@@ -238,11 +238,11 @@ Item {
                                                                                   delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("FontBold", delegateContainer.columnIndex) ?
                                                                                       delegateContainer.pTableDelegateContainer.cellDecorator.GetData("FontBold", delegateContainer.columnIndex) :
                                                                                       true: false;
-            color: delegateContainer.pTableDelegateContainer ?
-                       delegateContainer.pTableDelegateContainer.emptyDecorCell ? Style.textColor :
+            color: delegateContainer.pTableDelegateContainer && delegateContainer.pTableDelegateContainer.enabled ?
+                       (delegateContainer.pTableDelegateContainer.emptyDecorCell ? Style.textColor :
                                                                               delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("FontColor", delegateContainer.columnIndex) ?
                                                                                   delegateContainer.pTableDelegateContainer.cellDecorator.GetData("FontColor", delegateContainer.columnIndex) :
-                                                                                  Style.textColor : "transparent";
+                                                                                  Style.textColor) : Style.inactive_textColor;
             elide: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.elideMode : Text.ElideLeft;
             wrapMode: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.wrapMode : Text.NoWrap;
             onLinkActivated: {

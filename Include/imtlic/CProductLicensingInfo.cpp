@@ -67,6 +67,35 @@ void CProductLicensingInfo::SetCategoryId(const QByteArray& categoryId)
 	}
 }
 
+
+// reimplemented (imtlic::ILicenseDependenciesManager)
+
+void CProductLicensingInfo::SetLicenseDependencies(const QByteArray& licenseId, const QByteArrayList& dependentIds)
+{
+	istd::CChangeNotifier notifier(this);
+
+	if (dependentIds.isEmpty()){
+		m_dependencies.remove(licenseId);
+
+		return;
+	}
+
+	m_dependencies[licenseId] = dependentIds;
+}
+
+
+// reimplemented (imtlic::ILicenseDependenciesProvider)
+
+QByteArrayList CProductLicensingInfo::GetLicenseDependencies(const QByteArray& licenseId) const
+{
+	if (m_dependencies.contains(licenseId)){
+		return m_dependencies[licenseId];
+	}
+
+	return QByteArrayList();
+}
+
+
 // reimplemented (iprm::INameParam)
 
 const QString& CProductLicensingInfo::GetName() const

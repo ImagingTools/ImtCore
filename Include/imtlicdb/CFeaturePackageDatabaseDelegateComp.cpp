@@ -230,8 +230,6 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CFeaturePackageDatabaseDelegateCo
 			}
 		}
 
-		qDebug() << "retVal " << retVal.query;
-
 		return retVal;
 	}
 
@@ -432,8 +430,6 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 			}
 		}
 	}
-
-	qDebug() << "retVal " << retVal;
 
 	return retVal;
 }

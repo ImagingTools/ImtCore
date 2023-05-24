@@ -2,32 +2,47 @@ module imtqml
 ThumbnailDecorator 1.0 ThumbnailDecorator.qml
 
 AuthorizationPage 1.0 ./AuxComponents/AuthorizationPage.qml
+
 CollectionView 1.0 ./AuxComponents/CollectionView.qml
 CollectionViewBase 1.0 ./AuxComponents/CollectionViewBase.qml
 CollectionViewCommandsDelegateBase 1.0 ./AuxComponents/CollectionViewCommandsDelegateBase.qml
 CommandsProvider 1.0 ./AuxComponents/CommandsProvider.qml
 DocumentWorkspaceCommandsDelegate 1.0 ./AuxComponents/DocumentWorkspaceCommandsDelegate.qml
 DocumentWorkspaceCommandsDelegateBase 1.0 ./AuxComponents/DocumentWorkspaceCommandsDelegateBase.qml
-SaveCommandDelegate 1.0 ./AuxComponents/SaveCommandDelegate.qml
 MultiDocWorkspaceView 1.0 ./AuxComponents/MultiDocWorkspaceView.qml
-ComboBox 1.0 ./AuxComponents/ComboBox.qml
-CheckBox 1.0 ./AuxComponents/CheckBox.qml
+UndoRedo 1.0 ./AuxComponents/UndoRedo.qml
+DocumentBase 1.0 ./AuxComponents/DocumentBase.qml
+UndoRedoManager 1.0 ./AuxComponents/UndoRedoManager.qml
+DocumentViewBase 1.0 ./AuxComponents/DocumentViewBase.qml
+SettingsProvider 1.0 ./AuxComponents/SettingsProvider.qml
+MainDocumentManager 1.0 ./AuxComponents/MainDocumentManager.qml
+DocumentDataProvider 1.0 ./AuxComponents/DocumentDataProvider.qml
+DocumentObserver 1.0 ./AuxComponents/DocumentObserver.qml
+CommandsDelegateBase 1.0 ./AuxComponents/CommandsDelegateBase.qml
+DocumentCommandsDelegate 1.0 ./AuxComponents/DocumentCommandsDelegate.qml
+
 AuxTable 1.0 ./AuxComponents/AuxTable.qml
-FilterMenu 1.0 ./AuxComponents/FilterMenu.qml
 TableDelegate 1.0 ./AuxComponents/TableDelegate.qml
 TableCellDelegate 1.0 ./AuxComponents/TableCellDelegate.qml
+TableProperties 1.0 ./AuxComponents/TableProperties.qml
+TreeView 1.0 ./AuxComponents/TreeView.qml
 TreeDelegate 1.0 ./AuxComponents/TreeDelegate.qml
+TreeItemDelegate 1.0 ./AuxComponents/TreeItemDelegate.qml
+BasicTableView 1.0 ./AuxComponents/BasicTableView.qml
+BasicTreeView 1.0 ./AuxComponents/BasicTreeView.qml
+TableViewItemDelegateBase 1.0 ./AuxComponents/TableViewItemDelegateBase.qml
+TreeViewItemDelegateBase 1.0 ./AuxComponents/TreeViewItemDelegateBase.qml
+TreeViewSelection 1.0 ./AuxComponents/TreeViewSelection.qml
+
+ComboBox 1.0 ./AuxComponents/ComboBox.qml
+CheckBox 1.0 ./AuxComponents/CheckBox.qml
+FilterMenu 1.0 ./AuxComponents/FilterMenu.qml
 DatePicker 1.0 ./AuxComponents/DatePicker.qml
 AuxButton 1.0 ./AuxComponents/AuxButton.qml
 PreferenceButton 1.0 ./AuxComponents/PreferenceButton.qml
 TextButton 1.0 ./AuxComponents/TextButton.qml
 CustomTextField 1.0 ./AuxComponents/CustomTextField.qml
 CustomTextEdit 1.0 ./AuxComponents/CustomTextEdit.qml
-TreeView 1.0 ./AuxComponents/TreeView.qml
-TreeItemDelegate 1.0 ./AuxComponents/TreeItemDelegate.qml
-TreeViewEditor 1.0 ./AuxComponents/TreeViewEditor.qml
-TreeViewControllerBase 1.0 ./AuxComponents/TreeViewControllerBase.qml
-TableTreeViewEditor 1.0 ./AuxComponents/TableTreeViewEditor.qml
 Splitter 1.0 ./AuxComponents/Splitter.qml
 Calendar 1.0 ./AuxComponents/Calendar.qml
 Pagination 1.0 ./AuxComponents/Pagination.qml
@@ -38,9 +53,7 @@ ModelIndex 1.0 ./AuxComponents/ModelIndex.qml
 TopCenterPanel 1.0 ./AuxComponents/TopCenterPanel.qml
 TopLeftPanel 1.0 ./AuxComponents/TopLeftPanel.qml
 TopRightPanel 1.0 ./AuxComponents/TopRightPanel.qml
-UndoRedo 1.0 ./AuxComponents/UndoRedo.qml
-DocumentBase 1.0 ./AuxComponents/DocumentBase.qml
-UndoRedoManager 1.0 ./AuxComponents/UndoRedoManager.qml
+
 LoginButton 1.0 ./AuxComponents/LoginButton.qml
 PagesManager 1.0 ./AuxComponents/PagesManager.qml
 PreferencePage 1.0 ./AuxComponents/PreferencePage.qml
@@ -76,18 +89,6 @@ ModalDialogManager 1.0 ./AuxComponents/Dialogs/ModalDialogManager.qml
 TopPanelDialog 1.0 ./AuxComponents/Dialogs/TopPanelDialog.qml
 ButtonsDialog 1.0 ./AuxComponents/Dialogs/ButtonsDialog.qml
 PopupMenuDialogGql 1.0 ./AuxComponents/Dialogs/PopupMenuDialogGql.qml
-
-DocumentViewBase 1.0 ./AuxComponents/DocumentViewBase.qml
-SettingsProvider 1.0 ./AuxComponents/SettingsProvider.qml
-MainDocumentManager 1.0 ./AuxComponents/MainDocumentManager.qml
-
-DocumentDataProvider 1.0 ./AuxComponents/DocumentDataProvider.qml
-
-BasicTableView 1.0 ./AuxComponents/BasicTableView.qml
-BasicTreeView 1.0 ./AuxComponents/BasicTreeView.qml
-TableViewItemDelegateBase 1.0 ./AuxComponents/TableViewItemDelegateBase.qml
-TreeViewItemDelegateBase 1.0 ./AuxComponents/TreeViewItemDelegateBase.qml
-TreeViewSelection 1.0 ./AuxComponents/TreeViewSelection.qml
 TabPanel 1.0 ./AuxComponents/TabPanel.qml
 DesignSchemaProvider 1.0 ./AuxComponents/DesignSchemaProvider.qml
 LanguageProvider 1.0 ./AuxComponents/LanguageProvider.qml
@@ -95,12 +96,6 @@ LanguageProvider 1.0 ./AuxComponents/LanguageProvider.qml
 GqlDocumentDataController 1.0 ./AuxComponents/GqlDocumentDataController.qml
 ServerSettingsModelObserver 1.0 ./AuxComponents/ServerSettingsModelObserver.qml
 LocalSettingsModelObserver 1.0 ./AuxComponents/LocalSettingsModelObserver.qml
-TreeItemModelObserver 1.0 ./AuxComponents/TreeItemModelObserver.qml
-TreeItemModelConverter 1.0 ./AuxComponents/TreeItemModelConverter.qml
-DocumentObserver 1.0 ./AuxComponents/DocumentObserver.qml
-
-CommandsDelegateBase 1.0 ./AuxComponents/CommandsDelegateBase.qml
-DocumentCommandsDelegate 1.0 ./AuxComponents/DocumentCommandsDelegate.qml
 
 SimpleCommandsDecorator 1.0 ./AuxComponents/SimpleCommandsDecorator.qml
 CollectionDataProvider 1.0 ./AuxComponents/CollectionDataProvider.qml
@@ -110,3 +105,5 @@ Loading 1.0 ./AuxComponents/Loading.qml
 StateMachine 1.0 ./AuxComponents/StateMachine.qml
 
 TreeViewModelAdapter 1.0 ./AuxComponents/TreeViewModelAdapter.qml
+TreeItemModelObserver 1.0 ./AuxComponents/TreeItemModelObserver.qml
+TreeItemModelConverter 1.0 ./AuxComponents/TreeItemModelConverter.qml

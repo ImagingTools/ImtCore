@@ -63,12 +63,12 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CTestDatabaseDelegateComp::Create
 	if (typeId.isEmpty() || typeId != "TestInfo"){
 		return NewObjectQuery();
 	}
-	QByteArray testId;
+	QByteArray testId = proposedObjectId;
 	if (!proposedObjectId.isEmpty()){
 		QByteArray checkExistQuery = GetSelectionQuery(proposedObjectId);
 		QSqlError sqlError;
 		QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(checkExistQuery, &sqlError);
-		if (sqlError.type() == QSqlError::NoError && !sqlQuery.first()){
+		if (sqlError.type() == QSqlError::NoError && sqlQuery.size() == 0){
 			testId = proposedObjectId;
 		}
 		else{

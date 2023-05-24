@@ -3,7 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 
 DocumentBase {
-    id: container;
+    id: packageViewRoot;
 
     commandsDelegateSourceComp: packageViewCommandsDelegate;
     Component {
@@ -16,44 +16,44 @@ DocumentBase {
     property int packageIndex: -1;
     property TreeItemModel featuresModel: TreeItemModel {
         Component.onCompleted: {
-            container.featuresModel.dataChanged.connect(container.syncronise);
-            container.featuresModel.dataChanged.connect(container.onFeatureModelChanged);
+            packageViewRoot.featuresModel.dataChanged.connect(packageViewRoot.syncronise);
+            packageViewRoot.featuresModel.dataChanged.connect(packageViewRoot.onFeatureModelChanged);
         }
     }
 
     property TreeItemModel treeViewModel: TreeItemModel {}
     property TreeItemModel headersModel: TreeItemModel {
         Component.onCompleted: {
-            let index = container.headersModel.InsertNewItem();
-            container.headersModel.SetData("Id", "Name", index);
-            container.headersModel.SetData("Name", "Feature Name", index);
+            let index = packageViewRoot.headersModel.InsertNewItem();
+            packageViewRoot.headersModel.SetData("Id", "Name", index);
+            packageViewRoot.headersModel.SetData("Name", "Feature Name", index);
 
-            index = container.headersModel.InsertNewItem();
-            container.headersModel.SetData("Id", "Id", index);
-            container.headersModel.SetData("Name", "Feature-ID", index);
+            index = packageViewRoot.headersModel.InsertNewItem();
+            packageViewRoot.headersModel.SetData("Id", "Id", index);
+            packageViewRoot.headersModel.SetData("Name", "Feature-ID", index);
 
-            index = container.headersModel.InsertNewItem();
-            container.headersModel.SetData("Id", "Description", index);
-            container.headersModel.SetData("Name", "Description", index);
+            index = packageViewRoot.headersModel.InsertNewItem();
+            packageViewRoot.headersModel.SetData("Id", "Description", index);
+            packageViewRoot.headersModel.SetData("Name", "Description", index);
 
-            index = container.headersModel.InsertNewItem();
-            container.headersModel.SetData("Id", "Optional", index);
-            container.headersModel.SetData("Name", "Optional", index);
+            index = packageViewRoot.headersModel.InsertNewItem();
+            packageViewRoot.headersModel.SetData("Id", "Optional", index);
+            packageViewRoot.headersModel.SetData("Name", "Optional", index);
         }
     }
 
     Component.onCompleted: {
         commandsDelegate.tableTreeViewEditor = tableView;
-        featuresProvider.onModelChanged.connect(container.updateTreeViewModel);
+        featuresProvider.onModelChanged.connect(packageViewRoot.updateTreeViewModel);
     }
 
     Component.onDestruction: {
-        featuresProvider.onModelChanged.disconnect(container.updateTreeViewModel);
+        featuresProvider.onModelChanged.disconnect(packageViewRoot.updateTreeViewModel);
     }
 
     onCommandsIdChanged: {
-        if (container.itemId === ""){
-            container.commandsProvider.setCommandIsEnabled("Save", true);
+        if (packageViewRoot.itemId === ""){
+            packageViewRoot.commandsProvider.setCommandIsEnabled("Save", true);
         }
     }
 
@@ -62,49 +62,49 @@ DocumentBase {
     }
 
     onFeaturesModelChanged: {
-        container.featuresModel.dataChanged.connect(container.syncronise);
-        container.featuresModel.dataChanged.connect(container.onFeatureModelChanged);
+        packageViewRoot.featuresModel.dataChanged.connect(packageViewRoot.syncronise);
+        packageViewRoot.featuresModel.dataChanged.connect(packageViewRoot.onFeatureModelChanged);
     }
 
     onModelIsReadyChanged: {
-        if (container.modelIsReady){
-            container.blockUpdatingModel = true;
+        if (packageViewRoot.modelIsReady){
+            packageViewRoot.blockUpdatingModel = true;
 
-            if (!container.documentModel.ContainsKey("Items")){
-                container.documentModel.AddTreeModel("Items")
+            if (!packageViewRoot.documentModel.ContainsKey("Items")){
+                packageViewRoot.documentModel.AddTreeModel("Items")
             }
 
-            if (!container.documentModel.ContainsKey("DependenciesModel")){
-                container.documentModel.AddTreeModel("DependenciesModel")
+            if (!packageViewRoot.documentModel.ContainsKey("DependenciesModel")){
+                packageViewRoot.documentModel.AddTreeModel("DependenciesModel")
             }
 
-            tableView.columnModel = container.headersModel;
+            tableView.columnModel = packageViewRoot.headersModel;
 
-            tableView.rowModel = container.featuresModel;
-            tableView.rowModel.dataChanged.connect(container.syncronise);
-            container.updateTreeViewModel();
-            container.updateGui();
+            tableView.rowModel = packageViewRoot.featuresModel;
+            tableView.rowModel.dataChanged.connect(packageViewRoot.syncronise);
+            packageViewRoot.updateTreeViewModel();
+            packageViewRoot.updateGui();
 
-            container.blockUpdatingModel = false;
-            undoRedoManager.registerModel(container.documentModel);
+            packageViewRoot.blockUpdatingModel = false;
+            undoRedoManager.registerModel(packageViewRoot.documentModel);
         }
     }
 
     onWidthChanged: {
-        if (container.width > 0 && container.width - rightPanel.width > 250){
-            splitter.x = container.width - rightPanel.width;
+        if (packageViewRoot.width > 0 && packageViewRoot.width - rightPanel.width > 250){
+            splitter.x = packageViewRoot.width - rightPanel.width;
         }
     }
 
     UndoRedoManager {
         id: undoRedoManager;
-        documentBase: container;
+        documentBase: packageViewRoot;
         onModelStateChanged: {
             console.log("onModelStateChanged");
 
             undoRedoManager.modelIsRegistered = false;
-            container.updateGui();
-            container.syncronise();
+            packageViewRoot.updateGui();
+            packageViewRoot.syncronise();
             undoRedoManager.modelIsRegistered = true;
         }
     }
@@ -115,21 +115,21 @@ DocumentBase {
 
     function onFeatureModelChanged(){
         console.log("onFeatureModelChanged");
-        container.updateModel();
+        packageViewRoot.updateModel();
     }
 
     //Обновить модель для TreeView
     function updateTreeViewModel(){
         console.log("updateTreeViewModel");
 
-        container.treeViewModel.Copy(featuresProvider.model);
-        treeView.rowModel = container.treeViewModel;
-        container.treeViewModel.Refresh();
+        packageViewRoot.treeViewModel.Copy(featuresProvider.model);
+        treeView.rowModel = packageViewRoot.treeViewModel;
+        packageViewRoot.treeViewModel.Refresh();
 
         for (let i = 0; i < treeView.rowModel.GetItemsCount(); i++){
             let id =  treeView.rowModel.GetData("Id", i);
-            if (container.itemId === id){
-                container.packageIndex = i;
+            if (packageViewRoot.itemId === id){
+                packageViewRoot.packageIndex = i;
                 break;
             }
         }
@@ -151,7 +151,7 @@ DocumentBase {
                 let data = model2.GetData(key, i);
                 if (typeof data  == 'object'){
                     let childModel = model1.AddTreeModel(key, i);
-                    container.copyFrom(childModel, data);
+                    packageViewRoot.copyFrom(childModel, data);
                 }
                 else{
                     model1.SetData(key, data, i);
@@ -164,29 +164,29 @@ DocumentBase {
     function syncronise(){
         console.log("syncronise");
 
-        let items = container.documentModel.GetData("Items");
-        if (container.packageIndex >= 0){
-            let childModel = treeView.rowModel.AddTreeModel("ChildModel", container.packageIndex);
-            container.copyFrom(childModel, items)
+        let items = packageViewRoot.documentModel.GetData("Items");
+        if (packageViewRoot.packageIndex >= 0){
+            let childModel = treeView.rowModel.AddTreeModel("ChildModel", packageViewRoot.packageIndex);
+            packageViewRoot.copyFrom(childModel, items)
             childModel.Refresh();
         }
 
         rightPanel.updateTreeViewGui();
 
-        container.updateModel();
+        packageViewRoot.updateModel();
 
         console.log("end syncronise");
     }
 
     function updateGui(){
         console.log("updateGui");
-//        container.blockUpdatingModel = true;
+//        packageViewRoot.blockUpdatingModel = true;
 
-        if (container.documentModel.ContainsKey("Items")){
-            container.featuresModel = container.documentModel.GetData("Items");
+        if (packageViewRoot.documentModel.ContainsKey("Items")){
+            packageViewRoot.featuresModel = packageViewRoot.documentModel.GetData("Items");
         }
 
-        tableView.rowModel = container.featuresModel;
+        tableView.rowModel = packageViewRoot.featuresModel;
 
         tableView.rowModel.Refresh();
 
@@ -194,7 +194,7 @@ DocumentBase {
 
         rightPanel.updateTreeViewGui();
 
-//        container.blockUpdatingModel = false;
+//        packageViewRoot.blockUpdatingModel = false;
         console.log("end updateGui");
 
     }
@@ -204,15 +204,15 @@ DocumentBase {
 
         undoRedoManager.beginChanges();
 
-        container.documentModel.SetData("Id", container.itemId);
-        container.documentModel.SetData("Name", container.itemName);
+        packageViewRoot.documentModel.SetData("Id", packageViewRoot.itemId);
+        packageViewRoot.documentModel.SetData("Name", packageViewRoot.itemName);
 
-        if (!container.documentModel.ContainsKey("Items")){
-            container.featuresModel = container.documentModel.AddTreeModel("Items")
+        if (!packageViewRoot.documentModel.ContainsKey("Items")){
+            packageViewRoot.featuresModel = packageViewRoot.documentModel.AddTreeModel("Items")
         }
 
-        if (!container.documentModel.ContainsKey("DependenciesModel")){
-            container.documentModel.AddTreeModel("DependenciesModel")
+        if (!packageViewRoot.documentModel.ContainsKey("DependenciesModel")){
+            packageViewRoot.documentModel.AddTreeModel("DependenciesModel")
         }
 
         undoRedoManager.endChanges();
@@ -225,10 +225,10 @@ DocumentBase {
 
         undoRedoManager.beginChanges();
 
-        let dependenciesModel = container.documentModel.GetData("DependenciesModel");
+        let dependenciesModel = packageViewRoot.documentModel.GetData("DependenciesModel");
 
         if (!dependenciesModel){
-            dependenciesModel = container.documentModel.AddTreeModel("DependenciesModel");
+            dependenciesModel = packageViewRoot.documentModel.AddTreeModel("DependenciesModel");
         }
 
         let selectedId = tableView.selectedIndex.itemData.Id;
@@ -305,11 +305,11 @@ DocumentBase {
         rowDelegate: Component { PackageViewItemDelegate { root: tableView; } }
 
         function openFeatureErrorDialog(message){
-            container.documentManager.openErrorDialog(message);
+            packageViewRoot.documentManager.openErrorDialog(message);
         }
 
         function canRename(id){
-            if (container.featureHasDependencies(id)){
+            if (packageViewRoot.featureHasDependencies(id)){
                 return false;
             }
 
@@ -334,7 +334,7 @@ DocumentBase {
     function featureHasDependencies(featureId){
         console.log("featureHasDependencies", featureId);
 
-        let dependenciesModel = container.documentModel.GetData("DependenciesModel");
+        let dependenciesModel = packageViewRoot.documentModel.GetData("DependenciesModel");
         if (dependenciesModel){
             if (dependenciesModel.ContainsKey(featureId)){
                 return true;
@@ -361,20 +361,20 @@ DocumentBase {
 
     Splitter {
         id: splitter;
-        x: container.width - 250;
+        x: packageViewRoot.width - 250;
 
         height: parent.height;
         width: 4;
 
         onXChanged: {
-            if (!container.visible){
+            if (!packageViewRoot.visible){
                 return;
             }
 
             if (splitter.x <= 250){
                 splitter.x = 250;
-            } else if (splitter.x > container.width - titleHeader.width){
-                splitter.x = container.width - splitter.width;
+            } else if (splitter.x > packageViewRoot.width - titleHeader.width){
+                splitter.x = packageViewRoot.width - splitter.width;
             }
         }
     }
@@ -386,7 +386,7 @@ DocumentBase {
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
 
-        width: container.width > 0 ? container.width - tableView.width : 250;
+        width: packageViewRoot.width > 0 ? packageViewRoot.width - tableView.width : 250;
 
         Rectangle {
             id: headerTreeView;
@@ -448,7 +448,7 @@ DocumentBase {
             //Список основных зависящих фич для selectedId
             let dependenciesList = []
 
-            let dependenciesModel = container.documentModel.GetData("DependenciesModel");
+            let dependenciesModel = packageViewRoot.documentModel.GetData("DependenciesModel");
             if (dependenciesModel && dependenciesModel.ContainsKey(selectedId)){
                 let dependencies = dependenciesModel.GetData(selectedId);
                 if (dependencies !== ""){
@@ -462,7 +462,7 @@ DocumentBase {
                 let itemData = delegateItem.getItemData();
                 let itemId = itemData.Id;
 
-                if (container.isPackage(itemId) && delegateItem.level === 0){
+                if (packageViewRoot.isPackage(itemId) && delegateItem.level === 0){
                     delegateItem.isCheckable = false;
 
                     continue
@@ -506,7 +506,7 @@ DocumentBase {
         }
 
         function findParentFeatureDependencies(featureId, retVal){
-            let dependenciesModel = container.documentModel.GetData("DependenciesModel");
+            let dependenciesModel = packageViewRoot.documentModel.GetData("DependenciesModel");
 
             if (!dependenciesModel){
                 return;
@@ -529,7 +529,7 @@ DocumentBase {
         }
 
         function findChildrenFeatureDependencies(featureId, retVal){
-            let dependenciesModel = container.documentModel.GetData("DependenciesModel");
+            let dependenciesModel = packageViewRoot.documentModel.GetData("DependenciesModel");
 
             if (!dependenciesModel){
                 return;
@@ -568,7 +568,7 @@ DocumentBase {
 
             text: qsTr("Please save package first");
 
-            visible: container.itemId === "";
+            visible: packageViewRoot.itemId === "";
         }
 
         BasicTreeView {
@@ -579,7 +579,6 @@ DocumentBase {
             anchors.left: parent.left;
             anchors.right: parent.right;
             anchors.rightMargin: 5;
-//            width: parent.width;
 
             clip: true;
 
@@ -602,12 +601,12 @@ DocumentBase {
                 root: treeView;
 
                 onCheckStateChanged: {
-                    console.log("onCheckStateChanged");
+                    console.log("onCheckStateChanged", packageViewRoot);
                     if (tableView.selectedIndex != null){
                         if (!treeView.delegateUpdatingBlock){
 
                             if (delegate.itemData.Id !== ""){
-                                container.updateDependenciesModel(delegate.itemData.Id, delegate.checkState);
+                                packageViewRoot.updateDependenciesModel(delegate.itemData.Id, delegate.checkState);
                                 rightPanel.updateTreeViewGui();
                             }
                         }
@@ -619,7 +618,7 @@ DocumentBase {
         function selectedIndexChanged(){
             console.log("selectedIndexChanged", tableView.selectedIndex);
 
-            let result = tableView.selectedIndex != null && tableView.selectedIndex.itemData.Id !== "" && container.itemId !== "";
+            let result = tableView.selectedIndex != null && tableView.selectedIndex.itemData.Id !== "" && packageViewRoot.itemId !== "";
             treeView.visible = result;
             if (result){
                 rightPanel.updateTreeViewGui();

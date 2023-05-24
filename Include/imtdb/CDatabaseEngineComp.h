@@ -12,6 +12,7 @@
 // ImtCore includes
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtdb/IDatabaseEngine.h>
+#include <imtdb/IDatabaseServerConnectionChecker.h>
 #include <imtdb/CDatabaseAccessSettings.h>
 
 
@@ -29,13 +30,15 @@ public:
 
 class CDatabaseEngineComp:
 			virtual public CDatabaseEngineAttr,
-			virtual public IDatabaseEngine
+			virtual public IDatabaseEngine,
+			virtual public IDatabaseServerConnectionChecker
 {
 public:
 	typedef CDatabaseEngineAttr BaseClass;
 
 	I_BEGIN_COMPONENT(CDatabaseEngineComp);
 		I_REGISTER_INTERFACE(IDatabaseEngine)
+		I_REGISTER_INTERFACE(IDatabaseServerConnectionChecker)
 		I_REGISTER_SUBELEMENT(DatabaseAccessSettings);
 		I_REGISTER_SUBELEMENT_INTERFACE(DatabaseAccessSettings, imtdb::IDatabaseLoginSettings, ExtractDatabaseAccessSettings);
 		I_REGISTER_SUBELEMENT_INTERFACE(DatabaseAccessSettings, istd::IChangeable, ExtractDatabaseAccessSettings);
@@ -64,6 +67,9 @@ public:
 	virtual QSqlQuery ExecSqlQueryFromFile(const QString& filePath, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
 	virtual QSqlQuery ExecSqlQueryFromFile(const QString& filePath, const QVariantMap& bindValues, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
 
+	// reimplemented (IDatabaseServerConnectionChecker)
+	virtual bool IsDatabaseServerConnected() const override;
+
 	static void DrectBindValue(QByteArray* string, const QByteArray& what, const QByteArray& expr);
 	static void DrectBindValueInsertDefault(QByteArray* string, const QByteArray& what);
 	static void DrectBindValueUpdateDefault(QByteArray* string, const QByteArray& what);
@@ -90,11 +96,6 @@ private:
 	bool EnsureDatabaseConnected(QSqlError* sqlError = nullptr) const;
 
 	bool EnsureDatabaseCreated() const;
-
-	/**
-		Check if the database server is connected.
-	*/
-	bool IsDatabaseServerConnected() const;
 
 	QString GetDatabaseName() const;
 	QString GetHostName() const;

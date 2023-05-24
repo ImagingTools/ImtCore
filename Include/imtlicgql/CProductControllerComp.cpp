@@ -2,7 +2,7 @@
 
 // ImtCore includes
 #include <imtlic/CLicenseInfo.h>
-#include <imtlic/IProductLicensingInfo.h>
+#include <imtlic/CProductLicensingInfo.h>
 #include <imtlic/IFeatureInfo.h>
 #include <imtbase/ICollectionInfo.h>
 
@@ -77,6 +77,11 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 			return nullptr;
 		}
 
+		imtlic::CProductLicensingInfo* productLicensingInfoPtr = dynamic_cast<imtlic::CProductLicensingInfo*>(productPtr.GetPtr());
+		if (productLicensingInfoPtr == nullptr){
+			return nullptr;
+		}
+
 		imtbase::IObjectCollection* licenseCollectionPtr = dynamic_cast<imtbase::IObjectCollection*>(productPtr.GetPtr());
 		if (licenseCollectionPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get an license collection");
@@ -115,6 +120,20 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 		imtbase::CTreeItemModel *featuresModel = nullptr;
 		if (itemModel.ContainsKey("Features")){
 			featuresModel = itemModel.GetTreeItemModel("Features");
+		}
+
+		if (itemModel.ContainsKey("Dependencies")){
+			imtbase::CTreeItemModel* dependenciesModelPtr = featuresModel = itemModel.GetTreeItemModel("Dependencies");
+			if (dependenciesModelPtr != nullptr){
+				QStringList keys = dependenciesModelPtr->GetKeys();
+				for (const QString& key : keys){
+					QByteArray depends = dependenciesModelPtr->GetData(key.toUtf8()).toByteArray();
+					QByteArrayList dependsIDs = depends.split(';');
+					if (!dependsIDs.isEmpty()){
+						productLicensingInfoPtr->SetLicenseDependencies(key.toUtf8(), dependsIDs);
+					}
+				}
+			}
 		}
 
 		if (licenses != nullptr){
@@ -207,10 +226,16 @@ imtbase::CTreeItemModel* CProductControllerComp::GetObject(const imtgql::CGqlReq
 
 	imtbase::CTreeItemModel* licensesModelPtr = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* featuresModelPtr = dataModel->AddTreeModel("Features");
+	imtbase::CTreeItemModel* dependenciesModelPtr = dataModel->AddTreeModel("Dependencies");
 
 	if (m_objectCollectionCompPtr->GetObjectData(productId, dataPtr)){
 		const imtlic::IProductLicensingInfo* productPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());
 		if (productPtr != nullptr){
+			const imtlic::CProductLicensingInfo* productLicensingInfoPtr = dynamic_cast<const imtlic::CProductLicensingInfo*>(productPtr);
+			if (productLicensingInfoPtr == nullptr){
+				return nullptr;
+			}
+
 			QByteArray categoryId = productPtr->GetCategoryId();
 			dataModel->SetData("CategoryId", categoryId);
 
@@ -236,8 +261,12 @@ imtbase::CTreeItemModel* CProductControllerComp::GetObject(const imtgql::CGqlReq
 				QString description = licenseList.GetElementInfo(licenseId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 				licensesModelPtr->SetData("Description", description, index);
 
-				imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
+				QByteArrayList dependentIds = productLicensingInfoPtr->GetLicenseDependencies(licenseId);
+				if (!dependentIds.isEmpty()){
+					dependenciesModelPtr->SetData(licenseId, dependentIds.join(';'));
+				}
 
+				imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
 				imtbase::CTreeItemModel* featureModelPtr = nullptr;
 				if (!featureInfos.empty()){
 					featureModelPtr = featuresModelPtr->AddTreeModel(licenseId);

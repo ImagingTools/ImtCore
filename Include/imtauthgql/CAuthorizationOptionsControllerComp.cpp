@@ -21,20 +21,17 @@ imtbase::CTreeItemModel* CAuthorizationOptionsControllerComp::CreateRepresentati
 		imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->GetTreeItemModel("data");
 		Q_ASSERT(dataModelPtr != nullptr);
 		if (dataModelPtr != nullptr){
-			if (dataModelPtr->ContainsKey("UserMode")){
-				imtbase::CTreeItemModel* userModePtr = dataModelPtr->GetTreeItemModel("UserMode");
-				if (userModePtr != nullptr){
-					QByteArray value = userModePtr->GetData("Value").toByteArray();
-					if (value != "NO_USER_MANAGEMENT"){
-						if (m_superuserProviderCompPtr.IsValid()){
-							imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->GetTreeItemModel("data");
-							Q_ASSERT(dataModelPtr != nullptr);
-
-							bool superuserExists = m_superuserProviderCompPtr->SuperuserExists();
-							dataModelPtr->SetData("SuperUserExists", superuserExists);
-						}
-					}
+			QByteArray value = dataModelPtr->GetData("Value").toByteArray();
+			if (value != "NO_USER_MANAGEMENT"){
+				if (m_superuserProviderCompPtr.IsValid()){
+					bool superuserExists = m_superuserProviderCompPtr->SuperuserExists();
+					dataModelPtr->SetData("SuperUserExists", superuserExists);
 				}
+			}
+
+			if (m_databaseServerConnectionChekerCompPtr.IsValid()){
+				bool isConnected = m_databaseServerConnectionChekerCompPtr->IsDatabaseServerConnected();
+				dataModelPtr->SetData("DatabaseConnectionState", isConnected);
 			}
 		}
 	}

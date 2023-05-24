@@ -1,13 +1,13 @@
 #include <imtlicdb/CProductsDatabaseDelegateComp.h>
 
+
 // ACF includes
 #include <imod/TModelWrap.h>
 
 // ImtCore includes
-#include <imtlic/IFeaturePackage.h>
 #include <imtlic/CLicenseInfo.h>
 #include <imtlic/CProductLicensingMetaInfo.h>
-#include <imtlic/CFeaturePackageCollectionUtility.h>
+#include <imtlic/CProductLicensingInfo.h>
 
 
 namespace imtlicdb
@@ -30,6 +30,11 @@ istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(const Q
 
 	istd::TDelPtr<imtlic::IProductLicensingInfo> productPtr = m_productFactCompPtr.CreateInstance();
 	if (!productPtr.IsValid()){
+		return nullptr;
+	}
+
+	imtlic::CProductLicensingInfo* productLicensingInfoPtr = dynamic_cast<imtlic::CProductLicensingInfo*>(productPtr.GetPtr());
+	if (productLicensingInfoPtr == nullptr){
 		return nullptr;
 	}
 
@@ -87,14 +92,11 @@ istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(const Q
 		licenseInfoPtr->SetLicenseId(licenseId);
 
 		QByteArray selectLicenseFeatures = QString("SELECT * FROM \"ProductLicenseFeatures\" WHERE \"LicenseId\" = '%1'").arg(qPrintable(licenseId)).toUtf8();
-
 		QSqlQuery licenseFeatureQuery = m_databaseEngineCompPtr->ExecSqlQuery(selectLicenseFeatures, &error);
 
 		imtlic::ILicenseInfo::FeatureInfos featureInfos;
-
 		while (licenseFeatureQuery.next()){
 			QSqlRecord licenseFeatureRecord = licenseFeatureQuery.record();
-
 			imtlic::ILicenseInfo::FeatureInfo featureInfo;
 
 			QByteArray featureId, packageId;
@@ -117,6 +119,24 @@ istd::IChangeable* CProductsDatabaseDelegateComp::CreateObjectFromRecord(const Q
 
 		licenseInfoPtr->SetFeatureInfos(featureInfos);
 
+		QByteArray dependenciesQuery = QString("SELECT \"DependencyId\" FROM \"LicenseDependencies\" WHERE \"LicenseId\" = '%1'").arg(qPrintable(licenseId)).toUtf8();
+		QSqlQuery dependenciesSqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(dependenciesQuery, &error);
+
+		QByteArrayList licenseDependencies;
+		while (dependenciesSqlQuery.next()){
+			QSqlRecord depFeatureRecord = dependenciesSqlQuery.record();
+			QByteArray dependLicenseId;
+			if (depFeatureRecord.contains("DependencyId")){
+				dependLicenseId = depFeatureRecord.value("DependencyId").toByteArray();
+			}
+
+			licenseDependencies.append(dependLicenseId);
+		}
+
+		if (!licenseDependencies.isEmpty()){
+			productLicensingInfoPtr->SetLicenseDependencies(licenseId, licenseDependencies);
+		}
+
 		licenseCollectionPtr->InsertNewObject(imtlic::CLicenseInfo::GetTypeId(), licenseName, description, licenseInfoPtr.GetPtr(), licenseId);
 	}
 
@@ -131,7 +151,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::Cr
 			const QString& objectDescription,
 			const istd::IChangeable* valuePtr) const
 {
-	const imtlic::IProductLicensingInfo* productPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(valuePtr);
+	const imtlic::CProductLicensingInfo* productPtr = dynamic_cast<const imtlic::CProductLicensingInfo*>(valuePtr);
 	if (productPtr == nullptr){
 		return NewObjectQuery();
 	}
@@ -184,7 +204,22 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::Cr
 							.arg(qPrintable(licenseId))
 							.arg(qPrintable(featureInfo.id))
 							.toLocal8Bit();
+			}
+		}
+	}
 
+	for (const QByteArray& collectionId : licenseIds){
+		const imtlic::ILicenseInfo* licenseInfoPtr = productPtr->GetLicenseInfo(collectionId);
+		if (licenseInfoPtr != nullptr){
+			QByteArray licenseId = licenseInfoPtr->GetLicenseId();
+
+			QByteArrayList licenseDependencies = productPtr->GetLicenseDependencies(licenseId);
+			for (const QByteArray& dependentId : licenseDependencies){
+				retVal.query += "\n" +
+							QString("INSERT INTO \"LicenseDependencies\" (\"LicenseId\", \"DependencyId\") VALUES('%1', '%2');")
+							.arg(qPrintable(licenseId))
+							.arg(qPrintable(dependentId))
+							.toLocal8Bit();
 			}
 		}
 	}
@@ -225,7 +260,12 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const ContextDescription& /*description*/,
 			bool /*useExternDelegate*/) const
 {
-	const imtlic::IProductLicensingInfo* newProductPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(&object);
+//	const imtlic::IProductLicensingInfo* newProductPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(&object);
+//	if (newProductPtr == nullptr){
+//		return QByteArray();
+//	}
+
+	const imtlic::CProductLicensingInfo* newProductPtr = dynamic_cast<const imtlic::CProductLicensingInfo*>(&object);
 	if (newProductPtr == nullptr){
 		return QByteArray();
 	}
@@ -288,6 +328,14 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 							.arg(qPrintable(featureInfo.id))
 							.toLocal8Bit();
 			}
+//			QByteArrayList licenseDependencies = newProductPtr->GetLicenseDependencies(licenseId);
+//			for (const QByteArray& dependentId : licenseDependencies){
+//				retVal += "\n" +
+//							QString("INSERT INTO \"LicenseDependencies\" (\"LicenseId\", \"DependencyId\") VALUES('%1', '%2');")
+//							.arg(qPrintable(licenseId))
+//							.arg(qPrintable(dependentId))
+//							.toLocal8Bit();
+//			}
 		}
 	}
 
@@ -349,6 +397,29 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 		}
 	}
 
+	const imtbase::ICollectionInfo& licenseList = newProductPtr->GetLicenseList();
+	const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = licenseList.GetElementIds();
+
+	for ( const QByteArray& licenseId : licenseCollectionIds){
+		const imtlic::ILicenseInfo* licenseInfoPtr = newProductPtr->GetLicenseInfo(licenseId);
+		if (licenseInfoPtr != nullptr){
+			QByteArray licenseId = licenseInfoPtr->GetLicenseId();
+			QByteArrayList dependsIds = newProductPtr->GetLicenseDependencies(licenseId);
+
+			retVal += "\n" +
+					QString("DELETE FROM \"LicenseDependencies\" WHERE \"LicenseId\" = '%1';")
+					.arg(qPrintable(licenseId))
+					.toLocal8Bit();
+
+			for (const QByteArray& dependLicenseId : dependsIds){
+				retVal += "\n" +
+						QString("INSERT INTO \"LicenseDependencies\" (\"LicenseId\", \"DependencyId\") VALUES('%1', '%2');")
+						.arg(qPrintable(licenseId))
+						.arg(qPrintable(dependLicenseId))
+						.toLocal8Bit();
+			}
+		}
+	}
 	return retVal;
 }
 
@@ -430,6 +501,7 @@ bool CProductsDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord
 
 	return false;
 }
+
 
 // protected methods
 

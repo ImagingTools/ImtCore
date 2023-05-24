@@ -14,6 +14,7 @@
         <file alias="imtgui/AuxComponents/MenuPanelButton.qml">Qml/imtgui/AuxComponents/MenuPanelButton.qml</file>
         <file alias="imtgui/AuxComponents/TopButton.qml">Qml/imtgui/AuxComponents/TopButton.qml</file>
         <file alias="imtgui/AuxComponents/AuxTable.qml">Qml/imtgui/AuxComponents/AuxTable.qml</file>
+	<file alias="imtgui/AuxComponents/TableProperties.qml">Qml/imtgui/AuxComponents/TableProperties.qml</file>
         <file alias="imtgui/AuxComponents/TabPanel.qml">Qml/imtgui/AuxComponents/TabPanel.qml</file>
         <file alias="imtgui/AuxComponents/TableDelegate.qml">Qml/imtgui/AuxComponents/TableDelegate.qml</file>
         <file alias="imtgui/AuxComponents/TableCellDelegate.qml">Qml/imtgui/AuxComponents/TableCellDelegate.qml</file>

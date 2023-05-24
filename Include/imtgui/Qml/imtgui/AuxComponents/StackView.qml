@@ -45,28 +45,6 @@ Item {
 
         model: pagesModel;
 
-//        delegate: Item {
-//            id: dialogDelegate;
-
-//            anchors.fill: repeaterView;
-//            Loader {
-//                id: dialogLoader;
-
-//                anchors.fill: parent;
-
-//                source: model.Source;
-
-//                onLoaded: {
-//                    let object = pagesModel.get(model.index);
-//                    dialogLoader.item.documentsData = model.documentsData;
-//                    dialogLoader.item.documentManager = model.documentManager;
-//                    dialogLoader.item.itemId = model.Id;
-//                    dialogLoader.item.commandsId = model.CommandsId;
-//                    dialogLoader.item.forceActiveFocus();
-//                }
-//            }
-//        }
-
         delegate: Loader {
             id: dialogLoader;
 

@@ -142,6 +142,25 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQueryFromFile(const QString& filePath, con
 }
 
 
+// reimplemented (IDatabaseServerConnectionChecker)
+
+bool CDatabaseEngineComp::IsDatabaseServerConnected() const
+{
+	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, *m_maintenanceDatabaseNameAttrPtr);
+	maintainanceDb.setHostName(GetHostName());
+	maintainanceDb.setUserName(GetUserName());
+	maintainanceDb.setPassword(GetPassword());
+	maintainanceDb.setDatabaseName(*m_maintenanceDatabaseNameAttrPtr);
+	maintainanceDb.setPort(GetPort());
+
+	bool isConnected = maintainanceDb.open();
+
+	maintainanceDb.close();
+
+	return isConnected;
+}
+
+
 void CDatabaseEngineComp::DrectBindValue(QByteArray* string, const QByteArray& what, const QByteArray& expr)
 {
 	QRegularExpression regExp(what);
@@ -472,23 +491,6 @@ QString CDatabaseEngineComp::GetConnectionName() const
 	qptrdiff threadId = (qptrdiff)QThread::currentThreadId();
 
 	return GetDatabaseName() + QString(" - %1").arg(threadId);
-}
-
-
-bool CDatabaseEngineComp::IsDatabaseServerConnected() const
-{
-	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, *m_maintenanceDatabaseNameAttrPtr);
-	maintainanceDb.setHostName(GetHostName());
-	maintainanceDb.setUserName(GetUserName());
-	maintainanceDb.setPassword(GetPassword());
-	maintainanceDb.setDatabaseName(*m_maintenanceDatabaseNameAttrPtr);
-	maintainanceDb.setPort(GetPort());
-
-	bool isConnected = maintainanceDb.open();
-
-	maintainanceDb.close();
-
-	return isConnected;
 }
 
 

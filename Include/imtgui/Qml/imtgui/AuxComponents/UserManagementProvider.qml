@@ -94,33 +94,54 @@ Item {
 
                 if (userModeModel.ContainsKey("data")){
                     dataModelLocal = userModeModel.GetData("data")
-
                     if (dataModelLocal.ContainsKey("UserMode")){
                         dataModelLocal = dataModelLocal.GetData("UserMode");
+                    }
 
+                    if (dataModelLocal.ContainsKey("DatabaseConnectionState")){
                         let databaseState = dataModelLocal.GetData("DatabaseConnectionState");
-                        if (databaseState == false){
-                            let message = dataModelLocal.GetData("Message");
+                        if (databaseState === false){
+//                            let message = dataModelLocal.GetData("Message");
 
-                            message += '. ' + 'Please сheck the data to connect to the database'
+//                            message += '. ' + 'Please сheck the data to connect to the database'
+                            let message = qsTr("Please сheck the data to connect to the database");
                             modalDialogManager.openDialog(errorDialog, {"message": message});
 
                             return;
                         }
+                    }
 
+                    if (dataModelLocal.ContainsKey("Parameters")){
                         let parameters = dataModelLocal.GetData("Parameters");
-                        if (parameters){
-                            let value = dataModelLocal.GetData("Value");
-                            if (value >= 0){
-                                container.userMode = parameters.GetData("Id", value);
-                            }
+                        let value = dataModelLocal.GetData("Value");
+                        if (value >= 0){
+                            container.userMode = parameters.GetData("Id", value);
                         }
+                    }
 
+                    if (dataModelLocal.ContainsKey("SuperUserExists")){
                         let superUserExists = dataModelLocal.GetData("SuperUserExists");
-                        if (superUserExists == false){
+                        if (superUserExists === false){
                             modalDialogManager.openDialog(passwordInputDialog, {"message": qsTr("Please set the password for system administrator:")});
                         }
                     }
+
+//                    if (dataModelLocal.ContainsKey("UserMode")){
+//                        dataModelLocal = dataModelLocal.GetData("UserMode");
+
+//                        let parameters = dataModelLocal.GetData("Parameters");
+//                        if (parameters){
+//                            let value = dataModelLocal.GetData("Value");
+//                            if (value >= 0){
+//                                container.userMode = parameters.GetData("Id", value);
+//                            }
+//                        }
+
+//                        let superUserExists = dataModelLocal.GetData("SuperUserExists");
+//                        if (superUserExists == false){
+//                            modalDialogManager.openDialog(passwordInputDialog, {"message": qsTr("Please set the password for system administrator:")});
+//                        }
+//                    }
                 }
             }
         }

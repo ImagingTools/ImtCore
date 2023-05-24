@@ -14,6 +14,8 @@ Item {
 
     property bool checkable: false;
 
+    property bool canSelectAll: true;
+
     property bool scrollbarVisible: true;
 
     property bool showHeaders: true;
@@ -75,6 +77,9 @@ Item {
             tableContainer.selectionChanged(tableContainer.tableSelection.selectedIndexes);
         }
     }
+
+    property TableProperties properties: TableProperties {}
+
     function getSelectedIndexes(){
         return tableContainer.tableSelection.selectedIndexes;
     }
@@ -240,6 +245,22 @@ Item {
         }
 
         return true;
+    }
+
+    function setIsEnabledItem(index, isEnabled){
+        tableContainer.properties.setIsEnabledItem(index, isEnabled);
+    }
+
+    function allEnabled(){
+        tableContainer.properties.clearDisabledItems();
+    }
+
+    function setVisibleItem(index, isVisible){
+        tableContainer.properties.setIsVisibleItem(index, isVisible);
+    }
+
+    function allVisible(){
+        tableContainer.properties.clearInvisibleItems();
     }
 
     property var columnContentComps: []
@@ -457,38 +478,6 @@ Item {
 
         return null;
     }
-
-//    function allChecked(){
-//        if (!tableContainer.checkable){
-//            return;
-//        }
-
-//        if (elementsListObj.model){
-//            for (let i = 0; i < elementsListObj.model.GetItemsCount(); i++){
-//                let state = elementsListObj.model.GetData("CheckedState", i);
-//                if (state !== Qt.Checked){
-//                    elementsListObj.model.SetData("CheckedState", Qt.Checked, i);
-//                }
-//            }
-//        }
-//    }
-
-//    function allUnchecked(){
-//        if (!tableContainer.checkable){
-//            return;
-//        }
-
-//        if (elementsListObj.model){
-//            for (let i = 0; i < elementsListObj.model.GetItemsCount(); i++){
-//                let state = elementsListObj.model.GetData("CheckedState", i);
-//                if (state !== Qt.Unchecked){
-//                    elementsListObj.model.SetData("CheckedState", Qt.Unchecked, i);
-//                }
-//            }
-//        }
-//    }
-
-
 
     MouseArea {
         id: maTable;
@@ -715,7 +704,7 @@ Item {
 
                     checkState: tableContainer.isAllItemChecked ? Qt.Checked : Qt.Unchecked;
 
-                    visible: tableContainer.checkable && model.index === 0 && elementsListObj.count > 0;
+                    visible: tableContainer.checkable && model.index === 0 && elementsListObj.count > 0 && tableContainer.canSelectAll;
 
                     isActive: !tableContainer.readOnly;
 
@@ -915,15 +904,6 @@ Item {
 
         clip: true;
 
-        onModelChanged: {
-            console.log("elementsListObj onModelChanged");
-            console.log("elementsListObj.contentHeight", elementsListObj.contentHeight);
-        }
-
-        onContentHeightChanged: {
-            console.log("onContentHeightChanged", elementsListObj.contentHeight);
-        }
-
         Keys.onUpPressed: {
             tableContainer.tableSelection.up();
         }
@@ -946,7 +926,7 @@ Item {
 
             id: tableDelegate;
 
-            height: tableContainer.itemHeight;
+            height: visible ? tableContainer.itemHeight : 0;
             width: elementsListObj.width;
             minHeight: tableContainer.itemHeight;
             headers: tableContainer.headers;
@@ -956,6 +936,7 @@ Item {
             readOnly: tableContainer.readOnly;
 
             selected: tableContainer.tableSelection.selectedIndexes.includes(model.index)
+            enabled: tableContainer.properties.itemIsEnabled(model.index);
             checkedState: tableContainer.checkedIndexes.includes(model.index) ? Qt.Checked : Qt.Unchecked;
 
             onCheckedStateChanged: {
@@ -989,11 +970,17 @@ Item {
             Component.onCompleted: {
                 tableContainer.tableSelection.selectionChanged.connect(tableDelegate.selectionChanged);
                 tableContainer.checkedItemsChanged.connect(tableDelegate.checkedItemsChanged);
+
+                tableContainer.properties.visibleItemsChanged.connect(tableDelegate.visibleItemsChanged);
+                tableContainer.properties.stateItemsChanged.connect(tableDelegate.enabledItemsChanged);
             }
 
             Component.onDestruction: {
                 tableContainer.tableSelection.selectionChanged.disconnect(tableDelegate.selectionChanged);
                 tableContainer.checkedItemsChanged.disconnect(tableDelegate.checkedItemsChanged);
+
+                tableContainer.properties.visibleItemsChanged.disconnect(tableDelegate.visibleItemsChanged);
+                tableContainer.properties.stateItemsChanged.disconnect(tableDelegate.enabledItemsChanged);
             }
 
             function selectionChanged(){
@@ -1008,11 +995,23 @@ Item {
                 tableDelegate.checkedState = tableContainer.checkedIndexes.includes(model.index) ? Qt.Checked : Qt.Unchecked;
             }
 
-            onClicked: {
-                if (!tableContainer.tableSelection.isSelected(model.index)){
-                    tableContainer.tableSelection.singleSelect(model.index);
-                }
+            function visibleItemsChanged(){
+                tableDelegate.visible = tableContainer.properties.itemIsVisible(model.index);
+            }
 
+            function enabledItemsChanged(){
+                tableDelegate.enabled = tableContainer.properties.itemIsEnabled(model.index);
+
+                tableDelegate.readOnly = !tableDelegate.enabled;
+            }
+
+            onClicked: {
+//                if (!tableContainer.tableSelection.isSelected(model.index)){
+//                    tableContainer.tableSelection.singleSelect(model.index);
+//                }
+                tableContainer.tableSelection.singleSelect(model.index);
+
+                console.log("tableContainer.tableSelection", tableContainer.tableSelection.selectedIndexes)
                 elementsListObj.forceActiveFocus();
             }
 

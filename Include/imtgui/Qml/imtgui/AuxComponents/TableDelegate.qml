@@ -5,7 +5,7 @@ Rectangle {
     id: tableDelegateContainer;
 
     width: 1000;
-    height: minHeight;
+    height: visible ? minHeight : 0;
     color: tableDelegateContainer.selected ? Style.selectedColor : "transparent";
 
 	property alias cellDelegate: dataList.delegate
@@ -34,6 +34,8 @@ Rectangle {
     property bool emptyDecorCell: true;
 
     property bool readOnly: false;
+
+    property bool enabled: true;
 
     property string selectedColor: Style.selectedColor;
     property real selectedOpacity: 0.5;
@@ -318,9 +320,11 @@ Rectangle {
     MouseArea {
         id: ma;
 
+        z: 1000;
+
         anchors.fill: parent;
 
-//        hoverEnabled: true;
+        hoverEnabled: true;
         acceptedButtons: Qt.LeftButton | Qt.RightButton;
 
         onClicked: {

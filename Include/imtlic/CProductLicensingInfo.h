@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtlic/IProductLicensingInfo.h>
+#include <imtlic/ILicenseDependenciesManager.h>
 #include <imtlic/CLicenseInfoManager.h>
 
 
@@ -16,6 +17,7 @@ namespace imtlic
 */
 class CProductLicensingInfo:
 			virtual public imtlic::IProductLicensingInfo,
+			virtual public imtlic::ILicenseDependenciesManager,
 			public CLicenseInfoManager
 {
 public:
@@ -32,6 +34,12 @@ public:
 	virtual void SetProductId(const QByteArray& productId) override;
 	virtual QByteArray GetCategoryId() const override;
 	virtual void SetCategoryId(const QByteArray& categoryId) override;
+
+	// reimplemented (imtlic::ILicenseDependenciesManager)
+	virtual void SetLicenseDependencies(const QByteArray& licenseId, const QByteArrayList& dependentIds) override;
+
+	// reimplemented (imtlic::ILicenseDependenciesProvider)
+	virtual QByteArrayList GetLicenseDependencies(const QByteArray& licenseId) const override;
 
 	// reimplemented (iprm::INameParam)
 	virtual const QString& GetName() const override;
@@ -53,6 +61,9 @@ protected:
 	QString m_productName;
 	QByteArray m_productId;
 	QByteArray m_categoryId;
+
+private:
+	QMap<QByteArray, QByteArrayList> m_dependencies;
 };
 
 
