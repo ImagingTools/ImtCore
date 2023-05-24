@@ -126,7 +126,7 @@ bool CDeviceIdBasedConfigurationManagerComp::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.Process(deviceId);
 		retVal = retVal && archive.EndTag(idTag);
 
-		static iser::CArchiveTag dataTag("Data", "Data", iser::CArchiveTag::TT_LEAF, &configurationTag);
+		static iser::CArchiveTag dataTag("Data", "Data", iser::CArchiveTag::TT_GROUP, &configurationTag);
 		retVal = retVal && archive.BeginTag(dataTag);
 		retVal = retVal && configurationPtr->Serialize(archive);
 		retVal = retVal && archive.EndTag(dataTag);
