@@ -140,7 +140,7 @@ bool CDeviceIdBasedConfigurationManagerComp::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && archive.EndTag(configurationsTag);
 
-	return false;
+	return retVal;
 }
 
 
