@@ -50,6 +50,10 @@ export class MapCircle extends QtObject  {
             }))
         }
     }
+    $destroy(){
+        if(!this.center) this.center.$destroy()
+        super.$destroy()
+    }
 
 }
 

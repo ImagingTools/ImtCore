@@ -55,6 +55,11 @@ export class MapRectangle extends QtObject  {
         }
     }
 
+    $destroy(){
+        if(!this.topLeft) this.topLeft.$destroy()
+        if(!this.bottomRight) this.bottomRight.$destroy()
+        super.$destroy()
+    }
 }
 
 QML.MapRectangle = MapRectangle
