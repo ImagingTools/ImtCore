@@ -107,7 +107,7 @@ bool CDeviceIdBasedConfigurationManagerComp::Serialize(iser::IArchive& archive)
 		if (archive.IsStoring()){
 			deviceId = deviceIds[i];
 			deviceTypeId = m_configurations[deviceId].deviceTypeId;
-			DeviceConfigurationPtr configurationPtr = m_configurations[deviceId].configurationPtr;
+			configurationPtr = m_configurations[deviceId].configurationPtr;
 		}
 
 		static iser::CArchiveTag deviceIdTag("DeviceId", "DeviceId", iser::CArchiveTag::TT_LEAF, &itemTag);
