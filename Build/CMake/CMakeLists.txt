@@ -21,8 +21,13 @@ include_directories(${AUX_INCLUDE_DIR}/..)
 
 add_subdirectory("${INCLUDE_DIR}/imtbase/CMake" "${AUX_INCLUDE_DIR}/imtbase")
 add_subdirectory("${INCLUDE_DIR}/imtdesign/CMake" "${AUX_INCLUDE_DIR}/imtdesign")
+
+add_subdirectory("${IMPL_DIR}/ImtDesignPck/CMake" "${AUX_INCLUDE_DIR}/ImtDesignPck")
+add_dependencies(ImtDesignPck imtdesign)
+
 add_subdirectory("${IMPL_DIR}/DesignTokenCreatorExe/CMake" "${AUX_INCLUDE_DIR}/DesignTokenCreator")
 add_dependencies(DesignTokenCreator imtbase imtdesign)
+
 add_subdirectory("${INCLUDE_DIR}/imtstyle/CMake" "${AUX_INCLUDE_DIR}/imtstyle")
 add_dependencies(imtstyle DesignTokenCreator)
 
@@ -100,9 +105,6 @@ if(NOT ANDROID)
 
 	add_subdirectory("${IMPL_DIR}/ImtDevPck/CMake" "${AUX_INCLUDE_DIR}/ImtDevPck")
 	add_dependencies(ImtDevPck imtdev)
-
-	add_subdirectory("${IMPL_DIR}/ImtDesignPck/CMake" "${AUX_INCLUDE_DIR}/ImtDesignPck")
-	add_dependencies(ImtDesignPck imtdesign)
 
 	add_subdirectory("${IMPL_DIR}/ImtStylePck/CMake" "${AUX_INCLUDE_DIR}/ImtStylePck")
 	add_dependencies(ImtStylePck imtstyle)
