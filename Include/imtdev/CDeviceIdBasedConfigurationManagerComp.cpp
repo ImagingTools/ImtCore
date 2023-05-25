@@ -140,6 +140,7 @@ bool CDeviceIdBasedConfigurationManagerComp::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.EndTag(configurationTag);
 
 		if (retVal && !archive.IsStoring()){
+			m_configurations[deviceId].deviceTypeId = deviceTypeId;
 			m_configurations[deviceId].configurationPtr = configurationPtr;
 		}
 
