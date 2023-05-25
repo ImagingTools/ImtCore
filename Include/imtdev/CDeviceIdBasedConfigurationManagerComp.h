@@ -4,24 +4,21 @@
 // Qt includes
 #include <QtCore/QMap>
 
-#if QT_VERSION < 0x060000
-	#include <QtCore/QMutex>
-#else
-	#include <QtCore/QRecursiveMutex>
-#endif
-
 // ACF includes
-#include <imod/TModelWrap.h>
 #include <ilog/TLoggerCompWrap.h>
+#include <ilog/TLoggerCompWrap.h>
+#include <istd/TIFactory.h>
 
 // ImtCore includes
-#include <imtdev/IDeviceController.h>
 #include <imtdev/IDeviceConfigurationManager.h>
-#include <imtdev/IDeviceStaticInfo.h>
 
 
 namespace imtdev
 {
+
+
+class IDeviceController;
+class IDeviceStaticInfo;
 
 
 class CDeviceIdBasedConfigurationManagerComp:
@@ -34,23 +31,42 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(CDeviceIdBasedConfigurationManagerComp)
 		I_REGISTER_INTERFACE(IDeviceConfigurationManager);
+		I_REGISTER_INTERFACE(iser::ISerializable);
+		I_REGISTER_INTERFACE(istd::IChangeable);
 		I_ASSIGN(m_deviceControllerCompPtr, "DeviceController", "Device controller for creating and validating configurations", false, "");
+		I_ASSIGN_MULTI_0(m_deviceConfigurationFactoryCompPtr, "ConfigurationFactory", "Configuration factories for deserialization", false);
 	I_END_COMPONENT;
 
-	// reimplemented (IDeviceConfigurationProvider)
-	virtual DeviceConfigurationPtr GetDeviceConfiguration(const QByteArray& deviceId) const override;
-	virtual bool SetDeviceConfiguration(const QByteArray& deviceId, const iprm::IParamsSet* configurationPtr) override;
+	// reimplemented (IDeviceConfigurationManager)
+	virtual DeviceConfigurationPtr GetDeviceConfiguration(
+				const QByteArray& deviceId,
+				const QByteArray& deviceTypeId) const override;
+	virtual bool SetDeviceConfiguration(
+				const QByteArray& deviceId,
+				const QByteArray& deviceTypeId,
+				const iprm::IParamsSet& configuration) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
 
 private:
-	bool GetStaticDeviceInfo(const QByteArray& deviceId, const IDeviceStaticInfo** staticInfoPtr) const;
+	typedef istd::TIFactory<iprm::IParamsSet> ConfigurationFactory;
+
+	struct ConfigurationInfo
+	{
+		QByteArray deviceTypeId;
+		DeviceConfigurationPtr configurationPtr;
+	};
+
+private:
+	const IDeviceStaticInfo* FindDeviceStaticInfo(const QByteArray& deviceId) const;
+	ConfigurationFactory* FindConfigurationFactory(const QByteArray& deviceTypeId) const;
 
 private:
 	I_REF(IDeviceController, m_deviceControllerCompPtr);
+	I_MULTIREF(ConfigurationFactory, m_deviceConfigurationFactoryCompPtr);
 
-	QMap<QByteArray, DeviceConfigurationPtr> m_configurations;
+	QMap<QByteArray, ConfigurationInfo> m_configurations;
 };
 
 

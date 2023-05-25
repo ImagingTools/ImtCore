@@ -1,20 +1,13 @@
 #include <imtdev/CDeviceIdBasedConfigurationManagerComp.h>
 
 
-// Qt includes
-#include <QtCore/QMutexLocker>
-#include <QtCore/QThread>
-
 // ACF includes
 #include <iprm/CParamsSet.h>
-#include <imod/TModelWrap.h>
-#include <iprm/IOptionsList.h>
-#include <ilog/TLoggerCompWrap.h>
 #include <istd/CChangeNotifier.h>
 
 // ImtCore includes
-#include <imtbase/ICollectionInfo.h>
 #include <imtdev/IDeviceController.h>
+#include <imtdev/IDeviceStaticInfo.h>
 
 
 namespace imtdev
@@ -25,32 +18,30 @@ namespace imtdev
 
 // reimplemented (IDeviceConfigurationManager)
 
-DeviceConfigurationPtr CDeviceIdBasedConfigurationManagerComp::GetDeviceConfiguration(const QByteArray& deviceId) const
+DeviceConfigurationPtr CDeviceIdBasedConfigurationManagerComp::GetDeviceConfiguration(
+			const QByteArray& deviceId,
+			const QByteArray& deviceTypeId) const
 {
 	DeviceConfigurationPtr configurationPtr;
 
-	if (!deviceId.isEmpty()){
-		const IDeviceStaticInfo* staticInfoPtr = nullptr;
-		GetStaticDeviceInfo(deviceId, &staticInfoPtr);
-
-		if (m_configurations.contains(deviceId)){
-			if (staticInfoPtr != nullptr){
-				if (staticInfoPtr->AreConfigurationAccepted(m_configurations[deviceId].data())) {
-					configurationPtr.reset(new iprm::CParamsSet());
-					configurationPtr->CopyFrom(*m_configurations[deviceId].data());
-				}
-				else{
-					configurationPtr.reset(new iprm::CParamsSet());
-					configurationPtr->CopyFrom(staticInfoPtr->GetDefaultConfiguration());
-				}
-			}
-			else{
-				configurationPtr->CopyFrom(*m_configurations[deviceId].data());
-			}
+	if (!deviceId.isEmpty() && !deviceTypeId.isEmpty()){
+		const IDeviceStaticInfo* staticInfoPtr = FindDeviceStaticInfo(deviceId);
+		if (staticInfoPtr == nullptr){
+			staticInfoPtr = m_deviceControllerCompPtr->GetDeviceStaticInfo(deviceTypeId);
 		}
-		else if (staticInfoPtr != nullptr){
-			configurationPtr.reset(new iprm::CParamsSet());
-			configurationPtr->CopyFrom(staticInfoPtr->GetDefaultConfiguration());
+
+		if (staticInfoPtr != nullptr && staticInfoPtr->GetDeviceTypeId() == deviceTypeId){
+			if (m_configurations.contains(deviceId) && m_configurations[deviceId].deviceTypeId == deviceTypeId){
+				if (staticInfoPtr->AreConfigurationAccepted(*m_configurations[deviceId].configurationPtr.data())) {
+					configurationPtr.reset(new iprm::CParamsSet());
+					configurationPtr->CopyFrom(*m_configurations[deviceId].configurationPtr.data());
+				}
+			}
+
+			if (configurationPtr.isNull()){
+				configurationPtr.reset(new iprm::CParamsSet());
+				configurationPtr->CopyFrom(staticInfoPtr->GetDefaultConfiguration());
+			}
 		}
 	}
 
@@ -58,27 +49,29 @@ DeviceConfigurationPtr CDeviceIdBasedConfigurationManagerComp::GetDeviceConfigur
 }
 
 
-bool CDeviceIdBasedConfigurationManagerComp::SetDeviceConfiguration(const QByteArray& deviceId, const iprm::IParamsSet* configurationPtr)
+bool CDeviceIdBasedConfigurationManagerComp::SetDeviceConfiguration(
+			const QByteArray& deviceId,
+			const QByteArray& deviceTypeId,
+			const iprm::IParamsSet& configuration)
 {
-	if (!deviceId.isEmpty() && configurationPtr != nullptr){
-		const IDeviceStaticInfo* staticInfoPtr = nullptr;
-		GetStaticDeviceInfo(deviceId, &staticInfoPtr);
-
-		// If the (device is connected) && (the configuration is not compatible)
-		if (staticInfoPtr != nullptr){
-			if (!staticInfoPtr->AreConfigurationAccepted(configurationPtr)){
-				return false;
-			}
+	if (!deviceId.isEmpty() && !deviceTypeId.isEmpty()){
+		const IDeviceStaticInfo* staticInfoPtr = FindDeviceStaticInfo(deviceId);
+		if (staticInfoPtr == nullptr){
+			staticInfoPtr = m_deviceControllerCompPtr->GetDeviceStaticInfo(deviceTypeId);
 		}
 
-		// If (device not connected) || (device connected && configuration compatible)
-		DeviceConfigurationPtr deviceConfigurationPtr(new iprm::CParamsSet);
-		if (deviceConfigurationPtr->CopyFrom(*configurationPtr)){
-			istd::CChangeNotifier notifier(this);
+		if (staticInfoPtr != nullptr && staticInfoPtr->GetDeviceTypeId() == deviceTypeId){
+			if (staticInfoPtr->AreConfigurationAccepted(configuration)){
+				DeviceConfigurationPtr deviceConfigurationPtr(new iprm::CParamsSet);
+				if (deviceConfigurationPtr->CopyFrom(configuration)){
+					istd::CChangeNotifier notifier(this);
 
-			m_configurations[deviceId] = deviceConfigurationPtr;
+					m_configurations[deviceId].deviceTypeId = deviceTypeId;
+					m_configurations[deviceId].configurationPtr = deviceConfigurationPtr;
 
-			return true;
+					return true;
+				}
+			}
 		}
 	}
 
@@ -92,53 +85,72 @@ bool CDeviceIdBasedConfigurationManagerComp::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 
-	int configurationCount = m_configurations.count();
-
+	int itemCount = m_configurations.count();
 	if (!archive.IsStoring()){
 		m_configurations.clear();
-		configurationCount = 0;
+		itemCount = 0;
 	}
 
-	bool retVal = true;
-
-	static iser::CArchiveTag configurationsTag("Configurations", "List of configurations", iser::CArchiveTag::TT_MULTIPLE);
-	static iser::CArchiveTag configurationTag("Configuration", "Configuration", iser::CArchiveTag::TT_GROUP, &configurationsTag);
-	retVal = retVal && archive.BeginMultiTag(configurationsTag, configurationTag, configurationCount);
+	static iser::CArchiveTag itemsTag("Items", "Items", iser::CArchiveTag::TT_MULTIPLE);
+	static iser::CArchiveTag itemTag("Item", "Item", iser::CArchiveTag::TT_GROUP, &itemsTag);
+	bool retVal = archive.BeginMultiTag(itemsTag, itemTag, itemCount);
 
 	QByteArrayList deviceIds = m_configurations.keys();
 
-	for (int i = 0; i < configurationCount; i++){
-		retVal = retVal && archive.BeginTag(configurationTag);
+	for (int i = 0; i < itemCount; i++){
+		retVal = retVal && archive.BeginTag(itemTag);
 
 		QByteArray deviceId;
+		QByteArray deviceTypeId;
 		DeviceConfigurationPtr configurationPtr;
 
 		if (archive.IsStoring()){
 			deviceId = deviceIds[i];
-			configurationPtr = m_configurations[deviceId];
-		}
-		else{
-			configurationPtr.reset(new iprm::CParamsSet());
+			deviceTypeId = m_configurations[deviceId].deviceTypeId;
+			DeviceConfigurationPtr configurationPtr = m_configurations[deviceId].configurationPtr;
 		}
 
-		static iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_LEAF, &configurationTag);
-		retVal = retVal && archive.BeginTag(idTag);
+		static iser::CArchiveTag deviceIdTag("DeviceId", "DeviceId", iser::CArchiveTag::TT_LEAF, &itemTag);
+		retVal = retVal && archive.BeginTag(deviceIdTag);
 		retVal = retVal && archive.Process(deviceId);
-		retVal = retVal && archive.EndTag(idTag);
+		retVal = retVal && archive.EndTag(deviceIdTag);
 
-		static iser::CArchiveTag dataTag("Data", "Data", iser::CArchiveTag::TT_GROUP, &configurationTag);
-		retVal = retVal && archive.BeginTag(dataTag);
-		retVal = retVal && configurationPtr->Serialize(archive);
-		retVal = retVal && archive.EndTag(dataTag);
+		static iser::CArchiveTag deviceTypeIdTag("DeviceTypeId", "DeviceTypeId", iser::CArchiveTag::TT_LEAF, &itemTag);
+		retVal = retVal && archive.BeginTag(deviceTypeIdTag);
+		retVal = retVal && archive.Process(deviceTypeId);
+		retVal = retVal && archive.EndTag(deviceTypeIdTag);
 
-		if (!archive.IsStoring()){
-			m_configurations[deviceId] = configurationPtr;
+		if (retVal && !archive.IsStoring()){
+			ConfigurationFactory* factoryPtr = FindConfigurationFactory(deviceTypeId);
+			if (factoryPtr != nullptr){
+				configurationPtr.reset(factoryPtr->CreateInstance());
+				Q_ASSERT(!configurationPtr.isNull());
+				if (configurationPtr.isNull()){
+					retVal = false;
+				}
+			}
+			else{
+				retVal = false;
+			}
 		}
 
+		static iser::CArchiveTag configurationTag("Configuration", "Configuration", iser::CArchiveTag::TT_GROUP, &itemTag);
+		retVal = retVal && archive.BeginTag(configurationTag);
+		retVal = retVal && configurationPtr->Serialize(archive);
 		retVal = retVal && archive.EndTag(configurationTag);
+
+		if (retVal && !archive.IsStoring()){
+			m_configurations[deviceId].configurationPtr = configurationPtr;
+		}
+
+		retVal = retVal && archive.EndTag(itemTag);
 	}
 
-	retVal = retVal && archive.EndTag(configurationsTag);
+	retVal = retVal && archive.EndTag(itemsTag);
+
+	if (!retVal){
+		m_configurations.clear();
+	}
 
 	return retVal;
 }
@@ -146,18 +158,33 @@ bool CDeviceIdBasedConfigurationManagerComp::Serialize(iser::IArchive& archive)
 
 // private methods
 
-bool CDeviceIdBasedConfigurationManagerComp::GetStaticDeviceInfo(const QByteArray& deviceId, const IDeviceStaticInfo** staticInfoPtr) const
+const IDeviceStaticInfo* CDeviceIdBasedConfigurationManagerComp::FindDeviceStaticInfo(const QByteArray& deviceId) const
 {
-	if (!deviceId.isEmpty() && staticInfoPtr != nullptr && m_deviceControllerCompPtr.IsValid()){
+	if (!deviceId.isEmpty() && m_deviceControllerCompPtr.IsValid()){
 		DeviceInstanceInfoPtr deviceInstanceInfoPtr = m_deviceControllerCompPtr->GetDeviceInstanceInfo(deviceId);
 		if (!deviceInstanceInfoPtr.isNull()){
-			*staticInfoPtr = &deviceInstanceInfoPtr->GetDeviceStaticInfo();
-
-			return true;
+			return &deviceInstanceInfoPtr->GetDeviceStaticInfo();
 		}
 	}
 
-	return false;
+	return nullptr;
+}
+
+
+CDeviceIdBasedConfigurationManagerComp::ConfigurationFactory* CDeviceIdBasedConfigurationManagerComp::FindConfigurationFactory(const QByteArray& deviceTypeId) const
+{
+	if (m_deviceConfigurationFactoryCompPtr.IsValid()){
+		int count = m_deviceConfigurationFactoryCompPtr.GetCount();
+		for (int i = 0; i < count; i++){
+			if (m_deviceConfigurationFactoryCompPtr[i] != nullptr){
+				if (m_deviceConfigurationFactoryCompPtr[i]->GetFactoryKeys().contains(deviceTypeId)){
+					return m_deviceConfigurationFactoryCompPtr[i];
+				}
+			}
+		}
+	}
+
+	return nullptr;
 }
 
 

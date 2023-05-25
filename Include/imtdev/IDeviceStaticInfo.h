@@ -46,7 +46,7 @@ public:
 	/**
 		Check if device configuration is valid
 	*/
-	virtual bool AreConfigurationAccepted(const iprm::IParamsSet* configurationPtr) const = 0;
+	virtual bool AreConfigurationAccepted(const iprm::IParamsSet& configuration) const = 0;
 
 	/**
 		Get a list of subdevices for a given device type
