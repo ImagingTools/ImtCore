@@ -118,6 +118,7 @@ Rectangle{
         enabled: visible;
         hoverEnabled: enabled;
         property int delta: 40;
+        preventStealing: true;
         //cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
         onClicked: {
             var newCoords = mapToItem(scrollContainer,mouse.x,mouse.y);
@@ -233,11 +234,11 @@ Rectangle{
         id:scrollIndicator;
 
         x: scrollContainer.vertical ? (parent.width - width)/2 :
-                                      (scrollIndicator.width > scrollContainer.minSize ?  scrollContainer.targetItem.contentX :
-                                                                                         scrollContainer.targetItem.contentX*(scrollContainer.targetItem.width - scrollContainer.minSize)/(scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width));
+                                      (scrollIndicator.width > scrollContainer.minSize ?  scrollContainer.targetItem.contentX  - scrollContainer.targetItem.originX:
+                                                                                         (scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX)*(scrollContainer.targetItem.width - scrollContainer.minSize)/(scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width));
 
-        y: scrollContainer.vertical ? (scrollIndicator.height > scrollContainer.minSize ?  scrollContainer.targetItem.contentY :
-                                                                                          scrollContainer.targetItem.contentY*(scrollContainer.targetItem.height - scrollContainer.minSize)/(scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height)):
+        y: scrollContainer.vertical ? (scrollIndicator.height > scrollContainer.minSize ?  scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY:
+                                                                                          (scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY)*(scrollContainer.targetItem.height - scrollContainer.minSize)/(scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height)):
                                       (parent.height - height)/2;
 
 
@@ -289,6 +290,7 @@ Rectangle{
             visible: scrollContainer.visible;
             enabled: visible;
             hoverEnabled: enabled;
+            preventStealing: true;
 
             property bool dragEnabled: false;
 
