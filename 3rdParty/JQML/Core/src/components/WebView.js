@@ -113,11 +113,18 @@ export class WebView extends Item {
         this.$window.location.reload(true)
     }
     runJavaScript(script, callback) {
+        this.$window.callbackQML = callback
         let el = this.$window.document.createElement('script')
         this.$window.document.head.appendChild(el)
-        el.innerText = `(function() {${script}})()`
+        if(callback){
+            el.innerText = `(function() { window.callbackQML(${script}) })()`
+        } else {
+            el.innerText = `(function() { ${script} })()`
+        }
+        
         el.remove()
-        if(callback) callback()
+        this.$window.callbackQML = null
+        // if(callback) callback(this.$window.API.callbackResult)
     }
     setCookie(domain, name, value) {
         let added = this.$getCookie(name) ? false : true
