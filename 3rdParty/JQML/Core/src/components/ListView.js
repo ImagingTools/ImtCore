@@ -558,10 +558,10 @@ export class ListView extends Flickable {
                 if(this.contentItem.children.length === 0){
                     if(this.orientation === ListView.Horizontal){
                         if(this.contentX <= minX){
-                            currentIndex = leftIndex + Math.ceil((this.contentX - minX + this.spacing)/(Math.round(middleWidth + this.spacing)))
+                            currentIndex = leftIndex + Math.ceil((this.contentX - minX + (middleWidth ? this.spacing : 0))/(Math.round(middleWidth + (middleWidth ? this.spacing : 0))))
                             if(isNaN(currentIndex)) currentIndex = leftIndex
                         } else {
-                            currentIndex = rightIndex + Math.ceil((this.contentX - maxX - this.spacing)/(Math.round(middleWidth + this.spacing)))
+                            currentIndex = rightIndex + Math.ceil((this.contentX - maxX - (middleWidth ? this.spacing : 0))/(Math.round(middleWidth + (middleWidth ? this.spacing : 0))))
                             if(isNaN(currentIndex)) currentIndex = rightIndex
                         }
                         
@@ -584,10 +584,10 @@ export class ListView extends Flickable {
                         }
                     } else {
                         if(this.contentY <= minY){
-                            currentIndex = leftIndex + Math.ceil((this.contentY - minY + this.spacing)/(Math.round(middleHeight + this.spacing)))
+                            currentIndex = leftIndex + Math.ceil((this.contentY - minY + (middleHeight ? this.spacing : 0))/(Math.round(middleHeight + (middleHeight ? this.spacing : 0))))
                             if(isNaN(currentIndex)) currentIndex = leftIndex
                         } else {
-                            currentIndex = rightIndex + Math.ceil((this.contentY - maxY - this.spacing)/(Math.round(middleHeight + this.spacing)))
+                            currentIndex = rightIndex + Math.ceil((this.contentY - maxY - (middleHeight ? this.spacing : 0))/(Math.round(middleHeight + (middleHeight ? this.spacing : 0))))
                             if(isNaN(currentIndex)) currentIndex = rightIndex
                         }
 
