@@ -36,6 +36,8 @@ export class ListView extends Flickable {
         this.$cP('cacheBuffer', 320).connect(this.$cacheBufferChanged.bind(this))
 
         this.$updateGeometry()
+
+        // this.$s['Component.completed'].connect(this.$updateView.bind(this))
     }
     $domCreate(){
         super.$domCreate()
@@ -495,6 +497,9 @@ export class ListView extends Flickable {
                 
                 if(this.$items.length <= 0) return
 
+                let countChanged = this.count != this.$items.length
+                this.$p.count.val = this.$items.length
+
                 let leftIndex = this.contentItem.children.length ? this.contentItem.children[0].index : 0
                 let rightIndex = 0
                 let maxX = this.contentItem.children.length ? this.contentItem.children[0].x + this.contentItem.children[0].width : 0
@@ -554,11 +559,14 @@ export class ListView extends Flickable {
                     if(this.orientation === ListView.Horizontal){
                         if(this.contentX <= minX){
                             currentIndex = leftIndex + Math.ceil((this.contentX - minX + this.spacing)/(Math.round(middleWidth + this.spacing)))
+                            if(isNaN(currentIndex)) currentIndex = leftIndex
                         } else {
                             currentIndex = rightIndex + Math.ceil((this.contentX - maxX - this.spacing)/(Math.round(middleWidth + this.spacing)))
+                            if(isNaN(currentIndex)) currentIndex = rightIndex
                         }
+                        
                         if(currentIndex < 0 || currentIndex >= this.$items.length) return
-                        if(middleWidth === 0) currentIndex = 0
+                        
                         // currentIndex = (this.contentX <= minX ? leftIndex : rightIndex) + (Math.round(middleWidth)*(this.$items.length - visibleCount))
     
                         if(!this.$items[currentIndex]){
@@ -577,11 +585,14 @@ export class ListView extends Flickable {
                     } else {
                         if(this.contentY <= minY){
                             currentIndex = leftIndex + Math.ceil((this.contentY - minY + this.spacing)/(Math.round(middleHeight + this.spacing)))
+                            if(isNaN(currentIndex)) currentIndex = leftIndex
                         } else {
                             currentIndex = rightIndex + Math.ceil((this.contentY - maxY - this.spacing)/(Math.round(middleHeight + this.spacing)))
+                            if(isNaN(currentIndex)) currentIndex = rightIndex
                         }
+
                         if(currentIndex < 0 || currentIndex >= this.$items.length) return
-                        if(middleHeight === 0) currentIndex = 0
+                        
                         // currentIndex = (this.contentY <= minY ? leftIndex : rightIndex) + (Math.round(middleHeight)*(this.$items.length - visibleCount))
     
                         if(!this.$items[currentIndex]){
@@ -709,7 +720,11 @@ export class ListView extends Flickable {
                 }
                 
                 
-                this.count = this.$items.length
+                // this.count = this.$items.length
+                if(countChanged){
+                    this.$p.count.signal()
+                }
+                
                 
             }
         } catch (error) {
