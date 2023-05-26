@@ -479,16 +479,16 @@ Item {
         return null;
     }
 
-    MouseArea {
-        id: maTable;
+//    MouseArea {
+//        id: maTable;
 
-        anchors.fill: parent;
+//        anchors.fill: parent;
 
-        onClicked: {
-            console.log("AuxTable MouseArea onClicked");
-            tableContainer.selectedIndex = -1;
-        }
-    }
+//        onClicked: {
+//            console.log("AuxTable MouseArea onClicked");
+//            tableContainer.selectedIndex = -1;
+//        }
+//    }
 
     Item {
         id: headersPanel;
@@ -1016,6 +1016,7 @@ Item {
             }
 
             onRightButtonMouseClicked: {
+                console.log("onRightButtonMouseClicked")
                 var point = mapToItem(null, mX, mY);
                 tableContainer.rightButtonMouseClicked(point.x, point.y);
             }

@@ -191,11 +191,16 @@ FocusScope {
             id: cbTitleTxt;
 
             anchors.verticalCenter: parent.verticalCenter;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            anchors.rightMargin: 10;
 
             color: comboBoxContainer.fontColorTitle;
             text: comboBoxContainer.currentText !== "" ? comboBoxContainer.currentText : comboBoxContainer.placeHolderText;
             font.family: Style.fontFamily;
             font.pixelSize: comboBoxContainer.textSize;
+
+            elide: Text.ElideRight;
         }
 
         Image {

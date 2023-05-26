@@ -236,6 +236,9 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, CTreeItemModel *externTree
 
 bool CTreeItemModel::CopyItemDataFromModel(int index, const CTreeItemModel *externTreeModel, int externIndex)
 {
+	RemoveItem(index);
+	InsertNewItem(index);
+
 	bool retVal = true;
 	QList<QByteArray> keys;
 	externTreeModel->GetKeys(keys, externIndex);

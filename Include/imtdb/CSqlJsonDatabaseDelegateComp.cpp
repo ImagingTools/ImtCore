@@ -27,8 +27,6 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetSelectionQuery(const QByteArray& obj
 
 	QByteArray selectionQuery = BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
 
-	qDebug() << "selectionQuery" << selectionQuery;
-
 	return selectionQuery;
 }
 
@@ -60,12 +58,12 @@ istd::IChangeable* CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(const QS
 			}
 		}
 	}
-    else {
-        if (m_typesCompPtr->GetOptionsCount() > 0){
-            typeId = m_typesCompPtr->GetOptionId(0);
-            index = 0;
-        }
-    }
+	else {
+		if (m_typesCompPtr->GetOptionsCount() > 0){
+			typeId = m_typesCompPtr->GetOptionId(0);
+			index = 0;
+		}
+	}
 
 	if (m_documentFactoriesCompPtr.GetCount() > 0 && index >= 0){
 		documentPtr.SetPtr(m_documentFactoriesCompPtr.CreateInstance(index));
@@ -88,11 +86,11 @@ istd::IChangeable* CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(const QS
 
 
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::CreateNewObjectQuery(
-			const QByteArray& typeId,
-			const QByteArray& proposedObjectId,
-			const QString& objectName,
-			const QString& objectDescription,
-			const istd::IChangeable* valuePtr) const
+		const QByteArray& typeId,
+		const QByteArray& proposedObjectId,
+		const QString& objectName,
+		const QString& objectDescription,
+		const istd::IChangeable* valuePtr) const
 {
 	NewObjectQuery retVal;
 
@@ -111,18 +109,18 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 			QString queryStr;
 			if (*m_isMultiTypeAttrPtr){
 				queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\", \"TypeId\") VALUES('%2', '%3', '%4', '%5', '%6', true, '%0');")
-								.arg(QString(typeId));
+						.arg(QString(typeId));
 			}
 			else{
 				queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\") VALUES('%2', '%3', '%4', '%5', '%6', true);");
 			}
 			retVal.query = queryStr
-						.arg(qPrintable(*m_tableNameAttrPtr))
-						.arg(qPrintable(objectId))
-						.arg(SqlEncode(documentContent))
-						.arg(revisionVersion)
-						.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-						.arg(checksum).toLocal8Bit();
+					.arg(qPrintable(*m_tableNameAttrPtr))
+					.arg(qPrintable(objectId))
+					.arg(SqlEncode(documentContent))
+					.arg(revisionVersion)
+					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+					.arg(checksum).toLocal8Bit();
 
 			retVal.objectName = objectName;
 		}
@@ -132,8 +130,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 
 
 QByteArray CSqlJsonDatabaseDelegateComp::CreateDeleteObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& objectId) const
+		const imtbase::IObjectCollection& /*collection*/,
+		const QByteArray& objectId) const
 {
 	QByteArray retVal = QString("DELETE FROM \"%1\" WHERE \"%2\" = '%3';").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(*m_objectIdColumnAttrPtr)).arg(qPrintable(objectId)).toLocal8Bit();
 
@@ -142,11 +140,11 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateDeleteObjectQuery(
 
 
 QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const istd::IChangeable& object,
-			const ContextDescription& /*description*/,
-			bool /*useExternDelegate*/) const
+		const imtbase::IObjectCollection& collection,
+		const QByteArray& objectId,
+		const istd::IChangeable& object,
+		const ContextDescription& /*description*/,
+		bool /*useExternDelegate*/) const
 {
 	QByteArray retVal;
 
@@ -157,19 +155,19 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
 		QString queryStr;
 		if (*m_isMultiTypeAttrPtr){
 			queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\", \"TypeId\") VALUES('%2', '%3', '%4', '%5', true, "
-			" (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 ),"
-			" (SELECT \"TypeId\" FROM \"%1\" WHERE \"DocumentId\" = '%2' LIMIT 1) )," );
-					
+								" (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 ),"
+								" (SELECT \"TypeId\" FROM \"%1\" WHERE \"DocumentId\" = '%2' LIMIT 1) )," );
+
 		}
 		else{
 			queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\") VALUES('%2', '%3', '%4', '%5', true, (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 );");
 		}
 		retVal = queryStr
-					.arg(qPrintable(*m_tableNameAttrPtr))
-					.arg(qPrintable(objectId))
-					.arg(SqlEncode(documentContent))
-					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-					.arg(checksum).toLocal8Bit();
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(objectId))
+				.arg(SqlEncode(documentContent))
+				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+				.arg(checksum).toLocal8Bit();
 	}
 
 	return retVal;
@@ -194,16 +192,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateDescriptionObjectQuery(
 
 QByteArray CSqlJsonDatabaseDelegateComp::GetCountQuery(const iprm::IParamsSet* paramsPtr) const
 {
-//	QString filterQuery;
-//	if (paramsPtr != nullptr){
-//		if (!CreateFilterQuery(*paramsPtr, filterQuery)){
-//			return QByteArray();
-//		}
-//	}
-
 	QString baseQuery = GetSelectionQuery(QByteArray(), 0, -1, paramsPtr);
-
-//	return  QString("SELECT COUNT(*) FROM \"%1\" WHERE \"IsActive\" = true %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(filterQuery).toLocal8Bit();
 
 	return QString("SELECT COUNT(*) FROM (%1) as t").arg(baseQuery).toLocal8Bit();
 }
@@ -214,8 +203,8 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetCountQuery(const iprm::IParamsSet* p
 QString CSqlJsonDatabaseDelegateComp::GetBaseSelectionQuery() const
 {
 	return QString("SELECT \"Id\", \"%1\", \"Document\", \"RevisionNumber\", \"LastModified\","
-					"(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND t2.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
-					" as t2 WHERE \"IsActive\" = true")
+				   "(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND t2.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
+				   " as t2 WHERE \"IsActive\" = true")
 			.arg(qPrintable(*m_objectIdColumnAttrPtr))
 			.arg(qPrintable(*m_tableNameAttrPtr));
 }
@@ -336,8 +325,8 @@ bool CSqlJsonDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSet& fil
 
 
 bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
-			const iprm::IParamsSet& filterParams,
-			QString& filterQuery) const
+		const iprm::IParamsSet& filterParams,
+		QString& filterQuery) const
 {
 	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
 
@@ -369,8 +358,8 @@ bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
 
 
 bool CSqlJsonDatabaseDelegateComp::CreateTextFilterQuery(
-			const imtbase::ICollectionFilter& collectionFilter,
-			QString& textFilterQuery) const
+		const imtbase::ICollectionFilter& collectionFilter,
+		QString& textFilterQuery) const
 {
 	QByteArrayList filteringColumnIds = collectionFilter.GetFilteringInfoIds();
 	if (filteringColumnIds.isEmpty()){

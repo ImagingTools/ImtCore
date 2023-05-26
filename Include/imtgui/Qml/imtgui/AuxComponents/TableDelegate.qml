@@ -320,7 +320,7 @@ Rectangle {
     MouseArea {
         id: ma;
 
-        z: 1000;
+//        z: 1000;
 
         anchors.fill: parent;
 

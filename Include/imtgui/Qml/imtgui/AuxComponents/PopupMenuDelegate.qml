@@ -62,6 +62,8 @@ Item {
 
         anchors.left: icon2.source != "" ? iconItem2.right : parent.left;
         anchors.leftMargin: !popupMenuDelegate.textCentered ? 10 : (parent.width - width)/2;
+        anchors.right: parent.right;
+        anchors.rightMargin: 10;
         anchors.verticalCenter: parent.verticalCenter;
 
         color: popupMenuDelegate.fontColor;
@@ -71,6 +73,7 @@ Item {
 //        text: model.Name;
 
         text: model[popupMenuDelegate.rootItem.nameId];
+        elide: Text.ElideRight;
     }
 
     MouseArea {
