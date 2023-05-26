@@ -56,6 +56,9 @@ public:
 	virtual bool CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const override;
 
 protected:
+	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const override;
+	virtual bool ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const override;
+
 	I_ATTR(bool, m_isMultiTypeAttrPtr);
 	I_MULTIFACT(istd::IChangeable, m_documentFactoriesCompPtr);
 };

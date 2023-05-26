@@ -6,6 +6,9 @@
 #include <iprm/ITextParam.h>
 #include <istd/TOptDelPtr.h>
 #include <istd/CCrcCalculator.h>
+#include <iser/CJsonMemReadArchive.h>
+#include <iser/CJsonMemWriteArchive.h>
+#include <iser/ISerializable.h>
 
 
 namespace imtdb
@@ -375,6 +378,40 @@ bool CSqlJsonDatabaseDelegateComp::CreateTextFilterQuery(
 
 			textFilterQuery += QString("\"Document\"->>'%1' ILIKE '%%2%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
 		}
+	}
+
+	return true;
+}
+
+
+bool CSqlJsonDatabaseDelegateComp::WriteDataToMemory(const QByteArray &typeId, const istd::IChangeable &object, QByteArray &data) const 
+{
+	iser::ISerializable* serializableObjectPtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(&object)); 
+	if (serializableObjectPtr == nullptr){
+		Q_ASSERT(0);
+		return false;
+	}
+	iser::CJsonMemWriteArchive archive(data);
+
+	if (!serializableObjectPtr->Serialize(archive)){
+		return false;
+	}
+	
+	return true;
+}
+
+
+bool CSqlJsonDatabaseDelegateComp::ReadDataFromMemory(const QByteArray &typeId, const QByteArray &data, istd::IChangeable &object) const 
+{
+	iser::ISerializable* serializableObjectPtr = dynamic_cast<iser::ISerializable*>(&object); 
+	if (serializableObjectPtr == nullptr){
+		Q_ASSERT(0);
+		return false;
+	}
+	iser::CJsonMemReadArchive archive(data);
+
+	if (!serializableObjectPtr->Serialize(archive)){
+		return false;
 	}
 
 	return true;
