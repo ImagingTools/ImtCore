@@ -49,6 +49,7 @@ const QML = [
     'MapRectangle',
     'MapPolygon',
     'MapPolyline',
+    'MapQuickItem',
 ]
 
 let source = process.argv[2]

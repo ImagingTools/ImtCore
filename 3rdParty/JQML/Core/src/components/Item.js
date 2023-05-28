@@ -153,7 +153,7 @@ export class Item extends QtObject {
 
         // if(this.UID !== 0)
         // Core.root.dom.appendChild(this.dom)
-        if(this.parent){
+        if(this.parent && this.parent.dom){
             this.parent.dom.appendChild(this.dom)
         }
         
