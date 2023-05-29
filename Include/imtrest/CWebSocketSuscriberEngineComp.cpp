@@ -2,7 +2,7 @@
 
 
 // ACF includes
-#include <iser/CJsonStringWriteArchive.h>
+#include <iser/CJsonMemWriteArchive.h>
 
 // ImtCore includes
 #include <imtrest/CSubscriberBase.h>
@@ -95,7 +95,7 @@ void CWebSocketSubscriberEngineComp::OnModelUpdate(QByteArray modelId, const ist
 	}
 
 	{
-		iser::CJsonStringWriteArchive archive(body);
+		iser::CJsonMemWriteArchive archive(body);
 		treeItemModel.Serialize(archive);
 	}
 

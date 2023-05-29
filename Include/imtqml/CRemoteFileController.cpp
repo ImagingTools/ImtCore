@@ -5,16 +5,10 @@
 #include <QtCore/QUrlQuery>
 #include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
-#include <QtQuick/QQuickItem>
 #include <QtQml/QQmlEngine>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
 #include <QtCore/QFileInfo>
-#include <QtCore/QAbstractListModel>
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
-#include <QtCore/QtDebug>
 
 #ifdef Q_OS_ANDROID
 #include <QtAndroidExtras/QAndroidJniObject>
@@ -23,16 +17,6 @@
 #include <QtGui/QDesktopServices>
 #endif
 
-// ACF includes
-#include <iser/CJsonStringReadArchive.h>
-#include <iser/ISerializable.h>
-#include <imod/CModelUpdateBridge.h>
-#include <imod/CModelBase.h>
-#include <iser/IArchive.h>
-#include <iser/CArchiveTag.h>
-#include <iser/CJsonStringWriteArchive.h>
-#include <istd/CChangeNotifier.h>
-#include <istd/TSmartPtr.h>
 
 namespace imtqml
 {
@@ -43,10 +27,12 @@ CRemoteFileController::CRemoteFileController(QObject *parent) : QObject(parent),
 
 }
 
+
 CRemoteFileController::~CRemoteFileController()
 {
 
 }
+
 
 bool CRemoteFileController::OpenFile(const QString& filePath) const
 {
@@ -121,15 +107,16 @@ bool CRemoteFileController::OpenFile(const QString& filePath) const
 	jniIntent.callObjectMethod("addFlags", "(I)Landroid/content/Intent;", jniIntentFlags);
 	jniIntent.callObjectMethod("addFlags", "(I)Landroid/content/Intent;", jniIntentFlags2);
 	jniIntent.callObjectMethod("setDataAndType",
-				"(Landroid/net/Uri;Ljava/lang/String;)Landroid/content/Intent;",
-				jniUri.object(),
-				QAndroidJniObject::fromString(type).object());
+							   "(Landroid/net/Uri;Ljava/lang/String;)Landroid/content/Intent;",
+							   jniUri.object(),
+							   QAndroidJniObject::fromString(type).object());
 	QtAndroid::androidActivity().callMethod<void>("startActivity", "(Landroid/content/Intent;)V", jniIntent.object());
 	return true;
 #else
 	return QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absoluteFilePath()));
 #endif
 }
+
 
 bool CRemoteFileController::DeleteFile(const QString& fileId)
 {
@@ -144,12 +131,14 @@ bool CRemoteFileController::DeleteFile(const QString& fileId)
 		requestUrl.setPath(path);
 
 		QNetworkReply* reply = accessManager->deleteResource(QNetworkRequest(requestUrl));
-        connect(reply, &QNetworkReply::finished, this, &CRemoteFileController::OnFileDeleted);
+		connect(reply, &QNetworkReply::finished, this, &CRemoteFileController::OnFileDeleted);
+
 		return true;
 	}
 
 	return false;
 }
+
 
 bool CRemoteFileController::GetFile(const QString& fileId, const QString& fileName)
 {
@@ -172,10 +161,13 @@ bool CRemoteFileController::GetFile(const QString& fileId, const QString& fileNa
 		QNetworkReply* reply = accessManager->get(QNetworkRequest(requestUrl));
 		connect(reply, &QNetworkReply::downloadProgress, this, &CRemoteFileController::OnProgressChanged);
 		connect(reply, &QNetworkReply::finished, this, &CRemoteFileController::OnFileDownloaded);
+
 		return true;
 	}
+
 	return false;
 }
+
 
 bool CRemoteFileController::SendFile(const QString& fileUrl)
 {
@@ -201,14 +193,15 @@ bool CRemoteFileController::SendFile(const QString& fileUrl)
 		QNetworkRequest request(requestUrl);
 		request.setHeader(QNetworkRequest::ContentLengthHeader, payload.size());
 
-        QNetworkReply* reply = accessManager->post(request, payload);
-        connect(reply, &QNetworkReply::uploadProgress, this, &CRemoteFileController::OnProgressChanged);
-        connect(reply, &QNetworkReply::finished, this, &CRemoteFileController::OnFileUploaded);
+		QNetworkReply* reply = accessManager->post(request, payload);
+		connect(reply, &QNetworkReply::uploadProgress, this, &CRemoteFileController::OnProgressChanged);
+		connect(reply, &QNetworkReply::finished, this, &CRemoteFileController::OnFileUploaded);
+
 		return true;
 	}
+
 	return false;
 }
-
 
 
 void CRemoteFileController::OnFileDeleted()
@@ -219,15 +212,16 @@ void CRemoteFileController::OnFileDeleted()
 		qDebug() << representationData;
 		setJson(representationData);
 		SetState("Ready");
-        if (!reply->error()){
-            Q_EMIT fileDeleted();
-        }
-        else {
-            Q_EMIT fileDeleteFailed();
-        }
-        reply->deleteLater();
+		if (!reply->error()){
+			Q_EMIT fileDeleted();
+		}
+		else {
+			Q_EMIT fileDeleteFailed();
+		}
+		reply->deleteLater();
 	}
 }
+
 
 void CRemoteFileController::OnFileDownloaded()
 {
@@ -256,14 +250,15 @@ void CRemoteFileController::OnFileDownloaded()
 			else{
 				Q_EMIT fileDownloaded(downloadedFile.fileName());
 			}
-        }
-        else {
-            Q_EMIT fileDownloadFailed();
-        }
+		}
+		else {
+			Q_EMIT fileDownloadFailed();
+		}
 
 		reply->deleteLater();
 	}
 }
+
 
 void CRemoteFileController::OnFileUploaded()
 {
@@ -271,22 +266,23 @@ void CRemoteFileController::OnFileUploaded()
 	if(reply){
 		QByteArray representationData = reply->readAll();
 		setJson(representationData);
-        SetState("Ready");
-        if (!reply->error()){
-            Q_EMIT fileUploaded();
-        }
-        else {
-            Q_EMIT fileUploadFailed();
-        }
-        reply->deleteLater();
+		SetState("Ready");
+		if (!reply->error()){
+			Q_EMIT fileUploaded();
+		}
+		else {
+			Q_EMIT fileUploadFailed();
+		}
+		reply->deleteLater();
 	}
 }
 
+
 void CRemoteFileController::OnProgressChanged(qint64 bytesLoaded, qint64 bytesTotal)
 {
-    if(bytesLoaded > 0 && bytesTotal > 0){
-        qDebug() << __FILE__ << __LINE__ << "File load progress" << bytesLoaded/bytesTotal;
-        Q_EMIT progress(bytesLoaded, bytesTotal);
+	if(bytesLoaded > 0 && bytesTotal > 0){
+		qDebug() << __FILE__ << __LINE__ << "File load progress" << bytesLoaded/bytesTotal;
+		Q_EMIT progress(bytesLoaded, bytesTotal);
 	}
 }
 
@@ -304,23 +300,27 @@ void CRemoteFileController::SetState(const QString& newState)
 	emit stateChanged();
 }
 
+
 const QString& CRemoteFileController::downloadedFilePath() const
 {
 	return m_downloadedFilePath;
 }
 
+
 void CRemoteFileController::setDownloadedFilePath(const QString& newDownloadedFilePath)
 {
-    if (m_downloadedFilePath == newDownloadedFilePath)
-        return;
-    m_downloadedFilePath = newDownloadedFilePath;
-    emit downloadedFilePathChanged();
+	if (m_downloadedFilePath == newDownloadedFilePath)
+		return;
+	m_downloadedFilePath = newDownloadedFilePath;
+	emit downloadedFilePathChanged();
 }
+
 
 const QString& CRemoteFileController::downloadedFileLocation() const
 {
 	return m_downloadedFileLocation;
 }
+
 
 void CRemoteFileController::setDownloadedFileLocation(const QString& newDownloadedFileLocation)
 {
@@ -330,10 +330,12 @@ void CRemoteFileController::setDownloadedFileLocation(const QString& newDownload
 	emit downloadedFileLocationChanged();
 }
 
+
 const QByteArray& CRemoteFileController::json() const
 {
 	return m_json;
 }
+
 
 void CRemoteFileController::setJson(const QByteArray& newJson)
 {
@@ -357,8 +359,6 @@ void CRemoteFileController::setPrefix(const QString& newPrefix)
 	m_prefix = newPrefix;
 	emit prefixChanged();
 }
-
-
 
 
 } // namespace imtqml

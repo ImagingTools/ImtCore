@@ -3,7 +3,7 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
-#include <iser/CJsonStringWriteArchive.h>
+#include <iser/CJsonMemWriteArchive.h>
 
 // ImtCore includes
 #include <imtrest/IRequestServlet.h>

@@ -155,7 +155,7 @@ IRequestServlet::ConstResponsePtr CJsonModelBasedServletComp::ProcessRequest(con
 
 		{
 //			QByteArray jsonData;
-			iser::CJsonStringWriteArchive archive(body);
+			iser::CJsonMemWriteArchive archive(body);
 			treeItemModel.Serialize(archive);
 //			body = jsonData;
 		}

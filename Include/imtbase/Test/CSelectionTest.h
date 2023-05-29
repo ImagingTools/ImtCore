@@ -17,8 +17,6 @@
 #include <iser/CMemoryWriteArchive.h>
 #include <iser/CXmlStringWriteArchive.h>
 #include <iser/CXmlStringReadArchive.h>
-#include <iser/CJsonStringReadArchive.h>
-#include <iser/CJsonStringWriteArchive.h>
 #include <iser/CReadArchiveBase.h>
 #include <iser/CWriteArchiveBase.h>
 #include <itest/CStandardTestExecutor.h>

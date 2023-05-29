@@ -30,6 +30,7 @@ public:
 		I_ASSIGN(m_objectIdColumnAttrPtr, "ObjectIdColumn", "Name of the column containing ID of the object", true, "Id");
 		I_ASSIGN(m_objectTypeIdColumnAttrPtr, "ObjectTypeIdColumn", "Name of the column containing type-ID of the object", true, "TypeId");
 		I_ASSIGN(m_separatorObjectIdAttrPtr, "SeparatorObjectId", "Separator of the object ID", false, "SeparatorObjectId");
+		I_ASSIGN(m_versionInfoCompPtr, "VersionInfo", "Version info", false, "VersionInfo");
 	I_END_COMPONENT
 
 	virtual QString SqlEncode(const QString& sqlQuery) const;
@@ -73,6 +74,7 @@ protected:
 protected:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
 	I_REF(iprm::IOptionsList, m_typesCompPtr);
+	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
 	I_ATTR(QByteArray, m_tableNameAttrPtr);
 	I_ATTR(QByteArray, m_separatorObjectIdAttrPtr);
 	I_ATTR(QByteArray, m_objectIdColumnAttrPtr);

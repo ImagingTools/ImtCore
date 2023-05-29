@@ -384,14 +384,15 @@ bool CSqlJsonDatabaseDelegateComp::CreateTextFilterQuery(
 }
 
 
-bool CSqlJsonDatabaseDelegateComp::WriteDataToMemory(const QByteArray &typeId, const istd::IChangeable &object, QByteArray &data) const 
+bool CSqlJsonDatabaseDelegateComp::WriteDataToMemory(const QByteArray &typeId, const istd::IChangeable &object, QByteArray &data) const
 {
-	iser::ISerializable* serializableObjectPtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(&object)); 
+	iser::ISerializable* serializableObjectPtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(&object));
 	if (serializableObjectPtr == nullptr){
 		Q_ASSERT(0);
 		return false;
 	}
-	iser::CJsonMemWriteArchive archive(data);
+
+	iser::CJsonMemWriteArchive archive(data, m_versionInfoCompPtr.GetPtr());
 
 	if (!serializableObjectPtr->Serialize(archive)){
 		return false;
@@ -401,9 +402,9 @@ bool CSqlJsonDatabaseDelegateComp::WriteDataToMemory(const QByteArray &typeId, c
 }
 
 
-bool CSqlJsonDatabaseDelegateComp::ReadDataFromMemory(const QByteArray &typeId, const QByteArray &data, istd::IChangeable &object) const 
+bool CSqlJsonDatabaseDelegateComp::ReadDataFromMemory(const QByteArray &typeId, const QByteArray &data, istd::IChangeable &object) const
 {
-	iser::ISerializable* serializableObjectPtr = dynamic_cast<iser::ISerializable*>(&object); 
+	iser::ISerializable* serializableObjectPtr = dynamic_cast<iser::ISerializable*>(&object);
 	if (serializableObjectPtr == nullptr){
 		Q_ASSERT(0);
 		return false;
