@@ -28,32 +28,20 @@ Dialog {
         }
     }
 
+    Keys.onPressed: {
+        if (event.key === Qt.Key_Return){
+            let enabled = featuresDialog.buttons.getButtonState("Add");
+            if (enabled){
+                featuresDialog.finished("Add");
+            }
+        }
+        else if (event.key === Qt.Key_Escape){
+            featuresDialog.finished("Cancel");
+        }
+    }
+
     function updateGui(){
-
         featuresDialog.contentItem.tableView.elements = featuresDialog.featuresModel;
-//        featuresDialog.contentItem.tableView.columnModel.clear();
-//        featuresDialog.contentItem.tableView.rowModel.clear();
-
-//        featuresDialog.contentItem.tableView.addColumn({"Id": "Name", "Name": "Feature Name"})
-
-//        let model = featuresProvider.model;
-
-//        for (let i = 0; i < model.GetItemsCount(); i++){
-//            let id = model.GetData("Id", i);
-//            let name = model.GetData("Name", i);
-
-//            featuresDialog.contentItem.tableView.insertRow([i], {"Name": name, "Id": id, "CheckBoxVisible": false})
-
-//            let childModel = model.GetData("ChildModel", i);
-//            if (childModel){
-//                for (let j = 0; j < childModel.GetItemsCount(); j++){
-//                    let featureId = childModel.GetData("Id", j);
-//                    let featureName = childModel.GetData("Name", j);
-
-//                    featuresDialog.contentItem.tableView.insertRow([i, j], {"Name": featureName, "Id": featureId, "CheckBoxVisible": false})
-//                }
-//            }
-//        }
     }
 
     contentComp: Component{ Item {
@@ -97,28 +85,6 @@ Dialog {
                     featuresDialog.buttons.setButtonState("Add", indexes.length > 0);
                 }
             }
-
-//            BasicTreeView {
-//                id: tableTreeView;
-
-//                width: parent.width;
-//                height: 300;
-
-//                onSelectedIndexChanged: {
-//                    console.log("onSelectedIndexChanged", tableTreeView.selectedIndex);
-
-//                    if (tableTreeView.selectedIndex != null && tableTreeView.selectedIndex.itemData){
-//                         console.log("selectedIndex.itemData.Level", tableTreeView.selectedIndex.itemData.Level);
-//                        let state = tableTreeView.selectedIndex.itemData.Level === 1;
-
-//                        console.log("featuresDialog", featuresDialog);
-//                        console.log("featuresDialog.buttons", featuresDialog.buttons);
-//                        featuresDialog.buttons.setButtonState("Add", state);
-//                    }
-//                }
-//            }
         }
     } }
-
-
 }

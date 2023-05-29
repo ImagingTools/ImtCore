@@ -254,17 +254,6 @@ Rectangle {
         id: heightModel;
     }
 
-//    Rectangle {
-//        id: selectionBackGround;
-
-//        anchors.fill: parent;
-
-//        color: tableDelegateContainer.selectedColor;
-//        radius: 2;
-//        opacity: 0.5;
-//        visible: ma.containsMouse;
-//    }
-
     CheckBox {
         id: checkBox;
 
@@ -296,6 +285,8 @@ Rectangle {
     ListView {
         id: dataList;
 
+//         z: 10;
+
         anchors.left: checkBox.visible ? checkBox.right : parent.left;
         anchors.right: parent.right;
         anchors.top: parent.top;
@@ -312,6 +303,7 @@ Rectangle {
 
 		delegate: TableCellDelegate {
 			id: tableCellDelegate
+
 			pTableDelegateContainer: tableDelegateContainer
             contentComp: tableDelegateContainer.tableItem.columnContentComps[model.index] !== null ? tableDelegateContainer.tableItem.columnContentComps[model.index] : tableCellDelegate.defaultContentComp;
 		}//delegate
@@ -320,11 +312,10 @@ Rectangle {
     MouseArea {
         id: ma;
 
-//        z: 1000;
+        z: 1;
 
         anchors.fill: parent;
 
-        hoverEnabled: true;
         acceptedButtons: Qt.LeftButton | Qt.RightButton;
 
         onClicked: {

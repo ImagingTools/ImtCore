@@ -36,7 +36,7 @@ bool CFeaturesExportProviderComp::GetData(QByteArray& data, const QByteArray& da
 		const imtbase::ICollectionInfo& licenseList = productPtr->GetLicenseList();
 		const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = licenseList.GetElementIds();
 
-		istd::TDelPtr<imtlic::CFeaturePackage> featurePackagePtr = new imtlic::CFeaturePackage;
+		istd::TDelPtr<imtlic::CFeaturePackage> resultPackagePtr = new imtlic::CFeaturePackage;
 		for (const QByteArray& licenseId : licenseCollectionIds){
 			const imtlic::ILicenseInfo* licenseInfoPtr = productPtr->GetLicenseInfo(licenseId);
 			if (licenseInfoPtr != nullptr){
@@ -51,14 +51,15 @@ bool CFeaturesExportProviderComp::GetData(QByteArray& data, const QByteArray& da
 							const imtlic::CFeaturePackage* packagePtr  = dynamic_cast<const imtlic::CFeaturePackage*>(packageDataPtr.GetPtr());
 							if (packagePtr != nullptr){
 								const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->FindFeatureById(featureId);
-								if (featureInfoPtr != nullptr){
+								const imtlic::IFeatureInfo* findedFeatureInfoPtr = resultPackagePtr->FindFeatureById(featureId);
+								if (featureInfoPtr != nullptr && findedFeatureInfoPtr == nullptr){
 									QString featureName = featureInfoPtr->GetFeatureName();
 
-									featurePackagePtr->InsertNewObject("FeatureInfo", featureName, "", featureInfoPtr);
+									resultPackagePtr->InsertNewObject("FeatureInfo", featureName, "", featureInfoPtr);
 
 									QByteArrayList featureDependencies = packagePtr->GetFeatureDependencies(featureId);
 									if (!featureDependencies.empty()){
-										featurePackagePtr->SetFeatureDependencies(featureId, featureDependencies);
+										resultPackagePtr->SetFeatureDependencies(featureId, featureDependencies);
 									}
 
 									QByteArrayList allSubFeaturesList = featureInfoPtr->GetSubFeatureIds();
@@ -66,7 +67,7 @@ bool CFeaturesExportProviderComp::GetData(QByteArray& data, const QByteArray& da
 										QByteArrayList subfeatureDependencies = packagePtr->GetFeatureDependencies(subFeatureId);
 
 										if (!subfeatureDependencies.empty()){
-											featurePackagePtr->SetFeatureDependencies(subFeatureId, subfeatureDependencies);
+											resultPackagePtr->SetFeatureDependencies(subFeatureId, subfeatureDependencies);
 										}
 									}
 								}
@@ -81,7 +82,7 @@ bool CFeaturesExportProviderComp::GetData(QByteArray& data, const QByteArray& da
 		{
 			ifile::CCompactXmlFileWriteArchive writeArchive(filePathTmp);
 
-			featurePackagePtr->Serialize(writeArchive);
+			resultPackagePtr->Serialize(writeArchive);
 		}
 
 		QFile file(filePathTmp);

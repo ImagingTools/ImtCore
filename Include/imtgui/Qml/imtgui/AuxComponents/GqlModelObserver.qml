@@ -1,9 +1,8 @@
 import QtQuick 2.15
 import Acf 1.0
 import imtqml 1.0
-import imtgui 1.0
 
-Item {
+QtObject {
     id: container;
 
     property GqlModel observedModel: null;
@@ -11,22 +10,22 @@ Item {
 
     Component.onDestruction: {
         if (container.observedModel){
-            container.observedModel.stateChanged.disconnect(container.observedModelStateChanged);
+            container.observedModel.stateChanged.disconnect(container.onStateChanged);
         }
     }
 
     onObservedModelChanged: {
         if (container.observedModel){
-            container.observedModel.stateChanged.connect(container.observedModelStateChanged);
+            container.observedModel.stateChanged.connect(container.onStateChanged);
         }
     }
 
-    function observedModelStateChanged(){
+    function onStateChanged(){
         if (container.noConnectionView != null){
-            if (container.observedModel.state == "Ready"){
+            if (container.observedModel.state === "Ready"){
                 container.noConnectionView.visible = false;
             }
-            else if (container.observedModel.state == "Error"){
+            else if (container.observedModel.state === "Error"){
                 container.noConnectionView.visible = true;
             }
         }

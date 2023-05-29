@@ -44,11 +44,15 @@ DocumentBase {
 
     Component.onCompleted: {
         commandsDelegate.tableTreeViewEditor = tableView;
-        featuresProvider.onModelChanged.connect(packageViewRoot.updateTreeViewModel);
+        if (featuresProvider){
+            featuresProvider.onModelChanged.connect(packageViewRoot.updateTreeViewModel);
+        }
     }
 
     Component.onDestruction: {
-        featuresProvider.onModelChanged.disconnect(packageViewRoot.updateTreeViewModel);
+        if (featuresProvider){
+            featuresProvider.onModelChanged.disconnect(packageViewRoot.updateTreeViewModel);
+        }
     }
 
     onCommandsIdChanged: {
@@ -121,6 +125,9 @@ DocumentBase {
     //Обновить модель для TreeView
     function updateTreeViewModel(){
         console.log("updateTreeViewModel");
+        if (!featuresProvider){
+            return;
+        }
 
         packageViewRoot.treeViewModel.Copy(featuresProvider.model);
         treeView.rowModel = packageViewRoot.treeViewModel;
@@ -323,6 +330,10 @@ DocumentBase {
                 if (itemData.Id === featureId){
                     return true;
                 }
+            }
+
+            if (!featuresProvider){
+                return false;
             }
 
             let globalExists = featuresProvider.featureIsExists(featureId);

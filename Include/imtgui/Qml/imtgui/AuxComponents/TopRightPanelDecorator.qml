@@ -11,32 +11,30 @@ Rectangle {
     radius: 7;
 
     Component.onCompleted: {
-        Events.subscribeEvent("SetUserPanelButtonVisible", topRightPanelDecorator.setUserPanelButtonVisible);
-        Events.subscribeEvent("SetUserPanelButtonEnabled", topRightPanelDecorator.setUserPanelButtonEnabled);
-        Events.subscribeEvent("SetPreferenceButtonVisible", topRightPanelDecorator.setPreferenceButtonVisible);
+        Events.subscribeEvent("UserModeChanged", topRightPanelDecorator.onUserModeChanged);
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("SetUserPanelButtonVisible", topRightPanelDecorator.setUserPanelButtonVisible);
-        Events.unSubscribeEvent("SetPreferenceButtonVisible", topRightPanelDecorator.setPreferenceButtonVisible);
-        Events.unSubscribeEvent("SetUserPanelButtonEnabled", topRightPanelDecorator.setUserPanelButtonEnabled);
+        Events.unSubscribeEvent("UserModeChanged", topRightPanelDecorator.onUserModeChanged);
     }
 
-    function setUserPanelButtonVisible(visible){
-        userPanel.visible = visible;
-    }
-
-    function setUserPanelButtonEnabled(enabled){
-        userPanel.enabled = enabled;
-    }
-
-    function setPreferenceButtonVisible(visible){
-        preferenceButton.visible = visible;
+    function onUserModeChanged(userMode){
+        if (userMode === "NO_USER_MANAGEMENT"){
+            userPanel.visible = false;
+        }
+        else if (userMode === "OPTIONAL_USER_MANAGEMENT"){
+            userPanel.visible = true;
+        }
+        else if (userMode === "STRONG_USER_MANAGEMENT"){
+            userPanel.visible = true;
+        }
     }
 
     UserPanel {
         id: userPanel;
         anchors.verticalCenter: parent.verticalCenter;
+
+        visible: false;
     }
 
     PreferenceButton {

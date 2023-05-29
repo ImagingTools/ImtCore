@@ -3,10 +3,14 @@ import Acf 1.0
 import imtqml 1.0
 import imtgui 1.0
 
-Item {
+QtObject {
     id: container;
 
     property string userMode;
+
+    onUserModeChanged: {
+        Events.sendEvent("UserModeChanged", container.userMode);
+    }
 
     property alias userModeGqlModel: userModeModel;
 
@@ -14,32 +18,24 @@ Item {
         userModeModel.getUserMode();
     }
 
-    Component {
-        id: passwordInputDialog;
-
+    property Component passwordInputDialog: Component {
         SuperUserPasswordDialog {
             title: qsTr("Set a password");
-
             onFinished: {
                 if (buttonId == "Ok"){
-                    console.log("onFinished", inputValue);
-
                     saveQuery.updateModel(inputValue);
                 }
             }
         }
     }
 
-    Component {
-        id: errorDialog;
-
+    property Component errorDialog: Component {
         ErrorDialog {
-            onFinished: {
-            }
+            onFinished: {}
         }
     }
 
-    GqlModel {
+    property GqlModel saveQuery: GqlModel {
         id: saveQuery;
 
         function updateModel(password){
@@ -71,7 +67,7 @@ Item {
         }
     }
 
-    GqlModel{
+    property GqlModel userModeModel: GqlModel{
         id: userModeModel;
 
         function getUserMode() {

@@ -196,7 +196,6 @@ Item {
         anchors.left: mainRec.left;
         anchors.right: mainRec.right;
         anchors.leftMargin: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.textLeftMargin: 0;
-      //  anchors.rightMargin: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.textRightMargin : 0;
 
         sourceComponent: defaultContent;
 
@@ -205,7 +204,7 @@ Item {
                 contentLoader.item.tableCellDelegate = delegateContainer;
             }
 
-            contentLoader.item.z = 1000;
+            contentLoader.item.z = 100;
         }
     }
 
@@ -250,18 +249,13 @@ Item {
             }
             text: delegateContainer.pTableDelegateContainer ? delegateContainer.columnIndex >= 0 ? delegateContainer.pTableDelegateContainer.dataModel[delegateContainer.pTableDelegateContainer.headers.GetData("Id", delegateContainer.columnIndex)] : "" : "";
 
-//            onHeightChanged: {
-//                if(delegateContainer.pTableDelegateContainer.wrapMode !== Text.NoWrap){
-//                    if(delegateContainer.columnIndex < heightModel.count){
-//                        var height_ = name.height +
-//                                2*delegateContainer.pTableDelegateContainer.textMarginVer +
-//                                topBorder.height + bottomBorder.height;
-
-//                        heightModel.setProperty(delegateContainer.columnIndex, "cellHeight", height_);
-
-//                    }
-//                }
-//            }
+            onTextChanged: {
+                // Multiline fit in one line
+                if (name.text.includes('\n')){
+                    let result = name.text.split('\n');
+                    name.text = result[0] + "...";
+                }
+            }
         }
     }
 }//delegate

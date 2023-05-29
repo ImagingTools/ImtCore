@@ -1,11 +1,10 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtgui 1.0
 
-Item {
+QtObject {
     id: collectionViewContainer;
 
-    Shortcut {
+    property Shortcut ctrlF: Shortcut {
         sequence: "Ctrl+F";
         context: Qt.ApplicationShortcut;
 
@@ -16,7 +15,7 @@ Item {
         }
     }
 
-    Shortcut {
+    property Shortcut ctrlA: Shortcut {
         sequence: "Ctrl+A";
         context: Qt.ApplicationShortcut;
 
@@ -27,7 +26,7 @@ Item {
         }
     }
 
-    Shortcut {
+    property Shortcut ctrlDown: Shortcut {
         sequence: "Shift+Down";
         context: Qt.ApplicationShortcut;
 
@@ -38,7 +37,7 @@ Item {
         }
     }
 
-    Shortcut {
+    property Shortcut ctrlUp: Shortcut {
         sequence: "Shift+Up";
         context: Qt.ApplicationShortcut;
 
@@ -48,48 +47,5 @@ Item {
             Events.sendEvent("ShiftUp");
         }
     }
-
-    Shortcut {
-        sequence: "Shift+LBM";
-        context: Qt.ApplicationShortcut;
-
-        onActivated: {
-            console.log("onActivated Shift+LBM");
-
-//            Events.sendEvent("ShiftUp");
-        }
-    }
-    //    Shortcut {
-    //        sequence: "Ctrl+S";
-    //        context: Qt.ApplicationShortcut;
-
-    //        onActivated: {
-    //            console.log("onActivated Ctrl+S");
-
-    //            Events.sendEvent("SaveActivated");
-    //        }
-    //    }
-
-    //    Shortcut {
-    //        sequence: "Ctrl+Z";
-    //        context: Qt.ApplicationShortcut;
-
-    //        onActivated: {
-    //            console.log("onActivated Ctrl+Z");
-
-    //            Events.sendEvent("UndoActivated");
-    //        }
-    //    }
-
-    //    Shortcut {
-    //        sequence: "Ctrl+Shift+Z";
-    //        context: Qt.ApplicationShortcut;
-
-    //        onActivated: {
-    //            console.log("onActivated Ctrl+Shift+Z");
-
-    //            Events.sendEvent("RedoActivated");
-    //        }
-    //    }
 }
 

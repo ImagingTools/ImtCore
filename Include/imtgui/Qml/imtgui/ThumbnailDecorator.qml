@@ -170,12 +170,7 @@ Rectangle {
         id: userManagement;
 
         onUserModeChanged: {
-            if (userMode == "NO_USER_MANAGEMENT"){
-                Events.sendEvent("SetUserPanelButtonVisible", false);
-                thumbnailDecoratorContainer.root.updateAllModels();
-            }
-            else if (userMode == "OPTIONAL_USER_MANAGEMENT"){
-                Events.sendEvent("SetUserPanelButtonEnabled", true);
+            if (userMode == "NO_USER_MANAGEMENT" || userMode == "OPTIONAL_USER_MANAGEMENT"){
                 thumbnailDecoratorContainer.root.updateAllModels();
             }
             else if (userMode == "STRONG_USER_MANAGEMENT"){

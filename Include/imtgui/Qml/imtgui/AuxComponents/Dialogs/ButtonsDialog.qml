@@ -9,7 +9,6 @@ Item {
     height: 30;
     width: rowButtons.width;
 
-
     signal buttonClicked(string buttonId);
 
     function addButton(buttonObj){
@@ -20,12 +19,22 @@ Item {
     function setButtonState(buttonId, state){
         for (let i = 0; i < buttonsModel.count; i++){
             let id = buttonsModel.get(i).Id;
-
-            if (id == buttonId){
+            if (id === buttonId){
                 buttonsModel.setProperty(i, "Enabled", state);
                 break;
             }
         }
+    }
+
+    function getButtonState(buttonId){
+        for (let i = 0; i < buttonsModel.count; i++){
+            let id = buttonsModel.get(i).Id;
+            if (id === buttonId){
+                return buttonsModel.get(i).Enabled;
+            }
+        }
+
+        return false;
     }
 
     ListModel {

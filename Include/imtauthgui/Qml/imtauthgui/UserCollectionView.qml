@@ -8,7 +8,9 @@ CollectionView {
     Component.onCompleted: {
         userCollectionViewContainer.commandsDelegatePath = "../../imtauthgui/UserCollectionViewCommandsDelegate.qml";
 
-        userCollectionViewContainer.baseCollectionView.table.onHeadersChanged.connect(userCollectionViewContainer.onHeadersChanged);
+        if (userCollectionViewContainer.baseCollectionView.table.headers){
+            userCollectionViewContainer.baseCollectionView.table.onHeadersChanged.connect(userCollectionViewContainer.onHeadersChanged);
+        }
     }
 
     function fillContextMenuModel(){
@@ -62,8 +64,6 @@ CollectionView {
 
                 anchors.verticalCenter: parent.verticalCenter;
 
-//                width: item.width;
-
                 font.pixelSize: Style.fontSize_common;
                 font.family: Style.fontFamily;
                 color: Style.textColor;
@@ -92,6 +92,10 @@ CollectionView {
                     arrowButton.tooltipItem.horizontalAlignment = Text.AlignLeft;
                     arrowButton.tooltipItem.lineHeight = 1.2;
                 }
+
+                onContainsMouseChanged: {
+                    console.log("onContainsMouseChanged", containsMouse);
+                }
             }
         }
     }
@@ -101,8 +105,6 @@ CollectionView {
 
         Item {
             id: item2;
-
-           // height: 20;
 
             property Item tableCellDelegate: null;
 
@@ -132,8 +134,6 @@ CollectionView {
 
                 anchors.verticalCenter: parent.verticalCenter;
 
-//                width: item2.width;
-
                 font.pixelSize: Style.fontSize_common;
                 font.family: Style.fontFamily;
                 color: Style.textColor;
@@ -146,7 +146,6 @@ CollectionView {
 
                 anchors.verticalCenter: parent.verticalCenter;
                 anchors.left: name2.right;
-              //  anchors.leftMargin: 5;
 
                 width: 15;
                 height: width;
@@ -161,22 +160,6 @@ CollectionView {
                     arrowButton.tooltipItem.lineHeight = 1.2;
                 }
             }
-        }
-    }
-
-    Component {
-        id: customTooltipContentComp;
-
-        Rectangle {
-            width: 200;
-            height: 100;
-
-            color: arrowButton.tooltipItem.color;
-            border.color: arrowButton.tooltipItem.borderColor;
-            border.width: arrowButton.tooltipItem.borderWidth;
-            radius: arrowButton.tooltipItem.radius;
-
-            property Item root: null;
         }
     }
 }

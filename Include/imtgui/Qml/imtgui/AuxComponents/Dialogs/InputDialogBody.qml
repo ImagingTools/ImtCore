@@ -60,7 +60,6 @@ Item {
 
             onAccepted: {
                 inputDialogBodyContainer.rootItem.buttons.buttonClicked("Ok");
-                //buttonsDialog.buttonClicked("Ok");
             }
         }
     }
