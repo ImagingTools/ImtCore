@@ -24,6 +24,11 @@ I_EXPORT_COMPONENT(
             "Address element info object for SQL table",
             "SQL Address Element Delegate");
 
+I_EXPORT_COMPONENT(
+            AddressCollectionController,
+            "Address Collection Controller",
+            "Address Collection Controller");
+
 
 } // namespace ImtGeoPck
 

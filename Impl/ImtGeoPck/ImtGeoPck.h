@@ -8,6 +8,7 @@
 // ImtCore includes
 #include <imtgeo/CAddressElementInfo.h>
 #include <imtgeo/CAddressElementDatabaseDelegateComp.h>
+#include <imtgeo/CAddressCollectionControllerComp.h>
 
 
 
@@ -26,6 +27,7 @@ typedef icomp::TModelCompWrap<
                         iser::ISerializable,
                         istd::IChangeable>> AddressElementInfo;
 typedef imtgeo::CAddressElementDatabaseDelegateComp AddressElementDatabaseDelegate;
+typedef imtgeo::CAddressCollectionControllerComp AddressCollectionController;
 
 
 } // namespace ImtGeoPck

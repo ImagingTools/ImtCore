@@ -8,6 +8,6 @@ include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 
 
-target_link_libraries(${PROJECT_NAME} imtgeo imtdb)
+target_link_libraries(${PROJECT_NAME} imtgeo imtbase imtdb imtguigql imtgql)
 
 
