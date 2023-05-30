@@ -49,7 +49,7 @@ export class QtObject {
             } else {
                 args.parent.children.push(this)
             }
-            args.parent.$childChanged()
+            args.parent.$childChanged(this)
             this.parent = args.parent
             this.$treeParent = args.parent 
         }
@@ -172,8 +172,11 @@ export class QtObject {
             configurable: true,
         })
     }
-    $childChanged(){
+    $childChanged(child){
         
+    }
+    $childDomChanged(child){
+
     }
     $tryComplete(){
         if(!this.$completed){
@@ -836,7 +839,7 @@ export class QtObject {
             indx = this.parent.children.indexOf(this)
             if(indx >= 0) {
                 this.parent.children.splice(indx, 1)
-                this.parent.$childChanged()
+                this.parent.$childChanged(this)
             }
 
             

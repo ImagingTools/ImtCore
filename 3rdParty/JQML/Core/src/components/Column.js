@@ -8,25 +8,40 @@ export class Column extends Item {
     constructor(args) {
         super(args)
 
-        this.$cP('spacing', 0)
+        this.$cP('spacing', 0).connect(this.$spacingChanged.bind(this))
+    }
 
-        this.$childUpdater = null
+    $childDomChanged(child){
+        if(child.$qmlClassName !== 'Repeater'){
+            child.dom.style.position = 'relative'
+            child.$p.y.preventDefault = true
+
+            child.heightChanged.connect(()=>{
+                child.dom.style.height = `${child.height}px`
+                for(let c of this.children){
+                    if(c.$qmlClassName !== 'Repeater' && c.dom){
+                        c.y = c.dom.offsetTop
+                    }
+                }
+                this.$updateGeometry()
+            })
+            
+        }
+        this.$updateGeometry()
     }
-    $childChanged(){
-        clearTimeout(this.$childUpdater)
-        this.$childUpdater = setTimeout(()=>{
-            this.$updateGeometry()
-            this.$updateChildren()
-            this.$uP()
-        }, 100)
-    }
-    $uP(){
-        this.$updateChildren()
-        super.$uP()
+    $spacingChanged(){
+        this.dom.style.gap = `${this.spacing}px`
+        for(let child of this.children){
+            if(child.$qmlClassName !== 'Repeater' && child.dom){
+                child.y = child.dom.offsetTop
+            }
+        }
+        this.$updateGeometry()
     }
     $domCreate(){
         super.$domCreate()
-
+        this.dom.style.display = 'flex'
+        this.dom.style.flexDirection = 'column'
     }
     $updateGeometry(){
         if(this.$heightAuto)
@@ -59,33 +74,9 @@ export class Column extends Item {
             return width
         })
     }
-    $updateChildren(){
-        let prevIndex = -1
-        for(let i = 0; i < this.$availableGeometry.length; i++){
-            if(!(this.$availableGeometry[i] instanceof Repeater) && this.$availableGeometry[i].visible){
-                this.$anchorsChild(i, prevIndex)
-                prevIndex = i
-            }
-            
-        }
-    }
-
-    $anchorsChild(index, prevIndex){
-        let child = this.$availableGeometry[index]
-        
-        child.$sP('anchors.left', ()=>{ return this.left })
-        if(prevIndex < 0){
-            child.$sP('anchors.top', ()=>{ return this.top })
-            child.anchors.topMargin = 0
-        } else {
-            let prevChild = this.$availableGeometry[prevIndex]
-            child.$sP('anchors.top', ()=>{ return prevChild.bottom })
-            child.$sP('anchors.topMargin', ()=>{ return this.spacing })
-        }
-    }
+    
 
     $destroy(){
-        clearTimeout(this.$childUpdater)
         super.$destroy()
     }
 }

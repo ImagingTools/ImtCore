@@ -153,9 +153,7 @@ export class Item extends QtObject {
 
         // if(this.UID !== 0)
         // Core.root.dom.appendChild(this.dom)
-        if(this.parent && this.parent.dom){
-            this.parent.dom.appendChild(this.dom)
-        }
+        
         
         this.dom.style.position = 'absolute'
         this.dom.style.left = '0'
@@ -173,6 +171,10 @@ export class Item extends QtObject {
         //     e.preventDefault()
 		// 	this.focus = false
 		// })
+        if(this.parent && this.parent.dom){
+            this.parent.dom.appendChild(this.dom)
+            this.parent.$childDomChanged(this)
+        }
     }
 
     $destroy() {
@@ -184,7 +186,7 @@ export class Item extends QtObject {
         this.focus =  param === true ? true : false
     }
     $xChanged(){
-        let x = this.x
+        // let x = this.x
         // if(!this.$anchorsX){
         //     let parent = this.parent
         //     while(parent){
@@ -192,10 +194,10 @@ export class Item extends QtObject {
         //         parent = parent.parent
         //     }
         // }
-        this.dom.style.left = `${this.x}px`
+        if(!this.$p.x.preventDefault) this.dom.style.left = `${this.x}px`
     }
     $yChanged(){
-        let y = this.y
+        // let y = this.y
         // if(!this.$anchorsY){
         //     let parent = this.parent
         //     while(parent){
@@ -203,7 +205,7 @@ export class Item extends QtObject {
         //         parent = parent.parent
         //     }
         // }
-        this.dom.style.top = `${this.y}px`
+        if(!this.$p.y.preventDefault) this.dom.style.top = `${this.y}px`
     }
     $zChanged(){
         this.dom.style.zIndex = this.z
@@ -247,7 +249,7 @@ export class Item extends QtObject {
         // }
 
         if(this.parent && (this.parent.$qmlClassName === 'Row' || this.parent.$qmlClassName === 'Column')){
-            this.parent.$childChanged()
+            this.parent.$childChanged(this)
         }
     }
     $clipChanged(){

@@ -284,10 +284,18 @@ export class ListView extends Flickable {
                 }
             }
         }
+        this.$p.contentX.val = 0
+        this.$p.contentY.val = 0
+        this.$p.originX.val = 0
+        this.$p.originY.val = 0
         this.$updateGeometry()
         this.$updateView()
     }
     $delegateChanged(){
+        this.$p.contentX.val = 0
+        this.$p.contentY.val = 0
+        this.$p.originX.val = 0
+        this.$p.originY.val = 0
         this.$updateView(true)
     }
     $spacingChanged(){
@@ -564,7 +572,6 @@ export class ListView extends Flickable {
                             currentIndex = rightIndex + Math.ceil((this.contentX - maxX - (middleWidth ? this.spacing : 0))/(Math.round(middleWidth + (middleWidth ? this.spacing : 0))))
                             if(isNaN(currentIndex)) currentIndex = rightIndex
                         }
-                        
                         if(currentIndex < 0 || currentIndex >= this.$items.length) return
                         
                         // currentIndex = (this.contentX <= minX ? leftIndex : rightIndex) + (Math.round(middleWidth)*(this.$items.length - visibleCount))
@@ -590,7 +597,6 @@ export class ListView extends Flickable {
                             currentIndex = rightIndex + Math.ceil((this.contentY - maxY - (middleHeight ? this.spacing : 0))/(Math.round(middleHeight + (middleHeight ? this.spacing : 0))))
                             if(isNaN(currentIndex)) currentIndex = rightIndex
                         }
-
                         if(currentIndex < 0 || currentIndex >= this.$items.length) return
                         
                         // currentIndex = (this.contentY <= minY ? leftIndex : rightIndex) + (Math.round(middleHeight)*(this.$items.length - visibleCount))
