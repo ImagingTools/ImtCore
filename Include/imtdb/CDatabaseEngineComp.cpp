@@ -97,7 +97,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQuery(const QByteArray& queryString, const
 
 	if (sqlError){
 		*sqlError = databaseConnection.lastError().type() ? databaseConnection.lastError() : retVal.lastError();
-	}
+    }
 
 	if ((databaseConnection.lastError().type() != QSqlError::NoError) || (retVal.lastError().type() != QSqlError::NoError)){
 		qCritical() << __FILE__ << __LINE__
