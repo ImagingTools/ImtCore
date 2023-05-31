@@ -14,7 +14,6 @@ find_library(
         ${XLSX_LIB_SEARCH_PATH}
 )
 
-#target_link_libraries(${PROJECT_NAME} ${XLSX_LIB_PATH})
-
+message("QXlsx XLSX_LIB_PATH ${XLSX_LIB_PATH} XLSX_LIB_SEARCH_PATH ${XLSX_LIB_SEARCH_PATH}")
 
 
