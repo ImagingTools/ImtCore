@@ -41,7 +41,8 @@ public:
 		I_REGISTER_INTERFACE(IDeviceController);
 		I_ASSIGN_MULTI_0(m_deviceControllerCompPtr, "DeviceControllers", "Device controllers", false);
 		I_ASSIGN_TO(m_deviceEnumeratorCompPtr, m_deviceControllerCompPtr, true);
-		I_ASSIGN(m_enumerationIntervalAttrPtr, "DeviceEnumerationInterval", "Interval between starts of successive enumeration cycles (secs).\nNegative value or zero for continuous enumeration", true, 5);
+		I_ASSIGN(m_enableAttrPtr, "EnableEnumerationControl", "Enable automatic enumeration control if true", true, false);
+		I_ASSIGN(m_intervalAttrPtr, "EnumerationInterval", "Interval between starts of successive enumeration cycles (secs)\n0 - Continuous enumeration", true, 5);
 	I_END_COMPONENT;
 
 	CCompositeDeviceControllerComp();
@@ -52,11 +53,11 @@ public:
 	virtual const imtbase::ICollectionInfo& GetAvailableDeviceList() const override;
 	virtual DeviceState GetDeviceState(const QByteArray& deviceId) const override;
 	virtual DeviceInstanceInfoPtr GetDeviceInstanceInfo(const QByteArray& deviceId) const override;
-	virtual imtdev::DeviceAccessorPtr OpenDevice(const QByteArray& deviceId, const iprm::IParamsSet* paramsPtr) override;
+	virtual imtdev::DeviceAccessorPtr OpenDevice(const QByteArray& deviceTypeId, const QByteArray& deviceId, const iprm::IParamsSet* paramsPtr) override;
 	virtual bool CloseDevice(const QByteArray& deviceId) override;
 
 	// reimplemented (IDeviceEnumerator)
-    virtual IDeviceEnumerator::StartResult StartEnumeration(IDeviceEnumerator::IResultHandler* resultHandlerPtr) override;
+	virtual IDeviceEnumerator::StartResult StartEnumeration(IDeviceEnumerator::IResultHandler* resultHandlerPtr) override;
 	virtual void CancelEnumeration() override;
 
 	// reimplemented (IDeviceEnumerationResultHandler)
@@ -69,17 +70,16 @@ protected:
 	virtual void OnComponentCreated();
 	virtual void OnComponentDestroyed();
 
-private Q_SLOTS:
-	void OnTimer();
+protected Q_SLOTS:
+	virtual void OnIntervalTimer();
 
-private:
-	IDeviceEnumerator* GetCurrentDeviceEnumerator();
-	IDeviceEnumerator* GetNextDeviceEnumerator();
-	bool StartEnumeration();
-	void CacnelEnumeration();
-	void OnDeviceListChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet);
+protected:
+	virtual void StartEnumeration();
+	virtual IDeviceEnumerator* GetCurrentDeviceEnumerator();
+	virtual IDeviceEnumerator* GetNextDeviceEnumerator();
+	virtual void OnDeviceListChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet);
 
-private:
+protected:
 	class DeviceListObserver: public imod::CMultiModelDispatcherBase
 	{
 	public:
@@ -100,10 +100,11 @@ private:
 		return &parent.m_deviceList;
 	}
 
-private:
+protected:
 	I_MULTIREF(IDeviceController, m_deviceControllerCompPtr);
 	I_MULTIREF(IDeviceEnumerator, m_deviceEnumeratorCompPtr);
-	I_ATTR(int, m_enumerationIntervalAttrPtr);
+	I_ATTR(bool, m_enableAttrPtr);
+	I_ATTR(int, m_intervalAttrPtr);
 
 	QMap<QByteArray, IDeviceController*> m_deviceControllerMap;
 
@@ -113,7 +114,8 @@ private:
 	DeviceListObserver m_deviceListObserver;
 
 	int m_enumeratorIndex;
-	QTimer m_enumerationTimer;
+	QTimer m_intervalTimer;
+	IDeviceEnumerator::IResultHandler* m_resultHandlerPtr;
 };
 
 

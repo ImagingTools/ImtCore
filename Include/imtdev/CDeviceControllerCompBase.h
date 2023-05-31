@@ -56,7 +56,7 @@ protected:
 	typedef QVector<EnumeratedDeviceInfo> EnumeratedDeviceList;
 
 	// Must be called from the main thread!!!
-	void UpdateDeviceList(EnumeratedDeviceList& enumeratedDeviceList);
+	virtual void UpdateDeviceList(EnumeratedDeviceList& enumeratedDeviceList);
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated();
@@ -70,8 +70,8 @@ protected:
 	mutable QRecursiveMutex m_openedDevicesMutex;
 #endif
 
-private:
-	void AutoCloseDisconnectedDevices();
+protected:
+	virtual void AutoCloseDisconnectedDevices();
 
 	template <class InteraceType>
 	static InteraceType* ExtractDeviceInfoList(CDeviceControllerCompBase& parent)
@@ -79,7 +79,7 @@ private:
 		return &parent.m_deviceList;
 	}
 
-private:
+protected:
 	I_ATTR(bool, m_isAutoCloseEnabledAttrPtr);
 
 	typedef imod::TModelWrap<imtbase::CCollectionInfo> DeviceInfoList;

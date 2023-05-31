@@ -19,7 +19,8 @@ namespace imtdev
 
 CCompositeDeviceControllerComp::CCompositeDeviceControllerComp()
 	:m_deviceListObserver(*this),
-	m_enumeratorIndex(-1)
+	m_enumeratorIndex(-1),
+	m_resultHandlerPtr(nullptr)
 {
 }
 
@@ -87,10 +88,24 @@ DeviceInstanceInfoPtr CCompositeDeviceControllerComp::GetDeviceInstanceInfo(cons
 }
 
 
-DeviceAccessorPtr CCompositeDeviceControllerComp::OpenDevice(const QByteArray& deviceId, const iprm::IParamsSet* paramsPtr)
+DeviceAccessorPtr CCompositeDeviceControllerComp::OpenDevice(const QByteArray& deviceTypeId, const QByteArray& deviceId, const iprm::IParamsSet* paramsPtr)
 {
-	if (m_deviceControllerMap.contains(deviceId)){
-		return m_deviceControllerMap[deviceId]->OpenDevice(deviceId, paramsPtr);
+	if (!deviceId.isEmpty()){
+		if (m_deviceControllerMap.contains(deviceId)){
+			return m_deviceControllerMap[deviceId]->OpenDevice(deviceTypeId, deviceId, paramsPtr);
+		}
+	}
+	else{
+		int count = m_deviceControllerCompPtr.GetCount();
+		for (int i = 0; i < count; i++){
+			IDeviceController* controllerPtr = m_deviceControllerCompPtr[i];
+			if (controllerPtr != nullptr){
+				QByteArrayList deviceTypeIds = controllerPtr->GetSupportedDeviceTypeIds();
+				if (deviceTypeIds.contains(deviceTypeId)){
+					return controllerPtr->OpenDevice(deviceTypeId, deviceId, paramsPtr);
+				}
+			}
+		}
 	}
 
 	return DeviceAccessorPtr();
@@ -117,6 +132,14 @@ IDeviceEnumerator::StartResult CCompositeDeviceControllerComp::StartEnumeration(
 
 void CCompositeDeviceControllerComp::CancelEnumeration()
 {
+	SendInfoMessage(0, "Cancellation of enumeration");
+
+	IDeviceEnumerator* deviceEnumeratorPtr = GetCurrentDeviceEnumerator();
+	if (deviceEnumeratorPtr){
+		deviceEnumeratorPtr->CancelEnumeration();
+	}
+
+	m_resultHandlerPtr = nullptr;
 }
 
 
@@ -126,29 +149,21 @@ void CCompositeDeviceControllerComp::OnEnumerationResult(
 			EnumerationResult result,
 			const IDeviceEnumerator* /*deviceEnumeratorPtr*/)
 {
-	switch (result){
-	case ER_OK:
-		break;
-	case ER_CANCELED:
-		SendInfoMessage(0, "Enumeration canceled");
-		break;
-	case ER_FAILED:
-		SendInfoMessage(0, "Enumeration failed");
-		break;
-	}
-
 	IDeviceEnumerator* deviceEnumeratorPtr = GetNextDeviceEnumerator();
 	if (deviceEnumeratorPtr != nullptr){
 		deviceEnumeratorPtr->StartEnumeration(this);
 	}
 	else{
-		SendInfoMessage(0, QString("Enumeration finished"));
-
-		m_enumeratorIndex = -1;
-
-		if (!m_enumerationTimer.isActive()){
+		if (*m_enableAttrPtr && !m_intervalTimer.isActive()){
 			StartEnumeration();
 		}
+		else{
+			if (m_resultHandlerPtr != nullptr){
+				m_resultHandlerPtr->OnEnumerationResult(ER_OK, this);
+			}
+		}
+
+		m_resultHandlerPtr = nullptr;
 	}
 }
 
@@ -163,27 +178,29 @@ void CCompositeDeviceControllerComp::OnComponentCreated()
 
 	SendInfoMessage(0, "Created");
 
-	m_enumerationTimer.setInterval(*m_enumerationIntervalAttrPtr * 1000);
-	connect(&m_enumerationTimer, &QTimer::timeout, this, &CCompositeDeviceControllerComp::OnTimer);
+	if (*m_intervalAttrPtr > 0){
+		m_intervalTimer.setInterval(*m_intervalAttrPtr * 1000);
+	}
+	connect(&m_intervalTimer, &QTimer::timeout, this, &CCompositeDeviceControllerComp::OnIntervalTimer);
 
-	SendInfoMessage(0, QString("Enumeration interval set to %1").arg(m_enumerationTimer.interval()));
+	SendInfoMessage(0, QString("Enumeration interval set to %1").arg(m_intervalTimer.interval()));
 
-	bool modelFound = false;
-	
 	int count = m_deviceControllerCompPtr.GetCount();
 	for (int i = 0; i < count; i++){
 		const IDeviceController* deviceControllerPtr = m_deviceControllerCompPtr[i];
+		Q_ASSERT(deviceControllerPtr != nullptr);
+
 		if (deviceControllerPtr != nullptr){
 			imod::IModel* modelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(&deviceControllerPtr->GetAvailableDeviceList()));
+			Q_ASSERT(modelPtr != nullptr);
+
 			if (modelPtr != nullptr){
 				m_deviceListObserver.RegisterModel(modelPtr);
-
-				modelFound = true;
 			}
 		}
 	}
 
-	if (modelFound){
+	if (*m_enableAttrPtr){
 		StartEnumeration();
 	}
 }
@@ -191,9 +208,9 @@ void CCompositeDeviceControllerComp::OnComponentCreated()
 
 void CCompositeDeviceControllerComp::OnComponentDestroyed()
 {
-	CacnelEnumeration();
+	CancelEnumeration();
 
-	m_enumerationTimer.stop();
+	m_intervalTimer.stop();
 
 	m_deviceListObserver.UnregisterAllModels();
 
@@ -203,9 +220,9 @@ void CCompositeDeviceControllerComp::OnComponentDestroyed()
 
 // private slots
 
-void CCompositeDeviceControllerComp::OnTimer()
+void CCompositeDeviceControllerComp::OnIntervalTimer()
 {
-	if (m_enumeratorIndex < 0){
+	if (GetCurrentDeviceEnumerator() == nullptr){
 		StartEnumeration();
 	}
 }
@@ -213,13 +230,28 @@ void CCompositeDeviceControllerComp::OnTimer()
 
 // private methods
 
+void CCompositeDeviceControllerComp::StartEnumeration()
+{
+	Q_ASSERT(m_enumeratorIndex == -1);
+
+	IDeviceEnumerator* deviceEnumeratorPtr = GetNextDeviceEnumerator();
+	if (deviceEnumeratorPtr){
+		SendInfoMessage(0, "Enumeration started");
+
+		if (m_intervalTimer.interval() > 0){
+			m_intervalTimer.start();
+
+			SendInfoMessage(0, "Enumeration interval timer started");
+		}
+
+		deviceEnumeratorPtr->StartEnumeration(this);
+	}
+}
+
+
 IDeviceEnumerator* CCompositeDeviceControllerComp::GetCurrentDeviceEnumerator()
 {
-	int count = m_deviceEnumeratorCompPtr.GetCount();
-
-	Q_ASSERT(m_enumeratorIndex >= 0 && m_enumeratorIndex < count);
-
-	if (m_enumeratorIndex >= 0 && m_enumeratorIndex < count){
+	if (m_enumeratorIndex >= 0 && m_enumeratorIndex < m_deviceEnumeratorCompPtr.GetCount()){
 		return m_deviceEnumeratorCompPtr[m_enumeratorIndex];
 	}
 
@@ -229,47 +261,18 @@ IDeviceEnumerator* CCompositeDeviceControllerComp::GetCurrentDeviceEnumerator()
 
 IDeviceEnumerator* CCompositeDeviceControllerComp::GetNextDeviceEnumerator()
 {
+	m_enumeratorIndex++;
 	if (m_enumeratorIndex < m_deviceEnumeratorCompPtr.GetCount()){
-		m_enumeratorIndex++;
-		if (m_enumeratorIndex < m_deviceEnumeratorCompPtr.GetCount()){
+		if (m_deviceEnumeratorCompPtr[m_enumeratorIndex] != nullptr){
 			return m_deviceEnumeratorCompPtr[m_enumeratorIndex];
 		}
-	}
-
-	return nullptr;
-}
-
-
-bool CCompositeDeviceControllerComp::StartEnumeration()
-{
-	Q_ASSERT(m_enumeratorIndex < 0 );
-
-	IDeviceEnumerator* deviceEnumeratorPtr = GetNextDeviceEnumerator();
-	if (deviceEnumeratorPtr){
-		SendInfoMessage(0, "Enumeration started");
-
-		if (m_enumerationTimer.interval() > 0){
-			m_enumerationTimer.start();
-
-			SendInfoMessage(0, "Enumeration interval timer started");
+		else{
+			return GetNextDeviceEnumerator();
 		}
-
-		deviceEnumeratorPtr->StartEnumeration(this);
-
-		return true;
 	}
 
-	return false;
-}
-
-void CCompositeDeviceControllerComp::CacnelEnumeration()
-{
-	SendInfoMessage(0, "Cancellation of enumeration");
-
-	IDeviceEnumerator* deviceEnumeratorPtr = GetCurrentDeviceEnumerator();
-	if (deviceEnumeratorPtr){
-		deviceEnumeratorPtr->CancelEnumeration();
-	}
+	m_enumeratorIndex = -1;
+	return nullptr;
 }
 
 
