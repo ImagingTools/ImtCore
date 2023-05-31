@@ -24,8 +24,6 @@ Rectangle {
 
     property bool hasShadow: true;
 
-    property string shadowColor: "lightgray";
-
     property alias openST: verticalListViewContainer.openST;
 
     property bool hasActiveState: false;
@@ -36,6 +34,10 @@ Rectangle {
     property int openButtonWidth: 32;
     property int openButtonHeight: 22;
     property int openDuration: 0;
+
+    property string shadowColor: "lightgrey";
+    property string baseColor: "#ffffff";
+    property string buttonColor: Style.color_button;
 
     property TreeItemModel buttonModel: TreeItemModel{};
     property TreeItemModel horizontalModel: TreeItemModel{};
@@ -307,6 +309,7 @@ Rectangle {
 
         width: parent.width - openButton.width - openButton.anchors.rightMargin - buttonPanel.mainMargin -10;
         height: parent.height;
+        color: buttonPanel.baseColor;
         clip: true;
 
         ListView{
@@ -344,7 +347,7 @@ Rectangle {
         iconSource: buttonPanel.openButtonImageSource;
         fontPixelSize: 30;
         fontColor: containsMouse ? "black" : "gray";
-        color: containsMouse || verticalListViewContainer.openST ? Style.color_button : "transparent";
+        color: containsMouse || verticalListViewContainer.openST ? buttonPanel.buttonColor : "transparent";
         borderColor: "transparent";
         highlighted: false;
 
@@ -362,8 +365,8 @@ Rectangle {
 
         anchors.fill: verticalListViewContainer;
 
-        horizontalOffset: 2;
-        verticalOffset: 2;
+        horizontalOffset: 1;
+        verticalOffset: 1;
 
         visible: buttonPanel.hasShadow && verticalListViewContainer.visible;
 
@@ -384,7 +387,8 @@ Rectangle {
         height: 0;
         radius: 4;
         border.width: 1;
-        border.color: "lightgray";
+        border.color: buttonPanel.shadowColor;
+        color: buttonPanel.baseColor;
 
         clip: true;
 
@@ -413,10 +417,12 @@ Rectangle {
         ListView{
             id: verticalListView;
 
-            anchors.centerIn: parent;
+            anchors.horizontalCenter: parent.horizontalCenter;
+            anchors.top: parent.top;
+            anchors.topMargin: buttonPanel.mainMargin;
 
             width: buttonPanel.delegateWidth;
-            height:  Math.min(contentHeight,(buttonPanel.delegateHeight * buttonPanel.visibleCount + (spacing - 1) * buttonPanel.visibleCount));
+            height:  Math.min(contentHeight,(buttonPanel.delegateHeight * buttonPanel.visibleCount + spacing * (buttonPanel.visibleCount-1)));
 
             clip: true;
             boundsBehavior: Flickable.StopAtBounds;
@@ -426,6 +432,7 @@ Rectangle {
             model: buttonPanel.verticalModel;
 
             delegate: buttonPanel.buttonDelegate;
+
 
 
         }//verticalListView
@@ -440,7 +447,7 @@ Rectangle {
         property: "height";
         duration: buttonPanel.openDuration;
         from: 0;
-        to: verticalListView.height + 2*buttonPanel.mainMargin;
+        to: verticalListView.height + 1.5*buttonPanel.mainMargin;
     }
 
     NumberAnimation {
@@ -449,12 +456,12 @@ Rectangle {
         target: verticalListViewContainer;
         property: "height";
         duration: buttonPanel.openDuration;
-        from: verticalListView.height + 2*buttonPanel.mainMargin;
+        from: verticalListView.height + 1.5*buttonPanel.mainMargin;
         to: 0;
     }
 
     function open(){
-        verticalListViewContainer.height = verticalListView.height + 2*buttonPanel.mainMargin;
+        verticalListViewContainer.height = verticalListView.height + 1.5*buttonPanel.mainMargin;
     }
 
     function close(){
