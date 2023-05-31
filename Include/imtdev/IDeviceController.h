@@ -56,7 +56,7 @@ public:
 	/**
 		Get IDs of device types supported by the controller.
 	*/
-	virtual QByteArrayList GetSupportedDeviceTypeIds() const = 0;
+	virtual const QByteArrayList& GetSupportedDeviceTypeIds() const = 0;
 
 	/**
 		Get device static info for the given DeviceTypeId.

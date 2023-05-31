@@ -5,18 +5,18 @@
 #include <QtCore/QTimer>
 
 // ACF includes
+#include <icomp/CComponentBase.h>
+#include <imod/CMultiModelDispatcherBase.h>
 #include <ilog/TLoggerCompWrap.h>
 #include <imod/TModelWrap.h>
 #include <imod/IModel.h>
-#include <imod/CMultiModelDispatcherBase.h>
-#include <icomp/CComponentBase.h>
-#include <icomp/CComponentBase.h>
 
 // ImtCore includes
 #include <imtbase/CCollectionInfo.h>
+#include <imtdev/IDeviceController.h>
 #include <imtdev/IDeviceInstanceInfo.h>
 #include <imtdev/IDeviceStaticInfo.h>
-#include <imtdev/IDeviceController.h>
+#include <imtdev/IDeviceState.h>
 
 
 namespace imtdev
@@ -34,10 +34,15 @@ public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CCompositeDeviceControllerComp);
-		I_REGISTER_SUBELEMENT(DeviceInfoList);
-		I_REGISTER_SUBELEMENT_INTERFACE(DeviceInfoList, imtbase::ICollectionInfo, ExtractDeviceInfoList);
-		I_REGISTER_SUBELEMENT_INTERFACE(DeviceInfoList, istd::IChangeable, ExtractDeviceInfoList);
-		I_REGISTER_SUBELEMENT_INTERFACE(DeviceInfoList, imod::IModel, ExtractDeviceInfoList);
+		I_REGISTER_SUBELEMENT(DeviceList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceList, imtbase::ICollectionInfo, ExtractDeviceList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceList, istd::IChangeable, ExtractDeviceList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceList, imod::IModel, ExtractDeviceList);
+		I_REGISTER_SUBELEMENT(DeviceTypeList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceTypeList, imtbase::ICollectionInfo, ExtractDeviceTypeList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceTypeList, IDeviceState, ExtractDeviceTypeList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceTypeList, istd::IChangeable, ExtractDeviceTypeList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceTypeList, imod::IModel, ExtractDeviceTypeList);
 		I_REGISTER_INTERFACE(IDeviceController);
 		I_ASSIGN_MULTI_0(m_deviceControllerCompPtr, "DeviceControllers", "Device controllers", false);
 		I_ASSIGN_TO(m_deviceEnumeratorCompPtr, m_deviceControllerCompPtr, true);
@@ -48,7 +53,7 @@ public:
 	CCompositeDeviceControllerComp();
 
 	// reimplemented (IDeviceController)
-	virtual QByteArrayList GetSupportedDeviceTypeIds() const override;
+	virtual const QByteArrayList& GetSupportedDeviceTypeIds() const override;
 	virtual const IDeviceStaticInfo* GetDeviceStaticInfo(const QByteArray& deviceTypeId) const override;
 	virtual const imtbase::ICollectionInfo& GetAvailableDeviceList() const override;
 	virtual DeviceState GetDeviceState(const QByteArray& deviceId) const override;
@@ -94,10 +99,29 @@ protected:
 		CCompositeDeviceControllerComp& m_parent;
 	};
 
+	class DeviceTypeList: public imtbase::CCollectionInfo, virtual public IDeviceState
+	{
+	public:
+		DeviceTypeList();
+		void SetParent(CCompositeDeviceControllerComp& parent);
+
+		// reimplemented (IDeviceState)
+		virtual bool IsDeviceConnected(const QByteArray& deviceTypeId) override;
+
+	private:
+		CCompositeDeviceControllerComp* m_parentPtr;
+	};
+
 	template <class InteraceType>
-	static InteraceType* ExtractDeviceInfoList(CCompositeDeviceControllerComp& parent)
+	static InteraceType* ExtractDeviceList(CCompositeDeviceControllerComp& parent)
 	{
 		return &parent.m_deviceList;
+	}
+
+	template <class InteraceType>
+	static InteraceType* ExtractDeviceTypeList(CCompositeDeviceControllerComp& parent)
+	{
+		return &parent.m_deviceTypeList;
 	}
 
 protected:
@@ -106,10 +130,12 @@ protected:
 	I_ATTR(bool, m_enableAttrPtr);
 	I_ATTR(int, m_intervalAttrPtr);
 
+	QByteArrayList m_supportedDeviceTypeIds;
+
 	QMap<QByteArray, IDeviceController*> m_deviceControllerMap;
 
-	typedef imod::TModelWrap<imtbase::CCollectionInfo> DeviceInfoList;
-	DeviceInfoList m_deviceList;
+	imod::TModelWrap<imtbase::CCollectionInfo> m_deviceList;
+	imod::TModelWrap<DeviceTypeList> m_deviceTypeList;
 
 	DeviceListObserver m_deviceListObserver;
 
