@@ -76,23 +76,23 @@ DeviceInstanceInfoPtr CCompositeDeviceControllerComp::GetDeviceInstanceInfo(cons
 }
 
 
-DeviceAccessorPtr CCompositeDeviceControllerComp::OpenDevice(const QByteArray& deviceTypeId, const QByteArray& deviceId, const iprm::IParamsSet* paramsPtr)
+DeviceAccessorPtr CCompositeDeviceControllerComp::OpenDevice(const QByteArray& deviceId, const iprm::IParamsSet* paramsPtr)
 {
-	if (!deviceId.isEmpty()){
-		if (m_deviceControllerMap.contains(deviceId)){
-			return m_deviceControllerMap[deviceId]->OpenDevice(deviceTypeId, deviceId, paramsPtr);
-		}
-	}
-	else{
+	if (GetSupportedDeviceTypeIds().contains(deviceId)){
 		int count = m_deviceControllerCompPtr.GetCount();
 		for (int i = 0; i < count; i++){
 			IDeviceController* controllerPtr = m_deviceControllerCompPtr[i];
 			if (controllerPtr != nullptr){
 				QByteArrayList deviceTypeIds = controllerPtr->GetSupportedDeviceTypeIds();
-				if (deviceTypeIds.contains(deviceTypeId)){
-					return controllerPtr->OpenDevice(deviceTypeId, deviceId, paramsPtr);
+				if (deviceTypeIds.contains(deviceId)){
+					return controllerPtr->OpenDevice(deviceId, paramsPtr);
 				}
 			}
+		}
+	}
+	else{
+		if (m_deviceControllerMap.contains(deviceId)){
+			return m_deviceControllerMap[deviceId]->OpenDevice(deviceId, paramsPtr);
 		}
 	}
 
