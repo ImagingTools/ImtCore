@@ -139,6 +139,32 @@ export class QtObject {
                             
                         }
                     }
+                    if(parent.$mapView){
+                        if(typeof parent.$mapView.$p.model.val === 'number'){     
+                            return new Proxy({
+                                'index': this.index
+                            }, handler)
+                        } else if (typeof parent.$mapView.$p.model.val === 'object'){
+                            if(Array.isArray(parent.$mapView.$p.model.val)){
+                                let target = {}
+                                if(parent.$mapView.$p.model.val[this.index]){
+                                    target = parent.$mapView.$p.model.val[this.index]
+                                    if(target.$qmlClassName === 'ListElement') return target
+                                    handler.model = parent.$mapView.$p.model.val
+                                }
+                                return new Proxy(target, handler)
+                            } else {
+                                let target = {}
+                                if(parent.$mapView.$p.model.val.data[this.index]){
+                                    target = parent.$mapView.$p.model.val.data[this.index]
+                                    if(target.$qmlClassName === 'ListElement') return target
+                                    handler.model = parent.$mapView.$p.model.val
+                                }
+                                return new Proxy(target, handler)
+                            }
+                            
+                        }
+                    }
                     if(parent.$useModel) {
                         if(typeof parent.$p.model.val === 'number'){     
                             return new Proxy({

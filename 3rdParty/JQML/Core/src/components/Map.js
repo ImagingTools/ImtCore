@@ -17,6 +17,18 @@ export class Map extends Item {
         this.$cP('plugin', undefined).connect(this.$pluginChanged.bind(this))
         this.$cP('center', QtPositioning.coordinate(0, 0)).connect(this.$centerChanged.bind(this))
         this.$cP('zoomLevel', 2).connect(this.$zoomLevelChanged.bind(this))
+        this.$cP('copyrightsVisible', true)
+        this.$cPC('gesture', {
+            acceptedGestures : '',
+            enabled : false,
+            flickDeceleration : 2500,
+            maximumZoomLevelChange : 4,
+            panActive : false,
+            pinchActive : false,
+            preventStealing : false,
+            rotationActive : false,
+            tiltActive : false,
+        })
 
         this.$initialized = false
         this.$s['Component.completed'].connect(this.$init.bind(this))
@@ -56,6 +68,26 @@ export class Map extends Item {
             f.$updateFeature()
         }
         this.$queue.clear()
+
+        this.$map.on('moveend', (e)=>{
+            for(let child of this.children){
+                if(child.$qmlClassName === 'MapQuickItem' && child.sourceItem){
+                    let rect = child.sourceItem.dom.getBoundingClientRect()
+                    child.x = rect.x - this.x
+                    child.y = rect.y - this.y
+                }
+            }
+
+            // this.zoomLevel = this.$map.getView().getZoom()
+        })
+    }
+
+    $childChanged(child){
+        if(child.$qmlClassName === 'MapQuickItem' && child.sourceItem){
+            let rect = child.sourceItem.dom.getBoundingClientRect()
+            child.x = rect.x - this.x
+            child.y = rect.y - this.y
+        }
     }
 
     $domCreate(){
@@ -70,7 +102,9 @@ export class Map extends Item {
 
     }
     $zoomLevelChanged(){
-
+        if(this.$map){
+            this.$map.getView().setZoom(this.zoomLevel)
+        }
     }
     $destroy(){
         this.$queue.clear()
