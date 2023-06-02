@@ -29,6 +29,11 @@ I_EXPORT_COMPONENT(
             "Address Collection Controller",
             "Address Collection Controller");
 
+I_EXPORT_COMPONENT(
+            DeviceMapClusterCollectionController,
+            "Device Map Cluster Collection Controller",
+            "Device Map Cluster Collection Controller");
+
 
 } // namespace ImtGeoPck
 

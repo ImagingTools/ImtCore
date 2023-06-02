@@ -9,6 +9,7 @@
 #include <imtgeo/CAddressElementInfo.h>
 #include <imtgeo/CAddressElementDatabaseDelegateComp.h>
 #include <imtgeo/CAddressCollectionControllerComp.h>
+#include <imtgeo/CDeviceMapClusterCollectionControllerComp.h>
 
 
 
@@ -28,6 +29,7 @@ typedef icomp::TModelCompWrap<
                         istd::IChangeable>> AddressElementInfo;
 typedef imtgeo::CAddressElementDatabaseDelegateComp AddressElementDatabaseDelegate;
 typedef imtgeo::CAddressCollectionControllerComp AddressCollectionController;
+typedef imtgeo::CDeviceMapClusterCollectionControllerComp DeviceMapClusterCollectionController;
 
 
 } // namespace ImtGeoPck
