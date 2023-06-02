@@ -43,13 +43,13 @@ public:
 		/**
 			Device is available but not running.
 		*/
-		DS_INACTIVE,
+		DS_CLOSED,
 
 		/**
 			Processing loop of the device is running.
 			In this state the device can execute commands.
 		*/
-		DS_ACTIVE
+		DS_OPENED
 	};
 
 
@@ -82,7 +82,10 @@ public:
 	/**
 		Start processing loop of the given device. The state of the device will be switched into DS_ACTIVE, if the operation was successful.
 	*/
-	virtual DeviceAccessorPtr OpenDevice(const QByteArray& deviceId, const iprm::IParamsSet* paramsPtr) = 0;
+	virtual DeviceAccessorPtr OpenDevice(
+				const QByteArray& deviceTypeId,
+				const QByteArray& deviceId,
+				const iprm::IParamsSet* paramsPtr) = 0;
 
 	/**
 		Stop processing loop of the given device. The device will be in the \c DS_INACTIVE state, if the operation was successful.

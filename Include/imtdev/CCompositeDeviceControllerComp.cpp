@@ -15,11 +15,9 @@ namespace imtdev
 // public methods
 
 CCompositeDeviceControllerComp::CCompositeDeviceControllerComp()
-	:m_deviceListObserver(*this),
-	m_enumeratorIndex(-1),
+	:m_enumeratorIndex(-1),
 	m_resultHandlerPtr(nullptr)
 {
-	m_deviceTypeList.SetParent(*this);
 }
 
 
@@ -33,11 +31,15 @@ const QByteArrayList& CCompositeDeviceControllerComp::GetSupportedDeviceTypeIds(
 
 const IDeviceStaticInfo* CCompositeDeviceControllerComp::GetDeviceStaticInfo(const QByteArray& deviceTypeId) const
 {
-	int count = m_deviceControllerCompPtr.GetCount();
-	for (int i = 0; i < count; i++){
-		IDeviceController* controllerPtr = m_deviceControllerCompPtr[i];
-		if (controllerPtr != nullptr){
-			return controllerPtr->GetDeviceStaticInfo(deviceTypeId);
+	if (m_deviceControllerCompPtr.IsValid()){
+		int count = m_deviceControllerCompPtr.GetCount();
+		for (int i = 0; i < count; i++){
+			IDeviceController* controllerPtr = m_deviceControllerCompPtr[i];
+			if (controllerPtr != nullptr){
+				if (controllerPtr->GetSupportedDeviceTypeIds().contains(deviceTypeId)){
+					return controllerPtr->GetDeviceStaticInfo(deviceTypeId);
+				}
+			}
 		}
 	}
 
@@ -64,35 +66,28 @@ IDeviceController::DeviceState CCompositeDeviceControllerComp::GetDeviceState(co
 DeviceInstanceInfoPtr CCompositeDeviceControllerComp::GetDeviceInstanceInfo(const QByteArray& deviceId) const
 {
 	if (m_deviceControllerMap.contains(deviceId)){
-		istd::TDelPtr<imtdev::IDeviceInstanceInfo> instanceInfoPtr;
-		instanceInfoPtr.SetCastedOrRemove(m_deviceControllerMap[deviceId]->GetDeviceInstanceInfo(deviceId)->CloneMe());
-
-		DeviceInstanceInfoPtr retVal(instanceInfoPtr.PopPtr());
-
-		return retVal;
+		return m_deviceControllerMap[deviceId]->GetDeviceInstanceInfo(deviceId);
 	}
 
 	return DeviceInstanceInfoPtr();
 }
 
 
-DeviceAccessorPtr CCompositeDeviceControllerComp::OpenDevice(const QByteArray& deviceId, const iprm::IParamsSet* paramsPtr)
+DeviceAccessorPtr CCompositeDeviceControllerComp::OpenDevice(
+			const QByteArray& deviceTypeId,
+			const QByteArray& deviceId,
+			const iprm::IParamsSet* paramsPtr)
 {
-	if (GetSupportedDeviceTypeIds().contains(deviceId)){
+	if (GetSupportedDeviceTypeIds().contains(deviceTypeId)){
 		int count = m_deviceControllerCompPtr.GetCount();
 		for (int i = 0; i < count; i++){
 			IDeviceController* controllerPtr = m_deviceControllerCompPtr[i];
 			if (controllerPtr != nullptr){
 				QByteArrayList deviceTypeIds = controllerPtr->GetSupportedDeviceTypeIds();
 				if (deviceTypeIds.contains(deviceId)){
-					return controllerPtr->OpenDevice(deviceId, paramsPtr);
+					return controllerPtr->OpenDevice(deviceTypeId, deviceId, paramsPtr);
 				}
 			}
-		}
-	}
-	else{
-		if (m_deviceControllerMap.contains(deviceId)){
-			return m_deviceControllerMap[deviceId]->OpenDevice(deviceId, paramsPtr);
 		}
 	}
 
@@ -158,42 +153,33 @@ void CCompositeDeviceControllerComp::OnEnumerationResult(
 
 // protected methods
 
+// reimplemented (imod::CMultiModelDispatcherBase)
+
+void CCompositeDeviceControllerComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+{
+	Q_ASSERT(qApp->thread() == QThread::currentThread());
+
+	UpdateDeviceList();
+	UpdateExtendedDeviceList();
+
+	istd::IChangeable::ChangeSet localChangeSet(imtdev::IDeviceConnectionState::CF_CONNECTION_STATE_CHANGED);
+	istd::CChangeNotifier notifier(&m_deviceConnectionState, &localChangeSet);
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CCompositeDeviceControllerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	SendInfoMessage(0, "Created");
-
 	if (*m_intervalAttrPtr > 0){
 		m_intervalTimer.setInterval(*m_intervalAttrPtr * 1000);
 	}
+
 	connect(&m_intervalTimer, &QTimer::timeout, this, &CCompositeDeviceControllerComp::OnIntervalTimer);
 
-	SendInfoMessage(0, QString("Enumeration interval set to %1").arg(m_intervalTimer.interval()));
-
-	int count = m_deviceControllerCompPtr.GetCount();
-	for (int i = 0; i < count; i++){
-		const IDeviceController* deviceControllerPtr = m_deviceControllerCompPtr[i];
-		Q_ASSERT(deviceControllerPtr != nullptr);
-
-		if (deviceControllerPtr != nullptr){
-			QByteArrayList ids = deviceControllerPtr->GetSupportedDeviceTypeIds();
-			for (const QByteArray& id : ids){
-				m_deviceTypeList.InsertItem(id, deviceControllerPtr->GetDeviceStaticInfo(id)->GetDeviceTypeName(), "");
-			}
-
-			m_supportedDeviceTypeIds += ids;
-
-			imod::IModel* modelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(&deviceControllerPtr->GetAvailableDeviceList()));
-			Q_ASSERT(modelPtr != nullptr);
-
-			if (modelPtr != nullptr){
-				m_deviceListObserver.RegisterModel(modelPtr);
-			}
-		}
-	}
+	UpdateDeviceTypeIdList();
 
 	if (*m_enableAttrPtr){
 		StartEnumeration();
@@ -207,7 +193,7 @@ void CCompositeDeviceControllerComp::OnComponentDestroyed()
 
 	m_intervalTimer.stop();
 
-	m_deviceListObserver.UnregisterAllModels();
+	UnregisterAllModels();
 
 	BaseClass::OnComponentDestroyed();
 }
@@ -271,70 +257,122 @@ IDeviceEnumerator* CCompositeDeviceControllerComp::GetNextDeviceEnumerator()
 }
 
 
-void CCompositeDeviceControllerComp::OnDeviceListChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+void CCompositeDeviceControllerComp::UpdateDeviceTypeIdList()
 {
-	Q_ASSERT(qApp->thread() == QThread::currentThread());
+	if (m_deviceControllerCompPtr.IsValid()){
+		int count = m_deviceControllerCompPtr.GetCount();
+		for (int i = 0; i < count; i++){
+			const IDeviceController* deviceControllerPtr = m_deviceControllerCompPtr[i];
+			if (deviceControllerPtr != nullptr){
+				QByteArrayList ids = deviceControllerPtr->GetSupportedDeviceTypeIds();
+				for (const QByteArray& id : ids){
+					const IDeviceStaticInfo* staticInfoPtr = deviceControllerPtr->GetDeviceStaticInfo(id);
 
+					if (staticInfoPtr != nullptr){
+						m_deviceTypeList.InsertItem(id, staticInfoPtr->GetDeviceTypeName(), "");
+					}
+				}
+
+				m_supportedDeviceTypeIds += ids;
+
+				imod::IModel* modelPtr = const_cast<imod::IModel*>(dynamic_cast<const imod::IModel*>(&deviceControllerPtr->GetAvailableDeviceList()));
+				Q_ASSERT(modelPtr != nullptr);
+
+				if (modelPtr != nullptr){
+					RegisterModel(modelPtr, MI_DEVICE_LIST_BASE + i);
+				}
+			}
+		}
+	}
+}
+
+
+void CCompositeDeviceControllerComp::UpdateDeviceList()
+{
 	istd::CChangeGroup group(&m_deviceList);
 
 	m_deviceList.CopyFrom(imtbase::CCollectionInfo());
 	m_deviceControllerMap.clear();
 
-	QString devices;
+	if (m_deviceControllerCompPtr.IsValid()){
+		int count = m_deviceControllerCompPtr.GetCount();
+		for (int i = 0; i < count; i++){
+			IDeviceController* deviceControllerPtr = m_deviceControllerCompPtr[i];
+			if (deviceControllerPtr != nullptr){
+				const imtbase::ICollectionInfo& deviceList = deviceControllerPtr->GetAvailableDeviceList();
 
-	int count = m_deviceControllerCompPtr.GetCount();
-	for (int i = 0; i < count; i++){
-		IDeviceController* deviceControllerPtr = m_deviceControllerCompPtr[i];
-		if (deviceControllerPtr != nullptr){
-			const imtbase::ICollectionInfo& deviceList = deviceControllerPtr->GetAvailableDeviceList();
+				imtbase::ICollectionInfo::Ids ids = deviceList.GetElementIds();
+				for (const imtbase::ICollectionInfo::Id id : ids){
+					QString name = deviceList.GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
+					QString description = deviceList.GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
-			imtbase::ICollectionInfo::Ids ids = deviceList.GetElementIds();
-
-			for (const imtbase::ICollectionInfo::Id id : ids){
-				QString name = deviceList.GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
-				QString description = deviceList.GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
-
-				m_deviceList.InsertItem(id, name, description);
-				m_deviceControllerMap[id] = deviceControllerPtr;
-
-				devices += name + ", ";
+					m_deviceList.InsertItem(id, name, description);
+					m_deviceControllerMap[id] = deviceControllerPtr;
+				}
 			}
 		}
 	}
-
-	devices.chop(2);
-
-	SendInfoMessage(0, "Updating device list: [" + devices + "]");
-
-	istd::IChangeable::ChangeSet localChangeSet(imtdev::IDeviceState::CF_CONNECTION_STATE_CHANGED);
-	istd::CChangeNotifier notifier(&m_deviceTypeList, &localChangeSet);
 }
 
 
-// public methods of the embedded class DeviceControllerObserver
-
-CCompositeDeviceControllerComp::DeviceListObserver::DeviceListObserver(CCompositeDeviceControllerComp& parent)
-	:m_parent(parent)
+void CCompositeDeviceControllerComp::UpdateExtendedDeviceList()
 {
+	istd::CChangeGroup group(&m_extendedDeviceList);
+
+	m_extendedDeviceList.CopyFrom(imtbase::CCollectionInfo());
+
+	QMultiMap<QByteArray, QByteArray> sortedDeviceList;
+	imtbase::ICollectionInfo::Ids deviceIds = m_deviceList.GetElementIds();
+	for (const QByteArray& deviceId : deviceIds){
+		QByteArray deviceTypeId = GetDeviceTypeId(deviceId);
+		if (!deviceTypeId.isEmpty()){
+			sortedDeviceList.insert(deviceTypeId, deviceId);
+		}
+	}
+
+	imtbase::ICollectionInfo::Ids deviceTypeIds = m_deviceTypeList.GetElementIds();
+	for (const QByteArray& deviceTypeId : deviceTypeIds){
+		if (sortedDeviceList.contains(deviceTypeId)){
+			QByteArrayList deviceIds = sortedDeviceList.values(deviceTypeId);
+			for (const QByteArray& deviceId : deviceIds){
+				m_extendedDeviceList.InsertItem(
+							deviceId,
+							m_deviceList.GetElementInfo(deviceId, imtbase::ICollectionInfo::EIT_NAME).toString(),
+							m_deviceList.GetElementInfo(deviceId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString());
+			}
+		}
+		else{
+			m_extendedDeviceList.InsertItem(
+					deviceTypeId,
+					m_deviceTypeList.GetElementInfo(deviceTypeId, imtbase::ICollectionInfo::EIT_NAME).toString(),
+					m_deviceTypeList.GetElementInfo(deviceTypeId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString());
+		}
+	}
 }
 
-// reimplemented (imod::CMultiModelDispatcherBase)
 
-void CCompositeDeviceControllerComp::DeviceListObserver::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+QByteArray CCompositeDeviceControllerComp::GetDeviceTypeId(const QByteArray& deviceId) const
 {
-	m_parent.OnDeviceListChanged(modelId, changeSet);
+	DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo(deviceId);
+	if (!instanceInfoPtr.isNull()){
+		QByteArray deviceTypeId = instanceInfoPtr->GetDeviceStaticInfo().GetDeviceTypeId();
+
+		return deviceTypeId;
+	}
+
+	return QByteArray();
 }
 
 
-// public methods of the embedded class DeviceTypeList
+// public methods of the embedded class DeviceConnectionState
 
-CCompositeDeviceControllerComp::DeviceTypeList::DeviceTypeList()
+CCompositeDeviceControllerComp::DeviceConnectionState::DeviceConnectionState()
 	:m_parentPtr(nullptr)
 {
 }
 
 
-void CCompositeDeviceControllerComp::DeviceTypeList::SetParent(CCompositeDeviceControllerComp& parent)
+void CCompositeDeviceControllerComp::DeviceConnectionState::SetParent(CCompositeDeviceControllerComp& parent)
 {
 	m_parentPtr = &parent;
 }
@@ -342,25 +380,10 @@ void CCompositeDeviceControllerComp::DeviceTypeList::SetParent(CCompositeDeviceC
 
 // reimplemented (IDeviceState)
 
-bool CCompositeDeviceControllerComp::DeviceTypeList::IsDeviceConnected(const QByteArray& deviceTypeId)
+bool CCompositeDeviceControllerComp::DeviceConnectionState::IsDeviceConnected(const QByteArray& deviceId)
 {
-	if (m_parentPtr != nullptr && m_parentPtr->m_deviceControllerCompPtr.IsValid()){
-		int count = m_parentPtr->m_deviceControllerCompPtr.GetCount();
-		for (int i = 0; i < count; i++){
-			if (m_parentPtr->m_deviceControllerCompPtr[i] != nullptr){
-				if (m_parentPtr->m_deviceControllerCompPtr[i]->GetSupportedDeviceTypeIds().contains(deviceTypeId)){
-					Ids ids = m_parentPtr->m_deviceControllerCompPtr[i]->GetAvailableDeviceList().GetElementIds();
-					for (const QByteArray& id : ids){
-						DeviceInstanceInfoPtr infoPtr = m_parentPtr->m_deviceControllerCompPtr[i]->GetDeviceInstanceInfo(id);
-						if (!infoPtr.isNull()){
-							if (infoPtr->GetDeviceStaticInfo().GetDeviceTypeId() == deviceTypeId){
-								return true;
-							}
-						}
-					}
-				}
-			}
-		}
+	if (m_parentPtr != nullptr){
+		return m_parentPtr->m_deviceControllerMap.contains(deviceId);
 	}
 
 	return false;

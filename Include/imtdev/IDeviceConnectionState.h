@@ -10,9 +10,9 @@ namespace imtdev
 
 
 /**
-	Information about current measurement device state
+	Information about current device connection state
 */
-class IDeviceState: virtual public istd::IChangeable
+class IDeviceConnectionState: virtual public istd::IChangeable
 {
 public:
 
@@ -22,10 +22,10 @@ public:
 	};
 
 	/**
-		Check connection state for measurement device
+		Check connection state for device
 		\return \c true if the device is connected, otherwise \c false.
 	*/
-	virtual bool IsDeviceConnected(const QByteArray& deviceTypeId) = 0;
+	virtual bool IsDeviceConnected(const QByteArray& deviceId) = 0;
 };
 
 

@@ -38,10 +38,10 @@ IDeviceController::DeviceState CDeviceControllerCompBase::GetDeviceState(const Q
 
 	if (ids.contains(deviceId)){
 		if (m_openedDevices.contains(deviceId)){
-			return DS_ACTIVE;
+			return DS_OPENED;
 		}
 
-		return DS_INACTIVE;
+		return DS_CLOSED;
 	}
 
 	return DS_NONE;
