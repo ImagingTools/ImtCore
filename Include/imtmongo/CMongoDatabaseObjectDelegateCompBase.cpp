@@ -47,8 +47,8 @@ QByteArray CMongoDatabaseObjectDelegateCompBase::GetObjectIdFromMongoId(QByteArr
 	char bid[12];
 	for(int i = 0;i<12 && i<mid.size();i++)
 		bid[i] = mid.data()[i];
-	uint *bi = (uint*)&bid;
-	QByteArray uId = QUuid(*bi, 0, 0,bid[4],bid[5],bid[6],bid[7],bid[8],bid[9],bid[10],bid[11])
+	uint bi = (bid[0]<<24) + (bid[1]<<16) + (bid[2]<<8) + bid[3];
+	QByteArray uId = QUuid(bi, 0, 0,bid[4],bid[5],bid[6],bid[7],bid[8],bid[9],bid[10],bid[11])
 					.toByteArray();
 
 	return uId;

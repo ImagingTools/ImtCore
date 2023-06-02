@@ -115,10 +115,10 @@ const istd::IChangeable* CMongoDatabaseObjectCollectionComp::GetObjectPtr(const 
 	bsoncxx::oid id(objectId.data(),12);
 
 	bsoncxx::document::view_or_value filtr = bsoncxx::builder::basic::make_document(kvp("_id",id));
-	mongocxx::cursor cursor = coll.find(filtr);
-
-	for (bsoncxx::document::view doc : cursor)
+	bsoncxx::stdx::optional<bsoncxx::document::value> fs = coll.find_one(filtr);
+	if(fs)
 	{
+		bsoncxx::document::view doc = fs->view();
 		istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(doc);
 		return dataObjPtr;
 	}
@@ -137,18 +137,19 @@ bool CMongoDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectI
 	mongocxx::collection coll =(*db)[GetCollectionName().toStdString()];
 	bsoncxx::oid id(objectId.data(),12);
 	bsoncxx::document::view_or_value filtr = bsoncxx::builder::basic::make_document(kvp("_id",id));
-
-	mongocxx::cursor cursor = coll.find(filtr);
-
-	for (bsoncxx::document::view doc : cursor)
+	bsoncxx::stdx::optional<bsoncxx::document::value> fs = coll.find_one(filtr);
+	if(fs)
 	{
+		bsoncxx::document::view doc = fs->view();
 		istd::IChangeable* dataObjPtr = m_objectDelegateCompPtr->CreateObjectFromRecord(doc);
 		dataPtr = DataPtr(DataPtr::RootObjectPtr(dataObjPtr), [dataObjPtr](){
 			return dataObjPtr;
 		});
+
+		return dataPtr.IsValid();
 	}
 
-	return dataPtr.IsValid();
+	return false;
 }
 
 
@@ -286,15 +287,16 @@ imtbase::ICollectionInfo::Ids CMongoDatabaseObjectCollectionComp::GetElementIds(
 
 		if (id_ele.type() == bsoncxx::type::k_oid) {
 
-			QByteArray Id(id_ele.get_oid().value.bytes());
+			QByteArray Id(id_ele.get_oid().value.bytes(),12);
 			retVal.push_back(Id);
 
 
 			std::string oid = id_ele.get_oid().value.to_string();
 			QString id = QString::fromStdString(oid);
 			//retVal.push_back(id.toLocal8Bit());
-//			std::cout << "OID1: " << oid1<< std::endl;
+
 			std::cout << "OID2: " << oid<< std::endl;
+			qDebug() << id;
 
 		} else {
 

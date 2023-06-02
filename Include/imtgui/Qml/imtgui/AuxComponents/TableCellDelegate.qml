@@ -248,7 +248,7 @@ Item {
                 Qt.openUrlExternally(link);
             }
             text: delegateContainer.pTableDelegateContainer ? delegateContainer.columnIndex >= 0 ? delegateContainer.pTableDelegateContainer.dataModel[delegateContainer.pTableDelegateContainer.headers.GetData("Id", delegateContainer.columnIndex)] : "" : "";
-
+//            text: delegateContainer.pTableDelegateContainer.headers.GetData("Id", 1)
             onTextChanged: {
                 // Multiline fit in one line
                 if (name.text.includes('\n')){
