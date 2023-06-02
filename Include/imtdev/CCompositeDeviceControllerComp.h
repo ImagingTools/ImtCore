@@ -48,9 +48,9 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(ExtendedDeviceList, istd::IChangeable, ExtractExtendedDeviceList);
 		I_REGISTER_SUBELEMENT_INTERFACE(ExtendedDeviceList, imod::IModel, ExtractExtendedDeviceList);
 		I_REGISTER_SUBELEMENT(DeviceConnectionState);
-		I_REGISTER_SUBELEMENT_INTERFACE(DeviceConnectionState, imtbase::ICollectionInfo, ExtractExtendedDeviceList);
-		I_REGISTER_SUBELEMENT_INTERFACE(DeviceConnectionState, istd::IChangeable, ExtractExtendedDeviceList);
-		I_REGISTER_SUBELEMENT_INTERFACE(DeviceConnectionState, imod::IModel, ExtractExtendedDeviceList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceConnectionState, IDeviceConnectionState, ExtractDeviceConnectionState);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceConnectionState, istd::IChangeable, ExtractDeviceConnectionState);
+		I_REGISTER_SUBELEMENT_INTERFACE(DeviceConnectionState, imod::IModel, ExtractDeviceConnectionState);
 		I_REGISTER_INTERFACE(IDeviceController);
 		I_ASSIGN_MULTI_0(m_deviceControllerCompPtr, "DeviceControllers", "Device controllers", false);
 		I_ASSIGN_TO(m_deviceEnumeratorCompPtr, m_deviceControllerCompPtr, true);
@@ -118,6 +118,12 @@ protected:
 	static InteraceType* ExtractExtendedDeviceList(CCompositeDeviceControllerComp& parent)
 	{
 		return &parent.m_extendedDeviceList;
+	}
+
+	template <class InteraceType>
+	static InteraceType* ExtractDeviceConnectionState(CCompositeDeviceControllerComp& parent)
+	{
+		return &parent.m_deviceConnectionState;
 	}
 
 protected:
