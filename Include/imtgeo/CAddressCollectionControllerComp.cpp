@@ -10,6 +10,7 @@
 // ImtCore includes
 #include <imtbase/CCollectionFilter.h>
 #include <imtgeo/CAddressElementInfo.h>
+#include <imtgeo/CAddressTypeInfo.h>
 
 
 namespace imtgeo
@@ -93,7 +94,7 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 				}
 				if (!typeId.isEmpty()){
 					QByteArrayList filteringOnTypeIdInfoIds;
-					filteringOnTypeIdInfoIds << "Type";
+					filteringOnTypeIdInfoIds << "TypeId";
 					filterOnTypeId.SetFilteringInfoIds(filteringOnTypeIdInfoIds);
 					filterOnTypeId.SetTextFilter(typeId);
 				}
@@ -128,7 +129,7 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 		iprm::CParamsSet filterParams;
 		filterParams.SetEditableParameter("Filter", &filter);
 		filterParams.SetEditableParameter("ParentId", &filterOnParentId);
-		filterParams.SetEditableParameter("Type", &filterOnTypeId);
+		filterParams.SetEditableParameter("TypeId", &filterOnTypeId);
 
 		int pagesCount = std::ceil(m_objectCollectionCompPtr->GetElementsCount(&filterParams) / (double)count);
 		if (pagesCount < 0){
@@ -142,17 +143,45 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 
         for (const QByteArray& collectionId : collectionIds){
 			int itemIndex = itemsModel->InsertNewItem();
-
-            const imtgeo::IAddressElementInfo* addressElementInfoPtr = dynamic_cast<const imtgeo::IAddressElementInfo*>(subCollection->GetObjectPtr(collectionId));
-
-            QByteArray addressId = addressElementInfoPtr->GetId();
+			const IAddressElementInfo* addressElementInfoPtr = dynamic_cast<const IAddressElementInfo*>(subCollection->GetObjectPtr(collectionId));
+			QByteArray addressId = addressElementInfoPtr->GetId();
+			QByteArray typeAddressId = addressElementInfoPtr->GetAddressTypeId();
+			QByteArray parentId;
+			QList<QByteArray> parents =addressElementInfoPtr->GetParentsId();
+			if(!parents.isEmpty()){
+				parentId = *(parents.end());
+			}
 			QString name = addressElementInfoPtr->GetName();
-            QString address = addressElementInfoPtr->GetFullAddress();
-			int typeAddressId = addressElementInfoPtr->GetType();
-			QByteArray parentId = addressElementInfoPtr->GetParentId();
+			QString address = addressElementInfoPtr->GetAddress();
+			if(address == QString(""))
+			{
+				for(QByteArray elemId: parents)
+				{
+					imtbase::IObjectCollection::DataPtr dataElementPtr;
+					if (m_objectCollectionCompPtr->GetObjectData(elemId, dataElementPtr)){
+						const IAddressElementInfo* addressInfoPtr =
+								dynamic_cast<const IAddressElementInfo*>(dataElementPtr.GetPtr());
+						imtbase::IObjectCollection::DataPtr dataTypePtr;
+						if (m_addressTypeCollectionPtr->GetObjectData(addressInfoPtr->GetAddressTypeId(), dataTypePtr)){
+							const IAddressTypeInfo* typeInfoPtr =
+									dynamic_cast<const IAddressTypeInfo*>(dataTypePtr.GetPtr());
+							QString shortName = typeInfoPtr->GetShortName();
+							QString name = addressInfoPtr->GetName();
+							address += shortName+ " "+name + ",";
+						}
+					}
+				}
+				imtbase::IObjectCollection::DataPtr dataTypePtr;
+				if (m_addressTypeCollectionPtr->GetObjectData(typeAddressId, dataTypePtr)){
+					const IAddressTypeInfo* typeInfoPtr =
+							dynamic_cast<const IAddressTypeInfo*>(dataTypePtr.GetPtr());
+					address += typeInfoPtr->GetShortName() + " " +name;
+				}
+			}
+
 			itemsModel->SetData("Id", addressId, itemIndex);
 			itemsModel->SetData("Name", name, itemIndex);
-            itemsModel->SetData("FullAddress", address, itemIndex);
+			itemsModel->SetData("FullAddress", address, itemIndex);
 			itemsModel->SetData("TypeId", typeAddressId, itemIndex);
 			itemsModel->SetData("ParentId", parentId, itemIndex);
 		}
@@ -166,7 +195,7 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 }
 
 
-} // namespace imtgeo
+} // namespace npgql
 
 
 

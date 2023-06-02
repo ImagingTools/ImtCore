@@ -7,7 +7,6 @@
 // ImtCore includes
 #include <imtgeo/IAddressElementInfo.h>
 
-
 namespace imtgeo
 {
 
@@ -15,29 +14,28 @@ namespace imtgeo
 class CAddressElementInfo: virtual public IAddressElementInfo
 {
 public:
-	CAddressElementInfo();
-	~CAddressElementInfo();
 
-	virtual void SetId(QByteArray id);
-	virtual void SetParentId(QByteArray parentId);
-	virtual void SetName(QString name);
-	virtual void SetDescription(QString description);
-	virtual void SetSerialId(QByteArray serialId);
-	virtual void SetAddress(QString adr);
-	virtual void SetLatitude(double lat);
-	virtual void SetLongitude(double lat);
-	virtual QByteArray GetSerialId() const;
-	virtual void SetType(AddressElementType type);
+    CAddressElementInfo();
+    ~CAddressElementInfo();
 
-	// reimplemented (IAddressElementInfo)
-	virtual QByteArray GetId() const override;
-	virtual QByteArray GetParentId() const override;
-	virtual AddressElementType GetType() const override;
-	virtual QString GetName() const override;
-	virtual QString GetDescription() const override;
-	virtual QString GetFullAddress() const override;
+    // reimplemented (IAddressElementInfo)
+    virtual QByteArray GetId() const override;
+    virtual void SetId(QByteArray id) override;
+	virtual QList<QByteArray> GetParentsId() const override;
+	virtual void SetParentsId(QList<QByteArray> parentsId) override;
+	virtual QByteArray GetAddressTypeId() const override;
+	virtual void SetAddressTypeId(QByteArray typeId) override;
+    virtual QString GetTypeName() const override;
+    virtual QString GetName() const override;
+	virtual void SetName(QString name) override;
+    virtual QString GetDescription() const override;
+    virtual void SetDescription(QString description) override;
+	virtual QString GetAddress() const override;
+	virtual void SetAddress(QString adr) override;
 	virtual double GetLatitude() const override;
+	virtual void SetLatitude(double lat) override;
 	virtual double GetLongitude() const override;
+	virtual void SetLongitude(double lat) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -48,16 +46,18 @@ public:
 	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
+protected:
+
 private:
-	QByteArray m_id;
-	QByteArray m_parentId;
-	AddressElementType m_type;
-	QString m_name;
-	QString m_description;
-	QByteArray m_serialId;
+    QByteArray m_id;
+	QList<QByteArray> m_parentsId;
+	QByteArray m_adrTypeId;
+	QString m_name;    
+    QString m_description;
 	QString m_address;
 	double m_longitude;   // долгота
 	double m_latitude;    // широта
+
 };
 
 

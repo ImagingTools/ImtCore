@@ -1,6 +1,5 @@
 #include <imtgeo/CAddressElementDatabaseDelegateComp.h>
 
-
 // ACF includes
 #include <imod/TModelWrap.h>
 #include <iprm/TParamsPtr.h>
@@ -15,11 +14,10 @@ namespace imtgeo
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-QByteArray CAddressElementDatabaseDelegateComp::GetObjectTypeId(const QByteArray& /*objectId*/) const
+QByteArray CAddressElementDatabaseDelegateComp::GetObjectTypeId(const QByteArray& objectId) const
 {
 	return "Address";
 }
-
 
 istd::IChangeable* CAddressElementDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
@@ -27,103 +25,112 @@ istd::IChangeable* CAddressElementDatabaseDelegateComp::CreateObjectFromRecord(c
 		return nullptr;
 	}
 
-	if (!m_adrElementInfoFactCompPtr.IsValid()) {
+    if (!m_adrElementInfoFactCompPtr.IsValid()){
 		return nullptr;
 	}
 
-	istd::TDelPtr<imtgeo::CAddressElementInfo> adrElementInfoPtr = dynamic_cast<imtgeo::CAddressElementInfo*>(m_adrElementInfoFactCompPtr.CreateInstance());
-	if (!adrElementInfoPtr.IsValid()) {
-		return nullptr;
+	istd::TDelPtr<IAddressElementInfo> adrElementInfoPtr = m_adrElementInfoFactCompPtr.CreateInstance();
+    if (!adrElementInfoPtr.IsValid()){
+        return nullptr;
+    }
+
+    if(record.contains("Id")){
+        QByteArray id = record.value("Id").toByteArray();
+        adrElementInfoPtr->SetId(id);
+    }
+
+	if(record.contains("ParentsId")){
+		QByteArray dataIndexes = record.value("ParentsId").toByteArray();
+		QJsonDocument documentIndexes = QJsonDocument::fromJson(dataIndexes);
+		QJsonArray jsonIndexes = documentIndexes.array();
+		QList<QByteArray> parentsId;
+		for(int index = 0; index < jsonIndexes.size(); index++){
+			QByteArray parentId = jsonIndexes[index].toVariant().toByteArray();
+			parentsId.append(parentId);
+		}
+		adrElementInfoPtr->SetParentsId(parentsId);
 	}
 
-	if (record.contains("Id")) {
-		QByteArray id = record.value("Id").toByteArray();
-		adrElementInfoPtr->SetId(id);
+	if(record.contains("AddressTypeId")){
+		QByteArray typeId = record.value("AddressTypeId").toByteArray();
+		adrElementInfoPtr->SetAddressTypeId(typeId);
 	}
 
-	if (record.contains("ParentId")) {
-		QByteArray parentId = record.value("ParentId").toByteArray();
-		adrElementInfoPtr->SetParentId(parentId);
-	}
+    if(record.contains("Name")){
+        QString name = record.value("Name").toByteArray();
+        adrElementInfoPtr->SetName(name);
+    }
 
-	if (record.contains("Type")) {
-		int type = record.value("Type").toInt();
-		adrElementInfoPtr->SetType((imtgeo::IAddressElementInfo::AddressElementType)type);
-	}
+    if(record.contains("Description")){
+        QString description = record.value("Description").toByteArray();
+        adrElementInfoPtr->SetDescription(description);
+    }
 
-	if (record.contains("Name")) {
-		QString name = record.value("Name").toByteArray();
-		adrElementInfoPtr->SetName(name);
-	}
-
-	if (record.contains("Description")) {
-		QString description = record.value("Description").toByteArray();
-		adrElementInfoPtr->SetDescription(description);
-	}
-
-	if (record.contains("SerialId")) {
-		QByteArray serialId = record.value("SerialId").toByteArray();
-		adrElementInfoPtr->SetSerialId(serialId);
-	}
-
-	if (record.contains("FullAddress")) {
+	if(record.contains("FullAddress")){
 		QString address = record.value("FullAddress").toString();
 		adrElementInfoPtr->SetAddress(address);
 	}
 
-	if (record.contains("Latitude")) {
+	if(record.contains("Latitude")){
 		double lat = record.value("Latitude").toDouble();
 		adrElementInfoPtr->SetLatitude(lat);
 	}
 
-	if (record.contains("Longitude")) {
+	if(record.contains("Longitude")){
 		double lon = record.value("Longitude").toDouble();
 		adrElementInfoPtr->SetLongitude(lon);
 	}
 
-	return adrElementInfoPtr.PopPtr();
+    return adrElementInfoPtr.PopPtr();
 }
 
 
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateComp::CreateNewObjectQuery(
 			const QByteArray& /*typeId*/,
 			const QByteArray& proposedObjectId,
-			const QString& /*objectName*/,
+			const QString& objectName,
 			const QString& /*objectDescription*/,
 			const istd::IChangeable* valuePtr) const
 {
-	const imtgeo::IAddressElementInfo* adrInfoPtr = dynamic_cast<const imtgeo::IAddressElementInfo*>(valuePtr);
-	if (adrInfoPtr == nullptr) {
-		return NewObjectQuery();
-	}
+	const IAddressElementInfo* adrInfoPtr = dynamic_cast<const IAddressElementInfo*>(valuePtr);
+    if (adrInfoPtr == nullptr){
+        return NewObjectQuery();
+    }
 
-	QString name = adrInfoPtr->GetName();
-	QString description = adrInfoPtr->GetDescription();
-	QByteArray parentId = adrInfoPtr->GetParentId();
-	int type = adrInfoPtr->GetType();
-	QString address = adrInfoPtr->GetFullAddress();
+    QString name = adrInfoPtr->GetName();
+    QString description = adrInfoPtr->GetDescription();
+
+	QList<QByteArray> parentsId = adrInfoPtr->GetParentsId();
+	QJsonArray json;
+	for (QByteArray parentId: parentsId){
+		json.append(QJsonValue(QString(parentId)));
+	}
+	QJsonDocument document = QJsonDocument(json);
+	QByteArray parents = document.toJson(QJsonDocument::Compact);
+
+	QByteArray typeId = adrInfoPtr->GetAddressTypeId();
+	QString address = adrInfoPtr->GetAddress();
 	double lat = adrInfoPtr->GetLatitude();
 	double lon = adrInfoPtr->GetLongitude();
 
-	NewObjectQuery retVal;
-	retVal.query = QString("INSERT INTO \"AddressElements\"(\"Id\", \"ParentId\", \"Type\", \"Name\", \"FullAddress\", \"Description\", \"Latitude\", \"Longitude\") SELECT '%1', '%2', '%3', '%4', '%5', '%6', '%7', '8' WHERE NOT EXISTS (SELECT * FROM \"AddressElements\" WHERE \"ParentId\" = '%2' AND \"Name\" = '%4');")
-				.arg(qPrintable(proposedObjectId))
-				.arg(qPrintable(parentId))
-				.arg(type)
-				.arg(name)
-				.arg(address)
-				.arg(description)
-				.arg(lat)
-				.arg(lon)
-				.toLocal8Bit();
-	retVal.objectName = name;
+    NewObjectQuery retVal;
+	retVal.query = QString("INSERT INTO \"AddressElements\"(\"Id\", \"ParentsId\", \"AddressTypeId\", \"Name\", \"Description\", \"Latitude\", \"Longitude\")  VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
+                            .arg(qPrintable(proposedObjectId))
+							.arg(qPrintable(parents))
+							.arg(qPrintable(typeId))
+                            .arg(name)
+							.arg(description)
+							.arg(lat)
+							.arg(lon)
+                            .toLocal8Bit();
+    retVal.objectName = name;
 
-	return retVal;
+    return retVal;
 }
 
 
 QByteArray CAddressElementDatabaseDelegateComp::CreateDeleteObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
+			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId) const
 {
 	QByteArray retVal = QString("DELETE FROM \"AddressElements\" WHERE \"Id\" = '%1';").arg(qPrintable(objectId)).toLocal8Bit();
@@ -136,98 +143,103 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
-			const ContextDescription& /*description*/,
+            const ContextDescription& /*description*/,
 			bool /*useExternDelegate*/) const
 {
-	const imtgeo::IAddressElementInfo* adrInfoPtr = dynamic_cast<const imtgeo::IAddressElementInfo*>(&object);
-	if (adrInfoPtr == nullptr || objectId.isEmpty()) {
-		return QByteArray();
+	const IAddressElementInfo* adrInfoPtr = dynamic_cast<const IAddressElementInfo*>(&object);
+    if (adrInfoPtr == nullptr || objectId.isEmpty()){
+        return QByteArray();
+    }
+    QByteArray adrId = adrInfoPtr->GetId();
+	QList<QByteArray> parentsId = adrInfoPtr->GetParentsId();
+	QJsonArray json;
+	for (QByteArray parentId: parentsId){
+		json.append(QJsonValue(QString(parentId)));
 	}
-	QByteArray adrId = adrInfoPtr->GetId();
-	QByteArray parentId = adrInfoPtr->GetParentId();
-	int type = adrInfoPtr->GetType();
-	QString adrName = adrInfoPtr->GetName();
-	QString description = adrInfoPtr->GetDescription();
-	QString address = adrInfoPtr->GetFullAddress();
+	QJsonDocument document = QJsonDocument(json);
+	QByteArray parents = document.toJson(QJsonDocument::Compact);
+	QByteArray typeId = adrInfoPtr->GetAddressTypeId();
+    QString adrName = adrInfoPtr->GetName();
+    QString description = adrInfoPtr->GetDescription();
+	QString address = adrInfoPtr->GetAddress();
 	double lat = adrInfoPtr->GetLatitude();
 	double lon = adrInfoPtr->GetLongitude();
 
-	if (adrId.isEmpty() && !objectId.isEmpty()) {
-		adrId = objectId;
-	}
-	if (adrId.isEmpty()) {
-		return QByteArray();
-	}
+    if (adrId.isEmpty() && !objectId.isEmpty()){
+        adrId = objectId;
+    }
+    if(adrId.isEmpty()){
+        return QByteArray();
+    }
 
-	QByteArray retVal = QString("UPDATE \"AddressElements\" SET \"Id\" = '%1', \"ParentId\" = '%2', \"Type\" = '%3', \"Name\" = '%4', \"FullAddress\" = '%5', \"Description\" = '%6', \"Langitude\" = '%7', \"Latitude\" = '%8' WHERE \"Id\" ='%9';")
-				.arg(qPrintable(adrId))
-				.arg(qPrintable(parentId))
-				.arg(type)
-				.arg(adrName)
-				.arg(address)
-				.arg(description)
-				.arg(lat)
-				.arg(lon)
-				.arg(qPrintable(objectId))
-				.toLocal8Bit();
+	QByteArray retVal = QString("UPDATE \"AddressElements\" SET \"Id\" = '%1', \"ParentsId\" = '%2', \"TypeId\" = '%3', \"Name\" = '%4', \"FullAddress\" = '%5', \"Description\" = '%6', \"Langitude\" = '%7', \"Latitude\" = '%8' WHERE \"Id\" ='%9';")
+                            .arg(qPrintable(adrId))
+							.arg(qPrintable(parents))
+							.arg(qPrintable(typeId))
+                            .arg(adrName)
+							.arg(address)
+							.arg(description)
+							.arg(lat)
+							.arg(lon)
+                            .arg(qPrintable(objectId))
+                            .toLocal8Bit();
 
-	return retVal;
+    return retVal;
 }
 
 
 QByteArray CAddressElementDatabaseDelegateComp::CreateRenameObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& /*objectId*/,
-			const QString& /*newObjectName*/) const
+			const imtbase::IObjectCollection& collection,
+			const QByteArray& objectId,
+			const QString& newObjectName) const
 {
 	return QByteArray();
 }
 
 
 QByteArray CAddressElementDatabaseDelegateComp::CreateDescriptionObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& /*objectId*/,
-			const QString& /*description*/) const
+			const imtbase::IObjectCollection& collection,
+			const QByteArray& objectId,
+			const QString& description) const
 {
-	return QByteArray();
+    return QByteArray();
 }
-
 
 QByteArray CAddressElementDatabaseDelegateComp::GetSelectionQuery(const QByteArray &objectId, int offset, int count, const iprm::IParamsSet *paramsPtr) const
 {
-	if (!objectId.isEmpty()) {
-		return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
-			.arg(qPrintable(*m_tableNameAttrPtr))
-			.arg(qPrintable(*m_objectIdColumnAttrPtr))
-			.arg(qPrintable(objectId))
-			.toLocal8Bit();
+	if (!objectId.isEmpty()){
+        return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
+					.arg(qPrintable(*m_tableNameAttrPtr))
+					.arg(qPrintable(*m_objectIdColumnAttrPtr))
+					.arg(qPrintable(objectId))
+					.toLocal8Bit();
 	}
-	else {
+	else{
 		QString sortQuery;
 		QString filterQuery;
 		QString textFilter;
-		if (count == 0) {
+		if (count == 0){
 			return QByteArray();
 		}
-		if (paramsPtr != nullptr) {
-			if (!CreateFilterQuery(*paramsPtr, filterQuery)) {
-				//	return QByteArray();
+		if (paramsPtr != nullptr){
+			if (!CreateFilterQuery(*paramsPtr, filterQuery)){
+			//	return QByteArray();
 			}
 
 			iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(paramsPtr, "Filter");
-			if (collectionFilterParamPtr.IsValid()) {
+			if (collectionFilterParamPtr.IsValid()){
 				textFilter = collectionFilterParamPtr->GetTextFilter();
-				if (!CreateSortQuery(*collectionFilterParamPtr, sortQuery)) {
+				if (!CreateSortQuery(*collectionFilterParamPtr, sortQuery)){
 					return QByteArray();
 				}
 			}
 		}
 
 		QByteArray paginationQuery;
-		if (!CreatePaginationQuery(offset, count, paginationQuery)) {
+		if (!CreatePaginationQuery(offset, count, paginationQuery)){
 			return QByteArray();
 		}
-		QString baseSelelectionQuery = QString("SELECT * FROM \"%1\"").arg(qPrintable(m_tableNameAttrPtr->GetValue()));
+        QString baseSelelectionQuery = QString("SELECT * FROM \"%1\"").arg(qPrintable(m_tableNameAttrPtr->GetValue()));
 
 		// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
 		QString retVal = "(" + baseSelelectionQuery;
@@ -242,77 +254,83 @@ QByteArray CAddressElementDatabaseDelegateComp::GetSelectionQuery(const QByteArr
 }
 
 
+
 bool CAddressElementDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSet &filterParams, QString &filterQuery) const
 {
-	QString objectFilterQuery;
-	bool retVal = CreateObjectFilterQuery(filterParams, objectFilterQuery);
+    QString objectFilterQuery;
+    bool retVal = CreateObjectFilterQuery(filterParams, objectFilterQuery);
+   // if (!retVal){
+	//    return false;
+	//}
 
-	QString textFilterQuery;
-	QString parentIdFilterQuery;
-	QString typeIdFilterQuery;
-	iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(&filterParams, "Filter");
-	iprm::TParamsPtr<imtbase::ICollectionFilter> parentIdFilterParamPtr(&filterParams, "ParentId");
-	iprm::TParamsPtr<imtbase::ICollectionFilter> typeIdFilterParamPtr(&filterParams, "Type");
-	if (collectionFilterParamPtr.IsValid()) {
-		retVal = CreateTextFilterQuery(*collectionFilterParamPtr, textFilterQuery);
-	}
-	if (parentIdFilterParamPtr.IsValid() && parentIdFilterParamPtr->GetTextFilter() != "") {
-		parentIdFilterQuery = "\"ParentId\" = '" + parentIdFilterParamPtr->GetTextFilter() + "'";
-	}
-	if (typeIdFilterParamPtr.IsValid() && typeIdFilterParamPtr->GetTextFilter() != "") {
-		typeIdFilterQuery = "\"Type\" = " + typeIdFilterParamPtr->GetTextFilter();
-	}
-	if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdFilterQuery.isEmpty() || !typeIdFilterQuery.isEmpty()) {
-		filterQuery = " WHERE ";
-	}
+    QString textFilterQuery;
+    QString parentIdFilterQuery;
+    QString typeIdFilterQuery;
+    iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(&filterParams, "Filter");
+    iprm::TParamsPtr<imtbase::ICollectionFilter> parentIdFilterParamPtr(&filterParams, "ParentId");
+	iprm::TParamsPtr<imtbase::ICollectionFilter> typeIdFilterParamPtr(&filterParams, "TypeId");
+    if (collectionFilterParamPtr.IsValid()){
+        retVal = CreateTextFilterQuery(*collectionFilterParamPtr, textFilterQuery);
+    }
+    if (parentIdFilterParamPtr.IsValid() && parentIdFilterParamPtr->GetTextFilter() != ""){
+		parentIdFilterQuery = "'" + parentIdFilterParamPtr->GetTextFilter() + "' = ANY(\"ParentsId\")" ;
+    }
+    if (typeIdFilterParamPtr.IsValid() && typeIdFilterParamPtr->GetTextFilter() != ""){
+		typeIdFilterQuery = "\"AddressTypeId\" = " + typeIdFilterParamPtr->GetTextFilter();
+    }
+    if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdFilterQuery.isEmpty() || !typeIdFilterQuery.isEmpty()){
+        filterQuery = " WHERE ";
+    }
 
-	filterQuery += objectFilterQuery;
-	if (!objectFilterQuery.isEmpty() && !textFilterQuery.isEmpty()) {
-		filterQuery += " AND ";
-	}
+    filterQuery += objectFilterQuery;
+    if (!objectFilterQuery.isEmpty() && !textFilterQuery.isEmpty()){
+        filterQuery += " AND ";
+    }
 
-	if (!textFilterQuery.isEmpty()) {
-		filterQuery += "(" + textFilterQuery + ")";
-	}
+    if (!textFilterQuery.isEmpty()){
+        filterQuery += "(" + textFilterQuery + ")";
+    }
 
-	//levelFilter
-	if (!textFilterQuery.isEmpty() && parentIdFilterQuery.isEmpty() && typeIdFilterQuery.isEmpty()) {
+    //levelFilter
+    if (!textFilterQuery.isEmpty() && parentIdFilterQuery.isEmpty() && typeIdFilterQuery.isEmpty()){
 
-		QString text = collectionFilterParamPtr->GetTextFilter();
-		QString columnId = collectionFilterParamPtr->GetFilteringInfoIds().first();
-		int count = text.count(",");
-		QString positive = "%";
-		QString negative = "";
-		for (int i = 0; i < count; i++) {
-			positive += ",%";
-			negative = positive + ",%";
-		}
-		QString levelQuery = QString(" AND (\"%1\" LIKE '%2') AND (\"%1\" NOT LIKE '%3')").arg(columnId).arg(positive).arg(negative);
+        QString text = collectionFilterParamPtr->GetTextFilter();
+        QString columnId =  collectionFilterParamPtr->GetFilteringInfoIds().first();
+        int count = text.count(",");
+        QString positive = "%";
+        QString negative = "";
+        for(int i = 0; i < count; i++){
+            positive += ",%";
+            negative = positive + ",%";
+        }
+        QString levelQuery = QString(" AND (\"%1\" LIKE '%2') AND (\"%1\" NOT LIKE '%3')").arg(columnId).arg(positive).arg(negative);
 
-		filterQuery += levelQuery;
-	}
+        filterQuery += levelQuery;
+    }
 
 
-	if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty()) && !parentIdFilterQuery.isEmpty()) {
-		filterQuery += " AND ";
-	}
+    if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty()) && !parentIdFilterQuery.isEmpty()){
+        filterQuery += " AND ";
+    }
 
-	if (!parentIdFilterQuery.isEmpty()) {
-		filterQuery += "(" + parentIdFilterQuery + ")";
+    if (!parentIdFilterQuery.isEmpty()){
+        filterQuery += "(" + parentIdFilterQuery + ")";
 
-	}
+    }
 
-	if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdFilterQuery.isEmpty()) && !typeIdFilterQuery.isEmpty()) {
-		filterQuery += " AND ";
-	}
+    if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdFilterQuery.isEmpty()) && !typeIdFilterQuery.isEmpty()){
+        filterQuery += " AND ";
+    }
 
-	if (!typeIdFilterQuery.isEmpty()) {
-		filterQuery += "(" + typeIdFilterQuery + ")";
+    if (!typeIdFilterQuery.isEmpty()){
+        filterQuery += "(" + typeIdFilterQuery + ")";
 
-	}
+    }
 
-	return true;
+    return true;
 }
+
+
 
 
 } // namespace imtgeo

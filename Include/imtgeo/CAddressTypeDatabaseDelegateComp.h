@@ -3,22 +3,20 @@
 
 // ImtCore includes
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
-
-// NeoPro includes
-#include <imtgeo/CAddressElementInfo.h>
+#include <imtgeo/CAddressTypeInfo.h>
 
 
 namespace imtgeo
 {
 
 
-class CAddressElementDatabaseDelegateComp: public imtdb::CSqlDatabaseObjectDelegateCompBase
+class CAddressTypeDatabaseDelegateComp: public imtdb::CSqlDatabaseObjectDelegateCompBase
 {
 public:
 	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
 
-    I_BEGIN_COMPONENT(CAddressElementDatabaseDelegateComp)
-        I_ASSIGN(m_adrElementInfoFactCompPtr, "AddressElemenInfo", "Factory used for creation of the new address elemen instance", true, "AddressElemenInfo");
+	I_BEGIN_COMPONENT(CAddressTypeDatabaseDelegateComp)
+		I_ASSIGN(m_adrTypeInfoFactCompPtr, "AddressTypeInfo", "Factory used for creation of the new address type instance", true, "AddressTypeInfo");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -47,17 +45,11 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const QString& description) const override;
-	virtual QByteArray GetSelectionQuery(
-				const QByteArray& objectId = QByteArray(),
-				int offset = 0,
-				int count = -1,
-				const iprm::IParamsSet* paramsPtr = nullptr) const override;
-    virtual bool CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual QByteArray GetObjectTypeId(
 			const QByteArray& objectId) const override;
 
 private:
-	I_FACT(imtgeo::IAddressElementInfo, m_adrElementInfoFactCompPtr);
+	I_FACT(IAddressTypeInfo, m_adrTypeInfoFactCompPtr);
 };
 
 
