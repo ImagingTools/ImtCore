@@ -18,6 +18,7 @@ CCompositeDeviceControllerComp::CCompositeDeviceControllerComp()
 	:m_enumeratorIndex(-1),
 	m_resultHandlerPtr(nullptr)
 {
+	m_deviceConnectionState.SetParent(*this);
 }
 
 
