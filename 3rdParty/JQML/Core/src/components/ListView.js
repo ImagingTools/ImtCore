@@ -19,8 +19,8 @@ export class ListView extends Flickable {
     $middleWidth = 0
     $middleHeight = 0
     $enabledScroll = true
-    $oldContentX = 0
-    $oldContentY = 0
+    $cache = []
+    $tempElement = null
 
     constructor(args) {
         super(args)
@@ -292,6 +292,10 @@ export class ListView extends Flickable {
         this.$updateView()
     }
     $delegateChanged(){
+        if(this.$tempElement){
+            this.$tempElement.$destroy()
+        }
+        this.$tempElement = this.delegate.createObject ? this.delegate.createObject({parent: null}) : this.delegate({parent: null})
         this.$p.contentX.val = 0
         this.$p.contentY.val = 0
         this.$p.originX.val = 0
@@ -456,14 +460,31 @@ export class ListView extends Flickable {
         }
     }
     $createElement(index){
-        let obj = this.delegate.createObject ? this.delegate.createObject({parent: this.contentItem, index: index}) : this.delegate({parent: this.contentItem, index: index})
-        obj.widthChanged.connect(this.$updateGeometry.bind(this))
-        obj.heightChanged.connect(this.$updateGeometry.bind(this))
+        let obj = null
+        if(this.$cache.length){
+            obj = this.$cache.pop()
+            this.contentItem.children.push(obj)
+        } else {
+            obj = this.delegate.createObject ? this.delegate.createObject({parent: this.contentItem, index: index}) : this.delegate({parent: this.contentItem, index: index})
+            obj.widthChanged.connect(this.$updateGeometry.bind(this))
+            obj.heightChanged.connect(this.$updateGeometry.bind(this))
+        }
+        
         
         // obj.$orientation = this.orientation
         this.$recursiveIndex(obj, index)
         // obj.$uP()
         return obj
+    }
+
+    $toCache(child){
+        let index = this.contentItem.children.indexOf(child)
+        if(index >= 0){
+            this.contentItem.children.splice(index, 1)
+        }
+        child.x = -10000
+        child.y = -10000
+        this.$cache.push(child)
     }
 
     $getCurrentIndex(){
@@ -546,14 +567,16 @@ export class ListView extends Flickable {
                             
                         if(child.x + child.width < this.contentX-this.cacheBuffer || child.x > this.contentX + this.width + this.cacheBuffer) {
                             this.$items[child.index] = null
-                            child.$destroy()
+                            // child.$destroy()
+                            this.$toCache(child)
                             this.$updateGeometry()
                         }
                     } else {
                         
                         if(child.y + child.height < this.contentY-this.cacheBuffer || child.y > this.contentY + this.height + this.cacheBuffer) {
                             this.$items[child.index] = null
-                            child.$destroy()
+                            // child.$destroy()
+                            this.$toCache(child)
                             this.$updateGeometry()
                         }
                     }
@@ -637,13 +660,14 @@ export class ListView extends Flickable {
                             let currIndex = leftIndex-1
                             let prevIndex = leftIndex
                             if(!this.$items[currIndex]){
-                                this.$items[currIndex] = this.$createElement(currIndex)
+                                let obj = this.$createElement(currIndex)
+                                this.$items[currIndex] = obj
                                 this.$items[currIndex].y = 0
                                 this.$items[currIndex].$sP('x', ()=>{
                                     if(this.$items[prevIndex]){
-                                        return this.$items[prevIndex].x - this.$items[currIndex].width - this.spacing
+                                        return this.$items[prevIndex].x - obj.width - this.spacing
                                     } else {
-                                        return this.$items[currIndex].$p.x.val
+                                        return obj.$p.x.val
                                     }     
                                 })
                                 this.$items[currIndex].$uP()
@@ -660,13 +684,14 @@ export class ListView extends Flickable {
                             let currIndex = leftIndex-1
                             let prevIndex = leftIndex
                             if(!this.$items[currIndex]){
-                                this.$items[currIndex] = this.$createElement(currIndex)
+                                let obj = this.$createElement(currIndex)
+                                this.$items[currIndex] = obj
                                 this.$items[currIndex].x = 0
                                 this.$items[currIndex].$sP('y', ()=>{
                                     if(this.$items[prevIndex]){
-                                        return this.$items[prevIndex].y - this.$items[currIndex].height - this.spacing
+                                        return this.$items[prevIndex].y - obj.height - this.spacing
                                     } else {
-                                        return this.$items[currIndex].$p.y.val
+                                        return obj.$p.y.val
                                     }     
                                 })
                                 this.$items[currIndex].$uP()
@@ -685,13 +710,14 @@ export class ListView extends Flickable {
                             let currIndex = rightIndex+1
                             let prevIndex = rightIndex
                             if(!this.$items[currIndex]){
-                                this.$items[currIndex] = this.$createElement(currIndex)
+                                let obj = this.$createElement(currIndex)
+                                this.$items[currIndex] = obj
                                 this.$items[currIndex].y = 0
                                 this.$items[currIndex].$sP('x', ()=>{
                                     if(this.$items[prevIndex]){
                                         return this.$items[prevIndex].x + this.$items[prevIndex].width + this.spacing
                                     } else {
-                                        return this.$items[currIndex].$p.x.val
+                                        return obj.$p.x.val
                                     }     
                                 })
                                 this.$items[currIndex].$uP()
@@ -707,13 +733,14 @@ export class ListView extends Flickable {
                             let currIndex = rightIndex+1
                             let prevIndex = rightIndex
                             if(!this.$items[currIndex]){
-                                this.$items[currIndex] = this.$createElement(currIndex)
+                                let obj = this.$createElement(currIndex)
+                                this.$items[currIndex] = obj
                                 this.$items[currIndex].x = 0
                                 this.$items[currIndex].$sP('y', ()=>{
                                     if(this.$items[prevIndex]){
                                         return this.$items[prevIndex].y + this.$items[prevIndex].height + this.spacing
                                     } else {
-                                        return this.$items[currIndex].$p.y.val
+                                        return obj.$p.y.val
                                     }     
                                 })
                                 this.$items[currIndex].$uP()
@@ -990,6 +1017,9 @@ export class ListView extends Flickable {
 
 	}
     $destroy(){
+        if(this.$tempElement){
+            this.$tempElement.$destroy()
+        }
         if(this.model && typeof this.model === 'object' && this.model.$deps && this.model.$deps[this.UID]) delete this.model.$deps[this.UID]
         if(this.$model && typeof this.$model === 'object' && this.$model.$deps && this.$model.$deps[this.UID]) delete this.$model.$deps[this.UID]
         super.$destroy()

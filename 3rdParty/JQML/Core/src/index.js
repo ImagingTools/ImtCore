@@ -472,6 +472,7 @@ global.Core = {
                 // this.catchers = []
             },
             view: null,
+            map: null,
         }
         
         let events = ['mousedown', 'mouseup', 'mousemove', 'wheel', 'mousewheel', 'contextmenu', 'touchstart', 'touchend', 'touchmove', 'keydown', 'keyup', 'keypress', 'mouseover', 'mouseout']
@@ -518,6 +519,10 @@ global.Core = {
                         if(obj && obj.visible && obj.enabled && obj.webScroll !== undefined && !find && root.eventState.catchers.indexOf(p) >= 0 && (obj.width < obj.contentWidth ||obj.height < obj.contentHeight)){
                             find = true
                             root.eventState.view = obj
+                        }
+                        if(obj && obj.visible && obj.enabled && obj.$qmlClassName === 'Map' && root.eventState.catchers.indexOf(p) >= 0){
+                            find = true
+                            root.eventState.map = obj
                         }
                         
                     }

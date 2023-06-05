@@ -1,8 +1,9 @@
 import {QtObject} from './QtObject'
 
-import Feature from 'ol/Feature.js';
-import Polygon from 'ol/geom/Polygon';
-import { Style, Fill, Stroke } from 'ol/style.js';
+import Feature from 'ol/Feature.js'
+import Polygon from 'ol/geom/Polygon'
+import { Style, Fill, Stroke } from 'ol/style.js'
+import {transform} from 'ol/proj'
 
 export class MapRectangle extends QtObject  {
     constructor(args) {
@@ -19,7 +20,7 @@ export class MapRectangle extends QtObject  {
             color: 'black',
         }).connect(this.$updateFeature.bind(this))
     }
-    $updateFeature(){
+    $updateFeature(added = false){
         if(!this.topLeft || !this.bottomRight) return
         if(!this.parent.$source){
             this.parent.$queue.add(this)
@@ -28,18 +29,18 @@ export class MapRectangle extends QtObject  {
         if(this.$feature){
             this.parent.$source.removeFeature(this.$feature)
         }
-        this.$feature = new Feature({
+        this.$feature = new Feature({ 
             geometry: new Polygon(
                 [[
-                    QtPositioning.coordinate(this.topLeft.latitude, this.topLeft.longitude),
-                    QtPositioning.coordinate(this.topLeft.latitude, this.bottomRight.longitude),
-                    QtPositioning.coordinate(this.bottomRight.latitude, this.bottomRight.longitude),
-                    QtPositioning.coordinate(this.bottomRight.latitude, this.topLeft.longitude),
+                    transform([this.topLeft.longitude, this.topLeft.latitude], 'EPSG:4326','EPSG:3857'),
+                    transform([this.bottomRight.longitude, this.topLeft.latitude], 'EPSG:4326','EPSG:3857'),
+                    transform([this.bottomRight.longitude, this.bottomRight.latitude], 'EPSG:4326','EPSG:3857'),
+                    transform([this.topLeft.longitude, this.bottomRight.latitude], 'EPSG:4326','EPSG:3857')
                 ]]
             ),
         })
         this.$updateStyleFeature()
-        this.parent.$source.addFeature(this.$feature)
+        if(added) this.parent.addMapItem(this)
     }
     $updateStyleFeature(){
         if(this.$feature){
@@ -56,6 +57,7 @@ export class MapRectangle extends QtObject  {
     }
 
     $destroy(){
+        if(this.$feature && this.parent.$map) this.parent.$source.removeFeature(this.$feature)
         if(!this.topLeft) this.topLeft.$destroy()
         if(!this.bottomRight) this.bottomRight.$destroy()
         super.$destroy()

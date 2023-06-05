@@ -156,7 +156,7 @@ export class MouseArea extends Item {
 
 			if(this.$timerPressAndHold) clearTimeout(this.$timerPressAndHold)
 			this.$timerPressAndHold = setTimeout(()=>{
-				if(this.$s) this.$s.pressAndHold()
+				if(this.pressed && this.$s) this.$s.pressAndHold()
 			}, this.pressAndHoldInterval)
 			
 		}
@@ -201,7 +201,13 @@ export class MouseArea extends Item {
 		if(this.$p.enabled.val && (this.$p.pressed.val || this.$p.hoverEnabled.val)){
 			this.$fillMouse(e)
 
-			if(this.$p.pressed.val && state.view && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10) && !this.preventStealing){
+			if(this.$p.pressed.val && state.map && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10) && !this.preventStealing){
+				this.pressed = false
+				this.containsMouse = false
+				this.hover = false
+				this.$s.exited()
+				if(!this.mouse.accepted) state.release()
+			} else if(this.$p.pressed.val && state.view && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10) && !this.preventStealing){
 				// console.log('CONSOLE::', this)
 				this.pressed = false
 				this.containsMouse = false
@@ -271,7 +277,7 @@ export class MouseArea extends Item {
 
 			if(this.$timerPressAndHold) clearTimeout(this.$timerPressAndHold)
 			this.$timerPressAndHold = setTimeout(()=>{
-				this.$s.pressAndHold()
+				if(this.pressed && this.$s) this.$s.pressAndHold()
 			}, this.pressAndHoldInterval)
 		}
 
@@ -312,7 +318,14 @@ export class MouseArea extends Item {
 		e.preventDefault()
 		if(this.$p.enabled.val && (this.$p.pressed.val || this.$p.hoverEnabled.val)){
 			this.$fillMouse(e)
-			if(this.$p.pressed.val && state.view && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10) && !this.preventStealing){
+
+			if(this.$p.pressed.val && state.map && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10) && !this.preventStealing){
+				this.pressed = false
+				this.containsMouse = false
+				this.hover = false
+				this.$s.exited()
+				if(!this.mouse.accepted) state.release()
+			} else if(this.$p.pressed.val && state.view && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10) && !this.preventStealing){
 				// console.log('CONSOLE::', this)
 				this.pressed = false
 				this.containsMouse = false

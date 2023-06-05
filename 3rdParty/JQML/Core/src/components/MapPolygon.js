@@ -1,8 +1,9 @@
 import {QtObject} from './QtObject'
 
-import Feature from 'ol/Feature.js';
-import Polygon from 'ol/geom/Polygon';
-import { Style, Fill, Stroke } from 'ol/style.js';
+import Feature from 'ol/Feature.js'
+import Polygon from 'ol/geom/Polygon'
+import { Style, Fill, Stroke } from 'ol/style.js'
+import {transform} from 'ol/proj'
 
 export class MapPolygon extends QtObject  {
     constructor(args) {
@@ -18,7 +19,7 @@ export class MapPolygon extends QtObject  {
             color: 'black',
         }).connect(this.$updateFeature.bind(this))
     }
-    $updateFeature(){
+    $updateFeature(added = false){
         if(!this.path && !this.path.length) return
         if(!this.parent.$source){
             this.parent.$queue.add(this)
@@ -29,7 +30,7 @@ export class MapPolygon extends QtObject  {
         }
         let path = []
         for(let p of this.path){
-            path.push(QtPositioning.coordinate(p.latitude, p.longitude))
+            path.push(transform([p.longitude, p.latitude], 'EPSG:4326','EPSG:3857'))
         }
         this.$feature = new Feature({
             geometry: new Polygon(
@@ -39,7 +40,7 @@ export class MapPolygon extends QtObject  {
             ),
         })
         this.$updateStyleFeature()
-        this.parent.$source.addFeature(this.$feature)
+        if(added) this.parent.addMapItem(this)
     }
     $updateStyleFeature(){
         if(this.$feature){
@@ -53,6 +54,11 @@ export class MapPolygon extends QtObject  {
                 })
             }))
         }
+    }
+
+    $destroy(){
+        if(this.$feature && this.parent.$map) this.parent.$source.removeFeature(this.$feature)
+        super.$destroy()
     }
 
 }

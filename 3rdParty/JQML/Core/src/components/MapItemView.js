@@ -1,4 +1,5 @@
 import {QtObject} from './QtObject'
+import {transform} from 'ol/proj'
 
 export class MapItemView extends QtObject  {
     constructor(args) {

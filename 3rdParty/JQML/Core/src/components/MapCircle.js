@@ -1,8 +1,9 @@
 import {QtObject} from './QtObject'
 
-import Feature from 'ol/Feature.js';
-import Circle from 'ol/geom/Circle.js';
-import { Style, Fill, Stroke } from 'ol/style.js';
+import Feature from 'ol/Feature.js'
+import Circle from 'ol/geom/Circle.js'
+import { Style, Fill, Stroke } from 'ol/style.js'
+import {transform} from 'ol/proj'
 
 export class MapCircle extends QtObject  {
     constructor(args) {
@@ -19,7 +20,7 @@ export class MapCircle extends QtObject  {
             color: 'black',
         }).connect(this.$updateFeature.bind(this))
     }
-    $updateFeature(){
+    $updateFeature(added = false){
         if(!this.center) return
         if(!this.parent.$source){
             this.parent.$queue.add(this)
@@ -30,12 +31,12 @@ export class MapCircle extends QtObject  {
         }
         this.$feature = new Feature({
             geometry: new Circle(
-                QtPositioning.coordinate(this.center.latitude, this.center.longitude),
+                transform([this.center.longitude, this.center.latitude], 'EPSG:4326','EPSG:3857'),
                 this.radius
             ),
         })
         this.$updateStyleFeature()
-        this.parent.$source.addFeature(this.$feature)
+        if(added) this.parent.addMapItem(this)
     }
     $updateStyleFeature(){
         if(this.$feature){
@@ -51,6 +52,7 @@ export class MapCircle extends QtObject  {
         }
     }
     $destroy(){
+        if(this.$feature && this.parent.$map) this.parent.$source.removeFeature(this.$feature)
         if(!this.center) this.center.$destroy()
         super.$destroy()
     }

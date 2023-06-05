@@ -15,6 +15,7 @@ export class QtObject {
     // LVL = new Set()
 
     constructor(args) {
+        if(args.$qmlClassName) args = {parent: args}
         if(args.parent && args.parent.$flickable && args.parent.contentItem) args.parent = args.parent.contentItem
         this.$PI = new Proxy(this, Core.proxyHandlerID)
         this.$P0 = new Proxy(this, Core.proxyHandler0)
