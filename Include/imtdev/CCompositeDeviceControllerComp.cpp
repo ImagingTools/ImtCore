@@ -85,7 +85,7 @@ DeviceAccessorPtr CCompositeDeviceControllerComp::OpenDevice(
 			IDeviceController* controllerPtr = m_deviceControllerCompPtr[i];
 			if (controllerPtr != nullptr){
 				QByteArrayList deviceTypeIds = controllerPtr->GetSupportedDeviceTypeIds();
-				if (deviceTypeIds.contains(deviceId)){
+				if (deviceTypeIds.contains(deviceTypeId)){
 					return controllerPtr->OpenDevice(deviceTypeId, deviceId, paramsPtr);
 				}
 			}
