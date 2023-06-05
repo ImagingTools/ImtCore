@@ -891,7 +891,7 @@ DocumentBase {
 
                         dependenciesTable.visible = true;
 
-                        let indexes = dependenciesTable.checkedIndexes;
+                        let indexes = dependenciesTable.getCheckedItems();
                         let licenseIDs = []
 
                         for (let i of indexes){

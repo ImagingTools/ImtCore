@@ -181,7 +181,7 @@ Item {
         roleEditorContainer.documentModel.SetData("Description", descriptionInput.text);
 
         let selectedRoleIds = []
-        let indexes = parentRolesTable.checkedIndexes;
+        let indexes = parentRolesTable.getCheckedItems();
         for (let index of indexes){
             let id = parentRolesTable.elements.GetData("Id", index);
             selectedRoleIds.push(id);
@@ -420,7 +420,7 @@ Item {
                 return;
             }
 
-            let indexes = parentRolesTable.checkedIndexes;
+            let indexes = parentRolesTable.getCheckedItems();
             let roles = roleEditorContainer.documentModel.GetData("ParentRoles");
             let roleIDs = [];
             for (let index of indexes){

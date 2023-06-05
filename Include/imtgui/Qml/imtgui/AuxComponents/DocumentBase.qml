@@ -21,6 +21,8 @@ Item {
 
     property bool blockUpdatingModel: false;
 
+    property bool isUpdatingGui: false;
+
     // If true - after update the document will be closed
     property bool closingFlag: false;
 
@@ -145,7 +147,7 @@ Item {
         }
     }
 
-    // If the command 'Save' is missing then we block the UI
+    // If the command 'Save' is missing then we bloc k the UI
     function onCommandsModelLoaded(){
         let saveExists = documentBaseRoot.commandsProvider.commandExists("Save");
         if (!saveExists){

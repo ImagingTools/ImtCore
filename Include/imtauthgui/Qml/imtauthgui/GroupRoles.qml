@@ -59,7 +59,7 @@ Item {
         }
 
         let selectedRoleIds = []
-        let indexes = rolesTable.checkedIndexes;
+        let indexes = rolesTable.getCheckedItems();
         for (let index of indexes){
             let id = rolesTable.elements.GetData("Id", index);
             selectedRoleIds.push(id);
@@ -164,7 +164,7 @@ Item {
                 return;
             }
 
-            let indexes = rolesTable.checkedIndexes;
+            let indexes = rolesTable.getCheckedItems();
             let roles = groupRolesContainer.documentModel.GetData("Roles");
             let roleIDs = [];
             for (let index of indexes){

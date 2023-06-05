@@ -53,6 +53,18 @@ Rectangle {
         }
     }
 
+    onContainsMouseChanged: {
+        if (containsMouse){
+            if(tooltip.text !== ""){
+                pauseTooltip.restart();
+            }
+        }
+        else{
+            pauseTooltip.stop();
+            tooltip.closeTooltip();
+        }
+    }
+
     Image {
         id: image;
 
@@ -96,6 +108,7 @@ Rectangle {
         visible: auxButtonContainer.enabled;
 
         onClicked: {
+            tooltip.closeTooltip();
 
             auxButtonContainer.clicked();
         }
@@ -111,21 +124,21 @@ Rectangle {
             auxButtonContainer.pressed = false;
         }
 
-        onEntered: {
-            if(tooltip.text !== ""){
-                pauseTooltip.stop();
-                pauseTooltip.start();
+//        onEntered: {
+//            if(tooltip.text !== ""){
+//                pauseTooltip.stop();
+//                pauseTooltip.start();
 
-            }
+//            }
 
-        }
+//        }
 
-        onExited: {
-            if(tooltip.text !== ""){
-                pauseTooltip.stop();
-                tooltip.closeTooltip();
-            }
-        }
+//        onExited: {
+//            if(tooltip.text !== ""){
+//                pauseTooltip.stop();
+//                tooltip.closeTooltip();
+//            }
+//        }
     }
 
     CustomTooltip{

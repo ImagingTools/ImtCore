@@ -146,6 +146,7 @@ CollectionView {
 
                 anchors.verticalCenter: parent.verticalCenter;
                 anchors.left: name2.right;
+                anchors.leftMargin: 5;
 
                 width: 15;
                 height: width;

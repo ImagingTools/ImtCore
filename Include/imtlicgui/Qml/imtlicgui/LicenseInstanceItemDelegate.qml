@@ -2,137 +2,292 @@ import QtQuick 2.0
 import Acf 1.0
 import imtgui  1.0
 
-TableViewItemDelegateBase {
-    id: packageTreeItemDelegate;
+Rectangle {
+    id: root;
 
-    //root: licensesTable;
+    width: 1000;
+    height: 35;
 
-    rowBodyDelegate: Component { Row {
-            id: row;
+    color: root.selected ? Style.selectedColor : "transparent";
 
-            height: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.rowItemHeight :0;
+    property bool selected: false;
 
-            Item {
-                id: leftPart;
+    property int expirationState: Qt.Unchecked;
 
-                width: packageTreeItemDelegate.width / 2;
-                height: row.height;
+    property int licenseState: model.LicenseState ? model.LicenseState : Qt.Unchecked;
+    property string expiration: model.Expiration ? model.Expiration : "";
+    property string licenseId: model.Id ? model.Id : "";
+    property string licenseName: model.Name ? model.Name : "";
 
-                clip: true;
+    signal stateChanged();
+    signal dateChanged();
 
-                CheckBox {
-                    id: checkBoxLicense;
+    Row {
+        id: row;
 
-                    anchors.verticalCenter: parent.verticalCenter;
-                    anchors.left: leftPart.left;
-                    anchors.leftMargin: 10;
+        height: parent.height;
 
-                    checkState: model.LicenseState;
+        Item {
+            id: leftPart;
 
-                    onClicked: {
-                        console.log("TableInstanceLicensesDelegate CheckBox onClicked");
-                        model.LicenseState = 2 - checkBoxLicense.checkState;
+            width: root.width / 2;
+            height: row.height;
 
-                        packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "LicenseState");
-                    }
-                }
+            clip: true;
 
-                Text {
-                    id: titleLicensesTable;
+            CheckBox {
+                id: checkBoxLicense;
 
-                    anchors.verticalCenter: parent.verticalCenter;
-                    anchors.left: checkBoxLicense.right;
-                    anchors.leftMargin: 10;
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: leftPart.left;
+                anchors.leftMargin: 10;
 
-                    font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSize_common;
-                    color: Style.textColor;
-                    wrapMode: Text.WordWrap;
-                    elide: Text.ElideRight;
+                checkState: model.LicenseState ? model.LicenseState : Qt.Unchecked;
 
-                    text: model.Name;
+                onClicked: {
+                    console.log("TableInstanceLicensesDelegate CheckBox onClicked");
+                    model.LicenseState = Qt.Checked - model.LicenseState;
+
+                    root.stateChanged();
                 }
             }
 
-            Item {
-                id: rightPart;
+            Text {
+                id: titleLicensesTable;
 
-                width: packageTreeItemDelegate.width / 2;
-                height: parent.height;
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: checkBoxLicense.right;
+                anchors.leftMargin: 10;
 
-                visible: checkBoxLicense.checkState === 2;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+                color: Style.textColor;
+                wrapMode: Text.WordWrap;
+                elide: Text.ElideRight;
 
-                CheckBox {
-                    id: checkBoxExpiration;
+                text: model.Name ? model.Name : "";
+            }
+        }
 
-                    anchors.verticalCenter: parent.verticalCenter;
-                    anchors.left: rightPart.left;
+        Item {
+            id: rightPart;
 
-                    checkState: model.ExpirationState;
+            width: root.width / 2;
+            height: parent.height;
 
-                    onClicked: {
-                        console.log("checkBoxExpiration onClicked");
-                        model.ExpirationState = 2 - checkBoxExpiration.checkState;
+            visible: checkBoxLicense.checkState === Qt.Checked;
 
-                        if (model.ExpirationState == Qt.Checked){
-                            datePicker.setCurrentDay();
-                        }
+            CheckBox {
+                id: checkBoxExpiration;
 
-                        packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "ExpirationState");
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: rightPart.left;
+
+                checkState: model.ExpirationState;
+
+                onClicked: {
+//                    if (model.Expiration === ""){
+//                        datePicker.setCurrentDay();
+//                    }
+//                    else{
+//                        model.Expiration = "";
+//                    }
+
+                    console.log("checkBoxExpiration onClicked");
+                    model.ExpirationState = 2 - checkBoxExpiration.checkState;
+
+                    if (model.ExpirationState === Qt.Checked){
+                        datePicker.setCurrentDay();
                     }
                 }
+            }
 
-                Text {
-                    id: textUnlimited;
+            Text {
+                id: textUnlimited;
 
-                    anchors.verticalCenter: parent.verticalCenter;
-                    anchors.left: checkBoxExpiration.right;
-                    anchors.leftMargin: 5;
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: checkBoxExpiration.right;
+                anchors.leftMargin: 5;
 
-                    visible: checkBoxExpiration.checkState === 0;
+                visible: checkBoxExpiration.checkState === Qt.Unchecked;
 
-                    font.family: Style.fontFamily;
-                    font.pixelSize: Style.fontSize_common;
-                    color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+                color: Style.textColor;
 
-                    text: qsTr("Unlimited");
-                }
+                text: qsTr("Unlimited");
+            }
 
-                DatePicker {
-                    id: datePicker;
+            DatePicker {
+                id: datePicker;
 
-                    anchors.verticalCenter: parent.verticalCenter;
-                    anchors.left: checkBoxExpiration.right;
-                    anchors.leftMargin: 5;
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: checkBoxExpiration.right;
+                anchors.leftMargin: 5;
 
-                    visible: checkBoxExpiration.checkState === 2;
+                visible: checkBoxExpiration.checkState === Qt.Checked;
 
-                    width: 100;
-                    height: 20;
+                width: 100;
+                height: 20;
 
-                    currentDayButtonVisible: false;
-                    startWithCurrentDay: false;
+                currentDayButtonVisible: false;
+                startWithCurrentDay: false;
 
-                    property string expirationDate: model.Expiration;
+                property string expirationDate: model.Expiration;
 
-                    onExpirationDateChanged: {
-                        console.log("onExpirationDateChanged", datePicker.expirationDate);
+                onExpirationDateChanged: {
+                    console.log("onExpirationDateChanged", datePicker.expirationDate);
 
+                    let currentDate = datePicker.getDate();
+                    if (expirationDate !== "" && expirationDate !== currentDate){
                         let date = model.Expiration;
                         let data = date.split("-");
                         datePicker.setDate(Number(data[0]), Number(data[1]) - 1, Number(data[2]));
                     }
+                }
 
-                    onDateChanged: {
-                        console.log("onDateChanged", datePicker.getDate());
-                        model.Expiration = datePicker.getDate();
+                onDateChanged: {
+                    console.log("onDateChanged", datePicker.getDate());
+                    model.Expiration = datePicker.getDate();
 
-                        console.log("model.Expiration", model.Expiration);
-
-                        packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "Expiration");
-                    }
+                    root.dateChanged();
                 }
             }
         }
     }
 }
+
+//TableViewItemDelegateBase {
+//    id: packageTreeItemDelegate;
+
+//    //root: licensesTable;
+
+//    rowBodyDelegate: Component { Row {
+//            id: row;
+
+//            height: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.rowItemHeight :0;
+
+//            Item {
+//                id: leftPart;
+
+//                width: packageTreeItemDelegate.width / 2;
+//                height: row.height;
+
+//                clip: true;
+
+//                CheckBox {
+//                    id: checkBoxLicense;
+
+//                    anchors.verticalCenter: parent.verticalCenter;
+//                    anchors.left: leftPart.left;
+//                    anchors.leftMargin: 10;
+
+//                    checkState: model.LicenseState;
+
+//                    onClicked: {
+//                        console.log("TableInstanceLicensesDelegate CheckBox onClicked");
+//                        model.LicenseState = 2 - checkBoxLicense.checkState;
+
+//                        packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "LicenseState");
+//                    }
+//                }
+
+//                Text {
+//                    id: titleLicensesTable;
+
+//                    anchors.verticalCenter: parent.verticalCenter;
+//                    anchors.left: checkBoxLicense.right;
+//                    anchors.leftMargin: 10;
+
+//                    font.family: Style.fontFamily;
+//                    font.pixelSize: Style.fontSize_common;
+//                    color: Style.textColor;
+//                    wrapMode: Text.WordWrap;
+//                    elide: Text.ElideRight;
+
+//                    text: model.Name;
+//                }
+//            }
+
+//            Item {
+//                id: rightPart;
+
+//                width: packageTreeItemDelegate.width / 2;
+//                height: parent.height;
+
+//                visible: checkBoxLicense.checkState === 2;
+
+//                CheckBox {
+//                    id: checkBoxExpiration;
+
+//                    anchors.verticalCenter: parent.verticalCenter;
+//                    anchors.left: rightPart.left;
+
+//                    checkState: model.ExpirationState;
+
+//                    onClicked: {
+//                        console.log("checkBoxExpiration onClicked");
+//                        model.ExpirationState = 2 - checkBoxExpiration.checkState;
+
+//                        if (model.ExpirationState == Qt.Checked){
+//                            datePicker.setCurrentDay();
+//                        }
+
+//                        packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "ExpirationState");
+//                    }
+//                }
+
+//                Text {
+//                    id: textUnlimited;
+
+//                    anchors.verticalCenter: parent.verticalCenter;
+//                    anchors.left: checkBoxExpiration.right;
+//                    anchors.leftMargin: 5;
+
+//                    visible: checkBoxExpiration.checkState === 0;
+
+//                    font.family: Style.fontFamily;
+//                    font.pixelSize: Style.fontSize_common;
+//                    color: Style.textColor;
+
+//                    text: qsTr("Unlimited");
+//                }
+
+//                DatePicker {
+//                    id: datePicker;
+
+//                    anchors.verticalCenter: parent.verticalCenter;
+//                    anchors.left: checkBoxExpiration.right;
+//                    anchors.leftMargin: 5;
+
+//                    visible: checkBoxExpiration.checkState === 2;
+
+//                    width: 100;
+//                    height: 20;
+
+//                    currentDayButtonVisible: false;
+//                    startWithCurrentDay: false;
+
+//                    property string expirationDate: model.Expiration;
+
+//                    onExpirationDateChanged: {
+//                        console.log("onExpirationDateChanged", datePicker.expirationDate);
+
+//                        let date = model.Expiration;
+//                        let data = date.split("-");
+//                        datePicker.setDate(Number(data[0]), Number(data[1]) - 1, Number(data[2]));
+//                    }
+
+//                    onDateChanged: {
+//                        console.log("onDateChanged", datePicker.getDate());
+//                        model.Expiration = datePicker.getDate();
+
+//                        console.log("model.Expiration", model.Expiration);
+
+//                        packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "Expiration");
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}

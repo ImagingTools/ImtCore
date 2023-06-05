@@ -1,18 +1,12 @@
 #include <imtbase/CTreeItemModel.h>
 
 
-// Qt includes
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
-
 // ACF includes
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
 #include <iser/CJsonMemWriteArchive.h>
 #include <istd/CChangeNotifier.h>
-#include <istd/TSmartPtr.h>
-#include <imod/CModelUpdateBridge.h>
+#include <istd/TDelPtr.h>
 
 
 namespace imtbase
@@ -21,8 +15,8 @@ namespace imtbase
 
 CTreeItemModel::CTreeItemModel(QObject *parent)
 	:QAbstractListModel(parent),
-	m_isArray(false),
-	m_isUpdateEnabled(false)
+	  m_isArray(false),
+	  m_isUpdateEnabled(false)
 {
 	m_isTransaction = false;
 	imtbase::CTreeItemModel* parentModel = dynamic_cast<imtbase::CTreeItemModel*>(parent);
@@ -58,7 +52,6 @@ void CTreeItemModel::SetState(const QString &newState)
 
 // public slots
 
-
 void CTreeItemModel::SetParent(QObject* parent)
 {
 	BaseClass2::setParent(parent);
@@ -77,11 +70,21 @@ bool CTreeItemModel::Copy(CTreeItemModel* object)
 }
 
 
+imtbase::CTreeItemModel* CTreeItemModel::CopyMe() const
+{
+	istd::TDelPtr<CTreeItemModel> resultModelPtr = new CTreeItemModel();
+	resultModelPtr->CopyFrom(*this);
+	return resultModelPtr.PopPtr();
+}
+
+
 bool CTreeItemModel::IsEqualWithModel(CTreeItemModel* modelPtr) const
 {
-	bool result = IsEqual(*modelPtr);
+	if (modelPtr == nullptr){
+		return false;
+	}
 
-	return result;
+	return IsEqual(*modelPtr);
 }
 
 
@@ -174,6 +177,10 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap& /*infoMap*/)
 		EndChanges(changeSet);
 	}
 
+	if (!m_isTransaction){
+		emit dataChanged(QModelIndex(), QModelIndex(), QVector<int>());
+	}
+
 	return true;
 }
 
@@ -228,11 +235,13 @@ bool CTreeItemModel::SetExternTreeModel(const QByteArray &key, CTreeItemModel *e
 	return true;
 }
 
+
 bool CTreeItemModel::CopyItemDataFromModel(int index, CTreeItemModel *externTreeModel, int externIndex)
 {
 	const CTreeItemModel* constExternTreeModel = externTreeModel;
 	return CopyItemDataFromModel(index, constExternTreeModel, externIndex);
 }
+
 
 bool CTreeItemModel::CopyItemDataFromModel(int index, const CTreeItemModel *externTreeModel, int externIndex)
 {
@@ -421,13 +430,13 @@ bool CTreeItemModel::ContainsKey(const QByteArray &key, int index) const
 		retVal = m_items[index]->ContainsKey(key);
 	}
 
-    return retVal;
+	return retVal;
 }
 
 
 bool CTreeItemModel::IsValidData(const QByteArray &key, int index) const
 {
-    return GetData(key, index) != QVariant();
+	return GetData(key, index) != QVariant();
 }
 
 
@@ -625,6 +634,7 @@ QVariant CTreeItemModel::data(const QModelIndex& index, int role) const
 	return this->GetData(key, row);
 }
 
+
 bool CTreeItemModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
 	if (!m_roleNames.contains(role)){
@@ -782,7 +792,6 @@ istd::IChangeable* CTreeItemModel::CloneMe(CompatibilityMode /*mode*/) const
 {
 	return NULL;
 }
-
 
 
 // protected methods

@@ -3,7 +3,6 @@
 
 // ImtCore includes
 #include <imtbase/TIdentifiableWrap.h>
-#include <imtlic/CProductInstanceInfo.h>
 #include <imtlic/IHardwareInstanceInfo.h>
 
 
@@ -28,6 +27,8 @@ public:
 	virtual void SetDeviceId(const QByteArray& deviceId) override;
 	virtual QByteArray GetSoftwareId() const override;
 	virtual void SetSoftwareId(const QByteArray& softwareId) override;
+	virtual QByteArray GetModelTypeId() const override;
+	virtual void SetModelTypeId(const QByteArray& typeId) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -44,6 +45,7 @@ private:
 	QByteArray m_productId;
 	QByteArray m_deviceId;
 	QByteArray m_softwareId;
+	QByteArray m_modelTypeId;
 };
 
 typedef imtbase::TIdentifiableWrap<CHardwareInstanceInfo> CIdentifiableHardwareInstanceInfo;

@@ -23,7 +23,7 @@ Item {
     function setCommandVisible(commandId, visible){
         for (let i = 0; i < container.commandModel.GetItemsCount(); i++){
             let id = container.commandModel.GetData("Id", i);
-            if (id == commandId){
+            if (id === commandId){
                 container.commandModel.SetData("Visible", visible, i);
                 break;
             }
@@ -34,7 +34,6 @@ Item {
         id: commands;
 
         width: row.width;
-//        height: 25;
 
         height: container.height;
 

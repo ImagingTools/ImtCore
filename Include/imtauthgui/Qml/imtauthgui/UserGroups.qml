@@ -69,7 +69,7 @@ Item {
 
         let selectedGroupIds = []
 
-        let indexes = groupsTable.checkedIndexes;
+        let indexes = groupsTable.getCheckedItems();
         for (let index of indexes){
             let id = groupsTable.elements.GetData("Id", index);
             selectedGroupIds.push(id);
@@ -154,7 +154,7 @@ Item {
                 return;
             }
 
-            let indexes = groupsTable.checkedIndexes;
+            let indexes = groupsTable.getCheckedItems();
             let groups = userGroupsContainer.documentModel.GetData("Groups");
             let groupIDs = [];
             for (let index of indexes){

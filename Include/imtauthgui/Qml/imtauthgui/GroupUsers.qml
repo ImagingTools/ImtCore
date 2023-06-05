@@ -53,7 +53,7 @@ Item {
 
         let selectedUserIds = []
 
-        let indexes = usersTable.checkedIndexes;
+        let indexes = usersTable.getCheckedItems();
         for (let index of indexes){
             let id = usersTable.elements.GetData("Id", index);
             selectedUserIds.push(id);
@@ -152,7 +152,7 @@ Item {
                 return;
             }
 
-            let indexes = usersTable.checkedIndexes;
+            let indexes = usersTable.getCheckedItems();
             let users = groupUsersContainer.documentModel.GetData("Users");
             let userIDs = [];
             for (let index of indexes){

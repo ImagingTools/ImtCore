@@ -54,6 +54,16 @@ public:
 		Set the link to licensing software of this product instance.
 	*/
 	virtual void SetSoftwareId(const QByteArray& softwareId) = 0;
+
+	/**
+		Get the model type ID of this product instance.
+	*/
+	virtual QByteArray GetModelTypeId() const = 0;
+
+	/**
+		Set the model type ID of this product instance.
+	*/
+	virtual void SetModelTypeId(const QByteArray& typeId) = 0;
 };
 
 

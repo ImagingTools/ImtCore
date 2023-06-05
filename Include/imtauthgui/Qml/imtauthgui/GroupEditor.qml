@@ -150,7 +150,7 @@ Item {
         userGroupEditorContainer.documentModel.SetData("Name", nameInput.text);
 
         let selectedGroupIds = []
-        let indexes = parentGroupsTable.checkedIndexes;
+        let indexes = parentGroupsTable.getCheckedItems();
         for (let index of indexes){
             let id = parentGroupsTable.elements.GetData("Id", index);
             selectedGroupIds.push(id);
@@ -340,7 +340,7 @@ Item {
                 return;
             }
 
-            let indexes = parentGroupsTable.checkedIndexes;
+            let indexes = parentGroupsTable.getCheckedItems();
             let groups = userGroupEditorContainer.documentModel.GetData("ParentGroups");
             let groupIDs = [];
             for (let index of indexes){

@@ -68,6 +68,22 @@ void CHardwareInstanceInfo::SetSoftwareId(const QByteArray& softwareId)
 }
 
 
+QByteArray CHardwareInstanceInfo::GetModelTypeId() const
+{
+	return m_modelTypeId;
+}
+
+
+void CHardwareInstanceInfo::SetModelTypeId(const QByteArray& typeId)
+{
+	if (m_modelTypeId != typeId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_modelTypeId = typeId;
+	}
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CHardwareInstanceInfo::Serialize(iser::IArchive& archive)
@@ -89,15 +105,18 @@ bool CHardwareInstanceInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_softwareId);
 	retVal = retVal && archive.EndTag(softwareIdTag);
 
+
 	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
 	quint32 archiveVersion;
-	if (!versionInfo.GetVersionNumber(2022, archiveVersion)){
+	if (!versionInfo.GetVersionNumber(imtcore::VI_IMTCORE, archiveVersion)){
 		archiveVersion = 0;
 	}
 
-	if (archiveVersion == 0) {
-		imtlic::CProductInstanceInfo info;
-		retVal = retVal && info.Serialize(archive); // ?????????????????
+	if (archiveVersion >= 6626){
+		static iser::CArchiveTag modelIdTag("ModelTypeId", "ID of the model type", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(modelIdTag);
+		retVal = retVal && archive.Process(m_modelTypeId);
+		retVal = retVal && archive.EndTag(modelIdTag);
 	}
 
 	return retVal;
@@ -115,6 +134,7 @@ bool CHardwareInstanceInfo::CopyFrom(const IChangeable& object, CompatibilityMod
 		m_deviceId = sourcePtr->m_deviceId;
 		m_softwareId = sourcePtr->m_softwareId;
 		m_productId = sourcePtr->m_productId;
+		m_modelTypeId = sourcePtr->m_modelTypeId;
 
 		return true;
 	}
@@ -141,6 +161,7 @@ bool CHardwareInstanceInfo::ResetData(CompatibilityMode /*mode*/)
 	m_deviceId.clear();
 	m_softwareId.clear();
 	m_productId.clear();
+	m_modelTypeId.clear();
 
 	return true;
 }

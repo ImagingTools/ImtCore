@@ -42,6 +42,8 @@ Item {
     property alias filterMenu: collectionViewBase.filterMenu;
     property alias filterMenuVisible: collectionViewBase.filterMenuVisible;
     property alias modelFilter: collectionViewBase.modelFilter;
+    property alias defaultSortHeaderIndex: collectionViewBase.defaultSortHeaderIndex;
+    property alias defaultOrderType: collectionViewBase.defaultOrderType;
 
     property TreeItemModel documentsData: TreeItemModel {}
     property Item documentManager: null;

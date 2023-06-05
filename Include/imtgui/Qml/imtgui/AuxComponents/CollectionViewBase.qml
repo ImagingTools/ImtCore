@@ -35,6 +35,11 @@ Item {
     property alias modelFilter: modelFilterObj;
     property alias pagination: paginationObj;
 
+    // По умолчанию сорировка будет по этому столбцу
+    property int defaultSortHeaderIndex: 0;
+
+    // only ASC or DESC
+    property string defaultOrderType: "ASC";
 
     signal selectedItem(string id, string name);
     signal selectedIndexChanged(int index);
@@ -80,16 +85,31 @@ Item {
             FilterMenu {
                 decoratorSource: Style.filterPanelDecoratorPath;
 
-                onTextFilterChanged: {
-                    modelFilterObj.SetData("TextFilter", text);
-                    baseCommands.updateModels();
-                }
+//                onTextFilterChanged: {
+//                    modelFilterObj.SetData("TextFilter", text);
+//                    baseCommands.updateModels();
+//                }
 
-                onClosed: {
-                    filterMenuLocal.visible = false;
-                }
+//                onClosed: {
+//                    filterMenuLocal.visible = false;
+//                }
             }
         }
+
+        onLoaded: {
+            filterMenuLocal.item.onTextFilterChanged.connect(collectionViewBaseContainer.onTextFilterChanged);
+            filterMenuLocal.item.onClosed.connect(collectionViewBaseContainer.onFilterClosed);
+        }
+    }
+
+    function onFilterClosed(){
+        filterMenuLocal.visible = false;
+    }
+
+    function onTextFilterChanged(index, text){
+        console.log("onTextFilterChanged", text);
+        modelFilterObj.SetData("TextFilter", text);
+        baseCommands.updateModels();
     }
 
     Rectangle {
@@ -344,11 +364,11 @@ Item {
         onHeadersChanged: {
             console.log("onHeadersChanged", baseCommands.headers)
             if (baseCommands.headers.GetItemsCount() > 0 && sortCont.isEmpty()){
-                let headerId = baseCommands.headers.GetData("Id");
+                let headerId = baseCommands.headers.GetData("Id", collectionViewBaseContainer.defaultSortHeaderIndex);
 
                 sortCont.currentHeaderId = headerId;
 
-                sortCont.setHeaderSort(headerId, "ASC");
+                sortCont.setHeaderSort(headerId, collectionViewBaseContainer.defaultOrderType);
             }
 
             tableInternal.headers = baseCommands.headers;

@@ -52,6 +52,7 @@ public:
 public Q_SLOTS:
 	void SetParent(QObject *parent);
 	bool Copy(CTreeItemModel* object);
+	imtbase::CTreeItemModel* CopyMe() const;
 	bool IsEqualWithModel(CTreeItemModel* modelPtr) const;
 	void InsertNewItemWithParameters(int index, const QVariantMap& map);
 	int InsertNewItem();

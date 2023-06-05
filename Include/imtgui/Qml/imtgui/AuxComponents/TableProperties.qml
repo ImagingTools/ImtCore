@@ -3,13 +3,14 @@ import QtQuick 2.12
 QtObject {
     id: root;
 
-    property var checkedItems: []
+    property var _checkedItems: []
     property var selectedItems: []
     property var invisibleItems: []
     property var disableItems: []
 
     signal visibleItemsChanged();
     signal stateItemsChanged();
+    signal checkedItemsChanged();
 
     function addInvisibleItem(index){
         root.invisibleItems.push(index)
@@ -67,6 +68,55 @@ QtObject {
 
     function itemIsVisible(index){
         return !root.invisibleItems.includes(index);
+    }
+
+    function addCheckedItem(index){
+        let i = root._checkedItems.indexOf(index);
+        if (i === -1) {
+            root._checkedItems.push(index)
+
+            root.checkedItemsChanged();
+        }
+    }
+
+    function addSingleCheckedItem(index){
+        root._checkedItems = []
+        root._checkedItems.push(index)
+        root.checkedItemsChanged();
+    }
+
+    function addCheckedItems(indexes){
+        let changed = false;
+        for (let index of indexes){
+            let i = root._checkedItems.indexOf(index);
+            if (i === -1){
+                root._checkedItems.push(index)
+                changed = true;
+            }
+        }
+
+        if (changed){
+            root.checkedItemsChanged();
+        }
+    }
+
+    function removeCheckedItem(index){
+        let i = root._checkedItems.indexOf(index);
+        if (i !== -1) {
+            root._checkedItems.splice(i, 1);
+
+            root.checkedItemsChanged();
+        }
+    }
+
+    function clearCheckedItems(){
+        root._checkedItems = []
+
+        root.checkedItemsChanged();
+    }
+
+    function itemIsChecked(index){
+        return root._checkedItems.includes(index);
     }
 }
 

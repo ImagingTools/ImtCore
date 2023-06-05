@@ -58,7 +58,7 @@ DocumentBase {
         streetInput.readOnly = true;
         postalCodeInput.readOnly = true;
         cityInput.readOnly = true;
-        companyNameInput.readOnly = true;
+//        companyNameInput.readOnly = true;
         emailInput.readOnly = true;
         groupsTable.readOnly = true;
     }
@@ -91,9 +91,9 @@ DocumentBase {
             streetInput.text = accountEditorContainer.documentModel.GetData("Street");
         }
 
-        if (accountEditorContainer.documentModel.ContainsKey("CompanyName")){
-            companyNameInput.text = accountEditorContainer.documentModel.GetData("CompanyName");
-        }
+//        if (accountEditorContainer.documentModel.ContainsKey("CompanyName")){
+//            companyNameInput.text = accountEditorContainer.documentModel.GetData("CompanyName");
+//        }
 
         if (accountEditorContainer.documentModel.ContainsKey("Email")){
             emailInput.text = accountEditorContainer.documentModel.GetData("Email");
@@ -130,8 +130,6 @@ DocumentBase {
 
         undoRedoManager.beginChanges();
 
-//        accountEditorContainer.documentModel.SetData("Id", accountEditorContainer.itemId);
-
         let name = accountNameInput.text;
         accountEditorContainer.documentModel.SetData("Name", name)
 
@@ -150,14 +148,14 @@ DocumentBase {
         let street = streetInput.text;
         accountEditorContainer.documentModel.SetData("Street", street)
 
-        let companyName = companyNameInput.text;
-        accountEditorContainer.documentModel.SetData("CompanyName", companyName)
+//        let companyName = companyNameInput.text;
+//        accountEditorContainer.documentModel.SetData("CompanyName", companyName)
 
         let email = emailInput.text;
         accountEditorContainer.documentModel.SetData("Email", email);
 
         let selectedGroupIds = []
-        let indexes = groupsTable.checkedIndexes;
+        let indexes = groupsTable.getCheckedItems();
         for (let index of indexes){
             let id = groupsTable.elements.GetData("Id", index);
             selectedGroupIds.push(id)
@@ -268,102 +266,139 @@ DocumentBase {
                 KeyNavigation.tab: emailInput;
             }
 
+
             Text {
                 color: Style.textColor;
-
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
 
-                text: qsTr("Additional information");
+                text: qsTr("Email");
             }
 
-            Rectangle {
-                id: accountOwnerBlockBorders;
+            RegExpValidator {
+                id: mailValid;
 
-                width: parent.width;
-                height: accountOwnerBlock.height + 25;
+                regExp: /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+            }
 
-                color: "transparent";
+            CustomTextField {
+                id: emailInput;
 
-                border.width: 1;
-                border.color: Style.borderColor;
+                height: accountEditorContainer.textInputHeight;
+                width: bodyColumn.width;
 
-                Column {
-                    id: accountOwnerBlock;
+                textInputValidator: mailValid;
 
-                    anchors.horizontalCenter: accountOwnerBlockBorders.horizontalCenter;
-                    anchors.verticalCenter: accountOwnerBlockBorders.verticalCenter;
+                placeHolderText: qsTr("Enter the email");
 
-                    width: parent.width - 20;
-
-                    spacing: 7;
-
-                    Text {
-                        color: Style.textColor;
-                        font.family: Style.fontFamily;
-                        font.pixelSize: Style.fontSize_common;
-
-                        text: qsTr("Email");
+                onEditingFinished: {
+                    console.log("emailInput");
+                    let oldText = accountEditorContainer.documentModel.GetData("Email");
+                    if (oldText && oldText !== emailInput.text || !oldText && emailInput.text !== ""){
+                        accountEditorContainer.updateModel();
                     }
+                }
 
-                    RegExpValidator {
-                        id: mailValid;
-
-                        regExp: /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-                    }
-
-                    CustomTextField {
-                        id: emailInput;
-
-                        height: accountEditorContainer.textInputHeight;
-                        width: accountOwnerBlock.width;
-
-                        textInputValidator: mailValid;
-
-                        placeHolderText: qsTr("Enter the email");
-
-                        onEditingFinished: {
-                            console.log("emailInput");
-                            let oldText = accountEditorContainer.documentModel.GetData("Email");
-                            if (oldText && oldText !== emailInput.text || !oldText && emailInput.text !== ""){
-                                accountEditorContainer.updateModel();
-                            }
-                        }
-
-                        KeyNavigation.tab: companyNameInput;
-                    }
+                KeyNavigation.tab: countryInput;
+            }
 
 
+//            Text {
+//                color: Style.textColor;
 
-                    Text {
-                        color: Style.textColor;
-                        font.family: Style.fontFamily;
-                        font.pixelSize: Style.fontSize_common;
+//                font.family: Style.fontFamily;
+//                font.pixelSize: Style.fontSize_common;
 
-                        text: qsTr("Company Name");
-                    }
+//                text: qsTr("Additional information");
+//            }
 
-                    CustomTextField {
-                        id: companyNameInput;
+//            Rectangle {
+//                id: accountOwnerBlockBorders;
 
-                        height: accountEditorContainer.textInputHeight;
-                        width: accountOwnerBlock.width;
+//                width: parent.width;
+//                height: accountOwnerBlock.height + 25;
 
-                        placeHolderText: qsTr("Enter the company name");
+//                color: "transparent";
 
-                        onEditingFinished: {
-                            console.log("companyNameInput");
-                            let oldText = accountEditorContainer.documentModel.GetData("CompanyName");
-                            if (oldText && oldText !== companyNameInput.text || !oldText && companyNameInput.text !== ""){
-                                accountEditorContainer.updateModel();
-                            }
-                        }
+//                border.width: 1;
+//                border.color: Style.borderColor;
 
-                        KeyNavigation.tab: countryInput;
-                    }
+//                Column {
+//                    id: accountOwnerBlock;
 
-                } // Account owner block
-            } //Account owner borders
+//                    anchors.horizontalCenter: accountOwnerBlockBorders.horizontalCenter;
+//                    anchors.verticalCenter: accountOwnerBlockBorders.verticalCenter;
+
+//                    width: parent.width - 20;
+
+//                    spacing: 7;
+
+////                    Text {
+////                        color: Style.textColor;
+////                        font.family: Style.fontFamily;
+////                        font.pixelSize: Style.fontSize_common;
+
+////                        text: qsTr("Email");
+////                    }
+
+////                    RegExpValidator {
+////                        id: mailValid;
+
+////                        regExp: /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+////                    }
+
+////                    CustomTextField {
+////                        id: emailInput;
+
+////                        height: accountEditorContainer.textInputHeight;
+////                        width: accountOwnerBlock.width;
+
+////                        textInputValidator: mailValid;
+
+////                        placeHolderText: qsTr("Enter the email");
+
+////                        onEditingFinished: {
+////                            console.log("emailInput");
+////                            let oldText = accountEditorContainer.documentModel.GetData("Email");
+////                            if (oldText && oldText !== emailInput.text || !oldText && emailInput.text !== ""){
+////                                accountEditorContainer.updateModel();
+////                            }
+////                        }
+
+////                        KeyNavigation.tab: companyNameInput;
+////                    }
+
+
+
+//                    Text {
+//                        color: Style.textColor;
+//                        font.family: Style.fontFamily;
+//                        font.pixelSize: Style.fontSize_common;
+
+//                        text: qsTr("Company Name");
+//                    }
+
+//                    CustomTextField {
+//                        id: companyNameInput;
+
+//                        height: accountEditorContainer.textInputHeight;
+//                        width: accountOwnerBlock.width;
+
+//                        placeHolderText: qsTr("Enter the company name");
+
+//                        onEditingFinished: {
+//                            console.log("companyNameInput");
+//                            let oldText = accountEditorContainer.documentModel.GetData("CompanyName");
+//                            if (oldText && oldText !== companyNameInput.text || !oldText && companyNameInput.text !== ""){
+//                                accountEditorContainer.updateModel();
+//                            }
+//                        }
+
+//                        KeyNavigation.tab: countryInput;
+//                    }
+
+//                } // Account owner block
+//            } //Account owner borders
 
             Text {
                 color: Style.textColor;
@@ -547,7 +582,7 @@ DocumentBase {
                             return;
                         }
 
-                        let indexes = groupsTable.checkedIndexes;
+                        let indexes = groupsTable.getCheckedItems();
                         let groups = accountEditorContainer.documentModel.GetData("Groups");
                         let groupIDs = [];
                         for (let index of indexes){

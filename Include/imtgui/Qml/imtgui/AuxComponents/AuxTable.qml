@@ -1,8 +1,10 @@
 import QtQuick 2.12
 import Acf 1.0
 
-Item {
+Rectangle {
     id: tableContainer;
+
+    color: "transparent";
 
     property int selectedIndex: -1;
     property int itemHeight: 35;
@@ -11,14 +13,14 @@ Item {
 
     property bool hasFilter: false;
     property bool hasSort: false;
-
     property bool checkable: false;
-
+    property bool selectable: true;
+    property bool isMultiCheckable: true;
     property bool canSelectAll: true;
-
     property bool scrollbarVisible: true;
-
     property bool showHeaders: true;
+
+    property alias separatorVisible: bottomLine.visible;
 
     property TreeItemModel headers : TreeItemModel{}; //: elementsListObj.model;
 
@@ -45,8 +47,9 @@ Item {
     property alias headerElementHeight: headersList.height;
 
     property alias backgroundElementsColor: elementsBg.color;
+    property alias backgroundHeadersColor: headersPanel.color;
 
-    property int radius: 7;
+    /*property int */radius: 7;
 
 	property alias columnCount: headersList.count;
 
@@ -78,7 +81,13 @@ Item {
         }
     }
 
-    property TableProperties properties: TableProperties {}
+    property TableProperties properties: TableProperties {
+        onCheckedItemsChanged: {
+            tableContainer.checkedItemsChanged();
+        }
+    }
+
+    signal checkedItemsChanged();
 
     function getSelectedIndexes(){
         return tableContainer.tableSelection.selectedIndexes;
@@ -181,15 +190,17 @@ Item {
         }
     }
 
-    property var checkedIndexes: []
-    signal checkedItemsChanged();
-
     function checkItem(index){
         if (!tableContainer.checkable){
             return;
         }
-        tableContainer.checkedIndexes.push(index)
-        tableContainer.checkedItemsChanged();
+
+        if (tableContainer.isMultiCheckable){
+            tableContainer.properties.addCheckedItem(index);
+        }
+        else{
+            tableContainer.properties.addSingleCheckedItem(index);
+        }
     }
 
     function uncheckItem(index){
@@ -197,39 +208,33 @@ Item {
             return;
         }
 
-        let i = tableContainer.checkedIndexes.indexOf(index);
-        if (i !== -1) {
-          tableContainer.checkedIndexes.splice(i, 1);
-
-          tableContainer.checkedItemsChanged();
-        }
+        tableContainer.properties.removeCheckedItem(index);
     }
 
     function itemIsChecked(index){
-        return tableContainer.checkedIndexes.includes(index);
+        return tableContainer.properties.itemIsChecked(index);
     }
 
     function uncheckAll(){
         if (!tableContainer.checkable){
             return;
         }
-        tableContainer.checkedIndexes = []
-        tableContainer.checkedItemsChanged();
+
+        tableContainer.properties.clearCheckedItems();
     }
 
     function checkAll(){
-        if (!tableContainer.checkable){
+        if (!tableContainer.checkable || !tableContainer.isMultiCheckable){
             return;
         }
 
-        tableContainer.checkedIndexes = []
-
+        let indexes = []
         let count = tableContainer.elements.GetItemsCount();
         for (let i = 0; i < count; i++){
-            tableContainer.checkedIndexes.push(i);
+            indexes.push(i);
         }
 
-        tableContainer.checkedItemsChanged();
+        tableContainer.properties.addCheckedItems(indexes);
     }
 
     function isAllChecked(){
@@ -239,12 +244,17 @@ Item {
 
         let count = tableContainer.elements.GetItemsCount();
         for (let i = 0; i < count; i++){
-            if (!tableContainer.checkedIndexes.includes(i)){
+            let isChecked = tableContainer.itemIsChecked(i);
+            if (!isChecked){
                 return false;
             }
         }
 
         return true;
+    }
+
+    function getCheckedItems(){
+        return tableContainer.properties._checkedItems;
     }
 
     function setIsEnabledItem(index, isEnabled){
@@ -315,7 +325,6 @@ Item {
 
 
     function setWidth(){
-
         tableContainer.widthDecoratorDynamic.Clear();
         tableContainer.widthDecoratorDynamic.Copy(tableContainer.widthDecorator);
 
@@ -479,28 +488,21 @@ Item {
         return null;
     }
 
-//    MouseArea {
-//        id: maTable;
-
-//        anchors.fill: parent;
-
-//        onClicked: {
-//            console.log("AuxTable MouseArea onClicked");
-//            tableContainer.selectedIndex = -1;
-//        }
-//    }
-
-    Item {
+    Rectangle {
         id: headersPanel;
 
         anchors.left: parent.left;
         anchors.right: parent.right;
-        anchors.rightMargin: 5;
+       // anchors.rightMargin: 5;
         anchors.top: parent.top;
 
         height: visible ? tableContainer.headerHeight: 0;
 
         visible: headersList.count > 0 && tableContainer.showHeaders;
+
+        color: Style.baseColor;
+
+        radius: tableContainer.radius;
 
         clip: true;
 
@@ -617,10 +619,10 @@ Item {
                     anchors.left: leftBorder.right;
                     anchors.right: rightBorder.left;
                     anchors.bottom: bottomBorder.top;
-                    color: tableContainer.emptyDecorHeader ? Style.baseColor :
+                    color: tableContainer.emptyDecorHeader ? "transparent" :
                                                              tableContainer.headerDecorator.IsValidData("Color", model.index) ?
                                                                  tableContainer.headerDecorator.GetData("Color", model.index) :
-                                                                 Style.baseColor;
+                                                                 "transparent";
 
                     opacity:  tableContainer.emptyDecorHeader ? 1 :
                                                                 tableContainer.headerDecorator.IsValidData("Opacity", model.index) ?
@@ -937,7 +939,7 @@ Item {
 
             selected: tableContainer.tableSelection.selectedIndexes.includes(model.index)
             enabled: tableContainer.properties.itemIsEnabled(model.index);
-            checkedState: tableContainer.checkedIndexes.includes(model.index) ? Qt.Checked : Qt.Unchecked;
+            checkedState: tableContainer.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
 
             onCheckedStateChanged: {
                 tableContainer.isAllItemChecked = tableContainer.isAllChecked();
@@ -992,7 +994,7 @@ Item {
             }
 
             function checkedItemsChanged(){
-                tableDelegate.checkedState = tableContainer.checkedIndexes.includes(model.index) ? Qt.Checked : Qt.Unchecked;
+                tableDelegate.checkedState = tableContainer.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
             }
 
             function visibleItemsChanged(){
@@ -1009,6 +1011,10 @@ Item {
 //                if (!tableContainer.tableSelection.isSelected(model.index)){
 //                    tableContainer.tableSelection.singleSelect(model.index);
 //                }
+                if (!tableContainer.selectable){
+                    return;
+                }
+
                 tableContainer.tableSelection.singleSelect(model.index);
 
                 console.log("tableContainer.tableSelection", tableContainer.tableSelection.selectedIndexes)
