@@ -44,6 +44,7 @@ export class MapItemView extends QtObject  {
         obj.$mapView = this
         this.children.push(obj)
         this.$recursiveIndex(obj, index)
+        
         return obj
     }
 
@@ -59,18 +60,30 @@ export class MapItemView extends QtObject  {
 
             if(typeof this.model === 'number'){
                 for(let i = 0; i < this.model; i++){ 
-                    this.$createElement(i).$uP()
+                    let obj = this.$createElement(i)
+                    obj.$uP()
+                    if(this.parent.mapReady){
+                        obj.$updateFeature(true)
+                    }
                 }
                 
             } else if (typeof this.model === 'object'){
                 if(this.model.$deps) {
                     this.model.$deps[this.UID] = this
                     for(let i = 0; i < this.model.data.length; i++){
-                        this.$createElement(i).$uP()
+                        let obj = this.$createElement(i)
+                        obj.$uP()
+                        if(this.parent.mapReady){
+                            obj.$updateFeature(true)
+                        }
                     }
                 } else {
                     for(let i = 0; i < this.model.length; i++){
-                        this.$createElement(i).$uP()
+                        let obj = this.$createElement(i)
+                        obj.$uP()
+                        if(this.parent.mapReady){
+                            obj.$updateFeature(true)
+                        }
                     }
                 }
             }
