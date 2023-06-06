@@ -9,18 +9,30 @@ export class MapQuickItem extends QtObject  {
         this.$cP('autoFadeIn', true)
         this.$cP('zoomLevel', 0)
         this.$cP('coordinate', undefined).connect(this.$coordinateChanged.bind(this))
-        this.$cP('sourceItem', undefined).connect(this.$updateFeature.bind(this))
+        this.$cP('sourceItem', undefined).connect(this.$sourceItemChanged.bind(this))
         this.$cPC('anchorPoint', {
             x: 0,
             y: 0,
-        }).connect(this.$updateFeature.bind(this))
+        }).connect(this.$anchorPointChanged.bind(this))
         this.$cP('visible', true)
     }
     $coordinateChanged(){
-        if(this.coordinate && this.coordinate.latitudeChanged && this.coordinate.longitudeChanged){
-            this.coordinate.latitudeChanged.connect(this.$updateFeature.bind(this))
-            this.coordinate.longitudeChanged.connect(this.$updateFeature.bind(this))
+        if(this.coordinate !== undefined && this.coordinate.latitude !== undefined && this.coordinate.longitude !== undefined){
+            if(this.$overlay){
+                this.$overlay.setPosition(transform([this.coordinate.longitude, this.coordinate.latitude], 'EPSG:4326','EPSG:3857'))
+            } else {
+                this.$updateFeature()
+            }
         }
+    }
+    $anchorPointChanged(){
+        if(this.$overlay){
+            this.$overlay.setOffset([-this.anchorPoint.x, -this.anchorPoint.y])
+        }
+    }
+    $sourceItemChanged(){
+        if(this.$overlay && this.parent.$map) this.parent.$map.removeOverlay(this.$overlay)
+        
         this.$updateFeature()
     }
     $updateFeature(added = false){
@@ -35,8 +47,8 @@ export class MapQuickItem extends QtObject  {
             element: this.sourceItem.dom,
             offset: [-this.anchorPoint.x, -this.anchorPoint.y]
         })
-        //let point = QtPositioning.coordinate(this.coordinate.latitude, this.coordinate.longitude)
         this.$overlay.setPosition(transform([this.coordinate.longitude, this.coordinate.latitude], 'EPSG:4326','EPSG:3857'))
+        
         if(added) this.parent.addMapItem(this)
     }
 
