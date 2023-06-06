@@ -42,13 +42,12 @@ export class Map extends Item {
         if(this.$initialized) return
 
         this.$source = new $SourceVector({
-			features: [],//new ol.format.GeoJSON().readFeatures(geojsonObject),
-		});
+			features: [],
+		})
 
 		this.$layer = new $LayerVector({
 			source: this.$source,
-			//style: styles,
-		});
+		})
 		this.$map = new $Map({
 			target: this.dom,
 			layers: [
@@ -66,7 +65,7 @@ export class Map extends Item {
 				zoom: this.zoomLevel,
                 rotation: -this.bearing*Math.PI/180,
 			}),
-		});
+		})
         this.$initialized = true
 
         this.$map.on('moveend', (e)=>{
@@ -77,27 +76,34 @@ export class Map extends Item {
                     child.y = rect.y - this.y
                 }
             }
-            this.$p.zoomLevel.preventDefault = true
+            // this.$p.zoomLevel.preventDefault = true
             this.$p.center.preventDefault = true
-            this.$p.bearing.preventDefault = true
+            // this.$p.bearing.preventDefault = true
+            this.zoomLevel = this.$map.getView().getZoom()
+
+            // let center = this.$map.getView().getCenter()
+            // let point = transform(center, 'EPSG:3857', 'EPSG:4326')
+            // this.center = { longitude: point[0], latitude: point[1] }
+
+            this.bearing = -this.$map.getView().getRotation()*180/Math.PI
         })
         this.$map.on('movestart', (e)=>{
-            this.$p.zoomLevel.preventDefault = false
-            this.$p.center.preventDefault = false
-            this.$p.bearing.preventDefault = false
+            // this.$p.zoomLevel.preventDefault = false
+            // this.$p.center.preventDefault = false
+            // this.$p.bearing.preventDefault = false
         })
-        this.$map.getView().on('change:resolution', (e) => {
-            this.zoomLevel = this.$map.getView().getZoom()
-        })
+        // this.$map.getView().on('change:resolution', (e) => {
+        //     this.zoomLevel = this.$map.getView().getZoom()
+        // })
         this.$map.getView().on('change:center', (e) => {
             let center = this.$map.getView().getCenter()
 
             let point = transform(center, 'EPSG:3857', 'EPSG:4326')
             this.center = { longitude: point[0], latitude: point[1] }
         })
-        this.$map.getView().on('change:rotation', (e) => {
-            this.bearing = -this.$map.getView().getRotation()*180/Math.PI
-        })
+        // this.$map.getView().on('change:rotation', (e) => {
+        //     this.bearing = -this.$map.getView().getRotation()*180/Math.PI
+        // })
         this.$map.once('postrender', (e) => {
             this.mapReady = true
         })
