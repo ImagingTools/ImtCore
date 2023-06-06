@@ -50,6 +50,11 @@ imtbase::CTreeItemModel* CDeviceMapClusterCollectionControllerComp::ListObjects(
     imtbase::CTreeItemModel* itemsModel = nullptr;
     imtbase::CTreeItemModel* notificationModel = nullptr;
 
+
+
+    //qDebug() << "ТЕСТ ТАЙЛОВ " << long2tilex(73.35,10) << "," << lat2tiley(55,10);
+
+
     //qDebug() << "ЗАПРОС КЛАСТЕРОВ";
 
     //	if (!m_objectCollectionCompPtr.IsValid()){
@@ -79,9 +84,10 @@ imtbase::CTreeItemModel* CDeviceMapClusterCollectionControllerComp::ListObjects(
         double zoomLevel = 0;
         double leftTopLat = 0;
         double leftTopLon = 0;
-        double rigthBottomLat = 0;
-        double rigthBottomLon = 0;
+        double rightBottomLat = 0;
+        double rightBottomLon = 0;
 
+        QList<QPair<QPair<int, int>, int>> tileList;
         //		QString parentId = "";
         //		QString typeId = "";
 
@@ -98,8 +104,10 @@ imtbase::CTreeItemModel* CDeviceMapClusterCollectionControllerComp::ListObjects(
                 zoomLevel = generalModel.GetData("ZoomLevel").toDouble();
                 leftTopLat = generalModel.GetData("LeftTopLat").toDouble();
                 leftTopLon = generalModel.GetData("LeftTopLon").toDouble();
-                rigthBottomLat = generalModel.GetData("RightBottomLat").toDouble();
-                rigthBottomLon = generalModel.GetData("RightBottomLon").toDouble();
+                rightBottomLat = generalModel.GetData("RightBottomLat").toDouble();
+                rightBottomLon = generalModel.GetData("RightBottomLon").toDouble();
+
+                tileList = getTileSet(QGeoCoordinate(leftTopLat, leftTopLon), QGeoCoordinate(rightBottomLat, rightBottomLon), zoomLevel);
 
                 //qDebug() << "ZoomLevel_ " << zoomLevel << "leftTopLat_ " << leftTopLat << "leftTopLon_ " << leftTopLon << "rigthBottomLat_ " << rigthBottomLat << "rigthBottomLon_ " << rigthBottomLon;
 
@@ -184,31 +192,82 @@ imtbase::CTreeItemModel* CDeviceMapClusterCollectionControllerComp::ListObjects(
         //		}
 
 
-        {//test
+        //        {//test
+        //            int itemIndex = 0;
+
+        //            itemIndex = itemsModel->InsertNewItem();
+        //            itemsModel->SetData("Id", itemIndex, itemIndex);
+        //            itemsModel->SetData("Positive", 1000, itemIndex);
+        //            itemsModel->SetData("Negative", 0, itemIndex);
+        //            itemsModel->SetData("Latitude", 55, itemIndex);
+        //            itemsModel->SetData("Longitude", 73.30, itemIndex);
+
+        //            itemIndex = itemsModel->InsertNewItem();
+        //            itemsModel->SetData("Id", itemIndex, itemIndex);
+        //            itemsModel->SetData("Positive", 500, itemIndex);
+        //            itemsModel->SetData("Negative", 40, itemIndex);
+        //            itemsModel->SetData("Latitude", 55, itemIndex);
+        //            itemsModel->SetData("Longitude", 73.35, itemIndex);
+
+        //            itemIndex = itemsModel->InsertNewItem();
+        //            itemsModel->SetData("Id", itemIndex, itemIndex);
+        //            itemsModel->SetData("Positive", 0, itemIndex);
+        //            itemsModel->SetData("Negative", 8, itemIndex);
+        //            itemsModel->SetData("Latitude", 55, itemIndex);
+        //            itemsModel->SetData("Longitude", 73.40, itemIndex);
+
+        //        }//test
+
+        //        {//test
+        //            int itemIndex = 0;
+        //            double lat = leftTopLat;
+        //            double lon = leftTopLon;
+        //            int counter_lat = 0;
+        //            int counter_lon = 0;
+        //            double latIncr = (rightBottomLat - leftTopLat)/5;
+        //            double lonIncr = (rightBottomLon - leftTopLon)/5;
+        //            while(counter_lat < 5){
+        //                lat += latIncr;
+        //                counter_lon = 0;
+        //                lon = leftTopLon;
+        //                while(counter_lon < 5){
+        //                    lon += lonIncr;
+        //                    itemIndex = itemsModel->InsertNewItem();
+        //                    itemsModel->SetData("Id", itemIndex, itemIndex);
+        //                    itemsModel->SetData("Positive", lat, itemIndex);
+        //                    itemsModel->SetData("Negative", lon, itemIndex);
+        //                    itemsModel->SetData("Latitude", lat, itemIndex);
+        //                    itemsModel->SetData("Longitude", lon, itemIndex);
+
+        //                    counter_lon++;
+        //                }
+        //                counter_lat++;
+        //            }
+
+
+        //        }//test
+
+        if(tileList.count()){
             int itemIndex = 0;
+            int z = tileList.at(0).second;
+            for(int i = 0; i < tileList.size(); i++){
 
-            itemIndex = itemsModel->InsertNewItem();
-            itemsModel->SetData("Id", itemIndex, itemIndex);
-            itemsModel->SetData("Positive", 1000, itemIndex);
-            itemsModel->SetData("Negative", 0, itemIndex);
-            itemsModel->SetData("Latitude", 55, itemIndex);
-            itemsModel->SetData("Longitude", 73.30, itemIndex);
+                double lat = 0;
+                double lon = 0;
 
-            itemIndex = itemsModel->InsertNewItem();
-            itemsModel->SetData("Id", itemIndex, itemIndex);
-            itemsModel->SetData("Positive", 500, itemIndex);
-            itemsModel->SetData("Negative", 40, itemIndex);
-            itemsModel->SetData("Latitude", 55, itemIndex);
-            itemsModel->SetData("Longitude", 73.35, itemIndex);
+                lat = tiley2lat(tileList.at(i).first.second, z);
+                lon = tilex2long(tileList.at(i).first.first, z);
 
-            itemIndex = itemsModel->InsertNewItem();
-            itemsModel->SetData("Id", itemIndex, itemIndex);
-            itemsModel->SetData("Positive", 0, itemIndex);
-            itemsModel->SetData("Negative", 8, itemIndex);
-            itemsModel->SetData("Latitude", 55, itemIndex);
-            itemsModel->SetData("Longitude", 73.40, itemIndex);
+                itemIndex = itemsModel->InsertNewItem();
+                itemsModel->SetData("Id", itemIndex, itemIndex);
+                itemsModel->SetData("Positive", lat, itemIndex);
+                itemsModel->SetData("Negative", lon, itemIndex);
+                itemsModel->SetData("Latitude", lat, itemIndex);
+                itemsModel->SetData("Longitude", lon, itemIndex);
 
-        }//test
+            }
+        }
+
 
         itemsModel->SetIsArray(true);
         dataModel->SetExternTreeModel("items", itemsModel);
@@ -218,7 +277,65 @@ imtbase::CTreeItemModel* CDeviceMapClusterCollectionControllerComp::ListObjects(
 
     return rootModelPtr.PopPtr();
 
-    //return nullptr;
+
+}
+
+int CDeviceMapClusterCollectionControllerComp::long2tilex(double lon, int z) const
+{
+    return (int)(floor((lon + 180.0) / 360.0 * (1 << z)));
+}
+
+int CDeviceMapClusterCollectionControllerComp::lat2tiley(double lat, int z) const
+{
+    const double pi = acos(-1.0);
+
+    double latrad = lat * pi/180.0;
+    return (int)(floor((1.0 - asinh(tan(latrad)) / pi) / 2.0 * (1 << z)));
+}
+
+double CDeviceMapClusterCollectionControllerComp::tilex2long(int x, int z) const
+{
+    return x / (double)(1 << z) * 360.0 - 180;
+}
+
+double CDeviceMapClusterCollectionControllerComp::tiley2lat(int y, int z) const
+{
+    const double pi = acos(-1.0);
+
+    double n = pi - 2.0 * pi * y / (double)(1 << z);
+    return 180.0 / pi * atan(0.5 * (exp(n) - exp(-n)));
+}
+
+QList<QPair<QPair<int, int>, int> > CDeviceMapClusterCollectionControllerComp::getTileSet(QGeoCoordinate coordLeftTop, QGeoCoordinate coordRightBottom, int z) const
+{
+    qDebug() << "НАБОР ТАЙЛОВ";
+
+    QList<QPair<QPair<int, int>, int>> tileList;
+
+    int minX = long2tilex(coordLeftTop.longitude(),z);
+    int minY = lat2tiley(coordLeftTop.latitude(),z);
+    int maxX = long2tilex(coordRightBottom.longitude(),z);
+    int maxY = lat2tiley(coordRightBottom.latitude(),z);
+
+    //qDebug() << "Тайлы Границы " << minX << " " << minY << " " << maxX << " " << maxY;
+
+    for(int x = minX; x <= maxX; x++){
+        for(int y = minY; y <= maxY; y++){
+            QPair<int, int> pairX_Y = qMakePair(x,y);
+            QPair<QPair<int,int>,int> pairXY_Z = qMakePair(pairX_Y, z);
+            tileList.append(pairXY_Z);
+        }
+
+    }
+
+    //    for(int i = 0; i < tileList.size(); i++){
+    //        qDebug() << "Тайлы " << tileList.at(i).first.first << " " << tileList.at(i).first.second << " " << tileList.at(i).second;
+
+    //    }
+
+
+    return tileList;
+
 }
 
 
