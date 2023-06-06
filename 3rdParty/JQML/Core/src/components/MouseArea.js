@@ -201,7 +201,7 @@ export class MouseArea extends Item {
 		if(this.$p.enabled.val && (this.$p.pressed.val || this.$p.hoverEnabled.val)){
 			this.$fillMouse(e)
 
-			if(this.$p.pressed.val && state.map && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10) && !this.preventStealing){
+			if(this.$p.pressed.val && state.map && this.parent === state.map && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10) && !this.preventStealing){
 				this.pressed = false
 				this.containsMouse = false
 				this.hover = false
@@ -319,7 +319,7 @@ export class MouseArea extends Item {
 		if(this.$p.enabled.val && (this.$p.pressed.val || this.$p.hoverEnabled.val)){
 			this.$fillMouse(e)
 
-			if(this.$p.pressed.val && state.map && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10) && !this.preventStealing){
+			if(this.$p.pressed.val && state.map && this.parent === state.map && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10) && !this.preventStealing){
 				this.pressed = false
 				this.containsMouse = false
 				this.hover = false

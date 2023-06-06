@@ -15,9 +15,9 @@ export class MapItemView extends QtObject  {
     $modelChanged(){
         if(this.$model && typeof this.$model === 'object' && this.$model.$deps && this.$model.$deps[this.UID]) delete this.$model.$deps[this.UID]
         this.$model = this.model
-        for(let child of this.children){
-            child.$destroy()
-        }
+        // for(let child of this.children){
+        //     child.$destroy()
+        // }
         this.$updateView()
     }
 
@@ -52,13 +52,13 @@ export class MapItemView extends QtObject  {
 
     $updateView(){
         if(this.model && this.delegate){
-            if(!this.model){
+            // if(!this.model){
                 while(this.children.length){
                     let child = this.children.pop()
                     if(child) child.$destroy()
                 }
                 this.children = []
-            }
+            // }
 
             if(typeof this.model === 'number'){
                 for(let i = 0; i < this.model; i++){ 
