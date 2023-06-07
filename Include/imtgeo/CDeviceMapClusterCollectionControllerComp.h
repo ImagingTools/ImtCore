@@ -32,6 +32,7 @@ protected:
     double tiley2lat(int y, int z) const;
 
     QList<QPair<QPair<int, int>,int>> getTileSet(QGeoCoordinate coordLeftTop, QGeoCoordinate coordRightBottom, int z) const;
+    QPair<QPair<int, int>,int> getTile(QGeoCoordinate coord, int z) const;
 
 };
 

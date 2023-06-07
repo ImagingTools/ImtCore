@@ -107,7 +107,7 @@ imtbase::CTreeItemModel* CDeviceMapClusterCollectionControllerComp::ListObjects(
                 rightBottomLat = generalModel.GetData("RightBottomLat").toDouble();
                 rightBottomLon = generalModel.GetData("RightBottomLon").toDouble();
 
-                tileList = getTileSet(QGeoCoordinate(leftTopLat, leftTopLon), QGeoCoordinate(rightBottomLat, rightBottomLon), zoomLevel);
+                tileList = getTileSet(QGeoCoordinate(leftTopLat, leftTopLon), QGeoCoordinate(rightBottomLat, rightBottomLon), zoomLevel+1);
 
                 //qDebug() << "ZoomLevel_ " << zoomLevel << "leftTopLat_ " << leftTopLat << "leftTopLon_ " << leftTopLon << "rigthBottomLat_ " << rigthBottomLat << "rigthBottomLon_ " << rigthBottomLon;
 
@@ -247,26 +247,29 @@ imtbase::CTreeItemModel* CDeviceMapClusterCollectionControllerComp::ListObjects(
 
         //        }//test
 
-        if(tileList.count()){
-            int itemIndex = 0;
-            int z = tileList.at(0).second;
-            for(int i = 0; i < tileList.size(); i++){
+        {//test
+            if(tileList.count()){
+                int itemIndex = 0;
+                int z = tileList.at(0).second;
+                for(int i = 0; i < tileList.size(); i++){
 
-                double lat = 0;
-                double lon = 0;
+                    double lat = 0;
+                    double lon = 0;
 
-                lat = tiley2lat(tileList.at(i).first.second, z);
-                lon = tilex2long(tileList.at(i).first.first, z);
+                    lat = tiley2lat(tileList.at(i).first.second, z);
+                    lon = tilex2long(tileList.at(i).first.first, z);
 
-                itemIndex = itemsModel->InsertNewItem();
-                itemsModel->SetData("Id", itemIndex, itemIndex);
-                itemsModel->SetData("Positive", lat, itemIndex);
-                itemsModel->SetData("Negative", lon, itemIndex);
-                itemsModel->SetData("Latitude", lat, itemIndex);
-                itemsModel->SetData("Longitude", lon, itemIndex);
+                    itemIndex = itemsModel->InsertNewItem();
+                    itemsModel->SetData("Id", itemIndex, itemIndex);
+                    itemsModel->SetData("Positive", 100000, itemIndex);
+                    itemsModel->SetData("Negative", 100000, itemIndex);
+                    itemsModel->SetData("Latitude", lat, itemIndex);
+                    itemsModel->SetData("Longitude", lon, itemIndex);
 
+                }
             }
-        }
+
+        }//test
 
 
         itemsModel->SetIsArray(true);
@@ -336,6 +339,18 @@ QList<QPair<QPair<int, int>, int> > CDeviceMapClusterCollectionControllerComp::g
 
     return tileList;
 
+}
+
+QPair<QPair<int, int>, int> CDeviceMapClusterCollectionControllerComp::getTile(QGeoCoordinate coord, int z) const
+{
+    QPair<QPair<int, int>, int> tileData;
+
+    int x = long2tilex(coord.longitude(),z);
+    int y = lat2tiley(coord.latitude(),z);
+    QPair<int, int> coordPair = qMakePair(x,y);
+    tileData = qMakePair(coordPair,z);
+
+    return tileData;
 }
 
 
