@@ -24,6 +24,8 @@ Item {
     property alias commands: gridCollectionViewBase.commands;
     property alias gridCellWidth: gridCollectionViewBase.gridCellWidth;
     property alias gridCellHeight: gridCollectionViewBase.gridCellHeight;
+    property alias gridContenteHeight: gridCollectionViewBase.gridContentHeight;
+    property alias gridContenteY: gridCollectionViewBase.gridContentY;
 
     property alias gridElementsDelegate: gridCollectionViewBase.gridElementsDelegate;
     property alias gridElementsModel: gridCollectionViewBase.gridElementsModel;

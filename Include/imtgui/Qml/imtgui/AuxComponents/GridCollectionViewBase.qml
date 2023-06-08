@@ -15,6 +15,8 @@ Item {
     property alias gridElementsModel: gridInternal.model;
     property alias gridCellWidth: gridInternal.cellWidth;
     property alias gridCellHeight: gridInternal.cellHeight;
+    property alias gridContentHeight: gridInternal.contentHeight;
+    property alias gridContentY: gridInternal.contentY;
 //    property alias gridMinWidth: gridInternal.minWidth;
     property alias gridDecoratorPath: loaderTableDecorator.source;
     property alias modelFilter: modelFilterObj;
