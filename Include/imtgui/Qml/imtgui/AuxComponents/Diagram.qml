@@ -24,7 +24,7 @@ Item {
     property int fontSize: 18;
     property int maxValue: 100;
     property int maxAxeYValue: 100;
-    property real minWidth: Math.max((axeYValuesContainer.width + axeY.width + barsList.contentWidth + barsList.anchors.leftMargin),
+    property real minWidth: Math.max((axeYValuesContainer.width + axeY.width + barsList.contentWidth + barsList.anchors.leftMargin + barsSpace.anchors.rightMargin + legendXTextRight.width),
                                      titleText.width, legendXText.width, legendYText.width);
 
 
