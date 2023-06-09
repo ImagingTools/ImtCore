@@ -76,6 +76,7 @@ RadioBox 1.0 ./AuxComponents/RadioBox.qml
 UserPanel 1.0 ./AuxComponents/UserPanel.qml
 SuperUserPasswordDialog 1.0 ./AuxComponents/SuperUserPasswordDialog.qml
 GridCollectionView 1.0 ./AuxComponents/GridCollectionView.qml
+GridExtendingBaseDelegate 1.0 ./AuxComponents/GridExtendingBaseDelegate.qml
 ButtonPanel 1.0 ./AuxComponents/ButtonPanel.qml
 
 LoginDialog 1.0 ./AuxComponents/Dialogs/LoginDialog.qml
