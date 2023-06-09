@@ -149,6 +149,9 @@
 
         <file alias="imtgui/AuxComponents/GridExtendingBaseDelegate.qml">Qml/imtgui/AuxComponents/GridExtendingBaseDelegate.qml</file>
         <file alias="imtgui/AuxComponents/Diagram.qml">Qml/imtgui/AuxComponents/Diagram.qml</file>
+        <file alias="imtgui/AuxComponents/BarChart.qml">Qml/imtgui/AuxComponents/BarChart.qml</file>
+        <file alias="imtgui/AuxComponents/Piechart.qml">Qml/imtgui/AuxComponents/Piechart.qml</file>
+        <file alias="imtgui/AuxComponents/PaintedCorner.qml">Qml/imtgui/AuxComponents/PaintedCorner.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

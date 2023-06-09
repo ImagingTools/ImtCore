@@ -79,6 +79,9 @@ GridCollectionView 1.0 ./AuxComponents/GridCollectionView.qml
 GridExtendingBaseDelegate 1.0 ./AuxComponents/GridExtendingBaseDelegate.qml
 ButtonPanel 1.0 ./AuxComponents/ButtonPanel.qml
 Diagram 1.0 ./AuxComponents/Diagram.qml
+BarChart 1.0 ./AuxComponents/BarChart.qml
+Piechart 1.0 ./AuxComponents/Piechart.qml
+PaintedCorner 1.0 ./AuxComponents/PaintedCorner.qml
 
 LoginDialog 1.0 ./AuxComponents/Dialogs/LoginDialog.qml
 PopupMenuDialog 1.0 ./AuxComponents/Dialogs/PopupMenuDialog.qml
