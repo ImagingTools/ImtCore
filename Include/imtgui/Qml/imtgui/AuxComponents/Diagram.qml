@@ -17,7 +17,8 @@ Item {
     property string colorPositive: "yellow";
     property string colorNegative: "blue";
     property int barWidth: 20;
-    property alias model: barsList.model;
+    //property alias model: barsList.model;
+    property TreeItemModel model: TreeItemModel{};
     property bool visibleAxeX: false;
     property bool visibleAxeY: true;
     property int fontSize: 18;
@@ -317,7 +318,7 @@ Item {
             orientation: ListView.Horizontal;
             clip: true;
             boundsBehavior: Flickable.StopAtBounds;
-            model: 0;
+            model: diagram.model;
             delegate:
                 Item{
                 anchors.bottom: parent.bottom;
