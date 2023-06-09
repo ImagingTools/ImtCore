@@ -148,6 +148,7 @@
 	<file alias="imtgui/AuxComponents/InputActions.qml">Qml/imtgui/AuxComponents/InputActions.qml</file>
 
         <file alias="imtgui/AuxComponents/GridExtendingBaseDelegate.qml">Qml/imtgui/AuxComponents/GridExtendingBaseDelegate.qml</file>
+        <file alias="imtgui/AuxComponents/Diagram.qml">Qml/imtgui/AuxComponents/Diagram.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>
