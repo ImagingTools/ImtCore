@@ -182,10 +182,10 @@ Item {
             id: extendingInfoLoaderContainer;
 
             anchors.top: parent.top;
-            anchors.topMargin: collectionViewBaseContainer.gridCellHeightMin * (collectionViewBaseContainer.gridSelectedRow + 1) + 10 - collectionViewBaseContainer.gridContentY;
+            anchors.topMargin: collectionViewBaseContainer.gridCellHeightMin * (collectionViewBaseContainer.gridSelectedRow + 1)  - collectionViewBaseContainer.gridContentY;
 
             width: collectionViewBaseContainer.gridCellWidth * collectionViewBaseContainer.gridCountInLine - 10;
-            height: collectionViewBaseContainer.gridAddHeight - 30;
+            height: collectionViewBaseContainer.gridAddHeight - 10;
 
             visible: collectionViewBaseContainer.openST;
 
