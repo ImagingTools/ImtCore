@@ -7,6 +7,6 @@ find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Positioning REQUIRED)
 target_link_libraries(${PROJECT_NAME} Qt${QT_DEFAULT_MAJOR_VERSION}::Positioning)
 
 if(QT_VERSION_MAJOR EQUAL 5)
-    find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Location REQUIRED)
-    target_link_libraries(${PROJECT_NAME} Qt${QT_DEFAULT_MAJOR_VERSION}::Location)
+	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Location REQUIRED)
+	target_link_libraries(${PROJECT_NAME} Qt${QT_DEFAULT_MAJOR_VERSION}::Location)
 endif()
