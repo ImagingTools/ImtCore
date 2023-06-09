@@ -10,12 +10,13 @@ Item {
 
     width: 1000;
     height: 500;
-    property string title: "Количество пройденых объектов";
-    property string legendX: "Контроллеры";
-    property string legendY: "Кол-во";
+
+    property string title: "Заголовок";
+    property string legendX: "Ось абсцисс";
+    property string legendY: "Ось ординат";
     property string colorPositive: "yellow";
     property string colorNegative: "blue";
-    property int barWidth: 30;
+    property int barWidth: 20;
     property alias model: barsList.model;
     property bool visibleAxeX: false;
     property bool visibleAxeY: true;
@@ -26,30 +27,13 @@ Item {
                                      titleText.width, legendXText.width, legendYText.width);
 
 
-    //TO STYLE
-    property int size_panelsHeight: Style.size_panelsHeight;
-    property int size_mainCornerRadius: Style.size_mainCornerRadius;
-    property int size_mainMargin: Style.size_mainMargin;
-    property int size_tableDelegateHeight: Style.size_tableDelegateHeight;
 
-    property int fontSize_title: Style.fontSize_title;
-    property int fontSize_subtitle: Style.fontSize_subtitle;
-    property int fontSize_common: Style.fontSize_common;
-    property int fontSize_small: Style.fontSize_small;
+    property string backgroundColor: "transparent";
+    property string axeColor: "transparent";
+    property string titleColor: Style.color_text_subtitles;
+    property string valueColor: Style.color_text_common;
 
-    property string color_first: Style.color_first;
-    property string color_second: Style.color_second;
-    property string color_third: Style.color_third;
-    property string color_table_delegate: Style.color_table_delegate;
-    property string color_table_header: Style.color_table_header;
-    property string color_text_common: Style.color_text_common;
-    property string color_text_important: Style.color_text_important;
-    property string color_text_titles: Style.color_text_titles;
-    property string color_text_notActive: Style.color_text_notActive;
-    property string color_text_subtitles: Style.color_text_subtitles;
-    property string color_background: Style.color_background;
-    //TO STYLE
-
+    property int spacingX: 20;
 
 
     onModelChanged: {
@@ -97,6 +81,8 @@ Item {
 
     }
 
+
+
     function roundDigit(digit, ceil){
 
         var retval;
@@ -142,6 +128,9 @@ Item {
         id: axeYValueModel;
     }
 
+    ListModel{
+        id: axeXValueModel;
+    }
 
     Text {
         id: titleText;
@@ -152,7 +141,7 @@ Item {
         font.pixelSize: diagram.fontSize;
         font.bold: true;
         font.family: Style.fontFamily;
-        color:  diagram.color_text_subtitles;
+        color:  diagram.titleColor;
 
         text: diagram.title;
 
@@ -163,11 +152,13 @@ Item {
 
         anchors.left: parent.left;
         anchors.top: legendYText.bottom;
-        anchors.topMargin: diagram.size_mainMargin;
+        anchors.topMargin: Style.size_mainMargin;
         anchors.bottom: legendXText.top;
-        anchors.bottomMargin: 10;//diagram.size_mainMargin
+        anchors.bottomMargin: 10;//Style.size_mainMargin
 
-        width: sizeText.width + 2 * diagram.size_mainMargin;
+        width: sizeText.width + 2 * Style.size_mainMargin;
+
+        color: diagram.backgroundColor;
 
         Text {
             id: sizeText;// для определения размера панели значений оси Y
@@ -179,7 +170,7 @@ Item {
             font.pixelSize: diagram.fontSize;
             font.bold: true;
             font.family: Style.fontFamily;
-            color:  diagram.color_text_common;
+            color:  diagram.valueColor;
 
             text: diagram.maxValue;
 
@@ -208,7 +199,7 @@ Item {
                     font.pixelSize: diagram.fontSize;
                     font.bold: false;
                     font.family: Style.fontFamily;
-                    color:  diagram.color_text_common;
+                    color:  diagram.valueColor;
                     text: model.text;
 
                 }
@@ -225,11 +216,11 @@ Item {
         anchors.left: axeYValuesContainer.right;
         anchors.top: axeYValuesContainer.top;
         anchors.bottom: axeYValuesContainer.bottom;
-        anchors.bottomMargin: 10;//diagram.size_mainMargin
+        anchors.bottomMargin: 10;//Style.size_mainMargin
 
         width: 2;
         visible: diagram.visibleAxeY;
-        color: "#C4C4C4";
+        color: diagram.axeColor;
 
     }
 
@@ -238,11 +229,12 @@ Item {
 
         anchors.bottom: axeY.bottom;
         anchors.left: axeY.right;
-        anchors.right: parent.right;
+        anchors.right: legendXTextRight.left;
+        anchors.rightMargin: 10;
 
         height: 2;
         visible: diagram.visibleAxeX;
-        color: "#C4C4C4";
+        color: diagram.axeColor;
 
     }
 
@@ -250,7 +242,7 @@ Item {
         id: legendYText;
 
         anchors.top: titleText.bottom;
-        anchors.topMargin: diagram.size_mainMargin;
+        anchors.topMargin: Style.size_mainMargin;
         anchors.horizontalCenter: axeY.horizontalCenter;
 
         horizontalAlignment: Text.AlignLeft;
@@ -259,7 +251,7 @@ Item {
         font.pixelSize: diagram.fontSize;
         font.bold: true;
         font.family: Style.fontFamily;
-        color:  diagram.color_text_common;
+        color:  diagram.valueColor;
 
         text: diagram.legendY;
     }
@@ -270,6 +262,7 @@ Item {
         anchors.bottom:  parent.bottom;
         anchors.bottomMargin: 0;
         anchors.horizontalCenter: barsSpace.horizontalCenter;
+        visible: false;
 
         horizontalAlignment: Text.AlignLeft;
         verticalAlignment: Text.AlignVCenter;
@@ -277,25 +270,46 @@ Item {
         font.pixelSize: diagram.fontSize;
         font.bold: true;
         font.family: Style.fontFamily;
-        color:  diagram.color_text_common;
+        color:  diagram.valueColor;
+        text: diagram.legendX;
+
+    }
+
+    Text {
+        id: legendXTextRight;
+
+        anchors.right: parent.right;
+        anchors.verticalCenter: axeX.verticalCenter;
+
+        horizontalAlignment: Text.AlignLeft;
+        verticalAlignment: Text.AlignVCenter;
+        wrapMode: Text.NoWrap;
+        font.pixelSize: diagram.fontSize;
+        font.bold: true;
+        font.family: Style.fontFamily;
+        color:  diagram.valueColor;
         text: diagram.legendX;
     }
+
+
 
     Rectangle{
         id: barsSpace;
 
         anchors.top: axeYValuesContainer.top;
         anchors.left: axeY.right;
-        anchors.right: parent.right;
+        anchors.right: legendXTextRight.left;
+        anchors.rightMargin: 10;
         anchors.bottom: axeX.top;
         //width: barsList.width + barsList.anchors.leftMargin
+        color: diagram.backgroundColor;
         ListView{
-            id:barsList;
+            id: barsList;
 
             //anchors.top: parent.top
             anchors.bottom: parent.bottom;
             anchors.left: parent.left;
-            anchors.leftMargin: spacing;
+            anchors.leftMargin: 0;//diagram.spacingX/2;
             anchors.right: parent.right;
 
             //width: contentWidth
@@ -303,20 +317,68 @@ Item {
             orientation: ListView.Horizontal;
             clip: true;
             boundsBehavior: Flickable.StopAtBounds;
-            spacing: diagram.size_mainMargin;
             model: 0;
             delegate:
-                BarChart{
-
+                Item{
                 anchors.bottom: parent.bottom;
 
-                maxBarHeight: barsList.height;
-                maxValue: diagram.maxValue;
-                barWidth: diagram.barWidth;
-                positiveValue: model.positive;
-                negativeValue: model.negative;
-                color_positive: diagram.colorPositive;
-                color_negative: diagram.colorNegative;
+                width: diagram.barWidth + diagram.spacingX;
+                height: barChart.height;
+                BarChart{
+                    id: barChart;
+
+                    anchors.bottom: parent.bottom;
+                    anchors.horizontalCenter: parent.horizontalCenter;
+
+                    maxBarHeight: barsList.height;
+                    maxValue: diagram.maxValue;
+                    barWidth: diagram.barWidth;
+                    positiveValue: model.positive;
+                    negativeValue: model.negative;
+                    color_positive: diagram.colorPositive;
+                    color_negative: diagram.colorNegative;
+                }
+            }
+
+        }
+
+    }
+
+    ListView{
+        id: axeXValuesList;
+
+        anchors.left: barsSpace.left;
+        anchors.leftMargin: 0;//diagram.spacingX/2;
+        anchors.right: barsSpace.right;
+        anchors.top: axeX.bottom;
+        anchors.bottom: parent.bottom;
+        anchors.topMargin: 4;
+        anchors.bottomMargin: 2;
+
+        orientation: ListView.Horizontal;
+        clip: true;
+        boundsBehavior: Flickable.StopAtBounds;
+        model: diagram.model;
+        contentX: barsList.contentX;
+        onContentXChanged:{
+            barsList.contentX = contentX;
+        }
+
+        delegate: Rectangle{
+
+            width: diagram.barWidth + diagram.spacingX;
+            height: axeXValuesList.height;
+            color: "transparent";
+
+            Text{
+                id: xValuesText;
+
+                anchors.centerIn: parent;
+
+                color: diagram.valueColor;
+                rotation: -45;
+
+                text: model.xValue;
             }
         }
 
