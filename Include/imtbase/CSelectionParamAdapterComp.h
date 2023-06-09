@@ -20,7 +20,7 @@ namespace imtbase
 class CSelectionParamAdapterComp:
 			public icomp::CComponentBase,
 			public CSelectionAdapterBase,
-			public iprm::ISelectionParam
+			virtual public iprm::ISelectionParam
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
@@ -31,6 +31,7 @@ public:
 	I_REGISTER_SUBELEMENT_INTERFACE(Constraints, imod::IModel, ExtractConstraints);
 	I_REGISTER_SUBELEMENT_INTERFACE(Constraints, istd::IChangeable, ExtractConstraints);
 	I_REGISTER_INTERFACE(iprm::ISelectionParam);
+	I_REGISTER_INTERFACE(iser::ISerializable);
 	I_ASSIGN(m_selectionCompPtr, "Selection", "Source selection", false, "");
 	I_END_COMPONENT;
 
