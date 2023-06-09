@@ -11,6 +11,11 @@ Item {
     property alias gqlModelHeadersInfo: baseCommands.gqlModelHeadersInfo;
     property alias gqlModelItemsInfo: baseCommands.gqlModelItemsInfo;
 
+    property bool isWeb: Qt.platform.os == "web";
+
+    property bool hasExtention: true;
+    property bool openST: false;
+
     property alias gridElementsDelegate: gridInternal.delegate;
     property alias gridElementsModel: gridInternal.model;
     property alias gridCellWidth: gridInternal.cellWidth;
@@ -18,6 +23,18 @@ Item {
     property alias gridContentHeight: gridInternal.contentHeight;
     property alias gridContentY: gridInternal.contentY;
     property alias gridBottomMargin: backgroundTable.anchors.bottomMargin;
+
+    property alias gridCount: gridInternal.count;
+    property int gridCountInLine: Math.trunc(width/gridCellWidth);
+    property int gridRowCount : Math.ceil(gridCount/gridCountInLine);
+    property int gridSelectedRow: gridInternal.selectedIndex < 0 ? -1 : Math.trunc(gridInternal.selectedIndex/gridCountInLine);
+    property bool gridIsLastRow: gridSelectedRow == gridRowCount -1;
+    property real gridAddHeight: 110*3;
+    property int gridCellHeightMin: 110;//???
+    property int gridCellHeightMax: (gridCellHeightMin * gridRowCount + gridAddHeight) / gridRowCount + !isWeb * gridIsLastRow * gridAddHeight;
+
+    property alias extendingInfoComp: extendingInfoLoader.sourceComponent;
+
 //    property alias gridMinWidth: gridInternal.minWidth;
     property alias gridDecoratorPath: loaderTableDecorator.source;
     property alias modelFilter: modelFilterObj;
@@ -126,6 +143,8 @@ Item {
             boundsBehavior: Flickable.StopAtBounds;
             clip: true;
 
+            cellHeight: !collectionViewBaseContainer.hasExtention ? collectionViewBaseContainer.gridCellHeightMin : !collectionViewBaseContainer.openST ? collectionViewBaseContainer.gridCellHeightMin : collectionViewBaseContainer.gridCellHeightMax;
+
             property int selectedIndex: -1;
 //            property alias elements: model;
             signal selectItem(string idSelected, string name);
@@ -151,6 +170,47 @@ Item {
 //            anchors.margins: thumbnailDecoratorContainer.mainMargin;
 //            property real minWidth: 1000000;
         }
+    }
+
+    Item{
+        id: extendingInfoContainer;
+
+        width: parent.width;
+        height: parent.height - collectionViewBaseContainer.gridBottomMargin;
+        clip: true;
+        Item{
+            id: extendingInfoLoaderContainer;
+
+            anchors.top: parent.top;
+            anchors.topMargin: collectionViewBaseContainer.gridCellHeightMin * (collectionViewBaseContainer.gridSelectedRow + 1) + 10 - collectionViewBaseContainer.gridContentY;
+
+            width: collectionViewBaseContainer.gridCellWidth * collectionViewBaseContainer.gridCountInLine - 10;
+            height: collectionViewBaseContainer.gridAddHeight - 30;
+
+            visible: collectionViewBaseContainer.openST;
+
+            Loader{
+                id: extendingInfoLoader;
+
+                anchors.fill: parent;
+
+                sourceComponent: extendingInfoCompDefault;
+
+            }
+        }
+
+    }
+
+    Component{
+        id: extendingInfoCompDefault;
+
+        Rectangle{
+            color: "#ffffff";
+            border.color: "gray";
+            border.width: 2;
+
+        }
+
     }
 
     TreeItemModel {

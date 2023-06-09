@@ -6,6 +6,8 @@ import imtlicgui 1.0
 Item {
     id: gridCollectionViewContainer;
 
+    clip: true;
+
     property int contentMargins: 0;
 
     property alias baseGridCollectionView: gridCollectionViewBase;
@@ -23,10 +25,24 @@ Item {
     property alias commandsId: gridCollectionViewBase.commandsId;
     property alias commands: gridCollectionViewBase.commands;
     property alias gridCellWidth: gridCollectionViewBase.gridCellWidth;
-    property alias gridCellHeight: gridCollectionViewBase.gridCellHeight;
+    property alias gridCellHeight: gridCollectionViewBase.gridCellHeightMin;
     property alias gridContentHeight: gridCollectionViewBase.gridContentHeight;
     property alias gridContentY: gridCollectionViewBase.gridContentY;
     property alias gridBottomMargin: gridCollectionViewBase.gridBottomMargin;
+
+    property alias hasExtention: gridCollectionViewBase.hasExtention;
+    property alias openST: gridCollectionViewBase.openST;
+
+    property alias gridCount: gridCollectionViewBase.gridCount;
+    property alias gridCountInLine: gridCollectionViewBase.gridCountInLine;
+    property alias gridRowCount : gridCollectionViewBase.gridRowCount;
+    property alias gridSelectedRow: gridCollectionViewBase.gridSelectedRow;
+    property alias gridIsLastRow: gridCollectionViewBase.gridIsLastRow;
+    property alias gridAddHeight: gridCollectionViewBase.gridAddHeight;
+    property alias gridCellHeightMin: gridCollectionViewBase.gridCellHeightMin;
+    property alias gridCellHeightMax: gridCollectionViewBase.gridCellHeightMax;
+
+    property alias extendingInfoComp: gridCollectionViewBase.extendingInfoComp;
 
     property alias gridElementsDelegate: gridCollectionViewBase.gridElementsDelegate;
     property alias gridElementsModel: gridCollectionViewBase.gridElementsModel;
