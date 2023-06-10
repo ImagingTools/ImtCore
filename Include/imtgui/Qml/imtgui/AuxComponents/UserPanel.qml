@@ -9,7 +9,8 @@ Item {
     width: 50;
 
     property string username: authorizationPage.tokenProvider.login !== undefined ? authorizationPage.tokenProvider.login: "" ;
-    property bool enabled: authorizationPage.state !==undefined ? authorizationPage.state == "authorized" :false;
+//    property bool enabled: authorizationPage.state !==undefined ? authorizationPage.state == "authorized" :false;
+    property bool enabled: true;
     property alias iconSource: loginButton.iconSource;
     property bool isExitButton: false;
 

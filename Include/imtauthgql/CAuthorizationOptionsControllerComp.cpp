@@ -17,22 +17,36 @@ imtbase::CTreeItemModel* CAuthorizationOptionsControllerComp::CreateRepresentati
 		return nullptr;
 	}
 
+	QByteArray commandId = gqlRequest.GetCommandId();
+
 	if (rootModelPtr->ContainsKey("data")){
 		imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->GetTreeItemModel("data");
 		Q_ASSERT(dataModelPtr != nullptr);
-		if (dataModelPtr != nullptr){
-			QByteArray value = dataModelPtr->GetData("Value").toByteArray();
-			if (value != "NO_USER_MANAGEMENT"){
-				if (m_superuserProviderCompPtr.IsValid()){
-					bool superuserExists = m_superuserProviderCompPtr->SuperuserExists();
-					dataModelPtr->SetData("SuperUserExists", superuserExists);
-				}
-			}
+		if (dataModelPtr == nullptr){
+			return nullptr;
+		}
 
-			if (m_databaseServerConnectionChekerCompPtr.IsValid()){
-				bool isConnected = m_databaseServerConnectionChekerCompPtr->IsDatabaseServerConnected();
-				dataModelPtr->SetData("DatabaseConnectionState", isConnected);
+		imtbase::CTreeItemModel* parametersModelPtr = dataModelPtr->GetTreeItemModel("Parameters");
+		if (parametersModelPtr == nullptr){
+			return nullptr;
+		}
+
+		int value = dataModelPtr->GetData("Value").toInt();
+		if (value < 0){
+			return nullptr;
+		}
+
+		QByteArray userModeId = parametersModelPtr->GetData("Id", value).toByteArray();
+		if (userModeId == "STRONG_USER_MANAGEMENT"){
+			if (m_superuserProviderCompPtr.IsValid()){
+				bool superuserExists = m_superuserProviderCompPtr->SuperuserExists();
+				dataModelPtr->SetData("SuperUserExists", superuserExists);
 			}
+		}
+
+		if (m_databaseServerConnectionChekerCompPtr.IsValid()){
+			bool isConnected = m_databaseServerConnectionChekerCompPtr->IsDatabaseServerConnected();
+			dataModelPtr->SetData("DatabaseConnectionState", isConnected);
 		}
 	}
 
