@@ -30,7 +30,7 @@ Item {
                     barChart.maxBarHeight/barChart.maxValue*barChart.positiveValue : 1;
         radius: width;//Math.min(width, height)
         color: barChart.color_positive;
-        visible: (barChart.positiveValue == 0)? false : barChart.visibleElements;
+        visible: !barChart.visible ? false : (barChart.positiveValue == 0)? false : barChart.visibleElements;
 
     }
 
@@ -43,7 +43,7 @@ Item {
         height: (barChart.positiveValue !==0)? barDown.height/2 : 1;
                     //Math.min(barChart.maxBarHeight/barChart.maxValue*barChart.positiveValue, width/2) : 1
         color: barChart.color_positive;
-        visible: (barChart.positiveValue == 0)? false : (barChart.negativeValue == 0) ? false : barChart.visibleElements;
+        visible: !barChart.visible ? false : (barChart.positiveValue == 0)? false : (barChart.negativeValue == 0) ? false : barChart.visibleElements;
 
     }
 
@@ -57,7 +57,7 @@ Item {
                     barChart.maxBarHeight/barChart.maxValue*barChart.negativeValue : 1;
         radius: width//Math.min(width, height)
         color: barChart.color_negative;
-        visible: (barChart.negativeValue == 0)? false : barChart.visibleElements;
+        visible: !barChart.visible ? false : (barChart.negativeValue == 0)? false : barChart.visibleElements;
 
     }
 
@@ -70,7 +70,7 @@ Item {
         height: (barChart.negativeValue !==0)? barUp.height/2 : 1;
                     //Math.min(barChart.maxBarHeight/barChart.maxValue*barChart.negativeValue, width/2) : 1
         color: barChart.color_negative;
-        visible: (barChart.negativeValue == 0) ? false : (barChart.positiveValue == 0) ? false : barChart.visibleElements;
+        visible: !barChart.visible ? false : (barChart.negativeValue == 0) ? false : (barChart.positiveValue == 0) ? false : barChart.visibleElements;
 
     }
 

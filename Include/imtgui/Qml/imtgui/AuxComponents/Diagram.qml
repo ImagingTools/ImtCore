@@ -36,6 +36,8 @@ Item {
 
     property int spacingX: 20;
 
+    property real xElementRotation: -45;
+
 
     onModelChanged: {
         diagram.setMaxValue();
@@ -136,9 +138,11 @@ Item {
     Text {
         id: titleText;
 
-        horizontalAlignment: Text.AlignLeft;
-        verticalAlignment: Text.AlignVCenter;
-        wrapMode: Text.WrapAtWordBoundaryOrAnywhere;
+        anchors.top: parent.top;
+        anchors.left: parent.left;
+//        horizontalAlignment: Text.AlignLeft;
+//        verticalAlignment: Text.AlignVCenter;
+        wrapMode: Text.WordWrap;
         font.pixelSize: diagram.fontSize;
         font.bold: true;
         font.family: Style.fontFamily;
@@ -246,11 +250,11 @@ Item {
         anchors.topMargin: Style.size_mainMargin;
         anchors.horizontalCenter: axeY.horizontalCenter;
 
-        horizontalAlignment: Text.AlignLeft;
-        verticalAlignment: Text.AlignVCenter;
+//        horizontalAlignment: Text.AlignLeft;
+//        verticalAlignment: Text.AlignVCenter;
         wrapMode: Text.NoWrap;
         font.pixelSize: diagram.fontSize;
-        font.bold: true;
+        font.bold: false;
         font.family: Style.fontFamily;
         color:  diagram.valueColor;
 
@@ -269,7 +273,7 @@ Item {
         verticalAlignment: Text.AlignVCenter;
         wrapMode: Text.NoWrap;
         font.pixelSize: diagram.fontSize;
-        font.bold: true;
+        font.bold: false;
         font.family: Style.fontFamily;
         color:  diagram.valueColor;
         text: diagram.legendX;
@@ -282,11 +286,11 @@ Item {
         anchors.right: parent.right;
         anchors.verticalCenter: axeX.verticalCenter;
 
-        horizontalAlignment: Text.AlignLeft;
-        verticalAlignment: Text.AlignVCenter;
+//        horizontalAlignment: Text.AlignLeft;
+//        verticalAlignment: Text.AlignVCenter;
         wrapMode: Text.NoWrap;
         font.pixelSize: diagram.fontSize;
-        font.bold: true;
+        font.bold: false;
         font.family: Style.fontFamily;
         color:  diagram.valueColor;
         text: diagram.legendX;
@@ -330,6 +334,8 @@ Item {
 
                     anchors.bottom: parent.bottom;
                     anchors.horizontalCenter: parent.horizontalCenter;
+
+                    visible: diagram.visible;
 
                     maxBarHeight: barsList.height;
                     maxValue: diagram.maxValue;
@@ -377,10 +383,39 @@ Item {
                 anchors.centerIn: parent;
 
                 color: diagram.valueColor;
-                rotation: -45;
+                font.family: Style.fontFamily;
+                font.pixelSize: 10;
+
+                rotation: diagram.xElementRotation;
 
                 text: model.xValue;
             }
+
+//            Rectangle{//test for web
+//                anchors.centerIn: parent;
+
+//                width: xValuesText.width;
+//                height: xValuesText.height;
+
+//                color: "red";
+
+//                rotation: diagram.xElementRotation;
+
+//                Text{
+//                    id: xValuesText;
+
+//                    //anchors.centerIn: parent;
+
+//                    color: diagram.valueColor;
+//                    font.family: Style.fontFamily;
+//                    font.pixelSize: 10;
+
+//                    //rotation: diagram.xElementRotation;
+
+//                    text: model.xValue;
+//                }
+//            }//test for web
+
         }
 
     }
