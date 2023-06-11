@@ -122,7 +122,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 					.arg(qPrintable(objectId))
 					.arg(SqlEncode(documentContent))
 					.arg(revisionVersion)
-					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+                    .arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
 					.arg(checksum).toLocal8Bit();
 
 			retVal.objectName = objectName;
@@ -169,7 +169,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(qPrintable(objectId))
 				.arg(SqlEncode(documentContent))
-				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+                .arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
 				.arg(checksum).toLocal8Bit();
 	}
 
@@ -185,7 +185,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateDescriptionObjectQuery(
 	QByteArray retVal = QString("UPDATE \"%1\" SET \"Document\" = jsonb_set(\"Document\", '{Description}', '\"%2\"', true), \"LastModified\" = '%3' WHERE \"%4\" ='%5' AND \"IsActive\" = true;")
 			.arg(qPrintable(*m_tableNameAttrPtr))
 			.arg(SqlEncode(description))
-			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+            .arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
 			.arg(qPrintable(*m_objectIdColumnAttrPtr))
 			.arg(qPrintable(objectId)).toLocal8Bit();
 
