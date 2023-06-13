@@ -211,7 +211,7 @@ export class ListView extends Flickable {
                         if(child.index < firstIndex) firstIndex = child.index
                     }
                 }
-                let middleHeight = visibleContentHeight / this.contentItem.children.length
+                let middleHeight = this.contentItem.children.length ? visibleContentHeight / this.contentItem.children.length : 0
                 // let contentHeight = visibleContentHeight - minY + (Math.round(this.$middleHeight) + this.spacing)*(this.$items.length-this.contentItem.children.length)
                 // this.contentHeight = contentHeight
                 // this.originY = -(contentHeight - (visibleContentHeight + (this.$items.length - lastIndex - 1)*(Math.round(this.$middleHeight) + this.spacing)))
@@ -235,7 +235,7 @@ export class ListView extends Flickable {
                         if(child.index < firstIndex) firstIndex = child.index
                     }
                 }
-                let middleWidth = visibleContentWidth / this.contentItem.children.length
+                let middleWidth = this.contentItem.children.length ? visibleContentWidth / this.contentItem.children.length : 0
                 // let contentWidth = visibleContentWidth - minX + (Math.round(this.$middleWidth) + this.spacing)*(this.$items.length-this.contentItem.children.length)
                 // this.contentWidth = contentWidth
                 // this.originX = -(contentWidth - (visibleContentWidth + (this.$items.length - lastIndex - 1)*(Math.round(this.$middleWidth) + this.spacing)))
@@ -590,10 +590,10 @@ export class ListView extends Flickable {
                     if(this.orientation === ListView.Horizontal){
                         if(this.contentX <= minX){
                             currentIndex = leftIndex + Math.ceil((this.contentX - minX + (middleWidth ? this.spacing : 0))/(Math.round(middleWidth + (middleWidth ? this.spacing : 0))))
-                            if(isNaN(currentIndex)) currentIndex = leftIndex
+                            if(isNaN(currentIndex) || currentIndex === -Infinity || currentIndex === Infinity) currentIndex = leftIndex
                         } else {
                             currentIndex = rightIndex + Math.ceil((this.contentX - maxX - (middleWidth ? this.spacing : 0))/(Math.round(middleWidth + (middleWidth ? this.spacing : 0))))
-                            if(isNaN(currentIndex)) currentIndex = rightIndex
+                            if(isNaN(currentIndex) || currentIndex === -Infinity || currentIndex === Infinity) currentIndex = rightIndex
                         }
                         if(currentIndex < 0 || currentIndex >= this.$items.length) return
                         
@@ -615,10 +615,10 @@ export class ListView extends Flickable {
                     } else {
                         if(this.contentY <= minY){
                             currentIndex = leftIndex + Math.ceil((this.contentY - minY + (middleHeight ? this.spacing : 0))/(Math.round(middleHeight + (middleHeight ? this.spacing : 0))))
-                            if(isNaN(currentIndex)) currentIndex = leftIndex
+                            if(isNaN(currentIndex) || currentIndex === -Infinity || currentIndex === Infinity) currentIndex = leftIndex
                         } else {
                             currentIndex = rightIndex + Math.ceil((this.contentY - maxY - (middleHeight ? this.spacing : 0))/(Math.round(middleHeight + (middleHeight ? this.spacing : 0))))
-                            if(isNaN(currentIndex)) currentIndex = rightIndex
+                            if(isNaN(currentIndex) || currentIndex === -Infinity || currentIndex === Infinity) currentIndex = rightIndex
                         }
                         if(currentIndex < 0 || currentIndex >= this.$items.length) return
                         
@@ -664,8 +664,8 @@ export class ListView extends Flickable {
                                 this.$items[currIndex] = obj
                                 this.$items[currIndex].y = 0
                                 this.$items[currIndex].$sP('x', ()=>{
-                                    if(this.$items[prevIndex]){
-                                        return this.$items[prevIndex].x - obj.width - this.spacing
+                                    if(this.$items[obj.index+1]){
+                                        return this.$items[obj.index+1].x - obj.width - this.spacing
                                     } else {
                                         return obj.$p.x.val
                                     }     
@@ -688,8 +688,8 @@ export class ListView extends Flickable {
                                 this.$items[currIndex] = obj
                                 this.$items[currIndex].x = 0
                                 this.$items[currIndex].$sP('y', ()=>{
-                                    if(this.$items[prevIndex]){
-                                        return this.$items[prevIndex].y - obj.height - this.spacing
+                                    if(this.$items[obj.index+1]){
+                                        return this.$items[obj.index+1].y - obj.height - this.spacing
                                     } else {
                                         return obj.$p.y.val
                                     }     
@@ -714,8 +714,8 @@ export class ListView extends Flickable {
                                 this.$items[currIndex] = obj
                                 this.$items[currIndex].y = 0
                                 this.$items[currIndex].$sP('x', ()=>{
-                                    if(this.$items[prevIndex]){
-                                        return this.$items[prevIndex].x + this.$items[prevIndex].width + this.spacing
+                                    if(this.$items[obj.index-1]){
+                                        return this.$items[obj.index-1].x + this.$items[obj.index-1].width + this.spacing
                                     } else {
                                         return obj.$p.x.val
                                     }     
@@ -737,8 +737,8 @@ export class ListView extends Flickable {
                                 this.$items[currIndex] = obj
                                 this.$items[currIndex].x = 0
                                 this.$items[currIndex].$sP('y', ()=>{
-                                    if(this.$items[prevIndex]){
-                                        return this.$items[prevIndex].y + this.$items[prevIndex].height + this.spacing
+                                    if(this.$items[obj.index-1]){
+                                        return this.$items[obj.index-1].y + this.$items[obj.index-1].height + this.spacing
                                     } else {
                                         return obj.$p.y.val
                                     }     
