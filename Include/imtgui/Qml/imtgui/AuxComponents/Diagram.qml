@@ -36,7 +36,7 @@ Item {
 
     property int spacingX: 20;
 
-    property real xElementRotation: -45;
+    property real xElementRotation: 0;
 
 
     onModelChanged: {
