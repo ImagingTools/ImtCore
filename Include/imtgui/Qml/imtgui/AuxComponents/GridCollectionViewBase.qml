@@ -35,21 +35,21 @@ Item {
 
     property alias extendingInfoComp: extendingInfoLoader.sourceComponent;
 
-//    property alias gridMinWidth: gridInternal.minWidth;
+    //    property alias gridMinWidth: gridInternal.minWidth;
     property alias gridDecoratorPath: loaderTableDecorator.source;
     property alias modelFilter: modelFilterObj;
     property alias pagination: paginationObj;
     property alias paginationCurrentIndex: paginationObj.currentIndex;
     property alias paginationPageSize: paginationObj.pagesSize;
     property string commandsId;
-//    property alias elementsList: gridInternal.elementsList;
-//    property alias gridItemHeight: gridInternal.itemHeight;
+    //    property alias elementsList: gridInternal.elementsList;
+    //    property alias gridItemHeight: gridInternal.itemHeight;
     property string itemId;
 
     property alias grid: gridInternal;
     property alias indexSelected: gridInternal.selectedIndex;
 
-    property bool hasPagination: true;   
+    property bool hasPagination: true;
 
     signal selectedItem(string id, string name);
     signal selectedIndexChanged(int index);
@@ -67,7 +67,21 @@ Item {
         gridInternal.focus = true;
     }
 
+    onGridSelectedRowChanged: {
+        if(gridSelectedRow >=0){
 
+            var selectedRowY = collectionViewBaseContainer.gridSelectedRow * collectionViewBaseContainer.gridCellHeightMin - gridInternal.contentY;
+            var infonYBottom = (collectionViewBaseContainer.gridSelectedRow + 1) * collectionViewBaseContainer.gridCellHeightMin - gridInternal.contentY + collectionViewBaseContainer.gridAddHeight;
+
+            var diff = infonYBottom - gridInternal.height;
+
+            var contY = gridInternal.contentY;
+
+            if(diff > 0){
+                gridInternal.contentY = contY + diff;
+            }
+        }
+    }
 
     Rectangle {
         id: backgroundTable;
@@ -78,10 +92,10 @@ Item {
         anchors.bottom: parent.bottom;
         anchors.bottomMargin: 50;
 
-//        anchors.top: filterMenu.visible ? filterMenu.bottom: parent.top;
-//        anchors.left: parent.left;
-//        width: gridInternal.minWidth * gridInternal.columnCount < parent.width ? gridInternal.minWidth * gridInternal.columnCount : parent.width;
-//        anchors.bottom: parent.bottom;
+        //        anchors.top: filterMenu.visible ? filterMenu.bottom: parent.top;
+        //        anchors.left: parent.left;
+        //        width: gridInternal.minWidth * gridInternal.columnCount < parent.width ? gridInternal.minWidth * gridInternal.columnCount : parent.width;
+        //        anchors.bottom: parent.bottom;
 
         color: Style.baseColor;
 
@@ -146,7 +160,7 @@ Item {
             cellHeight: !collectionViewBaseContainer.hasExtention ? collectionViewBaseContainer.gridCellHeightMin : !collectionViewBaseContainer.openST ? collectionViewBaseContainer.gridCellHeightMin : collectionViewBaseContainer.gridCellHeightMax;
 
             property int selectedIndex: -1;
-//            property alias elements: model;
+            //            property alias elements: model;
             signal selectItem(string idSelected, string name);
 
             onSelectItem: {
@@ -159,16 +173,16 @@ Item {
                 collectionViewBaseContainer.selectedIndexChanged(gridInternal.selectedIndex);
             }
 
-//            onElementsChanged: {
-//                collectionViewBaseContainer.elementsChanged();
-//            }
+            //            onElementsChanged: {
+            //                collectionViewBaseContainer.elementsChanged();
+            //            }
 
-//            cellWidth: 160
-//            cellHeight: 160
+            //            cellWidth: 160
+            //            cellHeight: 160
 
-//            anchors.bottom: pagination.visible ? pagination.top : parent.bottom;
-//            anchors.margins: thumbnailDecoratorContainer.mainMargin;
-//            property real minWidth: 1000000;
+            //            anchors.bottom: pagination.visible ? pagination.top : parent.bottom;
+            //            anchors.margins: thumbnailDecoratorContainer.mainMargin;
+            //            property real minWidth: 1000000;
         }
     }
 
@@ -188,6 +202,7 @@ Item {
             height: collectionViewBaseContainer.gridAddHeight - 10;
 
             visible: collectionViewBaseContainer.openST;
+
 
             Loader{
                 id: extendingInfoLoader;
@@ -264,8 +279,8 @@ Item {
         }
 
         onHeadersChanged: {
-//            gridInternal.headers = baseCommands.headers;
-//            gridInternal.headersCompl = true;
+            //            gridInternal.headers = baseCommands.headers;
+            //            gridInternal.headersCompl = true;
         }
 
         onItemsChanged: {

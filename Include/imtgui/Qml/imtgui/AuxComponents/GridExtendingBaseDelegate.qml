@@ -29,6 +29,8 @@ Rectangle {
                 rootItem.openST = false;
                 rootItem.openST = true;
             }
+
+            rootItem.selectedIndex = -1;
         }
     }
 
