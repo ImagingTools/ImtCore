@@ -29,9 +29,15 @@ Item {
     property int gridRowCount : Math.ceil(gridCount/gridCountInLine);
     property int gridSelectedRow: gridInternal.selectedIndex < 0 ? -1 : Math.trunc(gridInternal.selectedIndex/gridCountInLine);
     property bool gridIsLastRow: gridSelectedRow == gridRowCount -1;
+    property int gridSelectedIndexInRow: gridSelectedRow < 0 ? 0 : gridInternal.selectedIndex - gridSelectedRow * gridCountInLine;
     property real gridAddHeight: 110*3;
     property int gridCellHeightMin: 110;//???
     property int gridCellHeightMax: (gridCellHeightMin * gridRowCount + gridAddHeight) / gridRowCount + !isWeb * gridIsLastRow * gridAddHeight;
+    property int gridDelegateMargin: 10;
+
+    property alias gridIndicatorMainColor: gridIndicator.color;
+    property alias gridIndicatorCoverColor: gridIndicatorCover.color;
+    property alias gridIndicatorCoverOpacity: gridIndicatorCover.opacity;
 
     property alias extendingInfoComp: extendingInfoLoader.sourceComponent;
 
@@ -65,6 +71,10 @@ Item {
         console.log("CollectionViewBase onCompleted");
 
         gridInternal.focus = true;
+    }
+
+    onGridSelectedIndexInRowChanged: {
+        //console.log("GridSelectedIndexInRowChanged ", gridSelectedIndexInRow)
     }
 
     onGridSelectedRowChanged: {
@@ -212,6 +222,38 @@ Item {
                 sourceComponent: extendingInfoCompDefault;
 
             }
+        }
+
+        Rectangle{
+            id: indicatorRec;
+
+            anchors.bottom:extendingInfoLoaderContainer.top;
+            anchors.bottomMargin: -2;
+            x: collectionViewBaseContainer.gridSelectedIndexInRow * collectionViewBaseContainer.gridCellWidth  + 0.5 * collectionViewBaseContainer.gridCellWidth - width/2 - collectionViewBaseContainer.gridDelegateMargin/4;
+
+            width: 40;
+            height: collectionViewBaseContainer.gridDelegateMargin - 2 * anchors.bottomMargin;
+            color: "transparent";
+            visible: collectionViewBaseContainer.openST;
+            clip: true;
+            Rectangle{
+                id: gridIndicator;
+
+                width: parent.width;
+                height: width;
+                rotation: 45;
+                color: Style.backgroundColor;
+                Rectangle{
+                    id: gridIndicatorCover;
+
+                    anchors.fill: parent;
+
+                    color: Style.textColor;
+                    opacity: 0.2;
+                }
+            }
+
+
         }
 
     }

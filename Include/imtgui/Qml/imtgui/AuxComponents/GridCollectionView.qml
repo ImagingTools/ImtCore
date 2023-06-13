@@ -43,6 +43,11 @@ Item {
     property alias gridCellHeightMax: gridCollectionViewBase.gridCellHeightMax;
 
     property alias extendingInfoComp: gridCollectionViewBase.extendingInfoComp;
+    property alias gridDelegateMargin: gridCollectionViewBase.gridDelegateMargin;
+
+    property alias gridIndicatorMainColor: gridCollectionViewBase.gridIndicatorMainColor;
+    property alias gridIndicatorCoverColor: gridCollectionViewBase.gridIndicatorCoverColor;
+    property alias gridIndicatorCoverOpacity: gridCollectionViewBase.gridIndicatorCoverOpacity;
 
     property alias gridElementsDelegate: gridCollectionViewBase.gridElementsDelegate;
     property alias gridElementsModel: gridCollectionViewBase.gridElementsModel;
