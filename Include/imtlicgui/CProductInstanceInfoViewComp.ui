@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>504</width>
+    <width>787</width>
     <height>837</height>
    </rect>
   </property>
@@ -33,7 +33,7 @@
     <widget class="QGroupBox" name="LicenseManagementGroup">
      <property name="maximumSize">
       <size>
-       <width>600</width>
+       <width>900</width>
        <height>16777215</height>
       </size>
      </property>
@@ -55,7 +55,7 @@
            <string>Create Transaction Code...</string>
           </property>
           <property name="icon">
-           <iconset resource="../imtgui/imtguilight.qrc">
+           <iconset>
             <normaloff>:/Icons/DocumentExport</normaloff>:/Icons/DocumentExport</iconset>
           </property>
          </widget>
@@ -79,7 +79,7 @@
            <string>Load License...</string>
           </property>
           <property name="icon">
-           <iconset resource="../imtgui/imtguilight.qrc">
+           <iconset>
             <normaloff>:/Icons/Import</normaloff>:/Icons/Import</iconset>
           </property>
           <property name="toolButtonStyle">
@@ -103,7 +103,7 @@
     <widget class="QGroupBox" name="InstanceIdGroup">
      <property name="maximumSize">
       <size>
-       <width>600</width>
+       <width>900</width>
        <height>16777215</height>
       </size>
      </property>
@@ -125,7 +125,7 @@
     <widget class="QGroupBox" name="CustomerGroup">
      <property name="maximumSize">
       <size>
-       <width>600</width>
+       <width>900</width>
        <height>16777215</height>
       </size>
      </property>
@@ -147,7 +147,7 @@
     <widget class="QGroupBox" name="ProductSelectionGroup">
      <property name="maximumSize">
       <size>
-       <width>600</width>
+       <width>900</width>
        <height>16777215</height>
       </size>
      </property>
@@ -175,7 +175,7 @@
      </property>
      <property name="maximumSize">
       <size>
-       <width>600</width>
+       <width>900</width>
        <height>16777215</height>
       </size>
      </property>
@@ -216,8 +216,6 @@
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="../imtgui/imtguilight.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
