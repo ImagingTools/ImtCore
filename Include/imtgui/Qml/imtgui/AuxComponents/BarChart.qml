@@ -1,4 +1,5 @@
-import QtQuick 2.0
+import QtQuick 2.12
+import Acf 1.0
 
 Item {
 
@@ -18,6 +19,14 @@ Item {
 
     property string color_positive: "#ff8a3d";
     property string color_negative: "#000000";
+
+    property bool hasTooltip: true;
+    property bool isPositiveTooltip: true;
+    property bool isNegativeTooltip: false;
+
+    property alias toolTipColor: tooltip.color;
+    property alias toolTipFontColor: tooltip.fontColor;
+    property alias toolTipFontSize: tooltip.fontPixelSize;
 
 
     Rectangle{
@@ -73,6 +82,62 @@ Item {
         visible: !barChart.visible ? false : (barChart.negativeValue == 0) ? false : (barChart.positiveValue == 0) ? false : barChart.visibleElements;
 
     }
+
+    CustomTooltip{
+        id: tooltip;
+
+        fitToTextWidth: true;
+
+        componentHeight: 30;
+        fontPixelSize:  Style.fontSize_common;
+
+        color: Style.color_buttonText;
+        fontColor: "#ffffff";
+
+        borderColor: Style.color_elementBorder;
+
+        text: barChart.isPositiveTooltip ? barChart.positiveValue : barChart.isNegativeTooltip ? barChart.negativeValue : "";
+    }
+
+    PauseAnimation {
+        id: pauseTooltip;
+
+        duration: tooltip.waitingDuration;
+        onFinished: {
+            tooltip.openTooltip(ma.mouseX, ma.mouseY);
+        }
+    }
+
+    MouseArea{
+        id: ma;
+
+        anchors.fill: parent;
+
+        visible: true;
+        hoverEnabled: visible;
+        cursorShape: Qt.PointingHandCursor;
+
+        onEntered: {
+            if(barChart.hasTooltip){
+                if(tooltip.text !== ""){
+                    pauseTooltip.stop();
+                    pauseTooltip.start();
+
+                }
+            }
+        }
+
+        onExited: {
+            if(barChart.hasTooltip){
+                if(tooltip.text !== ""){
+                    pauseTooltip.stop();
+                    tooltip.closeTooltip();
+                }
+            }
+        }
+
+    }
+
 
 }
 
