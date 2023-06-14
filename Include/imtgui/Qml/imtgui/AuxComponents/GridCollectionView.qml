@@ -48,6 +48,7 @@ Item {
     property alias gridIndicatorMainColor: gridCollectionViewBase.gridIndicatorMainColor;
     property alias gridIndicatorCoverColor: gridCollectionViewBase.gridIndicatorCoverColor;
     property alias gridIndicatorCoverOpacity: gridCollectionViewBase.gridIndicatorCoverOpacity;
+    property alias gridIndicatorVisible: gridCollectionViewBase.gridIndicatorVisible;
 
     property alias gridElementsDelegate: gridCollectionViewBase.gridElementsDelegate;
     property alias gridElementsModel: gridCollectionViewBase.gridElementsModel;

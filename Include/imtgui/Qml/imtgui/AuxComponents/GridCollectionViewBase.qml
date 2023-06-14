@@ -38,6 +38,7 @@ Item {
     property alias gridIndicatorMainColor: gridIndicator.color;
     property alias gridIndicatorCoverColor: gridIndicatorCover.color;
     property alias gridIndicatorCoverOpacity: gridIndicatorCover.opacity;
+    property bool gridIndicatorVisible: true;
 
     property alias extendingInfoComp: extendingInfoLoader.sourceComponent;
 
@@ -81,15 +82,27 @@ Item {
         if(gridSelectedRow >=0){
 
             var selectedRowY = collectionViewBaseContainer.gridSelectedRow * collectionViewBaseContainer.gridCellHeightMin - gridInternal.contentY;
-            var infonYBottom = (collectionViewBaseContainer.gridSelectedRow + 1) * collectionViewBaseContainer.gridCellHeightMin - gridInternal.contentY + collectionViewBaseContainer.gridAddHeight;
+            var selectedRowBottomY = (collectionViewBaseContainer.gridSelectedRow + 1) * collectionViewBaseContainer.gridCellHeightMin - gridInternal.contentY;
+            var infonYBottom = (collectionViewBaseContainer.gridSelectedRow + 1) * collectionViewBaseContainer.gridCellHeightMin
+                    - gridInternal.contentY +
+                    collectionViewBaseContainer.gridAddHeight;
 
             var diff = infonYBottom - gridInternal.height;
 
             var contY = gridInternal.contentY;
 
-            if(diff > 0){
-                gridInternal.contentY = contY + diff;
+            if((collectionViewBaseContainer.gridAddHeight + collectionViewBaseContainer.gridCellHeightMin) < gridInternal.height){
+                if(diff > 0){
+                    contY += diff;
+                    gridInternal.contentY = contY;
+
+                }
             }
+
+            else {
+                gridInternal.contentY = collectionViewBaseContainer.gridSelectedRow  * collectionViewBaseContainer.gridCellHeightMin;
+            }
+
         }
     }
 
@@ -228,21 +241,26 @@ Item {
             id: indicatorRec;
 
             anchors.bottom:extendingInfoLoaderContainer.top;
-            anchors.bottomMargin: -2;
-            x: collectionViewBaseContainer.gridSelectedIndexInRow * collectionViewBaseContainer.gridCellWidth  + 0.5 * collectionViewBaseContainer.gridCellWidth - width/2 - collectionViewBaseContainer.gridDelegateMargin/4;
+            anchors.bottomMargin: 0;//-2;
+            x: collectionViewBaseContainer.gridSelectedIndexInRow * collectionViewBaseContainer.gridCellWidth  + 0.5 * collectionViewBaseContainer.gridCellWidth - width/2 - collectionViewBaseContainer.gridDelegateMargin/2;
 
-            width: 40;
+            width: 80;
             height: collectionViewBaseContainer.gridDelegateMargin - 2 * anchors.bottomMargin;
             color: "transparent";
-            visible: collectionViewBaseContainer.openST;
-            clip: true;
+            visible: collectionViewBaseContainer.openST && collectionViewBaseContainer.gridIndicatorVisible;
+            //clip: true;
+
             Rectangle{
                 id: gridIndicator;
 
                 width: parent.width;
-                height: width;
-                rotation: 45;
+                height: parent.height;
+
                 color: Style.backgroundColor;
+                clip: true;
+
+                property int topThroatShift: 6;
+
                 Rectangle{
                     id: gridIndicatorCover;
 
@@ -250,8 +268,103 @@ Item {
 
                     color: Style.textColor;
                     opacity: 0.2;
+
+                }
+
+                Rectangle{
+                    id: circleLeft;
+
+                    anchors.left: parent.left
+                    anchors.leftMargin: -width/2 - gridIndicator.topThroatShift/2;
+                    anchors.bottom: parent.bottom;
+                    anchors.bottomMargin: 0;
+
+                    width: parent.width;
+                    height: width;
+                    radius: width;
+
+                    color: Style.baseColor;
+
+
+                }
+
+                Rectangle{
+                    id: circleRight;
+
+                    anchors.right: parent.right
+                    anchors.rightMargin: - width/2 - gridIndicator.topThroatShift/2;
+                    anchors.bottom: parent.bottom;
+                    anchors.bottomMargin: 0;
+
+                    width: parent.width;
+                    height: width;
+                    radius: width;
+
+                    color: Style.baseColor;
+
+
                 }
             }
+
+            Rectangle{
+                id: topPatch;
+
+                anchors.horizontalCenter: gridIndicator.horizontalCenter;
+                anchors.bottom: gridIndicator.top;
+
+                height: 2;
+                width: 36;
+                color: gridIndicator.color;
+
+                Rectangle{
+                    id: topPatchCover;
+
+                    anchors.fill: parent;
+
+                    color: gridIndicatorCover.color;
+                    opacity: gridIndicatorCover.opacity;
+
+                }
+            }
+
+            Rectangle{
+                id: bottomPatch;
+
+                anchors.horizontalCenter: gridIndicator.horizontalCenter;
+                anchors.top: gridIndicator.bottom;
+
+                height: 2;
+                width: gridIndicator.width;
+                color: gridIndicator.color;
+
+                Rectangle{
+                    id: bottomPatchCover;
+
+                    anchors.fill: parent;
+
+                    color: gridIndicatorCover.color;
+                    opacity: gridIndicatorCover.opacity;
+
+                }
+            }
+
+//            Rectangle{
+//                id: gridIndicator;
+
+//                width: parent.width;
+//                height: width;
+//                rotation: 45;
+//                color: Style.backgroundColor;
+//                Rectangle{
+//                    id: gridIndicatorCover;
+
+//                    anchors.fill: parent;
+
+//                    color: Style.textColor;
+//                    opacity: 0.2;
+//                }
+//            }
+            //
 
 
         }
