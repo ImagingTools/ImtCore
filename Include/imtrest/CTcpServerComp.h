@@ -41,6 +41,7 @@ public:
 		I_ASSIGN(m_serverPortAttrPtr, "ServerPort", "Server port to be listened", false, 0);
 		I_ASSIGN(m_startServerOnCreateAttrPtr, "StartServerOnCreate", "If enabled, the server will be started on after component creation", true, true);
 		I_ASSIGN(m_serverPortCompPtr, "ServerPortParam", "Parameter providing the server port to be listened", false, "ServerPortParam");
+		I_ASSIGN(m_isMultiThreadingAttrPtr, "MultiThreading", "Гsing multithreading", false, 0);
 	I_END_COMPONENT
 
 	// reimplemented (IRequestHandler)
@@ -59,6 +60,7 @@ private:
 
 private Q_SLOTS:
 	void HandleNewConnections();
+	void HandleNewThreadConnections(QTcpSocket* socketPtr);
 	void OnSocketDisconnected();
 
 private:
@@ -68,6 +70,7 @@ private:
 	I_ATTR(int, m_serverPortAttrPtr);
 	I_ATTR(bool, m_startServerOnCreateAttrPtr);
 	I_REF(iprm::ITextParam, m_serverPortCompPtr);
+	I_ATTR(bool, m_isMultiThreadingAttrPtr);
 
 	typedef QVector<QTcpServer*> Servers;
 

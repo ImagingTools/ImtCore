@@ -5,6 +5,7 @@
 #include <imtrest/IRequest.h>
 #include <imtrest/IResponse.h>
 #include <imtrest/ISender.h>
+#include <imtrest/CMultiThreadServer.h>
 
 
 namespace imtrest
@@ -69,19 +70,35 @@ bool CTcpServerComp::StartListening(const QHostAddress &address, quint16 port)
 	if (!m_protocolEngineCompPtr.IsValid()){
 		return false;
 	}
+	if ((m_isMultiThreadingAttrPtr.IsValid() && *m_isMultiThreadingAttrPtr)){
+		istd::TDelPtr<CMultiThreadServer> tcpServerPtr(new CMultiThreadServer(this));
+		if (tcpServerPtr->listen(address, port)){
+			SendInfoMessage(0, QString("Server successfully started on %1:%2").arg(address.toString()).arg(port));
 
-	istd::TDelPtr<QTcpServer> tcpServerPtr(new QTcpServer(this));
-	if (tcpServerPtr->listen(address, port)){
-		SendInfoMessage(0, QString("Server successfully started on %1:%2").arg(address.toString()).arg(port));
+			connect(tcpServerPtr.GetPtr(), &CMultiThreadServer::newThreadConnection, this, &CTcpServerComp::HandleNewThreadConnections, Qt::DirectConnection);
 
-		connect(tcpServerPtr.GetPtr(), &QTcpServer::newConnection, this, &CTcpServerComp::HandleNewConnections, Qt::UniqueConnection);
+			m_servers.push_back(tcpServerPtr.PopPtr());
 
-		m_servers.push_back(tcpServerPtr.PopPtr());
-
-		return true;
+			return true;
+		}
+		else{
+			SendErrorMessage(0, QString("Server could not be started on %1:%2").arg(address.toString()).arg(port));
+		}
 	}
 	else{
-		SendErrorMessage(0, QString("Server could not be started on %1:%2").arg(address.toString()).arg(port));
+		istd::TDelPtr<QTcpServer> tcpServerPtr(new QTcpServer(this));
+		if (tcpServerPtr->listen(address, port)){
+			SendInfoMessage(0, QString("Server successfully started on %1:%2").arg(address.toString()).arg(port));
+
+			connect(tcpServerPtr.GetPtr(), &QTcpServer::newConnection, this, &CTcpServerComp::HandleNewConnections, Qt::UniqueConnection);
+
+			m_servers.push_back(tcpServerPtr.PopPtr());
+
+			return true;
+		}
+		else{
+			SendErrorMessage(0, QString("Server could not be started on %1:%2").arg(address.toString()).arg(port));
+		}
 	}
 
 	return false;
@@ -106,10 +123,29 @@ void CTcpServerComp::HandleNewConnections()
 }
 
 
+void CTcpServerComp::HandleNewThreadConnections(QTcpSocket* socketPtr)
+{
+	if (socketPtr == nullptr){
+		return;
+	}
+
+	IRequest* newRequestPtr = m_protocolEngineCompPtr->CreateRequest(socketPtr, *this);
+	if (newRequestPtr != nullptr){
+		m_requests.PushBack(newRequestPtr);
+
+		QObject::connect(socketPtr, &QTcpSocket::disconnected, this, &CTcpServerComp::OnSocketDisconnected);
+	}
+}
+
+
 void CTcpServerComp::OnSocketDisconnected()
 {
 	QObject* socketObjectPtr = sender();
-	Q_ASSERT(socketObjectPtr != nullptr);
+	if (socketObjectPtr == nullptr){
+		//Q_ASSERT(false);
+
+		return;
+	}
 
 	for (int i = 0; i < m_requests.GetCount(); ++i){
 		IRequest* requestPtr = m_requests.GetAt(i);
