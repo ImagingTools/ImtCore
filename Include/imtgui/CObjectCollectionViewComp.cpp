@@ -444,7 +444,9 @@ void CObjectCollectionViewComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
 
-	UpdateGui(istd::IChangeable::GetAnyChange());
+	if (IsModelAttached()){
+		UpdateGui(istd::IChangeable::GetAnyChange());
+	}
 }
 
 
@@ -1058,13 +1060,15 @@ void CObjectCollectionViewComp::OnRenameShortCut()
 
 void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& changeSet)
 {
-	const imtbase::IObjectCollection* collectionPtr = GetObservedObject();
-	Q_ASSERT(collectionPtr != nullptr);
+	Q_ASSERT(IsGuiCreated());
 
 	ItemList->clearSelection();
 
-	if (!collectionPtr)
+	const imtbase::IObjectCollection* collectionPtr = GetObservedObject();
+	Q_ASSERT(collectionPtr != nullptr);
+	if (collectionPtr == nullptr){
 		return;
+	}
 
 	{
 		SignalSemaphore semaphore(m_semaphoreCounter);
