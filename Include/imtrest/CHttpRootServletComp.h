@@ -36,16 +36,16 @@ protected:
 	virtual IRequestServlet* FindRequestHandler(const QByteArray& commandId) const;
 
 	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated();
+	virtual void OnComponentCreated() override;
 
 private:
 	I_MULTIATTR(QByteArray, m_commandIdsAttrPtr);
 	I_MULTIREF(IRequestServlet, m_requestHandlersCompPtr);
 
-	typedef QMap<QString, IRequestServlet*> HandlersMap;
+	typedef QMap<QByteArray, IRequestServlet*> HandlersMap;
 
 	HandlersMap m_handlersMap;
-	QMutex m_handlersMapMutex;
+	mutable QMutex m_handlersMapMutex;
 };
 
 

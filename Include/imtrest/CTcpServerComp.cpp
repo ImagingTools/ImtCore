@@ -32,6 +32,13 @@ IRequestServlet::ConstResponsePtr CTcpServerComp::ProcessRequest(const IRequest&
 
 // protected methods
 
+// reimplemented (ibase::TRuntimeStatusHanderCompWrap)
+
+void CTcpServerComp::OnSystemShutdown()
+{
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CTcpServerComp::OnComponentCreated()

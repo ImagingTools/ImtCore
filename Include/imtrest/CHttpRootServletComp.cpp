@@ -42,10 +42,10 @@ IRequestServlet::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRe
 		return responsePtr;
 	}
 	else{
-        QByteArray commandIdSafe = commandId.replace("<","<<");
-        commandIdSafe = commandId.replace(">",">>");
-        commandIdSafe = commandId.replace("/","//");
-        QByteArray body = QString("<html><head><title>Error</title></head><body><p>The requested command could not be executed. No servlet was found for the given command: '%1'</p></body></html>").arg(qPrintable(commandIdSafe)).toUtf8();
+		QByteArray commandIdSafe = commandId.replace("<", "<<");
+		commandIdSafe = commandId.replace(">", ">>");
+		commandIdSafe = commandId.replace("/", "//");
+		QByteArray body = QString("<html><head><title>Error</title></head><body><p>The requested command could not be executed. No servlet was found for the given command: '%1'</p></body></html>").arg(qPrintable(commandIdSafe)).toUtf8();
 		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
 		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
@@ -66,40 +66,26 @@ IRequestServlet::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRe
 
 IRequestServlet* CHttpRootServletComp::FindRequestHandler(const QByteArray& commandId) const
 {
-	/// contains an IRequestHandler pointer in which the commandID is exactly the same as the request (highest priority) 
-	/// \warning This pointer MUST be returned if is not null!
-	IRequestServlet* exactsCommandIdHandler = nullptr;
+	QMutexLocker lockMap(&m_handlersMapMutex);
 
-	/// contains an IRequestHandler pointer in which the commandID is exactly the same as the request (highest priority) 
-	/// \warning This pointer chould be returned ONLY exactsCommandIdHandler is null!
-	IRequestServlet* startsCommandIdHandler = nullptr;
+	if (m_handlersMap.contains(commandId)){
+		return m_handlersMap[commandId];
+	}
 
-	for (int i = 0; i < m_requestHandlersCompPtr.GetCount(); ++i){
-		IRequestServlet* handlerPtr = m_requestHandlersCompPtr[i];
-		if (i > m_commandIdsAttrPtr.GetCount() - 1){
-			break;
-		}
-		if (handlerPtr != nullptr){
-//			QByteArray handlersPtrSupportedCommandId = handlerPtr->GetSupportedCommandId();
-			QByteArray handlersPtrSupportedCommandId = m_commandIdsAttrPtr[i];
-			if (handlersPtrSupportedCommandId == commandId)
-			{
-				exactsCommandIdHandler = handlerPtr;
-				startsCommandIdHandler = nullptr;
-				break;
+	QByteArrayList handlerIds = m_handlersMap.keys();
+
+	for (const QByteArray& handlerId : handlerIds){
+		if (handlerId.endsWith("*")){
+			QByteArray cleanedId = handlerId;
+			cleanedId.remove(cleanedId.length() - 1, 1);
+
+			if (commandId.startsWith(cleanedId)){
+				return m_handlersMap[commandId];
 			}
-
-			if
-				(handlersPtrSupportedCommandId.endsWith("*") &&
-				 commandId.startsWith(handlersPtrSupportedCommandId.remove(handlersPtrSupportedCommandId.length() - 1, 1))
-				 )
-			{
-				startsCommandIdHandler = handlerPtr;
-			}
-
 		}
 	}
-	return exactsCommandIdHandler == nullptr ? startsCommandIdHandler : exactsCommandIdHandler;
+
+	return nullptr;
 }
 
 
@@ -116,7 +102,7 @@ void CHttpRootServletComp::OnComponentCreated()
 		int handlersCount = qMin(m_commandIdsAttrPtr.GetCount(), m_requestHandlersCompPtr.GetCount());
 		
 		for (int i = 0; i < handlersCount; ++i){
-			QString registeredCommandId = m_commandIdsAttrPtr[i];
+			QByteArray registeredCommandId = m_commandIdsAttrPtr[i];
 			IRequestServlet* handlerPtr = m_requestHandlersCompPtr[i];
 
 			if ((handlerPtr != nullptr) && !registeredCommandId.isEmpty()){

@@ -7,6 +7,7 @@
 
 // ACF includes
 #include <istd/TPointerVector.h>
+#include <ibase/TRuntimeStatusHanderCompWrap.h>
 #include <ilog/TLoggerCompWrap.h>
 #include <iprm/ITextParam.h>
 
@@ -26,12 +27,12 @@ namespace imtrest
 */
 class CTcpServerComp:
 			public QObject,
-			public ilog::CLoggerComponentBase,
+			public ibase::TRuntimeStatusHanderCompWrap<ilog::CLoggerComponentBase>,
 			virtual public IRequestServlet
 {
 	Q_OBJECT
 public:
-	typedef ilog::CLoggerComponentBase BaseClass;
+	typedef ibase::TRuntimeStatusHanderCompWrap<ilog::CLoggerComponentBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CTcpServerComp);
 		I_ASSIGN(m_requestHandlerCompPtr, "RequestHandler", "Request handler registered for the server", true, "RequestHandler");
@@ -47,8 +48,11 @@ public:
 	virtual QByteArray GetSupportedCommandId() const override;
 
 protected:
+	// reimplemented (ibase::TRuntimeStatusHanderCompWrap)
+	virtual void OnSystemShutdown() override;
+
 	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated();
+	virtual void OnComponentCreated() override;
 
 private:
 	bool StartListening(const QHostAddress& address = QHostAddress::Any, quint16 port = 0);
