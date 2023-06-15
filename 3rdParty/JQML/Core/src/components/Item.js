@@ -799,38 +799,54 @@ export class Item extends QtObject {
     // }
 
     mapToItem(item, x, y){
-        let dx = 0
-        let dy = 0
-
-        if(item){
-            let itemParent = item.parent
-            while(itemParent)
-            {
-                dx -= itemParent.x
-                dy -= itemParent.y
-                itemParent = itemParent.parent
-            }
-            dx += x + this.x - item.x
-		    dy += y + this.y - item.y
-        } else {
-            
-            dx += x + this.x
-		    dy += y + this.y
+        let rect1 = this.dom.getBoundingClientRect()
+        let res = {
+            x: rect1.x + x,
+			y: rect1.y + y,
         }
+        if(item){
+            let rect2 = item.dom.getBoundingClientRect()
+            res.x -= rect2.x
+            res.y -= rect2.y
+            return res
+        } else {
+            return res
+        }
+        
 
-		let parent = this.parent
+
+        // let dx = 0
+        // let dy = 0
+
+        // if(item){
+        //     let itemParent = item.parent
+        //     while(itemParent)
+        //     {
+        //         dx -= itemParent.x
+        //         dy -= itemParent.y
+        //         itemParent = itemParent.parent
+        //     }
+        //     dx += x + this.x - item.x
+		//     dy += y + this.y - item.y
+        // } else {
+            
+        //     dx += x + this.x
+		//     dy += y + this.y
+        // }
+
+		// let parent = this.parent
 		
 		
-		while(parent && parent !== item)
-		{
-			dx += parent.x
-			dy += parent.y
-			parent = parent.parent
-		}
-		return {
-			x: dx,
-			y: dy,
-		}
+		// while(parent && parent !== item)
+		// {
+		// 	dx += parent.x
+		// 	dy += parent.y
+		// 	parent = parent.parent
+		// }
+		// return {
+		// 	x: dx,
+		// 	y: dy,
+		// }
 	}
 
 }

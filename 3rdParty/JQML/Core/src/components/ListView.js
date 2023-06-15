@@ -242,7 +242,7 @@ export class ListView extends Flickable {
                 this.$middleWidth = middleWidth
                 let contentWidth = visibleContentWidth + Math.round(middleWidth)*(this.$items.length-this.contentItem.children.length) + this.spacing * (this.$items.length-1)
                 this.contentWidth = contentWidth
-                this.originX = (minX - firstIndex*(Math.round(middleWidth)))
+                this.originX = (minX - firstIndex*(Math.round(middleWidth+this.spacing)))
             }
 
             //-this.$getOriginX()
@@ -525,6 +525,12 @@ export class ListView extends Flickable {
             if(this.model && this.delegate){
                 
                 if(this.$items.length <= 0) return
+
+                if(this.orientation === ListView.Horizontal){
+                    if((this.$items[0] && this.contentX < this.$items[0].x) || (this.$items[this.$items.length-1] && this.contentX > this.$items[this.$items.length-1].x + this.$items[this.$items.length-1].width)) return
+                } else {
+                    if((this.$items[0] && this.contentY < this.$items[0].y) || (this.$items[this.$items.length-1] && this.contentY > this.$items[this.$items.length-1].y + this.$items[this.$items.length-1].height)) return
+                }
 
                 let countChanged = this.count != this.$items.length
                 this.$p.count.val = this.$items.length
@@ -884,6 +890,42 @@ export class ListView extends Flickable {
         
         super.$mousedown(e, state)
 	}
+    $mousemove(e, state) {
+		e.preventDefault()
+		if(this.enabled && this.interactive && this.$pressed){
+			let deltaX = this.$mouseX
+			let deltaY = this.$mouseY
+			this.$fillMouse(e)
+			deltaX -= this.$mouseX
+			deltaY -= this.$mouseY
+			Core.velocityX = deltaX / 5
+			Core.velocityY = deltaY / 5
+
+			let tempContentX = this.contentX
+			let tempContentY = this.contentY
+
+			this.$scroll(deltaX, deltaY)
+
+			if(((this.$items[0] && this.contentX + deltaX < this.$items[0].x) || this.contentX + deltaX > this.contentWidth - this.width) && ((this.$items[0] && this.contentY + deltaY < this.$items[0].y) || this.contentY + deltaY > this.contentHeight - this.height)){
+				let parent = this.parent
+				let find = false
+				while(parent && !find){
+					if(parent && parent.webScroll !== undefined){
+						find = true
+						if(parent.interactive && parent.enabled){
+							this.$pressed = false
+							parent.$mousedown(e, state)
+						}
+					} else {
+						parent = parent.parent
+					}
+				}
+			} else {
+				this.$scroll(deltaX, deltaY)
+			}
+		}
+		
+	}
     $mouseup(e, state) {
         if(this.snapMode !== ListView.NoSnap){
             e.preventDefault()
@@ -959,6 +1001,42 @@ export class ListView extends Flickable {
         }
         
         super.$touchstart(e, state)
+	}
+    $touchmove(e, state) {
+		e.preventDefault()
+		if(this.enabled && this.interactive && this.$pressed){
+			let deltaX = this.$mouseX
+			let deltaY = this.$mouseY
+			this.$fillMouse(e)
+			deltaX -= this.$mouseX
+			deltaY -= this.$mouseY
+			Core.velocityX = deltaX / 5
+			Core.velocityY = deltaY / 5
+
+			
+			let tempContentX = this.contentX
+			let tempContentY = this.contentY
+
+			if(((this.$items[0] && this.contentX + deltaX < this.$items[0].x) || this.contentX + deltaX > this.contentWidth - this.width) && ((this.$items[0] && this.contentY + deltaY < this.$items[0].y) || this.contentY + deltaY > this.contentHeight - this.height)){
+				let parent = this.parent
+				let find = false
+				while(parent && !find){
+					if(parent && parent.webScroll !== undefined){
+						find = true
+						if(parent.interactive && parent.enabled){
+							this.$pressed = false
+							parent.$touchstart(e, state)
+						}
+						
+					} else {
+						parent = parent.parent
+					}
+				}
+			} else {
+				this.$scroll(deltaX, deltaY)
+			}
+
+		}
 	}
     $touchend(e, state) {
         if(this.snapMode !== ListView.NoSnap){
