@@ -7,14 +7,13 @@ namespace imtgql
 
 // public methods
 
-// reimplemented (imtgql::IGqlClient::ResponseHandler)
-
 CGqlRemoteRepresentationControllerComp::Response::Response()
-			: m_replyResultPtr(nullptr)
+	:m_replyResultPtr(nullptr)
 {
-
 }
 
+
+// reimplemented (imtgql::IGqlClient::ResponseHandler)
 
 imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::Response::GetResult()
 {
