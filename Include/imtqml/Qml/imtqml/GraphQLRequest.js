@@ -117,9 +117,17 @@ var GqlRequest = function(requestType, commandId){
 
         AddObjectParamPart: function(gqlObject){
             var retVal = ""
+            if(typeof gqlObject !== "object"){
+                if(typeof gqlObject == "string"){
+                    return '"' + gqlObject + '"';
+                }
+                return gqlObject;
+            }
+
             var objectId = gqlObject.m_objectId
 
-            if (objectId.length > 0) {
+
+            if (objectId && objectId.length) {
                 retVal += objectId
                 retVal += ": {"
             }
@@ -128,25 +136,43 @@ var GqlRequest = function(requestType, commandId){
             for (var i = 0; i < fieldIds.length; ++i) {
                 var fieldId = fieldIds[i]
 
+
                 if (gqlObject.IsObject(fieldId)) {
                     retVal += this.AddObjectParamPart(gqlObject.GetFieldArgumentObjectPtr(fieldId))
                 } else {
+
                     retVal += fieldId
                     retVal += ": "
                     var value = gqlObject.GetFieldArgumentValue(fieldId)
-                    var isString = (typeof value === 'string' || value instanceof String)
-                    if (isString) {
-                        value = value.replace(/\\/g,"\\\\\\\\")
-                        value = value.replace(/\"/g,"\\\\\\\"")
-                        value = value.replace(/\r/g,"\\\\\\\\r")
-                        value = value.replace(/\n/g,"\\\\\\\\n")
-                        value = value.replace(/\t/g,"\\\\\\\\t")
-                        retVal += "\\\""
+                    if(Array.isArray(value)){
+                        console.log("VALUE:::", value);
+                        retVal+= "[";
+                        for(let j = 0; j < value.length; j++){
+                            var tempVal = this.AddObjectParamPart(value[j]);
+                            if(j !== value.length - 1){
+                                tempVal += ",";
+                            }
+                            retVal += tempVal;
+                        }
+                        retVal+= "]";
+
                     }
-                    retVal += value
-                    if (isString) {
-                        retVal += "\\\""
+                    else {
+                        var isString = (typeof value === 'string' || value instanceof String)
+                        if (isString) {
+                            value = value.replace(/\\/g,"\\\\\\\\")
+                            value = value.replace(/\"/g,"\\\\\\\"")
+                            value = value.replace(/\r/g,"\\\\\\\\r")
+                            value = value.replace(/\n/g,"\\\\\\\\n")
+                            value = value.replace(/\t/g,"\\\\\\\\t")
+                            retVal += "\\\""
+                        }
+                        retVal += value
+                        if (isString) {
+                            retVal += "\\\""
+                        }
                     }
+
 
                 }
                 if (i < fieldIds.length - 1) {
