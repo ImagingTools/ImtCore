@@ -130,6 +130,7 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 	bool startText = false;
 	bool startBigText = false;
 	bool startBackSlash = false;
+	bool startArray = false;
 	QByteArray key;
 	QByteArray value;
 	QByteArray text;
@@ -300,11 +301,48 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 				return false;
 			}
 			break;
+		
+		case '[':
+			if (startBigText){
+				text.append(chr);
+			}
+			else{
+				if (!text.isEmpty()) {
+					SetParseText(text);
+					text.clear();
+				}
+				startText = true;
+				startBigText = true;
+				startArray = true;
+			}
+			break;
+		
+		case ']':
+			if (startArray){
+				QString str = text;
+				QStringList list = str.split(',');
+				m_activeGqlObjectPtr->InsertField(m_currentField, QVariant(list));
+				text.clear();
+				startText = false;
+				startBigText = false;
+				startArray = false;
+			}
+			else{
+				if (startBigText || startText){
+					text.append(chr);
+				}
+			}
+
+			break;
 
 		case '"':
 			if (startBackSlash){
 				text.append(chr);
 				startBackSlash = false;
+				break;
+			}
+
+			if (startArray){
 				break;
 			}
 
@@ -620,7 +658,13 @@ void CGqlRequest::ParceObjectParamPart(CGqlObject &gqlObject, const QJsonObject 
 		}
 		else{
 			gqlObject.InsertField(key.toUtf8());
-			gqlObject.InsertField(key.toUtf8(), object.value(key).toString());
+			QJsonValue jsonValue = object.value(key);
+			if (jsonValue.isString()){
+				gqlObject.InsertField(key.toUtf8(), jsonValue.toString());
+			}
+			else{
+				gqlObject.InsertField(key.toUtf8(), jsonValue);
+			}
 		}
 	}
 }
