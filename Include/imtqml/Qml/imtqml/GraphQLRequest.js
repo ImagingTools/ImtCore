@@ -119,7 +119,7 @@ var GqlRequest = function(requestType, commandId){
             var retVal = ""
             if(typeof gqlObject !== "object"){
                 if(typeof gqlObject == "string"){
-                    return '"' + gqlObject + '"';
+                    return "\\\"" + gqlObject + "\\\"";
                 }
                 return gqlObject;
             }

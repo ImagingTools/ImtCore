@@ -80,7 +80,7 @@ IRequestServlet* CHttpRootServletComp::FindRequestHandler(const QByteArray& comm
 			cleanedId.remove(cleanedId.length() - 1, 1);
 
 			if (commandId.startsWith(cleanedId)){
-				return m_handlersMap[commandId];
+				return m_handlersMap[handlerId];
 			}
 		}
 	}
