@@ -96,6 +96,10 @@ export class Text extends Item {
         this.$updateGeometry()
         // this.$calcWH()
     }
+    $visibleChanged(){
+        super.$visibleChanged()
+        this.$updateGeometry()
+    }
     $updateGeometry(){
 		// if(this.$contentHeightAuto)
         // this.$sP('contentHeight', ()=>{ 
@@ -141,24 +145,24 @@ export class Text extends Item {
         
         this.$updateTimer = setTimeout(()=>{
             if(this.impl){
-                let rect = this.impl.getBoundingClientRect()
+                // let rect = this.impl.getBoundingClientRect()
                 if(this.$contentHeightAuto){
-                    if(this.$heightAuto && this.$p.height.val !== rect.height) {
-                        this.$p.height.val = rect.height
+                    if(this.$heightAuto && this.$p.height.val !== this.impl.offsetHeight) {
+                        this.$p.height.val = this.impl.offsetHeight
                         this.$p.height.signal()
                         this.$heightAuto = true
-                        // this.dom.style.height = `${rect.height}px`
+                        // this.dom.style.height = `${this.impl.offsetHeight}px`
                     }
-                    this.contentHeight = rect.height
+                    this.contentHeight = this.impl.offsetHeight
                 }
                 if(this.$contentWidthAuto){
-                    if(this.$widthAuto && this.$p.width.val !== rect.width) {
-                        this.$p.width.val = rect.width
+                    if(this.$widthAuto && this.$p.width.val !== this.impl.offsetWidth) {
+                        this.$p.width.val = this.impl.offsetWidth
                         this.$p.width.signal()
                         this.$widthAuto = true
-                        // this.dom.style.width = `${rect.width}px`
+                        // this.dom.style.width = `${this.impl.offsetWidth}px`
                     }
-                    this.contentWidth = rect.width
+                    this.contentWidth = this.impl.offsetWidth
                 }
             }
             

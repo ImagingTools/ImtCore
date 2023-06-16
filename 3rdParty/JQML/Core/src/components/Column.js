@@ -12,11 +12,27 @@ export class Column extends Item {
     }
 
     $childDomChanged(child){
+        this.$cssDisplay = this.dom.style.display
         if(child.$qmlClassName !== 'Repeater'){
             child.dom.style.position = 'relative'
             child.$p.y.preventDefault = true
 
             child.heightChanged.connect(()=>{
+                child.dom.style.height = `${child.height}px`
+                for(let c of this.children){
+                    if(c.$qmlClassName !== 'Repeater' && c.dom){
+                        c.y = c.dom.offsetTop
+                    }
+                }
+                this.$updateGeometry()
+            })
+            child.visibleChanged.connect(()=>{
+                if(child.visible){
+                    child.dom.style.display = child.$cssDisplay     
+                } else {
+                    child.$cssDisplay = child.dom.style.display
+                    child.dom.style.display = 'none'
+                }
                 child.dom.style.height = `${child.height}px`
                 for(let c of this.children){
                     if(c.$qmlClassName !== 'Repeater' && c.dom){
@@ -44,35 +60,34 @@ export class Column extends Item {
         this.dom.style.flexDirection = 'column'
     }
     $updateGeometry(){
-        if(this.$heightAuto)
-        this.$sP('height', ()=>{ 
+        if(this.$heightAuto){
             let y1 = 0
             let y2 = 0
             let first = true
             for(let child of this.$availableGeometry){
+                let rect = child.dom.getBoundingClientRect()
                 if(child.visible){
                     if(first){
-                        y1 = child.y
-                        y2 = child.height + y1
+                        y1 = rect.y
+                        y2 = child.height + rect.y
                         first = false
                     } else {
-                        y2 = child.y + child.height
+                        y2 = rect.y + child.height
                     }
                 }
             }
-            return y2 - y1
-        })
+            this.height = y2-y1
+        }
 
-        if(this.$widthAuto)
-        this.$sP('width', ()=>{ 
+        if(this.$widthAuto){
             let width = 0
             if(this.$availableGeometry.length)
             for(let child of this.$availableGeometry) {
                 let childWidth = child.width
                 if(childWidth > width) width = childWidth
             }
-            return width
-        })
+            this.width = width
+        }
     }
     
 

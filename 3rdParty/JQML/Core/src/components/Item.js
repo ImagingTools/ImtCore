@@ -219,6 +219,7 @@ export class Item extends QtObject {
         this.dom.style.minHeight = `${this.height}px`
     }
     $visibleChanged(){
+        if(this.visible) this.$cssDisplay = this.dom.style.display
         // this.dom.style.opacity = this.visible ? this.opacity : 0
         this.dom.style.visibility = this.visible ? 'visible' : 'hidden'
         this.dom.style.zIndex = this.visible ? /*2147483646/2 +*/ this.z : -1

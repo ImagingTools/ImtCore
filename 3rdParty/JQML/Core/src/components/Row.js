@@ -12,11 +12,28 @@ export class Row extends Item {
     }
 
     $childDomChanged(child){
+        this.$cssDisplay = this.dom.style.display
         if(child.$qmlClassName !== 'Repeater'){
             child.dom.style.position = 'relative'
             child.$p.x.preventDefault = true
 
             child.widthChanged.connect(()=>{
+                child.dom.style.width = `${child.width}px`
+                for(let c of this.children){
+                    if(c.$qmlClassName !== 'Repeater' && c.dom){
+                        c.x = c.dom.offsetLeft
+                    }
+                }
+                this.$updateGeometry()
+            })
+
+            child.visibleChanged.connect(()=>{
+                if(child.visible){
+                    child.dom.style.display = child.$cssDisplay     
+                } else {
+                    child.$cssDisplay = child.dom.style.display
+                    child.dom.style.display = 'none'
+                }
                 child.dom.style.width = `${child.width}px`
                 for(let c of this.children){
                     if(c.$qmlClassName !== 'Repeater' && c.dom){
@@ -43,35 +60,35 @@ export class Row extends Item {
         this.dom.style.display = 'flex'
     }
     $updateGeometry(){
-        if(this.$widthAuto)
-        this.$sP('width', ()=>{ 
+        if(this.$widthAuto){
             let x1 = 0
             let x2 = 0
             let first = true
             for(let child of this.$availableGeometry){
+                let rect = child.dom.getBoundingClientRect()
                 if(child.visible){
                     if(first){
-                        x1 = child.x
+                        x1 = rect.x
                         x2 = child.width + x1
                         first = false
                     } else {
-                        x2 = child.x + child.width
+                        x2 = rect.x + child.width
                     }
                 }
             }
-            return x2 - x1
-        })
+            this.width = x2 - x1
+        }
 
-        if(this.$heightAuto)
-        this.$sP('height', ()=>{ 
+        if(this.$heightAuto){
             let height = 0
             if(this.$availableGeometry.length)
             for(let child of this.$availableGeometry) {
                 let childHeight = child.height
                 if(childHeight > height) height = childHeight
             }
-            return height
-        })
+            this.height = height
+        }
+
     }
 
     $destroy(){

@@ -99,6 +99,10 @@ export class TextInput extends Item {
 
         this.$fontChanged()
     }
+    $visibleChanged(){
+        super.$visibleChanged()
+        this.$updateGeometry()
+    }
     $updateGeometry(){
         clearTimeout(this.$updateTimer)
         

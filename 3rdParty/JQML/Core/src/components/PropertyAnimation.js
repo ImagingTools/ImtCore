@@ -9,12 +9,12 @@ export class PropertyAnimation extends Animation {
         this.$cP('from', undefined).connect(this.$fromChanged.bind(this))
         this.$cP('to', undefined).connect(this.$toChanged.bind(this))
         this.$cP('property', '').connect(this.$propertyChanged.bind(this))
-        this.$cP('properties', '').connect(this.$pChanged.bind(this))
+        this.$cP('properties', '').connect(this.$propertiesChanged.bind(this))
         this.$cP('target', this.parent).connect(this.$targetChanged.bind(this))
     }
 
     $tick(){
-        if(this.$p.target.val && this.$p.running.val){
+        if(this.$completed && this.$p.target.val && this.$p.running.val){
             let properties = this.$p.properties.val.split(',')
 
             for(let prop of properties){
@@ -27,13 +27,27 @@ export class PropertyAnimation extends Animation {
 
                 if(this.$p.to.val >= this.$p.from.val && this.$p.target.val.$p[prop].val >= this.$p.to.val) {
                     this.$p.target.val[prop] = this.$p.to.val
-                    this.running = false
-                    this.$s.finished()
+                    let loops = this.$loops + 1
+                    if(loops < this.loops || this.loops === Animation.Infinite){
+                        this.restart()
+                        this.$loops = loops
+                    } else {
+                        this.running = false
+                        this.$s.stopped()
+                        this.$s.finished()
+                    }
                 }
                 if(this.$p.to.val <= this.$p.from.val && this.$p.target.val.$p[prop].val <= this.$p.to.val) {
                     this.$p.target.val[prop] = this.$p.to.val
-                    this.running = false
-                    this.$s.finished()
+                    let loops = this.$loops + 1
+                    if(loops < this.loops || this.loops === Animation.Infinite){
+                        this.restart()
+                        this.$loops = loops
+                    } else {
+                        this.running = false
+                        this.$s.stopped()
+                        this.$s.finished()
+                    }
                 }
 
             }
@@ -57,7 +71,7 @@ export class PropertyAnimation extends Animation {
     $toChanged(){
 
     }
-    $pChanged(){
+    $propertiesChanged(){
 
     }
     $propertyChanged(){

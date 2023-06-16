@@ -3,6 +3,8 @@ import {Signal} from '../utils/Signal'
 
 export class Animation extends QtObject {
     $ready = true
+    $loops = 0
+    static Infinite = -1
     constructor(args) {
         super(args)
 
@@ -28,7 +30,7 @@ export class Animation extends QtObject {
         
     }
     $loopsChanged(){
-        
+        this.$loops = 0
     }
     $pausedChanged(){
         
@@ -42,7 +44,7 @@ export class Animation extends QtObject {
     }
 
 	pause() { 
-        this.pause = true
+        this.paused = true
     }
 	start() {
         this.restart()
@@ -53,10 +55,11 @@ export class Animation extends QtObject {
         this.$s.stopped()
     }
 	resume() { 
-        this.pause = false
+        this.paused = false
     }
 	restart() { 
-		this.pause = false
+        this.$loops = 0
+		this.paused = false
         this.running = true
     }
 
