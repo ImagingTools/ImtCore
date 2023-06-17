@@ -19,7 +19,11 @@ namespace imtdb
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-QByteArray CSqlJsonDatabaseDelegateComp::GetSelectionQuery(const QByteArray& objectId, int offset, int count, const iprm::IParamsSet* paramsPtr) const
+QByteArray CSqlJsonDatabaseDelegateComp::GetSelectionQuery(
+			const QByteArray& objectId,
+			int offset,
+			int count,
+			const iprm::IParamsSet* paramsPtr) const
 {
 	if (!objectId.isEmpty()){
 		return QString("SELECT * FROM \"%1\" WHERE \"IsActive\" = true AND \"%2\" = '%3'")
@@ -52,16 +56,16 @@ istd::IChangeable* CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(const QS
 		typeId = record.value("TypeId").toByteArray();
 		index = -1;
 
-		if (m_typesCompPtr.IsValid()) {
-			for (int i = 0; i < m_typesCompPtr->GetOptionsCount(); ++i) {
-				if (typeId == m_typesCompPtr->GetOptionId(i)) {
+		if (m_typesCompPtr.IsValid()){
+			for (int i = 0; i < m_typesCompPtr->GetOptionsCount(); ++i){
+				if (typeId == m_typesCompPtr->GetOptionId(i)){
 					index = i;
 					break;
 				}
 			}
 		}
 	}
-	else {
+	else{
 		if (m_typesCompPtr->GetOptionsCount() > 0){
 			typeId = m_typesCompPtr->GetOptionId(0);
 			index = 0;
@@ -92,7 +96,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 		const QByteArray& typeId,
 		const QByteArray& proposedObjectId,
 		const QString& objectName,
-		const QString& objectDescription,
+		const QString& /*objectDescription*/,
 		const istd::IChangeable* valuePtr) const
 {
 	NewObjectQuery retVal;
@@ -122,7 +126,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 					.arg(qPrintable(objectId))
 					.arg(SqlEncode(documentContent))
 					.arg(revisionVersion)
-                    .arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
+					.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
 					.arg(checksum).toLocal8Bit();
 
 			retVal.objectName = objectName;
@@ -143,7 +147,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateDeleteObjectQuery(
 
 
 QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
-		const imtbase::IObjectCollection& collection,
+		const imtbase::IObjectCollection& /*collection*/,
 		const QByteArray& objectId,
 		const istd::IChangeable& object,
 		const ContextDescription& /*description*/,
@@ -169,7 +173,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(qPrintable(objectId))
 				.arg(SqlEncode(documentContent))
-                .arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
+				.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
 				.arg(checksum).toLocal8Bit();
 	}
 
@@ -178,7 +182,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 
 QByteArray CSqlJsonDatabaseDelegateComp::CreateDescriptionObjectQuery(
-		const imtbase::IObjectCollection& collection,
+		const imtbase::IObjectCollection& /*collection*/,
 		const QByteArray& objectId,
 		const QString& description) const
 {
@@ -384,7 +388,10 @@ bool CSqlJsonDatabaseDelegateComp::CreateTextFilterQuery(
 }
 
 
-bool CSqlJsonDatabaseDelegateComp::WriteDataToMemory(const QByteArray &typeId, const istd::IChangeable &object, QByteArray &data) const
+bool CSqlJsonDatabaseDelegateComp::WriteDataToMemory(
+			const QByteArray& /*typeId*/,
+			const istd::IChangeable& object,
+			QByteArray& data) const
 {
 	iser::ISerializable* serializableObjectPtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(&object));
 	if (serializableObjectPtr == nullptr){
@@ -402,7 +409,10 @@ bool CSqlJsonDatabaseDelegateComp::WriteDataToMemory(const QByteArray &typeId, c
 }
 
 
-bool CSqlJsonDatabaseDelegateComp::ReadDataFromMemory(const QByteArray &typeId, const QByteArray &data, istd::IChangeable &object) const
+bool CSqlJsonDatabaseDelegateComp::ReadDataFromMemory(
+			const QByteArray& /*typeId*/,
+			const QByteArray& data,
+			istd::IChangeable& object) const
 {
 	iser::ISerializable* serializableObjectPtr = dynamic_cast<iser::ISerializable*>(&object);
 	if (serializableObjectPtr == nullptr){
