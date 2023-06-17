@@ -1,5 +1,6 @@
 #include <imtlicgql/CInstallationControllerComp.h>
 
+
 // ImtCore includes
 #include <imtlic/CFeaturePackageCollectionUtility.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
@@ -11,6 +12,10 @@
 namespace imtlicgql
 {
 
+
+// protected methods
+
+// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
 
 imtbase::CTreeItemModel* CInstallationControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
@@ -86,11 +91,11 @@ imtbase::CTreeItemModel* CInstallationControllerComp::GetObject(const imtgql::CG
 
 
 istd::IChangeable* CInstallationControllerComp::CreateObject(
-		const QList<imtgql::CGqlObject>& inputParams,
-		QByteArray& objectId,
-		QString& name,
-		QString& description,
-		QString &errorMessage) const
+			const QList<imtgql::CGqlObject>& inputParams,
+			QByteArray& objectId,
+			QString& name,
+			QString& /*description*/,
+			QString &errorMessage) const
 {
 	if (inputParams.isEmpty()) {
 		return nullptr;

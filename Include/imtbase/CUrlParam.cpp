@@ -103,7 +103,7 @@ istd::IChangeable* CUrlParam::CloneMe(istd::IChangeable::CompatibilityMode mode)
 }
 
 
-bool CUrlParam::ResetData(CompatibilityMode mode)
+bool CUrlParam::ResetData(CompatibilityMode /*mode*/)
 {
 	SetUrl(QUrl());
 

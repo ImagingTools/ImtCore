@@ -29,7 +29,7 @@ ISelection::SelectionMode CSelectionAdapterComp::GetSelectionMode() const
 }
 
 
-bool CSelectionAdapterComp::SetSelectionMode(SelectionMode mode)
+bool CSelectionAdapterComp::SetSelectionMode(SelectionMode /*mode*/)
 {
 	return false;
 }
@@ -131,7 +131,7 @@ void CSelectionAdapterComp::OnComponentDestroyed()
 
 // reimplemented (iser::ISerializable)
 
-bool CSelectionAdapterComp::Serialize(iser::IArchive& archive)
+bool CSelectionAdapterComp::Serialize(iser::IArchive& /*archive*/)
 {
 	return false;
 }
@@ -208,25 +208,31 @@ ICollectionInfo::Ids CSelectionAdapterComp::Constraints::GetElementIds(int offse
 }
 
 
-bool CSelectionAdapterComp::Constraints::GetSubsetInfo(ICollectionInfo& subsetInfo, int offset, int count, const iprm::IParamsSet* selectionParamsPtr, const Id& parentId, int iterationFlags) const
+bool CSelectionAdapterComp::Constraints::GetSubsetInfo(
+			ICollectionInfo& /*subsetInfo*/,
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	return false;
 }
 
 
-ICollectionInfo::Id CSelectionAdapterComp::Constraints::GetParentId(const Id& elementId) const
+ICollectionInfo::Id CSelectionAdapterComp::Constraints::GetParentId(const Id& /*elementId*/) const
 {
 	return Id();
 }
 
 
-ICollectionInfo::Ids CSelectionAdapterComp::Constraints::GetElementPath(const Id& elementId) const
+ICollectionInfo::Ids CSelectionAdapterComp::Constraints::GetElementPath(const Id& /*elementId*/) const
 {
 	return Ids();
 }
 
 
-bool CSelectionAdapterComp::Constraints::IsBranch(const Id& elementId) const
+bool CSelectionAdapterComp::Constraints::IsBranch(const Id& /*elementId*/) const
 {
 	return false;
 }
@@ -267,25 +273,25 @@ QVariant CSelectionAdapterComp::Constraints::GetElementInfo(const Id& elementId,
 }
 
 
-idoc::MetaInfoPtr CSelectionAdapterComp::Constraints::GetElementMetaInfo(const Id& elementId) const
+idoc::MetaInfoPtr CSelectionAdapterComp::Constraints::GetElementMetaInfo(const Id& /*elementId*/) const
 {
 	return idoc::MetaInfoPtr();
 }
 
 
-bool CSelectionAdapterComp::Constraints::SetElementName(const Id& elementId, const QString& name)
+bool CSelectionAdapterComp::Constraints::SetElementName(const Id& /*elementId*/, const QString& /*name*/)
 {
 	return false;
 }
 
 
-bool CSelectionAdapterComp::Constraints::SetElementDescription(const Id& elementId, const QString& description)
+bool CSelectionAdapterComp::Constraints::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/)
 {
 	return false;
 }
 
 
-bool CSelectionAdapterComp::Constraints::SetElementEnabled(const Id& elementId, bool isEnabled)
+bool CSelectionAdapterComp::Constraints::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/)
 {
 	return false;
 }

@@ -451,19 +451,21 @@ imtbase::CTreeItemModel* CTreeItemModel::GetTreeItemModel(const QByteArray& key,
 }
 
 
-CTreeItemModel *CTreeItemModel::GetModelFromItem(int itemIndex) const
+CTreeItemModel* CTreeItemModel::GetModelFromItem(int itemIndex) const
 {
 	int itemCount = GetItemsCount();
-
 	if (itemCount <= itemIndex){
 		return nullptr;
 	}
 
-	CTreeItemModel* modelPtr = new CTreeItemModel();
+	istd::TDelPtr<CTreeItemModel> modelPtr(new CTreeItemModel());
 
 	bool result = modelPtr->CopyItemDataFromModel(0, this, itemIndex);
+	if (result){
+		return modelPtr.PopPtr();
+	}
 
-	return modelPtr;
+	return nullptr;
 }
 
 
@@ -681,7 +683,7 @@ int CTreeItemModel::GetSupportedOperations() const
 }
 
 
-bool CTreeItemModel::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+bool CTreeItemModel::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const imtbase::CTreeItemModel* sourcePtr = dynamic_cast<const imtbase::CTreeItemModel*>(&object);
 	if (sourcePtr != nullptr){

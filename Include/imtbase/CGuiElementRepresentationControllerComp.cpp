@@ -107,7 +107,9 @@ bool CGuiElementRepresentationControllerComp::GetRepresentationFromDataModel(con
 }
 
 
-bool CGuiElementRepresentationControllerComp::GetDataModelFromRepresentation(const CTreeItemModel& representation, istd::IChangeable& dataModel) const
+bool CGuiElementRepresentationControllerComp::GetDataModelFromRepresentation(
+			const CTreeItemModel& /*representation*/,
+			istd::IChangeable& /*dataModel*/) const
 {
 	return true;
 }

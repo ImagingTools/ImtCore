@@ -24,7 +24,10 @@ bool CSelectionConstraintsRepresentationControllerComp::IsModelSupported(const i
 }
 
 
-bool CSelectionConstraintsRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
+bool CSelectionConstraintsRepresentationControllerComp::GetRepresentationFromDataModel(
+			const istd::IChangeable& dataModel,
+			CTreeItemModel& representation,
+			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (!IsModelSupported(dataModel)){
 		return false;
@@ -49,7 +52,9 @@ bool CSelectionConstraintsRepresentationControllerComp::GetRepresentationFromDat
 }
 
 
-bool CSelectionConstraintsRepresentationControllerComp::GetDataModelFromRepresentation(const CTreeItemModel& representation, istd::IChangeable& dataModel) const
+bool CSelectionConstraintsRepresentationControllerComp::GetDataModelFromRepresentation(
+			const CTreeItemModel& /*representation*/,
+			istd::IChangeable& dataModel) const
 {
 	if (!IsModelSupported(dataModel)){
 		return false;

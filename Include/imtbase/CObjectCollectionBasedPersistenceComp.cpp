@@ -36,8 +36,8 @@ bool CObjectCollectionBasedPersistenceComp::IsOperationSupported(
 
 
 int CObjectCollectionBasedPersistenceComp::LoadFromFile(
-			istd::IChangeable& data,
-			const QString& filePath,
+			istd::IChangeable& /*data*/,
+			const QString& /*filePath*/,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
 	Q_ASSERT(false);

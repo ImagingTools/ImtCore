@@ -23,7 +23,7 @@ QByteArrayList CSingleCommandPermissionsProviderComp::GetCommandIds() const
 }
 
 
-QByteArrayList CSingleCommandPermissionsProviderComp::GetCommandPermissions(const QByteArray& commandId) const
+QByteArrayList CSingleCommandPermissionsProviderComp::GetCommandPermissions(const QByteArray& /*commandId*/) const
 {
 	QByteArrayList retVal;
 

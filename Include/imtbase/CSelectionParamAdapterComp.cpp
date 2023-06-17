@@ -62,7 +62,7 @@ bool CSelectionParamAdapterComp::SetSelectedOptionIndex(int index)
 }
 
 
-iprm::ISelectionParam* CSelectionParamAdapterComp::GetSubselection(int index) const
+iprm::ISelectionParam* CSelectionParamAdapterComp::GetSubselection(int /*index*/) const
 {
 	return nullptr;
 }
@@ -125,7 +125,7 @@ void CSelectionParamAdapterComp::OnComponentDestroyed()
 
 // reimplemented (iser::ISerializable)
 
-bool CSelectionParamAdapterComp::Serialize(iser::IArchive& archive)
+bool CSelectionParamAdapterComp::Serialize(iser::IArchive& /*archive*/)
 {
 	return false;
 }

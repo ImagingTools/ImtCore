@@ -33,7 +33,7 @@ CSelectionAdapterBase::UpdateBlockerPtr CSelectionAdapterBase::CreateUpdateBlock
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CSelectionAdapterBase::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+void CSelectionAdapterBase::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	switch (modelId)
 	{

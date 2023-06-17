@@ -25,7 +25,7 @@ int CCommandLineParamsAdapterComp::GetParameterCount()
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CCommandLineParamsAdapterComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+void CCommandLineParamsAdapterComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	istd::CChangeGroup group(this);
 

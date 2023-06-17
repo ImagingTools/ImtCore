@@ -132,12 +132,12 @@ imtbase::ICollectionInfo::Ids CSimpleReferenceCollection::GetElementIds(
 
 
 bool CSimpleReferenceCollection::GetSubsetInfo(
-			imtbase::ICollectionInfo& subsetInfo,
-			int offset,
-			int count,
-			const iprm::IParamsSet* selectionParamsPtr,
-			const Id& parentId,
-			int iterationFlags) const
+			imtbase::ICollectionInfo& /*subsetInfo*/,
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			const Id& /*parentId*/,
+			int /*iterationFlags*/) const
 {
 	return false;
 }

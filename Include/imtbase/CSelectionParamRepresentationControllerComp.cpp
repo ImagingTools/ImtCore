@@ -25,7 +25,10 @@ bool CSelectionParamRepresentationControllerComp::IsModelSupported(const istd::I
 }
 
 
-bool CSelectionParamRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
+bool CSelectionParamRepresentationControllerComp::GetRepresentationFromDataModel(
+			const istd::IChangeable& dataModel,
+			CTreeItemModel& representation,
+			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (!IsModelSupported(dataModel)){
 		return false;

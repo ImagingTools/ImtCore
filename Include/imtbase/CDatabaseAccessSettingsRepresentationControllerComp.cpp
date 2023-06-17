@@ -24,7 +24,10 @@ bool CDatabaseAccessSettingsRepresentationControllerComp::IsModelSupported(const
 }
 
 
-bool CDatabaseAccessSettingsRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
+bool CDatabaseAccessSettingsRepresentationControllerComp::GetRepresentationFromDataModel(
+			const istd::IChangeable& dataModel,
+			CTreeItemModel& representation,
+			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (!IsModelSupported(dataModel)){
 		return false;

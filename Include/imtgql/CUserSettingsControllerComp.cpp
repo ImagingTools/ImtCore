@@ -17,7 +17,9 @@ namespace imtgql
 
 // reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-imtbase::CTreeItemModel* CUserSettingsControllerComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CUserSettingsControllerComp::CreateRepresentationFromRequest(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& /*errorMessage*/) const
 {
 	if (!m_userSettingsRepresentationControllerCompPtr.IsValid()){
 		return nullptr;
@@ -77,7 +79,9 @@ imtbase::CTreeItemModel* CUserSettingsControllerComp::CreateRepresentationFromRe
 }
 
 
-bool CUserSettingsControllerComp::UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const
+bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
+			const imtgql::CGqlRequest& request,
+			imtbase::CTreeItemModel* representationPtr) const
 {
 	if (!m_userSettingsRepresentationControllerCompPtr.IsValid()){
 		return false;

@@ -22,8 +22,8 @@ namespace imtgql
 // reimplemented (imtrest::IRequestServlet)
 
 imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
-		const QByteArray& commandId,
-		const imtrest::IRequest::CommandParams& commandParams,
+		const QByteArray& /*commandId*/,
+		const imtrest::IRequest::CommandParams& /*commandParams*/,
 		const HeadersMap& headers,
 		const imtrest::CHttpRequest& request) const
 {
@@ -32,8 +32,8 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 	if (!gqlRequest.ParseQuery(request.GetBody(), errorPosition)){
 		qCritical() << __FILE__ << __LINE__ << QString("Error when parsing request: %1; Error position: %2")
-					   .arg(qPrintable(request.GetBody()))
-					   .arg(errorPosition);
+					.arg(qPrintable(request.GetBody()))
+					.arg(errorPosition);
 	}
 
 	QByteArray accessToken = headers.value("X-authentication-token");
@@ -146,19 +146,19 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 // private methods
 
 imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::CreateResponse(
-		const imtrest::IProtocolEngine::StatusCode& statusCode,
-		const QByteArray& payload,
-		const imtrest::IRequest& request,
-		const QByteArray& contentTypeId) const
+			const imtrest::IProtocolEngine::StatusCode& statusCode,
+			const QByteArray& payload,
+			const imtrest::IRequest& request,
+			const QByteArray& contentTypeId) const
 {
 	return imtrest::IRequestServlet::ConstResponsePtr(request.GetProtocolEngine().CreateResponse(request, statusCode, payload, contentTypeId));
 }
 
 
 imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::GenerateError(
-		const imtrest::IProtocolEngine::StatusCode& errorCode,
-		const QString& errorString,
-		const imtrest::CHttpRequest& request) const
+			const imtrest::IProtocolEngine::StatusCode& errorCode,
+			const QString& /*errorString*/,
+			const imtrest::CHttpRequest& request) const
 {
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
@@ -169,10 +169,10 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::GenerateErro
 	QByteArray responseJson;
 	return imtrest::IRequestServlet::ConstResponsePtr(
 				engine.CreateResponse(
-					request,
-					errorCode,
-					responseJson,
-					QByteArray("application/json;charset=utf-8")));
+							request,
+							errorCode,
+							responseJson,
+							QByteArray("application/json;charset=utf-8")));
 }
 
 
