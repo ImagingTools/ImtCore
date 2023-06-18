@@ -112,3 +112,5 @@ StateMachine 1.0 ./AuxComponents/StateMachine.qml
 TreeViewModelAdapter 1.0 ./AuxComponents/TreeViewModelAdapter.qml
 TreeItemModelObserver 1.0 ./AuxComponents/TreeItemModelObserver.qml
 TreeItemModelConverter 1.0 ./AuxComponents/TreeItemModelConverter.qml
+
+SingleDocumentWorkspaceView 1.0 ./AuxComponents/SingleDocumentWorkspaceView.qml

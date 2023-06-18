@@ -105,7 +105,7 @@ void CHttpRootServletComp::OnComponentCreated()
 			QByteArray registeredCommandId = m_commandIdsAttrPtr[i];
 			IRequestServlet* handlerPtr = m_requestHandlersCompPtr[i];
 
-			if ((handlerPtr != nullptr) && !registeredCommandId.isEmpty()){
+			if ((handlerPtr != nullptr)){
 				m_handlersMap[registeredCommandId] = handlerPtr;
 			}
 		}

@@ -8,6 +8,7 @@
         <file alias="imtauthgui/AccountEditorCommandsDelegate.qml">Qml/imtauthgui/AccountEditorCommandsDelegate.qml</file>
         <file alias="imtauthgui/AccountCollectionViewCommandsDelegate.qml">Qml/imtauthgui/AccountCollectionViewCommandsDelegate.qml</file>
         <file alias="imtauthgui/AdministrationView.qml">Qml/imtauthgui/AdministrationView.qml</file>
+        <file alias="imtauthgui/AdministrationUi.qml">Qml/imtauthgui/AdministrationUi.qml</file>
         <file alias="imtauthgui/RoleCollectionView.qml">Qml/imtauthgui/RoleCollectionView.qml</file>
         <file alias="imtauthgui/RoleEditor.qml">Qml/imtauthgui/RoleEditor.qml</file>
         <file alias="imtauthgui/RoleView.qml">Qml/imtauthgui/RoleView.qml</file>
@@ -28,11 +29,11 @@
         <file alias="imtauthgui/RolesDialogBody.qml">Qml/imtauthgui/RolesDialogBody.qml</file>
         <file alias="imtauthgui/PermissionsProvider.qml">Qml/imtauthgui/PermissionsProvider.qml</file>
         <file alias="imtauthgui/RolesProvider.qml">Qml/imtauthgui/RolesProvider.qml</file>
-	<file alias="imtauthgui/UserGroupView.qml">Qml/imtauthgui/UserGroupView.qml</file>
-	<file alias="imtauthgui/GroupEditor.qml">Qml/imtauthgui/GroupEditor.qml</file>
-	<file alias="imtauthgui/GroupRoles.qml">Qml/imtauthgui/GroupRoles.qml</file>
-	<file alias="imtauthgui/UserGroups.qml">Qml/imtauthgui/UserGroups.qml</file>
-	<file alias="imtauthgui/GroupUsers.qml">Qml/imtauthgui/GroupUsers.qml</file>
+        <file alias="imtauthgui/UserGroupView.qml">Qml/imtauthgui/UserGroupView.qml</file>
+        <file alias="imtauthgui/GroupEditor.qml">Qml/imtauthgui/GroupEditor.qml</file>
+        <file alias="imtauthgui/GroupRoles.qml">Qml/imtauthgui/GroupRoles.qml</file>
+        <file alias="imtauthgui/UserGroups.qml">Qml/imtauthgui/UserGroups.qml</file>
+        <file alias="imtauthgui/GroupUsers.qml">Qml/imtauthgui/GroupUsers.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>
