@@ -215,7 +215,8 @@ QtObject {
                 }
 
                 dataModelLocal = gqlModelBaseContainer.objectViewModel.GetData("data");
-
+                if(!dataModelLocal)
+                    return;
                 if (dataModelLocal.ContainsKey(gqlModelBaseContainer.gqlModelObjectView)){
                     dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelObjectView);
 

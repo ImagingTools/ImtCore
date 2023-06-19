@@ -259,9 +259,9 @@ bool CAddressElementDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsS
 {
     QString objectFilterQuery;
     bool retVal = CreateObjectFilterQuery(filterParams, objectFilterQuery);
-   // if (!retVal){
-	//    return false;
-	//}
+	if (!retVal){
+		return false;
+	}
 
     QString textFilterQuery;
     QString parentIdFilterQuery;
