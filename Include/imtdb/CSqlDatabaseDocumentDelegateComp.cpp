@@ -32,7 +32,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(const QByteArray&
 		QString baseQuery = GetBaseSelectionQuery();
 
 		return QString(
-			baseQuery + QString(" AND \"%1\".Id = '%2'").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(objectId))).toLocal8Bit();
+			baseQuery + QString(" AND \"%1\".\"Id\" = '%2'").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(objectId))).toLocal8Bit();
 	}
 
 	return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
@@ -93,7 +93,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 			QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8() : proposedObjectId;
 			QByteArray revisionUuid = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 
-			retVal.query = QString("INSERT INTO \"%1\"(Id, %2, Name, Description, Added, LastRevisionId) VALUES('%3', '%4', '%5', '%6', '%7', '%8');")
+			retVal.query = QString("INSERT INTO \"%1\"(\"Id\", \"%2\", \"Name\", \"Description\", \"Added\", \"LastRevisionId\") VALUES('%3', '%4', '%5', '%6', '%7', '%8');")
 						.arg(qPrintable(*m_tableNameAttrPtr))
 						.arg(qPrintable(*m_objectTypeIdColumnAttrPtr))
 						.arg(qPrintable(objectId))
@@ -106,7 +106,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 
 			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 
-			retVal.query += QString("INSERT INTO \"%1\"(Id, %2, %3, RevisionNumber, Comment, LastModified, Checksum) VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
+			retVal.query += QString("INSERT INTO \"%1\"(\"Id\", \"%2\", \"%3\", \"RevisionNumber\", \"Comment\", \"LastModified\", \"Checksum\") VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 				.arg(qPrintable(s_documentIdColumn))
 				.arg(qPrintable(*m_documentContentColumnIdAttrPtr))
@@ -124,7 +124,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 				if (metaInfoPtr.IsValid()){
 					retVal.query += "\n";
 
-					QByteArrayList columnIds = {s_idColumn, "RevisionId"};
+					QByteArrayList columnIds = {"\"" + s_idColumn + "\"", "\"RevisionId\""};
 					columnIds += m_metaInfoTableDelegateCompPtr->GetColumnIds();
 
 					QStringList tableValues;
@@ -164,7 +164,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId) const
 {
-	QByteArray retVal = QString("DELETE FROM \"%1\" WHERE %2 = '%3';").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(s_idColumn)).arg(qPrintable(objectId)).toLocal8Bit();
+	QByteArray retVal = QString("DELETE FROM \"%1\" WHERE \"%2\" = '%3';").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(s_idColumn)).arg(qPrintable(objectId)).toLocal8Bit();
 
 	return retVal;
 }
@@ -178,7 +178,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 			bool /*useExternDelegate*/) const
 {
 	// Get number of the revisions of the document in the database:
-	QByteArray countRevisionsQuery = QString("SELECT COUNT(*) FROM \"%1\" WHERE %2 = '%3';")
+	QByteArray countRevisionsQuery = QString("SELECT COUNT(*) FROM \"%1\" WHERE \"%2\" = '%3';")
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 				.arg(qPrintable(s_documentIdColumn))
 				.arg(qPrintable(objectId)).toUtf8();
@@ -207,14 +207,14 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 		QByteArray revisionUuid = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 
-		retVal = QString("UPDATE \"%1\" SET LastRevisionId = '%2' WHERE %3 = '%4';")
+		retVal = QString("UPDATE \"%1\" SET \"LastRevisionId\" = '%2' WHERE \"%3\" = '%4';")
 					.arg(qPrintable(*m_tableNameAttrPtr))
 					.arg(qPrintable(revisionUuid))
 					.arg(qPrintable(s_idColumn))
 					.arg(qPrintable(objectId))
 					.toLocal8Bit();
 
-		retVal += QString("INSERT INTO \"%1\"(Id, %2, %3, RevisionNumber, Comment, LastModified, Checksum) VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
+		retVal += QString("INSERT INTO \"%1\"(\"Id\", \"%2\", \"%3\", \"RevisionNumber\", \"Comment\", \"LastModified\", \"Checksum\") VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
 					.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 					.arg(qPrintable(s_documentIdColumn))
 					.arg(qPrintable(*m_documentContentColumnIdAttrPtr))
@@ -232,7 +232,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 			if (metaInfoPtr.IsValid()){
 				retVal += "\n";
 
-				QByteArrayList columnIds = { s_idColumn, "RevisionId" };
+				QByteArrayList columnIds = { "\"" + s_idColumn + "\"", "\"RevisionId\"" };
 				columnIds += m_metaInfoTableDelegateCompPtr->GetColumnIds();
 
 				QStringList tableValues;
@@ -265,7 +265,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRenameObjectQuery(
 			const QByteArray& objectId,
 			const QString& newObjectName) const
 {
-	QByteArray retVal = QString("UPDATE \"%1\" SET Name = '%2' WHERE %3 = '%4';")
+	QByteArray retVal = QString("UPDATE \"%1\" SET \"Name\" = '%2' WHERE \"%3\" = '%4';")
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(newObjectName)
 				.arg(qPrintable(s_idColumn))
@@ -301,7 +301,7 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateComp:
 		return imtbase::IRevisionController::RevisionInfoList();
 	}
 
-	QString revisionListQuery = QString("SELECT revisionnumber, lastmodified, comment from \"%1\" WHERE %2 = '%3'")
+	QString revisionListQuery = QString("SELECT \"RevisionNumber\", \"LastModified\", \"Comment\" from \"%1\" WHERE \"%2\" = '%3'")
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 				.arg(qPrintable(s_documentIdColumn))
 				.arg(qPrintable(objectId));
@@ -320,16 +320,16 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateComp:
 		QSqlRecord revisionRecord = sqlQuery.record();
 		RevisionInfo revisionInfo;
 
-		if (revisionRecord.contains("revisionnumber")){
-			revisionInfo.revision = revisionRecord.value("revisionnumber").toLongLong();
+		if (revisionRecord.contains("RevisionNumber")){
+			revisionInfo.revision = revisionRecord.value("RevisionNumber").toLongLong();
 		}
 
-		if (revisionRecord.contains("lastmodified")){
-			revisionInfo.timestamp = revisionRecord.value("lastmodified").toDateTime();
+		if (revisionRecord.contains("LastModified")){
+			revisionInfo.timestamp = revisionRecord.value("LastModified").toDateTime();
 		}
 
-		if (revisionRecord.contains("comment")){
-			revisionInfo.comment = revisionRecord.value("comment").toString();
+		if (revisionRecord.contains("Comment")){
+			revisionInfo.comment = revisionRecord.value("Comment").toString();
 		}
 
 		revisionInfo.isRevisionAvailable = true;
@@ -358,21 +358,21 @@ int CSqlDatabaseDocumentDelegateComp::BackupObject(
 		return -1;
 	}
 
-	QByteArray lastRevisionQuery = QString("SELECT %1 from \"%2\" WHERE %1 in (SELECT lastrevisionid from \"%3\" WHERE %1 = '%4')")
+	QByteArray lastRevisionQuery = QString("SELECT \"%1\" from \"%2\" WHERE \"%1\" in (SELECT \"LastRevisionId\" from \"%3\" WHERE \"%1\" = '%4')")
 				.arg(qPrintable(s_idColumn))
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(qPrintable(objectId))
 				.toLocal8Bit();
 
-	QByteArray lastRevisionNumberQuery = QString("SELECT revisionnumber from \"%2\" WHERE %1 in (SELECT lastrevisionid from \"%3\" WHERE %1 = '%4')")
+	QByteArray lastRevisionNumberQuery = QString("SELECT \"RevisionNumber\" from \"%2\" WHERE \"%1\" in (SELECT \"LastRevisionId\" from \"%3\" WHERE \"%1\" = '%4')")
 				.arg(qPrintable(s_idColumn))
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(qPrintable(objectId))
 				.toLocal8Bit();
 
-	QByteArray updateCommentQuery = QString("UPDATE \"%1\" SET comment = '%2' WHERE %3 in (%4)")
+	QByteArray updateCommentQuery = QString("UPDATE \"%1\" SET \"Comment\" = '%2' WHERE \"%3\" in (%4)")
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 				.arg(userComment)
 				.arg(qPrintable(s_idColumn))
@@ -384,8 +384,8 @@ int CSqlDatabaseDocumentDelegateComp::BackupObject(
 	QSqlQuery queryResult = m_databaseEngineCompPtr->ExecSqlQuery(lastRevisionNumberQuery);
 	if (queryResult.next()){
 		QSqlRecord record = queryResult.record();
-		if (record.contains("revisionnumber")){
-			return record.value("revisionnumber").toInt();
+		if (record.contains("RevisionNumber")){
+			return record.value("RevisionNumber").toInt();
 		}
 	}
 
@@ -406,7 +406,7 @@ bool CSqlDatabaseDocumentDelegateComp::RestoreObject(
 		return false;
 	}
 
-	QString revisionIdQuery  = QString("SELECT %5 from \"%1\" WHERE %2 = '%3' AND revisionNumber = %4")
+	QString revisionIdQuery  = QString("SELECT \"%5\" from \"%1\" WHERE \"%2\" = '%3' AND \"RevisionNumber\" = %4")
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 				.arg(qPrintable(s_documentIdColumn))
 				.arg(qPrintable(objectId))
@@ -426,7 +426,7 @@ bool CSqlDatabaseDocumentDelegateComp::RestoreObject(
 		return false;
 	}
 
-	QString setActiveRevisionQuery = QString("UPDATE \"%1\" SET LastRevisionId = '%2' WHERE %3 = '%4';")
+	QString setActiveRevisionQuery = QString("UPDATE \"%1\" SET \"LastRevisionId\" = '%2' WHERE \"%3\" = '%4';")
 		.arg(qPrintable(*m_tableNameAttrPtr))
 		.arg(qPrintable(revisionUuid))
 		.arg(qPrintable(s_idColumn))
@@ -600,12 +600,12 @@ QString CSqlDatabaseDocumentDelegateComp::GetBaseSelectionQuery() const
 			metaInfoValuesQuery += QString(", \"%1\".%2").arg(qPrintable(*m_metaInfoTableNameAttrPtr)).arg(qPrintable(columnIds[i]));
 		}
 
-		joinMetaInfoQuery = QString("JOIN \"%1\" ON \"%2\".LastRevisionId = \"%1\".RevisionId")
+		joinMetaInfoQuery = QString("JOIN \"%1\" ON \"%2\".\"LastRevisionId\" = \"%1\".\"RevisionId\"")
 				.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
 				.arg(qPrintable(*m_tableNameAttrPtr));
 	}
 
-	return QString("SELECT \"%1\".*, \"%2\".document, \"%2\".lastmodified, \"%2\".checksum, \"%2\".RevisionNumber, \"%2\".Comment %3 FROM \"%1\" JOIN \"%2\" ON \"%1\".LastRevisionId = \"%2\".Id %4")
+	return QString("SELECT \"%1\".*, \"%2\".\"Document\", \"%2\".\"LastModified\", \"%2\".\"Checksum\", \"%2\".\"RevisionNumber\", \"%2\".\"Comment\" %3 FROM \"%1\" JOIN \"%2\" ON \"%1\".\"LastRevisionId\" = \"%2\".\"Id\" %4")
 		.arg(qPrintable(*m_tableNameAttrPtr))
 		.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 		.arg(metaInfoValuesQuery)
@@ -622,7 +622,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const iprm::IPara
 	if (collectionFilterParamPtr.IsValid()){
 		QByteArray typeId = collectionFilterParamPtr->GetObjectTypeId();
 
-		filterQuery = QString("TypeId = '%1'").arg(qPrintable(typeId)).toLocal8Bit();
+		filterQuery = QString("\"TypeId\" = '%1'").arg(qPrintable(typeId)).toLocal8Bit();
 	}
 
 	return true;
@@ -641,7 +641,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectInfoFromRecord(
 
 	QByteArray objectId = record.value(qPrintable(s_idColumn)).toByteArray();
 
-	QByteArray sqlMetaInfoQuery = QString("SELECT * FROM \"%1\" WHERE RevisionId = (SELECT lastRevisionId FROM \"%3\" WHERE Id = '%2')")
+	QByteArray sqlMetaInfoQuery = QString("SELECT * FROM \"%1\" WHERE \"RevisionId\" = (SELECT \"LastRevisionId\" FROM \"%3\" WHERE \"Id\" = '%2')")
 				.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
 				.arg(qPrintable(objectId))
 				.arg(qPrintable(*m_tableNameAttrPtr))

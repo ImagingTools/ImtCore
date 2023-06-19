@@ -16,7 +16,7 @@ QByteArrayList CStandardSqlMetaInfoTableDelegateComp::GetColumnIds() const
 	QByteArrayList retVal;
 
 	for (const QPair<int, QByteArray>& item : m_metaInfoIds){
-		retVal += item.second;
+		retVal += QByteArray("\"") + item.second + QByteArray("\"");
 	}
 
 	return retVal;
@@ -25,8 +25,13 @@ QByteArrayList CStandardSqlMetaInfoTableDelegateComp::GetColumnIds() const
 
 int CStandardSqlMetaInfoTableDelegateComp::GetMetaInfoType(const QByteArray& columnId) const
 {
+	QString temp = columnId;
+	temp.remove("\"");
+
+	QByteArray metaInfoId = temp.toLocal8Bit();
+	
 	for (const QPair<int, QByteArray>& item : m_metaInfoIds){
-		if (item.second == columnId){
+		if (item.second == metaInfoId){
 			return item.first;
 		}
 	}
