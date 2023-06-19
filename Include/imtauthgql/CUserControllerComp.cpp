@@ -21,13 +21,29 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(const imtgql::CGqlReques
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
+	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
+
+	QByteArray productId;
+	if (!paramsPtr.empty()){
+		productId = paramsPtr.at(0).GetFieldArgumentValue("ProductId").toByteArray();
+	}
+
+	const QList<imtgql::CGqlObject> fieldsPtr = gqlRequest.GetFields();
+
+	QByteArrayList allFields;
+	for (const imtgql::CGqlObject& object : fieldsPtr){
+		QByteArrayList fields = object.GetFieldIds();
+
+		allFields += fields;
+	}
+
 	dataModel->SetData("UserId", "");
 	dataModel->SetData("Username", "");
 	dataModel->SetData("Name", "");
 	dataModel->SetData("Password", "");
 	dataModel->SetData("Email", "");
 
-	QByteArray userId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
+	QByteArray userId = GetObjectIdFromInputParams(paramsPtr);
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(userId, dataPtr)){
@@ -38,7 +54,7 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(const imtgql::CGqlReques
 			QString name = userInfoPtr->GetName();
 			QByteArray passwordHash = userInfoPtr->GetPasswordHash();
 			QString mail = userInfoPtr->GetMail();
-			QByteArray roles = userInfoPtr->GetRoles().join(';');
+			QByteArray roles = userInfoPtr->GetRoles(productId).join(';');
 			QByteArray groups = userInfoPtr->GetGroups().join(';');
 
 			dataModel->SetData("Id", objectUuid);
@@ -48,6 +64,11 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(const imtgql::CGqlReques
 			dataModel->SetData("Email", mail);
 			dataModel->SetData("Groups", groups);
 			dataModel->SetData("Roles", roles);
+
+			if (allFields.contains("Permissions")){
+				QByteArray permissions = userInfoPtr->GetPermissions(productId).join(';');
+				dataModel->SetData("Permissions", permissions);
+			}
 		}
 	}
 
@@ -72,6 +93,11 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 	objectId = GetObjectIdFromInputParams(inputParams);
 	if (objectId.isEmpty()){
 		objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	}
+
+	QByteArray productId;
+	if (!inputParams.empty()){
+		productId = inputParams.at(0).GetFieldArgumentValue("ProductId").toByteArray();
 	}
 
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
@@ -135,13 +161,18 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 		}
 
 		bool calculate = true;
+		const imtauth::IUserInfo* currentuserInfoPtr = nullptr;
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-			const imtauth::IUserInfo* currentuserInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+			currentuserInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
 			if (currentuserInfoPtr != nullptr){
 				QByteArray currentPasswordHash = currentuserInfoPtr->GetPasswordHash();
 				if (currentPasswordHash == password){
 					calculate = false;
+				}
+
+				for (const QByteArray& productId : currentuserInfoPtr->GetProducts()){
+					userInfoPtr->SetRoles(productId, currentuserInfoPtr->GetRoles(productId));
 				}
 			}
 		}
@@ -161,26 +192,31 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 
 		if (itemModel.ContainsKey("Permissions")){
 			imtbase::CTreeItemModel* permissionsModel = itemModel.GetTreeItemModel("Permissions");
-			imtauth::IUserInfo::FeatureIds permissions;
+			if (permissionsModel != nullptr){
+				imtauth::IUserInfo::FeatureIds permissions;
 
-			for(int index = 0; index < permissionsModel->GetItemsCount(); index++){
-				QByteArray featureId;
-				if (permissionsModel->ContainsKey("PermissionId")){
-					featureId = permissionsModel->GetData("PermissionId", index).toByteArray();
-					if (!featureId.isEmpty()){
-						permissions << featureId;
+				for(int index = 0; index < permissionsModel->GetItemsCount(); index++){
+					QByteArray featureId;
+					if (permissionsModel->ContainsKey("PermissionId", index)){
+						featureId = permissionsModel->GetData("PermissionId", index).toByteArray();
+						if (!featureId.isEmpty()){
+							permissions << featureId;
+						}
 					}
 				}
-			}
 
-			userInfoPtr->SetLocalPermissions(permissions);
+				userInfoPtr->SetLocalPermissions(productId, permissions);
+			}
 		}
 
 		if (itemModel.ContainsKey("Roles")){
 			QByteArray roles = itemModel.GetData("Roles").toByteArray();
 			if (!roles.isEmpty()){
 				QByteArrayList roleIds = roles.split(';');
-				userInfoPtr->SetRoles(roleIds);
+				userInfoPtr->SetRoles(productId, roleIds);
+			}
+			else{
+				userInfoPtr->RemoveProduct(productId);
 			}
 		}
 
@@ -200,6 +236,73 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 	errorMessage = QObject::tr("Can not create user: %1").arg(QString(objectId));
 
 	return nullptr;
+}
+
+
+imtbase::CTreeItemModel* CUserControllerComp::DeleteObject(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	if (!m_objectCollectionCompPtr.IsValid()){
+		errorMessage = "No collection component was set";
+
+		return nullptr;
+	}
+
+	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+
+	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
+	if (objectId.isEmpty()){
+		errorMessage = QObject::tr("No object-ID could not be extracted from the request");
+
+		return nullptr;
+	}
+
+	QByteArray removedUserId;
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+		if (userInfoPtr != nullptr){
+			removedUserId = userInfoPtr->GetId();
+		}
+	}
+
+	if (!removedUserId.isEmpty()){
+		imtgql::IGqlContext* contextPtr = gqlRequest.GetGqlContext();
+		if (contextPtr != nullptr){
+			const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
+			if (userInfoPtr != nullptr){
+				QByteArray userId = userInfoPtr->GetId();
+				if (removedUserId == userId){
+					errorMessage = QObject::tr("It is not possible to delete a user");
+
+					return nullptr;
+				}
+			}
+		}
+	}
+
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+
+	if (m_objectCollectionCompPtr->RemoveElement(objectId)){
+		imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
+		imtbase::CTreeItemModel* notificationModel = new imtbase::CTreeItemModel();
+
+		notificationModel->SetData("Id", objectId);
+		dataModel->SetExternTreeModel("removedNotification", notificationModel);
+
+		rootModelPtr->SetExternTreeModel("data", dataModel);
+	}
+	else{
+		errorMessage = QObject::tr("Can't remove object: %1").arg(QString(objectId));
+	}
+
+	if (!errorMessage.isEmpty()){
+		imtbase::CTreeItemModel* errorsModel = rootModelPtr->AddTreeModel("errors");
+		errorsModel->SetData("message", errorMessage);
+	}
+
+	return rootModelPtr.PopPtr();
 }
 
 

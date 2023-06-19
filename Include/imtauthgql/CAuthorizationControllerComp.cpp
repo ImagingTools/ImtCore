@@ -17,27 +17,21 @@ namespace imtauthgql
 imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
 	if (m_userCollectionCompPtr.IsValid()){
 		QByteArray login;
 		QByteArray password;
 
-		const QList<imtgql::CGqlObject>* paramList = gqlRequest.GetParams();
-		if (paramList == nullptr){
-			return nullptr;
-		}
+		const QList<imtgql::CGqlObject> paramList = gqlRequest.GetParams();
 
-		if (!paramList->isEmpty()){
-			const imtgql::CGqlObject& object = paramList->at(0);
-
-			QByteArrayList fieldIds = object.GetFieldIds();
-
-			if (fieldIds.contains("Login")){
-				login = object.GetFieldArgumentValue("Login").toByteArray();
+		if (!paramList.isEmpty()){
+			if (paramList.at(0).GetFieldIds().contains("Login")){
+				login = paramList.at(0).GetFieldArgumentValue("Login").toByteArray();
 			}
 
-			if (fieldIds.contains("Password")){
-				password = object.GetFieldArgumentValue("Password").toByteArray();
+			if (paramList.at(0).GetFieldIds().contains("Password")){
+				password = paramList.at(0).GetFieldArgumentValue("Password").toByteArray();
 			}
 		}
 
@@ -55,12 +49,10 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 					if (userInfoPtr->GetId() == login){
 						QByteArray userPassword = userInfoPtr->GetPasswordHash();
 						if (userPassword == passwordHash){
-							imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
-
 							QByteArray tokenValue = QUuid::createUuid().toByteArray();
 
-							dataModel->SetData("Token", tokenValue);
-							dataModel->SetData("Login", login);
+							dataModelPtr->SetData("Token", tokenValue);
+							dataModelPtr->SetData("Login", login);
 
 							istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr = new imtauth::CSessionInfo();
 
@@ -70,8 +62,6 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 							if (m_sessionCollectionCompPtr.IsValid()){
 								m_sessionCollectionCompPtr->InsertNewObject("", "", "", sessionInfoPtr.PopPtr(), tokenValue);
 							}
-
-							rootModelPtr->SetExternTreeModel("data", dataModel);
 
 							return rootModelPtr.PopPtr();
 						}
@@ -84,7 +74,6 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 	errorMessage = QT_TR_NOOP("Invalid username or password");
 
 	imtbase::CTreeItemModel* errorsItemModelPtr = rootModelPtr->AddTreeModel("errors");
-	rootModelPtr->SetExternTreeModel("errors", errorsItemModelPtr);
 	errorsItemModelPtr->SetData("message", errorMessage);
 
 	return rootModelPtr.PopPtr();

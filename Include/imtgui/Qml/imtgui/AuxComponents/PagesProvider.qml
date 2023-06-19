@@ -22,6 +22,10 @@ Item {
             console.log("PagesProvider updateModel PagesData");
             var query = Gql.GqlRequest("query", "PagesData");
 
+//            var inputParams = Gql.GqlObject("input");
+//            inputParams.InsertField("ProductId", window.productId);
+//            query.AddParam(inputParams);
+
             var queryFields = Gql.GqlObject("items");
             queryFields.InsertField("PageId");
             queryFields.InsertField("Name");
@@ -31,6 +35,8 @@ Item {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
+
+            console.log("gqlData", gqlData);
 
             this.SetGqlQuery(gqlData)
         }

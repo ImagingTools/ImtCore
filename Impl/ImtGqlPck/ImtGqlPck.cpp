@@ -64,6 +64,21 @@ I_EXPORT_COMPONENT(
 			"GraphQl based object collection",
 			"GraphQl Gql Object Collection");
 
+I_EXPORT_COMPONENT(
+			GqlContextCacheController,
+			"GraphQl context cache controller",
+			"GraphQl Gql GQL Object Context Cache Controller");
+
+I_EXPORT_COMPONENT(
+			RemoteGqlContextController,
+			"Remote gql context controller",
+			"Remote Gql Context Controller");
+
+I_EXPORT_COMPONENT(
+			GqlContextController,
+			"Gql context controller",
+			"Gql Context Controller");
+
 
 } // namespace ImtGqlPck
 

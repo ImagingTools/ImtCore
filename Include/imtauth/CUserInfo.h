@@ -25,8 +25,8 @@ public:
 	virtual IUserGroupInfo::GroupIds GetGroups() const override;
 	virtual void AddToGroup(const QByteArray& groupId) override;
 	virtual bool RemoveFromGroup(const QByteArray& groupId) override;
-	virtual RoleIds GetRoles() const override;
-	virtual FeatureIds GetPermissions() const override;
+	virtual RoleIds GetRoles(const QByteArray& productId) const override;
+	virtual FeatureIds GetPermissions(const QByteArray& productId = QByteArray()) const override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;

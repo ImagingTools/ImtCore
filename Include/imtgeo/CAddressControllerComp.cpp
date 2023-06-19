@@ -24,7 +24,7 @@ imtbase::CTreeItemModel* CAddressControllerComp::GetObject(
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
-	QByteArray addressId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
+	QByteArray addressId = GetObjectIdFromInputParams(gqlRequest.GetParams());
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(addressId, dataPtr)){
@@ -111,9 +111,9 @@ imtbase::CTreeItemModel* CAddressControllerComp::InsertObject(
     }
     else{
         QByteArray objectId;
-		const QList<imtgql::CGqlObject>* inputParams = gqlRequest.GetParams();
+		const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
 
-		istd::IChangeable* newObject = CreateObject(*inputParams, objectId, name, description, errorMessage);
+		istd::IChangeable* newObject = CreateObject(inputParams, objectId, name, description, errorMessage);
 
 		if (newObject != nullptr){
             newObjectId = m_objectCollectionCompPtr->InsertNewObject("", name, description, newObject, objectId);
@@ -241,9 +241,9 @@ imtbase::CTreeItemModel* CAddressControllerComp::UpdateObject(
     imtbase::CTreeItemModel* dataModel = nullptr;
     imtbase::CTreeItemModel* notificationModel = nullptr;
 
-	const QList<imtgql::CGqlObject>* inputParams = gqlRequest.GetParams();
+	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
 
-	QByteArray oldObjectId = inputParams->at(0).GetFieldArgumentValue("Id").toByteArray();
+	QByteArray oldObjectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
     QByteArray newObjectId;
     QString name, description;
 
@@ -268,7 +268,7 @@ imtbase::CTreeItemModel* CAddressControllerComp::UpdateObject(
             QByteArrayList filteringOnSerialIdInfoIds;
             filteringOnSerialIdInfoIds << "Indexes";
             filterOnSerialId.SetFilteringInfoIds(filteringOnSerialIdInfoIds);
-			istd::IChangeable* savedObject = CreateObject(*inputParams, newObjectId, name, description, errorMessage);
+			istd::IChangeable* savedObject = CreateObject(inputParams, newObjectId, name, description, errorMessage);
             if (savedObject != nullptr){
                 if (m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject) == false){
                     errorMessage = QObject::tr("Can not update object: %1").arg(splitObjectId);
@@ -316,7 +316,7 @@ imtbase::CTreeItemModel* CAddressControllerComp::DeleteObject(
 		return nullptr;
     }
 
-	QByteArray objectId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
+	QByteArray objectId = GetObjectIdFromInputParams(gqlRequest.GetParams());
     if (objectId.isEmpty()){
         errorMessage = QObject::tr("No object-ID could not be extracted from the request");
 

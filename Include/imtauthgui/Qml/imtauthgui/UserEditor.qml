@@ -28,6 +28,13 @@ Item {
         console.log("UserEditor onUndoRedoManagerChanged", undoRedoManager);
     }
 
+    function blockEditing(){
+        usernameInput.readOnly = true;
+        nameInput.readOnly = true;
+        mailInput.readOnly = true;
+        passwordInput.readOnly = true;
+    }
+
     function updateGui(){
         console.log("UserEditor updateGui");
 

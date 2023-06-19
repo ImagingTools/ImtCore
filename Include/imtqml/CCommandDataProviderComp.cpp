@@ -15,12 +15,12 @@ namespace imtqml
 
 imtbase::CTreeItemModel* CCommandDataProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	const QList<imtgql::CGqlObject>* fieldsPtr = gqlRequest.GetFields();
+	const QList<imtgql::CGqlObject> fieldsPtr = gqlRequest.GetFields();
 
 	QByteArrayList fieldsList;
-	for (int i = 0; i < fieldsPtr->count(); i++){
-		if (fieldsPtr->at(i).GetId() == "items"){
-			fieldsList = fieldsPtr->at(i).GetFieldIds();
+	for (int i = 0; i < fieldsPtr.count(); i++){
+		if (fieldsPtr.at(i).GetId() == "items"){
+			fieldsList = fieldsPtr.at(i).GetFieldIds();
 			break;
 		}
 	}

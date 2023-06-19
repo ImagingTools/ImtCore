@@ -14,6 +14,7 @@ Item {
     onDocumentModelChanged: {
         console.log("UserRoles onDocumentModelChanged", documentModel);
 
+//        rolesProvider.updateModel({"ProductId" : window.productId});
         rolesProvider.updateModel();
     }
 
@@ -21,6 +22,10 @@ Item {
         if (groupRolesContainer.visible){
             groupRolesContainer.updateGui();
         }
+    }
+
+    function blockEditing(){
+        rolesTable.readOnly = true;
     }
 
     function updateGui(){

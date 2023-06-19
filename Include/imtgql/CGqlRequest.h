@@ -21,8 +21,14 @@ public:
 	void AddSimpleField(const QByteArray& fieldId);
 	void SetGqlContext(const imtgql::IGqlContext* gqlContext);
 
-	const QList<CGqlObject>* GetFields() const;
-	const QList<CGqlObject>* GetParams() const;
+	const QList<CGqlObject> GetFields() const;
+	const QList<CGqlObject> GetParams() const;
+
+	const CGqlObject* GetField(const QByteArray& fieldId) const;
+	const CGqlObject* GetParam(const QByteArray& paramId) const;
+
+	void SetField(const CGqlObject& gqlObject);
+	void SetParam(const CGqlObject& gqlObject);
 
 	// reimplemented (IGqlRequest)
 	virtual QByteArray GetCommandId() const override;

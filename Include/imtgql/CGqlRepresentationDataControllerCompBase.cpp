@@ -31,17 +31,15 @@ imtbase::CTreeItemModel* CGqlRepresentationControllerCompBase::CreateInternalRes
 		return CreateRepresentationFromRequest(gqlRequest, errorMessage);
 	}
 	else if (requestType == imtgql::IGqlRequest::RT_MUTATION){
-		const QList<CGqlObject>* paramsPtr = gqlRequest.GetParams();
-		if (paramsPtr != nullptr){
-			if (!paramsPtr->empty()){
-				QByteArray itemData = paramsPtr->at(0).GetFieldArgumentValue("Item").toByteArray();
-				if (!itemData.isEmpty()){
-					istd::TDelPtr<imtbase::CTreeItemModel> representationPtr(new imtbase::CTreeItemModel);
-					if (representationPtr->CreateFromJson(itemData)){
-						bool result = UpdateModelFromRepresentation(gqlRequest, representationPtr.GetPtr());
-						if (result){
-							return representationPtr.PopPtr();
-						}
+		const QList<CGqlObject> paramsPtr = gqlRequest.GetParams();
+		if (!paramsPtr.empty()){
+			QByteArray itemData = paramsPtr.at(0).GetFieldArgumentValue("Item").toByteArray();
+			if (!itemData.isEmpty()){
+				istd::TDelPtr<imtbase::CTreeItemModel> representationPtr(new imtbase::CTreeItemModel);
+				if (representationPtr->CreateFromJson(itemData)){
+					bool result = UpdateModelFromRepresentation(gqlRequest, representationPtr.GetPtr());
+					if (result){
+						return representationPtr.PopPtr();
 					}
 				}
 			}

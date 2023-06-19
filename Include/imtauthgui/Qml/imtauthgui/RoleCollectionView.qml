@@ -9,14 +9,15 @@ CollectionView {
 
     hasFilter: false;
 
+    property bool newCommandIsEnabled: true;
+
     tableElementsDelegate: Component { TableProductRolesDelegate {
         width: baseCollectionView.table.width;
 
         selectedIndex: baseCollectionView.table.selectedIndex;
-
         commandsId: roleCollectionViewContainer.commandsId;
-
         baseCollectionView: roleCollectionViewContainer.baseCollectionView;
+        newIsEnabled: roleCollectionViewContainer.newCommandIsEnabled;
 
         onDoubleClicked: {
             baseCollectionView.table.tableSelection.singleSelect(index);
@@ -41,9 +42,10 @@ CollectionView {
     }
 
     onElementsChanged: {
-        let elementsModel = elementsList.model.GetData("Roles");
-        console.log('elementsModel', elementsModel.GetItemsCount())
-        baseCollectionView.table.tableSelection.countElements = elementsModel.GetItemsCount();
+        if (elementsList.model.ContainsKey("Roles")){
+            let elementsModel = elementsList.model.GetData("Roles");
+            baseCollectionView.table.tableSelection.countElements = elementsModel.GetItemsCount();
+        }
     }
 
     function getSelectedIds(){
@@ -88,5 +90,9 @@ CollectionView {
 
         let productId = elements.GetData("Id");
         documentManager.openDocument(id, {"Id": id, "ProductId": productId, "Name": name, "Source": editorPath, "CommandsId": commandsId});
+    }
+
+    function onCommandsModelChanged(){
+        roleCollectionViewContainer.newCommandIsEnabled = commandsProvider.commandExists("New");
     }
 }

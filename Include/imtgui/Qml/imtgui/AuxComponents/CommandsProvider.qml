@@ -118,6 +118,11 @@ QtObject {
     property GqlModel modelCommands: GqlModel {
         function updateModel() {
             var query = Gql.GqlRequest("query", commandsProviderContainer.commandsId + "Commands");
+
+//            var inputParams = Gql.GqlObject("input");
+//            inputParams.InsertField("ProductId", window.productId);
+//            query.AddParam(inputParams);
+
             var gqlData = query.GetQuery();
             this.SetGqlQuery(gqlData);
         }

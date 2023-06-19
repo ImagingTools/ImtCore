@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5060" Description="ACF"/>
-            <Version Id="1" Number="2181" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5068" Description="ACF"/>
+            <Version Id="1" Number="2182" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -260,10 +260,13 @@
                                     <Data IsEnabled="true" Value="RoleCommandPermissions"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
-                                    <Data IsEnabled="true" Value="User"/>
+                                    <Data IsEnabled="true" Value="Role"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="">
                                     <Data IsEnabled="true" Value="CheckPermissionOr"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                                    <Data IsEnabled="false"/>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
@@ -429,6 +432,7 @@
                                     <Data IsEnabled="true">
                                         <Values>
                                             <Value>Remove</Value>
+                                            <Value>New</Value>
                                             <Value>Edit</Value>
                                         </Values>
                                     </Data>
@@ -469,6 +473,27 @@
                             </AttributeInfoMap>
                         </Data>
                     </Element>
+                    <Element Id="New" PackageId="ImtGuiPck" ComponentId="GuiElementModel">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="IconPath" Type="Text" ExportId="">
+                                    <Data IsEnabled="true" Value="Add"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Id" Type="Id" ExportId="">
+                                    <Data IsEnabled="true" Value="New"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="IsEnabled" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="true"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="IsVisible" Type="Boolean" ExportId="">
+                                    <Data IsEnabled="true" Value="false"/>
+                                </AttributeInfo>
+                                <AttributeInfo Id="Name" Type="Text" ExportId="">
+                                    <Data IsEnabled="true" Value="New"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
+                        </Data>
+                    </Element>
                     <Element Id="Remove" PackageId="ImtGuiPck" ComponentId="GuiElementModel">
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
@@ -493,8 +518,8 @@
                                 <AttributeInfo Id="EditCommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ChangeRole</Value>
-                                            <Value>RemoveRole</Value>
+                                            <Value>ViewRoles</Value>
+                                            <Value>EditRole</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -507,6 +532,7 @@
                                 <AttributeInfo Id="NewCommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
+                                            <Value>EditRole</Value>
                                             <Value>AddRole</Value>
                                         </Values>
                                     </Data>
@@ -514,6 +540,7 @@
                                 <AttributeInfo Id="RemoveCommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
+                                            <Value>EditRole</Value>
                                             <Value>RemoveRole</Value>
                                         </Values>
                                     </Data>

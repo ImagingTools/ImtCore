@@ -16,6 +16,10 @@
 #include <imtgql/CGqlRepresentationJoinerComp.h>
 #include <imtgql/CApplicationInfoControllerComp.h>
 #include <imtgql/CGqlObjectCollectionComp.h>
+#include <imtgql/CGqlContextCacheControllerComp.h>
+#include <imtgql/CRemoteGqlContextControllerComp.h>
+#include <imtgql/CGqlContextControllerComp.h>
+
 
 
 /**
@@ -35,6 +39,9 @@ typedef imtgql::CUserSettingsControllerComp UserSettingsController;
 typedef imtgql::CGqlRepresentationJoinerComp GqlRepresentationJoiner;
 typedef imtgql::CApplicationInfoControllerComp ApplicationInfoController;
 typedef icomp::TModelCompWrap<imtgql::CGqlObjectCollectionComp> GqlObjectCollection;
+typedef imtgql::CGqlContextCacheControllerComp GqlContextCacheController;
+typedef imtgql::CRemoteGqlContextControllerComp RemoteGqlContextController;
+typedef imtgql::CGqlContextControllerComp GqlContextController;
 
 
 } // namespace ImtGqlPck

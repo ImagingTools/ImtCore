@@ -23,12 +23,19 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::GetObject(const imtgql::CGqlR
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
+	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
+
+	QByteArray productId;
+	if (!paramsPtr.empty()){
+		productId = paramsPtr.at(0).GetFieldArgumentValue("ProductId").toByteArray();
+	}
+
 	dataModel->SetData("Id", "");
 	dataModel->SetData("Name", "");
 	dataModel->SetData("Description", "");
 	dataModel->SetData("Users", "");
 
-	QByteArray userGroupId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
+	QByteArray userGroupId = GetObjectIdFromInputParams(paramsPtr);
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(userGroupId, dataPtr)){
 		imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(dataPtr.GetPtr());
@@ -48,7 +55,7 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::GetObject(const imtgql::CGqlR
 				dataModel->SetData("Users", users);
 			}
 
-			imtauth::IUserGroupInfo::RoleIds roleIds = userGroupInfoPtr->GetRoles();
+			imtauth::IUserGroupInfo::RoleIds roleIds = userGroupInfoPtr->GetRoles(productId);
 			if (!roleIds.empty()){
 				QByteArray roles = roleIds.join(';');
 				dataModel->SetData("Roles", roles);
@@ -86,6 +93,11 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 		objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 	}
 
+	QByteArray productId;
+	if (!inputParams.empty()){
+		productId = inputParams.at(0).GetFieldArgumentValue("ProductId").toByteArray();
+	}
+
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
 		istd::TDelPtr<imtauth::CIdentifiableUserGroupInfo> userGroupInfoPtr = new imtauth::CIdentifiableUserGroupInfo();
@@ -107,6 +119,16 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 			errorMessage = QT_TR_NOOP("Group Name cannot be empty");
 
 			return nullptr;
+		}
+
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+			imtauth::IUserGroupInfo* oldUserGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
+			if (oldUserGroupInfoPtr != nullptr){
+				for (const QByteArray& productId : oldUserGroupInfoPtr->GetProducts()){
+					userGroupInfoPtr->SetRoles(productId, oldUserGroupInfoPtr->GetRoles(productId));
+				}
+			}
 		}
 
 		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
@@ -150,7 +172,10 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 			if (!roles.isEmpty()){
 				QByteArrayList roleIds = roles.split(';');
 
-				userGroupInfoPtr->SetRoles(roleIds);
+				userGroupInfoPtr->SetRoles(productId, roleIds);
+			}
+			else{
+				userGroupInfoPtr->RemoveProduct(productId);
 			}
 		}
 

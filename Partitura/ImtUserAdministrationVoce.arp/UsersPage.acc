@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5060" Description="ACF"/>
-            <Version Id="1" Number="2181" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5068" Description="ACF"/>
+            <Version Id="1" Number="2182" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -80,9 +80,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserRepository">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RolesCollection" Type="Reference" ExportId="RolesCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="">
@@ -512,8 +509,8 @@
                                 <AttributeInfo Id="EditCommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
-                                            <Value>ChangeUser</Value>
-                                            <Value>RemoveUser</Value>
+                                            <Value>ViewUsers</Value>
+                                            <Value>EditUser</Value>
                                         </Values>
                                     </Data>
                                 </AttributeInfo>
@@ -526,6 +523,7 @@
                                 <AttributeInfo Id="NewCommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
+                                            <Value>EditUser</Value>
                                             <Value>AddUser</Value>
                                         </Values>
                                     </Data>
@@ -533,6 +531,7 @@
                                 <AttributeInfo Id="RemoveCommandPermissions" Type="Id[]" ExportId="">
                                     <Data IsEnabled="true">
                                         <Values>
+                                            <Value>EditUser</Value>
                                             <Value>RemoveUser</Value>
                                         </Values>
                                     </Data>

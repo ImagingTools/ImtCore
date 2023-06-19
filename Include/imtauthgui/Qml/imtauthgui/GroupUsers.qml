@@ -17,6 +17,10 @@ Item {
         usersProvider.updateModel();
     }
 
+    function blockEditing(){
+        usersTable.readOnly = true;
+    }
+
     function updateGui(){
         console.log("GroupUsers updateGui");
         groupUsersContainer.blockUpdatingModel = true;

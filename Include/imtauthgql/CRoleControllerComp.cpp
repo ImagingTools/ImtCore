@@ -19,14 +19,14 @@ imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlReques
 
 	istd::TDelPtr<imtbase::CTreeItemModel> dataModelPtr = new imtbase::CTreeItemModel();
 
-	const QList<imtgql::CGqlObject>* inputParams = gqlRequest.GetParams();
-	QByteArray objectId = GetObjectIdFromInputParams(*inputParams);
+	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 
 	dataModelPtr->SetData("Id", "");
 	dataModelPtr->SetData("Name", "");
 
-	if (!inputParams->empty()){
-		QByteArray productId = inputParams->at(0).GetFieldArgumentValue("ProductId").toByteArray();
+	if (!inputParams.empty()){
+		QByteArray productId = inputParams.at(0).GetFieldArgumentValue("ProductId").toByteArray();
 		dataModelPtr->SetData("ProductId", productId);
 	}
 
@@ -106,10 +106,20 @@ istd::IChangeable* CRoleControllerComp::CreateObject(
 		if (itemModel.ContainsKey("RoleId")){
 			roleId = itemModel.GetData("RoleId").toByteArray();
 			if (roleId.isEmpty()){
-
 				errorMessage = QT_TR_NOOP("Role-ID can't be empty!");
 				return nullptr;
 			}
+		}
+
+		QByteArray productId;
+		if (itemModel.ContainsKey("ProductId")){
+			productId = itemModel.GetData("ProductId").toByteArray();
+			if (productId.isEmpty()){
+				errorMessage = QT_TR_NOOP("Product-ID can't be empty!");
+				return nullptr;
+			}
+
+			roleInfoPtr->SetProductId(productId);
 		}
 
 		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
@@ -120,7 +130,9 @@ istd::IChangeable* CRoleControllerComp::CreateObject(
 				if (currentRoleInfoPtr != nullptr){
 					if (collectionId != objectId){
 						QByteArray currentRoleId = currentRoleInfoPtr->GetRoleId();
-						if (currentRoleId == roleId){
+						QByteArray currentProductId = currentRoleInfoPtr->GetProductId();
+
+						if (currentRoleId == roleId && currentProductId == productId){
 							errorMessage = QT_TR_NOOP("Role already exists");
 							return nullptr;
 						}
@@ -139,18 +151,6 @@ istd::IChangeable* CRoleControllerComp::CreateObject(
 		if (itemModel.ContainsKey("Description")){
 			description = itemModel.GetData("Description").toString();
 			roleInfoPtr->SetRoleDescription(description);
-		}
-
-		QByteArray productId;
-		if (itemModel.ContainsKey("ProductId")){
-			productId = itemModel.GetData("ProductId").toByteArray();
-
-			if (productId.isEmpty()){
-				errorMessage = QT_TR_NOOP("Product-ID can't be empty!");
-				return nullptr;
-			}
-
-			roleInfoPtr->SetProductId(productId);
 		}
 
 		if (itemModel.ContainsKey("ParentRoles")){

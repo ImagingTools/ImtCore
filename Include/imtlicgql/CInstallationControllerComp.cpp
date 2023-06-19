@@ -35,8 +35,8 @@ imtbase::CTreeItemModel* CInstallationControllerComp::GetObject(const imtgql::CG
 
 	imtbase::CTreeItemModel* activeLicenses = dataModel->AddTreeModel("ActiveLicenses");
 
-	const QList<imtgql::CGqlObject>* inputParams = gqlRequest.GetParams();
-	QByteArray objectId = GetObjectIdFromInputParams(*inputParams);
+	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){

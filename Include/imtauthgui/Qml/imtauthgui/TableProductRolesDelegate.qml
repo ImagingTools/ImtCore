@@ -13,6 +13,8 @@ Item {
 
     property int selectedIndex: -1;
 
+    property bool newIsEnabled: true;
+
     property Item baseCollectionView: null;
 
     signal clicked(int index);
@@ -45,20 +47,6 @@ Item {
 
         return roleName;
     }
-
-//    MouseArea {
-//        id: ma;
-
-//        anchors.fill: parent;
-
-//        onClicked: {
-//            productRolesDelegate.clicked(productRolesDelegate.index);
-//        }
-
-//        onDoubleClicked: {
-//            productRolesDelegate.doubleClicked();
-//        }
-//    }
 
     Rectangle {
         id: body;
@@ -97,10 +85,13 @@ Item {
             width: 20;
             height: width;
 
+            visible: productRolesDelegate.newIsEnabled;
+
             iconSource: "../../../../" + "Icons/" + Style.theme + "/Add_Off_Normal.svg";
 
             onClicked: {
-                productRolesDelegate.clicked(productRolesDelegate.index);
+                console.log("productRolesDelegate.index", productRolesDelegate.index);
+              //  productRolesDelegate.clicked(productRolesDelegate.index);
                 Events.sendEvent(productRolesDelegate.commandsId + "CommandActivated", "New");
             }
         }

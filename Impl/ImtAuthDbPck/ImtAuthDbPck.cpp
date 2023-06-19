@@ -14,7 +14,6 @@ I_EXPORT_PACKAGE(
 			"Database-related authorization component package",
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
-
 I_EXPORT_COMPONENT(
 			RoleDatabaseDelegate,
 			"Role object delegate for SQL table",
@@ -44,6 +43,11 @@ I_EXPORT_COMPONENT(
 			SuperuserProvider,
 			"Superuser provider",
 			"SQL User su Superuser SuperUser admin");
+
+I_EXPORT_COMPONENT(
+			RemoteSuperuserProvider,
+			"Remote Superuser provider",
+			"Remote Puma SQL User su Superuser SuperUser admin");
 
 
 } // namespace ImtAuthDbPck

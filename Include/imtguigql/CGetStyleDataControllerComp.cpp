@@ -19,9 +19,9 @@ namespace imtguigql
 imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	QString theme;
-	const QList<imtgql::CGqlObject>* paramsPtr = gqlRequest.GetParams();
-	if (!paramsPtr->isEmpty()){
-		theme = paramsPtr->at(0).GetFieldArgumentValue("theme").toString();
+	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
+	if (!paramsPtr.isEmpty()){
+		theme = paramsPtr.at(0).GetFieldArgumentValue("theme").toString();
 	}
 
 	if(theme.isEmpty()){

@@ -2,7 +2,6 @@
 
 
 // ImtCore includes
-#include <imtbase/CCollectionInfo.h>
 #include <imtauth/IUserInfo.h>
 
 

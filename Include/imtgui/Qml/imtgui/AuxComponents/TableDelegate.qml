@@ -305,7 +305,7 @@ Rectangle {
 			id: tableCellDelegate
 
 			pTableDelegateContainer: tableDelegateContainer
-           // contentComp: tableDelegateContainer.tableItem.columnContentComps[model.index] !== null ? tableDelegateContainer.tableItem.columnContentComps[model.index] : tableCellDelegate.defaultContentComp;
+            contentComp: tableDelegateContainer.tableItem.columnContentComps[model.index] !== null ? tableDelegateContainer.tableItem.columnContentComps[model.index] : tableCellDelegate.defaultContentComp;
 		}//delegate
     }//dataList
 

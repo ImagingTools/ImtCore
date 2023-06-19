@@ -49,9 +49,16 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 		return nullptr;
 	}
 
+	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
+
+	QByteArray productId;
+	if (!paramsPtr.empty()){
+		productId = paramsPtr.at(0).GetFieldArgumentValue("ProductId").toByteArray();
+	}
+
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
-	QByteArray userId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
+	QByteArray userId = GetObjectIdFromInputParams(paramsPtr);
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(userId, dataPtr)){
@@ -64,7 +71,7 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 			imtbase::CTreeItemModel* children = dataModel->AddTreeModel("Children", index);
 
 			if (m_roleInfoProviderCompPtr.IsValid()){
-				imtauth::IUserInfo::RoleIds rolesIds = userInfoPtr->GetRoles();
+				imtauth::IUserInfo::RoleIds rolesIds = userInfoPtr->GetRoles(productId);
 				for (const QByteArray& productRoleId : rolesIds){
 					const imtauth::IRole* rolePtr = m_roleInfoProviderCompPtr->GetRole(productRoleId);
 					if (rolePtr != nullptr){
@@ -113,6 +120,13 @@ bool CUserCollectionControllerComp::SetupGqlItem(
 		return false;
 	}
 
+	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
+
+	QByteArray productId;
+	if (!paramsPtr.empty()){
+		productId = paramsPtr.at(0).GetFieldArgumentValue("ProductId").toByteArray();
+	}
+
 	bool retVal = true;
 	QByteArray collectionId = objectCollectionIterator->GetObjectId();
 	QByteArrayList informationIds = GetInformationIds(gqlRequest, "items");
@@ -130,98 +144,101 @@ bool CUserCollectionControllerComp::SetupGqlItem(
 			userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
 		}
 
-		if (userInfoPtr != nullptr && contextUserInfoPtr != nullptr){
-			bool ok = false;
+		bool ok = false;
+		if (contextUserInfoPtr != nullptr){
+			ok = contextUserInfoPtr->IsAdmin();
+		}
 
-			if (!userInfoPtr->IsAdmin()){
-				ok = true;
+		if (!ok){
+			if (userInfoPtr != nullptr){
+				ok = !userInfoPtr->IsAdmin();
 			}
-			else{
-				ok = contextUserInfoPtr->IsAdmin();
-			}
+		}
 
-			if (ok){
-				idoc::MetaInfoPtr elementMetaInfo = objectCollectionIterator->GetDataMetaInfo();
-				for (QByteArray informationId : informationIds){
-					QVariant elementInformation;
+		if (contextPtr == nullptr){
+			ok = true;
+		}
 
-					if(informationId == "Id"){
-						elementInformation = QString(collectionId);
-					}
-					else if(informationId == "UserId"){
-						elementInformation = userInfoPtr->GetId();
-					}
-					else if(informationId == "Name"){
-						elementInformation = userInfoPtr->GetName();
-					}
-					else if(informationId == "Description"){
-						elementInformation = userInfoPtr->GetDescription();
-					}
-					else if(informationId == "Mail"){
-						elementInformation = userInfoPtr->GetMail();
-					}
-					else if(informationId == "Roles"){
-						QByteArrayList resultList;
-						if (m_roleInfoProviderCompPtr.IsValid()){
-							for (const QByteArray& roleId: userInfoPtr->GetRoles()){
-								const imtauth::IRole* roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(roleId);
-								if (roleInfoPtr != nullptr){
-									QString roleName = roleInfoPtr->GetRoleName();
-									QString roleDescription = roleInfoPtr->GetRoleDescription();
+		if (ok){
+			idoc::MetaInfoPtr elementMetaInfo = objectCollectionIterator->GetDataMetaInfo();
+			for (QByteArray informationId : informationIds){
+				QVariant elementInformation;
 
-									QString result = roleName;
-									if (!roleDescription.isEmpty()){
-										result += " (" + roleDescription + ")";
-									}
-									resultList << result.toUtf8();
-								}
-							}
-						}
-						elementInformation = resultList.join(';');
-					}
-					else if(informationId == "Groups"){
-						QByteArrayList resultList;
-						if (m_userGroupInfoProviderCompPtr.IsValid()){
-							for (const QByteArray& groupId: userInfoPtr->GetGroups()){
-								const imtauth::IUserGroupInfo* userGroupInfoPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
-								if (userGroupInfoPtr != nullptr){
-									QString groupName = userGroupInfoPtr->GetName();
-									QString groupDescription = userGroupInfoPtr->GetDescription();
-
-									QString result = groupName;
-									if (!groupDescription.isEmpty()){
-										result += " (" + groupDescription + ")";
-									}
-
-									resultList << result.toUtf8();
-								}
-							}
-						}
-						elementInformation = resultList.join(';');
-					}
-					else{
-						if (elementMetaInfo.IsValid()){
-							if (informationId == QByteArray("Added")){
-								elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
-										.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-							}
-							else if (informationId == QByteArray("LastModified")){
-								elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
-										.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-							}
-						}
-					}
-
-
-					if(elementInformation.isNull()){
-						elementInformation = GetObjectInformation(informationId, collectionId);
-					}
-					if (elementInformation.isNull()){
-						elementInformation = "";
-					}
-
-					retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
+				if(informationId == "Id"){
+					elementInformation = QString(collectionId);
 				}
+				else if(informationId == "UserId"){
+					elementInformation = userInfoPtr->GetId();
+				}
+				else if(informationId == "Name"){
+					elementInformation = userInfoPtr->GetName();
+				}
+				else if(informationId == "Description"){
+					elementInformation = userInfoPtr->GetDescription();
+				}
+				else if(informationId == "Mail"){
+					elementInformation = userInfoPtr->GetMail();
+				}
+				else if(informationId == "Roles"){
+					QByteArrayList resultList;
+					if (m_roleInfoProviderCompPtr.IsValid()){
+						for (const QByteArray& roleId: userInfoPtr->GetRoles(productId)){
+							const imtauth::IRole* roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(roleId);
+							if (roleInfoPtr != nullptr){
+								QString roleName = roleInfoPtr->GetRoleName();
+								QString roleDescription = roleInfoPtr->GetRoleDescription();
+
+								QString result = roleName;
+								if (!roleDescription.isEmpty()){
+									result += " (" + roleDescription + ")";
+								}
+								resultList << result.toUtf8();
+							}
+						}
+					}
+					elementInformation = resultList.join(';');
+				}
+				else if(informationId == "Groups"){
+					QByteArrayList resultList;
+					if (m_userGroupInfoProviderCompPtr.IsValid()){
+						for (const QByteArray& groupId: userInfoPtr->GetGroups()){
+							const imtauth::IUserGroupInfo* userGroupInfoPtr = m_userGroupInfoProviderCompPtr->GetUserGroup(groupId);
+							if (userGroupInfoPtr != nullptr){
+								QString groupName = userGroupInfoPtr->GetName();
+								QString groupDescription = userGroupInfoPtr->GetDescription();
+
+								QString result = groupName;
+								if (!groupDescription.isEmpty()){
+									result += " (" + groupDescription + ")";
+								}
+
+								resultList << result.toUtf8();
+							}
+						}
+					}
+					elementInformation = resultList.join(';');
+				}
+				else{
+					if (elementMetaInfo.IsValid()){
+						if (informationId == QByteArray("Added")){
+							elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
+									.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+						}
+						else if (informationId == QByteArray("LastModified")){
+							elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
+									.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+						}
+					}
+				}
+
+				if(elementInformation.isNull()){
+					elementInformation = GetObjectInformation(informationId, collectionId);
+				}
+				if (elementInformation.isNull()){
+					elementInformation = "";
+				}
+
+				retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
 			}
 		}
 

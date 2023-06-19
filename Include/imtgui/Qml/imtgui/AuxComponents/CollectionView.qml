@@ -313,7 +313,13 @@ Item {
 
     CommandsProvider {
         id: commandsProviderLocal;
+
+        onModelLoaded: {
+            collectionViewContainer.onCommandsModelChanged();
+        }
     }
+
+    function onCommandsModelChanged(){}
 
     MetaInfo {
         id: collectionMetaInfo;

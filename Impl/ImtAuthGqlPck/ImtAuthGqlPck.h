@@ -14,6 +14,8 @@
 #include <imtauthgql/CUserGroupControllerComp.h>
 #include <imtauthgql/CUserGroupCollectionControllerComp.h>
 #include <imtauthgql/CAuthorizationOptionsControllerComp.h>
+#include <imtauthgql/CSessionControllerComp.h>
+#include <imtauthgql/CLogoutControllerComp.h>
 
 
 /**
@@ -31,6 +33,8 @@ typedef imtauthgql::CUserControllerComp UserController;
 typedef imtauthgql::CUserGroupControllerComp UserGroupController;
 typedef imtauthgql::CUserGroupCollectionControllerComp UserGroupCollectionController;
 typedef imtauthgql::CAuthorizationOptionsControllerComp AuthorizationOptionsController;
+typedef imtauthgql::CSessionControllerComp SessionController;
+typedef imtauthgql::CLogoutControllerComp LogoutController;
 
 
 } // namespace ImtAuthGqlPck

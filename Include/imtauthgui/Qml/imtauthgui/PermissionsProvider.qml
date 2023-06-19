@@ -49,7 +49,6 @@ Item {
                     dataModelLocal = permissionModel.GetData("data");
                     if (dataModelLocal.ContainsKey("ProductPermissions")){
                         dataModelLocal = dataModelLocal.GetData("ProductPermissions");
-
                         if (dataModelLocal.ContainsKey("Features")){
                             permissionsProvider.dataModel = dataModelLocal.GetData("Features");
                         }

@@ -20,6 +20,7 @@ Item {
     }
 
     onDocumentModelChanged: {
+//        rolesProvider.updateModel({"ProductId" : window.productId});
         rolesProvider.updateModel();
     }
 
@@ -51,6 +52,13 @@ Item {
                 }
             }
         }
+    }
+
+    function blockEditing(){
+        roleIdInput.readOnly = true;
+        roleNameInput.readOnly = true;
+        descriptionInput.readOnly = true;
+        parentRolesTable.readOnly = true;
     }
 
     CollectionDataProvider {

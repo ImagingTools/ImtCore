@@ -47,8 +47,8 @@ Item {
         id: dependenciesProvider;
     }
 
-    TreeItemModelConverter {
-        id: converter;
+    function blockEditing(){
+        permissionsTable.readOnly = true;
     }
 
     function updateGui(){

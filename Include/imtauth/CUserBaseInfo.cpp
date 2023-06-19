@@ -90,37 +90,64 @@ void CUserBaseInfo::SetDescription(const QString& description)
 }
 
 
-IUserBaseInfo::FeatureIds CUserBaseInfo::GetPermissions() const
+IUserBaseInfo::FeatureIds CUserBaseInfo::GetPermissions(const QByteArray& productId) const
 {
 	IUserBaseInfo::FeatureIds allPermissions;
 
 	if (m_roleProviderPtr != nullptr){
-		for (QByteArray roleId : m_roles){
-			const IRole* rolePtr = m_roleProviderPtr->GetRole(roleId);
-			if (rolePtr != nullptr){
+		RoleIds roleIds;
+		if (productId.isEmpty()){
+			for (const QByteArray& id : m_rolesMap.keys()){
+				RoleIds productRoleIds = m_rolesMap.value(id);
+				roleIds += productRoleIds;
+			}
+		}
+		else{
+			if (m_rolesMap.contains(productId)){
+				roleIds = m_rolesMap.value(productId);
+			}
+		}
+
+		for (const QByteArray& roleId : roleIds){
+			istd::TDelPtr<const IRole> rolePtr = m_roleProviderPtr->GetRole(roleId);
+			if (rolePtr.IsValid()){
 				allPermissions += rolePtr->GetPermissions();
 			}
 		}
 	}
 
-	allPermissions += m_permissions;
+	if (m_permissionsMap.contains(productId)){
+		allPermissions += m_permissionsMap[productId];
+	}
 
 	return allPermissions;
 }
 
 
-IUserBaseInfo::FeatureIds CUserBaseInfo::GetLocalPermissions() const
+IUserBaseInfo::FeatureIds CUserBaseInfo::GetLocalPermissions(const QByteArray& productId) const
 {
-	return m_permissions;
+	if (m_permissionsMap.contains(productId)){
+		return m_permissionsMap[productId];
+	}
+
+	return IUserBaseInfo::FeatureIds();
 }
 
 
-void CUserBaseInfo::SetLocalPermissions(const FeatureIds &permissions)
+void CUserBaseInfo::SetLocalPermissions(const QByteArray& productId, const FeatureIds &permissions)
 {
-	if (m_permissions != permissions){
+	bool ok = true;
+	if (m_permissionsMap.contains(productId)){
+		FeatureIds currentFeatureIds = m_permissionsMap.value(productId);
+		if (currentFeatureIds == permissions){
+			ok = false;
+		}
+	}
+
+	if (ok){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_permissions = permissions;
+		m_permissionsMap.insert(productId, permissions);
 	}
 }
 
@@ -141,40 +168,108 @@ void CUserBaseInfo::SetProhibitions(const FeatureIds &prohibitions)
 }
 
 
-IUserBaseInfo::RoleIds CUserBaseInfo::GetRoles() const
+QByteArrayList CUserBaseInfo::GetProducts() const
 {
-	return m_roles;
+	return m_rolesMap.keys();
 }
 
 
-void CUserBaseInfo::SetRoles(const RoleIds &roles)
+bool CUserBaseInfo::RemoveProduct(const QByteArray& productId)
 {
-	if (m_roles != roles){
+	bool ok = false;
+	if (m_permissionsMap.contains(productId)){
+		m_permissionsMap.remove(productId);
+
+		ok = true;
+	}
+
+	if (m_rolesMap.contains(productId)){
+		m_rolesMap.remove(productId);
+
+		ok = true;
+	}
+
+	if (ok){
+		istd::CChangeNotifier changeNotifier(this);
+	}
+
+	return false;
+}
+
+
+IUserBaseInfo::RoleIds CUserBaseInfo::GetRoles(const QByteArray& productId) const
+{
+	if (m_rolesMap.contains(productId)){
+		return m_rolesMap.value(productId);
+	}
+
+	return IUserBaseInfo::RoleIds();
+}
+
+
+void CUserBaseInfo::SetRoles(const QByteArray& productId, const RoleIds &roles)
+{
+	bool ok = true;
+	if (m_rolesMap.contains(productId)){
+		RoleIds currentRoleIds = m_rolesMap.value(productId);
+		if (currentRoleIds == roles){
+			ok = false;
+		}
+	}
+
+	if (ok){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_roles = roles;
+		m_rolesMap.insert(productId, roles);
 	}
 }
 
 
-void CUserBaseInfo::AddRole(const QByteArray& roleId)
+void CUserBaseInfo::AddRole(const QByteArray& productId, const QByteArray& roleId)
 {
-	if (!m_roles.contains(roleId)){
+	bool isChanged = false;
+	if (!m_rolesMap.contains(productId)){
+		m_rolesMap.insert(productId, RoleIds());
+
+		isChanged = true;
+	}
+
+	RoleIds roleIds = m_rolesMap.value(productId);
+	if (!roleIds.contains(roleId)){
+		roleIds << roleId;
+
+		isChanged = true;
+	}
+
+	if (isChanged){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_roles << roleId;
+		m_rolesMap.insert(productId, roleIds);
 	}
 }
 
 
-bool CUserBaseInfo::RemoveRole(const QByteArray& userId)
+bool CUserBaseInfo::RemoveRole(const QByteArray& productId, const QByteArray& roleId)
 {
-	bool result = m_roles.removeOne(userId);
-	if (result){
-		istd::CChangeNotifier changeNotifier(this);
+	if (m_rolesMap.contains(productId)){
+		RoleIds roleIds = m_rolesMap.value(productId);
+		if (roleIds.contains(roleId)){
+			istd::CChangeNotifier changeNotifier(this);
+
+			roleIds.removeOne(roleId);
+
+			if (roleIds.isEmpty()){
+				m_rolesMap.remove(productId);
+			}
+			else{
+				m_rolesMap.insert(productId, roleIds);
+			}
+
+			return true;
+		}
 	}
 
-	return result;
+	return false;
 }
 
 
@@ -186,6 +281,13 @@ const imtauth::IUserGroupInfoProvider* CUserBaseInfo::GetUserGroupProvider() con
 
 bool CUserBaseInfo::Serialize(iser::IArchive &archive)
 {
+	// Get ImtCore version
+	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
+	quint32 imtCoreVersion;
+	if (!versionInfo.GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion)){
+		imtCoreVersion = 0;
+	}
+
 	bool retVal = true;
 
 	static iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_LEAF);
@@ -198,15 +300,59 @@ bool CUserBaseInfo::Serialize(iser::IArchive &archive)
 	retVal = retVal && archive.Process(m_name);
 	retVal = retVal && archive.EndTag(nameTag);
 
-
 	static iser::CArchiveTag descriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(descriptionTag);
 	retVal = retVal && archive.Process(m_description);
 	retVal = retVal && archive.EndTag(descriptionTag);
 
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_permissions, "Permissions", "Permission");
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_restrictions, "Permissions", "Permission");
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_restrictions, "Restrictions", "Restriction");
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_roles, "Roles", "Role");
+
+//	if (imtCoreVersion < 6671){
+//		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_roles, "Roles", "Role");
+//	}
+//	else{
+		QByteArrayList keys = m_rolesMap.keys();
+		int count = keys.count();
+
+		if (!archive.IsStoring()){
+			m_rolesMap.clear();
+			keys.clear();
+			count = 0;
+		}
+
+		static iser::CArchiveTag productsTag("Products", "Products", iser::CArchiveTag::TT_MULTIPLE);
+		static iser::CArchiveTag roleTag("Role", "Role", iser::CArchiveTag::TT_GROUP, &productsTag);
+
+		retVal = retVal && archive.BeginMultiTag(productsTag, roleTag, count);
+
+		for (int index = 0; index < count; index++){
+			retVal = retVal && archive.BeginTag(roleTag);
+
+			QByteArray key;
+			QByteArrayList value;
+
+			if (archive.IsStoring()){
+				key = keys[index];
+				value = m_rolesMap[key];
+			}
+
+			static iser::CArchiveTag keyTag("ProductId", "ProductId", iser::CArchiveTag::TT_LEAF, &roleTag);
+			retVal = retVal && archive.BeginTag(keyTag);
+			retVal = retVal && archive.Process(key);
+			retVal = retVal && archive.EndTag(keyTag);
+
+			retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, value, "Roles", "RoleId");
+
+			if (!archive.IsStoring()){
+				m_rolesMap[key] = value;
+			}
+
+			retVal = retVal && archive.EndTag(roleTag);
+		}
+
+		retVal = retVal && archive.EndTag(productsTag);
+//	}
 
 	return retVal;
 }
@@ -226,9 +372,9 @@ bool CUserBaseInfo::CopyFrom(const IChangeable &object, CompatibilityMode /*mode
 
 		m_id = sourcePtr->m_id;
 		m_name = sourcePtr->m_name;
-		m_permissions = sourcePtr->m_permissions;
+		m_permissionsMap = sourcePtr->m_permissionsMap;
 		m_restrictions = sourcePtr->m_restrictions;
-		m_roles = sourcePtr->m_roles;
+		m_rolesMap = sourcePtr->m_rolesMap;
 		m_roleProviderPtr = sourcePtr->m_roleProviderPtr;
 		m_userGroupInfoProviderPtr = sourcePtr->m_userGroupInfoProviderPtr;
 
@@ -256,9 +402,9 @@ bool CUserBaseInfo::ResetData(CompatibilityMode mode)
 
 	m_id.clear();
 	m_name.clear();
-	m_permissions.clear();
+	m_permissionsMap.clear();
 	m_restrictions.clear();
-	m_roles.clear();
+	m_rolesMap.clear();
 	m_roleProviderPtr = nullptr;
 	m_permissionProviderPtr = nullptr;
 	m_userGroupInfoProviderPtr = nullptr;

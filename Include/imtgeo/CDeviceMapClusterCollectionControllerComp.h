@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QGeoCoordinate>
+#include <QtPositioning/QGeoCoordinate>
 
 
 // ImtCore includes

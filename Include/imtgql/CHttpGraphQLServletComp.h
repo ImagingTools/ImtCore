@@ -5,7 +5,7 @@
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CHttpServletCompBase.h>
 #include <imtgql/IGqlRequestHandler.h>
-#include <imtbase/IObjectCollection.h>
+#include <imtgql/IGqlContextController.h>
 
 
 namespace imtgql
@@ -19,9 +19,7 @@ public:
 
 	I_BEGIN_COMPONENT(CHttpGraphQLServletComp);
 		I_ASSIGN_MULTI_0(m_gqlRequestHandlerCompPtr, "GqlRequestHandler", "Handler for GraphQL-request", true);
-		I_ASSIGN(m_sessionCollectionCompPtr, "SessionCollection", "Session collection", false, "SessionCollection");
-		I_ASSIGN(m_settingsCollectionCompPtr, "SettingsCollection", "Settings collection", false, "SettingsCollection");
-		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", false, "UserCollection");
+		I_ASSIGN(m_gqlContextControllerCompPtr, "GqlContextController", "Gql context controller", false, "GqlContextController");
 	I_END_COMPONENT;
 
 protected:
@@ -41,9 +39,7 @@ private:
 
 private:
 	I_MULTIREF(imtgql::IGqlRequestHandler, m_gqlRequestHandlerCompPtr);
-	I_REF(imtbase::IObjectCollection, m_sessionCollectionCompPtr);
-	I_REF(imtbase::IObjectCollection, m_settingsCollectionCompPtr);
-	I_REF(imtbase::IObjectCollection, m_userCollectionCompPtr);
+	I_REF(imtgql::IGqlContextController, m_gqlContextControllerCompPtr);
 };
 
 

@@ -40,6 +40,7 @@ QtObject {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", modelId);
+//            inputParams.InsertField("ProductId", window.productId);
             if (externInputParams){
                 let keys = Object.keys(externInputParams)
                 for (let key of keys){
@@ -80,6 +81,7 @@ QtObject {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", modelId);
+//            inputParams.InsertField("ProductId", window.productId);
             var jsonString = data.toJSON();
             inputParams.InsertField ("Item", jsonString);
             query.AddParam(inputParams);

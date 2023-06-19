@@ -67,17 +67,17 @@ public:
 	/**
 		Get permissions.
 	*/
-	virtual FeatureIds GetPermissions() const = 0;
+	virtual FeatureIds GetPermissions(const QByteArray& productId = QByteArray()) const = 0;
 
 	/**
 		Get local permissions.
 	*/
-	virtual FeatureIds GetLocalPermissions() const = 0;
+	virtual FeatureIds GetLocalPermissions(const QByteArray& productId) const = 0;
 
 	/**
 		Set local permissions.
 	*/
-	virtual void SetLocalPermissions(const FeatureIds& permissions) = 0;
+	virtual void SetLocalPermissions(const QByteArray& productId, const FeatureIds& permissions) = 0;
 
 	/**
 		Get restrictions.
@@ -90,24 +90,34 @@ public:
 	virtual void SetProhibitions(const FeatureIds& prohibitions) = 0;
 
 	/**
+		Get all the products in which the user has roles.
+	*/
+	virtual QByteArrayList GetProducts() const = 0;
+
+	/**
+		Remove all roles contained in the product.
+	*/
+	virtual bool RemoveProduct(const QByteArray& productId) = 0;
+
+	/**
 		Get roles.
 	*/
-	virtual RoleIds GetRoles() const = 0;
+	virtual RoleIds GetRoles(const QByteArray& productId) const = 0;
 
 	/**
 		Set roles.
 	*/
-	virtual void SetRoles(const RoleIds& roles) = 0;
+	virtual void SetRoles(const QByteArray& productId, const RoleIds& roles) = 0;
 
 	/**
 		Add role to user.
 	*/
-	virtual void AddRole(const QByteArray& roleId) = 0;
+	virtual void AddRole(const QByteArray& productId, const QByteArray& roleId) = 0;
 
 	/**
 		Remove role from user.
 	*/
-	virtual bool RemoveRole(const QByteArray& userId) = 0;
+	virtual bool RemoveRole(const QByteArray& productId, const QByteArray& roleId) = 0;
 
 	/**
 		Get list of all availiable user groups.

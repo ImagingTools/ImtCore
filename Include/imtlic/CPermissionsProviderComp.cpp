@@ -20,6 +20,7 @@ imtbase::CTreeItemModel* CPermissionsProviderComp::CreateInternalResponse(const 
 	if (m_featurePackageCompPtr.IsValid() && m_featurePackageRepresentationCompPtr.IsValid()){
 		istd::TDelPtr<imtbase::CTreeItemModel> representationPtr(new imtbase::CTreeItemModel);
 		bool result = m_featurePackageRepresentationCompPtr->GetRepresentationFromDataModel(*m_featurePackageCompPtr, *representationPtr.GetPtr());
+		QString json = representationPtr->toJSON();
 		if (result){
 			return representationPtr.PopPtr();
 		}

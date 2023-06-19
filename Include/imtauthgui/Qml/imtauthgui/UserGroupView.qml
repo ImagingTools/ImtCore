@@ -48,6 +48,15 @@ DocumentBase {
         }
     }
 
+    function blockEditing(){
+        for (let index = 0; index < leftMenuModel.count; index++){
+            let loader = bodyRepeater.itemAt(index);
+            if (loader.item){
+                loader.item.blockEditing();
+            }
+        }
+    }
+
     function updateGui(){
         container.blockUpdatingModel = true;
 

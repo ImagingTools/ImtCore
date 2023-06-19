@@ -26,15 +26,17 @@ public:
 	virtual void SetName(const QString& name) override;
 	virtual QString GetDescription() const override;
 	virtual void SetDescription(const QString& description) override;
-	virtual FeatureIds GetPermissions() const override;
-	virtual FeatureIds GetLocalPermissions() const override;
-	virtual void SetLocalPermissions(const FeatureIds &permissions) override;
+	virtual FeatureIds GetPermissions(const QByteArray& productId = QByteArray()) const override;
+	virtual FeatureIds GetLocalPermissions(const QByteArray& productId) const override;
+	virtual void SetLocalPermissions(const QByteArray& productId, const FeatureIds &permissions) override;
 	virtual FeatureIds GetProhibitions() const override;
 	virtual void SetProhibitions(const FeatureIds &prohibitions) override;
-	virtual RoleIds GetRoles() const override;
-	virtual void SetRoles(const RoleIds &roles) override;
-	virtual void AddRole(const QByteArray& roleId) override;
-	virtual bool RemoveRole(const QByteArray& userId) override;
+	virtual QByteArrayList GetProducts() const override;
+	virtual bool RemoveProduct(const QByteArray& productId) override;
+	virtual RoleIds GetRoles(const QByteArray& productId) const override;
+	virtual void SetRoles(const QByteArray& productId, const RoleIds &roles) override;
+	virtual void AddRole(const QByteArray& productId, const QByteArray& roleId) override;
+	virtual bool RemoveRole(const QByteArray& productId, const QByteArray& roleId) override;
 	virtual const imtauth::IUserGroupInfoProvider* GetUserGroupProvider() const override;
 
 	// reimplemented (iser::ISerializable)
@@ -52,9 +54,11 @@ protected:
 	const imtauth::IUserGroupInfoProvider* m_userGroupInfoProviderPtr;
 
 protected:
-	IUserBaseInfo::FeatureIds m_permissions;
+//	IUserBaseInfo::FeatureIds m_permissions;
 	IUserBaseInfo::FeatureIds m_restrictions;
-	IUserBaseInfo::RoleIds m_roles;
+
+	QMap<QByteArray, QByteArrayList> m_permissionsMap;
+	QMap<QByteArray, QByteArrayList> m_rolesMap;
 	QString m_name;
 	QByteArray m_id;
 	QString m_description;

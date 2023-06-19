@@ -127,6 +127,7 @@ QtObject {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertFieldObject(viewParams);
+//            inputParams.InsertField("ProductId", "ProLife");
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");

@@ -17,8 +17,6 @@ imtbase::CTreeItemModel* CAuthorizationOptionsControllerComp::CreateRepresentati
 		return nullptr;
 	}
 
-	QByteArray commandId = gqlRequest.GetCommandId();
-
 	if (rootModelPtr->ContainsKey("data")){
 		imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->GetTreeItemModel("data");
 		Q_ASSERT(dataModelPtr != nullptr);

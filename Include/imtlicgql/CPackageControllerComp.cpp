@@ -298,7 +298,7 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetObject(const imtgql::CGqlReq
 	dataModelPtr->SetData("Name", "");
 	dataModelPtr->SetData("Description", "");
 
-	QByteArray packageId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
+	QByteArray packageId = GetObjectIdFromInputParams(gqlRequest.GetParams());
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(packageId, dataPtr)){
@@ -471,20 +471,17 @@ bool CPackageControllerComp::GetOperationFromRequest(
 		QString& errorMessage,
 		int& operationType) const
 {
-	const QList<imtgql::CGqlObject>* fieldList = gqlRequest.GetFields();
-	if(fieldList == nullptr){
-		return false;
-	}
+	const QList<imtgql::CGqlObject> fieldList = gqlRequest.GetFields();
 
-	int count = fieldList->count();
+	int count = fieldList.count();
 	for (int i = 0; i < count; i++){
-		if (fieldList->at(i).GetId() == "treeItem"){
-			gqlObject = fieldList->at(i);
+		if (fieldList.at(i).GetId() == "treeItem"){
+			gqlObject = fieldList.at(i);
 			operationType = OT_USER_OPERATION + 1;
 			return true;
 		}
-		if (fieldList->at(i).GetId() == "dependencies"){
-			gqlObject = fieldList->at(i);
+		if (fieldList.at(i).GetId() == "dependencies"){
+			gqlObject = fieldList.at(i);
 			operationType = OT_USER_OPERATION + 2;
 			return true;
 		}

@@ -16,16 +16,17 @@ public:
 	CGqlContext();
 	~CGqlContext();
 
-	void SetLanguageId(const QByteArray& languageId);
-	void SetDesignScheme(const QByteArray& designScheme);
-	void SetToken(const QByteArray& token);
-	void SetUserInfo(const imtauth::IUserInfo* userInfoPtr);
-
 	// reimplemented (IGqlContext)
+	virtual QByteArray GetProductId() const override;
+	virtual void SetProductId(const QByteArray& productId) override;
 	virtual QByteArray GetLanguageId() const override;
+	virtual void SetLanguageId(const QByteArray& languageId) override;
 	virtual QByteArray GetDesignScheme() const override;
+	virtual void SetDesignScheme(const QByteArray& designScheme) override;
 	virtual QByteArray GetToken() const override;
+	virtual void SetToken(const QByteArray& token) override;
 	virtual imtauth::IUserInfo* GetUserInfo() const override;
+	virtual void SetUserInfo(const imtauth::IUserInfo* userInfoPtr) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
@@ -37,6 +38,7 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
+	QByteArray m_productId;
 	QByteArray m_languageId;
 	QByteArray m_designScheme;
 	QByteArray m_token;

@@ -3,16 +3,11 @@
 
 // ACF includes
 #include <iser/CJsonMemWriteArchive.h>
-#include <iprm/ISelectionParam.h>
-#include <iprm/IOptionsList.h>
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
-#include <imtgql/CGqlContext.h>
+#include <imtgql/IGqlContext.h>
 #include <imtrest/IProtocolEngine.h>
-#include <imtauth/ISession.h>
-#include <imtauth/IUserInfo.h>
-#include <imtauth/IUserSettings.h>
 
 
 namespace imtgql
@@ -22,76 +17,35 @@ namespace imtgql
 // reimplemented (imtrest::IRequestServlet)
 
 imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
-		const QByteArray& /*commandId*/,
-		const imtrest::IRequest::CommandParams& /*commandParams*/,
-		const HeadersMap& headers,
-		const imtrest::CHttpRequest& request) const
+			const QByteArray& commandId,
+			const imtrest::IRequest::CommandParams& commandParams,
+			const HeadersMap& headers,
+			const imtrest::CHttpRequest& request) const
 {
 	imtgql::CGqlRequest gqlRequest;
 	int errorPosition = -1;
 
-	if (!gqlRequest.ParseQuery(request.GetBody(), errorPosition)){
+	QByteArray requestBody = request.GetBody();
+	if (!gqlRequest.ParseQuery(requestBody, errorPosition)){
 		qCritical() << __FILE__ << __LINE__ << QString("Error when parsing request: %1; Error position: %2")
-					.arg(qPrintable(request.GetBody()))
-					.arg(errorPosition);
+						.arg(qPrintable(request.GetBody()))
+						.arg(errorPosition);
 	}
 
+	QByteArray gqlCommand = gqlRequest.GetCommandId();
+
 	QByteArray accessToken = headers.value("X-authentication-token");
-
-	if (m_sessionCollectionCompPtr.IsValid() && !accessToken.isEmpty()){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_sessionCollectionCompPtr->GetObjectData(accessToken, dataPtr)){
-			const imtauth::ISession* sessionInfoPtr = dynamic_cast<const imtauth::ISession*>(dataPtr.GetPtr());
-			if (sessionInfoPtr != nullptr){
-				imtgql::CGqlContext* gqlContextPtr = new imtgql::CGqlContext();
-
-				QByteArray userId = sessionInfoPtr->GetUserId();
-
-				if (m_userCollectionCompPtr.IsValid()){
-					imtbase::IObjectCollection::DataPtr userDataPtr;
-					if (m_userCollectionCompPtr->GetObjectData(userId, userDataPtr)){
-						const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(userDataPtr.GetPtr());
-						if (userInfoPtr != nullptr){
-							gqlContextPtr->SetUserInfo(dynamic_cast<const imtauth::IUserInfo*>(userInfoPtr->CloneMe()));
-						}
-					}
-				}
-
-				if (m_settingsCollectionCompPtr.IsValid()){
-					imtbase::IObjectCollection::DataPtr settingsDataPtr;
-					if (m_settingsCollectionCompPtr->GetObjectData(userId, settingsDataPtr)){
-						const imtauth::IUserSettings* userSettingsPtr = dynamic_cast<const imtauth::IUserSettings*>(settingsDataPtr.GetPtr());
-						if (userSettingsPtr != nullptr){
-							iprm::IParamsSet* settingsPtr = userSettingsPtr->GetSettings();
-							if (settingsPtr != nullptr){
-								const iprm::ISelectionParam* languageParamPtr = dynamic_cast<const iprm::ISelectionParam*>(settingsPtr->GetParameter("Language"));
-								if (languageParamPtr != nullptr){
-									const iprm::IOptionsList* optionList = languageParamPtr->GetSelectionConstraints();
-									if (optionList != nullptr){
-										int index = languageParamPtr->GetSelectedOptionIndex();
-
-										if (index >= 0){
-											QByteArray languageId = optionList->GetOptionId(index);
-
-											gqlContextPtr->SetLanguageId(languageId);
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-
-				gqlContextPtr->SetToken(accessToken);
-				gqlRequest.SetGqlContext(gqlContextPtr);
-			}
+	if (!accessToken.isEmpty() && m_gqlContextControllerCompPtr.IsValid()){
+		imtgql::IGqlContext* gqlContextPtr = m_gqlContextControllerCompPtr->GetGqlContext(gqlRequest, accessToken);
+		if (gqlContextPtr != nullptr){
+			QByteArray token = gqlContextPtr->GetToken();
+			gqlRequest.SetGqlContext(gqlContextPtr);
 		}
 	}
 
 	QByteArray responseData;
 	bool isSuccessful = false;
 	QString errorMessage;
-	QByteArray gqlCommand = gqlRequest.GetCommandId();
 
 	int dataControllersCount = m_gqlRequestHandlerCompPtr.GetCount();
 	for (int index = 0; index < dataControllersCount; index++){
@@ -110,8 +64,10 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 						if (errorsItemModel == nullptr){
 							errorsItemModel = rootModel.AddTreeModel("errors");
 						}
+
 						errorsItemModel->SetExternTreeModel(gqlCommand, errorsSourceItemModel);
 					}
+
 					isSuccessful = true;
 
 					iser::CJsonMemWriteArchive archive(responseData);
@@ -146,19 +102,19 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 // private methods
 
 imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::CreateResponse(
-			const imtrest::IProtocolEngine::StatusCode& statusCode,
-			const QByteArray& payload,
-			const imtrest::IRequest& request,
-			const QByteArray& contentTypeId) const
+		const imtrest::IProtocolEngine::StatusCode& statusCode,
+		const QByteArray& payload,
+		const imtrest::IRequest& request,
+		const QByteArray& contentTypeId) const
 {
 	return imtrest::IRequestServlet::ConstResponsePtr(request.GetProtocolEngine().CreateResponse(request, statusCode, payload, contentTypeId));
 }
 
 
 imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::GenerateError(
-			const imtrest::IProtocolEngine::StatusCode& errorCode,
-			const QString& /*errorString*/,
-			const imtrest::CHttpRequest& request) const
+		const imtrest::IProtocolEngine::StatusCode& errorCode,
+		const QString& errorString,
+		const imtrest::CHttpRequest& request) const
 {
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
@@ -169,10 +125,10 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::GenerateErro
 	QByteArray responseJson;
 	return imtrest::IRequestServlet::ConstResponsePtr(
 				engine.CreateResponse(
-							request,
-							errorCode,
-							responseJson,
-							QByteArray("application/json;charset=utf-8")));
+					request,
+					errorCode,
+					responseJson,
+					QByteArray("application/json;charset=utf-8")));
 }
 
 

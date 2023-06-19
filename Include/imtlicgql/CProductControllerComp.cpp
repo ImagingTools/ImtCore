@@ -27,7 +27,7 @@ imtbase::CTreeItemModel* CProductControllerComp::ListObjects(const imtgql::CGqlR
 		imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
 		imtbase::CTreeItemModel* itemsModel = dataModel->AddTreeModel("items");
 
-		QByteArray productId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
+		QByteArray productId = GetObjectIdFromInputParams(gqlRequest.GetParams());
 
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_objectCollectionCompPtr->GetObjectData(productId, dataPtr)){
@@ -211,7 +211,7 @@ imtbase::CTreeItemModel* CProductControllerComp::GetObject(const imtgql::CGqlReq
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();;
 
-	QByteArray productId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
+	QByteArray productId = GetObjectIdFromInputParams(gqlRequest.GetParams());
 
 	dataModel->SetData("Id", productId);
 	dataModel->SetData("Name", "");
@@ -311,15 +311,12 @@ bool CProductControllerComp::GetOperationFromRequest(
 			QString& errorMessage,
 			int& operationType) const
 {
-	const QList<imtgql::CGqlObject>* fieldList = gqlRequest.GetFields();
-	if(fieldList == nullptr){
-		return false;
-	}
+	const QList<imtgql::CGqlObject> fieldList = gqlRequest.GetFields();
 
-	int count = fieldList->count();
+	int count = fieldList.count();
 	for (int i = 0; i < count; i++){
-		if (fieldList->at(i).GetId() == "LicensesItems"){
-			gqlObject = fieldList->at(i);
+		if (fieldList.at(i).GetId() == "LicensesItems"){
+			gqlObject = fieldList.at(i);
 			operationType = OT_USER_OPERATION + 1;
 			return true;
 		}

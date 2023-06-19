@@ -11,11 +11,6 @@ namespace imtgql
 
 bool CGqlRequestHandlerCompBase::IsRequestSupported(const CGqlRequest& gqlRequest) const
 {
-	const QList<CGqlObject>* fieldsPtr = gqlRequest.GetFields();
-	if (fieldsPtr == nullptr){
-		return false;
-	}
-
 	QByteArray commandId = gqlRequest.GetCommandId();
 
 	return m_commandIdsAttrPtr.FindValue(commandId) != -1;
@@ -66,13 +61,20 @@ bool CGqlRequestHandlerCompBase::CheckPermissions(const imtgql::CGqlRequest& gql
 {
 	bool result = true;
 	if (gqlRequest.GetGqlContext() != nullptr){
+		const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
+		QByteArray productId;
+		if (!paramsPtr.empty()){
+			productId = paramsPtr.at(0).GetFieldArgumentValue("ProductId").toByteArray();
+		}
+
+		QByteArray gqlCommand = gqlRequest.GetCommandId();
+
 		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetGqlContext()->GetUserInfo();
-		Q_ASSERT(userInfoPtr != nullptr);
 		if (userInfoPtr != nullptr){
 			QByteArray userId = userInfoPtr->GetId();
 			if (!userInfoPtr->IsAdmin()){
 				if(m_commandPermissionsCompPtr.IsValid()){
-					imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetPermissions();
+					imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetPermissions(productId);
 					QByteArray gqlCommand = gqlRequest.GetCommandId();
 					QByteArrayList commandIds = m_commandPermissionsCompPtr->GetCommandIds();
 					if(commandIds.contains(gqlCommand)){

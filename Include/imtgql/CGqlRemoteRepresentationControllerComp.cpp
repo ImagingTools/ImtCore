@@ -26,7 +26,24 @@ void CGqlRemoteRepresentationControllerComp::Response::OnReply(const IGqlRequest
 	m_replyResultPtr = new imtbase::CTreeItemModel();
 	QJsonDocument document = QJsonDocument::fromJson(replyData);
 	if (document.isObject()){
-		QJsonObject dataObject = document.object().value("data").toObject();
+		QJsonObject dataObject = document.object();
+
+		if (dataObject.contains("errors")){
+			QJsonValue jsonValue = dataObject.value("errors");
+			if (jsonValue.isObject()){
+				QJsonObject errorObj = jsonValue.toObject();
+				if (errorObj.contains(request.GetCommandId())){
+					QJsonValue bodyValue = errorObj.value(request.GetCommandId());
+					dataObject = QJsonObject();
+					dataObject.insert("errors", bodyValue);
+					document.setObject(dataObject);
+					QByteArray parserData = document.toJson(QJsonDocument::Compact);
+					m_replyResultPtr->CreateFromJson(parserData);
+				}
+			}
+		}
+
+		dataObject = document.object().value("data").toObject();
 		if (!dataObject.isEmpty()){
 			QJsonValue bodyValue = dataObject.value(request.GetCommandId());
 			if (!bodyValue.isNull()){

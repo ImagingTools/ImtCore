@@ -60,9 +60,9 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateInternalRes
 		return CreateRepresentationFromRequest(gqlRequest, errorMessage);
 	}
 	else if (requestType == imtgql::IGqlRequest::RT_MUTATION){
-		const QList<CGqlObject>* paramsPtr = gqlRequest.GetParams();
-		if (paramsPtr != nullptr){
-			QByteArray itemData = paramsPtr->at(0).GetFieldArgumentValue("Item").toByteArray();
+		const QList<CGqlObject> params = gqlRequest.GetParams();
+		if (!params.isEmpty()){
+			QByteArray itemData = params.at(0).GetFieldArgumentValue("Item").toByteArray();
 			if (!itemData.isEmpty()){
 				istd::TDelPtr<imtbase::CTreeItemModel> representationPtr(new imtbase::CTreeItemModel);
 				if (representationPtr->CreateFromJson(itemData)){
@@ -83,6 +83,13 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateInternalRes
 
 iprm::IParamsSet* CGqlRepresentationDataControllerComp::CreateContextParams(const imtgql::CGqlRequest& gqlRequest) const
 {
+	const QList<imtgql::CGqlObject> requestParamsPtr = gqlRequest.GetParams();
+
+	QByteArray productId;
+	if (!requestParamsPtr.empty()){
+		productId = requestParamsPtr.at(0).GetFieldArgumentValue("ProductId").toByteArray();
+	}
+
 	istd::TDelPtr<iprm::CParamsSet> paramsPtr = new imod::TModelWrap<iprm::CParamsSet>();
 	if (gqlRequest.GetGqlContext() != nullptr){
 		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetGqlContext()->GetUserInfo();
@@ -100,6 +107,11 @@ iprm::IParamsSet* CGqlRepresentationDataControllerComp::CreateContextParams(cons
 		languageIdParam->SetId(gqlRequest.GetGqlContext()->GetLanguageId());
 
 		paramsPtr->SetEditableParameter("LanguageParam", languageIdParam.PopPtr(), true);
+
+		istd::TDelPtr<iprm::IIdParam> productIdParam = new iprm::CIdParam();
+		productIdParam->SetId(productId);
+
+		paramsPtr->SetEditableParameter("ProductId", productIdParam.PopPtr(), true);
 	}
 
 	return paramsPtr.PopPtr();

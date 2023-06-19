@@ -23,8 +23,8 @@ public:
 	I_BEGIN_COMPONENT(CUserInfoComp);
 		I_REGISTER_INTERFACE(IUserInfo);
 		I_REGISTER_INTERFACE(iser::ISerializable);
-		I_ASSIGN(m_roleProviderCompPtr, "RoleProvider", "Role provider", true, "RoleProvider");
-		I_ASSIGN(m_userGroupProviderCompPtr, "UserGroupProvider", "User group provider", true, "UserGroupProvider");
+		I_ASSIGN(m_roleProviderCompPtr, "RoleProvider", "Role provider", false, "RoleProvider");
+		I_ASSIGN(m_userGroupProviderCompPtr, "UserGroupProvider", "User group provider", false, "UserGroupProvider");
 		I_ASSIGN(m_adminIdAttrPtr, "AdminId", "Id for admin user", true, "admin");
 	I_END_COMPONENT;
 

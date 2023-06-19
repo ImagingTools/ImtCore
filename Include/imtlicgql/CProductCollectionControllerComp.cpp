@@ -45,7 +45,7 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(const imt
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel);
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
-	QByteArray packageId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
+	QByteArray packageId = GetObjectIdFromInputParams(gqlRequest.GetParams());
 
 	int index = dataModelPtr->InsertNewItem();
 	dataModelPtr->SetData("Name", QT_TR_NOOP("Modification Time"), index);

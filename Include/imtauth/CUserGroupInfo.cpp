@@ -31,7 +31,7 @@ IUserGroupInfo::UserIds CUserGroupInfo::GetUsers() const
 
 	if (m_userGroupInfoProviderPtr != nullptr){
 		for (const QByteArray& parentGroupId : m_parentGroupIds){
-			const imtauth::IUserGroupInfo* parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
+			istd::TDelPtr<const IUserGroupInfo> parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
 			if (parentGroupPtr != nullptr){
 				for (const QByteArray& userId : parentGroupPtr->GetUsers()){
 					if (!retVal.contains(userId)){
@@ -122,15 +122,14 @@ const imtauth::IUserInfoProvider* CUserGroupInfo::GetUserProvider() const
 
 // reimplemented (IUserBaseInfo)
 
-imtauth::IUserBaseInfo::RoleIds CUserGroupInfo::GetRoles() const
+imtauth::IUserBaseInfo::RoleIds CUserGroupInfo::GetRoles(const QByteArray& productId) const
 {
-	QByteArrayList retVal = m_roles;
-
+	IUserBaseInfo::RoleIds retVal = BaseClass::GetRoles(productId);
 	if (m_userGroupInfoProviderPtr != nullptr){
 		for (const QByteArray& parentGroupId : m_parentGroupIds){
-			const imtauth::IUserGroupInfo* parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
-			if (parentGroupPtr != nullptr){
-				for (const QByteArray& roleId : parentGroupPtr->GetRoles()){
+			istd::TDelPtr<const IUserGroupInfo> parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
+			if (parentGroupPtr.IsValid()){
+				for (const QByteArray& roleId : parentGroupPtr->GetRoles(productId)){
 					if (!retVal.contains(roleId)){
 						retVal << roleId;
 					}
@@ -143,15 +142,15 @@ imtauth::IUserBaseInfo::RoleIds CUserGroupInfo::GetRoles() const
 }
 
 
-IUserBaseInfo::FeatureIds CUserGroupInfo::GetPermissions() const
+IUserBaseInfo::FeatureIds CUserGroupInfo::GetPermissions(const QByteArray& productId) const
 {
-	IUserBaseInfo::FeatureIds allPermissions = BaseClass::GetPermissions();
+	IUserBaseInfo::FeatureIds allPermissions = BaseClass::GetPermissions(productId);
 
 	if (m_userGroupInfoProviderPtr != nullptr){
 		for (const QByteArray& parentGroupId : m_parentGroupIds){
-			const imtauth::IUserGroupInfo* parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
-			if (parentGroupPtr != nullptr){
-				allPermissions += parentGroupPtr->GetPermissions();
+			istd::TDelPtr<const IUserGroupInfo> parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
+			if (parentGroupPtr.IsValid()){
+				allPermissions += parentGroupPtr->GetPermissions(productId);
 			}
 		}
 	}

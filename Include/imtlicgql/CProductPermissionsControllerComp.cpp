@@ -15,12 +15,11 @@ imtbase::CTreeItemModel* CProductPermissionsControllerComp::CreateInternalRespon
 		return nullptr;
 	}
 
-	const QList<imtgql::CGqlObject>* paramsPtr = gqlRequest.GetParams();
-	Q_ASSERT(paramsPtr != nullptr);
+	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
 
 	QByteArray productId;
-	if (!paramsPtr->empty()){
-		productId = paramsPtr->at(0).GetFieldArgumentValue("ProductId").toByteArray();
+	if (!paramsPtr.empty()){
+		productId = paramsPtr.at(0).GetFieldArgumentValue("ProductId").toByteArray();
 	}
 
 	if (productId.isEmpty()){
@@ -30,6 +29,8 @@ imtbase::CTreeItemModel* CProductPermissionsControllerComp::CreateInternalRespon
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
 	imtbase::CTreeItemModel* productsModelPtr = m_productProviderCompPtr->CreateResponse(gqlRequest, errorMessage);
+
+	QString json = productsModelPtr->toJSON();
 	if (productsModelPtr != nullptr){
 		for (int i = 0; i < productsModelPtr->GetItemsCount(); i++){
 			QByteArray currentProductId = productsModelPtr->GetData("Id", i).toByteArray();

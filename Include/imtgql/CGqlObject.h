@@ -5,6 +5,9 @@
 #include <QtCore/QByteArray>
 #include <QtCore/QVariant>
 
+// ACF includes
+#include <iser/IObject.h>
+
 // ImtCore includes
 #include <istd/TSmartPtr.h>
 #include <imtgql/CGqlEnum.h>
@@ -14,7 +17,7 @@ namespace imtgql
 {
 
 
-class CGqlObject
+class CGqlObject: virtual public iser::IObject
 {
 public:
 	CGqlObject(const QByteArray& objectId = QByteArray());
@@ -35,6 +38,14 @@ public:
 	bool IsObject(const QByteArray& fieldId) const;
 	bool IsEnum(const QByteArray& fieldId) const;
 	bool IsObjectList(const QByteArray& fieldId) const;
+
+	// reimplemented (iser::ISerializable)
+	virtual bool Serialize(iser::IArchive &archive) override;
+
+	// reimplemented (iser::IChangeable)
+	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
 	void InsertFieldObject(istd::TSmartPtr<CGqlObject> objectPtr);

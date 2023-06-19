@@ -41,8 +41,6 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserGroupDatabaseDelegateComp::C
 				return NewObjectQuery();
 			}
 
-			imtauth::IUserGroupInfo::RoleIds groupRoleIds = groupInfoPtr->GetRoles();
-
 			QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8() : proposedObjectId;
 			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 
@@ -106,8 +104,6 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 		}
 
 		if (useExternDelegate){
-			imtauth::IUserGroupInfo::RoleIds groupRoleIds = groupInfoPtr->GetRoles();
-
 			imtauth::IUserGroupInfo::UserIds oldUserIds = oldObjectPtr->GetUsers();
 			imtauth::IUserGroupInfo::UserIds newUserIds = groupInfoPtr->GetUsers();
 

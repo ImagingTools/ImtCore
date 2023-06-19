@@ -20,9 +20,16 @@ imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const i
 		return nullptr;
 	}
 
+	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
+
+	QByteArray productId;
+	if (!paramsPtr.empty()){
+		productId = paramsPtr.at(0).GetFieldArgumentValue("ProductId").toByteArray();
+	}
+
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
-	QByteArray userId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
+	QByteArray userId = GetObjectIdFromInputParams(paramsPtr);
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(userId, dataPtr)){
@@ -68,7 +75,7 @@ imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const i
 			children = dataModel->AddTreeModel("Children", index);
 
 			if (m_roleInfoProviderCompPtr.IsValid()){
-				imtauth::IUserGroupInfo::RoleIds roleIds = userGroupInfoPtr->GetRoles();
+				imtauth::IUserGroupInfo::RoleIds roleIds = userGroupInfoPtr->GetRoles(productId);
 				for (const QByteArray& roleId : roleIds){
 					const imtauth::IRole* roleInfoPtr = m_roleInfoProviderCompPtr->GetRole(roleId);
 					if (roleInfoPtr != nullptr){
@@ -93,6 +100,13 @@ bool CUserGroupCollectionControllerComp::SetupGqlItem(
 		const imtbase::IObjectCollectionIterator* objectCollectionIterator,
 		QString& errorMessage) const
 {
+	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
+
+	QByteArray productId;
+	if (!paramsPtr.empty()){
+		productId = paramsPtr.at(0).GetFieldArgumentValue("ProductId").toByteArray();
+	}
+
 	bool retVal = true;
 
 	QByteArrayList informationIds = GetInformationIds(gqlRequest, "items");
@@ -123,7 +137,7 @@ bool CUserGroupCollectionControllerComp::SetupGqlItem(
 					elementInformation = userGroupInfoPtr->GetDescription();
 				}
 				else if(informationId == "Roles"){
-					elementInformation = userGroupInfoPtr->GetRoles().join(';');
+					elementInformation = userGroupInfoPtr->GetRoles(productId).join(';');
 				}
 				else if(informationId == "ParentGroups"){
 					elementInformation = userGroupInfoPtr->GetParentGroups().join(';');

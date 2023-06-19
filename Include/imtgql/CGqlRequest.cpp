@@ -27,10 +27,6 @@ imtgql::CGqlRequest::CGqlRequest(RequestType requestType, const QByteArray& comm
 
 imtgql::CGqlRequest::~CGqlRequest()
 {
-	delete m_gqlContextPtr;
-	delete m_activeGqlObjectPtr;
-
-	ResetData();
 }
 
 
@@ -53,15 +49,81 @@ void CGqlRequest::AddSimpleField(const QByteArray &fieldId)
 }
 
 
-const QList<CGqlObject> *CGqlRequest::GetFields() const
+const QList<CGqlObject> CGqlRequest::GetFields() const
 {
-	return &m_fields;
+	return m_fields;
 }
 
 
-const QList<CGqlObject> *CGqlRequest::GetParams() const
+const QList<CGqlObject> CGqlRequest::GetParams() const
 {
-	return &m_params;
+	return m_params;
+}
+
+
+const CGqlObject* CGqlRequest::GetField(const QByteArray& fieldId) const
+{
+	for (const CGqlObject& gqlObject : m_fields){
+		QByteArray objectId = gqlObject.GetId();
+		if (objectId == fieldId){
+			return &gqlObject;
+		}
+	}
+
+	return nullptr;
+}
+
+
+const CGqlObject* CGqlRequest::GetParam(const QByteArray& paramId) const
+{
+	for (const CGqlObject& gqlObject : m_params){
+		QByteArray objectId = gqlObject.GetId();
+		if (objectId == paramId){
+			return &gqlObject;
+		}
+	}
+
+	return nullptr;
+}
+
+
+void CGqlRequest::SetField(const CGqlObject& gqlObject)
+{
+	QByteArray paramId = gqlObject.GetId();
+
+	bool isFound = false;
+	for (int i = 0; i < m_fields.count(); i++){
+		QByteArray objectId = m_fields[i].GetId();
+		if (objectId == paramId){
+			isFound = true;
+			m_fields[i] = gqlObject;
+			break;
+		}
+	}
+
+	if (!isFound){
+		AddField(gqlObject);
+	}
+}
+
+
+void CGqlRequest::SetParam(const CGqlObject& gqlObject)
+{
+	QByteArray paramId = gqlObject.GetId();
+
+	bool isFound = false;
+	for (int i = 0; i < m_params.count(); i++){
+		QByteArray objectId = m_params[i].GetId();
+		if (objectId == paramId){
+			isFound = true;
+			m_params[i] = gqlObject;
+			break;
+		}
+	}
+
+	if (!isFound){
+		AddParam(gqlObject);
+	}
 }
 
 

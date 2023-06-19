@@ -54,6 +54,16 @@ I_EXPORT_COMPONENT(
 		"AuthorizationOptionsController",
 		"Authorization Options Controller");
 
+I_EXPORT_COMPONENT(
+		SessionController,
+		"Session controller",
+		"Session Controller");
+
+I_EXPORT_COMPONENT(
+		LogoutController,
+		"Logout controller",
+		"Logout Controller");
+
 
 } // namespace ImtAuthGqlPck
 

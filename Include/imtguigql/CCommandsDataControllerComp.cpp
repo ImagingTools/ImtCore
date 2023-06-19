@@ -13,9 +13,9 @@ imtbase::CTreeItemModel* CCommandsDataControllerComp::CreateInternalResponse(con
 {
 	QByteArray commandId;
 
-	const QList<imtgql::CGqlObject>* paramsPtr = gqlRequest.GetParams();
-	if (!paramsPtr->isEmpty()){
-		commandId = paramsPtr->at(0).GetFieldArgumentValue("PageId").toByteArray();
+	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
+	if (!paramsPtr.isEmpty()){
+		commandId = paramsPtr.at(0).GetFieldArgumentValue("PageId").toByteArray();
 	}
 
 	if (commandId.isEmpty()){

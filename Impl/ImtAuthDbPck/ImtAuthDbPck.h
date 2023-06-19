@@ -8,6 +8,7 @@
 #include <imtauthdb/CUsersSessionsDatabaseDelegateComp.h>
 #include <imtauthdb/CUsersSettingsDatabaseDelegateComp.h>
 #include <imtauthdb/CSuperuserProviderComp.h>
+#include <imtauthdb/CRemoteSuperuserProviderComp.h>
 
 
 /**
@@ -23,6 +24,7 @@ typedef imtauthdb::CUserGroupDatabaseDelegateComp UserGroupDatabaseDelegate;
 typedef imtauthdb::CUsersSessionsDatabaseDelegateComp UsersSessionsDatabaseDelegate;
 typedef imtauthdb::CUsersSettingsDatabaseDelegateComp UsersSettingsDatabaseDelegate;
 typedef imtauthdb::CSuperuserProviderComp SuperuserProvider;
+typedef imtauthdb::CRemoteSuperuserProviderComp RemoteSuperuserProvider;
 
 
 } // namespace ImtAuthDbPck

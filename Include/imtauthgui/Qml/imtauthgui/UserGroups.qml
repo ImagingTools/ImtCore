@@ -32,6 +32,10 @@ Item {
         }
     }
 
+    function blockEditing(){
+        groupsTable.readOnly = true;
+    }
+
     function updateGui(){
         console.log("UserGroups updateGui");
         userGroupsContainer.blockUpdatingModel = true;

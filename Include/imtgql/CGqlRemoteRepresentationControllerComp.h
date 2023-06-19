@@ -37,7 +37,7 @@ protected:
 	// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
-private:
+protected:
 	I_REF(imtgql::IGqlClient, m_apiClientCompPtr);
 };
 

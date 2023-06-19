@@ -23,7 +23,7 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlReq
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
-	QByteArray accountId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
+	QByteArray accountId = GetObjectIdFromInputParams(gqlRequest.GetParams());
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(accountId, dataPtr)){

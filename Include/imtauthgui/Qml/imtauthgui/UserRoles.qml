@@ -12,10 +12,12 @@ Item {
     property bool blockUpdatingModel: false;
 
     Component.onCompleted: {
+//        rolesProvider.updateModel({"ProductId" : window.productId});
         rolesProvider.updateModel();
     }
 
     onDocumentModelChanged: {
+//        rolesProvider.updateModel({"ProductId" : window.productId});
         rolesProvider.updateModel();
     }
 
@@ -42,6 +44,10 @@ Item {
                 }
             }
         }
+    }
+
+    function blockEditing(){
+        rolesTable.readOnly = true;
     }
 
     function updateGui(){

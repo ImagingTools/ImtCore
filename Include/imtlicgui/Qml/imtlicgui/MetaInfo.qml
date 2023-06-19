@@ -130,6 +130,7 @@ Rectangle {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", selectedId);
+//            inputParams.InsertField("ProductId", window.productId);
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("metaInfo");

@@ -20,10 +20,6 @@ DocumentBase {
     property int mainMargin: 0;
     property int panelWidth: 150;
 
-    onIncludedRolesTableChanged: {
-        console.log("onIncludedRolesTableChanged", container.includedRolesTable);
-    }
-
     onItemNameChanged: {
         if (container.documentModel.ContainsKey("Name")){
             let roleName = container.documentModel.GetData("Name");
@@ -78,6 +74,15 @@ DocumentBase {
         anchors.fill: parent;
 
         visible: false;
+    }
+
+    function blockEditing(){
+        for (let index = 0; index < leftMenuModel.count; index++){
+            let loader = bodyRepeater.itemAt(index);
+            if (loader.item){
+                loader.item.blockEditing();
+            }
+        }
     }
 
     function updateGui(){

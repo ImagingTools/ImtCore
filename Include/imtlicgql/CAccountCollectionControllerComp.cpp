@@ -46,7 +46,7 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(const imt
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel);
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
-	QByteArray accountId = GetObjectIdFromInputParams(*gqlRequest.GetParams());
+	QByteArray accountId = GetObjectIdFromInputParams(gqlRequest.GetParams());
 
 	int index = dataModelPtr->InsertNewItem();
 
@@ -101,6 +101,16 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(const imt
 	QString name = companyInfoPtr->GetName();
 
 	children->SetData("Value", name);
+
+//	index = dataModelPtr->InsertNewItem();
+//	dataModelPtr->SetData("Name", QT_TR_NOOP("Groups"), index);
+
+//	children = dataModelPtr->AddTreeModel("Children", index);
+
+//	for (const QByteArray& groupId : companyInfoPtr->GetGroups()){
+//		int childIndex = children->InsertNewItem();
+//		children->SetData("Value", groupId, childIndex);
+//	}
 
 	return rootModelPtr.PopPtr();
 }

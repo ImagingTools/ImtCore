@@ -80,15 +80,15 @@ bool CUserInfo::RemoveFromGroup(const QByteArray& groupId)
 }
 
 
-IUserBaseInfo::RoleIds CUserInfo::GetRoles() const
+IUserBaseInfo::RoleIds CUserInfo::GetRoles(const QByteArray& productId) const
 {
-	QByteArrayList retVal = m_roles;
+	IUserBaseInfo::RoleIds retVal = BaseClass::GetRoles(productId);
 
 	if (m_userGroupInfoProviderPtr != nullptr){
 		for (const QByteArray& parentGroupId : m_groupIds){
-			const imtauth::IUserGroupInfo* parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
-			if (parentGroupPtr != nullptr){
-				QByteArrayList groupRoleIds = parentGroupPtr->GetRoles();
+			istd::TDelPtr<const IUserGroupInfo> parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
+			if (parentGroupPtr.IsValid()){
+				QByteArrayList groupRoleIds = parentGroupPtr->GetRoles(productId);
 				for (const QByteArray& roleId : groupRoleIds){
 					if (!retVal.contains(roleId)){
 						retVal << roleId;
@@ -102,15 +102,15 @@ IUserBaseInfo::RoleIds CUserInfo::GetRoles() const
 }
 
 
-IUserBaseInfo::FeatureIds CUserInfo::GetPermissions() const
+IUserBaseInfo::FeatureIds CUserInfo::GetPermissions(const QByteArray& productId) const
 {
-	IUserBaseInfo::FeatureIds allPermissions = BaseClass::GetPermissions();
+	IUserBaseInfo::FeatureIds allPermissions = BaseClass::GetPermissions(productId);
 
 	if (m_userGroupInfoProviderPtr != nullptr){
 		for (const QByteArray& parentGroupId : m_groupIds){
-			const imtauth::IUserGroupInfo* parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
-			if (parentGroupPtr != nullptr){
-				allPermissions += parentGroupPtr->GetPermissions();
+			istd::TDelPtr<const IUserGroupInfo> parentGroupPtr = m_userGroupInfoProviderPtr->GetUserGroup(parentGroupId);
+			if (parentGroupPtr.IsValid()){
+				allPermissions += parentGroupPtr->GetPermissions(productId);
 			}
 		}
 	}
