@@ -22,11 +22,11 @@ void CEventBasedRepresentationViewComp::OnUpdate(const istd::IChangeable::Change
 		ilog::IMessageContainer::Messages messages = representationObjectPtr->GetMessages();
 
 		if (m_eventItemFactoryCompPtr.IsValid() && m_positionProviderCompPtr.IsValid()){
-			for (int i = 0; i < messages.count(); i++){
+			for (ilog::IMessageContainer::Messages::iterator it = messages.begin(); it != messages.end(); it++) {
 				IEventItem* itemPtr = nullptr;
-				QDateTime messageTimeStamp = messages[i]->GetInformationTimeStamp();
+				QDateTime messageTimeStamp = (*it)->GetInformationTimeStamp();
 
-				itemPtr = m_eventItemFactoryCompPtr->CreateInstance(messages[i]);
+				itemPtr = m_eventItemFactoryCompPtr->CreateInstance(*it);
 				if (itemPtr != nullptr){
 					QGraphicsItem* graphicsItemPtr = dynamic_cast<QGraphicsItem*>(itemPtr);
 					graphicsItemPtr->setFlags(QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIgnoresTransformations);
