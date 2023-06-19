@@ -41,13 +41,13 @@ Row {
             }
         }
         else {
-            [1, 2].map(function(v){listModel.append({number: v, selected: paginationContainer.currentIndex + 1 === v})});
+            [1, 2].map(function(v){listModel.append({number: v, selected: paginationContainer.currentIndex + 1 === v})}.bind(this));
             listModel.append({number: paginationContainer.currentIndex + 1 - 2 > 1 + 3 ? -1 : 1 + 2, selected: paginationContainer.currentIndex + 1 === 3});
             for (var k = Math.max(1 + 3, paginationContainer.currentIndex + 1 - 2); k <= Math.min(paginationContainer.pagesSize - 3, paginationContainer.currentIndex + 1 + 2); k++){
                 listModel.append({number: k, selected: paginationContainer.currentIndex + 1 === k});
             }
             listModel.append({number: paginationContainer.currentIndex + 1 + 2 < paginationContainer.pagesSize - 3 ? -1 : paginationContainer.pagesSize - 2, selected: paginationContainer.currentIndex + 1 === paginationContainer.pagesSize - 2});
-            [paginationContainer.pagesSize - 1, paginationContainer.pagesSize].map(function(v){listModel.append({number: v, selected: paginationContainer.currentIndex + 1 === v})});
+            [paginationContainer.pagesSize - 1, paginationContainer.pagesSize].map(function(v){listModel.append({number: v, selected: paginationContainer.currentIndex + 1 === v})}.bind(this));
         }
         repeaterPagination.model = listModel;
     }

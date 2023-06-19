@@ -45,7 +45,7 @@ Item {
 
 
     function setMaxValue(){
-        if(diagram.model !== 0){
+        if(diagram.model.GetItemsCount()){
             var maxVal = 0;
             //for(var i = 0; i < diagram.model.count; i++)
             for(var i = 0; i < diagram.model.GetItemsCount(); i++)
@@ -54,16 +54,17 @@ Item {
                 //var currVal = diagram.model.get(i).positive + diagram.model.get(i).negative;
                 var currVal = diagram.model.GetData("positive",i) + diagram.model.GetData("negative",i);
                 if(currVal > maxVal){
-                    maxVal = currVal
+                    maxVal = currVal;
                 }
 
             }
+
+            diagram.maxValue = maxVal;
+            sizeText.text = maxVal;
+            diagram.fillAxeYModel();
         }
 
-        //console.log(maxVal);
-        diagram.maxValue = maxVal;
-        sizeText.text = maxVal;
-        diagram.fillAxeYModel();
+
 
     }
 
