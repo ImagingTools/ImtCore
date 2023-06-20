@@ -69,6 +69,7 @@ export class TextInput extends Item {
         this.dom.style.display = 'flex'
         this.dom.appendChild(this.impl);
         
+        this.impl.autocomplete = "new-password"
         this.impl.style.textAlign = "inherit"
         this.impl.style.width = "100%";
         this.impl.style.height = 'auto'
@@ -98,6 +99,11 @@ export class TextInput extends Item {
 		}.bind(this))
 
         this.$fontChanged()
+    }
+
+    $sID(ID){
+        super.$sID(ID)
+        this.impl.name = this.ID.size ? this.ID.values().next().value : ''
     }
     $visibleChanged(){
         super.$visibleChanged()
