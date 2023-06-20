@@ -121,9 +121,6 @@ if(NOT ANDROID)
 	add_subdirectory("${IMPL_DIR}/ImtLicenseGuiPck/CMake" "${AUX_INCLUDE_DIR}/ImtLicenseGuiPck")
 	add_dependencies(ImtLicenseGuiPck imtbase imtlic imtlicgui)
 
-	add_subdirectory("${IMPL_DIR}/ImtLicenseGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtLicenseGqlPck")
-	add_dependencies(ImtLicenseGuiPck imtbase imtlic imtlicgql)
-
 	add_subdirectory("${IMPL_DIR}/ImtCryptPck/CMake" "${AUX_INCLUDE_DIR}/ImtCryptPck")
 	add_dependencies(ImtCryptPck imtbase imtcrypt)
 
@@ -159,9 +156,6 @@ if(NOT ANDROID)
 	add_subdirectory("${IMPL_DIR}/ImtHttpPck/CMake" "${AUX_INCLUDE_DIR}/ImtHttpPck")
 	add_dependencies(ImtHttpPck imthttp)
 
-	add_subdirectory("${IMPL_DIR}/ImtAuthGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthGqlPck")
-	add_dependencies(ImtAuthGqlPck imtauthgql)
-
 	add_subdirectory("${IMPL_DIR}/ImtGeoPck/CMake" "${AUX_INCLUDE_DIR}/ImtGeoPck")
 	add_dependencies(ImtGeoPck imtgeo)
 
@@ -184,6 +178,15 @@ if(NOT ANDROID)
 
 		add_subdirectory("${IMPL_DIR}/ImtLicenseDbPck/CMake" "${AUX_INCLUDE_DIR}/ImtLicenseDbPck")
 		add_dependencies(ImtLicenseDbPck imtbase imtdb imtlicdb)
+
+		add_subdirectory("${IMPL_DIR}/ImtLicenseGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtLicenseGqlPck")
+		add_dependencies(ImtLicenseGuiPck imtbase imtlic imtlicgql imtdb)
+
+		add_subdirectory("${IMPL_DIR}/ImtAuthGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtAuthGqlPck")
+		add_dependencies(ImtAuthGqlPck imtauthgql imtdb)
+
+		add_subdirectory("${IMPL_DIR}/ImtGuiGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtGuiGqlPck")
+		add_dependencies(ImtGuiGqlPck imtguigql imtdb)
 	endif()
 
 	if(NOT DEFINED USE_QT3D OR USE_QT3D)
@@ -205,8 +208,7 @@ if(NOT ANDROID)
 	if(NOT DEFINED USE_QTQML OR USE_QTQML)
 		add_subdirectory("${IMPL_DIR}/ImtQmlPck/CMake" "${AUX_INCLUDE_DIR}/ImtQmlPck")
 		add_dependencies(ImtQmlPck imtqml)
-		add_subdirectory("${IMPL_DIR}/ImtGuiGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtGuiGqlPck")
-		add_dependencies(ImtGuiGqlPck imtguigql imtdb)
+
 	endif()
 
 endif()
