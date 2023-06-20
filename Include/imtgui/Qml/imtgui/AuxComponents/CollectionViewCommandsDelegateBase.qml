@@ -96,8 +96,12 @@ Item {
     }
 
     function onEdit(){
+        console.log("CollectionView onEdit");
+
         let itemIds = containerBase.tableData.getSelectedIds();
         let itemNames = containerBase.tableData.getSelectedNames();
+
+        console.log("itemIds", itemIds);
 
         for (let i = 0; i < itemIds.length; i++){
             let itemId = itemIds[i];
@@ -144,6 +148,7 @@ Item {
         }
 
         let commandIsEnabled = containerBase.commandsProvider.commandIsEnabled(commandId);
+        console.log("commandIsEnabled", commandIsEnabled);
         if (commandIsEnabled){
             if (commandId === "New"){
                 containerBase.onNew();
@@ -157,6 +162,7 @@ Item {
         }
 
         let editIsEnabled = containerBase.commandsProvider.commandIsEnabled("Edit");
+        console.log("editIsEnabled", editIsEnabled);
         if (editIsEnabled){
             if (commandId === "Rename"){
                 containerBase.onRename();

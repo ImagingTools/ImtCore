@@ -66,8 +66,6 @@ Item {
 
                 text: model.Name;
 
-
-
                 onClicked: {
                     Events.sendEvent(commandsDecoratorContainer.commandsId + "CommandActivated", model.Id);
                 }

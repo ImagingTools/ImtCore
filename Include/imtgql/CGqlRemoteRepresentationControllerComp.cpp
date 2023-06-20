@@ -5,7 +5,27 @@ namespace imtgql
 {
 
 
-// public methods
+// protected methods
+
+// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+
+imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalResponse(const CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	if (!IsRequestSupported(gqlRequest)){
+		return nullptr;
+	}
+
+	Response responseHandler;
+	bool retVal = m_apiClientCompPtr->SendRequest(gqlRequest, responseHandler);
+	if (retVal){
+		return responseHandler.GetResult();
+	}
+
+	return nullptr;
+}
+
+
+// private methods
 
 CGqlRemoteRepresentationControllerComp::Response::Response()
 	:m_replyResultPtr(nullptr)
@@ -55,26 +75,6 @@ void CGqlRemoteRepresentationControllerComp::Response::OnReply(const IGqlRequest
 			}
 		}
 	}
-}
-
-
-// protected methods
-
-// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
-
-imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalResponse(const CGqlRequest& gqlRequest, QString& errorMessage) const
-{
-	if (!IsRequestSupported(gqlRequest)){
-		return nullptr;
-	}
-
-	Response responseHandler;
-	bool retVal = m_apiClientCompPtr->SendRequest(gqlRequest, responseHandler);
-	if (retVal){
-		return responseHandler.GetResult();
-	}
-
-	return nullptr;
 }
 
 

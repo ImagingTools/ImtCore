@@ -13,7 +13,6 @@
 #include <iqtgui/TGuiComponentBase.h>
 
 
-
 namespace imtqml
 {
 

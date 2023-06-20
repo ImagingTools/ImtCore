@@ -6,8 +6,12 @@
 
 // ACF includes
 #include <icomp/CComponentBase.h>
-#include <imtqml/IQuickObject.h>
+#include <iprm/IEnableableParam.h>
+#include <imod/TModelWrap.h>
+
+// ImtCore includes
 #include <imtbase/CTreeItemModel.h>
+#include <imtqml/IQuickObject.h>
 
 
 namespace imtqml
@@ -28,6 +32,10 @@ public:
 
 	I_BEGIN_COMPONENT(CQuickObjectCompBase);
 		I_REGISTER_INTERFACE(imtqml::IQuickObject);
+		I_REGISTER_SUBELEMENT(QuickItemCreated);
+		I_REGISTER_SUBELEMENT_INTERFACE(QuickItemCreated, iprm::IEnableableParam, ExtractEnableableParam);
+		I_REGISTER_SUBELEMENT_INTERFACE(QuickItemCreated, imod::IModel, ExtractEnableableParam);
+		I_REGISTER_SUBELEMENT_INTERFACE(QuickItemCreated, istd::IChangeable, ExtractEnableableParam);
 		I_ASSIGN(m_pathToQmlAttrPtr, "QmlFilePath", "This path used for load QML file", true, GetPathToQml());
 		I_ASSIGN(m_baseUrlAttrPtr, "BaseUrl", "BaseUrl for AccessManager", false, "");
 		I_ASSIGN_MULTI_0(m_modelIdsAttrPtr, "ModelIdsAttr", "If enabled, this Id's used for register models", false);
@@ -75,14 +83,44 @@ protected:
 public Q_SLOTS:
 	void OnModelNeedsReload(imtbase::CTreeItemModel *itemModelPtr = nullptr);
 
+private:
+	class QuickItemCreated : public iprm::IEnableableParam
+	{
+	public:
+		QuickItemCreated();
+
+		void SetQuickItemCreated(bool isCreated);
+
+		// reimplemented (iprm::IEnableableParam)
+		virtual bool IsEnabled() const;
+		virtual bool IsEnablingAllowed() const;
+		virtual bool SetEnabled(bool isEnabled = true);
+
+		// reimplemented (iser::ISerializable)
+		virtual bool Serialize(iser::IArchive& archive);
+
+	private:
+		bool m_isCreated;
+	};
+
+	// static template methods for sub element access
+	template <class InterfaceType>
+	static InterfaceType* ExtractEnableableParam(CQuickObjectCompBase& component)
+	{
+		return &component.m_itemCreated;
+	}
+
+protected:
+	imod::TModelWrap<QuickItemCreated> m_itemCreated;
+
+	QQuickItem* m_quickItemPtr;
+	QList<imtbase::CTreeItemModel*> m_models;
+
 protected:
 	I_ATTR(QString, m_pathToQmlAttrPtr);
 	I_ATTR(QString, m_baseUrlAttrPtr);
 	I_MULTIATTR(QByteArray, m_modelIdsAttrPtr);
 	I_MULTIATTR(QByteArray, m_modelQueriesAttrPtr);
-
-	QQuickItem* m_quickItemPtr;
-	QList<imtbase::CTreeItemModel*> m_models;
 };
 
 

@@ -52,7 +52,8 @@ bool CQuickObjectCompBase::CreateQuickItem(QQuickItem* parentPtr)
 	QQmlEngine *engine = qmlEngine(parentPtr);
 	if (engine != nullptr){
 		if (m_baseUrlAttrPtr.IsValid() && *m_baseUrlAttrPtr != ""){
-			engine->setBaseUrl(*m_baseUrlAttrPtr);
+			QString baseUrl = *m_baseUrlAttrPtr;
+			engine->setBaseUrl(baseUrl);
 		}
 		m_quickItemPtr = CreateItem(engine);
 		if (m_quickItemPtr != nullptr){
@@ -138,7 +139,6 @@ QQuickItem* CQuickObjectCompBase::CreateItem(QQmlEngine* enginePtr, const QVaria
 	QQmlComponent component(enginePtr, QUrl("qrc" + m_pathToQmlAttrPtr->GetValue()));
 #if QT_VERSION > QT_VERSION_CHECK(5, 14, 0)
 	return qobject_cast<QQuickItem*>(component.createWithInitialProperties(initialProperties, enginePtr->rootContext()));
-
 #endif
 	return nullptr;
 }
@@ -158,12 +158,15 @@ void CQuickObjectCompBase::OnItemCreated()
 		m_quickItemPtr->setProperty(modelId, QVariant::fromValue(modelPtr));
 	}
 
+	m_itemCreated.SetQuickItemCreated(true);
+
 	QMetaObject::invokeMethod(m_quickItemPtr, "firstModelsInit");
 }
 
 
 void CQuickObjectCompBase::OnItemDestroyed()
 {
+	m_itemCreated.SetQuickItemCreated(false);
 }
 
 
@@ -177,6 +180,52 @@ void CQuickObjectCompBase::OnComponentCreated()
 
 void CQuickObjectCompBase::OnModelNeedsReload(imtbase::CTreeItemModel *itemModelPtr)
 {
+}
+
+
+// private methods of the embedded class QuickItemCreated
+
+CQuickObjectCompBase::QuickItemCreated::QuickItemCreated()
+	:m_isCreated(false)
+{
+}
+
+
+void CQuickObjectCompBase::QuickItemCreated::SetQuickItemCreated(bool isCreated)
+{
+	if (m_isCreated != isCreated){
+		istd::CChangeNotifier changePtr(this);
+
+		m_isCreated = isCreated;
+	}
+}
+
+
+// reimplemented (iprm::IEnableableParam)
+
+bool CQuickObjectCompBase::QuickItemCreated::IsEnabled() const
+{
+	return m_isCreated;
+}
+
+
+bool CQuickObjectCompBase::QuickItemCreated::IsEnablingAllowed() const
+{
+	return false;
+}
+
+
+bool CQuickObjectCompBase::QuickItemCreated::SetEnabled(bool isEnabled)
+{
+	return false;
+}
+
+
+// reimplemented (iser::ISerializable)
+
+bool CQuickObjectCompBase::QuickItemCreated::Serialize(iser::IArchive& archive)
+{
+	return true;
 }
 
 

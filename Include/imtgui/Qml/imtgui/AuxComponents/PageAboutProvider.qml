@@ -27,8 +27,6 @@ Item {
     property string pageId: "About";
     property string pageName: "About";
 
-
-
     function createRepresentationModel(){
         if (root.applicationInfoProvider != null){
             root.pageModel.SetData("Id", root.pageId);

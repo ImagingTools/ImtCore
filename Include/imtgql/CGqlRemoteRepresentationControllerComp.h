@@ -20,6 +20,11 @@ public:
 		I_ASSIGN(m_apiClientCompPtr, "ApiClient", "Api Client", true, "ApiClient");
 	I_END_COMPONENT;
 
+protected:
+	// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+
+protected:
 	class Response: virtual public imtgql::IGqlClient::ResponseHandler
 	{
 	public:
@@ -32,11 +37,6 @@ public:
 	private:
 		imtbase::CTreeItemModel* m_replyResultPtr;
 	};
-
-protected:
-	// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
-
 protected:
 	I_REF(imtgql::IGqlClient, m_apiClientCompPtr);
 };

@@ -26,12 +26,13 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 		const QList<imtgql::CGqlObject> paramList = gqlRequest.GetParams();
 
 		if (!paramList.isEmpty()){
+			imtgql::CGqlObject gqlObject = paramList.at(0);
 			if (paramList.at(0).GetFieldIds().contains("Login")){
-				login = paramList.at(0).GetFieldArgumentValue("Login").toByteArray();
+				login = gqlObject.GetFieldArgumentValue("Login").toByteArray();
 			}
 
 			if (paramList.at(0).GetFieldIds().contains("Password")){
-				password = paramList.at(0).GetFieldArgumentValue("Password").toByteArray();
+				password = gqlObject.GetFieldArgumentValue("Password").toByteArray();
 			}
 		}
 

@@ -23,6 +23,10 @@ QtObject {
         commandsProviderContainer.modelLoaded();
     }
 
+    onCommandModeChanged: {
+        Events.sendEvent("CommandsEnabledChanged", {"CommandsId":commandsProviderContainer.documentUuid, "CommandId":commandId, "Enabled":newMode, "Model": commandsProviderContainer.commandsModel});
+    }
+
     function updateModel(){
         commandsProviderContainer.modelCommands.updateModel();
     }

@@ -1,12 +1,6 @@
 #include <imtqml/CGuiQuickWrapComp.h>
 
 
-// Qt includes
-#include <QtGui/QGuiApplication>
-#include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QPushButton>
-
-
 namespace imtqml
 {
 
