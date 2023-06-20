@@ -410,7 +410,6 @@ bool CCompositeDeviceControllerComp::DeviceConnectionState::IsDeviceConnected(co
 				}
 			}
 
-			Q_ASSERT(false);
 			return false;
 		}
 
