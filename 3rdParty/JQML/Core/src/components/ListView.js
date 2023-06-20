@@ -99,11 +99,17 @@ export class ListView extends Flickable {
 
     $contentXChanged(){
         if(this.orientation === ListView.Horizontal){
-            if(this.$items[0] && this.$p.contentX.val < this.$items[0].x){
-                this.$p.contentX.val = this.$items[0].x
+            // if(this.$items[0] && this.$p.contentX.val < this.$items[0].x){
+            //     this.$p.contentX.val = this.$items[0].x
+            // }
+            // if(this.$items[this.$items.length-1] && this.$p.contentX.val > this.$items[this.$items.length-1].x + this.$items[this.$items.length-1].width - this.width){
+            //     this.$p.contentX.val = this.$items[this.$items.length-1].x + this.$items[this.$items.length-1].width - this.width
+            // }
+            if(this.contentX < this.originX){
+                this.$p.contentX.val = this.originX
             }
-            if(this.$items[this.$items.length-1] && this.$p.contentX.val > this.$items[this.$items.length-1].x + this.$items[this.$items.length-1].width - this.width){
-                this.$p.contentX.val = this.$items[this.$items.length-1].x + this.$items[this.$items.length-1].width - this.width
+            if(this.contentX > this.contentWidth + this.originX - this.width){
+                this.$p.contentX.val = this.contentWidth + this.originX - this.width
             }
             super.$contentXChanged()
             this.$updateView()
@@ -112,11 +118,17 @@ export class ListView extends Flickable {
     }
     $contentYChanged(){
         if(this.orientation === ListView.Vertical){
-            if(this.$items[0] && this.$p.contentY.val < this.$items[0].y){
-                this.$p.contentY.val = this.$items[0].y
+            // if(this.$items[0] && this.$p.contentY.val < this.$items[0].y){
+            //     this.$p.contentY.val = this.$items[0].y
+            // }
+            // if(this.$items[this.$items.length-1] && this.$p.contentY.val > this.$items[this.$items.length-1].y + this.$items[this.$items.length-1].height - this.height){
+            //     this.$p.contentY.val = this.$items[this.$items.length-1].y + this.$items[this.$items.length-1].height - this.height
+            // }
+            if(this.contentY < this.originY){
+                this.$p.contentY.val = this.originY
             }
-            if(this.$items[this.$items.length-1] && this.$p.contentY.val > this.$items[this.$items.length-1].y + this.$items[this.$items.length-1].height - this.height){
-                this.$p.contentY.val = this.$items[this.$items.length-1].y + this.$items[this.$items.length-1].height - this.height
+            if(this.contentY > this.contentHeight + this.originY - this.height){
+                this.$p.contentY.val = this.contentHeight + this.originY - this.height
             }
             super.$contentYChanged()
             this.$updateView()
@@ -835,35 +847,27 @@ export class ListView extends Flickable {
 
 		if(this.interactive && this.enabled){
 			if(this.flickableDirection !== Flickable.VerticalFlick && this.contentWidth > 0 && this.contentWidth > this.width){
-				if(deltaX > 0)
-				if(!this.$items[this.$items.length-1] || this.contentX + deltaX < this.$items[this.$items.length-1].x + this.$items[this.$items.length-1].width - this.width){
-					this.contentX += deltaX
-				} else {
-					this.contentX = this.$items[this.$items.length-1].x+this.$items[this.$items.length-1].width-this.width//this.contentHeight - this.height
-				}
-				if(deltaX < 0)
-				if(!this.$items[0] || this.contentX + deltaX > this.$items[0].x){
-					this.contentX += deltaX
-				} else {
-					this.contentX = this.$items[0].x
-				}
+				let newContentX = this.contentX + deltaX
+				if(newContentX < this.originX){
+                    this.contentX = this.originX
+                } else if(newContentX > this.contentWidth + this.originX - this.width){
+                    this.contentX = this.contentWidth + this.originX - this.width
+                } else {
+                    this.contentX = newContentX
+                }
 			} else {
 				// this.$parentScroll(deltaX, 0)
 			}
 			
 			if(this.flickableDirection !== Flickable.HorizontalFlick && this.contentHeight > 0 && this.contentHeight > this.height){
-				if(deltaY > 0)
-				if(!this.$items[this.$items.length-1] || this.contentY + deltaY < this.$items[this.$items.length-1].y + this.$items[this.$items.length-1].height - this.height){
-					this.contentY += deltaY
-				} else {
-					this.contentY = this.$items[this.$items.length-1].y+this.$items[this.$items.length-1].height-this.height//this.contentHeight - this.height
-				}
-				if(deltaY < 0)
-				if(!this.$items[0] || this.contentY + deltaY > this.$items[0].y){
-					this.contentY += deltaY
-				} else {
-					this.contentY = this.$items[0].y
-				}
+				let newContentY = this.contentY + deltaY
+				if(newContentY < this.originY){
+                    this.contentY = this.originY
+                } else if(newContentY > this.contentHeight + this.originY - this.height){
+                    this.contentY = this.contentHeight + this.originY - this.height
+                } else {
+                    this.contentY = newContentY
+                }
 			} else {
 				// this.$parentScroll(0, deltaY)
 			}
