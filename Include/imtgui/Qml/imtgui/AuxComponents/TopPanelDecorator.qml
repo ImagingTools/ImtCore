@@ -58,16 +58,6 @@ Item {
             GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
         }
 
-        Component.onCompleted: {
-            console.log("rightPanel");
-            console.log("rightPanel.width", rightPanel.width);
-            console.log("rightPanel.height", rightPanel.height);
-            rightPanel.decoratorSource = "TopRightPanelDecorator.qml";
-        }
-
-        onDecoratorSourceChanged: {
-            console.log("rightPanel onDecoratorSourceChanged", Style.topRightPanelDecoratorPath);
-        }
     }
 }
 
