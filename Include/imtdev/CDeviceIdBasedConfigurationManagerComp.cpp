@@ -162,7 +162,7 @@ bool CDeviceIdBasedConfigurationManagerComp::Serialize(iser::IArchive& archive)
 const IDeviceStaticInfo* CDeviceIdBasedConfigurationManagerComp::FindDeviceStaticInfo(const QByteArray& deviceId) const
 {
 	if (!deviceId.isEmpty() && m_deviceControllerCompPtr.IsValid()){
-		DeviceInstanceInfoPtr deviceInstanceInfoPtr = m_deviceControllerCompPtr->GetDeviceInstanceInfo(deviceId);
+		DeviceInstanceInfoPtr deviceInstanceInfoPtr = m_deviceControllerCompPtr->GetDeviceInstanceInfo("", deviceId);
 		if (!deviceInstanceInfoPtr.isNull()){
 			return &deviceInstanceInfoPtr->GetDeviceStaticInfo();
 		}

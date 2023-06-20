@@ -64,10 +64,22 @@ IDeviceController::DeviceState CCompositeDeviceControllerComp::GetDeviceState(co
 }
 
 
-DeviceInstanceInfoPtr CCompositeDeviceControllerComp::GetDeviceInstanceInfo(const QByteArray& deviceId) const
+DeviceInstanceInfoPtr CCompositeDeviceControllerComp::GetDeviceInstanceInfo(
+			const QByteArray& deviceTypeId,
+			const QByteArray& deviceId) const
 {
-	if (m_deviceControllerMap.contains(deviceId)){
-		return m_deviceControllerMap[deviceId]->GetDeviceInstanceInfo(deviceId);
+	if (!deviceId.isEmpty() && m_deviceControllerMap.contains(deviceId)){
+		return m_deviceControllerMap[deviceId]->GetDeviceInstanceInfo(deviceTypeId, deviceId);
+	}
+
+	if (!deviceTypeId.isEmpty()){
+		for (int i = 0; i < m_deviceControllerCompPtr.GetCount(); i++){
+			if (m_deviceControllerCompPtr[i] != nullptr){
+				if (m_deviceControllerCompPtr[i]->GetSupportedDeviceTypeIds().contains(deviceTypeId)){
+					return m_deviceControllerCompPtr[i]->GetDeviceInstanceInfo(deviceTypeId, deviceId);
+				}
+			}
+		}
 	}
 
 	return DeviceInstanceInfoPtr();
@@ -354,7 +366,7 @@ void CCompositeDeviceControllerComp::UpdateExtendedDeviceList()
 
 QByteArray CCompositeDeviceControllerComp::GetDeviceTypeId(const QByteArray& deviceId) const
 {
-	DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo(deviceId);
+	DeviceInstanceInfoPtr instanceInfoPtr = GetDeviceInstanceInfo("", deviceId);
 	if (!instanceInfoPtr.isNull()){
 		QByteArray deviceTypeId = instanceInfoPtr->GetDeviceStaticInfo().GetDeviceTypeId();
 

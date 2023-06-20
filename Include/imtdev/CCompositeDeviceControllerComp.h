@@ -65,7 +65,9 @@ public:
 	virtual const IDeviceStaticInfo* GetDeviceStaticInfo(const QByteArray& deviceTypeId) const override;
 	virtual const imtbase::ICollectionInfo& GetAvailableDeviceList() const override;
 	virtual DeviceState GetDeviceState(const QByteArray& deviceId) const override;
-	virtual DeviceInstanceInfoPtr GetDeviceInstanceInfo(const QByteArray& deviceId) const override;
+	virtual DeviceInstanceInfoPtr GetDeviceInstanceInfo(
+				const QByteArray& deviceTypeId,
+				const QByteArray& deviceId) const override;
 	virtual imtdev::DeviceAccessorPtr OpenDevice(
 				const QByteArray& deviceTypeId,
 				const QByteArray& deviceId,

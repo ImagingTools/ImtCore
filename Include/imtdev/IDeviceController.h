@@ -77,7 +77,9 @@ public:
 		Get device instance info for the given DeviceId.
 		For some devices DeviceInstanceInfo can only be obtained for open devices
 	*/
-	virtual DeviceInstanceInfoPtr GetDeviceInstanceInfo(const QByteArray& deviceId) const = 0;
+	virtual DeviceInstanceInfoPtr GetDeviceInstanceInfo(
+				const QByteArray& deviceTypeId,
+				const QByteArray& deviceId) const = 0;
 
 	/**
 		Start processing loop of the given device. The state of the device will be switched into DS_ACTIVE, if the operation was successful.
