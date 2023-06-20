@@ -13,8 +13,10 @@ Item {
     property real maxValue: 100;
     property real negativeValue;
     property real positiveValue;
-    property real elementWidth:barWidth;
+    property real elementWidth: barWidth;
     property real barWidth:30;
+
+    property int addToValue: 30;
 
 
     property string color_positive: "#ff8a3d";
@@ -96,7 +98,7 @@ Item {
 
         borderColor: Style.color_elementBorder;
 
-        text: barChart.isPositiveTooltip ? barChart.positiveValue : barChart.isNegativeTooltip ? barChart.negativeValue : "";
+        text: barChart.isPositiveTooltip ? barChart.positiveValue + barChart.addToValue : barChart.isNegativeTooltip ? barChart.negativeValue + barChart.addToValue : "";
     }
 
     PauseAnimation {

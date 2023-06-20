@@ -22,8 +22,10 @@ Item {
     property bool visibleAxeX: false;
     property bool visibleAxeY: true;
     property int fontSize: 18;
-    property int maxValue: 100;
-    property int maxAxeYValue: 100;
+    property bool hasMinValue: false;
+    property int minValue: 0;
+    property real maxValue: 100;
+    property real maxAxeYValue: 100;
     property real minWidth: Math.max((axeYValuesContainer.width + axeY.width + barsList.contentWidth + barsList.anchors.leftMargin + barsSpace.anchors.rightMargin + legendXTextRight.width),
                                      titleText.width, legendXText.width, legendYText.width);
 
@@ -43,16 +45,51 @@ Item {
         diagram.setMaxValue();
     }
 
+    function setMinValue(){
+        if(!diagram.hasMinValue){
+            diagram.minValue = 0;
+        }
+        else{
+            var minVal = 0;
+            var summ = 0;
+            var average = 0;
+            var count = diagram.model.GetItemsCount();
+            var firstVal;
+            var lastVal;
+            var delta;
+            if(count){
+                for(var i = 0; i < diagram.model.GetItemsCount(); i++){
+                    var currVal = diagram.model.GetData("positive",i) + diagram.model.GetData("negative",i);
+                    summ += currVal;
+                    if(i == 0){
+                        firstVal = currVal;
+                    }
+                    if(i == count -1){
+                        lastVal = currVal;
+                    }
+                }
+                average = summ/count;
+                delta = lastVal - firstVal;
+                minVal = Math.trunc(firstVal/10) * 10;
+            }
+
+            diagram.minValue = minVal;
+        }
+    }
+
 
     function setMaxValue(){
         if(diagram.model.GetItemsCount()){
+
+            setMinValue();
+
             var maxVal = 0;
             //for(var i = 0; i < diagram.model.count; i++)
             for(var i = 0; i < diagram.model.GetItemsCount(); i++)
             {
                 //console.log(model.get(i).positive, model.get(i).negative);
                 //var currVal = diagram.model.get(i).positive + diagram.model.get(i).negative;
-                var currVal = diagram.model.GetData("positive",i) + diagram.model.GetData("negative",i);
+                var currVal = diagram.model.GetData("positive",i) + diagram.model.GetData("negative",i) - diagram.minValue;
                 if(currVal > maxVal){
                     maxVal = currVal;
                 }
@@ -60,7 +97,6 @@ Item {
             }
 
             diagram.maxValue = maxVal;
-            sizeText.text = maxVal;
             diagram.fillAxeYModel();
         }
 
@@ -75,17 +111,29 @@ Item {
             if(i == 4){
                 val = diagram.roundDigit((diagram.maxValue/4 * i),true);
                 diagram.maxAxeYValue = val;
-                axeYValueModel.append({"text" : val})
+                let valToModel = val + diagram.minValue;
+                axeYValueModel.append({"text" : valToModel})
             }
             else {
                 val = diagram.roundDigit((diagram.maxValue/4 * i),false);
-                axeYValueModel.append({"text" : val})
+                let valToModel = val + diagram.minValue;
+                axeYValueModel.append({"text" : valToModel})
             }
         }
-
+        diagram.setSizeText();
     }
 
 
+    function setSizeText(){
+        var maxText = "";
+        for (var i = 0; i < axeYValueModel.count; i++){
+            var currText = String(axeYValueModel.get(i).text);
+            if(currText.length > maxText.length){
+                maxText = currText;
+            }
+        }
+        sizeText.text = maxText;
+    }
 
     function roundDigit(digit, ceil){
 
@@ -178,7 +226,7 @@ Item {
             font.family: Style.fontFamily;
             color:  diagram.valueColor;
 
-            text: diagram.maxValue;
+            text: diagram.roundDigit(diagram.maxValue);
 
         }
 
@@ -326,10 +374,11 @@ Item {
             model: diagram.model;
             delegate:
                 Item{
-                anchors.bottom: parent.bottom;
+                //anchors.bottom: parent.bottom;
 
                 width: diagram.barWidth + diagram.spacingX;
-                height: barChart.height;
+                //height: barChart.height;
+                height: barsList.height;
                 BarChart{
                     id: barChart;
 
@@ -341,10 +390,12 @@ Item {
                     maxBarHeight: barsList.height;
                     maxValue: diagram.maxValue;
                     barWidth: diagram.barWidth;
-                    positiveValue: model.positive;
-                    negativeValue: model.negative;
+                    positiveValue: (model.positive - diagram.minValue) >= 0 ? (model.positive - diagram.minValue) : 0;
+                    negativeValue: (model.negative - diagram.minValue) >= 0 ? (model.negative - diagram.minValue) : 0;
                     color_positive: diagram.colorPositive;
                     color_negative: diagram.colorNegative;
+
+                    addToValue: diagram.minValue;
                 }
             }
 
