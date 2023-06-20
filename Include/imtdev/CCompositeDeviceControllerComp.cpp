@@ -396,6 +396,24 @@ void CCompositeDeviceControllerComp::DeviceConnectionState::SetParent(CComposite
 bool CCompositeDeviceControllerComp::DeviceConnectionState::IsDeviceConnected(const QByteArray& deviceId)
 {
 	if (m_parentPtr != nullptr){
+		QByteArrayList typeIds = m_parentPtr->GetSupportedDeviceTypeIds();
+		if (typeIds.contains(deviceId)){
+			QByteArrayList deviceIds = m_parentPtr->m_deviceControllerMap.keys();
+			for (int i = 0; i < deviceIds.count(); i++){
+				DeviceInstanceInfoPtr instancePtr = m_parentPtr->GetDeviceInstanceInfo("", deviceIds[i]);
+				Q_ASSERT(!instancePtr.isNull());
+
+				if (!instancePtr.isNull()){
+					if (instancePtr->GetDeviceStaticInfo().GetDeviceTypeId() == deviceId){
+						return true;
+					}
+				}
+			}
+
+			Q_ASSERT(false);
+			return false;
+		}
+
 		return m_parentPtr->m_deviceControllerMap.contains(deviceId);
 	}
 
