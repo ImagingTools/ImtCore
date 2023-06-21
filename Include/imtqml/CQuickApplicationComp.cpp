@@ -41,8 +41,6 @@ namespace imtqml
 // public methods
 
 CQuickApplicationComp::CQuickApplicationComp()
-	:m_defaultWidgetFlags(0),
-	  m_trayMessages(*this)
 {
 }
 
@@ -138,32 +136,6 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 
 		HideSplashScreen();
 
-		if (*m_useTrayIconAttrPtr){
-			m_trayIconPtr.SetPtr(new QSystemTrayIcon);
-#if QT_VERSION >= 0x050000
-			m_trayIconPtr->setIcon(QGuiApplication::windowIcon());
-#else
-			m_trayIconPtr->setIcon(QApplication::windowIcon());
-#endif
-
-			QMenu* trayMenuPtr = new QMenu;
-
-			if (m_trayIconCommandsCompPtr.IsValid()){
-				const iqtgui::CHierarchicalCommand* commandPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(m_trayIconCommandsCompPtr->GetCommands());
-				if (commandPtr != NULL){
-					iqtgui::CCommandTools::CreateMenu<QMenu>(*commandPtr, *trayMenuPtr);
-				}
-			}
-
-			trayMenuPtr->addSeparator();
-
-			trayMenuPtr->addAction(tr("Quit"), this, SLOT(OnQuit()));
-
-			m_trayIconPtr->setContextMenu(trayMenuPtr);
-
-			m_trayIconPtr->setVisible(true);
-		}
-
 		QTimer::singleShot(0, this, SLOT(OnEventLoopStarted()));
 
 		// Start application loop:
@@ -171,15 +143,6 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 
 		m_runtimeStatus.SetRuntimeStatus(ibase::IRuntimeStatusProvider::RS_SHUTDOWN);
 	}
-
-	if (m_trayIconPtr.IsValid()){
-		QMenu* trayMenuPtr = m_trayIconPtr->contextMenu();
-		if (trayMenuPtr != NULL){
-			delete trayMenuPtr;
-		}
-	}
-
-	m_trayIconPtr.Reset();
 
 	return retVal;
 }
@@ -203,16 +166,6 @@ void CQuickApplicationComp::OnComponentDestroyed()
 
 // private methods
 
-void CQuickApplicationComp::UpdateMainWidgetDecorations()
-{
-}
-
-
-void CQuickApplicationComp::ShowWindow()
-{
-}
-
-
 void CQuickApplicationComp::OnEventLoopStarted()
 {
 	m_runtimeStatus.SetRuntimeStatus(ibase::IRuntimeStatusProvider::RS_RUNNING);
@@ -228,53 +181,6 @@ void CQuickApplicationComp::OnEventLoopStarted()
 void CQuickApplicationComp::OnQuit()
 {
 	QCoreApplication::quit();
-}
-
-
-// public methods of the embedded class TrayMessages
-
-CQuickApplicationComp::TrayMessages::TrayMessages(CQuickApplicationComp& parent)
-	:m_parent(parent)
-{
-}
-
-
-// reimplemented (ilog::IMessageConsumer)
-
-bool CQuickApplicationComp::TrayMessages::IsMessageSupported(
-		int /*messageCategory*/,
-		int /*messageId*/,
-		const istd::IInformationProvider* /*messagePtr*/) const
-{
-	return m_parent.m_trayIconPtr.IsValid();
-}
-
-
-void CQuickApplicationComp::TrayMessages::AddMessage(const MessagePtr& messagePtr)
-{
-	if (m_parent.m_trayIconPtr.IsValid()){
-		QSystemTrayIcon::MessageIcon severityIcon = QSystemTrayIcon::NoIcon;
-
-		switch (messagePtr->GetInformationCategory()){
-		case istd::IInformationProvider::IC_INFO:
-			severityIcon = QSystemTrayIcon::Information;
-			break;
-
-		case istd::IInformationProvider::IC_WARNING:
-			severityIcon = QSystemTrayIcon::Warning;
-			break;
-
-		case istd::IInformationProvider::IC_ERROR:
-		case istd::IInformationProvider::IC_CRITICAL:
-			severityIcon = QSystemTrayIcon::Critical;
-			break;
-
-		default:
-			break;
-		}
-
-		m_parent.m_trayIconPtr->showMessage(QCoreApplication::applicationName(), messagePtr->GetInformationDescription(), severityIcon);
-	}
 }
 
 

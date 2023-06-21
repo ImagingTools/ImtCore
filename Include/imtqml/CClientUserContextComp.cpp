@@ -1,4 +1,4 @@
-#include "imtqml/CClientUserContextComp.h"
+#include <imtqml/CClientUserContextComp.h>
 
 
 // Qt includes
@@ -26,7 +26,7 @@ void CClientUserContextComp::SetLanguage(QString translation)
 					m_enginePtr->retranslate();
 				}
 
-				emit LanguageChanged();
+				Q_EMIT LanguageChanged();
 			}
 		}
 	}
