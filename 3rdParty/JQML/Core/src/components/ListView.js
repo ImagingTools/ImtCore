@@ -300,6 +300,8 @@ export class ListView extends Flickable {
         this.$p.contentY.val = 0
         this.$p.originX.val = 0
         this.$p.originY.val = 0
+        super.$contentXChanged()
+        super.$contentYChanged()
         this.$updateGeometry()
         this.$updateView()
     }
