@@ -15,8 +15,24 @@ defineTest(copyToWebDir) {
     export(QMAKE_PRE_LINK)
 }
 
+defineTest(copyFile) {
+    file = $$1
+	fileNew = $$2
+	# replace slashes in destination path for Windows
+	win32:fileNew ~= s,/,\\,g
+
+    # replace slashes in source path for Windows
+	win32:file ~= s,/,\\,g
+
+    QMAKE_PRE_LINK += $$QMAKE_COPY_FILE $$shell_quote($$file) $$shell_quote($$fileNew) $$escape_expand(\\n\\t)
+
+
+    export(QMAKE_PRE_LINK)
+}
+
 defineTest(compyleWeb) {
     buildwebdir = $$1
+	resname = $$2
 	dir = $$1/src
 	jqmldir = $(IMTCOREDIR)/3rdParty/JQML
 	npmexe = npm
@@ -32,8 +48,7 @@ defineTest(compyleWeb) {
 	QMAKE_PRE_LINK += cd $$shell_quote($$jqmldir) && $$npmexe run compile  $$shell_quote($$dir) $$escape_expand(\\n\\t)
 	export(QMAKE_PRE_LINK)
 
-    copyToWebDir($$buildwebdir/src/jqml.full.js, $$buildwebdir/Resources)
-	copyToWebDir($$buildwebdir/src/Acf/core.js, $$buildwebdir/Resources)
+    copyFile($$buildwebdir/src/jqml.full.js, $$buildwebdir/Resources/jqml.$${resname}.js)
 	copyToWebDir($$buildwebdir/src/imtqml/GraphQLRequest.js, $$buildwebdir/Resources)
 
     QRC_WEB_FILE = $${buildwebdir}/Resources/$${TARGET}JsWeb.qrc
