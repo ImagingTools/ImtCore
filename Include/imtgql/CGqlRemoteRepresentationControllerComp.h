@@ -10,8 +10,7 @@ namespace imtgql
 {
 
 
-class CGqlRemoteRepresentationControllerComp:
-		public imtgql::CGqlRequestHandlerCompBase
+class CGqlRemoteRepresentationControllerComp: public imtgql::CGqlRequestHandlerCompBase
 {
 public:
 	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
@@ -22,7 +21,9 @@ public:
 
 protected:
 	// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual imtbase::CTreeItemModel* CreateInternalResponse(
+				const imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const override;
 
 protected:
 	class Response: virtual public imtgql::IGqlClient::ResponseHandler

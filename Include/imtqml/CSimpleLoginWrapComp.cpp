@@ -43,15 +43,10 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 	inputObject.InsertField("Password", password);
 	request.AddParam(inputObject);
 
-	Response responseHandler;
-	bool retVal = m_apiClientCompPtr->SendRequest(request, responseHandler);
+	imtbase::CTreeItemModel responseModel;
+	bool retVal = SendModelRequest(request, responseModel);
 	if (retVal){
-		imtbase::CTreeItemModel* resultModelPtr = responseHandler.GetResult();
-		if (resultModelPtr == nullptr){
-			return false;
-		}
-
-		imtbase::CTreeItemModel* dataModelPtr = resultModelPtr->GetTreeItemModel("data");
+		imtbase::CTreeItemModel* dataModelPtr = responseModel.GetTreeItemModel("data");
 		if (dataModelPtr == nullptr){
 			return false;
 		}
@@ -97,14 +92,6 @@ QByteArray CSimpleLoginWrapComp::GetToken(const QByteArray& /*userId*/) const
 }
 
 
-// reimplemented (iser::ISerializable)
-
-bool CSimpleLoginWrapComp::Serialize(iser::IArchive& archive)
-{
-	return true;
-}
-
-
 // protected methods
 
 // reimplemented (icomp::CComponentBase)
@@ -114,58 +101,6 @@ void CSimpleLoginWrapComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 }
 
-
-// private methods
-
-CSimpleLoginWrapComp::Response::Response()
-	:m_replyResultPtr(nullptr)
-{
-}
-
-
-// reimplemented (imtgql::IGqlClient::ResponseHandler)
-
-imtbase::CTreeItemModel* CSimpleLoginWrapComp::Response::GetResult()
-{
-	return m_replyResultPtr;
-}
-
-
-void CSimpleLoginWrapComp::Response::OnReply(const imtgql::IGqlRequest& request, const QByteArray& replyData)
-{
-	m_replyResultPtr = new imtbase::CTreeItemModel();
-	QJsonDocument document = QJsonDocument::fromJson(replyData);
-	if (document.isObject()){
-		QJsonObject dataObject = document.object();
-
-		if (dataObject.contains("errors")){
-			QJsonValue jsonValue = dataObject.value("errors");
-			if (jsonValue.isObject()){
-				QJsonObject errorObj = jsonValue.toObject();
-				if (errorObj.contains(request.GetCommandId())){
-					QJsonValue bodyValue = errorObj.value(request.GetCommandId());
-					dataObject = QJsonObject();
-					dataObject.insert("errors", bodyValue);
-					document.setObject(dataObject);
-					QByteArray parserData = document.toJson(QJsonDocument::Compact);
-					m_replyResultPtr->CreateFromJson(parserData);
-				}
-			}
-		}
-
-		dataObject = document.object().value("data").toObject();
-		if (!dataObject.isEmpty()){
-			QJsonValue bodyValue = dataObject.value(request.GetCommandId());
-			if (!bodyValue.isNull()){
-				dataObject = QJsonObject();
-				dataObject.insert("data", bodyValue);
-				document.setObject(dataObject);
-				QByteArray parserData = document.toJson(QJsonDocument::Compact);
-				m_replyResultPtr->CreateFromJson(parserData);
-			}
-		}
-	}
-}
 
 } // namespace imtqml
 
