@@ -81,6 +81,7 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
             count = viewParamsGql->GetFieldArgumentValue("Count").toInt();
 
             QByteArray filterBA = viewParamsGql->GetFieldArgumentValue("FilterModel").toByteArray();
+            qDebug() << "filterBA:: " << filterBA;
             if (!filterBA.isEmpty()){
                 imtbase::CTreeItemModel generalModel;
                 generalModel.CreateFromJson(filterBA);

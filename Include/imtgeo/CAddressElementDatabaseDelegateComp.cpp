@@ -208,12 +208,19 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateDescriptionObjectQuery(
 QByteArray CAddressElementDatabaseDelegateComp::GetSelectionQuery(const QByteArray &objectId, int offset, int count, const iprm::IParamsSet *paramsPtr) const
 {
 	if (!objectId.isEmpty()){
-        return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
-					.arg(qPrintable(*m_tableNameAttrPtr))
-					.arg(qPrintable(*m_objectIdColumnAttrPtr))
-					.arg(qPrintable(objectId))
-					.toLocal8Bit();
-	}
+
+//        return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
+//                    .arg(qPrintable(*m_tableNameAttrPtr))
+//                    .arg(qPrintable(*m_objectIdColumnAttrPtr))
+//                    .arg(qPrintable(objectId))
+//                    .toLocal8Bit();
+
+        return QString(R"sql(SELECT "Id", "ParentId", "ParentIds", "Type", "Name", "Latitude", "Longitude",(SELECT get_full_address(ae."ParentIds", ae."Name", ae."Type")) AS "FullAddress" FROM "%1" AS ae WHERE ae."%2" = '%3')sql")
+                .arg(qPrintable(*m_tableNameAttrPtr))
+                .arg(qPrintable(*m_objectIdColumnAttrPtr))
+                .arg(qPrintable(objectId))
+                .toLocal8Bit();
+    }
 	else{
 		QString sortQuery;
 		QString filterQuery;
@@ -239,7 +246,10 @@ QByteArray CAddressElementDatabaseDelegateComp::GetSelectionQuery(const QByteArr
 		if (!CreatePaginationQuery(offset, count, paginationQuery)){
 			return QByteArray();
 		}
-        QString baseSelelectionQuery = QString("SELECT * FROM \"%1\"").arg(qPrintable(m_tableNameAttrPtr->GetValue()));
+        //QString baseSelelectionQuery = QString("SELECT * FROM \"%1\"").arg(qPrintable(m_tableNameAttrPtr->GetValue()));
+
+        QString baseSelelectionQuery = QString(R"sql(SELECT "Id", "ParentId", "ParentIds", "Type", "Name", "Latitude", "Longitude",(SELECT get_full_address(ae."ParentIds", ae."Name", ae."Type")) AS "FullAddress" FROM "%1" AS ae )sql")
+                        .arg(qPrintable(*m_tableNameAttrPtr));
 
 		// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
 		QString retVal = "(" + baseSelelectionQuery;
