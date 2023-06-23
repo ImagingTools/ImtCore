@@ -102,6 +102,7 @@ GqlDocumentDataController 1.0 ./AuxComponents/GqlDocumentDataController.qml
 ServerSettingsModelObserver 1.0 ./AuxComponents/ServerSettingsModelObserver.qml
 LocalSettingsModelObserver 1.0 ./AuxComponents/LocalSettingsModelObserver.qml
 
+CommandsDecorator 1.0 ./AuxComponents/CommandsDecorator.qml
 SimpleCommandsDecorator 1.0 ./AuxComponents/SimpleCommandsDecorator.qml
 CollectionDataProvider 1.0 ./AuxComponents/CollectionDataProvider.qml
 UuidGenerator 1.0 ./AuxComponents/UuidGenerator.qml
