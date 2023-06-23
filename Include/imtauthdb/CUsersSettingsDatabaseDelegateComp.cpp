@@ -61,8 +61,8 @@ istd::IChangeable* CUsersSettingsDatabaseDelegateComp::CreateObjectFromRecord(co
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSettingsDatabaseDelegateComp::CreateNewObjectQuery(
 			const QByteArray& /*typeId*/,
 			const QByteArray& /*proposedObjectId*/,
-			const QString& objectName,
-			const QString& objectDescription,
+			const QString& /*objectName*/,
+			const QString& /*objectDescription*/,
 			const istd::IChangeable* valuePtr,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
@@ -102,7 +102,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSettingsDatabaseDelegateCom
 
 
 QByteArray CUsersSettingsDatabaseDelegateComp::CreateDeleteObjectQuery(
-			const imtbase::IObjectCollection& collection,
+			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
@@ -112,7 +112,7 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateDeleteObjectQuery(
 
 
 QByteArray CUsersSettingsDatabaseDelegateComp::CreateUpdateObjectQuery(
-			const imtbase::IObjectCollection& collection,
+			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
 			const imtbase::IOperationContext* /*operationContextPtr*/,
