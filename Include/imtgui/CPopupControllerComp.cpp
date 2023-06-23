@@ -62,9 +62,9 @@ bool CPopupControllerComp::ClosePopup(const QByteArray& popupId)
 // reimplemented (ilog::IMessageConsumer)
 
 bool CPopupControllerComp::IsMessageSupported(
-			int messageCategory,
-			int messageId,
-			const istd::IInformationProvider* messagePtr) const
+			int /*messageCategory*/,
+			int /*messageId*/,
+			const istd::IInformationProvider* /*messagePtr*/) const
 {
 	return true;
 }
@@ -109,7 +109,7 @@ void CPopupControllerComp::OnPrimaryScreenChanged()
 }
 
 
-void CPopupControllerComp::OnScreenGeometryChanged(const QRect& geometry)
+void CPopupControllerComp::OnScreenGeometryChanged(const QRect& /*geometry*/)
 {
 	if (!m_clientAreaProviderCompPtr.IsValid()){
 		CalculatePopupAreaFromScreen();
@@ -117,7 +117,7 @@ void CPopupControllerComp::OnScreenGeometryChanged(const QRect& geometry)
 }
 
 
-void CPopupControllerComp::OnClientAreaUpdated(const istd::IChangeable::ChangeSet& changeSet, const IClientAreaProvider* objectPtr)
+void CPopupControllerComp::OnClientAreaUpdated(const istd::IChangeable::ChangeSet& /*changeSet*/, const IClientAreaProvider* objectPtr)
 {
 	m_anchor = objectPtr->GetAnchor();
 	m_size = objectPtr->GetSize();
@@ -128,7 +128,7 @@ void CPopupControllerComp::OnClientAreaUpdated(const istd::IChangeable::ChangeSe
 }
 
 
-void CPopupControllerComp::OnHoverEnter(QEvent* event)
+void CPopupControllerComp::OnHoverEnter(QEvent* /*event*/)
 {
 	for (PopupItemPtr& itemPtr : m_visibleItems){
 		itemPtr->timeoutTimer.stop();
@@ -140,7 +140,7 @@ void CPopupControllerComp::OnHoverEnter(QEvent* event)
 }
 
 
-void CPopupControllerComp::OnHoverLeave(QEvent* event)
+void CPopupControllerComp::OnHoverLeave(QEvent* /*event*/)
 {
 	for (PopupItemPtr& itemPtr : m_visibleItems){
 		if (itemPtr->timeout > 0){
@@ -253,9 +253,8 @@ QByteArray CPopupControllerComp::CreatePopupItem(const MessagePtr& messagePtr, i
 }
 
 
-void CPopupControllerComp::RemovePopupItem(int index)
+void CPopupControllerComp::RemovePopupItem(int /*index*/)
 {
-
 }
 
 

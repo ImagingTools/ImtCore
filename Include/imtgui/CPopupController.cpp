@@ -112,7 +112,7 @@ void CPopupController::SetPopupWidgetFactory(IPopupWidgetFactory* factoryPtr)
 }
 
 
-QByteArray CPopupController::AddPopupEvenHandler(IPopupEventHandler* handlerPtr)
+QByteArray CPopupController::AddPopupEvenHandler(IPopupEventHandler* /*handlerPtr*/)
 {
 	return QByteArray();
 }
@@ -124,7 +124,7 @@ QByteArray CPopupController::RemovePopupEvenHandler(QByteArray)
 }
 
 
-void CPopupController::SetEnabled(bool enable)
+void CPopupController::SetEnabled(bool /*enable*/)
 {
 }
 
@@ -163,9 +163,9 @@ bool CPopupController::ClosePopup(const QByteArray& popupId)
 // reimplemented (ilog::IMessageConsumer)
 
 bool CPopupController::IsMessageSupported(
-	int messageCategory,
-	int messageId,
-	const istd::IInformationProvider* messagePtr) const
+			int /*messageCategory*/,
+			int /*messageId*/,
+			const istd::IInformationProvider* /*messagePtr*/) const
 {
 	return true;
 }
@@ -187,12 +187,12 @@ void CPopupController::OnAddMessage(const MessagePtr& messagePtr)
 }
 
 
-void CPopupController::OnScreenGeometryChanged(const QRect& rect)
+void CPopupController::OnScreenGeometryChanged(const QRect& /*rect*/)
 {
 }
 
 
-void CPopupController::OnHoverEnter(QEvent* event)
+void CPopupController::OnHoverEnter(QEvent* /*event*/)
 {
 	for (PopupItemPtr& itemPtr : m_visibleItems){
 		itemPtr->timeoutTimer.stop();
@@ -204,7 +204,7 @@ void CPopupController::OnHoverEnter(QEvent* event)
 }
 
 
-void CPopupController::OnHoverLeave(QEvent* event)
+void CPopupController::OnHoverLeave(QEvent* /*event*/)
 {
 	for (PopupItemPtr& itemPtr : m_visibleItems){
 		if (itemPtr->timeout > 0){
@@ -298,7 +298,7 @@ QByteArray CPopupController::CreatePopupItem(const MessagePtr& messagePtr, int t
 }
 
 
-void CPopupController::RemovePopupItem(int index)
+void CPopupController::RemovePopupItem(int /*index*/)
 {
 
 }
@@ -429,7 +429,7 @@ void CPopupController::HideItems()
 }
 
 
-bool CPopupController::eventFilter(QObject* watched, QEvent* event)
+bool CPopupController::eventFilter(QObject* /*watched*/, QEvent* event)
 {
 	if (event->type() == QEvent::Resize){
 		QSize size = m_parentPtr->size();

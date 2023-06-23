@@ -1,10 +1,10 @@
 #include <imtgeo/CAddressControllerComp.h>
 
-// NeoPro includes
+
+// ImtCore includes
 #include <imtgeo/CAddressTypeInfo.h>
 #include <imtgeo/CAddressElementInfo.h>
 #include <imtbase/CCollectionFilter.h>
-#include <iprm/CParamsSet.h>
 
 
 namespace imtgeo
@@ -12,8 +12,8 @@ namespace imtgeo
 
 
 imtbase::CTreeItemModel* CAddressControllerComp::GetObject(
-		const imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
@@ -37,8 +37,8 @@ imtbase::CTreeItemModel* CAddressControllerComp::GetObject(
 
 		QByteArray id = addressInfoPtr->GetId();
 		QByteArray parentId;
-        QList<QByteArray> parents =addressInfoPtr->GetParentIds();
-		if(!parents.isEmpty()){
+		QList<QByteArray> parents = addressInfoPtr->GetParentIds();
+		if (!parents.isEmpty()){
 			parentId = *(parents.end());
 		}
 		QByteArray typeId = addressInfoPtr->GetAddressTypeId();
@@ -47,31 +47,31 @@ imtbase::CTreeItemModel* CAddressControllerComp::GetObject(
 		imtbase::IObjectCollection::DataPtr dataTypePtr;
 		if (m_addressTypeCollectionPtr->GetObjectData(typeId, dataTypePtr)){
 			const IAddressTypeInfo* addressTypeInfoPtr =
-					dynamic_cast<const IAddressTypeInfo*>(dataTypePtr.GetPtr());
+				dynamic_cast<const IAddressTypeInfo*>(dataTypePtr.GetPtr());
 			QString typeName = addressTypeInfoPtr->GetName();
 			QString typeShortName = addressTypeInfoPtr->GetShortName();
 		}
 		QString name = addressInfoPtr->GetName();
 		QString address = addressInfoPtr->GetAddress();
-		if(address == QString(""))
+		if (address == QString(""))
 		{
-			for(QByteArray elemId: parents)
+			for (QByteArray elemId : parents)
 			{
 				imtbase::IObjectCollection::DataPtr dataElementPtr;
 				if (m_objectCollectionCompPtr->GetObjectData(elemId, dataElementPtr)){
 					const IAddressElementInfo* addressInfoPtr =
-							dynamic_cast<const IAddressElementInfo*>(dataElementPtr.GetPtr());
+						dynamic_cast<const IAddressElementInfo*>(dataElementPtr.GetPtr());
 					imtbase::IObjectCollection::DataPtr dataTypePtr;
 					if (m_addressTypeCollectionPtr->GetObjectData(addressInfoPtr->GetAddressTypeId(), dataTypePtr)){
 						const IAddressTypeInfo* typeInfoPtr =
-								dynamic_cast<const IAddressTypeInfo*>(dataTypePtr.GetPtr());
+							dynamic_cast<const IAddressTypeInfo*>(dataTypePtr.GetPtr());
 						QString shortName = typeInfoPtr->GetShortName();
 						QString name = addressInfoPtr->GetName();
-						address += shortName+ " "+name + ",";
+						address += shortName + " " + name + ",";
 					}
 				}
 			}
-			address += typeShortName + " " +name;
+			address += typeShortName + " " + name;
 		}
 
 		QString description = addressInfoPtr->GetDescription();
@@ -97,52 +97,52 @@ imtbase::CTreeItemModel* CAddressControllerComp::GetObject(
 
 
 imtbase::CTreeItemModel* CAddressControllerComp::InsertObject(
-		const imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-    imtbase::CTreeItemModel* dataModel = nullptr;
-    imtbase::CTreeItemModel* notificationModel = nullptr;
-    QByteArray newObjectId, newFullAddressObjectId;
-    QString name, description;
+	imtbase::CTreeItemModel* dataModel = nullptr;
+	imtbase::CTreeItemModel* notificationModel = nullptr;
+	QByteArray newObjectId, newFullAddressObjectId;
+	QString name, description;
 
 	if (!m_objectCollectionCompPtr.IsValid()){
-        errorMessage = QObject::tr("Internal error").toUtf8();
-    }
-    else{
-        QByteArray objectId;
+		errorMessage = QObject::tr("Internal error").toUtf8();
+	}
+	else{
+		QByteArray objectId;
 		const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
 
 		istd::IChangeable* newObject = CreateObject(inputParams, objectId, name, description, errorMessage);
 
 		if (newObject != nullptr){
-            newObjectId = m_objectCollectionCompPtr->InsertNewObject("", name, description, newObject, objectId);
-            imtbase::IObjectCollection::DataPtr dataPtr;
-            m_objectCollectionCompPtr->GetObjectData(newObjectId, dataPtr);
+			newObjectId = m_objectCollectionCompPtr->InsertNewObject("", name, description, newObject, objectId);
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			m_objectCollectionCompPtr->GetObjectData(newObjectId, dataPtr);
 			CAddressElementInfo addressElementInfo;
-            addressElementInfo.CopyFrom(*dataPtr);
-        }
+			addressElementInfo.CopyFrom(*dataPtr);
+		}
 
-        if (errorMessage.isEmpty() && (newObjectId.isEmpty() || newFullAddressObjectId.isEmpty())){
-            errorMessage = QObject::tr("Can not insert object: %1").arg(qPrintable(objectId));
-        }
-    }
+		if (errorMessage.isEmpty() && (newObjectId.isEmpty() || newFullAddressObjectId.isEmpty())){
+			errorMessage = QObject::tr("Can not insert object: %1").arg(qPrintable(objectId));
+		}
+	}
 
-    if (!errorMessage.isEmpty()){
+	if (!errorMessage.isEmpty()){
 		imtbase::CTreeItemModel* errorsModel = rootModelPtr->AddTreeModel("errors");
-        errorsModel->SetData("message", errorMessage);
-    }
-    else{
-        imtbase::IObjectCollection::DataPtr dataPtr;
-        dataModel = new imtbase::CTreeItemModel();
-        notificationModel = new imtbase::CTreeItemModel();
-        notificationModel->SetData("Id", newObjectId);
-        notificationModel->SetData("Name", name);
-        if (m_objectCollectionCompPtr->GetObjectData(newObjectId, dataPtr)){
+		errorsModel->SetData("message", errorMessage);
+	}
+	else{
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		dataModel = new imtbase::CTreeItemModel();
+		notificationModel = new imtbase::CTreeItemModel();
+		notificationModel->SetData("Id", newObjectId);
+		notificationModel->SetData("Name", name);
+		if (m_objectCollectionCompPtr->GetObjectData(newObjectId, dataPtr)){
 			const IAddressElementInfo* addressInfoPtr = dynamic_cast<const IAddressElementInfo*>(dataPtr.GetPtr());
-        }
-        dataModel->SetExternTreeModel("addedNotification", notificationModel);
-    }
+		}
+		dataModel->SetExternTreeModel("addedNotification", notificationModel);
+	}
 
 	rootModelPtr->SetExternTreeModel("data", dataModel);
 
@@ -151,11 +151,11 @@ imtbase::CTreeItemModel* CAddressControllerComp::InsertObject(
 
 
 istd::IChangeable* CAddressControllerComp::CreateObject(
-		const QList<imtgql::CGqlObject>& inputParams,
-		QByteArray &objectId,
-		QString &name,
-		QString &description,
-		QString& errorMessage) const
+			const QList<imtgql::CGqlObject>& inputParams,
+			QByteArray& objectId,
+			QString& name,
+			QString& description,
+			QString& errorMessage) const
 {
 	if (!m_addressInfoFactCompPtr.IsValid()){
 		errorMessage = QObject::tr("Can not create Address: %1").arg(QString(objectId));
@@ -188,13 +188,11 @@ istd::IChangeable* CAddressControllerComp::CreateObject(
 		if (itemModel.ContainsKey("ParentId")){
 			parentId = itemModel.GetData("ParentId").toByteArray();
 			imtbase::IObjectCollection::DataPtr adrDataPtr;
-			if (m_objectCollectionCompPtr->GetObjectData(parentId, adrDataPtr))
-			{
-				const IAddressElementInfo* adrInfoPtr = dynamic_cast
-						<const IAddressElementInfo*>(adrDataPtr.GetPtr());
-                QList<QByteArray> parentIds = adrInfoPtr->GetParentIds();
-                parentIds.append((parentId));
-                addressInfoPtr->SetParentIds(parentIds);
+			if (m_objectCollectionCompPtr->GetObjectData(parentId, adrDataPtr)){
+				const IAddressElementInfo* adrInfoPtr = dynamic_cast<const IAddressElementInfo*>(adrDataPtr.GetPtr());
+				QList<QByteArray> parentIds = adrInfoPtr->GetParentIds();
+				parentIds.append((parentId));
+				addressInfoPtr->SetParentIds(parentIds);
 			}
 		}
 
@@ -228,78 +226,79 @@ istd::IChangeable* CAddressControllerComp::CreateObject(
 
 	errorMessage = QObject::tr("Can not create address: %1").arg(QString(objectId));
 
-    return nullptr;
+	return nullptr;
 }
 
 
 
 imtbase::CTreeItemModel* CAddressControllerComp::UpdateObject(
-		const imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-    imtbase::CTreeItemModel* dataModel = nullptr;
-    imtbase::CTreeItemModel* notificationModel = nullptr;
+	imtbase::CTreeItemModel* dataModel = nullptr;
+	imtbase::CTreeItemModel* notificationModel = nullptr;
 
 	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
 
 	QByteArray oldObjectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
-    QByteArray newObjectId;
-    QString name, description;
+	QByteArray newObjectId;
+	QString name, description;
 
-    QString splitObjectId;
-    if (m_separatorObjectIdAttrPtr.IsValid()){
-        splitObjectId = oldObjectId;
+	QString splitObjectId;
+	if (m_separatorObjectIdAttrPtr.IsValid()){
+		splitObjectId = oldObjectId;
 
-        QStringList splitData = splitObjectId.split(*m_separatorObjectIdAttrPtr);
-        splitObjectId = splitData[0].toUtf8();
-    }
+		QStringList splitData = splitObjectId.split(*m_separatorObjectIdAttrPtr);
+		splitObjectId = splitData[0].toUtf8();
+	}
 
 	if (!m_objectCollectionCompPtr.IsValid()){
-        errorMessage = QObject::tr("Internal error").toUtf8();
-    }
-    else{
-        imtbase::IObjectCollection::DataPtr dataPtr;
-        if (m_objectCollectionCompPtr->GetObjectData(oldObjectId, dataPtr)){
+		errorMessage = QObject::tr("Internal error").toUtf8();
+	}
+	else{
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_objectCollectionCompPtr->GetObjectData(oldObjectId, dataPtr)){
 			const IAddressElementInfo* addressInfoPtr = dynamic_cast<const IAddressElementInfo*>(dataPtr.GetPtr());
-			//QByteArray serialId = addressInfoPtr->GetSerialId();
-            QString oldName = addressInfoPtr->GetName();
-            imtbase::CCollectionFilter filterOnSerialId;
-            QByteArrayList filteringOnSerialIdInfoIds;
-            filteringOnSerialIdInfoIds << "Indexes";
-            filterOnSerialId.SetFilteringInfoIds(filteringOnSerialIdInfoIds);
+			QString oldName = addressInfoPtr->GetName();
+
+			imtbase::CCollectionFilter filterOnSerialId;
+			QByteArrayList filteringOnSerialIdInfoIds;
+			filteringOnSerialIdInfoIds << "Indexes";
+			filterOnSerialId.SetFilteringInfoIds(filteringOnSerialIdInfoIds);
+
 			istd::IChangeable* savedObject = CreateObject(inputParams, newObjectId, name, description, errorMessage);
-            if (savedObject != nullptr){
-                if (m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject) == false){
-                    errorMessage = QObject::tr("Can not update object: %1").arg(splitObjectId);
-                }
-                else{
-                    imtbase::IObjectCollection::DataPtr newDataPtr;
-                    m_objectCollectionCompPtr->GetObjectData(oldObjectId, newDataPtr);
+			if (savedObject != nullptr){
+				if (m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject) == false){
+					errorMessage = QObject::tr("Can not update object: %1").arg(splitObjectId);
+				}
+				else{
+					imtbase::IObjectCollection::DataPtr newDataPtr;
+					m_objectCollectionCompPtr->GetObjectData(oldObjectId, newDataPtr);
 					const IAddressElementInfo* newAddressInfoPtr = dynamic_cast<const IAddressElementInfo*>(newDataPtr.GetPtr());
-                    QString newName = newAddressInfoPtr->GetName();
+					QString newName = newAddressInfoPtr->GetName();
 
-                }
-            }
-            else {
-                if (errorMessage.isEmpty()){
-                    errorMessage = QObject::tr("Can not create object for update: %1").arg(splitObjectId);
-                }
-            }
-        }
-    }
+				}
+			}
+			else{
+				if (errorMessage.isEmpty()){
+					errorMessage = QObject::tr("Can not create object for update: %1").arg(splitObjectId);
+				}
+			}
+		}
+	}
 
-    if (!errorMessage.isEmpty()){
+	if (!errorMessage.isEmpty()){
 		imtbase::CTreeItemModel* errorsModel = rootModelPtr->AddTreeModel("errors");
-        errorsModel->SetData("message", errorMessage);
-    }
-    else{
-        dataModel = new imtbase::CTreeItemModel();
-        notificationModel = new imtbase::CTreeItemModel();
-        notificationModel->SetData("Id", newObjectId);
-        notificationModel->SetData("Name", name);
-        dataModel->SetExternTreeModel("updatedNotification", notificationModel);
-    }
+		errorsModel->SetData("message", errorMessage);
+	}
+	else{
+		dataModel = new imtbase::CTreeItemModel();
+		notificationModel = new imtbase::CTreeItemModel();
+		notificationModel->SetData("Id", newObjectId);
+		notificationModel->SetData("Name", name);
+		dataModel->SetExternTreeModel("updatedNotification", notificationModel);
+	}
 	rootModelPtr->SetExternTreeModel("data", dataModel);
 
 	return rootModelPtr.PopPtr();
@@ -307,42 +306,42 @@ imtbase::CTreeItemModel* CAddressControllerComp::UpdateObject(
 
 
 imtbase::CTreeItemModel* CAddressControllerComp::DeleteObject(
-		const imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
-    if (!m_objectCollectionCompPtr.IsValid()){
-        errorMessage = "No collection component was set";
+	if (!m_objectCollectionCompPtr.IsValid()){
+		errorMessage = "No collection component was set";
 
 		return nullptr;
-    }
+	}
 
 	QByteArray objectId = GetObjectIdFromInputParams(gqlRequest.GetParams());
-    if (objectId.isEmpty()){
-        errorMessage = QObject::tr("No object-ID could not be extracted from the request");
+	if (objectId.isEmpty()){
+		errorMessage = QObject::tr("No object-ID could not be extracted from the request");
 
 		return nullptr;
-    }
+	}
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-    imtbase::CTreeItemModel* dataModel = nullptr;
-    imtbase::CTreeItemModel* notificationModel = nullptr;
+	imtbase::CTreeItemModel* dataModel = nullptr;
+	imtbase::CTreeItemModel* notificationModel = nullptr;
 
-    if (!errorMessage.isEmpty()){
+	if (!errorMessage.isEmpty()){
 		imtbase::CTreeItemModel* errorsModel = rootModelPtr->AddTreeModel("errors");
-        errorsModel->SetData("message", errorMessage);
-    }
-    else{
-        dataModel = new imtbase::CTreeItemModel();
-        notificationModel = new imtbase::CTreeItemModel();
-        notificationModel->SetData("Id", objectId);
-        dataModel->SetExternTreeModel("removedNotification", notificationModel);
-    }
+		errorsModel->SetData("message", errorMessage);
+	}
+	else{
+		dataModel = new imtbase::CTreeItemModel();
+		notificationModel = new imtbase::CTreeItemModel();
+		notificationModel->SetData("Id", objectId);
+		dataModel->SetExternTreeModel("removedNotification", notificationModel);
+	}
 	rootModelPtr->SetExternTreeModel("data", dataModel);
 
 	return rootModelPtr.PopPtr();
 }
 
 
-} // namespace npgql
+} // namespace imtgeo
 
 

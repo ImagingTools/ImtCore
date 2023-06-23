@@ -1,12 +1,6 @@
 #include <imtgeo/CAddressTypeDatabaseDelegateComp.h>
 
 
-// ACF includes
-#include <imod/TModelWrap.h>
-#include <iprm/TParamsPtr.h>
-#include <idoc/CStandardDocumentMetaInfo.h>
-
-
 namespace imtgeo
 {
 
@@ -19,6 +13,7 @@ QByteArray CAddressTypeDatabaseDelegateComp::GetObjectTypeId(const QByteArray& /
 {
 	return "AddressType";
 }
+
 
 istd::IChangeable* CAddressTypeDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
@@ -132,7 +127,7 @@ QByteArray CAddressTypeDatabaseDelegateComp::CreateUpdateObjectQuery(
 				.arg(qPrintable(objectId))
 				.toLocal8Bit();
 
-    return retVal;
+	return retVal;
 }
 
 
