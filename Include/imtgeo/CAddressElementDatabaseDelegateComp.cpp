@@ -39,16 +39,16 @@ istd::IChangeable* CAddressElementDatabaseDelegateComp::CreateObjectFromRecord(c
         adrElementInfoPtr->SetId(id);
     }
 
-	if(record.contains("ParentsId")){
-		QByteArray dataIndexes = record.value("ParentsId").toByteArray();
+    if(record.contains("ParentIds")){
+        QByteArray dataIndexes = record.value("ParentIds").toByteArray();
 		QJsonDocument documentIndexes = QJsonDocument::fromJson(dataIndexes);
 		QJsonArray jsonIndexes = documentIndexes.array();
-		QList<QByteArray> parentsId;
+        QList<QByteArray> parentIds;
 		for(int index = 0; index < jsonIndexes.size(); index++){
 			QByteArray parentId = jsonIndexes[index].toVariant().toByteArray();
-			parentsId.append(parentId);
+            parentIds.append(parentId);
 		}
-		adrElementInfoPtr->SetParentsId(parentsId);
+        adrElementInfoPtr->SetParentIds(parentIds);
 	}
 
 	if(record.contains("AddressTypeId")){
@@ -100,9 +100,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
     QString name = adrInfoPtr->GetName();
     QString description = adrInfoPtr->GetDescription();
 
-	QList<QByteArray> parentsId = adrInfoPtr->GetParentsId();
+    QList<QByteArray> parentIds = adrInfoPtr->GetParentIds();
 	QJsonArray json;
-	for (QByteArray parentId: parentsId){
+    for (QByteArray parentId: parentIds){
 		json.append(QJsonValue(QString(parentId)));
 	}
 	QJsonDocument document = QJsonDocument(json);
@@ -114,7 +114,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
 	double lon = adrInfoPtr->GetLongitude();
 
     NewObjectQuery retVal;
-	retVal.query = QString("INSERT INTO \"AddressElements\"(\"Id\", \"ParentsId\", \"AddressTypeId\", \"Name\", \"Description\", \"Latitude\", \"Longitude\")  VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
+    retVal.query = QString("INSERT INTO \"AddressElements\"(\"Id\", \"ParentIds\", \"AddressTypeId\", \"Name\", \"Description\", \"Latitude\", \"Longitude\")  VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
                             .arg(qPrintable(proposedObjectId))
 							.arg(qPrintable(parents))
 							.arg(qPrintable(typeId))
@@ -151,9 +151,9 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateUpdateObjectQuery(
         return QByteArray();
     }
     QByteArray adrId = adrInfoPtr->GetId();
-	QList<QByteArray> parentsId = adrInfoPtr->GetParentsId();
+    QList<QByteArray> parentIds = adrInfoPtr->GetParentIds();
 	QJsonArray json;
-	for (QByteArray parentId: parentsId){
+    for (QByteArray parentId: parentIds){
 		json.append(QJsonValue(QString(parentId)));
 	}
 	QJsonDocument document = QJsonDocument(json);
@@ -172,7 +172,7 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateUpdateObjectQuery(
         return QByteArray();
     }
 
-	QByteArray retVal = QString("UPDATE \"AddressElements\" SET \"Id\" = '%1', \"ParentsId\" = '%2', \"TypeId\" = '%3', \"Name\" = '%4', \"FullAddress\" = '%5', \"Description\" = '%6', \"Langitude\" = '%7', \"Latitude\" = '%8' WHERE \"Id\" ='%9';")
+    QByteArray retVal = QString("UPDATE \"AddressElements\" SET \"Id\" = '%1', \"ParentIds\" = '%2', \"TypeId\" = '%3', \"Name\" = '%4', \"FullAddress\" = '%5', \"Description\" = '%6', \"Langitude\" = '%7', \"Latitude\" = '%8' WHERE \"Id\" ='%9';")
                             .arg(qPrintable(adrId))
 							.arg(qPrintable(parents))
 							.arg(qPrintable(typeId))
@@ -230,12 +230,13 @@ QByteArray CAddressElementDatabaseDelegateComp::GetSelectionQuery(const QByteArr
 		}
 		if (paramsPtr != nullptr){
 			if (!CreateFilterQuery(*paramsPtr, filterQuery)){
-			//	return QByteArray();
+                return QByteArray();
 			}
 
 			iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(paramsPtr, "Filter");
 			if (collectionFilterParamPtr.IsValid()){
 				textFilter = collectionFilterParamPtr->GetTextFilter();
+                //qDebug() << "textFilter:::::: " << textFilter;
 				if (!CreateSortQuery(*collectionFilterParamPtr, sortQuery)){
 					return QByteArray();
 				}
@@ -267,28 +268,36 @@ QByteArray CAddressElementDatabaseDelegateComp::GetSelectionQuery(const QByteArr
 
 bool CAddressElementDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSet &filterParams, QString &filterQuery) const
 {
+
     QString objectFilterQuery;
-    bool retVal = CreateObjectFilterQuery(filterParams, objectFilterQuery);
-	if (!retVal){
-		return false;
-	}
+    bool retVal = true;
+    //bool retVal = CreateObjectFilterQuery(filterParams, objectFilterQuery);
+    if (!retVal){
+        return false;
+    }
 
     QString textFilterQuery;
-    QString parentIdFilterQuery;
+    //QString parentIdFilterQuery;
+    QString parentIdsFilterQuery;
     QString typeIdFilterQuery;
     iprm::TParamsPtr<imtbase::ICollectionFilter> collectionFilterParamPtr(&filterParams, "Filter");
-    iprm::TParamsPtr<imtbase::ICollectionFilter> parentIdFilterParamPtr(&filterParams, "ParentId");
-	iprm::TParamsPtr<imtbase::ICollectionFilter> typeIdFilterParamPtr(&filterParams, "TypeId");
+    //iprm::TParamsPtr<imtbase::ICollectionFilter> parentIdFilterParamPtr(&filterParams, "ParentId");
+    iprm::TParamsPtr<imtbase::ICollectionFilter> parentIdsFilterParamPtr(&filterParams, "ParentIds");
+    iprm::TParamsPtr<imtbase::ICollectionFilter> typeIdFilterParamPtr(&filterParams, "TypeId");
     if (collectionFilterParamPtr.IsValid()){
         retVal = CreateTextFilterQuery(*collectionFilterParamPtr, textFilterQuery);
     }
-    if (parentIdFilterParamPtr.IsValid() && parentIdFilterParamPtr->GetTextFilter() != ""){
-		parentIdFilterQuery = "'" + parentIdFilterParamPtr->GetTextFilter() + "' = ANY(\"ParentsId\")" ;
+
+    if (parentIdsFilterParamPtr.IsValid() && parentIdsFilterParamPtr->GetTextFilter() != ""){
+        parentIdsFilterQuery = "'" + parentIdsFilterParamPtr->GetTextFilter() + "' <@ (\"ParentIds\")" ;
+//        parentIdsFilterQuery = "\"ParentIds\" = ""'" + parentIdsFilterParamPtr->GetTextFilter() + "'";
     }
+
     if (typeIdFilterParamPtr.IsValid() && typeIdFilterParamPtr->GetTextFilter() != ""){
-		typeIdFilterQuery = "\"AddressTypeId\" = " + typeIdFilterParamPtr->GetTextFilter();
+        typeIdFilterQuery = "\"AddressTypeId\" = " + typeIdFilterParamPtr->GetTextFilter();
     }
-    if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdFilterQuery.isEmpty() || !typeIdFilterQuery.isEmpty()){
+
+    if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdsFilterQuery.isEmpty() /*|| !typeIdFilterQuery.isEmpty()*/){
         filterQuery = " WHERE ";
     }
 
@@ -299,36 +308,22 @@ bool CAddressElementDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsS
 
     if (!textFilterQuery.isEmpty()){
         filterQuery += "(" + textFilterQuery + ")";
-    }
-
-    //levelFilter
-    if (!textFilterQuery.isEmpty() && parentIdFilterQuery.isEmpty() && typeIdFilterQuery.isEmpty()){
-
-        QString text = collectionFilterParamPtr->GetTextFilter();
-        QString columnId =  collectionFilterParamPtr->GetFilteringInfoIds().first();
-        int count = text.count(",");
-        QString positive = "%";
-        QString negative = "";
-        for(int i = 0; i < count; i++){
-            positive += ",%";
-            negative = positive + ",%";
-        }
-        QString levelQuery = QString(" AND (\"%1\" LIKE '%2') AND (\"%1\" NOT LIKE '%3')").arg(columnId).arg(positive).arg(negative);
-
-        filterQuery += levelQuery;
+        qDebug() << "textFilterQuery::: " << textFilterQuery;
     }
 
 
-    if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty()) && !parentIdFilterQuery.isEmpty()){
+    if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty()) && !parentIdsFilterQuery.isEmpty()){
         filterQuery += " AND ";
     }
 
-    if (!parentIdFilterQuery.isEmpty()){
-        filterQuery += "(" + parentIdFilterQuery + ")";
+
+    if (!parentIdsFilterQuery.isEmpty()){
+        filterQuery += "(" + parentIdsFilterQuery + ")";
 
     }
 
-    if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdFilterQuery.isEmpty()) && !typeIdFilterQuery.isEmpty()){
+
+    if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdsFilterQuery.isEmpty()) && !typeIdFilterQuery.isEmpty()){
         filterQuery += " AND ";
     }
 
@@ -337,11 +332,9 @@ bool CAddressElementDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsS
 
     }
 
+    qDebug() << "filterQuery::: " << filterQuery;
     return true;
 }
-
-
-
 
 } // namespace imtgeo
 

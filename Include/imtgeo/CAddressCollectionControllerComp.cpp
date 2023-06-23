@@ -11,6 +11,9 @@
 #include <imtbase/CCollectionFilter.h>
 #include <imtgeo/CAddressElementInfo.h>
 #include <imtgeo/CAddressTypeInfo.h>
+#include <imtdb/CSqlDatabaseObjectCollectionComp.h>
+#include <imtbase/CCollectionInfo.h>
+
 
 
 namespace imtgeo
@@ -71,10 +74,12 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
         }
 
         imtbase::CCollectionFilter filter;
-        imtbase::CCollectionFilter filterOnParentId;
+        //imtbase::CCollectionFilter filterOnParentId;
+        imtbase::CCollectionFilter filterOnParentIds;
         imtbase::CCollectionFilter filterOnTypeId;
         int offset = 0, count = -1;
-        QString parentId = "";
+        //QString parentId = "";
+        QString parentIds = "";
         QString typeId = "";
         if (viewParamsGql != nullptr){
             offset = viewParamsGql->GetFieldArgumentValue("Offset").toInt();
@@ -85,14 +90,42 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
             if (!filterBA.isEmpty()){
                 imtbase::CTreeItemModel generalModel;
                 generalModel.CreateFromJson(filterBA);
-                parentId = generalModel.GetData("ParentId").toString();
-                typeId = generalModel.GetData("TypeId").toString();
-                if (!parentId.isEmpty()){
-                    QByteArrayList filteringOnParentIdInfoIds;
-                    filteringOnParentIdInfoIds << "ParentId";
-                    filterOnParentId.SetFilteringInfoIds(filteringOnParentIdInfoIds);
-                    filterOnParentId.SetTextFilter(parentId);
+
+                //parentIds = "{00000817-0000-0000-0000-000000000000}";//generalModel.GetData("ParentId").toString();
+
+                parentIds = generalModel.GetData("ParentIds").toString();
+
+
+                if (!parentIds.isEmpty()){
+                    QStringList parentIdList = parentIds.split(",");
+                    QJsonArray jsonArray;
+                    QJsonDocument json_document;
+                    for(int i = 0; i < parentIdList.count(); i++){
+                        jsonArray.append(parentIdList.at(i));
+                    }
+                    jsonArray.append(parentIds);
+                    json_document = QJsonDocument(jsonArray);
+
+
+                    //qDebug() << "jsonParents::: " << qPrintable(QJsonDocument(jsonArray).toJson(QJsonDocument::Compact));
+
+
+                    QByteArrayList filteringOnParentIdsInfoIds;
+                    filteringOnParentIdsInfoIds << "ParentIds";
+                    filterOnParentIds.SetFilteringInfoIds(filteringOnParentIdsInfoIds);
+                    filterOnParentIds.SetTextFilter(qPrintable(QJsonDocument(jsonArray).toJson(QJsonDocument::Compact)));
                 }
+
+//                if (!parentId.isEmpty()){
+//                    QByteArrayList filteringOnParentIdInfoIds;
+//                    filteringOnParentIdInfoIds << "ParentId";
+//                    filterOnParentId.SetFilteringInfoIds(filteringOnParentIdInfoIds);
+//                    filterOnParentId.SetTextFilter(parentId);
+//                }
+
+
+                typeId = generalModel.GetData("TypeId").toString();
+
                 if (!typeId.isEmpty()){
                     QByteArrayList filteringOnTypeIdInfoIds;
                     filteringOnTypeIdInfoIds << "TypeId";
@@ -114,6 +147,7 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 
                 QString filterText = generalModel.GetData("TextFilter").toString();
                 if (!filterText.isEmpty()){
+                    qDebug() << "filterText::" << filterText;
                     filter.SetTextFilter(filterText);
                 }
                 imtbase::CTreeItemModel* sortModel = generalModel.GetTreeItemModel("Sort");
@@ -129,7 +163,7 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
         }
         iprm::CParamsSet filterParams;
         filterParams.SetEditableParameter("Filter", &filter);
-        filterParams.SetEditableParameter("ParentId", &filterOnParentId);
+        filterParams.SetEditableParameter("ParentIds", &filterOnParentIds);
         filterParams.SetEditableParameter("TypeId", &filterOnTypeId);
 
         int pagesCount = std::ceil(m_objectCollectionCompPtr->GetElementsCount(&filterParams) / (double)count);
@@ -139,55 +173,70 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
 
         notificationModel->SetData("PagesCount", pagesCount);
 
-        imtbase::IObjectCollection* subCollection = m_objectCollectionCompPtr->CreateSubCollection(offset, count, &filterParams);
-        imtbase::ICollectionInfo::Ids collectionIds = subCollection->GetElementIds(0, -1);
 
-        for (const QByteArray& collectionId : collectionIds){
-            int itemIndex = itemsModel->InsertNewItem();
+        imtdb::CSqlDatabaseObjectCollectionComp* objectCollectionCompPtr = dynamic_cast<imtdb::CSqlDatabaseObjectCollectionComp*>(m_objectCollectionCompPtr.GetPtr());
+        if (objectCollectionCompPtr == nullptr){
+            return nullptr;
 
-            const imtgeo::IAddressElementInfo* addressElementInfoPtr = dynamic_cast<const imtgeo::IAddressElementInfo*>(subCollection->GetObjectPtr(collectionId));
-
-            QByteArray addressId = addressElementInfoPtr->GetId();
-            QByteArray typeAddressId = addressElementInfoPtr->GetAddressTypeId();
-            QByteArray parentId;
-            QList<QByteArray> parents =addressElementInfoPtr->GetParentsId();
-            if(!parents.isEmpty()){
-                parentId = *(parents.end());
-            }
-            QString name = addressElementInfoPtr->GetName();
-            QString address = addressElementInfoPtr->GetAddress();
-            if(address == QString(""))
-            {
-                for(QByteArray elemId: parents)
-                {
-                    imtbase::IObjectCollection::DataPtr dataElementPtr;
-                    if (m_objectCollectionCompPtr->GetObjectData(elemId, dataElementPtr)){
-                        const imtgeo::IAddressElementInfo* addressInfoPtr =
-                                dynamic_cast<const imtgeo::IAddressElementInfo*>(dataElementPtr.GetPtr());
-                        imtbase::IObjectCollection::DataPtr dataTypePtr;
-                        if (m_addressTypeCollectionPtr->GetObjectData(addressInfoPtr->GetAddressTypeId(), dataTypePtr)){
-                            const imtgeo::IAddressTypeInfo* typeInfoPtr =
-                                    dynamic_cast<const imtgeo::IAddressTypeInfo*>(dataTypePtr.GetPtr());
-                            QString shortName = typeInfoPtr->GetShortName();
-                            QString name = addressInfoPtr->GetName();
-                            address += shortName+ " "+name + ",";
-                        }
-                    }
-                }
-                imtbase::IObjectCollection::DataPtr dataTypePtr;
-                if (m_addressTypeCollectionPtr->GetObjectData(typeAddressId, dataTypePtr)){
-                    const imtgeo::IAddressTypeInfo* typeInfoPtr =
-                            dynamic_cast<const imtgeo::IAddressTypeInfo*>(dataTypePtr.GetPtr());
-                    address += typeInfoPtr->GetShortName() + " " +name;
-                }
-            }
-
-            itemsModel->SetData("Id", addressId, itemIndex);
-            itemsModel->SetData("Name", name, itemIndex);
-            itemsModel->SetData("FullAddress", address, itemIndex);
-            itemsModel->SetData("TypeId", typeAddressId, itemIndex);
-            itemsModel->SetData("ParentId", parentId, itemIndex);
         }
+//        int countElement = objectCollectionCompPtr->GetElementsCount(&filterParams);
+//        if (!countElement){
+//            return nullptr;
+//        }
+
+        istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(objectCollectionCompPtr->CreateObjectCollectionIterator(offset, count, &filterParams));
+
+        if (objectCollectionIterator != nullptr){
+            int whileCount = 0;
+            while (objectCollectionIterator->Next()){
+                imtbase::IObjectCollection::DataPtr objectDataPtr;
+                if (objectCollectionIterator->GetObjectData(objectDataPtr)){
+                    int itemIndex = itemsModel->InsertNewItem();
+                    if (itemIndex >= 0){
+
+                        const imtgeo::IAddressElementInfo* addressElementInfoPtr = nullptr;
+                        addressElementInfoPtr = dynamic_cast<const imtgeo::IAddressElementInfo*>(objectDataPtr.GetPtr());
+
+                        QString fullAddress = addressElementInfoPtr->GetAddress();
+                        QString name = addressElementInfoPtr->GetName();
+                        QByteArray addressId = addressElementInfoPtr->GetId();
+                        QByteArray typeAddressId = addressElementInfoPtr->GetAddressTypeId();
+                        QList<QByteArray> parentsList = addressElementInfoPtr->GetParentIds();
+                        QByteArray addressParentId = parentsList.isEmpty() ? QByteArray() : parentsList.last();
+                        QString parentsStr = QString();
+                        for(int i = 0; i < parentsList.count(); i++){
+                            parentsStr.append(QString(parentsList.at(i)));
+                            if(i < parentsList.count() -1){
+                                parentsStr.append(",");
+                            }
+                        }
+
+                        //qDebug() << "fullAddress::: "  << fullAddress;
+
+                        itemsModel->SetData("FullAddress", fullAddress, itemIndex);
+                        itemsModel->SetData("Id", addressId, itemIndex);
+                        itemsModel->SetData("Name", name, itemIndex);
+                        itemsModel->SetData("TypeId", typeAddressId, itemIndex);
+                        itemsModel->SetData("ParentId", addressParentId, itemIndex);
+                        itemsModel->SetData("ParentIds", parentsStr, itemIndex);
+
+                    }
+
+                }
+                else{
+                    //qDebug() << "тест" << " return nullptr";
+                    //return nullptr;
+                }
+                whileCount++;
+                //qDebug() << "тест" << whileCount;
+
+
+
+            }//while
+            //qDebug() << "тест" << " while exit";
+
+        }//ITERATOR
+
         itemsModel->SetIsArray(true);
         dataModel->SetExternTreeModel("items", itemsModel);
         dataModel->SetExternTreeModel("notification", notificationModel);

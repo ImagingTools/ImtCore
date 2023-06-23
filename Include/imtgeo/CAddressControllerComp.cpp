@@ -37,7 +37,7 @@ imtbase::CTreeItemModel* CAddressControllerComp::GetObject(
 
 		QByteArray id = addressInfoPtr->GetId();
 		QByteArray parentId;
-		QList<QByteArray> parents =addressInfoPtr->GetParentsId();
+        QList<QByteArray> parents =addressInfoPtr->GetParentIds();
 		if(!parents.isEmpty()){
 			parentId = *(parents.end());
 		}
@@ -192,9 +192,9 @@ istd::IChangeable* CAddressControllerComp::CreateObject(
 			{
 				const IAddressElementInfo* adrInfoPtr = dynamic_cast
 						<const IAddressElementInfo*>(adrDataPtr.GetPtr());
-				QList<QByteArray> parentsId = adrInfoPtr->GetParentsId();
-				parentsId.append((parentId));
-				addressInfoPtr->SetParentsId(parentsId);
+                QList<QByteArray> parentIds = adrInfoPtr->GetParentIds();
+                parentIds.append((parentId));
+                addressInfoPtr->SetParentIds(parentIds);
 			}
 		}
 

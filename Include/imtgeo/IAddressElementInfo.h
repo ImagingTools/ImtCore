@@ -28,12 +28,12 @@ public:
 	/**
 		Get ids of parent the address element.
 	*/
-	virtual QList<QByteArray> GetParentsId() const = 0;
+    virtual QList<QByteArray> GetParentIds() const = 0;
 
 	/**
 		Set ids of parent the address element.
 	*/
-	virtual void SetParentsId(QList<QByteArray> parentId) = 0;
+    virtual void SetParentIds(QList<QByteArray> parentId) = 0;
 	/**
 		Get id address type of element.
 	*/

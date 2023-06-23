@@ -21,8 +21,8 @@ public:
     // reimplemented (IAddressElementInfo)
     virtual QByteArray GetId() const override;
     virtual void SetId(QByteArray id) override;
-	virtual QList<QByteArray> GetParentsId() const override;
-	virtual void SetParentsId(QList<QByteArray> parentsId) override;
+    virtual QList<QByteArray> GetParentIds() const override;
+    virtual void SetParentIds(QList<QByteArray> parentIds) override;
 	virtual QByteArray GetAddressTypeId() const override;
 	virtual void SetAddressTypeId(QByteArray typeId) override;
     virtual QString GetTypeName() const override;
@@ -50,7 +50,7 @@ protected:
 
 private:
     QByteArray m_id;
-	QList<QByteArray> m_parentsId;
+    QList<QByteArray> m_parentIds;
 	QByteArray m_adrTypeId;
 	QString m_name;    
     QString m_description;

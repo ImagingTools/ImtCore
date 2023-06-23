@@ -39,17 +39,17 @@ void CAddressElementInfo::SetId(QByteArray id)
 }
 
 
-QList<QByteArray> CAddressElementInfo::GetParentsId() const
+QList<QByteArray> CAddressElementInfo::GetParentIds() const
 {
-	return m_parentsId;
+    return m_parentIds;
 }
 
 
-void CAddressElementInfo::SetParentsId(QList<QByteArray> parentsId)
+void CAddressElementInfo::SetParentIds(QList<QByteArray> parentIds)
 {
-	if (m_parentsId != parentsId){
+    if (m_parentIds != parentIds){
 		istd::CChangeNotifier notifier(this);
-		m_parentsId = parentsId;
+        m_parentIds = parentIds;
 	}
 }
 
@@ -230,7 +230,7 @@ bool CAddressElementInfo::CopyFrom(const IChangeable& object, CompatibilityMode 
 		istd::CChangeNotifier changeNotifier(this);
 
         m_id = sourcePtr->m_id;
-		m_parentsId = sourcePtr->m_parentsId;
+        m_parentIds = sourcePtr->m_parentIds;
 		m_adrTypeId = sourcePtr->m_adrTypeId;
         m_name = sourcePtr->m_name;
         m_description = sourcePtr->m_description;
@@ -261,7 +261,7 @@ bool CAddressElementInfo::ResetData(CompatibilityMode /*mode*/)
 	istd::CChangeNotifier changeNotifier(this);
 
     m_id.clear();
-	m_parentsId.clear();
+    m_parentIds.clear();
 	m_adrTypeId.clear();
 	m_name.clear();
     m_description.clear();
