@@ -129,7 +129,8 @@ ICollectionInfo::Id CObjectCollectionBase::InsertNewObject(
 			const Id& proposedElementId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
 			const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
-			const Id& /*parentId*/)
+			const Id& /*parentId*/,
+			const IOperationContext* /*operationContextPtr*/)
 {
 	ObjectInfo info;
 
@@ -173,7 +174,7 @@ ICollectionInfo::Id CObjectCollectionBase::InsertNewObject(
 }
 
 
-bool CObjectCollectionBase::RemoveElement(const Id& elementId)
+bool CObjectCollectionBase::RemoveElement(const Id& elementId, const IOperationContext* /*operationContextPtr*/)
 {
 	for (Objects::iterator iter = m_objects.begin(); iter != m_objects.end(); ++iter){
 		if ((*iter).id == elementId){
@@ -232,7 +233,11 @@ bool CObjectCollectionBase::GetObjectData(const Id& objectId, DataPtr& dataPtr) 
 }
 
 
-bool CObjectCollectionBase::SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode)
+bool CObjectCollectionBase::SetObjectData(
+			const Id& objectId,
+			const istd::IChangeable& object,
+			CompatibilityMode mode,
+			const IOperationContext* /*operationContextPtr*/)
 {
 	for (ObjectInfo& objectInfo : m_objects){
 		if ((objectInfo.id == objectId) && objectInfo.objectPtr.IsValid()){

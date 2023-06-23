@@ -45,7 +45,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSessionsDatabaseDelegateCom
 			const QByteArray& /*proposedObjectId*/,
 			const QString& /*objectName*/,
 			const QString& /*objectDescription*/,
-			const istd::IChangeable* valuePtr) const
+			const istd::IChangeable* valuePtr,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	const imtauth::ISession* sessionPtr = dynamic_cast<const imtauth::ISession*>(valuePtr);
 	if (sessionPtr == nullptr){
@@ -59,9 +60,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSessionsDatabaseDelegateCom
 	NewObjectQuery retVal;
 
 	retVal.query += QString("\nINSERT INTO \"UserSessions\" (\"AccessToken\", \"UserId\", \"LastActivity\") VALUES ('%1', '%2', '%3');")
-			.arg(qPrintable(token))
-			.arg(qPrintable(userId))
-			.arg(QDateTime::currentDateTime().toString(Qt::ISODate)).toLocal8Bit();
+				.arg(qPrintable(token))
+				.arg(qPrintable(userId))
+				.arg(QDateTime::currentDateTime().toString(Qt::ISODate)).toLocal8Bit();
 
 	return retVal;
 }
@@ -69,7 +70,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSessionsDatabaseDelegateCom
 
 QByteArray CUsersSessionsDatabaseDelegateComp::CreateDeleteObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& /*objectId*/) const
+			const QByteArray& /*objectId*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QByteArray();
 }
@@ -79,7 +81,7 @@ QByteArray CUsersSessionsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& /*objectId*/,
 			const istd::IChangeable& /*object*/,
-			const ContextDescription& /*context*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/,
 			bool /*useExternDelegate*/) const
 {
 	return QByteArray();
@@ -89,7 +91,8 @@ QByteArray CUsersSessionsDatabaseDelegateComp::CreateUpdateObjectQuery(
 QByteArray CUsersSessionsDatabaseDelegateComp::CreateRenameObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& /*objectId*/,
-			const QString& /*newObjectName*/) const
+			const QString& /*newObjectName*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QByteArray();
 }
@@ -98,7 +101,8 @@ QByteArray CUsersSessionsDatabaseDelegateComp::CreateRenameObjectQuery(
 QByteArray CUsersSessionsDatabaseDelegateComp::CreateDescriptionObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& /*objectId*/,
-			const QString& /*description*/) const
+			const QString& /*description*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QByteArray();
 }

@@ -61,9 +61,9 @@ int CGqlObjectCollectionComp::GetOperationFlags(const Id& elementId) const
 imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewBranch(
 			const Id& parentId,
 			const QString& name,
-			const QString& description,
-			const Id& proposedElementId,
-			const idoc::IDocumentMetaInfo* elementMetaInfoPtr)
+			const QString& /*description*/,
+			const Id& /*proposedElementId*/,
+			const idoc::IDocumentMetaInfo* /*elementMetaInfoPtr*/)
 {
 	if (m_gqlClientCompPtr.IsValid()){
 		if (m_typesInfo.GetOptionsCount() > 0){
@@ -99,12 +99,13 @@ imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewBranch(
 imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
-			const QString& description,
+			const QString& /*description*/,
 			DataPtr defaultValuePtr,
-			const QByteArray& proposedObjectId,
+			const QByteArray& /*proposedObjectId*/,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
-			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr,
-			const Id& parentId)
+			const idoc::IDocumentMetaInfo* /*collectionItemMetaInfoPtr*/,
+			const Id& parentId,
+			const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	QByteArray documentId;
 
@@ -181,7 +182,7 @@ imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewObject(
 }
 
 
-bool CGqlObjectCollectionComp::RemoveElement(const Id& elementId)
+bool CGqlObjectCollectionComp::RemoveElement(const Id& elementId, const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	bool retVal = false;
 
@@ -238,7 +239,8 @@ bool CGqlObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dataPt
 bool CGqlObjectCollectionComp::SetObjectData(
 			const Id& objectId,
 			const istd::IChangeable& object,
-			CompatibilityMode /*mode*/)
+			CompatibilityMode /*mode*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	bool retVal = false;
 
@@ -418,7 +420,7 @@ idoc::MetaInfoPtr CGqlObjectCollectionComp::GetDataMetaInfo(const Id& objectId) 
 
 // reimplemented (ICollectionInfo)
 
-int CGqlObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* selectionParamsPtr, const Id& parentId, int iterationFlags) const
+int CGqlObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* /*selectionParamsPtr*/, const Id& /*parentId*/, int /*iterationFlags*/) const
 {
 	Q_ASSERT(false);
 
@@ -485,7 +487,7 @@ imtbase::ICollectionInfo::Ids CGqlObjectCollectionComp::GetElementIds(
 }
 
 
-bool CGqlObjectCollectionComp::GetSubsetInfo(ICollectionInfo& subsetInfo, int offset, int count, const iprm::IParamsSet* selectionParamsPtr, const Id& parentId, int iterationFlags) const
+bool CGqlObjectCollectionComp::GetSubsetInfo(ICollectionInfo& /*subsetInfo*/, int /*offset*/, int /*count*/, const iprm::IParamsSet* /*selectionParamsPtr*/, const Id& /*parentId*/, int /*iterationFlags*/) const
 {
 	return false;
 }
@@ -624,8 +626,6 @@ bool CGqlObjectCollectionComp::SetElementName(const Id& elementId, const QString
 			IGqlObjectCollectionDelegate::ElementInfoResponsePtr responsePtr = delegatePtr->CreateElementInfoResponsePtr();
 			istd::TDelPtr<imtgql::IGqlRequest> infoRequestPtr(delegatePtr->CreateElementInfoRequest(elementId));
 			if (m_gqlClientCompPtr->SendRequest(*infoRequestPtr, *responsePtr)){
-				int version = responsePtr->GetElementInfo().version;
-
 				IGqlObjectCollectionDelegate::ElementDescription elementDescription;
 				elementDescription.name = name;
 				elementDescription.description = responsePtr->GetElementInfo().description;
@@ -636,9 +636,9 @@ bool CGqlObjectCollectionComp::SetElementName(const Id& elementId, const QString
 							m_items[elementId].orgId,
 							name));
 				if (requestPtr.IsValid()){
-					IGqlObjectCollectionDelegate::RenameBranchResponsePtr responsePtr = delegatePtr->CreateRenameBranchResponsePtr();
-					if (m_gqlClientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-						return responsePtr->Result();
+					IGqlObjectCollectionDelegate::RenameBranchResponsePtr renameBranchResponsePtr = delegatePtr->CreateRenameBranchResponsePtr();
+					if (m_gqlClientCompPtr->SendRequest(*requestPtr, *renameBranchResponsePtr)){
+						return renameBranchResponsePtr->Result();
 					}
 				}
 			}
@@ -649,7 +649,7 @@ bool CGqlObjectCollectionComp::SetElementName(const Id& elementId, const QString
 }
 
 
-bool CGqlObjectCollectionComp::SetElementDescription(const Id& elementId, const QString& description)
+bool CGqlObjectCollectionComp::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/)
 {
 	return false;
 }
@@ -778,7 +778,7 @@ QByteArray CGqlObjectCollectionComp::ImportFile(
 
 // reimplemented (gmgaws::ISubscriptionClient)
 
-void CGqlObjectCollectionComp::OnResponseReceived(const QByteArray& subscriptionId, const QByteArray& subscriptionData)
+void CGqlObjectCollectionComp::OnResponseReceived(const QByteArray& /*subscriptionId*/, const QByteArray& /*subscriptionData*/)
 {
 	istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
 	imtbase::ICollectionInfo::ElementInsertInfo insertInfo;
@@ -787,7 +787,10 @@ void CGqlObjectCollectionComp::OnResponseReceived(const QByteArray& subscription
 }
 
 
-void CGqlObjectCollectionComp::OnSubscriptionStatusChanged(const QByteArray& subscriptionId, const SubscriptionStatus& status, const QString& message)
+void CGqlObjectCollectionComp::OnSubscriptionStatusChanged(
+			const QByteArray& /*subscriptionId*/,
+			const SubscriptionStatus& /*status*/,
+			const QString& /*message*/)
 {
 }
 
@@ -860,10 +863,7 @@ void CGqlObjectCollectionComp::OnComponentCreated()
 
 void CGqlObjectCollectionComp::OnComponentDestroyed()
 {
-	if (m_subscriptionManagerCompPtr.IsValid()){
-		m_subscriptionManagerCompPtr->UnRegisterSubscription(m_addMeasurementSubsriptionId);
-	}
-
+	m_subscriptionManagerCompPtr->UnRegisterSubscription(m_addMeasurementSubsriptionId);
 	m_delegatesMap.clear();
 
 	BaseClass::OnComponentDestroyed();
@@ -941,10 +941,10 @@ imtbase::IObjectCollection::DataPtr CGqlObjectCollectionComp::GetDocument(
 						docFile.write(replyPtr->readAll());
 						docFile.close();
 
-						QByteArray typeId = GetObjectTypeId(localDocumentId);
-						const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(typeId);
+						QByteArray localTypeId = GetObjectTypeId(localDocumentId);
+						const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(localTypeId);
 						if (persistencePtr != nullptr){
-							documentPtr = CreateObjectInstance(typeId);
+							documentPtr = CreateObjectInstance(localTypeId);
 							if (documentPtr.IsValid()){
 								if (persistencePtr->LoadFromFile(*documentPtr, docPath) != ifile::IFilePersistence::OS_OK){
 									documentPtr = imtbase::IObjectCollection::DataPtr();

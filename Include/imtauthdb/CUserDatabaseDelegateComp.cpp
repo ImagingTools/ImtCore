@@ -22,7 +22,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 		const QByteArray& proposedObjectId,
 		const QString& objectName,
 		const QString& /*objectDescription*/,
-		const istd::IChangeable* valuePtr) const
+		const istd::IChangeable* valuePtr,
+		const imtbase::IOperationContext* operationContextPtr) const
 {
 	NewObjectQuery retVal;
 
@@ -47,12 +48,11 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 				imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
 				if (userGroupInfoPtr != nullptr){
 					userGroupInfoPtr->AddUser(objectId);
-					ContextDescription context;
 					retVal.query += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(
 								*m_userGroupCollectionCompPtr,
 								groupId,
 								*userGroupInfoPtr,
-								context,
+								operationContextPtr,
 								false);
 				}
 			}
@@ -83,7 +83,7 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 		const imtbase::IObjectCollection& collection,
 		const QByteArray& objectId,
 		const istd::IChangeable& object,
-		const ContextDescription& /*description*/,
+		const imtbase::IOperationContext* operationContextPtr,
 		bool useExternDelegate) const
 {
 	const imtauth::IUserInfo* oldObjectPtr = nullptr;
@@ -131,13 +131,11 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 					if (!userGroupInfoPtr->GetUsers().contains(objectId)){
 						userGroupInfoPtr->AddUser(objectId);
 
-						ContextDescription context;
-
 						retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(
 									*m_userGroupCollectionCompPtr,
 									groupId,
 									*userGroupInfoPtr,
-									context,
+									operationContextPtr,
 									false);
 					}
 				}
@@ -151,13 +149,11 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 				if (userGroupInfoPtr != nullptr){
 					bool result = userGroupInfoPtr->RemoveUser(objectId);
 					if (result){
-						ContextDescription context;
-
 						retVal += m_userGroupDatabaseDelegateCompPtr->CreateUpdateObjectQuery(
 									*m_userGroupCollectionCompPtr,
 									groupId,
 									*userGroupInfoPtr,
-									context,
+									operationContextPtr,
 									false);
 					}
 				}
@@ -182,7 +178,8 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 QByteArray CUserDatabaseDelegateComp::CreateDeleteObjectQuery(
 			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId) const
+			const QByteArray& objectId,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	const imtauth::IUserInfo* userInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr objectPtr;

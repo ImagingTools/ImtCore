@@ -17,8 +17,8 @@ class CAddressElementDatabaseDelegateComp: public imtdb::CSqlDatabaseObjectDeleg
 public:
 	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
 
-    I_BEGIN_COMPONENT(CAddressElementDatabaseDelegateComp)
-        I_ASSIGN(m_adrElementInfoFactCompPtr, "AddressElemenInfo", "Factory used for creation of the new address elemen instance", true, "AddressElemenInfo");
+	I_BEGIN_COMPONENT(CAddressElementDatabaseDelegateComp)
+		I_ASSIGN(m_adrElementInfoFactCompPtr, "AddressElemenInfo", "Factory used for creation of the new address elemen instance", true, "AddressElemenInfo");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -29,24 +29,28 @@ public:
 				const QByteArray& proposedObjectId,
 				const QString& objectName,
 				const QString& objectDescription,
-				const istd::IChangeable* valuePtr) const override;
+				const istd::IChangeable* valuePtr,
+				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual QByteArray CreateDeleteObjectQuery(
 				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId) const override;
+				const QByteArray& objectId,
+				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual QByteArray CreateUpdateObjectQuery(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
-                const ContextDescription& description,
+				const imtbase::IOperationContext* operationContextPtr,
 				bool useExternDelegate = true) const override;
 	virtual QByteArray CreateRenameObjectQuery(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
-				const QString& newObjectName) const override;
+				const QString& newObjectName,
+				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual QByteArray CreateDescriptionObjectQuery(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
-				const QString& description) const override;
+				const QString& description,
+				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual QByteArray GetSelectionQuery(
 				const QByteArray& objectId = QByteArray(),
 				int offset = 0,

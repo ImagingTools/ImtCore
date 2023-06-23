@@ -1,5 +1,6 @@
 #include <imtgeo/CAddressTypeDatabaseDelegateComp.h>
 
+
 // ACF includes
 #include <imod/TModelWrap.h>
 #include <iprm/TParamsPtr.h>
@@ -14,7 +15,7 @@ namespace imtgeo
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-QByteArray CAddressTypeDatabaseDelegateComp::GetObjectTypeId(const QByteArray& objectId) const
+QByteArray CAddressTypeDatabaseDelegateComp::GetObjectTypeId(const QByteArray& /*objectId*/) const
 {
 	return "AddressType";
 }
@@ -31,28 +32,28 @@ istd::IChangeable* CAddressTypeDatabaseDelegateComp::CreateObjectFromRecord(cons
 
 	istd::TDelPtr<IAddressTypeInfo> adrTypeInfoPtr = m_adrTypeInfoFactCompPtr.CreateInstance();
 	if (!adrTypeInfoPtr.IsValid()){
-        return nullptr;
-    }
+		return nullptr;
+	}
 
-    if(record.contains("Id")){
-        QByteArray id = record.value("Id").toByteArray();
+	if (record.contains("Id")){
+		QByteArray id = record.value("Id").toByteArray();
 		adrTypeInfoPtr->SetId(id);
-    }
+	}
 
-    if(record.contains("Name")){
+	if (record.contains("Name")){
 		QString name = record.value("Name").toString();
 		adrTypeInfoPtr->SetName(name);
-    }
+	}
 
-	if(record.contains("ShortName")){
+	if (record.contains("ShortName")){
 		QString sname = record.value("ShortName").toString();
 		adrTypeInfoPtr->SetShortName(sname);
 	}
 
-    if(record.contains("Description")){
+	if (record.contains("Description")){
 		QString description = record.value("Description").toString();
 		adrTypeInfoPtr->SetDescription(description);
-    }
+	}
 
 
 	return adrTypeInfoPtr.PopPtr();
@@ -62,35 +63,37 @@ istd::IChangeable* CAddressTypeDatabaseDelegateComp::CreateObjectFromRecord(cons
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressTypeDatabaseDelegateComp::CreateNewObjectQuery(
 			const QByteArray& /*typeId*/,
 			const QByteArray& proposedObjectId,
-			const QString& objectName,
+			const QString& /*objectName*/,
 			const QString& /*objectDescription*/,
-			const istd::IChangeable* valuePtr) const
+			const istd::IChangeable* valuePtr,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	const IAddressTypeInfo* adrInfoPtr = dynamic_cast<const IAddressTypeInfo*>(valuePtr);
-    if (adrInfoPtr == nullptr){
-        return NewObjectQuery();
-    }
+	if (adrInfoPtr == nullptr) {
+		return NewObjectQuery();
+	}
 
-    QString name = adrInfoPtr->GetName();
+	QString name = adrInfoPtr->GetName();
 	QString sname = adrInfoPtr->GetShortName();
 	QString description = adrInfoPtr->GetDescription();
 
-    NewObjectQuery retVal;
+	NewObjectQuery retVal;
 	retVal.query = QString("INSERT INTO \"AddressTypes\"(\"Id\", \"Name\", \"ShortName\", \"Description\")  VALUES('%1', '%2', '%3', '%4');")
-                            .arg(qPrintable(proposedObjectId))
-							.arg(name)
-							.arg(sname)
-							.arg(description)
-							.toLocal8Bit();
-    retVal.objectName = name;
+				.arg(qPrintable(proposedObjectId))
+				.arg(name)
+				.arg(sname)
+				.arg(description)
+				.toLocal8Bit();
+	retVal.objectName = name;
 
-    return retVal;
+	return retVal;
 }
 
 
 QByteArray CAddressTypeDatabaseDelegateComp::CreateDeleteObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& objectId,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	QByteArray retVal = QString("DELETE FROM \"AddressTypes\" WHERE \"Id\" = '%1';").arg(qPrintable(objectId)).toLocal8Bit();
 
@@ -102,52 +105,54 @@ QByteArray CAddressTypeDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
-            const ContextDescription& /*description*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/,
 			bool /*useExternDelegate*/) const
 {
 	const IAddressTypeInfo* adrInfoPtr = dynamic_cast<const IAddressTypeInfo*>(&object);
-    if (adrInfoPtr == nullptr || objectId.isEmpty()){
-        return QByteArray();
-    }
-    QByteArray adrId = adrInfoPtr->GetId();
+	if (adrInfoPtr == nullptr || objectId.isEmpty()) {
+		return QByteArray();
+	}
+	QByteArray adrId = adrInfoPtr->GetId();
 	QString name = adrInfoPtr->GetName();
 	QString shortName = adrInfoPtr->GetShortName();
 	QString description = adrInfoPtr->GetDescription();
 
-    if (adrId.isEmpty() && !objectId.isEmpty()){
-        adrId = objectId;
-    }
-    if(adrId.isEmpty()){
-        return QByteArray();
-    }
+	if (adrId.isEmpty() && !objectId.isEmpty()) {
+		adrId = objectId;
+	}
+	if (adrId.isEmpty()) {
+		return QByteArray();
+	}
 
 	QByteArray retVal = QString("UPDATE \"AddressTypes\" SET \"Id\" = '%1', \"Name\" = '%2', \"ShortName\" = '%3', \"Description\" = '%4' WHERE \"Id\" ='%5';")
-                            .arg(qPrintable(adrId))
-							.arg(name)
-							.arg(shortName)
-							.arg(description)
-                            .arg(qPrintable(objectId))
-                            .toLocal8Bit();
+				.arg(qPrintable(adrId))
+				.arg(name)
+				.arg(shortName)
+				.arg(description)
+				.arg(qPrintable(objectId))
+				.toLocal8Bit();
 
     return retVal;
 }
 
 
 QByteArray CAddressTypeDatabaseDelegateComp::CreateRenameObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const QString& newObjectName) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const QString& /*newObjectName*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QByteArray();
 }
 
 
 QByteArray CAddressTypeDatabaseDelegateComp::CreateDescriptionObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const QString& description) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const QString& /*description*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-    return QByteArray();
+	return QByteArray();
 }
 
 

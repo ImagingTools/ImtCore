@@ -25,12 +25,13 @@ public:
 				const QByteArray& proposedObjectId,
 				const QString& objectName,
 				const QString& objectDescription,
-				const istd::IChangeable* valuePtr) const override;
+				const istd::IChangeable* valuePtr,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual QByteArray CreateUpdateObjectQuery(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
-				const ContextDescription& description,
+				const imtbase::IOperationContext* operationContextPtr = nullptr,
 				bool useExternDelegate = true) const override;
 
 	// reimplemented (imtdb::CSqlDatabaseDocumentDelegateComp)

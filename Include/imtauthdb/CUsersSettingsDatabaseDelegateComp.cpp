@@ -63,7 +63,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSettingsDatabaseDelegateCom
 			const QByteArray& /*proposedObjectId*/,
 			const QString& objectName,
 			const QString& objectDescription,
-			const istd::IChangeable* valuePtr) const
+			const istd::IChangeable* valuePtr,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	const imtauth::IUserSettings* userSettingsPtr = dynamic_cast<const imtauth::IUserSettings*>(valuePtr);
 	if (userSettingsPtr == nullptr){
@@ -102,7 +103,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSettingsDatabaseDelegateCom
 
 QByteArray CUsersSettingsDatabaseDelegateComp::CreateDeleteObjectQuery(
 			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId) const
+			const QByteArray& objectId,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QString("\nDELETE FROM \"UserSettings\" WHERE \"UserId\" = '%1';")
 			.arg(qPrintable(objectId)).toLocal8Bit();
@@ -113,7 +115,7 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
-			const ContextDescription& /*description*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/,
 			bool /*useExternDelegate*/) const
 {
 	const imtauth::IUserSettings* userSettingsPtr = dynamic_cast<const imtauth::IUserSettings*>(&object);
@@ -151,18 +153,20 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 
 QByteArray CUsersSettingsDatabaseDelegateComp::CreateRenameObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const QString& newObjectName) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const QString& /*newObjectName*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QByteArray();
 }
 
 
 QByteArray CUsersSettingsDatabaseDelegateComp::CreateDescriptionObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const QString& description) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const QString& /*description*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QByteArray();
 }

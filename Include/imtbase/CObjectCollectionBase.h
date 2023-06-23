@@ -64,11 +64,12 @@ public:
 				const Id& proposedElementId = Id(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
-				const Id& parentId = Id()) override;
-	virtual bool RemoveElement(const Id& elementId) override;
+				const Id& parentId = Id(),
+				const IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool RemoveElement(const Id& elementId, const IOperationContext* operationContextPtr = nullptr) override;
 	virtual const istd::IChangeable* GetObjectPtr(const Id& objectId) const override;
 	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr) const override;
-	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS, const IOperationContext* operationContextPtr = nullptr) override;
 	virtual IObjectCollection* CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const Id &parentId, int iterationFlags) const override;
 	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
 				int offset = 0,

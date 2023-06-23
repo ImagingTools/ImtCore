@@ -90,9 +90,9 @@ const IFeatureInfoProvider* CFeaturePackage::GetDependencyContainer(const QByteA
 
 // reimplemented (IObjectCollection)
 
-bool CFeaturePackage::RemoveElement(const Id& elementId)
+bool CFeaturePackage::RemoveElement(const Id& elementId, const imtbase::IOperationContext* operationContextPtr)
 {
-	bool retVal = BaseClass::RemoveElement(elementId);
+	bool retVal = BaseClass::RemoveElement(elementId, operationContextPtr);
 
 	if (retVal){
 		istd::CChangeNotifier changeNotifier(this);

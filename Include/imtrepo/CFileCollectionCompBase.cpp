@@ -446,7 +446,8 @@ QByteArray CFileCollectionCompBase::InsertNewObject(
 			const QByteArray& proposedObjectId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
 			const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
-			const Id& /*parentId*/)
+			const Id& /*parentId*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	DataPtr newObjectPtr;
 
@@ -492,7 +493,7 @@ QByteArray CFileCollectionCompBase::InsertNewObject(
 }
 
 
-bool CFileCollectionCompBase::RemoveElement(const Id& /*elementId*/)
+bool CFileCollectionCompBase::RemoveElement(const Id& /*elementId*/, const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	return false;
 }
@@ -569,7 +570,7 @@ bool CFileCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr&
 }
 
 
-bool CFileCollectionCompBase::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode /*mode*/)
+bool CFileCollectionCompBase::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode /*mode*/, const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(GetObjectTypeId(objectId));
 	if (persistencePtr != nullptr){

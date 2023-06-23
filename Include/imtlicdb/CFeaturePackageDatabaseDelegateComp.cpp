@@ -175,7 +175,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CFeaturePackageDatabaseDelegateCo
 		const QByteArray& /*proposedObjectId*/,
 		const QString& objectName,
 		const QString& objectDescription,
-		const istd::IChangeable* valuePtr) const
+		const istd::IChangeable* valuePtr,
+		const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	QByteArray packageId;
 	const imtlic::CFeaturePackage* featurePackagePtr = dynamic_cast<const imtlic::CFeaturePackage*>(valuePtr);
@@ -239,7 +240,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CFeaturePackageDatabaseDelegateCo
 
 QByteArray CFeaturePackageDatabaseDelegateComp::CreateDeleteObjectQuery(
 		const imtbase::IObjectCollection& collection,
-		const QByteArray& objectId) const
+		const QByteArray& objectId,
+		const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	imtbase::IObjectCollection::DataPtr objectPtr;
 	if (collection.GetObjectData(objectId, objectPtr)){
@@ -296,7 +298,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 		const imtbase::IObjectCollection& collection,
 		const QByteArray& objectId,
 		const istd::IChangeable& object,
-		const ContextDescription& /*description*/,
+		const imtbase::IOperationContext* /*operationContextPtr*/,
 		bool /*useExternDelegate*/) const
 {
 	const imtlic::CFeaturePackage* newObjectPtr = dynamic_cast<const imtlic::CFeaturePackage*>(&object);
@@ -438,7 +440,8 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 QByteArray CFeaturePackageDatabaseDelegateComp::CreateRenameObjectQuery(
 		const imtbase::IObjectCollection& collection,
 		const QByteArray& objectId,
-		const QString& newObjectName) const
+		const QString& newObjectName,
+		const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	const imtlic::CFeaturePackage* currentPackagePtr = nullptr;
 	imtbase::IObjectCollection::DataPtr objectPtr;
@@ -468,7 +471,8 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateRenameObjectQuery(
 QByteArray CFeaturePackageDatabaseDelegateComp::CreateDescriptionObjectQuery(
 		const imtbase::IObjectCollection& collection,
 		const QByteArray& objectId,
-		const QString& description) const
+		const QString& description,
+		const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	const imtlic::IFeaturePackage* packagePtr = nullptr;
 	imtbase::IObjectCollection::DataPtr objectPtr;

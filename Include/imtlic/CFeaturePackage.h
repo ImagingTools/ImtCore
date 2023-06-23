@@ -34,7 +34,7 @@ public:
 	virtual const IFeatureInfoProvider* GetDependencyContainer(const QByteArray& dependencyId) const override;
 
 	// reimplemented (IObjectCollection)
-	virtual bool RemoveElement(const Id& elementId) override;
+	virtual bool RemoveElement(const Id& elementId, const imtbase::IOperationContext* operationContextPtr = nullptr) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;

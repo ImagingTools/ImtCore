@@ -354,7 +354,7 @@ const imtbase::IRevisionController* CFileCollectionComp::GetRevisionController()
 }
 
 
-bool CFileCollectionComp::RemoveElement(const Id& elementId)
+bool CFileCollectionComp::RemoveElement(const Id& elementId, const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	if (elementId.isEmpty()){
 		SendErrorMessage(0, "Object-ID is empty. Unknown resource could not be removed");

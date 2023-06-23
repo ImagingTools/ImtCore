@@ -25,16 +25,18 @@ public:
 				const QByteArray& proposedObjectId,
 				const QString& objectName,
 				const QString& objectDescription,
-				const istd::IChangeable* valuePtr) const override;
+				const istd::IChangeable* valuePtr,
+				const imtbase::IOperationContext* operationContextPtr) const override;
 	virtual QByteArray CreateUpdateObjectQuery(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
-				const ContextDescription& description,
+				const imtbase::IOperationContext* operationContextPtr,
 				bool useExternDelegate = true) const override;
 	virtual QByteArray CreateDeleteObjectQuery(
 				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId) const override;
+				const QByteArray& objectId,
+				const imtbase::IOperationContext* operationContextPtr) const override;
 
 private:
 	I_REF(imtdb::ISqlDatabaseObjectDelegate, m_userGroupDatabaseDelegateCompPtr);

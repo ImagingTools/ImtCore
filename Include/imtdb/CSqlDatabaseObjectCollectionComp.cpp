@@ -75,7 +75,8 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 			const QByteArray& proposedObjectId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
 			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr,
-			const Id& /*parentId*/)
+			const Id& /*parentId*/,
+			const imtbase::IOperationContext* operationContextPtr)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		return nullptr;
@@ -86,7 +87,13 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 		objectId = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 	}
 
-	imtdb::IDatabaseObjectDelegate::NewObjectQuery objectQuery = m_objectDelegateCompPtr->CreateNewObjectQuery(typeId, objectId, name, description, defaultValuePtr.GetPtr());
+	imtdb::IDatabaseObjectDelegate::NewObjectQuery objectQuery = m_objectDelegateCompPtr->CreateNewObjectQuery(
+				typeId,
+				objectId,
+				name,
+				description,
+				defaultValuePtr.GetPtr(),
+				operationContextPtr);
 	if (objectQuery.query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 
@@ -122,13 +129,13 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 }
 
 
-bool CSqlDatabaseObjectCollectionComp::RemoveElement(const Id& elementId)
+bool CSqlDatabaseObjectCollectionComp::RemoveElement(const Id& elementId, const imtbase::IOperationContext* operationContextPtr)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		return false;
 	}
 
-	QByteArray query = m_objectDelegateCompPtr->CreateDeleteObjectQuery(*this, elementId);
+	QByteArray query = m_objectDelegateCompPtr->CreateDeleteObjectQuery(*this, elementId, operationContextPtr);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 
@@ -196,15 +203,14 @@ bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId,
 bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 			const Id& objectId,
 			const istd::IChangeable& object,
-			CompatibilityMode /*mode*/)
+			CompatibilityMode /*mode*/,
+			const imtbase::IOperationContext* operationContextPtr)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		return false;
 	}
 
-	imtdb::IDatabaseObjectDelegate::ContextDescription description;
-
-	QByteArray query = m_objectDelegateCompPtr->CreateUpdateObjectQuery(*this, objectId, object, description);
+	QByteArray query = m_objectDelegateCompPtr->CreateUpdateObjectQuery(*this, objectId, object, operationContextPtr);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 
@@ -512,7 +518,7 @@ bool CSqlDatabaseObjectCollectionComp::SetElementName(const Id& elementId, const
 		return false;
 	}
 
-	QByteArray query = m_objectDelegateCompPtr->CreateRenameObjectQuery(*this, elementId, name);
+	QByteArray query = m_objectDelegateCompPtr->CreateRenameObjectQuery(*this, elementId, name, nullptr);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 
@@ -547,7 +553,7 @@ bool CSqlDatabaseObjectCollectionComp::SetElementDescription(const Id& elementId
 		return false;
 	}
 
-	QByteArray query = m_objectDelegateCompPtr->CreateDescriptionObjectQuery(*this, elementId, description);
+	QByteArray query = m_objectDelegateCompPtr->CreateDescriptionObjectQuery(*this, elementId, description, nullptr);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Database collection");
 

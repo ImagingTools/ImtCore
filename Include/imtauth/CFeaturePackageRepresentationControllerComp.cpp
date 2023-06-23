@@ -66,7 +66,9 @@ bool CFeaturePackageRepresentationControllerComp::GetRepresentationFromDataModel
 }
 
 
-bool CFeaturePackageRepresentationControllerComp::GetDataModelFromRepresentation(const imtbase::CTreeItemModel& representation, istd::IChangeable& dataModel) const
+bool CFeaturePackageRepresentationControllerComp::GetDataModelFromRepresentation(
+			const imtbase::CTreeItemModel& /*representation*/,
+			istd::IChangeable& /*dataModel*/) const
 {
 	return false;
 }

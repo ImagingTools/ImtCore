@@ -75,7 +75,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 			const QByteArray& proposedObjectId,
 			const QString& objectName,
 			const QString& objectDescription,
-			const istd::IChangeable* valuePtr) const
+			const istd::IChangeable* valuePtr,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	NewObjectQuery retVal;
 
@@ -162,7 +163,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& objectId) const
+			const QByteArray& objectId,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	QByteArray retVal = QString("DELETE FROM \"%1\" WHERE \"%2\" = '%3';").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(s_idColumn)).arg(qPrintable(objectId)).toLocal8Bit();
 
@@ -174,7 +176,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
-			const ContextDescription& contextDescription,
+			const imtbase::IOperationContext* operationContextPtr,
 			bool /*useExternDelegate*/) const
 {
 	// Get number of the revisions of the document in the database:
@@ -214,6 +216,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 					.arg(qPrintable(objectId))
 					.toLocal8Bit();
 
+
+		QString operationComment = operationContextPtr != nullptr ? operationContextPtr->GetOperationDescription() : QString();
 		retVal += QString("INSERT INTO \"%1\"(\"Id\", \"%2\", \"%3\", \"RevisionNumber\", \"Comment\", \"LastModified\", \"Checksum\") VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
 					.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 					.arg(qPrintable(s_documentIdColumn))
@@ -222,7 +226,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 					.arg(qPrintable(objectId))
 					.arg(qPrintable(documentContent.toBase64()))
 					.arg(revisionsCount + 1)
-					.arg(contextDescription.comment)
+					.arg(operationComment)
 					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 					.arg(checksum)
 					.toLocal8Bit();
@@ -263,7 +267,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateRenameObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId,
-			const QString& newObjectName) const
+			const QString& newObjectName,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	QByteArray retVal = QString("UPDATE \"%1\" SET \"Name\" = '%2' WHERE \"%3\" = '%4';")
 				.arg(qPrintable(*m_tableNameAttrPtr))
@@ -279,7 +284,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRenameObjectQuery(
 QByteArray CSqlDatabaseDocumentDelegateComp::CreateDescriptionObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& /*objectId*/,
-			const QString& /*description*/) const
+			const QString& /*description*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	QByteArray retVal;
 

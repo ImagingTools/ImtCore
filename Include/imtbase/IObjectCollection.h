@@ -6,6 +6,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollectionInfo.h>
+#include <imtbase/IOperationContext.h>
 
 
 namespace imtbase
@@ -154,12 +155,15 @@ public:
 				const Id& proposedElementId = Id(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
-				const Id& parentId = Id()) = 0;
+				const Id& parentId = Id(),
+				const IOperationContext* operationContextPtr = nullptr) = 0;
 
 	/**
 		Remove element with the given ID.
 	*/
-	virtual bool RemoveElement(const Id& elementId) = 0;
+	virtual bool RemoveElement(
+				const Id& elementId,
+				const IOperationContext* operationContextPtr = nullptr) = 0;
 
 	/**
 		Get access to the object instance inside of collecton.
@@ -175,7 +179,11 @@ public:
 	/**
 		Set data for the entry with the given ID.
 	*/
-	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) = 0;
+	virtual bool SetObjectData(
+				const Id& objectId, 
+				const istd::IChangeable& object, 
+				CompatibilityMode mode = CM_WITHOUT_REFS,
+				const IOperationContext* operationContextPtr = nullptr) = 0;
 
 	/**
 		Create sub collection of the whole collection according to the given filtering/sorting parameters.

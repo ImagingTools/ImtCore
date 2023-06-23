@@ -149,7 +149,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::Cr
 			const QByteArray& /*proposedObjectId*/,
 			const QString& objectName,
 			const QString& objectDescription,
-			const istd::IChangeable* valuePtr) const
+			const istd::IChangeable* valuePtr,
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	const imtlic::CProductLicensingInfo* productPtr = dynamic_cast<const imtlic::CProductLicensingInfo*>(valuePtr);
 	if (productPtr == nullptr){
@@ -230,7 +231,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::Cr
 
 QByteArray CProductsDatabaseDelegateComp::CreateDeleteObjectQuery(
 			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId) const
+			const QByteArray& objectId,
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	imtbase::IObjectCollection::DataPtr objectPtr;
 	if (collection.GetObjectData(objectId, objectPtr)){
@@ -257,14 +259,9 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
-			const ContextDescription& /*description*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/,
 			bool /*useExternDelegate*/) const
 {
-//	const imtlic::IProductLicensingInfo* newProductPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(&object);
-//	if (newProductPtr == nullptr){
-//		return QByteArray();
-//	}
-
 	const imtlic::CProductLicensingInfo* newProductPtr = dynamic_cast<const imtlic::CProductLicensingInfo*>(&object);
 	if (newProductPtr == nullptr){
 		return QByteArray();
@@ -328,14 +325,6 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 							.arg(qPrintable(featureInfo.id))
 							.toLocal8Bit();
 			}
-//			QByteArrayList licenseDependencies = newProductPtr->GetLicenseDependencies(licenseId);
-//			for (const QByteArray& dependentId : licenseDependencies){
-//				retVal += "\n" +
-//							QString("INSERT INTO \"LicenseDependencies\" (\"LicenseId\", \"DependencyId\") VALUES('%1', '%2');")
-//							.arg(qPrintable(licenseId))
-//							.arg(qPrintable(dependentId))
-//							.toLocal8Bit();
-//			}
 		}
 	}
 
@@ -427,7 +416,8 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 QByteArray CProductsDatabaseDelegateComp::CreateRenameObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
-			const QString& newObjectName) const
+			const QString& newObjectName,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	const imtlic::IProductLicensingInfo* productPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr objectPtr;
@@ -458,7 +448,8 @@ QByteArray CProductsDatabaseDelegateComp::CreateRenameObjectQuery(
 QByteArray CProductsDatabaseDelegateComp::CreateDescriptionObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
-			const QString& description) const
+			const QString& description,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	const imtlic::IProductLicensingInfo* productPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr objectPtr;

@@ -32,19 +32,6 @@ public:
 		QString objectName;
 	};
 
-	struct ContextDescription
-	{
-		/**
-			ID of the initiator of the operation. E.g user-ID
-		*/
-		QString contextOwnerId;
-
-		/**
-			Description/comment related to the operation.
-		*/
-		QString comment;
-	};
-
 	/**
 		Get information about supported object types.
 	*/
@@ -81,14 +68,16 @@ public:
 				const QByteArray& proposedObjectId,
 				const QString& objectName,
 				const QString& objectDescription,
-				const istd::IChangeable* valuePtr) const = 0;
+				const istd::IChangeable* valuePtr,
+				const imtbase::IOperationContext* operationContextPtr) const = 0;
 
 	/**
 		Create query for the deletion of the object from the database.
 	*/
 	virtual QByteArray CreateDeleteObjectQuery(
 				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId) const = 0;
+				const QByteArray& objectId,
+				const imtbase::IOperationContext* operationContextPtr) const = 0;
 
 	/**
 		Create query for the update an existing object in the collection.
@@ -97,7 +86,7 @@ public:
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
 				const istd::IChangeable& object,
-				const ContextDescription& contextDescription,
+				const imtbase::IOperationContext* operationContextPtr,
 				bool useExternDelegate = true) const = 0;
 
 	/**
@@ -106,7 +95,8 @@ public:
 	virtual QByteArray CreateRenameObjectQuery(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
-				const QString& newObjectName) const = 0;
+				const QString& newObjectName,
+				const imtbase::IOperationContext* operationContextPtr) const = 0;
 
 	/**
 	*	Create query for the settings description of the object.
@@ -114,7 +104,8 @@ public:
 	virtual QByteArray CreateDescriptionObjectQuery(
 				const imtbase::IObjectCollection& collection,
 				const QByteArray& objectId,
-				const QString& description) const = 0;
+				const QString& description,
+				const imtbase::IOperationContext* operationContextPtr) const = 0;
 
 	/**
 		Create query for the reseting the collection.

@@ -23,7 +23,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserGroupDatabaseDelegateComp::C
 		const QByteArray& proposedObjectId,
 		const QString& objectName,
 		const QString& /*objectDescription*/,
-		const istd::IChangeable* valuePtr) const
+		const istd::IChangeable* valuePtr,
+		const imtbase::IOperationContext* operationContextPtr) const
 {
 	NewObjectQuery retVal;
 
@@ -41,6 +42,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserGroupDatabaseDelegateComp::C
 				return NewObjectQuery();
 			}
 
+			imtauth::IUserGroupInfo::RoleIds groupRoleIds = groupInfoPtr->GetRoles();
+
 			QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8() : proposedObjectId;
 			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 
@@ -52,8 +55,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserGroupDatabaseDelegateComp::C
 					if (userInfoPtr != nullptr){
 						if (!userInfoPtr->GetGroups().contains(objectId)){
 							userInfoPtr->AddToGroup(objectId);
-							ContextDescription context;
-							retVal.query += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, context, false);
+
+							retVal.query += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, operationContextPtr, false);
 						}
 					}
 				}
@@ -80,7 +83,7 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 		const imtbase::IObjectCollection& collection,
 		const QByteArray& objectId,
 		const istd::IChangeable& object,
-		const ContextDescription& /*description*/,
+		const imtbase::IOperationContext* operationContextPtr,
 		bool useExternDelegate) const
 {
 	const imtauth::IUserGroupInfo* oldObjectPtr = nullptr;
@@ -104,6 +107,8 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 		}
 
 		if (useExternDelegate){
+			imtauth::IUserGroupInfo::RoleIds groupRoleIds = groupInfoPtr->GetRoles();
+
 			imtauth::IUserGroupInfo::UserIds oldUserIds = oldObjectPtr->GetUsers();
 			imtauth::IUserGroupInfo::UserIds newUserIds = groupInfoPtr->GetUsers();
 
@@ -130,8 +135,7 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 						if (!userInfoPtr->GetGroups().contains(objectId)){
 							userInfoPtr->AddToGroup(objectId);
 
-							ContextDescription context;
-							retVal += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, context, false);
+							retVal += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, operationContextPtr, false);
 						}
 					}
 				}
@@ -144,8 +148,7 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 					if (userInfoPtr != nullptr){
 						bool result = userInfoPtr->RemoveFromGroup(objectId);
 						if (result){
-							ContextDescription context;
-							retVal += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, context, false);
+							retVal += m_userDatabaseDelegateCompPtr->CreateUpdateObjectQuery(*m_userCollectionCompPtr, userId, *userInfoPtr, operationContextPtr, false);
 						}
 					}
 				}

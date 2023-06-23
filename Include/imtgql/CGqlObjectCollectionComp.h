@@ -71,11 +71,12 @@ public:
 				const QByteArray& proposedObjectId = QByteArray(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
-				const Id& parentId = Id()) override;
-	virtual bool RemoveElement(const Id& elementId) override;
+				const Id& parentId = Id(),
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool RemoveElement(const Id& elementId, const imtbase::IOperationContext* operationContextPtr = nullptr) override;
 	virtual const istd::IChangeable* GetObjectPtr(const Id& objectId) const override;
 	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr) const override;
-	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS, const imtbase::IOperationContext* operationContextPtr = nullptr) override;
 	virtual imtbase::IObjectCollection* CreateSubCollection(
 				int offset = 0,
 				int count = -1,
