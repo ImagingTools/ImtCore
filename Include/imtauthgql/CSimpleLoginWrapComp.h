@@ -59,7 +59,7 @@ protected:
 	virtual void OnComponentCreated() override;
 
 private:
-	bool UserInfoUpdate(const QByteArray& userObjectId);
+    bool RetrieveUserInfo(const QByteArray& userObjectId);
 	void CheckSuperuser();
 
 private:
