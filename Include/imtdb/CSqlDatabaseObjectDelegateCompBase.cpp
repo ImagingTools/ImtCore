@@ -284,14 +284,11 @@ bool CSqlDatabaseObjectDelegateCompBase::CreatePaginationQuery(int offset, int c
 bool CSqlDatabaseObjectDelegateCompBase::CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
 {
 	bool retVal = true;
+
 	QString objectFilterQuery;
-	iprm::TParamsPtr<iprm::IParamsSet> objectFilterParamPtr(&filterParams, "ObjectFilter");
-	if (objectFilterParamPtr.IsValid()){
-		iprm::TParamsPtr<iprm::ITextParam> textParamPtr(objectFilterParamPtr.GetPtr(), "ObjectFilter");
-		retVal = CreateObjectFilterQuery(*objectFilterParamPtr, objectFilterQuery);
-		if (!retVal){
-			return false;
-		}
+	retVal = CreateObjectFilterQuery(filterParams, objectFilterQuery);
+	if (!retVal){
+		return false;
 	}
 
 	QString textFilterQuery;
@@ -324,23 +321,28 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(
 			const iprm::IParamsSet& filterParams,
 			QString& filterQuery) const
 {
-	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
+	bool retVal = true;
+	QString objectFilterQuery;
+	iprm::TParamsPtr<iprm::IParamsSet> objectFilterParamPtr(&filterParams, "ObjectFilter");
+	if (objectFilterParamPtr.IsValid()){
+		iprm::IParamsSet::Ids paramIds = objectFilterParamPtr->GetParamIds();
+		if (!paramIds.isEmpty()){
+	#if QT_VERSION < 0x060000
+			QByteArrayList idsList(paramIds.toList());
+	#else
+			QByteArrayList idsList(paramIds.cbegin(), paramIds.cend());
+	#endif
+			QByteArray key = idsList[0];
 
-	if (!paramIds.isEmpty()){
-#if QT_VERSION < 0x060000
-		QByteArrayList idsList(paramIds.toList());
-#else
-		QByteArrayList idsList(paramIds.cbegin(), paramIds.cend());
-#endif
-		QByteArray key = idsList[0];
+			iprm::TParamsPtr<iprm::ITextParam> textParamPtr(objectFilterParamPtr.GetPtr(), key);
+			if (!textParamPtr.IsValid()){
+				return false;
+			}
 
-		const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(filterParams.GetParameter(key));
-		if (textParamPtr == nullptr){
-			return false;
+			QString value = textParamPtr->GetText();
+
+			filterQuery = QString("%1 = '%2'").arg(qPrintable(key)).arg(value);
 		}
-
-		QString value = textParamPtr->GetText();
-		filterQuery = QString("%1 = '%2'").arg(qPrintable(key)).arg(value);
 	}
 
 	return true;

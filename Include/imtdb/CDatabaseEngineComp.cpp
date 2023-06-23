@@ -373,12 +373,18 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 								<< "\n\t| Error: " << sqlError.text();
 
 					SendErrorMessage(0, QString("Migration is failed: %1").arg(sqlError.text()), "Database engine");
+
 					return false;
 				}
 			}
 			else{
-				ExecSqlQueryFromFile(folder.filePath("migration_"+QString::number(index)+".sql").toLocal8Bit(), &sqlError);
+				QString migrationFilePath = folder.filePath("migration_"+QString::number(index) + ".sql");
+
+				ExecSqlQueryFromFile(migrationFilePath.toLocal8Bit(), &sqlError);
+
 				if (sqlError.type() != QSqlError::NoError){
+					SendErrorMessage(0, QString("Execution of %1 is failed: %2").arg(migrationFilePath).arg(sqlError.text()), "Database engine");
+
 					return false;
 				}
 			}
@@ -386,11 +392,17 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 			valuesRevision.insert(":Revision",index);
 			ExecSqlQueryFromFile(folder.filePath("SetRevision.sql"), valuesRevision, &sqlError);
 			if (sqlError.type() != QSqlError::NoError){
+				SendErrorMessage(0, QString("Execution of SetRevision.sql is failed: %1").arg(sqlError.text()), "Database engine");
+			
 				return false;
 			}
 		}
+
+		SendInfoMessage(0, QString("Database was successfully  migrated"), "Database engine");
+
 		return true;
 	}
+
 	return false;
 }
 
