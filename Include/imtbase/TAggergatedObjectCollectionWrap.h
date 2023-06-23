@@ -59,11 +59,12 @@ public:
 				const QByteArray& proposedObjectId = QByteArray(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
-				const Id& parentId = Id()) override;
-	virtual bool RemoveElement(const QByteArray& elementId) override;
+				const Id& parentId = Id(),
+				const IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool RemoveElement(const QByteArray& elementId, const IOperationContext* operationContextPtr = nullptr) override;
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData( const QByteArray& objectId, DataPtr& dataPtr) const override;
-	virtual bool SetObjectData( const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
+	virtual bool SetObjectData( const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS, const IOperationContext* operationContextPtr = nullptr) override;
 	virtual imtbase::IObjectCollection* CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const Id &parentId, int iterationFlags) const override;
 	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
 				int offset = 0,
@@ -205,7 +206,8 @@ inline QByteArray TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::In
 			const QByteArray& proposedObjectId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
 			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr,
-			const Id& parentId)
+			const Id& parentId,
+			const IOperationContext* operationContextPtr)
 {
 	return m_collection.InsertNewObject(
 				typeId,
@@ -215,14 +217,17 @@ inline QByteArray TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::In
 				proposedObjectId,
 				dataMetaInfoPtr,
 				collectionItemMetaInfoPtr,
-				parentId);
+				parentId,
+				operationContextPtr);
 }
 
 
 template<class BaseInterface, class ObjectImpl>
-inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::RemoveElement(const QByteArray& elementId)
+inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::RemoveElement(
+			const QByteArray& elementId,
+			const IOperationContext* operationContextPtr)
 {
-	return m_collection.RemoveElement(elementId);
+	return m_collection.RemoveElement(elementId, operationContextPtr);
 }
 
 
@@ -241,9 +246,13 @@ inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetObjec
 
 
 template<class BaseInterface, class ObjectImpl>
-inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetObjectData(const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode)
+inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetObjectData(
+			const QByteArray& objectId,
+			const istd::IChangeable& object,
+			CompatibilityMode mode,
+			const IOperationContext* operationContextPtr)
 {
-	return m_collection.SetObjectData(objectId, object, mode);
+	return m_collection.SetObjectData(objectId, object, mode, operationContextPtr);
 }
 
 
