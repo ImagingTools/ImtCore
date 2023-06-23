@@ -207,6 +207,7 @@ Item {
         radius: comboBoxContainerGql.radius;
         color: comboBoxContainerGql.backgroundColor;
 
+
         gradient: Gradient {
             GradientStop { position: 0.0; color: comboBoxContainerGql.isColor ? cbMainRect.color : Style.imagingToolsGradient1; }
             GradientStop { position: 0.97; color: comboBoxContainerGql.isColor ? cbMainRect.color : Style.imagingToolsGradient2; }
@@ -222,6 +223,10 @@ Item {
             anchors.verticalCenter: parent.verticalCenter;
             anchors.left: parent.left;
             anchors.leftMargin: 10;
+            anchors.right: parent.right;
+            anchors.rightMargin: 20;
+
+            clip: true;
 
             color: comboBoxContainerGql.fontColorTitle;
             font.family: Style.fontFamily;

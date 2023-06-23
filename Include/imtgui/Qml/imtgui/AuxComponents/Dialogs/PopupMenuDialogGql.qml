@@ -27,6 +27,7 @@ Item {
     property string filterName: "Name";
     property string fontColor: Style.textColor;
     property alias filterText: filterField.text;
+    property string excludeFilterPart: "";
     property bool endListStatus: false;
     property bool hiddenBackground: true;
     property bool canClose: true;
@@ -161,7 +162,9 @@ Item {
             if(popupMenuContainer.ready){
                 popupMenuContainer.rootItem.currentIndex = -1;
                 popupMenuContainer.offset = 0;
-                modelFilter.SetData("TextFilter", popupMenuContainer.filterText);
+                //modelFilter.SetData("TextFilter", popupMenuContainer.filterText);
+                var str = text.replace(popupMenuContainer.excludeFilterPart, "");
+                modelFilter.SetData("TextFilter", str);
                 popupMenuContainer.rootItem.editSignal();
                 pause.stop();
                 pause.start();
@@ -195,13 +198,35 @@ Item {
         anchors.left: parent.left
 
         width: popupMenuContainer.width;
-        height: popupMenuListView.height;
+        height: popupMenuListView.height + noDataRec.height * noDataRec.visible;
         radius: popupMenuContainer.delegateRadius;
 
         color: Style.baseColor;
 
         border.width: 1;
         border.color: Style.alternateBaseColor;
+
+        Rectangle{
+            id: noDataRec;
+
+            width: parent.width;
+            height: 50;
+            radius: parent.radius;
+            color: parent.color;
+
+            visible: !popupMenuListView.count;
+
+            Text{
+                id: noDataText;
+
+                anchors.centerIn: parent;
+
+                font.pixelSize:  popupMenuContainer.textSize;
+                color: popupMenuContainer.fontColor;
+
+                text: "Нет данных";
+            }
+        }
 
         Rectangle{
             id: loadedRec;
@@ -222,6 +247,8 @@ Item {
                 text: "Loaded..."
             }
         }
+
+
 
         ListView {
             id: popupMenuListView;
