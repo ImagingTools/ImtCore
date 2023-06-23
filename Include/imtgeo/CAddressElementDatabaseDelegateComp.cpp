@@ -88,7 +88,7 @@ istd::IChangeable* CAddressElementDatabaseDelegateComp::CreateObjectFromRecord(c
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateComp::CreateNewObjectQuery(
 			const QByteArray& /*typeId*/,
 			const QByteArray& proposedObjectId,
-			const QString& objectName,
+			const QString& /*objectName*/,
 			const QString& /*objectDescription*/,
 			const istd::IChangeable* valuePtr,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
@@ -134,7 +134,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
 
 
 QByteArray CAddressElementDatabaseDelegateComp::CreateDeleteObjectQuery(
-			const imtbase::IObjectCollection& collection,
+			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
@@ -194,9 +194,9 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 
 QByteArray CAddressElementDatabaseDelegateComp::CreateRenameObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const QString& newObjectName,
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const QString& /*newObjectName*/,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QByteArray();
@@ -204,9 +204,9 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateRenameObjectQuery(
 
 
 QByteArray CAddressElementDatabaseDelegateComp::CreateDescriptionObjectQuery(
-			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId,
-			const QString& description,
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const QString& /*description*/,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QByteArray();
