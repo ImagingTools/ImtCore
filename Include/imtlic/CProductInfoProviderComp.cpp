@@ -29,7 +29,7 @@ imtbase::CTreeItemModel* CProductInfoProviderComp::CreateInternalResponse(const 
 		if (representationDataProvider != nullptr){
 			imtbase::CTreeItemModel* permissionsModelPtr = representationDataProvider->CreateResponse(gqlRequest, errorMessage);
 			if (permissionsModelPtr != nullptr){
--				rootModelPtr->SetExternTreeModel("Permissions", permissionsModelPtr, i);
+				rootModelPtr->SetExternTreeModel("Permissions", permissionsModelPtr, i);
 			}
 		}
 	}

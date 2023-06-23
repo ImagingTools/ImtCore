@@ -60,6 +60,12 @@ bool TClientRequestManagerCompWrap<Base>::SendModelRequest(const IGqlRequest & r
 			return false;
 		}
 
+		QString json = resultModelPtr->toJSON();
+
+		if (resultModelPtr->ContainsKey("errors")){
+			return false;
+		}
+
 		return responseModel.Copy(resultModelPtr);
 	}
 

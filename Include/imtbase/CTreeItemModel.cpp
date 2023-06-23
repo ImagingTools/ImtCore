@@ -910,6 +910,13 @@ bool CTreeItemModel::ParseRecursive(const QJsonObject& jsonObject, int index)
 					treeItemModel->InsertNewItem();
 					treeItemModel->ParseRecursive(jsonValue.toObject(), treeItemModel->m_items.count() - 1);
 				}
+				else if(jsonValue.isArray()){
+				}
+				else{
+					int i = treeItemModel->InsertNewItem();
+					treeItemModel->SetData("", jsonValue.toVariant(), i);
+				}
+
 				arrayIterator++;
 			}
 		}

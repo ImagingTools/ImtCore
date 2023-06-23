@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <istd/TChangeDelegator.h>
+#include <iser/CJsonMemWriteArchive.h>
 
 // ImtCore includes
 #include <imtauth/CUserGroupInfo.h>
@@ -25,9 +26,14 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::GetObject(const imtgql::CGqlR
 
 	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
 
+	bool isJsonSerialized = false;
+	QByteArray userGroupId;
 	QByteArray productId;
-	if (!paramsPtr.empty()){
-		productId = paramsPtr.at(0).GetFieldArgumentValue("ProductId").toByteArray();
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	if (inputParamPtr != nullptr){
+		productId = inputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
+		userGroupId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+		isJsonSerialized = inputParamPtr->GetFieldArgumentValue("IsJsonSerialized").toBool();
 	}
 
 	dataModel->SetData("Id", "");
@@ -35,36 +41,50 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::GetObject(const imtgql::CGqlR
 	dataModel->SetData("Description", "");
 	dataModel->SetData("Users", "");
 
-	QByteArray userGroupId = GetObjectIdFromInputParams(paramsPtr);
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(userGroupId, dataPtr)){
-		imtauth::CIdentifiableUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::CIdentifiableUserGroupInfo*>(dataPtr.GetPtr());
+		imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
 		if (userGroupInfoPtr != nullptr){
-			QByteArray groupUuid = userGroupInfoPtr->GetObjectUuid();
-			QString name = userGroupInfoPtr->GetName();
-			QString description = userGroupInfoPtr->GetDescription();
+			if (isJsonSerialized){
+				QByteArray userJson;
+				{
+					iser::CJsonMemWriteArchive archive(userJson);
+					if (!userGroupInfoPtr->Serialize(archive)){
+						return nullptr;
+					}
+				}
 
-			dataModel->SetData("Id", userGroupId);
-			dataModel->SetData("Name", name);
-			dataModel->SetData("Description", description);
-			dataModel->SetData("Users", "");
-
-			imtauth::IUserGroupInfo::UserIds userGroupIds = userGroupInfoPtr->GetUsers();
-			if (!userGroupIds.empty()){
-				QByteArray users = userGroupIds.join(';');
-				dataModel->SetData("Users", users);
+				if (!dataModel->CreateFromJson(userJson)){
+					return nullptr;
+				}
 			}
+			else{
+				QByteArray groupUuid = userGroupId;
+				QString name = userGroupInfoPtr->GetName();
+				QString description = userGroupInfoPtr->GetDescription();
 
-			imtauth::IUserGroupInfo::RoleIds roleIds = userGroupInfoPtr->GetRoles(productId);
-			if (!roleIds.empty()){
-				QByteArray roles = roleIds.join(';');
-				dataModel->SetData("Roles", roles);
-			}
+				dataModel->SetData("Id", userGroupId);
+				dataModel->SetData("Name", name);
+				dataModel->SetData("Description", description);
+				dataModel->SetData("Users", "");
 
-			imtauth::IUserGroupInfo::GroupIds groupIds = userGroupInfoPtr->GetParentGroups();
-			if (!groupIds.isEmpty()){
-				QByteArray groups = groupIds.join(';');
-				dataModel->SetData("ParentGroups", groups);
+				imtauth::IUserGroupInfo::UserIds userGroupIds = userGroupInfoPtr->GetUsers();
+				if (!userGroupIds.empty()){
+					QByteArray users = userGroupIds.join(';');
+					dataModel->SetData("Users", users);
+				}
+
+				imtauth::IUserGroupInfo::RoleIds roleIds = userGroupInfoPtr->GetRoles(productId);
+				if (!roleIds.empty()){
+					QByteArray roles = roleIds.join(';');
+					dataModel->SetData("Roles", roles);
+				}
+
+				imtauth::IUserGroupInfo::GroupIds groupIds = userGroupInfoPtr->GetParentGroups();
+				if (!groupIds.isEmpty()){
+					QByteArray groups = groupIds.join(';');
+					dataModel->SetData("ParentGroups", groups);
+				}
 			}
 		}
 	}

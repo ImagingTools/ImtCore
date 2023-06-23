@@ -1,6 +1,9 @@
 #include <imtauthgql/CRoleControllerComp.h>
 
 
+// ACF includes
+#include <iser/CJsonMemWriteArchive.h>
+
 // ImtCore includes
 #include <imtauth/CRole.h>
 
@@ -17,50 +20,70 @@ imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlReques
 		return nullptr;
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> dataModelPtr = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModelPtr = new imtbase::CTreeItemModel();
 
-	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
-	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
+	QByteArray productId;
+	QByteArray objectId;
+	bool isJsonSerialized = false;
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	if (inputParamPtr != nullptr){
+		objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+		productId = inputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
+		isJsonSerialized = inputParamPtr->GetFieldArgumentValue("IsJsonSerialized").toBool();
+	}
 
 	dataModelPtr->SetData("Id", "");
 	dataModelPtr->SetData("Name", "");
-
-	if (!inputParams.empty()){
-		QByteArray productId = inputParams.at(0).GetFieldArgumentValue("ProductId").toByteArray();
-		dataModelPtr->SetData("ProductId", productId);
-	}
+	dataModelPtr->SetData("ProductId", productId);
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		const imtauth::IRole* roleInfoPtr = dynamic_cast<const imtauth::IRole*>(dataPtr.GetPtr());
+		imtauth::IRole* roleInfoPtr = dynamic_cast<imtauth::IRole*>(dataPtr.GetPtr());
 		if (roleInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get a role info");
 
 			return nullptr;
 		}
 
-		QByteArray objectUuid = objectId;
-		QByteArray roleId = roleInfoPtr->GetRoleId();
-		QString roleName = roleInfoPtr->GetRoleName();
-		QString roleDescription = roleInfoPtr->GetRoleDescription();
-		QByteArray productId = roleInfoPtr->GetProductId();
+		if (isJsonSerialized){
+			QByteArray roleJson;
+			{
+				iser::CJsonMemWriteArchive archive(roleJson);
+				if (!roleInfoPtr->Serialize(archive)){
+					return nullptr;
+				}
+			}
 
-		dataModelPtr->SetData("Id", objectUuid);
-		dataModelPtr->SetData("RoleId", roleId);
-		dataModelPtr->SetData("ProductId", productId);
-		dataModelPtr->SetData("Name", roleName);
+			if (!dataModelPtr->CreateFromJson(roleJson)){
+				return nullptr;
+			}
 
-		dataModelPtr->SetData("Description", roleDescription);
+//			dataModelPtr->SetData("RoleJson", roleJson);
+		}
+		else{
+			QByteArray objectUuid = objectId;
+			QByteArray roleId = roleInfoPtr->GetRoleId();
+			QString roleName = roleInfoPtr->GetRoleName();
+			QString roleDescription = roleInfoPtr->GetRoleDescription();
+			QByteArray productId = roleInfoPtr->GetProductId();
 
-		QByteArrayList parentsRolesIds = roleInfoPtr->GetIncludedRoles();
-		dataModelPtr->SetData("ParentRoles", parentsRolesIds.join(';'));
+			dataModelPtr->SetData("Id", objectUuid);
+			dataModelPtr->SetData("RoleId", roleId);
+			dataModelPtr->SetData("ProductId", productId);
+			dataModelPtr->SetData("Name", roleName);
 
-		imtauth::IRole::FeatureIds permissions = roleInfoPtr->GetLocalPermissions();
-		dataModelPtr->SetData("Permissions", permissions.join(';'));
+			dataModelPtr->SetData("Description", roleDescription);
+
+			QByteArrayList parentsRolesIds = roleInfoPtr->GetIncludedRoles();
+			dataModelPtr->SetData("ParentRoles", parentsRolesIds.join(';'));
+
+			imtauth::IRole::FeatureIds permissions = roleInfoPtr->GetLocalPermissions();
+			dataModelPtr->SetData("Permissions", permissions.join(';'));
+		}
 	}
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	rootModelPtr->SetExternTreeModel("data", dataModelPtr.PopPtr());
+	rootModelPtr->SetExternTreeModel("data", dataModelPtr);
 
 	return rootModelPtr.PopPtr();
 }

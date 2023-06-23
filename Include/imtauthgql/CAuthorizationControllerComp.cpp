@@ -54,6 +54,7 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 
 							dataModelPtr->SetData("Token", tokenValue);
 							dataModelPtr->SetData("Login", login);
+							dataModelPtr->SetData("UserId", userId);
 
 							istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr = new imtauth::CSessionInfo();
 

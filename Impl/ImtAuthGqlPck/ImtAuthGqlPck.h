@@ -16,6 +16,10 @@
 #include <imtauthgql/CAuthorizationOptionsControllerComp.h>
 #include <imtauthgql/CSessionControllerComp.h>
 #include <imtauthgql/CLogoutControllerComp.h>
+#include <imtauthgql/CPumaRoleInfoProviderComp.h>
+#include <imtauthgql/CPumaUserGroupInfoProviderComp.h>
+#include <imtauthgql/CPumaSuperuserProviderComp.h>
+#include <imtauthgql/CSimpleLoginWrapComp.h>
 
 
 /**
@@ -35,6 +39,10 @@ typedef imtauthgql::CUserGroupCollectionControllerComp UserGroupCollectionContro
 typedef imtauthgql::CAuthorizationOptionsControllerComp AuthorizationOptionsController;
 typedef imtauthgql::CSessionControllerComp SessionController;
 typedef imtauthgql::CLogoutControllerComp LogoutController;
+typedef imtauthgql::CPumaRoleInfoProviderComp PumaRoleInfoProvider;
+typedef imtauthgql::CPumaUserGroupInfoProviderComp PumaUserGroupInfoProvider;
+typedef imtauthgql::CPumaSuperuserProviderComp PumaSuperuserProvider;
+typedef icomp::TModelCompWrap<imtauthgql::CSimpleLoginWrapComp> SimpleLoginWrap;
 
 
 } // namespace ImtAuthGqlPck

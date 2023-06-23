@@ -112,6 +112,7 @@ void CCommandsObserverQmlComp::OnCommandsModelChanged(QVariant value)
 	}
 }
 
+
 void CCommandsObserverQmlComp::OnTriggered()
 {
 	iqtgui::CHierarchicalCommand* commandPtr = dynamic_cast<iqtgui::CHierarchicalCommand*>(sender());

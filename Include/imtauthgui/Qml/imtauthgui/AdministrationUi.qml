@@ -25,15 +25,20 @@ SingleDocumentWorkspaceView {
         Events.unSubscribeEvent("CommandsEnabledChanged", container.onCommandsEnabledChanged);
     }
 
+    onVisibleChanged: {
+        console.log("AdministrationUI onVisibleChanged", visible);
+        if (visible){
+            container.updateModels();
+        }
+    }
+
     UserTokenProvider {
         id: userTokenProvider;
     }
 
     ModalDialogManager {
         id: modalDialogManager;
-
         z: 30;
-
         anchors.fill: parent;
     }
 
@@ -62,6 +67,11 @@ SingleDocumentWorkspaceView {
     function onCommandActivated(value){
         var commandId = String(value);
         Events.sendEvent(container.commandId + "CommandActivated", commandId);
+    }
+
+    function updateModels(){
+        console.log("updateModels");
+        Events.sendEvent(container.commandId + "_CommandsUpdateModel");
     }
 }
 

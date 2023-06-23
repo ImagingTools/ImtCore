@@ -1,5 +1,9 @@
 #include <imtauthgql/CUserControllerComp.h>
 
+
+// ACF includes
+#include <iser/CJsonMemWriteArchive.h>
+
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
 #include <imtauth/IRoleInfoProvider.h>
@@ -10,7 +14,9 @@ namespace imtauthgql
 {
 
 
-imtbase::CTreeItemModel* CUserControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CUserControllerComp::GetObject(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
@@ -21,11 +27,15 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(const imtgql::CGqlReques
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
-	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
-
+	QByteArray userId;
 	QByteArray productId;
-	if (!paramsPtr.empty()){
-		productId = paramsPtr.at(0).GetFieldArgumentValue("ProductId").toByteArray();
+
+	bool isJsonSerialized = false;
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	if (inputParamPtr != nullptr){
+		productId = inputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
+		userId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+		isJsonSerialized = inputParamPtr->GetFieldArgumentValue("IsJsonSerialized").toBool();
 	}
 
 	const QList<imtgql::CGqlObject> fieldsPtr = gqlRequest.GetFields();
@@ -43,31 +53,46 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(const imtgql::CGqlReques
 	dataModel->SetData("Password", "");
 	dataModel->SetData("Email", "");
 
-	QByteArray userId = GetObjectIdFromInputParams(paramsPtr);
+	userId = userId.replace('{', "").replace('}', "");
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(userId, dataPtr)){
-		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
+		imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
 		if (userInfoPtr != nullptr){
-			QByteArray objectUuid = userId;
-			QByteArray username = userInfoPtr->GetId();
-			QString name = userInfoPtr->GetName();
-			QByteArray passwordHash = userInfoPtr->GetPasswordHash();
-			QString mail = userInfoPtr->GetMail();
-			QByteArray roles = userInfoPtr->GetRoles(productId).join(';');
-			QByteArray groups = userInfoPtr->GetGroups().join(';');
+			if (isJsonSerialized){
+				QByteArray userJson;
+				{
+					iser::CJsonMemWriteArchive archive(userJson);
+					if (!userInfoPtr->Serialize(archive)){
+						return nullptr;
+					}
+				}
 
-			dataModel->SetData("Id", objectUuid);
-			dataModel->SetData("Username", username);
-			dataModel->SetData("Name", name);
-			dataModel->SetData("Password", passwordHash);
-			dataModel->SetData("Email", mail);
-			dataModel->SetData("Groups", groups);
-			dataModel->SetData("Roles", roles);
+				if (!dataModel->CreateFromJson(userJson)){
+					return nullptr;
+				}
+			}
+			else{
+				QByteArray objectUuid = userId;
+				QByteArray username = userInfoPtr->GetId();
+				QString name = userInfoPtr->GetName();
+				QByteArray passwordHash = userInfoPtr->GetPasswordHash();
+				QString mail = userInfoPtr->GetMail();
+				QByteArray roles = userInfoPtr->GetRoles(productId).join(';');
+				QByteArray groups = userInfoPtr->GetGroups().join(';');
 
-			if (allFields.contains("Permissions")){
-				QByteArray permissions = userInfoPtr->GetPermissions(productId).join(';');
-				dataModel->SetData("Permissions", permissions);
+				dataModel->SetData("Id", objectUuid);
+				dataModel->SetData("Username", username);
+				dataModel->SetData("Name", name);
+				dataModel->SetData("Password", passwordHash);
+				dataModel->SetData("Email", mail);
+				dataModel->SetData("Groups", groups);
+				dataModel->SetData("Roles", roles);
+
+				if (allFields.contains("Permissions")){
+					QByteArray permissions = userInfoPtr->GetPermissions(productId).join(';');
+					dataModel->SetData("Permissions", permissions);
+				}
 			}
 		}
 	}
@@ -79,11 +104,11 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(const imtgql::CGqlReques
 
 
 istd::IChangeable* CUserControllerComp::CreateObject(
-		const QList<imtgql::CGqlObject>& inputParams,
-		QByteArray &objectId,
-		QString &name,
-		QString &description,
-		QString& errorMessage) const
+			const QList<imtgql::CGqlObject>& inputParams,
+			QByteArray &objectId,
+			QString &name,
+			QString &description,
+			QString& errorMessage) const
 {
 	if (!m_userInfoFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT(false);

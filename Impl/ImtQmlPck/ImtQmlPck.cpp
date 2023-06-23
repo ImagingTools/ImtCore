@@ -78,11 +78,6 @@ I_EXPORT_COMPONENT(
 			"Page Based Model");
 
 I_EXPORT_COMPONENT(
-			SimpleLoginWrap,
-			"Simple login wrap",
-			"Simple Login Wrap");
-
-I_EXPORT_COMPONENT(
 			CommandsObserverQml,
 			"Commands observer qml",
 			"Commands Observer Qml QML Provider");

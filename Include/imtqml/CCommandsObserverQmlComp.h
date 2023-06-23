@@ -8,7 +8,6 @@
 #include <imod/IModel.h>
 #include <imod/TSingleModelObserverBase.h>
 
-
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
 #include <imtqml/IQuickObject.h>

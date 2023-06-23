@@ -79,6 +79,11 @@ I_EXPORT_COMPONENT(
 			"Gql context controller",
 			"Gql Context Controller");
 
+I_EXPORT_COMPONENT(
+			PumaGqlRemoteRepresentationController,
+			"Puma GraphQL remote representation controller",
+			"Puma GraphQL Gql Api Client Controller User");
+
 
 } // namespace ImtGqlPck
 

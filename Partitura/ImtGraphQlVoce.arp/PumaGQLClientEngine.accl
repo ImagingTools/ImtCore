@@ -8,11 +8,9 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="FeaturePackage" X="550" Y="375" Note=""/>
-        <Element ComponentName="FeaturePackageRepresentationController" X="925" Y="250" Note=""/>
-        <Element ComponentName="PermissionsProvider" X="550" Y="250" Note=""/>
-        <Element ComponentName="ProductInfoProvider" X="550" Y="75" Note=""/>
-        <Element ComponentName="QtResourceLoaderComp" X="550" Y="500" Note=""/>
+        <Element ComponentName="ApiClient" X="550" Y="325" Note=""/>
+        <Element ComponentName="GraphQLClientEngine" X="550" Y="450" Note=""/>
+        <Element ComponentName="PumaGqlRemoteRepresentationController" X="575" Y="175" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

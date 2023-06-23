@@ -13,8 +13,8 @@ namespace imtauth
 
 
 class CRoleComp:
-		public icomp::CComponentBase,
-		public CIdentifiableRoleInfo
+			public icomp::CComponentBase,
+			public CIdentifiableRoleInfo
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
@@ -23,7 +23,7 @@ public:
 		I_REGISTER_INTERFACE(IRole);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_REGISTER_INTERFACE(imtauth::IRoleInfoProvider);
-		I_ASSIGN(m_parentRoleProviderCompPtr, "ParentRoleProvider", "Parent role provider", true, "ParentRoleProvider");
+		I_ASSIGN(m_parentRoleProviderCompPtr, "ParentRoleProvider", "Parent role provider", false, "ParentRoleProvider");
 	I_END_COMPONENT;
 
 protected:

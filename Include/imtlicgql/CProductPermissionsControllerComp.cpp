@@ -29,8 +29,6 @@ imtbase::CTreeItemModel* CProductPermissionsControllerComp::CreateInternalRespon
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
 	imtbase::CTreeItemModel* productsModelPtr = m_productProviderCompPtr->CreateResponse(gqlRequest, errorMessage);
-
-	QString json = productsModelPtr->toJSON();
 	if (productsModelPtr != nullptr){
 		for (int i = 0; i < productsModelPtr->GetItemsCount(); i++){
 			QByteArray currentProductId = productsModelPtr->GetData("Id", i).toByteArray();

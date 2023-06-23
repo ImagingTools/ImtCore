@@ -13,6 +13,10 @@ QtObject {
     signal modelLoaded();
     signal commandModeChanged(string commandId, bool newMode);
 
+    Component.onDestruction: {
+        Events.unSubscribeEvent(commandsProviderContainer.documentUuid + "_CommandsUpdateModel", commandsProviderContainer.updateModel)
+    }
+
     onCommandsIdChanged: {
         commandsProviderContainer.modelCommands.updateModel();
     }
@@ -21,6 +25,10 @@ QtObject {
         commandsProviderContainer.updateGui();
 
         commandsProviderContainer.modelLoaded();
+    }
+
+    onDocumentUuidChanged: {
+        Events.subscribeEvent(commandsProviderContainer.documentUuid + "_CommandsUpdateModel", commandsProviderContainer.updateModel)
     }
 
     onCommandModeChanged: {
@@ -122,11 +130,6 @@ QtObject {
     property GqlModel modelCommands: GqlModel {
         function updateModel() {
             var query = Gql.GqlRequest("query", commandsProviderContainer.commandsId + "Commands");
-
-//            var inputParams = Gql.GqlObject("input");
-//            inputParams.InsertField("ProductId", window.productId);
-//            query.AddParam(inputParams);
-
             var gqlData = query.GetQuery();
             this.SetGqlQuery(gqlData);
         }
@@ -142,6 +145,10 @@ QtObject {
 
                 if (commandsProviderContainer.modelCommands.ContainsKey("data")){
                     dataModelLocal = commandsProviderContainer.modelCommands.GetData("data")
+                    if (!dataModelLocal){
+                        return;
+                    }
+
                     if(dataModelLocal.ContainsKey(commandsProviderContainer.commandsId + "Commands")){
                         dataModelLocal = dataModelLocal.GetData(commandsProviderContainer.commandsId + "Commands");
 

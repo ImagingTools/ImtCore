@@ -20,7 +20,7 @@ public:
 
 	I_BEGIN_COMPONENT(CSuperuserProviderComp);
 		I_REGISTER_INTERFACE(imtauth::ISuperuserProvider);
-		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", true, "UserCollection");
+		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "User collection", false, "UserCollection");
 		I_ASSIGN(m_superuserIdAttrPtr, "SuperuserId", "ID of the superuser", true, "su");
 	I_END_COMPONENT;
 

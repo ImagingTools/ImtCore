@@ -18,8 +18,8 @@
 #include <imtgql/CGqlObjectCollectionComp.h>
 #include <imtgql/CGqlContextCacheControllerComp.h>
 #include <imtgql/CRemoteGqlContextControllerComp.h>
+#include <imtgql/CPumaGqlRemoteRepresentationControllerComp.h>
 #include <imtgql/CGqlContextControllerComp.h>
-
 
 
 /**
@@ -42,6 +42,8 @@ typedef icomp::TModelCompWrap<imtgql::CGqlObjectCollectionComp> GqlObjectCollect
 typedef imtgql::CGqlContextCacheControllerComp GqlContextCacheController;
 typedef imtgql::CRemoteGqlContextControllerComp RemoteGqlContextController;
 typedef imtgql::CGqlContextControllerComp GqlContextController;
+typedef imtgql::CPumaGqlRemoteRepresentationControllerComp PumaGqlRemoteRepresentationController;
+
 
 
 } // namespace ImtGqlPck

@@ -13,7 +13,9 @@ namespace imtauth
 {
 
 
-class CRoleCollectionAdapterComp: public icomp::CComponentBase, virtual public IRoleInfoProvider
+class CRoleCollectionAdapterComp:
+			public icomp::CComponentBase,
+			virtual public IRoleInfoProvider
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
