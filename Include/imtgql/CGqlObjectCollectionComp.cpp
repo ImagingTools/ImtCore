@@ -860,8 +860,10 @@ void CGqlObjectCollectionComp::OnComponentCreated()
 
 void CGqlObjectCollectionComp::OnComponentDestroyed()
 {
-	m_subscriptionManagerCompPtr->UnRegisterSubscription(m_addMeasurementSubsriptionId);
-	m_delegatesMap.clear();
+	if (m_subscriptionManagerCompPtr.IsValid()){
+		m_subscriptionManagerCompPtr->UnRegisterSubscription(m_addMeasurementSubsriptionId);
+		m_delegatesMap.clear();
+	}
 
 	BaseClass::OnComponentDestroyed();
 }
