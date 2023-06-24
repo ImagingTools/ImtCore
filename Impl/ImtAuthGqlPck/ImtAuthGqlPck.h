@@ -16,9 +16,10 @@
 #include <imtauthgql/CAuthorizationOptionsControllerComp.h>
 #include <imtauthgql/CSessionControllerComp.h>
 #include <imtauthgql/CLogoutControllerComp.h>
-#include <imtauthgql/CPumaRoleInfoProviderComp.h>
-#include <imtauthgql/CPumaUserGroupInfoProviderComp.h>
-#include <imtauthgql/CPumaSuperuserProviderComp.h>
+#include <imtauthgql/CRemoteRoleInfoProviderComp.h>
+#include <imtauthgql/CRemoteUserGroupInfoProviderComp.h>
+#include <imtauthgql/CClientRequestRemoteSuperuserProviderComp.h>
+#include <imtauthgql/CRemoteSuperuserControllerComp.h>
 #include <imtauthgql/CSimpleLoginWrapComp.h>
 
 
@@ -39,9 +40,10 @@ typedef imtauthgql::CUserGroupCollectionControllerComp UserGroupCollectionContro
 typedef imtauthgql::CAuthorizationOptionsControllerComp AuthorizationOptionsController;
 typedef imtauthgql::CSessionControllerComp SessionController;
 typedef imtauthgql::CLogoutControllerComp LogoutController;
-typedef imtauthgql::CPumaRoleInfoProviderComp PumaRoleInfoProvider;
-typedef imtauthgql::CPumaUserGroupInfoProviderComp PumaUserGroupInfoProvider;
-typedef imtauthgql::CPumaSuperuserProviderComp PumaSuperuserProvider;
+typedef imtauthgql::CRemoteRoleInfoProviderComp RemoteRoleInfoProvider;
+typedef imtauthgql::CRemoteUserGroupInfoProviderComp RemoteUserGroupInfoProvider;
+typedef imtauthgql::CClientRequestRemoteSuperuserProviderComp ClientRequestRemoteSuperuserProvider;
+typedef imtauthgql::CRemoteSuperuserControllerComp RemoteSuperuserController;
 typedef icomp::TModelCompWrap<imtauthgql::CSimpleLoginWrapComp> SimpleLoginWrap;
 
 

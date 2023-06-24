@@ -1,14 +1,6 @@
 #include <imtauthgql/CSimpleLoginWrapComp.h>
 
 
-// Qt includes
-#if QT_VERSION >= 0x050000
-#include <QtWidgets/QInputDialog>
-#else
-#include <QtGui/QInputDialog>
-#endif
-#include <QtWidgets/QMessageBox>
-
 // ACF includes
 #include <iser/CJsonMemReadArchive.h>
 
@@ -80,7 +72,7 @@ bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& passwor
 			return false;
 		}
 
-        RetrieveUserInfo(objectId);
+		RetrieveUserInfo(objectId);
 
 		if (dataModelPtr->ContainsKey("Token")){
 			m_loggedUserToken = dataModelPtr->GetData("Token").toByteArray();
@@ -154,8 +146,6 @@ QByteArray CSimpleLoginWrapComp::GetToken(const QByteArray& /*userId*/) const
 void CSimpleLoginWrapComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
-
-	CheckSuperuser();
 }
 
 
@@ -163,6 +153,10 @@ void CSimpleLoginWrapComp::OnComponentCreated()
 
 bool CSimpleLoginWrapComp::RetrieveUserInfo(const QByteArray& userObjectId)
 {
+	if (!m_userInfoFactCompPtr.IsValid()){
+		return false;
+	}
+
 	imtgql::CGqlRequest userRequest(imtgql::CGqlRequest::RT_QUERY, "UserItem");
 	imtgql::CGqlObject userInputObject("input");
 	userInputObject.InsertField(QByteArray("ProductId"), QVariant(*m_productIdAttrPtr));
@@ -198,70 +192,12 @@ bool CSimpleLoginWrapComp::RetrieveUserInfo(const QByteArray& userObjectId)
 			return false;
 		}
 
-        m_userPermissionIds = m_userInfoPtr->GetPermissions(*m_productIdAttrPtr);
+		m_userPermissionIds = m_userInfoPtr->GetPermissions(*m_productIdAttrPtr);
 
 		return true;
 	}
 
 	return false;
-}
-
-
-void CSimpleLoginWrapComp::CheckSuperuser()
-{
-	if (m_superuserProviderCompPtr.IsValid()){
-		bool superuserExists = m_superuserProviderCompPtr->SuperuserExists();
-		if (!superuserExists){
-			bool isOk = false;
-			QByteArray password = QInputDialog::getText(
-						NULL,
-						QObject::tr("Enter password"),
-						QObject::tr("Enter the superuser password"),
-						QLineEdit::Password,
-						"",
-						&isOk).toLocal8Bit();
-
-            if (isOk){
-                if (!password.isEmpty()){
-                    imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, "UserAdd");
-                    imtgql::CGqlObject inputObject("input");
-                    inputObject.InsertField("Id", "su");
-
-                    QByteArray json = QString("{\"Username\": \"%1\", \"UserId\": \"%2\", \"Password\": \"%3\", \"Name\": \"%4\"}")
-                            .arg(qPrintable("su"))
-                            .arg(qPrintable("su"))
-                            .arg(qPrintable(password))
-                            .arg(qPrintable("username")).toUtf8();
-
-                    inputObject.InsertField ("Item", QVariant(json));
-                    request.AddParam(inputObject);
-
-                    imtgql::CGqlObject fieldObject("addedNotification");
-                    fieldObject.InsertField("Id");
-                    fieldObject.InsertField("Successed");
-                    request.AddField(fieldObject);
-
-                    imtbase::CTreeItemModel responseModel;
-                    bool isSuccess = SendModelRequest(request, responseModel);
-                    if (!isSuccess){
-                        isOk = false;
-                    }
-                }
-                else{
-                    QMessageBox::warning(
-                                NULL,
-                                QObject::tr("Error"),
-                                QObject::tr("Please enter a non-empty password"));
-
-                    CheckSuperuser();
-                }
-            }
-            else{
-
-                QCoreApplication::quit();
-            }
-		}
-	}
 }
 
 

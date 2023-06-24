@@ -10,14 +10,14 @@ namespace imtauthgql
 {
 
 
-class CPumaRoleInfoProviderComp:
+class CRemoteRoleInfoProviderComp:
 			public imtgql::CClientRequestManagerCompBase,
 			virtual public imtauth::IRoleInfoProvider
 {
 public:
 	typedef imtgql::CClientRequestManagerCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CPumaRoleInfoProviderComp)
+	I_BEGIN_COMPONENT(CRemoteRoleInfoProviderComp)
 		I_REGISTER_INTERFACE(imtauth::IRoleInfoProvider);
 		I_ASSIGN(m_roleInfoFactCompPtr, "RoleFactory", "Factory used for creation of the new role", true, "RoleFactory");
 	I_END_COMPONENT;

@@ -1,4 +1,4 @@
-#include <imtauthgql/CPumaSuperuserProviderComp.h>
+#include <imtauthgql/CClientRequestRemoteSuperuserProviderComp.h>
 
 
 // ImtCore includes
@@ -13,7 +13,7 @@ namespace imtauthgql
 
 // reimplemented (imtauth::ISuperuserProvider)
 
-bool CPumaSuperuserProviderComp::SuperuserExists() const
+bool CClientRequestRemoteSuperuserProviderComp::SuperuserExists() const
 {
 	imtgql::CGqlRequest gqlRequest(imtgql::CGqlRequest::RT_QUERY, "UsersList");
 	imtgql::CGqlObject queryFields("items");
@@ -48,7 +48,7 @@ bool CPumaSuperuserProviderComp::SuperuserExists() const
 }
 
 
-QByteArray CPumaSuperuserProviderComp::GetSuperuserId() const
+QByteArray CClientRequestRemoteSuperuserProviderComp::GetSuperuserId() const
 {
 	return *m_superuserIdAttrPtr;
 }

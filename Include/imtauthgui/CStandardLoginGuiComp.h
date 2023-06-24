@@ -9,8 +9,11 @@
 #include <iqtgui/TDesignerGuiCompBase.h>
 #include <iqtgui/TRestorableGuiWrap.h>
 #include <ilog/IMessageConsumer.h>
+#include <iqtgui/TDesignerGuiObserverCompBase.h>
 
 // ImtCore includes
+#include <imtauth/ISuperuserController.h>
+#include <imtauth/ISuperuserProvider.h>
 #include <imtbase/TModelUpdateBinder.h>
 #include <GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h>
 
@@ -19,7 +22,7 @@ namespace imtauthgui
 {
 
 
-class CStandardLoginGuiComp: public iqtgui::TRestorableGuiWrap< 
+class CStandardLoginGuiComp: public iqtgui::TRestorableGuiWrap<
 			iqtgui::TDesignerGuiCompBase<Ui::CStandardLoginGuiComp>>
 {
 	Q_OBJECT
@@ -31,8 +34,9 @@ public:
 		I_REGISTER_SUBELEMENT(LoginLog);
 		I_REGISTER_SUBELEMENT_INTERFACE(LoginLog, ilog::IMessageConsumer, ExtractLoginLog);
 		I_ASSIGN(m_loginCompPtr, "Login", "Login", false, "Login");
+		I_ASSIGN(m_superuserProviderCompPtr, "SuperuserProvider", "Superuser provider", false, "SuperuserProvider");
 		I_ASSIGN(m_settingsProviderCompPtr, "SettingsProvider", "Application settings provider", false, "SettingsProvider");
-		I_ASSIGN(m_rightsCompPtr, "Rights", "User rights for the application", false, "Rights");
+		I_ASSIGN(m_superuserControllerCompPtr, "SuperuserController", "Superuser controller", false, "SuperuserController");
 	I_END_COMPONENT;
 
 	CStandardLoginGuiComp();
@@ -55,6 +59,7 @@ private Q_SLOTS:
 private:
 	void OnLoginUpdate(const istd::IChangeable::ChangeSet& changeSet, const iauth::ILogin* objectPtr);
 	void UpdateLoginButtonsState();
+	void CheckSuperuser();
 
 private:
 	class LoginLog: public ilog::IMessageConsumer
@@ -76,13 +81,14 @@ private:
 		return &parent.m_loginLog;
 	}
 
-
 private:
+	I_REF(imtauth::ISuperuserProvider, m_superuserProviderCompPtr);
+	I_REF(imtauth::ISuperuserController, m_superuserControllerCompPtr);
 	I_REF(iauth::ILogin, m_loginCompPtr);
 	I_REF(iqt::ISettingsProvider, m_settingsProviderCompPtr);
-	I_REF(iauth::IRightsProvider, m_rightsCompPtr);
 
 	imtbase::TModelUpdateBinder<iauth::ILogin, CStandardLoginGuiComp> m_loginObserver;
+
 	LoginLog m_loginLog;
 };
 

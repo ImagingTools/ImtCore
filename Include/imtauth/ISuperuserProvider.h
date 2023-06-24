@@ -13,6 +13,14 @@ class ISuperuserProvider: virtual public istd::IChangeable
 {
 public:
 	/**
+		Data model change notification flags.
+	*/
+	enum ChangeFlags
+	{
+		CF_SU_EXISTS = 0x36e7b88
+	};
+
+	/**
 		Get information for exists superuser.
 	*/
 	virtual bool SuperuserExists() const = 0;

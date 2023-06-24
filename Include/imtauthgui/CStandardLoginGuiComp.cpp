@@ -3,6 +3,13 @@
 
 // Qt includes
 #include <QtGui/QKeyEvent>
+#if QT_VERSION >= 0x050000
+#include <QtWidgets/QInputDialog>
+#else
+#include <QtGui/QInputDialog>
+#endif
+#include <QtWidgets/QMessageBox>
+
 
 
 namespace imtauthgui
@@ -69,6 +76,8 @@ void CStandardLoginGuiComp::OnGuiCreated()
 	if (m_loginCompPtr.IsValid()){
 		m_loginObserver.RegisterObject(m_loginCompPtr.GetPtr(), &CStandardLoginGuiComp::OnLoginUpdate);
 	}
+
+	CheckSuperuser();
 }
 
 
@@ -168,6 +177,44 @@ void CStandardLoginGuiComp::UpdateLoginButtonsState()
 	UserEdit->setEnabled(!isLogged);
 	LoginButton->setEnabled(!isLogged);
 }
+
+
+void CStandardLoginGuiComp::CheckSuperuser()
+{
+	if (m_superuserProviderCompPtr.IsValid()){
+		bool superuserExists = m_superuserProviderCompPtr->SuperuserExists();
+		if (!superuserExists){
+			bool isOk = false;
+			QByteArray password = QInputDialog::getText(
+						NULL,
+						QObject::tr("Enter password"),
+						QObject::tr("Enter the superuser password"),
+						QLineEdit::Password,
+						"",
+						&isOk).toLocal8Bit();
+
+			if (isOk){
+				if (!password.isEmpty()){
+					if (m_superuserControllerCompPtr.IsValid()){
+						m_superuserControllerCompPtr->SetSuperuserPassword(password);
+					}
+				}
+				else{
+					QMessageBox::warning(
+								NULL,
+								QObject::tr("Error"),
+								QObject::tr("Please enter a non-empty password"));
+
+					CheckSuperuser();
+				}
+			}
+			else{
+				QCoreApplication::quit();
+			}
+		}
+	}
+}
+
 
 
 // public methods of embedded class LoginLog

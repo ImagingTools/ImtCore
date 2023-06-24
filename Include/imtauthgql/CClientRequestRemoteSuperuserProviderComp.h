@@ -10,14 +10,14 @@ namespace imtauthgql
 {
 
 
-class CPumaSuperuserProviderComp:
+class CClientRequestRemoteSuperuserProviderComp:
 			public imtgql::CClientRequestManagerCompBase,
 			virtual public imtauth::ISuperuserProvider
 {
 public:
 	typedef imtgql::CClientRequestManagerCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CPumaSuperuserProviderComp)
+	I_BEGIN_COMPONENT(CClientRequestRemoteSuperuserProviderComp)
 		I_REGISTER_INTERFACE(imtauth::ISuperuserProvider);
 		I_ASSIGN(m_superuserIdAttrPtr, "SuperuserId", "ID of the superuser", false, "su");
 	I_END_COMPONENT;

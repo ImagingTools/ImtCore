@@ -5,14 +5,17 @@
 #include <icomp/CComponentBase.h>
 #include <iauth/ILogin.h>
 #include <iauth/IRightsProvider.h>
+#include <iprm/IEnableableParam.h>
+#include <imod/TModelWrap.h>
+#include <ibase/TRuntimeStatusHanderCompWrap.h>
 
 // ImtCore includes
 #include <imtgql/TClientRequestManagerCompWrap.h>
 #include <imtbase/CTreeItemModel.h>
 #include <imtauth/IAccessTokenProvider.h>
 #include <imtauth/IPermissionChecker.h>
-#include <imtauth/ISuperuserProvider.h>
 #include <imtauth/CUserInfo.h>
+#include <imtauth/ISuperuserProvider.h>
 
 
 namespace imtauthgql
@@ -32,11 +35,10 @@ public:
 		I_REGISTER_INTERFACE(ILogin);
 		I_REGISTER_INTERFACE(IRightsProvider);
 		I_REGISTER_INTERFACE(IAccessTokenProvider);
-		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_ASSIGN(m_userInfoFactCompPtr, "UserFactory", "Factory used for creation of the new user", true, "UserFactory");
-		I_ASSIGN(m_superuserProviderCompPtr, "SuperuserProvider", "Superuser provider", false, "SuperuserProvider");
 		I_ASSIGN(m_checkPermissionCompPtr, "PermissionChecker", "Checker of the permissions", false, "PermissionChecker");
-		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product ID", true, "");
+		I_ASSIGN(m_superuserProviderCompPtr, "SuperuserProvider", "Superuser provider", false, "SuperuserProvider");
+		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product-ID", true, "");
 	I_END_COMPONENT;
 
 	CSimpleLoginWrapComp();
@@ -59,7 +61,7 @@ protected:
 	virtual void OnComponentCreated() override;
 
 private:
-    bool RetrieveUserInfo(const QByteArray& userObjectId);
+	bool RetrieveUserInfo(const QByteArray& userObjectId);
 	void CheckSuperuser();
 
 private:

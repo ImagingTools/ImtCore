@@ -65,19 +65,24 @@ I_EXPORT_COMPONENT(
 		"Logout Controller");
 
 I_EXPORT_COMPONENT(
-		PumaRoleInfoProvider,
-		"Puma role info provider",
-		"Puma Role Info Provider");
+		RemoteRoleInfoProvider,
+		"Remote role info provider",
+		"Remote Role Info Provider");
 
 I_EXPORT_COMPONENT(
-		PumaUserGroupInfoProvider,
-		"Puma user group info provider",
-		"Puma User Group Info Provider");
+		RemoteUserGroupInfoProvider,
+		"Remote user group info provider",
+		"Remote User Group Info Provider");
 
 I_EXPORT_COMPONENT(
-		PumaSuperuserProvider,
-		"Puma superuser provider for client requests",
-		"Puma Superuser Provider Client");
+		ClientRequestRemoteSuperuserProvider,
+		"Remote superuser provider for client requests",
+		"Remote Superuser Provider Client");
+
+I_EXPORT_COMPONENT(
+		RemoteSuperuserController,
+		"Puma superuser controller",
+		"Puma Superuser Controller");
 
 I_EXPORT_COMPONENT(
 			SimpleLoginWrap,

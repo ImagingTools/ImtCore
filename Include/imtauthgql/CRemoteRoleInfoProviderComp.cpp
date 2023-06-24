@@ -1,4 +1,4 @@
-#include <imtauthgql/CPumaUserGroupInfoProviderComp.h>
+#include <imtauthgql/CRemoteRoleInfoProviderComp.h>
 
 
 // ACF includes
@@ -17,24 +17,30 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (IUserGroupInfoProvider)
+// reimplemented (IRoleInfoProvider)
 
-const imtbase::ICollectionInfo& CPumaUserGroupInfoProviderComp::GetUserGroupList() const
+const imtbase::ICollectionInfo& CRemoteRoleInfoProviderComp::GetRoleList() const
 {
 	static imtbase::CCollectionInfo emptyCollection;
 	return emptyCollection;
 }
 
 
-const imtauth::IUserGroupInfo* CPumaUserGroupInfoProviderComp::GetUserGroup(const QByteArray& groupId) const
+const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& roleId, const QByteArray& productId) const
 {
-	if (!m_userGroupInfoFactCompPtr.IsValid()){
+	return nullptr;
+}
+
+
+const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& objectId) const
+{
+	if (!m_roleInfoFactCompPtr.IsValid()){
 		return nullptr;
 	}
 
-	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, "GroupItem");
+	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, "RoleItem");
 	imtgql::CGqlObject inputObject("input");
-	inputObject.InsertField(QByteArray("Id"), QVariant(groupId));
+	inputObject.InsertField(QByteArray("Id"), QVariant(objectId));
 	inputObject.InsertField(QByteArray("IsJsonSerialized"), QVariant(true));
 	request.AddParam(inputObject);
 
@@ -50,20 +56,20 @@ const imtauth::IUserGroupInfo* CPumaUserGroupInfoProviderComp::GetUserGroup(cons
 			return nullptr;
 		}
 
-		QByteArray json = roleDataModelPtr->toJSON().toUtf8();
+		QByteArray roleJson = roleDataModelPtr->toJSON().toUtf8();
 
-		istd::TDelPtr<imtauth::IUserGroupInfo> groupInfoPtr;
-		groupInfoPtr.SetPtr(m_userGroupInfoFactCompPtr.CreateInstance());
-		if (!groupInfoPtr.IsValid()){
+		istd::TDelPtr<imtauth::IRole> roleInfoPtr;
+		roleInfoPtr.SetPtr(m_roleInfoFactCompPtr.CreateInstance());
+		if (!roleInfoPtr.IsValid()){
 			return nullptr;
 		}
 
-		iser::CJsonMemReadArchive archive(json);
-		if (!groupInfoPtr->Serialize(archive)){
+		iser::CJsonMemReadArchive archive(roleJson);
+		if (!roleInfoPtr->Serialize(archive)){
 			return nullptr;
 		}
 
-		return groupInfoPtr.PopPtr();
+		return roleInfoPtr.PopPtr();
 	}
 
 	return nullptr;

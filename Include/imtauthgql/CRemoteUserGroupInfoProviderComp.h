@@ -10,14 +10,14 @@ namespace imtauthgql
 {
 
 
-class CPumaUserGroupInfoProviderComp:
+class CRemoteUserGroupInfoProviderComp:
 			public imtgql::CClientRequestManagerCompBase,
 			virtual public imtauth::IUserGroupInfoProvider
 {
 public:
 	typedef imtgql::CClientRequestManagerCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CPumaUserGroupInfoProviderComp)
+	I_BEGIN_COMPONENT(CRemoteUserGroupInfoProviderComp)
 		I_REGISTER_INTERFACE(imtauth::IUserGroupInfoProvider);
 		I_ASSIGN(m_userGroupInfoFactCompPtr, "GroupFactory", "Factory used for creation of the new group", true, "GroupFactory");
 	I_END_COMPONENT;
