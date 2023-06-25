@@ -58,7 +58,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CTestDatabaseDelegateComp::Create
 			const QByteArray& proposedObjectId,
 			const QString& objectName,
 			const QString& objectDescription,
-			const istd::IChangeable* valuePtr) const
+			const istd::IChangeable* valuePtr,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	if (typeId.isEmpty() || typeId != "TestInfo"){
 		return NewObjectQuery();
@@ -115,7 +116,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CTestDatabaseDelegateComp::Create
 
 QByteArray CTestDatabaseDelegateComp::CreateDeleteObjectQuery(
 			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId) const
+			const QByteArray& objectId,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	imtbase::IObjectCollection::DataPtr objectPtr;
 	if (collection.GetObjectData(objectId, objectPtr)){
@@ -137,8 +139,8 @@ QByteArray CTestDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
-			const ContextDescription& contextDescription,
-			bool useExternDelegate) const
+			const imtbase::IOperationContext* /*operationContextPtr*/,
+			bool /*useExternDelegate*/) const
 {
 	const imttest::ITestInfo* testInfoPtr = dynamic_cast<const imttest::ITestInfo*>(&object);
 	if (testInfoPtr == nullptr){
@@ -164,7 +166,8 @@ QByteArray CTestDatabaseDelegateComp::CreateUpdateObjectQuery(
 QByteArray CTestDatabaseDelegateComp::CreateRenameObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
-			const QString& newObjectName) const
+			const QString& newObjectName,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	const imttest::ITestInfo* testInfoPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr objectPtr;
@@ -191,7 +194,8 @@ QByteArray CTestDatabaseDelegateComp::CreateRenameObjectQuery(
 QByteArray CTestDatabaseDelegateComp::CreateDescriptionObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
-			const QString& description) const
+			const QString& description,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	const imttest::ITestInfo* testPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr objectPtr;
