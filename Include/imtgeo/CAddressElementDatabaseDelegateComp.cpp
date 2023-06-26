@@ -90,7 +90,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
 			const QByteArray& proposedObjectId,
 			const QString& objectName,
 			const QString& /*objectDescription*/,
-			const istd::IChangeable* valuePtr) const
+            const istd::IChangeable* valuePtr,
+            const imtbase::IOperationContext* operationContextPtr) const
 {
 	const IAddressElementInfo* adrInfoPtr = dynamic_cast<const IAddressElementInfo*>(valuePtr);
     if (adrInfoPtr == nullptr){
@@ -131,7 +132,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
 
 QByteArray CAddressElementDatabaseDelegateComp::CreateDeleteObjectQuery(
 			const imtbase::IObjectCollection& collection,
-			const QByteArray& objectId) const
+            const QByteArray& objectId,
+            const imtbase::IOperationContext* operationContextPtr) const
 {
 	QByteArray retVal = QString("DELETE FROM \"AddressElements\" WHERE \"Id\" = '%1';").arg(qPrintable(objectId)).toLocal8Bit();
 
@@ -143,7 +145,7 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
-            const ContextDescription& /*description*/,
+            const imtbase::IOperationContext* operationContextPtr,
 			bool /*useExternDelegate*/) const
 {
 	const IAddressElementInfo* adrInfoPtr = dynamic_cast<const IAddressElementInfo*>(&object);
@@ -191,7 +193,8 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateUpdateObjectQuery(
 QByteArray CAddressElementDatabaseDelegateComp::CreateRenameObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
-			const QString& newObjectName) const
+            const QString& newObjectName,
+            const imtbase::IOperationContext* operationContextPtr) const
 {
 	return QByteArray();
 }
@@ -200,7 +203,8 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateRenameObjectQuery(
 QByteArray CAddressElementDatabaseDelegateComp::CreateDescriptionObjectQuery(
 			const imtbase::IObjectCollection& collection,
 			const QByteArray& objectId,
-			const QString& description) const
+            const QString& description,
+            const imtbase::IOperationContext* operationContextPtr) const
 {
     return QByteArray();
 }
