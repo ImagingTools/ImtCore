@@ -80,7 +80,8 @@ QByteArray CMongoDatabaseObjectCollectionComp::InsertNewObject(
 			const QByteArray& proposedObjectId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
 			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr,
-			const Id& /*parentId*/)
+			const Id& /*parentId*/,
+			const imtbase::IOperationContext* operationContextPtr)
 {
 
 	QByteArray objectId = proposedObjectId;
@@ -96,7 +97,8 @@ QByteArray CMongoDatabaseObjectCollectionComp::InsertNewObject(
 }
 
 
-bool CMongoDatabaseObjectCollectionComp::RemoveElement(const Id& elementId)
+bool CMongoDatabaseObjectCollectionComp::RemoveElement(const Id& elementId,
+													   const imtbase::IOperationContext* operationContextPtr)
 {
 	mongocxx::database* db = m_mongoDatabaseEngineCompPtr->GetDatabase();
 	mongocxx::collection coll = (*db)[GetCollectionName().toStdString()];
@@ -156,7 +158,8 @@ bool CMongoDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectI
 bool CMongoDatabaseObjectCollectionComp::SetObjectData(
 			const Id& objectId,
 			const istd::IChangeable& object,
-			CompatibilityMode /*mode*/)
+			CompatibilityMode /*mode*/,
+			const imtbase::IOperationContext* operationContextPtr)
 {
 	mongocxx::database* db = m_mongoDatabaseEngineCompPtr->GetDatabase();
 	mongocxx::collection coll = (*db)[GetCollectionName().toStdString()];
