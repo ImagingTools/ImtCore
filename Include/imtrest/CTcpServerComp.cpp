@@ -74,6 +74,7 @@ bool CTcpServerComp::StartListening(const QHostAddress &address, quint16 port)
 		istd::TDelPtr<CMultiThreadServer> tcpServerPtr(new CMultiThreadServer(this));
 		if (tcpServerPtr->listen(address, port)){
 			SendInfoMessage(0, QString("Server successfully started on %1:%2").arg(address.toString()).arg(port));
+			qDebug() << QString("Server successfully started on %1:%2").arg(address.toString()).arg(port);
 
 			connect(tcpServerPtr.GetPtr(), &CMultiThreadServer::newThreadConnection, this, &CTcpServerComp::HandleNewThreadConnections, Qt::DirectConnection);
 
@@ -89,6 +90,7 @@ bool CTcpServerComp::StartListening(const QHostAddress &address, quint16 port)
 		istd::TDelPtr<QTcpServer> tcpServerPtr(new QTcpServer(this));
 		if (tcpServerPtr->listen(address, port)){
 			SendInfoMessage(0, QString("Server successfully started on %1:%2").arg(address.toString()).arg(port));
+			qDebug() << QString("Server successfully started on %1:%2").arg(address.toString()).arg(port);
 
 			connect(tcpServerPtr.GetPtr(), &QTcpServer::newConnection, this, &CTcpServerComp::HandleNewConnections, Qt::UniqueConnection);
 

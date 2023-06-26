@@ -106,6 +106,15 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="InternetConnectionChecker" PackageId="ImtComPck" ComponentId="InternetConnectionChecker">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Url" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="http://localhost:8111"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="MainGui" PackageId="QtGuiPck" ComponentId="SimpleMainGui">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -331,6 +340,9 @@
         <Element Id="StandardLoginGui" PackageId="ImtAuthGuiPck" ComponentId="StandardLoginGui">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ConnectionStatusProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="InternetConnectionChecker"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Login" Type="Reference" ExportId="Login">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

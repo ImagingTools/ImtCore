@@ -10,6 +10,7 @@
 #include <iqtgui/TRestorableGuiWrap.h>
 #include <ilog/IMessageConsumer.h>
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
+#include <imtcom/IConnectionStatusProvider.h>
 
 // ImtCore includes
 #include <imtauth/ISuperuserController.h>
@@ -37,6 +38,7 @@ public:
 		I_ASSIGN(m_superuserProviderCompPtr, "SuperuserProvider", "Superuser provider", false, "SuperuserProvider");
 		I_ASSIGN(m_settingsProviderCompPtr, "SettingsProvider", "Application settings provider", false, "SettingsProvider");
 		I_ASSIGN(m_superuserControllerCompPtr, "SuperuserController", "Superuser controller", false, "SuperuserController");
+		I_ASSIGN(m_connectionStatusProviderCompPtr, "ConnectionStatusProvider", "Connection status provider", false, "ConnectionStatusProvider");
 	I_END_COMPONENT;
 
 	CStandardLoginGuiComp();
@@ -54,12 +56,14 @@ protected:
 
 private Q_SLOTS:
 	void on_LoginButton_clicked();
+	void on_SetPasswordButton_clicked();
 	void on_PasswordEdit_textEdited(const QString& text);
+	void on_SuPasswordEdit_textEdited(const QString& text);
 
 private:
 	void OnLoginUpdate(const istd::IChangeable::ChangeSet& changeSet, const iauth::ILogin* objectPtr);
+	void OnConnectionStatusChanged(const istd::IChangeable::ChangeSet& changeSet, const imtcom::IConnectionStatusProvider* objectPtr);
 	void UpdateLoginButtonsState();
-	void CheckSuperuser();
 
 private:
 	class LoginLog: public ilog::IMessageConsumer
@@ -86,8 +90,10 @@ private:
 	I_REF(imtauth::ISuperuserController, m_superuserControllerCompPtr);
 	I_REF(iauth::ILogin, m_loginCompPtr);
 	I_REF(iqt::ISettingsProvider, m_settingsProviderCompPtr);
+	I_REF(imtcom::IConnectionStatusProvider, m_connectionStatusProviderCompPtr);
 
 	imtbase::TModelUpdateBinder<iauth::ILogin, CStandardLoginGuiComp> m_loginObserver;
+	imtbase::TModelUpdateBinder<imtcom::IConnectionStatusProvider, CStandardLoginGuiComp> m_connectionObserver;
 
 	LoginLog m_loginLog;
 };

@@ -11,6 +11,7 @@
         <Element ComponentName="ApplicationInfo" X="925" Y="75" Note=""/>
         <Element ComponentName="CommandsMultiplexer" X="300" Y="625" Note=""/>
         <Element ComponentName="GuiApplication" X="575" Y="250" Note=""/>
+        <Element ComponentName="InternetConnectionChecker" X="950" Y="750" Note=""/>
         <Element ComponentName="MainGui" X="575" Y="375" Note=""/>
         <Element ComponentName="MenuPanelVisibility" X="575" Y="625" Note=""/>
         <Element ComponentName="PageNavigationController" X="200" Y="375" Note=""/>

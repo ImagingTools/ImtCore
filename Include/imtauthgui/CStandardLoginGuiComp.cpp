@@ -20,6 +20,7 @@ namespace imtauthgui
 
 CStandardLoginGuiComp::CStandardLoginGuiComp()
 	:m_loginObserver(*this),
+	m_connectionObserver(*this),
 	m_loginLog(*this)
 {
 }
@@ -64,6 +65,14 @@ void CStandardLoginGuiComp::OnGuiShown()
 	PasswordEdit->setStyleSheet("");
 	PasswordLabel->setStyleSheet("");
 	PasswordMessage->setText("");
+
+	LoginMessage->setStyleSheet("font-weight: bold");
+	LoginMessage_2->setStyleSheet("font-weight: bold");
+	NoConnection->setStyleSheet("font-weight: bold; color: red");
+
+	SetPasswordButton->setEnabled(false);
+
+	on_SuPasswordEdit_textEdited("");
 }
 
 
@@ -71,19 +80,22 @@ void CStandardLoginGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
-	LoginLogText->setVisible(false);
-
 	if (m_loginCompPtr.IsValid()){
 		m_loginObserver.RegisterObject(m_loginCompPtr.GetPtr(), &CStandardLoginGuiComp::OnLoginUpdate);
 	}
 
-	CheckSuperuser();
+	if (m_connectionStatusProviderCompPtr.IsValid()){
+		m_connectionObserver.RegisterObject(m_connectionStatusProviderCompPtr.GetPtr(), &CStandardLoginGuiComp::OnConnectionStatusChanged);
+	}
+
+	StackedWidget->setCurrentIndex(0);
 }
 
 
 void CStandardLoginGuiComp::OnGuiDestroyed()
 {
 	m_loginObserver.UnregisterAllObjects();
+	m_connectionObserver.UnregisterAllObjects();
 
 	BaseClass::OnGuiDestroyed();
 }
@@ -125,10 +137,6 @@ void CStandardLoginGuiComp::on_LoginButton_clicked()
 {
 	PasswordEdit->setFocus();
 
-	LoginLogText->clear();
-
-	LoginLogText->setVisible(false);
-
 	if (m_loginCompPtr.IsValid()){
 		QString userName = UserEdit->text();
 		QString password = PasswordEdit->text();
@@ -147,21 +155,72 @@ void CStandardLoginGuiComp::on_LoginButton_clicked()
 }
 
 
+void CStandardLoginGuiComp::on_SetPasswordButton_clicked()
+{
+	if (m_superuserControllerCompPtr.IsValid()){
+		QString password = SuPasswordEdit->text();
+
+		if (password.isEmpty()){
+
+		}
+
+		m_superuserControllerCompPtr->SetSuperuserPassword(password.toUtf8());
+
+		StackedWidget->setCurrentIndex(0);
+	}
+}
+
+
 void CStandardLoginGuiComp::on_PasswordEdit_textEdited(const QString&/*text*/)
 {
 	PasswordEdit->setStyleSheet("");
 	PasswordLabel->setStyleSheet("");
 	PasswordMessage->setText("");
-	LoginLogText->clear();
-	LoginLogText->setVisible(false);
+}
+
+
+void CStandardLoginGuiComp::on_SuPasswordEdit_textEdited(const QString& text)
+{
+	SuPasswordEdit->setStyleSheet("");
+	SuPasswordMessage->setText("");
+
+	if (text.isEmpty()){
+		SuPasswordMessage->setStyleSheet("color: red");
+		SuPasswordMessage->setText(tr("Please enter a non-empty password"));
+	}
+
+	SetPasswordButton->setEnabled(!text.isEmpty());
 }
 
 
 // private methods
 
-void CStandardLoginGuiComp::OnLoginUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/, const iauth::ILogin* /*objectPtr*/)
+void CStandardLoginGuiComp::OnLoginUpdate(
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const iauth::ILogin* /*objectPtr*/)
 {
 	UpdateLoginButtonsState();
+}
+
+
+void CStandardLoginGuiComp::OnConnectionStatusChanged(
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const imtcom::IConnectionStatusProvider* objectPtr)
+{
+	if (objectPtr != nullptr){
+		imtcom::IConnectionStatusProvider::ConnectionStatus connectionStatus = objectPtr->GetConnectionStatus();
+		if (connectionStatus == imtcom::IConnectionStatusProvider::CS_CONNECTED){
+			if (m_superuserProviderCompPtr.IsValid()){
+				bool superuserExists = m_superuserProviderCompPtr->SuperuserExists();
+				if (!superuserExists){
+					StackedWidget->setCurrentIndex(1);
+				}
+			}
+		}
+		else if (connectionStatus == imtcom::IConnectionStatusProvider::CS_DISCONNECTED){
+			StackedWidget->setCurrentIndex(2);
+		}
+	}
 }
 
 
@@ -177,44 +236,6 @@ void CStandardLoginGuiComp::UpdateLoginButtonsState()
 	UserEdit->setEnabled(!isLogged);
 	LoginButton->setEnabled(!isLogged);
 }
-
-
-void CStandardLoginGuiComp::CheckSuperuser()
-{
-	if (m_superuserProviderCompPtr.IsValid()){
-		bool superuserExists = m_superuserProviderCompPtr->SuperuserExists();
-		if (!superuserExists){
-			bool isOk = false;
-			QByteArray password = QInputDialog::getText(
-						NULL,
-						QObject::tr("Enter password"),
-						QObject::tr("Enter the superuser password"),
-						QLineEdit::Password,
-						"",
-						&isOk).toLocal8Bit();
-
-			if (isOk){
-				if (!password.isEmpty()){
-					if (m_superuserControllerCompPtr.IsValid()){
-						m_superuserControllerCompPtr->SetSuperuserPassword(password);
-					}
-				}
-				else{
-					QMessageBox::warning(
-								NULL,
-								QObject::tr("Error"),
-								QObject::tr("Please enter a non-empty password"));
-
-					CheckSuperuser();
-				}
-			}
-			else{
-				QCoreApplication::quit();
-			}
-		}
-	}
-}
-
 
 
 // public methods of embedded class LoginLog
@@ -239,10 +260,6 @@ void CStandardLoginGuiComp::LoginLog::AddMessage(const MessagePtr& messagePtr)
 
 	if (messagePtr.IsValid()){
 		QString loginMessage = messagePtr->GetInformationDescription();
-
-		m_parent.LoginLogText->setVisible(!loginMessage.isEmpty());
-
-		m_parent.LoginLogText->setPlainText(m_parent.LoginLogText->toPlainText() + "\n" + loginMessage);
 	}
 }
 
