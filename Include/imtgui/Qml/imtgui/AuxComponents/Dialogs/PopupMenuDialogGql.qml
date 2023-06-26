@@ -31,6 +31,7 @@ Item {
     property bool endListStatus: false;
     property bool hiddenBackground: true;
     property bool canClose: true;
+    property bool canUpdateModel: true;
     property bool preventFirstLoading: false;
 
     property alias modelFilterAlias: modelFilter;
@@ -182,6 +183,18 @@ Item {
 
     }
 
+    PauseAnimation {
+        id: pause;
+
+        duration: 500;
+        onFinished:  {
+            if(popupMenuContainer.canUpdateModel){
+                popupMenuContainer.updateModel();
+            }
+        }
+    }
+
+
     Item{
         id: clearContainer;
 
@@ -228,14 +241,6 @@ Item {
 
 
 
-    PauseAnimation {
-        id: pause;
-
-        duration: 500;
-        onFinished:  {
-            popupMenuContainer.updateModel();
-        }
-    }
 
     Rectangle {
         id: itemBody;

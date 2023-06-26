@@ -52,6 +52,7 @@ Item {
     property int pauseDuration: 500;
 
     property string excludeFilterPart: "";
+    property bool canUpdateModel: true;
 
     // ID for display in combo box delegates
     property string nameId: "Name";
@@ -128,6 +129,7 @@ Item {
             preventFirstLoading: comboBoxContainerGql.preventFirstLoading;
             pauseDuration: comboBoxContainerGql.pauseDuration;
             excludeFilterPart: comboBoxContainerGql.excludeFilterPart;
+            canUpdateModel: comboBoxContainerGql.canUpdateModel;
 //            function getCurrentText(index){
 //                return popup.model.GetData("Name",index);
 //            }
