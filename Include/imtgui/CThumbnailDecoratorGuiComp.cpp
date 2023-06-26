@@ -1131,10 +1131,6 @@ bool CThumbnailDecoratorGuiComp::IsUserActionAllowed(UserAction action)
 	if (m_loginCompPtr.IsValid()){
 		isLogged = (m_loginCompPtr->GetLoggedUser() != NULL);
 
-		if (!m_rightsCompPtr.IsValid()){
-			hasCloseRight = hasCloseRight && isLogged;
-		}
-
 		LoginMode loginMode = GetLoginMode();
 		if (loginMode == LM_STRONG){
 			isHomeEnabled = isLogged;
@@ -1145,16 +1141,16 @@ bool CThumbnailDecoratorGuiComp::IsUserActionAllowed(UserAction action)
 
 	switch (action){
 	case UA_APPLICATION_EXIT:
-	return hasCloseRight;
+		return hasCloseRight;
 	case UA_HOME_ENABLED:
-	return isHomeEnabled;
+		return isHomeEnabled;
 	case UA_LOGIN_CONTROL_ENABLED:
-	return isLoginControlEnabled;
+		return isLoginControlEnabled;
 	case UA_LOGIN_ENABLED:
-	return !isLogged;
+		return !isLogged;
 
 	default:
-	return false;
+		return false;
 	}
 }
 

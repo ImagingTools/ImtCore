@@ -159,14 +159,18 @@ void CStandardLoginGuiComp::on_SetPasswordButton_clicked()
 {
 	if (m_superuserControllerCompPtr.IsValid()){
 		QString password = SuPasswordEdit->text();
-
 		if (password.isEmpty()){
+			QMessageBox::critical(GetWidget(), tr("User Management"), tr("Password for the super user could not be empty"), QMessageBox::Close);
 
+			return;
 		}
 
-		m_superuserControllerCompPtr->SetSuperuserPassword(password.toUtf8());
-
-		StackedWidget->setCurrentIndex(0);
+		if (m_superuserControllerCompPtr->SetSuperuserPassword(password.toUtf8())){
+			StackedWidget->setCurrentIndex(0);
+		}
+		else{
+			QMessageBox::critical(GetWidget(), tr("User Management"), tr("Password for the super user could not be set"), QMessageBox::Close);
+		}
 	}
 }
 
