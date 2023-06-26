@@ -182,12 +182,58 @@ Item {
 
     }
 
+    Item{
+        id: clearContainer;
+
+        anchors.right: filterField.right;
+        anchors.verticalCenter: filterField.verticalCenter;
+        anchors.rightMargin: 5;
+
+        z: filterField.z +1;
+
+        width: 12;
+        height: 12;
+        visible: filterField.text !=="";
+
+        Image {
+            id: clearIcon;
+
+            anchors.fill: parent;
+
+            source: "../../../../" + "Icons/" + Style.theme + "/" + "Close" + "_On_Normal.svg";
+
+            sourceSize.width: width;
+            sourceSize.height: height;
+
+            visible: parent.visible;
+        }
+
+        MouseArea {
+            id: clearMouseArea;
+
+            anchors.fill: parent;
+            hoverEnabled: true;
+
+            cursorShape: Qt.PointingHandCursor;
+
+            visible: parent.visible;
+
+            onClicked: {
+                filterField.text = "";
+            }
+
+        }
+
+    }
+
+
+
     PauseAnimation {
         id: pause;
 
         duration: 500;
         onFinished:  {
-            itemsModel.updateModel(0);
+            popupMenuContainer.updateModel();
         }
     }
 
