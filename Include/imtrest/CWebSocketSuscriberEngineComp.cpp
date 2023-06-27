@@ -45,8 +45,6 @@ void CWebSocketSubscriberEngineComp::UnRegisterSubscriber(QObject *socketObjectP
 		if (&subscriberPtr->GetSocketObject() == socketObjectPtr){
 			m_subscribers.RemoveAt(i);
 
-			qDebug("Request deleted");
-
 			break;
 		}
 	}

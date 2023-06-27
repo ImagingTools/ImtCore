@@ -156,8 +156,6 @@ void CTcpServerComp::OnSocketDisconnected()
 		if (&requestPtr->GetSocketObject() == socketObjectPtr){
 			m_requests.RemoveAt(i);
 
-			qDebug("Request deleted");
-
 			break;
 		}
 	}
