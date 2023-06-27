@@ -14,6 +14,8 @@ imtbase::CTreeItemModel* CPumaGqlRemoteRepresentationControllerComp::CreateInter
 			QString& errorMessage) const
 {
 	if (!IsRequestSupported(gqlRequest)){
+		errorMessage = QObject::tr("GraphQL-request is not supported").toUtf8();
+
 		return nullptr;
 	}
 
@@ -21,7 +23,7 @@ imtbase::CTreeItemModel* CPumaGqlRemoteRepresentationControllerComp::CreateInter
 	gqlRequestPtr.SetCastedOrRemove(gqlRequest.CloneMe());
 
 	if (!gqlRequestPtr.IsValid()){
-		errorMessage = QObject::tr("Gql request is invalid").toUtf8();
+		errorMessage = QObject::tr("GraphQL-request could not be copied").toUtf8();
 
 		return nullptr;
 	}
@@ -31,7 +33,7 @@ imtbase::CTreeItemModel* CPumaGqlRemoteRepresentationControllerComp::CreateInter
 		istd::TDelPtr<imtgql::CGqlObject> newInputParamPtr;
 		newInputParamPtr.SetCastedOrRemove(inputParam->CloneMe());
 		if (!newInputParamPtr.IsValid()){
-			errorMessage = QObject::tr("Gql request after the cloning operation is invalid").toUtf8();
+			errorMessage = QObject::tr("Creation of input parameters related to the GraphQL-request failed").toUtf8();
 
 			return nullptr;
 		}
@@ -43,6 +45,7 @@ imtbase::CTreeItemModel* CPumaGqlRemoteRepresentationControllerComp::CreateInter
 	else{
 		imtgql::CGqlObject inputGqlObject("input");
 		inputGqlObject.InsertField("ProductId", QVariant(*m_productIdAttrPtr));
+
 		gqlRequestPtr->AddParam(inputGqlObject);
 	}
 
