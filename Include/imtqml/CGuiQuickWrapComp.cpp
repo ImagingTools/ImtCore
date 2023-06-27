@@ -4,6 +4,7 @@
 namespace imtqml
 {
 
+
 CGuiQuickWrapComp::CGuiQuickWrapComp()
 	:m_quickWidget(nullptr)
 {
@@ -71,6 +72,38 @@ void CGuiQuickWrapComp::OnTryClose(bool* /*ignoredPtr*/)
 	if (m_quickWidget != nullptr){
 		m_quickWidget->close();
 	}
+}
+
+
+// protected methods
+
+// reimplemented (icomp::CComponentBase)
+
+void CGuiQuickWrapComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	if (m_defaultStatusIconPathAttrPtr.IsValid()){
+		m_visualStatus.m_statusIcon = GetIcon(*m_defaultStatusIconPathAttrPtr);
+	}
+
+	m_visualStatus.m_statusText = *m_defaultStatusTextAttrPtr;
+}
+
+
+// public methods of embedded class VisualStatus
+
+// reimplemented (iqtgui::IVisualStatus)
+
+QIcon CGuiQuickWrapComp::VisualStatus::GetStatusIcon() const
+{
+	return m_statusIcon;
+}
+
+
+QString CGuiQuickWrapComp::VisualStatus::GetStatusText() const
+{
+	return m_statusText;
 }
 
 
