@@ -80,7 +80,7 @@ QtObject {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, userModeModel);
+            console.log("UserMode State:", this.state, userModeModel);
             if (this.state === "Ready"){
                 var dataModelLocal;
 
