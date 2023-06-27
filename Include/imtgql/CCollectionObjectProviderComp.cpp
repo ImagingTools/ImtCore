@@ -9,7 +9,9 @@ namespace imtgql
 {
 
 
-imtbase::CTreeItemModel* CCollectionObjectProviderComp::GetObject(
+// reimplemented (imtgql::CCGqlRepresentationControllerCompBase)
+
+imtbase::CTreeItemModel* CCollectionObjectProviderComp::CreateInternalResponse(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {

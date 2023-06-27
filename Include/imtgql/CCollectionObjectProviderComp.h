@@ -2,23 +2,29 @@
 
 
 // ImtCore includes
-#include <imtguigql/CObjectCollectionControllerCompBase.h>
+#include <imtbase/IObjectCollection.h>
+#include <imtgql/CGqlRequestHandlerCompBase.h>
 
 
 namespace imtgql
 {
 
 
-class CCollectionObjectProviderComp: public imtguigql::CObjectCollectionControllerCompBase
+class CCollectionObjectProviderComp: public imtgql::CGqlRequestHandlerCompBase
 {
 public:
-	typedef imtguigql::CObjectCollectionControllerCompBase BaseClass;
+	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CCollectionObjectProviderComp);
+		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 	I_END_COMPONENT;
 
 protected:
-	virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	// reimplemented (imtgql::CCGqlRepresentationControllerCompBase)
+	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+
+protected:
+	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 };
 
 

@@ -44,7 +44,6 @@ void CGqlClientEngineComp::OnComponentDestroyed(){
 QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRequest& request) const
 {
 	QNetworkRequest* networkRequest = new QNetworkRequest();
-
 	networkRequest->setUrl(QUrl(m_workingUrl));
 	imtgql::IGqlContext* contextPtr = request.GetGqlContext();
 	if (contextPtr != nullptr){

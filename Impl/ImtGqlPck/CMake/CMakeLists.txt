@@ -12,6 +12,6 @@ if(NOT DEFINED USE_QTQML OR USE_QTQML)
 	target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::QuickWidgets)
 endif()
 
-target_link_libraries(${PROJECT_NAME} imtbase imtgql imtguigql imtrest imtcom)
+target_link_libraries(${PROJECT_NAME} imtbase imtgql imtrest imtcom)
 
 
