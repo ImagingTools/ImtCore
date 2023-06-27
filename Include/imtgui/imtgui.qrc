@@ -159,4 +159,7 @@
         <file alias="Ubuntu-Bold.ttf">Qml/Fonts/Ubuntu-Bold.ttf</file>
         <file alias="Ubuntu-Regular.ttf">Qml/Fonts/Ubuntu-Regular.ttf</file>
     </qresource>
+    <qresource prefix="/Animation">
+	<file alias="Loading">Resources/Loading.gif</file>
+    </qresource>
 </RCC>

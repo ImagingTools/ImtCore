@@ -9,7 +9,7 @@
 #include <QtGui/QInputDialog>
 #endif
 #include <QtWidgets/QMessageBox>
-
+#include <QtGui/QMovie>
 
 
 namespace imtauthgui
@@ -95,6 +95,14 @@ void CStandardLoginGuiComp::OnGuiShown()
 	SetPasswordButton->setEnabled(false);
 
 	on_SuPasswordEdit_textEdited("");
+
+	QMovie* movie = new QMovie(":/Animation/Loading");
+	movie->setScaledSize(QSize(50, 50));
+
+	LoadingLabel->setMovie(movie);
+
+	LoadingLabel->movie()->start();
+	LoadingLabel->show();
 }
 
 
@@ -180,6 +188,8 @@ void CStandardLoginGuiComp::on_LoginButton_clicked()
 void CStandardLoginGuiComp::on_SetPasswordButton_clicked()
 {
 	if (m_superuserControllerCompPtr.IsValid()){
+		StackedWidget->setCurrentIndex(3);
+
 		QString password = SuPasswordEdit->text();
 
 		m_setSuPasswordThread.Start(password.toUtf8());
@@ -224,6 +234,8 @@ void CStandardLoginGuiComp::OnSetSuPasswordFinished()
 		StackedWidget->setCurrentIndex(0);
 	}
 	else if (state == CStandardLoginGuiComp::SetSuPasswordThread::ThreadState::TS_FAILED){
+		StackedWidget->setCurrentIndex(1);
+
 		QMessageBox::critical(GetWidget(), tr("User Management"), tr("Password for the super user could not be set"), QMessageBox::Close);
 	}
 }
@@ -232,16 +244,16 @@ void CStandardLoginGuiComp::OnSetSuPasswordFinished()
 // private methods
 
 void CStandardLoginGuiComp::OnLoginUpdate(
-			const istd::IChangeable::ChangeSet& /*changeSet*/,
-			const iauth::ILogin* /*objectPtr*/)
+		const istd::IChangeable::ChangeSet& /*changeSet*/,
+		const iauth::ILogin* /*objectPtr*/)
 {
 	UpdateLoginButtonsState();
 }
 
 
 void CStandardLoginGuiComp::OnConnectionStatusChanged(
-			const istd::IChangeable::ChangeSet& /*changeSet*/,
-			const imtcom::IConnectionStatusProvider* objectPtr)
+		const istd::IChangeable::ChangeSet& /*changeSet*/,
+		const imtcom::IConnectionStatusProvider* objectPtr)
 {
 	if (objectPtr != nullptr){
 		imtcom::IConnectionStatusProvider::ConnectionStatus connectionStatus = objectPtr->GetConnectionStatus();
@@ -285,7 +297,7 @@ void CStandardLoginGuiComp::CheckMatchingPassword()
 	bool isEqual = password == confirmPassword;
 	if (!isEqual){
 		SuPasswordMessage->setStyleSheet("color: red");
-		SuPasswordMessage->setText(tr("Password and Confirm Password did not match"));
+		SuPasswordMessage->setText(tr("Password doesn't match"));
 	}
 	else{
 		SuPasswordMessage->setStyleSheet("");
@@ -293,6 +305,11 @@ void CStandardLoginGuiComp::CheckMatchingPassword()
 	}
 
 	SetPasswordButton->setEnabled(isEqual);
+}
+
+
+void CStandardLoginGuiComp::ShowLoadingPage()
+{
 }
 
 
@@ -326,7 +343,7 @@ void CStandardLoginGuiComp::LoginLog::AddMessage(const MessagePtr& messagePtr)
 
 CStandardLoginGuiComp::SetSuPasswordThread::SetSuPasswordThread(CStandardLoginGuiComp& parent)
 	:m_parent(parent),
-	m_state(TS_UNKNOWN)
+	  m_state(TS_UNKNOWN)
 {
 }
 

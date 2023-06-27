@@ -74,6 +74,7 @@ private:
 	void OnConnectionStatusChanged(const istd::IChangeable::ChangeSet& changeSet, const imtcom::IConnectionStatusProvider* objectPtr);
 	void UpdateLoginButtonsState();
 	void CheckMatchingPassword();
+	void ShowLoadingPage();
 
 private:
 	class LoginLog: public ilog::IMessageConsumer
