@@ -302,7 +302,6 @@ bool CSqlJsonDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSet& fil
 	QString objectFilterQuery;
 	iprm::TParamsPtr<iprm::IParamsSet> objectFilterParamPtr(&filterParams, "ObjectFilter");
 	if (objectFilterParamPtr.IsValid()){
-		iprm::TParamsPtr<iprm::ITextParam> textParamPtr(objectFilterParamPtr.GetPtr(), "ObjectFilter");
 		retVal = CreateObjectFilterQuery(*objectFilterParamPtr, objectFilterQuery);
 		if (!retVal){
 			return false;

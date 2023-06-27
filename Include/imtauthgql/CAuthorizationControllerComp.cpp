@@ -1,6 +1,10 @@
 #include <imtauthgql/CAuthorizationControllerComp.h>
 
 
+// ACF includes
+#include <iprm/CParamsSet.h>
+#include <iprm/CTextParam.h>
+
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
 #include <imtauth/CSessionInfo.h>
@@ -41,32 +45,40 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 			passwordHash = m_hashCalculatorCompPtr->GenerateHash(login + password);
 		}
 
-		imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds();
-		for (const imtbase::IObjectCollection::Id& userId : userIds){
+		iprm::CParamsSet filterParam;
+		iprm::CParamsSet paramsSet;
+
+		iprm::CTextParam userId;
+		userId.SetText(login);
+
+		paramsSet.SetEditableParameter("Id", &userId);
+		filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
+
+		imtbase::IObjectCollection::Ids userIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+		if (!userIds.isEmpty()){
+			QByteArray userObjectId = userIds[0];
 			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_userCollectionCompPtr->GetObjectData(userId, dataPtr)){
+			if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
 				const imtauth::CUserInfo* userInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
 				if (userInfoPtr != nullptr){
-					if (userInfoPtr->GetId() == login){
-						QByteArray userPassword = userInfoPtr->GetPasswordHash();
-						if (userPassword == passwordHash){
-							QByteArray tokenValue = QUuid::createUuid().toByteArray();
+					QByteArray userPassword = userInfoPtr->GetPasswordHash();
+					if (userPassword == passwordHash){
+						QByteArray tokenValue = QUuid::createUuid().toByteArray();
 
-							dataModelPtr->SetData("Token", tokenValue);
-							dataModelPtr->SetData("Login", login);
-							dataModelPtr->SetData("UserId", userId);
+						dataModelPtr->SetData("Token", tokenValue);
+						dataModelPtr->SetData("Login", login);
+						dataModelPtr->SetData("UserId", userObjectId);
 
-							istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr = new imtauth::CSessionInfo();
+						istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr = new imtauth::CSessionInfo();
 
-							sessionInfoPtr->SetUserId(userId);
-							sessionInfoPtr->SetToken(tokenValue);
+						sessionInfoPtr->SetUserId(userObjectId);
+						sessionInfoPtr->SetToken(tokenValue);
 
-							if (m_sessionCollectionCompPtr.IsValid()){
-								m_sessionCollectionCompPtr->InsertNewObject("", "", "", sessionInfoPtr.PopPtr(), tokenValue);
-							}
-
-							return rootModelPtr.PopPtr();
+						if (m_sessionCollectionCompPtr.IsValid()){
+							m_sessionCollectionCompPtr->InsertNewObject("", "", "", sessionInfoPtr.PopPtr(), tokenValue);
 						}
+
+						return rootModelPtr.PopPtr();
 					}
 				}
 			}
