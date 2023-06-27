@@ -231,7 +231,7 @@ bool CDatabaseEngineComp::OpenDatabase() const
 
 bool CDatabaseEngineComp::CreateDatabase() const
 {
-	if (!m_migrationFolderPathCompPtr.IsValid()) {
+	if (!m_migrationFolderPathCompPtr.IsValid()){
 		SendCriticalMessage(0, QString("Wrong component configuration: 'MigrationFolderPath' component was not set"));
 
 		return false;
@@ -474,9 +474,9 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected(QSqlError* sqlError) const
 bool CDatabaseEngineComp::EnsureDatabaseCreated() const
 {
 	bool isOpened = OpenDatabase();
-	if (!isOpened) {
+	if (!isOpened){
 		bool isServerConnected = IsDatabaseServerConnected();
-		if (isServerConnected) {
+		if (isServerConnected){
 			if (*m_autoCreateDatabaseAttrPtr >= 1){
 				return CreateDatabase();
 			}
@@ -614,15 +614,15 @@ bool CDatabaseEngineComp::ExecuteTransaction(const QByteArray &sqlQuery) const
 
 	QByteArray singleQuery;
 
-	for (const char* ch = sqlQuery.begin(); ch != sqlQuery.end(); ch++) {
-		if (*ch != ';') {
+	for (const char* ch = sqlQuery.begin(); ch != sqlQuery.end(); ch++){
+		if (*ch != ';'){
 			singleQuery.append(*ch);
 		}
 		else {
-			if (!singleQuery.isEmpty()) {
+			if (!singleQuery.isEmpty()){
 				QSqlError error;
 				ExecSqlQuery(singleQuery, &error);
-				if (error.type() != QSqlError::NoError) {
+				if (error.type() != QSqlError::NoError){
 					SendErrorMessage(0, error.text(), "Database collection");
 
 					CancelTransaction();
@@ -635,10 +635,10 @@ bool CDatabaseEngineComp::ExecuteTransaction(const QByteArray &sqlQuery) const
 		}
 	}
 
-	if (!singleQuery.isEmpty()) {
+	if (!singleQuery.isEmpty()){
 		QSqlError error;
 		ExecSqlQuery(singleQuery, &error);
-		if (error.type() != QSqlError::NoError) {
+		if (error.type() != QSqlError::NoError){
 			SendErrorMessage(0, error.text(), "Database collection");
 
 			CancelTransaction();
