@@ -21,7 +21,8 @@ namespace imtauthgui
 CStandardLoginGuiComp::CStandardLoginGuiComp()
 	:m_loginObserver(*this),
 	m_connectionObserver(*this),
-	m_loginLog(*this)
+	m_loginLog(*this),
+	m_setSuPasswordThread(*this)
 {
 }
 
@@ -49,6 +50,27 @@ bool CStandardLoginGuiComp::eventFilter(QObject* watched, QEvent* event)
 
 
 // protected methods
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CStandardLoginGuiComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+	connect(&m_setSuPasswordThread, &QThread::finished, this, &CStandardLoginGuiComp::OnSetSuPasswordFinished, Qt::QueuedConnection);
+}
+
+
+void CStandardLoginGuiComp::OnComponentDestroyed()
+{
+	if (m_setSuPasswordThread.isRunning()){
+		m_setSuPasswordThread.requestInterruption();
+		m_setSuPasswordThread.wait();
+	}
+
+	BaseClass::OnComponentDestroyed();
+}
+
 
 // reimplemented (iqtgui::CGuiComponentBase)
 
@@ -88,7 +110,7 @@ void CStandardLoginGuiComp::OnGuiCreated()
 		m_connectionObserver.RegisterObject(m_connectionStatusProviderCompPtr.GetPtr(), &CStandardLoginGuiComp::OnConnectionStatusChanged);
 	}
 
-	StackedWidget->setCurrentIndex(0);
+	StackedWidget->setCurrentIndex(3);
 }
 
 
@@ -159,18 +181,8 @@ void CStandardLoginGuiComp::on_SetPasswordButton_clicked()
 {
 	if (m_superuserControllerCompPtr.IsValid()){
 		QString password = SuPasswordEdit->text();
-		if (password.isEmpty()){
-			QMessageBox::critical(GetWidget(), tr("User Management"), tr("Password for the super user could not be empty"), QMessageBox::Close);
 
-			return;
-		}
-
-		if (m_superuserControllerCompPtr->SetSuperuserPassword(password.toUtf8())){
-			StackedWidget->setCurrentIndex(0);
-		}
-		else{
-			QMessageBox::critical(GetWidget(), tr("User Management"), tr("Password for the super user could not be set"), QMessageBox::Close);
-		}
+		m_setSuPasswordThread.Start(password.toUtf8());
 	}
 }
 
@@ -188,12 +200,32 @@ void CStandardLoginGuiComp::on_SuPasswordEdit_textEdited(const QString& text)
 	SuPasswordEdit->setStyleSheet("");
 	SuPasswordMessage->setText("");
 
+	CheckMatchingPassword();
+
 	if (text.isEmpty()){
 		SuPasswordMessage->setStyleSheet("color: red");
 		SuPasswordMessage->setText(tr("Please enter a non-empty password"));
 	}
 
 	SetPasswordButton->setEnabled(!text.isEmpty());
+}
+
+
+void CStandardLoginGuiComp::on_SuConfirmPasswordEdit_textEdited(const QString& text)
+{
+	CheckMatchingPassword();
+}
+
+
+void CStandardLoginGuiComp::OnSetSuPasswordFinished()
+{
+	CStandardLoginGuiComp::SetSuPasswordThread::ThreadState state = m_setSuPasswordThread.GetState();
+	if (state == CStandardLoginGuiComp::SetSuPasswordThread::ThreadState::TS_OK){
+		StackedWidget->setCurrentIndex(0);
+	}
+	else if (state == CStandardLoginGuiComp::SetSuPasswordThread::ThreadState::TS_FAILED){
+		QMessageBox::critical(GetWidget(), tr("User Management"), tr("Password for the super user could not be set"), QMessageBox::Close);
+	}
 }
 
 
@@ -216,7 +248,10 @@ void CStandardLoginGuiComp::OnConnectionStatusChanged(
 		if (connectionStatus == imtcom::IConnectionStatusProvider::CS_CONNECTED){
 			if (m_superuserProviderCompPtr.IsValid()){
 				bool superuserExists = m_superuserProviderCompPtr->SuperuserExists();
-				if (!superuserExists){
+				if (superuserExists){
+					StackedWidget->setCurrentIndex(0);
+				}
+				else{
 					StackedWidget->setCurrentIndex(1);
 				}
 			}
@@ -242,6 +277,25 @@ void CStandardLoginGuiComp::UpdateLoginButtonsState()
 }
 
 
+void CStandardLoginGuiComp::CheckMatchingPassword()
+{
+	QString password = SuPasswordEdit->text();
+	QString confirmPassword = SuConfirmPasswordEdit->text();
+
+	bool isEqual = password == confirmPassword;
+	if (!isEqual){
+		SuPasswordMessage->setStyleSheet("color: red");
+		SuPasswordMessage->setText(tr("Password and Confirm Password did not match"));
+	}
+	else{
+		SuPasswordMessage->setStyleSheet("");
+		SuPasswordMessage->setText("");
+	}
+
+	SetPasswordButton->setEnabled(isEqual);
+}
+
+
 // public methods of embedded class LoginLog
 
 CStandardLoginGuiComp::LoginLog::LoginLog(CStandardLoginGuiComp& parent)
@@ -264,6 +318,46 @@ void CStandardLoginGuiComp::LoginLog::AddMessage(const MessagePtr& messagePtr)
 
 	if (messagePtr.IsValid()){
 		QString loginMessage = messagePtr->GetInformationDescription();
+	}
+}
+
+
+// public methods of the embedded class SetSuPasswordThread
+
+CStandardLoginGuiComp::SetSuPasswordThread::SetSuPasswordThread(CStandardLoginGuiComp& parent)
+	:m_parent(parent),
+	m_state(TS_UNKNOWN)
+{
+}
+
+
+void CStandardLoginGuiComp::SetSuPasswordThread::Start(const QByteArray& suPassword)
+{
+	m_suPassword = suPassword;
+
+	QThread::start();
+}
+
+
+CStandardLoginGuiComp::SetSuPasswordThread::ThreadState CStandardLoginGuiComp::SetSuPasswordThread::GetState()
+{
+	return m_state;
+}
+
+
+// protected methods of the embedded class SetSuPasswordThread
+
+// reimplemented (QThread)
+
+void CStandardLoginGuiComp::SetSuPasswordThread::run()
+{
+	if (m_parent.m_superuserControllerCompPtr.IsValid()){
+		if (m_parent.m_superuserControllerCompPtr->SetSuperuserPassword(m_suPassword)){
+			m_state = TS_OK;
+		}
+		else{
+			m_state = TS_FAILED;
+		}
 	}
 }
 

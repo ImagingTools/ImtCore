@@ -5,14 +5,9 @@
 #include <icomp/CComponentBase.h>
 #include <iprm/ITextParam.h>
 
-
 // ImtCore includes
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtgql/IClientProtocolEngine.h>
-
-
-// Qt includes
-#include <QtQml/QQmlEngine>
 
 
 namespace imtgql
@@ -51,8 +46,6 @@ private:
 	imtbase::TModelUpdateBinder<iprm::ITextParam, CGqlClientEngineComp> m_textParamObserver;
 
 	QByteArray m_workingUrl;
-
-	static QString s_accessToken;
 };
 
 

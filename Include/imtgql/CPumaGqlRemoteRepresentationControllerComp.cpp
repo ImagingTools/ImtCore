@@ -11,7 +11,7 @@ namespace imtgql
 
 imtbase::CTreeItemModel* CPumaGqlRemoteRepresentationControllerComp::CreateInternalResponse(
 			const imtgql::CGqlRequest& gqlRequest,
-			QString& /*errorMessage*/) const
+			QString& errorMessage) const
 {
 	if (!IsRequestSupported(gqlRequest)){
 		return nullptr;
@@ -21,6 +21,8 @@ imtbase::CTreeItemModel* CPumaGqlRemoteRepresentationControllerComp::CreateInter
 	gqlRequestPtr.SetCastedOrRemove(gqlRequest.CloneMe());
 
 	if (!gqlRequestPtr.IsValid()){
+		errorMessage = QObject::tr("Gql request is invalid").toUtf8();
+
 		return nullptr;
 	}
 
@@ -29,6 +31,8 @@ imtbase::CTreeItemModel* CPumaGqlRemoteRepresentationControllerComp::CreateInter
 		istd::TDelPtr<imtgql::CGqlObject> newInputParamPtr;
 		newInputParamPtr.SetCastedOrRemove(inputParam->CloneMe());
 		if (!newInputParamPtr.IsValid()){
+			errorMessage = QObject::tr("Gql request after the cloning operation is invalid").toUtf8();
+
 			return nullptr;
 		}
 
@@ -47,6 +51,8 @@ imtbase::CTreeItemModel* CPumaGqlRemoteRepresentationControllerComp::CreateInter
 	if (retVal){
 		return responseHandler.GetResult();
 	}
+
+	errorMessage = QObject::tr("Failed to create network request").toUtf8();
 
 	return nullptr;
 }

@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QThread>
+
 // ACF includes
 #include <iauth/ILogin.h>
 #include <iauth/IRightsProvider.h>
@@ -45,6 +48,10 @@ public:
 	virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
 protected:
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
+
 	// reimplemented (iqtgui::CGuiComponentBase)
 	virtual void OnGuiShown() override;
 	virtual void OnGuiCreated() override;
@@ -59,11 +66,14 @@ private Q_SLOTS:
 	void on_SetPasswordButton_clicked();
 	void on_PasswordEdit_textEdited(const QString& text);
 	void on_SuPasswordEdit_textEdited(const QString& text);
+	void on_SuConfirmPasswordEdit_textEdited(const QString& text);
+	void OnSetSuPasswordFinished();
 
 private:
 	void OnLoginUpdate(const istd::IChangeable::ChangeSet& changeSet, const iauth::ILogin* objectPtr);
 	void OnConnectionStatusChanged(const istd::IChangeable::ChangeSet& changeSet, const imtcom::IConnectionStatusProvider* objectPtr);
 	void UpdateLoginButtonsState();
+	void CheckMatchingPassword();
 
 private:
 	class LoginLog: public ilog::IMessageConsumer
@@ -85,6 +95,31 @@ private:
 		return &parent.m_loginLog;
 	}
 
+	class SetSuPasswordThread: public QThread
+	{
+	public:
+		enum ThreadState
+		{
+			TS_UNKNOWN = 0,
+			TS_OK,
+			TS_FAILED
+		};
+
+		SetSuPasswordThread(CStandardLoginGuiComp& parent);
+
+		void Start(const QByteArray& suPassword);
+		ThreadState GetState();
+
+	protected:
+		// reimplemented (QThread)
+		virtual void run() override;
+
+	private:
+		CStandardLoginGuiComp& m_parent;
+		QByteArray m_suPassword;
+		ThreadState m_state;
+	};
+
 private:
 	I_REF(imtauth::ISuperuserProvider, m_superuserProviderCompPtr);
 	I_REF(imtauth::ISuperuserController, m_superuserControllerCompPtr);
@@ -96,6 +131,7 @@ private:
 	imtbase::TModelUpdateBinder<imtcom::IConnectionStatusProvider, CStandardLoginGuiComp> m_connectionObserver;
 
 	LoginLog m_loginLog;
+	SetSuPasswordThread m_setSuPasswordThread;
 };
 
 
