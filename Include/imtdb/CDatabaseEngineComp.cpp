@@ -239,7 +239,7 @@ bool CDatabaseEngineComp::CreateDatabase() const
 
 	QDir migrationsFolder(m_migrationFolderPathCompPtr->GetPath());
 	if (!migrationsFolder.exists()){
-		SendErrorMessage(0, QString("Folder containing SQL scripts doesn't exist: ").arg(m_migrationFolderPathCompPtr->GetPath()));
+		SendErrorMessage(0, QString("Folder containing SQL scripts doesn't exist: %1").arg(m_migrationFolderPathCompPtr->GetPath()));
 		
 		return false;
 	}
@@ -338,8 +338,8 @@ bool CDatabaseEngineComp::CreateDatabase() const
 	else{
 		SendErrorMessage(0, QString("Maintanance database could not be opened. Error message: '%1'").arg(maintainanceDb.lastError().text()));
 
-			return false;
-		}
+		return false;
+	}
 
 	return retVal;
 }

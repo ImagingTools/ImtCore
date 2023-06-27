@@ -17,8 +17,7 @@ namespace imtguigql
 {
 
 
-class CObjectCollectionControllerCompBase:
-			public imtgql::CGqlRequestHandlerCompBase
+class CObjectCollectionControllerCompBase: public imtgql::CGqlRequestHandlerCompBase
 {
 public:
 	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
