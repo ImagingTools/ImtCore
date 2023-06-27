@@ -84,6 +84,16 @@ I_EXPORT_COMPONENT(
 			"Puma GraphQL remote representation controller",
 			"Puma GraphQL Gql Api Client Controller User");
 
+I_EXPORT_COMPONENT(
+			ObjectProvider,
+			"Object provider",
+			"Object Provider");
+
+I_EXPORT_COMPONENT(
+			CollectionObjectProvider,
+			"Collection object provider",
+			"Collection Object Provider");
+
 
 } // namespace ImtGqlPck
 

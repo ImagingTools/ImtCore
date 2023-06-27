@@ -35,7 +35,7 @@ Item {
     property alias modelFilter: modelFilterObj;
     property alias pagination: paginationObj;
 
-    // По умолчанию сорировка будет по этому столбцу
+    // Sort by default this index
     property int defaultSortHeaderIndex: 0;
 
     // only ASC or DESC
@@ -48,17 +48,12 @@ Item {
     signal selectionChanged(var selection);
     signal filterDecoratorLoaded();
 
-    /**
-        Если true -> данные будут запрошены с сервера,
-        иначе нужно будет подставлять данные вручную
-      */
     property bool loadData;
 
     Component.onCompleted: {
         console.log("CollectionViewBase onCompleted");
 
         tableInternal.focus = true;
-
     }
 
     onCommandsIdChanged: {
