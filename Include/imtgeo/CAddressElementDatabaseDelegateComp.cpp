@@ -301,7 +301,7 @@ bool CAddressElementDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsS
         typeIdFilterQuery = "\"AddressTypeId\" = " + typeIdFilterParamPtr->GetTextFilter();
     }
 
-    if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdsFilterQuery.isEmpty() /*|| !typeIdFilterQuery.isEmpty()*/){
+    if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdsFilterQuery.isEmpty() || !typeIdFilterQuery.isEmpty()){
         filterQuery = " WHERE ";
     }
 

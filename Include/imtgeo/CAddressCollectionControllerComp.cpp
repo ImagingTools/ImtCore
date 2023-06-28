@@ -86,7 +86,7 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
             count = viewParamsGql->GetFieldArgumentValue("Count").toInt();
 
             QByteArray filterBA = viewParamsGql->GetFieldArgumentValue("FilterModel").toByteArray();
-            qDebug() << "filterBA:: " << filterBA;
+            //qDebug() << "filterBA:: " << filterBA;
             if (!filterBA.isEmpty()){
                 imtbase::CTreeItemModel generalModel;
                 generalModel.CreateFromJson(filterBA);
@@ -94,7 +94,7 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
                 //parentIds = "{00000817-0000-0000-0000-000000000000}";//generalModel.GetData("ParentId").toString();
 
                 parentIds = generalModel.GetData("ParentIds").toString();
-                qDebug()<< "filter::: parentIds::: " << parentIds;
+                //qDebug()<< "filter::: parentIds::: " << parentIds;
 
                 if (!parentIds.isEmpty()){
                     QStringList parentIdList = parentIds.split(",");
@@ -103,7 +103,6 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
                     for(int i = 0; i < parentIdList.count(); i++){
                         jsonArray.append(parentIdList.at(i));
                     }
-                    jsonArray.append(parentIds);
                     json_document = QJsonDocument(jsonArray);
 
                     //qDebug() << "jsonParents::: " << qPrintable(QJsonDocument(jsonArray).toJson(QJsonDocument::Compact));
@@ -156,7 +155,7 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
                         filterText = filterText.trimmed();
                     }
 
-                    qDebug() << "filter::: Text::" << filterText;
+                    //qDebug() << "filter::: Text::" << filterText;
                     filter.SetTextFilter(filterText);
                 }
                 imtbase::CTreeItemModel* sortModel = generalModel.GetTreeItemModel("Sort");
