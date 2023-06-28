@@ -219,7 +219,7 @@ QByteArray CAddressElementDatabaseDelegateComp::GetSelectionQuery(const QByteArr
 //                    .arg(qPrintable(objectId))
 //                    .toLocal8Bit();
 
-        return QString(R"sql(SELECT "Id", "ParentId", "ParentIds", "Type", "Name", "Latitude", "Longitude",(SELECT get_full_address(ae."ParentIds", ae."Name", ae."Type")) AS "FullAddress" FROM "%1" AS ae WHERE ae."%2" = '%3')sql")
+        return QString(R"sql(SELECT "Id", "ParentIds", "Type", "Name", "Latitude", "Longitude",(SELECT get_full_address(ae."ParentIds", ae."Name", ae."Type")) AS "FullAddress" FROM "%1" AS ae WHERE ae."%2" = '%3')sql")
                 .arg(qPrintable(*m_tableNameAttrPtr))
                 .arg(qPrintable(*m_objectIdColumnAttrPtr))
                 .arg(qPrintable(objectId))
@@ -253,7 +253,7 @@ QByteArray CAddressElementDatabaseDelegateComp::GetSelectionQuery(const QByteArr
 		}
         //QString baseSelelectionQuery = QString("SELECT * FROM \"%1\"").arg(qPrintable(m_tableNameAttrPtr->GetValue()));
 
-        QString baseSelelectionQuery = QString(R"sql(SELECT "Id", "ParentId", "ParentIds", "Type", "Name", "Latitude", "Longitude",(SELECT get_full_address(ae."ParentIds", ae."Name", ae."Type")) AS "FullAddress" FROM "%1" AS ae )sql")
+        QString baseSelelectionQuery = QString(R"sql(SELECT "Id", "ParentIds", "Type", "Name", "Latitude", "Longitude",(SELECT get_full_address(ae."ParentIds", ae."Name", ae."Type")) AS "FullAddress" FROM "%1" AS ae )sql")
                         .arg(qPrintable(*m_tableNameAttrPtr));
 
 		// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
