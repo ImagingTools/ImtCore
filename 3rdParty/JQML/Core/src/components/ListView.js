@@ -523,14 +523,17 @@ export class ListView extends Flickable {
         while(removed.length){
             removed.pop().$destroy()
         }
+        this.$updateGeometry()
         this.$updateView()
     }
     $insert(index){
         this.$items.splice(index, 0, null)
+        this.$updateGeometry()
         this.$updateView()
     }
     $append(){
         this.$items.push(null)
+        this.$updateGeometry()
         this.$updateView()
     }
     $updateView(){
