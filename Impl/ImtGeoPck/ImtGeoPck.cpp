@@ -20,9 +20,19 @@ I_EXPORT_COMPONENT(
 			"Address element");
 
 I_EXPORT_COMPONENT(
+            AddressTypeInfo,
+            "Address type",
+            "Address type");
+
+I_EXPORT_COMPONENT(
             AddressElementDatabaseDelegate,
             "Address element info object for SQL table",
             "SQL Address Element Delegate");
+
+I_EXPORT_COMPONENT(
+            AddressTypeDatabaseDelegate,
+            "Address type info object for SQL table",
+            "SQL Address type Delegate");
 
 I_EXPORT_COMPONENT(
             AddressCollectionController,
