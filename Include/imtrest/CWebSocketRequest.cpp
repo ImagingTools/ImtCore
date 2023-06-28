@@ -27,10 +27,15 @@ CWebSocketRequest::CWebSocketRequest(QObject& socket, const IRequestServlet& han
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(&socket);
 	if (webSocketPtr != nullptr){
 		m_remoteAddress = webSocketPtr->peerAddress();
-
-		connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CWebSocketRequest::OnWebSocketTextMessage);
-		connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CWebSocketRequest::OnWebSocketBinaryMessage);
 		QObject::connect(webSocketPtr, &QWebSocket::disconnected, &QObject::deleteLater);
+	}
+}
+
+
+CWebSocketRequest::~CWebSocketRequest()
+{
+	for (int index = 0; index < m_destroyObserverList.count(); index++){
+		m_destroyObserverList[index]->OnRequestDestroyed(this);
 	}
 }
 
@@ -87,12 +92,26 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 	if (object.value("type") == "stop"){
 		m_type = MT_STOP;
 	}
+
+	m_subscriptionId = object.value("id").toString().toUtf8();
 }
 
 
 CWebSocketRequest::MethodType CWebSocketRequest::GetMethodType() const
 {
 	return m_type;
+}
+
+
+QByteArray CWebSocketRequest::GetSubscriptionId() const
+{
+	return m_subscriptionId;
+}
+
+
+void CWebSocketRequest::RegisterDestroyObserver(IDestroyObserver* destroyObserver)
+{
+	m_destroyObserverList.append(destroyObserver);
 }
 
 
@@ -155,22 +174,6 @@ bool CWebSocketRequest::ResetData(CompatibilityMode /*mode*/)
 	m_state = RS_NON_STARTED;
 
 	return true;
-}
-
-
-// protected methods
-
-void CWebSocketRequest::OnWebSocketTextMessage(const QString& textMessage)
-{
-	SetBody(textMessage.toUtf8());
-	m_requestHandler.ProcessRequest(*this);
-}
-
-
-void CWebSocketRequest::OnWebSocketBinaryMessage(const QByteArray& dataMessage)
-{
-	SetBody(dataMessage);
-	m_requestHandler.ProcessRequest(*this);
 }
 
 

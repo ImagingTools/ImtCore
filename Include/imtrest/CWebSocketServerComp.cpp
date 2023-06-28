@@ -1,10 +1,14 @@
 #include <imtrest/CWebSocketServerComp.h>
 
 
+// Acf includes
+#include <istd/TDelPtr.h>
+
 // ImtCore includes
 #include <imtrest/IRequest.h>
 #include <imtrest/IResponse.h>
 #include <imtrest/ISender.h>
+#include <imtrest/CWebSocketRequest.h>
 
 
 namespace imtrest
@@ -27,6 +31,12 @@ IRequestServlet::ConstResponsePtr CWebSocketServerComp::ProcessRequest(const IRe
 	}
 
 	return retVal;
+}
+
+
+QByteArray CWebSocketServerComp::GetSupportedCommandId() const
+{
+	return QByteArray();
 }
 
 
@@ -86,17 +96,13 @@ void CWebSocketServerComp::HandleNewConnections()
 	QWebSocketServer* webSocketServerPtr = qobject_cast<QWebSocketServer*>(sender());
 	Q_ASSERT(webSocketServerPtr != nullptr);
 
-	while (QWebSocket* socketPtr = webSocketServerPtr->nextPendingConnection()){
+	while (QWebSocket* webSocketPtr = webSocketServerPtr->nextPendingConnection()){
 		if (m_subscriberEngineCompPtr.IsValid()){
-			m_subscriberEngineCompPtr->RegisterSubscriber(socketPtr, *m_requestHandlerCompPtr, *m_protocolEngineCompPtr);
+			m_subscriberEngineCompPtr->RegisterSubscriber(webSocketPtr, *m_requestHandlerCompPtr, *m_protocolEngineCompPtr);
 		}
+		connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CWebSocketServerComp::OnWebSocketTextMessage);
+		connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CWebSocketServerComp::OnWebSocketBinaryMessage);
 
-		IRequest* newRequestPtr = m_protocolEngineCompPtr->CreateRequest(socketPtr, *this);
-		if (newRequestPtr != nullptr){
-			m_requests.PushBack(newRequestPtr);
-
-			QObject::connect(socketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);
-		}
 	}
 }
 
@@ -125,10 +131,37 @@ void CWebSocketServerComp::OnSocketDisconnected()
 }
 
 
-QByteArray CWebSocketServerComp::GetSupportedCommandId() const
+void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 {
-	return QByteArray();
+	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
+
+	if (webSocketPtr == nullptr){
+		return;
+	}
+
+	istd::TDelPtr<IRequest> newRequestPtr = m_protocolEngineCompPtr->CreateRequest(webSocketPtr, *this);
+	if (newRequestPtr.IsValid()){
+		CWebSocketRequest* webSocketRequest = dynamic_cast<CWebSocketRequest*>(newRequestPtr.GetPtr());
+		if (webSocketRequest == nullptr){
+			return;
+		}
+		webSocketRequest->SetBody(textMessage.toUtf8());
+		ProcessRequest(*webSocketRequest);
+
+		if (webSocketRequest->GetMethodType() == CWebSocketRequest::MT_START){
+			newRequestPtr.PopPtr();
+			m_requests.PushBack(webSocketRequest);
+			QObject::connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);
+		}
+	}
 }
+
+
+void CWebSocketServerComp::OnWebSocketBinaryMessage(const QByteArray& dataMessage)
+{
+
+}
+
 
 
 } // namespace imtrest

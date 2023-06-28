@@ -21,8 +21,13 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			GraphQLServlet,
-			"GraphQLServlet",
+			"GraphQL servlet",
 			"GraphQL Receiver");
+
+I_EXPORT_COMPONENT(
+			WebSocketServlet,
+			"WebSocket servlet",
+			"GraphQL WebSocket Receiver");
 
 I_EXPORT_COMPONENT(
 			GraphQLDemultiplexer,

@@ -80,6 +80,22 @@ var GqlRequest = function(requestType, commandId){
         m_fields: [],
         m_params: [],
 
+        SetRequestType: function(requestType){
+            this.m_requestType = requestType
+        },
+
+        GetRequestType: function(){
+            return this.m_requestType
+        },
+
+        SetCommandId: function(commandId){
+            this.m_commandId = commandId
+        },
+
+        GetCommandId: function(){
+            return this.m_commandId
+        },
+
         AddField: function(field){
             this.m_fields.push(field)
         },

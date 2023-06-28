@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5075" Description="ACF"/>
+            <Version Id="0" Number="5073" Description="ACF"/>
             <Version Id="1" Number="2183" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -11,7 +11,7 @@
     <Keywords>HTTP Server</Keywords>
     <ElementsList>
         <Element Id="HttpProtocolEngine" PackageId="ImtRestPck" ComponentId="HttpProtocolEngine">
-            <Data IsEnabled="true" Flags="1">
+            <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
@@ -23,7 +23,7 @@
             </Data>
         </Element>
         <Element Id="HttpRootHandler" PackageId="ImtRestPck" ComponentId="HttpRootServlet">
-            <Data IsEnabled="true" Flags="1">
+            <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="HttpCommandIds">
                         <Data IsEnabled="false"/>
@@ -73,23 +73,8 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="WebSocketHttpRootHandler" PackageId="ImtRestPck" ComponentId="HttpRootServlet">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="WebSocketCommandIds">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="WebSocketProtocolEngine" PackageId="ImtRestPck" ComponentId="WebSocketProtocolEngine">
-            <Data IsEnabled="true" Flags="1">
+            <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -106,8 +91,8 @@
                     <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketProtocolEngine"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RequestHandler" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="WebSocketHttpRootHandler"/>
+                    <AttributeInfo Id="RequestHandler" Type="Reference" ExportId="WebSocketRequestHandler">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ServerAddress" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="http://localhost"/>

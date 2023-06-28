@@ -20,6 +20,8 @@ public:
 	void AddField(const CGqlObject& field);
 	void AddSimpleField(const QByteArray& fieldId);
 	void SetGqlContext(const imtgql::IGqlContext* gqlContext);
+	void SetRequestType(RequestType requestType);
+	void SetCommandId(const QByteArray& commandId);
 
 	const QList<CGqlObject> GetFields() const;
 	const QList<CGqlObject> GetParams() const;

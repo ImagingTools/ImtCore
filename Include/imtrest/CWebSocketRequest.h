@@ -22,6 +22,12 @@ class CWebSocketRequest: public QObject, virtual public IRequest
 {
 	Q_OBJECT
 public:
+	class IDestroyObserver
+	{
+		public:
+		virtual void OnRequestDestroyed(CWebSocketRequest* webSocketRequest) = 0;
+	};
+
 	enum MethodType
 	{
 		MT_UNKNOWN = 0,
@@ -37,6 +43,7 @@ public:
 	};
 
 	CWebSocketRequest(QObject& socket, const IRequestServlet& requestHandler, const IProtocolEngine& engine);
+	~CWebSocketRequest();
 
 	QByteArrayList GetHeaders() const;
 	QByteArray GetHeaderValue(const QByteArray& headerType) const;
@@ -44,6 +51,8 @@ public:
 	QHostAddress GetRemoteAddress() const;
 	void SetBody(const QByteArray& body);
 	MethodType GetMethodType() const;
+	QByteArray GetSubscriptionId() const;
+	void RegisterDestroyObserver(IDestroyObserver* destroyObserver);
 
 	// reimplemented (IRequest)
 	virtual RequestState GetState() const override;
@@ -58,15 +67,16 @@ public:
 	// reimplemented (istd::IChangeable)
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
-private Q_SLOTS:
-	void OnWebSocketTextMessage(const QString& textMessage);
-	void OnWebSocketBinaryMessage(const QByteArray& dataMessage);
+// private Q_SLOTS:
+// 	void OnWebSocketTextMessage(const QString& textMessage);
+// 	void OnWebSocketBinaryMessage(const QByteArray& dataMessage);
 
 private:
 	QHostAddress m_remoteAddress;
 	QUrl m_url;
 	RequestState m_state;
 	QByteArray m_body;
+	QByteArray m_subscriptionId;
 	MethodType m_type;
 
 	const IRequestServlet& m_requestHandler;
@@ -77,6 +87,7 @@ private:
 	HeaderMap m_headers;
 
 	QByteArray m_lastHeader;
+	QList<IDestroyObserver*> m_destroyObserverList;
 };
 
 

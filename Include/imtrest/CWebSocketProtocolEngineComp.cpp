@@ -1,6 +1,9 @@
 #include <imtrest/CWebSocketProtocolEngineComp.h>
 
 
+// Acf includes
+#include <imod/TModelWrap.h>
+
 // ImtCore includes
 #include <imtrest/CWebSocketRequest.h>
 #include <imtrest/CWebSocketResponse.h>
@@ -37,7 +40,11 @@ bool CWebSocketProtocolEngineComp::GetProtocolStatusCode(int /*statusCode*/, int
 IRequest* CWebSocketProtocolEngineComp::CreateRequest(QObject* socketPtr, const IRequestServlet& requestHandler) const
 {
 	if (socketPtr != nullptr){
-		return new CWebSocketRequest(*socketPtr, requestHandler, *this);
+		// CWebSocketRequest* webSocketRequest = new imod::TModelWrap<CWebSocketRequest>;
+		// webSocketRequest->Init(*socketPtr, requestHandler, *this);
+		CWebSocketRequest* webSocketRequest = new CWebSocketRequest(*socketPtr, requestHandler, *this);
+
+		return webSocketRequest;
 	}
 
 	return nullptr;
@@ -51,8 +58,7 @@ IRequest *CWebSocketProtocolEngineComp::CreateRequestForSend(
 		const QByteArray& data,
 		const QByteArray& /*dataTypeId*/) const
 {
-	CWebSocketRequest *webSocketRequest = new CWebSocketRequest(*socketPtr, requestHandler, *this);
-
+	CWebSocketRequest* webSocketRequest = new CWebSocketRequest(*socketPtr, requestHandler, *this);
 	webSocketRequest->SetBody(data);
 
 	return webSocketRequest;

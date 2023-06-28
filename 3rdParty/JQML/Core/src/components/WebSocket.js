@@ -37,7 +37,7 @@ export class WebSocket extends QtObject {
         }
 
         this.status = WebSocket.Connecting
-        this.$socket = new WebSocket(this.url)
+        this.$socket = new window.WebSocket(this.url)
         this.$socket.onopen = () => {
             this.status = WebSocket.Open
         }

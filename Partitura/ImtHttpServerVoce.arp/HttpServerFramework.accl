@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5075" Description="ACF"/>
+            <Version Id="0" Number="5073" Description="ACF"/>
             <Version Id="1" Number="2183" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -11,7 +11,6 @@
         <Element ComponentName="HttpProtocolEngine" X="875" Y="375" Note=""/>
         <Element ComponentName="HttpRootHandler" X="275" Y="375" Note=""/>
         <Element ComponentName="TcpServer" X="550" Y="175" Note=""/>
-        <Element ComponentName="WebSocketHttpRootHandler" X="275" Y="700" Note=""/>
         <Element ComponentName="WebSocketProtocolEngine" X="925" Y="700" Note=""/>
         <Element ComponentName="WebSocketServer" X="550" Y="500" Note=""/>
     </PositionMap>

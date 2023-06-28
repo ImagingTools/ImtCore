@@ -58,6 +58,8 @@ private:
 private Q_SLOTS:
 	void HandleNewConnections();
 	void OnSocketDisconnected();
+	void OnWebSocketTextMessage(const QString& textMessage);
+	void OnWebSocketBinaryMessage(const QByteArray& dataMessage);
 
 private:
 	I_REF(imtrest::IRequestServlet, m_requestHandlerCompPtr);

@@ -21,6 +21,7 @@
 #include <imtgql/CPumaGqlRemoteRepresentationControllerComp.h>
 #include <imtgql/CGqlContextControllerComp.h>
 #include <imtgql/CObjectProviderComp.h>
+#include <imtgql/CWebSocketServletComp.h>
 #include <imtgql/CCollectionObjectProviderComp.h>
 
 
@@ -33,6 +34,7 @@ namespace ImtGqlPck
 
 typedef imtgql::CApiClientComp ApiClient;
 typedef imtgql::CHttpGraphQLServletComp GraphQLServlet;
+typedef imtgql::CWebSocketServletComp WebSocketServlet;
 typedef imtgql::CGqlDemultiplexerComp GraphQLDemultiplexer;
 typedef imtgql::CGqlRemoteRepresentationControllerComp GraphQLRemoteRepresentationController;
 typedef imtgql::CGqlClientEngineComp GraphQLClientEngine;

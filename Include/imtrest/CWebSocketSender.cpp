@@ -38,7 +38,7 @@ bool CWebSocketSender::SendResponse(const IResponse& response) const
 
 		const QByteArray& contentData = response.GetData();
 
-		webSocketPtr->sendBinaryMessage(contentData);
+		webSocketPtr->sendTextMessage(contentData);
 
 		return true;
 	}

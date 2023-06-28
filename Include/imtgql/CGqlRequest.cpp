@@ -49,6 +49,28 @@ void CGqlRequest::AddSimpleField(const QByteArray &fieldId)
 }
 
 
+void CGqlRequest::SetGqlContext(const IGqlContext *gqlContext)
+{
+	if (m_gqlContextPtr != gqlContext){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_gqlContextPtr = const_cast<IGqlContext*>(gqlContext);
+	}
+}
+
+
+void CGqlRequest::SetRequestType(RequestType requestType)
+{
+	m_requestType = requestType;
+}
+
+
+void CGqlRequest::SetCommandId(const QByteArray& commandId)
+{
+	m_commandId = commandId;
+}
+
+
 const QList<CGqlObject> CGqlRequest::GetFields() const
 {
 	return m_fields;
@@ -771,16 +793,6 @@ void CGqlRequest::SetParseText(const QByteArray &text)
 		m_activeGqlObjectPtr->InsertField(m_currentField, QVariant(text));
 	}
 
-}
-
-
-void CGqlRequest::SetGqlContext(const IGqlContext *gqlContext)
-{
-	if (m_gqlContextPtr != gqlContext){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_gqlContextPtr = const_cast<IGqlContext*>(gqlContext);
-	}
 }
 
 
