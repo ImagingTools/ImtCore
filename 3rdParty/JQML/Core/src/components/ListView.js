@@ -523,16 +523,19 @@ export class ListView extends Flickable {
         while(removed.length){
             removed.pop().$destroy()
         }
+        if(typeof this.model === 'object' && this.model.isUpdateEnabled === false) return
         this.$updateGeometry()
         this.$updateView()
     }
     $insert(index){
         this.$items.splice(index, 0, null)
+        if(typeof this.model === 'object' && this.model.isUpdateEnabled === false) return
         this.$updateGeometry()
         this.$updateView()
     }
     $append(){
         this.$items.push(null)
+        if(typeof this.model === 'object' && this.model.isUpdateEnabled === false) return
         this.$updateGeometry()
         this.$updateView()
     }
