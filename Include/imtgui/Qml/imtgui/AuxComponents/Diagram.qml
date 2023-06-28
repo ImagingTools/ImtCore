@@ -189,6 +189,7 @@ Item {
 
         anchors.top: parent.top;
         anchors.left: parent.left;
+        anchors.right: parent.right;
 //        horizontalAlignment: Text.AlignLeft;
 //        verticalAlignment: Text.AlignVCenter;
         wrapMode: Text.WordWrap;
@@ -254,7 +255,7 @@ Item {
                     font.bold: false;
                     font.family: Style.fontFamily;
                     color:  diagram.valueColor;
-                    text: model.text;
+                    text: model.text !== undefined ? model.text : "";
 
                 }
 
