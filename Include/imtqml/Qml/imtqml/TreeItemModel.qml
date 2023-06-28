@@ -7,9 +7,15 @@ JSONListModel {
     property string baseUrl;
     property var queryParams: [];
     property bool isArray: false;
+    property bool isUpdateEnabled: true;
+
 
     signal modelChanged();
 //    signal dataChanged();
+
+    function SetUpdateEnabled(flag){
+        isUpdateEnabled = flag
+    }
 
     function GetItemsCount(){
         return this.count
@@ -37,6 +43,8 @@ JSONListModel {
         if(typeof retVal === 'object' && !retVal.$qmlClassName){
             var retModel
             retModel = this.createComponent("imtqml/TreeItemModel.qml", this);
+            retModel.isUpdateEnabled = this.isUpdateEnabled
+			retModel.$sP('isUpdateEnabled', function (){return this.isUpdateEnabled}.bind(this))
             retModel.append(retVal);
 
             return  retModel
@@ -66,9 +74,10 @@ JSONListModel {
             modelObject.$cP(key, value)
         }
 
-
-        this.dataChanged(row, row+1)
-        this.modelChanged()
+        if (isUpdateEnabled){
+            this.modelChanged()
+            this.dataChanged(row, row+1)
+        }
     }
 
     function RemoveData(key, row){
@@ -83,7 +92,10 @@ JSONListModel {
             console.log("modelObject is null")
 
         delete modelObject.$p[key]
-        this.modelChanged()
+
+        if (isUpdateEnabled){
+            this.modelChanged()
+        }
     }
 
     function Clear(){
@@ -218,7 +230,10 @@ JSONListModel {
 
     function RemoveItem(index){
         this.remove(index)
-        this.modelChanged()
+
+        if (isUpdateEnabled){
+            this.modelChanged()
+        }
     }
 
 
@@ -293,6 +308,8 @@ JSONListModel {
                 var retVal = modelObject.$p[keys[index]].val
                 if(retVal !== null && typeof retVal === 'object' && retVal._qmlName !== 'TreeItemModel.qml'){
                     var retModel = this.createComponent("imtqml/TreeItemModel.qml", this);
+                    retModel.isUpdateEnabled = this.isUpdateEnabled
+			        retModel.$sP('isUpdateEnabled', function (){return this.isUpdateEnabled}.bind(this))
                     retModel.append(retVal);
                     retVal = retModel
                     retVal.updateTreeItemJSONModel()
