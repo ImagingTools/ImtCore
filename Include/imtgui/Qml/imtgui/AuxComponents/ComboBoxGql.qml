@@ -199,6 +199,10 @@ Item {
                                                    "countVisibleItem": 5 });
     }
 
+    function closeFunc(){
+        modalDialogManager.closeDialog();
+    }
+
     Rectangle {
         id: cbMainRect;
 

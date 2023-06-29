@@ -80,6 +80,7 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
         int offset = 0, count = -1;
         //QString parentId = "";
         QString parentIds = "";
+        QString filterText = "";
         QString typeId = "";
         if (viewParamsGql != nullptr){
             offset = viewParamsGql->GetFieldArgumentValue("Offset").toInt();
@@ -142,7 +143,7 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
                     filter.SetFilteringInfoIds(filteringInfoIds);
                 }
 
-                QString filterText = generalModel.GetData("TextFilter").toString();
+                filterText = generalModel.GetData("TextFilter").toString();
                 if (!filterText.isEmpty()){
 
                     filterText = filterText.trimmed();
@@ -244,6 +245,10 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
             //qDebug() << "тест" << " while exit";
 
         }//ITERATOR
+
+        if(!itemsModel->GetItemsCount() && !parentIds.isEmpty() && filterText.isEmpty()){
+            notificationModel->SetData("Close",true);
+        }
 
         itemsModel->SetIsArray(true);
         dataModel->SetExternTreeModel("items", itemsModel);

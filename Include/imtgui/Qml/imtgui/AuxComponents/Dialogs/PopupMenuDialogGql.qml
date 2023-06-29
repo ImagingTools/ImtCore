@@ -413,6 +413,11 @@ Item {
                             if (notifModel.ContainsKey("ElementsCount")){
                                 popupMenuContainer.elementsCount = notifModel.GetData("ElementsCount");
                             }
+                            if(notifModel.ContainsKey("Close")){
+                                if(notifModel.GetData("Close")){
+                                    popupMenuContainer.rootItem.closeFunc();
+                                }
+                            }
                         }
 
                         dataModelLocal = dataModelLocal.GetData("items");
