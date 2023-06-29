@@ -698,8 +698,10 @@ bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRec
 		for (const QByteArray& columnId : columnIds){
 			int metaInfoType = m_metaInfoTableDelegateCompPtr->GetMetaInfoType(columnId);
 			if (metaInfoType >= 0){
-				if (record.contains(columnId)){
-					QVariant data = m_metaInfoTableDelegateCompPtr->FromTableRepresentation(record.value(qPrintable(columnId)), columnId);
+				QByteArray metaInfoId = QString(columnId).remove("\"").toLocal8Bit();
+
+				if (record.contains(metaInfoId)){
+					QVariant data = m_metaInfoTableDelegateCompPtr->FromTableRepresentation(record.value(qPrintable(metaInfoId)), metaInfoId);
 					if (data.isValid()){
 						metaInfo.SetMetaInfo(metaInfoType, data);
 					}
