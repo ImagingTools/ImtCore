@@ -46,7 +46,7 @@ Item {
 
 
     onModelChanged: {
-        diagram.setMaxValue();
+        //diagram.setMaxValue();
     }
 
     function setMinValue(){
@@ -63,17 +63,17 @@ Item {
             var delta;
             if(count){
                 for(var i = 0; i < diagram.model.GetItemsCount(); i++){
-                    var currVal = diagram.model.GetData("positive",i) + diagram.model.GetData("negative",i);
-                    summ += currVal;
+                    var currVal = Number(diagram.model.GetData("positive",i)) + Number(diagram.model.GetData("negative",i));
+                    //summ += currVal;
                     if(i == 0){
                         firstVal = currVal;
                     }
-                    if(i == count -1){
-                        lastVal = currVal;
-                    }
+//                    if(i == count -1){
+//                        lastVal = currVal;
+//                    }
                 }
-                average = summ/count;
-                delta = lastVal - firstVal;
+                //average = summ/count;
+                //delta = lastVal - firstVal;
                 minVal = Math.trunc(firstVal);
             }
 
@@ -91,9 +91,7 @@ Item {
             //for(var i = 0; i < diagram.model.count; i++)
             for(var i = 0; i < diagram.model.GetItemsCount(); i++)
             {
-                //console.log(model.get(i).positive, model.get(i).negative);
-                //var currVal = diagram.model.get(i).positive + diagram.model.get(i).negative;
-                var currVal = diagram.model.GetData("positive",i) + diagram.model.GetData("negative",i) - diagram.minValue;
+                var currVal = Number(diagram.model.GetData("positive",i)) + Number(diagram.model.GetData("negative",i)) - Number(diagram.minValue);
                 if(currVal > maxVal){
                     maxVal = currVal;
                 }
@@ -322,8 +320,6 @@ Item {
         anchors.topMargin: Style.size_mainMargin;
         anchors.horizontalCenter: axeY.horizontalCenter;
 
-//        horizontalAlignment: Text.AlignLeft;
-//        verticalAlignment: Text.AlignVCenter;
         wrapMode: Text.NoWrap;
         font.pixelSize: diagram.fontSize;
         font.bold: false;
@@ -358,8 +354,6 @@ Item {
         anchors.right: parent.right;
         anchors.verticalCenter: axeX.verticalCenter;
 
-//        horizontalAlignment: Text.AlignLeft;
-//        verticalAlignment: Text.AlignVCenter;
         wrapMode: Text.NoWrap;
         font.pixelSize: diagram.fontSize;
         font.bold: false;
