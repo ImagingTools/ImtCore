@@ -8,7 +8,7 @@ namespace imtlog
 int CEventContainer::GetMessagesCount() const
 {
 	QMutexLocker locker(&m_mutex);
-	return m_messages.count();
+	return m_messages.size();
 }
 
 
@@ -16,13 +16,13 @@ imtbase::CTimeRange CEventContainer::GetTimeRange() const
 {
 	QMutexLocker locker(&m_mutex);
 
-	if (m_messages.isEmpty()){
+	if (m_messages.empty()){
 		return imtbase::CTimeRange();
 	}
 
 	return imtbase::CTimeRange(
-				m_messages.last()->GetInformationTimeStamp(),
-				m_messages.first()->GetInformationTimeStamp());
+				m_messages.back()->GetInformationTimeStamp(),
+				m_messages.front()->GetInformationTimeStamp());
 }
 
 

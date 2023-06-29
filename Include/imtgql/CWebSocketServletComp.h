@@ -33,9 +33,6 @@ protected:
 	virtual ConstResponsePtr CreateDataResponse(QByteArray data, const imtrest::IRequest& request) const;
 	virtual ConstResponsePtr CreateErrorResponse(QByteArray errorMessage, const imtrest::IRequest& request) const;
 
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-
 private:
 	I_MULTIREF(IGqlSubscriberController, m_gqlSubscriberControllersCompPtr);
 

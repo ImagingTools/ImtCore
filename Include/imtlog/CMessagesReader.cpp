@@ -62,8 +62,8 @@ imtbase::CTimeRange CMessagesReader::ReadTimeRange() const
 				EventContainerPtr containerPtr = ImportContainer(*itTime);
 				if (containerPtr.IsValid()){
 					ilog::IMessageContainer::Messages messages = containerPtr->GetMessages();
-					if (!messages.isEmpty()){
-						begin = messages.last()->GetInformationTimeStamp();
+					if (!messages.empty()){
+						begin = messages.back()->GetInformationTimeStamp();
 						finish = true;
 					}
 				}
@@ -87,8 +87,8 @@ imtbase::CTimeRange CMessagesReader::ReadTimeRange() const
 				EventContainerPtr containerPtr = ImportContainer(*itTime);
 				if (containerPtr.IsValid()){
 					ilog::IMessageContainer::Messages messages = containerPtr->GetMessages();
-					if (!messages.isEmpty()){
-						end = messages.first()->GetInformationTimeStamp();
+					if (!messages.empty()){
+						end = messages.front()->GetInformationTimeStamp();
 						finish = true;
 					}
 				}
@@ -136,10 +136,10 @@ CMessagesReader::EventContainerListPtr CMessagesReader::ReadContainers(const imt
 
 				EventContainerPtr container = ImportContainer(fileMap[fileMapKeys[i]]);
 				if (timeRange.Intersect(container->GetTimeRange()).IsClosed()){
-					ilog::IMessageContainer::Messages messages = container->GetMessages();
+					const ilog::IMessageContainer::Messages messages = container->GetMessages();
 
-					for (int j = 0; j < messages.count(); j++){
-						QDateTime timeStamp = messages[j]->GetInformationTimeStamp();
+					for (ilog::IMessageContainer::Messages::const_iterator it = messages.begin(); it != messages.end(); it++) {
+						QDateTime timeStamp = (*it)->GetInformationTimeStamp();
 						if (timeRange.Contains(timeStamp)){
 							retVal->append(container);
 						}

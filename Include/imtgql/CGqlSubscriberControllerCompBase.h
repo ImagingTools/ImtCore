@@ -9,10 +9,10 @@
 // ImtCore includes
 #include <imtbase/IRepresentationController.h>
 #include <imtbase/ICommandPermissionsProvider.h>
-#include <imtgql/IGqlRequestHandler.h>
 #include <imtauth/IPermissionChecker.h>
-#include <imtgql/IGqlSubscriberController.h>
 #include <imtrest/CWebSocketRequest.h>
+#include <imtgql/IGqlRequestHandler.h>
+#include <imtgql/IGqlSubscriberController.h>
 
 
 namespace imtgql

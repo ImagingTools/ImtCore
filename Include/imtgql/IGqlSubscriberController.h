@@ -2,7 +2,6 @@
 
 
 // ImtCore includes
-#include <imtbase/CTreeItemModel.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtrest/IRequest.h>
 
@@ -23,8 +22,8 @@ public:
 		Register subscriprion for a GraphQL-based request.
 	*/
 	virtual bool RegisterSubscribtion(
-				const QByteArray& subscriptionId, 
-				const imtgql::CGqlRequest& gqlRequest,  
+				const QByteArray& subscriptionId,
+				const imtgql::CGqlRequest& gqlRequest,
 				const imtrest::IRequest& networkRequest,
 				QString& errorMessage) = 0;
 	virtual bool UnRegisterSubscribtion(const QByteArray& subscriptionId) = 0;

@@ -39,7 +39,6 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(LoginLog, ilog::IMessageConsumer, ExtractLoginLog);
 		I_ASSIGN(m_loginCompPtr, "Login", "Login", false, "Login");
 		I_ASSIGN(m_superuserProviderCompPtr, "SuperuserProvider", "Superuser provider", false, "SuperuserProvider");
-		I_ASSIGN(m_settingsProviderCompPtr, "SettingsProvider", "Application settings provider", false, "SettingsProvider");
 		I_ASSIGN(m_superuserControllerCompPtr, "SuperuserController", "Superuser controller", false, "SuperuserController");
 		I_ASSIGN(m_connectionStatusProviderCompPtr, "ConnectionStatusProvider", "Connection status provider", false, "ConnectionStatusProvider");
 	I_END_COMPONENT;
@@ -125,7 +124,6 @@ private:
 	I_REF(imtauth::ISuperuserProvider, m_superuserProviderCompPtr);
 	I_REF(imtauth::ISuperuserController, m_superuserControllerCompPtr);
 	I_REF(iauth::ILogin, m_loginCompPtr);
-	I_REF(iqt::ISettingsProvider, m_settingsProviderCompPtr);
 	I_REF(imtcom::IConnectionStatusProvider, m_connectionStatusProviderCompPtr);
 
 	imtbase::TModelUpdateBinder<iauth::ILogin, CStandardLoginGuiComp> m_loginObserver;

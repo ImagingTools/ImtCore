@@ -242,8 +242,8 @@ void CProductInstanceInfoViewComp::on_LoadLicenseButton_clicked()
 			else{
 				ilog::CMessageContainer::Messages messages = log.GetMessages();
 
-				if (!messages.isEmpty()){
-					QMessageBox::critical(GetWidget(), tr("License Manager"), messages[0]->GetInformationDescription());
+				if (!messages.empty()){
+					QMessageBox::critical(GetWidget(), tr("License Manager"), messages.front()->GetInformationDescription());
 				}
 				else{
 					QMessageBox::critical(GetWidget(), tr("License Manager"), tr("License could not be imported"));

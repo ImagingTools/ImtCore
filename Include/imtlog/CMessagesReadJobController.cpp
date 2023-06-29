@@ -135,15 +135,15 @@ void CMessagesReadJobController::ProcessJob(Job& job)
 		CMessagesReader::EventContainerList::const_iterator it = containerListPtr->begin();
 		while (it != containerListPtr->end()){
 			ilog::IMessageContainer::Messages messages = (*it)->GetMessages();
-			for (int i = messages.count() - 1; i >= 0; i--){
+			for (ilog::IMessageContainer::Messages::reverse_iterator rit = messages.rbegin(); rit != messages.rend(); rit++) {
 				if (job.filterPtr != nullptr){
-					if(		job.filterParams.GetFilterTimeRange().Contains(messages[i]->GetInformationTimeStamp()) &&
-							job.filterPtr->IsMessageAccepted(*messages[i], &job.filterParams)){
-						job.containerPtr->AddMessage(messages[i]);
+					if(		job.filterParams.GetFilterTimeRange().Contains((*rit)->GetInformationTimeStamp()) &&
+							job.filterPtr->IsMessageAccepted(*(*rit), &job.filterParams)){
+						job.containerPtr->AddMessage((*rit));
 					}
 				}
 				else{
-					job.containerPtr->AddMessage(messages[i]);
+					job.containerPtr->AddMessage((*rit));
 				}
 			}
 

@@ -53,9 +53,9 @@ IEventProvider::EventContainerPtr CEventHistoryControllerComp::GetEvents(
 		ilog::IMessageContainer::Messages messages = m_log.GetMessages();
 		locker.unlock();
 
-		for (int i = messages.count() - 1; i >= 0; i--){
-			if (filterPtr->IsMessageAccepted(*messages[i], filterParamsPtr)){
-				containerPtr->AddMessage(messages[i]);
+		for (ilog::IMessageContainer::Messages::reverse_iterator it = messages.rbegin(); it != messages.rend(); it++) {
+			if (filterPtr->IsMessageAccepted(*(*it), filterParamsPtr)){
+				containerPtr->AddMessage(*it);
 			}
 		}
 

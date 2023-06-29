@@ -18,17 +18,17 @@ namespace imtauthdb
 
 bool CSuperuserProviderComp::SuperuserExists() const
 {
-    if (m_userCollectionCompPtr.IsValid()){
-        iprm::CParamsSet filterParam;
-        iprm::CParamsSet paramsSet;
+	if (m_userCollectionCompPtr.IsValid()) {
+		iprm::CParamsSet filterParam;
+		iprm::CParamsSet paramsSet;
 
-        iprm::CTextParam suId;
-        suId.SetText(*m_superuserIdAttrPtr);
+		iprm::CTextParam suId;
+		suId.SetText(*m_superuserIdAttrPtr);
 
-        paramsSet.SetEditableParameter("Id", &suId);
-        filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
+		paramsSet.SetEditableParameter("Id", &suId);
+		filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
 
-        imtbase::ICollectionInfo::Ids userObjectIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+		imtbase::ICollectionInfo::Ids userObjectIds = m_userCollectionCompPtr->GetElementIds(0, -1, &filterParam);
 		for (const imtbase::ICollectionInfo::Id& userObjectId : userObjectIds){
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (m_userCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){

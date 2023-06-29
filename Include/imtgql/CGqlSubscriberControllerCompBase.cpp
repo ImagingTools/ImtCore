@@ -1,6 +1,7 @@
 #include <imtgql/CGqlSubscriberControllerCompBase.h>
 
-// Acf includes
+
+// ACF includes
 #include<istd/TDelPtr.h>
 #include<imod/IModel.h>
 
@@ -15,8 +16,8 @@ namespace imtgql
 
 
 // public methods
-CGqlSubscriberControllerCompBase::CGqlSubscriberControllerCompBase():
-			BaseClass()
+CGqlSubscriberControllerCompBase::CGqlSubscriberControllerCompBase()
+	:BaseClass()
 {
 }
 
@@ -85,7 +86,7 @@ bool CGqlSubscriberControllerCompBase::RegisterSubscribtion(
 
 	errorMessage = QT_TR_NOOP("Invalid permissions for " + userName);
 
-    return false;
+	return false;
 }
 
 
@@ -93,11 +94,11 @@ bool CGqlSubscriberControllerCompBase::UnRegisterSubscribtion(const QByteArray& 
 {
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		if (requestNetworks.networkRequests.contains(subscriptionId)){
-	  		requestNetworks.networkRequests.remove(subscriptionId);
+			requestNetworks.networkRequests.remove(subscriptionId);
 
 			return true;
 		}
- 	}
+	}
 
 	return false;
 }
@@ -162,14 +163,13 @@ bool CGqlSubscriberControllerCompBase::SetSubscriptions()
 }
 
 
-
-bool CGqlSubscriberControllerCompBase::StartInternalSubscriber(const imtgql::CGqlRequest &gqlRequest, QString &errorMessage) 
+bool CGqlSubscriberControllerCompBase::StartInternalSubscriber(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage)
 {
-    return true;
+	return true;
 }
 
 
-iprm::IParamsSet *CGqlSubscriberControllerCompBase::CreateContextParams(const imtgql::CGqlRequest &gqlRequest) const
+iprm::IParamsSet *CGqlSubscriberControllerCompBase::CreateContextParams(const imtgql::CGqlRequest& gqlRequest) const
 {
 	return nullptr;
 }

@@ -1,15 +1,16 @@
 #include <imtgql/CWebSocketServletComp.h>
 
 
+// Qt includes
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+
 // ImtCore includes
 #include <imtrest/IRequest.h>
 #include <imtrest/ISender.h>
 #include <imtrest/IResponse.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CWebSocketRequest.h>
-
-// Qt includes
-#include <QtCore/QJsonDocument>
 
 
 namespace imtgql
@@ -24,27 +25,25 @@ imtrest::IRequestServlet::ConstResponsePtr CWebSocketServletComp::ProcessRequest
 {
 	QByteArray commandId = request.GetCommandId();
 
-	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
-
 	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
 
 	if (webSocketRequest != nullptr){
 		switch (webSocketRequest->GetMethodType())
 		{
 		case imtrest::CWebSocketRequest::MT_CONNECTION_INIT:
-			return InitConnection(request);		
+			return InitConnection(request);
 			break;
 		
 		case imtrest::CWebSocketRequest::MT_START:
-			return RegisterSubscription(request);		
+			return RegisterSubscription(request);
 			break;
 
 		case imtrest::CWebSocketRequest::MT_STOP:
-			return UnRegisterSubscription(request);		
+			return UnRegisterSubscription(request);
 			break;
 
 		default:{
-			QByteArray errorMessage = QString("Method type not corrected: %1").arg(webSocketRequest->GetMethodType()).toUtf8();
+			QByteArray errorMessage = QString("Method type not correct: %1").arg(webSocketRequest->GetMethodType()).toUtf8();
 
 			return CreateErrorResponse(errorMessage, request);
 			}
@@ -135,13 +134,12 @@ imtrest::IRequestServlet::ConstResponsePtr CWebSocketServletComp::RegisterSubscr
 		return CreateErrorResponse(errorMessage, request);
 	}
 
-	imtrest::IRequestServlet::ConstResponsePtr();
+	return imtrest::IRequestServlet::ConstResponsePtr();
 }
 
 
 imtrest::IRequestServlet::ConstResponsePtr CWebSocketServletComp::UnRegisterSubscription(const imtrest::IRequest& request) const
 {
-	IGqlSubscriberController* subscriberControllerPtr = nullptr;
 	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
 	if (webSocketRequest == nullptr){
 		Q_ASSERT(false);
@@ -150,7 +148,8 @@ imtrest::IRequestServlet::ConstResponsePtr CWebSocketServletComp::UnRegisterSubs
 	}
 
 	for (int index = 0; index < m_gqlSubscriberControllersCompPtr.GetCount(); index++){
-		if (m_gqlSubscriberControllersCompPtr[index]->UnRegisterSubscribtion(webSocketRequest->GetSubscriptionId())){
+		IGqlSubscriberController* controlerPtr = m_gqlSubscriberControllersCompPtr[index];
+		if ((controlerPtr != nullptr) && m_gqlSubscriberControllersCompPtr[index]->UnRegisterSubscribtion(webSocketRequest->GetSubscriptionId())){
 
 			QByteArray data = QString(R""(
 {
@@ -175,8 +174,12 @@ imtrest::IRequestServlet::ConstResponsePtr CWebSocketServletComp::CreateDataResp
 	
 	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-	imtrest::IRequestServlet::ConstResponsePtr responsePtr(engine.CreateResponse(request, imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, data, reponseTypeId));
-
+	imtrest::IRequestServlet::ConstResponsePtr responsePtr(
+				engine.CreateResponse(
+							request,
+							imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
+							data,
+							reponseTypeId));
 
 	return responsePtr;
 }
@@ -202,7 +205,12 @@ imtrest::IRequestServlet::ConstResponsePtr CWebSocketServletComp::CreateErrorRes
 	
 	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-	imtrest::IRequestServlet::ConstResponsePtr responsePtr(engine.CreateResponse(request, imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body.toUtf8(), reponseTypeId));
+	imtrest::IRequestServlet::ConstResponsePtr responsePtr(
+				engine.CreateResponse(
+							request,
+							imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
+							body.toUtf8(),
+							reponseTypeId));
 
 	SendErrorMessage(0, QString(errorMessage));
 
@@ -210,14 +218,6 @@ imtrest::IRequestServlet::ConstResponsePtr CWebSocketServletComp::CreateErrorRes
 }
 
 
-void CWebSocketServletComp::OnComponentCreated() 
-{
-	BaseClass::OnComponentCreated();
-}
-
-
-
-
-} // namespace imtrest
+} // namespace imtgql
 
 

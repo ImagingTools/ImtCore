@@ -252,8 +252,8 @@ void CStandardLoginGuiComp::OnLoginUpdate(
 
 
 void CStandardLoginGuiComp::OnConnectionStatusChanged(
-		const istd::IChangeable::ChangeSet& /*changeSet*/,
-		const imtcom::IConnectionStatusProvider* objectPtr)
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const imtcom::IConnectionStatusProvider* objectPtr)
 {
 	if (objectPtr != nullptr){
 		imtcom::IConnectionStatusProvider::ConnectionStatus connectionStatus = objectPtr->GetConnectionStatus();
