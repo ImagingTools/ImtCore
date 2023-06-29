@@ -19,6 +19,11 @@ I_EXPORT_COMPONENT(
 			"Internet connection checker",
 			"Connection Internet");
 
+I_EXPORT_COMPONENT(
+			SimpleConnectionChecker,
+			"Simple internet connection checker",
+			"Simple Internet Connection Checker");
+
 
 } // namespace ImtComPck
 

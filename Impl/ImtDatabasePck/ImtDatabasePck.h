@@ -13,6 +13,8 @@
 #include <imtdb/CSqlJsonDatabaseDelegateComp.h>
 #include <imtdb/CStandardSqlMetaInfoTableDelegateComp.h>
 #include <imtdb/CDatabaseAutomaticBackupComp.h>
+#include <imtdb/CRemoteDatabaseServerConnectionComp.h>
+#include <imtdb/CDatabaseServerConnectionControllerComp.h>
 
 
 /**
@@ -29,6 +31,8 @@ typedef imtdb::CSqlDatabaseDocumentDelegateComp SqlDatabaseDocumentDelegate;
 typedef imtdb::CSqlJsonDatabaseDelegateComp SqlDatabaseJsonDelegate;
 typedef imtdb::CStandardSqlMetaInfoTableDelegateComp StandardMetaInfoTableDelegate;
 typedef imtdb::CDatabaseAutomaticBackupComp DatabaseAutomaticBackup;
+typedef imtdb::CRemoteDatabaseServerConnectionComp RemoteDatabaseServerConnection;
+typedef imtdb::CDatabaseServerConnectionControllerComp DatabaseServerConnectionController;
 
 
 } // namespace ImtDatabasePck

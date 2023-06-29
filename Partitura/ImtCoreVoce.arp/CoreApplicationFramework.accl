@@ -8,17 +8,21 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="ApiClient" X="425" Y="750" Note=""/>
         <Element ComponentName="ApplicationInfo" X="925" Y="75" Note=""/>
-        <Element ComponentName="CommandsMultiplexer" X="300" Y="625" Note=""/>
-        <Element ComponentName="GuiApplication" X="575" Y="250" Note=""/>
-        <Element ComponentName="InternetConnectionChecker" X="950" Y="750" Note=""/>
-        <Element ComponentName="MainGui" X="575" Y="375" Note=""/>
-        <Element ComponentName="MenuPanelVisibility" X="575" Y="625" Note=""/>
-        <Element ComponentName="PageNavigationController" X="200" Y="375" Note=""/>
-        <Element ComponentName="Pages" X="575" Y="525" Note=""/>
-        <Element ComponentName="SettingsProvider" X="925" Y="475" Note=""/>
+        <Element ComponentName="CommandsMultiplexer" X="275" Y="475" Note=""/>
+        <Element ComponentName="GraphQLClientEngine" X="175" Y="750" Note=""/>
+        <Element ComponentName="GuiApplication" X="575" Y="175" Note=""/>
+        <Element ComponentName="MainGui" X="575" Y="275" Note=""/>
+        <Element ComponentName="MenuPanelVisibility" X="575" Y="475" Note=""/>
+        <Element ComponentName="PageNavigationController" X="275" Y="275" Note=""/>
+        <Element ComponentName="Pages" X="575" Y="375" Note=""/>
+        <Element ComponentName="RemoteDatabaseServerConnection" X="225" Y="625" Note=""/>
+        <Element ComponentName="SettingsProvider" X="950" Y="375" Note=""/>
+        <Element ComponentName="SimpleConnectionChecker" X="950" Y="750" Note=""/>
         <Element ComponentName="SplashScreen" X="575" Y="75" Note=""/>
-        <Element ComponentName="StandardLoginGui" X="925" Y="625" Note=""/>
+        <Element ComponentName="StandardLoginGui" X="950" Y="475" Note=""/>
+        <Element ComponentName="SystemStatus" X="700" Y="625" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

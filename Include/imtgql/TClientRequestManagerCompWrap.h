@@ -46,7 +46,7 @@ protected:
 
 
 template<class Base>
-bool TClientRequestManagerCompWrap<Base>::SendModelRequest(const IGqlRequest & request, imtbase::CTreeItemModel& responseModel) const
+bool TClientRequestManagerCompWrap<Base>::SendModelRequest(const IGqlRequest& request, imtbase::CTreeItemModel& responseModel) const
 {
 	if (!m_apiClientCompPtr.IsValid()){
 		return false;
@@ -57,12 +57,6 @@ bool TClientRequestManagerCompWrap<Base>::SendModelRequest(const IGqlRequest & r
 	if (retVal){
 		imtbase::CTreeItemModel* resultModelPtr = responseHandler.GetResult();
 		if (resultModelPtr == nullptr){
-			return false;
-		}
-
-		QString json = resultModelPtr->toJSON();
-
-		if (resultModelPtr->ContainsKey("errors")){
 			return false;
 		}
 

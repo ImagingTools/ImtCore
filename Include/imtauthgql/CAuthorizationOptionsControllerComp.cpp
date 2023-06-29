@@ -9,7 +9,9 @@ namespace imtauthgql
 
 // reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-imtbase::CTreeItemModel* CAuthorizationOptionsControllerComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CAuthorizationOptionsControllerComp::CreateRepresentationFromRequest(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	rootModelPtr.SetPtr(BaseClass::CreateRepresentationFromRequest(gqlRequest, errorMessage));
@@ -43,7 +45,7 @@ imtbase::CTreeItemModel* CAuthorizationOptionsControllerComp::CreateRepresentati
 		}
 
 		if (m_databaseServerConnectionChekerCompPtr.IsValid()){
-			bool isConnected = m_databaseServerConnectionChekerCompPtr->IsDatabaseServerConnected();
+			bool isConnected = m_databaseServerConnectionChekerCompPtr->IsDatabaseServerConnected(errorMessage);
 			dataModelPtr->SetData("DatabaseConnectionState", isConnected);
 		}
 	}

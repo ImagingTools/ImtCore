@@ -27,12 +27,12 @@ bool CApiClientComp::SendRequest(const IGqlRequest& request, ResponseHandler& re
 {
 	bool retVal = false;
 
-	if (m_protocolEngineCompPtr.IsValid()) {
+	if (m_protocolEngineCompPtr.IsValid()){
 		IGqlRequest::RequestType requestType = request.GetRequestType();
-		if ((requestType == IGqlRequest::RT_QUERY) || (requestType == IGqlRequest::RT_MUTATION)) {
+		if ((requestType == IGqlRequest::RT_QUERY) || (requestType == IGqlRequest::RT_MUTATION)){
 			QNetworkRequest* networkRequestPtr = m_protocolEngineCompPtr->CreateNetworkRequest(request);
 
-			if (networkRequestPtr != nullptr) {
+			if (networkRequestPtr != nullptr){
 				QByteArray uuid = QUuid::createUuid().toByteArray();
 
 				istd::IInformationProvider::InformationCategory category = istd::IInformationProvider::IC_INFO;
@@ -43,8 +43,9 @@ bool CApiClientComp::SendRequest(const IGqlRequest& request, ResponseHandler& re
 				imtcom::CRequestSender requestSender;
 				QNetworkReply* replyPtr = requestSender.DoSyncPost(*networkRequestPtr, request.GetQuery(), m_timeout);
 
-				if (replyPtr != nullptr) {
-					if (replyPtr->error() == QNetworkReply::NoError) {
+				if (replyPtr != nullptr){
+					QNetworkReply::NetworkError error = replyPtr->error();
+					if (replyPtr->error() == QNetworkReply::NoError){
 						QByteArray payload = replyPtr->readAll();
 
 						responseHandler.OnReply(request, payload);
@@ -54,23 +55,23 @@ bool CApiClientComp::SendRequest(const IGqlRequest& request, ResponseHandler& re
 
 						retVal = true;
 					}
-					else {
+					else{
 						category = istd::IInformationProvider::IC_ERROR;
 						message = "Response for request ID " + uuid + "\n" + replyPtr->errorString();
 					}
 				}
-				else {
+				else{
 					category = istd::IInformationProvider::IC_ERROR;
 					message = "Response for request ID " + uuid + "\n" + replyPtr->errorString();
 				}
 
 				SendLogMessage(category, 0, message, "API Client");
 			}
-			else {
+			else{
 				SendErrorMessage(0, "Failed to create network request", "API Client");
 			}
 		}
-		else {
+		else{
 			SendErrorMessage(0, "Invalid request type", "API Client");
 		}
 	}

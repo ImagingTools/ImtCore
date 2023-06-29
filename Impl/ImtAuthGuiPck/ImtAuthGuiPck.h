@@ -14,6 +14,7 @@
 #include <imtauthgui/CDesignManagerComp.h>
 #include <imtauthgui/CStandardAccountMenuComp.h>
 #include <imtauthgui/CStandardLoginGuiComp.h>
+#include <imtauthgui/CRemoteStandardLoginGuiComp.h>
 
 
 namespace ImtAuthGuiPck
@@ -28,6 +29,7 @@ typedef imtauthgui::CAccountInfoViewDelegateComp AccountInfoViewDelegate;
 typedef icomp::TModelCompWrap<imtauthgui::CDesignManagerComp> DesignManager;
 typedef imtauthgui::CStandardAccountMenuComp StandardAccountMenu;
 typedef imtauthgui::CStandardLoginGuiComp StandardLoginGui;
+typedef imtauthgui::CRemoteStandardLoginGuiComp RemoteStandardLoginGui;
 
 
 } // namespace ImtAuthGuiPck

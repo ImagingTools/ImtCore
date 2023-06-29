@@ -325,6 +325,8 @@ Rectangle {
 
 
     function setWidth(){
+        console.log("setWidth");
+
         tableContainer.widthDecoratorDynamic.Clear();
         tableContainer.widthDecoratorDynamic.Copy(tableContainer.widthDecorator);
 

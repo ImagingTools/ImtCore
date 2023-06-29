@@ -15,7 +15,7 @@ public:
 	/**
 		Check if the database server is connected.
 	*/
-	virtual bool IsDatabaseServerConnected() const = 0;
+	virtual bool IsDatabaseServerConnected(QString& errorMessage) const = 0;
 };
 
 

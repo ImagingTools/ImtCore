@@ -214,6 +214,11 @@ I_EXPORT_COMPONENT(
 			"Selection param adapter",
 			"Selection SelectionParam Adapter");
 
+I_EXPORT_COMPONENT(
+			SystemStatus,
+			"System status",
+			"System Status");
+
 
 } // namespace ImtCorePck
 

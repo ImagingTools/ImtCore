@@ -58,7 +58,9 @@ Rectangle {
 
             onClicked: {
                 console.log("TabDelegate onClicked", list.model);
+                console.time('doSomething')
                 tabPanelContainer.selectedIndex = model.index;
+                console.timeEnd('doSomething')
             }
 
             onCloseSignal: {

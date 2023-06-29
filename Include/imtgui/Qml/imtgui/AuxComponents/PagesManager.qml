@@ -24,6 +24,7 @@ Item {
     }
 
     function clearModels(){
+        console.log("clearModels");
         pageModel.Clear();
         pagesData.model = 0;
     }

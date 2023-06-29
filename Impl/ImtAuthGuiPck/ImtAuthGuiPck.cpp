@@ -54,6 +54,11 @@ I_EXPORT_COMPONENT(
 			"Standard login gui",
 			"Login Logout Gui");
 
+I_EXPORT_COMPONENT(
+			RemoteStandardLoginGui,
+			"Remote Standard login gui",
+			"Remote Login Logout Gui");
+
 
 } // namespace ImtAuthGuiPck
 

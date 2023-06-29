@@ -21,8 +21,8 @@ namespace imtdb
 
 
 class CDatabaseAutomaticBackupComp:
-		public QObject,
-		public ilog::CLoggerComponentBase
+			public QObject,
+			public ilog::CLoggerComponentBase
 {
 	Q_OBJECT
 public:

@@ -144,7 +144,7 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQueryFromFile(const QString& filePath, con
 
 // reimplemented (IDatabaseServerConnectionChecker)
 
-bool CDatabaseEngineComp::IsDatabaseServerConnected() const
+bool CDatabaseEngineComp::IsDatabaseServerConnected(QString& errorMessage) const
 {
 	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, *m_maintenanceDatabaseNameAttrPtr);
 	maintainanceDb.setHostName(GetHostName());
@@ -156,6 +156,11 @@ bool CDatabaseEngineComp::IsDatabaseServerConnected() const
 	bool isConnected = maintainanceDb.open();
 
 	maintainanceDb.close();
+
+	if (!isConnected){
+		QSqlError sqlError = maintainanceDb.lastError();
+		errorMessage = sqlError.text();
+	}
 
 	return isConnected;
 }
@@ -475,7 +480,8 @@ bool CDatabaseEngineComp::EnsureDatabaseCreated() const
 {
 	bool isOpened = OpenDatabase();
 	if (!isOpened){
-		bool isServerConnected = IsDatabaseServerConnected();
+		QString errorMessage;
+		bool isServerConnected = IsDatabaseServerConnected(errorMessage);
 		if (isServerConnected){
 			if (*m_autoCreateDatabaseAttrPtr >= 1){
 				return CreateDatabase();

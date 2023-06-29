@@ -131,6 +131,7 @@ DocumentBase {
     }
 
     function updateFeaturesModel(){
+        console.log("updateFeaturesModel")
         productViewContainer.featuresModel.Clear();
 
         if (featuresProvider.model){
@@ -168,6 +169,7 @@ DocumentBase {
 
     function updateModel(){
         console.log("updateModel");
+        console.time('updateModel')
 
         if (productViewContainer.blockUpdatingModel){
             return;
@@ -201,9 +203,14 @@ DocumentBase {
         }
 
         undoRedoManager.endChanges();
+
+        console.timeEnd('updateModel')
+
     }
 
     function updateGui(){
+        console.time('updateGui')
+
         productViewContainer.blockUpdatingModel = true;
 
         let categoryId = productViewContainer.documentModel.GetData("CategoryId");
@@ -230,6 +237,8 @@ DocumentBase {
         dependenciesTable.elements = productViewContainer.licensesModel;
 
         productViewContainer.blockUpdatingModel = false;
+
+        console.timeEnd('updateGui')
     }
 
     function updateLicenseFeaturesModel(){

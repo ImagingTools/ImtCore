@@ -10,6 +10,18 @@
     <Description>ImagingTools application framework</Description>
     <Keywords>Application</Keywords>
     <ElementsList>
+        <Element Id="ApiClient" PackageId="ImtGqlPck" ComponentId="ApiClient">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GraphQLClientEngine"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="ApplicationInfo" PackageId="BasePck" ComponentId="ApplicationInfo">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -51,6 +63,15 @@
                     </AttributeInfo>
                     <AttributeInfo Id="CommandSelector" Type="Reference" ExportId="CommandSelector">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GraphQLClientEngine" PackageId="ImtGqlPck" ComponentId="GraphQLClientEngine">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Url" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="http://localhost:7788/Puma/graphql"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -102,15 +123,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="UseTrayIcon" Type="Boolean" ExportId="UseTrayIcon">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="InternetConnectionChecker" PackageId="ImtComPck" ComponentId="InternetConnectionChecker">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Url" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="http://localhost:8111"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -292,11 +304,29 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="RemoteDatabaseServerConnection" PackageId="ImtDatabasePck" ComponentId="RemoteDatabaseServerConnection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApiClient"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="SettingsProvider" PackageId="QtPck" ComponentId="ApplicationSettingsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SimpleConnectionChecker" PackageId="ImtComPck" ComponentId="SimpleConnectionChecker">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApiClient"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -337,12 +367,9 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="StandardLoginGui" PackageId="ImtAuthGuiPck" ComponentId="StandardLoginGui">
+        <Element Id="StandardLoginGui" PackageId="ImtAuthGuiPck" ComponentId="RemoteStandardLoginGui">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ConnectionStatusProvider" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="InternetConnectionChecker"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Login" Type="Reference" ExportId="Login">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -353,6 +380,27 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SuperuserProvider" Type="Reference" ExportId="SuperuserProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SystemStatus" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SystemStatus"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SystemStatus" PackageId="ImtCorePck" ComponentId="SystemStatus">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CheckInterval" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="1"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ConnectionStatusProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SimpleConnectionChecker"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseServerConnectionChecker" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RemoteDatabaseServerConnection"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

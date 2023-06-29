@@ -80,7 +80,7 @@ Rectangle {
 
     onWidthDecoratorChanged: {
         tableDelegateContainer.setWidth();
-	}
+    }
 
     onCellDecoratorChanged: {
         tableDelegateContainer.emptyDecorCell = !tableDelegateContainer.cellDecorator.GetItemsCount();
@@ -148,7 +148,7 @@ Rectangle {
     }
 
     function setWidth(){
-
+        console.log("Table delegate setWidth")
         tableDelegateContainer.widthDecoratorDynamic.Clear();
         tableDelegateContainer.widthDecoratorDynamic.Copy(tableDelegateContainer.widthDecorator);
 

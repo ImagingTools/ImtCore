@@ -50,6 +50,16 @@ I_EXPORT_COMPONENT(
 			"Database automatic backup",
 			"Database Automatic Backup PostgreSQL SQL");
 
+I_EXPORT_COMPONENT(
+			RemoteDatabaseServerConnection,
+			"Remote database server connection",
+			"Remote Database Server Connection");
+
+I_EXPORT_COMPONENT(
+			DatabaseServerConnectionController,
+			"Database server connection controller",
+			"Database Server Connection Controller");
+
 
 } // namespace ImtDatabasePck
 

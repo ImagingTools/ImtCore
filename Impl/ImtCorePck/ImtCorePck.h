@@ -47,6 +47,7 @@
 #include <imtbase/CSelectionComp.h>
 #include <imtbase/CSelectionAdapterComp.h>
 #include <imtbase/CSelectionParamAdapterComp.h>
+#include <imtbase/CSystemStatusComp.h>
 
 
 /**
@@ -107,6 +108,7 @@ typedef imtbase::CApplicationInfoRepresentationComp ApplicationInfoRepresentatio
 typedef icomp::TModelCompWrap<imtbase::CSelectionComp> Selection;
 typedef icomp::TModelCompWrap<imtbase::CSelectionAdapterComp> SelectionAdapter;
 typedef icomp::TModelCompWrap<imtbase::CSelectionParamAdapterComp> SelectionParamAdapter;
+typedef icomp::TModelCompWrap<imtbase::CSystemStatusComp> SystemStatus;
 
 
 } // namespace ImtCorePck

@@ -8,6 +8,7 @@
 
 // ImtCore includes
 #include <imtcom/CInternetConnectionCheckerComp.h>
+#include <imtcom/CSimpleConnectionCheckerComp.h>
 
 
 /**
@@ -18,6 +19,7 @@ namespace ImtComPck
 
 
 typedef icomp::TModelCompWrap<imtcom::CInternetConnectionCheckerComp> InternetConnectionChecker;
+typedef imtcom::CSimpleConnectionCheckerComp SimpleConnectionChecker;
 
 
 } // namespace ImtComPck

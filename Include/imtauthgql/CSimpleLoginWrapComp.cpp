@@ -25,18 +25,16 @@ CSimpleLoginWrapComp::CSimpleLoginWrapComp()
 
 iauth::CUser* CSimpleLoginWrapComp::GetLoggedUser() const
 {
-	if (!m_loggedUserId.isEmpty()){
-		if (m_userInfoPtr.IsValid()){
-			istd::TDelPtr<iauth::CUser> userPtr(new iauth::CUser);
+	if (!m_loggedUserId.isEmpty() && m_userInfoPtr.IsValid()){
+		istd::TDelPtr<iauth::CUser> userPtr(new iauth::CUser);
 
-			QByteArray passwordHash = m_userInfoPtr->GetPasswordHash();
-			userPtr->SetPassword(passwordHash);
+		QByteArray passwordHash = m_userInfoPtr->GetPasswordHash();
+		userPtr->SetPassword(passwordHash);
 
-			QByteArray username = m_userInfoPtr->GetId();
-			userPtr->SetUserName(username);
+		QByteArray username = m_userInfoPtr->GetId();
+		userPtr->SetUserName(username);
 
-			return userPtr.PopPtr();
-		}
+		return userPtr.PopPtr();
 	}
 
 	return nullptr;
@@ -45,10 +43,6 @@ iauth::CUser* CSimpleLoginWrapComp::GetLoggedUser() const
 
 bool CSimpleLoginWrapComp::Login(const QString& userName, const QString& password)
 {
-	if (!m_userInfoFactCompPtr.IsValid()){
-		return false;
-	}
-
 	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, "UserToken");
 	imtgql::CGqlObject inputObject("input");
 	inputObject.InsertField("Login", userName);
@@ -136,16 +130,6 @@ bool CSimpleLoginWrapComp::HasRight(
 QByteArray CSimpleLoginWrapComp::GetToken(const QByteArray& /*userId*/) const
 {
 	return m_loggedUserToken;
-}
-
-
-// protected methods
-
-// reimplemented (icomp::CComponentBase)
-
-void CSimpleLoginWrapComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
 }
 
 

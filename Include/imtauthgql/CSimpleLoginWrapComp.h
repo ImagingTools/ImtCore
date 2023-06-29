@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QThread>
+
 // ACF includes
 #include <icomp/CComponentBase.h>
 #include <iauth/ILogin.h>
@@ -56,13 +59,8 @@ public:
 	// reimplemented (imtauth::IAccessTokenProvider)
 	virtual QByteArray GetToken(const QByteArray& userId) const override;
 
-protected:
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-
 private:
 	bool RetrieveUserInfo(const QByteArray& userObjectId);
-	void CheckSuperuser();
 
 private:
 	QByteArray m_loggedUserId;

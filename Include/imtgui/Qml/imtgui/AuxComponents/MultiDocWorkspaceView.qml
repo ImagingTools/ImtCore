@@ -190,6 +190,9 @@ Item {
     }
 
     function closeDocument(itemId, force){
+        console.log("closeDocument", itemId, force);
+        console.log("workspaceView.documentsData1", workspaceView.documentsData.toJSON());
+
         if (force === undefined){
             force = false;
         }
@@ -198,6 +201,8 @@ Item {
         if (index < 0){
             index = tabPanelInternal.selectedIndex;
         }
+
+        console.log("index", index);
 
         if (index !== 0){
             let documentBase = workspaceView.documentsData.GetData("Item", index);
@@ -215,6 +220,8 @@ Item {
                 workspaceView.documentsData.RemoveItem(index);
             }
         }
+
+        console.log("workspaceView.documentsData2", workspaceView.documentsData.toJSON());
     }
 
     function saveDocument(documentId){
