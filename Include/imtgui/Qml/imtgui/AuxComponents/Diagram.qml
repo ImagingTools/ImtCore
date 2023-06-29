@@ -191,6 +191,7 @@ Item {
         anchors.top: parent.top;
         anchors.left: parent.left;
         anchors.right: parent.right;
+        width: parent.width/2;
 //        horizontalAlignment: Text.AlignLeft;
 //        verticalAlignment: Text.AlignVCenter;
         wrapMode: Text.WordWrap;
@@ -208,6 +209,8 @@ Item {
 
         anchors.top: parent.top;
         anchors.right: parent.right;
+        width: parent.width/2;
+        horizontalAlignment: Text.AlignRight;
         wrapMode: Text.WordWrap;
         font.pixelSize: diagram.fontSize;
         font.bold: true;
