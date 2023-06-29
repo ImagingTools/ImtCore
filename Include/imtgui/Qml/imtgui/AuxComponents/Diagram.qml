@@ -12,6 +12,7 @@ Item {
     height: 500;
 
     property string title: "Заголовок";
+    property string diagramName: "Название диаграммы";
     property string legendX: "Ось абсцисс";
     property string legendY: "Ось ординат";
     property string colorPositive: "yellow";
@@ -199,6 +200,21 @@ Item {
         color:  diagram.titleColor;
 
         text: diagram.title;
+
+    }
+
+    Text {
+        id: diagramNameText;
+
+        anchors.top: parent.top;
+        anchors.right: parent.right;
+        wrapMode: Text.WordWrap;
+        font.pixelSize: diagram.fontSize;
+        font.bold: true;
+        font.family: Style.fontFamily;
+        color:  diagram.valueColor;
+
+        text: diagram.diagramName;
 
     }
 

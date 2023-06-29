@@ -13,6 +13,7 @@ Rectangle {
     property string state;
 
     property alias tokenProvider: userTokenProvider;
+    property alias login: userTokenProvider.login;
 
     property int mainRadius: 3;
     property string mainColor: Style.backgroundColor;
