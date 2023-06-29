@@ -27,9 +27,12 @@ Item {
     property int minValue: 0;
     property real maxValue: 100;
     property real maxAxeYValue: 100;
-    property real minWidth: Math.max((axeYValuesContainer.width + axeY.width + barsList.contentWidth + barsList.anchors.leftMargin + barsSpace.anchors.rightMargin + legendXTextRight.width),
-                                     titleText.width, legendXText.width, legendYText.width);
+//    property real minWidth: Math.max((axeYValuesContainer.width + axeY.width + barsList.contentWidth + barsList.anchors.leftMargin + barsSpace.anchors.rightMargin + legendXTextRight.width),
+//                                     titleText.width, legendXText.width, legendYText.width, 400);
 
+
+    property real minWidth: Math.max((axeYValuesContainer.width + axeY.width + barsList.contentWidth + barsList.anchors.leftMargin + barsSpace.anchors.rightMargin + legendXTextRight.width),
+                                        400);
 
 
     property string backgroundColor: "transparent";
@@ -71,7 +74,7 @@ Item {
                 }
                 average = summ/count;
                 delta = lastVal - firstVal;
-                minVal = Math.trunc(firstVal/10) * 10;
+                minVal = Math.trunc(firstVal);
             }
 
             diagram.minValue = minVal;
@@ -117,7 +120,7 @@ Item {
             }
             else {
                 val = diagram.roundDigit((diagram.maxValue/4 * i),false);
-                let valToModel = val + diagram.minValue;
+                let valToModel = Math.trunc((val + diagram.minValue)*100)/100;
                 axeYValueModel.append({"text" : valToModel})
             }
         }
@@ -191,9 +194,8 @@ Item {
         anchors.top: parent.top;
         anchors.left: parent.left;
         anchors.right: parent.right;
+
         width: parent.width/2;
-//        horizontalAlignment: Text.AlignLeft;
-//        verticalAlignment: Text.AlignVCenter;
         wrapMode: Text.WordWrap;
         font.pixelSize: diagram.fontSize;
         font.bold: true;
@@ -209,11 +211,12 @@ Item {
 
         anchors.top: parent.top;
         anchors.right: parent.right;
+
         width: parent.width/2;
         horizontalAlignment: Text.AlignRight;
         wrapMode: Text.WordWrap;
         font.pixelSize: diagram.fontSize;
-        font.bold: true;
+        font.bold: false;
         font.family: Style.fontFamily;
         color:  diagram.valueColor;
 
