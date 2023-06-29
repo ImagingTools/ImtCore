@@ -518,6 +518,16 @@ export class ListView extends Flickable {
         return undefined
 
     }
+    $clear(){
+        while(this.$items.length){
+            let obj = this.$items.pop()
+            if(obj) obj.$destroy()
+        }
+        while(this.$cache.length){
+            let obj = this.$cache.pop()
+            if(obj) obj.$destroy()
+        }
+    }
     $remove(index, count){
         let removed = this.$items.splice(index, count)
         while(removed.length){

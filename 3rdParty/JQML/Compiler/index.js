@@ -860,7 +860,8 @@ function compile(instructions, code, curr = '$root', prev = ''){
     for(let prop in instructions.propertiesLazy){
         let val = instructions.propertiesLazy[prop]
         if(prop === 'visible'){
-            code.push(`${curr}.$sP(\`${prop}\`, function(){return this.parent.visible && ${val}}.bind(${curr}))`)
+            if(val[val.length-1] === ';') val = val.slice(0, val.length-1)
+            code.push(`${curr}.$sP(\`${prop}\`, function(){return this.parent.visible && (${val})}.bind(${curr}))`)
         } else {
             code.push(`${curr}.$sP(\`${prop}\`, function(){return ${val}}.bind(${curr}))`)
         }

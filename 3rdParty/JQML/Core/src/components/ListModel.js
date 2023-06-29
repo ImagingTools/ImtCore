@@ -81,6 +81,7 @@ export class ListModel extends QtObject {
         this.data = []
         
         for(let key in this.$deps){
+            this.$deps[key].$clear()
             this.$deps[key].$updateView()
         }
         this.count = 0

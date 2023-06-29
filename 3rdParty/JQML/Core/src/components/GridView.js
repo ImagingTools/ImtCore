@@ -150,7 +150,7 @@ export class GridView extends Flickable {
             this.contentY = this.contentItem.children[index].y - (this.height - this.contentItem.children[index].height)
         }
     }
-
+    $clear(){}
     $insert(index){
         if(this.model && this.delegate){
             let childRecursive = (obj, indx)=>{

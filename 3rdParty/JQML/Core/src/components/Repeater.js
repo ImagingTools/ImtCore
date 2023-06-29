@@ -46,6 +46,7 @@ export class Repeater extends Item {
     itemAt(index){
         return index >= 0 && index < this.children.length ? this.children[index] : undefined
     }
+    $clear(){}
     $insert(index){
         let pos = this.parent.children.indexOf(this)
         if(this.model && this.delegate){
