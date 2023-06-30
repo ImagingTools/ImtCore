@@ -19,13 +19,13 @@ CSystemStatusComp::CSystemStatusComp()
 ISystemStatus::SystemStatus CSystemStatusComp::GetSystemStatus(QString& errorMessage) const
 {
 	if (m_status == ISystemStatus::SystemStatus::SS_SERVER_CONNECTION_ERROR){
-		errorMessage = QObject::tr("Server connection error");
+		errorMessage = tr("Server connection error");
 	}
 	else if (m_status == ISystemStatus::SystemStatus::SS_DATABASE_CONNECTION_ERROR){
 		errorMessage = m_errorMessage;
 	}
 	else if (m_status == ISystemStatus::SystemStatus::SS_UNKNOWN_ERROR){
-		errorMessage = QObject::tr("Unknown error");
+		errorMessage = tr("Unknown error");
 	}
 
 	return m_status;
@@ -40,7 +40,7 @@ void CSystemStatusComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	QObject::connect(&m_checkStatusThread, &QThread::finished, this, &CSystemStatusComp::OnCheckStatusFinished, Qt::QueuedConnection);
+	connect(&m_checkStatusThread, &QThread::finished, this, &CSystemStatusComp::OnCheckStatusFinished, Qt::QueuedConnection);
 
 	if (m_connectionStatusProviderCompPtr.IsValid() && m_dbServerConnectionCheckerCompPtr.IsValid()){
 		m_checkStatusThread.Start();

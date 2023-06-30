@@ -1,4 +1,4 @@
-import QtQuick 2.15
+import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 import QtQuick.Dialogs 1.3

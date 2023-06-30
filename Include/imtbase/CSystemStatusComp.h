@@ -22,7 +22,6 @@ class CSystemStatusComp:
 			public ilog::CLoggerComponentBase,
 			virtual public imtbase::ISystemStatus
 {
-	Q_OBJECT
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 

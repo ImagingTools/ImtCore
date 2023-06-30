@@ -8,7 +8,7 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="Application" X="475" Y="175" Note=""/>
+        <Element ComponentName="Application" X="175" Y="175" Note=""/>
         <Element ComponentName="ApplicationInfo" X="850" Y="175" Note=""/>
         <Element ComponentName="ConsoleLog" X="175" Y="450" Note=""/>
         <Element ComponentName="LogFilePath" X="850" Y="700" Note=""/>
