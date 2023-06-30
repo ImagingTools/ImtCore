@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5075" Description="ACF"/>
+            <Version Id="1" Number="2183" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ApiClient" X="575" Y="300" Note=""/>
+        <Element ComponentName="GraphQLClientEngine" X="575" Y="525" Note=""/>
+        <Element ComponentName="RemoteDatabaseServerConnection" X="200" Y="300" Note=""/>
+        <Element ComponentName="SimpleConnectionChecker" X="950" Y="300" Note=""/>
+        <Element ComponentName="SystemStatus" X="550" Y="100" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
