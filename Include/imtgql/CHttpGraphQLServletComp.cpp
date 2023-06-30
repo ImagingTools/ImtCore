@@ -36,7 +36,7 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 	QByteArray accessToken = headers.value("X-authentication-token");
 	if (!accessToken.isEmpty() && m_gqlContextControllerCompPtr.IsValid()){
-		imtgql::IGqlContext* gqlContextPtr = m_gqlContextControllerCompPtr->GetGqlContext(gqlRequest, accessToken);
+		imtgql::IGqlContext* gqlContextPtr = m_gqlContextControllerCompPtr->GetRequestContext(gqlRequest, accessToken);
 		if (gqlContextPtr != nullptr){
 			QByteArray token = gqlContextPtr->GetToken();
 			gqlRequest.SetGqlContext(gqlContextPtr);

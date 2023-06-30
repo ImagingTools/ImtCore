@@ -36,7 +36,7 @@ public:
 	virtual QByteArray GetCommandId() const override;
 	virtual RequestType GetRequestType() const override;
 	virtual QByteArray GetQuery() const override;
-	virtual imtgql::IGqlContext* GetGqlContext() const override;
+	virtual imtgql::IGqlContext* GetRequestContext() const override;
 	virtual bool ParseQuery(const QByteArray& query, int &errorPosition);
 
 	// reimplemented (iser::IObject)

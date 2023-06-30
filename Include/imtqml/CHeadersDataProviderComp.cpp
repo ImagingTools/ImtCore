@@ -24,7 +24,7 @@ imtbase::CTreeItemModel* CHeadersDataProviderComp::CreateInternalResponse(const 
 	istd::TDelPtr<imtbase::CTreeItemModel> dataModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* headersModelPtr = dataModelPtr->AddTreeModel("Headers");
 
-	imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetGqlContext();
+	imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 
 	QByteArray languageId;
 	if(gqlContextPtr != nullptr){

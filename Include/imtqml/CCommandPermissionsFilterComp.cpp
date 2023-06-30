@@ -15,7 +15,7 @@ imtbase::CTreeItemModel* CCommandPermissionsFilterComp::CreateRepresentationFrom
 		return nullptr;
 	}
 
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetGqlContext();
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
 		imtbase::CTreeItemModel* commandsModelPtr = m_commandsProviderCompPtr->CreateResponse(gqlRequest, errorMessage);
 		if (commandsModelPtr != nullptr){

@@ -31,7 +31,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlContextController)
-	virtual imtgql::IGqlContext* GetGqlContext(const imtgql::CGqlRequest& gqlRequest, const QByteArray& token) const override;
+	virtual imtgql::IGqlContext* GetRequestContext(const imtgql::CGqlRequest& gqlRequest, const QByteArray& token) const override;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_sessionCollectionCompPtr);

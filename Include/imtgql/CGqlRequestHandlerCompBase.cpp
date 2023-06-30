@@ -32,8 +32,8 @@ imtbase::CTreeItemModel* CGqlRequestHandlerCompBase::CreateResponse(const CGqlRe
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
 	QString userName;
-	if (gqlRequest.GetGqlContext() != nullptr){
-		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetGqlContext()->GetUserInfo();
+	if (gqlRequest.GetRequestContext() != nullptr){
+		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetRequestContext()->GetUserInfo();
 
 		if (userInfoPtr != nullptr){
 			userName = userInfoPtr->GetName();
@@ -60,7 +60,7 @@ iprm::IParamsSet* CGqlRequestHandlerCompBase::CreateContextParams(const imtgql::
 bool CGqlRequestHandlerCompBase::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	bool result = true;
-	if (gqlRequest.GetGqlContext() != nullptr){
+	if (gqlRequest.GetRequestContext() != nullptr){
 		const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
 		QByteArray productId;
 		if (!paramsPtr.empty()){
@@ -69,7 +69,7 @@ bool CGqlRequestHandlerCompBase::CheckPermissions(const imtgql::CGqlRequest& gql
 
 		QByteArray gqlCommand = gqlRequest.GetCommandId();
 
-		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetGqlContext()->GetUserInfo();
+		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetRequestContext()->GetUserInfo();
 		if (userInfoPtr != nullptr){
 			QByteArray userId = userInfoPtr->GetId();
 			if (!userInfoPtr->IsAdmin()){

@@ -37,7 +37,7 @@ imtbase::CTreeItemModel* CPageDataProviderComp::CreateInternalResponse(const imt
 	}
 
 	QByteArray languageId;
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetGqlContext();
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	if (gqlContextPtr != nullptr){
 		languageId = gqlContextPtr->GetLanguageId();
 	}

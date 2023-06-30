@@ -1,9 +1,6 @@
 #pragma once
 
 
-// ACF includes
-#include <istd/IPolymorphic.h>
-
 // ImtCore includes
 #include <imtgql/IGqlContext.h>
 #include <imtgql/CGqlRequest.h>
@@ -13,10 +10,13 @@ namespace imtgql
 {
 
 
+/**
+	\todo Rename it to IGqlContextProvider and replace CGqlRequest by IGqlRequest in GetRequestContext
+*/
 class IGqlContextController: virtual public istd::IPolymorphic
 {
 public:
-	virtual imtgql::IGqlContext* GetGqlContext(const imtgql::CGqlRequest& gqlRequest, const QByteArray& token) const = 0;
+	virtual imtgql::IGqlContext* GetRequestContext(const imtgql::CGqlRequest& gqlRequest, const QByteArray& token) const = 0;
 };
 
 

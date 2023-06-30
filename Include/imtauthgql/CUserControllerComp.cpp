@@ -293,7 +293,7 @@ imtbase::CTreeItemModel* CUserControllerComp::DeleteObject(
 	}
 
 	if (!removedUserId.isEmpty()){
-		imtgql::IGqlContext* contextPtr = gqlRequest.GetGqlContext();
+		imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 		if (contextPtr != nullptr){
 			const imtauth::IUserInfo* userInfoPtr = contextPtr->GetUserInfo();
 			if (userInfoPtr != nullptr){

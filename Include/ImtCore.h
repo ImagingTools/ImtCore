@@ -11,11 +11,17 @@ which can find a general application in every software product.
 
 \defgroup Collection Collection
 \section Motivation Motivation
-One of the most important aspects in software development is the definition and implementation of the data layer.
-A common task here is to group data. Every software product manages sets of objects.
-The aim of the collection module is to standardize this management through a set of general interfaces and the associated implementations
+One of the most important aspects in the software development is the definition and implementation of the data layer.
+A general task here is the grouping of data, since we can assume that any software product must manage sets of entities. We call such sets of entities - Collection.
+The typical requirements for an entity collection are:
+- Iterations over the collection
+- Searching for entities based on one or more conditions
+- Filtering of entities
+- Reading and writing of entity data
+
+The aim of the collection module is to standardize the working with object collections through a set of general interfaces and the associated implementations
 \section Introduction Introduction
-A collection is a container of items. We do not know anything about the structure or implementation detailes of items in the container.
+A collection is a container of items. We do not know anything about the structure or implementation detailes of the items in the container.
 The only thing we know about this container is that the items, that are located there, can be clearly identified (e.g. via a UUID).
 With regard to a collection, we therefore differentiate between two types of interfaces:
 - Accessing to the items inside a collection

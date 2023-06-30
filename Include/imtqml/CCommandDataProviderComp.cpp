@@ -25,7 +25,7 @@ imtbase::CTreeItemModel* CCommandDataProviderComp::CreateInternalResponse(const 
 		}
 	}
 
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetGqlContext();
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 
 	QByteArray languageId;
 	if(gqlContextPtr != nullptr){

@@ -11,7 +11,9 @@
 namespace imtgql
 {
 
-
+/**
+	\todo Move to imtrest. This is a general interface, rename it to IClientContextCacheController
+*/
 class IGqlContextCacheController: virtual public istd::IPolymorphic
 {
 public:

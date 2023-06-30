@@ -45,7 +45,7 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 {
 	QNetworkRequest* networkRequest = new QNetworkRequest();
 	networkRequest->setUrl(QUrl(m_workingUrl));
-	imtgql::IGqlContext* contextPtr = request.GetGqlContext();
+	imtgql::IGqlContext* contextPtr = request.GetRequestContext();
 	if (contextPtr != nullptr){
 		QByteArray token = contextPtr->GetToken();
 		if (!token.isEmpty()){

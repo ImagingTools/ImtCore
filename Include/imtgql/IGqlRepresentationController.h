@@ -13,8 +13,12 @@ namespace imtgql
 class IGqlRepresentationController: virtual public istd::IPolymorphic
 {
 public:
-	virtual imtbase::CTreeItemModel* CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const = 0;
-	virtual bool UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const = 0;
+	virtual imtbase::CTreeItemModel* CreateRepresentationFromRequest(
+				const imtgql::CGqlRequest& gqlRequest,
+				QString& errorMessage) const = 0;
+	virtual bool UpdateModelFromRepresentation(
+				const imtgql::CGqlRequest& request,
+				imtbase::CTreeItemModel* representationPtr) const = 0;
 };
 
 

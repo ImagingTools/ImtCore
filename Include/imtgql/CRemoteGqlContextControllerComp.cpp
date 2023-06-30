@@ -26,7 +26,7 @@ CRemoteGqlContextControllerComp::CRemoteGqlContextControllerComp()
 
 // reimplemented (imtgql::IGqlContextController)
 
-imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetGqlContext(const imtgql::CGqlRequest& gqlRequest, const QByteArray& token) const
+imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(const imtgql::CGqlRequest& gqlRequest, const QByteArray& token) const
 {
 	QMutexLocker lock(&m_mutex);
 
@@ -37,7 +37,7 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetGqlContext(const imtgql
 		return gqlContextPtr.PopPtr();
 	}
 
-	if (!m_gqlRequestCompPtr.IsValid()){
+	if (!m_gqlRequestHandlerCompPtr.IsValid()){
 		return nullptr;
 	}
 
@@ -63,14 +63,14 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetGqlContext(const imtgql
 	sessionGqlRequest.SetGqlContext(sessionGqlContextPtr);
 
 	QString errorMessage;
-	imtbase::CTreeItemModel* sessionModelPtr = m_gqlRequestCompPtr->CreateResponse(sessionGqlRequest, errorMessage);
-	if (sessionModelPtr == nullptr){
+	imtbase::CTreeItemModel* userSessionModelPtr = m_gqlRequestHandlerCompPtr->CreateResponse(sessionGqlRequest, errorMessage);
+	if (userSessionModelPtr == nullptr){
 		return nullptr;
 	}
 
 	QByteArray userId;
-	if (sessionModelPtr->ContainsKey("data")){
-		imtbase::CTreeItemModel* dataModelPtr = sessionModelPtr->GetTreeItemModel("data");
+	if (userSessionModelPtr->ContainsKey("data")){
+		imtbase::CTreeItemModel* dataModelPtr = userSessionModelPtr->GetTreeItemModel("data");
 		if (dataModelPtr != nullptr){
 			if (dataModelPtr->ContainsKey("UserId")){
 				userId = dataModelPtr->GetData("UserId").toByteArray();
@@ -100,7 +100,7 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetGqlContext(const imtgql
 
 		gqlUserRequest.SetGqlContext(userGqlContextPtr);
 
-		imtbase::CTreeItemModel* userModelPtr = m_gqlRequestCompPtr->CreateResponse(gqlUserRequest, errorMessage);
+		imtbase::CTreeItemModel* userModelPtr = m_gqlRequestHandlerCompPtr->CreateResponse(gqlUserRequest, errorMessage);
 		if (userModelPtr == nullptr){
 			return nullptr;
 		}
@@ -192,6 +192,7 @@ void CRemoteGqlContextControllerComp::OnComponentCreated()
 void CRemoteGqlContextControllerComp::OnComponentDestroyed()
 {
 	ClearCache();
+
 	BaseClass::OnComponentDestroyed();
 }
 
@@ -201,6 +202,7 @@ void CRemoteGqlContextControllerComp::OnComponentDestroyed()
 void CRemoteGqlContextControllerComp::ClearCache()
 {
 	qDeleteAll(m_cacheMap);
+
 	m_cacheMap.clear();
 }
 

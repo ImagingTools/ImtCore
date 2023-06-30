@@ -2,11 +2,7 @@
 
 
 // ACF includes
-#include <iprm/CParamsSet.h>
 #include <istd/TOptDelPtr.h>
-
-// ImtCore includes
-#include <imtauth/CUserSettings.h>
 
 
 namespace imtgql
@@ -34,7 +30,7 @@ imtbase::CTreeItemModel* CUserSettingsControllerComp::CreateRepresentationFromRe
 	}
 
 	// Get user-ID from GqlContext
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetGqlContext();
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	QByteArray userId;
 	if (gqlContextPtr != nullptr){
 		imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();
@@ -96,7 +92,7 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 	}
 
 	// Get user-ID from GqlContext
-	const imtgql::IGqlContext* gqlContextPtr = request.GetGqlContext();
+	const imtgql::IGqlContext* gqlContextPtr = request.GetRequestContext();
 	QByteArray userId;
 	if (gqlContextPtr != nullptr){
 		imtauth::IUserInfo* userInfoPtr = gqlContextPtr->GetUserInfo();

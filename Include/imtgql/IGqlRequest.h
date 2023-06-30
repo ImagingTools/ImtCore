@@ -38,7 +38,7 @@ public:
 	virtual QByteArray GetCommandId() const = 0;
 	virtual RequestType GetRequestType() const = 0;
 	virtual QByteArray GetQuery() const = 0;
-	virtual imtgql::IGqlContext* GetGqlContext() const = 0;
+	virtual imtgql::IGqlContext* GetRequestContext() const = 0;
 };
 
 

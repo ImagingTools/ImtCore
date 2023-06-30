@@ -196,7 +196,7 @@ QByteArray CGqlRequest::GetQuery() const
 }
 
 
-IGqlContext* CGqlRequest::GetGqlContext() const
+IGqlContext* CGqlRequest::GetRequestContext() const
 {
 	return m_gqlContextPtr;
 }

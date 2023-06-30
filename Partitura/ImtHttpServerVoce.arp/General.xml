@@ -16,7 +16,7 @@
     </VersionInfos>
   </AcfHeader>
   <Description>
-    Web-service related components of the ImagingTools SDK
+    Web-service (HTTP) related components of the ImagingTools SDK
   </Description>
   <Keywords>
     Company='ImagingTools' Project='"ImagingTools Core Framework"'

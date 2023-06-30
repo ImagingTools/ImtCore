@@ -17,6 +17,7 @@ namespace imtgql
 
 /**
 	Common interface for a GraphQL context.
+	\todo Move to imtrest. This is a general interface, rename it to IClientRequestContext
 */
 class IGqlContext: virtual public iser::IObject
 {

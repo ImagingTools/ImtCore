@@ -76,8 +76,8 @@ bool CGqlSubscriberControllerCompBase::RegisterSubscribtion(
 	}
 
 	QString userName;
-	if (gqlRequest.GetGqlContext() != nullptr){
-		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetGqlContext()->GetUserInfo();
+	if (gqlRequest.GetRequestContext() != nullptr){
+		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetRequestContext()->GetUserInfo();
 
 		if (userInfoPtr != nullptr){
 			userName = userInfoPtr->GetName();
@@ -178,8 +178,8 @@ iprm::IParamsSet *CGqlSubscriberControllerCompBase::CreateContextParams(const im
 bool CGqlSubscriberControllerCompBase::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	bool result = true;
-	if (gqlRequest.GetGqlContext() != nullptr){
-		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetGqlContext()->GetUserInfo();
+	if (gqlRequest.GetRequestContext() != nullptr){
+		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetRequestContext()->GetUserInfo();
 		Q_ASSERT(userInfoPtr != nullptr);
 		if (userInfoPtr != nullptr){
 			QByteArray userId = userInfoPtr->GetId();

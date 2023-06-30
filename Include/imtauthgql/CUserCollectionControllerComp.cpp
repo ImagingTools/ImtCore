@@ -133,7 +133,7 @@ bool CUserCollectionControllerComp::SetupGqlItem(
 
 	if (!informationIds.isEmpty()){
 		const imtauth::IUserInfo* contextUserInfoPtr = nullptr;
-		const imtgql::IGqlContext* contextPtr = gqlRequest.GetGqlContext();
+		const imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
 		if (contextPtr != nullptr){
 			contextUserInfoPtr = contextPtr->GetUserInfo();
 		}

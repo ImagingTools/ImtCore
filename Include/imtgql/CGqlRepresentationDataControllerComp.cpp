@@ -91,8 +91,8 @@ iprm::IParamsSet* CGqlRepresentationDataControllerComp::CreateContextParams(cons
 	}
 
 	istd::TDelPtr<iprm::CParamsSet> paramsPtr = new imod::TModelWrap<iprm::CParamsSet>();
-	if (gqlRequest.GetGqlContext() != nullptr){
-		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetGqlContext()->GetUserInfo();
+	if (gqlRequest.GetRequestContext() != nullptr){
+		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetRequestContext()->GetUserInfo();
 		Q_ASSERT(userInfoPtr != nullptr);
 		if (userInfoPtr != nullptr){
 			istd::TDelPtr<imtauth::IUserInfo> userInfoParamPtr;
@@ -104,7 +104,7 @@ iprm::IParamsSet* CGqlRepresentationDataControllerComp::CreateContextParams(cons
 		}
 
 		istd::TDelPtr<iprm::IIdParam> languageIdParam = new iprm::CIdParam();
-		languageIdParam->SetId(gqlRequest.GetGqlContext()->GetLanguageId());
+		languageIdParam->SetId(gqlRequest.GetRequestContext()->GetLanguageId());
 
 		paramsPtr->SetEditableParameter("LanguageParam", languageIdParam.PopPtr(), true);
 
