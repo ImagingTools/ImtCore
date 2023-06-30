@@ -15,6 +15,11 @@ Item {
     property int mainMargin: 0;
     property int panelWidth: 400;
 
+    Rectangle{
+            anchors.fill: parent;
+            color: Style.backgroundColor;
+        }
+
     onBlockUpdatingModelChanged: {
         Events.sendEvent("DocumentUpdating", roleEditorContainer.blockUpdatingModel);
     }
@@ -207,6 +212,7 @@ Item {
 
         anchors.top: parent.top;
         anchors.left: parent.left;
+        anchors.leftMargin: 10;
 
         width: roleEditorContainer.panelWidth;
         height: bodyColumn.height + 2*bodyColumn.anchors.topMargin;
@@ -228,8 +234,16 @@ Item {
 
             spacing: 10;
 
+            Item{
+                width: parent.width;
+                height: 1;
+            }
+
             Text {
                 id: titleRoleName;
+
+                anchors.left: parent.left;
+                anchors.leftMargin: 5;
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
@@ -283,6 +297,9 @@ Item {
             Text {
                 id: titleRoleId;
 
+                anchors.left: parent.left;
+                anchors.leftMargin: 5;
+
                 color: Style.textColor;
                 font.family: Style.fontFamily;
                 font.pixelSize: Style.fontSize_common;
@@ -324,6 +341,9 @@ Item {
 
             Text {
                 id: titleDescription;
+
+                anchors.left: parent.left;
+                anchors.leftMargin: 5;
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
@@ -392,6 +412,8 @@ Item {
 
         anchors.top: columnContainer.bottom;
         anchors.topMargin: 10;
+        anchors.left: parent.left;
+        anchors.leftMargin: 10;
 
         color: Style.textColor;
         font.family: Style.fontFamily;
@@ -418,6 +440,9 @@ Item {
         anchors.topMargin: 10;
         anchors.bottom: parent.bottom;
         anchors.bottomMargin: 10;
+        anchors.left: parent.left;
+        anchors.leftMargin: 10;
+
 
         width: 400;
         checkable: true;
