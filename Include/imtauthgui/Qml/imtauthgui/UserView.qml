@@ -279,8 +279,10 @@ DocumentBase {
         anchors.bottom: parent.bottom;
         anchors.right: parent.right;
         anchors.topMargin: container.mainMargin;
-        anchors.leftMargin: container.mainMargin;
+        anchors.leftMargin: 10;//container.mainMargin;
         anchors.rightMargin: container.mainMargin;
+
+        color: Style.backgroundColor;
 
         Repeater {
             id: bodyRepeater;

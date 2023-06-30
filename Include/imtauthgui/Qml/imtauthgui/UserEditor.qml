@@ -132,8 +132,16 @@ Item {
 
                 spacing: 10;
 
+                Item{
+                    width: parent.width;
+                    height: 1;
+                }
+
                 Text {
                     id: titleUsername;
+
+                    anchors.left: parent.left;
+                    anchors.leftMargin: 5;
 
                     color: Style.textColor;
                     font.family: Style.fontFamily;
@@ -185,6 +193,9 @@ Item {
 
                 Text {
                     id: titlePassword;
+
+                    anchors.left: parent.left;
+                    anchors.leftMargin: 5;
 
                     color: Style.textColor;
                     font.family: Style.fontFamily;
@@ -238,6 +249,9 @@ Item {
                 Text {
                     id: titleName;
 
+                    anchors.left: parent.left;
+                    anchors.leftMargin: 5;
+
                     color: Style.textColor;
                     font.family: Style.fontFamily;
                     font.pixelSize: Style.fontSize_common;
@@ -277,6 +291,9 @@ Item {
 
                 Text {
                     id: titleMail;
+
+                    anchors.left: parent.left;
+                    anchors.leftMargin: 5;
 
                     color: Style.textColor;
                     font.family: Style.fontFamily;

@@ -216,8 +216,16 @@ Item {
 
             spacing: 10;
 
+            Item{
+                width: parent.width;
+                height: 1;
+            }
+
             Text {
                 id: titleName;
+
+                anchors.left: parent.left;
+                anchors.leftMargin: 5;
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
@@ -257,6 +265,9 @@ Item {
 
             Text {
                 id: titleDescription;
+
+                anchors.left: parent.left;
+                anchors.leftMargin: 5;
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
