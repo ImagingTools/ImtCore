@@ -8,6 +8,8 @@ Item {
     property string text: "";
 
     property int componentWidth: 200;
+    property int tooltipWidth: customTooltip.fitToTextWidth ? forWidthText.width + 2*customTooltip.textMargin : customTooltip.componentWidth;
+
     property int componentMinHeight: 40;
     property int componentMargin: 12;
 
@@ -38,11 +40,24 @@ Item {
         customTooltip.closeTooltip();
     }
 
+    function openTooltipWithCoord(xX, yY){
+        if(!customTooltip.openST){
+
+            var point = mapToItem(null, xX, yY);
+
+            modalDialogManager.openDialog(customTooltip.tooltipContentComp, {"x": point.x, "y": point.y});
+
+            modalDialogManager.backgroundItem.visible = false;
+
+            customTooltip.openST = true;
+        }
+
+    }
+
     function openTooltip(xX, yY){
         if(!customTooltip.openST){
             console.log("openTooltip", xX, yY);
 
-            //var point = mapToItem(thumbnailDecoratorContainer, xX, yY);
             var point = mapToItem(null, xX, yY);
             if(point.x > modalDialogManager.width*2/3){
                 if(customTooltip.fitToTextWidth){

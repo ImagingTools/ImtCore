@@ -30,6 +30,9 @@ Item {
     property alias toolTipFontColor: tooltip.fontColor;
     property alias toolTipFontSize: tooltip.fontPixelSize;
 
+    //Rectangle{anchors.fill: parent;color: "red"; opacity: 0.2}
+
+
 
     Rectangle{
         id: barDown;//positive
@@ -97,8 +100,11 @@ Item {
         fontColor: "#ffffff";
 
         borderColor: Style.color_elementBorder;
+        property string shownValPos: Math.trunc((barChart.positiveValue + barChart.addToValue)*100)/100;
+        property string shownValNeg: Math.trunc((barChart.negativeValue + barChart.addToValue)*100)/100;
+        property string shownVal: barChart.isPositiveTooltip ? shownValPos : barChart.isNegativeTooltip ? shownValNeg : "";
 
-        text: barChart.isPositiveTooltip ? barChart.positiveValue + barChart.addToValue : barChart.isNegativeTooltip ? barChart.negativeValue + barChart.addToValue : "";
+        text: shownVal;
     }
 
     PauseAnimation {
@@ -106,7 +112,9 @@ Item {
 
         duration: tooltip.waitingDuration;
         onFinished: {
-            tooltip.openTooltip(ma.mouseX, ma.mouseY);
+            //tooltip.openTooltip(ma.mouseX, ma.mouseY);
+            tooltip.openTooltipWithCoord(barChart.barWidth/2 - tooltip.tooltipWidth/2,  barDown.y - tooltip.componentHeight - 5);
+
         }
     }
 
