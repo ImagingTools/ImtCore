@@ -144,7 +144,6 @@
 	<file alias="imtgui/AuxComponents/SchedulerParams.qml">Qml/imtgui/AuxComponents/SchedulerParams.qml</file>
 	<file alias="imtgui/AuxComponents/Spinner.qml">Qml/imtgui/AuxComponents/Spinner.qml</file>
 
-	<file alias="imtgui/AuxComponents/TableCellDelegate.qml">Qml/imtgui/AuxComponents/TableCellDelegate.qml</file>
 	<file alias="imtgui/AuxComponents/InputActions.qml">Qml/imtgui/AuxComponents/InputActions.qml</file>
 
         <file alias="imtgui/AuxComponents/GridExtendingBaseDelegate.qml">Qml/imtgui/AuxComponents/GridExtendingBaseDelegate.qml</file>
