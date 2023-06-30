@@ -316,7 +316,8 @@ Item {
             onContentYChanged: {
                 if(popupMenuContainer.ready){
                     if(contentHeight - contentY - popupMenuListView.height == 0){
-                        var elemCountOk = popupMenuContainer.elementsCount >= 0 ? popupMenuContainer.elementsCount > popupMenuContainer.offset : true;
+                        //var elemCountOk = popupMenuContainer.elementsCount >= 0 ? popupMenuContainer.elementsCount > popupMenuContainer.offset : true;
+                        var elemCountOk = popupMenuContainer.elementsCount > popupMenuContainer.offset;
                         var ok = !popupMenuContainer.endListStatus
                                 && itemsModel.state == "Ready"
                                 && elemCountOk;

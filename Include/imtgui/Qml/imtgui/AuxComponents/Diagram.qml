@@ -190,6 +190,7 @@ Item {
         id: titleText;
 
         anchors.top: parent.top;
+
         anchors.left: parent.left;
         anchors.right: parent.right;
 
@@ -208,6 +209,7 @@ Item {
         id: diagramNameText;
 
         anchors.top: parent.top;
+        anchors.topMargin: legendYText.y;
         anchors.right: parent.right;
 
         width: parent.width/2;
