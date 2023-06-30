@@ -30,6 +30,14 @@ Item {
     property alias toolTipFontColor: tooltip.fontColor;
     property alias toolTipFontSize: tooltip.fontPixelSize;
 
+    property real parentY: 0;
+
+    onParentYChanged: {
+        if(tooltip.openST){
+            tooltip.closeTooltip();
+        }
+    }
+
     //Rectangle{anchors.fill: parent;color: "red"; opacity: 0.2}
 
 

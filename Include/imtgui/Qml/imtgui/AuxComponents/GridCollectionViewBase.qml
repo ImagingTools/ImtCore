@@ -226,6 +226,12 @@ Item {
 
             visible: collectionViewBaseContainer.openST;
 
+            onYChanged: {
+                if(extendingInfoLoader.item && extendingInfoLoader.item.parentY !==undefined){
+                    extendingInfoLoader.item.parentY = y;
+                }
+            }
+
 
             Loader{
                 id: extendingInfoLoader;

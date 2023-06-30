@@ -44,6 +44,10 @@ Item {
 
     property real xElementRotation: 0;
 
+    property real parentY: 0;
+
+    onParentYChanged: {console.log("ParentYChanged");}
+
 
     onModelChanged: {
         //diagram.setMaxValue();
@@ -415,6 +419,8 @@ Item {
                     color_negative: diagram.colorNegative;
 
                     addToValue: diagram.minValue;
+
+                    parentY: diagram.parentY;
                 }
             }
 
