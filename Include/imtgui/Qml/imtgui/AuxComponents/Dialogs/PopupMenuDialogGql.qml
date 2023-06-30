@@ -36,7 +36,7 @@ Item {
 
     property alias modelFilterAlias: modelFilter;
 
-    property int elementsCount;
+    property int elementsCount: -1;
     property int pauseDuration: 500;
 
 
@@ -316,12 +316,13 @@ Item {
             onContentYChanged: {
                 if(popupMenuContainer.ready){
                     if(contentHeight - contentY - popupMenuListView.height == 0){
+                        var elemCountOk = popupMenuContainer.elementsCount >= 0 ? popupMenuContainer.elementsCount > popupMenuContainer.offset : true;
                         var ok = !popupMenuContainer.endListStatus
                                 && itemsModel.state == "Ready"
-                               && popupMenuContainer.elementsCount > popupMenuContainer.offset;
+                                && elemCountOk;
                         if(ok){
 
-                            //popupMenuContainer.endListStatus = true;
+//                            popupMenuContainer.endListStatus = true;
 
                             console.log("Create additional query")
                             loadedRec.visible = true;
