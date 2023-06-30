@@ -165,7 +165,7 @@ Item {
                 horizontalAlignment: customTooltip.fitToTextWidth ? Text.AlignLeft: customTooltip.horizontalAlignment;
                 verticalAlignment: Text.AlignVCenter;
 
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere;
+                wrapMode: customTooltip.fitToTextWidth ? Text.NoWrap : Text.WrapAtWordBoundaryOrAnywhere;
 
                 text: qsTr(customTooltip.text);
 
