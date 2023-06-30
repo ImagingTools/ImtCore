@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5060" Description="ACF"/>
-            <Version Id="1" Number="2181" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5075" Description="ACF"/>
+            <Version Id="1" Number="2183" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -21,6 +21,14 @@
         <Element ComponentName="VisualStatus" X="425" Y="225" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
+        <EmbededRegistry Id="PagesPermissions">
+            <PositionMap>
+                <Element ComponentName="CommandPermissionsProviderJoiner" X="575" Y="200" Note=""/>
+                <Element ComponentName="RolesPermissions" X="250" Y="400" Note=""/>
+                <Element ComponentName="UsersPermissions" X="875" Y="400" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
         <EmbededRegistry Id="Repositories">
             <PositionMap>
                 <Element ComponentName="Role" X="450" Y="225" Note=""/>
@@ -36,14 +44,6 @@
                 <Element ComponentName="RolesPage" X="875" Y="425" Note=""/>
                 <Element ComponentName="UserGroupsPage" X="500" Y="500" Note=""/>
                 <Element ComponentName="UsersPage" X="500" Y="325" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-        <EmbededRegistry Id="PagesPermissions">
-            <PositionMap>
-                <Element ComponentName="CommandPermissionsProviderJoiner" X="575" Y="200" Note=""/>
-                <Element ComponentName="RolesPermissions" X="250" Y="400" Note=""/>
-                <Element ComponentName="UsersPermissions" X="875" Y="400" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

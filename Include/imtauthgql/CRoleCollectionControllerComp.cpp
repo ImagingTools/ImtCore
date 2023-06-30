@@ -119,13 +119,16 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::ListObjects(const imtgql
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 	Q_ASSERT(dataModelPtr != nullptr);
 
-	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
-
 	QByteArray productId;
-	if (!paramsPtr.empty()){
-		imtgql::CGqlObject inputParams = paramsPtr.at(0);
+	if (m_productIdAttrPtr.IsValid()){
+		productId = *m_productIdAttrPtr;
+	}
 
-		productId = inputParams.GetFieldArgumentValue("ProductId").toByteArray();
+	const imtgql::CGqlObject* inputParams = gqlRequest.GetParam("input");
+	if (inputParams != nullptr){
+		if (productId.isEmpty()){
+			productId = inputParams->GetFieldArgumentValue("ProductId").toByteArray();
+		}
 	}
 
 	imtbase::CTreeItemModel* itemsModelPtr = dataModelPtr->AddTreeModel("items");
