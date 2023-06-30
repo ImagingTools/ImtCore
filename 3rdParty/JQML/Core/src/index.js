@@ -475,7 +475,7 @@ global.Core = {
             map: null,
         }
         
-        let events = ['mousedown', 'mouseup', 'mousemove', 'wheel', 'mousewheel', 'contextmenu', 'touchstart', 'touchend', 'touchmove', 'keydown', 'keyup', 'keypress', 'mouseover', 'mouseout']
+        let events = ['mousedown', 'mouseup', 'mousemove', 'wheel', 'mousewheel', 'contextmenu', 'touchstart', 'touchend', 'touchmove', 'keydown', 'keyup', 'keypress']
 		
 		for(let event of events){
 			root.dom.addEventListener(event, (e)=>{
@@ -494,9 +494,16 @@ global.Core = {
                         if(e.type === 'mousedown' || e.type === 'touchstart') root.eventState.catchers = path
                         if(e.type === 'mouseup' || e.type === 'touchend') root.eventState.catchers = []
        
-                        for(let indx in UIDList){
-                            if(e.type === 'mousemove' && UIDList[indx].visible && UIDList[indx].enabled && UIDList[indx].dom && path.indexOf(UIDList[indx].dom) < 0 && UIDList[indx].$mouseout){
-                                UIDList[indx].$mouseout(e)
+                        if(e.type === 'mousemove'){
+                            for(let indx in UIDList){
+                                if(UIDList[indx].visible && UIDList[indx].enabled && UIDList[indx].dom && path.indexOf(UIDList[indx].dom) < 0 && UIDList[indx].$mouseout){
+                                    let rect = UIDList[indx].dom.getBoundingClientRect()
+                                    if(e.pageX < rect.left || e.pageX > rect.right || e.pageY < rect.top || e.pageY > rect.bottom) {
+                                        UIDList[indx].$mouseout(e)
+                                    } else {
+                                        UIDList[indx].$mouseover(e)
+                                    }
+                                }
                             }
                         }
                         
