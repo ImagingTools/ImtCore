@@ -119,7 +119,6 @@ void CRemoteStandardLoginGuiComp::OnGuiCreated()
 		m_systemStatusObserver.RegisterObject(m_systemStatusCompPtr.GetPtr(), &CRemoteStandardLoginGuiComp::OnSystemStatusUpdate);
 
 		StackedWidget->setCurrentIndex(3);
-//		on_RefreshButton_clicked();
 	}
 	else{
 		StackedWidget->setCurrentIndex(0);

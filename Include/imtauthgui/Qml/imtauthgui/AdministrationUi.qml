@@ -73,6 +73,8 @@ SingleDocumentWorkspaceView {
         console.log("updateModels");
         Events.sendEvent(container.commandId + "_CommandsUpdateModel");
     }
+
+    function firstModelsInit(){}
 }
 
 
