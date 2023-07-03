@@ -130,6 +130,7 @@ void CRemoteStandardLoginGuiComp::OnGuiCreated()
 void CRemoteStandardLoginGuiComp::OnGuiDestroyed()
 {
 	m_loginObserver.UnregisterAllObjects();
+	m_systemStatusObserver.UnregisterAllObjects();
 
 	BaseClass::OnGuiDestroyed();
 }
