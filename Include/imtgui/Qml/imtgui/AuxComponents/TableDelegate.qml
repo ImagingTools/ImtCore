@@ -6,7 +6,7 @@ Rectangle {
 
     width: 1000;
     height: visible ? minHeight : 0;
-    color: tableDelegateContainer.selected ? Style.selectedColor : "transparent";
+	color: tableDelegateContainer.selected ? Style.selectedColor : "transparent";
 
 	property alias cellDelegate: dataList.delegate
     property int textTopMargin: 8;
@@ -241,7 +241,6 @@ Rectangle {
         tableDelegateContainer.height = Math.max(maxVal, tableDelegateContainer.minHeight);
     }
 
-
     PauseAnimation {
         id: pause;
         duration: 100;
@@ -308,6 +307,14 @@ Rectangle {
             contentComp: tableDelegateContainer.tableItem.columnContentComps[model.index] !== null ? tableDelegateContainer.tableItem.columnContentComps[model.index] : tableCellDelegate.defaultContentComp;
 		}//delegate
     }//dataList
+
+	Rectangle{
+		id: alternatingRect
+		anchors.fill: parent
+		color: tableItem.enableAlternating ? tableItem.alternatingColor : 'transparent'
+		opacity: tableItem.enableAlternating ? (model.index % 2 === 0 ? tableItem.alternatingOpacity : 0) : 0
+		visible: !tableDelegateContainer.selected
+	}
 
     MouseArea {
         id: ma;
