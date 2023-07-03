@@ -9,10 +9,16 @@ defineTest(copyToWebDir) {
         # replace slashes in source path for Windows
         win32:file ~= s,/,\\,g
 
-        QMAKE_PRE_LINK += $$QMAKE_COPY_DIR $$shell_quote($$file) $$shell_quote($$dir) $$escape_expand(\\n\\t)
-    }
+        isEmpty(WEB_COMMAND){
+		}
+		else {
+		    WEB_COMMAND += &&
+		}
 
-    export(QMAKE_PRE_LINK)
+        WEB_COMMAND +=  $$QMAKE_COPY_DIR $$shell_quote($$file) $$shell_quote($$dir)
+		}
+
+    export(WEB_COMMAND)
 }
 
 defineTest(copyFile) {
@@ -24,10 +30,13 @@ defineTest(copyFile) {
     # replace slashes in source path for Windows
 	win32:file ~= s,/,\\,g
 
-    QMAKE_PRE_LINK += $$QMAKE_COPY_FILE $$shell_quote($$file) $$shell_quote($$fileNew) $$escape_expand(\\n\\t)
-
-
-    export(QMAKE_PRE_LINK)
+    isEmpty(WEB_COMMAND) {
+	}
+	else {
+	    WEB_COMMAND += &&
+	}
+	WEB_COMMAND += $$QMAKE_COPY_FILE $$shell_quote($$file) $$shell_quote($$fileNew)
+	export(WEB_COMMAND)
 }
 
 defineTest(compyleWeb) {
@@ -45,8 +54,8 @@ defineTest(compyleWeb) {
 		npmexe = $(IMTCOREDIR)/3rdParty/nodejs/npm_acf.cmd
 		npmexe ~= s,/,\\,g
 	}
-	QMAKE_PRE_LINK += cd $$shell_quote($$jqmldir) && $$npmexe run compile  $$shell_quote($$dir) $$escape_expand(\\n\\t)
-	export(QMAKE_PRE_LINK)
+
+    WEB_COMMAND += && cd $$shell_quote($$jqmldir) && $$npmexe run compile  $$shell_quote($$dir)
 
     copyFile($$buildwebdir/src/jqml.full.js, $$buildwebdir/Resources/jqml.$${resname}.js)
 	copyToWebDir($$buildwebdir/src/imtqml/GraphQLRequest.js, $$buildwebdir/Resources)
@@ -62,8 +71,8 @@ defineTest(compyleWeb) {
 	else{
 	    QMAKE_RCC = rcc
 	}
+	WEB_COMMAND += && $$[QT_INSTALL_BINS]/$$QMAKE_RCC -name $${TARGET}Web $${QRC_WEB_FILE} -o $${QRC_CPP_WEB_FILE}
+	export(WEB_COMMAND)
 
-    QMAKE_PRE_LINK += $$[QT_INSTALL_BINS]/$$QMAKE_RCC -name $${TARGET}Web $${QRC_WEB_FILE} -o $${QRC_CPP_WEB_FILE}
-	export(QMAKE_PRE_LINK)
 }
 

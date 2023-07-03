@@ -1,8 +1,18 @@
 
-GENERATED_WEB_RESOURCE_OUTPUT = $${buildwebdir}/Resources/qrc_$${TARGET}Web.cpp
-win32:GENERATED_WEB_RESOURCE_OUTPUT ~= s,/,\\,g
+GENERATE_RESOURCE_COMMANDS = $$WEB_COMMAND
+GENERATED_RESOURCE_OUTPUT = $${buildwebdir}/Resources/qrc_$${TARGET}Web.cpp
+win32{
+    GENERATED_RESOURCE_OUTPUT ~= s,/,\\,g
+}
 
-webQrc$${TARGET}.target = $${GENERATED_WEB_RESOURCE_OUTPUT}
-webQrc$${TARGET}.commands = echo $${GENERATED_WEB_RESOURCE_OUTPUT}
-QMAKE_EXTRA_TARGETS += webQrc$${TARGET}
-GENERATED_SOURCES += $${GENERATED_WEB_RESOURCE_OUTPUT}
+generatedWebResources.name = ARX-Compiler
+arcCompiler.target = $${ARXC_OUTDIR}/C${QMAKE_FILE_BASE}.h
+generatedWebResources.CONFIG += no_link
+generatedWebResources.CONFIG += target_predeps
+generatedWebResources.output = $$GENERATED_RESOURCE_OUTPUT
+generatedWebResources.commands = $$GENERATE_RESOURCE_COMMANDS
+generatedWebResources.input = GENERATED_RESOURCES
+generatedWebResources.variable_out = SOURCES
+generatedWebResources.dependency_type = TYPE_QRC
+QMAKE_EXTRA_COMPILERS += generatedWebResources
+
