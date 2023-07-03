@@ -4,7 +4,7 @@
         <VersionInfos>
             <Version Id="0" Number="5075" Description="ACF"/>
             <Version Id="1" Number="2183" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -34,7 +34,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="PumaGqlRemoteRepresentationController" PackageId="ImtGqlPck" ComponentId="PumaGqlRemoteRepresentationController">
+        <Element Id="RemoteRepresentationController" PackageId="ImtGqlPck" ComponentId="PumaGqlRemoteRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
@@ -61,7 +61,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="PumaGqlRemoteRepresentationController"/>
+        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="RemoteRepresentationController"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

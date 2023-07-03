@@ -15,7 +15,7 @@
         <Element ComponentName="ResourcesPath" X="1050" Y="75" Note=""/>
         <Element ComponentName="RessourcesProvider" X="775" Y="75" Note=""/>
         <Element ComponentName="ServerLogFileAccess" X="1000" Y="450" Note=""/>
-        <Element ComponentName="WebResourcesServlet" X="475" Y="75" Note="Handler for all compiled resources of the application. Primary used in the web application"/>
+        <Element ComponentName="WebResourcesServlet" X="475" Y="76" Note="Handler for all compiled resources of the application. Primary used in the web application"/>
         <Element ComponentName="WebSocketServlet" X="575" Y="450" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
