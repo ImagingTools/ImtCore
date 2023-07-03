@@ -11,6 +11,9 @@ Rectangle {
 
     clip: true;
 
+    visible: count > 1;
+    width: visible ? contentWidth : 1;
+
     property string textColor: Style.textColor;
     property string fontName: "Helvetica";
     property string activePageId;
@@ -24,6 +27,9 @@ Rectangle {
     property TreeItemModel model: TreeItemModel {};
 
     property int spacing: 0;
+
+    property int count: lvPages.count;
+    property int contentWidth: 0;
 
     signal activePageChanged;
 
@@ -100,4 +106,5 @@ Rectangle {
             }
         }
     }
+
 }

@@ -33,8 +33,8 @@ Item {
     }
 
     onContentWidthChanged: {
-        if (menuPanel.width != container.contentWidth){
-            menuPanel.width = container.contentWidth;
+        if (menuPanel.contentWidth != container.contentWidth){
+            menuPanel.contentWidth = container.contentWidth;
         }
     }
 
