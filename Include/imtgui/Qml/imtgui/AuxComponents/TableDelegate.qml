@@ -311,8 +311,8 @@ Rectangle {
 	Rectangle{
 		id: alternatingRect
 		anchors.fill: parent
-		color: tableItem.enableAlternating ? tableItem.alternatingColor : 'transparent'
-		opacity: tableItem.enableAlternating ? (model.index % 2 === 0 ? tableItem.alternatingOpacity : 0) : 0
+		color: tableDelegateContainer.tableItem.enableAlternating ? tableDelegateContainer.tableItem.alternatingColor : 'transparent'
+		opacity: tableDelegateContainer.tableItem.enableAlternating ? (model.index % 2 === 0 ? tableDelegateContainer.tableItem.alternatingOpacity : 0) : 0
 		visible: !tableDelegateContainer.selected
 	}
 
