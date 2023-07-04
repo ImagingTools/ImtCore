@@ -13,6 +13,7 @@ Item {
     height: popupMenuListView.height;
 
     property var model;
+    //property TreeItemModel model: TreeItemModel{};
     property Item root: null;
     property Item rootItem: null;
 
@@ -384,7 +385,7 @@ Item {
             query.AddField(queryFields)
             var gqlData = query.GetQuery();
 
-            console.log("COMBO_QUERY ", gqlData);
+            //console.log("COMBO_QUERY ", gqlData);
 
             this.SetGqlQuery(gqlData);
         }
@@ -402,9 +403,7 @@ Item {
 
                 if (itemsModel.ContainsKey("data")){
 
-
                     dataModelLocal = itemsModel.GetData("data");
-
 
 
                     if (dataModelLocal.ContainsKey(popupMenuContainer.commandId)){
@@ -423,7 +422,9 @@ Item {
                         }
 
                         dataModelLocal = dataModelLocal.GetData("items");
-                        console.log(popupMenuContainer.commandId, " = ", dataModelLocal);
+
+                        //console.log(popupMenuContainer.commandId, " = ", dataModelLocal);
+                        //console.log("comboModel:::", dataModelLocal.toJSON());
                         if (popupMenuContainer.offset == 0){
                             popupMenuContainer.model = dataModelLocal;
                             //popupMenuListView.model = popupMenuContainer.model;
@@ -432,11 +433,14 @@ Item {
                              popupMenuContainer.endListStatus = false;
                         }
                         else{
+
                             console.log("count items = ", dataModelLocal.GetItemsCount())
                             if(dataModelLocal.GetItemsCount() > 0){
                                 for (var i = 0; i < dataModelLocal.GetItemsCount(); i++){
-                                    popupMenuContainer.model.InsertNewItem();
-                                    dataModelLocal.CopyItemDataToModel(i, popupMenuContainer.model, popupMenuContainer.offset + i);
+                                    var index_
+                                    var index_ = popupMenuContainer.model.InsertNewItem();
+                                    //dataModelLocal.CopyItemDataToModel(i, popupMenuContainer.model, popupMenuContainer.offset + i);
+                                    dataModelLocal.CopyItemDataToModel(i, popupMenuContainer.model, index_);
                                 }
                                 //popupMenuListView.model = popupMenuContainer.model;
                                 popupMenuContainer.endListStatus = false;
