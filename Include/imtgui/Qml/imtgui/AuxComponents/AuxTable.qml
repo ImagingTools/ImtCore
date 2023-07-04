@@ -20,9 +20,10 @@ Rectangle {
 	property bool scrollbarVisible: true;
 	property bool showHeaders: true;
 
-	property bool enableAlternating: false;
-	property color alternatingColor: '#000';
-	property real alternatingOpacity: 0.05;
+	property bool enableAlternating: (Style.enableAlternating !== undefined && Style.enableAlternating !== null) ? Style.enableAlternating : false;
+	property color alternatingColor: Style.alternatingColor ? Style.alternatingColor : '#000';
+	property real alternatingOpacity: Style.alternatingOpacity ? Style.alternatingOpacity : 0.05;
+	property bool hoverEnabled: (Style.enableHoverEffect !== undefined && Style.enableHoverEffect !== null) ? Style.enableHoverEffect : true;
 
 	property alias separatorVisible: bottomLine.visible;
 	property string sortIndicatorIcon: "../../../Icons/" + Style.theme + "/Down_On_Normal.svg";

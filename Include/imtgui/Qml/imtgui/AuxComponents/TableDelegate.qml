@@ -37,8 +37,8 @@ Rectangle {
 
     property bool enabled: true;
 
-    property string selectedColor: Style.selectedColor;
-    property real selectedOpacity: 0.5;
+	property real selectedOpacity: ((Style.selectedOpacity !== undefined && Style.selectedOpacity !== null) ?  Style.selectedOpacity :  0.5);
+	property real hoverOpacity:((Style.hoverOpacity !== undefined && Style.hoverOpacity !== null) ?  Style.hoverOpacity :  selectedOpacity/2);
 
     //
     property string borderColorHorizontal: "transparent";
@@ -311,8 +311,13 @@ Rectangle {
 	Rectangle{
 		id: alternatingRect
 		anchors.fill: parent
-		color: tableDelegateContainer.tableItem.enableAlternating ? tableDelegateContainer.tableItem.alternatingColor : 'transparent'
-		opacity: tableDelegateContainer.tableItem.enableAlternating ? (model.index % 2 === 0 ? tableDelegateContainer.tableItem.alternatingOpacity : 0) : 0
+		color: tableDelegateContainer.tableItem.hoverEnabled && ma.containsMouse ? Style.selectedColor :
+			tableDelegateContainer.tableItem.enableAlternating ? tableDelegateContainer.tableItem.alternatingColor : 'transparent'
+
+		opacity: tableDelegateContainer.selected ? tableDelegateContainer.selectedOpacity :
+				tableDelegateContainer.tableItem.hoverEnabled && ma.containsMouse ? tableDelegateContainer.hoverOpacity :
+				tableDelegateContainer.tableItem.enableAlternating && model.index % 2 === 0 ? tableDelegateContainer.tableItem.alternatingOpacity: 0
+
 		visible: !tableDelegateContainer.selected
 	}
 
@@ -321,7 +326,8 @@ Rectangle {
 
         z: 1;
 
-        anchors.fill: parent;
+		anchors.fill: parent;
+		hoverEnabled: true
 
         acceptedButtons: Qt.LeftButton | Qt.RightButton;
 
