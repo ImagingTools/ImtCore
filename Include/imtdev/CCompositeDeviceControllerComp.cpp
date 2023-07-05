@@ -128,8 +128,6 @@ IDeviceEnumerator::StartResult CCompositeDeviceControllerComp::StartEnumeration(
 
 void CCompositeDeviceControllerComp::CancelEnumeration()
 {
-	SendInfoMessage(0, "Cancellation of enumeration");
-
 	IDeviceEnumerator* deviceEnumeratorPtr = GetCurrentDeviceEnumerator();
 	if (deviceEnumeratorPtr){
 		deviceEnumeratorPtr->CancelEnumeration();
@@ -230,12 +228,8 @@ void CCompositeDeviceControllerComp::StartEnumeration()
 
 	IDeviceEnumerator* deviceEnumeratorPtr = GetNextDeviceEnumerator();
 	if (deviceEnumeratorPtr){
-		SendInfoMessage(0, "Enumeration started");
-
 		if (m_intervalTimer.interval() > 0){
 			m_intervalTimer.start();
-
-			SendInfoMessage(0, "Enumeration interval timer started");
 		}
 
 		deviceEnumeratorPtr->StartEnumeration(this);
