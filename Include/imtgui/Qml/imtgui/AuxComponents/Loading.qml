@@ -46,7 +46,7 @@ Rectangle {
 
     Timer {
         interval: 10;
-        running: true;
+        running: root.visible;
         repeat:  true;
 
         onTriggered: {
