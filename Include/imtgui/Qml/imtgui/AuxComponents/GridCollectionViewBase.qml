@@ -240,6 +240,13 @@ Item {
 
                 sourceComponent: extendingInfoCompDefault;
 
+//                onItemChanged:  {
+//                    if(extendingInfoLoader.item && extendingInfoLoader.item.border.color !== undefined){
+//                        console.log("extendingInfoLoader.item.border.color:: ", extendingInfoLoader.item.border.color);
+//                        //indicatorRec.borderColor = extendingInfoLoader.item.border.color;
+//                    }
+//                }
+
             }
         }
 
@@ -247,14 +254,18 @@ Item {
             id: indicatorRec;
 
             anchors.bottom:extendingInfoLoaderContainer.top;
-            anchors.bottomMargin: 0;//-2;
+            anchors.bottomMargin: -borderWidth;
+
             x: collectionViewBaseContainer.gridSelectedIndexInRow * collectionViewBaseContainer.gridCellWidth  + 0.5 * collectionViewBaseContainer.gridCellWidth - width/2 - collectionViewBaseContainer.gridDelegateMargin/2;
 
             width: 80;
-            height: collectionViewBaseContainer.gridDelegateMargin - 2 * anchors.bottomMargin;
+            height: collectionViewBaseContainer.gridDelegateMargin + borderWidth; //- 2 * anchors.bottomMargin;
             color: "transparent";
             visible: collectionViewBaseContainer.openST && collectionViewBaseContainer.gridIndicatorVisible;
             //clip: true;
+            property int borderWidth: 2;
+            property string borderColor: extendingInfoLoader.item ? extendingInfoLoader.item.border.color : "transparent";
+
 
             Rectangle{
                 id: gridIndicator;
@@ -262,7 +273,7 @@ Item {
                 width: parent.width;
                 height: parent.height;
 
-                color: Style.backgroundColor;
+                color: Style.color_element;
                 clip: true;
 
                 property int topThroatShift: 6;
@@ -270,8 +281,8 @@ Item {
                 Rectangle{
                     id: gridIndicatorCover;
 
+                    visible: false;
                     anchors.fill: parent;
-
                     color: Style.textColor;
                     opacity: 0.2;
 
@@ -290,6 +301,8 @@ Item {
                     radius: width;
 
                     color: Style.baseColor;
+                    border.color: indicatorRec.borderColor;
+                    border.width: indicatorRec.borderWidth;
 
 
                 }
@@ -307,9 +320,12 @@ Item {
                     radius: width;
 
                     color: Style.baseColor;
-
+                    border.color: indicatorRec.borderColor;
+                    border.width: indicatorRec.borderWidth;
 
                 }
+
+
             }
 
             Rectangle{
@@ -317,61 +333,13 @@ Item {
 
                 anchors.horizontalCenter: gridIndicator.horizontalCenter;
                 anchors.bottom: gridIndicator.top;
+                anchors.bottomMargin:0;
 
-                height: 2;
-                width: 36;
+                height: 4;
+                width: 30;
                 color: gridIndicator.color;
 
-                Rectangle{
-                    id: topPatchCover;
-
-                    anchors.fill: parent;
-
-                    color: gridIndicatorCover.color;
-                    opacity: gridIndicatorCover.opacity;
-
-                }
             }
-
-            Rectangle{
-                id: bottomPatch;
-
-                anchors.horizontalCenter: gridIndicator.horizontalCenter;
-                anchors.top: gridIndicator.bottom;
-
-                height: 2;
-                width: gridIndicator.width;
-                color: gridIndicator.color;
-
-                Rectangle{
-                    id: bottomPatchCover;
-
-                    anchors.fill: parent;
-
-                    color: gridIndicatorCover.color;
-                    opacity: gridIndicatorCover.opacity;
-
-                }
-            }
-
-//            Rectangle{
-//                id: gridIndicator;
-
-//                width: parent.width;
-//                height: width;
-//                rotation: 45;
-//                color: Style.backgroundColor;
-//                Rectangle{
-//                    id: gridIndicatorCover;
-
-//                    anchors.fill: parent;
-
-//                    color: Style.textColor;
-//                    opacity: 0.2;
-//                }
-//            }
-            //
-
 
         }
 
