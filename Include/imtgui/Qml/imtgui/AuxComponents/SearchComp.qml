@@ -12,6 +12,8 @@ Rectangle{
     border.color: Style.color_gray;
     border.width: 1;
 
+    property int elementHeight: 60;
+
     property string fontColor: Style.textColor;
     property int textSize: Style.fontSize_common -2;
 
@@ -20,7 +22,7 @@ Rectangle{
     //
     property string gettedParam: "Name";
     property string filterId: "Name";
-    property string propertyId: "ParentIds";
+    property string propertyId: "";
     //
 
     property bool hasSearchProperty: false;
@@ -389,7 +391,7 @@ Rectangle{
         borderColor: "transparent";
         backgroundColor: "transparent";
         delegateRadius: 10;
-        itemHeight: 60;
+        itemHeight: searchContainer.elementHeight;
         textSize: searchContainer.textSize;
         backVisible: !openST;
         complexModel: true;
@@ -565,7 +567,7 @@ Rectangle{
 
         highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
-        iconSource: "../Icons/" + Style.theme + "/Close.svg";
+        iconSource: "../../../Icons/" + Style.theme + "/Close.svg";
 
         visible: searchTextField.currentText !== "" && !searchTextField.openST;
         enabled: visible;
