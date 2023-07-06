@@ -151,6 +151,7 @@
         <file alias="imtgui/AuxComponents/BarChart.qml">Qml/imtgui/AuxComponents/BarChart.qml</file>
         <file alias="imtgui/AuxComponents/Piechart.qml">Qml/imtgui/AuxComponents/Piechart.qml</file>
         <file alias="imtgui/AuxComponents/PaintedCorner.qml">Qml/imtgui/AuxComponents/PaintedCorner.qml</file>
+        <file alias="imtgui/AuxComponents/SearchComp.qml">Qml/imtgui/AuxComponents/SearchComp.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

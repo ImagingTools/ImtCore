@@ -167,7 +167,7 @@ Rectangle {
     }
 
     function setWidth(){
-        console.log("Table delegate setWidth")
+        //console.log("Table delegate setWidth")
         tableDelegateContainer.widthDecoratorDynamic.Clear();
         tableDelegateContainer.widthDecoratorDynamic.Copy(tableDelegateContainer.widthDecorator);
 
