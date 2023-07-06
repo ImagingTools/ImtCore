@@ -445,77 +445,77 @@ Rectangle{
 
             }
 
-            //            Text{
-            //                id: firstText;
+            Text{
+                id: firstText;
 
-            //                anchors.left: parent.left;
-            //                anchors.top: parent.top;
-            //                anchors.leftMargin: 10;
-            //                anchors.topMargin: 6;
+                anchors.left: parent.left;
+                anchors.top: parent.top;
+                anchors.leftMargin: 10;
+                anchors.topMargin: 6;
 
-            //                font.family: Style.fontFamily;
-            //                color: searchContainer.fontColor;
-            //                font.pixelSize: searchContainer.textSize - 2;
-            //                font.bold: false;
+                font.family: Style.fontFamily;
+                color: searchContainer.fontColor;
+                font.pixelSize: searchContainer.textSize - 2;
+                font.bold: false;
 
-            //                text: "";
-            //            }
+                text: "";
+            }
 
-            //            Text{
-            //                id: secondText;
+            Text{
+                id: secondText;
 
-            //                anchors.left: parent.left;
-            //                anchors.top: firstText.bottom;
-            //                anchors.leftMargin: 10;
-            //                anchors.topMargin: 2;
+                anchors.left: parent.left;
+                anchors.top: firstText.bottom;
+                anchors.leftMargin: 10;
+                anchors.topMargin: 2;
 
-            //                font.family: Style.fontFamily;
-            //                color: searchContainer.fontColor;
-            //                font.pixelSize: searchContainer.textSize;
-            //                font.bold: false;
+                font.family: Style.fontFamily;
+                color: searchContainer.fontColor;
+                font.pixelSize: searchContainer.textSize;
+                font.bold: false;
 
-            //                text: "";
-            //            }
+                text: "";
+            }
 
-            //            Text{
-            //                id: thirdText;
+            Text{
+                id: thirdText;
 
-            //                anchors.left: secondText.right;
-            //                anchors.top: firstText.bottom;
-            //                anchors.leftMargin: 0;
-            //                anchors.topMargin: 2;
+                anchors.left: secondText.right;
+                anchors.top: firstText.bottom;
+                anchors.leftMargin: 0;
+                anchors.topMargin: 2;
 
-            //                font.family: Style.fontFamily;
-            //                color: searchContainer.fontColor;
-            //                font.pixelSize: searchContainer.textSize;
-            //                font.bold: false;
+                font.family: Style.fontFamily;
+                color: searchContainer.fontColor;
+                font.pixelSize: searchContainer.textSize;
+                font.bold: false;
 
-            //                property string number: "";
+                property string number: "";
 
-            //                text: number == "" ? "" : ", " + number;
-            //            }
+                text: number == "" ? "" : ", " + number;
+            }
 
-            //            Text{
-            //                id: fourthText;
+            Text{
+                id: fourthText;
 
-            //                anchors.left: thirdText.right;
-            //                anchors.top: firstText.bottom;
-            //                anchors.leftMargin: 0;
-            //                anchors.topMargin: 2;
+                anchors.left: thirdText.right;
+                anchors.top: firstText.bottom;
+                anchors.leftMargin: 0;
+                anchors.topMargin: 2;
 
-            //                font.family: Style.fontFamily;
-            //                color: searchContainer.fontColor;
-            //                font.pixelSize: searchContainer.textSize;
-            //                font.bold: false;
+                font.family: Style.fontFamily;
+                color: searchContainer.fontColor;
+                font.pixelSize: searchContainer.textSize;
+                font.bold: false;
 
-            //                property string number: "";
+                property string number: "";
 
-            //                text: number == "" ? "" : ", " + number;
-            //            }
+                text: number == "" ? "" : ", " + number;
+            }
 
 
-            //            onClicked: {
-            //            }
+            onClicked: {
+            }
 
         }//delegate
 
