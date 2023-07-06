@@ -8,10 +8,10 @@ Item {
     property Item pTableDelegateContainer: null;
 
 	/// \workaround to calc cells count
-    property Item pDataList: null;
+    property var pDataList: [];
 
     property bool compl: false;
-    property bool complCompl: pDataList ? delegateContainer.compl && pDataList.compl : false;
+    property bool complCompl: pDataList.length && delegateContainer.compl;
 
     property alias contentComp: contentLoader.sourceComponent;
 	property real textLeftIndent: 0
@@ -39,7 +39,7 @@ Item {
             return;
         }
 
-        var defaultWidth = delegateContainer.pDataList.count == 0 ? 0 : delegateContainer.pTableDelegateContainer.width/pDataList.count;
+        var defaultWidth = delegateContainer.pDataList.length == 0 ? 0 : delegateContainer.pTableDelegateContainer.width/pDataList.length;
         var widthFromModel = delegateContainer.pTableDelegateContainer.widthDecoratorDynamic.IsValidData("Width", model.index) ? delegateContainer.pTableDelegateContainer.widthDecoratorDynamic.GetData("Width", model.index) : -1;
 
         if(!delegateContainer.pTableDelegateContainer.widthDecoratorDynamic.GetItemsCount()){

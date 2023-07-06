@@ -279,7 +279,7 @@ Rectangle {
 		tableContainer.properties.clearInvisibleItems();
 	}
 
-	property var columnContentComps: []
+    property var columnContentComps: [];
 
 	onHeadersChanged: {
 		for (let i = 0; i < tableContainer.headers.GetItemsCount(); i++){

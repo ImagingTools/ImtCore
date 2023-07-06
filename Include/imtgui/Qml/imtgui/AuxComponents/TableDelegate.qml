@@ -307,6 +307,7 @@ Rectangle {
 
             pTableDelegateContainer: tableDelegateContainer;
             contentComp: tableDelegateContainer.tableItem.columnContentComps[model.index] !== null ? tableDelegateContainer.tableItem.columnContentComps[model.index] : tableCellDelegate.defaultContentComp;
+            pDataList: tableDelegateContainer.tableItem.columnContentComps;
 		}//delegate
     }//dataList
 
