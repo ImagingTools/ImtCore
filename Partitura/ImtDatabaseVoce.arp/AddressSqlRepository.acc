@@ -10,7 +10,7 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="AddressDatabaseDelegate" PackageId="ChronosDbPck" ComponentId="AddressElementDatabaseDelegate">
+        <Element Id="AddressDatabaseDelegate" PackageId="ImtGeoPck" ComponentId="AddressElementDatabaseDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="AddressElemenInfo" Type="Factory" ExportId="">
