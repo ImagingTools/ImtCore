@@ -5,7 +5,7 @@ import Acf 1.0
 Item {
     id: delegateContainer;
 
-    property Item pTableDelegateContainer: Item{};
+    property Item pTableDelegateContainer: null;
 
 	/// \workaround to calc cells count
     property Item pDataList: null;
@@ -242,6 +242,8 @@ Item {
                                                                               delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("FontColor", delegateContainer.columnIndex) ?
                                                                                   delegateContainer.pTableDelegateContainer.cellDecorator.GetData("FontColor", delegateContainer.columnIndex) :
                                                                                   Style.textColor) : Style.inactive_textColor;
+
+
             elide: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.elideMode : Text.ElideLeft;
             wrapMode: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.wrapMode : Text.NoWrap;
             onLinkActivated: {

@@ -66,6 +66,8 @@ Rectangle {
 
     property bool compl: false;
 
+    property string selectedColor: Style.selectedColor;
+
     signal clicked();
     signal rightButtonMouseClicked(int mX, int mY);
     signal doubleClicked(int mX, int mY);
@@ -303,22 +305,24 @@ Rectangle {
 		delegate: TableCellDelegate {
 			id: tableCellDelegate
 
-			pTableDelegateContainer: tableDelegateContainer
+            pTableDelegateContainer: tableDelegateContainer;
             contentComp: tableDelegateContainer.tableItem.columnContentComps[model.index] !== null ? tableDelegateContainer.tableItem.columnContentComps[model.index] : tableCellDelegate.defaultContentComp;
 		}//delegate
     }//dataList
 
 	Rectangle{
-		id: alternatingRect
-		anchors.fill: parent
+        id: alternatingRect;
+
+        anchors.fill: parent;
+
 		color: tableDelegateContainer.tableItem.hoverEnabled && ma.containsMouse ? Style.selectedColor :
-			tableDelegateContainer.tableItem.enableAlternating ? tableDelegateContainer.tableItem.alternatingColor : 'transparent'
+            tableDelegateContainer.tableItem.enableAlternating ? tableDelegateContainer.tableItem.alternatingColor : 'transparent';
 
 		opacity: tableDelegateContainer.selected ? tableDelegateContainer.selectedOpacity :
 				tableDelegateContainer.tableItem.hoverEnabled && ma.containsMouse ? tableDelegateContainer.hoverOpacity :
-				tableDelegateContainer.tableItem.enableAlternating && model.index % 2 === 0 ? tableDelegateContainer.tableItem.alternatingOpacity: 0
+                tableDelegateContainer.tableItem.enableAlternating && model.index % 2 === 0 ? tableDelegateContainer.tableItem.alternatingOpacity: 0;
 
-		visible: !tableDelegateContainer.selected
+        visible: !tableDelegateContainer.selected;
 	}
 
     MouseArea {
