@@ -79,7 +79,6 @@ Rectangle {
 
 	property bool readOnly: false;
 
-	signal selectionChanged(var selection);
 
 	property TableSelection tableSelection: TableSelection {
 		onSelectionChanged: {
@@ -93,64 +92,49 @@ Rectangle {
 		}
 	}
 
+    //properties for delegate:
+    property string borderColorHorizontal_deleg: "transparent";
+    property string borderColorVertical_deleg: "transparent";
+    property int horizontalBorderSize_deleg: 0;
+    property int verticalBorderSize_deleg: 0;
+
+    property bool visibleLeftBorderFirst_deleg: true;
+    property bool visibleRightBorderLast_deleg: false;
+    property bool visibleTopBorderFirst_deleg: false;
+    property bool visibleBottomBorderLast_deleg: true;
+
+    property bool canSetBorderParams_deleg: false;
+    property int wrapMode_deleg: Text.NoWrap;
+    property int elideMode_deleg: Text.ElideRight;
+    property bool isRightBorder_deleg: false;
+
+    property int textMarginHor_deleg: 8;
+    property int textMarginVer_deleg: 8;
+    //properties for delegate
+
+    property string maxLengthText: '';
+
+    property int textMarginHor: 8;
+    property int textMarginVer: 8;
+
+    property bool emptyDecor: true;
+    property bool emptyDecorHeader: true;
+
+    property var columnContentComps: [];
+
 	signal checkedItemsChanged();
+    signal selectionChanged(var selection);
 
-	function getSelectedIndexes(){
-		return tableContainer.tableSelection.selectedIndexes;
-	}
+    signal selectItem(string idSelected, string name);
+    signal rightButtonMouseClicked(int mouseX, int mouseY);
+    signal doubleClicked(int mouseX, int mouseY);
+    signal setActiveFocusFromTable();
+    signal headerClicked(string headerId);
+    signal textFilterChanged(string id, int index, string text);
+    signal filterClicked();
 
-	function setSelectedIndexes(indexes){
-		return tableContainer.tableSelection.selectedIndexes;
-	}
-
-	function select(index){
-		tableContainer.tableSelection.singleSelect(index);
-	}
-
-	function resetSelection(){
-		tableContainer.tableSelection.resetSelection();
-	}
-
-	//
-
-	//properties for delegate:
-	property string borderColorHorizontal_deleg: "transparent";
-	property string borderColorVertical_deleg: "transparent";
-	property int horizontalBorderSize_deleg: 0;
-	property int verticalBorderSize_deleg: 0;
-
-	property bool visibleLeftBorderFirst_deleg: true;
-	property bool visibleRightBorderLast_deleg: false;
-	property bool visibleTopBorderFirst_deleg: false;
-	property bool visibleBottomBorderLast_deleg: true;
-
-	property bool canSetBorderParams_deleg: false;
-	property int wrapMode_deleg: Text.NoWrap;
-	property int elideMode_deleg: Text.ElideRight;
-	property bool isRightBorder_deleg: false;
-
-	property int textMarginHor_deleg: 8;
-	property int textMarginVer_deleg: 8;
-	//properties for delegate
-
-	property string maxLengthText: '';
-
-	property int textMarginHor: 8;
-	property int textMarginVer: 8;
-
-	property bool emptyDecor: true;
-	property bool emptyDecorHeader: true;
-
-	signal selectItem(string idSelected, string name);
-	signal rightButtonMouseClicked(int mouseX, int mouseY);
-	signal doubleClicked(int mouseX, int mouseY);
-	signal setActiveFocusFromTable();
-	signal headerClicked(string headerId);
-	signal textFilterChanged(string id, int index, string text);
-	signal filterClicked();
-
-	signal widthRecalc();
-	signal heightRecalc();
+    signal widthRecalc();
+    signal heightRecalc();
 
 	Component.onCompleted: {
 		tableContainer.headerMinHeight = tableContainer.headerHeight;
@@ -195,6 +179,30 @@ Rectangle {
 			pause.start();
 		}
 	}
+
+    onHeadersChanged: {
+        for (let i = 0; i < tableContainer.headers.GetItemsCount(); i++){
+            tableContainer.columnContentComps.push(null);
+        }
+    }
+
+    function getSelectedIndexes(){
+        return tableContainer.tableSelection.selectedIndexes;
+    }
+
+    function setSelectedIndexes(indexes){
+        return tableContainer.tableSelection.selectedIndexes;
+    }
+
+    function select(index){
+        tableContainer.tableSelection.singleSelect(index);
+    }
+
+    function resetSelection(){
+        tableContainer.tableSelection.resetSelection();
+    }
+
+    //
 
 	function checkItem(index){
 		if (!tableContainer.checkable){
@@ -279,13 +287,6 @@ Rectangle {
 		tableContainer.properties.clearInvisibleItems();
 	}
 
-    property var columnContentComps: [];
-
-	onHeadersChanged: {
-		for (let i = 0; i < tableContainer.headers.GetItemsCount(); i++){
-			tableContainer.columnContentComps.push(null);
-		}
-	}
 
 	function getHeaderIndex(headerId){
 		if (!tableContainer.headers){
@@ -317,6 +318,173 @@ Rectangle {
 		tableContainer.headerHeight = Math.max(maxVal, tableContainer.headerMinHeight);
 	}
 
+    function setWidth(){
+        console.log("setWidth");
+
+        tableContainer.widthDecoratorDynamic.Clear();
+        tableContainer.widthDecoratorDynamic.Copy(tableContainer.widthDecorator);
+
+        if(!tableContainer.tableDecorator.GetItemsCount()||!tableContainer.widthDecorator.GetItemsCount()){
+            tableContainer.widthRecalc();
+            return;
+        }
+
+        var count_ = 0;
+        var lengthMinus = 0;
+
+        for(var i = 0; i < tableContainer.widthDecorator.GetItemsCount(); i++){
+
+            var width_ = tableContainer.widthDecorator.IsValidData("Width",i) ? tableContainer.widthDecorator.GetData("Width",i): -1;
+            var widthPercent_ = tableContainer.widthDecorator.IsValidData("WidthPercent",i) ? tableContainer.widthDecorator.GetData("WidthPercent",i): -1;
+
+            if((width_ == -1) && (widthPercent_ == -1)){
+                count_++;
+            }
+            else{
+                width_ = width_< 0 ? 0 : width_;
+                widthPercent_ = widthPercent_ < 0 ? 0 : widthPercent_*tableContainer.width/100;
+                lengthMinus += Math.max(width_,widthPercent_);
+            }
+        }
+
+        if((tableContainer.width - lengthMinus) < 0 || count_ == tableContainer.widthDecorator.GetItemsCount() ){
+            tableContainer.widthDecoratorDynamic.Clear();
+            tableContainer.widthRecalc();
+            return;
+        }
+
+        for(var i = 0; i < tableContainer.widthDecorator.GetItemsCount(); i++){
+
+            var width_ = tableContainer.widthDecorator.IsValidData("Width",i) ? tableContainer.widthDecorator.GetData("Width",i): -1;
+            var widthPercent_ = tableContainer.widthDecorator.IsValidData("WidthPercent",i) ? tableContainer.widthDecorator.GetData("WidthPercent",i): -1;
+
+            if(width_ < 0  && widthPercent_ < 0 ){
+                if(count_){
+                    tableContainer.widthDecoratorDynamic.SetData("Width",(tableContainer.width - lengthMinus)/count_,i);
+                }
+            }
+            else if(width_ < 0  && widthPercent_ >= 0){
+                tableContainer.widthDecoratorDynamic.SetData("Width", widthPercent_*tableContainer.width/100,i);
+            }
+
+            width_ = tableContainer.widthDecoratorDynamic.IsValidData("Width",i) ? tableContainer.widthDecoratorDynamic.GetData("Width",i): -1;
+
+            if(width_ < 0){
+                if(count_){
+                    tableContainer.widthDecoratorDynamic.SetData("Width",(tableContainer.width - lengthMinus)/count_,i);
+                }
+
+            }
+
+        }
+
+        tableContainer.widthRecalc();
+    }
+
+    function setBorderParams(){
+
+        if(tableContainer.emptyDecorHeader){
+            return;
+        }
+        if(!tableContainer.canSetBorderParams){
+            return;
+        }
+
+        if(tableContainer.headerDecorator.IsValidData("BorderColorHorizontal")){
+            tableContainer.borderColorHorizontal = tableContainer.headerDecorator.GetData("BorderColorHorizontal");
+        }
+        if(tableContainer.headerDecorator.IsValidData("BorderColorVertical")){
+            tableContainer.borderColorVertical = tableContainer.headerDecorator.GetData("BorderColorVertical");
+        }
+        if(tableContainer.headerDecorator.IsValidData("HorizontalBorderSize")){
+            tableContainer.horizontalBorderSize = tableContainer.headerDecorator.GetData("HorizontalBorderSize");
+        }
+        if(tableContainer.headerDecorator.IsValidData("VerticalBorderSize")){
+            tableContainer.verticalBorderSize = tableContainer.headerDecorator.GetData("VerticalBorderSize");
+        }
+        if(tableContainer.headerDecorator.IsValidData("VisibleLeftBorderFirst")){
+            tableContainer.visibleLeftBorderFirst = tableContainer.headerDecorator.GetData("VisibleLeftBorderFirst");
+        }
+        if(tableContainer.headerDecorator.IsValidData("VisibleRightBorderLast")){
+            tableContainer.visibleRightBorderLast = tableContainer.headerDecorator.GetData("VisibleRightBorderLast");
+        }
+        if(tableContainer.headerDecorator.IsValidData("VisibleTopBorderFirst")){
+            tableContainer.visibleTopBorderFirst = tableContainer.headerDecorator.GetData("VisibleTopBorderFirst");
+        }
+        if(tableContainer.headerDecorator.IsValidData("VisibleBottomBorderLast")){
+            tableContainer.visibleBottomBorderLast = tableContainer.headerDecorator.GetData("VisibleBottomBorderLast");
+        }
+        if(tableContainer.headerDecorator.IsValidData("WrapMode")){
+            tableContainer.wrapMode = tableContainer.headerDecorator.GetData("WrapMode");
+        }
+        if(tableContainer.headerDecorator.IsValidData("IsRightBorder")){
+            tableContainer.isRightBorder = tableContainer.headerDecorator.GetData("IsRightBorder");
+        }
+        if(tableContainer.headerDecorator.IsValidData("ElideMode")){
+            tableContainer.elideMode = tableContainer.headerDecorator.GetData("ElideMode");
+        }
+
+    }
+
+    function getSelectedIds(){
+        console.log("getSelectedIds");
+        let retVal = []
+
+        let indexes = tableContainer.getSelectedIndexes();
+        for (let i = 0; i < indexes.length; i++){
+            if (elementsListObj.model.ContainsKey("Id", indexes[i])){
+                let id = elementsListObj.model.GetData("Id", indexes[i]);
+                retVal.push(id);
+            }
+        }
+
+        return retVal;
+    }
+
+    function getSelectedNames(){
+        let retVal = []
+
+        let indexes = tableContainer.getSelectedIndexes();
+        for (let i = 0; i < indexes.length; i++){
+            if (elementsListObj.model.ContainsKey("Name", indexes[i])){
+                let name = elementsListObj.model.GetData("Name", indexes[i]);
+                retVal.push(name);
+            }
+        }
+
+        return retVal;
+    }
+
+
+    function getSelectedId(){
+        console.log("getSelectedId");
+        if (tableContainer.selectedIndex > -1){
+            let item = elementsListObj.itemAtIndex(tableContainer.selectedIndex);
+            return item.getSelectedId();
+        }
+
+        return "";
+    }
+
+    function getSelectedName(){
+        if (tableContainer.selectedIndex > -1){
+            let item = elementsListObj.itemAtIndex(tableContainer.selectedIndex);
+            return item.getSelectedName();
+        }
+
+        return "";
+    }
+
+    function getSelectedItemData(){
+        if (tableContainer.selectedIndex > -1){
+            let item = elementsListObj.itemAtIndex(tableContainer.selectedIndex);
+            return item.getItemData();
+        }
+
+        return null;
+    }
+
+
 	PauseAnimation {
 		id: pause;
 		duration: 100;
@@ -327,173 +495,6 @@ Rectangle {
 
 	ListModel{
 		id: heightModel;
-	}
-
-
-	function setWidth(){
-		console.log("setWidth");
-
-		tableContainer.widthDecoratorDynamic.Clear();
-		tableContainer.widthDecoratorDynamic.Copy(tableContainer.widthDecorator);
-
-		if(!tableContainer.tableDecorator.GetItemsCount()||!tableContainer.widthDecorator.GetItemsCount()){
-			tableContainer.widthRecalc();
-			return;
-		}
-
-		var count_ = 0;
-		var lengthMinus = 0;
-
-		for(var i = 0; i < tableContainer.widthDecorator.GetItemsCount(); i++){
-
-			var width_ = tableContainer.widthDecorator.IsValidData("Width",i) ? tableContainer.widthDecorator.GetData("Width",i): -1;
-			var widthPercent_ = tableContainer.widthDecorator.IsValidData("WidthPercent",i) ? tableContainer.widthDecorator.GetData("WidthPercent",i): -1;
-
-			if((width_ == -1) && (widthPercent_ == -1)){
-				count_++;
-			}
-			else{
-				width_ = width_< 0 ? 0 : width_;
-				widthPercent_ = widthPercent_ < 0 ? 0 : widthPercent_*tableContainer.width/100;
-				lengthMinus += Math.max(width_,widthPercent_);
-			}
-		}
-
-		if((tableContainer.width - lengthMinus) < 0 || count_ == tableContainer.widthDecorator.GetItemsCount() ){
-			tableContainer.widthDecoratorDynamic.Clear();
-			tableContainer.widthRecalc();
-			return;
-		}
-
-		for(var i = 0; i < tableContainer.widthDecorator.GetItemsCount(); i++){
-
-			var width_ = tableContainer.widthDecorator.IsValidData("Width",i) ? tableContainer.widthDecorator.GetData("Width",i): -1;
-			var widthPercent_ = tableContainer.widthDecorator.IsValidData("WidthPercent",i) ? tableContainer.widthDecorator.GetData("WidthPercent",i): -1;
-
-			if(width_ < 0  && widthPercent_ < 0 ){
-				if(count_){
-					tableContainer.widthDecoratorDynamic.SetData("Width",(tableContainer.width - lengthMinus)/count_,i);
-				}
-			}
-			else if(width_ < 0  && widthPercent_ >= 0){
-				tableContainer.widthDecoratorDynamic.SetData("Width", widthPercent_*tableContainer.width/100,i);
-			}
-
-			width_ = tableContainer.widthDecoratorDynamic.IsValidData("Width",i) ? tableContainer.widthDecoratorDynamic.GetData("Width",i): -1;
-
-			if(width_ < 0){
-				if(count_){
-					tableContainer.widthDecoratorDynamic.SetData("Width",(tableContainer.width - lengthMinus)/count_,i);
-				}
-
-			}
-
-		}
-
-		tableContainer.widthRecalc();
-	}
-
-	function setBorderParams(){
-
-		if(tableContainer.emptyDecorHeader){
-			return;
-		}
-		if(!tableContainer.canSetBorderParams){
-			return;
-		}
-
-		if(tableContainer.headerDecorator.IsValidData("BorderColorHorizontal")){
-			tableContainer.borderColorHorizontal = tableContainer.headerDecorator.GetData("BorderColorHorizontal");
-		}
-		if(tableContainer.headerDecorator.IsValidData("BorderColorVertical")){
-			tableContainer.borderColorVertical = tableContainer.headerDecorator.GetData("BorderColorVertical");
-		}
-		if(tableContainer.headerDecorator.IsValidData("HorizontalBorderSize")){
-			tableContainer.horizontalBorderSize = tableContainer.headerDecorator.GetData("HorizontalBorderSize");
-		}
-		if(tableContainer.headerDecorator.IsValidData("VerticalBorderSize")){
-			tableContainer.verticalBorderSize = tableContainer.headerDecorator.GetData("VerticalBorderSize");
-		}
-		if(tableContainer.headerDecorator.IsValidData("VisibleLeftBorderFirst")){
-			tableContainer.visibleLeftBorderFirst = tableContainer.headerDecorator.GetData("VisibleLeftBorderFirst");
-		}
-		if(tableContainer.headerDecorator.IsValidData("VisibleRightBorderLast")){
-			tableContainer.visibleRightBorderLast = tableContainer.headerDecorator.GetData("VisibleRightBorderLast");
-		}
-		if(tableContainer.headerDecorator.IsValidData("VisibleTopBorderFirst")){
-			tableContainer.visibleTopBorderFirst = tableContainer.headerDecorator.GetData("VisibleTopBorderFirst");
-		}
-		if(tableContainer.headerDecorator.IsValidData("VisibleBottomBorderLast")){
-			tableContainer.visibleBottomBorderLast = tableContainer.headerDecorator.GetData("VisibleBottomBorderLast");
-		}
-		if(tableContainer.headerDecorator.IsValidData("WrapMode")){
-			tableContainer.wrapMode = tableContainer.headerDecorator.GetData("WrapMode");
-		}
-		if(tableContainer.headerDecorator.IsValidData("IsRightBorder")){
-			tableContainer.isRightBorder = tableContainer.headerDecorator.GetData("IsRightBorder");
-		}
-		if(tableContainer.headerDecorator.IsValidData("ElideMode")){
-			tableContainer.elideMode = tableContainer.headerDecorator.GetData("ElideMode");
-		}
-
-	}
-
-	function getSelectedIds(){
-		console.log("getSelectedIds");
-		let retVal = []
-
-		let indexes = tableContainer.getSelectedIndexes();
-		for (let i = 0; i < indexes.length; i++){
-			if (elementsListObj.model.ContainsKey("Id", indexes[i])){
-				let id = elementsListObj.model.GetData("Id", indexes[i]);
-				retVal.push(id);
-			}
-		}
-
-		return retVal;
-	}
-
-	function getSelectedNames(){
-		let retVal = []
-
-		let indexes = tableContainer.getSelectedIndexes();
-		for (let i = 0; i < indexes.length; i++){
-			if (elementsListObj.model.ContainsKey("Name", indexes[i])){
-				let name = elementsListObj.model.GetData("Name", indexes[i]);
-				retVal.push(name);
-			}
-		}
-
-		return retVal;
-	}
-
-
-	function getSelectedId(){
-		console.log("getSelectedId");
-		if (tableContainer.selectedIndex > -1){
-			let item = elementsListObj.itemAtIndex(tableContainer.selectedIndex);
-			return item.getSelectedId();
-		}
-
-		return "";
-	}
-
-	function getSelectedName(){
-		if (tableContainer.selectedIndex > -1){
-			let item = elementsListObj.itemAtIndex(tableContainer.selectedIndex);
-			return item.getSelectedName();
-		}
-
-		return "";
-	}
-
-	function getSelectedItemData(){
-		if (tableContainer.selectedIndex > -1){
-			let item = elementsListObj.itemAtIndex(tableContainer.selectedIndex);
-			return item.getItemData();
-		}
-
-		return null;
 	}
 
 	Rectangle {

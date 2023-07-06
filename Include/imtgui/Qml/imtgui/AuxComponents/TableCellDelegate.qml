@@ -7,6 +7,9 @@ Item {
 
     property Item pTableDelegateContainer: null;
 
+    height: pTableDelegateContainer ? pTableDelegateContainer.height : 0;
+    width: pTableDelegateContainer ? pTableDelegateContainer.width/pTableDelegateContainer.count : 0;
+
 	/// \workaround to calc cells count
     property var pDataList: [];
 
@@ -20,8 +23,6 @@ Item {
     property int columnIndex: model.index;
     property int rowIndex: pTableDelegateContainer ? pTableDelegateContainer.rowIndex : -1;
 
-    height: pTableDelegateContainer ? pTableDelegateContainer.height : 0;
-    width: pTableDelegateContainer ? pTableDelegateContainer.width/pTableDelegateContainer.count : 0;
 
     Component.onCompleted: {
         delegateContainer.compl = true;

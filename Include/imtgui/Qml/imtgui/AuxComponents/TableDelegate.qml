@@ -93,6 +93,23 @@ Rectangle {
         tableDelegateContainer.count = tableDelegateContainer.headers.GetItemsCount();
     }
 
+    onWidthChanged: {
+        tableDelegateContainer.setWidth();
+        if(tableDelegateContainer.wrapMode !== Text.NoWrap){
+            pause.stop();
+            pause.start();
+        }
+
+    }
+
+    onCountChanged: {
+        if(tableDelegateContainer.wrapMode !== Text.NoWrap){
+            heightModel.append({"cellHeight": 0});
+            pause.stop();
+            pause.start();
+        }
+    }
+
     function getItemData(){
         return model;
     }
@@ -211,22 +228,7 @@ Rectangle {
         tableDelegateContainer.widthRecalc();
     }
 
-    onWidthChanged: {
-        tableDelegateContainer.setWidth();
-        if(tableDelegateContainer.wrapMode !== Text.NoWrap){
-            pause.stop();
-            pause.start();
-        }
 
-    }
-
-    onCountChanged: {
-        if(tableDelegateContainer.wrapMode !== Text.NoWrap){
-            heightModel.append({"cellHeight": 0});
-            pause.stop();
-            pause.start();
-        }
-    }
 
     function setCellHeight(){
         if(tableDelegateContainer.wrapMode == Text.NoWrap){
