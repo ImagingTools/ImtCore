@@ -53,7 +53,7 @@ public:
 				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
 				const IOperationContext* operationContextPtr = nullptr) = 0;
 	virtual bool MoveObject(const Id& objectId, const Id& parentId, const Id& newParentId) = 0;
-	virtual bool RemoveObjectFromStructure(const Id& objectId) = 0;
+	virtual bool RemoveObjectFromStructure(const Id& objectId, const Id& parentId) = 0;
 
 	/*
 		Find operations
