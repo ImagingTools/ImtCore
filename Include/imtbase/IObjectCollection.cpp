@@ -9,7 +9,7 @@ namespace imtbase
 {
 
 
-IHierarchicalCollectionNode* IObjectCollection::GetCollectionStructure() const
+ICollectionStructure* IObjectCollection::GetCollectionStructure() const
 {
 	return nullptr;
 }

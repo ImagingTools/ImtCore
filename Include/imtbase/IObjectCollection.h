@@ -13,10 +13,10 @@ namespace imtbase
 {
 
 
+class ICollectionStructure;
 class IRevisionController;
 class ICollectionDataController;
 class IObjectCollectionIterator;
-class IHierarchicalCollectionNode;
 
 
 /**
@@ -106,7 +106,7 @@ public:
 		virtual istd::IFactoryInfo::KeyList GetFactoryKeys() const = 0;
 	};
 
-	virtual IHierarchicalCollectionNode* GetCollectionStructure() const;
+	virtual ICollectionStructure* GetCollectionStructure() const;
 
 	/**
 		Get access to the revision controller of the collection, if available.
