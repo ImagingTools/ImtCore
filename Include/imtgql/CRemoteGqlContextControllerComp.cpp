@@ -1,6 +1,11 @@
 #include <imtgql/CRemoteGqlContextControllerComp.h>
 
 
+#include <QtCore/QThread>
+
+// ACF includes
+#include <iser/CJsonMemReadArchive.h>
+
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
 #include <imtgql/CGqlContext.h>
@@ -26,8 +31,14 @@ CRemoteGqlContextControllerComp::CRemoteGqlContextControllerComp()
 
 // reimplemented (imtgql::IGqlContextController)
 
-imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(const imtgql::CGqlRequest& gqlRequest, const QByteArray& token) const
+imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
+			const imtgql::CGqlRequest& gqlRequest,
+			const QByteArray& token) const
 {
+	qptrdiff threadId = (qptrdiff)QThread::currentThreadId();
+
+	QByteArray gqlCommand = gqlRequest.GetCommandId();
+
 	QMutexLocker lock(&m_mutex);
 
 	if (m_cacheMap.contains(token)){
@@ -41,18 +52,7 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(const im
 		return nullptr;
 	}
 
-	const QList<imtgql::CGqlObject> requestParamsPtr = gqlRequest.GetParams();
-
-	QByteArray productId;
-	if (!requestParamsPtr.empty()){
-		productId = requestParamsPtr.at(0).GetFieldArgumentValue("ProductId").toByteArray();
-	}
-
-	imtgql::CGqlRequest sessionGqlRequest(imtgql::CGqlRequest::RT_QUERY, "SessionItem");
-	imtgql::CGqlObject queryFields("item");
-	queryFields.InsertField("UserId");
-	sessionGqlRequest.AddField(queryFields);
-
+	imtgql::CGqlRequest sessionGqlRequest(imtgql::CGqlRequest::RT_QUERY, "GetSessionInfo");
 	imtgql::CGqlObject inputParams("input");
 	inputParams.InsertField(QByteArray("Id"), QVariant(token));
 	sessionGqlRequest.AddParam(inputParams);
@@ -72,28 +72,27 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(const im
 	if (userSessionModelPtr->ContainsKey("data")){
 		imtbase::CTreeItemModel* dataModelPtr = userSessionModelPtr->GetTreeItemModel("data");
 		if (dataModelPtr != nullptr){
-			if (dataModelPtr->ContainsKey("UserId")){
-				userId = dataModelPtr->GetData("UserId").toByteArray();
+			QByteArray sessionJson = dataModelPtr->toJSON().toUtf8();
+
+			istd::TDelPtr<imtauth::ISession> sessionInstancePtr = m_sessionInfoFactCompPtr.CreateInstance();
+			if (!sessionInstancePtr.IsValid()){
+				return nullptr;
 			}
+
+			iser::CJsonMemReadArchive archive(sessionJson);
+			if (!sessionInstancePtr->Serialize(archive)){
+				return nullptr;
+			}
+
+			userId = sessionInstancePtr->GetUserId();
 		}
 	}
 
 	if (!userId.isEmpty()){
-		imtgql::CGqlRequest gqlUserRequest(imtgql::CGqlRequest::RT_QUERY, "UserItem");
+		imtgql::CGqlRequest gqlUserRequest(imtgql::CGqlRequest::RT_QUERY, "GetUserInfo");
 		imtgql::CGqlObject userInputParams("input");
-		userInputParams.InsertField(QByteArray("ProductId"), QVariant(productId));
 		userInputParams.InsertField(QByteArray("Id"), QVariant(userId));
 		gqlUserRequest.AddParam(userInputParams);
-
-		imtgql::CGqlObject queryUserFields("item");
-		queryUserFields.InsertField("Id");
-		queryUserFields.InsertField("Username");
-		queryUserFields.InsertField("Name");
-		queryUserFields.InsertField("Email");
-		queryUserFields.InsertField("Permissions");
-		queryUserFields.InsertField("Roles");
-		queryUserFields.InsertField("Groups");
-		gqlUserRequest.AddField(queryUserFields);
 
 		imtgql::CGqlContext* userGqlContextPtr = new imtgql::CGqlContext();
 		userGqlContextPtr->SetToken(token);
@@ -102,11 +101,6 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(const im
 
 		imtbase::CTreeItemModel* userModelPtr = m_gqlRequestHandlerCompPtr->CreateResponse(gqlUserRequest, errorMessage);
 		if (userModelPtr == nullptr){
-			return nullptr;
-		}
-
-		istd::TDelPtr<imtauth::IUserInfo> userInstancePtr = m_userInfoFactCompPtr.CreateInstance();
-		if (!userInstancePtr.IsValid()){
 			return nullptr;
 		}
 
@@ -119,42 +113,16 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(const im
 			return nullptr;
 		}
 
-		if (dataModelPtr->ContainsKey("Username")){
-			QByteArray userId = dataModelPtr->GetData("Username").toByteArray();
+		QByteArray userJson = dataModelPtr->toJSON().toUtf8();
 
-			userInstancePtr->SetId(userId);
+		istd::TDelPtr<imtauth::IUserInfo> userInstancePtr = m_userInfoFactCompPtr.CreateInstance();
+		if (!userInstancePtr.IsValid()){
+			return nullptr;
 		}
 
-		if (dataModelPtr->ContainsKey("Name")){
-			QString name = dataModelPtr->GetData("Name").toString();
-
-			userInstancePtr->SetName(name);
-		}
-
-		if (dataModelPtr->ContainsKey("Email")){
-			QByteArray email = dataModelPtr->GetData("Email").toByteArray();
-
-			userInstancePtr->SetMail(email);
-		}
-
-		if (dataModelPtr->ContainsKey("Permissions")){
-			QByteArray permissions = dataModelPtr->GetData("Permissions").toByteArray();
-			if (!permissions.isEmpty()){
-				QByteArrayList permissionsIDs = permissions.split(';');
-
-				userInstancePtr->SetLocalPermissions(productId, permissionsIDs);
-			}
-		}
-
-		if (dataModelPtr->ContainsKey("Groups")){
-			QByteArray groups = dataModelPtr->GetData("Groups").toByteArray();\
-			if (!groups.isEmpty()){
-				QByteArrayList groupIDs = groups.split(';');
-
-				for (const QByteArray& groupId : groupIDs){
-					userInstancePtr->AddToGroup(groupId);
-				}
-			}
+		iser::CJsonMemReadArchive archive(userJson);
+		if (!userInstancePtr->Serialize(archive)){
+			return nullptr;
 		}
 
 		istd::TDelPtr<imtgql::CGqlContext> gqlContextPtr = new imtgql::CGqlContext();

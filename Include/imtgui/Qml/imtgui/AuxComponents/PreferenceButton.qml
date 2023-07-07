@@ -18,12 +18,7 @@ Item {
 
         onClicked: {
             console.log("Preference button clicked !");
-//            var source = "AuxComponents/PreferenceDialog.qml";
-//            var parameters = {};
-//            parameters["localSettings"] = thumbnailDecoratorContainer.localSettings;
-//            thumbnailDecoratorContainer.openDialog(source, parameters);
-            //thumbnailDecoratorContainer.setPreferencesVisible(true);
-            Events.sendEvent("setPreferencesVisible", {"visible": true});
+            Events.sendEvent("ShowPreferencePage");
         }
     }
 }

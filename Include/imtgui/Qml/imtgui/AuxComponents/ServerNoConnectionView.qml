@@ -1,67 +1,24 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtqml 1.0
 
-Item {
+Rectangle {
     id: container;
 
-    signal refresh();
+    color: Style.backgroundColor;
 
-    Rectangle {
-        id: background;
+    property string text: qsTr("There is no connection to the server. Please check server url.");
 
-        anchors.fill: parent;
-        color: "gray";
-        opacity: 0.4;
-        MouseArea {
-            anchors.fill: parent;
-            onWheel: {}
-        }
-    }
+    Text {
+        id: textNoConnection;
 
-    Rectangle {
-        id: body;
-
+        anchors.horizontalCenter: parent.horizontalCenter;
         anchors.verticalCenter: parent.verticalCenter;
 
-        width: parent.width;
-        height: parent.height / 2;
+        text: container.text;
 
-        color: Style.backgroundColor;
-
-        Text {
-            id: textNoConnection;
-
-            anchors.horizontalCenter: parent.horizontalCenter;
-            anchors.verticalCenter: parent.verticalCenter;
-
-            text: qsTr("There is no connection to the server. Please check server url.");
-            color: Style.textColor;
-            font.pixelSize: Style.fontSize_title;
-            font.family: Style.fontFamily;
-        }
-
-        AuxButton {
-            id: refreshButton;
-
-            anchors.horizontalCenter: parent.horizontalCenter;
-            anchors.top: textNoConnection.bottom;
-            anchors.topMargin: 10;
-
-            width: 70;
-            height: 25;
-
-            hasText: true;
-            hasIcon: false;
-
-            textButton: qsTr("Refresh");
-            borderColor: (refreshButton.highlighted || refreshButton.focus) ? Style.iconColorOnSelected : Style.buttonColor;
-            backgroundColor: Style.baseColor;
-
-            onClicked: {
-                container.refresh();
-            }
-        }
+        color: Style.textColor;
+        font.pixelSize: Style.fontSize_title;
+        font.family: Style.fontFamily;
     }
 }
 

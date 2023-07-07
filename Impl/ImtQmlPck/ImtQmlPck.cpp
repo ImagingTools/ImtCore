@@ -78,6 +78,11 @@ I_EXPORT_COMPONENT(
 			"Page Based Model");
 
 I_EXPORT_COMPONENT(
+			ClientMainWindowQml,
+			"Client main window qml",
+			"Client Main Window Qml");
+
+I_EXPORT_COMPONENT(
 			CommandsObserverQml,
 			"Commands observer qml",
 			"Commands Observer Qml QML Provider");

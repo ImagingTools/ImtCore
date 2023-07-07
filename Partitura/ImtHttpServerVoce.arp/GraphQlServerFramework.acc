@@ -4,7 +4,7 @@
         <VersionInfos>
             <Version Id="0" Number="5075" Description="ACF"/>
             <Version Id="1" Number="2183" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Server framework fpr GraphQ-based implementations</Description>
@@ -151,7 +151,7 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="FileAccessCommandIds">
+                    <AttributeInfo Id="CommandId" Type="Id" ExportId="FileAccessCommandId">
                         <Data IsEnabled="true" Value="Acula/files*"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
@@ -173,7 +173,7 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="WebCommandIds">
+                    <AttributeInfo Id="CommandId" Type="Id" ExportId="WebCommandId">
                         <Data IsEnabled="true" Value="Acula/Views*"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">

@@ -44,8 +44,23 @@ void CGqlClientEngineComp::OnComponentDestroyed(){
 QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRequest& request) const
 {
 	QNetworkRequest* networkRequest = new QNetworkRequest();
-	networkRequest->setHeader(QNetworkRequest::ContentTypeHeader,QVariant("application/x-www-form-urlencoded"));
-	networkRequest->setUrl(QUrl(m_workingUrl));
+	networkRequest->setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/x-www-form-urlencoded"));
+
+	QByteArray url = m_workingUrl;
+
+	if (m_prefixServer.IsValid()){
+		QByteArray prefix = *m_prefixServer;
+		if (!prefix.startsWith('/')){
+			prefix.prepend('/');
+		}
+
+		url.append(prefix);
+	}
+
+	url.append("/graphql");
+
+	networkRequest->setUrl(QUrl(url));
+
 	imtgql::IGqlContext* contextPtr = request.GetRequestContext();
 	if (contextPtr != nullptr){
 		QByteArray token = contextPtr->GetToken();

@@ -5,11 +5,7 @@ Item {
     id: root;
 
     function logout(){
-        //thumbnailDecoratorContainer.clearModels();
-//        authorizationPage.tokenProvider.login = "";
-//        authorizationPage.visible = true;
-        Events.sendEvent("clearModels");
-        Events.sendEvent("logout");
+        Events.sendEvent("Logout");
     }
 }
 

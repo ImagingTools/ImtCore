@@ -1,7 +1,12 @@
 module imtqml
 ThumbnailDecorator 1.0 ThumbnailDecorator.qml
+ApplicationMain 1.0 ApplicationMain.qml
 
 AuthorizationPage 1.0 ./AuxComponents/AuthorizationPage.qml
+SuperuserPasswordPage 1.0 ./AuxComponents/SuperuserPasswordPage.qml
+SuperuserProvider 1.0 ./AuxComponents/SuperuserProvider.qml
+
+BaseText 1.0 ./AuxComponents/BaseText.qml
 
 CollectionView 1.0 ./AuxComponents/CollectionView.qml
 CollectionViewBase 1.0 ./AuxComponents/CollectionViewBase.qml

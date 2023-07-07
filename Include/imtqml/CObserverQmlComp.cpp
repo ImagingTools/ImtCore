@@ -82,7 +82,7 @@ void CObserverQmlComp::OnComponentCreated()
 
 					ApplyUrl();
 
-					QMetaObject::invokeMethod(quickItem, "updateModels");
+					QMetaObject::invokeMethod(quickItem, "firstModelsInit");
 				}
 			}
 		}

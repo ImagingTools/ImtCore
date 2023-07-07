@@ -11,7 +11,6 @@ Rectangle {
 
     clip: true;
 
-    visible: count > 1;
     width: visible ? contentWidth : 1;
 
     property string textColor: Style.textColor;
@@ -34,22 +33,22 @@ Rectangle {
     signal activePageChanged;
 
     function clearModels(){
-
         lvPages.model = 0;
         menuPanel.activePageIndex = -1;
     }
 
     onModelChanged: {
-        console.log("MenuPanel onModelChanged", menuPanel.model);
+        console.log("MenuPanel onModelChanged", menuPanel.model.toJSON());
         clearModels();
 
         lvPages.model = menuPanel.model;
+        console.log("lvPages count", lvPages.count);
+        console.log("lvPages.model", lvPages.model.toJSON());
     }
 
     onActivePageIndexChanged: {
         console.log("MenuPanel onActivePageIndexChanged", menuPanel.activePageIndex);
     }
-
 
     ListView {
         id: lvPages;

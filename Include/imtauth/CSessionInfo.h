@@ -1,20 +1,16 @@
 #pragma once
 
 
-// Qt includes
-#include <QtCore/QUuid>
-
 // ImtCore includes
 #include <imtauth/ISession.h>
-#include <imtauth/IUserInfo.h>
 
 
 namespace imtauth
 {
 
+
 class CSessionInfo: virtual public ISession
 {
-
 public:
 	// reimplemented (iser::ISession)
 	virtual QByteArray GetToken() const override;
@@ -32,6 +28,5 @@ private:
 
 
 } // namespace imtauth
-
 
 

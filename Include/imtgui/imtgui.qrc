@@ -4,6 +4,8 @@
         <file alias="Acf/Events.qml">Qml/Acf/Events.qml</file>
         <file alias="imtgui/qmldir">Qml/imtgui/qmldir</file>
         <file alias="imtgui/ThumbnailDecorator.qml">Qml/imtgui/ThumbnailDecorator.qml</file>
+	<file alias="imtgui/ApplicationMain.qml">Qml/imtgui/ApplicationMain.qml</file>
+	<file alias="imtgui/AuxComponents/BaseText.qml">Qml/imtgui/AuxComponents/BaseText.qml</file>
         <file alias="imtgui/AuxComponents/AuxButton.qml">Qml/imtgui/AuxComponents/AuxButton.qml</file>
         <file alias="imtgui/AuxComponents/TextButton.qml">Qml/imtgui/AuxComponents/TextButton.qml</file>
         <file alias="imtgui/AuxComponents/MenuPanel.qml">Qml/imtgui/AuxComponents/MenuPanel.qml</file>
@@ -90,6 +92,7 @@
 	<file alias="imtgui/AuxComponents/SettingsProvider.qml">Qml/imtgui/AuxComponents/SettingsProvider.qml</file>
 	<file alias="imtgui/AuxComponents/UserManagementProvider.qml">Qml/imtgui/AuxComponents/UserManagementProvider.qml</file>
 	<file alias="imtgui/AuxComponents/UserTokenProvider.qml">Qml/imtgui/AuxComponents/UserTokenProvider.qml</file>
+	<file alias="imtgui/AuxComponents/SuperuserPasswordPage.qml">Qml/imtgui/AuxComponents/SuperuserPasswordPage.qml</file>
 
         <file alias="imtgui/AuxComponents/BaseButton.qml">Qml/imtgui/AuxComponents/BaseButton.qml</file>
         <file alias="imtgui/AuxComponents/TopButtonDecorator.qml">Qml/imtgui/AuxComponents/TopButtonDecorator.qml</file>
@@ -103,6 +106,8 @@
 	<file alias="imtgui/AuxComponents/TreeViewItemDelegateBase.qml">Qml/imtgui/AuxComponents/TreeViewItemDelegateBase.qml</file>
 	
 	<file alias="imtgui/AuxComponents/SuperUserPasswordDialog.qml">Qml/imtgui/AuxComponents/SuperUserPasswordDialog.qml</file>
+	<file alias="imtgui/AuxComponents/SuperuserProvider.qml">Qml/imtgui/AuxComponents/SuperuserProvider.qml</file>
+
 	<file alias="imtgui/AuxComponents/LanguageProvider.qml">Qml/imtgui/AuxComponents/LanguageProvider.qml</file>
 	<file alias="imtgui/AuxComponents/DesignSchemaProvider.qml">Qml/imtgui/AuxComponents/DesignSchemaProvider.qml</file>
 	<file alias="imtgui/AuxComponents/GqlDocumentDataController.qml">Qml/imtgui/AuxComponents/GqlDocumentDataController.qml</file>

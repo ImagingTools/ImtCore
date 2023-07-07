@@ -4,13 +4,13 @@
         <VersionInfos>
             <Version Id="0" Number="5075" Description="ACF"/>
             <Version Id="1" Number="2183" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ApiClient" X="550" Y="325" Note=""/>
         <Element ComponentName="GraphQLClientEngine" X="550" Y="450" Note=""/>
-        <Element ComponentName="RemoteRepresentationController" X="575" Y="175" Note=""/>
+        <Element ComponentName="PumaGqlRemoteRepresentationController" X="550" Y="175" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

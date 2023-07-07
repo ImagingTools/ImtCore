@@ -355,8 +355,11 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="/Puma"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Url" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="http://localhost:7788/Puma/graphql"/>
+                        <Data IsEnabled="true" Value="http://localhost:7788"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

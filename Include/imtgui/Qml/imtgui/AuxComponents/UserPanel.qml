@@ -8,11 +8,33 @@ Item {
     height: 30;
     width: 50;
 
-    property string username: authorizationPage.tokenProvider.login !== undefined ? authorizationPage.tokenProvider.login: "" ;
-//    property bool enabled: authorizationPage.state !==undefined ? authorizationPage.state == "authorized" :false;
-    property bool enabled: true;
+    property string username;
+    property bool enabled: false;
+
     property alias iconSource: loginButton.iconSource;
     property bool isExitButton: false;
+
+    Component.onCompleted: {
+        Events.subscribeEvent("Logout", root.onLogout);
+        Events.subscribeEvent("Login", root.onLogin);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("Logout", root.onLogout);
+        Events.unSubscribeEvent("Login", root.onLogin);
+    }
+
+    function onLogout(){
+        root.username = "";
+
+        root.enabled = false;
+    }
+
+    function onLogin(login){
+        root.username = login;
+
+        root.enabled = true;
+    }
 
     Text {
         id: usernameText;

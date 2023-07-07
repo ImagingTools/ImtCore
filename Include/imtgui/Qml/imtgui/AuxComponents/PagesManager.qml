@@ -8,16 +8,7 @@ Item {
     property TreeItemModel pageModel: TreeItemModel {};
     property Item activeItem: null;
     property int activePageIndex: -1;
-
     property MainDocumentManager documentManager: null;
-
-    onActiveItemChanged: {
-        console.log("onActiveItemChanged", container.activeItem);
-    }
-
-    onActivePageIndexChanged: {
-        console.log("PagesManager onActivePageIndexChanged", container.activePageIndex);
-    }
 
     function updateModel(){
         pagesProvider.updateModel();
@@ -29,11 +20,13 @@ Item {
         pagesData.model = 0;
     }
 
+    property alias modelState: pagesProvider.modelState;
+
     PagesProvider {
         id: pagesProvider;
 
         onPagesModelChanged: {
-            console.log("pagesProvider onPagesModelChanged", container.pageModel.toJSON());
+            console.log("pagesProvider onPagesModelChanged", pagesProvider.pagesModel.toJSON());
             pagesData.model = pagesProvider.pagesModel;
             container.pageModel = pagesProvider.pagesModel;
         }

@@ -2,9 +2,9 @@
 
 
 // ImtCore includes
+#include <imtauth/CRole.h>
 #include <imtauth/IUserBaseInfo.h>
 #include "imtbase/CCollectionInfo.h"
-#include <imtauth/CRole.h>
 
 
 namespace imtauth
@@ -54,7 +54,6 @@ protected:
 	const imtauth::IUserGroupInfoProvider* m_userGroupInfoProviderPtr;
 
 protected:
-//	IUserBaseInfo::FeatureIds m_permissions;
 	IUserBaseInfo::FeatureIds m_restrictions;
 
 	QMap<QByteArray, QByteArrayList> m_permissionsMap;

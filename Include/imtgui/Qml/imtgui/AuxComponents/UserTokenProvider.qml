@@ -2,27 +2,22 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 
-Item {
+QtObject {
     id: container;
 
     property string token: "";
     property string login: "";
 
     signal accepted();
-    signal errorSignal(string message);
+    signal failed(string message);
 
-    onErrorSignal: {
-        console.log("ERROR: ",message);
-    }
+    property string modelState: container.authorizationGqlModel.state;
 
     function authorization(loginF, passwordF){
-        console.log('DEBUG::authorization', loginF, passwordF);
-        authorizationGqlModel.authorization(loginF, passwordF);
+        container.authorizationGqlModel.authorization(loginF, passwordF);
     }
 
-    GqlModel{
-        id: authorizationGqlModel;
-
+    property GqlModel authorizationGqlModel : GqlModel{
         function authorization(login, password) {
             var query = Gql.GqlRequest("query", "UserToken");
 
@@ -37,22 +32,22 @@ Item {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, authorizationGqlModel);
+            console.log("State:", this.state, container.authorizationGqlModel);
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                if (authorizationGqlModel.ContainsKey("errors")){
-                    dataModelLocal = authorizationGqlModel.GetData("errors")
+                if (container.authorizationGqlModel.ContainsKey("errors")){
+                    dataModelLocal = container.authorizationGqlModel.GetData("errors")
                     dataModelLocal = dataModelLocal.GetData("UserToken")
 
                     let message = dataModelLocal.GetData("message");
-                    container.errorSignal(message);
+                    container.failed(message);
 
                     return;
                 }
 
-                if (authorizationGqlModel.ContainsKey("data")){
-                    dataModelLocal = authorizationGqlModel.GetData("data");
+                if (container.authorizationGqlModel.ContainsKey("data")){
+                    dataModelLocal = container.authorizationGqlModel.GetData("data");
 
                     if (dataModelLocal.ContainsKey("UserToken")){
                         dataModelLocal = dataModelLocal.GetData("UserToken");

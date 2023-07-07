@@ -8,8 +8,6 @@ TreeItemModelObserver {
     property DesignSchemaProvider designProvider: null;
     property LanguageProvider languageProvider: null;
 
-    property Item root: null;
-
     onModelChanged: {
         console.log("ServerSettingsModelObserver onModelChanged");
         for (let i = 0; i < changeList.length; i++){
@@ -26,7 +24,7 @@ TreeItemModelObserver {
                 }
             }
             else if (ids.includes("Database")){
-                container.root.updateAllModels();
+                Events.sendEvent("UpdateModels");
             }
         }
     }

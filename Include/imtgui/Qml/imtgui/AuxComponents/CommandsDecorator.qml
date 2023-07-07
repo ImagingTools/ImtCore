@@ -10,13 +10,13 @@ Item {
     property string commandsId;
 
     Component.onCompleted: {
-        Events.subscribeEvent("CommandsDecoratorClear", commandsDecoratorContainer.clearModel);
-        Events.subscribeEvent("CommandsDecoratorSetVisible", commandsDecoratorContainer.setVisible);
+        Events.subscribeEvent("Logout", commandsDecoratorContainer.clearModel);
+        Events.subscribeEvent("SetCommandsVisible", commandsDecoratorContainer.setVisible);
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("CommandsDecoratorClear", commandsDecoratorContainer.clearModel);
-        Events.unSubscribeEvent("CommandsDecoratorSetVisible", commandsDecoratorContainer.setVisible);
+        Events.unSubscribeEvent("Logout", commandsDecoratorContainer.clearModel);
+        Events.unSubscribeEvent("SetCommandsVisible", commandsDecoratorContainer.setVisible);
     }
 
     function setCommandsModel(parameters){

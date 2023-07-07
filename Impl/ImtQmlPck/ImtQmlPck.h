@@ -19,6 +19,7 @@
 #include <imtqml/CCommandPermissionsFilterComp.h>
 #include <imtqml/CPageGuiElementModelComp.h>
 #include <imtqml/CCommandsObserverQmlComp.h>
+#include <imtqml/CClientMainWindowQmlComp.h>
 
 
 /**
@@ -40,6 +41,7 @@ typedef imtqml::CApplicationInfoDataProviderComp ApplicationInfoDataProvider;
 typedef imtqml::CObjectViewDataProviderComp ObjectViewDataProvider;
 typedef imtqml::CCommandPermissionsFilterComp CommandPermissionsFilter;
 typedef imtqml::CPageGuiElementModelComp PageGuiElementModel;
+typedef imtqml::CClientMainWindowQmlComp ClientMainWindowQml;
 typedef icomp::TModelCompWrap<imtqml::CCommandsObserverQmlComp> CommandsObserverQml;
 
 

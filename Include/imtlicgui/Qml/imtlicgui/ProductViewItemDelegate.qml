@@ -54,8 +54,8 @@ TreeViewItemDelegateBase {
                     font.family: Style.fontFamily;
                     font.pixelSize: Style.fontSize_common;
                     color: Style.textColor;
-//                    wrapMode: Text.WordWrap;
                     elide: Text.ElideRight;
+                    visible: !inputName.visible;
 
                     text: model.Name ? model.Name : "";
                 }
@@ -135,8 +135,8 @@ TreeViewItemDelegateBase {
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_common;
                         color: Style.textColor;
-//                        wrapMode: Text.WordWrap;
                         elide: Text.ElideRight;
+                        visible: !inputId.visible;
 
                         text: model.Id ? model.Id : "";
                     }
@@ -217,8 +217,8 @@ TreeViewItemDelegateBase {
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_common;
                         color: Style.textColor;
-//                        wrapMode: Text.WordWrap;
                         elide: Text.ElideRight;
+                        visible: !inputDescription.visible;
 
                         text: model.Description ? model.Description : "";
                     }

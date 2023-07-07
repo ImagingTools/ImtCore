@@ -5,16 +5,20 @@ import imtgui 1.0
 Rectangle {
     id: root;
 
-    color: Style.alternateBaseColor;
+    color: Style.backgroundColor;
 
-//    Text {
-//        anchors.centerIn: parent;
+    function start(){
+        console.log("Loading start");
 
-//        text: qsTr("Loading...");
-//        color: Style.textColor;
-//        font.family: Style.fontFamilyBold;
-//        font.pixelSize: Style.fontSize_common;
-//    }
+        root.stop();
+
+        root.visible = true;
+    }
+
+    function stop(){
+        console.log("Loading stop");
+        root.visible = false;
+    }
 
     Item { // square
         id: square;

@@ -40,12 +40,14 @@ bool CApiClientComp::SendRequest(const IGqlRequest& request, ResponseHandler& re
 
 				SendInfoMessage(0, message, "API client");
 
+				qDebug() << message;
+
 				imtcom::CRequestSender requestSender;
 				QNetworkReply* replyPtr = requestSender.DoSyncPost(*networkRequestPtr, request.GetQuery(), m_timeout);
 
 				if (replyPtr != nullptr){
 					QNetworkReply::NetworkError error = replyPtr->error();
-					if (replyPtr->error() == QNetworkReply::NoError){
+					if (error == QNetworkReply::NoError){
 						QByteArray payload = replyPtr->readAll();
 
 						responseHandler.OnReply(request, payload);

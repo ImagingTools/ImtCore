@@ -151,7 +151,6 @@ TableViewItemDelegateBase {
 
             property var childModel: treeDelegateBase.itemData.ChildModel ? model.ChildModel: 0;
             onChildModelChanged: {
-                console.log("onChildModelChanged", childModel);
                 if (childrenColumn.childModel){
                     if (childrenColumn.childModel.GetItemsCount() > 0){
                             treeDelegateBase.hasChild = true;

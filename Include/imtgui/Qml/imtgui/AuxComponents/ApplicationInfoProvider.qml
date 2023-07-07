@@ -2,7 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 
-Item {
+QtObject {
     id: root;
 
     property TreeItemModel clientApplicationInfo: null;
@@ -28,9 +28,7 @@ Item {
         applicationInfoQuery.updateModel();
     }
 
-    GqlModel {
-        id: applicationInfoQuery;
-
+    property GqlModel applicationInfoQuery : GqlModel {
         function updateModel() {
             var query = Gql.GqlRequest("query", "GetApplicationInfo");
 

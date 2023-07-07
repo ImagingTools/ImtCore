@@ -1,5 +1,6 @@
 #include <imtgql/CGqlRequest.h>
 
+
 // Qt includes
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
@@ -225,6 +226,7 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 			break;
 		}
 	}
+
 	if (type == "query"){
 		m_requestType = imtgql::IGqlRequest::RT_QUERY;
 	}
@@ -657,10 +659,8 @@ QByteArray CGqlRequest::AddObjectParamValue(const QVariant &value) const
 {
 	QByteArray retVal;
 	int valueType = value.type();
-	qDebug() << "value" << value;
 	if (valueType == QVariant::List || valueType == QVariant::StringList){
 		QVariantList variantList = value.toList();
-		qDebug() << "variantList" << variantList;
 		retVal += "[";
 		for (int i = 0; i < variantList.count(); i++){
 			if (i > 0){
@@ -683,7 +683,6 @@ QByteArray CGqlRequest::AddObjectParamValue(const QVariant &value) const
 	}
 	else if (value.canConvert<QStringList>()){
 		QStringList stringList = value.value<QStringList>();
-		qDebug() << "stringList" << stringList;
 		retVal += "[";
 		for (int i = 0; i < stringList.count(); i++){
 			if (i > 0){
@@ -695,7 +694,6 @@ QByteArray CGqlRequest::AddObjectParamValue(const QVariant &value) const
 	}
 	else if (value.canConvert<QList<QString>>()){
 		QList<QString> stringList = value.value<QList<QString>>();
-		qDebug() << "QList<QString>" << stringList;
 		retVal += "[";
 		for (int i = 0; i < stringList.count(); i++){
 			if (i > 0){

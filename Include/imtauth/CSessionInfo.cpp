@@ -3,10 +3,13 @@
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
+#include <iser/IArchive.h>
+#include <iser/CArchiveTag.h>
 
 
 namespace imtauth
 {
+
 
 // reimplemented (iser::ISession)
 
@@ -46,7 +49,19 @@ void CSessionInfo::SetUserId(const QByteArray &userId)
 
 bool CSessionInfo::Serialize(iser::IArchive &archive)
 {
-	return true;
+	bool retVal = true;
+
+	static iser::CArchiveTag tokenTag("Token", "User token", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(tokenTag);
+	retVal = retVal && archive.Process(m_token);
+	retVal = retVal && archive.EndTag(tokenTag);
+
+	static iser::CArchiveTag userIdTag("UserId", "User-ID", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(userIdTag);
+	retVal = retVal && archive.Process(m_userId);
+	retVal = retVal && archive.EndTag(userIdTag);
+
+	return retVal;
 }
 
 

@@ -124,6 +124,11 @@ I_EXPORT_COMPONENT(
 			"User group provider",
 			"UserGroup Group User Provider");
 
+I_EXPORT_COMPONENT(
+			SessionInfo,
+			"Session info",
+			"Session Info");
+
 
 } // namespace ImtAuthPck
 

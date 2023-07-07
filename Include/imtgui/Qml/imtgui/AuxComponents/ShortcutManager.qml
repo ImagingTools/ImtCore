@@ -2,7 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 
 QtObject {
-    id: collectionViewContainer;
+    id: root;
 
     property Shortcut ctrlF: Shortcut {
         sequence: "Ctrl+F";

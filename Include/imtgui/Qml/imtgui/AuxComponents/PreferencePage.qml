@@ -9,8 +9,6 @@ Rectangle {
 
     color: "transparent";
 
-    property Item root: null;
-
     property TreeItemModel serverModel: TreeItemModel {}
     property TreeItemModel localModel: TreeItemModel {}
 

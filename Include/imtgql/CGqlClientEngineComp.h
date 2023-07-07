@@ -25,6 +25,7 @@ public:
 		I_REGISTER_INTERFACE(imtgql::IClientProtocolEngine);
 		I_ASSIGN(m_urlAttrPtr, "Url", "The property holds connection's url.", true, "localhost");
 		I_ASSIGN(m_urlParamCompPtr, "UrlParam", "The object holds connection's url.", false, "UrlParam");
+		I_ASSIGN(m_prefixServer, "ServerPrefix", "Prefix Server", true, "/");
 	I_END_COMPONENT;
 
 	CGqlClientEngineComp();
@@ -41,6 +42,7 @@ protected:
 
 private:
 	I_ATTR(QByteArray, m_urlAttrPtr);
+	I_ATTR(QByteArray, m_prefixServer);
 	I_REF(iprm::ITextParam, m_urlParamCompPtr);
 
 	imtbase::TModelUpdateBinder<iprm::ITextParam, CGqlClientEngineComp> m_textParamObserver;

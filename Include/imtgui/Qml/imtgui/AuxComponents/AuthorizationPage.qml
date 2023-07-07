@@ -8,8 +8,6 @@ Rectangle {
 
     color: "transparent";
 
-    property var windows;
-
     property string state;
 
     property alias tokenProvider: userTokenProvider;
@@ -18,11 +16,18 @@ Rectangle {
     property int mainRadius: 3;
     property string mainColor: Style.backgroundColor;
 
-    //property alias title: welcomeText.text;
+    property alias modelState: userTokenProvider.modelState;
+
+    signal loginSuccessful();
+    signal loginFailed();
 
     Component.onCompleted: {
-        Events.subscribeEvent("logout", authPageContainer.logout);
+        Events.subscribeEvent("Logout", authPageContainer.logout);
         decoratorPause.start();
+    }
+
+    onLoginSuccessful: {
+        Events.sendEvent("Login", authPageContainer.login);
     }
 
     onVisibleChanged: {
@@ -34,6 +39,14 @@ Rectangle {
 
             loginTextInput.focus = true;
         }
+    }
+
+    function getLoggedUserId(){
+        return authPageContainer.login;
+    }
+
+    function setLoggedUserId(login){
+        authPageContainer.login = login;
     }
 
     function passwordRecovery(){
@@ -284,8 +297,10 @@ Rectangle {
 
                     highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
-                    iconSource: passwordTextInput.echoMode == TextInput.Password ? "../../../Icons/" + Style.theme + "/HiddenPassword.svg" :
-                                                                                   passwordTextInput.echoMode == TextInput.Normal ? "../../../Icons/" + Style.theme + "/ShownPassword.svg" : "";
+                    iconSource: passwordTextInput.echoMode == TextInput.Password ? "../../../Icons/" + Style.theme + "/ShownPassword.svg" : "../../../Icons/" + Style.theme + "/HiddenPassword.svg";
+
+//                    iconSource: passwordTextInput.echoMode == TextInput.Password ? "../../../Icons/" + Style.theme + "/HiddenPassword.svg" :
+//                                                                                   passwordTextInput.echoMode == TextInput.Normal ? "../../../Icons/" + Style.theme + "/ShownPassword.svg" : "";
                     onClicked: {
                         if(passwordTextInput.echoMode == TextInput.Password){
                             passwordTextInput.echoMode = TextInput.Normal;
@@ -294,11 +309,7 @@ Rectangle {
                             passwordTextInput.echoMode = TextInput.Password;
                         }
                     }
-
-
                 }
-
-
             }
 
             Item{
@@ -414,17 +425,13 @@ Rectangle {
         id: userTokenProvider;
 
         onAccepted: {
-            console.log('DEBUG::UserTokenProvider.onAccepted', authPageContainer.windows)
-            authPageContainer.state = "authorized";
-            var pageContainer =  authPageContainer.windows;
-            pageContainer.updateAllModels();
-            pageContainer.updateServerSettings();
-            authPageContainer.visible = false;
+            authPageContainer.loginSuccessful();
         }
-        onErrorSignal: {
+
+        onFailed: {
             errorMessage.text = message;
+
+            authPageContainer.loginFailed();
         }
     }
-
-
 }

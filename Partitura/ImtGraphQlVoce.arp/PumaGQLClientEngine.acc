@@ -25,6 +25,9 @@
         <Element Id="GraphQLClientEngine" PackageId="ImtGqlPck" ComponentId="GraphQLClientEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="ServerPrefix">
+                        <Data IsEnabled="true" Value=""/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Url" Type="Id" ExportId="Url">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

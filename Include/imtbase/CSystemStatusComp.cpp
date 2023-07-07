@@ -1,6 +1,14 @@
 #include <imtbase/CSystemStatusComp.h>
 
 
+// Qt includes
+#if QT_VERSION >= 0x050000
+#include <QtConcurrent/QtConcurrent>
+#else
+#include <QtCore>
+#endif
+
+
 namespace imtbase
 {
 
@@ -9,7 +17,7 @@ namespace imtbase
 
 CSystemStatusComp::CSystemStatusComp()
 	:m_status(SystemStatus::SS_UNKNOWN_ERROR),
-	m_checkStatusThread(*this)
+	  m_futureResultStatus(SystemStatus::SS_UNKNOWN_ERROR)
 {
 }
 
@@ -40,20 +48,21 @@ void CSystemStatusComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	connect(&m_checkStatusThread, &QThread::finished, this, &CSystemStatusComp::OnCheckStatusFinished, Qt::QueuedConnection);
+	connect(&m_timer, &QTimer::timeout, this, &CSystemStatusComp::OnTimeout);
+	connect(&m_checkStatusFutureWatcher, &QFutureWatcher<void>::finished, this, &CSystemStatusComp::OnCheckStatusFinished);
 
-	if (m_connectionStatusProviderCompPtr.IsValid() && m_dbServerConnectionCheckerCompPtr.IsValid()){
-		m_checkStatusThread.Start();
-	}
+	m_timer.setSingleShot(true);
+
+	int interval = m_checkIntervalAttrPtr.IsValid() ? *m_checkIntervalAttrPtr * 1000 : 60000;
+	m_timer.setInterval(interval);
+
+	m_timer.start();
 }
 
 
 void CSystemStatusComp::OnComponentDestroyed()
 {
-	if (m_checkStatusThread.isRunning()){
-		m_checkStatusThread.requestInterruption();
-		m_checkStatusThread.wait();
-	}
+	m_checkStatusFutureWatcher.waitForFinished();
 
 	BaseClass::OnComponentDestroyed();
 }
@@ -72,97 +81,51 @@ void CSystemStatusComp::SetStatus(ISystemStatus::SystemStatus status)
 }
 
 
+// private slots
+
+void CSystemStatusComp::OnCheckStatusFinished()
+{
+	SetStatus(m_futureResultStatus);
+
+	m_timer.start();
+}
+
+
+void CSystemStatusComp::OnTimeout()
+{
+	Q_ASSERT(!m_checkStatusFutureWatcher.isRunning());
+
+#if QT_VERSION >= 0x060000
+	m_checkStatusFutureWatcher.setFuture(QtConcurrent::run(&CSystemStatusComp::CheckStatus, this));
+#else
+	m_checkStatusFutureWatcher.setFuture(QtConcurrent::run(this, &CSystemStatusComp::CheckStatus));
+#endif
+}
+
+
 void CSystemStatusComp::CheckStatus()
 {
 	if (m_connectionStatusProviderCompPtr.IsValid()){
 		imtcom::IConnectionStatusProvider::ConnectionStatus serverConnectionStatus = m_connectionStatusProviderCompPtr->GetConnectionStatus();
 		if (serverConnectionStatus != imtcom::IConnectionStatusProvider::ConnectionStatus::CS_CONNECTED){
-			SetStatus(ISystemStatus::SystemStatus::SS_SERVER_CONNECTION_ERROR);
+			m_futureResultStatus = ISystemStatus::SystemStatus::SS_SERVER_CONNECTION_ERROR;
 
 			return;
 		}
 
 		if (m_dbServerConnectionCheckerCompPtr.IsValid()){
-			bool isConnected = m_dbServerConnectionCheckerCompPtr->IsDatabaseServerConnected(m_errorMessage);
-			if (!isConnected){
-				SetStatus(ISystemStatus::SystemStatus::SS_DATABASE_CONNECTION_ERROR);
-
-				return;
-			}
-		}
-
-		SetStatus(ISystemStatus::SystemStatus::SS_NO_ERROR);
-	}
-}
-
-
-// private slots
-
-void CSystemStatusComp::OnCheckStatusFinished()
-{
-	ISystemStatus::SystemStatus systemStatus = m_checkStatusThread.GetStatus();
-
-	m_errorMessage = m_checkStatusThread.GetErrorMessage();
-
-	SetStatus(systemStatus);
-
-	m_checkStatusThread.Start();
-}
-
-
-// public methods of the embedded class CheckStatusThread
-
-CSystemStatusComp::CheckStatusThread::CheckStatusThread(CSystemStatusComp& parent)
-	:m_parent(parent)
-{
-
-}
-
-
-void CSystemStatusComp::CheckStatusThread::Start()
-{
-	QThread::start();
-}
-
-
-ISystemStatus::SystemStatus CSystemStatusComp::CheckStatusThread::GetStatus()
-{
-	return m_status;
-}
-
-
-QString CSystemStatusComp::CheckStatusThread::GetErrorMessage()
-{
-	return m_errorMessage;
-}
-
-
-// protected methods of the embedded class CheckStatusThread
-
-// reimplemented (QThread)
-
-void CSystemStatusComp::CheckStatusThread::run()
-{
-	if (m_parent.m_connectionStatusProviderCompPtr.IsValid()){
-		imtcom::IConnectionStatusProvider::ConnectionStatus serverConnectionStatus = m_parent.m_connectionStatusProviderCompPtr->GetConnectionStatus();
-		if (serverConnectionStatus != imtcom::IConnectionStatusProvider::ConnectionStatus::CS_CONNECTED){
-			m_status = ISystemStatus::SystemStatus::SS_SERVER_CONNECTION_ERROR;
-
-			return;
-		}
-
-		if (m_parent.m_dbServerConnectionCheckerCompPtr.IsValid()){
 			QString error;
-			bool isConnected = m_parent.m_dbServerConnectionCheckerCompPtr->IsDatabaseServerConnected(error);
+			bool isConnected = m_dbServerConnectionCheckerCompPtr->IsDatabaseServerConnected(error);
 			if (!isConnected){
 				m_errorMessage = error;
-				m_status = ISystemStatus::SystemStatus::SS_DATABASE_CONNECTION_ERROR;
+
+				m_futureResultStatus = ISystemStatus::SystemStatus::SS_DATABASE_CONNECTION_ERROR;
 
 				return;
 			}
 		}
 
-		m_status = ISystemStatus::SystemStatus::SS_NO_ERROR;
+		m_futureResultStatus = ISystemStatus::SystemStatus::SS_NO_ERROR;
 	}
 }
 

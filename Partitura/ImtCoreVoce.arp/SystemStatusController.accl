@@ -9,9 +9,11 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ApiClient" X="575" Y="300" Note=""/>
+        <Element ComponentName="AsyncConnectionChecker" X="1000" Y="125" Note=""/>
+        <Element ComponentName="DatabaseServerConnectionChecker" X="200" Y="300" Note=""/>
         <Element ComponentName="GraphQLClientEngine" X="575" Y="525" Note=""/>
-        <Element ComponentName="RemoteDatabaseServerConnection" X="200" Y="300" Note=""/>
-        <Element ComponentName="SimpleConnectionChecker" X="950" Y="300" Note=""/>
+        <Element ComponentName="InternetConnectionChecker" X="1000" Y="50" Note=""/>
+        <Element ComponentName="ServerConnectionChecker" X="950" Y="300" Note=""/>
         <Element ComponentName="SystemStatus" X="550" Y="100" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>

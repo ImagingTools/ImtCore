@@ -16,6 +16,8 @@ QtObject {
     signal documentAdded(string documentId, string documentName);
     signal savingError(string message);
 
+    signal error(string message);
+
     function getData(documentId, inputParams, typeId){
         container.documentTypeId = typeId;
         container.gqlGetModel.getModelData(documentId, inputParams);
@@ -28,6 +30,9 @@ QtObject {
     function updateData(documentId, documentData){
         container.gqlSetModel.set(updateCommandId, documentId, documentData);
     }
+
+    property string getModelState: gqlGetModel.state;
+    property string setModelState: gqlSetModel.state;
 
     property GqlModel gqlGetModel: GqlModel {
         function getModelData(modelId, externInputParams){
@@ -62,6 +67,19 @@ QtObject {
                 var dataModelLocal;
 
                 if (container.gqlGetModel.ContainsKey("errors")){
+                    dataModelLocal = container.gqlGetModel.GetData("errors");
+
+                    if (dataModelLocal.ContainsKey(container.getCommandId)){
+                        dataModelLocal = dataModelLocal.GetData(container.getCommandId);
+                    }
+
+                    let message = ""
+                    if (dataModelLocal.ContainsKey("message")){
+                        message = dataModelLocal.GetData("message");
+                    }
+
+                    container.error(message);
+
                     return;
                 }
 
@@ -72,6 +90,9 @@ QtObject {
                     container.documentModel = dataModelLocal;
                 }
             }
+            else if (this.state === "Error"){
+                container.error("Unknown error");
+            }
         }
     }//GqlModel itemModel
 
@@ -81,7 +102,6 @@ QtObject {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", modelId);
-//            inputParams.InsertField("ProductId", window.productId);
             var jsonString = data.toJSON();
             inputParams.InsertField ("Item", jsonString);
             query.AddParam(inputParams);

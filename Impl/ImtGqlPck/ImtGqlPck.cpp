@@ -70,11 +70,6 @@ I_EXPORT_COMPONENT(
 			"GraphQl Gql Object Collection");
 
 I_EXPORT_COMPONENT(
-			GqlContextCacheController,
-			"GraphQl context cache controller",
-			"GraphQl Gql GQL Object Context Cache Controller");
-
-I_EXPORT_COMPONENT(
 			RemoteGqlContextController,
 			"Remote gql context controller",
 			"Remote Gql Context Controller");

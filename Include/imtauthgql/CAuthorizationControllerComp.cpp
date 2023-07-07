@@ -85,7 +85,7 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 		}
 	}
 
-	errorMessage = QT_TR_NOOP("Invalid username or password");
+	errorMessage = QT_TR_NOOP("Invalid login or password");
 
 	imtbase::CTreeItemModel* errorsItemModelPtr = rootModelPtr->AddTreeModel("errors");
 	errorsItemModelPtr->SetData("message", errorMessage);

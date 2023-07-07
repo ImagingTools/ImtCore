@@ -2,7 +2,7 @@ import QtQuick 2.0
 import Acf 1.0
 import imtqml 1.0
 
-Item {
+QtObject {
     id: provider;
 
     property TreeItemModel model: TreeItemModel {};
@@ -18,7 +18,7 @@ Item {
 
         let result = [];
 
-        privateBlock.getAllDependenciesRecursive(featureId, provider.model, result);
+        provider.getAllDependenciesRecursive(featureId, provider.model, result);
 
         console.log("result", result);
 
@@ -41,55 +41,48 @@ Item {
     function getAllDependentFeaturesByFeatureId(featureId){
         let result = []
 
-        privateBlock.getAllDependentFeaturesRecursive(featureId, result);
+        provider.getAllDependentFeaturesRecursive(featureId, result);
 
         return result;
     }
 
-    // private functions
-    Item {
-        id: privateBlock;
+    function getAllDependenciesRecursive(featureId, dependenciesModel, retVal){
+        console.log("getAllDependenciesRecursive", featureId, dependenciesModel, retVal);
+        if (dependenciesModel.ContainsKey(featureId)){
+            let dependencies = dependenciesModel.GetData(featureId);
 
-        function getAllDependenciesRecursive(featureId, dependenciesModel, retVal){
-            console.log("getAllDependenciesRecursive", featureId, dependenciesModel, retVal);
-            if (dependenciesModel.ContainsKey(featureId)){
-                let dependencies = dependenciesModel.GetData(featureId);
+            let dependenciesList = dependencies.split(';');
 
-                let dependenciesList = dependencies.split(';');
+            for (let i = 0; i < dependenciesList.length; i++){
+                let valueId = dependenciesList[i];
 
-                for (let i = 0; i < dependenciesList.length; i++){
-                    let valueId = dependenciesList[i];
+                retVal.push(valueId)
 
-                    retVal.push(valueId)
-
-                    privateBlock.getAllDependenciesRecursive(valueId, dependenciesModel, retVal);
-                }
+                provider.getAllDependenciesRecursive(valueId, dependenciesModel, retVal);
             }
         }
+    }
 
-        function getAllDependentFeaturesRecursive(featureId, retVal){
-            let keys = provider.model.GetKeys();
+    function getAllDependentFeaturesRecursive(featureId, retVal){
+        let keys = provider.model.GetKeys();
 
-            for (let i = 0; i < keys.length; i++){
-                let key = keys[i];
+        for (let i = 0; i < keys.length; i++){
+            let key = keys[i];
 
-                let values = provider.model.GetData(key);
-                if (values != ""){
-                    let dependenciesList = values.split(';');
-                    if (dependenciesList.includes(featureId)){
-                        retVal.push(key);
+            let values = provider.model.GetData(key);
+            if (values != ""){
+                let dependenciesList = values.split(';');
+                if (dependenciesList.includes(featureId)){
+                    retVal.push(key);
 
-                        provider.getAllDependentFeaturesRecursive(key, retVal);
-                    }
+                    provider.getAllDependentFeaturesRecursive(key, retVal);
                 }
             }
         }
     }
 
     // GqlModel for update feature dependencies model.
-    GqlModel {
-        id: dependenciesModel;
-
+    property GqlModel dependenciesModel : GqlModel {
         function updateModel() {
             var query = Gql.GqlRequest("query", "FeaturesDependencies");
 

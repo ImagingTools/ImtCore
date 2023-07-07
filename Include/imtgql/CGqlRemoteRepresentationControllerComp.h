@@ -2,44 +2,29 @@
 
 
 // ImtCore includes
-#include <imtgql/CGqlRequestHandlerCompBase.h>
-#include <imtgql/CApiClientComp.h>
+#include <imtgql/CGqlRemoteRepresentationControllerCompBase.h>
 
 
 namespace imtgql
 {
 
 
-class CGqlRemoteRepresentationControllerComp: public imtgql::CGqlRequestHandlerCompBase
+class CGqlRemoteRepresentationControllerComp:
+			public imtgql::CGqlRemoteRepresentationControllerCompBase
 {
 public:
-	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
+	typedef imtgql::CGqlRemoteRepresentationControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlRemoteRepresentationControllerComp)
-		I_ASSIGN(m_apiClientCompPtr, "ApiClient", "Api Client", true, "ApiClient");
+		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product ID", true, "");
 	I_END_COMPONENT;
 
 protected:
 	// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
-	virtual imtbase::CTreeItemModel* CreateInternalResponse(
-				const imtgql::CGqlRequest& gqlRequest,
-				QString& errorMessage) const override;
+	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
-protected:
-	class Response: virtual public imtgql::IGqlClient::ResponseHandler
-	{
-	public:
-		Response();
-		virtual imtbase::CTreeItemModel* GetResult();
-
-		// reimplemented (imtgql::IGqlClient::ResponseHandler)
-		virtual void OnReply(const IGqlRequest& request, const QByteArray& replyData) override;
-
-	private:
-		imtbase::CTreeItemModel* m_replyResultPtr;
-	};
-protected:
-	I_REF(imtgql::IGqlClient, m_apiClientCompPtr);
+private:
+	I_ATTR(QByteArray, m_productIdAttrPtr);
 };
 
 

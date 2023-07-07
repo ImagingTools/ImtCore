@@ -30,7 +30,6 @@ Item {
     signal clicked(var itemData, int index);
 
     onChildModelChanged: {
-        console.log("onChildModelChanged");
         childModelRepeater.model = model.ChildModel;
     }
 

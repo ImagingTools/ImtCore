@@ -24,8 +24,9 @@ TreeViewItemDelegateBase {
                     font.family: Style.fontFamily;
                     font.pixelSize: Style.fontSize_common;
                     color: Style.textColor;
-                    wrapMode: Text.WordWrap;
                     elide: Text.ElideRight;
+
+                    visible: !inputName.visible;
 
                     text: model.Name ? model.Name : "";
                 }
@@ -90,13 +91,12 @@ TreeViewItemDelegateBase {
                 Text {
                     anchors.verticalCenter: idItem.verticalCenter;
 
-
                     width: parent.width;
 
                     font.family: Style.fontFamily;
                     font.pixelSize: Style.fontSize_common;
                     color: Style.textColor;
-                    wrapMode: Text.WordWrap;
+                    visible: !inputId.visible;
                     elide: Text.ElideRight;
 
                     text: model.Id ? model.Id : "";
@@ -177,7 +177,7 @@ TreeViewItemDelegateBase {
                     font.family: Style.fontFamily;
                     font.pixelSize: Style.fontSize_common;
                     color: Style.textColor;
-                    wrapMode: Text.WordWrap;
+                    visible: !inputDescription.visible;
                     elide: Text.ElideRight;
 
                     text: model.Description ? model.Description : "";

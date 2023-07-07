@@ -116,7 +116,13 @@ IUserBaseInfo::FeatureIds CUserBaseInfo::GetPermissions(const QByteArray& produc
 		}
 	}
 
-	if (m_permissionsMap.contains(productId)){
+	if (productId.isEmpty()){
+		for (const QByteArray& id : m_permissionsMap.keys()){
+			IUserBaseInfo::FeatureIds productPermissions = m_permissionsMap.value(id);
+			allPermissions += productPermissions;
+		}
+	}
+	else if (m_permissionsMap.contains(productId)){
 		allPermissions += m_permissionsMap[productId];
 	}
 
@@ -305,7 +311,52 @@ bool CUserBaseInfo::Serialize(iser::IArchive &archive)
 	retVal = retVal && archive.Process(m_description);
 	retVal = retVal && archive.EndTag(descriptionTag);
 
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_restrictions, "Permissions", "Permission");
+	if (imtCoreVersion >= 6940){
+		QByteArrayList keys = m_permissionsMap.keys();
+		int count = keys.count();
+
+		if (!archive.IsStoring()){
+			m_permissionsMap.clear();
+			keys.clear();
+			count = 0;
+		}
+
+		static iser::CArchiveTag permissionsTag("Permissions", "Permissions", iser::CArchiveTag::TT_MULTIPLE);
+		static iser::CArchiveTag permissionTag("Permission", "Permission", iser::CArchiveTag::TT_GROUP, &permissionsTag);
+
+		retVal = retVal && archive.BeginMultiTag(permissionsTag, permissionTag, count);
+
+		for (int index = 0; index < count; index++){
+			retVal = retVal && archive.BeginTag(permissionTag);
+
+			QByteArray key;
+			QByteArrayList value;
+
+			if (archive.IsStoring()){
+				key = keys[index];
+				value = m_permissionsMap[key];
+			}
+
+			static iser::CArchiveTag keyTag("ProductId", "ProductId", iser::CArchiveTag::TT_LEAF, &permissionTag);
+			retVal = retVal && archive.BeginTag(keyTag);
+			retVal = retVal && archive.Process(key);
+			retVal = retVal && archive.EndTag(keyTag);
+
+			retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, value, "Permissions", "PermissionId");
+
+			if (!archive.IsStoring()){
+				m_permissionsMap[key] = value;
+			}
+
+			retVal = retVal && archive.EndTag(permissionTag);
+		}
+
+		retVal = retVal && archive.EndTag(permissionsTag);
+	}
+	else{
+		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_restrictions, "Permissions", "Permission");
+	}
+
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_restrictions, "Restrictions", "Restriction");
 
 //	if (imtCoreVersion < 6671){

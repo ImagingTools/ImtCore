@@ -7,6 +7,9 @@ QtObject {
     id: container;
 
     property string userMode;
+//    property bool superuserExists: false;
+
+    signal updated();
 
     onUserModeChanged: {
         Events.sendEvent("UserModeChanged", container.userMode);
@@ -14,19 +17,12 @@ QtObject {
 
     property alias userModeGqlModel: userModeModel;
 
-    function updateModel(){
-        userModeModel.getUserMode();
+    function isNoUserManagement(){
+        return userMode === "NO_USER_MANAGEMENT";
     }
 
-    property Component passwordInputDialog: Component {
-        SuperUserPasswordDialog {
-            title: qsTr("Set a password");
-            onFinished: {
-                if (buttonId == "Ok"){
-                    saveQuery.updateModel(inputValue);
-                }
-            }
-        }
+    function updateModel(){
+        userModeModel.getUserMode();
     }
 
     property Component errorDialog: Component {
@@ -50,7 +46,7 @@ QtObject {
             let obj = {"Username": "su", "UserId": "su", "Password": password, "Name": "superuser"}
 
             var jsonString = JSON.stringify(obj);
-//            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
+            //            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
 
             inputParams.InsertField ("Item", jsonString);
 
@@ -112,13 +108,14 @@ QtObject {
                         }
                     }
 
-                    if (dataModelLocal.ContainsKey("SuperUserExists")){
-                        let superUserExists = dataModelLocal.GetData("SuperUserExists");
-                        if (superUserExists === false){
-                            modalDialogManager.openDialog(passwordInputDialog, {"message": qsTr("Please set the password for system administrator:")});
-                        }
-                    }
+//                    if (dataModelLocal.ContainsKey("SuperUserExists")){
+//                        let superUserExists = dataModelLocal.GetData("SuperUserExists");
+
+//                        container.superuserExists = Boolean(superUserExists);
+//                    }
                 }
+
+                container.updated();
             }
         }
     }

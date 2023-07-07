@@ -21,14 +21,11 @@ Item {
     signal buttonClicked();
 
     Component.onCompleted: {
-        console.log("tableItemDelegate onCompleted", model.Id, model.Name);
         tableItemDelegate.modelIndex.itemData = model;
         tableItemDelegate.modelIndex.index = model.index;
     }
 
     onChildModelChanged: {
-        console.log("tableItemDelegate onChildModelChanged", model.ChildModel);
-
         if (model.ChildModel){
             childModelRepeater.model = model.ChildModel;
         }

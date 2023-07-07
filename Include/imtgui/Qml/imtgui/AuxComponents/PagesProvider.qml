@@ -2,29 +2,24 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 
-Item {
+QtObject {
     id: pagesProvider;
 
     property TreeItemModel pagesModel: TreeItemModel {};
 
     function updateModel(){
-        pagesGqlModel.updateModel();
+        pagesProvider.pagesGqlModel.updateModel();
     }
 
     function clearModel(){
         pagesModel.Clear();
     }
 
-    GqlModel {
-        id: pagesGqlModel;
+    property string modelState: pagesGqlModel.state;
 
+    property GqlModel pagesGqlModel : GqlModel {
         function updateModel(){
-            console.log("PagesProvider updateModel PagesData");
             var query = Gql.GqlRequest("query", "PagesData");
-
-//            var inputParams = Gql.GqlObject("input");
-//            inputParams.InsertField("ProductId", window.productId);
-//            query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");
             queryFields.InsertField("PageId");
@@ -43,13 +38,15 @@ Item {
 
         onStateChanged: {
             console.log("State:",this.state, pagesGqlModel)
-            if (this.state == "Ready"){
-
+            if (this.state === "Ready"){
                 if (this.ContainsKey("data")){
                     var dataModelLocal = this.GetData("data");
 
                     if(dataModelLocal.ContainsKey("PagesData")){
                         dataModelLocal = dataModelLocal.GetData("PagesData");
+
+                        console.log("dataModelLocal1", dataModelLocal)
+                        console.log("dataModelLocal2", dataModelLocal.toJSON())
 
                         pagesProvider.pagesModel = dataModelLocal;
                     }

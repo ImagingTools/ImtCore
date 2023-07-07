@@ -2,10 +2,8 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 
-Item {
+QtObject {
     id: container;
-
-    property Item root: null;
 
     property TreeItemModel serverModel: null;
     property TreeItemModel localModel: null;
@@ -14,6 +12,14 @@ Item {
 
     signal serverSettingsSaved();
     signal localSettingsSaved();
+
+    Component.onCompleted: {
+        Events.subscribeEvent("UpdateSettings", container.updateModel);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("UpdateSettings", container.updateModel);
+    }
 
     onServerModelChanged: {
         console.log("SettingsProvider onServerModelChanged", container.serverModel);
@@ -42,8 +48,6 @@ Item {
 
     function saveLocalModel(){
         console.log("SettingsProvider saveLocalModel", container.localModel.toJSON());
-
-        container.root.settingsUpdate();
 
         container.localSettingsSaved();
     }
@@ -76,9 +80,7 @@ Item {
         }
     }
 
-    GqlModel {
-        id: settingsQuery;
-
+    property GqlModel settingsQuery: GqlModel {
         function getSettings() {
             console.log("GetSettings");
 
@@ -114,9 +116,7 @@ Item {
         }
     }//GetSettings
 
-    GqlModel {
-        id: preferenceSaveQuery;
-
+    property GqlModel preferenceSaveQuery: GqlModel {
         function save(){
             console.log("SetSettings");
 

@@ -24,6 +24,11 @@ I_EXPORT_COMPONENT(
 			"Simple internet connection checker",
 			"Simple Internet Connection Checker");
 
+I_EXPORT_COMPONENT(
+			AsyncConnectionChecker,
+			"Async connection checker",
+			"Async Connection Checker");
+
 
 } // namespace ImtComPck
 

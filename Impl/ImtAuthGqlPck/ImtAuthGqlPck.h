@@ -15,12 +15,12 @@
 #include <imtauthgql/CUserGroupCollectionControllerComp.h>
 #include <imtauthgql/CAuthorizationOptionsControllerComp.h>
 #include <imtauthgql/CSessionControllerComp.h>
-#include <imtauthgql/CLogoutControllerComp.h>
 #include <imtauthgql/CRemoteRoleInfoProviderComp.h>
 #include <imtauthgql/CRemoteUserGroupInfoProviderComp.h>
 #include <imtauthgql/CClientRequestRemoteSuperuserProviderComp.h>
 #include <imtauthgql/CRemoteSuperuserControllerComp.h>
 #include <imtauthgql/CSimpleLoginWrapComp.h>
+#include <imtauthgql/CCollectionUserInfoProviderComp.h>
 
 
 /**
@@ -39,11 +39,11 @@ typedef imtauthgql::CUserGroupControllerComp UserGroupController;
 typedef imtauthgql::CUserGroupCollectionControllerComp UserGroupCollectionController;
 typedef imtauthgql::CAuthorizationOptionsControllerComp AuthorizationOptionsController;
 typedef imtauthgql::CSessionControllerComp SessionController;
-typedef imtauthgql::CLogoutControllerComp LogoutController;
 typedef imtauthgql::CRemoteRoleInfoProviderComp RemoteRoleInfoProvider;
 typedef imtauthgql::CRemoteUserGroupInfoProviderComp RemoteUserGroupInfoProvider;
 typedef imtauthgql::CClientRequestRemoteSuperuserProviderComp ClientRequestRemoteSuperuserProvider;
 typedef imtauthgql::CRemoteSuperuserControllerComp RemoteSuperuserController;
+typedef imtauthgql::CCollectionUserInfoProviderComp CollectionUserInfoProvider;
 typedef icomp::TModelCompWrap<imtauthgql::CSimpleLoginWrapComp> SimpleLoginWrap;
 
 

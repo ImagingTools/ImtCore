@@ -23,6 +23,9 @@ public:
 
 	// reimplemented (IConnectionStatusProvider)
 	virtual ConnectionStatus GetConnectionStatus() const override;
+
+private:
+	ConnectionStatus m_status;
 };
 
 

@@ -9,9 +9,11 @@ Rectangle {
 
     color: Style.backgroundColor;
 
-    property Item root: null;
     property alias settingsProvider: preferenceDialog.settingsProvider;
     property alias applicationInfoProvider: preferenceDialog.applicationInfoProvider;
+
+    property alias errorPage: serverNoConnectionView;
+    property alias loadingPage: loading;
 
     property int mainMargin: 0;
     property int mainRadius: 0;
@@ -22,9 +24,30 @@ Rectangle {
     property alias documentManager: mainDocumentManager;
     property alias dialogManager: modalDialogManager;
 
+    property SuperuserProvider superuserProvider : SuperuserProvider {
+        onResult: {
+            if (exists){
+                authorizationPage.visible = true;
+            }
+            else{
+                superuserPasswordPage.visible = true;
+            }
+        }
+
+        onModelStateChanged: {
+            if (state === "Ready"){
+                console.log("SuperuserProvider Ready", state);
+                loading.stop();
+            }
+            else{
+                loading.start();
+            }
+        }
+    }
+
     Component.onCompleted: {
-        Events.subscribeEvent("setPreferencesVisible", thumbnailDecoratorContainer.setPreferencesVisible);
-        Events.subscribeEvent("clearModels", thumbnailDecoratorContainer.clearModels);
+        Events.subscribeEvent("ShowPreferencePage", thumbnailDecoratorContainer.showPreferencePage);
+        Events.subscribeEvent("Logout", thumbnailDecoratorContainer.clearModels);
     }
 
     function updateModels(){
@@ -37,8 +60,6 @@ Rectangle {
 
         preferenceDialog.clearModels();
         settingsProvider.clearModel();
-
-        Events.sendEvent("CommandsDecoratorClear");
     }
 
     MenuPanel {
@@ -54,10 +75,6 @@ Rectangle {
         model: pagesManager.pageModel;
 
         color: Style.imagingToolsGradient1;
-
-        onActivePageIndexChanged: {
-            //pagesManager.activePageIndex = menuPanel.activePageIndex;
-        }
     }
 
     Item {
@@ -99,6 +116,17 @@ Rectangle {
         activePageIndex: menuPanel.activePageIndex;
 
         documentManager: mainDocumentManager;
+
+        onModelStateChanged: {
+            console.log("PagesManager onModelStateChanged", pagesManager.modelState);
+            if (pagesManager.modelState === "Ready"){
+                console.log("PagesManager Ready", pagesManager.modelState);
+                loading.stop();
+            }
+            else{
+                loading.start();
+            }
+        }
     }
 
     TopPanel {
@@ -121,13 +149,13 @@ Rectangle {
 
         visible: false;
 
-        onRefresh: {
-            userManagement.updateModel();
+        onVisibleChanged: {
+            Events.sendEvent("SetCommandsVisible", !visible);
         }
     }
 
-    function setPreferencesVisible(visible){
-        preferenceDialog.visible = visible;
+    function showPreferencePage(){
+        preferenceDialog.visible = true;
     }
 
     AuthorizationPage {
@@ -135,9 +163,51 @@ Rectangle {
 
         anchors.fill: parent;
         anchors.topMargin: 60;
-        windows: thumbnailDecoratorContainer.root;
 
         visible: false;
+
+        onLoginSuccessful: {
+            authorizationPage.visible = false;
+
+            Events.sendEvent("UpdateModels");
+            Events.sendEvent("UpdateSettings");
+        }
+
+//        onModelStateChanged: {
+//            if (authorizationPage.modelState === "Ready"){
+//                console.log("AuthorizationPage Ready", modelState);
+//                loading.stop();
+//            }
+//            else{
+//                loading.start();
+//            }
+//        }
+    }
+
+    SuperuserPasswordPage {
+        id: superuserPasswordPage;
+
+        anchors.fill: parent;
+
+        visible: false;
+
+        onBeforeSetted: {
+            loading.start();
+        }
+
+        onPasswordSetted: {
+            console.log("onPasswordSetted Ready");
+
+            loading.stop();
+
+            superuserPasswordPage.visible = false;
+            authorizationPage.visible = true;
+        }
+
+        onFailed: {
+            console.log("onFailed Ready");
+            loading.stop();
+        }
     }
 
     PreferencePage {
@@ -146,8 +216,6 @@ Rectangle {
         z: 20;
 
         anchors.fill: parent;
-
-        root: thumbnailDecoratorContainer.root;
 
         visible: false;
     }
@@ -169,17 +237,22 @@ Rectangle {
     UserManagementProvider {
         id: userManagement;
 
-        onUserModeChanged: {
-            if (userMode == "NO_USER_MANAGEMENT" || userMode == "OPTIONAL_USER_MANAGEMENT"){
-                thumbnailDecoratorContainer.root.updateAllModels();
-            }
-            else if (userMode == "STRONG_USER_MANAGEMENT"){
-                authorizationPage.visible = true;
-            }
-        }
+//        onUpdated: {
+//            if (userMode == "NO_USER_MANAGEMENT" || userMode == "OPTIONAL_USER_MANAGEMENT"){
+//                Events.sendEvent("UpdateModels");
+//            }
+//        }
     }
 
     ShortcutManager {
         id: shortcutManager;
+    }
+
+    Loading {
+        id: loading;
+
+        anchors.fill: parent;
+
+        visible: false;
     }
 }

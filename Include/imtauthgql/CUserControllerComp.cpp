@@ -3,6 +3,8 @@
 
 // ACF includes
 #include <iser/CJsonMemWriteArchive.h>
+#include <iprm/CParamsSet.h>
+#include <iprm/CTextParam.h>
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
@@ -25,7 +27,7 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 	}
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
 
 	QByteArray userId;
 	QByteArray productId;
@@ -55,10 +57,14 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 
 	userId = userId.replace('{', "").replace('}', "");
 
+	bool objectExists = false;
+
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(userId, dataPtr)){
 		imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
 		if (userInfoPtr != nullptr){
+			objectExists = true;
+
 			if (isJsonSerialized){
 				QByteArray userJson;
 				{
@@ -97,7 +103,14 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 		}
 	}
 
-	rootModelPtr->SetExternTreeModel("data", dataModel);
+	if (!objectExists && !userId.isEmpty()){
+		errorMessage = QObject::tr("Object with ID %1 does not exist").arg(qPrintable(userId));
+
+		imtbase::CTreeItemModel* errorsModelPtr = rootModelPtr->AddTreeModel("errors");
+		errorsModelPtr->SetData("message", errorMessage);
+
+		rootModelPtr->SetExternTreeModel("errors", errorsModelPtr);
+	}
 
 	return rootModelPtr.PopPtr();
 }
@@ -150,13 +163,23 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 			}
 		}
 
-		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
-		for (imtbase::ICollectionInfo::Id collectionId : collectionIds){
+		iprm::CParamsSet filterParam;
+		iprm::CParamsSet paramsSet;
+
+		iprm::CTextParam userId;
+		userId.SetText(username);
+
+		paramsSet.SetEditableParameter("Id", &userId);
+		filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
+
+		imtbase::IObjectCollection::Ids userIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+		if (!userIds.isEmpty()){
+			QByteArray userObjectId = userIds[0];
 			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
-				imtauth::IUserInfo* currentUserInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
+			if (m_objectCollectionCompPtr->GetObjectData(userObjectId, dataPtr)){
+				const imtauth::CUserInfo* currentUserInfoPtr = dynamic_cast<const imtauth::CUserInfo*>(dataPtr.GetPtr());
 				if (currentUserInfoPtr != nullptr){
-					if (collectionId != objectId){
+					if (userObjectId != objectId){
 						QByteArray currentUsername = currentUserInfoPtr->GetId();
 						if (currentUsername == username){
 							errorMessage = QT_TR_NOOP("Username already exists");

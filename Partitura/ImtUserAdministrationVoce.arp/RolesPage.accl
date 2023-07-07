@@ -14,6 +14,7 @@
         <Element ComponentName="RoleCollectionAdapter" X="175" Y="650" Note=""/>
         <Element ComponentName="RoleCommands" X="425" Y="325" Note=""/>
         <Element ComponentName="RoleDataController" X="150" Y="325" Note=""/>
+        <Element ComponentName="RoleProvider" X="125" Y="75" Note=""/>
         <Element ComponentName="RolesCommands" X="700" Y="325" Note=""/>
         <Element ComponentName="RolesDataController" X="1025" Y="325" Note=""/>
         <Element ComponentName="RolesHeadersDataProvider" X="800" Y="500" Note=""/>

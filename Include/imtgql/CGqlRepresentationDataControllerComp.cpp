@@ -83,11 +83,10 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateInternalRes
 
 iprm::IParamsSet* CGqlRepresentationDataControllerComp::CreateContextParams(const imtgql::CGqlRequest& gqlRequest) const
 {
-	const QList<imtgql::CGqlObject> requestParamsPtr = gqlRequest.GetParams();
-
 	QByteArray productId;
-	if (!requestParamsPtr.empty()){
-		productId = requestParamsPtr.at(0).GetFieldArgumentValue("ProductId").toByteArray();
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	if (inputParamPtr != nullptr){
+		productId = inputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
 	}
 
 	istd::TDelPtr<iprm::CParamsSet> paramsPtr = new imod::TModelWrap<iprm::CParamsSet>();

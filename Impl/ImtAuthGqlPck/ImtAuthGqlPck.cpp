@@ -60,11 +60,6 @@ I_EXPORT_COMPONENT(
 		"Session Controller");
 
 I_EXPORT_COMPONENT(
-		LogoutController,
-		"Logout controller",
-		"Logout Controller");
-
-I_EXPORT_COMPONENT(
 		RemoteRoleInfoProvider,
 		"Remote role info provider",
 		"Remote Role Info Provider");
@@ -83,6 +78,11 @@ I_EXPORT_COMPONENT(
 		RemoteSuperuserController,
 		"Puma superuser controller",
 		"Puma Superuser Controller");
+
+I_EXPORT_COMPONENT(
+		CollectionUserInfoProvider,
+		"Collection user info provider",
+		"Collection UserInfo User Provider");
 
 I_EXPORT_COMPONENT(
 			SimpleLoginWrap,

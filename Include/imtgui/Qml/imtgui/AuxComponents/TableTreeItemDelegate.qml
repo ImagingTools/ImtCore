@@ -25,14 +25,11 @@ Item {
     signal itemRemoved(var itemData);
 
     Component.onCompleted: {
-        console.log("TreeItemDelegate onCompleted");
         modelIndex.itemData = model;
         modelIndex.index = model.index;
     }
 
     onChildModelChanged: {
-        console.log("treeItemDelegate onChildModelChanged", model.ChildModel);
-
         if (model.ChildModel){
             childModelRepeater.model = model.ChildModel;
         }

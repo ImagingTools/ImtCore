@@ -3,6 +3,8 @@
 
 // Qt includes
 #include <QtCore/QThread>
+#include <QtCore/QTimer>
+#include <QtCore/QFutureWatcher>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -29,6 +31,7 @@ public:
 		I_REGISTER_INTERFACE(imtbase::ISystemStatus);
 		I_ASSIGN(m_connectionStatusProviderCompPtr, "ConnectionStatusProvider", "Server connection status provider", true, "ConnectionStatusProvider");
 		I_ASSIGN(m_dbServerConnectionCheckerCompPtr, "DatabaseServerConnectionChecker", "Database server connection status provider", true, "DatabaseServerConnectionChecker");
+		I_ASSIGN(m_checkIntervalAttrPtr, "CheckInterval", "Interval for backup timer (in sec)", false, 60);
 	I_END_COMPONENT;
 
 	CSystemStatusComp();
@@ -43,36 +46,21 @@ protected:
 
 private:
 	void SetStatus(SystemStatus status);
-	void CheckStatus();
 	void OnCheckStatusFinished();
-
-	class CheckStatusThread: public QThread
-	{
-	public:
-		CheckStatusThread(CSystemStatusComp& parent);
-
-		void Start();
-		SystemStatus GetStatus();
-		QString GetErrorMessage();
-
-	protected:
-		// reimplemented (QThread)
-		virtual void run() override;
-
-	private:
-		CSystemStatusComp& m_parent;
-		SystemStatus m_status;
-		QString m_errorMessage;
-	};
+	void OnTimeout();
+	void CheckStatus();
 
 private:
 	SystemStatus m_status;
 	QString m_errorMessage;
-	CheckStatusThread m_checkStatusThread;
+	QTimer m_timer;
+	QFutureWatcher<void> m_checkStatusFutureWatcher;
+	SystemStatus m_futureResultStatus;
 
 private:
 	I_REF(imtcom::IConnectionStatusProvider, m_connectionStatusProviderCompPtr);
 	I_REF(imtdb::IDatabaseServerConnectionChecker, m_dbServerConnectionCheckerCompPtr);
+	I_ATTR(int, m_checkIntervalAttrPtr);
 };
 
 

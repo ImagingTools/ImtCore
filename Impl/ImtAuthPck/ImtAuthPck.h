@@ -29,19 +29,13 @@
 #include <imtauth/CUserSettingsComp.h>
 #include <imtauth/CUserGroupInfoProviderComp.h>
 #include <imtauth/CUserCollectionAdapterComp.h>
+#include <imtauth/CSessionInfo.h>
 
 
 namespace ImtAuthPck
 {
 
 
-//typedef icomp::TModelCompWrap<
-//			icomp::TMakeComponentWrap<
-//						imtauth::CContactInfo,
-//						imtauth::IContactInfo,
-//						iser::IObject,
-//						iser::ISerializable,
-//						istd::IChangeable>> ContactInfo;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<imtauth::CAddress>> Address;
 typedef icomp::TModelCompWrap<
@@ -82,6 +76,13 @@ typedef imtauth::CCollectionPermissionsProviderComp CollectionPermissionsProvide
 typedef imtauth::CCheckPermissionOrComp CheckPermissionOr;
 typedef icomp::TModelCompWrap<imtauth::CUserSettingsComp> UserSettings;
 typedef imtauth::CUserGroupInfoProviderComp UserGroupInfoProvider;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap <
+						imtauth::CSessionInfo,
+						imtauth::ISession,
+						iser::IObject,
+						iser::ISerializable,
+						istd::IChangeable>> SessionInfo;
 
 
 } // namespace ImtAuthPck

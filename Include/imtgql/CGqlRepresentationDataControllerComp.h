@@ -11,7 +11,9 @@ namespace imtgql
 {
 
 
-class CGqlRepresentationDataControllerComp: virtual public IGqlRepresentationController, public CGqlRequestHandlerCompBase
+class CGqlRepresentationDataControllerComp:
+			virtual public IGqlRepresentationController,
+			public CGqlRequestHandlerCompBase
 {
 public:
 	typedef CGqlRequestHandlerCompBase BaseClass;
