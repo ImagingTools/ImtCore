@@ -710,10 +710,7 @@ imtbase::ICollectionInfo::Id CMultiDocumentWorkspaceGuiCompBase::DocumentList::G
 
 // reimplemented (imtbase::ICollectionInfo)
 
-int CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementsCount(
-			const iprm::IParamsSet* /*selectionParamPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+int CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
 {
 	return 0;
 }
@@ -722,9 +719,7 @@ int CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementsCount(
 imtbase::ICollectionInfo::Ids CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementIds(
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	return Ids();
 }
@@ -734,27 +729,7 @@ bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetSubsetInfo(
 			imtbase::ICollectionInfo& /*subsetInfo*/,
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
-{
-	return false;
-}
-
-
-imtbase::ICollectionInfo::Id CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetParentId(const Id& /*elementId*/) const
-{
-	return Id();
-}
-
-
-imtbase::ICollectionInfo::Ids CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementPath(const Id& /*elementId*/) const
-{
-	return Ids();
-}
-
-
-bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::IsBranch(const Id& /*elementId*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	return false;
 }

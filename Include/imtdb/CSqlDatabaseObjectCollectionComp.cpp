@@ -56,17 +56,6 @@ int CSqlDatabaseObjectCollectionComp::GetOperationFlags(const QByteArray& /*obje
 }
 
 
-imtbase::ICollectionInfo::Id CSqlDatabaseObjectCollectionComp::InsertNewBranch(
-			const Id& /*parentId*/,
-			const QString& /*name*/,
-			const QString& /*description*/,
-			const Id& /*proposedElementId*/,
-			const idoc::IDocumentMetaInfo* /*elementMetaInfoPtr*/)
-{
-	return Id();
-}
-
-
 QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
@@ -75,7 +64,6 @@ QByteArray CSqlDatabaseObjectCollectionComp::InsertNewObject(
 			const QByteArray& proposedObjectId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
 			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr,
-			const Id& /*parentId*/,
 			const imtbase::IOperationContext* operationContextPtr)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
@@ -236,9 +224,7 @@ bool CSqlDatabaseObjectCollectionComp::SetObjectData(
 imtbase::IObjectCollection* CSqlDatabaseObjectCollectionComp::CreateSubCollection(
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamsPtr,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+			const iprm::IParamsSet* selectionParamsPtr) const
 {
 	imtbase::IObjectCollection* collectionPtr = m_objectCollectionFactoryCompPtr.CreateInstance();
 	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
@@ -322,10 +308,7 @@ idoc::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetDataMetaInfo(const Id& ob
 
 // reimplemented (ICollectionInfo)
 
-int CSqlDatabaseObjectCollectionComp::GetElementsCount(
-			const iprm::IParamsSet* selectionParamPtr,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+int CSqlDatabaseObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* selectionParamPtr) const
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
@@ -366,9 +349,7 @@ int CSqlDatabaseObjectCollectionComp::GetElementsCount(
 imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamsPtr,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+			const iprm::IParamsSet* selectionParamsPtr) const
 {
 	Ids retVal;
 
@@ -399,9 +380,7 @@ bool CSqlDatabaseObjectCollectionComp::GetSubsetInfo(
 			imtbase::ICollectionInfo& /*subsetInfo*/,
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	return false;
 }
@@ -410,9 +389,7 @@ bool CSqlDatabaseObjectCollectionComp::GetSubsetInfo(
 imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObjectCollectionIterator(
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamsPtr,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+			const iprm::IParamsSet* selectionParamsPtr) const
 {
 	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
 
@@ -437,24 +414,6 @@ imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObje
 	}
 
 	return nullptr;
-}
-
-
-imtbase::ICollectionInfo::Id CSqlDatabaseObjectCollectionComp::GetParentId(const Id& /*elementId*/) const
-{
-	return Id();
-}
-
-
-imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementPath(const Id& /*elementId*/) const
-{
-	return Ids();
-}
-
-
-bool CSqlDatabaseObjectCollectionComp::IsBranch(const Id& /*elementId*/) const
-{
-	return false;
 }
 
 

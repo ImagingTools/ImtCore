@@ -95,10 +95,7 @@ void CCollectionInfo::UpdateItem(const QByteArray& id, const QString& name, cons
 
 // reimplemented (ICollectionInfo)
 
-int CCollectionInfo::GetElementsCount(
-			const iprm::IParamsSet* /*selectionParamPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+int CCollectionInfo::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
 {
 	return m_items.size();
 }
@@ -107,9 +104,7 @@ int CCollectionInfo::GetElementsCount(
 ICollectionInfo::Ids CCollectionInfo::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	Ids retVal;
 
@@ -129,27 +124,7 @@ bool CCollectionInfo::GetSubsetInfo(
 			imtbase::ICollectionInfo& /*subsetInfo*/,
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
-{
-	return false;
-}
-
-
-ICollectionInfo::Id CCollectionInfo::GetParentId(const Id& /*elementId*/) const
-{
-	return Id();
-}
-
-
-ICollectionInfo::Ids CCollectionInfo::GetElementPath(const Id& /*elementId*/) const
-{
-	return Ids();
-}
-
-
-bool CCollectionInfo::IsBranch(const Id& /*elementId*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	return false;
 }

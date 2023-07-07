@@ -179,23 +179,19 @@ void CSelectionAdapterComp::Constraints::SetParent(CSelectionAdapterComp* parent
 
 // reimplemented (ICollectionInfo)
 
-int CSelectionAdapterComp::Constraints::GetElementsCount(const iprm::IParamsSet* selectionParamPtr, const Id& parentId, int iterationFlags) const
+int CSelectionAdapterComp::Constraints::GetElementsCount(const iprm::IParamsSet* selectionParamPtr) const
 {
 	Q_ASSERT(selectionParamPtr == nullptr);
-	Q_ASSERT(parentId.isEmpty());
-	Q_ASSERT((iterationFlags & IF_LEAF_ONLY) != 0);
 
 	return m_parentPtr->m_selectionConstraintsPtr->GetOptionsCount();
 }
 
 
-ICollectionInfo::Ids CSelectionAdapterComp::Constraints::GetElementIds(int offset, int count, const iprm::IParamsSet* selectionParamsPtr, const Id& parentId, int iterationFlags) const
+ICollectionInfo::Ids CSelectionAdapterComp::Constraints::GetElementIds(int offset, int count, const iprm::IParamsSet* selectionParamsPtr) const
 {
 	Q_ASSERT(offset == 0);
 	Q_ASSERT(count == -1);
 	Q_ASSERT(selectionParamsPtr == nullptr);
-	Q_ASSERT(parentId.isEmpty());
-	Q_ASSERT((iterationFlags & IF_LEAF_ONLY) != 0);
 
 	ICollectionInfo::Ids retVal;
 
@@ -212,27 +208,7 @@ bool CSelectionAdapterComp::Constraints::GetSubsetInfo(
 			ICollectionInfo& /*subsetInfo*/,
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
-{
-	return false;
-}
-
-
-ICollectionInfo::Id CSelectionAdapterComp::Constraints::GetParentId(const Id& /*elementId*/) const
-{
-	return Id();
-}
-
-
-ICollectionInfo::Ids CSelectionAdapterComp::Constraints::GetElementPath(const Id& /*elementId*/) const
-{
-	return Ids();
-}
-
-
-bool CSelectionAdapterComp::Constraints::IsBranch(const Id& /*elementId*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	return false;
 }

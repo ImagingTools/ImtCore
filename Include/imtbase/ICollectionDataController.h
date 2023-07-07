@@ -52,8 +52,7 @@ public:
 	virtual ICollectionInfo::Id ImportFile(
 				imtbase::IObjectCollection& collection,
 				const QByteArray& typeId,
-				const QString& sourceFilePath = QString(),
-				const ICollectionInfo::Id& parentId = ICollectionInfo::Id()) const = 0;
+				const QString& sourceFilePath = QString()) const = 0;
 };
 
 

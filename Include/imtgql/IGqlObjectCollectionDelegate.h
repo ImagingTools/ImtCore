@@ -211,14 +211,12 @@ public:
 
 	virtual imtgql::IGqlRequest* CreateElementCountRequest(
 				const iprm::IParamsSet* selectionParamsPtr = nullptr,
-				const QByteArray& parentId = QByteArray(),
-				int iterationFlags = imtbase::ICollectionInfo::IF_RECURSIVE | imtbase::ICollectionInfo::IF_LEAF_ONLY) const = 0;
+				const QByteArray& parentId = QByteArray()) const = 0;
 	virtual imtgql::IGqlRequest* CreateElementListRequest(
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr,
-				const QByteArray& parentId = QByteArray(),
-				int iterationFlags = imtbase::ICollectionInfo::IF_RECURSIVE | imtbase::ICollectionInfo::IF_LEAF_ONLY) const = 0;
+				const QByteArray& parentId = QByteArray()) const = 0;
 	virtual imtgql::IGqlRequest* CreateElementInfoRequest(const QByteArray& elementId) const = 0;
 
 	/**

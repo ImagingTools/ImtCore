@@ -23,16 +23,11 @@ public:
 	typedef Base BaseClass;
 
 	// pseudo-reimplemented (ICollectionInfo)
-	virtual int GetElementsCount(
-				const iprm::IParamsSet* selectionParamPtr = nullptr,
-				const ICollectionInfo::Id& parentId = ICollectionInfo::Id(),
-				int iterationFlags = ICollectionInfo::IF_RECURSIVE | ICollectionInfo::IF_LEAF_ONLY) const override;
+	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr) const override;
 	virtual imtbase::ICollectionInfo::Ids GetElementIds(
 			int offset = 0,
 			int count = -1,
-			const iprm::IParamsSet* selectionParamsPtr = nullptr,
-			const ICollectionInfo::Id& parentId = ICollectionInfo::Id(),
-			int iterationFlags = ICollectionInfo::IF_RECURSIVE | ICollectionInfo::IF_LEAF_ONLY) const override;
+			const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 
 protected:
 	virtual imtbase::ICollectionInfo::Ids GetFilteredElementIds(const iprm::IParamsSet& filterParams) const;
@@ -46,16 +41,13 @@ protected:
 // reimplemented (ICollectionInfo)
 
 template <class Base>
-int TFilterableCollectionWrap<Base>::GetElementsCount(
-			const iprm::IParamsSet* selectionParamPtr,
-			const ICollectionInfo::Id& parentId,
-			int iterationFlags) const
+int TFilterableCollectionWrap<Base>::GetElementsCount(const iprm::IParamsSet* selectionParamPtr) const
 {
 	if (selectionParamPtr != nullptr){
 		return GetFilteredElementIds(*selectionParamPtr).count();
 	}
 
-	return BaseClass::GetElementsCount(selectionParamPtr, parentId, iterationFlags);
+	return BaseClass::GetElementsCount(selectionParamPtr);
 }
 
 
@@ -63,9 +55,7 @@ template <class Base>
 imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamPtr,
-			const ICollectionInfo::Id& parentId,
-			int iterationFlags) const
+			const iprm::IParamsSet* selectionParamPtr) const
 {
 	ICollectionInfo::Ids retVal;
 
@@ -88,7 +78,7 @@ imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetElementIds(
 	}
 	}
 	else {
-		retVal = BaseClass::GetElementIds(offset, count, selectionParamPtr, parentId, iterationFlags);
+		retVal = BaseClass::GetElementIds(offset, count, selectionParamPtr);
 	}
 
 	return retVal;

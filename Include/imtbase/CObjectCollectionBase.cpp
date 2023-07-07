@@ -60,7 +60,7 @@ bool CObjectCollectionBase::ExportFile(const imtbase::IObjectCollection& /*colle
 }
 
 
-ICollectionInfo::Id CObjectCollectionBase::ImportFile(imtbase::IObjectCollection& /*collection*/, const QByteArray& typeId, const QString& sourceFilePath, const ICollectionInfo::Id& /*parentId*/) const
+ICollectionInfo::Id CObjectCollectionBase::ImportFile(imtbase::IObjectCollection& /*collection*/, const QByteArray& typeId, const QString& sourceFilePath) const
 {
 	if (!typeId.isEmpty()){
 		const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(typeId);
@@ -110,17 +110,6 @@ int CObjectCollectionBase::GetOperationFlags(const Id& objectId) const
 }
 
 
-ICollectionInfo::Id CObjectCollectionBase::InsertNewBranch(
-			const Id& /*parentId*/,
-			const QString& /*name*/,
-			const QString& /*description*/,
-			const Id& /*proposedElementId*/,
-			const idoc::IDocumentMetaInfo* /*elementMetaInfoPtr*/)
-{
-	return Id();
-}
-
-
 ICollectionInfo::Id CObjectCollectionBase::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
@@ -129,7 +118,6 @@ ICollectionInfo::Id CObjectCollectionBase::InsertNewObject(
 			const Id& proposedElementId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
 			const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
-			const Id& /*parentId*/,
 			const IOperationContext* /*operationContextPtr*/)
 {
 	ObjectInfo info;
@@ -258,9 +246,7 @@ bool CObjectCollectionBase::SetObjectData(
 IObjectCollection* CObjectCollectionBase::CreateSubCollection(
 			int offset,
 			int count,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	imtbase::IObjectCollection* collectionPtr = new imtbase::CObjectCollection;
 
@@ -279,9 +265,7 @@ IObjectCollection* CObjectCollectionBase::CreateSubCollection(
 imtbase::IObjectCollectionIterator* CObjectCollectionBase::CreateObjectCollectionIterator(
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	return nullptr;
 }
@@ -325,10 +309,7 @@ idoc::MetaInfoPtr CObjectCollectionBase::GetDataMetaInfo(const Id& objectId) con
 
 // reimplemented (ICollectionInfo)
 
-int CObjectCollectionBase::GetElementsCount(
-			const iprm::IParamsSet* /*selectionParamPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+int CObjectCollectionBase::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
 {
 	return m_objects.count();
 }
@@ -337,9 +318,7 @@ int CObjectCollectionBase::GetElementsCount(
 ICollectionInfo::Ids CObjectCollectionBase::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	Ids retVal;
 
@@ -359,27 +338,7 @@ bool CObjectCollectionBase::GetSubsetInfo(
 			ICollectionInfo& /*subsetInfo*/,
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
-{
-	return false;
-}
-
-
-ICollectionInfo::Id CObjectCollectionBase::GetParentId(const Id& /*elementId*/) const
-{
-	return Id();
-}
-
-
-ICollectionInfo::Ids CObjectCollectionBase::GetElementPath(const Id& /*elementId*/) const
-{
-	return Ids();
-}
-
-
-bool CObjectCollectionBase::IsBranch(const Id& /*elementId*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	return false;
 }

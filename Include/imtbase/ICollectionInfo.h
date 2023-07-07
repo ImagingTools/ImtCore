@@ -126,20 +126,11 @@ public:
 		MIT_REVISION = idoc::IDocumentMetaInfo::MIT_USER + 20000
 	};
 
-	enum IterationFlags
-	{
-		IF_RECURSIVE = 1,
-		IF_BRANCH_ONLY = 2,
-		IF_LEAF_ONLY = 4
-	};
 
 	/**
 		Get number of elements in the collection
 	*/
-	virtual int GetElementsCount(
-				const iprm::IParamsSet* selectionParamPtr = nullptr,
-				const Id& parentId = Id(),
-				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const = 0;
+	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr) const = 0;
 
 	/**
 		Get IDs of the elements inside the collection for parent.
@@ -151,9 +142,7 @@ public:
 	virtual Ids GetElementIds(
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr,
-				const Id& parentId = Id(),
-				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const = 0;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
 	/**
 		Get information about the subset of the whole collection according to the given filtering/sorting parameters.
 		\param subsetInfo		collection information for the data subset.
@@ -166,24 +155,7 @@ public:
 				ICollectionInfo& subsetInfo,
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr,
-				const Id& parentId = Id(),
-				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const = 0;
-
-	/**
-		Get parent of the element with the given ID.
-	*/
-	virtual Id GetParentId(const Id& elementId) const = 0;
-
-	/**
-		Get path of the element with the given ID.
-	*/
-	virtual Ids GetElementPath(const Id& elementId) const = 0;
-
-	/**
-		Checking if the element with the given ID is a branch.
-	*/
-	virtual bool IsBranch(const Id& elementId) const = 0;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
 
 	/**
 		Get information about a given element.

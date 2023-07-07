@@ -68,7 +68,7 @@ int CObjectCollectionBasedPersistenceComp::SaveToFile(
 					}
 				}
 
-				imtbase::ICollectionInfo::Ids ids = m_collectionCompPtr->GetElementIds(0, -1, nullptr, parentId, imtbase::ICollectionInfo::IF_LEAF_ONLY);
+				imtbase::ICollectionInfo::Ids ids = m_collectionCompPtr->GetElementIds(0, -1, nullptr);
 
 				if (!proposedId.isEmpty() && objectName.isEmpty()){
 					if (ids.contains(proposedId)){
@@ -86,7 +86,7 @@ int CObjectCollectionBasedPersistenceComp::SaveToFile(
 						}
 					}
 
-					QByteArray objectId = m_collectionCompPtr->InsertNewObject(*m_objectTypeIdAttrPtr, objectName, "", &data, proposedId, nullptr, nullptr, parentId);
+					QByteArray objectId = m_collectionCompPtr->InsertNewObject(*m_objectTypeIdAttrPtr, objectName, "", &data, proposedId, nullptr, nullptr);
 
 					return !objectId.isEmpty() ? OS_OK : OS_FAILED;
 				}
@@ -111,7 +111,7 @@ int CObjectCollectionBasedPersistenceComp::SaveToFile(
 							}
 						}
 
-						QByteArray objectId = m_collectionCompPtr->InsertNewObject(*m_objectTypeIdAttrPtr, objectName, "", &data, proposedId, nullptr, nullptr, parentId);
+						QByteArray objectId = m_collectionCompPtr->InsertNewObject(*m_objectTypeIdAttrPtr, objectName, "", &data, proposedId, nullptr, nullptr);
 
 						return !objectId.isEmpty() ? OS_OK : OS_FAILED;
 					}

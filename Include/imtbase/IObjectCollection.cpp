@@ -1,0 +1,20 @@
+#pragma once
+
+
+// ImtCore includes
+#include <imtbase/IObjectCollection.h>
+
+
+namespace imtbase
+{
+
+
+IHierarchicalCollectionNode* IObjectCollection::GetCollectionStructure() const
+{
+	return nullptr;
+}
+
+
+} // namespace imtbase
+
+

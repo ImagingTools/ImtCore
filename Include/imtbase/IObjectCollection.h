@@ -16,6 +16,8 @@ namespace imtbase
 class IRevisionController;
 class ICollectionDataController;
 class IObjectCollectionIterator;
+class IHierarchicalCollectionNode;
+
 
 /**
 	Common interface for a data object collection.
@@ -104,6 +106,8 @@ public:
 		virtual istd::IFactoryInfo::KeyList GetFactoryKeys() const = 0;
 	};
 
+	virtual IHierarchicalCollectionNode* GetCollectionStructure() const;
+
 	/**
 		Get access to the revision controller of the collection, if available.
 	*/
@@ -119,22 +123,6 @@ public:
 		\param objectId	ID of the object for quering flags. If this parameter is empty, the flags for entire collection will be returned.
 	*/
 	virtual int GetOperationFlags(const Id& elementId = Id()) const = 0;
-
-	/**
-		Create a new object in the container.
-		\param name								Name of the object in the collection.
-		\param description						Descrpition of the object.
-		\param defaultValuePtr					Optional instance used for the object data initialization.
-		\param proposedElementId				Optional-defined ID of the object in the collection. If the value is non-empty inserted object become specified ID if possible.
-		\param elementMetaInfoPtr				Optional-defined meta-information for the collection element.
-		\return If the operation was successful the method will return ID of the created data object in the collection or an empty ID otherwise.
-	*/
-	virtual Id InsertNewBranch(
-				const Id& parentId,
-				const QString& name,
-				const QString& description,
-				const Id& proposedElementId = Id(),
-				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr) = 0;
 
 	/**
 		Create a new object in the container.
@@ -155,7 +143,6 @@ public:
 				const Id& proposedElementId = Id(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
-				const Id& parentId = Id(),
 				const IOperationContext* operationContextPtr = nullptr) = 0;
 
 	/**
@@ -195,16 +182,12 @@ public:
 	virtual imtbase::IObjectCollection* CreateSubCollection(
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr,
-				const Id& parentId = Id(),
-				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const = 0;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
 
 	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr,
-				const Id& parentId = Id(),
-				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const = 0;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
 };
 
 

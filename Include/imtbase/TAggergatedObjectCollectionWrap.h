@@ -45,12 +45,6 @@ public:
 	virtual const imtbase::IRevisionController* GetRevisionController() const override;
 	virtual const imtbase::ICollectionDataController* GetDataController() const override;
 	virtual int GetOperationFlags(const QByteArray& objectId = QByteArray()) const override;
-	virtual Id InsertNewBranch(
-				const Id& parentId,
-				const QString& name,
-				const QString& description,
-				const Id& proposedElementId = Id(),
-				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr) override;
 	virtual QByteArray InsertNewObject(
 				const QByteArray& typeId,
 				const QString& name,
@@ -59,45 +53,32 @@ public:
 				const QByteArray& proposedObjectId = QByteArray(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
-				const Id& parentId = Id(),
 				const IOperationContext* operationContextPtr = nullptr) override;
 	virtual bool RemoveElement(const QByteArray& elementId, const IOperationContext* operationContextPtr = nullptr) override;
 	virtual const istd::IChangeable* GetObjectPtr(const QByteArray& objectId) const override;
 	virtual bool GetObjectData( const QByteArray& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData( const QByteArray& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS, const IOperationContext* operationContextPtr = nullptr) override;
-	virtual imtbase::IObjectCollection* CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const Id &parentId, int iterationFlags) const override;
+	virtual imtbase::IObjectCollection* CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr) const override;
 	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr,
-				const Id& parentId = Id(),
-				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 	// reimplemented (IObjectCollectionInfo)
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
 	virtual Id GetObjectTypeId(const QByteArray& objectId) const override;
 	virtual idoc::MetaInfoPtr GetDataMetaInfo(const Id& objectId) const override;
 
 	// reimplemented (ICollectionInfo)
-	virtual int GetElementsCount(
-				const iprm::IParamsSet* selectionParamPtr = nullptr,
-				const Id& parentId = Id(),
-				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr) const override;
 	virtual Ids GetElementIds(
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr,
-				const Id& parentId = Id(),
-				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 	virtual bool GetSubsetInfo(
 				imtbase::ICollectionInfo& subsetInfo,
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr,
-				const Id& parentId = Id(),
-				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
-	virtual Id GetParentId(const Id& elementId) const override;
-	virtual Ids GetElementPath(const Id& elementId) const override;
-	virtual bool IsBranch(const Id& elementId) const override;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
 	virtual idoc::MetaInfoPtr GetElementMetaInfo(const Id& elementId) const override;
 	virtual bool SetElementName(const QByteArray& objectId, const QString& objectName) override;
@@ -181,23 +162,6 @@ inline int TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetOperat
 
 
 template<class BaseInterface, class ObjectImpl>
-inline ICollectionInfo::Id TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::InsertNewBranch(
-			const Id& parentId,
-			const QString& name,
-			const QString& description,
-			const Id& proposedElementId,
-			const idoc::IDocumentMetaInfo* elementMetaInfoPtr)
-{
-	return m_collection.InsertNewBranch(
-				parentId,
-				name,
-				description,
-				proposedElementId,
-				elementMetaInfoPtr);
-}
-
-
-template<class BaseInterface, class ObjectImpl>
 inline QByteArray TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
@@ -206,7 +170,6 @@ inline QByteArray TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::In
 			const QByteArray& proposedObjectId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
 			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr,
-			const Id& parentId,
 			const IOperationContext* operationContextPtr)
 {
 	return m_collection.InsertNewObject(
@@ -217,7 +180,6 @@ inline QByteArray TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::In
 				proposedObjectId,
 				dataMetaInfoPtr,
 				collectionItemMetaInfoPtr,
-				parentId,
 				operationContextPtr);
 }
 
@@ -260,11 +222,9 @@ template<class BaseInterface, class ObjectImpl>
 inline imtbase::IObjectCollection* TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::CreateSubCollection(
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamsPtr,
-			const imtbase::ICollectionInfo::Id& parentId,
-			int iterationFlags) const
+			const iprm::IParamsSet* selectionParamsPtr) const
 {
-	return m_collection.CreateSubCollection(offset, count, selectionParamsPtr, parentId, iterationFlags);
+	return m_collection.CreateSubCollection(offset, count, selectionParamsPtr);
 }
 
 
@@ -272,11 +232,9 @@ template<class BaseInterface, class ObjectImpl>
 imtbase::IObjectCollectionIterator* TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::CreateObjectCollectionIterator(
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamsPtr,
-			const Id& parentId,
-			int iterationFlags) const
+			const iprm::IParamsSet* selectionParamsPtr) const
 {
-	return m_collection.CreateObjectCollectionIterator(offset, count, selectionParamsPtr, parentId, iterationFlags);
+	return m_collection.CreateObjectCollectionIterator(offset, count, selectionParamsPtr);
 }
 
 
@@ -305,12 +263,9 @@ inline idoc::MetaInfoPtr TAggergatedObjectCollectionWrap<BaseInterface, ObjectIm
 // reimplemented (ICollectionInfo)
 
 template<class BaseInterface, class ObjectImpl>
-inline int TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementsCount(
-			const iprm::IParamsSet* selectionParamPtr,
-			const Id& parentId,
-			int iterationFlags) const
+inline int TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementsCount(const iprm::IParamsSet* selectionParamPtr) const
 {
-	return m_collection.GetElementsCount(selectionParamPtr, parentId, iterationFlags);
+	return m_collection.GetElementsCount(selectionParamPtr);
 }
 
 
@@ -318,11 +273,9 @@ template<class BaseInterface, class ObjectImpl>
 inline imtbase::ICollectionInfo::Ids TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamsPtr,
-			const Id& parentId,
-			int iterationFlags) const
+			const iprm::IParamsSet* selectionParamsPtr) const
 {
-	return m_collection.GetElementIds(offset, count, selectionParamsPtr, parentId, iterationFlags);
+	return m_collection.GetElementIds(offset, count, selectionParamsPtr);
 }
 
 
@@ -331,32 +284,9 @@ inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetSubse
 			imtbase::ICollectionInfo& /*subsetInfo*/,
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	return false;
-}
-
-
-template<class BaseInterface, class ObjectImpl>
-inline ICollectionInfo::Id TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetParentId(const Id& elementId) const
-{
-	return m_collection.GetParentId(elementId);
-}
-
-
-template<class BaseInterface, class ObjectImpl>
-inline ICollectionInfo::Ids TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementPath(const Id& elementId) const
-{
-	return m_collection.GetElementPath(elementId);;
-}
-
-
-template<class BaseInterface, class ObjectImpl>
-inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::IsBranch(const Id& elementId) const
-{
-	return m_collection.IsBranch(elementId);
 }
 
 

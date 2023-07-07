@@ -551,7 +551,7 @@ bool CFileCollectionComp::ExportFile(const imtbase::IObjectCollection& /*collect
 }
 
 
-QByteArray CFileCollectionComp::ImportFile(imtbase::IObjectCollection& /*collection*/, const QByteArray& typeId, const QString& sourceFilePath, const ICollectionInfo::Id& /*parentId*/) const
+QByteArray CFileCollectionComp::ImportFile(imtbase::IObjectCollection& /*collection*/, const QByteArray& typeId, const QString& sourceFilePath) const
 {
 	int repositoryRevision = *m_revisionAttrPtr;
 
@@ -967,10 +967,7 @@ QString CFileCollectionComp::CalculateTargetFilePath(
 
 // reimplemented (imtbase::ICollectionInfo)
 
-int CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementsCount(
-			const iprm::IParamsSet* /*selectionParamPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+int CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
 {
 	QReadLocker locker(&m_lock);
 
@@ -981,9 +978,7 @@ int CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementsCount(
 imtbase::ICollectionInfo::Ids CFileCollectionComp::RepositoryItemInfoProvider::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	QReadLocker locker(&m_lock);
 
@@ -1005,27 +1000,7 @@ bool CFileCollectionCompBase::RepositoryItemInfoProvider::GetSubsetInfo(
 			imtbase::ICollectionInfo& subsetInfo,
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamsPtr,
-			const Id& parentId,
-			int iterationFlags) const
-{
-	return false;
-}
-
-
-imtbase::ICollectionInfo::Id CFileCollectionCompBase::RepositoryItemInfoProvider::GetParentId(const Id& /*elementId*/) const
-{
-	return Id();
-}
-
-
-imtbase::ICollectionInfo::Ids CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementPath(const Id& /*elementId*/) const
-{
-	return Ids();
-}
-
-
-bool CFileCollectionCompBase::RepositoryItemInfoProvider::IsBranch(const Id& /*elementId*/) const
+			const iprm::IParamsSet* selectionParamsPtr) const
 {
 	return false;
 }

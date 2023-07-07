@@ -33,7 +33,7 @@ public:
 	// reimplemented (ICollectionDataController)
 	virtual const ifile::IFilePersistence* GetPersistenceForObjectType(const QByteArray& typeId) const override;
 	virtual bool ExportFile(const imtbase::IObjectCollection& collection, const QByteArray& objectId, const QString& targetFilePath = QString()) const override;
-	virtual imtbase::ICollectionInfo::Id ImportFile(imtbase::IObjectCollection& collection, const QByteArray& typeId, const QString& sourceFilePath = QString(), const ICollectionInfo::Id& parentId = ICollectionInfo::Id()) const override;
+	virtual imtbase::ICollectionInfo::Id ImportFile(imtbase::IObjectCollection& collection, const QByteArray& typeId, const QString& sourceFilePath = QString()) const override;
 
 protected:
 	virtual istd::IChangeable* CreateObjectInstance(const QByteArray& typeId) const;

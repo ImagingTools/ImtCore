@@ -101,10 +101,7 @@ idoc::MetaInfoPtr CSimpleReferenceCollection::GetDataMetaInfo(const Id& /*object
 
 // reimplemented (imtbase::ICollectionInfo)
 
-int CSimpleReferenceCollection::GetElementsCount(
-			const iprm::IParamsSet* /*selectionParamPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+int CSimpleReferenceCollection::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
 {
 	return m_references.count();
 }
@@ -113,9 +110,7 @@ int CSimpleReferenceCollection::GetElementsCount(
 imtbase::ICollectionInfo::Ids CSimpleReferenceCollection::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	Ids retVal;
 
@@ -135,27 +130,7 @@ bool CSimpleReferenceCollection::GetSubsetInfo(
 			imtbase::ICollectionInfo& /*subsetInfo*/,
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
-{
-	return false;
-}
-
-
-imtbase::ICollectionInfo::Id CSimpleReferenceCollection::GetParentId(const Id& /*elementId*/) const
-{
-	return Id();
-}
-
-
-imtbase::ICollectionInfo::Ids CSimpleReferenceCollection::GetElementPath(const Id& /*elementId*/) const
-{
-	return Ids();
-}
-
-
-bool CSimpleReferenceCollection::IsBranch(const Id& /*elementId*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	return false;
 }

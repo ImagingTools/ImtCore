@@ -57,8 +57,7 @@ bool CCollectionDataControllerComp::ExportFile(
 QByteArray CCollectionDataControllerComp::ImportFile(
 			imtbase::IObjectCollection& collection,
 			const QByteArray& typeId,
-			const QString& sourceFilePath,
-			const ICollectionInfo::Id& /*parentId*/) const
+			const QString& sourceFilePath) const
 {
 	const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(typeId);
 	if (persistencePtr != nullptr){

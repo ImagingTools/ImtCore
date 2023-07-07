@@ -11,10 +11,10 @@
 #include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
+#include <imtbase/CObjectCollectionMetaInfo.h>
+#include <imtbase/ICollectionDataController.h>
 #include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/IObjectCollection.h>
-#include <imtbase/ICollectionDataController.h>
-#include <imtbase/CObjectCollectionMetaInfo.h>
 
 
 namespace imtbase
@@ -43,19 +43,12 @@ public:
 	virtual Id ImportFile(
 				imtbase::IObjectCollection& collection,
 				const QByteArray& typeId,
-				const QString& sourceFilePath = QString(),
-				const ICollectionInfo::Id& parentId = ICollectionInfo::Id()) const override;
+				const QString& sourceFilePath = QString()) const override;
 
 	// reimplemented (IObjectCollection)
 	virtual const IRevisionController* GetRevisionController() const override;
 	virtual const ICollectionDataController* GetDataController() const override;
 	virtual int GetOperationFlags(const Id& objectId = Id()) const override;
-	virtual Id InsertNewBranch(
-				const Id& parentId,
-				const QString& name,
-				const QString& description,
-				const Id& proposedElementId = Id(),
-				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr) override;
 	virtual Id InsertNewObject(
 				const QByteArray& typeId,
 				const QString& name,
@@ -64,19 +57,16 @@ public:
 				const Id& proposedElementId = Id(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
-				const Id& parentId = Id(),
 				const IOperationContext* operationContextPtr = nullptr) override;
 	virtual bool RemoveElement(const Id& elementId, const IOperationContext* operationContextPtr = nullptr) override;
 	virtual const istd::IChangeable* GetObjectPtr(const Id& objectId) const override;
 	virtual bool GetObjectData(const Id& objectId, DataPtr& dataPtr) const override;
 	virtual bool SetObjectData(const Id& objectId, const istd::IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS, const IOperationContext* operationContextPtr = nullptr) override;
-	virtual IObjectCollection* CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr, const Id &parentId, int iterationFlags) const override;
+	virtual IObjectCollection* CreateSubCollection(int offset, int count, const iprm::IParamsSet *selectionParamsPtr) const override;
 	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr,
-				const Id& parentId = Id(),
-				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 
 	// reimplemented (IObjectCollectionInfo)
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
@@ -84,26 +74,16 @@ public:
 	virtual idoc::MetaInfoPtr GetDataMetaInfo(const Id& objectId) const override;
 
 	// reimplemented (ICollectionInfo)
-	virtual int GetElementsCount(
-				const iprm::IParamsSet* selectionParamPtr = nullptr,
-				const Id& parentId = Id(),
-				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr) const override;
 	virtual Ids GetElementIds(
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr,
-				const Id& parentId = Id(),
-				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 	virtual bool GetSubsetInfo(
 				ICollectionInfo& subsetInfo,
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr,
-				const Id& parentId = Id(),
-				int iterationFlags = IF_RECURSIVE | IF_LEAF_ONLY) const override;
-	virtual Id GetParentId(const Id& elementId) const override;
-	virtual Ids GetElementPath(const Id& elementId) const override;
-	virtual bool IsBranch(const Id& elementId) const override;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 	virtual QVariant GetElementInfo(const Id& elementId, int infoType) const override;
 	virtual idoc::MetaInfoPtr GetElementMetaInfo(const Id& elementId) const override;
 	virtual bool SetElementName(const Id& elementId, const QString& name) override;

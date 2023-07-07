@@ -58,44 +58,6 @@ int CGqlObjectCollectionComp::GetOperationFlags(const Id& elementId) const
 }
 
 
-imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewBranch(
-			const Id& parentId,
-			const QString& name,
-			const QString& /*description*/,
-			const Id& /*proposedElementId*/,
-			const idoc::IDocumentMetaInfo* /*elementMetaInfoPtr*/)
-{
-	if (m_gqlClientCompPtr.IsValid()){
-		if (m_typesInfo.GetOptionsCount() > 0){
-			QByteArray typeId = m_typesInfo.GetOptionId(0);
-
-			// TODO refactoring retrieve orgId
-			QByteArray orgId;
-			for (auto item : m_items){
-				if (!item.orgId.isEmpty()){
-					orgId = item.orgId;
-					break;
-				}
-			}
-
-			Q_ASSERT(!orgId.isEmpty());
-
-			IGqlObjectCollectionDelegate* delegatePtr = GetDelegateForType(typeId);
-			if (delegatePtr != nullptr){
-				istd::TDelPtr<imtgql::IGqlRequest> insertBranchRequestPtr(delegatePtr->CreateInsertBranchRequest(
-							name, "", nullptr, "", parentId, orgId));
-				IGqlObjectCollectionDelegate::InsertBranchResponsePtr insertBranchResponsePtr = delegatePtr->CreateInsertBranchResponsePtr();
-				if (m_gqlClientCompPtr->SendRequest(*insertBranchRequestPtr, *insertBranchResponsePtr)){
-					return insertBranchResponsePtr->GetBranchId();
-				}
-			}
-		}
-	}
-
-	return QByteArray();
-}
-
-
 imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
@@ -104,7 +66,6 @@ imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewObject(
 			const QByteArray& /*proposedObjectId*/,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
 			const idoc::IDocumentMetaInfo* /*collectionItemMetaInfoPtr*/,
-			const Id& parentId,
 			const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	QByteArray documentId;
@@ -126,7 +87,8 @@ imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewObject(
 							if (file.open(QIODevice::ReadOnly)){
 								QByteArray data = file.readAll();
 
-								istd::TDelPtr<imtgql::IGqlRequest> getDocumentUploadUrlRequestPtr(delegatePtr->CreateUploadUrlRequest(name, parentId));
+								Q_ASSERT(false);
+								istd::TDelPtr<imtgql::IGqlRequest> getDocumentUploadUrlRequestPtr(delegatePtr->CreateUploadUrlRequest(name, "parentId"));
 
 								IGqlObjectCollectionDelegate::UploadUrlResponsePtr uploadUrlDocumentResponsePtr = delegatePtr->CreateUploadUrlResponsePtr();
 								if (m_gqlClientCompPtr->SendRequest(*getDocumentUploadUrlRequestPtr, *uploadUrlDocumentResponsePtr)){
@@ -137,7 +99,8 @@ imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewObject(
 										QNetworkReply* replyPtr = imtcom::CRequestSender::DoSyncPut(request, data, 30000);
 										if (replyPtr != nullptr){
 											if (!replyPtr->error()){
-												istd::TDelPtr<imtgql::IGqlRequest> uploadDocumentRequestPtr(delegatePtr->CreateInsertObjectRequest(name, "", *defaultValuePtr, dataMetaInfoPtr, nullptr, uploadUrl, "", parentId));
+												Q_ASSERT(false);
+												istd::TDelPtr<imtgql::IGqlRequest> uploadDocumentRequestPtr(delegatePtr->CreateInsertObjectRequest(name, "", *defaultValuePtr, dataMetaInfoPtr, nullptr, uploadUrl, "", "parentId"));
 
 												IGqlObjectCollectionDelegate::InsertObjectResponsePtr saveDocumentResponsePtr = delegatePtr->CreateInsertObjectResponsePtr();
 												if (m_gqlClientCompPtr->SendRequest(*uploadDocumentRequestPtr, *saveDocumentResponsePtr)){
@@ -163,7 +126,8 @@ imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewObject(
 						}
 					}
 					else{
-						istd::TDelPtr<imtgql::IGqlRequest> insertDocumentRequestPtr(delegatePtr->CreateInsertObjectRequest(name, "", * defaultValuePtr, dataMetaInfoPtr, nullptr, "", "", parentId));
+						Q_ASSERT(false);
+						istd::TDelPtr<imtgql::IGqlRequest> insertDocumentRequestPtr(delegatePtr->CreateInsertObjectRequest(name, "", *defaultValuePtr, dataMetaInfoPtr, nullptr, "", "", "parentId"));
 
 						IGqlObjectCollectionDelegate::InsertObjectResponsePtr saveDocumentResponsePtr = delegatePtr->CreateInsertObjectResponsePtr();
 						if (m_gqlClientCompPtr->SendRequest(*insertDocumentRequestPtr, *saveDocumentResponsePtr)){
@@ -335,9 +299,7 @@ bool CGqlObjectCollectionComp::SetObjectData(
 imtbase::IObjectCollection* CGqlObjectCollectionComp::CreateSubCollection(
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	return nullptr;
 }
@@ -346,9 +308,7 @@ imtbase::IObjectCollection* CGqlObjectCollectionComp::CreateSubCollection(
 imtbase::IObjectCollectionIterator* CGqlObjectCollectionComp::CreateObjectCollectionIterator(
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	return nullptr;
 }
@@ -420,7 +380,7 @@ idoc::MetaInfoPtr CGqlObjectCollectionComp::GetDataMetaInfo(const Id& objectId) 
 
 // reimplemented (ICollectionInfo)
 
-int CGqlObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* /*selectionParamsPtr*/, const Id& /*parentId*/, int /*iterationFlags*/) const
+int CGqlObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	Q_ASSERT(false);
 
@@ -445,34 +405,33 @@ int CGqlObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* /*selecti
 imtbase::ICollectionInfo::Ids CGqlObjectCollectionComp::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamsPtr,
-			const Id& parentId,
-			int iterationFlags) const
+			const iprm::IParamsSet* selectionParamsPtr) const
 {
 	if (!m_delegatesMap.isEmpty()){
 		QByteArray typeId = m_delegatesMap.firstKey();
 		IGqlObjectCollectionDelegate* delegatePtr = m_delegatesMap.first();
 		if (delegatePtr != nullptr){
 			IGqlObjectCollectionDelegate::ElementListResponsePtr elementCountResponsePtr = delegatePtr->CreateElementListResponsePtr();
+			Q_ASSERT(false);
 			istd::TDelPtr<imtgql::IGqlRequest> requestPtr(delegatePtr->CreateElementListRequest(
 						offset,
 						count,
 						selectionParamsPtr,
-						parentId,
-						iterationFlags));
+						"parentId"));
 			if (requestPtr.IsValid()){
 				if (m_gqlClientCompPtr->SendRequest(*requestPtr, *elementCountResponsePtr)){
 					IGqlObjectCollectionDelegate::ElementList elementList = elementCountResponsePtr->GetElementList();
 					imtbase::ICollectionInfo::Ids ids;
 					for (IGqlObjectCollectionDelegate::ElementInfo& element : elementList){
 						// TODO: remove after api changed
-						m_items[element.id] = {element.orgId, parentId, element.isBranch, element.name, element.version};
+						Q_ASSERT(false);
+						m_items[element.id] = { element.orgId, "parentId", element.isBranch, element.name, element.version };
 
-						if (element.isBranch && !element.id.isEmpty() && (iterationFlags & imtbase::ICollectionInfo::IF_BRANCH_ONLY)) {
+						if (element.isBranch && !element.id.isEmpty() /*&& (iterationFlags & imtbase::ICollectionInfo::IF_BRANCH_ONLY)*/) {
 							ids.append(element.id);
 						}
 
-						if (!element.isBranch && (iterationFlags & imtbase::ICollectionInfo::IF_LEAF_ONLY)) {
+						if (!element.isBranch /*&& (iterationFlags & imtbase::ICollectionInfo::IF_LEAF_ONLY)*/) {
 							ids.append(element.id);
 						}
 					}
@@ -487,65 +446,8 @@ imtbase::ICollectionInfo::Ids CGqlObjectCollectionComp::GetElementIds(
 }
 
 
-bool CGqlObjectCollectionComp::GetSubsetInfo(ICollectionInfo& /*subsetInfo*/, int /*offset*/, int /*count*/, const iprm::IParamsSet* /*selectionParamsPtr*/, const Id& /*parentId*/, int /*iterationFlags*/) const
+bool CGqlObjectCollectionComp::GetSubsetInfo(ICollectionInfo& /*subsetInfo*/, int /*offset*/, int /*count*/, const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
-	return false;
-}
-
-
-imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::GetParentId(const Id& elementId) const
-{
-	Ids ids = GetElementPath(elementId);
-	if (!ids.isEmpty()){
-		return ids.first();
-	}
-	
-	return Id();
-}
-
-
-imtbase::ICollectionInfo::Ids CGqlObjectCollectionComp::GetElementPath(const Id& elementId) const
-{
-	if (m_gqlClientCompPtr.IsValid()){
-		QByteArray typeId = GetObjectTypeId(elementId);
-		IGqlObjectCollectionDelegate* delegatePtr = GetDelegateForType(typeId);
-		if (delegatePtr != nullptr){
-			IGqlObjectCollectionDelegate::ElementInfoResponsePtr responsePtr = delegatePtr->CreateElementInfoResponsePtr();
-			istd::TDelPtr<imtgql::IGqlRequest> requestPtr(delegatePtr->CreateElementInfoRequest(elementId));
-			if (requestPtr.IsValid()){
-				if (m_gqlClientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-					IGqlObjectCollectionDelegate::ElementInfo info = responsePtr->GetElementInfo();
-					return info.path;
-				}
-			}
-		}
-	}
-
-	return Ids();
-}
-
-
-bool CGqlObjectCollectionComp::IsBranch(const Id& elementId) const
-{
-	if (m_gqlClientCompPtr.IsValid()){
-		if (m_items.contains(elementId)){
-			return m_items[elementId].isBranch;
-		}
-
-		//QByteArray typeId = GetObjectTypeId(elementId);
-		//gmgaws::IGqlObjectCollectionDelegate* delegatePtr = GetDelegateForType(typeId);
-		//if (delegatePtr != nullptr){
-		//	GetElementInfoResponse response(*const_cast<CGqlObjectCollectionComp*>(this), typeId);
-		//	istd::TDelPtr<imtgql::IGqlRequest> requestPtr(delegatePtr->CreateElementInfoRequest(elementId));
-		//	if (requestPtr.IsValid()){
-		//		if (m_gqlClientCompPtr->SendRequest(*requestPtr, response)){
-		//			IGqlObjectCollectionDelegate::ElementInfo info = response.GetElementInfo();
-		//			return info.isBranch;
-		//		}
-		//	}
-		//}
-	}
-
 	return false;
 }
 
@@ -703,8 +605,7 @@ bool CGqlObjectCollectionComp::ExportFile(
 QByteArray CGqlObjectCollectionComp::ImportFile(
 			imtbase::IObjectCollection& collection,
 			const QByteArray& typeId,
-			const QString& sourceFilePath,
-			const ICollectionInfo::Id& parentId) const
+			const QString& sourceFilePath) const
 {
 	Q_ASSERT(false);
 	return QByteArray();
@@ -729,7 +630,8 @@ QByteArray CGqlObjectCollectionComp::ImportFile(
 						QString objectName = fileInfo.completeBaseName();
 
 						IGqlObjectCollectionDelegate::UploadUrlResponsePtr uploadUrlDocumentResponsePtr = delegatePtr->CreateUploadUrlResponsePtr();
-						istd::TDelPtr<imtgql::IGqlRequest> getDocumentUploadUrlRequestPtr(delegatePtr->CreateUploadUrlRequest(objectName, parentId));
+						Q_ASSERT(false);
+						istd::TDelPtr<imtgql::IGqlRequest> getDocumentUploadUrlRequestPtr(delegatePtr->CreateUploadUrlRequest(objectName, "parentId"));
 						if (m_gqlClientCompPtr->SendRequest(*getDocumentUploadUrlRequestPtr, *uploadUrlDocumentResponsePtr)){
 							QString uploadUrl = uploadUrlDocumentResponsePtr->GetUploadUrl();
 							if (!uploadUrl.isEmpty()){
