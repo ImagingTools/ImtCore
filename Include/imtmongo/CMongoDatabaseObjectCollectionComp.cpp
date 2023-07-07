@@ -61,17 +61,6 @@ int CMongoDatabaseObjectCollectionComp::GetOperationFlags(const QByteArray& /*ob
 }
 
 
-imtbase::ICollectionInfo::Id CMongoDatabaseObjectCollectionComp::InsertNewBranch(
-			const Id& /*parentId*/,
-			const QString& /*name*/,
-			const QString& /*description*/,
-			const Id& /*proposedElementId*/,
-			const idoc::IDocumentMetaInfo* /*elementMetaInfoPtr*/)
-{
-	return Id();
-}
-
-
 QByteArray CMongoDatabaseObjectCollectionComp::InsertNewObject(
 			const QByteArray& typeId,
 			const QString& name,
@@ -80,7 +69,6 @@ QByteArray CMongoDatabaseObjectCollectionComp::InsertNewObject(
 			const QByteArray& proposedObjectId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
 			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr,
-			const Id& /*parentId*/,
 			const imtbase::IOperationContext* operationContextPtr)
 {
 
@@ -174,9 +162,7 @@ bool CMongoDatabaseObjectCollectionComp::SetObjectData(
 imtbase::IObjectCollection* CMongoDatabaseObjectCollectionComp::CreateSubCollection(
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamsPtr,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+			const iprm::IParamsSet* selectionParamsPtr) const
 {
 	imtbase::IObjectCollection* collectionPtr = m_objectCollectionFactoryCompPtr.CreateInstance();
 	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
@@ -245,9 +231,7 @@ idoc::MetaInfoPtr CMongoDatabaseObjectCollectionComp::GetDataMetaInfo(const Id& 
 // reimplemented (ICollectionInfo)
 
 int CMongoDatabaseObjectCollectionComp::GetElementsCount(
-			const iprm::IParamsSet* selectionParamPtr,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+			const iprm::IParamsSet* selectionParamPtr) const
 {
 	imtbase::CParamsSetJoiner filterParams(selectionParamPtr, m_filterParamsCompPtr.GetPtr());
 
@@ -263,9 +247,7 @@ int CMongoDatabaseObjectCollectionComp::GetElementsCount(
 imtbase::ICollectionInfo::Ids CMongoDatabaseObjectCollectionComp::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamsPtr,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+			const iprm::IParamsSet* selectionParamsPtr) const
 {
 	Ids retVal;
 
@@ -315,9 +297,7 @@ bool CMongoDatabaseObjectCollectionComp::GetSubsetInfo(
 			imtbase::ICollectionInfo& /*subsetInfo*/,
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/,
-			const Id& /*parentId*/,
-			int /*iterationFlags*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 
 	return false;
@@ -327,9 +307,7 @@ bool CMongoDatabaseObjectCollectionComp::GetSubsetInfo(
 imtbase::IObjectCollectionIterator *CMongoDatabaseObjectCollectionComp::CreateObjectCollectionIterator(
 			int offset, 
 			int count, 
-			const iprm::IParamsSet *selectionParamsPtr, 
-			const Id &parentId, 
-			int iterationFlags) const
+			const iprm::IParamsSet *selectionParamsPtr) const
 {
 	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
 
@@ -360,24 +338,6 @@ imtbase::IObjectCollectionIterator *CMongoDatabaseObjectCollectionComp::CreateOb
 
 
 	return iterator;
-}
-
-
-imtbase::ICollectionInfo::Id CMongoDatabaseObjectCollectionComp::GetParentId(const Id& /*elementId*/) const
-{
-	return Id();
-}
-
-
-imtbase::ICollectionInfo::Ids CMongoDatabaseObjectCollectionComp::GetElementPath(const Id& /*elementId*/) const
-{
-	return Ids();
-}
-
-
-bool CMongoDatabaseObjectCollectionComp::IsBranch(const Id& /*elementId*/) const
-{
-	return false;
 }
 
 
