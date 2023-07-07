@@ -6,11 +6,8 @@
 #include <QtCore/QString>
 #include <QtCore/QVector>
 
-// ACF includes
-#include <istd/IPolymorphic.h>
-
 // ImtCore includes
-#include <imtbase/IObjectCollection.h>
+#include <istd/IChangeable.h>
 
 
 namespace imtbase
@@ -21,27 +18,38 @@ class ICollectionNode;
 
 
 /**
-	Interface for non-iterable colllection info.
+	Interface describing the structure of a object collection.
 	\ingroup Collection
 */
-class ICollectionStructure: virtual public istd::IPolymorphic
+class ICollectionStructure: virtual public istd::IChangeable
 {
 public:
 	typedef QByteArray Id;
 	typedef QVector<Id> Ids;
 
-	/*
-		Node operations.
-	*/
-	virtual ICollectionNode* CreateNode(const Id& nodeId, const Id& parentId) = 0;
-	virtual ICollectionNode* GetNode(const Id& nodeId) const = 0;
-	virtual bool MoveNode(const Id& nodeId, const Id& newParentId) = 0;
-	virtual bool RemoveNode(const Id& nodeId) = 0;
+	struct NodeInfo
+	{
+		QString name;
+		// istd::TSmartPtr<idoc::IDocumentMetaInfo> metaInfoPtr;
+	};
 
-	/*
-		Object operations
+	virtual QByteArray InsertNewNode(const QString& name, const Id& parentNodeId, const Id& proposedNodeId = QByteArray()) = 0;
+	virtual ICollectionNode* GetNode(const Id& nodeId) const = 0;
+	virtual bool MoveNode(const Id& nodeId, const Id& parentNodeId) = 0;
+	virtual bool RemoveNode(const Id& nodeId) = 0;
+	virtual NodeInfo GetNodeInfo(const Id& nodeId) const = 0;
+	virtual bool SetNodeInfo(const Id& nodeId, const NodeInfo& nodeInfo) = 0;
+
+	/**
+		Add a collection object to the structure
+		\param objectId	ID of the object in the data collection
+		\param nodeId	ID of the node in the collection structure
 	*/
-	virtual bool InsertObject(const Id& objectId, const Id& parentId) = 0;
+	virtual bool AddObject(const Id& objectId, const Id& nodeId) = 0;
+	virtual bool MoveObject(const Id& objectId, const Id& parentNodeId, const Id& newParentNodeId) = 0;
+	virtual bool RemoveObjectFromStructure(const Id& objectId, const Id& nodeId) = 0;
+
+	// TODO: Move to IStructuredCollectionInserter
 	virtual bool InsertNewObject(
 				const QByteArray& typeId,
 				const QString& name,
@@ -52,11 +60,8 @@ public:
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
 				const IOperationContext* operationContextPtr = nullptr) = 0;
-	virtual bool MoveObject(const Id& objectId, const Id& parentId, const Id& newParentId) = 0;
-	virtual bool RemoveObjectFromStructure(const Id& objectId, const Id& parentId) = 0;
-
-	/*
-		Find operations
+	/**
+		Get the list of nodes containing the given object.
 	*/
 	virtual Ids FindObjectNodes(const Id& objectId) const = 0;
 };
