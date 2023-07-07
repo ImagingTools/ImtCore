@@ -30,6 +30,7 @@ Rectangle{
     property alias canClose: searchTextField.canClose;
 
     property string valueName: "Name";
+    property string retValName: "";
 
     property string externalSearchParam: "";
 
@@ -45,38 +46,28 @@ Rectangle{
     property alias textField: searchTextField;
     property alias currentText: searchTextField.currentText;
 
+    property alias itemHeight: searchTextField.itemHeight;
+    property alias textFieldWidth: searchTextField.width;
+    property alias textFieldTextSize: searchTextField.textSize;
+
     property alias openST: searchTextField.openST;
 
-    property Component delegateDefault: PopupMenuDelegate{
-        id: searchDelegateDefault;
-
-        width: searchContainer.textField.width;
-        height: visible ? searchContainer.textField.itemHeight : 0;
-        textSize: searchContainer.textSize;
-        text: "";
-        clip: true;
-        rootItem: searchContainer.textField;
-        property TreeItemModel itemsModel: TreeItemModel{};
-        Component.onCompleted:  {
-            text = model.Name;
-        }
-
-    }
-
     signal accepted(string retVal);
-    //signal updateSignal(string param);
 
 
     Component.onCompleted: {
     }
 
-    onCommandIdChanged: {
+
+
+    function clearSearchParams(){
         searchContainer.clearModels();
 
         searchTextField.excludeFilterPart = "";
         searchTextField.currentText = "";
         searchContainer.externalSearchParam = ""
         searchContainer.selectedText = "";
+
     }
 
     function setGettedParamsModel(param){
@@ -131,7 +122,7 @@ Rectangle{
 
     }
 
-    function setCurrentTextFunc(modelll, index_){
+    function setCurrentTextAddressFunc(modelll, index_){
         if(searchContainer.isAddressSearch){
             searchTextField.currentText = modelll.GetData(searchContainer.valueName, index_);
             var parentIds__ = modelll.GetData("ParentIds",index_) !== undefined ? modelll.GetData("ParentIds", index_) : "";
@@ -166,10 +157,19 @@ Rectangle{
 
         }
 
-        else{
-            searchTextField.currentText = modelll.GetData(searchContainer.valueName, index_);
-        }
 
+    }
+
+    function setCurrentTextFunc(modelll, index_){
+        searchTextField.currentText = modelll.GetData(searchContainer.valueName, index_);
+        var retV;
+        if(searchContainer.retValName !== ""){
+            retV = modelll.GetData(searchContainer.retValName, index_);
+        }
+        else{
+            retV = searchTextField.currentText;
+        }
+        searchContainer.accepted(retV);
     }
 
     function textChangeFunc(filterText){
@@ -212,7 +212,21 @@ Rectangle{
 
 
     function closeComboFunc(){
+        if(!searchTextField.openST && searchTextField.currentText == "" ){
+            searchTextField.excludeFilterPart = "";
+            searchContainer.externalSearchParam = "";
+            //searchContainer.updateModel("");
+            searchContainer.accepted("");
+        }
+        else if(!searchTextField.openST && searchTextField.currentText !== ""){
+//            if(searchContainer.canClose){
+//                searchContainer.accepted(searchTextField.currentText);
+//            }
+        }
+    }
 
+
+    function closeComboAddressFunc(){
         if(!searchTextField.openST && searchTextField.currentText == "" ){
             searchTextField.excludeFilterPart = "";
             searchContainer.externalSearchParam = "";
@@ -228,18 +242,12 @@ Rectangle{
                     searchContainer.parentIds = searchContainer.removeLastElement(searchContainer.parentIds);
                 }
                 setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
-                if(searchContainer.canClose){
-                    searchContainer.accepted(searchTextField.currentText);
-                }
+
                 //console.log("secondSearch:: ", "parentIds:: " ,searchContainer.parentIds)
-            }
-            else{
-                if(searchContainer.canClose){
-                    searchContainer.accepted(searchTextField.currentText);
-                }
             }
 
         }
+
     }
 
     function clearModels(){
@@ -256,16 +264,41 @@ Rectangle{
             searchContainer.gettedParamsModel.CopyItemDataFromModel(i,gettedParamModel_,i);
         }
         for(let j = 0; j < filterIdsModel_.GetItemsCount(); j++){
-            searchContainer.gettedParamsModel.InsertNewItem();
-            searchContainer.gettedParamsModel.CopyItemDataFromModel(j,filterIdsModel_,j);
+            searchContainer.filterIdsModel.InsertNewItem();
+            searchContainer.filterIdsModel.CopyItemDataFromModel(j,filterIdsModel_,j);
         }
         if(propertiesModel_ !== null){
             for(let k = 0; k < propertiesModel_.GetItemsCount(); k++){
-                searchContainer.gettedParamsModel.InsertNewItem();
-                searchContainer.gettedParamsModel.CopyItemDataFromModel(k,propertiesModel_,k);
+                searchContainer.propertiesModel.InsertNewItem();
+                searchContainer.propertiesModel.CopyItemDataFromModel(k,propertiesModel_,k);
             }
         }
     }
+
+    function copyToGettedParamsModel(gettedParamModel_){
+        searchContainer.gettedParamsModel.Clear();
+        for(let i = 0; i < gettedParamModel_.GetItemsCount(); i++){
+            searchContainer.gettedParamsModel.InsertNewItem();
+            searchContainer.gettedParamsModel.CopyItemDataFromModel(i,gettedParamModel_,i);
+        }
+    }
+
+    function copyToFilterIdsModel(filterIdsModel_){
+        searchContainer.filterIdsModel.Clear();
+        for(let j = 0; j < filterIdsModel_.GetItemsCount(); j++){
+            searchContainer.filterIdsModel.InsertNewItem();
+            searchContainer.filterIdsModel.CopyItemDataFromModel(j,filterIdsModel_,j);
+        }
+    }
+
+    function copyToPropertiesModel(propertiesModel_){
+        searchContainer.propertiesModel.Clear();
+        for(let k = 0; k < propertiesModel_.GetItemsCount(); k++){
+            searchContainer.propertiesModel.InsertNewItem();
+            searchContainer.propertiesModel.CopyItemDataFromModel(k,propertiesModel_,k);
+        }
+    }
+
 
     ////////////////////////////////////
 
@@ -398,7 +431,7 @@ Rectangle{
         keepFilterText: true;
         preventFirstLoading:  searchContainer.externalSearchParam !=="";
 
-        canClose: false;
+        canClose: true;
 
         onInFocusChanged: {
 
@@ -407,7 +440,12 @@ Rectangle{
             searchContainer.textChangeFunc(filterText);
         }
         onSetCurrentText:{
-            searchContainer.setCurrentTextFunc(modelll, searchTextField.currentIndex);
+            if(searchContainer.isAddressSearch){
+                searchContainer.setCurrentTextAddressFunc(modelll, searchTextField.currentIndex);
+            }
+            else{
+                searchContainer.setCurrentTextFunc(modelll, searchTextField.currentIndex);
+            }
         }
 
         delegate:
@@ -445,73 +483,6 @@ Rectangle{
 
             }
 
-            Text{
-                id: firstText;
-
-                anchors.left: parent.left;
-                anchors.top: parent.top;
-                anchors.leftMargin: 10;
-                anchors.topMargin: 6;
-
-                font.family: Style.fontFamily;
-                color: searchContainer.fontColor;
-                font.pixelSize: searchContainer.textSize - 2;
-                font.bold: false;
-
-                text: "";
-            }
-
-            Text{
-                id: secondText;
-
-                anchors.left: parent.left;
-                anchors.top: firstText.bottom;
-                anchors.leftMargin: 10;
-                anchors.topMargin: 2;
-
-                font.family: Style.fontFamily;
-                color: searchContainer.fontColor;
-                font.pixelSize: searchContainer.textSize;
-                font.bold: false;
-
-                text: "";
-            }
-
-            Text{
-                id: thirdText;
-
-                anchors.left: secondText.right;
-                anchors.top: firstText.bottom;
-                anchors.leftMargin: 0;
-                anchors.topMargin: 2;
-
-                font.family: Style.fontFamily;
-                color: searchContainer.fontColor;
-                font.pixelSize: searchContainer.textSize;
-                font.bold: false;
-
-                property string number: "";
-
-                text: number == "" ? "" : ", " + number;
-            }
-
-            Text{
-                id: fourthText;
-
-                anchors.left: thirdText.right;
-                anchors.top: firstText.bottom;
-                anchors.leftMargin: 0;
-                anchors.topMargin: 2;
-
-                font.family: Style.fontFamily;
-                color: searchContainer.fontColor;
-                font.pixelSize: searchContainer.textSize;
-                font.bold: false;
-
-                property string number: "";
-
-                text: number == "" ? "" : ", " + number;
-            }
 
 
             onClicked: {
@@ -531,7 +502,12 @@ Rectangle{
         duration: 10;
 
         onFinished: {
-            searchContainer.closeComboFunc();
+            if(searchContainer.isAddressSearch){
+                searchContainer.closeComboAddressFunc();
+            }
+            else{
+                searchContainer.closeComboFunc();
+            }
         }
     }
 
