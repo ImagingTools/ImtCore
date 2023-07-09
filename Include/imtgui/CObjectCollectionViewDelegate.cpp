@@ -335,7 +335,19 @@ ICollectionViewDelegate::SummaryInformation CObjectCollectionViewDelegate::GetSu
 			result.sortValue = result.text;
 		}
 		else if (informationId == QByteArray("TypeId")){
-			result.text = m_collectionPtr->GetObjectTypeId(objectId);
+			const iprm::IOptionsList* typeListInfoPtr = m_collectionPtr->GetObjectTypesInfo();
+			QByteArray typeId = m_collectionPtr->GetObjectTypeId(objectId);
+
+			if (typeListInfoPtr == nullptr){
+				result.text = typeId;
+			}
+			else{
+				int typeIndex = iprm::FindOptionIndexById(typeId, *typeListInfoPtr);
+				Q_ASSERT(typeIndex >= 0);
+
+				result.text = typeListInfoPtr->GetOptionName(typeIndex);
+			}
+
 			result.sortValue = result.text;
 		}
 		else if (informationId == QByteArray("Description")){
