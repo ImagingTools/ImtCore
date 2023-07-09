@@ -17,7 +17,7 @@ namespace imtbase
 
 CSystemStatusComp::CSystemStatusComp()
 	:m_status(SystemStatus::SS_UNKNOWN_ERROR),
-	  m_futureResultStatus(SystemStatus::SS_UNKNOWN_ERROR)
+	m_futureResultStatus(SystemStatus::SS_UNKNOWN_ERROR)
 {
 }
 
