@@ -38,7 +38,6 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	if (!accessToken.isEmpty() && m_gqlContextControllerCompPtr.IsValid()){
 		imtgql::IGqlContext* gqlContextPtr = m_gqlContextControllerCompPtr->GetRequestContext(gqlRequest, accessToken);
 		if (gqlContextPtr != nullptr){
-			QByteArray token = gqlContextPtr->GetToken();
 			gqlRequest.SetGqlContext(gqlContextPtr);
 		}
 	}
@@ -125,10 +124,10 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::GenerateErro
 	QByteArray responseJson;
 	return imtrest::IRequestServlet::ConstResponsePtr(
 				engine.CreateResponse(
-					request,
-					errorCode,
-					responseJson,
-					QByteArray("application/json;charset=utf-8")));
+							request,
+							errorCode,
+							responseJson,
+							QByteArray("application/json;charset=utf-8")));
 }
 
 

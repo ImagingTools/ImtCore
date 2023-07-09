@@ -19,7 +19,7 @@ public:
 
 	I_BEGIN_COMPONENT(CHttpGraphQLServletComp);
 		I_ASSIGN_MULTI_0(m_gqlRequestHandlerCompPtr, "GqlRequestHandler", "Handler for GraphQL-request", true);
-		I_ASSIGN(m_gqlContextControllerCompPtr, "GqlContextController", "Gql context controller", false, "GqlContextController");
+		I_ASSIGN(m_gqlContextControllerCompPtr, "GqlContextController", "GraphQL-related context controller", false, "GqlContextController");
 	I_END_COMPONENT;
 
 protected:
