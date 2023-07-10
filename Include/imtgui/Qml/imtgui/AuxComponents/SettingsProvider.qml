@@ -92,19 +92,19 @@ QtObject {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, settingsQuery);
+            console.log("State:", this.state, container.settingsQuery);
 
             if (this.state === "Ready") {
                 var dataModelLocal;
 
-                if (settingsQuery.ContainsKey("errors")){
-                    dataModelLocal = settingsQuery.GetData("errors");
+                if (container.settingsQuery.ContainsKey("errors")){
+                    dataModelLocal = container.settingsQuery.GetData("errors");
 
                     return;
                 }
 
-                if (settingsQuery.ContainsKey("data")){
-                    dataModelLocal = settingsQuery.GetData("data");
+                if (container.settingsQuery.ContainsKey("data")){
+                    dataModelLocal = container.settingsQuery.GetData("data");
 
                     if (dataModelLocal.ContainsKey("GetSettings")){
                         dataModelLocal = dataModelLocal.GetData("GetSettings");
