@@ -38,12 +38,12 @@ bool CRemoteFileController::OpenFile(const QString& filePath) const
 {
 	QFileInfo fileInfo(filePath.length() > 2 ? filePath : m_downloadedFilePath);
 	if(!fileInfo.exists()){
-		qWarning() << "Uttempting to aquire unexisted file" << fileInfo.absoluteFilePath();
+        qWarning() << "Attempting to aquire a non-existent file" << fileInfo.absoluteFilePath();
 
 		return false;
 	}
 	if(!fileInfo.isReadable()){
-		qWarning() << "Uttempting to aquire unreaddable file" << fileInfo.absoluteFilePath();
+        qWarning() << "Attempting to aquire an unreadable file" << fileInfo.absoluteFilePath();
 	}
 #ifdef Q_OS_ANDROID
 	QString type = "*/*";
