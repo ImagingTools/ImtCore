@@ -42,7 +42,7 @@ Rectangle{
     property string excludeFilterPart: "";
     property string selectedText: "";
 
-    property alias delegate: searchTextField.delegate;
+    property alias searchDelegate: searchTextField.delegate;
     property alias textField: searchTextField;
     property alias currentText: searchTextField.currentText;
 
@@ -441,16 +441,16 @@ Rectangle{
         }
         onSetCurrentText:{
             if(searchContainer.isAddressSearch){
-                searchContainer.setCurrentTextAddressFunc(modelll, searchTextField.currentIndex);
+                searchContainer.setCurrentTextAddressFunc(modelll, index);
             }
             else{
-                searchContainer.setCurrentTextFunc(modelll, searchTextField.currentIndex);
+                searchContainer.setCurrentTextFunc(modelll, index);
             }
         }
 
         delegate:
             PopupMenuDelegate{
-            id: searchDelegate;
+            id: searchDel;
 
             width: searchTextField.width;
             height: visible ? searchTextField.itemHeight : 0;

@@ -166,6 +166,10 @@ Item {
                     comboBoxContainerGql.currentText = popup.filterText;
                 }
 
+                if(popup.canClose){
+                    popup.root.closeDialog();
+                }
+
             }
             onPropertiesChanged: {
                 comboBoxContainerGql.currentIndex = -1;

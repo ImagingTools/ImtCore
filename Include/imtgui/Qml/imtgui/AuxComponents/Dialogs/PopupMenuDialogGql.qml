@@ -134,9 +134,9 @@ Item {
 
 
     onFinished: {
-        if(popupMenuContainer.canClose){
-            popupMenuContainer.root.closeDialog();
-        }
+//        if(popupMenuContainer.canClose){
+//            popupMenuContainer.root.closeDialog();
+//        }
     }
 
     function setTextFocus(focus){
