@@ -190,7 +190,7 @@ Item {
         duration: 500;
         onFinished:  {
             if(popupMenuContainer.canUpdateModel){
-                popupMenuContainer.updateModel();
+                popupMenuContainer.updateModel(0);
             }
         }
     }
@@ -343,7 +343,6 @@ Item {
 
 
 
-
     DropShadow {
         id: dropShadow;
 
@@ -362,7 +361,7 @@ Item {
         id: itemsModel;
 
         function updateModel(offsetVar) {
-            //console.log("______UPDATE_MODEL_____");
+            //console.log("______UPDATE_MODEL_____", offsetVar);
             var query = Gql.GqlRequest("query", popupMenuContainer.commandId);
 
             var inputParams = Gql.GqlObject("input");
@@ -391,7 +390,7 @@ Item {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, itemsModel);
+            //console.log("State:", this.state, itemsModel);
             if (this.state === "Ready"){
 
                 let dataModelLocal;
@@ -404,7 +403,6 @@ Item {
                 if (itemsModel.ContainsKey("data")){
 
                     dataModelLocal = itemsModel.GetData("data");
-
 
                     if (dataModelLocal.ContainsKey(popupMenuContainer.commandId)){
                         dataModelLocal = dataModelLocal.GetData(popupMenuContainer.commandId);
@@ -424,7 +422,7 @@ Item {
                         dataModelLocal = dataModelLocal.GetData("items");
 
                         //console.log(popupMenuContainer.commandId, " = ", dataModelLocal);
-                        //console.log("comboModel:::", dataModelLocal.toJSON());
+                       //console.log("comboModel:::", dataModelLocal.toJSON());
                         if (popupMenuContainer.offset == 0){
                             popupMenuContainer.model = dataModelLocal;
                             //popupMenuListView.model = popupMenuContainer.model;
@@ -432,12 +430,12 @@ Item {
                             loadedRec.visible = false;
                              popupMenuContainer.endListStatus = false;
                         }
-                        else{
+                        else{//OFSET !== 0
 
-                            console.log("count items = ", dataModelLocal.GetItemsCount())
+                            //console.log("count items = ", dataModelLocal.GetItemsCount(), dataModelLocal.toJSON())
+
                             if(dataModelLocal.GetItemsCount() > 0){
                                 for (var i = 0; i < dataModelLocal.GetItemsCount(); i++){
-                                    var index_
                                     var index_ = popupMenuContainer.model.InsertNewItem();
                                     //dataModelLocal.CopyItemDataToModel(i, popupMenuContainer.model, popupMenuContainer.offset + i);
                                     dataModelLocal.CopyItemDataToModel(i, popupMenuContainer.model, index_);
