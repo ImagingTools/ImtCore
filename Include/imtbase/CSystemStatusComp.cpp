@@ -52,11 +52,7 @@ void CSystemStatusComp::OnComponentCreated()
 	connect(&m_checkStatusFutureWatcher, &QFutureWatcher<void>::finished, this, &CSystemStatusComp::OnCheckStatusFinished);
 
 	m_timer.setSingleShot(true);
-
-	int interval = m_checkIntervalAttrPtr.IsValid() ? *m_checkIntervalAttrPtr * 1000 : 60000;
-	m_timer.setInterval(interval);
-
-	m_timer.start();
+	m_timer.start(0);
 }
 
 
@@ -87,7 +83,8 @@ void CSystemStatusComp::OnCheckStatusFinished()
 {
 	SetStatus(m_futureResultStatus);
 
-	m_timer.start();
+	int interval = m_checkIntervalAttrPtr.IsValid() ? *m_checkIntervalAttrPtr * 1000 : 60000;
+	m_timer.start(interval);
 }
 
 
