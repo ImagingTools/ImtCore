@@ -441,6 +441,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 			offset = viewParamsGql->GetFieldArgumentValue("Offset").toInt();
 			count = viewParamsGql->GetFieldArgumentValue("Count").toInt();
 
+
 			QByteArray filterBA = viewParamsGql->GetFieldArgumentValue("FilterModel").toByteArray();
 			if (!filterBA.isEmpty()){
 				imtbase::CTreeItemModel generalModel;
@@ -498,15 +499,12 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		int elementsCount = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
 
 		int pagesCount = std::ceil(elementsCount / (double)count);
-		if (pagesCount <= 0){
-			pagesCount = 1;
-		}
+        if (pagesCount <= 0){
+            pagesCount = 1;
+        }
 
 		notificationModel->SetData("PagesCount", pagesCount);
 
-		if (offset >= elementsCount){
-			offset -= count;
-		}
 
 		istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(m_objectCollectionCompPtr->CreateObjectCollectionIterator(offset, count, &filterParams));
 		if (objectCollectionIterator != nullptr){
@@ -527,6 +525,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		}
 
 		itemsModel->SetIsArray(true);
+
+
 		dataModel->SetExternTreeModel("items", itemsModel);
 		dataModel->SetExternTreeModel("notification", notificationModel);
 	}
