@@ -15,6 +15,8 @@ namespace imtstyle
 
 void CDesignManagerComp::RegisterResourcesFunctions()
 {
+	qDebug(qPrintable(QString("Registering resources for imtstyle library")));
+
 	SetDesignResourcesFunctions(
 				imtstyle::CImtStyle::DS_LIGHT,
 				qInitResources_imtstylelight,

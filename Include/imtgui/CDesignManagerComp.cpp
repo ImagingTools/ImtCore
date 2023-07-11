@@ -15,6 +15,8 @@ namespace imtgui
 
 void CDesignManagerComp::RegisterResourcesFunctions()
 {
+	qDebug(qPrintable(QString("Registering resources for imtgui library")));
+
 	SetDesignResourcesFunctions(
 				imtstyle::CImtStyle::DS_LIGHT,
 				qInitResources_imtguilight,

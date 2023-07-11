@@ -112,6 +112,8 @@ bool CDesignManagerCompBase::ApplyDesignScheme(int index)
 {
 	bool retVal = true;
 
+	qDebug(qPrintable(QString("Applying color scheme index: %1").arg(index)));
+
 	imtstyle::CImtStyle* imtStylePtr = imtstyle::CImtStyle::GetInstance();
 	Q_ASSERT(imtStylePtr != nullptr);
 
@@ -141,6 +143,7 @@ bool CDesignManagerCompBase::ApplyDesignScheme(int index)
 					}
 
 					m_initResources[designSchema]();
+
 					imtStylePtr->SetDesignSchema(designSchema);
 				}
 			}
@@ -164,10 +167,14 @@ void CDesignManagerCompBase::DesignList::UpdateDesignList()
 
 	imtstyle::CImtStyle* imtStyle = imtstyle::CImtStyle::GetInstance();
 	if (imtStyle != nullptr){
+		qDebug(qPrintable(QString("Update list of color schemes: %1").arg(imtStyle->GetDesignSchemaCount())));
+
 		for (int i = 0; i < imtStyle->GetDesignSchemaCount(); i++){
 			DesignInfo designInfo;
 			designInfo.id = imtStyle->GetDesignSchemaId((imtstyle::CImtStyle::DesignSchema)i);
 			designInfo.name = imtStyle->GetDesignSchemaName((imtstyle::CImtStyle::DesignSchema)i);
+
+			qDebug(qPrintable(QString("Color scheme added: %1").arg(designInfo.name)));
 
 			m_designList.append(designInfo);
 		}
