@@ -57,12 +57,14 @@ Item {
                     id: backgroundArea;
                     anchors.fill: parent;
                     hoverEnabled: true;
+                    preventStealing: true;
 
                     onWheel: {
                         wheel.accepted = true;
                     }
                     onClicked: {
                         Events.sendEvent("DialogBackgroundClicked");
+                        mouse.accepted = true;
                     }
                     onDoubleClicked: {}
                     onReleased: {}
@@ -82,7 +84,7 @@ Item {
 
                     container.backgroundItem = background;
 
-                    dialogLoader.item["root"] = container;
+                    dialogLoader.item.root = container;
                     for (let key in model.Parameters) {
                         dialogLoader.item[key] = model.Parameters[key];
                     }

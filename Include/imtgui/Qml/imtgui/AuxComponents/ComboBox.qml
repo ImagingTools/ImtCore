@@ -127,6 +127,7 @@ FocusScope {
 			onFinished: {
 				comboBoxContainer.currentIndex = index;
 				comboBoxContainer.isOpen = false;
+                popup.root.closeDialog();
 			}
 			Component.onCompleted: {
 				comboBoxContainer.finished.connect(popup.finished);

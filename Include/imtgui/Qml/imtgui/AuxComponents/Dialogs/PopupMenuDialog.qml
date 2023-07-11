@@ -41,6 +41,8 @@ Item {
 		textSize: popupMenuContainer.textSize;
 		fontColor: popupMenuContainer.fontColor;
 
+        onClicked: {popupMenuContainer.finished(commandId, index)}
+
 		rootItem: popupMenuContainer;
 	}
 
@@ -57,7 +59,7 @@ Item {
 	}
 
 	onFinished: {
-		popupMenuContainer.root.closeDialog();
+        //popupMenuContainer.root.closeDialog();
 	}
 
 	onModelChanged: {
@@ -88,9 +90,9 @@ Item {
 
 	function onBackgroundClicked(){
 		popupMenuContainer.root.closeDialog();
-		if (rootItem){
-			popupMenuContainer.finished('', rootItem.currentIndex);
-		}
+//		if (rootItem){
+//			popupMenuContainer.finished('', rootItem.currentIndex);
+//		}
 	}
 
 	onContentYChanged: {
