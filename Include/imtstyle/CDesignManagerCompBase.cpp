@@ -1,6 +1,10 @@
 #include <imtstyle/CDesignManagerCompBase.h>
 
 
+// Qt includes
+#include <QtCore/QDirIterator>
+#include <QtCore/QDebug>
+
 // ACF includes
 #include <istd/CChangeNotifier.h>
 
@@ -27,13 +31,18 @@ CDesignManagerCompBase::~CDesignManagerCompBase()
 
 bool CDesignManagerCompBase::SetSelectedOptionIndex(int index)
 {
-	bool retVal = BaseClass2::SetSelectedOptionIndex(index);
+	int currentIndex = GetSelectedOptionIndex();
+	if (currentIndex != index){
+		bool retVal = BaseClass2::SetSelectedOptionIndex(index);
 
-	if (retVal){
-		retVal = retVal && ApplyDesignScheme(index);
+		if (retVal){
+			retVal = retVal && ApplyDesignScheme(index);
+		}
+
+		return retVal;
 	}
 
-	return retVal;
+	return true;
 }
 
 
@@ -112,7 +121,7 @@ bool CDesignManagerCompBase::ApplyDesignScheme(int index)
 {
 	bool retVal = true;
 
-	qDebug(qPrintable(QString("Applying color scheme index: %1").arg(index)));
+	qDebug(qPrintable(QString("%1: Start applying color scheme index: %2").arg(qPrintable(GetComponentId(GetComponentContext()))).arg(index)));
 
 	imtstyle::CImtStyle* imtStylePtr = imtstyle::CImtStyle::GetInstance();
 	Q_ASSERT(imtStylePtr != nullptr);
@@ -144,6 +153,15 @@ bool CDesignManagerCompBase::ApplyDesignScheme(int index)
 
 					m_initResources[designSchema]();
 
+					I_IF_DEBUG(
+						qDebug() << "Start dumping of the embedded resources";
+						QDirIterator it(":/Styles", QDirIterator::Subdirectories);
+						while (it.hasNext()){
+							qDebug() << it.next();
+						}
+						qDebug() << "Finished dumping of the embedded resources";
+					)
+
 					imtStylePtr->SetDesignSchema(designSchema);
 				}
 			}
@@ -152,6 +170,8 @@ bool CDesignManagerCompBase::ApplyDesignScheme(int index)
 	else{
 		retVal = false;
 	}
+
+	qDebug(qPrintable(QString("%1: Finished applying color scheme index: %2").arg(qPrintable(GetComponentId(GetComponentContext()))).arg(index)));
 
 	return retVal;
 }
