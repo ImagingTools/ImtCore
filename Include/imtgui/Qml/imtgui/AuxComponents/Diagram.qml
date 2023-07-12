@@ -19,6 +19,7 @@ Item {
     property string colorNegative: "blue";
     property int barWidth: 15;
     property TreeItemModel model: TreeItemModel{};
+    property TreeItemModel axeYValueModel: TreeItemModel{};
     property bool visibleAxeX: false;
     property bool visibleAxeY: true;
     property int fontSize: 18;
@@ -55,17 +56,19 @@ Item {
             diagram.minValue = 0;
         }
         else{
-            var minVal = 0;
-            var count = diagram.model.GetItemsCount();
+            var minVal;
             var firstVal;
+            var count = diagram.model.GetItemsCount();
             if(count){
+                firstVal = Number(diagram.model.GetData("positive",0)) + Number(diagram.model.GetData("negative",0));
+                minVal = firstVal;
                 for(var i = 0; i < diagram.model.GetItemsCount(); i++){
                     var currVal = Number(diagram.model.GetData("positive",i)) + Number(diagram.model.GetData("negative",i));
-                    if(i == 0){
-                        firstVal = currVal;
+                    if(currVal < minVal){
+                        minVal = currVal;
                     }
                 }
-                minVal = Math.trunc(firstVal);
+                minVal = Math.trunc(minVal);
             }
 
             diagram.minValue = minVal;
@@ -85,9 +88,7 @@ Item {
                 if(currVal > maxVal){
                     maxVal = currVal;
                 }
-
             }
-
             diagram.maxValue = maxVal;
             diagram.fillAxeYModel();
         }
@@ -97,19 +98,21 @@ Item {
     }
 
     function fillAxeYModel(){
-        axeYValueModel.clear();
+        diagram.axeYValueModel.Clear();
         for(var i = 4; i >= 0 ; i--){
             var val;
             if(i == 4){
                 val = diagram.roundDigit((diagram.maxValue/4 * i),true);
                 diagram.maxAxeYValue = val;
                 let valToModel = val + diagram.minValue;
-                axeYValueModel.append({"text" : valToModel})
+                var index = diagram.axeYValueModel.InsertNewItem();
+                diagram.axeYValueModel.SetData("text", valToModel, index);
             }
             else {
                 val = diagram.roundDigit((diagram.maxValue/4 * i),false);
                 let valToModel = Math.trunc((val + diagram.minValue)*100)/100;
-                axeYValueModel.append({"text" : valToModel})
+                index = diagram.axeYValueModel.InsertNewItem();
+                diagram.axeYValueModel.SetData("text", valToModel, index);
             }
         }
         diagram.setSizeText();
@@ -118,8 +121,8 @@ Item {
 
     function setSizeText(){
         var maxText = "";
-        for (var i = 0; i < axeYValueModel.count; i++){
-            var currText = String(axeYValueModel.get(i).text);
+        for (var i = 0; i < diagram.axeYValueModel.GetItemsCount(); i++){
+            var currText = String(diagram.axeYValueModel.GetData("text",i));
             if(currText.length > maxText.length){
                 maxText = currText;
             }
@@ -168,9 +171,6 @@ Item {
         return retval;
     }
 
-    ListModel{
-        id: axeYValueModel;
-    }
 
     ListModel{
         id: axeXValueModel;
@@ -239,7 +239,7 @@ Item {
             font.family: Style.fontFamily;
             color:  diagram.valueColor;
 
-            text: diagram.roundDigit(diagram.maxValue,false);
+            text: Math.trunc(diagram.maxValue*100)/100;
 
         }
 
@@ -250,7 +250,7 @@ Item {
 
             clip: true;
             boundsBehavior: Flickable.StopAtBounds;
-            model: axeYValueModel;
+            model: diagram.axeYValueModel;
             delegate: Item {
                 width: axeYValuesList.width;
                 height : valueText.height + ((axeYValuesList.height - valueText.height)/4 - valueText.height) * (index !== (axeYValuesList.count - 1));
