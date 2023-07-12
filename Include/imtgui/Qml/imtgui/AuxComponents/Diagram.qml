@@ -44,6 +44,8 @@ Item {
 
     property real parentY: 0;
 
+    property alias maxSizeText: sizeText.text;
+
     onParentYChanged: {console.log("ParentYChanged");}
 
 
