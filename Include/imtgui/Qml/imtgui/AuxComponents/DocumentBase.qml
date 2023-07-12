@@ -87,8 +87,13 @@ Item {
 
         documentBaseRoot.documentModel.dataChanged.connect(documentBaseRoot.onDataChanged);
 
-        documentBaseRoot.itemId = documentBaseRoot.documentModel.GetData("Id");
-        documentBaseRoot.itemName = documentBaseRoot.documentModel.GetData("Name");
+        if (documentBaseRoot.documentModel.ContainsKey("Id")){
+            documentBaseRoot.itemId = documentBaseRoot.documentModel.GetData("Id");
+        }
+
+        if (documentBaseRoot.documentModel.ContainsKey("Name")){
+            documentBaseRoot.itemName = documentBaseRoot.documentModel.GetData("Name");
+        }
 
         documentBaseRoot.updateDocumentTitle()
 
@@ -137,8 +142,8 @@ Item {
 
     function updateDocumentTitle(){
         if (documentBaseRoot.documentManager != null){
-            let documentId = documentBaseRoot.documentModel.GetData("Id");
-            let documentName = documentBaseRoot.documentModel.GetData("Name");
+            let documentId = documentBaseRoot.itemId;
+            let documentName = documentBaseRoot.itemName;
             if (documentName === ""){
                 documentName = "<new item>"
             }

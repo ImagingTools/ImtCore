@@ -238,17 +238,15 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 
 	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
 
-	QByteArray oldObjectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
-	QByteArray newObjectId;
+	QByteArray oldObjectId;
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	if (inputParamPtr != nullptr){
+		oldObjectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+	}
 
+	QByteArray newObjectId;
 	QString name;
 	QString description;
-
-	QString splitObjectId = oldObjectId;
-	if (m_separatorObjectIdAttrPtr.IsValid()){
-		QStringList splitData = splitObjectId.split(*m_separatorObjectIdAttrPtr);
-		splitObjectId = splitData[0].toUtf8();
-	}
 
 	istd::IChangeable* savedObject = CreateObject(inputParams, newObjectId, name, description, errorMessage);
 	if (savedObject != nullptr){

@@ -120,6 +120,16 @@ public:
 		\sa GetCustomerDatabase
 	*/
 	virtual QByteArray GetCustomerId() const = 0;
+
+	/**
+		Get the serial number of this product instance.
+	*/
+	virtual QByteArray GetSerialNumber() const = 0;
+
+	/**
+		Set the serial number of this product instance.
+	*/
+	virtual void SetSerialNumber(const QByteArray& serialNumber) = 0;
 };
 
 

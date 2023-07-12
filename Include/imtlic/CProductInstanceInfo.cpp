@@ -99,13 +99,33 @@ QByteArray CProductInstanceInfo::GetProductInstanceId() const
 
 void CProductInstanceInfo::SetProductInstanceId(const QByteArray &instanceId)
 {
-	m_instanceId = instanceId;
+	if (m_instanceId != instanceId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_instanceId = instanceId;
+	}
 }
 
 
 QByteArray CProductInstanceInfo::GetCustomerId() const
 {
 	return m_customerId;
+}
+
+
+QByteArray CProductInstanceInfo::GetSerialNumber() const
+{
+	return m_serialNumber;
+}
+
+
+void CProductInstanceInfo::SetSerialNumber(const QByteArray& serialNumber)
+{
+	if (m_serialNumber != serialNumber){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_serialNumber = serialNumber;
+	}
 }
 
 
@@ -131,12 +151,26 @@ const imtlic::ILicenseInstance* CProductInstanceInfo::GetLicenseInstance(const Q
 
 bool CProductInstanceInfo::Serialize(iser::IArchive& archive)
 {
+	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
+
+	quint32 imtCoreVersion;
+	if (!versionInfo.GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion)){
+		imtCoreVersion = 0;
+	}
+
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
 	static iser::CArchiveTag productIdTag("ProductId", "ID of the product", iser::CArchiveTag::TT_LEAF);
 	bool retVal = archive.BeginTag(productIdTag);
 	retVal = retVal && archive.Process(m_productId);
 	retVal = retVal && archive.EndTag(productIdTag);
+
+	if (imtCoreVersion >= 7003 || imtCoreVersion == 0){
+		static iser::CArchiveTag serialNumberTag("SerialNumber", "Serial Number of the product", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(serialNumberTag);
+		retVal = retVal && archive.Process(m_serialNumber);
+		retVal = retVal && archive.EndTag(serialNumberTag);
+	}
 
 	static iser::CArchiveTag instanceIdTag("InstanceId", "ID of the product instance", iser::CArchiveTag::TT_LEAF);
 	retVal = archive.BeginTag(instanceIdTag);
@@ -213,6 +247,7 @@ bool CProductInstanceInfo::CopyFrom(const IChangeable& object, CompatibilityMode
 		istd::CChangeNotifier changeNotifier(this);
 
 		m_productId = sourcePtr->m_productId;
+		m_serialNumber = sourcePtr->m_serialNumber;
 		m_customerId = sourcePtr->m_customerId;
 		m_instanceId= sourcePtr->m_instanceId;
 		m_licenses = sourcePtr->m_licenses;
@@ -241,6 +276,7 @@ bool CProductInstanceInfo::ResetData(CompatibilityMode /*mode*/)
 	istd::CChangeNotifier changeNotifier(this);
 
 	m_productId.clear();
+	m_serialNumber.clear();
 	m_customerId.clear();
 	m_instanceId.clear();
 	m_licenses.clear();

@@ -36,6 +36,8 @@ public:
 	virtual QByteArray GetProductInstanceId() const override;
 	virtual void SetProductInstanceId(const QByteArray& instanceId) override;
 	virtual QByteArray GetCustomerId() const override;
+	virtual QByteArray GetSerialNumber() const override;
+	virtual void SetSerialNumber(const QByteArray& serialNumber) override;
 
 	// reimplemented (imtlic::ILicenseInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetLicenseInstances() const override;
@@ -65,6 +67,7 @@ private:
 	QByteArray m_productId;
 	QByteArray m_customerId;
 	QByteArray m_instanceId;
+	QByteArray m_serialNumber;
 	LicenseInstances m_licenses;
 	imtbase::CCollectionInfo m_licenseContainerInfo;
 };

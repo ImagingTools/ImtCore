@@ -2,10 +2,6 @@ module imtqml
 ThumbnailDecorator 1.0 ThumbnailDecorator.qml
 ApplicationMain 1.0 ApplicationMain.qml
 
-AuthorizationPage 1.0 ./AuxComponents/AuthorizationPage.qml
-SuperuserPasswordPage 1.0 ./AuxComponents/SuperuserPasswordPage.qml
-SuperuserProvider 1.0 ./AuxComponents/SuperuserProvider.qml
-
 BaseText 1.0 ./AuxComponents/BaseText.qml
 
 CollectionView 1.0 ./AuxComponents/CollectionView.qml
@@ -59,15 +55,12 @@ TopCenterPanel 1.0 ./AuxComponents/TopCenterPanel.qml
 TopLeftPanel 1.0 ./AuxComponents/TopLeftPanel.qml
 TopRightPanel 1.0 ./AuxComponents/TopRightPanel.qml
 
-LoginButton 1.0 ./AuxComponents/LoginButton.qml
 PagesManager 1.0 ./AuxComponents/PagesManager.qml
 PreferencePage 1.0 ./AuxComponents/PreferencePage.qml
 Preference 1.0 ./AuxComponents/Preference.qml
 ServerNoConnectionView 1.0 ./AuxComponents/ServerNoConnectionView.qml
-ComboBoxGql 1.0 ./AuxComponents/ComboBoxGql.qml
 PopupMenuDelegate 1.0 ./AuxComponents/PopupMenuDelegate.qml
-UserManagementProvider 1.0 ./AuxComponents/UserManagementProvider.qml
-UserTokenProvider 1.0 ./AuxComponents/UserTokenProvider.qml
+
 CustomScrollbar 1.0 ./AuxComponents/CustomScrollbar.qml
 SwitchCustom 1.0 ./AuxComponents/SwitchCustom.qml
 CustomTooltip 1.0 ./AuxComponents/CustomTooltip.qml
@@ -78,8 +71,7 @@ BaseButton 1.0 ./AuxComponents/BaseButton.qml
 RoundButton 1.0 ./AuxComponents/RoundButton.qml
 CustomRadioButton 1.0 ./AuxComponents/CustomRadioButton.qml
 RadioBox 1.0 ./AuxComponents/RadioBox.qml
-UserPanel 1.0 ./AuxComponents/UserPanel.qml
-SuperUserPasswordDialog 1.0 ./AuxComponents/SuperUserPasswordDialog.qml
+
 GridCollectionView 1.0 ./AuxComponents/GridCollectionView.qml
 GridExtendingBaseDelegate 1.0 ./AuxComponents/GridExtendingBaseDelegate.qml
 ButtonPanel 1.0 ./AuxComponents/ButtonPanel.qml
@@ -104,7 +96,6 @@ TabPanel 1.0 ./AuxComponents/TabPanel.qml
 DesignSchemaProvider 1.0 ./AuxComponents/DesignSchemaProvider.qml
 LanguageProvider 1.0 ./AuxComponents/LanguageProvider.qml
 
-GqlDocumentDataController 1.0 ./AuxComponents/GqlDocumentDataController.qml
 ServerSettingsModelObserver 1.0 ./AuxComponents/ServerSettingsModelObserver.qml
 LocalSettingsModelObserver 1.0 ./AuxComponents/LocalSettingsModelObserver.qml
 

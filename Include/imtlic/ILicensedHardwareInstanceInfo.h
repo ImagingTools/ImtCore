@@ -52,7 +52,7 @@ public:
 	/**
 		Set the link to licensing software of this product instance.
 	*/
-    virtual void SetSoftwareId(const QByteArray& softwareId) = 0;
+	virtual void SetSoftwareId(const QByteArray& softwareId) = 0;
 };
 
 

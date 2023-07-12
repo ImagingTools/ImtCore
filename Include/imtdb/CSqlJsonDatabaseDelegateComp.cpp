@@ -20,10 +20,10 @@ namespace imtdb
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
 QByteArray CSqlJsonDatabaseDelegateComp::GetSelectionQuery(
-			const QByteArray& objectId,
-			int offset,
-			int count,
-			const iprm::IParamsSet* paramsPtr) const
+		const QByteArray& objectId,
+		int offset,
+		int count,
+		const iprm::IParamsSet* paramsPtr) const
 {
 	if (!objectId.isEmpty()){
 		return QString("SELECT * FROM \"%1\" WHERE \"IsActive\" = true AND \"%2\" = '%3'")
@@ -164,8 +164,8 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
 		QString queryStr;
 		if (*m_isMultiTypeAttrPtr){
 			queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\", \"TypeId\") VALUES('%2', '%3', '%4', '%5', true, "
-								" (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 ),"
-								" (SELECT \"TypeId\" FROM \"%1\" WHERE \"DocumentId\" = '%2' LIMIT 1) )," );
+							   " (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 ),"
+							   " (SELECT \"TypeId\" FROM \"%1\" WHERE \"DocumentId\" = '%2' LIMIT 1) )," );
 
 		}
 		else{
@@ -212,20 +212,20 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetCountQuery(const iprm::IParamsSet* p
 
 QString CSqlJsonDatabaseDelegateComp::GetBaseSelectionQuery() const
 {
-    if (*m_isMultiTypeAttrPtr){
-        return QString("SELECT \"Id\", \"%1\", \"TypeId\", \"Document\", \"RevisionNumber\", \"LastModified\","
-                       "(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND t2.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
-                       " as t2 WHERE \"IsActive\" = true")
-            .arg(qPrintable(*m_objectIdColumnAttrPtr))
-            .arg(qPrintable(*m_tableNameAttrPtr));
-    }
-    else{
-        return QString("SELECT \"Id\", \"%1\", \"Document\", \"RevisionNumber\", \"LastModified\","
-                       "(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND t2.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
-                       " as t2 WHERE \"IsActive\" = true")
-            .arg(qPrintable(*m_objectIdColumnAttrPtr))
-            .arg(qPrintable(*m_tableNameAttrPtr));
-    }
+	if (*m_isMultiTypeAttrPtr){
+		return QString("SELECT \"Id\", \"%1\", \"TypeId\", \"Document\", \"RevisionNumber\", \"LastModified\","
+						"(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND t2.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
+					" as t2 WHERE \"IsActive\" = true")
+				.arg(qPrintable(*m_objectIdColumnAttrPtr))
+				.arg(qPrintable(*m_tableNameAttrPtr));
+	}
+	else{
+		return QString("SELECT \"Id\", \"%1\", \"Document\", \"RevisionNumber\", \"LastModified\","
+						"(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND t2.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
+						" as t2 WHERE \"IsActive\" = true")
+				.arg(qPrintable(*m_objectIdColumnAttrPtr))
+				.arg(qPrintable(*m_tableNameAttrPtr));
+	}
 }
 
 
@@ -400,9 +400,9 @@ bool CSqlJsonDatabaseDelegateComp::CreateTextFilterQuery(
 
 
 bool CSqlJsonDatabaseDelegateComp::WriteDataToMemory(
-			const QByteArray& /*typeId*/,
-			const istd::IChangeable& object,
-			QByteArray& data) const
+		const QByteArray& /*typeId*/,
+		const istd::IChangeable& object,
+		QByteArray& data) const
 {
 	iser::ISerializable* serializableObjectPtr = const_cast<iser::ISerializable*>(dynamic_cast<const iser::ISerializable*>(&object));
 	if (serializableObjectPtr == nullptr){
@@ -421,9 +421,9 @@ bool CSqlJsonDatabaseDelegateComp::WriteDataToMemory(
 
 
 bool CSqlJsonDatabaseDelegateComp::ReadDataFromMemory(
-			const QByteArray& /*typeId*/,
-			const QByteArray& data,
-			istd::IChangeable& object) const
+		const QByteArray& /*typeId*/,
+		const QByteArray& data,
+		istd::IChangeable& object) const
 {
 	iser::ISerializable* serializableObjectPtr = dynamic_cast<iser::ISerializable*>(&object);
 	if (serializableObjectPtr == nullptr){

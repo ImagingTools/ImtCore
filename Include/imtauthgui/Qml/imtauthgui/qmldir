@@ -2,3 +2,14 @@ module imtauthgui
 
 AccountEditor 1.0 AccountEditor.qml
 AccountCollectionView 1.0 AccountCollectionView.qml
+AuthorizationPage 1.0 AuthorizationPage.qml
+
+SuperuserPasswordPage 1.0 SuperuserPasswordPage.qml
+SuperuserProvider 1.0 SuperuserProvider.qml
+SuperUserPasswordDialog 1.0 SuperUserPasswordDialog.qml
+
+UserPanel 1.0 UserPanel.qml
+UserManagementProvider 1.0 UserManagementProvider.qml
+UserTokenProvider 1.0 UserTokenProvider.qml
+
+LoginButton 1.0 LoginButton.qml

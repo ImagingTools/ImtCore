@@ -98,16 +98,18 @@ Item {
     function onEdit(){
         console.log("CollectionView onEdit");
 
-        let itemIds = containerBase.tableData.getSelectedIds();
-        let itemNames = containerBase.tableData.getSelectedNames();
+        let indexes = containerBase.tableData.getSelectedIndexes();
 
-        console.log("itemIds", itemIds);
+        let elementsModel = containerBase.tableData.elements;
+        if (!elementsModel){
+            return;
+        }
 
-        for (let i = 0; i < itemIds.length; i++){
-            let itemId = itemIds[i];
-            let itemName = itemNames[i];
+        for (let index of indexes){
+            let itemId = elementsModel.GetData("Id", index);
+            let itemName = elementsModel.GetData("Name", index);
 
-            containerBase.collectionViewBase.selectItem(itemId, itemName);
+            containerBase.collectionViewBase.selectItem(itemId, itemName, index);
         }
     }
 

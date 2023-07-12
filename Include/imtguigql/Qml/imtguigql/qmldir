@@ -1,0 +1,6 @@
+module imtguigql
+
+GqlDocumentDataController 1.0 GqlDocumentDataController.qml
+GqlDocumentObserver 1.0 GqlDocumentObserver.qml
+GqlModelObserver 1.0 GqlModelObserver.qml
+ComboBoxGql 1.0 ComboBoxGql.qml

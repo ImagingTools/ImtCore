@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtguigql 1.0
 
 Item {
     id: workspaceView;
@@ -153,6 +154,7 @@ Item {
 
     // isRequested - if true, then the document model will be requested from the server
     function addDocument(documentObj, params, isRequested){
+        console.log();
         if (isRequested === undefined){
             isRequested = false;
         }

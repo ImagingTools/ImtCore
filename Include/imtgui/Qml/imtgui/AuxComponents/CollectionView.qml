@@ -145,7 +145,7 @@ Item {
         collectionViewBase.commands.updateModels();
     }
 
-    function selectItem(id, name){
+    function selectItem(id, name, index){
         let editorPath = collectionViewBase.commands.objectViewEditorPath;
         let commandsId = collectionViewBase.commands.objectViewEditorCommandsId;
         console.log("CollectionView selectItem", id, name, commandsId, editorPath);
@@ -251,6 +251,10 @@ Item {
 
     function getSelectedIds(){
         return collectionViewBase.table.getSelectedIds();
+    }
+
+    function getSelectedIndexes(){
+        return collectionViewBase.table.getSelectedIndexes();
     }
 
     function getSelectedNames(){

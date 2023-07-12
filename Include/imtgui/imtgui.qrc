@@ -35,7 +35,6 @@
         <file alias="imtgui/AuxComponents/MultiDocWorkspaceView.qml">Qml/imtgui/AuxComponents/MultiDocWorkspaceView.qml</file>
         <file alias="imtgui/AuxComponents/Dialogs/InputDialog.qml">Qml/imtgui/AuxComponents/Dialogs/InputDialog.qml</file>
         <file alias="imtgui/AuxComponents/PreferencePage.qml">Qml/imtgui/AuxComponents/PreferencePage.qml</file>
-        <file alias="imtgui/AuxComponents/AuthorizationPage.qml">Qml/imtgui/AuxComponents/AuthorizationPage.qml</file>
         <file alias="imtgui/AuxComponents/Splitter.qml">Qml/imtgui/AuxComponents/Splitter.qml</file>
         <file alias="imtgui/AuxComponents/SettingsComboBox.qml">Qml/imtgui/AuxComponents/SettingsComboBox.qml</file>
         <file alias="imtgui/AuxComponents/SettingsIntegerInput.qml">Qml/imtgui/AuxComponents/SettingsIntegerInput.qml</file>
@@ -53,7 +52,6 @@
         <file alias="imtgui/AuxComponents/TopCenterPanelDecorator.qml">Qml/imtgui/AuxComponents/TopCenterPanelDecorator.qml</file>
         <file alias="imtgui/AuxComponents/UndoRedo.qml">Qml/imtgui/AuxComponents/UndoRedo.qml</file>
         <file alias="imtgui/AuxComponents/CustomTextField.qml">Qml/imtgui/AuxComponents/CustomTextField.qml</file>
-        <file alias="imtgui/AuxComponents/LoginButton.qml">Qml/imtgui/AuxComponents/LoginButton.qml</file>
         <file alias="imtgui/AuxComponents/SettingsTextLabel.qml">Qml/imtgui/AuxComponents/SettingsTextLabel.qml</file>
         <file alias="imtgui/AuxComponents/CollectionViewBase.qml">Qml/imtgui/AuxComponents/CollectionViewBase.qml</file>
         <file alias="imtgui/AuxComponents/MultiDocWorkspacePageView.qml">Qml/imtgui/AuxComponents/MultiDocWorkspacePageView.qml</file>
@@ -79,20 +77,15 @@
         <file alias="imtgui/AuxComponents/SingleDocumentWorkspaceView.qml">Qml/imtgui/AuxComponents/SingleDocumentWorkspaceView.qml</file>
         <file alias="imtgui/AuxComponents/SubMenuPanelButtonDecorator.qml">Qml/imtgui/AuxComponents/SubMenuPanelButtonDecorator.qml</file>
         <file alias="imtgui/AuxComponents/StackView.qml">Qml/imtgui/AuxComponents/StackView.qml</file>
-        <file alias="imtgui/AuxComponents/ComboBoxGql.qml">Qml/imtgui/AuxComponents/ComboBoxGql.qml</file>
+
         <file alias="imtgui/AuxComponents/Dialogs/PopupMenuDialogGql.qml">Qml/imtgui/AuxComponents/Dialogs/PopupMenuDialogGql.qml</file>
         <file alias="imtgui/AuxComponents/PopupMenuDelegate.qml">Qml/imtgui/AuxComponents/PopupMenuDelegate.qml</file>
         <file alias="imtgui/AuxComponents/TableTreeItemDelegate.qml">Qml/imtgui/AuxComponents/TableTreeItemDelegate.qml</file>
         <file alias="imtgui/AuxComponents/ModelIndex.qml">Qml/imtgui/AuxComponents/ModelIndex.qml</file>
-        <file alias="imtgui/AuxComponents/UserPanel.qml">Qml/imtgui/AuxComponents/UserPanel.qml</file>
-        <file alias="imtgui/AuxComponents/UserPanelDelegate.qml">Qml/imtgui/AuxComponents/UserPanelDelegate.qml</file>
         <file alias="imtgui/AuxComponents/CustomScrollbar.qml">Qml/imtgui/AuxComponents/CustomScrollbar.qml</file>
 
 	<file alias="imtgui/AuxComponents/PagesProvider.qml">Qml/imtgui/AuxComponents/PagesProvider.qml</file>
 	<file alias="imtgui/AuxComponents/SettingsProvider.qml">Qml/imtgui/AuxComponents/SettingsProvider.qml</file>
-	<file alias="imtgui/AuxComponents/UserManagementProvider.qml">Qml/imtgui/AuxComponents/UserManagementProvider.qml</file>
-	<file alias="imtgui/AuxComponents/UserTokenProvider.qml">Qml/imtgui/AuxComponents/UserTokenProvider.qml</file>
-	<file alias="imtgui/AuxComponents/SuperuserPasswordPage.qml">Qml/imtgui/AuxComponents/SuperuserPasswordPage.qml</file>
 
         <file alias="imtgui/AuxComponents/BaseButton.qml">Qml/imtgui/AuxComponents/BaseButton.qml</file>
         <file alias="imtgui/AuxComponents/TopButtonDecorator.qml">Qml/imtgui/AuxComponents/TopButtonDecorator.qml</file>
@@ -105,17 +98,11 @@
 	<file alias="imtgui/AuxComponents/TableViewItemDelegateBase.qml">Qml/imtgui/AuxComponents/TableViewItemDelegateBase.qml</file>
 	<file alias="imtgui/AuxComponents/TreeViewItemDelegateBase.qml">Qml/imtgui/AuxComponents/TreeViewItemDelegateBase.qml</file>
 	
-	<file alias="imtgui/AuxComponents/SuperUserPasswordDialog.qml">Qml/imtgui/AuxComponents/SuperUserPasswordDialog.qml</file>
-	<file alias="imtgui/AuxComponents/SuperuserProvider.qml">Qml/imtgui/AuxComponents/SuperuserProvider.qml</file>
-
 	<file alias="imtgui/AuxComponents/LanguageProvider.qml">Qml/imtgui/AuxComponents/LanguageProvider.qml</file>
 	<file alias="imtgui/AuxComponents/DesignSchemaProvider.qml">Qml/imtgui/AuxComponents/DesignSchemaProvider.qml</file>
-	<file alias="imtgui/AuxComponents/GqlDocumentDataController.qml">Qml/imtgui/AuxComponents/GqlDocumentDataController.qml</file>
 
 	<file alias="imtgui/AuxComponents/LocalSettingsModelObserver.qml">Qml/imtgui/AuxComponents/LocalSettingsModelObserver.qml</file>
 	<file alias="imtgui/AuxComponents/ServerSettingsModelObserver.qml">Qml/imtgui/AuxComponents/ServerSettingsModelObserver.qml</file>
-	<file alias="imtgui/AuxComponents/GqlModelObserver.qml">Qml/imtgui/AuxComponents/GqlModelObserver.qml</file>
-	<file alias="imtgui/AuxComponents/GqlDocumentObserver.qml">Qml/imtgui/AuxComponents/GqlDocumentObserver.qml</file>
 	<file alias="imtgui/AuxComponents/TreeItemModelObserver.qml">Qml/imtgui/AuxComponents/TreeItemModelObserver.qml</file>
 	<file alias="imtgui/AuxComponents/TreeItemModelConverter.qml">Qml/imtgui/AuxComponents/TreeItemModelConverter.qml</file>
         <file alias="imtgui/AuxComponents/SwitchCustom.qml">Qml/imtgui/AuxComponents/SwitchCustom.qml</file>

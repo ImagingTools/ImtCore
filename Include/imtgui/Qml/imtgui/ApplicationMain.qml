@@ -208,6 +208,7 @@ Item {
     }
 
     function firstModelsInit(){
+        console.log("firstModelsInit");
         thumbnailDecorator.userManagementProvider.updateModel();
     }
 }
