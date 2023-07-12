@@ -181,6 +181,9 @@ Rectangle {
 	}
 
     onHeadersChanged: {
+        while(tableContainer.columnContentComps.length){
+            tableContainer.columnContentComps.pop();
+        }
         for (let i = 0; i < tableContainer.headers.GetItemsCount(); i++){
             tableContainer.columnContentComps.push(null);
         }
