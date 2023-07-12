@@ -17,8 +17,7 @@ Item {
     property string legendY: "Ось ординат";
     property string colorPositive: "yellow";
     property string colorNegative: "blue";
-    property int barWidth: 20;
-    //property alias model: barsList.model;
+    property int barWidth: 15;
     property TreeItemModel model: TreeItemModel{};
     property bool visibleAxeX: false;
     property bool visibleAxeY: true;
@@ -27,8 +26,6 @@ Item {
     property int minValue: 0;
     property real maxValue: 100;
     property real maxAxeYValue: 100;
-//    property real minWidth: Math.max((axeYValuesContainer.width + axeY.width + barsList.contentWidth + barsList.anchors.leftMargin + barsSpace.anchors.rightMargin + legendXTextRight.width),
-//                                     titleText.width, legendXText.width, legendYText.width, 400);
 
 
     property real minWidth: Math.max((axeYValuesContainer.width + axeY.width + barsList.contentWidth + barsList.anchors.leftMargin + barsSpace.anchors.rightMargin + legendXTextRight.width),
@@ -40,7 +37,7 @@ Item {
     property string titleColor: Style.color_text_subtitles;
     property string valueColor: Style.color_text_common;
 
-    property int spacingX: 20;
+    property int spacingX: 25;
 
     property real xElementRotation: 0;
 
@@ -68,16 +65,10 @@ Item {
             if(count){
                 for(var i = 0; i < diagram.model.GetItemsCount(); i++){
                     var currVal = Number(diagram.model.GetData("positive",i)) + Number(diagram.model.GetData("negative",i));
-                    //summ += currVal;
                     if(i == 0){
                         firstVal = currVal;
                     }
-//                    if(i == count -1){
-//                        lastVal = currVal;
-//                    }
                 }
-                //average = summ/count;
-                //delta = lastVal - firstVal;
                 minVal = Math.trunc(firstVal);
             }
 
@@ -277,7 +268,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter;
                     verticalAlignment: Text.AlignTop;
                     wrapMode: Text.NoWrap;
-                    font.pixelSize: diagram.fontSize;
+                    font.pixelSize: diagram.fontSize -2;
                     font.bold: false;
                     font.family: Style.fontFamily;
                     color:  diagram.valueColor;
@@ -467,31 +458,6 @@ Item {
 
                 text: model.xValue;
             }
-
-//            Rectangle{//test for web
-//                anchors.centerIn: parent;
-
-//                width: xValuesText.width;
-//                height: xValuesText.height;
-
-//                color: "red";
-
-//                rotation: diagram.xElementRotation;
-
-//                Text{
-//                    id: xValuesText;
-
-//                    //anchors.centerIn: parent;
-
-//                    color: diagram.valueColor;
-//                    font.family: Style.fontFamily;
-//                    font.pixelSize: 10;
-
-//                    //rotation: diagram.xElementRotation;
-
-//                    text: model.xValue;
-//                }
-//            }//test for web
 
         }
 
