@@ -56,12 +56,8 @@ Item {
         }
         else{
             var minVal = 0;
-            var summ = 0;
-            var average = 0;
             var count = diagram.model.GetItemsCount();
             var firstVal;
-            var lastVal;
-            var delta;
             if(count){
                 for(var i = 0; i < diagram.model.GetItemsCount(); i++){
                     var currVal = Number(diagram.model.GetData("positive",i)) + Number(diagram.model.GetData("negative",i));
@@ -83,7 +79,6 @@ Item {
             setMinValue();
 
             var maxVal = 0;
-            //for(var i = 0; i < diagram.model.count; i++)
             for(var i = 0; i < diagram.model.GetItemsCount(); i++)
             {
                 var currVal = Number(diagram.model.GetData("positive",i)) + Number(diagram.model.GetData("negative",i)) - Number(diagram.minValue);
@@ -244,7 +239,7 @@ Item {
             font.family: Style.fontFamily;
             color:  diagram.valueColor;
 
-            text: diagram.roundDigit(diagram.maxValue);
+            text: diagram.roundDigit(diagram.maxValue,false);
 
         }
 
