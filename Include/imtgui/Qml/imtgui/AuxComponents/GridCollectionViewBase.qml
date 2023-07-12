@@ -381,6 +381,7 @@ Item {
             console.log("Pagination onCurrentValueChanged", paginationObj.currentValue);
             gridInternal.selectedIndex = -1;
             baseCommands.updateModels();
+            collectionViewBaseContainer.openST = false;
         }
     }
 
