@@ -998,7 +998,7 @@ Rectangle {
 					tableDelegate.selected = tableContainer.tableSelection.selectedIndexes.includes(model.index);
 
 					if (tableDelegate.selected){
-						elementsListObj.positionViewAtIndex(model.index, ListView.Visible);
+                        //elementsListObj.positionViewAtIndex(model.index, ListView.Visible);
 					}
 				}
 
