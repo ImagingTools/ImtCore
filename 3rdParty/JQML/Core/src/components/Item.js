@@ -211,12 +211,16 @@ export class Item extends QtObject {
         this.dom.style.zIndex = this.z
     }
     $widthChanged(){
-        this.dom.style.width = `${this.width}px`
-        this.dom.style.minWidth = `${this.width}px`
+        if(!this.$p.width.preventDefault) {
+            this.dom.style.width = `${this.width}px`
+            this.dom.style.minWidth = `${this.width}px`
+        }
     }
     $heightChanged(){
-        this.dom.style.height = `${this.height}px`
-        this.dom.style.minHeight = `${this.height}px`
+        if(!this.$p.height.preventDefault) {
+            this.dom.style.height = `${this.height}px`
+            this.dom.style.minHeight = `${this.height}px`
+        }
     }
     $visibleChanged(){
         if(this.visible) this.$cssDisplay = this.dom.style.display

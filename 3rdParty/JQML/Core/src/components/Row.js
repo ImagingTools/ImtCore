@@ -61,6 +61,7 @@ export class Row extends Item {
     }
     $updateGeometry(){
         if(this.$widthAuto){
+            this.$p.width.preventDefault = true
             let x1 = 0
             let x2 = 0
             let first = true
@@ -77,9 +78,12 @@ export class Row extends Item {
                 }
             }
             this.width = x2 - x1
+        } else {
+            this.$p.width.preventDefault = false
         }
 
         if(this.$heightAuto){
+            this.$p.height.preventDefault = true
             let height = 0
             if(this.$availableGeometry.length)
             for(let child of this.$availableGeometry) {
@@ -87,6 +91,8 @@ export class Row extends Item {
                 if(childHeight > height) height = childHeight
             }
             this.height = height
+        } else {
+            this.$p.height.preventDefault = false
         }
 
     }

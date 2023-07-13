@@ -61,6 +61,7 @@ export class Column extends Item {
     }
     $updateGeometry(){
         if(this.$heightAuto){
+            this.$p.height.preventDefault = true
             let y1 = 0
             let y2 = 0
             let first = true
@@ -77,9 +78,12 @@ export class Column extends Item {
                 }
             }
             this.height = y2-y1
+        } else {
+            this.$p.height.preventDefault = false
         }
 
         if(this.$widthAuto){
+            this.$p.width.preventDefault = true
             let width = 0
             if(this.$availableGeometry.length)
             for(let child of this.$availableGeometry) {
@@ -87,6 +91,8 @@ export class Column extends Item {
                 if(childWidth > width) width = childWidth
             }
             this.width = width
+        } else {
+            this.$p.width.preventDefault = false
         }
     }
     
