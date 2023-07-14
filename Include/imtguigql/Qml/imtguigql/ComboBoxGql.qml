@@ -80,7 +80,7 @@ Item {
 
     onSetCurrentText: {
         if(!comboBoxContainerGql.complexModel){
-            comboBoxContainerGql.currentText = modelll.GetData("Name",index);
+            comboBoxContainerGql.currentText = modelll.GetData(comboBoxContainerGql.nameId,index);
         }
     }
 
