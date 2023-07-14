@@ -1,16 +1,13 @@
 {
-	"Decorators": {
-		"MenuButton": "MenuPanelButtonDecorator.qml",
-		"TabPanel": "TabDecorator.qml",
-		"FilterPanel": "FilterDecorator.qml"
-	},
 	"ColorPalette": {
 		"LightGray": "#c0c0c0",
 		"DeepGray": "#2b2d2d",
 		"DeepGray2": "#5b5d5d",
 		"DarkGray": "#1e2020",
 		"DarkGray 2": "#3a3b3b",
-		"LightGray2": "#e4e7e7",
+		"DarkGray 3": "#333333",
+		"LightGray2": "#dbdfdf",
+		"LightGray3": "#808080",
 		"White": "#cecece",
 		"Black": "#000000",
 		"Brown": "#a05028",
@@ -83,7 +80,10 @@
 			"TextSelected": "VividBlue",
 			"TextSelectedBackground": "VividBlue",
 			"Shadow": "Black",
-			"BorderColor": "DarkGray 2"
+			"BorderColor": "DarkGray 2",
+			"ScrollIndicator": "DarkGray 3",
+                        "ScrollHighlight": "DarkGray 3",
+                        "ScrollBackground": "LightGray3"
 		},
 		"InactiveColors": {
 			"Background": "DeepGray",
@@ -92,7 +92,7 @@
 			"AlternateBase": "DeepGray",
 			"ToolTipBase": "LightGray",
 			"ToolTipText": "LightGray",
-			"Text": "ImagingTools Blue",
+			"Text": "ImagingToolsGradient0",
 			"Button": "DeepGray",
 			"ButtonBorder": "LightGray2",
 			"ButtonText": "DarkGray",

@@ -66,7 +66,7 @@ Item {
             elide: Text.ElideRight;
 
             color: parent.selected ? Style.iconColorOnSelected: Style.textColor;
-            font.pixelSize: container.fontSize;
+            font.pixelSize: Style.fontSize_small;
             font.family: Style.fontFamily;
 
             text: leftPanelElement.title;

@@ -12,7 +12,7 @@ BaseButtonDecorator {
 
     property string textColor: Style.textColor;
     property string textColorDisabled: "gray";
-    property real fontSize: 11;
+    property real fontSize: Style.fontSize_small;
     property int radius: 4;
     property bool isEmpty: text == "";
 

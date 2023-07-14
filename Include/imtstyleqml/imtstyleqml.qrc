@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/qml">
+        <file alias="Acf/Style.qml">Qml/Acf/Style.qml</file>
+    </qresource>
+    <qresource prefix="/Decorators">
+        <file alias="imtstyle_decorators.theme">imtstyle_decorators.theme</file>
+    </qresource>
+</RCC>
