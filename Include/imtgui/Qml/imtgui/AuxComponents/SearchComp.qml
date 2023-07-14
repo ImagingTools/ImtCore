@@ -50,6 +50,9 @@ Rectangle{
     property alias itemHeight: searchTextField.itemHeight;
     property alias textFieldWidth: searchTextField.width;
     property alias textFieldTextSize: searchTextField.textSize;
+    property alias arrowIconSource: searchTextField.imageSource;
+    property alias arrowIconRotation: searchTextField.imageRotation;
+
 
     property alias openST: searchTextField.openST;
 
@@ -137,8 +140,15 @@ Rectangle{
 
             searchContainer.externalSearchParam = searchContainer.parentIds;
 
+            var retV;
+            if(searchContainer.retValName !== ""){
+                retV = modelll.GetData(searchContainer.retValName, index_);
+            }
+            else {
+                retV = searchContainer.externalSearchParam;
+            }
             //console.log("searchContainer.externalSearchParam", searchContainer.externalSearchParam)
-            searchContainer.accepted(searchContainer.externalSearchParam);
+            searchContainer.accepted(retV);
 
             if(searchTextField.openST){
                 var popup = modalDialogManager.topItem;
@@ -424,7 +434,7 @@ Rectangle{
         isColor: true;
         borderColor: "transparent";
         backgroundColor: "transparent";
-        delegateRadius: 10;
+        delegateRadius: radius;
         itemHeight: searchContainer.elementHeight;
         textSize: searchContainer.textSize;
         backVisible: !openST;

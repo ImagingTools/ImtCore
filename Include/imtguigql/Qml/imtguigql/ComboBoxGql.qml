@@ -72,6 +72,8 @@ Item {
     property alias gradient: cbMainRect.gradient;
 
     property alias image: cbArrowIcon;
+    property alias imageSource: cbArrowIcon.source;
+    property alias imageRotation: cbArrowIcon.rotation;
 
     property alias tooltipText: tooltip.text;
     property alias tooltipItem: tooltip;
