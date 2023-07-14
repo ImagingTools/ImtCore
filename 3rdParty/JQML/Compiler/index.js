@@ -3,6 +3,7 @@ const path = require('path')
 const parser = require('./parser')
 const crypto = require('crypto')
 const esprima = require('./esprima')
+const zlib = require('zlib')
 
 const QML = [
     'Component',
@@ -72,8 +73,8 @@ function getFiles (dir, _files){
 
 // if(!source) source = `C:\\Users\\Артур\\Documents\\projects\\2023\\TEST\\web\\web\\src`
 // if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\NeoPro\\Bin\\web\\src`
-// if(!source) source = `C:\\Users\\Артур\\Documents\\projects\\2023\\РТС\\web\\web\\src`
-if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src`
+if(!source) source = `C:\\projects\\sibnavacf\\RTS\\Bin\\web\\src`
+// if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src`
 if(!destination) destination = source
 
 if(!fs.existsSync(source + '/cache/')) fs.mkdirSync(source + '/cache/');
@@ -1011,5 +1012,8 @@ while(i < fullCode.length){
 fullCode = fullCode.join('\n')
 
 fs.writeFile([destination, 'jqml.full.js'].join('/'), fullCode, function(error){
+    if(error) throw error
+})
+fs.writeFile([destination, 'jqml.full.js.gzip'].join('/'), zlib.gzipSync(fullCode), function(error){
     if(error) throw error
 })
