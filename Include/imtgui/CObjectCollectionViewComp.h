@@ -48,18 +48,14 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(CObjectCollectionViewAttr);
 		I_ASSIGN(m_columnSettingsKeyAttrPtr, "ColumnSettingsKey", "Registry/INI file key for storing column settings", true, "");
-		I_ASSIGN(m_useAsyncReadAttrPtr, "UseAsyncRead", "Useasync collectionRead", true, false);
 		I_ASSIGN(m_useSearchWidgetAttrPtr, "UseSearchWidget", "Use internal search widget", true, true);
-		I_ASSIGN(m_viewProgressAttrPtr, "ViewProgress", "View progress bar on upload", true, true);
 		I_ASSIGN(m_viewRightPanelAttrPtr, "ViewRightPanel", "View right panel", true, true);
 		I_ASSIGN(m_viewFilterAttrPtr, "ViewFilter", "View filter for default", true, false);
 	I_END_COMPONENT;
 
 protected:
 	I_ATTR(QByteArray, m_columnSettingsKeyAttrPtr);
-	I_ATTR(bool, m_useAsyncReadAttrPtr);
 	I_ATTR(bool, m_useSearchWidgetAttrPtr);
-	I_ATTR(bool, m_viewProgressAttrPtr);
 	I_ATTR(bool, m_viewRightPanelAttrPtr);
 	I_ATTR(bool, m_viewFilterAttrPtr);
 };
