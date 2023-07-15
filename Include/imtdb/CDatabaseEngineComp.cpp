@@ -565,7 +565,9 @@ QString CDatabaseEngineComp::GetPassword() const
 int CDatabaseEngineComp::GetLastMigration() const
 {
 	if (m_migrationFolderPathCompPtr.IsValid()){
-		QDir folder(m_migrationFolderPathCompPtr->GetPath());
+		QString migrationFolder = m_migrationFolderPathCompPtr->GetPath();
+
+		QDir folder(migrationFolder);
 		if (folder.exists()){
 			QStringList nameFilter = {"migration_*.sql"};
 			folder.setNameFilters(nameFilter);
@@ -586,7 +588,7 @@ int CDatabaseEngineComp::GetLastMigration() const
 			return avaliableMigration;
 		}
 		else{
-			SendErrorMessage(0, "Directory containing SQL-migration files doesn't exist", "Migration");
+			SendErrorMessage(0, QString("Directory containing SQL-migration files doesn't exist: '%1'").arg(migrationFolder), "Database Migration");
 			return -1;
 		}
 	}
