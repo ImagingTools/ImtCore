@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5082" Description="ACF"/>
+            <Version Id="1" Number="2185" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ApiClient" X="550" Y="350" Note=""/>
+        <Element ComponentName="GraphQLClientEngine" X="550" Y="500" Note=""/>
+        <Element ComponentName="SimpleLoginWrap" X="550" Y="200" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
