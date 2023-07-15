@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5082" Description="ACF"/>
+            <Version Id="1" Number="2185" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="CheckPermissionOr" PackageId="ImtAuthPck" ComponentId="CheckPermissionOr">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="RemoteRoleInfoProvider" PackageId="ImtAuthGqlPck" ComponentId="RemoteRoleInfoProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="Role"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RemoteSuperuserController" PackageId="ImtAuthGqlPck" ComponentId="RemoteSuperuserController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RemoteSuperuserProvider" PackageId="ImtAuthGqlPck" ComponentId="ClientRequestRemoteSuperuserProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SuperuserId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="su"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RemoteUserGroupInfoProvider" PackageId="ImtAuthGqlPck" ComponentId="RemoteUserGroupInfoProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GroupFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="UserGroupInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Role" PackageId="ImtAuthPck" ComponentId="Role">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ParentRoleProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RemoteRoleInfoProvider"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SimpleLoginWrap" PackageId="ImtAuthGqlPck" ComponentId="SimpleLoginWrap">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CheckPermissionOr"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SuperuserProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RemoteSuperuserProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="UserInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserGroupInfo" PackageId="ImtAuthPck" ComponentId="UserGroupInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RemoteRoleInfoProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RemoteUserGroupInfoProvider"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="UserInfo" PackageId="ImtAuthPck" ComponentId="UserInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AdminId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="su"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RoleProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RemoteRoleInfoProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserGroupProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RemoteUserGroupInfoProvider"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="iauth::ILogin" ComponentId="SimpleLoginWrap"/>
+        <Interface InterfaceId="iauth::IRightsProvider" ComponentId="SimpleLoginWrap"/>
+        <Interface InterfaceId="imod::IModel" ComponentId="SimpleLoginWrap"/>
+        <Interface InterfaceId="imtauth::IAccessTokenProvider" ComponentId="SimpleLoginWrap"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="SimpleLoginWrap"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="SimpleLoginWrap"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="RemoteSuperuserController" ComponentId="RemoteSuperuserController"/>
+        <Component ExportedId="RemoteSuperuserProvider" ComponentId="RemoteSuperuserProvider"/>
+    </ExportedComponents>
+</Acf>

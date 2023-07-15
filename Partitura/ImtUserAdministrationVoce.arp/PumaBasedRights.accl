@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5082" Description="ACF"/>
+            <Version Id="1" Number="2185" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="CheckPermissionOr" X="625" Y="50" Note=""/>
+        <Element ComponentName="RemoteRoleInfoProvider" X="925" Y="325" Note=""/>
+        <Element ComponentName="RemoteSuperuserController" X="1000" Y="50" Note=""/>
+        <Element ComponentName="RemoteSuperuserProvider" X="200" Y="325" Note=""/>
+        <Element ComponentName="RemoteUserGroupInfoProvider" X="575" Y="475" Note=""/>
+        <Element ComponentName="Role" X="1125" Y="450" Note=""/>
+        <Element ComponentName="SimpleLoginWrap" X="625" Y="175" Note=""/>
+        <Element ComponentName="UserGroupInfo" X="625" Y="650" Note=""/>
+        <Element ComponentName="UserInfo" X="625" Y="325" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
