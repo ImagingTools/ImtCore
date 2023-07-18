@@ -124,9 +124,21 @@ bool CDesignTokenFileParserComp::ParseFile()
 
 	QVariantMap colorPaletteVariables = designTokenObject["ColorPalette"].toObject().toVariantMap();
 
+	const QString designTokenFileFileBaseName(QFileInfo(designTokenFile).baseName());
+
 	for (const QJsonValue& style : ::qAsConst(designTokenStylesArray)){
 		QJsonObject styleEntry = style.toObject();
 		QString styleName = styleEntry["Name"].toString();
+
+		if (styleName.compare(designTokenFileFileBaseName, Qt::CaseInsensitive) != 0){
+			SendErrorMessage(0, QString("The file name does not match the theme name '%1' VS '%2'").arg(designTokenFileFileBaseName).arg(styleName));
+
+			return false;
+		}
+
+		if (styleName != designTokenFileFileBaseName){
+			SendInfoMessage(0, QString("The file name and the theme name have different case '%1' VS '%2'").arg(designTokenFileFileBaseName).arg(styleName));
+		}
 
 		ReplaceColorNamesRecursivle(styleEntry, colorPaletteVariables);
 		m_stylesBasePalettes.insert(styleName.toUtf8(), colorPaletteVariables);
