@@ -13,8 +13,10 @@ Item {
 	/// \workaround to calc cells count
     property var pDataList: [];
 
+    property int columnCount: pTableDelegateContainer.tableItem ? pTableDelegateContainer.tableItem.columnCount : 0;
+
     property bool compl: false;
-    property bool complCompl: pDataList.length && delegateContainer.compl;
+    property bool complCompl: columnCount && delegateContainer.compl;
 
     property alias contentComp: contentLoader.sourceComponent;
 	property real textLeftIndent: 0
@@ -28,22 +30,32 @@ Item {
         delegateContainer.compl = true;
     }
 
+
+
     onComplComplChanged: {
         if(delegateContainer.complCompl){
-            pTableDelegateContainer.widthRecalc.connect(delegateContainer.setCellWidth)
+            //pTableDelegateContainer.widthRecalc.connect(delegateContainer.setCellWidth)
+            pTableDelegateContainer.tableItem.widthRecalc.connect(delegateContainer.setCellWidth)
             delegateContainer.setCellWidth();
+
         }
     }
 
     function setCellWidth(){
+        //console.log("widthRecalc:: cellDelegate", 2);
+
+        if(!delegateContainer){
+            return;
+        }
         if(!delegateContainer.complCompl){
             return;
         }
 
-        var defaultWidth = delegateContainer.pDataList.length == 0 ? 0 : delegateContainer.pTableDelegateContainer.width/pDataList.length;
-        var widthFromModel = delegateContainer.pTableDelegateContainer.widthDecoratorDynamic.IsValidData("Width", model.index) ? delegateContainer.pTableDelegateContainer.widthDecoratorDynamic.GetData("Width", model.index) : -1;
+        var defaultWidth = delegateContainer.columnCount == 0 ? 0 : delegateContainer.pTableDelegateContainer.width/delegateContainer.columnCount;
+        var widthFromModel = delegateContainer.pTableDelegateContainer.tableItem.widthDecoratorDynamic.IsValidData("Width", model.index) ?
+                    delegateContainer.pTableDelegateContainer.tableItem.widthDecoratorDynamic.GetData("Width", model.index) : -1;
 
-        if(!delegateContainer.pTableDelegateContainer.widthDecoratorDynamic.GetItemsCount()){
+        if(!delegateContainer.pTableDelegateContainer.tableItem.widthDecoratorDynamic.GetItemsCount()){
             delegateContainer.width = defaultWidth;
         }
         else if(widthFromModel >= 0){
@@ -200,6 +212,7 @@ Item {
 
         sourceComponent: defaultContent;
 
+
         onLoaded: {
             if (contentLoader.item.tableCellDelegate !== undefined){
                 contentLoader.item.tableCellDelegate = delegateContainer;
@@ -217,10 +230,10 @@ Item {
         Text {
             id: name;
 
-			anchors.left: parent.left
-			anchors.leftMargin:  delegateContainer.textLeftIndent
-			anchors.right: parent.right
-			anchors.rightMargin: delegateContainer.textRightIndent
+            anchors.left: parent.left;
+            anchors.leftMargin:  delegateContainer.textLeftIndent;
+            anchors.right: parent.right;
+            anchors.rightMargin: delegateContainer.textRightIndent;
 
             verticalAlignment: Text.AlignVCenter;
             horizontalAlignment: delegateContainer.pTableDelegateContainer ?
@@ -254,11 +267,26 @@ Item {
 //            text: delegateContainer.pTableDelegateContainer.headers.GetData("Id", 1)
             onTextChanged: {
                 // Multiline fit in one line
-                if (name.text.includes('\n')){
-                    let result = name.text.split('\n');
-                    name.text = result[0] + "...";
+                if(wrapMode == Text.NoWrap){
+                    if (name.text.includes('\n')){
+                        let result = name.text.split('\n');
+                        name.text = result[0] + "...";
+                    }
                 }
             }
+            onHeightChanged: {
+                if(!delegateContainer.pTableDelegateContainer.tableItem || !delegateContainer.pTableDelegateContainer.tableItem.canFitHeight ){
+                    return;
+                }
+                if(wrapMode !== Text.NoWrap && delegateContainer.pTableDelegateContainer){
+                    var height_ = name.height +
+                            2*delegateContainer.pTableDelegateContainer.textMarginVer +
+                            topBorder.height + bottomBorder.height;
+
+                    delegateContainer.pTableDelegateContainer.setHeightModelElememt(delegateContainer.columnIndex, height_);
+
+                }
+            }//
         }
     }
 }//delegate

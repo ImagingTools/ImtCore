@@ -10,7 +10,7 @@ Rectangle {
 
 	property alias cellDelegate: dataList.delegate
     property int textTopMargin: 8;
-    property int count: 0; // bodyArray.length;
+    property int count: 0;
 
     property real minHeight: 40;
 
@@ -74,15 +74,14 @@ Rectangle {
 
     signal widthRecalc();
 
+
     Component.onCompleted: {
         tableDelegateContainer.compl = true;
         tableDelegateContainer.minHeight = tableDelegateContainer.height;
-        tableDelegateContainer.setWidth();
+
     }
 
-    onWidthDecoratorChanged: {
-        tableDelegateContainer.setWidth();
-    }
+
 
     onCellDecoratorChanged: {
         tableDelegateContainer.emptyDecorCell = !tableDelegateContainer.cellDecorator.GetItemsCount();
@@ -91,13 +90,13 @@ Rectangle {
 
     onHeadersChanged: {
         tableDelegateContainer.count = tableDelegateContainer.headers.GetItemsCount();
+        setCellHeightModelDefault();
     }
 
     onWidthChanged: {
-        tableDelegateContainer.setWidth();
         if(tableDelegateContainer.wrapMode !== Text.NoWrap){
-            pause.stop();
-            pause.start();
+            pauseHeight.stop();
+            pauseHeight.start();
         }
 
     }
@@ -105,8 +104,8 @@ Rectangle {
     onCountChanged: {
         if(tableDelegateContainer.wrapMode !== Text.NoWrap){
             heightModel.append({"cellHeight": 0});
-            pause.stop();
-            pause.start();
+            pauseHeight.stop();
+            pauseHeight.start();
         }
     }
 
@@ -166,71 +165,28 @@ Rectangle {
 
     }
 
-    function setWidth(){
-        //console.log("Table delegate setWidth")
-        tableDelegateContainer.widthDecoratorDynamic.Clear();
-        tableDelegateContainer.widthDecoratorDynamic.Copy(tableDelegateContainer.widthDecorator);
-
-        if(!tableDelegateContainer.widthDecorator.GetItemsCount()){
-            tableDelegateContainer.widthRecalc();
+    function setHeightModelElememt(index_,height_){
+        if(!tableDelegateContainer.tableItem || !tableDelegateContainer.tableItem.canFitHeight ){
             return;
         }
-
-        var count_ = 0;
-        var lengthMinus = 0;
-
-        for(var i = 0; i < tableDelegateContainer.widthDecorator.GetItemsCount(); i++){
-
-            var width_ = tableDelegateContainer.widthDecorator.IsValidData("Width",i) ? tableDelegateContainer.widthDecorator.GetData("Width",i): -1;
-            var widthPercent_ = tableDelegateContainer.widthDecorator.IsValidData("WidthPercent",i) ? tableDelegateContainer.widthDecorator.GetData("WidthPercent",i): -1;
-
-            if((width_ == -1) && (widthPercent_ == -1)){
-                count_++;
-            }
-            else{
-                width_ = width_< 0 ? 0 : width_;
-                widthPercent_ = widthPercent_ < 0 ? 0 : widthPercent_*tableDelegateContainer.width/100;
-                lengthMinus += Math.max(width_,widthPercent_);
-            }
+        if(index_ < heightModel.count){
+            heightModel.setProperty(index_, "cellHeight", height_);
         }
-
-        if((tableDelegateContainer.width - lengthMinus) < 0 || count_ == tableDelegateContainer.widthDecorator.GetItemsCount() ){
-            tableDelegateContainer.widthDecoratorDynamic.Clear();
-            tableDelegateContainer.widthRecalc();
-            return;
-        }
-
-        for(var i = 0; i < tableDelegateContainer.widthDecorator.GetItemsCount(); i++){
-
-            var width_ = tableDelegateContainer.widthDecorator.IsValidData("Width",i) ? tableDelegateContainer.widthDecorator.GetData("Width",i): -1;
-            var widthPercent_ = tableDelegateContainer.widthDecorator.IsValidData("WidthPercent",i) ? tableDelegateContainer.widthDecorator.GetData("WidthPercent",i): -1;
-
-            if(width_ < 0  && widthPercent_ < 0 ){
-                if(count_){
-                    tableDelegateContainer.widthDecoratorDynamic.SetData("Width",(tableDelegateContainer.width - lengthMinus)/count_,i);
-                }
-            }
-            else if(width_ < 0  && widthPercent_ >= 0){
-                tableDelegateContainer.widthDecoratorDynamic.SetData("Width", widthPercent_*tableDelegateContainer.width/100,i);
-            }
-
-            width_ = tableDelegateContainer.widthDecoratorDynamic.IsValidData("Width",i) ? tableDelegateContainer.widthDecoratorDynamic.GetData("Width",i): -1;
-
-            if(width_ < 0){
-                if(count_){
-                    tableDelegateContainer.widthDecoratorDynamic.SetData("Width",(tableDelegateContainer.width - lengthMinus)/count_,i);
-                }
-
-            }
-
-        }
-
-        tableDelegateContainer.widthRecalc();
     }
 
-
+    function setCellHeightModelDefault(){
+        if(!tableDelegateContainer.tableItem || !tableDelegateContainer.tableItem.canFitHeight ){
+            return;
+        }
+        for(var i = 0; i < tableDelegateContainer.count; i++){
+            heightModel.append({"cellHeight": tableDelegateContainer.minHeight})
+        }
+    }
 
     function setCellHeight(){
+        if(!tableDelegateContainer.tableItem || !tableDelegateContainer.tableItem.canFitHeight ){
+            return;
+        }
         if(tableDelegateContainer.wrapMode == Text.NoWrap){
             return;
         }
@@ -245,8 +201,10 @@ Rectangle {
         tableDelegateContainer.height = Math.max(maxVal, tableDelegateContainer.minHeight);
     }
 
+
+
     PauseAnimation {
-        id: pause;
+        id: pauseHeight;
         duration: 100;
         onFinished: {
             tableDelegateContainer.setCellHeight();
@@ -287,8 +245,6 @@ Rectangle {
 
     ListView {
         id: dataList;
-
-//         z: 10;
 
         anchors.left: checkBox.visible ? checkBox.right : parent.left;
         anchors.right: parent.right;

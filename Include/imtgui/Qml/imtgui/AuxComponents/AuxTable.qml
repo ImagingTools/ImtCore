@@ -78,6 +78,7 @@ Rectangle {
 	property bool isAllItemChecked: false;
 
 	property bool readOnly: false;
+    property bool canFitHeight : false;
 
 
 	property TableSelection tableSelection: TableSelection {
@@ -160,23 +161,28 @@ Rectangle {
 		tableContainer.emptyDecorHeader = !tableContainer.headerDecorator.GetItemsCount();
 
 		tableContainer.setBorderParams();
-		tableContainer.setWidth();
+
+        //tableContainer.setWidth();
+        pauseWidth.stop;
+        pauseWidth.start();
 
 		if(tableContainer.wrapMode !== Text.NoWrap){
 			for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
 				heightModel.append({"cellHeight": 0});
 			}
 			tableContainer.heightRecalc();
-			pause.stop();
-			pause.start();
+            pauseHeight.stop();
+            pauseHeight.start();
 		}
 	}
 
 	onWidthChanged: {
-		tableContainer.setWidth();
+//		tableContainer.setWidth();
+        pauseWidth.stop;
+        pauseWidth.start();
 		if(tableContainer.wrapMode !== Text.NoWrap){
-			pause.stop();
-			pause.start();
+            pauseHeight.stop();
+            pauseHeight.start();
 		}
 	}
 
@@ -321,7 +327,7 @@ Rectangle {
 	}
 
     function setWidth(){
-        console.log("setWidth");
+        //console.log("widthRecalc:: table", 0);
 
         tableContainer.widthDecoratorDynamic.Clear();
         tableContainer.widthDecoratorDynamic.Copy(tableContainer.widthDecorator);
@@ -488,12 +494,20 @@ Rectangle {
 
 
 	PauseAnimation {
-		id: pause;
-		duration: 100;
+        id: pauseWidth;
+        duration: 100;
 		onFinished: {
-			tableContainer.setCellHeight();
+            tableContainer.setWidth();
 		}
 	}
+
+    PauseAnimation {
+        id: pauseHeight;
+        duration: 100;
+        onFinished: {
+            tableContainer.setCellHeight();
+        }
+    }
 
 	ListModel{
 		id: heightModel;
@@ -513,7 +527,7 @@ Rectangle {
 
 		color: Style.baseColor;
 
-		radius: tableContainer.radius;
+        //radius: tableContainer.radius;
 
 		clip: true;
 
@@ -635,14 +649,14 @@ Rectangle {
 																 tableContainer.headerDecorator.GetData("Color", model.index) :
 																 "transparent";
 
-					opacity:  tableContainer.emptyDecorHeader ? 1 :
-																tableContainer.headerDecorator.IsValidData("Opacity", model.index) ?
-																	tableContainer.headerDecorator.GetData("Opacity", model.index) :
-																	1;
+                    opacity:  tableContainer.emptyDecorHeader ? 1 :
+                                                                tableContainer.headerDecorator.IsValidData("Opacity", model.index) ?
+                                                                    tableContainer.headerDecorator.GetData("Opacity", model.index) :
+                                                                    1;
 
-					radius: tableContainer.emptyDecorHeader ? 0 :
-															  tableContainer.headerDecorator.IsValidData("CellRadius", model.index) ?
-																  tableContainer.headerDecorator.GetData("CellRadius", model.index) :0;
+                    radius: tableContainer.emptyDecorHeader ? 0 :
+                                                              tableContainer.headerDecorator.IsValidData("CellRadius", model.index) ?
+                                                                  tableContainer.headerDecorator.GetData("CellRadius", model.index) :0;
 
 
 
@@ -674,19 +688,20 @@ Rectangle {
 
 					}
 
-					Rectangle{
-						id: leftBottomCornerPatch;
-						anchors.left: parent.left;
-						anchors.bottom: parent.bottom;
-						width: parent.width/2;
-						height: parent.height/2;
-						color: parent.color;
-						visible: tableContainer.emptyDecorHeader ? true :
-																   tableContainer.headerDecorator.IsValidData("LeftBottomRound", model.index) ?
-																	   !tableContainer.headerDecorator.GetData("LeftBottomRound", model.index) :true;
+                    Rectangle{
+                        id: leftBottomCornerPatch;
+                        anchors.left: parent.left;
+                        anchors.bottom: parent.bottom;
+                        width: parent.width/2;
+                        height: parent.height/2;
+                        color: parent.color;
+                        visible: tableContainer.emptyDecorHeader ? true :
+                                                                   tableContainer.headerDecorator.IsValidData("LeftBottomRound", model.index) ?
+                                                                       !tableContainer.headerDecorator.GetData("LeftBottomRound", model.index) :true;
 
 
-					}
+
+                    }
 
 					Rectangle{
 						id: rightBottomCornerPatch;
@@ -984,7 +999,8 @@ Rectangle {
 
 					tableContainer.properties.visibleItemsChanged.connect(tableDelegate.visibleItemsChanged);
 					tableContainer.properties.stateItemsChanged.connect(tableDelegate.enabledItemsChanged);
-				}
+
+                }
 
 				Component.onDestruction: {
 					tableContainer.tableSelection.selectionChanged.disconnect(tableDelegate.selectionChanged);
