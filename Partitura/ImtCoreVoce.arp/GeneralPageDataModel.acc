@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5060" Description="ACF"/>
-            <Version Id="1" Number="2181" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5073" Description="ACF"/>
+            <Version Id="1" Number="2183" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -25,7 +25,7 @@
         <Element Id="DesignOptions" PackageId="BasePck" ComponentId="SelectionConstraints">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="">
+                    <AttributeInfo Id="OptionIds" Type="Id[]" ExportId="SchemeIds">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Light</Value>
@@ -33,7 +33,7 @@
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="">
+                    <AttributeInfo Id="OptionNames" Type="Text[]" ExportId="SchemeNames">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>Light</Value>

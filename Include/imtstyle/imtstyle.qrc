@@ -5,5 +5,7 @@
     <qresource prefix="/Style">
         <file alias="imtstyle_dark.theme">dark.theme</file>
         <file alias="imtstyle_light.theme">light.theme</file>
-    </qresource>
+		<file alias="imtstyle_blue.theme">blue.theme</file>
+		<file alias="imtstyle_orange.theme">orange.theme</file>
+		</qresource>
 </RCC>

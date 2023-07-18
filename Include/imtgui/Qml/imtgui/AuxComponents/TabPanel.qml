@@ -7,7 +7,7 @@ Rectangle {
     height: 40;
     width: 1000;
 
-    color: Style.theme === "Dark" ? Style.baseColor: Style.backgroundColor;
+    color: Style.backgroundColor;
 
     property int selectedIndex: 0;
     property int count: 0;

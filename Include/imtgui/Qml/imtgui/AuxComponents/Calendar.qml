@@ -119,7 +119,6 @@ Rectangle {
 
     Row {
         id: row;
-//        radius: 3;
 
         ComboBox {
             id: yearCB;
@@ -128,14 +127,12 @@ Rectangle {
             width: 60;
 
             backgroundColor: Style.baseColor;
-//            menuHeight: 100;
             radius: 0;
 
             model: ListModel {
                 id: modelYear;
             }
 
-//            borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
             borderColor: Style.alternateBaseColor;
 
             property bool flag: true;
@@ -199,7 +196,6 @@ Rectangle {
 
             property bool flag: true;
 
-//            borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
             borderColor: Style.alternateBaseColor;
 
             onCurrentIndexChanged: {
@@ -248,7 +244,6 @@ Rectangle {
             height: calendarContainer.height;
             width: 40;
 
-//            menuHeight: 100;
             radius: 0;
 
             backgroundColor: Style.baseColor;
@@ -259,7 +254,6 @@ Rectangle {
 
             property bool flag: true;
 
-//            borderColor: Style.theme == "Dark" ? "#565757" : "#a4a4a6";
             borderColor: Style.alternateBaseColor;
 
             onCurrentIndexChanged: {
