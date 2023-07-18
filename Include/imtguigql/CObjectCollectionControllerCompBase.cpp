@@ -6,6 +6,7 @@
 
 // ACF includes
 #include <iprm/CTextParam.h>
+#include <iprm/CEnableableParam.h>
 #include <istd/TDelPtr.h>
 
 // ImtCore includes
@@ -472,19 +473,13 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 					}
 				}
 
-				imtbase::CTreeItemModel* objectFilterPtr = generalModel.GetTreeItemModel("ObjectFilter");
-				if (objectFilterPtr != nullptr){
-					QByteArray key;
-					if (objectFilterPtr->ContainsKey("Key")){
-						key = objectFilterPtr->GetData("Key").toByteArray();
-					}
-
-					istd::TDelPtr<iprm::CTextParam> textParamPtr(new iprm::CTextParam());
-					if (objectFilterPtr->ContainsKey("Value")){
-						QString value = objectFilterPtr->GetData("Value").toString();
-						textParamPtr->SetText(value);
-					}
-					objectFilter.SetEditableParameter(key, textParamPtr.PopPtr());
+				if (generalModel.ContainsKey("ObjectFilter")){
+					imtbase::CTreeItemModel* objectFilterPtr = generalModel.GetTreeItemModel("ObjectFilter");
+					SetObjectFilter(gqlRequest, *objectFilterPtr, objectFilter);
+				}
+				else{
+					imtbase::CTreeItemModel objectFilterModel;
+					SetObjectFilter(gqlRequest, objectFilterModel, objectFilter);
 				}
 			}
 
@@ -502,7 +497,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
         }
 
 		notificationModel->SetData("PagesCount", pagesCount);
-
 
 		istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(m_objectCollectionCompPtr->CreateObjectCollectionIterator(offset, count, &filterParams));
 		if (objectCollectionIterator != nullptr){
@@ -789,6 +783,39 @@ istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(
 
 void CObjectCollectionControllerCompBase::SetAdditionalFilters(const imtgql::CGqlObject& viewParamsGql, iprm::CParamsSet* filterParams) const
 {
+}
+
+
+void CObjectCollectionControllerCompBase::SetObjectFilter(
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			const imtbase::CTreeItemModel& objectFilterModel,
+			iprm::CParamsSet& filterParams) const
+{
+	QByteArray key;
+	if (objectFilterModel.ContainsKey("Key")){
+		key = objectFilterModel.GetData("Key").toByteArray();
+	}
+
+	istd::TDelPtr<iprm::CTextParam> textParamPtr(new iprm::CTextParam());
+	if (objectFilterModel.ContainsKey("Value")){
+		QString value = objectFilterModel.GetData("Value").toString();
+		textParamPtr->SetText(value);
+	}
+
+	istd::TDelPtr<iprm::CEnableableParam> enableableParamPtr(new iprm::CEnableableParam());
+	if (objectFilterModel.ContainsKey("IsEqual")){
+		bool isEqual = objectFilterModel.GetData("IsEqual").toBool();
+		enableableParamPtr->SetEnabled(isEqual);
+
+		istd::TDelPtr<iprm::CParamsSet> paramsSetPtr(new iprm::CParamsSet());
+		paramsSetPtr->SetEditableParameter("Value", textParamPtr.PopPtr());
+		paramsSetPtr->SetEditableParameter("IsEqual", enableableParamPtr.PopPtr());
+
+		filterParams.SetEditableParameter(key, paramsSetPtr.PopPtr());
+	}
+	else{
+		filterParams.SetEditableParameter(key, textParamPtr.PopPtr());
+	}
 }
 
 

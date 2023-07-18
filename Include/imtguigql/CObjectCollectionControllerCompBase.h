@@ -105,6 +105,11 @@ protected:
 	*/
 	virtual void SetAdditionalFilters(const imtgql::CGqlObject& viewParamsGql, iprm::CParamsSet* filterParams) const;
 
+	/**
+		Set object filter.
+	*/
+	virtual void SetObjectFilter(const imtgql::CGqlRequest& gqlRequest, const imtbase::CTreeItemModel& objectFilterModel, iprm::CParamsSet& filterParams) const;
+
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 

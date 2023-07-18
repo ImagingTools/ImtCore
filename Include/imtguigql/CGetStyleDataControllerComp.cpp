@@ -49,14 +49,7 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(con
 		prefix = *m_prefixFileNameAttrPtr + '_';
 	}
 
-	QString pathToTheme;
-	if (theme == "Dark"){
-		pathToTheme = ":/Style/" + prefix + "dark.theme";
-	}
-	else if (theme == "Light"){
-		pathToTheme = ":/Style/" + prefix + "light.theme";
-	}
-
+	QString pathToTheme = prefix + theme.toLower() + ".theme";
 	QFile resource(pathToTheme);
 	if (resource.open(QIODevice::ReadOnly)){
 		imtbase::CTreeItemModel* sourceModelPtr = dataModelPtr->AddTreeModel("source");
