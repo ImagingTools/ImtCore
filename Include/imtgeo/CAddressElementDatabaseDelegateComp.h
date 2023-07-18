@@ -59,6 +59,9 @@ public:
     virtual bool CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual QByteArray GetObjectTypeId(
 			const QByteArray& objectId) const override;
+    virtual bool CreateTextFilterQuery(
+                const imtbase::ICollectionFilter& collectionFilter,
+                QString& textFilterQuery) const;
 
 private:
 	I_FACT(imtgeo::IAddressElementInfo, m_adrElementInfoFactCompPtr);

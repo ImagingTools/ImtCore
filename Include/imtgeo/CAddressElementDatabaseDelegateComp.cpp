@@ -340,6 +340,27 @@ bool CAddressElementDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsS
     return true;
 }
 
+bool CAddressElementDatabaseDelegateComp::CreateTextFilterQuery(const imtbase::ICollectionFilter &collectionFilter, QString &textFilterQuery) const
+{
+    QByteArrayList filteringColumnIds = collectionFilter.GetFilteringInfoIds();
+    if (filteringColumnIds.isEmpty()){
+        return true;
+    }
+
+    QString textFilter = collectionFilter.GetTextFilter();
+    if (!textFilter.isEmpty()){
+        textFilterQuery = QString("\"%1\" ILIKE '%2%%'").arg(qPrintable(filteringColumnIds.first())).arg(textFilter);
+
+        for (int i = 1; i < filteringColumnIds.count(); ++i){
+            textFilterQuery += " OR ";
+
+            textFilterQuery += QString("\"%1\" ILIKE '%2%%'").arg(qPrintable(filteringColumnIds[i])).arg(textFilter);
+        }
+    }
+
+    return true;
+}
+
 } // namespace imtgeo
 
 
