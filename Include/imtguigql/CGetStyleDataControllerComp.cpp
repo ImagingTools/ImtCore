@@ -50,7 +50,7 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(con
 	}
 
 	QString pathToTheme = prefix + theme.toLower() + ".theme";
-	QFile resource(pathToTheme);
+	QFile resource(":/Style/" + pathToTheme);
 	if (resource.open(QIODevice::ReadOnly)){
 		imtbase::CTreeItemModel* sourceModelPtr = dataModelPtr->AddTreeModel("source");
 
