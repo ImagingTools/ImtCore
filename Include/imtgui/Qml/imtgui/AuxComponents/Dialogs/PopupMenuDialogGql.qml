@@ -57,6 +57,7 @@ Item {
         onClicked: {popupMenuContainer.finished(commandId, index)}
 
         rootItem: popupMenuContainer.rootItem;
+
     }
 
 
@@ -458,4 +459,31 @@ Item {
             }
         }
     }
+
+    Shortcut {
+        sequence: "Escape"
+        enabled: true;
+        onActivated: root.closeDialog();
+    }
+    Shortcut {
+        sequence: "Up"
+        enabled: true;
+        onActivated: {
+            //popupMenuContainer.rootItem.selectedIndex--;
+        }
+    }
+    Shortcut {
+        sequence: "Down"
+        enabled: true;
+        onActivated: {
+            //popupMenuContainer.rootItem.selectedIndex++;
+        }
+    }
+//    Shortcut {
+//        sequence: "Enter"
+//        enabled: true;
+//        onActivated: {
+//            console.log("Enter");
+//        }
+//    }
 }

@@ -57,6 +57,8 @@ Item {
     // ID for display in combo box delegates
     property string nameId: "Name";
 
+    property int selectedIndex: -1;
+
     property Component delegate: PopupMenuDelegate{
         width: comboBoxContainerGql.width;
         height: comboBoxContainerGql.itemHeight;
