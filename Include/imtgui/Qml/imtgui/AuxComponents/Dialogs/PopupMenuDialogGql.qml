@@ -74,6 +74,7 @@ Item {
     signal textEdited();
     signal started();
 
+
     function onBackgroundClicked(){
         popupMenuContainer.root.closeDialog();
     }
@@ -173,8 +174,8 @@ Item {
             }
         }
         onAccepted: {
+            popupMenuContainer.rootItem.closeSignal(popupMenuContainer.model);
             popupMenuContainer.root.closeDialog();
-            popupMenuContainer.close();
         }
 
         onTextInputFocusChanged: {

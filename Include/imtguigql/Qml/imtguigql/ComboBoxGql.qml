@@ -90,6 +90,7 @@ Item {
     signal clicked();
     signal finished(string commandId, int index);
     signal editSignal();
+    signal closeSignal(var model_);
 
 
     onModelChanged: {

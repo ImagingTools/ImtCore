@@ -244,11 +244,7 @@ Rectangle{
                         }
                     }
 
-
                 }
-
-
-
 
             }
 
@@ -493,6 +489,22 @@ Rectangle{
             }
             else{
                 searchContainer.setCurrentTextFunc(modelll, index);
+            }
+        }
+
+        onCloseSignal:{
+            if(searchContainer.isAddressSearch){
+                var modelCount = model_.GetItemsCount();
+                if(modelCount){
+                    var str = currentText;
+                    var newAddress = model_.GetData(searchContainer.valueName),strArrCount;
+                    var str_form = str.replace(/ +/g, '');
+                    var newAddress_form = newAddress.replace(/ +/g, '');
+
+                    if(str_form == newAddress_form){
+                        searchContainer.setCurrentTextAddressFunc(model_,0);
+                    }
+                }
             }
         }
 
