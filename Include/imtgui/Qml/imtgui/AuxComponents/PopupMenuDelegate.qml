@@ -13,9 +13,16 @@ Item {
 
     property alias text: mainText.text;
     property Item rootItem: null;
+    property Item menuItem: null;
     property bool textCentered: false;
 
+    property bool selected: !rootItem ? false : rootItem.selectedIndex == model.index ;
+
     signal clicked(string commandId, int index);
+
+    Component.onCompleted: {
+        //console.log("DEBUG::", model.Id, model.index, popupMenuDelegate.width, popupMenuDelegate.height, popupMenuDelegate.visible, popupMenuDelegate.x, popupMenuDelegate.y, popupMenuDelegate.z, popupMenuDelegate.parent)
+    }
 
     Rectangle{
         id: background;
@@ -26,8 +33,9 @@ Item {
 
     Rectangle {
         anchors.fill: parent;
-        color: popupMenuDelegate.selectedColor;
-        visible: mouseArea.containsMouse;
+
+        color: popupMenuDelegate.selected ? popupMenuDelegate.selectedColor  : "transparent";
+        visible: true;
         opacity: 0.5;
     }
 
@@ -80,10 +88,14 @@ Item {
         hoverEnabled: true;
         cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
+        onEntered: {
+            popupMenuDelegate.rootItem.selectedIndex = model.index;
+        }
+
         onClicked: {
-            console.log("DEBUG::2022-11-13")
+            //console.log("DEBUG::2022-11-13")
             popupMenuDelegate.clicked(model.Id, model.index);
-            //popupMenuDelegate.rootItem.finished(model.Id, model.index)
+            popupMenuDelegate.rootItem.finished(model.Id, model.index)
         }
     }
 }

@@ -30,25 +30,18 @@ Item {
 	property alias contentY: popupMenuListView.contentY;
 
 	property bool forceFocus: false;
-    property bool closingByFinished: true;
 
 	// ID for display in combo box delegates
 	property string nameId: "Name";
 
 	property Component delegate: PopupMenuDelegate{
+
 		width: popupMenuContainer.width;
 		height: popupMenuContainer.itemHeight;
 		textSize: popupMenuContainer.textSize;
 		fontColor: popupMenuContainer.fontColor;
 
-        onClicked: {
-//            if (popupMenuContainer.closingByFinished){
-//                console.log("PopupMenuDialog.qml closeDialog");
-//                popupMenuContainer.root.closeDialog();
-//            }
-            console.log("popupMenuContainer onClicked");
-            popupMenuContainer.finished(commandId, index)
-        }
+        onClicked: {popupMenuContainer.finished(commandId, index)}
 
 		rootItem: popupMenuContainer;
 	}
@@ -66,9 +59,7 @@ Item {
 	}
 
 	onFinished: {
-        console.log("popupMenuContainer onFinished");
-
-        popupMenuContainer.root.closeDialog();
+        //popupMenuContainer.root.closeDialog();
 	}
 
 	onModelChanged: {
@@ -164,4 +155,47 @@ Item {
 
 		source: itemBody;
 	}
+
+    function contentYCorrection(down_){
+//        var contentY = popupMenuListView.contentY;
+//        var itemHeight = popupMenuContainer.itemHeight;
+//        var visibleCount = popupMenuContainer.shownItemsCount;
+//        var index = popupMenuContainer.rootItem.selectedIndex;
+
+    }
+
+    Shortcut {
+        sequence: "Escape"
+        enabled: true;
+        onActivated: root.closeDialog();
+    }
+    Shortcut {
+        sequence: "Up"
+        enabled: true;
+        onActivated: {
+//            if(popupMenuContainer.rootItem.selectedIndex > 0){
+//                popupMenuContainer.rootItem.selectedIndex--;
+//                popupMenuContainer.contentYCorrection(false);
+//            }
+        }
+    }
+    Shortcut {
+        sequence: "Down"
+        enabled: true;
+        onActivated: {
+//            if(popupMenuContainer.rootItem.selectedIndex < popupMenuContainer.rootItem.model.GetItemsCount() - 1){
+//                popupMenuContainer.rootItem.selectedIndex++;
+//                popupMenuContainer.contentYCorrection(true);
+//            }
+
+        }
+    }
+//    Shortcut {
+//        sequence: "Enter"
+//        enabled: true;
+//        onActivated: {
+//            console.log("Enter");
+//        }
+//    }
+
 }
