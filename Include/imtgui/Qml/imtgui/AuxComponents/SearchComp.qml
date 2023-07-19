@@ -191,6 +191,7 @@ Rectangle{
     function textChangeFunc(filterText){
         //console.log("filterText:: " ,filterText);
         searchContainer.isTextIncrease = searchContainer.previousText.length < filterText.length;
+        var comaDeleted = searchContainer.previousText[searchContainer.previousText.length -1] == "," && filterText[filterText.length -1] !== ",";
         searchContainer.previousText = filterText;
 
         console.log("isTextIncrease:: " , searchContainer.isTextIncrease)
@@ -205,10 +206,15 @@ Rectangle{
                     var arrCount = searchContainer.newArrayCount(searchContainer.selectedText, filterText);
                     //console.log("arrCount::: prev , curr ", arrCount_prev, arrCount);
 
-                    if(arrCount < arrCount_prev){
+                    if(arrCount <= arrCount_prev){
+                        var keepCount = arrCount;
+                        if(comaDeleted){
+                            keepCount--;
+                        }
+
                         searchContainer.selectedText = filterText;
-                        searchTextField.excludeFilterPart = searchContainer.keepNElements(popup.filterText, arrCount);
-                        searchContainer.parentIds = searchContainer.keepNElements(searchContainer.parentIds, arrCount);
+                        searchTextField.excludeFilterPart = searchContainer.keepNElements(popup.filterText, keepCount);
+                        searchContainer.parentIds = searchContainer.keepNElements(searchContainer.parentIds, keepCount);
                         setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
                         popup.excludeFilterPart = searchTextField.excludeFilterPart;
 
@@ -233,13 +239,15 @@ Rectangle{
                     var modelCount = popup.model.GetItemsCount();
                     if(modelCount){
                         if(filterText[filterText.length -1] == ","){
-                            var str = filterText.slice(0,-1);
+                            let str = filterText.slice(0,-1);
                             var strArrCount = searchContainer.arraySize(str);
                             var newAddress = searchContainer.keepNElements(popup.model.GetData(searchContainer.valueName),strArrCount)//;
+                             str = str.replace(/ +/g, '');
+                             newAddress = newAddress.replace(/ +/g, '');
                             //console.log("ЗАПЯТАЯ " , "str: ", str, "newAddress: ", newAddress);
-                            if(str !== newAddress){
-                                setCurrentTextAddressFunc(popup.model,0, ",");
-                            }
+                            //if(str !== newAddress){
+                                searchContainer.setCurrentTextAddressFunc(popup.model,0, ",");
+                            //}
 
                         }
                     }
@@ -501,7 +509,7 @@ Rectangle{
                     var str_form = str.replace(/ +/g, '');
                     var newAddress_form = newAddress.replace(/ +/g, '');
 
-                    if(str_form == newAddress_form){
+                    if(str_form == newAddress_form || modelCount == 1){
                         searchContainer.setCurrentTextAddressFunc(model_,0);
                     }
                 }
