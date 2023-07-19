@@ -295,13 +295,13 @@ Rectangle{
             property bool dragEnabled: false;
 
             onDragEnabledChanged: {
-                console.log("onDragEnabledChanged", dragEnabled)
+                //console.log("onDragEnabledChanged", dragEnabled)
             }
 
             property var coord :mapToItem(scrollContainer,0,0);
             //cursorShape: containsMouse ? Qt.PointingHandCursor: Qt.ArrowCursor;
             onWheel: {
-                console.log("onWheel", scrollMA.dragEnabled);
+                //console.log("onWheel", scrollMA.dragEnabled);
                 if(scrollContainer.inSideTarget){
                     wheel.accepted = false;
                 }
@@ -400,7 +400,7 @@ Rectangle{
 //                scrollMA.dragEnabled = false;
             }
             onPositionChanged: {
-                console.log("onPositionChanged", scrollMA.dragEnabled);
+                //console.log("onPositionChanged", scrollMA.dragEnabled);
                 if(scrollMA.dragEnabled)
                 {
                     var newCoords = mapToItem(scrollContainer,mouse.x,mouse.y);
