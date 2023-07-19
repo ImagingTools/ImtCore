@@ -16,7 +16,8 @@ namespace imtmongo
 // public methods
 
 CMongoDatabaseEngineComp::CMongoDatabaseEngineComp()
-	:m_databaseAccessObserver(*this)
+	:m_databaseAccessObserver(*this),
+	m_database(nullptr)
 {
 
 }
@@ -69,7 +70,6 @@ mongocxx::database* CMongoDatabaseEngineComp::GetDatabase()
 		m_database = new mongocxx::database;
 
 		mongocxx::instance inst{};
-		//mongocxx::client client{mongocxx::uri{"mongodb://localhost:27017"}};
 		QString databaseName = GetDatabaseName();
 		qDebug() << "database " << databaseName;
 		*m_database = (*m_client)[databaseName.toStdString()];

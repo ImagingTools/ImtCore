@@ -111,7 +111,7 @@ private:
 	imod::TModelWrap<imtdb::CDatabaseAccessSettings> m_workingAccessSettings;
 
 	mongocxx::client * m_client;
-	mongocxx::database* m_database = nullptr;
+	mongocxx::database* m_database;
 
 };
 
