@@ -3,6 +3,6 @@
         <file alias="Acf/Style.qml">Qml/Acf/Style.qml</file>
     </qresource>
     <qresource prefix="/Decorators">
-        <file alias="imtstyle_decorators.theme">imtstyle_decorators.theme</file>
+        <file alias="decorators.theme">decorators.theme</file>
     </qresource>
 </RCC>
