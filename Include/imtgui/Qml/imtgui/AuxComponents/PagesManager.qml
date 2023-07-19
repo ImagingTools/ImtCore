@@ -10,6 +10,15 @@ Item {
     property int activePageIndex: -1;
     property MainDocumentManager documentManager: null;
 
+    Component.onCompleted: {
+        Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
+    }
+
+
     function updateModel(){
         pagesProvider.updateModel();
     }
@@ -18,6 +27,12 @@ Item {
         console.log("clearModels");
         pageModel.Clear();
         pagesData.model = 0;
+    }
+
+    function onLocalizationChanged(language){
+        console.log("pagesProvider onLocalizationChanged", language);
+
+        pagesProvider.updateModel();
     }
 
     property alias modelState: pagesProvider.modelState;
@@ -61,9 +76,12 @@ Item {
             onVisibleChanged: {
                 if(pagesDeleg.visible){
                     if (!pagesLoader.item){
-                        var source = container.pageModel.GetData("Source", model.index);
-                        console.log('DEBUG::pagesData', source)
-                        pagesLoader.source = source;
+                        if (container.pageModel && container.pageModel.ContainsKey("Source", model.index)){
+                            var source = container.pageModel.GetData("Source", model.index);
+                            if (source){
+                                pagesLoader.source = source;
+                            }
+                        }
                     }
 
                     container.activeItem = pagesLoader.item;
@@ -80,10 +98,12 @@ Item {
                             pagesLoader.item.mainDocumentManager = container.documentManager;
                         }
 
-                        pagesLoader.item.startPageObj = {"Id": model.Id,
-                                                         "Name": model.Name,
-                                                         "Source": model.StartItem,
-                                                         "CommandsId": model.Id};
+//                        if (pagesLoader.item.startPageObj){
+                            pagesLoader.item.startPageObj = {"Id": model.Id,
+                                                             "Name": model.Name,
+                                                             "Source": model.StartItem,
+                                                             "CommandsId": model.Id};
+//                        }
                     }
                 }
             }

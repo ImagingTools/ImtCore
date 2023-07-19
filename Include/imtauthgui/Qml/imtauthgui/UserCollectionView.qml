@@ -40,8 +40,8 @@ CollectionView {
 
             onTableCellDelegateChanged: {
                 if (item.tableCellDelegate != null){
-                    let username = userCollectionViewContainer.baseCollectionView.table.elements.GetData("Name", tableCellDelegate.rowIndex);
-                    let roles = userCollectionViewContainer.baseCollectionView.table.elements.GetData("Roles", tableCellDelegate.rowIndex);
+                    let username = userCollectionViewContainer.table.elements.GetData("Name", tableCellDelegate.rowIndex);
+                    let roles = userCollectionViewContainer.table.elements.GetData("Roles", tableCellDelegate.rowIndex);
                     arrowButton.visible = roles !== "";
                     if (roles !== ""){
                         let roleList = roles.split(';');
@@ -90,11 +90,7 @@ CollectionView {
                 Component.onCompleted: {
                     arrowButton.tooltipItem.componentWidth = 300;
                     arrowButton.tooltipItem.horizontalAlignment = Text.AlignLeft;
-                    arrowButton.tooltipItem.lineHeight = 1.2;
-                }
-
-                onContainsMouseChanged: {
-                    console.log("onContainsMouseChanged", containsMouse);
+                    arrowButton.tooltipItem.lineHeight = 1;
                 }
             }
         }
@@ -107,6 +103,15 @@ CollectionView {
             id: item2;
 
             property Item tableCellDelegate: null;
+
+            Component.onCompleted: {
+                let loader = parent;
+                let tableCellDelegate = loader.parent;
+
+                if (tableCellDelegate.mainMouseArea){
+                    tableCellDelegate.mainMouseArea.hoverEnabled = false;
+                }
+            }
 
             onTableCellDelegateChanged: {
                 if (item2.tableCellDelegate != null){
@@ -158,7 +163,7 @@ CollectionView {
                 Component.onCompleted: {
                     arrowButton.tooltipItem.componentWidth = 300;
                     arrowButton.tooltipItem.horizontalAlignment = Text.AlignLeft;
-                    arrowButton.tooltipItem.lineHeight = 1.2;
+                    arrowButton.tooltipItem.lineHeight = 1;
                 }
             }
         }

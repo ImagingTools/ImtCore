@@ -15,6 +15,8 @@ Item {
 
     property bool newIsEnabled: true;
 
+    property int radius: 3;
+
     property Item baseCollectionView: null;
 
     signal clicked(int index);
@@ -59,10 +61,14 @@ Item {
         border.width: 1;
         border.color: Style.imagingToolsGradient2;
 
+        radius: productRolesDelegate.radius;
+
         Text {
             anchors.verticalCenter: parent.verticalCenter;
             anchors.left: parent.left;
             anchors.leftMargin: 10;
+
+            width: parent.width;
 
             font.pixelSize: Style.fontSize_common;
             font.family: Style.fontFamilyBold;
@@ -133,6 +139,8 @@ Item {
                     width: rolesColumn.width;
                     height: body.height;
 
+                    radius: productRolesDelegate.radius;
+
                     property bool selected: false;
 
                     color: this.selected ? Style.selectedColor : "transparent";
@@ -148,14 +156,20 @@ Item {
                     }
 
                     function selectionChanged(){
+                        console.log("selectionChanged");
                         let table = productRolesDelegate.baseCollectionView.table;
+
+                        console.log("selectedIndexes", table.tableSelection.selectedIndexes);
                         selected = table.tableSelection.selectedIndexes.includes(model.index);
+                        console.log("selected", selected);
                     }
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter;
                         anchors.left: parent.left;
                         anchors.leftMargin: 10;
+
+                        width: parent.width;
 
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_common;

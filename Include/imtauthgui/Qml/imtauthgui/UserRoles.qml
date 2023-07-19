@@ -11,6 +11,8 @@ Item {
 
     property bool blockUpdatingModel: false;
 
+    property int radius: 3;
+
     Component.onCompleted: {
 //        rolesProvider.updateModel({"ProductId" : window.productId});
         rolesProvider.updateModel();
@@ -189,7 +191,7 @@ Item {
         elements: TreeItemModel {}
 
         checkable: true;
-        radius: 0;
+        radius: userRolesContainer.radius;
 
         onCheckedItemsChanged: {
             if (userRolesContainer.blockUpdatingModel){

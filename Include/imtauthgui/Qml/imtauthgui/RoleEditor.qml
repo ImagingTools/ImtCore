@@ -15,6 +15,8 @@ Item {
     property int mainMargin: 0;
     property int panelWidth: 400;
 
+    property int radius: 3;
+
     Rectangle{
             anchors.fill: parent;
             color: Style.backgroundColor;
@@ -243,7 +245,7 @@ Item {
                 id: titleRoleName;
 
                 anchors.left: parent.left;
-                anchors.leftMargin: 5;
+//                anchors.leftMargin: 5;
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
@@ -298,7 +300,7 @@ Item {
                 id: titleRoleId;
 
                 anchors.left: parent.left;
-                anchors.leftMargin: 5;
+//                anchors.leftMargin: 5;
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
@@ -343,7 +345,7 @@ Item {
                 id: titleDescription;
 
                 anchors.left: parent.left;
-                anchors.leftMargin: 5;
+//                anchors.leftMargin: 5;
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
@@ -443,10 +445,9 @@ Item {
         anchors.left: parent.left;
         anchors.leftMargin: 10;
 
-
         width: 400;
         checkable: true;
-        radius: 0;
+        radius: roleEditorContainer.radius;
 
         onCheckedItemsChanged: {
             if (roleEditorContainer.blockUpdatingModel){

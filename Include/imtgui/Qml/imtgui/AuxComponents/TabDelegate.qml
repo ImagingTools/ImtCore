@@ -5,6 +5,7 @@ Item{
     id: tabDelegate;
 
     height: 40;
+//    width: loaderDecorator.width + closeButton.width;
 
     property bool selected: false;
     property bool firstElement: false;
@@ -29,16 +30,11 @@ Item{
         height: tabDelegate.height;
 
         onItemChanged: {
-
-            console.log("loaderDecorator.item.width", loaderDecorator.item.width);
-
             tabDelegate.width = loaderDecorator.item.width;
             if(loaderDecorator.item.rootItem !== undefined){
                 loaderDecorator.item.rootItem = tabDelegate;
             }
         }
-
-
 
         onWidthChanged: {
             if (loaderDecorator.item){
@@ -61,12 +57,13 @@ Item{
     Item {
         id: closeButton;
 
+//        anchors.right: parent.right;
         anchors.right: loaderDecorator.right;
-        anchors.rightMargin: 5;
+        anchors.rightMargin: 8;
         anchors.verticalCenter: parent.verticalCenter;
 
-        height: parent.height * 0.3;
-        width: height;
+        height: parent.height;
+        width: closeImage.width;
 
         visible: !parent.firstElement && tabDelegate.isCloseEnable;
 
@@ -75,8 +72,8 @@ Item{
 
             anchors.centerIn: parent;
 
-            width: parent.width;
-            height: parent.height;
+            width: 13;
+            height: width;
 
             sourceSize.width: width;
             sourceSize.height: height;

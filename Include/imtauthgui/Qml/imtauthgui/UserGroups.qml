@@ -11,6 +11,8 @@ Item {
 
     property bool blockUpdatingModel: false;
 
+    property int radius: 3;
+
     onDocumentModelChanged: {
         groupsProvider.updateModel();
     }
@@ -151,7 +153,7 @@ Item {
         width: 400;
 
         checkable: true;
-        radius: 0;
+        radius: userGroupsContainer.radius;
 
         onCheckedItemsChanged: {
             if (userGroupsContainer.blockUpdatingModel){

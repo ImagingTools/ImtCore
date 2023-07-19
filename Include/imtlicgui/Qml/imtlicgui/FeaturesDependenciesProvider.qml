@@ -14,13 +14,9 @@ QtObject {
 
     // Get all dependencies together with children elements.
     function getAllDependencies(featureId){
-        console.log("getAllDependencies", featureId);
-
         let result = [];
 
         provider.getAllDependenciesRecursive(featureId, provider.model, result);
-
-        console.log("result", result);
 
         return result;
     }

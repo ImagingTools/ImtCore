@@ -78,6 +78,7 @@ Item {
     property ServerSettingsModelObserver serverSettingsObserver : ServerSettingsModelObserver
     {
         designProvider: application.designProvider;
+        languageProvider: application.languageProvider;
     }
 
     property LocalSettingsModelObserver localSettingsObserver : LocalSettingsModelObserver

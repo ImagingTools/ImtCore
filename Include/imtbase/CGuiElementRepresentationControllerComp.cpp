@@ -36,18 +36,12 @@ bool CGuiElementRepresentationControllerComp::GetRepresentationFromDataModel(con
 		return false;
 	}
 
-	QByteArray productId;
-	iprm::TParamsPtr<iprm::IIdParam> productIdParamPtr(paramsPtr, "ProductId");
-	if (productIdParamPtr.IsValid()){
-		productId = productIdParamPtr->GetId();
-	}
-
 	iprm::TParamsPtr<imtauth::IUserInfo> userInfoParamPtr(paramsPtr, "UserInfo");
 
 	imtauth::IUserInfo::FeatureIds userPermissions;
 	bool isAdmin = true;
 	if (userInfoParamPtr.IsValid()){
-		userPermissions = userInfoParamPtr->GetPermissions(productId);
+		userPermissions = userInfoParamPtr->GetPermissions();
 		isAdmin = userInfoParamPtr->IsAdmin();
 	}
 

@@ -17,6 +17,10 @@ Rectangle {
         headerText.text += "/ " + header;
     }
 
+    Component.onDestruction: {
+        console.log("AdministrationView.qml onDestruction");
+    }
+
     Row {
         id: header;
 
@@ -62,6 +66,7 @@ Rectangle {
             spacing: 5;
 
             onSelectedIndexChanged: {
+                console.log("onSelectedIndexChanged", selectedIndex);
                  headerText.text = qsTr("Administration") + " / " + leftMenuModel.get(mainPanel.selectedIndex).Id;
             }
 
@@ -98,16 +103,17 @@ Rectangle {
 
                     backgroundColor: Style.alternateBaseColor;
 
-                    borderColor: mainPanel.selectedIndex == model.index ? Style.iconColorOnSelected : Style.buttonColor;
+                    borderColor: mainPanel.selectedIndex === model.index ? Style.iconColorOnSelected : Style.buttonColor;
 
                     Component.onCompleted: {
+                        console.log("onCompleted", model.index);
                         if (model.index === 0){
                             clicked();
                         }
                     }
 
                     onClicked: {
-                        console.log("onClicked", model)
+                        console.log("onClicked", model.index);
                         if (mainPanel.selectedIndex !== model.index){
                             mainPanel.selectedIndex = model.index;
                         }
@@ -131,8 +137,16 @@ Rectangle {
     property Item activePage: null;
 
     function updateGui(){
-        bodyRepeater.model = 0;
-        bodyRepeater.model = leftMenuModel;
+//        bodyRepeater.model = 0;
+//        bodyRepeater.model = leftMenuModel;
+
+        if (mainPanel.selectedIndex >= 0){
+            let loaderDelegate = bodyRepeater.itemAt(mainPanel.selectedIndex);
+
+            if (loaderDelegate.item){
+                loaderDelegate.item.updateGui();
+            }
+        }
     }
 
     Rectangle{
@@ -146,14 +160,32 @@ Rectangle {
         Repeater {
             id: bodyRepeater;
 
+            anchors.fill: parent;
+
             model: leftMenuModel;
+
+            Component.onDestruction: {
+                console.log("Repeater bodyRepeater onDestruction");
+            }
 
             delegate: Loader {
                 id: bodyLoader;
 
                 anchors.fill: parent;
 
+                visible: false;
+
                 property Item documentManager: container.documentManager;
+
+                property int selectedIndex: mainPanel.selectedIndex;
+
+                Component.onDestruction: {
+                    console.log("Loader bodyLoader onDestruction", model.Id);
+                }
+
+                onSelectedIndexChanged: {
+                    bodyLoader.visible = selectedIndex === model.index;
+                }
 
                 onDocumentManagerChanged: {
                     if (bodyLoader.item){
@@ -170,7 +202,6 @@ Rectangle {
 
                 onVisibleChanged: {
                     if (bodyLoader.visible){
-                        console.log("onVisibleChanged model.Source", model.Source);
                         if (!bodyLoader.item){
                             bodyLoader.source = model.Source;
                         }
@@ -179,10 +210,7 @@ Rectangle {
                     }
                 }
 
-                visible: mainPanel.selectedIndex == model.index;
-
                 onLoaded: {
-                    console.log("bodyRepeater onLoaded", model.Source);
                     bodyLoader.item.commandsId = model.Id;
 
                     if (documentManager != null && bodyLoader.item.documentManager !== undefined){

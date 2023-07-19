@@ -23,7 +23,7 @@ Item {
     }
 
     function closeDialog(){
-        console.log("DialogsManager closeDialog");
+        console.log("DialogsManager closeDialog", modalDialogModels.count);
 
         if (modalDialogModels.count > 0){
             modalDialogModels.remove(modalDialogModels.count - 1);

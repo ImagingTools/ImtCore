@@ -43,6 +43,7 @@ AuxButton 1.0 ./AuxComponents/AuxButton.qml
 PreferenceButton 1.0 ./AuxComponents/PreferenceButton.qml
 TextButton 1.0 ./AuxComponents/TextButton.qml
 CustomTextField 1.0 ./AuxComponents/CustomTextField.qml
+TextFieldWithTitle 1.0 ./AuxComponents/TextFieldWithTitle.qml
 CustomTextEdit 1.0 ./AuxComponents/CustomTextEdit.qml
 Splitter 1.0 ./AuxComponents/Splitter.qml
 Calendar 1.0 ./AuxComponents/Calendar.qml

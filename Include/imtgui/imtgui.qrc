@@ -52,6 +52,7 @@
         <file alias="imtgui/AuxComponents/TopCenterPanelDecorator.qml">Qml/imtgui/AuxComponents/TopCenterPanelDecorator.qml</file>
         <file alias="imtgui/AuxComponents/UndoRedo.qml">Qml/imtgui/AuxComponents/UndoRedo.qml</file>
         <file alias="imtgui/AuxComponents/CustomTextField.qml">Qml/imtgui/AuxComponents/CustomTextField.qml</file>
+	<file alias="imtgui/AuxComponents/TextFieldWithTitle.qml">Qml/imtgui/AuxComponents/TextFieldWithTitle.qml</file>
         <file alias="imtgui/AuxComponents/SettingsTextLabel.qml">Qml/imtgui/AuxComponents/SettingsTextLabel.qml</file>
         <file alias="imtgui/AuxComponents/CollectionViewBase.qml">Qml/imtgui/AuxComponents/CollectionViewBase.qml</file>
         <file alias="imtgui/AuxComponents/MultiDocWorkspacePageView.qml">Qml/imtgui/AuxComponents/MultiDocWorkspacePageView.qml</file>

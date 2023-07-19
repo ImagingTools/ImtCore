@@ -11,6 +11,8 @@ Item {
 
     property bool blockUpdatingModel: false;
 
+    property int radius: 3;
+
     onDocumentModelChanged: {
         console.log("UserRoles onDocumentModelChanged", documentModel);
 
@@ -162,7 +164,7 @@ Item {
         elements: TreeItemModel {}
 
         checkable: true;
-        radius: 0;
+        radius: groupRolesContainer.radius;
 
         onCheckedItemsChanged: {
             if (groupRolesContainer.blockUpdatingModel){

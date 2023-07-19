@@ -71,11 +71,7 @@ Item {
             let id = itemData.Id;
             if (selectedPermissionsIds.includes(id)){
                 permissionsTable.checkItem(delegateItem);
-//                delegateItem.checkState = Qt.Checked;
             }
-//            else{
-//                delegateItem.checkState = Qt.Unchecked;
-//            }
         }
 
         rolePermissionsContainer.blockUpdatingModel = false;
@@ -98,15 +94,6 @@ Item {
             selectedPermissionIds.push(id)
         }
 
-//        for (let i = 0; i < itemsList.length; i++){
-//            let delegateItem = itemsList[i];
-//            let itemData = delegateItem.getItemData();
-//            let id = itemData.Id;
-//            let state = delegateItem.checkState;
-//            if (state === Qt.Checked){
-//                selectedPermissionIds.push(id)
-//            }
-//        }
         rolePermissionsContainer.documentModel.SetData("Permissions", selectedPermissionIds.join(';'));
 
         if (rolePermissionsContainer.undoRedoManager){
@@ -185,18 +172,8 @@ Item {
 
         tristate: true;
 
-//        rowDelegate: Component {
-//            TreeViewItemDelegateBase{
-//                root: permissionsTable;
-
-//                onCheckStateChanged: {
-//                    rolePermissionsContainer.updateModel();
-//                }
-//            }
-//        }
-
         Component.onCompleted: {
-            permissionsTable.addColumn({"Id": "Name", "Name": "Permission Name"});
+            permissionsTable.addColumn({"Id": "Name", "Name": "Permission"});
         }
 
         onSelectedIndexChanged: {
@@ -205,7 +182,15 @@ Item {
 
                 let featureDependencies = dependenciesProvider.getAllDependencies(selectedFeatureId);
 
+                if (featureDependencies.length === 0){
+                    featureDependencies.push(qsTr("No dependencies"))
+                }
+
                 repeater.model = featureDependencies;
+//                repeater.visible = true;
+            }
+            else{
+//                repeater.visible = false;
             }
         }
 
@@ -243,6 +228,8 @@ Item {
 
         width: 200;
 
+        visible: permissionsTable.selectedIndex != null;
+
         Item {
             anchors.fill: parent;
 
@@ -274,6 +261,8 @@ Item {
 
                 Repeater {
                     id: repeater;
+
+                    visible: false;
 
                     delegate: Text {
                         width: 200;

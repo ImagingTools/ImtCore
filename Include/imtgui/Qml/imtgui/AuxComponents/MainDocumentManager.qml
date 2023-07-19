@@ -30,6 +30,7 @@ Item {
     }
 
     function collectionUpdated(){
+        console.log('collectionUpdated')
         if (root.openingDocumentInfo != null){
 
             openDocument(root.openingDocumentInfo["DocumentTypeId"], root.openingDocumentInfo["DocumentId"]);
@@ -72,14 +73,11 @@ Item {
     }
 
     function dirtyDocumentsExists(){
-        console.log('dirtyDocumentsExists')
         let typeIds = Object.keys(root.documentManagers);
         for (let i = 0; i < typeIds.length; i++){
             let typeId = typeIds[i];
-            console.log('typeId', typeId);
             let documentManager = root.documentManagers[typeId];
             if (documentManager && documentManager !== null){
-                console.log('documentManager', documentManager)
                 if (documentManager.dirtyDocumentsExists()){
                     return true;
                 }

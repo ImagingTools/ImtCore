@@ -28,7 +28,7 @@ FocusScope {
 
     property string borderColorConst: "";
 
-    property int radius: 0;
+    property int radius: 3;
     property int textSize: 15;
     property int placeHolderTextSize: textSize;
     property int echoMode: TextInput.Normal;

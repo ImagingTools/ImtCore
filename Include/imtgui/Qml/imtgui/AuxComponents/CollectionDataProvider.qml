@@ -15,7 +15,10 @@ QtObject {
     // Fields to get from server
     property var fields: [];
 
+    property alias stateModel: container.itemsInfoModel.state;
+
     signal modelUpdated();
+    signal failed();
 
     function updateModel(inputParams){
         if (container.commandId == ""){
@@ -97,13 +100,16 @@ QtObject {
                             }
                         }
 
-//                        container.onModelUpdated();
-
                         container.modelUpdated();
 
                         container.completed = true;
                     }
                 }
+            }
+            else if (this.state === "Error"){
+//                container.completed = true;
+
+                container.failed();
             }
         }
     }

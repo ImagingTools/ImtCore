@@ -5,8 +5,15 @@ import imtqml 1.0
 Item {
     id: tabPanelDecorator;
 
-    width: texttabDelegate.width + imagetabDelegate.width + 30;
+    width: texttabDelegate.width + imagetabDelegate.width + 40;
     property Item rootItem: null;
+
+    property string firstElementImageSource: tabPanelDecorator.rootItem ? tabPanelDecorator.rootItem.firstElementImageSource : "";
+    onFirstElementImageSourceChanged: {
+        if (tabPanelDecorator.firstElementImageSource !== ""){
+            firsElementImage.source = "../../../Icons/" + Style.theme + "/" + tabPanelDecorator.firstElementImageSource + "_On_Normal.svg";
+        }
+    }
 
     Rectangle {
         anchors.fill: parent;
@@ -46,7 +53,6 @@ Item {
             sourceSize.height: height;
 
             fillMode: Image.PreserveAspectFit;
-            source: tabPanelDecorator.rootItem ?  "../../../Icons/" + Style.theme + "/" + tabPanelDecorator.rootItem.firstElementImageSource + "_On_Normal.svg": "";
         }
     }
 

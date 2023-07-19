@@ -38,16 +38,9 @@ Rectangle {
     }
 
     onModelChanged: {
-        console.log("MenuPanel onModelChanged", menuPanel.model.toJSON());
         clearModels();
 
         lvPages.model = menuPanel.model;
-        console.log("lvPages count", lvPages.count);
-        console.log("lvPages.model", lvPages.model.toJSON());
-    }
-
-    onActivePageIndexChanged: {
-        console.log("MenuPanel onActivePageIndexChanged", menuPanel.activePageIndex);
     }
 
     ListView {
@@ -57,13 +50,7 @@ Rectangle {
 
         boundsBehavior: Flickable.StopAtBounds;
 
-        Component.onCompleted: {
-            console.log("Style.menuButtonDecoratorPath", Style.menuButtonDecoratorPath)
-        }
-
         Keys.onPressed: {
-            console.log("MenuPanel onPressed");
-
             console.log("menuPanel.activePageIndex");
             if (event.key == Qt.Key_Up){
                 if (menuPanel.activePageIndex >= 1){

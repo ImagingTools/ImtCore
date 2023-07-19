@@ -9,6 +9,8 @@ QtObject {
     property ListView table: null;
     signal selectionChanged();
 
+    property bool isMultiSelect: true;
+
     property int countElements: root.table ? root.table.count : -1;
 
     Component.onDestruction: {
@@ -53,6 +55,10 @@ QtObject {
     }
 
     function selectAll(){
+        if (!root.isMultiSelect){
+            return;
+        }
+
         selectedIndexes = []
 
         for (let i = 0; i < root.countElements; i++){
@@ -89,6 +95,10 @@ QtObject {
     }
 
     function shiftUp(){
+        if (!root.isMultiSelect){
+            return;
+        }
+
         if (root.selectedIndexes.length > 0){
             let lastIndex = root.selectedIndexes[root.selectedIndexes.length - 1];
             if (lastIndex > 0){
@@ -106,6 +116,10 @@ QtObject {
     }
 
     function shiftDown(){
+        if (!root.isMultiSelect){
+            return;
+        }
+
         if (root.selectedIndexes.length > 0){
             let lastIndex = root.selectedIndexes[root.selectedIndexes.length - 1];
             if (root.countElements - 1 > lastIndex){

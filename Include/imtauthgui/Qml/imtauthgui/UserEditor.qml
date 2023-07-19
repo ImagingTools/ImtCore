@@ -13,6 +13,7 @@ Item {
 
     property int mainMargin: 0;
     property int panelWidth: 400;
+    property int radius: 3;
 
     onDocumentModelChanged: {
         console.log("UserEditor onDocumentModelChanged", userEditorContainer.documentModel);
@@ -141,7 +142,7 @@ Item {
                     id: titleUsername;
 
                     anchors.left: parent.left;
-                    anchors.leftMargin: 5;
+//                    anchors.leftMargin: 5;
 
                     color: Style.textColor;
                     font.family: Style.fontFamily;
@@ -195,7 +196,7 @@ Item {
                     id: titlePassword;
 
                     anchors.left: parent.left;
-                    anchors.leftMargin: 5;
+//                    anchors.leftMargin: 5;
 
                     color: Style.textColor;
                     font.family: Style.fontFamily;
@@ -250,7 +251,7 @@ Item {
                     id: titleName;
 
                     anchors.left: parent.left;
-                    anchors.leftMargin: 5;
+//                    anchors.leftMargin: 5;
 
                     color: Style.textColor;
                     font.family: Style.fontFamily;
@@ -293,7 +294,7 @@ Item {
                     id: titleMail;
 
                     anchors.left: parent.left;
-                    anchors.leftMargin: 5;
+//                    anchors.leftMargin: 5;
 
                     color: Style.textColor;
                     font.family: Style.fontFamily;

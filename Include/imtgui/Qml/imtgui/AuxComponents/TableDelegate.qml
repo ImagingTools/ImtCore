@@ -84,8 +84,10 @@ Rectangle {
 
 
     onCellDecoratorChanged: {
-        tableDelegateContainer.emptyDecorCell = !tableDelegateContainer.cellDecorator.GetItemsCount();
-        tableDelegateContainer.setBorderParams();
+        if (tableDelegateContainer.cellDecorator){
+            tableDelegateContainer.emptyDecorCell = !tableDelegateContainer.cellDecorator.GetItemsCount();
+            tableDelegateContainer.setBorderParams();
+        }
     }
 
     onHeadersChanged: {
@@ -290,7 +292,7 @@ Rectangle {
         z: 1;
 
 		anchors.fill: parent;
-		hoverEnabled: true
+        hoverEnabled: true
 
         acceptedButtons: Qt.LeftButton | Qt.RightButton;
 

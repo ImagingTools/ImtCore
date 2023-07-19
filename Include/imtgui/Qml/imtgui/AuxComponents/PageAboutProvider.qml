@@ -21,7 +21,9 @@ Item {
     }
 
     Component.onDestruction: {
-        root.applicationInfoProvider.updated.disconnect(root.createRepresentationModel);
+        if (root.applicationInfoProvider){
+            root.applicationInfoProvider.updated.disconnect(root.createRepresentationModel);
+        }
     }
 
     property string pageId: "About";

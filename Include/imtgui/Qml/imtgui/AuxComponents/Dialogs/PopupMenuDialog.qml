@@ -30,18 +30,25 @@ Item {
 	property alias contentY: popupMenuListView.contentY;
 
 	property bool forceFocus: false;
+    property bool closingByFinished: true;
 
 	// ID for display in combo box delegates
 	property string nameId: "Name";
 
 	property Component delegate: PopupMenuDelegate{
-
 		width: popupMenuContainer.width;
 		height: popupMenuContainer.itemHeight;
 		textSize: popupMenuContainer.textSize;
 		fontColor: popupMenuContainer.fontColor;
 
-        onClicked: {popupMenuContainer.finished(commandId, index)}
+        onClicked: {
+//            if (popupMenuContainer.closingByFinished){
+//                console.log("PopupMenuDialog.qml closeDialog");
+//                popupMenuContainer.root.closeDialog();
+//            }
+            console.log("popupMenuContainer onClicked");
+            popupMenuContainer.finished(commandId, index)
+        }
 
 		rootItem: popupMenuContainer;
 	}
@@ -59,7 +66,9 @@ Item {
 	}
 
 	onFinished: {
-        //popupMenuContainer.root.closeDialog();
+        console.log("popupMenuContainer onFinished");
+
+        popupMenuContainer.root.closeDialog();
 	}
 
 	onModelChanged: {

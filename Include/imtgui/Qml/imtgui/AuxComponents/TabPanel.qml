@@ -41,26 +41,19 @@ Rectangle {
         delegate: TabDelegate {
             height: list.height;
 
-            width: 100;
+//            width: 100;
 
             selected: model.index === tabPanelContainer.selectedIndex;
             firstElement: model.index === 0;
             lastElement: model.index === list.count - 1;
             firstElementImageSource: tabPanelContainer.firstElementImageSource;
-            text: model.Title;
+            text: model.Title ? model.Title : "";
             isCloseEnable: tabPanelContainer.isCloseEnable;
 
             decoratorSource: Style.tabPanelDecoratorPath;
 
-            onTextChanged: {
-                console.log("TabDelegate onTitleChanged", model.index, model.Title);
-            }
-
             onClicked: {
-                console.log("TabDelegate onClicked", list.model);
-                console.time('doSomething')
                 tabPanelContainer.selectedIndex = model.index;
-                console.timeEnd('doSomething')
             }
 
             onCloseSignal: {

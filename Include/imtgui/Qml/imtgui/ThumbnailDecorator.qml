@@ -62,6 +62,8 @@ Rectangle {
 
         preferenceDialog.clearModels();
         settingsProvider.clearModel();
+
+        mainDocumentManager.documentManagers = {}
     }
 
     MenuPanel {

@@ -10,18 +10,25 @@ TreeItemModelObserver {
 
     onModelChanged: {
         console.log("ServerSettingsModelObserver onModelChanged");
+        if (container.languageProvider == null || container.designProvider == null){
+            return;
+        }
+
         for (let i = 0; i < changeList.length; i++){
             let changeObj = changeList[i]
             let changeId = changeObj["id"];
 
             let ids = changeId.split('/')
             if (ids.includes("Language")){
-                context.language = languageProvider.getLanguage();
+                let language = languageProvider.getLanguage()
+                if (context){
+                    context.language = language;
+                }
+
+                Events.sendEvent("OnLocalizationChanged", language);
             }
             else if (ids.includes("DesignSchema")){
-                if (container.designProvider != null){
-                    container.designProvider.applyDesignSchema();
-                }
+                container.designProvider.applyDesignSchema();
             }
             else if (ids.includes("Database")){
                 Events.sendEvent("UpdateModels");

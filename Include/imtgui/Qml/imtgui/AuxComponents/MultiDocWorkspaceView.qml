@@ -266,6 +266,8 @@ Item {
     Component {
         id: saveDialog;
         MessageDialog {
+
+            title: qsTr("Save document");
             Component.onCompleted: {
                 buttons.addButton({"Id":"Cancel", "Name":"Cancel", "Enabled": true});
             }
@@ -420,6 +422,24 @@ Item {
 
             workspaceView.openErrorDialog(message);
         }
+
+//        onGetModelStateChanged: {
+//            if (getModelState === "Loading"){
+//                loading.start();
+//            }
+//            else{
+//                loading.stop();
+//            }
+//        }
+
+        onSetModelStateChanged: {
+            if (setModelState === "Loading"){
+                loading.start();
+            }
+            else{
+                loading.stop();
+            }
+        }
     }
 
     function openErrorDialog(message){
@@ -429,8 +449,8 @@ Item {
     GqlDocumentObserver {
         id: documentObserver;
 
-        observedGetModel: documentController.gqlGetModel;
-        observedSetModel: documentController.gqlSetModel;
+//        observedGetModel: documentController.gqlGetModel;
+//        observedSetModel: documentController.gqlSetModel;
     }
 
     ListView {
@@ -465,7 +485,7 @@ Item {
 
                 anchors.fill: parent;
 
-                source: model.Source;
+                source: model.Source ? model.Source : "";
 
                 onLoaded: {
                     workspaceView.documentsData.SetData("Item", dataLoader.item, model.index);

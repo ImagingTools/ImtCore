@@ -28,9 +28,6 @@ Item {
 
         radius: 3;
 
-//        borderColor: settingsComboBoxContainer.active ? Style.iconColorOnSelected :
-//                                                        Style.alternateBaseColor;
-
         textCentered: false;
 
         onCurrentIndexChanged: {

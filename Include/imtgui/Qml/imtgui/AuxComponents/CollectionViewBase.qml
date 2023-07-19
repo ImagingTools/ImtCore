@@ -43,7 +43,9 @@ Item {
 
     signal selectedItem(string id, string name);
     signal selectedIndexChanged(int index);
+
     signal elementsChanged();
+    signal headersChanged();
 
     signal selectionChanged(var selection);
     signal filterDecoratorLoaded();
@@ -51,14 +53,10 @@ Item {
     property bool loadData;
 
     Component.onCompleted: {
-        console.log("CollectionViewBase onCompleted");
-
         tableInternal.focus = true;
     }
 
     onCommandsIdChanged: {
-        console.log("CollectionViewBase onCommandsIdChanged", collectionViewBaseContainer.loadData);
-
         if (collectionViewBaseContainer.loadData){
             baseCommands.updateModels();
         }
@@ -79,15 +77,6 @@ Item {
         sourceComponent: Component {
             FilterMenu {
                 decoratorSource: Style.filterPanelDecoratorPath;
-
-//                onTextFilterChanged: {
-//                    modelFilterObj.SetData("TextFilter", text);
-//                    baseCommands.updateModels();
-//                }
-
-//                onClosed: {
-//                    filterMenuLocal.visible = false;
-//                }
             }
         }
 
@@ -119,7 +108,6 @@ Item {
         color: Style.baseColor;
 
         radius: Style.size_mainCornerRadius !== undefined ? Style.size_mainCornerRadius: 0;
-        //radius: thumbnailDecoratorContainer.mainRadius;
         TreeItemModel{
             id: tableDecoratorModel;
 
@@ -174,12 +162,10 @@ Item {
 
             anchors.left: parent.left;
             anchors.right: tableRightPanel.left;
-//            anchors.rightMargin: 5;
             anchors.top: parent.top;
 
             anchors.bottom: paginationObj.visible ? paginationObj.top : parent.bottom;
             anchors.margins: Style.size_mainMargin !== undefined ? Style.size_mainMargin : 0;
-            //anchors.margins: thumbnailDecoratorContainer.mainMargin;
             hasFilter: collectionViewBaseContainer.hasFilter;
             hasSort: collectionViewBaseContainer.hasSort;
             scrollbarVisible: false;
@@ -209,24 +195,14 @@ Item {
                 collectionViewBaseContainer.elementsChanged();
             }
 
+            onHeadersChanged: {
+                collectionViewBaseContainer.headersChanged();
+            }
+
             onFilterClicked: {
-                console.log("onFilterClicked")
                 filterMenuLocal.visible = !filterMenuLocal.visible;
             }
         }
-
-
-//        Rectangle{
-//            id: bottomLine;
-
-//            anchors.left: tableInternal.right;
-//            anchors.right: parent.right;
-//            anchors.bottom: filterItem.bottom;
-//            height: 1;
-//            color: "lightgray";
-
-//            visible: tableInternal.emptyDecor;
-//        }
 
         Item {
             id: tableRightPanel;
@@ -237,6 +213,8 @@ Item {
             anchors.bottom: parent.bottom;
 
             width: 20;
+
+            visible: tableInternal.width > 0;
 
             Item {
                 id: filterItem;
@@ -260,34 +238,10 @@ Item {
                     iconSource: "../../../" + "Icons/" + Style.theme + "/Filter_On_Normal.svg";
 
                     onClicked: {
-                        console.log("AuxButton iconFilter onClicked");
                         filterMenuLocal.visible = !filterMenuLocal.visible;
                     }
                 }
             }
-
-//            CustomScrollbar {
-//                id: scrollbar;
-
-//                z: 100;
-
-//                anchors.bottom: parent.bottom;
-//                anchors.bottomMargin: 5;
-//                anchors.top: filterItem.bottom;
-//                anchors.topMargin: 5;
-//                anchors.horizontalCenter: parent.horizontalCenter;
-
-//                secondSize: 10;
-//                targetItem: collectionViewBaseContainer.elementsList;
-
-//                onVisibleChanged: {
-//                    tableInternal.scrollbarItem.visible = !visible;
-//                }
-
-//                Component.onCompleted: {
-//                    tableInternal.scrollbarItem.visible = false;
-//                }
-//            }
         }
 
         Loading {
@@ -297,10 +251,6 @@ Item {
             anchors.topMargin: tableInternal.headerElementHeight;
 
             visible: false;
-
-            onVisibleChanged: {
-                console.log("Loading onVisibleChanged", ldng.visible);
-            }
         }
     }
 
@@ -357,7 +307,6 @@ Item {
         loading: ldng;
 
         onHeadersChanged: {
-            console.log("onHeadersChanged", baseCommands.headers)
             if (baseCommands.headers.GetItemsCount() > 0 && sortCont.isEmpty()){
                 let headerId = baseCommands.headers.GetData("Id", collectionViewBaseContainer.defaultSortHeaderIndex);
 
@@ -375,7 +324,6 @@ Item {
         }
 
         onItemsInfoGqlStateChanged: {
-            console.log("onItemsInfoGqlStateChanged", state);
             if (state === "Loading"){
                 ldng.visible = true;
             }

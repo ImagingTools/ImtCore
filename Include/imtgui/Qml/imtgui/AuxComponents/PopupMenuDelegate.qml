@@ -17,10 +17,6 @@ Item {
 
     signal clicked(string commandId, int index);
 
-    Component.onCompleted: {
-        //console.log("DEBUG::", model.Id, model.index, popupMenuDelegate.width, popupMenuDelegate.height, popupMenuDelegate.visible, popupMenuDelegate.x, popupMenuDelegate.y, popupMenuDelegate.z, popupMenuDelegate.parent)
-    }
-
     Rectangle{
         id: background;
 
@@ -85,9 +81,9 @@ Item {
         cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
         onClicked: {
-            //console.log("DEBUG::2022-11-13")
+            console.log("DEBUG::2022-11-13")
             popupMenuDelegate.clicked(model.Id, model.index);
-            popupMenuDelegate.rootItem.finished(model.Id, model.index)
+            //popupMenuDelegate.rootItem.finished(model.Id, model.index)
         }
     }
 }

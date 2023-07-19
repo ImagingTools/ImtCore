@@ -80,6 +80,7 @@ Rectangle {
 	property bool readOnly: false;
     property bool canFitHeight : false;
 
+    property alias isMultiSelect: tableContainer.tableSelection.isMultiSelect;
 
 	property TableSelection tableSelection: TableSelection {
 		onSelectionChanged: {
@@ -158,7 +159,10 @@ Rectangle {
 		tableContainer.widthDecorator = tableContainer.tableDecorator.GetTreeItemModel("CellWidth");
 
 		tableContainer.emptyDecor = !tableContainer.tableDecorator.GetItemsCount();
-		tableContainer.emptyDecorHeader = !tableContainer.headerDecorator.GetItemsCount();
+
+        if (tableContainer.headerDecorator){
+            tableContainer.emptyDecorHeader = !tableContainer.headerDecorator.GetItemsCount();
+        }
 
 		tableContainer.setBorderParams();
 
@@ -188,6 +192,7 @@ Rectangle {
 
     onHeadersChanged: {
         tableContainer.columnContentComps = [];
+
 
         for (let i = 0; i < tableContainer.headers.GetItemsCount(); i++){
             tableContainer.columnContentComps.push(null);
@@ -341,7 +346,6 @@ Rectangle {
         var lengthMinus = 0;
 
         for(var i = 0; i < tableContainer.widthDecorator.GetItemsCount(); i++){
-
             var width_ = tableContainer.widthDecorator.IsValidData("Width",i) ? tableContainer.widthDecorator.GetData("Width",i): -1;
             var widthPercent_ = tableContainer.widthDecorator.IsValidData("WidthPercent",i) ? tableContainer.widthDecorator.GetData("WidthPercent",i): -1;
 
@@ -362,7 +366,6 @@ Rectangle {
         }
 
         for(var i = 0; i < tableContainer.widthDecorator.GetItemsCount(); i++){
-
             var width_ = tableContainer.widthDecorator.IsValidData("Width",i) ? tableContainer.widthDecorator.GetData("Width",i): -1;
             var widthPercent_ = tableContainer.widthDecorator.IsValidData("WidthPercent",i) ? tableContainer.widthDecorator.GetData("WidthPercent",i): -1;
 
@@ -381,9 +384,7 @@ Rectangle {
                 if(count_){
                     tableContainer.widthDecoratorDynamic.SetData("Width",(tableContainer.width - lengthMinus)/count_,i);
                 }
-
             }
-
         }
 
         tableContainer.widthRecalc();
@@ -1003,11 +1004,13 @@ Rectangle {
                 }
 
 				Component.onDestruction: {
-					tableContainer.tableSelection.selectionChanged.disconnect(tableDelegate.selectionChanged);
-					tableContainer.checkedItemsChanged.disconnect(tableDelegate.checkedItemsChanged);
+                    if (tableContainer){
+                        tableContainer.tableSelection.selectionChanged.disconnect(tableDelegate.selectionChanged);
+                        tableContainer.checkedItemsChanged.disconnect(tableDelegate.checkedItemsChanged);
 
-					tableContainer.properties.visibleItemsChanged.disconnect(tableDelegate.visibleItemsChanged);
-					tableContainer.properties.stateItemsChanged.disconnect(tableDelegate.enabledItemsChanged);
+                        tableContainer.properties.visibleItemsChanged.disconnect(tableDelegate.visibleItemsChanged);
+                        tableContainer.properties.stateItemsChanged.disconnect(tableDelegate.enabledItemsChanged);
+                    }
 				}
 
 				function selectionChanged(){

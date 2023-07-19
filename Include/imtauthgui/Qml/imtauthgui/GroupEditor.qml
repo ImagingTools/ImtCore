@@ -15,6 +15,8 @@ Item {
     property int mainMargin: 0;
     property int panelWidth: 400;
 
+    property int radius: 3;
+
     onDocumentModelChanged: {
         console.log("UserEditor onDocumentModelChanged", userGroupEditorContainer.documentModel);
 
@@ -225,7 +227,7 @@ Item {
                 id: titleName;
 
                 anchors.left: parent.left;
-                anchors.leftMargin: 5;
+//                anchors.leftMargin: 5;
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
@@ -267,7 +269,7 @@ Item {
                 id: titleDescription;
 
                 anchors.left: parent.left;
-                anchors.leftMargin: 5;
+//                anchors.leftMargin: 5;
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
@@ -344,7 +346,8 @@ Item {
 
         elements: TreeItemModel {}
         checkable: true;
-        radius: 0;
+
+        radius:userGroupEditorContainer.radius;
 
         onCheckedItemsChanged: {
             if (userGroupEditorContainer.blockUpdatingModel){

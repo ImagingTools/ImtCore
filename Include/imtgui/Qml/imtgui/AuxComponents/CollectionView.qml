@@ -53,6 +53,8 @@ Item {
     property alias commandsProvider: commandsProviderLocal;
 
     signal elementsChanged();
+    signal headersChanged();
+
     signal filterDecoratorLoaded();
 
     Component.onCompleted: {
@@ -74,6 +76,8 @@ Item {
     }
 
     Component.onDestruction: {
+        console.log("CollectionView onDestruction", itemId);
+
         Events.unSubscribeEvent(collectionViewContainer.commandUpdateGui, collectionViewContainer.updateGui);
         Events.unSubscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
     }
@@ -312,6 +316,10 @@ Item {
 
         onElementsChanged: {
             collectionViewContainer.elementsChanged();
+        }
+
+        onHeadersChanged: {
+            collectionViewContainer.headersChanged();
         }
     }
 

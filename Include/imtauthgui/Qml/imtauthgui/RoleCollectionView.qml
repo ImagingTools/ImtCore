@@ -26,14 +26,12 @@ CollectionView {
         }
 
         onClicked: {
-            console.log('roleCollectionViewContainer onClicked', index)
             baseCollectionView.table.tableSelection.singleSelect(index);
             roleCollectionViewContainer.baseCollectionView.table.elementsList.forceActiveFocus();
         }
     } }
 
     Component.onCompleted: {
-        console.log("RoleCollection onCompleted", model.index);
         roleCollectionViewContainer.commandsDelegatePath = "../../imtauthgui/RoleCollectionViewCommandsDelegate.qml";
 
         elementsList.spacing = 10;
@@ -65,7 +63,6 @@ CollectionView {
     }
 
     function getSelectedNames(){
-        console.log("new getSelectedNames");
         let retVal = []
 
         let elementsModel = roleCollectionViewContainer.baseCollectionView.table.elements;
@@ -82,7 +79,6 @@ CollectionView {
     }
 
     function selectItem(id, name){
-        console.log("RoleCollectionView selectItem", id, name);
         let editorPath = baseCollectionView.commands.objectViewEditorPath;
         let commandsId = baseCollectionView.commands.objectViewEditorCommandsId;
 

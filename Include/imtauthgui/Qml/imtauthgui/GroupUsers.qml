@@ -11,6 +11,8 @@ Item {
 
     property bool blockUpdatingModel: false;
 
+    property int radius: 3;
+
     onDocumentModelChanged: {
         console.log("GroupUsers onDocumentModelChanged", documentModel);
 
@@ -149,7 +151,7 @@ Item {
         width: 400;
 
         checkable: true;
-        radius: 0;
+        radius: groupUsersContainer.radius;
 
         onCheckedItemsChanged: {
             if (groupUsersContainer.blockUpdatingModel){
