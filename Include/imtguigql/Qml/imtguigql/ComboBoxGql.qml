@@ -94,6 +94,9 @@ Item {
     signal editSignal();
     signal closeSignal(var model_);
 
+    onOpenSTChanged: {
+        selectedIndex = -1;
+    }
 
     onModelChanged: {
         if (comboBoxContainerGql.currentIndex > -1){

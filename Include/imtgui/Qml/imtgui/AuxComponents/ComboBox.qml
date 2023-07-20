@@ -83,6 +83,10 @@ FocusScope {
 	signal clicked();
 	signal finished(string commandId, int index);
 
+    onOpenSTChanged: {
+        selectedIndex = -1;
+    }
+
 	onModelChanged: {
 		if (!comboBoxContainer.model){
 			return;
