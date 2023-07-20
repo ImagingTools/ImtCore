@@ -12,10 +12,16 @@ export class Shortcut extends QtObject {
         this.$cP('portableText', '')
         this.$cP('sequence', '')
         this.$cP('sequences', [])
-        this.$cP('sequence', '')
 
         this.$s['activated'] = Signal()
         this.$s['activatedAmbiguously'] = Signal()
+
+        Core.shortcuts.push(this)
+    }
+
+    $destroy(){
+        Core.shortcuts.splice(Core.shortcuts.indexOf(this), 1)
+        super.$destroy()
     }
 }
 
