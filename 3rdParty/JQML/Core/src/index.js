@@ -476,7 +476,7 @@ global.Core = {
             map: null,
         }
         
-        let events = ['mousedown', 'mouseup', 'mousemove', 'wheel', 'mousewheel', 'contextmenu', 'touchstart', 'touchend', 'touchmove']
+        let events = ['mousedown', 'mouseup', 'mousemove', 'wheel', 'mousewheel', 'contextmenu', 'touchstart', 'touchend', 'touchmove', 'keypress', 'keydown', 'keyup']
 
         window.onkeydown = (e)=>{
             
@@ -539,7 +539,7 @@ global.Core = {
                                     } else if(skey === 'Ctrl') {
                                         stateKeys.ctrlKey = true
                                     } else {
-                                        skey === 'Return' ? 'Enter' : skey
+                                        stateKeys.key = skey === 'Return' ? 'Enter' : skey
                                     }
                                 }
                                 if(stateKeys.key === key && stateKeys.shiftKey === e.shiftKey && stateKeys.ctrlKey === e.ctrlKey && stateKeys.altKey === e.altKey) {
