@@ -51,8 +51,14 @@ Item {
 
     property int selectedIndex: -1;
 
-	signal finished(string commandId, int index);
+    signal finished(string commandId, int index);
 	signal started();
+
+    //forShortcutEnter
+    Component.onCompleted: {
+        forShortcutEnter.forceActiveFocus();
+        forShortcutEnter.focus = true;
+    }
 
 	Component.onDestruction: {
 		Events.unSubscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
@@ -157,52 +163,68 @@ Item {
 	}
 
     function contentYCorrection(down_){
-        var contentY = popupMenuListView.contentY;
-        var itemHeight = popupMenuContainer.itemHeight;
-        var visibleCount = popupMenuContainer.shownItemsCount;
-        var index = popupMenuContainer.rootItem.selectedIndex;
-        if(down_){
-
+        if(popupMenuContainer.rootItem){
+            var contentY = popupMenuListView.contentY;
+            var itemHeight = popupMenuContainer.itemHeight;
+            var visibleCount = popupMenuContainer.shownItemsCount;
+            var index = popupMenuContainer.rootItem.selectedIndex;
+            if(down_){
+                if((index+1) * itemHeight > contentY + visibleCount * itemHeight){
+                    popupMenuListView.contentY = (index+1) * itemHeight - visibleCount * itemHeight
+                }
+            }
+            else {
+                if(index * itemHeight < contentY){
+                    popupMenuListView.contentY = index * itemHeight
+                }
+            }
         }
-        else {
-
-
-        }
-
     }
 
     Shortcut {
-        sequence: "Escape"
+        sequence: "Escape";
         enabled: true;
         onActivated: root.closeDialog();
     }
     Shortcut {
-        sequence: "Up"
+        sequence: "Up";
         enabled: true;
         onActivated: {
-            if(popupMenuContainer.rootItem.selectedIndex > 0){
-                popupMenuContainer.rootItem.selectedIndex--;
-                popupMenuContainer.contentYCorrection(false);
+            if(popupMenuContainer.rootItem){
+                if(popupMenuContainer.rootItem.selectedIndex > 0){
+                    popupMenuContainer.rootItem.selectedIndex--;
+                    popupMenuContainer.contentYCorrection(false);
+                }
             }
         }
     }
     Shortcut {
-        sequence: "Down"
+        sequence: "Down";
         enabled: true;
         onActivated: {
-            if(popupMenuContainer.rootItem.selectedIndex < popupMenuContainer.rootItem.model.GetItemsCount() - 1){
-                popupMenuContainer.rootItem.selectedIndex++;
-                popupMenuContainer.contentYCorrection(true);
+            if(popupMenuContainer.rootItem){
+                if(popupMenuContainer.rootItem.selectedIndex < popupMenuContainer.model.GetItemsCount() - 1){
+                    popupMenuContainer.rootItem.selectedIndex++;
+                    popupMenuContainer.contentYCorrection(true);
+                }
             }
-
         }
     }
-//    Shortcut {
-//        sequence: "Enter"
-//        enabled: true;
-//        onActivated: {
-//            console.log("Enter");
-//        }
-//    }
+
+    TextInput{
+        id: forShortcutEnter;
+
+        visible: false;
+        width: 1;
+        height: 1;
+        onAccepted: {
+            if(popupMenuContainer.rootItem){
+                if(popupMenuContainer.rootItem.selectedIndex >=0){
+                    var id = popupMenuContainer.model.GetData("Id", popupMenuContainer.rootItem.selectedIndex);
+                    popupMenuContainer.finished(id, popupMenuContainer.rootItem.selectedIndex);
+                }
+            }
+        }
+    }
 
 }
