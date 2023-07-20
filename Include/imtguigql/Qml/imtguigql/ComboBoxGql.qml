@@ -58,6 +58,7 @@ Item {
     property string nameId: "Name";
 
     property int selectedIndex: -1;
+    property bool hoverBlocked: true;
 
     property Component delegate: PopupMenuDelegate{
         width: comboBoxContainerGql.width;

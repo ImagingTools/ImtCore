@@ -180,7 +180,6 @@ Item {
     function contentYCorrection(down_){
         if(popupMenuContainer.rootItem){
             if(popupMenuContainer.rootItem.selectedIndex >=0){
-                console.log("selectedIndex:: ", popupMenuContainer.rootItem.selectedIndex)
                 var contentY = popupMenuListView.contentY;
                 var itemHeight = popupMenuContainer.itemHeight;
                 var visibleCount = popupMenuContainer.shownItemsCount;

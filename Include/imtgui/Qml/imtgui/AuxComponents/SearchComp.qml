@@ -465,7 +465,7 @@ Rectangle{
         filterHeiht: height;
 
         commandId: searchContainer.commandId;
-        count: 6;
+        count: 5;
 
         gettedParams: searchContainer.gettedParamsModel;
         properties: searchContainer.propertiesModel;

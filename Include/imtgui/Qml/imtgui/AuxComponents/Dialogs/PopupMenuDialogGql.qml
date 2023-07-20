@@ -69,6 +69,10 @@ Item {
     */
     property int countVisibleItem: -1;
 
+    property int selectedIndex: -1;
+
+    property bool hoverBlocked: true;
+
     signal finished(string commandId, int index);
     signal endList();
     signal textEdited();
@@ -135,9 +139,9 @@ Item {
 
 
     onFinished: {
-//        if(popupMenuContainer.canClose){
-//            popupMenuContainer.root.closeDialog();
-//        }
+        //        if(popupMenuContainer.canClose){
+        //            popupMenuContainer.root.closeDialog();
+        //        }
     }
 
     function setTextFocus(focus){
@@ -157,10 +161,10 @@ Item {
         textSize: popupMenuContainer.textSize;
         fontColor: popupMenuContainer.fontColor;
 
-//        onTextEdited:  {
-//            console.log("______TEXT_EDITED______")
-//        }
-            onTextChanged:  {
+        //        onTextEdited:  {
+        //            console.log("______TEXT_EDITED______")
+        //        }
+        onTextChanged:  {
 
             if(popupMenuContainer.ready){
                 popupMenuContainer.rootItem.currentIndex = -1;
@@ -318,21 +322,7 @@ Item {
             onContentYChanged: {
                 if(popupMenuContainer.ready){
                     if(contentHeight - contentY - popupMenuListView.height == 0){
-                        var elemCountOk = popupMenuContainer.elementsCount >= 0 ? popupMenuContainer.elementsCount > popupMenuContainer.offset : true;
-//                        var elemCountOk = popupMenuContainer.elementsCount > popupMenuContainer.offset;
-                        var ok = !popupMenuContainer.endListStatus
-                                && itemsModel.state == "Ready"
-                                && elemCountOk;
-                        if(ok){
-
-//                            popupMenuContainer.endListStatus = true;
-
-                            console.log("Create additional query")
-                            loadedRec.visible = true;
-                            popupMenuContainer.offset = popupMenuContainer.offset + popupMenuContainer.count;
-                            console.log("Offset = ", popupMenuContainer.offset);
-                            itemsModel.updateModel(popupMenuContainer.offset);
-                        }
+                        popupMenuContainer.createAdditionalQuery();
                     }
                 }
             }
@@ -340,6 +330,19 @@ Item {
             delegate: popupMenuContainer.delegate;
 
         }//ListView
+
+        MouseArea{
+            anchors.fill: parent;
+            hoverEnabled: true;
+            visible: popupMenuContainer.rootItem ? popupMenuContainer.rootItem.hoverBlocked :
+                                                   popupMenuContainer.hoverBlocked;
+            onPositionChanged: {
+                popupMenuContainer.hoverBlocked = false;
+                if(popupMenuContainer.rootItem){
+                    popupMenuContainer.rootItem.hoverBlocked = false;
+                }
+            }
+        }
     }//ItemListView
 
 
@@ -357,6 +360,102 @@ Item {
 
         source: itemBody;
     }
+
+    function createAdditionalQuery(){
+        var elemCountOk = popupMenuContainer.elementsCount >= 0 ? popupMenuContainer.elementsCount > popupMenuContainer.offset : true;
+        var ok = !popupMenuContainer.endListStatus
+                && itemsModel.state == "Ready"
+                && elemCountOk;
+        if(ok){
+            loadedRec.visible = true;
+            popupMenuContainer.offset = popupMenuContainer.offset + popupMenuContainer.count;
+            itemsModel.updateModel(popupMenuContainer.offset);
+        }
+    }
+
+    function contentYCorrection(down_){
+        if(popupMenuContainer.rootItem){
+            if(popupMenuContainer.rootItem.selectedIndex >=0){
+                var contentY = popupMenuListView.contentY;
+                var itemHeight = popupMenuContainer.itemHeight;
+                var visibleCount = popupMenuContainer.countVisibleItem;
+                var index = popupMenuContainer.rootItem.selectedIndex;
+                if(down_){
+                    if((index+1) * itemHeight > contentY + visibleCount * itemHeight){
+                        popupMenuListView.contentY = (index+1) * itemHeight - visibleCount * itemHeight
+                    }
+                }
+                else {
+                    if(index * itemHeight < contentY){
+                        popupMenuListView.contentY = index * itemHeight
+                    }
+                }
+            }
+
+        }
+    }
+
+    Shortcut {
+        sequence: "Escape";
+        enabled: true;
+        onActivated: {
+            root.closeDialog();
+        }
+    }
+
+    Shortcut {
+        sequence: "Return";
+        enabled: !filterField.textInputFocus;
+        onActivated: {
+            if(popupMenuContainer.rootItem){
+                if(popupMenuContainer.rootItem.selectedIndex >=0){
+                    var id = popupMenuContainer.model.GetData("Id", popupMenuContainer.rootItem.selectedIndex);
+                    popupMenuContainer.finished(id, popupMenuContainer.rootItem.selectedIndex);
+                }
+            }
+        }
+    }
+
+    Shortcut {
+        sequence: "Up";
+        enabled: true;
+        onActivated: {
+            popupMenuContainer.hoverBlocked = true;
+            if(popupMenuContainer.rootItem){
+                popupMenuContainer.rootItem.hoverBlocked = true;
+                if(popupMenuContainer.rootItem.selectedIndex > 0){
+                    popupMenuContainer.rootItem.selectedIndex--;
+                    popupMenuContainer.contentYCorrection(false);
+                }
+            }
+
+        }
+    }
+    Shortcut {
+        sequence: "Down";
+        enabled: true;
+        onActivated: {
+            popupMenuContainer.hoverBlocked = true;
+            if(popupMenuContainer.rootItem){
+                popupMenuContainer.rootItem.hoverBlocked = true;
+                if(popupMenuContainer.rootItem.selectedIndex < popupMenuContainer.model.GetItemsCount() - 1){
+                    popupMenuContainer.rootItem.selectedIndex++;
+                    popupMenuContainer.contentYCorrection(true);
+                }
+                else if(popupMenuContainer.rootItem.selectedIndex == popupMenuContainer.model.GetItemsCount() - 1){
+                    popupMenuContainer.createAdditionalQuery();
+                    popupMenuListView.contentY += popupMenuContainer.itemHeight;
+                }
+
+            }
+        }
+    }
+
+
+//    PauseAnimation {
+//        id: contentYCorrectionPause;
+//        duration: 200
+//    }
 
     GqlModel {
         id: itemsModel;
@@ -423,13 +522,13 @@ Item {
                         dataModelLocal = dataModelLocal.GetData("items");
 
                         //console.log(popupMenuContainer.commandId, " = ", dataModelLocal);
-                       //console.log("comboModel:::", dataModelLocal.toJSON());
+                        //console.log("comboModel:::", dataModelLocal.toJSON());
                         if (popupMenuContainer.offset == 0){
                             popupMenuContainer.model = dataModelLocal;
                             //popupMenuListView.model = popupMenuContainer.model;
 
                             loadedRec.visible = false;
-                             popupMenuContainer.endListStatus = false;
+                            popupMenuContainer.endListStatus = false;
                         }
                         else{//OFSET !== 0
 
@@ -459,30 +558,5 @@ Item {
         }
     }
 
-    Shortcut {
-        sequence: "Escape"
-        enabled: true;
-        onActivated: root.closeDialog();
-    }
-    Shortcut {
-        sequence: "Up"
-        enabled: true;
-        onActivated: {
-            //popupMenuContainer.rootItem.selectedIndex--;
-        }
-    }
-    Shortcut {
-        sequence: "Down"
-        enabled: true;
-        onActivated: {
-            //popupMenuContainer.rootItem.selectedIndex++;
-        }
-    }
-//    Shortcut {
-//        sequence: "Enter"
-//        enabled: true;
-//        onActivated: {
-//            console.log("Enter");
-//        }
-//    }
+
 }
