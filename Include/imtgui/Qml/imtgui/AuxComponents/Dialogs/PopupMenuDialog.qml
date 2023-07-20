@@ -51,6 +51,8 @@ Item {
 
     property int selectedIndex: -1;
 
+    property bool hoverBlocked: true;
+
     signal finished(string commandId, int index);
     signal started();
 
@@ -146,6 +148,19 @@ Item {
 
             delegate: popupMenuContainer.delegate;
         }//ListView
+
+        MouseArea{
+            anchors.fill: parent;
+            hoverEnabled: true;
+            visible: popupMenuContainer.rootItem ? popupMenuContainer.rootItem.hoverBlocked :
+                                                   popupMenuContainer.hoverBlocked;
+            onPositionChanged: {
+                popupMenuContainer.hoverBlocked = false;
+                if(popupMenuContainer.rootItem){
+                    popupMenuContainer.rootItem.hoverBlocked = false;
+                }
+            }
+        }
     }//ItemListView
 
     DropShadow {
@@ -212,7 +227,9 @@ Item {
         sequence: "Up";
         enabled: true;
         onActivated: {
+            popupMenuContainer.hoverBlocked = true;
             if(popupMenuContainer.rootItem){
+                popupMenuContainer.rootItem.hoverBlocked = true;
                 if(popupMenuContainer.rootItem.selectedIndex > 0){
                     popupMenuContainer.rootItem.selectedIndex--;
                     popupMenuContainer.contentYCorrection(false);
@@ -225,7 +242,9 @@ Item {
         sequence: "Down";
         enabled: true;
         onActivated: {
+            popupMenuContainer.hoverBlocked = true;
             if(popupMenuContainer.rootItem){
+                popupMenuContainer.rootItem.hoverBlocked = true;
                 if(popupMenuContainer.rootItem.selectedIndex < popupMenuContainer.model.GetItemsCount() - 1){
                     popupMenuContainer.rootItem.selectedIndex++;
                     popupMenuContainer.contentYCorrection(true);

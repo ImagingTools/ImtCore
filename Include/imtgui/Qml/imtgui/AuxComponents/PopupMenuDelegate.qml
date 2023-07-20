@@ -88,6 +88,7 @@ Item {
         hoverEnabled: true;
         cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
+        visible: !popupMenuDelegate.rootItem ? true : !popupMenuDelegate.rootItem.hoverBlocked;
         onEntered: {
             if(popupMenuDelegate.rootItem && popupMenuDelegate.rootItem.selectedIndex !== undefined)
             {
