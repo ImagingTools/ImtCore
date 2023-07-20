@@ -487,6 +487,8 @@ export class ListView extends Flickable {
         
         // obj.$orientation = this.orientation
         this.$recursiveIndex(obj, index)
+
+        if(obj.clear) obj.clear()
         // obj.$uP()
         return obj
     }
