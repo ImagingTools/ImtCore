@@ -264,8 +264,11 @@ Item {
         id: popupMenu;
 
         PopupMenuDialog {
+            id: popupMenuDialog;
+
             onFinished: {
                 console.log("CollectionView PopupMenuDialog", commandId);
+                popupMenuDialog.root.closeDialog();
                 containerBase.commandHandle(commandId);
             }
         }

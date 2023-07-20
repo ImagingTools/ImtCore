@@ -89,7 +89,10 @@ Item {
         cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
         onEntered: {
-            popupMenuDelegate.rootItem.selectedIndex = model.index;
+            if(popupMenuDelegate.rootItem && popupMenuDelegate.rootItem.selectedIndex !== undefined)
+            {
+                popupMenuDelegate.rootItem.selectedIndex = model.index;
+            }
         }
 
         onClicked: {

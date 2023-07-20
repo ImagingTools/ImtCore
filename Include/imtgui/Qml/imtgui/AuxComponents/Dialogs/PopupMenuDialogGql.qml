@@ -54,7 +54,6 @@ Item {
     property Component delegate: PopupMenuDelegate{
         textSize: popupMenuContainer.textSize;
         fontColor: popupMenuContainer.fontColor;
-        onClicked: {popupMenuContainer.finished(commandId, index)}
 
         rootItem: popupMenuContainer.rootItem;
 

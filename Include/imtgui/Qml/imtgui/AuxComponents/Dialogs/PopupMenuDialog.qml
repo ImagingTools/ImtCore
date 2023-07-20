@@ -41,8 +41,6 @@ Item {
 		textSize: popupMenuContainer.textSize;
 		fontColor: popupMenuContainer.fontColor;
 
-        onClicked: {popupMenuContainer.finished(commandId, index)}
-
 		rootItem: popupMenuContainer;
 	}
 
@@ -50,6 +48,8 @@ Item {
 		Count of the visible item, if value = -1 then count unlimited
 	*/
 	property int countVisibleItem: -1;
+
+    property int selectedIndex: -1;
 
 	signal finished(string commandId, int index);
 	signal started();
@@ -157,10 +157,17 @@ Item {
 	}
 
     function contentYCorrection(down_){
-//        var contentY = popupMenuListView.contentY;
-//        var itemHeight = popupMenuContainer.itemHeight;
-//        var visibleCount = popupMenuContainer.shownItemsCount;
-//        var index = popupMenuContainer.rootItem.selectedIndex;
+        var contentY = popupMenuListView.contentY;
+        var itemHeight = popupMenuContainer.itemHeight;
+        var visibleCount = popupMenuContainer.shownItemsCount;
+        var index = popupMenuContainer.rootItem.selectedIndex;
+        if(down_){
+
+        }
+        else {
+
+
+        }
 
     }
 
@@ -173,20 +180,20 @@ Item {
         sequence: "Up"
         enabled: true;
         onActivated: {
-//            if(popupMenuContainer.rootItem.selectedIndex > 0){
-//                popupMenuContainer.rootItem.selectedIndex--;
-//                popupMenuContainer.contentYCorrection(false);
-//            }
+            if(popupMenuContainer.rootItem.selectedIndex > 0){
+                popupMenuContainer.rootItem.selectedIndex--;
+                popupMenuContainer.contentYCorrection(false);
+            }
         }
     }
     Shortcut {
         sequence: "Down"
         enabled: true;
         onActivated: {
-//            if(popupMenuContainer.rootItem.selectedIndex < popupMenuContainer.rootItem.model.GetItemsCount() - 1){
-//                popupMenuContainer.rootItem.selectedIndex++;
-//                popupMenuContainer.contentYCorrection(true);
-//            }
+            if(popupMenuContainer.rootItem.selectedIndex < popupMenuContainer.rootItem.model.GetItemsCount() - 1){
+                popupMenuContainer.rootItem.selectedIndex++;
+                popupMenuContainer.contentYCorrection(true);
+            }
 
         }
     }
