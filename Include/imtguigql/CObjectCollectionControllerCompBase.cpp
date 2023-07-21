@@ -192,8 +192,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 
 		istd::IChangeable* newObject = CreateObject(inputParams, objectId, name, description, errorMessage);
 		if (newObject != nullptr){
-			imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
-			if (elementIds.contains(objectId)){
+			imtbase::IObjectCollection::DataPtr dataPtr;
+			if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 				errorMessage = QT_TR_NOOP("Object with this ID already exists");
 			}
 			else{
