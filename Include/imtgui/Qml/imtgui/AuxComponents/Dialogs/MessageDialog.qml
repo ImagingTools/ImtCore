@@ -19,6 +19,11 @@ Dialog {
         }
     }
 
+    onLocalizationChanged: {
+        messageDialog.buttonsModel.setProperty(0, "Name", qsTr("Yes"));
+        messageDialog.buttonsModel.setProperty(1, "Name", qsTr("No"));
+    }
+
     contentComp: Component {
         MessageDialogBody {
             message: messageDialog.message;
@@ -26,8 +31,8 @@ Dialog {
     }
 
     Component.onCompleted: {
-        messageDialog.buttons.addButton({"Id":"Yes", "Name":"Yes", "Enabled": true});
-        messageDialog.buttons.addButton({"Id":"No", "Name":"No", "Enabled": true});
+        messageDialog.buttons.addButton({"Id":"Yes", "Name":qsTr("Yes"), "Enabled": true});
+        messageDialog.buttons.addButton({"Id":"No", "Name":qsTr("No"), "Enabled": true});
     }
 
     Component{

@@ -106,40 +106,10 @@ Item {
         applicationInfoProvider: application.applicationInfoProvider;
     }
 
-//    Timer{
-//        id: timer2;
-
-//        interval: 1000;
-
-//        running: true;
-//        repeat: true;
-
-//        onTriggered: {
-//            console.log("onTriggered", rect.state);
-//            if (rect.state == "1"){
-//                rect.color = "green";
-//                rect.state = "2";
-//            }
-//            else{
-//                rect.color = "red";
-//                rect.state = "1";
-//            }
-//        }
-//    }
-
-//    Rectangle{
-//        id: rect;
-
-//        anchors.verticalCenter: parent.verticalCenter;
-//        anchors.horizontalCenter: parent.horizontalCenter;
-
-//        width: 100;
-//        height: 100;
-
-//        color: "red";
-
-//        state: "1";
-//    }
+    function onLocalizationChanged(){
+        console.log("Main onLocalizationChanged");
+        Events.sendEvent("OnLocalizationChanged");
+    }
 
     function updateAllModels(){
         thumbnailDecorator.updateModels();

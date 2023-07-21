@@ -2,6 +2,7 @@
 
 
 // ACF includes
+#include <iqt/ITranslationManager.h>
 #include <ilog/TLoggerCompWrap.h>
 #include <iprm/IParamsSet.h>
 
@@ -29,12 +30,14 @@ public:
 		I_ASSIGN(m_prefixServer, "ServerPrefix", "Prefix Server", true, "/");
 		I_ASSIGN(m_applicationInfoRepresentationCompPtr, "ApplicationInfoRepresentation", "Application info representation", true, "ApplicationInfoRepresentation");
 		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info", true, "ApplicationInfo");
+		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
 
 	CObserverQmlComp();
 
 protected:
 	void ApplyUrl() const;
+	void UpdateLanguage() const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -51,6 +54,7 @@ private:
 	I_REF(imtqml::IQuickObject, m_quickObjectCompPtr);
 	I_REF(imtbase::IApplicationInfoRepresentation, m_applicationInfoRepresentationCompPtr);
 	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
+	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 
 private:
 	imtbase::CTreeItemModel* m_settingsModelPtr;

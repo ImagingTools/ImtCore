@@ -6,6 +6,8 @@
 
 // ACF includes
 #include <iprm/ITextParam.h>
+#include <iprm/ISelectionParam.h>
+#include <iprm/TParamsPtr.h>
 
 
 namespace imtqml
@@ -44,6 +46,37 @@ void CObserverQmlComp::ApplyUrl() const
 }
 
 
+void CObserverQmlComp::UpdateLanguage() const
+{
+	if (!m_settingsCompPtr.IsValid() || !m_translationManagerCompPtr.IsValid()){
+		return;
+	}
+
+	QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
+	Q_ASSERT(quickItem != nullptr);
+
+	QQmlEngine* enginePtr = qmlEngine(quickItem);
+	Q_ASSERT(enginePtr != nullptr);
+
+	iprm::TParamsPtr<iprm::ISelectionParam> languageParamPtr(m_settingsCompPtr.GetPtr(), "General/Language");
+	if (languageParamPtr.IsValid()){
+		const iprm::IOptionsList* optionListPtr = languageParamPtr->GetSelectionConstraints();
+		if (optionListPtr != nullptr){
+			int index = languageParamPtr->GetSelectedOptionIndex();
+			if (index >= 0){
+				m_translationManagerCompPtr->SwitchLanguage(index);
+
+				if (enginePtr != nullptr){
+					enginePtr->retranslate();
+
+					QMetaObject::invokeMethod(quickItem, "onLocalizationChanged");
+				}
+			}
+		}
+	}
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CObserverQmlComp::OnComponentCreated()
@@ -54,6 +87,8 @@ void CObserverQmlComp::OnComponentCreated()
 		QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
 		if (quickItem != nullptr){
 			if (m_settingsRepresentationControllerCompPtr.IsValid() && m_settingsCompPtr.IsValid()){
+				UpdateLanguage();
+
 				m_settingsModelPtr = new imtbase::CTreeItemModel();
 				bool result = m_settingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*m_settingsCompPtr, *m_settingsModelPtr);
 				if (result){

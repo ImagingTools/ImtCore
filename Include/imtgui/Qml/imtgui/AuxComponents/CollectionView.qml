@@ -59,8 +59,32 @@ Item {
 
     Component.onCompleted: {
         Events.subscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
+        Events.subscribeEvent("OnLocalizationChanged", collectionViewContainer.onLocalizationChanged);
 
         collectionViewContainer.fillContextMenuModel();
+    }
+
+    Component.onDestruction: {
+        console.log("CollectionView onDestruction", itemId);
+
+        Events.unSubscribeEvent("OnLocalizationChanged", collectionViewContainer.onLocalizationChanged);
+        Events.unSubscribeEvent(collectionViewContainer.commandUpdateGui, collectionViewContainer.updateGui);
+        Events.unSubscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
+    }
+
+    property bool localizationChanged: false;
+
+    function onLocalizationChanged(language){
+        console.log("CommandsDecorator onLocalizationChanged", language);
+
+        if (visible){
+            commandsProviderLocal.updateModel();
+        }
+        else{
+            localizationChanged = true;
+        }
+
+        fillContextMenuModel();
     }
 
     Keys.onPressed: {
@@ -75,13 +99,6 @@ Item {
         collectionViewContainer.itemName = documentsData.GetData("Title", model.index);
     }
 
-    Component.onDestruction: {
-        console.log("CollectionView onDestruction", itemId);
-
-        Events.unSubscribeEvent(collectionViewContainer.commandUpdateGui, collectionViewContainer.updateGui);
-        Events.unSubscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
-    }
-
     onCommandUpdateGuiChanged: {
         Events.subscribeEvent(collectionViewContainer.commandUpdateGui, collectionViewContainer.updateGui);
     }
@@ -93,6 +110,12 @@ Item {
                                                       "CommandsId": commandsProviderLocal.commandsId});
 
             Events.subscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
+
+            if (localizationChanged){
+                commandsProviderLocal.updateModel();
+
+                localizationChanged = false;
+            }
         }
         else{
             Events.unSubscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
@@ -115,6 +138,7 @@ Item {
     }
 
     function fillContextMenuModel(){
+        contextMenuModel.clear();
         contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../../Icons/Light/Edit_On_Normal.svg"});
         contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../Icons/Light/Remove_On_Normal.svg"});
         contextMenuModel.append({"Id": "Rename", "Name": qsTr("Rename"), "IconSource": ""});

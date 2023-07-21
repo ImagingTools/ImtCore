@@ -269,7 +269,7 @@ Item {
 
             title: qsTr("Save document");
             Component.onCompleted: {
-                buttons.addButton({"Id":"Cancel", "Name":"Cancel", "Enabled": true});
+                buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true});
             }
 
             onFinished: {

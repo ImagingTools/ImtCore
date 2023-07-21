@@ -27,7 +27,7 @@ Item {
     }
 
     property string pageId: "About";
-    property string pageName: "About";
+    property string pageName: qsTr("About");
 
     function createRepresentationModel(){
         if (root.applicationInfoProvider != null){
@@ -49,7 +49,7 @@ Item {
 
             index = parameters.InsertNewItem();
             parameters.SetData("Id", "ServerLog", index);
-            parameters.SetData("Name", "Server Log", index);
+            parameters.SetData("Name", qsTr("Server Log"), index);
             parameters.SetData("Source", "qrc:/qml/imtgui/AuxComponents/ServerLogProvider.qml", index);
 
             console.log("pageModel", pageModel.toJSON());

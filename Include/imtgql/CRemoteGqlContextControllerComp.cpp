@@ -3,12 +3,12 @@
 
 // ACF includes
 #include <iser/CJsonMemReadArchive.h>
-#include <iprm/TParamsPtr.h>
-#include <iprm/ISelectionParam.h>
-#include <iprm/IOptionsList.h>
+//#include <iprm/TParamsPtr.h>
+//#include <iprm/ISelectionParam.h>
+//#include <iprm/IOptionsList.h>
 
 // ImtCore includes
-#include <imtauth/IUserSettings.h>
+//#include <imtauth/IUserSettings.h>
 #include <imtauth/CUserInfo.h>
 #include <imtgql/CGqlContext.h>
 
@@ -123,49 +123,49 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 			return nullptr;
 		}
 
-		QByteArray languageId;
-		QByteArray designSchemeId;
+//		QByteArray languageId;
+//		QByteArray designSchemeId;
 
-		QByteArray username = userInstancePtr->GetId();
+//		QByteArray username = userInstancePtr->GetId();
 
-		if (m_userSettingsCollectionCompPtr.IsValid()){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_userSettingsCollectionCompPtr->GetObjectData(username, dataPtr)){
-				imtauth::IUserSettings* userSettingsPtr = dynamic_cast<imtauth::IUserSettings*>(dataPtr.GetPtr());
-				if (userSettingsPtr != nullptr){
-					iprm::IParamsSet* paramsSetPtr = userSettingsPtr->GetSettings();
-					if (paramsSetPtr != nullptr){
-						iprm::TParamsPtr<iprm::ISelectionParam> languageParamPtr(paramsSetPtr, "Language");
-						if (languageParamPtr.IsValid()){
-							const iprm::IOptionsList* optionListPtr = languageParamPtr->GetSelectionConstraints();
-							if (optionListPtr != nullptr){
-								int index = languageParamPtr->GetSelectedOptionIndex();
-								if (index >= 0){
-									languageId = optionListPtr->GetOptionId(index);
-								}
-							}
-						}
+//		if (m_userSettingsCollectionCompPtr.IsValid()){
+//			imtbase::IObjectCollection::DataPtr dataPtr;
+//			if (m_userSettingsCollectionCompPtr->GetObjectData(username, dataPtr)){
+//				imtauth::IUserSettings* userSettingsPtr = dynamic_cast<imtauth::IUserSettings*>(dataPtr.GetPtr());
+//				if (userSettingsPtr != nullptr){
+//					iprm::IParamsSet* paramsSetPtr = userSettingsPtr->GetSettings();
+//					if (paramsSetPtr != nullptr){
+//						iprm::TParamsPtr<iprm::ISelectionParam> languageParamPtr(paramsSetPtr, "Language");
+//						if (languageParamPtr.IsValid()){
+//							const iprm::IOptionsList* optionListPtr = languageParamPtr->GetSelectionConstraints();
+//							if (optionListPtr != nullptr){
+//								int index = languageParamPtr->GetSelectedOptionIndex();
+//								if (index >= 0){
+//									languageId = optionListPtr->GetOptionId(index);
+//								}
+//							}
+//						}
 
-						iprm::TParamsPtr<iprm::ISelectionParam> designParamPtr(paramsSetPtr, "DesignSchema");
-						if (designParamPtr.IsValid()){
-							const iprm::IOptionsList* optionListPtr = designParamPtr->GetSelectionConstraints();
-							if (optionListPtr != nullptr){
-								int index = designParamPtr->GetSelectedOptionIndex();
-								if (index >= 0){
-									designSchemeId = optionListPtr->GetOptionId(index);
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+//						iprm::TParamsPtr<iprm::ISelectionParam> designParamPtr(paramsSetPtr, "DesignSchema");
+//						if (designParamPtr.IsValid()){
+//							const iprm::IOptionsList* optionListPtr = designParamPtr->GetSelectionConstraints();
+//							if (optionListPtr != nullptr){
+//								int index = designParamPtr->GetSelectedOptionIndex();
+//								if (index >= 0){
+//									designSchemeId = optionListPtr->GetOptionId(index);
+//								}
+//							}
+//						}
+//					}
+//				}
+//			}
+//		}
 
 		istd::TDelPtr<imtgql::CGqlContext> gqlContextPtr = new imtgql::CGqlContext();
 		gqlContextPtr->SetToken(token);
 		gqlContextPtr->SetUserInfo(userInstancePtr.PopPtr());
-		gqlContextPtr->SetLanguageId(languageId);
-		gqlContextPtr->SetDesignScheme(designSchemeId);
+//		gqlContextPtr->SetLanguageId(languageId);
+//		gqlContextPtr->SetDesignScheme(designSchemeId);
 
 		m_cacheMap.insert(token, gqlContextPtr.PopPtr());
 

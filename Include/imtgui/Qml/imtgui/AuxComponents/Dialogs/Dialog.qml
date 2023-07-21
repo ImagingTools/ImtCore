@@ -24,12 +24,13 @@ Rectangle {
 
     property alias topPanel: loaderTopPanel.item;
     property alias buttons: buttonsDialog;
-
+    property alias buttonsModel: buttonsDialog.buttons;
 
     property string notClosingButtons: "";
 
     signal finished(string buttonId);
     signal started();
+    signal localizationChanged(string language);
 
     property alias contentComp: loaderBodyDialog.sourceComponent;
     property alias topPanelComp: loaderTopPanel.sourceComponent;
@@ -37,6 +38,18 @@ Rectangle {
 
     property Component topPanelDefault: Component{
         TopPanelDialog {}
+    }
+
+    Component.onCompleted: {
+        Events.subscribeEvent("OnLocalizationChanged", dialogContainer.onLocalizationChanged);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", dialogContainer.onLocalizationChanged);
+    }
+
+    function onLocalizationChanged(language){
+        dialogContainer.localizationChanged(language);
     }
 
     Keys.onPressed: {

@@ -38,6 +38,7 @@ Item {
     }
 
     signal commandsDelegateLoaded();
+    signal localizationChanged(string language);
 
     signal saved();
 
@@ -57,11 +58,41 @@ Item {
 
         documentBaseRoot.commandsProvider.modelLoaded.connect(documentBaseRoot.onCommandsModelLoaded);
         documentBaseRoot.commandsDelegate.documentBase = documentBaseRoot;
+
+        Events.subscribeEvent("OnLocalizationChanged", documentBaseRoot.onLocalizationChanged);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent(documentBaseRoot.documentUuid + "CommandActivated", documentBaseRoot.commandsDelegate.commandHandle);
+        Events.unSubscribeEvent("OnLocalizationChanged", documentBaseRoot.onLocalizationChanged);
+
+        documentBaseRoot.commandsProvider.modelLoaded.disconnect(documentBaseRoot.onCommandsModelLoaded);
+    }
+
+    property bool m_localizationChanged: false;
+
+    function onLocalizationChanged(language){
+        console.log("CommandsDecorator onLocalizationChanged", language);
+
+        if (visible){
+            documentBaseRoot.commandsProvider.updateModel();
+        }
+        else{
+            m_localizationChanged = true;
+        }
+
+        documentBaseRoot.localizationChanged(language);
     }
 
     onVisibleChanged: {
         if (visible){
             documentBaseRoot.commandsProvider.updateGui();
+
+            if (m_localizationChanged){
+                documentBaseRoot.commandsProvider.updateModel();
+
+                m_localizationChanged = false;
+            }
         }
     }
 
@@ -70,12 +101,6 @@ Item {
             documentBaseRoot.commandsProvider.documentUuid = documentBaseRoot.documentUuid;
             Events.subscribeEvent(documentBaseRoot.documentUuid + "CommandActivated", documentBaseRoot.commandsDelegate.commandHandle);
         }
-    }
-
-    Component.onDestruction: {
-        Events.unSubscribeEvent(documentBaseRoot.documentUuid + "CommandActivated", documentBaseRoot.commandsDelegate.commandHandle);
-
-        documentBaseRoot.commandsProvider.modelLoaded.disconnect(documentBaseRoot.onCommandsModelLoaded);
     }
 
     onBlockUpdatingModelChanged: {

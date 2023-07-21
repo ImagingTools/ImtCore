@@ -1,14 +1,14 @@
 #pragma once
 
 
-//ACF includes
-#include <iqt/ITranslationManager.h>
-#include <icomp/CComponentBase.h>
-
-//Qt includes
+// Qt includes
 #include <QtCore/QObject>
 #include <QtCore/QTranslator>
 #include <QtQml/QQmlEngine>
+
+// ACF includes
+#include <iqt/ITranslationManager.h>
+#include <icomp/CComponentBase.h>
 
 
 namespace imtqml

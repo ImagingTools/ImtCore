@@ -20,15 +20,15 @@ DocumentBase {
         Component.onCompleted: {
             let index = productViewContainer.softwareHeadersModel.InsertNewItem();
             productViewContainer.softwareHeadersModel.SetData("Id", "Name", index);
-            productViewContainer.softwareHeadersModel.SetData("Name", "License Name", index);
+            productViewContainer.softwareHeadersModel.SetData("Name", qsTr("License Name"), index);
 
             index = productViewContainer.softwareHeadersModel.InsertNewItem();
             productViewContainer.softwareHeadersModel.SetData("Id", "Id", index);
-            productViewContainer.softwareHeadersModel.SetData("Name", "License-ID", index);
+            productViewContainer.softwareHeadersModel.SetData("Name", qsTr("License-ID"), index);
 
             index = productViewContainer.softwareHeadersModel.InsertNewItem();
             productViewContainer.softwareHeadersModel.SetData("Id", "Description", index);
-            productViewContainer.softwareHeadersModel.SetData("Name", "Description", index);
+            productViewContainer.softwareHeadersModel.SetData("Name", qsTr("Description"), index);
         }
     }
 
@@ -36,15 +36,15 @@ DocumentBase {
         Component.onCompleted: {
             let index = productViewContainer.hardwareHeadersModel.InsertNewItem();
             productViewContainer.hardwareHeadersModel.SetData("Id", "Name", index);
-            productViewContainer.hardwareHeadersModel.SetData("Name", "Model Name", index);
+            productViewContainer.hardwareHeadersModel.SetData("Name", qsTr("Model Name"), index);
 
             index = productViewContainer.hardwareHeadersModel.InsertNewItem();
             productViewContainer.hardwareHeadersModel.SetData("Id", "Id", index);
-            productViewContainer.hardwareHeadersModel.SetData("Name", "Model-ID", index);
+            productViewContainer.hardwareHeadersModel.SetData("Name", qsTr("Model-ID"), index);
 
             index = productViewContainer.hardwareHeadersModel.InsertNewItem();
             productViewContainer.hardwareHeadersModel.SetData("Id", "Description", index);
-            productViewContainer.hardwareHeadersModel.SetData("Name", "Description", index);
+            productViewContainer.hardwareHeadersModel.SetData("Name", qsTr("Description"), index);
         }
     }
 
@@ -58,6 +58,19 @@ DocumentBase {
 
     Component.onDestruction: {
         Events.unSubscribeEvent("FeaturesUpdated", productViewContainer.onFeaturesUpdated);
+    }
+
+    onLocalizationChanged: {
+        productViewContainer.softwareHeadersModel.SetData("Name", qsTr("License Name"), 0);
+        productViewContainer.softwareHeadersModel.SetData("Name", qsTr("License-ID"), 1);
+        productViewContainer.softwareHeadersModel.SetData("Name", qsTr("Description"), 2);
+
+        productViewContainer.hardwareHeadersModel.SetData("Name", qsTr("Model Name"), 0);
+        productViewContainer.hardwareHeadersModel.SetData("Name", qsTr("Model-ID"), 1);
+        productViewContainer.hardwareHeadersModel.SetData("Name", qsTr("Description"), 2);
+
+        productViewContainer.softwareHeadersModel.Refresh();
+        productViewContainer.hardwareHeadersModel.Refresh();
     }
 
     onCommandsIdChanged: {
@@ -726,7 +739,7 @@ DocumentBase {
                     }
 
                     if (childrenItems.includes(id)){
-//                        dependenciesTable.checkItem(i);
+                        //                        dependenciesTable.checkItem(i);
                         dependenciesTable.setIsEnabledItem(i, false);
                     }
                 }

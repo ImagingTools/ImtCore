@@ -110,7 +110,7 @@ imtbase::CTreeItemModel* CRoleCollectionControllerComp::GetMetaInfo(const imtgql
 
 imtbase::CTreeItemModel* CRoleCollectionControllerComp::ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid() || !m_productProviderCompPtr.IsValid()){
+	if (!m_objectCollectionCompPtr.IsValid()){
 		return nullptr;
 	}
 

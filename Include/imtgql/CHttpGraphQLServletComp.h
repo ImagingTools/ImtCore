@@ -20,6 +20,7 @@ public:
 	I_BEGIN_COMPONENT(CHttpGraphQLServletComp);
 		I_ASSIGN_MULTI_0(m_gqlRequestHandlerCompPtr, "GqlRequestHandler", "Handler for GraphQL-request", true);
 		I_ASSIGN(m_gqlContextControllerCompPtr, "GqlContextController", "GraphQL-related context controller", false, "GqlContextController");
+		I_ASSIGN(m_userSettingsCollectionCompPtr, "UserSettingsCollection", "User settings collection", false, "UserSettingsCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -40,6 +41,7 @@ private:
 private:
 	I_MULTIREF(imtgql::IGqlRequestHandler, m_gqlRequestHandlerCompPtr);
 	I_REF(imtgql::IGqlContextController, m_gqlContextControllerCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userSettingsCollectionCompPtr);
 };
 
 

@@ -17,8 +17,29 @@ Rectangle {
         headerText.text += "/ " + header;
     }
 
+    Component.onCompleted: {
+        Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
+    }
+
     Component.onDestruction: {
-        console.log("AdministrationView.qml onDestruction");
+        Events.unSubscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
+    }
+
+    function onLocalizationChanged(language){
+        console.log("CollectionViewBase onLocalizationChanged", language);
+
+        for (let i = 0; i < leftMenuModel.count; i++){
+            let id = leftMenuModel.get(i).Id;
+            if (id === "Roles"){
+                leftMenuModel.setProperty(i, "Name", qsTr("Roles"));
+            }
+            else if (id === "Users"){
+                leftMenuModel.setProperty(i, "Name", qsTr("Users"));
+            }
+            else if (id === "Groups"){
+                leftMenuModel.setProperty(i, "Name", qsTr("Groups"));
+            }
+        }
     }
 
     Row {
@@ -41,6 +62,16 @@ Rectangle {
             font.family: Style.fontFamily;
 
             color: Style.titleColor;
+        }
+    }
+
+    ListModel{
+        id: leftMenuModel;
+
+        Component.onCompleted: {
+            leftMenuModel.append({Id: "Roles",  Name: qsTr("Roles"), Source: "RoleCollectionView.qml"})
+            leftMenuModel.append({Id: "Users",  Name: qsTr("Users"), Source: "UserCollectionView.qml"})
+            leftMenuModel.append({Id: "Groups",  Name: qsTr("Groups"), Source: "UserGroupCollectionView.qml"})
         }
     }
 
@@ -68,16 +99,6 @@ Rectangle {
             onSelectedIndexChanged: {
                 console.log("onSelectedIndexChanged", selectedIndex);
                  headerText.text = qsTr("Administration") + " / " + leftMenuModel.get(mainPanel.selectedIndex).Id;
-            }
-
-            ListModel{
-                id: leftMenuModel;
-
-                Component.onCompleted: {
-                    leftMenuModel.append({Id: "Roles",  Name: qsTr("Roles"), Source: "RoleCollectionView.qml"})
-                    leftMenuModel.append({Id: "Users",  Name: qsTr("Users"), Source: "UserCollectionView.qml"})
-                    leftMenuModel.append({Id: "Groups",  Name: qsTr("Groups"), Source: "UserGroupCollectionView.qml"})
-                }
             }
 
             Repeater {

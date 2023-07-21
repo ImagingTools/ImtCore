@@ -44,8 +44,13 @@ Rectangle {
         id: aboutApplicationProvider;
     }
 
+    Component.onCompleted: {
+        Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
+    }
+
     Component.onDestruction: {
         container.commonModel.dataChanged.disconnect(container.modelChanged);
+        Events.unSubscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
     }
 
     onApplicationInfoProviderChanged: {
@@ -158,6 +163,21 @@ Rectangle {
 
     MouseArea {
         anchors.fill: parent;
+    }
+
+    function onLocalizationChanged(language){
+        console.log("Preference onLocalizationChanged", language);
+        loaderTopPanel.item.title = qsTr("Preferences");
+
+        for (let i = 0; i < buttonsDialog.buttons.count; i++){
+            let id = buttonsDialog.buttons.get(i).Id;
+            if (id === "Apply"){
+                buttonsDialog.buttons.setProperty(i, "Name", qsTr("Apply"));
+            }
+            else if (id === "Close"){
+                buttonsDialog.buttons.setProperty(i, "Name", qsTr("Close"));
+            }
+        }
     }
 
     Rectangle {
@@ -387,7 +407,10 @@ Rectangle {
                     }
 
                     if (container.settingsProvider && container.settingsProvider.localModel != null){
-                        if (!container.localModel.IsEqualWithModel(container.settingsProvider.localModel)){
+                        let isEqual = container.localModel.IsEqualWithModel(container.settingsProvider.localModel);
+                        console.log("isEqual", isEqual);
+
+                        if (!isEqual){
                             container.settingsProvider.localModel.Copy(container.localModel);
                             container.settingsProvider.saveLocalModel();
                         }

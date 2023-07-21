@@ -218,9 +218,9 @@ DocumentBase {
             ListModel{
                 id: leftMenuModel
                 Component.onCompleted: {
-                    leftMenuModel.append({Id: "General",  Name: "General", Source: "qrc:/qml/imtauthgui/GroupEditor.qml"})
-                    leftMenuModel.append({Id: "Users",  Name: "Users", Source: "qrc:/qml/imtauthgui/GroupUsers.qml"})
-                    leftMenuModel.append({Id: "Roles",  Name: "Roles", Source: "qrc:/qml/imtauthgui/GroupRoles.qml"})
+                    leftMenuModel.append({Id: "General",  Name: qsTr("General"), Source: "qrc:/qml/imtauthgui/GroupEditor.qml"})
+                    leftMenuModel.append({Id: "Users",  Name: qsTr("Users"), Source: "qrc:/qml/imtauthgui/GroupUsers.qml"})
+                    leftMenuModel.append({Id: "Roles",  Name: qsTr("Roles"), Source: "qrc:/qml/imtauthgui/GroupRoles.qml"})
                 }
             }
 

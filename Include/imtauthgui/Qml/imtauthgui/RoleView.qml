@@ -269,21 +269,9 @@ DocumentBase {
             ListModel{
                 id: leftMenuModel
                 Component.onCompleted: {
-                    leftMenuModel.append({Id: "General", Name: "General", Source: "qrc:/qml/imtauthgui/RoleEditor.qml"})
-                    leftMenuModel.append({Id: "Permissions", Name: "Permissions", Source: "qrc:/qml/imtauthgui/RolePermissions.qml"})
+                    leftMenuModel.append({Id: "General", Name: qsTr("General"), Source: "qrc:/qml/imtauthgui/RoleEditor.qml"})
+                    leftMenuModel.append({Id: "Permissions", Name: qsTr("Permissions"), Source: "qrc:/qml/imtauthgui/RolePermissions.qml"})
                 }
-
-//                ListElement{
-//                    Id: "General";
-//                    Name: "General";
-//                    Source: "qrc:/qml/imtauthgui/RoleEditor.qml"
-//                }
-
-//                ListElement{
-//                    Id: "Permissions";
-//                    Name: "Permissions";
-//                    Source: "qrc:/qml/imtauthgui/RolePermissions.qml"
-//                }
             }
 
             Component{
@@ -325,7 +313,6 @@ DocumentBase {
                             mainPanel.selectedIndex = model.index;
                         }
                     }
-
                 }
             }
         }
@@ -368,5 +355,4 @@ DocumentBase {
             }
         }
     }
-
 }

@@ -39,7 +39,7 @@ Item {
     property int defaultSortHeaderIndex: 0;
 
     // only ASC or DESC
-    property string defaultOrderType: "ASC";
+    property alias defaultOrderType: sortCont.currentOrder;
 
     signal selectedItem(string id, string name);
     signal selectedIndexChanged(int index);
@@ -54,7 +54,14 @@ Item {
 
     Component.onCompleted: {
         tableInternal.focus = true;
+
+        Events.subscribeEvent("OnLocalizationChanged", collectionViewBaseContainer.onLocalizationChanged);
     }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", collectionViewBaseContainer.onLocalizationChanged);
+    }
+
 
     onCommandsIdChanged: {
         if (collectionViewBaseContainer.loadData){
@@ -64,8 +71,12 @@ Item {
 
     Loader {
         id: filterMenuLocal;
+
         anchors.top: collectionViewBaseContainer.top;
+        anchors.topMargin: Style.margin;
+
         width: parent.width;
+
         visible: tableInternal ? false : false;//for web, do not remove!!!
 
         onVisibleChanged: {
@@ -86,6 +97,11 @@ Item {
         }
     }
 
+    function onLocalizationChanged(language){
+        console.log("CollectionViewBase onLocalizationChanged", language);
+        baseCommands.updateModels();
+    }
+
     function onFilterClosed(){
         filterMenuLocal.visible = false;
     }
@@ -100,7 +116,9 @@ Item {
         id: backgroundTable;
 
         anchors.top: filterMenuLocal.visible ? filterMenuLocal.bottom: parent.top;
+        anchors.topMargin: filterMenuLocal.visible ? Style.margin : 0;
         anchors.left: parent.left;
+
         width: tableInternal.minWidth * tableInternal.columnCount < parent.width ? tableInternal.minWidth * tableInternal.columnCount : parent.width;
 
         anchors.bottom: paginationObj.top;
@@ -212,7 +230,7 @@ Item {
             anchors.rightMargin: 5;
             anchors.bottom: parent.bottom;
 
-            width: 20;
+            width: 35;
 
             visible: tableInternal.width > 0;
 
@@ -232,8 +250,12 @@ Item {
                     visible: collectionViewBaseContainer.hasFilter;
                     highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
-                    width: collectionViewBaseContainer.hasFilter ? tableRightPanel.width : 0;
+//                    width: collectionViewBaseContainer.hasFilter ? tableRightPanel.width : 0;
+                    width: Style.buttonWidthMedium;
                     height: width;
+
+                    iconWidth: Style.iconSizeSmall;
+                    iconHeight: iconWidth;
 
                     iconSource: "../../../" + "Icons/" + Style.theme + "/Filter_On_Normal.svg";
 
@@ -307,7 +329,12 @@ Item {
         loading: ldng;
 
         onHeadersChanged: {
-            if (baseCommands.headers.GetItemsCount() > 0 && sortCont.isEmpty()){
+            let headersCount = baseCommands.headers.GetItemsCount();
+            if (headersCount > 0 && sortCont.isEmpty()){
+                if (collectionViewBaseContainer.defaultSortHeaderIndex < 0 || headersCount <= collectionViewBaseContainer.defaultSortHeaderIndex){
+                    collectionViewBaseContainer.defaultSortHeaderIndex = 0;
+                }
+
                 let headerId = baseCommands.headers.GetData("Id", collectionViewBaseContainer.defaultSortHeaderIndex);
 
                 sortCont.currentHeaderId = headerId;

@@ -17,11 +17,13 @@ Item {
     Component.onCompleted: {
         Events.subscribeEvent("Logout", root.onLogout);
         Events.subscribeEvent("Login", root.onLogin);
+        Events.subscribeEvent("OnLocalizationChanged", root.onLocalizationChanged);
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("Logout", root.onLogout);
         Events.unSubscribeEvent("Login", root.onLogin);
+        Events.unSubscribeEvent("OnLocalizationChanged", root.onLocalizationChanged);
     }
 
     function onLogout(){
@@ -34,6 +36,10 @@ Item {
         root.username = login;
 
         root.enabled = true;
+    }
+
+    function onLocalizationChanged(language){
+        contextMenuModel.setProperty(0, "Name", qsTr("Logout"));
     }
 
     Text {

@@ -21,11 +21,16 @@ Dialog {
         }
     }
 
+    onLocalizationChanged: {
+        inputDialogContainer.buttonsModel.setProperty(0, "Name", qsTr("OK"));
+        inputDialogContainer.buttonsModel.setProperty(1, "Name", qsTr("Cancel"));
+    }
+
     Component.onCompleted: {
         console.log("InputDialog onCompleted", inputDialogContainer);
 
-        inputDialogContainer.buttons.addButton({"Id":"Ok", "Name":"OK", "Enabled": true, "Active": true});
-        inputDialogContainer.buttons.addButton({"Id":"Cancel", "Name":"Cancel", "Enabled": true, "Active": false});
+        inputDialogContainer.buttons.addButton({"Id":"Ok", "Name":qsTr("OK"), "Enabled": true, "Active": true});
+        inputDialogContainer.buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true, "Active": false});
     }
 
     contentComp: Component { InputDialogBody {

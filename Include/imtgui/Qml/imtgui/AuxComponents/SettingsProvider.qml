@@ -30,8 +30,8 @@ QtObject {
     }
 
     onModelsCompletedChanged: {
+        console.log("onModelsCompletedChanged", modelsCompleted);
         if(container.modelsCompleted){
-            container.rewriteModel(container.serverModel, container.localModel);
             container.saveLocalModel();
         }
     }
@@ -48,6 +48,7 @@ QtObject {
 
     function saveLocalModel(){
         console.log("SettingsProvider saveLocalModel", container.localModel.toJSON());
+        container.rewriteModel(container.serverModel, container.localModel);
 
         container.localSettingsSaved();
     }
@@ -56,20 +57,20 @@ QtObject {
         console.log("SettingsProvider saveServerModel", container.serverModel.toJSON());
 
         preferenceSaveQuery.save();
+
+        saveLocalModel();
     }
 
-    /**
-        The server model rewrite pages from the local model.
-    */
     function rewriteModel(fromModel, toModel){
         for (let i = 0; i < toModel.GetItemsCount(); i++){
             let pageId = toModel.GetData("Id", i);
-
             let index = -1;
             for (let j = 0; j < fromModel.GetItemsCount(); j++){
                 let id = fromModel.GetData("Id", j);
                 if (id == pageId){
+                    console.log("id === pageId", id);
                     index = j;
+
                     break;
                 }
             }

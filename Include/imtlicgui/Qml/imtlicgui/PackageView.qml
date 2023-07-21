@@ -26,19 +26,19 @@ DocumentBase {
         Component.onCompleted: {
             let index = packageViewRoot.headersModel.InsertNewItem();
             packageViewRoot.headersModel.SetData("Id", "Name", index);
-            packageViewRoot.headersModel.SetData("Name", "Feature Name", index);
+            packageViewRoot.headersModel.SetData("Name", qsTr("Feature Name"), index);
 
             index = packageViewRoot.headersModel.InsertNewItem();
             packageViewRoot.headersModel.SetData("Id", "Id", index);
-            packageViewRoot.headersModel.SetData("Name", "Feature-ID", index);
+            packageViewRoot.headersModel.SetData("Name", qsTr("Feature-ID"), index);
 
             index = packageViewRoot.headersModel.InsertNewItem();
             packageViewRoot.headersModel.SetData("Id", "Description", index);
-            packageViewRoot.headersModel.SetData("Name", "Description", index);
+            packageViewRoot.headersModel.SetData("Name", qsTr("Description"), index);
 
             index = packageViewRoot.headersModel.InsertNewItem();
             packageViewRoot.headersModel.SetData("Id", "Optional", index);
-            packageViewRoot.headersModel.SetData("Name", "Optional", index);
+            packageViewRoot.headersModel.SetData("Name", qsTr("Optional"), index);
         }
     }
 
@@ -53,6 +53,27 @@ DocumentBase {
         if (featuresProvider){
             featuresProvider.onModelChanged.disconnect(packageViewRoot.updateTreeViewModel);
         }
+    }
+
+    onLocalizationChanged: {
+        console.log("Package view onLocalizationChanged", language);
+        for (let i = 0; i < packageViewRoot.headersModel.GetItemsCount(); i++){
+            let headerId = packageViewRoot.headersModel.GetData("Id", i);
+            if (headerId === "Name"){
+                packageViewRoot.headersModel.SetData("Name", qsTr("Feature Name"), i);
+            }
+            else if (headerId === "Id"){
+                packageViewRoot.headersModel.SetData("Name", qsTr("Feature-ID"), i);
+            }
+            else if (headerId === "Description"){
+                packageViewRoot.headersModel.SetData("Name", qsTr("Description"), i);
+            }
+            else if (headerId === "Optional"){
+                packageViewRoot.headersModel.SetData("Name", qsTr("Optional"), i);
+            }
+        }
+
+        packageViewRoot.headersModel.Refresh();
     }
 
     onCommandsIdChanged: {

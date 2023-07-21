@@ -18,7 +18,6 @@ Item {
         Events.unSubscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
     }
 
-
     function updateModel(){
         pagesProvider.updateModel();
     }
@@ -42,7 +41,21 @@ Item {
 
         onPagesModelChanged: {
             console.log("pagesProvider onPagesModelChanged", pagesProvider.pagesModel.toJSON());
-            pagesData.model = pagesProvider.pagesModel;
+            let updateRepeaterModel = true;
+
+            if (pagesData.model){
+                let countPages = pagesData.model.GetItemsCount();
+                if (pagesProvider.pagesModel.GetItemsCount() === countPages){
+                    updateRepeaterModel = false;
+                }
+            }
+
+            console.log("updateRepeaterModel", updateRepeaterModel);
+
+            if (updateRepeaterModel){
+                pagesData.model = pagesProvider.pagesModel;
+            }
+
             container.pageModel = pagesProvider.pagesModel;
         }
     }

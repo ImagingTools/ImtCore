@@ -18,7 +18,11 @@ Dialog {
     }
 
     Component.onCompleted: {
-        messageDialog.buttons.addButton({"Id":"Ok", "Name":"OK", "Enabled": true});
+        messageDialog.buttons.addButton({"Id":"Ok", "Name":qsTr("OK"), "Enabled": true});
+    }
+
+    onLocalizationChanged: {
+         messageDialog.buttonsModel.setProperty(0, "Name", qsTr("OK"));
     }
 
     contentComp: Component { MessageDialogBody {

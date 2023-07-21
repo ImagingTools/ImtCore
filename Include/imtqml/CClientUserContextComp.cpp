@@ -1,13 +1,11 @@
 #include <imtqml/CClientUserContextComp.h>
 
 
-// Qt includes
-#include <QtQml/QQmlEngine>
-
-
 namespace imtqml
 {
 
+
+// public methods
 
 CClientUserContextComp::CClientUserContextComp()
 {

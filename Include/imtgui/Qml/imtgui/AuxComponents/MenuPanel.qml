@@ -38,9 +38,21 @@ Rectangle {
     }
 
     onModelChanged: {
-        clearModels();
+        let pageIndex = menuPanel.activePageIndex;
 
+        lvPages.model = 0;
         lvPages.model = menuPanel.model;
+//        if (!lvPages.model){
+//            lvPages.model = menuPanel.model;
+//        }
+//        else{
+//            let count = lvPages.count;
+//            if (menuPanel.model.GetItemsCount() !== count){
+//                clearModels();
+
+//                lvPages.model = menuPanel.model;
+//            }
+//        }
     }
 
     ListView {
@@ -67,7 +79,7 @@ Rectangle {
 
         delegate: MenuPanelButton {
             Component.onCompleted: {
-                if (model.index == 0){
+                if (model.index === 0 && menuPanel.activePageIndex === -1){
                     clicked();
                 }
             }

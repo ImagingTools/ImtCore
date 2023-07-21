@@ -4,7 +4,7 @@ import Acf 1.0
 Rectangle {
     id: filterContainer;
 
-    height: 40;
+    height: 30;
 
     color: Style.baseColor;
 
@@ -42,7 +42,7 @@ Rectangle {
         id: prefixLoader;
 
         anchors.right: loaderDecoratorObj.left;
-        anchors.rightMargin: 5;
+        anchors.rightMargin: Style.margin;
         anchors.verticalCenter: parent.verticalCenter;
     }
 
@@ -50,8 +50,10 @@ Rectangle {
         id: loaderDecoratorObj;
 
         anchors.right: parent.right;
-        anchors.rightMargin: 5;
+        anchors.rightMargin: Style.margin;
         anchors.verticalCenter: parent.verticalCenter;
+
+        height: filterContainer.height;
 
 //        anchors.fill: parent;
 

@@ -12,11 +12,20 @@ Item {
     Component.onCompleted: {
         Events.subscribeEvent("Logout", commandsDecoratorContainer.clearModel);
         Events.subscribeEvent("SetCommandsVisible", commandsDecoratorContainer.setVisible);
+
+//        Events.subscribeEvent("OnLocalizationChanged", commandsDecoratorContainer.onLocalizationChanged);
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("Logout", commandsDecoratorContainer.clearModel);
         Events.unSubscribeEvent("SetCommandsVisible", commandsDecoratorContainer.setVisible);
+
+//        Events.unSubscribeEvent("OnLocalizationChanged", commandsDecoratorContainer.onLocalizationChanged);
+    }
+
+    function onLocalizationChanged(language){
+        console.log("CommandsDecorator onLocalizationChanged", language);
+//        Events.sendEvent(commandsDecoratorContainer.commandsId + "_CommandsUpdateModel")
     }
 
     function setCommandsModel(parameters){

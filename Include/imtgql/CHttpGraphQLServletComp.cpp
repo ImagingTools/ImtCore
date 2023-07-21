@@ -3,8 +3,13 @@
 
 // ACF includes
 #include <iser/CJsonMemWriteArchive.h>
+#include <iprm/TParamsPtr.h>
+#include <iprm/ISelectionParam.h>
+#include <iprm/IOptionsList.h>
 
 // ImtCore includes
+#include <imtbase/IObjectCollection.h>
+#include <imtauth/IUserSettings.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlContext.h>
 #include <imtrest/IProtocolEngine.h>
@@ -34,12 +39,61 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 	QByteArray gqlCommand = gqlRequest.GetCommandId();
 
+	QByteArray userId;
+
+	imtgql::IGqlContext* gqlContextPtr = nullptr;
 	QByteArray accessToken = headers.value("X-authentication-token");
 	if (!accessToken.isEmpty() && m_gqlContextControllerCompPtr.IsValid()){
-		imtgql::IGqlContext* gqlContextPtr = m_gqlContextControllerCompPtr->GetRequestContext(gqlRequest, accessToken);
+		gqlContextPtr = m_gqlContextControllerCompPtr->GetRequestContext(gqlRequest, accessToken);
+
 		if (gqlContextPtr != nullptr){
 			gqlRequest.SetGqlContext(gqlContextPtr);
+
+			if (gqlContextPtr->GetUserInfo() != nullptr){
+				userId = gqlContextPtr->GetUserInfo()->GetId();
+			}
 		}
+	}
+
+	QByteArray languageId;
+	QByteArray designSchemeId;
+
+	if (m_userSettingsCollectionCompPtr.IsValid()){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_userSettingsCollectionCompPtr->GetObjectData(userId, dataPtr)){
+			imtauth::IUserSettings* userSettingsPtr = dynamic_cast<imtauth::IUserSettings*>(dataPtr.GetPtr());
+			if (userSettingsPtr != nullptr){
+				iprm::IParamsSet* paramsSetPtr = userSettingsPtr->GetSettings();
+				if (paramsSetPtr != nullptr){
+					iprm::TParamsPtr<iprm::ISelectionParam> languageParamPtr(paramsSetPtr, "Language");
+					if (languageParamPtr.IsValid()){
+						const iprm::IOptionsList* optionListPtr = languageParamPtr->GetSelectionConstraints();
+						if (optionListPtr != nullptr){
+							int index = languageParamPtr->GetSelectedOptionIndex();
+							if (index >= 0){
+								languageId = optionListPtr->GetOptionId(index);
+							}
+						}
+					}
+
+					iprm::TParamsPtr<iprm::ISelectionParam> designParamPtr(paramsSetPtr, "DesignSchema");
+					if (designParamPtr.IsValid()){
+						const iprm::IOptionsList* optionListPtr = designParamPtr->GetSelectionConstraints();
+						if (optionListPtr != nullptr){
+							int index = designParamPtr->GetSelectedOptionIndex();
+							if (index >= 0){
+								designSchemeId = optionListPtr->GetOptionId(index);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (gqlContextPtr != nullptr){
+		gqlContextPtr->SetLanguageId(languageId);
+		gqlContextPtr->SetDesignScheme(designSchemeId);
 	}
 
 	QByteArray responseData;

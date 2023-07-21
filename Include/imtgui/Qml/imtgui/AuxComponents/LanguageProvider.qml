@@ -35,10 +35,14 @@ QtObject {
                         if (elementId == "Language"){
                             let elementValue = elements.GetData("Value", j);
                             let parameters = elements.GetData("Parameters", j);
+                            if (parameters){
+                                let scheme = parameters.GetData("Id", elementValue);
 
-                            let scheme = parameters.GetData("Id", elementValue);
-
-                            return scheme;
+                                return scheme;
+                            }
+                            else{
+                                return null;
+                            }
                         }
                     }
                 }

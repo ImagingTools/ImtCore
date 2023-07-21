@@ -2,12 +2,13 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 
-
 Item {
     id: buttonsDialogContainer;
 
     height: 30;
     width: rowButtons.width;
+
+    property alias buttons: buttonsModel;
 
     signal buttonClicked(string buttonId);
 
