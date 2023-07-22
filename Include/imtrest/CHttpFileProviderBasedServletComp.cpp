@@ -109,7 +109,7 @@ IRequestServlet::ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
 	if (commandParams.contains(m_fileIdCommandParamAttrPtr->GetValue().toUtf8())){
 		commandIdFileName = commandParams[m_fileIdCommandParamAttrPtr->GetValue().toUtf8()];
 	}
-	else {
+	else{
 		QByteArray commandId = request.GetCommandId();
 		QByteArray commandIdBase = *m_commandIdAttrPtr;
 

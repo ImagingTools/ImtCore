@@ -71,7 +71,7 @@ void CHttpClientComp::OnComponentDestroyed()
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CHttpClientComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+void CHttpClientComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	/// The collection type name
 	using L_CT = imtbase::IObjectCollection;
