@@ -6,6 +6,13 @@
 #include <imtrest/ISender.h>
 #include <imtrest/IResponse.h>
 #include <imtrest/IProtocolEngine.h>
+#include <imtrest/CHttpResponse.h>
+#include <imtrest/CHttpRequest.h>
+
+// Qt i ncludes
+#include <QtCore/QDataStream>
+
+#include "zlib.h"
 
 
 namespace imtrest
@@ -15,6 +22,7 @@ namespace imtrest
 // public methods
 
 // reimplemented (IRequestHandler)
+
 
 IRequestServlet::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request) const
 {
@@ -31,7 +39,64 @@ IRequestServlet::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRe
 
 	const IRequestServlet* handlerPtr = FindRequestHandler(commandId);
 	if (handlerPtr != nullptr){
-		return handlerPtr->ProcessRequest(request);
+		ConstResponsePtr responsePtr = handlerPtr->ProcessRequest(request);
+		const CHttpResponse* httpResponseConstPtr = dynamic_cast<const CHttpResponse*>(responsePtr.GetPtr());
+		CHttpResponse* httpResponsePtr = dynamic_cast<CHttpResponse*>(const_cast<CHttpResponse*>(httpResponseConstPtr));
+
+		if (m_autoCompressionAttrPtr->GetValue() == true && httpResponsePtr != nullptr){
+			EncodingType encodingType = ET_NONE;
+			const CHttpRequest* httprequestPtr = dynamic_cast<const CHttpRequest*>(&request);
+			if (httprequestPtr != nullptr){
+				QByteArrayList headers = httprequestPtr->GetHeaders();
+				qDebug() << "headers" << headers;
+				QByteArray encodingHeader = httprequestPtr->GetHeaderValue("Accept-Encoding");
+				if (encodingHeader.contains("deflate")){
+					encodingType = ET_DEFLATE;
+				}
+				else{
+					if (encodingHeader.contains("gzip")){
+						encodingType = ET_GZIP;
+					}
+				}
+
+			}
+			if (encodingType == ET_DEFLATE){
+				QByteArray data = responsePtr->GetData();
+				QByteArray qData = qCompress(data, 8);
+				qData.remove(0, 4);
+				httpResponsePtr->SetData(qData);
+				IResponse::Headers headers = responsePtr->GetHeaders();
+				headers.insert("Content-Encoding", "deflate");
+				httpResponsePtr->SetHeaders(headers);
+			}
+			if (encodingType == ET_GZIP){
+				QByteArray data = responsePtr->GetData();
+				QByteArray qData = qCompress(data, 8);
+				qData.remove(0, 6);
+				qData.remove(qData.count() - 4, 4);
+				int crc = (int)crc32(0, (unsigned char *)qData.data(), qData.count());
+				const char gzipheader[] = {
+						 0x1f, 0x8b      // gzip magic number
+						 , 8             // compress method "defalte"
+						 , 1             // text data
+						 , 0, 0, 0, 0    // timestamp is not set
+						 , 2             // maximum compression flag
+						 , 255           // unknown OS
+					 };
+				QByteArray outData;
+				QDataStream datastream(&outData, QIODevice::WriteOnly);
+				datastream.device()->write(gzipheader,10);
+				datastream.device()->write(qData);
+				datastream << crc;
+				datastream << qData.count();
+				httpResponsePtr->SetData(outData);
+				IResponse::Headers headers = responsePtr->GetHeaders();
+				headers.insert("Content-Encoding", "gzip");
+				httpResponsePtr->SetHeaders(headers);
+			}
+
+		}
+		return responsePtr;
 	}
 	else if (commandId.isEmpty()){
 		QByteArray body = QByteArray("<html><head><title>Error</title></head><body><p>Empty command-ID</p></body></html>");

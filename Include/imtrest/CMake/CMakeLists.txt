@@ -3,6 +3,7 @@ project(imtrest)
 include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 #include(${ACFDIR}/Config/CMake/AcfStd.cmake)
+include(${IMTCOREDIR}/Config/CMake/Quazip.cmake)
 
 target_link_libraries(${PROJECT_NAME} imod iser imtbase)
 

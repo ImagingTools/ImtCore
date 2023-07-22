@@ -26,6 +26,17 @@ CHttpResponse::CHttpResponse(
 }
 
 
+void CHttpResponse::SetData(const QByteArray &data)
+{
+	m_data = data;
+}
+
+void CHttpResponse::SetHeaders(const Headers &headers)
+{
+	m_headers = headers;
+}
+
+
 // reimplemented (IResponse)
 
 int CHttpResponse::GetStatusCode() const

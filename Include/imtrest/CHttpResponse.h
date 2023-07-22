@@ -23,6 +23,9 @@ public:
 			QObject& socketObject,
 			const IProtocolEngine& engine);
 
+	void SetData(const QByteArray& data);
+	void SetHeaders(const Headers& headers);
+
 	// reimplemented (IResponse)
 	virtual int GetStatusCode() const override;
 	virtual const QByteArray& GetData() const override;
