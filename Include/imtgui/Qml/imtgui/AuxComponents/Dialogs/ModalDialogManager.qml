@@ -82,16 +82,32 @@ Item {
 
                 property real  mainWindowWidth: container.width;
                 property real  mainWindowHeight: container.height;
+
+                property real  mainWindowWidth_prev: 0;
+                property real  mainWindowHeight_prev: 0;
+
                 onMainWindowWidthChanged: {
                     if(dialogLoader.item && dialogLoader.item.centered){
                         dialogLoader.x = container.width/2 - dialogLoader.width/2;
                         dialogLoader.y = container.height/2 - dialogLoader.height/2;
                     }
+                    else if(dialogLoader.item && !dialogLoader.item.centered){
+                        var deltaWidth = mainWindowWidth - mainWindowWidth_prev;
+                        mainWindowWidth_prev = mainWindowWidth;
+                        dialogLoader.x += deltaWidth/2;
+                    }
+
+
                 }
                 onMainWindowHeightChanged: {
                     if(dialogLoader.item && dialogLoader.item.centered){
                         dialogLoader.x = container.width/2 - dialogLoader.width/2;
                         dialogLoader.y = container.height/2 - dialogLoader.height/2;
+                    }
+                    else if(dialogLoader.item && !dialogLoader.item.centered){
+                        var deltaHeight = mainWindowHeight - mainWindowHeight_prev;
+                        mainWindowHeight_prev = mainWindowHeight;
+                        dialogLoader.y += deltaHeight/2;
                     }
                 }
 
@@ -119,6 +135,9 @@ Item {
                     if (dialogLoader.item.forceFocus === undefined || dialogLoader.item.forceFocus){
                         dialogLoader.item.forceActiveFocus();
                     }
+
+                    dialogLoader.mainWindowWidth_prev = container.width;
+                    dialogLoader.mainWindowHeight_prev = container.height;
                 }
             }
         }
