@@ -61,7 +61,7 @@ public:
 			const QByteArray& objectId) const override;
     virtual bool CreateTextFilterQuery(
                 const imtbase::ICollectionFilter& collectionFilter,
-                QString& textFilterQuery) const;
+                QString& textFilterQuery) const override;
 
 private:
 	I_FACT(imtgeo::IAddressElementInfo, m_adrElementInfoFactCompPtr);
