@@ -146,6 +146,8 @@
         <file alias="imtgui/AuxComponents/PaintedCorner.qml">Qml/imtgui/AuxComponents/PaintedCorner.qml</file>
         <file alias="imtgui/AuxComponents/SearchComp.qml">Qml/imtgui/AuxComponents/SearchComp.qml</file>
         <file alias="imtgui/AuxComponents/GqlModelObserver.qml">Qml/imtgui/AuxComponents/GqlModelObserver.qml</file>
+        <file alias="imtgui/AuxComponents/MovingItem.qml">Qml/imtgui/AuxComponents/MovingItem.qml</file>
+        <file alias="imtgui/AuxComponents/ChangeItemSize.qml">Qml/imtgui/AuxComponents/ChangeItemSize.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

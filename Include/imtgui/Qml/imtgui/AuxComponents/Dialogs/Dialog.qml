@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
+import imtgui 1.0
 
 Rectangle {
     id: dialogContainer;
@@ -35,6 +36,8 @@ Rectangle {
     property alias contentComp: loaderBodyDialog.sourceComponent;
     property alias topPanelComp: loaderTopPanel.sourceComponent;
     property alias contentItem: loaderBodyDialog.item;
+
+    property bool canMove: false;
 
     property Component topPanelDefault: Component{
         TopPanelDialog {}
@@ -105,22 +108,35 @@ Rectangle {
 
 
 
-        Loader {
-            id: loaderTopPanel;
+        Item{
+            id: topPanelContainer;
 
-            //            sourceComponent: contentComp;
-            source: "../../../../qml/imtgui/AuxComponents/Dialogs/TopPanelDialog.qml";
-            onLoaded:  {
-                loaderTopPanel.item.width = dialogContainer.width;
-                loaderTopPanel.item.title = dialogContainer.title;
-                loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
+            width: loaderTopPanel.width;
+            height: loaderTopPanel.height;
+
+            MovingItem{
+                visible: dialogContainer.canMove;
+                containerItem: topPanelContainer;
+                globalParent: dialogContainer.root;
+                movingItem: dialogContainer;
             }
-            onItemChanged: {
-                //loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
-                loaderTopPanel.item.title = dialogContainer.title;
+
+            Loader {
+                id: loaderTopPanel;
+
+                //            sourceComponent: contentComp;
+                source: "../../../../qml/imtgui/AuxComponents/Dialogs/TopPanelDialog.qml";
+                onLoaded:  {
+                    loaderTopPanel.item.width = dialogContainer.width;
+                    loaderTopPanel.item.title = dialogContainer.title;
+                    loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
+                }
+                onItemChanged: {
+                    //loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
+                    loaderTopPanel.item.title = dialogContainer.title;
+                }
             }
         }
-
 
 
         Loader {

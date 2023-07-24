@@ -126,6 +126,8 @@ Rectangle {
 
     property var columnContentComps: [];
 
+    property bool compl: false;
+
     signal checkedItemsChanged();
     signal selectionChanged(var selection);
 
@@ -145,6 +147,7 @@ Rectangle {
         tableContainer.setWidth();
 
         tableContainer.tableSelection.table = elementsListObj;
+        tableContainer.compl = true;
     }
 
     onFocusChanged: {

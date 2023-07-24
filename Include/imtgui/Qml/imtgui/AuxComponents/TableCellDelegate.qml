@@ -15,7 +15,7 @@ Item {
 	/// \workaround to calc cells count
     property var pDataList: [];
 
-    property int columnCount: pTableDelegateContainer.tableItem ? pTableDelegateContainer.tableItem.columnCount : 0;
+    property int columnCount: pTableDelegateContainer && pTableDelegateContainer.tableItem ? pTableDelegateContainer.tableItem.columnCount : 0;
 
     property bool compl: false;
     property bool complCompl: columnCount && delegateContainer.compl;
