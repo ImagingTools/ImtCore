@@ -7,3 +7,5 @@ find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Sql REQUIRED)
 target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Sql)
 target_link_libraries(${PROJECT_NAME} imtbase imtgql)
 
+acf_use_qt_graphics_modules()
+
