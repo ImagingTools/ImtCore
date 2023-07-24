@@ -1,15 +1,15 @@
 // import {QtObject} from './QtObject'
 import {Item} from './Item'
 
-export class DropShadow extends Item {
+export class InnerShadow extends Item {
     constructor(args) {
         super(args)
 
         this.$cP('color', 'black').connect(this.$updateShadow.bind(this))
         this.$cP('horizontalOffset', 0).connect(this.$updateShadow.bind(this))
         this.$cP('verticalOffset', 0).connect(this.$updateShadow.bind(this))
-        this.$cP('radius', 4).connect(this.$updateShadow.bind(this))
-        this.$cP('samples', 9).connect(this.$updateShadow.bind(this))
+        this.$cP('radius', 0).connect(this.$updateShadow.bind(this))
+        this.$cP('samples', 0).connect(this.$updateShadow.bind(this))
         this.$cP('source', undefined).connect(this.$updateShadow.bind(this))
         this.$cP('spread', 0).connect(this.$updateShadow.bind(this))
         
@@ -22,10 +22,10 @@ export class DropShadow extends Item {
     $updateShadow(){
         if(this.$p.source.val) {
             let rgba = Qt.$colorToRGBA(this.color)
-            this.source.dom.style.boxShadow = `${this.$p.horizontalOffset.val}px ${this.$p.verticalOffset.val}px ${this.$p.radius.val}px ${this.$p.spread.val}px rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity})`
+            this.source.dom.style.boxShadow = `${this.$p.horizontalOffset.val}px ${this.$p.verticalOffset.val}px ${this.$p.radius.val}px ${this.$p.spread.val}px rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity}) inset`
         }
     }
 
 }
 
-QML.DropShadow = DropShadow
+QML.InnerShadow = InnerShadow

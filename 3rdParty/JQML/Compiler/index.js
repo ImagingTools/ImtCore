@@ -53,6 +53,7 @@ const QML = [
     'MapQuickItem',
     'MapItemView',
     'Binding',
+    'InnerShadow',
 ]
 
 let source = process.argv[2]
