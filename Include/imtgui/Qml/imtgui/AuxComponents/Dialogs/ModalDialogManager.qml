@@ -80,6 +80,21 @@ Item {
 
                 sourceComponent: model.Component;
 
+                property real  mainWindowWidth: container.width;
+                property real  mainWindowHeight: container.height;
+                onMainWindowWidthChanged: {
+                    if(dialogLoader.item && dialogLoader.item.centered){
+                        dialogLoader.x = container.width/2 - dialogLoader.width/2;
+                        dialogLoader.y = container.height/2 - dialogLoader.height/2;
+                    }
+                }
+                onMainWindowHeightChanged: {
+                    if(dialogLoader.item && dialogLoader.item.centered){
+                        dialogLoader.x = container.width/2 - dialogLoader.width/2;
+                        dialogLoader.y = container.height/2 - dialogLoader.height/2;
+                    }
+                }
+
                 onLoaded: {
                     container.topItem = dialogLoader.item;
 
