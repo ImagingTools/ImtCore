@@ -163,6 +163,13 @@ Rectangle {
 
     MouseArea {
         anchors.fill: parent;
+
+        acceptedButtons: Qt.AllButtons
+        hoverEnabled: true;
+
+        onWheel: {
+            wheel.accepted = true;
+        }
     }
 
     function onLocalizationChanged(language){
