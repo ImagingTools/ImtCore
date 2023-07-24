@@ -52,6 +52,7 @@ const QML = [
     'MapPolyline',
     'MapQuickItem',
     'MapItemView',
+    'Binding',
 ]
 
 let source = process.argv[2]
@@ -72,8 +73,8 @@ function getFiles (dir, _files){
 }
 
 // if(!source) source = `C:\\Users\\Артур\\Documents\\projects\\2023\\TEST\\web\\web\\src`
-// if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\NeoPro\\Bin\\web\\src`
-if(!source) source = `C:\\projects\\sibnavacf\\RTS\\Bin\\web\\src`
+if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\NeoPro\\Bin\\web\\src`
+// if(!source) source = `C:\\projects\\sibnavacf\\RTS\\Bin\\web\\src`
 // if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src`
 if(!destination) destination = source
 
@@ -671,6 +672,7 @@ for(let file of files){
     let instructions = getBaseStructure()
     
     data = data.replaceAll(/((?<![:\/])\/\/(.*?)\n)|(\/\*(.*?)\*\/)/gms, '\n')
+    data = data.replaceAll('Qt.binding(', 'Qt.binding(this,')
     
     parser.parse.nowParsingFile = file.replaceAll(/\\+/g, '/')
     let meta = parser.parse(data)
@@ -882,7 +884,7 @@ function compile(instructions, code, curr = '$root', prev = ''){
     }
     for(let prop in instructions.propertiesSpecial){
         let codeNew = []
-        codeNew.push(`function($args){`)
+        codeNew.push(`function($args){caller=null;`)
         // codeNew.push(`let $LVL = Core.LVL++`)
         compile(instructions.propertiesSpecial[prop], codeNew)
         // codeNew.push(`$root.$tryComplete()`)

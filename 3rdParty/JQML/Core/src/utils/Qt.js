@@ -130,5 +130,11 @@ export var Qt = {
         }
         
 
+    },
+
+    binding(target, func){
+        let binded = func.bind(target)
+        binded.type = 'Binding'
+        return binded
     }
 }

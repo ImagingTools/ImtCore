@@ -12,7 +12,7 @@ export class Rectangle extends Item {
         this.$cP('gradient', undefined).connect(this.$gradientChanged.bind(this))
         this.$cPC('border', {
             width: 0,
-            color: 'white',
+            color: 'black',
         }).connect(this.$borderChanged.bind(this))
     }
 

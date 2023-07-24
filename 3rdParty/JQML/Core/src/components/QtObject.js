@@ -226,6 +226,7 @@ export class QtObject {
         let errors = []
         let errorsSignal = []
         let queueSignals = []
+        let bindings = []
         
         while(this.$uL.properties.length){
             let propName = this.$uL.properties.shift()
@@ -299,6 +300,7 @@ export class QtObject {
         }
         
         for(let i = this.children.length-1; i >= 0; i--){
+            if(this.children[i].$qmlClassName === 'Binding') bindings.push(this.children[i])
             this.children[i].$uP(step + 1)
         }
         
@@ -341,6 +343,15 @@ export class QtObject {
         //     }
             
         // }
+
+        while(bindings.length){
+            let binding = bindings.shift()
+            if(!binding.$updated){
+                binding.$updated = true
+                binding.$update()
+            }
+            
+        }
 
         if(step === 0){
             this.$tryComplete()
@@ -478,6 +489,21 @@ export class QtObject {
                 while(this.$uL.aliases.indexOf(name) >= 0){
                     this.$uL.aliases.splice(this.$uL.aliases.indexOf(name), 1)
                 }
+
+                let isBinding = false
+                if(typeof newVal === 'function' && newVal.type === 'Binding'){
+                    for(let s of this.$p[name].depends){
+                        delete s[this.$p[name].PID]
+                    }
+                    this.$p[name].depends.clear()
+                    
+                    caller = this.$p[name]
+                    this.$p[name].func = newVal
+                    newVal = this.$p[name].func()
+                    caller = null
+                    isBinding = true
+                }
+
                 if(this.$p[name].val !== newVal){
                     if(this.jqmlDebug){
                         console.info(`JQML::set property ${name}. old = `, this.$p[name].val, `new = `, newVal)
@@ -486,10 +512,13 @@ export class QtObject {
                         signal()
                         signal()
                     } else {
-                        for(let s of this.$p[name].depends){
-                            delete s[this.$p[name].PID]
+                        if(!isBinding){
+                            for(let s of this.$p[name].depends){
+                                delete s[this.$p[name].PID]
+                            }
+                            this.$p[name].depends.clear()
                         }
-                        this.$p[name].depends.clear()
+                      
                         if(name === 'visible' && this.parent){
                             this.$sP('visible', ()=>{return this.parent.visible && newVal})
                             let val = this.$p[name].func()
@@ -573,14 +602,31 @@ export class QtObject {
                     while(this.$uL.aliases.indexOf(`${name}.${name2}`) >= 0){
                         this.$uL.aliases.splice(this.$uL.aliases.indexOf(`${name}.${name2}`), 1)
                     }
-                    if(this.$p[`${name}.${name2}`].val !== newVal){
-                        if(this.jqmlDebug){
-                            console.info(`JQML::set property ${name}.${name2}. old = `, this.$p[`${name}.${name2}`].val, `new = `, newVal)
-                        }
+
+                    let isBinding = false
+                    if(typeof newVal === 'function' && newVal.type === 'Binding'){
                         for(let s of this.$p[`${name}.${name2}`].depends){
                             delete s[this.$p[`${name}.${name2}`].PID]
                         }
                         this.$p[`${name}.${name2}`].depends.clear()
+
+                        caller = this.$p[`${name}.${name2}`]
+                        this.$p[`${name}.${name2}`].func = newVal
+                        newVal = this.$p[`${name}.${name2}`].func()
+                        caller = null
+                        isBinding = true
+                    }
+
+                    if(this.$p[`${name}.${name2}`].val !== newVal){
+                        if(this.jqmlDebug){
+                            console.info(`JQML::set property ${name}.${name2}. old = `, this.$p[`${name}.${name2}`].val, `new = `, newVal)
+                        }
+                        if(!isBinding){
+                            for(let s of this.$p[`${name}.${name2}`].depends){
+                                delete s[this.$p[`${name}.${name2}`].PID]
+                            }
+                            this.$p[`${name}.${name2}`].depends.clear()
+                        }
                         this.$p[`${name}.${name2}`].val = newVal
                         signal()
                     }
@@ -796,12 +842,30 @@ export class QtObject {
                     this.$uL.aliases.splice(this.$uL.aliases.indexOf(name), 1)
                 }
 
-                if(this.$p[name].val !== newVal){
+                let isBinding = false
+                if(typeof newVal === 'function' && newVal.type === 'Binding'){
                     for(let s of this.$p[name].depends){
                         delete s[this.$p[name].PID]
                     }
                     this.$p[name].depends.clear()
-                    this.$p[name].func = null
+
+                    caller = this.$p[name]
+                    this.$p[name].func = newVal
+                    newVal = this.$p[name].func()
+                    caller = null
+                    isBinding = true
+                }
+
+                if(this.$p[name].val !== newVal){
+                    if(!isBinding){
+                        for(let s of this.$p[name].depends){
+                            delete s[this.$p[name].PID]
+                        }
+                        this.$p[name].depends.clear()
+                        this.$p[name].func = null
+                    }
+                    
+
                     this.$p[name].val = newVal
                     setter(newVal)
                     signal()

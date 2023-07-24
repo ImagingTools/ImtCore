@@ -50,6 +50,7 @@ require('./components/MapPolygon')
 require('./components/MapPolyline')
 require('./components/MapQuickItem')
 require('./components/MapItemView')
+require('./components/Binding')
 
 QML.Qt = Qt
 for(let key in Qt){
