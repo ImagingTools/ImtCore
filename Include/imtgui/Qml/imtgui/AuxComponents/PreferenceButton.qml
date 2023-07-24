@@ -10,8 +10,8 @@ Item {
         id: preferenceButton;
         anchors.verticalCenter: parent.verticalCenter;
 
-        width: 24;
-        height: 24;
+        width: Style.buttonWidthMedium;
+        height: width;
 
         iconSource: "../../../Icons/" + Style.theme + "/Settings_On_Normal.svg";
 

@@ -31,6 +31,8 @@ Rectangle {
     property TreeItemModel widthDecorator : TreeItemModel{};
     property TreeItemModel widthDecoratorDynamic : TreeItemModel{};
 
+    property alias mouseArea: ma;
+
     property bool emptyDecorCell: true;
 
     property bool readOnly: false;

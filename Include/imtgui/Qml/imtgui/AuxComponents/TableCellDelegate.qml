@@ -7,6 +7,8 @@ Item {
 
     property Item pTableDelegateContainer: null;
 
+    property Item mainMouseArea: pTableDelegateContainer != null ? pTableDelegateContainer.mouseArea : null;
+
     height: pTableDelegateContainer ? pTableDelegateContainer.height : 0;
     width: pTableDelegateContainer ? pTableDelegateContainer.width/pTableDelegateContainer.count : 0;
 
@@ -222,6 +224,16 @@ Item {
         }
     }
 
+    function getValue(){
+        if (delegateContainer.pTableDelegateContainer){
+            if (delegateContainer.columnIndex >= 0){
+                return delegateContainer.pTableDelegateContainer.dataModel[delegateContainer.pTableDelegateContainer.headers.GetData("Id", delegateContainer.columnIndex)];
+            }
+        }
+
+        return "";
+    }
+
     property Component defaultContentComp: defaultContent;
 
     Component {
@@ -263,8 +275,10 @@ Item {
             onLinkActivated: {
                 Qt.openUrlExternally(link);
             }
-            text: delegateContainer.pTableDelegateContainer ? delegateContainer.columnIndex >= 0 ? delegateContainer.pTableDelegateContainer.dataModel[delegateContainer.pTableDelegateContainer.headers.GetData("Id", delegateContainer.columnIndex)] : "" : "";
+//            text: delegateContainer.pTableDelegateContainer ? delegateContainer.columnIndex >= 0 ? delegateContainer.pTableDelegateContainer.dataModel[delegateContainer.pTableDelegateContainer.headers.GetData("Id", delegateContainer.columnIndex)] : "" : "";
 //            text: delegateContainer.pTableDelegateContainer.headers.GetData("Id", 1)
+
+            text: delegateContainer.getValue();
             onTextChanged: {
                 // Multiline fit in one line
                 if(wrapMode == Text.NoWrap){

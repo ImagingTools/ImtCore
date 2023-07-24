@@ -62,14 +62,17 @@ Item {
         anchors.right: parent.right;
         anchors.verticalCenter: root.verticalCenter;
 
-        width: 24;
-        height: 24;
+        width: Style.buttonWidthMedium;
+        height: width;
 
         highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
         iconSource: "../../../Icons/" + Style.theme + "/Account.svg";
 
         enabled: root.enabled;
+
+//        iconWidth: Style.iconSizeSmall;
+//        iconHeight: iconWidth;
 
         onClicked: {
             if(root.isExitButton){

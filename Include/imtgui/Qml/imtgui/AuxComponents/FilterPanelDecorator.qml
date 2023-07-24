@@ -73,12 +73,14 @@ Item {
             anchors.rightMargin: Style.margin;
             anchors.verticalCenter: parent.verticalCenter;
 
-            height: 15;
-            width: height;
+            width: Style.buttonWidthSmall;
+            height: width;
 
             visible: tfc.text != "";
 
             iconSource: "../../../" + "Icons/" + Style.theme + "/Close_On_Normal.svg";
+            iconWidth: Style.iconSizeExtraSmall;
+            iconHeight: iconWidth;
 
             onClicked: {
                 tfc.text = "";
@@ -92,10 +94,13 @@ Item {
         anchors.verticalCenter: parent.verticalCenter;
         anchors.right: parent.right;
 
-        height: 20;
-        width: height;
+        width: Style.buttonWidthMedium;
+        height: width;
 
         iconSource: "../../../" + "Icons/" + Style.theme + "/Close_On_Normal.svg";
+
+        iconWidth: Style.iconSizeSmall;
+        iconHeight: iconWidth;
 
         onClicked: {
             tfc.text = "";

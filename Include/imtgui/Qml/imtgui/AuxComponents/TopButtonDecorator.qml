@@ -5,10 +5,8 @@ import QtGraphicalEffects 1.0
 BaseButtonDecorator {
     id: topButtonDecorator;
 
-    height: 56;
-    width: isEmpty ? 30 : 73;
-    scale: isHighlighted ? 0.985 : 1;
-
+    width: isEmpty ? 20 : 60;
+    height: 28;
 
     property string textColor: Style.textColor;
     property string textColorDisabled: "gray";
@@ -16,6 +14,40 @@ BaseButtonDecorator {
     property int radius: 4;
     property bool isEmpty: text == "";
 
+    onIsHighlightedChanged: {
+        if (isToggleable){
+            return;
+        }
+
+        if (isHighlighted){
+            innerShadow.verticalOffset = 1;
+            innerShadow.horizontalOffset = 1;
+
+            button.width += 2;
+        }
+        else{
+            dropShadow.verticalOffset = 1;
+            dropShadow.horizontalOffset = 1;
+
+            button.width = parent.width;
+        }
+    }
+
+    onIsToggledChanged: {
+        console.log("TopButtonDecorator onIsToggledChanged", isToggled);
+        if (isToggled){
+            innerShadow.visible = true;
+            dropShadow.visible = false;
+
+            button.width += 2;
+        }
+        else{
+            innerShadow.visible = false;
+            dropShadow.visible = true;
+
+            button.width = parent.width;
+        }
+    }
 
     DropShadow {
        id: dropShadow;
@@ -23,12 +55,13 @@ BaseButtonDecorator {
        anchors.fill: button;
 
        verticalOffset: 1;
+       horizontalOffset: 1;
 
        radius: 2;
        color: Style.shadowColor;
        source: button;
 
-       visible: button.visible;
+       visible: topButtonDecorator.isToggleable ? !topButtonDecorator.isToggled : button.visible && !topButtonDecorator.isHighlighted;
     }
 
     Rectangle{
@@ -36,17 +69,18 @@ BaseButtonDecorator {
 
         anchors.top: parent.top;
         anchors.topMargin: 6;
+        anchors.left: parent.left;
         anchors.horizontalCenter: parent.horizontalCenter;
 
-        width: parent.width - 10;
-        height: parent.height/2;
+        width: parent.width;
+        height: parent.height;
 
         radius: topButtonDecorator.radius;
         visible: !topButtonDecorator.isEmpty;
 
         color: Style.baseColor;
 
-        gradient: selection.visible ? pressedGradientButton : standardGradientButton;
+        gradient: topButtonDecorator.isHighlighted || topButtonDecorator.isToggled ? pressedGradientButton : standardGradientButton;
 
         Gradient {
             id: standardGradientButton;
@@ -58,8 +92,8 @@ BaseButtonDecorator {
         Gradient {
             id: pressedGradientButton;
 
-            GradientStop { position: 0.0; color: Style.imagingToolsGradient0; }
-            GradientStop { position: 1.0; color: Style.imagingToolsGradient0; }
+            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
+            GradientStop { position: 1.0; color: Style.imagingToolsGradient1; }
         }
 
         Image {
@@ -78,6 +112,23 @@ BaseButtonDecorator {
         }
     }
 
+    InnerShadow {
+        id: innerShadow;
+
+        anchors.fill: button;
+
+        verticalOffset: 1;
+        horizontalOffset: 1;
+
+        radius: 2;
+        color: Style.shadowColor;
+        source: button;
+
+        samples: 16;
+        visible: topButtonDecorator.isToggleable ? topButtonDecorator.isToggled : button.visible && topButtonDecorator.isHighlighted;
+
+    }
+
     Rectangle{
         id: selection;
 
@@ -87,7 +138,7 @@ BaseButtonDecorator {
         height: 4;
         width: button.width/1.8;
         color: Style.greenColor;
-        visible: topButtonDecorator.enabled && topButtonDecorator.isHighlighted;
+        visible: false;
     }
 
     Text {

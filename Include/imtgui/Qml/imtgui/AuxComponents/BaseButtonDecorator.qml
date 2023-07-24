@@ -15,6 +15,8 @@ Item {
     property bool isHovered: false;
     property bool isMainButton: false;
     property bool isHighlighted: false;
+    property bool isToggled: false;
+    property bool isToggleable: false;
 
     property bool selected: false;
     property string color: "";

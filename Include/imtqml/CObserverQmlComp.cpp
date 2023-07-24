@@ -69,7 +69,7 @@ void CObserverQmlComp::UpdateLanguage() const
 				if (enginePtr != nullptr){
 					enginePtr->retranslate();
 
-					QMetaObject::invokeMethod(quickItem, "onLocalizationChanged");
+//					QMetaObject::invokeMethod(quickItem, "onLocalizationChanged");
 				}
 			}
 		}

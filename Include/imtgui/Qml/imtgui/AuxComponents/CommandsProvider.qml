@@ -107,16 +107,22 @@ QtObject {
     }
 
     function commandExists(commandId){
-        if(commandsProviderContainer.commandsModel === undefined) return false;
+        let index = commandsProviderContainer.getCommandIndex(commandId);
+
+        return index >= 0;
+    }
+
+    function getCommandIndex(commandId){
+        if(commandsProviderContainer.commandsModel === undefined) return -1;
 
         for (let i = 0; i < commandsProviderContainer.commandsModel.GetItemsCount(); i++){
             let currentCommandId = commandsProviderContainer.commandsModel.GetData("Id", i);
             if (currentCommandId === commandId){
-                return true;
+                return i;
             }
         }
 
-        return false;
+        return -1;
     }
 
     function mergeModelWith(externModel){
@@ -124,6 +130,17 @@ QtObject {
 
             let index = commandsModel.InsertNewItem()
             commandsModel.CopyItemDataFromModel(index, externModel, i)
+        }
+    }
+
+    function setAdditionalProperties(model){
+        if (!model){
+            return;
+        }
+
+        for (let i = 0; i < model.GetItemsCount(); i++){
+            model.SetData("IsToggleable", false, i);
+            model.SetData("IsToggled", false, i);
         }
     }
 
@@ -151,6 +168,8 @@ QtObject {
 
                     if(dataModelLocal.ContainsKey(commandsProviderContainer.commandsId + "Commands")){
                         dataModelLocal = dataModelLocal.GetData(commandsProviderContainer.commandsId + "Commands");
+
+                        commandsProviderContainer.setAdditionalProperties(dataModelLocal);
 
                         commandsProviderContainer.commandsModel = dataModelLocal;
                     }

@@ -12,20 +12,14 @@ Item {
     Component.onCompleted: {
         Events.subscribeEvent("Logout", commandsDecoratorContainer.clearModel);
         Events.subscribeEvent("SetCommandsVisible", commandsDecoratorContainer.setVisible);
-
-//        Events.subscribeEvent("OnLocalizationChanged", commandsDecoratorContainer.onLocalizationChanged);
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("Logout", commandsDecoratorContainer.clearModel);
         Events.unSubscribeEvent("SetCommandsVisible", commandsDecoratorContainer.setVisible);
-
-//        Events.unSubscribeEvent("OnLocalizationChanged", commandsDecoratorContainer.onLocalizationChanged);
     }
 
     function onLocalizationChanged(language){
-        console.log("CommandsDecorator onLocalizationChanged", language);
-//        Events.sendEvent(commandsDecoratorContainer.commandsId + "_CommandsUpdateModel")
     }
 
     function setCommandsModel(parameters){
@@ -55,7 +49,7 @@ Item {
 
         height: parent.height;
 
-        spacing: 5;
+        spacing: 15;
 
         Repeater {
             id: repeaterCommands;
@@ -74,6 +68,13 @@ Item {
                 visible: model.Visible;
 
                 text: model.Name;
+
+                isToggled: isToggleable ? model.IsToggled !== undefined ? model.IsToggled : false : false;
+                isToggleable: model.IsToggleable !== undefined ? model.IsToggleable : false
+
+                Component.onCompleted: {
+                    console.log("Command onCompleted", model.Id);
+                }
 
                 onClicked: {
                     Events.sendEvent(commandsDecoratorContainer.commandsId + "CommandActivated", model.Id);

@@ -22,6 +22,9 @@ Item {
     property bool isHovered: enabled ? ma.containsMouse : false;
     property bool isMainButton: false;
     property bool isHighlighted: false;
+    property bool isToggled: false;
+    property bool isToggleable: false;
+
     //
 
     property bool containsMouse: enabled ? ma.containsMouse : false;
@@ -37,6 +40,18 @@ Item {
 
     signal loaded();
 
+    onIsToggledChanged: {
+        if (loader.item && loader.item.isToggled !== undefined){
+            loader.item.isToggled = baseButton.isToggled;
+        }
+    }
+
+    onIsToggleableChanged: {
+        if (loader.item && loader.item.isToggleable !== undefined){
+            loader.item.isToggleable = baseButton.isToggleable;
+        }
+    }
+
     function setItemProperties(){
 
         baseButton.setItemPropertiesAdd()
@@ -50,6 +65,8 @@ Item {
         loader.item.isMainButton = baseButton.isMainButton;
         loader.item.enabled = baseButton.enabled;
         loader.item.isHighlighted = baseButton.isHighlighted;
+        loader.item.isToggled = baseButton.isToggled;
+        loader.item.isToggleable = baseButton.isToggleable;
         loader.item.selected = baseButton.selected;
         loader.item.color = baseButton.color;
 

@@ -59,7 +59,7 @@ Item {
 	property real selectedOpacity: 0.75
 	property real hoverOpacity: selectedOpacity/2
 
-	property bool enableAlternating: false
+    property bool enableAlternating: true;
 	property color alternatingColor: '#000'
 	property real alternatingOpacity: 0.05
 	property bool enableHoverEffect: true
@@ -131,14 +131,13 @@ Item {
 
     property string hover: "#e6e6e8";
 
-//    property string textColor: "#335777";
-    property string textColor: "#FF0000";
+    property string textColor: "#335777";
     property string textSelected: "#0078d7";
     property color inactive_textColor: "#aaaaaa";
 
     property string disabledInActiveTextColor: "#c0c0c0";
 
-    property int margin: 11;
+    property int margin: 13;
 
     property string menuPanelBackgroundColor: "#e2e2e8";
 
