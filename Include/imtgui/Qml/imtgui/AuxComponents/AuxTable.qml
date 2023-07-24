@@ -2,97 +2,99 @@ import QtQuick 2.12
 import Acf 1.0
 
 Rectangle {
-	id: tableContainer;
+    id: tableContainer;
 
-	color: "transparent";
+    color: "transparent";
 
-	property int selectedIndex: -1;
-	property int itemHeight: 35;
-	property int headerHeight: 35;
-	property int headerMinHeight: 35;
+    property int selectedIndex: -1;
+    property int itemHeight: 35;
+    property int headerHeight: 35;
+    property int headerMinHeight: 35;
 
-	property bool hasFilter: false;
-	property bool hasSort: false;
-	property bool checkable: false;
-	property bool selectable: true;
-	property bool isMultiCheckable: true;
-	property bool canSelectAll: true;
-	property bool scrollbarVisible: true;
-	property bool showHeaders: true;
+    property bool hasFilter: false;
+    property bool hasSort: false;
+    property bool checkable: false;
+    property bool selectable: true;
+    property bool isMultiCheckable: true;
+    property bool canSelectAll: true;
+    property bool scrollbarVisible: true;
+    property bool showHeaders: true;
 
-	property bool enableAlternating: (Style.enableAlternating !== undefined && Style.enableAlternating !== null) ? Style.enableAlternating : false;
-	property color alternatingColor: Style.alternatingColor ? Style.alternatingColor : '#000';
-	property real alternatingOpacity: Style.alternatingOpacity ? Style.alternatingOpacity : 0.05;
-	property bool hoverEnabled: (Style.enableHoverEffect !== undefined && Style.enableHoverEffect !== null) ? Style.enableHoverEffect : true;
+    property bool enableAlternating: (Style.enableAlternating !== undefined && Style.enableAlternating !== null) ? Style.enableAlternating : false;
+    property color alternatingColor: Style.alternatingColor ? Style.alternatingColor : '#000';
+    property real alternatingOpacity: Style.alternatingOpacity ? Style.alternatingOpacity : 0.05;
+    property bool hoverEnabled: (Style.enableHoverEffect !== undefined && Style.enableHoverEffect !== null) ? Style.enableHoverEffect : true;
 
-	property alias separatorVisible: bottomLine.visible;
-	property string sortIndicatorIcon: "../../../Icons/" + Style.theme + "/Down_On_Normal.svg";
+    property alias separatorVisible: bottomLine.visible;
+    property string sortIndicatorIcon: "../../../Icons/" + Style.theme + "/Down_On_Normal.svg";
 
-	property TreeItemModel headers : TreeItemModel{};
+    property TreeItemModel headers : TreeItemModel{};
 
-	property TreeItemModel tableDecorator : TreeItemModel{};
+    property TreeItemModel tableDecorator : TreeItemModel{};
 
-	property TreeItemModel headerDecorator : TreeItemModel{};
-	property TreeItemModel cellDecorator : TreeItemModel{};
-	property TreeItemModel widthDecorator : TreeItemModel{};
-	property TreeItemModel widthDecoratorDynamic : TreeItemModel{};
+    property TreeItemModel headerDecorator : TreeItemModel{};
+    property TreeItemModel cellDecorator : TreeItemModel{};
+    property TreeItemModel widthDecorator : TreeItemModel{};
+    property TreeItemModel widthDecoratorDynamic : TreeItemModel{};
 
-	property alias scrollbarItem: scrollbar;
+    property alias scrollbarItem: scrollbar;
 
-	property SortController sortController: null;
+    property SortController sortController: null;
 
-	property alias delegate: elementsListObj.delegate;
-	property alias elements: elementsListObj.model;
+    property alias delegate: elementsListObj.delegate;
+    property alias elements: elementsListObj.model;
 
-	property alias elementsList: elementsListObj;
-	property alias cacheBuffer: elementsListObj.cacheBuffer;
-	property alias contentHeight: elementsListObj.contentHeight;
+    property alias elementsList: elementsListObj;
+    property alias cacheBuffer: elementsListObj.cacheBuffer;
+    property alias contentHeight: elementsListObj.contentHeight;
 
-	property alias headerDelegate: headersList.delegate;
-	property real headerElementWidth: (headersList.width)/headersList.count;
-	property alias headerElementHeight: headersList.height;
+    property alias headerDelegate: headersList.delegate;
+    property real headerElementWidth: (headersList.width)/headersList.count;
+    property alias headerElementHeight: headersList.height;
 
-	property alias backgroundElementsColor: elementsBg.color;
-	property alias backgroundHeadersColor: headersPanel.color;
+    property alias backgroundElementsColor: elementsBg.color;
+    property alias backgroundHeadersColor: headersPanel.color;
 
-	/*property int */radius: 7;
+    /*property int */radius: 7;
 
-	property alias columnCount: headersList.count;
+    property alias columnCount: headersList.count;
 
-	//
-	property string borderColorHorizontal: "transparent";
-	property string borderColorVertical: "transparent";
-	property int horizontalBorderSize: 0;
-	property int verticalBorderSize: 0;
+    //
+    property string borderColorHorizontal: "transparent";
+    property string borderColorVertical: "transparent";
+    property int horizontalBorderSize: 0;
+    property int verticalBorderSize: 0;
 
-	property bool visibleLeftBorderFirst: true;
-	property bool visibleRightBorderLast: false;
-	property bool visibleTopBorderFirst: false;
-	property bool visibleBottomBorderLast: true;
+    property bool visibleLeftBorderFirst: true;
+    property bool visibleRightBorderLast: false;
+    property bool visibleTopBorderFirst: false;
+    property bool visibleBottomBorderLast: true;
 
-	property bool canSetBorderParams: false;
-	property int wrapMode: Text.NoWrap;
-	property int elideMode: Text.ElideRight;
-	property bool isRightBorder: false;
+    property bool canSetBorderParams: false;
+    property int wrapMode: Text.NoWrap;
+    property int elideMode: Text.ElideRight;
+    property bool isRightBorder: false;
 
-	property bool isAllItemChecked: false;
+    property bool isAllItemChecked: false;
 
-	property bool readOnly: false;
+    property bool readOnly: false;
     property bool canFitHeight : false;
+    property bool canMoveColumns : false;
+    property int minCellWidth : 30;
 
     property alias isMultiSelect: tableContainer.tableSelection.isMultiSelect;
 
-	property TableSelection tableSelection: TableSelection {
-		onSelectionChanged: {
-			tableContainer.selectionChanged(tableContainer.tableSelection.selectedIndexes);
-		}
-	}
+    property TableSelection tableSelection: TableSelection {
+        onSelectionChanged: {
+            tableContainer.selectionChanged(tableContainer.tableSelection.selectedIndexes);
+        }
+    }
 
-	property TableProperties properties: TableProperties {
-		onCheckedItemsChanged: {
-			tableContainer.checkedItemsChanged();
-		}
-	}
+    property TableProperties properties: TableProperties {
+        onCheckedItemsChanged: {
+            tableContainer.checkedItemsChanged();
+        }
+    }
 
     //properties for delegate:
     property string borderColorHorizontal_deleg: "transparent";
@@ -124,7 +126,7 @@ Rectangle {
 
     property var columnContentComps: [];
 
-	signal checkedItemsChanged();
+    signal checkedItemsChanged();
     signal selectionChanged(var selection);
 
     signal selectItem(string idSelected, string name);
@@ -138,57 +140,55 @@ Rectangle {
     signal widthRecalc();
     signal heightRecalc();
 
-	Component.onCompleted: {
-		tableContainer.headerMinHeight = tableContainer.headerHeight;
-		tableContainer.setWidth();
+    Component.onCompleted: {
+        tableContainer.headerMinHeight = tableContainer.headerHeight;
+        tableContainer.setWidth();
 
-		tableContainer.tableSelection.table = elementsListObj;
-	}
+        tableContainer.tableSelection.table = elementsListObj;
+    }
 
-	onFocusChanged: {
-		if (tableContainer.focus){
-			elementsListObj.forceActiveFocus();
-		}
-	}
+    onFocusChanged: {
+        if (tableContainer.focus){
+            elementsListObj.forceActiveFocus();
+        }
+    }
 
-	onTableDecoratorChanged: {
-		console.log("onTableDecoratorChanged");
+    onTableDecoratorChanged: {
+        console.log("onTableDecoratorChanged");
 
-		tableContainer.headerDecorator = tableContainer.tableDecorator.GetTreeItemModel("Headers");
-		tableContainer.cellDecorator = tableContainer.tableDecorator.GetTreeItemModel("Cells");
-		tableContainer.widthDecorator = tableContainer.tableDecorator.GetTreeItemModel("CellWidth");
+        tableContainer.headerDecorator = tableContainer.tableDecorator.GetTreeItemModel("Headers");
+        tableContainer.cellDecorator = tableContainer.tableDecorator.GetTreeItemModel("Cells");
+        tableContainer.widthDecorator = tableContainer.tableDecorator.GetTreeItemModel("CellWidth");
 
-		tableContainer.emptyDecor = !tableContainer.tableDecorator.GetItemsCount();
+        tableContainer.emptyDecor = !tableContainer.tableDecorator.GetItemsCount();
 
         if (tableContainer.headerDecorator){
             tableContainer.emptyDecorHeader = !tableContainer.headerDecorator.GetItemsCount();
         }
 
-		tableContainer.setBorderParams();
+        tableContainer.setBorderParams();
 
-        //tableContainer.setWidth();
         pauseWidth.stop;
         pauseWidth.start();
 
-		if(tableContainer.wrapMode !== Text.NoWrap){
-			for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
-				heightModel.append({"cellHeight": 0});
-			}
-			tableContainer.heightRecalc();
+        if(tableContainer.wrapMode !== Text.NoWrap){
+            for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
+                heightModel.append({"cellHeight": 0});
+            }
+            tableContainer.heightRecalc();
             pauseHeight.stop();
             pauseHeight.start();
-		}
-	}
+        }
+    }
 
-	onWidthChanged: {
-//		tableContainer.setWidth();
+    onWidthChanged: {
         pauseWidth.stop;
         pauseWidth.start();
-		if(tableContainer.wrapMode !== Text.NoWrap){
+        if(tableContainer.wrapMode !== Text.NoWrap){
             pauseHeight.stop();
             pauseHeight.start();
-		}
-	}
+        }
+    }
 
     onHeadersChanged: {
         tableContainer.columnContentComps = [];
@@ -217,130 +217,139 @@ Rectangle {
 
     //
 
-	function checkItem(index){
-		if (!tableContainer.checkable){
-			return;
-		}
+    function checkItem(index){
+        if (!tableContainer.checkable){
+            return;
+        }
 
-		if (tableContainer.isMultiCheckable){
-			tableContainer.properties.addCheckedItem(index);
-		}
-		else{
-			tableContainer.properties.addSingleCheckedItem(index);
-		}
-	}
+        if (tableContainer.isMultiCheckable){
+            tableContainer.properties.addCheckedItem(index);
+        }
+        else{
+            tableContainer.properties.addSingleCheckedItem(index);
+        }
+    }
 
-	function uncheckItem(index){
-		if (!tableContainer.checkable){
-			return;
-		}
+    function uncheckItem(index){
+        if (!tableContainer.checkable){
+            return;
+        }
 
-		tableContainer.properties.removeCheckedItem(index);
-	}
+        tableContainer.properties.removeCheckedItem(index);
+    }
 
-	function itemIsChecked(index){
-		return tableContainer.properties.itemIsChecked(index);
-	}
+    function itemIsChecked(index){
+        return tableContainer.properties.itemIsChecked(index);
+    }
 
-	function uncheckAll(){
-		if (!tableContainer.checkable){
-			return;
-		}
+    function uncheckAll(){
+        if (!tableContainer.checkable){
+            return;
+        }
 
-		tableContainer.properties.clearCheckedItems();
-	}
+        tableContainer.properties.clearCheckedItems();
+    }
 
-	function checkAll(){
-		if (!tableContainer.checkable || !tableContainer.isMultiCheckable){
-			return;
-		}
+    function checkAll(){
+        if (!tableContainer.checkable || !tableContainer.isMultiCheckable){
+            return;
+        }
 
-		let indexes = []
-		let count = tableContainer.elements.GetItemsCount();
-		for (let i = 0; i < count; i++){
-			indexes.push(i);
-		}
+        let indexes = []
+        let count = tableContainer.elements.GetItemsCount();
+        for (let i = 0; i < count; i++){
+            indexes.push(i);
+        }
 
-		tableContainer.properties.addCheckedItems(indexes);
-	}
+        tableContainer.properties.addCheckedItems(indexes);
+    }
 
-	function isAllChecked(){
-		if (!tableContainer.checkable){
-			return false;
-		}
+    function isAllChecked(){
+        if (!tableContainer.checkable){
+            return false;
+        }
 
-		let count = tableContainer.elements.GetItemsCount();
-		for (let i = 0; i < count; i++){
-			let isChecked = tableContainer.itemIsChecked(i);
-			if (!isChecked){
-				return false;
-			}
-		}
+        let count = tableContainer.elements.GetItemsCount();
+        for (let i = 0; i < count; i++){
+            let isChecked = tableContainer.itemIsChecked(i);
+            if (!isChecked){
+                return false;
+            }
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	function getCheckedItems(){
-		return tableContainer.properties._checkedItems;
-	}
+    function getCheckedItems(){
+        return tableContainer.properties._checkedItems;
+    }
 
-	function setIsEnabledItem(index, isEnabled){
-		tableContainer.properties.setIsEnabledItem(index, isEnabled);
-	}
+    function setIsEnabledItem(index, isEnabled){
+        tableContainer.properties.setIsEnabledItem(index, isEnabled);
+    }
 
-	function allEnabled(){
-		tableContainer.properties.clearDisabledItems();
-	}
+    function allEnabled(){
+        tableContainer.properties.clearDisabledItems();
+    }
 
-	function setVisibleItem(index, isVisible){
-		tableContainer.properties.setIsVisibleItem(index, isVisible);
-	}
+    function setVisibleItem(index, isVisible){
+        tableContainer.properties.setIsVisibleItem(index, isVisible);
+    }
 
-	function allVisible(){
-		tableContainer.properties.clearInvisibleItems();
-	}
+    function allVisible(){
+        tableContainer.properties.clearInvisibleItems();
+    }
 
 
-	function getHeaderIndex(headerId){
-		if (!tableContainer.headers){
-			return -1;
-		}
+    function getHeaderIndex(headerId){
+        if (!tableContainer.headers){
+            return -1;
+        }
 
-		for (let i = 0; i < tableContainer.headers.GetItemsCount(); i++){
-			if (tableContainer.headers.GetData("Id", i) === headerId){
-				return i;
-			}
-		}
+        for (let i = 0; i < tableContainer.headers.GetItemsCount(); i++){
+            if (tableContainer.headers.GetData("Id", i) === headerId){
+                return i;
+            }
+        }
 
-		return -1;
-	}
+        return -1;
+    }
 
-	function setColumnContentComponent(columnIndex, comp){
-		tableContainer.columnContentComps[columnIndex] = comp;
-	}
+    function setColumnContentComponent(columnIndex, comp){
+        tableContainer.columnContentComps[columnIndex] = comp;
+    }
 
-	function setCellHeight(){
+    function setCellHeight(){
 
-		var maxVal = 0;
-		for(var i = 0; i < heightModel.count; i++){
-			var currVal = heightModel.get(i).cellHeight;
-			if(currVal > maxVal){
-				maxVal = currVal;
-			}
-		}
-		tableContainer.headerHeight = Math.max(maxVal, tableContainer.headerMinHeight);
-	}
+        var maxVal = 0;
+        for(var i = 0; i < heightModel.count; i++){
+            var currVal = heightModel.get(i).cellHeight;
+            if(currVal > maxVal){
+                maxVal = currVal;
+            }
+        }
+        tableContainer.headerHeight = Math.max(maxVal, tableContainer.headerMinHeight);
+    }
 
     function setWidth(){
         //console.log("widthRecalc:: table", 0);
 
+        var headersCount = tableContainer.headers.GetItemsCount();
+
+        if(!tableContainer.widthDecorator.GetItemsCount() && tableContainer.headers.GetItemsCount()){
+            for(var ind = 0; ind < headersCount; ind++){
+                var index = tableContainer.widthDecorator.InsertNewItem();
+                tableContainer.widthDecorator.SetData("Width",tableContainer.width/headersCount,index);
+            }
+        }
+
         tableContainer.widthDecoratorDynamic.Clear();
         tableContainer.widthDecoratorDynamic.Copy(tableContainer.widthDecorator);
 
-        if(!tableContainer.tableDecorator.GetItemsCount()||!tableContainer.widthDecorator.GetItemsCount()){
-            tableContainer.widthRecalc();
-            return;
-        }
+//        if(!tableContainer.tableDecorator.GetItemsCount()||!tableContainer.widthDecorator.GetItemsCount()){
+//            tableContainer.widthRecalc();
+//            return;
+//        }
 
         var count_ = 0;
         var lengthMinus = 0;
@@ -359,15 +368,19 @@ Rectangle {
             }
         }
 
-        if((tableContainer.width - lengthMinus) < 0 || count_ == tableContainer.widthDecorator.GetItemsCount() ){
+        if((tableContainer.width - lengthMinus) < headersCount * tableContainer.minCellWidth || count_ == tableContainer.widthDecorator.GetItemsCount() ){
             tableContainer.widthDecoratorDynamic.Clear();
+            for(let ind = 0; ind < headersCount; ind++){
+                let index = tableContainer.widthDecoratorDynamic.InsertNewItem();
+                tableContainer.widthDecoratorDynamic.SetData("Width",tableContainer.width/headersCount,index);
+            }
             tableContainer.widthRecalc();
             return;
         }
 
-        for(var i = 0; i < tableContainer.widthDecorator.GetItemsCount(); i++){
-            var width_ = tableContainer.widthDecorator.IsValidData("Width",i) ? tableContainer.widthDecorator.GetData("Width",i): -1;
-            var widthPercent_ = tableContainer.widthDecorator.IsValidData("WidthPercent",i) ? tableContainer.widthDecorator.GetData("WidthPercent",i): -1;
+        for(let i = 0; i < tableContainer.widthDecorator.GetItemsCount(); i++){
+            let width_ = tableContainer.widthDecorator.IsValidData("Width",i) ? tableContainer.widthDecorator.GetData("Width",i): -1;
+            let widthPercent_ = tableContainer.widthDecorator.IsValidData("WidthPercent",i) ? tableContainer.widthDecorator.GetData("WidthPercent",i): -1;
 
             if(width_ < 0  && widthPercent_ < 0 ){
                 if(count_){
@@ -388,6 +401,10 @@ Rectangle {
         }
 
         tableContainer.widthRecalc();
+    }
+
+    function saveWidth(){
+
     }
 
     function setBorderParams(){
@@ -494,13 +511,13 @@ Rectangle {
     }
 
 
-	PauseAnimation {
+    PauseAnimation {
         id: pauseWidth;
         duration: 100;
-		onFinished: {
+        onFinished: {
             tableContainer.setWidth();
-		}
-	}
+        }
+    }
 
     PauseAnimation {
         id: pauseHeight;
@@ -510,145 +527,145 @@ Rectangle {
         }
     }
 
-	ListModel{
-		id: heightModel;
-	}
+    ListModel{
+        id: heightModel;
+    }
 
-	Rectangle {
-		id: headersPanel;
+    Rectangle {
+        id: headersPanel;
 
-		anchors.left: parent.left;
-		anchors.right: parent.right;
-	   // anchors.rightMargin: 5;
-		anchors.top: parent.top;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+       // anchors.rightMargin: 5;
+        anchors.top: parent.top;
 
-		height: visible ? tableContainer.headerHeight: 0;
+        height: visible ? tableContainer.headerHeight: 0;
 
-		visible: headersList.count > 0 && tableContainer.showHeaders;
+        visible: headersList.count > 0 && tableContainer.showHeaders;
 
-		color: Style.baseColor;
+        color: Style.baseColor;
 
         //radius: tableContainer.radius;
 
-		clip: true;
+        clip: true;
 
-		ListView {
-			id: headersList;
+        ListView {
+            id: headersList;
 
-			anchors.fill: parent;
+            anchors.fill: parent;
 
-			clip: true;
-			orientation: ListView.Horizontal;
-			spacing: 0;
-			model: tableContainer.headers;
-			boundsBehavior: Flickable.StopAtBounds;
-			property bool compl: false;
+            clip: true;
+            orientation: ListView.Horizontal;
+            spacing: 0;
+            model: tableContainer.headers;
+            boundsBehavior: Flickable.StopAtBounds;
+            property bool compl: false;
 
-			property int currentIndex: 0;
+            property int currentIndex: 0;
 
-			onCurrentIndexChanged: {
-				console.log("headersList onCurrentIndexChanged", headersList.currentIndex);
-			}
+            onCurrentIndexChanged: {
+                console.log("headersList onCurrentIndexChanged", headersList.currentIndex);
+            }
 
-			Component.onCompleted: {
-				headersList.compl = true;
-			}
-			delegate: Item{
-				id: deleg;
+            Component.onCompleted: {
+                headersList.compl = true;
+            }
+            delegate: Item{
+                id: deleg;
 
-				height: headersList.height;
+                height: headersList.height;
 
-				property bool compl: false;
-				property bool complCompl: deleg.compl && headersList.compl;
+                property bool compl: false;
+                property bool complCompl: deleg.compl && headersList.compl;
 
-				Component.onCompleted: {
-					deleg.compl = true;
-				}
-				onComplComplChanged: {
-					if(deleg.complCompl){
-						tableContainer.widthRecalc.connect(deleg.setCellWidth);
-						deleg.setCellWidth();
-					}
+                Component.onCompleted: {
+                    deleg.compl = true;
+                }
+                onComplComplChanged: {
+                    if(deleg.complCompl){
+                        tableContainer.widthRecalc.connect(deleg.setCellWidth);
+                        deleg.setCellWidth();
+                    }
 
-				}
+                }
 
-				function setCellWidth(){
-					if(!deleg || !deleg.complCompl){
-						return;
-					}
+                function setCellWidth(){
+                    if(!deleg || !deleg.complCompl){
+                        return;
+                    }
 
-					var defaultWidth = (headersList.width)/headersList.count;
-					var widthFromModel = tableContainer.widthDecoratorDynamic.IsValidData("Width", model.index) ? tableContainer.widthDecoratorDynamic.GetData("Width", model.index) : -1;
-
-
-					if(!tableContainer.widthDecoratorDynamic.GetItemsCount()){
-						width = defaultWidth;
-					}
-					else if(widthFromModel >= 0){
-						width = widthFromModel;
-					}
-					else{
-						width = defaultWidth;
-					}
-
-				}
-
-				//borders
-
-				Rectangle{
-					id: topBorder;
-					anchors.top: parent.top;
-					anchors.left: parent.left;
-					anchors.right: parent.right;
-					height: tableContainer.visibleTopBorderFirst  ? tableContainer.horizontalBorderSize : 0;
-					color: tableContainer.borderColorHorizontal;
-				}
-
-				Rectangle{
-					id: bottomBorder;
-					anchors.bottom: parent.bottom;
-					anchors.left: parent.left;
-					anchors.right: parent.right;
-					height: tableContainer.visibleBottomBorderLast ? tableContainer.horizontalBorderSize : 0;
-					color:  tableContainer.borderColorHorizontal;
-				}
-
-				Rectangle{
-					id: leftBorder;
-					anchors.left: parent.left;
-					anchors.top: parent.top;
-					anchors.bottom: parent.bottom;
-					width: tableContainer.isRightBorder ? tableContainer.verticalBorderSize * tableContainer.visibleLeftBorderFirst * (model.index == 0)
-														: tableContainer.visibleLeftBorderFirst ? tableContainer.verticalBorderSize : model.index > 0 ? tableContainer.verticalBorderSize : 0;
-					color:  tableContainer.borderColorVertical;
-				}
-
-				Rectangle{
-					id: rightBorder;
-					anchors.right: parent.right;
-					anchors.top: parent.top;
-					anchors.bottom: parent.bottom;
-					width: !tableContainer.isRightBorder ?
-							   tableContainer.verticalBorderSize * tableContainer.visibleRightBorderLast  * (model.index == (headersList.count -1)) * (headersList.count > 0) :
-							   tableContainer.visibleRightBorderLast ? tableContainer.verticalBorderSize  :
-																	   tableContainer.verticalBorderSize * (model.index < (headersList.count -1));
-
-					color: tableContainer.borderColorVertical;
-				}
+                    var defaultWidth = (headersList.width)/headersList.count;
+                    var widthFromModel = tableContainer.widthDecoratorDynamic.IsValidData("Width", model.index) ? tableContainer.widthDecoratorDynamic.GetData("Width", model.index) : -1;
 
 
-				//borders
+                    if(!tableContainer.widthDecoratorDynamic.GetItemsCount()){
+                        width = defaultWidth;
+                    }
+                    else if(widthFromModel >= 0){
+                        width = widthFromModel;
+                    }
+                    else{
+                        width = defaultWidth;
+                    }
 
-				Rectangle{
-					id: mainRec;
-					anchors.top: topBorder.bottom;
-					anchors.left: leftBorder.right;
-					anchors.right: rightBorder.left;
-					anchors.bottom: bottomBorder.top;
-					color: tableContainer.emptyDecorHeader ? "transparent" :
-															 tableContainer.headerDecorator.IsValidData("Color", model.index) ?
-																 tableContainer.headerDecorator.GetData("Color", model.index) :
-																 "transparent";
+                }
+
+                //borders
+
+                Rectangle{
+                    id: topBorder;
+                    anchors.top: parent.top;
+                    anchors.left: parent.left;
+                    anchors.right: parent.right;
+                    height: tableContainer.visibleTopBorderFirst  ? tableContainer.horizontalBorderSize : 0;
+                    color: tableContainer.borderColorHorizontal;
+                }
+
+                Rectangle{
+                    id: bottomBorder;
+                    anchors.bottom: parent.bottom;
+                    anchors.left: parent.left;
+                    anchors.right: parent.right;
+                    height: tableContainer.visibleBottomBorderLast ? tableContainer.horizontalBorderSize : 0;
+                    color:  tableContainer.borderColorHorizontal;
+                }
+
+                Rectangle{
+                    id: leftBorder;
+                    anchors.left: parent.left;
+                    anchors.top: parent.top;
+                    anchors.bottom: parent.bottom;
+                    width: tableContainer.isRightBorder ? tableContainer.verticalBorderSize * tableContainer.visibleLeftBorderFirst * (model.index == 0)
+                                                        : tableContainer.visibleLeftBorderFirst ? tableContainer.verticalBorderSize : model.index > 0 ? tableContainer.verticalBorderSize : 0;
+                    color:  tableContainer.borderColorVertical;
+                }
+
+                Rectangle{
+                    id: rightBorder;
+                    anchors.right: parent.right;
+                    anchors.top: parent.top;
+                    anchors.bottom: parent.bottom;
+                    width: !tableContainer.isRightBorder ?
+                               tableContainer.verticalBorderSize * tableContainer.visibleRightBorderLast  * (model.index == (headersList.count -1)) * (headersList.count > 0) :
+                               tableContainer.visibleRightBorderLast ? tableContainer.verticalBorderSize  :
+                                                                       tableContainer.verticalBorderSize * (model.index < (headersList.count -1));
+
+                    color: tableContainer.borderColorVertical;
+                }
+
+
+                //borders
+
+                Rectangle{
+                    id: mainRec;
+                    anchors.top: topBorder.bottom;
+                    anchors.left: leftBorder.right;
+                    anchors.right: rightBorder.left;
+                    anchors.bottom: bottomBorder.top;
+                    color: tableContainer.emptyDecorHeader ? "transparent" :
+                                                             tableContainer.headerDecorator.IsValidData("Color", model.index) ?
+                                                                 tableContainer.headerDecorator.GetData("Color", model.index) :
+                                                                 "transparent";
 
                     opacity:  tableContainer.emptyDecorHeader ? 1 :
                                                                 tableContainer.headerDecorator.IsValidData("Opacity", model.index) ?
@@ -662,32 +679,32 @@ Rectangle {
 
 
 
-					//cornerPatches
-					Rectangle{
-						id: leftTopCornerPatch;
-						anchors.left: parent.left;
-						anchors.top: parent.top;
-						width: parent.width/2;
-						height: parent.height/2;
-						color: parent.color;
-						visible: tableContainer.emptyDecorHeader ? true :
-																   tableContainer.headerDecorator.IsValidData("LeftTopRound", model.index) ?
-																	   !tableContainer.headerDecorator.GetData("LeftTopRound", model.index) :true;
-					}
+                    //cornerPatches
+                    Rectangle{
+                        id: leftTopCornerPatch;
+                        anchors.left: parent.left;
+                        anchors.top: parent.top;
+                        width: parent.width/2;
+                        height: parent.height/2;
+                        color: parent.color;
+                        visible: tableContainer.emptyDecorHeader ? true :
+                                                                   tableContainer.headerDecorator.IsValidData("LeftTopRound", model.index) ?
+                                                                       !tableContainer.headerDecorator.GetData("LeftTopRound", model.index) :true;
+                    }
 
-					Rectangle{
-						id: rightTopCornerPatch;
-						anchors.right: parent.right;
-						anchors.top: parent.top;
-						width: parent.width/2;
-						height: parent.height/2;
-						color: parent.color;
-						visible: tableContainer.emptyDecorHeader ? true :
-																   tableContainer.headerDecorator.IsValidData("RightTopRound", model.index) ?
-																	   !tableContainer.headerDecorator.GetData("RightTopRound", model.index) :true;
+                    Rectangle{
+                        id: rightTopCornerPatch;
+                        anchors.right: parent.right;
+                        anchors.top: parent.top;
+                        width: parent.width/2;
+                        height: parent.height/2;
+                        color: parent.color;
+                        visible: tableContainer.emptyDecorHeader ? true :
+                                                                   tableContainer.headerDecorator.IsValidData("RightTopRound", model.index) ?
+                                                                       !tableContainer.headerDecorator.GetData("RightTopRound", model.index) :true;
 
 
-					}
+                    }
 
                     Rectangle{
                         id: leftBottomCornerPatch;
@@ -704,306 +721,342 @@ Rectangle {
 
                     }
 
-					Rectangle{
-						id: rightBottomCornerPatch;
-						anchors.right:  parent.right;
-						anchors.bottom: parent.bottom;
-						width: parent.width/2;
-						height: parent.height/2;
-						color: parent.color;
-						visible: tableContainer.emptyDecorHeader ? true :
-																   tableContainer.headerDecorator.IsValidData("RightBottomRound", model.index) ?
-																	   !tableContainer.headerDecorator.GetData("RightBottomRound", model.index) :true;
+                    Rectangle{
+                        id: rightBottomCornerPatch;
+                        anchors.right:  parent.right;
+                        anchors.bottom: parent.bottom;
+                        width: parent.width/2;
+                        height: parent.height/2;
+                        color: parent.color;
+                        visible: tableContainer.emptyDecorHeader ? true :
+                                                                   tableContainer.headerDecorator.IsValidData("RightBottomRound", model.index) ?
+                                                                       !tableContainer.headerDecorator.GetData("RightBottomRound", model.index) :true;
 
-					}
-					//cornerPatches
+                    }
+                    //cornerPatches
 
 
 
-				}//mainRec
+                }//mainRec
 
-				CheckBox {
-					id: checkBox;
+                CheckBox {
+                    id: checkBox;
 
-					z: 1000;
+                    z: 1000;
 
-					anchors.verticalCenter: mainRec.verticalCenter;
-					anchors.left: mainRec.left;
-					anchors.leftMargin: 8;
+                    anchors.verticalCenter: mainRec.verticalCenter;
+                    anchors.left: mainRec.left;
+                    anchors.leftMargin: 8;
 
-					checkState: tableContainer.isAllItemChecked ? Qt.Checked : Qt.Unchecked;
+                    checkState: tableContainer.isAllItemChecked ? Qt.Checked : Qt.Unchecked;
 
-					visible: tableContainer.checkable && model.index === 0 && elementsListObj.count > 0 && tableContainer.canSelectAll;
+                    visible: tableContainer.checkable && model.index === 0 && elementsListObj.count > 0 && tableContainer.canSelectAll;
 
-					isActive: !tableContainer.readOnly;
+                    isActive: !tableContainer.readOnly;
 
-					onClicked: {
-						if (tableContainer.readOnly){
-							return;
-						}
+                    onClicked: {
+                        if (tableContainer.readOnly){
+                            return;
+                        }
 
-						if (checkBox.checkState === Qt.Checked){
-							tableContainer.uncheckAll();
-						}
-						else{
-							tableContainer.checkAll();
-						}
-					}
-				}
+                        if (checkBox.checkState === Qt.Checked){
+                            tableContainer.uncheckAll();
+                        }
+                        else{
+                            tableContainer.checkAll();
+                        }
+                    }
+                }
 
-				Text {
-					id: name;
+                Text {
+                    id: name;
 
-					anchors.verticalCenter: mainRec.verticalCenter;
-					anchors.left: checkBox.visible ? checkBox.right : mainRec.left;
-					anchors.right: iconSort.visible ? iconSort.left : mainRec.right;
-					anchors.leftMargin: tableContainer.textMarginHor;
-					anchors.rightMargin: iconSort.visible ? 0 : tableContainer.textMarginHor;
+                    anchors.verticalCenter: mainRec.verticalCenter;
+                    anchors.left: checkBox.visible ? checkBox.right : mainRec.left;
+                    anchors.right: iconSort.visible ? iconSort.left : mainRec.right;
+                    anchors.leftMargin: tableContainer.textMarginHor;
+                    anchors.rightMargin: iconSort.visible ? 0 : tableContainer.textMarginHor;
 
-					verticalAlignment: Text.AlignVCenter;
-					horizontalAlignment: tableContainer.emptyDecorHeader ? Text.AlignLeft :
-																		   tableContainer.headerDecorator.IsValidData("TextPosition", model.index) ?
-																			   tableContainer.headerDecorator.GetData("TextPosition", model.index) :
-																			   Text.AlignLeft;
+                    verticalAlignment: Text.AlignVCenter;
+                    horizontalAlignment: tableContainer.emptyDecorHeader ? Text.AlignLeft :
+                                                                           tableContainer.headerDecorator.IsValidData("TextPosition", model.index) ?
+                                                                               tableContainer.headerDecorator.GetData("TextPosition", model.index) :
+                                                                               Text.AlignLeft;
 
 
-					font.pixelSize: tableContainer.emptyDecorHeader ? Style.fontSize_common * deleg.scale :
-																	  tableContainer.headerDecorator.IsValidData("FontSize", model.index) ?
-																		  tableContainer.headerDecorator.GetData("FontSize", model.index) :
-																		  Style.fontSize_common * deleg.scale;
+                    font.pixelSize: tableContainer.emptyDecorHeader ? Style.fontSize_common * deleg.scale :
+                                                                      tableContainer.headerDecorator.IsValidData("FontSize", model.index) ?
+                                                                          tableContainer.headerDecorator.GetData("FontSize", model.index) :
+                                                                          Style.fontSize_common * deleg.scale;
 
 
-					font.family: Style.fontFamilyBold;
+                    font.family: Style.fontFamilyBold;
 
-					font.bold: tableContainer.emptyDecorHeader ? true :
-																 tableContainer.headerDecorator.IsValidData("FontBold", model.index) ?
-																	 tableContainer.headerDecorator.GetData("FontBold", model.index) :
-																	 true;
+                    font.bold: tableContainer.emptyDecorHeader ? true :
+                                                                 tableContainer.headerDecorator.IsValidData("FontBold", model.index) ?
+                                                                     tableContainer.headerDecorator.GetData("FontBold", model.index) :
+                                                                     true;
 
 
-					color: tableContainer.emptyDecorHeader ? Style.textColor :
-															 tableContainer.headerDecorator.IsValidData("FontColor", model.index) ?
-																 tableContainer.headerDecorator.GetData("FontColor", model.index) :
-																 Style.textColor;
-					elide: tableContainer.elideMode;
+                    color: tableContainer.emptyDecorHeader ? Style.textColor :
+                                                             tableContainer.headerDecorator.IsValidData("FontColor", model.index) ?
+                                                                 tableContainer.headerDecorator.GetData("FontColor", model.index) :
+                                                                 Style.textColor;
+                    elide: tableContainer.elideMode;
 
-					wrapMode: tableContainer.wrapMode;
+                    wrapMode: tableContainer.wrapMode;
 
-					onLinkActivated: {
-						Qt.openUrlExternally(link)
-					}
+                    onLinkActivated: {
+                        Qt.openUrlExternally(link)
+                    }
 
-					text: model.Name;
+                    text: model.Name;
 
-					Component.onCompleted: {
-						tableContainer.heightRecalc.connect(name.sendHeightData);
-					}
+                    Component.onCompleted: {
+                        tableContainer.heightRecalc.connect(name.sendHeightData);
+                    }
 
-					onHeightChanged: {
-						name.sendHeightData();
-					}
+                    onHeightChanged: {
+                        name.sendHeightData();
+                    }
 
-					function sendHeightData(){
-						if(tableContainer.wrapMode !== Text.NoWrap){
-							if(model.index < heightModel.count){
-								var height_ = name.height +
-										2*tableContainer.textMarginVer +
-										topBorder.height + bottomBorder.height;
-
-								heightModel.setProperty(model.index, "cellHeight", height_);
-
-							}
-						}
-					}
-
-				}
-
-				Image {
-					id: iconSort;
-
-					anchors.verticalCenter: mainRec.verticalCenter;
-					anchors.right: mainRec.right;
-
-					anchors.rightMargin: 5;
-
-					height: 10;
-					width: visible ? 10 : 0;
-
-					visible: tableContainer.sortController && tableContainer.sortController.currentHeaderId === model.Id && tableContainer.hasSort;
-
-					rotation:  tableContainer.sortController && tableContainer.sortController.currentOrder == "ASC" ? 180 : 0
-
-					sourceSize.width: width;
-					sourceSize.height: height;
-
-					source: tableContainer.sortIndicatorIcon
-
-				}
-
-				////
-				MouseArea {
-					id: headerMa;
-
-					anchors.fill: parent;
-
-					visible: tableContainer.hasSort;
-
-					onReleased: {
-						deleg.scale = 1;
-					}
-
-					onPressed: {
-						deleg.scale = 0.985;
-					}
-
-					onClicked: {
-						if (!tableContainer.sortController){
-							return;
-						}
-
-						if (tableContainer.sortController.currentHeaderId !== model.Id){
-							tableContainer.sortController.currentOrder = "ASC";
-
-							tableContainer.sortController.currentHeaderId = model.Id;
-						}
-						else{
-							tableContainer.sortController.currentOrder = tableContainer.sortController.currentOrder === "ASC" ? "DESC" : "ASC";
-						}
-
-						tableContainer.headerClicked(model.Id);
-					}
-				}
-
-			}//delegate
-
-		}//Headers ListView
-
-		Rectangle{
-			id: bottomLine;
-
-			anchors.left: parent.left;
-			anchors.right: parent.right;
-			anchors.bottom: parent.bottom;
-
-			height: 1;
-
-			//TODO -> Style
-			color: "lightgray";
-			visible: tableContainer.emptyDecor;
-		}
-	}//headers
-
-	Rectangle {
-		id: elementsBg;
-
-		anchors.fill: elementsListObj;
-		color: Style.baseColor;
-
-		radius: tableContainer.radius;
-	}
-
-	property int scrollbarRightMargin: 0;
-
-	CustomScrollbar {
-		id: scrollbar;
-
-		z: 100;
-
-		anchors.right: elementsListObj.right;
-		anchors.rightMargin: tableContainer.scrollbarRightMargin;
-		anchors.bottom: elementsListObj.bottom;
-		anchors.top: elementsListObj.top;
-
-		secondSize: 10;
-		targetItem: elementsListObj;
-	}
-
-	ListView {
-		id: elementsListObj;
-
-		anchors.left: parent.left;
-		anchors.right: headersPanel.right;
-		anchors.top: headersPanel.bottom;
-		anchors.bottom: parent.bottom;
-
-		boundsBehavior: Flickable.StopAtBounds;
-
-		cacheBuffer: 1000;
-
-		clip: true;
-
-		Keys.onUpPressed: {
-			tableContainer.tableSelection.up();
-		}
-
-		Keys.onDownPressed: {
-			tableContainer.tableSelection.down();
-		}
-
-		onActiveFocusChanged: {
-			if (elementsListObj.activeFocus){
-				tableContainer.tableSelection.subscribeEvents();
-			}
-			else{
-				tableContainer.tableSelection.unsubscribeEvents();
-			}
-		}
-
-		delegate:
-			TableDelegate {
-
-				id: tableDelegate;
-
-				height: visible ? tableContainer.itemHeight : 0;
-				width: elementsListObj.width;
-				minHeight: tableContainer.itemHeight;
-				headers: tableContainer.headers;
-
-				tableItem: tableContainer;
-
-				readOnly: tableContainer.readOnly;
-
-				selected: tableContainer.tableSelection.selectedIndexes.includes(model.index)
-				enabled: tableContainer.properties.itemIsEnabled(model.index);
-				checkedState: tableContainer.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
-
-				onCheckedStateChanged: {
-					tableContainer.isAllItemChecked = tableContainer.isAllChecked();
-				}
-
-				cellDecorator: tableContainer.cellDecorator;
-				widthDecorator: tableContainer.widthDecorator;
-
-				borderColorHorizontal: tableContainer.borderColorHorizontal_deleg;
-				borderColorVertical: tableContainer.borderColorVertical_deleg;
-				horizontalBorderSize: tableContainer.horizontalBorderSize_deleg;
-				verticalBorderSize: tableContainer.verticalBorderSize_deleg;
-
-				visibleLeftBorderFirst: tableContainer.visibleLeftBorderFirst_deleg;
-				visibleRightBorderLast: tableContainer.visibleRightBorderLast_deleg;
-				visibleTopBorderFirst: tableContainer.visibleTopBorderFirst_deleg;
-				visibleBottomBorderLast: tableContainer.visibleBottomBorderLast_deleg;
-
-				canSetBorderParams: tableContainer.canSetBorderParams_deleg;
-				wrapMode:  tableContainer.wrapMode_deleg;
-				elideMode: tableContainer.elideMode_deleg;
-				isRightBorder: tableContainer.isRightBorder_deleg;
-
-				textMarginHor: tableContainer.textMarginHor_deleg;
-				textMarginVer: tableContainer.textMarginVer_deleg;
-
-				//!!!
-
-				Component.onCompleted: {
-					tableContainer.tableSelection.selectionChanged.connect(tableDelegate.selectionChanged);
-					tableContainer.checkedItemsChanged.connect(tableDelegate.checkedItemsChanged);
-
-					tableContainer.properties.visibleItemsChanged.connect(tableDelegate.visibleItemsChanged);
-					tableContainer.properties.stateItemsChanged.connect(tableDelegate.enabledItemsChanged);
+                    function sendHeightData(){
+                        if(tableContainer.wrapMode !== Text.NoWrap){
+                            if(model.index < heightModel.count){
+                                var height_ = name.height +
+                                        2*tableContainer.textMarginVer +
+                                        topBorder.height + bottomBorder.height;
+
+                                heightModel.setProperty(model.index, "cellHeight", height_);
+
+                            }
+                        }
+                    }
 
                 }
 
-				Component.onDestruction: {
+                Image {
+                    id: iconSort;
+
+                    anchors.verticalCenter: mainRec.verticalCenter;
+                    anchors.right: mainRec.right;
+
+                    anchors.rightMargin: 5;
+
+                    height: 10;
+                    width: visible ? 10 : 0;
+
+                    visible: tableContainer.sortController && tableContainer.sortController.currentHeaderId === model.Id && tableContainer.hasSort;
+
+                    rotation:  tableContainer.sortController && tableContainer.sortController.currentOrder == "ASC" ? 180 : 0
+
+                    sourceSize.width: width;
+                    sourceSize.height: height;
+
+                    source: tableContainer.sortIndicatorIcon
+
+                }
+
+                ////
+                MouseArea {
+                    id: headerMa;
+
+                    anchors.fill: parent;
+
+                    visible: tableContainer.hasSort;
+
+                    onReleased: {
+                        deleg.scale = 1;
+                    }
+
+                    onPressed: {
+                        deleg.scale = 0.985;
+                    }
+
+                    onClicked: {
+                        if (!tableContainer.sortController){
+                            return;
+                        }
+
+                        if (tableContainer.sortController.currentHeaderId !== model.Id){
+                            tableContainer.sortController.currentOrder = "ASC";
+
+                            tableContainer.sortController.currentHeaderId = model.Id;
+                        }
+                        else{
+                            tableContainer.sortController.currentOrder = tableContainer.sortController.currentOrder === "ASC" ? "DESC" : "ASC";
+                        }
+
+                        tableContainer.headerClicked(model.Id);
+                    }
+                }
+
+                MouseArea{
+                    id: moving;
+
+                    anchors.right:  parent.right;
+
+                    height: parent.height;
+                    width: 20;
+
+                    visible: tableContainer.canMoveColumns && model.index < headersList.count -1;
+                    enabled: visible;
+
+                    cursorShape: containsPress ? Qt.PointingHandCursor : Qt.ArrowCursor;
+                    property var coord: mapToItem(moving,0,0);
+                    onPressed: {
+                        moving.coord = mapToItem(moving,mouse.x,mouse.y)
+                    }
+                    onPositionChanged: {
+                        var newCoords = mapToItem(moving,mouse.x,mouse.y);
+                        var deltaX = newCoords.x - moving.coord.x;
+                        var width_ = tableContainer.widthDecoratorDynamic.GetData("Width", model.index);
+                        var width_next = tableContainer.widthDecoratorDynamic.GetData("Width", model.index+1);
+                        width_ += deltaX;
+                        width_next -= deltaX
+                        if(width_ > tableContainer.minCellWidth && width_next > tableContainer.minCellWidth){
+                            tableContainer.widthDecorator.SetData("Width", width_, model.index);
+                            tableContainer.widthDecorator.SetData("Width", width_next, model.index+1);
+
+                            tableContainer.setWidth();
+                        }
+
+                    }
+                    onReleased: {
+                        tableContainer.saveWidth();
+                    }
+                }
+
+            }//delegate
+
+        }//Headers ListView
+
+        Rectangle{
+            id: bottomLine;
+
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            anchors.bottom: parent.bottom;
+
+            height: 1;
+
+            //TODO -> Style
+            color: "lightgray";
+            visible: tableContainer.emptyDecor;
+        }
+    }//headers
+
+    Rectangle {
+        id: elementsBg;
+
+        anchors.fill: elementsListObj;
+        color: Style.baseColor;
+
+        radius: tableContainer.radius;
+    }
+
+    property int scrollbarRightMargin: 0;
+
+    CustomScrollbar {
+        id: scrollbar;
+
+        z: 100;
+
+        anchors.right: elementsListObj.right;
+        anchors.rightMargin: tableContainer.scrollbarRightMargin;
+        anchors.bottom: elementsListObj.bottom;
+        anchors.top: elementsListObj.top;
+
+        secondSize: 10;
+        targetItem: elementsListObj;
+    }
+
+    ListView {
+        id: elementsListObj;
+
+        anchors.left: parent.left;
+        anchors.right: headersPanel.right;
+        anchors.top: headersPanel.bottom;
+        anchors.bottom: parent.bottom;
+
+        boundsBehavior: Flickable.StopAtBounds;
+
+        cacheBuffer: 1000;
+
+        clip: true;
+
+        Keys.onUpPressed: {
+            tableContainer.tableSelection.up();
+        }
+
+        Keys.onDownPressed: {
+            tableContainer.tableSelection.down();
+        }
+
+        onActiveFocusChanged: {
+            if (elementsListObj.activeFocus){
+                tableContainer.tableSelection.subscribeEvents();
+            }
+            else{
+                tableContainer.tableSelection.unsubscribeEvents();
+            }
+        }
+
+        delegate:
+            TableDelegate {
+
+                id: tableDelegate;
+
+                height: visible ? tableContainer.itemHeight : 0;
+                width: elementsListObj.width;
+                minHeight: tableContainer.itemHeight;
+                headers: tableContainer.headers;
+
+                tableItem: tableContainer;
+
+                readOnly: tableContainer.readOnly;
+
+                selected: tableContainer.tableSelection.selectedIndexes.includes(model.index)
+                enabled: tableContainer.properties.itemIsEnabled(model.index);
+                checkedState: tableContainer.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
+
+                onCheckedStateChanged: {
+                    tableContainer.isAllItemChecked = tableContainer.isAllChecked();
+                }
+
+                cellDecorator: tableContainer.cellDecorator;
+                widthDecorator: tableContainer.widthDecorator;
+
+                borderColorHorizontal: tableContainer.borderColorHorizontal_deleg;
+                borderColorVertical: tableContainer.borderColorVertical_deleg;
+                horizontalBorderSize: tableContainer.horizontalBorderSize_deleg;
+                verticalBorderSize: tableContainer.verticalBorderSize_deleg;
+
+                visibleLeftBorderFirst: tableContainer.visibleLeftBorderFirst_deleg;
+                visibleRightBorderLast: tableContainer.visibleRightBorderLast_deleg;
+                visibleTopBorderFirst: tableContainer.visibleTopBorderFirst_deleg;
+                visibleBottomBorderLast: tableContainer.visibleBottomBorderLast_deleg;
+
+                canSetBorderParams: tableContainer.canSetBorderParams_deleg;
+                wrapMode:  tableContainer.wrapMode_deleg;
+                elideMode: tableContainer.elideMode_deleg;
+                isRightBorder: tableContainer.isRightBorder_deleg;
+
+                textMarginHor: tableContainer.textMarginHor_deleg;
+                textMarginVer: tableContainer.textMarginVer_deleg;
+
+                //!!!
+
+                Component.onCompleted: {
+                    tableContainer.tableSelection.selectionChanged.connect(tableDelegate.selectionChanged);
+                    tableContainer.checkedItemsChanged.connect(tableDelegate.checkedItemsChanged);
+
+                    tableContainer.properties.visibleItemsChanged.connect(tableDelegate.visibleItemsChanged);
+                    tableContainer.properties.stateItemsChanged.connect(tableDelegate.enabledItemsChanged);
+
+                }
+
+                Component.onDestruction: {
                     if (tableContainer){
                         tableContainer.tableSelection.selectionChanged.disconnect(tableDelegate.selectionChanged);
                         tableContainer.checkedItemsChanged.disconnect(tableDelegate.checkedItemsChanged);
@@ -1011,57 +1064,57 @@ Rectangle {
                         tableContainer.properties.visibleItemsChanged.disconnect(tableDelegate.visibleItemsChanged);
                         tableContainer.properties.stateItemsChanged.disconnect(tableDelegate.enabledItemsChanged);
                     }
-				}
+                }
 
-				function selectionChanged(){
-					tableDelegate.selected = tableContainer.tableSelection.selectedIndexes.includes(model.index);
+                function selectionChanged(){
+                    tableDelegate.selected = tableContainer.tableSelection.selectedIndexes.includes(model.index);
 
-					if (tableDelegate.selected){
+                    if (tableDelegate.selected){
                         //elementsListObj.positionViewAtIndex(model.index, ListView.Visible);
-					}
-				}
+                    }
+                }
 
-				function checkedItemsChanged(){
-					tableDelegate.checkedState = tableContainer.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
-				}
+                function checkedItemsChanged(){
+                    tableDelegate.checkedState = tableContainer.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
+                }
 
-				function visibleItemsChanged(){
-					tableDelegate.visible = tableContainer.properties.itemIsVisible(model.index);
-				}
+                function visibleItemsChanged(){
+                    tableDelegate.visible = tableContainer.properties.itemIsVisible(model.index);
+                }
 
-				function enabledItemsChanged(){
-					tableDelegate.enabled = tableContainer.properties.itemIsEnabled(model.index);
+                function enabledItemsChanged(){
+                    tableDelegate.enabled = tableContainer.properties.itemIsEnabled(model.index);
 
-					tableDelegate.readOnly = !tableDelegate.enabled;
-				}
+                    tableDelegate.readOnly = !tableDelegate.enabled;
+                }
 
-				onClicked: {
-					//                if (!tableContainer.tableSelection.isSelected(model.index)){
-					//                    tableContainer.tableSelection.singleSelect(model.index);
-					//                }
-					if (!tableContainer.selectable){
-						return;
-					}
+                onClicked: {
+                    //                if (!tableContainer.tableSelection.isSelected(model.index)){
+                    //                    tableContainer.tableSelection.singleSelect(model.index);
+                    //                }
+                    if (!tableContainer.selectable){
+                        return;
+                    }
 
-					tableContainer.tableSelection.singleSelect(model.index);
+                    tableContainer.tableSelection.singleSelect(model.index);
 
-					console.log("tableContainer.tableSelection", tableContainer.tableSelection.selectedIndexes)
-					elementsListObj.forceActiveFocus();
-				}
+                    console.log("tableContainer.tableSelection", tableContainer.tableSelection.selectedIndexes)
+                    elementsListObj.forceActiveFocus();
+                }
 
-				onRightButtonMouseClicked: {
-					console.log("onRightButtonMouseClicked")
-					var point = mapToItem(null, mX, mY);
-					tableContainer.rightButtonMouseClicked(point.x, point.y);
-				}
+                onRightButtonMouseClicked: {
+                    console.log("onRightButtonMouseClicked")
+                    var point = mapToItem(null, mX, mY);
+                    tableContainer.rightButtonMouseClicked(point.x, point.y);
+                }
 
-				onDoubleClicked: {
-					var point = mapToItem(null, mX, mY);
-					tableContainer.doubleClicked(point.x, point.y)
-					tableContainer.selectItem(model.Id, model.Name);
-				}
-			}
+                onDoubleClicked: {
+                    var point = mapToItem(null, mX, mY);
+                    tableContainer.doubleClicked(point.x, point.y)
+                    tableContainer.selectItem(model.Id, model.Name);
+                }
+            }
 
 
-	}//Elements ListView
+    }//Elements ListView
 }
