@@ -11,7 +11,6 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonValue>
 #include <QtCore/QRandomGenerator>
-#include <QtGui/QColor>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -105,10 +104,10 @@ IRequestServlet::ConstResponsePtr CJsonModelBasedServletComp::ProcessRequest(con
 				quint32 r = generateRandomNumber(1,254);
 				quint32 g = generateRandomNumber(2,253);
 				quint32 b = generateRandomNumber(3,252);
-				colorsArray << QJsonObject({QPair<QString, QJsonValue>(QString("Color ").append(QString::number(i)),QColor::fromRgb(r,g,b).name(QColor::HexRgb))});
+//				colorsArray << QJsonObject({QPair<QString, QJsonValue>(QString("Color ").append(QString::number(i)),QColor::fromRgb(r,g,b).name(QColor::HexRgb))});
 			}
 
-			allArray << QJsonObject({QPair<QString, QJsonValue>(QString("data ").append(QString::number(j)),colorsArray)});
+	//		allArray << QJsonObject({QPair<QString, QJsonValue>(QString("data ").append(QString::number(j)),colorsArray)});
 		}
 
 		body = QJsonDocument(QJsonObject({QPair<QString, QJsonValue>("data",allArray)})).toJson(QJsonDocument::Compact);
@@ -147,7 +146,7 @@ IRequestServlet::ConstResponsePtr CJsonModelBasedServletComp::ProcessRequest(con
 				quint32 g = generateRandomNumber(2,253);
 				quint32 b = generateRandomNumber(3,252);
 				int newIndex = treeModelPtr->InsertNewItem();
-				treeModelPtr->SetData(QByteArray("Color ") + QByteArray::number(j), QColor::fromRgb(r,g,b).name(QColor::HexRgb), newIndex);
+				// treeModelPtr->SetData(QByteArray("Color ") + QByteArray::number(j), QColor::fromRgb(r,g,b).name(QColor::HexRgb), newIndex);
 			}
 		}
 

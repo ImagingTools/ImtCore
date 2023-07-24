@@ -76,12 +76,12 @@ IRequestServlet::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRe
 				qData.remove(qData.count() - 4, 4);
 				int crc = (int)crc32(0, (unsigned char *)qData.data(), qData.count());
 				const char gzipheader[] = {
-						 0x1f, 0x8b      // gzip magic number
+						 0x1f, static_cast<char>(0x8b)      // gzip magic number
 						 , 8             // compress method "defalte"
 						 , 1             // text data
 						 , 0, 0, 0, 0    // timestamp is not set
 						 , 2             // maximum compression flag
-						 , 255           // unknown OS
+						 , static_cast<char>(255)           // unknown OS
 					 };
 				QByteArray outData;
 				QDataStream datastream(&outData, QIODevice::WriteOnly);
