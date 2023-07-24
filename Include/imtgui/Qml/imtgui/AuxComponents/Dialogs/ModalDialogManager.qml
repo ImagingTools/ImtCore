@@ -90,7 +90,9 @@ Item {
                         dialogLoader.item[key] = model.Parameters[key];
                     }
                     if (dialogLoader.item.centered){
-                        dialogLoader.anchors.centerIn = dialogDelegate;
+                        //dialogLoader.anchors.centerIn = dialogDelegate;
+                        dialogLoader.x = container.width/2 - dialogLoader.width/2;
+                        dialogLoader.y = container.height/2 - dialogLoader.height/2;
                     }
 
                     if (dialogLoader.item.started){

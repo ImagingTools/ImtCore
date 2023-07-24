@@ -55,9 +55,6 @@ Rectangle {
     Keys.onPressed: {
         console.log("Dialog onPressed", event.key);
 
-        if (event.key == Qt.Key_Escape){
-            dialogContainer.finished("Close")
-        }
     }
 
 
@@ -106,6 +103,8 @@ Rectangle {
 
         width: dialogContainer.width;
 
+
+
         Loader {
             id: loaderTopPanel;
 
@@ -121,6 +120,8 @@ Rectangle {
                 loaderTopPanel.item.title = dialogContainer.title;
             }
         }
+
+
 
         Loader {
             id: loaderBodyDialog;
@@ -154,6 +155,14 @@ Rectangle {
                     dialogContainer.finished(buttonId);
                 }
             }
+        }
+    }
+
+    Shortcut {
+        sequence: "Escape";
+        enabled: true;
+        onActivated: {
+            dialogContainer.finished("Close")
         }
     }
 }
