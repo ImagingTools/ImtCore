@@ -60,6 +60,11 @@ I_EXPORT_COMPONENT(
 			"Database server connection controller",
 			"Database Server Connection Controller");
 
+I_EXPORT_COMPONENT(
+			RestoringDatabaseController,
+			"Restoring database controller",
+			"Restoring Restore Database Controller PostreSQL psql");
+
 
 } // namespace ImtDatabasePck
 

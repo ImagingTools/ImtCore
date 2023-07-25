@@ -22,6 +22,8 @@ Item {
 
         width: settingsDatabaseInputContainer.width;
 
+        spacing: 10;
+
         Repeater {
             id: settingsDatabaseInputRepeater;
 
@@ -68,6 +70,12 @@ Item {
                     }
                 }
             }
-        }
+        } // Repeater
+
+//        DatabaseBackupController {
+//            width: parent.width;
+//        }
     }
 }
+
+

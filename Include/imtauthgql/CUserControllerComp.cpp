@@ -116,6 +116,125 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 }
 
 
+imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	if (!m_objectCollectionCompPtr.IsValid()){
+		return nullptr;
+	}
+
+	QByteArray representationData;
+	QByteArray productId;
+	QByteArray objectId;
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	if (inputParamPtr != nullptr){
+		representationData = inputParamPtr->GetFieldArgumentValue("Item").toByteArray();
+		productId = inputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
+		objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+	}
+
+	imtauth::IUserInfo* userInfoPtr = nullptr;
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+		userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
+	}
+
+	if (userInfoPtr == nullptr){
+		return nullptr;
+	}
+
+	imtbase::CTreeItemModel representationModel;
+	if (!representationModel.CreateFromJson(representationData)){
+		return nullptr;
+	}
+
+	if (representationModel.ContainsKey("Username")){
+		QByteArray username = representationModel.GetData("Username").toByteArray();
+
+		iprm::CParamsSet filterParam;
+		iprm::CParamsSet paramsSet;
+
+		iprm::CTextParam userId;
+		userId.SetText(username);
+
+		paramsSet.SetEditableParameter("Id", &userId);
+		filterParam.SetEditableParameter("ObjectFilter", &paramsSet);
+
+		imtbase::IObjectCollection::Ids userIds = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+		if (!userIds.isEmpty()){
+			QByteArray userObjectId = userIds[0];
+			if (userObjectId != objectId){
+				return nullptr;
+			}
+		}
+
+		userInfoPtr->SetId(username);
+	}
+
+	if (representationModel.ContainsKey("Name")){
+		QString name = representationModel.GetData("Name").toString();
+
+		userInfoPtr->SetName(name);
+	}
+
+	if (representationModel.ContainsKey("Password")){
+		QByteArray password = representationModel.GetData("Password").toByteArray();
+
+		if (m_hashCalculatorCompPtr.IsValid()){
+			password = m_hashCalculatorCompPtr->GenerateHash(userInfoPtr->GetId() + password);
+		}
+
+		userInfoPtr->SetPasswordHash(password);
+	}
+
+	if (representationModel.ContainsKey("Email")){
+		QByteArray email = representationModel.GetData("Email").toByteArray();
+
+		userInfoPtr->SetMail(email);
+	}
+
+	if (representationModel.ContainsKey("Roles")){
+		for (const QByteArray& productId : userInfoPtr->GetProducts()){
+			userInfoPtr->RemoveProduct(productId);
+		}
+
+		QByteArray roles = representationModel.GetData("Roles").toByteArray();
+		if (!roles.isEmpty()){
+			QByteArrayList roleIds = roles.split(';');
+			userInfoPtr->SetRoles(productId, roleIds);
+		}
+	}
+
+	if (representationModel.ContainsKey("Groups")){
+		for (const QByteArray& groupId : userInfoPtr->GetGroups()){
+			userInfoPtr->RemoveFromGroup(groupId);
+		}
+
+		QByteArray groups = representationModel.GetData("Groups").toByteArray();
+		if (!groups.isEmpty()){
+			QByteArrayList groupIds = groups.split(';');
+			for (const QByteArray& groupId : groupIds){
+				userInfoPtr->AddToGroup(groupId);
+			}
+		}
+	}
+
+	if (!m_objectCollectionCompPtr->SetObjectData(objectId, *userInfoPtr)){
+		return nullptr;
+	}
+
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+	imtbase::CTreeItemModel* notificationModelPtr = dataModelPtr->AddTreeModel("updatedNotification");
+
+	notificationModelPtr->SetData("Id", objectId);
+	notificationModelPtr->SetData("Name", userInfoPtr->GetName());
+
+	return rootModelPtr.PopPtr();
+}
+
+
 istd::IChangeable* CUserControllerComp::CreateObject(
 			const QList<imtgql::CGqlObject>& inputParams,
 			QByteArray &objectId,

@@ -76,7 +76,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DefaultIndex" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="0"/>
+                        <Data IsEnabled="true" Value="-1"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

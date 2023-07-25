@@ -25,7 +25,7 @@ TreeItemModelObserver {
                     context.language = language;
                 }
 
-//                Events.sendEvent("OnLocalizationChanged", language);
+                Events.sendEvent("OnLocalizationChanged", language);
             }
             else if (ids.includes("DesignSchema")){
                 container.designProvider.applyDesignSchema();

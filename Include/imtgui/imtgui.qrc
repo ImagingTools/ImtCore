@@ -39,7 +39,6 @@
         <file alias="imtgui/AuxComponents/SettingsComboBox.qml">Qml/imtgui/AuxComponents/SettingsComboBox.qml</file>
         <file alias="imtgui/AuxComponents/SettingsIntegerInput.qml">Qml/imtgui/AuxComponents/SettingsIntegerInput.qml</file>
         <file alias="imtgui/AuxComponents/SettingsTextInput.qml">Qml/imtgui/AuxComponents/SettingsTextInput.qml</file>
-        <file alias="imtgui/AuxComponents/DatabaseInput.qml">Qml/imtgui/AuxComponents/DatabaseInput.qml</file>
         <file alias="imtgui/AuxComponents/Calendar.qml">Qml/imtgui/AuxComponents/Calendar.qml</file>
         <file alias="imtgui/AuxComponents/Pagination.qml">Qml/imtgui/AuxComponents/Pagination.qml</file>
         <file alias="imtgui/AuxComponents/FilterMenu.qml">Qml/imtgui/AuxComponents/FilterMenu.qml</file>
@@ -78,6 +77,9 @@
         <file alias="imtgui/AuxComponents/SingleDocumentWorkspaceView.qml">Qml/imtgui/AuxComponents/SingleDocumentWorkspaceView.qml</file>
         <file alias="imtgui/AuxComponents/SubMenuPanelButtonDecorator.qml">Qml/imtgui/AuxComponents/SubMenuPanelButtonDecorator.qml</file>
         <file alias="imtgui/AuxComponents/StackView.qml">Qml/imtgui/AuxComponents/StackView.qml</file>
+
+        <file alias="imtgui/AuxComponents/DatabaseInput.qml">Qml/imtgui/AuxComponents/DatabaseInput.qml</file>
+	<file alias="imtgui/AuxComponents/DatabaseBackupController.qml">Qml/imtgui/AuxComponents/DatabaseBackupController.qml</file>
 
         <file alias="imtgui/AuxComponents/Dialogs/PopupMenuDialogGql.qml">Qml/imtgui/AuxComponents/Dialogs/PopupMenuDialogGql.qml</file>
         <file alias="imtgui/AuxComponents/PopupMenuDelegate.qml">Qml/imtgui/AuxComponents/PopupMenuDelegate.qml</file>

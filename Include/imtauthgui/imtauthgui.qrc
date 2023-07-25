@@ -50,6 +50,9 @@
 	<file alias="imtauthgui/SuperUserPasswordDialog.qml">Qml/imtauthgui/SuperUserPasswordDialog.qml</file>
 	<file alias="imtauthgui/SuperuserPasswordPage.qml">Qml/imtauthgui/SuperuserPasswordPage.qml</file>
 	<file alias="imtauthgui/SuperuserProvider.qml">Qml/imtauthgui/SuperuserProvider.qml</file>
+	
+	<file alias="imtauthgui/ChangePasswordDialog.qml">Qml/imtauthgui/ChangePasswordDialog.qml</file>
+	<file alias="imtauthgui/PasswordInput.qml">Qml/imtauthgui/PasswordInput.qml</file>
 
         <file alias="imtauthgui/qmldir">Qml/imtauthgui/qmldir</file>
     </qresource>

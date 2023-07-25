@@ -35,6 +35,8 @@ IRequestServlet::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRe
 		commandId = commandId.remove(commandId.length() - 1, 1);
 	}
 
+	QByteArray bodyRequest = request.GetBody();
+
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 
 	const IRequestServlet* handlerPtr = FindRequestHandler(commandId);

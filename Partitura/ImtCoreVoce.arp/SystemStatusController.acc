@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5075" Description="ACF"/>
-            <Version Id="1" Number="2183" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5079" Description="ACF"/>
+            <Version Id="1" Number="2184" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -18,21 +18,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GraphQLClientEngine"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="AsyncConnectionChecker" PackageId="ImtComPck" ComponentId="AsyncConnectionChecker">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CheckInterval" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="5"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="/Puma"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Url" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="http://localhost:7788"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -57,18 +42,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="UrlParam" Type="Reference" ExportId="UrlParam">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="InternetConnectionChecker" PackageId="ImtComPck" ComponentId="InternetConnectionChecker">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="RequestDelay" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="5000"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Url" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="http://localhost:7788"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

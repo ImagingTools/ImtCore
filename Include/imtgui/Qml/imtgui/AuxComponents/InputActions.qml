@@ -60,6 +60,8 @@ Item {
 
         PopupMenuDialog {
             onFinished: {
+                this.root.closeDialog();
+
                 if (commandId === "Cut"){
                     inputActions.cutClicked();
                 }

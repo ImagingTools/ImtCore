@@ -57,8 +57,9 @@ CHttpFileControllerServletComp::ConstResponsePtr CHttpFileControllerServletComp:
 	bool loadRes = false;
 	bool fileExists = false;
 	ConstResponsePtr responsePtr;
+	QByteArray httpRequestBody = request.GetBody();
 	for (int i = 0; i < m_binaryDataControllersCompPtr.GetCount(); ++i){
-		loadRes = m_binaryDataControllersCompPtr[i]->SetData(request.GetBody(), commandIdFileName);
+		loadRes = m_binaryDataControllersCompPtr[i]->SetData(httpRequestBody, commandIdFileName);
 		if (loadRes){
 			responsePtr = ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, commandIdFileName, "text/plain;charset=utf-8"));
 			break;

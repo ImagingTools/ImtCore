@@ -9,6 +9,8 @@ Item {
     width: 50;
 
     property string username;
+    property string userId;
+
     property bool enabled: false;
 
     property alias iconSource: loginButton.iconSource;
@@ -32,14 +34,15 @@ Item {
         root.enabled = false;
     }
 
-    function onLogin(login){
-        root.username = login;
+    function onLogin(loginData){
+        root.username = loginData["Login"];
+        root.userId = loginData["UserId"];
 
         root.enabled = true;
     }
 
     function onLocalizationChanged(language){
-        contextMenuModel.setProperty(0, "Name", qsTr("Logout"));
+        contextMenuModel.fillModel();
     }
 
     Text {
@@ -71,9 +74,6 @@ Item {
 
         enabled: root.enabled;
 
-//        iconWidth: Style.iconSizeSmall;
-//        iconHeight: iconWidth;
-
         onClicked: {
             if(root.isExitButton){
                 panelDelegate.logout();
@@ -93,8 +93,13 @@ Item {
         PopupMenuDialog {
             onFinished: {
                 console.log("CollectionView PopupMenuDialog", commandId);
+                this.root.closeDialog();
+
                 if (commandId == "Logout"){
                     panelDelegate.logout();
+                }
+                else if (commandId == "ChangePassword"){
+                    panelDelegate.changePassword();
                 }
             }
         }
@@ -104,12 +109,20 @@ Item {
         id: contextMenuModel;
 
         Component.onCompleted: {
+            fillModel();
+        }
+
+        function fillModel(){
+            contextMenuModel.clear();
+            contextMenuModel.append({"Id": "ChangePassword", "Name": qsTr("Change Password"), "IconSource": ""});
             contextMenuModel.append({"Id": "Logout", "Name": qsTr("Logout"), "IconSource": ""});
         }
     }
 
     UserPanelDelegate {
         id: panelDelegate;
+
+        userId: root.userId;
     }
 }
 

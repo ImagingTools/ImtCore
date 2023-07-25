@@ -7,6 +7,7 @@ QtObject {
 
     property string token: "";
     property string login: "";
+    property string userId: "";
 
     signal accepted();
     signal failed(string message);
@@ -60,6 +61,9 @@ QtObject {
 
                             let login = dataModelLocal.GetData("Login");
                             container.login = login;
+
+                            let userId = dataModelLocal.GetData("UserId");
+                            container.userId = userId;
 
                             container.accepted();
                         }

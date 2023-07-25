@@ -34,15 +34,13 @@ void CObserverQmlComp::ApplyUrl() const
 	QQmlEngine* engine = qmlEngine(quickItem);
 	Q_ASSERT(engine != nullptr);
 
-	const istd::IChangeable* serverUrlDataPtr = m_settingsCompPtr->GetParameter("NetworkSettings/ServerUrl");
-	if (serverUrlDataPtr != nullptr){
-		const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(serverUrlDataPtr);
-		if (textParamPtr != nullptr){
-			QString text = textParamPtr->GetText();
-
-			engine->setBaseUrl(text + *m_prefixServer);
-		}
+	QString serverUrl;
+	iprm::TParamsPtr<iprm::ITextParam> serverUrlDataPtr(m_settingsCompPtr.GetPtr(), "NetworkSettings/ServerUrl");
+	if (serverUrlDataPtr.IsValid()){
+		serverUrl = serverUrlDataPtr->GetText();
 	}
+
+	engine->setBaseUrl(serverUrl + *m_prefixServer);
 }
 
 
@@ -69,7 +67,7 @@ void CObserverQmlComp::UpdateLanguage() const
 				if (enginePtr != nullptr){
 					enginePtr->retranslate();
 
-//					QMetaObject::invokeMethod(quickItem, "onLocalizationChanged");
+					QMetaObject::invokeMethod(quickItem, "onLocalizationChanged");
 				}
 			}
 		}

@@ -12,6 +12,7 @@ Rectangle {
 
     property alias tokenProvider: userTokenProvider;
     property alias login: userTokenProvider.login;
+    property alias userId: userTokenProvider.userId;
 
     property int mainRadius: 3;
     property string mainColor: Style.backgroundColor;
@@ -27,7 +28,11 @@ Rectangle {
     }
 
     onLoginSuccessful: {
-        Events.sendEvent("Login", authPageContainer.login);
+        let obj = {}
+        obj["Login"] = authPageContainer.login;
+        obj["UserId"] = authPageContainer.userId;
+
+        Events.sendEvent("Login", obj);
     }
 
     onVisibleChanged: {

@@ -51,8 +51,6 @@ Item {
             parameters.SetData("Id", "ServerLog", index);
             parameters.SetData("Name", qsTr("Server Log"), index);
             parameters.SetData("Source", "qrc:/qml/imtgui/AuxComponents/ServerLogProvider.qml", index);
-
-            console.log("pageModel", pageModel.toJSON());
         }
     }
 

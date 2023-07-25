@@ -179,6 +179,10 @@ bool CRemoteFileController::SendFile(const QString& fileUrl)
 		QUrl requestUrl = engine->baseUrl();
 
 		QFileInfo uploadingFileInfo(fileUrl);
+		if (!uploadingFileInfo.exists()){
+			return false;
+		}
+
 		QString fileName = uploadingFileInfo.fileName();
 
 		QFile uploadingFile(uploadingFileInfo.absoluteFilePath());
