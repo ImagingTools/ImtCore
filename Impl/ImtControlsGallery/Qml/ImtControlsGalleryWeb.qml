@@ -6,7 +6,7 @@ Item {
 
     anchors.fill: parent;
 
-    LisaMain {
+    ImtControlsGalleryMain {
         id: application;
 
         anchors.fill: parent;
