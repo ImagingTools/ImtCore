@@ -4,13 +4,5 @@
         <file alias="IconButtonDecorator.qml">Qml/imtcontrols/IconButtonDecorator.qml</file>
         <file alias="TextButtonDecorator.qml">Qml/imtcontrols/TextButtonDecorator.qml</file>
     </qresource>
-    <!--<qresource prefix="/Fonts">
-        <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>
-        <file alias="Ubuntu-Medium.ttf">Qml/Fonts/Ubuntu-Medium.ttf</file>
-        <file alias="Ubuntu-Bold.ttf">Qml/Fonts/Ubuntu-Bold.ttf</file>
-        <file alias="Ubuntu-Regular.ttf">Qml/Fonts/Ubuntu-Regular.ttf</file>
-    </qresource>
-    <qresource prefix="/Animation">
-	<file alias="Loading">Resources/Loading.gif</file>
-    </qresource>-->
+
 </RCC>
