@@ -99,8 +99,10 @@ Rectangle {
 
     onWidthChanged: {
         if(tableDelegateContainer.wrapMode !== Text.NoWrap){
-            pauseHeight.stop();
-            pauseHeight.start();
+            if(pauseHeight){
+                pauseHeight.stop();
+                pauseHeight.start();
+            }
         }
 
     }
@@ -108,8 +110,10 @@ Rectangle {
     onCountChanged: {
         if(tableDelegateContainer.wrapMode !== Text.NoWrap){
             heightModel.append({"cellHeight": 0});
-            pauseHeight.stop();
-            pauseHeight.start();
+            if(pauseHeight){
+                pauseHeight.stop();
+                pauseHeight.start();
+            }
         }
     }
 

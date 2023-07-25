@@ -111,8 +111,11 @@ Rectangle {
     }
 
     onWidthChanged: {
-        widthPause.stop();
-        widthPause.start();
+        if(widthPause){
+            widthPause.stop();
+            widthPause.start();
+        }
+
     }
 
     onButtonModelChanged: {
@@ -144,6 +147,7 @@ Rectangle {
         id: widthPause;
 
         duration: 200;
+
 
         onFinished: {
             if(buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
