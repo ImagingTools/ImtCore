@@ -89,6 +89,7 @@ endif()
 if(NOT DEFINED USE_QTQML OR USE_QTQML)
     add_subdirectory("${INCLUDE_DIR}/imtqml/CMake" "${AUX_INCLUDE_DIR}/imtqml")
     add_subdirectory("${INCLUDE_DIR}/imtstyleqml/CMake" "${AUX_INCLUDE_DIR}/imtstyleqml")
+    add_subdirectory("${INCLUDE_DIR}/imtcontrols/CMake" "${AUX_INCLUDE_DIR}/imtcontrols")
 endif()
 
 if(NOT DEFINED USE_QTDB OR USE_QTDB)
