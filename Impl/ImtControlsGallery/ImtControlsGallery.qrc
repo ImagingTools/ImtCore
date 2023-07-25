@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/qml">
+        <file alias="ImtControlsGalleryMain.qml">Qml/ImtControlsGalleryMain.qml</file>
+        <file alias="ImtControlsGalleryWeb.qml">Qml/ImtControlsGalleryWeb.qml</file>
+    </qresource>
+</RCC>

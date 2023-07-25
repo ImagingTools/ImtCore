@@ -209,7 +209,8 @@ if(NOT ANDROID)
 	if(NOT DEFINED USE_QTQML OR USE_QTQML)
 		add_subdirectory("${IMPL_DIR}/ImtQmlPck/CMake" "${AUX_INCLUDE_DIR}/ImtQmlPck")
 		add_dependencies(ImtQmlPck imtqml)
-
+		add_subdirectory("${IMPL_DIR}/ImtControlsGallery/CMake" "${AUX_INCLUDE_DIR}/ImtControlsGallery")
+		
 	endif()
 
 endif()
