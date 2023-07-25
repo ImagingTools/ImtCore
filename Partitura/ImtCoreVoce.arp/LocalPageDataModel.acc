@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5048" Description="ACF"/>
-            <Version Id="1" Number="2178" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5083" Description="ACF"/>
+            <Version Id="1" Number="2188" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -33,7 +33,7 @@
         <Element Id="ServerUrl" PackageId="BasePck" ComponentId="TextParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultText" Type="Text" ExportId="DefaultText">
+                    <AttributeInfo Id="DefaultText" Type="Text" ExportId="DefaultServerUrl">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
