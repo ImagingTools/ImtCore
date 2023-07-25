@@ -44,6 +44,23 @@ export class ListView extends Flickable {
     }
 
     $orientationChanged(){
+        let tempChildren = this.contentItem.children.slice()
+ 
+        while(tempChildren.length){
+            let child = tempChildren.pop()
+            if(this.orientation === ListView.Horizontal){
+                if(child.y > 0){
+                    this.$items[child.index] = null
+                    this.$toCache(child)
+                }
+            } else {
+                if(child.x > 0){
+                    this.$items[child.index] = null
+                    this.$toCache(child)
+                }
+            }
+        }
+    
         this.$updateGeometry()
         this.$updateView()
     }
@@ -905,7 +922,7 @@ export class ListView extends Flickable {
                     this.$snapIndex = i
                 }
             } else {
-                if(item.Y === this.$snapY) {
+                if(item.y === this.$snapY) {
                     this.$snapIndex = i
                 }
             }
