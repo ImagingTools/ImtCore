@@ -127,6 +127,37 @@ Item {
         return false;
     }
 
+    function closeAllDocuments(force){
+        for (let i = 1; i < workspaceView.documentsData.GetItemsCount(); i++){
+            let documentBase = workspaceView.documentsData.GetData("Item", i);
+            workspaceView.closeDocument(documentBase.itemId, force);
+        }
+    }
+
+    function getDocumentIDs(){
+        let ids = []
+
+        for (let i = 1; i < workspaceView.documentsData.GetItemsCount(); i++){
+            let documentBase = workspaceView.documentsData.GetData("Item", i);
+            ids.push(documentBase.itemId);
+        }
+
+        return ids;
+    }
+
+    // TODO: Rename Item
+    function documentIsDirty(documentId){
+        let index = getDocumentIndexById(documentId);
+        if (index >= 0){
+            let documentBase = workspaceView.documentsData.GetData("Item", index);
+            if (documentBase.isDirty){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     function documentSaved(parameters){
         let documentId = parameters["Id"];
         let documentName = parameters["Name"];
@@ -191,7 +222,7 @@ Item {
         tabPanelInternal.selectedIndex = documentIndex;
     }
 
-    function closeDocument(itemId, force){
+    function closeDocument(itemId, force, callback){
         if (force === undefined){
             force = false;
         }
@@ -207,7 +238,7 @@ Item {
             if (documentBase.isDirty && !force){
                 tabPanelInternal.selectedIndex = index;
 
-                modalDialogManager.openDialog(saveDialog, {"message": qsTr("Save all changes ?")});
+                modalDialogManager.openDialog(saveDialog, {});
             }
             else{
                 if (tabPanelInternal.selectedIndex >= index && index > 0){
@@ -266,8 +297,9 @@ Item {
     Component {
         id: saveDialog;
         MessageDialog {
-
             title: qsTr("Save document");
+
+            message: qsTr("Save all changes ?")
             Component.onCompleted: {
                 buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true});
             }
@@ -423,15 +455,6 @@ Item {
             workspaceView.openErrorDialog(message);
         }
 
-//        onGetModelStateChanged: {
-//            if (getModelState === "Loading"){
-//                loading.start();
-//            }
-//            else{
-//                loading.stop();
-//            }
-//        }
-
         onSetModelStateChanged: {
             if (setModelState === "Loading"){
                 loading.start();
@@ -448,9 +471,6 @@ Item {
 
     GqlDocumentObserver {
         id: documentObserver;
-
-//        observedGetModel: documentController.gqlGetModel;
-//        observedSetModel: documentController.gqlSetModel;
     }
 
     ListView {

@@ -118,7 +118,7 @@ Item {
             remoteFileController.downloadedFileLocation = pathDir.replace('file:///', '');
             var fileName = fileDialogSave.file.toString().replace(pathDir + "/", '');
 
-            remoteFileController.GetFile("BackupFile", fileName);
+            remoteFileController.GetFile("GetBackupFile", fileName);
         }
     }
 }

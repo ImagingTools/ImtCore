@@ -57,9 +57,7 @@ Rectangle {
 
     Keys.onPressed: {
         console.log("Dialog onPressed", event.key);
-
     }
-
 
     onFocusChanged: {
         console.log("Dialog onFocusChanged", dialogContainer.focus);

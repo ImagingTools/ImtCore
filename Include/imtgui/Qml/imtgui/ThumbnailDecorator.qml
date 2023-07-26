@@ -26,6 +26,22 @@ Rectangle {
     property alias documentManager: mainDocumentManager;
     property alias dialogManager: modalDialogManager;
 
+    Component.onCompleted: {
+        Events.subscribeEvent("StartLoading", loading.start);
+        Events.subscribeEvent("StopLoading", loading.stop);
+
+        Events.subscribeEvent("ShowPreferencePage", thumbnailDecoratorContainer.showPreferencePage);
+        Events.subscribeEvent("Logout", thumbnailDecoratorContainer.onLogout);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("StartLoading", loading.start);
+        Events.unSubscribeEvent("StopLoading", loading.stop);
+
+        Events.unSubscribeEvent("ShowPreferencePage", thumbnailDecoratorContainer.showPreferencePage);
+        Events.unSubscribeEvent("Logout", thumbnailDecoratorContainer.onLogout);
+    }
+
     property SuperuserProvider superuserProvider : SuperuserProvider {
         onResult: {
             if (exists){
@@ -47,13 +63,21 @@ Rectangle {
         }
     }
 
-    Component.onCompleted: {
-        Events.subscribeEvent("ShowPreferencePage", thumbnailDecoratorContainer.showPreferencePage);
-        Events.subscribeEvent("Logout", thumbnailDecoratorContainer.clearModels);
-    }
-
     function updateModels(){
         pagesManager.updateModel();
+    }
+
+    function onLogout(){
+        clearModels();
+        authorizationPage.logout();
+//        let exists = mainDocumentManager.dirtyDocumentsExists();
+//        if (exists){
+//            modalDialogManager.openDialog(saveDialog, {});
+//        }
+//        else{
+//            clearModels();
+//            authorizationPage.logout();
+//        }
     }
 
     function clearModels(){
@@ -255,8 +279,32 @@ Rectangle {
     Loading {
         id: loading;
 
+        z: 100;
+
         anchors.fill: parent;
 
         visible: false;
+    }
+
+    Component {
+        id: saveDialog;
+        MessageDialog {
+            title: qsTr("Save dirty documents");
+            message: qsTr("Save all dirty documents ?");
+            Component.onCompleted: {
+                buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true});
+            }
+
+            onFinished: {
+                if (buttonId == "Yes"){
+                    documentManager.saveDirtyDocuments();
+                }
+                else if (buttonId == "No"){
+                    documentManager.closeAllDocuments();
+
+                   // onLogout();
+                }
+            }
+        }
     }
 }

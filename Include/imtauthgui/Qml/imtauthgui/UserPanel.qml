@@ -10,6 +10,7 @@ Item {
 
     property string username;
     property string userId;
+    property string passwordHash;
 
     property bool enabled: false;
 
@@ -30,13 +31,21 @@ Item {
 
     function onLogout(){
         root.username = "";
+        root.userId = "";
+        root.passwordHash = "";
 
         root.enabled = false;
     }
 
     function onLogin(loginData){
+        console.log("onLogin");
+
         root.username = loginData["Login"];
         root.userId = loginData["UserId"];
+        root.passwordHash = loginData["PasswordHash"];
+
+        console.log("userId", root.userId);
+        console.log("passwordHash", root.passwordHash);
 
         root.enabled = true;
     }
@@ -115,6 +124,7 @@ Item {
         function fillModel(){
             contextMenuModel.clear();
             contextMenuModel.append({"Id": "ChangePassword", "Name": qsTr("Change Password"), "IconSource": ""});
+            contextMenuModel.append({"Id": "Separator", "Name": "", "IconSource": ""});
             contextMenuModel.append({"Id": "Logout", "Name": qsTr("Logout"), "IconSource": ""});
         }
     }
@@ -123,6 +133,12 @@ Item {
         id: panelDelegate;
 
         userId: root.userId;
+        passwordHash: root.passwordHash;
+        login: root.username;
+
+        onUserUpdated: {
+            root.passwordHash = Qt.md5(cacheData.login + cacheData.password);
+        }
     }
 }
 

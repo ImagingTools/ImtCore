@@ -142,6 +142,10 @@ bool CRestoringDatabaseControllerComp::GetData(QByteArray& data, const QByteArra
 		return false;
 	}
 
+	if (*m_commandIdAttrPtr != dataId){
+		return false;
+	}
+
 	QString host = m_databaseLoginSettingsCompPtr->GetHost();
 	QString dbName = m_databaseLoginSettingsCompPtr->GetDatabaseName();
 	QString password = m_databaseLoginSettingsCompPtr->GetPassword();

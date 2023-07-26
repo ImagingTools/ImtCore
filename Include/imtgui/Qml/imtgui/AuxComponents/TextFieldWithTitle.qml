@@ -13,6 +13,9 @@ Item {
     property alias borderColor: input.borderColor;
     property alias acceptableInput: input.acceptableInput;
     property alias textInputValidator: input.textInputValidator;
+    property alias echoMode: input.echoMode;
+
+    property alias titleFontFamily: title.font.family;
 
     property string placeHolderText;
 

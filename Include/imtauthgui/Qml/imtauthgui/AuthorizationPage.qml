@@ -23,7 +23,7 @@ Rectangle {
     signal loginFailed();
 
     Component.onCompleted: {
-        Events.subscribeEvent("Logout", authPageContainer.logout);
+//        Events.subscribeEvent("Logout", authPageContainer.logout);
         decoratorPause.start();
     }
 
@@ -31,6 +31,7 @@ Rectangle {
         let obj = {}
         obj["Login"] = authPageContainer.login;
         obj["UserId"] = authPageContainer.userId;
+        obj["PasswordHash"] = userTokenProvider.passwordHash;
 
         Events.sendEvent("Login", obj);
     }
@@ -59,7 +60,10 @@ Rectangle {
     }
 
     function logout(){
-        authPageContainer.tokenProvider.login = "";
+        authPageContainer.login = "";
+        authPageContainer.userId = "";
+        userTokenProvider.token = "";
+
         authPageContainer.visible = true;
     }
 

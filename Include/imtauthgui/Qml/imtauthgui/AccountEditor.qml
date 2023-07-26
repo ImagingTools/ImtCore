@@ -44,12 +44,7 @@ DocumentBase {
         fields: ["Id", "Name"];
 
         onModelUpdated: {
-//            console.log("AccountEditor onModelUpdated", groupsProvider.completed);
-//            for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
-//                groupsProvider.collectionModel.SetData("CheckedState", Qt.Unchecked, i);
-//            }
             groupsTable.elements = groupsProvider.collectionModel;
-//            groupsProvider.collectionModel.dataChanged.connect(accountEditorContainer.updateModel);
         }
     }
 
@@ -60,7 +55,6 @@ DocumentBase {
         streetInput.readOnly = true;
         postalCodeInput.readOnly = true;
         cityInput.readOnly = true;
-//        companyNameInput.readOnly = true;
         emailInput.readOnly = true;
         groupsTable.readOnly = true;
     }
@@ -92,10 +86,6 @@ DocumentBase {
         if (accountEditorContainer.documentModel.ContainsKey("Street")){
             streetInput.text = accountEditorContainer.documentModel.GetData("Street");
         }
-
-//        if (accountEditorContainer.documentModel.ContainsKey("CompanyName")){
-//            companyNameInput.text = accountEditorContainer.documentModel.GetData("CompanyName");
-//        }
 
         if (accountEditorContainer.documentModel.ContainsKey("Email")){
             emailInput.text = accountEditorContainer.documentModel.GetData("Email");
@@ -149,9 +139,6 @@ DocumentBase {
 
         let street = streetInput.text;
         accountEditorContainer.documentModel.SetData("Street", street)
-
-//        let companyName = companyNameInput.text;
-//        accountEditorContainer.documentModel.SetData("CompanyName", companyName)
 
         let email = emailInput.text;
         accountEditorContainer.documentModel.SetData("Email", email);
@@ -229,36 +216,6 @@ DocumentBase {
                 KeyNavigation.tab: accountDescriptionInput;
             }
 
-//            Text {
-//                id: titleAccountName;
-
-//                color: Style.textColor;
-//                font.family: Style.fontFamily;
-//                font.pixelSize: Style.fontSize_common;
-
-//                text: qsTr("Account name");
-//            }
-
-//            CustomTextField {
-//                id: accountNameInput;
-
-//                height: accountEditorContainer.textInputHeight;
-//                width: bodyColumn.width;
-
-//                placeHolderText: qsTr("Enter the account name");
-
-//                radius: accountEditorContainer.radius;
-
-//                onEditingFinished: {
-//                    let oldText = accountEditorContainer.documentModel.GetData("Name");
-//                    if (oldText && oldText !== accountNameInput.text || !oldText && accountNameInput.text !== ""){
-//                        accountEditorContainer.updateModel();
-//                    }
-//                }
-
-//                KeyNavigation.tab: accountDescriptionInput;
-//            }
-
             TextFieldWithTitle {
                 id: accountDescriptionInput;
 
@@ -277,37 +234,6 @@ DocumentBase {
 
                 KeyNavigation.tab: emailInput;
             }
-
-//            Text {
-//                id: titleAccountDescription;
-
-//                color: Style.textColor;
-//                font.family: Style.fontFamily;
-//                font.pixelSize: Style.fontSize_common;
-
-//                text: qsTr("Account description");
-//            }
-
-//            CustomTextField {
-//                id: accountDescriptionInput;
-
-//                height: accountEditorContainer.textInputHeight;
-//                width: bodyColumn.width;
-
-//                placeHolderText: qsTr("Enter the account description");
-
-//                radius: accountEditorContainer.radius;
-
-//                onEditingFinished: {
-//                    console.log("accountDescriptionInput");
-//                    let oldText = accountEditorContainer.documentModel.GetData("Description");
-//                    if (oldText && oldText !== accountDescriptionInput.text || !oldText && accountDescriptionInput.text !== ""){
-//                        accountEditorContainer.updateModel();
-//                    }
-//                }
-
-//                KeyNavigation.tab: emailInput;
-//            }
 
             TextFieldWithTitle {
                 id: emailInput;
@@ -329,42 +255,12 @@ DocumentBase {
 
                 KeyNavigation.tab: countryInput;
             }
-//            Text {
-//                color: Style.textColor;
-//                font.family: Style.fontFamily;
-//                font.pixelSize: Style.fontSize_common;
-
-//                text: qsTr("Email");
-//            }
 
             RegExpValidator {
                 id: mailValid;
 
                 regExp: /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
             }
-
-//            CustomTextField {
-//                id: emailInput;
-
-//                height: accountEditorContainer.textInputHeight;
-//                width: bodyColumn.width;
-
-//                textInputValidator: mailValid;
-
-//                placeHolderText: qsTr("Enter the email");
-
-//                radius: accountEditorContainer.radius;
-
-//                onEditingFinished: {
-//                    console.log("emailInput");
-//                    let oldText = accountEditorContainer.documentModel.GetData("Email");
-//                    if (oldText && oldText !== emailInput.text || !oldText && emailInput.text !== ""){
-//                        accountEditorContainer.updateModel();
-//                    }
-//                }
-
-//                KeyNavigation.tab: countryInput;
-//            }
 
             Text {
                 color: Style.textColor;
@@ -415,36 +311,6 @@ DocumentBase {
                         KeyNavigation.tab: cityInput;
                     }
 
-//                    Text {
-//                        id: countryTitle;
-
-//                        color: Style.textColor;
-//                        font.family: Style.fontFamily;
-//                        font.pixelSize: Style.fontSize_common;
-
-//                        text: qsTr("Country");
-//                    }
-
-//                    CustomTextField {
-//                        id: countryInput;
-
-//                        height: accountEditorContainer.textInputHeight;
-//                        width: companyAddressBlock.width;
-
-//                        placeHolderText: qsTr("Enter the country");
-
-//                        radius: accountEditorContainer.radius;
-
-//                        onEditingFinished: {
-//                            let oldText = accountEditorContainer.documentModel.GetData("Country");
-//                            if (oldText && oldText !== countryInput.text || !oldText && countryInput.text !== ""){
-//                                accountEditorContainer.updateModel();
-//                            }
-//                        }
-
-//                        KeyNavigation.tab: cityInput;
-//                    }
-
                     TextFieldWithTitle {
                         id: cityInput;
 
@@ -462,35 +328,6 @@ DocumentBase {
 
                         KeyNavigation.tab: postalCodeInput;
                     }
-
-//                    Text {
-//                        color: Style.textColor;
-//                        font.family: Style.fontFamily;
-//                        font.pixelSize: Style.fontSize_common;
-
-//                        text: qsTr("City");
-//                    }
-
-//                    CustomTextField {
-//                        id: cityInput;
-
-//                        height: accountEditorContainer.textInputHeight;
-//                        width: companyAddressBlock.width;
-
-//                        placeHolderText: qsTr("Enter the city");
-
-//                        radius: accountEditorContainer.radius;
-
-//                        onEditingFinished: {
-//                            let oldText = accountEditorContainer.documentModel.GetData("City");
-//                            if (oldText && oldText !== cityInput.text || !oldText && cityInput.text !== ""){
-//                                accountEditorContainer.updateModel();
-//                            }
-//                        }
-
-//                        KeyNavigation.tab: postalCodeInput;
-//                    }
-
 
                     TextFieldWithTitle {
                         id: postalCodeInput;
@@ -510,33 +347,6 @@ DocumentBase {
                         KeyNavigation.tab: streetInput;
                     }
 
-//                    Text {
-//                        color: Style.textColor;
-//                        font.family: Style.fontFamily;
-//                        font.pixelSize: Style.fontSize_common;
-
-//                        text: qsTr("Postal Code");
-//                    }
-
-//                    CustomTextField {
-//                        id: postalCodeInput;
-
-//                        height: accountEditorContainer.textInputHeight;
-//                        width: companyAddressBlock.width;
-
-//                        placeHolderText: qsTr("Enter the postal code");
-
-//                        radius: accountEditorContainer.radius;
-
-//                        onEditingFinished: {
-//                            let oldText = String(accountEditorContainer.documentModel.GetData("PostalCode"));
-//                            if (oldText && oldText !== postalCodeInput.text || !oldText && postalCodeInput.text !== ""){
-//                                accountEditorContainer.updateModel();
-//                            }
-//                        }
-//                        KeyNavigation.tab: streetInput;
-//                    }
-
                     TextFieldWithTitle {
                         id: streetInput;
 
@@ -554,34 +364,6 @@ DocumentBase {
 
                         KeyNavigation.tab: accountNameInput;
                     }
-
-//                    Text {
-//                        color: Style.textColor;
-//                        font.family: Style.fontFamily;
-//                        font.pixelSize: Style.fontSize_common;
-
-//                        text: qsTr("Street");
-//                    }
-
-//                    CustomTextField {
-//                        id: streetInput;
-
-//                        height: accountEditorContainer.textInputHeight;
-//                        width: companyAddressBlock.width;
-
-//                        placeHolderText: qsTr("Enter the street");
-
-//                        radius: accountEditorContainer.radius;
-
-//                        onEditingFinished: {
-//                            let oldText = accountEditorContainer.documentModel.GetData("Street");
-//                            if (oldText && oldText !== streetInput.text || !oldText && streetInput.text !== ""){
-//                                accountEditorContainer.updateModel();
-//                            }
-//                        }
-
-//                        KeyNavigation.tab: accountNameInput;
-//                    }
                 }// Company address block
             }//Company address block borders
 
@@ -592,7 +374,7 @@ DocumentBase {
                     headersModel.InsertNewItem();
 
                     headersModel.SetData("Id", "Name");
-                    headersModel.SetData("Name", "Group Name");
+                    headersModel.SetData("Name", qsTr("Group Name"));
 
                     groupsTable.headers = headersModel;
                 }

@@ -5,25 +5,46 @@ import imtgui 1.0
 Column {
     id: root;
 
-    spacing: 10;
+    spacing: 7;
 
     width: 300;
 
     property alias password: passwordTextInput.text;
-    property bool accepted: passwordTextInput.text !== "" && passwordTextInput.text === confirmPasswordInput.text;
+    property bool accepted: !readOnly && passwordTextInput.text != "" && passwordTextInput.text === confirmPasswordInput.text;
 
-//    Item {
-//        width: root.width;
-//        height: 30;
+    property alias passwordInput: passwordTextInput;
+    property alias confirmInput: confirmPasswordInput;
+    property alias errorText: errorText;
 
-//        BaseText {
-//            id: title;
+    property bool readOnly: false;
 
-//            font.family: Style.fontFamilyBold;
+    onAcceptedChanged: {
+        errorText.visible = !accepted;
+    }
 
-//            text: qsTr("Please enter the password for system administrator");
-//        }
-//    }
+    onPasswordChanged: {
+        let isError = false;
+        if (root.password === ""){
+            errorText.text = qsTr("Password cannot be empty");
+            isError = true;
+        }
+        else{
+            if (passwordTextInput.text !== confirmPasswordInput.text){
+                errorText.text = qsTr("Passwords don't match");
+                isError = true;
+            }
+        }
+
+        errorText.visible = isError;
+    }
+
+    onFocusChanged: {
+        console.log("InputBody onFocusChanged", focus);
+
+        if (root.focus){
+            passwordTextInput.focus = root.focus;
+        }
+    }
 
     BaseText {
         id: titlePassword;
@@ -40,6 +61,8 @@ Column {
         placeHolderText: qsTr("Enter the password");
         echoMode: TextInput.Password;
         KeyNavigation.tab: confirmPasswordInput;
+
+        readOnly: root.readOnly;
 
         Loader{
             id: inputDecoratorLoader1;
@@ -63,7 +86,8 @@ Column {
 
         placeHolderText: qsTr("Confirm password");
         echoMode: TextInput.Password;
-        KeyNavigation.tab: passwordTextInput;
+
+        readOnly: root.readOnly;
 
         Loader{
             id: inputDecoratorLoader2;
@@ -85,7 +109,7 @@ Column {
 
             color: Style.errorTextColor;
 
-            visible: !root.accepted;
+            visible: false;
 
             text: qsTr("Passwords don't match");
         }

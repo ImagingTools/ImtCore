@@ -11,7 +11,6 @@ Item {
     property string documentUuid;
 
     property TreeItemModel documentModel: TreeItemModel {};
-    property TreeItemModel documentsData: TreeItemModel{};
     property Item documentManager: null;
 
     property bool isDirty: false;

@@ -42,17 +42,6 @@ Rectangle {
 
         lvPages.model = 0;
         lvPages.model = menuPanel.model;
-//        if (!lvPages.model){
-//            lvPages.model = menuPanel.model;
-//        }
-//        else{
-//            let count = lvPages.count;
-//            if (menuPanel.model.GetItemsCount() !== count){
-//                clearModels();
-
-//                lvPages.model = menuPanel.model;
-//            }
-//        }
     }
 
     ListView {

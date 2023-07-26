@@ -65,7 +65,7 @@ Item {
     }
 
     Component.onDestruction: {
-        console.log("CollectionView onDestruction", itemId);
+        console.log("CollectionView onDestruction", itemId, collectionViewContainer);
 
         Events.unSubscribeEvent("OnLocalizationChanged", collectionViewContainer.onLocalizationChanged);
         Events.unSubscribeEvent(collectionViewContainer.commandUpdateGui, collectionViewContainer.updateGui);
@@ -104,7 +104,7 @@ Item {
     }
 
     onVisibleChanged: {
-        console.log("CollectionView onVisibleChanged", visible);
+        console.log("CollectionView onVisibleChanged", visible, itemId, collectionViewContainer);
         if (collectionViewContainer.visible){
             Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderLocal.commandsModel,
                                                       "CommandsId": commandsProviderLocal.commandsId});
@@ -146,7 +146,7 @@ Item {
     }
 
     onCommandsIdChanged: {
-        console.log("this onItemIdChanged", collectionViewContainer.commandsId);
+        console.log("CollectionView onCommandsIdChanged", collectionViewContainer.commandsId);
 
         commandsProviderLocal.commandsId = collectionViewContainer.commandsId;
         commandsProviderLocal.documentUuid = collectionViewContainer.commandsId;

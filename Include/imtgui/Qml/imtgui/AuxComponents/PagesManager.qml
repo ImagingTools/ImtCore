@@ -24,8 +24,8 @@ Item {
 
     function clearModels(){
         console.log("clearModels");
-        pageModel.Clear();
         pagesData.model = 0;
+        pageModel.Clear();
     }
 
     function onLocalizationChanged(language){
@@ -76,17 +76,24 @@ Item {
             visible: container.activePageIndex === model.index;
 
             Component.onCompleted: {
-                console.log("pagesDeleg onCompleted", model.Source);
+                console.log("pagesDeleg onCompleted", model.Id);
 
                 if (container.documentManager != null){
                     container.documentManager.registerDocumentManager(model.Id, null);
                 }
             }
 
+            Component.onDestruction: {
+                console.log("pagesDeleg onDestruction", model.Id);
+            }
+
             /**
                 The page will be loaded only by click if it hasn't loaded yet
             */
             onVisibleChanged: {
+                console.log("pagesDeleg onVisibleChanged", visible, model.Id);
+                console.log("container.activePageIndex", container.activePageIndex);
+                console.log("model.index", model.index);
                 if(pagesDeleg.visible){
                     if (!pagesLoader.item){
                         if (container.pageModel && container.pageModel.ContainsKey("Source", model.index)){
@@ -111,12 +118,10 @@ Item {
                             pagesLoader.item.mainDocumentManager = container.documentManager;
                         }
 
-//                        if (pagesLoader.item.startPageObj){
-                            pagesLoader.item.startPageObj = {"Id": model.Id,
-                                                             "Name": model.Name,
-                                                             "Source": model.StartItem,
-                                                             "CommandsId": model.Id};
-//                        }
+                        pagesLoader.item.startPageObj = {"Id": model.Id,
+                            "Name": model.Name,
+                            "Source": model.StartItem,
+                            "CommandsId": model.Id};
                     }
                 }
             }

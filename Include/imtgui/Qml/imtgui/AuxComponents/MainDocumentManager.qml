@@ -86,5 +86,41 @@ Item {
 
         return false;
     }
+
+    property var documents;
+
+    function closeAllDocuments(){
+        documents = {}
+
+        let typeIds = Object.keys(root.documentManagers);
+        for (let i = 0; i < typeIds.length; i++){
+            let typeId = typeIds[i];
+            let documentManager = root.documentManagers[typeId];
+            if (documentManager && documentManager !== null){
+                let documentIds = documentManager.getDocumentIDs();
+
+                documents[typeId] = documentIds;
+
+//                for (let documentId of documentIds){
+//                    if (documentManager.documentIsDirty(documentId)){
+//                        root.openDocument(typeId, documentId);
+
+//                        documentManager.closeDocument(documentId);
+//                    }
+//                }
+            }
+        }
+    }
+
+    function closeDocument(){
+        let keys = Object.keys(documents);
+        if (keys.length > 0){
+            let typeId = keys[0];
+            let documentManager = root.documentManagers[typeId];
+            if (documentManager){
+                let documentIds = root.documents[typeId];
+            }
+        }
+    }
 }
 

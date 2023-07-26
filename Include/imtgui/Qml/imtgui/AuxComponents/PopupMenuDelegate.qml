@@ -17,6 +17,7 @@ Item {
     property bool textCentered: false;
 
     property bool selected: !rootItem ? false : rootItem.selectedIndex == model.index ;
+    property bool isSeparator: model.Id === "Separator";
 
     signal clicked(string commandId, int index);
 
@@ -24,11 +25,36 @@ Item {
         //console.log("DEBUG::", model.Id, model.index, popupMenuDelegate.width, popupMenuDelegate.height, popupMenuDelegate.visible, popupMenuDelegate.x, popupMenuDelegate.y, popupMenuDelegate.z, popupMenuDelegate.parent)
     }
 
+    onIsSeparatorChanged: {
+        if (isSeparator){
+            mouseArea.visible = false;
+
+            popupMenuDelegate.height = 5;
+        }
+    }
+
     Rectangle{
         id: background;
 
         anchors.fill: parent;
         color: popupMenuDelegate.rootItem.currentIndex == model.index ? popupMenuDelegate.selectedColor : popupMenuDelegate.mainColor;
+    }
+
+    Rectangle {
+        id: separator;
+
+        anchors.left: parent.left;
+        anchors.leftMargin: 5;
+        anchors.right: parent.right;
+        anchors.rightMargin: 5;
+        anchors.verticalCenter: parent.verticalCenter;
+
+//        width: parent.width;
+        height: 1;
+
+        color: popupMenuDelegate.fontColor;
+
+        visible: isSeparator;
     }
 
     Rectangle {

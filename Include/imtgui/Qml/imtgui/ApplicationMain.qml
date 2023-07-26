@@ -182,4 +182,16 @@ Item {
         console.log("firstModelsInit");
         thumbnailDecorator.userManagementProvider.updateModel();
     }
+
+//    Connections {
+//        target: Qt.application;
+
+//        onAboutToQuit: {
+//            console.log("onAboutToQuit");
+
+//            let dirtyDocumentsExists = thumbnailDecorator.documentManager.dirtyDocumentsExists();
+
+//            console.log("dirtyDocumentsExists", dirtyDocumentsExists);
+//        }
+//    }
 }

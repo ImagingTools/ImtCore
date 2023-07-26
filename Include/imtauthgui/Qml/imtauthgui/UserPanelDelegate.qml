@@ -7,7 +7,11 @@ Item {
     id: userPanelDelegate;
 
     property string userId;
+    property string login;
+    property string passwordHash;
     property TreeItemModel userModel: TreeItemModel {}
+
+    signal userUpdated();
 
     function logout(){
         Events.sendEvent("Logout");
@@ -17,14 +21,24 @@ Item {
         modalDialogManager.openDialog(changePasswordComp, {});
     }
 
+    property QtObject cacheData : QtObject{
+        property string login;
+        property string password;
+    }
+
     Component {
         id: changePasswordComp;
 
         ChangePasswordDialog {
             title: qsTr("Change Password");
+            userPasswordHash: userPanelDelegate.passwordHash;
+            login: userPanelDelegate.login;
 
             onFinished: {
                 if (buttonId === "Ok"){
+                    cacheData.login = login;
+                    cacheData.password = this.password;
+
                     userPanelDelegate.userModel.SetData("Password", this.password)
                     documentController.updateData(userPanelDelegate.userId, userPanelDelegate.userModel);
                 }
@@ -39,9 +53,17 @@ Item {
 
         onDocumentUpdated: {
             modalDialogManager.openDialog(savingErrorDialog, {"message" : qsTr("Password changed successfully")});
+
+            userPanelDelegate.userUpdated();
         }
 
-        onError: {
+        onSetModelStateChanged: {
+            if (setModelState === "Loading"){
+                Events.sendEvent("StartLoading");
+            }
+            else{
+                Events.sendEvent("StopLoading");
+            }
         }
     }
 
@@ -50,7 +72,8 @@ Item {
 
         ErrorDialog {
             title: qsTr("Password changed");
-            onFinished: {}
+            onFinished: {
+            }
         }
     }
 }

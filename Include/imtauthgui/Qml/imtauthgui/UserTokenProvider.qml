@@ -8,6 +8,7 @@ QtObject {
     property string token: "";
     property string login: "";
     property string userId: "";
+    property string passwordHash: "";
 
     signal accepted();
     signal failed(string message);
@@ -64,6 +65,9 @@ QtObject {
 
                             let userId = dataModelLocal.GetData("UserId");
                             container.userId = userId;
+
+                            let userPasswordHash = dataModelLocal.GetData("PasswordHash");
+                            container.passwordHash = userPasswordHash;
 
                             container.accepted();
                         }
