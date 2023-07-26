@@ -4,10 +4,10 @@ import imtgui 1.0
 // import imtqml 1.0
 // import QtGraphicalEffects 1.0
 
-Item {
+FocusScope {
     id: commonButtonDecorator;
 
-    width: iconObj.width + iconObj.width + Style.paddingSmall * 3;
+    width: textObj.width + Style.paddingSmall * 3;
     height: 25;
 
     property var baseButton;
@@ -31,20 +31,6 @@ Item {
         border.width: 1;
         border.color: baseButton.isHovered || baseButton.selected ? Style.iconColorOnSelected : Style.borderColor;
 
-        Image {
-            id: iconObj;
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left
-            anchors.leftMargin: Style.paddingSmall
-
-            width: Style.fontSize_common * 2
-            height: width
-
-            sourceSize.width: width
-            sourceSize.height: height
-            source: baseButton.imageSource
-        }
 
         Text {
             id: textObj;

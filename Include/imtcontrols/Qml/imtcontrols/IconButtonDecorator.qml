@@ -4,13 +4,18 @@ import imtgui 1.0
 // import imtqml 1.0
 // import QtGraphicalEffects 1.0
 
-Item {
+FocusScope {
     id: commonButtonDecorator;
 
-    width: icon.width + text.width + Style.paddingSmall * 3;
+    width: iconObj.width + textObj.width + Style.paddingSmall * 3;
     height: 25;
 
     property var baseButton;
+
+    property alias radius: mainRec.radius;
+    property alias color: mainRec.color;
+    property alias icon: iconObj;
+
 
     Rectangle{
         id: mainRec;
@@ -28,22 +33,26 @@ Item {
         border.color: baseButton.isHovered || baseButton.selected ? Style.iconColorOnSelected : Style.borderColor;
 
         Image {
-            id: icon
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: parent.left
-            anchors.leftMargin: Style.paddingSmall
-            width: Style.fontSize_common * 2
-            height: width
-            sourceSize.width: width
-            sourceSize.height: height
-            source: baseButton.imageSource
+            id: iconObj;
+
+            anchors.verticalCenter: parent.verticalCenter;
+            anchors.left: parent.left;
+            anchors.leftMargin: textObj.text == "" ? parent.width/2 - width/2 : Style.paddingSmall;
+
+            width: Style.fontSize_common * 2;
+            height: width;
+
+            sourceSize.width: width;
+            sourceSize.height: height;
+            source: baseButton.iconSource;
         }
 
         Text {
-            id: text;
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.left: icon.right
-            anchors.leftMargin: Style.paddingSmall
+            id: textObj;
+
+            anchors.verticalCenter: parent.verticalCenter;
+            anchors.left: baseButton.imageSource ? iconObj.right : parent.left;
+            anchors.leftMargin: baseButton.imageSource ? Style.paddingSmall : baseButton.width/2 - width/2;
 
             color: baseButton.enabled ? Style.textColor : Style.inactive_textColor;
 
