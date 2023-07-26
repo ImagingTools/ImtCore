@@ -342,7 +342,7 @@ Rectangle {
         if(!tableContainer.widthDecorator.GetItemsCount() && tableContainer.headers.GetItemsCount()){
             for(var ind = 0; ind < headersCount; ind++){
                 var index = tableContainer.widthDecorator.InsertNewItem();
-                tableContainer.widthDecorator.SetData("Width",tableContainer.width/headersCount,index);
+                tableContainer.widthDecorator.SetData("WidthPercent",100/headersCount,index);
             }
         }
 
