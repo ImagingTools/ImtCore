@@ -196,10 +196,10 @@ Rectangle {
     onHeadersChanged: {
         tableContainer.columnContentComps = [];
 
-
         for (let i = 0; i < tableContainer.headers.GetItemsCount(); i++){
             tableContainer.columnContentComps.push(null);
         }
+
     }
 
     function getSelectedIndexes(){
@@ -340,19 +340,16 @@ Rectangle {
         var headersCount = tableContainer.headers.GetItemsCount();
 
         if(!tableContainer.widthDecorator.GetItemsCount() && tableContainer.headers.GetItemsCount()){
-            for(var ind = 0; ind < headersCount; ind++){
+            for(var ind = 0; ind < headersCount ; ind++){
                 var index = tableContainer.widthDecorator.InsertNewItem();
-                tableContainer.widthDecorator.SetData("WidthPercent",100/headersCount,index);
+                tableContainer.widthDecorator.SetData("Width",-1,index);
+                tableContainer.widthDecorator.SetData("WidthPercent",-1,index);
             }
         }
 
         tableContainer.widthDecoratorDynamic.Clear();
         tableContainer.widthDecoratorDynamic.Copy(tableContainer.widthDecorator);
 
-//        if(!tableContainer.tableDecorator.GetItemsCount()||!tableContainer.widthDecorator.GetItemsCount()){
-//            tableContainer.widthRecalc();
-//            return;
-//        }
 
         var count_ = 0;
         var lengthMinus = 0;
@@ -369,9 +366,11 @@ Rectangle {
                 widthPercent_ = widthPercent_ < 0 ? 0 : widthPercent_*tableContainer.width/100;
                 lengthMinus += Math.max(width_,widthPercent_);
             }
+
         }
 
         if((tableContainer.width - lengthMinus) < headersCount * tableContainer.minCellWidth || count_ == tableContainer.widthDecorator.GetItemsCount() ){
+            //console.log("lengthMinus", lengthMinus);
             tableContainer.widthDecoratorDynamic.Clear();
             for(let ind = 0; ind < headersCount; ind++){
                 let index = tableContainer.widthDecoratorDynamic.InsertNewItem();
@@ -394,13 +393,14 @@ Rectangle {
                 tableContainer.widthDecoratorDynamic.SetData("Width", widthPercent_*tableContainer.width/100,i);
             }
 
-            width_ = tableContainer.widthDecoratorDynamic.IsValidData("Width",i) ? tableContainer.widthDecoratorDynamic.GetData("Width",i): -1;
-
-            if(width_ < 0){
-                if(count_){
-                    tableContainer.widthDecoratorDynamic.SetData("Width",(tableContainer.width - lengthMinus)/count_,i);
-                }
+            else if(width_ >= 0  && widthPercent_ < 0){
+                tableContainer.widthDecoratorDynamic.SetData("Width", width_,i);
             }
+
+            else if(width_ >= 0  && widthPercent_ >= 0){
+                tableContainer.widthDecoratorDynamic.SetData("Width", width_,i);
+            }
+
         }
 
         tableContainer.widthRecalc();
@@ -912,9 +912,10 @@ Rectangle {
                     }
                     onPositionChanged: {
                         var newCoords = mapToItem(moving,mouse.x,mouse.y);
-                        var deltaX = newCoords.x - moving.coord.x;
+                        var deltaX = Math.trunc(newCoords.x - moving.coord.x);
                         var width_ = tableContainer.widthDecoratorDynamic.GetData("Width", model.index);
                         var width_next = tableContainer.widthDecoratorDynamic.GetData("Width", model.index+1);
+
                         width_ += deltaX;
                         width_next -= deltaX
                         if(width_ > tableContainer.minCellWidth && width_next > tableContainer.minCellWidth){
