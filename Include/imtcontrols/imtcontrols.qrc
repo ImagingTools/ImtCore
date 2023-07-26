@@ -1,8 +1,10 @@
 <RCC>
     <qresource prefix="/qml">
-        <file alias="Button.qml">Qml/imtcontrols/Button.qml</file>
-        <file alias="IconButtonDecorator.qml">Qml/imtcontrols/IconButtonDecorator.qml</file>
-        <file alias="TextButtonDecorator.qml">Qml/imtcontrols/TextButtonDecorator.qml</file>
+        <file alias="imtcontrols/qmldir">Qml/imtcontrols/qmldir</file>
+
+        <file alias="imtcontrols/Button.qml">Qml/imtcontrols/Button.qml</file>
+        <file alias="imtcontrols/IconButtonDecorator.qml">Qml/imtcontrols/IconButtonDecorator.qml</file>
+        <file alias="imtcontrols/TextButtonDecorator.qml">Qml/imtcontrols/TextButtonDecorator.qml</file>
     </qresource>
 
 </RCC>

@@ -7,11 +7,11 @@ Item {
     id: baseButton;
 
     property var decorator: style.createObject(baseButton);
-    property Component style
+    property Component style;
 
    //required parameters in every decorator
     property string text: "";
-    property string imageSource: "";
+    property string iconSource: "";
 
     property bool enabled: true;
 
@@ -37,20 +37,24 @@ Item {
     signal loaded();    
     Component.onCompleted: {
         // decorator = decorator.createObject(container);
-        decorator.baseButton = baseButton
+        decorator.baseButton = baseButton;
+
     }
 
-    // Binding {
-    //     target: decorator
-    //     property: "text"
-    //     value: baseButton.text
-    // }
+
+     Binding {
+         target: baseButton;
+         property: "width"
+         value: baseButton.decorator.width;
+     }
     
-    // Binding {
-    //     target: decorator
-    //     property: "color"
-    //     value: baseButton.color
-    // }
+     Binding {
+         target: baseButton;
+         property: "height"
+         value: baseButton.decorator.height;
+     }
+
+
 
     // MouseArea {
     //     anchors.fill: parent

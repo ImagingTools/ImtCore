@@ -10,7 +10,7 @@
     <PositionMap>
         <Element ComponentName="ClientApplication" X="675" Y="425" Note=""/>
         <Element ComponentName="ControlsGalleryLocalization" X="575" Y="600" Note=""/>
-        <Element ComponentName="ImtControlsGallerServer" X="850" Y="225" Note=""/>
+        <Element ComponentName="ControlsGalleryServer" X="850" Y="225" Note=""/>
         <Element ComponentName="LocalSettings" X="850" Y="600" Note=""/>
         <Element ComponentName="LogFilePath" X="250" Y="425" Note=""/>
         <Element ComponentName="LogSystemLocation" X="250" Y="600" Note=""/>

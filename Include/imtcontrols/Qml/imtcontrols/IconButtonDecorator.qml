@@ -10,7 +10,7 @@ Item {
     width: icon.width + text.width + Style.paddingSmall * 3;
     height: 25;
 
-    property var baseButton
+    property var baseButton;
 
     Rectangle{
         id: mainRec;

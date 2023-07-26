@@ -40,7 +40,7 @@ endif()
 
 target_link_libraries(${PROJECT_NAME} iauth)
 target_link_libraries(${PROJECT_NAME} imtbase imtgui imtzip imtrest imtcrypt imtstyle imtqml imtdb imtfile imtguigql)
-target_link_libraries(${PROJECT_NAME} imtlicgql imtguigql imtgql imtauthgui imtauthgql imtauthdb imtapp imtstyleqml)
+target_link_libraries(${PROJECT_NAME} imtlicgql imtguigql imtgql imtauthgui imtauthgql imtauthdb imtapp imtstyleqml imtcontrols)
 # target_link_libraries(${PROJECT_NAME} lisaqml ImtCoreLoc LisaLoc)
 target_link_libraries(${PROJECT_NAME} iqtgui)
 target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::Quick  Qt${QT_VERSION_MAJOR}::WebSockets)
@@ -112,17 +112,20 @@ if(WIN32)
 	unset(listOptions)
 endif()
 
-list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtqml/Qml")
-list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtgui/Qml")
-list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtguigql/Qml")
+if(DEFINED CONTROLS_QML_DIRS AND CONTROLS_QML_DIRS)
+    list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtqml/Qml")
+    list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtgui/Qml")
+    list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtguigql/Qml")
+    list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtcontrols/Qml")
+    list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtstyleqml/Qml")
 
-# Prevent adding duplicate values at each run of CMake.
-list(REMOVE_DUPLICATES QML_IMPORT_DIRS)
+    # Prevent adding duplicate values at each run of CMake.
+    list(REMOVE_DUPLICATES QML_IMPORT_DIRS)
 
-# The variable is cached in ${BUILD_DIR}/CMakeCache.txt. We need FORCE to
-# change it there immediately. Also, add a comment to the cache file.
-set(QML_IMPORT_PATH ${QML_IMPORT_DIRS}
-	CACHE STRING "Qt Creator extra qml import paths for ${PROJECT_NAME}"
-	FORCE
-)
-
+    # The variable is cached in ${BUILD_DIR}/CMakeCache.txt. We need FORCE to
+    # change it there immediately. Also, add a comment to the cache file.
+    set(QML_IMPORT_PATH ${QML_IMPORT_DIRS}
+        CACHE STRING "Qt Creator extra qml import paths for ${PROJECT_NAME}"
+        FORCE
+    )
+endif()

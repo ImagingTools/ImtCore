@@ -19,7 +19,7 @@
                     <AttributeInfo Id="ComponentsToInitialize" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ImtControlsGallerServer</Value>
+                                <Value>ControlsGalleryServer</Value>
                                 <Value>ClientApplication/ClientMainWindowQml</Value>
                                 <Value>ClientApplication/ObserverQml</Value>
                             </Values>
@@ -80,7 +80,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ImtControlsGallerServer" PackageId="ImtControlsGalleryVoce" ComponentId="ImtControlsGalleryServer">
+        <Element Id="ControlsGalleryServer" PackageId="ImtControlsGalleryVoce" ComponentId="ImtControlsGalleryServer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
