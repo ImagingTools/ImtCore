@@ -32,7 +32,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(const QByteArray&
 		QString baseQuery = GetBaseSelectionQuery();
 
 		return QString(
-			baseQuery + QString(" AND \"%1\".\"Id\" = '%2'").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(objectId))).toLocal8Bit();
+			baseQuery + QString(" AND \"%1\".\"Id\" = '%2'").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(objectId))).toUtf8();
 	}
 
 	return BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
@@ -91,8 +91,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 	if (workingDocumentPtr.IsValid()){
 		QByteArray documentContent;
 		if (WriteDataToMemory(typeId, *workingDocumentPtr, documentContent)){
-			QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8() : proposedObjectId;
-			QByteArray revisionUuid = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+			QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray(QUuid::WithoutBraces) : proposedObjectId;
+			QByteArray revisionUuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 			retVal.query = QString("INSERT INTO \"%1\"(\"Id\", \"%2\", \"Name\", \"Description\", \"Added\", \"LastRevisionId\") VALUES('%3', '%4', '%5', '%6', '%7', '%8');")
 						.arg(qPrintable(*m_tableNameAttrPtr))
@@ -103,7 +103,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 						.arg(objectDescription)
 						.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 						.arg(qPrintable(revisionUuid))
-						.toLocal8Bit();
+						.toUtf8();
 
 			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
 
@@ -118,7 +118,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 				.arg(QObject::tr("Initial revision"))
 				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 				.arg(checksum)
-				.toLocal8Bit();
+				.toUtf8();
 
 			if (m_metaInfoTableDelegateCompPtr.IsValid()){
 				idoc::MetaInfoPtr metaInfoPtr = m_metaInfoTableDelegateCompPtr->CreateMetaInfo(valuePtr, typeId);
@@ -144,7 +144,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 								.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
 								.arg(qPrintable(columnIds.join(", ")))
 								.arg(tableValues.join(", "))
-								.toLocal8Bit();
+								.toUtf8();
 				}
 				else{
 					SendErrorMessage(0, "Meta information of the document could not be created", "SQL Database Delegate");
@@ -166,7 +166,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateDeleteObjectQuery(
 			const QByteArray& objectId,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	QByteArray retVal = QString("DELETE FROM \"%1\" WHERE \"%2\" = '%3';").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(s_idColumn)).arg(qPrintable(objectId)).toLocal8Bit();
+	QByteArray retVal = QString("DELETE FROM \"%1\" WHERE \"%2\" = '%3';").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(s_idColumn)).arg(qPrintable(objectId)).toUtf8();
 
 	return retVal;
 }
@@ -183,7 +183,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 	QByteArray countRevisionsQuery = QString("SELECT COUNT(*) FROM \"%1\" WHERE \"%2\" = '%3';")
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 				.arg(qPrintable(s_documentIdColumn))
-				.arg(qPrintable(objectId)).toUtf8();
+				.arg(qPrintable(objectId))
+				.toUtf8();
 
 	QSqlError error;
 	QSqlQuery countQuery = m_databaseEngineCompPtr->ExecSqlQuery(countRevisionsQuery, &error);
@@ -207,14 +208,14 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 	QByteArray documentContent;
 	if (WriteDataToMemory(typeId, object, documentContent)){
 		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
-		QByteArray revisionUuid = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+		QByteArray revisionUuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
 		retVal = QString("UPDATE \"%1\" SET \"LastRevisionId\" = '%2' WHERE \"%3\" = '%4';")
 					.arg(qPrintable(*m_tableNameAttrPtr))
 					.arg(qPrintable(revisionUuid))
 					.arg(qPrintable(s_idColumn))
 					.arg(qPrintable(objectId))
-					.toLocal8Bit();
+					.toUtf8();
 
 
 		QString operationComment = operationContextPtr != nullptr ? operationContextPtr->GetOperationDescription() : QString();
@@ -229,7 +230,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 					.arg(operationComment)
 					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 					.arg(checksum)
-					.toLocal8Bit();
+					.toUtf8();
 
 		if (m_metaInfoTableDelegateCompPtr.IsValid()){
 			idoc::MetaInfoPtr metaInfoPtr = m_metaInfoTableDelegateCompPtr->CreateMetaInfo(&object, collection.GetObjectTypeId(objectId));
@@ -255,7 +256,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 					.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
 					.arg(qPrintable(columnIds.join(", ")))
 					.arg(tableValues.join(", "))
-					.toLocal8Bit();
+					.toUtf8();
 			}
 		}
 	}
@@ -275,7 +276,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateRenameObjectQuery(
 				.arg(newObjectName)
 				.arg(qPrintable(s_idColumn))
 				.arg(qPrintable(objectId))
-				.toLocal8Bit();
+				.toUtf8();
 
 	return retVal;
 }
@@ -313,7 +314,7 @@ imtbase::IRevisionController::RevisionInfoList CSqlDatabaseDocumentDelegateComp:
 				.arg(qPrintable(objectId));
 
 	QSqlError sqlError;
-	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(revisionListQuery.toLocal8Bit(), &sqlError);
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(revisionListQuery.toUtf8(), &sqlError);
 	if (sqlError.type() != QSqlError::NoError){
 		SendErrorMessage(0, sqlError.text(), "Database collection");
 
@@ -369,21 +370,21 @@ int CSqlDatabaseDocumentDelegateComp::BackupObject(
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(qPrintable(objectId))
-				.toLocal8Bit();
+				.toUtf8();
 
 	QByteArray lastRevisionNumberQuery = QString("SELECT \"RevisionNumber\" from \"%2\" WHERE \"%1\" in (SELECT \"LastRevisionId\" from \"%3\" WHERE \"%1\" = '%4')")
 				.arg(qPrintable(s_idColumn))
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(qPrintable(objectId))
-				.toLocal8Bit();
+				.toUtf8();
 
 	QByteArray updateCommentQuery = QString("UPDATE \"%1\" SET \"Comment\" = '%2' WHERE \"%3\" in (%4)")
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 				.arg(userComment)
 				.arg(qPrintable(s_idColumn))
 				.arg(qPrintable(lastRevisionQuery))
-				.toLocal8Bit();
+				.toUtf8();
 
 	m_databaseEngineCompPtr->ExecSqlQuery(updateCommentQuery);
 
@@ -420,7 +421,7 @@ bool CSqlDatabaseDocumentDelegateComp::RestoreObject(
 				.arg(qPrintable(s_idColumn));
 
 	QByteArray revisionUuid;
-	QSqlQuery queryResult = m_databaseEngineCompPtr->ExecSqlQuery(revisionIdQuery.toLocal8Bit());
+	QSqlQuery queryResult = m_databaseEngineCompPtr->ExecSqlQuery(revisionIdQuery.toUtf8());
 	if (queryResult.next()){
 		QSqlRecord record = queryResult.record();
 		if (record.contains(qPrintable(s_idColumn))){
@@ -437,12 +438,12 @@ bool CSqlDatabaseDocumentDelegateComp::RestoreObject(
 		.arg(qPrintable(revisionUuid))
 		.arg(qPrintable(s_idColumn))
 		.arg(qPrintable(objectId))
-		.toLocal8Bit();
+		.toUtf8();
 
 	istd::CChangeNotifier changeNotifier(&collection);
 
 	QSqlError sqlError;
-	m_databaseEngineCompPtr->ExecSqlQuery(setActiveRevisionQuery.toLocal8Bit(), &sqlError);
+	m_databaseEngineCompPtr->ExecSqlQuery(setActiveRevisionQuery.toUtf8(), &sqlError);
 
 	return sqlError.type() == QSqlError::NoError;
 }
@@ -628,7 +629,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectFilterQuery(const iprm::IPara
 	if (collectionFilterParamPtr.IsValid()){
 		QByteArray typeId = collectionFilterParamPtr->GetObjectTypeId();
 
-		filterQuery = QString("\"TypeId\" = '%1'").arg(qPrintable(typeId)).toLocal8Bit();
+		filterQuery = QString("\"TypeId\" = '%1'").arg(qPrintable(typeId)).toUtf8();
 	}
 
 	return true;
@@ -651,7 +652,7 @@ bool CSqlDatabaseDocumentDelegateComp::CreateObjectInfoFromRecord(
 				.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
 				.arg(qPrintable(objectId))
 				.arg(qPrintable(*m_tableNameAttrPtr))
-				.toLocal8Bit();
+				.toUtf8();
 
 	QSqlQuery metaInfoQuery = m_databaseEngineCompPtr->ExecSqlQuery(sqlMetaInfoQuery);
 	if (metaInfoQuery.next()){
@@ -698,7 +699,7 @@ bool CSqlDatabaseDocumentDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRec
 		for (const QByteArray& columnId : columnIds){
 			int metaInfoType = m_metaInfoTableDelegateCompPtr->GetMetaInfoType(columnId);
 			if (metaInfoType >= 0){
-				QByteArray metaInfoId = QString(columnId).remove("\"").toLocal8Bit();
+				QByteArray metaInfoId = QString(columnId).remove("\"").toUtf8();
 
 				if (record.contains(metaInfoId)){
 					QVariant data = m_metaInfoTableDelegateCompPtr->FromTableRepresentation(record.value(qPrintable(metaInfoId)), metaInfoId);

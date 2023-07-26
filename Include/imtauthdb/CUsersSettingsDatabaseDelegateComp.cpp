@@ -95,7 +95,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSettingsDatabaseDelegateCom
 
     retVal.query += QString("\nINSERT INTO \"UserSettings\" (\"UserId\", \"Settings\") VALUES ('%1', '%2');")
 			.arg(qPrintable(userId))
-			.arg(qPrintable(data)).toLocal8Bit();
+			.arg(qPrintable(data)).toUtf8();
 
 	return retVal;
 }
@@ -107,7 +107,7 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateDeleteObjectQuery(
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QString("\nDELETE FROM \"UserSettings\" WHERE \"UserId\" = '%1';")
-			.arg(qPrintable(objectId)).toLocal8Bit();
+			.arg(qPrintable(objectId)).toUtf8();
 }
 
 
@@ -146,7 +146,7 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			.arg(qPrintable(userId))
 			.arg(qPrintable(data))
 			.arg(qPrintable(objectId))
-			.toLocal8Bit();
+			.toUtf8();
 
 	return retVal;
 }

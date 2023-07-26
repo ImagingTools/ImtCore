@@ -73,7 +73,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetCountQuery(const iprm::IParams
 		}
 	}
 
-	return QString("SELECT COUNT(*) FROM \"%1\" %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(filterQuery).toLocal8Bit();
+	return QString("SELECT COUNT(*) FROM \"%1\" %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(filterQuery).toUtf8();
 }
 
 
@@ -88,7 +88,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 					.arg(qPrintable(*m_tableNameAttrPtr))
 					.arg(qPrintable(*m_objectIdColumnAttrPtr))
 					.arg(qPrintable(objectId))
-					.toLocal8Bit();
+					.toUtf8();
 	}
 	else{
 		QString sortQuery;
@@ -122,7 +122,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 		retVal += QString(" ") + qPrintable(paginationQuery) + ")";
 		retVal += QString(" ") + sortQuery;
 
-		return retVal.toLocal8Bit();
+		return retVal.toUtf8();
 	}
 
 	return QByteArray();
@@ -181,7 +181,7 @@ QVariant CSqlDatabaseObjectDelegateCompBase::GetElementInfoFromRecord(const QSql
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::CreateResetQuery(const imtbase::IObjectCollection& /*collection*/) const
 {
-	QByteArray retVal = QString("DELETE FROM \"%1\";").arg(qPrintable(*m_tableNameAttrPtr)).toLocal8Bit();
+	QByteArray retVal = QString("DELETE FROM \"%1\";").arg(qPrintable(*m_tableNameAttrPtr)).toUtf8();
 
 	return retVal;
 }
@@ -274,7 +274,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreatePaginationQuery(int offset, int c
 	paginationQuery.clear();
 
 	if (offset >= 0 && count > 0){
-		paginationQuery = QString("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset).arg(count).toLocal8Bit();
+		paginationQuery = QString("OFFSET %1 ROWS FETCH NEXT %2 ROWS ONLY").arg(offset).arg(count).toUtf8();
 	}
 
 	return true;

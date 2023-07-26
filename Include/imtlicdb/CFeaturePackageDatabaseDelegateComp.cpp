@@ -183,10 +183,11 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CFeaturePackageDatabaseDelegateCo
 	if (featurePackagePtr != nullptr){
 		packageId = featurePackagePtr->GetPackageId();
 		if (packageId.isEmpty()){
-			packageId = objectName.toLocal8Bit();
+			packageId = objectName.toUtf8();
 		}
 
 		NewObjectQuery retVal;
+
 
 		retVal.query = QString("INSERT INTO \"Packages\"(\"Id\", \"Name\", \"Description\", \"Added\", \"LastModified\") VALUES('%1', '%2', '%3', '%4', '%5');")
 				.arg(qPrintable(packageId))
@@ -194,7 +195,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CFeaturePackageDatabaseDelegateCo
 				.arg(objectDescription)
 				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-				.toLocal8Bit();
+				.toUtf8();
 
 		retVal.objectName = objectName;
 
@@ -214,7 +215,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CFeaturePackageDatabaseDelegateCo
 						.arg(featureName)
 						.arg(featureDescription)
 						.arg(qPrintable(packageId))
-						.arg(isOptional).toLocal8Bit();
+						.arg(isOptional).toUtf8();
 
 				CreateInsertSubFeaturesQuery(featurePackagePtr, featureInfoPtr, retVal.query);
 
@@ -225,7 +226,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CFeaturePackageDatabaseDelegateCo
 								QString("INSERT INTO \"FeatureDependencies\"(\"FeatureId\", \"DependencyId\") VALUES('%1', '%2');")
 								.arg(qPrintable(featureId))
 								.arg(qPrintable(dependFeatureId))
-								.toLocal8Bit();
+								.toUtf8();
 					}
 				}
 			}
@@ -250,7 +251,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateDeleteObjectQuery(
 		if (featurePackagePtr != nullptr){
 			packageId = featurePackagePtr->GetPackageId();
 			if (!packageId.isEmpty()){
-				QByteArray retVal = "\n" + QString("DELETE FROM \"Packages\" WHERE \"Id\" = '%1';").arg(qPrintable(packageId)).toLocal8Bit();
+				QByteArray retVal = "\n" + QString("DELETE FROM \"Packages\" WHERE \"Id\" = '%1';").arg(qPrintable(packageId)).toUtf8();
 
 				return retVal;
 			}
@@ -287,7 +288,7 @@ void CFeaturePackageDatabaseDelegateComp::CreateInsertSubFeaturesQuery(
 				.arg(featureName)
 				.arg(featureDescription)
 				.arg(qPrintable(parentFeatureId))
-				.arg(isOptional).toLocal8Bit();
+				.arg(isOptional).toUtf8();
 
 		CreateInsertSubFeaturesQuery(featurePackagePtr, featureInfo, retVal);
 	}
@@ -323,7 +324,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 			.arg(qPrintable(newPackageId))
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 			.arg(qPrintable(oldPackageId))
-			.toLocal8Bit();
+			.toUtf8();
 
 	QByteArrayList addedFeatures;
 	QByteArrayList removedFeatures;
@@ -336,7 +337,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 		retVal += "\n" +
 				QString("DELETE FROM \"Features\" WHERE \"Id\" = '%1' AND \"PackageId\" = '%2';")
 				.arg(qPrintable(removedFeatureId))
-				.arg(qPrintable(newPackageId)).toLocal8Bit();
+				.arg(qPrintable(newPackageId)).toUtf8();
 	}
 
 	// Add new features to the package:
@@ -353,7 +354,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 			retVal += "\n" +
 					QString("DELETE FROM \"Features\" WHERE \"Id\" = '%1';")
-					.arg(qPrintable(addFeatureId)).toLocal8Bit();
+					.arg(qPrintable(addFeatureId)).toUtf8();
 
 			retVal += "\n" +
 					QString("INSERT INTO \"Features\" (\"Id\", \"Name\", \"Description\", \"PackageId\", \"Optional\") VALUES('%1', '%2', '%3', '%4', '%5');")
@@ -361,7 +362,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 					.arg(featureName)
 					.arg(featureDescription)
 					.arg(qPrintable(newPackageId))
-					.arg(isOptional).toLocal8Bit();
+					.arg(isOptional).toUtf8();
 
 			CreateInsertSubFeaturesQuery(newObjectPtr, featureInfoPtr, retVal);
 		}
@@ -385,9 +386,9 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 					.arg(qPrintable(newPackageId))
 					.arg(isOptional)
 					.arg(qPrintable(newPackageId))
-					.arg(qPrintable(updatedFeatureId)).toLocal8Bit();
+					.arg(qPrintable(updatedFeatureId)).toUtf8();
 
-			retVal += QString("\nDELETE FROM \"Features\" WHERE \"ParentId\" = '%1';").arg(qPrintable(updatedFeatureId)).toLocal8Bit();
+			retVal += QString("\nDELETE FROM \"Features\" WHERE \"ParentId\" = '%1';").arg(qPrintable(updatedFeatureId)).toUtf8();
 
 			CreateInsertSubFeaturesQuery(newObjectPtr, featureInfoPtr, retVal);
 		}
@@ -404,14 +405,14 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 			retVal += "\n" +
 					QString("DELETE FROM \"FeatureDependencies\" WHERE \"FeatureId\" = '%1';")
 					.arg(qPrintable(featureId))
-					.toLocal8Bit();
+					.toUtf8();
 
 			for (const QByteArray& dependFeatureId : dependsIds){
 				retVal += "\n" +
 						QString("INSERT INTO \"FeatureDependencies\" (\"FeatureId\", \"DependencyId\") VALUES('%1', '%2');")
 						.arg(qPrintable(featureId))
 						.arg(qPrintable(dependFeatureId))
-						.toLocal8Bit();
+						.toUtf8();
 			}
 
 			QByteArrayList subFeatureIds = featureInfoPtr->GetSubFeatureIds();
@@ -419,7 +420,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 				retVal += "\n" +
 						QString("DELETE FROM \"FeatureDependencies\" WHERE \"FeatureId\" = '%1';")
 						.arg(qPrintable(subFeatureId))
-						.toLocal8Bit();
+						.toUtf8();
 
 				QByteArrayList dependsIds = newObjectPtr->GetFeatureDependencies(subFeatureId);
 				for (const QByteArray& dependFeatureId : dependsIds){
@@ -427,7 +428,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateUpdateObjectQuery(
 							QString("INSERT INTO \"FeatureDependencies\" (\"FeatureId\", \"DependencyId\") VALUES('%1', '%2');")
 							.arg(qPrintable(subFeatureId))
 							.arg(qPrintable(dependFeatureId))
-							.toLocal8Bit();
+							.toUtf8();
 				}
 			}
 		}
@@ -462,7 +463,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateRenameObjectQuery(
 	QByteArray retVal = QString("UPDATE \"Packages\" SET \"Name\" = '%1', \"LastModified\" = '%2' WHERE \"Id\" ='%3';")
 			.arg(newObjectName)
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-			.arg(qPrintable(packageId)).toLocal8Bit();
+			.arg(qPrintable(packageId)).toUtf8();
 
 	return retVal;
 }
@@ -487,7 +488,7 @@ QByteArray CFeaturePackageDatabaseDelegateComp::CreateDescriptionObjectQuery(
 	QByteArray retVal = QString("UPDATE \"Packages\" SET \"Description\" = '%1', \"LastModified\" = '%2' WHERE \"Id\" ='%3';")
 			.arg(description)
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-			.arg(qPrintable(packagePtr->GetPackageId())).toLocal8Bit();
+			.arg(qPrintable(packagePtr->GetPackageId())).toUtf8();
 
 	return retVal;
 }

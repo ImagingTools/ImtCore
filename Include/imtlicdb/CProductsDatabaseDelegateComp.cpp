@@ -159,7 +159,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::Cr
 
 	QByteArray productId = productPtr->GetProductId();
 	if (productId.isEmpty()){
-		productId = objectName.toLocal8Bit();
+		productId = objectName.toUtf8();
 	}
 
 	QByteArray categoryId = productPtr->GetCategoryId();
@@ -181,7 +181,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::Cr
 				.arg(objectDescription)
 				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-				.toLocal8Bit();
+				.toUtf8();
 	retVal.objectName = productName;
 
 	imtbase::ICollectionInfo::Ids licenseIds = productPtr->GetLicenseList().GetElementIds();
@@ -196,7 +196,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::Cr
 						.arg(qPrintable(licenseId))
 						.arg(licenseName)
 						.arg(licenseDescription)
-						.arg(qPrintable(productId)).toLocal8Bit();
+						.arg(qPrintable(productId)).toUtf8();
 
 			imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
 			for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : featureInfos){
@@ -204,7 +204,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::Cr
 							QString("INSERT INTO \"ProductLicenseFeatures\" (\"LicenseId\", \"FeatureId\") VALUES('%1', '%2');")
 							.arg(qPrintable(licenseId))
 							.arg(qPrintable(featureInfo.id))
-							.toLocal8Bit();
+							.toUtf8();
 			}
 		}
 	}
@@ -220,7 +220,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CProductsDatabaseDelegateComp::Cr
 							QString("INSERT INTO \"LicenseDependencies\" (\"LicenseId\", \"DependencyId\") VALUES('%1', '%2');")
 							.arg(qPrintable(licenseId))
 							.arg(qPrintable(dependentId))
-							.toLocal8Bit();
+							.toUtf8();
 			}
 		}
 	}
@@ -246,7 +246,7 @@ QByteArray CProductsDatabaseDelegateComp::CreateDeleteObjectQuery(
 			return QByteArray();
 		}
 
-		QByteArray retVal = QString("DELETE FROM \"Products\" WHERE \"Id\" = '%1';").arg(qPrintable(productId)).toLocal8Bit();
+		QByteArray retVal = QString("DELETE FROM \"Products\" WHERE \"Id\" = '%1';").arg(qPrintable(productId)).toUtf8();
 
 		return retVal;
 	}
@@ -290,7 +290,7 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			.arg(qPrintable(newProductName))
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 			.arg(qPrintable(oldProductId))
-			.arg(qPrintable(categoryId)).toLocal8Bit();
+			.arg(qPrintable(categoryId)).toUtf8();
 
 	QByteArrayList addedLicenses;
 	QByteArrayList removedLicenses;
@@ -313,7 +313,7 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 								.arg(qPrintable(licenseId))
 								.arg(licenseName)
 								.arg(licenseDescription)
-								.arg(qPrintable(newProductId)).toLocal8Bit();
+								.arg(qPrintable(newProductId)).toUtf8();
 
 			const imtlic::ILicenseInfo* licenseInfoPtr = newProductPtr->GetLicenseInfo(licenseId);
 			imtlic::ILicenseInfo::FeatureInfos currentFeatures = licenseInfoPtr->GetFeatureInfos();
@@ -323,7 +323,7 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 							QString("INSERT INTO \"ProductLicenseFeatures\" (\"LicenseId\", \"FeatureId\") VALUES('%1', '%2');")
 							.arg(qPrintable(licenseId))
 							.arg(qPrintable(featureInfo.id))
-							.toLocal8Bit();
+							.toUtf8();
 			}
 		}
 	}
@@ -336,7 +336,7 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			retVal += "\n" +
 						QString("DELETE FROM \"ProductLicenses\" WHERE \"Id\" = '%1' AND \"ProductId\" = '%2';")
 									.arg(qPrintable(licenseId))
-									.arg(qPrintable(oldProductId)).toLocal8Bit();
+									.arg(qPrintable(oldProductId)).toUtf8();
 		}
 	}
 
@@ -359,7 +359,7 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 									.arg(licenseName)
 									.arg(licenseDescription)
 									.arg(qPrintable(oldLicenseId))
-									.arg(qPrintable(newProductId)).toLocal8Bit();
+									.arg(qPrintable(newProductId)).toUtf8();
 
 			QByteArrayList addedFeatures;
 			QByteArrayList removedFeatures;
@@ -373,7 +373,7 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 							QString("INSERT INTO \"ProductLicenseFeatures\" (\"LicenseId\", \"FeatureId\") VALUES('%1', '%2');")
 							.arg(qPrintable(collectionLicenseId))
 							.arg(qPrintable(addedFeatureId))
-							.toLocal8Bit();
+							.toUtf8();
 			}
 
 			// Delete removed features to the license:
@@ -381,7 +381,7 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 				retVal += "\n" +
 							QString("DELETE FROM \"ProductLicenseFeatures\" WHERE \"FeatureId\" = '%1' AND \"LicenseId\" = '%2';")
 							.arg(qPrintable(removedFeatureId))
-							.arg(qPrintable(collectionLicenseId)).toLocal8Bit();
+							.arg(qPrintable(collectionLicenseId)).toUtf8();
 			}
 		}
 	}
@@ -398,14 +398,14 @@ QByteArray CProductsDatabaseDelegateComp::CreateUpdateObjectQuery(
 			retVal += "\n" +
 					QString("DELETE FROM \"LicenseDependencies\" WHERE \"LicenseId\" = '%1';")
 					.arg(qPrintable(licenseId))
-					.toLocal8Bit();
+					.toUtf8();
 
 			for (const QByteArray& dependLicenseId : dependsIds){
 				retVal += "\n" +
 						QString("INSERT INTO \"LicenseDependencies\" (\"LicenseId\", \"DependencyId\") VALUES('%1', '%2');")
 						.arg(qPrintable(licenseId))
 						.arg(qPrintable(dependLicenseId))
-						.toLocal8Bit();
+						.toUtf8();
 			}
 		}
 	}
@@ -434,12 +434,12 @@ QByteArray CProductsDatabaseDelegateComp::CreateRenameObjectQuery(
 	}
 
 	QByteArray oldProductId = productPtr->GetProductId();
-	QByteArray newProductId = newObjectName.toLocal8Bit();
+	QByteArray newProductId = newObjectName.toUtf8();
 
 	QByteArray retVal = QString("UPDATE \"Products\" SET \"Name\" = '%1', \"LastModified\" = '%2' WHERE \"Id\" ='%3';")
 			.arg(qPrintable(newObjectName))
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-			.arg(qPrintable(oldProductId)).toLocal8Bit();
+			.arg(qPrintable(oldProductId)).toUtf8();
 
 	return retVal;
 }
@@ -464,7 +464,7 @@ QByteArray CProductsDatabaseDelegateComp::CreateDescriptionObjectQuery(
 	QByteArray retVal = QString("UPDATE \"Products\" SET \"Description\" = '%1', \"LastModified\" = '%2' WHERE \"Id\" ='%3';")
 			.arg(description)
 			.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-			.arg(qPrintable(productPtr->GetProductId())).toLocal8Bit();
+			.arg(qPrintable(productPtr->GetProductId())).toUtf8();
 
 	return retVal;
 }

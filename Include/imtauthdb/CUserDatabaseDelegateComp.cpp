@@ -69,7 +69,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 					.arg(SqlEncode(documentContent))
 					.arg(revisionVersion)
 					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-					.arg(checksum).toLocal8Bit();
+					.arg(checksum).toUtf8();
 
 			retVal.objectName = objectName;
 		}
@@ -169,7 +169,7 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 				.arg(qPrintable(objectId))
 				.arg(SqlEncode(documentContent))
 				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-				.arg(checksum).toLocal8Bit();
+				.arg(checksum).toUtf8();
 	}
 
 	return retVal;
@@ -195,7 +195,11 @@ QByteArray CUserDatabaseDelegateComp::CreateDeleteObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray retVal = QString("DELETE FROM \"%1\" WHERE \"%2\" = '%3';").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(*m_objectIdColumnAttrPtr)).arg(qPrintable(objectId)).toLocal8Bit();
+	QByteArray retVal = QString("DELETE FROM \"%1\" WHERE \"%2\" = '%3';")
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(*m_objectIdColumnAttrPtr))
+				.arg(qPrintable(objectId))
+				.toUtf8();
 
 	return retVal;
 }

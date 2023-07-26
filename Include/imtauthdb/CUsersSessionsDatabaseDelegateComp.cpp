@@ -62,7 +62,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSessionsDatabaseDelegateCom
 	retVal.query += QString("\nINSERT INTO \"UserSessions\" (\"AccessToken\", \"UserId\", \"LastActivity\") VALUES ('%1', '%2', '%3');")
 				.arg(qPrintable(token))
 				.arg(qPrintable(userId))
-				.arg(QDateTime::currentDateTime().toString(Qt::ISODate)).toLocal8Bit();
+				.arg(QDateTime::currentDateTime().toString(Qt::ISODate)).toUtf8();
 
 	return retVal;
 }

@@ -74,7 +74,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CRoleDatabaseDelegateComp::Create
 						.arg(SqlEncode(documentContent))
 						.arg(revisionVersion)
 						.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-						.arg(checksum).toLocal8Bit();
+						.arg(checksum).toUtf8();
 
 			retVal.objectName = objectName;
 		}
@@ -101,7 +101,7 @@ QByteArray CRoleDatabaseDelegateComp::CreateUpdateObjectQuery(
 					.arg(qPrintable(objectId))
 					.arg(SqlEncode(documentContent))
 					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-					.arg(checksum).toLocal8Bit();
+					.arg(checksum).toUtf8();
 	}
 
 	return retVal;

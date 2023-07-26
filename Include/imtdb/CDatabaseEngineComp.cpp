@@ -309,7 +309,7 @@ bool CDatabaseEngineComp::CreateDatabase() const
 				ExecSqlQueryFromFile(migrationsFolder.filePath("CreateRevision.sql"), &sqlError);
 				if (sqlError.type() != QSqlError::NoError){
 					// If the creation of the revision tables was failed, remove newly created database:
-					ExecSqlQuery(rollbackQuery.toLocal8Bit());
+					ExecSqlQuery(rollbackQuery.toUtf8());
 
 					SendErrorMessage(0, QString("\n\t| Revision table could not be created""\n\t| Error: %1").arg(sqlError.text()));
 
@@ -385,7 +385,7 @@ bool CDatabaseEngineComp::ExecuteDatabasePatches() const
 			else{
 				QString migrationFilePath = folder.filePath("migration_"+QString::number(index) + ".sql");
 
-				ExecSqlQueryFromFile(migrationFilePath.toLocal8Bit(), &sqlError);
+				ExecSqlQueryFromFile(migrationFilePath.toUtf8(), &sqlError);
 
 				if (sqlError.type() != QSqlError::NoError){
 					SendErrorMessage(0, QString("Execution of %1 is failed: %2").arg(migrationFilePath).arg(sqlError.text()), "Database engine");

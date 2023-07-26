@@ -78,7 +78,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressTypeDatabaseDelegateComp:
 				.arg(name)
 				.arg(sname)
 				.arg(description)
-				.toLocal8Bit();
+				.toUtf8();
 	retVal.objectName = name;
 
 	return retVal;
@@ -90,7 +90,7 @@ QByteArray CAddressTypeDatabaseDelegateComp::CreateDeleteObjectQuery(
 			const QByteArray& objectId,
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
-	QByteArray retVal = QString("DELETE FROM \"AddressTypes\" WHERE \"Id\" = '%1';").arg(qPrintable(objectId)).toLocal8Bit();
+	QByteArray retVal = QString("DELETE FROM \"AddressTypes\" WHERE \"Id\" = '%1';").arg(qPrintable(objectId)).toUtf8();
 
 	return retVal;
 }
@@ -125,7 +125,7 @@ QByteArray CAddressTypeDatabaseDelegateComp::CreateUpdateObjectQuery(
 				.arg(shortName)
 				.arg(description)
 				.arg(qPrintable(objectId))
-				.toLocal8Bit();
+				.toUtf8();
 
 	return retVal;
 }

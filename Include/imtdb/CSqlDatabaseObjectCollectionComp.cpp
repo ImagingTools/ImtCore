@@ -576,7 +576,7 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 		return false;
 	}
 
-	QStringList queryList = QString(qPrintable(sqlQuery)).split(";");
+	QStringList queryList = QString::fromUtf8(sqlQuery).split(";");
 
 	m_dbEngineCompPtr->BeginTransaction();
 
@@ -584,11 +584,12 @@ bool CSqlDatabaseObjectCollectionComp::ExecuteTransaction(const QByteArray& sqlQ
 		if (!singleQuery.isEmpty()){
 			QSqlError error;
 			singleQuery = singleQuery.replace('\b', ';');
-			m_dbEngineCompPtr->ExecSqlQuery(singleQuery.toLocal8Bit(), &error);
+			m_dbEngineCompPtr->ExecSqlQuery(singleQuery.toUtf8(), &error);
 			if (error.type() != QSqlError::NoError){
 				SendErrorMessage(0, error.text(), "Database collection");
 
-				qDebug() << "Sql error" << singleQuery;
+				qDebug() << "SQL-error: " << singleQuery;
+
 				m_dbEngineCompPtr->CancelTransaction();
 
 				return false;
