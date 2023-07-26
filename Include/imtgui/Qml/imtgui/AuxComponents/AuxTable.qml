@@ -369,8 +369,7 @@ Rectangle {
 
         }
 
-        if((tableContainer.width - lengthMinus) < headersCount * tableContainer.minCellWidth || count_ == tableContainer.widthDecorator.GetItemsCount() ){
-            //console.log("lengthMinus", lengthMinus);
+        if((tableContainer.width - lengthMinus) < count_ * tableContainer.minCellWidth || count_ == tableContainer.widthDecorator.GetItemsCount() ){
             tableContainer.widthDecoratorDynamic.Clear();
             for(let ind = 0; ind < headersCount; ind++){
                 let index = tableContainer.widthDecoratorDynamic.InsertNewItem();
