@@ -22,6 +22,9 @@ export class ListView extends Flickable {
     $cache = []
     $tempElement = null
 
+    $width0 = 0
+    $height0 = 0
+
     constructor(args) {
         super(args)
 
@@ -343,16 +346,16 @@ export class ListView extends Flickable {
         return index >= 0 && index < this.contentItem.children.length ? this.contentItem.children[index] : undefined
     }
     positionViewAtBeginning(){
-        this.contentX = 0
-        this.contentY = 0
+        this.positionViewAtIndex(0, ListView.Beginning)
     }
     positionViewAtEnd(){
-        if(this.contentWidth > this.width){
-            this.contentX = Math.min(this.contentItem.children[this.contentItem.children.length-1].x + this.contentItem.children[this.contentItem.children.length-1].width, this.contentWidth - this.width)
-        }
-        if(this.contentHeight > this.height){
-            this.contentY = Math.min(this.contentItem.children[this.contentItem.children.length-1].y + this.contentItem.children[this.contentItem.children.length-1].height, this.contentHeight - this.height)
-        }
+        this.positionViewAtIndex(this.$items.length-1, ListView.Beginning)
+        // if(this.contentWidth > this.width){
+        //     this.contentX = Math.min(this.contentItem.children[this.contentItem.children.length-1].x + this.contentItem.children[this.contentItem.children.length-1].width, this.contentWidth - this.width)
+        // }
+        // if(this.contentHeight > this.height){
+        //     this.contentY = Math.min(this.contentItem.children[this.contentItem.children.length-1].y + this.contentItem.children[this.contentItem.children.length-1].height, this.contentHeight - this.height)
+        // }
         
     }
     positionViewAtIndex(index, mode){
@@ -362,34 +365,65 @@ export class ListView extends Flickable {
             case ListView.Center: pos = 'center'; break;
             case ListView.End: pos = 'end'; break;
         }
-        if(pos === 'start') {
-            if(this.contentWidth > this.width){
-                this.contentX = Math.min(this.contentItem.children[index].x, this.contentWidth - this.width)
-            }
-            if(this.contentHeight > this.height){
-                this.contentY = Math.min(this.contentItem.children[index].y, this.contentHeight - this.height)
-            }
-            // this.contentX = this.contentItem.children[index].x
-            // this.contentY = this.contentItem.children[index].y
-        } else if(pos === 'center') {
-            if(this.contentWidth > this.width){
-                this.contentX = Math.min(this.contentItem.children[index].x - (this.width - this.contentItem.children[index].width)/2, this.contentWidth - this.width)
-            }
-            if(this.contentHeight > this.height){
-                this.contentY = Math.min(this.contentItem.children[index].y - (this.height - this.contentItem.children[index].height)/2, this.contentHeight - this.height)
-            }
-            // this.contentX = this.contentItem.children[index].x - (this.width - this.contentItem.children[index].width)/2
-            // this.contentY = this.contentItem.children[index].y - (this.height - this.contentItem.children[index].height)/2
-        } else if(pos === 'end') {
-            if(this.contentWidth > this.width){
-                this.contentX = Math.min(this.contentItem.children[index].x - (this.width - this.contentItem.children[index].width), this.contentWidth - this.width)
-            }
-            if(this.contentHeight > this.height){
-                this.contentY = Math.min(this.contentItem.children[index].y - (this.height - this.contentItem.children[index].height), this.contentHeight - this.height)
-            }
-            // this.contentX = this.contentItem.children[index].x - (this.width - this.contentItem.children[index].width)
-            // this.contentY = this.contentItem.children[index].y - (this.height - this.contentItem.children[index].height)
+
+        let indexWithout0 = index === 0 ? 1 : index
+
+        let contentX = index === 0 ? this.$width0 + this.spacing : 0
+        let contentY = index === 0 ? this.$height0 + this.spacing : 0
+        let leftIndex = this.$items.length - 1
+        let rightIndex = 0
+        let middleWidth = Math.ceil(this.contentWidth / this.$items.length)
+        let middleHeight = Math.ceil(this.contentHeight / this.$items.length)
+        for(let i = 0; i < this.$items.length; i++){
+            if(this.$items[i] && i < leftIndex) leftIndex = i
+            if(this.$items[i] && i > rightIndex) rightIndex = i
         }
+
+        if(index > rightIndex){
+            contentX = this.$items[rightIndex].x + this.$items[rightIndex].width - middleWidth * (rightIndex - (indexWithout0-1)) - contentX
+            contentY = this.$items[rightIndex].y + this.$items[rightIndex].height - middleHeight * (rightIndex - (indexWithout0-1)) - contentY
+        } else if(index < leftIndex) {
+            contentX = this.$items[leftIndex].x - middleWidth * (leftIndex - indexWithout0) - contentX
+            contentY = this.$items[leftIndex].y - middleHeight * (leftIndex - indexWithout0) - contentY
+        } else {
+            contentX = this.$items[index].x
+            contentY = this.$items[index].y
+        }
+
+        if(this.orientation === ListView.Horizontal){
+            this.contentX = contentX
+        } else {
+            this.contentY = contentY
+        }
+
+        // if(pos === 'start') {
+        //     if(this.contentWidth > this.width){
+        //         this.contentX = Math.min(this.contentItem.children[index].x, this.contentWidth - this.width)
+        //     }
+        //     if(this.contentHeight > this.height){
+        //         this.contentY = Math.min(this.contentItem.children[index].y, this.contentHeight - this.height)
+        //     }
+        //     // this.contentX = this.contentItem.children[index].x
+        //     // this.contentY = this.contentItem.children[index].y
+        // } else if(pos === 'center') {
+        //     if(this.contentWidth > this.width){
+        //         this.contentX = Math.min(this.contentItem.children[index].x - (this.width - this.contentItem.children[index].width)/2, this.contentWidth - this.width)
+        //     }
+        //     if(this.contentHeight > this.height){
+        //         this.contentY = Math.min(this.contentItem.children[index].y - (this.height - this.contentItem.children[index].height)/2, this.contentHeight - this.height)
+        //     }
+        //     // this.contentX = this.contentItem.children[index].x - (this.width - this.contentItem.children[index].width)/2
+        //     // this.contentY = this.contentItem.children[index].y - (this.height - this.contentItem.children[index].height)/2
+        // } else if(pos === 'end') {
+        //     if(this.contentWidth > this.width){
+        //         this.contentX = Math.min(this.contentItem.children[index].x - (this.width - this.contentItem.children[index].width), this.contentWidth - this.width)
+        //     }
+        //     if(this.contentHeight > this.height){
+        //         this.contentY = Math.min(this.contentItem.children[index].y - (this.height - this.contentItem.children[index].height), this.contentHeight - this.height)
+        //     }
+        //     // this.contentX = this.contentItem.children[index].x - (this.width - this.contentItem.children[index].width)
+        //     // this.contentY = this.contentItem.children[index].y - (this.height - this.contentItem.children[index].height)
+        // }
     }
 
     // $insert(index){
@@ -478,6 +512,12 @@ export class ListView extends Flickable {
     //     this.count = this.contentItem.children.length
     //     // this.$updateGeometry()
     // }
+    $update0(){
+        if(this.$items[0]){
+            this.$width0 = this.$items[0].width
+            this.$height0 = this.$items[0].height
+        }
+    }
 
     $recursiveIndex(obj, index){
         if(obj.$qmlClassName !== 'ListElement'){
@@ -500,7 +540,6 @@ export class ListView extends Flickable {
             obj.widthChanged.connect(this.$updateGeometry.bind(this))
             obj.heightChanged.connect(this.$updateGeometry.bind(this))
         }
-        
         
         // obj.$orientation = this.orientation
         this.$recursiveIndex(obj, index)
@@ -821,6 +860,7 @@ export class ListView extends Flickable {
             // this.$oldContentX = this.contentX
             // this.$oldContentY = this.contentY
             this.$enabledScroll = true
+            this.$update0()
         }
         
     
