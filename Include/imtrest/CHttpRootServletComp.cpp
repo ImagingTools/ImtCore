@@ -50,7 +50,6 @@ IRequestServlet::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRe
 			const CHttpRequest* httprequestPtr = dynamic_cast<const CHttpRequest*>(&request);
 			if (httprequestPtr != nullptr){
 				QByteArrayList headers = httprequestPtr->GetHeaders();
-				qDebug() << "headers" << headers;
 				QByteArray encodingHeader = httprequestPtr->GetHeaderValue("Accept-Encoding");
 				if (encodingHeader.contains("deflate")){
 					encodingType = ET_DEFLATE;
