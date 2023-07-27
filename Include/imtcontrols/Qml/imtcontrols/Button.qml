@@ -1,9 +1,9 @@
-import QtQuick 2.0
+import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 import imtqml 1.0
 
-Item {
+FocusScope {
     id: baseButton;
 
     property var decorator: style.createObject(baseButton);
@@ -34,13 +34,29 @@ Item {
     signal entered();
     signal exited();
 
-    signal loaded();    
+    signal loaded();
+
     Component.onCompleted: {
         // decorator = decorator.createObject(container);
         decorator.baseButton = baseButton;
 
     }
 
+    Keys.onPressed: {
+        if (event.key === Qt.Key_Return){
+            console.log('Key was pressed', baseButton.text);
+            event.accepted = true;
+        }
+    }
+
+//    Shortcut {
+//        sequence: "Return";
+//        enabled: baseButton.focus;
+//        onActivated: {
+//            console.log('Key was pressed', baseButton.text);
+
+//        }
+//    }
 
      Binding {
          target: baseButton;

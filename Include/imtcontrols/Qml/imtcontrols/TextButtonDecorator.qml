@@ -4,7 +4,7 @@ import imtgui 1.0
 // import imtqml 1.0
 // import QtGraphicalEffects 1.0
 
-FocusScope {
+Item {
     id: commonButtonDecorator;
 
     width: textObj.width + Style.paddingSmall * 3;
@@ -23,7 +23,7 @@ FocusScope {
 
         radius: 2;
 
-        color: baseButton.color !== "" ? baseButton.color : baseButton.isHighlighted && baseButton.isHovered ? Style.hover :
+        color: commonButtonDecorator.baseButton.focus ? "red" : baseButton.color !== "" ? baseButton.color : baseButton.isHighlighted && baseButton.isHovered ? Style.hover :
                                                                               baseButton.isHovered ? Style.selectedColor:
                                                                               Style.buttonColor;
 
