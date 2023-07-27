@@ -5,15 +5,12 @@ import Acf 1.0
 Item {
     id: delegateContainer;
 
-    property Item pTableDelegateContainer: null;
+    property Item pTableDelegateContainer: parent.parent.parent !== null ? parent.parent.parent: null;
 
     property Item mainMouseArea: pTableDelegateContainer != null ? pTableDelegateContainer.mouseArea : null;
 
     height: pTableDelegateContainer ? pTableDelegateContainer.height : 0;
     width: pTableDelegateContainer ? pTableDelegateContainer.width/pTableDelegateContainer.count : 0;
-
-	/// \workaround to calc cells count
-    property var pDataList: [];
 
     property int columnCount: pTableDelegateContainer && pTableDelegateContainer.tableItem ? pTableDelegateContainer.tableItem.columnCount : 0;
 
@@ -21,8 +18,8 @@ Item {
     property bool complCompl: columnCount && delegateContainer.compl;
 
     property alias contentComp: contentLoader.sourceComponent;
-	property real textLeftIndent: 0
-	property real textRightIndent: 0
+    property real textLeftIndent: 0
+    property real textRightIndent: 0
 
     property int columnIndex: model.index;
     property int rowIndex: pTableDelegateContainer ? pTableDelegateContainer.rowIndex : -1;
@@ -32,11 +29,11 @@ Item {
         delegateContainer.compl = true;
     }
 
-
-
     onComplComplChanged: {
         if(delegateContainer.complCompl){
-            //pTableDelegateContainer.widthRecalc.connect(delegateContainer.setCellWidth)
+            delegateContainer.contentComp = delegateContainer.pTableDelegateContainer.tableItem.columnContentComps[model.index] !== null ?
+                             delegateContainer.pTableDelegateContainer.tableItem.columnContentComps[model.index] : delegateContainer.defaultContentComp;
+
             pTableDelegateContainer.tableItem.widthRecalc.connect(delegateContainer.setCellWidth)
             delegateContainer.setCellWidth();
 
@@ -44,8 +41,6 @@ Item {
     }
 
     function setCellWidth(){
-        //console.log("widthRecalc:: cellDelegate", 2);
-
         if(!delegateContainer){
             return;
         }
@@ -68,59 +63,12 @@ Item {
         }
     }
 
-    //borders
 
-    Rectangle{
-        id: topBorder;
-        anchors.top: parent.top;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
-        height: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.visibleTopBorderFirst  ? delegateContainer.pTableDelegateContainer.horizontalBorderSize : 0 : 0;
-        color: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.borderColorHorizontal : "transparent";
-    }
-
-    Rectangle{
-        id: bottomBorder;
-        anchors.bottom: parent.bottom;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
-        height: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.visibleBottomBorderLast ? delegateContainer.pTableDelegateContainer.horizontalBorderSize : 0 : 0;
-        color:  delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.borderColorHorizontal : "transparent";
-    }
-
-    Rectangle{
-        id: leftBorder;
-        anchors.left: parent.left;
-        anchors.top: parent.top;
-        anchors.bottom: parent.bottom;
-        width: delegateContainer.pTableDelegateContainer ?
-                   delegateContainer.pTableDelegateContainer.isRightBorder ? delegateContainer.pTableDelegateContainer.verticalBorderSize * delegateContainer.pTableDelegateContainer.visibleLeftBorderFirst * (model.index == 0)
-                                                                       : delegateContainer.pTableDelegateContainer.visibleLeftBorderFirst ? delegateContainer.pTableDelegateContainer.verticalBorderSize : model.index > 0 ? delegateContainer.pTableDelegateContainer.verticalBorderSize : 0
-                                                                                                                                                                                                                                                    :0;
-        color:  delegateContainer.pTableDelegateContainer ?delegateContainer.pTableDelegateContainer.borderColorVertical : "transparent";
-    }
-
-    Rectangle{
-        id: rightBorder;
-        anchors.right: parent.right;
-        anchors.top: parent.top;
-        anchors.bottom: parent.bottom;
-        width: delegateContainer.pTableDelegateContainer ?
-            !delegateContainer.pTableDelegateContainer.isRightBorder ?
-                   delegateContainer.pTableDelegateContainer.verticalBorderSize * delegateContainer.pTableDelegateContainer.visibleRightBorderLast  * (model.index == (delegateContainer.pTableDelegateContainer.count -1)) * (delegateContainer.pTableDelegateContainer.count > 0) :
-                   delegateContainer.pTableDelegateContainer.visibleRightBorderLast ? delegateContainer.pTableDelegateContainer.verticalBorderSize  :
-                                                                                      delegateContainer.pTableDelegateContainer.verticalBorderSize * (model.index < (delegateContainer.pTableDelegateContainer.count -1)) : 0;
-
-        color: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.borderColorVertical : "transparent";
-    }
-
-    //borders
     Rectangle{
         id: mainRec;
-        anchors.top: topBorder.bottom;
-        anchors.left: leftBorder.right;
-        anchors.right: rightBorder.left;
-        anchors.bottom: bottomBorder.top;
+
+        anchors.fill: parent;
+
         color: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.emptyDecorCell ? "transparent" :
                                                                           delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("Color", model.index) ?
                                                                               delegateContainer.pTableDelegateContainer.cellDecorator.GetData("Color", model.index) :
@@ -135,56 +83,7 @@ Item {
                                                                            delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("CellRadius", model.index) ?
                                                                                delegateContainer.pTableDelegateContainer.cellDecorator.GetData("CellRadius", model.index) :0 : 0;
 
-        //cornerPatches
-        Rectangle{
-            id: leftTopCornerPatch;
-            anchors.left: parent.left;
-            anchors.top: parent.top;
-            width: parent.width/2;
-            height: parent.height/2;
-            color: parent.color;
-            visible: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.emptyDecorCell ? true :
-                                                                                delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("LeftTopRound", model.index) ?
-                                                                                    !delegateContainer.pTableDelegateContainer.cellDecorator.GetData("LeftTopRound", model.index) :true : 0;
-        }
 
-        Rectangle{
-            id: rightTopCornerPatch;
-            anchors.right: parent.right;
-            anchors.top: parent.top;
-            width: parent.width/2;
-            height: parent.height/2;
-            color: parent.color;
-            visible: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.emptyDecorCell ? true :
-                                                                                delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("RightTopRound", model.index) ?
-                                                                                    !delegateContainer.pTableDelegateContainer.cellDecorator.GetData("RightTopRound", model.index) :true : 0;
-        }
-
-        Rectangle{
-            id: leftBottomCornerPatch;
-            anchors.left: parent.left;
-            anchors.bottom: parent.bottom;
-            width: parent.width/2;
-            height: parent.height/2;
-            color: parent.color;
-            visible: delegateContainer.pTableDelegateContainer ?
-                         delegateContainer.pTableDelegateContainer.emptyDecorCell ? true :
-                                                                                delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("LeftBottomRound", model.index) ?
-                                                                                    !delegateContainer.pTableDelegateContainer.cellDecorator.GetData("LeftBottomRound", model.index) :true : 0;
-        }
-
-        Rectangle{
-            id: rightBottomCornerPatch;
-            anchors.right:  parent.right;
-            anchors.bottom: parent.bottom;
-            width: parent.width/2;
-            height: parent.height/2;
-            color: parent.color;
-            visible: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.emptyDecorCell ? true :
-                                                                                delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("RightBottomRound", model.index) ?
-                                                                                    !delegateContainer.pTableDelegateContainer.cellDecorator.GetData("RightBottomRound", model.index) :true : 0;
-        }
-        //cornerPatches
     }//mainRec
 
     Rectangle {
@@ -194,8 +93,6 @@ Item {
         anchors.right: parent.right;
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
-        anchors.topMargin: topBorder.height;
-        anchors.bottomMargin: bottomBorder.height;
 
         color: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.selectedColor : "transparent";
         opacity: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.selectedOpacity : 0;
@@ -211,9 +108,6 @@ Item {
         anchors.left: mainRec.left;
         anchors.right: mainRec.right;
         anchors.leftMargin: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.textLeftMargin: 0;
-
-        sourceComponent: defaultContent;
-
 
         onLoaded: {
             if (contentLoader.item.tableCellDelegate !== undefined){
@@ -275,8 +169,6 @@ Item {
             onLinkActivated: {
                 Qt.openUrlExternally(link);
             }
-//            text: delegateContainer.pTableDelegateContainer ? delegateContainer.columnIndex >= 0 ? delegateContainer.pTableDelegateContainer.dataModel[delegateContainer.pTableDelegateContainer.headers.GetData("Id", delegateContainer.columnIndex)] : "" : "";
-//            text: delegateContainer.pTableDelegateContainer.headers.GetData("Id", 1)
 
             text: delegateContainer.getValue();
             onTextChanged: {
@@ -294,8 +186,7 @@ Item {
                 }
                 if(wrapMode !== Text.NoWrap && delegateContainer.pTableDelegateContainer){
                     var height_ = name.height +
-                            2*delegateContainer.pTableDelegateContainer.textMarginVer +
-                            topBorder.height + bottomBorder.height;
+                            2*delegateContainer.pTableDelegateContainer.textMarginVer;
 
                     delegateContainer.pTableDelegateContainer.setHeightModelElememt(delegateContainer.columnIndex, height_);
 

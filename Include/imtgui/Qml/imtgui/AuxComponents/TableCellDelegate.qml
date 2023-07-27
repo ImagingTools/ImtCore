@@ -5,15 +5,12 @@ import Acf 1.0
 Item {
     id: delegateContainer;
 
-    property Item pTableDelegateContainer: null;
+    property Item pTableDelegateContainer: parent.parent.parent !== null ? parent.parent.parent: null;
 
     property Item mainMouseArea: pTableDelegateContainer != null ? pTableDelegateContainer.mouseArea : null;
 
     height: pTableDelegateContainer ? pTableDelegateContainer.height : 0;
     width: pTableDelegateContainer ? pTableDelegateContainer.width/pTableDelegateContainer.count : 0;
-
-	/// \workaround to calc cells count
-    property var pDataList: [];
 
     property int columnCount: pTableDelegateContainer && pTableDelegateContainer.tableItem ? pTableDelegateContainer.tableItem.columnCount : 0;
 
@@ -32,11 +29,11 @@ Item {
         delegateContainer.compl = true;
     }
 
-
-
     onComplComplChanged: {
         if(delegateContainer.complCompl){
-            //pTableDelegateContainer.widthRecalc.connect(delegateContainer.setCellWidth)
+            delegateContainer.contentComp = delegateContainer.pTableDelegateContainer.tableItem.columnContentComps[model.index] !== null ?
+                             delegateContainer.pTableDelegateContainer.tableItem.columnContentComps[model.index] : delegateContainer.defaultContentComp;
+
             pTableDelegateContainer.tableItem.widthRecalc.connect(delegateContainer.setCellWidth)
             delegateContainer.setCellWidth();
 
@@ -44,8 +41,6 @@ Item {
     }
 
     function setCellWidth(){
-        //console.log("widthRecalc:: cellDelegate", 2);
-
         if(!delegateContainer){
             return;
         }
@@ -211,9 +206,6 @@ Item {
         anchors.left: mainRec.left;
         anchors.right: mainRec.right;
         anchors.leftMargin: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.textLeftMargin: 0;
-
-        sourceComponent: defaultContent;
-
 
         onLoaded: {
             if (contentLoader.item.tableCellDelegate !== undefined){

@@ -128,6 +128,8 @@ Rectangle {
 
     property bool compl: false;
 
+    property  Component cellDelegate: TableCellDelegate {};
+
     signal checkedItemsChanged();
     signal selectionChanged(var selection);
 
@@ -171,8 +173,7 @@ Rectangle {
 
         tableContainer.setBorderParams();
 
-        pauseWidth.stop;
-        pauseWidth.start();
+        tableContainer.setWidth();
 
         if(tableContainer.wrapMode !== Text.NoWrap){
             for(var i = 0; i < tableContainer.headers.GetItemsCount(); i++){
@@ -185,8 +186,7 @@ Rectangle {
     }
 
     onWidthChanged: {
-        pauseWidth.stop;
-        pauseWidth.start();
+        tableContainer.setWidth();
         if(tableContainer.wrapMode !== Text.NoWrap){
             pauseHeight.stop();
             pauseHeight.start();

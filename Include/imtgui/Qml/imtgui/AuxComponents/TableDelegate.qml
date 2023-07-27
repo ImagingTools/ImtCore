@@ -8,7 +8,6 @@ Rectangle {
     height: visible ? minHeight : 0;
 	color: tableDelegateContainer.selected ? Style.selectedColor : "transparent";
 
-	property alias cellDelegate: dataList.delegate
     property int textTopMargin: 8;
     property int count: 0;
 
@@ -69,6 +68,9 @@ Rectangle {
     property bool compl: false;
 
     property string selectedColor: Style.selectedColor;
+
+    property  Component cellDelegate: tableItem ? tableItem.cellDelegate : cellDelegateDefault;
+    property  Component cellDelegateDefault: TableCellDelegate {};
 
     signal clicked();
     signal rightButtonMouseClicked(int mX, int mY);
@@ -268,13 +270,7 @@ Rectangle {
         }
         model: tableDelegateContainer.count;
 
-		delegate: TableCellDelegate {
-			id: tableCellDelegate
-
-            pTableDelegateContainer: tableDelegateContainer;
-            contentComp: tableDelegateContainer.tableItem.columnContentComps[model.index] !== null ? tableDelegateContainer.tableItem.columnContentComps[model.index] : tableCellDelegate.defaultContentComp;
-            pDataList: tableDelegateContainer.tableItem.columnContentComps;
-		}//delegate
+        delegate: tableDelegateContainer.cellDelegate;
     }//dataList
 
 	Rectangle{
