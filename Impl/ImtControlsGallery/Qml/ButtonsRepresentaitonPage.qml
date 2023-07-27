@@ -7,51 +7,203 @@ import imtcontrols 1.0
 Rectangle {
     anchors.fill: parent;
 
-    Row{
-        id: buttonsRow;
+    Component.onCompleted: {
+        //iconButton.forceActiveFocus();
+        iconButton.focus = true;
+    }
 
-        anchors.centerIn: parent;
-        spacing: 50;
+    FocusScope{
+        id: item1;
+        anchors.horizontalCenter: parent.horizontalCenter;
+        anchors.top: parent.top;
+        anchors.topMargin: 100;
 
-        Button{
-            id: textButton;
+        width: buttonsRow.width;
+        height: buttonsRow.height;
+        Row{
+            id: buttonsRow;
 
-            anchors.verticalCenter:  parent.verticalCenter;
+            anchors.centerIn: parent;
+            height: 50;
+            spacing: 50;
 
-            style: textButtonDecorator;
+            Button{
+                id: textButton;
 
-            text: "Text button";
-            onClicked: {
-                pauseMessage.restart();
+                anchors.verticalCenter:  parent.verticalCenter;
+
+                style: textButtonDecorator;
+
+                text: "Text button";
+                onClicked: {
+                    pauseMessage.restart();
+                    focus = true;
+                    //forceActiveFocus()
+                }
             }
-        }
 
-        Button{
-            id: roundButton;
+            Button{
+                id: roundButton;
 
-            anchors.verticalCenter:  parent.verticalCenter;
+                anchors.verticalCenter:  parent.verticalCenter;
 
-            style: roundButtonDecorator;
-            iconSource: "../../../Icons/" + Style.theme + "/Close.svg";
-            onClicked: {
-                pauseMessage.restart();
+                style: roundButtonDecorator;
+                iconSource: "../../../Icons/" + Style.theme + "/Close.svg";
+                onClicked: {
+                    pauseMessage.restart();
+                    focus = true;
+                    //forceActiveFocus()
+                }
             }
-        }
 
-        Button{
-            id: iconButton;
+            Button{
+                id: iconButton;
 
-            anchors.verticalCenter:  parent.verticalCenter;
+                anchors.verticalCenter:  parent.verticalCenter;
 
-            style: iconButtonDecorator;
+                style: iconButtonDecorator;
 
-            iconSource: "../../../Icons/" + Style.theme + "/Eye.svg";
-            text: "Icon button";
-            onClicked: {
-                pauseMessage.restart();
+                iconSource: "../../../Icons/" + Style.theme + "/Eye.svg";
+                text: "Icon button";
+                onClicked: {
+                    pauseMessage.restart();
+                    focus = true;
+                    //forceActiveFocus()
+                }
+            }
+
+            TextInput{
+                width: 100;
+                height: 50
+                onAccepted: console.log("textINput")
             }
         }
     }
+
+    FocusScope{
+        id: item2;
+        anchors.horizontalCenter: parent.horizontalCenter;
+        anchors.top: item1.bottom;
+        anchors.topMargin: 100;
+
+        width: buttonsRow.width;
+        height: buttonsRow.height;
+        Row{
+            id: buttonsRow2;
+
+            anchors.centerIn: parent;
+            height: 50;
+            spacing: 50;
+
+            Button{
+                id: textButton2;
+
+                anchors.verticalCenter:  parent.verticalCenter;
+
+                style: textButtonDecorator;
+
+                text: "Text button";
+                onClicked: {
+                    pauseMessage.restart();
+                    focus = true;
+                    //forceActiveFocus()
+                }
+            }
+
+            Button{
+                id: roundButton2;
+
+                anchors.verticalCenter:  parent.verticalCenter;
+
+                style: roundButtonDecorator;
+                iconSource: "../../../Icons/" + Style.theme + "/Close.svg";
+                onClicked: {
+                    pauseMessage.restart();
+                    focus = true;
+                    //forceActiveFocus()
+                }
+            }
+
+            Button{
+                id: iconButton2;
+
+                anchors.verticalCenter:  parent.verticalCenter;
+
+                style: iconButtonDecorator;
+
+                iconSource: "../../../Icons/" + Style.theme + "/Eye.svg";
+                text: "Icon button";
+                onClicked: {
+                    pauseMessage.restart();
+                    focus = true;
+                    //forceActiveFocus()
+                }
+            }
+
+            TextInput{
+                width: 100;
+                height: 50
+                onAccepted: console.log("textINput")
+            }
+        }
+    }
+//    Row{
+//        id: buttonsRow;
+
+//        anchors.centerIn: parent;
+//        spacing: 50;
+
+//        Button{
+//            id: textButton;
+
+//            anchors.verticalCenter:  parent.verticalCenter;
+
+//            style: textButtonDecorator;
+
+//            text: "Text button";
+//            onClicked: {
+//                pauseMessage.restart();
+//                focus = true;
+//                forceActiveFocus()
+//            }
+//        }
+
+//        Button{
+//            id: roundButton;
+
+//            anchors.verticalCenter:  parent.verticalCenter;
+
+//            style: roundButtonDecorator;
+//            iconSource: "../../../Icons/" + Style.theme + "/Close.svg";
+//            onClicked: {
+//                pauseMessage.restart();
+//                focus = true;
+//                forceActiveFocus()
+//            }
+//        }
+
+//        Button{
+//            id: iconButton;
+
+//            anchors.verticalCenter:  parent.verticalCenter;
+
+//            style: iconButtonDecorator;
+
+//            iconSource: "../../../Icons/" + Style.theme + "/Eye.svg";
+//            text: "Icon button";
+//            onClicked: {
+//                pauseMessage.restart();
+//                focus = true;
+//                forceActiveFocus()
+//            }
+//        }
+
+//        TextInput{
+//            width: 100;
+//            height: 50
+//            onAccepted: console.log("textINput")
+//        }
+//    }
 
 
     Component{
