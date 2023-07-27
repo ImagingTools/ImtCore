@@ -168,12 +168,13 @@ Item {
                         comboBoxContainerGql.gettedParams.SetData("Value", value, item);
                     }
                 }
-                comboBoxContainerGql.currentIndex = index;
                 //comboBoxContainerGql.currentText = popup.model.GetData("Name", index);
                 comboBoxContainerGql.setCurrentText(popup.model,index)
                 if (comboBoxContainerGql.currentText == ""){
                     comboBoxContainerGql.currentText = popup.filterText;
                 }
+
+                comboBoxContainerGql.currentIndex = index;
 
                 if(popup.canClose){
                     popup.root.closeDialog();
