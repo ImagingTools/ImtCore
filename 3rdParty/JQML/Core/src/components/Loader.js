@@ -21,18 +21,18 @@ export class Loader extends Item {
     constructor(args) {
         super(args)
 
-        this.$cP('active', true).connect(this.$activeChanged.bind(this))
-        this.$cP('status', Loader.Null).connect(this.$statusChanged.bind(this))
+        this.$cP('active', true, this.$activeChanged)
+        this.$cP('status', Loader.Null, this.$statusChanged)
         this.$cP('progress', 0)
-        this.$cP('item', undefined).connect(this.$itemChanged.bind(this))
+        this.$cP('item', undefined, this.$itemChanged)
         this.$cP('asynchronous', false)
-        this.$cP('source', '').connect(this.$sourceChanged.bind(this))
-        this.$cP('sourceComponent', undefined).connect(this.$sourceComponentChanged.bind(this))
+        this.$cP('source', '', this.$sourceChanged)
+        this.$cP('sourceComponent', undefined, this.$sourceComponentChanged)
 
         this.$sP('width', ()=>{return this.item ? this.item.width : 0})
         this.$sP('height', ()=>{return this.item ? this.item.height : 0})
-        this.$s.loaded = Signal()
-        
+
+        this.$cS('loaded')
     }
 
     $domCreate(){
@@ -40,7 +40,7 @@ export class Loader extends Item {
     }
 
     $statusChanged(){
-        if(this.status === Loader.Ready) this.$s.loaded()
+        if(this.status === Loader.Ready) this.loaded()
     }
     $activeChanged(){
         if(!this.active) this.status = Loader.Null
@@ -218,7 +218,7 @@ export class Loader extends Item {
                     console.error(error)
                 }
             // }
-            this.$p.item.signal()
+            this.$p.item.getSignal()()
             if(this.$uL.properties.length) this.$uP()
             
         } else {
@@ -263,7 +263,7 @@ export class Loader extends Item {
                     }
                     
                 // }
-                this.$p.item.signal()
+                this.$p.item.getSignal()()
                 if(this.$uL.properties.length) this.$uP()
   
         } else {

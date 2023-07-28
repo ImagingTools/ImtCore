@@ -4,8 +4,8 @@ export class RegularExpressionValidator extends QtObject  {
     constructor(args) {
         super(args)
 
-        this.$cP('regularExpression', undefined).connect(this.$regularExpressionChanged.bind(this))
-        this.$cP('regExp', undefined).connect(this.$regularExpressionChanged.bind(this))
+        this.$cP('regularExpression', undefined, this.$regularExpressionChanged)
+        this.$cP('regExp', undefined, this.$regularExpressionChanged)
     }
     $domCreate(){}
 
@@ -13,10 +13,10 @@ export class RegularExpressionValidator extends QtObject  {
 
     }
     validate(str){
-        if(this.$p.regularExpression.val){
-            return this.$p.regularExpression.val.test(str)
-        } else if(this.$p.regExp.val){
-            return this.$p.regExp.val.test(str)
+        if(this.regularExpression){
+            return this.regularExpression.test(str)
+        } else if(this.regExp){
+            return this.regExp.test(str)
         } else {
             return true
         }

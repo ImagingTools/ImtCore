@@ -11,7 +11,7 @@ export class FontLoader extends QtObject {
         super(args)
 
         this.$cP('name', '')
-        this.$cP('source', '').connect(this, this.$sourceChanged)
+        this.$cP('source', '', this.$sourceChanged)
         this.$cP('status', FontLoader.Null)
     }
     $domCreate(){
@@ -22,31 +22,31 @@ export class FontLoader extends QtObject {
     $sourceChanged(){
         this.status = FontLoader.Loading
 
-        let temp = this.$p.source.val.split('/')
+        let temp = this.source.split('/')
         this.name = temp[temp.length-1].split('.')[0]
 
         let path = []
         if(Core.rootPath !== ''){
             path.push(Core.rootPath)
-            path.push(this.$p.source.val.replaceAll('../', '').replaceAll('./', ''))
+            path.push(this.source.replaceAll('../', '').replaceAll('./', ''))
         } else {    
             // if(Core.hostPath !== '') path.push(Core.hostPath)
             // if(Core.rootPath !== '') path.push(Core.rootPath)
             if(this.$basePath !== '') path.push(this.$basePath)
-            path.push(this.$p.source.val)
+            path.push(this.source)
         }
         
         
 
         let domStyle = document.createElement("style")
-        domStyle.innerHTML = `@font-face { font-family: ${this.$p.name.val}; src: url('${path.join('/').replaceAll('//', '/')}'); }`
+        domStyle.innerHTML = `@font-face { font-family: ${this.name}; src: url('${path.join('/').replaceAll('//', '/')}'); }`
         document.head.appendChild(domStyle)
 
         let xhr = new XMLHttpRequest()
         xhr.open('GET', path.join('/').replaceAll('//', '/'), false)
         xhr.onload = ()=>{
             if(xhr.status === 200)
-            document.fonts.load(`12px ${this.$p.name.val}`).then((fonts)=>{
+            document.fonts.load(`12px ${this.name}`).then((fonts)=>{
                 if(fonts.length) this.status = FontLoader.Ready; else this.status = FontLoader.Error;
             })
         }

@@ -25,17 +25,17 @@ export class TextEdit extends Item {
     constructor(args) {
         super(args)
 
-        this.$cP('text', '').connect(this.$textChanged.bind(this))
-        this.$cP('color', 'black').connect(this.$colorChanged.bind(this))
-        this.$cP('contentHeight', 0).connect(this.$contentHeightChanged.bind(this))
-        this.$cP('contentWidth', 0).connect(this.$contentWidthChanged.bind(this))
-        this.$cP('horizontalAlignment', TextEdit.AlignLeft).connect(this.$horizontalAlignmentChanged.bind(this))
-        this.$cP('verticalAlignment', TextEdit.AlignTop).connect(this.$verticalAlignmentChanged.bind(this))
-        this.$cP('wrapMode', TextEdit.NoWrap).connect(this.$wrapModeChanged.bind(this))
-        this.$cPC('font', Font()).connect(this.$fontChanged.bind(this))
-        this.$cP('selectionColor', '#000080').connect(this.$selectionColorChanged.bind(this))
-        this.$cP('selectedTextColor', '#fff').connect(this.$selectedTextColorChanged.bind(this))
-        this.$cP('readOnly', false).connect(this.$readOnlyChanged.bind(this))
+        this.$cP('text', '', this.$textChanged)
+        this.$cP('color', 'black', this.$colorChanged)
+        this.$cP('contentHeight', 0, this.$contentHeightChanged)
+        this.$cP('contentWidth', 0, this.$contentWidthChanged)
+        this.$cP('horizontalAlignment', TextEdit.AlignLeft, this.$horizontalAlignmentChanged)
+        this.$cP('verticalAlignment', TextEdit.AlignTop, this.$verticalAlignmentChanged)
+        this.$cP('wrapMode', TextEdit.NoWrap, this.$wrapModeChanged)
+        this.$cPC('font', Font(), this.$fontChanged)
+        this.$cP('selectionColor', '#000080', this.$selectionColorChanged)
+        this.$cP('selectedTextColor', '#fff', this.$selectedTextColorChanged)
+        this.$cP('readOnly', false, this.$readOnlyChanged)
         // this.$sP('height', ()=>{return this.contentHeight})
         this.$cS('editingFinished')
         this.$sP('width', ()=>{return this.contentWidth})
@@ -107,7 +107,7 @@ export class TextEdit extends Item {
             Core.setFocus(this)
         } else {
             this.impl.blur()
-            this.$s.editingFinished()
+            this.editingFinished()
         }
         
     }

@@ -4,11 +4,11 @@ export class GradientStop extends QtObject  {
     constructor(args) {
         super(args)
 
-        this.$cP('color', "'black'").connect(this.$gradientChanged.bind(this))
-        this.$cP('position', 0).connect(this.$gradientChanged.bind(this))
+        this.$cP('color', "'black'", this.$gradientChanged)
+        this.$cP('position', 0, this.$gradientChanged)
 
-        this.parent.$p.stops.val.push(this)
-        this.parent.$s.stopsChanged()
+        this.parent.stops.push(this)
+        this.parent.stopsChanged()
 
     }
     $domCreate(){}
@@ -17,10 +17,10 @@ export class GradientStop extends QtObject  {
     }
     $destroy(){
         if(this.parent){
-            let indx = this.parent.$p.stops.val.indexOf(this)
+            let indx = this.parent.stops.indexOf(this)
             if(indx >= 0){
-                this.parent.$p.stops.val.splice(indx, 1)
-                this.parent.$s.stopsChanged()
+                this.parent.stops.splice(indx, 1)
+                this.parent.stopsChanged()
             }
         }
         

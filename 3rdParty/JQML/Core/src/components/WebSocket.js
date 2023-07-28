@@ -10,12 +10,12 @@ export class WebSocket extends QtObject {
 
     constructor(args) {
         super(args)
-        this.$cP('url', '').connect(this.$reconnectSocket.bind(this))
-        this.$cP('active', false).connect(this.$reconnectSocket.bind(this))
+        this.$cP('url', '', this.$reconnectSocket)
+        this.$cP('active', false, this.$reconnectSocket)
         this.$cP('errorString', '')
         this.$cP('negotiatedSubprotocol', '')
         this.$cP('requestedSubprotocols', [])
-        this.$cP('status', WebSocket.Closed).connect(this.$onStatusChanged.bind(this))
+        this.$cP('status', WebSocket.Closed, this.$onStatusChanged)
 
         this.$cS('binaryMessageReceived', 'message')
         this.$cS('textMessageReceived', 'message')

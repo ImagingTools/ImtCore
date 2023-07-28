@@ -28,15 +28,15 @@ export class ListView extends Flickable {
     constructor(args) {
         super(args)
 
-        this.$cP('model', undefined).connect(this.$modelChanged.bind(this))
-        this.$cP('delegate', undefined).connect(this.$delegateChanged.bind(this))
-        this.$cP('count', 0)//.connect(this.$countChanged.bind(this))
-        this.$cP('orientation', ListView.Vertical).connect(this.$orientationChanged.bind(this))
-        this.$cP('spacing', 0).connect(this.$spacingChanged.bind(this))
-        this.$cP('currentIndex', -1).connect(this.$currentIndexChanged.bind(this))
+        this.$cP('model', undefined, this.$modelChanged)
+        this.$cP('delegate', undefined, this.$delegateChanged)
+        this.$cP('count', 0)
+        this.$cP('orientation', ListView.Vertical, this.$orientationChanged)
+        this.$cP('spacing', 0, this.$spacingChanged)
+        this.$cP('currentIndex', -1, this.$currentIndexChanged)
         this.$cP('currentItem', undefined)
         this.$cP('snapMode', ListView.NoSnap)
-        this.$cP('cacheBuffer', 320).connect(this.$cacheBufferChanged.bind(this))
+        this.$cP('cacheBuffer', 320, this.$cacheBufferChanged)
 
         this.$updateGeometry()
 
@@ -556,6 +556,7 @@ export class ListView extends Flickable {
         }
         child.x = -10000
         child.y = -10000
+        child.$completed = false
         this.$cache.push(child)
     }
 
@@ -849,7 +850,7 @@ export class ListView extends Flickable {
                 
                 // this.count = this.$items.length
                 if(countChanged){
-                    this.$p.count.signal()
+                    this.$p.count.getSignal()()
                 }
                 
                 

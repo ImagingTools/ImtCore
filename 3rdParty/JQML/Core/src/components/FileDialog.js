@@ -19,10 +19,10 @@ export class FileDialog extends Item {
         // signal accepted;
         // signal rejected;
 
-        this.$cP('selectMultiple', false).connect(this.$selectMultipleChanged.bind(this))
+        this.$cP('selectMultiple', false, this.$selectMultipleChanged)
         this.$cP('defaultSuffix', '')
         this.$cP('title', '')
-        this.$cP('nameFilters', []).connect(this.$nameFiltersChanged.bind(this))
+        this.$cP('nameFilters', [], this.$nameFiltersChanged)
         this.$cP('fileUrl', '')
         this.$cP('fileUrls', [])
         this.$cP('folder', '')
@@ -36,8 +36,9 @@ export class FileDialog extends Item {
             'pictures': '',
         })
 
-        this.$s.accepted = Signal()
-        this.$s.rejected = Signal()
+        this.$cS('accepted')
+        this.$cS('rejected')
+    
     }
 
     $domCreate(){
@@ -76,11 +77,11 @@ export class FileDialog extends Item {
             this.fileUrl = e.target.files[0]
         }
         
-        this.$s.accepted()
+        this.accepted()
     }
 
     open(){
-        this.$s.accepted()
+        this.accepted()
     }
 
     $destroy(){

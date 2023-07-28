@@ -24,14 +24,14 @@ export class Image extends Item {
     constructor(args) {
         super(args)
 
-        this.$cP('progress', 0).connect(this.$progressChanged.bind(this))
-        this.$cP('fillMode', Image.Stretch).connect(this.$fillModeChanged.bind(this))
-        this.$cP('source', '').connect(this.$sourceChanged.bind(this))
+        this.$cP('progress', 0, this.$progressChanged)
+        this.$cP('fillMode', Image.Stretch, this.$fillModeChanged)
+        this.$cP('source', '', this.$sourceChanged)
 
         this.$cPC('sourceSize', {
             width: 0,
             height: 0,
-        }).connect(this.$sourceSizeChanged.bind(this))
+        }, this.$sourceSizeChanged)
 
         this.$img = new window.Image();
         this.$imgLoad = function(){

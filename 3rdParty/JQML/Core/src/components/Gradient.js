@@ -7,8 +7,8 @@ export class Gradient extends QtObject  {
     constructor(args) {
         super(args)
 
-        this.$cP('orientation', Gradient.Vertical).connect(this.$gradientChanged.bind(this))
-        this.$cP('stops', []).connect(this.$gradientChanged.bind(this))
+        this.$cP('orientation', Gradient.Vertical, this.$gradientChanged)
+        this.$cP('stops', [], this.$gradientChanged)
 
     }
     $domCreate(){}

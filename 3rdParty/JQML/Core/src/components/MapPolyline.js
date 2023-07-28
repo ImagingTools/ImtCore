@@ -11,11 +11,11 @@ export class MapPolyline extends QtObject  {
         
         this.$cP('autoFadeIn', true)
         this.$cP('backend', null)
-        this.$cP('path', []).connect(this.$updateFeature.bind(this))
+        this.$cP('path', [], this.$updateFeature)
         this.$cPC('line', {
             width: 1,
             color: 'black',
-        }).connect(this.$updateFeature.bind(this))
+        }, this.$updateFeature)
     }
     $updateFeature(added = false){
         if(!this.path && !this.path.length) return

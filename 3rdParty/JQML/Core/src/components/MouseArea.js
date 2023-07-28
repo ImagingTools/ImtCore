@@ -8,16 +8,16 @@ export class MouseArea extends Item {
     constructor(args) {
         super(args)
 
-        this.$s.clicked = Signal()
-        this.$s.entered = Signal()
-        this.$s.exited = Signal()
-        this.$s.canceled = Signal()
-        this.$s.pressAndHold = Signal()
-        this.$s.pressed = Signal()
-        this.$s.released = Signal()
-        this.$s.wheel = Signal()
-        this.$s.doubleClicked = Signal()
-        this.$s.positionChanged = Signal()
+		this.$cS('clicked')
+		this.$cS('entered')
+		this.$cS('exited')
+		this.$cS('canceled')
+		this.$cS('pressAndHold')
+		this.$cS('pressed')
+		this.$cS('released')
+		this.$cS('wheel')
+		this.$cS('doubleClicked')
+		this.$cS('positionChanged')
 
 		this.mouse = {
 			accepted: false,
@@ -30,41 +30,30 @@ export class MouseArea extends Item {
 			x: 0,
 			y: 0,
 		}
-		this.$s.wheel.accepted = false
-		this.$s.wheel.buttons = Qt.LeftButton
-		this.$s.wheel.angleDelta = {
+		this.wheel.accepted = false
+		this.wheel.buttons = Qt.LeftButton
+		this.wheel.angleDelta = {
 			x: 0,
 			y: 0,
 		}
-		this.$s.wheel.inverted = false
-		this.$s.wheel.pixelDelta = 0
-		//this.$s.wheel.//flags: int
-		this.$s.wheel.modifiers = 0
-		this.$s.wheel.x = 0
-		this.$s.wheel.y = 0
+		this.wheel.inverted = false
+		this.wheel.pixelDelta = 0
+		//this.wheel.//flags: int
+		this.wheel.modifiers = 0
+		this.wheel.x = 0
+		this.wheel.y = 0
 		
-
-		this.clicked = this.$s.clicked
-		this.entered = this.$s.entered
-		this.exited = this.$s.exited
-		this.canceled = this.$s.canceled
-		this.pressAndHold  = this.$s.pressAndHold 
-		// this.pressed = this.$s.pressed
-		this.released = this.$s.released
-		this.wheel = this.$s.wheel
-		this.doubleClicked = this.$s.doubleClicked
-		this.positionChanged = this.$s.positionChanged
 
         this.$cP('acceptedButtons', Qt.LeftButton)
         this.$cP('containsMouse', false)
         this.$cP('hoverEnabled', false)
-        this.$cP('pressed', false)
+        // this.$cP('pressed', false)
 		this.$cP('propagateComposedEvents', false)
 		this.$cP('preventStealing', false)
         this.$cP('pressAndHoldInterval', 800)
         this.$cP('mouseX', 0)
         this.$cP('mouseY', 0)
-        this.$cP('cursorShape', 'default').connect(this.$cursorShapeChanged.bind(this))
+        this.$cP('cursorShape', 'default', this.$cursorShapeChanged)
 
         
         this.tempMouse = {
@@ -142,8 +131,8 @@ export class MouseArea extends Item {
 			if(!this.mouse.accepted) state.blocked(this)
 			if(this.availableButton(e.button)){
 				this.$fillMouse(e)
-				this.pressed = true
-				this.$s.pressed()
+				this.$pressed = true
+				this.pressed()
 			}
 
 			this.tempMouse.x = this.mouse.x
@@ -156,7 +145,7 @@ export class MouseArea extends Item {
 
 			if(this.$timerPressAndHold) clearTimeout(this.$timerPressAndHold)
 			this.$timerPressAndHold = setTimeout(()=>{
-				if(this.pressed && this.$s) this.$s.pressAndHold()
+				if(this.pressed && this.$s) this.pressAndHold()
 			}, this.pressAndHoldInterval)
 			
 		}
@@ -167,22 +156,22 @@ export class MouseArea extends Item {
 			if(!this.mouse.accepted) state.release()
 			if(this.availableButton(e.button)){
 				this.$fillMouse(e)
-				this.pressed = false
-				this.$s.released()
+				this.$pressed = false
+				this.released()
 
 				let now = new Date().getTime()
 				if(this.$lastClickOrTouch){
-					if(now - this.$lastClickOrTouch > 250 || Object.keys(this.$s.doubleClicked.connections).length === 0){
+					if(now - this.$lastClickOrTouch > 250 || Object.keys(this.doubleClicked.connections).length === 0){
 						this.setFocus(true)
-						this.$s.clicked();
+						this.clicked();
 						this.$lastClickOrTouch = now
 					} else {
-						this.$s.doubleClicked();
+						this.doubleClicked();
 						this.$lastClickOrTouch = now
 					}
 				} else {
 					this.setFocus(true)
-					this.$s.clicked();
+					this.clicked();
 					this.$lastClickOrTouch = now
 				}
 			}
@@ -198,26 +187,26 @@ export class MouseArea extends Item {
 	$mousemove(e, state) {
 		e.preventDefault()
 		this.$mouseover(e, state)
-		if(this.$p.enabled.val && (this.$p.pressed.val || this.$p.hoverEnabled.val)){
+		if(this.$p.enabled.val && (this.$pressed || this.$p.hoverEnabled.val)){
 			this.$fillMouse(e)
 
-			if(this.$p.pressed.val && state.map && this.parent === state.map && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10) && !this.preventStealing){
-				this.pressed = false
+			if(this.$pressed && state.map && this.parent === state.map && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10) && !this.preventStealing){
+				this.$pressed = false
 				this.containsMouse = false
 				this.hover = false
-				this.$s.exited()
+				this.exited()
 				if(!this.mouse.accepted) state.release()
-			} else if(this.$p.pressed.val && state.view && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10) && !this.preventStealing){
+			} else if(this.$pressed && state.view && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10) && !this.preventStealing){
 				// console.log('CONSOLE::', this)
-				this.pressed = false
+				this.$pressed = false
 				this.containsMouse = false
 				this.hover = false
-				this.$s.exited()
+				this.exited()
 				if(!this.mouse.accepted) state.release()
 				state.view.$mousedown(e, state)
 				
 			} else {
-				this.$s.positionChanged()
+				this.positionChanged()
 			}
 
 			// console.log('CONSOLE::', state)
@@ -227,7 +216,7 @@ export class MouseArea extends Item {
 	$mousewheel(e, state) {
 		e.preventDefault()
 		this.$feelWheel(e)
-		this.$s.wheel()
+		this.wheel()
 		if(this.wheel.accepted) state.blocked(this)
 	}
 	$wheel(e, state) {
@@ -245,7 +234,7 @@ export class MouseArea extends Item {
 			this.$fillMouse(e)
 			this.containsMouse = true
 			this.hover = true
-			this.$s.entered()
+			this.entered()
 		}
 	}
 	$mouseout(e, state){
@@ -256,7 +245,7 @@ export class MouseArea extends Item {
 			//this.$fillMouse(e)
 			this.containsMouse = false
 			this.hover = false
-			this.$s.exited()
+			this.exited()
 		}
 	}
 	$touchstart(e, state) {
@@ -264,8 +253,8 @@ export class MouseArea extends Item {
 		if(this.$p.enabled.val && Core.velocityX === 0 && Core.velocityY === 0){
 			if(!this.mouse.accepted) state.blocked(this)
 			this.$fillMouse(e)
-			this.pressed = true
-			this.$s.pressed()
+			this.$pressed = true
+			this.pressed()
 
 			this.tempMouse.x = this.mouse.x
 			this.tempMouse.y = this.mouse.y
@@ -277,7 +266,7 @@ export class MouseArea extends Item {
 
 			if(this.$timerPressAndHold) clearTimeout(this.$timerPressAndHold)
 			this.$timerPressAndHold = setTimeout(()=>{
-				if(this.pressed && this.$s) this.$s.pressAndHold()
+				if(this.pressed && this.$s) this.pressAndHold()
 			}, this.pressAndHoldInterval)
 		}
 
@@ -287,22 +276,22 @@ export class MouseArea extends Item {
 		if(this.$p.enabled.val){
 			if(!this.mouse.accepted) state.release()
 			this.$fillMouse(e)
-			this.pressed = false
-			this.$s.released()
+			this.$pressed = false
+			this.released()
 
 			let now = new Date().getTime()
 			if(this.$lastClickOrTouch){
-				if(now - this.$lastClickOrTouch > 250 || Object.keys(this.$s.doubleClicked.connections).length === 0){
+				if(now - this.$lastClickOrTouch > 250 || Object.keys(this.doubleClicked.connections).length === 0){
 					this.setFocus(true)
-					this.$s.clicked();
+					this.clicked();
 					this.$lastClickOrTouch = now
 				} else {
-					this.$s.doubleClicked();
+					this.doubleClicked();
 					this.$lastClickOrTouch = now
 				}
 			} else {
 				this.setFocus(true)
-				this.$s.clicked();
+				this.clicked();
 				this.$lastClickOrTouch = now
 			}
 
@@ -316,26 +305,26 @@ export class MouseArea extends Item {
 	}
 	$touchmove(e, state) {
 		e.preventDefault()
-		if(this.$p.enabled.val && (this.$p.pressed.val || this.$p.hoverEnabled.val)){
+		if(this.$p.enabled.val && (this.$pressed || this.$p.hoverEnabled.val)){
 			this.$fillMouse(e)
 
-			if(this.$p.pressed.val && state.map && this.parent === state.map && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10) && !this.preventStealing){
-				this.pressed = false
+			if(this.$pressed && state.map && this.parent === state.map && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10) && !this.preventStealing){
+				this.$pressed = false
 				this.containsMouse = false
 				this.hover = false
-				this.$s.exited()
+				this.exited()
 				if(!this.mouse.accepted) state.release()
-			} else if(this.$p.pressed.val && state.view && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10) && !this.preventStealing){
+			} else if(this.$pressed && state.view && (Math.abs(this.mouse.x-this.tempMouse.x) > 10 || Math.abs(this.mouse.y-this.tempMouse.y) > 10) && !this.preventStealing){
 				// console.log('CONSOLE::', this)
-				this.pressed = false
+				this.$pressed = false
 				this.containsMouse = false
 				this.hover = false
-				this.$s.exited()
+				this.exited()
 				if(!this.mouse.accepted) state.release()
 				state.view.$touchstart(e, state)
 				
 			} else {
-				this.$s.positionChanged()
+				this.positionChanged()
 			}
 		}
 	}

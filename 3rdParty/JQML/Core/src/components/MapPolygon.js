@@ -11,13 +11,13 @@ export class MapPolygon extends QtObject  {
         
         this.$cP('autoFadeIn', true)
         this.$cP('backend', null)
-        this.$cP('path', []).connect(this.$updateFeature.bind(this))
-        this.$cP('color', 'transparent').connect(this.$updateFeature.bind(this))
-        this.$cP('opacity', 1).connect(this.$updateFeature.bind(this))
+        this.$cP('path', [], this.$updateFeature)
+        this.$cP('color', 'transparent', this.$updateFeature)
+        this.$cP('opacity', 1, this.$updateFeature)
         this.$cPC('border', {
             width: 0,
             color: 'black',
-        }).connect(this.$updateFeature.bind(this))
+        }, this.$updateFeature)
     }
     $updateFeature(added = false){
         if(!this.path && !this.path.length) return

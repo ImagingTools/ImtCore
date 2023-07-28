@@ -13,8 +13,8 @@ export class Shortcut extends QtObject {
         this.$cP('sequence', '')
         this.$cP('sequences', [])
 
-        this.$s['activated'] = Signal()
-        this.$s['activatedAmbiguously'] = Signal()
+        this.$cS('activated')
+        this.$cS('activatedAmbiguously')
 
         Core.shortcuts.push(this)
     }

@@ -74,9 +74,10 @@ function getFiles (dir, _files){
 }
 
 // if(!source) source = `C:\\Users\\Артур\\Documents\\projects\\2023\\TEST\\web\\web\\src`
-if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\NeoPro\\Bin\\web\\src`
+// if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\NeoPro\\Bin\\web\\src`
 // if(!source) source = `C:\\projects\\sibnavacf\\RTS\\Bin\\web\\src`
 // if(!source) source = `C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src`
+if(!source) source = `C:\\Users\\Артур\\Documents\\test`
 if(!destination) destination = source
 
 if(!fs.existsSync(source + '/cache/')) fs.mkdirSync(source + '/cache/');
@@ -932,7 +933,7 @@ function compile(instructions, code, curr = '$root', prev = ''){
     }
     for(let signal of instructions.connectionSignals){
         //code.push(`${curr}.$s['${signal.name}'].connect(function(){with(this)with(QML)with(this.$s['${signal.name}'].context){${signal.source}}}.bind(${curr}))`)
-        code.push(`${curr}.$s['${signal.name}'].connect(${signal.sourceFull}.bind(${curr}))`)
+        code.push(`${curr}['${signal.name}'].connect(${signal.sourceFull}.bind(${curr}))`)
     }
 
     for(let prop in instructions.properties){

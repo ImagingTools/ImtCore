@@ -5,53 +5,53 @@ export class PropertyAnimation extends Animation {
     constructor(args) {
         super(args)
 
-        this.$cP('duration', 250).connect(this.$durationChanged.bind(this))
-        this.$cP('from', undefined).connect(this.$fromChanged.bind(this))
-        this.$cP('to', undefined).connect(this.$toChanged.bind(this))
-        this.$cP('property', '').connect(this.$propertyChanged.bind(this))
-        this.$cP('properties', '').connect(this.$propertiesChanged.bind(this))
-        this.$cP('target', this.parent).connect(this.$targetChanged.bind(this))
+        this.$cP('duration', 250, this.$durationChanged)
+        this.$cP('from', undefined, this.$fromChanged)
+        this.$cP('to', undefined, this.$toChanged)
+        this.$cP('property', '', this.$propertyChanged)
+        this.$cP('properties', '', this.$propertiesChanged)
+        this.$cP('target', this.parent, this.$targetChanged)
     }
 
     $tick(){
-        if(this.$completed && this.$p.target.val && this.$p.running.val){
-            let properties = this.$p.properties.val.split(',')
+        if(this.$completed && this.target && this.running){
+            let properties = this.properties.split(',')
 
             for(let prop of properties){
-                if(this.$p.to.val === undefined) this.to = this.$p.target.val.$p[prop].val
-                if(this.$p.from.val === undefined) this.from = this.$p.target.val.$p[prop].val
+                if(this.to === undefined) this.to = this.target[prop]
+                if(this.from === undefined) this.from = this.target[prop]
                 
-                let increment = (this.$p.to.val - this.$p.from.val) / (this.$p.duration.val / (1000/Core.FPS))
+                let increment = (this.to - this.from) / (this.duration / (1000/Core.FPS))
 
-                this.$p.target.val[prop] += increment
+                this.target[prop] += increment
 
-                if(this.$p.to.val >= this.$p.from.val && this.$p.target.val.$p[prop].val >= this.$p.to.val) {
-                    this.$p.target.val[prop] = this.$p.to.val
+                if(this.to >= this.from && this.target[prop] >= this.to) {
+                    this.target[prop] = this.to
                     let loops = this.$loops + 1
                     if(loops < this.loops || this.loops === Animation.Infinite){
                         this.restart()
                         this.$loops = loops
                     } else {
                         this.running = false
-                        this.$s.stopped()
-                        this.$s.finished()
+                        this.stopped()
+                        this.finished()
                     }
                 }
-                if(this.$p.to.val <= this.$p.from.val && this.$p.target.val.$p[prop].val <= this.$p.to.val) {
-                    this.$p.target.val[prop] = this.$p.to.val
+                if(this.to <= this.from && this.target[prop] <= this.to) {
+                    this.target[prop] = this.to
                     let loops = this.$loops + 1
                     if(loops < this.loops || this.loops === Animation.Infinite){
                         this.restart()
                         this.$loops = loops
                     } else {
                         this.running = false
-                        this.$s.stopped()
-                        this.$s.finished()
+                        this.stopped()
+                        this.finished()
                     }
                 }
 
             }
-            this.$p.target.val.$updateRect()
+            this.target.$updateRect()
         }
     }
 
@@ -75,7 +75,7 @@ export class PropertyAnimation extends Animation {
 
     }
     $propertyChanged(){
-        this.properties = this.$p.property.val
+        this.properties = this.property
     }
     $targetChanged(){
 
@@ -84,9 +84,9 @@ export class PropertyAnimation extends Animation {
 
     }
     restart() { 
-        let properties = this.$p.properties.val.split(',')
+        let properties = this.properties.split(',')
         for(let prop of properties){
-            this.$p.target.val[prop] = this.$p.from.val
+            this.target[prop] = this.from
         }
 		super.restart()
     }

@@ -11,14 +11,14 @@ export class MapRectangle extends QtObject  {
         
         this.$cP('autoFadeIn', true)
         this.$cP('backend', null)
-        this.$cP('topLeft', null).connect(this.$updateFeature.bind(this))
-        this.$cP('bottomRight', null).connect(this.$updateFeature.bind(this))
-        this.$cP('color', 'transparent').connect(this.$updateFeature.bind(this))
-        this.$cP('opacity', 1).connect(this.$updateFeature.bind(this))
+        this.$cP('topLeft', null, this.$updateFeature)
+        this.$cP('bottomRight', null, this.$updateFeature)
+        this.$cP('color', 'transparent', this.$updateFeature)
+        this.$cP('opacity', 1, this.$updateFeature)
         this.$cPC('border', {
             width: 0,
             color: 'black',
-        }).connect(this.$updateFeature.bind(this))
+        }, this.$updateFeature)
     }
     $updateFeature(added = false){
         if(!this.topLeft || !this.bottomRight) return

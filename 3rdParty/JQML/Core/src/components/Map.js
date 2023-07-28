@@ -16,12 +16,12 @@ export class Map extends Item {
         Core.loadMapTools()
         super(args)
 
-        this.$cP('plugin', undefined).connect(this.$pluginChanged.bind(this))
-        this.$cP('center', QtPositioning.coordinate(0, 0)).connect(this.$centerChanged.bind(this))
-        this.$cP('zoomLevel', 2).connect(this.$zoomLevelChanged.bind(this))
+        this.$cP('plugin', undefined, this.$pluginChanged)
+        this.$cP('center', QtPositioning.coordinate(0, 0), this.$centerChanged)
+        this.$cP('zoomLevel', 2, this.$zoomLevelChanged)
         this.$cP('copyrightsVisible', true)
-        this.$cP('bearing', 0).connect(this.$bearingChanged.bind(this))
-        this.$cP('mapReady', false).connect(this.$mapReadyChanged.bind(this))
+        this.$cP('bearing', 0, this.$bearingChanged)
+        this.$cP('mapReady', false, this.$mapReadyChanged)
         this.$cPC('gesture', {
             acceptedGestures : '',
             enabled : false,
@@ -35,7 +35,7 @@ export class Map extends Item {
         })
 
         this.$initialized = false
-        this.$s['Component.completed'].connect(this.$init.bind(this))
+        this['Component.completed'].connect(this.$init.bind(this))
     }
 
     $init(){

@@ -448,8 +448,8 @@ global.Core = {
             Core.context.location.href = href
         }
         Core.context.languages = {}
-        Core.context.$cP('language', '').connect(this.updateLanguage.bind(this))
-        Core.context.$cP('application', '').connect(this.updateLanguage.bind(this))
+        Core.context.$cP('language', '', this.updateLanguage)
+        Core.context.$cP('application', '', this.updateLanguage)
 
         let root = this.cC('Item', {parent: null})
         Core.root = root
@@ -557,9 +557,9 @@ global.Core = {
                 if(currentShortcuts.length >= 1){
                     e.preventDefault()
                     if(currentShortcuts.length === 1){
-                        currentShortcuts[0].$s.activated()
+                        currentShortcuts[0].activated()
                     } else {
-                        currentShortcuts[currentShortcuts.length-1].$s.activatedAmbiguously()
+                        currentShortcuts[currentShortcuts.length-1].activatedAmbiguously()
                         Core.shortcuts.splice(Core.shortcuts.indexOf(currentShortcuts[currentShortcuts.length-1]), 1)
                         Core.shortcuts.unshift(currentShortcuts[currentShortcuts.length-1])
                     }

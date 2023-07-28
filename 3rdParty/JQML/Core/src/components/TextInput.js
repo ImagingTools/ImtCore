@@ -32,19 +32,19 @@ export class TextInput extends Item {
     constructor(args) {
         super(args)
 
-        this.$cP('text', '').connect(this.$textChanged.bind(this))
-        this.$cP('color', 'black').connect(this.$colorChanged.bind(this))
-        this.$cP('contentHeight', 0)//.connect(this.$contentHeightChanged.bind(this))
-        this.$cP('contentWidth', 0)//.connect(this.$contentWidthChanged.bind(this))
-        this.$cP('horizontalAlignment', TextInput.AlignLeft).connect(this.$horizontalAlignmentChanged.bind(this))
-        this.$cP('verticalAlignment', TextInput.AlignTop).connect(this.$verticalAlignmentChanged.bind(this))
-        this.$cP('wrapMode', TextInput.NoWrap).connect(this.$wrapModeChanged.bind(this))
-        this.$cPC('font', Font()).connect(this.$fontChanged.bind(this))
-        this.$cP('selectionColor', '#000080').connect(this.$selectionColorChanged.bind(this))
-        this.$cP('selectedTextColor', '#fff').connect(this.$selectedTextColorChanged.bind(this))
-        this.$cP('echoMode', TextInput.Normal).connect(this.$echoModeChanged.bind(this))
-        this.$cP('validator', undefined).connect(this.$validatorChanged.bind(this))
-        this.$cP('readOnly', false).connect(this.$readOnlyChanged.bind(this))
+        this.$cP('text', '', this.$textChanged)
+        this.$cP('color', 'black', this.$colorChanged)
+        this.$cP('contentHeight', 0)
+        this.$cP('contentWidth', 0)
+        this.$cP('horizontalAlignment', TextInput.AlignLeft, this.$horizontalAlignmentChanged)
+        this.$cP('verticalAlignment', TextInput.AlignTop, this.$verticalAlignmentChanged)
+        this.$cP('wrapMode', TextInput.NoWrap, this.$wrapModeChanged)
+        this.$cPC('font', Font(), this.$fontChanged)
+        this.$cP('selectionColor', '#000080', this.$selectionColorChanged)
+        this.$cP('selectedTextColor', '#fff', this.$selectedTextColorChanged)
+        this.$cP('echoMode', TextInput.Normal, this.$echoModeChanged)
+        this.$cP('validator', undefined, this.$validatorChanged)
+        this.$cP('readOnly', false, this.$readOnlyChanged)
         this.$cP('acceptableInput', true)
 
 
@@ -118,7 +118,7 @@ export class TextInput extends Item {
                 if(this.$contentHeightAuto){
                     if(this.$heightAuto && this.$p.height.val !== rect.height) {
                         this.$p.height.val = rect.height
-                        this.$p.height.signal()
+                        this.$p.height.getSignal()()
                         this.$heightAuto = true
                         // this.dom.style.height = `${rect.height}px`
                     }
@@ -127,7 +127,7 @@ export class TextInput extends Item {
                 if(this.$contentWidthAuto){
                     if(this.$widthAuto && this.$p.width.val !== rect.width) {
                         this.$p.width.val = rect.width
-                        this.$p.width.signal()
+                        this.$p.width.getSignal()()
                         this.$widthAuto = true
                         // this.dom.style.width = `${rect.width}px`
                     }
@@ -168,7 +168,7 @@ export class TextInput extends Item {
             this.impl.blur()
             if(this.$editing) {
                 this.$editing = false
-                this.$s.editingFinished()
+                this.editingFinished()
             }
         }
     }
@@ -287,15 +287,15 @@ export class TextInput extends Item {
             e.preventDefault()
             if(this.$p.validator.val){
                 if(this.$p.validator.val.validate(this.impl.value)){
-                    this.$s.accepted()
-                    this.$s.editingFinished()
+                    this.accepted()
+                    this.editingFinished()
                     this.acceptableInput = true
                 } else {
                     this.acceptableInput = false
                 }
             } else {
-                this.$s.accepted()
-                this.$s.editingFinished()
+                this.accepted()
+                this.editingFinished()
                 this.acceptableInput = true
             }
             

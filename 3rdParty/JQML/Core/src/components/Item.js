@@ -13,9 +13,6 @@ export class Item extends QtObject {
     static Left = 7
     static Center = 8
 
-    // $anchorsX = false
-    // $anchorsY = false
-
     constructor(args) {
         super(args)
 
@@ -41,27 +38,22 @@ export class Item extends QtObject {
             }
             return bottom - top
         })
-        // this.$cP('left', ()=>{return this.x})
-        // this.$cP('right', ()=>{return this.x + this.width})
-        // this.$cP('top', ()=>{return this.y})
-        // this.$cP('bottom', ()=>{return this.y + this.height})
-        // this.$cP('horizontalCenter', ()=>{return this.x+this.width/2})
-        // this.$cP('verticalCenter', ()=>{return this.y+this.height/2})
+        
         this.$cP('left', {'target': this, 'float': 'left'})
         this.$cP('right', {'target': this, 'float': 'right'})
         this.$cP('top', {'target': this, 'float': 'top'})
         this.$cP('bottom', {'target': this, 'float': 'bottom'})
         this.$cP('horizontalCenter', {'target': this, 'float': 'horizontalCenter'})
         this.$cP('verticalCenter', {'target': this, 'float': 'verticalCenter'})
-        this.$cP('childrenRect', ()=>{return {}})
+        this.$cP('childrenRect', {})
 
 
-        this.$cP('x', 0).connect(this.$xChanged.bind(this))
-        this.$cP('y', 0).connect(this.$yChanged.bind(this))
-        this.$cP('z', 0).connect(this.$zChanged.bind(this))
-        this.$cP('visible', true).connect(this.$visibleChanged.bind(this))
+        this.$cP('x', 0, this.$xChanged)
+        this.$cP('y', 0, this.$yChanged)
+        this.$cP('z', 0, this.$zChanged)
+        this.$cP('visible', true, this.$visibleChanged)
         if(this.parent) this.$sP('visible', ()=>{return this.parent.visible})
-        this.$cP('clip', false).connect(this.$clipChanged.bind(this))
+        this.$cP('clip', false, this.$clipChanged)
         this.$cP('opacity', ()=>{
             let parent = this.parent
             while(parent && !parent.dom){
@@ -72,15 +64,15 @@ export class Item extends QtObject {
             } else {
                 return 1.0
             }
-        }).connect(this.$opacityChanged.bind(this))
-        this.$cP('enabled', true).connect(this.$enabledChanged.bind(this))
-        this.$cP('focus', false).connect(this.$focusChanged.bind(this))
-        this.$cP('activeFocus', ()=>{return this.focus}).connect(this.$focusChanged.bind(this))
-        this.$cP('width', 0).connect(this.$widthChanged.bind(this))
-        this.$cP('height', 0).connect(this.$heightChanged.bind(this))
-        this.$cP('scale', 1.0).connect(this.$rotationAndScaleChanged.bind(this))
-        this.$cP('rotation', 0).connect(this.$rotationAndScaleChanged.bind(this))
-        this.$cP('transformOrigin', Item.Center).connect(this.$transformChanged.bind(this))
+        }, this.$opacityChanged)
+        this.$cP('enabled', true, this.$enabledChanged)
+        this.$cP('focus', false, this.$focusChanged)
+        this.$cP('activeFocus', ()=>{return this.focus}, this.$focusChanged)
+        this.$cP('width', 0, this.$widthChanged)
+        this.$cP('height', 0, this.$heightChanged)
+        this.$cP('scale', 1.0, this.$rotationAndScaleChanged)
+        this.$cP('rotation', 0, this.$rotationAndScaleChanged)
+        this.$cP('transformOrigin', Item.Center, this.$transformChanged)
 
         // if(this.parent && this.parent.$qmlClassName === 'Loader'){
         //     this.$sP('width', ()=>{return this.parent.width})
@@ -102,49 +94,48 @@ export class Item extends QtObject {
             bottomMargin: 0,
             verticalCenterOffset: 0,
             horizontalCenterOffset: 0,
-        }).connect(this.$anchorsChanged.bind(this))
+        }, this.$anchorsChanged)
 
-        this.Keys = {}
-        this.Keys.onAsteriskPressed = this.$s['Keys.asteriskPressed'] = Signal()
-        this.Keys.onBackPressed = this.$s['Keys.backPressed'] = Signal()
-        this.Keys.onBacktabPressed = this.$s['Keys.backtabPressed'] = Signal()
-        this.Keys.onCallPressed = this.$s['Keys.callPressed'] = Signal()
-        this.Keys.onCancelPressed = this.$s['Keys.cancelPressed'] = Signal()
-        this.Keys.onContext1Pressed = this.$s['Keys.context1Pressed'] = Signal()
-        this.Keys.onContext2Pressed = this.$s['Keys.context2Pressed'] = Signal()
-        this.Keys.onContext3Pressed = this.$s['Keys.context3Pressed'] = Signal()
-        this.Keys.onContext4Pressed = this.$s['Keys.context4Pressed'] = Signal()
-        this.Keys.onDeletePressed = this.$s['Keys.deletePressed'] = Signal()
-        this.Keys.onDigit0Pressed = this.$s['Keys.digit0Pressed'] = Signal()
-        this.Keys.onDigit1Pressed = this.$s['Keys.digit1Pressed'] = Signal()
-        this.Keys.onDigit2Pressed = this.$s['Keys.digit2Pressed'] = Signal()
-        this.Keys.onDigit3Pressed = this.$s['Keys.digit3Pressed'] = Signal()
-        this.Keys.onDigit4Pressed = this.$s['Keys.digit4Pressed'] = Signal()
-        this.Keys.onDigit5Pressed = this.$s['Keys.digit5Pressed'] = Signal()
-        this.Keys.onDigit6Pressed = this.$s['Keys.digit6Pressed'] = Signal()
-        this.Keys.onDigit7Pressed = this.$s['Keys.digit7Pressed'] = Signal()
-        this.Keys.onDigit8Pressed = this.$s['Keys.digit8Pressed'] = Signal()
-        this.Keys.onDigit9Pressed = this.$s['Keys.digit9Pressed'] = Signal()
-        this.Keys.onDownPressed = this.$s['Keys.downPressed'] = Signal()
-        this.Keys.onEnterPressed = this.$s['Keys.enterPressed'] = Signal()
-        this.Keys.onEscapePressed = this.$s['Keys.escapePressed'] = Signal()
-        this.Keys.onFlipPressed = this.$s['Keys.flipPressed'] = Signal()
-        this.Keys.onHangupPressed = this.$s['Keys.hangupPressed'] = Signal()
-        this.Keys.onLeftPressed = this.$s['Keys.leftPressed'] = Signal()
-        this.Keys.onMenuPressed = this.$s['Keys.menuPressed'] = Signal()
-        this.Keys.onNoPressed = this.$s['Keys.noPressed'] = Signal()
-        this.Keys.onPressed = this.$s['Keys.pressed'] = Signal()
-        this.Keys.onReleased = this.$s['Keys.released'] = Signal()
-        this.Keys.onReturnPressed = this.$s['Keys.returnPressed'] = Signal()
-        this.Keys.onRightPressed = this.$s['Keys.rightPressed'] = Signal()
-        this.Keys.onSelectPressed = this.$s['Keys.selectPressed'] = Signal()
-        this.Keys.onShortcutOverride = this.$s['Keys.shortcutOverride'] = Signal()
-        this.Keys.onSpacePressed = this.$s['Keys.spacePressed'] = Signal()
-        this.Keys.onTabPressed = this.$s['Keys.tabPressed'] = Signal()
-        this.Keys.onUpPressed = this.$s['Keys.upPressed'] = Signal()
-        this.Keys.onVolumeDownPressed = this.$s['Keys.volumeDownPressed'] = Signal()
-        this.Keys.onVolumeUpPressed = this.$s['Keys.volumeUpPressed'] = Signal()
-        this.Keys.onYesPressed = this.$s['Keys.yesPressed'] = Signal()
+        this.$cS('Keys.asteriskPressed')
+        this.$cS('Keys.backPressed')
+        this.$cS('Keys.backtabPressed')
+        this.$cS('Keys.callPressed')
+        this.$cS('Keys.cancelPressed')
+        this.$cS('Keys.context1Pressed')
+        this.$cS('Keys.context2Pressed')
+        this.$cS('Keys.context3Pressed')
+        this.$cS('Keys.context4Pressed')
+        this.$cS('Keys.deletePressed')
+        this.$cS('Keys.digit0Pressed')
+        this.$cS('Keys.digit1Pressed')
+        this.$cS('Keys.digit2Pressed')
+        this.$cS('Keys.digit3Pressed')
+        this.$cS('Keys.digit4Pressed')
+        this.$cS('Keys.digit5Pressed')
+        this.$cS('Keys.digit6Pressed')
+        this.$cS('Keys.digit7Pressed')
+        this.$cS('Keys.digit8Pressed')
+        this.$cS('Keys.digit9Pressed')
+        this.$cS('Keys.downPressed')
+        this.$cS('Keys.enterPressed')
+        this.$cS('Keys.escapePressed')
+        this.$cS('Keys.flipPressed')
+        this.$cS('Keys.hangupPressed')
+        this.$cS('Keys.leftPressed')
+        this.$cS('Keys.menuPressed')
+        this.$cS('Keys.noPressed')
+        this.$cS('Keys.pressed')
+        this.$cS('Keys.released')
+        this.$cS('Keys.returnPressed')
+        this.$cS('Keys.rightPressed')
+        this.$cS('Keys.selectPressed')
+        this.$cS('Keys.shortcutOverride')
+        this.$cS('Keys.spacePressed')
+        this.$cS('Keys.tabPressed')
+        this.$cS('Keys.upPressed')
+        this.$cS('Keys.volumeDownPressed')
+        this.$cS('Keys.volumeUpPressed')
+        this.$cS('Keys.yesPressed')
     }
     $domCreate(tag = 'div'){
         super.$domCreate()

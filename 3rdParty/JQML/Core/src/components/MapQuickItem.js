@@ -8,8 +8,8 @@ export class MapQuickItem extends QtObject  {
         
         this.$cP('autoFadeIn', true)
         this.$cP('zoomLevel', 0)
-        this.$cP('coordinate', undefined).connect(this.$coordinateChanged.bind(this))
-        this.$cP('sourceItem', undefined).connect(this.$sourceItemChanged.bind(this))
+        this.$cP('coordinate', undefined, this.$coordinateChanged)
+        this.$cP('sourceItem', undefined, this.$sourceItemChanged)
         this.$cPC('anchorPoint', {
             x: 0,
             y: 0,

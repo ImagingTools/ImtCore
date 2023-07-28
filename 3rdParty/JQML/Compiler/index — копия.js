@@ -431,7 +431,7 @@ function compile(instructions, code, curr = '$root', prev = ''){
         
     }
     for(let signal of instructions.connectionSignals){
-        code.push(`${curr}.$s.${signal.name}.connect(function(){${signal.source}})`)
+        code.push(`${curr}['${signal.name}'].connect(function(){${signal.source}})`)
     }
     
     let step = 0

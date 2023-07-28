@@ -8,7 +8,7 @@ export class Row extends Item {
     constructor(args) {
         super(args)
 
-        this.$cP('spacing', 0).connect(this.$spacingChanged.bind(this))
+        this.$cP('spacing', 0, this.$spacingChanged)
     }
 
     $childDomChanged(child){

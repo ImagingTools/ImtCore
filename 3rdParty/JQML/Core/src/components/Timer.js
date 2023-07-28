@@ -5,13 +5,13 @@ export class Timer extends QtObject {
     constructor(args) {
         super(args)
 
-        this.$cP('interval', 1000).connect(this.$timerChanged.bind(this))
-        this.$cP('repeat', false).connect(this.$timerChanged.bind(this))
-        this.$cP('running', false).connect(this.$timerChanged.bind(this))
-        this.$cP('triggeredOnStart', false).connect(this.$timerChanged.bind(this))
+        this.$cP('interval', 1000, this.$timerChanged)
+        this.$cP('repeat', false, this.$timerChanged)
+        this.$cP('running', false, this.$timerChanged)
+        this.$cP('triggeredOnStart', false, this.$timerChanged)
 
-        this.$s.triggered = Signal()
-
+        this.$cS('triggered')
+    
         this.$timer = null
     }
     $domCreate(){
@@ -30,7 +30,7 @@ export class Timer extends QtObject {
         if(this.$p.running.val) this.running = false
     }
     $triggered(){
-        this.$s.triggered()
+        this.triggered()
         if(this.$p.repeat.val && this.$p.running.val) {
             if(this.$timer) clearTimeout(this.$timer)
             this.$timer = setTimeout(()=>{

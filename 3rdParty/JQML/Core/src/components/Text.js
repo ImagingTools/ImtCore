@@ -38,19 +38,19 @@ export class Text extends Item {
     constructor(args) {
         super(args)
 
-        this.$cP('text', '').connect(this.$textChanged.bind(this))
-        this.$cP('color', 'black').connect(this.$colorChanged.bind(this))
-        this.$cP('contentHeight', 0).connect(this.$contentHeightChanged.bind(this))
-        this.$cP('contentWidth', 0).connect(this.$contentWidthChanged.bind(this))
-        this.$cP('horizontalAlignment', Text.AlignLeft).connect(this.$horizontalAlignmentChanged.bind(this))
-        this.$cP('verticalAlignment', Text.AlignTop).connect(this.$verticalAlignmentChanged.bind(this))
-        this.$cP('wrapMode', Text.NoWrap).connect(this.$wrapModeChanged.bind(this))
+        this.$cP('text', '', this.$textChanged)
+        this.$cP('color', 'black', this.$colorChanged)
+        this.$cP('contentHeight', 0, this.$contentHeightChanged)
+        this.$cP('contentWidth', 0, this.$contentWidthChanged)
+        this.$cP('horizontalAlignment', Text.AlignLeft, this.$horizontalAlignmentChanged)
+        this.$cP('verticalAlignment', Text.AlignTop, this.$verticalAlignmentChanged)
+        this.$cP('wrapMode', Text.NoWrap, this.$wrapModeChanged)
         this.$cP('textFormat', Text.AutoText)
-        this.$cP('elide', Text.ElideNone).connect(this.$elideChanged.bind(this))
-        this.$cPC('font', Font()).connect(this.$fontChanged.bind(this))
+        this.$cP('elide', Text.ElideNone, this.$elideChanged)
+        this.$cPC('font', Font(), this.$fontChanged)
 
-        this.$s.linkActivated = Signal()
-
+        this.$cS('linkActivated')
+    
         this.$updateTimer = null
     }
 
@@ -149,7 +149,7 @@ export class Text extends Item {
                 if(this.$contentHeightAuto){
                     if(this.$heightAuto && this.$p.height.val !== this.impl.offsetHeight) {
                         this.$p.height.val = this.impl.offsetHeight
-                        this.$p.height.signal()
+                        this.$p.height.getSignal()()
                         this.$heightAuto = true
                         // this.dom.style.height = `${this.impl.offsetHeight}px`
                     }
@@ -158,7 +158,7 @@ export class Text extends Item {
                 if(this.$contentWidthAuto){
                     if(this.$widthAuto && this.$p.width.val !== this.impl.offsetWidth) {
                         this.$p.width.val = this.impl.offsetWidth
-                        this.$p.width.signal()
+                        this.$p.width.getSignal()()
                         this.$widthAuto = true
                         // this.dom.style.width = `${this.impl.offsetWidth}px`
                     }

@@ -16,22 +16,22 @@ export class Flickable extends Item {
 
     constructor(args) {
         super(args)
-        this.$cP('contentHeight', -1).connect(this.$contentHeightChanged.bind(this))
-        this.$cP('contentWidth', -1).connect(this.$contentWidthChanged.bind(this))
-        this.$cP('contentX', 0).connect(this.$contentXChanged.bind(this))
-        this.$cP('contentY', 0).connect(this.$contentYChanged.bind(this))
-        this.$cP('flickableDirection', Flickable.AutoFlickDirection).connect(this.$flickableDirectionChanged.bind(this))
+        this.$cP('contentHeight', -1, this.$contentHeightChanged)
+        this.$cP('contentWidth', -1, this.$contentWidthChanged)
+        this.$cP('contentX', 0, this.$contentXChanged)
+        this.$cP('contentY', 0, this.$contentYChanged)
+        this.$cP('flickableDirection', Flickable.AutoFlickDirection, this.$flickableDirectionChanged)
         this.$cP('interactive', true)
         this.$cP('contentItem', null)
 
 		this.$cP('originX', 0)
 		this.$cP('originY', 0)
 		
-
-        this.$s.flickEnded = Signal()
-        this.$s.flickStarted = Signal()
-        this.$s.movementEnded = Signal()
-        this.$s.movementStarted = Signal()
+		this.$cS('flickEnded')
+		this.$cS('flickStarted')
+		this.$cS('movementEnded')
+		this.$cS('movementStarted')
+       
 
 		this.$childUpdater = null
 
@@ -172,12 +172,12 @@ export class Flickable extends Item {
 
     $flickTimerUpdate(){
         if(!this.$flickTimer) {
-            this.$s.flickStarted()
+            this.flickStarted()
         }
         clearTimeout(this.$flickTimer)
         
         this.$flickTimer = setTimeout(()=>{
-            this.$s.flickEnded()
+            this.flickEnded()
             this.$flickTimer = null
         }, 100)
     }

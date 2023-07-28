@@ -11,14 +11,14 @@ export class MapCircle extends QtObject  {
         
         this.$cP('autoFadeIn', true)
         this.$cP('backend', null)
-        this.$cP('center', null).connect(this.$updateFeature.bind(this))
-        this.$cP('color', 'transparent').connect(this.$updateFeature.bind(this))
-        this.$cP('opacity', 1).connect(this.$updateFeature.bind(this))
-        this.$cP('radius', 0).connect(this.$updateFeature.bind(this))
+        this.$cP('center', null, this.$updateFeature)
+        this.$cP('color', 'transparent', this.$updateFeature)
+        this.$cP('opacity', 1, this.$updateFeature)
+        this.$cP('radius', 0, this.$updateFeature)
         this.$cPC('border', {
             width: 0,
             color: 'black',
-        }).connect(this.$updateFeature.bind(this))
+        }, this.$updateFeature)
     }
     $updateFeature(added = false){
         if(!this.center) return

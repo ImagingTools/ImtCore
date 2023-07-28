@@ -4,13 +4,13 @@ export class WebView extends Item {
     constructor(args) {
         super(args)
 
-        this.$cP('url', '').connect(this.$urlChanged.bind(this))
+        this.$cP('url', '', this.$urlChanged)
         this.$cP('canGoBack', true)
         this.$cP('canGoForward', true)
         this.$cP('httpUserAgent', '') // not implemented yet
         this.$cP('loadProgress', 0)
         this.$cP('loading', false)
-        this.$cP('title', '').connect(this.$titleChanged.bind(this))
+        this.$cP('title', '', this.$titleChanged)
 
         // since Qt v6.5
         // this.$cPC('settings', {

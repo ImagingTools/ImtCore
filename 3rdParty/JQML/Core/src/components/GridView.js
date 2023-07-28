@@ -16,15 +16,15 @@ export class GridView extends Flickable {
     constructor(args) {
         super(args)
 
-        this.$cP('model', undefined).connect(this.$modelChanged.bind(this))
-        this.$cP('delegate', undefined).connect(this.$delegateChanged.bind(this))
+        this.$cP('model', undefined, this.$modelChanged)
+        this.$cP('delegate', undefined, this.$delegateChanged)
         this.$cP('count', 0)
-        this.$cP('cellWidth', 100).connect(this.$cellChanged.bind(this))
-        this.$cP('cellHeight', 100).connect(this.$cellChanged.bind(this))
-        this.$cP('verticalLayoutDirection', GridView.TopToBottom).connect(this.$directionChanged.bind(this))
-        this.$cP('layoutDirection', GridView.LeftToRight).connect(this.$directionChanged.bind(this))
+        this.$cP('cellWidth', 100, this.$cellChanged)
+        this.$cP('cellHeight', 100, this.$cellChanged)
+        this.$cP('verticalLayoutDirection', GridView.TopToBottom, this.$directionChanged)
+        this.$cP('layoutDirection', GridView.LeftToRight, this.$directionChanged)
         // this.$cP('spacing', 'real', 0).connect(this.$spacingChanged.bind(this))
-        this.$cP('currentIndex', -1).connect(this.$currentIndexChanged.bind(this))
+        this.$cP('currentIndex', -1, this.$currentIndexChanged)
         this.$cP('currentItem', undefined)
 
         this.$updateTimer = null

@@ -23,8 +23,8 @@ export class Binding extends QtObject {
     $update(){
         if(this.target && this.property && this.$updated){
             if(this.$prop) {
-                delete this.$p.value.signal.connections[this.$prop.PID]
-                this.$prop.depends.delete(this.$p.value.signal)
+                delete this.$p.value.getSignal().connections[this.$prop.PID]
+                this.$prop.depends.delete(this.$p.value.getSignal())
             }
 
             let path = this.property.split('.')
@@ -51,18 +51,18 @@ export class Binding extends QtObject {
             }
             // caller = prop
             this.$prop = prop
-            prop.depends.add(this.$p.value.signal)
-            this.$p.value.signal.connectWithName(prop.PID, ()=>{
+            prop.depends.add(this.$p.value.getSignal())
+            this.$p.value.getSignal().connectWithName(prop.PID, ()=>{
                 if(this.$p.value.val !== prop.val){
                     prop.val = this.$p.value.val
                     if(prop.type === 'alias') prop.setter(prop.val)
-                    prop.signal()
+                    prop.getSignal()()
                 }
             })
             if(this.$p.value.val !== prop.val){
                 prop.val = this.$p.value.val
                 if(prop.type === 'alias') prop.setter(prop.val)
-                prop.signal()
+                prop.getSignal()()
             }
             // caller = null
         }

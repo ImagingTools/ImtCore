@@ -5,17 +5,17 @@ export class PauseAnimation extends Animation {
     constructor(args) {
         super(args)
 
-        this.$cP('duration', 250).connect(this.$durationChanged.bind(this))
+        this.$cP('duration', 250, this.$durationChanged)
         
     }   
 
     $tick(){
-        if(this.$p.running.val && !this.$p.paused.val && this.$duration > 0){
+        if(this.running && !this.paused && this.$duration > 0){
             this.$duration -= 1000/60
 
             if(this.$duration < 0) {
                 this.running = false
-                this.$s.finished()
+                this.finished()
             }
         }
     }

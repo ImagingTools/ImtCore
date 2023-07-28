@@ -5,13 +5,13 @@ export class InnerShadow extends Item {
     constructor(args) {
         super(args)
 
-        this.$cP('color', 'black').connect(this.$updateShadow.bind(this))
-        this.$cP('horizontalOffset', 0).connect(this.$updateShadow.bind(this))
-        this.$cP('verticalOffset', 0).connect(this.$updateShadow.bind(this))
-        this.$cP('radius', 0).connect(this.$updateShadow.bind(this))
-        this.$cP('samples', 0).connect(this.$updateShadow.bind(this))
-        this.$cP('source', undefined).connect(this.$updateShadow.bind(this))
-        this.$cP('spread', 0).connect(this.$updateShadow.bind(this))
+        this.$cP('color', 'black', this.$updateShadow)
+        this.$cP('horizontalOffset', 0, this.$updateShadow)
+        this.$cP('verticalOffset', 0, this.$updateShadow)
+        this.$cP('radius', 0, this.$updateShadow)
+        this.$cP('samples', 0, this.$updateShadow)
+        this.$cP('source', undefined, this.$updateShadow)
+        this.$cP('spread', 0, this.$updateShadow)
         
     }
     $domCreate(){
@@ -20,9 +20,9 @@ export class InnerShadow extends Item {
     }
 
     $updateShadow(){
-        if(this.$p.source.val) {
+        if(this.source) {
             let rgba = Qt.$colorToRGBA(this.color)
-            this.source.dom.style.boxShadow = `${this.$p.horizontalOffset.val}px ${this.$p.verticalOffset.val}px ${this.$p.radius.val}px ${this.$p.spread.val}px rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity}) inset`
+            this.source.dom.style.boxShadow = `${this.horizontalOffset}px ${this.verticalOffset}px ${this.radius}px ${this.spread}px rgba(${rgba.r},${rgba.g},${rgba.b},${this.color === 'transparent' ? 0 : rgba.a * this.opacity}) inset`
         }
     }
 

@@ -7,13 +7,13 @@ export class Rectangle extends Item {
     constructor(args) {
         super(args)
 
-        this.$cP('color', 'white').connect(this.$colorChanged.bind(this))
-        this.$cP('radius', 0).connect(this.$radiusChanged.bind(this))
-        this.$cP('gradient', undefined).connect(this.$gradientChanged.bind(this))
+        this.$cP('color', 'white', this.$colorChanged)
+        this.$cP('radius', 0, this.$radiusChanged)
+        this.$cP('gradient', undefined, this.$gradientChanged)
         this.$cPC('border', {
             width: 0,
             color: 'black',
-        }).connect(this.$borderChanged.bind(this))
+        }, this.$borderChanged)
     }
 
     $domCreate(){

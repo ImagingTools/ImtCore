@@ -8,14 +8,14 @@ export class Animation extends QtObject {
     constructor(args) {
         super(args)
 
-        this.$cP('loops', 1).connect(this.$loopsChanged.bind(this))
-        this.$cP('paused', false).connect(this.$pausedChanged.bind(this))
-        this.$cP('running', false).connect(this.$runningChanged.bind(this))
-        this.$cP('alwaysRunToEnd', false).connect(this.$runningChanged.bind(this))
+        this.$cP('loops', 1, this.$loopsChanged)
+        this.$cP('paused', false, this.$pausedChanged)
+        this.$cP('running', false, this.$runningChanged)
+        this.$cP('alwaysRunToEnd', false, this.$runningChanged)
 
-        this.$s.finished = Signal()
-        this.$s.started = Signal()
-        this.$s.stopped = Signal()
+        this.$cS('finished')
+        this.$cS('started')
+        this.$cS('stopped')
 
         Core.animations[this.UID] = this
     }
@@ -48,11 +48,11 @@ export class Animation extends QtObject {
     }
 	start() {
         this.restart()
-        this.$s.started()
+        this.started()
     }
 	stop() {
 		this.running = false
-        this.$s.stopped()
+        this.stopped()
     }
 	resume() { 
         this.paused = false

@@ -7,8 +7,8 @@ export class MapItemView extends QtObject  {
         
         this.$cP('add', null)
         this.$cP('autoFitViewport', null)
-        this.$cP('delegate', null).connect(this.$delegateChanged.bind(this))
-        this.$cP('model', null).connect(this.$modelChanged.bind(this))
+        this.$cP('delegate', null, this.$delegateChanged)
+        this.$cP('model', null, this.$modelChanged)
         this.$cP('remove', null)
     }
 

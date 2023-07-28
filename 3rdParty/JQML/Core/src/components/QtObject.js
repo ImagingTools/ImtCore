@@ -59,8 +59,8 @@ export class QtObject {
             this.index = args.index
         }
 
-        this.$s['Component.completed'] = Signal()
-        this.$s['Component.destruction'] = Signal()
+        this.$cS('Component.completed')
+        this.$cS('Component.destruction')
 
         // ReadyList.push(this)
         // console.log(this)
@@ -208,7 +208,7 @@ export class QtObject {
     $tryComplete(){
         if(!this.$completed){
             this.$completed = true
-            this.$s['Component.completed']()
+            this['Component.completed']()
         }
 
         for(let i = this.children.length-1; i >= 0; i--){
@@ -237,12 +237,13 @@ export class QtObject {
                 this.$p[propName].depends.clear()
 
                 let val = this.$p[propName].func()
+               
                 if(this.$p[propName].val !== val){
                     if(this.jqmlDebug){
                         console.info(`JQML::updating property ${propName}. old = `, this.$p[propName].val, `new = `, val)
                     }
                     this.$p[propName].val = val
-                    if(queueSignals.indexOf(this.$p[propName].signal) < 0) queueSignals.push(this.$p[propName].signal)          
+                    if(queueSignals.indexOf(this.$p[propName].getSignal()) < 0) queueSignals.push(this.$p[propName].getSignal())          
                 }
             } catch (error) {
                 errors.push({
@@ -287,7 +288,7 @@ export class QtObject {
                     }
                     this.$p[propName].setter(val)
                 }
-                if(queueSignals.indexOf(this.$p[propName].signal) < 0) queueSignals.push(this.$p[propName].signal)     
+                if(queueSignals.indexOf(this.$p[propName].getSignal()) < 0) queueSignals.push(this.$p[propName].getSignal())     
             }
 
             if(this.$uL.aliases.length === 0){
@@ -317,7 +318,7 @@ export class QtObject {
                     this.$p[propName].depends.clear()
 
                     error.obj.$p[error.propName].val = val
-                    if(queueSignals.indexOf(error.obj.$p[error.propName].signal) < 0) queueSignals.push(error.obj.$p[error.propName].signal)   
+                    if(queueSignals.indexOf(error.obj.$p[error.propName].getSignal()) < 0) queueSignals.push(error.obj.$p[error.propName].getSignal())   
 
                 }
             } catch {
@@ -389,29 +390,21 @@ export class QtObject {
         }
         
     }
+    
 
-    $cP(name, val){
-        if(typeof val === 'number'){
-            if(isNaN(val)){
-                val = 0
-            }
-            if(val === Infinity){
-                val = -2147483648
-            }
-
-        }
-
+    $cP(name, val, changed){
         if(name in this.$p){
-            return this.$p[name].signal
+            return //this.$s[`${name}Changed`]
         }
 
-        let signal = this.$cS(`${name}Changed`)
-        signal.debug = `${this.UID}-${name}`
+        this.$cS(`${name}Changed`)
+
         if(typeof val === 'function'){
             this.$p[name] = {
                 'val': undefined,
-                'freeze': false,
-                'signal': signal,
+                'changed': true,
+                // 'freeze': false,
+                // 'signal': this.$cS(`${name}Changed`),
                 'depends': new Set(),
                 'func': ()=>{
                     caller = this.$p[name]
@@ -433,16 +426,39 @@ export class QtObject {
                 },
                 'PID': PID++
             }
-            // PropertyManager.add(this.$p[name])
+
             this.$uL.properties.push(name)
         } else {
+            if(typeof val === 'number'){
+                if(isNaN(val)){
+                    val = 0
+                }
+                if(val === Infinity){
+                    val = -2147483648
+                }
+    
+            }
             this.$p[name] = {
                 'val': val,
-                'freeze': false,
-                'signal': signal,
-                'depends': new Set(),
+                'changed': true,
+                // 'freeze': false,
+                // 'signal': signal,
+                // 'depends': new Set(),
                 'PID': PID++
             }
+        }
+
+        // if(changed) this.$p[name].changed = changed.bind(this)
+        
+        this.$p[name].getSignal = ()=>{
+            if(!this.$s[`${name}Changed`]) {
+                this.$s[`${name}Changed`] = Signal()
+            }
+            if(changed && this.$p[name].changed){
+                this.$s[`${name}Changed`].connect(changed.bind(this))
+                delete this.$p[name].changed
+            }
+            return this.$s[`${name}Changed`]
         }
         
         // this.$s[`${name}Changed`] = signal
@@ -454,25 +470,28 @@ export class QtObject {
                 if(caller && caller !== this.$p[name]){
                     let _caller = caller
                     if(_caller.type === 'alias'){
-                        signal.connectWithName(_caller.PID, ()=>{
+                        this.$p[name].getSignal().connectWithName(_caller.PID, ()=>{
                             let val1 = _caller.func ? _caller.func() : _caller.val
                             let val2 = _caller.getter()
                             if(val1 !== _caller.val){
                                 _caller.val = val1
                                 _caller.setter(_caller.val)
-                                _caller.signal()
+                                
+                                _caller.getSignal()()
                             } else if (val2 !== _caller.val) {
                                 _caller.val = val2
-                                _caller.signal()
+                                
+                                _caller.getSignal()()
                             }
                         })
                     } else {
-                        _caller.depends.add(signal)
-                        signal.connectWithName(_caller.PID, ()=>{
+                        _caller.depends.add(this.$p[name].getSignal())
+                        this.$p[name].getSignal().connectWithName(_caller.PID, ()=>{
                             let val = _caller.func()
                             if(_caller.val !== val){
                                 _caller.val = val
-                                _caller.signal()
+                                
+                                _caller.getSignal()()
                             }
                         })
                     }
@@ -492,10 +511,15 @@ export class QtObject {
 
                 let isBinding = false
                 if(typeof newVal === 'function' && newVal.type === 'Binding'){
-                    for(let s of this.$p[name].depends){
-                        delete s[this.$p[name].PID]
+
+                    if(this.$p[name].depends){
+                        for(let s of this.$p[name].depends){
+                            s.disconnectWithName(this.$p[name].PID)
+                        }
+                        this.$p[name].depends.clear()
+                        delete this.$p[name].depends
                     }
-                    this.$p[name].depends.clear()
+                    
                     
                     caller = this.$p[name]
                     this.$p[name].func = newVal
@@ -509,14 +533,16 @@ export class QtObject {
                         console.info(`JQML::set property ${name}. old = `, this.$p[name].val, `new = `, newVal)
                     }
                     if(this.$p[name].freeze === true){
-                        signal()
-                        signal()
+                        
+                        this.$p[name].getSignal()()
+                        this.$p[name].getSignal()()
                     } else {
-                        if(!isBinding){
+                        if(!isBinding && this.$p[name].depends){
                             for(let s of this.$p[name].depends){
-                                delete s[this.$p[name].PID]
+                                s.disconnectWithName(this.$p[name].PID)
                             }
                             this.$p[name].depends.clear()
+                            delete this.$p[name].depends
                         }
                       
                         if(name === 'visible' && this.parent){
@@ -524,11 +550,13 @@ export class QtObject {
                             let val = this.$p[name].func()
                             if(this.$p[name].val !== val){
                                 this.$p[name].val = val
-                                signal()
+                                
+                                this.$p[name].getSignal()()
                             }
                         } else {
                             this.$p[name].val = newVal
-                            signal()
+                            
+                            this.$p[name].getSignal()()
                         }
                         
                     }
@@ -536,30 +564,43 @@ export class QtObject {
                 }              
             },
         })
-        return signal
+        
     }
 
-    $cPC(name, props){
+    $cPC(name, props, changed){
         if(name in this.$p){
             return
         }
-        let signal = this.$cS(`${name}Changed`)
-        signal.debug = `${this.UID}-${name}`
-
-        // this.$s[`${name}Changed`] = signal
+   
+        this.$cS(`${name}Changed`)
 
         this[name] = {
 
         }
 
+        
+
         for(let name2 in props){
             
             this.$p[`${name}.${name2}`] = {
                 'val': props[name2],
-                'signal': signal,
-                'depends': new Set(),
+                'changed': true,
+                // 'signal': signal,
+                // 'depends': new Set(),
                 'PID': PID++,
             }
+
+            this.$p[`${name}.${name2}`].getSignal = ()=>{
+                if(!this.$s[`${name}Changed`]) {
+                    this.$s[`${name}Changed`] = Signal()
+                }
+                if(changed && this.$p[`${name}.${name2}`].changed){
+                    this.$s[`${name}Changed`].connect(changed.bind(this))
+                    delete this.$p[`${name}.${name2}`].changed
+                }
+                return this.$s[`${name}Changed`]
+            }
+
             Object.defineProperty(this[name], name2, {
                 get: ()=>{ 
                     if(this.UID === null || this.UID === undefined) return
@@ -567,25 +608,28 @@ export class QtObject {
                     if(caller && caller !== this.$p[`${name}.${name2}`]){
                         let _caller = caller
                         if(_caller.type === 'alias'){
-                            signal.connectWithName(_caller.PID, ()=>{
+                            this.$p[`${name}.${name2}`].getSignal().connectWithName(_caller.PID, ()=>{
                                 let val1 = _caller.func ? _caller.func() : _caller.val
                                 let val2 = _caller.getter()
                                 if(val1 !== _caller.val){
                                     _caller.val = val1
                                     _caller.setter(_caller.val)
-                                    _caller.signal()
+                                    
+                                    _caller.getSignal()()
                                 } else if (val2 !== _caller.val) {
                                     _caller.val = val2
-                                    _caller.signal()
+                                    
+                                    _caller.getSignal()()
                                 }
                             })
                         } else {
-                            _caller.depends.add(signal)
-                            signal.connectWithName(_caller.PID, ()=>{
+                            _caller.depends.add(this.$p[`${name}.${name2}`].getSignal())
+                            this.$p[`${name}.${name2}`].getSignal().connectWithName(_caller.PID, ()=>{
                                 let val = _caller.func()
                                 if(_caller.val !== val){
                                     _caller.val = val
-                                    _caller.signal()
+                                    
+                                    _caller.getSignal()()
                                 }
                             })
                         }
@@ -605,10 +649,13 @@ export class QtObject {
 
                     let isBinding = false
                     if(typeof newVal === 'function' && newVal.type === 'Binding'){
-                        for(let s of this.$p[`${name}.${name2}`].depends){
-                            delete s[this.$p[`${name}.${name2}`].PID]
+                        if(this.$p[`${name}.${name2}`].depends){
+                            for(let s of this.$p[`${name}.${name2}`].depends){
+                                s.disconnectWithName(this.$p[`${name}.${name2}`].PID)
+                            }
+                            this.$p[`${name}.${name2}`].depends.clear()
+                            delete this.$p[`${name}.${name2}`].depends
                         }
-                        this.$p[`${name}.${name2}`].depends.clear()
 
                         caller = this.$p[`${name}.${name2}`]
                         this.$p[`${name}.${name2}`].func = newVal
@@ -621,19 +668,22 @@ export class QtObject {
                         if(this.jqmlDebug){
                             console.info(`JQML::set property ${name}.${name2}. old = `, this.$p[`${name}.${name2}`].val, `new = `, newVal)
                         }
-                        if(!isBinding){
+                        if(!isBinding && this.$p[`${name}.${name2}`].depends){
                             for(let s of this.$p[`${name}.${name2}`].depends){
-                                delete s[this.$p[`${name}.${name2}`].PID]
+                                s.disconnectWithName(this.$p[`${name}.${name2}`].PID)
                             }
                             this.$p[`${name}.${name2}`].depends.clear()
+                            delete this.$p[`${name}.${name2}`].depends
                         }
                         this.$p[`${name}.${name2}`].val = newVal
-                        signal()
+    
+                   
+                        this.$p[`${name}.${name2}`].getSignal()()
                     }
                 },
             })
         }
-        return signal
+        // return signal
     }
 
     $sP(name, func){
@@ -649,8 +699,12 @@ export class QtObject {
         //         this.$cP(name, 'var', undefined)
         //     }
         // }
+        
 
         if(this.$p[name]){
+            if(!this.$p[name].depends){
+                this.$p[name].depends = new Set()
+            }
             if(this.$p[name].type === 'alias'){
                 this.$p[name].func = ()=>{
                     if(this.UID === null || this.UID === undefined) return
@@ -731,7 +785,7 @@ export class QtObject {
         //                     if(val !== _caller.getter()){
         //                         _caller.setter(val)
         //                     } else {
-        //                         _caller.signal()
+        //                         _caller.getSignal()()
         //                     }
                             
         //                 }
@@ -741,7 +795,7 @@ export class QtObject {
         //                     let val = _caller.func()
         //                     if(_caller.val !== val){
         //                         _caller.val = val
-        //                         _caller.signal()
+        //                         _caller.getSignal()()
         //                     }
         //                 }
         //             }
@@ -768,12 +822,14 @@ export class QtObject {
             }
 
         }
-        let signal = this.$cS(`${name}Changed`)
-        signal.debug = `${this.UID}-${name}`
+
+        this.$cS(`${name}Changed`)
+        // let signal = this.$cS(`${name}Changed`)
+        // signal.debug = `${this.UID}-${name}`
 
         this.$p[name] = {
             'val': undefined,
-            'signal': signal,
+            // 'signal': signal,
             'depends': new Set(),
             'type': 'alias',
             'func': ()=>{
@@ -799,6 +855,13 @@ export class QtObject {
             'PID': PID++
         }
 
+        this.$p[name].getSignal = ()=>{
+            if(!this.$s[`${name}Changed`]) {
+                this.$s[`${name}Changed`] = Signal()
+            }
+            return this.$s[`${name}Changed`]
+        }
+
         Object.defineProperty(this, name, {
             get: ()=>{ 
                 if(this.UID === null || this.UID === undefined) return
@@ -806,25 +869,28 @@ export class QtObject {
                 if(caller && caller !== this.$p[name]){
                     let _caller = caller
                     if(_caller.type === 'alias'){
-                        signal.connectWithName(_caller.PID, ()=>{
+                        this.$p[name].getSignal().connectWithName(_caller.PID, ()=>{
                             let val1 = _caller.func ? _caller.func() : _caller.val
                             let val2 = _caller.getter()
                             if(val1 !== _caller.val){
                                 _caller.val = val1
                                 _caller.setter(_caller.val)
-                                _caller.signal()
+                                
+                                _caller.getSignal()()
                             } else if (val2 !== _caller.val) {
                                 _caller.val = val2
-                                _caller.signal()
+                                
+                                _caller.getSignal()()
                             }
                         })
                     } else {
-                        _caller.depends.add(signal)
-                        signal.connectWithName(_caller.PID, ()=>{
+                        _caller.depends.add(this.$p[name].getSignal())
+                        this.$p[name].getSignal().connectWithName(_caller.PID, ()=>{
                             let val = _caller.func()
                             if(_caller.val !== val){
                                 _caller.val = val
-                                _caller.signal()
+                                
+                                _caller.getSignal()()
                             }
                         })
                     }
@@ -844,10 +910,13 @@ export class QtObject {
 
                 let isBinding = false
                 if(typeof newVal === 'function' && newVal.type === 'Binding'){
-                    for(let s of this.$p[name].depends){
-                        delete s[this.$p[name].PID]
+                    if(this.$p[name].depends){
+                        for(let s of this.$p[name].depends){
+                            s.disconnectWithName(this.$p[name].PID)
+                        }
+                        this.$p[name].depends.clear()
+                        delete this.$p[name].depends
                     }
-                    this.$p[name].depends.clear()
 
                     caller = this.$p[name]
                     this.$p[name].func = newVal
@@ -857,31 +926,34 @@ export class QtObject {
                 }
 
                 if(this.$p[name].val !== newVal){
-                    if(!isBinding){
+                    if(!isBinding && this.$p[name].depends){
                         for(let s of this.$p[name].depends){
-                            delete s[this.$p[name].PID]
+                            s.disconnectWithName(this.$p[name].PID)
                         }
                         this.$p[name].depends.clear()
+                        delete this.$p[name].depends
                         this.$p[name].func = null
                     }
                     
 
                     this.$p[name].val = newVal
                     setter(newVal)
-                    signal()
+                    this.$p[name].getSignal()()
                 }              
             },
         })
         this.$uL.aliases.push(name)
-        return signal
+       
     }
 
     $cS(name, ...args){
-        let signal = Signal(args)
-        
-        this.$s[name] = signal
-        this[name] = signal
-        return signal
+        // if(name in this) return
+        Object.defineProperty(this, name, {
+            get: ()=>{
+                if(!this.$s[name]) this.$s[name] = Signal(args)
+                return this.$s[name]
+            }
+        })
     }
 
     $updateGeometry(){
@@ -910,7 +982,7 @@ export class QtObject {
             child.$destroy()
         }
         
-        this.$s['Component.destruction']()
+        this['Component.destruction']()
         delete UIDList[this.UID]
 
         this.$uL.properties = []
@@ -936,22 +1008,24 @@ export class QtObject {
             
         }
         for(let propName in this.$p){
-            
-            for(let s of this.$p[propName].depends){
-                // delete s[this.$p[propName]]
-                delete s.connections[this.$p[propName].PID]
+            if(this.$p[propName].depends){
+                for(let s of this.$p[propName].depends){
+                    // delete s[this.$p[propName]]
+                    s.disconnectWithName(this.$p[propName].PID)
+                }
+                this.$p[propName].depends.clear()
             }
-            this.$p[propName].depends.clear()
-            this.$p[propName].signal.connections = {}      
+            
+            delete this.$p[propName].getSignal().connections
         }
         // if(this.$timer) clearTimeout(this.$timer)
         setTimeout(()=>{
             
             for(let sigName in this.$s){
-                this.$s[sigName].connections = {}
-                for(let key in this.$s[sigName].repeats){
-                    clearTimeout(this.$s[sigName].repeats[key])
-                }
+                delete this.$s[sigName].connections
+                // for(let key in this.$s[sigName].repeats){
+                //     clearTimeout(this.$s[sigName].repeats[key])
+                // }
             }
             for(let key in this){
                 delete this[key]

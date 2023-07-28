@@ -10,8 +10,8 @@ export class Repeater extends Item {
     constructor(args) {
         super(args)
 
-        this.$cP('model', undefined).connect(this.$modelChanged.bind(this))
-        this.$cP('delegate', undefined).connect(this.$delegateChanged.bind(this))
+        this.$cP('model', undefined, this.$modelChanged)
+        this.$cP('delegate', undefined, this.$delegateChanged)
         this.$cP('count', 0)
 
         this.$cS('itemAdded', 'index', 'item')

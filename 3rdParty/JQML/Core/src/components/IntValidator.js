@@ -16,7 +16,7 @@ export class IntValidator extends QtObject  {
 
         if (regExp.test(str.trim())) {
             const value = parseInt(str, 10);
-            return this.$p.bottom.val <= value && this.$p.top.val >= value
+            return this.bottom <= value && this.top >= value
         }
             return false;
         }
