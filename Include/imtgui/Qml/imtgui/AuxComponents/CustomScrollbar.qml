@@ -11,7 +11,7 @@ Rectangle{
 
     visible: vertical ? targetItem.contentHeight > scrollContainer.height : targetItem.contentWidth > scrollContainer.width;
 
-    property var targetItem;
+    property var targetItem: null;
 
     property bool vertical: true;
 

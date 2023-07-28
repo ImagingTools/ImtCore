@@ -133,9 +133,13 @@ Rectangle {
                 }
                 onItemChanged: {
                     //loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
-                    if(loaderTopPanel.item.title !== undefined){
-                        loaderTopPanel.item.title = dialogContainer.title;
-                    }                }
+                    if(loaderTopPanel.item){
+                        loaderTopPanel.item.width = dialogContainer.width;
+                        if(loaderTopPanel.item.title !== undefined){
+                            loaderTopPanel.item.title = dialogContainer.title;
+                        }
+                    }
+                                   }
             }
         }
 
