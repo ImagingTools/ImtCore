@@ -1,7 +1,7 @@
 export function Signal(...args){
     let names = args
     let signal = (...args) => {
-        signal.context = {}
+        
         for(let i = 0; i < names.length; i++){
             for(let k = 0; k < names[i].length && k < args.length; k++){
                 signal.context[names[i][k]] = args[k]
@@ -25,7 +25,7 @@ export function Signal(...args){
             }
         }
 
-        delete signal.context
+        // delete signal.context
         // for(let key in signal.connections){
 
         //     try {
@@ -42,6 +42,7 @@ export function Signal(...args){
         // }
     }
     signal.count = 0
+    signal.context = {}
 
     signal.connect = (...args) => {
         if(!signal.connections) signal.connections = {}
