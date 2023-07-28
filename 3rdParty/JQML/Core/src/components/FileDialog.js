@@ -73,8 +73,14 @@ export class FileDialog extends Item {
     $dialogChanged(e){
         if(this.selectMultiple){
             this.fileUrls = e.target.files
+            for(let fileUrl of this.fileUrls){
+                fileUrl.toString = ()=>{return this.fileUrl}
+                fileUrl.replace = ()=>{return this.fileUrl}
+            }
         } else {
             this.fileUrl = e.target.files[0]
+            this.fileUrl.toString = ()=>{return this.fileUrl}
+            this.fileUrl.replace = ()=>{return this.fileUrl}
         }
         
         this.accepted()
