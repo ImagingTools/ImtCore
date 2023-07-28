@@ -485,6 +485,7 @@ export class QtObject {
                             }
                         })
                     } else {
+                        if(!_caller.depends) _caller.depends = new Set()
                         _caller.depends.add(this.$p[name].getSignal())
                         this.$p[name].getSignal().connectWithName(_caller.PID, ()=>{
                             let val = _caller.func()
@@ -623,6 +624,7 @@ export class QtObject {
                                 }
                             })
                         } else {
+                            if(!_caller.depends) _caller.depends = new Set()
                             _caller.depends.add(this.$p[`${name}.${name2}`].getSignal())
                             this.$p[`${name}.${name2}`].getSignal().connectWithName(_caller.PID, ()=>{
                                 let val = _caller.func()
@@ -884,6 +886,7 @@ export class QtObject {
                             }
                         })
                     } else {
+                        if(!_caller.depends) _caller.depends = new Set()
                         _caller.depends.add(this.$p[name].getSignal())
                         this.$p[name].getSignal().connectWithName(_caller.PID, ()=>{
                             let val = _caller.func()

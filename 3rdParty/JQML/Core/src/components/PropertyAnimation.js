@@ -23,10 +23,13 @@ export class PropertyAnimation extends Animation {
                 
                 let increment = (this.to - this.from) / (this.duration / (1000/Core.FPS))
 
-                this.target[prop] += increment
+                // this.target[prop] += increment
+                this.target.$p[prop].val += increment
+                // this.target.$p[prop].getSignal()()
+                
 
                 if(this.to >= this.from && this.target[prop] >= this.to) {
-                    this.target[prop] = this.to
+                    this.target.$p[prop].val = this.to
                     let loops = this.$loops + 1
                     if(loops < this.loops || this.loops === Animation.Infinite){
                         this.restart()
@@ -38,7 +41,7 @@ export class PropertyAnimation extends Animation {
                     }
                 }
                 if(this.to <= this.from && this.target[prop] <= this.to) {
-                    this.target[prop] = this.to
+                    this.target.$p[prop].val = this.to
                     let loops = this.$loops + 1
                     if(loops < this.loops || this.loops === Animation.Infinite){
                         this.restart()
@@ -49,6 +52,7 @@ export class PropertyAnimation extends Animation {
                         this.finished()
                     }
                 }
+                this.target.$p[prop].getSignal()()
 
             }
             this.target.$updateRect()
@@ -86,7 +90,11 @@ export class PropertyAnimation extends Animation {
     restart() { 
         let properties = this.properties.split(',')
         for(let prop of properties){
-            this.target[prop] = this.from
+            if(this.target.$p[prop].val !== this.from){
+                this.target.$p[prop].val = this.from
+                this.target.$p[prop].getSignal()()
+            }
+            
         }
 		super.restart()
     }
