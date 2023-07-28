@@ -13,6 +13,9 @@ QtObject {
     signal fileDownloaded(string filePath);
     signal fileUploaded(var url);
     signal fileExists(var url);
+    signal fileDownloadFailed();
+    signal fileUploadFailed();
+
 
     function SendFile(fileUrl){
         this.state = "Loading"
@@ -27,7 +30,9 @@ QtObject {
             if (this.prefix == ""){
                 this.prefix = "files"
             }
-            xhr.open("POST", `../../` + this.prefix + `/${fileUrl.name}`);
+            let pathIn = `../../` + this.prefix + `/${fileUrl.name}`;
+            pathIn = pathIn.replace('\/\/','/')
+            xhr.open("POST", pathIn);
             xhr.send(reader.result)
         }.bind(this)
 
@@ -54,7 +59,9 @@ QtObject {
         if (this.prefix == ""){
             this.prefix = "files"
         }
-        Qt.openUrlExternally(`../../` + this.prefix + `/${fileName}?FileId=${fileHash}`)
+        let pathIn = `../../` + this.prefix + `/${fileName}?FileId=${fileHash}`;
+        pathIn = pathIn.replace('\/\/','/')
+        Qt.openUrlExternally(pathIn)
     }
 
     function DeleteFile(fileHash, fileUrl){
@@ -63,7 +70,9 @@ QtObject {
         }
         this.state = "Loading"
         var xhr = new XMLHttpRequest;
-        xhr.open("DELETE", `../../` + this.prefix + `/${fileHash}`);
+        let pathIn = `../../` + this.prefix + `/${fileHash}`;
+        pathIn = pathIn.replace('\/\/','/')
+        xhr.open("DELETE", pathIn);
         xhr.send(fileHash)
 
         xhr.onreadystatechange = function(){
