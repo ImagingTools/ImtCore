@@ -39,7 +39,7 @@ public:
 	I_BEGIN_BASE_COMPONENT(TPluginManagerCompBase);
 		I_ASSIGN(m_settingsCompPtr, "Settings", "Plugin settings", true, "Settings");
 		I_ASSIGN_TO(m_settingsModelCompPtr, m_settingsCompPtr, true);
-		I_ASSIGN(m_pluginStatusMonitorCompPtr, "PluginStatusMonitor", "Plugin status monitor", true, "PluginStatusMonitor");
+		I_ASSIGN(m_pluginStatusMonitorCompPtr, "PluginStatusMonitor", "Plugin status monitor", false, "PluginStatusMonitor");
 		I_ASSIGN(m_pluginPathsManagerIdAttrPtr, "PluginPathsManagerId", "ID of the plugin path manager parameter in the application settings", true, "PluginPathsManager");
 		I_ASSIGN(m_pluginPathIdAttrPtr, "PluginPathId", "ID of the plugin path parameter in the parameter set", true, "PluginPath");
 		I_ASSIGN(m_defaultPluginPathIdAttrPtr, "DefaultPluginPathId", "ID of the default plug-in path parameter in the settings", true, "DefaultPluginPath");
