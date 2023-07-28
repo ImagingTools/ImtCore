@@ -39,7 +39,6 @@ Item {
     }
 
     onComplComplChanged: {
-        //delegateContainer.pTableDelegateContainer = parent_temp;
         if(delegateContainer.complCompl){
             delegateContainer.contentComp = delegateContainer.pTableDelegateContainer.tableItem.columnContentComps[model.index] !== null ?
                              delegateContainer.pTableDelegateContainer.tableItem.columnContentComps[model.index] : delegateContainer.defaultContentComp;

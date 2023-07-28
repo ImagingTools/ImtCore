@@ -5,7 +5,7 @@ import Acf 1.0
 Item {
     id: delegateContainer;
 
-    property Item pTableDelegateContainer: parent.parent.parent !== null ? parent.parent.parent: null;
+    property Item pTableDelegateContainer: null;
 
     property Item mainMouseArea: pTableDelegateContainer != null ? pTableDelegateContainer.mouseArea : null;
 
@@ -15,7 +15,7 @@ Item {
     property int columnCount: pTableDelegateContainer && pTableDelegateContainer.tableItem ? pTableDelegateContainer.tableItem.columnCount : 0;
 
     property bool compl: false;
-    property bool complCompl: columnCount && delegateContainer.compl;
+    property bool complCompl: columnCount && delegateContainer.compl && ready;
 
     property alias contentComp: contentLoader.sourceComponent;
     property real textLeftIndent: 0
@@ -24,6 +24,15 @@ Item {
     property int columnIndex: model.index;
     property int rowIndex: pTableDelegateContainer ? pTableDelegateContainer.rowIndex : -1;
 
+    property Item parent_temp: (parent == null || parent.parent == null || parent.parent.parent == null) ? null : parent.parent.parent;
+
+        property bool  ready: parent_temp !==null;
+
+        onParent_tempChanged: {
+            if(parent_temp !== null){
+                pTableDelegateContainer = parent_temp;
+            }
+        }
 
     Component.onCompleted: {
         delegateContainer.compl = true;
@@ -119,9 +128,11 @@ Item {
     }
 
     function getValue(){
-        if (delegateContainer.pTableDelegateContainer){
+        if (delegateContainer.complCompl){
             if (delegateContainer.columnIndex >= 0){
-                return delegateContainer.pTableDelegateContainer.dataModel[delegateContainer.pTableDelegateContainer.headers.GetData("Id", delegateContainer.columnIndex)];
+                if(delegateContainer.pTableDelegateContainer !== null && delegateContainer.pTableDelegateContainer.dataModel !==null){
+                    return delegateContainer.pTableDelegateContainer.dataModel[delegateContainer.pTableDelegateContainer.headers.GetData("Id", delegateContainer.columnIndex)];
+                }
             }
         }
 
