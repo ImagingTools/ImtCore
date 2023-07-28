@@ -27,12 +27,19 @@ FocusScope {
     property bool selected: false;
     property string color: "";
 
+    property bool checkable: false;
+    property bool checked: false;
+
+    property int focusPolicy: Qt.WheelFocus;
+    property int focusReason: -1;
+
     signal clicked();
     signal doubleClicked();
     signal pressed();
     signal released();
     signal entered();
     signal exited();
+    signal toggled();
 
     signal loaded();
 
@@ -94,6 +101,8 @@ FocusScope {
         cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
         onClicked: {
+            baseButton.focus = true;
+            baseButton.forceActiveFocus();
             baseButton.clicked();
         }
         onDoubleClicked: {

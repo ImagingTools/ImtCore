@@ -174,7 +174,10 @@ Rectangle {
 
     function onLocalizationChanged(language){
         console.log("Preference onLocalizationChanged", language);
-        loaderTopPanel.item.title = qsTr("Preferences");
+        if(loaderTopPanel.item && loaderTopPanel.item.title !== undefined){
+            loaderTopPanel.item.title = qsTr("Preferences");
+        }
+
 
         for (let i = 0; i < buttonsDialog.buttons.count; i++){
             let id = buttonsDialog.buttons.get(i).Id;
@@ -213,11 +216,15 @@ Rectangle {
 //            }
 
             onLoaded:  {
-                loaderTopPanel.item.title = qsTr("Preferences");
+                if(loaderTopPanel.item && loaderTopPanel.item.title !== undefined){
+                    loaderTopPanel.item.title = qsTr("Preferences");
+                }
                 loaderTopPanel.item.closeButtonClicked.connect(container.close);
             }
             onSourceChanged: {
-                loaderTopPanel.item.title = qsTr("Preferences");
+                if(loaderTopPanel.item && loaderTopPanel.item.title !== undefined){
+                    loaderTopPanel.item.title = qsTr("Preferences");
+                }
             }
         }
 

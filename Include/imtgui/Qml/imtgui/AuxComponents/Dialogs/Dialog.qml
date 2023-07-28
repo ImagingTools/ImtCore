@@ -126,13 +126,16 @@ Rectangle {
                 source: "../../../../qml/imtgui/AuxComponents/Dialogs/TopPanelDialog.qml";
                 onLoaded:  {
                     loaderTopPanel.item.width = dialogContainer.width;
-                    loaderTopPanel.item.title = dialogContainer.title;
+                    if(loaderTopPanel.item.title !== undefined){
+                        loaderTopPanel.item.title = dialogContainer.title;
+                    }
                     loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
                 }
                 onItemChanged: {
                     //loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
-                    loaderTopPanel.item.title = dialogContainer.title;
-                }
+                    if(loaderTopPanel.item.title !== undefined){
+                        loaderTopPanel.item.title = dialogContainer.title;
+                    }                }
             }
         }
 
