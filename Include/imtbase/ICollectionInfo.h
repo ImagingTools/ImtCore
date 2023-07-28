@@ -130,7 +130,7 @@ public:
 	/**
 		Get number of elements in the collection
 	*/
-	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr) const = 0;
+	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
 
 	/**
 		Get IDs of the elements inside the collection for parent.

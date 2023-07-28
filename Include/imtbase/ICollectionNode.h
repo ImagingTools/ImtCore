@@ -4,9 +4,6 @@
 // ACF includes
 #include <istd/IChangeable.h>
 
-// ImtCore includes
-#include <imtbase/TIIdBasedHierarchical.h>
-
 
 namespace imtbase
 {
@@ -15,21 +12,17 @@ namespace imtbase
 class ICollectionInfo;
 
 
-/**
-	Interface for non-iterable colllection info.
-	\ingroup Collection
-*/
 class ICollectionNode: virtual public istd::IChangeable
 {
 public:
-	/**
-		Get contents of the node.
-	*/
-	virtual const ICollectionInfo& GetObjectsList() const = 0;
+	typedef QByteArray Id;
+	typedef QVector<Id> Ids;
+
+	virtual QByteArray GetNodeId() const = 0;
+	virtual QByteArray GetParentNodeId() const = 0;
+	virtual const ICollectionInfo& GetChildNodes() const = 0;
+	virtual const ICollectionInfo& GetObjects() const = 0;
 };
-
-
-typedef TIIdBasedHierarchical<ICollectionNode> IHierarchicalCollectionNode;
 
 
 } // namespace imtbase

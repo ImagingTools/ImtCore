@@ -49,17 +49,6 @@ public:
 	virtual bool MoveObject(const Id& objectId, const Id& parentNodeId, const Id& newParentNodeId) = 0;
 	virtual bool RemoveObjectFromStructure(const Id& objectId, const Id& nodeId) = 0;
 
-	// TODO: Move to IStructuredCollectionInserter
-	virtual bool InsertNewObject(
-				const QByteArray& typeId,
-				const QString& name,
-				const QString& description,
-				IObjectCollection::DataPtr defaultValuePtr = IObjectCollection::DataPtr(),
-				const Id& proposedObjectId = Id(),
-				const Id& parentId = Id(),
-				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
-				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
-				const IOperationContext* operationContextPtr = nullptr) = 0;
 	/**
 		Get the list of nodes containing the given object.
 	*/
