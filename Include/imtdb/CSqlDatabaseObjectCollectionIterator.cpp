@@ -11,14 +11,16 @@ namespace imtdb
 
 // public methods
 
-CSqlDatabaseObjectCollectionIterator::CSqlDatabaseObjectCollectionIterator(QSqlQuery sqlQuery, ISqlDatabaseObjectDelegate *databaseDelegate):
-	m_currentIndex(-1)
+CSqlDatabaseObjectCollectionIterator::CSqlDatabaseObjectCollectionIterator(
+			QSqlQuery sqlQuery,
+			ISqlDatabaseObjectDelegate* databaseDelegatePtr)
+	:m_currentIndex(-1)
 {
 	while(sqlQuery.next()){
 		m_records.append(sqlQuery.record());
 	}
 
-	m_databaseDelegate = databaseDelegate;
+	m_databaseDelegate = databaseDelegatePtr;
 }
 
 
@@ -54,11 +56,11 @@ QByteArray CSqlDatabaseObjectCollectionIterator::GetObjectId() const
 		return QByteArray();
 	}
 
-	return 	m_databaseDelegate->GetObjectIdFromRecord(m_records[m_currentIndex]);
+	return m_databaseDelegate->GetObjectIdFromRecord(m_records[m_currentIndex]);
 }
 
 
-bool imtdb::CSqlDatabaseObjectCollectionIterator::GetObjectData(imtbase::IObjectCollection::DataPtr &dataPtr) const
+bool imtdb::CSqlDatabaseObjectCollectionIterator::GetObjectData(imtbase::IObjectCollection::DataPtr& dataPtr) const
 {
 	if (m_databaseDelegate == nullptr || m_currentIndex < 0 || m_currentIndex >= m_records.count()){
 		return false;
