@@ -103,12 +103,6 @@ Rectangle {
         loaderTopPanel.source = dialogContainer.topPanelSource;
     }
 
-    onWidthChanged: {
-        if(loaderTopPanel.item){
-            loaderTopPanel.item.width = dialogContainer.width;
-        }
-    }
-
     MouseArea {
         anchors.fill: parent;
         onClicked: {}
