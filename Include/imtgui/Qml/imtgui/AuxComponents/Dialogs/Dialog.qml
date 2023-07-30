@@ -11,7 +11,6 @@ Rectangle {
 
     color: Style.backgroundColor;
 
-
     property string title;
     property string bodySource;
     property string topPanelSource;
@@ -67,6 +66,16 @@ Rectangle {
         }
     }
 
+    onWidthChanged: {
+        if (loaderTopPanel && loaderTopPanel.item){
+            loaderTopPanel.item.width = dialogContainer.width;
+        }
+
+        if (loaderBodyDialog && loaderBodyDialog.item){
+            loaderBodyDialog.item.width = dialogContainer.width;
+        }
+    }
+
     onRootChanged: {
         root.backgroundItem.opacity = 0.4;
     }
@@ -110,15 +119,23 @@ Rectangle {
 
         width: dialogContainer.width;
 
-
-
-        Item{
+        Item {
             id: topPanelContainer;
 
             width: loaderTopPanel.width;
             height: loaderTopPanel.height;
 
-            MovingItem{
+            onWidthChanged: {
+                console.log("topPanelContainer onWidthChanged", width);
+
+            }
+
+            onHeightChanged: {
+                console.log("topPanelContainer onHeightChanged", height);
+
+            }
+
+            MovingItem {
                 visible: dialogContainer.canMove;
                 containerItem: topPanelContainer;
                 globalParent: dialogContainer.root;
@@ -128,16 +145,27 @@ Rectangle {
             Loader {
                 id: loaderTopPanel;
 
-                //            sourceComponent: contentComp;
                 source: "../../../../qml/imtgui/AuxComponents/Dialogs/TopPanelDialog.qml";
                 onLoaded:  {
+                    console.log("loaderTopPanel onLoaded");
+
                     loaderTopPanel.item.width = dialogContainer.width;
                     if(loaderTopPanel.item.title !== undefined){
                         loaderTopPanel.item.title = dialogContainer.title;
                     }
-                    loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
+
+                    console.log("loaderTopPanel.item.height", loaderTopPanel.item.height);
+
+                    loaderTopPanel.width = loaderTopPanel.item.width;
+                    loaderTopPanel.height = loaderTopPanel.item.height;
+
+                    if (loaderTopPanel.item.closeButtonClicked){
+                        loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
+                    }
                 }
                 onItemChanged: {
+                    console.log("loaderTopPanel onItemChanged");
+
                     //loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
                     if(loaderTopPanel.item){
                         loaderTopPanel.item.width = dialogContainer.width;
@@ -149,7 +177,6 @@ Rectangle {
             }
         }
 
-
         Loader {
             id: loaderBodyDialog;
 
@@ -159,6 +186,12 @@ Rectangle {
                 loaderBodyDialog.item.width = dialogContainer.width;
                 if(loaderBodyDialog.item.rootItem !== undefined){
                     loaderBodyDialog.item.rootItem = dialogContainer;
+                }
+            }
+
+            onItemChanged: {
+                if (loaderBodyDialog.item){
+                    loaderBodyDialog.item.width = dialogContainer.width;
                 }
             }
         }

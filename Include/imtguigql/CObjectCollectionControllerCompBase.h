@@ -7,6 +7,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IObjectCollectionIterator.h>
+#include <imtbase/IOperationContext.h>
 #include <imtgql/CGqlRequestHandlerCompBase.h>
 
 
@@ -67,6 +68,8 @@ protected:
 	virtual imtbase::CTreeItemModel* GetDependencies(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetObjectView(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+
+	virtual imtbase::IOperationContext* CreateOperationContext(const imtgql::CGqlRequest& gqlRequest, const QString& operationDescription) const;
 
 	/**
 		Setup a GraphQL item at the given position in the model based on the information about an element in the object collection.

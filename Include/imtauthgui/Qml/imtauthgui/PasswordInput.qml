@@ -14,28 +14,28 @@ Column {
 
     property alias passwordInput: passwordTextInput;
     property alias confirmInput: confirmPasswordInput;
-    property alias errorText: errorText;
+    property alias errorText: textError;
 
     property bool readOnly: false;
 
     onAcceptedChanged: {
-        errorText.visible = !accepted;
+        textError.visible = !accepted;
     }
 
     onPasswordChanged: {
         let isError = false;
         if (root.password === ""){
-            errorText.text = qsTr("Password cannot be empty");
+            textError.text = qsTr("Password cannot be empty");
             isError = true;
         }
         else{
             if (passwordTextInput.text !== confirmPasswordInput.text){
-                errorText.text = qsTr("Passwords don't match");
+                textError.text = qsTr("Passwords don't match");
                 isError = true;
             }
         }
 
-        errorText.visible = isError;
+        textError.visible = isError;
     }
 
     onFocusChanged: {
@@ -102,7 +102,7 @@ Column {
         height: 30;
 
         BaseText {
-            id: errorText;
+            id: textError;
 
             anchors.left: parent.left;
             anchors.verticalCenter: parent.verticalCenter;

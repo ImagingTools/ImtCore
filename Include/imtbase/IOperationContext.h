@@ -23,6 +23,16 @@ public:
 	{
 		QByteArray id;
 		QString name;
+
+		bool operator==(const IdentifableObjectInfo& other) const
+		{
+			return (id == other.id) && (name == other.name);
+		}
+
+		bool operator!=(const IdentifableObjectInfo& other) const
+		{
+			return !operator==(other);
+		}
 	};
 
 	/**

@@ -93,12 +93,12 @@ istd::IChangeable* CSqlJsonDatabaseDelegateComp::CreateObjectFromRecord(const QS
 
 
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::CreateNewObjectQuery(
-		const QByteArray& typeId,
-		const QByteArray& proposedObjectId,
-		const QString& objectName,
-		const QString& /*objectDescription*/,
-		const istd::IChangeable* valuePtr,
-		const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const QByteArray& typeId,
+			const QByteArray& proposedObjectId,
+			const QString& objectName,
+			const QString& /*objectDescription*/,
+			const istd::IChangeable* valuePtr,
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	NewObjectQuery retVal;
 
@@ -122,6 +122,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 			else{
 				queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\"(\"DocumentId\", \"Document\", \"RevisionNumber\", \"LastModified\", \"Checksum\", \"IsActive\") VALUES('%2', '%3', '%4', '%5', '%6', true);");
 			}
+
 			retVal.query = queryStr
 					.arg(qPrintable(*m_tableNameAttrPtr))
 					.arg(qPrintable(objectId))
@@ -129,6 +130,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 					.arg(revisionVersion)
 					.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
 					.arg(checksum).toUtf8();
+
+			retVal.query += CreateOperationDescriptionQuery(objectId, operationContextPtr);
 
 			retVal.objectName = objectName;
 		}
@@ -138,9 +141,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 
 
 QByteArray CSqlJsonDatabaseDelegateComp::CreateDeleteObjectQuery(
-		const imtbase::IObjectCollection& /*collection*/,
-		const QByteArray& objectId,
-		const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& objectId,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	QByteArray retVal = QString("DELETE FROM \"%1\" WHERE \"%2\" = '%3';").arg(qPrintable(*m_tableNameAttrPtr)).arg(qPrintable(*m_objectIdColumnAttrPtr)).arg(qPrintable(objectId)).toUtf8();
 
@@ -149,11 +152,11 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateDeleteObjectQuery(
 
 
 QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
-		const imtbase::IObjectCollection& /*collection*/,
-		const QByteArray& objectId,
-		const istd::IChangeable& object,
-		const imtbase::IOperationContext* /*operationContextPtr*/,
-		bool /*useExternDelegate*/) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& objectId,
+			const istd::IChangeable& object,
+			const imtbase::IOperationContext* operationContextPtr,
+			bool /*useExternDelegate*/) const
 {
 	QByteArray retVal;
 
@@ -177,6 +180,8 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
 				.arg(SqlEncode(documentContent))
 				.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
 				.arg(checksum).toUtf8();
+
+		retVal += CreateOperationDescriptionQuery(objectId, operationContextPtr);
 	}
 
 	return retVal;
@@ -343,8 +348,8 @@ bool CSqlJsonDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSet& fil
 
 
 bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
-		const iprm::IParamsSet& filterParams,
-		QString& filterQuery) const
+			const iprm::IParamsSet& filterParams,
+			QString& filterQuery) const
 {
 	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
 
@@ -376,8 +381,8 @@ bool CSqlJsonDatabaseDelegateComp::CreateObjectFilterQuery(
 
 
 bool CSqlJsonDatabaseDelegateComp::CreateTextFilterQuery(
-		const imtbase::ICollectionFilter& collectionFilter,
-		QString& textFilterQuery) const
+			const imtbase::ICollectionFilter& collectionFilter,
+			QString& textFilterQuery) const
 {
 	QByteArrayList filteringColumnIds = collectionFilter.GetFilteringInfoIds();
 	if (filteringColumnIds.isEmpty()){
@@ -396,6 +401,23 @@ bool CSqlJsonDatabaseDelegateComp::CreateTextFilterQuery(
 	}
 
 	return true;
+}
+
+
+QByteArray CSqlJsonDatabaseDelegateComp::CreateOperationDescriptionQuery(const QByteArray& objectId, const imtbase::IOperationContext* operationContextPtr) const
+{
+	if (operationContextPtr != nullptr){
+		imtbase::IOperationContext::IdentifableObjectInfo objectInfo = operationContextPtr->GetOperationOwnerId();
+		return QString(R"(UPDATE "%1" SET "OwnerId" = '%2', "OwnerName" = '%3', "OperationDescription" = '%4' WHERE "IsActive" = true AND "DocumentId" = '%5';)")
+					.arg(qPrintable(*m_tableNameAttrPtr))
+					.arg(qPrintable(objectInfo.id))
+					.arg(objectInfo.name)
+					.arg(operationContextPtr->GetOperationDescription())
+					.arg(qPrintable(objectId))
+					.toUtf8();
+	}
+
+	return QByteArray();
 }
 
 

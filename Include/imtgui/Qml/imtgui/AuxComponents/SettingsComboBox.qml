@@ -31,10 +31,15 @@ Item {
         textCentered: false;
 
         onCurrentIndexChanged: {
+            console.log("onCurrentIndexChanged");
             let modelValue = settingsComboBoxContainer.modelData.Value;
+            console.log("modelValue", modelValue);
+             console.log("settingsComboBox.currentIndex", settingsComboBox.currentIndex);
             if (modelValue != settingsComboBox.currentIndex){
                 settingsComboBoxContainer.modelData.Value = settingsComboBox.currentIndex;
             }
+
+            console.log("settingsComboBoxContainer.modelData.Value", settingsComboBoxContainer.modelData.Value);
         }
     }
 }

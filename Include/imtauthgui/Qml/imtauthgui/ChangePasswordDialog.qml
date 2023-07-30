@@ -3,9 +3,9 @@ import Acf 1.0
 import imtgui 1.0
 
 Dialog {
-    id: root;
+    id: rootDialog;
 
-    width: 600;
+    width: 400;
 
     property string password: contentItem.password;
 
@@ -13,21 +13,17 @@ Dialog {
     property string login;
 
     Component.onCompleted: {
-        console.log("InputDialog onCompleted", root);
+        console.log("InputDialog onCompleted", rootDialog);
 
-        root.buttons.addButton({"Id":"Ok", "Name":qsTr("OK"), "Enabled": false, "Active": true});
-        root.buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true, "Active": true});
-    }
-
-    onUserPasswordHashChanged: {
-        console.log("onUserPasswordHashChanged", userPasswordHash);
+        rootDialog.buttons.addButton({"Id":"Ok", "Name":qsTr("OK"), "Enabled": false, "Active": true});
+        rootDialog.buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true, "Active": true});
     }
 
     Keys.onPressed: {
         if (event.key === Qt.Key_Return){
-            let enabled = root.buttons.getButtonState("Ok");
+            let enabled = rootDialog.buttons.getButtonState("Ok");
             if (enabled){
-                root.finished("Ok")
+                rootDialog.finished("Ok")
             }
         }
     }
@@ -47,6 +43,10 @@ Dialog {
             }
         }
 
+        onWidthChanged: {
+            console.log("onWidthChanged", width);
+        }
+
         Column {
             id: columnBodyMain;
 
@@ -61,16 +61,9 @@ Dialog {
             spacing: 10;
 
             function checkPassword(){
-                console.log("checkPassword");
-
-                console.log("root.login", root.login);
-                console.log("roldPassword.text", oldPassword.text);
-
                 if (oldPassword.text != ""){
-                    let passwordHash = Qt.md5(root.login + oldPassword.text);
-                    console.log("passwordHash", passwordHash);
-                    console.log("userPasswordHash", userPasswordHash);
-                    if (passwordHash == root.userPasswordHash){
+                    let passwordHash = Qt.md5(rootDialog.login + oldPassword.text);
+                    if (passwordHash == rootDialog.userPasswordHash){
                         columnBody.errorText.visible = false;
                         columnBody.readOnly = false;
 
@@ -137,7 +130,9 @@ Dialog {
                     spacing: 7;
 
                     onAcceptedChanged: {
-                        root.buttons.setButtonState("Ok", columnBody.accepted)
+                        if (rootDialog.buttons){
+                            rootDialog.buttons.setButtonState("Ok", columnBody.accepted)
+                        }
                     }
                 }
             }
@@ -157,10 +152,10 @@ Dialog {
         sourceComponent: Style.messageDecorator !==undefined ? Style.messageDecorator: emptyDecorator;
         onLoaded: {
             if(messageDecoratorLoader.item){
-                messageDecoratorLoader.item.rootItem = root;
+                messageDecoratorLoader.item.rootItem = rootDialog;
             }
 
-            root.width = 300;
+            rootDialog.width = 400;
         }
     }
 }

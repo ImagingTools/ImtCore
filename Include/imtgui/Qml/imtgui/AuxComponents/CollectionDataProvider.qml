@@ -107,8 +107,6 @@ QtObject {
                 }
             }
             else if (this.state === "Error"){
-//                container.completed = true;
-
                 container.failed();
             }
         }

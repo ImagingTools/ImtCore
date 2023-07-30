@@ -100,25 +100,39 @@ Item {
                 let documentIds = documentManager.getDocumentIDs();
 
                 documents[typeId] = documentIds;
-
-//                for (let documentId of documentIds){
-//                    if (documentManager.documentIsDirty(documentId)){
-//                        root.openDocument(typeId, documentId);
-
-//                        documentManager.closeDocument(documentId);
-//                    }
-//                }
             }
         }
+
+        closeDocument();
     }
 
     function closeDocument(){
+        console.log("closeDocument");
         let keys = Object.keys(documents);
         if (keys.length > 0){
             let typeId = keys[0];
             let documentManager = root.documentManagers[typeId];
             if (documentManager){
                 let documentIds = root.documents[typeId];
+
+                if (documentIds.length > 0){
+                    let documentId = documentIds[documentIds.length - 1];
+
+                    documentManager.closeDocument(documentId, false,
+                                                  function (result){
+                                                      console.log("closing result", result);
+                                                      if (result){
+                                                          root.documents[typeId].pop();
+
+                                                          if (root.documents[typeId].length === 0){
+                                                              delete root.documents[typeId];
+                                                          }
+
+                                                          closeDocument();
+                                                      }
+                                                  }
+                                                  );
+                }
             }
         }
     }

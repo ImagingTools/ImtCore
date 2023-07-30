@@ -5,10 +5,24 @@ import imtgui  1.0
 TreeViewItemDelegateBase {
     id: packageTreeItemDelegate;
 
+//    property string description: model.Description;
+
+//    onDescriptionChanged: {
+////        inputDescription.text = packageTreeItemDelegate.description;
+
+//        if (packageTreeItemDelegate.rowBodyItem){
+//            packageTreeItemDelegate.rowBodyItem.descriptionInput.text = packageTreeItemDelegate.description;
+//        }
+//    }
+
     rowBodyDelegate: Component{ Row {
             id: row;
 
             height: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.rowItemHeight : 0;
+
+            property alias descriptionInput: inputDescription;
+            property alias nameInput: inputName;
+            property alias idInput: inputId;
 
             Item {
                 id: nameItem;

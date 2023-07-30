@@ -25,7 +25,7 @@ QtObject {
     function updateModel(){
         console.log("ApplicationInfo updateModel");
 
-        applicationInfoQuery.updateModel();
+        root.applicationInfoQuery.updateModel();
     }
 
     property GqlModel applicationInfoQuery : GqlModel {
@@ -38,19 +38,19 @@ QtObject {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, applicationInfoQuery);
+            console.log("State:", this.state, root.applicationInfoQuery);
 
             if (this.state === "Ready") {
                 var dataModelLocal;
 
-                if (applicationInfoQuery.ContainsKey("errors")){
-                    dataModelLocal = applicationInfoQuery.GetData("errors");
+                if (root.applicationInfoQuery.ContainsKey("errors")){
+                    dataModelLocal = root.applicationInfoQuery.GetData("errors");
 
                     return;
                 }
 
-                if (applicationInfoQuery.ContainsKey("data")){
-                    dataModelLocal = applicationInfoQuery.GetData("data");
+                if (root.applicationInfoQuery.ContainsKey("data")){
+                    dataModelLocal = root.applicationInfoQuery.GetData("data");
 
                     if (dataModelLocal.ContainsKey("GetApplicationInfo")){
                         dataModelLocal = dataModelLocal.GetData("GetApplicationInfo");

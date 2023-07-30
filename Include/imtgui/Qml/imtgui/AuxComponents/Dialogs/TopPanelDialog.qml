@@ -16,6 +16,14 @@ Rectangle {
 
     signal closeButtonClicked(string buttonId);
 
+    onWidthChanged: {
+        console.log("topPanelDialogContainer onWidthChanged", width);
+    }
+
+    onHeightChanged: {
+        console.log("topPanelDialogContainer onHeightChanged", height);
+    }
+
     Image {
         id: iconDialog;
 

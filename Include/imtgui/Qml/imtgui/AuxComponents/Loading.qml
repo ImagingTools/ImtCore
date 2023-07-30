@@ -48,6 +48,10 @@ Rectangle {
         }
     }
 
+    MouseArea {
+        anchors.fill: parent;
+    }
+
     Timer {
         interval: 10;
         running: root.visible;

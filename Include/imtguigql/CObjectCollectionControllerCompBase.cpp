@@ -12,6 +12,7 @@
 // ImtCore includes
 #include <imtbase/CCollectionFilter.h>
 #include <imtbase/IObjectCollectionIterator.h>
+#include <imtbase/COperationContext.h>
 
 
 namespace imtguigql
@@ -82,10 +83,10 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 // protected methods
 
 bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
-		const imtgql::CGqlRequest& gqlRequest,
-		imtgql::CGqlObject& gqlObject,
-		QString& errorMessage,
-		int& operationType) const
+			const imtgql::CGqlRequest& gqlRequest,
+			imtgql::CGqlObject& gqlObject,
+			QString& errorMessage,
+			int& operationType) const
 {
 	const QList<imtgql::CGqlObject> fieldList = gqlRequest.GetFields();
 
@@ -197,7 +198,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 				errorMessage = QT_TR_NOOP("Object with this ID already exists");
 			}
 			else{
-				newObjectId = m_objectCollectionCompPtr->InsertNewObject("DocumentInfo", name, description, newObject, objectId);
+				imtbase::IOperationContext* operationContextPtr = CreateOperationContext(gqlRequest, QString("Created the object"));
+				newObjectId = m_objectCollectionCompPtr->InsertNewObject("DocumentInfo", name, description, newObject, objectId, nullptr, nullptr, operationContextPtr);
 			}
 		}
 
@@ -251,7 +253,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 
 	istd::IChangeable* savedObject = CreateObject(inputParams, newObjectId, name, description, errorMessage);
 	if (savedObject != nullptr){
-		if (m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject) == false){
+		imtbase::IOperationContext* operationContextPtr = CreateOperationContext(gqlRequest, QString("Updated the object"));
+		if (!m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject, istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr)){
 			errorMessage = QObject::tr("Can not update object: %1").arg(qPrintable(oldObjectId));
 		}
 	}
@@ -550,7 +553,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
-	if (m_objectCollectionCompPtr->RemoveElement(objectId)){
+	imtbase::IOperationContext* operationContextPtr = CreateOperationContext(gqlRequest, QString("Removed the object"));
+	if (m_objectCollectionCompPtr->RemoveElement(objectId, operationContextPtr)){
 		imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 		imtbase::CTreeItemModel* notificationModel = new imtbase::CTreeItemModel();
 
@@ -634,12 +638,38 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectView(
 }
 
 
+imtbase::IOperationContext* CObjectCollectionControllerCompBase::CreateOperationContext(const imtgql::CGqlRequest& gqlRequest, const QString& operationDescription) const
+{
+	imtgql::IGqlContext* requestContextPtr = gqlRequest.GetRequestContext();
+	if (requestContextPtr == nullptr){
+		return nullptr;
+	}
+
+	imtauth::IUserInfo* userInfoPtr = requestContextPtr->GetUserInfo();
+	if (userInfoPtr == nullptr){
+		return nullptr;
+	}
+
+	imtbase::IOperationContext::IdentifableObjectInfo objectInfo;
+	objectInfo.id = userInfoPtr->GetId();
+	objectInfo.name = userInfoPtr->GetName();
+
+	istd::TDelPtr<imtbase::COperationContext> operationContextPtr;
+	operationContextPtr.SetPtr(new imtbase::COperationContext);
+
+	operationContextPtr->SetOperationOwnerId(objectInfo);
+	operationContextPtr->SetOperationDescription(operationDescription);
+
+	return operationContextPtr.PopPtr();
+}
+
+
 bool CObjectCollectionControllerCompBase::SetupGqlItem(
-		const imtgql::CGqlRequest& gqlRequest,
-		imtbase::CTreeItemModel& model,
-		int itemIndex,
-		const QByteArray& collectionId,
-		QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			imtbase::CTreeItemModel& model,
+			int itemIndex,
+			const QByteArray& collectionId,
+			QString& errorMessage) const
 {
 	bool retVal = true;
 
@@ -771,11 +801,11 @@ QVariant CObjectCollectionControllerCompBase::GetObjectInformation(const QByteAr
 
 
 istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(
-		const QList<imtgql::CGqlObject>& inputParams,
-		QByteArray& objectId,
-		QString& name,
-		QString& description,
-		QString& errorMessage) const
+			const QList<imtgql::CGqlObject>& inputParams,
+			QByteArray& objectId,
+			QString& name,
+			QString& description,
+			QString& errorMessage) const
 {
 	return nullptr;
 }

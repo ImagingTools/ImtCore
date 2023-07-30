@@ -203,17 +203,17 @@ Rectangle {
 
         color: container.backgroundColor;
 
+        onWidthChanged: {
+            if (loaderTopPanel.item){
+                loaderTopPanel.item.width = mainRec.width;
+            }
+        }
+
         Loader {
             id: loaderTopPanel;
 
             width: parent.width;
             source: "../../../qml/imtgui/AuxComponents/Dialogs/TopPanelDialog.qml";
-
-//            sourceComponent: Component {
-//                TopPanelDialog {
-//                    title: qsTr("Preferences");
-//                }
-//            }
 
             onLoaded:  {
                 if(loaderTopPanel.item && loaderTopPanel.item.title !== undefined){
