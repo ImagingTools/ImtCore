@@ -42,6 +42,7 @@
 #include <imtgui/TPopupControllerCompWrap.h>
 #include <imtgui/CGuiElementModelComp.h>
 #include <imtgui/CGuiElementContainerComp.h>
+#include <imtgui/CMultiParamsSetGuiComp.h>
 
 
 /**
@@ -87,6 +88,7 @@ typedef imtgui::CPopupTestGuiComp PopupTestGui;
 typedef icomp::TModelCompWrap<imtgui::CStandardClientAreaProviderComp> StandardClientAreaProvider;
 typedef imtgui::CGuiElementModelComp GuiElementModel;
 typedef imtgui::CGuiElementContainerComp GuiElementContainer;
+typedef imtgui::CMultiParamsSetGuiComp MultiParamsSetGui;
 
 
 } // namespace ImtGuiPck

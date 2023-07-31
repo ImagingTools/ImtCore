@@ -192,6 +192,11 @@ I_EXPORT_COMPONENT(
 			"Gui element container",
 			"Gui Model Container Joiner");
 
+I_EXPORT_COMPONENT(
+			MultiParamsSetGui,
+			"The Ui, that combines different editors for model",
+			"Multi Parameters Editor Gui Observer" IM_CATEGORY(I_GUI) IM_AUTHOR("\"Sergey Zastrovnyh\""));
+
 
 } // namespace ImtGuiPck
 
