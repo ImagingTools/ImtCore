@@ -255,8 +255,6 @@ imtbase::IObjectCollection* CSqlDatabaseObjectCollectionComp::CreateSubCollectio
 }
 
 
-
-
 // reimplemented (IObjectCollectionInfo)
 
 const iprm::IOptionsList* CSqlDatabaseObjectCollectionComp::GetObjectTypesInfo() const
@@ -405,7 +403,7 @@ imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObje
 		if (sqlError.type() != QSqlError::NoError){
 			SendErrorMessage(0, sqlError.text(), "Database collection");
 
-			qDebug() << "Sql error" << objectSelectionQuery;
+			qDebug() << "SQL-error" << objectSelectionQuery;
 
 			return nullptr;
 		}

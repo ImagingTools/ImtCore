@@ -54,11 +54,13 @@ QByteArray CLicenseManagerViewDelegateComp::CreateNewObject(
 }
 
 
-bool CLicenseManagerViewDelegateComp::RenameObject(const QByteArray& objectId, const QString& newName) const
+QString CLicenseManagerViewDelegateComp::RenameObject(const QByteArray& objectId, const QString& newName) const
 {
 	QString name = GetUniqueName(newName);
 
-	if (BaseClass::RenameObject(objectId, name)){
+	name = BaseClass::RenameObject(objectId, name);
+
+	if (!name.isEmpty()){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		m_collectionPtr->GetObjectData(objectId, dataPtr);
 
@@ -69,10 +71,10 @@ bool CLicenseManagerViewDelegateComp::RenameObject(const QByteArray& objectId, c
 			m_collectionPtr->SetObjectData(objectId, *licenseInfoPtr);
 		}
 
-		return true;
+		return name;
 	}
 
-	return false;
+	return QString();
 }
 
 

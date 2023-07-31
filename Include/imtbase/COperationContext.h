@@ -9,7 +9,7 @@ namespace imtbase
 {
 
 
-class COperationContext : virtual public imtbase::IOperationContext
+class COperationContext: virtual public imtbase::IOperationContext
 {
 public:
 	void SetOperationOwnerId(IdentifableObjectInfo operationOwnerId);

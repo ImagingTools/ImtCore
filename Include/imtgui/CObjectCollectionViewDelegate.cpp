@@ -286,36 +286,41 @@ bool CObjectCollectionViewDelegate::UpdateObject(const QByteArray& objectId, con
 }
 
 
-bool CObjectCollectionViewDelegate::RenameObject(const QByteArray& objectId, const QString& newName) const
+QString CObjectCollectionViewDelegate::RenameObject(const QByteArray& objectId, const QString& newName) const
 {
 	if (objectId.isEmpty()){
-		return false;
+		return QString();
 	}
 
 	if (m_collectionPtr != nullptr){
-		QString name = newName;
+		QString retVal = newName;
 
-		if (name.isEmpty()){
+		if (retVal.isEmpty()){
 			QString oldName = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+
 			bool ok;
-			name = QInputDialog::getText(nullptr, tr("Enter new object name"), tr("Name"), QLineEdit::Normal, oldName, &ok);
+			retVal = QInputDialog::getText(nullptr, tr("Enter new object name"), tr("Name"), QLineEdit::Normal, oldName, &ok);
 			if (!ok){
-				return false;
+				return QString();
 			}
 		}
 
 		QRegularExpressionValidator inputValidator(QRegularExpression("^[^\\\\/:\\*\\?\"\\<\\>\\|\\+]+$"));
 		int pos;
-		name = name.trimmed();
-		if (inputValidator.validate(name, pos) == QValidator::Acceptable){
-			m_collectionPtr->SetElementName(objectId, name);
-			return true;
+		retVal = retVal.trimmed();
+		if (inputValidator.validate(retVal, pos) == QValidator::Acceptable){
+			if (m_collectionPtr->SetElementName(objectId, retVal)){
+				return retVal;
+			}
+			else{
+				QMessageBox::critical(nullptr, tr("Error"), tr("The document name could not be set"));
+			}
 		}
 
 		QMessageBox::critical(nullptr, tr("Error"), tr("The document name contains some not allowed characters"));
 	}
 
-	return false;
+	return QString();
 }
 
 
@@ -918,8 +923,8 @@ void CObjectCollectionViewDelegate::OnRename(bool /*checked*/)
 		return;
 	}
 
-	for (const QByteArray& itemId : m_selectedItemIds) {
-		if (!itemId.isEmpty()) {
+	for (QByteArray itemId : m_selectedItemIds) {
+		if (!itemId.isEmpty()){
 			RenameObject(itemId, "");
 		}
 	}

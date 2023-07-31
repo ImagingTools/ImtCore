@@ -65,7 +65,7 @@ public:
 	virtual QByteArray ImportObject(const QByteArray& typeId, const QString& sourcePath = QString()) const override;
 	virtual bool ExportObject(const QByteArray& objectId, const QString& targetPath = QString()) const override;
 	virtual void RemoveObjects(const imtbase::ICollectionInfo::Ids& objectIds)  const override;
-	virtual bool RenameObject(const QByteArray& objectId, const QString& newName) const override;
+	virtual QString RenameObject(const QByteArray& objectId, const QString& newName) const override;
 	virtual void UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
 	virtual bool OpenDocumentEditor(const QByteArray& objectId, const QByteArray& viewTypeId = QByteArray()) const override;
 	virtual iqtgui::IGuiObject* GetInformationView() const override;

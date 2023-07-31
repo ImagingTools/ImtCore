@@ -191,34 +191,35 @@ void CDocumentCollectionViewDelegateComp::RemoveObjects(const imtbase::ICollecti
 }
 
 
-bool CDocumentCollectionViewDelegateComp::RenameObject(const QByteArray& objectId, const QString& newName) const
+QString CDocumentCollectionViewDelegateComp::RenameObject(const QByteArray& objectId, const QString& newName) const
 {
 	const QByteArray objectIdLocal = objectId;
-	if (BaseClass2::RenameObject(objectIdLocal, newName)){
+	QString newDocumentName = BaseClass2::RenameObject(objectIdLocal, newName);
+	if (!newDocumentName.isEmpty()){
 		for (int i = 0; i < m_openedDocuments.GetCount(); i++){
 			ObjectInfo* objectInfoPtr = m_openedDocuments.GetAt(i);
 			if (objectIdLocal == objectInfoPtr->uuid){
-				objectInfoPtr->name = newName;
+				objectInfoPtr->name = newDocumentName;
 				if (m_documentManagerCompPtr.IsValid()){
 					for (int docIndex = 0; docIndex < m_documentManagerCompPtr->GetDocumentsCount(); docIndex++){
 						idoc::IDocumentManager::DocumentInfo documentInfo;
 						if (objectInfoPtr->objectPtr == &m_documentManagerCompPtr->GetDocumentFromIndex(docIndex, &documentInfo)){
 							imtbase::IDocumentManagerExtender* extenderPtr = dynamic_cast<imtbase::IDocumentManagerExtender*>(m_documentManagerCompPtr.GetPtr());
 							if (extenderPtr != nullptr){
-								extenderPtr->SetDocumentName(docIndex, newName);
+								extenderPtr->SetDocumentName(docIndex, newDocumentName);
 
-								return true;
+								return newDocumentName;
 							}
 						}
 					}
 				}
 
-				return true;
+				return newDocumentName;
 			}
 		}
 	}
 
-	return false;
+	return QString();
 }
 
 

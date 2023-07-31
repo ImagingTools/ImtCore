@@ -113,9 +113,9 @@ bool CPluginStatusMonitorViewDelegateComp::UpdateObject(const QByteArray& /*obje
 }
 
 
-bool CPluginStatusMonitorViewDelegateComp::RenameObject(const QByteArray& /*objectId*/, const QString& /*newName*/) const
+QString CPluginStatusMonitorViewDelegateComp::RenameObject(const QByteArray& /*objectId*/, const QString& /*newName*/) const
 {
-	return false;
+	return QString();
 }
 
 
@@ -125,13 +125,16 @@ const imtbase::ICollectionInfo& CPluginStatusMonitorViewDelegateComp::GetSummary
 }
 
 
-ICollectionViewDelegate::SummaryInformation CPluginStatusMonitorViewDelegateComp::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
+ICollectionViewDelegate::SummaryInformation CPluginStatusMonitorViewDelegateComp::GetSummaryInformation(
+			const QByteArray& objectId,
+			const QByteArray& informationId) const
 {
 	SummaryInformation result;
 
 	static QIcon none(":/Icons/StateUnknown");
 	static QIcon ok(":/Icons/StateOk");
 	static QIcon warning(":/Icons/StateWarning");
+
 	static QIcon error(":/Icons/Error");
 	static QIcon critical(":/Icons/StateInvalid");
 

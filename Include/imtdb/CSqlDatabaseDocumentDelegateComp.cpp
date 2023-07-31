@@ -26,7 +26,11 @@ static const QByteArray s_idColumn = "Id";
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
-QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(const QByteArray& objectId, int offset, int count, const iprm::IParamsSet* paramsPtr) const
+QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
+			const QByteArray& objectId,
+			int offset,
+			int count,
+			const iprm::IParamsSet* paramsPtr) const
 {
 	if (!objectId.isEmpty()){
 		QString baseQuery = GetBaseSelectionQuery();

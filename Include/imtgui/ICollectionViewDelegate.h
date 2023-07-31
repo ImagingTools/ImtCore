@@ -175,8 +175,9 @@ public:
 
 	/**
 		Rename an existing object.
+		\return	New object name if the operation was successfull or an empty string otherwise.
 	*/
-	virtual bool RenameObject(const QByteArray& objectId, const QString& newName) const = 0;
+	virtual QString RenameObject(const QByteArray& objectId, const QString& newName) const = 0;
 
 	/**
 		Get the list of the summary informations for the document type managed by this delegate.

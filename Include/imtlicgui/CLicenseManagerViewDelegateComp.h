@@ -31,7 +31,7 @@ public:
 				const QString& objectName,
 				const QString& description,
 				const istd::IChangeable* defaultDataPtr = nullptr) const override;
-	virtual bool RenameObject(const QByteArray& objectId, const QString& newName) const override;
+	virtual QString RenameObject(const QByteArray& objectId, const QString& newName) const override;
 	virtual SummaryInformation GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
 
 protected:

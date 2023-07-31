@@ -58,7 +58,7 @@ public:
 	virtual bool ExportObject(const QByteArray& objectId, const QString& targetPath = QString()) const override;
 	virtual void RemoveObjects(const imtbase::ICollectionInfo::Ids& objectIds)  const override;
 	virtual bool UpdateObject(const QByteArray& objectId, const istd::IChangeable& contents) const override;
-	virtual bool RenameObject(const QByteArray& objectId, const QString& newName) const override;
+	virtual QString RenameObject(const QByteArray& objectId, const QString& newName) const override;
 	virtual const imtbase::ICollectionInfo& GetSummaryInformationTypes() const override;
 	virtual SummaryInformation GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
 	virtual HeaderInfo GetSummaryInformationHeaderInfo(const QByteArray& informationId) const override;

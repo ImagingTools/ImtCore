@@ -36,7 +36,7 @@ public:
 	};
 
 	/**
-		Get the ID of the initiator of the operation. E.g user-ID
+		Get information about the initiator of the operation. E.g user-ID
 	*/
 	virtual IdentifableObjectInfo GetOperationOwnerId() const = 0;
 
