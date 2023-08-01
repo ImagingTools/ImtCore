@@ -555,6 +555,7 @@ export class QtObject {
                                 this.$p[name].getSignal()()
                             }
                         } else {
+                            this.$p[name].func = null
                             this.$p[name].val = newVal
                             
                             this.$p[name].getSignal()()
@@ -677,6 +678,7 @@ export class QtObject {
                             this.$p[`${name}.${name2}`].depends.clear()
                             delete this.$p[`${name}.${name2}`].depends
                         }
+                        this.$p[`${name}.${name2}`].func = null
                         this.$p[`${name}.${name2}`].val = newVal
     
                    

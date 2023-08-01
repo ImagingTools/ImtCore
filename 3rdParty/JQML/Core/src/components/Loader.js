@@ -74,6 +74,15 @@ export class Loader extends Item {
     $propertyOverride(){
         if(this.$xOverride){
             this.item.x = 0
+            if(this.$p.x.func){
+                caller = this.$p.x
+                let x = this.$p.x.func()
+                caller = null
+                if(this.$p.x.val !== x){
+                    this.$p.x.val = x
+                    this.$p.x.getSignal()()
+                }
+            }
         } else {
             this.x = this.item.x
             // this.$p.x.depends.add(this.item.$p.x.signal)
@@ -88,6 +97,15 @@ export class Loader extends Item {
         }
         if(this.$yOverride){
             this.item.y = 0
+            if(this.$p.y.func){
+                caller = this.$p.y
+                let y = this.$p.y.func()
+                caller = null
+                if(this.$p.y.val !== y){
+                    this.$p.y.val = y
+                    this.$p.y.getSignal()()
+                }
+            }
         } else {
             this.y = this.item.y
             // this.$p.y.depends.add(this.item.$p.y.signal)
@@ -103,6 +121,15 @@ export class Loader extends Item {
 
         if(this.$widthOverride){
             this.item.width = this.width
+            if(this.$p.width.func){
+                caller = this.$p.width
+                let width = this.$p.width.func()
+                caller = null
+                if(this.$p.width.val !== width){
+                    this.$p.width.val = width
+                    this.$p.width.getSignal()()
+                }
+            }
             this.item.$sP('width', ()=>{return this.width})
             // this.$p.width.signal.connections[this.item.$p.width.PID] = ()=>{
             //     this.$p.item.val.width = this.width
@@ -123,6 +150,15 @@ export class Loader extends Item {
         if(this.$heightOverride){
            
             this.item.height = this.height
+            if(this.$p.height.func){
+                caller = this.$p.height
+                let height = this.$p.height.func()
+                caller = null
+                if(this.$p.height.val !== height){
+                    this.$p.height.val = height
+                    this.$p.height.getSignal()()
+                }
+            }
             this.item.$sP('height', ()=>{return this.height})
             // this.$p.height.signal.connections[this.item.$p.height.PID] = ()=>{
             //     this.$p.item.val.height = this.height
@@ -153,6 +189,15 @@ export class Loader extends Item {
         if(this.$clipOverride){
             
             this.item.clip = this.clip
+            if(this.$p.clip.func){
+                caller = this.$p.clip
+                let clip = this.$p.clip.func()
+                caller = null
+                if(this.$p.clip.val !== clip){
+                    this.$p.clip.val = clip
+                    this.$p.clip.getSignal()()
+                }
+            }
             this.item.$sP('clip', ()=>{return this.clip})
             // this.$p.clip.signal.connections[this.item.$p.clip.PID] = ()=>{
             //     this.$p.item.val.clip = this.clip
