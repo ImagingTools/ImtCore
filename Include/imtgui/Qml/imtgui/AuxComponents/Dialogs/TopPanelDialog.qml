@@ -16,14 +16,6 @@ Rectangle {
 
     signal closeButtonClicked(string buttonId);
 
-    onWidthChanged: {
-        console.log("topPanelDialogContainer onWidthChanged", width);
-    }
-
-    onHeightChanged: {
-        console.log("topPanelDialogContainer onHeightChanged", height);
-    }
-
     Image {
         id: iconDialog;
 
@@ -48,12 +40,16 @@ Rectangle {
         anchors.left: topPanelDialogContainer.hasIcon ? iconDialog.right : parent.left;
         anchors.leftMargin: topPanelDialogContainer.hasIcon ? 10 : 15;
         anchors.verticalCenter: topPanelDialogContainer.verticalCenter;
+        anchors.right: parent.right;
+        anchors.rightMargin: 10;
 
         color: Style.textColor;
         font.family: Style.fontFamily;
         font.pixelSize: Style.fontSize_subtitle;
 
         text: topPanelDialogContainer.title;
+
+        elide: Text.ElideRight;
     }
 
     AuxButton {

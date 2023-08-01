@@ -28,34 +28,22 @@ Item {
     property MainDocumentManager mainDocumentManager: null;
 
     Component.onCompleted: {
-        Events.subscribeEvent("DocumentSaved", workspaceView.documentSaved);
-        Events.subscribeEvent("CloseDocument", workspaceView.closeCurrentDocument);
         Events.subscribeEvent("DocumentIsDirtyChanged", workspaceView.documentIsDirtyChanged);
-
         Events.subscribeEvent("DocumentUpdating", workspaceView.documentUpdating);
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("DocumentSaved", workspaceView.documentSaved);
-        Events.unSubscribeEvent("CloseDocument", workspaceView.closeCurrentDocument);
         Events.unSubscribeEvent("DocumentIsDirtyChanged", workspaceView.documentIsDirtyChanged);
-
         Events.unSubscribeEvent("DocumentUpdating", workspaceView.documentUpdating);
     }
 
     onVisibleChanged: {
         if (workspaceView.visible){
-            Events.subscribeEvent("DocumentSaved", workspaceView.documentSaved);
-            Events.subscribeEvent("CloseDocument", workspaceView.closeCurrentDocument);
             Events.subscribeEvent("DocumentIsDirtyChanged", workspaceView.documentIsDirtyChanged);
-
             Events.subscribeEvent("DocumentUpdating", workspaceView.documentUpdating);
         }
         else{
-            Events.unSubscribeEvent("DocumentSaved", workspaceView.documentSaved);
-            Events.unSubscribeEvent("CloseDocument", workspaceView.closeCurrentDocument);
             Events.unSubscribeEvent("DocumentIsDirtyChanged", workspaceView.documentIsDirtyChanged);
-
             Events.unSubscribeEvent("DocumentUpdating", workspaceView.documentUpdating);
         }
     }
@@ -222,7 +210,15 @@ Item {
         tabPanelInternal.selectedIndex = documentIndex;
     }
 
+    QtObject {
+        id: cacheData;
+
+        property var callback;
+    }
+
     function closeDocument(itemId, force, callback){
+        console.log("closeDocument", itemId, force, callback);
+
         if (force === undefined){
             force = false;
         }
@@ -237,6 +233,9 @@ Item {
 
             if (documentBase.isDirty && !force){
                 tabPanelInternal.selectedIndex = index;
+                console.log("openDialog", callback);
+
+                cacheData.callback = callback;
 
                 modalDialogManager.openDialog(saveDialog, {});
             }
@@ -246,6 +245,11 @@ Item {
                 }
 
                 workspaceView.documentsData.RemoveItem(index);
+
+                console.log("callback", callback);
+                if (callback){
+                    callback(true);
+                }
             }
         }
     }
@@ -300,6 +304,7 @@ Item {
             title: qsTr("Save document");
 
             message: qsTr("Save all changes ?")
+
             Component.onCompleted: {
                 buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true});
             }
@@ -313,7 +318,11 @@ Item {
                 }
                 else if (buttonId == "No"){
                     documentBase.isDirty = false;
-                    workspaceView.closeDocument(documentBase.itemId);
+                    workspaceView.closeDocument(documentBase.itemId, false, cacheData.callback);
+                }
+
+                if (cacheData.callback){
+                    cacheData.callback(false);
                 }
             }
         }
@@ -380,9 +389,31 @@ Item {
         return -1;
     }
 
+    function showAlertMessage(message){
+        alertMessage.message = message;
+
+        alertMessage.visible = true;
+    }
+
+    function hideAlertMessage(){
+        alertMessage.visible = false;
+    }
+
+    AlertMessage {
+        id: alertMessage;
+
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+
+        height: visible ? 40: 0;
+
+        visible: false;
+    }
+
     TabPanel {
         id: tabPanelInternal;
 
+        anchors.top: alertMessage.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
 
@@ -454,6 +485,15 @@ Item {
 
             workspaceView.openErrorDialog(message);
         }
+
+//        onGetModelStateChanged: {
+//            if (getModelState === "Loading"){
+//                loading.start();
+//            }
+//            else{
+//                loading.stop();
+//            }
+//        }
 
         onSetModelStateChanged: {
             if (setModelState === "Loading"){

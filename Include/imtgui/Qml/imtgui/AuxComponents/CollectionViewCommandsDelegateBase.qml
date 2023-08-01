@@ -97,18 +97,17 @@ Item {
 
     function onEdit(){
         console.log("CollectionView onEdit");
-
-        let indexes = containerBase.tableData.getSelectedIndexes();
-
         let elementsModel = containerBase.tableData.elements;
         if (!elementsModel){
             return;
         }
 
-        for (let index of indexes){
+        let indexes = containerBase.tableData.getSelectedIndexes();
+        if (indexes.length > 0){
+            let index = indexes[0];
+
             let itemId = elementsModel.GetData("Id", index);
             let itemName = elementsModel.GetData("Name", index);
-
             containerBase.collectionViewBase.selectItem(itemId, itemName, index);
         }
     }
@@ -150,7 +149,6 @@ Item {
         }
 
         let commandIsEnabled = containerBase.commandsProvider.commandIsEnabled(commandId);
-        console.log("commandIsEnabled", commandIsEnabled);
         if (commandIsEnabled){
             if (commandId === "New"){
                 containerBase.onNew();
@@ -164,7 +162,6 @@ Item {
         }
 
         let editIsEnabled = containerBase.commandsProvider.commandIsEnabled("Edit");
-        console.log("editIsEnabled", editIsEnabled);
         if (editIsEnabled){
             if (commandId === "Rename"){
                 containerBase.onRename();

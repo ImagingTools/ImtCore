@@ -9,6 +9,8 @@ QtObject {
 
     property bool completed: false;
 
+    signal failed();
+
     function updateModel(){
         console.log("LicensesProvider updateModel");
         provider.licensesModel.updateModel();
@@ -58,6 +60,11 @@ QtObject {
                         provider.completed = true;
                     }
                 }
+            }
+            else if (this.state === "Error"){
+                provider.failed();
+
+                provider.completed = true;
             }
         }
     }

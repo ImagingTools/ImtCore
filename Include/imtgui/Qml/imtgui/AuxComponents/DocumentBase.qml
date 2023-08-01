@@ -22,6 +22,8 @@ Item {
 
     property bool isUpdatingGui: false;
 
+    property string errorMessage: "";
+
     // If true - after update the document will be closed
     property bool closingFlag: false;
 
@@ -184,9 +186,25 @@ Item {
         }
     }
 
-    function updateGui(){}
+    function updateGui(){
+        documentBaseRoot.blockUpdatingModel = true;
 
-    function updateModel(){}
+        documentBaseRoot.onUpdateGui();
+
+        documentBaseRoot.blockUpdatingModel = false;
+    }
+
+    function onUpdateGui(){}
+
+    function updateModel(){
+        if (documentBaseRoot.blockUpdatingModel){
+            return;
+        }
+
+        documentBaseRoot.onUpdateModel();
+    }
+
+    function onUpdateModel(){}
 
     Shortcut {
         sequence: "Ctrl+S";
