@@ -51,6 +51,7 @@ export class Binding extends QtObject {
             }
             // caller = prop
             this.$prop = prop
+            if(!prop.depends) prop.depends = new Set() 
             prop.depends.add(this.$p.value.getSignal())
             this.$p.value.getSignal().connectWithName(prop.PID, ()=>{
                 if(this.$p.value.val !== prop.val){
