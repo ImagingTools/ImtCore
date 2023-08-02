@@ -9,12 +9,12 @@ export class Binding extends QtObject {
     constructor(args){
         super(args)
 
-        this.$cP('delayed', false).connect(this.$update.bind(this))
-        this.$cP('property', '').connect(this.$update.bind(this))
-        this.$cP('restoreMode', Binding.RestoreBindingOrValue).connect(this.$update.bind(this))
-        this.$cP('target', undefined).connect(this.$update.bind(this))
-        this.$cP('value', undefined)//.connect(this.$update.bind(this))
-        this.$cP('when', true).connect(this.$update.bind(this))
+        this.$cP('delayed', false, this.$update)
+        this.$cP('property', '', this.$update)
+        this.$cP('restoreMode', Binding.RestoreBindingOrValue, this.$update)
+        this.$cP('target', undefined, this.$update)
+        this.$cP('value', undefined)
+        this.$cP('when', true, this.$update)
 
         this.$updated = false
         this.$prop = null
