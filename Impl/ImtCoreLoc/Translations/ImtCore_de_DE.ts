@@ -554,19 +554,19 @@
         <location filename="../../../Include/imtdbgui/CDatabaseLoginSettingsEditorComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+123"/>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Datenbankeinstellungen</translation>
     </message>
     <message>
         <location line="+20"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Host</source>
-        <translation type="unfinished">Host</translation>
+        <translation>Host</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Port</source>
-        <translation type="unfinished">Port</translation>
+        <translation>Port</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -578,13 +578,13 @@
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>User</source>
-        <translation type="unfinished">Benutzer</translation>
+        <translation>Benutzer</translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Password</source>
-        <translation type="unfinished">Passwort</translation>
+        <translation>Passwort</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -691,22 +691,22 @@
     <message>
         <location filename="../../../Include/imtbase/CObjectCollectionMetaInfo.cpp" line="+52"/>
         <source>Added</source>
-        <translation type="unfinished">Hinzugefügt</translation>
+        <translation>Hinzugefügt</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Revision</source>
-        <translation type="unfinished">Revision</translation>
+        <translation>Revision</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Time when the object was added to the collection</source>
-        <translation type="unfinished">Zeitpunkt als Objekt hinzugefügt wurde</translation>
+        <translation>Zeitpunkt als Objekt hinzugefügt wurde</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Item revision</source>
-        <translation type="unfinished">Artikelrevision</translation>
+        <translation>Artikelrevision</translation>
     </message>
 </context>
 <context>
@@ -790,31 +790,31 @@
         <location filename="../../../Include/imtgui/CPaginationGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+123"/>
         <source>Form</source>
-        <translation type="unfinished">Form</translation>
+        <translation>Form</translation>
     </message>
     <message>
         <location line="+85"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+1"/>
         <source>&lt;&lt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+1"/>
         <source>&lt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+40"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+1"/>
         <source>&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC15_64/GeneratedFiles/imtgui/ui_CPaginationGuiComp.h" line="+1"/>
         <source>&gt;&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1367,37 +1367,37 @@
     <message>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionViewCommandsDelegateBase.qml" line="+70"/>
         <source>Remove selected item from the collection ?</source>
-        <translation type="unfinished">Artikel aus der Sammlung entfernen?</translation>
+        <translation>Artikel aus der Sammlung entfernen?</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Please enter the name of the document:</source>
-        <translation type="unfinished">Bitte den Namen des Dokuments eingeben:</translation>
+        <translation>Bitte den Namen des Dokuments eingeben:</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Please enter the description of the document:</source>
-        <translation type="unfinished">Bitte die Beschreibung des Dokuments eingeben:</translation>
+        <translation>Bitte die Beschreibung des Dokuments eingeben:</translation>
     </message>
     <message>
         <location line="+81"/>
         <source>Edit</source>
-        <translation type="unfinished">Bearbeiten</translation>
+        <translation>Bearbeiten</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Remove</source>
-        <translation type="unfinished">Entfernen</translation>
+        <translation>Entfernen</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rename</source>
-        <translation type="unfinished">Umbenennen</translation>
+        <translation>Umbenennen</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Set Description</source>
-        <translation type="unfinished">Beschreibung setzen</translation>
+        <translation>Beschreibung setzen</translation>
     </message>
 </context>
 <context>
@@ -1529,7 +1529,7 @@
     <message>
         <location line="+14"/>
         <source>Please enter the name of the item: </source>
-        <translation>Bitte den Artikelnamen eintragen:</translation>
+        <translation>Bitte den Namen eingeben: </translation>
     </message>
 </context>
 <context>
@@ -2771,52 +2771,52 @@ Fehler: 0</translation>
     <message>
         <location filename="../../../Include/imtauthgui/Qml/imtauthgui/RoleEditor.qml" line="+26"/>
         <source>New</source>
-        <translation type="unfinished">Neu</translation>
+        <translation>Neu</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Remove</source>
-        <translation type="unfinished">Entfernen</translation>
+        <translation>Entfernen</translation>
     </message>
     <message>
         <location line="+42"/>
         <source>Product-ID</source>
-        <translation type="unfinished">Produkt-ID</translation>
+        <translation>Produkt-ID</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Role-ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Rollen-ID</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Enter the Role-ID</source>
-        <translation type="unfinished"></translation>
+        <translation>Rollen-ID eingeben</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Role Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Rollenname</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Enter the Role name</source>
-        <translation type="unfinished"></translation>
+        <translation>Geben Sie den Rollennamen ein</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Description</source>
-        <translation type="unfinished">Beschreibung</translation>
+        <translation>Beschreibung</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Enter the description</source>
-        <translation type="unfinished"></translation>
+        <translation>Geben Sie die Beschreibung ein</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Included roles</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Beinhaltete Rollen</translation>
     </message>
 </context>
 <context>
