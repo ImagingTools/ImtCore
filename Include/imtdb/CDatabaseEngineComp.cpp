@@ -146,23 +146,24 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQueryFromFile(const QString& filePath, con
 
 bool CDatabaseEngineComp::IsDatabaseServerConnected(QString& errorMessage) const
 {
-	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, *m_maintenanceDatabaseNameAttrPtr);
-	maintainanceDb.setHostName(GetHostName());
-	maintainanceDb.setUserName(GetUserName());
-	maintainanceDb.setPassword(GetPassword());
-	maintainanceDb.setDatabaseName(*m_maintenanceDatabaseNameAttrPtr);
-	maintainanceDb.setPort(GetPort());
+    QSqlDatabase::removeDatabase(*m_maintenanceDatabaseNameAttrPtr);
+    QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, *m_maintenanceDatabaseNameAttrPtr);
+    maintainanceDb.setHostName(GetHostName());
+    maintainanceDb.setUserName(GetUserName());
+    maintainanceDb.setPassword(GetPassword());
+    maintainanceDb.setDatabaseName(*m_maintenanceDatabaseNameAttrPtr);
+    maintainanceDb.setPort(GetPort());
 
-	bool isConnected = maintainanceDb.open();
+    bool isConnected = maintainanceDb.open();
 
-	maintainanceDb.close();
+    maintainanceDb.close();
 
-	if (!isConnected){
-		QSqlError sqlError = maintainanceDb.lastError();
-		errorMessage = sqlError.text();
-	}
+    if (!isConnected){
+        QSqlError sqlError = maintainanceDb.lastError();
+        errorMessage = sqlError.text();
+    }
 
-	return isConnected;
+    return isConnected;
 }
 
 

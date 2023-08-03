@@ -28,6 +28,7 @@ Rectangle{
 
     property bool hasSearchProperty: false;
     property bool isAddressSearch: false;
+    property bool canSearchAnyStr: false;
     property alias canClose: searchTextField.canClose;
 
     property string valueName: "Name";
@@ -56,11 +57,10 @@ Rectangle{
     property alias arrowIconSource: searchTextField.imageSource;
     property alias arrowIconRotation: searchTextField.imageRotation;
 
-
     property alias openST: searchTextField.openST;
 
     signal accepted(string retVal);
-
+    signal searchPartialAddress(string addressStr);
 
     Component.onCompleted: {
     }
@@ -504,6 +504,7 @@ Rectangle{
             if(searchContainer.isAddressSearch){
                 var modelCount = model_.GetItemsCount();
                 if(modelCount){
+
                     var str = currentText;
                     var newAddress = model_.GetData(searchContainer.valueName),strArrCount;
                     var str_form = str.replace(/ +/g, '');
@@ -511,6 +512,9 @@ Rectangle{
 
                     if(str_form == newAddress_form || modelCount == 1){
                         searchContainer.setCurrentTextAddressFunc(model_,0);
+                    }
+                    else if(searchContainer.canSearchAnyStr){
+                        searchContainer.searchPartialAddress(currentText);
                     }
                 }
             }

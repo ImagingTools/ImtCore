@@ -16,6 +16,7 @@ Item {
     property string itemName;
     property bool isUsedDocumentManager: true;
     property bool visibleMetaInfo: true;
+    property bool hasMetaInfo: true;
 
     property string editorPath;
     property string commandsDelegatePath: "CollectionViewCommandsDelegateBase.qml";
@@ -211,7 +212,9 @@ Item {
 
         onSelectedIndexChanged: {
             console.log("gridCollectionViewBase onSelectedIndexChanged");
-            collectionMetaInfo.getMetaInfo();
+            if(gridCollectionViewContainer.hasMetaInfo){
+                collectionMetaInfo.getMetaInfo();
+            }
         }
 
         onSelectedItem: {

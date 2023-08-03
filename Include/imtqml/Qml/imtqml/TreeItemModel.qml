@@ -100,7 +100,6 @@ JSONListModel {
 
     function Clear(){
         this.clear();
-        console.log("ccleared", this)
     }
 
     function IsValidData(key, row){
