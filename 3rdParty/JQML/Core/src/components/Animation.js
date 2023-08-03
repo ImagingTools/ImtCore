@@ -48,7 +48,7 @@ export class Animation extends QtObject {
     }
 	start() {
         this.restart()
-        this.started()
+        
     }
 	stop() {
 		this.running = false
@@ -61,6 +61,7 @@ export class Animation extends QtObject {
         this.$loops = 0
 		this.paused = false
         this.running = true
+        this.started()
     }
 
 }
