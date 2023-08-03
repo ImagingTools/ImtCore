@@ -7,7 +7,7 @@
 #include <iprm/IParamsSet.h>
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 
-
+// ImtCore includes
 #include <GeneratedFiles/imtgui/ui_CMultiParamsSetGuiComp.h>
 
 
@@ -18,9 +18,7 @@ namespace imtgui
 class CMultiParamsSetGuiComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
 						Ui::CMultiParamsSetGuiComp, iprm::IParamsSet>
-
 {
-
 public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<
 				Ui::CMultiParamsSetGuiComp, iprm::IParamsSet> BaseClass;
@@ -53,8 +51,6 @@ private:
 };
 
 
-
 } // namespace imtgui
-
 
 

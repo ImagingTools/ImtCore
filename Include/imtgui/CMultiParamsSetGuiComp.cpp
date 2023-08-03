@@ -1,13 +1,14 @@
-#include "CMultiParamsSetGuiComp.h"
+#include <imtgui/CMultiParamsSetGuiComp.h>
 
 
-// Acf includes
+// ACF includes
 #include <imeas/INumericValue.h>
 #include <imeas/INumericConstraints.h>
 #include <iprm/INameParam.h>
 #include <iprm/IEnableableParam.h>
 #include <iprm/ISelectionParam.h>
 
+// ImtCore includes
 #include <imtgui/CNumericSliderLayoutFittableEditorGui.h>
 #include <imtgui/CNameLayoutFittableEditorGui.h>
 #include <imtgui/CEnableableLayoutFittableEditorGui.h>
@@ -135,7 +136,7 @@ bool CMultiParamsSetGuiComp::OnModelDetached(imod::IModel* modelPtr)
 	const int guisCount = m_modelEditors.GetCount();
 	const int idsCount = m_idsAttrPtr.GetCount();
 	for (int guiIndex = 0; guiIndex < guisCount; ++guiIndex){
-            ILayoutFittableModelEditor* editorPtr =  m_modelEditors.GetAt(guiIndex);
+		ILayoutFittableModelEditor* editorPtr =  m_modelEditors.GetAt(guiIndex);
 		imod::IModel* currentModelPtr = modelPtr;
 		if (guiIndex < idsCount){
 			const QByteArray paramId = m_idsAttrPtr[guiIndex];
@@ -162,6 +163,7 @@ bool CMultiParamsSetGuiComp::OnModelDetached(imod::IModel* modelPtr)
 
 	return BaseClass::OnModelDetached(modelPtr);
 }
+
 
 ILayoutFittableModelEditor* CMultiParamsSetGuiComp::CreateEditorFromModel(const imod::IModel* modelPtr) const
 {
@@ -195,8 +197,5 @@ ILayoutFittableModelEditor* CMultiParamsSetGuiComp::CreateEditorFromModel(const 
 
 
 } // namespace imtgui
-
-
-
 
 
