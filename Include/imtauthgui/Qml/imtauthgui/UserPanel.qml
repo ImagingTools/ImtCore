@@ -38,14 +38,9 @@ Item {
     }
 
     function onLogin(loginData){
-        console.log("onLogin");
-
         root.username = loginData["Login"];
         root.userId = loginData["UserId"];
         root.passwordHash = loginData["PasswordHash"];
-
-        console.log("userId", root.userId);
-        console.log("passwordHash", root.passwordHash);
 
         root.enabled = true;
     }

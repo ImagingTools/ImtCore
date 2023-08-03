@@ -50,8 +50,6 @@ Item {
                 }
             }
 
-            console.log("updateRepeaterModel", updateRepeaterModel);
-
             if (updateRepeaterModel){
                 pagesData.model = pagesProvider.pagesModel;
             }
@@ -76,24 +74,15 @@ Item {
             visible: container.activePageIndex === model.index;
 
             Component.onCompleted: {
-                console.log("pagesDeleg onCompleted", model.Id);
-
                 if (container.documentManager != null){
                     container.documentManager.registerDocumentManager(model.Id, null);
                 }
-            }
-
-            Component.onDestruction: {
-                console.log("pagesDeleg onDestruction", model.Id);
             }
 
             /**
                 The page will be loaded only by click if it hasn't loaded yet
             */
             onVisibleChanged: {
-                console.log("pagesDeleg onVisibleChanged", visible, model.Id);
-                console.log("container.activePageIndex", container.activePageIndex);
-                console.log("model.index", model.index);
                 if(pagesDeleg.visible){
                     if (!pagesLoader.item){
                         if (container.pageModel && container.pageModel.ContainsKey("Source", model.index)){
@@ -118,13 +107,13 @@ Item {
                             pagesLoader.item.mainDocumentManager = container.documentManager;
                         }
 
-//                        if(pagesLoader.item.startPageObj !== undefined){
-                            pagesLoader.item.startPageObj = {"Id": model.Id,
-                                "Name": model.Name,
-                                "Source": model.StartItem,
-                                "CommandsId": model.Id};
-//                        }
-
+                        pagesLoader.item.startPageObj =
+                        {
+                            "Id": model.Id,
+                            "Name": model.Name,
+                            "Source": model.StartItem,
+                            "CommandsId": model.Id
+                        };
                     }
                 }
             }

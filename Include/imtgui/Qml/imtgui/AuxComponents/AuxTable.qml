@@ -336,7 +336,8 @@ Rectangle {
 
     function setWidth(){
         //console.log("widthRecalc:: table", 0);
-
+        console.log("tableContainer.widthDecorator", tableContainer.widthDecorator);
+        console.log("tableContainer.headers", tableContainer.headers);
         var headersCount = tableContainer.headers.GetItemsCount();
 
         if(!tableContainer.widthDecorator.GetItemsCount() && tableContainer.headers.GetItemsCount()){

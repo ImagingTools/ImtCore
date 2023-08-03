@@ -54,11 +54,11 @@ imtbase::CTreeItemModel* CProductControllerComp::ListObjects(const imtgql::CGqlR
 
 
 istd::IChangeable* CProductControllerComp::CreateObject(
-		const QList<imtgql::CGqlObject>& inputParams,
-		QByteArray& objectId,
-		QString& name,
-		QString& description,
-		QString &errorMessage) const
+			const QList<imtgql::CGqlObject>& inputParams,
+			QByteArray& objectId,
+			QString& name,
+			QString& description,
+			QString &errorMessage) const
 {
 	if (!m_productFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT(false);
@@ -123,7 +123,7 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 		}
 
 		if (itemModel.ContainsKey("Dependencies")){
-			imtbase::CTreeItemModel* dependenciesModelPtr = featuresModel = itemModel.GetTreeItemModel("Dependencies");
+			imtbase::CTreeItemModel* dependenciesModelPtr = itemModel.GetTreeItemModel("Dependencies");
 			if (dependenciesModelPtr != nullptr){
 				QStringList keys = dependenciesModelPtr->GetKeys();
 				for (const QString& key : keys){

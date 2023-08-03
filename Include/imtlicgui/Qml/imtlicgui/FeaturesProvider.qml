@@ -52,9 +52,8 @@ QtObject {
 
     property GqlModel featuresModel: GqlModel {
         function updateModel() {
-            var query = Gql.GqlRequest("query", "FeaturesTree");
+            var query = Gql.GqlRequest("query", "GetFeatures");
             var queryFields = Gql.GqlObject("treeItem");
-            queryFields.InsertField("TreeModel");
             queryFields.InsertField("Successed");
             query.AddField(queryFields);
 
@@ -66,13 +65,10 @@ QtObject {
             console.log("State:", this.state, provider.featuresModel);
             if (this.state === "Ready"){
                 var dataModelLocal = this.GetData("data");
-                if (dataModelLocal.ContainsKey("FeaturesTree")){
-                    dataModelLocal = dataModelLocal.GetData("FeaturesTree");
-                    if (dataModelLocal.ContainsKey("TreeModel")) {
-                        dataModelLocal = dataModelLocal.GetData("TreeModel");
+                if (dataModelLocal.ContainsKey("GetFeatures")){
+                    dataModelLocal = dataModelLocal.GetData("GetFeatures");
 
-                        provider.model = dataModelLocal;
-                    }
+                    provider.model = dataModelLocal;
                 }
             }
         }

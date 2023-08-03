@@ -418,7 +418,6 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(const imtgql::
 	}
 	else{
 		imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-		imtbase::CTreeItemModel* treeItemModel = dataModelPtr->AddTreeModel("TreeModel");
 
 		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
 		for (const QByteArray& collectionId : collectionIds){
@@ -429,14 +428,14 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(const imtgql::
 					QByteArray packageId = packagePtr->GetPackageId();
 					QString packageName = m_objectCollectionCompPtr->GetElementInfo(collectionId, imtbase::ICollectionInfo::EIT_NAME).toString();
 
-					int index = treeItemModel->InsertNewItem();
+					int index = dataModelPtr->InsertNewItem();
 
-					treeItemModel->SetData("Id", packageId, index);
-					treeItemModel->SetData("Name", packageName, index);
+					dataModelPtr->SetData("Id", packageId, index);
+					dataModelPtr->SetData("Name", packageName, index);
 
 					QByteArrayList featureCollectionIds = packagePtr->GetFeatureList().GetElementIds().toList();
 
-					imtbase::CTreeItemModel* childItemModel = treeItemModel->AddTreeModel("ChildModel", index);
+					imtbase::CTreeItemModel* childItemModel = dataModelPtr->AddTreeModel("ChildModel", index);
 
 					for (const QByteArray& featureCollectionId : featureCollectionIds){
 						const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);

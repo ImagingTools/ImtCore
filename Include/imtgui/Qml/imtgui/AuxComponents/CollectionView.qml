@@ -325,6 +325,13 @@ Item {
                     collectionMetaInfo.contentVisible = false
                 }
             }
+
+//            let itemIds = collectionViewContainer.getSelectedIds();
+//            if (itemIds.length > 0){
+//                let itemId = itemIds[0];
+
+//                documentHistoryProvider.updateModel(itemId);
+//            }
         }
 
         onSelectedItem: {
@@ -367,5 +374,24 @@ Item {
 
         visible: collectionViewContainer.visibleMetaInfo;
     }
+
+//    DocumentHistoryProvider {
+//        id: documentHistoryProvider;
+
+//        onHistoryModelChanged: {
+//            console.log("onHistoryModelChanged", historyModel.toJSON());
+
+//            documentHistoryView.historyModel = historyModel;
+//        }
+//    }
+
+//    DocumentHistoryView {
+//        id: documentHistoryView;
+
+//        anchors.right: parent.right;
+
+//        width: visible ? 200 : 1;
+//        height: parent.height;
+//    }
 }
 

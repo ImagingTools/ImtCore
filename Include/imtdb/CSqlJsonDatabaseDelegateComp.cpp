@@ -4,6 +4,8 @@
 // ACF includes
 #include <iprm/TParamsPtr.h>
 #include <iprm/ITextParam.h>
+#include <iprm/IIdParam.h>
+#include <iprm/IEnableableParam.h>
 #include <istd/TOptDelPtr.h>
 #include <istd/CCrcCalculator.h>
 #include <iser/CJsonMemReadArchive.h>
@@ -30,6 +32,13 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetSelectionQuery(
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(qPrintable(*m_objectIdColumnAttrPtr))
 				.arg(qPrintable(objectId)).toUtf8();
+	}
+
+	iprm::TParamsPtr<iprm::IEnableableParam> enableableParamPtr(paramsPtr, "IsHistory");
+	if (enableableParamPtr.IsValid()){
+		if (enableableParamPtr->IsEnabled()){
+			return CreateObjectHistoryQuery(offset, count, paramsPtr);
+		}
 	}
 
 	QByteArray selectionQuery = BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
@@ -167,8 +176,8 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
 		QString queryStr;
 		if (*m_isMultiTypeAttrPtr){
 			queryStr = QString("UPDATE \"%1\" SET \"IsActive\" = false WHERE \"DocumentId\" = '%2'; INSERT INTO \"%1\" (\"DocumentId\", \"Document\", \"LastModified\", \"Checksum\", \"IsActive\", \"RevisionNumber\", \"TypeId\") VALUES('%2', '%3', '%4', '%5', true, "
-								" (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 ),"
-								" (SELECT \"TypeId\" FROM \"%1\" WHERE \"DocumentId\" = '%2' LIMIT 1) )," );
+							   " (SELECT COUNT(\"Id\") FROM \"%1\" WHERE \"DocumentId\" = '%2') + 1 ),"
+							   " (SELECT \"TypeId\" FROM \"%1\" WHERE \"DocumentId\" = '%2' LIMIT 1) )," );
 
 		}
 		else{
@@ -189,10 +198,10 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateUpdateObjectQuery(
 
 
 QByteArray CSqlJsonDatabaseDelegateComp::CreateDescriptionObjectQuery(
-		const imtbase::IObjectCollection& /*collection*/,
-		const QByteArray& objectId,
-		const QString& description,
-		const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& objectId,
+			const QString& description,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	QByteArray retVal = QString("UPDATE \"%1\" SET \"Document\" = jsonb_set(\"Document\", '{Description}', '\"%2\"', true), \"LastModified\" = '%3' WHERE \"%4\" ='%5' AND \"IsActive\" = true;")
 			.arg(qPrintable(*m_tableNameAttrPtr))
@@ -219,18 +228,18 @@ QString CSqlJsonDatabaseDelegateComp::GetBaseSelectionQuery() const
 {
 	if (*m_isMultiTypeAttrPtr){
 		return QString("SELECT \"Id\", \"%1\", \"TypeId\", \"Document\", \"RevisionNumber\", \"LastModified\","
-						"(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND t2.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
+					"(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND t2.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
 					" as t2 WHERE \"IsActive\" = true")
 				.arg(qPrintable(*m_objectIdColumnAttrPtr))
 				.arg(qPrintable(*m_tableNameAttrPtr));
 	}
 	else{
-	return QString("SELECT \"Id\", \"%1\", \"Document\", \"RevisionNumber\", \"LastModified\","
-				"(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND t2.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
-				" as t2 WHERE \"IsActive\" = true")
-			.arg(qPrintable(*m_objectIdColumnAttrPtr))
-			.arg(qPrintable(*m_tableNameAttrPtr));
-}
+		return QString("SELECT \"Id\", \"%1\", \"Document\", \"RevisionNumber\", \"LastModified\","
+					"(SELECT \"LastModified\" FROM \"%2\" as t1 WHERE \"RevisionNumber\" = 1 AND t2.\"%1\" = t1.\"%1\" LIMIT 1) as \"Added\" FROM \"%2\""
+					" as t2 WHERE \"IsActive\" = true")
+				.arg(qPrintable(*m_objectIdColumnAttrPtr))
+				.arg(qPrintable(*m_tableNameAttrPtr));
+	}
 }
 
 
@@ -409,11 +418,35 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateOperationDescriptionQuery(const Q
 	if (operationContextPtr != nullptr){
 		imtbase::IOperationContext::IdentifableObjectInfo objectInfo = operationContextPtr->GetOperationOwnerId();
 		return QString(R"(UPDATE "%1" SET "OwnerId" = '%2', "OwnerName" = '%3', "OperationDescription" = '%4' WHERE "IsActive" = true AND "DocumentId" = '%5';)")
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(objectInfo.id))
+				.arg(objectInfo.name)
+				.arg(operationContextPtr->GetOperationDescription())
+				.arg(qPrintable(objectId))
+				.toUtf8();
+	}
+
+	return QByteArray();
+}
+
+
+QByteArray CSqlJsonDatabaseDelegateComp::CreateObjectHistoryQuery(
+			int offset,
+			int count,
+			const iprm::IParamsSet* paramsPtr) const
+{
+	iprm::TParamsPtr<iprm::IIdParam> idParamPtr(paramsPtr, "Id");
+	if (idParamPtr.IsValid()){
+		QByteArray objectId = idParamPtr->GetId();
+
+		QByteArray paginationQuery;
+		CreatePaginationQuery(offset, count, paginationQuery);
+
+		return QString(R"((SELECT * FROM "%1" WHERE "%2" = '%3' %4) ORDER BY "RevisionNumber" ASC;)")
 					.arg(qPrintable(*m_tableNameAttrPtr))
-					.arg(qPrintable(objectInfo.id))
-					.arg(objectInfo.name)
-					.arg(operationContextPtr->GetOperationDescription())
+					.arg(qPrintable(*m_objectIdColumnAttrPtr))
 					.arg(qPrintable(objectId))
+					.arg(qPrintable(paginationQuery))
 					.toUtf8();
 	}
 

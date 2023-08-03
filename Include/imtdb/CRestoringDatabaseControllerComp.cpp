@@ -31,8 +31,6 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 	QString userName = m_databaseLoginSettingsCompPtr->GetUserName();
 	int port = m_databaseLoginSettingsCompPtr->GetPort();
 
-	dbName = "prolife";
-
 	QTemporaryDir tempDir;
 	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + ".backup";
 

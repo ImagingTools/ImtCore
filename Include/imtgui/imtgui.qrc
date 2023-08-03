@@ -152,6 +152,8 @@
         <file alias="imtgui/AuxComponents/ChangeItemSize.qml">Qml/imtgui/AuxComponents/ChangeItemSize.qml</file>
         <file alias="imtgui/AuxComponents/TableCellDelegateSimple.qml">Qml/imtgui/AuxComponents/TableCellDelegateSimple.qml</file>
 	<file alias="imtgui/AuxComponents/AlertMessage.qml">Qml/imtgui/AuxComponents/AlertMessage.qml</file>
+	<file alias="imtgui/AuxComponents/DocumentHistoryView.qml">Qml/imtgui/AuxComponents/DocumentHistoryView.qml</file>
+	<file alias="imtgui/AuxComponents/DocumentHistoryProvider.qml">Qml/imtgui/AuxComponents/DocumentHistoryProvider.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

@@ -30,7 +30,7 @@ Rectangle {
         Item {
             id: leftPart;
 
-            width: root.width / 2;
+            width: root.width / 3;
             height: row.height;
 
             clip: true;
@@ -70,9 +70,34 @@ Rectangle {
         }
 
         Item {
+            id: centerPart;
+
+            width: 100;
+            height: row.height;
+
+            clip: true;
+
+            Text {
+                id: licenseIdText;
+
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: parent.left;
+                anchors.leftMargin: 10;
+
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_common;
+                color: Style.textColor;
+                wrapMode: Text.WordWrap;
+                elide: Text.ElideRight;
+
+                text: model.Id ? model.Id : "";
+            }
+        }
+
+        Item {
             id: rightPart;
 
-            width: root.width / 2;
+            width: root.width / 3;
             height: parent.height;
 
             visible: checkBoxLicense.checkState === Qt.Checked;
@@ -86,14 +111,6 @@ Rectangle {
                 checkState: model.ExpirationState;
 
                 onClicked: {
-//                    if (model.Expiration === ""){
-//                        datePicker.setCurrentDay();
-//                    }
-//                    else{
-//                        model.Expiration = "";
-//                    }
-
-                    console.log("checkBoxExpiration onClicked");
                     model.ExpirationState = 2 - checkBoxExpiration.checkState;
 
                     if (model.ExpirationState === Qt.Checked){
@@ -156,138 +173,3 @@ Rectangle {
         }
     }
 }
-
-//TableViewItemDelegateBase {
-//    id: packageTreeItemDelegate;
-
-//    //root: licensesTable;
-
-//    rowBodyDelegate: Component { Row {
-//            id: row;
-
-//            height: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.rowItemHeight :0;
-
-//            Item {
-//                id: leftPart;
-
-//                width: packageTreeItemDelegate.width / 2;
-//                height: row.height;
-
-//                clip: true;
-
-//                CheckBox {
-//                    id: checkBoxLicense;
-
-//                    anchors.verticalCenter: parent.verticalCenter;
-//                    anchors.left: leftPart.left;
-//                    anchors.leftMargin: 10;
-
-//                    checkState: model.LicenseState;
-
-//                    onClicked: {
-//                        console.log("TableInstanceLicensesDelegate CheckBox onClicked");
-//                        model.LicenseState = 2 - checkBoxLicense.checkState;
-
-//                        packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "LicenseState");
-//                    }
-//                }
-
-//                Text {
-//                    id: titleLicensesTable;
-
-//                    anchors.verticalCenter: parent.verticalCenter;
-//                    anchors.left: checkBoxLicense.right;
-//                    anchors.leftMargin: 10;
-
-//                    font.family: Style.fontFamily;
-//                    font.pixelSize: Style.fontSize_common;
-//                    color: Style.textColor;
-//                    wrapMode: Text.WordWrap;
-//                    elide: Text.ElideRight;
-
-//                    text: model.Name;
-//                }
-//            }
-
-//            Item {
-//                id: rightPart;
-
-//                width: packageTreeItemDelegate.width / 2;
-//                height: parent.height;
-
-//                visible: checkBoxLicense.checkState === 2;
-
-//                CheckBox {
-//                    id: checkBoxExpiration;
-
-//                    anchors.verticalCenter: parent.verticalCenter;
-//                    anchors.left: rightPart.left;
-
-//                    checkState: model.ExpirationState;
-
-//                    onClicked: {
-//                        console.log("checkBoxExpiration onClicked");
-//                        model.ExpirationState = 2 - checkBoxExpiration.checkState;
-
-//                        if (model.ExpirationState == Qt.Checked){
-//                            datePicker.setCurrentDay();
-//                        }
-
-//                        packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "ExpirationState");
-//                    }
-//                }
-
-//                Text {
-//                    id: textUnlimited;
-
-//                    anchors.verticalCenter: parent.verticalCenter;
-//                    anchors.left: checkBoxExpiration.right;
-//                    anchors.leftMargin: 5;
-
-//                    visible: checkBoxExpiration.checkState === 0;
-
-//                    font.family: Style.fontFamily;
-//                    font.pixelSize: Style.fontSize_common;
-//                    color: Style.textColor;
-
-//                    text: qsTr("Unlimited");
-//                }
-
-//                DatePicker {
-//                    id: datePicker;
-
-//                    anchors.verticalCenter: parent.verticalCenter;
-//                    anchors.left: checkBoxExpiration.right;
-//                    anchors.leftMargin: 5;
-
-//                    visible: checkBoxExpiration.checkState === 2;
-
-//                    width: 100;
-//                    height: 20;
-
-//                    currentDayButtonVisible: false;
-//                    startWithCurrentDay: false;
-
-//                    property string expirationDate: model.Expiration;
-
-//                    onExpirationDateChanged: {
-//                        console.log("onExpirationDateChanged", datePicker.expirationDate);
-
-//                        let date = model.Expiration;
-//                        let data = date.split("-");
-//                        datePicker.setDate(Number(data[0]), Number(data[1]) - 1, Number(data[2]));
-//                    }
-
-//                    onDateChanged: {
-//                        console.log("onDateChanged", datePicker.getDate());
-//                        model.Expiration = datePicker.getDate();
-
-//                        console.log("model.Expiration", model.Expiration);
-
-//                        packageTreeItemDelegate.root.rowModelDataChanged(packageTreeItemDelegate, "Expiration");
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}

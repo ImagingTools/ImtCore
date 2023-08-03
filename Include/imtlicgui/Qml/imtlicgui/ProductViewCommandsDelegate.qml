@@ -11,9 +11,6 @@ DocumentWorkspaceCommandsDelegateBase {
 
     property ModelIndex selectedIndex: container.tableData != null ? container.tableData.selectedIndex: null;
 
-//    signal edited(string itemId, string itemName);
-//    signal removed(string itemId);
-
     onSelectedIndexChanged: {
         console.log("CollectionViewCommands onSelectedIndexChanged");
         let isEnabled = false;
@@ -36,7 +33,6 @@ DocumentWorkspaceCommandsDelegateBase {
             let count = container.tableData.rowModel.GetItemsCount();
 
             let licensesModel = container.documentBase.documentModel.GetData("Items");
-//            licensesModel.InsertNewItemWithParameters(count, {"Id":"", "Name":"License Name", "Description":""})
 
             let index = licensesModel.InsertNewItem();
 
@@ -64,6 +60,8 @@ DocumentWorkspaceCommandsDelegateBase {
                 }
             }
 
+            container.removeDependencies(licenseId);
+
             let licensesModel = container.documentBase.documentModel.GetData("Items");
             licensesModel.RemoveItem(selectedIndex.getIndex());
 
@@ -75,63 +73,36 @@ DocumentWorkspaceCommandsDelegateBase {
         }
     }
 
-//    onEntered: {
-//        container.documentBase.documentModel.SetData("Id", value);
-//        container.documentBase.documentModel.SetData("Name", value);
-//    }
+    function removeDependencies(licenseId){
+        if (container.documentBase.documentModel.ContainsKey("Dependencies")){
+            let dependenciesModel = container.documentBase.documentModel.GetData("Dependencies");
+            if (dependenciesModel.ContainsKey(licenseId)){
+                dependenciesModel.RemoveData(licenseId);
+            }
 
-//    property Component messageDialog: Component {
-//        MessageDialog {
-//            onFinished: {
-//                if (buttonId == "Yes"){
-//                    let selectedIndex = container.tableData.selectedIndex;
+            let keys = dependenciesModel.GetKeys();
 
-//                    container.tableData.removeRow([selectedIndex.index]);
-//                }
-//            }
-//        }
-//    }
+            for (let i = 0; i < keys.length; i++){
+                let key = keys[i];
+                let values = dependenciesModel.GetData(key);
+                if (values !== ""){
+                    let dependenciesList = values.split(';');
 
-//    property Component setDescriptionDialog: Component {
-//        InputDialog {
-//            onFinished: {
-//                if (buttonId == "Ok"){
-//                    let elements = container.tableData.elements;
-//                    elements.SetData("Description", inputValue, container.selectedIndex);
+                    if (dependenciesList.includes(licenseId)){
+                        let pos = dependenciesList.indexOf(licenseId);
+                        dependenciesList.splice(pos, 1);
 
-//                    container.documentBase.updateGui();
-//                }
-//            }
-//        }
-//    }
-
-//    property Component popupMenu: Component {
-//        PopupMenuDialog {
-//            onFinished: {
-//                console.log("DocumentView PopupMenuDialog", commandId);
-//                container.commandActivated(commandId);
-//            }
-//        }
-//    }
-
-//    property Component editDialog: Component {
-//        EditLicenseDialog {
-//            onFinished: {
-//                if (buttonId == "Ok"){
-//                    let elementsModel = container.documentBase.documentModel.GetData("Items");
-
-//                    let oldId = elementsModel.GetData("Id", container.selectedIndex);
-//                    let oldName = elementsModel.GetData("Name", container.selectedIndex);
-
-//                    elementsModel.SetData("Name", valueName, container.selectedIndex);
-//                    elementsModel.SetData("Id", valueId, container.selectedIndex);
-
-//                    container.edited(oldId, oldName);
-
-//                    container.documentBase.updateGui();
-//                }
-//            }
-//        }
-//    }
+                        if (dependenciesList.length === 0){
+                            dependenciesModel.RemoveData(key);
+                        }
+                        else{
+                            let newDependencies = dependenciesList.join(';');
+                            dependenciesModel.SetData(key, newDependencies);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 

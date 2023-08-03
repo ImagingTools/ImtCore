@@ -19,9 +19,6 @@ Item {
         Events.unSubscribeEvent("SetCommandsVisible", commandsDecoratorContainer.setVisible);
     }
 
-    function onLocalizationChanged(language){
-    }
-
     function setCommandsModel(parameters){
         console.log("CommandsDecorator setCommandsModel", parameters, commandsDecoratorContainer);
         let model = parameters["Model"];

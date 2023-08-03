@@ -60,6 +60,10 @@ public:
 
 protected:
 	virtual QByteArray CreateOperationDescriptionQuery(const QByteArray& objectId, const imtbase::IOperationContext* operationContextPtr) const;
+	virtual QByteArray CreateObjectHistoryQuery(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* paramsPtr = nullptr) const;
 
 	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const override;
 	virtual bool ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const override;

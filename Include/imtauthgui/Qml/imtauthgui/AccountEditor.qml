@@ -15,6 +15,16 @@ DocumentBase {
 
     Component.onCompleted: {
         groupsProvider.updateModel();
+
+        Events.subscribeEvent("OnLocalizationChanged", accountEditorContainer.onLocalizationChanged);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", accountEditorContainer.onLocalizationChanged);
+    }
+
+    function onLocalizationChanged(language){
+        bodyColumn.updateHeaders();
     }
 
     onModelsIsLoadedChanged: {
@@ -371,13 +381,19 @@ DocumentBase {
                 id: headersModel;
 
                 Component.onCompleted: {
-                    headersModel.InsertNewItem();
-
-                    headersModel.SetData("Id", "Name");
-                    headersModel.SetData("Name", qsTr("Group Name"));
-
-                    groupsTable.headers = headersModel;
+                    bodyColumn.updateHeaders();
                 }
+            }
+
+            function updateHeaders(){
+                headersModel.Clear();
+
+                headersModel.InsertNewItem();
+
+                headersModel.SetData("Id", "Name");
+                headersModel.SetData("Name", qsTr("Group Name"));
+
+                groupsTable.headers = headersModel;
             }
 
             Text {

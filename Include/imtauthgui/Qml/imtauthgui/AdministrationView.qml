@@ -26,11 +26,13 @@ Rectangle {
     }
 
     function onLocalizationChanged(language){
-        console.log("CollectionViewBase onLocalizationChanged", language);
+        console.log("Administration onLocalizationChanged", language);
 
         for (let i = 0; i < leftMenuModel.count; i++){
             let id = leftMenuModel.get(i).Id;
             if (id === "Roles"){
+                console.log("id == Roles");
+
                 leftMenuModel.setProperty(i, "Name", qsTr("Roles"));
             }
             else if (id === "Users"){

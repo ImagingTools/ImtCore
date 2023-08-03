@@ -28,7 +28,8 @@ CSqlDatabaseObjectCollectionIterator::CSqlDatabaseObjectCollectionIterator(
 
 bool CSqlDatabaseObjectCollectionIterator::Next()
 {
-	if (m_currentIndex < m_records.size() - 1){
+	int recordsSize = m_records.size();
+	if (m_currentIndex < recordsSize - 1){
 		m_currentIndex++;
 
 		return true;

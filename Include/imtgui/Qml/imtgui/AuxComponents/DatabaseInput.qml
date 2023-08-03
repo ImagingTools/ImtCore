@@ -72,9 +72,9 @@ Item {
             }
         } // Repeater
 
-//        DatabaseBackupController {
-//            width: parent.width;
-//        }
+        DatabaseBackupController {
+            width: parent.width;
+        }
     }
 }
 

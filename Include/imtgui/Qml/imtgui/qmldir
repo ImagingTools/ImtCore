@@ -116,3 +116,5 @@ TreeItemModelObserver 1.0 ./AuxComponents/TreeItemModelObserver.qml
 TreeItemModelConverter 1.0 ./AuxComponents/TreeItemModelConverter.qml
 
 SingleDocumentWorkspaceView 1.0 ./AuxComponents/SingleDocumentWorkspaceView.qml
+DocumentHistoryView 1.0 ./AuxComponents/DocumentHistoryView.qml
+DocumentHistoryProvider 1.0 ./AuxComponents/DocumentHistoryProvider.qml
