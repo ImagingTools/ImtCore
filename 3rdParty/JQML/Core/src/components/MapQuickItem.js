@@ -13,7 +13,7 @@ export class MapQuickItem extends QtObject  {
         this.$cPC('anchorPoint', {
             x: 0,
             y: 0,
-        }).connect(this.$anchorPointChanged.bind(this))
+        }, this.$anchorPointChanged)
         this.$cP('visible', true)
     }
     $coordinateChanged(){
