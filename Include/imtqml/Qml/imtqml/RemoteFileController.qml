@@ -41,7 +41,7 @@ QtObject {
                 var existingHash = xhr.responseXML.getElementsByTagName("p")[2].innerHTML;
                 this.json = existingHash;
                 this.fileExists(fileUrl)
-                this.fileUploaded(fileUrl)
+//                this.fileUploaded(fileUrl)
               }
             if (xhr.readyState === XMLHttpRequest.DONE && xhr.status !== 409){
                 this.json = xhr.responseText;
