@@ -443,7 +443,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 			offset = viewParamsGql->GetFieldArgumentValue("Offset").toInt();
 			count = viewParamsGql->GetFieldArgumentValue("Count").toInt();
 
-
 			QByteArray filterBA = viewParamsGql->GetFieldArgumentValue("FilterModel").toByteArray();
 			if (!filterBA.isEmpty()){
 				imtbase::CTreeItemModel generalModel;

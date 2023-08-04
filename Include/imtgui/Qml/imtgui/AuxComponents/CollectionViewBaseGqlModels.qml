@@ -53,8 +53,6 @@ QtObject {
 
     property GqlModel headerInfoModel: GqlModel {
         function updateModel() {
-            console.log( "headerInfoModel update", gqlModelBaseContainer.gqlModelHeadersInfo);
-
             var query = Gql.GqlRequest("query", gqlModelBaseContainer.gqlModelHeadersInfo);
 
             var queryHeaders = Gql.GqlObject("headers");
@@ -70,8 +68,6 @@ QtObject {
         onStateChanged: {
             console.log("State:", this.state, gqlModelBaseContainer.headerInfoModel);
             if (this.state === "Ready"){
-                console.log("onStateChanged Ready", gqlModelBaseContainer.gqlModelHeadersInfo);
-
                 var dataModelLocal;
 
                 if (gqlModelBaseContainer.headerInfoModel.ContainsKey("errors")){

@@ -17,6 +17,21 @@ QtObject {
 
     property alias stateModel: container.itemsInfoModel.state;
 
+    property int offset: 0;
+    property int count: -1;
+
+    property TreeItemModel filterModel: TreeItemModel {
+        Component.onCompleted: {
+            console.log("onCompleted");
+
+            filterModel.InsertNewItem();
+            filterModel.SetData("Test", "Test", 0);
+            filterModel.AddTreeModel("FilterIds");
+            filterModel.AddTreeModel("Sort");
+
+            console.log("json", filterModel.toJSON())
+        }};
+
     signal modelUpdated();
     signal failed();
 
@@ -57,11 +72,19 @@ QtObject {
             console.log( "gqlModelBaseContainer updateModel", container.commandId + "List");
             var query = Gql.GqlRequest("query", container.commandId + "List");
 
+            var viewParams = Gql.GqlObject("viewParams");
+            viewParams.InsertField("Offset", container.offset);
+            viewParams.InsertField("Count", container.count);
+
+            var jsonString = container.filterModel.toJSON();
+            viewParams.InsertField("FilterModel", "{}");
+
             var inputParams = Gql.GqlObject("input");
             let keys = Object.keys(externInputParams)
             for (let key of keys){
                 inputParams.InsertField(key, externInputParams[key]);
             }
+            inputParams.InsertFieldObject(viewParams);
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");

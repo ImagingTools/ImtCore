@@ -57,8 +57,8 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 			const QList<imtgql::CGqlObject>& inputParams,
 			QByteArray& objectId,
 			QString& name,
-			QString& description,
-			QString &errorMessage) const
+			QString& /*description*/,
+			QString& errorMessage) const
 {
 	if (!m_productFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT(false);
@@ -171,11 +171,11 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 					if (featuresModel->ContainsKey(licenseId)){
 						imtbase::CTreeItemModel *featureModelPtr = featuresModel->GetTreeItemModel(licenseId);
 						if (featureModelPtr != nullptr){
-							for (int i = 0; i < featureModelPtr->GetItemsCount(); i++){
+							for (int j = 0; j < featureModelPtr->GetItemsCount(); j++){
 								imtlic::ILicenseInfo::FeatureInfo featureInfo;
 
-								QByteArray featureId = featureModelPtr->GetData("Id", i).toByteArray();
-								QString featureName = featureModelPtr->GetData("Name", i).toString();
+								QByteArray featureId = featureModelPtr->GetData("Id", j).toByteArray();
+								QString featureName = featureModelPtr->GetData("Name", j).toString();
 
 								featureInfo.id = featureId;
 								featureInfo.name = featureName;
@@ -277,7 +277,7 @@ imtbase::CTreeItemModel* CProductControllerComp::GetObject(const imtgql::CGqlReq
 						if (m_featureInfoProviderCompPtr.IsValid()){
 							istd::TDelPtr<const imtlic::IFeatureInfo> featureInfoPtr = m_featureInfoProviderCompPtr->GetFeatureInfo(featureInfo.id);
 							if (featureInfoPtr != nullptr){
-								int index = featureModelPtr->InsertNewItem();
+								int featureIndex = featureModelPtr->InsertNewItem();
 
 								QByteArray featureId = featureInfoPtr->GetFeatureId();
 								QString featureName = featureInfoPtr->GetFeatureName();
@@ -286,9 +286,9 @@ imtbase::CTreeItemModel* CProductControllerComp::GetObject(const imtgql::CGqlReq
 									isOptional = featureInfoPtr->IsOptional();
 								}
 
-								featureModelPtr->SetData("Id", featureId, index);
-								featureModelPtr->SetData("Name", featureName, index);
-								featureModelPtr->SetData("Optional", isOptional, index);
+								featureModelPtr->SetData("Id", featureId, featureIndex);
+								featureModelPtr->SetData("Name", featureName, featureIndex);
+								featureModelPtr->SetData("Optional", isOptional, featureIndex);
 							}
 						}
 					}
@@ -330,7 +330,7 @@ bool CProductControllerComp::GetOperationFromRequest(
 }
 
 
-imtbase::CTreeItemModel* CProductControllerComp::GetTreeItemModel(const imtgql::CGqlRequest& gqlRequest, QString &errorMessage) const
+imtbase::CTreeItemModel* CProductControllerComp::GetTreeItemModel(const imtgql::CGqlRequest& /*gqlRequest*/, QString &errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
@@ -358,8 +358,8 @@ imtbase::CTreeItemModel* CProductControllerComp::GetTreeItemModel(const imtgql::
 				imtbase::CTreeItemModel* licensesModel = dataModel->AddTreeModel("Licenses", productIndex);
 				const imtbase::ICollectionInfo& licenseList = productPtr->GetLicenseList();
 				const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = licenseList.GetElementIds();
-				for ( const QByteArray& licenseId : licenseCollectionIds){
-					const imtlic::ILicenseInfo* licenseInfoPtr = productPtr->GetLicenseInfo(licenseId);
+				for ( const QByteArray& licenseCollectionId : licenseCollectionIds){
+					const imtlic::ILicenseInfo* licenseInfoPtr = productPtr->GetLicenseInfo(licenseCollectionId);
 					if (licenseInfoPtr != nullptr){
 						const QByteArray licenseId = licenseInfoPtr->GetLicenseId();
 						const QString licenseName = licenseInfoPtr->GetLicenseName();

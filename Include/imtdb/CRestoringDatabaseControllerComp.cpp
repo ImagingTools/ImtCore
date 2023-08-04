@@ -19,7 +19,7 @@ namespace imtdb
 
 // reimplemented (imtbase::IBinaryDataController)
 
-bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArray& dataId) const
+bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArray& /*dataId*/) const
 {
 	if (!m_databaseLoginSettingsCompPtr.IsValid()){
 		return false;

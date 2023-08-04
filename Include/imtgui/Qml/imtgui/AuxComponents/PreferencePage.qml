@@ -62,24 +62,17 @@ Rectangle {
     onVisibleChanged: {
         console.log("onVisibleChanged settingsProvider", container.settingsProvider);
         if (visible){
-            //console.log("settingsProvider.localModel", settingsProvider.localModel);
             if (container.settingsProvider && container.settingsProvider.localModel){
                 let localModelJson = container.settingsProvider.localModel.toJSON();
 
-                console.log("localModelJson", localModelJson);
                 container.localModel.CreateFromJson(localModelJson);
-
-//                updateCommonModel(localModel);
             }
 
             updateCommonModel(container.localModel);
 
-           // console.log("settingsProvider.serverModel", container.settingsProvider.serverModel);
             if (container.settingsProvider && container.settingsProvider.serverModel){
                 let serverModelJson = container.settingsProvider.serverModel.toJSON();
                 container.serverModel.CreateFromJson(serverModelJson);
-
-//                updateCommonModel(serverModel);
             }
 
             updateCommonModel(container.serverModel);

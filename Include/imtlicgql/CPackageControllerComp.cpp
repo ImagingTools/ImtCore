@@ -18,11 +18,11 @@ namespace imtlicgql
 // reimplemented (imtguigql::CObjectCollectionControllerCompBase)
 
 istd::IChangeable* CPackageControllerComp::CreateObject(
-		const QList<imtgql::CGqlObject>& inputParams,
-		QByteArray& objectId,
-		QString& name,
-		QString& description,
-		QString& errorMessage) const
+			const QList<imtgql::CGqlObject>& inputParams,
+			QByteArray& objectId,
+			QString& name,
+			QString& description,
+			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		Q_ASSERT(false);
@@ -39,8 +39,6 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 		Q_ASSERT(false);
 		return nullptr;
 	}
-
-//	objectId = GetObjectIdFromInputParams(inputParams);
 
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
@@ -63,7 +61,6 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 
 		if (objectId.isEmpty()){
 			errorMessage = QT_TR_NOOP("Package-ID can not be empty!");
-//			Q_ASSERT(false);
 			return nullptr;
 		}
 
@@ -71,7 +68,6 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 			name = itemModel.GetData("Name").toString();
 		}
 
-		QString description;
 		if (itemModel.ContainsKey("Description")){
 			description = itemModel.GetData("Description").toString();
 		}
@@ -102,12 +98,6 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 				if (featuresModelPtr->ContainsKey("Id", i)){
 					featureId = featuresModelPtr->GetData("Id", i).toByteArray();
 				}
-
-//				const imtlic::IFeatureInfo* findFeatureInfoPtr = m_featureInfoProviderCompPtr->GetFeatureInfo(featureId);
-//				if (findFeatureInfoPtr != nullptr){
-//					errorMessage = QT_TR_NOOP(QString("Please change the Feature-ID for %1. (Feature-ID already exists)").arg(featureName));
-//					return nullptr;
-//				}
 
 				if (featureId.isEmpty()){
 					errorMessage = QT_TR_NOOP(QString("%1 has an empty Feature-ID").arg(featureName));
@@ -161,11 +151,11 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 
 
 bool CPackageControllerComp::InsertSubFeaturesToDataFromModel(
-		imtlic::CFeaturePackage* packagePtr,
-		imtlic::IFeatureInfo* parentFeaturePtr,
-		const imtbase::CTreeItemModel* dependenciesModelPtr,
-		const imtbase::CTreeItemModel* subFeaturesModelPtr,
-		QString& errorMessage) const
+			imtlic::CFeaturePackage* packagePtr,
+			imtlic::IFeatureInfo* parentFeaturePtr,
+			const imtbase::CTreeItemModel* dependenciesModelPtr,
+			const imtbase::CTreeItemModel* subFeaturesModelPtr,
+			QString& errorMessage) const
 {
 	for (int i = 0; i < subFeaturesModelPtr->GetItemsCount(); i++){
 		QString featureName;
@@ -235,10 +225,10 @@ bool CPackageControllerComp::InsertSubFeaturesToDataFromModel(
 
 
 void CPackageControllerComp::InsertSubFeaturesToModelFromData(
-		const imtlic::CFeaturePackage* packagePtr,
-		const imtlic::IFeatureInfo* featurePtr,
-		imtbase::CTreeItemModel* dependenciesModelPtr,
-		imtbase::CTreeItemModel* featuresModelPtr) const
+			const imtlic::CFeaturePackage* packagePtr,
+			const imtlic::IFeatureInfo* featurePtr,
+			imtbase::CTreeItemModel* dependenciesModelPtr,
+			imtbase::CTreeItemModel* featuresModelPtr) const
 {
 	const imtlic::FeatureInfoList& subFeatures = featurePtr->GetSubFeatures();
 
@@ -356,7 +346,7 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetObject(const imtgql::CGqlReq
 }
 
 
-imtbase::CTreeItemModel* CPackageControllerComp::GetDependencies(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CPackageControllerComp::GetDependencies(const imtgql::CGqlRequest& /*gqlRequest*/, QString& /*errorMessage*/) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return nullptr;
@@ -404,7 +394,7 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetDependencies(const imtgql::C
 }
 
 
-imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(const imtgql::CGqlRequest& /*gqlRequest*/, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return nullptr;
@@ -465,10 +455,10 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetTreeItemModel(const imtgql::
 
 
 bool CPackageControllerComp::GetOperationFromRequest(
-		const imtgql::CGqlRequest& gqlRequest,
-		imtgql::CGqlObject& gqlObject,
-		QString& errorMessage,
-		int& operationType) const
+			const imtgql::CGqlRequest& gqlRequest,
+			imtgql::CGqlObject& gqlObject,
+			QString& errorMessage,
+			int& operationType) const
 {
 	const QList<imtgql::CGqlObject> fieldList = gqlRequest.GetFields();
 
