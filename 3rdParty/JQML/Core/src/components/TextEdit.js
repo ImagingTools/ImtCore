@@ -308,7 +308,13 @@ export class TextEdit extends Item {
 	$mouseup(e, state) {
 		// e.preventDefault()
 		if(this.$p.enabled.val){
-            this.focus = true
+            if(this.focus) {
+                this.impl.focus()
+                Core.setFocus(this)
+            } else {
+                this.focus = true
+            }
+
             state.release()
 		}
 	}
@@ -330,7 +336,13 @@ export class TextEdit extends Item {
 	$touchend(e, state) {
 		// e.preventDefault()
 		if(this.$p.enabled.val){
-            this.focus = true
+            if(this.focus) {
+                this.impl.focus()
+                Core.setFocus(this)
+            } else {
+                this.focus = true
+            }
+            
             state.release()
 		}
 	}
