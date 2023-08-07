@@ -48,7 +48,7 @@ int CDesignTokenWebQrcGeneratorComp::Exec()
 		}
 	}
 
-	if(!CreateQrcForDirs(dirsForTheme, QByteArray(outputDirPath) + dirSeparator + "Web" + projectName + ".qrc")){
+	if(!CreateQrcForDirs(dirsForTheme, QByteArray(outputDirPath) + dirSeparator + projectName + "Theme" + ".qrc")){
 		return -1;
 	}
 

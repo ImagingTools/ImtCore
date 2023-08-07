@@ -48,7 +48,7 @@ imtauthgql.file = ../../Include/imtauthgql/QMake/imtauthgql.pro
 
 SUBDIRS += imtauthgui
 imtauthgui.file = ../../Include/imtauthgui/QMake/imtauthgui.pro
-imtauthgui.depends = DesignTokenCreatorExe
+imtauthgui.depends = DesignTokenCreatorExe imtgui
 
 SUBDIRS += imtcrypt
 imtcrypt.file = ../../Include/imtcrypt/QMake/imtcrypt.pro
@@ -153,7 +153,7 @@ ImtDatabasePck.depends = imtbase imtdb
 
 SUBDIRS += ImtAuthGuiPck
 ImtAuthGuiPck.file = ../../Impl/ImtAuthGuiPck/QMake/ImtAuthGuiPck.pro
-ImtAuthGuiPck.depends = imtbase imtauth imtauthgui
+ImtAuthGuiPck.depends = imtbase imtauth imtauthgui imtgui
 
 SUBDIRS += ImtLicensePck
 ImtLicensePck.file = ../../Impl/ImtLicensePck/QMake/ImtLicensePck.pro
@@ -161,7 +161,7 @@ ImtLicensePck.depends = imtbase
 
 SUBDIRS += ImtLicenseGqlPck
 ImtLicenseGqlPck.file = ../../Impl/ImtLicenseGqlPck/QMake/ImtLicenseGqlPck.pro
-ImtLicenseGqlPck.depends = imtlicgql
+ImtLicenseGqlPck.depends = imtlicgql imtlicgui
 
 SUBDIRS += ImtLicenseGuiPck
 ImtLicenseGuiPck.file = ../../Impl/ImtLicenseGuiPck/QMake/ImtLicenseGuiPck.pro
@@ -208,6 +208,7 @@ ImtGuiGqlPck.depends = imtgui imtguigql imtgql
 
 SUBDIRS += ImtQmlPck
 ImtQmlPck.file = ../../Impl/ImtQmlPck/QMake/ImtQmlPck.pro
+ImtQmlPck.depends = imtqml imtgui
 
 SUBDIRS += ImtLogPck
 ImtLogPck.file = ../../Impl/ImtLogPck/QMake/ImtLogPck.pro
@@ -223,7 +224,7 @@ Imt3dViewPck.depends = imt3dview
 
 SUBDIRS += Imt3dGuiPck
 Imt3dGuiPck.file = ../../Impl/Imt3dGuiPck/QMake/Imt3dGuiPck.pro
-Imt3dGuiPck.depends = imt3dview imt3dgui
+Imt3dGuiPck.depends = imt3dview imt3dgui imtgui
 
 SUBDIRS += ImtZipPck
 ImtZipPck.file = ../../Impl/ImtZipPck/QMake/ImtZipPck.pro
@@ -257,7 +258,7 @@ ImtAppPck.depends = imtapp
 
 SUBDIRS += ImtAuthDbPck
 ImtAuthDbPck.file = ../../Impl/ImtAuthDbPck/QMake/ImtAuthDbPck.pro
-ImtAuthDbPck.depends = imtauthdb
+ImtAuthDbPck.depends = imtauthdb imtdb
 
 SUBDIRS += ImtAuthGqlPck
 ImtAuthGqlPck.file = ../../Impl/ImtAuthGqlPck/QMake/ImtAuthGqlPck.pro

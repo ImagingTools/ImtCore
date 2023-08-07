@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(ImtControlsGallery);
 
 
-	Q_INIT_RESOURCE(Webimtgui);
+	Q_INIT_RESOURCE(imtguiTheme);
 
 	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
