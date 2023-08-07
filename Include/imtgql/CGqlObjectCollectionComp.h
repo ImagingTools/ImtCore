@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <icomp/CComponentBase.h>
+#include <idoc/CStandardDocumentMetaInfo.h>
 #include <ilog/TLoggerCompWrap.h>
 #include <iprm/COptionsManager.h>
 
@@ -11,9 +12,14 @@
 #include <imtgql/IGqlObjectCollectionDelegate.h>
 #include <imtgql/IGqlSubscriptionManager.h>
 #include <imtgql/IGqlClient.h>
+#include <imtbase/CCollectionInfo.h>
 #include <imtbase/TModelUpdateBinder.h>
 #include <imtbase/ICollectionDataController.h>
 #include <imtbase/IObjectCollection.h>
+
+#include <imtbase/TICollectionStructure.h>
+#include <imtbase/TIStructuredCollectionInfo.h>
+#include <imtbase/IStructuredCollectionInserter.h>
 
 
 namespace imtbase
@@ -31,20 +37,26 @@ class CGqlObjectCollectionComp:
 			public ilog::TLoggerCompWrap<icomp::CComponentBase>,
 			virtual public imtbase::IObjectCollection,
 			virtual public imtbase::ICollectionDataController,
-			virtual public IGqlSubscriptionClient
+			virtual public IGqlSubscriptionClient,
+			virtual public imtbase::IObjectCollectionStructure,
+			virtual public imtbase::IStructuredCollectionInserter,
+			virtual public imtbase::IStructuredCollectionFinder
 {
 	Q_OBJECT
 public:
 	typedef ilog::TLoggerCompWrap<icomp::CComponentBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlObjectCollectionComp);
+		I_REGISTER_INTERFACE(imtbase::IObjectCollectionStructure);
+		I_REGISTER_INTERFACE(imtbase::IObjectCollectionStructureInfo);
+		I_REGISTER_INTERFACE(imtbase::IStructuredCollectionInserter);
 		I_REGISTER_INTERFACE(IObjectCollection);
 		I_REGISTER_INTERFACE(IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(ICollectionInfo);
 		I_REGISTER_INTERFACE(istd::IChangeable);
 		I_ASSIGN(m_gqlClientCompPtr, "ApiClient", "GraphQL API client", true, "ApiClient");
 		I_ASSIGN(m_subscriptionManagerCompPtr, "SubscriptionManager", "GraphQL subscription manager", true, "SubscriptionManager");
-		I_ASSIGN_MULTI_0(m_gqlDatabaseDelegatesCompPtr, "GqlDatabaseDelegates", "GraphQL-based document delegate for database CRUD oeprations", true);
+		I_ASSIGN(m_gqlDatabaseDelegateCompPtr, "GqlDatabaseDelegate", "GraphQL-based document delegate for database CRUD oeprations", true, "GqlObjectCollectionDelegate");
 		I_ASSIGN_MULTI_0(m_typeIdsAttrPtr, "TypeIds", "List of type-ID corresponding to the registered factories", false);
 		I_ASSIGN_MULTI_0(m_typeNamesAttrPtr, "TypeNames", "List of type names corresponding to the registered factories", false);
 		I_ASSIGN_MULTI_0(m_objectFactoriesCompPtr, "ObjectFactories", "List of factories used for object creation", false);
@@ -52,6 +64,68 @@ public:
 	I_END_COMPONENT;
 
 	CGqlObjectCollectionComp();
+
+	// reimplemented (imtbase::IStructuredCollectionFinder)
+	virtual QByteArrayList FindObjectParentNodes(const QByteArray& objectId) const override;
+
+	// reimpolemented (imtbase::IStructuredCollectionInserter)
+	virtual QByteArray InsertNewObject(
+				const QByteArray& typeId,
+				const QString& name,
+				const QString& description,
+				IObjectCollection::DataPtr defaultValuePtr = IObjectCollection::DataPtr(),
+				const Id& proposedObjectId = Id(),
+				const Id& nodeId = Id(),
+				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
+				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+
+	// reimpolemented (imtbase::TICollectionStructure)
+	virtual QByteArray InsertNewNode(
+				const QString& name,
+				const QString& description = QString(),
+				const QByteArray& proposedNodeId = QByteArray(),
+				const QByteArray& parentNodeId = QByteArray(),
+				const idoc::IDocumentMetaInfo* metaInfoPtr = nullptr,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool SetNodeName(
+				const QByteArray& nodeId,
+				const QString& name,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool SetNodeDescription(
+				const QByteArray& nodeId,
+				const QString& description,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool SetNodeMetaInfo(
+				const QByteArray& nodeId,
+				const idoc::IDocumentMetaInfo& metaInfo,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool MoveNode(
+				const QByteArray& nodeId,
+				const QByteArray& parentNodeId,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool RemoveNode(
+				const QByteArray& nodeId,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+
+	virtual bool AddObjectToNode(
+				const QByteArray& objectId,
+				const QByteArray& nodeId,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool MoveObjectToNode(
+				const QByteArray& objectId,
+				const QByteArray& fromNodeId,
+				const QByteArray& toNodeId,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	virtual bool RemoveObjectFromNode(
+				const QByteArray& objectId,
+				const QByteArray& nodeId,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+
+	// reimpolemented (imtbase::IObjectCollectionStructureInfo)
+	virtual QByteArrayList GetNodePath(const QByteArray& nodeId) const override;
+	virtual QSharedPointer<imtbase::IStructuredObjectCollectionInfo> GetNodeContent(const QByteArray& nodeId) const override;
+	virtual const imtbase::IStructuredCollectionFinder* GetCollectionFinder() const override;
 
 	// reimplemented (IObjectCollection)
 	virtual const imtbase::IRevisionController* GetRevisionController() const override;
@@ -125,7 +199,6 @@ protected:
 
 protected:
 	QString GetDocumentExtension(const QByteArray& typeId) const;
-	IGqlObjectCollectionDelegate* GetDelegateForType(const QByteArray& typeId) const;
 
 protected:
 	IObjectCollection::DataPtr GetDocument(const QByteArray& typeId, const QByteArray& documentId) const;
@@ -133,7 +206,7 @@ protected:
 protected:
 	I_REF(imtgql::IGqlClient, m_gqlClientCompPtr);
 	I_REF(imtgql::IGqlSubscriptionManager, m_subscriptionManagerCompPtr);
-	I_MULTIREF(IGqlObjectCollectionDelegate, m_gqlDatabaseDelegatesCompPtr);
+	I_REF(IGqlObjectCollectionDelegate, m_gqlDatabaseDelegateCompPtr);
 	I_MULTIATTR(QByteArray, m_typeIdsAttrPtr);
 	I_MULTITEXTATTR(m_typeNamesAttrPtr);
 	I_MULTIFACT(istd::IChangeable, m_objectFactoriesCompPtr);
@@ -146,7 +219,6 @@ protected:
 
 	struct Item
 	{
-		QByteArray orgId;
 		QByteArray parentId;
 		bool isBranch;
 		QString name;
@@ -154,6 +226,9 @@ protected:
 	};
 	mutable QMap<QByteArray, Item> m_items;
 	QByteArray m_addMeasurementSubsriptionId;
+
+	imtbase::CCollectionInfo m_objectinfo;
+	idoc::CStandardDocumentMetaInfo m_nodeMetaInfo;
 };
 
 

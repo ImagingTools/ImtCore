@@ -29,7 +29,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (IGqlObjectCollectionDelegate)
-	virtual QByteArray GetSupportedObjectTypeId() const override;
+	virtual QByteArrayList GetSupportedObjectTypeIds() const override;
 	virtual imtcom::IFileTransfer* GetFileTransfer() const override;
 
 protected:

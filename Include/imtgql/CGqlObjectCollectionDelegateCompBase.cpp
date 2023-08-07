@@ -7,9 +7,9 @@ namespace imtgql
 
 // reimplemented (IGqlObjectCollectionDelegate)
 
-QByteArray CGqlObjectCollectionDelegateCompBase::GetSupportedObjectTypeId() const
+QByteArrayList CGqlObjectCollectionDelegateCompBase::GetSupportedObjectTypeIds() const
 {
-	return *m_objectTypeIdAttrPtr;
+	return { *m_objectTypeIdAttrPtr };
 }
 
 

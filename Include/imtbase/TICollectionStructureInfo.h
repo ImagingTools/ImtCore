@@ -2,8 +2,8 @@
 
 
 // ImtCore includes
-#include <imtbase/IObjectCollectionInfo.h>
-#include <imtbase/ICollectionFilter.h>
+#include <imtbase/TIStructuredCollectionInfo.h>;
+#include <imtbase/IStructuredCollectionFinder.h>;
 
 
 namespace idoc
@@ -14,41 +14,6 @@ namespace idoc
 
 namespace imtbase
 {
-
-
-class ICollectionInfo;
-class IStructuredCollectionFinder;
-
-
-template <class BaseInterface>
-class TIStructuredCollectionInfo : virtual public BaseInterface
-{
-public:
-	enum ElementType
-	{
-		ET_NODE,
-		ET_ELEMENT
-	};
-
-	virtual ElementType GetElementType(const QByteArray& elementId) const = 0;
-	virtual QByteArrayList GetBasePath() const = 0;
-};
-
-typedef TIStructuredCollectionInfo<imtbase::ICollectionInfo> IStructuredCollectionInfo;
-typedef TIStructuredCollectionInfo<imtbase::IObjectCollectionInfo> IStructuredObjectCollectionInfo;
-
-
-class IHierarchicalCollectionFilter: virtual public ICollectionFilter
-{
-	enum FilterTypeFlags
-	{
-		FTF_NODE = 1,
-		FTF_OBJECT = 2
-	};
-
-	virtual int GetFilterTypeFlags() = 0;
-	virtual void SetFilterTypeFlags(int flags) = 0;
-};
 
 
 template <class BaseInterface>

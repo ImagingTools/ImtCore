@@ -2,14 +2,15 @@
 
 
 // ImtCore includes
-#include <imtbase/ICollectionStructureInfo.h>
+#include <imtbase/TICollectionStructureInfo.h>
 
 
 namespace imtbase
 {
 
 
-class IObjectCollectionStructure: virtual public IObjectCollectionStructureInfo
+template<class BaseInterface>
+class TICollectionStructure: virtual public BaseInterface
 {
 public:
 	virtual QByteArray InsertNewNode(
@@ -53,6 +54,9 @@ public:
 				const QByteArray& nodeId,
 				const IOperationContext* operationContextPtr = nullptr) = 0;
 };
+
+
+typedef TICollectionStructure<IObjectCollectionStructureInfo> IObjectCollectionStructure;
 
 
 } // namespace imtbase
