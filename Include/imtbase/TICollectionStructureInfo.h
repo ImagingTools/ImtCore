@@ -2,8 +2,8 @@
 
 
 // ImtCore includes
-#include <imtbase/TIStructuredCollectionInfo.h>;
-#include <imtbase/IStructuredCollectionFinder.h>;
+#include <imtbase/TIStructuredCollectionInfo.h>
+#include <imtbase/IStructuredCollectionFinder.h>
 
 
 namespace idoc
