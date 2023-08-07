@@ -200,6 +200,7 @@ bool CRemoteFileController::SendFile(const QString& fileUrl)
 		QNetworkReply* reply = accessManager->post(request, payload);
 		connect(reply, &QNetworkReply::uploadProgress, this, &CRemoteFileController::OnProgressChanged);
 		connect(reply, &QNetworkReply::finished, this, &CRemoteFileController::OnFileUploaded);
+		connect(reply, &QNetworkReply::finished, this, &CRemoteFileController::OnFileExists);
 
 		return true;
 	}
@@ -207,6 +208,21 @@ bool CRemoteFileController::SendFile(const QString& fileUrl)
 	return false;
 }
 
+void CRemoteFileController::OnFileExists()
+{
+/*	QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
+	if(reply){
+		QByteArray representationData = reply->readAll();
+		qDebug() << representationData;
+		setJson(representationData);
+		SetState("Ready");
+		if (!reply->error()){
+			Q_EMIT fileExists();
+		}
+
+		reply->deleteLater();
+	}*/
+}
 
 void CRemoteFileController::OnFileDeleted()
 {

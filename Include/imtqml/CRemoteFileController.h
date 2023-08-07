@@ -49,6 +49,7 @@ public Q_SLOTS:
 	virtual bool OpenFile(const QString& filePath = QString()) const;
 
 private Q_SLOTS:
+	void OnFileExists();
 	void OnFileDeleted();
 	void OnFileDownloaded();
 	void OnFileUploaded();
@@ -66,6 +67,7 @@ signals:
 	void fileUploadFailed();
 	void fileDeleteFailed();
 	void fileDownloadFailed();
+	void fileExists();
 
 	void prefixChanged();
 
