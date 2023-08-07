@@ -52,6 +52,7 @@ require('./components/MapQuickItem')
 require('./components/MapItemView')
 require('./components/Binding')
 require('./components/InnerShadow')
+require('./components/PluginParameter')
 
 QML.Qt = Qt
 for(let key in Qt){
