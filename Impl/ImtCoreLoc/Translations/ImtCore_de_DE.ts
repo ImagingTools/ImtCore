@@ -658,7 +658,7 @@
     <message>
         <location line="-189"/>
         <source>Enter the login</source>
-        <translation>Geben Sie den Login ein</translation>
+        <translation>Geben Sie Ihre Benutzerkennung ein</translation>
     </message>
     <message>
         <location line="+34"/>
@@ -668,7 +668,7 @@
     <message>
         <location line="+17"/>
         <source>Enter the password</source>
-        <translation>Passwort eintragen</translation>
+        <translation>Passwort eingeben</translation>
     </message>
     <message>
         <location line="+69"/>
@@ -2035,7 +2035,7 @@
     <message>
         <location line="+2"/>
         <source>Enter the password</source>
-        <translation>Passwort eintragen</translation>
+        <translation>Altes Passwort eingeben</translation>
     </message>
     <message>
         <location line="+21"/>

@@ -5,7 +5,5 @@
     <qresource prefix="/Style">
         <file alias="dark.theme">dark.theme</file>
         <file alias="light.theme">light.theme</file>
-	<file alias="blue.theme">blue.theme</file>
-	<file alias="orange.theme">orange.theme</file>
-     </qresource>
+    </qresource>
 </RCC>
