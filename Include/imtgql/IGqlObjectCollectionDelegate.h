@@ -24,6 +24,12 @@ namespace imtgql
 class IGqlObjectCollectionDelegate: virtual public istd::IPolymorphic
 {
 public:
+	enum MetaInfoType
+	{
+		MIT_KEYWORDS = idoc::IDocumentMetaInfo::MIT_USER + 30000,
+		MIT_VERSION
+	};
+
 	/**
 		Get the ID of the supported document type.
 	*/
