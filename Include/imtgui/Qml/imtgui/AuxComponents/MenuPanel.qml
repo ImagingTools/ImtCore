@@ -32,9 +32,29 @@ Rectangle {
 
     signal activePageChanged;
 
+    Component.onCompleted: {
+        Events.subscribeEvent("ChangePage", menuPanel.changePage);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("ChangePage", menuPanel.changePage);
+    }
+
     function clearModels(){
         lvPages.model = 0;
         menuPanel.activePageIndex = -1;
+    }
+
+    function changePage(pageId){
+        console.log("MenuPanel onChangePage", pageId);
+        for(var i = 0; i < lvPages.count; ++i){
+            let item = lvPages.itemAtIndex(i);
+            console.log("index", i)
+            console.log("item", item)
+            if(item.pageId === pageId){
+                item.clicked();
+            }
+        }
     }
 
     onModelChanged: {
@@ -80,6 +100,7 @@ Rectangle {
                                                      "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_On_Normal.svg";
             decoratorSource : Style.menuButtonDecoratorPath;
             selected: menuPanel.activePageIndex === model.index;
+            property string pageId: model["Id"];
 
             onClicked: {
 //                lvPages.currentIndex = model.index;
