@@ -100,7 +100,7 @@ export class TextEdit extends Item {
         // }
     }
     $focusChanged(){
-        super.$focusChanged()
+        // super.$focusChanged()
         if(this.$p.focus.val) {
             this.$updateGeometry()
             this.impl.focus()
@@ -342,7 +342,7 @@ export class TextEdit extends Item {
             } else {
                 this.focus = true
             }
-            
+
             state.release()
 		}
 	}

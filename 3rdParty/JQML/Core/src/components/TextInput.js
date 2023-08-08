@@ -160,7 +160,7 @@ export class TextInput extends Item {
         }
     }
     $focusChanged(){
-        super.$focusChanged()
+        // super.$focusChanged()
         if(this.$p.focus.val) {
             this.impl.focus()
             Core.setFocus(this)
@@ -353,7 +353,7 @@ export class TextInput extends Item {
             } else {
                 this.focus = true
             }
-            
+
             state.release()
 		}
 	}

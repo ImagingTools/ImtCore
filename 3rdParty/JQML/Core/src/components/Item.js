@@ -96,6 +96,16 @@ export class Item extends QtObject {
             horizontalCenterOffset: 0,
         }, this.$anchorsChanged)
 
+        this.$cPC('KeyNavigation', {
+            backtab: undefined,
+            down: undefined,
+            left: undefined,
+            priority : '',
+            right: undefined,
+            tab: undefined,
+            up: undefined,
+        })
+
         this.$cS('Keys.asteriskPressed')
         this.$cS('Keys.backPressed')
         this.$cS('Keys.backtabPressed')
@@ -259,6 +269,12 @@ export class Item extends QtObject {
     }
     $focusChanged(){
         // this.dom.focus()
+        if(this.$p.focus.val) {
+            this.dom.focus()
+            Core.setFocus(this)
+        } else {
+            this.dom.blur()
+        }
     }
     $rotationAndScaleChanged(){
         this.dom.style.transform = `scale(${this.scale}) rotate(${this.rotation}deg)`

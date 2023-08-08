@@ -94,15 +94,15 @@ export class MouseArea extends Item {
 			case 2: this.mouse.button = Qt.RightButton; this.mouse.buttons = Qt.RightButton; break;
 		}				
 	}
-	$focusChanged(){
-        super.$focusChanged()
-        if(this.$p.focus.val) {
-            this.dom.focus()
-            Core.setFocus(this)
-        } else {
-            this.dom.blur()
-        }
-    }
+	// $focusChanged(){
+    //     super.$focusChanged()
+    //     if(this.$p.focus.val) {
+    //         this.dom.focus()
+    //         Core.setFocus(this)
+    //     } else {
+    //         this.dom.blur()
+    //     }
+    // }
 	$feelWheel(e){
 		// this.wheel.accepted = false
 		this.wheel.x = e.offsetX
@@ -162,7 +162,7 @@ export class MouseArea extends Item {
 				let now = new Date().getTime()
 				if(this.$lastClickOrTouch){
 					if(now - this.$lastClickOrTouch > 250 || Object.keys(this.doubleClicked.connections).length === 0){
-						this.setFocus(true)
+						if(Core.focusedElement.$qmlClassName === 'TextInput' || Core.focusedElement.$qmlClassName === 'TextEdit') Core.focusedElement.focus = false
 						this.clicked();
 						this.$lastClickOrTouch = now
 					} else {
@@ -170,7 +170,7 @@ export class MouseArea extends Item {
 						this.$lastClickOrTouch = now
 					}
 				} else {
-					this.setFocus(true)
+					if(Core.focusedElement.$qmlClassName === 'TextInput' || Core.focusedElement.$qmlClassName === 'TextEdit') Core.focusedElement.focus = false
 					this.clicked();
 					this.$lastClickOrTouch = now
 				}
@@ -282,7 +282,7 @@ export class MouseArea extends Item {
 			let now = new Date().getTime()
 			if(this.$lastClickOrTouch){
 				if(now - this.$lastClickOrTouch > 250 || Object.keys(this.doubleClicked.connections).length === 0){
-					this.setFocus(true)
+					if(Core.focusedElement.$qmlClassName === 'TextInput' || Core.focusedElement.$qmlClassName === 'TextEdit') Core.focusedElement.focus = false
 					this.clicked();
 					this.$lastClickOrTouch = now
 				} else {
@@ -290,7 +290,7 @@ export class MouseArea extends Item {
 					this.$lastClickOrTouch = now
 				}
 			} else {
-				this.setFocus(true)
+				if(Core.focusedElement.$qmlClassName === 'TextInput' || Core.focusedElement.$qmlClassName === 'TextEdit') Core.focusedElement.focus = false
 				this.clicked();
 				this.$lastClickOrTouch = now
 			}

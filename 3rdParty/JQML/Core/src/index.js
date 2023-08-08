@@ -564,10 +564,50 @@ global.Core = {
                         Core.shortcuts.splice(Core.shortcuts.indexOf(currentShortcuts[currentShortcuts.length-1]), 1)
                         Core.shortcuts.unshift(currentShortcuts[currentShortcuts.length-1])
                     }
+                    return
                 }
                 
             }
             
+            if(this.focusedElement && this.focusedElement.KeyNavigation){
+                if(e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt') return
+
+                if(e.key === 'ArrowLeft') {
+                    if(this.focusedElement.KeyNavigation.left){
+                        e.preventDefault()
+                        this.focusedElement.KeyNavigation.left.focus = true
+                    }
+                }
+                if(e.key === 'ArrowRight') {
+                    if(this.focusedElement.KeyNavigation.right){
+                        e.preventDefault()
+                        this.focusedElement.KeyNavigation.right.focus = true
+                    }
+                }
+                if(e.key === 'ArrowUp') {
+                    if(this.focusedElement.KeyNavigation.up){
+                        e.preventDefault()
+                        this.focusedElement.KeyNavigation.up.focus = true
+                    }
+                }
+                if(e.key === 'ArrowDown') {
+                    if(this.focusedElement.KeyNavigation.down){
+                        e.preventDefault()
+                        this.focusedElement.KeyNavigation.down.focus = true
+                    }
+                }
+                if(e.key === 'Tab' && e.shiftKey) {
+                    if(this.focusedElement.KeyNavigation.backtab){
+                        e.preventDefault()
+                        this.focusedElement.KeyNavigation.backtab.focus = true
+                    }
+                } else if(e.key === 'Tab') {
+                    if(this.focusedElement.KeyNavigation.tab){
+                        e.preventDefault()
+                        this.focusedElement.KeyNavigation.tab.focus = true
+                    }
+                }
+            }
         }
 
 		
