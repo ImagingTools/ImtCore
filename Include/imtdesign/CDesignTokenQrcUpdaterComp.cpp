@@ -122,6 +122,8 @@ bool CDesignTokenQrcUpdaterComp::CreateQrcForDirs(const QStringList& inputDirNam
 		QStringList dirParts = dir.split(QDir::separator());
 		if (dirParts.size() > 2){
 			prefix += dirParts[dirParts.size() - 2];
+			prefix += "/";
+			prefix += dirParts[dirParts.size() - 1];
 		}
 		CreateSingleEntry(prefix, dir, GetPathOverFile(dir, outputFileName), xmlWriter);
 	}
@@ -169,8 +171,9 @@ bool CDesignTokenQrcUpdaterComp::CreateSingleEntry(const QString& prefix, const 
 	filters = QDir::Filter::Dirs | QDir::NoDotAndDotDot;
 	files = QDir(inputDirPath).entryInfoList(filters, sort);
 	for (const QFileInfo& file : ::qAsConst(files)){
-		if(prefix == "/Icons" && file.baseName() == "Color"){
-			CreateSingleEntry("/ColorIcons",file.absoluteFilePath(), path + QDir::separator().toLatin1() + file.fileName(),xmlWriter);
+		if(prefix.contains("/Icons") && file.baseName() == "Color"){
+			QString theme = prefix.right(prefix.count() - 6);
+			CreateSingleEntry("/ColorIcons" + theme,file.absoluteFilePath(), path + QDir::separator().toLatin1() + file.fileName(),xmlWriter);
 		}
 		else{
 			CreateSingleEntryInCurrentPrefix(file.absoluteFilePath(), path + QDir::separator().toLatin1() + file.fileName(),xmlWriter);
