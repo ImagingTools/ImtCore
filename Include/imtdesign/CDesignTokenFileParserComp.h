@@ -20,7 +20,9 @@ namespace imtdesign
 {
 
 
-class CDesignTokenFileParserComp: public ilog::CLoggerComponentBase, public IDesignTokenFileParser
+class CDesignTokenFileParserComp:
+			public ilog::CLoggerComponentBase,
+			public IDesignTokenFileParser
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
@@ -33,17 +35,15 @@ public:
 	virtual bool ParseFile() override;
 	virtual bool SplitFile(const QString& outputDirPath, const QString& projectName) override;
 	virtual bool SetFile(const QByteArray& filePath) override;
-
 	virtual QByteArray GetRawColor(const QByteArray& styleName, QPalette::ColorGroup group, QPalette::ColorRole role) const override;
 	virtual bool GetStyleSheetColorPalette(const QByteArray& designSchemaId, QVariantMap& palette) const override;
 	virtual bool GetBasePalette(const QByteArray& designSchemaId, QVariantMap& palette) const override;
-
 	virtual QByteArray GetTemplateIconColor(const QByteArray& styleName) const override;
 	virtual QByteArray GetIconColor(const QByteArray& styleName, IconState iconState) const override;
 
 	// reimplemented (IColorPaletteProvider)
 	virtual const imtbase::ICollectionInfo& GetDesignSchemaList() const override;
-	virtual bool GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const override;
+	virtual bool GetColorPalette(const QByteArray& designSchemaId, ColorSchema& palette) const override;
 
 	// reimplemented (IFontProvider)
 	virtual const imtbase::ICollectionInfo& GetFontList(const QByteArray& designSchemaId) const override;
@@ -65,7 +65,7 @@ private:
 	QVariantMap m_iconColors;
 	QMap<QString, QVariantMap> m_stylesPalettes;
 	QMap<QString, QVariantMap> m_stylesBasePalettes;
-	QMap<QString, QPalette> m_colorPalettes;
+	QMap<QString, ColorSchema> m_colorPalettes;
 
 	QMap<QString, istd::TSmartPtr<imtbase::ICollectionInfo>> m_fontsCollectionInfos;
 	QMap<QString, QMap<QByteArray, QFont>> m_fonts;
@@ -83,7 +83,6 @@ private:
 		QByteArray value;
 	};
 	QMultiMap<QByteArray, RawColor> m_styleSheetColors;
-
 };
 
 

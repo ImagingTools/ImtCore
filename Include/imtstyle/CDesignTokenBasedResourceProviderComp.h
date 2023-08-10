@@ -35,14 +35,14 @@ public:
 		I_REGISTER_INTERFACE(IDesignSchemaInfoProvider);
 		I_REGISTER_INTERFACE(IColorPaletteProvider);
 		I_REGISTER_INTERFACE(IFontProvider);
-		I_ASSIGN_MULTI_0(m_resourceFileNameAttrPtr, "ResourceFileNames", "Resource file names", false);
+		I_ASSIGN_MULTI_0(m_resourceFileNameAttrPtr, "ResourceFileNames", "Path to the resource file containing the theme", true);
 		I_ASSIGN_MULTI_0(m_designShemaIdAttrPtr, "DesignSchemaIds", "Design schema ids", false);
 		I_ASSIGN_MULTI_0(m_paletteModeAttrPtr, "PaletteModes", "Palette modes", false);
-		I_ASSIGN(m_designTokenFileParser, "DesignTokenFileParser", "DesignToken File Parser", false, "IDesignTokenFileParser");
+		I_ASSIGN(m_designTokenFileParserCompPtr, "DesignTokenFileParser", "DesignToken File Parser", false, "DesignTokenFileParser");
 	I_END_COMPONENT;
 
 	// reimplemented (IColorPaletteProvider)
-	virtual bool GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const override;
+	virtual bool GetColorPalette(const QByteArray& designSchemaId, ColorSchema& palette) const override;
 
 	// reimplemented (IFontProvider)
 	virtual const imtbase::ICollectionInfo& GetFontList(const QByteArray& designSchemaId) const override;
@@ -64,13 +64,13 @@ private:
 	I_MULTIATTR(QByteArray, m_resourceFileNameAttrPtr);
 	I_MULTIATTR(QByteArray, m_designShemaIdAttrPtr);
 	I_MULTIATTR(QByteArray, m_paletteModeAttrPtr);
-	I_REF(imtdesign::IDesignTokenFileParser, m_designTokenFileParser);
+	I_REF(imtdesign::IDesignTokenFileParser, m_designTokenFileParserCompPtr);
 
 	imtbase::CCollectionInfo m_designSchemaList;
 
 	imtbase::CCollectionInfo m_emptyCollectionInfo;
 
-	QMap<QByteArray, QPalette> m_paletteMap;
+	QMap<QByteArray, ColorSchema> m_paletteMap;
 	QMap<QByteArray, istd::TSmartPtr<imtbase::ICollectionInfo>> m_fontsCollectionInfos;
 	QMap<QByteArray, QMap<QByteArray, QFont>> m_fonts;
 

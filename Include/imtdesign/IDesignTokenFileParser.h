@@ -15,7 +15,9 @@
 namespace imtdesign
 {
 
-class IDesignTokenFileParser: virtual public imtstyle::IColorPaletteProvider, virtual public imtstyle::IFontProvider
+class IDesignTokenFileParser:
+			virtual public imtstyle::IColorPaletteProvider,
+			virtual public imtstyle::IFontProvider
 {
 public:
 	enum IconState

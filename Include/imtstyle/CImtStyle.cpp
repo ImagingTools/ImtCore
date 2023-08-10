@@ -70,7 +70,6 @@ namespace imtstyle
 
 // public methods
 
-
 CImtStyle* CImtStyle::m_instancePtr = nullptr;
 
 
@@ -84,37 +83,21 @@ CImtStyle* CImtStyle::GetInstance()
 }
 
 
-int CImtStyle::GetDesignSchemaCount() const
+QByteArray CImtStyle::GetActiveDesignSchemaId() const
 {
-	return DS_LAST;
+	return m_activeColorSchema.id;
 }
 
 
-CImtStyle::DesignSchema CImtStyle::GetDesignSchemaFromIndex(int index) const
-{
-	if (index >= 0 && index < CImtStyle::DS_LAST){
-		return (DesignSchema)index;
-	}
-
-	return DS_INVALID;
-}
-
-
-CImtStyle::DesignSchema CImtStyle::GetDesignSchema() const
-{
-	return m_designSchema;
-}
-
-
-void CImtStyle::SetDesignSchema(DesignSchema designSchema)
+void CImtStyle::SetActiveDesignSchema(const IColorPaletteProvider::ColorSchema& schema)
 {
 	if (m_blockerCount == 0){
-		if (m_designSchema != designSchema){
+		if (m_activeColorSchema.id != schema.id){
+			m_activeColorSchema = schema;
+
 			if (qApp != nullptr){
 				BaseClass::unpolish(qApp);
 			}
-
-			m_designSchema = designSchema;
 
 			EnsureStyleSheetApplied(true);
 
@@ -144,38 +127,6 @@ void CImtStyle::SetStyleType(StyleType styleType)
 }
 
 
-QByteArray CImtStyle::GetDesignSchemaId(DesignSchema designSchema) const
-{
-	switch (designSchema){
-	case DS_LIGHT:
-		return "Light";
-	case DS_DARK:
-		return "Dark";
-	default:
-		return QByteArray();
-	}
-}
-
-
-QString CImtStyle::GetDesignSchemaName(DesignSchema designSchema) const
-{
-	switch (designSchema){
-	case DS_LIGHT:
-		return tr("Light");
-	case DS_DARK:
-		return tr("Dark");
-	default:
-		return QString();
-	}
-}
-
-
-void CImtStyle::SetPalette(DesignSchema designSchema, const QPalette& palette)
-{
-	m_colorSchemaMap[designSchema].palette = palette;
-}
-
-
 // reimplemented (QStyle)
 
 void CImtStyle::polish(QWidget* widgetPtr)
@@ -186,7 +137,11 @@ void CImtStyle::polish(QWidget* widgetPtr)
 }
 
 
-void CImtStyle::drawPrimitive(QStyle::PrimitiveElement pe, const QStyleOption* option, QPainter* painter, const QWidget* widget) const
+void CImtStyle::drawPrimitive(
+			QStyle::PrimitiveElement pe,
+			const QStyleOption* option,
+			QPainter* painter,
+			const QWidget* widget) const
 {
 	if (m_styleType == ST_IMAGINGTOOLS){
 		if (pe == QStyle::PE_PanelButtonCommand){
@@ -236,7 +191,11 @@ QRect CImtStyle::subElementRect(SubElement subElement, const QStyleOption* optio
 }
 
 
-QSize CImtStyle::sizeFromContents(QStyle::ContentsType type, const QStyleOption* option, const QSize& contentsSize, const QWidget* widget) const
+QSize CImtStyle::sizeFromContents(
+			QStyle::ContentsType type,
+			const QStyleOption* option,
+			const QSize& contentsSize,
+			const QWidget* widget) const
 {
 	QSize size = BaseClass::sizeFromContents(type, option, contentsSize, widget);
 
@@ -266,8 +225,6 @@ void CImtStyle::DrawImagingToolsToolButton(
 	if (optionPtr == nullptr){
 		return;
 	}
-
-	ColorSchema colorSchema = m_colorSchemaMap[m_designSchema];
 
 	QRect rect = optionPtr->rect;
 	int shiftX = 0;
@@ -372,12 +329,7 @@ void CImtStyle::DrawImagingToolsToolButton(
 				else{
 					path.addRoundedRect(borderRect.adjusted(0, 0, 0, 0), 6, 6);
 
-					if (m_designSchema == DS_LIGHT){
-						painter->fillPath(path, Qt::white);
-					}
-					else{
-						painter->fillPath(path, QColor(88, 88, 88));
-					}
+					painter->fillPath(path, QColor("red"));
 				}
 
 				path = QPainterPath();
@@ -387,12 +339,12 @@ void CImtStyle::DrawImagingToolsToolButton(
 				gradient.setSpread(QGradient::PadSpread);
 
 				if (optionPtr->state & (State_Sunken | State_On)){
-					gradient.setColorAt(1, colorSchema.pressedToolButtonGradientColors.startColor);
-					gradient.setColorAt(0, colorSchema.pressedToolButtonGradientColors.endColor);
+					gradient.setColorAt(1, m_activeColorSchema.pressedToolButtonGradientColors.startColor);
+					gradient.setColorAt(0, m_activeColorSchema.pressedToolButtonGradientColors.endColor);
 				}
 				else{
-					gradient.setColorAt(0, colorSchema.toolButtonGradientColors.startColor);
-					gradient.setColorAt(1, colorSchema.toolButtonGradientColors.endColor);
+					gradient.setColorAt(0, m_activeColorSchema.toolButtonGradientColors.startColor);
+					gradient.setColorAt(1, m_activeColorSchema.toolButtonGradientColors.endColor);
 				}
 
 				painter->fillPath(path, gradient);
@@ -429,6 +381,8 @@ void CImtStyle::DrawImagingToolsToolButton(
 }
 
 
+// private methods
+
 void CImtStyle::EnsureStyleSheetApplied(bool force) const
 {
 	if (force){
@@ -441,19 +395,18 @@ void CImtStyle::EnsureStyleSheetApplied(bool force) const
 
 			QPixmapCache::clear();
 
-			const ColorSchema& colorSchema = m_colorSchemaMap[m_designSchema];
+			if (!m_activeColorSchema.id.isEmpty()){
+				qApp->setPalette(m_activeColorSchema.palette);
 
-			qApp->setPalette(colorSchema.palette);
+				QWidget widget;
+				iqtgui::SetStyleSheetFromFile(&widget, ":/Styles/ImtStyle");
 
-			QWidget widget;
+				QString geometryStyleSheet = widget.styleSheet();
+				iqtgui::SetStyleSheetFromFile(&widget, m_activeColorSchema.stylePath);
 
-			iqtgui::SetStyleSheetFromFile(&widget, ":/Styles/ImtStyle");
-
-			QString geometryStyleSheet = widget.styleSheet();
-			iqtgui::SetStyleSheetFromFile(&widget, colorSchema.stylePath);
-
-			QString imtStyle = widget.styleSheet();
-			qApp->setStyleSheet(geometryStyleSheet + imtStyle);
+				QString imtStyle = widget.styleSheet();
+				qApp->setStyleSheet(geometryStyleSheet + imtStyle);
+			}
 		}
 	}
 	else{
@@ -465,50 +418,10 @@ void CImtStyle::EnsureStyleSheetApplied(bool force) const
 // private methods
 
 CImtStyle::CImtStyle()
-	:m_designSchema(DS_LIGHT),
-	m_styleType(ST_IMAGINGTOOLS),
+	:m_styleType(ST_IMAGINGTOOLS),
 	m_wasStyleSheetInitialized(false),
 	m_blockerCount(0)
 {
-	ColorSchema light;
-	light.toolButtonGradientColors.startColor = QColor(248, 248, 251);
-	light.toolButtonGradientColors.endColor = QColor(235, 235, 238);
-	light.pressedToolButtonGradientColors.startColor = QColor(245, 245, 245);
-	light.pressedToolButtonGradientColors.endColor = QColor(245, 245, 245);
-	istd::TDelPtr<QStyle> baseStylePtr(QStyleFactory::create("fusion"));
-	light.palette = baseStylePtr->standardPalette();
-	light.palette.setColor(QPalette::Highlight, QColor("#1a76e7"));
-	light.palette.setColor(QPalette::Text, QColor("#335777"));
-	light.stylePath = ":/Styles/ImtColorStyle";
-
-	m_colorSchemaMap[DS_LIGHT] = light;
-
-	ColorSchema dark;
-	dark.toolButtonGradientColors.startColor = QColor(83, 83, 83);
-	dark.toolButtonGradientColors.endColor = QColor(58, 58, 58);
-	dark.pressedToolButtonGradientColors.startColor = QColor(77, 77, 77);
-	dark.pressedToolButtonGradientColors.endColor = QColor(77, 77, 77);
-	dark.palette.setColor(QPalette::Window, QColor(53, 53, 53));
-	dark.palette.setColor(QPalette::WindowText, Qt::white);
-	dark.palette.setColor(QPalette::Base, QColor(33, 33, 33));
-	dark.palette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
-	dark.palette.setColor(QPalette::ToolTipBase, Qt::lightGray);
-	dark.palette.setColor(QPalette::ToolTipText, Qt::lightGray);
-	dark.palette.setColor(QPalette::Text, Qt::lightGray);
-	dark.palette.setColor(QPalette::ButtonText, Qt::lightGray);
-	dark.palette.setColor(QPalette::BrightText, Qt::white);
-	dark.palette.setColor(QPalette::Link, QColor(42, 130, 218));
-	dark.palette.setColor(QPalette::Highlight, QColor("#1a76e7"));
-	dark.palette.setColor(QPalette::HighlightedText, Qt::white);
-	dark.palette.setColor(QPalette::Light, QColor(63, 63, 63));
-	dark.palette.setColor(QPalette::Midlight, QColor(58, 58, 58));
-	dark.palette.setColor(QPalette::Button, QColor(53, 53, 53));
-	dark.palette.setColor(QPalette::Mid, QColor(48, 48, 48));
-	dark.palette.setColor(QPalette::Dark, QColor(43, 43, 43));
-	dark.palette.setColor(QPalette::Shadow, QColor(30, 30, 30));
-	dark.stylePath = ":/Styles/ImtColorStyle";
-
-	m_colorSchemaMap[DS_DARK] = dark;
 }
 
 

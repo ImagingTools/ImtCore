@@ -107,9 +107,9 @@ bool CStandardCollectionViewDelegateComp::IsBundlePersistenceSupported(ifile::IF
 
 // reimplemented (iqtgui::TDesignSchemaHandlerWrap)
 
-void CStandardCollectionViewDelegateComp::OnDesignSchemaChanged()
+void CStandardCollectionViewDelegateComp::OnDesignSchemaChanged(const QByteArray& themeId)
 {
-	BaseClass2::OnDesignSchemaChanged();
+	BaseClass2::OnDesignSchemaChanged(themeId);
 
 	m_editContentsCommand.SetVisuals(tr("Edit"), tr("Edit"), tr("Edit existing object"), GetIcon(":/Icons/Edit"));
 }

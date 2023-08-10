@@ -6,7 +6,7 @@
 
 // ImtCore includes
 #include <imtstyle/CDesignTokenBasedResourceProviderComp.h>
-#include <imtstyle/CDesignManagerComp.h>
+#include <imtstyle/CDesignManagerCompBase.h>
 
 
 /**
@@ -17,7 +17,7 @@ namespace ImtStylePck
 
 
 typedef imtstyle::CDesignTokenBasedResourceProviderComp DesignTokenBasedResourceProvider;
-typedef icomp::TModelCompWrap<imtstyle::CDesignManagerComp> DesignManager;
+typedef icomp::TModelCompWrap<imtstyle::CDesignManagerCompBase> DesignManager;
 
 
 } // namespace ImtStylePck

@@ -113,17 +113,21 @@ protected:
 	iqtgui::CHierarchicalCommand m_redoCommand;
 	iqtgui::CHierarchicalCommand m_closeCommand;
 
-	class UiResourcesManager: public iqtgui::TMakeIconProviderCompWrap<iqtgui::TDesignSchemaHandlerWrap<QObject>>
+	class UiResourcesManager: public iqtgui::TMakeIconProviderCompWrap<QObject>
 	{
 	public:
+		typedef iqtgui::TMakeIconProviderCompWrap<QObject> BaseClass;
+
 		UiResourcesManager(TStandardDocumentViewDecorator& parent)
 			:m_parent(parent)
 		{
 		}
 
 	protected:
-		virtual void OnDesignSchemaChanged() override
+		virtual void OnDesignSchemaChanged(const QByteArray& themeId) override
 		{
+			BaseClass::OnDesignSchemaChanged(themeId);
+
 			m_parent.UpdateAppearance();
 		}
 

@@ -25,7 +25,6 @@
 #include <imtgui/CPluginStatusViewerComp.h>
 #include <imtgui/CPluginStatusMonitorViewDelegateComp.h>
 #include <imtgui/CApplicationSwitchCommandComp.h>
-#include <imtgui/CDesignManagerComp.h>
 #include <imtwidgets/CMenuPanelDelegate.h>
 #include <imtwidgets/CMenuPanelDelegateMin.h>
 #include <imtgui/CVirtualKeyboardShowCommandComp.h>
@@ -72,7 +71,6 @@ typedef imtgui::CStandardCollectionViewDelegateComp StandardCollectionViewDelega
 typedef imtgui::CPluginStatusViewerComp PluginStatusViewer;
 typedef imtgui::CPluginStatusMonitorViewDelegateComp PluginStatusMonitorViewDelegate;
 typedef imtgui::CApplicationSwitchCommandComp ApplicationSwitchCommand;
-typedef icomp::TModelCompWrap<imtgui::CDesignManagerComp> DesignManager;
 typedef imtgui::CVirtualKeyboardShowCommandComp VirtualKeyboardShowCommand;
 typedef imtgui::CFullScreenCommandComp FullScreenCommand;
 typedef icomp::TMakeComponentWrap<imtwidgets::CMenuPanelDelegate, imtwidgets::IMenuPanelDelegate> MenuPanelDelegate;

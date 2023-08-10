@@ -464,7 +464,7 @@ void CThumbnailDecoratorGuiComp::OnGuiDesignChanged()
 	BaseClass::OnGuiDesignChanged();
 
 	if (IsGuiCreated()){
-		iqtgui::SetStyleSheetFromFile(GetWidget(), ":/Styles/ThumbnailDecoratorGui");
+		iqtgui::SetStyleSheetFromFile(GetWidget(), GetStyleSheetPath(":/Styles/ThumbnailDecoratorGui"));
 
 		LoginControlButton->setIcon(GetIcon(":/Icons/Account"));
 		ExitButton->setIcon(GetIcon(":/Icons/PowerOff"));

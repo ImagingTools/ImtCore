@@ -59,7 +59,7 @@ void CPopupTestGuiComp::OnGuiCreated()
 
 // reimplemented (iqtgui::TDesignSchemaHandlerWrap)
 
-void CPopupTestGuiComp::OnDesignSchemaChanged()
+void CPopupTestGuiComp::OnDesignSchemaChanged(const QByteArray& /*themeId*/)
 {
 	SetStatusIcon(GetIcon(":/Icons/Log"));
 }

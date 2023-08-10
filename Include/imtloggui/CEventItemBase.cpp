@@ -90,7 +90,7 @@ void CEventItemBase::RemoveMetaInfo(int /*metaInfoType*/)
 }
 
 
-QByteArray CEventItemBase::GetMetaInfoId(int metaInfoType) const
+QByteArray CEventItemBase::GetMetaInfoId(int /*metaInfoType*/) const
 {
 	return QByteArray();
 }

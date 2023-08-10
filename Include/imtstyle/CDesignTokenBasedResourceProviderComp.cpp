@@ -24,10 +24,12 @@ namespace imtstyle
 
 // public methods
 
-bool CDesignTokenBasedResourceProviderComp::GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const
+bool CDesignTokenBasedResourceProviderComp::GetColorPalette(
+			const QByteArray& designSchemaId,
+			ColorSchema& palette) const
 {
-	if(m_designTokenFileParser.IsValid()){
-		return m_designTokenFileParser->GetColorPalette(designSchemaId, palette);
+	if(m_designTokenFileParserCompPtr.IsValid()){
+		return m_designTokenFileParserCompPtr->GetColorPalette(designSchemaId, palette);
 	}
 
 	if (m_paletteMap.contains(designSchemaId)){
@@ -44,8 +46,8 @@ bool CDesignTokenBasedResourceProviderComp::GetColorPalette(const QByteArray& de
 
 const imtbase::ICollectionInfo& CDesignTokenBasedResourceProviderComp::GetFontList(const QByteArray& designSchemaId) const
 {
-	if(m_designTokenFileParser.IsValid()){
-		return m_designTokenFileParser->GetFontList(designSchemaId);
+	if(m_designTokenFileParserCompPtr.IsValid()){
+		return m_designTokenFileParserCompPtr->GetFontList(designSchemaId);
 	}
 
 	if (m_fonts.contains(designSchemaId) && m_fontsCollectionInfos[designSchemaId].GetPtr() != nullptr){
@@ -58,8 +60,8 @@ const imtbase::ICollectionInfo& CDesignTokenBasedResourceProviderComp::GetFontLi
 
 bool CDesignTokenBasedResourceProviderComp::GetFont(const QByteArray& designSchemaId, const QByteArray& fontId, QFont& font) const
 {	
-	if(m_designTokenFileParser.IsValid()){
-		return m_designTokenFileParser->GetFont(designSchemaId, fontId, font);
+	if(m_designTokenFileParserCompPtr.IsValid()){
+		return m_designTokenFileParserCompPtr->GetFont(designSchemaId, fontId, font);
 	}
 
 	if (m_fonts.contains(designSchemaId) && m_fonts[designSchemaId].contains(fontId)){
@@ -75,6 +77,10 @@ bool CDesignTokenBasedResourceProviderComp::GetFont(const QByteArray& designSche
 
 const imtbase::ICollectionInfo& CDesignTokenBasedResourceProviderComp::GetDesignSchemaList() const
 {
+	if(m_designTokenFileParserCompPtr.IsValid()){
+		return m_designTokenFileParserCompPtr->GetDesignSchemaList();
+	}
+
 	return m_designSchemaList;
 }
 
@@ -89,12 +95,18 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 
 	CreateDefaultPalettes();
 
-	int count = qMin(qMin(m_designShemaIdAttrPtr.GetCount(), m_paletteModeAttrPtr.GetCount()), m_resourceFileNameAttrPtr.GetCount());
+	int count = qMin(m_designShemaIdAttrPtr.GetCount(), m_resourceFileNameAttrPtr.GetCount());
 
 	for (int i = 0; i < count; i++){
-		if (m_designTokenFileParser.IsValid()){
-			m_designTokenFileParser->SetFile(m_resourceFileNameAttrPtr[i]);
-			m_designTokenFileParser->ParseFile();
+		if (!m_resourceFileNameAttrPtr.IsValid()){
+			Q_ASSERT(false);
+
+			continue;
+		}
+
+		if (m_designTokenFileParserCompPtr.IsValid()){
+			m_designTokenFileParserCompPtr->SetFile(m_resourceFileNameAttrPtr[i]);
+			m_designTokenFileParserCompPtr->ParseFile();
 		}
 		else{
 			QFile paletteFile(m_resourceFileNameAttrPtr[i]);
@@ -154,13 +166,14 @@ void CDesignTokenBasedResourceProviderComp::OnComponentCreated()
 
 						QByteArray designShemaId = m_designShemaIdAttrPtr[i];
 						if (m_designSchemaList.GetElementIds().contains(designShemaId)){
-							QPalette palette = m_paletteMap[designShemaId];
-							palette.setColor(QPalette::WindowText, textColor);
-							palette.setColor(QPalette::Text, textColor);
-							palette.setColor(QPalette::Window, backgroundColor);
-							palette.setColor(QPalette::Base, backgroundColor);
+							ColorSchema colorSchema = m_paletteMap[designShemaId];
+							colorSchema.id = designShemaId;
+							colorSchema.palette.setColor(QPalette::WindowText, textColor);
+							colorSchema.palette.setColor(QPalette::Text, textColor);
+							colorSchema.palette.setColor(QPalette::Window, backgroundColor);
+							colorSchema.palette.setColor(QPalette::Base, backgroundColor);
 
-							m_paletteMap[designShemaId] = palette;
+							m_paletteMap[designShemaId] = colorSchema;
 						}
 					}
 
@@ -212,32 +225,39 @@ int CDesignTokenBasedResourceProviderComp::GetCount() const
 
 void CDesignTokenBasedResourceProviderComp::CreateDefaultPalettes()
 {
+	ColorSchema light;
+	light.id = "Light";
 	istd::TDelPtr<QStyle> baseStylePtr(QStyleFactory::create("fusion"));
 	QPalette lightPalette = baseStylePtr->standardPalette();
-	lightPalette.setColor(QPalette::Highlight, QColor("#1a76e7"));
-	lightPalette.setColor(QPalette::Text, QColor("#335777"));
+	light.palette.setColor(QPalette::Highlight, QColor("#1a76e7"));
+	light.palette.setColor(QPalette::Text, QColor("#335777"));
+	light.toolButtonGradientColors.startColor = QColor(248, 248, 251);
+	light.toolButtonGradientColors.endColor = QColor(235, 235, 238);
+	light.pressedToolButtonGradientColors.startColor = QColor(245, 245, 245);
+	light.pressedToolButtonGradientColors.endColor = QColor(245, 245, 245);
+	light.stylePath = ":/Styles/Light/ImtColorStyle";
 
-	m_paletteMap["Light"] = lightPalette;
-
+	m_paletteMap["Light"] = light;
 	m_designSchemaList.InsertItem("Light", QObject::tr("Light"),"");
 
-	QPalette darkPalette;
-	darkPalette.setColor(QPalette::Window, QColor(53, 53, 53));
-	darkPalette.setColor(QPalette::WindowText, Qt::white);
-	darkPalette.setColor(QPalette::Base, QColor(33, 33, 33));
-	darkPalette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
-	darkPalette.setColor(QPalette::ToolTipBase, Qt::lightGray);
-	darkPalette.setColor(QPalette::ToolTipText, Qt::lightGray);
-	darkPalette.setColor(QPalette::Text, Qt::lightGray);
-	darkPalette.setColor(QPalette::Button, QColor(53, 53, 53));
-	darkPalette.setColor(QPalette::ButtonText, Qt::lightGray);
-	darkPalette.setColor(QPalette::BrightText, Qt::white);
-	darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
-	darkPalette.setColor(QPalette::Highlight, QColor("#1a76e7"));
-	darkPalette.setColor(QPalette::HighlightedText, Qt::white);
+	ColorSchema dark;
+	dark.id = "Dark";
+	dark.palette.setColor(QPalette::Window, QColor(53, 53, 53));
+	dark.palette.setColor(QPalette::WindowText, Qt::white);
+	dark.palette.setColor(QPalette::Base, QColor(33, 33, 33));
+	dark.palette.setColor(QPalette::AlternateBase, QColor(53, 53, 53));
+	dark.palette.setColor(QPalette::ToolTipBase, Qt::lightGray);
+	dark.palette.setColor(QPalette::ToolTipText, Qt::lightGray);
+	dark.palette.setColor(QPalette::Text, Qt::lightGray);
+	dark.palette.setColor(QPalette::Button, QColor(53, 53, 53));
+	dark.palette.setColor(QPalette::ButtonText, Qt::lightGray);
+	dark.palette.setColor(QPalette::BrightText, Qt::white);
+	dark.palette.setColor(QPalette::Link, QColor(42, 130, 218));
+	dark.palette.setColor(QPalette::Highlight, QColor("#1a76e7"));
+	dark.palette.setColor(QPalette::HighlightedText, Qt::white);
+	dark.stylePath = ":/Styles/Dark/ImtColorStyle";
 
-	m_paletteMap["Dark"] = darkPalette;
-
+	m_paletteMap["Dark"] = dark;
 	m_designSchemaList.InsertItem("Dark", QObject::tr("Dark"), "");
 }
 

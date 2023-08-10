@@ -178,7 +178,7 @@ void CQuickObjectCompBase::OnComponentCreated()
 }
 
 
-void CQuickObjectCompBase::OnModelNeedsReload(imtbase::CTreeItemModel *itemModelPtr)
+void CQuickObjectCompBase::OnModelNeedsReload(imtbase::CTreeItemModel* /*itemModelPtr*/)
 {
 }
 
@@ -215,7 +215,7 @@ bool CQuickObjectCompBase::QuickItemCreated::IsEnablingAllowed() const
 }
 
 
-bool CQuickObjectCompBase::QuickItemCreated::SetEnabled(bool isEnabled)
+bool CQuickObjectCompBase::QuickItemCreated::SetEnabled(bool /*isEnabled*/)
 {
 	return false;
 }
@@ -223,9 +223,9 @@ bool CQuickObjectCompBase::QuickItemCreated::SetEnabled(bool isEnabled)
 
 // reimplemented (iser::ISerializable)
 
-bool CQuickObjectCompBase::QuickItemCreated::Serialize(iser::IArchive& archive)
+bool CQuickObjectCompBase::QuickItemCreated::Serialize(iser::IArchive& /*archive*/)
 {
-	return true;
+	return false;
 }
 
 

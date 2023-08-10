@@ -14,7 +14,7 @@ namespace imtqml
 
 // reimplemented (imtgql::IGqlRequestHandler)
 
-bool CPageDataProviderComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+bool CPageDataProviderComp::IsRequestSupported(const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
 	return true;
 }
@@ -24,7 +24,7 @@ bool CPageDataProviderComp::IsRequestSupported(const imtgql::CGqlRequest& gqlReq
 
 // reimplemented (imtgql::CGqlRepresentationControllerCompBase)
 
-imtbase::CTreeItemModel* CPageDataProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CPageDataProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
 {
 	const QList<imtgql::CGqlObject> fieldsPtr = gqlRequest.GetFields();
 

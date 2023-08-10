@@ -11,7 +11,6 @@
 #include <imt3dgui/CView3dProviderComp.h>
 #include <imt3dgui/CPointCloudViewComp.h>
 #include <imt3dgui/CMeshViewComp.h>
-#include <imt3dgui/CDesignManagerComp.h>
 #include <imt3dgui/CCompositeShapeViewComp.h>
 #include <imt3dgui/CWireShape.h>
 #include <imt3dgui/CPointCloudShapeComp.h>
@@ -27,7 +26,6 @@ namespace Imt3dGuiPck
 typedef imod::TModelWrap<imt3dgui::CView3dProviderComp> View3dProvider;
 typedef icomp::TModelCompWrap<ibase::TModelObserverCompWrap<imt3dgui::CPointCloudViewComp>> PointCloudView;
 typedef icomp::TModelCompWrap<ibase::TModelObserverCompWrap<imt3dgui::CMeshViewComp>> MeshView;
-typedef icomp::TModelCompWrap<imt3dgui::CDesignManagerComp> DesignManager;
 typedef imt3dgui::CCompositeShapeViewComp CompositeShapeView;
 typedef ibase::TMakeModelObserverCompWrap<
 			imt3dgui::CAxisShape,

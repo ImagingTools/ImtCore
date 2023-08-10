@@ -131,7 +131,7 @@ bool CCompanyBaseInfo::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	bool retVal = BaseClass::ResetData();
+	bool retVal = BaseClass::ResetData(mode);
 
 	m_parentCompanyPtr = nullptr;
 	m_companyChildren.Reset();

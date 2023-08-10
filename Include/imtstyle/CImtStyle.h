@@ -6,6 +6,9 @@
 #include <QtWidgets/QProxyStyle>
 #include <QtWidgets/QStyleOption>
 
+// ImtCore includes
+#include <imtstyle/IColorPaletteProvider.h>
+
 
 namespace imtstyle
 {
@@ -17,19 +20,6 @@ class CImtStyle: public QProxyStyle
 public:
 	typedef QProxyStyle BaseClass;
 
-	/**
-		Design shema for the application style.
-	*/
-	enum DesignSchema
-	{
-		DS_INVALID = -1,
-
-		DS_LIGHT = 0,
-		DS_DARK,
-
-		DS_LAST
-	};
-
 	enum StyleType
 	{
 		ST_IMAGINGTOOLS,
@@ -38,16 +28,10 @@ public:
 
 	static CImtStyle* GetInstance();
 
-	int GetDesignSchemaCount() const;
-	DesignSchema GetDesignSchemaFromIndex(int index) const;
-	DesignSchema GetDesignSchema() const;
-	void SetDesignSchema(DesignSchema designSchema);
 	StyleType GetStyleType() const;
 	void SetStyleType(StyleType styleType);
-	QByteArray GetDesignSchemaId(DesignSchema designSchema) const;
-	QString GetDesignSchemaName(DesignSchema designSchema) const;
-
-	void SetPalette(DesignSchema designSchema, const QPalette& palette);
+	QByteArray GetActiveDesignSchemaId() const;
+	void SetActiveDesignSchema(const IColorPaletteProvider::ColorSchema& schema);
 
 	// reimplemented (QStyle)
 	virtual void polish(QWidget* widgetPtr) override;
@@ -83,23 +67,8 @@ private:
 		QColor endColor;
 	};
 
-	struct ColorSchema
-	{
-		ColorSchema()
-		{
-		}
+	IColorPaletteProvider::ColorSchema m_activeColorSchema;
 
-		GradientColors toolButtonGradientColors;
-		GradientColors pressedToolButtonGradientColors;
-		QPalette palette;
-		QString stylePath;
-	};
-
-	typedef QMap<DesignSchema, ColorSchema> ColorSchemaMap;
-
-	ColorSchemaMap m_colorSchemaMap;
-
-	DesignSchema m_designSchema;
 	StyleType m_styleType;
 
 	mutable bool m_wasStyleSheetInitialized;

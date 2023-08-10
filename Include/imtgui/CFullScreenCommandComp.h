@@ -27,12 +27,13 @@ namespace imtgui
 */
 class CFullScreenCommandComp:
 			public QObject,
-			public iqtgui::TMakeIconProviderCompWrap<iqtgui::TDesignSchemaHandlerWrap<ibase::TLocalizableWrap<icomp::CComponentBase>>>,
+			public iqtgui::TMakeIconProviderCompWrap<
+						ibase::TLocalizableWrap<icomp::CComponentBase>>,
 			virtual public ibase::ICommandsProvider
 {
 	Q_OBJECT
 public:
-	typedef iqtgui::TMakeIconProviderCompWrap<iqtgui::TDesignSchemaHandlerWrap<ibase::TLocalizableWrap<icomp::CComponentBase>>> BaseClass;
+	typedef iqtgui::TMakeIconProviderCompWrap<ibase::TLocalizableWrap<icomp::CComponentBase>> BaseClass;
 	typedef QObject BaseClass2;
 	
 	I_BEGIN_COMPONENT(CFullScreenCommandComp);
@@ -63,7 +64,7 @@ protected:
 	virtual void UpdateVisualStatus();
 
 	// reimpemented (iqtgui::TDesignSchemaHandlerWrap)
-	virtual void OnDesignSchemaChanged() override;
+	virtual void OnDesignSchemaChanged(const QByteArray& themeId) override;
 
 	// reimpemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;

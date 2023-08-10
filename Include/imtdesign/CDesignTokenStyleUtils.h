@@ -36,18 +36,18 @@ public:
 				const QChar& variableEndSymbol,
 				const QMap<QByteArray, QByteArray>& variables);
 	static bool SetVariables(QByteArray& data,
-							 const QChar& variableBeginSymbol,
-							 const QChar& variableBeginSymbol2,
-							 const QChar& variableEndSymbol,
-							 const QVariantMap& variables);
+				const QChar& variableBeginSymbol,
+				const QChar& variableBeginSymbol2,
+				const QChar& variableEndSymbol,
+				const QVariantMap& variables);
 	/**
 		sets variable that declared as dual i.e. Active.Background
 	*/
 	static bool SetVariablesFromDualVariable(QByteArray& data,
-							 const QChar& variableBeginSymbol,
-							 const QChar& variableBeginSymbol2,
-							 const QChar& variableEndSymbol,
-							 const QVariantMap& variables);
+				const QChar& variableBeginSymbol,
+				const QChar& variableBeginSymbol2,
+				const QChar& variableEndSymbol,
+				const QVariantMap& variables);
 
 	static bool GetColorRoleGroup(const QString& name, QPalette::ColorGroup& group, QPalette::ColorRole& role);
 	static QString GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role);

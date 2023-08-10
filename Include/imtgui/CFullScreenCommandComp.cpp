@@ -124,7 +124,7 @@ void CFullScreenCommandComp::UpdateVisualStatus()
 
 // reimpemented (iqtgui::TDesignSchemaHandlerWrap)
 
-void CFullScreenCommandComp::OnDesignSchemaChanged()
+void CFullScreenCommandComp::OnDesignSchemaChanged(const QByteArray& /*themeId*/)
 {
 	UpdateVisualStatus();
 }
@@ -134,7 +134,7 @@ void CFullScreenCommandComp::OnDesignSchemaChanged()
 
 void CFullScreenCommandComp::OnLanguageChanged()
 {
-	OnDesignSchemaChanged();
+	OnDesignSchemaChanged(GetCurrentThemeId());
 }
 
 

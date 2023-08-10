@@ -997,10 +997,10 @@ imtbase::ICollectionInfo::Ids CFileCollectionComp::RepositoryItemInfoProvider::G
 
 
 bool CFileCollectionCompBase::RepositoryItemInfoProvider::GetSubsetInfo(
-			imtbase::ICollectionInfo& subsetInfo,
-			int offset,
-			int count,
-			const iprm::IParamsSet* selectionParamsPtr) const
+			imtbase::ICollectionInfo& /*subsetInfo*/,
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	return false;
 }

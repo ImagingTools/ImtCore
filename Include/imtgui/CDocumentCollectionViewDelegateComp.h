@@ -132,7 +132,7 @@ protected:
 	virtual void OnLanguageChanged() override;
 
 	// reimplemented (iqtgui::TDesignSchemaHandlerWrap)
-	virtual void OnDesignSchemaChanged() override;
+	virtual void OnDesignSchemaChanged(const QByteArray& themeId) override;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

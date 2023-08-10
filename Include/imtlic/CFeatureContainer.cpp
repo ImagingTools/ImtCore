@@ -113,7 +113,7 @@ const imtbase::ICollectionInfo* CFeatureContainer::GetParentFeatureInfoProviderL
 }
 
 
-const IFeatureInfoProvider* CFeatureContainer::GetParentFeatureInfoProvider(const QByteArray& parentId) const
+const IFeatureInfoProvider* CFeatureContainer::GetParentFeatureInfoProvider(const QByteArray& /*parentId*/) const
 {
 	return nullptr;
 }

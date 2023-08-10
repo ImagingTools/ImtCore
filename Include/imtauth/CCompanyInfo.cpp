@@ -91,7 +91,7 @@ istd::IChangeable *CCompanyInfo::CloneMe(CompatibilityMode mode) const
 }
 
 
-bool CCompanyInfo::ResetData(CompatibilityMode mode)
+bool CCompanyInfo::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 

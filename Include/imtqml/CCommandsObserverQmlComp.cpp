@@ -36,9 +36,9 @@ const ibase::IHierarchicalCommand* CCommandsObserverQmlComp::GetCommands() const
 
 // reimplemented (iser::ISerializable)
 
-bool CCommandsObserverQmlComp::Serialize(iser::IArchive& archive)
+bool CCommandsObserverQmlComp::Serialize(iser::IArchive& /*archive*/)
 {
-	return true;
+	return false;
 }
 
 

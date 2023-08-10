@@ -150,7 +150,7 @@ void CObserverQmlComp::OnGuiChanged()
 {
 	if (m_settingsRepresentationControllerCompPtr.IsValid() && m_settingsCompPtr.IsValid()){
 		if (m_settingsModelPtr != nullptr){
-			bool result = m_settingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(*m_settingsModelPtr, *m_settingsCompPtr);
+			m_settingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(*m_settingsModelPtr, *m_settingsCompPtr);
 
 			ApplyUrl();
 		}

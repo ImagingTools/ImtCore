@@ -32,11 +32,6 @@ I_EXPORT_COMPONENT(
 			"3D Mesh View")
 
 I_EXPORT_COMPONENT(
-			DesignManager,
-			"Design Manager",
-			"Style Design Manager");
-
-I_EXPORT_COMPONENT(
 			CompositeShapeView,
 			"3D View for list of shapes",
 			"3D View");

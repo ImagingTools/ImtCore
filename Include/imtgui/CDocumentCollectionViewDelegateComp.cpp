@@ -434,7 +434,7 @@ void CDocumentCollectionViewDelegateComp::OnLanguageChanged()
 
 // reimplemented (iqtgui::TDesignSchemaHandlerWrap)
 
-void CDocumentCollectionViewDelegateComp::OnDesignSchemaChanged()
+void CDocumentCollectionViewDelegateComp::OnDesignSchemaChanged(const QByteArray& /*themeId*/)
 {
 	OnLanguageChanged();
 }

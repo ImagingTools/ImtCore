@@ -14,11 +14,14 @@ namespace imtdesign
 {
 
 
-QByteArray CDesignTokenFileParserComp::GetRawColor(const QByteArray& /*styleName*/, QPalette::ColorGroup group, QPalette::ColorRole role) const
+QByteArray CDesignTokenFileParserComp::GetRawColor(
+			const QByteArray& /*styleName*/,
+			QPalette::ColorGroup group,
+			QPalette::ColorRole role) const
 {
 	for(const RawColor& color: ::qAsConst(m_styleSheetColors)){
 		if (color.group == group && color.role == role){
-			return color.value ;
+			return color.value;
 		}
 	}
 
@@ -28,7 +31,7 @@ QByteArray CDesignTokenFileParserComp::GetRawColor(const QByteArray& /*styleName
 
 bool CDesignTokenFileParserComp::GetStyleSheetColorPalette(const QByteArray& designSchemaId, QVariantMap& palette) const
 {
-	if(!designSchemaId.length() && m_styleSheetColors.size()) {
+	if(!designSchemaId.length() && m_styleSheetColors.size()){
 		palette = m_stylesPalettes.first();
 	}
 	else{
@@ -42,12 +45,14 @@ bool CDesignTokenFileParserComp::GetStyleSheetColorPalette(const QByteArray& des
 bool CDesignTokenFileParserComp::GetBasePalette(const QByteArray& designSchemaId, QVariantMap& palette) const
 {
 	if(m_stylesBasePalettes.size()){
-		if(!designSchemaId.length()) {
+		if(!designSchemaId.length()){
 			palette = m_stylesBasePalettes.first();
+
 			return true;
 		}
 		else if (m_stylesBasePalettes.contains(designSchemaId)){
 			palette = m_stylesBasePalettes[designSchemaId];
+
 			return true;
 		}
 	}
@@ -57,19 +62,25 @@ bool CDesignTokenFileParserComp::GetBasePalette(const QByteArray& designSchemaId
 
 
 // reimplemented (IDesignTokenFileParser)
+
 bool CDesignTokenFileParserComp::SetFile(const QByteArray& filePath)
 {
-	bool retval = false;
+	bool retVal = false;
 
 	QFileInfo designTokenFileInfo(filePath);
+	if (designTokenFileInfo.exists()){
+		retVal = designTokenFileInfo.isReadable();
+		if(retVal){
+			m_designTokenFileInfo = designTokenFileInfo;
+		}
+	}
+	else{
+		qDebug(qPrintable(QString("Theme file doesn't exist: '%1'").arg(qPrintable(filePath))));
 
-	retval = designTokenFileInfo.isReadable();
-
-	if(retval){
-		m_designTokenFileInfo = designTokenFileInfo;
+		return false;
 	}
 
-	return retval;
+	return retVal;
 }
 
 
@@ -162,7 +173,13 @@ bool CDesignTokenFileParserComp::ParseFile()
 		m_designSchemaList.InsertItem(styleName.toUtf8(), styleName,"");
 
 		m_stylesPalettes.insert(styleName, styleEntry.toVariantMap());
-		m_colorPalettes.insert(styleName, CDesignTokenStyleUtils::GetPaletteFromMultiEntry(styleEntry));
+
+		ColorSchema schema;
+		schema.id = styleName.toLocal8Bit();
+		schema.stylePath = ":/Styles/" + styleName +  "/ImtColorStyle";
+		schema.palette = CDesignTokenStyleUtils::GetPaletteFromMultiEntry(styleEntry);
+
+		m_colorPalettes.insert(styleName, schema);
 
 		imtbase::CCollectionInfo* themeFontsCollection = new imtbase::CCollectionInfo;
 		QMap<QByteArray, QFont> fonts;
@@ -208,14 +225,14 @@ bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const Q
 
 	QJsonParseError jsonParseError;
 	QJsonObject designTokenObject = QJsonDocument::fromJson(designTokenFile.readAll(), &jsonParseError).object();
-	if(designTokenObject.isEmpty()) {
+	if(designTokenObject.isEmpty()){
 		SendErrorMessage(__LINE__, QString("Error occured '%1' during the styles processing in the file :'%2'").arg(jsonParseError.errorString(), designTokenFile.fileName()));
 
 		return false;
 	}
 
 	QJsonArray designTokenStylesArray = designTokenObject["Styles"].toArray();
-	if(designTokenStylesArray.isEmpty()) {
+	if(designTokenStylesArray.isEmpty()){
 		SendErrorMessage(__LINE__, "Cannot parse Styles");
 
 		return false;
@@ -269,7 +286,7 @@ const imtbase::ICollectionInfo& CDesignTokenFileParserComp::GetDesignSchemaList(
 }
 
 
-bool CDesignTokenFileParserComp::GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const
+bool CDesignTokenFileParserComp::GetColorPalette(const QByteArray& designSchemaId, ColorSchema& palette) const
 {
 	if(!designSchemaId.length() && m_colorPalettes.size()){
 		palette = m_colorPalettes.first();
@@ -289,7 +306,7 @@ QByteArray CDesignTokenFileParserComp::GetTemplateIconColor(const QByteArray&) c
 
 QByteArray CDesignTokenFileParserComp::GetIconColor(const QByteArray& styleName, IconState iconState) const
 {
-	switch (iconState) {
+	switch (iconState){
 	case IS_NORMAL:
 		return m_iconColors[styleName].toMap()["Normal"].toByteArray();
 	case IS_OFF_NORMAL:
@@ -317,9 +334,9 @@ QByteArray CDesignTokenFileParserComp::GetIconColor(const QByteArray& styleName,
 const imtbase::ICollectionInfo& CDesignTokenFileParserComp::GetFontList(const QByteArray& designSchemaId) const
 {
 	if (m_fonts.contains(designSchemaId) && m_fontsCollectionInfos[designSchemaId].GetPtr() != nullptr){
-		const imtbase::ICollectionInfo& retval = *m_fontsCollectionInfos[designSchemaId];
+		const imtbase::ICollectionInfo& retVal = *m_fontsCollectionInfos[designSchemaId];
 
-		return retval;
+		return retVal;
 	}
 
 	return m_emptyCollectionInfo;

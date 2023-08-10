@@ -42,7 +42,7 @@ QVariant CInstallationCollectionControllerComp::GetObjectInformation(const QByte
 
 imtbase::CHierarchicalItemModelPtr CInstallationCollectionControllerComp::GetMetaInfo(
 		const QList<imtgql::CGqlObject> &inputParams,
-		const imtgql::CGqlObject &gqlObject,
+		const imtgql::CGqlObject& /*gqlObject*/,
 		QString &errorMessage) const
 {
 	imtbase::CHierarchicalItemModelPtr rootModel(new imtbase::CTreeItemModel());

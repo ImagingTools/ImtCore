@@ -35,7 +35,7 @@ QByteArrayList CFeatureDependenciesProviderComp::GetFeatureDependencies(const QB
 }
 
 
-const IFeatureInfoProvider* CFeatureDependenciesProviderComp::GetDependencyContainer(const QByteArray& dependencyId) const
+const IFeatureInfoProvider* CFeatureDependenciesProviderComp::GetDependencyContainer(const QByteArray& /*dependencyId*/) const
 {
 	return nullptr;
 }

@@ -321,7 +321,6 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(
 			const iprm::IParamsSet& filterParams,
 			QString& filterQuery) const
 {
-	bool retVal = true;
 	QString objectFilterQuery;
 	iprm::TParamsPtr<iprm::IParamsSet> objectFilterParamPtr(&filterParams, "ObjectFilter");
 	if (objectFilterParamPtr.IsValid()){

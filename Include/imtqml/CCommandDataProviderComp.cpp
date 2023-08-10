@@ -13,7 +13,9 @@ namespace imtqml
 
 // reimplemented (imtgql::CGqlRepresentationControllerCompBase)
 
-imtbase::CTreeItemModel* CCommandDataProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CCommandDataProviderComp::CreateInternalResponse(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& /*errorMessage*/) const
 {
 	const QList<imtgql::CGqlObject> fieldsPtr = gqlRequest.GetFields();
 

@@ -193,7 +193,7 @@ CGqlObject *CGqlObject::GetParentObject() const
 
 // reimplemented (iser::ISerializable)
 
-bool CGqlObject::Serialize(iser::IArchive &archive)
+bool CGqlObject::Serialize(iser::IArchive& /*archive*/)
 {
 	return true;
 }
@@ -218,13 +218,13 @@ bool CGqlObject::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 		for (const QByteArray& key : keys){
 			istd::TSmartPtr<CGqlObject> sourceObject = sourcePtr->m_objectFields.value(key);
 
-			istd::TSmartPtr<CGqlObject> object;
-			object.SetCastedOrRemove(sourceObject->CloneMe());
-			if (!object.IsValid()){
+			istd::TSmartPtr<CGqlObject> gqlObject;
+			gqlObject.SetCastedOrRemove(sourceObject->CloneMe());
+			if (!gqlObject.IsValid()){
 				return false;
 			}
 
-			m_objectFields.insert(key, object);
+			m_objectFields.insert(key, gqlObject);
 		}
 
 		m_objectFieldsArray.clear();
@@ -264,7 +264,7 @@ istd::IChangeable* CGqlObject::CloneMe(CompatibilityMode mode) const
 }
 
 
-bool CGqlObject::ResetData(CompatibilityMode mode)
+bool CGqlObject::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 

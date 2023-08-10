@@ -30,14 +30,12 @@ namespace imtgui
 class CObjectCollectionViewDelegate:
 			public QObject,
 			public iqtgui::TMakeIconProviderCompWrap<
-						iqtgui::TDesignSchemaHandlerWrap<
-										ibase::TLocalizableWrap<ICollectionViewDelegate>>>
+						ibase::TLocalizableWrap<ICollectionViewDelegate>>
 {
 	Q_OBJECT
 public:
 	typedef iqtgui::TMakeIconProviderCompWrap<
-				iqtgui::TDesignSchemaHandlerWrap<
-							ibase::TLocalizableWrap<ICollectionViewDelegate>>> BaseClass;
+				ibase::TLocalizableWrap<ICollectionViewDelegate>> BaseClass;
 
 	enum CommandGroup
 	{
@@ -124,7 +122,7 @@ protected:
 	virtual void OnLanguageChanged() override;
 
 	// reimplemented (iqtgui::TDesignSchemaHandlerWrap)
-	virtual void OnDesignSchemaChanged() override;
+	virtual void OnDesignSchemaChanged(const QByteArray& themeId) override;
 
 protected:
 	class VisualStatus: virtual public iqtgui::IVisualStatus

@@ -40,11 +40,6 @@ I_EXPORT_COMPONENT(
 			"Account Info View Delegate");
 
 I_EXPORT_COMPONENT(
-			DesignManager,
-			"Design Manager",
-			"Style Design Manager");
-
-I_EXPORT_COMPONENT(
 			StandardAccountMenu,
 			"Standard account menu",
 			"Account Menu Login Logout");

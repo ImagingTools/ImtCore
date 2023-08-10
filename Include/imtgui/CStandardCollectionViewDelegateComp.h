@@ -53,7 +53,7 @@ protected:
 	virtual bool IsBundlePersistenceSupported(ifile::IFileTypeInfo::QueryFlags flags) const;
 
 	// reimplemented (iqtgui::TDesignSchemaHandlerWrap)
-	virtual void OnDesignSchemaChanged() override;
+	virtual void OnDesignSchemaChanged(const QByteArray& themeId) override;
 
 	// reimplemented (ibase::TLocalizableWrap)
 	virtual void OnLanguageChanged() override;

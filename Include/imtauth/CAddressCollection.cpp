@@ -51,7 +51,8 @@ const IAddress* CAddressCollection::GetAddress(const QByteArray& addressId) cons
 	return dynamic_cast<const IAddress*>(m_collection.GetObjectPtr(addressId));
 }
 
-IAddressProvider::AddressCategory CAddressCollection::GetAddressCategory(const QByteArray& addressId) const
+
+IAddressProvider::AddressCategory CAddressCollection::GetAddressCategory(const QByteArray& /*addressId*/) const
 {
 	return AC_CONTACT;
 }

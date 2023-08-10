@@ -24,7 +24,10 @@ bool CFileNameParamRepresentationControllerComp::IsModelSupported(const istd::IC
 }
 
 
-bool CFileNameParamRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, imtbase::CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
+bool CFileNameParamRepresentationControllerComp::GetRepresentationFromDataModel(
+			const istd::IChangeable& dataModel,
+			imtbase::CTreeItemModel& representation,
+			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (!IsModelSupported(dataModel)){
 		return false;
@@ -52,7 +55,9 @@ bool CFileNameParamRepresentationControllerComp::GetRepresentationFromDataModel(
 }
 
 
-bool CFileNameParamRepresentationControllerComp::GetDataModelFromRepresentation(const imtbase::CTreeItemModel& representation, istd::IChangeable& dataModel) const
+bool CFileNameParamRepresentationControllerComp::GetDataModelFromRepresentation(
+			const imtbase::CTreeItemModel& representation,
+			istd::IChangeable& dataModel) const
 {
 	if (!IsModelSupported(dataModel)){
 		return false;

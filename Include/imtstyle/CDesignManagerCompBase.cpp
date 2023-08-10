@@ -7,6 +7,10 @@
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
+#include <iqt/CDesignThemeEvent.h>
+
+// ImtCore includes
+#include <imtbase/ICollectionInfo.h>
 
 
 namespace imtstyle
@@ -18,6 +22,8 @@ namespace imtstyle
 CDesignManagerCompBase::CDesignManagerCompBase()
 {
 	EnableLocalization(true);
+
+	m_designs.SetParent(this);
 }
 
 
@@ -34,9 +40,8 @@ bool CDesignManagerCompBase::SetSelectedOptionIndex(int index)
 	int currentIndex = GetSelectedOptionIndex();
 	if (currentIndex != index){
 		bool retVal = BaseClass2::SetSelectedOptionIndex(index);
-
 		if (retVal){
-			retVal = retVal && ApplyDesignScheme(index);
+			retVal = retVal && ApplyDesignScheme(m_designs.GetOptionId(index));
 		}
 
 		return retVal;
@@ -52,27 +57,28 @@ bool CDesignManagerCompBase::Serialize(iser::IArchive& archive)
 {
 	bool retVal = BaseClass2::Serialize(archive);
 
-	if (retVal && !archive.IsStoring()){
-		int index = GetSelectedOptionIndex();
-
-		ApplyDesignScheme(index);
-	}
-
 	return retVal;
 }
 
 
 // protected methods
 
-void CDesignManagerCompBase::SetDesignResourcesFunctions(
-			imtstyle::CImtStyle::DesignSchema designSchema,
-			ResourceFunctionPtr initResources,
-			ResourceFunctionPtr cleanupResources)
+void CDesignManagerCompBase::OnSystemStarting()
 {
-	if (initResources != nullptr && cleanupResources != nullptr){
-		m_initResources[designSchema] = initResources;
+	m_designs.UpdateDesignList();
 
-		m_cleanupResources[designSchema] = cleanupResources;
+	SetSelectionConstraints(&m_designs);
+
+	if (m_designs.GetOptionsCount() > 0){
+		QByteArray themeId;
+		int selectedIndex = BaseClass2::GetSelectedOptionIndex();
+		if (selectedIndex < 0){
+			SetSelectedOptionIndex(0);
+		}
+
+		themeId = m_designs.GetOptionId(selectedIndex);
+
+		ApplyDesignScheme(themeId);
 	}
 }
 
@@ -82,27 +88,11 @@ void CDesignManagerCompBase::SetDesignResourcesFunctions(
 void CDesignManagerCompBase::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
-
-	m_designs.UpdateDesignList();
-
-	SetSelectionConstraints(&m_designs);
-
-	RegisterResourcesFunctions();
-
-	if (m_designs.GetOptionsCount() > 0){
-		SetSelectedOptionIndex(0);
-	}
 }
 
 
 void CDesignManagerCompBase::OnComponentDestroyed()
 {
-	for (ResourceFunctionPtr cleanupFunctionPtr : m_cleanupResources){
-		if (cleanupFunctionPtr != nullptr){
-			cleanupFunctionPtr();
-		}
-	}
-
 	BaseClass::OnComponentDestroyed();
 }
 
@@ -117,61 +107,29 @@ void CDesignManagerCompBase::OnLanguageChanged()
 
 // private methods
 
-bool CDesignManagerCompBase::ApplyDesignScheme(int index)
+bool CDesignManagerCompBase::ApplyDesignScheme(const QByteArray& themeId)
 {
 	bool retVal = true;
 
-	qDebug(qPrintable(QString("%1: Start applying color scheme index: %2").arg(qPrintable(GetComponentId(GetComponentContext()))).arg(index)));
+	qDebug(qPrintable(QString("%1: Start applying color scheme index: %2").arg(qPrintable(GetComponentId(GetComponentContext()))).arg(qPrintable(themeId))));
 
 	imtstyle::CImtStyle* imtStylePtr = imtstyle::CImtStyle::GetInstance();
 	Q_ASSERT(imtStylePtr != nullptr);
 
-	imtstyle::CImtStyle::DesignSchema designSchema = imtStylePtr->GetDesignSchemaFromIndex(index);
-	if (designSchema != imtstyle::CImtStyle::DS_INVALID){
-		if (index < imtStylePtr->GetDesignSchemaCount()){
-			if (m_initResources.contains(designSchema)){
-				if (m_initResources[designSchema] != nullptr){
-					for (ResourceFunctionPtr cleanupFunctionPtr : m_cleanupResources){
-						if (cleanupFunctionPtr != nullptr){
-							cleanupFunctionPtr();
-						}
-					}
-
-					{
-						imtstyle::CImtStyle::DesignSchemaSetterBlocker blocker(*imtStylePtr);
-
-						if (m_slaveCompPtr.IsValid()){
-							retVal = retVal && m_slaveCompPtr->SetSelectedOptionIndex(index);
-						}
-						else if (m_paletteProviderCompPtr.IsValid()){
-							QPalette palette;
-							if (m_paletteProviderCompPtr->GetColorPalette(imtStylePtr->GetDesignSchemaId(designSchema), palette)){
-								imtStylePtr->SetPalette(designSchema, palette);
-							}
-						}
-					}
-
-					m_initResources[designSchema]();
-
-					I_IF_DEBUG(
-						qDebug() << "Start dumping of the embedded resources";
-						QDirIterator it(":/Styles", QDirIterator::Subdirectories);
-						while (it.hasNext()){
-							qDebug() << it.next();
-						}
-						qDebug() << "Finished dumping of the embedded resources";
-					)
-
-					imtStylePtr->SetDesignSchema(designSchema);
-				}
-			}
+	if (m_paletteProviderCompPtr.IsValid()){
+		IColorPaletteProvider::ColorSchema colorShema;
+		if (m_paletteProviderCompPtr->GetColorPalette(themeId, colorShema)){
+			imtStylePtr->SetActiveDesignSchema(colorShema);
 		}
 	}
 	else{
 		retVal = false;
 	}
 
-	qDebug(qPrintable(QString("%1: Finished applying color scheme index: %2").arg(qPrintable(GetComponentId(GetComponentContext()))).arg(index)));
+	QCoreApplication::instance()->setProperty("ThemeId", themeId);
+	QCoreApplication::postEvent(QCoreApplication::instance(), new iqt::CDesignThemeEvent(themeId));
+
+	qDebug(qPrintable(QString("%1: Finished applying color scheme index: %2").arg(qPrintable(GetComponentId(GetComponentContext()))).arg(qPrintable(themeId))));
 
 	return retVal;
 }
@@ -179,20 +137,31 @@ bool CDesignManagerCompBase::ApplyDesignScheme(int index)
 
 // public methods of the embedded class DesignList
 
+CDesignManagerCompBase::DesignList::DesignList()
+	:m_parentPtr(nullptr)
+{
+}
+
+
+void CDesignManagerCompBase::DesignList::SetParent(CDesignManagerCompBase * parentPtr)
+{
+	m_parentPtr = parentPtr;
+}
+
 void CDesignManagerCompBase::DesignList::UpdateDesignList()
 {
 	istd::CChangeNotifier changeNotifier(this);
 
 	m_designList.clear();
 
-	imtstyle::CImtStyle* imtStyle = imtstyle::CImtStyle::GetInstance();
-	if (imtStyle != nullptr){
-		qDebug(qPrintable(QString("Update list of color schemes: %1").arg(imtStyle->GetDesignSchemaCount())));
+	if (m_parentPtr->m_paletteProviderCompPtr.IsValid()){
+		const imtbase::ICollectionInfo& themeList = m_parentPtr->m_paletteProviderCompPtr->GetDesignSchemaList();
 
-		for (int i = 0; i < imtStyle->GetDesignSchemaCount(); i++){
+		for (const QByteArray& themeId : themeList.GetElementIds()) {
 			DesignInfo designInfo;
-			designInfo.id = imtStyle->GetDesignSchemaId((imtstyle::CImtStyle::DesignSchema)i);
-			designInfo.name = imtStyle->GetDesignSchemaName((imtstyle::CImtStyle::DesignSchema)i);
+			designInfo.id = themeId;
+			designInfo.name = themeList.GetElementInfo(themeId, imtbase::ICollectionInfo::EIT_NAME).toString();
+			designInfo.description = themeList.GetElementInfo(themeId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
 
 			qDebug(qPrintable(QString("Color scheme added: %1").arg(designInfo.name)));
 
@@ -218,21 +187,17 @@ int CDesignManagerCompBase::DesignList::GetOptionsCount() const
 
 QString CDesignManagerCompBase::DesignList::GetOptionName(int index) const
 {
-	Q_ASSERT(index >= 0);
-
-	if (index < m_designList.count()){
+	if (index >= 0 && index < m_designList.count()){
 		return m_designList[index].name;
 	}
 
-	return QString();
+	return ("Default");
 }
 
 
 QString CDesignManagerCompBase::DesignList::GetOptionDescription(int index) const
 {
-	Q_ASSERT(index >= 0);
-
-	if (index < m_designList.count()){
+	if (index >= 0 && index < m_designList.count()){
 		return m_designList[index].description;
 	}
 
@@ -242,9 +207,7 @@ QString CDesignManagerCompBase::DesignList::GetOptionDescription(int index) cons
 
 QByteArray CDesignManagerCompBase::DesignList::GetOptionId(int index) const
 {
-	Q_ASSERT(index >= 0);
-
-	if (index < m_designList.count()){
+	if (index >= 0 && index < m_designList.count()){
 		return m_designList[index].id;
 	}
 

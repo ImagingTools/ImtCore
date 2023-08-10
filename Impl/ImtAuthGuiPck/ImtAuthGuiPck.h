@@ -11,7 +11,6 @@
 #include <imtauthgui/CAccountInfoEditorComp.h>
 #include <imtauthgui/CContactInfoViewDelegateComp.h>
 #include <imtauthgui/CAccountInfoViewDelegateComp.h>
-#include <imtauthgui/CDesignManagerComp.h>
 #include <imtauthgui/CStandardAccountMenuComp.h>
 #include <imtauthgui/CStandardLoginGuiComp.h>
 #include <imtauthgui/CRemoteStandardLoginGuiComp.h>
@@ -26,7 +25,6 @@ typedef imtauthgui::CAddressEditorComp AddressEditor;
 typedef imtauthgui::CAccountInfoEditorComp AccountInfoEditor;
 typedef imtauthgui::CContactInfoViewDelegateComp ContactInfoViewDelegate;
 typedef imtauthgui::CAccountInfoViewDelegateComp AccountInfoViewDelegate;
-typedef icomp::TModelCompWrap<imtauthgui::CDesignManagerComp> DesignManager;
 typedef imtauthgui::CStandardAccountMenuComp StandardAccountMenu;
 typedef imtauthgui::CStandardLoginGuiComp StandardLoginGui;
 typedef imtauthgui::CRemoteStandardLoginGuiComp RemoteStandardLoginGui;

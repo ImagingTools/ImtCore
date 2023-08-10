@@ -176,9 +176,6 @@ void CRemoteStandardLoginGuiComp::on_LoginButton_clicked()
 	QString password = PasswordEdit->text();
 
 	if (m_loginCompPtr.IsValid()){
-		QString userName = UserEdit->text();
-		QString password = PasswordEdit->text();
-
 		StackedWidget->setCurrentIndex(3);
 
 		if (m_loginCompPtr->Login(userName, password)){

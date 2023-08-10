@@ -9,13 +9,15 @@ namespace imtqml
 
 // reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-bool CApplicationInfoDataProviderComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+bool CApplicationInfoDataProviderComp::IsRequestSupported(const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
 	return true;
 }
 
 
-imtbase::CTreeItemModel* CApplicationInfoDataProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CApplicationInfoDataProviderComp::CreateInternalResponse(
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
 	if (m_applicationInfoCompPtr.IsValid()){
 		istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());

@@ -15,7 +15,26 @@ namespace imtstyle
 class IColorPaletteProvider: virtual public IDesignSchemaInfoProvider
 {
 public:
-	virtual bool GetColorPalette(const QByteArray& designSchemaId, QPalette& palette) const = 0;
+	struct GradientColors
+	{
+		QColor startColor;
+		QColor endColor;
+	};
+
+	struct ColorSchema
+	{
+		ColorSchema()
+		{
+		}
+
+		QByteArray id;
+		GradientColors toolButtonGradientColors;
+		GradientColors pressedToolButtonGradientColors;
+		QPalette palette;
+		QString stylePath;
+	};
+
+	virtual bool GetColorPalette(const QByteArray& designSchemaId, ColorSchema& palette) const = 0;
 };
 
 

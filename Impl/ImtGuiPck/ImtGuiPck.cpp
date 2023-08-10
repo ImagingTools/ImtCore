@@ -113,11 +113,6 @@ I_EXPORT_COMPONENT(
 			"Command Application Switch Process Window");
 
 I_EXPORT_COMPONENT(
-			DesignManager,
-			"Design Manager",
-			"Style Design Manager");
-
-I_EXPORT_COMPONENT(
 			VirtualKeyboardShowCommand,
 			"Command for show Virtual Keyboard",
 			"Command for show Virtual Keyboard");

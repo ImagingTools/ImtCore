@@ -13,13 +13,17 @@ namespace imtlicgql
 
 // reimplemented (imtguigql::CObjectCollectionControllerCompBase)
 
-QVariant CAccountCollectionControllerComp::GetObjectInformation(const QByteArray &informationId, const QByteArray &objectId) const
+QVariant CAccountCollectionControllerComp::GetObjectInformation(
+			const QByteArray& /*informationId*/,
+			const QByteArray& /*objectId*/) const
 {
 	return QVariant();
 }
 
 
-imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
@@ -91,11 +95,11 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(const imt
 
 
 bool CAccountCollectionControllerComp::SetupGqlItem(
-		const imtgql::CGqlRequest& gqlRequest,
-		imtbase::CTreeItemModel& model,
-		int itemIndex,
-		const imtbase::IObjectCollectionIterator* objectCollectionIterator,
-		QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			imtbase::CTreeItemModel& model,
+			int itemIndex,
+			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
+			QString& /*errorMessage*/) const
 {
 	if (objectCollectionIterator == nullptr){
 		return false;
@@ -137,8 +141,7 @@ bool CAccountCollectionControllerComp::SetupGqlItem(
 									.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 						}
 						else if (informationId == QByteArray("LastModified")){
-							elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
-									.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+							elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
 						}
 					}
 				}
@@ -152,7 +155,6 @@ bool CAccountCollectionControllerComp::SetupGqlItem(
 
 				retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
 			}
-
 		}
 
 		return true;

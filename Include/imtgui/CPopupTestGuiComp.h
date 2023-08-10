@@ -35,7 +35,7 @@ protected:
 	virtual void OnGuiCreated() override;
 
 	// reimplemented (iqtgui::TDesignSchemaHandlerWrap)
-	virtual void OnDesignSchemaChanged() override;
+	virtual void OnDesignSchemaChanged(const QByteArray& themeId) override;
 
 	// reimplemented (QObject)
 	virtual bool eventFilter(QObject* watched, QEvent* event) override;

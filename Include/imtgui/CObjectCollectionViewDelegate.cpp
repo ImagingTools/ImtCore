@@ -737,8 +737,10 @@ void CObjectCollectionViewDelegate::OnLanguageChanged()
 
 // reimplemented (iqtgui::TDesignSchemaHandlerWrap)
 
-void CObjectCollectionViewDelegate::OnDesignSchemaChanged()
+void CObjectCollectionViewDelegate::OnDesignSchemaChanged(const QByteArray& themeId)
 {
+	BaseClass::OnDesignSchemaChanged(themeId);
+
 	m_insertCommand.SetVisuals(tr("Insert"), tr("New"), tr("Insert new document into the collection"), GetIcon(":/Icons/Add"));
 	m_duplicateCommand.SetVisuals(tr("Duplicate"), tr("Duplicate"), tr("Duplicate selected objects"), GetIcon(":/Icons/Duplicate"));
 	m_removeCommand.SetVisuals(tr("Remove"), tr("Remove"), tr("Remove selected document from the collection"), GetIcon(":/Icons/Delete"));
