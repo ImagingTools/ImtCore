@@ -213,24 +213,40 @@ global.Core = {
     },
     XMLParser: new DOMParser(),
     updateLanguage(){
-        if(Core.context.application && Core.context.language && !Core.context.languages[`${Core.context.application}_${Core.context.language}`]){
-            let xhr = new XMLHttpRequest()
-            xhr.open('GET', `../Translations/${Core.context.application}_${Core.context.language}.ts`, false)
-            xhr.onload = ()=>{
-                if (xhr.readyState === XMLHttpRequest.DONE){
-                    let xml = Core.XMLParser.parseFromString(xhr.responseText, 'text/xml')
-                    let messages = xml.getElementsByTagName('message')
-                    let dict = {}
-                    for(let message of messages){
-                        let source = message.getElementsByTagName('source')[0]
-                        let translation = message.getElementsByTagName('translation')[0]
-                        dict[source.innerHTML] = translation.innerHTML
-                    }
-                    
-                    Core.context.languages[`${Core.context.application}_${Core.context.language}`] = dict
-                }
+        if(Core.context.application && Core.context.language && !Core.context.languages[Core.context.language]){
+            let langPrefixList = []
+            if(typeof Core.context.application === 'string'){
+                langPrefixList.push(Core.context.application)
+            } else if(Array.isArray(Core.context.application)){
+                langPrefixList = Core.context.application
             }
-            xhr.send()
+            for(let langPrefix of langPrefixList){
+                let xhr = new XMLHttpRequest()
+                if(langPrefix){
+                    xhr.open('GET', `../Translations/${langPrefix}_${Core.context.language}.ts`, false)
+                } else {
+                    xhr.open('GET', `../Translations/${Core.context.language}.ts`, false)
+                }
+                xhr.onload = ()=>{
+                    if (xhr.readyState === XMLHttpRequest.DONE){
+                        let xml = Core.XMLParser.parseFromString(xhr.responseText, 'text/xml')
+                        let messages = xml.getElementsByTagName('message')
+                        let dict = {}
+                        for(let message of messages){
+                            let source = message.getElementsByTagName('source')[0]
+                            let translation = message.getElementsByTagName('translation')[0]
+                            dict[source.innerHTML] = translation.innerHTML
+                        }
+                        if(!Core.context.languages[Core.context.language]){
+                            Core.context.languages[Core.context.language] = dict
+                        } else {
+                            Object.assign(Core.context.languages[Core.context.language], dict)
+                        }
+                    }
+                }
+                xhr.send()
+            }
+            
         }
         
     },
