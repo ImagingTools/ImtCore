@@ -47,6 +47,11 @@ Item {
     {
         onServerModelChanged: {
             application.serverSettingsObserver.registerModel(serverModel);
+
+            console.log("context.language", context.language, context.application);
+            context.language = application.languageProvider.getLanguage();
+            console.log("context.language", context.language, context.application);
+
             application.designProvider.applyDesignSchema();
         }
 
@@ -106,9 +111,9 @@ Item {
         applicationInfoProvider: application.applicationInfoProvider;
     }
 
-    function onLocalizationChanged(){
-        console.log("Main onLocalizationChanged");
-        Events.sendEvent("OnLocalizationChanged");
+    function onLocalizationChanged(language){
+        console.log("Main onLocalizationChanged", language);
+        Events.sendEvent("OnLocalizationChanged", language);
     }
 
     function updateAllModels(){

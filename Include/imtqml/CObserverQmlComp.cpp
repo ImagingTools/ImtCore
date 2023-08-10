@@ -60,14 +60,15 @@ void CObserverQmlComp::UpdateLanguage() const
 	if (languageParamPtr.IsValid()){
 		const iprm::IOptionsList* optionListPtr = languageParamPtr->GetSelectionConstraints();
 		if (optionListPtr != nullptr){
-			int index = languageParamPtr->GetSelectedOptionIndex();
+            int index = languageParamPtr->GetSelectedOptionIndex();
 			if (index >= 0){
 				m_translationManagerCompPtr->SwitchLanguage(index);
 
 				if (enginePtr != nullptr){
 					enginePtr->retranslate();
+                    QString langId =  m_translationManagerCompPtr->GetLanguagesInfo().GetOptionId(index);
 
-					QMetaObject::invokeMethod(quickItem, "onLocalizationChanged");
+                    QMetaObject::invokeMethod(quickItem, "onLocalizationChanged", Qt::AutoConnection, Q_ARG(QVariant, langId));
 				}
 			}
 		}
