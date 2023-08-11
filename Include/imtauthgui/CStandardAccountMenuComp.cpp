@@ -23,13 +23,6 @@ void CStandardAccountMenuComp::OnGuiCreated()
 
 	GetQtWidget()->setWindowFlags(Qt::Popup);
 
-	QIcon accountIcon = GetIcon(*m_accountPreviewAttrPtr);
-	QIcon preferencesIcon = GetIcon(*m_preferencesIconAttrPtr);
-	QIcon logoutIcon = GetIcon(*m_logoutIconAttrPtr);
-	AccountPreview->setPixmap(accountIcon.pixmap(*m_iconSizeAttrPtr));
-	PreferencesIcon->setPixmap(preferencesIcon.pixmap(*m_iconSizeAttrPtr));
-	LogoutIcon->setPixmap(logoutIcon.pixmap(*m_iconSizeAttrPtr));
-
 	LogoutFrame->installEventFilter(this);
 	PreferencesFrame->installEventFilter(this);
 
@@ -53,8 +46,10 @@ void CStandardAccountMenuComp::OnGuiDesignChanged()
 
 	QIcon accountIcon = GetIcon(*m_accountPreviewAttrPtr);
 	QIcon preferencesIcon = GetIcon(*m_preferencesIconAttrPtr);
+	QIcon logoutIcon = GetIcon(*m_logoutIconAttrPtr);
 	AccountPreview->setPixmap(accountIcon.pixmap(*m_iconSizeAttrPtr));
 	PreferencesIcon->setPixmap(preferencesIcon.pixmap(*m_iconSizeAttrPtr));
+	LogoutIcon->setPixmap(logoutIcon.pixmap(*m_iconSizeAttrPtr));
 }
 
 
