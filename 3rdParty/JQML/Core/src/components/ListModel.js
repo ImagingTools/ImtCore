@@ -30,6 +30,21 @@ export class ListModel extends QtObject {
     //     this.dataChanged()
     //     // console.log('DEBUG::dataChanged', topLeft, bottomRight, keyRoles)
     // }
+    $dataChanged(ignore = []){
+        ignore.push(this)
+        let parent = this.parent
+        if(parent && ignore.indexOf(parent) < 0 && parent.$dataChanged){
+            parent.$dataChanged(ignore)
+        }
+        
+        if(this.dataChanged) this.dataChanged()
+
+        for(let child of this.children){
+            if(child && ignore.indexOf(child) < 0 && child.$dataChanged){
+                child.$dataChanged(ignore)
+            }
+        }
+    }
     $modelChanged(ignore = []){
         ignore.push(this)
         let parent = this.parent
@@ -54,8 +69,8 @@ export class ListModel extends QtObject {
                 let listElement = new ListElement({parent:this,appended:true})
                 listElement.$cP('index', i)
                 for(let key in dict[i]){
-                    listElement.$cP(key, dict[i][key])
-                    listElement.$p[key].getSignal().connect(this.$modelChanged.bind(this))
+                    listElement.$cP(key, dict[i][key], ()=>{this.$dataChanged()})
+                    // listElement.$p[key].getSignal().connect(this.$modelChanged.bind(this))
                 }
                 this.data.push(listElement)
             }
@@ -67,13 +82,14 @@ export class ListModel extends QtObject {
                 let listElement = new ListElement({parent:this,appended:true})
                 listElement.$cP('index', this.data.length)
                 for(let key in dict){
-                    listElement.$cP(key, dict[key])
-                    listElement.$p[key].getSignal().connect(this.$modelChanged.bind(this))
+                    listElement.$cP(key, dict[key], ()=>{this.$dataChanged()})
+                    // listElement.$p[key].getSignal().connect(this.$modelChanged.bind(this))
                 }
                 this.data.push(listElement)
             }
 			
 		}
+        this.$modelChanged()
         this.count = this.data.length
 
         for(let key in this.$deps){
@@ -101,8 +117,8 @@ export class ListModel extends QtObject {
                 let listElement = new ListElement({parent:this,appended:true})
                 listElement.$cP('index', i)
                 for(let key in dict[i]){
-                    listElement.$cP(key, dict[i][key])
-                    listElement.$p[key].getSignal().connect(this.$modelChanged.bind(this))
+                    listElement.$cP(key, dict[i][key], ()=>{this.$dataChanged()})
+                    // listElement.$p[key].getSignal().connect(this.$modelChanged.bind(this))
                 }
                 this.data.splice(index + i, 0, listElement)
             }
@@ -115,12 +131,13 @@ export class ListModel extends QtObject {
                 let listElement = new ListElement({parent:this,appended:true})
                 listElement.$cP('index', index)
                 for(let key in dict){
-                    listElement.$cP(key, dict[key])
-                    listElement.$p[key].getSignal().connect(this.$modelChanged.bind(this))
+                    listElement.$cP(key, dict[key], ()=>{this.$dataChanged()})
+                    // listElement.$p[key].getSignal().connect(this.$modelChanged.bind(this))
                 }
                 this.data.splice(index, 0, listElement)
             }
 		}
+        this.$modelChanged()
         this.count = this.data.length
         for(let key in this.$deps){
             this.$deps[key].$insert(index)

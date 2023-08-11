@@ -161,7 +161,7 @@ export class MouseArea extends Item {
 
 				let now = new Date().getTime()
 				if(this.$lastClickOrTouch){
-					if(now - this.$lastClickOrTouch > 250 || Object.keys(this.doubleClicked.connections).length === 0){
+					if(now - this.$lastClickOrTouch > 250 || !this.doubleClicked.connections || Object.keys(this.doubleClicked.connections).length === 0){
 						if(Core.focusedElement && (Core.focusedElement.$qmlClassName === 'TextInput' || Core.focusedElement.$qmlClassName === 'TextEdit')) Core.focusedElement.focus = false
 						this.clicked();
 						this.$lastClickOrTouch = now
@@ -281,7 +281,7 @@ export class MouseArea extends Item {
 
 			let now = new Date().getTime()
 			if(this.$lastClickOrTouch){
-				if(now - this.$lastClickOrTouch > 250 || Object.keys(this.doubleClicked.connections).length === 0){
+				if(now - this.$lastClickOrTouch > 250 || !this.doubleClicked.connections || Object.keys(this.doubleClicked.connections).length === 0){
 					if(Core.focusedElement && (Core.focusedElement.$qmlClassName === 'TextInput' || Core.focusedElement.$qmlClassName === 'TextEdit')) Core.focusedElement.focus = false
 					this.clicked();
 					this.$lastClickOrTouch = now
