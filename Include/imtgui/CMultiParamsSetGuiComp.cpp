@@ -83,7 +83,7 @@ void CMultiParamsSetGuiComp::OnGuiModelAttached()
 			modelPtr = dynamic_cast<imod::IModel*>(paramPtr);
 		}
 
-		ILayoutFittableModelEditor* guiEditorPtr = CreateEditorFromModel(modelPtr);
+		ILayoutFittableModelEditor* guiEditorPtr = CreateEditorFromModel(modelPtr, QString(objectId));
 		if (guiEditorPtr == nullptr){
 			I_CRITICAL();
 
@@ -165,30 +165,49 @@ bool CMultiParamsSetGuiComp::OnModelDetached(imod::IModel* modelPtr)
 }
 
 
-ILayoutFittableModelEditor* CMultiParamsSetGuiComp::CreateEditorFromModel(const imod::IModel* modelPtr) const
+ILayoutFittableModelEditor* CMultiParamsSetGuiComp::CreateEditorFromModel(const imod::IModel* modelPtr, const QString& objectName) const
 {
-    ILayoutFittableModelEditor* retVal = nullptr;
+	ILayoutFittableModelEditor* retVal = nullptr;
 
 	const imeas::INumericValue* numericParamPtr = dynamic_cast<const imeas::INumericValue*>(modelPtr);
 	if (numericParamPtr != nullptr){
-		return new CNumericSliderLayoutFittableEditorGui;
+		CNumericSliderLayoutFittableEditorGui* guiPtr = new CNumericSliderLayoutFittableEditorGui;
+		if (!objectName.isNull()){
+			guiPtr->setObjectName(objectName);
+		}
+
+		return guiPtr;
 	}
 
 	const iprm::INameParam* nameParamPtr = dynamic_cast<const iprm::INameParam*>(modelPtr);
 	if (nameParamPtr != nullptr){
-		return new CNameLayoutFittableEditorGui;
+		CNameLayoutFittableEditorGui* guiPtr = new CNameLayoutFittableEditorGui;
+		if (!objectName.isNull()){
+			guiPtr->setObjectName(objectName);
+		}
+
+		return guiPtr;
 	}
 
 	const iprm::IEnableableParam* enableableParamPtr = dynamic_cast<const iprm::IEnableableParam*>(modelPtr);
 	if (enableableParamPtr != nullptr){
-		return new CEnableableLayoutFittableEditorGui;
+		CEnableableLayoutFittableEditorGui* guiPtr = new CEnableableLayoutFittableEditorGui;
+		if (!objectName.isNull()){
+			guiPtr->setObjectName(objectName);
+		}
+
+		return guiPtr;
 	}
 
 	const iprm::ISelectionParam* selectionParamPtr = dynamic_cast<const iprm::ISelectionParam*>(modelPtr);
 	if (selectionParamPtr != nullptr){
-		return new CSelectionParamLayoutFittableEditorGui;
-	}
+		CSelectionParamLayoutFittableEditorGui* guiPtr = new CSelectionParamLayoutFittableEditorGui;
+		if (!objectName.isNull()){
+			guiPtr->setObjectName(objectName);
+		}
 
+		return guiPtr;
+	}
 
 	Q_ASSERT_X(retVal != nullptr, "CreateEditorFromModel", "Provided model is not supported");
 

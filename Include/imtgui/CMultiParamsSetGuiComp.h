@@ -30,7 +30,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	virtual ILayoutFittableModelEditor* CreateEditorFromModel(const imod::IModel* modelPtr) const;
+	virtual ILayoutFittableModelEditor* CreateEditorFromModel(const imod::IModel* modelPtr, const QString& objectName = QString()) const;
 
 	// reimplemented (imod::IModelEditor)
 	virtual void SetReadOnly(bool state) override;
