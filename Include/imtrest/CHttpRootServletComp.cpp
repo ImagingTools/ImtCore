@@ -35,6 +35,10 @@ IRequestServlet::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRe
 		commandId = commandId.remove(commandId.length() - 1, 1);
 	}
 
+	if (QString(commandId) != QString(commandId).toHtmlEscaped()){
+		commandId = "Invalid command";
+	}
+
 	QByteArray bodyRequest = request.GetBody();
 
 	const IProtocolEngine& engine = request.GetProtocolEngine();
@@ -108,10 +112,11 @@ IRequestServlet::ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRe
 		return responsePtr;
 	}
 	else{
-		QByteArray commandIdSafe = commandId.replace("<","<<");
-		commandIdSafe = commandId.replace(">",">>");
-		commandIdSafe = commandId.replace("/","//");
-		QByteArray body = QString("<html><head><title>Error</title></head><body><p>The requested command could not be executed. No servlet was found for the given command: '%1'</p></body></html>").arg(qPrintable(commandIdSafe)).toUtf8();
+		QString commandIdSafe = commandId;
+		commandIdSafe = commandIdSafe.toHtmlEscaped();
+		commandIdSafe.prepend('"');
+		commandIdSafe.append('"');
+		QByteArray body = QString("<html><head><title>Error</title></head><body><p>The requested command could not be executed. No servlet was found for the given command: '%1'</p></body></html>").arg(commandIdSafe).toUtf8();
 		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
 		ConstResponsePtr responsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
