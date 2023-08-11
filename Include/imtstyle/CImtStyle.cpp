@@ -329,7 +329,7 @@ void CImtStyle::DrawImagingToolsToolButton(
 				else{
 					path.addRoundedRect(borderRect.adjusted(0, 0, 0, 0), 6, 6);
 
-					painter->fillPath(path, QColor("red"));
+					painter->fillPath(path, m_activeColorSchema.toolButtonBorderColor);
 				}
 
 				path = QPainterPath();

@@ -51,7 +51,7 @@ public:
 
 private:
 	static void ReplaceColorNames(QJsonObject& json, const QVariantMap& variableMaps);
-	static void ReplaceColorNamesRecursivle(QJsonObject& json, const QVariantMap& variableMaps);
+	static void ReplaceColorNamesRecursive(QJsonObject& json, const QVariantMap& variableMaps);
 
 private:
 	I_REF(ifile::IFileNameParam, m_designTokenFilePathAttrPtr);

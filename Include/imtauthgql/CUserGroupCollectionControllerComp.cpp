@@ -59,8 +59,8 @@ imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const i
 
 			if (m_userInfoProviderCompPtr.IsValid()){
 				imtauth::IUserGroupInfo::UserIds userIds = userGroupInfoPtr->GetUsers();
-				for (const QByteArray& userId : userIds){
-					const imtauth::IUserInfo* userInfoPtr = m_userInfoProviderCompPtr->GetUser(userId);
+				for (const QByteArray& groupUserId : userIds){
+					const imtauth::IUserInfo* userInfoPtr = m_userInfoProviderCompPtr->GetUser(groupUserId);
 					if (userInfoPtr != nullptr){
 						QString userName = userInfoPtr->GetName();
 
@@ -98,7 +98,7 @@ bool CUserGroupCollectionControllerComp::SetupGqlItem(
 		imtbase::CTreeItemModel& model,
 		int itemIndex,
 		const imtbase::IObjectCollectionIterator* objectCollectionIterator,
-		QString& errorMessage) const
+		QString& /*errorMessage*/) const
 {
 	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
 

@@ -145,17 +145,17 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 		if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 			imtauth::IUserGroupInfo* oldUserGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
 			if (oldUserGroupInfoPtr != nullptr){
-				for (const QByteArray& productId : oldUserGroupInfoPtr->GetProducts()){
-					userGroupInfoPtr->SetRoles(productId, oldUserGroupInfoPtr->GetRoles(productId));
+				for (const QByteArray& oldUserGroupProductId : oldUserGroupInfoPtr->GetProducts()){
+					userGroupInfoPtr->SetRoles(oldUserGroupProductId, oldUserGroupInfoPtr->GetRoles(oldUserGroupProductId));
 				}
 			}
 		}
 
 		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
 		for (imtbase::ICollectionInfo::Id collectionId : collectionIds){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
-				imtauth::IUserGroupInfo* currentUserGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
+			imtbase::IObjectCollection::DataPtr groupDataPtr;
+			if (m_objectCollectionCompPtr->GetObjectData(collectionId, groupDataPtr)){
+				imtauth::IUserGroupInfo* currentUserGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(groupDataPtr.GetPtr());
 				if (currentUserGroupInfoPtr != nullptr){
 					if (collectionId != objectId){
 						QString currentUserGroupName = currentUserGroupInfoPtr->GetName();

@@ -18,7 +18,6 @@
 #include <imtlicgui/CProductInstanceInfoEditorComp.h>
 #include <imtlicgui/CProductInstanceInfoViewComp.h>
 #include <imtlicgui/CFeatureTreeGuiComp.h>
-#include <imtstyle/CDesignManagerComp.h>
 
 
 /**
@@ -40,7 +39,6 @@ typedef imtlicgui::CProductInstanceInfoViewDelegateComp ProductInstanceInfoViewD
 typedef imtlicgui::CProductInstanceInfoEditorComp ProductInstanceInfoEditor;
 typedef imtlicgui::CProductInstanceInfoViewComp ProductInstanceInfoView;
 typedef imtlicgui::CFeatureTreeGuiComp FeatureTreeGui;
-typedef icomp::TModelCompWrap<imtstyle::CDesignManagerComp> DesignManager;
 
 
 } // namespace ImtLicenseGuiPck

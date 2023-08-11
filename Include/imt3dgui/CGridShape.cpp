@@ -38,7 +38,7 @@ void CGridShape::SetCount(int count)
 
 // reimplement (imt3dgui::CShape3dBase)
 
-void CGridShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeSet)
+void CGridShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	if (!m_doUpdate) {
 		return;
@@ -78,7 +78,7 @@ void CGridShape::UpdateShapeGeometry(const istd::IChangeable::ChangeSet& changeS
 	m_data.CreateCloud(imt3d::CPointCloud3d::PF_XYZ_32, vertices.size(), vertices.data());
 
 	m_indices.clear();
-	m_indices.reserve(vertices.size());
+	m_indices.reserve(int(vertices.size()));
 
 	for(int i = 0; i < vertices.size(); ++i){
 		m_indices.push_back(i);

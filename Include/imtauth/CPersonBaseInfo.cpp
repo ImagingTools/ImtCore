@@ -46,13 +46,13 @@ void CPersonBaseInfo::SetBirthday(const QDate& birthday)
 }
 
 
-QString CPersonBaseInfo::GetNameField(NameFieldType fieldType) const
+QString CPersonBaseInfo::GetNameField(NameFieldType /*fieldType*/) const
 {
 	return QString();
 }
 
 
-void CPersonBaseInfo::SetNameField(NameFieldType fieldType, const QString& value)
+void CPersonBaseInfo::SetNameField(NameFieldType /*fieldType*/, const QString& /*value*/)
 {
 
 }

@@ -74,10 +74,6 @@ I_EXPORT_COMPONENT(
 			"Feature tree view",
 			"Licensing Feature Tree View Package");
 
-I_EXPORT_COMPONENT(
-			DesignManager,
-			"Design Manager",
-			"Style Design Manager");
 
 } // namespace ImtLicenseGuiPck
 

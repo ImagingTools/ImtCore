@@ -31,13 +31,14 @@
 		"Name": "Light",
 		"TemplateIconColor": "#D9D9D9",
 		"ToolButtonGradient": {
-			"Start": "Orange",
-			"End": "GrayBlue"
+			"Start": "#F8F8FB",
+			"End": "#EEEEEE"
 		},
 		"PressedToolButtonGradient": {
-			"Start": "White",
-			"End": "Green"
+			"Start": "#F5F5F5",
+			"End": "#F5F5F5"
 		},
+		"ToolButtonBorderColor": "#FFFFFF",
 		"IconColor": {
 			"Normal": "ImagingTools Blue",
 			"OffActive": "ImagingTools Blue",

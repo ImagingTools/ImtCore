@@ -447,7 +447,7 @@ istd::IChangeable *CUserBaseInfo::CloneMe(CompatibilityMode mode) const
 }
 
 
-bool CUserBaseInfo::ResetData(CompatibilityMode mode)
+bool CUserBaseInfo::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 

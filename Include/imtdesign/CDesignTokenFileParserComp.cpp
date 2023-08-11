@@ -153,7 +153,7 @@ bool CDesignTokenFileParserComp::ParseFile()
 			SendInfoMessage(0, QString("The file name and the theme name have different case '%1' VS '%2'").arg(designTokenFileFileBaseName).arg(styleName));
 		}
 
-		ReplaceColorNamesRecursivle(styleEntry, colorPaletteVariables);
+		ReplaceColorNamesRecursive(styleEntry, colorPaletteVariables);
 		m_stylesBasePalettes.insert(styleName.toUtf8(), colorPaletteVariables);
 
 		if (!styleName.length()){
@@ -191,6 +191,12 @@ bool CDesignTokenFileParserComp::ParseFile()
 			schema.pressedToolButtonGradientColors = CDesignTokenStyleUtils::GetGradientColorsFromEntry(pressedToolButtonGradientColorsObject);
 		}
 
+		QJsonValue toolButtonBorderColorObject = styleEntry["ToolButtonBorderColor"];
+		if (toolButtonBorderColorObject.isString()){
+			QString value = toolButtonBorderColorObject.toString();
+
+			schema.toolButtonBorderColor = QColor(value);
+		}
 
 		m_colorPalettes.insert(styleName, schema);
 
@@ -380,7 +386,7 @@ void CDesignTokenFileParserComp::ReplaceColorNames(QJsonObject& json, const QVar
 }
 
 
-void CDesignTokenFileParserComp::ReplaceColorNamesRecursivle(QJsonObject& json, const QVariantMap& variableMaps)
+void CDesignTokenFileParserComp::ReplaceColorNamesRecursive(QJsonObject& json, const QVariantMap& variableMaps)
 {
 	QStringList keys = json.keys();
 	for (const QString& key : ::qAsConst(keys)){

@@ -32,6 +32,7 @@ public:
 		GradientColors pressedToolButtonGradientColors;
 		QPalette palette;
 		QString stylePath;
+		QColor toolButtonBorderColor;
 	};
 
 	virtual bool GetColorPalette(const QByteArray& designSchemaId, ColorSchema& palette) const = 0;

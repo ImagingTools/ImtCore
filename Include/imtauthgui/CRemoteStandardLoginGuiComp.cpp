@@ -239,7 +239,7 @@ void CRemoteStandardLoginGuiComp::on_SuPasswordEdit_textEdited(const QString& te
 }
 
 
-void CRemoteStandardLoginGuiComp::on_SuConfirmPasswordEdit_textEdited(const QString& text)
+void CRemoteStandardLoginGuiComp::on_SuConfirmPasswordEdit_textEdited(const QString& /*text*/)
 {
 	CheckMatchingPassword();
 }

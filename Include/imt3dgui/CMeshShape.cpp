@@ -314,7 +314,7 @@ bool CMeshShape::IsPointWithin(const QPoint& point, const QRect& rect, bool isCi
 }
 
 
-bool CMeshShape::GetFacePointIntersection(const QPoint& point, Indices& intersectedIndicies) const
+bool CMeshShape::GetFacePointIntersection(const QPoint& /*point*/, Indices& /*intersectedIndicies*/) const
 {
 	/*
 	intersectedIndicies.clear();
@@ -362,7 +362,7 @@ bool CMeshShape::GetFacePointIntersection(const QPoint& point, Indices& intersec
 }
 
 
-bool CMeshShape::GetFaceRectIntersections(const QRect& rect, bool isCircle, Indices& intersectedIndicies) const
+bool CMeshShape::GetFaceRectIntersections(const QRect& /*rect*/, bool /*isCircle*/, Indices& /*intersectedIndicies*/) const
 {
 	/*
 	intersectedIndicies.clear();
@@ -449,7 +449,7 @@ bool CMeshShape::IsFaceRayIntersection(
 }
 
 
-void CMeshShape::SelectVertices(Indices& intersectedIndicies, bool clearPreviousSelection)
+void CMeshShape::SelectVertices(Indices& /*intersectedIndicies*/, bool /*clearPreviousSelection*/)
 {
 	/*
 	// update selected indices

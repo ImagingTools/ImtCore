@@ -305,7 +305,7 @@ void COpenGLWidget::initializeGL()
 }
 
 
-void COpenGLWidget::resizeGL(int w, int h)
+void COpenGLWidget::resizeGL(int /*w*/, int /*h*/)
 {
 	m_scene.SetViewPort(rect());
 	m_scene.SetProjection(GetProjectionMatrix());
