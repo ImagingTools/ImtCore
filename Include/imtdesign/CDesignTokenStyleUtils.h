@@ -9,6 +9,7 @@
 
 // ImtCore includes
 #include <imtbase/CJsonHelper.h>
+#include <imtstyle/IColorPaletteProvider.h>
 
 
 namespace imtbase
@@ -53,6 +54,7 @@ public:
 	static QString GetColorName(QPalette::ColorGroup group, QPalette::ColorRole role);
 	static QPalette GetPaletteFromMultiEntry(const QJsonValue& styleEntry);
 	static QPalette GetPaletteFromEntry(const QJsonValue& paletteEntry);
+	static imtstyle::IColorPaletteProvider::GradientColors GetGradientColorsFromEntry(const QJsonValue& gradientColorsEntry);
 	static bool CreateColorFromGrb(const QString& rgbString, QColor& color);
 	static bool GetFontHintingPreference(const QString& name, QFont::HintingPreference& hintingPreference);
 	static bool GetFontCapitalization(const QString& name, QFont::Capitalization& capitalization);

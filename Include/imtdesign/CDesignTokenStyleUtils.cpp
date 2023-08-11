@@ -354,6 +354,15 @@ QPalette CDesignTokenStyleUtils::GetPaletteFromEntry(const QJsonValue& paletteEn
 	return palette;
 }
 
+imtstyle::IColorPaletteProvider::GradientColors CDesignTokenStyleUtils::GetGradientColorsFromEntry(const QJsonValue& gradientColorsEntry)
+{
+	imtstyle::IColorPaletteProvider::GradientColors retVal;
+	retVal.startColor = QColor(gradientColorsEntry["Start"].toString());
+	retVal.endColor = QColor(gradientColorsEntry["End"].toString());
+
+	return retVal;
+}
+
 
 bool CDesignTokenStyleUtils::CreateColorFromGrb(const QString& rgbString, QColor& color)
 {

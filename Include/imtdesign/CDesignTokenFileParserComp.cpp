@@ -179,6 +179,17 @@ bool CDesignTokenFileParserComp::ParseFile()
 		schema.stylePath = ":/Styles/" + styleName +  "/ImtColorStyle";
 		schema.palette = CDesignTokenStyleUtils::GetPaletteFromMultiEntry(styleEntry);
 
+		QJsonValue toolButtonGradientColorsObject = styleEntry["ToolButtonGradient"];
+		if (toolButtonGradientColorsObject.isObject()){
+			schema.toolButtonGradientColors = CDesignTokenStyleUtils::GetGradientColorsFromEntry(toolButtonGradientColorsObject);
+		}
+
+		QJsonValue pressedToolButtonGradientColorsObject = styleEntry["PressedToolButtonGradient"];
+		if (pressedToolButtonGradientColorsObject.isObject()){
+			schema.pressedToolButtonGradientColors = CDesignTokenStyleUtils::GetGradientColorsFromEntry(pressedToolButtonGradientColorsObject);
+		}
+
+
 		m_colorPalettes.insert(styleName, schema);
 
 		imtbase::CCollectionInfo* themeFontsCollection = new imtbase::CCollectionInfo;
