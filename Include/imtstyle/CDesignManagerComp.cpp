@@ -1,4 +1,4 @@
-#include <imtstyle/CDesignManagerCompBase.h>
+#include <imtstyle/CDesignManagerComp.h>
 
 
 // Qt includes
@@ -19,7 +19,7 @@ namespace imtstyle
 
 // public methods
 
-CDesignManagerCompBase::CDesignManagerCompBase()
+CDesignManagerComp::CDesignManagerComp()
 {
 	EnableLocalization(true);
 
@@ -27,7 +27,7 @@ CDesignManagerCompBase::CDesignManagerCompBase()
 }
 
 
-CDesignManagerCompBase::~CDesignManagerCompBase()
+CDesignManagerComp::~CDesignManagerComp()
 {
 	EnableLocalization(false);
 }
@@ -35,7 +35,7 @@ CDesignManagerCompBase::~CDesignManagerCompBase()
 
 // reimplemented (iprm:ISelectionParam)
 
-bool CDesignManagerCompBase::SetSelectedOptionIndex(int index)
+bool CDesignManagerComp::SetSelectedOptionIndex(int index)
 {
 	int currentIndex = GetSelectedOptionIndex();
 	if (currentIndex != index){
@@ -53,7 +53,7 @@ bool CDesignManagerCompBase::SetSelectedOptionIndex(int index)
 
 // reimplemented (iser::ISerializable)
 
-bool CDesignManagerCompBase::Serialize(iser::IArchive& archive)
+bool CDesignManagerComp::Serialize(iser::IArchive& archive)
 {
 	bool retVal = BaseClass2::Serialize(archive);
 
@@ -63,7 +63,7 @@ bool CDesignManagerCompBase::Serialize(iser::IArchive& archive)
 
 // protected methods
 
-void CDesignManagerCompBase::OnSystemStarting()
+void CDesignManagerComp::OnSystemStarting()
 {
 	m_designs.UpdateDesignList();
 
@@ -85,13 +85,13 @@ void CDesignManagerCompBase::OnSystemStarting()
 
 // reimplemented (icomp::CComponentBase)
 
-void CDesignManagerCompBase::OnComponentCreated()
+void CDesignManagerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 }
 
 
-void CDesignManagerCompBase::OnComponentDestroyed()
+void CDesignManagerComp::OnComponentDestroyed()
 {
 	BaseClass::OnComponentDestroyed();
 }
@@ -99,7 +99,7 @@ void CDesignManagerCompBase::OnComponentDestroyed()
 
 // reimplemented (ibase::TLocalizableWrap)
 
-void CDesignManagerCompBase::OnLanguageChanged()
+void CDesignManagerComp::OnLanguageChanged()
 {
 	m_designs.UpdateDesignList();
 }
@@ -107,7 +107,7 @@ void CDesignManagerCompBase::OnLanguageChanged()
 
 // private methods
 
-bool CDesignManagerCompBase::ApplyDesignScheme(const QByteArray& themeId)
+bool CDesignManagerComp::ApplyDesignScheme(const QByteArray& themeId)
 {
 	bool retVal = true;
 
@@ -137,18 +137,18 @@ bool CDesignManagerCompBase::ApplyDesignScheme(const QByteArray& themeId)
 
 // public methods of the embedded class DesignList
 
-CDesignManagerCompBase::DesignList::DesignList()
+CDesignManagerComp::DesignList::DesignList()
 	:m_parentPtr(nullptr)
 {
 }
 
 
-void CDesignManagerCompBase::DesignList::SetParent(CDesignManagerCompBase * parentPtr)
+void CDesignManagerComp::DesignList::SetParent(CDesignManagerComp * parentPtr)
 {
 	m_parentPtr = parentPtr;
 }
 
-void CDesignManagerCompBase::DesignList::UpdateDesignList()
+void CDesignManagerComp::DesignList::UpdateDesignList()
 {
 	istd::CChangeNotifier changeNotifier(this);
 
@@ -173,19 +173,19 @@ void CDesignManagerCompBase::DesignList::UpdateDesignList()
 
 // reimplemented (iprm::IOptionsList)
 
-int CDesignManagerCompBase::DesignList::GetOptionsFlags() const
+int CDesignManagerComp::DesignList::GetOptionsFlags() const
 {
 	return SCF_NONE;
 }
 
 
-int CDesignManagerCompBase::DesignList::GetOptionsCount() const
+int CDesignManagerComp::DesignList::GetOptionsCount() const
 {
 	return m_designList.count();
 }
 
 
-QString CDesignManagerCompBase::DesignList::GetOptionName(int index) const
+QString CDesignManagerComp::DesignList::GetOptionName(int index) const
 {
 	if (index >= 0 && index < m_designList.count()){
 		return m_designList[index].name;
@@ -195,7 +195,7 @@ QString CDesignManagerCompBase::DesignList::GetOptionName(int index) const
 }
 
 
-QString CDesignManagerCompBase::DesignList::GetOptionDescription(int index) const
+QString CDesignManagerComp::DesignList::GetOptionDescription(int index) const
 {
 	if (index >= 0 && index < m_designList.count()){
 		return m_designList[index].description;
@@ -205,7 +205,7 @@ QString CDesignManagerCompBase::DesignList::GetOptionDescription(int index) cons
 }
 
 
-QByteArray CDesignManagerCompBase::DesignList::GetOptionId(int index) const
+QByteArray CDesignManagerComp::DesignList::GetOptionId(int index) const
 {
 	if (index >= 0 && index < m_designList.count()){
 		return m_designList[index].id;
@@ -215,7 +215,7 @@ QByteArray CDesignManagerCompBase::DesignList::GetOptionId(int index) const
 }
 
 
-bool CDesignManagerCompBase::DesignList::IsOptionEnabled(int /*index*/) const
+bool CDesignManagerComp::DesignList::IsOptionEnabled(int /*index*/) const
 {
 	return true;
 }

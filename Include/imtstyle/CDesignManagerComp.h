@@ -18,7 +18,7 @@ namespace imtstyle
 {
 
 
-class CDesignManagerCompBase:
+class CDesignManagerComp:
 			public ibase::TRuntimeStatusHanderCompWrap<icomp::CComponentBase>,
 			public ibase::TLocalizableWrap<iprm::CSelectionParam>
 {
@@ -26,7 +26,7 @@ public:
 	typedef ibase::TRuntimeStatusHanderCompWrap<icomp::CComponentBase> BaseClass;
 	typedef ibase::TLocalizableWrap<iprm::CSelectionParam> BaseClass2;
 
-	I_BEGIN_COMPONENT(CDesignManagerCompBase);
+	I_BEGIN_COMPONENT(CDesignManagerComp);
 		I_REGISTER_INTERFACE(iprm::ISelectionParam);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_ASSIGN(m_slaveCompPtr, "SlaveDesignManager", "Slave design manager", false, "SlaveDesignManager");
@@ -34,8 +34,8 @@ public:
 		I_ASSIGN_TO(m_fontProviderCompPtr, m_paletteProviderCompPtr, false);
 	I_END_COMPONENT;
 
-	CDesignManagerCompBase();
-	~CDesignManagerCompBase();
+	CDesignManagerComp();
+	~CDesignManagerComp();
 
 	// reimplemented (iprm::ISelectionParam)
 	virtual bool SetSelectedOptionIndex(int index) override;
@@ -63,7 +63,7 @@ private:
 	public:
 		DesignList();
 
-		void SetParent(CDesignManagerCompBase* parentPtr);
+		void SetParent(CDesignManagerComp* parentPtr);
 
 		void UpdateDesignList();
 
@@ -85,7 +85,7 @@ private:
 
 	private:
 		QList<DesignInfo> m_designList;
-		CDesignManagerCompBase* m_parentPtr;
+		CDesignManagerComp* m_parentPtr;
 	};
 
 private:
