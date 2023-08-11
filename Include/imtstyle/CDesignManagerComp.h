@@ -29,7 +29,6 @@ public:
 	I_BEGIN_COMPONENT(CDesignManagerComp);
 		I_REGISTER_INTERFACE(iprm::ISelectionParam);
 		I_REGISTER_INTERFACE(iser::ISerializable);
-		I_ASSIGN(m_slaveCompPtr, "SlaveDesignManager", "Slave design manager", false, "SlaveDesignManager");
 		I_ASSIGN(m_paletteProviderCompPtr, "PaletteProvider", "Palette provider", false, "PaletteProvider");
 		I_ASSIGN_TO(m_fontProviderCompPtr, m_paletteProviderCompPtr, false);
 	I_END_COMPONENT;
