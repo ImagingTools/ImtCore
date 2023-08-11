@@ -3,6 +3,7 @@ call Update_de_DE.bat
 call Update_es_ES.bat
 call Update_fr_FR.bat
 call Update_pl_PL.bat
+call Update_pt_PT.bat
 call Update_ru_RU.bat
 call Update_fr_FR.bat
 call Update_zh_ZH.bat
