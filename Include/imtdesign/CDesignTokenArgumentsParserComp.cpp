@@ -77,9 +77,11 @@ QByteArrayList CDesignTokenArgumentsParserComp::GetArgumentValueMulti(AvailableA
 
 	int indexOfArg = m_arguments.indexOf(argValue);
 
+	// qDebug() << m_arguments;
+
 	while(indexOfArg > -1 && m_arguments.size() > indexOfArg + 1){
 		++indexOfArg;
-		if(m_arguments[indexOfArg].startsWith('-') || m_arguments[indexOfArg].startsWith('/')){
+		if(m_arguments[indexOfArg].startsWith('-') || m_arguments[indexOfArg].startsWith("/?")){
 			break;
 		}
 
