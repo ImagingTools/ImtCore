@@ -135,9 +135,8 @@ QtObject {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, preferenceSaveQuery);
+            console.log("State:", this.state, container.preferenceSaveQuery);
             if (this.state === "Ready") {
-
                 if (this.ContainsKey("errors")){
                     return;
                 }

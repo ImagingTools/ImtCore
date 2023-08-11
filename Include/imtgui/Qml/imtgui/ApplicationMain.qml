@@ -61,7 +61,7 @@ Item {
         }
 
         onServerSettingsSaved: {
-            serverSettingsObserver.observedModelDataChanged();
+            application.serverSettingsObserver.observedModelDataChanged();
         }
 
         onLocalSettingsSaved: {
