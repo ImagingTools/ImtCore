@@ -82,8 +82,8 @@
 			"Shadow": "Black",
 			"BorderColor": "DarkGray 2",
 			"ScrollIndicator": "DarkGray 3",
-                        "ScrollHighlight": "DarkGray 3",
-                        "ScrollBackground": "LightGray3"
+			"ScrollHighlight": "DarkGray 3",
+      "ScrollBackground": "LightGray3"
 		},
 		"InactiveColors": {
 			"Background": "DeepGray",

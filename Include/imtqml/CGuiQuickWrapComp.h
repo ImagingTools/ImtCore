@@ -52,6 +52,9 @@ public:
 	virtual void OnTryClose(bool* ignoredPtr = NULL) override;
 	
 protected:
+	// reimplemented (ibase::TDesignSchemaHandlerWrap)
+	virtual void OnDesignSchemaChanged(const QByteArray& themeId) override;
+
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 

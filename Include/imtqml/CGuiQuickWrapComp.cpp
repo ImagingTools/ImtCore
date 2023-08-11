@@ -8,6 +8,7 @@ namespace imtqml
 CGuiQuickWrapComp::CGuiQuickWrapComp()
 	:m_quickWidget(nullptr)
 {
+	EnableDesignHandler(true);
 }
 
 
@@ -21,6 +22,7 @@ bool CGuiQuickWrapComp::IsGuiCreated() const
 
 bool CGuiQuickWrapComp::CreateGui(QWidget *parentPtr)
 {
+		
 	if (m_quickCompPtr.IsValid()){
 		imtqml::IQuickObject *quickObjectPtr = m_quickCompPtr.GetPtr();
 		if (m_quickWidget == nullptr){
@@ -76,6 +78,19 @@ void CGuiQuickWrapComp::OnTryClose(bool* /*ignoredPtr*/)
 
 
 // protected methods
+
+// reimplemented (ibase::TDesignSchemaHandlerWrap)
+
+void CGuiQuickWrapComp::OnDesignSchemaChanged(const QByteArray & themeId)
+{
+	BaseClass::OnDesignSchemaChanged(themeId);
+
+	if (m_defaultStatusIconPathAttrPtr.IsValid()){
+		istd::CChangeNotifier changeNotifier(&m_visualStatus);
+
+		m_visualStatus.m_statusIcon = GetIcon(*m_defaultStatusIconPathAttrPtr);
+	}
+}
 
 // reimplemented (icomp::CComponentBase)
 
