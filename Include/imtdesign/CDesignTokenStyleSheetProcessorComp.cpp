@@ -39,9 +39,11 @@ int CDesignTokenStyleSheetProcessorComp::Exec()
 		return -1;
 	}
 
-	m_designTokenFileParserAttrPtr->SetFile(m_argumentParserAttrPtr->GetDesignTokenFilePath());
-	if(!m_designTokenFileParserAttrPtr->ParseFile()){
-		return -1;
+	QByteArrayList designTokenFileMultiPath = m_argumentParserAttrPtr->GetDesignTokenFileMultiPath();
+
+	for (QByteArray designTokenFilePath: designTokenFileMultiPath){
+		m_designTokenFileParserAttrPtr->SetFile(designTokenFilePath);
+		m_designTokenFileParserAttrPtr->ParseFile();
 	}
 
 	QVector<QByteArray> styles = m_designTokenFileParserAttrPtr->GetDesignSchemaList().GetElementIds();
@@ -53,7 +55,6 @@ int CDesignTokenStyleSheetProcessorComp::Exec()
 	}
 
 	for (const QByteArray& styleName: ::qAsConst(styles)){
-
 		m_currentTheme = styleName;
 		QVariantMap palette;
 		QVariantMap currentBasePalette;
@@ -77,6 +78,7 @@ int CDesignTokenStyleSheetProcessorComp::Exec()
 			return -1;
 		}
 	}
+
 	return 0;
 }
 

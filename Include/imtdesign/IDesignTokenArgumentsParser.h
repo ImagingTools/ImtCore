@@ -75,7 +75,12 @@ public:
 			\details Tells processors to ignore any errors, that could be emerged
 			\warning The program with this modificator must finished with code 0 ALWAYS!!!
 		*/
-		AA_ERRORS_IGNORE_MODE
+		AA_ERRORS_IGNORE_MODE,
+
+		/**
+			The common qrc file generate
+		*/
+		AA_COMMON
 	};
 
 	virtual void SetArguments(int argc, char**argv) = 0;
@@ -84,8 +89,10 @@ public:
 	virtual bool IsSplitModeRequired() const = 0;
 	virtual bool IsCopyDesignTokenFileRequired() const = 0;
 	virtual bool IsWebGenerateResourceRequired() const = 0;
+	virtual bool IsCommonGenerateResourceRequired() const = 0;
 	virtual bool IsQmlGenerateRequired() const = 0;
 	virtual QByteArray GetDesignTokenFilePath() const = 0;
+	virtual QByteArrayList GetDesignTokenFileMultiPath() const = 0;
 	virtual QByteArray GetImagesInputDirectoryPath() const = 0;
 	virtual QByteArrayList GetImagesInputDirectoryMultiPath() const = 0;
 	virtual QByteArray GetStyleSheetsInputDirectoryPath() const = 0;

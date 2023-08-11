@@ -50,6 +50,9 @@ void CDesignTokenProcessorsControllerComp::OnComponentCreated()
 		if(m_argumentParserAttrPtr->IsWebGenerateResourceRequired()){
 			beginInfoString += "\n\t| Web Generate";
 		}
+		if(m_argumentParserAttrPtr->IsCommonGenerateResourceRequired()){
+			beginInfoString += "\n\t| Common res Generate";
+		}
 		if(m_argumentParserAttrPtr->IsQmlGenerateRequired()){
 			beginInfoString += "\n\t| Qml Generate";
 		}

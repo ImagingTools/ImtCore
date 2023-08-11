@@ -118,6 +118,7 @@ void CDesignTokenArgumentsParserComp::SetArguments(int argc, char** argv)
 	m_commands.insert(AA_ERRORS_IGNORE_MODE, "--ignore-errors");
 	m_commands.insert(AA_WEB, "-W");
 	m_commands.insert(AA_QML, "--qml");
+	m_commands.insert(AA_COMMON, "--common");
 }
 
 
@@ -151,6 +152,12 @@ bool CDesignTokenArgumentsParserComp::IsWebGenerateResourceRequired() const
 }
 
 
+bool CDesignTokenArgumentsParserComp::IsCommonGenerateResourceRequired() const
+{
+	return this->CheckArgument(AA_COMMON);
+}
+
+
 bool CDesignTokenArgumentsParserComp::IsQmlGenerateRequired() const
 {
 	return this->CheckArgument(AA_QML);
@@ -178,6 +185,12 @@ QByteArray CDesignTokenArgumentsParserComp::GetStyleSheetsInputDirectoryPath() c
 QByteArray CDesignTokenArgumentsParserComp::GetDesignTokenFilePath() const
 {
 	return this->GetArgumentValue(AA_DESIGN_TOKEN_FILE_PATH);
+}
+
+
+QByteArrayList CDesignTokenArgumentsParserComp::GetDesignTokenFileMultiPath() const
+{
+	return this->GetArgumentValueMulti(AA_DESIGN_TOKEN_FILE_PATH);
 }
 
 

@@ -96,7 +96,9 @@ bool CDesignTokenFileParserComp::ParseFile()
 			designTokenFile.setFileName(m_designTokenFilePathAttrPtr->GetPath());
 		}
 		else{
-			SendErrorMessage(__LINE__, QString("Unable to open theme file : '%1'").arg(m_designTokenFileInfo.absoluteFilePath()));
+			if (!m_designTokenFileInfo.absoluteFilePath().isEmpty()){
+				SendErrorMessage(__LINE__, QString("Unable to open theme file : '%1'").arg(m_designTokenFileInfo.absoluteFilePath()));
+			}
 
 			return false;
 		}

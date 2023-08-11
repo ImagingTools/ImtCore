@@ -52,9 +52,11 @@ public:
 	bool IsErrorsIgnoreRequested() const override;
 	bool IsCopyDesignTokenFileRequired() const override;
 	bool IsWebGenerateResourceRequired() const override;
+	bool IsCommonGenerateResourceRequired() const override;
 	bool IsQmlGenerateRequired() const override;
 
 	QByteArray GetDesignTokenFilePath() const override;
+	QByteArrayList GetDesignTokenFileMultiPath() const override;
 	QByteArray GetImagesInputDirectoryPath() const override;
 	QByteArrayList GetImagesInputDirectoryMultiPath() const override;
 	QByteArray GetStyleSheetsInputDirectoryPath() const override;

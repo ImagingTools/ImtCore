@@ -41,62 +41,63 @@ int CDesignTokenIconProcessorComp::Exec()
 		return -1;
 	}
 
+	QByteArrayList designTokenFileMultiPath = m_argumentParserAttrPtr->GetDesignTokenFileMultiPath();
 
-	m_designTokenFileParserAttrPtr->SetFile(m_argumentParserAttrPtr->GetDesignTokenFilePath());
-	if (!m_designTokenFileParserAttrPtr->ParseFile()){
-		return -1;
-	}
+	for (QByteArray designTokenFilePath: designTokenFileMultiPath){
+		m_designTokenFileParserAttrPtr->SetFile(designTokenFilePath);
+		m_designTokenFileParserAttrPtr->ParseFile();
 
-	QVector<QByteArray> styles = m_designTokenFileParserAttrPtr->GetDesignSchemaList().GetElementIds();
-	m_outputDirName = m_argumentParserAttrPtr->GetOutputDirectoryPath();
-	m_inputDirName = m_argumentParserAttrPtr->GetImagesInputDirectoryPath();
-	m_projectName = m_argumentParserAttrPtr->GetProjectName();
-	if (!m_inputDirName.length()){
-		qInfo() << "Icons directory was not set. Skipping...";
-		return 0;
-	}
-
-	for (const QByteArray& styleName : ::qAsConst(styles)){
-		m_templateIconColor = m_designTokenFileParserAttrPtr->GetTemplateIconColor(styleName);
-		m_normalColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_NORMAL);
-		m_offNormalColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_OFF_NORMAL);
-		m_offDisabledColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_OFF_DISABLED);
-		m_offActiveColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_OFF_ACTIVE);
-		m_offSelectedColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_OFF_SELECTED);
-		m_onNormalColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_ON_NORMAL);
-		m_onDisabledColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_ON_DISABLED);
-		m_onActiveColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_ON_ACTIVE);
-		m_onSelectedColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_ON_SELECTED);
-
-		QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + QByteArray("Resources") + QDir::separator().toLatin1() + QByteArray("Icons") + QDir::separator().toLatin1() + styleName.constData();
-
-		QDir resourceDir(m_inputDirName);
-		QDir colorResourceDir(m_inputDirName);
-		colorResourceDir.cdUp();
-		for (const QFileInfo& possibleColorResourceDir : colorResourceDir.entryInfoList({(QString('*').append(styleName).append('*'))}, QDir::Dirs)){
-			if (possibleColorResourceDir.isDir()){
-				istd::CSystem::CopyDirectory(possibleColorResourceDir.absoluteFilePath(), outputDirName);
-				break;
-			}
+		QVector<QByteArray> styles = m_designTokenFileParserAttrPtr->GetDesignSchemaList().GetElementIds();
+		m_outputDirName = m_argumentParserAttrPtr->GetOutputDirectoryPath();
+		m_inputDirName = m_argumentParserAttrPtr->GetImagesInputDirectoryPath();
+		m_projectName = m_argumentParserAttrPtr->GetProjectName();
+		if (!m_inputDirName.length()){
+			qInfo() << "Icons directory was not set. Skipping...";
+			return 0;
 		}
 
-		QDir outputDir(outputDirName);
-		QFileInfoList outputDirEntries = outputDir.entryInfoList(QDir::Files);
+		for (const QByteArray& styleName : ::qAsConst(styles)){
+			m_templateIconColor = m_designTokenFileParserAttrPtr->GetTemplateIconColor(styleName);
+			m_normalColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_NORMAL);
+			m_offNormalColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_OFF_NORMAL);
+			m_offDisabledColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_OFF_DISABLED);
+			m_offActiveColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_OFF_ACTIVE);
+			m_offSelectedColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_OFF_SELECTED);
+			m_onNormalColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_ON_NORMAL);
+			m_onDisabledColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_ON_DISABLED);
+			m_onActiveColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_ON_ACTIVE);
+			m_onSelectedColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_ON_SELECTED);
 
-		for (const QFileInfo& outputDirEntry : ::qAsConst(outputDirEntries)){
-			if (outputDirEntry.isFile()){
-				QFile file(outputDirEntry.absoluteFilePath());
-				file.setPermissions(
-							file.permissions() |
-							QFileDevice::WriteOwner |
-							QFileDevice::WriteUser |
-							QFileDevice::WriteGroup |
-							QFileDevice::WriteOther);
+			QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + QByteArray("Resources") + QDir::separator().toLatin1() + QByteArray("Icons") + QDir::separator().toLatin1() + styleName.constData();
+
+			QDir resourceDir(m_inputDirName);
+			QDir colorResourceDir(m_inputDirName);
+			colorResourceDir.cdUp();
+			for (const QFileInfo& possibleColorResourceDir : colorResourceDir.entryInfoList({(QString('*').append(styleName).append('*'))}, QDir::Dirs)){
+				if (possibleColorResourceDir.isDir()){
+					istd::CSystem::CopyDirectory(possibleColorResourceDir.absoluteFilePath(), outputDirName);
+					break;
+				}
 			}
-		}
 
-		if (!SetColorAllFilesInDir(m_inputDirName, outputDirName)){
-			return -1;
+			QDir outputDir(outputDirName);
+			QFileInfoList outputDirEntries = outputDir.entryInfoList(QDir::Files);
+
+			for (const QFileInfo& outputDirEntry : ::qAsConst(outputDirEntries)){
+				if (outputDirEntry.isFile()){
+					QFile file(outputDirEntry.absoluteFilePath());
+					file.setPermissions(
+								file.permissions() |
+								QFileDevice::WriteOwner |
+								QFileDevice::WriteUser |
+								QFileDevice::WriteGroup |
+								QFileDevice::WriteOther);
+				}
+			}
+
+			if (!SetColorAllFilesInDir(m_inputDirName, outputDirName)){
+				return -1;
+			}
 		}
 	}
 	return 0;

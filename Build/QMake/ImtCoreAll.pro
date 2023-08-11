@@ -110,6 +110,9 @@ imtzip.file = ../../Include/imtzip/QMake/imtzip.pro
 SUBDIRS += imtqml
 imtqml.file = ../../Include/imtqml/QMake/imtqml.pro
 
+SUBDIRS += imtcontrols
+imtcontrols.file = ../../Include/imtcontrols/QMake/imtcontrols.pro
+
 SUBDIRS += imtlic
 imtlic.file = ../../Include/imtlic/QMake/imtlic.pro
 
@@ -263,4 +266,8 @@ ImtAuthDbPck.depends = imtauthdb imtdb
 SUBDIRS += ImtAuthGqlPck
 ImtAuthGqlPck.file = ../../Impl/ImtAuthGqlPck/QMake/ImtAuthGqlPck.pro
 ImtAuthGqlPck.depends = imtauthgql
+
+#SUBDIRS += ImtControlsGallery
+#ImtControlsGallery.file = ../../Impl/ImtControlsGallery/QMake/ImtControlsGallery.pro
+#ImtControlsGallery.depends = imtqml imtstyle imtcontrols
 

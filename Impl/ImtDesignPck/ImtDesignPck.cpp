@@ -50,6 +50,11 @@ I_EXPORT_COMPONENT(
 		"Design Token QRC");
 
 I_EXPORT_COMPONENT(
+		CDesignTokenCommonQrcGenerator,
+		"Generate common QRC themes and styles",
+		"Design Token Theme Style QRC");
+
+I_EXPORT_COMPONENT(
 		DesignTokenWebQrcGenerator,
 		"Generate Web QRC files",
 		"Design Token Web QRC");
