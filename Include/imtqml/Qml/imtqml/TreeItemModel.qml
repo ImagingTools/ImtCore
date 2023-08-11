@@ -147,9 +147,58 @@ JSONListModel {
     }
 
     function IsEqualWithModel(externModel){
-        if(!externModel) return false
+        if(!externModel) {
+            return false
+        }
+        return IsEqual(externModel);
+    }
 
-        return true;
+    function IsEqual(sourceModel){
+        if(sourceModel) {
+            if(this.GetItemsCount() !== sourceModel.GetItemsCount()){
+                return false;
+            }
+
+            for(let i = 0; i < sourceModel.GetItemsCount(); ++i){
+                var item = this.GetModelFromItem(i);
+                var sourceItem = sourceModel.GetModelFromItem(i);
+
+                var itemKeys = item.GetKeys();
+                var sourceItemKeys = sourceItem.GetKeys();
+
+                if(itemKeys.length !== sourceItemKeys.length){
+                    return false;
+                }
+
+                for(let key in sourceItemKeys){
+                    if(!itemKeys.includes(sourceItemKeys[key])){
+                        return false;
+                    }
+
+                    var itemValue = item.GetData(sourceItemKeys[key]);
+                    var sourceValue = sourceItem.GetData(sourceItemKeys[key]);
+
+                    if(typeof sourceValue === 'object'){
+                        if(typeof itemValue !== 'object'){
+                            return false;
+                        }
+
+                        let result = sourceValue.IsEqual(itemValue);
+
+                        if(!result){
+                            return false;
+                        }
+                    }
+                    else if(sourceValue !== itemValue){
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     function Copy(obj){
@@ -163,10 +212,15 @@ JSONListModel {
     }
 
     function GetKeys(index){
+        if (index === undefined) index = 0
+
         var keys = []
         if(this.count > 0){
             var modelObject = this.get(index)
             keys = Object.keys(modelObject.$p)
+
+            keys = keys.filter(function(arrFiltered) { return arrFiltered !== 'index' })
+
         }
         return keys;
     }
