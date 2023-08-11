@@ -90,7 +90,7 @@ bool CSelectionParamLayoutFittableEditorGui::OnModelAttached(imod::IModel* model
 
 // reimplemented (imod::IModelEditor)
 
-void CSelectionParamLayoutFittableEditorGui::UpdateEditor(const istd::IChangeable::ChangeSet& changeSet)
+void CSelectionParamLayoutFittableEditorGui::UpdateEditor(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	if (!m_comboBoxPtr.isNull()){
 		ModelType* observedObjectPtr = GetObservedObject();

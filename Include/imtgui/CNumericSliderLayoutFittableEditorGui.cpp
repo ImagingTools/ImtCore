@@ -148,7 +148,7 @@ bool CNumericSliderLayoutFittableEditorGui::OnModelAttached(imod::IModel* modelP
 }
 
 
-void CNumericSliderLayoutFittableEditorGui::UpdateEditor(const istd::IChangeable::ChangeSet& changeSet)
+void CNumericSliderLayoutFittableEditorGui::UpdateEditor(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	ModelType* observedObject = GetObservedObject();
 	imath::CVarVector values = observedObject->GetValues();

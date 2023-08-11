@@ -92,7 +92,7 @@ void CRepresentationViewCompBase::SetId(const QByteArray& id)
 
 // reimplemented (iser::ISerializable)
 
-bool CRepresentationViewCompBase::Serialize(iser::IArchive& archive)
+bool CRepresentationViewCompBase::Serialize(iser::IArchive& /*archive*/)
 {
 	return false;
 }
@@ -152,7 +152,7 @@ CRepresentationViewCompBase::GraphicsItemList CRepresentationViewCompBase::GetRe
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CRepresentationViewCompBase::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+void CRepresentationViewCompBase::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	Q_ASSERT(QThread::currentThread() == qApp->thread());
 

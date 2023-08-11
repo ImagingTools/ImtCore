@@ -58,7 +58,7 @@ bool CNameLayoutFittableEditorGui::OnModelAttached(imod::IModel* modelPtr, istd:
 
 // reimplemented (imod::IModelEditor)
 
-void CNameLayoutFittableEditorGui::UpdateEditor(const istd::IChangeable::ChangeSet& changeSet)
+void CNameLayoutFittableEditorGui::UpdateEditor(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	ModelType* observedObjectPtr = GetObservedObject();
 	if (!m_nameLineEditPtr.isNull()){

@@ -47,7 +47,7 @@ QRectF CProductionSpeedItem::boundingRect() const
 }
 
 
-void CProductionSpeedItem::paint(QPainter* painter, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
+void CProductionSpeedItem::paint(QPainter* /*painter*/, const QStyleOptionGraphicsItem* /*option*/, QWidget* /*widget*/)
 {
 	//Q_ASSERT(m_positionProviderPtr != nullptr);
 
@@ -182,7 +182,7 @@ void CProductionSpeedItem::paint(QPainter* painter, const QStyleOptionGraphicsIt
 }
 
 
-void CProductionSpeedItem::hoverMoveEvent(QGraphicsSceneHoverEvent *event)
+void CProductionSpeedItem::hoverMoveEvent(QGraphicsSceneHoverEvent* /*event*/)
 {
 	Q_ASSERT(m_positionProviderPtr != nullptr);
 

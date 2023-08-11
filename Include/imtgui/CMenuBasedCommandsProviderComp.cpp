@@ -128,7 +128,7 @@ CMenuBasedCommandsProviderComp::MenuCommandVisualStatusObserver::MenuCommandVisu
 }
 
 
-void CMenuBasedCommandsProviderComp::MenuCommandVisualStatusObserver::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+void CMenuBasedCommandsProviderComp::MenuCommandVisualStatusObserver::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	m_parent.UpdateMenuCommandVisualStatus();
 }

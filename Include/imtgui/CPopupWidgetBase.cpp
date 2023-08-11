@@ -67,7 +67,7 @@ void CPopupWidgetBase::leaveEvent(QEvent* event)
 }
 
 
-void CPopupWidgetBase::mousePressEvent(QMouseEvent* event)
+void CPopupWidgetBase::mousePressEvent(QMouseEvent* /*event*/)
 {
 	if (m_isClosingOnMouseClickAllowed){
 		Q_EMIT EmitCloseRequest();

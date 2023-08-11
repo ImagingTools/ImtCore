@@ -58,7 +58,7 @@ bool CEnableableLayoutFittableEditorGui::OnModelAttached(imod::IModel* modelPtr,
 
 // reimplemented (imod::IModelEditor)
 
-void CEnableableLayoutFittableEditorGui::UpdateEditor(const istd::IChangeable::ChangeSet& changeSet)
+void CEnableableLayoutFittableEditorGui::UpdateEditor(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	ModelType* observedObjectPtr = GetObservedObject();
 	if (!m_checkBoxPtr.isNull()){
