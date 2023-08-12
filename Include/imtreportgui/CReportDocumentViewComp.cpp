@@ -129,9 +129,9 @@ void CReportDocumentViewComp::OnGuiRetranslate()
 {
 	BaseClass::OnGuiRetranslate();
 
-	m_exportToPdfCommand.SetVisuals(tr("Export to PDF..."), tr("PDF..."), tr("Export current report to PDF file"), QIcon(":/Icons/Pdf"));
+	m_exportToPdfCommand.SetVisuals(tr("Export to PDF..."), tr("PDF..."), tr("Export current report to PDF file"), GetIcon(":/Icons/Pdf"));
 	m_exportToTiffCommand.SetVisuals(tr("Export to TIFF..."), tr("TIFF..."), tr("Export current report to TIFF file"));
-	m_showGridCommand.SetVisuals(tr("Show/Hide Grid"), tr("Grid"), tr("Set grid visible/unvisible"), QIcon(":/Icons/Grid2"));
+	m_showGridCommand.SetVisuals(tr("Show/Hide Grid"), tr("Grid"), tr("Set grid visible/unvisible"), GetIcon(":/Icons/Grid2"));
 }
 
 

@@ -28,6 +28,16 @@ void CMultiStatusProviderGuiComp::OnGuiRetranslate()
 	}
 }
 
+void CMultiStatusProviderGuiComp::OnGuiDesignChanged()
+{
+	BaseClass::OnGuiDesignChanged();
+
+	m_stateUnknownIcon = GetIcon(":/Icons/StateUnknown");
+	m_stateOkIcon = GetIcon(":/Icons/StateOk");
+	m_stateWarningIcon = GetIcon(":/Icons/StateWarning");
+	m_stateInvalidIcon = GetIcon(":/Icons/StateInvalid");
+}
+
 
 // reimplemented (iqtgui::TGuiObserverWrap)
 
@@ -81,21 +91,17 @@ void CMultiStatusProviderGuiComp::UpdateStatusesGui(const imtbase::IMultiStatusP
 
 QIcon CMultiStatusProviderGuiComp::GetStatusIcon(istd::IInformationProvider::InformationCategory status)
 {
-	static QIcon stateUnknownIcon(":/Icons/StateUnknown");
-	static QIcon stateOkIcon(":/Icons/StateOk");
-	static QIcon stateWarningIcon(":/Icons/StateWarning");
-	static QIcon stateInvalidIcon(":/Icons/StateInvalid");
 
 	switch (status){
 		case istd::IInformationProvider::IC_INFO:
-			return stateOkIcon;
+			return m_stateOkIcon;
 		case istd::IInformationProvider::IC_WARNING:
-			return stateWarningIcon;
+			return m_stateWarningIcon;
 		case istd::IInformationProvider::IC_ERROR:
 		case istd::IInformationProvider::IC_CRITICAL:
-			return stateInvalidIcon;
+			return m_stateInvalidIcon;
 		default:
-			return stateUnknownIcon;
+			return m_stateUnknownIcon;
 	}
 }
 

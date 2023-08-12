@@ -148,8 +148,8 @@ void CAccountInfoEditorComp::OnGuiCreated()
 	AccountTypeCombo->addItem(tr("Company"));
 	m_blockComboChanged = false;
 
-	m_loadAccountPictureAction.setIcon(QIcon(":/Icons/Workflow"));
-	m_removeAccountPictureAction.setIcon(QIcon(":/Icons/Remove"));
+	m_loadAccountPictureAction.setIcon(GetIcon(":/Icons/Workflow"));
+	m_removeAccountPictureAction.setIcon(GetIcon(":/Icons/Remove"));
 	m_loadAccountPictureAction.setText(tr("Load..."));
 	m_removeAccountPictureAction.setText(tr("Remove"));
 

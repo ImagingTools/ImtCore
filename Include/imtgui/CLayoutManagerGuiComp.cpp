@@ -252,16 +252,21 @@ void CLayoutManagerGuiComp::OnGuiRetranslate()
 	BaseClass::OnGuiRetranslate();
 
 	// File commands emptyIcon
-	m_startEndEditModeCommand.SetVisuals(tr("Edit Mode"), tr("Edit Mode"), tr("EditMode"), QIcon(":/Icons/Edit"));
-	m_clearCommand.SetVisuals(tr("Clear All"), tr("Clear All"), tr("ClearAll"), QIcon(":/Icons/Clear"));
-	m_loadCommand.SetVisuals(tr("Import"), tr("Import"), tr("Import"), QIcon(":/Icons/Import"));
-	m_saveCommand.SetVisuals(tr("Export"), tr("Export"), tr("Export"), QIcon(":/Icons/Export"));
+	m_startEndEditModeCommand.SetVisuals(tr("Edit Mode"), tr("Edit Mode"), tr("EditMode"), GetIcon(":/Icons/Edit"));
+	m_clearCommand.SetVisuals(tr("Clear All"), tr("Clear All"), tr("ClearAll"), GetIcon(":/Icons/Clear"));
+	m_loadCommand.SetVisuals(tr("Import"), tr("Import"), tr("Import"), GetIcon(":/Icons/Import"));
+	m_saveCommand.SetVisuals(tr("Export"), tr("Export"), tr("Export"), GetIcon(":/Icons/Export"));
 }
 
 
 void CLayoutManagerGuiComp::OnGuiDesignChanged()
 {
 	BaseClass::OnGuiDesignChanged();
+
+	m_startEndEditModeCommand.setIcon(GetIcon(":/Icons/Edit"));
+	m_clearCommand.setIcon(GetIcon(":/Icons/Clear"));
+	m_loadCommand.setIcon(GetIcon(":/Icons/Import"));
+	m_saveCommand.setIcon(GetIcon(":/Icons/Export"));
 
 	iqtgui::SetStyleSheetFromFile(GetWidget(), GetStyleSheetPath(":/Styles/CustomLayoutWidgetForm"));
 }

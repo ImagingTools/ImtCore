@@ -31,12 +31,19 @@ protected:
 	// reimplemented (iqtgui::TGuiObserverWrap)
 	virtual void UpdateGui(const istd::IChangeable::ChangeSet& changeSet) override;
 	virtual void OnGuiRetranslate() override;
+	virtual void OnGuiDesignChanged() override;
 
 private:
 	void UpdateCommonStatusGui(const istd::IInformationProvider& status);
 	void UpdateStatusesGui(const imtbase::IMultiStatusProvider& statuses);
 
-	static QIcon GetStatusIcon(istd::IInformationProvider::InformationCategory status);
+	QIcon GetStatusIcon(istd::IInformationProvider::InformationCategory status);
+
+private:
+	QIcon m_stateUnknownIcon;
+	QIcon m_stateOkIcon;
+	QIcon m_stateWarningIcon;
+	QIcon m_stateInvalidIcon;
 };
 
 

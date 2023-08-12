@@ -92,74 +92,107 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 		workingDocumentPtr.SetPtr(CreateObject(typeId));
 	}
 
+	bool useExternalDocumentStorage = m_externalDocumentCollectionCompPtr.IsValid();
+	quint32 checksum = 0;
+	QByteArray documentContent;
+
 	if (workingDocumentPtr.IsValid()){
-		QByteArray documentContent;
-		if (WriteDataToMemory(typeId, *workingDocumentPtr, documentContent)){
-			QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray(QUuid::WithoutBraces) : proposedObjectId;
-			QByteArray revisionUuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+		if (!WriteDataToMemory(typeId, *workingDocumentPtr, documentContent)){
+			SendCriticalMessage(0, "Document data could not be written to the memory");
 
-			retVal.query = QString("INSERT INTO \"%1\"(\"Id\", \"%2\", \"Name\", \"Description\", \"Added\", \"LastRevisionId\") VALUES('%3', '%4', '%5', '%6', '%7', '%8');")
-						.arg(qPrintable(*m_tableNameAttrPtr))
-						.arg(qPrintable(*m_objectTypeIdColumnAttrPtr))
-						.arg(qPrintable(objectId))
-						.arg(qPrintable(typeId))
-						.arg(objectName)
-						.arg(objectDescription)
-						.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-						.arg(qPrintable(revisionUuid))
-						.toUtf8();
+			return retVal;
+		}
 
-			quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
+		checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
+	}
+	else{
+		SendCriticalMessage(0, "Document instance is invalid. SQL-query could not be created");
+	}
 
-			retVal.query += QString("INSERT INTO \"%1\"(\"Id\", \"%2\", \"%3\", \"RevisionNumber\", \"Comment\", \"LastModified\", \"Checksum\") VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
+	QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray(QUuid::WithoutBraces) : proposedObjectId;
+	QByteArray revisionUuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
+
+	if (m_externalDocumentCollectionCompPtr.IsValid()){
+		QByteArray dataObjectId = m_externalDocumentCollectionCompPtr->InsertNewObject(
+					typeId,
+					objectName,
+					objectDescription,
+					imtbase::IObjectCollection::DataPtr(workingDocumentPtr.GetPtr()),
+					revisionUuid);
+		if (dataObjectId.isEmpty()){
+			SendErrorMessage(0, QString("Document '%1' could not be added to the external data storage").arg(objectName));
+
+			return retVal;
+		}
+
+		// Rollback if the IDs are not correct:
+		if (dataObjectId != revisionUuid){
+			m_externalDocumentCollectionCompPtr->RemoveElement(dataObjectId);
+
+			SendCriticalMessage(0, "External collection created an invalid document-ID");
+
+			return retVal;
+		}
+	}
+
+	retVal.query = QString("INSERT INTO \"%1\"(\"Id\", \"%2\", \"Name\", \"Description\", \"Added\", \"LastRevisionId\") VALUES('%3', '%4', '%5', '%6', '%7', '%8');")
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(*m_objectTypeIdColumnAttrPtr))
+				.arg(qPrintable(objectId))
+				.arg(qPrintable(typeId))
+				.arg(objectName)
+				.arg(objectDescription)
+				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+				.arg(qPrintable(revisionUuid))
+				.toUtf8();
+
+	retVal.query += QString("INSERT INTO \"%1\"(\"Id\", \"%2\", \"%3\", \"RevisionNumber\", \"Comment\", \"LastModified\", \"Checksum\") VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 				.arg(qPrintable(s_documentIdColumn))
 				.arg(qPrintable(*m_documentContentColumnIdAttrPtr))
 				.arg(qPrintable(revisionUuid))
 				.arg(qPrintable(objectId))
-				.arg(qPrintable(documentContent.toBase64()))
+				.arg(!useExternalDocumentStorage ? qPrintable(documentContent.toBase64()) : QByteArray())
 				.arg(1)
 				.arg(QObject::tr("Initial revision"))
 				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 				.arg(checksum)
 				.toUtf8();
 
-			if (m_metaInfoTableDelegateCompPtr.IsValid()){
-				idoc::MetaInfoPtr metaInfoPtr = m_metaInfoTableDelegateCompPtr->CreateMetaInfo(valuePtr, typeId);
-				if (metaInfoPtr.IsValid()){
-					retVal.query += "\n";
+	if (m_metaInfoTableDelegateCompPtr.IsValid()){
+		idoc::MetaInfoPtr metaInfoPtr = m_metaInfoTableDelegateCompPtr->CreateMetaInfo(valuePtr, typeId);
+		if (metaInfoPtr.IsValid()){
+			retVal.query += "\n";
 
-					QByteArrayList columnIds = {"\"" + s_idColumn + "\"", "\"RevisionId\""};
-					columnIds += m_metaInfoTableDelegateCompPtr->GetColumnIds();
+			QByteArrayList columnIds = { "\"" + s_idColumn + "\"", "\"RevisionId\"" };
+			columnIds += m_metaInfoTableDelegateCompPtr->GetColumnIds();
 
-					QStringList tableValues;
-					tableValues.push_back("'" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "'");
-					tableValues.push_back("'" + revisionUuid + "'");
+			QStringList tableValues;
+			tableValues.push_back("'" + QUuid::createUuid().toString(QUuid::WithoutBraces) + "'");
+			tableValues.push_back("'" + revisionUuid + "'");
 
-					for (const QByteArray& columnId : m_metaInfoTableDelegateCompPtr->GetColumnIds()){
-						QVariant data = metaInfoPtr->GetMetaInfo(m_metaInfoTableDelegateCompPtr->GetMetaInfoType(columnId));
+			for (const QByteArray& columnId : m_metaInfoTableDelegateCompPtr->GetColumnIds()){
+				QVariant data = metaInfoPtr->GetMetaInfo(m_metaInfoTableDelegateCompPtr->GetMetaInfoType(columnId));
 
-						QString value = m_metaInfoTableDelegateCompPtr->ToTableRepresentation(data, columnId).toString();
+				QString value = m_metaInfoTableDelegateCompPtr->ToTableRepresentation(data, columnId).toString();
 
-						tableValues.push_back("'" + value + "'");
-					}
-
-					retVal.query += QString("INSERT INTO \"%1\"(%2) VALUES(%3);")
-								.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
-								.arg(qPrintable(columnIds.join(", ")))
-								.arg(tableValues.join(", "))
-								.toUtf8();
-				}
-				else{
-					SendErrorMessage(0, "Meta information of the document could not be created", "SQL Database Delegate");
-
-					return imtdb::IDatabaseObjectDelegate::NewObjectQuery();
-				}
+				tableValues.push_back("'" + value + "'");
 			}
 
-			retVal.objectName = objectName;
+			retVal.query += QString("INSERT INTO \"%1\"(%2) VALUES(%3);")
+						.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
+						.arg(qPrintable(columnIds.join(", ")))
+						.arg(tableValues.join(", "))
+						.toUtf8();
+		}
+		else {
+			SendErrorMessage(0, "Meta information of the document could not be created", "SQL Database Delegate");
+
+			return imtdb::IDatabaseObjectDelegate::NewObjectQuery();
 		}
 	}
+
+	retVal.objectName = objectName;
 
 	return retVal;
 }
@@ -209,6 +242,8 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 
 	QByteArray typeId = collection.GetObjectTypeId(objectId);
 
+	bool useExternalDocumentStorage = m_externalDocumentCollectionCompPtr.IsValid();
+
 	QByteArray documentContent;
 	if (WriteDataToMemory(typeId, object, documentContent)){
 		quint32 checksum = istd::CCrcCalculator::GetCrcFromData((const quint8*)documentContent.constData(), documentContent.size());
@@ -229,7 +264,7 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 					.arg(qPrintable(*m_documentContentColumnIdAttrPtr))
 					.arg(qPrintable(revisionUuid))
 					.arg(qPrintable(objectId))
-					.arg(qPrintable(documentContent.toBase64()))
+					.arg(!useExternalDocumentStorage ? qPrintable(documentContent.toBase64()): QByteArray())
 					.arg(revisionsCount + 1)
 					.arg(operationComment)
 					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
@@ -257,10 +292,24 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 				}
 
 				retVal += QString("INSERT INTO \"%1\"(%2) VALUES(%3);")
-					.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
-					.arg(qPrintable(columnIds.join(", ")))
-					.arg(tableValues.join(", "))
-					.toUtf8();
+							.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
+							.arg(qPrintable(columnIds.join(", ")))
+							.arg(tableValues.join(", "))
+							.toUtf8();
+			}
+
+			if (m_externalDocumentCollectionCompPtr.IsValid()) {
+				QByteArray dataObjectId = m_externalDocumentCollectionCompPtr->InsertNewObject(
+							typeId,
+							"",
+							"Document Update",
+							imtbase::IObjectCollection::DataPtr(&object),
+							revisionUuid);
+				if (dataObjectId.isEmpty()) {
+					SendErrorMessage(0, QString("Document could not be added to the external data storage"));
+
+					return retVal;
+				}
 			}
 		}
 	}
@@ -438,11 +487,11 @@ bool CSqlDatabaseDocumentDelegateComp::RestoreObject(
 	}
 
 	QString setActiveRevisionQuery = QString("UPDATE \"%1\" SET \"LastRevisionId\" = '%2' WHERE \"%3\" = '%4';")
-		.arg(qPrintable(*m_tableNameAttrPtr))
-		.arg(qPrintable(revisionUuid))
-		.arg(qPrintable(s_idColumn))
-		.arg(qPrintable(objectId))
-		.toUtf8();
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(revisionUuid))
+				.arg(qPrintable(s_idColumn))
+				.arg(qPrintable(objectId))
+				.toUtf8();
 
 	istd::CChangeNotifier changeNotifier(&collection);
 

@@ -129,8 +129,8 @@ void CContactInfoEditorComp::OnGuiCreated()
 	AddAddress->setDefaultAction(&m_addAddressAction);
 	RemoveAddress->setDefaultAction(&m_removeAddressAction);
 
-	m_addAddressAction.setIcon(QIcon(":/Icons/Add"));
-	m_removeAddressAction.setIcon(QIcon(":/Icons/Remove"));
+	m_addAddressAction.setIcon(GetIcon(":/Icons/Add"));
+	m_removeAddressAction.setIcon(GetIcon(":/Icons/Remove"));
 
 	EMailGroup->setVisible(*m_showMailEditAttrPtr);
 	BirthdayGroup->setVisible(*m_showBirthdayEditAttrPtr);
