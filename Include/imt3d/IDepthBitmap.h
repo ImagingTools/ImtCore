@@ -49,20 +49,6 @@ public:
 				const istd::CRange& depthRange,
 				const istd::CIndex2d& size) = 0;
 
-	/**
-		Create bitmap with specified size and format using external image data buffer.
-		\param	size			bitmap size.
-		\param	dataPtr			pointer to external image buffer.
-		\param	releaseFlag		if its true, external buffer will be managed (removed) by this object.
-		\param	linesDifference	address difference between next and previos line. If it equals 0, the value will be taken from size and number of bits per pixel.
-	*/
-	virtual bool CreateDepthBitmap(
-				const istd::CRange& depthRange,
-				const istd::CIndex2d& size,
-				void* dataPtr,
-				bool releaseFlag,
-				int linesDifference = 0) = 0;
-
 	virtual const IImage3dCalibration* GetCalibration3d() const = 0;
 	virtual const iimg::IBitmap* GetReferenceBitmap() const = 0;
 };

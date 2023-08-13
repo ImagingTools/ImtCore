@@ -49,7 +49,8 @@ void CDepthBitmap::SetColorMap(ColorMapType colorMapType)
 	InvalidateCache(istd::IChangeable::GetNoChanges());
 }
 
-void CDepthBitmap::SetClibration3d(const CImage3dCalibration& calibration3d)
+
+void CDepthBitmap::SetCalibration3d(const CImage3dCalibration& calibration3d)
 {
 	m_calibration3d.CopyFrom(calibration3d);
 
@@ -77,24 +78,6 @@ bool CDepthBitmap::CreateDepthBitmap(const istd::CRange & depthRange, const istd
 	istd::CChangeNotifier changeNotifier(this);
 
 	if (CreateBitmap(PF_FLOAT32, size)){
-		m_depthRange = depthRange;
-
-		EnsureMetaInfoCreated();
-
-		InvalidateCache(istd::IChangeable::GetNoChanges());
-
-		return true;
-	}
-
-	return false;
-}
-
-
-bool CDepthBitmap::CreateDepthBitmap(const istd::CRange& depthRange, const istd::CIndex2d & size, void * dataPtr, bool releaseFlag, int linesDifference)
-{
-	istd::CChangeNotifier changeNotifier(this);
-
-	if (CreateBitmap(PF_FLOAT32,size, dataPtr, releaseFlag, linesDifference)){
 		m_depthRange = depthRange;
 
 		EnsureMetaInfoCreated();

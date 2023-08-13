@@ -54,13 +54,12 @@ public:
 
 	void SetDepthRange(const istd::CRange& depthRange);
 	void SetColorMap(ColorMapType colorMapType);
-	void SetClibration3d(const CImage3dCalibration& calibration3d);
+	void SetCalibration3d(const CImage3dCalibration& calibration3d);
 	void SetReferenceBitmap(const iimg::CGeneralBitmap& referenceBitmap);
 
 	// reimplemented (IDepthBitmap)
 	istd::CRange GetDepthRange() const override;
 	virtual bool CreateDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size) override;
-	virtual bool CreateDepthBitmap(const istd::CRange & depthRange, const istd::CIndex2d & size, void * dataPtr, bool releaseFlag, int linesDifference = 0) override;
 	virtual const IImage3dCalibration* GetCalibration3d() const override;
 	virtual const iimg::IBitmap* GetReferenceBitmap() const override;
 

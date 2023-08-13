@@ -6,8 +6,8 @@ namespace imt3d
 
 
 CImage3dCalibration::CImage3dCalibration(const iimg::CGeneralBitmap & xyzBitmap)
-	:m_xyzBitmap(xyzBitmap)
 {
+	m_xyzBitmap = xyzBitmap;
 }
 
 
