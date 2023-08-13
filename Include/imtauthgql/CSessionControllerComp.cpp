@@ -12,7 +12,7 @@ namespace imtauthgql
 
 // reimplemented (CObjectCollectionControllerCompBase)
 
-imtbase::CTreeItemModel* CSessionControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CSessionControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return nullptr;

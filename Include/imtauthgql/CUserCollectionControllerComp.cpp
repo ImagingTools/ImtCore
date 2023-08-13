@@ -43,7 +43,7 @@ QVariant CUserCollectionControllerComp::GetObjectInformation(const QByteArray &i
 }
 
 
-imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return nullptr;
@@ -77,10 +77,10 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 					if (rolePtr != nullptr){
 						QByteArray roleId = rolePtr->GetRoleId();
 						QString roleName = rolePtr->GetRoleName();
-						QByteArray productId = rolePtr->GetProductId();
+						QByteArray roleProductId = rolePtr->GetProductId();
 
 						int childrenIndex = children->InsertNewItem();
-						children->SetData("Value", roleName + " (" + productId + ")", childrenIndex);
+						children->SetData("Value", roleName + " (" + roleProductId + ")", childrenIndex);
 					}
 				}
 			}
@@ -110,11 +110,11 @@ imtbase::CTreeItemModel* CUserCollectionControllerComp::GetMetaInfo(const imtgql
 
 
 bool CUserCollectionControllerComp::SetupGqlItem(
-		const imtgql::CGqlRequest& gqlRequest,
-		imtbase::CTreeItemModel& model,
-		int itemIndex,
-		const imtbase::IObjectCollectionIterator* objectCollectionIterator,
-		QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			imtbase::CTreeItemModel& model,
+			int itemIndex,
+			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
+			QString& /*errorMessage*/) const
 {
 	if (objectCollectionIterator == nullptr){
 		return false;

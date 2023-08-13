@@ -10,7 +10,7 @@ namespace imtdb
 // reimplemented (imtgql::CGqlRepresentationControllerCompBase)
 
 imtbase::CTreeItemModel* CDatabaseServerConnectionControllerComp::CreateInternalResponse(
-			const imtgql::CGqlRequest& gqlRequest,
+			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
 	if (!m_dbServerConnectionCheckerCompPtr.IsValid()){

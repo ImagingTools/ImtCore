@@ -16,7 +16,7 @@ namespace imtgql
 
 // reimplemented (imtgql::IGqlRepresentationController)
 
-imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
 {
 	if (m_representationControllerCompPtr.IsValid() && m_dataModelCompPtr.IsValid()){
 		istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
@@ -36,7 +36,7 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateRepresentat
 }
 
 
-bool CGqlRepresentationDataControllerComp::UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const
+bool CGqlRepresentationDataControllerComp::UpdateModelFromRepresentation(const imtgql::CGqlRequest& /*request*/, imtbase::CTreeItemModel* representationPtr) const
 {
 	if (!m_representationControllerCompPtr.IsValid() || !m_dataModelCompPtr.IsValid()){
 		return false;

@@ -163,19 +163,19 @@ bool CGqlSubscriberControllerCompBase::SetSubscriptions()
 }
 
 
-bool CGqlSubscriberControllerCompBase::StartInternalSubscriber(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage)
+bool CGqlSubscriberControllerCompBase::StartInternalSubscriber(const imtgql::CGqlRequest& /*gqlRequest*/, QString& /*errorMessage*/)
 {
 	return true;
 }
 
 
-iprm::IParamsSet *CGqlSubscriberControllerCompBase::CreateContextParams(const imtgql::CGqlRequest& gqlRequest) const
+iprm::IParamsSet *CGqlSubscriberControllerCompBase::CreateContextParams(const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
 	return nullptr;
 }
 
 
-bool CGqlSubscriberControllerCompBase::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+bool CGqlSubscriberControllerCompBase::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
 {
 	bool result = true;
 	if (gqlRequest.GetRequestContext() != nullptr){

@@ -9,7 +9,7 @@ namespace imtgql
 
 // reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateInternalResponse(const CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateInternalResponse(const CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
 {
 	if (!IsRequestSupported(gqlRequest)){
 		return nullptr;

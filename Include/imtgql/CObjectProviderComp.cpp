@@ -12,7 +12,7 @@ namespace imtgql
 // reimplemented (imtgql::CCGqlRepresentationControllerCompBase)
 
 imtbase::CTreeItemModel* CObjectProviderComp::CreateInternalResponse(
-			const imtgql::CGqlRequest& gqlRequest,
+			const imtgql::CGqlRequest& /*gqlRequest*/,
 			QString& errorMessage) const
 {
 	if (!m_objectCompPtr.IsValid()){

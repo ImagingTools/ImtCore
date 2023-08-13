@@ -9,7 +9,7 @@ namespace imtlic
 
 // reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-bool CProductInfoProviderComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+bool CProductInfoProviderComp::IsRequestSupported(const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
 	return true;
 }

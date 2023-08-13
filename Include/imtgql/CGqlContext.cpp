@@ -182,7 +182,7 @@ istd::IChangeable *CGqlContext::CloneMe(CompatibilityMode mode) const
 }
 
 
-bool CGqlContext::ResetData(CompatibilityMode mode)
+bool CGqlContext::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 

@@ -22,8 +22,8 @@ namespace imtgql
 // reimplemented (imtrest::IRequestServlet)
 
 imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
-			const QByteArray& commandId,
-			const imtrest::IRequest::CommandParams& commandParams,
+			const QByteArray& /*commandId*/,
+			const imtrest::IRequest::CommandParams& /*commandParams*/,
 			const HeadersMap& headers,
 			const imtrest::CHttpRequest& request) const
 {
@@ -166,7 +166,7 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::CreateRespon
 
 imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::GenerateError(
 		const imtrest::IProtocolEngine::StatusCode& errorCode,
-		const QString& errorString,
+		const QString& /*errorString*/,
 		const imtrest::CHttpRequest& request) const
 {
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();

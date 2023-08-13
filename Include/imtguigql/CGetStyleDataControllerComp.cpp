@@ -16,7 +16,7 @@ namespace imtguigql
 
 // reimplemented (imtgql::CGqlRepresentationControllerCompBase)
 
-imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
 {
 	QString theme;
 	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();

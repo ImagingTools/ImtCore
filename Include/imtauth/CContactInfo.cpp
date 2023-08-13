@@ -202,7 +202,7 @@ bool CContactInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 }
 
 
-istd::IChangeable* CContactInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeable* CContactInfo::CloneMe(CompatibilityMode /*mode*/) const
 {
 //	istd::TDelPtr<CContactInfo> clonePtr(new CContactInfo);
 //	if (clonePtr->CopyFrom(*this, mode)){

@@ -221,7 +221,7 @@ void CStandardLoginGuiComp::on_SuPasswordEdit_textEdited(const QString& text)
 }
 
 
-void CStandardLoginGuiComp::on_SuConfirmPasswordEdit_textEdited(const QString& text)
+void CStandardLoginGuiComp::on_SuConfirmPasswordEdit_textEdited(const QString& /*text*/)
 {
 	CheckMatchingPassword();
 }

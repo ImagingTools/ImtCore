@@ -34,7 +34,7 @@ CRemoteGqlContextControllerComp::CRemoteGqlContextControllerComp()
 // reimplemented (imtgql::IGqlContextController)
 
 imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
-			const imtgql::CGqlRequest& gqlRequest,
+			const imtgql::CGqlRequest& /*gqlRequest*/,
 			const QByteArray& token) const
 {
 	QMutexLocker lock(&m_mutex);

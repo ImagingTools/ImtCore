@@ -9,13 +9,13 @@ namespace imtlic
 
 // reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-bool CPermissionsProviderComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+bool CPermissionsProviderComp::IsRequestSupported(const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
 	return true;
 }
 
 
-imtbase::CTreeItemModel* CPermissionsProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CPermissionsProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& /*gqlRequest*/, QString& /*errorMessage*/) const
 {
 	if (m_featurePackageCompPtr.IsValid() && m_featurePackageRepresentationCompPtr.IsValid()){
 		istd::TDelPtr<imtbase::CTreeItemModel> representationPtr(new imtbase::CTreeItemModel);

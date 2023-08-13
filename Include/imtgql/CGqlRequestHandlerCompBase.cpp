@@ -51,7 +51,7 @@ imtbase::CTreeItemModel* CGqlRequestHandlerCompBase::CreateResponse(const CGqlRe
 
 // protected methods
 
-iprm::IParamsSet* CGqlRequestHandlerCompBase::CreateContextParams(const imtgql::CGqlRequest& gqlRequest) const
+iprm::IParamsSet* CGqlRequestHandlerCompBase::CreateContextParams(const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
 	return nullptr;
 }
@@ -59,22 +59,21 @@ iprm::IParamsSet* CGqlRequestHandlerCompBase::CreateContextParams(const imtgql::
 
 bool CGqlRequestHandlerCompBase::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
 {
-	bool result = true;
-	if (gqlRequest.GetRequestContext() != nullptr){
-		QByteArray gqlCommand = gqlRequest.GetCommandId();
+	bool retVal = true;
 
+	if (gqlRequest.GetRequestContext() != nullptr){
 		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetRequestContext()->GetUserInfo();
 		if (userInfoPtr != nullptr){
 			QByteArray userId = userInfoPtr->GetId();
 			if (!userInfoPtr->IsAdmin()){
 				if(m_commandPermissionsCompPtr.IsValid()){
 					imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetPermissions();
-					QByteArray gqlCommand = gqlRequest.GetCommandId();
+					QByteArray requestedCommandId = gqlRequest.GetCommandId();
 					QByteArrayList commandIds = m_commandPermissionsCompPtr->GetCommandIds();
-					if(commandIds.contains(gqlCommand)){
-						QByteArrayList permissionIds = m_commandPermissionsCompPtr->GetCommandPermissions(gqlCommand);
+					if(commandIds.contains(requestedCommandId)){
+						QByteArrayList permissionIds = m_commandPermissionsCompPtr->GetCommandPermissions(requestedCommandId);
 						if (m_checkPermissionCompPtr.IsValid()){
-							result = m_checkPermissionCompPtr->CheckPermission(permissions, permissionIds);
+							retVal = m_checkPermissionCompPtr->CheckPermission(permissions, permissionIds);
 						}
 					}
 				}
@@ -82,7 +81,7 @@ bool CGqlRequestHandlerCompBase::CheckPermissions(const imtgql::CGqlRequest& gql
 		}
 	}
 
-	return result;
+	return retVal;
 }
 
 

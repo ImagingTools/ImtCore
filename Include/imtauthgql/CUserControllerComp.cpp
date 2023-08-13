@@ -118,7 +118,7 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 
 imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+			QString& /*errorMessage*/) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return nullptr;
@@ -195,8 +195,8 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 	}
 
 	if (representationModel.ContainsKey("Roles")){
-		for (const QByteArray& productId : userInfoPtr->GetProducts()){
-			userInfoPtr->RemoveProduct(productId);
+		for (const QByteArray& userProductId : userInfoPtr->GetProducts()){
+			userInfoPtr->RemoveProduct(userProductId);
 		}
 
 		QByteArray roles = representationModel.GetData("Roles").toByteArray();
@@ -237,9 +237,9 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 
 istd::IChangeable* CUserControllerComp::CreateObject(
 			const QList<imtgql::CGqlObject>& inputParams,
-			QByteArray &objectId,
-			QString &name,
-			QString &description,
+			QByteArray& objectId,
+			QString& name,
+			QString&/*description*/,
 			QString& errorMessage) const
 {
 	if (!m_userInfoFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
@@ -338,8 +338,8 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 					calculate = false;
 				}
 
-				for (const QByteArray& productId : currentuserInfoPtr->GetProducts()){
-					userInfoPtr->SetRoles(productId, currentuserInfoPtr->GetRoles(productId));
+				for (const QByteArray& userProductId : currentuserInfoPtr->GetProducts()){
+					userInfoPtr->SetRoles(userProductId, currentuserInfoPtr->GetRoles(userProductId));
 				}
 			}
 		}

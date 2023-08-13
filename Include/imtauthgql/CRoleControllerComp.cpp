@@ -65,11 +65,11 @@ imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlReques
 			QByteArray roleId = roleInfoPtr->GetRoleId();
 			QString roleName = roleInfoPtr->GetRoleName();
 			QString roleDescription = roleInfoPtr->GetRoleDescription();
-			QByteArray productId = roleInfoPtr->GetProductId();
+			QByteArray roleProductId = roleInfoPtr->GetProductId();
 
 			dataModelPtr->SetData("Id", objectUuid);
 			dataModelPtr->SetData("RoleId", roleId);
-			dataModelPtr->SetData("ProductId", productId);
+			dataModelPtr->SetData("ProductId", roleProductId);
 			dataModelPtr->SetData("Name", roleName);
 
 			dataModelPtr->SetData("Description", roleDescription);

@@ -26,7 +26,7 @@ const imtbase::ICollectionInfo& CRemoteRoleInfoProviderComp::GetRoleList() const
 }
 
 
-const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& roleId, const QByteArray& productId) const
+const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& /*roleId*/, const QByteArray& /*productId*/) const
 {
 	return nullptr;
 }

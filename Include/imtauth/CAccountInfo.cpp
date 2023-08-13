@@ -114,7 +114,7 @@ const IContactInfo* CAccountInfo::GetAccountOwner() const
 }
 
 
-void CAccountInfo::SetAccountOwner(const IContactInfo& ownerInfo)
+void CAccountInfo::SetAccountOwner(const IContactInfo& /*ownerInfo*/)
 {
 	istd::CChangeNotifier changeNorifier(this);
 

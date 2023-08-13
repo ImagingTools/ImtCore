@@ -42,7 +42,7 @@ void CPointCloudShape::SetPointSize(float pointSize)
 }
 
 
-void CPointCloudShape::SetPointSelection(const QPoint& selectionPoint, bool clearPreviousSelection)
+void CPointCloudShape::SetPointSelection(const QPoint& /*selectionPoint*/, bool /*clearPreviousSelection*/)
 {
 	/*
 	if (selectionPoint.isNull() || m_vertices.isEmpty()){
@@ -248,7 +248,7 @@ QVector3D CPointCloudShape::GetColor() const
 
 // private methods
 
-void CPointCloudShape::SetRectSelection(const QRect& selectionRect, bool isCircle, bool clearPreviousSelection)
+void CPointCloudShape::SetRectSelection(const QRect& /*selectionRect*/, bool /*isCircle*/, bool clearPreviousSelection)
 {
 	/*
 	if (!selectionRect.isValid() || m_vertices.isEmpty()){

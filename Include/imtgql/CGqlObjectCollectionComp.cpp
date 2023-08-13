@@ -36,7 +36,7 @@ CGqlObjectCollectionComp::CGqlObjectCollectionComp()
 
 // reimplemented (imtbase::IStructuredCollectionFinder)
 
-QByteArrayList CGqlObjectCollectionComp::FindObjectParentNodes(const QByteArray& objectId) const
+QByteArrayList CGqlObjectCollectionComp::FindObjectParentNodes(const QByteArray& /*objectId*/) const
 {
 	return QByteArrayList();
 }
@@ -52,7 +52,7 @@ QByteArray CGqlObjectCollectionComp::InsertNewObject(
 			const QByteArray& proposedObjectId,
 			const QByteArray& parentId,
 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
-			const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
+			const idoc::IDocumentMetaInfo* /*elementMetaInfoPtr*/,
 			const imtbase::IOperationContext* operationContextPtr)
 {
 	QByteArray documentId;
@@ -426,7 +426,7 @@ QByteArrayList CGqlObjectCollectionComp::GetNodePath(const QByteArray& nodeId) c
 }
 
 
-QSharedPointer<imtbase::IStructuredObjectCollectionInfo> CGqlObjectCollectionComp::GetNodeContent(const QByteArray& nodeId) const
+QSharedPointer<imtbase::IStructuredObjectCollectionInfo> CGqlObjectCollectionComp::GetNodeContent(const QByteArray& /*nodeId*/) const
 {
 	return nullptr;
 }
@@ -531,8 +531,8 @@ bool CGqlObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dataPt
 
 
 bool CGqlObjectCollectionComp::SetObjectData(
-			const Id& objectId,
-			const istd::IChangeable& object,
+			const Id& /*objectId*/,
+			const istd::IChangeable& /*object*/,
 			CompatibilityMode /*mode*/,
 			const imtbase::IOperationContext* /*operationContextPtr*/)
 {
@@ -709,9 +709,9 @@ int CGqlObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* /*selecti
 
 
 imtbase::ICollectionInfo::Ids CGqlObjectCollectionComp::GetElementIds(
-			int offset,
-			int count,
-			const iprm::IParamsSet* selectionParamsPtr) const
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	Q_ASSERT(false);
 
@@ -792,7 +792,7 @@ idoc::MetaInfoPtr CGqlObjectCollectionComp::GetElementMetaInfo(const Id& element
 }
 
 
-bool CGqlObjectCollectionComp::SetElementName(const Id& elementId, const QString& name)
+bool CGqlObjectCollectionComp::SetElementName(const Id& /*elementId*/, const QString& /*name*/)
 {
 	//if (m_gqlClientCompPtr.IsValid()){
 	//	QByteArray typeId = GetObjectTypeId(elementId);
