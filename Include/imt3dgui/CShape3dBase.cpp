@@ -82,7 +82,7 @@ CShape3dBase::CShape3dBase()
 	m_vertexBuffer(QOpenGLBuffer::VertexBuffer),
 	m_indexBuffer(QOpenGLBuffer::IndexBuffer),
 #if QT_VERSION < 0x060000
-	m_bufferMutex(QMutex::Recursive)
+	m_bufferMutex(QMutex::Recursive),
 #endif
 	m_isVisible(true)
 {
