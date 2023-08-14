@@ -14,15 +14,37 @@
 #include <imtbase/CTempDir.h>
 #include <imtcom/CRequestSender.h>
 #include <imtgql/CGqlRequest.h>
+#include <imtgql/CGqlObjectCollectionInfo.h>
+#include <imtgql/IGqlPrimitiveTypeResponse.h>
+#include <imtgql/IGqlStructuredCollectionResponse.h>
 
 
 namespace imtgql
 {
 
 
-bool operator==(const ElementInfo& a, const ElementInfo& b)
+bool operator==(const IGqlStructuredCollectionResponse::ElementInfo& a, const IGqlStructuredCollectionResponse::ElementInfo& b)
 {
-	return a.id == b.id && a.typeId == b.typeId && a.name == b.name;
+	bool retVal =
+		a.id == b.id &&
+		a.name == b.name &&
+		a.description == b.description &&
+		a.path == b.path &&
+		a.typeId == b.typeId &&
+		a.version == b.version &&
+		a.elementMetaInfoPtr.isNull() == b.elementMetaInfoPtr.isNull() &&
+		a.elementMetaInfoPtr.isNull() == b.elementMetaInfoPtr.isNull() &&
+		a.isNode == b.isNode;
+
+	if (retVal && !a.elementMetaInfoPtr.isNull()) {
+		retVal &= a.elementMetaInfoPtr->IsEqual(*b.elementMetaInfoPtr);
+	}
+
+	if (retVal && !a.dataMetaInfoPtr.isNull()) {
+		retVal &= a.dataMetaInfoPtr->IsEqual(*b.dataMetaInfoPtr);
+	}
+
+	return retVal;
 }
 
 
@@ -30,7 +52,6 @@ bool operator==(const ElementInfo& a, const ElementInfo& b)
 
 CGqlObjectCollectionComp::CGqlObjectCollectionComp()
 {
-	qRegisterMetaType<ElementList>("imtgql::IGqlObjectCollectionDelegate::ElementList");
 }
 
 
@@ -57,8 +78,8 @@ QByteArray CGqlObjectCollectionComp::InsertNewObject(
 {
 	QByteArray documentId;
 
-	if (m_gqlClientCompPtr.IsValid()) {
-		IGqlObjectCollectionDelegate* delegatePtr = m_gqlDatabaseDelegateCompPtr.GetPtr();
+	if (m_clientCompPtr.IsValid()) {
+		IGqlObjectCollectionDelegate* delegatePtr = m_delegateCompPtr.GetPtr();
 		if (delegatePtr != nullptr) {
 			const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(typeId);
 			if (persistencePtr != nullptr) {
@@ -75,11 +96,14 @@ QByteArray CGqlObjectCollectionComp::InsertNewObject(
 								QByteArray data = file.readAll();
 
 								Q_ASSERT(false);
-								istd::TDelPtr<imtgql::IGqlRequest> getDocumentUploadUrlRequestPtr(delegatePtr->CreateUploadUrlsRequest({ name }, "parentId"));
-								istd::TDelPtr<imtgql::IResponseBase> uploadUrlDocumentResponsePtr = uploadUrlDocumentResponsePtr = delegatePtr->CreateResponse();
-								if (m_gqlClientCompPtr->SendRequest(*getDocumentUploadUrlRequestPtr, *uploadUrlDocumentResponsePtr)) {
+								istd::TDelPtr<IGqlRequest> uploadUrlRequestPtr(delegatePtr->CreateUploadUrlsRequest({ name }, "parentId"));
+								istd::TDelPtr<IGqlPrimitiveTypeResponse> uploadUrlResponsePtr;
+								uploadUrlResponsePtr.SetCastedOrRemove(delegatePtr->CreateResponse(*uploadUrlRequestPtr));
+								Q_ASSERT(uploadUrlResponsePtr.IsValid());
+								if (m_clientCompPtr->SendRequest(*uploadUrlRequestPtr, *uploadUrlResponsePtr)) {
 									QVariant variant;
-									if (uploadUrlDocumentResponsePtr->GetResult() && uploadUrlDocumentResponsePtr->GetValue(variant)) {
+									if (uploadUrlResponsePtr->IsSuccessfull() && uploadUrlResponsePtr->GetValue(variant)){
+										Q_ASSERT(variant.type() == QVariant::String);
 										QString uploadUrlVal = variant.toString();
 										if (!uploadUrlVal.isEmpty()) {
 											QNetworkRequest request;
@@ -88,7 +112,7 @@ QByteArray CGqlObjectCollectionComp::InsertNewObject(
 											if (replyPtr != nullptr) {
 												if (!replyPtr->error()) {
 													Q_ASSERT(false);
-													istd::TDelPtr<imtgql::IGqlRequest> saveDocumentRequestPtr(delegatePtr->CreateInsertObjectRequest(
+													istd::TDelPtr<IGqlRequest> insertObjectRequestPtr(delegatePtr->CreateInsertObjectRequest(
 																typeId,
 																name,
 																description,
@@ -100,9 +124,12 @@ QByteArray CGqlObjectCollectionComp::InsertNewObject(
 																nullptr,
 																operationContextPtr));
 
-													istd::TDelPtr<imtgql::IResponseBase> saveDocumentResponsePtr = delegatePtr->CreateResponse();
-													if (m_gqlClientCompPtr->SendRequest(*saveDocumentRequestPtr, *saveDocumentResponsePtr)) {
-														if (saveDocumentResponsePtr->GetResult() && saveDocumentResponsePtr->GetValue(variant)) {
+													istd::TDelPtr<IGqlPrimitiveTypeResponse> insertObjectResponsePtr;
+													insertObjectResponsePtr.SetCastedOrRemove(delegatePtr->CreateResponse(*insertObjectRequestPtr));
+													Q_ASSERT(insertObjectResponsePtr.IsValid());
+													if (m_clientCompPtr->SendRequest(*insertObjectRequestPtr, *insertObjectResponsePtr)){
+														if (insertObjectResponsePtr->IsSuccessfull() && insertObjectResponsePtr->GetValue(variant)){
+															Q_ASSERT(variant.type() == QVariant::ByteArray);
 															documentId = variant.toByteArray();
 															if (!documentId.isEmpty()) {
 																istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
@@ -112,7 +139,7 @@ QByteArray CGqlObjectCollectionComp::InsertNewObject(
 																istd::CChangeNotifier notifier(this, &changeSet);
 															}
 															else {
-																ilog::IMessageContainer::Messages messages = saveDocumentResponsePtr->GetMessages();
+																ilog::IMessageContainer::Messages messages = insertObjectResponsePtr->GetMessages();
 																if (!messages.isEmpty()) {
 																	SendErrorMessage(0, messages.first()->GetInformationDescription(), "Document Cloud Controller");
 																}
@@ -134,7 +161,7 @@ QByteArray CGqlObjectCollectionComp::InsertNewObject(
 						//istd::TDelPtr<imtgql::IGqlRequest> insertDocumentRequestPtr(delegatePtr->CreateInsertObjectRequest(name, "", *defaultValuePtr, dataMetaInfoPtr, nullptr, "", "", "parentId"));
 
 						//IGqlObjectCollectionDelegate::InsertObjectResponsePtr saveDocumentResponsePtr = delegatePtr->CreateInsertObjectResponsePtr();
-						//if (m_gqlClientCompPtr->SendRequest(*insertDocumentRequestPtr, *saveDocumentResponsePtr)) {
+						//if (m_clientCompPtr->SendRequest(*insertDocumentRequestPtr, *saveDocumentResponsePtr)) {
 						//	documentId = saveDocumentResponsePtr->GetObjectId();
 						//	if (documentId.isEmpty()) {
 						//		SendErrorMessage(0, saveDocumentResponsePtr->GetMessage(0), "Document Cloud Controller");
@@ -150,7 +177,27 @@ QByteArray CGqlObjectCollectionComp::InsertNewObject(
 }
 
 
-// reimpolemented (imtbase::ICollectionStructure)
+// reimpolemented (imtbase::TIStructuredCollectionInfo)
+
+imtbase::IStructuredObjectCollectionInfo::ElementType CGqlObjectCollectionComp::GetElementType(const QByteArray& elementId) const
+{
+	ElementType type;
+
+	if (GetElementType(elementId, type, true)) {
+		return type;
+	}
+
+	return ET_UNKNOWN;
+}
+
+
+QByteArrayList CGqlObjectCollectionComp::GetElementBasePath(const QByteArray& elementId) const
+{
+	return QByteArrayList();
+}
+
+
+// reimpolemented (imtbase::TICollectionStructure)
 
 QByteArray CGqlObjectCollectionComp::InsertNewNode(
 			const QString& name,
@@ -162,19 +209,21 @@ QByteArray CGqlObjectCollectionComp::InsertNewNode(
 {
 	QByteArray retVal;
 
-	if (m_gqlClientCompPtr.IsValid() && m_gqlDatabaseDelegateCompPtr.IsValid()) {
-		istd::TDelPtr<IGqlRequest> requestPtr = m_gqlDatabaseDelegateCompPtr->CreateInsertNodeRequest(
+	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()) {
+		istd::TDelPtr<IGqlRequest> requestPtr = m_delegateCompPtr->CreateInsertNodeRequest(
 					name,
 					description,
 					proposedNodeId,
 					parentNodeId,
 					metaInfoPtr,
 					operationContextPtr);
-		istd::TDelPtr<IResponseBase> responsePtr = m_gqlDatabaseDelegateCompPtr->CreateResponse();
-		if (m_gqlClientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
+		istd::TDelPtr<IGqlPrimitiveTypeResponse> responsePtr;
+		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+		Q_ASSERT(responsePtr.IsValid());
+		if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 			QVariant variant;
-			if (responsePtr->GetResult() && responsePtr->GetValue(variant)){
-				if (variant.type() == QVariant::ByteArray) {
+			if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+				if (variant.type() == QVariant::ByteArray){
 					retVal = variant.toByteArray();
 				}
 			}
@@ -192,15 +241,17 @@ bool CGqlObjectCollectionComp::SetNodeName(
 {
 	bool retVal = false;
 
-	if (m_gqlClientCompPtr.IsValid() && m_gqlDatabaseDelegateCompPtr.IsValid()) {
-		istd::TDelPtr<IGqlRequest> requestPtr = m_gqlDatabaseDelegateCompPtr->CreateSetNodeNameRequest(
+	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()) {
+		istd::TDelPtr<IGqlRequest> requestPtr = m_delegateCompPtr->CreateSetNodeNameRequest(
 					nodeId,
 					name,
 					operationContextPtr);
-		istd::TDelPtr<IResponseBase> responsePtr = m_gqlDatabaseDelegateCompPtr->CreateResponse();
-		if (m_gqlClientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
+		istd::TDelPtr<IGqlPrimitiveTypeResponse> responsePtr;
+		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+		Q_ASSERT(responsePtr.IsValid());
+		if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
 			QVariant variant;
-			if (responsePtr->GetResult() && responsePtr->GetValue(variant)) {
+			if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)) {
 				if (variant.type() == QVariant::Bool) {
 					retVal = variant.toBool();
 				}
@@ -219,15 +270,17 @@ bool CGqlObjectCollectionComp::SetNodeDescription(
 {
 	bool retVal = false;
 
-	if (m_gqlClientCompPtr.IsValid() && m_gqlDatabaseDelegateCompPtr.IsValid()) {
-		istd::TDelPtr<IGqlRequest> requestPtr = m_gqlDatabaseDelegateCompPtr->CreateSetNodeNameRequest(
+	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()) {
+		istd::TDelPtr<IGqlRequest> requestPtr = m_delegateCompPtr->CreateSetNodeNameRequest(
 					nodeId,
 					description,
 					operationContextPtr);
-		istd::TDelPtr<IResponseBase> responsePtr = m_gqlDatabaseDelegateCompPtr->CreateResponse();
-		if (m_gqlClientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
+		istd::TDelPtr<IGqlPrimitiveTypeResponse> responsePtr;
+		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+		Q_ASSERT(responsePtr.IsValid());
+		if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
 			QVariant variant;
-			if (responsePtr->GetResult() && responsePtr->GetValue(variant)) {
+			if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)) {
 				if (variant.type() == QVariant::Bool) {
 					retVal = variant.toBool();
 				}
@@ -246,15 +299,17 @@ bool CGqlObjectCollectionComp::SetNodeMetaInfo(
 {
 	bool retVal = false;
 
-	if (m_gqlClientCompPtr.IsValid() && m_gqlDatabaseDelegateCompPtr.IsValid()) {
-		istd::TDelPtr<IGqlRequest> requestPtr = m_gqlDatabaseDelegateCompPtr->CreateSetNodeMetaInfoRequest(
+	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()) {
+		istd::TDelPtr<IGqlRequest> requestPtr = m_delegateCompPtr->CreateSetNodeMetaInfoRequest(
 					nodeId,
 					metaInfo,
 					operationContextPtr);
-		istd::TDelPtr<IResponseBase> responsePtr = m_gqlDatabaseDelegateCompPtr->CreateResponse();
-		if (m_gqlClientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
+		istd::TDelPtr<IGqlPrimitiveTypeResponse> responsePtr;
+		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+		Q_ASSERT(responsePtr.IsValid());
+		if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
 			QVariant variant;
-			if (responsePtr->GetResult() && responsePtr->GetValue(variant)) {
+			if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)) {
 				if (variant.type() == QVariant::Bool) {
 					retVal = variant.toBool();
 				}
@@ -273,15 +328,17 @@ bool CGqlObjectCollectionComp::MoveNode(
 {
 	bool retVal = false;
 
-	if (m_gqlClientCompPtr.IsValid() && m_gqlDatabaseDelegateCompPtr.IsValid()) {
-		istd::TDelPtr<IGqlRequest> requestPtr = m_gqlDatabaseDelegateCompPtr->CreateMoveNodeRequest(
+	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()) {
+		istd::TDelPtr<IGqlRequest> requestPtr = m_delegateCompPtr->CreateMoveNodeRequest(
 					nodeId,
 					parentNodeId,
 					operationContextPtr);
-		istd::TDelPtr<IResponseBase> responsePtr = m_gqlDatabaseDelegateCompPtr->CreateResponse();
-		if (m_gqlClientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
+		istd::TDelPtr<IGqlPrimitiveTypeResponse> responsePtr;
+		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+		Q_ASSERT(responsePtr.IsValid());
+		if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
 			QVariant variant;
-			if (responsePtr->GetResult() && responsePtr->GetValue(variant)) {
+			if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)) {
 				if (variant.type() == QVariant::Bool) {
 					retVal = variant.toBool();
 				}
@@ -299,14 +356,16 @@ bool CGqlObjectCollectionComp::RemoveNode(
 {
 	bool retVal = false;
 
-	if (m_gqlClientCompPtr.IsValid() && m_gqlDatabaseDelegateCompPtr.IsValid()) {
-		istd::TDelPtr<IGqlRequest> requestPtr = m_gqlDatabaseDelegateCompPtr->CreateRemoveNodeRequest(
+	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()) {
+		istd::TDelPtr<IGqlRequest> requestPtr = m_delegateCompPtr->CreateRemoveNodeRequest(
 					nodeId,
 					operationContextPtr);
-		istd::TDelPtr<IResponseBase> responsePtr = m_gqlDatabaseDelegateCompPtr->CreateResponse();
-		if (m_gqlClientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
+		istd::TDelPtr<IGqlPrimitiveTypeResponse> responsePtr;
+		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+		Q_ASSERT(responsePtr.IsValid());
+		if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
 			QVariant variant;
-			if (responsePtr->GetResult() && responsePtr->GetValue(variant)) {
+			if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)) {
 				if (variant.type() == QVariant::Bool) {
 					retVal = variant.toBool();
 				}
@@ -325,15 +384,20 @@ bool CGqlObjectCollectionComp::AddObjectToNode(
 {
 	bool retVal = false;
 
-	if (m_gqlClientCompPtr.IsValid() && m_gqlDatabaseDelegateCompPtr.IsValid()) {
-		istd::TDelPtr<IGqlRequest> requestPtr = m_gqlDatabaseDelegateCompPtr->CreateAddObjectToNodeRequest(
+	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()) {
+		//Getobje
+
+		istd::TDelPtr<IGqlRequest> requestPtr = m_delegateCompPtr->CreateAddObjectToNodeRequest(
 					objectId,
 					nodeId,
+					-1,
 					operationContextPtr);
-		istd::TDelPtr<IResponseBase> responsePtr = m_gqlDatabaseDelegateCompPtr->CreateResponse();
-		if (m_gqlClientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
+		istd::TDelPtr<IGqlPrimitiveTypeResponse> responsePtr;
+		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+		Q_ASSERT(responsePtr.IsValid());
+		if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
 			QVariant variant;
-			if (responsePtr->GetResult() && responsePtr->GetValue(variant)) {
+			if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)) {
 				if (variant.type() == QVariant::Bool) {
 					retVal = variant.toBool();
 				}
@@ -353,16 +417,19 @@ bool CGqlObjectCollectionComp::MoveObjectToNode(
 {
 	bool retVal = false;
 
-	if (m_gqlClientCompPtr.IsValid() && m_gqlDatabaseDelegateCompPtr.IsValid()) {
-		istd::TDelPtr<IGqlRequest> requestPtr = m_gqlDatabaseDelegateCompPtr->CreateMoveObjectToNodeRequest(
+	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()) {
+		istd::TDelPtr<IGqlRequest> requestPtr = m_delegateCompPtr->CreateMoveObjectToNodeRequest(
 					objectId,
 					parentNodeId,
 					newParentNodeId,
+					-1,
 					operationContextPtr);
-		istd::TDelPtr<IResponseBase> responsePtr = m_gqlDatabaseDelegateCompPtr->CreateResponse();
-		if (m_gqlClientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
+		istd::TDelPtr<IGqlPrimitiveTypeResponse> responsePtr;
+		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+		Q_ASSERT(responsePtr.IsValid());
+		if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
 			QVariant variant;
-			if (responsePtr->GetResult() && responsePtr->GetValue(variant)) {
+			if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)) {
 				if (variant.type() == QVariant::Bool) {
 					retVal = variant.toBool();
 				}
@@ -381,15 +448,18 @@ bool CGqlObjectCollectionComp::RemoveObjectFromNode(
 {
 	bool retVal = false;
 
-	if (m_gqlClientCompPtr.IsValid() && m_gqlDatabaseDelegateCompPtr.IsValid()) {
-		istd::TDelPtr<IGqlRequest> requestPtr = m_gqlDatabaseDelegateCompPtr->CreateRemoveObjectFromNodeRequest(
+	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()) {
+		istd::TDelPtr<IGqlRequest> requestPtr = m_delegateCompPtr->CreateRemoveObjectFromNodeRequest(
 					objectId,
 					nodeId,
+					-1,
 					operationContextPtr);
-		istd::TDelPtr<IResponseBase> responsePtr = m_gqlDatabaseDelegateCompPtr->CreateResponse();
-		if (m_gqlClientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
+		istd::TDelPtr<IGqlPrimitiveTypeResponse> responsePtr;
+		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+		Q_ASSERT(responsePtr.IsValid());
+		if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
 			QVariant variant;
-			if (responsePtr->GetResult() && responsePtr->GetValue(variant)) {
+			if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)) {
 				if (variant.type() == QVariant::Bool) {
 					retVal = variant.toBool();
 				}
@@ -407,15 +477,15 @@ QByteArrayList CGqlObjectCollectionComp::GetNodePath(const QByteArray& nodeId) c
 {
 	QByteArrayList retVal;
 
-	if (m_gqlClientCompPtr.IsValid() && m_gqlDatabaseDelegateCompPtr.IsValid()) {
-		istd::TDelPtr<imtgql::IGqlRequest> requestPtr = m_gqlDatabaseDelegateCompPtr->CreateGetNodeInfoRequest(nodeId);
-		istd::TDelPtr<IResponseBase> responsePtr = m_gqlDatabaseDelegateCompPtr->CreateResponse();
-		if (m_gqlClientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
-			QVariant variant;
-			if (responsePtr->GetResult() && responsePtr->GetValue(variant)) {
-				if (variant.canConvert<NodeInfo>()) {
-					NodeInfo info = variant.value<NodeInfo>();
-
+	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()) {
+		istd::TDelPtr<imtgql::IGqlRequest> requestPtr = m_delegateCompPtr->CreateGetNodeInfoRequest(nodeId);
+		istd::TDelPtr<IGqlStructuredCollectionResponse> responsePtr;
+		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+		Q_ASSERT(responsePtr.IsValid());
+		if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
+			if (responsePtr->IsSuccessfull()){
+				IGqlStructuredCollectionResponse::NodeInfo info;
+				if (responsePtr->GetNodeInfo(info)) {
 					return retVal = info.path;
 				}
 			}
@@ -426,9 +496,15 @@ QByteArrayList CGqlObjectCollectionComp::GetNodePath(const QByteArray& nodeId) c
 }
 
 
-QSharedPointer<imtbase::IStructuredObjectCollectionInfo> CGqlObjectCollectionComp::GetNodeContent(const QByteArray& /*nodeId*/) const
+QSharedPointer<imtbase::IStructuredObjectCollectionInfo> CGqlObjectCollectionComp::GetNodeContent(const QByteArray& nodeId) const
 {
-	return nullptr;
+	CGqlObjectCollectionInfo* infoPtr = new CGqlObjectCollectionInfo();
+
+	infoPtr->SetGqlClient(m_clientCompPtr.GetPtr());
+	infoPtr->SetGqlDelegate(m_delegateCompPtr.GetPtr());
+	infoPtr->SetNodeId(nodeId);
+
+	return QSharedPointer<imtbase::IStructuredObjectCollectionInfo>(infoPtr);
 }
 
 
@@ -480,15 +556,17 @@ bool CGqlObjectCollectionComp::RemoveElement(const Id& elementId, const imtbase:
 {
 	bool retVal = false;
 
-	if (m_gqlClientCompPtr.IsValid()){
+	if (m_clientCompPtr.IsValid()){
 		QByteArray typeId = GetObjectTypeId(elementId);
 
-		IGqlObjectCollectionDelegate* delegatePtr = m_gqlDatabaseDelegateCompPtr.GetPtr();
+		IGqlObjectCollectionDelegate* delegatePtr = m_delegateCompPtr.GetPtr();
 		if (delegatePtr != nullptr){
-			istd::TDelPtr<imtgql::IGqlRequest> queryPtr(delegatePtr->CreateRemoveObjectRequest(elementId));
-			istd::TDelPtr<IResponseBase> responsePtr = delegatePtr->CreateResponse();
-			if (m_gqlClientCompPtr->SendRequest(*queryPtr, *responsePtr)){
-				if (responsePtr->GetResult()){
+			istd::TDelPtr<imtgql::IGqlRequest> requestPtr(delegatePtr->CreateRemoveObjectRequest(elementId));
+			istd::TDelPtr<IGqlPrimitiveTypeResponse> responsePtr;
+			responsePtr.SetCastedOrRemove(delegatePtr->CreateResponse(*requestPtr));
+			Q_ASSERT(responsePtr.IsValid());
+			if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
+				if (responsePtr->IsSuccessfull()){
 					if (retVal) {
 						istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
 						imtbase::ICollectionInfo::ElementRemoveInfo removeInfo;
@@ -513,7 +591,7 @@ const istd::IChangeable* CGqlObjectCollectionComp::GetObjectPtr(const Id& /*obje
 
 bool CGqlObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dataPtr) const
 {
-	if (m_gqlClientCompPtr.IsValid()){
+	if (m_clientCompPtr.IsValid()){
 		QByteArray typeId = GetObjectTypeId(objectId);
 
 		if (dataPtr.IsValid()){
@@ -538,7 +616,7 @@ bool CGqlObjectCollectionComp::SetObjectData(
 {
 	bool retVal = false;
 
-	//if (m_gqlClientCompPtr.IsValid()){
+	//if (m_clientCompPtr.IsValid()){
 	//	QByteArray typeId = GetObjectTypeId(objectId);
 
 	//	IGqlObjectCollectionDelegate* delegatePtr = GetDelegateForType(typeId);
@@ -575,9 +653,9 @@ bool CGqlObjectCollectionComp::SetObjectData(
 	//						return false;
 	//					}
 
-	//					istd::TDelPtr<IUploadUrlResponse> uploadUrlDocumentResponsePtr = delegatePtr->CreateUploadUrlResponse();
-	//					if (m_gqlClientCompPtr->SendRequest(*uploadUrlRequestPtr, *uploadUrlDocumentResponsePtr)){
-	//						QString uploadUrl = uploadUrlDocumentResponsePtr->GetValue();
+	//					istd::TDelPtr<IUploadUrlResponse> uploadUrlResponsePtr = delegatePtr->CreateUploadUrlResponse();
+	//					if (m_clientCompPtr->SendRequest(*uploadUrlRequestPtr, *uploadUrlResponsePtr)){
+	//						QString uploadUrl = uploadUrlResponsePtr->GetValue();
 	//						if (!uploadUrl.isEmpty()){
 	//							QNetworkRequest request;
 	//							request.setUrl(QUrl(uploadUrl));
@@ -587,7 +665,7 @@ bool CGqlObjectCollectionComp::SetObjectData(
 	//									istd::TDelPtr<imtgql::IGqlRequest> updateDocumentRequestPtr(delegatePtr->CreateUpdateObjectContentRequest(m_items[objectId].parentId + "/" + objectId, object, nullptr, nullptr, version, uploadUrl));
 	//									if (updateDocumentRequestPtr.IsValid()){
 	//										IGqlObjectCollectionDelegate::UpdateObjectContentResponsePtr responsePtr = delegatePtr->CreateUpdateObjectContentResponsePtr();
-	//										if (m_gqlClientCompPtr->SendRequest(*updateDocumentRequestPtr, *responsePtr)){
+	//										if (m_clientCompPtr->SendRequest(*updateDocumentRequestPtr, *responsePtr)){
 	//											retVal = responsePtr->Result();
 	//											if (retVal){
 	//												istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
@@ -614,7 +692,7 @@ bool CGqlObjectCollectionComp::SetObjectData(
 	//			}
 	//			else{
 	//				IGqlObjectCollectionDelegate::UpdateObjectContentResponsePtr responsePtr = delegatePtr->CreateUpdateObjectContentResponsePtr();
-	//				if (m_gqlClientCompPtr->SendRequest(*updateDocumentRequestPtr, *responsePtr)){
+	//				if (m_clientCompPtr->SendRequest(*updateDocumentRequestPtr, *responsePtr)){
 	//					retVal = true;
 	//				}
 	//			}
@@ -654,15 +732,15 @@ const iprm::IOptionsList* CGqlObjectCollectionComp::GetObjectTypesInfo() const
 
 QByteArray CGqlObjectCollectionComp::GetObjectTypeId(const Id& objectId) const
 {
-	if (m_gqlClientCompPtr.IsValid() && m_gqlDatabaseDelegateCompPtr.IsValid()){
-		istd::TDelPtr<imtgql::IGqlRequest> requestPtr = m_gqlDatabaseDelegateCompPtr->CreateGetObjectInfoRequest(objectId);
-		istd::TDelPtr<IResponseBase> responsePtr = m_gqlDatabaseDelegateCompPtr->CreateResponse();
-		if (m_gqlClientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-			QVariant variant;
-			if (responsePtr->GetResult() && responsePtr->GetValue(variant)) {
-				if (variant.canConvert<ObjectInfo>()) {
-					ObjectInfo info = variant.value<ObjectInfo>();
-
+	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()){
+		istd::TDelPtr<imtgql::IGqlRequest> requestPtr = m_delegateCompPtr->CreateGetObjectInfoRequest(objectId);
+		istd::TDelPtr<IGqlStructuredCollectionResponse> responsePtr;
+		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+		Q_ASSERT(responsePtr.IsValid());
+		if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
+			if (responsePtr->IsSuccessfull()){
+				IGqlStructuredCollectionResponse::ObjectInfo info;
+				if (responsePtr->GetObjectInfo(info)) {
 					return info.typeId;
 				}
 			}
@@ -675,14 +753,15 @@ QByteArray CGqlObjectCollectionComp::GetObjectTypeId(const Id& objectId) const
 
 idoc::MetaInfoPtr CGqlObjectCollectionComp::GetDataMetaInfo(const Id& objectId) const
 {
-	if (m_gqlClientCompPtr.IsValid() && m_gqlDatabaseDelegateCompPtr.IsValid()){
-		istd::TDelPtr<IGqlRequest> requestPtr(m_gqlDatabaseDelegateCompPtr->CreateGetObjectInfoRequest(objectId));
-		istd::TDelPtr<IResponseBase> responsePtr = m_gqlDatabaseDelegateCompPtr->CreateResponse();
-		if (m_gqlClientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-			QVariant variant;
-			if (responsePtr->GetResult() && responsePtr->GetValue(variant)){
-				if (variant.canConvert<ObjectInfo>()){
-					ObjectInfo info = variant.value<ObjectInfo>();
+	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()){
+		istd::TDelPtr<IGqlRequest> requestPtr(m_delegateCompPtr->CreateGetObjectInfoRequest(objectId));
+		istd::TDelPtr<IGqlStructuredCollectionResponse> responsePtr;
+		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+		Q_ASSERT(responsePtr.IsValid());
+		if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
+			if (responsePtr->IsSuccessfull()){
+				IGqlStructuredCollectionResponse::ObjectInfo info;
+				if (responsePtr->GetObjectInfo(info)){
 					if (!info.dataMetaInfoPtr.isNull()) {
 						idoc::MetaInfoPtr metaInfoPtr;
 						metaInfoPtr.SetCastedOrRemove(info.dataMetaInfoPtr->CloneMe());
@@ -727,30 +806,28 @@ bool CGqlObjectCollectionComp::GetSubsetInfo(ICollectionInfo& /*subsetInfo*/, in
 
 QVariant CGqlObjectCollectionComp::GetElementInfo(const Id& elementId, int infoType) const
 {
-	if (m_gqlClientCompPtr.IsValid()){
-		//QByteArray typeId = GetObjectTypeId(elementId);
-		//gmgaws::IGqlObjectCollectionDelegate* delegatePtr = GetDelegateForType(typeId);
-		//if (delegatePtr != nullptr){
-			//GetElementInfoResponse response(*const_cast<CGqlObjectCollectionComp*>(this), typeId);
-			//istd::TDelPtr<imtgql::IGqlRequest> requestPtr(delegatePtr->CreateElementInfoRequest(elementId));
-			//if (requestPtr.IsValid()){
-			//	if (m_gqlClientCompPtr->SendRequest(*requestPtr, response)){
-			//		IGqlObjectCollectionDelegate::ElementInfo info = response.GetElementInfo();
-					switch (infoType){
-					case EIT_NAME:
-						if (m_items.contains(elementId)){
-							return m_items[elementId].name;
-						}
+	IGqlStructuredCollectionResponse::ObjectInfo info;
+	bool isValid = false;
 
-			//			return info.name;
-			//		case EIT_DESCRIPTION:
-			//			return info.description;
-			//		case EIT_ENABLED:
-			//			return true;
-					}
-			//	}
-			//}
-	//	}
+	if (GetNodeInfo(elementId, info)) {
+		isValid = true;
+	}
+	else if (GetObjectInfo(elementId, info)) {
+		isValid = true;
+	}
+
+	if (isValid) {
+		switch (infoType)
+		{
+		case EIT_NAME:
+			return info.name;
+
+		case EIT_DESCRIPTION:
+			return info.description;
+
+		case EIT_ENABLED:
+			return true;
+		}
 	}
 
 	return QVariant();
@@ -761,71 +838,96 @@ idoc::MetaInfoPtr CGqlObjectCollectionComp::GetElementMetaInfo(const Id& element
 {
 	idoc::MetaInfoPtr metaInfoPtr;
 
-	if (m_items.contains(elementId)) {
-		if (!m_items[elementId].isBranch) {
-			metaInfoPtr.SetPtr(new idoc::CStandardDocumentMetaInfo());
-			metaInfoPtr->SetMetaInfo(MIT_VERSION, m_items[elementId].version);
-		}
+	IGqlStructuredCollectionResponse::ObjectInfo info;
+	bool isValid = false;
+
+	if (GetNodeInfo(elementId, info)) {
+		isValid = true;
+	}
+	else if (GetObjectInfo(elementId, info)) {
+		isValid = true;
 	}
 
-	//if (m_gqlClientCompPtr.IsValid()){
-	//	QByteArray typeId = GetObjectTypeId(elementId);
-	//	gmgaws::IGqlObjectCollectionDelegate* delegatePtr = GetDelegateForType(typeId);
-	//	if (delegatePtr != nullptr){
-	//		GetElementInfoResponse response(*const_cast<CGqlObjectCollectionComp*>(this), typeId);
-	//		istd::TDelPtr<imtgql::IGqlRequest> requestPtr(delegatePtr->CreateElementInfoRequest(elementId));
-	//		if (requestPtr.IsValid()){
-	//			if (m_gqlClientCompPtr->SendRequest(*requestPtr, response)){
-	//				IGqlObjectCollectionDelegate::ElementInfo info = response.GetElementInfo();
-	//				if (info.dataMetaInfoPtr.IsValid()){
-	//					idoc::MetaInfoPtr metaInfo;
-	//					metaInfo.SetCastedOrRemove(info.elementMetaInfoPtr->CloneMe());
-
-	//					return metaInfo;
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
+	if (isValid) {
+		if (!info.elementMetaInfoPtr.isNull()) {
+			metaInfoPtr.SetCastedOrRemove(info.elementMetaInfoPtr->CloneMe());
+		}
+	}
 
 	return metaInfoPtr;
 }
 
 
-bool CGqlObjectCollectionComp::SetElementName(const Id& /*elementId*/, const QString& /*name*/)
+bool CGqlObjectCollectionComp::SetElementName(const Id& elementId, const QString& name)
 {
-	//if (m_gqlClientCompPtr.IsValid()){
-	//	QByteArray typeId = GetObjectTypeId(elementId);
-	//	IGqlObjectCollectionDelegate* delegatePtr = GetDelegateForType(typeId);
-	//	if (delegatePtr != nullptr){
-	//		IGqlObjectCollectionDelegate::ElementInfoResponsePtr responsePtr = delegatePtr->CreateElementInfoResponsePtr();
-	//		istd::TDelPtr<imtgql::IGqlRequest> infoRequestPtr(delegatePtr->CreateElementInfoRequest(elementId));
-	//		if (m_gqlClientCompPtr->SendRequest(*infoRequestPtr, *responsePtr)){
-	//			IGqlObjectCollectionDelegate::ElementDescription elementDescription;
-	//			elementDescription.name = name;
-	//			elementDescription.description = responsePtr->GetElementInfo().description;
+	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()) {
+		istd::TDelPtr<imtgql::IGqlRequest> requestPtr;
+		istd::TDelPtr<imtgql::IGqlResponse> responsePtr;
+		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+		Q_ASSERT(responsePtr.IsValid());
 
-	//			istd::TDelPtr<imtgql::IGqlRequest> requestPtr(delegatePtr->CreateRenameBranchRequest(
-	//						elementId,
-	//						m_items[elementId].parentId,
-	//						m_items[elementId].orgId,
-	//						name));
-	//			if (requestPtr.IsValid()){
-	//				IGqlObjectCollectionDelegate::RenameBranchResponsePtr renameBranchResponsePtr = delegatePtr->CreateRenameBranchResponsePtr();
-	//				if (m_gqlClientCompPtr->SendRequest(*requestPtr, *renameBranchResponsePtr)){
-	//					return renameBranchResponsePtr->Result();
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
+		ElementType type;
+		if (GetElementType(elementId, type, true)) {
+			switch (type){
+			case ET_NODE:
+				requestPtr.SetPtr(m_delegateCompPtr->CreateSetNodeNameRequest(elementId, name));
+				break;
+
+			case ET_OBJECT:
+				requestPtr.SetPtr(m_delegateCompPtr->CreateSetObjectNameRequest(elementId, name));
+				break;
+
+			default:
+				Q_ASSERT(false);
+			}
+		}
+
+		if (requestPtr.IsValid()) {
+			if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
+				if (responsePtr->IsSuccessfull()) {
+					return true;
+				}
+			}
+		}
+	}
 
 	return false;
 }
 
 
-bool CGqlObjectCollectionComp::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/)
+bool CGqlObjectCollectionComp::SetElementDescription(const Id& elementId, const QString& description)
 {
+	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()) {
+		istd::TDelPtr<imtgql::IGqlRequest> requestPtr;
+		istd::TDelPtr<imtgql::IGqlResponse> responsePtr;
+		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+		Q_ASSERT(responsePtr.IsValid());
+
+		ElementType type;
+		if (GetElementType(elementId, type, true)) {
+			switch (type) {
+			case ET_NODE:
+				requestPtr.SetPtr(m_delegateCompPtr->CreateSetNodeDescriptionRequest(elementId, description));
+				break;
+
+			case ET_OBJECT:
+				requestPtr.SetPtr(m_delegateCompPtr->CreateSetObjectDescriptionRequest(elementId, description));
+				break;
+
+			default:
+				Q_ASSERT(false);
+			}
+		}
+
+		if (requestPtr.IsValid()) {
+			if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
+				if (responsePtr->IsSuccessfull()) {
+					return true;
+				}
+			}
+		}
+	}
+
 	return false;
 }
 
@@ -887,7 +989,7 @@ QByteArray CGqlObjectCollectionComp::ImportFile(
 		return QByteArray();
 	}
 
-	IGqlObjectCollectionDelegate* delegatePtr = m_gqlDatabaseDelegateCompPtr.GetPtr();
+	IGqlObjectCollectionDelegate* delegatePtr = m_delegateCompPtr.GetPtr();
 	if (delegatePtr != nullptr){
 		const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(typeId);
 		if (persistencePtr != nullptr){
@@ -904,9 +1006,9 @@ QByteArray CGqlObjectCollectionComp::ImportFile(
 
 						Q_ASSERT(false);
 						istd::TDelPtr<imtgql::IGqlRequest> getDocumentUploadUrlRequestPtr(delegatePtr->CreateUploadUrlsRequest({ objectName }, "parentId"));
-						istd::TDelPtr<IResponseBase> uploadUrlDocumentResponsePtr = delegatePtr->CreateResponse();
-						if (m_gqlClientCompPtr->SendRequest(*getDocumentUploadUrlRequestPtr, *uploadUrlDocumentResponsePtr)){
-							QString uploadUrl;// = uploadUrlDocumentResponsePtr->GetValue();
+						istd::TDelPtr<IGqlResponse> uploadUrlDocumentResponsePtr;// = delegatePtr->CreateResponse();
+						if (m_clientCompPtr->SendRequest(*getDocumentUploadUrlRequestPtr, *uploadUrlDocumentResponsePtr)){
+							QString uploadUrl;// = uploadUrlResponsePtr->GetValue();
 							if (!uploadUrl.isEmpty()){
 								QByteArray documentId;
 
@@ -920,7 +1022,7 @@ QByteArray CGqlObjectCollectionComp::ImportFile(
 										//istd::TDelPtr<imtgql::IGqlRequest> uploadDocumentRequestPtr(delegatePtr->CreateInsertObjectRequest(fileName, "", *objectPtr, metaInfoPtr.GetPtr(), nullptr, uploadUrl));
 
 										//IGqlObjectCollectionDelegate::InsertObjectResponsePtr saveDocumentResponsePtr = delegatePtr->CreateInsertObjectResponsePtr();
-										//if (m_gqlClientCompPtr->SendRequest(*uploadDocumentRequestPtr, *saveDocumentResponsePtr)){
+										//if (m_clientCompPtr->SendRequest(*uploadDocumentRequestPtr, *saveDocumentResponsePtr)){
 										//	documentId = saveDocumentResponsePtr->GetObjectId();
 										//	if (!documentId.isEmpty()){
 										//		//istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
@@ -996,7 +1098,7 @@ void CGqlObjectCollectionComp::OnComponentCreated()
 
 	//connect(this, &CGqlObjectCollectionComp::EmitSyncronizeDocumentListWithServer, this, &CGqlObjectCollectionComp::SyncronizeDocumentListWithServer, Qt::QueuedConnection);
 
-	m_gqlClientCompPtr.EnsureInitialized();
+	m_clientCompPtr.EnsureInitialized();
 
 	int count = qMin(m_typeIdsAttrPtr.GetCount(), m_typeNamesAttrPtr.GetCount());
 	count = qMin(count, m_objectFactoriesCompPtr.GetCount());
@@ -1027,7 +1129,6 @@ void CGqlObjectCollectionComp::OnComponentCreated()
 void CGqlObjectCollectionComp::OnComponentDestroyed()
 {
 	m_subscriptionManagerCompPtr->UnRegisterSubscription(m_addMeasurementSubsriptionId);
-	m_delegatesMap.clear();
 
 	BaseClass::OnComponentDestroyed();
 }
@@ -1060,7 +1161,7 @@ imtbase::IObjectCollection::DataPtr CGqlObjectCollectionComp::GetDocument(
 			const QByteArray& typeId,
 			const QByteArray& documentId) const
 {
-	IGqlObjectCollectionDelegate* delegatePtr = m_gqlDatabaseDelegateCompPtr.GetPtr();
+	IGqlObjectCollectionDelegate* delegatePtr = m_delegateCompPtr.GetPtr();
 	if (delegatePtr == nullptr){
 		return nullptr;
 	}
@@ -1076,11 +1177,11 @@ imtbase::IObjectCollection::DataPtr CGqlObjectCollectionComp::GetDocument(
 			return nullptr;
 		}
 
-		istd::TDelPtr<IResponseBase> responsePtr = delegatePtr->CreateResponse();
-		if (m_gqlClientCompPtr->SendRequest(*queryPtr, *responsePtr)) {
+		istd::TDelPtr<IGqlResponse> responsePtr;// = delegatePtr->CreateResponse();
+		if (m_clientCompPtr->SendRequest(*queryPtr, *responsePtr)) {
 			QVariant variant;
 
-			if (responsePtr->GetResult() && responsePtr->GetValue(variant)){
+			if (responsePtr->IsSuccessfull() /*&& responsePtr->GetValue(variant)*/){
 				QString downloadUrl = variant.toString();
 				if (!downloadUrl.isEmpty()) {
 					QNetworkRequest request;
@@ -1117,6 +1218,96 @@ imtbase::IObjectCollection::DataPtr CGqlObjectCollectionComp::GetDocument(
 	}
 
 	return documentPtr;
+}
+
+
+bool CGqlObjectCollectionComp::GetElementType(const QByteArray& elementId, ElementType& valueOut, bool tryViaInfo) const
+{
+	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()) {
+		istd::TDelPtr<imtgql::IGqlRequest> requestPtr(m_delegateCompPtr->CreateGetElementType(elementId));
+		if (requestPtr.IsValid()) {
+			istd::TDelPtr<imtgql::IGqlStructuredCollectionResponse> responsePtr;
+			responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+			Q_ASSERT(responsePtr.IsValid());
+			if (requestPtr.IsValid()) {
+				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
+					if (responsePtr->IsSuccessfull()) {
+						IGqlStructuredCollectionResponse::ElementInfo info;
+						if (responsePtr->GetElementInfo(info)) {
+							valueOut = info.isNode ? ET_NODE : ET_OBJECT;
+
+							return true;
+						}
+
+						Q_ASSERT(false);
+					}
+				}
+			}
+		}
+		else if (tryViaInfo){
+			IGqlStructuredCollectionResponse::NodeInfo nodeInfo;
+			IGqlStructuredCollectionResponse::ObjectInfo objectInfo;
+
+			if (GetNodeInfo(elementId, nodeInfo)) {
+				valueOut = ET_NODE;
+
+				return true;
+			}
+			else if (GetObjectInfo(elementId, objectInfo)) {
+				valueOut = ET_OBJECT;
+
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+
+bool CGqlObjectCollectionComp::GetNodeInfo(const QByteArray& nodeId, IGqlStructuredCollectionResponse::NodeInfo& valueOut) const
+{
+	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()) {
+		istd::TDelPtr<imtgql::IGqlRequest> requestPtr(m_delegateCompPtr->CreateGetNodeInfoRequest(nodeId));
+		istd::TDelPtr<imtgql::IGqlStructuredCollectionResponse> responsePtr;
+		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+		Q_ASSERT(responsePtr.IsValid());
+		if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
+			if (responsePtr->IsSuccessfull()) {
+				IGqlStructuredCollectionResponse::NodeInfo info;
+				if (responsePtr->GetNodeInfo(info)) {
+					valueOut = info;
+
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+
+bool CGqlObjectCollectionComp::GetObjectInfo(const QByteArray& objectId, IGqlStructuredCollectionResponse::ObjectInfo& valueOut) const
+{
+	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()) {
+		istd::TDelPtr<imtgql::IGqlRequest> requestPtr(m_delegateCompPtr->CreateGetObjectInfoRequest(objectId));
+		istd::TDelPtr<imtgql::IGqlStructuredCollectionResponse> responsePtr;
+		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+		Q_ASSERT(responsePtr.IsValid());
+		if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)) {
+			if (responsePtr->IsSuccessfull()) {
+				IGqlStructuredCollectionResponse::ObjectInfo info;
+				if (responsePtr->GetObjectInfo(info)) {
+					valueOut = info;
+
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
 }
 
 

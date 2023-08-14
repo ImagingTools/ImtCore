@@ -27,7 +27,7 @@ protected:
 	virtual bool SendModelRequest(const IGqlRequest& request, imtbase::CTreeItemModel& responseModel) const;
 
 private:
-	class Response: virtual public imtgql::IGqlClient::ResponseHandler
+	class Response: virtual public imtgql::IGqlResponseHandler
 	{
 	public:
 		Response();

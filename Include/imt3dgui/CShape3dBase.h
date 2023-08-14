@@ -99,7 +99,12 @@ protected:
 	QOpenGLBuffer m_vertexBuffer;
 	QOpenGLBuffer m_indexBuffer;
 	QMatrix4x4 m_projection;
+
+#if QT_VERSION >= 0x060000
+	mutable QRecursiveMutex m_bufferMutex;
+#else
 	mutable QMutex m_bufferMutex;
+#endif
 
 	bool m_isVisible;
 };

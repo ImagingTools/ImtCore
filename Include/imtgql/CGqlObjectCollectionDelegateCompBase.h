@@ -24,7 +24,7 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(CGqlObjectCollectionDelegateCompBase);
 		I_REGISTER_INTERFACE(IGqlObjectCollectionDelegate);
-		I_ASSIGN(m_objectTypeIdAttrPtr, "ObjectTypeId", "ID of the supported object type for this delegate", true, "");
+		I_ASSIGN_MULTI_0(m_objectTypeIdsAttrPtr, "ObjectTypeIds", "ID of the supported object type for this delegate", true);
 		I_ASSIGN(m_fileTransferCompPtr, "FileTransfer", "Transferring files by url", true, "HttpFileTransfer");
 	I_END_COMPONENT;
 
@@ -33,7 +33,7 @@ public:
 	virtual imtcom::IFileTransfer* GetFileTransfer() const override;
 
 protected:
-	I_ATTR(QByteArray, m_objectTypeIdAttrPtr);
+	I_MULTIATTR(QByteArray, m_objectTypeIdsAttrPtr);
 	I_REF(imtcom::IFileTransfer, m_fileTransferCompPtr);
 };
 

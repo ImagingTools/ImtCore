@@ -23,7 +23,7 @@ CApiClientComp::CApiClientComp()
 
 // reimplemented (IGqlClient)
 
-bool CApiClientComp::SendRequest(const IGqlRequest& request, ResponseHandler& responseHandler) const
+bool CApiClientComp::SendRequest(const IGqlRequest& request, IGqlResponseHandler& responseHandler) const
 {
 	bool retVal = false;
 

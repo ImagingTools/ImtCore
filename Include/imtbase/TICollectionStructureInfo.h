@@ -31,6 +31,7 @@ public:
 };
 
 
+typedef TICollectionStructureInfo<IStructuredCollectionInfo> ICollectionStructureInfo;
 typedef TICollectionStructureInfo<IStructuredObjectCollectionInfo> IObjectCollectionStructureInfo;
 
 

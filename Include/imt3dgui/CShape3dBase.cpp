@@ -81,7 +81,9 @@ CShape3dBase::CShape3dBase()
 	m_cameraPtr(nullptr),
 	m_vertexBuffer(QOpenGLBuffer::VertexBuffer),
 	m_indexBuffer(QOpenGLBuffer::IndexBuffer),
-	m_bufferMutex(QMutex::Recursive),
+#if QT_VERSION < 0x060000
+	m_bufferMutex(QMutex::Recursive)
+#endif
 	m_isVisible(true)
 {
 	m_vertexBuffer.setUsagePattern(QOpenGLBuffer::DynamicDraw);

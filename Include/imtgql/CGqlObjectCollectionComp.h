@@ -10,6 +10,7 @@
 // ImtCore includes
 #include <imtgql/IClientProtocolEngine.h>
 #include <imtgql/IGqlObjectCollectionDelegate.h>
+#include <imtgql/IGqlStructuredCollectionResponse.h>
 #include <imtgql/IGqlSubscriptionManager.h>
 #include <imtgql/IGqlClient.h>
 #include <imtbase/CCollectionInfo.h>
@@ -37,10 +38,11 @@ class CGqlObjectCollectionComp:
 			public ilog::TLoggerCompWrap<icomp::CComponentBase>,
 			virtual public imtbase::IObjectCollection,
 			virtual public imtbase::ICollectionDataController,
-			virtual public IGqlSubscriptionClient,
 			virtual public imtbase::IObjectCollectionStructure,
+			virtual public imtbase::IStructuredObjectCollectionInfo,
 			virtual public imtbase::IStructuredCollectionInserter,
-			virtual public imtbase::IStructuredCollectionFinder
+			virtual public imtbase::IStructuredCollectionFinder,
+			virtual public IGqlSubscriptionClient
 {
 	Q_OBJECT
 public:
@@ -54,9 +56,9 @@ public:
 		I_REGISTER_INTERFACE(IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(ICollectionInfo);
 		I_REGISTER_INTERFACE(istd::IChangeable);
-		I_ASSIGN(m_gqlClientCompPtr, "ApiClient", "GraphQL API client", true, "ApiClient");
+		I_ASSIGN(m_clientCompPtr, "ApiClient", "GraphQL API client", true, "ApiClient");
 		I_ASSIGN(m_subscriptionManagerCompPtr, "SubscriptionManager", "GraphQL subscription manager", true, "SubscriptionManager");
-		I_ASSIGN(m_gqlDatabaseDelegateCompPtr, "GqlDatabaseDelegate", "GraphQL-based document delegate for database CRUD oeprations", true, "GqlObjectCollectionDelegate");
+		I_ASSIGN(m_delegateCompPtr, "GqlDatabaseDelegate", "GraphQL-based document delegate for database CRUD oeprations", true, "GqlObjectCollectionDelegate");
 		I_ASSIGN_MULTI_0(m_typeIdsAttrPtr, "TypeIds", "List of type-ID corresponding to the registered factories", false);
 		I_ASSIGN_MULTI_0(m_typeNamesAttrPtr, "TypeNames", "List of type names corresponding to the registered factories", false);
 		I_ASSIGN_MULTI_0(m_objectFactoriesCompPtr, "ObjectFactories", "List of factories used for object creation", false);
@@ -79,6 +81,10 @@ public:
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+
+	// reimpolemented (imtbase::TIStructuredCollectionInfo)
+	virtual ElementType GetElementType(const QByteArray& elementId) const override;
+	virtual QByteArrayList GetElementBasePath(const QByteArray& elementId) const override;
 
 	// reimpolemented (imtbase::TICollectionStructure)
 	virtual QByteArray InsertNewNode(
@@ -197,38 +203,27 @@ protected:
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
 
-protected:
+private:
 	QString GetDocumentExtension(const QByteArray& typeId) const;
-
-protected:
 	IObjectCollection::DataPtr GetDocument(const QByteArray& typeId, const QByteArray& documentId) const;
+	bool GetElementType(const QByteArray& elementId, ElementType& valueOut, bool tryViaInfo = false) const;
+	bool GetNodeInfo(const QByteArray& nodeId, IGqlStructuredCollectionResponse::NodeInfo& valueOut) const;
+	bool GetObjectInfo(const QByteArray& objectId, IGqlStructuredCollectionResponse::ObjectInfo& valueOut) const;
 
 protected:
-	I_REF(imtgql::IGqlClient, m_gqlClientCompPtr);
+	I_REF(imtgql::IGqlClient, m_clientCompPtr);
 	I_REF(imtgql::IGqlSubscriptionManager, m_subscriptionManagerCompPtr);
-	I_REF(IGqlObjectCollectionDelegate, m_gqlDatabaseDelegateCompPtr);
+	I_REF(IGqlObjectCollectionDelegate, m_delegateCompPtr);
 	I_MULTIATTR(QByteArray, m_typeIdsAttrPtr);
 	I_MULTITEXTATTR(m_typeNamesAttrPtr);
 	I_MULTIFACT(istd::IChangeable, m_objectFactoriesCompPtr);
 	I_MULTIREF(ifile::IFilePersistence, m_objectPersistenceListCompPtr);
 
 	typedef QMap<QByteArray, IGqlObjectCollectionDelegate*> DelegatesMap;
-	DelegatesMap m_delegatesMap;
 
 	iprm::COptionsManager m_typesInfo;
 
-	struct Item
-	{
-		QByteArray parentId;
-		bool isBranch;
-		QString name;
-		int version;
-	};
-	mutable QMap<QByteArray, Item> m_items;
 	QByteArray m_addMeasurementSubsriptionId;
-
-	imtbase::CCollectionInfo m_objectinfo;
-	idoc::CStandardDocumentMetaInfo m_nodeMetaInfo;
 };
 
 

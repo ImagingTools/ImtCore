@@ -1,11 +1,12 @@
 #pragma once
 
 
+// Qt includes
+#include <QtGui/QColor>
+#include <QtGui/QPalette>
+
 // ImtCore includes
 #include <imtstyle/IDesignSchemaInfoProvider.h>
-
-
-class QPalette;
 
 
 namespace imtstyle

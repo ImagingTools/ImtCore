@@ -1,9 +1,12 @@
 #pragma once
 
+// ACF includes
+#include <ilog/CMessageContainer.h>
 
 // ImtCore includes
 #include <imtgql/CGqlRequestHandlerCompBase.h>
 #include <imtgql/CApiClientComp.h>
+#include <imtgql/IGqlResponse.h>
 
 
 namespace imtgql
@@ -26,7 +29,7 @@ protected:
 				QString& errorMessage) const override;
 
 protected:
-	class Response: virtual public imtgql::IGqlClient::ResponseHandler
+	class Response: public ilog::CMessageContainer, virtual public IGqlResponse
 	{
 	public:
 		Response();
@@ -34,6 +37,8 @@ protected:
 
 		// reimplemented (imtgql::IGqlClient::ResponseHandler)
 		virtual void OnReply(const IGqlRequest& request, const QByteArray& replyData) override;
+
+		virtual bool IsSuccessfull() const override { return false; }
 
 	private:
 		imtbase::CTreeItemModel* m_replyResultPtr;

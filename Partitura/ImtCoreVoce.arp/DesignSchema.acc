@@ -2,62 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4950" Description="ACF"/>
-            <Version Id="1" Number="2151" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5090" Description="ACF"/>
+            <Version Id="1" Number="2191" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Design schema for ImtCore</Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="Imt3dGuiDesignSchema" PackageId="Imt3dGuiPck" ComponentId="DesignManager">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="PaletteProvider" Type="Reference" ExportId="PaletteProvider">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SlaveDesignManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ImtLicDesignSchema"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ImtAuthDesignSchema" PackageId="ImtAuthGuiPck" ComponentId="DesignManager">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="PaletteProvider" Type="Reference" ExportId="PaletteProvider">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SlaveDesignManager" Type="Reference" ExportId="SlaveDesignManager">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ImtGuiDesignSchema" PackageId="ImtGuiPck" ComponentId="DesignManager">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="PaletteProvider" Type="Reference" ExportId="PaletteProvider">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SlaveDesignManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="Imt3dGuiDesignSchema"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="ImtLicDesignSchema" PackageId="ImtLicenseGuiPck" ComponentId="DesignManager">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="PaletteProvider" Type="Reference" ExportId="PaletteProvider">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SlaveDesignManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ImtAuthDesignSchema"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="ImtStyleDesignShema" PackageId="ImtStylePck" ComponentId="DesignManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>

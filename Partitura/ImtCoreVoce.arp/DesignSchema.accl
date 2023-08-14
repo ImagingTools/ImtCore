@@ -2,16 +2,12 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="4950" Description="ACF"/>
-            <Version Id="1" Number="2151" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5090" Description="ACF"/>
+            <Version Id="1" Number="2191" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="Imt3dGuiDesignSchema" X="525" Y="350" Note=""/>
-        <Element ComponentName="ImtAuthDesignSchema" X="675" Y="550" Note=""/>
-        <Element ComponentName="ImtGuiDesignSchema" X="425" Y="225" Note=""/>
-        <Element ComponentName="ImtLicDesignSchema" X="600" Y="450" Note=""/>
         <Element ComponentName="ImtStyleDesignShema" X="325" Y="125" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
