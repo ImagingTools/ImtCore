@@ -255,6 +255,8 @@ global.Core = {
             this.focusedElement.focus = false
         }
         this.focusedElement = item
+        this.focusedElement.focus = true
+        
     },
     globalContext: [],
     getLastGlobalContext(){

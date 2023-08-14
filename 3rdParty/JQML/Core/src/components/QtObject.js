@@ -102,8 +102,8 @@ export class QtObject {
                             return new Proxy(target, handler)
                         } else {
                             let target = {}
-                            if(this.$repeater.$p.model.val.$p.data.val[this.index]){
-                                target = this.$repeater.$p.model.val.$p.data.val[this.index]
+                            if(this.$repeater.$p.model.val.data[this.index]){
+                                target = this.$repeater.$p.model.val.data[this.index]
                                 if(target.$qmlClassName === 'ListElement') return target
                                 handler.model = this.$repeater.$p.model.val
                             }
@@ -130,8 +130,8 @@ export class QtObject {
                                 return new Proxy(target, handler)
                             } else {
                                 let target = {}
-                                if(parent.$repeater.$p.model.val.$p.data.val[this.index]){
-                                    target = parent.$repeater.$p.model.val.$p.data.val[this.index]
+                                if(parent.$repeater.$p.model.val.data[this.index]){
+                                    target = parent.$repeater.$p.model.val.data[this.index]
                                     if(target.$qmlClassName === 'ListElement') return target
                                     handler.model = parent.$repeater.$p.model.val
                                 }
@@ -156,8 +156,8 @@ export class QtObject {
                                 return new Proxy(target, handler)
                             } else {
                                 let target = {}
-                                if(parent.$mapView.$p.model.val.$p.data.val[this.index]){
-                                    target = parent.$mapView.$p.model.val.$p.data.val[this.index]
+                                if(parent.$mapView.$p.model.val.data[this.index]){
+                                    target = parent.$mapView.$p.model.val.data[this.index]
                                     if(target.$qmlClassName === 'ListElement') return target
                                     handler.model = parent.$mapView.$p.model.val
                                 }
@@ -182,8 +182,8 @@ export class QtObject {
                                 return new Proxy(target, handler)
                             } else {
                                 let target = {}
-                                if(parent.$p.model.val.$p.data.val[this.index]){
-                                    target = parent.$p.model.val.$p.data.val[this.index]
+                                if(parent.$p.model.val.data[this.index]){
+                                    target = parent.$p.model.val.data[this.index]
                                     if(target.$qmlClassName === 'ListElement') return target
                                     handler.model = parent.$p.model.val
                                 }
