@@ -104,6 +104,7 @@ protected:
 	void mouseMoveEvent(QMouseEvent *e) override;
 	void closeEvent(QCloseEvent* event) override;
 	void wheelEvent(QWheelEvent* event) override;
+	void keyPressEvent(QKeyEvent* e) override;
 
 private Q_SLOTS:
 	void OnZoomIn();

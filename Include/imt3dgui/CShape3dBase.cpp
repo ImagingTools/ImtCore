@@ -81,6 +81,7 @@ CShape3dBase::CShape3dBase()
 	m_cameraPtr(nullptr),
 	m_vertexBuffer(QOpenGLBuffer::VertexBuffer),
 	m_indexBuffer(QOpenGLBuffer::IndexBuffer),
+	m_bufferMutex(QMutex::Recursive),
 	m_isVisible(true)
 {
 	m_vertexBuffer.setUsagePattern(QOpenGLBuffer::DynamicDraw);
@@ -143,6 +144,7 @@ int CShape3dBase::FindVertex(const QPoint& point, bool limitDistance, QVector3D*
 
 bool CShape3dBase::IsValid() const
 {
+	QMutexLocker lock(&m_bufferMutex);
 	return m_contextPtr && m_vertexBuffer.isCreated() && m_indexBuffer.isCreated();
 }
 
@@ -222,20 +224,25 @@ void CShape3dBase::SetContext(QOpenGLContext* contextPtr)
 			return;
 		m_contextPtr = contextPtr;
 
-		if (!m_vertexBuffer.isCreated()){
-			m_vertexBuffer.create();
-		}
+		{
+			QMutexLocker lock(&m_bufferMutex);
+			if (!m_vertexBuffer.isCreated()) {
+				m_vertexBuffer.create();
+			}
 
-		if (!m_indexBuffer.isCreated()){
-			m_indexBuffer.create();
-		}
+			if (!m_indexBuffer.isCreated()) {
+				m_indexBuffer.create();
+			}
 
-		Q_ASSERT(m_vertexBuffer.isCreated());
-		Q_ASSERT(m_indexBuffer.isCreated());
+			Q_ASSERT(m_vertexBuffer.isCreated());
+			Q_ASSERT(m_indexBuffer.isCreated());
+		}
 
 		UpdateGeometry(istd::IChangeable::GetAllChanges());
 	}
 	else {
+		QMutexLocker lock(&m_bufferMutex);
+
 		if (m_vertexBuffer.isCreated()){
 			m_vertexBuffer.destroy();
 		}
@@ -262,6 +269,8 @@ void CShape3dBase::DrawGl(QOpenGLShaderProgram &program)
 				m_indices.isEmpty()){
 		return;
 	}
+
+	QMutexLocker lock(&m_bufferMutex);
 
 	m_vertexBuffer.bind();
 	m_indexBuffer.bind();
@@ -415,6 +424,9 @@ void CShape3dBase::CreateGeometry()
 				m_pointsDataPtr->GetData() != nullptr &&
 				!m_pointsDataPtr->IsEmpty() &&
 				!m_indices.isEmpty() && IsValid()){
+
+		QMutexLocker lock(&m_bufferMutex);
+
 		m_vertexBuffer.bind();
 		m_indexBuffer.bind();
 
@@ -433,6 +445,8 @@ void CShape3dBase::RefreshGeometry()
 			m_pointsDataPtr->GetData() != nullptr &&
 			!m_pointsDataPtr->IsEmpty() &&
 			IsValid()){
+		QMutexLocker lock(&m_bufferMutex);
+
 		m_vertexBuffer.bind();
 
 		m_vertexBuffer.write(0, m_pointsDataPtr->GetData(), m_pointsDataPtr->GetPointsCount() * m_pointsDataPtr->GetPointBytesSize());

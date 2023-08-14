@@ -37,6 +37,7 @@ COpenGLWidget::COpenGLWidget(QWidget* parentPtr)
 	setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::MinimumExpanding);
 	setMouseTracking(true);
 	setCursor(Qt::OpenHandCursor);
+	setFocusPolicy(Qt::FocusPolicy::ClickFocus);
 
 	connect(&m_cameraRotationAnimation, SIGNAL(valueChanged(const QVariant&)), this, SLOT(OnCameraRotationAnimation(const QVariant&)));
 	connect(&m_cameraPositionAnimation, SIGNAL(valueChanged(const QVariant&)), this, SLOT(OnCameraPositionAnimation(const QVariant&)));
@@ -392,6 +393,36 @@ void COpenGLWidget::wheelEvent(QWheelEvent* eventPtr)
 	}
 	else{
 		OnZoomOut();
+	}
+}
+
+void COpenGLWidget::keyPressEvent(QKeyEvent * e)
+{
+	if (e->key() == Qt::Key::Key_PageUp) {
+		ZoomIn();
+	}
+	else if (e->key() == Qt::Key::Key_PageDown) {
+		ZoomOut();
+	}
+	else if (e->key() == Qt::Key::Key_Right) {
+		if (m_cameraPtr != nullptr) {
+			m_cameraPtr->MoveTo(QPoint(width() / 2,height() / 2), QPoint(width() / 2 - 5, height() / 2));
+		}
+	}
+	else if (e->key() == Qt::Key::Key_Left) {
+		if (m_cameraPtr != nullptr) {
+			m_cameraPtr->MoveTo(QPoint(width() / 2, height() / 2), QPoint(width() / 2 + 5, height() / 2));
+		}
+	}
+	else if (e->key() == Qt::Key::Key_Up) {
+		if (m_cameraPtr != nullptr) {
+			m_cameraPtr->MoveTo(QPoint(width() / 2, height() / 2), QPoint(width() / 2, height() / 2 + 5));
+		}
+	}
+	else if (e->key() == Qt::Key::Key_Down) {
+		if (m_cameraPtr != nullptr) {
+			m_cameraPtr->MoveTo(QPoint(width() / 2, height() / 2), QPoint(width() / 2, height() / 2 - 5));
+		}
 	}
 }
 
