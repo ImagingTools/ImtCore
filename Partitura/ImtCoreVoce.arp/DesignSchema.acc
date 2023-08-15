@@ -2,22 +2,65 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5090" Description="ACF"/>
-            <Version Id="1" Number="2191" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5087" Description="ACF"/>
+            <Version Id="1" Number="2190" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Design schema for ImtCore</Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="DesignTokenBasedResourceProvider" PackageId="ImtStylePck" ComponentId="DesignTokenBasedResourceProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DesignSchemaIds" Type="Id[]" ExportId="DesignSchemaIds">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Light</Value>
+                                <Value>Dark</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DesignTokenFileParser" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DesignTokenFileParser"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ResourceFileNames" Type="Id[]" ExportId="ResourceFileNames">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>:/Style/light.theme</Value>
+                                <Value>:/Style/dark.theme</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="DesignTokenFileParser" PackageId="ImtDesignPck" ComponentId="DesignTokenFileParser">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="ImtStyleDesignShema" PackageId="ImtStylePck" ComponentId="DesignManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="PaletteProvider" Type="Reference" ExportId="PaletteProvider">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="PaletteProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DesignTokenBasedResourceProvider"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SlaveDesignManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ImtGuiDesignSchema"/>
+                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="RuntimeStatus">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

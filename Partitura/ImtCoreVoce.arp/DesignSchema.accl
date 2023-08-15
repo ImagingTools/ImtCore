@@ -2,13 +2,15 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5090" Description="ACF"/>
-            <Version Id="1" Number="2191" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5087" Description="ACF"/>
+            <Version Id="1" Number="2190" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ImtStyleDesignShema" X="325" Y="125" Note=""/>
+        <Element ComponentName="DesignTokenBasedResourceProvider" X="575" Y="450" Note=""/>
+        <Element ComponentName="DesignTokenFileParser" X="575" Y="650" Note=""/>
+        <Element ComponentName="ImtStyleDesignShema" X="575" Y="250" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
