@@ -77,7 +77,7 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 }
 
 
-// reimplemented (ibase::ICommandsProvider)
+// reimplemented (imtgui::IWidgetProvider)
 
 const imtbase::ICollectionInfo* CThumbnailDecoratorGuiComp::GetWidgetList() const
 {
@@ -345,7 +345,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	QScreen* screenPtr = QGuiApplication::primaryScreen();
 	if ((screenPtr != nullptr) && showPageTitle){
 		QRect screenGeometry = screenPtr->geometry();
-		int width = screenGeometry.width();
+		int width = screenGeometry.width() * screenPtr->devicePixelRatio();
 		if (width < 1900){
 			showPageTitle = false;
 

@@ -69,6 +69,7 @@ bool CObjectCollectionViewComp::SetSelectionMode(SelectionMode /*mode*/)
 	return false;
 }
 
+
 imtbase::ISelection::Ids CObjectCollectionViewComp::GetSelectedIds() const
 {
 	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
