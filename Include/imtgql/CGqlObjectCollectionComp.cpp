@@ -22,6 +22,13 @@
 namespace imtgql
 {
 
+bool operator==(const IGqlStructuredCollectionResponse::ElementInfo::PathItem& a, const IGqlStructuredCollectionResponse::ElementInfo::PathItem& b)
+{
+	bool retVal = a.id == b.id && a.name == b.name;
+
+	return retVal;
+}
+
 
 bool operator==(const IGqlStructuredCollectionResponse::ElementInfo& a, const IGqlStructuredCollectionResponse::ElementInfo& b)
 {
@@ -486,7 +493,11 @@ QByteArrayList CGqlObjectCollectionComp::GetNodePath(const QByteArray& nodeId) c
 			if (responsePtr->IsSuccessfull()){
 				IGqlStructuredCollectionResponse::NodeInfo info;
 				if (responsePtr->GetNodeInfo(info)) {
-					return retVal = info.path;
+					for (const IGqlStructuredCollectionResponse::NodeInfo::PathItem& item : info.path) {
+						retVal += item.id;
+					}
+
+					return retVal;
 				}
 			}
 		}
@@ -1128,7 +1139,9 @@ void CGqlObjectCollectionComp::OnComponentCreated()
 
 void CGqlObjectCollectionComp::OnComponentDestroyed()
 {
-	m_subscriptionManagerCompPtr->UnRegisterSubscription(m_addMeasurementSubsriptionId);
+	if (m_subscriptionManagerCompPtr.IsValid() && !m_addMeasurementSubsriptionId.isEmpty()) {
+		m_subscriptionManagerCompPtr->UnRegisterSubscription(m_addMeasurementSubsriptionId);
+	}
 
 	BaseClass::OnComponentDestroyed();
 }
@@ -1173,45 +1186,48 @@ imtbase::IObjectCollection::DataPtr CGqlObjectCollectionComp::GetDocument(
 	imtcom::IFileTransfer* fileTransferPtr = delegatePtr->GetFileTransfer();
 	if (fileTransferPtr != nullptr){
 		istd::TDelPtr<imtgql::IGqlRequest> queryPtr = delegatePtr->CreateDownloadUrlsRequest({ documentId });
-		if (queryPtr == nullptr){
-			return nullptr;
+		istd::TDelPtr<IGqlPrimitiveTypeResponse> responsePtr;
+		if (queryPtr.IsValid()) {
+			responsePtr.SetCastedOrRemove(delegatePtr->CreateResponse(*queryPtr));
 		}
 
-		istd::TDelPtr<IGqlResponse> responsePtr;// = delegatePtr->CreateResponse();
-		if (m_clientCompPtr->SendRequest(*queryPtr, *responsePtr)) {
-			QVariant variant;
+		if (responsePtr.IsValid()) {
+			if (m_clientCompPtr->SendRequest(*queryPtr, *responsePtr)) {
+				if (responsePtr->IsSuccessfull()) {
+					QVariant variant;
+					if (responsePtr->GetValue(variant)) {
+						QString downloadUrl = variant.toString();
+						if (!downloadUrl.isEmpty()) {
+							QNetworkRequest request;
+							request.setUrl(QUrl(downloadUrl));
+							QNetworkReply* replyPtr = imtcom::CRequestSender::DoSyncGet(request, 30000);
+							if (!replyPtr->error()) {
+								imtbase::CTempDir tempDir;
+								QString workingPath = tempDir.Path();
+								QString docExt = GetDocumentExtension(typeId);
+								QString docName = GetElementInfo(localDocumentId, EIT_NAME).toString();
+								QString docPath = workingPath + "/" + docName + QString(".") + docExt;
+								QFile docFile(docPath);
+								if (docFile.open(QIODevice::WriteOnly)) {
+									docFile.write(replyPtr->readAll());
+									docFile.close();
 
-			if (responsePtr->IsSuccessfull() /*&& responsePtr->GetValue(variant)*/){
-				QString downloadUrl = variant.toString();
-				if (!downloadUrl.isEmpty()) {
-					QNetworkRequest request;
-					request.setUrl(QUrl(downloadUrl));
-					QNetworkReply* replyPtr = imtcom::CRequestSender::DoSyncGet(request, 30000);
-					if (!replyPtr->error()) {
-						imtbase::CTempDir tempDir;
-						QString workingPath = tempDir.Path();
-						QString docExt = GetDocumentExtension(typeId);
-						QString docName = GetElementInfo(localDocumentId, EIT_NAME).toString();
-						QString docPath = workingPath + "/" + docName + QString(".") + docExt;
-						QFile docFile(docPath);
-						if (docFile.open(QIODevice::WriteOnly)) {
-							docFile.write(replyPtr->readAll());
-							docFile.close();
-
-							QByteArray localTypeId = GetObjectTypeId(localDocumentId);
-							const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(localTypeId);
-							if (persistencePtr != nullptr) {
-								documentPtr = CreateObjectInstance(localTypeId);
-								if (documentPtr.IsValid()) {
-									if (persistencePtr->LoadFromFile(*documentPtr, docPath) != ifile::IFilePersistence::OS_OK) {
-										documentPtr = imtbase::IObjectCollection::DataPtr();
+									QByteArray localTypeId = GetObjectTypeId(localDocumentId);
+									const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(localTypeId);
+									if (persistencePtr != nullptr) {
+										documentPtr = CreateObjectInstance(localTypeId);
+										if (documentPtr.IsValid()) {
+											if (persistencePtr->LoadFromFile(*documentPtr, docPath) != ifile::IFilePersistence::OS_OK) {
+												documentPtr = imtbase::IObjectCollection::DataPtr();
+											}
+										}
 									}
 								}
 							}
+
+							replyPtr->deleteLater();
 						}
 					}
-
-					replyPtr->deleteLater();
 				}
 			}
 		}

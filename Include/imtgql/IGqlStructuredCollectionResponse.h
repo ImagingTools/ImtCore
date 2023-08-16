@@ -26,7 +26,13 @@ public:
 		QByteArray id;
 		QString name;
 		QString description;
-		QByteArrayList path;
+
+		struct PathItem{
+			QByteArray id;
+			QString name;
+		};
+
+		QList<PathItem> path;
 
 		QSharedPointer<idoc::IDocumentMetaInfo> elementMetaInfoPtr;
 	};
