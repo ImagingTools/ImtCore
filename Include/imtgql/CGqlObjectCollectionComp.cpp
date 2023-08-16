@@ -605,13 +605,11 @@ bool CGqlObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dataPt
 	if (m_clientCompPtr.IsValid()){
 		QByteArray typeId = GetObjectTypeId(objectId);
 
-		if (dataPtr.IsValid()){
-			DataPtr retVal = GetDocument(typeId, objectId);
-			if (retVal.IsValid()){
-				dataPtr = retVal;
+		DataPtr retVal = GetDocument(typeId, objectId);
+		if (retVal.IsValid()){
+			dataPtr = retVal;
 
-				return true;
-			}
+			return true;
 		}
 	}
 
