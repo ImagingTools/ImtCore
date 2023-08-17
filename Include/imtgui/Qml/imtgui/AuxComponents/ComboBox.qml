@@ -175,8 +175,8 @@ FocusScope {
 	}
 
 	function closePopupMenu(){
-		modalDialogManager.closeDialog();
 		comboBoxContainer.isOpen = false;
+		modalDialogManager.closeDialog();
 	}
 
 	Rectangle {

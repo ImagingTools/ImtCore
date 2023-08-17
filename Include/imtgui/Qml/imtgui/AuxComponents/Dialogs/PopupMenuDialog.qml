@@ -97,10 +97,10 @@ Item {
     }
 
     function onBackgroundClicked(){
+            if (rootItem){
+                popupMenuContainer.finished('', rootItem.currentIndex);
+            }
         popupMenuContainer.root.closeDialog();
-        //		if (rootItem){
-        //			popupMenuContainer.finished('', rootItem.currentIndex);
-        //		}
     }
 
     onContentYChanged: {
@@ -168,6 +168,8 @@ Item {
 
         anchors.fill: itemBody;
 
+		z: itemBody.z-1
+
         horizontalOffset: 2;
         verticalOffset: 2;
 
@@ -205,6 +207,9 @@ Item {
         sequence: "Escape";
         enabled: true;
         onActivated: {
+            if (rootItem){
+                popupMenuContainer.finished('', rootItem.currentIndex);
+            }
             root.closeDialog();
         }
     }
