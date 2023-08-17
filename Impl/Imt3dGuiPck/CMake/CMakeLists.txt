@@ -3,6 +3,7 @@ project(Imt3dGuiPck LANGUAGES CXX)
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)
+include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 
 if(QT_VERSION_MAJOR EQUAL 6)
 	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS OpenGLWidgets REQUIRED)

@@ -7,5 +7,6 @@ target_link_libraries(${PROJECT_NAME} idoc)
 target_link_libraries(${PROJECT_NAME} imtbase imtauth imtlic)
 
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)
+include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 
 acf_use_qt_graphics_modules()

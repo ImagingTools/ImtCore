@@ -6,6 +6,7 @@ message("QT_VERSION_MAJOR " ${QT_VERSION_MAJOR})
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)
+include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 
 if(NOT DEFINED USE_QTQML OR USE_QTQML)
 	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS QuickWidgets REQUIRED)
