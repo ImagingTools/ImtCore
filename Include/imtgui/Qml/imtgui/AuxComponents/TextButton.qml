@@ -17,6 +17,7 @@ Item {
 
     property alias tooltipText: tooltip.text;
     property alias tooltipItem: tooltip;
+    property alias legendColor: legendText.color;
 
 
     signal clicked();
