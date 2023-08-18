@@ -21,8 +21,8 @@ Item {
         qsTr("December")
     ];
 
-    property int startYear: 1900;
-    property int lastYear: 2100;
+    property int startYear: 2010;
+    property int lastYear: 2040;
 
     property int todayYear;
 

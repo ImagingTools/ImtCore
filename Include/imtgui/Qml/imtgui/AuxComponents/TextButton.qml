@@ -17,7 +17,9 @@ Item {
 
     property alias tooltipText: tooltip.text;
     property alias tooltipItem: tooltip;
-    property alias legendColor: legendText.color;
+    //property alias legendColor: legendText.color;
+
+    property var legendColor:textButton.active ? Style.color_text_titles : Style.color_text_notActive;
 
 
     signal clicked();
@@ -37,7 +39,8 @@ Item {
         font.pixelSize: textButton.fontPixelSize;
         font.bold: textButton.fontBold;
         font.family: textButton.fontFamily;
-        color: textButton.active ? Style.color_text_titles : Style.color_text_notActive;
+
+        color: textButton.legendColor;
 
         text: textButton.legend;
     }
