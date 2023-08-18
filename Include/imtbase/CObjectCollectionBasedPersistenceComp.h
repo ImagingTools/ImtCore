@@ -7,6 +7,8 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/IStructuredCollectionInserter.h>
+#include <imtbase/TICollectionStructure.h>
 
 
 namespace imtbase
@@ -28,6 +30,8 @@ public:
 		I_ASSIGN_MULTI_0(m_extensionAttrPtr, "FileExtension", "File extensions supported by this persistence", false);
 		I_ASSIGN_MULTI_0(m_extensionDescAttrPtr, "FileExtensionDescription", "Descriptions for supported extensions", false);
 		I_ASSIGN(m_collectionCompPtr, "ObjectCollection", "Object collection", false, "ObjectCollection");
+		I_ASSIGN(m_collectionStructureCompPtr, "ObjectCollectionStructure", "Object collection structure", false, "ObjectCollectionStructure");
+		I_ASSIGN(m_collectionInserterCompPtr, "StructuredObjectCollectionInserter", "Structured object collection inserter", false, "StructuredObjectCollectionInserter");
 		I_ASSIGN(m_fileTypeInfoCompPtr, "SourceFileTypeInfo", "FileTypeInfo used as source", false, "FileTypeInfo");
 	I_END_COMPONENT;
 
@@ -59,6 +63,8 @@ private:
 	I_MULTIATTR(QString, m_extensionAttrPtr);
 	I_MULTITEXTATTR(m_extensionDescAttrPtr);
 	I_REF(imtbase::IObjectCollection, m_collectionCompPtr);
+	I_REF(imtbase::IObjectCollectionStructure, m_collectionStructureCompPtr);
+	I_REF(imtbase::IStructuredCollectionInserter, m_collectionInserterCompPtr);
 	I_REF(ifile::IFileTypeInfo, m_fileTypeInfoCompPtr);
 };
 
