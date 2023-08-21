@@ -617,15 +617,15 @@ imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewObject(
 			const imtbase::IOperationContext* operationContextPtr)
 {
 	return InsertNewObject(
-		typeId,
-		name,
-		description,
-		defaultValuePtr,
-		proposedObjectId,
-		QByteArray(),
-		dataMetaInfoPtr,
-		collectionItemMetaInfoPtr,
-		operationContextPtr);
+				typeId,
+				name,
+				description,
+				defaultValuePtr,
+				proposedObjectId,
+				QByteArray(),
+				dataMetaInfoPtr,
+				collectionItemMetaInfoPtr,
+				operationContextPtr);
 }
 
 
@@ -761,90 +761,6 @@ bool CGqlObjectCollectionComp::SetObjectData(
 			}
 		}
 	}
-
-	//if (m_clientCompPtr.IsValid()){
-	//	QByteArray typeId = GetObjectTypeId(objectId);
-
-	//	IGqlObjectCollectionDelegate* delegatePtr = GetDelegateForType(typeId);
-	//	if (delegatePtr != nullptr){
-	//		idoc::MetaInfoPtr metaInfoPtr = GetElementMetaInfo(objectId);
-
-	//		if (!metaInfoPtr.IsValid()){
-	//			return false;
-	//		}
-
-	//		if (!metaInfoPtr->GetMetaInfoTypes().contains(MIT_VERSION)){
-	//			return false;
-	//		}
-
-	//		int version = metaInfoPtr->GetMetaInfo(MIT_VERSION).toInt();
-
-	//		QString name = GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
-
-	//		imtcom::IFileTransfer* fileTransferPtr = delegatePtr->GetFileTransfer();
-	//		if (fileTransferPtr != nullptr){
-	//			const ifile::IFilePersistence* persistencePtr = GetPersistenceForObjectType(typeId);
-	//			imtbase::CTempDir tempDir;
-	//			QString workingPath = tempDir.Path();
-	//			QString retVal = GetDocumentExtension(typeId);
-	//			QString filePath = workingPath + "/" + name + QString(".") + retVal;
-	//			if (persistencePtr->SaveToFile(object, filePath) == ifile::IFilePersistence::OS_OK){
-	//				QFile file(filePath);
-	//				if (file.open(QIODevice::ReadOnly)){
-	//					QByteArray data = file.readAll();
-
-	//					Q_ASSERT(false);
-	//					istd::TDelPtr<imtgql::IGqlRequest> uploadUrlRequestPtr(delegatePtr->CreateUploadUrlRequest(name, ""));
-	//					if (!uploadUrlRequestPtr.IsValid()){
-	//						return false;
-	//					}
-
-	//					istd::TDelPtr<IUploadUrlResponse> responsePtr = delegatePtr->CreateUploadUrlResponse();
-	//					if (m_clientCompPtr->SendRequest(*uploadUrlRequestPtr, *responsePtr)){
-	//						QString uploadUrl = responsePtr->GetValue();
-	//						if (!uploadUrl.isEmpty()){
-	//							QNetworkRequest networkRequest;
-	//							networkRequest.setUrl(QUrl(uploadUrl));
-	//							QNetworkReply* networkReplyPtr = imtcom::CRequestSender::DoSyncPut(networkRequest, data, 30000);
-	//							if (networkReplyPtr != nullptr){
-	//								if (!networkReplyPtr->error()){
-	//									istd::TDelPtr<imtgql::IGqlRequest> updateDocumentRequestPtr(delegatePtr->CreateUpdateObjectContentRequest(m_items[objectId].parentId + "/" + objectId, object, nullptr, nullptr, version, uploadUrl));
-	//									if (updateDocumentRequestPtr.IsValid()){
-	//										IGqlObjectCollectionDelegate::UpdateObjectContentResponsePtr responsePtr = delegatePtr->CreateUpdateObjectContentResponsePtr();
-	//										if (m_clientCompPtr->SendRequest(*updateDocumentRequestPtr, *responsePtr)){
-	//											retVal = responsePtr->Result();
-	//											if (retVal){
-	//												istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
-	//												imtbase::ICollectionInfo::ElementUpdateInfo updateInfo;
-	//												updateInfo.elementId = objectId;
-	//												changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_UPDATED, QVariant::fromValue(updateInfo));
-	//												istd::CChangeNotifier notifier(this, &changeSet);
-	//											}
-	//										}
-	//									}
-	//								}
-
-	//								networkReplyPtr->deleteLater();
-	//							}
-	//						}
-	//					}
-	//				}
-	//			}
-	//		}
-	//		else{
-	//			istd::TDelPtr<imtgql::IGqlRequest> updateDocumentRequestPtr(delegatePtr->CreateUpdateObjectContentRequest(objectId, object, nullptr, nullptr));
-	//			if (!updateDocumentRequestPtr.IsValid()){
-	//				retVal = false;
-	//			}
-	//			else{
-	//				IGqlObjectCollectionDelegate::UpdateObjectContentResponsePtr responsePtr = delegatePtr->CreateUpdateObjectContentResponsePtr();
-	//				if (m_clientCompPtr->SendRequest(*updateDocumentRequestPtr, *responsePtr)){
-	//					retVal = true;
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
 
 	return false;
 }
@@ -1259,8 +1175,6 @@ imtbase::IObjectCollection::DataPtr CGqlObjectCollectionComp::CreateObjectInstan
 void CGqlObjectCollectionComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
-
-	//connect(this, &CGqlObjectCollectionComp::EmitSyncronizeDocumentListWithServer, this, &CGqlObjectCollectionComp::SyncronizeDocumentListWithServer, Qt::QueuedConnection);
 
 	m_clientCompPtr.EnsureInitialized();
 
