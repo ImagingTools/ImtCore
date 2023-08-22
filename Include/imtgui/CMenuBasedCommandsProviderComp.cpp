@@ -53,6 +53,11 @@ void CMenuBasedCommandsProviderComp::OnSystemStarted()
 
 	Q_ASSERT(m_menuGuiCompPtr.IsValid());
 	if (m_menuGuiCompPtr->CreateGui(m_mainWidgetPtr)){
+		QWidget* widgetPtr = m_menuGuiCompPtr->GetWidget();
+		if (widgetPtr != nullptr){
+			widgetPtr->hide();
+		}
+
 		QObject::connect(m_menuCommand, &QAction::triggered, this, &CMenuBasedCommandsProviderComp::OnCommandActivated);
 	}
 	else{
