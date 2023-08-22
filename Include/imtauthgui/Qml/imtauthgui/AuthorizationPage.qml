@@ -8,7 +8,7 @@ Rectangle {
 
     color: "transparent";
 
-    property string state;
+    property string state:"";
 
     property alias tokenProvider: userTokenProvider;
     property alias login: userTokenProvider.login;
@@ -22,10 +22,13 @@ Rectangle {
     signal loginSuccessful();
     signal loginFailed();
 
+
+
     Component.onCompleted: {
 //        Events.subscribeEvent("Logout", authPageContainer.logout);
         decoratorPause.start();
     }
+
 
     onLoginSuccessful: {
         let obj = {}

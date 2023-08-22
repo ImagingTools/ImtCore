@@ -18,7 +18,7 @@ Rectangle {
     property bool highlighted: ma.containsMouse;
     property bool containsMouse: ma.containsMouse;
     property bool hasIcon: auxButtonContainer.iconSource !== "";
-    property bool hasText: false;
+    property bool hasText: true;
     property bool fontBold: false;
     property bool borderExist: false;
     property bool enabled: true;

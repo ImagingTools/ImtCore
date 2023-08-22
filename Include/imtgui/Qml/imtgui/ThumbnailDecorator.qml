@@ -196,9 +196,10 @@ Rectangle {
 
         onLoginSuccessful: {
             authorizationPage.visible = false;
+            authorizationPage.state = "authorized";
 
-            Events.sendEvent("UpdateModels");
             Events.sendEvent("UpdateSettings");
+            Events.sendEvent("UpdateModels");
         }
 
 //        onModelStateChanged: {
