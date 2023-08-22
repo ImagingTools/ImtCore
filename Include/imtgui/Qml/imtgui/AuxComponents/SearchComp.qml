@@ -597,7 +597,7 @@ Rectangle{
         visible: (!searchTextField.openST && searchTextField.currentText == "") ? true :
                                                                                   (!searchTextField.openST && searchTextField.currentText !== "") ? false :
                                                                                                                                                     (searchTextField.openST && searchTextField.currentText !== "") ? false : false;
-        text: "Поиск"
+        text: qsTr("Поиск");
 
     }
 
