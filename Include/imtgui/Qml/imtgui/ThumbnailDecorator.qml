@@ -17,7 +17,7 @@ Rectangle {
     property alias errorPage: serverNoConnectionView;
     property alias loadingPage: loading;
 
-    property int mainMargin: 0;
+    property int mainMargin: Style.mainWindowMargin !== undefined ? Style.mainWindowMargin : 0;
     property int mainRadius: 0;
 
     property alias authorizationPageAlias: authorizationPage;
@@ -102,7 +102,7 @@ Rectangle {
 
         model: pagesManager.pageModel;
 
-        color: Style.imagingToolsGradient1;
+        color: Style.color_menuPanel !==undefined ? Style.color_menuPanel : Style.imagingToolsGradient1;
     }
 
     Item {
@@ -163,9 +163,10 @@ Rectangle {
         z: 10;
 
         anchors.top: parent.top;
+        anchors.topMargin: thumbnailDecoratorContainer.mainMargin;
 
         width: parent.width;
-        height: 60;
+        height: Style.size_panelsHeight !== undefined ? Style.size_panelsHeight : 60;
     }
 
     ServerNoConnectionView {
