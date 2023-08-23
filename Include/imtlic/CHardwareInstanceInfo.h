@@ -23,8 +23,6 @@ public:
 	// reimplemented (imtlic::IHardwareInstanceInfo)
 	virtual QByteArray GetProductId() const override;
 	virtual void SetProductId(const QByteArray& productId) override;
-	virtual QByteArray GetDeviceId() const override;
-	virtual void SetDeviceId(const QByteArray& deviceId) override;
 	virtual QByteArray GetSoftwareId() const override;
 	virtual void SetSoftwareId(const QByteArray& softwareId) override;
 	virtual QByteArray GetModelTypeId() const override;
@@ -40,6 +38,8 @@ public:
 
 	// reimplemented (istd::IChangeable)
 	virtual QByteArray GetFactoryId() const override;
+
+	QByteArray GetDeviceId(); // deprecated
 
 private:
 	QByteArray m_productId;

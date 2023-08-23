@@ -36,16 +36,6 @@ public:
 	virtual void SetProductId(const QByteArray& productId) = 0;
 
 	/**
-		Get the device Id (identifacator of sensor in the table of sensors) of this product instance.
-	*/
-	virtual QByteArray GetDeviceId() const = 0;
-
-	/**
-		Set the device Id (identifacator of sensor in the table of sensors) of this product instance.
-	*/
-	virtual void SetDeviceId(const QByteArray& deviceId) = 0;
-
-	/**
 		Get the link to licensing software of this product instance.
 	*/
 	virtual QByteArray GetSoftwareId() const = 0;

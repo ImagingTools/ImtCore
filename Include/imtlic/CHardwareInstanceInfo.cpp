@@ -37,21 +37,6 @@ void CHardwareInstanceInfo::SetProductId(const QByteArray& productId)
 
 // reimplemented (imtlic::ILicensedHardwareInstanceInfo)
 
-QByteArray CHardwareInstanceInfo::GetDeviceId() const
-{
-	return m_deviceId;
-}
-
-void CHardwareInstanceInfo::SetDeviceId(const QByteArray &deviceId)
-{
-	if (m_deviceId != deviceId){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_deviceId = deviceId;
-	}
-}
-
-
 QByteArray CHardwareInstanceInfo::GetSoftwareId() const
 {
 	return m_softwareId;
@@ -170,6 +155,12 @@ bool CHardwareInstanceInfo::ResetData(CompatibilityMode /*mode*/)
 QByteArray CHardwareInstanceInfo::GetFactoryId() const
 {
 	return "Hardware";
+}
+
+
+QByteArray CHardwareInstanceInfo::GetDeviceId()
+{
+	return m_deviceId;
 }
 
 
