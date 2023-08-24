@@ -88,6 +88,8 @@ void CDesignManagerComp::OnSystemStarting()
 void CDesignManagerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
+	BaseClass2::SetSelectedOptionIndex(*m_defaultThemeIndexAttrPtr);
 }
 
 

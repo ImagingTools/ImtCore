@@ -31,6 +31,7 @@ public:
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_ASSIGN(m_paletteProviderCompPtr, "PaletteProvider", "Palette provider", false, "PaletteProvider");
 		I_ASSIGN_TO(m_fontProviderCompPtr, m_paletteProviderCompPtr, false);
+		I_ASSIGN(m_defaultThemeIndexAttrPtr, "DefaultThemeIndex", "Index of the default theme", true, -1);
 	I_END_COMPONENT;
 
 	CDesignManagerComp();
@@ -91,6 +92,7 @@ private:
 	I_REF(iprm::ISelectionParam, m_slaveCompPtr);
 	I_REF(imtstyle::IColorPaletteProvider, m_paletteProviderCompPtr);
 	I_REF(imtstyle::IFontProvider, m_fontProviderCompPtr);
+	I_ATTR(int, m_defaultThemeIndexAttrPtr);
 
 	imod::TModelWrap<DesignList> m_designs;
 };
