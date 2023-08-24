@@ -204,6 +204,12 @@ Rectangle {
                 anchors.bottom: parent.bottom;
                 anchors.bottomMargin: 10;
 
+                onWidthChanged: {
+                    if(dialogContainer.width < buttonsDialog.width){
+                        dialogContainer.width = buttonsDialog.width + 20;
+                    }
+                }
+
                 onButtonClicked: {
                     console.log("ButtonsDialog onButtonClicked", buttonId);
                     dialogContainer.finished(buttonId);
