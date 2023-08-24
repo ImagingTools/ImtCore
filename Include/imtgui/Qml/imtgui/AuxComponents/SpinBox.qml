@@ -1,4 +1,6 @@
 import QtQuick 2.12
+import imtqml 1.0
+import imtgui 1.0
 import Acf 1.0
 
 Rectangle{
@@ -9,25 +11,21 @@ Rectangle{
     radius: Style.size_TextFieldRadius;
     clip: true;
 
-    //color: "transparent";
     border.width: 1;
     border.color: Style.color_gray;
 
-    property string iconUpSource: "../../../" + "Icons/" + Style.theme + "/" + "Up" + "_On_Normal.svg";
-    property string iconDownSource: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
-    property int iconWidth: 12;
-    property int iconHeight: 10;
+    property string icon: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
+    property int iconWidth: 5;
+    property int iconHeight: 5;
 
     property string fontColor: "#000000";
     property int fontSize: Style.fontSize_common;
 
-
     property var numberReg: /^\-{0,1}\d*\.{0,1}\d*$/;
-
 
     property real startValue: 0;
 
-    property real difference: 5;
+    property real incrementStep: 1;
 
     property string retVal: numberTextField.text;
 
@@ -36,7 +34,7 @@ Rectangle{
         numberTextField.prevText = numberTextField.text;
     }
 
-    Rectangle {
+    Item {
         id: numberBlock;
 
         anchors.left: parent.left;
@@ -44,23 +42,17 @@ Rectangle{
         width: parent.width - buttonsBlock.width;
         height: parent.height;
 
-        color: "transparent";
-        border.width: spinBox.border.width;
-        border.color: spinBox.border.color;
-        radius: spinBox.radius;
-
         CustomTextField {
             id: numberTextField;
 
             anchors.centerIn: parent;
 
             width: parent.width - 10;
-            height: parent.height - 2*parent.border.width;
-            radius: parent.radius;
-            color: "#ffffff";
+            height: parent.height;
+            color: "transparent";
             fontColor: spinBox.fontColor;
             textSize: spinBox.fontSize;
-            borderColor: "transparent";
+            borderColorConst: "transparent";
 
             property string prevText: "";
 
@@ -88,6 +80,7 @@ Rectangle{
             anchors.left: parent.left;
             anchors.leftMargin: -spinBox.border.width;
             anchors.verticalCenter: parent.verticalCenter;
+            spacing: -spinBox.border.width
 
             width: parent.width +  spinBox.border.width;
 
@@ -95,22 +88,32 @@ Rectangle{
                 id: upButton;
 
                 width: buttonColumn.width;
-                height: buttonsBlock.height/2;
+                height: buttonsBlock.height/2 + spinBox.border.width/2;
                 radius: spinBox.radius;
 
                 iconWidth: spinBox.iconWidth;
                 iconHeight: spinBox.iconHeight;
-                iconSource: spinBox.iconUpSource;
+                iconSource: spinBox.icon;
 
+                rotation: 180
                 highlighted: false;
                 borderColor: spinBox.border.color;
 
                 onClicked: {
-                    var arr = numberTextField.text.split(".");
-                    var numAfterDot = arr[1].length;
-                    var val = Number(numberTextField.text);
-                    val += spinBox.difference;
-                    numberTextField.text = val.toFixed(numAfterDot);
+                    let precision = 0
+                    if (numberTextField.text.includes('.')){
+                        precision = numberTextField.text.split('.')[1].length
+                    }
+
+                    if (!numberTextField.text){
+                        numberTextField.text = spinBox.incrementStep
+                    }
+                    else {
+                        let value = parseFloat(numberTextField.text)
+                        value += spinBox.incrementStep
+                        numberTextField.text = value.toFixed(precision)
+                    }
+
                 }
             }
 
@@ -118,37 +121,33 @@ Rectangle{
                 id: downButton;
 
                 width: buttonColumn.width;
-                height: buttonsBlock.height/2;
+                height: buttonsBlock.height/2 + spinBox.border.width/2;
                 radius: spinBox.radius;
 
                 iconWidth: spinBox.iconWidth;
                 iconHeight: spinBox.iconHeight;
-                iconSource: spinBox.iconDownSource;
+                iconSource: spinBox.icon;
 
                 highlighted: false;
                 borderColor: spinBox.border.color;
 
                 onClicked: {
-                    var arr = numberTextField.text.split(".");
-                    var numAfterDot = arr[1].length;
-                    var val = Number(numberTextField.text);
-                    val -= spinBox.difference;
-                    numberTextField.text = val.toFixed(numAfterDot);
+                    let precision = 0
+                    if (numberTextField.text.includes('.')){
+                        precision = numberTextField.text.split('.')[1].length
+                    }
+
+                    if (!numberTextField.text){
+                        numberTextField.text = -spinBox.incrementStep
+                    }
+                    else {
+                        let value = parseFloat(numberTextField.text)
+                        value -= spinBox.incrementStep
+                        numberTextField.text = value.toFixed(precision)
+                    }
                 }
             }
         }
-
     }
-
-    Rectangle{
-        anchors.fill: parent;
-
-        color: "transparent";
-
-        radius: parent.radius;
-        border.color: parent.border.color;
-        border.width: parent.border.width;
-    }
-
 }
 
