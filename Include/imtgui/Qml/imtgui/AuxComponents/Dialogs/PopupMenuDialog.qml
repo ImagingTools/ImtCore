@@ -97,10 +97,9 @@ Item {
     }
 
     function onBackgroundClicked(){
-            if (rootItem){
-                popupMenuContainer.finished('', rootItem.currentIndex);
-            }
-        popupMenuContainer.root.closeDialog();
+        if (rootItem){
+            popupMenuContainer.finished('', rootItem.currentIndex);
+        }
     }
 
     onContentYChanged: {
