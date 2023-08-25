@@ -925,18 +925,25 @@ bool CGqlObjectCollectionComp::SetElementName(const Id& elementId, const QString
 	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()){
 		istd::TDelPtr<imtgql::IGqlRequest> requestPtr;
 		istd::TDelPtr<imtgql::IGqlResponse> responsePtr;
-		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
-		Q_ASSERT(responsePtr.IsValid());
 
 		ElementType type;
 		if (GetElementType(elementId, type, true)){
 			switch (type){
 			case ET_NODE:
 				requestPtr.SetPtr(m_delegateCompPtr->CreateSetNodeNameRequest(elementId, name));
+				responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+				Q_ASSERT(responsePtr.IsValid());
 				break;
 
 			case ET_OBJECT:
-				requestPtr.SetPtr(m_delegateCompPtr->CreateSetObjectNameRequest(elementId, name));
+				{
+					IGqlStructuredCollectionResponse::ObjectInfo info;
+					if (GetObjectInfo(elementId, info)){
+						requestPtr.SetPtr(m_delegateCompPtr->CreateSetObjectNameRequest(elementId, name, info.version));
+						responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+						Q_ASSERT(responsePtr.IsValid());
+					}
+				}
 				break;
 
 			default:
@@ -962,18 +969,20 @@ bool CGqlObjectCollectionComp::SetElementDescription(const Id& elementId, const 
 	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()){
 		istd::TDelPtr<imtgql::IGqlRequest> requestPtr;
 		istd::TDelPtr<imtgql::IGqlResponse> responsePtr;
-		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
-		Q_ASSERT(responsePtr.IsValid());
 
 		ElementType type;
 		if (GetElementType(elementId, type, true)){
 			switch (type){
 			case ET_NODE:
 				requestPtr.SetPtr(m_delegateCompPtr->CreateSetNodeDescriptionRequest(elementId, description));
+				responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+				Q_ASSERT(responsePtr.IsValid());
 				break;
 
 			case ET_OBJECT:
 				requestPtr.SetPtr(m_delegateCompPtr->CreateSetObjectDescriptionRequest(elementId, description));
+				responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+				Q_ASSERT(responsePtr.IsValid());
 				break;
 
 			default:
