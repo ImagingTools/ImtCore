@@ -18,7 +18,6 @@ CFullScreenCommandComp::CFullScreenCommandComp()
 bool CFullScreenCommandComp::eventFilter(QObject* watchedPtr, QEvent* eventPtr)
 {
 	QWidget* mainWidgetPtr = GetMainWidget();
-	const bool isFullScreen = CheckIsFullScreen();
 	if (watchedPtr == mainWidgetPtr){
 		if (eventPtr->type() == QEvent::WindowStateChange){
 			const Qt::WindowStates windowStates = mainWidgetPtr->windowState();
@@ -60,6 +59,8 @@ void CFullScreenCommandComp::OnComponentCreated()
 	if(mainWidgetPtr != nullptr){
 		mainWidgetPtr->installEventFilter(this);
 	}
+
+	UpdateVisualStatus();
 }
 
 

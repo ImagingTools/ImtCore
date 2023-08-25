@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5093" Description="ACF"/>
-            <Version Id="1" Number="2194" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5090" Description="ACF"/>
+            <Version Id="1" Number="2191" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -376,6 +376,7 @@
     <ExportedComponents>
         <Component ExportedId="ApplicationInfo" ComponentId="ApplicationInfo"/>
         <Component ExportedId="LoginLog" ComponentId="StandardLoginGui/LoginLog"/>
+        <Component ExportedId="MainGui" ComponentId="MainGui"/>
         <Component ExportedId="MenuPanelVisibility" ComponentId="MenuPanelVisibility"/>
         <Component ExportedId="PageCommands" ComponentId="CommandsMultiplexer"/>
         <Component ExportedId="PopupController" ComponentId="Pages/PopupController"/>
