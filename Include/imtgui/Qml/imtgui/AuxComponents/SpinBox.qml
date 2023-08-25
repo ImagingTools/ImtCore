@@ -27,7 +27,7 @@ Rectangle{
 
     property real incrementStep: 1;
 
-    property string value: numberTextField.text;
+	property alias value: numberTextField.text;
 
     Component.onCompleted: {
         numberTextField.text = String(startValue);
