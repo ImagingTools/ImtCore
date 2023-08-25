@@ -2,6 +2,8 @@
 
 
 // Qt includes
+#include <QtCore/QTextStream>
+#include <QtCore/QDir>
 #include <QtGui/QPainter>
 #include <QtGui/QPainterPath>
 #include <QtWidgets/QApplication>
@@ -152,6 +154,11 @@ void CImtStyle::drawPrimitive(
 				}
 			}
 		}
+	}
+
+	/* do not draw focus rectangles - this permits modern styling */
+	if (pe == QStyle::PE_FrameFocusRect){
+		return;
 	}
 
 	BaseClass::drawPrimitive(pe, option, painter, widget);
@@ -405,6 +412,20 @@ void CImtStyle::EnsureStyleSheetApplied(bool force) const
 				iqtgui::SetStyleSheetFromFile(&widget, m_activeColorSchema.stylePath);
 
 				QString imtStyle = widget.styleSheet();
+
+				I_IF_DEBUG(
+					QString styleFilePath = QDir::tempPath() + "/AppStyle.css";
+					QFile appStyleFile(styleFilePath);
+					if (appStyleFile.open(QFile::Text | QFile::WriteOnly)){
+						QTextStream stream(&appStyleFile);
+
+						stream << geometryStyleSheet + imtStyle;
+
+						stream.flush();
+					}
+					appStyleFile.close();
+				);
+
 				qApp->setStyleSheet(geometryStyleSheet + imtStyle);
 			}
 		}
