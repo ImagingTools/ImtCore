@@ -157,10 +157,9 @@ void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 }
 
 
-void CWebSocketServerComp::OnWebSocketBinaryMessage(const QByteArray& dataMessage)
+void CWebSocketServerComp::OnWebSocketBinaryMessage(const QByteArray& /*dataMessage*/)
 {
 }
-
 
 
 } // namespace imtrest

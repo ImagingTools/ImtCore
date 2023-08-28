@@ -120,7 +120,7 @@ bool CCompositeDeviceControllerComp::CloseDevice(const QByteArray& deviceId)
 
 // reimplemented (IDeviceEnumerator)
 
-IDeviceEnumerator::StartResult CCompositeDeviceControllerComp::StartEnumeration(IDeviceEnumerator::IResultHandler* resultHandlerPtr)
+IDeviceEnumerator::StartResult CCompositeDeviceControllerComp::StartEnumeration(IDeviceEnumerator::IResultHandler* /*resultHandlerPtr*/)
 {
 	return SR_FAILED;
 }
@@ -140,7 +140,7 @@ void CCompositeDeviceControllerComp::CancelEnumeration()
 // reimplemented (imtdev::IDeviceEnumerationResultHandler)
 
 void CCompositeDeviceControllerComp::OnEnumerationResult(
-			EnumerationResult result,
+			EnumerationResult /*result*/,
 			const IDeviceEnumerator* /*deviceEnumeratorPtr*/)
 {
 	IDeviceEnumerator* deviceEnumeratorPtr = GetNextDeviceEnumerator();
@@ -166,7 +166,7 @@ void CCompositeDeviceControllerComp::OnEnumerationResult(
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CCompositeDeviceControllerComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+void CCompositeDeviceControllerComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	Q_ASSERT(qApp->thread() == QThread::currentThread());
 
@@ -340,8 +340,8 @@ void CCompositeDeviceControllerComp::UpdateExtendedDeviceList()
 	imtbase::ICollectionInfo::Ids deviceTypeIds = m_deviceTypeList.GetElementIds();
 	for (const QByteArray& deviceTypeId : deviceTypeIds){
 		if (sortedDeviceList.contains(deviceTypeId)){
-			QByteArrayList deviceIds = sortedDeviceList.values(deviceTypeId);
-			for (const QByteArray& deviceId : deviceIds){
+			QByteArrayList sortedDeviceIds = sortedDeviceList.values(deviceTypeId);
+			for (const QByteArray& deviceId : sortedDeviceIds){
 				m_extendedDeviceList.InsertItem(
 							deviceId,
 							m_deviceList.GetElementInfo(deviceId, imtbase::ICollectionInfo::EIT_NAME).toString(),
