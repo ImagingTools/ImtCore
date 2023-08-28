@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5087" Description="ACF"/>
+            <Version Id="1" Number="2190" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ApplicationFramework" X="600" Y="350" Note=""/>
+        <Element ComponentName="MenuPanel" X="175" Y="525" Note=""/>
+        <Element ComponentName="PanelDelegate" X="175" Y="650" Note=""/>
+        <Element ComponentName="StandardAccountMenu" X="950" Y="350" Note=""/>
+        <Element ComponentName="StandardLoginGui" X="175" Y="175" Note=""/>
+        <Element ComponentName="SystemStatusController" X="175" Y="75" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

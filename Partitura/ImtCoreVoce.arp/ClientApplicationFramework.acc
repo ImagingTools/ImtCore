@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5087" Description="ACF"/>
+            <Version Id="1" Number="2190" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>Framework for a client application used a remote login on the autorization server</Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="ApplicationFramework" PackageId="ImtCoreVoce" ComponentId="CoreApplicationFramework">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AccountMenu" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="StandardAccountMenu"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AdditionalCommandActivators" Type="Reference[]" ExportId="AdditionalCommandActivators">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AdditionalCommandIds" Type="Id[]" ExportId="AdditionalCommandIds">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AdditionalCommands" Type="Reference" ExportId="AdditionalCommandsGroup1">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AllowClose" Type="Reference" ExportId="AllowClose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationName" Type="Text" ExportId="ApplicationName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationSubname" Type="Text" ExportId="ApplicationSubname">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AutoLogoutMinutes" Type="Integer" ExportId="AutoLogoutMinutes">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="AutoLogoutTime" Type="Reference" ExportId="AutoLogoutTime">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CloseRightId" Type="Id" ExportId="CloseRightId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandProviders" Type="Reference[]" ExportId="CommandProviders">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandSelector" Type="Reference" ExportId="CommandSelector">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CompanyName" Type="Text" ExportId="CompanyName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ComponentsToInitialize" Type="Reference[]" ExportId="ComponentsToInitialize">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Dashboard" Type="Reference" ExportId="Dashboard">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultPageIndex" Type="Integer" ExportId="DefaultPageIndex">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DisablePageListViewIndexes" Type="Integer[]" ExportId="DisablePageListViewIndexes">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableGeometryRestoring" Type="Boolean" ExportId="EnableGeometryRestoring">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HelpFile" Type="Reference" ExportId="HelpFile">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HideHomeButton" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HideMenuPanelOnHomePage" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HorizontalItemsView" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="3"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IconPath" Type="String" ExportId="IconPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="IconSize" Type="Integer" ExportId="IconSize">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LeftMenuPanel" Type="Reference" ExportId="LeftMenuPanel">
+                        <Data IsEnabled="true" Value="MenuPanel"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LegalCopyright" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="(C) 2020 ImagingTools GmbH. All rights reserved."/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Login" Type="Reference" ExportId="Login">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LoginGui" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="StandardLoginGui"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MainPageModel" Type="Reference" ExportId="MainPageModel">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MainUiPages" Type="Reference" ExportId="MainUiPages">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MainVersionId" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="1978"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MainWindowComponents" Type="Reference[]" ExportId="MainWindowComponents">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MenuPanelVisibility" Type="Reference" ExportId="MenuPanelVisibility">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageCommands" Type="Reference" ExportId="PageCommands">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PopupAnchorCorner" Type="Integer" ExportId="PopupAnchorCorner">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PopupDefaultTimeout" Type="Integer" ExportId="PopupDefaultTimeout">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PopupEventHandler" Type="Reference[]" ExportId="PopupEventHandler">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PopupSpacing" Type="Integer" ExportId="PopupSpacing">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PopupWidgetFactory" Type="Reference" ExportId="PopupWidgetFactory">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductEdition" Type="Text" ExportId="ProductEdition">
+                        <Data IsEnabled="true" Value=""/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductName" Type="Text" ExportId="ProductName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="QuitDialogIgnored" Type="Boolean" ExportId="QuitDialogIgnored">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Rights" Type="Reference" ExportId="Rights">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RightsCommands" Type="Reference" ExportId="AdditionalCommandsGroup2">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ShowPageTitles" Type="Boolean" ExportId="ShowPageTitles">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SplashScreen" Type="Reference" ExportId="SplashScreen">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SplashTime" Type="Real" ExportId="SplashTime">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="StyleSheet" Type="String" ExportId="StyleSheet">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TitleFormat" Type="String" ExportId="TitleFormat">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TrayIconsCommands" Type="Reference" ExportId="TrayIconsCommands">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UiStartMode" Type="Integer" ExportId="UiStartMode">
+                        <Data IsEnabled="true" Value="0"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UseFullScreenBorderOnWindows" Type="Boolean" ExportId="UseFullScreenBorderOnWindows">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UseMenuIconsOnMac" Type="Boolean" ExportId="UseMenuIconsOnMac">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UseTrayIcon" Type="Boolean" ExportId="UseTrayIcon">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ViewPageNavigation" Type="Boolean" ExportId="ViewPageNavigation">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WelcomeText" Type="Text" ExportId="WelcomeText">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="MenuPanel" PackageId="ImtGuiPck" ComponentId="MenuPanel">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AnimationEnabled" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="BottomPagesIds" Type="Id[]" ExportId="BottomPagesIds">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultModel" Type="Reference" ExportId="DefaultModel">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ItemHeight" Type="Real" ExportId="">
+                        <Data IsEnabled="true" Value="20"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MenuPanelDelegate" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="PanelDelegate"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MenuPanelVisibility" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationFramework/MenuPanelVisibility"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PhysicalResolution" Type="Real" ExportId="">
+                        <Data IsEnabled="true" Value="3.5"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WidgetProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationFramework"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="PanelDelegate" PackageId="ImtGuiPck" ComponentId="MenuPanelDelegateMin">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="StandardAccountMenu" PackageId="ImtAuthGuiPck" ComponentId="StandardAccountMenu">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Login" Type="Reference" ExportId="Login">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PreferencesDialog" Type="Reference" ExportId="PreferencesDialog">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="StandardLoginGui" PackageId="ImtAuthGuiPck" ComponentId="RemoteStandardLoginGui">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Login" Type="Reference" ExportId="Login">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationFramework/SettingsProvider"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SuperuserController" Type="Reference" ExportId="SuperuserController">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SuperuserProvider" Type="Reference" ExportId="SuperuserProvider">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SystemStatus" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SystemStatusController"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SystemStatusController" PackageId="ImtCoreVoce" ComponentId="SystemStatusController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CheckInterval" Type="Integer" ExportId="AuthorizationCheckInterval">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="AuthorizationServerPrefix">
+                        <Data IsEnabled="true" Value="/Puma"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Url" Type="Id" ExportId="DefaultAuthorizationUrl">
+                        <Data IsEnabled="true" Value="http://localhost:7788"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="AuthorizationServerUrl">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="ibase::IApplication" ComponentId="ApplicationFramework"/>
+        <Interface InterfaceId="imtgui::IWidgetProvider" ComponentId="ApplicationFramework"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="ApplicationInfo" ComponentId="ApplicationFramework/ApplicationInfo"/>
+        <Component ExportedId="PageCommands" ComponentId="ApplicationFramework/PageCommands"/>
+        <Component ExportedId="RuntimeStatus" ComponentId="ApplicationFramework/RuntimeStatus"/>
+        <Component ExportedId="SettingsProvider" ComponentId="ApplicationFramework/SettingsProvider"/>
+    </ExportedComponents>
+</Acf>

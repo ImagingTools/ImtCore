@@ -468,6 +468,9 @@ void CThumbnailDecoratorGuiComp::OnGuiDesignChanged()
 
 		LoginControlButton->setIcon(GetIcon(":/Icons/Account"));
 		ExitButton->setIcon(GetIcon(":/Icons/PowerOff"));
+		HomeButton->setIcon(GetIcon(":/ColorIcons/MenuRing"));
+		BackPageButton->setIcon(GetIcon(":/Icons/Left"));
+		NextPageButton->setIcon(GetIcon(":/Icons/Right"));
 	}
 }
 

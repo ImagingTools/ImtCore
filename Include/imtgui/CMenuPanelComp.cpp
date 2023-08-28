@@ -164,6 +164,12 @@ void CMenuPanelComp::OnGuiDesignChanged()
 	BaseClass::OnGuiDesignChanged();
 
 	iqtgui::SetStyleSheetFromFile(GetWidget(), GetStyleSheetPath(":/Styles/MenuPanel"));
+
+	if (!IsUpdateBlocked()){
+		UpdateBlocker blockUpdate(this);
+	
+		UpdateGui(istd::IChangeable::GetAnyChange());
+	}
 }
 
 
