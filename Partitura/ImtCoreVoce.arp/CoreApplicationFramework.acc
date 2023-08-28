@@ -67,6 +67,9 @@
                     <AttributeInfo Id="ComponentsToInitialize" Type="Reference[]" ExportId="ComponentsToInitialize">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ComponentsToPreInitialize" Type="Reference[]" ExportId="ComponentsToPreInitialize">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="FrameSpaceSize" Type="Integer" ExportId="FrameSpaceSize">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
