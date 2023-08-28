@@ -4,7 +4,5 @@
         <file alias="ImtCore_de_DE">Translations/ImtCore_de_DE.qm</file>
         <file alias="ImtCore_ru_RU">Translations/ImtCore_ru_RU.qm</file>
         <file alias="ImtCore_pl_PL">Translations/ImtCore_pl_PL.qm</file>
-        <file alias="ImtCore_en_US.ts">Translations/ImtCore_en_US.ts</file>
-        <file alias="ImtCore_ru_RU.ts">Translations/ImtCore_ru_RU.ts</file>
     </qresource>
 </RCC>
