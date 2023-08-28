@@ -9,6 +9,7 @@ QtObject {
 
     property string commandsId;
     property string documentUuid;
+    property bool isLoadData: true
 
     signal modelLoaded();
     signal commandModeChanged(string commandId, bool newMode);
@@ -146,6 +147,10 @@ QtObject {
 
     property GqlModel modelCommands: GqlModel {
         function updateModel() {
+            if (!commandsProviderContainer.isLoadData){
+                return
+            }
+
             var query = Gql.GqlRequest("query", commandsProviderContainer.commandsId + "Commands");
             var gqlData = query.GetQuery();
             this.SetGqlQuery(gqlData);

@@ -5,7 +5,7 @@ import imtgui 1.0
 Item {
     id: collectionViewBaseContainer;
 
-    property alias commands: baseCommands;
+    property alias commands: gqlModels;
 
     property string commandsId;
 
@@ -65,7 +65,7 @@ Item {
 
     onCommandsIdChanged: {
         if (collectionViewBaseContainer.loadData){
-            baseCommands.updateModels();
+            gqlModels.updateModels();
         }
     }
 
@@ -99,7 +99,7 @@ Item {
 
     function onLocalizationChanged(language){
         console.log("CollectionViewBase onLocalizationChanged", language);
-        baseCommands.updateModels();
+        gqlModels.updateModels();
     }
 
     function onFilterClosed(){
@@ -109,7 +109,7 @@ Item {
     function onTextFilterChanged(index, text){
         console.log("onTextFilterChanged", text);
         modelFilterObj.SetData("TextFilter", text);
-        baseCommands.updateModels();
+        gqlModels.updateModels();
     }
 
     Rectangle {
@@ -279,7 +279,7 @@ Item {
     SortController {
         id: sortCont;
 
-        commands: baseCommands;
+        commands: gqlModels;
 
         Component.onCompleted: {
             tableInternal.headerClicked.connect(sortCont.headerClicked);
@@ -294,8 +294,10 @@ Item {
         id: modelFilterObj;
 
         Component.onCompleted: {
+            modelFilterObj.SetUpdateEnabled(true)
             modelFilterObj.AddTreeModel("FilterIds");
             sortCont.sortModel = modelFilterObj.AddTreeModel("Sort");
+            console.log("modelFilterObj onCompleted", modelFilterObj.toJSON())
         }
     }
 
@@ -312,12 +314,12 @@ Item {
 
         onCurrentIndexChanged: {
             tableInternal.selectedIndex = -1;
-            baseCommands.updateModels();
+            gqlModels.updateModels();
         }
     }
 
     CollectionViewBaseGqlModels {
-        id: baseCommands;
+        id: gqlModels;
 
         itemId: collectionViewBaseContainer.itemId;
         table: collectionViewBaseContainer.table;
@@ -329,25 +331,25 @@ Item {
         loading: ldng;
 
         onHeadersChanged: {
-            let headersCount = baseCommands.headers.GetItemsCount();
+            let headersCount = gqlModels.headers.GetItemsCount();
             if (headersCount > 0 && sortCont.isEmpty()){
                 if (collectionViewBaseContainer.defaultSortHeaderIndex < 0 || headersCount <= collectionViewBaseContainer.defaultSortHeaderIndex){
                     collectionViewBaseContainer.defaultSortHeaderIndex = 0;
                 }
 
-                let headerId = baseCommands.headers.GetData("Id", collectionViewBaseContainer.defaultSortHeaderIndex);
+                let headerId = gqlModels.headers.GetData("Id", collectionViewBaseContainer.defaultSortHeaderIndex);
 
                 sortCont.currentHeaderId = headerId;
 
                 sortCont.setHeaderSort(headerId, collectionViewBaseContainer.defaultOrderType);
             }
 
-            tableInternal.headers = baseCommands.headers;
+            tableInternal.headers = gqlModels.headers;
             tableInternal.headersCompl = true;
         }
 
         onItemsChanged: {
-            tableInternal.elements = baseCommands.items;
+            tableInternal.elements = gqlModels.items;
         }
 
         onItemsInfoGqlStateChanged: {
