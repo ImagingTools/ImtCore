@@ -22,11 +22,11 @@ QtObject {
 
     property TreeItemModel filterModel: TreeItemModel {
         Component.onCompleted: {
-            filterModel.InsertNewItem();
-            let objectFilter = filterModel.AddTreeModel("ObjectFilter");
-            objectFilter.SetData("Key", "DeviceId");
-            objectFilter.SetData("Value", "");
-            objectFilter.SetData("IsEqual", true);
+//            filterModel.InsertNewItem();
+//            let objectFilter = filterModel.AddTreeModel("ObjectFilter");
+//            objectFilter.SetData("Key", "DeviceId");
+//            objectFilter.SetData("Value", "");
+//            objectFilter.SetData("IsEqual", true);
 //            console.log("onCompleted filterModel", filterModel.toJSON());
 
 //            filterModel.InsertNewItem();
@@ -91,6 +91,7 @@ QtObject {
                 inputParams.InsertField(key, externInputParams[key]);
             }
             inputParams.InsertFieldObject(viewParams);
+
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");

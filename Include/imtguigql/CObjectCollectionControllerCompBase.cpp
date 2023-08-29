@@ -35,8 +35,8 @@ void CObjectCollectionControllerCompBase::OnComponentCreated()
 // reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResponse(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+		const imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const
 {
 	imtgql::CGqlObject gqlObject;
 
@@ -83,10 +83,10 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 // protected methods
 
 bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
-			const imtgql::CGqlRequest& gqlRequest,
-			imtgql::CGqlObject& gqlObject,
-			QString& /*errorMessage*/,
-			int& operationType) const
+		const imtgql::CGqlRequest& gqlRequest,
+		imtgql::CGqlObject& gqlObject,
+		QString& /*errorMessage*/,
+		int& operationType) const
 {
 	const QList<imtgql::CGqlObject> fieldList = gqlRequest.GetFields();
 
@@ -166,16 +166,16 @@ QByteArray CObjectCollectionControllerCompBase::GetObjectIdFromInputParams(const
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObject(
-			const imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
+		const imtgql::CGqlRequest& /*gqlRequest*/,
+		QString& /*errorMessage*/) const
 {
 	return nullptr;
 }
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+		const imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const
 {
 	imtbase::CTreeItemModel* rootModel(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
@@ -227,8 +227,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+		const imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return nullptr;
@@ -282,8 +282,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateCollection(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+		const imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return nullptr;
@@ -343,8 +343,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateCollection(
 }
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& /*errorMessage*/) const
+		const imtgql::CGqlRequest& gqlRequest,
+		QString& /*errorMessage*/) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return nullptr;
@@ -374,8 +374,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescription(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& /*errorMessage*/) const
+		const imtgql::CGqlRequest& gqlRequest,
+		QString& /*errorMessage*/) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return nullptr;
@@ -405,8 +405,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescripti
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+		const imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return nullptr;
@@ -494,9 +494,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		int elementsCount = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
 
 		int pagesCount = std::ceil(elementsCount / (double)count);
-        if (pagesCount <= 0){
-            pagesCount = 1;
-        }
+		if (pagesCount <= 0){
+			pagesCount = 1;
+		}
 
 		notificationModel->SetData("PagesCount", pagesCount);
 
@@ -532,8 +532,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+		const imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = "No collection component was set";
@@ -576,8 +576,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetHeaders(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+		const imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const
 {
 	if (!m_headersProviderCompPtr.IsValid()){
 		return nullptr;
@@ -595,32 +595,32 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetHeaders(
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetTreeItemModel(
-			const imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
+		const imtgql::CGqlRequest& /*gqlRequest*/,
+		QString& /*errorMessage*/) const
 {
 	return nullptr;
 }
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetDependencies(
-			const imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
+		const imtgql::CGqlRequest& /*gqlRequest*/,
+		QString& /*errorMessage*/) const
 {
 	return nullptr;
 }
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetMetaInfo(
-			const imtgql::CGqlRequest& /*gqlRequest*/,
-			QString& /*errorMessage*/) const
+		const imtgql::CGqlRequest& /*gqlRequest*/,
+		QString& /*errorMessage*/) const
 {
 	return nullptr;
 }
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectView(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+		const imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const
 {
 	if (!m_objectViewProviderCompPtr.IsValid()){
 		return nullptr;
@@ -664,11 +664,11 @@ imtbase::IOperationContext* CObjectCollectionControllerCompBase::CreateOperation
 
 
 bool CObjectCollectionControllerCompBase::SetupGqlItem(
-			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
-			const QByteArray& collectionId,
-			QString& /*errorMessage*/) const
+		const imtgql::CGqlRequest& gqlRequest,
+		imtbase::CTreeItemModel& model,
+		int itemIndex,
+		const QByteArray& collectionId,
+		QString& /*errorMessage*/) const
 {
 	bool retVal = true;
 
@@ -719,11 +719,11 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 
 
 bool CObjectCollectionControllerCompBase::SetupGqlItem(
-			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
-			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
-			QString&/*errorMessage*/) const
+		const imtgql::CGqlRequest& gqlRequest,
+		imtbase::CTreeItemModel& model,
+		int itemIndex,
+		const imtbase::IObjectCollectionIterator* objectCollectionIterator,
+		QString&/*errorMessage*/) const
 {
 	if (objectCollectionIterator == nullptr){
 		return false;
@@ -800,11 +800,11 @@ QVariant CObjectCollectionControllerCompBase::GetObjectInformation(const QByteAr
 
 
 istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(
-			const QList<imtgql::CGqlObject>& /*inputParams*/,
-			QByteArray& /*objectId*/,
-			QString& /*name*/,
-			QString& /*description*/,
-			QString& /*errorMessage*/) const
+		const QList<imtgql::CGqlObject>& /*inputParams*/,
+		QByteArray& /*objectId*/,
+		QString& /*name*/,
+		QString& /*description*/,
+		QString& /*errorMessage*/) const
 {
 	return nullptr;
 }
@@ -816,9 +816,9 @@ void CObjectCollectionControllerCompBase::SetAdditionalFilters(const imtgql::CGq
 
 
 void CObjectCollectionControllerCompBase::SetObjectFilter(
-			const imtgql::CGqlRequest& /*gqlRequest*/,
-			const imtbase::CTreeItemModel& objectFilterModel,
-			iprm::CParamsSet& filterParams) const
+		const imtgql::CGqlRequest& /*gqlRequest*/,
+		const imtbase::CTreeItemModel& objectFilterModel,
+		iprm::CParamsSet& filterParams) const
 {
 	QByteArray key;
 	if (objectFilterModel.ContainsKey("Key")){
