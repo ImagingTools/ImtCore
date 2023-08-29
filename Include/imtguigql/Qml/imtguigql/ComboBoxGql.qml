@@ -26,6 +26,7 @@ Item {
     property bool backVisible: true;
     property bool hiddenBackground: true;
     property bool canClose: true;
+    property bool closeEmpty: false;
     property bool complexModel: false;
     property bool openST: false;
     property bool preventFirstLoading: false;
@@ -214,7 +215,9 @@ Item {
     }
 
     function closeFunc(){
-        modalDialogManager.closeDialog();
+        if(comboBoxContainerGql.closeEmpty){
+            modalDialogManager.closeDialog();
+        }
     }
 
     Rectangle {

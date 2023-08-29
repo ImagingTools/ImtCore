@@ -482,6 +482,7 @@ Rectangle{
         complexModel: true;
         keepFilterText: true;
         preventFirstLoading:  searchContainer.externalSearchParam !=="";
+        closeEmpty: true;
 
         canClose: true;
 
