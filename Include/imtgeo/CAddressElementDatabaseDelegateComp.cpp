@@ -51,8 +51,8 @@ istd::IChangeable* CAddressElementDatabaseDelegateComp::CreateObjectFromRecord(c
         adrElementInfoPtr->SetParentIds(parentIds);
 	}
 
-	if(record.contains("AddressTypeId")){
-		QByteArray typeId = record.value("AddressTypeId").toByteArray();
+	if(record.contains("Type")){
+		QByteArray typeId = record.value("Type").toByteArray();
 		adrElementInfoPtr->SetAddressTypeId(typeId);
 	}
 
@@ -115,7 +115,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
 	double lon = adrInfoPtr->GetLongitude();
 
 	NewObjectQuery retVal;
-	retVal.query = QString("INSERT INTO \"AddressElements\"(\"Id\", \"ParentIds\", \"AddressTypeId\", \"Name\", \"Description\", \"Latitude\", \"Longitude\")  VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
+	retVal.query = QString("INSERT INTO \"AddressElements\"(\"Id\", \"ParentIds\", \"Type\", \"Name\", \"Description\", \"Latitude\", \"Longitude\")  VALUES('%1', '%2', '%3', '%4', '%5', '%6', '%7');")
 				.arg(qPrintable(proposedObjectId))
 				.arg(qPrintable(parents))
 				.arg(qPrintable(typeId))
@@ -123,7 +123,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CAddressElementDatabaseDelegateCo
 				.arg(description)
 				.arg(lat)
 				.arg(lon)
-				.toUtf8();
+				.toLocal8Bit();
 
 	retVal.objectName = name;
 
@@ -175,7 +175,7 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateUpdateObjectQuery(
 		return QByteArray();
 	}
 
-	QByteArray retVal = QString("UPDATE \"AddressElements\" SET \"Id\" = '%1', \"ParentIds\" = '%2', \"TypeId\" = '%3', \"Name\" = '%4', \"FullAddress\" = '%5', \"Description\" = '%6', \"Langitude\" = '%7', \"Latitude\" = '%8' WHERE \"Id\" ='%9';")
+	QByteArray retVal = QString("UPDATE \"AddressElements\" SET \"Id\" = '%1', \"ParentIds\" = '%2', \"Type\" = '%3', \"Name\" = '%4', \"FullAddress\" = '%5', \"Description\" = '%6', \"Langitude\" = '%7', \"Latitude\" = '%8' WHERE \"Id\" ='%9';")
 				.arg(qPrintable(adrId))
 				.arg(qPrintable(parents))
 				.arg(qPrintable(typeId))
@@ -289,7 +289,7 @@ bool CAddressElementDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsS
 	}
 
 	if (typeIdFilterParamPtr.IsValid() && typeIdFilterParamPtr->GetTextFilter() != ""){
-		typeIdFilterQuery = "\"AddressTypeId\" = " + typeIdFilterParamPtr->GetTextFilter();
+		typeIdFilterQuery = "\"Type\" = '" + typeIdFilterParamPtr->GetTextFilter() + "'";
 	}
 
     if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !parentIdsFilterQuery.isEmpty() || !typeIdFilterQuery.isEmpty()){
