@@ -40,6 +40,18 @@ I_EXPORT_COMPONENT(
 
 
 I_EXPORT_COMPONENT(
+		LicenseController,
+		"LicenseController",
+		"Product License Controller");
+
+
+I_EXPORT_COMPONENT(
+		LicenseCollectionController,
+		"LicenseCollectionController",
+		"Product License Collection Controller");
+
+
+I_EXPORT_COMPONENT(
 		AccountCollectionController,
 		"AccountCollectionController",
 		"Account Collection Controller");

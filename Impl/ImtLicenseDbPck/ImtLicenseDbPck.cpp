@@ -25,6 +25,11 @@ I_EXPORT_COMPONENT(
 			"Product object delegate for SQL table",
 			"SQL Product License Delegate");
 
+//I_EXPORT_COMPONENT(
+//			LicenseDatabaseDelegate,
+//			"Product license object delegate for SQL table",
+//			"Product License Delegate");
+
 
 } // namespace ImtLicenseDbPck
 
