@@ -31,10 +31,12 @@ imtbase::CTreeItemModel* CLicenseCollectionControllerComp::ListObjects(const imt
 			if (m_objectCollectionCompPtr->GetObjectData(licenseId, dataPtr)){
 				imtlic::ILicenseInfo* licenseInfoPtr = dynamic_cast<imtlic::ILicenseInfo*>(dataPtr.GetPtr());
 				if (licenseInfoPtr != nullptr){
-					dataModelPtr->SetData("Id", licenseInfoPtr->GetLicenseId());
-					dataModelPtr->SetData("Name", licenseInfoPtr->GetLicenseName());
+					int licenseIndex = dataModelPtr->InsertNewItem();
 
-					imtbase::CTreeItemModel* featuresInfoModelPtr = dataModelPtr->AddTreeModel("FeaturesInfo");
+					dataModelPtr->SetData("Id", licenseInfoPtr->GetLicenseId(), licenseIndex);
+					dataModelPtr->SetData("Name", licenseInfoPtr->GetLicenseName(), licenseIndex);
+
+					imtbase::CTreeItemModel* featuresInfoModelPtr = dataModelPtr->AddTreeModel("FeaturesInfo", licenseIndex);
 
 					imtlic::ILicenseInfo::FeatureInfos featuresInfos = licenseInfoPtr->GetFeatureInfos();
 					for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : featuresInfos){
