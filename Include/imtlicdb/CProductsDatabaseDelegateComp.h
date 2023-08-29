@@ -53,6 +53,7 @@ public:
 	// reimplemented (imtdb::CSqlDatabaseObjectDelegateCompBase)
 	virtual idoc::MetaInfoPtr CreateObjectMetaInfo(const QByteArray& typeId) const override;
 	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
+	virtual bool CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 
 protected:
 	void GenerateDifferences(

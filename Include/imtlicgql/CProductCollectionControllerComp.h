@@ -21,6 +21,10 @@ protected:
 	// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
 	virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const override;
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual void SetObjectFilter(const imtgql::CGqlRequest& gqlRequest,
+								 const imtbase::CTreeItemModel& objectFilterModel,
+								 iprm::CParamsSet& filterParams) const override;
+
 };
 
 

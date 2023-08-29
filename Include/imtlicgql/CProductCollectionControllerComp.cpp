@@ -3,6 +3,8 @@
 
 // ACF includes
 #include <idoc/IDocumentMetaInfo.h>
+#include <istd/TDelPtr.h>
+#include <iprm/CTextParam.h>
 
 
 namespace imtlicgql
@@ -81,6 +83,21 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(const imt
 	}
 
 	return rootModelPtr.PopPtr();
+}
+
+
+void CProductCollectionControllerComp::SetObjectFilter(const imtgql::CGqlRequest &gqlRequest,
+			const imtbase::CTreeItemModel &objectFilterModel,
+			iprm::CParamsSet &filterParams) const
+{
+	if (objectFilterModel.ContainsKey("CategoryId")){
+		QByteArray filterValue = objectFilterModel.GetData("CategoryId").toByteArray();
+		if (!filterValue.isEmpty()){
+			istd::TDelPtr<iprm::CTextParam> textParamPtr(new iprm::CTextParam());
+			textParamPtr->SetText(filterValue);
+			filterParams.SetEditableParameter("CategoryId", textParamPtr.PopPtr());
+		}
+	}
 }
 
 

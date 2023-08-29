@@ -719,9 +719,6 @@ Rectangle {
                         visible: tableContainer.emptyDecorHeader ? true :
                                                                    tableContainer.headerDecorator.IsValidData("LeftBottomRound", model.index) ?
                                                                        !tableContainer.headerDecorator.GetData("LeftBottomRound", model.index) :true;
-
-
-
                     }
 
                     Rectangle{
@@ -734,7 +731,6 @@ Rectangle {
                         visible: tableContainer.emptyDecorHeader ? true :
                                                                    tableContainer.headerDecorator.IsValidData("RightBottomRound", model.index) ?
                                                                        !tableContainer.headerDecorator.GetData("RightBottomRound", model.index) :true;
-
                     }
                     //cornerPatches
 
@@ -1057,7 +1053,7 @@ Rectangle {
 
                     tableContainer.properties.visibleItemsChanged.connect(tableDelegate.visibleItemsChanged);
                     tableContainer.properties.stateItemsChanged.connect(tableDelegate.enabledItemsChanged);
-
+                    mouseArea.visible = tableContainer.hoverEnabled
                 }
 
                 Component.onDestruction: {

@@ -8,6 +8,9 @@
 #include <imtlic/CLicenseInfo.h>
 #include <imtlic/CProductLicensingMetaInfo.h>
 #include <imtlic/CProductLicensingInfo.h>
+#include <iprm/IParamsSet.h>
+#include <iprm/TParamsPtr.h>
+#include <iprm/ITextParam.h>
 
 
 namespace imtlicdb
@@ -599,6 +602,51 @@ void CProductsDatabaseDelegateComp::GenerateDifferences(
 			removedFeatures.push_back(currentFeatureId);
 		}
 	}
+}
+
+
+bool CProductsDatabaseDelegateComp::CreateObjectFilterQuery(
+			const iprm::IParamsSet &filterParams,
+			QString &filterQuery) const
+{
+	QString objectFilterQuery;
+	iprm::TParamsPtr<iprm::IParamsSet> objectFilterParamPtr(&filterParams, "ObjectFilter");
+	if (objectFilterParamPtr.IsValid()){
+		iprm::IParamsSet::Ids paramIds = objectFilterParamPtr->GetParamIds();
+		if (!paramIds.isEmpty()){
+	#if QT_VERSION < 0x060000
+			QByteArrayList paramIdsList(paramIds.toList());
+	#else
+			QByteArrayList paramIdsList(paramIds.cbegin(), paramIds.cend());
+	#endif
+			int index = 0;
+			for (const QByteArray& key : paramIdsList){
+				if (key == "CategoryId"){
+					const iser::ISerializable* filterParam = objectFilterParamPtr->GetParameter(key);
+					if (filterParam == nullptr){
+						return false;
+					}
+					const iprm::ITextParam* textParamPtr = dynamic_cast<const iprm::ITextParam*>(filterParam);
+					if (textParamPtr == nullptr){
+						return false;
+					}
+
+					QString value = textParamPtr->GetText();
+					if (!value.isEmpty() && value != "ANY"){
+						if (!filterQuery.isEmpty()){
+							filterQuery += " AND ";
+						}
+						filterQuery += "\"CategoryId\" = '";
+						filterQuery += value.toUtf8();
+						filterQuery += "'";
+					}
+				}
+				index++;
+			}
+		}
+	}
+
+	return true;
 }
 
 

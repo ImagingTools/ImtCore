@@ -230,7 +230,7 @@ Item {
             anchors.rightMargin: 5;
             anchors.bottom: parent.bottom;
 
-            width: 35;
+            width: hasFilter ? 35 : 10;
 
             visible: tableInternal.width > 0;
 
