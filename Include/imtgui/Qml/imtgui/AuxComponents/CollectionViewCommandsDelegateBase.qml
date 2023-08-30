@@ -268,6 +268,10 @@ Item {
                 popupMenuDialog.root.closeDialog();
                 containerBase.commandHandle(commandId);
             }
+
+            function onBackgroundClicked(){
+                popupMenuDialog.root.closeDialog();
+            }
         }
     }
 

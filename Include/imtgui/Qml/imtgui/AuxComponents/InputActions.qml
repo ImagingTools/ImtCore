@@ -59,6 +59,8 @@ Item {
         id: popupMenu;
 
         PopupMenuDialog {
+            id: popupMenuDialog;
+
             onFinished: {
                 this.root.closeDialog();
 
@@ -77,6 +79,10 @@ Item {
                 else if (commandId === "SelectAll"){
                     inputActions.selectAllClicked();
                 }
+            }
+
+            function onBackgroundClicked(){
+                popupMenuDialog.root.closeDialog();
             }
         }
     }

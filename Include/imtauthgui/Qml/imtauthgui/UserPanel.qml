@@ -95,6 +95,8 @@ Item {
         id: popupMenu;
 
         PopupMenuDialog {
+            id: popupMenuDialog;
+
             onFinished: {
                 console.log("CollectionView PopupMenuDialog", commandId);
                 this.root.closeDialog();
@@ -105,6 +107,10 @@ Item {
                 else if (commandId == "ChangePassword"){
                     panelDelegate.changePassword();
                 }
+            }
+
+            function onBackgroundClicked(){
+                popupMenuDialog.root.closeDialog();
             }
         }
     }

@@ -27,7 +27,9 @@ Item {
     property var table: tableInternal;
     property bool hasPagination: true;
     property bool hasFilter: true;
+
     property bool hasSort: true;
+    property alias isMultiCheckable: tableInternal.isMultiCheckable;
 
     property alias filterMenu: filterMenuLocal.sourceComponent;
     property alias filterMenuItem: filterMenuLocal.item;

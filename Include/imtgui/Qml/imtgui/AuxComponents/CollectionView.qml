@@ -46,6 +46,8 @@ Item {
     property alias defaultOrderType: collectionViewBase.defaultOrderType;
 
     property TreeItemModel documentsData: TreeItemModel {}
+    property TreeItemModel notificationModel: collectionViewBase.commands.notificationModel;
+
     property Item documentManager: null;
 
     property ListModel contextMenuModel: ListModel {}

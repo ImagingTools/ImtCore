@@ -61,6 +61,27 @@ Item {
         }
     }
 
+    onMainCollectionViewChanged: {
+        if (workspaceView.mainCollectionView != null){
+            workspaceView.mainCollectionView.elementsChanged.connect(workspaceView.onMainCollectionUpdated);
+        }
+    }
+
+    function onMainCollectionUpdated(){
+        if (workspaceView.mainCollectionView != null){
+            let notificationModel = workspaceView.mainCollectionView.notificationModel;
+            if (notificationModel.ContainsKey("TotalCount")){
+                let totalCount = notificationModel.GetData("TotalCount");
+
+                let collectionTitle = workspaceView.documentsData.GetData("Name");
+
+                collectionTitle += " (" + totalCount + ")"
+
+                workspaceView.documentsData.SetData("Title", collectionTitle);
+            }
+        }
+    }
+
     function documentUpdating(updatingFlag){
         if (!updatingFlag){
             workspaceView.documentLoading = false;
@@ -182,14 +203,15 @@ Item {
 
         let itemId = documentObj["Id"];
         let commandId = documentObj["CommandsId"];
-        let title = documentObj["Name"];
+        let name = documentObj["Name"];
         let source = documentObj["Source"];
 
         let index = workspaceView.documentsData.InsertNewItem();
 
         workspaceView.documentsData.SetData("Id", itemId, index);
         workspaceView.documentsData.SetData("CommandsId", commandId, index);
-        workspaceView.documentsData.SetData("Title", title, index);
+        workspaceView.documentsData.SetData("Name", name, index);
+        workspaceView.documentsData.SetData("Title", name, index);
         workspaceView.documentsData.SetData("Source", source, index);
 
         if (isRequested){
