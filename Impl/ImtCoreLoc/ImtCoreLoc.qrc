@@ -4,5 +4,8 @@
         <file alias="ImtCore_de_DE">Translations/ImtCore_de_DE.qm</file>
         <file alias="ImtCore_ru_RU">Translations/ImtCore_ru_RU.qm</file>
         <file alias="ImtCore_pl_PL">Translations/ImtCore_pl_PL.qm</file>
+        <file alias="ProLife_fr_FR">Translations/ImtCore_fr_FR.qm</file>
+        <file alias="ProLife_it_IT">Translations/ImtCore_it_IT.qm</file>
+        <file alias="ProLife_pt_PT">Translations/ImtCore_pt_PT.qm</file>
     </qresource>
 </RCC>
