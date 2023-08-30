@@ -130,6 +130,16 @@ public:
 		Set the serial number of this product instance.
 	*/
 	virtual void SetSerialNumber(const QByteArray& serialNumber) = 0;
+
+	/**
+		Check this product instance is in use.
+	*/
+	virtual bool IsInUse() const = 0;
+
+	/**
+		Set in use for this product instance.
+	*/
+	virtual void SetInUse(bool inUse) = 0;
 };
 
 

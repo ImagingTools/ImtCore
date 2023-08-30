@@ -129,6 +129,22 @@ void CProductInstanceInfo::SetSerialNumber(const QByteArray& serialNumber)
 }
 
 
+bool CProductInstanceInfo::IsInUse() const
+{
+	return m_inUse;
+}
+
+
+void CProductInstanceInfo::SetInUse(bool inUse)
+{
+	if (m_inUse != inUse){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_inUse = inUse;
+	}
+}
+
+
 // reimplemented (imtlic::ILicenseInfoProvider)
 
 const imtbase::ICollectionInfo& CProductInstanceInfo::GetLicenseInstances() const
@@ -170,6 +186,13 @@ bool CProductInstanceInfo::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.BeginTag(serialNumberTag);
 		retVal = retVal && archive.Process(m_serialNumber);
 		retVal = retVal && archive.EndTag(serialNumberTag);
+	}
+
+	if (imtCoreVersion >= 7386){
+		static iser::CArchiveTag inUseTag("InUse", "In-Use", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(inUseTag);
+		retVal = retVal && archive.Process(m_inUse);
+		retVal = retVal && archive.EndTag(inUseTag);
 	}
 
 	static iser::CArchiveTag instanceIdTag("InstanceId", "ID of the product instance", iser::CArchiveTag::TT_LEAF);
@@ -252,6 +275,7 @@ bool CProductInstanceInfo::CopyFrom(const IChangeable& object, CompatibilityMode
 		m_instanceId= sourcePtr->m_instanceId;
 		m_licenses = sourcePtr->m_licenses;
 		m_licenseContainerInfo= sourcePtr->m_licenseContainerInfo;
+		m_inUse= sourcePtr->m_inUse;
 
 		return true;
 	}
@@ -281,6 +305,7 @@ bool CProductInstanceInfo::ResetData(CompatibilityMode /*mode*/)
 	m_instanceId.clear();
 	m_licenses.clear();
 	m_licenseContainerInfo.ResetData();
+	m_inUse = false;
 
 	return true;
 }
