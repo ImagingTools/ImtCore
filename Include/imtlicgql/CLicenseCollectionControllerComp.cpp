@@ -22,6 +22,13 @@ imtbase::CTreeItemModel* CLicenseCollectionControllerComp::ListObjects(const imt
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
+	QByteArrayList fields;
+
+	const imtgql::CGqlObject* fieldsParamPtr = gqlRequest.GetField("items");
+	if (fieldsParamPtr != nullptr){
+		fields = fieldsParamPtr->GetFieldIds();
+	}
+
 	const imtgql::CGqlObject* licensesParamPtr = gqlRequest.GetParam("licenses");
 	if (licensesParamPtr != nullptr){
 		QByteArrayList fieldIds = licensesParamPtr->GetFieldIds();
@@ -33,17 +40,24 @@ imtbase::CTreeItemModel* CLicenseCollectionControllerComp::ListObjects(const imt
 				if (licenseInfoPtr != nullptr){
 					int licenseIndex = dataModelPtr->InsertNewItem();
 
-					dataModelPtr->SetData("Id", licenseInfoPtr->GetLicenseId(), licenseIndex);
-					dataModelPtr->SetData("Name", licenseInfoPtr->GetLicenseName(), licenseIndex);
+					if (fields.contains("Id")){
+						dataModelPtr->SetData("Id", licenseInfoPtr->GetLicenseId(), licenseIndex);
+					}
 
-					imtbase::CTreeItemModel* featuresInfoModelPtr = dataModelPtr->AddTreeModel("FeaturesInfo", licenseIndex);
+					if (fields.contains("Name")){
+						dataModelPtr->SetData("Name", licenseInfoPtr->GetLicenseName(), licenseIndex);
+					}
 
-					imtlic::ILicenseInfo::FeatureInfos featuresInfos = licenseInfoPtr->GetFeatureInfos();
-					for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : featuresInfos){
-						int index = featuresInfoModelPtr->InsertNewItem();
+					if (fields.contains("Features")){
+						imtbase::CTreeItemModel* featuresInfoModelPtr = dataModelPtr->AddTreeModel("FeaturesInfo", licenseIndex);
 
-						featuresInfoModelPtr->SetData("Id", featureInfo.id, index);
-						featuresInfoModelPtr->SetData("Name", featureInfo.name, index);
+						imtlic::ILicenseInfo::FeatureInfos featuresInfos = licenseInfoPtr->GetFeatureInfos();
+						for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : featuresInfos){
+							int index = featuresInfoModelPtr->InsertNewItem();
+
+							featuresInfoModelPtr->SetData("Id", featureInfo.id, index);
+							featuresInfoModelPtr->SetData("Name", featureInfo.name, index);
+						}
 					}
 				}
 			}

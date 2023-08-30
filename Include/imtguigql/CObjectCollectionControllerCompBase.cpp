@@ -499,6 +499,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		}
 
 		notificationModel->SetData("PagesCount", pagesCount);
+		notificationModel->SetData("TotalCount", elementsCount);
 
 		istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(m_objectCollectionCompPtr->CreateObjectCollectionIterator(offset, count, &filterParams));
 		if (objectCollectionIterator != nullptr){

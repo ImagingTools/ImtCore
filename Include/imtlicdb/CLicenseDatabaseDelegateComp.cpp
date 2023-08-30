@@ -80,6 +80,58 @@ istd::IChangeable* CLicenseDatabaseDelegateComp::CreateObjectFromRecord(const QS
 }
 
 
+imtdb::IDatabaseObjectDelegate::NewObjectQuery CLicenseDatabaseDelegateComp::CreateNewObjectQuery(
+			const QByteArray& /*typeId*/,
+			const QByteArray& /*proposedObjectId*/,
+			const QString& /*objectName*/,
+			const QString& /*objectDescription*/,
+			const istd::IChangeable* /*valuePtr*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
+{
+	return imtdb::IDatabaseObjectDelegate::NewObjectQuery();
+}
+
+
+QByteArray CLicenseDatabaseDelegateComp::CreateDeleteObjectQuery(
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
+{
+	return QByteArray();
+}
+
+
+QByteArray CLicenseDatabaseDelegateComp::CreateUpdateObjectQuery(
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const istd::IChangeable& /*object*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/,
+			bool /*useExternDelegate*/) const
+{
+	return QByteArray();
+}
+
+
+QByteArray CLicenseDatabaseDelegateComp::CreateRenameObjectQuery(
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const QString& /*newObjectName*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
+{
+	return QByteArray();
+}
+
+
+QByteArray CLicenseDatabaseDelegateComp::CLicenseDatabaseDelegateComp::CreateDescriptionObjectQuery(
+			const imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& /*objectId*/,
+			const QString& /*description*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
+{
+	return QByteArray();
+}
+
+
 } // namespace imtlicdb
 
 
