@@ -74,11 +74,15 @@ void CDesignManagerComp::OnSystemStarting()
 		int selectedIndex = BaseClass2::GetSelectedOptionIndex();
 		if (selectedIndex < 0){
 			SetSelectedOptionIndex(0);
+
+			selectedIndex = BaseClass2::GetSelectedOptionIndex();
 		}
 
-		themeId = m_designs.GetOptionId(selectedIndex);
+		if (selectedIndex >= 0){
+			themeId = m_designs.GetOptionId(selectedIndex);
 
-		ApplyDesignScheme(themeId);
+			ApplyDesignScheme(themeId);
+		}
 	}
 }
 
@@ -88,7 +92,6 @@ void CDesignManagerComp::OnSystemStarting()
 void CDesignManagerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
-
 	BaseClass2::SetSelectedOptionIndex(*m_defaultThemeIndexAttrPtr);
 }
 
