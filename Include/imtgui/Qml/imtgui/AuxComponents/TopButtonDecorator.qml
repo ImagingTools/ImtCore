@@ -5,7 +5,7 @@ import QtGraphicalEffects 1.0
 BaseButtonDecorator {
     id: topButtonDecorator;
 
-    width: isEmpty ? 20 : 60;
+    width: isEmpty ? 20 : description.width > 60 ? description.width : 60;
     height: 28;
 
     property string textColor: Style.textColor;
@@ -29,7 +29,7 @@ BaseButtonDecorator {
             dropShadow.verticalOffset = 1;
             dropShadow.horizontalOffset = 1;
 
-            button.width = parent.width;
+            button.width = 60;
         }
     }
 
@@ -45,7 +45,7 @@ BaseButtonDecorator {
             innerShadow.visible = false;
             dropShadow.visible = true;
 
-            button.width = parent.width;
+            button.width = 60;
         }
     }
 
@@ -69,10 +69,9 @@ BaseButtonDecorator {
 
         anchors.top: parent.top;
         anchors.topMargin: 6;
-        anchors.left: parent.left;
         anchors.horizontalCenter: parent.horizontalCenter;
 
-        width: parent.width;
+        width: 60;
         height: parent.height;
 
         radius: topButtonDecorator.radius;
