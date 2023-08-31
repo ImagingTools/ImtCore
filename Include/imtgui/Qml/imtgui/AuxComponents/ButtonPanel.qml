@@ -15,6 +15,7 @@ Rectangle {
     property int delegateWidth: Style.size_ButtonWidth;
     property int delegateHeight: Style.size_ButtonHeight;
     property int verticalMenuWidth: delegateWidth;
+    //property real contentWidth: horizontalListView.contentWidth //+ openButton.width + openButton.anchors.rightMargin + buttonPanel.mainMargin + 10;
     property int visibleCount: 5;
     property int mainMargin: 10;
 
@@ -29,6 +30,8 @@ Rectangle {
 
     property bool hasActiveState: false;
     property string activeId: "";
+
+    property bool centered: false;
 
     property string openButtonText: "";
     property string openButtonImageSource: "";
@@ -109,7 +112,13 @@ Rectangle {
     Component.onCompleted: {
         if(buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
             buttonPanel.setModels();
+
+            Events.subscribeEvent("DialogBackgroundClicked", buttonPanel.onBackgroundClicked)
+
         }
+    }
+    function onBackgroundClicked(){
+        modalDialogManager.closeDialog();
     }
 
     onWidthChanged: {
@@ -120,7 +129,7 @@ Rectangle {
 
 
         if(buttonPanel.vertMenuItem){
-            var point = buttonPanel.mapToItem(null, buttonPanel.width - buttonPanel.verticalMenuWidth, buttonPanel.height + buttonPanel.mainMargin);
+            var point = buttonPanel.mapToItem(null, buttonPanel.width - buttonPanel.verticalMenuWidth - buttonPanel.mainMargin, buttonPanel.height + buttonPanel.mainMargin);
 
             buttonPanel.vertMenuItem.x = point.x;
             buttonPanel.vertMenuItem.y = point.y;
@@ -208,6 +217,11 @@ Rectangle {
                 buttonPanel.verticalModel.CopyItemDataFromModel(kk,buttonPanel.buttonModel,k);
 
             }
+        }
+
+        if(buttonPanel.openST && !buttonPanel.verticalModel.GetItemsCount()){
+            buttonPanel.openST = false;
+            modalDialogManager.closeDialog();
         }
 
     }
@@ -329,7 +343,13 @@ Rectangle {
         ListView{
             id: horizontalListView;
 
-            anchors.fill: parent;
+            //anchors.fill: parent;
+            anchors.verticalCenter: parent.verticalCenter;
+            anchors.left: parent.left;
+            anchors.leftMargin: !buttonPanel.centered ? 0 : parent.width/2 - width/2;
+
+            width: Math.min(contentWidth, parent.width);
+            height: parent.height;
 
             clip: true;
             boundsBehavior: Flickable.StopAtBounds;
@@ -370,7 +390,7 @@ Rectangle {
         onClicked: {
             //verticalListViewContainer.openST = !verticalListViewContainer.openST;
 
-            var point = buttonPanel.mapToItem(null, buttonPanel.width - buttonPanel.verticalMenuWidth, buttonPanel.height + buttonPanel.mainMargin);
+            var point = buttonPanel.mapToItem(null, buttonPanel.width - buttonPanel.verticalMenuWidth - buttonPanel.mainMargin, buttonPanel.height + buttonPanel.mainMargin);
             modalDialogManager.openDialog(vertMenuComp, {
                                                        "x":     point.x,
                                                        "y":     point.y,
@@ -397,6 +417,7 @@ Rectangle {
           border.color: buttonPanel.shadowColor;
           color: buttonPanel.baseColor;
 
+
           clip: true;
 
           property Item root: null;
@@ -404,19 +425,10 @@ Rectangle {
 
 
           onRootChanged: {
-              if(root){
-                  root.backgroundItem.opacity = 0;
-                  Events.subscribeEvent("DialogBackgroundClicked", verticalListViewContainer.onBackgroundClicked)
+              if(verticalListViewContainer.root){
+                  verticalListViewContainer.root.backgroundItem.opacity = 0;
               }
           }
-
-          function onBackgroundClicked(){
-              if (root){
-                  root.closeDialog();
-              }
-          }
-
-
 
           ListView{
               id: verticalListView;
