@@ -14,6 +14,7 @@ Rectangle {
 
     property int delegateWidth: Style.size_ButtonWidth;
     property int delegateHeight: Style.size_ButtonHeight;
+    property int verticalMenuWidth: delegateWidth;
     property int visibleCount: 5;
     property int mainMargin: 10;
 
@@ -24,7 +25,7 @@ Rectangle {
 
     property bool hasShadow: true;
 
-    property alias openST: verticalListViewContainer.openST;
+    property bool openST: false;
 
     property bool hasActiveState: false;
     property string activeId: "";
@@ -46,7 +47,7 @@ Rectangle {
     property TreeItemModel proxiModel: TreeItemModel{};
     property TreeItemModel rightOrderModel: TreeItemModel{};
 
-
+    property Item vertMenuItem: null;
 
     property Component buttonDelegate : defaultDelegate;
 
@@ -98,8 +99,9 @@ Rectangle {
 
         }
 
-        if(verticalListViewContainer.openST){
-            verticalListViewContainer.openST = false;
+        if(buttonPanel.openST){
+            buttonPanel.openST = false;
+            modalDialogManager.closeDialog();
         }
 
     }
@@ -114,6 +116,16 @@ Rectangle {
         if(widthPause){
             widthPause.stop();
             widthPause.start();
+        }
+
+
+        if(buttonPanel.vertMenuItem){
+            var point = buttonPanel.mapToItem(null, buttonPanel.width - buttonPanel.verticalMenuWidth, buttonPanel.height + buttonPanel.mainMargin);
+
+            buttonPanel.vertMenuItem.x = point.x;
+            buttonPanel.vertMenuItem.y = point.y;
+
+
         }
 
     }
@@ -165,6 +177,7 @@ Rectangle {
                 }
             }
 
+
         }
     }
 
@@ -172,8 +185,8 @@ Rectangle {
         buttonPanel.horizontalModel.Clear();
         buttonPanel.verticalModel.Clear();
 
-        buttonPanel.horizCount  = Math.floor((horizontalListViewContainer.width + buttonPanel.horizontalSpacing)  / (buttonPanel.delegateWidth + buttonPanel.horizontalSpacing));
-        //console.log("horizCount ",buttonPanel.horizCount);
+        buttonPanel.horizCount  = Math.floor(Math.max(horizontalListViewContainer.width + buttonPanel.horizontalSpacing,0)  / (buttonPanel.delegateWidth + buttonPanel.horizontalSpacing));
+        console.log("horizCount ",buttonPanel.horizCount);
 
         var count = buttonPanel.buttonModel.GetItemsCount();
         if(count <= buttonPanel.horizCount){
@@ -197,9 +210,6 @@ Rectangle {
             }
         }
 
-        if(verticalListViewContainer.openST){
-            verticalListViewContainer.openST = false;
-        }
     }
 
 
@@ -351,126 +361,87 @@ Rectangle {
         iconSource: buttonPanel.openButtonImageSource;
         fontPixelSize: 30;
         fontColor: containsMouse ? "black" : "gray";
-        color: containsMouse || verticalListViewContainer.openST ? buttonPanel.buttonColor : "transparent";
+        //color: containsMouse || verticalListViewContainer.openST ? buttonPanel.buttonColor : "transparent";
         borderColor: "transparent";
         highlighted: false;
 
         visible: buttonPanel.buttonModel.GetItemsCount() > buttonPanel.horizCount;
 
         onClicked: {
-            verticalListViewContainer.openST = !verticalListViewContainer.openST;
+            //verticalListViewContainer.openST = !verticalListViewContainer.openST;
+
+            var point = buttonPanel.mapToItem(null, buttonPanel.width - buttonPanel.verticalMenuWidth, buttonPanel.height + buttonPanel.mainMargin);
+            modalDialogManager.openDialog(vertMenuComp, {
+                                                       "x":     point.x,
+                                                       "y":     point.y,
+                                                        });
+
+            buttonPanel.vertMenuItem = modalDialogManager.topItem;
+            buttonPanel.openST = true;
         }
 
 
     }
 
-    DropShadow {
-        id: shadow;
 
-        anchors.fill: verticalListViewContainer;
+    Component{
+      id: vertMenuComp;
 
-        horizontalOffset: 1;
-        verticalOffset: 1;
+      Rectangle{
+          id: verticalListViewContainer;
 
-        visible: buttonPanel.hasShadow && verticalListViewContainer.visible;
+          width: buttonPanel.verticalMenuWidth + 2*buttonPanel.mainMargin;
+          height: verticalListView.height + 1.5*buttonPanel.mainMargin;
+          radius: 4;
+          border.width: 1;
+          border.color: buttonPanel.shadowColor;
+          color: buttonPanel.baseColor;
 
-        radius: verticalListViewContainer.radius;
-        color: buttonPanel.shadowColor;
+          clip: true;
 
-        source: verticalListViewContainer;
+          property Item root: null;
+          property bool doNotCorrectPosition: true;
+
+
+          onRootChanged: {
+              if(root){
+                  root.backgroundItem.opacity = 0;
+                  Events.subscribeEvent("DialogBackgroundClicked", verticalListViewContainer.onBackgroundClicked)
+              }
+          }
+
+          function onBackgroundClicked(){
+              if (root){
+                  root.closeDialog();
+              }
+          }
+
+
+
+          ListView{
+              id: verticalListView;
+
+              anchors.horizontalCenter: parent.horizontalCenter;
+              anchors.top: parent.top;
+              anchors.topMargin: buttonPanel.mainMargin;
+
+              width: buttonPanel.verticalMenuWidth;
+              height:  Math.min(contentHeight,(buttonPanel.delegateHeight * buttonPanel.visibleCount + spacing * (buttonPanel.visibleCount-1)));
+
+              clip: true;
+              boundsBehavior: Flickable.StopAtBounds;
+
+              spacing: buttonPanel.verticalSpacing;
+
+              model: buttonPanel.verticalModel;
+
+              delegate: buttonPanel.buttonDelegate;
+
+
+
+          }//verticalListView
+
+      }//verticalListViewContainer
     }
-
-    Rectangle{
-        id: verticalListViewContainer;
-
-        anchors.right: parent.right;
-        anchors.top: parent.bottom;
-        anchors.topMargin: buttonPanel.mainMargin;
-
-        width: buttonPanel.delegateWidth + 2*buttonPanel.mainMargin;
-        height: 0;
-        radius: 4;
-        border.width: 1;
-        border.color: buttonPanel.shadowColor;
-        color: buttonPanel.baseColor;
-
-        clip: true;
-
-
-        property bool openST: false;
-        onOpenSTChanged: {
-            if(openST){
-                if(buttonPanel.openDuration){
-                    animHeightTo.start();
-                }
-                else{
-                    buttonPanel.open();
-                }
-            }
-            else{
-                if(buttonPanel.openDuration){
-                    animHeightFrom.start();
-                }
-
-                else{
-                    buttonPanel.close();
-                }
-            }
-        }
-
-        ListView{
-            id: verticalListView;
-
-            anchors.horizontalCenter: parent.horizontalCenter;
-            anchors.top: parent.top;
-            anchors.topMargin: buttonPanel.mainMargin;
-
-            width: buttonPanel.delegateWidth;
-            height:  Math.min(contentHeight,(buttonPanel.delegateHeight * buttonPanel.visibleCount + spacing * (buttonPanel.visibleCount-1)));
-
-            clip: true;
-            boundsBehavior: Flickable.StopAtBounds;
-
-            spacing: buttonPanel.verticalSpacing;
-
-            model: buttonPanel.verticalModel;
-
-            delegate: buttonPanel.buttonDelegate;
-
-
-
-        }//verticalListView
-
-    }//verticalListViewContainer
-
-
-    NumberAnimation {
-        id: animHeightTo;
-
-        target: verticalListViewContainer;
-        property: "height";
-        duration: buttonPanel.openDuration;
-        from: 0;
-        to: verticalListView.height + 1.5*buttonPanel.mainMargin;
-    }
-
-    NumberAnimation {
-        id: animHeightFrom;
-
-        target: verticalListViewContainer;
-        property: "height";
-        duration: buttonPanel.openDuration;
-        from: verticalListView.height + 1.5*buttonPanel.mainMargin;
-        to: 0;
-    }
-
-    function open(){
-        verticalListViewContainer.height = verticalListView.height + 1.5*buttonPanel.mainMargin;
-    }
-
-    function close(){
-        verticalListViewContainer.height = 0;
-    }
-
 
 }
