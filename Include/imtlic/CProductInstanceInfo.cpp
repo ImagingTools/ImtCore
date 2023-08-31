@@ -20,7 +20,8 @@ namespace imtlic
 
 CProductInstanceInfo::CProductInstanceInfo()
 	:m_customerCollectionPtr(nullptr),
-	m_productCollectionPtr(nullptr)
+	m_productCollectionPtr(nullptr),
+	m_inUse(false)
 {
 }
 

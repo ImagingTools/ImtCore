@@ -30,11 +30,13 @@ Item {
     Component.onCompleted: {
         Events.subscribeEvent("DocumentIsDirtyChanged", workspaceView.documentIsDirtyChanged);
         Events.subscribeEvent("DocumentUpdating", workspaceView.documentUpdating);
+        Events.subscribeEvent("OnLocalizationChanged", workspaceView.onLocalizationChanged);
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("DocumentIsDirtyChanged", workspaceView.documentIsDirtyChanged);
         Events.unSubscribeEvent("DocumentUpdating", workspaceView.documentUpdating);
+        Events.unSubscribeEvent("OnLocalizationChanged", workspaceView.onLocalizationChanged);
     }
 
     onVisibleChanged: {
@@ -65,6 +67,14 @@ Item {
         if (workspaceView.mainCollectionView != null){
             workspaceView.mainCollectionView.elementsChanged.connect(workspaceView.onMainCollectionUpdated);
         }
+    }
+
+    function onLocalizationChanged(language){
+//        let name = workspaceView.documentsData.GetData("Name");
+
+//        let trName = qsTr(name);
+
+//        workspaceView.documentsData.SetData("Title", trName);
     }
 
     function onMainCollectionUpdated(){
