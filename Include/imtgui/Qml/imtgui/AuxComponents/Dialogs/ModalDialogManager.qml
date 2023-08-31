@@ -87,27 +87,30 @@ Item {
                 property real  mainWindowHeight_prev: 0;
 
                 onMainWindowWidthChanged: {
-                    if(dialogLoader.item && dialogLoader.item.centered){
-                        dialogLoader.x = container.width/2 - dialogLoader.width/2;
-                        dialogLoader.y = container.height/2 - dialogLoader.height/2;
+                    if(dialogLoader.item && !dialogLoader.item.doNotCorrectPosition){
+                        if(dialogLoader.item && dialogLoader.item.centered){
+                            dialogLoader.x = container.width/2 - dialogLoader.width/2;
+                            dialogLoader.y = container.height/2 - dialogLoader.height/2;
+                        }
+                        else if(dialogLoader.item && !dialogLoader.item.centered){
+                            var deltaWidth = mainWindowWidth - mainWindowWidth_prev;
+                            mainWindowWidth_prev = mainWindowWidth;
+                            dialogLoader.x += deltaWidth/2;
+                        }
                     }
-                    else if(dialogLoader.item && !dialogLoader.item.centered){
-                        var deltaWidth = mainWindowWidth - mainWindowWidth_prev;
-                        mainWindowWidth_prev = mainWindowWidth;
-                        dialogLoader.x += deltaWidth/2;
-                    }
-
 
                 }
                 onMainWindowHeightChanged: {
-                    if(dialogLoader.item && dialogLoader.item.centered){
-                        dialogLoader.x = container.width/2 - dialogLoader.width/2;
-                        dialogLoader.y = container.height/2 - dialogLoader.height/2;
-                    }
-                    else if(dialogLoader.item && !dialogLoader.item.centered){
-                        var deltaHeight = mainWindowHeight - mainWindowHeight_prev;
-                        mainWindowHeight_prev = mainWindowHeight;
-                        dialogLoader.y += deltaHeight/2;
+                    if(dialogLoader.item && !dialogLoader.item.doNotCorrectPosition){
+                        if(dialogLoader.item && dialogLoader.item.centered){
+                            dialogLoader.x = container.width/2 - dialogLoader.width/2;
+                            dialogLoader.y = container.height/2 - dialogLoader.height/2;
+                        }
+                        else if(dialogLoader.item && !dialogLoader.item.centered){
+                            var deltaHeight = mainWindowHeight - mainWindowHeight_prev;
+                            mainWindowHeight_prev = mainWindowHeight;
+                            dialogLoader.y += deltaHeight/2;
+                        }
                     }
                 }
 
