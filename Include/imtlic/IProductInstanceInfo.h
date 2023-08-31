@@ -132,6 +132,16 @@ public:
 	virtual void SetSerialNumber(const QByteArray& serialNumber) = 0;
 
 	/**
+		Get the project of this product instance.
+	*/
+	virtual QByteArray GetProject() const = 0;
+
+	/**
+		Set the project of this product instance.
+	*/
+	virtual void SetProject(const QByteArray& project) = 0;
+
+	/**
 		Check this product instance is in use.
 	*/
 	virtual bool IsInUse() const = 0;

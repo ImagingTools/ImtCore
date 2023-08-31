@@ -7,6 +7,8 @@ Rectangle {
 
     color: Style.backgroundColor;
 
+    property int indicatorSize: 50;
+
     function start(){
         console.log("Loading start");
 
@@ -25,8 +27,8 @@ Rectangle {
 
         anchors.centerIn: parent
         property double minimum: Math.min(root.width, root.height);
-        width: 50;
-        height: 50;
+        width: root.indicatorSize;
+        height: width;
 
         Repeater {
             id: repeater;

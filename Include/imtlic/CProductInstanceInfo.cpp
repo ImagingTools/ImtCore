@@ -20,8 +20,8 @@ namespace imtlic
 
 CProductInstanceInfo::CProductInstanceInfo()
 	:m_customerCollectionPtr(nullptr),
-	m_productCollectionPtr(nullptr),
-	m_inUse(false)
+	  m_productCollectionPtr(nullptr),
+	  m_inUse(false)
 {
 }
 
@@ -41,9 +41,9 @@ const imtbase::IObjectCollection* CProductInstanceInfo::GetCustomerDatabase() co
 
 
 void CProductInstanceInfo::SetupProductInstance(
-			const QByteArray& productId,
-			const QByteArray& instanceId,
-			const QByteArray& customerId)
+		const QByteArray& productId,
+		const QByteArray& instanceId,
+		const QByteArray& customerId)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
@@ -130,6 +130,22 @@ void CProductInstanceInfo::SetSerialNumber(const QByteArray& serialNumber)
 }
 
 
+QByteArray CProductInstanceInfo::GetProject() const
+{
+	return m_project;
+}
+
+
+void CProductInstanceInfo::SetProject(const QByteArray& project)
+{
+	if (m_project != project){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_project = project;
+	}
+}
+
+
 bool CProductInstanceInfo::IsInUse() const
 {
 	return m_inUse;
@@ -194,6 +210,13 @@ bool CProductInstanceInfo::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.BeginTag(inUseTag);
 		retVal = retVal && archive.Process(m_inUse);
 		retVal = retVal && archive.EndTag(inUseTag);
+	}
+
+	if (imtCoreVersion >= 7386){
+		static iser::CArchiveTag projectTag("Project", "Project", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(projectTag);
+		retVal = retVal && archive.Process(m_project);
+		retVal = retVal && archive.EndTag(projectTag);
 	}
 
 	static iser::CArchiveTag instanceIdTag("InstanceId", "ID of the product instance", iser::CArchiveTag::TT_LEAF);
@@ -272,11 +295,12 @@ bool CProductInstanceInfo::CopyFrom(const IChangeable& object, CompatibilityMode
 
 		m_productId = sourcePtr->m_productId;
 		m_serialNumber = sourcePtr->m_serialNumber;
+		m_project = sourcePtr->m_project;
 		m_customerId = sourcePtr->m_customerId;
 		m_instanceId= sourcePtr->m_instanceId;
 		m_licenses = sourcePtr->m_licenses;
-		m_licenseContainerInfo= sourcePtr->m_licenseContainerInfo;
-		m_inUse= sourcePtr->m_inUse;
+		m_licenseContainerInfo = sourcePtr->m_licenseContainerInfo;
+		m_inUse = sourcePtr->m_inUse;
 
 		return true;
 	}
@@ -302,6 +326,7 @@ bool CProductInstanceInfo::ResetData(CompatibilityMode /*mode*/)
 
 	m_productId.clear();
 	m_serialNumber.clear();
+	m_project.clear();
 	m_customerId.clear();
 	m_instanceId.clear();
 	m_licenses.clear();

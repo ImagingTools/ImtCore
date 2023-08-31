@@ -20,22 +20,7 @@ QtObject {
     property int offset: 0;
     property int count: -1;
 
-    property TreeItemModel filterModel: TreeItemModel {
-        Component.onCompleted: {
-//            filterModel.InsertNewItem();
-//            let objectFilter = filterModel.AddTreeModel("ObjectFilter");
-//            objectFilter.SetData("Key", "DeviceId");
-//            objectFilter.SetData("Value", "");
-//            objectFilter.SetData("IsEqual", true);
-//            console.log("onCompleted filterModel", filterModel.toJSON());
-
-//            filterModel.InsertNewItem();
-//            filterModel.SetData("Test", "Test", 0);
-//            filterModel.AddTreeModel("FilterIds");
-//            filterModel.AddTreeModel("Sort");
-
-//            console.log("json", filterModel.toJSON())
-        }};
+    property TreeItemModel filterModel: TreeItemModel {};
 
     signal modelUpdated();
     signal failed();

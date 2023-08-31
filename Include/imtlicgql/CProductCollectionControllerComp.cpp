@@ -6,6 +6,9 @@
 #include <istd/TDelPtr.h>
 #include <iprm/CTextParam.h>
 
+// ImtCore includes
+#include <imtlic/CLicenseInfo.h>
+
 
 namespace imtlicgql
 {
@@ -14,6 +17,83 @@ namespace imtlicgql
 // protected methods
 
 // reimplemented (imtguigql::CObjectCollectionControllerCompBase)
+
+bool CProductCollectionControllerComp::SetupGqlItem(
+			const imtgql::CGqlRequest& gqlRequest,
+			imtbase::CTreeItemModel& model,
+			int itemIndex,
+			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
+			QString& errorMessage) const
+{
+	if (objectCollectionIterator == nullptr){
+		return false;
+	}
+
+	bool retVal = true;
+
+	QByteArrayList informationIds = GetInformationIds(gqlRequest, "items");
+
+	if (!informationIds.isEmpty() && m_objectCollectionCompPtr.IsValid()){
+		imtlic::IProductLicensingInfo* productLicensingInfoPtr = nullptr;
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (objectCollectionIterator->GetObjectData(dataPtr)){
+			productLicensingInfoPtr = dynamic_cast<imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());
+		}
+
+		QByteArray collectionId = objectCollectionIterator->GetObjectId();
+
+		if (productLicensingInfoPtr != nullptr){
+			for (const QByteArray& informationId : informationIds){
+				QVariant elementInformation;
+
+				if(informationId == "Id"){
+					elementInformation = productLicensingInfoPtr->GetProductId();
+				}
+				else if(informationId == "Name"){
+					elementInformation = productLicensingInfoPtr->GetName();
+				}
+				else if(informationId == "CategoryId"){
+					elementInformation = productLicensingInfoPtr->GetCategoryId();
+				}
+				else if(informationId == "Licenses"){
+					imtbase::CTreeItemModel* licenseModelPtr = model.AddTreeModel("Licenses", itemIndex);
+
+					imtbase::IObjectCollection* licenseCollectionPtr = dynamic_cast<imtbase::IObjectCollection*>(productLicensingInfoPtr);
+					if (licenseCollectionPtr == nullptr){
+						return false;
+					}
+
+					imtbase::ICollectionInfo::Ids elementIds = licenseCollectionPtr->GetElementIds();
+					for (const imtbase::ICollectionInfo::Id& elementId : elementIds){
+						imtbase::IObjectCollection::DataPtr elementDataPtr;
+						if (licenseCollectionPtr->GetObjectData(elementId, elementDataPtr)){
+							const imtlic::CLicenseInfo* licenseInfoPtr = dynamic_cast<const imtlic::CLicenseInfo*>(elementDataPtr.GetPtr());
+							if (licenseInfoPtr != nullptr){
+								int index = licenseModelPtr->InsertNewItem();
+
+								licenseModelPtr->SetData("Id", licenseInfoPtr->GetLicenseId(), index);
+								licenseModelPtr->SetData("Name", licenseInfoPtr->GetLicenseName(), index);
+							}
+						}
+					}
+
+					continue;
+				}
+
+				if (elementInformation.isNull()){
+					elementInformation = "";
+				}
+
+				retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
+			}
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
 
 QVariant CProductCollectionControllerComp::GetObjectInformation(
 		const QByteArray &informationId,

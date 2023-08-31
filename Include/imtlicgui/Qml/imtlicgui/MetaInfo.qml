@@ -16,7 +16,7 @@ Rectangle {
 
     property bool contentVisible: true;
 
-//    property Item tableData: null;
+    //    property Item tableData: null;
 
     function getMetaInfo(selectedId){
         metaInfo.getMetaInfo(selectedId);
@@ -40,7 +40,7 @@ Rectangle {
             anchors.rightMargin: 5;
             anchors.leftMargin: 5;
 
-            visible: container.contentVisible;
+            visible: container.contentVisible && !loading.visible;
 
             Repeater {
                 id: repeaterColumn;
@@ -121,6 +121,20 @@ Rectangle {
         }//Column main
     }
 
+    Loading {
+        id: loading;
+
+        anchors.top: parent.top;
+        anchors.horizontalCenter: parent.horizontalCenter;
+
+        width: parent.width;
+        height: 100;
+
+        indicatorSize: 20;
+
+        visible: metaInfo.state === "Loading";
+    }
+
     GqlModel {
         id: metaInfo;
 
@@ -130,7 +144,7 @@ Rectangle {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", selectedId);
-//            inputParams.InsertField("ProductId", window.productId);
+            //            inputParams.InsertField("ProductId", window.productId);
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("metaInfo");

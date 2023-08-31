@@ -227,8 +227,8 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
-		const imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return nullptr;
