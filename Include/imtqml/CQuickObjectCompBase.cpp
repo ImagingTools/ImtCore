@@ -13,8 +13,7 @@ namespace imtqml
 // public methods
 
 CQuickObjectCompBase::CQuickObjectCompBase()
-	:m_quickItemPtr(nullptr),
-	  QObject()
+	:m_quickItemPtr(nullptr)
 {
 }
 
