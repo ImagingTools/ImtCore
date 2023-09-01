@@ -159,6 +159,28 @@ Rectangle {
     }
 
     onTableDecoratorChanged: {
+        setDecorators();
+    }
+
+    onWidthChanged: {
+        tableContainer.setWidth();
+        if(tableContainer.wrapMode !== Text.NoWrap){
+            pauseHeight.stop();
+            pauseHeight.start();
+        }
+    }
+
+    onHeadersChanged: {
+        tableContainer.columnContentComps = [];
+
+        for (let i = 0; i < tableContainer.headers.GetItemsCount(); i++){
+            tableContainer.columnContentComps.push(null);
+        }
+
+
+    }
+
+    function setDecorators(){
         console.log("onTableDecoratorChanged");
 
         tableContainer.headerDecorator = tableContainer.tableDecorator.GetTreeItemModel("Headers");
@@ -183,22 +205,7 @@ Rectangle {
             pauseHeight.stop();
             pauseHeight.start();
         }
-    }
 
-    onWidthChanged: {
-        tableContainer.setWidth();
-        if(tableContainer.wrapMode !== Text.NoWrap){
-            pauseHeight.stop();
-            pauseHeight.start();
-        }
-    }
-
-    onHeadersChanged: {
-        tableContainer.columnContentComps = [];
-
-        for (let i = 0; i < tableContainer.headers.GetItemsCount(); i++){
-            tableContainer.columnContentComps.push(null);
-        }
 
     }
 
@@ -573,6 +580,7 @@ Rectangle {
             Component.onCompleted: {
                 headersList.compl = true;
             }
+
             delegate: Item{
                 id: deleg;
 
