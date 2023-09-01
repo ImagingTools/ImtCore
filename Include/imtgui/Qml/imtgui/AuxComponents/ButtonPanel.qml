@@ -1,4 +1,4 @@
-import QtQuick 2.12
+import QtQuick 2.15
 import Qt5Compat.GraphicalEffects 1.0
 import QtGraphicalEffects 1.12
 
@@ -14,8 +14,7 @@ Rectangle {
 
     property int delegateWidth: Style.size_ButtonWidth;
     property int delegateHeight: Style.size_ButtonHeight;
-    property int verticalMenuWidth: delegateWidth;
-    //property real contentWidth: horizontalListView.contentWidth //+ openButton.width + openButton.anchors.rightMargin + buttonPanel.mainMargin + 10;
+    property int verticalMenuWidth: 0;
     property int visibleCount: 5;
     property int mainMargin: 10;
 
@@ -30,6 +29,7 @@ Rectangle {
 
     property bool hasActiveState: false;
     property string activeId: "";
+    property int startActiveIndex: 0;
 
     property bool centered: false;
 
@@ -38,6 +38,10 @@ Rectangle {
     property int openButtonWidth: 32;
     property int openButtonHeight: 22;
     property int openDuration: 0;
+
+    property var widthArr: [];
+    property bool widthReady: widthArr.length  && buttonModel.GetItemsCount() &&
+                              widthArr.length  == buttonModel.GetItemsCount();
 
     property string shadowColor: "lightgrey";
     property string baseColor: "#ffffff";
@@ -96,7 +100,6 @@ Rectangle {
         if(buttonPanel.hasActiveState){
             buttonPanel.activeId = buttonId;
             var ind =  buttonPanel.setActive(buttonId);
-            //console.log("_____SELECTED_INDEX___ ",ind)
 
             buttonPanel.setModelsWithActive(ind);
 
@@ -117,23 +120,18 @@ Rectangle {
 
         }
     }
-    function onBackgroundClicked(){
-        modalDialogManager.closeDialog();
-    }
+
 
     onWidthChanged: {
         if(widthPause){
-            widthPause.stop();
-            widthPause.start();
+            widthPause.restart();
         }
-
 
         if(buttonPanel.vertMenuItem){
             var point = buttonPanel.mapToItem(null, buttonPanel.width - buttonPanel.verticalMenuWidth - buttonPanel.mainMargin, buttonPanel.height + buttonPanel.mainMargin);
 
             buttonPanel.vertMenuItem.x = point.x;
             buttonPanel.vertMenuItem.y = point.y;
-
 
         }
 
@@ -151,6 +149,10 @@ Rectangle {
         buttonPanel.setModels();
     }
 
+    function onBackgroundClicked(){
+        modalDialogManager.closeDialog();
+        buttonPanel.openST = false;
+    }
 
     function getMaxString(){
         var max = "";
@@ -194,13 +196,58 @@ Rectangle {
         buttonPanel.horizontalModel.Clear();
         buttonPanel.verticalModel.Clear();
 
-        buttonPanel.horizCount  = Math.floor(Math.max(horizontalListViewContainer.width + buttonPanel.horizontalSpacing,0)  / (buttonPanel.delegateWidth + buttonPanel.horizontalSpacing));
-        console.log("horizCount ",buttonPanel.horizCount);
+        let width_max = 0;
+        let counted = false;
+
+        var countAdded = 0;
+
+        var maxHorWidth = Math.max(horizontalListViewContainer.width ,0)
+
+        for(var i = buttonPanel.startActiveIndex; i < buttonPanel.widthArr.length; i++){
+
+            var width_ = buttonPanel.widthArr[i] + buttonPanel.horizontalSpacing;
+            width_max += width_;
+
+            if(width_max > maxHorWidth){
+                counted = true;
+                countAdded = i - buttonPanel.startActiveIndex;
+                break;
+            }
+            else{
+                countAdded++;
+            }
+        }
+
+        let countAdded_2 = countAdded;
+
+        if(!counted){
+            for(let i = 0; i < buttonPanel.startActiveIndex; i++){
+
+                let width_ = buttonPanel.widthArr[i] + buttonPanel.horizontalSpacing;
+
+                width_max += width_;
+
+                if(width_max > maxHorWidth){
+                    countAdded_2 = countAdded + i;
+                    break;
+                }
+                else{
+                     countAdded_2++;
+                }
+            }
+        }
+
+        if(countAdded_2 < 0){
+            countAdded_2 = 0;
+        }
+
+        buttonPanel.horizCount = countAdded_2;
+
+        //console.log("horizCount ",buttonPanel.horizCount);
 
         var count = buttonPanel.buttonModel.GetItemsCount();
         if(count <= buttonPanel.horizCount){
-            //buttonPanel.horizontalModel = buttonPanel.buttonModel;
-            for(var i = 0; i < count; i++){
+            for(let i = 0; i < count; i++){
                 buttonPanel.horizontalModel.InsertNewItem()
                 buttonPanel.horizontalModel.CopyItemDataFromModel(i,buttonPanel.buttonModel,i);
             }
@@ -247,9 +294,6 @@ Rectangle {
 
     function setModelsWithActive(index){
 
-        //console.log("_____SELECTED_INDEX___ ",index)
-        //console.log("_____HORIZ_COUNT___ ",buttonPanel.horizCount)
-
         if(buttonPanel.horizCount == 0){
             for(var i = 0; i < buttonPanel.verticalModel.GetItemsCount(); i++){
                 buttonPanel.verticalModel.SetData("Active",(index == i), i);
@@ -260,12 +304,14 @@ Rectangle {
         else{
 
             if (index < buttonPanel.horizCount){
-                for(var i = 0; i < buttonPanel.horizontalModel.GetItemsCount(); i++){
+                for(let i = 0; i < buttonPanel.horizontalModel.GetItemsCount(); i++){
                     buttonPanel.horizontalModel.SetData("Active",(index == i), i);
                 }
             }
 
             else{//перезаполнение моделей
+
+                buttonPanel.startActiveIndex = index;
 
                 buttonPanel.proxiModel.Clear();
 
@@ -323,12 +369,54 @@ Rectangle {
             buttonPanel.buttonModel.CopyItemDataFromModel(i,buttonPanel.rightOrderModel,i);
         }
 
-        for(var i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
+        for(let i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
             var id = buttonPanel.buttonModel.GetData("Id",i);
             buttonPanel.buttonModel.SetData("Active",(id == buttonPanel.activeId), i);
         }
 
         buttonPanel.setModels();
+
+    }
+
+    Repeater {
+        id: buttonSizeRep;
+        anchors.right: parent.right;
+
+        width: 0; height: 0;
+
+        visible: false;
+
+
+        clip: true;
+
+        model: buttonPanel.buttonModel;
+        delegate: buttonPanel.buttonDelegate;
+
+        onItemAdded: {
+
+            let okLength = buttonPanel.widthArr.length == 0 ? true :
+                                                              buttonPanel.widthArr.length < buttonPanel.buttonModel.GetItemsCount();
+
+            let width__ = item.width;
+
+            let ok = item && width__ > 0 && okLength;
+
+
+            if(ok){
+                buttonPanel.widthArr.push(width__);
+
+                if(width__ > buttonPanel.verticalMenuWidth){
+                    buttonPanel.verticalMenuWidth = width__;
+                }
+
+
+
+
+            }
+            item.width = 0;
+            item.height = 0;
+            item.visible = false;
+        }
 
     }
 
@@ -343,7 +431,6 @@ Rectangle {
         ListView{
             id: horizontalListView;
 
-            //anchors.fill: parent;
             anchors.verticalCenter: parent.verticalCenter;
             anchors.left: parent.left;
             anchors.leftMargin: !buttonPanel.centered ? 0 : parent.width/2 - width/2;
@@ -360,7 +447,6 @@ Rectangle {
             model: buttonPanel.horizontalModel;
 
             delegate: buttonPanel.buttonDelegate;
-
 
         }//horizontalListView
     }//horizontalListViewContainer
@@ -381,14 +467,13 @@ Rectangle {
         iconSource: buttonPanel.openButtonImageSource;
         fontPixelSize: 30;
         fontColor: containsMouse ? "black" : "gray";
-        //color: containsMouse || verticalListViewContainer.openST ? buttonPanel.buttonColor : "transparent";
+        color: containsMouse || buttonPanel.openST ? buttonPanel.buttonColor : "transparent";
         borderColor: "transparent";
         highlighted: false;
 
         visible: buttonPanel.buttonModel.GetItemsCount() > buttonPanel.horizCount;
 
         onClicked: {
-            //verticalListViewContainer.openST = !verticalListViewContainer.openST;
 
             var point = buttonPanel.mapToItem(null, buttonPanel.width - buttonPanel.verticalMenuWidth - buttonPanel.mainMargin, buttonPanel.height + buttonPanel.mainMargin);
             modalDialogManager.openDialog(vertMenuComp, {
@@ -438,7 +523,8 @@ Rectangle {
               anchors.topMargin: buttonPanel.mainMargin;
 
               width: buttonPanel.verticalMenuWidth;
-              height:  Math.min(contentHeight,(buttonPanel.delegateHeight * buttonPanel.visibleCount + spacing * (buttonPanel.visibleCount-1)));
+              //height:  Math.min(contentHeight,(buttonPanel.delegateHeight * buttonPanel.visibleCount + spacing * (buttonPanel.visibleCount-1)));
+              height: contentHeight;
 
               clip: true;
               boundsBehavior: Flickable.StopAtBounds;
