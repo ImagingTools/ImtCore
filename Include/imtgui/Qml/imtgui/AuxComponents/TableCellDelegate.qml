@@ -216,6 +216,8 @@ Item {
         anchors.right: mainRec.right;
         anchors.leftMargin: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.textLeftMargin: 0;
 
+        property var cellDelegate: delegateContainer;
+
         onLoaded: {
             if (contentLoader.item.tableCellDelegate !== undefined){
                 contentLoader.item.tableCellDelegate = delegateContainer;

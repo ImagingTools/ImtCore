@@ -129,6 +129,18 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 					}
 				}
 				else{
+					if (!errorMessage.isEmpty()){
+						imtbase::CTreeItemModel rootModel;
+						imtbase::CTreeItemModel* errorsModelPtr = rootModel.AddTreeModel("errors");
+						imtbase::CTreeItemModel* errorItemModelPtr = errorsModelPtr->AddTreeModel(gqlCommand);
+
+						errorItemModelPtr->SetData("message", errorMessage);
+
+						iser::CJsonMemWriteArchive archive(responseData);
+						if (!rootModel.Serialize(archive)){
+						}
+					}
+
 					QString servletErrorMessage = QString("Can not create response for command: '%1'. Info:'%2'").arg(qPrintable(gqlCommand)).arg(errorMessage);
 					SendErrorMessage(0, servletErrorMessage, "GraphQL - servlet");
 				}
