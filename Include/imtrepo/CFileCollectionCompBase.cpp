@@ -251,8 +251,8 @@ QByteArray CFileCollectionCompBase::InsertFile(
 					metaInfoPtr->SetMetaInfo(dataMetaInfoTypesList[i], dataValueMeta);
 				}
 			}
-			bool metaInfoCreated = SaveMetaInfo(*metaInfoPtr, metaInfoFilePath);
 
+			bool metaInfoCreated = SaveMetaInfo(*metaInfoPtr, metaInfoFilePath);
 			if (metaInfoCreated){
 				collectionItem.contentsMetaInfoPtr = metaInfoPtr;
 
@@ -272,7 +272,7 @@ QByteArray CFileCollectionCompBase::InsertFile(
 				}
 			}
 			else{
-				SendErrorMessage(0, tr("Metainfo for the file '%1' could not be created").arg(workingFilePath));
+				SendErrorMessage(0, tr("Meta-information for the file '%1' could not be created").arg(workingFilePath));
 			}
 		}
 		else{
@@ -290,8 +290,8 @@ QByteArray CFileCollectionCompBase::InsertFile(
 
 
 bool CFileCollectionCompBase::UpdateFile(
-	const QString& localFilePath,
-	const QByteArray& objectId)
+			const QString& localFilePath,
+			const QByteArray& objectId)
 {
 	{
 		QWriteLocker cacheLocker(&m_objectCacheLock);
@@ -1281,10 +1281,10 @@ bool CFileCollectionCompBase::IsObjectIdUsed(const QByteArray& objectId)
 
 
 bool CFileCollectionCompBase::FinishInsertFileTransaction(
-	const QString& workingPath,
-	const QString& repositoryPath,
-	const QByteArray& fileId,
-	const CollectionItem& collectionItem)
+			const QString& workingPath,
+			const QString& repositoryPath,
+			const QByteArray& fileId,
+			const CollectionItem& collectionItem)
 {
 	bool result = false;
 

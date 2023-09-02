@@ -46,10 +46,14 @@ QByteArray CSqlDatabaseDocumentDelegateComp::GetSelectionQuery(
 istd::IChangeable* CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid()){
+		Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord", "No database engine was registered");
+
 		return nullptr;
 	}
 
 	if (!m_documentFactoriesCompPtr.IsValid()){
+		Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord", "No document factories were registered");
+
 		return nullptr;
 	}
 
@@ -57,16 +61,50 @@ istd::IChangeable* CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord(cons
 
 	istd::TDelPtr<istd::IChangeable> documentPtr = CreateObject(typeId);
 	if (!documentPtr.IsValid()){
+		Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord", qPrintable(QString("Document instance could not be created for the type: '%1'").arg(qPrintable(typeId))));
+
 		return nullptr;
 	}
 
-	if (record.contains(*m_documentContentColumnIdAttrPtr)){
-		QByteArray documentContent = record.value(qPrintable(*m_documentContentColumnIdAttrPtr)).toByteArray();
+	if (m_externalDocumentCollectionCompPtr.IsValid()){
+		imtbase::IObjectCollection::DataPtr externalDocumentDataPtr;
 
-		documentContent = QByteArray::fromBase64(documentContent);
+		QByteArray objectId;
+		if (record.contains("LastRevisionId")){
+			objectId = record.value("LastRevisionId").toByteArray();
+		}
+		else{
+			Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord", "Table doesn't contain 'LastRevisionId' column");
+		}
 
-		if (ReadDataFromMemory(typeId, documentContent, *documentPtr)){
-			return documentPtr.PopPtr();
+		if (!objectId.isEmpty()){
+			if (!m_externalDocumentCollectionCompPtr->GetObjectData(objectId, externalDocumentDataPtr)){
+				return nullptr;
+			}
+
+			Q_ASSERT(externalDocumentDataPtr.IsValid());
+
+			if (documentPtr->CopyFrom(*externalDocumentDataPtr)){
+				return documentPtr.PopPtr();
+			}
+
+			return nullptr;
+		}
+		else{
+			Q_ASSERT_X(false, "CSqlDatabaseDocumentDelegateComp::CreateObjectFromRecord", "Revision-ID of the document data is empty");
+
+			return nullptr;
+		}
+	}
+	else{
+		if (record.contains(*m_documentContentColumnIdAttrPtr)){
+			QByteArray documentContent = record.value(qPrintable(*m_documentContentColumnIdAttrPtr)).toByteArray();
+
+			documentContent = QByteArray::fromBase64(documentContent);
+
+			if (ReadDataFromMemory(typeId, documentContent, *documentPtr)){
+				return documentPtr.PopPtr();
+			}
 		}
 	}
 
