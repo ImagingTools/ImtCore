@@ -15,8 +15,12 @@ namespace imtbase
 class CParamsSetJoiner: virtual public iprm::IParamsSet
 {
 public:
+	CParamsSetJoiner();
 	CParamsSetJoiner(iprm::IParamsSet* paramsSet1, iprm::IParamsSet* paramsSet2);
 	CParamsSetJoiner(const iprm::IParamsSet* paramsSet1, const iprm::IParamsSet* paramsSet2);
+
+	void SetParams(iprm::IParamsSet* paramsSet1, iprm::IParamsSet* paramsSet2);
+	void SetParams(const iprm::IParamsSet* paramsSet1, const iprm::IParamsSet* paramsSet2);
 
 	// reimplemented (iprm::IParamsSet)
 	virtual Ids GetParamIds(bool editableOnly = false) const override;

@@ -5,6 +5,16 @@ namespace imtbase
 {
 
 
+
+// public methods
+
+CParamsSetJoiner::CParamsSetJoiner()
+	:m_paramsSet1(nullptr),
+	m_paramsSet2(nullptr)
+{
+}
+
+
 CParamsSetJoiner::CParamsSetJoiner(iprm::IParamsSet* paramsSet1, iprm::IParamsSet* paramsSet2)
 	:m_paramsSet1(paramsSet1),
 	m_paramsSet2(paramsSet2)
@@ -16,6 +26,21 @@ CParamsSetJoiner::CParamsSetJoiner(const iprm::IParamsSet* paramsSet1, const ipr
 	:m_paramsSet1(const_cast<iprm::IParamsSet*>(paramsSet1)),
 	m_paramsSet2(const_cast<iprm::IParamsSet*>(paramsSet2))
 {
+}
+
+
+void CParamsSetJoiner::SetParams(iprm::IParamsSet* paramsSet1, iprm::IParamsSet* paramsSet2)
+{
+	Q_ASSERT(paramsSet1 != paramsSet2);
+
+	m_paramsSet1 = paramsSet1;
+	m_paramsSet2 = paramsSet2;
+}
+
+
+void CParamsSetJoiner::SetParams(const iprm::IParamsSet* paramsSet1, const iprm::IParamsSet* paramsSet2)
+{
+	SetParams(const_cast<iprm::IParamsSet*>(paramsSet1), const_cast<iprm::IParamsSet*>(paramsSet2));
 }
 
 
