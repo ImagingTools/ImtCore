@@ -930,8 +930,8 @@ QString CFileCollectionCompBase::SaveCollectionItem(const CFileCollectionItem& c
 {
 	QString itemFilePath = dataFilePath.isEmpty() ? GetDataItemFilePath(collectionItem) : dataFilePath;
 
-	if (m_helperFilesPersistence.IsValid()){
-		if (m_helperFilesPersistence->SaveToFile(collectionItem, itemFilePath) == ifile::IFilePersistence::OS_OK)
+	if (m_helperFilesPersistenceCompPtr.IsValid()){
+		if (m_helperFilesPersistenceCompPtr->SaveToFile(collectionItem, itemFilePath) == ifile::IFilePersistence::OS_OK)
 			return itemFilePath;
 	}
 	else{
@@ -1007,8 +1007,8 @@ bool CFileCollectionCompBase::SaveMetaInfo(const idoc::IDocumentMetaInfo& metaIn
 		return false;
 	}
 
-	if (m_helperFilesPersistence.IsValid()){
-		return m_helperFilesPersistence->SaveToFile(*serializablePtr, metaInfoFilePath) == ifile::IFilePersistence::OS_OK;
+	if (m_helperFilesPersistenceCompPtr.IsValid()){
+		return m_helperFilesPersistenceCompPtr->SaveToFile(*serializablePtr, metaInfoFilePath) == ifile::IFilePersistence::OS_OK;
 	}
 
 	// Use default serializer:
@@ -1027,8 +1027,8 @@ bool CFileCollectionCompBase::LoadMetaInfo(idoc::IDocumentMetaInfo& metaInfo, co
 	if (!serializablePtr)
 		return false;
 
-	if (m_helperFilesPersistence.IsValid())
-		return m_helperFilesPersistence->LoadFromFile(*serializablePtr, metaInfoFilePath) == ifile::IFilePersistence::OS_OK;
+	if (m_helperFilesPersistenceCompPtr.IsValid())
+		return m_helperFilesPersistenceCompPtr->LoadFromFile(*serializablePtr, metaInfoFilePath) == ifile::IFilePersistence::OS_OK;
 
 	// using default serializer
 	ifile::CCompactXmlFileReadArchive archive(metaInfoFilePath, m_versionInfoCompPtr.GetPtr());
@@ -1200,8 +1200,8 @@ bool CFileCollectionCompBase::ReadItemFile(CFileCollectionItem& collectionItem, 
 	if (itemFilePath.isEmpty())
 		return false;
 
-	if (m_helperFilesPersistence.IsValid())
-		return m_helperFilesPersistence->LoadFromFile(collectionItem, itemFilePath) == ifile::IFilePersistence::OS_OK;
+	if (m_helperFilesPersistenceCompPtr.IsValid())
+		return m_helperFilesPersistenceCompPtr->LoadFromFile(collectionItem, itemFilePath) == ifile::IFilePersistence::OS_OK;
 
 	ifile::CCompactXmlFileReadArchive archive(itemFilePath, m_versionInfoCompPtr.GetPtr());
 	return collectionItem.Serialize(archive);
