@@ -198,11 +198,9 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& collecti
 
 bool CFileCollectionComp::RestoreObject(imtbase::IObjectCollection&, const Id& objectId, int revision) const
 {
-	if (!m_compressorCompPtr.IsValid())
+	if (!m_compressorCompPtr.IsValid()){
 		return false;
-
-	if (m_rightsProviderCompPtr.IsValid() && !m_rightsProviderCompPtr->HasRight(*m_restoreRevisionRightIdAttrPtr))
-		return false;
+	}
 
 	RevisionsContents revisionsContents;
 	if (LoadRevisionsContents(*this, objectId, revisionsContents)){
