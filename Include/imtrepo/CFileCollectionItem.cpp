@@ -1,6 +1,21 @@
 #include <imtrepo/CFileCollectionItem.h>
 
 
+// Qt includes
+#include <QtCore/QDir>
+
+// ACF includes
+#include <iser/IArchive.h>
+#include <iser/CArchiveTag.h>
+
+// ImtCore includes
+#include <imtcore/Version.h>
+
+
+namespace imtrepo
+{
+
+
 // public methods
 
 CFileCollectionItem::CFileCollectionItem(const QString& repositoryFolderPath, int repositoryRev)
@@ -82,7 +97,7 @@ bool CFileCollectionItem::Serialize(iser::IArchive& archive)
 
 bool CFileCollectionItem::CopyFrom(const istd::IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const CollectionItem* sourceItemPtr = dynamic_cast<const CollectionItem*>(&object);
+	const CFileCollectionItem* sourceItemPtr = dynamic_cast<const CFileCollectionItem*>(&object);
 	if (sourceItemPtr != nullptr){
 		fileId = sourceItemPtr->fileId;
 		filePathInRepository = sourceItemPtr->filePathInRepository;

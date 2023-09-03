@@ -4,7 +4,9 @@
 // ACF includes
 #include <istd/TSmartPtr.h>
 #include <iser/ISerializable.h>
-#include <idoc/IDocumentMetaInfo.h>
+
+// ImtCore includes
+#include <imtbase/CObjectCollectionMetaInfo.h>
 
 
 namespace imtrepo
