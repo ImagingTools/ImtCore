@@ -441,11 +441,6 @@ protected:
 	I_REF(iauth::ILogin, m_loginProviderCompPtr);
 
 	/**
-		Rights provider
-	*/
-	I_REF(iauth::IRightsProvider, m_rightsProviderCompPtr);
-
-	/**
 		Path to the directory where the file file collection is located.
 		If the path is set, the incomming file will be copied to this location,
 		otherwise only a link to the file wil be created.
