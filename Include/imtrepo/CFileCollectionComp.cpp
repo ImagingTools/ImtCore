@@ -35,7 +35,9 @@ CFileCollectionComp::CFileCollectionComp()
 
 // reimplemented (imtbase::IRevisionController)
 
-imtbase::IRevisionController::RevisionInfoList CFileCollectionComp::GetRevisionInfoList(const imtbase::IObjectCollection& collection, const QByteArray& objectId) const
+imtbase::IRevisionController::RevisionInfoList CFileCollectionComp::GetRevisionInfoList(
+			const imtbase::IObjectCollection& collection,
+			const QByteArray& objectId) const
 {
 	imtbase::IRevisionController::RevisionInfoList revisionInfoList;
 	
@@ -68,7 +70,10 @@ imtbase::IRevisionController::RevisionInfoList CFileCollectionComp::GetRevisionI
 }
 
 
-int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& collection, const Id& objectId, const QString& userComment) const
+int CFileCollectionComp::BackupObject(
+			const imtbase::IObjectCollection& collection,
+			const Id& objectId,
+			const QString& userComment) const
 {
 	const IFileObjectCollection* collectionPtr = dynamic_cast<const IFileObjectCollection*>(&collection);
 	if (collectionPtr == nullptr || !m_compressorCompPtr.IsValid()){
@@ -148,7 +153,6 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& collecti
 
 						int fileIndex = GetFileIndexById(objectId);
 						if (fileIndex < 0){
-							qDebug() << "fileIndex -1";
 							return -1;
 						}
 
@@ -190,13 +194,14 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& collecti
 		SendErrorMessage(0, QString(QObject::tr("Target folder '%1' could not be created")).arg(revisionsPath));
 	}
 
-	qDebug() << "Return -1";
-
 	return -1;
 }
 
 
-bool CFileCollectionComp::RestoreObject(imtbase::IObjectCollection&, const Id& objectId, int revision) const
+bool CFileCollectionComp::RestoreObject(
+			imtbase::IObjectCollection&,
+			const Id& objectId,
+			int revision) const
 {
 	if (!m_compressorCompPtr.IsValid()){
 		return false;
@@ -277,7 +282,11 @@ bool CFileCollectionComp::RestoreObject(imtbase::IObjectCollection&, const Id& o
 }
 
 
-bool CFileCollectionComp::ExportObject(const imtbase::IObjectCollection& collection, const Id& objectId, int revision, const QString& filePath) const
+bool CFileCollectionComp::ExportObject(
+			const imtbase::IObjectCollection& collection,
+			const Id& objectId,
+			int revision,
+			const QString& filePath) const
 {
 	if (!m_compressorCompPtr.IsValid()){
 		return false;
@@ -528,11 +537,14 @@ bool CFileCollectionComp::SetElementName(const Id& elementId, const QString& nam
 
 // reimplemented (ICollectionDataController)
 
-bool CFileCollectionComp::ExportFile(const imtbase::IObjectCollection& /*collection*/, const Id& objectId, const QString& targetFilePath) const
+bool CFileCollectionComp::ExportFile(
+			const imtbase::IObjectCollection& /*collection*/,
+			const Id& objectId,
+			const QString& targetFilePath) const
 {
 	if (targetFilePath.isEmpty()){
 		return false;
-		}
+	}
 
 	if (QFileInfo(targetFilePath).suffix() != "zip"){ // normal file save - taking the implementation of the base class
 		return BaseClass::ExportFile(*this, objectId, targetFilePath);
@@ -549,7 +561,10 @@ bool CFileCollectionComp::ExportFile(const imtbase::IObjectCollection& /*collect
 }
 
 
-QByteArray CFileCollectionComp::ImportFile(imtbase::IObjectCollection& /*collection*/, const QByteArray& typeId, const QString& sourceFilePath) const
+QByteArray CFileCollectionComp::ImportFile(
+			imtbase::IObjectCollection& /*collection*/,
+			const QByteArray& typeId,
+			const QString& sourceFilePath) const
 {
 	int repositoryRevision = *m_revisionAttrPtr;
 
@@ -806,7 +821,10 @@ QString CFileCollectionComp::CalculateTargetFilePath(
 }
 
 
-bool CFileCollectionComp::LoadRevisionsContents(const IFileObjectCollection& collection, const QByteArray& objectId, RevisionsContents& revisionsContents) const
+bool CFileCollectionComp::LoadRevisionsContents(
+			const IFileObjectCollection& collection,
+			const QByteArray& objectId,
+			RevisionsContents& revisionsContents) const
 {
 	QString objectName = collection.GetElementInfo(objectId, EIT_NAME).toString();
 	QString revisionsContentsPath = QFileInfo(collection.GetFileInfo(objectId).filePath).path() + "/Revisions/contents.xml";
@@ -816,7 +834,10 @@ bool CFileCollectionComp::LoadRevisionsContents(const IFileObjectCollection& col
 }
 
 
-bool CFileCollectionComp::SaveRevisionsContents(const IFileObjectCollection& collection, const QByteArray& objectId, RevisionsContents& revisionsContents) const
+bool CFileCollectionComp::SaveRevisionsContents(
+			const IFileObjectCollection& collection,
+			const QByteArray& objectId,
+			RevisionsContents& revisionsContents) const
 {
 	QString objectName = collection.GetElementInfo(objectId, EIT_NAME).toString();
 	QString revisionsContentsPath = QFileInfo(collection.GetFileInfo(objectId).filePath).path() + "/Revisions/contents.xml";
@@ -884,7 +905,10 @@ bool CFileCollectionComp::UpdateRepositoryFormat()
 }
 
 
-bool CFileCollectionComp::TransformRepositoryItem(const RepositoryItemInfo& repositoryItemInfo, int fromRepositoryRevision, int toRepositoryRevision) const
+bool CFileCollectionComp::TransformRepositoryItem(
+			const RepositoryItemInfo& repositoryItemInfo,
+			int fromRepositoryRevision,
+			int toRepositoryRevision) const
 {
 	if (m_transformationStepsProviderCompPtr.IsValid()){
 		IRepositoryFileTransformationStepsProvider::TransformationSteps steps =
