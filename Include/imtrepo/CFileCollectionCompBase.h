@@ -388,6 +388,9 @@ protected:
 	bool IsObjectNameLocked(const QString& resourceName);
 	bool IsObjectIdUsed(const QByteArray& objectId);
 
+	/**
+		Calculate path in file collection for the local file path
+	*/
 	virtual QString CalculateFolderPathInRepository(
 				const QString& localFilePath,
 				const QString& resourceName,

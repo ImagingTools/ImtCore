@@ -735,92 +735,6 @@ bool CFileCollectionComp::ResetData(CompatibilityMode /*mode*/)
 
 // protected methods
 
-QString CFileCollectionComp::CalculateFolderPathInRepository(
-			const QString& localFilePath,
-			const QString& objectName,
-			const QByteArray& typeId,
-			ilog::IMessageConsumer* messageConsumerPtr) const
-{
-	QFileInfo inputFileInfo(localFilePath);
-	if (!inputFileInfo.isFile()){
-		SendErrorMessage(0 , QObject::tr("Path '%1' is not a valid path to an existing file").arg(localFilePath));
-
-		return QString();
-	}
-
-	QString targetDirPath = inputFileInfo.absoluteDir().absolutePath();
-
-	QString repositoryDirPath = GetCollectionRootFolder();
-	if (repositoryDirPath.isEmpty()){
-		return QString();
-	}
-
-	targetDirPath = repositoryDirPath;
-
-	// If object-ID is non empty, create subfolder for this:
-	if (!typeId.isEmpty()){
-		Q_ASSERT(m_resourceTypesCompPtr.IsValid());
-
-		if (m_resourceTypesCompPtr->GetOptionsCount() > 1){
-			targetDirPath += QString("/") + typeId.constData();
-		}
-	}
-
-	QString subfolderName = objectName;
-#ifdef Q_OS_WIN
-	if (inputFileInfo.fileName() == objectName){
-		subfolderName = inputFileInfo.completeBaseName();
-	}
-#endif
-	targetDirPath += QString("/") + subfolderName;
-
-	int count = 0;
-	QString newDirPath = targetDirPath;
-	while (QFileInfo::exists(newDirPath)){
-		newDirPath = QString("%1 - %2").arg(targetDirPath).arg(++count);
-	}
-
-	if (newDirPath != targetDirPath){
-		QString warning = tr("Input file name %1 renamed to %2").arg(QDir(targetDirPath).dirName()).arg(QDir(newDirPath).dirName());
-
-		SendWarningMessage(0, warning);
-
-		if (messageConsumerPtr != nullptr){
-			messageConsumerPtr->AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_WARNING, 0, warning, "File Collection")));
-		}
-	}
-
-	targetDirPath = newDirPath;
-
-	return targetDirPath;
-}
-
-
-QString CFileCollectionComp::CalculateTargetFilePath(
-			const QString& targetFolderPath,
-			const QString& localFilePath) const
-{
-	QFileInfo inputFileInfo(localFilePath);
-
-	QString targetFilePath;
-
-	Q_ASSERT(inputFileInfo.fileName().size() <= 255); // would be an invalid filename!
-
-	QString targetFileName = inputFileInfo.fileName();
-	QString dirName = QDir(targetFolderPath).dirName();
-	if (!dirName.isEmpty() && (dirName != ".")){
-		targetFileName = dirName + "." + inputFileInfo.suffix();
-	}
-
-#ifdef Q_OS_WIN
-	targetFileName = CalculateShortFileName(targetFileName, inputFileInfo, "");
-#endif
-	targetFilePath = targetFolderPath + QString("/") + targetFileName;
-
-	return targetFilePath;
-}
-
-
 bool CFileCollectionComp::LoadRevisionsContents(
 			const IFileObjectCollection& collection,
 			const QByteArray& objectId,
@@ -926,6 +840,94 @@ bool CFileCollectionComp::TransformRepositoryItem(
 	}
 
 	return true;
+}
+
+
+// reimplemented (CFileCollectionCompBase)
+
+QString CFileCollectionComp::CalculateFolderPathInRepository(
+			const QString& localFilePath,
+			const QString& objectName,
+			const QByteArray& typeId,
+			ilog::IMessageConsumer* messageConsumerPtr) const
+{
+	QFileInfo inputFileInfo(localFilePath);
+	if (!inputFileInfo.isFile()){
+		SendErrorMessage(0 , QObject::tr("Path '%1' is not a valid path to an existing file").arg(localFilePath));
+
+		return QString();
+	}
+
+	QString targetDirPath = inputFileInfo.absoluteDir().absolutePath();
+
+	QString repositoryDirPath = GetCollectionRootFolder();
+	if (repositoryDirPath.isEmpty()){
+		return QString();
+	}
+
+	targetDirPath = repositoryDirPath;
+
+	// If object-ID is non empty, create subfolder for this:
+	if (!typeId.isEmpty()){
+		Q_ASSERT(m_resourceTypesCompPtr.IsValid());
+
+		if (m_resourceTypesCompPtr->GetOptionsCount() > 1){
+			targetDirPath += QString("/") + typeId.constData();
+		}
+	}
+
+	QString subfolderName = objectName;
+#ifdef Q_OS_WIN
+	if (inputFileInfo.fileName() == objectName){
+		subfolderName = inputFileInfo.completeBaseName();
+	}
+#endif
+	targetDirPath += QString("/") + subfolderName;
+
+	int count = 0;
+	QString newDirPath = targetDirPath;
+	while (QFileInfo::exists(newDirPath)){
+		newDirPath = QString("%1 - %2").arg(targetDirPath).arg(++count);
+	}
+
+	if (newDirPath != targetDirPath){
+		QString warning = tr("Input file name %1 renamed to %2").arg(QDir(targetDirPath).dirName()).arg(QDir(newDirPath).dirName());
+
+		SendWarningMessage(0, warning);
+
+		if (messageConsumerPtr != nullptr){
+			messageConsumerPtr->AddMessage(ilog::IMessageConsumer::MessagePtr(new ilog::CMessage(istd::IInformationProvider::IC_WARNING, 0, warning, "File Collection")));
+		}
+	}
+
+	targetDirPath = newDirPath;
+
+	return targetDirPath;
+}
+
+
+QString CFileCollectionComp::CalculateTargetFilePath(
+			const QString& targetFolderPath,
+			const QString& localFilePath) const
+{
+	QFileInfo inputFileInfo(localFilePath);
+
+	QString targetFilePath;
+
+	Q_ASSERT(inputFileInfo.fileName().size() <= 255); // would be an invalid filename!
+
+	QString targetFileName = inputFileInfo.fileName();
+	QString dirName = QDir(targetFolderPath).dirName();
+	if (!dirName.isEmpty() && (dirName != ".")){
+		targetFileName = dirName + "." + inputFileInfo.suffix();
+	}
+
+#ifdef Q_OS_WIN
+	targetFileName = CalculateShortFileName(targetFileName, inputFileInfo, "");
+#endif
+	targetFilePath = targetFolderPath + QString("/") + targetFileName;
+
+	return targetFilePath;
 }
 
 

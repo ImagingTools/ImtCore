@@ -88,24 +88,6 @@ protected:
 		virtual bool Serialize(iser::IArchive& archive) override;
 	};
 
-	/**
-		Calculate path in file collection for the local file path
-	*/
-	virtual QString CalculateFolderPathInRepository(
-				const QString& localFilePath,
-				const QString& resourceName,
-				const QByteArray& typeId,
-				ilog::IMessageConsumer* messageConsumerPtr) const override;
-
-	virtual QString CalculateTargetFilePath(
-				const QString& filePath,
-				const QString& objectName,
-				const QByteArray& typeId) const override;
-
-	virtual QString CalculateTargetFilePath(
-				const QString& targetFolderPath,
-				const QString& localFilePath) const override;
-
 	virtual bool LoadRevisionsContents(const IFileObjectCollection& collection, const QByteArray& objectId, RevisionsContents& revisionsContents) const;
 	virtual bool SaveRevisionsContents(const IFileObjectCollection& collection, const QByteArray& objectId, RevisionsContents& revisionsContents) const;
 
@@ -115,6 +97,20 @@ protected:
 	*/
 	virtual bool UpdateRepositoryFormat();
 	virtual bool TransformRepositoryItem(const RepositoryItemInfo& repositoryItemInfo, int fromRepositoryRevision, int toRepositoryRevision) const;
+
+	// reimplemented (CFileCollectionCompBase)
+	virtual QString CalculateFolderPathInRepository(
+				const QString& localFilePath,
+				const QString& resourceName,
+				const QByteArray& typeId,
+				ilog::IMessageConsumer* messageConsumerPtr) const override;
+	virtual QString CalculateTargetFilePath(
+				const QString& filePath,
+				const QString& objectName,
+				const QByteArray& typeId) const override;
+	virtual QString CalculateTargetFilePath(
+				const QString& targetFolderPath,
+				const QString& localFilePath) const override;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
