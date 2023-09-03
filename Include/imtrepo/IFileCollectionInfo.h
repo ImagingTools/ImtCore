@@ -6,6 +6,7 @@
 
 // ACF includes
 #include <istd/IChangeable.h>
+#include <ifile/IFileResourceTypeConstraints.h>
 
 
 namespace imtrepo
@@ -34,6 +35,40 @@ public:
 		*/
 		FCL_FOLDER
 	};
+
+	/**
+		Information related to the file item in the file collection.
+	*/
+	struct FileInfo
+	{
+		/**
+			Name of the file in the collection folder.
+		*/
+		QString fileName;
+
+		/**
+			Path to the file inside of the collection folder.
+		*/
+		QString filePath;
+
+		/**
+			Timestamp of the last file modification.
+		*/
+		QDateTime lastModified;
+	};
+
+	/**
+		Get type contraints describing each supported type of a resource.
+		\return	Type constraints, if available or \c nullptr, if no type constraints were defined.
+	*/
+	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const = 0;
+
+	/**
+		Get file information related to a object
+		\param objectId	ID of the file in the collection
+		\return	Related informations \sa FileInfo
+	*/
+	virtual FileInfo GetFileInfo(const QByteArray& objectId) const = 0;
 
 	/**
 		Get information about a type of the file collection layout.

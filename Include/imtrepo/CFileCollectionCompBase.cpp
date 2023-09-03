@@ -56,26 +56,6 @@ const IRepositoryItemInfo* CFileCollectionCompBase::GetRepositoryItemInfo(const 
 
 // reimplemented (IFileCollectionInfo)
 
-QString CFileCollectionCompBase::GetCollectionRootFolder() const
-{
-	QString retVal;
-
-	if (m_repositoryPathCompPtr.IsValid()){
-		retVal = m_repositoryPathCompPtr->GetPath();
-	}
-
-	return retVal;
-}
-
-
-int CFileCollectionCompBase::GetRepositoryRevision() const
-{
-	return *m_revisionAttrPtr;
-}
-
-
-// reimplemented (IFileObjectCollection)
-
 const ifile::IFileResourceTypeConstraints* CFileCollectionCompBase::GetFileTypeConstraints() const
 {
 	if (!m_resourceFileTypesCompPtr.IsValid() || !m_resourceTypesCompPtr.IsValid()){
@@ -108,6 +88,26 @@ IFileObjectCollection::FileInfo CFileCollectionCompBase::GetFileInfo(const QByte
 	return retVal;
 }
 
+
+QString CFileCollectionCompBase::GetCollectionRootFolder() const
+{
+	QString retVal;
+
+	if (m_repositoryPathCompPtr.IsValid()){
+		retVal = m_repositoryPathCompPtr->GetPath();
+	}
+
+	return retVal;
+}
+
+
+int CFileCollectionCompBase::GetRepositoryRevision() const
+{
+	return *m_revisionAttrPtr;
+}
+
+
+// reimplemented (IFileObjectCollection)
 
 QString CFileCollectionCompBase::GetFile(
 			const QByteArray& objectId,

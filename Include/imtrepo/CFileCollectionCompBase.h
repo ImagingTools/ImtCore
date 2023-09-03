@@ -117,12 +117,12 @@ public:
 	virtual const IRepositoryItemInfo* GetRepositoryItemInfo(const QByteArray& itemId) const override;
 
 	// reimplemented (IFileCollectionInfo)
+	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const override;
+	virtual FileInfo GetFileInfo(const QByteArray& objectId) const override;
 	virtual QString GetCollectionRootFolder() const override;
 	virtual int GetRepositoryRevision() const override;
 
 	// reimplemented (IFileObjectCollection)
-	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const override;
-	virtual FileInfo GetFileInfo(const QByteArray& objectId) const override;
 	virtual QString GetFile(const QByteArray& objectId, const QString& targetFilePath = QString()) const override;
 	virtual QByteArray InsertFile(
 				const QString& filePath,
