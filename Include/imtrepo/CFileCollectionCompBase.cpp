@@ -974,7 +974,10 @@ QString CFileCollectionCompBase::GetMetaInfoFilePath(const CFileCollectionItem& 
 }
 
 
-QString CFileCollectionCompBase::CalculateShortFileName(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const
+QString CFileCollectionCompBase::CalculateShortFileName(
+			const QString& fileName,
+			const QFileInfo& fileInfo,
+			const QString& prefix) const
 {
 	const int maxFileNameLength = 255;
 
@@ -1073,7 +1076,9 @@ int CFileCollectionCompBase::GetFileIndexByName(const QString& fileName) const
 }
 
 
-idoc::MetaInfoPtr CFileCollectionCompBase::CreateItemMetaInfo(const QString& dataObjectFilePath, const QByteArray& typeId) const
+idoc::MetaInfoPtr CFileCollectionCompBase::CreateItemMetaInfo(
+			const QString& dataObjectFilePath,
+			const QByteArray& typeId) const
 {
 	idoc::MetaInfoPtr retVal;
 
@@ -1107,7 +1112,10 @@ idoc::MetaInfoPtr CFileCollectionCompBase::CreateItemMetaInfo(const QString& dat
 }
 
 
-bool CFileCollectionCompBase::CreateItemMetaInfoFile(const QString& dataObjectFilePath, const QByteArray& typeId, const QString& metaInfoFilePath) const
+bool CFileCollectionCompBase::CreateItemMetaInfoFile(
+			const QString& dataObjectFilePath,
+			const QByteArray& typeId,
+			const QString& metaInfoFilePath) const
 {
 	idoc::MetaInfoPtr metaInfoPtr = CreateItemMetaInfo(dataObjectFilePath, typeId);
 	if (metaInfoPtr.IsValid()){
