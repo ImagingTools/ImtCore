@@ -32,6 +32,7 @@
 #include <imtrepo/IFileCollectionInfo.h>
 #include <imtrepo/IFileObjectCollection.h>
 #include <imtrepo/IRepositoryItemInfoProvider.h>
+#include <imtrepo/CFileCollectionItem.h>
 
 
 namespace imtrepo
@@ -268,73 +269,8 @@ protected:
 		mutable QReadWriteLock m_lock;
 	};
 
-	/**
-		Internal structure representing the file item in the collection.
-	*/
-	class CollectionItem: virtual public iser::ISerializable
-	{
-	public:
-		CollectionItem(const QString& repositoryFolderPath, int repositoryRev)
-			:m_repositoryFolderPath(repositoryFolderPath),
-			repositoryRevision(repositoryRev)
-		{
-		}
 
-		// reimplement (iser::ISerializable)
-		virtual bool Serialize(iser::IArchive& archive) override;
-
-		// reimplement (istd::IChangeable)
-		virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-
-	public:
-		/**
-			ID of the file in the file collection.
-		*/
-		QByteArray fileId;
-
-		/**
-			File path in the file collection.
-		*/
-		QString filePathInRepository;
-
-		/**
-			Location of the source file.
-		*/
-		QString sourceFilePath;
-
-		/**
-			Name of the file object.
-		*/
-		QString objectName;
-
-		/**
-			Type ID of the file object.
-		*/
-		QByteArray typeId;
-
-		/**
-			Repository revision.
-		*/
-		int repositoryRevision;
-
-		/**
-			Meta-informations for the file item in the collection.
-		*/
-		imtbase::CObjectCollectionMetaInfo metaInfo;
-
-		/**
-			Meta-informations for the file contents.
-		*/
-		idoc::MetaInfoPtr contentsMetaInfoPtr;
-
-	private:
-		/**
-			Path to the root folder of the repository.
-		*/
-		QString m_repositoryFolderPath;
-	};
-
-	typedef QList<CollectionItem> Files;
+	typedef QList<CFileCollectionItem> Files;
 
 	class ResourceTypeConstraints: public ifile::IFileResourceTypeConstraints
 	{
@@ -386,9 +322,9 @@ protected:
 		\param dataFilePath target file path for the data item. If this parameter is empty file path defined in \c repositoryItem will be used.
 		\todo Refactor this method --> liquid shit in the brain of the programmer!
 	*/
-	QString SaveCollectionItem(const CollectionItem& repositoryItem, const QString& dataFilePath = QString()) const;
-	QString GetDataItemFilePath(const CollectionItem& repositoryFile) const;
-	QString GetMetaInfoFilePath(const CollectionItem& repositoryFile) const;
+	QString SaveCollectionItem(const CFileCollectionItem& repositoryItem, const QString& dataFilePath = QString()) const;
+	QString GetDataItemFilePath(const CFileCollectionItem& repositoryFile) const;
+	QString GetMetaInfoFilePath(const CFileCollectionItem& repositoryFile) const;
 	QString CalculateShortFileName(const QString& fileName, const QFileInfo& fileInfo, const QString& prefix) const;
 
 	/**
@@ -438,11 +374,11 @@ protected:
 	/**
 		Update the meta informations for the existing item.
 	*/
-	void UpdateItemMetaInfo(CollectionItem& item) const;
+	void UpdateItemMetaInfo(CFileCollectionItem& item) const;
 
 	void ReadRepositoryItems();
 	void ReadItem(Files& files, const QString& itemFilePath) const;
-	bool ReadItemFile(CollectionItem& collectionItem, const QString& itemFilePath) const;
+	bool ReadItemFile(CFileCollectionItem& collectionItem, const QString& itemFilePath) const;
 
 	void StartRepositoryLoader();
 	Q_INVOKABLE void OnReaderProgress(int progress);
@@ -472,7 +408,7 @@ protected:
 				const QString& workingPath,
 				const QString& repositoryPath,
 				const QByteArray& fileId,
-				const CollectionItem& collectionItem);
+				const CFileCollectionItem& collectionItem);
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

@@ -152,7 +152,7 @@ int CFileCollectionComp::BackupObject(const imtbase::IObjectCollection& collecti
 							return -1;
 						}
 
-						CollectionItem& collectionItem = m_files[fileIndex];
+						CFileCollectionItem& collectionItem = m_files[fileIndex];
 
 						readLocker.unlock();
 
@@ -244,7 +244,7 @@ bool CFileCollectionComp::RestoreObject(imtbase::IObjectCollection&, const Id& o
 										return false;
 									}
 
-									CollectionItem& collectionItem = m_files[fileIndex];
+									CFileCollectionItem& collectionItem = m_files[fileIndex];
 
 									collectionItem.metaInfo.SetMetaInfo(imtbase::IObjectCollectionInfo::MIT_REVISION, revision);
 									collectionItem.metaInfo.SetMetaInfo(imtbase::IObjectCollectionInfo::MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
@@ -375,7 +375,7 @@ bool CFileCollectionComp::RemoveElement(const Id& elementId, const imtbase::IOpe
 	int fileIndex = GetFileIndexById(elementId);
 	if (fileIndex >= 0){
 		// If the file was copied into the repository, remove also the file from repository folder:
-		const CollectionItem& itemToRemove = m_files[fileIndex];
+		const CFileCollectionItem& itemToRemove = m_files[fileIndex];
 
 		QFileInfo fileInfo(itemToRemove.filePathInRepository);
 
@@ -434,7 +434,7 @@ bool CFileCollectionComp::SetElementName(const Id& elementId, const QString& nam
 
 	int fileIndex = GetFileIndexById(elementId);
 	if (fileIndex >= 0){
-		CollectionItem& item = m_files[fileIndex];
+		CFileCollectionItem& item = m_files[fileIndex];
 
 		if (item.objectName != name){
 			int foundIndex = GetFileIndexByName(name);
@@ -571,7 +571,7 @@ QByteArray CFileCollectionComp::ImportFile(imtbase::IObjectCollection& /*collect
 				QStringList list = workingDir.entryList();
 				if (!list.isEmpty()){
 					QString itemFile = workingDir.filePath(list[0]);
-					CollectionItem collectionItem(GetCollectionRootFolder(), repositoryRevision);
+					CFileCollectionItem collectionItem(GetCollectionRootFolder(), repositoryRevision);
 					if (ReadItemFile(collectionItem, itemFile)){
 						QString dataFile = workingDir.filePath(QFileInfo(collectionItem.filePathInRepository).fileName());
 						if (QFile(dataFile).exists()){
@@ -1032,102 +1032,6 @@ bool CFileCollectionCompBase::RepositoryItemInfoProvider::SetElementDescription(
 
 bool CFileCollectionCompBase::RepositoryItemInfoProvider::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/)
 {
-	return false;
-}
-
-
-// public methods of embedded class CollectionItem
-
-// reimplement (iser::ISerializable)
-
-bool CFileCollectionComp::CollectionItem::Serialize(iser::IArchive& archive)
-{
-	bool retVal = true;
-
-	static iser::CArchiveTag fileIdTag("FileID", "ID of the file in the repository");
-	retVal = retVal && archive.BeginTag(fileIdTag);
-	retVal = retVal && archive.Process(fileId);
-	retVal = retVal && archive.EndTag(fileIdTag);
-
-	// Change file path in the repository to a relative path (relvative to repository's folder):
-	QDir repositoryDir(m_repositoryFolderPath);
-	QString relativeFilePathInRepository = repositoryDir.relativeFilePath(filePathInRepository);
-
-	static iser::CArchiveTag filePathInrepositoryItemsTag("RepositoryFilePath", "File path in the repository");
-	retVal = retVal && archive.BeginTag(filePathInrepositoryItemsTag);
-	retVal = retVal && archive.Process(relativeFilePathInRepository);
-	retVal = retVal && archive.EndTag(filePathInrepositoryItemsTag);
-
-	if (retVal && !archive.IsStoring()){
-		filePathInRepository = QDir::cleanPath(repositoryDir.absoluteFilePath(relativeFilePathInRepository));
-	}
-
-	QString relativeSourceFilePath = repositoryDir.relativeFilePath(sourceFilePath);
-
-	static iser::CArchiveTag sourceFilePathTag("SourceFilePath", "Source location of the file");
-	retVal = retVal && archive.BeginTag(sourceFilePathTag);
-	retVal = retVal && archive.Process(relativeSourceFilePath);
-	retVal = retVal && archive.EndTag(sourceFilePathTag);
-
-	if (retVal && !archive.IsStoring()){
-		sourceFilePath = QDir::cleanPath(repositoryDir.absoluteFilePath(relativeSourceFilePath));
-	}
-
-	static iser::CArchiveTag resourceNameTag("Name", "Name of the file resource");
-	retVal = retVal && archive.BeginTag(resourceNameTag);
-	retVal = retVal && archive.Process(objectName);
-	retVal = retVal && archive.EndTag(resourceNameTag);
-
-	static iser::CArchiveTag resourceTypeIdTag("TypeID", "Type ID of the file resource");
-	retVal = retVal && archive.BeginTag(resourceTypeIdTag);
-	retVal = retVal && archive.Process(typeId);
-	retVal = retVal && archive.EndTag(resourceTypeIdTag);
-
-	quint32 imtCoreVersion;
-	bool imtCoreVersionExists = archive.GetVersionInfo().GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion);
-	if (imtCoreVersionExists && imtCoreVersion >= 3068){
-		static iser::CArchiveTag repositoryRevisionTag("RepositoryRevision", "Repository revision");
-		retVal = retVal && archive.BeginTag(repositoryRevisionTag);
-		retVal = retVal && archive.Process(repositoryRevision);
-		retVal = retVal && archive.EndTag(repositoryRevisionTag);
-	}
-	else{
-		if (!archive.IsStoring()){
-			repositoryRevision = 0;
-		}
-	}
-
-	static iser::CArchiveTag metaInfoTag("MetaInfo", "Collection related meta-informations", iser::CArchiveTag::TT_GROUP);
-	retVal = retVal && archive.BeginTag(metaInfoTag);
-	retVal = retVal && metaInfo.Serialize(archive);
-	retVal = retVal && archive.EndTag(metaInfoTag);
-
-	return retVal;
-}
-
-
-// reimplement (istd::IChangeable)
-
-bool CFileCollectionComp::CollectionItem::CopyFrom(const istd::IChangeable& object, CompatibilityMode /*mode*/)
-{
-	const CollectionItem* sourceItemPtr = dynamic_cast<const CollectionItem*>(&object);
-	if (sourceItemPtr != nullptr){
-		fileId = sourceItemPtr->fileId;
-		filePathInRepository = sourceItemPtr->filePathInRepository;
-		sourceFilePath = sourceItemPtr->sourceFilePath;
-		objectName = sourceItemPtr->objectName;
-		typeId = sourceItemPtr->typeId;
-
-		if (sourceItemPtr->contentsMetaInfoPtr.IsValid()){
-			contentsMetaInfoPtr.SetCastedOrRemove(sourceItemPtr->contentsMetaInfoPtr->CloneMe());
-			if (!contentsMetaInfoPtr.IsValid()){
-				return false;
-			}
-		}
-
-		return metaInfo.CopyFrom(sourceItemPtr->metaInfo);
-	}
-
 	return false;
 }
 
