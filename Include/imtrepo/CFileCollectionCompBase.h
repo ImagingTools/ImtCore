@@ -118,7 +118,7 @@ public:
 
 	// reimplemented (IFileCollectionInfo)
 	virtual const ifile::IFileResourceTypeConstraints* GetFileTypeConstraints() const override;
-	virtual FileInfo GetFileInfo(const QByteArray& objectId) const override;
+	virtual bool GetFileInfo(const QByteArray& objectId, IFileCollectionItem& fileCollectionItem) const override;
 	virtual QString GetCollectionRootFolder() const override;
 	virtual int GetRepositoryRevision() const override;
 

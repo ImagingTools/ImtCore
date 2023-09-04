@@ -26,8 +26,8 @@ public:
 		I_ASSIGN_MULTI_0(m_documentFactoriesCompPtr, "DocumentFactories", "Factory list used for creation of the new document instance according to the given type-ID", true);
 		I_ASSIGN_MULTI_0(m_documentPersistenceListCompPtr, "DocumentPersistenceList", "List of persistence components for each type of the document", true);
 		I_ASSIGN(m_metaInfoTableDelegateCompPtr, "MetaInfoTableDelegate", "Delegate for the table containing meta-informations for the document type", false, "MetaInfoTableDelegate");
-		I_ASSIGN(m_externalDocumentCollectionCompPtr, "ExternalDocumentCollection", "External document coillection used as a storage of the document data", false, "ExternalDocumentCollection");
-		I_ASSIGN(m_documentContentColumnIdAttrPtr, "DocumntContentColumnId", "ID of the column in the table containing document content", true, "Document");
+		I_ASSIGN(m_externalDocumentCollectionCompPtr, "ExternalDocumentCollection", "External document collection used as a storage of the document data", false, "ExternalDocumentCollection");
+		I_ASSIGN(m_documentContentColumnIdAttrPtr, "DocumentContentColumnId", "ID of the column in the table containing document content", true, "Document");
 		I_ASSIGN(m_metaInfoTableNameAttrPtr, "MetaInfoTableName", "Name of the meta-info table", true, "");
 		I_ASSIGN(m_revisionsTableNameAttrPtr, "RevisionsTableName", "Name of the table contained document revisions", true, "");
 	I_END_COMPONENT

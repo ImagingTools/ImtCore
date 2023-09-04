@@ -66,10 +66,8 @@ const ifile::IFileResourceTypeConstraints* CFileCollectionCompBase::GetFileTypeC
 }
 
 
-IFileObjectCollection::FileInfo CFileCollectionCompBase::GetFileInfo(const QByteArray& objectId) const
+bool CFileCollectionCompBase::GetFileInfo(const QByteArray& objectId, IFileCollectionItem& fileCollectionItem) const
 {
-	FileInfo retVal;
-
 	QReadLocker locker(&m_filesLock);
 
 	int fileIndex = GetFileIndexById(objectId);
@@ -78,14 +76,11 @@ IFileObjectCollection::FileInfo CFileCollectionCompBase::GetFileInfo(const QByte
 
 		locker.unlock();
 
-		QString repositoryFilePath = collectionItem.filePathInRepository;
+		return fileCollectionItem.CopyFrom(collectionItem);
 
-		retVal.fileName = QFileInfo(repositoryFilePath).fileName();
-		retVal.filePath = repositoryFilePath;
-		retVal.lastModified = collectionItem.metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime();
 	}
 
-	return retVal;
+	return false;
 }
 
 
@@ -119,7 +114,7 @@ QString CFileCollectionCompBase::GetFile(
 
 	int fileIndex = GetFileIndexById(objectId);
 	if (fileIndex >= 0){
-		QString filePathInRepository = m_files[fileIndex].filePathInRepository;
+		QString filePathInRepository = m_files[fileIndex].GetFilePath();
 
 		QFileInfo fileInfo(filePathInRepository);
 		if (fileInfo.exists()){
@@ -213,31 +208,6 @@ QByteArray CFileCollectionCompBase::InsertFile(
 			QFile::ReadOther | QFile::WriteOther | QFile::ExeOther)){
 			QString metaInfoFilePath = workingPath + "/" + targetFileInfo.fileName() + "." + GetRepositoryInfo().metaInfoFileSuffix;
 
-			CFileCollectionItem collectionItem(GetCollectionRootFolder(), *m_revisionAttrPtr);
-			collectionItem.fileId = fileId;
-			collectionItem.typeId = typeId;
-			collectionItem.objectName = targetName;
-			collectionItem.filePathInRepository = targetFilePath;
-			collectionItem.sourceFilePath = localFilePath;
-
-			if (collectionItemMetaInfoPtr != nullptr){
-				idoc::CStandardDocumentMetaInfo::MetaInfoTypes metaInfoTypes = collectionItemMetaInfoPtr->GetMetaInfoTypes();
-#if QT_VERSION < 0x051500
-				QList<int> metaInfoTypesList = metaInfoTypes.toList();
-#else
-				QList<int> metaInfoTypesList(metaInfoTypes.begin(), metaInfoTypes.end());
-#endif
-				for (int i = 0; i < metaInfoTypesList.size(); i++){
-					QVariant valueMeta = collectionItemMetaInfoPtr->GetMetaInfo(metaInfoTypesList[i]);
-					collectionItem.metaInfo.SetMetaInfo(metaInfoTypesList[i], valueMeta);
-				}
-			}
-			else{
-				collectionItem.metaInfo.SetMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
-				collectionItem.metaInfo.SetMetaInfo(MIT_INSERTION_TIME, QDateTime::currentDateTime());
-				collectionItem.metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, objectDescription);
-			}
-
 			idoc::MetaInfoPtr metaInfoPtr = CreateItemMetaInfo(workingFilePath, typeId);
 			if (dataMetaInfoPtr != nullptr){
 				idoc::CStandardDocumentMetaInfo::MetaInfoTypes dataMetaInfoTypes = dataMetaInfoPtr->GetMetaInfoTypes();
@@ -254,7 +224,32 @@ QByteArray CFileCollectionCompBase::InsertFile(
 
 			bool metaInfoCreated = SaveMetaInfo(*metaInfoPtr, metaInfoFilePath);
 			if (metaInfoCreated){
-				collectionItem.contentsMetaInfoPtr = metaInfoPtr;
+				CFileCollectionItem collectionItem(
+							GetCollectionRootFolder(),
+							*m_revisionAttrPtr,
+							fileId,
+							typeId,
+							targetFilePath,
+							targetName,
+							metaInfoPtr);
+
+				if (collectionItemMetaInfoPtr != nullptr){
+					idoc::CStandardDocumentMetaInfo::MetaInfoTypes metaInfoTypes = collectionItemMetaInfoPtr->GetMetaInfoTypes();
+#if QT_VERSION < 0x051500
+					QList<int> metaInfoTypesList = metaInfoTypes.toList();
+#else
+					QList<int> metaInfoTypesList(metaInfoTypes.begin(), metaInfoTypes.end());
+#endif
+					for (int i = 0; i < metaInfoTypesList.size(); i++){
+						QVariant valueMeta = collectionItemMetaInfoPtr->GetMetaInfo(metaInfoTypesList[i]);
+						collectionItem.SetCollectionMetaInfo(metaInfoTypesList[i], valueMeta);
+					}
+				}
+				else{
+					collectionItem.SetCollectionMetaInfo(MIT_LAST_OPERATION_TIME, QDateTime::currentDateTime());
+					collectionItem.SetCollectionMetaInfo(MIT_INSERTION_TIME, QDateTime::currentDateTime());
+					collectionItem.SetCollectionMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, objectDescription);
+				}
 
 				QString dataFilePath = workingPath + "/" + targetFileInfo.fileName() + "." + GetRepositoryInfo().dataFileSuffix;
 				QString savedPath = SaveCollectionItem(collectionItem, dataFilePath);
@@ -315,16 +310,18 @@ bool CFileCollectionCompBase::UpdateFile(
 	locker.unlock();
 
 	// Create meta-informations for the file contents:
-	collectionItem.contentsMetaInfoPtr = CreateItemMetaInfo(localFilePath, collectionItem.typeId);
-	if (!collectionItem.contentsMetaInfoPtr.IsValid()){
+	idoc::MetaInfoPtr contentsMetaInfoPtr = CreateItemMetaInfo(localFilePath, collectionItem.GetTypeId());
+	if (!contentsMetaInfoPtr.IsValid()){
 		SendErrorMessage(0, QObject::tr("Meta-informations could not be created for'%1'. File could not be updated").arg(localFilePath));
 
 		return false;
 	}
 
+	collectionItem.SetContentsMetaInfo(contentsMetaInfoPtr);
+
 	QFileInfo inputFileInfo(localFilePath);
 
-	QString targetFilePath = collectionItem.filePathInRepository;
+	QString targetFilePath = collectionItem.GetFilePath();
 
 	if (istd::CSystem::FileCopy(localFilePath, targetFilePath, true)){
 		if (!QFile::setPermissions(targetFilePath, QFile::WriteGroup)){
@@ -342,7 +339,7 @@ bool CFileCollectionCompBase::UpdateFile(
 		SaveCollectionItem(collectionItem);
 
 		QString metaInfoFilePath = GetMetaInfoFilePath(collectionItem);
-		if (!SaveMetaInfo(*collectionItem.contentsMetaInfoPtr, metaInfoFilePath)){
+		if (!SaveMetaInfo(*collectionItem.GetContentsMetaInfo(), metaInfoFilePath)){
 			SendErrorMessage(0, QObject::tr("Meta information of the file '%1' could not be updated").arg(targetFilePath));
 		}
 
@@ -519,10 +516,9 @@ bool CFileCollectionCompBase::GetObjectData(const QByteArray& objectId, DataPtr&
 		}
 	}
 
-	FileInfo item = GetFileInfo(objectId);
-
-	if (!item.filePath.isEmpty()){
-		DataPtr dataObjectPtr = CreateObjectFromFile(item.filePath, typeId);
+	CFileCollectionItem item;
+	if (GetFileInfo(objectId, item)){
+		DataPtr dataObjectPtr = CreateObjectFromFile(item.GetFilePath(), typeId);
 		if (!dataObjectPtr.IsValid()){
 			return false;
 		}
@@ -606,7 +602,7 @@ imtbase::IObjectCollection* CFileCollectionCompBase::CreateSubCollection(
 	int objectsCount = count >= 0 ? qMin(count, m_files.count()) : m_files.count();
 
 	for (int fileIndex = offset; fileIndex < objectsCount; ++fileIndex){
-		collectionPtr->InsertNewObject(m_files[fileIndex].typeId, m_files[fileIndex].objectName, "", m_files[fileIndex].CloneMe());
+		collectionPtr->InsertNewObject(m_files[fileIndex].GetTypeId(), m_files[fileIndex].GetName(), "", m_files[fileIndex].CloneMe());
 	}
 
 	m_filesLock.unlock();
@@ -640,7 +636,7 @@ imtbase::IObjectCollectionInfo::Id CFileCollectionCompBase::GetObjectTypeId(cons
 
 	int fileIndex = GetFileIndexById(objectId);
 	if (fileIndex >= 0){
-		retVal = m_files[fileIndex].typeId;
+		retVal = m_files[fileIndex].GetTypeId();
 	}
 
 	m_filesLock.unlock();
@@ -666,8 +662,9 @@ idoc::MetaInfoPtr CFileCollectionCompBase::GetDataMetaInfo(const Id& objectId) c
 	// Get meta-information from cache:
 	CFileCollectionItem& item = m_files[fileIndex];
 
-	if (item.contentsMetaInfoPtr.IsValid()){
-		metaInfoPtr.SetCastedOrRemove(item.contentsMetaInfoPtr->CloneMe());
+	idoc::MetaInfoPtr contentsMetaInfoPtr = item.GetContentsMetaInfo();
+	if (contentsMetaInfoPtr.IsValid()){
+		metaInfoPtr.SetCastedOrRemove(contentsMetaInfoPtr->CloneMe());
 	}
 
 	return metaInfoPtr;
@@ -700,7 +697,7 @@ imtbase::ICollectionInfo::Ids CFileCollectionCompBase::GetElementIds(
 	int objectsCount = count >= 0 ? qMin(count, m_files.count()) : m_files.count();
 
 	for (int fileIndex = offset; fileIndex < objectsCount; ++fileIndex){
-		retVal.append(m_files[fileIndex].fileId);
+		retVal.append(m_files[fileIndex].GetFileId());
 	}
 
 	m_filesLock.unlock();
@@ -729,10 +726,10 @@ QVariant CFileCollectionCompBase::GetElementInfo(const QByteArray& elementId, in
 		
 		switch (infoType){
 		case EIT_NAME:
-			return item.objectName;
+			return item.GetName();
 
 		case EIT_DESCRIPTION:
-			return item.metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
+			return item.GetCollectionMetaInfo().GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
 		}
 	}
 
@@ -757,7 +754,7 @@ idoc::MetaInfoPtr CFileCollectionCompBase::GetElementMetaInfo(const Id& elementI
 	// Get meta-information from cache:
 	CFileCollectionItem& item = m_files[fileIndex];
 
-	metaInfoPtr.SetCastedOrRemove(item.metaInfo.CloneMe());
+	metaInfoPtr.SetCastedOrRemove(item.GetCollectionMetaInfo().CloneMe());
 
 	return metaInfoPtr;
 }
@@ -777,14 +774,14 @@ bool CFileCollectionCompBase::SetElementDescription(const Id& elementId, const Q
 	if (fileIndex >= 0){
 		CFileCollectionItem& item = m_files[fileIndex];
 
-		QString oldDescription = item.metaInfo.GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
+		QString oldDescription = item.GetCollectionMetaInfo().GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
 
 		if (oldDescription != description){
 			static ChangeSet changes(CF_UPDATED);
 			changes.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
 			istd::CChangeNotifier changeNotifier(this, &changes);
 
-			item.metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, description);
+			item.SetCollectionMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION, description);
 
 			SaveCollectionItem(item);
 
@@ -898,14 +895,14 @@ CFileCollectionCompBase::DataPtr CFileCollectionCompBase::CreateDataObject(const
 
 	if ((factoryIndex >= 0) && factoryIndex < m_objectFactoryListCompPtr.GetCount()){
 		icomp::IComponent* compPtr = m_objectFactoryListCompPtr.CreateComponent(factoryIndex);
-		return CFileCollectionCompBase::DataPtr(
+		return DataPtr(
 			DataPtr::RootObjectPtr(compPtr),
 			[this, compPtr]() {
 				return m_objectFactoryListCompPtr.ExtractInterface(compPtr);
 			});
 	}
 
-	return CFileCollectionCompBase::DataPtr();
+	return DataPtr();
 }
 
 
@@ -950,7 +947,7 @@ QString CFileCollectionCompBase::GetDataItemFilePath(const CFileCollectionItem& 
 {
 	QString retVal;
 
-	QFileInfo fileInfo(repositoryFile.filePathInRepository);
+	QFileInfo fileInfo(repositoryFile.GetFilePath());
 	QString baseName = fileInfo.fileName();
 	if (!baseName.isEmpty()){
 		retVal = fileInfo.absolutePath() + "/" + baseName + "." + GetRepositoryInfo().dataFileSuffix;
@@ -964,7 +961,7 @@ QString CFileCollectionCompBase::GetMetaInfoFilePath(const CFileCollectionItem& 
 {
 	QString retVal;
 
-	QFileInfo fileInfo(repositoryFile.filePathInRepository);
+	QFileInfo fileInfo(repositoryFile.GetFilePath());
 	QString baseName = fileInfo.fileName();
 	if (!baseName.isEmpty()){
 		retVal = fileInfo.absolutePath() + "/" + baseName + "." + GetRepositoryInfo().metaInfoFileSuffix;
@@ -1055,7 +1052,7 @@ int CFileCollectionCompBase::GetFileIndexById(const QByteArray& fileId) const
 	}
 
 	for (int i = 0; i < m_files.count(); ++i){
-		if (m_files[i].fileId == fileId){
+		if (m_files[i].GetFileId() == fileId){
 			return i;
 		}
 	}
@@ -1067,7 +1064,7 @@ int CFileCollectionCompBase::GetFileIndexById(const QByteArray& fileId) const
 int CFileCollectionCompBase::GetFileIndexByName(const QString& fileName) const
 {
 	for (int i = 0; i < m_files.count(); ++i){
-		if (m_files[i].objectName == fileName){
+		if (m_files[i].GetName() == fileName){
 			return i;
 		}
 	}
@@ -1135,12 +1132,12 @@ void CFileCollectionCompBase::UpdateItemMetaInfo(CFileCollectionItem& item) cons
 
 	bool retVal = false;
 
-	if (item.contentsMetaInfoPtr.IsValid()){
-		retVal = LoadMetaInfo(*item.contentsMetaInfoPtr, metaInfoFilePath);
+	if (item.GetContentsMetaInfo().IsValid()){
+		retVal = LoadMetaInfo(*item.GetContentsMetaInfo(), metaInfoFilePath);
 	}
 
 	if (!retVal){
-		retVal = CreateItemMetaInfoFile(item.filePathInRepository, item.typeId, metaInfoFilePath);
+		retVal = CreateItemMetaInfoFile(item.GetFilePath(), item.GetTypeId(), metaInfoFilePath);
 		if (!retVal){
 			SendErrorMessage(0, QObject::tr("Meta-information for the file '%1' could not be created. Meta-information could not be provided").arg(metaInfoFilePath), "File Collection");
 		}
@@ -1173,13 +1170,14 @@ void CFileCollectionCompBase::ReadItem(Files& filesPtr, const QString& itemFileP
 		return;
 	}
 
-	QFileInfo repositoryFileInfo(fileItem.filePathInRepository);
+	QFileInfo repositoryFileInfo(fileItem.GetFilePath());
 	if (repositoryFileInfo.exists()){
-		if (!fileItem.contentsMetaInfoPtr.IsValid()){
+		if (!fileItem.GetContentsMetaInfo().IsValid()){
 			idoc::MetaInfoPtr retVal;
 
-			if (m_metaInfoCreatorMap.contains(fileItem.typeId)){
-				m_metaInfoCreatorMap[fileItem.typeId]->CreateMetaInfo(nullptr, fileItem.typeId, retVal);
+			QByteArray typeId = fileItem.GetTypeId();
+			if (m_metaInfoCreatorMap.contains(typeId)){
+				m_metaInfoCreatorMap[typeId]->CreateMetaInfo(nullptr, typeId, retVal);
 			}
 
 			if (!retVal.IsValid()){
@@ -1188,17 +1186,17 @@ void CFileCollectionCompBase::ReadItem(Files& filesPtr, const QString& itemFileP
 
 			Q_ASSERT(retVal.IsValid());
 
-			fileItem.contentsMetaInfoPtr = retVal;
+			fileItem.SetContentsMetaInfo(retVal);
 		}
 
-		if (fileItem.contentsMetaInfoPtr.IsValid()){
-			LoadMetaInfo(*fileItem.contentsMetaInfoPtr, GetMetaInfoFilePath(fileItem));
+		if (fileItem.GetContentsMetaInfo().IsValid()){
+			LoadMetaInfo(*fileItem.GetContentsMetaInfo(), GetMetaInfoFilePath(fileItem));
 
 			filesPtr.push_back(fileItem);
 		}
 	}
 	else{
-		SendErrorMessage(0, QObject::tr("File '%1' doesn't exist. Collection item was automatically removed").arg(fileItem.filePathInRepository));
+		SendErrorMessage(0, QObject::tr("File '%1' doesn't exist. Collection item was automatically removed").arg(fileItem.GetFilePath()));
 	}
 }
 
@@ -1282,7 +1280,7 @@ bool CFileCollectionCompBase::IsObjectIdUsed(const QByteArray& objectId)
 	}
 
 	for (int i = 0; i < m_files.count(); ++i){
-		if (m_files[i].fileId == objectId){
+		if (m_files[i].GetFileId() == objectId){
 			return true;
 		}
 	}

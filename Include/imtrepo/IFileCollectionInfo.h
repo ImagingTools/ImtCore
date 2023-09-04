@@ -13,6 +13,9 @@ namespace imtrepo
 {
 
 
+class IFileCollectionItem;
+
+
 /**
 	Interface for describing the structure of a file-based collection.
 	\ingroup FileRepository
@@ -37,27 +40,6 @@ public:
 	};
 
 	/**
-		Information related to the file item in the file collection.
-	*/
-	struct FileInfo
-	{
-		/**
-			Name of the file in the collection folder.
-		*/
-		QString fileName;
-
-		/**
-			Path to the file inside of the collection folder.
-		*/
-		QString filePath;
-
-		/**
-			Timestamp of the last file modification.
-		*/
-		QDateTime lastModified;
-	};
-
-	/**
 		Get type contraints describing each supported type of a resource.
 		\return	Type constraints, if available or \c nullptr, if no type constraints were defined.
 	*/
@@ -68,7 +50,7 @@ public:
 		\param objectId	ID of the file in the collection
 		\return	Related informations \sa FileInfo
 	*/
-	virtual FileInfo GetFileInfo(const QByteArray& objectId) const = 0;
+	virtual bool GetFileInfo(const QByteArray& objectId, IFileCollectionItem& collectionItem) const = 0;
 
 	/**
 		Get information about a type of the file collection layout.

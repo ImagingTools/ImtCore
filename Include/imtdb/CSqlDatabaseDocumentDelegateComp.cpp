@@ -123,17 +123,23 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 	NewObjectQuery retVal;
 
 	istd::TOptDelPtr<const istd::IChangeable> workingDocumentPtr;
+
+	// If the document value is not null, use this for saving into the database. This is the use case 'Insert an existing document into the database':
 	if (valuePtr != nullptr){
 		workingDocumentPtr.SetPtr(valuePtr, false);
 	}
+	// Otherwise create a new document instance of the related type:
 	else{
 		workingDocumentPtr.SetPtr(CreateObject(typeId));
 	}
 
+	// Check the siutation, that we want to store the document data outside of the database:
 	bool useExternalDocumentStorage = m_externalDocumentCollectionCompPtr.IsValid();
+
 	quint32 checksum = 0;
 	QByteArray documentContent;
 
+	// Even if we use the external document storage, we should write the data to memory for CRC-checksum calculation:
 	if (workingDocumentPtr.IsValid()){
 		if (!WriteDataToMemory(typeId, *workingDocumentPtr, documentContent)){
 			SendCriticalMessage(0, "Document data could not be written to the memory");
@@ -147,9 +153,13 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 		SendCriticalMessage(0, "Document instance is invalid. SQL-query could not be created");
 	}
 
+	// Create the document-ID:
 	QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray(QUuid::WithoutBraces) : proposedObjectId;
+
+	// Create ID for the document data revision:
 	QByteArray revisionUuid = QUuid::createUuid().toByteArray(QUuid::WithoutBraces);
 
+	// Write the document data into an external document collection:
 	if (m_externalDocumentCollectionCompPtr.IsValid()){
 		QByteArray dataObjectId = m_externalDocumentCollectionCompPtr->InsertNewObject(
 					typeId,
@@ -173,6 +183,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 		}
 	}
 
+	// Insert new entry into the document list table:
 	retVal.query = QString("INSERT INTO \"%1\"(\"Id\", \"%2\", \"Name\", \"Description\", \"Added\", \"LastRevisionId\") VALUES('%3', '%4', '%5', '%6', '%7', '%8');")
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(qPrintable(*m_objectTypeIdColumnAttrPtr))
@@ -184,6 +195,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 				.arg(qPrintable(revisionUuid))
 				.toUtf8();
 
+	// Insert new entry into the document data revision table:
 	retVal.query += QString("INSERT INTO \"%1\"(\"Id\", \"%2\", \"%3\", \"RevisionNumber\", \"Comment\", \"LastModified\", \"Checksum\") VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
 				.arg(qPrintable(*m_revisionsTableNameAttrPtr))
 				.arg(qPrintable(s_documentIdColumn))
@@ -217,6 +229,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlDatabaseDocumentDelegateComp:
 				tableValues.push_back("'" + value + "'");
 			}
 
+			// Insert new entry into the document' meta info table:
 			retVal.query += QString("INSERT INTO \"%1\"(%2) VALUES(%3);")
 						.arg(qPrintable(*m_metaInfoTableNameAttrPtr))
 						.arg(qPrintable(columnIds.join(", ")))
@@ -293,7 +306,6 @@ QByteArray CSqlDatabaseDocumentDelegateComp::CreateUpdateObjectQuery(
 					.arg(qPrintable(s_idColumn))
 					.arg(qPrintable(objectId))
 					.toUtf8();
-
 
 		QString operationComment = operationContextPtr != nullptr ? operationContextPtr->GetOperationDescription() : QString();
 		retVal += QString("INSERT INTO \"%1\"(\"Id\", \"%2\", \"%3\", \"RevisionNumber\", \"Comment\", \"LastModified\", \"Checksum\") VALUES('%4', '%5', '%6', '%7', '%8', '%9', %10);")
