@@ -12,8 +12,6 @@
 #include <istd/CCrcCalculator.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
-#include <ilog/CMessage.h>
-#include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <imtcore/Version.h>
