@@ -4,8 +4,7 @@ import Acf 1.0
 Item {
     id: commandsDecoratorContainer;
 
-    height: 30;
-    width: rowCommands.width;
+    anchors.fill: parent;
 
     property string commandsId;
 
@@ -25,15 +24,15 @@ Item {
         let commId = parameters["CommandsId"];
 
         commandsDecoratorContainer.commandsId = commId;
-        repeaterCommands.model = model;
+        buttonPanel.buttonModel = model;
     }
 
     function clearModel(){
-        repeaterCommands.model = 0;
+        buttonPanel.model = 0;
     }
 
     function setVisible(visible){
-        rowCommands.visible = visible;
+        buttonPanel.visible = visible;
     }
 
     Component{
@@ -41,24 +40,31 @@ Item {
         TopButtonDecorator{}
     }
 
-    Row {
-        id: rowCommands;
+    ButtonPanel{
+        id: buttonPanel;
 
-        height: parent.height;
+        anchors.verticalCenter: parent.verticalCenter;
+        anchors.left: parent.left;
+        anchors.leftMargin: 100;
+        width:  parent.width - 2*anchors.leftMargin;
+        height: parent.height
 
-        spacing: 15;
+        horizontalSpacing: 15;
+        verticalSpacing: 10;
 
-        Repeater {
-            id: repeaterCommands;
+        //hasActiveState: true;
+        openButtonImageSource: "../../../Icons/" + Style.theme + "/Next_On_Active.svg"
 
-            delegate:
-                BaseButton {
+        centered: true;
+
+        buttonDelegate: Component{
+            BaseButton {
 
                 id: topButtonDelegate;
 
                 decorator: Style.topButtonDecorator !==undefined ? Style.topButtonDecorator: defaultButtonDecorator;
                 imageSource: model.IsEnabled ? "../../../../Icons/" + Style.theme + "/" + model.Icon + "_Off_Normal.svg" :
-                                       "../../../../Icons/" + Style.theme + "/" + model.Icon + "_Off_Disabled.svg";
+                                               "../../../../Icons/" + Style.theme + "/" + model.Icon + "_Off_Disabled.svg";
 
                 enabled: model.IsEnabled;
 
@@ -105,6 +111,86 @@ Item {
                     }
                 }
             }
+
+        }
+
+        buttonDelegateVert: Component{
+            Item{
+                width: model.Name == "" ? splitter.width : textButtonDelegateContainer.width;
+                height: model.Name == "" ? splitter.height : textButtonDelegateContainer.height;
+
+                Item{
+                    id: textButtonDelegateContainer;
+
+                    width: imageButton.width + textButtonDelegate.width;
+                    height: textButtonDelegate.height;
+                    visible: model.Name !== "";
+
+                    AuxButton{
+                        id: imageButton;
+
+                        anchors.verticalCenter: parent.verticalCenter;
+
+                        width: textButtonDelegate.height + 5;
+                        height: textButtonDelegate.height;
+                        iconWidth: width - 8;
+
+                        enabled: model.IsEnabled;
+                        hasIcon: true;
+                        hasText: false;
+                        highlighted: false;
+                        color: "transparent";
+                        iconSource: model.IsEnabled ? "../../../../Icons/" + Style.theme + "/" + model.Icon + "_Off_Normal.svg" :
+                                                       "../../../../Icons/" + Style.theme + "/" + model.Icon + "_Off_Disabled.svg";
+
+
+                        onClicked: {
+                            Events.sendEvent(commandsDecoratorContainer.commandsId + "CommandActivated", model.Id);
+                        }
+                    }
+
+                    TextButton{
+                        id: textButtonDelegate;
+
+                        anchors.left: imageButton.right;
+                        anchors.verticalCenter: parent.verticalCenter;
+
+                        legendColor: model.IsEnabled ? Style.textColor : "gray";
+                        indicatorColor: "transparent";
+
+                        enabled: model.IsEnabled;
+                        legend: model.Name !== undefined ? model.Name : "";
+                        active: model.Active !== undefined ? model.Active : false;
+                        fontFamily: Style.fontFamily;
+                        hasIndicator: false;
+                        fontBold: true;
+                        fontPixelSize: Style.fontSize_common;
+                        property Item rootItem: buttonPanel;
+                        property string id: model.Id !== undefined ? model.Id : "";
+
+                        onClicked: {
+                            Events.sendEvent(commandsDecoratorContainer.commandsId + "CommandActivated", model.Id);
+                            rootItem.clicked(id);
+                        }
+                    }
+                }
+
+
+
+                Rectangle{
+                    id: splitter;
+
+                    anchors.top: parent.top;
+
+                    width: buttonPanel.verticalMenuWidth;
+                    height: model.Name == "" && model.index == 0 ? -buttonPanel.verticalSpacing : 2;
+                    color: Style.textColor;
+                    visible: model.Name !== "" ? false : model.index == 0 ? false : model.index == (buttonPanel.verticalModel.GetItemsCount() - 1) ? false : true ;
+                }
+
+            }
+
         }
     }
+
 }

@@ -5,9 +5,10 @@ Item {
     id: textButton;
 
     width: legendText.width;
-    height: legendText.height + activeIndicator.height + activeIndicator.anchors.topMargin;
+    height: legendText.height + hasIndicator * (activeIndicator.height + activeIndicator.anchors.topMargin);
     visible: true;
     property bool active: false;
+    property bool hasIndicator: true;
     property string legend: "";
     property int textWidth: legendText.width;
     property string fontFamily: Style.fontFamilyBold;
@@ -20,7 +21,7 @@ Item {
     //property alias legendColor: legendText.color;
 
     property var legendColor: textButton.active ? Style.color_text_titles : Style.color_text_notActive;
-
+    property string indicatorColor: Style.color_text_titles;
 
     signal clicked();
 
@@ -56,7 +57,7 @@ Item {
         height: 3;
 
         radius: 5;
-        color: Style.color_text_titles;
+        color: textButton.indicatorColor;
         visible: textButton.active;
     }
 

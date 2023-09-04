@@ -12,8 +12,8 @@ Rectangle {
 
     color: "transparent";
 
-    property int delegateWidth: Style.size_ButtonWidth;
-    property int delegateHeight: Style.size_ButtonHeight;
+    property int delegateWidth: 110;
+    property int delegateHeight: 30;
     property int verticalMenuWidth: 0;
     property int visibleCount: 5;
     property int mainMargin: 10;
@@ -40,12 +40,9 @@ Rectangle {
     property int openDuration: 0;
 
     property var widthArr: [];
-    property bool widthReady: widthArr.length  && buttonModel.GetItemsCount() &&
-                              widthArr.length  == buttonModel.GetItemsCount();
 
     property string shadowColor: "lightgrey";
     property string baseColor: "#ffffff";
-    property string buttonColor: Style.color_button;
 
     property TreeItemModel buttonModel: TreeItemModel{};
     property TreeItemModel horizontalModel: TreeItemModel{};
@@ -57,6 +54,9 @@ Rectangle {
     property Item vertMenuItem: null;
 
     property Component buttonDelegate : defaultDelegate;
+    property Component buttonDelegateVert : defaultDelegateVert;
+
+    property bool menuAlignRight: false;
 
     Component {
         id: defaultDelegate;
@@ -94,6 +94,51 @@ Rectangle {
 
     }
 
+    Component{
+        id: defaultDelegateVert;
+
+        Item{
+            width: model.Name == "" ? splitter.width : textButtonDelegate.width;
+            height: model.Name == "" ? splitter.height : textButtonDelegate.height;
+
+            TextButton{
+                id: textButtonDelegate;
+
+                legendColor: Style.textColor;
+                indicatorColor: "transparent";
+
+                legend: model.Name !== undefined ? model.Name : "";
+                active: model.Active !== undefined ? model.Active : false;
+                fontFamily: Style.fontFamily;
+                fontBold: true;
+                fontPixelSize: Style.fontSize_common;
+                property Item rootItem: buttonPanel;
+                property string id: model.Id !== undefined ? model.Id : "";
+
+                visible: model.Name !== "";
+
+                onClicked: {
+                    rootItem.clicked(id);
+                }
+            }
+
+
+
+
+            Rectangle{
+                id: splitter;
+
+                anchors.top: parent.top;
+
+                width: buttonPanel.verticalMenuWidth;
+                height: model.Name == "" && model.index == 0 ? -buttonPanel.verticalSpacing : 2;
+                color: Style.textColor;
+                visible: model.Name !== "" ? false : model.index == 0 ? false : model.index == (buttonPanel.verticalModel.GetItemsCount() - 1) ? false : true ;
+            }
+
+        }
+    }
+
     signal clicked(string buttonId);
 
     onClicked: {
@@ -113,12 +158,33 @@ Rectangle {
     }
 
     Component.onCompleted: {
-        if(buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
-            buttonPanel.setModels();
 
-            Events.subscribeEvent("DialogBackgroundClicked", buttonPanel.onBackgroundClicked)
+        Events.subscribeEvent("DialogBackgroundClicked", buttonPanel.onBackgroundClicked)
+
+        if(buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
+            buttonPanel.widthArr = [];
+            buttonSizeRep.model = buttonPanel.buttonModel;
+            buttonSizeRepVert.model = buttonPanel.buttonModel;
+            setModelPause.restart();
 
         }
+    }
+
+    onButtonModelChanged: {
+        buttonPanel.widthArr = [];
+        buttonSizeRep.model = buttonPanel.buttonModel;
+        buttonSizeRepVert.model = buttonPanel.buttonModel;
+
+        buttonPanel.rightOrderModel.Clear();
+        for(var i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
+            var active = buttonPanel.buttonModel.GetData("Active",i);
+            if(active){
+                buttonPanel.activeId = buttonPanel.buttonModel.GetData("Id",i);
+            }
+            buttonPanel.rightOrderModel.InsertNewItem()
+            buttonPanel.rightOrderModel.CopyItemDataFromModel(i,buttonPanel.buttonModel,i);
+        }
+        setModelPause.restart();
     }
 
 
@@ -128,7 +194,7 @@ Rectangle {
         }
 
         if(buttonPanel.vertMenuItem){
-            var point = buttonPanel.mapToItem(null, buttonPanel.width - buttonPanel.verticalMenuWidth - buttonPanel.mainMargin, buttonPanel.height + buttonPanel.mainMargin);
+            var point = buttonPanel.getMenuPoint();
 
             buttonPanel.vertMenuItem.x = point.x;
             buttonPanel.vertMenuItem.y = point.y;
@@ -137,17 +203,7 @@ Rectangle {
 
     }
 
-    onButtonModelChanged: {
-        for(var i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
-            var active = buttonPanel.buttonModel.GetData("Active",i);
-            if(active){
-                buttonPanel.activeId = buttonPanel.buttonModel.GetData("Id",i);
-            }
-            buttonPanel.rightOrderModel.InsertNewItem()
-            buttonPanel.rightOrderModel.CopyItemDataFromModel(i,buttonPanel.buttonModel,i);
-        }
-        buttonPanel.setModels();
-    }
+
 
     function onBackgroundClicked(){
         modalDialogManager.closeDialog();
@@ -166,13 +222,41 @@ Rectangle {
         return max;
     }
 
+    function getMenuPoint(){
+        let x = openButton.x;
+        if(buttonPanel.menuAlignRight){
+            x = x - buttonPanel.verticalMenuWidth  - 2*buttonPanel.mainMargin + openButton.width;
+        }
+        let y = openButton.y + openButton.height + 4;
+        return buttonPanel.mapToItem(null, x, y);
+    }
+
     PauseAnimation {
-        id: widthPause;
+        id: setModelPause;
 
         duration: 200;
 
+        onFinished: {
+            if(buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
+                buttonPanel.setModels();
+            }
+        }
+    }
+
+    PauseAnimation {
+        id: widthPause;
+
+        duration: 100;
+
 
         onFinished: {
+            if(buttonPanel.vertMenuItem){
+                var point = buttonPanel.getMenuPoint();
+
+                buttonPanel.vertMenuItem.x = point.x;
+                buttonPanel.vertMenuItem.y = point.y;
+
+            }
             if(buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
                 buttonPanel.setModels();
             }
@@ -200,6 +284,7 @@ Rectangle {
         let counted = false;
 
         var countAdded = 0;
+
 
         var maxHorWidth = Math.max(horizontalListViewContainer.width ,0)
 
@@ -232,7 +317,7 @@ Rectangle {
                     break;
                 }
                 else{
-                     countAdded_2++;
+                    countAdded_2++;
                 }
             }
         }
@@ -242,8 +327,6 @@ Rectangle {
         }
 
         buttonPanel.horizCount = countAdded_2;
-
-        //console.log("horizCount ",buttonPanel.horizCount);
 
         var count = buttonPanel.buttonModel.GetItemsCount();
         if(count <= buttonPanel.horizCount){
@@ -380,20 +463,17 @@ Rectangle {
 
     Repeater {
         id: buttonSizeRep;
+
         anchors.right: parent.right;
 
         width: 0; height: 0;
 
         visible: false;
-
-
         clip: true;
 
-        model: buttonPanel.buttonModel;
         delegate: buttonPanel.buttonDelegate;
 
         onItemAdded: {
-
             let okLength = buttonPanel.widthArr.length == 0 ? true :
                                                               buttonPanel.widthArr.length < buttonPanel.buttonModel.GetItemsCount();
 
@@ -401,32 +481,54 @@ Rectangle {
 
             let ok = item && width__ > 0 && okLength;
 
-
             if(ok){
                 buttonPanel.widthArr.push(width__);
 
-                if(width__ > buttonPanel.verticalMenuWidth){
-                    buttonPanel.verticalMenuWidth = width__;
-                }
-
-
-
-
+                //                if(width__ > buttonPanel.verticalMenuWidth){
+                //                    buttonPanel.verticalMenuWidth = width__;
+                //                }
             }
             item.width = 0;
             item.height = 0;
             item.visible = false;
         }
+    }
 
+    Repeater {
+        id: buttonSizeRepVert;
+
+        anchors.right: parent.right;
+
+        width: 0; height: 0;
+
+        visible: false;
+        clip: true;
+
+        delegate: buttonPanel.buttonDelegateVert;
+
+        onItemAdded: {
+            let width__ = item.width;
+
+            let ok = item && width__ > 0;
+
+            if(ok){
+                if(width__ > buttonPanel.verticalMenuWidth){
+                    buttonPanel.verticalMenuWidth = width__;
+                }
+            }
+            item.width = 0;
+            item.height = 0;
+            item.visible = false;
+        }
     }
 
     Rectangle{
         id: horizontalListViewContainer;
 
-        width: parent.width - openButton.width - openButton.anchors.rightMargin - buttonPanel.mainMargin -10;
+        width: parent.width - openButton.width - buttonPanel.mainMargin ;
         height: parent.height;
-        color: buttonPanel.baseColor;
         clip: true;
+        color: "transparent";
 
         ListView{
             id: horizontalListView;
@@ -449,14 +551,16 @@ Rectangle {
             delegate: buttonPanel.buttonDelegate;
 
         }//horizontalListView
+
+
     }//horizontalListViewContainer
 
     AuxButton{
         id: openButton;
 
-        anchors.bottom: parent.bottom;
-        anchors.right: parent.right;
-        anchors.rightMargin: buttonPanel.mainMargin;
+        anchors.verticalCenter: parent.verticalCenter;
+        anchors.left: horizontalListViewContainer.right;
+        anchors.leftMargin: buttonPanel.mainMargin;
 
         width: buttonPanel.openButtonWidth;
         height: buttonPanel.openButtonHeight;
@@ -467,19 +571,18 @@ Rectangle {
         iconSource: buttonPanel.openButtonImageSource;
         fontPixelSize: 30;
         fontColor: containsMouse ? "black" : "gray";
-        color: containsMouse || buttonPanel.openST ? buttonPanel.buttonColor : "transparent";
-        borderColor: "transparent";
-        highlighted: false;
+        pressed: buttonPanel.openST;
+        color: buttonPanel.openST ? Style.hover : defaultColor;
 
         visible: buttonPanel.buttonModel.GetItemsCount() > buttonPanel.horizCount;
 
         onClicked: {
+            var point = buttonPanel.getMenuPoint();
 
-            var point = buttonPanel.mapToItem(null, buttonPanel.width - buttonPanel.verticalMenuWidth - buttonPanel.mainMargin, buttonPanel.height + buttonPanel.mainMargin);
             modalDialogManager.openDialog(vertMenuComp, {
-                                                       "x":     point.x,
-                                                       "y":     point.y,
-                                                        });
+                                              "x":     point.x,
+                                              "y":     point.y,
+                                          });
 
             buttonPanel.vertMenuItem = modalDialogManager.topItem;
             buttonPanel.openST = true;
@@ -490,56 +593,56 @@ Rectangle {
 
 
     Component{
-      id: vertMenuComp;
+        id: vertMenuComp;
 
-      Rectangle{
-          id: verticalListViewContainer;
+        Rectangle{
+            id: verticalListViewContainer;
 
-          width: buttonPanel.verticalMenuWidth + 2*buttonPanel.mainMargin;
-          height: verticalListView.height + 1.5*buttonPanel.mainMargin;
-          radius: 4;
-          border.width: 1;
-          border.color: buttonPanel.shadowColor;
-          color: buttonPanel.baseColor;
-
-
-          clip: true;
-
-          property Item root: null;
-          property bool doNotCorrectPosition: true;
+            width: buttonPanel.verticalMenuWidth + 2*buttonPanel.mainMargin;
+            height: verticalListView.height + 1.5*buttonPanel.mainMargin;
+            radius: 4;
+            border.width: 1;
+            border.color: buttonPanel.shadowColor;
+            color: buttonPanel.baseColor;
 
 
-          onRootChanged: {
-              if(verticalListViewContainer.root){
-                  verticalListViewContainer.root.backgroundItem.opacity = 0;
-              }
-          }
+            clip: true;
 
-          ListView{
-              id: verticalListView;
-
-              anchors.horizontalCenter: parent.horizontalCenter;
-              anchors.top: parent.top;
-              anchors.topMargin: buttonPanel.mainMargin;
-
-              width: buttonPanel.verticalMenuWidth;
-              //height:  Math.min(contentHeight,(buttonPanel.delegateHeight * buttonPanel.visibleCount + spacing * (buttonPanel.visibleCount-1)));
-              height: contentHeight;
-
-              clip: true;
-              boundsBehavior: Flickable.StopAtBounds;
-
-              spacing: buttonPanel.verticalSpacing;
-
-              model: buttonPanel.verticalModel;
-
-              delegate: buttonPanel.buttonDelegate;
+            property Item root: null;
+            property bool doNotCorrectPosition: true;
 
 
+            onRootChanged: {
+                if(verticalListViewContainer.root){
+                    verticalListViewContainer.root.backgroundItem.opacity = 0;
+                }
+            }
 
-          }//verticalListView
+            ListView{
+                id: verticalListView;
 
-      }//verticalListViewContainer
+                anchors.horizontalCenter: parent.horizontalCenter;
+                anchors.top: parent.top;
+                anchors.topMargin: buttonPanel.mainMargin;
+
+                width: buttonPanel.verticalMenuWidth;
+                //height:  Math.min(contentHeight,(buttonPanel.delegateHeight * buttonPanel.visibleCount + spacing * (buttonPanel.visibleCount-1)));
+                height: contentHeight;
+
+                clip: true;
+                boundsBehavior: Flickable.StopAtBounds;
+
+                spacing: buttonPanel.verticalSpacing;
+
+                model: buttonPanel.verticalModel;
+
+                delegate: buttonPanel.buttonDelegateVert;
+
+
+
+            }//verticalListView
+
+        }//verticalListViewContainer
     }
 
 }
