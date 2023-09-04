@@ -59,6 +59,8 @@ Item {
 
                     enabled: model.IsEnabled;
 
+                    visible: model.Visible;
+
 //                    tooltipText: model.Name;
 
                     property string commandId: model.Id;

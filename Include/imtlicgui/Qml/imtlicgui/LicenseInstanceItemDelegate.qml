@@ -19,6 +19,8 @@ Rectangle {
     property string licenseId: model.Id ? model.Id : "";
     property string licenseName: model.Name ? model.Name : "";
 
+    property bool readOnly: false;
+
     signal stateChanged();
     signal dateChanged();
 
@@ -44,7 +46,13 @@ Rectangle {
 
                 checkState: model.LicenseState ? model.LicenseState : Qt.Unchecked;
 
+                isActive: !root.readOnly;
+
                 onClicked: {
+                    if (root.readOnly){
+                        return;
+                    }
+
                     console.log("TableInstanceLicensesDelegate CheckBox onClicked");
                     model.LicenseState = Qt.Checked - model.LicenseState;
 
@@ -110,7 +118,13 @@ Rectangle {
 
                 checkState: model.ExpirationState;
 
+                isActive: !root.readOnly;
+
                 onClicked: {
+                    if (root.readOnly){
+                        return;
+                    }
+
                     model.ExpirationState = 2 - checkBoxExpiration.checkState;
 
                     if (model.ExpirationState === Qt.Checked){
