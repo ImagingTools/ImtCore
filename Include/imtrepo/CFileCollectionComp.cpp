@@ -936,7 +936,6 @@ QString CFileCollectionComp::CalculateFolderPathInRepository(
 }
 
 
-
 QString CFileCollectionComp::CalculateTargetFilePath(
 			const QString& filePath,
 			const QString& objectName,

@@ -43,12 +43,12 @@ namespace imtrepo
 	Base class of the file collection. General implementation
 */
 class CFileRepositoryComp:
-			public QObject,
 			public ilog::CLoggerComponentBase,
 			virtual public IFileObjectCollection,
 			virtual public imtbase::IObjectCollection::IDataFactory
 {
-	Q_OBJECT
+	Q_DECLARE_TR_FUNCTIONS(CFileRepositoryComp);
+
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 

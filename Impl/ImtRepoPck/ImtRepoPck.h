@@ -9,6 +9,7 @@
 #include <imtrepo/CFileCollectionComp.h>
 #include <imtrepo/CFileTransformationControllerComp.h>
 #include <imtrepo/CRepositoryFileTransformationCompBase.h>
+#include <imtrepo/CFileRepositoryComp.h>
 
 
 /**
@@ -21,6 +22,7 @@ namespace ImtRepoPck
 typedef icomp::TModelCompWrap<imtrepo::CFileCollectionComp> FileCollection;
 typedef imtrepo::CFileTransformationControllerComp FileTransformationController;
 typedef imtrepo::CRepositoryFileTransformationCompBase RepositoryFileTransformationCompBase;
+typedef icomp::TModelCompWrap<imtrepo::CFileRepositoryComp> FileRepository;
 
 
 } // namespace ImtRepoPck
