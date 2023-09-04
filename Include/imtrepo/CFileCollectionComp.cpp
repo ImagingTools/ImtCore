@@ -936,6 +936,31 @@ QString CFileCollectionComp::CalculateFolderPathInRepository(
 }
 
 
+
+QString CFileCollectionComp::CalculateTargetFilePath(
+			const QString& filePath,
+			const QString& objectName,
+			const QByteArray& typeId) const
+{
+	ilog::IMessageConsumer* logPtr = GetLogPtr();
+
+	if (QFile(filePath).exists()){
+		QString targetFolderPath = CalculateFolderPathInRepository(filePath, objectName, typeId, logPtr);
+		if (!targetFolderPath.isEmpty()){
+			return CalculateTargetFilePath(targetFolderPath, filePath);
+		}
+		else{
+			SendErrorMessage(0, QObject::tr("Collection folder for the input file '%1' could not be calculated").arg(filePath));
+		}
+	}
+	else{
+		SendErrorMessage(0, QObject::tr("Input file '%1' doesn't exist").arg(filePath));
+	}
+
+	return QString();
+}
+
+
 QString CFileCollectionComp::CalculateTargetFilePath(
 			const QString& targetFolderPath,
 			const QString& localFilePath) const
@@ -992,30 +1017,6 @@ void CFileCollectionComp::OnComponentCreated()
 void CFileCollectionComp::OnComponentDestroyed()
 {
 	BaseClass::OnComponentDestroyed();
-}
-
-
-QString CFileCollectionComp::CalculateTargetFilePath(
-			const QString& filePath,
-			const QString& objectName,
-			const QByteArray& typeId) const
-{
-	ilog::IMessageConsumer* logPtr = GetLogPtr();
-
-	if (QFile(filePath).exists()){
-		QString targetFolderPath = CalculateFolderPathInRepository(filePath, objectName, typeId, logPtr);
-		if (!targetFolderPath.isEmpty()){
-			return CalculateTargetFilePath(targetFolderPath, filePath);
-		}
-		else{
-			SendErrorMessage(0, QObject::tr("Collection folder for the input file '%1' could not be calculated").arg(filePath));
-		}
-	}
-	else{
-		SendErrorMessage(0, QObject::tr("Input file '%1' doesn't exist").arg(filePath));
-	}
-
-	return QString();
 }
 
 
