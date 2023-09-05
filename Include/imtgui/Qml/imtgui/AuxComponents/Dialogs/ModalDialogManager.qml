@@ -86,6 +86,8 @@ Item {
                 property real  mainWindowWidth_prev: 0;
                 property real  mainWindowHeight_prev: 0;
 
+                clip: false;
+
                 onMainWindowWidthChanged: {
                     if(dialogLoader.item && !dialogLoader.item.doNotCorrectPosition){
                         if(dialogLoader.item && dialogLoader.item.centered){
