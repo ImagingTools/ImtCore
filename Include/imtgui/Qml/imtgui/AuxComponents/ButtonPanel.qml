@@ -203,6 +203,9 @@ Rectangle {
 
     }
 
+    function updateModel(){
+        setModelPause.restart();
+    }
 
 
     function onBackgroundClicked(){

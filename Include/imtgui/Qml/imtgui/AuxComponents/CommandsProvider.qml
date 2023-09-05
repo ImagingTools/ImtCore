@@ -34,6 +34,7 @@ QtObject {
 
     onCommandModeChanged: {
         Events.sendEvent("CommandsEnabledChanged", {"CommandsId":commandsProviderContainer.documentUuid, "CommandId":commandId, "Enabled":newMode, "Model": commandsProviderContainer.commandsModel});
+        commandsProviderContainer.updateGui();
     }
 
     function updateModel(){
@@ -57,6 +58,7 @@ QtObject {
                     commandsProviderContainer.commandsModel.SetData("IsEnabled", isEnabled, i);
 
                     commandsProviderContainer.commandModeChanged(commandId, isEnabled);
+
                 }
             }
         }

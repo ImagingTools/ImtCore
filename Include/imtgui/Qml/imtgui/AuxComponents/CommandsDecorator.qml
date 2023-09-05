@@ -25,6 +25,7 @@ Item {
 
         commandsDecoratorContainer.commandsId = commId;
         buttonPanel.buttonModel = model;
+        buttonPanel.updateModel();
     }
 
     function clearModel(){
