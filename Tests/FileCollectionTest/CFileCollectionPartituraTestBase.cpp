@@ -1,7 +1,9 @@
 #include "CFileCollectionPartituraTestBase.h"
 
+
 // ImtCore includes
 #include <imtrepo/IFileObjectCollection.h>
+#include <imtrepo/CFileCollectionItem.h>
 #include <imtauth/CAccountInfo.h>
 
 
@@ -429,8 +431,9 @@ void CFileCollectionPartituraTestBase::GetFileInfoTest()
 			if (!idInsertedObject.isEmpty()){
 
 				// get info of inserted file
-				imtrepo::IFileObjectCollection::FileInfo fileInfo = fileCollectionPtr->GetFileInfo(idInsertedObject);
-				if (QFile::exists(fileInfo.filePath)){
+				imtrepo::CFileCollectionItem fileItem;
+				fileCollectionPtr->GetFileInfo(idInsertedObject, fileItem);
+				if (QFile::exists(fileItem.GetFilePath())){
 
 					// read data of file for insert
 					QFile fileForInsert(pathToInsertFile);
@@ -439,14 +442,15 @@ void CFileCollectionPartituraTestBase::GetFileInfoTest()
 					fileForInsert.close();
 
 					// read data of file from fileinfo
-					QFile referenceFile(fileInfo.filePath);
+					QFile referenceFile(fileItem.GetFilePath());
 					referenceFile.open(QIODevice::ReadOnly);
 					QByteArray dataReferenceFile = referenceFile.readAll();
 					referenceFile.close();
 
 					// check GetFileInfo()
 					QCOMPARE(dataReferenceFile, dataOfFileForInsert);
-					QVERIFY2(fileInfo.fileName.contains(nameInsertFile), "FileInfo have incorrect filename, GetFileInfo failed");
+
+					QVERIFY2(fileItem.GetName().contains(nameInsertFile), "FileInfo have incorrect filename, GetFileInfo failed");
 				}
 				else{
 					QFAIL("Inserted file have incorrect path to file in info, GetFileInfo() is failed");
