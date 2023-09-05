@@ -27,6 +27,7 @@ export class Image extends Item {
         this.$cP('progress', 0, this.$progressChanged)
         this.$cP('fillMode', Image.Stretch, this.$fillModeChanged)
         this.$cP('source', '', this.$sourceChanged)
+        this.$cP('status', Image.Null)
 
         this.$cPC('sourceSize', {
             width: 0,
