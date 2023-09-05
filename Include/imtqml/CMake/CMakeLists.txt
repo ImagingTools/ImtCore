@@ -1,5 +1,5 @@
 project(imtqml LANGUAGES CXX)
-set (CMAKE_CXX_STANDARD 11)
+# set (CMAKE_CXX_STANDARD 11)
 
 find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS QuickWidgets REQUIRED)
 

@@ -2,13 +2,15 @@ project(ImtCoreObjectCollectionTest)
 
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
+
+target_link_libraries(${PROJECT_NAME} itest ipackage imtbase imtauth imtdb imttest)
+
 include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test)
 
 target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Test)
-target_link_libraries(${PROJECT_NAME} itest ipackage imtbase imtauth imtdb imttest)
 
 imtcore_generate_tests(${TESTS_DIR}/ObjectCollectionTest)
 file(COPY Migrations DESTINATION ${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
