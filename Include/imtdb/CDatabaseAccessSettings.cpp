@@ -70,6 +70,22 @@ void CDatabaseAccessSettings::SetDatabaseName(const QString& databaseName)
 }
 
 
+QString CDatabaseAccessSettings::GetDatabasePath() const
+{
+	return m_databasePath;
+}
+
+
+void CDatabaseAccessSettings::SetDatabasePath(const QString& databasePath)
+{
+	if (m_databasePath != databasePath){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_databasePath = databasePath;
+	}
+}
+
+
 QString CDatabaseAccessSettings::GetUserName() const
 {
 	return m_userName;
@@ -132,6 +148,11 @@ bool CDatabaseAccessSettings::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(passwordTag);
 	retVal = retVal && archive.Process(m_password);
 	retVal = retVal && archive.EndTag(passwordTag);
+
+	static iser::CArchiveTag databasePathTag("DatabasePath", "Database Path", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(databasePathTag);
+	retVal = retVal && archive.Process(m_databasePath);
+	retVal = retVal && archive.EndTag(databasePathTag);
 
 	return retVal;
 }

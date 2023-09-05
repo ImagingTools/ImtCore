@@ -24,6 +24,8 @@ public:
 	virtual void SetPort(int port) override;
 	virtual QString GetDatabaseName() const override;
 	virtual void SetDatabaseName(const QString& databaseName) override;
+	virtual QString GetDatabasePath() const override;
+	virtual void SetDatabasePath(const QString& databasePath) override;
 	virtual QString GetUserName() const override;
 	virtual void SetUserName(const QString& userName) override;
 	virtual QString GetPassword() const override;
@@ -43,6 +45,7 @@ protected:
 	QString m_host;
 	int m_port;
 	QString m_databaseName;
+	QString m_databasePath;
 	QString m_userName;
 	QString m_password;
 };

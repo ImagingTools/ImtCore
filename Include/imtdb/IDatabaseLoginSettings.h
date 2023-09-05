@@ -24,6 +24,8 @@ public:
 	virtual void SetPort(int port) = 0;
 	virtual QString GetDatabaseName() const = 0;
 	virtual void SetDatabaseName(const QString& databaseName) = 0;
+	virtual QString GetDatabasePath() const = 0;
+	virtual void SetDatabasePath(const QString& databasePath) = 0;
 	virtual QString GetUserName() const = 0;
 	virtual void SetUserName(const QString& userName) = 0;
 	virtual QString GetPassword() const = 0;

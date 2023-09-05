@@ -222,6 +222,9 @@ bool CDatabaseEngineComp::OpenDatabase() const
 	if (m_dbTypeAttrPtr->GetValue().compare(QByteArray("QODBC"), Qt::CaseInsensitive) == 0){
 
 	}
+	else if (m_dbTypeAttrPtr->GetValue().compare(QByteArray("QSQLITE"), Qt::CaseInsensitive) == 0){
+		 databaseName = GetDatabasePath();
+	}
 	else {
 		databaseConnection.setHostName(GetHostName());
 		databaseConnection.setUserName(GetUserName());
@@ -509,6 +512,8 @@ QString CDatabaseEngineComp::GetConnectionName() const
 {
 	qptrdiff threadId = (qptrdiff)QThread::currentThreadId();
 
+	qDebug() << QString("GetConnectionName - %1").arg(threadId);
+
 	return GetDatabaseName() + QString(" - %1").arg(threadId);
 }
 
@@ -520,6 +525,16 @@ QString CDatabaseEngineComp::GetDatabaseName() const
 	}
 
 	return *m_dbNameAttrPtr;
+}
+
+
+QString CDatabaseEngineComp::GetDatabasePath() const
+{
+	if (m_databaseAccessSettingsCompPtr.IsValid()){
+		return m_databaseAccessSettingsCompPtr->GetDatabasePath();
+	}
+
+	return *m_dbPathAttrPtr;
 }
 
 

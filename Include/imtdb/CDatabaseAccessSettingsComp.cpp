@@ -12,6 +12,7 @@ void CDatabaseAccessSettingsComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 
 	BaseClass2::SetDatabaseName(*m_dbNameAttrPtr);
+	BaseClass2::SetDatabasePath(*m_dbPathAttrPtr);
 	BaseClass2::SetUserName(*m_userNameAttrPtr);
 	BaseClass2::SetPassword(*m_paswordAttrPtr);
 	BaseClass2::SetHost(*m_hostNameAttrPtr);

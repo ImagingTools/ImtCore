@@ -46,6 +46,7 @@ public:
 		I_ASSIGN(m_databaseAccessSettingsCompPtr, "DatabaseAccessSettings", "Settings for database access", false, "DatabaseAccessSettings");
 		I_ASSIGN(m_dbTypeAttrPtr, "DbType", "The property holds database connections using the driver", true, "QPSQL");
 		I_ASSIGN(m_dbNameAttrPtr, "DbName", "The property holds connection's database name", true, "postgres");
+		I_ASSIGN(m_dbPathAttrPtr, "DbPath", "The property holds connection's database path", true, "");
 		I_ASSIGN(m_userNameAttrPtr, "UserName", "The property holds connection's user name", true, "postgres");
 		I_ASSIGN(m_paswordAttrPtr, "Pasword", "The property holds connection's password.", true, "12345");
 		I_ASSIGN(m_hostNameAttrPtr, "HostName", "The property holds connection's host name.", true, "localhost");
@@ -98,6 +99,7 @@ private:
 	bool EnsureDatabaseCreated() const;
 
 	QString GetDatabaseName() const;
+	QString GetDatabasePath() const;
 	QString GetHostName() const;
 	int GetPort() const;
 	QString GetUserName() const;
@@ -115,6 +117,7 @@ private:
 	I_REF(imtdb::IDatabaseLoginSettings, m_databaseAccessSettingsCompPtr);
 	I_ATTR(QByteArray, m_dbTypeAttrPtr);
 	I_ATTR(QByteArray, m_dbNameAttrPtr);
+	I_ATTR(QByteArray, m_dbPathAttrPtr);
 	I_ATTR(QByteArray, m_userNameAttrPtr);
 	I_ATTR(QByteArray, m_paswordAttrPtr);
 	I_ATTR(QByteArray, m_hostNameAttrPtr);
