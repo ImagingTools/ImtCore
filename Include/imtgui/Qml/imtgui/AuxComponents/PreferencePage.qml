@@ -53,12 +53,6 @@ Rectangle {
         Events.unSubscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
     }
 
-    onApplicationInfoProviderChanged: {
-        if (container.applicationInfoProvider != null){
-
-        }
-    }
-
     onVisibleChanged: {
         console.log("onVisibleChanged settingsProvider", container.settingsProvider);
         if (visible){
@@ -77,6 +71,7 @@ Rectangle {
 
             updateCommonModel(container.serverModel);
 
+            aboutApplicationProvider.createRepresentationModel();
             updateCommonModel(aboutApplicationProvider.pageModel);
 
             if (container.settingsProvider){

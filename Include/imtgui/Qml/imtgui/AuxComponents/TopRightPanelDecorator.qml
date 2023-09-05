@@ -33,6 +33,7 @@ Rectangle {
 
     UserPanel {
         id: userPanel;
+
         anchors.verticalCenter: parent.verticalCenter;
 
         visible: false;

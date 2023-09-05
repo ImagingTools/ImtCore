@@ -15,7 +15,8 @@ namespace imtqml
 
 
 CObserverQmlComp::CObserverQmlComp()
-	:m_settingsModelPtr(nullptr)
+	:m_settingsModelPtr(nullptr),
+	m_applicationInfoModelPtr(nullptr)
 {
 }
 
@@ -40,7 +41,12 @@ void CObserverQmlComp::ApplyUrl() const
 		serverUrl = serverUrlDataPtr->GetText();
 	}
 
-	engine->setBaseUrl(serverUrl + *m_prefixServer);
+	QUrl url = engine->baseUrl();
+	QUrl newUrl = serverUrl + *m_prefixServer;
+
+	engine->setBaseUrl(newUrl);
+
+	SendInfoMessage(0, QString("Server URL changed from %1 to %2").arg(url.toString()).arg(newUrl.toString()));
 }
 
 
@@ -60,15 +66,17 @@ void CObserverQmlComp::UpdateLanguage() const
 	if (languageParamPtr.IsValid()){
 		const iprm::IOptionsList* optionListPtr = languageParamPtr->GetSelectionConstraints();
 		if (optionListPtr != nullptr){
-            int index = languageParamPtr->GetSelectedOptionIndex();
+			int index = languageParamPtr->GetSelectedOptionIndex();
 			if (index >= 0){
 				m_translationManagerCompPtr->SwitchLanguage(index);
 
 				if (enginePtr != nullptr){
 					enginePtr->retranslate();
-                    QString langId =  m_translationManagerCompPtr->GetLanguagesInfo().GetOptionId(index);
+					QString langId =  m_translationManagerCompPtr->GetLanguagesInfo().GetOptionId(index);
 
-                    QMetaObject::invokeMethod(quickItem, "onLocalizationChanged", Qt::AutoConnection, Q_ARG(QVariant, langId));
+					SendInfoMessage(0, QString("Localization changed to %1").arg(langId));
+
+					QMetaObject::invokeMethod(quickItem, "onLocalizationChanged", Qt::AutoConnection, Q_ARG(QVariant, langId));
 				}
 			}
 		}
@@ -92,6 +100,7 @@ void CObserverQmlComp::OnComponentCreated()
 				bool result = m_settingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*m_settingsCompPtr, *m_settingsModelPtr);
 				if (result){
 					m_applicationInfoModelPtr = new imtbase::CTreeItemModel();
+
 					if (m_applicationInfoCompPtr.IsValid() && m_applicationInfoRepresentationCompPtr.IsValid()){
 						if (m_applicationInfoRepresentationCompPtr->GetRepresentationFromApplicationInfo(*m_applicationInfoCompPtr, *m_applicationInfoModelPtr)){
 							QVariant data = QVariant::fromValue(m_applicationInfoModelPtr);
@@ -130,6 +139,12 @@ void CObserverQmlComp::OnComponentDestroyed()
 		delete m_settingsModelPtr;
 
 		m_settingsModelPtr = nullptr;
+	}
+
+	if (m_applicationInfoModelPtr != nullptr){
+		delete m_applicationInfoModelPtr;
+
+		m_applicationInfoModelPtr = nullptr;
 	}
 
 	BaseClass::OnComponentDestroyed();

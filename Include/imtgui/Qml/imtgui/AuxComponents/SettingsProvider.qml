@@ -62,6 +62,10 @@ QtObject {
     }
 
     function rewriteModel(fromModel, toModel){
+        if (!fromModel || !toModel){
+            return;
+        }
+
         for (let i = 0; i < toModel.GetItemsCount(); i++){
             let pageId = toModel.GetData("Id", i);
             let index = -1;

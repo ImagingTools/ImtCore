@@ -240,7 +240,10 @@ FocusScope {
 			cursorShape: comboBoxContainer.changeable ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
 			onClicked: {
-                if (comboBoxContainer.changeable && comboBoxContainer.model !==undefined && comboBoxContainer.model.GetItemsCount() > 0){
+//                comboBoxContainer.forceActiveFocus();
+                comboBoxContainer.focus = true
+
+                if (comboBoxContainer.changeable && comboBoxContainer.model !==undefined && comboBoxContainer.model !== null && comboBoxContainer.model.GetItemsCount() > 0){
 					comboBoxContainer.openPopupMenu();
 				}
 

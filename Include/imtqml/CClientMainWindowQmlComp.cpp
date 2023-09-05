@@ -20,8 +20,10 @@ void CClientMainWindowQmlComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_systemStatusCompPtr.IsValid()){
-		m_systemStatusObserver.RegisterObject(m_systemStatusCompPtr.GetPtr(), &CClientMainWindowQmlComp::OnSystemStatusUpdate);
+	if (m_checkSystemStatusAttrPtr.IsValid() && *m_checkSystemStatusAttrPtr){
+		if (m_systemStatusCompPtr.IsValid()){
+			m_systemStatusObserver.RegisterObject(m_systemStatusCompPtr.GetPtr(), &CClientMainWindowQmlComp::OnSystemStatusUpdate);
+		}
 	}
 }
 
@@ -37,8 +39,8 @@ void CClientMainWindowQmlComp::OnComponentDestroyed()
 // private methods
 
 void CClientMainWindowQmlComp::OnSystemStatusUpdate(
-		const istd::IChangeable::ChangeSet& /*changeSet*/,
-		const imtbase::ISystemStatus* objectPtr)
+			const istd::IChangeable::ChangeSet& /*changeSet*/,
+			const imtbase::ISystemStatus* objectPtr)
 {
 	if (objectPtr == nullptr){
 		return;
@@ -81,12 +83,12 @@ void CClientMainWindowQmlComp::OnSystemStatusUpdate(
 		}
 
 		QMetaObject::invokeMethod(quickItem, "setSystemStatus",
-								Q_ARG(QVariant, QVariant::fromValue(statusStr)),
-								Q_ARG(QVariant, QVariant::fromValue(error)));
-	} // namespace imtqml
+					Q_ARG(QVariant, QVariant::fromValue(statusStr)),
+					Q_ARG(QVariant, QVariant::fromValue(error)));
+	}
 }
 
 
-}
+} // namespace imtqml
 
 

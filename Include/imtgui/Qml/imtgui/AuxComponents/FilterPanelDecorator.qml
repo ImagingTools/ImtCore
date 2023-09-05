@@ -10,6 +10,8 @@ Item {
 
     property Item rootLoader: null;
 
+    property alias textInputWidth: tfc.width;
+
     function calcWidth(){
         console.log("calcWidth");
 

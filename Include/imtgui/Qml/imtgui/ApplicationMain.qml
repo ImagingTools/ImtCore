@@ -12,6 +12,15 @@ Item {
     property string systemStatus: "UNKNOWN_ERROR";
     property alias localSettings: application.settingsProvider.localModel;
 
+//    property alias applicationInfo: applicationInfoProvider.clientApplicationInfo;
+    property var applicationInfo;
+
+    onApplicationInfoChanged: {
+        if (application.applicationInfo){
+            applicationInfoProvider.clientApplicationInfo = application.applicationInfo;
+        }
+    }
+
     signal settingsUpdate();
     signal localSettingsUpdated();
 
@@ -21,6 +30,7 @@ Item {
 
     Component.onCompleted: {
         Events.subscribeEvent("UpdateModels", application.updateAllModels);
+        Events.subscribeEvent("Logout", application.onLogout);
 
         thumbnailDecorator.userManagementProvider.updated.connect(application.onUserModeChanged);
 
@@ -29,12 +39,7 @@ Item {
 
     Component.onDestruction: {
         Events.unSubscribeEvent("UpdateModels", application.updateAllModels);
-    }
-
-    onSystemStatusChanged: {
-        console.log("onSystemStatusChanged", application.systemStatus);
-
-        application.run();
+        Events.unSubscribeEvent("Logout", application.onLogout);
     }
 
     property alias thumbnailDecoratorGui: thumbnailDecorator;
@@ -111,6 +116,10 @@ Item {
         applicationInfoProvider: application.applicationInfoProvider;
     }
 
+    function onLogout(){
+//        application.applicationInfoProvider.serverApplicationInfo = null;
+    }
+
     function onLocalizationChanged(language){
         console.log("Main onLocalizationChanged", language);
         Events.sendEvent("OnLocalizationChanged", language);
@@ -121,28 +130,8 @@ Item {
         applicationInfoProvider.updateModel();
     }
 
-    function onUserModeChanged(){
-        application.run();
-    }
-
-    function run(){
-        console.log("run");
-
-        let userMode = thumbnailDecorator.userManagementProvider.userMode;
-        let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
-
-        // If no user management - update all model without login
-        if (userMode == "NO_USER_MANAGEMENT" || userMode == "OPTIONAL_USER_MANAGEMENT"){
-            application.onSimpleUserManagement();
-        }
-        else if (userMode == "STRONG_USER_MANAGEMENT"){
-            application.onStrongUserManagement();
-        }
-    }
-
     function onSimpleUserManagement(){
         let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
-
         if (loggedUserId === ""){
             thumbnailDecorator.authorizationPageAlias.setLoggedUserId("Anonim");
 
@@ -152,35 +141,41 @@ Item {
 
     function onStrongUserManagement(){
         let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
-
-        if (application.systemStatus == "NO_ERROR"){
-            thumbnailDecorator.errorPage.visible = false;
-
-            // If user is logged in the system - continue, else check supeuser
-            if (loggedUserId === ""){
-                thumbnailDecorator.superuserProvider.superuserExists();
-            }
-        }
-        else{
-            application.showErrorPage(application.message);
+        if (loggedUserId === ""){
+            thumbnailDecorator.superuserProvider.superuserExists();
         }
     }
 
     function setSystemStatus(status, message){
         console.log("setSystemStatus", status, message);
         application.message = message;
-
         application.systemStatus = status;
-    }
 
-    function showErrorPage(errorMessage){
-        console.log("showErrorPage", errorMessage);
+        if (application.systemStatus == "NO_ERROR"){
+            thumbnailDecorator.errorPage.visible = false;
 
-        if (errorMessage && errorMessage !== ""){
-            thumbnailDecorator.errorPage.text = errorMessage;
+            let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
+            if (loggedUserId === ""){
+                thumbnailDecorator.closeAllPages();
+
+                firstModelsInit();
+            }
         }
+        else if (application.systemStatus == "UNKNOWN_ERROR"){
 
-        thumbnailDecorator.errorPage.visible = true;
+        }
+        else if (application.systemStatus == "CONNECTION_ERROR"){
+            thumbnailDecorator.closeAllPages();
+
+            thumbnailDecorator.errorPage.text = qsTr("Server connection error. Please check the server URL in the settings.");
+            thumbnailDecorator.errorPage.visible = true;
+        }
+        else if (application.systemStatus == "DATABASE_CONNECTION_ERROR"){
+            thumbnailDecorator.closeAllPages();
+
+            thumbnailDecorator.errorPage.text = message;
+            thumbnailDecorator.errorPage.visible = true;
+        }
     }
 
     function firstModelsInit(){
@@ -188,6 +183,17 @@ Item {
         thumbnailDecorator.userManagementProvider.updateModel();
     }
 
+    function onUserModeChanged(){
+        let userMode = thumbnailDecorator.userManagementProvider.userMode;
+        let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
+
+        if (userMode == "NO_USER_MANAGEMENT" || userMode == "OPTIONAL_USER_MANAGEMENT"){
+            application.onSimpleUserManagement();
+        }
+        else if (userMode == "STRONG_USER_MANAGEMENT"){
+            application.onStrongUserManagement();
+        }
+    }
 //    Connections {
 //        target: Qt.application;
 

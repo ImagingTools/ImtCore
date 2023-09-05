@@ -21,6 +21,8 @@ Rectangle {
     property int mainRadius: 0;
 
     property alias authorizationPageAlias: authorizationPage;
+    property alias superuserPasswordPageAlias: superuserPasswordPage;
+
     property alias preferencePage: preferenceDialog;
     property alias userManagementProvider: userManagement;
     property alias documentManager: mainDocumentManager;
@@ -44,6 +46,7 @@ Rectangle {
 
     property SuperuserProvider superuserProvider : SuperuserProvider {
         onResult: {
+            console.log("SuperuserProvider onResult", exists);
             if (exists){
                 authorizationPage.visible = true;
             }
@@ -65,6 +68,14 @@ Rectangle {
 
     function updateModels(){
         pagesManager.updateModel();
+    }
+
+    function closeAllPages(){
+        authorizationPage.visible = false;
+        superuserPasswordPage.visible = false;
+        loading.visible = false;
+        serverNoConnectionView.visible = false;
+        preferenceDialog.visible = false;
     }
 
     function onLogout(){
@@ -180,6 +191,7 @@ Rectangle {
 
         onVisibleChanged: {
             Events.sendEvent("SetCommandsVisible", !visible);
+            Events.sendEvent("SetUserPanelVisible", !visible);
         }
     }
 
@@ -266,12 +278,6 @@ Rectangle {
 
     UserManagementProvider {
         id: userManagement;
-
-//        onUpdated: {
-//            if (userMode == "NO_USER_MANAGEMENT" || userMode == "OPTIONAL_USER_MANAGEMENT"){
-//                Events.sendEvent("UpdateModels");
-//            }
-//        }
     }
 
     ShortcutManager {
@@ -288,25 +294,25 @@ Rectangle {
         visible: false;
     }
 
-    Component {
-        id: saveDialog;
-        MessageDialog {
-            title: qsTr("Save dirty documents");
-            message: qsTr("Save all dirty documents ?");
-            Component.onCompleted: {
-                buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true});
-            }
+//    Component {
+//        id: saveDialog;
+//        MessageDialog {
+//            title: qsTr("Save dirty documents");
+//            message: qsTr("Save all dirty documents ?");
+//            Component.onCompleted: {
+//                buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true});
+//            }
 
-            onFinished: {
-                if (buttonId == "Yes"){
-                    documentManager.saveDirtyDocuments();
-                }
-                else if (buttonId == "No"){
-                    documentManager.closeAllDocuments();
+//            onFinished: {
+//                if (buttonId == "Yes"){
+//                    documentManager.saveDirtyDocuments();
+//                }
+//                else if (buttonId == "No"){
+//                    documentManager.closeAllDocuments();
 
-                   // onLogout();
-                }
-            }
-        }
-    }
+//                   // onLogout();
+//                }
+//            }
+//        }
+//    }
 }

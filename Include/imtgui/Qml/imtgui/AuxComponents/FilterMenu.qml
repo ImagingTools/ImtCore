@@ -73,4 +73,10 @@ Rectangle {
             filterContainer.decoratorLoaded();
         }
     }
+
+    function setTextInputWidth(width){
+        if (loaderDecoratorObj.item && loaderDecoratorObj.item.textInputWidth !==undefined){
+            loaderDecoratorObj.item.textInputWidth = width;
+        }
+    }
 }

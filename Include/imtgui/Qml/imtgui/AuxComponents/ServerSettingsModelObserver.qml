@@ -18,6 +18,8 @@ TreeItemModelObserver {
             let changeObj = changeList[i]
             let changeId = changeObj["id"];
 
+            console.log("changeId", changeId)
+
             let ids = changeId.split('/')
             if (ids.includes("Language")){
                 let language = languageProvider.getLanguage()
@@ -32,6 +34,8 @@ TreeItemModelObserver {
             }
             else if (ids.includes("Database")){
                 Events.sendEvent("UpdateModels");
+            }
+            else if (ids.includes("ServerUrl")){
             }
         }
     }

@@ -18,12 +18,14 @@ Item {
     property bool isExitButton: false;
 
     Component.onCompleted: {
+        Events.subscribeEvent("SetUserPanelVisible", root.setVisible);
         Events.subscribeEvent("Logout", root.onLogout);
         Events.subscribeEvent("Login", root.onLogin);
         Events.subscribeEvent("OnLocalizationChanged", root.onLocalizationChanged);
     }
 
     Component.onDestruction: {
+        Events.unSubscribeEvent("SetUserPanelVisible", root.setVisible);
         Events.unSubscribeEvent("Logout", root.onLogout);
         Events.unSubscribeEvent("Login", root.onLogin);
         Events.unSubscribeEvent("OnLocalizationChanged", root.onLocalizationChanged);
@@ -35,6 +37,10 @@ Item {
         root.passwordHash = "";
 
         root.enabled = false;
+    }
+
+    function setVisible(visible){
+        root.visible = visible;
     }
 
     function onLogin(loginData){
