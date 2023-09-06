@@ -105,7 +105,10 @@ void TClientRequestManagerCompWrap<Base>::Response::OnReply(const imtgql::IGqlRe
 
 					m_replyResultPtr = new imtbase::CTreeItemModel();
 
-					m_replyResultPtr->CreateFromJson(parserData);
+					bool ok = m_replyResultPtr->CreateFromJson(parserData);
+					if (!ok){
+						qDebug() << QString("Error when try create model from json: %1").arg(qPrintable(parserData));
+					}
 				}
 			}
 		}

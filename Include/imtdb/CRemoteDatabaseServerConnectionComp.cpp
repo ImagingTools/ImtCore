@@ -13,11 +13,14 @@ namespace imtdb
 
 bool CRemoteDatabaseServerConnectionComp::IsDatabaseServerConnected(QString& errorMessage) const
 {
-	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, "GetDatabaseStatus");
+	QByteArray commandID = m_commandIdAttrPtr.IsValid() ? *m_commandIdAttrPtr : "GetDatabaseStatus";
+
+	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, commandID);
 
 	imtbase::CTreeItemModel responseModel;
 	bool retVal = SendModelRequest(request, responseModel);
 	if (retVal){
+		QString json = responseModel.toJSON();
 		if (responseModel.ContainsKey("errors")){
 			imtbase::CTreeItemModel* errorsModelPtr = responseModel.GetTreeItemModel("errors");
 			if (errorsModelPtr != nullptr){

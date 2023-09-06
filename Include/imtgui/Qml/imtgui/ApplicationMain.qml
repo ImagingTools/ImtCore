@@ -167,7 +167,8 @@ Item {
         else if (application.systemStatus == "CONNECTION_ERROR"){
             thumbnailDecorator.closeAllPages();
 
-            thumbnailDecorator.errorPage.text = qsTr("Server connection error. Please check the server URL in the settings.");
+//            thumbnailDecorator.errorPage.text = qsTr("Server connection error. Please check the server URL in the settings.");
+            thumbnailDecorator.errorPage.text = message;
             thumbnailDecorator.errorPage.visible = true;
         }
         else if (application.systemStatus == "DATABASE_CONNECTION_ERROR"){
@@ -180,7 +181,9 @@ Item {
 
     function firstModelsInit(){
         console.log("firstModelsInit");
-        thumbnailDecorator.userManagementProvider.updateModel();
+        if (application.systemStatus == "NO_ERROR"){
+            thumbnailDecorator.userManagementProvider.updateModel();
+        }
     }
 
     function onUserModeChanged(){

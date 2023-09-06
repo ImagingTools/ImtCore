@@ -90,15 +90,15 @@ QtObject {
                         dataModelLocal = dataModelLocal.GetData("UserMode");
                     }
 
-                    if (dataModelLocal.ContainsKey("DatabaseConnectionState")){
-                        let databaseState = dataModelLocal.GetData("DatabaseConnectionState");
-                        if (databaseState === false){
-                            let message = qsTr("Please сheck the data to connect to the database");
-                            modalDialogManager.openDialog(errorDialog, {"message": message});
+//                    if (dataModelLocal.ContainsKey("DatabaseConnectionState")){
+//                        let databaseState = dataModelLocal.GetData("DatabaseConnectionState");
+//                        if (databaseState === false){
+//                            let message = qsTr("Please сheck the data to connect to the database");
+//                            modalDialogManager.openDialog(errorDialog, {"message": message});
 
-                            return;
-                        }
-                    }
+//                            return;
+//                        }
+//                    }
 
                     if (dataModelLocal.ContainsKey("Parameters")){
                         let parameters = dataModelLocal.GetData("Parameters");

@@ -162,13 +162,28 @@
         <Element Id="SystemStatusController" PackageId="ImtCoreVoce" ComponentId="SystemStatusController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CheckInterval" Type="Integer" ExportId="">
+                    <AttributeInfo Id="AutoCheckStatus" Type="Boolean" ExportId="AutoCheckStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CheckCommandId" Type="Id" ExportId="CheckCommandId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CheckInterval" Type="Integer" ExportId="CheckInterval">
                         <Data IsEnabled="true" Value="5"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseCheckerCommandId" Type="Id" ExportId="DatabaseCheckerCommandId">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ServerName" Type="Id" ExportId="ServerName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="ServerPrefix">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SlaveSystemStatus" Type="Reference" ExportId="SlaveSystemStatus">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Url" Type="Id" ExportId="SystemStatusURL">

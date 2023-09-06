@@ -15,7 +15,9 @@ namespace imtcom
 
 IConnectionStatusProvider::ConnectionStatus CSimpleConnectionCheckerComp::GetConnectionStatus() const
 {
-	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, "GetDatabaseStatus");
+	QByteArray commandID = m_commandIdAttrPtr.IsValid() ? *m_commandIdAttrPtr : "Test";
+
+	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, commandID);
 
 	imtbase::CTreeItemModel responseModel;
 	bool retVal = SendModelRequest(request, responseModel);

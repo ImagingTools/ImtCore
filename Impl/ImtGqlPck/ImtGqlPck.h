@@ -22,6 +22,7 @@
 #include <imtgql/CObjectProviderComp.h>
 #include <imtgql/CWebSocketServletComp.h>
 #include <imtgql/CCollectionObjectProviderComp.h>
+#include <imtgql/CGqlControllerComp.h>
 
 
 /**
@@ -47,6 +48,7 @@ typedef imtgql::CGqlContextControllerComp GqlContextController;
 typedef imtgql::CGqlRemoteRepresentationControllerComp PumaGqlRemoteRepresentationController;
 typedef imtgql::CObjectProviderComp ObjectProvider;
 typedef imtgql::CCollectionObjectProviderComp CollectionObjectProvider;
+typedef imtgql::CGqlControllerComp GqlController;
 
 
 } // namespace ImtGqlPck

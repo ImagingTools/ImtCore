@@ -94,6 +94,11 @@ I_EXPORT_COMPONENT(
 			"Collection object provider",
 			"Collection Object Provider");
 
+I_EXPORT_COMPONENT(
+			GqlController,
+			"Simple GQL controller",
+			"GqlController");
+
 
 } // namespace ImtGqlPck
 

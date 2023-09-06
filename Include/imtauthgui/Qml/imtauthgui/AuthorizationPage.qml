@@ -22,13 +22,10 @@ Rectangle {
     signal loginSuccessful();
     signal loginFailed();
 
-
-
     Component.onCompleted: {
 //        Events.subscribeEvent("Logout", authPageContainer.logout);
         decoratorPause.start();
     }
-
 
     onLoginSuccessful: {
         let obj = {}

@@ -8,8 +8,8 @@ Window
     width: 800;
     height: 600;
 
-    minimumHeight: 480;
-    minimumWidth: 740;
+    minimumHeight: 600;
+    minimumWidth: 800;
 
     visible: true;
 }

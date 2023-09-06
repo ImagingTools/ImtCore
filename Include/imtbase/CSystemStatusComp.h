@@ -31,7 +31,10 @@ public:
 		I_REGISTER_INTERFACE(imtbase::ISystemStatus);
 		I_ASSIGN(m_connectionStatusProviderCompPtr, "ConnectionStatusProvider", "Server connection status provider", true, "ConnectionStatusProvider");
 		I_ASSIGN(m_dbServerConnectionCheckerCompPtr, "DatabaseServerConnectionChecker", "Database server connection status provider", true, "DatabaseServerConnectionChecker");
+		I_ASSIGN(m_slaveSystemStatusCompPtr, "SlaveSystemStatus", "Slave system status", false, "SlaveSystemStatus");
 		I_ASSIGN(m_checkIntervalAttrPtr, "CheckInterval", "Interval for backup timer (in sec)", false, 60);
+		I_ASSIGN(m_autoCheckStatusAttrPtr, "AutoCheckStatus", "Auto-check system status", false, false);
+		I_ASSIGN(m_serverNameAttrPtr, "ServerName", "The name of the server to which the connection is being checked", false, "");
 	I_END_COMPONENT;
 
 	CSystemStatusComp();
@@ -60,7 +63,10 @@ private:
 private:
 	I_REF(imtcom::IConnectionStatusProvider, m_connectionStatusProviderCompPtr);
 	I_REF(imtdb::IDatabaseServerConnectionChecker, m_dbServerConnectionCheckerCompPtr);
+	I_REF(imtbase::ISystemStatus, m_slaveSystemStatusCompPtr);
 	I_ATTR(int, m_checkIntervalAttrPtr);
+	I_ATTR(bool, m_autoCheckStatusAttrPtr);
+	I_ATTR(QByteArray, m_serverNameAttrPtr);
 };
 
 

@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5079" Description="ACF"/>
-            <Version Id="1" Number="2184" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5102" Description="ACF"/>
+            <Version Id="1" Number="2194" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -27,6 +27,9 @@
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApiClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandId" Type="Id" ExportId="DatabaseCheckerCommandId">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -52,12 +55,18 @@
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApiClient"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="Command-ID" Type="Id" ExportId="CheckCommandId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="SystemStatus" PackageId="ImtCorePck" ComponentId="SystemStatus">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AutoCheckStatus" Type="Boolean" ExportId="AutoCheckStatus">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="CheckInterval" Type="Integer" ExportId="CheckInterval">
                         <Data IsEnabled="true" Value="5"/>
                     </AttributeInfo>
@@ -68,6 +77,12 @@
                         <Data IsEnabled="true" Value="DatabaseServerConnectionChecker"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerName" Type="Id" ExportId="ServerName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SlaveSystemStatus" Type="Reference" ExportId="SlaveSystemStatus">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

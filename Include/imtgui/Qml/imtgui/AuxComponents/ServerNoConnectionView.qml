@@ -11,14 +11,19 @@ Rectangle {
     Text {
         id: textNoConnection;
 
-        anchors.horizontalCenter: parent.horizontalCenter;
-        anchors.verticalCenter: parent.verticalCenter;
+        anchors.centerIn: parent;
+
+        width: parent.width - 100;
 
         text: container.text;
+
+        horizontalAlignment: Text.AlignHCenter;
 
         color: Style.textColor;
         font.pixelSize: Style.fontSize_title;
         font.family: Style.fontFamily;
+
+        wrapMode: Text.Wrap;
     }
 }
 

@@ -19,12 +19,15 @@ public:
 
 	I_BEGIN_COMPONENT(CSimpleConnectionCheckerComp);
 		I_REGISTER_INTERFACE(IConnectionStatusProvider);
+		I_ASSIGN(m_commandIdAttrPtr, "Command-ID", "Request command-ID", false, "Test");
 	I_END_COMPONENT;
 
 	// reimplemented (IConnectionStatusProvider)
 	virtual ConnectionStatus GetConnectionStatus() const override;
 
 private:
+	I_ATTR(QByteArray, m_commandIdAttrPtr);
+
 	ConnectionStatus m_status;
 };
 
