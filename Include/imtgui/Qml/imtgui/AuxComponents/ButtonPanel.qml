@@ -157,6 +157,10 @@ Rectangle {
 
     }
 
+    Component.onDestruction: {
+        Events.unSubscribeEvent("DialogBackgroundClicked", buttonPanel.onBackgroundClicked);
+    }
+
     Component.onCompleted: {
 
         Events.subscribeEvent("DialogBackgroundClicked", buttonPanel.onBackgroundClicked)
@@ -207,6 +211,10 @@ Rectangle {
         setModelPause.restart();
     }
 
+
+    function closeFunc(){
+
+    }
 
     function onBackgroundClicked(){
         modalDialogManager.closeDialog();
