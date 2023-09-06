@@ -166,9 +166,11 @@ Rectangle {
         Events.subscribeEvent("DialogBackgroundClicked", buttonPanel.onBackgroundClicked)
 
         if(buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
+
             buttonPanel.widthArr = [];
             buttonSizeRep.model = buttonPanel.buttonModel;
             buttonSizeRepVert.model = buttonPanel.buttonModel;
+
             setModelPause.restart();
 
         }
@@ -208,12 +210,14 @@ Rectangle {
     }
 
     function updateModel(){
+        if(buttonPanel.hasActiveState){
+            buttonPanel.rightOrderModel.Clear();
+            for(var i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
+                buttonPanel.rightOrderModel.InsertNewItem()
+                buttonPanel.rightOrderModel.CopyItemDataFromModel(i,buttonPanel.buttonModel,i);
+            }
+        }
         setModelPause.restart();
-    }
-
-
-    function closeFunc(){
-
     }
 
     function onBackgroundClicked(){
@@ -250,6 +254,16 @@ Rectangle {
         onFinished: {
             if(buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
                 buttonPanel.setModels();
+            }
+            if(buttonPanel.hasActiveState && buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
+                var index = buttonPanel.checkActiveInVertical();
+                if(index > -1){
+                    buttonPanel.setModelsWithActive(index);
+                }
+
+                if(buttonPanel.buttonModel.GetItemsCount() <= buttonPanel.horizCount){
+                    buttonPanel.setRightOrder();
+                }
             }
         }
     }
