@@ -45,7 +45,7 @@ export class Text extends Item {
         this.$cP('horizontalAlignment', Text.AlignLeft, this.$horizontalAlignmentChanged)
         this.$cP('verticalAlignment', Text.AlignTop, this.$verticalAlignmentChanged)
         this.$cP('wrapMode', Text.NoWrap, this.$wrapModeChanged)
-        this.$cP('textFormat', Text.AutoText)
+        this.$cP('textFormat', Text.AutoText, this.$textFormatChanged)
         this.$cP('elide', Text.ElideNone, this.$elideChanged)
         this.$cPC('font', Font(), this.$fontChanged)
 
@@ -65,6 +65,7 @@ export class Text extends Item {
         this.impl = document.createElement("span")
         this.dom.appendChild(this.impl);
         
+        this.dom.style.display = "flex"
         this.impl.style.textAlign = "inherit"
         this.impl.style.whiteSpace = "pre"
         this.impl.style.lineHeight = "normal";
@@ -80,6 +81,7 @@ export class Text extends Item {
         this.dom.style.display = 'flex'
     }
     $elideChanged(){
+        this.$preChanged()
         if(this.elide === Text.ElideRight){
             this.dom.style.textOverflow = 'ellipsis' 
             this.dom.style.overflow = 'auto' 
@@ -87,88 +89,54 @@ export class Text extends Item {
             this.dom.style.overflow = 'unset' 
             this.dom.style.textOverflow = 'unset' 
         }
+        this.$postChanged()
         
-        this.$updateGeometry()
+        // this.$updateGeometry()
+    }
+    $textFormatChanged(){
+        if(this.textFormat === Text.AutoText){
+            let regexp = /<[^<>]+>/g
+            if(regexp.test(this.text)){
+                this.$isHTML = true
+            } else {
+                this.$isHTML = false
+            }
+        } else if(this.textFormat === Text.PlainText){
+            this.$isHTML = false
+        } else {
+            this.$isHTML = true
+        }
+
+        this.$preChanged()
+        this.impl.innerHTML = `${this.text}`
+        this.$postChanged()
     }
     $textChanged(){
-        this.impl.innerHTML = `${this.text}`
+        if(this.textFormat === Text.AutoText){
+            let regexp = /<[^<>]+>/g
+            if(regexp.test(this.text)){
+                this.$isHTML = true
+            } else {
+                this.$isHTML = false
+            }
+        } else if(this.textFormat === Text.PlainText){
+            this.$isHTML = false
+        } else {
+            this.$isHTML = true
+        }
 
-        this.$updateGeometry()
+        this.$preChanged()
+        this.impl.innerHTML = `${this.text}`
+        this.$postChanged()
+        // this.$updateGeometry()
         // this.$calcWH()
     }
     $visibleChanged(){
         super.$visibleChanged()
-        this.$updateGeometry()
+        // this.$updateGeometry()
     }
     $updateGeometry(){
-		// if(this.$contentHeightAuto)
-        // this.$sP('contentHeight', ()=>{ 
-        //     this.text
-        //     this.font.family
-        //     this.wrapMode
-        //     this.height
-        //     // this.$textChanged()
-        //     // this.$fontChanged()
-        //     // this.$wrapModeChanged()
-
-        //     // let rect = this.impl.getBoundingClientRect()
-        //     if(this.$heightAuto && this.$p.height.val !== this.impl.scrollHeight) {
-        //         this.$p.height.val = this.impl.scrollHeight
-        //         this.$p.height.signal()
-        //         this.$heightAuto = true
-        //         // this.dom.style.height = `${rect.height}px`
-        //     }
-
-        //     return this.impl.scrollHeight
-        // })
-		// if(this.$contentWidthAuto)
-        // this.$sP('contentWidth', ()=>{ 
-        //     this.text
-        //     this.font.family
-        //     this.wrapMode
-        //     this.width
-        //     // this.$textChanged()
-        //     // this.$fontChanged()
-        //     // this.$wrapModeChanged()
-
-        //     // let rect = this.impl.getBoundingClientRect()
-        //     if(this.$widthAuto && this.$p.width.val !== this.impl.scrollWidth) {
-        //         this.$p.width.val = this.impl.scrollWidth
-        //         this.$p.width.signal()
-        //         this.$widthAuto = true
-        //         // this.dom.style.width = `${rect.width}px`
-        //     }
-
-        //     return this.impl.scrollWidth
-        // })
-        clearTimeout(this.$updateTimer)
-        
-        this.$updateTimer = setTimeout(()=>{
-            if(this.impl){
-                // let rect = this.impl.getBoundingClientRect()
-                if(this.$contentHeightAuto){
-                    if(this.$heightAuto && this.$p.height.val !== this.impl.offsetHeight) {
-                        this.$p.height.val = this.impl.offsetHeight
-                        this.$p.height.getSignal()()
-                        this.$heightAuto = true
-                        // this.dom.style.height = `${this.impl.offsetHeight}px`
-                    }
-                    this.contentHeight = this.impl.offsetHeight
-                }
-                if(this.$contentWidthAuto){
-                    if(this.$widthAuto && this.$p.width.val !== this.impl.offsetWidth) {
-                        this.$p.width.val = this.impl.offsetWidth
-                        this.$p.width.getSignal()()
-                        this.$widthAuto = true
-                        // this.dom.style.width = `${this.impl.offsetWidth}px`
-                    }
-                    this.contentWidth = this.impl.offsetWidth
-                }
-            }
-            
-        }, 1000 / Core.FPS)
-        
-
+	
     }
     // $calcWH(){
     //     // let tempText = document.createElement("span")
@@ -261,18 +229,66 @@ export class Text extends Item {
     $widthChanged(){
         super.$widthChanged()
         this.$widthAuto = false
+        this.$preChanged()
+        this.$postChanged()
         // this.$contentWAuto = false
         // this.$calcWH()
-        this.$updateGeometry()
-        this.$horizontalAlignmentChanged()
+        // this.$updateGeometry()
+        // this.$horizontalAlignmentChanged()
     }
     $heightChanged(){
         super.$heightChanged()
         this.$heightAuto = false
         // this.$contentHAuto = false
         // this.$calcWH()
-        this.$updateGeometry()
-        this.$verticalAlignmentChanged()
+        // this.$updateGeometry()
+        this.$preChanged()
+        this.$postChanged()
+        // this.$verticalAlignmentChanged()
+    }
+    $preChanged(){
+        if(this.$isHTML){
+            if(this.$widthAuto) this.impl.style.width = '0px'
+            if(this.$heightAuto) this.impl.style.height = '0px'
+        }
+        
+    }
+    $postChanged(){
+        if(this.$isHTML){
+            if(this.$widthAuto){
+                this.width = this.impl.scrollWidth
+                this.impl.style.width = `${this.impl.scrollWidth}px`
+                this.$widthAuto = true
+            }
+            if(this.$heightAuto){
+                this.height = this.impl.scrollHeight
+                this.impl.style.height = `${this.impl.scrollHeight}px`
+                this.$heightAuto = true
+            }
+
+            this.contentWidth = this.dom.scrollWidth
+            this.contentHeight = this.dom.scrollHeight
+        } else {
+            this.$applyMetrics()
+        }
+    }
+    $applyMetrics(){
+        let textMetrics = Core.measureText(this.text, this.font.pixelSize, this.font.family, this.width.auto ? 0 : this.width, this.wrapMode)
+        this.impl.innerHTML = textMetrics.text
+
+        if(this.$widthAuto){
+            this.width = textMetrics.width
+            this.impl.style.width = `${textMetrics.width}px`
+            this.$widthAuto = true
+        }
+        if(this.$heightAuto){
+            this.height = textMetrics.height
+            this.impl.style.height = `${textMetrics.height}px`
+            this.$heightAuto = true
+        }
+
+        this.contentWidth = this.dom.scrollWidth
+        this.contentHeight = this.dom.scrollHeight
     }
     $horizontalAlignmentChanged(){
         // switch(this.$p.horizontalAlignment.val){
@@ -281,12 +297,12 @@ export class Text extends Item {
         //     case Text.AlignHCenter: this.dom.style.textAlign = 'center'; this.impl.style.margin = "0 auto 0 auto"; break;
         //     case Text.AlignJustify: this.dom.style.textAlign = 'justify'; this.impl.style.margin = "0 0 0 0"; break;
         // }
-        let realWidth = this.width + this.anchors.leftMargin + this.anchors.rightMargin
+        // let realWidth = this.width + this.anchors.leftMargin + this.anchors.rightMargin
         switch(this.$p.horizontalAlignment.val){
-            case Text.AlignLeft: this.dom.style.textAlign = 'left'; break;
-            case Text.AlignRight: this.dom.style.textAlign = 'right'; break;
-            case Text.AlignHCenter: this.dom.style.textAlign = 'center'; break;
-            case Text.AlignJustify: this.dom.style.textAlign = 'justify'; break;
+            case Text.AlignLeft: this.dom.style.justifyContent = 'flex-start'; break;
+            case Text.AlignRight: this.dom.style.justifyContent = 'dlex-end'; break;
+            case Text.AlignHCenter: this.dom.style.justifyContent = 'center'; break;
+            case Text.AlignJustify: this.dom.style.justifyContent = 'normal'; break;
         }
     }
     $verticalAlignmentChanged(){
@@ -295,14 +311,15 @@ export class Text extends Item {
         //     case Text.AlignBottom: this.dom.style.alignItems = 'flex-end'; break;
         //     case Text.AlignVCenter: this.dom.style.alignItems = 'center'; break;
         // }
-        let realHeight = this.height + this.anchors.topMargin + this.anchors.bottomMargin
+        // let realHeight = this.height + this.anchors.topMargin + this.anchors.bottomMargin
         switch(this.$p.verticalAlignment.val){
-            case Text.AlignTop: this.dom.style.marginTop = `0`; this.dom.style.marginBottom = `0`; break;
-            case Text.AlignBottom: this.dom.style.marginTop = `0`; this.dom.style.marginBottom = "0"; break;
-            case Text.AlignVCenter: this.dom.style.marginTop = `${(this.parent.height - realHeight)/2 - this.y}px`; this.dom.style.marginBottom = `${(this.parent.height - realHeight)/2 - this.y}px`; break;
+            case Text.AlignTop: this.dom.style.alignItems = 'flex-start'; break;
+            case Text.AlignBottom: this.dom.style.alignItems = 'flex-end'; break;
+            case Text.AlignVCenter: this.dom.style.alignItems = 'center'; break;
         }
     }
     $wrapModeChanged(){
+        this.$preChanged()
         switch(this.$p.wrapMode.val){
             case Text.NoWrap: this.impl.style.whiteSpace = "pre"; break;
             case Text.WordWrap: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordBreak = "break-word"; break;
@@ -311,7 +328,7 @@ export class Text extends Item {
             case Text.WrapAtWordBoundaryOrAnywhere: this.impl.style.whiteSpace = "pre-wrap"; this.impl.style.wordBreak = "break-all"; break;
         }
         // this.$calcWH()
-        this.$updateGeometry()
+        this.$postChanged()
     }
 
     $fontChanged(){
@@ -319,6 +336,7 @@ export class Text extends Item {
         // if(this.$pointSize !== this.font.pointSize) this.$p.font.$pixelSize = this.font.pointSize * 0.75
         // this.$pixelSize = this.font.pixelSize
         // this.$pointSize = this.font.pointSize
+        this.$preChanged()
 
         this.impl.style.fontFamily = this.$p['font.family'].val ? this.$p['font.family'].val : 'unset';
         this.impl.style.fontSize = `${this.$p['font.pixelSize'].val}px`
@@ -326,17 +344,20 @@ export class Text extends Item {
         this.impl.style.fontWeight = this.$p['font.bold'].val ? 'bold' : 'normal';
         this.impl.style.textDecoration = this.$p['font.underline'].val ? 'underline' : 'unset';
         // this.$calcWH()
-        this.$updateGeometry()
+        this.$postChanged()
 
         if(this.$p['font.family'].val && this.$p['font.pixelSize'].val){
             document.fonts.load(`${this.$p['font.pixelSize'].val}px ${this.$p['font.family'].val}`).then((fonts)=>{
-                if(fonts.length && this.$p) this.$updateGeometry()
+                if(fonts.length && this.$p) {
+                    this.$preChanged()
+                    this.$postChanged()
+                }
             })
         }
     }
     $destroy(){
         //clearInterval(this.$observer)
-        clearTimeout(this.$updateTimer)
+        // clearTimeout(this.$updateTimer)
         this.impl.remove()
         super.$destroy()
     }

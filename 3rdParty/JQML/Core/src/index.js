@@ -182,8 +182,9 @@ global.IDManager = {
     },
 }
 
-
+let canvas = document.createElement('canvas')
 global.Core = {
+    ctx: canvas.getContext('2d'),
     FPS: 60,
     exports: {},
     Singletons: {},
@@ -194,6 +195,49 @@ global.Core = {
     context: null,
     mapTools: false,
     shortcuts: [],
+    measureText(text, pixelSize, fontFamily, maxWidth, wordWrap){
+        this.ctx.font = `${pixelSize}px ${fontFamily ? fontFamily : 'auto'}`
+        
+        if(wordWrap && maxWidth){
+            let resWidth = 0
+            let resHeight = 0
+            let words = wordWrap && wordWrap === 1 || wordWrap === 3 ? text.split(" ") : text.split("")
+            let lines = []
+            let currentLine = words[0]
+        
+            for (let i = 1; i < words.length; i++) {
+                let word = words[i]
+                let width = this.ctx.measureText(currentLine + (wordWrap === 1 || wordWrap === 3 ? " " + word: word)).width
+                if (width < maxWidth) {
+                    currentLine += (wordWrap === 1 || wordWrap === 3 ? " " + word: word)
+                } else {
+                    lines.push(currentLine)
+                    let metrics = this.ctx.measureText(currentLine)
+                    resWidth = Math.max(resWidth, metrics.width)
+                    resHeight += metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
+                    currentLine = word
+                }
+            }
+            let metrics = this.ctx.measureText(currentLine)
+            resWidth = Math.max(resWidth, metrics.width)
+            resHeight += metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
+            lines.push(currentLine)
+            
+            return {
+                text: lines.join('\n'),
+                width: resWidth,
+                height: resHeight
+            }
+        } else {
+            let metrics = this.ctx.measureText(text)
+            return {
+                text: text,
+                width: metrics.width,
+                height: metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
+            }
+        }
+        
+    },
     loadMapTools(){
         if(!this.mapTools){
             let mapStyle = document.createElement('link')
