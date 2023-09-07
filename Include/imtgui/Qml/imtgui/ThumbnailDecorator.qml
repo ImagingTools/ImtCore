@@ -11,8 +11,8 @@ Rectangle {
 
     color: Style.backgroundColor;
 
-    property alias settingsProvider: preferenceDialog.settingsProvider;
-    property alias applicationInfoProvider: preferenceDialog.applicationInfoProvider;
+//    property alias settingsProvider: preferenceDialog.settingsProvider;
+//    property alias applicationInfoProvider: preferenceDialog.applicationInfoProvider;
 
     property alias errorPage: serverNoConnectionView;
     property alias loadingPage: loading;
@@ -27,6 +27,9 @@ Rectangle {
     property alias userManagementProvider: userManagement;
     property alias documentManager: mainDocumentManager;
     property alias dialogManager: modalDialogManager;
+
+    property SettingsProvider settingsProvider: null;
+    property SettingsObserver settingsObserver: null;
 
     Component.onCompleted: {
         Events.subscribeEvent("StartLoading", loading.start);
@@ -196,7 +199,15 @@ Rectangle {
     }
 
     function showPreferencePage(){
-        preferenceDialog.visible = true;
+        if (thumbnailDecoratorContainer.settingsProvider != null){
+            let representationModel = thumbnailDecoratorContainer.settingsProvider.getRepresentationModel();
+
+            if (thumbnailDecoratorContainer.settingsObserver != null){
+                thumbnailDecoratorContainer.settingsObserver.registerModel(representationModel);
+            }
+
+            modalDialogManager.openDialog(preferenceDialogComp, {"settingsModel": representationModel});
+        }
     }
 
     AuthorizationPage {
@@ -252,7 +263,20 @@ Rectangle {
         }
     }
 
-    PreferencePage {
+    Component {
+        id: preferenceDialogComp;
+        PreferenceDialog {
+            onFinished: {
+                if (buttonId == "Apply"){
+                    if (thumbnailDecoratorContainer.settingsObserver != null){
+                        thumbnailDecoratorContainer.settingsObserver.observedModelDataChanged();
+                    }
+                }
+            }
+        }
+    }
+
+    Preference {
         id: preferenceDialog;
 
         z: 20;
@@ -260,6 +284,19 @@ Rectangle {
         anchors.fill: parent;
 
         visible: false;
+
+        onVisibleChanged: {
+            if (visible){
+                if (thumbnailDecoratorContainer.settingsProvider != null){
+                    let representationModel = thumbnailDecoratorContainer.settingsProvider.getRepresentationModel();
+
+                    preferenceDialog.settingsModel = representationModel;
+                }
+            }
+            else{
+                preferenceDialog.clearModels();
+            }
+        }
     }
 
     ModalDialogManager {

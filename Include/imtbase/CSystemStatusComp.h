@@ -8,9 +8,11 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
+#include <iprm/ITextParam.h>
 
 // ImtCore includes
 #include <imtbase/ISystemStatus.h>
+#include <imtbase/TModelUpdateBinder.h>
 #include <imtcom/IConnectionStatusProvider.h>
 #include <imtdb/IDatabaseServerConnectionChecker.h>
 
@@ -35,6 +37,7 @@ public:
 		I_ASSIGN(m_checkIntervalAttrPtr, "CheckInterval", "Interval for backup timer (in sec)", false, 60);
 		I_ASSIGN(m_autoCheckStatusAttrPtr, "AutoCheckStatus", "Auto-check system status", false, false);
 		I_ASSIGN(m_serverNameAttrPtr, "ServerName", "The name of the server to which the connection is being checked", false, "");
+		I_ASSIGN(m_urlParamCompPtr, "UrlParam", "The object holds connection's url.", false, "UrlParam");
 	I_END_COMPONENT;
 
 	CSystemStatusComp();
@@ -47,6 +50,7 @@ protected:
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
 
+	void OnUrlParamChanged(const istd::IChangeable::ChangeSet& changeSet, const iprm::ITextParam* textParamPtr);
 private:
 	void SetStatus(SystemStatus status);
 	void OnCheckStatusFinished();
@@ -55,10 +59,14 @@ private:
 
 private:
 	SystemStatus m_status;
-	QString m_errorMessage;
+	QString m_statusMessage;
 	QTimer m_timer;
 	QFutureWatcher<void> m_checkStatusFutureWatcher;
 	SystemStatus m_futureResultStatus;
+	imtbase::TModelUpdateBinder<iprm::ITextParam, CSystemStatusComp> m_textParamObserver;
+	QByteArray m_workingUrl;
+
+	bool m_blockAutoStart;
 
 private:
 	I_REF(imtcom::IConnectionStatusProvider, m_connectionStatusProviderCompPtr);
@@ -67,6 +75,7 @@ private:
 	I_ATTR(int, m_checkIntervalAttrPtr);
 	I_ATTR(bool, m_autoCheckStatusAttrPtr);
 	I_ATTR(QByteArray, m_serverNameAttrPtr);
+	I_REF(iprm::ITextParam, m_urlParamCompPtr);
 };
 
 

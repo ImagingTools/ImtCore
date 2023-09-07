@@ -5,30 +5,33 @@ import imtgui 1.0
 QtObject {
     id: container;
 
-    property TreeItemModel beginModel: TreeItemModel {}; // Model before changes
     property TreeItemModel observedModel: null;
+
+    property QtObject private_: QtObject{
+            property TreeItemModel beginModel: TreeItemModel {}; // Model before changes
+    }
 
     signal modelChanged(var changeList);
 
-    Component.onDestruction: {
-        if (container.observedModel != null){
-            container.observedModel.dataChanged.disconnect(container.observedModelDataChanged);
-        }
-    }
+//    Component.onDestruction: {
+//        if (container.observedModel != null){
+//            container.observedModel.dataChanged.disconnect(container.observedModelDataChanged);
+//        }
+//    }
 
     function registerModel(model){
         console.log("PreferenceObserver registerModel", model);
 
         container.observedModel = model;
-        container.observedModel.dataChanged.connect(container.observedModelDataChanged);
-        container.beginModel.Copy(container.observedModel);
+//        container.observedModel.dataChanged.connect(container.observedModelDataChanged);
+        container.private_.beginModel.Copy(container.observedModel);
     }
 
     function observedModelDataChanged(){
         console.log("observedModelDataChanged");
-        let changeList = compare(container.beginModel, container.observedModel);
+        let changeList = compare(container.private_.beginModel, container.observedModel);
         container.modelChanged(changeList);
-        container.beginModel.Copy(container.observedModel);
+        container.private_.beginModel.Copy(container.observedModel);
     }
 
     function compare(model1, model2){
@@ -48,23 +51,28 @@ QtObject {
             let keys = model1.GetKeys(i);
             for (let j = 0; j < keys.length; j++){
                 let key = keys[j];
-
                 let globalId = parentKey + '/' + dataId;
                 if (model1.ContainsKey(key, i) && model2.ContainsKey(key, i)){
-                    let model1Value = model1.GetData(key, i);
-                    let model2Value = model2.GetData(key, i);
 
-                    if(typeof model1Value === 'object' && typeof model2Value === 'object'){
-                        compareRecursive(model1Value, model2Value, changeList, globalId);
+                    let model1Value = model1.GetTreeItemModel(key, i);
+                    let model2Value = model2.GetTreeItemModel(key, i);
+
+                    if (model1Value != null && model2Value != null){
+                        container.compareRecursive(model1Value, model2Value, changeList, globalId);
                     }
                     else{
-                        if (model1Value != model2Value){
+                        let value1 = String(model1.GetData(key, i));
+                        let value2 = String(model2.GetData(key, i));
+
+                        if (value1 !== value2){
+                            console.log("value1 != value2")
+
                             let changeObj = {}
 
                             changeObj["operation"] = "change";
                             changeObj["key"] = key;
-                            changeObj["curVal"] = model1Value;
-                            changeObj["newVal"] = model2Value;
+                            changeObj["curVal"] = value1;
+                            changeObj["newVal"] = value2;
                             changeObj["index"] = i;
                             changeObj["id"] = globalId;
 

@@ -80,6 +80,10 @@ void CClientMainWindowQmlComp::OnSystemStatusUpdate(
 			statusStr = "DATABASE_CONNECTION_ERROR";
 
 			break;
+		case imtbase::ISystemStatus::SystemStatus::SS_TRY_CONNECTING_SERVER:
+			statusStr = "TRY_CONNECTING";
+
+			break;
 		}
 
 		QMetaObject::invokeMethod(quickItem, "setSystemStatus",

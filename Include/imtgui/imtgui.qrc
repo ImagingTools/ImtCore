@@ -155,6 +155,8 @@
 	<file alias="imtgui/AuxComponents/DocumentHistoryView.qml">Qml/imtgui/AuxComponents/DocumentHistoryView.qml</file>
 	<file alias="imtgui/AuxComponents/DocumentHistoryProvider.qml">Qml/imtgui/AuxComponents/DocumentHistoryProvider.qml</file>
         <file alias="imtgui/AuxComponents/SpinBox.qml">Qml/imtgui/AuxComponents/SpinBox.qml</file>
+	<file alias="imtgui/AuxComponents/SettingsObserver.qml">Qml/imtgui/AuxComponents/SettingsObserver.qml</file>
+	<file alias="imtgui/AuxComponents/PreferenceDialog.qml">Qml/imtgui/AuxComponents/PreferenceDialog.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

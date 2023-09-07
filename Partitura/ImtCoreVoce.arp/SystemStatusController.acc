@@ -85,6 +85,9 @@
                     <AttributeInfo Id="SlaveSystemStatus" Type="Reference" ExportId="SlaveSystemStatus">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="UrlParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>

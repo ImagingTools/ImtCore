@@ -8,6 +8,117 @@ QtObject {
     property TreeItemModel serverModel: null;
     property TreeItemModel localModel: null;
 
+    property var applicationInfoProvider;
+
+    onApplicationInfoProviderChanged: {
+        if (container.applicationInfoProvider){
+            container.aboutApplicationProvider.applicationInfoProvider = container.applicationInfoProvider;
+        }
+    }
+
+    property PageAboutProvider aboutApplicationProvider: PageAboutProvider{}
+
+    property QtObject private_: QtObject {
+        property TreeItemModel representationModel: TreeItemModel {};
+
+        function mergeWithExternModel(externModel){
+            if (externModel != undefined && externModel != null){
+                for (let i = 0; i < externModel.GetItemsCount(); i++){
+                    let pageId = externModel.GetData("Id", i);
+                    let pageName = externModel.GetData("Name", i);
+                    let pageParameters = externModel.GetData("Parameters", i);
+
+                    let index = container.private_.getPageIndexByPageId(pageId)
+                    if (index < 0){
+                        index = container.private_.representationModel.InsertNewItem();
+                    }
+
+                    container.private_.representationModel.SetData("Id", pageId, index);
+                    container.private_.representationModel.SetData("Name", pageName, index);
+
+                    if(pageParameters != null){
+                        let parametersModel = container.private_.representationModel.AddTreeModel("Parameters", index);
+                        parametersModel.Copy(pageParameters)
+                    }
+                }
+            }
+        }
+
+        function getPageIndexByPageId(pageId){
+            for (let i = 0; i < container.private_.representationModel.GetItemsCount(); i++){
+                let id = container.private_.representationModel.GetData("Id", i);
+                if (String(id) === String(pageId)){
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        function setValueToLocalModel(rootKey, key, value){
+            if (!container.localModel){
+                return;
+            }
+
+            for (let i = 0; i < container.localModel.GetItemsCount(); i++){
+                let id = String(container.localModel.GetData("Id", i));
+                if (id === rootKey){
+                    let parametersModel = container.localModel.GetData("Parameters", i)
+                    if (parametersModel){
+                        for (let j = 0; j < parametersModel.GetItemsCount(); j++){
+                            let parameterId = String(parametersModel.GetData("Id", j));
+                            if (parameterId === key){
+                                parametersModel.SetData("Value", value, j);
+                                break;
+                            }
+                        }
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        function setValueToServerModel(rootKey, key, value){
+            if (!container.serverModel){
+                return;
+            }
+
+            for (let i = 0; i < container.serverModel.GetItemsCount(); i++){
+                let id = String(container.serverModel.GetData("Id", i));
+                if (id === rootKey){
+                    let parametersModel = container.serverModel.GetData("Parameters", i)
+                    if (parametersModel){
+                        for (let j = 0; j < parametersModel.GetItemsCount(); j++){
+                            let parameterId = String(parametersModel.GetData("Id", j));
+                            if (parameterId === key){
+                                parametersModel.SetData("Value", value, j);
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        function getParameters(rootKey, key){
+            if (!container.serverModel){
+                return null;
+            }
+            for (let i = 0; i < container.serverModel.GetItemsCount(); i++){
+                let id = String(container.serverModel.GetData("Id", i));
+                if (id === rootKey){
+                    let parametersModel = container.serverModel.GetData("Parameters", i)
+
+                    return parametersModel;
+                }
+            }
+
+            return null;
+        }
+    }
+
     property bool modelsCompleted: serverModel && localModel;
 
     signal serverSettingsSaved();
@@ -22,19 +133,19 @@ QtObject {
     }
 
     onServerModelChanged: {
-        console.log("SettingsProvider onServerModelChanged", container.serverModel);
+        container.cacheServerModel();
     }
 
     onLocalModelChanged: {
         console.log("SettingsProvider onLocalModelChanged", container.localModel);
     }
 
-    onModelsCompletedChanged: {
-        console.log("onModelsCompletedChanged", modelsCompleted);
-        if(container.modelsCompleted){
-            container.saveLocalModel();
-        }
-    }
+//    onModelsCompletedChanged: {
+//        console.log("onModelsCompletedChanged", modelsCompleted);
+//        if(container.modelsCompleted){
+//            container.saveLocalModel();
+//        }
+//    }
 
     function clearModel(){
         if (container.serverModel){
@@ -42,23 +153,138 @@ QtObject {
         }
     }
 
+    function getRepresentationModel(){
+        private_.representationModel.Clear();
+
+        private_.mergeWithExternModel(container.localModel);
+        private_.mergeWithExternModel(container.serverModel);
+
+        if (container.aboutApplicationProvider != null){
+            let representationModel = container.aboutApplicationProvider.getRepresentationModel();
+            private_.mergeWithExternModel(representationModel);
+        }
+
+        return private_.representationModel;
+    }
+
     function updateModel(){
         settingsQuery.getSettings();
     }
 
     function saveLocalModel(){
-        console.log("SettingsProvider saveLocalModel", container.localModel.toJSON());
-        container.rewriteModel(container.serverModel, container.localModel);
-
         container.localSettingsSaved();
     }
 
     function saveServerModel(){
-        console.log("SettingsProvider saveServerModel", container.serverModel.toJSON());
-
         preferenceSaveQuery.save();
 
         saveLocalModel();
+    }
+
+    function setDesignSchema(schema){
+        console.log("setDesignSchema", schema);
+//        private_.setValueToServerModel("General", "DesignSchema", schema);
+
+//        container.cacheServerModel();
+
+//        preferenceSaveQuery.save();
+
+        let model = container.serverModel;
+
+        if (!model){
+            model = container.localModel;
+        }
+
+        if (model){
+            for (let i = 0; i < model.GetItemsCount(); i++){
+                let id = String(model.GetData("Id", i));
+                if (id == String("General")){
+                    let parametersModel = model.GetData("Parameters", i)
+                    if (parametersModel){
+                        for (let j = 0; j < parametersModel.GetItemsCount(); j++){
+                            let parameterId = String(parametersModel.GetData("Id", j));
+                            if (parameterId == String("DesignSchema")){
+                                let languageParametersModel = parametersModel.GetData("Parameters", j);
+                                for (let k = 0; k < languageParametersModel.GetItemsCount(); k++){
+                                    let langId = languageParametersModel.GetData("Id", k);
+                                    if (String(langId) == String(schema)){
+                                        parametersModel.SetData("Value", k, j);
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        console.log("model", model.toJSON());
+
+        if (container.serverModel){
+            container.cacheServerModel();
+
+            preferenceSaveQuery.save();
+        }
+        else{
+            container.localSettingsSaved();
+        }
+    }
+
+    function setLanguage(language){
+        let model = container.serverModel;
+
+        if (!model){
+            model = container.localModel;
+        }
+
+        if (model){
+            for (let i = 0; i < model.GetItemsCount(); i++){
+                let id = String(model.GetData("Id", i));
+                if (id == String("General")){
+                    let parametersModel = model.GetData("Parameters", i)
+                    if (parametersModel){
+                        for (let j = 0; j < parametersModel.GetItemsCount(); j++){
+                            let parameterId = String(parametersModel.GetData("Id", j));
+                            if (parameterId == String("Language")){
+                                let languageParametersModel = parametersModel.GetData("Parameters", j);
+                                for (let k = 0; k < languageParametersModel.GetItemsCount(); k++){
+                                    let langId = languageParametersModel.GetData("Id", k);
+                                    if (String(langId) == String(language)){
+                                        parametersModel.SetData("Value", k, j);
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        if (container.serverModel){
+            container.cacheServerModel();
+
+            preferenceSaveQuery.save();
+        }
+        else{
+            container.localSettingsSaved();
+        }
+    }
+
+    function setServerUrl(serverUrl){
+        private_.setValueToLocalModel("NetworkSettings", "ServerUrl", serverUrl);
+
+        container.localSettingsSaved();
+    }
+
+    function cacheServerModel(){
+        container.rewriteModel(container.serverModel, container.localModel);
+        container.localSettingsSaved();
     }
 
     function rewriteModel(fromModel, toModel){
@@ -72,7 +298,6 @@ QtObject {
             for (let j = 0; j < fromModel.GetItemsCount(); j++){
                 let id = fromModel.GetData("Id", j);
                 if (id == pageId){
-                    console.log("id === pageId", id);
                     index = j;
 
                     break;

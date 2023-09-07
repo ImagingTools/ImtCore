@@ -41,12 +41,14 @@ void CObserverQmlComp::ApplyUrl() const
 		serverUrl = serverUrlDataPtr->GetText();
 	}
 
-	QUrl url = engine->baseUrl();
 	QUrl newUrl = serverUrl + *m_prefixServer;
-
 	engine->setBaseUrl(newUrl);
 
-	SendInfoMessage(0, QString("Server URL changed from %1 to %2").arg(url.toString()).arg(newUrl.toString()));
+	qDebug() << QString("Server URL changed to %1").arg(newUrl.toString());
+
+	SendInfoMessage(0, QString("Server URL changed to %1").arg(newUrl.toString()));
+
+	quickItem->setProperty("serverReady", true);
 }
 
 

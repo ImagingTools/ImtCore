@@ -29,12 +29,16 @@ Rectangle {
     signal modelChanged();
 
     onModelChanged: {
+        console.log("onModelChanged");
         root.modelIsDirty = true;
     }
 
     onSettingsModelChanged: {
+        console.log("onSettingsModelChanged");
         if (root.settingsModel != null){
+            console.log("connect");
             root.settingsModel.dataChanged.connect(root.modelChanged);
+
             root.updateGui();
         }
     }

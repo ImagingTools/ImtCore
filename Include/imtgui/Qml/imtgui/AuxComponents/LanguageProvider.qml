@@ -7,6 +7,68 @@ QtObject {
 
     property SettingsProvider settingsProvider: null;
 
+    property TreeItemModel languagesModel: TreeItemModel {}
+
+    onSettingsProviderChanged: {
+        if (container.settingsProvider != null){
+            container.settingsProvider.localModelChanged.connect(container.onLocalModelChanged);
+        }
+    }
+
+    function onLocalModelChanged(){
+        if (settingsProvider == null){
+            return;
+        }
+
+        let localModel = settingsProvider.serverModel;
+
+        if (localModel == null){
+            localModel = settingsProvider.localModel;
+        }
+
+        if (localModel == null){
+            return;
+        }
+
+        for (let i = 0; i < localModel.GetItemsCount(); i++){
+            let pageModel = localModel.GetModelFromItem(i);
+            if (pageModel){
+                let pageId = pageModel.GetData("Id");
+                if (pageId == "General"){
+                    let elements = pageModel.GetData("Parameters");
+
+                    for (let j = 0; j < elements.GetItemsCount(); j++){
+                        let elementId = elements.GetData("Id", j);
+                        if (elementId == "Language"){
+                            languagesModel.Copy(elements.GetData("Parameters", j))
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    function applyCachedLanguage(){
+        let design = container.getLanguage();
+        if (design != null){
+        }
+    }
+
+    function getLanguageIdByIndex(index){
+        if (settingsProvider == null || index < 0 || index >= container.languagesModel.GetItemsCount()){
+            return "";
+        }
+
+        if (container.languagesModel.ContainsKey("Id", index)){
+            let langId = container.languagesModel.GetData("Id", index);
+            return langId;
+        }
+
+        return "";
+    }
+
     function getLanguage(){
         if (settingsProvider == null){
             return null;

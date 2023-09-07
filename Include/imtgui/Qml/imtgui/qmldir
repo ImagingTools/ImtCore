@@ -16,6 +16,7 @@ DocumentBase 1.0 ./AuxComponents/DocumentBase.qml
 UndoRedoManager 1.0 ./AuxComponents/UndoRedoManager.qml
 DocumentViewBase 1.0 ./AuxComponents/DocumentViewBase.qml
 SettingsProvider 1.0 ./AuxComponents/SettingsProvider.qml
+SettingsObserver 1.0 ./AuxComponents/SettingsObserver.qml
 MainDocumentManager 1.0 ./AuxComponents/MainDocumentManager.qml
 DocumentDataProvider 1.0 ./AuxComponents/DocumentDataProvider.qml
 DocumentObserver 1.0 ./AuxComponents/DocumentObserver.qml
@@ -57,6 +58,7 @@ TopLeftPanel 1.0 ./AuxComponents/TopLeftPanel.qml
 TopRightPanel 1.0 ./AuxComponents/TopRightPanel.qml
 
 PagesManager 1.0 ./AuxComponents/PagesManager.qml
+PreferenceDialog 1.0 ./AuxComponents/PreferenceDialog.qml
 PreferencePage 1.0 ./AuxComponents/PreferencePage.qml
 Preference 1.0 ./AuxComponents/Preference.qml
 ServerNoConnectionView 1.0 ./AuxComponents/ServerNoConnectionView.qml

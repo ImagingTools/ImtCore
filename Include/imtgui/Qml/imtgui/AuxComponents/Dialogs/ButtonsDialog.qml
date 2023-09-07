@@ -45,8 +45,6 @@ Item {
     Component{
         id: defaultButtonDecorator;
         CommonButtonDecorator{
-            width: 70;
-            height: 25;
         }
     }
 

@@ -9,11 +9,13 @@ Item {
     anchors.fill: parent;
 
     property string message;
-    property string systemStatus: "UNKNOWN_ERROR";
+    property string systemStatus: "NO_ERROR";
     property alias localSettings: application.settingsProvider.localModel;
 
 //    property alias applicationInfo: applicationInfoProvider.clientApplicationInfo;
     property var applicationInfo;
+
+    property bool serverReady: false;
 
     onApplicationInfoChanged: {
         if (application.applicationInfo){
@@ -29,6 +31,8 @@ Item {
     }
 
     Component.onCompleted: {
+        console.log("AppMain onCompleted");
+
         Events.subscribeEvent("UpdateModels", application.updateAllModels);
         Events.subscribeEvent("Logout", application.onLogout);
 
@@ -48,53 +52,50 @@ Item {
     {
     }
 
+    property SettingsObserver settingsObserver : SettingsObserver
+    {
+        designProvider: application.designProvider;
+        languageProvider: application.languageProvider;
+        settingsProvider: application.settingsProvider;
+    }
+
     property SettingsProvider settingsProvider : SettingsProvider
     {
+        applicationInfoProvider: application.applicationInfoProvider;
+
         onServerModelChanged: {
-            application.serverSettingsObserver.registerModel(serverModel);
+            let design = application.designProvider.getDesignSchema();
 
-            console.log("context.language", context.language, context.application);
-            context.language = application.languageProvider.getLanguage();
-            console.log("context.language", context.language, context.application);
+            console.log("design", design);
 
-            application.designProvider.applyDesignSchema();
+            let index = application.designProvider.getDesignSchemaIndex(design);
+            if (index >= 0){
+                application.settingsObserver.onDesignSchemaChanged(index);
+            }
         }
 
         onLocalModelChanged: {
-            localSettingsObserver.registerModel(localModel);
-            timer.start();
-        }
-
-        onServerSettingsSaved: {
-            application.serverSettingsObserver.observedModelDataChanged();
+//            application.designProvider.applyCachedDesignSchema();
         }
 
         onLocalSettingsSaved: {
             application.settingsUpdate();
         }
-    }
 
-    // Timer for updating design schema when start application, without this timer request does not come
-    Timer {
-        id: timer;
-
-        interval: 100;
-
-        onTriggered: {
-            designProvider.applyDesignSchema();
+        property bool applyCachedLanguage: application.serverReady && application.settingsProvider.localModel != null;
+        onApplyCachedLanguageChanged: {
+            if (applyCachedLanguage){
+//                let lang = application.languageProvider.getLanguage();
+//                application.settingsObserver.onLanguageChanged(lang);
+            }
         }
-    }
 
-    property ServerSettingsModelObserver serverSettingsObserver : ServerSettingsModelObserver
-    {
-        designProvider: application.designProvider;
-        languageProvider: application.languageProvider;
-    }
-
-    property LocalSettingsModelObserver localSettingsObserver : LocalSettingsModelObserver
-    {
-        designProvider: application.designProvider;
-        languageProvider: application.languageProvider;
+        property bool applyCachedSchema: application.serverReady && application.settingsProvider.localModel != null;
+        onApplyCachedSchemaChanged: {
+            if (applyCachedSchema){
+                application.designProvider.applyCachedDesignSchema();
+            }
+        }
     }
 
     property DesignSchemaProvider designProvider : DesignSchemaProvider
@@ -113,16 +114,15 @@ Item {
         anchors.fill: parent;
 
         settingsProvider: application.settingsProvider;
-        applicationInfoProvider: application.applicationInfoProvider;
+        settingsObserver: application.settingsObserver;
     }
 
     function onLogout(){
-//        application.applicationInfoProvider.serverApplicationInfo = null;
     }
 
     function onLocalizationChanged(language){
         console.log("Main onLocalizationChanged", language);
-        Events.sendEvent("OnLocalizationChanged", language);
+       // Events.sendEvent("OnLocalizationChanged", language);
     }
 
     function updateAllModels(){
@@ -167,11 +167,16 @@ Item {
         else if (application.systemStatus == "CONNECTION_ERROR"){
             thumbnailDecorator.closeAllPages();
 
-//            thumbnailDecorator.errorPage.text = qsTr("Server connection error. Please check the server URL in the settings.");
             thumbnailDecorator.errorPage.text = message;
             thumbnailDecorator.errorPage.visible = true;
         }
         else if (application.systemStatus == "DATABASE_CONNECTION_ERROR"){
+            thumbnailDecorator.closeAllPages();
+
+            thumbnailDecorator.errorPage.text = message;
+            thumbnailDecorator.errorPage.visible = true;
+        }
+        else if (application.systemStatus == "TRY_CONNECTING"){
             thumbnailDecorator.closeAllPages();
 
             thumbnailDecorator.errorPage.text = message;

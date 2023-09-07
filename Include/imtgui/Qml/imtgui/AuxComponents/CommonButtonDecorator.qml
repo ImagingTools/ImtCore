@@ -5,8 +5,11 @@ import QtGraphicalEffects 1.0
 BaseButtonDecorator {
     id: commonButtonDecorator;
 
-    width: 70;
+    width: text.width > maxWidth ? maxWidth : text.width < minWidth ? minWidth : text.width + 10;
     height: 25;
+
+    property int maxWidth: 100;
+    property int minWidth: 70;
 
     Rectangle{
         id: mainRec;

@@ -47,12 +47,12 @@ istd::IChangeable* CRoleDatabaseDelegateComp::CreateObjectFromRecord(const QSqlR
 
 
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CRoleDatabaseDelegateComp::CreateNewObjectQuery(
-		const QByteArray& /*typeId*/,
-		const QByteArray& proposedObjectId,
-		const QString& objectName,
-		const QString& /*objectDescription*/,
-		const istd::IChangeable* valuePtr,
-		const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const QByteArray& /*typeId*/,
+			const QByteArray& proposedObjectId,
+			const QString& objectName,
+			const QString& /*objectDescription*/,
+			const istd::IChangeable* valuePtr,
+			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	NewObjectQuery retVal;
 

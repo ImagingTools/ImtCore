@@ -31,12 +31,14 @@ Item {
         Events.subscribeEvent("DocumentIsDirtyChanged", workspaceView.documentIsDirtyChanged);
         Events.subscribeEvent("DocumentUpdating", workspaceView.documentUpdating);
         Events.subscribeEvent("OnLocalizationChanged", workspaceView.onLocalizationChanged);
+        Events.subscribeEvent("SetCollectionName", workspaceView.updateCollectionName);
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("DocumentIsDirtyChanged", workspaceView.documentIsDirtyChanged);
         Events.unSubscribeEvent("DocumentUpdating", workspaceView.documentUpdating);
         Events.unSubscribeEvent("OnLocalizationChanged", workspaceView.onLocalizationChanged);
+        Events.unSubscribeEvent("SetCollectionName", workspaceView.updateCollectionName);
     }
 
     onVisibleChanged: {
@@ -70,11 +72,14 @@ Item {
     }
 
     function onLocalizationChanged(language){
-//        let name = workspaceView.documentsData.GetData("Name");
+        console.log("workspaceView onLocalizationChanged", language);
+        let name = workspaceView.documentsData.GetData("Name");
+        console.log("name", name);
 
-//        let trName = qsTr(name);
+        let trName = qsTr(name);
+        console.log("trName", trName);
 
-//        workspaceView.documentsData.SetData("Title", trName);
+        workspaceView.documentsData.SetData("Title", trName);
     }
 
     function onMainCollectionUpdated(){
@@ -88,6 +93,20 @@ Item {
                 collectionTitle += " (" + totalCount + ")"
 
                 workspaceView.documentsData.SetData("Title", collectionTitle);
+            }
+        }
+    }
+
+    function updateCollectionName(parameters){
+        if (workspaceView.mainCollectionView != null){
+            let id = String(parameters["Id"]);
+            let collectionItemId = String(workspaceView.mainCollectionView.itemId);
+            if (id == collectionItemId){
+                let newName = String(parameters["Name"]);
+
+                workspaceView.documentsData.SetData("Name", newName);
+
+                onMainCollectionUpdated();
             }
         }
     }
