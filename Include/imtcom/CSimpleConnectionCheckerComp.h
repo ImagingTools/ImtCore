@@ -19,7 +19,7 @@ public:
 
 	I_BEGIN_COMPONENT(CSimpleConnectionCheckerComp);
 		I_REGISTER_INTERFACE(IConnectionStatusProvider);
-		I_ASSIGN(m_commandIdAttrPtr, "Command-ID", "Request command-ID", false, "Test");
+		I_ASSIGN(m_commandIdAttrPtr, "Command-ID", "Request command-ID", true, "");
 	I_END_COMPONENT;
 
 	// reimplemented (IConnectionStatusProvider)

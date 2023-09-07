@@ -13,7 +13,7 @@ namespace imtdb
 
 bool CRemoteDatabaseServerConnectionComp::IsDatabaseServerConnected(QString& errorMessage) const
 {
-	QByteArray commandID = m_commandIdAttrPtr.IsValid() ? *m_commandIdAttrPtr : "GetDatabaseStatus";
+	QByteArray commandID = m_commandIdAttrPtr.IsValid() ? *m_commandIdAttrPtr : QByteArrayLiteral("GetDatabaseStatus");
 
 	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, commandID);
 
