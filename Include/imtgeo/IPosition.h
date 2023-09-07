@@ -1,18 +1,20 @@
 #pragma once
 
+
 // ACF includes
 #include <iser/IObject.h>
 
+
 namespace imtgeo
 {
-/**
-    Interface for describing the coordinates of an object.
 
+
+/**
+	Interface for describing the coordinates of an object.
 */
 class IPosition: virtual public iser::IObject
 {
 public:
-
 	/**
 		Get latitude address.
 	*/
@@ -32,7 +34,6 @@ public:
 		Set longitude address.
 	*/
 	virtual void SetLongitude(double lon) = 0;
-
 };
 
 

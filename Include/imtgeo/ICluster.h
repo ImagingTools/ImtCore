@@ -10,22 +10,21 @@
 
 namespace imtgeo
 {
-/**
-    Interface for describing a cluster of objects on the map.
-*/
 
-class ICluster: virtual public iser::ISerializable, virtual public imtgeo::IPosition
+
+/**
+	Interface for describing a cluster of objects on the map.
+*/
+class ICluster: virtual public imtgeo::IPosition
 {
 public:
-
-    /**
-        Get longitude address.
-    */
-    virtual int GetChilderenCount() const = 0;
-
+	/**
+		Get number of the positions in the cluster.
+	*/
+	virtual int GetChildrenCount() const = 0;
 };
 
 
-} // namespace nphandbooksgql
+} // namespace imtgeo
 
 
