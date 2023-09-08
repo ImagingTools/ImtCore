@@ -273,7 +273,7 @@ export class Text extends Item {
         }
     }
     $applyMetrics(){
-        let textMetrics = Core.measureText(this.text, this.font.pixelSize, this.font.family, this.width.auto ? 0 : this.width, this.wrapMode)
+        let textMetrics = Core.measureText(this.text, this.font.pixelSize, this.font.family, this.$widthAuto ? 0 : this.width, this.wrapMode)
         this.impl.innerHTML = textMetrics.text
 
         if(this.$widthAuto){
@@ -287,8 +287,8 @@ export class Text extends Item {
             this.$heightAuto = true
         }
 
-        this.contentWidth = this.dom.scrollWidth
-        this.contentHeight = this.dom.scrollHeight
+        this.contentWidth = textMetrics.width
+        this.contentHeight = textMetrics.height
     }
     $horizontalAlignmentChanged(){
         // switch(this.$p.horizontalAlignment.val){
