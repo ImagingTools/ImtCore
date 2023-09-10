@@ -40,6 +40,7 @@ Rectangle {
     property int openDuration: 0;
 
     property var widthArr: [];
+    property var widthArrVer: [];
 
     property string shadowColor: "lightgrey";
     property string baseColor: "#ffffff";
@@ -58,6 +59,9 @@ Rectangle {
 
     property bool menuAlignRight: false;
     property bool canChangeOrder: false;
+
+    property bool compl: false;
+    property bool ready: false;
 
     Component {
         id: defaultDelegate;
@@ -163,34 +167,42 @@ Rectangle {
     }
 
     Component.onCompleted: {
-
+        buttonPanel.compl = true;
         Events.subscribeEvent("DialogBackgroundClicked", buttonPanel.onBackgroundClicked)
 
-        if(buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
-
-            assignModel();
-
-            setModelPause.restart();
-
-        }
     }
 
     onButtonModelChanged: {
-
-        assignModel();
-
-        setModelPause.restart();
+        buttonPanel.widthArr = [];
+        buttonPanel.widthArrVer = [];
+        buttonSizeRep.model = buttonPanel.buttonModel;
+        buttonSizeRepVert.model = buttonPanel.buttonModel;
     }
 
 
     onWidthChanged: {
-        if(widthPause){
-            widthPause.restart();
+        if(buttonPanel.ready){
+            if(widthPause){
+                widthPause.restart();
+            }
+            if(buttonPanel.openST){
+                buttonPanel.setVertMenuWidth();
+                buttonPanel.menuPositionCorrection()
+            }
         }
-        if(buttonPanel.openST){
-            buttonPanel.setVertMenuWidth();
-            buttonPanel.menuPositionCorrection()
+    }
+
+    onReadyChanged: {
+        if(buttonPanel.ready){
+            buttonPanel.assignModel();
+            setModelPause.restart();
         }
+    }
+
+    function setReady(){
+        var count = buttonPanel.buttonModel.GetItemsCount();
+        buttonPanel.ready =  buttonPanel.compl && count && buttonPanel.widthArr.length == count && buttonPanel.widthArrVer.length == count;
+
     }
 
     function menuPositionCorrection(){
@@ -205,12 +217,9 @@ Rectangle {
     }
 
     function assignModel(){
-        buttonPanel.widthArr = [];
-        buttonSizeRep.model = buttonPanel.buttonModel;
-        buttonSizeRepVert.model = buttonPanel.buttonModel;
 
         if(!buttonPanel.canChangeOrder){
-            for(let i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
+            for(var i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
                 buttonPanel.buttonModel.SetData("IsHorizontal", false, i);
             }
             horizontalListView.model = buttonPanel.buttonModel;
@@ -235,10 +244,10 @@ Rectangle {
 
     function setVertMenuWidth(){
         if(!buttonPanel.canChangeOrder){
-            let visibleCount_ = buttonPanel.buttonModel.GetItemsCount() - buttonPanel.horizCount
+            let visibleCount_ = buttonPanel.buttonModel.GetItemsCount() - buttonPanel.horizCount;
             let maxVal = 0;
-            for(let i = buttonPanel.widthArr.length - visibleCount_; i < buttonPanel.widthArr.length; i++){
-                let width_ = buttonPanel.widthArr[i];
+            for(let i = buttonPanel.widthArrVer.length - visibleCount_; i < buttonPanel.widthArrVer.length; i++){
+                let width_ = buttonPanel.widthArrVer[i];
                 if(width_ > maxVal){
                     maxVal = width_;
                 }
@@ -246,17 +255,6 @@ Rectangle {
             buttonPanel.verticalMenuWidth = maxVal;
 
         }
-    }
-
-    function updateModel(){
-        if(buttonPanel.hasActiveState){
-            buttonPanel.rightOrderModel.Clear();
-            for(var i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
-                buttonPanel.rightOrderModel.InsertNewItem()
-                buttonPanel.rightOrderModel.CopyItemDataFromModel(i,buttonPanel.buttonModel,i);
-            }
-        }
-        setModelPause.restart();
     }
 
     function onBackgroundClicked(){
@@ -583,13 +581,10 @@ Rectangle {
             let ok = item && width__ > 0 && okLength;
 
             if(ok){
-
+                //console.log("width__",width__)
                 buttonPanel.widthArr.push(width__);
-                console.log("width__",width__)
+                buttonPanel.setReady();
 
-                //                if(width__ > buttonPanel.verticalMenuWidth){
-                //                    buttonPanel.verticalMenuWidth = width__;
-                //                }
             }
             item.width = 0;
             item.height = 0;
@@ -610,11 +605,17 @@ Rectangle {
         delegate: buttonPanel.buttonDelegateVert;
 
         onItemAdded: {
+            let okLength = buttonPanel.widthArrVer.length == 0 ? true :
+                                                              buttonPanel.widthArrVer.length < buttonPanel.buttonModel.GetItemsCount();
+
             let width__ = item.width;
 
-            let ok = item && width__ > 0;
+            let ok = item && width__ > 0 && okLength;
 
             if(ok){
+                //console.log("width__ver",width__)
+                buttonPanel.widthArrVer.push(width__);
+                buttonPanel.setReady();
                 if(width__ > buttonPanel.verticalMenuWidth){
                     buttonPanel.verticalMenuWidth = width__;
                 }
@@ -649,10 +650,6 @@ Rectangle {
 
             spacing: buttonPanel.horizontalSpacing;
 
-//            model: buttonPanel.canChangeOrder ? buttonPanel.horizontalModel :
-//                                                buttonPanel.buttonModel;
-            //model: buttonPanel.buttonModel;
-
             delegate: buttonPanel.buttonDelegate;
 
 
@@ -680,7 +677,7 @@ Rectangle {
         pressed: buttonPanel.openST;
         color: buttonPanel.openST ? Style.hover : defaultColor;
 
-        visible: buttonPanel.buttonModel.GetItemsCount() > buttonPanel.horizCount;
+        visible: buttonPanel.buttonModel.GetItemsCount() && buttonPanel.buttonModel.GetItemsCount() > buttonPanel.horizCount;
 
         onClicked: {
             buttonPanel.setVertMenuWidth();
@@ -706,7 +703,7 @@ Rectangle {
             id: verticalListViewContainer;
 
             width: verticalListView.width + 2*buttonPanel.mainMargin;
-            height: verticalListView.height + 1.5*buttonPanel.mainMargin;
+            height: verticalListView.height + 2*buttonPanel.mainMargin;
             radius: 4;
             border.width: 1;
             border.color: buttonPanel.shadowColor;
@@ -733,7 +730,6 @@ Rectangle {
                 anchors.topMargin: buttonPanel.mainMargin;
 
                 width: buttonPanel.verticalMenuWidth;
-                //height:  Math.min(contentHeight,(buttonPanel.delegateHeight * buttonPanel.visibleCount + spacing * (buttonPanel.visibleCount-1)));
                 height: contentHeight;
 
                 clip: true;
@@ -744,8 +740,6 @@ Rectangle {
                 model: buttonPanel.canChangeOrder ? buttonPanel.verticalModel :
                                                     buttonPanel.buttonModel;
 
-
-                //model: buttonPanel.buttonModel;
 
                 delegate: buttonPanel.buttonDelegateVert;
 
