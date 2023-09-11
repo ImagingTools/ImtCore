@@ -18,6 +18,7 @@ Item {
     property bool serverReady: false;
 
     onApplicationInfoChanged: {
+        console.log("onApplicationInfoChanged");
         if (application.applicationInfo){
             applicationInfoProvider.clientApplicationInfo = application.applicationInfo;
         }
@@ -28,6 +29,10 @@ Item {
 
     onLocalSettingsUpdated: {
         application.updateAllModels();
+    }
+
+    onSystemStatusChanged: {
+        Events.sendEvent("SystemStatusChanged", application.systemStatus)
     }
 
     Component.onCompleted: {
@@ -75,18 +80,18 @@ Item {
         }
 
         onLocalModelChanged: {
-//            application.designProvider.applyCachedDesignSchema();
+            application.designProvider.applyCachedDesignSchema();
         }
 
         onLocalSettingsSaved: {
             application.settingsUpdate();
         }
 
-        property bool applyCachedLanguage: application.serverReady && application.settingsProvider.localModel != null;
+        property bool applyCachedLanguage: application.serverReady && application.settingsProvider.serverModel != null;
         onApplyCachedLanguageChanged: {
             if (applyCachedLanguage){
-//                let lang = application.languageProvider.getLanguage();
-//                application.settingsObserver.onLanguageChanged(lang);
+                let lang = application.languageProvider.getLanguage();
+                context.language = lang;
             }
         }
 
@@ -118,6 +123,7 @@ Item {
     }
 
     function onLogout(){
+        settingsProvider.serverModel = null;
     }
 
     function onLocalizationChanged(language){

@@ -53,6 +53,8 @@ bool CParamSetRepresentationControllerComp::GetRepresentationFromDataModel(const
 	const iprm::IParamsSet* paramsSetPtr = dynamic_cast<const iprm::IParamsSet*>(&dataModel);
 	if (paramsSetPtr != nullptr){
 		representation.SetData("Id", *m_paramIdAttrPtr);
+
+		QString paramName = *m_paramNameAttrPtr;
 		representation.SetData("Name", *m_paramNameAttrPtr);
 
 		if (m_qmlPathAttrPtr.IsValid()){
@@ -65,33 +67,6 @@ bool CParamSetRepresentationControllerComp::GetRepresentationFromDataModel(const
 		Q_ASSERT(parametersRepresentationPtr != nullptr);
 
 		for (const QByteArray& paramId : parameterIds){
-			//			QByteArrayList ids = paramId.split('/');
-			//			if (ids.size() > 0){
-			//				QByteArray id = ids[ids.size() - 1];
-			//				if (!isAdmin){
-			//					bool result = CheckPermissions(userPermissions, id);
-			//					if (!result){
-			//						continue;
-			//					}
-			//				}
-
-			//				const iser::ISerializable* paramPtr = paramsSetPtr->GetParameter(paramId);
-			//				Q_ASSERT(paramPtr != nullptr);
-
-			//				const IRepresentationController* subControllerPtr = FindSubController(id);
-			//				if (subControllerPtr != nullptr){
-			//					istd::TDelPtr<CTreeItemModel> parameterRepresentationPtr = new imtbase::CTreeItemModel();
-			//					if (subControllerPtr->GetRepresentationFromDataModel(*paramPtr, *parameterRepresentationPtr, paramsPtr)){
-			//						int index = parametersRepresentationPtr->InsertNewItem();
-
-			//						parametersRepresentationPtr->CopyItemDataFromModel(index, parameterRepresentationPtr.PopPtr());
-			//					}
-			//					else{
-			//						return false;
-			//					}
-			//				}
-			//			}
-
 			if (!paramId.contains('/')){
 				if (!isAdmin){
 					bool result = CheckPermissions(userPermissions, paramId);

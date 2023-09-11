@@ -49,8 +49,6 @@ Rectangle {
         console.log("MenuPanel onChangePage", pageId);
         for(var i = 0; i < lvPages.count; ++i){
             let item = lvPages.itemAtIndex(i);
-            console.log("index", i)
-            console.log("item", item)
             if(item.pageId === pageId){
                 item.clicked();
             }
@@ -91,6 +89,11 @@ Rectangle {
                 if (model.index === 0 && menuPanel.activePageIndex === -1){
                     clicked();
                 }
+            }
+
+            property string pageName: model["Name"];
+            onPageNameChanged: {
+                Events.sendEvent("PageNameChanged", {"Id": model["Id"], "Name": model["Name"]})
             }
 
             text:  model["Name"];

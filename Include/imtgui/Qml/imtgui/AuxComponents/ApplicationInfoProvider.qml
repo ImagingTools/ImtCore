@@ -11,8 +11,6 @@ QtObject {
     signal updated();
 
     onClientApplicationInfoChanged: {
-        console.log("onClientApplicationInfoChanged", clientApplicationInfo.toJSON());
-
         root.updated();
     }
 

@@ -48,6 +48,7 @@ TreeItemModelObserver {
     }
 
     function onServerUrlChanged(newVal){
+        console.log("onServerUrlChanged", newVal);
         if (container.settingsProvider != null){
             container.settingsProvider.setServerUrl(newVal);
             Events.sendEvent("Logout");
@@ -55,15 +56,18 @@ TreeItemModelObserver {
     }
 
     function onLanguageChanged(newVal){
+        console.log("onLanguageChanged", newVal);
         if (container.settingsProvider != null){
             let lang = container.languageProvider.getLanguageIdByIndex(newVal);
-            container.settingsProvider.setLanguage(lang);
-        }
+            context.language = lang;
 
-        if (container.languageProvider != null){
-            let language = languageProvider.getLanguage();
-            Events.sendEvent("OnLocalizationChanged", language);
-            context.language = language;
+            container.settingsProvider.setLanguage(lang);
+            if (container.languageProvider != null){
+
+                Events.sendEvent("OnLocalizationChanged", lang);
+            }
+
+            container.settingsProvider.updateModel();
         }
     }
 

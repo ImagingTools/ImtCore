@@ -8,20 +8,25 @@ Rectangle {
 
     property var startPageObj;
     property MainDocumentManager mainDocumentManager: null;
+    property alias documentManager: documentManager_;
 
     onStartPageObjChanged: {
         console.log("multiDocPageView onStartPageObjChanged");
-        documentManager.addDocument(multiDocPageView.startPageObj, {}, false)
+        documentManager_.addDocument(multiDocPageView.startPageObj, {}, false)
 
         if (multiDocPageView.mainDocumentManager != null){
-            multiDocPageView.mainDocumentManager.registerDocumentManager(multiDocPageView.startPageObj["CommandsId"], documentManager);
+            multiDocPageView.mainDocumentManager.registerDocumentManager(multiDocPageView.startPageObj["CommandsId"], documentManager_);
         }
 
-        documentManager.documentLoading = false;
+        documentManager_.documentLoading = false;
+    }
+
+    function updateName(){
+
     }
 
     MultiDocWorkspaceView {
-        id: documentManager;
+        id: documentManager_;
 
         anchors.fill: parent;
 

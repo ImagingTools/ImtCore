@@ -10,6 +10,16 @@ QtObject {
 
     property var applicationInfoProvider;
 
+    Component.onCompleted: {
+//        Events.subscribeEvent("OnLocalizationChanged", container.updateModel);
+        Events.subscribeEvent("UpdateSettings", container.updateModel);
+    }
+
+    Component.onDestruction: {
+//        Events.unSubscribeEvent("OnLocalizationChanged", container.updateModel);
+        Events.unSubscribeEvent("UpdateSettings", container.updateModel);
+    }
+
     onApplicationInfoProviderChanged: {
         if (container.applicationInfoProvider){
             container.aboutApplicationProvider.applicationInfoProvider = container.applicationInfoProvider;
@@ -124,28 +134,21 @@ QtObject {
     signal serverSettingsSaved();
     signal localSettingsSaved();
 
-    Component.onCompleted: {
-        Events.subscribeEvent("UpdateSettings", container.updateModel);
-    }
-
-    Component.onDestruction: {
-        Events.unSubscribeEvent("UpdateSettings", container.updateModel);
-    }
-
     onServerModelChanged: {
         container.cacheServerModel();
     }
 
     onLocalModelChanged: {
-        console.log("SettingsProvider onLocalModelChanged", container.localModel);
+        console.log("SettingsProvider onLocalModelChanged", container.localModel.toJSON());
+
+        if (container.localModel){
+            container.localModel.dataChanged.connect(container.onLocalModelDataChanged);
+        }
     }
 
-//    onModelsCompletedChanged: {
-//        console.log("onModelsCompletedChanged", modelsCompleted);
-//        if(container.modelsCompleted){
-//            container.saveLocalModel();
-//        }
-//    }
+    function onLocalModelDataChanged(){
+        console.log("onLocalModelDataChanged", container.localModel.toJSON());
+    }
 
     function clearModel(){
         if (container.serverModel){
@@ -183,11 +186,6 @@ QtObject {
 
     function setDesignSchema(schema){
         console.log("setDesignSchema", schema);
-//        private_.setValueToServerModel("General", "DesignSchema", schema);
-
-//        container.cacheServerModel();
-
-//        preferenceSaveQuery.save();
 
         let model = container.serverModel;
 

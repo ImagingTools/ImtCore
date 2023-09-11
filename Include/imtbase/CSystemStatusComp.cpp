@@ -42,21 +42,18 @@ void CSystemStatusComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_urlParamCompPtr.IsValid()){
-		m_textParamObserver.RegisterObject(m_urlParamCompPtr.GetPtr(), &CSystemStatusComp::OnUrlParamChanged);
-	}
+	m_slaveSystemStatusCompPtr.EnsureInitialized();
 
 	m_timer.setSingleShot(true);
 
-	bool autoStart = m_autoCheckStatusAttrPtr.IsValid() && *m_autoCheckStatusAttrPtr;
-	if (autoStart){
-		connect(&m_timer, &QTimer::timeout, this, &CSystemStatusComp::OnTimeout);
-		connect(&m_checkStatusFutureWatcher, &QFutureWatcher<void>::finished, this, &CSystemStatusComp::OnCheckStatusFinished);
+	connect(&m_timer, &QTimer::timeout, this, &CSystemStatusComp::OnTimeout);
+	connect(&m_checkStatusFutureWatcher, &QFutureWatcher<void>::finished, this, &CSystemStatusComp::OnCheckStatusFinished);
 
-		m_timer.start();
+	if (m_urlParamCompPtr.IsValid()){
+		m_textParamObserver.RegisterObject(m_urlParamCompPtr.GetPtr(), &CSystemStatusComp::OnUrlParamChanged);
 	}
 	else{
-		OnTimeout();
+		m_timer.start();
 	}
 }
 
@@ -83,7 +80,7 @@ void CSystemStatusComp::OnUrlParamChanged(
 
 		SetStatus(ISystemStatus::SS_TRY_CONNECTING_SERVER);
 
-		OnTimeout();
+		m_timer.start();
 	}
 }
 
@@ -107,7 +104,7 @@ void CSystemStatusComp::OnCheckStatusFinished()
 {
 	SetStatus(m_futureResultStatus);
 
-	if (!m_blockAutoStart){
+	if (*m_autoCheckStatusAttrPtr){
 		int interval = m_checkIntervalAttrPtr.IsValid() ? *m_checkIntervalAttrPtr * 1000 : 60000;
 		m_timer.start(interval);
 	}
@@ -116,7 +113,7 @@ void CSystemStatusComp::OnCheckStatusFinished()
 
 void CSystemStatusComp::OnTimeout()
 {
-//	Q_ASSERT(!m_checkStatusFutureWatcher.isRunning());
+	Q_ASSERT(!m_checkStatusFutureWatcher.isRunning());
 
 #if QT_VERSION >= 0x060000
 	m_checkStatusFutureWatcher.setFuture(QtConcurrent::run(&CSystemStatusComp::CheckStatus, this));
@@ -152,15 +149,15 @@ void CSystemStatusComp::CheckStatus()
 		m_futureResultStatus = ISystemStatus::SS_NO_ERROR;
 	}
 
-//	if (m_slaveSystemStatusCompPtr.IsValid()){
-//		QString error;
-//		ISystemStatus::SystemStatus slaveStatus = m_slaveSystemStatusCompPtr->GetSystemStatus(error);
-//		if (slaveStatus != SS_NO_ERROR){
-//			m_statusMessage = error;
+	if (m_slaveSystemStatusCompPtr.IsValid()){
+		QString error;
+		ISystemStatus::SystemStatus slaveStatus = m_slaveSystemStatusCompPtr->GetSystemStatus(error);
+		if (slaveStatus != SS_NO_ERROR){
+			m_statusMessage = error;
 
-//			m_futureResultStatus = slaveStatus;
-//		}
-//	}
+			m_futureResultStatus = slaveStatus;
+		}
+	}
 }
 
 

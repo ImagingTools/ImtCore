@@ -31,14 +31,14 @@ Item {
         Events.subscribeEvent("DocumentIsDirtyChanged", workspaceView.documentIsDirtyChanged);
         Events.subscribeEvent("DocumentUpdating", workspaceView.documentUpdating);
         Events.subscribeEvent("OnLocalizationChanged", workspaceView.onLocalizationChanged);
-        Events.subscribeEvent("SetCollectionName", workspaceView.updateCollectionName);
+        Events.subscribeEvent("PageNameChanged", workspaceView.onPageNameChanged);
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("DocumentIsDirtyChanged", workspaceView.documentIsDirtyChanged);
         Events.unSubscribeEvent("DocumentUpdating", workspaceView.documentUpdating);
         Events.unSubscribeEvent("OnLocalizationChanged", workspaceView.onLocalizationChanged);
-        Events.unSubscribeEvent("SetCollectionName", workspaceView.updateCollectionName);
+        Events.unSubscribeEvent("PageNameChanged", workspaceView.onPageNameChanged);
     }
 
     onVisibleChanged: {
@@ -97,12 +97,14 @@ Item {
         }
     }
 
-    function updateCollectionName(parameters){
+    function onPageNameChanged(parameters){
+        let pageId = parameters["Id"]
+        let pageName = parameters["Name"]
+
         if (workspaceView.mainCollectionView != null){
-            let id = String(parameters["Id"]);
             let collectionItemId = String(workspaceView.mainCollectionView.itemId);
-            if (id == collectionItemId){
-                let newName = String(parameters["Name"]);
+            if (pageId == collectionItemId){
+                let newName = String(pageName);
 
                 workspaceView.documentsData.SetData("Name", newName);
 

@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <icomp/CComponentBase.h>
+#include <iqt/ITranslationManager.h>
 
 // ImtCore includes
 #include <imtbase/IRepresentationController.h>
@@ -26,6 +27,7 @@ public:
 		I_ASSIGN(m_paramIdAttrPtr, "ObjectId", "Object-ID", false, "");
 		I_ASSIGN(m_commandPermissionsProviderCompPtr, "CommandPermissionsProvider", "Command permissions provider", false, "CommandPermissionsProvider");
 		I_ASSIGN(m_checkPermissionCompPtr, "PermissionChecker", "Checker of the permissions", false, "PermissionChecker");
+		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
 
 protected:
@@ -38,6 +40,7 @@ protected:
 
 	I_REF(imtbase::ICommandPermissionsProvider, m_commandPermissionsProviderCompPtr);
 	I_REF(imtauth::IPermissionChecker, m_checkPermissionCompPtr);
+	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 };
 
 

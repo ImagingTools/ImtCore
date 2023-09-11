@@ -159,6 +159,8 @@ Rectangle {
 
         documentManager: mainDocumentManager;
 
+        authorizationStatusProvider: authorizationPage;
+
         onModelStateChanged: {
             console.log("PagesManager onModelStateChanged", pagesManager.modelState);
             if (pagesManager.modelState === "Ready"){
@@ -206,7 +208,7 @@ Rectangle {
                 thumbnailDecoratorContainer.settingsObserver.registerModel(representationModel);
             }
 
-            modalDialogManager.openDialog(preferenceDialogComp, {"settingsModel": representationModel});
+            modalDialogManager.openDialog(preferenceDialogComp, {"settingsModel": representationModel, "settingsProvider": settingsProvider });
         }
     }
 
@@ -259,7 +261,9 @@ Rectangle {
 
         onFailed: {
             console.log("onFailed Ready");
-            loading.stop();
+//            loading.stop();
+
+            closeAllPages();
         }
     }
 

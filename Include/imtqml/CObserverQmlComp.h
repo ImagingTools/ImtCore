@@ -5,12 +5,14 @@
 #include <iqt/ITranslationManager.h>
 #include <ilog/TLoggerCompWrap.h>
 #include <iprm/IParamsSet.h>
+#include <iprm/ISelectionParam.h>
 
 // ImtCore includes
 #include <imtbase/IApplicationInfoRepresentation.h>
 #include <imtbase/CTreeItemModel.h>
 #include <imtbase/IRepresentationController.h>
 #include <imtqml/IQuickObject.h>
+#include <imtbase/TModelUpdateBinder.h>
 
 
 namespace imtqml
@@ -26,6 +28,7 @@ public:
 	I_BEGIN_COMPONENT(CObserverQmlComp);
 		I_ASSIGN(m_settingsRepresentationControllerCompPtr, "SettingsRepresentationController", "Controller for representation settings", true, "");
 		I_ASSIGN(m_settingsCompPtr, "Settings", "Settings", false, "Settings");
+		I_ASSIGN(m_languageParamPtr, "LanguageParam", "Language selection param", false, "LanguageParam");
 		I_ASSIGN(m_quickObjectCompPtr, "QuickObject", "Main QML Component", true, "QuickObject");
 		I_ASSIGN(m_prefixServer, "ServerPrefix", "Prefix Server", true, "/");
 		I_ASSIGN(m_applicationInfoRepresentationCompPtr, "ApplicationInfoRepresentation", "Application info representation", true, "ApplicationInfoRepresentation");
@@ -38,6 +41,11 @@ public:
 protected:
 	void ApplyUrl() const;
 	void UpdateLanguage() const;
+	void UpdateSettingsRepresentation();
+	void UpdateApplicationInfoRepresentation();
+
+	void OnSettingsChanged(const istd::IChangeable::ChangeSet& changeSet, const iprm::IParamsSet* objectPtr);
+	void OnLanguageChanged(const istd::IChangeable::ChangeSet& changeSet, const iprm::ISelectionParam* objectPtr);
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -50,6 +58,7 @@ private Q_SLOTS:
 private:
 	I_ATTR(QByteArray, m_prefixServer);
 	I_REF(iprm::IParamsSet, m_settingsCompPtr);
+	I_REF(iprm::ISelectionParam, m_languageParamPtr);
 	I_REF(imtbase::IRepresentationController, m_settingsRepresentationControllerCompPtr);
 	I_REF(imtqml::IQuickObject, m_quickObjectCompPtr);
 	I_REF(imtbase::IApplicationInfoRepresentation, m_applicationInfoRepresentationCompPtr);
@@ -59,6 +68,9 @@ private:
 private:
 	imtbase::CTreeItemModel* m_settingsModelPtr;
 	imtbase::CTreeItemModel* m_applicationInfoModelPtr;
+
+	imtbase::TModelUpdateBinder<iprm::IParamsSet, CObserverQmlComp> m_settingsObserver;
+	imtbase::TModelUpdateBinder<iprm::ISelectionParam, CObserverQmlComp> m_languageParamObserver;
 };
 
 

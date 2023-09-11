@@ -24,6 +24,8 @@ void CClientUserContextComp::SetLanguage(QString translation)
 					m_enginePtr->retranslate();
 				}
 
+				m_language = translation;
+
 				Q_EMIT LanguageChanged();
 			}
 		}

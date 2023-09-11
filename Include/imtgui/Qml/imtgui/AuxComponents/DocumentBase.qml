@@ -47,6 +47,12 @@ Item {
         id: uuidGenerator;
     }
 
+    QtObject {
+        id: cacheData;
+
+        property TreeItemModel cacheCommandsModel: TreeItemModel {};
+    }
+
     function documentCanBeSaved(){
         return true;
     }
@@ -76,6 +82,7 @@ Item {
         console.log("CommandsDecorator onLocalizationChanged", language);
 
         if (visible){
+            cacheData.cacheCommandsModel.Copy(documentBaseRoot.commandsProvider.commandsModel);
             documentBaseRoot.commandsProvider.updateModel();
         }
         else{
@@ -90,6 +97,8 @@ Item {
             documentBaseRoot.commandsProvider.updateGui();
 
             if (m_localizationChanged){
+                cacheData.cacheCommandsModel.Copy(documentBaseRoot.commandsProvider.commandsModel);
+
                 documentBaseRoot.commandsProvider.updateModel();
 
                 m_localizationChanged = false;

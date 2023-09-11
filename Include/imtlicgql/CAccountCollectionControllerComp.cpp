@@ -2,6 +2,7 @@
 
 
 // ImtCore includes
+#include <imtbase/imtbase.h>
 #include <imtauth/ICompanyInfo.h>
 
 
@@ -25,10 +26,16 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
+	if (!m_objectCollectionCompPtr.IsValid() || !m_translationManagerCompPtr.IsValid()){
 		errorMessage = QObject::tr("Internal error").toUtf8();
 
 		return nullptr;
+	}
+
+	QByteArray languageId;
+	imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		languageId = gqlContextPtr->GetLanguageId();
 	}
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel);
@@ -38,7 +45,10 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 
 	int index = dataModelPtr->InsertNewItem();
 
-	dataModelPtr->SetData("Name", QT_TR_NOOP("Modification Time"), index);
+	QString modificationTime = QT_TR_NOOP("Modification Time");
+	QString modificationTimeTr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), modificationTime.toUtf8(), languageId, "imtlicgql::CAccountCollectionControllerComp");
+
+	dataModelPtr->SetData("Name", modificationTimeTr, index);
 	imtbase::CTreeItemModel* children = dataModelPtr->AddTreeModel("Children", index);
 
 	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(accountId);
@@ -59,30 +69,38 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 		return nullptr;
 	}
 
+	QString companyNameStr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Company Name"), languageId, "imtlicgql::CAccountCollectionControllerComp");
+
 	index = dataModelPtr->InsertNewItem();
-	dataModelPtr->SetData("Name", QT_TR_NOOP("Company Name"), index);
+	dataModelPtr->SetData("Name", companyNameStr, index);
 	children = dataModelPtr->AddTreeModel("Children", index);
 
 	QString companyName = companyInfoPtr->GetName();
 	children->SetData("Value", companyName);
 
+	QString emailStr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Email"), languageId, "imtlicgql::CAccountCollectionControllerComp");
+
 	index = dataModelPtr->InsertNewItem();
-	dataModelPtr->SetData("Name", QT_TR_NOOP("Email"), index);
+	dataModelPtr->SetData("Name", emailStr, index);
 	children = dataModelPtr->AddTreeModel("Children", index);
 
 	QString mail = companyInfoPtr->GetEmail();
 	children->SetData("Value", mail);
 
+	QString descriptionStr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Description"), languageId, "imtlicgql::CAccountCollectionControllerComp");
+
 	index = dataModelPtr->InsertNewItem();
-	dataModelPtr->SetData("Name", QT_TR_NOOP("Description"), index);
+	dataModelPtr->SetData("Name", descriptionStr, index);
 	children = dataModelPtr->AddTreeModel("Children", index);
 
 	QString description = companyInfoPtr->GetDescription();
 
 	children->SetData("Value", description);
 
+	QString accountNameStr = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Account Name"), languageId, "imtlicgql::CAccountCollectionControllerComp");
+
 	index = dataModelPtr->InsertNewItem();
-	dataModelPtr->SetData("Name", QT_TR_NOOP("Account Name"), index);
+	dataModelPtr->SetData("Name", accountNameStr, index);
 
 	children = dataModelPtr->AddTreeModel("Children", index);
 

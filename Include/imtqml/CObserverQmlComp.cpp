@@ -16,7 +16,9 @@ namespace imtqml
 
 CObserverQmlComp::CObserverQmlComp()
 	:m_settingsModelPtr(nullptr),
-	m_applicationInfoModelPtr(nullptr)
+	m_applicationInfoModelPtr(nullptr),
+	m_settingsObserver(*this),
+	m_languageParamObserver(*this)
 {
 }
 
@@ -86,6 +88,66 @@ void CObserverQmlComp::UpdateLanguage() const
 }
 
 
+void CObserverQmlComp::UpdateSettingsRepresentation()
+{
+	if (m_quickObjectCompPtr.IsValid() && m_settingsCompPtr.IsValid()){
+		QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
+		if (quickItem != nullptr){
+			if (m_settingsModelPtr == nullptr){
+				m_settingsModelPtr = new imtbase::CTreeItemModel();
+			}
+
+			bool result = m_settingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*m_settingsCompPtr, *m_settingsModelPtr);
+			if (result){
+				if (m_settingsModelPtr->ContainsKey("Parameters")){
+					imtbase::CTreeItemModel* parametersPtr = m_settingsModelPtr->GetTreeItemModel("Parameters");
+					if (parametersPtr != nullptr){
+						QVariant data = QVariant::fromValue(parametersPtr);
+
+						quickItem->setProperty("localSettings", data);
+					}
+				}
+			}
+		}
+	}
+}
+
+
+void CObserverQmlComp::UpdateApplicationInfoRepresentation()
+{
+	if (m_quickObjectCompPtr.IsValid() && m_settingsCompPtr.IsValid()){
+		QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
+		if (quickItem != nullptr){
+			if (m_applicationInfoModelPtr != nullptr){
+				delete m_applicationInfoModelPtr;
+			}
+
+			m_applicationInfoModelPtr = new imtbase::CTreeItemModel();
+
+			if (m_applicationInfoCompPtr.IsValid() && m_applicationInfoRepresentationCompPtr.IsValid()){
+				if (m_applicationInfoRepresentationCompPtr->GetRepresentationFromApplicationInfo(*m_applicationInfoCompPtr, *m_applicationInfoModelPtr)){
+					QVariant data = QVariant::fromValue(m_applicationInfoModelPtr);
+
+					quickItem->setProperty("applicationInfo", data);
+				}
+			}
+		}
+	}
+}
+
+
+void CObserverQmlComp::OnSettingsChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::IParamsSet* /*objectPtr*/)
+{
+}
+
+
+void CObserverQmlComp::OnLanguageChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::ISelectionParam* /*objectPtr*/)
+{
+	UpdateSettingsRepresentation();
+	UpdateApplicationInfoRepresentation();
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CObserverQmlComp::OnComponentCreated()
@@ -95,41 +157,24 @@ void CObserverQmlComp::OnComponentCreated()
 	if (m_quickObjectCompPtr.IsValid()){
 		QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
 		if (quickItem != nullptr){
-			if (m_settingsRepresentationControllerCompPtr.IsValid() && m_settingsCompPtr.IsValid()){
-				UpdateLanguage();
-
-				m_settingsModelPtr = new imtbase::CTreeItemModel();
-				bool result = m_settingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*m_settingsCompPtr, *m_settingsModelPtr);
-				if (result){
-					m_applicationInfoModelPtr = new imtbase::CTreeItemModel();
-
-					if (m_applicationInfoCompPtr.IsValid() && m_applicationInfoRepresentationCompPtr.IsValid()){
-						if (m_applicationInfoRepresentationCompPtr->GetRepresentationFromApplicationInfo(*m_applicationInfoCompPtr, *m_applicationInfoModelPtr)){
-							QVariant data = QVariant::fromValue(m_applicationInfoModelPtr);
-
-							quickItem->setProperty("applicationInfo", data);
-						}
-					}
-
-					if (m_settingsModelPtr != nullptr){
-						if (m_settingsModelPtr->ContainsKey("Parameters")){
-							imtbase::CTreeItemModel* parametersPtr = m_settingsModelPtr->GetTreeItemModel("Parameters");
-							if (parametersPtr != nullptr){
-								QVariant data = QVariant::fromValue(parametersPtr);
-
-								quickItem->setProperty("localSettings", data);
-							}
-						}
-					}
-
-					bool isConnected = connect(quickItem, SIGNAL(settingsUpdate()), this, SLOT(OnGuiChanged()));
-					Q_ASSERT(isConnected);
-
-					ApplyUrl();
-
-					QMetaObject::invokeMethod(quickItem, "firstModelsInit");
-				}
+			if (m_settingsCompPtr.IsValid()){
+				m_settingsObserver.RegisterObject(m_settingsCompPtr.GetPtr(), &CObserverQmlComp::OnSettingsChanged);
 			}
+
+			if (m_languageParamPtr.IsValid()){
+				m_languageParamObserver.RegisterObject(m_languageParamPtr.GetPtr(), &CObserverQmlComp::OnLanguageChanged);
+			}
+
+			UpdateLanguage();
+			UpdateSettingsRepresentation();
+			UpdateApplicationInfoRepresentation();
+
+			ApplyUrl();
+
+			bool isConnected = connect(quickItem, SIGNAL(settingsUpdate()), this, SLOT(OnGuiChanged()));
+			Q_ASSERT(isConnected);
+
+			QMetaObject::invokeMethod(quickItem, "firstModelsInit");
 		}
 	}
 }
@@ -148,6 +193,9 @@ void CObserverQmlComp::OnComponentDestroyed()
 
 		m_applicationInfoModelPtr = nullptr;
 	}
+
+	m_settingsObserver.UnregisterAllObjects();
+	m_languageParamObserver.UnregisterAllObjects();
 
 	BaseClass::OnComponentDestroyed();
 }

@@ -34,7 +34,6 @@ Rectangle {
     }
 
     onSettingsModelChanged: {
-        console.log("onSettingsModelChanged");
         if (root.settingsModel != null){
             console.log("connect");
             root.settingsModel.dataChanged.connect(root.modelChanged);

@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
+import imtauthgui 1.0
 
 Item {
     id: container;
@@ -9,6 +10,7 @@ Item {
     property Item activeItem: null;
     property int activePageIndex: -1;
     property MainDocumentManager documentManager: null;
+    property AuthorizationPage authorizationStatusProvider: null;
 
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
@@ -30,8 +32,12 @@ Item {
 
     function onLocalizationChanged(language){
         console.log("pagesProvider onLocalizationChanged", language);
-
-        pagesProvider.updateModel();
+        if (container.authorizationStatusProvider != null){
+            let loggedUserId = container.authorizationStatusProvider.getLoggedUserId();
+            if (loggedUserId !== ""){
+                pagesProvider.updateModel();
+            }
+        }
     }
 
     property alias modelState: pagesProvider.modelState;
@@ -47,6 +53,15 @@ Item {
                 let countPages = pagesData.model.GetItemsCount();
                 if (pagesProvider.pagesModel.GetItemsCount() === countPages){
                     updateRepeaterModel = false;
+
+//                    for (let i = 0; i < pagesData.count; i++){
+//                        let pageData = pagesData.itemAt(i);
+
+//                        let id = pagesProvider.pagesModel.GetData("Id", i);
+//                        let name = pagesProvider.pagesModel.GetData("Name", i);
+
+//                        Events.sendEvent(id + "NameChanged", name);
+//                    }
                 }
             }
 
@@ -77,6 +92,21 @@ Item {
                 if (container.documentManager != null){
                     container.documentManager.registerDocumentManager(model.Id, null);
                 }
+
+                Events.subscribeEvent("PageNameChanged", pagesDeleg.onPageNameChanged);
+            }
+
+            Component.onDestruction: {
+                Events.unSubscribeEvent("PageNameChanged", pagesDeleg.onPageNameChanged);
+            }
+
+            function onPageNameChanged(parameters){
+                let pageId = parameters["Id"]
+                let pageName = parameters["Name"]
+
+                if (pageId == model.Id){
+                    model.Name = pageName;
+                }
             }
 
             /**
@@ -94,6 +124,13 @@ Item {
                     }
 
                     container.activeItem = pagesLoader.item;
+                }
+            }
+
+            function updateName(newName){
+                if (pagesLoader.item){
+                    pagesLoader.item.startPageObj["Name"] = newName;
+
                 }
             }
 

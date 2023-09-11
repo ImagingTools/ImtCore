@@ -18,7 +18,7 @@ Dialog {
 
     onSettingsProviderChanged: {
         if (messageDialog.settingsProvider != null){
-
+            messageDialog.settingsProvider.serverModelChanged.connect(messageDialog.onServerModelChanged);
         }
     }
 
@@ -31,12 +31,17 @@ Dialog {
 
         let name = messageDialog.buttonsModel.get(1).Name;
         messageDialog.buttonsModel.setProperty(1, "Name", qsTr(name));
+    }
 
+    function onServerModelChanged(){
+        console.log("Preference onServerModelChanged");
 //        messageDialog.contentItem.clearModels();
 
-        if (messageDialog.settingsProvider != null){
-//            messageDialog.contentItem.settingsModel = messageDialog.settingsProvider.getRepresentationModel();
-        }
+//        let representatioModel = messageDialog.settingsProvider.getRepresentationModel();
+//        if (messageDialog.settingsProvider != null){
+//            messageDialog.contentItem.settingsModel = null;
+//            messageDialog.contentItem.settingsModel = representatioModel
+//        }
     }
 
     onFinished: {

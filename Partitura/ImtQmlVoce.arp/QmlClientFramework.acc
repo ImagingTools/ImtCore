@@ -109,6 +109,9 @@
                     <AttributeInfo Id="ApplicationInfoRepresentation" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationInfoRepresentation"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="LanguageParam" Type="Reference" ExportId="LanguageParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
