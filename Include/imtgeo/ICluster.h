@@ -10,18 +10,24 @@
 
 namespace imtgeo
 {
-
-
 /**
-	Interface for describing a cluster of objects on the map.
+    Interface for describing a cluster of objects on the map.
 */
-class ICluster: virtual public imtgeo::IPosition
+
+class ICluster:  virtual public imtgeo::IPosition
 {
 public:
-	/**
-		Get number of the positions in the cluster.
-	*/
-	virtual int GetChildrenCount() const = 0;
+
+    /**
+        Get id list of objects in cluster.
+    */
+    virtual QStringList GetChildrenIds() const = 0;
+
+    /**
+        Set id list of objects in cluster.
+    */
+    virtual void SetChildrenIds(QStringList &list) = 0;
+
 };
 
 
