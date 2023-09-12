@@ -19,7 +19,8 @@ CSystemStatusComp::CSystemStatusComp()
 	:m_status(SystemStatus::SS_UNKNOWN_ERROR),
 	m_futureResultStatus(SystemStatus::SS_UNKNOWN_ERROR),
 	m_textParamObserver(*this),
-	m_blockAutoStart(false)
+	m_singleCheck(false),
+	m_autoCheck(true)
 {
 }
 
@@ -31,6 +32,52 @@ ISystemStatus::SystemStatus CSystemStatusComp::GetSystemStatus(QString& errorMes
 	errorMessage = m_statusMessage;
 
 	return m_status;
+}
+
+
+void CSystemStatusComp::UpdateSystemStatus()
+{
+	if (m_slaveSystemStatusCompPtr.IsValid()){
+		m_slaveSystemStatusCompPtr->UpdateSystemStatus();
+	}
+
+	m_statusMessage = QObject::tr("Try connection to the address %1 ...").arg(qPrintable(m_workingUrl));
+	SetStatus(ISystemStatus::SS_TRY_CONNECTING_SERVER);
+
+	StartCheckSystemStatus();
+}
+
+
+imtcom::IConnectionStatusProvider* CSystemStatusComp::GetConnectionStatusProvider() const
+{
+	return m_connectionStatusProviderCompPtr.GetPtr();
+}
+
+
+imtdb::IDatabaseServerConnectionChecker* CSystemStatusComp::GetDatabaseServerConnectionStatusProvider() const
+{
+	return m_dbServerConnectionCheckerCompPtr.GetPtr();
+}
+
+
+bool CSystemStatusComp::StartCheckSystemStatus()
+{
+	m_autoCheck = true;
+
+	if (!m_timer.isActive()){
+		m_timer.start();
+	}
+
+	return true;
+}
+
+
+bool CSystemStatusComp::StopCheckSystemStatus()
+{
+	m_timer.stop();
+	m_autoCheck = false;
+
+	return true;
 }
 
 
@@ -94,6 +141,10 @@ void CSystemStatusComp::SetStatus(ISystemStatus::SystemStatus status)
 		Q_UNUSED(notifier);
 
 		m_status = status;
+
+		if (m_status == ISystemStatus::SS_NO_ERROR){
+			m_autoCheck = false;
+		}
 	}
 }
 
@@ -104,16 +155,22 @@ void CSystemStatusComp::OnCheckStatusFinished()
 {
 	SetStatus(m_futureResultStatus);
 
-	if (*m_autoCheckStatusAttrPtr){
+	if (m_autoCheck && !m_singleCheck){
 		int interval = m_checkIntervalAttrPtr.IsValid() ? *m_checkIntervalAttrPtr * 1000 : 60000;
 		m_timer.start(interval);
+	}
+
+	if (m_singleCheck){
+		m_singleCheck = false;
 	}
 }
 
 
 void CSystemStatusComp::OnTimeout()
 {
-	Q_ASSERT(!m_checkStatusFutureWatcher.isRunning());
+	if (m_checkStatusFutureWatcher.isRunning()){
+		return;
+	}
 
 #if QT_VERSION >= 0x060000
 	m_checkStatusFutureWatcher.setFuture(QtConcurrent::run(&CSystemStatusComp::CheckStatus, this));
@@ -125,6 +182,7 @@ void CSystemStatusComp::OnTimeout()
 
 void CSystemStatusComp::CheckStatus()
 {
+	qDebug() << "CheckStatus";
 	if (m_connectionStatusProviderCompPtr.IsValid()){
 		imtcom::IConnectionStatusProvider::ConnectionStatus serverConnectionStatus = m_connectionStatusProviderCompPtr->GetConnectionStatus();
 		if (serverConnectionStatus != imtcom::IConnectionStatusProvider::ConnectionStatus::CS_CONNECTED){
@@ -146,6 +204,7 @@ void CSystemStatusComp::CheckStatus()
 			}
 		}
 
+		m_statusMessage = "";
 		m_futureResultStatus = ISystemStatus::SS_NO_ERROR;
 	}
 

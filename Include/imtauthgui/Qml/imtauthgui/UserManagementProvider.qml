@@ -7,7 +7,7 @@ QtObject {
     id: container;
 
     property string userMode;
-//    property bool superuserExists: false;
+    property bool superuserExists: false;
 
     signal updated();
 
@@ -112,6 +112,16 @@ QtObject {
 //                        let superUserExists = dataModelLocal.GetData("SuperUserExists");
 
 //                        container.superuserExists = Boolean(superUserExists);
+//                    }
+
+//                    if (!container.superuserExists){
+//                        if (dataModelLocal.ContainsKey("ErrorMessage")){
+//                            let errorMessage = dataModelLocal.GetData("ErrorMessage");
+
+//                            modalDialogManager.openDialog(errorDialog, {"message": errorMessage});
+
+//                            return;
+//                        }
 //                    }
                 }
 

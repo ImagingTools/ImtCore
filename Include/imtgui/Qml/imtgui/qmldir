@@ -3,6 +3,7 @@ ThumbnailDecorator 1.0 ThumbnailDecorator.qml
 ApplicationMain 1.0 ApplicationMain.qml
 
 BaseText 1.0 ./AuxComponents/BaseText.qml
+ErrorManager 1.0 ./AuxComponents/ErrorManager.qml
 
 CollectionView 1.0 ./AuxComponents/CollectionView.qml
 CollectionViewBase 1.0 ./AuxComponents/CollectionViewBase.qml

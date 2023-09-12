@@ -12,7 +12,6 @@ Item {
     property string systemStatus: "NO_ERROR";
     property alias localSettings: application.settingsProvider.localModel;
 
-//    property alias applicationInfo: applicationInfoProvider.clientApplicationInfo;
     property var applicationInfo;
 
     property bool serverReady: false;
@@ -24,6 +23,7 @@ Item {
         }
     }
 
+    signal updateSystemStatus();
     signal settingsUpdate();
     signal localSettingsUpdated();
 
@@ -89,6 +89,7 @@ Item {
 
         property bool applyCachedLanguage: application.serverReady && application.settingsProvider.serverModel != null;
         onApplyCachedLanguageChanged: {
+            console.log("onApplyCachedLanguageChanged", applyCachedLanguage);
             if (applyCachedLanguage){
                 let lang = application.languageProvider.getLanguage();
                 context.language = lang;
@@ -97,6 +98,7 @@ Item {
 
         property bool applyCachedSchema: application.serverReady && application.settingsProvider.localModel != null;
         onApplyCachedSchemaChanged: {
+            console.log("onApplyCachedSchemaChanged", applyCachedSchema);
             if (applyCachedSchema){
                 application.designProvider.applyCachedDesignSchema();
             }
@@ -120,6 +122,8 @@ Item {
 
         settingsProvider: application.settingsProvider;
         settingsObserver: application.settingsObserver;
+
+        applicationMain: application;
     }
 
     function onLogout(){

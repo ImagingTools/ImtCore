@@ -44,6 +44,11 @@ public:
 
 	// reimplemented (ISystemStatus)
 	virtual SystemStatus GetSystemStatus(QString& errorMessage) const override;
+	virtual void UpdateSystemStatus() override;
+	virtual imtcom::IConnectionStatusProvider* GetConnectionStatusProvider() const override;
+	virtual imtdb::IDatabaseServerConnectionChecker* GetDatabaseServerConnectionStatusProvider() const override;
+	virtual bool StartCheckSystemStatus() override;
+	virtual bool StopCheckSystemStatus() override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
@@ -66,7 +71,8 @@ private:
 	imtbase::TModelUpdateBinder<iprm::ITextParam, CSystemStatusComp> m_textParamObserver;
 	QByteArray m_workingUrl;
 
-	bool m_blockAutoStart;
+	bool m_singleCheck;
+	bool m_autoCheck;
 
 private:
 	I_REF(imtcom::IConnectionStatusProvider, m_connectionStatusProviderCompPtr);

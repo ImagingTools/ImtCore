@@ -23,7 +23,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtauth::ISuperuserProvider)
-	virtual bool SuperuserExists() const override;
+	virtual bool SuperuserExists(QString& errorMessage) const override;
 	virtual QByteArray GetSuperuserId() const override;
 
 protected:

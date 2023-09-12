@@ -8,6 +8,25 @@ Rectangle {
 
     property string text: qsTr("There is no connection to the server. Please check server url.");
 
+    signal refresh();
+
+    Component.onCompleted: {
+        Events.subscribeEvent("SystemStatusChanged", container.onSystemStatusChanged)
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("SystemStatusChanged", container.onSystemStatusChanged)
+    }
+
+    function onSystemStatusChanged(status){
+        if (status === "TRY_CONNECTING"){
+            loading.visible = true;
+        }
+        else{
+            loading.visible = false;
+        }
+    }
+
     Text {
         id: textNoConnection;
 
@@ -25,5 +44,34 @@ Rectangle {
 
         wrapMode: Text.Wrap;
     }
-}
 
+    Loading {
+        id: loading;
+
+        anchors.fill: textNoConnection;
+
+        visible: false;
+    }
+
+    BaseButton{
+        id: buttonContainer;
+
+        anchors.top: textNoConnection.bottom;
+        anchors.topMargin: 20;
+        anchors.horizontalCenter: parent.horizontalCenter;
+
+        text: qsTr("Refresh");
+
+        decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
+
+        onClicked: {
+            container.refresh();
+        }
+    }
+
+    Component{
+        id: defaultButtonDecorator;
+        CommonButtonDecorator{
+        }
+    }
+}

@@ -71,6 +71,23 @@ QtObject {
                 var dataModelLocal;
 
                 if (gqlModelBaseContainer.headerInfoModel.ContainsKey("errors")){
+                    dataModelLocal = gqlModelBaseContainer.headerInfoModel.GetData("errors");
+
+                    if (dataModelLocal.ContainsKey(gqlModelBaseContainer.gqlModelHeadersInfo)){
+                        dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelHeadersInfo);
+                    }
+
+                    let message = ""
+                    if (dataModelLocal.ContainsKey("message")){
+                        message = dataModelLocal.GetData("message");
+                    }
+
+                    let type;
+                    if (dataModelLocal.ContainsKey("type")){
+                        type = dataModelLocal.GetData("type");
+                    }
+
+                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
 
                     return;
                 }
@@ -80,6 +97,9 @@ QtObject {
 
                     if (dataModelLocal.ContainsKey(gqlModelBaseContainer.gqlModelHeadersInfo)){
                         dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelHeadersInfo);
+                        if (!dataModelLocal){
+                            return;
+                        }
 
                         if (dataModelLocal.ContainsKey("FilterSearch")){
                             let filterSearchModel = dataModelLocal.GetData("FilterSearch")
@@ -144,6 +164,24 @@ QtObject {
             if (this.state === "Ready"){
                 var dataModelLocal;
                 if (gqlModelBaseContainer.itemsInfoModel.ContainsKey("errors")){
+                    dataModelLocal = gqlModelBaseContainer.itemsInfoModel.GetData("errors");
+
+                    if (dataModelLocal.ContainsKey(gqlModelBaseContainer.gqlModelItemsInfo)){
+                        dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelItemsInfo);
+                    }
+
+                    let message = ""
+                    if (dataModelLocal.ContainsKey("message")){
+                        message = dataModelLocal.GetData("message");
+                    }
+
+                    let type;
+                    if (dataModelLocal.ContainsKey("type")){
+                        type = dataModelLocal.GetData("type");
+                    }
+
+                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+
                     return;
                 }
 
@@ -206,6 +244,24 @@ QtObject {
                 var dataModelLocal;
 
                 if (gqlModelBaseContainer.objectViewModel.ContainsKey("errors")){
+                    dataModelLocal = gqlModelBaseContainer.objectViewModel.GetData("errors");
+
+                    if (dataModelLocal.ContainsKey(gqlModelBaseContainer.gqlModelObjectView)){
+                        dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelObjectView);
+                    }
+
+                    let message = ""
+                    if (dataModelLocal.ContainsKey("message")){
+                        message = dataModelLocal.GetData("message");
+                    }
+
+                    let type;
+                    if (dataModelLocal.ContainsKey("type")){
+                        type = dataModelLocal.GetData("type");
+                    }
+
+                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+
                     return;
                 }
 

@@ -15,7 +15,6 @@
         <Element ComponentName="MainWindow" X="600" Y="500" Note=""/>
         <Element ComponentName="ObserverQml" X="300" Y="500" Note=""/>
         <Element ComponentName="QuickApplication" X="600" Y="275" Note=""/>
-        <Element ComponentName="SystemStatusController" X="925" Y="675" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

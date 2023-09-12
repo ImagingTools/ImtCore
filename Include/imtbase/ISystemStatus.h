@@ -4,6 +4,10 @@
 // ACF includes
 #include <istd/IChangeable.h>
 
+// ImtCore includes
+#include <imtcom/IConnectionStatusProvider.h>
+#include <imtdb/IDatabaseServerConnectionChecker.h>
+
 
 namespace imtbase
 {
@@ -22,6 +26,11 @@ public:
 	};
 
 	virtual SystemStatus GetSystemStatus(QString& errorMessage) const = 0;
+	virtual void UpdateSystemStatus() = 0;
+	virtual bool StartCheckSystemStatus() = 0;
+	virtual bool StopCheckSystemStatus() = 0;
+	virtual imtcom::IConnectionStatusProvider* GetConnectionStatusProvider() const = 0;
+	virtual imtdb::IDatabaseServerConnectionChecker* GetDatabaseServerConnectionStatusProvider() const = 0;
 };
 
 

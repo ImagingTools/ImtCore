@@ -157,6 +157,7 @@
         <file alias="imtgui/AuxComponents/SpinBox.qml">Qml/imtgui/AuxComponents/SpinBox.qml</file>
 	<file alias="imtgui/AuxComponents/SettingsObserver.qml">Qml/imtgui/AuxComponents/SettingsObserver.qml</file>
 	<file alias="imtgui/AuxComponents/PreferenceDialog.qml">Qml/imtgui/AuxComponents/PreferenceDialog.qml</file>
+	<file alias="imtgui/AuxComponents/ErrorManager.qml">Qml/imtgui/AuxComponents/ErrorManager.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

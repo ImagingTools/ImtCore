@@ -20,9 +20,15 @@ void CClientMainWindowQmlComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_checkSystemStatusAttrPtr.IsValid() && *m_checkSystemStatusAttrPtr){
-		if (m_systemStatusCompPtr.IsValid()){
-			m_systemStatusObserver.RegisterObject(m_systemStatusCompPtr.GetPtr(), &CClientMainWindowQmlComp::OnSystemStatusUpdate);
+	if (m_systemStatusCompPtr.IsValid()){
+		m_systemStatusObserver.RegisterObject(m_systemStatusCompPtr.GetPtr(), &CClientMainWindowQmlComp::OnSystemStatusUpdate);
+	}
+
+	if (m_quickObjectCompPtr.IsValid()){
+		QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
+		if (quickItem != nullptr){
+			bool isConnected = connect(quickItem, SIGNAL(updateSystemStatus()), this, SLOT(UpdateSystemStatus()));
+			Q_ASSERT(isConnected);
 		}
 	}
 }
@@ -43,6 +49,10 @@ void CClientMainWindowQmlComp::OnSystemStatusUpdate(
 			const imtbase::ISystemStatus* objectPtr)
 {
 	if (objectPtr == nullptr){
+		return;
+	}
+
+	if (!m_systemStatusCompPtr.IsValid()){
 		return;
 	}
 
@@ -89,6 +99,14 @@ void CClientMainWindowQmlComp::OnSystemStatusUpdate(
 		QMetaObject::invokeMethod(quickItem, "setSystemStatus",
 					Q_ARG(QVariant, QVariant::fromValue(statusStr)),
 					Q_ARG(QVariant, QVariant::fromValue(error)));
+	}
+}
+
+
+void CClientMainWindowQmlComp::UpdateSystemStatus()
+{
+	if (m_systemStatusCompPtr.IsValid()){
+		m_systemStatusCompPtr->UpdateSystemStatus();
 	}
 }
 

@@ -13,7 +13,7 @@ namespace imtauthgql
 
 // reimplemented (imtauth::ISuperuserProvider)
 
-bool CClientRequestRemoteSuperuserProviderComp::SuperuserExists() const
+bool CClientRequestRemoteSuperuserProviderComp::SuperuserExists(QString& errorMessage) const
 {
 	imtgql::CGqlRequest gqlRequest(imtgql::CGqlRequest::RT_QUERY, "UsersList");
 	imtgql::CGqlObject queryFields("items");

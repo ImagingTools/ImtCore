@@ -14,8 +14,12 @@ QtObject {
     signal commandActivated(string commandId);
 
     function commandHandle(commandId){
+        console.log("commandHandle", commandId);
         let documentId = container.documentBase.documentModel.GetData("Id");
         if (commandId === "Close"){
+            console.log("Close", documentId);
+            console.log("container.documentBase.documentModel", container.documentBase.documentModel.toJSON());
+
             let itemId = container.documentBase.itemId;
             let documentManager = container.documentBase.documentManager;
             documentManager.closeDocument(itemId);

@@ -23,7 +23,7 @@ public:
 	/**
 		Get information for exists superuser.
 	*/
-	virtual bool SuperuserExists() const = 0;
+	virtual bool SuperuserExists(QString& errorMessage) const = 0;
 
 	/**
 		Get information for superuser ID.

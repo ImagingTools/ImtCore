@@ -39,8 +39,13 @@ imtbase::CTreeItemModel* CAuthorizationOptionsControllerComp::CreateRepresentati
 		QByteArray userModeId = parametersModelPtr->GetData("Id", value).toByteArray();
 		if (userModeId == "STRONG_USER_MANAGEMENT"){
 			if (m_superuserProviderCompPtr.IsValid()){
-				bool superuserExists = m_superuserProviderCompPtr->SuperuserExists();
+				QString errorMessage;
+				bool superuserExists = m_superuserProviderCompPtr->SuperuserExists(errorMessage);
 				dataModelPtr->SetData("SuperUserExists", superuserExists);
+
+				if (!errorMessage.isEmpty()){
+					dataModelPtr->SetData("ErrorMessage", errorMessage);
+				}
 			}
 		}
 

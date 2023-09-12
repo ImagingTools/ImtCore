@@ -16,7 +16,10 @@ namespace imtgql
 
 // reimplemented (imtgql::IGqlContextController)
 
-imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(const imtgql::CGqlRequest& /*gqlRequest*/, const QByteArray& token) const
+imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			const QByteArray& token,
+			QString& errorMessage) const
 {
 	if (!m_sessionCollectionCompPtr.IsValid() || !m_userCollectionCompPtr.IsValid()){
 		return nullptr;

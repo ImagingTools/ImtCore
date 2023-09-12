@@ -7,9 +7,10 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
+#include <iprm/ITextParam.h>
 
 // ImtCore includes
-//#include <imtbase/IObjectCollection.h>
+#include <imtbase/ISystemStatus.h>
 #include <imtauth/ISession.h>
 #include <imtgql/IGqlContextController.h>
 #include <imtgql/IGqlRequestHandler.h>
@@ -33,14 +34,15 @@ public:
 		I_ASSIGN(m_userInfoFactCompPtr, "UserFactory", "Factory used for creation of the new user", true, "UserFactory");
 		I_ASSIGN(m_sessionInfoFactCompPtr, "SessionFactory", "Factory used for creation of the new session", true, "SessionFactory");
 		I_ASSIGN(m_gqlRequestHandlerCompPtr, "GqlRequest", "GraphQL request handler", true, "GqlRequest");
-//		I_ASSIGN(m_userSettingsCollectionCompPtr, "UserSettingsCollection", "User settings collection", false, "UserSettingsCollection");
 		I_ASSIGN(m_cacheClearingIntervalAttrPtr, "CacheClearingInterval", "Interval for cache clearing (in seconds)", false, 60.0);
+		I_ASSIGN(m_cacheClearingIntervalParamCompPtr, "CacheClearingIntervalParam", "Param interval for cache clearing", false, "CacheClearingIntervalParam");
+		I_ASSIGN(m_remoteSystemStatusCompPtr, "RemoteSystemStatus", "System status of the remote server", false, "RemoteSystemStatus");
 	I_END_COMPONENT;
 
 	CRemoteGqlContextControllerComp();
 
 	// reimplemented (imtgql::IGqlContextController)
-	virtual imtgql::IGqlContext* GetRequestContext(const imtgql::CGqlRequest& gqlRequest, const QByteArray& token) const override;
+	virtual imtgql::IGqlContext* GetRequestContext(const imtgql::CGqlRequest& gqlRequest, const QByteArray& token, QString &errorMessage) const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
@@ -66,8 +68,9 @@ private:
 	I_FACT(imtauth::IUserInfo, m_userInfoFactCompPtr);
 	I_FACT(imtauth::ISession, m_sessionInfoFactCompPtr);
 	I_REF(imtgql::IGqlRequestHandler, m_gqlRequestHandlerCompPtr);
-//	I_REF(imtbase::IObjectCollection, m_userSettingsCollectionCompPtr);
 	I_ATTR(int, m_cacheClearingIntervalAttrPtr);
+	I_REF(iprm::ITextParam, m_cacheClearingIntervalParamCompPtr);
+	I_REF(imtbase::ISystemStatus, m_remoteSystemStatusCompPtr);
 };
 
 

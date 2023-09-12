@@ -44,13 +44,34 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	imtgql::IGqlContext* gqlContextPtr = nullptr;
 	QByteArray accessToken = headers.value("X-authentication-token");
 	if (!accessToken.isEmpty() && m_gqlContextControllerCompPtr.IsValid()){
-		gqlContextPtr = m_gqlContextControllerCompPtr->GetRequestContext(gqlRequest, accessToken);
+		QString errorMessage;
+		gqlContextPtr = m_gqlContextControllerCompPtr->GetRequestContext(gqlRequest, accessToken, errorMessage);
 
 		if (gqlContextPtr != nullptr){
 			gqlRequest.SetGqlContext(gqlContextPtr);
 
 			if (gqlContextPtr->GetUserInfo() != nullptr){
 				userId = gqlContextPtr->GetUserInfo()->GetId();
+			}
+		}
+		else{
+			QByteArray responseData;
+
+			imtbase::CTreeItemModel rootModel;
+			imtbase::CTreeItemModel* errorsModelPtr = rootModel.AddTreeModel("errors");
+			imtbase::CTreeItemModel* errorItemModelPtr = errorsModelPtr->AddTreeModel(gqlCommand);
+
+			errorItemModelPtr->SetData("message", errorMessage);
+			errorItemModelPtr->SetData("type", "Critical");
+
+			{
+				iser::CJsonMemWriteArchive archive(responseData);
+				if (!rootModel.Serialize(archive)){
+				}
+			}
+
+			if (!responseData.isEmpty()){
+				return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_OK, responseData, request);
 			}
 		}
 	}
@@ -118,6 +139,7 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 							errorsItemModel = rootModel.AddTreeModel("errors");
 						}
 
+						errorsSourceItemModel->SetData("type", "Warning");
 						errorsItemModel->SetExternTreeModel(gqlCommand, errorsSourceItemModel);
 					}
 
@@ -135,6 +157,7 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 						imtbase::CTreeItemModel* errorItemModelPtr = errorsModelPtr->AddTreeModel(gqlCommand);
 
 						errorItemModelPtr->SetData("message", errorMessage);
+						errorItemModelPtr->SetData("type", "Warning");
 
 						iser::CJsonMemWriteArchive archive(responseData);
 						if (!rootModel.Serialize(archive)){

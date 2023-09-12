@@ -73,26 +73,21 @@ Item {
 
     function onLocalizationChanged(language){
         console.log("workspaceView onLocalizationChanged", language);
-        let name = workspaceView.documentsData.GetData("Name");
-        console.log("name", name);
-
-        let trName = qsTr(name);
-        console.log("trName", trName);
-
-        workspaceView.documentsData.SetData("Title", trName);
     }
 
     function onMainCollectionUpdated(){
         if (workspaceView.mainCollectionView != null){
             let notificationModel = workspaceView.mainCollectionView.notificationModel;
-            if (notificationModel.ContainsKey("TotalCount")){
-                let totalCount = notificationModel.GetData("TotalCount");
+            if (notificationModel){
+                if (notificationModel.ContainsKey("TotalCount")){
+                    let totalCount = notificationModel.GetData("TotalCount");
 
-                let collectionTitle = workspaceView.documentsData.GetData("Name");
+                    let collectionTitle = workspaceView.documentsData.GetData("Name");
 
-                collectionTitle += " (" + totalCount + ")"
+                    collectionTitle += " (" + totalCount + ")"
 
-                workspaceView.documentsData.SetData("Title", collectionTitle);
+                    workspaceView.documentsData.SetData("Title", collectionTitle);
+                }
             }
         }
     }
@@ -221,6 +216,10 @@ Item {
         if (workspaceView.mainCollectionView != null){
             workspaceView.mainCollectionView.updateGui();
         }
+    }
+
+    UuidGenerator {
+        id: uuidGenerator;
     }
 
     // isRequested - if true, then the document model will be requested from the server
@@ -474,8 +473,17 @@ Item {
         model: workspaceView.documentsData;
 
         onCloseItem: {
-            let item = workspaceView.documentsData.GetData("Item", index);
-            item.commandsDelegate.commandHandle("Close");
+//            let currentSelectedIndex = tabPanelInternal.selectedIndex;
+//            tabPanelInternal.selectedIndex = index;
+            console.log("onCloseItem", index);
+            let documentBase = workspaceView.documentsData.GetData("Item", index);
+            console.log("documentBase.itemId", documentBase.itemId);
+
+            workspaceView.closeDocument(documentBase.itemId);
+
+//            item.commandsDelegate.commandHandle("Close");
+
+//            tabPanelInternal.selectedIndex = currentSelectedIndex;
         }
 
         onRightClicked: {
@@ -623,11 +631,13 @@ Item {
                         dataLoader.item.mainDocumentManager = workspaceView.mainDocumentManager;
                     }
 
-                    //C
                     dataLoader.item.itemId = model.Id;
-                    //
-
                     dataLoader.item.commandsId = model.CommandsId
+
+                    if (model.Id === ""){
+                        model.Id = dataLoader.item.documentUuid;
+                        dataLoader.item.itemId = dataLoader.item.documentUuid;
+                    }
                 }
             }
         }

@@ -28,6 +28,8 @@ Rectangle {
     property alias documentManager: mainDocumentManager;
     property alias dialogManager: modalDialogManager;
 
+    property var applicationMain: null;
+
     property SettingsProvider settingsProvider: null;
     property SettingsObserver settingsObserver: null;
 
@@ -51,14 +53,23 @@ Rectangle {
         onResult: {
             console.log("SuperuserProvider onResult", exists);
             if (exists){
+                thumbnailDecoratorContainer.closeAllPages();
+
                 authorizationPage.visible = true;
             }
             else{
-                superuserPasswordPage.visible = true;
+                if (error === ""){
+                    superuserPasswordPage.visible = true;
+                }
+                else{
+                    Events.sendEvent("SendCriticalError", error);
+                }
             }
         }
 
         onModelStateChanged: {
+            console.log("Superuser onModelStateChanged", state);
+
             if (state === "Ready"){
                 console.log("SuperuserProvider Ready", state);
                 loading.stop();
@@ -198,6 +209,12 @@ Rectangle {
             Events.sendEvent("SetCommandsVisible", !visible);
             Events.sendEvent("SetUserPanelVisible", !visible);
         }
+
+        onRefresh: {
+            if (thumbnailDecoratorContainer.applicationMain != null){
+                thumbnailDecoratorContainer.applicationMain.updateSystemStatus();
+            }
+        }
     }
 
     function showPreferencePage(){
@@ -323,6 +340,22 @@ Rectangle {
 
     ShortcutManager {
         id: shortcutManager;
+    }
+
+    property Component errorDialog: Component {
+        ErrorDialog {
+            onFinished: {}
+        }
+    }
+
+    ErrorManager {
+        id: errorManager;
+
+        anchors.fill: parent;
+
+        errorPage: serverNoConnectionView;
+
+        visible: false;
     }
 
     Loading {

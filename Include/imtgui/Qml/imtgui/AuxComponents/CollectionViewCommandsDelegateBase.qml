@@ -73,8 +73,8 @@ Item {
     Component.onDestruction: {
         Events.unSubscribeEvent(containerBase.commandsId + "CommandActivated", containerBase.commandHandle);
         if (containerBase.tableData){
-            containerBase.tableData.rightButtonMouseClicked.disconnect(containerBase.openPopupMenu);
-            containerBase.tableData.selectionChanged.disconnect(containerBase.selectionChanged);
+//            containerBase.tableData.rightButtonMouseClicked.disconnect(containerBase.openPopupMenu);
+//            containerBase.tableData.selectionChanged.disconnect(containerBase.selectionChanged);
         }
     }
 
@@ -323,11 +323,27 @@ Item {
                 var dataModelLocal;
                 if (removeModel.ContainsKey("errors")){
                     dataModelLocal = removeModel.GetData("errors");
+
                     if (dataModelLocal.ContainsKey(containerBase.gqlModelRemove)){
                         dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelRemove);
-                        var message = dataModelLocal.GetData("message");
-                        modalDialogManager.openDialog(errorDialog, {"message": message});
                     }
+
+                    let message = ""
+                    if (dataModelLocal.ContainsKey("message")){
+                        message = dataModelLocal.GetData("message");
+                    }
+
+                    let type;
+                    if (dataModelLocal.ContainsKey("type")){
+                        type = dataModelLocal.GetData("type");
+                    }
+
+                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+//                    if (dataModelLocal.ContainsKey(containerBase.gqlModelRemove)){
+//                        dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelRemove);
+//                        var message = dataModelLocal.GetData("message");
+//                        modalDialogManager.openDialog(errorDialog, {"message": message});
+//                    }
 
                     return;
                 }
@@ -396,10 +412,22 @@ Item {
                     if (dataModelLocal.ContainsKey(containerBase.gqlModelRename)){
                         dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelRename);
 
+                        let message = ""
                         if (dataModelLocal.ContainsKey("message")){
-                            var message = dataModelLocal.GetData("message");
-                            modalDialogManager.openDialog(errorDialog, {"message": message});
+                            message = dataModelLocal.GetData("message");
                         }
+
+                        let type;
+                        if (dataModelLocal.ContainsKey("type")){
+                            type = dataModelLocal.GetData("type");
+                        }
+
+                        Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+
+//                        if (dataModelLocal.ContainsKey("message")){
+//                            var message = dataModelLocal.GetData("message");
+//                            modalDialogManager.openDialog(errorDialog, {"message": message});
+//                        }
                     }
 
                     return;
@@ -461,10 +489,22 @@ Item {
                     if (dataModelLocal.ContainsKey(containerBase.gqlModelSetDescription)){
                         dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelSetDescription);
 
+//                        if (dataModelLocal.ContainsKey("message")){
+//                            var message = dataModelLocal.GetData("message");
+//                            modalDialogManager.openDialog(errorDialog, {"message": message});
+//                        }
+
+                        let message = ""
                         if (dataModelLocal.ContainsKey("message")){
-                            var message = dataModelLocal.GetData("message");
-                            modalDialogManager.openDialog(errorDialog, {"message": message});
+                            message = dataModelLocal.GetData("message");
                         }
+
+                        let type;
+                        if (dataModelLocal.ContainsKey("type")){
+                            type = dataModelLocal.GetData("type");
+                        }
+
+                        Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
                     }
 
                     return;

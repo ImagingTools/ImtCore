@@ -23,7 +23,6 @@ public:
 	I_BEGIN_COMPONENT(CClientMainWindowQmlComp);
 		I_ASSIGN(m_systemStatusCompPtr, "SystemStatus", "System status", true, "SystemStatus");
 		I_ASSIGN(m_quickObjectCompPtr, "QuickObject", "Main QML Component", true, "QuickObject");
-		I_ASSIGN(m_checkSystemStatusAttrPtr, "CheckSystemStatus", "Check the system status", true, false);
 	I_END_COMPONENT;
 
 	CClientMainWindowQmlComp();
@@ -36,10 +35,12 @@ protected:
 private:
 	void OnSystemStatusUpdate(const istd::IChangeable::ChangeSet& changeSet, const imtbase::ISystemStatus* objectPtr);
 
+private Q_SLOTS:
+	void UpdateSystemStatus();
+
 private:
 	I_REF(imtbase::ISystemStatus, m_systemStatusCompPtr);
 	I_REF(imtqml::IQuickObject, m_quickObjectCompPtr);
-	I_ATTR(bool, m_checkSystemStatusAttrPtr);
 
 private:
 	imtbase::TModelUpdateBinder<imtbase::ISystemStatus, CClientMainWindowQmlComp> m_systemStatusObserver;

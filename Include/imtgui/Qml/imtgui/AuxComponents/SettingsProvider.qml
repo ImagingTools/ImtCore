@@ -157,13 +157,19 @@ QtObject {
     }
 
     function getRepresentationModel(){
+        console.log("getRepresentationModel");
         private_.representationModel.Clear();
 
+//        console.log("container.localModel", container.localModel.toJSON());
         private_.mergeWithExternModel(container.localModel);
+
+//        console.log("container.serverModel", container.serverModel.toJSON());
         private_.mergeWithExternModel(container.serverModel);
 
         if (container.aboutApplicationProvider != null){
             let representationModel = container.aboutApplicationProvider.getRepresentationModel();
+//            console.log("representationModel", representationModel.toJSON());
+
             private_.mergeWithExternModel(representationModel);
         }
 

@@ -259,7 +259,8 @@ void CStandardLoginGuiComp::OnConnectionStatusChanged(
 		imtcom::IConnectionStatusProvider::ConnectionStatus connectionStatus = objectPtr->GetConnectionStatus();
 		if (connectionStatus == imtcom::IConnectionStatusProvider::CS_CONNECTED){
 			if (m_superuserProviderCompPtr.IsValid()){
-				bool superuserExists = m_superuserProviderCompPtr->SuperuserExists();
+				QString errorMessage;
+				bool superuserExists = m_superuserProviderCompPtr->SuperuserExists(errorMessage);
 				if (superuserExists){
 					StackedWidget->setCurrentIndex(0);
 				}

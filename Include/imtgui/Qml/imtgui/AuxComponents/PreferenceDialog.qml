@@ -31,6 +31,18 @@ Dialog {
 
         let name = messageDialog.buttonsModel.get(1).Name;
         messageDialog.buttonsModel.setProperty(1, "Name", qsTr(name));
+
+//        updateRepresentation();
+    }
+
+    function updateRepresentation(){
+        messageDialog.contentItem.clearModels();
+
+        let representatioModel = messageDialog.settingsProvider.getRepresentationModel();
+        if (messageDialog.settingsProvider != null){
+            messageDialog.contentItem.settingsModel = null;
+            messageDialog.contentItem.settingsModel = representatioModel
+        }
     }
 
     function onServerModelChanged(){

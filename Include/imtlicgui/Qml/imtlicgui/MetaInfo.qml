@@ -163,6 +163,19 @@ Rectangle {
                 var dataModelLocal;
 
                 if (metaInfo.ContainsKey("errors")){
+                    dataModelLocal = metaInfo.GetData("errors");
+                    let message = ""
+                    if (dataModelLocal.ContainsKey("message")){
+                        message = dataModelLocal.GetData("message");
+                    }
+
+                    let type;
+                    if (dataModelLocal.ContainsKey("type")){
+                        type = dataModelLocal.GetData("type");
+                    }
+
+                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+
                     return;
                 }
 

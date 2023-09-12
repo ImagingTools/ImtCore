@@ -9,7 +9,7 @@ namespace imtauthdb
 
 // reimplemented (imtauth::ISuperuserProvider)
 
-bool CRemoteSuperuserProviderComp::SuperuserExists() const
+bool CRemoteSuperuserProviderComp::SuperuserExists(QString& errorMessage) const
 {
 	if (!m_gqlRequestCompPtr.IsValid()){
 		return false;
@@ -21,11 +21,14 @@ bool CRemoteSuperuserProviderComp::SuperuserExists() const
 	queryFields.InsertField("UserId");
 	gqlRequest.AddField(queryFields);
 
-	QString errorMessage;
 	imtbase::CTreeItemModel* usersModelPtr = m_gqlRequestCompPtr->CreateResponse(gqlRequest, errorMessage);
 	if (usersModelPtr == nullptr){
+		errorMessage = QString("The remote superuser verification server is not available.");
+
 		return false;
 	}
+
+	errorMessage = "";
 
 	if (!usersModelPtr->ContainsKey("data")){
 		return false;

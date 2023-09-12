@@ -16,7 +16,7 @@ namespace imtauthdb
 
 // reimplemented (imtauth::ISuperuserProvider)
 
-bool CSuperuserProviderComp::SuperuserExists() const
+bool CSuperuserProviderComp::SuperuserExists(QString& errorMessage) const
 {
 	if (m_userCollectionCompPtr.IsValid()) {
 		iprm::CParamsSet filterParam;

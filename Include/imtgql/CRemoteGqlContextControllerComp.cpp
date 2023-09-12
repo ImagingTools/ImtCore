@@ -3,12 +3,8 @@
 
 // ACF includes
 #include <iser/CJsonMemReadArchive.h>
-//#include <iprm/TParamsPtr.h>
-//#include <iprm/ISelectionParam.h>
-//#include <iprm/IOptionsList.h>
 
 // ImtCore includes
-//#include <imtauth/IUserSettings.h>
 #include <imtauth/CUserInfo.h>
 #include <imtgql/CGqlContext.h>
 
@@ -35,7 +31,8 @@ CRemoteGqlContextControllerComp::CRemoteGqlContextControllerComp()
 
 imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 			const imtgql::CGqlRequest& /*gqlRequest*/,
-			const QByteArray& token) const
+			const QByteArray& token,
+			QString& errorMessage) const
 {
 	QMutexLocker lock(&m_mutex);
 
@@ -60,7 +57,6 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 
 	sessionGqlRequest.SetGqlContext(sessionGqlContextPtr);
 
-	QString errorMessage;
 	imtbase::CTreeItemModel* userSessionModelPtr = m_gqlRequestHandlerCompPtr->CreateResponse(sessionGqlRequest, errorMessage);
 	if (userSessionModelPtr == nullptr){
 		return nullptr;
@@ -123,49 +119,9 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 			return nullptr;
 		}
 
-//		QByteArray languageId;
-//		QByteArray designSchemeId;
-
-//		QByteArray username = userInstancePtr->GetId();
-
-//		if (m_userSettingsCollectionCompPtr.IsValid()){
-//			imtbase::IObjectCollection::DataPtr dataPtr;
-//			if (m_userSettingsCollectionCompPtr->GetObjectData(username, dataPtr)){
-//				imtauth::IUserSettings* userSettingsPtr = dynamic_cast<imtauth::IUserSettings*>(dataPtr.GetPtr());
-//				if (userSettingsPtr != nullptr){
-//					iprm::IParamsSet* paramsSetPtr = userSettingsPtr->GetSettings();
-//					if (paramsSetPtr != nullptr){
-//						iprm::TParamsPtr<iprm::ISelectionParam> languageParamPtr(paramsSetPtr, "Language");
-//						if (languageParamPtr.IsValid()){
-//							const iprm::IOptionsList* optionListPtr = languageParamPtr->GetSelectionConstraints();
-//							if (optionListPtr != nullptr){
-//								int index = languageParamPtr->GetSelectedOptionIndex();
-//								if (index >= 0){
-//									languageId = optionListPtr->GetOptionId(index);
-//								}
-//							}
-//						}
-
-//						iprm::TParamsPtr<iprm::ISelectionParam> designParamPtr(paramsSetPtr, "DesignSchema");
-//						if (designParamPtr.IsValid()){
-//							const iprm::IOptionsList* optionListPtr = designParamPtr->GetSelectionConstraints();
-//							if (optionListPtr != nullptr){
-//								int index = designParamPtr->GetSelectedOptionIndex();
-//								if (index >= 0){
-//									designSchemeId = optionListPtr->GetOptionId(index);
-//								}
-//							}
-//						}
-//					}
-//				}
-//			}
-//		}
-
 		istd::TDelPtr<imtgql::CGqlContext> gqlContextPtr = new imtgql::CGqlContext();
 		gqlContextPtr->SetToken(token);
 		gqlContextPtr->SetUserInfo(userInstancePtr.PopPtr());
-//		gqlContextPtr->SetLanguageId(languageId);
-//		gqlContextPtr->SetDesignScheme(designSchemeId);
 
 		m_cacheMap.insert(token, gqlContextPtr.PopPtr());
 
@@ -190,6 +146,16 @@ void CRemoteGqlContextControllerComp::OnComponentCreated()
 	QObject::connect(&m_timer, &QTimer::timeout, this, &CRemoteGqlContextControllerComp::OnTimeout);
 
 	int interval = m_cacheClearingIntervalAttrPtr.IsValid() ? *m_cacheClearingIntervalAttrPtr * 1000 : 60000;
+
+	if (m_cacheClearingIntervalParamCompPtr.IsValid()){
+		QString intervalText = m_cacheClearingIntervalParamCompPtr->GetText();
+
+		bool ok = true;
+		int intervalParam = intervalText.toInt(&ok);
+		if (ok){
+			interval = intervalParam * 1000;
+		}
+	}
 
 	m_timer.start(interval);
 }

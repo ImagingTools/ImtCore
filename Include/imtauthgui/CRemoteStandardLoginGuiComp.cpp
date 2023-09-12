@@ -277,7 +277,8 @@ void CRemoteStandardLoginGuiComp::OnSystemStatusUpdate(
 	imtbase::ISystemStatus::SystemStatus status = objectPtr->GetSystemStatus(error);
 	if (status == imtbase::ISystemStatus::SystemStatus::SS_NO_ERROR){
 		if (m_superuserProviderCompPtr.IsValid()){
-			bool superuserExists = m_superuserProviderCompPtr->SuperuserExists();
+			QString errorMessage;
+			bool superuserExists = m_superuserProviderCompPtr->SuperuserExists(errorMessage);
 			if (superuserExists){
 				StackedWidget->setCurrentIndex(0);
 			}

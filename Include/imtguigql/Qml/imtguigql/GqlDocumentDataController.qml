@@ -16,10 +16,13 @@ QtObject {
     signal documentAdded(string documentId, string documentName);
     signal savingError(string message);
 
-    signal error(string message);
+    signal error(int type, string message);
 
     function getData(documentId, inputParams, typeId){
-        container.documentTypeId = typeId;
+        if (container.documentTypeId == "" && typeId){
+            container.documentTypeId = typeId;
+        }
+
         container.gqlGetModel.getModelData(documentId, inputParams);
     }
 
@@ -77,7 +80,14 @@ QtObject {
                         message = dataModelLocal.GetData("message");
                     }
 
-                    container.error(message);
+                    let type;
+                    if (dataModelLocal.ContainsKey("type")){
+                        type = dataModelLocal.GetData("type");
+                    }
+
+                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+
+//                    container.error(message);
 
                     return;
                 }
@@ -139,10 +149,22 @@ QtObject {
                         dataModelLocal = dataModelLocal.GetData(container.updateCommandId);
                     }
 
+//                    if (dataModelLocal.ContainsKey("message")){
+//                        let message = dataModelLocal.GetData("message");
+//                        container.savingError(message);
+//                    }
+
+                    let message = ""
                     if (dataModelLocal.ContainsKey("message")){
-                        let message = dataModelLocal.GetData("message");
-                        container.savingError(message);
+                        message = dataModelLocal.GetData("message");
                     }
+
+                    let type;
+                    if (dataModelLocal.ContainsKey("type")){
+                        type = dataModelLocal.GetData("type");
+                    }
+
+                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
 
                     return;
                 }
