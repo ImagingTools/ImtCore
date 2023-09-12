@@ -101,6 +101,7 @@ public:
 		I_ASSIGN_MULTI_0(m_additionalCommandIdsAttrPtr, "AdditionalCommandIds", "Additional command IDs", false);
 		I_ASSIGN_MULTI_0(m_additionalCommandActivatorsCompPtr, "AdditionalCommandActivators", "Additional command activators that allow the display of commands", false);
 		I_ASSIGN(m_rightsCommandsCompPtr, "RightsCommands", "Additional tool commands showed on the right side of the login button", false, "RightsCommands");
+		I_ASSIGN(m_fullscreenCommandCompPtr, "FullscreenCommand", "Tool command to switch an application to full screen mode", false, "FullscreenCommand");
 	I_END_COMPONENT;
 
 protected:
@@ -114,6 +115,7 @@ protected:
 	I_MULTIATTR(QByteArray, m_additionalCommandIdsAttrPtr);
 	I_MULTIREF(iprm::IEnableableParam, m_additionalCommandActivatorsCompPtr);
 	I_REF(ibase::ICommandsProvider, m_rightsCommandsCompPtr);
+	I_REF(ibase::ICommandsProvider, m_fullscreenCommandCompPtr);
 };
 
 
@@ -391,6 +393,7 @@ private:
 	QToolBar* m_mainToolBar;
 	QToolBar* m_additionalCommandsToolBar;
 	QToolBar* m_rightsCommandsToolBar;
+	QToolBar* m_fullscreenCommandToolBar;
 	QTimer m_autoLogoutTimer;
 	QTimer m_checkIsFullScreenTimer;
 

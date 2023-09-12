@@ -36,6 +36,7 @@ CThumbnailDecoratorGuiComp::CThumbnailDecoratorGuiComp()
 	m_mainToolBar(nullptr),
 	m_additionalCommandsToolBar(nullptr),
 	m_rightsCommandsToolBar(nullptr),
+	m_fullscreenCommandToolBar(nullptr),
 	m_commandsObserver(*this),
 	m_pageModelObserver(*this),
 	m_loginObserver(*this),
@@ -226,6 +227,25 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 			}
 		}
 	}
+
+#ifndef Q_OS_MACOS
+	if (m_fullscreenCommandCompPtr.IsValid()){
+		const iqtgui::CHierarchicalCommand* commandPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(m_fullscreenCommandCompPtr->GetCommands());
+		if (commandPtr != nullptr){
+			if (m_fullscreenCommandToolBar == nullptr){
+				m_fullscreenCommandToolBar = new QToolBar(FullscreenCommandFrame);
+				m_fullscreenCommandToolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+				m_fullscreenCommandToolBar->setIconSize(QSize(24, 24));
+
+				QLayout* layoutPtr = FullscreenCommandFrame->layout();
+				if (layoutPtr != nullptr){
+					layoutPtr->addWidget(m_fullscreenCommandToolBar);
+					iqtgui::CCommandTools::SetupToolbar(*commandPtr, *m_fullscreenCommandToolBar);
+				}
+			}
+		}
+	}
+#endif
 
 	NavigationControlFrame->setVisible(m_pageNavigationControllerCompPtr.IsValid());
 	DashboardButton->setVisible(m_dashboardGuiCompPtr.IsValid() && m_dashboardGuiCompPtr->IsGuiCreated());
