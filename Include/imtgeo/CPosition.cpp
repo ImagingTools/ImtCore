@@ -4,6 +4,10 @@
 // STL includes
 #include <cmath>
 
+// ACF includes
+#include <istd/CChangeNotifier.h>
+
+
 using namespace std;
 
 namespace imtgeo
@@ -29,6 +33,9 @@ void CPosition::SetLatitude(double lat)
     bool ok = !m_coordinate.isValid() ? true : m_coordinate.latitude() != lat;
     if(ok){
         m_coordinate.setLatitude(lat);
+
+        istd::CChangeNotifier notifier(this);
+
     }
 }
 
@@ -42,6 +49,9 @@ void CPosition::SetLongitude(double lon)
     bool ok = !m_coordinate.isValid() ? true : m_coordinate.longitude() != lon;
     if(ok){
         m_coordinate.setLongitude(lon);
+
+        istd::CChangeNotifier notifier(this);
+
     }
 }
 

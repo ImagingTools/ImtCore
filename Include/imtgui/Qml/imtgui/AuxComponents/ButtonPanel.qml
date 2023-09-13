@@ -199,6 +199,10 @@ Rectangle {
         }
     }
 
+    function updateModel(){
+
+    }
+
     function setReady(){
         var count = buttonPanel.buttonModel.GetItemsCount();
         buttonPanel.ready =  buttonPanel.compl && count && buttonPanel.widthArr.length == count && buttonPanel.widthArrVer.length == count;
