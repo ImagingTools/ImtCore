@@ -62,6 +62,8 @@ Rectangle {
 
         text: qsTr("Refresh");
 
+        visible: false;
+
         decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
 
         onClicked: {

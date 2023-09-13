@@ -52,22 +52,15 @@ TreeItemModelObserver {
         if (container.settingsProvider != null){
             container.settingsProvider.setServerUrl(newVal);
             Events.sendEvent("Logout");
+            Events.sendEvent("UpdateSystemStatus");
         }
     }
 
     function onLanguageChanged(newVal){
         console.log("onLanguageChanged", newVal);
-        if (container.settingsProvider != null){
+        if (container.languageProvider != null){
             let lang = container.languageProvider.getLanguageIdByIndex(newVal);
-            context.language = lang;
-
-            container.settingsProvider.setLanguage(lang);
-            if (container.languageProvider != null){
-
-                Events.sendEvent("OnLocalizationChanged", lang);
-            }
-
-            container.settingsProvider.updateModel();
+            container.languageProvider.setLanguage(lang);
         }
     }
 

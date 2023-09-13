@@ -25,7 +25,7 @@ QByteArray GetTranslation(const iqt::ITranslationManager* translationManagerPtr,
 				if(phraseTr.isEmpty()){
 					const iqt::ITranslationManager* slaveTranslatorManager = translationManagerPtr->GetSlaveTranslationManager();
 					if(slaveTranslatorManager != nullptr){
-						GetTranslation(slaveTranslatorManager, phrase, languageId, context);
+						return GetTranslation(slaveTranslatorManager, phrase, languageId, context);
 					}
 					else{
 						return phrase;

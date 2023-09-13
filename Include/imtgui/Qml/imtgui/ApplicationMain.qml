@@ -40,6 +40,7 @@ Item {
 
         Events.subscribeEvent("UpdateModels", application.updateAllModels);
         Events.subscribeEvent("Logout", application.onLogout);
+        Events.subscribeEvent("UpdateSystemStatus", application.updateSystemStatus);
 
         thumbnailDecorator.userManagementProvider.updated.connect(application.onUserModeChanged);
 
@@ -49,6 +50,7 @@ Item {
     Component.onDestruction: {
         Events.unSubscribeEvent("UpdateModels", application.updateAllModels);
         Events.unSubscribeEvent("Logout", application.onLogout);
+        Events.unSubscribeEvent("UpdateSystemStatus", application.updateSystemStatus);
     }
 
     property alias thumbnailDecoratorGui: thumbnailDecorator;
@@ -92,7 +94,7 @@ Item {
             console.log("onApplyCachedLanguageChanged", applyCachedLanguage);
             if (applyCachedLanguage){
                 let lang = application.languageProvider.getLanguage();
-                context.language = lang;
+                application.languageProvider.setLanguage(lang);
             }
         }
 
@@ -128,6 +130,8 @@ Item {
 
     function onLogout(){
         settingsProvider.serverModel = null;
+//        thumbnailDecorator.closeAllPages();
+//        firstModelsInit();
     }
 
     function onLocalizationChanged(language){

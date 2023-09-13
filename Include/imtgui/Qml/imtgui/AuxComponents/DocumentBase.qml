@@ -51,6 +51,37 @@ Item {
         id: cacheData;
 
         property TreeItemModel cacheCommandsModel: TreeItemModel {};
+
+        function clear(){
+            cacheData.cacheCommandsModel.Clear();
+        }
+
+        function cacheExists(){
+            return cacheData.cacheCommandsModel.GetItemsCount() > 0;
+        }
+
+        function resetStateCommands(commandsModel){
+            console.log("resetStateCommands");
+            console.log("cacheCommandsModel", cacheCommandsModel.toJSON());
+            console.log("commandsModel", commandsModel.toJSON());
+
+            if (!commandsModel){
+                return;
+            }
+
+            for (let i = 0; i < cacheCommandsModel.GetItemsCount(); i++){
+                let cacheCommandId = cacheCommandsModel.GetData("Id", i);
+                let cacheIsEnabled = cacheCommandsModel.GetData("IsEnabled", i);
+
+                for (let j = 0; j < commandsModel.GetItemsCount(); j++){
+                    let commandId = commandsModel.GetData("Id", j);
+                    if (cacheCommandId === commandId){
+                        commandsModel.SetData("IsEnabled", cacheIsEnabled, j);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     function documentCanBeSaved(){
@@ -64,6 +95,7 @@ Item {
         documentBaseRoot.documentUuid = uuidGenerator.generateUUID();
 
         documentBaseRoot.commandsProvider.modelLoaded.connect(documentBaseRoot.onCommandsModelLoaded);
+        documentBaseRoot.commandsProvider.commandsModelChanged.connect(documentBaseRoot.onCommandsModelChanged);
         documentBaseRoot.commandsDelegate.documentBase = documentBaseRoot;
 
         Events.subscribeEvent("OnLocalizationChanged", documentBaseRoot.onLocalizationChanged);
@@ -73,7 +105,7 @@ Item {
         Events.unSubscribeEvent(documentBaseRoot.documentUuid + "CommandActivated", documentBaseRoot.commandsDelegate.commandHandle);
         Events.unSubscribeEvent("OnLocalizationChanged", documentBaseRoot.onLocalizationChanged);
 
-        documentBaseRoot.commandsProvider.modelLoaded.disconnect(documentBaseRoot.onCommandsModelLoaded);
+//        documentBaseRoot.commandsProvider.modelLoaded.disconnect(documentBaseRoot.onCommandsModelLoaded);
     }
 
     property bool m_localizationChanged: false;
@@ -199,11 +231,20 @@ Item {
         }
     }
 
-    // If the command 'Save' is missing then we bloc k the UI
+    // If the command 'Save' is missing then we block the UI
     function onCommandsModelLoaded(){
         let saveExists = documentBaseRoot.commandsProvider.commandExists("Save");
         if (!saveExists){
             documentBaseRoot.blockEditing();
+        }
+    }
+
+    function onCommandsModelChanged(){
+        console.log("onCommandsModelChanged");
+        if (cacheData.cacheExists()){
+            console.log("cacheExists");
+            cacheData.resetStateCommands(commandsProvider.commandsModel);
+            cacheData.clear();
         }
     }
 

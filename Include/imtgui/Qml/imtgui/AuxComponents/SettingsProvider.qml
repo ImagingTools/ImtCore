@@ -46,7 +46,7 @@ QtObject {
                     container.private_.representationModel.SetData("Id", pageId, index);
                     container.private_.representationModel.SetData("Name", pageName, index);
 
-                    if(pageParameters != null){
+                    if(pageParameters !== null){
                         let parametersModel = container.private_.representationModel.AddTreeModel("Parameters", index);
                         parametersModel.Copy(pageParameters)
                     }
@@ -160,15 +160,11 @@ QtObject {
         console.log("getRepresentationModel");
         private_.representationModel.Clear();
 
-//        console.log("container.localModel", container.localModel.toJSON());
-        private_.mergeWithExternModel(container.localModel);
-
-//        console.log("container.serverModel", container.serverModel.toJSON());
         private_.mergeWithExternModel(container.serverModel);
+        private_.mergeWithExternModel(container.localModel);
 
         if (container.aboutApplicationProvider != null){
             let representationModel = container.aboutApplicationProvider.getRepresentationModel();
-//            console.log("representationModel", representationModel.toJSON());
 
             private_.mergeWithExternModel(representationModel);
         }

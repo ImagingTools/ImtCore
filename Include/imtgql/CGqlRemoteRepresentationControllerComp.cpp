@@ -55,9 +55,15 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 		return responseHandler.GetResult();
 	}
 
-	errorMessage = QObject::tr("Failed to create network request").toUtf8();
+	errorMessage = QObject::tr("Failed to create a network request to a remote server").toUtf8();
 
-	return nullptr;
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	imtbase::CTreeItemModel* errorsModelPtr = rootModelPtr->AddTreeModel("errors");
+
+	errorsModelPtr->SetData("message", errorMessage);
+	errorsModelPtr->SetData("type", "Critical");
+
+	return rootModelPtr.PopPtr();
 }
 
 

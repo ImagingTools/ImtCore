@@ -43,7 +43,15 @@ QtObject {
                     dataModelLocal = dataModelLocal.GetData("UserToken")
 
                     let message = dataModelLocal.GetData("message");
+
+                    let type;
+                    if (dataModelLocal.ContainsKey("type")){
+                        type = dataModelLocal.GetData("type");
+                    }
+
                     container.failed(message);
+
+                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
 
                     return;
                 }

@@ -19,7 +19,7 @@
                     <AttributeInfo Id="ObjectName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Design Schema"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="DesignPathToQml">
+                    <AttributeInfo Id="PathToQml" Type="Id" ExportId="DesignPathToQml">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
@@ -60,7 +60,7 @@
                     <AttributeInfo Id="ObjectName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Language"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PathToQml" Type="Text" ExportId="LanguagePathToQml">
+                    <AttributeInfo Id="PathToQml" Type="Id" ExportId="LanguagePathToQml">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">

@@ -12,7 +12,31 @@ namespace imtapp
 {
 
 
-// public methods
+// protected methods
+
+// reimplemented (imtbase::CObjectRepresentationControllerCompBase)
+
+bool CSchedulerParamsRepresentationControllerComp::GetRepresentationFromValue(
+		const istd::IChangeable& dataModel,
+		imtbase::CTreeItemModel& representation,
+		const iprm::IParamsSet* /*paramsPtr*/) const
+{
+	const imtapp::ISchedulerParams* schedulerParamsPtr = dynamic_cast<const imtapp::ISchedulerParams*>(&dataModel);
+	Q_ASSERT(schedulerParamsPtr != nullptr);
+
+	int interval = schedulerParamsPtr->GetInterval();
+	representation.SetData("Interval", interval);
+
+	QDateTime startTime = schedulerParamsPtr->GetStartTime();
+	representation.SetData("StartTime", startTime.toString("dd-MM-yyyy HH:mm"));
+
+	if (m_qmlPathAttrPtr.IsValid()){
+		representation.SetData("Source", *m_qmlPathAttrPtr);
+	}
+
+	return true;
+}
+
 
 // reimplemented (IRepresentationController)
 
@@ -27,58 +51,18 @@ bool CSchedulerParamsRepresentationControllerComp::IsModelSupported(const istd::
 }
 
 
-bool CSchedulerParamsRepresentationControllerComp::GetRepresentationFromDataModel(
-			const istd::IChangeable& dataModel,
-			imtbase::CTreeItemModel& representation,
-			const iprm::IParamsSet* /*paramsPtr*/) const
-{
-	if (!IsModelSupported(dataModel)){
-		return false;
-	}
-
-	const imtapp::ISchedulerParams* schedulerParamsPtr = dynamic_cast<const imtapp::ISchedulerParams*>(&dataModel);
-	if (schedulerParamsPtr != nullptr){
-		representation.SetData("Id", *m_paramIdAttrPtr);
-
-		if (m_paramNameAttrPtr.IsValid()){
-			representation.SetData("Name", *m_paramNameAttrPtr);
-		}
-
-		int interval = schedulerParamsPtr->GetInterval();
-		representation.SetData("Interval", interval);
-
-		QDateTime startTime = schedulerParamsPtr->GetStartTime();
-		representation.SetData("StartTime", startTime.toString("dd-MM-yyyy HH:mm"));
-
-		if (m_qmlPathAttrPtr.IsValid()){
-			representation.SetData("Source", *m_qmlPathAttrPtr);
-		}
-
-		return true;
-	}
-
-	return false;
-}
-
-
 bool CSchedulerParamsRepresentationControllerComp::GetDataModelFromRepresentation(const imtbase::CTreeItemModel& representation, istd::IChangeable& dataModel) const
 {
-	if (!IsModelSupported(dataModel)){
-		return false;
-	}
-
 	imtapp::ISchedulerParams* schedulerParamsPtr = dynamic_cast<imtapp::ISchedulerParams*>(&dataModel);
-	if (schedulerParamsPtr != nullptr){
-		int interval = representation.GetData("Interval").toInt();
-		schedulerParamsPtr->SetInterval(interval);
+	Q_ASSERT(schedulerParamsPtr != nullptr);
 
-		QString startTime = representation.GetData("StartTime").toString();
-		schedulerParamsPtr->SetStartTime(QDateTime::fromString(startTime, "dd-MM-yyyy HH:mm"));
+	int interval = representation.GetData("Interval").toInt();
+	schedulerParamsPtr->SetInterval(interval);
 
-		return true;
-	}
+	QString startTime = representation.GetData("StartTime").toString();
+	schedulerParamsPtr->SetStartTime(QDateTime::fromString(startTime, "dd-MM-yyyy HH:mm"));
 
-	return false;
+	return true;
 }
 
 

@@ -23,6 +23,7 @@ QtObject {
     }
 
     onCommandsModelChanged: {
+        console.log("onCommandsModelChanged");
         commandsProviderContainer.updateGui();
 
         commandsProviderContainer.modelLoaded();

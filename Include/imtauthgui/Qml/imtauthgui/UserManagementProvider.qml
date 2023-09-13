@@ -81,6 +81,24 @@ QtObject {
                 var dataModelLocal;
 
                 if (userModeModel.ContainsKey("errors")){
+                    dataModelLocal = userModeModel.GetData("errors");
+
+                    if (dataModelLocal.ContainsKey("UserMode")){
+                        dataModelLocal = dataModelLocal.GetData("UserMode");
+                    }
+
+                    let message = ""
+                    if (dataModelLocal.ContainsKey("message")){
+                        message = dataModelLocal.GetData("message");
+                    }
+
+                    let type;
+                    if (dataModelLocal.ContainsKey("type")){
+                        type = dataModelLocal.GetData("type");
+                    }
+
+                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+
                     return;
                 }
 

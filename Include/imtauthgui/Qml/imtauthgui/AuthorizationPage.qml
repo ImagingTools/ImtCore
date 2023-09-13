@@ -27,6 +27,10 @@ Rectangle {
         decoratorPause.start();
     }
 
+    Component.onDestruction: {
+        Events.unSubscribeEvent("Logout", authPageContainer.logout);
+    }
+
     onLoginSuccessful: {
         let obj = {}
         obj["Login"] = authPageContainer.login;
@@ -65,6 +69,8 @@ Rectangle {
         userTokenProvider.token = "";
 
         authPageContainer.visible = true;
+
+        userTokenProvider.authorizationGqlModel.SetGlobalAccessToken("");
     }
 
     function setDecorators(){

@@ -1,5 +1,6 @@
 #pragma once
 
+
 // ACF includes
 #include <iqt/ITranslationManager.h>
 
@@ -7,6 +8,7 @@
 #include <imtbase/CObjectRepresentationControllerCompBase.h>
 #include <imtbase/ICommandPermissionsProvider.h>
 #include <imtauth/IPermissionChecker.h>
+
 
 namespace imtbase
 {
@@ -18,18 +20,15 @@ public:
 	typedef imtbase::CObjectRepresentationControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGuiElementRepresentationControllerComp)
-		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
 
 protected:
+	// reimplemented (imtbase::CObjectRepresentationControllerCompBase)
+	virtual bool GetRepresentationFromValue(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr = nullptr) const override;
+
 	// reimplemented (IRepresentationController)
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
-	virtual bool GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual bool GetDataModelFromRepresentation(const CTreeItemModel& representation, istd::IChangeable& dataModel) const override;
-
-protected:
-	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
-
 };
 
 

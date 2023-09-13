@@ -20,24 +20,22 @@ public:
 		I_ASSIGN(m_passwordPathAttrPtr, "PasswordSource", "Path to qml password component for representation data", false, "");
 		I_ASSIGN(m_portAttrPtr, "PortSource", "Path to qml port component for representation data", false, "");
 		I_ASSIGN(m_usernamePathAttrPtr, "UsernameSource", "Path to qml username component for representation data", false, "");
-		I_ASSIGN(m_paramNameAttrPtr, "ObjectName", "Object Name", false, "");
-		I_ASSIGN(m_qmlPathAttrPtr, "PathToQml", "Path to qml component for representation data", false, "");
 	I_END_COMPONENT;
 
 protected:
+	// reimplemented (imtbase::CObjectRepresentationControllerCompBase)
+	virtual bool GetRepresentationFromValue(const istd::IChangeable& dataModel, imtbase::CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr = nullptr) const override;
+
 	// reimplemented (IRepresentationController)
 	virtual bool IsModelSupported(const istd::IChangeable &dataModel) const override;
-	virtual bool GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr = nullptr) const override;
 	virtual bool GetDataModelFromRepresentation(const CTreeItemModel &representation, istd::IChangeable &dataModel) const override;
 
 protected:
-	I_TEXTATTR(m_dbNamePathAttrPtr);
-	I_TEXTATTR(m_hostPathAttrPtr);
-	I_TEXTATTR(m_passwordPathAttrPtr);
-	I_TEXTATTR(m_portAttrPtr);
-	I_TEXTATTR(m_usernamePathAttrPtr);
-	I_TEXTATTR(m_paramNameAttrPtr);
-	I_TEXTATTR(m_qmlPathAttrPtr);
+	I_ATTR(QByteArray, m_dbNamePathAttrPtr);
+	I_ATTR(QByteArray, m_hostPathAttrPtr);
+	I_ATTR(QByteArray, m_passwordPathAttrPtr);
+	I_ATTR(QByteArray, m_portAttrPtr);
+	I_ATTR(QByteArray, m_usernamePathAttrPtr);
 };
 
 

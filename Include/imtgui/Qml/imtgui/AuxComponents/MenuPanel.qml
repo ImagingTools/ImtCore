@@ -93,7 +93,9 @@ Rectangle {
 
             property string pageName: model["Name"];
             onPageNameChanged: {
-                Events.sendEvent("PageNameChanged", {"Id": model["Id"], "Name": model["Name"]})
+//                if (pageName !== model["Name"]){
+                    Events.sendEvent("PageNameChanged", {"Id": model["Id"], "Name": model["Name"]})
+//                }
             }
 
             text:  model["Name"];

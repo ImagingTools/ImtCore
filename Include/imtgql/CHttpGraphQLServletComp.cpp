@@ -139,7 +139,10 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 							errorsItemModel = rootModel.AddTreeModel("errors");
 						}
 
-						errorsSourceItemModel->SetData("type", "Warning");
+						if (!errorsSourceItemModel->ContainsKey("type")){
+							errorsSourceItemModel->SetData("type", "Warning");
+						}
+
 						errorsItemModel->SetExternTreeModel(gqlCommand, errorsSourceItemModel);
 					}
 

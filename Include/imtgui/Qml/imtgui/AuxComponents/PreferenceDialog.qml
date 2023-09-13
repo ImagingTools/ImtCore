@@ -18,7 +18,8 @@ Dialog {
 
     onSettingsProviderChanged: {
         if (messageDialog.settingsProvider != null){
-            messageDialog.settingsProvider.serverModelChanged.connect(messageDialog.onServerModelChanged);
+            messageDialog.settingsProvider.serverModelChanged.connect(messageDialog.updateRepresentation);
+            messageDialog.settingsProvider.localModelChanged.connect(messageDialog.updateRepresentation);
         }
     }
 
@@ -31,8 +32,6 @@ Dialog {
 
         let name = messageDialog.buttonsModel.get(1).Name;
         messageDialog.buttonsModel.setProperty(1, "Name", qsTr(name));
-
-//        updateRepresentation();
     }
 
     function updateRepresentation(){
@@ -43,23 +42,14 @@ Dialog {
             messageDialog.contentItem.settingsModel = null;
             messageDialog.contentItem.settingsModel = representatioModel
         }
-    }
 
-    function onServerModelChanged(){
-        console.log("Preference onServerModelChanged");
-//        messageDialog.contentItem.clearModels();
-
-//        let representatioModel = messageDialog.settingsProvider.getRepresentationModel();
-//        if (messageDialog.settingsProvider != null){
-//            messageDialog.contentItem.settingsModel = null;
-//            messageDialog.contentItem.settingsModel = representatioModel
-//        }
+        messageDialog.buttons.setButtonState("Apply", false);
+        messageDialog.buttonsModel.setProperty(1, "Name", qsTr("Close"));
     }
 
     onFinished: {
         if (buttonId === "Apply"){
             messageDialog.buttons.setButtonState("Apply", false);
-
             messageDialog.buttonsModel.setProperty(1, "Name", qsTr("Close"));
         }
     }

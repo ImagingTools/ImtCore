@@ -50,12 +50,6 @@ QtObject {
         }
     }
 
-    function applyCachedLanguage(){
-        let design = container.getLanguage();
-        if (design != null){
-        }
-    }
-
     function getLanguageIdByIndex(index){
         if (settingsProvider == null || index < 0 || index >= container.languagesModel.GetItemsCount()){
             return "";
@@ -112,5 +106,15 @@ QtObject {
         }
 
         return null;
+    }
+
+    function setLanguage(langId){
+        context.language = langId;
+
+        if (container.settingsProvider != null){
+            container.settingsProvider.setLanguage(langId);
+        }
+
+        Events.sendEvent("OnLocalizationChanged", langId);
     }
 }
