@@ -64,9 +64,6 @@
         <Element Id="ClientMainWindowQml" PackageId="ImtQmlPck" ComponentId="ClientMainWindowQml">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CheckSystemStatus" Type="Boolean" ExportId="CheckSystemStatus">
-                        <Data IsEnabled="true" Value="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
