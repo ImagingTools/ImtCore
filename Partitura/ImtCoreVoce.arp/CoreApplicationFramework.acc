@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5090" Description="ACF"/>
-            <Version Id="1" Number="2191" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5104" Description="ACF"/>
+            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -197,6 +197,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DisablePageListViewIndexes" Type="Integer[]" ExportId="DisablePageListViewIndexes">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FullscreenCommand" Type="Reference" ExportId="FullscreenCommand">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="HideHomeButton" Type="Boolean" ExportId="HideHomeButton">
