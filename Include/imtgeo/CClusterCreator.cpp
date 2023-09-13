@@ -246,6 +246,7 @@ QList<CCluster*> CClusterCreator::createMapClusterModel(const QList<CPositionIde
     itemsModel = new imtbase::CTreeItemModel();
     clusterModel = new imtbase::CTreeItemModel();
 
+
     for(int i = 0; i < objectList.length(); i++){
         CPositionIdentifiable* object = objectList.at(i);
         double lat = object->GetLatitude();

@@ -22,22 +22,22 @@ public:
 
     // reimplemented (imtgeo::IPosition)
 	/**
-		Get latitude address.
+        Get latitude of object.
 	*/
     virtual double GetLatitude() const override;
 
 	/**
-		Set latitude address.
+        Set latitude of object.
 	*/
     virtual void SetLatitude(double lat) override;
 
 	/**
-		Get longitude address.
+        Get longitude of object.
 	*/
     virtual double GetLongitude() const override;
 
 	/**
-		Set longitude address.
+        Set longitude of object.
 	*/
     virtual void SetLongitude(double lon) override;
 

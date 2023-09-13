@@ -1,4 +1,5 @@
 #include "CPosition.h"
+#include "qdebug.h"
 
 // STL includes
 #include <cmath>
@@ -25,7 +26,8 @@ double CPosition::GetLatitude() const
 
 void CPosition::SetLatitude(double lat)
 {
-    if(m_coordinate.latitude() != lat){
+    bool ok = !m_coordinate.isValid() ? true : m_coordinate.latitude() != lat;
+    if(ok){
         m_coordinate.setLatitude(lat);
     }
 }
@@ -37,7 +39,8 @@ double CPosition::GetLongitude() const
 
 void CPosition::SetLongitude(double lon)
 {
-    if(m_coordinate.longitude() != lon){
+    bool ok = !m_coordinate.isValid() ? true : m_coordinate.longitude() != lon;
+    if(ok){
         m_coordinate.setLongitude(lon);
     }
 }
