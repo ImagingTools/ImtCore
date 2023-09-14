@@ -21,7 +21,7 @@ Item {
     QtObject {
         id: private_;
 
-        property var permissions: {[]}
+        property var permissions: []
 
         function setPermissions(permissions){
             console.log("setPermissions", permissions);

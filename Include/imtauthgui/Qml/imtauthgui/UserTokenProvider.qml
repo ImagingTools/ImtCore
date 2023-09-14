@@ -30,6 +30,8 @@ QtObject {
 
             var gqlData = query.GetQuery();
 
+            console.log("UserToken", gqlData);
+
             this.SetGqlQuery(gqlData);
         }
 

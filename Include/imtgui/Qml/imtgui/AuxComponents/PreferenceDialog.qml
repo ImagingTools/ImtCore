@@ -35,6 +35,10 @@ Dialog {
     }
 
     function updateRepresentation(){
+        if (!messageDialog || !messageDialog.contentItem){
+            return;
+        }
+
         messageDialog.contentItem.clearModels();
 
         let representatioModel = messageDialog.settingsProvider.getRepresentationModel();

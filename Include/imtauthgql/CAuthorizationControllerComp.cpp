@@ -35,7 +35,12 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 		QByteArray productId = gqlInputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
 
 		QByteArray login = gqlInputParamPtr->GetFieldArgumentValue("Login").toByteArray();
-		QByteArray passwordHash = gqlInputParamPtr->GetFieldArgumentValue("Password").toByteArray();
+		QByteArray password = gqlInputParamPtr->GetFieldArgumentValue("Password").toByteArray();
+
+		QByteArray passwordHash;
+		if (m_hashCalculatorCompPtr.IsValid()){
+			passwordHash = m_hashCalculatorCompPtr->GenerateHash(login + password);
+		}
 
 		iprm::CParamsSet filterParam;
 		iprm::CParamsSet paramsSet;

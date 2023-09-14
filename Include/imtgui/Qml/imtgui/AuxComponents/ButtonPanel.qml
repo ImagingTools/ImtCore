@@ -174,6 +174,10 @@ Rectangle {
 
     onButtonModelChanged: {
         //console.log("BUTTON_PANEL_CHANGED ", buttonPanel.buttonModel.toJSON());
+        if (!buttonPanel.buttonModel){
+            return;
+        }
+
         if(buttonPanel.buttonModel.GetItemsCount()){
             for(let i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
                 buttonPanel.buttonModel.SetData("IsHorizontal", true, i);

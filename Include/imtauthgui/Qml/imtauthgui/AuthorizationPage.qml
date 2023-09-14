@@ -421,9 +421,9 @@ Rectangle {
                     text: qsTr("Login");
 
                     onClicked: {
-                        let passwordHash = Qt.md5(loginTextInput.text + passwordTextInput.text);
-
-                        userTokenProvider.authorization(loginTextInput.text, passwordHash);
+//                        let passwordHash = Qt.md5(loginTextInput.text + passwordTextInput.text);
+//                        userTokenProvider.authorization(loginTextInput.text, passwordHash);
+                        userTokenProvider.authorization(loginTextInput.text, passwordTextInput.text);
                     }
 
                     onDecoratorChanged: {
