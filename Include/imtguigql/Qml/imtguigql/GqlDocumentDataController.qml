@@ -19,7 +19,7 @@ QtObject {
     signal error(int type, string message);
 
     function getData(documentId, inputParams, typeId){
-        if (container.documentTypeId == "" && typeId){
+        if (typeId){
             container.documentTypeId = typeId;
         }
 

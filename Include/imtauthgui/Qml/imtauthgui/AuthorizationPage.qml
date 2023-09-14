@@ -25,6 +25,8 @@ Rectangle {
     Component.onCompleted: {
 //        Events.subscribeEvent("Logout", authPageContainer.logout);
         decoratorPause.start();
+
+        PermissionsController.authorizationPage = authPageContainer;
     }
 
     Component.onDestruction: {
@@ -49,6 +51,10 @@ Rectangle {
 
             loginTextInput.focus = true;
         }
+    }
+
+    function loggedUserIsSuperuser(){
+        return authPageContainer.login === "su";
     }
 
     function getLoggedUserId(){
@@ -415,7 +421,9 @@ Rectangle {
                     text: qsTr("Login");
 
                     onClicked: {
-                        userTokenProvider.authorization(loginTextInput.text, passwordTextInput.text);
+                        let passwordHash = Qt.md5(loginTextInput.text + passwordTextInput.text);
+
+                        userTokenProvider.authorization(loginTextInput.text, passwordHash);
                     }
 
                     onDecoratorChanged: {

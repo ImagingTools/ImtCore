@@ -77,6 +77,12 @@ QtObject {
                             let userPasswordHash = dataModelLocal.GetData("PasswordHash");
                             container.passwordHash = userPasswordHash;
 
+                            if (dataModelLocal.ContainsKey("Permissions")){
+                                let permissions = dataModelLocal.GetData("Permissions");
+
+                                Events.sendEvent("SetPermissions", permissions.split(';'))
+                            }
+
                             container.accepted();
                         }
                     }

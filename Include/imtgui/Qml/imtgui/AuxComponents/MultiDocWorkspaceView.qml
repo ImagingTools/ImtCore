@@ -307,6 +307,7 @@ Item {
     }
 
     function saveDocument(documentId){
+        console.log("saveDocument", documentId);
         let documentIndex = -1;
 
         let isNew = false;

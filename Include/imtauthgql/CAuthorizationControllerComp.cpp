@@ -24,26 +24,18 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
 	if (m_userCollectionCompPtr.IsValid()){
-		QByteArray login;
-		QByteArray password;
+		const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParam("input");
+		if (gqlInputParamPtr == nullptr){
+			SendErrorMessage(0, QString("Invalid input parameters"), "imtgql::CAuthorizationControllerComp");
+			errorMessage = QString("Invalid input parameters");
 
-		const QList<imtgql::CGqlObject> paramList = gqlRequest.GetParams();
-
-		if (!paramList.isEmpty()){
-			imtgql::CGqlObject gqlObject = paramList.at(0);
-			if (paramList.at(0).GetFieldIds().contains("Login")){
-				login = gqlObject.GetFieldArgumentValue("Login").toByteArray();
-			}
-
-			if (paramList.at(0).GetFieldIds().contains("Password")){
-				password = gqlObject.GetFieldArgumentValue("Password").toByteArray();
-			}
+			return nullptr;
 		}
 
-		QByteArray passwordHash;
-		if (m_hashCalculatorCompPtr.IsValid()){
-			passwordHash = m_hashCalculatorCompPtr->GenerateHash(login + password);
-		}
+		QByteArray productId = gqlInputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
+
+		QByteArray login = gqlInputParamPtr->GetFieldArgumentValue("Login").toByteArray();
+		QByteArray passwordHash = gqlInputParamPtr->GetFieldArgumentValue("Password").toByteArray();
 
 		iprm::CParamsSet filterParam;
 		iprm::CParamsSet paramsSet;
@@ -70,6 +62,9 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 						dataModelPtr->SetData("UserId", userObjectId);
 						dataModelPtr->SetData("PasswordHash", passwordHash);
 
+						imtauth::IUserInfo::FeatureIds permissionIds = userInfoPtr->GetPermissions(productId);
+						dataModelPtr->SetData("Permissions", permissionIds.join(';'));
+
 						istd::TDelPtr<imtauth::CSessionInfo> sessionInfoPtr = new imtauth::CSessionInfo();
 
 						sessionInfoPtr->SetUserId(userObjectId);
@@ -86,6 +81,7 @@ imtbase::CTreeItemModel* CAuthorizationControllerComp::CreateInternalResponse(co
 		}
 	}
 
+	SendWarningMessage(0, QString("Invalid login or password"), "imtgql::CAuthorizationControllerComp");
 	errorMessage = QT_TR_NOOP("Invalid login or password");
 
 	imtbase::CTreeItemModel* errorsItemModelPtr = rootModelPtr->AddTreeModel("errors");

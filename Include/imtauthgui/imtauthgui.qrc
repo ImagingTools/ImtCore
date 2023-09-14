@@ -45,6 +45,7 @@
         <file alias="imtauthgui/GroupUsers.qml">Qml/imtauthgui/GroupUsers.qml</file>
 
 	<file alias="imtauthgui/PermissionsProvider.qml">Qml/imtauthgui/PermissionsProvider.qml</file>
+	<file alias="imtauthgui/PermissionsController.qml">Qml/imtauthgui/PermissionsController.qml</file>
 	<file alias="imtauthgui/LoginButton.qml">Qml/imtauthgui/LoginButton.qml</file>
 
 	<file alias="imtauthgui/SuperUserPasswordDialog.qml">Qml/imtauthgui/SuperUserPasswordDialog.qml</file>

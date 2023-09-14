@@ -61,10 +61,6 @@ Item {
         }
 
         function resetStateCommands(commandsModel){
-            console.log("resetStateCommands");
-            console.log("cacheCommandsModel", cacheCommandsModel.toJSON());
-            console.log("commandsModel", commandsModel.toJSON());
-
             if (!commandsModel){
                 return;
             }
@@ -141,12 +137,6 @@ Item {
     onDocumentUuidChanged: {
         console.log("onDocumentUuidChanged");
         if (documentBaseRoot.documentUuid !== ""){
-            documentBaseRoot.itemId = documentBaseRoot.documentUuid;
-
-            if (!documentBaseRoot.documentModel.ContainsKey("Id")){
-                documentBaseRoot.documentModel.SetData("Id", documentBaseRoot.documentUuid)
-            }
-
             documentBaseRoot.commandsProvider.documentUuid = documentBaseRoot.documentUuid;
             Events.subscribeEvent(documentBaseRoot.documentUuid + "CommandActivated", documentBaseRoot.commandsDelegate.commandHandle);
         }
@@ -158,10 +148,6 @@ Item {
 
     onDocumentModelChanged: {
         console.log("onDocumentModelChanged", documentBaseRoot.documentModel);
-
-        if (!documentBaseRoot.documentModel.ContainsKey("Id")){
-            documentBaseRoot.documentModel.SetData("Id", documentBaseRoot.documentUuid)
-        }
 
         documentBaseRoot.documentModel.dataChanged.connect(documentBaseRoot.onDataChanged);
 
@@ -190,7 +176,6 @@ Item {
 
     onCommandsIdChanged: {
         if (documentBaseRoot.itemId === ""){
-//            documentBaseRoot.itemId = documentBaseRoot.documentUuid;
             documentBaseRoot.documentModel.dataChanged.connect(documentBaseRoot.onDataChanged);
 
             documentBaseRoot.updateModel();

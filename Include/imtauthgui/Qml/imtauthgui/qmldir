@@ -11,5 +11,6 @@ SuperUserPasswordDialog 1.0 SuperUserPasswordDialog.qml
 UserPanel 1.0 UserPanel.qml
 UserManagementProvider 1.0 UserManagementProvider.qml
 UserTokenProvider 1.0 UserTokenProvider.qml
+singleton PermissionsController 1.0 PermissionsController.qml
 
 LoginButton 1.0 LoginButton.qml

@@ -121,6 +121,9 @@ Item {
 
     function saveDocument(documentId){
         console.log("saveDocument" ,documentId);
+        if (!documentId){
+            documentId = "";
+        }
 
         let item = stackView.peek();
 

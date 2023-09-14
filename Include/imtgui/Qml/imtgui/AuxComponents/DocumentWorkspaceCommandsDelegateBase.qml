@@ -15,7 +15,12 @@ QtObject {
 
     function commandHandle(commandId){
         console.log("commandHandle", commandId);
-        let documentId = container.documentBase.documentModel.GetData("Id");
+        let documentId = "";
+        let documentModel = container.documentBase.documentModel;
+        if (documentModel.ContainsKey("Id")){
+            documentId = documentModel.GetData("Id");
+        }
+
         if (commandId === "Close"){
             console.log("Close", documentId);
             console.log("container.documentBase.documentModel", container.documentBase.documentModel.toJSON());
@@ -26,9 +31,10 @@ QtObject {
         }
         else if (commandId === "Save"){
             if (container.documentBase.isDirty){
-                    let itemId = container.documentBase.itemId;
-                    let documentManager = container.documentBase.documentManager;
-                    documentManager.saveDocument(itemId);
+                let itemId = container.documentBase.itemId;
+                let documentManager = container.documentBase.documentManager;
+//                documentManager.saveDocument(itemId);
+                documentManager.saveDocument(documentId);
             }
         }
 

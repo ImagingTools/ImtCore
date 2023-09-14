@@ -21,6 +21,7 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
+		SendErrorMessage(0, "GetObject m_objectCollectionCompPtr is not valid", "imtauthgql::CUserControllerComp");
 		errorMessage = QObject::tr("Internal error").toUtf8();
 
 		return nullptr;
@@ -70,11 +71,17 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 				{
 					iser::CJsonMemWriteArchive archive(userJson);
 					if (!userInfoPtr->Serialize(archive)){
+						SendErrorMessage(0, QString("Error when try to serialize json: %1").arg(qPrintable(userJson)), "imtauthgql::CUserControllerComp");
+						errorMessage = QString("Error when try to serialize json: %1").arg(qPrintable(userJson));
+
 						return nullptr;
 					}
 				}
 
 				if (!dataModel->CreateFromJson(userJson)){
+					SendErrorMessage(0, QString("Error when try to create model from json: %1").arg(qPrintable(userJson)), "imtauthgql::CUserControllerComp");
+					errorMessage = QString("Error when try to create model from json: %1").arg(qPrintable(userJson));
+
 					return nullptr;
 				}
 			}
@@ -118,9 +125,11 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 
 imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 			const imtgql::CGqlRequest& gqlRequest,
-			QString& /*errorMessage*/) const
+			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
+		SendErrorMessage(0, "m_objectCollectionCompPtr is not valid", "imtauthgql::CUserControllerComp");
+
 		return nullptr;
 	}
 
@@ -141,11 +150,17 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 	}
 
 	if (userInfoPtr == nullptr){
+		SendErrorMessage(0, "userInfoPtr is nullptr", "imtauthgql::CUserControllerComp");
+		errorMessage = QString("Unable to update user with ID: %1").arg(qPrintable(objectId));
+
 		return nullptr;
 	}
 
 	imtbase::CTreeItemModel representationModel;
 	if (!representationModel.CreateFromJson(representationData)){
+		SendErrorMessage(0, QString("Error when try to create a representation model from json: %1").arg(qPrintable(representationData)), "imtauthgql::CUserControllerComp");
+		errorMessage = QString("Error when try to create a representation model from json% 1").arg(qPrintable(representationData));
+
 		return nullptr;
 	}
 
@@ -165,6 +180,9 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 		if (!userIds.isEmpty()){
 			QByteArray userObjectId = userIds[0];
 			if (userObjectId != objectId){
+				SendWarningMessage(0, QString("Unable to update user username %1 already exists.").arg(qPrintable(username)), "imtauthgql::CUserControllerComp");
+				errorMessage = QString("Username already exists").arg(qPrintable(representationData));
+
 				return nullptr;
 			}
 		}
@@ -181,9 +199,9 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 	if (representationModel.ContainsKey("Password")){
 		QByteArray password = representationModel.GetData("Password").toByteArray();
 
-		if (m_hashCalculatorCompPtr.IsValid()){
-			password = m_hashCalculatorCompPtr->GenerateHash(userInfoPtr->GetId() + password);
-		}
+//		if (m_hashCalculatorCompPtr.IsValid()){
+//			password = m_hashCalculatorCompPtr->GenerateHash(userInfoPtr->GetId() + password);
+//		}
 
 		userInfoPtr->SetPasswordHash(password);
 	}
@@ -221,6 +239,9 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 	}
 
 	if (!m_objectCollectionCompPtr->SetObjectData(objectId, *userInfoPtr)){
+		SendWarningMessage(0, QString("Unable to save user with ID: %1").arg(qPrintable(objectId)), "imtauthgql::CUserControllerComp");
+		errorMessage = QString("Unable to save user with ID: %1").arg(qPrintable(objectId));
+
 		return nullptr;
 	}
 
@@ -243,7 +264,9 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 			QString& errorMessage) const
 {
 	if (!m_userInfoFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
-		Q_ASSERT(false);
+		SendErrorMessage(0, QString("m_userInfoFactCompPtr or m_objectCollectionCompPtr is not valid"), "imtauthgql::CUserControllerComp");
+		errorMessage = QString("Internal error");
+
 		return nullptr;
 	}
 
@@ -262,7 +285,9 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 		imtauth::IUserInfo* userInstancePtr = m_userInfoFactCompPtr.CreateInstance();
 		imtauth::CIdentifiableUserInfo* userInfoPtr = dynamic_cast<imtauth::CIdentifiableUserInfo*>(userInstancePtr);
 		if (userInfoPtr == nullptr){
+			SendErrorMessage(0, QString("Unable to get an account info"), "imtauthgql::CUserControllerComp");
 			errorMessage = QT_TR_NOOP("Unable to get an account info!");
+
 			return nullptr;
 		}
 
@@ -276,6 +301,7 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 			username = itemModel.GetData("Username").toByteArray();
 
 			if (username.isEmpty()){
+				SendWarningMessage(0, QString("Username can't be empty"), "imtauthgql::CUserControllerComp");
 				errorMessage = QT_TR_NOOP("Username can't be empty!");
 
 				return nullptr;
@@ -301,7 +327,9 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 					if (userObjectId != objectId){
 						QByteArray currentUsername = currentUserInfoPtr->GetId();
 						if (currentUsername == username){
+							SendWarningMessage(0, QString("Username already exists"), "imtauthgql::CUserControllerComp");
 							errorMessage = QT_TR_NOOP("Username already exists");
+
 							return nullptr;
 						}
 					}
@@ -344,11 +372,11 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 			}
 		}
 
-		if (calculate){
-			if (m_hashCalculatorCompPtr.IsValid()){
-				password = m_hashCalculatorCompPtr->GenerateHash(username + password);
-			}
-		}
+//		if (calculate){
+//			if (m_hashCalculatorCompPtr.IsValid()){
+//				password = m_hashCalculatorCompPtr->GenerateHash(username + password);
+//			}
+//		}
 
 		userInfoPtr->SetPasswordHash(password);
 
@@ -400,6 +428,7 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 		return userInfoPtr;
 	}
 
+	SendErrorMessage(0, QString("Can not create user: %1").arg(QString(objectId)), "imtauthgql::CUserControllerComp");
 	errorMessage = QObject::tr("Can not create user: %1").arg(QString(objectId));
 
 	return nullptr;

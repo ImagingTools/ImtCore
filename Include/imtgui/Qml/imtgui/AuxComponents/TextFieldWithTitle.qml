@@ -25,6 +25,8 @@ Item {
 
     property int radius: 3;
 
+    property alias readOnly: input.readOnly;
+
     signal editingFinished();
 
     onFocusChanged: {

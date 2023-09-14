@@ -70,7 +70,20 @@ Item {
         userEditorContainer.documentModel.SetData("Username", usernameInput.text);
         userEditorContainer.documentModel.SetData("Name", nameInput.text);
         userEditorContainer.documentModel.SetData("Email", mailInput.text);
-        userEditorContainer.documentModel.SetData("Password", passwordInput.text);
+
+        let ok = true;
+        if (userEditorContainer.documentModel.ContainsKey("Password")){
+            let oldPassword = userEditorContainer.documentModel.GetData("Password");
+            console.log("oldPassword", oldPassword);
+            if (passwordInput.text != oldPassword){
+                ok = false;
+            }
+        }
+
+        if (!ok){
+            let hash = Qt.md5(usernameInput.text + passwordInput.text).toString();
+            userEditorContainer.documentModel.SetData("Password", hash);
+        }
 
         if (userEditorContainer.undoRedoManager){
             userEditorContainer.undoRedoManager.endChanges();
