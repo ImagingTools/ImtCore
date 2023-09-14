@@ -124,6 +124,8 @@ Item {
         buttonDelegateVert: Component{
             Item{
 
+                id: verticalComp;
+
                 width: model.Name == "" ? splitter.width : textButtonDelegateContainer.width;
                 height: isHorizontal ? -buttonPanel.verticalSpacing : model.Name == "" ? splitter.height : textButtonDelegateContainer.height;
 
@@ -194,7 +196,7 @@ Item {
 
                     anchors.top: parent.top;
 
-                    width: model.IsHorizontal == undefined ? 1 : buttonPanel.verticalMenuWidth;
+                    width: verticalComp.isHorizontal ? 1 : buttonPanel.verticalMenuWidth;
                     height: model.Name == "" && model.index == buttonPanel.horizCount ? -buttonPanel.verticalSpacing : 2;
                     color: Style.textColor;
                     visible: model.Name !== "" ? false : model.index == buttonPanel.horizCount ? false : model.index == (buttonPanel.buttonModel.GetItemsCount() - 1) ? false : true ;

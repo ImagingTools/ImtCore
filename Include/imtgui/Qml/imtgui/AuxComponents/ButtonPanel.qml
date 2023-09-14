@@ -14,7 +14,7 @@ Rectangle {
 
     property int delegateWidth: 110;
     property int delegateHeight: 30;
-    property int verticalMenuWidth: 0;
+    property int verticalMenuWidth: 1;
     property int visibleCount: 5;
     property int mainMargin: 10;
 
@@ -173,7 +173,7 @@ Rectangle {
     }
 
     onButtonModelChanged: {
-
+        //console.log("BUTTON_PANEL_CHANGED ", buttonPanel.buttonModel.toJSON());
         if(buttonPanel.buttonModel.GetItemsCount()){
             for(let i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
                 buttonPanel.buttonModel.SetData("IsHorizontal", true, i);
@@ -237,7 +237,7 @@ Rectangle {
         let ok4 =  buttonPanel.widthArrVer.length === count;
         buttonPanel.ready =  ok1 && ok2 && ok3 && ok4;
 
-        //console.log("READY_SET", buttonPanel.ready, ok1, ok2, ok3, ok4);
+        //console.log("BUTTON_PANEL_CHANGED_READY_SET", buttonPanel.ready, ok1, ok2, ok3, ok4);
     }
 
     function menuPositionCorrection(){
