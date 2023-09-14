@@ -29,7 +29,7 @@ Item {
     }
 
     function clearModel(){
-        buttonPanel.model = 0;
+        buttonPanel.clearModel();
     }
 
     function setVisible(visible){
@@ -53,62 +53,68 @@ Item {
         horizontalSpacing: 15;
         verticalSpacing: 10;
 
-        //hasActiveState: true;
         openButtonImageSource: "../../../Icons/" + Style.theme + "/Next_On_Active.svg"
 
         centered: true;
 
         buttonDelegate: Component{
-            BaseButton {
+            Item{
+                width: isHorizontal ? topButtonDelegate.width : -buttonPanel.horizontalSpacing;
 
-                id: topButtonDelegate;
+                height: topButtonDelegate.height;
 
-                decorator: Style.topButtonDecorator !==undefined ? Style.topButtonDecorator: defaultButtonDecorator;
-                imageSource: model.IsEnabled ? "../../../../Icons/" + Style.theme + "/" + model.Icon + "_Off_Normal.svg" :
-                                               "../../../../Icons/" + Style.theme + "/" + model.Icon + "_Off_Disabled.svg";
+                property bool isHorizontal: model.IsHorizontal == undefined ? true : model.IsHorizontal;
+                BaseButton {
 
-                enabled: model.IsEnabled;
+                    id: topButtonDelegate;
 
-                visible: model.Visible;
+                    decorator: Style.topButtonDecorator !==undefined ? Style.topButtonDecorator: defaultButtonDecorator;
+                    imageSource: model.IsEnabled ? "../../../../Icons/" + Style.theme + "/" + model.Icon + "_Off_Normal.svg" :
+                                                   "../../../../Icons/" + Style.theme + "/" + model.Icon + "_Off_Disabled.svg";
 
-                text: model.Name;
+                    enabled: model.IsEnabled;
 
-                isToggled: isToggleable ? model.IsToggled !== undefined ? model.IsToggled : false : false;
-                isToggleable: model.IsToggleable !== undefined ? model.IsToggleable : false
+                    visible: model.Visible;
 
-                Component.onCompleted: {
-                    console.log("Command onCompleted", model.Id);
-                }
+                    text: model.Name;
 
-                onClicked: {
-                    Events.sendEvent(commandsDecoratorContainer.commandsId + "CommandActivated", model.Id);
-                }
+                    isToggled: isToggleable ? model.IsToggled !== undefined ? model.IsToggled : false : false;
+                    isToggleable: model.IsToggleable !== undefined ? model.IsToggleable : false
 
-                Rectangle {
-                    id: notification;
+                    Component.onCompleted: {
+                        console.log("Command onCompleted", model.Id);
+                    }
 
-                    anchors.top: parent.top;
-                    anchors.right: parent.right;
+                    onClicked: {
+                        Events.sendEvent(commandsDecoratorContainer.commandsId + "CommandActivated", model.Id);
+                    }
 
-                    width: notificationText.width + 10;
-                    height: notificationText.height;
+                    Rectangle {
+                        id: notification;
 
-                    color: Style.errorTextColor;
-                    radius: width;
+                        anchors.top: parent.top;
+                        anchors.right: parent.right;
 
-                    visible: model.Status && model.Status !== "";
+                        width: notificationText.width + 10;
+                        height: notificationText.height;
 
-                    Text {
-                        id: notificationText;
+                        color: Style.errorTextColor;
+                        radius: width;
 
-                        anchors.centerIn: notification;
+                        visible: model.Status && model.Status !== "";
 
-                        text: model.Status;
+                        Text {
+                            id: notificationText;
 
-                        font.family: Style.fontFamilyBold;
-                        font.pixelSize: Style.fontSize_common;
+                            anchors.centerIn: notification;
 
-                        color: Style.baseColor;
+                            text: model.Status;
+
+                            font.family: Style.fontFamilyBold;
+                            font.pixelSize: Style.fontSize_common;
+
+                            color: Style.baseColor;
+                        }
                     }
                 }
             }
@@ -117,14 +123,19 @@ Item {
 
         buttonDelegateVert: Component{
             Item{
+
                 width: model.Name == "" ? splitter.width : textButtonDelegateContainer.width;
-                height: model.Name == "" ? splitter.height : textButtonDelegateContainer.height;
+                height: isHorizontal ? -buttonPanel.verticalSpacing : model.Name == "" ? splitter.height : textButtonDelegateContainer.height;
+
+                property bool isHorizontal: model.IsHorizontal == undefined ? true : model.IsHorizontal;
 
                 Item{
                     id: textButtonDelegateContainer;
 
-                    width: imageButton.width + textButtonDelegate.width;
-                    height: textButtonDelegate.height;
+                    anchors.top: parent.top;
+
+                    width: imageButton.width + textButtonDelegate.width + 5;
+                    height: Math.max(textButtonDelegate.height, imageButton.height);
                     visible: model.Name !== "";
 
                     AuxButton{
@@ -183,11 +194,12 @@ Item {
 
                     anchors.top: parent.top;
 
-                    width: buttonPanel.verticalMenuWidth;
-                    height: model.Name == "" && model.index == 0 ? -buttonPanel.verticalSpacing : 2;
+                    width: model.IsHorizontal == undefined ? 1 : buttonPanel.verticalMenuWidth;
+                    height: model.Name == "" && model.index == buttonPanel.horizCount ? -buttonPanel.verticalSpacing : 2;
                     color: Style.textColor;
-                    visible: model.Name !== "" ? false : model.index == 0 ? false : model.index == (buttonPanel.verticalModel.GetItemsCount() - 1) ? false : true ;
+                    visible: model.Name !== "" ? false : model.index == buttonPanel.horizCount ? false : model.index == (buttonPanel.buttonModel.GetItemsCount() - 1) ? false : true ;
                 }
+
 
             }
 

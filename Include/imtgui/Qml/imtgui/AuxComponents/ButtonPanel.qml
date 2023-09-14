@@ -173,10 +173,20 @@ Rectangle {
     }
 
     onButtonModelChanged: {
-        buttonPanel.widthArr = [];
-        buttonPanel.widthArrVer = [];
-        buttonSizeRep.model = buttonPanel.buttonModel;
-        buttonSizeRepVert.model = buttonPanel.buttonModel;
+
+        if(buttonPanel.buttonModel.GetItemsCount()){
+            for(let i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
+                buttonPanel.buttonModel.SetData("IsHorizontal", true, i);
+            }
+            buttonPanel.widthArr = [];
+            buttonPanel.widthArrVer = [];
+            buttonSizeRep.model = 0;
+            buttonSizeRepVert.model = 0;
+            buttonPanel.ready = false;
+            buttonPanel.horizCount = 0;
+            buttonSizeRep.model = buttonPanel.buttonModel;
+            buttonSizeRepVert.model = buttonPanel.buttonModel;
+        }
     }
 
 
@@ -192,6 +202,8 @@ Rectangle {
         }
     }
 
+
+
     onReadyChanged: {
         if(buttonPanel.ready){
             buttonPanel.assignModel();
@@ -203,10 +215,29 @@ Rectangle {
 
     }
 
+    function clearModel(){
+        buttonPanel.widthArr = [];
+        buttonPanel.widthArrVer = [];
+        buttonPanel.ready = false;
+        buttonPanel.horizCount = 0;
+        horizontalListView.model = 0;
+        buttonSizeRep.model = 0;
+        buttonSizeRepVert.model = 0;
+        buttonPanel.buttonModel.Clear();
+        buttonPanel.horizontalModel.Clear();
+        buttonPanel.verticalModel.Clear();
+
+    }
+
     function setReady(){
         var count = buttonPanel.buttonModel.GetItemsCount();
-        buttonPanel.ready =  buttonPanel.compl && count && buttonPanel.widthArr.length == count && buttonPanel.widthArrVer.length == count;
+        let ok1 = buttonPanel.compl;
+        let ok2 = count;
+        let ok3 = buttonPanel.widthArr.length === count;
+        let ok4 =  buttonPanel.widthArrVer.length === count;
+        buttonPanel.ready =  ok1 && ok2 && ok3 && ok4;
 
+        //console.log("READY_SET", buttonPanel.ready, ok1, ok2, ok3, ok4);
     }
 
     function menuPositionCorrection(){
