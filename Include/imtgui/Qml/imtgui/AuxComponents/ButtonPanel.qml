@@ -226,6 +226,7 @@ Rectangle {
         buttonPanel.buttonModel.Clear();
         buttonPanel.horizontalModel.Clear();
         buttonPanel.verticalModel.Clear();
+        buttonPanel.setOpenButtonVisible();
 
     }
 
@@ -238,6 +239,11 @@ Rectangle {
         buttonPanel.ready =  ok1 && ok2 && ok3 && ok4;
 
         //console.log("BUTTON_PANEL_CHANGED_READY_SET", buttonPanel.ready, ok1, ok2, ok3, ok4);
+    }
+
+    function setOpenButtonVisible(){
+        let count = buttonPanel.buttonModel.GetItemsCount();
+        openButton.visible = count && count > buttonPanel.horizCount;
     }
 
     function menuPositionCorrection(){
@@ -254,9 +260,6 @@ Rectangle {
     function assignModel(){
 
         if(!buttonPanel.canChangeOrder){
-            for(var i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
-                buttonPanel.buttonModel.SetData("IsHorizontal", false, i);
-            }
             horizontalListView.model = buttonPanel.buttonModel;
         }
         else {
@@ -487,6 +490,7 @@ Rectangle {
             }
 
         }
+        buttonPanel.setOpenButtonVisible();
 
     }
 
@@ -712,7 +716,7 @@ Rectangle {
         pressed: buttonPanel.openST;
         color: buttonPanel.openST ? Style.hover : defaultColor;
 
-        visible: buttonPanel.buttonModel.GetItemsCount() && buttonPanel.buttonModel.GetItemsCount() > buttonPanel.horizCount;
+        visible: false;//buttonPanel.buttonModel.GetItemsCount() && buttonPanel.buttonModel.GetItemsCount() > buttonPanel.horizCount;
 
         onClicked: {
             buttonPanel.setVertMenuWidth();
