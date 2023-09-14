@@ -64,7 +64,7 @@ public:
                 QString& textFilterQuery) const override;
 
 private:
-	I_FACT(imtgeo::IAddressElementInfo, m_adrElementInfoFactCompPtr);
+    I_FACT(imtgeo::IAddressElementInfo, m_adrElementInfoFactCompPtr);
 };
 
 

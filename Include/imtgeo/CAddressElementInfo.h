@@ -6,21 +6,20 @@
 
 // ImtCore includes
 #include <imtgeo/IAddressElementInfo.h>
+#include <imtgeo/CPosition.h>
 
 namespace imtgeo
 {
 
 
-class CAddressElementInfo: virtual public IAddressElementInfo
+class CAddressElementInfo: public CPositionIdentifiable , virtual public IAddressElementInfo
 {
 public:
+    typedef CPositionIdentifiable BaseClass;
 
     CAddressElementInfo();
     ~CAddressElementInfo();
 
-    // reimplemented (IAddressElementInfo)
-    virtual QByteArray GetId() const override;
-    virtual void SetId(QByteArray id) override;
     virtual QList<QByteArray> GetParentIds() const override;
     virtual void SetParentIds(QList<QByteArray> parentIds) override;
 	virtual QByteArray GetAddressTypeId() const override;
@@ -32,10 +31,6 @@ public:
     virtual void SetDescription(QString description) override;
 	virtual QString GetAddress() const override;
 	virtual void SetAddress(QString adr) override;
-	virtual double GetLatitude() const override;
-	virtual void SetLatitude(double lat) override;
-	virtual double GetLongitude() const override;
-	virtual void SetLongitude(double lat) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -55,8 +50,6 @@ private:
 	QString m_name;    
     QString m_description;
 	QString m_address;
-	double m_longitude;   // долгота
-	double m_latitude;    // широта
 
 };
 

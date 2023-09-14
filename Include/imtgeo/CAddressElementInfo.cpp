@@ -23,24 +23,6 @@ CAddressElementInfo::~CAddressElementInfo()
 }
 
 
-// reimplemented (IAddressElementInfo)
-
-QByteArray CAddressElementInfo::GetId() const
-{
-	return m_id;
-}
-
-
-void CAddressElementInfo::SetId(QByteArray id)
-{
-	if (m_id != id){
-		istd::CChangeNotifier notifier(this);
-
-		m_id = id;
-	}
-}
-
-
 QList<QByteArray> CAddressElementInfo::GetParentIds() const
 {
 	return m_parentIds;
@@ -138,34 +120,6 @@ void CAddressElementInfo::SetAddress(QString adr)
 }
 
 
-double CAddressElementInfo::GetLatitude() const
-{
-	return m_latitude;
-}
-
-
-void CAddressElementInfo::SetLatitude(double lat)
-{
-	if (m_latitude != lat){
-		istd::CChangeNotifier notifier(this);
-		m_latitude = lat;
-	}
-}
-
-double CAddressElementInfo::GetLongitude() const
-{
-	return m_longitude;
-}
-
-
-void CAddressElementInfo::SetLongitude(double lon)
-{
-	if (m_longitude != lon){
-		istd::CChangeNotifier notifier(this);
-		m_longitude = lon;
-	}
-}
-
 
 
 // reimplemented (iser::ISerializable)
@@ -174,7 +128,7 @@ bool CAddressElementInfo::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	bool retVal = true;
+    bool retVal = BaseClass::Serialize(archive);
 
 	static iser::CArchiveTag idTag("Id", "Address elemen id", iser::CArchiveTag::TT_LEAF);
 	retVal = archive.BeginTag(idTag);
@@ -202,16 +156,6 @@ bool CAddressElementInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_address);
 	retVal = retVal && archive.EndTag(fullAddressTag);
 
-	static iser::CArchiveTag latTag("Latitude", "Latitude address", iser::CArchiveTag::TT_LEAF);
-	retVal = archive.BeginTag(latTag);
-	retVal = retVal && archive.Process(m_latitude);
-	retVal = retVal && archive.EndTag(latTag);
-
-	static iser::CArchiveTag lonTag("Longitude", "Longitude address", iser::CArchiveTag::TT_LEAF);
-	retVal = archive.BeginTag(lonTag);
-	retVal = retVal && archive.Process(m_longitude);
-	retVal = retVal && archive.EndTag(lonTag);
-
 	return retVal;
 }
 
@@ -238,8 +182,8 @@ bool CAddressElementInfo::CopyFrom(const IChangeable& object, CompatibilityMode 
 		m_name = sourcePtr->m_name;
 		m_description = sourcePtr->m_description;
 		m_address = sourcePtr->m_address;
-		m_latitude = sourcePtr->m_latitude;
-		m_longitude = sourcePtr->m_longitude;
+        SetLatitude(sourcePtr->GetLatitude());
+        SetLongitude(sourcePtr->GetLongitude());
 
 		return true;
 	}
@@ -269,8 +213,8 @@ bool CAddressElementInfo::ResetData(CompatibilityMode /*mode*/)
 	m_name.clear();
 	m_description.clear();
 	m_address.clear();
-	m_latitude = 0;
-	m_longitude = 0;
+    SetLatitude(0.0);
+    SetLongitude(0.0);
 
 	return true;
 }

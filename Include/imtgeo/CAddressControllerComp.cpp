@@ -28,14 +28,15 @@ imtbase::CTreeItemModel* CAddressControllerComp::GetObject(
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(addressId, dataPtr)){
-		const IAddressElementInfo* addressInfoPtr = dynamic_cast<const IAddressElementInfo*>(dataPtr.GetPtr());
+        const IAddressElementInfo* addressInfoPtr = dynamic_cast<const IAddressElementInfo*>(dataPtr.GetPtr());
+        const CPositionIdentifiable* addressPosition = dynamic_cast<const CPositionIdentifiable*>(dataPtr.GetPtr());
 
 		if (addressInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get an address info");
 			return nullptr;
 		}
 
-		QByteArray id = addressInfoPtr->GetId();
+        QByteArray id = addressPosition->GetObjectUuid();
 		QByteArray parentId;
 		QList<QByteArray> parents = addressInfoPtr->GetParentIds();
 		if (!parents.isEmpty()){
@@ -181,7 +182,7 @@ istd::IChangeable* CAddressControllerComp::CreateObject(
 				return nullptr;
 			}
 
-			addressInfoPtr->SetId(id);
+            addressInfoPtr->SetObjectUuid(id);
 		}
 
 		QByteArray parentId = nullptr;

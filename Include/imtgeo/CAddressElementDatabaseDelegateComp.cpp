@@ -29,14 +29,17 @@ istd::IChangeable* CAddressElementDatabaseDelegateComp::CreateObjectFromRecord(c
 		return nullptr;
 	}
 
-	istd::TDelPtr<IAddressElementInfo> adrElementInfoPtr = m_adrElementInfoFactCompPtr.CreateInstance();
+    istd::TDelPtr<IAddressElementInfo> adrElementInfoPtr = m_adrElementInfoFactCompPtr.CreateInstance();
     if (!adrElementInfoPtr.IsValid()){
         return nullptr;
     }
 
     if(record.contains("Id")){
-        QByteArray id = record.value("Id").toByteArray();
-        adrElementInfoPtr->SetId(id);
+        CPositionIdentifiable* adrElementIdentifiableInfoPtr = dynamic_cast<CPositionIdentifiable*>(adrElementInfoPtr.GetPtr());
+        if(adrElementIdentifiableInfoPtr !=nullptr){
+            QByteArray id = record.value("Id").toByteArray();
+            adrElementIdentifiableInfoPtr->SetObjectUuid(id);
+        }
     }
 
     if(record.contains("ParentIds")){
@@ -150,10 +153,11 @@ QByteArray CAddressElementDatabaseDelegateComp::CreateUpdateObjectQuery(
 	bool /*useExternDelegate*/) const
 {
 	const IAddressElementInfo* adrInfoPtr = dynamic_cast<const IAddressElementInfo*>(&object);
+    const CPositionIdentifiable* positionInfoPtr = dynamic_cast<const CPositionIdentifiable*>(&object);
 	if (adrInfoPtr == nullptr || objectId.isEmpty()){
 		return QByteArray();
 	}
-	QByteArray adrId = adrInfoPtr->GetId();
+    QByteArray adrId = positionInfoPtr->GetObjectUuid();
 	QList<QByteArray> parentIds = adrInfoPtr->GetParentIds();
 	QJsonArray json;
 	for (QByteArray parentId : parentIds){

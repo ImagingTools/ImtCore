@@ -57,7 +57,23 @@ void CPosition::SetLongitude(double lon)
 
 bool CPosition::Serialize(iser::IArchive &archive)
 {
-    return false;
+    istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
+
+    bool retVal = false;
+
+    static iser::CArchiveTag latTag("Latitude", "Latitude address", iser::CArchiveTag::TT_LEAF);
+    retVal = archive.BeginTag(latTag);
+    double lat = m_coordinate.latitude();
+    retVal = retVal && archive.Process(lat);
+    retVal = retVal && archive.EndTag(latTag);
+
+    static iser::CArchiveTag lonTag("Longitude", "Longitude address", iser::CArchiveTag::TT_LEAF);
+    retVal = archive.BeginTag(lonTag);
+    double lon = m_coordinate.longitude();
+    retVal = retVal && archive.Process(lon);
+    retVal = retVal && archive.EndTag(lonTag);
+
+    return retVal;
 }
 
 

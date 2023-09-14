@@ -204,11 +204,13 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
                     if (itemIndex >= 0){
 
                         const imtgeo::IAddressElementInfo* addressElementInfoPtr = nullptr;
+                        const imtgeo::CPositionIdentifiable* addressPosition = nullptr;
                         addressElementInfoPtr = dynamic_cast<const imtgeo::IAddressElementInfo*>(objectDataPtr.GetPtr());
+                        addressPosition = dynamic_cast<const imtgeo::CPositionIdentifiable*>(objectDataPtr.GetPtr());
 
                         QString fullAddress = addressElementInfoPtr->GetAddress();
                         QString name = addressElementInfoPtr->GetName();
-                        QByteArray addressId = addressElementInfoPtr->GetId();
+                        QByteArray addressId = addressPosition->GetObjectUuid();
                         QByteArray typeAddressId = addressElementInfoPtr->GetAddressTypeId();
                         QList<QByteArray> parentsList = addressElementInfoPtr->GetParentIds();
                         QByteArray addressParentId = parentsList.isEmpty() ? QByteArray() : parentsList.last();

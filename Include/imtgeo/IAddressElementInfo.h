@@ -4,6 +4,8 @@
 #include <iser/IObject.h>
 #include <imtbase/IObjectCollection.h>
 
+// ImtCore includes
+#include <imtgeo/IPosition.h>
 
 namespace imtgeo
 {
@@ -11,21 +13,11 @@ namespace imtgeo
     Interface for describing a address element regions.
 	\ingroup Handbooks
 */
-class IAddressElementInfo: virtual public iser::IObject
+class IAddressElementInfo: virtual public iser::IObject, virtual public imtgeo::IPosition
 {
 public:
 
     /**
-        Get id of the address element.
-    */
-    virtual QByteArray GetId() const = 0;
-
-    /**
-        Set id of the address element.
-    */
-    virtual void SetId(QByteArray id) = 0;
-
-	/**
 		Get ids of parent the address element.
 	*/
     virtual QList<QByteArray> GetParentIds() const = 0;
@@ -78,27 +70,6 @@ public:
 		Set string address.
 	*/
 	virtual void SetAddress(QString adr) = 0;
-
-	/**
-		Get latitude address.
-	*/
-	virtual double GetLatitude() const = 0;
-
-	/**
-		Set latitude address.
-	*/
-	virtual void SetLatitude(double lat) = 0;
-
-	/**
-		Get longitude address.
-	*/
-	virtual double GetLongitude() const = 0;
-
-	/**
-		Set longitude address.
-	*/
-	virtual void SetLongitude(double lon) = 0;
-
 
 };
 
