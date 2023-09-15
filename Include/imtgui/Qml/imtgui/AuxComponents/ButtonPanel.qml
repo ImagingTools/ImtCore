@@ -162,14 +162,18 @@ Rectangle {
 
     }
 
-    Component.onDestruction: {
-        Events.unSubscribeEvent("DialogBackgroundClicked", buttonPanel.onBackgroundClicked);
-    }
 
     Component.onCompleted: {
         buttonPanel.compl = true;
-        Events.subscribeEvent("DialogBackgroundClicked", buttonPanel.onBackgroundClicked)
+    }
 
+    onOpenSTChanged: {
+        if(buttonPanel.openST){
+            Events.subscribeEvent("DialogBackgroundClicked", buttonPanel.onBackgroundClicked)
+        }
+        else {
+            Events.unSubscribeEvent("DialogBackgroundClicked", buttonPanel.onBackgroundClicked);
+        }
     }
 
     onButtonModelChanged: {
