@@ -244,16 +244,6 @@ Rectangle {
             Events.sendEvent("UpdateSettings");
             Events.sendEvent("UpdateModels");
         }
-
-//        onModelStateChanged: {
-//            if (authorizationPage.modelState === "Ready"){
-//                console.log("AuthorizationPage Ready", modelState);
-//                loading.stop();
-//            }
-//            else{
-//                loading.start();
-//            }
-//        }
     }
 
     SuperuserPasswordPage {

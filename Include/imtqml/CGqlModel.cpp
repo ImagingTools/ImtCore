@@ -46,6 +46,7 @@ bool CGqlModel::SetGqlQuery(QString query)
 			networkRequest.setRawHeader("X-authentication-token", s_accessToken.toUtf8());
 		}
 
+		qDebug() << QString("Post to url %1 query %2 ").arg(requestUrl.toString()).arg(query);
 		QNetworkReply* reply = accessManager->post(networkRequest, query.toUtf8());
 		connect(reply, &QNetworkReply::finished, this, &CGqlModel::replyFinished);
 

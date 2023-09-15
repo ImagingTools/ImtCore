@@ -36,7 +36,7 @@ QtObject {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, container.authorizationGqlModel);
+            console.log("User Token State:", this.state, container.authorizationGqlModel.toJSON());
             if (this.state === "Ready"){
                 var dataModelLocal;
 
