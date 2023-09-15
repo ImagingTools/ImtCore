@@ -53,15 +53,6 @@ Item {
                 let countPages = pagesData.model.GetItemsCount();
                 if (pagesProvider.pagesModel.GetItemsCount() === countPages){
                     updateRepeaterModel = false;
-
-//                    for (let i = 0; i < pagesData.count; i++){
-//                        let pageData = pagesData.itemAt(i);
-
-//                        let id = pagesProvider.pagesModel.GetData("Id", i);
-//                        let name = pagesProvider.pagesModel.GetData("Name", i);
-
-//                        Events.sendEvent(id + "NameChanged", name);
-//                    }
                 }
             }
 

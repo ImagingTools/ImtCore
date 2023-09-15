@@ -96,7 +96,6 @@ Rectangle {
 
             }
         }
-
     }
 
     Component{
@@ -126,9 +125,6 @@ Rectangle {
                     rootItem.clicked(id);
                 }
             }
-
-
-
 
             Rectangle{
                 id: splitter;
@@ -166,7 +162,6 @@ Rectangle {
     Component.onCompleted: {
         buttonPanel.compl = true;
     }
-
     onOpenSTChanged: {
         if(buttonPanel.openST){
             Events.subscribeEvent("DialogBackgroundClicked", buttonPanel.onBackgroundClicked)
@@ -231,7 +226,11 @@ Rectangle {
         horizontalListView.model = 0;
         buttonSizeRep.model = 0;
         buttonSizeRepVert.model = 0;
-        buttonPanel.buttonModel.Clear();
+
+        if (buttonPanel.buttonModel){
+            buttonPanel.buttonModel.Clear();
+        }
+
         buttonPanel.horizontalModel.Clear();
         buttonPanel.verticalModel.Clear();
         buttonPanel.setOpenButtonVisible();
@@ -304,6 +303,8 @@ Rectangle {
     }
 
     function onBackgroundClicked(){
+        console.log("ButtonPanel onBackgroundClicked");
+
         modalDialogManager.closeDialog();
         buttonPanel.openST = false;
     }

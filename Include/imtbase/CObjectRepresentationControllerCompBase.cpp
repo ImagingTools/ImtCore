@@ -37,6 +37,8 @@ QByteArray CObjectRepresentationControllerCompBase::GetModelId() const
 bool CObjectRepresentationControllerCompBase::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
 {
 	if (!IsModelSupported(dataModel)){
+		SendErrorMessage(0, QString("Unable to get representation model from data model. Model is not supported."));
+
 		return false;
 	}
 

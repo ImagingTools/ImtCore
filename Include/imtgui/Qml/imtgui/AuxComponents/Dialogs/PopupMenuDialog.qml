@@ -97,6 +97,7 @@ Item {
     }
 
     function onBackgroundClicked(){
+        console.log("PopupMenuDialog onBackgroundClicked");
         if (rootItem){
             popupMenuContainer.finished('', rootItem.currentIndex);
         }

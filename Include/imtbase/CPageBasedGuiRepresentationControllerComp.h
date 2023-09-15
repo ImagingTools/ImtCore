@@ -18,8 +18,8 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (IRepresentationController)
-	virtual bool GetRepresentationFromDataModel(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr = nullptr) const override;
+	// reimplemented (imtbase::CObjectRepresentationControllerCompBase)
+	virtual bool GetRepresentationFromValue(const istd::IChangeable& dataModel, CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr = nullptr) const override;
 };
 
 

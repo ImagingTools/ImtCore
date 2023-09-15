@@ -2,7 +2,7 @@
 
 
 // ACF includes
-#include <icomp/CComponentBase.h>
+#include <ilog/TLoggerCompWrap.h>
 #include <iqt/ITranslationManager.h>
 
 // ImtCore includes
@@ -16,7 +16,7 @@ namespace imtbase
 
 
 class CObjectRepresentationControllerCompBase:
-			public icomp::CComponentBase,
+			public ilog::CLoggerComponentBase,
 			virtual public IRepresentationController
 {
 public:
