@@ -34,7 +34,7 @@ public:
 		MT_PATCH = 64
 	};
 
-	CHttpRequest(QObject& socket, const IRequestServlet& requestHandler, const IProtocolEngine& engine);
+	CHttpRequest(const IRequestServlet& requestHandler, const IProtocolEngine& engine);
 
 	QByteArrayList GetHeaders() const;
 	QByteArray GetHeaderValue(const QByteArray& headerType) const;
@@ -58,22 +58,23 @@ public:
 	virtual RequestState GetState() const override;
 	virtual QByteArray GetCommandId() const override;
 	virtual CommandParams GetCommandParams() const override;
+	virtual QByteArray GetRequestId() const override;
 
 	// reimplemented (INetworkObject)
 	virtual const IProtocolEngine& GetProtocolEngine() const override;
-	virtual QObject& GetSocketObject() const override;
 
 	// reimplemented (istd::IChangeable)
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
-protected:
-	virtual bool ParseDeviceData(QIODevice& device);
+public:
+	virtual bool ParseDeviceData(QIODevice& device) override;
 	virtual bool ExecuteHttpParser(const QByteArray& data, const QObject* socketObjectPtr);
 
-private Q_SLOTS:
-	void HandleReadyRead();
-	void OnWebSocketTextMessage(const QString& textMessage);
-	void OnWebSocketBinaryMessage(const QByteArray& dataMessage);
+//private Q_SLOTS:
+//	void HandleReadyRead();
+//	void SocketDisconnected();
+//	void OnWebSocketTextMessage(const QString& textMessage);
+//	void OnWebSocketBinaryMessage(const QByteArray& dataMessage);
 
 private:
 	static bool ParseUrl(const char *at, size_t length, bool connect, QUrl& url);
@@ -87,12 +88,14 @@ private:
 
 	const IRequestServlet& m_requestHandler;
 	const IProtocolEngine& m_engine;
-	QObject& m_socket;
+	QObject* m_socket;
 
 	typedef QMap<QByteArray, QByteArray> HeaderMap;
 	HeaderMap m_headers;
 
 	QByteArray m_lastHeader;
+
+	QByteArray m_requestId;
 };
 
 

@@ -19,16 +19,16 @@ namespace imtrest
 
 // reimplemented (IRequestHandler)
 
-IRequestServlet::ConstResponsePtr CWebSocketServerComp::ProcessRequest(const IRequest& request) const
+ConstResponsePtr CWebSocketServerComp::ProcessRequest(const IRequest& request) const
 {
 	ConstResponsePtr retVal;
 
-	if (m_requestHandlerCompPtr.IsValid()){
-		retVal = m_requestHandlerCompPtr->ProcessRequest(request);
-		if (retVal.IsValid()){
-			request.GetProtocolEngine().GetSender().SendResponse(*retVal);
-		}
-	}
+//	if (m_requestHandlerCompPtr.IsValid()){
+//		retVal = m_requestHandlerCompPtr->ProcessRequest(request);
+//		if (retVal.IsValid()){
+//			request.GetProtocolEngine().GetSender().SendResponse(*retVal);
+//		}
+//	}
 
 	return retVal;
 }
@@ -37,6 +37,18 @@ IRequestServlet::ConstResponsePtr CWebSocketServerComp::ProcessRequest(const IRe
 QByteArray CWebSocketServerComp::GetSupportedCommandId() const
 {
 	return QByteArray();
+}
+
+
+const IRequest* CWebSocketServerComp::GetRequest(const QByteArray& requestId) const
+{
+	return nullptr;
+}
+
+
+const ISender* CWebSocketServerComp::GetSender(const QByteArray& requestId) const
+{
+	return nullptr;
 }
 
 
@@ -116,16 +128,16 @@ void CWebSocketServerComp::OnSocketDisconnected()
 		m_subscriberEngineCompPtr->UnRegisterSubscriber(socketObjectPtr);
 	}
 
-	for (int i = 0; i < m_requests.GetCount(); ++i){
-		IRequest* requestPtr = m_requests.GetAt(i);
-		Q_ASSERT(requestPtr != nullptr);
+//	for (int i = 0; i < m_requests.GetCount(); ++i){
+//		IRequest* requestPtr = m_requests.GetAt(i);
+//		Q_ASSERT(requestPtr != nullptr);
 
-		if (&requestPtr->GetSocketObject() == socketObjectPtr){
-			m_requests.RemoveAt(i);
+//		if (&requestPtr->GetSocketObject() == socketObjectPtr){
+//			m_requests.RemoveAt(i);
 
-			break;
-		}
-	}
+//			break;
+//		}
+//	}
 
 	socketObjectPtr->deleteLater();
 }
@@ -139,7 +151,7 @@ void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 		return;
 	}
 
-	istd::TDelPtr<IRequest> newRequestPtr = m_protocolEngineCompPtr->CreateRequest(webSocketPtr, *this);
+	istd::TDelPtr<IRequest> newRequestPtr = m_protocolEngineCompPtr->CreateRequest(*this);
 	if (newRequestPtr.IsValid()){
 		CWebSocketRequest* webSocketRequest = dynamic_cast<CWebSocketRequest*>(newRequestPtr.GetPtr());
 		if (webSocketRequest == nullptr){
@@ -157,9 +169,10 @@ void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 }
 
 
-void CWebSocketServerComp::OnWebSocketBinaryMessage(const QByteArray& /*dataMessage*/)
+void CWebSocketServerComp::OnWebSocketBinaryMessage(const QByteArray& dataMessage)
 {
 }
+
 
 
 } // namespace imtrest

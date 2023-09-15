@@ -3,7 +3,6 @@
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
-#include <imtrest/IResponder.h>
 #include <imtrest/IResponse.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CHttpResponse.h>
@@ -17,7 +16,7 @@ namespace imtrest
 
 // reimplemented (IProtocolEngine)
 
-IRequestServlet::ConstResponsePtr CHttpServletCompBase::ProcessRequest(const imtrest::IRequest& request) const
+ConstResponsePtr CHttpServletCompBase::ProcessRequest(const imtrest::IRequest& request) const
 {
 	imtrest::CHttpRequest* httpRequestPtr = dynamic_cast<imtrest::CHttpRequest*>(const_cast<imtrest::IRequest*>(&request));
 	if (httpRequestPtr == nullptr){
@@ -39,7 +38,7 @@ QByteArray CHttpServletCompBase::GetSupportedCommandId() const
 
 // protected methods
 
-IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnRequestReceived(const imtrest::CHttpRequest& request) const
+ConstResponsePtr CHttpServletCompBase::OnRequestReceived(const imtrest::CHttpRequest& request) const
 {
 	QByteArray commandId;
 	imtrest::IRequest::CommandParams commandParams;
@@ -81,7 +80,7 @@ IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnRequestReceived(const 
 }
 
 
-IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnGet(
+ConstResponsePtr CHttpServletCompBase::OnGet(
 			const QByteArray& commandId,
 			const imtrest::IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,
@@ -95,7 +94,7 @@ IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnGet(
 }
 
 
-IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnPost(
+ConstResponsePtr CHttpServletCompBase::OnPost(
 			const QByteArray& commandId,
 			const imtrest::IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,
@@ -109,7 +108,7 @@ IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnPost(
 }
 
 
-IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnDelete(
+ConstResponsePtr CHttpServletCompBase::OnDelete(
 			const QByteArray& commandId,
 			const imtrest::IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,
@@ -123,7 +122,7 @@ IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnDelete(
 }
 
 
-IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnPatch(
+ConstResponsePtr CHttpServletCompBase::OnPatch(
 			const QByteArray& commandId,
 			const imtrest::IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,
@@ -137,7 +136,7 @@ IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnPatch(
 }
 
 
-IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnPut(
+ConstResponsePtr CHttpServletCompBase::OnPut(
 			const QByteArray& commandId,
 			const imtrest::IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,
@@ -151,7 +150,7 @@ IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnPut(
 }
 
 
-IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnHead(
+ConstResponsePtr CHttpServletCompBase::OnHead(
 			const QByteArray& commandId,
 			const imtrest::IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,
@@ -165,7 +164,7 @@ IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnHead(
 }
 
 
-IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnOptions(
+ConstResponsePtr CHttpServletCompBase::OnOptions(
 			const QByteArray& commandId,
 			const imtrest::IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,
@@ -178,7 +177,7 @@ IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnOptions(
 	return CreateDefaultErrorResponse("OPTIONS request received but is NOT implemented!", request);
 }
 
-IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnUnknown(
+ConstResponsePtr CHttpServletCompBase::OnUnknown(
 			const QByteArray& commandId,
 			const imtrest::IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,
@@ -191,7 +190,7 @@ IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnUnknown(
 	return CreateDefaultErrorResponse("UNKNOWN request received but is NOT implemented!", request);
 }
 
-IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnInvalid(
+ConstResponsePtr CHttpServletCompBase::OnInvalid(
 			const QByteArray& commandId,
 			const imtrest::IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,
@@ -204,12 +203,12 @@ IRequestServlet::ConstResponsePtr CHttpServletCompBase::OnInvalid(
 	return CreateDefaultErrorResponse("INVALID request received but is NOT implemented!", request);
 }
 
-IRequestServlet::ConstResponsePtr CHttpServletCompBase::CreateDefaultErrorResponse(const QByteArray& errorString, const imtrest::CHttpRequest& request) const
+ConstResponsePtr CHttpServletCompBase::CreateDefaultErrorResponse(const QByteArray& errorString, const imtrest::CHttpRequest& request) const
 {
 	qCritical() << __FILE__ << __LINE__ << __FUNCTION__ << errorString;
 	SendErrorMessage(0, errorString);
 
-	IRequestServlet::ConstResponsePtr retVal;
+	ConstResponsePtr retVal;
 
 	retVal.SetPtr(request.GetProtocolEngine().CreateResponse(
 				request,

@@ -16,29 +16,31 @@ namespace imtrest
 
 // public methods
 
-// reimplemented (IResponder)
+CWebSocketSender::CWebSocketSender(QWebSocket* webSocketPtr): m_webSocketPtr(webSocketPtr)
+{
 
-bool CWebSocketSender::SendResponse(const IResponse& response) const
+}
+
+// reimplemented (IRequest)
+
+bool CWebSocketSender::SendResponse(ConstResponsePtr& response) const
 {
 	int protocolStatusCode = -1;
 	QByteArray statusLiteral;
 
-	bool retVal = response.GetProtocolEngine().GetProtocolStatusCode(response.GetStatusCode(), protocolStatusCode, statusLiteral);
+	bool retVal = response->GetProtocolEngine().GetProtocolStatusCode(response->GetStatusCode(), protocolStatusCode, statusLiteral);
 	if (!retVal){
 		return false;
 	}
 
-	QObject& socket = response.GetSocketObject();
-
-	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(&socket);
-	if (webSocketPtr != nullptr){
-		if (!webSocketPtr->isValid()){
+	if (m_webSocketPtr != nullptr){
+		if (!m_webSocketPtr->isValid()){
 			return false;
 		}
 
-		const QByteArray& contentData = response.GetData();
+		const QByteArray& contentData = response->GetData();
 
-		webSocketPtr->sendTextMessage(contentData);
+		m_webSocketPtr->sendTextMessage(contentData);
 
 		return true;
 	}
@@ -47,19 +49,16 @@ bool CWebSocketSender::SendResponse(const IResponse& response) const
 }
 
 
-bool CWebSocketSender::SendRequest(const IRequest &reguest) const
+bool CWebSocketSender::SendRequest(ConstRequestPtr& reguest) const
 {
-	QObject& socket = reguest.GetSocketObject();
-
-	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(&socket);
-	if (webSocketPtr != nullptr){
-		if (!webSocketPtr->isValid()){
+	if (m_webSocketPtr != nullptr){
+		if (!m_webSocketPtr->isValid()){
 			return false;
 		}
 
-		const QByteArray& contentData = reguest.GetBody();
+		const QByteArray& contentData = reguest->GetBody();
 
-		webSocketPtr->sendTextMessage(contentData);
+		m_webSocketPtr->sendTextMessage(contentData);
 
 		return true;
 	}
@@ -67,8 +66,6 @@ bool CWebSocketSender::SendRequest(const IRequest &reguest) const
 	return false;
 
 }
-
-
 
 
 } // namespace imtrest

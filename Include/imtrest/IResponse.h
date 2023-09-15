@@ -4,6 +4,9 @@
 // Qt includes
 #include <QtCore/QMap>
 
+// ACF includes
+#include <istd/TSmartPtr.h>
+
 // ImtCore includes
 #include <imtrest/INetworkObject.h>
 
@@ -46,7 +49,10 @@ public:
 	virtual Headers GetHeaders() const = 0;
 };
 
+typedef istd::TSmartPtr<const imtrest::IResponse> ConstResponsePtr;
 
 } // namespace imtrest
+
+Q_DECLARE_METATYPE(imtrest::ConstResponsePtr)
 
 

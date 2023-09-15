@@ -25,15 +25,15 @@ public:
 
 protected:
 	// reimplemented (imtrest::CHttpServletCompBase)
-	virtual ConstResponsePtr OnPost(const QByteArray& commandId, const imtrest::IRequest::CommandParams& commandParams, const HeadersMap& headers, const imtrest::CHttpRequest& request) const override;
+	virtual imtrest::ConstResponsePtr OnPost(const QByteArray& commandId, const imtrest::IRequest::CommandParams& commandParams, const HeadersMap& headers, const imtrest::CHttpRequest& request) const override;
 
 private:
-	imtrest::IRequestServlet::ConstResponsePtr CreateResponse(
+	imtrest::ConstResponsePtr CreateResponse(
 				const imtrest::IProtocolEngine::StatusCode& statusCode,
 				const QByteArray& payload,
 				const imtrest::IRequest& request,
 				const QByteArray& contentTypeId = "text/plain; charset=utf-8") const;
-	imtrest::IRequestServlet::ConstResponsePtr GenerateError(
+	imtrest::ConstResponsePtr GenerateError(
 				const imtrest::IProtocolEngine::StatusCode& errorCode,
 				const QString& errorString,
 				const imtrest::CHttpRequest& request) const;

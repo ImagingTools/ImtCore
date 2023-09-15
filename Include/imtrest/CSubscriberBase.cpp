@@ -10,11 +10,10 @@ namespace imtrest
 
 // public methods
 
-CSubscriberBase::CSubscriberBase(QObject &socket, const IRequestServlet& requestHandler, const IProtocolEngine &engine)
-	:m_engine(engine),
-	m_requestHandler(requestHandler),
-	m_socket(socket),
-	m_state(SS_NON_AUTHORIZED)
+CSubscriberBase::CSubscriberBase(const IRequestServlet& requestHandler, const IProtocolEngine &engine)
+			:m_state(SS_NON_AUTHORIZED),
+			m_engine(engine),
+			m_requestHandler(requestHandler)
 {
 }
 
@@ -56,12 +55,6 @@ const IRequestServlet& CSubscriberBase::GetRequestHandler() const
 const IProtocolEngine& CSubscriberBase::GetProtocolEngine() const
 {
 	return m_engine;
-}
-
-
-QObject& CSubscriberBase::GetSocketObject() const
-{
-	return m_socket;
 }
 
 

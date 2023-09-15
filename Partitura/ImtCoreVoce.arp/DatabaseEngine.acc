@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5060" Description="ACF"/>
-            <Version Id="1" Number="2181" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5091" Description="ACF"/>
+            <Version Id="1" Number="2192" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -25,7 +25,10 @@
                     <AttributeInfo Id="DbName" Type="Id" ExportId="DbName">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DbType" Type="Id" ExportId="">
+                    <AttributeInfo Id="DbPath" Type="Id" ExportId="DbPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DbType" Type="Id" ExportId="DbType">
                         <Data IsEnabled="true" Value="QPSQL"/>
                     </AttributeInfo>
                     <AttributeInfo Id="HostName" Type="Id" ExportId="PgHostName">
@@ -79,6 +82,7 @@
         <Interface InterfaceId="imtdb::IDatabaseEngine" ComponentId="PgSqlDatabaseEngine"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="DatabaseAccessSettings" ComponentId="PgSqlDatabaseEngine/DatabaseAccessSettings"/>
         <Component ExportedId="PgSqlDatabaseEngine" ComponentId="PgSqlDatabaseEngine"/>
     </ExportedComponents>
 </Acf>

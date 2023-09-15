@@ -132,12 +132,13 @@ function(jqml_compile_web)
 	# Python path
 	list(APPEND webdirs ${buildwebdir})
 
+	#               COMMAND ${CMAKE_COMMAND} -E rm -rf ${buildwebdir}
+
 	add_custom_command(
 		OUTPUT
 		${buildwebdir}/__header.h  # fake! ensure we run!
 		${QRC_WEB_FILE}
 		PRE_BUILD
-                COMMAND ${CMAKE_COMMAND} -E rm -rf ${buildwebdir}
 		COMMAND ${CMAKE_COMMAND} -E make_directory ${buildwebdir}
 		COMMAND ${PYTHONEXE} ${IMTCOREDIR}/3rdParty/JQML/preparesources.py ${webdirs}
 		WORKING_DIRECTORY ${IMTCOREDIR}/3rdParty/JQML

@@ -13,7 +13,7 @@ namespace imtrest
 
 // reimplemented (IProtocolEngine)
 
-CHttpRedirectComp::ConstResponsePtr CHttpRedirectComp::ProcessRequest(const IRequest& request) const
+ConstResponsePtr CHttpRedirectComp::ProcessRequest(const IRequest& request) const
 {
 	QByteArray body;
 	body = R"(<head> <meta http-equiv="refresh" content="0; URL=)";

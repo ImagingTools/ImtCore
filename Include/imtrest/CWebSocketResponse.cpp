@@ -14,10 +14,8 @@ CWebSocketResponse::CWebSocketResponse(
 			int statusCode,
 			const QByteArray& data,
 			const QByteArray& dataTypeId,
-			QObject& socketObject,
 			const IProtocolEngine& engine)
 	:m_engine(engine),
-	m_socket(socketObject),
 	m_statusCode(statusCode),
 	m_data(data),
 	m_dataTypeId(dataTypeId)
@@ -58,11 +56,6 @@ const IProtocolEngine& CWebSocketResponse::GetProtocolEngine() const
 	return m_engine;
 }
 
-
-QObject& CWebSocketResponse::GetSocketObject() const
-{
-	return m_socket;
-}
 
 
 // reimplemented (istd::IChangeable)

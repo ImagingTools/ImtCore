@@ -21,7 +21,7 @@ namespace imtgql
 
 // reimplemented (IRequestHandler)
 
-imtrest::IRequestServlet::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::IRequest& request) const
+imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::IRequest& request) const
 {
 	QByteArray commandId = request.GetCommandId();
 
@@ -56,7 +56,7 @@ imtrest::IRequestServlet::ConstResponsePtr CWebSocketServletComp::ProcessRequest
 		return CreateErrorResponse(errorMessage, request);
 	}
 
-	return imtrest::IRequestServlet::ConstResponsePtr();
+	return imtrest::ConstResponsePtr();
 }
 
 
@@ -66,7 +66,7 @@ QByteArray CWebSocketServletComp::GetSupportedCommandId() const
 }
 
 
-imtrest::IRequestServlet::ConstResponsePtr CWebSocketServletComp::InitConnection(const imtrest::IRequest& request) const
+imtrest::ConstResponsePtr CWebSocketServletComp::InitConnection(const imtrest::IRequest& request) const
 {
 	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
 
@@ -83,11 +83,11 @@ imtrest::IRequestServlet::ConstResponsePtr CWebSocketServletComp::InitConnection
 		return CreateDataResponse(data, request);
 	}
 
-	return imtrest::IRequestServlet::ConstResponsePtr();	
+	return imtrest::ConstResponsePtr();	
 }
 
 
-imtrest::IRequestServlet::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtrest::IRequest& request) const
+imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtrest::IRequest& request) const
 {
 	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
 	imtgql::CGqlRequest gqlRequest;
@@ -134,17 +134,17 @@ imtrest::IRequestServlet::ConstResponsePtr CWebSocketServletComp::RegisterSubscr
 		return CreateErrorResponse(errorMessage, request);
 	}
 
-	return imtrest::IRequestServlet::ConstResponsePtr();
+	return imtrest::ConstResponsePtr();
 }
 
 
-imtrest::IRequestServlet::ConstResponsePtr CWebSocketServletComp::UnRegisterSubscription(const imtrest::IRequest& request) const
+imtrest::ConstResponsePtr CWebSocketServletComp::UnRegisterSubscription(const imtrest::IRequest& request) const
 {
 	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
 	if (webSocketRequest == nullptr){
 		Q_ASSERT(false);
 
-		return imtrest::IRequestServlet::ConstResponsePtr();
+		return imtrest::ConstResponsePtr();
 	}
 
 	for (int index = 0; index < m_gqlSubscriberControllersCompPtr.GetCount(); index++){
@@ -168,13 +168,13 @@ imtrest::IRequestServlet::ConstResponsePtr CWebSocketServletComp::UnRegisterSubs
 }
 
 
-imtrest::IRequestServlet::ConstResponsePtr CWebSocketServletComp::CreateDataResponse(QByteArray data, const imtrest::IRequest& request) const
+imtrest::ConstResponsePtr CWebSocketServletComp::CreateDataResponse(QByteArray data, const imtrest::IRequest& request) const
 {
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 	
 	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-	imtrest::IRequestServlet::ConstResponsePtr responsePtr(
+	imtrest::ConstResponsePtr responsePtr(
 				engine.CreateResponse(
 							request,
 							imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,
@@ -185,7 +185,7 @@ imtrest::IRequestServlet::ConstResponsePtr CWebSocketServletComp::CreateDataResp
 }
 
 
-imtrest::IRequestServlet::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(QByteArray errorMessage, const imtrest::IRequest& request) const
+imtrest::ConstResponsePtr CWebSocketServletComp::CreateErrorResponse(QByteArray errorMessage, const imtrest::IRequest& request) const
 {
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
@@ -205,7 +205,7 @@ imtrest::IRequestServlet::ConstResponsePtr CWebSocketServletComp::CreateErrorRes
 	
 	QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
-	imtrest::IRequestServlet::ConstResponsePtr responsePtr(
+	imtrest::ConstResponsePtr responsePtr(
 				engine.CreateResponse(
 							request,
 							imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE,

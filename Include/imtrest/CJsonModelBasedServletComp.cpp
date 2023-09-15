@@ -34,7 +34,7 @@ CJsonModelBasedServletComp::CJsonModelBasedServletComp()
 
 // reimplemented (IRequestServlet)
 
-IRequestServlet::ConstResponsePtr CJsonModelBasedServletComp::ProcessRequest(const IRequest& request) const
+ConstResponsePtr CJsonModelBasedServletComp::ProcessRequest(const IRequest& request) const
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 	QByteArray errorBody = "<html><head><title>Error</title></head><body><p>File resource was not found</p></body></html>";

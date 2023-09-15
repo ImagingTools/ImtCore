@@ -154,9 +154,7 @@ public:
 		\param socketPtr		Socket instance for reading the incommming data
 		\param requestHandler	Instance to process the request after all data has been read.
 	*/
-	virtual IRequest* CreateRequest(
-				QObject* socketPtr,
-				const IRequestServlet& requestHandler) const = 0;
+	virtual IRequest* CreateRequest(const IRequestServlet& requestHandler) const = 0;
 
 	/**
 		Create request for sending data.
@@ -164,7 +162,6 @@ public:
 		\param request	Related request.
 	*/
 	virtual IRequest* CreateRequestForSend(
-				QObject* socketPtr,
 				const IRequestServlet& requestHandler,
 				int statusCode,
 				const QByteArray& data,
@@ -181,10 +178,6 @@ public:
 				const QByteArray& data,
 				const QByteArray& dataTypeId) const = 0;
 
-	/**
-		Get sender instance using for sending responses to the clients.
-	*/
-	virtual const ISender& GetSender(const IRequest* requestPtr = nullptr) const = 0;
 };
 
 

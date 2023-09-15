@@ -154,7 +154,7 @@ bool CGqlSubscriberControllerCompBase::SetSubscriptions()
 
 			const imtrest::IResponse* responsePtr = engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId);
 			if (responsePtr != nullptr){
-				engine.GetSender().SendResponse(*responsePtr);
+//				engine.GetSender().SendResponse(*responsePtr);
 			}
 		}
  	}

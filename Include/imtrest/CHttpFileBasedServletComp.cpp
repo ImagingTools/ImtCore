@@ -7,7 +7,6 @@
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
-#include <imtrest/IResponder.h>
 #include <imtrest/IResponse.h>
 #include <imtrest/IProtocolEngine.h>
 
@@ -20,7 +19,7 @@ namespace imtrest
 
 // reimplemented (IRequestHandler)
 
-IRequestServlet::ConstResponsePtr CHttpFileBasedServletComp::ProcessRequest(const IRequest& request) const
+ConstResponsePtr CHttpFileBasedServletComp::ProcessRequest(const IRequest& request) const
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 	QByteArray errorBody = "<html><head><title>Error</title></head><body><p>File resource was not found</p></body></html>";

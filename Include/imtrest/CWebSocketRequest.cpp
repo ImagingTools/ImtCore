@@ -17,18 +17,13 @@ namespace imtrest
 
 // public methods
 
-CWebSocketRequest::CWebSocketRequest(QObject& socket, const IRequestServlet& handler, const IProtocolEngine& engine)
-	:m_requestHandler(handler),
-	m_engine(engine),
-	m_socket(socket),
-	m_state(RS_NON_STARTED)
-{
+CWebSocketRequest::CWebSocketRequest(const IRequestServlet& handler, const IProtocolEngine& engine)
+			:m_state(RS_NON_STARTED),
+			m_requestHandler(handler),
+			m_engine(engine)
 
-	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(&socket);
-	if (webSocketPtr != nullptr){
-		m_remoteAddress = webSocketPtr->peerAddress();
-		QObject::connect(webSocketPtr, &QWebSocket::disconnected, &QObject::deleteLater);
-	}
+{
+	m_requestId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 }
 
 
@@ -67,6 +62,17 @@ QByteArray CWebSocketRequest::GetBody() const
 	return m_body;
 }
 
+
+QByteArray CWebSocketRequest::GetRequestId() const
+{
+	return m_requestId;
+}
+
+
+bool CWebSocketRequest::ParseDeviceData(QIODevice& device)
+{
+	return false;
+}
 
 QHostAddress CWebSocketRequest::GetRemoteAddress() const
 {
@@ -153,12 +159,6 @@ IRequest::CommandParams CWebSocketRequest::GetCommandParams() const
 const IProtocolEngine& CWebSocketRequest::GetProtocolEngine() const
 {
 	return m_engine;
-}
-
-
-QObject& CWebSocketRequest::GetSocketObject() const
-{
-	return m_socket;
 }
 
 

@@ -23,15 +23,15 @@ public:
 	I_END_COMPONENT
 
 	// reimplemented (IRequestServlet)
-	virtual imtrest::IRequestServlet::ConstResponsePtr ProcessRequest(const imtrest::IRequest& request) const override;
+	virtual imtrest::ConstResponsePtr ProcessRequest(const imtrest::IRequest& request) const override;
 	virtual QByteArray GetSupportedCommandId() const override;
 
 protected:
-	virtual ConstResponsePtr InitConnection(const imtrest::IRequest& request) const;
-	virtual ConstResponsePtr RegisterSubscription(const imtrest::IRequest& request) const;
-	virtual ConstResponsePtr UnRegisterSubscription(const imtrest::IRequest& request) const;
-	virtual ConstResponsePtr CreateDataResponse(QByteArray data, const imtrest::IRequest& request) const;
-	virtual ConstResponsePtr CreateErrorResponse(QByteArray errorMessage, const imtrest::IRequest& request) const;
+	virtual imtrest::ConstResponsePtr InitConnection(const imtrest::IRequest& request) const;
+	virtual imtrest::ConstResponsePtr RegisterSubscription(const imtrest::IRequest& request) const;
+	virtual imtrest::ConstResponsePtr UnRegisterSubscription(const imtrest::IRequest& request) const;
+	virtual imtrest::ConstResponsePtr CreateDataResponse(QByteArray data, const imtrest::IRequest& request) const;
+	virtual imtrest::ConstResponsePtr CreateErrorResponse(QByteArray errorMessage, const imtrest::IRequest& request) const;
 
 private:
 	I_MULTIREF(IGqlSubscriberController, m_gqlSubscriberControllersCompPtr);

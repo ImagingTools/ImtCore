@@ -15,7 +15,6 @@
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
-#include <imtrest/IResponder.h>
 #include <imtrest/IResponse.h>
 #include <imtrest/IProtocolEngine.h>
 

@@ -8,7 +8,6 @@
 // ImtCore includes
 #include <imtrest/CWebSocketServerComp.h>
 #include <imtrest/CWebSocketProtocolEngineComp.h>
-#include <imtrest/CWebSocketSuscriberEngineComp.h>
 #include <imtrest/CTcpServerComp.h>
 #include <imtrest/CHttpProtocolEngineComp.h>
 #include <imtrest/CHttpRootServletComp.h>
@@ -20,6 +19,7 @@
 #include <imtrest/CHttpFileControllerServletComp.h>
 #include <imtrest/CHttpClientRequest.h>
 #include <imtrest/CHttpClientComp.h>
+#include <imtrest/CWorkerManagerComp.h>
 
 
 /**
@@ -31,7 +31,6 @@ namespace ImtRestPck
 
 typedef imtrest::CTcpServerComp TcpServer;
 typedef imtrest::CWebSocketServerComp WebSocketServer;
-typedef imtrest::CWebSocketSubscriberEngineComp WebSocketSubscriberEngine;
 typedef imtrest::CWebSocketProtocolEngineComp WebSocketProtocolEngine;
 typedef imtrest::CHttpProtocolEngineComp HttpProtocolEngine;
 typedef imtrest::CHttpRootServletComp HttpRootServlet;
@@ -43,6 +42,8 @@ typedef imtrest::CHttpFileProviderBasedServletComp HttpFileProviderBasedServlet;
 typedef imtrest::CHttpFileControllerServletComp HttpFileControllerServlet;
 typedef imtrest::CHttpClientComp HttpClientRequestManager;
 typedef icomp::TModelCompWrap<icomp::TMakeComponentWrap<imtrest::CHttpClientRequest>> HttpClientRequestFactory;
+typedef imtrest::CWorkerManagerComp WorkerManaqer;
+
 
 
 } // namespace ImtRestPck

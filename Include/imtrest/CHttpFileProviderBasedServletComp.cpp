@@ -83,7 +83,7 @@ QByteArray CHttpFileProviderBasedServletComp::GetMimeType(QByteArray fileSuffix)
 
 // reimplemented (IRequestHandler)
 
-IRequestServlet::ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
+ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
 		const QByteArray& commandId,
 		const imtrest::IRequest::CommandParams& commandParams,
 		const HeadersMap& headers,

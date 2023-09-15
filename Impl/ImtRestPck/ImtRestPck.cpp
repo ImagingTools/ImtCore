@@ -25,11 +25,6 @@ I_EXPORT_COMPONENT(
 			"WebSocket Connection Server");
 
 I_EXPORT_COMPONENT(
-			WebSocketSubscriberEngine,
-			"WebSocket subscriber engine",
-			"WebSocket subscriber engine");
-
-I_EXPORT_COMPONENT(
 			WebSocketProtocolEngine,
 			"WebSocket protocol engine",
 			"WebSocket Connection Server HTTP REST");
@@ -83,6 +78,11 @@ I_EXPORT_COMPONENT(
 		HttpClientRequestFactory,
 		"The factory for creting http client requests for 'HttpClientRequestManager'",
 		"Rest Http Client Request Factory");
+
+I_EXPORT_COMPONENT(
+		WorkerManaqer,
+		"The manager of request handlers factory for 'CMultiThreadServer' ",
+        "Rest Http Handler Request Factory");
 
 
 } // namespace ImtRestPck

@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QUrlQuery>
+#include <QtCore/QUuid>
 #if QT_CONFIG(ssl)
 #include <QtNetwork/QSslSocket>
 #endif
@@ -30,33 +31,42 @@ static http_parser_settings s_httpParserSettings
 
 // public methods
 
-CHttpRequest::CHttpRequest(QObject& socket, const IRequestServlet& handler, const IProtocolEngine& engine)
-	:m_requestHandler(handler),
-	m_engine(engine),
-	m_socket(socket),
-	m_state(RS_NON_STARTED)
+CHttpRequest::CHttpRequest(const IRequestServlet& handler, const IProtocolEngine& engine)
+	: //QObject(&socket),
+	 m_state(RS_NON_STARTED),
+	m_requestHandler(handler),
+	m_engine(engine)
 {
-	QAbstractSocket* socketPtr = dynamic_cast<QAbstractSocket*>(&socket);
-	if (socketPtr != nullptr){
-		m_remoteAddress = socketPtr->peerAddress();
-		QObject::connect(socketPtr, &QAbstractSocket::readyRead, this, &CHttpRequest::HandleReadyRead);
-		QObject::connect(socketPtr, &QAbstractSocket::disconnected, &QObject::deleteLater);
-	}
-	else{
-		QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(&socket);
-		if (webSocketPtr != nullptr){
-			m_remoteAddress = webSocketPtr->peerAddress();
+//	QAbstractSocket* socketPtr = dynamic_cast<QAbstractSocket*>(&socket);
+//	if (socketPtr != nullptr){
+//		m_remoteAddress = socketPtr->peerAddress();
+//        QObject::connect(socketPtr, &QAbstractSocket::readyRead, this, &CHttpRequest::HandleReadyRead);
+////        QObject::connect(socketPtr, &QAbstractSocket::readyRead, this, &CHttpRequest::HandleReadyRead, Qt::UniqueConnection);
+////        QObject::connect(socketPtr, &QAbstractSocket::readyRead, this, &CHttpRequest::HandleReadyRead, Qt::DirectConnection);
+////        QObject::connect(socketPtr, &QAbstractSocket::readyRead, this, &CHttpRequest::HandleReadyRead, Qt::QueuedConnection);
+//		QObject::connect(socketPtr, &QAbstractSocket::disconnected, this, &CHttpRequest::SocketDisconnected);
+//	}
+//	else{
+//		QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(&socket);
+//		if (webSocketPtr != nullptr){
+//			m_remoteAddress = webSocketPtr->peerAddress();
 
-			connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CHttpRequest::OnWebSocketTextMessage);
-			connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CHttpRequest::OnWebSocketBinaryMessage);
-			QObject::connect(webSocketPtr, &QWebSocket::disconnected, &QObject::deleteLater);
-		}
-	}
+//			connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CHttpRequest::OnWebSocketTextMessage);
+//			connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CHttpRequest::OnWebSocketBinaryMessage);
+////			QObject::connect(webSocketPtr, &QWebSocket::disconnected, &QObject::deleteLater);
+//		}
+//	}
+
+	m_requestId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 
 	http_parser_init(&m_httpParser, HTTP_REQUEST);
 
 	m_httpParser.data = this;
 
+//    if (socketPtr != nullptr){
+//        emit socketPtr->readyRead();
+//    }
+//    HandleReadyRead();
 }
 
 
@@ -302,6 +312,11 @@ IRequest::CommandParams CHttpRequest::GetCommandParams() const
 }
 
 
+QByteArray CHttpRequest::GetRequestId() const
+{
+	return m_requestId;
+}
+
 // reimplemented (INetworkObject)
 
 const IProtocolEngine& CHttpRequest::GetProtocolEngine() const
@@ -310,10 +325,13 @@ const IProtocolEngine& CHttpRequest::GetProtocolEngine() const
 }
 
 
-QObject& CHttpRequest::GetSocketObject() const
-{
-	return m_socket;
-}
+//QObject& CHttpRequest::GetSocketObject() const
+//{
+//	if (m_socket == nullptr){
+//		qDebug() << "socket is null!!";
+//	}
+//	return *m_socket;
+//}
 
 
 // reimplemented (istd::IChangeable)
@@ -380,55 +398,69 @@ bool CHttpRequest::ExecuteHttpParser(const QByteArray& data, const QObject* sock
 }
 
 
-// private slots
+//// private slots
 
-void CHttpRequest::HandleReadyRead()
-{
-	QAbstractSocket* socketPtr = qobject_cast<QAbstractSocket*>(sender());
-	Q_ASSERT(socketPtr != nullptr);
+//void CHttpRequest::HandleReadyRead()
+//{
+//	QAbstractSocket* socketPtr = qobject_cast<QAbstractSocket*>(sender());
+//	Q_ASSERT(socketPtr != nullptr);
 
-	if (!socketPtr->isTransactionStarted()){
-		socketPtr->startTransaction();
-	}
+//	if (!socketPtr->isOpen()){
+//		socketPtr->open(QIODevice::ReadWrite);
+//	}
 
-	if (m_state == RS_MESSAGE_COMPLETE){
-		ResetData();
-	}
+//	if (!socketPtr->isTransactionStarted()){
+//		socketPtr->startTransaction();
+//	}
 
-	// Get state of request data:
-	if (!ParseDeviceData(*socketPtr)){
-		socketPtr->disconnect();
+//	if (m_state == RS_MESSAGE_COMPLETE){
+//		ResetData();
+//	}
 
-		return;
-	}
+//	// Get state of request data:
+//	if (!ParseDeviceData(*socketPtr)){
+//		socketPtr->disconnect();
+////		socketPtr->close();
 
-	// Not all data was read:
-	if (m_state != RS_MESSAGE_COMPLETE){
-		return;
-	}
+//		return;
+//	}
 
-	// All request data was read:
-	socketPtr->commitTransaction();
+//	// Not all data was read:
+//	if (m_state != RS_MESSAGE_COMPLETE){
+////		socketPtr->close();
 
-	// Start request handler:
-	m_requestHandler.ProcessRequest(*this);
-}
+//		return;
+//	}
 
+//	// All request data was read:
+//	socketPtr->commitTransaction();
 
-void CHttpRequest::OnWebSocketTextMessage(const QString& textMessage)
-{
-	if (ExecuteHttpParser(textMessage.toUtf8(), sender())){
-		m_requestHandler.ProcessRequest(*this);
-	}
-}
+//	// Start request handler:
+//	m_requestHandler.ProcessRequest(*this);
+////	socketPtr->close();
+//}
 
 
-void CHttpRequest::OnWebSocketBinaryMessage(const QByteArray& dataMessage)
-{
-	if (ExecuteHttpParser(dataMessage, sender())){
-		m_requestHandler.ProcessRequest(*this);
-	}
-}
+//void CHttpRequest::SocketDisconnected()
+//{
+//	m_socket = nullptr;
+//}
+
+
+//void CHttpRequest::OnWebSocketTextMessage(const QString& textMessage)
+//{
+//	if (ExecuteHttpParser(textMessage.toUtf8(), sender())){
+//		m_requestHandler.ProcessRequest(*this);
+//	}
+//}
+
+
+//void CHttpRequest::OnWebSocketBinaryMessage(const QByteArray& dataMessage)
+//{
+//	if (ExecuteHttpParser(dataMessage, sender())){
+//		m_requestHandler.ProcessRequest(*this);
+//	}
+//}
 
 
 

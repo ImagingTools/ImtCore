@@ -15,7 +15,7 @@ namespace imtrest
 
 // reimplemented (CHttpServletCompBase)
 
-CHttpFileControllerServletComp::ConstResponsePtr CHttpFileControllerServletComp::OnPost(
+ConstResponsePtr CHttpFileControllerServletComp::OnPost(
 			const QByteArray& commandId,
 			const IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,
@@ -82,7 +82,7 @@ CHttpFileControllerServletComp::ConstResponsePtr CHttpFileControllerServletComp:
 }
 
 
-CHttpFileControllerServletComp::ConstResponsePtr CHttpFileControllerServletComp::OnDelete(
+ConstResponsePtr CHttpFileControllerServletComp::OnDelete(
 			const QByteArray& commandId,
 			const IRequest::CommandParams& commandParams,
 			const HeadersMap& headers,

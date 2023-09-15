@@ -1,5 +1,10 @@
 #pragma once
 
+// Qt includes
+#include <QtCore/QIODevice>
+
+// ACF includes
+#include <istd/TSmartPtr.h>
 
 // ACF includes
 #include <imtrest/INetworkObject.h>
@@ -35,7 +40,12 @@ public:
 	virtual QByteArray GetCommandId() const = 0;
 	virtual CommandParams GetCommandParams() const = 0;
 	virtual QByteArray GetBody() const = 0;
+	virtual QByteArray GetRequestId() const = 0;
+	virtual bool ParseDeviceData(QIODevice& device) = 0;
 };
+
+
+typedef istd::TSmartPtr<const imtrest::IRequest> ConstRequestPtr;
 
 
 } // namespace imtrest

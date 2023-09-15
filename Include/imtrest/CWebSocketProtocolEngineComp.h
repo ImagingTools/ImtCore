@@ -32,9 +32,8 @@ public:
 	virtual QByteArray GetProtocolTypeId() const override;
 	virtual const iser::IVersionInfo* GetProtocolVersion() const override;
 	virtual bool GetProtocolStatusCode(int statusCode, int& protocolStatusCode, QByteArray& statusCodeLiteral) const override;
-	virtual IRequest* CreateRequest(QObject* socketPtr, const IRequestServlet& requestHandler) const override;
+	virtual IRequest* CreateRequest(const IRequestServlet& requestHandler) const override;
 	virtual IRequest* CreateRequestForSend(
-				QObject* socketPtr,
 				const IRequestServlet& requestHandler,
 				int statusCode,
 				const QByteArray& data,
@@ -44,14 +43,11 @@ public:
 				int statusCode,
 				const QByteArray& data,
 				const QByteArray& dataTypeId) const override;
-	virtual const ISender& GetSender(const IRequest* requestPtr = nullptr) const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated();
+	virtual void OnComponentCreated() override;
 
-private:
-	CWebSocketSender m_sender;
 };
 
 

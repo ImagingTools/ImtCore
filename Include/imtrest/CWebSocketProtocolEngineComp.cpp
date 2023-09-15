@@ -37,28 +37,21 @@ bool CWebSocketProtocolEngineComp::GetProtocolStatusCode(int /*statusCode*/, int
 }
 
 
-IRequest* CWebSocketProtocolEngineComp::CreateRequest(QObject* socketPtr, const IRequestServlet& requestHandler) const
+IRequest* CWebSocketProtocolEngineComp::CreateRequest(const IRequestServlet& requestHandler) const
 {
-	if (socketPtr != nullptr){
-		// CWebSocketRequest* webSocketRequest = new imod::TModelWrap<CWebSocketRequest>;
-		// webSocketRequest->Init(*socketPtr, requestHandler, *this);
-		CWebSocketRequest* webSocketRequest = new CWebSocketRequest(*socketPtr, requestHandler, *this);
+	CWebSocketRequest* webSocketRequest = new CWebSocketRequest(requestHandler, *this);
 
-		return webSocketRequest;
-	}
-
-	return nullptr;
+	return webSocketRequest;
 }
 
 
 IRequest *CWebSocketProtocolEngineComp::CreateRequestForSend(
-		QObject* socketPtr,
 		const IRequestServlet& requestHandler,
 		int /*statusCode*/,
 		const QByteArray& data,
 		const QByteArray& /*dataTypeId*/) const
 {
-	CWebSocketRequest* webSocketRequest = new CWebSocketRequest(*socketPtr, requestHandler, *this);
+	CWebSocketRequest* webSocketRequest = new CWebSocketRequest(requestHandler, *this);
 	webSocketRequest->SetBody(data);
 
 	return webSocketRequest;
@@ -71,13 +64,7 @@ IResponse* CWebSocketProtocolEngineComp::CreateResponse(
 			const QByteArray& data,
 			const QByteArray& dataTypeId) const
 {
-	return new CWebSocketResponse(statusCode, data, dataTypeId, request.GetSocketObject(), *this);
-}
-
-
-const ISender& CWebSocketProtocolEngineComp::GetSender(const IRequest* /*requestPtr*/) const
-{
-	return m_sender;
+	return new CWebSocketResponse(statusCode, data, dataTypeId, *this);
 }
 
 

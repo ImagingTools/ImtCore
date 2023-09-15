@@ -20,7 +20,6 @@ public:
 			int statusCode,
 			const QByteArray& data,
 			const QByteArray& dataTypeId,
-			QObject& socketObject,
 			const IProtocolEngine& engine);
 
 	// reimplemented (IResponse)
@@ -31,14 +30,12 @@ public:
 
 	// reimplemented (INetworkObject)
 	virtual const IProtocolEngine& GetProtocolEngine() const override;
-	virtual QObject& GetSocketObject() const override;
 
 	// reimplemented (istd::IChangeable)
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 private:
 	const IProtocolEngine& m_engine;
-	QObject& m_socket;
 
 	Headers m_headers;
 	int m_statusCode;

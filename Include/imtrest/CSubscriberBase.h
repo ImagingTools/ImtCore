@@ -15,7 +15,7 @@ namespace imtrest
 class CSubscriberBase: virtual public ISubscriber
 {
 public:
-	CSubscriberBase(QObject& socket, const IRequestServlet& requestHandler,const IProtocolEngine& engine);
+	CSubscriberBase(const IRequestServlet& requestHandler,const IProtocolEngine& engine);
 
 	// reimplemented (ISubscriber)
 	virtual SubscriberState GetState() const override;
@@ -26,13 +26,11 @@ public:
 
 	// reimplemented (INetworkObject)
 	virtual const IProtocolEngine& GetProtocolEngine() const override;
-	virtual QObject& GetSocketObject() const override;
 
 private:
 	SubscriberState m_state;
 	const IProtocolEngine& m_engine;
 	const IRequestServlet& m_requestHandler;
-	QObject& m_socket;
 };
 
 

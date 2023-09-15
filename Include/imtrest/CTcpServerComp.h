@@ -10,16 +10,21 @@
 #include <ibase/TRuntimeStatusHanderCompWrap.h>
 #include <ilog/TLoggerCompWrap.h>
 #include <iprm/ITextParam.h>
+#include <istd/TDelPtr.h>
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
+#include <imtrest/IRequestManager.h>
+
 
 
 namespace imtrest
 {
 
+
+class CMultiThreadServer;
 
 /**
 	TCP-based communication server.
@@ -28,25 +33,29 @@ namespace imtrest
 class CTcpServerComp:
 			public QObject,
 			public ibase::TRuntimeStatusHanderCompWrap<ilog::CLoggerComponentBase>,
-			virtual public IRequestServlet
+			virtual public IRequestManager
 {
 	Q_OBJECT
 public:
 	typedef ibase::TRuntimeStatusHanderCompWrap<ilog::CLoggerComponentBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CTcpServerComp);
+		I_REGISTER_INTERFACE(IRequestManager)
 		I_ASSIGN(m_requestHandlerCompPtr, "RequestHandler", "Request handler registered for the server", true, "RequestHandler");
 		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used in the server", true, "ProtocolEngine");
+		I_ASSIGN(m_threadsLimitAttrPtr, "ThreadsLimit", "Limit of threads", true, 5);
 		I_ASSIGN(m_serverAddressAttrPtr, "ServerAddress", "Server address to be listened", false, "ServerAddress");
 		I_ASSIGN(m_serverPortAttrPtr, "ServerPort", "Server port to be listened", false, 0);
 		I_ASSIGN(m_startServerOnCreateAttrPtr, "StartServerOnCreate", "If enabled, the server will be started on after component creation", true, true);
 		I_ASSIGN(m_serverPortCompPtr, "ServerPortParam", "Parameter providing the server port to be listened", false, "ServerPortParam");
-		I_ASSIGN(m_isMultiThreadingAttrPtr, "MultiThreading", "Гsing multithreading", false, 0);
 	I_END_COMPONENT
 
-	// reimplemented (IRequestHandler)
-	virtual ConstResponsePtr ProcessRequest(const IRequest& request) const override;
-	virtual QByteArray GetSupportedCommandId() const override;
+	CTcpServerComp();
+	~CTcpServerComp();
+
+    imtrest::IRequestServlet* GetRequestServlet();
+    imtrest::IProtocolEngine* GetProtocolEngine();
+	int GetThreadsLimit();    
 
 protected:
 	// reimplemented (ibase::TRuntimeStatusHanderCompWrap)
@@ -55,26 +64,28 @@ protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 
+	// reimplemented (icomp::IRequestManager)
+	virtual const IRequest* GetRequest(const QByteArray& requestId) const override;
+	virtual const ISender* GetSender(const QByteArray& requestId) const override;
+
 private:
 	bool StartListening(const QHostAddress& address = QHostAddress::Any, quint16 port = 0);
 
 private Q_SLOTS:
-	void HandleNewConnections();
-	void HandleNewThreadConnections(QTcpSocket* socketPtr);
-	void OnSocketDisconnected();
+    void OnNewThreadConnection(const IRequest* request);
 
 private:
-	I_REF(imtrest::IRequestServlet, m_requestHandlerCompPtr);
-	I_REF(IProtocolEngine, m_protocolEngineCompPtr);
+    I_REF(imtrest::IRequestServlet, m_requestHandlerCompPtr);
+    I_REF(IProtocolEngine, m_protocolEngineCompPtr);
+	I_ATTR(int, m_threadsLimitAttrPtr);
 	I_ATTR(QByteArray, m_serverAddressAttrPtr);
 	I_ATTR(int, m_serverPortAttrPtr);
 	I_ATTR(bool, m_startServerOnCreateAttrPtr);
 	I_REF(iprm::ITextParam, m_serverPortCompPtr);
 	I_ATTR(bool, m_isMultiThreadingAttrPtr);
 
-	typedef QVector<QTcpServer*> Servers;
 
-	Servers m_servers;
+	istd::TDelPtr<CMultiThreadServer> m_server;
 
 	typedef istd::TPointerVector<IRequest> Requests;
 	Requests m_requests;

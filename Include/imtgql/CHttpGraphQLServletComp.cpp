@@ -21,7 +21,7 @@ namespace imtgql
 
 // reimplemented (imtrest::IRequestServlet)
 
-imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
+imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			const QByteArray& /*commandId*/,
 			const imtrest::IRequest::CommandParams& /*commandParams*/,
 			const HeadersMap& headers,
@@ -199,17 +199,17 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 // private methods
 
-imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::CreateResponse(
+imtrest::ConstResponsePtr CHttpGraphQLServletComp::CreateResponse(
 			const imtrest::IProtocolEngine::StatusCode& statusCode,
 			const QByteArray& payload,
 			const imtrest::IRequest& request,
 			const QByteArray& contentTypeId) const
 {
-	return imtrest::IRequestServlet::ConstResponsePtr(request.GetProtocolEngine().CreateResponse(request, statusCode, payload, contentTypeId));
+	return imtrest::ConstResponsePtr(request.GetProtocolEngine().CreateResponse(request, statusCode, payload, contentTypeId));
 }
 
 
-imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::GenerateError(
+imtrest::ConstResponsePtr CHttpGraphQLServletComp::GenerateError(
 			const imtrest::IProtocolEngine::StatusCode& errorCode,
 			const QString& /*errorString*/,
 			const imtrest::CHttpRequest& request) const
@@ -221,7 +221,7 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::GenerateErro
 	engine.GetProtocolStatusCode(errorCode, protocolErrorCode, protocolErrorString);
 
 	QByteArray responseJson;
-	return imtrest::IRequestServlet::ConstResponsePtr(
+	return imtrest::ConstResponsePtr(
 				engine.CreateResponse(
 							request,
 							errorCode,

@@ -15,6 +15,7 @@
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/ISuscriberEngine.h>
+#include <imtrest/IRequestManager.h>
 
 
 namespace imtrest
@@ -28,7 +29,8 @@ namespace imtrest
 class CWebSocketServerComp:
 			public QObject,
 			public ilog::CLoggerComponentBase,
-			virtual public IRequestServlet
+			virtual public IRequestServlet,
+			virtual public IRequestManager
 {
 	Q_OBJECT
 public:
@@ -48,9 +50,13 @@ public:
 	virtual ConstResponsePtr ProcessRequest(const IRequest& request) const override;
 	virtual QByteArray GetSupportedCommandId() const override;
 
+	// reimplemented (icomp::IRequestManager)
+	virtual const IRequest* GetRequest(const QByteArray& requestId) const override;
+	virtual const ISender* GetSender(const QByteArray& requestId) const override;
+
 protected:
 	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated();
+	virtual void OnComponentCreated() override;
 
 private:
 	bool StartListening(const QHostAddress& address = QHostAddress::Any, quint16 port = 0);

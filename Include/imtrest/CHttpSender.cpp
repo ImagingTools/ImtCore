@@ -15,41 +15,48 @@ namespace imtrest
 
 // public methods
 
-// reimplemented (IResponder)
-
-bool CHttpSender::SendResponse(const IResponse& response) const
+CHttpSender::CHttpSender(QAbstractSocket* tcpSocketPtr)
 {
+	m_tcpSocketPtr = tcpSocketPtr;
+}
+
+
+// reimplemented (IRequest)
+
+bool CHttpSender::SendResponse(ConstResponsePtr& response) const
+{
+	if (!response.IsValid()){
+		return false;
+	}
+
 	int protocolStatusCode = -1;
 	QByteArray statusLiteral;
 
-	bool retVal = response.GetProtocolEngine().GetProtocolStatusCode(response.GetStatusCode(), protocolStatusCode, statusLiteral);
+	bool retVal = response->GetProtocolEngine().GetProtocolStatusCode(response->GetStatusCode(), protocolStatusCode, statusLiteral);
 	if (!retVal){
 		return false;
 	}
 
-	QObject& socket = response.GetSocketObject();
-
-	QAbstractSocket* tcpSocketPtr = dynamic_cast<QAbstractSocket*>(&socket);
-	if (tcpSocketPtr != nullptr){
-		if (!tcpSocketPtr->isOpen()){
+	if (m_tcpSocketPtr != nullptr){
+		if (!m_tcpSocketPtr->isOpen()){
 			return false;
 		}
 
-		retVal = retVal && WriteStatus(protocolStatusCode, statusLiteral, *tcpSocketPtr);
+		retVal = retVal && WriteStatus(protocolStatusCode, statusLiteral, *m_tcpSocketPtr);
 
-		IResponse::Headers headers = response.GetHeaders();
+		IResponse::Headers headers = response->GetHeaders();
 
 		for (IResponse::Headers::ConstIterator headerIter = headers.constBegin(); headerIter != headers.constEnd(); ++headerIter){
-			retVal = retVal && WriteHeader(headerIter.key(), headerIter.value(), *tcpSocketPtr);
+			retVal = retVal && WriteHeader(headerIter.key(), headerIter.value(), *m_tcpSocketPtr);
 		}
 
-		const QByteArray& contentData = response.GetData();
+		const QByteArray& contentData = response->GetData();
 		quint64 contentLength = contentData.size();
 
-		retVal = retVal && WriteHeader(QByteArray("Content-Length"), QByteArray::number(contentLength), *tcpSocketPtr);
-		retVal = retVal && WriteHeader(QByteArray("Content-Type"), response.GetDataTypeId(), *tcpSocketPtr);
+		retVal = retVal && WriteHeader(QByteArray("Content-Length"), QByteArray::number(contentLength), *m_tcpSocketPtr);
+		retVal = retVal && WriteHeader(QByteArray("Content-Type"), response->GetDataTypeId(), *m_tcpSocketPtr);
 
-		retVal = retVal && WriteBody(contentData, *tcpSocketPtr);
+		retVal = retVal && WriteBody(contentData, *m_tcpSocketPtr);
 
 		return retVal;
 	}
@@ -60,7 +67,7 @@ bool CHttpSender::SendResponse(const IResponse& response) const
 }
 
 
-bool imtrest::CHttpSender::SendRequest(const IRequest &reguest) const
+bool imtrest::CHttpSender::SendRequest(ConstRequestPtr& reguest) const
 {
 	return false;
 }
