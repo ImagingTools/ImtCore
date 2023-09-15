@@ -20,7 +20,7 @@ class CObjectRepresentationControllerCompBase:
 			virtual public IRepresentationController
 {
 public:
-	typedef icomp::CComponentBase BaseClass;
+	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CObjectRepresentationControllerCompBase)
 		I_REGISTER_INTERFACE(IRepresentationController);

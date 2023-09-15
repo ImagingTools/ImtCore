@@ -22,6 +22,8 @@ imtbase::CTreeItemModel* CGqlRequestHandlerCompBase::CreateResponse(const CGqlRe
 	Q_ASSERT(IsRequestSupported(gqlRequest));
 
 	if (!IsRequestSupported(gqlRequest)){
+		SendErrorMessage(0, QString("GQL handler is not supported GQL Request with command %1").arg(qPrintable(gqlRequest.GetCommandId())));
+
 		return nullptr;
 	}
 
@@ -40,6 +42,7 @@ imtbase::CTreeItemModel* CGqlRequestHandlerCompBase::CreateResponse(const CGqlRe
 		}
 	}
 
+	SendErrorMessage(0, QString("Unable to create response for command %1 because invalid permissions for %1").arg(qPrintable(gqlRequest.GetCommandId())).arg(userName));
 	errorMessage = QT_TR_NOOP("Invalid permissions for " + userName);
 
 	imtbase::CTreeItemModel* errorsItemModelPtr = rootModelPtr->AddTreeModel("errors");

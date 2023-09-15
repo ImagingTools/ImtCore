@@ -18,31 +18,42 @@ namespace imtgql
 
 imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
 {
-	if (m_representationControllerCompPtr.IsValid() && m_dataModelCompPtr.IsValid()){
-		istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	if (!m_representationControllerCompPtr.IsValid() || !m_dataModelCompPtr.IsValid()){
+		SendErrorMessage(0, QString("Internal error"), "CGqlRepresentationDataControllerComp");
 
-		imtbase::CTreeItemModel* representationPtr = rootModelPtr->AddTreeModel("data");
-		Q_ASSERT(representationPtr != nullptr);
-
-		istd::TDelPtr<iprm::IParamsSet> representationParamsPtr(CreateContextParams(gqlRequest));
-
-		bool result = m_representationControllerCompPtr->GetRepresentationFromDataModel(*m_dataModelCompPtr, *representationPtr, representationParamsPtr.GetPtr());
-		if (result){
-			return rootModelPtr.PopPtr();
-		}
+		return nullptr;
 	}
+
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+
+	imtbase::CTreeItemModel* representationPtr = rootModelPtr->AddTreeModel("data");
+	Q_ASSERT(representationPtr != nullptr);
+
+	istd::TDelPtr<iprm::IParamsSet> representationParamsPtr(CreateContextParams(gqlRequest));
+
+	bool result = m_representationControllerCompPtr->GetRepresentationFromDataModel(*m_dataModelCompPtr, *representationPtr, representationParamsPtr.GetPtr());
+	if (result){
+		return rootModelPtr.PopPtr();
+	}
+
+	SendErrorMessage(0, QString("Unable to get representation from data model. Command: %1.").arg(qPrintable(gqlRequest.GetCommandId())), "CGqlRepresentationDataControllerComp");
 
 	return nullptr;
 }
 
 
-bool CGqlRepresentationDataControllerComp::UpdateModelFromRepresentation(const imtgql::CGqlRequest& /*request*/, imtbase::CTreeItemModel* representationPtr) const
+bool CGqlRepresentationDataControllerComp::UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const
 {
 	if (!m_representationControllerCompPtr.IsValid() || !m_dataModelCompPtr.IsValid()){
+		SendErrorMessage(0, QString("Internal error"), "CGqlRepresentationDataControllerComp");
+
 		return false;
 	}
 
 	bool retVal = m_representationControllerCompPtr->GetDataModelFromRepresentation(*representationPtr, *m_dataModelCompPtr);
+	if (!retVal){
+		SendErrorMessage(0, QString("Unable to get data model from representation. Command: %1.").arg(qPrintable(request.GetCommandId())), "CGqlRepresentationDataControllerComp");
+	}
 
 	return retVal;
 }
@@ -74,6 +85,8 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateInternalRes
 			}
 		}
 	}
+
+	SendErrorMessage(0, QString("Unable to create internal response with command %1").arg(qPrintable(commandId)));
 
 	Q_ASSERT(false);
 

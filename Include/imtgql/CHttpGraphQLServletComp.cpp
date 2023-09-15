@@ -55,6 +55,8 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			}
 		}
 		else{
+			SendWarningMessage(0, QString("Invalid GQL-Context for token %1. Command: %2.").arg(qPrintable(accessToken)).arg(qPrintable(gqlCommand)), "GraphQL - servlet");
+
 			QByteArray responseData;
 
 			imtbase::CTreeItemModel rootModel;
@@ -179,6 +181,8 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	}
 
 	if (!isSuccessful){
+		SendErrorMessage(0, QString("Invalid command request: %1").arg(qPrintable(gqlCommand)), "GraphQL - servlet");
+
 		return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_BAD_REQUEST, responseData, request);
 	}
 	else {
@@ -186,6 +190,9 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			return CreateResponse(imtrest::IProtocolEngine::StatusCode::SC_OK, responseData, request);
 		}
 	}
+
+	SendErrorMessage(0, QString("Internal server error for command %1").arg(qPrintable(gqlCommand)), "GraphQL - servlet");
+
 	return GenerateError(imtrest::IProtocolEngine::StatusCode::SC_INTERNAL_SERVER_ERROR,"Request incorrected",request);
 }
 
