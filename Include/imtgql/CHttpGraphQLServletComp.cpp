@@ -200,19 +200,19 @@ imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 // private methods
 
 imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::CreateResponse(
-		const imtrest::IProtocolEngine::StatusCode& statusCode,
-		const QByteArray& payload,
-		const imtrest::IRequest& request,
-		const QByteArray& contentTypeId) const
+			const imtrest::IProtocolEngine::StatusCode& statusCode,
+			const QByteArray& payload,
+			const imtrest::IRequest& request,
+			const QByteArray& contentTypeId) const
 {
 	return imtrest::IRequestServlet::ConstResponsePtr(request.GetProtocolEngine().CreateResponse(request, statusCode, payload, contentTypeId));
 }
 
 
 imtrest::IRequestServlet::ConstResponsePtr CHttpGraphQLServletComp::GenerateError(
-		const imtrest::IProtocolEngine::StatusCode& errorCode,
-		const QString& /*errorString*/,
-		const imtrest::CHttpRequest& request) const
+			const imtrest::IProtocolEngine::StatusCode& errorCode,
+			const QString& /*errorString*/,
+			const imtrest::CHttpRequest& request) const
 {
 	const imtrest::IProtocolEngine& engine = request.GetProtocolEngine();
 
