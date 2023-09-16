@@ -13,6 +13,12 @@ namespace imtgql
 {
 
 
+#if QT_VERSION >= 0x060000
+	QRecursiveMutex m_mutex;
+#else
+	QMutex m_mutex;
+#endif
+
 // public methods
 
 #if QT_VERSION >= 0x060000
@@ -21,7 +27,6 @@ CRemoteGqlContextControllerComp::CRemoteGqlContextControllerComp()
 }
 #else
 CRemoteGqlContextControllerComp::CRemoteGqlContextControllerComp()
-	:m_mutex(QMutex::Recursive)
 {
 }
 #endif
@@ -30,7 +35,7 @@ CRemoteGqlContextControllerComp::CRemoteGqlContextControllerComp()
 // reimplemented (imtgql::IGqlContextController)
 
 imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
-			const imtgql::CGqlRequest& /*gqlRequest*/,
+			const imtgql::CGqlRequest& gqlRequest,
 			const QByteArray& token,
 			QString& errorMessage) const
 {
@@ -46,6 +51,9 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 	if (!m_gqlRequestHandlerCompPtr.IsValid()){
 		return nullptr;
 	}
+
+	QByteArray commandId = gqlRequest.GetCommandId();
+	qDebug() << "Command-ID" << commandId;
 
 	imtgql::CGqlRequest sessionGqlRequest(imtgql::CGqlRequest::RT_QUERY, "GetSessionInfo");
 	imtgql::CGqlObject inputParams("input");
