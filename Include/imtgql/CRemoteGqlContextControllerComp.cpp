@@ -19,6 +19,7 @@ namespace imtgql
 	QMutex m_mutex;
 #endif
 
+
 // public methods
 
 #if QT_VERSION >= 0x060000
@@ -39,14 +40,14 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 			const QByteArray& token,
 			QString& errorMessage) const
 {
-	QMutexLocker lock(&m_mutex);
-
 	if (m_cacheMap.contains(token)){
 		istd::TDelPtr<imtgql::IGqlContext> gqlContextPtr;
 		gqlContextPtr.SetCastedOrRemove(m_cacheMap[token]->CloneMe());
 
 		return gqlContextPtr.PopPtr();
 	}
+
+	QMutexLocker lock(&m_mutex);
 
 	if (!m_gqlRequestHandlerCompPtr.IsValid()){
 		return nullptr;
