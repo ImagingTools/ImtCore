@@ -1,6 +1,10 @@
 #include <imtbase/CObjectRepresentationControllerCompBase.h>
 
 
+// ACF includes
+#include <iprm/TParamsPtr.h>
+#include <iprm/IIdParam.h>
+
 // ImtCore includes
 #include <imtbase/imtbase.h>
 
@@ -47,11 +51,20 @@ bool CObjectRepresentationControllerCompBase::GetRepresentationFromDataModel(con
 	}
 
 	QByteArray languageId;
-	if (m_translationManagerCompPtr.IsValid()){
+
+	if (paramsPtr != nullptr){
+		iprm::TParamsPtr<iprm::IIdParam> languageParamPtr(paramsPtr, "LanguageParam");
+		if (languageParamPtr.IsValid()){
+			languageId = languageParamPtr->GetId();
+		}
+	}
+
+	if (m_translationManagerCompPtr.IsValid() && languageId.isEmpty()){
 		const iprm::IOptionsList& optionsList = m_translationManagerCompPtr->GetLanguagesInfo();
 		int languageIndex = m_translationManagerCompPtr->GetCurrentLanguageIndex();
-
-		languageId = optionsList.GetOptionId(languageIndex);
+		if (languageIndex >= 0){
+			languageId = optionsList.GetOptionId(languageIndex);
+		}
 	}
 
 	QString paramName;

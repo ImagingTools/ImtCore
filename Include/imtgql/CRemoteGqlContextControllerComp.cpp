@@ -13,24 +13,14 @@ namespace imtgql
 {
 
 
-#if QT_VERSION >= 0x060000
-	QRecursiveMutex m_mutex;
-#else
-	QMutex m_mutex;
-#endif
+QMutex s_mutex;
 
 
 // public methods
 
-#if QT_VERSION >= 0x060000
 CRemoteGqlContextControllerComp::CRemoteGqlContextControllerComp()
 {
 }
-#else
-CRemoteGqlContextControllerComp::CRemoteGqlContextControllerComp()
-{
-}
-#endif
 
 
 // reimplemented (imtgql::IGqlContextController)
@@ -47,7 +37,7 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 		return gqlContextPtr.PopPtr();
 	}
 
-	QMutexLocker lock(&m_mutex);
+	QMutexLocker lock(&s_mutex);
 
 	if (!m_gqlRequestHandlerCompPtr.IsValid()){
 		return nullptr;

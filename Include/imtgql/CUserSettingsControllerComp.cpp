@@ -80,14 +80,20 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 			imtbase::CTreeItemModel* representationPtr) const
 {
 	if (!m_userSettingsRepresentationControllerCompPtr.IsValid()){
+		SendErrorMessage(0, QString("Internal error. m_userSettingsRepresentationControllerCompPtr is invalid."));
+
 		return false;
 	}
 
 	if (!m_userSettingsCollectionCompPtr.IsValid()){
+		SendErrorMessage(0, QString("Internal error. m_userSettingsCollectionCompPtr is invalid."));
+
 		return false;
 	}
 
 	if (!m_userSettingsInfoFactCompPtr.IsValid()){
+		SendErrorMessage(0, QString("Internal error. m_userSettingsInfoFactCompPtr is invalid."));
+
 		return false;
 	}
 
@@ -101,6 +107,12 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 		}
 	}
 
+	if (userId.isEmpty()){
+		SendErrorMessage(0, QString("Unable to update model from representation. User-ID is empty!"));
+
+		return false;
+	}
+
 	istd::TDelPtr<imtauth::IUserSettings> userSettingsPtr = m_userSettingsInfoFactCompPtr.CreateInstance();
 	Q_ASSERT(userSettingsPtr.IsValid());
 	if (!userSettingsPtr.IsValid()){
@@ -112,6 +124,8 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 	iprm::IParamsSet* paramSetPtr = userSettingsPtr->GetSettings();
 	Q_ASSERT(paramSetPtr != nullptr);
 	if (paramSetPtr == nullptr){
+		SendErrorMessage(0, QString("Unable to get setting from user %1.").arg(qPrintable(userId)));
+
 		return false;
 	}
 
