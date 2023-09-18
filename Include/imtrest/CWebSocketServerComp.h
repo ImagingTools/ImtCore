@@ -80,8 +80,9 @@ private:
 
 	Servers m_servers;
 
-	typedef istd::TPointerVector<IRequest> Requests;
-	Requests m_requests;
+	//	typedef istd::TPointerVector<IRequest> Requests;
+	//	Requests m_requests;
+		QMap <QByteArray, QWebSocket*> m_sockets;
 };
 
 

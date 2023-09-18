@@ -11,6 +11,7 @@
 #include <imtbase/ICommandPermissionsProvider.h>
 #include <imtauth/IPermissionChecker.h>
 #include <imtrest/CWebSocketRequest.h>
+#include <imtrest/IRequestManager.h>
 #include <imtgql/IGqlRequestHandler.h>
 #include <imtgql/IGqlSubscriberController.h>
 
@@ -34,6 +35,7 @@ public:
 		I_ASSIGN(m_checkPermissionCompPtr, "PermissionChecker", "Checker of the permissions", false, "PermissionChecker");
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 		I_ASSIGN(m_requestHandlerCompPtr, "GqlRequestHandler", "Graphql request handler to create the subscription body", true, "GqlRequestHandler");
+		I_ASSIGN(m_requestManagerCompPtr, "RequestManager", "Request manager registered for the server", true, "RequestManager");
 		I_ASSIGN(m_requestHandlerCommandIdAtrPtr, "RequestHandlerCommandId", "Request handler commandId to create the subscription body", true, "");
 	I_END_COMPONENT;
 
@@ -68,6 +70,7 @@ protected:
 	I_REF(imtauth::IPermissionChecker, m_checkPermissionCompPtr);
 	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 	I_REF(imtgql::IGqlRequestHandler, m_requestHandlerCompPtr);
+	I_REF(imtrest::IRequestManager, m_requestManagerCompPtr);
 	I_ATTR(QByteArray, m_requestHandlerCommandIdAtrPtr);
 
 	struct RequestNetworks

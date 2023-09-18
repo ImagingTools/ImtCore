@@ -128,16 +128,12 @@ void CWebSocketServerComp::OnSocketDisconnected()
 		m_subscriberEngineCompPtr->UnRegisterSubscriber(socketObjectPtr);
 	}
 
-//	for (int i = 0; i < m_requests.GetCount(); ++i){
-//		IRequest* requestPtr = m_requests.GetAt(i);
-//		Q_ASSERT(requestPtr != nullptr);
-
-//		if (&requestPtr->GetSocketObject() == socketObjectPtr){
-//			m_requests.RemoveAt(i);
-
-//			break;
-//		}
-//	}
+	for (QByteArray key: m_sockets.keys()){
+		if (socketObjectPtr == m_sockets[key]){
+			m_sockets.remove(key);
+			break;
+		}
+	}
 
 	socketObjectPtr->deleteLater();
 }
@@ -145,24 +141,28 @@ void CWebSocketServerComp::OnSocketDisconnected()
 
 void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 {
+	if (!m_requestHandlerCompPtr.IsValid()){
+		return;
+	}
+
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
 
 	if (webSocketPtr == nullptr){
 		return;
 	}
 
-	istd::TDelPtr<IRequest> newRequestPtr = m_protocolEngineCompPtr->CreateRequest(*this);
+	istd::TDelPtr<IRequest> newRequestPtr = m_protocolEngineCompPtr->CreateRequest(*m_requestHandlerCompPtr.GetPtr());
 	if (newRequestPtr.IsValid()){
 		CWebSocketRequest* webSocketRequest = dynamic_cast<CWebSocketRequest*>(newRequestPtr.GetPtr());
 		if (webSocketRequest == nullptr){
 			return;
 		}
 		webSocketRequest->SetBody(textMessage.toUtf8());
-		ProcessRequest(*webSocketRequest);
+		m_requestHandlerCompPtr->ProcessRequest(*webSocketRequest);
 
 		if (webSocketRequest->GetMethodType() == CWebSocketRequest::MT_START){
 			newRequestPtr.PopPtr();
-			m_requests.PushBack(webSocketRequest);
+			m_sockets.insert(webSocketRequest->GetRequestId(), webSocketPtr);
 			QObject::connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);
 		}
 	}

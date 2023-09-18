@@ -124,6 +124,10 @@ bool CGqlSubscriberControllerCompBase::SetSubscriptions()
 		return false;
 	}
 
+	if (!m_requestManagerCompPtr.IsValid()){
+		return false;
+	}
+
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		imtgql::CGqlRequest clonedRequest;
 
@@ -152,9 +156,12 @@ bool CGqlSubscriberControllerCompBase::SetSubscriptions()
 			QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
 			const imtrest::IProtocolEngine&  engine = networkRequest->GetProtocolEngine();
 
-			const imtrest::IResponse* responsePtr = engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId);
-			if (responsePtr != nullptr){
-//				engine.GetSender().SendResponse(*responsePtr);
+			 imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
+			if (responsePtr.IsValid()){
+				const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest->GetRequestId());
+				if (sender != nullptr){
+					sender->SendResponse(responsePtr);
+				}
 			}
 		}
  	}
