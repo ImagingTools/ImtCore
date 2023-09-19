@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5084" Description="ACF"/>
-            <Version Id="1" Number="2188" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5104" Description="ACF"/>
+            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -31,6 +31,9 @@
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="UserSettingsCollection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -49,52 +52,40 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="HttpServerFramework" PackageId="ImtHttpServerVoce" ComponentId="HttpServerFramework">
-            <Data IsEnabled="true" Flags="1">
+        <Element Id="HttpRootHandler" PackageId="ImtRestPck" ComponentId="HttpRootServlet">
+            <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="HttpCommandIds" Type="Id[]" ExportId="">
+                    <AttributeInfo Id="AutoCompression" Type="Boolean" ExportId="AutoCompression">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="HttpCommandIds">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value></Value>
                                 <Value>Acula/Views*</Value>
+                                <Value></Value>
                                 <Value>Acula/graphql</Value>
                                 <Value>Acula/files*</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
-                    <AttributeInfo Id="HttpRequestHandlers" Type="Reference[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>HttpRedirect</Value>
-                                <Value>WebResourcesServlet</Value>
-                                <Value>GraphQlRoot</Value>
-                                <Value>ServerLogFileAccess</Value>
-                            </Values>
-                        </Data>
+                    <AttributeInfo Id="CompressionLevel" Type="Integer" ExportId="CompressionLevel">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="MultiThreading" Type="Boolean" ExportId="SupportMultiThreading">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerAddress" Type="Id" ExportId="ServerAddress">
-                        <Data IsEnabled="true" Value="http://localhost"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerPort" Type="Integer" ExportId="ServerPort">
-                        <Data IsEnabled="true" Value="8111"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="StartServerOnCreate" Type="Boolean" ExportId="StartServerOnCreate">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="StartWebSocketServerOnCreate" Type="Boolean" ExportId="StartWebSocketServerOnCreate">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="WebSocketRequestHandler" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="WebSocketServlet"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="WebSocketServerPort" Type="Integer" ExportId="WebSocketServerPort">
-                        <Data IsEnabled="true" Value="8112"/>
+                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="HttpRequestHandlers">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>WebResourcesServlet</Value>
+                                <Value>HttpRedirect</Value>
+                                <Value>GraphQlRoot</Value>
+                                <Value>ServerLogFileAccess</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -144,7 +135,10 @@
         <Element Id="ServerLogFileAccess" PackageId="ImtRestPck" ComponentId="HttpFileControllerServlet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="BinaryDataProviders" Type="Reference[]" ExportId="">
+                    <AttributeInfo Id="BinaryDataControllers" Type="Reference[]" ExportId="BinaryDataControllers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="BinaryDataProviders" Type="Reference[]" ExportId="BinaryDataProviders">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>LogFileDataProvider</Value>
@@ -185,22 +179,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="WebSocketServlet" PackageId="ImtGqlPck" ComponentId="WebSocketServlet">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="GqlSubscriberControllers" Type="Reference[]" ExportId="GqlSubscriberControllers">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="istd::IPolymorphic" ComponentId="HttpServerFramework"/>
+        <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="HttpRootHandler"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="HttpRootHandler"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

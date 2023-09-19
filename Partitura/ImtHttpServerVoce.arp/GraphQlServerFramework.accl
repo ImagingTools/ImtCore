@@ -2,21 +2,20 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5084" Description="ACF"/>
-            <Version Id="1" Number="2188" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5104" Description="ACF"/>
+            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="GraphQlRoot" X="150" Y="450" Note="Handler/Servlet for all GraphQL requests"/>
+        <Element ComponentName="GraphQlRoot" X="150" Y="550" Note="Handler/Servlet for all GraphQL requests"/>
         <Element ComponentName="HttpRedirect" X="150" Y="75" Note="HTTP redirect component used for web applications"/>
-        <Element ComponentName="HttpServerFramework" X="600" Y="300" Note=""/>
-        <Element ComponentName="LogFileDataProvider" X="1000" Y="550" Note=""/>
-        <Element ComponentName="ResourcesPath" X="1050" Y="75" Note=""/>
-        <Element ComponentName="RessourcesProvider" X="775" Y="75" Note=""/>
-        <Element ComponentName="ServerLogFileAccess" X="1000" Y="450" Note=""/>
-        <Element ComponentName="WebResourcesServlet" X="475" Y="76" Note="Handler for all compiled resources of the application. Primary used in the web application"/>
-        <Element ComponentName="WebSocketServlet" X="575" Y="450" Note=""/>
+        <Element ComponentName="HttpRootHandler" X="600" Y="375" Note=""/>
+        <Element ComponentName="LogFileDataProvider" X="1050" Y="675" Note=""/>
+        <Element ComponentName="ResourcesPath" X="575" Y="75" Note=""/>
+        <Element ComponentName="RessourcesProvider" X="800" Y="75" Note=""/>
+        <Element ComponentName="ServerLogFileAccess" X="1050" Y="550" Note=""/>
+        <Element ComponentName="WebResourcesServlet" X="1050" Y="75" Note="Handler for all compiled resources of the application. Primary used in the web application"/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

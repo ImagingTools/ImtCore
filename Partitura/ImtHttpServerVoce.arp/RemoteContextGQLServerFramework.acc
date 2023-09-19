@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5104" Description="ACF"/>
+            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="GqlContextController" PackageId="ImtGqlPck" ComponentId="RemoteGqlContextController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CacheClearingInterval" Type="Integer" ExportId="CacheClearingInterval">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CacheClearingIntervalParam" Type="Reference" ExportId="CacheClearingIntervalParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GqlRequest" Type="Reference" ExportId="RemoteGqlRequest">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SessionFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="SessionInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UserFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="UserInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GraphQlServerFramework" PackageId="ImtHttpServerVoce" ComponentId="GraphQlServerFramework">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="FileAccessCommandId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Acula/files*"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GqlContextController" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GqlContextController"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GqlRequestHandler" Type="Reference[]" ExportId="GqlRequestHandler">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GraphQlCommandId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Acula/graphql"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LogPath" Type="Reference" ExportId="LogPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RedirectToCommandId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Acula/Views/html/index.html?item=Pages/StartPage.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WebCommandId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Acula/files*"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SessionInfo" PackageId="ImtAuthPck" ComponentId="SessionInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="UserInfo" PackageId="ImtAuthPck" ComponentId="UserInfo">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AdminId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="su"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtgql::IGqlContextController" ComponentId="GqlContextController"/>
+        <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="GraphQlServerFramework"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="GraphQlServerFramework"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>
