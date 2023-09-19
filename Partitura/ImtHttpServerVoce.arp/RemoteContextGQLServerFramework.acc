@@ -37,6 +37,9 @@
         <Element Id="GraphQlServerFramework" PackageId="ImtHttpServerVoce" ComponentId="GraphQlServerFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="AutoCompression" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="FileAccessCommandId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Acula/files*"/>
                     </AttributeInfo>
@@ -49,6 +52,16 @@
                     <AttributeInfo Id="GraphQlCommandId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="Acula/graphql"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="HttpCommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Acula/Views*</Value>
+                                <Value></Value>
+                                <Value>Acula/graphql</Value>
+                                <Value>Acula/files*</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -59,7 +72,7 @@
                         <Data IsEnabled="true" Value="Acula/Views/html/index.html?item=Pages/StartPage.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WebCommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Acula/files*"/>
+                        <Data IsEnabled="true" Value="Acula/Views*"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

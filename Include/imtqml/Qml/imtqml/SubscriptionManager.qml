@@ -15,7 +15,7 @@ WebSocket {
         }
 
         if (status == WebSocket.Closed){
-            for (index = 0; index < subscriptionModel.length; index++){
+            for (let index = 0; index < subscriptionModel.length; index++){
                 subscriptionModel[index]["status"] = "unregistered"
             }
         }
