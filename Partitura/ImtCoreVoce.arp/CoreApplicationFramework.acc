@@ -337,7 +337,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="StandardLoginGui" PackageId="ImtAuthGuiPck" ComponentId="RemoteStandardLoginGui">
+        <Element Id="StandardLoginGui" PackageId="ImtAuthGuiPck" ComponentId="StandardLoginGui">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Login" Type="Reference" ExportId="Login">

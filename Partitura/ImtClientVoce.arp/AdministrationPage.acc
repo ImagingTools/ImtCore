@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5104" Description="ACF"/>
+            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="CommandsObserverQml" PackageId="ImtQmlPck" ComponentId="CommandsObserverQml">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="QuickItemCreated" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="QuickObject/QuickItemCreated"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="QuickObject" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="QuickObject"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="GuiQuickWrap" PackageId="ImtQmlPck" ComponentId="GuiQuickWrap">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultStatusIcon" Type="String" ExportId="AdministrationDefaultStatusIcon">
+                        <Data IsEnabled="true" Value=":/Icons/Key"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="QuickObject" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="QuickObject"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="QuickObject" PackageId="ImtQmlPck" ComponentId="QuickObject">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="BaseUrl" Type="String" ExportId="AdministrationBaseURL">
+                        <Data IsEnabled="true" Value="http://localhost:8111/Acula"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="QmlFilePath" Type="String" ExportId="AdministrationQmlPath">
+                        <Data IsEnabled="true" Value=":/qml/imtauthgui/AdministrationUi.qml"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtqml::IQuickObject" ComponentId="QuickObject"/>
+        <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="GuiQuickWrap"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="AdministrationVisualStatus" ComponentId="GuiQuickWrap/VisualStatus"/>
+        <Component ExportedId="CommandsObserverQml" ComponentId="CommandsObserverQml"/>
+        <Component ExportedId="GuiQuickWrap" ComponentId="GuiQuickWrap"/>
+        <Component ExportedId="QuickObject" ComponentId="QuickObject"/>
+    </ExportedComponents>
+</Acf>

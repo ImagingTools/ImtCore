@@ -14,6 +14,7 @@
         <Element ComponentName="LogFileDataProvider" X="1050" Y="675" Note=""/>
         <Element ComponentName="ResourcesPath" X="575" Y="75" Note=""/>
         <Element ComponentName="RessourcesProvider" X="800" Y="75" Note=""/>
+        <Element ComponentName="RestoringDatabaseController" X="750" Y="675" Note=""/>
         <Element ComponentName="ServerLogFileAccess" X="1050" Y="550" Note=""/>
         <Element ComponentName="WebResourcesServlet" X="1050" Y="75" Note="Handler for all compiled resources of the application. Primary used in the web application"/>
     </PositionMap>

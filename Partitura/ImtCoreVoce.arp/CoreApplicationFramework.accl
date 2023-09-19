@@ -15,7 +15,7 @@
         <Element ComponentName="MenuPanelVisibility" X="575" Y="475" Note=""/>
         <Element ComponentName="PageNavigationController" X="275" Y="275" Note=""/>
         <Element ComponentName="Pages" X="575" Y="375" Note=""/>
-        <Element ComponentName="SettingsProvider" X="1025" Y="300" Note=""/>
+        <Element ComponentName="SettingsProvider" X="1025" Y="275" Note=""/>
         <Element ComponentName="SplashScreen" X="575" Y="75" Note=""/>
         <Element ComponentName="StandardLoginGui" X="950" Y="475" Note=""/>
     </PositionMap>

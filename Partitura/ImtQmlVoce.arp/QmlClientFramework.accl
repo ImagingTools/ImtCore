@@ -2,19 +2,24 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5102" Description="ACF"/>
-            <Version Id="1" Number="2194" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5104" Description="ACF"/>
+            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ApplicationInfo" X="300" Y="275" Note=""/>
-        <Element ComponentName="ApplicationInfoRepresentation" X="325" Y="675" Note=""/>
-        <Element ComponentName="ClientMainWindowQml" X="925" Y="500" Note=""/>
-        <Element ComponentName="Context" X="975" Y="275" Note=""/>
-        <Element ComponentName="MainWindow" X="600" Y="500" Note=""/>
-        <Element ComponentName="ObserverQml" X="300" Y="500" Note=""/>
-        <Element ComponentName="QuickApplication" X="600" Y="275" Note=""/>
+        <Element ComponentName="ApplicationInfo" X="300" Y="250" Note=""/>
+        <Element ComponentName="ApplicationInfoRepresentation" X="225" Y="675" Note=""/>
+        <Element ComponentName="ApplicationLocalization" X="950" Y="50" Note=""/>
+        <Element ComponentName="ClientMainWindowQml" X="950" Y="500" Note=""/>
+        <Element ComponentName="Context" X="775" Y="225" Note=""/>
+        <Element ComponentName="LocalSettings" X="700" Y="700" Note=""/>
+        <Element ComponentName="LogFilePath" X="125" Y="50" Note=""/>
+        <Element ComponentName="LogSystemLocation" X="500" Y="125" Note=""/>
+        <Element ComponentName="MainWindow" X="600" Y="550" Note=""/>
+        <Element ComponentName="ObserverQml" X="350" Y="500" Note=""/>
+        <Element ComponentName="QuickApplication" X="575" Y="325" Note=""/>
+        <Element ComponentName="TextFileLog" X="150" Y="375" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

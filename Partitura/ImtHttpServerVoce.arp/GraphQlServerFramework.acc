@@ -132,6 +132,27 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="RestoringDatabaseController" PackageId="ImtDatabasePck" ComponentId="RestoringDatabaseController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="BackupBeforeRestore" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="BackupSettings" Type="Reference" ExportId="BackupSettings">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Command-ID" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="GetBackupFile"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseLoginSettings" Type="Reference" ExportId="DatabaseAccessSettings">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="ServerLogFileAccess" PackageId="ImtRestPck" ComponentId="HttpFileControllerServlet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -142,6 +163,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>LogFileDataProvider</Value>
+                                <Value>RestoringDatabaseController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -185,5 +207,8 @@
         <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="HttpRootHandler"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="HttpRootHandler"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="LogFileDataProvider" ComponentId="LogFileDataProvider"/>
+        <Component ExportedId="RestoringDatabaseController" ComponentId="RestoringDatabaseController"/>
+    </ExportedComponents>
 </Acf>

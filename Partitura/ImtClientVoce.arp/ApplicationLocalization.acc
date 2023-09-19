@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5104" Description="ACF"/>
+            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="AppLocalization" PackageId="QtPck" ComponentId="TranslationManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IgnoreLocale" Type="Boolean" ExportId="IgnoreLocale">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="InstallTranslator" Type="Boolean" ExportId="InstallTranslator">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LanguageIds" Type="Id[]" ExportId="LanguageIds">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>en_US</Value>
+                                <Value>de_DE</Value>
+                                <Value>ru_RU</Value>
+                                <Value>pl_PL</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LanguageSelection" Type="Reference" ExportId="LanguageSelection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SlaveTranslationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ImtCoreLocalization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationFilePath" Type="String" ExportId="TranslationFilePath">
+                        <Data IsEnabled="true" Value=":/Translations"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationFilePrefix" Type="Id" ExportId="TranslationFilePrefix">
+                        <Data IsEnabled="true" Value="ProLife"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ImtCoreLocalization" PackageId="ImtCoreVoce" ComponentId="ImtCoreLocalization">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IgnoreLocale" Type="Boolean" ExportId="IgnoreLocale">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="InstallTranslator" Type="Boolean" ExportId="InstallTranslator">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LanguageIds" Type="Id[]" ExportId="LanguageIds">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LanguageSelection" Type="Reference" ExportId="LanguageSelection">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="iprm::IOptionsList" ComponentId="AppLocalization"/>
+        <Interface InterfaceId="iqt::ITranslationManager" ComponentId="AppLocalization"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

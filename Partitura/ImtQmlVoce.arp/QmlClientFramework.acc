@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5102" Description="ACF"/>
-            <Version Id="1" Number="2194" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5104" Description="ACF"/>
+            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -46,8 +46,8 @@
         <Element Id="ApplicationInfoRepresentation" PackageId="ImtCorePck" ComponentId="ApplicationInfoRepresentation">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TextFileLog"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ParamId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="ClientVersion"/>
@@ -61,11 +61,35 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="ApplicationLocalization" PackageId="ImtClientVoce" ComponentId="ApplicationLocalization">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IgnoreLocale" Type="Boolean" ExportId="IgnoreLocale">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="InstallTranslator" Type="Boolean" ExportId="InstallTranslator">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LanguageIds" Type="Id[]" ExportId="LanguageIds">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TextFileLog"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationFilePath" Type="String" ExportId="TranslationFilePath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationFilePrefix" Type="Id" ExportId="TranslationFilePrefix">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="ClientMainWindowQml" PackageId="ImtQmlPck" ComponentId="ClientMainWindowQml">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TextFileLog"/>
                     </AttributeInfo>
                     <AttributeInfo Id="QuickObject" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="MainWindow"/>
@@ -80,7 +104,79 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="true" Value="ApplicationLocalization"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="LocalSettings" PackageId="ImtQmlVoce" ComponentId="LocalSettings">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultSchemaIndex" Type="Integer" ExportId="DefaultSchemaIndex">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultServerUrl" Type="Text" ExportId="DefaultServerUrl">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="LanguageConstraints">
+                        <Data IsEnabled="true" Value="ApplicationLocalization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TextFileLog"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParamRepresentationControllers" Type="Reference[]" ExportId="PreferenceParamRepresentationControllers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="PreferenceParameters">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="PreferenceParametersId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PreferenceDefaultPath" Type="String" ExportId="PreferenceDefaultPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PreferenceLocationType" Type="Integer" ExportId="PreferenceLocationType">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="QuickApplication/RuntimeStatus"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationLocalization"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="LogFilePath" PackageId="FilePck" ComponentId="RelativeFileNameParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultPath" Type="String" ExportId="LogDefaultPath">
+                        <Data IsEnabled="true" Value="ProLifeClientLog.txt"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PathType" Type="Integer" ExportId="LogPathType">
+                        <Data IsEnabled="true" Value="1"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ReferencePath" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="LogSystemLocation"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="LogSystemLocation" PackageId="FilePck" ComponentId="SystemLocation">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LocationType" Type="Integer" ExportId="LogLocationType">
+                        <Data IsEnabled="true" Value="9"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -106,11 +202,11 @@
                     <AttributeInfo Id="ApplicationInfoRepresentation" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationInfoRepresentation"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="LanguageParam" Type="Reference" ExportId="LanguageParam">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="LanguageParam" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="LocalSettings/Language"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TextFileLog"/>
                     </AttributeInfo>
                     <AttributeInfo Id="QuickObject" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="MainWindow"/>
@@ -119,13 +215,13 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Settings" Type="Reference" ExportId="Settings">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="true" Value="LocalSettings"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SettingsRepresentationController" Type="Reference" ExportId="SettingsRepresentationController">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="true" Value="LocalSettings"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="true" Value="ApplicationLocalization"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -154,7 +250,25 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="true" Value="ApplicationLocalization"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TextFileLog" PackageId="FilePck" ComponentId="TextFileLog">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="LogFile" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="LogFilePath"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UseCategory" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UseCode" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="UseTimeStamp" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -166,8 +280,13 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="ApplicationInfo" ComponentId="ApplicationInfo"/>
+        <Component ExportedId="ApplicationLocalization" ComponentId="ApplicationLocalization"/>
         <Component ExportedId="ClientMainWindowQml" ComponentId="ClientMainWindowQml"/>
+        <Component ExportedId="Design" ComponentId="LocalSettings/Design"/>
+        <Component ExportedId="Language" ComponentId="LocalSettings/Language"/>
         <Component ExportedId="ObserverQml" ComponentId="ObserverQml"/>
         <Component ExportedId="RuntimeStatus" ComponentId="QuickApplication/RuntimeStatus"/>
+        <Component ExportedId="ServerUrl" ComponentId="LocalSettings/ServerUrl"/>
+        <Component ExportedId="TextFileLog" ComponentId="TextFileLog"/>
     </ExportedComponents>
 </Acf>

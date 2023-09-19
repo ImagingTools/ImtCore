@@ -249,7 +249,11 @@ Rectangle {
     }
 
     function setOpenButtonVisible(){
-        let count = buttonPanel.buttonModel.GetItemsCount();
+        let count = 0;
+        if (buttonPanel.buttonModel){
+            count = buttonPanel.buttonModel.GetItemsCount();
+        }
+
         openButton.visible = count && count > buttonPanel.horizCount;
     }
 
