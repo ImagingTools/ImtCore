@@ -601,7 +601,7 @@ Rectangle {
                 }
 
                 function setCellWidth(){
-                    if(!deleg || !deleg.complCompl){
+                    if(!deleg || !deleg.complCompl || !headersList){
                         return;
                     }
 

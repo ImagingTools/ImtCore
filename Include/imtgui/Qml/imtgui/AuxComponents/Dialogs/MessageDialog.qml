@@ -11,6 +11,8 @@ Dialog {
 
     property string message;
 
+    canMove: true;
+
     Keys.onPressed: {
         console.log("MessageDialog onPressed", event.key);
 

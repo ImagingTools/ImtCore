@@ -87,6 +87,9 @@ bool CWebSocketServerComp::StartListening(const QHostAddress &address, quint16 p
 
 	istd::TDelPtr<QWebSocketServer> webSocketServerPtr(new QWebSocketServer("",QWebSocketServer::NonSecureMode,this));
 	if (webSocketServerPtr->listen(address, port)){
+		SendInfoMessage(0, QString("Web server successfully started on %1:%2").arg(address.toString()).arg(port));
+		qDebug() << QString("Web server successfully started on %1:%2").arg(address.toString()).arg(port);
+
 		connect(webSocketServerPtr.GetPtr(), &QWebSocketServer::newConnection, this, &CWebSocketServerComp::HandleNewConnections, Qt::UniqueConnection);
 
 		m_servers.push_back(webSocketServerPtr.PopPtr());

@@ -21,7 +21,7 @@ public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CClientMainWindowQmlComp);
-		I_ASSIGN(m_systemStatusCompPtr, "SystemStatus", "System status", true, "SystemStatus");
+		I_ASSIGN(m_systemStatusCompPtr, "SystemStatus", "System status", false, "SystemStatus");
 		I_ASSIGN(m_quickObjectCompPtr, "QuickObject", "Main QML Component", true, "QuickObject");
 	I_END_COMPONENT;
 

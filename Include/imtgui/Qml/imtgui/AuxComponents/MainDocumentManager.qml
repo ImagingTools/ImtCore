@@ -14,6 +14,16 @@ Item {
     property var openingDocumentInfo: null;
 
     Component.onDestruction: {
+        root.unsubscribeAll();
+    }
+
+    function clear(){
+        root.unsubscribeAll();
+        root.documentManagers = {};
+        root.openingDocumentInfo = null;
+    }
+
+    function unsubscribeAll(){
         let typeIds = Object.keys(root.documentManagers);
         for (let i = 0; i < typeIds.length; i++){
             Events.unSubscribeEvent(typeIds[i] + "CollectionUpdated", root.collectionUpdated);
@@ -39,9 +49,7 @@ Item {
     }
 
     function openDocument(typeId, documentId){
-        console.log('openDocument', typeId, documentId)
         let typeIds = Object.keys(root.documentManagers);
-        console.log('typeIds', typeIds)
         let index = typeIds.indexOf(typeId);
         if (index >= 0){
             let documentManager = root.documentManagers[typeId];

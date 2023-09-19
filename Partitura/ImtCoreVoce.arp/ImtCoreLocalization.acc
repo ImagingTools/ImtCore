@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5075" Description="ACF"/>
-            <Version Id="1" Number="2183" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5104" Description="ACF"/>
+            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -72,6 +72,7 @@
         <Interface InterfaceId="iprm::IOptionsList" ComponentId="ImtCoreLocalization"/>
         <Interface InterfaceId="iqt::ITranslationManager" ComponentId="ImtCoreLocalization"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="ImtCoreLocalization"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="ImtCoreLocalization"/>
     </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

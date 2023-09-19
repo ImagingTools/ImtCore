@@ -136,15 +136,12 @@ void CSystemStatusComp::OnUrlParamChanged(
 
 void CSystemStatusComp::SetStatus(ISystemStatus::SystemStatus status)
 {
+	qDebug() << "System Status: " << status;
 	if (m_status != status){
 		istd::CChangeNotifier notifier(this);
 		Q_UNUSED(notifier);
 
 		m_status = status;
-
-		if (m_status == ISystemStatus::SS_NO_ERROR){
-			m_autoCheck = false;
-		}
 	}
 }
 
@@ -154,6 +151,12 @@ void CSystemStatusComp::SetStatus(ISystemStatus::SystemStatus status)
 void CSystemStatusComp::OnCheckStatusFinished()
 {
 	SetStatus(m_futureResultStatus);
+
+	if (m_status == ISystemStatus::SS_NO_ERROR){
+		StopCheckSystemStatus();
+
+		return;
+	}
 
 	if (m_autoCheck && !m_singleCheck){
 		int interval = m_checkIntervalAttrPtr.IsValid() ? *m_checkIntervalAttrPtr * 1000 : 60000;
@@ -182,7 +185,6 @@ void CSystemStatusComp::OnTimeout()
 
 void CSystemStatusComp::CheckStatus()
 {
-	qDebug() << "CheckStatus";
 	if (m_connectionStatusProviderCompPtr.IsValid()){
 		imtcom::IConnectionStatusProvider::ConnectionStatus serverConnectionStatus = m_connectionStatusProviderCompPtr->GetConnectionStatus();
 		if (serverConnectionStatus != imtcom::IConnectionStatusProvider::ConnectionStatus::CS_CONNECTED){
@@ -192,17 +194,17 @@ void CSystemStatusComp::CheckStatus()
 			return;
 		}
 
-		if (m_dbServerConnectionCheckerCompPtr.IsValid()){
-			QString error;
-			bool isConnected = m_dbServerConnectionCheckerCompPtr->IsDatabaseServerConnected(error);
-			if (!isConnected){
-				error = QString("%1 %2").arg(qPrintable(*m_serverNameAttrPtr)).arg(error);
-				m_statusMessage = error;
-				m_futureResultStatus = ISystemStatus::SS_DATABASE_CONNECTION_ERROR;
+//		if (m_dbServerConnectionCheckerCompPtr.IsValid()){
+//			QString error;
+//			bool isConnected = m_dbServerConnectionCheckerCompPtr->IsDatabaseServerConnected(error);
+//			if (!isConnected){
+//				error = QString("%1 %2").arg(qPrintable(*m_serverNameAttrPtr)).arg(error);
+//				m_statusMessage = error;
+//				m_futureResultStatus = ISystemStatus::SS_DATABASE_CONNECTION_ERROR;
 
-				return;
-			}
-		}
+//				return;
+//			}
+//		}
 
 		m_statusMessage = "";
 		m_futureResultStatus = ISystemStatus::SS_NO_ERROR;

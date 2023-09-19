@@ -4,7 +4,7 @@
         <VersionInfos>
             <Version Id="0" Number="5104" Description="ACF"/>
             <Version Id="1" Number="2195" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>ImagingTools application framework</Description>
@@ -351,24 +351,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="SuperuserProvider" Type="Reference" ExportId="SuperuserProvider">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SystemStatus" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SystemStatusController"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="SystemStatusController" PackageId="ImtCoreVoce" ComponentId="SystemStatusController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="/Puma"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Url" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="http://localhost:7788"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

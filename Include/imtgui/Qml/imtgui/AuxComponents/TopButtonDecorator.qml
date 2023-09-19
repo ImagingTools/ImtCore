@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import QtGraphicalEffects 1.0
+import Qt5Compat.GraphicalEffects 1.0
 
 BaseButtonDecorator {
     id: topButtonDecorator;
@@ -15,38 +16,38 @@ BaseButtonDecorator {
     property bool isEmpty: text == "";
 
     onIsHighlightedChanged: {
-        if (isToggleable){
-            return;
-        }
+//        if (isToggleable){
+//            return;
+//        }
 
-        if (isHighlighted){
-            innerShadow.verticalOffset = 1;
-            innerShadow.horizontalOffset = 1;
+//        if (isHighlighted){
+//            innerShadow.verticalOffset = 1;
+//            innerShadow.horizontalOffset = 1;
 
-            button.width += 2;
-        }
-        else{
-            dropShadow.verticalOffset = 1;
-            dropShadow.horizontalOffset = 1;
+//            button.width += 2;
+//        }
+//        else{
+//            dropShadow.verticalOffset = 1;
+//            dropShadow.horizontalOffset = 1;
 
-            button.width = 60;
-        }
+//            button.width = 60;
+//        }
     }
 
     onIsToggledChanged: {
         console.log("TopButtonDecorator onIsToggledChanged", isToggled);
-        if (isToggled){
-            innerShadow.visible = true;
-            dropShadow.visible = false;
+//        if (isToggled){
+//            innerShadow.visible = true;
+//            dropShadow.visible = false;
 
-            button.width += 2;
-        }
-        else{
-            innerShadow.visible = false;
-            dropShadow.visible = true;
+//            button.width += 2;
+//        }
+//        else{
+//            innerShadow.visible = false;
+//            dropShadow.visible = true;
 
-            button.width = 60;
-        }
+//            button.width = 60;
+//        }
     }
 
     DropShadow {
@@ -111,22 +112,21 @@ BaseButtonDecorator {
         }
     }
 
-    InnerShadow {
-        id: innerShadow;
+//    InnerShadow {
+//        id: innerShadow;
 
-        anchors.fill: button;
+//        anchors.fill: button;
 
-        verticalOffset: 1;
-        horizontalOffset: 1;
+//        verticalOffset: 1;
+//        horizontalOffset: 1;
 
-        radius: 2;
-        color: Style.shadowColor;
-        source: button;
+//        radius: 2;
+//        color: Style.shadowColor;
+//        source: button;
 
-        samples: 16;
-        visible: topButtonDecorator.isToggleable ? topButtonDecorator.isToggled : button.visible && topButtonDecorator.isHighlighted;
-
-    }
+//        samples: 16;
+//        visible: topButtonDecorator.isToggleable ? topButtonDecorator.isToggled : button.visible && topButtonDecorator.isHighlighted;
+//    }
 
     Rectangle{
         id: selection;

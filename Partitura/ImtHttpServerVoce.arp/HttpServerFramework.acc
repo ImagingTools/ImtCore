@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5073" Description="ACF"/>
-            <Version Id="1" Number="2183" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5104" Description="ACF"/>
+            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -22,47 +22,20 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="HttpRootHandler" PackageId="ImtRestPck" ComponentId="HttpRootServlet">
+        <Element Id="TcpServer" PackageId="ImtRestPck" ComponentId="TcpServer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="AutoCompression" Type="Boolean" ExportId="AutoCompression">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="HttpCommandIds">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CompressionLevel" Type="Integer" ExportId="CompressionLevel">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="HttpRequestHandlers">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="TcpServer" PackageId="ImtRestPck" ComponentId="TcpServer">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="MultiThreading" Type="Boolean" ExportId="MultiThreading">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="HttpProtocolEngine"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RequestHandler" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="HttpRootHandler"/>
+                        <Data IsEnabled="true" Value="WorkerManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ServerAddress" Type="Id" ExportId="ServerAddress">
                         <Data IsEnabled="true" Value="http://localhost"/>
@@ -75,6 +48,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="StartServerOnCreate" Type="Boolean" ExportId="StartServerOnCreate">
                         <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ThreadsLimit" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="100"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -97,8 +73,8 @@
                     <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketProtocolEngine"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RequestHandler" Type="Reference" ExportId="WebSocketRequestHandler">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="RequestHandler" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketServlet"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ServerAddress" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="http://localhost"/>
@@ -112,13 +88,49 @@
                     <AttributeInfo Id="StartServerOnCreate" Type="Boolean" ExportId="StartWebSocketServerOnCreate">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="SubscriberEngine" Type="Reference" ExportId="SubscriberEngine">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="WebSocketServlet" PackageId="ImtGqlPck" ComponentId="WebSocketServlet">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="GqlSubscriberControllers" Type="Reference[]" ExportId="GqlSubscriberControllers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="WorkerManager" PackageId="ImtRestPck" ComponentId="WorkerManaqer">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestHandler" Type="Factory" ExportId="RequestHandler">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TcpServer"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ThreadsLimit" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="100"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
+        <Interface InterfaceId="imtrest::IRequestManager" ComponentId="TcpServer"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="TcpServer"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="WebSocketServer" ComponentId="WebSocketServer"/>
+    </ExportedComponents>
 </Acf>

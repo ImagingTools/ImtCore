@@ -40,7 +40,7 @@ Rectangle {
         anchors.left: topPanelDialogContainer.hasIcon ? iconDialog.right : parent.left;
         anchors.leftMargin: topPanelDialogContainer.hasIcon ? 10 : 15;
         anchors.verticalCenter: topPanelDialogContainer.verticalCenter;
-        anchors.right: parent.right;
+        anchors.right: closeButton.left;
         anchors.rightMargin: 10;
 
         color: Style.textColor;

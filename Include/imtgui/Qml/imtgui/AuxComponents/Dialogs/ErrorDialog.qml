@@ -11,6 +11,8 @@ Dialog {
 
     property string message;
 
+    canMove: true;
+
     Keys.onPressed: {
         if (event.key == Qt.Key_Enter){
             messageDialog.finished("Ok");

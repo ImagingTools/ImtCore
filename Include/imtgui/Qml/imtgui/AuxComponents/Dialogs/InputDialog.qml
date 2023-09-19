@@ -9,6 +9,8 @@ Dialog {
     property string message;
     property string inputValue;
 
+    canMove: true;
+
     Keys.onPressed: {
         if (event.key == Qt.Key_Enter){
             inputDialogContainer.finished("Ok");

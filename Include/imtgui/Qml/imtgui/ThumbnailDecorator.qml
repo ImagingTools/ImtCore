@@ -34,6 +34,8 @@ Rectangle {
     property SettingsObserver settingsObserver: null;
 
     Component.onCompleted: {
+        console.log("Thumbnail onCompleted");
+
         Events.subscribeEvent("StartLoading", loading.start);
         Events.subscribeEvent("StopLoading", loading.stop);
 
@@ -112,7 +114,7 @@ Rectangle {
         preferenceDialog.clearModels();
         settingsProvider.clearModel();
 
-        mainDocumentManager.documentManagers = {}
+        mainDocumentManager.clear();
     }
 
     MenuPanel {

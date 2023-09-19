@@ -109,12 +109,15 @@ QtObject {
     }
 
     function setLanguage(langId){
-        context.language = langId;
+        console.log("setLanguage", langId);
+        if (context.language !== langId){
+            context.language = langId;
 
-        if (container.settingsProvider != null){
-            container.settingsProvider.setLanguage(langId);
+            if (container.settingsProvider != null){
+                container.settingsProvider.setLanguage(langId);
+            }
+
+            Events.sendEvent("OnLocalizationChanged", langId);
         }
-
-        Events.sendEvent("OnLocalizationChanged", langId);
     }
 }

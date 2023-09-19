@@ -10,7 +10,6 @@
 #include <iprm/ITextParam.h>
 
 // ImtCore includes
-#include <imtbase/ISystemStatus.h>
 #include <imtauth/ISession.h>
 #include <imtgql/IGqlContextController.h>
 #include <imtgql/IGqlRequestHandler.h>
@@ -36,7 +35,6 @@ public:
 		I_ASSIGN(m_gqlRequestHandlerCompPtr, "GqlRequest", "GraphQL request handler", true, "GqlRequest");
 		I_ASSIGN(m_cacheClearingIntervalAttrPtr, "CacheClearingInterval", "Interval for cache clearing (in seconds)", false, 60.0);
 		I_ASSIGN(m_cacheClearingIntervalParamCompPtr, "CacheClearingIntervalParam", "Param interval for cache clearing", false, "CacheClearingIntervalParam");
-		I_ASSIGN(m_remoteSystemStatusCompPtr, "RemoteSystemStatus", "System status of the remote server", false, "RemoteSystemStatus");
 	I_END_COMPONENT;
 
 	CRemoteGqlContextControllerComp();
@@ -65,7 +63,6 @@ private:
 	I_REF(imtgql::IGqlRequestHandler, m_gqlRequestHandlerCompPtr);
 	I_ATTR(int, m_cacheClearingIntervalAttrPtr);
 	I_REF(iprm::ITextParam, m_cacheClearingIntervalParamCompPtr);
-	I_REF(imtbase::ISystemStatus, m_remoteSystemStatusCompPtr);
 };
 
 
