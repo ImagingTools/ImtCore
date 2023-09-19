@@ -5,7 +5,6 @@ Rectangle {
 
     width: 72;
     height: 40;
-
     property int backgroundHeight: 25;
     property string backgroundColor: "#E1E1E1";
     property string controlColor: "#C4C4C4";
