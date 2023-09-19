@@ -29,7 +29,7 @@ protected:
 
     QPair<double, double> coordToMercator(const QGeoCoordinate &coord) const;
     imtbase::CTreeItemModel* createMapClusterModel(imtbase::CTreeItemModel* model, double zoomLevel)const;
-    QList<CCluster*> createMapClusterModel(const QList<CPositionIdentifiable*>& objectList, double zoomLevel)const;
+    QList<CCluster*> createMapClusters(const QList<CPositionIdentifiable*>& objectList, double zoomLevel)const;
 
 private:
 

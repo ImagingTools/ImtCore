@@ -236,7 +236,7 @@ imtbase::CTreeItemModel *CClusterCreator::createMapClusterModel(imtbase::CTreeIt
     return retModel;
 }
 
-QList<CCluster*> CClusterCreator::createMapClusterModel(const QList<CPositionIdentifiable*>& objectList, double zoomLevel) const
+QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentifiable*>& objectList, double zoomLevel) const
 {
     QList<CCluster*> clusterList;
 
@@ -436,8 +436,10 @@ QList<CCluster*> CClusterCreator::createMapClusterModel(const QList<CPositionIde
         imtgeo::CCluster* cluster = new imtgeo::CCluster();
         cluster->SetLatitude(itemsModel->GetData("Latitude",i).toDouble());
         cluster->SetLongitude(itemsModel->GetData("Longitude",i).toDouble());
-        QString id = itemsModel->GetData("Id", i).toString();
-        cluster->SetChildrenIds(QStringList() << id);
+        QByteArray id = itemsModel->GetData("Id", i).toByteArray();
+        QByteArrayList listBA;
+        listBA << id;
+        cluster->SetChildrenIds(listBA);
         clusterList.append(cluster);
     }
 
@@ -445,8 +447,13 @@ QList<CCluster*> CClusterCreator::createMapClusterModel(const QList<CPositionIde
         imtgeo::CCluster* cluster = new imtgeo::CCluster();
         cluster->SetLatitude(clusterModel->GetData("Latitude",i).toDouble());
         cluster->SetLongitude(clusterModel->GetData("Longitude",i).toDouble());
+        cluster->SetZoom(zoomLevel);
         QStringList ids = clusterModel->GetData("ObjectIds", i).toStringList();
-        cluster->SetChildrenIds(ids);
+        QByteArrayList idsBA;
+        for(const QString& id: qAsConst(ids)){
+            idsBA.append(id.toUtf8());
+        }
+        cluster->SetChildrenIds(idsBA);
         clusterList.append(cluster);
     }
 

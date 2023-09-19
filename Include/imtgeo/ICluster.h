@@ -21,12 +21,22 @@ public:
     /**
         Get id list of objects in cluster.
     */
-    virtual QStringList GetChildrenIds() const = 0;
+    virtual QByteArrayList GetChildrenIds() const = 0;
 
     /**
         Set id list of objects in cluster.
     */
-    virtual void SetChildrenIds(QStringList &list) = 0;
+    virtual void SetChildrenIds(QByteArrayList &list) = 0;
+
+    /**
+        Get zoom level of cluster.
+    */
+    virtual double GetZoom() const = 0;
+
+    /**
+        Set zoom level of cluster.
+    */
+    virtual void SetZoom(double zoom) = 0;
 
 };
 
