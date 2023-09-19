@@ -25,6 +25,7 @@ Item {
     property int lastYear: 2040;
 
     property int todayYear;
+    property int todayMonth;
 
     property int selectedIndexMonth;
 
@@ -52,6 +53,7 @@ Item {
     property alias dayCombo: dayComboObj;
 
     property bool openST: monthComboObj.openST || yearComboObj.openST || dayComboObj.openST;
+    property bool endComboOnCurrentMonth: false;
 
     //icons
     property int iconWidth: 12;
@@ -87,6 +89,7 @@ Item {
         var date_ = new Date();
 
         datePicker.selectedIndexMonth = date_.getMonth();
+        datePicker.todayMonth = date_.getMonth();
         datePicker.todayYear = date_.getFullYear();
 
         if (datePicker.startWithCurrentDay){
@@ -104,7 +107,13 @@ Item {
         }
 
         if(datePicker.hasMonthCombo){
-            for(var i = 0; i < datePicker.monthNames.length; i++){
+            let monthCount = datePicker.monthNames.length;
+
+            if(datePicker.endComboOnCurrentMonth){
+                monthCount = date_.getMonth() + 1;
+            }
+
+            for(var i = 0; i < monthCount; i++){
                 var index = monthTreeModel.InsertNewItem();
                 monthTreeModel.SetData("Id", index, index);
                 monthTreeModel.SetData("Name",qsTr(datePicker.monthNames[i]),index);
@@ -144,11 +153,14 @@ Item {
 
     onSelectedYearChanged: {
         console.log("onSelectedYearChanged");
-        if (datePicker.completed){
-            datePicker.dateChanged();
+        if(datePicker.hasMonthCombo && datePicker.endComboOnCurrentMonth && datePicker.completed){
+            datePicker.fillMonthModel();
         }
         if(datePicker.hasDayCombo && datePicker.completed){
             datePicker.fillDayModel();
+        }
+        if (datePicker.completed){
+            datePicker.dateChanged();
         }
     }
 
@@ -231,7 +243,28 @@ Item {
 
     }
 
+    function fillMonthModel(){
+        monthTreeModel.Clear();
 
+        let monthCount = datePicker.monthNames.length;
+        let monthComboIndexPrev = datePicker.selectedIndexMonth;
+
+        if(Number(datePicker.selectedYear) === datePicker.todayYear){
+            monthCount = Number(datePicker.todayMonth) + 1;
+        }
+
+        for(var i = 0; i < monthCount; i++){
+            var index = monthTreeModel.InsertNewItem();
+            monthTreeModel.SetData("Id", index, index);
+            monthTreeModel.SetData("Name",qsTr(datePicker.monthNames[i]),index);
+        }
+
+        if(monthComboIndexPrev > monthTreeModel.GetItemsCount() - 1){
+            monthComboIndexPrev = 0;
+        }
+
+        monthComboObj.currentIndex = monthComboIndexPrev;
+    }
 
     function getLastDayOfMonth(month){
 
