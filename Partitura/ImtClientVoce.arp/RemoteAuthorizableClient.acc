@@ -31,10 +31,10 @@
                     <AttributeInfo Id="ServerName" Type="Id" ExportId="RemoteServerName">
                         <Data IsEnabled="true" Value="Puma"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="RemtoeServerPrefix">
+                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="ServerPrefix">
                         <Data IsEnabled="true" Value="/Puma"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Url" Type="Id" ExportId="RemoteUrl">
+                    <AttributeInfo Id="Url" Type="Id" ExportId="Url">
                         <Data IsEnabled="true" Value="http://localhost:7788"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UrlParam" Type="Reference" ExportId="RemoteUrlParam">
@@ -67,8 +67,8 @@
         <Element Id="StandardLoginGui" PackageId="ImtAuthGuiPck" ComponentId="RemoteStandardLoginGui">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="Login" Type="Reference" ExportId="Login">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="Login" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="Rights"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SettingsProvider" Type="Reference" ExportId="SettingsProvider">
                         <Data IsEnabled="false"/>
@@ -127,10 +127,8 @@
         <Interface InterfaceId="imtbase::ISystemStatus" ComponentId="SystemStatusController"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="AdministrationCommandsObserverQml" ComponentId="AdministrationPage/CommandsObserverQml"/>
-        <Component ExportedId="AdministrationVisualStatus" ComponentId="AdministrationPage/AdministrationVisualStatus"/>
-        <Component ExportedId="GuiQuickWrap" ComponentId="AdministrationPage/GuiQuickWrap"/>
-        <Component ExportedId="QuickObject" ComponentId="AdministrationPage/QuickObject"/>
+        <Component ExportedId="RemoteSuperuserController" ComponentId="Rights/RemoteSuperuserController"/>
+        <Component ExportedId="RemoteSuperuserProvider" ComponentId="Rights/RemoteSuperuserProvider"/>
         <Component ExportedId="Rights" ComponentId="Rights"/>
         <Component ExportedId="StandardLoginGui" ComponentId="StandardLoginGui"/>
         <Component ExportedId="SystemStatusController" ComponentId="SystemStatusController"/>
