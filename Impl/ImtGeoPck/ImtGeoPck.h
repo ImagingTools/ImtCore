@@ -12,6 +12,7 @@
 #include <imtgeo/CAddressTypeInfo.h>
 #include <imtgeo/CAddressCollectionControllerComp.h>
 #include <imtgeo/CDeviceMapClusterCollectionControllerComp.h>
+#include <imtgeo/CCluster.h>
 
 
 
@@ -36,6 +37,14 @@ typedef icomp::TModelCompWrap<
                         iser::IObject,
                         iser::ISerializable,
                         istd::IChangeable>> AddressTypeInfo;
+
+typedef icomp::TModelCompWrap<
+            icomp::TMakeComponentWrap <
+                        imtgeo::CCluster,
+                        imtgeo::ICluster,
+                        iser::IObject,
+                        iser::ISerializable,
+                        istd::IChangeable>> ClusterInfo;
 
 
 typedef imtgeo::CAddressTypeDatabaseDelegateComp AddressTypeDatabaseDelegate;

@@ -25,6 +25,11 @@ I_EXPORT_COMPONENT(
             "Address type");
 
 I_EXPORT_COMPONENT(
+            ClusterInfo,
+            "Map cluster",
+            "Map cluster");
+
+I_EXPORT_COMPONENT(
             AddressElementDatabaseDelegate,
             "Address element info object for SQL table",
             "SQL Address Element Delegate");
