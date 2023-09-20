@@ -194,17 +194,17 @@ void CSystemStatusComp::CheckStatus()
 			return;
 		}
 
-//		if (m_dbServerConnectionCheckerCompPtr.IsValid()){
-//			QString error;
-//			bool isConnected = m_dbServerConnectionCheckerCompPtr->IsDatabaseServerConnected(error);
-//			if (!isConnected){
-//				error = QString("%1 %2").arg(qPrintable(*m_serverNameAttrPtr)).arg(error);
-//				m_statusMessage = error;
-//				m_futureResultStatus = ISystemStatus::SS_DATABASE_CONNECTION_ERROR;
+		if (m_dbServerConnectionCheckerCompPtr.IsValid()){
+			QString error;
+			bool isConnected = m_dbServerConnectionCheckerCompPtr->IsDatabaseServerConnected(error);
+			if (!isConnected){
+				error = QString("%1 %2").arg(qPrintable(*m_serverNameAttrPtr)).arg(error);
+				m_statusMessage = error;
+				m_futureResultStatus = ISystemStatus::SS_DATABASE_CONNECTION_ERROR;
 
-//				return;
-//			}
-//		}
+				return;
+			}
+		}
 
 		m_statusMessage = "";
 		m_futureResultStatus = ISystemStatus::SS_NO_ERROR;

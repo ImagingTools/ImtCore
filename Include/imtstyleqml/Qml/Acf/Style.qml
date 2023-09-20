@@ -6,6 +6,8 @@ import imtqml 1.0
 Item {
     id: styleContainer;
 
+    property string name: "ImtCore";
+
     property int fontSizeExtraLarge: 64
 	property int fontSizeHuge: 32
 	property int fontSizeLarge: 24

@@ -100,7 +100,7 @@ QtObject {
                 }
             }
             else if (this.state === "Error"){
-                container.error("Unknown error");
+                Events.sendEvent("SendError", {"Message": "Unknown error", "ErrorType": "Warning"})
             }
         }
     }//GqlModel itemModel
