@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5104" Description="ACF"/>
-            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5091" Description="ACF"/>
+            <Version Id="1" Number="2192" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -127,7 +127,7 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="imtrest::IRequestManager" ComponentId="TcpServer"/>
+        <Interface InterfaceId="imtrest::IRequestManager" ComponentId="WebSocketServer"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="TcpServer"/>
     </ExportedInterfaces>
     <ExportedComponents>

@@ -21,6 +21,11 @@ CWebSocketSender::CWebSocketSender(QWebSocket* webSocketPtr): m_webSocketPtr(web
 
 }
 
+const QWebSocket* CWebSocketSender::GetSocket() const
+{
+	return m_webSocketPtr;
+}
+
 // reimplemented (IRequest)
 
 bool CWebSocketSender::SendResponse(ConstResponsePtr& response) const

@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtWebSockets/QWebSocketServer>
 #include <QtWebSockets/QWebSocket>
+#include <QtCore/QSharedPointer>
 
 // ACF includes
 #include <istd/TPointerVector.h>
@@ -16,6 +17,7 @@
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/ISuscriberEngine.h>
 #include <imtrest/IRequestManager.h>
+#include <imtrest/CWebSocketSender.h>
 
 
 namespace imtrest
@@ -29,7 +31,6 @@ namespace imtrest
 class CWebSocketServerComp:
 			public QObject,
 			public ilog::CLoggerComponentBase,
-			virtual public IRequestServlet,
 			virtual public IRequestManager
 {
 	Q_OBJECT
@@ -46,10 +47,6 @@ public:
 		I_ASSIGN(m_startServerOnCreateAttrPtr, "StartServerOnCreate", "If enabled, the server will be started on after component creation", true, true);
 		I_ASSIGN(m_webSocketServerPortCompPtr, "ServerPortParam", "Parameter providing the server port to be listened", false, "ServerPortParam");
 	I_END_COMPONENT
-
-	// reimplemented (IRequestHandler)
-	virtual ConstResponsePtr ProcessRequest(const IRequest& request) const override;
-	virtual QByteArray GetSupportedCommandId() const override;
 
 	// reimplemented (icomp::IRequestManager)
 	virtual const IRequest* GetRequest(const QByteArray& requestId) const override;
@@ -83,7 +80,7 @@ private:
 
 	//	typedef istd::TPointerVector<IRequest> Requests;
 	//	Requests m_requests;
-		QMap <QByteArray, QWebSocket*> m_sockets;
+		QMap <QByteArray, QSharedPointer<CWebSocketSender>> m_senders;
 };
 
 

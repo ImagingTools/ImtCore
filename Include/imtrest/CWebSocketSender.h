@@ -17,6 +17,7 @@ class CWebSocketSender: public QObject, virtual public ISender
 	Q_OBJECT
 public:
 	CWebSocketSender(QWebSocket* webSocketPtr);
+	const QWebSocket* GetSocket() const;
 
 	// reimplemented (ISender)
 	virtual bool SendResponse(ConstResponsePtr& response) const override;

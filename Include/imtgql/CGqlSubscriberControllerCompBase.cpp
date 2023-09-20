@@ -130,15 +130,15 @@ bool CGqlSubscriberControllerCompBase::SetSubscriptions()
 
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		imtgql::CGqlRequest clonedRequest;
-
 		clonedRequest.CopyFrom(requestNetworks.gqlRequest);
 		clonedRequest.SetRequestType(imtgql::CGqlRequest::RT_QUERY);
 		clonedRequest.SetCommandId(*m_requestHandlerCommandIdAtrPtr);
 
+		QString errorMessage;
+		istd::TDelPtr<imtbase::CTreeItemModel> resultModel = m_requestHandlerCompPtr->CreateResponse(clonedRequest, errorMessage);
+
 		for (QByteArray id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequest = requestNetworks.networkRequests[id];
-			QString errorMessage;
-			istd::TDelPtr<imtbase::CTreeItemModel> resultModel = m_requestHandlerCompPtr->CreateResponse(clonedRequest, errorMessage);
 			imtbase::CTreeItemModel* dataModel = resultModel->GetTreeItemModel("data");
 			if (dataModel == nullptr){
 				continue;

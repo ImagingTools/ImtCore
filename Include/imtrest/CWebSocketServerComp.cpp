@@ -17,28 +17,6 @@ namespace imtrest
 
 // public methods
 
-// reimplemented (IRequestHandler)
-
-ConstResponsePtr CWebSocketServerComp::ProcessRequest(const IRequest& request) const
-{
-	ConstResponsePtr retVal;
-
-//	if (m_requestHandlerCompPtr.IsValid()){
-//		retVal = m_requestHandlerCompPtr->ProcessRequest(request);
-//		if (retVal.IsValid()){
-//			request.GetProtocolEngine().GetSender().SendResponse(*retVal);
-//		}
-//	}
-
-	return retVal;
-}
-
-
-QByteArray CWebSocketServerComp::GetSupportedCommandId() const
-{
-	return QByteArray();
-}
-
 
 const IRequest* CWebSocketServerComp::GetRequest(const QByteArray& requestId) const
 {
@@ -48,6 +26,11 @@ const IRequest* CWebSocketServerComp::GetRequest(const QByteArray& requestId) co
 
 const ISender* CWebSocketServerComp::GetSender(const QByteArray& requestId) const
 {
+	CWebSocketSender* sender = m_senders.value(requestId).data();
+	if (sender != nullptr){
+		return sender;
+	}
+
 	return nullptr;
 }
 
@@ -131,9 +114,9 @@ void CWebSocketServerComp::OnSocketDisconnected()
 		m_subscriberEngineCompPtr->UnRegisterSubscriber(socketObjectPtr);
 	}
 
-	for (QByteArray key: m_sockets.keys()){
-		if (socketObjectPtr == m_sockets[key]){
-			m_sockets.remove(key);
+	for (QByteArray key: m_senders.keys()){
+		if (socketObjectPtr == m_senders[key]->GetSocket()){
+			m_senders.remove(key);
 			break;
 		}
 	}
@@ -161,12 +144,18 @@ void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 			return;
 		}
 		webSocketRequest->SetBody(textMessage.toUtf8());
-		m_requestHandlerCompPtr->ProcessRequest(*webSocketRequest);
 
 		if (webSocketRequest->GetMethodType() == CWebSocketRequest::MT_START){
 			newRequestPtr.PopPtr();
-			m_sockets.insert(webSocketRequest->GetRequestId(), webSocketPtr);
+			QSharedPointer<CWebSocketSender> socketSender(new CWebSocketSender(webSocketPtr));
+			m_senders.insert(webSocketRequest->GetRequestId(), socketSender);
 			QObject::connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);
+		}
+
+		imtrest::ConstResponsePtr responsePtr = m_requestHandlerCompPtr->ProcessRequest(*webSocketRequest);
+		if (responsePtr.IsValid()){
+			QByteArray data = responsePtr->GetData();
+			webSocketPtr->sendTextMessage(data);
 		}
 	}
 }
