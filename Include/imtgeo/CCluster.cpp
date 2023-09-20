@@ -38,6 +38,7 @@ double CCluster::GetZoom() const
 
 void CCluster::SetZoom(double zoom)
 {
+
     if(zoom != m_zoom){
         m_zoom = zoom;
 
@@ -50,7 +51,8 @@ bool CCluster::Serialize(iser::IArchive &archive)
 {
     istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-    bool retVal = BaseClass::Serialize(archive);
+    bool retVal;
+    retVal = BaseClass::Serialize(archive);
 
     retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_childrenIds, "ObjectIds", "ObjectId");
 

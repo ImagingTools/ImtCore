@@ -436,6 +436,7 @@ QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentif
         imtgeo::CCluster* cluster = new imtgeo::CCluster();
         cluster->SetLatitude(itemsModel->GetData("Latitude",i).toDouble());
         cluster->SetLongitude(itemsModel->GetData("Longitude",i).toDouble());
+        cluster->SetZoom(zoomLevel);
         QByteArray id = itemsModel->GetData("Id", i).toByteArray();
         QByteArrayList listBA;
         listBA << id;
