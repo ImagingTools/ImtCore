@@ -47,7 +47,8 @@ public:
 
 private:
 
-    QGeoCoordinate m_coordinate = QGeoCoordinate(0.0,0.0);
+    double m_latitude = 0.0;
+    double m_longitude = 0.0;
 
 };
 

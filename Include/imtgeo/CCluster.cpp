@@ -56,7 +56,7 @@ bool CCluster::Serialize(iser::IArchive &archive)
 
     retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_childrenIds, "ObjectIds", "ObjectId");
 
-    static iser::CArchiveTag zoomLevelTag("ZoomLevel", "Map zoom level", iser::CArchiveTag::TT_LEAF);
+    iser::CArchiveTag zoomLevelTag("ZoomLevel", "Map zoom level", iser::CArchiveTag::TT_LEAF);
     retVal = archive.BeginTag(zoomLevelTag);
     retVal = retVal && archive.Process(m_zoom);
     retVal = retVal && archive.EndTag(zoomLevelTag);

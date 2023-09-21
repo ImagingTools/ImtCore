@@ -25,14 +25,13 @@ CPosition::~CPosition()
 
 double CPosition::GetLatitude() const
 {
-    return m_coordinate.latitude();
+    return m_latitude;
 }
 
 void CPosition::SetLatitude(double lat)
 {
-    bool ok = !m_coordinate.isValid() ? true : m_coordinate.latitude() != lat;
-    if(ok){
-        m_coordinate.setLatitude(lat);
+    if(m_latitude != lat){
+        m_latitude = lat;
 
         istd::CChangeNotifier notifier(this);
 
@@ -41,14 +40,13 @@ void CPosition::SetLatitude(double lat)
 
 double CPosition::GetLongitude() const
 {
-    return m_coordinate.longitude();
+    return m_longitude;
 }
 
 void CPosition::SetLongitude(double lon)
 {
-    bool ok = !m_coordinate.isValid() ? true : m_coordinate.longitude() != lon;
-    if(ok){
-        m_coordinate.setLongitude(lon);
+    if(m_longitude != lon){
+        m_longitude = lon;
 
         istd::CChangeNotifier notifier(this);
 
@@ -61,16 +59,14 @@ bool CPosition::Serialize(iser::IArchive &archive)
 
     bool retVal = false;
 
-    static iser::CArchiveTag latTag("Latitude", "Latitude address", iser::CArchiveTag::TT_LEAF);
+    iser::CArchiveTag latTag("Latitude", "Latitude address", iser::CArchiveTag::TT_LEAF);
     retVal = archive.BeginTag(latTag);
-    double lat = m_coordinate.latitude();
-    retVal = retVal && archive.Process(lat);
+        retVal = retVal && archive.Process(m_latitude);
     retVal = retVal && archive.EndTag(latTag);
 
-    static iser::CArchiveTag lonTag("Longitude", "Longitude address", iser::CArchiveTag::TT_LEAF);
+    iser::CArchiveTag lonTag("Longitude", "Longitude address", iser::CArchiveTag::TT_LEAF);
     retVal = archive.BeginTag(lonTag);
-    double lon = m_coordinate.longitude();
-    retVal = retVal && archive.Process(lon);
+    retVal = retVal && archive.Process(m_longitude);
     retVal = retVal && archive.EndTag(lonTag);
 
     return retVal;
