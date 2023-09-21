@@ -13,6 +13,8 @@
 #include <imtgeo/CAddressCollectionControllerComp.h>
 #include <imtgeo/CDeviceMapClusterCollectionControllerComp.h>
 #include <imtgeo/CCluster.h>
+#include <imtgeo/CMapClusterDatabaseDelegateComp.h>
+
 
 
 
@@ -51,6 +53,7 @@ typedef imtgeo::CAddressTypeDatabaseDelegateComp AddressTypeDatabaseDelegate;
 typedef imtgeo::CAddressElementDatabaseDelegateComp AddressElementDatabaseDelegate;
 typedef imtgeo::CAddressCollectionControllerComp AddressCollectionController;
 typedef imtgeo::CDeviceMapClusterCollectionControllerComp DeviceMapClusterCollectionController;
+typedef imtgeo::CMapClusterDatabaseDelegateComp MapClusterDatabaseDelegate;
 
 
 } // namespace ImtGeoPck

@@ -49,6 +49,11 @@ I_EXPORT_COMPONENT(
             "Device Map Cluster Collection Controller",
             "Device Map Cluster Collection Controller");
 
+I_EXPORT_COMPONENT(
+            MapClusterDatabaseDelegate,
+            "Map Cluster info object for SQL table",
+            "SQL Map Cluster Delegate");
+
 
 } // namespace ImtGeoPck
 
