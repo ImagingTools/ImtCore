@@ -185,6 +185,7 @@ QByteArray CWorkerManagerComp::GetSupportedCommandId() const
 	 QMutexLocker loc(&m_requestListMutex);
 	 qDebug() << "FinishProcess" << "Request:" << request->GetRequestId();
 	 delete request;
+	 
 	 if (m_requestList.isEmpty()){
 		 return;
 	 }

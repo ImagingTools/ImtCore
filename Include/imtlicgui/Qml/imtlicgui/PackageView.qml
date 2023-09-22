@@ -232,7 +232,7 @@ DocumentBase {
 
         undoRedoManager.beginChanges();
 
-        packageViewRoot.documentModel.SetData("Id", packageViewRoot.itemId);
+//        packageViewRoot.documentModel.SetData("Id", packageViewRoot.itemId);
         packageViewRoot.documentModel.SetData("Name", packageViewRoot.itemName);
 
         if (!packageViewRoot.documentModel.ContainsKey("Items")){

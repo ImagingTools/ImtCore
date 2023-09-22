@@ -147,22 +147,22 @@ bool CTimeFilterParam::Serialize(iser::IArchive& archive)
 
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
 
-	static iser::CArchiveTag timeRangeTag("TimeRange", "User-defined time range", iser::CArchiveTag::TT_GROUP);
+	iser::CArchiveTag timeRangeTag("TimeRange", "User-defined time range", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(timeRangeTag);
 	retVal = retVal && m_timeRange.Serialize(archive);
 	retVal = retVal && archive.EndTag(timeRangeTag);
 
-	static iser::CArchiveTag timeUnitTag("TimeUnit", "Predefined time unit", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag timeUnitTag("TimeUnit", "Predefined time unit", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(timeUnitTag);
 	retVal = retVal && I_SERIALIZE_ENUM(TimeUnit, archive, m_timeUnit);
 	retVal = retVal && archive.EndTag(timeUnitTag);
 
-	static iser::CArchiveTag interpretationModeTag("InterpretationMode", "Interpretation of the time unit", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag interpretationModeTag("InterpretationMode", "Interpretation of the time unit", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(interpretationModeTag);
 	retVal = retVal && I_SERIALIZE_ENUM(InterpretationMode, archive, m_interpretationMode);
 	retVal = retVal && archive.EndTag(interpretationModeTag);
 
-	static iser::CArchiveTag timeUnitMultiplierTag("UnitMulitplier", "Unit multiplication factor", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag timeUnitMultiplierTag("UnitMulitplier", "Unit multiplication factor", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(timeUnitMultiplierTag);
 	retVal = retVal && archive.Process(m_timeUnitMultiplier);
 	retVal = retVal && archive.EndTag(timeUnitMultiplierTag);

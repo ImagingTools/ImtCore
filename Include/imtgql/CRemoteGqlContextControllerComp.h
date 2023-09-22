@@ -56,6 +56,7 @@ private Q_SLOTS:
 private:
 	mutable QMap<QByteArray, imtgql::IGqlContext*> m_cacheMap;
 	QTimer m_timer;
+	mutable QString m_threadName;
 
 private:
 	I_FACT(imtauth::IUserInfo, m_userInfoFactCompPtr);

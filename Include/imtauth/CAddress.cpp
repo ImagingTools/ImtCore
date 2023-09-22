@@ -12,7 +12,7 @@ namespace imtauth
 {
 
 
-// public static methods
+// public methods
 
 QByteArray CAddress::GetTypeId()
 {
@@ -110,22 +110,22 @@ bool CAddress::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
-	static iser::CArchiveTag countryTag("Country", "Country name", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag countryTag("Country", "Country name", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(countryTag);
 	retVal = retVal && archive.Process(m_country);
 	retVal = retVal && archive.EndTag(countryTag);
 	
-	static iser::CArchiveTag cityTag("City", "City name", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag cityTag("City", "City name", iser::CArchiveTag::TT_LEAF);
 	retVal = archive.BeginTag(cityTag);
 	retVal = retVal && archive.Process(m_city);
 	retVal = retVal && archive.EndTag(cityTag);
 
-	static iser::CArchiveTag postalCodeTag("PostalCode", "Postal code", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag postalCodeTag("PostalCode", "Postal code", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(postalCodeTag);
 	retVal = retVal && archive.Process(m_postalCode);
 	retVal = retVal && archive.EndTag(postalCodeTag);
 
-	static iser::CArchiveTag streetTag("Street", "Street", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag streetTag("Street", "Street", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(streetTag);
 	retVal = retVal && archive.Process(m_street);
 	retVal = retVal && archive.EndTag(streetTag);

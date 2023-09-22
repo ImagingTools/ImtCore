@@ -16,6 +16,8 @@ namespace imtauthdb
 {
 
 
+QMutex s_mutex;
+
 // public methods
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -25,8 +27,10 @@ istd::IChangeable* CUsersSettingsDatabaseDelegateComp::CreateObjectFromRecord(co
 	if (!m_databaseEngineCompPtr.IsValid() || !m_userSettingsInfoFactCompPtr.IsValid()){
 		return nullptr;
 	}
-
+	
+	s_mutex.lock();
 	istd::TDelPtr<imtauth::IUserSettings> userSettingsPtr = m_userSettingsInfoFactCompPtr.CreateInstance();
+	s_mutex.unlock();
 
 	QByteArray userId;
 	if (record.contains("UserId")){

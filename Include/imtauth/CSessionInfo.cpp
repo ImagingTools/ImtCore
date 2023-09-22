@@ -51,12 +51,12 @@ bool CSessionInfo::Serialize(iser::IArchive &archive)
 {
 	bool retVal = true;
 
-	static iser::CArchiveTag tokenTag("Token", "User token", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag tokenTag("Token", "User token", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(tokenTag);
 	retVal = retVal && archive.Process(m_token);
 	retVal = retVal && archive.EndTag(tokenTag);
 
-	static iser::CArchiveTag userIdTag("UserId", "User-ID", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag userIdTag("UserId", "User-ID", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(userIdTag);
 	retVal = retVal && archive.Process(m_userId);
 	retVal = retVal && archive.EndTag(userIdTag);

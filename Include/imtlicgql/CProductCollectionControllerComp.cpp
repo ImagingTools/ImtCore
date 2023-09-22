@@ -52,6 +52,17 @@ bool CProductCollectionControllerComp::SetupGqlItem(
 				else if(informationId == "Name"){
 					elementInformation = productLicensingInfoPtr->GetName();
 				}
+				else if(informationId == "Description"){
+					elementInformation = objectCollectionIterator->GetElementInfo("Description");
+				}
+				else if(informationId == "Added"){
+					QDateTime addedTime =  objectCollectionIterator->GetElementInfo("Added").toDateTime();
+					elementInformation = addedTime.toString("dd.MM.yyyy hh:mm:ss");
+				}
+				else if(informationId == "LastModified"){
+					QDateTime lastTime =  objectCollectionIterator->GetElementInfo("LastModified").toDateTime();
+					elementInformation = lastTime.toString("dd.MM.yyyy hh:mm:ss");
+				}
 				else if(informationId == "CategoryId"){
 					elementInformation = productLicensingInfoPtr->GetCategoryId();
 				}

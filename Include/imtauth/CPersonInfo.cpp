@@ -28,7 +28,7 @@ bool CPersonInfo::Serialize(iser::IArchive& archive)
 
 	bool retVal = BaseClass::Serialize(archive);
 
-	static iser::CArchiveTag addressesTag("Addresses", "Addresses", iser::CArchiveTag::TT_GROUP);
+	iser::CArchiveTag addressesTag("Addresses", "Addresses", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(addressesTag);
 	retVal = retVal && m_addresses.Serialize(archive);
 	retVal = retVal && archive.EndTag(addressesTag);

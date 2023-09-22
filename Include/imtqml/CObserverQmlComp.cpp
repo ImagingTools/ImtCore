@@ -224,9 +224,12 @@ void CObserverQmlComp::OnChangeSourceItem(QString src)
 
 void CObserverQmlComp::OnGuiChanged()
 {
+	qDebug() << "OnGuiChanged";
+
 	if (m_settingsRepresentationControllerCompPtr.IsValid() && m_settingsCompPtr.IsValid()){
 		if (m_settingsModelPtr != nullptr){
-			m_settingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(*m_settingsModelPtr, *m_settingsCompPtr);
+			bool ok = m_settingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(*m_settingsModelPtr, *m_settingsCompPtr);
+			qDebug() << "ok" << ok;
 
 			ApplyUrl();
 		}

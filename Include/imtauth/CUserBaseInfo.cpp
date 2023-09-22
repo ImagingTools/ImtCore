@@ -296,17 +296,17 @@ bool CUserBaseInfo::Serialize(iser::IArchive &archive)
 
 	bool retVal = true;
 
-	static iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(idTag);
 	retVal = retVal && archive.Process(m_id);
 	retVal = retVal && archive.EndTag(idTag);
 
-	static iser::CArchiveTag nameTag("Name", "Name", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag nameTag("Name", "Name", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(nameTag);
 	retVal = retVal && archive.Process(m_name);
 	retVal = retVal && archive.EndTag(nameTag);
 
-	static iser::CArchiveTag descriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag descriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(descriptionTag);
 	retVal = retVal && archive.Process(m_description);
 	retVal = retVal && archive.EndTag(descriptionTag);
@@ -321,8 +321,8 @@ bool CUserBaseInfo::Serialize(iser::IArchive &archive)
 			count = 0;
 		}
 
-		static iser::CArchiveTag permissionsTag("Permissions", "Permissions", iser::CArchiveTag::TT_MULTIPLE);
-		static iser::CArchiveTag permissionTag("Permission", "Permission", iser::CArchiveTag::TT_GROUP, &permissionsTag);
+		iser::CArchiveTag permissionsTag("Permissions", "Permissions", iser::CArchiveTag::TT_MULTIPLE);
+		iser::CArchiveTag permissionTag("Permission", "Permission", iser::CArchiveTag::TT_GROUP, &permissionsTag);
 
 		retVal = retVal && archive.BeginMultiTag(permissionsTag, permissionTag, count);
 
@@ -337,7 +337,7 @@ bool CUserBaseInfo::Serialize(iser::IArchive &archive)
 				value = m_permissionsMap[key];
 			}
 
-			static iser::CArchiveTag keyTag("ProductId", "ProductId", iser::CArchiveTag::TT_LEAF, &permissionTag);
+			iser::CArchiveTag keyTag("ProductId", "ProductId", iser::CArchiveTag::TT_LEAF, &permissionTag);
 			retVal = retVal && archive.BeginTag(keyTag);
 			retVal = retVal && archive.Process(key);
 			retVal = retVal && archive.EndTag(keyTag);
@@ -372,8 +372,8 @@ bool CUserBaseInfo::Serialize(iser::IArchive &archive)
 			count = 0;
 		}
 
-		static iser::CArchiveTag productsTag("Products", "Products", iser::CArchiveTag::TT_MULTIPLE);
-		static iser::CArchiveTag roleTag("Role", "Role", iser::CArchiveTag::TT_GROUP, &productsTag);
+		iser::CArchiveTag productsTag("Products", "Products", iser::CArchiveTag::TT_MULTIPLE);
+		iser::CArchiveTag roleTag("Role", "Role", iser::CArchiveTag::TT_GROUP, &productsTag);
 
 		retVal = retVal && archive.BeginMultiTag(productsTag, roleTag, count);
 
@@ -388,7 +388,7 @@ bool CUserBaseInfo::Serialize(iser::IArchive &archive)
 				value = m_rolesMap[key];
 			}
 
-			static iser::CArchiveTag keyTag("ProductId", "ProductId", iser::CArchiveTag::TT_LEAF, &roleTag);
+			iser::CArchiveTag keyTag("ProductId", "ProductId", iser::CArchiveTag::TT_LEAF, &roleTag);
 			retVal = retVal && archive.BeginTag(keyTag);
 			retVal = retVal && archive.Process(key);
 			retVal = retVal && archive.EndTag(keyTag);

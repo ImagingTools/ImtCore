@@ -41,7 +41,7 @@ bool CUrlParam::IsReadOnly() const
 
 bool CUrlParam::Serialize(iser::IArchive& archive)
 {
-	static iser::CArchiveTag urlTag("Url", "Url", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag urlTag("Url", "Url", iser::CArchiveTag::TT_LEAF);
 
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 	Q_UNUSED(notifier);

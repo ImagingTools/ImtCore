@@ -9,10 +9,17 @@ QtObject {
 
     property TreeItemModel languagesModel: TreeItemModel {}
 
+    property string currentLanguage: context.language;
+
     onSettingsProviderChanged: {
         if (container.settingsProvider != null){
             container.settingsProvider.localModelChanged.connect(container.onLocalModelChanged);
+            container.settingsProvider.serverSettingsSaved.connect(container.onServerSettingsSaved);
         }
+    }
+
+    function onServerSettingsSaved(){
+        Events.sendEvent("OnLocalizationChanged", container.currentLanguage);
     }
 
     function onLocalModelChanged(){
@@ -117,7 +124,7 @@ QtObject {
                 container.settingsProvider.setLanguage(langId);
             }
 
-            Events.sendEvent("OnLocalizationChanged", langId);
+//            Events.sendEvent("OnLocalizationChanged", langId);
         }
     }
 }

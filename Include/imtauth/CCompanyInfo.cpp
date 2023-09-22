@@ -53,7 +53,7 @@ bool CCompanyInfo::Serialize(iser::IArchive& archive)
 	if (identifiableVersion > 6362){
 		retVal = retVal && BaseClass::Serialize(archive);
 
-		static iser::CArchiveTag addressesTag("Addresses", "Addresses", iser::CArchiveTag::TT_GROUP);
+		iser::CArchiveTag addressesTag("Addresses", "Addresses", iser::CArchiveTag::TT_GROUP);
 		retVal = retVal && archive.BeginTag(addressesTag);
 		retVal = retVal && m_addresses.Serialize(archive);
 		retVal = retVal && archive.EndTag(addressesTag);

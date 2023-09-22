@@ -154,7 +154,7 @@ bool CAccountInfo::Serialize(iser::IArchive& archive)
 
 	int accountType = m_accountType;
 
-	static iser::CArchiveTag accountTypeTag("AccountType", "Account type", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag accountTypeTag("AccountType", "Account type", iser::CArchiveTag::TT_LEAF);
 	retVal = archive.BeginTag(accountTypeTag);
 	retVal = retVal && archive.Process(accountType);
 	retVal = retVal && archive.EndTag(accountTypeTag);
@@ -167,22 +167,22 @@ bool CAccountInfo::Serialize(iser::IArchive& archive)
 		}
 	}
 
-	static iser::CArchiveTag accountNameTag("AccountName", "Account name", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag accountNameTag("AccountName", "Account name", iser::CArchiveTag::TT_LEAF);
 	retVal = archive.BeginTag(accountNameTag);
 	retVal = retVal && archive.Process(m_accountName);
 	retVal = retVal && archive.EndTag(accountNameTag);
 
-	static iser::CArchiveTag accountDescriptionTag("AccountDescription", "Account description", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag accountDescriptionTag("AccountDescription", "Account description", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(accountDescriptionTag);
 	retVal = retVal && archive.Process(m_accountDescription);
 	retVal = retVal && archive.EndTag(accountDescriptionTag);
 
-	static iser::CArchiveTag accountPictureTag("AccountPicture", "Account picture", iser::CArchiveTag::TT_GROUP);
+	iser::CArchiveTag accountPictureTag("AccountPicture", "Account picture", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(accountPictureTag);
 	retVal = retVal && m_accountPicture.Serialize(archive);
 	retVal = retVal && archive.EndTag(accountPictureTag);
 
-//	static iser::CArchiveTag contactTag("Contact", "Contact", iser::CArchiveTag::TT_GROUP);
+//	iser::CArchiveTag contactTag("Contact", "Contact", iser::CArchiveTag::TT_GROUP);
 //	retVal = retVal && archive.BeginTag(contactTag);
 //	retVal = retVal && m_contact.Serialize(archive);
 //	retVal = retVal && archive.EndTag(contactTag);

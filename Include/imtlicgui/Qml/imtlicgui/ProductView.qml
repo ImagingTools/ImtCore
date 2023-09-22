@@ -190,7 +190,7 @@ DocumentBase {
 
         undoRedoManager.beginChanges();
 
-        productViewContainer.documentModel.SetData("Id", productViewContainer.itemId);
+//        productViewContainer.documentModel.SetData("Id", productViewContainer.itemId);
         productViewContainer.documentModel.SetData("Name", productViewContainer.itemName);
 
         if (categoryComboBox.currentIndex == 0){

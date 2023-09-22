@@ -77,17 +77,17 @@ bool CBackupSettings::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	static iser::CArchiveTag backupFolderTag("BackupFolder", "Backup folder", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag backupFolderTag("BackupFolder", "Backup folder", iser::CArchiveTag::TT_LEAF);
 	bool retVal = archive.BeginTag(backupFolderTag);
 	retVal = retVal && archive.Process(m_backupFolderPath);
 	retVal = retVal && archive.EndTag(backupFolderTag);
 
-	static iser::CArchiveTag intervalTag("Interval", "Backup interval", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag intervalTag("Interval", "Backup interval", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(intervalTag);
 	retVal = retVal && archive.Process(m_interval);
 	retVal = retVal && archive.EndTag(intervalTag);
 
-	static iser::CArchiveTag startTimeTag("StartTime", "Start time", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag startTimeTag("StartTime", "Start time", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(startTimeTag);
 	QString startTime = m_startTime.toString("dd-MM-yyyy HH:mm");
 	retVal = retVal && archive.Process(startTime);

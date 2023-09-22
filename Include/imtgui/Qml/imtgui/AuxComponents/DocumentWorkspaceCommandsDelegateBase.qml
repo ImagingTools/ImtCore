@@ -21,6 +21,8 @@ QtObject {
             documentId = documentModel.GetData("Id");
         }
 
+        console.log("documentId", documentId);
+
         if (commandId === "Close"){
             console.log("Close", documentId);
             console.log("container.documentBase.documentModel", container.documentBase.documentModel.toJSON());

@@ -79,12 +79,12 @@ bool imtauth::CUserSettings::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
-	static iser::CArchiveTag userTag("UserId", "User-ID", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag userTag("UserId", "User-ID", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(userTag);
 	retVal = retVal && archive.Process(m_userId);
 	retVal = retVal && archive.EndTag(userTag);
 
-	static iser::CArchiveTag settingsTag("Settings", "Settings params set", iser::CArchiveTag::TT_GROUP);
+	iser::CArchiveTag settingsTag("Settings", "Settings params set", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(settingsTag);
 
 	if (m_settingsPtr.IsValid()){

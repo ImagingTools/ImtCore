@@ -135,37 +135,37 @@ bool CContactInfo::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
-	static iser::CArchiveTag emailTag("Email", "Email", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag emailTag("Email", "Email", iser::CArchiveTag::TT_LEAF);
 	retVal = archive.BeginTag(emailTag);
 	retVal = retVal && archive.Process(m_email);
 	retVal = retVal && archive.EndTag(emailTag);
 
-	static iser::CArchiveTag genderTypeTag("GenderType", "Gender type", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag genderTypeTag("GenderType", "Gender type", iser::CArchiveTag::TT_LEAF);
 	retVal= archive.BeginTag(genderTypeTag);
 	retVal = retVal && I_SERIALIZE_ENUM(GenderType, archive, m_genderType);
 	retVal = retVal && archive.EndTag(genderTypeTag);
 
-	static iser::CArchiveTag birthdayTag("Birthday", "Birthday", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag birthdayTag("Birthday", "Birthday", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(birthdayTag);
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDate(archive, m_birthday);
 	retVal = retVal && archive.EndTag(birthdayTag);
 
-	static iser::CArchiveTag firstNameTag("FirstName", "First name", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag firstNameTag("FirstName", "First name", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(firstNameTag);
 	retVal = retVal && archive.Process(m_firstName);
 	retVal = retVal && archive.EndTag(firstNameTag);
 
-	static iser::CArchiveTag lastNameTag("LastName", "Last name", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag lastNameTag("LastName", "Last name", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(lastNameTag);
 	retVal = retVal && archive.Process(m_lastName);
 	retVal = retVal && archive.EndTag(lastNameTag);
 
-	static iser::CArchiveTag nickNameTag("NickName", "Nick name", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag nickNameTag("NickName", "Nick name", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(nickNameTag);
 	retVal = retVal && archive.Process(m_nickName);
 	retVal = retVal && archive.EndTag(nickNameTag);
 
-	static iser::CArchiveTag addressesTag("Addresses", "Addresses", iser::CArchiveTag::TT_GROUP);
+	iser::CArchiveTag addressesTag("Addresses", "Addresses", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(addressesTag);
 	retVal = retVal && m_addresses.Serialize(archive);
 	retVal = retVal && archive.EndTag(addressesTag);

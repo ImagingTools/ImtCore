@@ -66,22 +66,22 @@ bool CPersonBaseInfo::Serialize(iser::IArchive& archive)
 
 	bool retVal = BaseClass::Serialize(archive);
 
-	static iser::CArchiveTag lastNameTag("LastName", "LastName", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag lastNameTag("LastName", "LastName", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(lastNameTag);
 	retVal = retVal && archive.Process(m_lastName);
 	retVal = retVal && archive.EndTag(lastNameTag);
 
-	static iser::CArchiveTag nickNameTag("NickName", "NickName", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag nickNameTag("NickName", "NickName", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(nickNameTag);
 	retVal = retVal && archive.Process(m_nick);
 	retVal = retVal && archive.EndTag(nickNameTag);
 
-	static iser::CArchiveTag birthdayTag("Birthday", "Birthday", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag birthdayTag("Birthday", "Birthday", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(birthdayTag);
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDate(archive, m_birthday);
 	retVal = retVal && archive.EndTag(birthdayTag);
 
-	static iser::CArchiveTag genderTypeTag("GenderType", "Gender type", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag genderTypeTag("GenderType", "Gender type", iser::CArchiveTag::TT_LEAF);
 	retVal= archive.BeginTag(genderTypeTag);
 	retVal = retVal && I_SERIALIZE_ENUM(GenderType, archive, m_genderType);
 	retVal = retVal && archive.EndTag(genderTypeTag);

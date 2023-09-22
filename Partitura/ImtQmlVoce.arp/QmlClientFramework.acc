@@ -109,51 +109,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="LocalSettings" PackageId="ImtQmlVoce" ComponentId="LocalSettings">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ApplicationInfo"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DefaultSchemaIndex" Type="Integer" ExportId="DefaultSchemaIndex">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DefaultServerUrl" Type="Text" ExportId="DefaultServerUrl">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="LanguageConstraints">
-                        <Data IsEnabled="true" Value="ApplicationLocalization"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TextFileLog"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParamRepresentationControllers" Type="Reference[]" ExportId="PreferenceParamRepresentationControllers">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="PreferenceParameters">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="PreferenceParametersId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PreferenceDefaultPath" Type="String" ExportId="PreferenceDefaultPath">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="PreferenceLocationType" Type="Integer" ExportId="PreferenceLocationType">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="QuickApplication/RuntimeStatus"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ApplicationLocalization"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="LogFilePath" PackageId="FilePck" ComponentId="RelativeFileNameParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -202,8 +157,8 @@
                     <AttributeInfo Id="ApplicationInfoRepresentation" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationInfoRepresentation"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="LanguageParam" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="LocalSettings/Language"/>
+                    <AttributeInfo Id="LanguageParam" Type="Reference" ExportId="LanguageParam">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TextFileLog"/>
@@ -215,10 +170,10 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Settings" Type="Reference" ExportId="Settings">
-                        <Data IsEnabled="true" Value="LocalSettings"/>
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SettingsRepresentationController" Type="Reference" ExportId="SettingsRepresentationController">
-                        <Data IsEnabled="true" Value="LocalSettings"/>
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="true" Value="ApplicationLocalization"/>
@@ -282,11 +237,8 @@
         <Component ExportedId="ApplicationInfo" ComponentId="ApplicationInfo"/>
         <Component ExportedId="ApplicationLocalization" ComponentId="ApplicationLocalization"/>
         <Component ExportedId="ClientMainWindowQml" ComponentId="ClientMainWindowQml"/>
-        <Component ExportedId="Design" ComponentId="LocalSettings/Design"/>
-        <Component ExportedId="Language" ComponentId="LocalSettings/Language"/>
         <Component ExportedId="ObserverQml" ComponentId="ObserverQml"/>
         <Component ExportedId="RuntimeStatus" ComponentId="QuickApplication/RuntimeStatus"/>
-        <Component ExportedId="ServerUrl" ComponentId="LocalSettings/ServerUrl"/>
         <Component ExportedId="TextFileLog" ComponentId="TextFileLog"/>
     </ExportedComponents>
 </Acf>

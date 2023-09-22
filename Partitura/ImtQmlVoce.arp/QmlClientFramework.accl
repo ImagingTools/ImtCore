@@ -13,7 +13,6 @@
         <Element ComponentName="ApplicationLocalization" X="950" Y="50" Note=""/>
         <Element ComponentName="ClientMainWindowQml" X="950" Y="500" Note=""/>
         <Element ComponentName="Context" X="775" Y="225" Note=""/>
-        <Element ComponentName="LocalSettings" X="700" Y="700" Note=""/>
         <Element ComponentName="LogFilePath" X="125" Y="50" Note=""/>
         <Element ComponentName="LogSystemLocation" X="500" Y="125" Note=""/>
         <Element ComponentName="MainWindow" X="600" Y="550" Note=""/>

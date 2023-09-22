@@ -124,32 +124,32 @@ bool CDatabaseAccessSettings::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	static iser::CArchiveTag hostTag("Host", "Database server host", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag hostTag("Host", "Database server host", iser::CArchiveTag::TT_LEAF);
 	bool retVal = archive.BeginTag(hostTag);
 	retVal = retVal && archive.Process(m_host);
 	retVal = retVal && archive.EndTag(hostTag);
 
-	static iser::CArchiveTag portTag("Port", "Database server port", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag portTag("Port", "Database server port", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(portTag);
 	retVal = retVal && archive.Process(m_port);
 	retVal = retVal && archive.EndTag(portTag);
 
-	static iser::CArchiveTag databaseNameTag("DatabaseName", "Database Name", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag databaseNameTag("DatabaseName", "Database Name", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(databaseNameTag);
 	retVal = retVal && archive.Process(m_databaseName);
 	retVal = retVal && archive.EndTag(databaseNameTag);
 
-	static iser::CArchiveTag userNameTag("UserName", "User Name", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag userNameTag("UserName", "User Name", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(userNameTag);
 	retVal = retVal && archive.Process(m_userName);
 	retVal = retVal && archive.EndTag(userNameTag);
 
-	static iser::CArchiveTag passwordTag("Password", "Password", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag passwordTag("Password", "Password", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(passwordTag);
 	retVal = retVal && archive.Process(m_password);
 	retVal = retVal && archive.EndTag(passwordTag);
 
-	static iser::CArchiveTag databasePathTag("DatabasePath", "Database Path", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag databasePathTag("DatabasePath", "Database Path", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(databasePathTag);
 	retVal = retVal && archive.Process(m_databasePath);
 	retVal = retVal && archive.EndTag(databasePathTag);

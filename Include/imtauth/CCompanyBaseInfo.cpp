@@ -44,14 +44,14 @@ bool CCompanyBaseInfo::Serialize(iser::IArchive& archive)
 	bool retVal = BaseClass::Serialize(archive);
 
 	if (m_parentCompanyPtr != nullptr){
-		static iser::CArchiveTag parentCompanyTag("ParentCompany", "Parent of the company", iser::CArchiveTag::TT_LEAF);
+		iser::CArchiveTag parentCompanyTag("ParentCompany", "Parent of the company", iser::CArchiveTag::TT_LEAF);
 		retVal = retVal && archive.BeginTag(parentCompanyTag);
 		retVal = retVal && m_parentCompanyPtr->Serialize(archive);
 		retVal = retVal && archive.EndTag(parentCompanyTag);
 	}
 
-	static iser::CArchiveTag subCompaniesTag("SubCompanies", "Subsidiary companies", iser::CArchiveTag::TT_MULTIPLE);
-	static iser::CArchiveTag companyTag("Company", "Company", iser::CArchiveTag::TT_GROUP, &subCompaniesTag);
+	iser::CArchiveTag subCompaniesTag("SubCompanies", "Subsidiary companies", iser::CArchiveTag::TT_MULTIPLE);
+	iser::CArchiveTag companyTag("Company", "Company", iser::CArchiveTag::TT_GROUP, &subCompaniesTag);
 
 	int companyCount = m_companyChildren.GetCount();
 

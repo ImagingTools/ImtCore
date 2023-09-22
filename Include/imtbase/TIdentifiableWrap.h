@@ -98,7 +98,7 @@ bool TIdentifiableWrap<Base>::Serialize(iser::IArchive& archive)
 		identifiableVersion = 0;
 	}
 //	if (identifiableVersion >= 5902){
-		static iser::CArchiveTag identifierTag("Uuid", "Unique identifier of the object", iser::CArchiveTag::TT_LEAF);
+		iser::CArchiveTag identifierTag("Uuid", "Unique identifier of the object", iser::CArchiveTag::TT_LEAF);
 		retVal = retVal && archive.BeginTag(identifierTag);
 		retVal = retVal && archive.Process(m_identifier);
 		retVal = retVal && archive.EndTag(identifierTag);

@@ -4,6 +4,9 @@
 // ACF includes
 #include <istd/TOptDelPtr.h>
 
+// ImtCore includes
+#include <imtauth/CUserSettings.h>
+
 
 namespace imtgql
 {
@@ -114,6 +117,8 @@ bool CUserSettingsControllerComp::UpdateModelFromRepresentation(
 	}
 
 	istd::TDelPtr<imtauth::IUserSettings> userSettingsPtr = m_userSettingsInfoFactCompPtr.CreateInstance();
+	//istd::TDelPtr<imtauth::IUserSettings> userSettingsPtr;
+	//userSettingsPtr.SetPtr(new imtauth::CUserSettings);
 	Q_ASSERT(userSettingsPtr.IsValid());
 	if (!userSettingsPtr.IsValid()){
 		return false;

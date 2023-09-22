@@ -198,22 +198,22 @@ bool CRole::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
-	static iser::CArchiveTag roleIdTag("RoleId", "ID of the role", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag roleIdTag("RoleId", "ID of the role", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(roleIdTag);
 	retVal = retVal && archive.Process(m_roleId);
 	retVal = retVal && archive.EndTag(roleIdTag);
 
-	static iser::CArchiveTag productIdTag("ProductId", "ID of the product", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag productIdTag("ProductId", "ID of the product", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(productIdTag);
 	retVal = retVal && archive.Process(m_productId);
 	retVal = retVal && archive.EndTag(productIdTag);
 
-	static iser::CArchiveTag roleNameTag("RoleName", "Name of the role", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag roleNameTag("RoleName", "Name of the role", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(roleNameTag);
 	retVal = retVal && archive.Process(m_roleName);
 	retVal = retVal && archive.EndTag(roleNameTag);
 
-	static iser::CArchiveTag roleDescriptionTag("RoleDescription", "Description of the role", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag roleDescriptionTag("RoleDescription", "Description of the role", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(roleDescriptionTag);
 	retVal = retVal && archive.Process(m_roleDescription);
 	retVal = retVal && archive.EndTag(roleDescriptionTag);
