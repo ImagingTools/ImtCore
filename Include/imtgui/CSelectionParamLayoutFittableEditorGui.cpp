@@ -118,7 +118,7 @@ bool CSelectionParamLayoutFittableEditorGui::IsReadOnly() const
 void CSelectionParamLayoutFittableEditorGui::SetReadOnly(bool state)
 {
 	if (!m_comboBoxPtr.isNull() && m_comboBoxPtr->isEnabled() != state){
-		m_comboBoxPtr->setEnabled(state);
+		m_comboBoxPtr->setEnabled(!state);
 	}
 }
 

@@ -85,7 +85,7 @@ bool CEnableableLayoutFittableEditorGui::IsReadOnly() const
 void CEnableableLayoutFittableEditorGui::SetReadOnly(bool state)
 {
 	if (!m_checkBoxPtr.isNull() && m_checkBoxPtr->isEnabled() != state){
-		m_checkBoxPtr->setEnabled(state);
+		m_checkBoxPtr->setEnabled(!state);
 	}
 }
 

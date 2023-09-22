@@ -85,7 +85,7 @@ bool CNameLayoutFittableEditorGui::IsReadOnly() const
 void CNameLayoutFittableEditorGui::SetReadOnly(bool state)
 {
 	if (!m_nameLineEditPtr.isNull() && m_nameLineEditPtr->isEnabled() != state){
-		m_nameLineEditPtr->setEnabled(state);
+		m_nameLineEditPtr->setEnabled(!state);
 	}
 }
 

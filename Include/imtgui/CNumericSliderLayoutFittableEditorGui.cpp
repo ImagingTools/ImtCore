@@ -190,12 +190,12 @@ void CNumericSliderLayoutFittableEditorGui::SetReadOnly(bool state)
 	if (m_valueSliderPtrList[0]->isEnabled() != state){
 		for (QSlider* sliderPtr: qAsConst(m_valueSliderPtrList)){
 			if (sliderPtr!= nullptr){
-				sliderPtr->setEnabled(state);
+				sliderPtr->setEnabled(!state);
 			}
 		}
 		for (QLabel* labelPtr: qAsConst(m_valueLabelPtrList)){
 			if (labelPtr!= nullptr){
-				labelPtr->setEnabled(state);
+				labelPtr->setEnabled(!state);
 			}
 		}
 	}
