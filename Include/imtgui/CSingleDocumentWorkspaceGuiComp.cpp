@@ -61,7 +61,7 @@ IDocumentViewDecorator* CSingleDocumentWorkspaceGuiComp::CreateDocumentViewDecor
 void CSingleDocumentWorkspaceGuiComp::UpdateTitle()
 {
 	if (m_documentViewPtr.IsValid()){
-		QString titleName = BaseClass::GenerateDocumentTitle();
+		QString titleName = GenerateDocumentTitle();
 
 		m_documentViewPtr->SetTitle(titleName);
 	}
