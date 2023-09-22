@@ -63,6 +63,9 @@ public:
 		Qt::ToolButtonStyle documentButtonsStyle;
 		Qt::ToolButtonStyle undoButtonsStyle;
 		bool showDocumentTitle;
+
+		QVector<int> includedCommandGroups;
+		QVector<int> excludedCommandGroups;
 	};
 
 	TStandardDocumentViewDecorator(
@@ -73,7 +76,7 @@ public:
 				const DecoratorConfiguration& configuration);
 
 	virtual void UpdateSaveButtonsStatus();
-	void UpdateAppearance();
+	virtual void UpdateAppearance();
 
 	// reimplemeneted (IDocumentViewDecorator)
 	virtual QWidget* GetDecoratorWidget() override;
@@ -439,7 +442,7 @@ void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::OnModelChanged(int model
 					QToolBar* toolBarPtr = new QToolBar(UI::CommandToolBarFrame);
 					toolBarPtr->setToolButtonStyle(m_configuration.documentButtonsStyle);
 					UI::CommandToolBarFrame->layout()->addWidget(toolBarPtr);
-					iqtgui::CCommandTools::SetupToolbar(*guiCommandPtr, *toolBarPtr);
+					iqtgui::CCommandTools::SetupToolbar(*guiCommandPtr, *toolBarPtr, -1, m_configuration.includedCommandGroups, m_configuration.excludedCommandGroups);
 					toolBarPtr->setIconSize(QSize(m_configuration.iconSize, m_configuration.iconSize));
 				}
 
