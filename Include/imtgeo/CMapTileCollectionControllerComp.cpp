@@ -1,4 +1,4 @@
-#include <imtgeo/CDeviceMapClusterCollectionControllerComp.h>
+#include <imtgeo/CMapTileCollectionControllerComp.h>
 
 
 // STL includes
@@ -18,7 +18,7 @@ namespace imtgeo
 {
 
 
-QVariant CDeviceMapClusterCollectionControllerComp::GetObjectInformation(
+QVariant CMapTileCollectionControllerComp::GetObjectInformation(
 			const QByteArray &informationId,
 			const QByteArray &objectId) const
 {
@@ -36,7 +36,7 @@ QVariant CDeviceMapClusterCollectionControllerComp::GetObjectInformation(
 }
 
 
-imtbase::CTreeItemModel* CDeviceMapClusterCollectionControllerComp::GetMetaInfo(
+imtbase::CTreeItemModel* CMapTileCollectionControllerComp::GetMetaInfo(
 			const imtgql::CGqlRequest& gqlRequest,
 			QString& errorMessage) const
 {
@@ -46,7 +46,7 @@ imtbase::CTreeItemModel* CDeviceMapClusterCollectionControllerComp::GetMetaInfo(
 }
 
 
-imtbase::CTreeItemModel* CDeviceMapClusterCollectionControllerComp::ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CMapTileCollectionControllerComp::ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = nullptr;
@@ -92,7 +92,7 @@ imtbase::CTreeItemModel* CDeviceMapClusterCollectionControllerComp::ListObjects(
 			}
 		}
 
-		{//test
+        {
 			if (tileList.count()){
 				int itemIndex = 0;
 				int z = tileList.at(0).second;
@@ -106,15 +106,13 @@ imtbase::CTreeItemModel* CDeviceMapClusterCollectionControllerComp::ListObjects(
 
 					itemIndex = itemsModel->InsertNewItem();
 					itemsModel->SetData("Id", itemIndex, itemIndex);
-					itemsModel->SetData("Positive", 100000, itemIndex);
-					itemsModel->SetData("Negative", 100000, itemIndex);
 					itemsModel->SetData("Latitude", lat, itemIndex);
 					itemsModel->SetData("Longitude", lon, itemIndex);
 
 				}
 			}
 
-		}//test
+        }
 
 
 		itemsModel->SetIsArray(true);
@@ -126,65 +124,6 @@ imtbase::CTreeItemModel* CDeviceMapClusterCollectionControllerComp::ListObjects(
 	return rootModelPtr.PopPtr();
 
 
-}
-
-int CDeviceMapClusterCollectionControllerComp::long2tilex(double lon, int z) const
-{
-	return (int)(floor((lon + 180.0) / 360.0 * (1 << z)));
-}
-
-int CDeviceMapClusterCollectionControllerComp::lat2tiley(double lat, int z) const
-{
-	const double pi = acos(-1.0);
-
-	double latrad = lat * pi / 180.0;
-	return (int)(floor((1.0 - asinh(tan(latrad)) / pi) / 2.0 * (1 << z)));
-}
-
-double CDeviceMapClusterCollectionControllerComp::tilex2long(int x, int z) const
-{
-	return x / (double)(1 << z) * 360.0 - 180;
-}
-
-double CDeviceMapClusterCollectionControllerComp::tiley2lat(int y, int z) const
-{
-	const double pi = acos(-1.0);
-
-	double n = pi - 2.0 * pi * y / (double)(1 << z);
-	return 180.0 / pi * atan(0.5 * (exp(n) - exp(-n)));
-}
-
-QList<QPair<QPair<int, int>, int> > CDeviceMapClusterCollectionControllerComp::getTileSet(QGeoCoordinate coordLeftTop, QGeoCoordinate coordRightBottom, int z) const
-{
-	QList<QPair<QPair<int, int>, int>> tileList;
-
-	int minX = long2tilex(coordLeftTop.longitude(), z);
-	int minY = lat2tiley(coordLeftTop.latitude(), z);
-	int maxX = long2tilex(coordRightBottom.longitude(), z);
-	int maxY = lat2tiley(coordRightBottom.latitude(), z);
-
-	for (int x = minX; x <= maxX; x++){
-		for (int y = minY; y <= maxY; y++){
-			QPair<int, int> pairX_Y = qMakePair(x, y);
-			QPair<QPair<int, int>, int> pairXY_Z = qMakePair(pairX_Y, z);
-			tileList.append(pairXY_Z);
-		}
-	}
-
-	return tileList;
-
-}
-
-QPair<QPair<int, int>, int> CDeviceMapClusterCollectionControllerComp::getTile(QGeoCoordinate coord, int z) const
-{
-	QPair<QPair<int, int>, int> tileData;
-
-	int x = long2tilex(coord.longitude(), z);
-	int y = lat2tiley(coord.latitude(), z);
-	QPair<int, int> coordPair = qMakePair(x, y);
-	tileData = qMakePair(coordPair, z);
-
-	return tileData;
 }
 
 

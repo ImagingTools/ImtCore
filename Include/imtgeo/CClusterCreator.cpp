@@ -349,7 +349,8 @@ QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentif
             }
 
         }
-    }
+
+    }// двойной цикл
 
     for( int i = 0; i < itemsModel->GetItemsCount(); i++){
 
