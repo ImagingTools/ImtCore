@@ -19,14 +19,38 @@ namespace imtgui
 {
 
 
+CMultiParamsSetGuiComp::CMultiParamsSetGuiComp()
+	:m_uiActivatorsObserver(*this)
+{
+}
+
+
 void CMultiParamsSetGuiComp::SetReadOnly(bool state)
 {
 	ParamsFrame->setEnabled(state);
 }
 
 
+void CMultiParamsSetGuiComp::OnGuiCreated()
+{
+	if (m_uiActivatorsCompPtr.IsValid() && m_uiActivatorsModelCompPtr.IsValid()){
+		int uiActivatorsCount = m_uiActivatorsCompPtr.GetCount();
+		for (int activatorIndex = 0; activatorIndex < uiActivatorsCount; ++activatorIndex){
+			iprm::IEnableableParam* uiActivatorPtr = m_uiActivatorsCompPtr[activatorIndex];
+			Q_ASSERT(uiActivatorPtr != nullptr);
+
+			m_uiActivatorsObserver.RegisterObject(uiActivatorPtr, &CMultiParamsSetGuiComp::UpdateUiState, activatorIndex);
+		}
+	}
+
+	BaseClass::OnGuiCreated();
+}
+
+
 void CMultiParamsSetGuiComp::OnGuiDestroyed()
 {
+	m_uiActivatorsObserver.UnregisterAllObjects();
+
 	BaseClass::OnGuiDestroyed();
 }
 
@@ -163,6 +187,30 @@ bool CMultiParamsSetGuiComp::OnModelDetached(imod::IModel* modelPtr)
 
 	return BaseClass::OnModelDetached(modelPtr);
 }
+
+
+void CMultiParamsSetGuiComp::UpdateUiState(const istd::IChangeable::ChangeSet& changeSet, const iprm::IEnableableParam* aUiActivatorPtr)
+{
+	if (m_uiActivatorsCompPtr.IsValid() && m_uiActivatorsModelCompPtr.IsValid()){
+		int uiActivatorsCount = m_uiActivatorsCompPtr.GetCount();
+		for (int activatorIndex = 0; activatorIndex < uiActivatorsCount; ++activatorIndex){
+			iprm::IEnableableParam* uiActivatorPtr = m_uiActivatorsCompPtr[activatorIndex];
+			if (aUiActivatorPtr == uiActivatorPtr){
+				if (activatorIndex < m_modelEditors.GetCount()){
+					ILayoutFittableModelEditor* editorPtr = m_modelEditors.GetAt(activatorIndex);
+					Q_ASSERT(editorPtr != nullptr);
+					if (editorPtr != nullptr){
+						editorPtr->SetReadOnly(!aUiActivatorPtr->IsEnabled());
+					}
+				}
+
+				break;
+			}
+
+		}
+	}
+}
+
 
 
 ILayoutFittableModelEditor* CMultiParamsSetGuiComp::CreateEditorFromModel(const imod::IModel* modelPtr, const QString& objectName) const
