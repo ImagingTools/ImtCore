@@ -36,11 +36,31 @@ bool CObjectCollectionBasedPersistenceComp::IsOperationSupported(
 
 
 int CObjectCollectionBasedPersistenceComp::LoadFromFile(
-			istd::IChangeable& /*data*/,
-			const QString& /*filePath*/,
+			istd::IChangeable& data,
+			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
-	Q_ASSERT(false);
+	if (m_collectionCompPtr.IsValid()){
+		QUrl uri(filePath);
+		if (uri.scheme() == "collection"){
+			QString path = uri.path();
+			QStringList parts = path.split("/");
+			if (parts.count() == 2){
+				QByteArray nodeId = parts[0].toUtf8();
+				QByteArray objectId = parts[1].toUtf8();
+
+				Q_ASSERT(!objectId.isEmpty());
+				if (!objectId.isEmpty()){
+					imtbase::IObjectCollection::DataPtr dataPtr;
+					if (m_collectionCompPtr->GetObjectData(objectId, dataPtr)){
+						if (data.CopyFrom(*dataPtr)){
+							return OS_OK;
+						}
+					}
+				}
+			}
+		}
+	}
 
 	return OS_FAILED;
 }
