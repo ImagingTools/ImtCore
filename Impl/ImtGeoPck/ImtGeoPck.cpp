@@ -45,9 +45,9 @@ I_EXPORT_COMPONENT(
             "Address Collection Controller");
 
 I_EXPORT_COMPONENT(
-            DeviceMapClusterCollectionController,
-            "Device Map Cluster Collection Controller",
-            "Device Map Cluster Collection Controller");
+            MapTileCollectionController,
+            "Map Tile Cluster Collection Controller",
+            "Map Tile Cluster Collection Controller");
 
 I_EXPORT_COMPONENT(
             MapClusterDatabaseDelegate,
