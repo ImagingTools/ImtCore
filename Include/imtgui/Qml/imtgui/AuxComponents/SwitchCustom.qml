@@ -66,7 +66,7 @@ Rectangle {
 
 //        }
         onPressed: {
-            ma.canDrag = true;
+//            ma.canDrag = true;
             if(tooltip.text !== ""){
                 tooltip.closeTooltip();
             }

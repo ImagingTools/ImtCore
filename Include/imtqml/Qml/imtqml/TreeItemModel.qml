@@ -13,13 +13,13 @@ JSONListModel {
     signal modelChanged();
 //    signal dataChanged();
 
-    onModelChanged: {
-        console.log("TreeItemModel onModelChanged");
-    }
+//    onModelChanged: {
+//        console.log("TreeItemModel onModelChanged");
+//    }
 
-    onDataChanged: {
-        console.log("TreeItemModel onDataChanged");
-    }
+//    onDataChanged: {
+//        console.log("TreeItemModel onDataChanged");
+//    }
 
     function SetUpdateEnabled(flag){
         isUpdateEnabled = flag
