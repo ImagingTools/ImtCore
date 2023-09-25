@@ -2,16 +2,15 @@
 
 
 // ACF includes
-#include <istd/TSmartPtr.h>
-#include <iprm/IParamsSet.h>
 #include <idoc/IDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <imtbase/TIStructuredCollectionInfo.h>
+#include <imtbase/IObjectCollection.h>
 #include <imtbase/IOperationContext.h>
-#include <imtcom/IFileTransfer.h>
-#include <imtgql/IGqlResponse.h>
 #include <imtgql/IGqlClient.h>
+#include <imtgql/IGqlPrimitiveTypeResponse.h>
+#include <imtgql/IGqlStructuredCollectionResponse.h>
 
 
 namespace imtgql
@@ -39,121 +38,102 @@ public:
 	/**
 		Infos
 	*/
-	virtual IGqlRequest* CreateGetElementType(const QByteArray& elementId) const = 0;
-	virtual IGqlRequest* CreateGetNodeInfoRequest(const QByteArray& nodeId) const = 0;
-	virtual IGqlRequest* CreateGetObjectInfoRequest(const QByteArray& objectId) const = 0;
+	virtual imtbase::IStructuredObjectCollectionInfo::ElementType GetElementType(const QByteArray& elementId) const = 0;
+	virtual bool GetNodeInfo(const QByteArray& nodeId, imtgql::IGqlStructuredCollectionResponse::NodeInfo& outInfo) const = 0;
+	virtual bool GetObjectInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& outInfo) const = 0;
 
 	/**
 		Structure manipulations
 	*/
-	virtual IGqlRequest* CreateInsertNodeRequest(
+	virtual QByteArray InsertNode(
 				const QString& name,
 				const QString& description,
 				const QByteArray& proposedNodeId = QByteArray(),
 				const QByteArray& parentNodeId = QByteArray(),
-				const idoc::IDocumentMetaInfo* metaInfoPtr = nullptr,
+				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-	virtual IGqlRequest* CreateSetNodeNameRequest(
+	virtual QSharedPointer<imtbase::IStructuredObjectCollectionInfo> GetNodeContent(const QByteArray& nodeId) const = 0;
+	virtual bool SetNodeName(
 				const QByteArray& nodeId,
 				const QString& name,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-	virtual IGqlRequest* CreateSetNodeDescriptionRequest(
+	virtual bool SetNodeDescription(
 				const QByteArray& nodeId,
 				const QString& description,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-	virtual IGqlRequest* CreateSetNodeMetaInfoRequest(
+	virtual bool SetNodeMetaInfo(
 				const QByteArray& nodeId,
 				const idoc::IDocumentMetaInfo& metaInfo,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-	virtual IGqlRequest* CreateMoveNodeRequest(
+	virtual bool MoveNode(
 				const QByteArray& nodeId,
 				const QByteArray& parentNodeId,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-	virtual IGqlRequest* CreateRemoveNodeRequest(
+	virtual bool RemoveNode(
 				const QByteArray& nodeId,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
 
-	virtual IGqlRequest* CreateAddObjectToNodeRequest(
+	virtual bool AddObjectToNode(
 				const QByteArray& objectId,
 				const QByteArray& nodeId,
-				int clientVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) = 0;
-	virtual IGqlRequest* CreateMoveObjectToNodeRequest(
+	virtual bool MoveObjectToNode(
 				const QByteArray& objectId,
 				const QByteArray& nodeId,
 				const QByteArray& newNodeId,
-				int clientVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) = 0;
-	virtual IGqlRequest* CreateRemoveObjectFromNodeRequest(
+	virtual bool RemoveObjectFromNode(
 				const QByteArray& objectId,
 				const QByteArray& nodeId,
-				int clientVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
 
 	/**
 		Object manipulations
 	*/
-	virtual IGqlRequest* CreateInsertObjectRequest(
+	virtual QByteArray InsertObject(
 				const QByteArray& typeId,
 				const QString& name,
 				const QString& description,
-				const istd::IChangeable* objectPtr,
-				const QString& uploadUrl = QString(),
+				const istd::IChangeable& object,
 				const QByteArray& proposedObjectId = QByteArray(),
 				const QByteArray& nodeId = QByteArray(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
-				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
+				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-	virtual IGqlRequest* CreateSetObjectNameRequest(
+	virtual bool SetObjectName(
 				const QByteArray& objectId,
 				const QString& name,
-				int clientVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-	virtual IGqlRequest* CreateSetObjectDescriptionRequest(
+	virtual bool SetObjectDescription(
 				const QByteArray& objectId,
 				const QString& description,
-				int clientVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-	virtual IGqlRequest* CreateSetObjectMetaInfoRequest(
+	virtual bool SetObjectMetaInfo(
 				const QByteArray& objectId,
-				const idoc::IDocumentMetaInfo& metaInfo,
-				int clientVersion = -1,
+				const idoc::IDocumentMetaInfo& dataMetaInfo,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-	virtual IGqlRequest* CreateGetObjectRequest(const QByteArray& objectId) const = 0;
-	virtual IGqlRequest* CreateSetObjectRequest(
+	virtual bool GetObject(
 				const QByteArray& objectId,
-				const istd::IChangeable* objectPtr,
-				const QString& uploadUrl = QString(),
+				imtbase::IObjectCollection::DataPtr) const = 0;
+	virtual bool SetObject(
+				const QByteArray& objectId,
+				const istd::IChangeable& object,
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
-				int clientVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-	virtual IGqlRequest* CreateRemoveObjectRequest(
+	virtual bool RemoveObject(
 				const QByteArray& objectId,
-				int clientElementVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
 
 	/**
 		Enumeration
 	*/
-	virtual IGqlRequest* CreateGetElementCountRequest(
+	virtual bool GetElementCount(
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
-	virtual IGqlRequest* CreateGetElementListRequest(
+	virtual imtgql::IGqlStructuredCollectionResponse::ElementList GetElementList(
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
-
-	/**
-		File Transfer Management
-	*/
-	virtual IGqlRequest* CreateUploadUrlsRequest(const QStringList& fileNames, const QByteArray& nodeId) const = 0;
-	virtual IGqlRequest* CreateDownloadUrlsRequest(const QByteArrayList& objectIds) const = 0;
-	virtual imtcom::IFileTransfer* GetFileTransfer() const = 0;
-
-	/**
-		Create response
-	*/
-	virtual IGqlResponse* CreateResponse(const IGqlRequest& request) const = 0;
 };
 
 

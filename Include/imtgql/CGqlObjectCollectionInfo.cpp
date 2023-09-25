@@ -267,39 +267,29 @@ void CGqlObjectCollectionInfo::UpdateCache()
 {
 	m_items.clear();
 
-	Q_ASSERT(m_clientPtr != nullptr && m_delegatePtr != nullptr);
-	if (m_clientPtr != nullptr && m_delegatePtr != nullptr){
+	Q_ASSERT(m_delegatePtr != nullptr);
+	if (m_delegatePtr != nullptr){
 		iprm::CParamsSet selectionParam;
 		iprm::CIdParam nodeIdParam;
 		nodeIdParam.SetId(m_nodeId);
 		selectionParam.SetEditableParameter("NodeId", &nodeIdParam);
 
-		istd::TDelPtr<IGqlRequest> requestPtr = m_delegatePtr->CreateGetElementListRequest(0, -1, &selectionParam);
-		istd::TDelPtr<IGqlStructuredCollectionResponse> responsePtr;
-		responsePtr.SetCastedOrRemove(m_delegatePtr->CreateResponse(*requestPtr));
+		IGqlStructuredCollectionResponse::ElementList list = m_delegatePtr->GetElementList(0, -1, &selectionParam);
+		for (const IGqlStructuredCollectionResponse::ElementInfo& element : list) {
+			Item item;
 
-		if (m_clientPtr->SendRequest(*requestPtr, *responsePtr)){
-			if (responsePtr->IsSuccessfull()) {
-				IGqlStructuredCollectionResponse::ElementList list;
-				if (responsePtr->GetElementList(list)) {
-					for (const IGqlStructuredCollectionResponse::ElementInfo& element : list) {
-						Item item;
-
-						item.id = element.id;
-						item.name = element.name;
-						item.description = element.description;
-						item.typeId = element.isNode ? QByteArray() : element.typeId;
-						if (!element.elementMetaInfoPtr.isNull()) {
-							item.elementMetaInfoPtr.SetCastedOrRemove(element.elementMetaInfoPtr->CloneMe());
-						}
-						if (!element.dataMetaInfoPtr.isNull()) {
-							item.dataMetaInfoPtr.SetCastedOrRemove(element.dataMetaInfoPtr->CloneMe());
-						}
-
-						m_items.append(item);
-					}
-				}
+			item.id = element.id;
+			item.name = element.name;
+			item.description = element.description;
+			item.typeId = element.isNode ? QByteArray() : element.typeId;
+			if (!element.elementMetaInfoPtr.isNull()) {
+				item.elementMetaInfoPtr.SetCastedOrRemove(element.elementMetaInfoPtr->CloneMe());
 			}
+			if (!element.dataMetaInfoPtr.isNull()) {
+				item.dataMetaInfoPtr.SetCastedOrRemove(element.dataMetaInfoPtr->CloneMe());
+			}
+
+			m_items.append(item);
 		}
 	}
 }
