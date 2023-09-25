@@ -126,7 +126,7 @@ public:
 	/**
 		Enumeration
 	*/
-	virtual bool GetElementCount(
+	virtual int GetElementCount(
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 	virtual imtgql::IGqlStructuredCollectionResponse::ElementList GetElementList(
 				int offset = 0,
@@ -221,6 +221,14 @@ protected:
 				const QByteArray& objectId,
 				int clientElementVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const;
+
+	virtual imtgql::IGqlRequest* CreateGetElementCountRequest(
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const;
+	virtual imtgql::IGqlRequest* CreateGetElementListRequest(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const;
+
 
 	virtual IGqlResponse* CreateResponse(const IGqlRequest& request) const = 0;
 

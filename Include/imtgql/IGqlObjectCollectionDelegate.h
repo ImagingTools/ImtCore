@@ -128,7 +128,7 @@ public:
 	/**
 		Enumeration
 	*/
-	virtual bool GetElementCount(
+	virtual int GetElementCount(
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
 	virtual imtgql::IGqlStructuredCollectionResponse::ElementList GetElementList(
 				int offset = 0,

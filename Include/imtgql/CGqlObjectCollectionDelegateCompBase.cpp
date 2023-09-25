@@ -484,6 +484,51 @@ bool CGqlObjectCollectionDelegateCompBase::RemoveObject(const QByteArray& object
 }
 
 
+int CGqlObjectCollectionDelegateCompBase::GetElementCount(const iprm::IParamsSet* selectionParamsPtr) const
+{
+	if (m_clientCompPtr.IsValid()){
+		istd::TDelPtr<IGqlRequest> requestPtr = CreateGetElementCountRequest(selectionParamsPtr);
+		istd::TDelPtr<IGqlPrimitiveTypeResponse> responsePtr;
+		responsePtr.SetCastedOrRemove(CreateResponse(*requestPtr));
+		if (responsePtr.IsValid()){
+			if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
+				QVariant variant;
+				if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					if (variant.type() == QVariant::Int){
+						return variant.toInt();
+					}
+				}
+			}
+		}
+	}
+
+	return -1;
+}
+
+
+imtgql::IGqlStructuredCollectionResponse::ElementList CGqlObjectCollectionDelegateCompBase::GetElementList(int offset, int count, const iprm::IParamsSet* selectionParamsPtr) const
+{
+	if (m_clientCompPtr.IsValid()){
+		istd::TDelPtr<IGqlRequest> requestPtr = CreateGetElementListRequest(offset, count, selectionParamsPtr);
+		istd::TDelPtr<IGqlStructuredCollectionResponse> responsePtr;
+		responsePtr.SetCastedOrRemove(CreateResponse(*requestPtr));
+		if (responsePtr.IsValid()){
+			if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
+				QVariant variant;
+				if (responsePtr->IsSuccessfull()){
+					imtgql::IGqlStructuredCollectionResponse::ElementList list;
+					if (responsePtr->GetElementList(list)){
+						return list;
+					}
+				}
+			}
+		}
+	}
+
+	return imtgql::IGqlStructuredCollectionResponse::ElementList();
+}
+
+
 // protected methods
 
 IGqlRequest* CGqlObjectCollectionDelegateCompBase::CreateGetElementType(const QByteArray& elementId) const
@@ -595,6 +640,18 @@ IGqlRequest* CGqlObjectCollectionDelegateCompBase::CreateSetObjectRequest(const 
 
 
 IGqlRequest* CGqlObjectCollectionDelegateCompBase::CreateRemoveObjectRequest(const QByteArray& objectId, int clientElementVersion, const imtbase::IOperationContext* operationContextPtr) const
+{
+	return nullptr;
+}
+
+
+imtgql::IGqlRequest* CGqlObjectCollectionDelegateCompBase::CreateGetElementCountRequest(const iprm::IParamsSet* selectionParamsPtr) const
+{
+	return nullptr;
+}
+
+
+imtgql::IGqlRequest* CGqlObjectCollectionDelegateCompBase::CreateGetElementListRequest(int offset, int count, const iprm::IParamsSet* selectionParamsPtr) const
 {
 	return nullptr;
 }
