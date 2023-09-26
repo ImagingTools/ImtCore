@@ -30,7 +30,6 @@ public:
 		I_ASSIGN_MULTI_0(m_idsAttrPtr, "Ids", "List of parameter IDs according to observed parameter set. \n Use '*' sign to  attach all model", true);
 		I_ASSIGN_MULTI_0(m_objectIdsAttrPtr, "ObjectIds", "List of IDs of created elements", true);
 		I_ASSIGN_MULTI_1(m_labelTextsAttrPtr, "Labels", "List of parameter's Descriptions \n Leave empty string to get description from model \n Use whitespace symbols to create label without text", true, "");
-
 		I_ASSIGN_MULTI_0(m_uiActivatorsCompPtr, "UiActivators", "Optional activators for each ui (enable/disable)", false);
 		I_ASSIGN_TO(m_uiActivatorsModelCompPtr, m_uiActivatorsCompPtr, false);
 	I_END_COMPONENT;
