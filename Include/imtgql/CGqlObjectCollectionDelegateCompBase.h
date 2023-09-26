@@ -11,6 +11,7 @@
 // GmgCore includes
 #include <imtgql/CGqlObjectCollectionInfo.h>
 #include <imtgql/IGqlObjectCollectionDelegate.h>
+#include <imtgql/IGqlObjectCollectionRequestDelegate.h>
 
 
 namespace imtgql
@@ -19,7 +20,8 @@ namespace imtgql
 
 class CGqlObjectCollectionDelegateCompBase:
 			public ilog::CLoggerComponentBase,
-			virtual public IGqlObjectCollectionDelegate
+	virtual public IGqlObjectCollectionDelegate,
+	virtual public IGqlObjectCollectionRequestDelegate
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
@@ -88,16 +90,6 @@ public:
 	/**
 		Object manipulations
 	*/
-	virtual QByteArray InsertObject(
-				const QByteArray& typeId,
-				const QString& name,
-				const QString& description,
-				const istd::IChangeable& object,
-				const QByteArray& proposedObjectId = QByteArray(),
-				const QByteArray& nodeId = QByteArray(),
-				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
-				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual bool SetObjectName(
 				const QByteArray& objectId,
 				const QString& name,
@@ -109,15 +101,6 @@ public:
 	virtual bool SetObjectMetaInfo(
 				const QByteArray& objectId,
 				const idoc::IDocumentMetaInfo& dataMetaInfo,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
-	virtual bool GetObject(
-				const QByteArray& objectId,
-				imtbase::IObjectCollection::DataPtr) const override;
-	virtual bool SetObject(
-				const QByteArray& objectId,
-				const istd::IChangeable& object,
-				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
-				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual bool RemoveObject(
 				const QByteArray& objectId,
@@ -134,9 +117,9 @@ public:
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 
 protected:
-	virtual IGqlRequest* CreateGetElementType(const QByteArray& elementId) const;
-	virtual IGqlRequest* CreateGetNodeInfoRequest(const QByteArray& nodeId) const;
-	virtual IGqlRequest* CreateGetObjectInfoRequest(const QByteArray& objectId) const;
+	virtual IGqlRequest* CreateGetElementType(const QByteArray& elementId) const override;
+	virtual IGqlRequest* CreateGetNodeInfoRequest(const QByteArray& nodeId) const override;
+	virtual IGqlRequest* CreateGetObjectInfoRequest(const QByteArray& objectId) const override;
 
 	virtual IGqlRequest* CreateInsertNodeRequest(
 				const QString& name,
@@ -144,43 +127,43 @@ protected:
 				const QByteArray& proposedNodeId = QByteArray(),
 				const QByteArray& parentNodeId = QByteArray(),
 				const idoc::IDocumentMetaInfo* metaInfoPtr = nullptr,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const;
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual IGqlRequest* CreateSetNodeNameRequest(
 				const QByteArray& nodeId,
 				const QString& name,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const;
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual IGqlRequest* CreateSetNodeDescriptionRequest(
 				const QByteArray& nodeId,
 				const QString& description,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const;
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual IGqlRequest* CreateSetNodeMetaInfoRequest(
 				const QByteArray& nodeId,
 				const idoc::IDocumentMetaInfo& metaInfo,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const;
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual IGqlRequest* CreateMoveNodeRequest(
 				const QByteArray& nodeId,
 				const QByteArray& parentNodeId,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const;
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual IGqlRequest* CreateRemoveNodeRequest(
 				const QByteArray& nodeId,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const;
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 
 	virtual IGqlRequest* CreateAddObjectToNodeRequest(
 				const QByteArray& objectId,
 				const QByteArray& nodeId,
 				int clientVersion = -1,
-				const imtbase::IOperationContext* operationContextPtr = nullptr);
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
 	virtual IGqlRequest* CreateMoveObjectToNodeRequest(
 				const QByteArray& objectId,
 				const QByteArray& nodeId,
 				const QByteArray& newNodeId,
 				int clientVersion = -1,
-				const imtbase::IOperationContext* operationContextPtr = nullptr);
+				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
 	virtual IGqlRequest* CreateRemoveObjectFromNodeRequest(
 				const QByteArray& objectId,
 				const QByteArray& nodeId,
 				int clientVersion = -1,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const;
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 
 	virtual IGqlRequest* CreateInsertObjectRequest(
 				const QByteArray& typeId,
@@ -192,23 +175,23 @@ protected:
 				const QByteArray& nodeId = QByteArray(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const;
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual IGqlRequest* CreateSetObjectNameRequest(
 				const QByteArray& objectId,
 				const QString& name,
 				int clientVersion = -1,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const;
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual IGqlRequest* CreateSetObjectDescriptionRequest(
 				const QByteArray& objectId,
 				const QString& description,
 				int clientVersion = -1,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const;
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual IGqlRequest* CreateSetObjectMetaInfoRequest(
 				const QByteArray& objectId,
 				const idoc::IDocumentMetaInfo& metaInfo,
 				int clientVersion = -1,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const;
-	virtual IGqlRequest* CreateGetObjectRequest(const QByteArray& objectId) const;
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
+	virtual IGqlRequest* CreateGetObjectRequest(const QByteArray& objectId) const override;
 	virtual IGqlRequest* CreateSetObjectRequest(
 				const QByteArray& objectId,
 				const istd::IChangeable* objectPtr,
@@ -216,21 +199,18 @@ protected:
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
 				int clientVersion = -1,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const;
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual IGqlRequest* CreateRemoveObjectRequest(
 				const QByteArray& objectId,
 				int clientElementVersion = -1,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const;
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 
 	virtual imtgql::IGqlRequest* CreateGetElementCountRequest(
-				const iprm::IParamsSet* selectionParamsPtr = nullptr) const;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 	virtual imtgql::IGqlRequest* CreateGetElementListRequest(
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr) const;
-
-
-	virtual IGqlResponse* CreateResponse(const IGqlRequest& request) const = 0;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 
 protected:
 	I_MULTIATTR(QByteArray, m_objectTypeIdsAttrPtr);
