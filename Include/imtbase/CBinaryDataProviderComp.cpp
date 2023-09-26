@@ -1,5 +1,6 @@
 #include <imtbase/CBinaryDataProviderComp.h>
 
+
 // Qt includes
 #include <QtCore/QRegularExpression>
 #include <QtCore/QRegularExpressionMatch>
@@ -65,9 +66,9 @@ bool CBinaryDataProviderComp::GetData(QByteArray& data, const QByteArray& dataId
 			destinationFileAbsoluteFilePath.chop(1);
 		}
 
-		if (destinationEntry.suffix().isEmpty()){
-			destinationFileAbsoluteFilePath += ".svg";
-		}
+//		if (destinationEntry.suffix().isEmpty()){
+//			destinationFileAbsoluteFilePath += ".svg";
+//		}
 
 		QFile destinationFile(destinationFileAbsoluteFilePath);
 

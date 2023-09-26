@@ -28,7 +28,6 @@ public:
 	I_BEGIN_COMPONENT(CBinaryDataProviderComp);
 		I_REGISTER_INTERFACE(IBinaryDataProvider);
 		I_ASSIGN(m_homeDirPathAttrPtr, "HomePath", "Home path", false, "HomePath");
-//		I_ASSIGN(m_homeDirPathAttrPtr, "HomePath", "Home path", true, QDir::currentPath());
 		I_ASSIGN(m_pathsProblemsAutoSolveAttrPtr, "AutoSolvePathsProblems", "If 'true' servelt'll automatically solve paths problems", true, true);
 		I_ASSIGN(m_fileTemplatePathCompPtr, "FileTemplateHomePath", "FileTemplate based Home path\n Note: type is ignored only value matters \n Warning: overwrites HomePath!", false, "FileTemplatePath");
 	I_END_COMPONENT
@@ -36,12 +35,10 @@ public:
 	// reimplemented (IBinaryDataProvider)
 	virtual bool GetData(QByteArray& data, const QByteArray& dataId) const override;
 
-private:
-//	I_ATTR (QString, m_homeDirPathAttrPtr);
+protected:
 	I_REF (ifile::IRelativeFilePath, m_homeDirPathAttrPtr);
 	I_ATTR (bool, m_pathsProblemsAutoSolveAttrPtr);
 	I_REF(ifile::IFileNameParam, m_fileTemplatePathCompPtr);
-//	I_REF(ifile::IRelativeFilePath, m_relativeFilePathCompPtr);
 };
 
 
