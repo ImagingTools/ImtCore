@@ -114,9 +114,11 @@ public:
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
 	virtual bool GetObject(
 				const QByteArray& objectId,
+				const QByteArray& typeId,
 				imtbase::IObjectCollection::DataPtr objectPtr) const = 0;
 	virtual bool SetObject(
 				const QByteArray& objectId,
+				const QByteArray& typeId,
 				const istd::IChangeable& object,
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,

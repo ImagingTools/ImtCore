@@ -13,7 +13,7 @@ QByteArrayList CGqlObjectCollectionDelegateCompBase::GetSupportedObjectTypeIds()
 {
 	QByteArrayList ids;
 	if (m_objectTypeIdsAttrPtr.IsValid()) {
-		for (int i = 0; m_objectTypeIdsAttrPtr.GetCount(); i++){
+		for (int i = 0; i < m_objectTypeIdsAttrPtr.GetCount(); i++){
 			QByteArray id = m_objectTypeIdsAttrPtr[i];
 			if (!id.isEmpty()) {
 				if (!ids.contains(id)) {

@@ -190,7 +190,7 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 private:
-	IObjectCollection::DataPtr GetDocument(const QByteArray& typeId, const QByteArray& documentId) const;
+	IObjectCollection::DataPtr GetObject(const QByteArray& objectId, const QByteArray& typeId) const;
 	bool GetElementType(const QByteArray& elementId, ElementType& valueOut) const;
 	bool GetNodeInfo(const QByteArray& nodeId, IGqlStructuredCollectionResponse::NodeInfo& valueOut) const;
 	bool GetObjectInfo(const QByteArray& objectId, IGqlStructuredCollectionResponse::ObjectInfo& valueOut) const;

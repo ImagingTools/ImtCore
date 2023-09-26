@@ -98,7 +98,7 @@ QByteArray CGqlObjectCollectionComp::InsertNewObject(
 			const imtbase::IOperationContext* operationContextPtr)
 {
 	if (m_delegateCompPtr.IsValid()){
-		return m_delegateCompPtr->InsertObject(
+		QByteArray objectId = m_delegateCompPtr->InsertObject(
 					typeId,
 					name,
 					description,
@@ -108,6 +108,16 @@ QByteArray CGqlObjectCollectionComp::InsertNewObject(
 					dataMetaInfoPtr,
 					elementMetaInfoPtr,
 					operationContextPtr);
+
+		if (!objectId.isEmpty()){
+			istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
+			imtbase::ICollectionInfo::ElementInsertInfo insertInfo;
+			insertInfo.elementId = objectId;
+			changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_INSERTED, QVariant::fromValue(insertInfo));
+			istd::CChangeNotifier notifier(this, &changeSet);
+		}
+
+		return objectId;
 	}
 
 	return QByteArray();
@@ -406,7 +416,7 @@ bool CGqlObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dataPt
 {
 	QByteArray typeId = GetObjectTypeId(objectId);
 
-	DataPtr retVal = GetDocument(typeId, objectId);
+	DataPtr retVal = GetObject(objectId, typeId);
 	if (retVal.IsValid()){
 		dataPtr = retVal;
 
@@ -428,6 +438,7 @@ bool CGqlObjectCollectionComp::SetObjectData(
 		if (GetObjectInfo(objectId, info)){
 			if (m_delegateCompPtr->SetObject(
 						objectId,
+						info.typeId,
 						object,
 						nullptr,
 						nullptr,
@@ -719,20 +730,17 @@ void CGqlObjectCollectionComp::OnComponentDestroyed()
 
 // private methods
 
-imtbase::IObjectCollection::DataPtr CGqlObjectCollectionComp::GetDocument(
-			const QByteArray& typeId,
-			const QByteArray& documentId) const
+imtbase::IObjectCollection::DataPtr CGqlObjectCollectionComp::GetObject(
+			const QByteArray& objectId,
+			const QByteArray& typeId) const
 {
 	imtbase::IObjectCollection::DataPtr documentPtr;
 
 	if (m_delegateCompPtr.IsValid()){
-		imtgql::IGqlStructuredCollectionResponse::ObjectInfo info;
-		if (GetObjectInfo(documentId, info)){
-			imtbase::IObjectCollection::DataPtr documentPtr = CreateObjectInstance(info.typeId);
-			if (documentPtr.IsValid()){
-				if (m_delegateCompPtr->GetObject(documentId, documentPtr)){
-					return documentPtr;
-				}
+		imtbase::IObjectCollection::DataPtr documentPtr = CreateObjectInstance(typeId);
+		if (documentPtr.IsValid()){
+			if (m_delegateCompPtr->GetObject(objectId, typeId, documentPtr)){
+				return documentPtr;
 			}
 		}
 	}
