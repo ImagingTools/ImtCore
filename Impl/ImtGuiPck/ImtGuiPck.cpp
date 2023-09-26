@@ -192,6 +192,11 @@ I_EXPORT_COMPONENT(
 			"The Ui, that combines different editors for model",
 			"Multi Parameters Editor Gui Observer" IM_CATEGORY(I_GUI) IM_AUTHOR("\"Sergey Zastrovnyh\""));
 
+I_EXPORT_COMPONENT(
+			IconDataProvider,
+			"Component for providing icons",
+			"Icon Provider");
+
 
 } // namespace ImtGuiPck
 

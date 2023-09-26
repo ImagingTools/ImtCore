@@ -42,6 +42,7 @@
 #include <imtgui/CGuiElementModelComp.h>
 #include <imtgui/CGuiElementContainerComp.h>
 #include <imtgui/CMultiParamsSetGuiComp.h>
+#include <imtgui/CIconDataProviderComp.h>
 
 
 /**
@@ -87,6 +88,7 @@ typedef icomp::TModelCompWrap<imtgui::CStandardClientAreaProviderComp> StandardC
 typedef imtgui::CGuiElementModelComp GuiElementModel;
 typedef imtgui::CGuiElementContainerComp GuiElementContainer;
 typedef imtgui::CMultiParamsSetGuiComp MultiParamsSetGui;
+typedef imtgui::CIconDataProviderComp IconDataProvider;
 
 
 } // namespace ImtGuiPck
