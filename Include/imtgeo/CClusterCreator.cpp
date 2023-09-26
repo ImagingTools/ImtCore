@@ -92,7 +92,7 @@ imtbase::CTreeItemModel *CClusterCreator::createMapClusterModel(imtbase::CTreeIt
             y_j = coordToMercator(coor_j).second;
 
             int num = itemsModel->GetData("numClaster", i).toInt();
-            double dist = std::sqrtf((x_i - x_j)*(x_i - x_j) + (y_i - y_j)*(y_i - y_j));
+            double dist = sqrtf((x_i - x_j)*(x_i - x_j) + (y_i - y_j)*(y_i - y_j));
 
             bool toCluster = std::fabs(dist) < limit;
 
@@ -307,7 +307,7 @@ QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentif
 
 
             int num = itemsModel->GetData("numClaster", i).toInt();
-            double dist = std::sqrtf((x_i - x_j)*(x_i - x_j) + (y_i - y_j)*(y_i - y_j));
+            double dist = sqrtf((x_i - x_j)*(x_i - x_j) + (y_i - y_j)*(y_i - y_j));
 
             bool toCluster = std::fabs(dist) < limit;
 
