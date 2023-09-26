@@ -2,20 +2,16 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5083" Description="ACF"/>
-            <Version Id="1" Number="2188" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5105" Description="ACF"/>
+            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ClientApplication" X="675" Y="425" Note=""/>
-        <Element ComponentName="ControlsGalleryLocalization" X="575" Y="600" Note=""/>
-        <Element ComponentName="ControlsGalleryServer" X="850" Y="225" Note=""/>
-        <Element ComponentName="LocalSettings" X="850" Y="600" Note=""/>
-        <Element ComponentName="LogFilePath" X="250" Y="425" Note=""/>
-        <Element ComponentName="LogSystemLocation" X="250" Y="600" Note=""/>
-        <Element ComponentName="TextFileLog" X="225" Y="225" Note=""/>
-        <Element ComponentName="VersionInfo" X="1100" Y="425" Note=""/>
+        <Element ComponentName="ClientApplication" X="550" Y="400" Note=""/>
+        <Element ComponentName="ControlsGalleryServer" X="575" Y="175" Note=""/>
+        <Element ComponentName="LocalSettings" X="575" Y="625" Note=""/>
+        <Element ComponentName="VersionInfo" X="1050" Y="200" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

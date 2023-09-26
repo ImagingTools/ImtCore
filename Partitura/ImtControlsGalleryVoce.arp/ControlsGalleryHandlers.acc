@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5105" Description="ACF"/>
+            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="ApplicationController" PackageId="ImtControlsGalleryVoce" ComponentId="RootDataController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="ApplicationInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="RemoteContextGQLServerFramework" PackageId="ImtHttpServerVoce" ComponentId="RemoteAuthorizableGQLServerFramework">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="BackupSettings" Type="Reference" ExportId="BackupSettings">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CacheClearingInterval" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="60"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FileAccessCommandId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="ControlsGallery/Views*"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GqlRequestHandler" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>ApplicationController</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GraphQlCommandId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="ControlsGallery/graphql"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HttpCommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>ControlsGallery/Views*</Value>
+                                <Value></Value>
+                                <Value>ControlsGallery/graphql</Value>
+                                <Value>ControlsGallery/files*</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LogPath" Type="Reference" ExportId="LogPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RedirectToCommandId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="ControlsGallery/Views/html/index.html?item=Pages/StartPage.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WebCommandId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="ControlsGallery/Views*"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="ApplicationController"/>
+        <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="RemoteContextGQLServerFramework"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="RemoteContextGQLServerFramework"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

@@ -8,9 +8,8 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="Design" X="925" Y="400" Note=""/>
-        <Element ComponentName="General" X="600" Y="200" Note=""/>
-        <Element ComponentName="Language" X="250" Y="400" Note=""/>
+        <Element ComponentName="ApplicationController" X="575" Y="350" Note=""/>
+        <Element ComponentName="RemoteContextGQLServerFramework" X="575" Y="125" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

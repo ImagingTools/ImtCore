@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5104" Description="ACF"/>
+            <Version Id="0" Number="5105" Description="ACF"/>
             <Version Id="1" Number="2195" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -90,6 +90,21 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="IconDataProvider" PackageId="ImtGuiPck" ComponentId="IconDataProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HomePath" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ResourcesPath"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="LogFileDataProvider" PackageId="ImtCorePck" ComponentId="BinaryDataProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -157,7 +172,11 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="BinaryDataControllers" Type="Reference[]" ExportId="BinaryDataControllers">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RestoringDatabaseController</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="BinaryDataProviders" Type="Reference[]" ExportId="BinaryDataProviders">
                         <Data IsEnabled="true">
@@ -185,6 +204,7 @@
                     <AttributeInfo Id="BinaryDataProviders" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value>IconDataProvider</Value>
                                 <Value>RessourcesProvider</Value>
                             </Values>
                         </Data>
