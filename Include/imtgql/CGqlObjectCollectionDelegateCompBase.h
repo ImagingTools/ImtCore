@@ -28,6 +28,7 @@ public:
 
 	I_BEGIN_BASE_COMPONENT(CGqlObjectCollectionDelegateCompBase);
 		I_REGISTER_INTERFACE(IGqlObjectCollectionDelegate);
+		I_REGISTER_INTERFACE(IGqlObjectCollectionRequestDelegate);
 		I_ASSIGN_MULTI_0(m_objectTypeIdsAttrPtr, "ObjectTypeIds", "ID of the supported object type for this delegate", true);
 		I_ASSIGN(m_clientCompPtr, "ApiClient", "GraphQL API client", true, "ApiClient");
 	I_END_COMPONENT;
