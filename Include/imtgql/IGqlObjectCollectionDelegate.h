@@ -134,8 +134,6 @@ public:
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
-
-	virtual IGqlResponse* CreateResponse(const IGqlRequest& request) const = 0;
 };
 
 

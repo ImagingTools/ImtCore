@@ -20,8 +20,8 @@ namespace imtgql
 
 class CGqlObjectCollectionDelegateCompBase:
 			public ilog::CLoggerComponentBase,
-	virtual public IGqlObjectCollectionDelegate,
-	virtual public IGqlObjectCollectionRequestDelegate
+			virtual public IGqlObjectCollectionDelegate,
+			virtual public IGqlObjectCollectionRequestDelegate
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
