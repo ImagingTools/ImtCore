@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0;
+import imtqml 1.0;
 
 Item {
     id: container;
@@ -19,8 +20,8 @@ Item {
     property int checkState: Qt.Unchecked;
     property alias imageSource: image.source;
 
-    property string imageSourceActive: "../../../Icons/" + Style.theme + "/Ok_On_Normal.svg";
-    property string imageSourceNotActive: "../../../Icons/" + Style.theme + "/Ok_On_Disabled.svg";
+    property string imageSourceActive: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal);
+    property string imageSourceNotActive: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.Off, Icon.Mode.Disabled);
 
     property alias text: checkBoxText.text;
     property alias textObj: checkBoxText;

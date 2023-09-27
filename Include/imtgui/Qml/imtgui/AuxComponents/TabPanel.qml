@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtqml 1.0
 
 Rectangle {
     id: tabPanelContainer;
@@ -109,7 +110,8 @@ Rectangle {
 
             iconHeight: 10;
             iconWidth: 10;
-            iconSource: "../../../" + "Icons/" + Style.theme + "/Left_On_Normal.svg";
+
+            iconSource: "../../../" +  Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal);
             borderColor: Style.buttonColor;
 
             onClicked: {
@@ -130,7 +132,7 @@ Rectangle {
             hasText: false;
             iconHeight: 10;
             iconWidth: 10;
-            iconSource: "../../../" + "Icons/" + Style.theme + "/Right_On_Normal.svg";
+            iconSource: "../../../" +  Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal);
             borderColor: Style.buttonColor;
 
             onClicked: {

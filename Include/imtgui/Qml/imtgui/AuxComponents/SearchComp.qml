@@ -616,7 +616,7 @@ Rectangle{
 
         highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
-        iconSource: "../../../Icons/" + Style.theme + "/Close.svg";
+        iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
         visible: searchTextField.currentText !== "" && !searchTextField.openST;
         enabled: visible;

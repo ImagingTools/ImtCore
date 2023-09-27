@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5075" Description="ACF"/>
-            <Version Id="1" Number="2183" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5105" Description="ACF"/>
+            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -247,7 +247,7 @@
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="IconPath" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="Close"/>
+                                    <Data IsEnabled="true" Value="Icons/Close"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="Id" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="Close"/>
@@ -310,7 +310,7 @@
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="IconPath" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="Redo"/>
+                                    <Data IsEnabled="true" Value="Icons/Redo"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="Id" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="Redo"/>
@@ -401,7 +401,7 @@
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="IconPath" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="Save"/>
+                                    <Data IsEnabled="true" Value="Icons/Save"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="Id" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="Save"/>
@@ -419,7 +419,7 @@
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="IconPath" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="Undo"/>
+                                    <Data IsEnabled="true" Value="Icons/Undo"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="Id" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="Undo"/>
@@ -485,7 +485,7 @@
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="IconPath" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="Edit"/>
+                                    <Data IsEnabled="true" Value="Icons/Edit"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="Id" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="Edit"/>
@@ -503,7 +503,7 @@
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="IconPath" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="Add"/>
+                                    <Data IsEnabled="true" Value="Icons/Add"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="Id" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="New"/>
@@ -524,7 +524,7 @@
                         <Data IsEnabled="true" Flags="0">
                             <AttributeInfoMap>
                                 <AttributeInfo Id="IconPath" Type="Text" ExportId="">
-                                    <Data IsEnabled="true" Value="Delete"/>
+                                    <Data IsEnabled="true" Value="Icons/Delete"/>
                                 </AttributeInfo>
                                 <AttributeInfo Id="Id" Type="Id" ExportId="">
                                     <Data IsEnabled="true" Value="Remove"/>

@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5075" Description="ACF"/>
-            <Version Id="1" Number="2183" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5105" Description="ACF"/>
+            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -19,6 +19,19 @@
         <Element ComponentName="UserGroupsHeadersDataProvider" X="775" Y="550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
+        <EmbededRegistry Id="UsersCommands">
+            <PositionMap>
+                <Element ComponentName="CheckPermissionOr" X="775" Y="400" Note=""/>
+                <Element ComponentName="Commands" X="275" Y="225" Note=""/>
+                <Element ComponentName="CommandsRepresentation" X="1025" Y="225" Note=""/>
+                <Element ComponentName="Edit" X="525" Y="400" Note=""/>
+                <Element ComponentName="GroupsCommandsController" X="575" Y="50" Note=""/>
+                <Element ComponentName="New" X="100" Y="400" Note=""/>
+                <Element ComponentName="Remove" X="300" Y="400" Note=""/>
+                <Element ComponentName="UsersCommandPermissions" X="1025" Y="400" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
         <EmbededRegistry Id="UserCommands">
             <PositionMap>
                 <Element ComponentName="CheckPermissionOr" X="775" Y="425" Note=""/>
@@ -31,19 +44,6 @@
                 <Element ComponentName="Save" X="100" Y="600" Note=""/>
                 <Element ComponentName="Undo" X="100" Y="425" Note=""/>
                 <Element ComponentName="UserGroupCommandPermissions" X="1050" Y="425" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
-        <EmbededRegistry Id="UsersCommands">
-            <PositionMap>
-                <Element ComponentName="CheckPermissionOr" X="775" Y="400" Note=""/>
-                <Element ComponentName="Commands" X="275" Y="225" Note=""/>
-                <Element ComponentName="CommandsRepresentation" X="1025" Y="225" Note=""/>
-                <Element ComponentName="Edit" X="525" Y="400" Note=""/>
-                <Element ComponentName="GroupsCommandsController" X="575" Y="50" Note=""/>
-                <Element ComponentName="New" X="100" Y="400" Note=""/>
-                <Element ComponentName="Remove" X="300" Y="400" Note=""/>
-                <Element ComponentName="UsersCommandPermissions" X="1025" Y="400" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

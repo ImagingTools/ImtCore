@@ -132,22 +132,22 @@ Rectangle {
 
             property string pageName: model["Name"];
             onPageNameChanged: {
-//                if (pageName !== model["Name"]){
-                    Events.sendEvent("PageNameChanged", {"Id": model["Id"], "Name": model["Name"]})
-//                }
+                Events.sendEvent("PageNameChanged", {"Id": model["Id"], "Name": model["Name"]})
             }
 
             text:  model["Name"];
             textColor: Style.textColor;
             fontName: menuPanel.fontName;
-            imageSource: (highlighted || selected) ? "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_On_Selected.svg":
-                                                     "../../../" + "Icons/" + Style.theme + "/" + model["Icon"] + "_On_Normal.svg";
+
+            imageSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["Icon"], "On", "Selected"):
+                                                     "../../../" + Style.getIconPath(model["Icon"], "On", "Normal");
+
             decoratorSource : Style.menuButtonDecoratorPath;
             selected: menuPanel.activePageIndex === model.index;
             property string pageId: model["Id"];
 
             onClicked: {
-//                lvPages.currentIndex = model.index;
+                //                lvPages.currentIndex = model.index;
                 console.log("MenuPanel onClicked", model.index);
                 menuPanel.activePageIndex = model.index;
                 menuPanel.activePageName = model["Name"];

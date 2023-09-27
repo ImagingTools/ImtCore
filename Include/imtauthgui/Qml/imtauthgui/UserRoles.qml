@@ -14,12 +14,10 @@ Item {
     property int radius: 3;
 
     Component.onCompleted: {
-//        rolesProvider.updateModel({"ProductId" : window.productId});
         rolesProvider.updateModel();
     }
 
     onDocumentModelChanged: {
-//        rolesProvider.updateModel({"ProductId" : window.productId});
         rolesProvider.updateModel();
     }
 
@@ -153,29 +151,6 @@ Item {
         }
     }
 
-//    AuxButton {
-//        id: addProduct;
-
-//        anchors.top: parent.top;
-//        anchors.left: parent.left;
-
-//        height: 22;
-//        width: height;
-
-//        iconSource: "../../../Icons/" + Style.theme + "/Add_On_Normal.svg";
-
-//        gradient: Gradient {
-//            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
-//            GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
-//            GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
-//            GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
-//        }
-//        onClicked: {
-
-////            documentManager.
-//        }
-//    }
-
     AuxTable {
         id: rolesTable;
 
@@ -184,7 +159,6 @@ Item {
         anchors.bottom: parent.bottom;
         anchors.bottomMargin: 10;
         anchors.left: parent.left;
-//        anchors.leftMargin: 10;
 
         width: 400;
 

@@ -219,7 +219,7 @@ Item {
 
             anchors.fill: parent;
 
-            source: "../../../../" + "Icons/" + Style.theme + "/" + "Close" + "_On_Normal.svg";
+            source: "../../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
             sourceSize.width: width;
             sourceSize.height: height;

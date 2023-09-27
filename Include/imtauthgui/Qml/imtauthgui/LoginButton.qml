@@ -19,7 +19,7 @@ Item {
         width: 24;
         height: 24;
 
-        iconSource: "../../../Icons/" + Style.theme + "/Account.svg";
+        iconSource: "../../../" + Style.getIconPath("Icons/Account", Icon.State.On, Icon.Mode.Normal);
 
         onClicked: {
             var source = "AuxComponents/Dialogs/LoginDialog.qml";

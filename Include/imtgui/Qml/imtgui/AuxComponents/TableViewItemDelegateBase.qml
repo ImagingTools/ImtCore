@@ -1,11 +1,11 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtqml 1.0
 
 FocusScope {
     id: delegate;
 
     width: root ? root.width : 0;
-    //width: parent.width;
     height: root ? root.rowItemHeight : 0;
 
     visible: delegate.isVisible;
@@ -65,13 +65,6 @@ FocusScope {
             delegate.root.tableSelection.selectionChanged.connect(delegate.selectionChanged);
         }
     }
-
-//    onRootChanged:  {
-//        if (delegate.root){
-//            delegate.root._addItem(delegate);
-//            delegate.root.tableSelection.selectionChanged.connect(delegate.selectionChanged);
-//        }
-//    }
 
     function selectionChanged(){
         if (delegate.root){

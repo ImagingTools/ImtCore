@@ -1,11 +1,11 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtqml 1.0
 
 Item {
     id: filterPanelDecorator;
 
-//    height: 30;
     width: 325;
 
     property Item rootLoader: null;
@@ -80,7 +80,7 @@ Item {
 
             visible: tfc.text != "";
 
-            iconSource: "../../../" + "Icons/" + Style.theme + "/Close_On_Normal.svg";
+            iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
             iconWidth: Style.iconSizeExtraSmall;
             iconHeight: iconWidth;
 
@@ -99,7 +99,7 @@ Item {
         width: Style.buttonWidthMedium;
         height: width;
 
-        iconSource: "../../../" + "Icons/" + Style.theme + "/Close_On_Normal.svg";
+        iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
         iconWidth: Style.iconSizeSmall;
         iconHeight: iconWidth;

@@ -13,7 +13,7 @@ Item {
         width: Style.buttonWidthMedium;
         height: width;
 
-        iconSource: "../../../Icons/" + Style.theme + "/Settings_On_Normal.svg";
+        iconSource: "../../../" + Style.getIconPath("Icons/Settings", "On", "Normal");
 
         onClicked: {
             console.log("Preference button clicked !");

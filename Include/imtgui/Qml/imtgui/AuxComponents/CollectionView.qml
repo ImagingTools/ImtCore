@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtqml 1.0
 import imtlicgui 1.0
 
 Item {
@@ -141,8 +142,9 @@ Item {
 
     function fillContextMenuModel(){
         contextMenuModel.clear();
-        contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../../Icons/Light/Edit_On_Normal.svg"});
-        contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../Icons/Light/Remove_On_Normal.svg"});
+
+        contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../../" + Style.getIconPath("Icons/Edit", "On", "Normal")});
+        contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../" + Style.getIconPath("Icons/Remove", "On", "Normal")});
         contextMenuModel.append({"Id": "Rename", "Name": qsTr("Rename"), "IconSource": ""});
         contextMenuModel.append({"Id": "SetDescription", "Name": qsTr("Set Description"), "IconSource": ""});
     }
@@ -176,6 +178,8 @@ Item {
     }
 
     function selectItem(id, name, index){
+        Events.sendEvent("CommandsClearModel");
+
         let editorPath = collectionViewBase.commands.objectViewEditorPath;
         let commandsId = collectionViewBase.commands.objectViewEditorCommandsId;
         console.log("CollectionView selectItem", id, name, commandsId, editorPath);

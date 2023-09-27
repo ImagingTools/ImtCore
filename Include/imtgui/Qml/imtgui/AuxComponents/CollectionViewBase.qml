@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtqml 1.0
 
 Item {
     id: collectionViewBaseContainer;
@@ -259,7 +260,7 @@ Item {
                     iconWidth: Style.iconSizeSmall;
                     iconHeight: iconWidth;
 
-                    iconSource: "../../../" + "Icons/" + Style.theme + "/Filter_On_Normal.svg";
+                    iconSource: "../../../" + Style.getIconPath("Icons/Filter", Icon.State.On, Icon.Mode.Normal);
 
                     onClicked: {
                         filterMenuLocal.visible = !filterMenuLocal.visible;

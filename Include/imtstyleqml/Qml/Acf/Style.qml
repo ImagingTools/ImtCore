@@ -143,12 +143,6 @@ Item {
 
     property string menuPanelBackgroundColor: "#e2e2e8";
 
-    function getImageSource (name, styleTheme, buttonState, buttonMode)
-    {
-        var imageSource = "Icons/" + styleTheme + "/" + name + "_" + buttonState + "_" + buttonMode + ".svg";
-        return imageSource;
-    }
-
     FontLoader{
         id: mainFont;
         source: "../../Fonts/Ubuntu-Light.ttf";
@@ -157,6 +151,28 @@ Item {
     FontLoader{
         id: boldFont;
         source: "../../Fonts/Ubuntu-Medium.ttf";
+    }
+
+    function getIconPath(iconName, state, mode){
+        if (iconName.length > 0){
+            if (iconName.charAt(0) !== '/'){
+                iconName = '/' + iconName;
+            }
+        }
+
+        let iconPath = Style.theme + iconName;
+
+        if (state && state !== ""){
+            iconPath += "_" + state;
+        }
+
+        if (mode && mode !== ""){
+            iconPath += "_" + mode;
+        }
+
+        iconPath += ".svg";
+
+        return iconPath;
     }
 
     function getDesignScheme(theme){

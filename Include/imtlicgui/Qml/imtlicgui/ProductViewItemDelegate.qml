@@ -282,7 +282,7 @@ TreeViewItemDelegateBase {
                     width: 18;
                     height: width;
 
-                    iconSource: "../../../Icons/" + Style.theme + "/Add_On_Normal.svg";
+                    iconSource: "../../../" + Style.getIconPath("Icons/Add", Icon.State.On, Icon.Mode.Normal);
 
                     onClicked: {
                         console.log("onClicked");
@@ -312,7 +312,7 @@ TreeViewItemDelegateBase {
                     width: 18;
                     height: width;
 
-                    iconSource: "../../../Icons/" + Style.theme + "/Delete_On_Normal.svg";
+                    iconSource: "../../../" + Style.getIconPath("Icons/Delete", Icon.State.On, Icon.Mode.Normal);
 
                     onClicked: {
                         console.log("onClicked");

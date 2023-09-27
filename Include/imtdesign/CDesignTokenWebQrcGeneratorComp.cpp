@@ -137,7 +137,9 @@ bool CDesignTokenWebQrcGeneratorComp::CreateQrcForDirs(const QStringList& inputD
 		QString prefix = "/";
 		QStringList dirParts = dir.split(QDir::separator());
 		if (dirParts.size() > 2){
-			prefix += dirParts[dirParts.size() - 2] + '/' + dirParts[dirParts.size() - 1];
+			prefix += dirParts[dirParts.size() - 1];
+			prefix += "/";
+			prefix += dirParts[dirParts.size() - 2];
 		}
 		CreateSingleEntry(prefix, dir, GetPathOverFile(dir, outputFileName), xmlWriter);
 	}

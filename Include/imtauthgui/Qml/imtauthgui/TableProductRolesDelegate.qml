@@ -1,6 +1,7 @@
 import QtQuick 2.0
-import imtgui 1.0
 import Acf 1.0
+import imtgui 1.0
+import imtqml 1.0
 
 Item {
     id: productRolesDelegate;
@@ -93,7 +94,7 @@ Item {
 
             visible: productRolesDelegate.newIsEnabled;
 
-            iconSource: "../../../../" + "Icons/" + Style.theme + "/Add_Off_Normal.svg";
+            iconSource: "../../../../" + Style.getIconPath("Icons/Add", Icon.State.On, Icon.Mode.Normal);
 
             onClicked: {
                 console.log("productRolesDelegate.index", productRolesDelegate.index);

@@ -83,15 +83,23 @@ bool CIconDataProviderComp::GetData(QByteArray& data, const QByteArray& dataId) 
 			destinationFile.setFileName(destinationFileAbsoluteFilePath);
 			if (!destinationFile.open(QFile::ReadOnly)){
 				QString baseName = destinationEntry.baseName();
-				QStringList data = baseName.split('_');
-				if (data.size() >= 2){
-					data.removeLast();
-					data.removeLast();
+				if (baseName.contains('_')){
+					QStringList data = baseName.split('_');
+					if (data.size() >= 3){
+						QString newName = data[0];
+						QStringList fileData = destinationFileAbsoluteFilePath.split('/');
 
-					QString newName = data.join('_');
+						fileData.removeLast();
+						fileData << newName;
+
+						destinationFileAbsoluteFilePath = fileData.join('/');
+
+						destinationFile.setFileName(destinationFileAbsoluteFilePath);
+						if (!destinationFile.open(QFile::ReadOnly)){
+							return false;
+						}
+					}
 				}
-
-				return false;
 			}
 		}
 

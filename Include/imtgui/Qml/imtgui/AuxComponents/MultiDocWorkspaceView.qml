@@ -285,7 +285,6 @@ Item {
 
             if (documentBase.isDirty && !force){
                 tabPanelInternal.selectedIndex = index;
-                console.log("openDialog", callback);
 
                 cacheData.callback = callback;
 
@@ -298,7 +297,6 @@ Item {
 
                 workspaceView.documentsData.RemoveItem(index);
 
-                console.log("callback", callback);
                 if (callback){
                     callback(true);
                 }
@@ -547,15 +545,6 @@ Item {
 
             workspaceView.openErrorDialog(message);
         }
-
-//        onGetModelStateChanged: {
-//            if (getModelState === "Loading"){
-//                loading.start();
-//            }
-//            else{
-//                loading.stop();
-//            }
-//        }
 
         onSetModelStateChanged: {
             if (setModelState === "Loading"){

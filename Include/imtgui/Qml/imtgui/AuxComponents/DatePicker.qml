@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtqml 1.0
 
 Item {
     id: datePicker;
@@ -58,8 +59,8 @@ Item {
     //icons
     property int iconWidth: 12;
     property int iconHeight: 10;
-    property string iconUpSource: "../../../" + "Icons/" + Style.theme + "/" + "Up" + "_On_Normal.svg";
-    property string iconDownSource: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
+    property string iconUpSource: "../../../" + Style.getIconPath("Icons/Up", Icon.State.On, Icon.Mode.Normal);
+    property string iconDownSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
     //margins
     property int mainMargin: 0;
     //CustomTextField

@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0;
+import imtqml 1.0;
 
 Row {
     id: paginationContainer;
@@ -64,8 +65,8 @@ Row {
 
         enabled: listModel.count > 1 && paginationContainer.currentIndex != 0;
 
-        iconSource: buttonDecr.enabled ? "../../../" + "Icons/" + Style.theme + "/Left_On_Normal.svg":
-                                         "../../../" + "Icons/" + Style.theme + "/Left_Off_Disabled.svg";
+        iconSource: buttonDecr.enabled ? "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal):
+                                         "../../../" + Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled);
 
         onClicked: {
             if (paginationContainer.currentIndex >= 1){
@@ -125,8 +126,8 @@ Row {
 
         enabled: listModel.count > 1 && paginationContainer.currentIndex != paginationContainer.pagesSize - 1;
 
-        iconSource: buttonIncr.enabled ? "../../../" + "Icons/" + Style.theme + "/Right_On_Normal.svg":
-                                         "../../../" + "Icons/" + Style.theme + "/Right_Off_Disabled.svg";
+        iconSource: buttonIncr.enabled ? "../../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal):
+                                         "../../../../" + Style.getIconPath("Icons/Right", Icon.State.Off, Icon.Mode.Disabled);
 
         onClicked: {
             if (paginationContainer.currentIndex < paginationContainer.pagesSize - 1){

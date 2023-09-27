@@ -225,7 +225,7 @@ FocusScope {
 			width: 12;
 			height: 10;
 			rotation: comboBoxContainer.isOpen ? 180 : 0
-			source: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
+            source: "../../../" + Style.getIconPath("Icons/Down", "On", "Normal");
 
 			sourceSize.width: width;
 			sourceSize.height: height;

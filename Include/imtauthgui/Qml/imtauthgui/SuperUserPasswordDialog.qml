@@ -107,8 +107,11 @@ Dialog {
 
                     highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
-                    iconSource: inputField.echoMode == TextInput.Password ? "../../../Icons/" + Style.theme + "/HiddenPassword.svg" :
-                                          inputField.echoMode == TextInput.Normal ? "../../../Icons/" + Style.theme + "/ShownPassword.svg" : "";
+//                    iconSource: "../../.." + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal);
+
+
+                    iconSource: inputField.echoMode == TextInput.Password ? "../../../" + Style.getIconPath("Icons/HiddenPassword", Icon.State.On, Icon.Mode.Normal) :
+                                          inputField.echoMode == TextInput.Normal ? "../../../" + Style.getIconPath("Icons/ShownPassword", Icon.State.On, Icon.Mode.Normal) : "";
 
                     onClicked: {
                         if(inputField.echoMode == TextInput.Password){

@@ -8,7 +8,7 @@ Item {
     height: subPagesColumn.visible ? container.contentHeight + subPagesColumn.height : container.contentHeight;
 
     property string text: "Test";
-    property string imageSource: "../Icons/FeaturePackage.svg";
+    property string imageSource: "";
     property string textColor: "#335777";//"#191970"
     property string fontName: "";
 

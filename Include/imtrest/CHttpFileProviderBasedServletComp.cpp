@@ -133,7 +133,6 @@ ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
 	bool loadRes = false;
 
 	for (int i = 0; i < m_binaryDataProvidersCompPtr.GetCount(); ++i){
-
 		if ((loadRes = (m_binaryDataProvidersCompPtr[i]->GetData(body, commandIdFileName)))){
 			QByteArray fileSuffix;
 			int index = commandIdFileName.lastIndexOf('.');

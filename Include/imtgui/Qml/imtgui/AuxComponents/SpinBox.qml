@@ -14,7 +14,7 @@ Rectangle{
     border.width: 1;
     border.color: Style.color_gray;
 
-    property string icon: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
+    property string icon: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
     property int iconWidth: 5;
     property int iconHeight: 5;
 

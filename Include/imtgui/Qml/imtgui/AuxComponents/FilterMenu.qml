@@ -19,20 +19,17 @@ Rectangle {
     signal decoratorLoaded();
 
     onDecoratorSourceChanged: {
-        console.log("loaderDecorator.source", filterContainer.decoratorSource);
         loaderDecoratorObj.source = filterContainer.decoratorSource;
     }
 
     onVisibleChanged: {
         filterContainer.focus = filterContainer.visible;
         if (filterContainer.visible){
-            console.log("loaderDecoratorObj.item.focus = true");
             loaderDecoratorObj.item.focus = true;
         }
     }
 
     Keys.onPressed: {
-        console.log("Filter onPressed");
         if (event.key === Qt.Key_Escape){
             filterContainer.parent.visible = false;
         }
@@ -54,8 +51,6 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter;
 
         height: filterContainer.height;
-
-//        anchors.fill: parent;
 
         function textChanged(index, text){
             filterContainer.textFilterChanged(index, text);

@@ -318,10 +318,9 @@ Rectangle {
 
                     highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
-                    iconSource: passwordTextInput.echoMode == TextInput.Password ? "../../../Icons/" + Style.theme + "/ShownPassword.svg" : "../../../Icons/" + Style.theme + "/HiddenPassword.svg";
+                    iconSource: passwordTextInput.echoMode == TextInput.Password ? "../../../" + Style.getIconPath("Icons/ShownPassword", Icon.State.On, Icon.Mode.Normal) :
+                                                                                   "../../../" + Style.getIconPath("Icons/HiddenPassword", Icon.State.On, Icon.Mode.Normal) ;
 
-//                    iconSource: passwordTextInput.echoMode == TextInput.Password ? "../../../Icons/" + Style.theme + "/HiddenPassword.svg" :
-//                                                                                   passwordTextInput.echoMode == TextInput.Normal ? "../../../Icons/" + Style.theme + "/ShownPassword.svg" : "";
                     onClicked: {
                         if(passwordTextInput.echoMode == TextInput.Password){
                             passwordTextInput.echoMode = TextInput.Normal;

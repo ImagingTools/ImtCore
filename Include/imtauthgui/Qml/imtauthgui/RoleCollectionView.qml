@@ -79,6 +79,8 @@ CollectionView {
     }
 
     function selectItem(id, name){
+        Events.sendEvent("CommandsClearModel");
+
         let editorPath = baseCollectionView.commands.objectViewEditorPath;
         let commandsId = baseCollectionView.commands.objectViewEditorCommandsId;
 

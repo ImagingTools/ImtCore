@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtqml 1.0
 
 Item{
     id: tabDelegate;
@@ -14,7 +15,7 @@ Item{
     property bool isCloseEnable: true;
 
     property string text;
-    property string firstElementImageSource:  "../../../" + "Icons/" + Style.theme + "/" + "Workflow" + "_On_Normal.svg";
+    property string firstElementImageSource:  "";
 
     property string decoratorSource;
 
@@ -79,7 +80,8 @@ Item{
             sourceSize.height: height;
 
             fillMode: Image.PreserveAspectFit;
-            source: "../../../" + "Icons/" + Style.theme + "/" + "Close" + "_On_Normal.svg";
+
+            source: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
         }
 
         MouseArea{

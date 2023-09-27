@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtqml 1.0
 
 CollectionView {
     id: userCollectionViewContainer;
@@ -15,8 +16,8 @@ CollectionView {
 
     function fillContextMenuModel(){
         contextMenuModel.clear();
-        contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../../Icons/Light/Edit_On_Normal.svg"});
-        contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../Icons/Light/Remove_On_Normal.svg"});
+        contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../../" + Style.getIconPath("Icons/Edit", Icon.State.On, Icon.Mode.Normal)});
+        contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../" + Style.getIconPath("Icons/Remove", Icon.State.On, Icon.Mode.Normal)});
     }
 
     function onHeadersChanged(){
@@ -82,7 +83,7 @@ CollectionView {
                 width: 15;
                 height: width;
 
-                iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
+                iconSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
 
                 onClicked: {
                     console.log("Roles AuxButton onClicked");
@@ -159,7 +160,7 @@ CollectionView {
 
                 visible: name2.text !== "";
 
-                iconSource: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
+                iconSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
 
                 Component.onCompleted: {
                     arrowButton.tooltipItem.componentWidth = 300;

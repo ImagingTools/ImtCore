@@ -35,7 +35,6 @@ Item {
     property string nameId: "Name";
 
     property Component delegate: PopupMenuDelegate{
-
         width: popupMenuContainer.width;
         height: popupMenuContainer.itemHeight;
         textSize: popupMenuContainer.textSize;

@@ -157,14 +157,6 @@ Item {
         anchors.fill: parent;
     }
 
-    Loading {
-        id: loading;
-
-        anchors.fill: parent;
-
-        visible: false;
-    }
-
     GqlDocumentDataController {
         id: documentController;
 
@@ -219,5 +211,13 @@ Item {
                 }
             }
         }
+    }
+
+    Loading {
+        id: loading;
+
+        anchors.fill: parent;
+
+        visible: false;
     }
 }

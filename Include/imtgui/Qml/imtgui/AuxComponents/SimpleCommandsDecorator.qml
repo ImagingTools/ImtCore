@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtqml 1.0
 
 Item {
     id: container;
@@ -54,14 +55,12 @@ Item {
                     width: 18;
                     height: width;
 
-                    iconSource: enabled ? "../../../../Icons/Light/" + model.Icon + "_Off_Normal.svg" :
-                                                  "../../../../Icons/Light/" + model.Icon + "_Off_Disabled.svg";
+                    iconSource: enabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Normal) :
+                                                  "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Normal);
 
                     enabled: model.IsEnabled;
 
                     visible: model.Visible;
-
-//                    tooltipText: model.Name;
 
                     property string commandId: model.Id;
 

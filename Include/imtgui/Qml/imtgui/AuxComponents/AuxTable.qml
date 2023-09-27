@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtqml 1.0
 
 Rectangle {
     id: tableContainer;
@@ -26,7 +27,7 @@ Rectangle {
     property bool hoverEnabled: (Style.enableHoverEffect !== undefined && Style.enableHoverEffect !== null) ? Style.enableHoverEffect : true;
 
     property alias separatorVisible: bottomLine.visible;
-    property string sortIndicatorIcon: "../../../Icons/" + Style.theme + "/Down_On_Normal.svg";
+    property string sortIndicatorIcon: "../../../" +  Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
 
     property TreeItemModel headers : TreeItemModel{};
 
@@ -861,7 +862,6 @@ Rectangle {
                     sourceSize.height: height;
 
                     source: tableContainer.sortIndicatorIcon
-
                 }
 
                 ////

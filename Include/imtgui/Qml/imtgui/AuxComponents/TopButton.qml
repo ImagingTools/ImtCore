@@ -8,7 +8,7 @@ Item {
     height: 56;
     width: isEmpty ? 30 : 73;
 
-    property string imageSource: "../Icons/Add.svg";
+    property string imageSource: "";
     property string text: "New";
     property string textColor: Style.textColor;
     property string hint: "button";

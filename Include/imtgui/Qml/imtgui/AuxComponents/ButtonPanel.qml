@@ -227,9 +227,9 @@ Rectangle {
         buttonSizeRep.model = 0;
         buttonSizeRepVert.model = 0;
 
-        if (buttonPanel.buttonModel){
-            buttonPanel.buttonModel.Clear();
-        }
+//        if (buttonPanel.buttonModel){
+//            buttonPanel.buttonModel.Clear();
+//        }
 
         buttonPanel.horizontalModel.Clear();
         buttonPanel.verticalModel.Clear();

@@ -11,7 +11,7 @@ Item {
     property string firstElementImageSource: tabPanelDecorator.rootItem ? tabPanelDecorator.rootItem.firstElementImageSource : "";
     onFirstElementImageSourceChanged: {
         if (tabPanelDecorator.firstElementImageSource !== ""){
-            firsElementImage.source = "../../../Icons/" + Style.theme + "/" + tabPanelDecorator.firstElementImageSource + "_On_Normal.svg";
+            firsElementImage.source = "../../../" + Style.getIconPath(tabPanelDecorator.firstElementImageSource, Icon.State.On, Icon.Mode.Normal);
         }
     }
 

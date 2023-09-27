@@ -270,7 +270,7 @@ Item {
             width: 12;
             height: 10;
 
-            source: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
+            source: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
 
             sourceSize.width: width;
             sourceSize.height: height;

@@ -73,8 +73,6 @@ Item {
     Component.onDestruction: {
         Events.unSubscribeEvent(containerBase.commandsId + "CommandActivated", containerBase.commandHandle);
         if (containerBase.tableData){
-//            containerBase.tableData.rightButtonMouseClicked.disconnect(containerBase.openPopupMenu);
-//            containerBase.tableData.selectionChanged.disconnect(containerBase.selectionChanged);
         }
     }
 
@@ -274,17 +272,6 @@ Item {
             }
         }
     }
-
-//    ListModel {
-//        id: contextMenuModel;
-
-//        Component.onCompleted: {
-//            contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../../Icons/Light/Edit_On_Normal.svg"});
-//            contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../Icons/Light/Remove_On_Normal.svg"});
-//            contextMenuModel.append({"Id": "Rename", "Name": qsTr("Rename"), "IconSource": ""});
-//            contextMenuModel.append({"Id": "SetDescription", "Name": qsTr("Set Description"), "IconSource": ""});
-//        }
-//    }
 
     /**
         GQL Request for removing element from the collection by object id

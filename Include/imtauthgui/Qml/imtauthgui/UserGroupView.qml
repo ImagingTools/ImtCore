@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtqml 1.0
 
 DocumentBase {
     id: container;
@@ -123,7 +124,7 @@ DocumentBase {
             width: 25;
             height: width;
 
-            iconSource: "../../../Icons/" + Style.theme + "/Left_On_Normal.svg";
+            iconSource: "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal);
 
             onClicked: {
                 Events.sendEvent(container.documentUuid + "CommandActivated", "Close")

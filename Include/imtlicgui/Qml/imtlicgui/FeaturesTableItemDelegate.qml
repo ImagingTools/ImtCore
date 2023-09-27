@@ -71,8 +71,10 @@ Item {
                 width: 15;
                 height: width;
 
-                iconSource: model.Opened ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
-                                       "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
+                iconSource: model.Opened ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal) :
+                                       "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal);
+
+
 
                 visible: childModelRepeater.count > 0;
 
@@ -149,7 +151,7 @@ Item {
                 width: 18;
                 height: width;
 
-                iconSource: "../../../Icons/" + Style.theme + "/Add_On_Normal.svg";
+                iconSource: "../../../" + Style.getIconPath("Icons/Add", Icon.State.On, Icon.Mode.Normal);
 
                 onClicked: {
                     tableItemDelegate.buttonClicked();

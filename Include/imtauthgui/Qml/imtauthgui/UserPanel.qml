@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtqml 1.0
 
 Item {
     id: root;
@@ -80,7 +81,7 @@ Item {
 
         highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
-        iconSource: "../../../Icons/" + Style.theme + "/Account.svg";
+        iconSource: "../../../" + Style.getIconPath("Icons/Account", Icon.State.On, Icon.Mode.Normal);
 
         enabled: root.enabled;
 

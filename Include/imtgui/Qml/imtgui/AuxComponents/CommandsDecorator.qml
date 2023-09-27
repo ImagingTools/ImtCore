@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtqml 1.0
 
 Item {
     id: commandsDecoratorContainer;
@@ -11,11 +12,13 @@ Item {
     Component.onCompleted: {
         Events.subscribeEvent("Logout", commandsDecoratorContainer.clearModel);
         Events.subscribeEvent("SetCommandsVisible", commandsDecoratorContainer.setVisible);
+        Events.subscribeEvent("CommandsClearModel", commandsDecoratorContainer.clearModel);
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("Logout", commandsDecoratorContainer.clearModel);
         Events.unSubscribeEvent("SetCommandsVisible", commandsDecoratorContainer.setVisible);
+        Events.unSubscribeEvent("CommandsClearModel", commandsDecoratorContainer.clearModel);
     }
 
     function setCommandsModel(parameters){
@@ -53,7 +56,7 @@ Item {
         horizontalSpacing: 15;
         verticalSpacing: 10;
 
-        openButtonImageSource: "../../../Icons/" + Style.theme + "/Next_On_Active.svg"
+        openButtonImageSource: "../../../" + Style.getIconPath("Icons/Next", Icon.Mode.On, Icon.State.Active);
 
         centered: true;
 
@@ -69,8 +72,9 @@ Item {
                     id: topButtonDelegate;
 
                     decorator: Style.topButtonDecorator !==undefined ? Style.topButtonDecorator: defaultButtonDecorator;
-                    imageSource: model.IsEnabled ? "../../../../Icons/" + Style.theme + "/" + model.Icon + "_Off_Normal.svg" :
-                                                   "../../../../Icons/" + Style.theme + "/" + model.Icon + "_Off_Disabled.svg";
+
+                    imageSource: model.IsEnabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) :
+                                                   "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled);
 
                     enabled: model.IsEnabled;
 
@@ -154,9 +158,9 @@ Item {
                         hasText: false;
                         highlighted: false;
                         color: "transparent";
-                        iconSource: model.IsEnabled ? "../../../../Icons/" + Style.theme + "/" + model.Icon + "_Off_Normal.svg" :
-                                                       "../../../../Icons/" + Style.theme + "/" + model.Icon + "_Off_Disabled.svg";
 
+                        iconSource: model.IsEnabled !== "" ? (model.Icon !== "" ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) : "") :
+                                                       (model.Icon !== "" ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled) : "");
 
                         onClicked: {
                             Events.sendEvent(commandsDecoratorContainer.commandsId + "CommandActivated", model.Id);

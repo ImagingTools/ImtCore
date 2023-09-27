@@ -1,7 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
-
+import imtqml 1.0
 
 Rectangle {
     id: topPanelDialogContainer;
@@ -29,7 +29,7 @@ Rectangle {
         sourceSize.height: height;
         sourceSize.width: width;
 
-        source: "../../../../" + "Icons/" + Style.theme + "/LisaIcon.svg";
+        source: "../../../../" + Style.getIconPath("Icons/AppIcon", Icon.State.On, Icon.Mode.Normal)
 
         visible: topPanelDialogContainer.hasIcon;
     }
@@ -62,7 +62,7 @@ Rectangle {
         width: 20;
         height: 20;
 
-        iconSource: "../../../../" + "Icons/" + Style.theme + "/" + "Close" + "_" + "On" + "_" + "Normal" + ".svg";
+        iconSource: "../../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
         onClicked: {
             topPanelDialogContainer.closeButtonClicked("Exit");

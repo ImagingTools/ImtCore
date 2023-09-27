@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtqml 1.0
 
 TableViewItemDelegateBase {
     id: treeDelegateBase;
@@ -82,8 +83,8 @@ TableViewItemDelegateBase {
 
                     visible: treeDelegateBase.hasChild;
 
-                    iconSource: treeDelegateBase.isOpened ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
-                                                          "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
+                    iconSource: treeDelegateBase.isOpened ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal) :
+                                             "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal);
 
                     onClicked: {
                         treeDelegateBase.isOpened = !treeDelegateBase.isOpened;

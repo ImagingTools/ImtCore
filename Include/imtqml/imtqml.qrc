@@ -5,6 +5,7 @@
         <file alias="imtqml/JSONListModel.qml">Qml/imtqml/JSONListModel.qml</file>
         <file alias="imtqml/jsonpath.js">Qml/imtqml/jsonpath.js</file>
         <file alias="imtqml/GraphQLRequest.js">Qml/imtqml/GraphQLRequest.js</file>
+	<file alias="imtqml/Icon.js">Qml/imtqml/Icon.js</file>
         <file alias="imtqml/GqlModel.qml">Qml/imtqml/GqlModel.qml</file>
         <file alias="imtqml/qmldir">Qml/imtqml/qmldir</file>
         <file alias="imtqml/RemoteFileController.qml">Qml/imtqml/RemoteFileController.qml</file>
