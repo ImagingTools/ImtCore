@@ -177,13 +177,18 @@ public:
 		\param offset				[optional] Index offset of the first element
 		\param count				[optional] If positive, the number of elements should be returned.
 		\param selectionParamsPtr	[optional] Additional parameters for filtering/ordering elements.
-		\param parentId				[optional] Parent element ID. Entire filtering operation applies to the childs of this element only.
 	*/
 	virtual imtbase::IObjectCollection* CreateSubCollection(
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
 
+	/**
+		Create a collection iterator according to the given filtering/sorting parameters.
+		\param offset				[optional] Index offset of the first element
+		\param count				[optional] If positive, the number of elements should be returned.
+		\param selectionParamsPtr	[optional] Additional parameters for filtering/ordering elements.
+	*/
 	virtual imtbase::IObjectCollectionIterator* CreateObjectCollectionIterator(
 				int offset = 0,
 				int count = -1,
