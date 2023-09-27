@@ -173,7 +173,7 @@ public:
 				const IOperationContext* operationContextPtr = nullptr) = 0;
 
 	/**
-		Create sub collection of the whole collection according to the given filtering/sorting parameters.
+		Create a sub-collection (a subset) of the whole collection according to the given filtering/sorting parameters.
 		\param offset				[optional] Index offset of the first element
 		\param count				[optional] If positive, the number of elements should be returned.
 		\param selectionParamsPtr	[optional] Additional parameters for filtering/ordering elements.
