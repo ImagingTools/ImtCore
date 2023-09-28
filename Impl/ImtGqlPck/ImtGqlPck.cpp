@@ -15,11 +15,6 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
-			ApiClient,
-			"General API client",
-			"GraphQL API Client");
-
-I_EXPORT_COMPONENT(
 			GraphQLServlet,
 			"GraphQL servlet",
 			"GraphQL Receiver");
@@ -33,16 +28,6 @@ I_EXPORT_COMPONENT(
 			GraphQLDemultiplexer,
 			"GraphQLDemultiplexer",
 			"GraphQL Demultiplexer");
-
-I_EXPORT_COMPONENT(
-			GraphQLRemoteRepresentationController,
-			"GraphQL remote representation controller",
-			"GraphQL Gql Api Client Controller User");
-
-I_EXPORT_COMPONENT(
-			GraphQLClientEngine,
-			"GraphQLClientEngine",
-			"GraphQL Client Engine");
 
 I_EXPORT_COMPONENT(
 			GqlRepresentationDataController,
@@ -65,11 +50,6 @@ I_EXPORT_COMPONENT(
 			"Application Controller Representation");
 
 I_EXPORT_COMPONENT(
-			GqlObjectCollection,
-			"GraphQl based object collection",
-			"GraphQl Gql Object Collection");
-
-I_EXPORT_COMPONENT(
 			RemoteGqlContextController,
 			"Remote gql context controller",
 			"Remote Gql Context Controller");
@@ -78,11 +58,6 @@ I_EXPORT_COMPONENT(
 			GqlContextController,
 			"Gql context controller",
 			"Gql Context Controller");
-
-I_EXPORT_COMPONENT(
-			PumaGqlRemoteRepresentationController,
-			"Puma GraphQL remote representation controller",
-			"Puma GraphQL Gql Api Client Controller User");
 
 I_EXPORT_COMPONENT(
 			ObjectProvider,
@@ -99,7 +74,10 @@ I_EXPORT_COMPONENT(
 			"Simple GQL controller",
 			"GqlController");
 
-
+I_EXPORT_COMPONENT(
+			SerializableObjectCollectionController,
+			"Serializable object collection Gql controller for gql collection",
+			"GqlController Serializable Collection");
 } // namespace ImtGqlPck
 
 

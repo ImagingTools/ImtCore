@@ -25,6 +25,8 @@
 // ImtCore includes
 #include <imtbase/IPluginStatusMonitor.h>
 
+#undef SetDllDirectoryA
+
 
 namespace imtbase
 {

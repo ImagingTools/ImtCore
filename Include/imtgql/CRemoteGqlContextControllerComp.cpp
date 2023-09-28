@@ -1,19 +1,19 @@
 #include <imtgql/CRemoteGqlContextControllerComp.h>
 
-#include <QtCore/QThread>
 
 // ACF includes
 #include <iser/CJsonMemReadArchive.h>
-#include <iprm/CEnableableParam.h>
 
 // ImtCore includes
 #include <imtauth/CUserInfo.h>
-#include <imtauth/CSessionInfo.h>
 #include <imtgql/CGqlContext.h>
 
 
 namespace imtgql
 {
+
+
+QMutex s_mutex;
 
 
 // public methods
@@ -30,25 +30,14 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 			const QByteArray& token,
 			QString& errorMessage) const
 {
-	qptrdiff threadId = (qptrdiff)QThread::currentThreadId();
-
-	QString connectionName = QString("GetConnectionName - %1").arg(threadId);
-
-	if (m_threadName.isEmpty()){
-		m_threadName = connectionName;
-	}
-	else{
-		if (m_threadName != connectionName){
-			Q_ASSERT(false);
-		}
-	}
-
 	if (m_cacheMap.contains(token)){
 		istd::TDelPtr<imtgql::IGqlContext> gqlContextPtr;
 		gqlContextPtr.SetCastedOrRemove(m_cacheMap[token]->CloneMe());
 
 		return gqlContextPtr.PopPtr();
 	}
+
+	QMutexLocker lock(&s_mutex);
 
 	if (!m_gqlRequestHandlerCompPtr.IsValid()){
 		return nullptr;
@@ -139,8 +128,6 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 		retValPtr.SetCastedOrRemove(m_cacheMap[token]->CloneMe());
 
 		return retValPtr.PopPtr();
-
-//		return gqlContextPtr.PopPtr();
 	}
 
 	return nullptr;
@@ -157,10 +144,7 @@ void CRemoteGqlContextControllerComp::OnComponentCreated()
 
 	QObject::connect(&m_timer, &QTimer::timeout, this, &CRemoteGqlContextControllerComp::OnTimeout);
 
-	int interval = 60000;
-	if (m_cacheClearingIntervalAttrPtr.IsValid()){
-		interval = *m_cacheClearingIntervalAttrPtr * 1000;
-	}
+	int interval = m_cacheClearingIntervalAttrPtr.IsValid() ? *m_cacheClearingIntervalAttrPtr * 1000 : 60000;
 
 	if (m_cacheClearingIntervalParamCompPtr.IsValid()){
 		QString intervalText = m_cacheClearingIntervalParamCompPtr->GetText();

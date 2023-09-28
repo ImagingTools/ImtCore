@@ -18,7 +18,7 @@ namespace imtauthgql
 
 // protected methods
 
-// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
+// reimplemented (imtgql::CObjectCollectionControllerCompBase)
 
 QVariant CUserCollectionControllerComp::GetObjectInformation(const QByteArray &informationId, const QByteArray &objectId) const
 {

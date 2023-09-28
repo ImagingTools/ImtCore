@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtguigql/CObjectCollectionControllerCompBase.h>
+#include <imtgql/CObjectCollectionControllerCompBase.h>
 #include <imtlic/IProductInstanceInfo.h>
 #include <imtbase/IMetaInfoCreator.h>
 
@@ -11,10 +11,10 @@ namespace imtlicgql
 {
 
 
-class CInstallationControllerComp: public imtguigql::CObjectCollectionControllerCompBase
+class CInstallationControllerComp: public imtgql::CObjectCollectionControllerCompBase
 {
 public:
-	typedef imtguigql::CObjectCollectionControllerCompBase BaseClass;
+	typedef imtgql::CObjectCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CInstallationControllerComp)
 		I_ASSIGN(m_productInstanceFactCompPtr, "InstallationFactory", "Factory used for creation of the new product instance", true, "InstallationFactory");
@@ -22,7 +22,7 @@ public:
 	I_END_COMPONENT
 
 protected:
-	// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
+	// reimplemented (imtgql::CObjectCollectionControllerCompBase)
 	virtual imtbase::CTreeItemModel* GetObject(
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;

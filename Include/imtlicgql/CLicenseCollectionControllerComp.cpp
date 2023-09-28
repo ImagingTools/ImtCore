@@ -11,7 +11,7 @@ namespace imtlicgql
 
 // protected methods
 
-// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
+// reimplemented (imtgql::CObjectCollectionControllerCompBase)
 
 imtbase::CTreeItemModel* CLicenseCollectionControllerComp::ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {

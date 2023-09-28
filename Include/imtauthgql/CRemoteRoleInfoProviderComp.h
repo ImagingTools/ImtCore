@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtauth/IRoleInfoProvider.h>
-#include <imtgql/TClientRequestManagerCompWrap.h>
+#include <imtclientgql/TClientRequestManagerCompWrap.h>
 
 
 namespace imtauthgql
@@ -11,11 +11,11 @@ namespace imtauthgql
 
 
 class CRemoteRoleInfoProviderComp:
-			public imtgql::CClientRequestManagerCompBase,
+			public imtclientgql::CClientRequestManagerCompBase,
 			virtual public imtauth::IRoleInfoProvider
 {
 public:
-	typedef imtgql::CClientRequestManagerCompBase BaseClass;
+	typedef imtclientgql::CClientRequestManagerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteRoleInfoProviderComp)
 		I_REGISTER_INTERFACE(imtauth::IRoleInfoProvider);

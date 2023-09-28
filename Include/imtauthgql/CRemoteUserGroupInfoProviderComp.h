@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtauth/IUserGroupInfoProvider.h>
-#include <imtgql/TClientRequestManagerCompWrap.h>
+#include <imtclientgql/TClientRequestManagerCompWrap.h>
 
 
 namespace imtauthgql
@@ -11,11 +11,11 @@ namespace imtauthgql
 
 
 class CRemoteUserGroupInfoProviderComp:
-			public imtgql::CClientRequestManagerCompBase,
+			public imtclientgql::CClientRequestManagerCompBase,
 			virtual public imtauth::IUserGroupInfoProvider
 {
 public:
-	typedef imtgql::CClientRequestManagerCompBase BaseClass;
+	typedef imtclientgql::CClientRequestManagerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteUserGroupInfoProviderComp)
 		I_REGISTER_INTERFACE(imtauth::IUserGroupInfoProvider);

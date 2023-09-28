@@ -39,6 +39,7 @@ add_subdirectory("${INCLUDE_DIR}/imtdev/CMake" "${AUX_INCLUDE_DIR}/imtdev")
 add_subdirectory("${INCLUDE_DIR}/imtrest/CMake" "${AUX_INCLUDE_DIR}/imtrest")
 add_subdirectory("${INCLUDE_DIR}/imtgql/CMake" "${AUX_INCLUDE_DIR}/imtgql")
 add_dependencies(imtgql imtrest)
+add_subdirectory("${INCLUDE_DIR}/imtclientgql/CMake" "${AUX_INCLUDE_DIR}/imtclientgql")
 add_subdirectory("${INCLUDE_DIR}/imtauth/CMake" "${AUX_INCLUDE_DIR}/imtauth")
 add_subdirectory("${INCLUDE_DIR}/imtauthgui/CMake" "${AUX_INCLUDE_DIR}/imtauthgui")
 add_dependencies(imtauthgui DesignTokenCreator)
@@ -156,6 +157,9 @@ if(NOT ANDROID)
 	add_subdirectory("${IMPL_DIR}/ImtGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtGqlPck")
 	add_dependencies(ImtGqlPck imtgql)
 
+	add_subdirectory("${IMPL_DIR}/ImtClientGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtClientGqlPck")
+	add_dependencies(ImtClientGqlPck ImtGqlPck imtclientgql)
+
 	add_subdirectory("${IMPL_DIR}/ImtComPck/CMake" "${AUX_INCLUDE_DIR}/ImtComPck")
 	add_dependencies(ImtComPck imtcom)
 
@@ -216,7 +220,7 @@ if(NOT ANDROID)
 	if(NOT DEFINED USE_QTQML OR USE_QTQML)
 		add_subdirectory("${IMPL_DIR}/ImtQmlPck/CMake" "${AUX_INCLUDE_DIR}/ImtQmlPck")
 		add_dependencies(ImtQmlPck imtqml)
-		add_subdirectory("${IMPL_DIR}/ImtControlsGallery/CMake" "${AUX_INCLUDE_DIR}/ImtControlsGallery")
+#		add_subdirectory("${IMPL_DIR}/ImtControlsGallery/CMake" "${AUX_INCLUDE_DIR}/ImtControlsGallery")
 
 	endif()
 

@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtcom/IConnectionStatusProvider.h>
-#include <imtgql/TClientRequestManagerCompWrap.h>
+#include <imtclientgql/TClientRequestManagerCompWrap.h>
 
 
 namespace imtcom
@@ -11,11 +11,11 @@ namespace imtcom
 
 
 class CSimpleConnectionCheckerComp:
-			public imtgql::CClientRequestManagerCompBase,
+			public imtclientgql::CClientRequestManagerCompBase,
 			virtual public IConnectionStatusProvider
 {
 public:
-	typedef imtgql::CClientRequestManagerCompBase BaseClass;
+	typedef imtclientgql::CClientRequestManagerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSimpleConnectionCheckerComp);
 		I_REGISTER_INTERFACE(IConnectionStatusProvider);

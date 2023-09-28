@@ -30,6 +30,10 @@ public:
 		struct PathItem{
 			QByteArray id;
 			QString name;
+			bool operator ==(const PathItem& other) const
+			{
+				return (id == other.id) && (name == other.name);
+			}
 		};
 
 		QList<PathItem> path;

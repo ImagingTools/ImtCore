@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtguigql/CObjectCollectionControllerCompBase.h>
+#include <imtgql/CObjectCollectionControllerCompBase.h>
 #include <imtauth/IUserGroupInfo.h>
 
 
@@ -10,10 +10,10 @@ namespace imtauthgql
 {
 
 
-class CUserGroupCollectionControllerComp: public imtguigql::CObjectCollectionControllerCompBase
+class CUserGroupCollectionControllerComp: public imtgql::CObjectCollectionControllerCompBase
 {
 public:
-	typedef imtguigql::CObjectCollectionControllerCompBase BaseClass;
+	typedef imtgql::CObjectCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CUserGroupCollectionControllerComp);
 		I_ASSIGN(m_roleInfoProviderCompPtr, "RoleInfoProvider", "Role info provider", true, "RoleInfoProvider");
@@ -22,7 +22,7 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
+	// reimplemented (imtgql::CObjectCollectionControllerCompBase)
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual bool SetupGqlItem(
 			const imtgql::CGqlRequest& gqlRequest,

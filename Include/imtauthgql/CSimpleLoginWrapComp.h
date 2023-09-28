@@ -13,7 +13,7 @@
 #include <ibase/TRuntimeStatusHanderCompWrap.h>
 
 // ImtCore includes
-#include <imtgql/TClientRequestManagerCompWrap.h>
+#include <imtclientgql/TClientRequestManagerCompWrap.h>
 #include <imtbase/CTreeItemModel.h>
 #include <imtauth/IAccessTokenProvider.h>
 #include <imtauth/IPermissionChecker.h>
@@ -26,13 +26,13 @@ namespace imtauthgql
 
 
 class CSimpleLoginWrapComp:
-			public imtgql::CClientRequestManagerCompBase,
+			public imtclientgql::CClientRequestManagerCompBase,
 			public iauth::ILogin,
 			public iauth::IRightsProvider,
 			public imtauth::IAccessTokenProvider
 {
 public:
-	typedef imtgql::CClientRequestManagerCompBase BaseClass;
+	typedef imtclientgql::CClientRequestManagerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSimpleLoginWrapComp);
 		I_REGISTER_INTERFACE(ILogin);

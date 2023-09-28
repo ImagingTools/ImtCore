@@ -15,7 +15,7 @@ namespace imtlicgql
 
 // pretected methods
 
-// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
+// reimplemented (imtgql::CObjectCollectionControllerCompBase)
 
 istd::IChangeable* CPackageControllerComp::CreateObject(
 			const QList<imtgql::CGqlObject>& inputParams,

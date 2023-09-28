@@ -2,17 +2,17 @@
 
 
 // ImtCore includes
-#include <imtguigql/CObjectCollectionControllerCompBase.h>
+#include <imtgql/CObjectCollectionControllerCompBase.h>
 
 
 namespace imtauthgql
 {
 
 
-class CSessionControllerComp: public imtguigql::CObjectCollectionControllerCompBase
+class CSessionControllerComp: public imtgql::CObjectCollectionControllerCompBase
 {
 public:
-	typedef imtguigql::CObjectCollectionControllerCompBase BaseClass;
+	typedef imtgql::CObjectCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSessionControllerComp);
 	I_END_COMPONENT;

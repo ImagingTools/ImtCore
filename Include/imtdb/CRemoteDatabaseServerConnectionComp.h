@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtdb/IDatabaseServerConnectionChecker.h>
-#include <imtgql/TClientRequestManagerCompWrap.h>
+#include <imtclientgql/TClientRequestManagerCompWrap.h>
 
 
 namespace imtdb
@@ -11,11 +11,11 @@ namespace imtdb
 
 
 class CRemoteDatabaseServerConnectionComp:
-			public imtgql::CClientRequestManagerCompBase,
+			public imtclientgql::CClientRequestManagerCompBase,
 			virtual public IDatabaseServerConnectionChecker
 {
 public:
-	typedef imtgql::CClientRequestManagerCompBase BaseClass;
+	typedef imtclientgql::CClientRequestManagerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CRemoteDatabaseServerConnectionComp);
 		I_REGISTER_INTERFACE(IDatabaseServerConnectionChecker)

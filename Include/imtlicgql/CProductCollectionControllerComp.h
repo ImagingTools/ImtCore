@@ -2,23 +2,23 @@
 
 
 // ImtCore includes
-#include <imtguigql/CObjectCollectionControllerCompBase.h>
+#include <imtgql/CObjectCollectionControllerCompBase.h>
 
 
 namespace imtlicgql
 {
 
 
-class CProductCollectionControllerComp: public imtguigql::CObjectCollectionControllerCompBase
+class CProductCollectionControllerComp: public imtgql::CObjectCollectionControllerCompBase
 {
 public:
-	typedef imtguigql::CObjectCollectionControllerCompBase BaseClass;
+	typedef imtgql::CObjectCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CProductCollectionControllerComp);
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
+	// reimplemented (imtgql::CObjectCollectionControllerCompBase)
 	virtual bool SetupGqlItem(
 				const imtgql::CGqlRequest& gqlRequest,
 				imtbase::CTreeItemModel& model,

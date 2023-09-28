@@ -16,7 +16,7 @@ namespace imtlicgql
 
 // protected methods
 
-// reimplemented (imtguigql::CObjectCollectionControllerCompBase)
+// reimplemented (imtgql::CObjectCollectionControllerCompBase)
 
 bool CProductCollectionControllerComp::SetupGqlItem(
 			const imtgql::CGqlRequest& gqlRequest,

@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtguigql/CObjectCollectionControllerCompBase.h>
+#include <imtgql/CObjectCollectionControllerCompBase.h>
 #include <imtauth/IRole.h>
 #include <imtauth/IPermissionsProvider.h>
 
@@ -11,10 +11,10 @@ namespace imtauthgql
 {
 
 
-class CRoleControllerComp: public imtguigql::CObjectCollectionControllerCompBase
+class CRoleControllerComp: public imtgql::CObjectCollectionControllerCompBase
 {
 public:
-	typedef imtguigql::CObjectCollectionControllerCompBase BaseClass;
+	typedef imtgql::CObjectCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CRoleControllerComp);
 		I_ASSIGN(m_roleFactCompPtr, "RoleFactory", "Factory used for creation of the new role", true, "RoleFactory");

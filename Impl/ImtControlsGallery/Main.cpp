@@ -27,13 +27,17 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(imtstyleqml);
 	Q_INIT_RESOURCE(imtgui);
 	Q_INIT_RESOURCE(imtauthgui);
-    Q_INIT_RESOURCE(imtcontrols);
- 
+	Q_INIT_RESOURCE(imtcontrols);
+
 	Q_INIT_RESOURCE(imtresthtml);
 	Q_INIT_RESOURCE(ImtControlsGallery);
 
 
-	Q_INIT_RESOURCE(imtguiTheme);
+//	Q_INIT_RESOURCE(Webimt3dgui);
+	Q_INIT_RESOURCE(Webimtauthgui);
+	Q_INIT_RESOURCE(Webimtgui);
+//	Q_INIT_RESOURCE(Webimtcontrols);
+//	Q_INIT_RESOURCE(Webimtlicgui);
 
 	QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
