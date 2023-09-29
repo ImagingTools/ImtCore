@@ -214,7 +214,9 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 
 	if (representationModel.ContainsKey("Roles")){
 		for (const QByteArray& userProductId : userInfoPtr->GetProducts()){
-			userInfoPtr->RemoveProduct(userProductId);
+			if (userProductId == productId){
+				userInfoPtr->RemoveProduct(userProductId);
+			}
 		}
 
 		QByteArray roles = representationModel.GetData("Roles").toByteArray();
