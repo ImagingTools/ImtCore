@@ -27,7 +27,8 @@ void CObjectCollection::SetOperationFlags(int flags, const QByteArray& objectId)
 	ObjectInfo* objectInfo = GetObjectInfo(objectId);
 	if (objectInfo != nullptr){
 		objectInfo->flags = flags;
-	} else {
+	}
+	else{
 		m_operationFlags = flags;
 	}
 }
