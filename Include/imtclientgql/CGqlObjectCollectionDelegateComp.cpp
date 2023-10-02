@@ -83,8 +83,10 @@ bool CGqlObjectCollectionDelegateComp::GetObjectInfo(const QByteArray& objectId,
 }
 
 
-bool CGqlObjectCollectionDelegateComp::GetObjectMetaInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& outInfo) const
+bool CGqlObjectCollectionDelegateComp::GetObjectMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& outInfo) const
 {
+	outInfo.ResetData();
+
 	if (m_clientCompPtr.IsValid()){
 		istd::TDelPtr<imtgql::IGqlRequest> requestPtr = CreateGetObjectMetaInfoRequest(objectId);
 		istd::TDelPtr<imtgql::IGqlPrimitiveTypeResponse> responsePtr;
@@ -95,22 +97,19 @@ bool CGqlObjectCollectionDelegateComp::GetObjectMetaInfo(const QByteArray& objec
 				if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
 					if (variant.canConvert<QJsonObject>()){
 						QJsonObject jsonObject = variant.value<QJsonObject>();
-						outInfo.id = objectId;
-						outInfo.typeId = jsonObject.value("typeId").toString().toUtf8();
 						jsonObject = jsonObject.value("metaInfo").toObject();
-						outInfo.elementMetaInfoPtr.reset(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);
 						for (QString key: jsonObject.keys()){
 							int type = key.toInt();
 							switch (type){
 								case idoc::IDocumentMetaInfo::MIT_CREATION_TIME: case idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME:
 								{
 									QString timestr = jsonObject.value(key).toString();
-									outInfo.elementMetaInfoPtr->SetMetaInfo(type, QDateTime::fromString(timestr, Qt::ISODate));
+									outInfo.SetMetaInfo(type, QDateTime::fromString(timestr, Qt::ISODate));
 									break;
 								}
 								default:
 									QByteArray data = jsonObject.value(key).toString().toUtf8();
-									outInfo.elementMetaInfoPtr->SetMetaInfo(type, data);
+									outInfo.SetMetaInfo(type, data);
 							}
 						}
 						return true;
@@ -125,8 +124,10 @@ bool CGqlObjectCollectionDelegateComp::GetObjectMetaInfo(const QByteArray& objec
 }
 
 
-bool CGqlObjectCollectionDelegateComp::GetObjectDataMetaInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& outInfo) const
+bool CGqlObjectCollectionDelegateComp::GetObjectDataMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& outInfo) const
 {
+	outInfo.ResetData();
+
 	if (m_clientCompPtr.IsValid()){
 		istd::TDelPtr<imtgql::IGqlRequest> requestPtr = CreateGetObjectDataMetaInfoRequest(objectId);
 		istd::TDelPtr<imtgql::IGqlPrimitiveTypeResponse> responsePtr;
@@ -137,22 +138,19 @@ bool CGqlObjectCollectionDelegateComp::GetObjectDataMetaInfo(const QByteArray& o
 				if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
 					if (variant.canConvert<QJsonObject>()){
 						QJsonObject jsonObject = variant.value<QJsonObject>();
-						outInfo.id = objectId;
-						outInfo.typeId = jsonObject.value("typeId").toString().toUtf8();
 						jsonObject = jsonObject.value("dataMetaInfo").toObject();
-						outInfo.dataMetaInfoPtr.reset(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);
 						for (QString key: jsonObject.keys()){
 							int type = key.toInt();
 							switch (type){
 								case idoc::IDocumentMetaInfo::MIT_CREATION_TIME: case idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME:
 								{
 									QString timestr = jsonObject.value(key).toString();
-									outInfo.dataMetaInfoPtr->SetMetaInfo(type, QDateTime::fromString(timestr, Qt::ISODate));
+									outInfo.SetMetaInfo(type, QDateTime::fromString(timestr, Qt::ISODate));
 									break;
 								}
 								default:
 									QByteArray data = jsonObject.value(key).toString().toUtf8();
-									outInfo.dataMetaInfoPtr->SetMetaInfo(type, data);
+									outInfo.SetMetaInfo(type, data);
 							}
 						}
 						return true;
@@ -160,7 +158,6 @@ bool CGqlObjectCollectionDelegateComp::GetObjectDataMetaInfo(const QByteArray& o
 				}
 			}
 		}
-
 	}
 
 	return false;

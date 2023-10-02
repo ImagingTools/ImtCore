@@ -500,14 +500,10 @@ QByteArray CGqlObjectCollectionComp::GetObjectTypeId(const Id& objectId) const
 idoc::MetaInfoPtr CGqlObjectCollectionComp::GetDataMetaInfo(const Id& objectId) const
 {
 	if (m_delegateCompPtr.IsValid()){
-		imtgql::IGqlStructuredCollectionResponse::ObjectInfo info;
-		if (m_delegateCompPtr->GetObjectDataMetaInfo(objectId, info)){
-			if (!info.dataMetaInfoPtr.isNull()){
-				idoc::MetaInfoPtr metaInfoPtr;
-				metaInfoPtr.SetCastedOrRemove(info.dataMetaInfoPtr->CloneMe());
+		idoc::MetaInfoPtr retVal(new idoc::CStandardDocumentMetaInfo());
 
-				return metaInfoPtr;
-			}
+		if (m_delegateCompPtr->GetObjectDataMetaInfo(objectId, *retVal)){
+			return retVal;
 		}
 	}
 
@@ -590,18 +586,17 @@ idoc::MetaInfoPtr CGqlObjectCollectionComp::GetElementMetaInfo(const Id& element
 	idoc::MetaInfoPtr metaInfoPtr;
 
 	imtgql::IGqlStructuredCollectionResponse::ObjectInfo info;
-	bool isValid = false;
 
 	if (GetNodeInfo(elementId, info)){
-		isValid = true;
-	}
-	else if (GetObjectMetaInfo(elementId, info)){
-		isValid = true;
-	}
-
-	if (isValid){
 		if (!info.elementMetaInfoPtr.isNull()){
 			metaInfoPtr.SetCastedOrRemove(info.elementMetaInfoPtr->CloneMe());
+		}
+	}
+	else{
+		metaInfoPtr.SetPtr(new idoc::CStandardDocumentMetaInfo());
+
+		if (!GetObjectMetaInfo(elementId, *metaInfoPtr)){
+			metaInfoPtr.Reset();
 		}
 	}
 
@@ -780,17 +775,17 @@ bool CGqlObjectCollectionComp::GetObjectInfo(const QByteArray& objectId, imtgql:
 }
 
 
-bool CGqlObjectCollectionComp::GetObjectMetaInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& valueOut) const
+bool CGqlObjectCollectionComp::GetObjectMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& valueOut) const
 {
 	if (m_delegateCompPtr.IsValid()){
-		return m_delegateCompPtr->GetObjectMetaInfo(objectId, valueOut);
+		return m_delegateCompPtr->GetObjectDataMetaInfo(objectId, valueOut);
 	}
 
 	return false;
 }
 
 
-bool CGqlObjectCollectionComp::GetObjectDataMetaInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& valueOut) const
+bool CGqlObjectCollectionComp::GetObjectDataMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& valueOut) const
 {
 	if (m_delegateCompPtr.IsValid()){
 		return m_delegateCompPtr->GetObjectDataMetaInfo(objectId, valueOut);
