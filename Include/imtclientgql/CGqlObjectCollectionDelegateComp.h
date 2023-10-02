@@ -40,8 +40,11 @@ public:
 	*/
 //	virtual imtbase::IStructuredObjectCollectionInfo::ElementType GetElementType(const QByteArray& elementId) const override;
 //	virtual bool GetNodeInfo(const QByteArray& nodeId, imtgql::IGqlStructuredCollectionResponse::NodeInfo& outInfo) const override;
-//	virtual bool GetObjectInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& outInfo) const override;
+	virtual bool GetObjectInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& outInfo) const override;
+	virtual bool GetObjectMetaInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& outInfo) const override;
+	virtual bool GetObjectDataMetaInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& outInfo) const override;
 
+	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
 
 	/**
 		Object manipulations
@@ -73,17 +76,21 @@ public:
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
-	virtual bool GetObject(
+	virtual bool GetObjectData(
 				const QByteArray& objectId,
 				const QByteArray& typeId,
 				imtbase::IObjectCollection::DataPtr objectPtr) const override;
-	virtual bool SetObject(
+	virtual bool SetObjectData(
 				const QByteArray& objectId,
 				const QByteArray& typeId,
 				const istd::IChangeable& object,
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
+
+	virtual imtgql::IGqlRequest* CreateGetObjectInfoRequest(const QByteArray& objectId) const override;
+	virtual imtgql::IGqlRequest* CreateGetObjectMetaInfoRequest(const QByteArray& objectId) const;
+	virtual imtgql::IGqlRequest* CreateGetObjectDataMetaInfoRequest(const QByteArray& objectId) const;
 
 	virtual imtgql::IGqlRequest* CreateInsertObjectRequest(
 		const QByteArray& typeId,

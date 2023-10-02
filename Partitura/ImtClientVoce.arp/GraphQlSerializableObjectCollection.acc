@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5091" Description="ACF"/>
-            <Version Id="1" Number="2192" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5108" Description="ACF"/>
+            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -44,6 +44,9 @@
                         <Data IsEnabled="true" Value="ApiClient"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Id" Type="Id" ExportId="Id">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectTypeIds" Type="Id[]" ExportId="ObjectTypeIds">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

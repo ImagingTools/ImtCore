@@ -194,6 +194,8 @@ private:
 	bool GetElementType(const QByteArray& elementId, ElementType& valueOut) const;
 	bool GetNodeInfo(const QByteArray& nodeId, imtgql::IGqlStructuredCollectionResponse::NodeInfo& valueOut) const;
 	bool GetObjectInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& valueOut) const;
+	bool GetObjectMetaInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& valueOut) const;
+	bool GetObjectDataMetaInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& valueOut) const;
 
 protected:
 	I_REF(IGqlSubscriptionManager, m_subscriptionManagerCompPtr);

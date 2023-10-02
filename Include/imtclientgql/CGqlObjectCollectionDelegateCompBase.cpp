@@ -69,9 +69,14 @@ bool CGqlObjectCollectionDelegateCompBase::GetNodeInfo(const QByteArray& nodeId,
 {
 	if (m_clientCompPtr.IsValid()){
 		istd::TDelPtr<imtgql::IGqlRequest> requestPtr(CreateGetNodeInfoRequest(nodeId));
+		if (!requestPtr.IsValid()){
+			return false;
+		}
 		istd::TDelPtr<imtgql::IGqlStructuredCollectionResponse> responsePtr;
 		responsePtr.SetCastedOrRemove(CreateResponse(*requestPtr));
-		Q_ASSERT(responsePtr.IsValid());
+		if (!responsePtr.IsValid()){
+			return false;
+		}
 		if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 			if (responsePtr->IsSuccessfull()){
 				imtgql::IGqlStructuredCollectionResponse::NodeInfo info;
@@ -494,7 +499,7 @@ int CGqlObjectCollectionDelegateCompBase::GetElementCount(const iprm::IParamsSet
 			if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 				QVariant variant;
 				if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-					if (variant.type() == QVariant::Int){
+					if (variant.type() == QVariant::Int || variant.type() == QVariant::LongLong){
 						return variant.toInt();
 					}
 				}

@@ -41,6 +41,9 @@ public:
 	virtual imtbase::IStructuredObjectCollectionInfo::ElementType GetElementType(const QByteArray& elementId) const = 0;
 	virtual bool GetNodeInfo(const QByteArray& nodeId, imtgql::IGqlStructuredCollectionResponse::NodeInfo& outInfo) const = 0;
 	virtual bool GetObjectInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& outInfo) const = 0;
+	virtual bool GetObjectMetaInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& outInfo) const = 0;
+	virtual bool GetObjectDataMetaInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& outInfo) const = 0;
+	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const = 0;
 
 	/**
 		Structure manipulations
@@ -112,11 +115,11 @@ public:
 				const QByteArray& objectId,
 				const idoc::IDocumentMetaInfo& dataMetaInfo,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-	virtual bool GetObject(
+	virtual bool GetObjectData(
 				const QByteArray& objectId,
 				const QByteArray& typeId,
 				imtbase::IObjectCollection::DataPtr objectPtr) const = 0;
-	virtual bool SetObject(
+	virtual bool SetObjectData(
 				const QByteArray& objectId,
 				const QByteArray& typeId,
 				const istd::IChangeable& object,

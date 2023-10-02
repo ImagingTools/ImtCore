@@ -1563,9 +1563,13 @@ QVariant CObjectCollectionViewComp::TableModel::data(const QModelIndex& index, i
 
 	switch (role){
 	case Qt::DisplayRole:
-		return metaInfo[index.column()].text;
+		if (metaInfo.count() > index.column()){
+			return metaInfo[index.column()].text;
+		}
 	case Qt::DecorationRole:
-		return metaInfo[index.column()].icon;
+		if (metaInfo.count() > index.column()){
+			return metaInfo[index.column()].icon;
+		}
 	case DR_TYPE_ID:
 		if (itemTypeId.isEmpty()){
 			itemTypeId = collectionPtr->GetObjectTypeId(objectId);

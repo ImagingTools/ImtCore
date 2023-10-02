@@ -319,6 +319,9 @@ bool CGqlRequest::ParseQuery(const QByteArray &query, int& errorPosition)
 			else{
 				if (m_activeGqlObjectPtr == nullptr){
 					if (m_startFields == true){
+						if (!text.isEmpty()){
+							SetParseObject(text);
+						}
 						return true;
 					}
 					else{

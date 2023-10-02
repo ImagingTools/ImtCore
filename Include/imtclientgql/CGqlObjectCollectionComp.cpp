@@ -436,7 +436,7 @@ bool CGqlObjectCollectionComp::SetObjectData(
 	if (m_delegateCompPtr.IsValid()){
 		imtgql::IGqlStructuredCollectionResponse::ObjectInfo info;
 		if (GetObjectInfo(objectId, info)){
-			if (m_delegateCompPtr->SetObject(
+			if (m_delegateCompPtr->SetObjectData(
 						objectId,
 						info.typeId,
 						object,
@@ -486,10 +486,11 @@ const iprm::IOptionsList* CGqlObjectCollectionComp::GetObjectTypesInfo() const
 QByteArray CGqlObjectCollectionComp::GetObjectTypeId(const Id& objectId) const
 {
 	if (m_delegateCompPtr.IsValid()){
-		imtgql::IGqlStructuredCollectionResponse::ObjectInfo info;
-		if (m_delegateCompPtr->GetObjectInfo(objectId, info)){
-			return info.typeId;
-		}
+		return m_delegateCompPtr->GetObjectTypeId(objectId);
+//		imtgql::IGqlStructuredCollectionResponse::ObjectInfo info;
+//		if (m_delegateCompPtr->GetObjectInfo(objectId, info)){
+//			return info.typeId;
+//		}
 	}
 
 	return QByteArray();
@@ -500,7 +501,7 @@ idoc::MetaInfoPtr CGqlObjectCollectionComp::GetDataMetaInfo(const Id& objectId) 
 {
 	if (m_delegateCompPtr.IsValid()){
 		imtgql::IGqlStructuredCollectionResponse::ObjectInfo info;
-		if (m_delegateCompPtr->GetObjectInfo(objectId, info)){
+		if (m_delegateCompPtr->GetObjectDataMetaInfo(objectId, info)){
 			if (!info.dataMetaInfoPtr.isNull()){
 				idoc::MetaInfoPtr metaInfoPtr;
 				metaInfoPtr.SetCastedOrRemove(info.dataMetaInfoPtr->CloneMe());
@@ -594,7 +595,7 @@ idoc::MetaInfoPtr CGqlObjectCollectionComp::GetElementMetaInfo(const Id& element
 	if (GetNodeInfo(elementId, info)){
 		isValid = true;
 	}
-	else if (GetObjectInfo(elementId, info)){
+	else if (GetObjectMetaInfo(elementId, info)){
 		isValid = true;
 	}
 
@@ -739,7 +740,7 @@ imtbase::IObjectCollection::DataPtr CGqlObjectCollectionComp::GetObject(
 	if (m_delegateCompPtr.IsValid()){
 		imtbase::IObjectCollection::DataPtr documentPtr = CreateObjectInstance(typeId);
 		if (documentPtr.IsValid()){
-			if (m_delegateCompPtr->GetObject(objectId, typeId, documentPtr)){
+			if (m_delegateCompPtr->GetObjectData(objectId, typeId, documentPtr)){
 				return documentPtr;
 			}
 		}
@@ -773,6 +774,26 @@ bool CGqlObjectCollectionComp::GetObjectInfo(const QByteArray& objectId, imtgql:
 {
 	if (m_delegateCompPtr.IsValid()){
 		return m_delegateCompPtr->GetObjectInfo(objectId, valueOut);
+	}
+
+	return false;
+}
+
+
+bool CGqlObjectCollectionComp::GetObjectMetaInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& valueOut) const
+{
+	if (m_delegateCompPtr.IsValid()){
+		return m_delegateCompPtr->GetObjectMetaInfo(objectId, valueOut);
+	}
+
+	return false;
+}
+
+
+bool CGqlObjectCollectionComp::GetObjectDataMetaInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& valueOut) const
+{
+	if (m_delegateCompPtr.IsValid()){
+		return m_delegateCompPtr->GetObjectDataMetaInfo(objectId, valueOut);
 	}
 
 	return false;

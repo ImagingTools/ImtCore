@@ -110,40 +110,51 @@ void CGqlObjectCollectionResponse::OnReply(const imtgql::IGqlRequest& request, c
 
 	m_json = QJsonDocument::fromJson(replyData);
 
-	if (m_commandId == "getFolderContent") {
-		ParseFolderContentReply();
+	QJsonObject data = m_json.object().value("data").toObject();
+
+	if (data.contains(m_commandId)){
+		data = data.value(m_commandId).toObject();
 	}
 
-	if (m_commandId == "createFolder") {
-		ParseCreateFolderReply();
+	if (data.contains("itemsCount")){
+		m_variant = data.value("itemsCount").toVariant();
+		m_isPrimitiveTypePresent = true;
 	}
 
-	if (m_commandId == "deleteFolder") {
-		ParseDeleteFolderReply();
+	if (data.contains("itemIds")){
+		QStringList itemIdsData = data.value("itemIds").toString().split(";");
+		ElementInfo itemInfo;
+
+		for (QString id: itemIdsData){
+			itemInfo.isNode = false;
+			itemInfo.id = id.toLatin1();
+			m_elementList.push_back(itemInfo);
+		}
+		m_isElementListPresent = true;
 	}
 
-	if (m_commandId == "addMeasurement") {
-		ParseAddMeasurementReply();
+	if (data.contains("objectData")){
+		m_variant = data.value("objectData").toVariant();
+		qDebug() << m_variant;
+		m_isPrimitiveTypePresent = true;
 	}
 
-	if (m_commandId == "replaceMeasurement") {
-		ParseReplaceMeasurementReply();
+	if (data.contains("info")){
+		m_variant = data;
+		qDebug() << m_variant;
+		m_isPrimitiveTypePresent = true;
 	}
 
-	if (m_commandId == "renameMeasurement") {
-		ParseRenameMeasurementReply();
+	if (data.contains("metaInfo")){
+		m_variant = data;
+		qDebug() << m_variant;
+		m_isPrimitiveTypePresent = true;
 	}
 
-	if (m_commandId == "deleteMeasurement") {
-		ParseDeleteMeasurementReply();
-	}
-
-	if (m_commandId == "getMeasurementUploadUrls") {
-		ParseGetMeasurementUploadUrlsReply();
-	}
-
-	if (m_commandId == "getMeasurementDownloadUrl") {
-		ParseGetMeasurementDownloadUrlsReply();
+	if (data.contains("dataMetaInfo")){
+		m_variant = data;
+		qDebug() << m_variant;
+		m_isPrimitiveTypePresent = true;
 	}
 }
 

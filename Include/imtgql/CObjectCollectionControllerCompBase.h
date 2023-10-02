@@ -44,7 +44,9 @@ public:
 		OT_LIST,
 		OT_HEADERS,
 		OT_COMMANDS,
+		OT_INFO,
 		OT_METAINFO,
+		OT_DATAMETAINFO,
 		OT_OBJECT_VIEW,
 		OT_ELEMENTS_COUNT,
 		OT_ELEMENT_IDS,
@@ -71,6 +73,8 @@ protected:
 	virtual imtbase::CTreeItemModel* GetTreeItemModel(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetDependencies(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* GetInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* GetDataMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetObjectView(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
 	virtual imtbase::IOperationContext* CreateOperationContext(const imtgql::CGqlRequest& gqlRequest, const QString& operationDescription) const;

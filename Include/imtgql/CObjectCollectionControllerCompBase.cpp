@@ -68,6 +68,10 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 		return GetHeaders(gqlRequest, errorMessage);
 	case OT_METAINFO:
 		return GetMetaInfo(gqlRequest, errorMessage);
+	case OT_INFO:
+		return GetInfo(gqlRequest, errorMessage);
+	case OT_DATAMETAINFO:
+		return GetDataMetaInfo(gqlRequest, errorMessage);
 	case OT_OBJECT_VIEW:
 		return GetObjectView(gqlRequest, errorMessage);
 	case OT_ELEMENTS_COUNT:
@@ -151,9 +155,19 @@ bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 			operationType = OT_SET_DESCRIPTION;
 			return true;
 		}
+		if (fieldList.at(i).GetId() == "info"){
+			gqlObject = fieldList.at(i);
+			operationType = OT_INFO;
+			return true;
+		}
 		if (fieldList.at(i).GetId() == "metaInfo"){
 			gqlObject = fieldList.at(i);
 			operationType = OT_METAINFO;
+			return true;
+		}
+		if (fieldList.at(i).GetId() == "dataMetaInfo"){
+			gqlObject = fieldList.at(i);
+			operationType = OT_DATAMETAINFO;
 			return true;
 		}
 		if (fieldList.at(i).GetId() == "objectView"){
@@ -510,7 +524,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementsCount(c
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
 	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* notificationModel = nullptr;
 
 	if (!errorMessage.isEmpty()){
 		imtbase::CTreeItemModel* errorsItemModel = rootModelPtr->AddTreeModel("errors");
@@ -518,7 +531,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementsCount(c
 	}
 	else{
 		dataModel = new imtbase::CTreeItemModel();
-		notificationModel = new imtbase::CTreeItemModel();
 
 		const imtgql::CGqlObject* viewParamsGql = nullptr;
 		if (inputParams.size() > 0){
@@ -533,8 +545,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementsCount(c
 
 		int elementsCount = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
 
-		notificationModel->SetData("TotalCount", elementsCount);
-		dataModel->SetExternTreeModel("notification", notificationModel);
+		dataModel->SetData("itemsCount", elementsCount);
 	}
 
 	rootModelPtr->SetExternTreeModel("data", dataModel);
@@ -555,7 +566,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementIds(cons
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
 	imtbase::CTreeItemModel* dataModel = nullptr;
-	imtbase::CTreeItemModel* notificationModel = nullptr;
 
 	if (!errorMessage.isEmpty()){
 		imtbase::CTreeItemModel* errorsItemModel = rootModelPtr->AddTreeModel("errors");
@@ -563,7 +573,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementIds(cons
 	}
 	else{
 		dataModel = new imtbase::CTreeItemModel();
-		notificationModel = new imtbase::CTreeItemModel();
 
 		const imtgql::CGqlObject* viewParamsGql = nullptr;
 		if (inputParams.size() > 0){
@@ -587,14 +596,11 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementIds(cons
 		for (int i = 0; i < ids.count(); i++){
 			if (i > 0){
 				dataIds += ";";
-				dataIds += ids[i];
 			}
-
+			dataIds += ids[i];
 		}
 
-		notificationModel->SetData("ElementIds", dataIds);
-
-		dataModel->SetExternTreeModel("notification", notificationModel);
+		dataModel->SetData("itemIds", dataIds);
 	}
 
 	rootModelPtr->SetExternTreeModel("data", dataModel);
@@ -683,6 +689,22 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetDependencies(
 
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetMetaInfo(
+		const imtgql::CGqlRequest& /*gqlRequest*/,
+		QString& /*errorMessage*/) const
+{
+	return nullptr;
+}
+
+
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetInfo(
+		const imtgql::CGqlRequest& /*gqlRequest*/,
+		QString& /*errorMessage*/) const
+{
+	return nullptr;
+}
+
+
+imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetDataMetaInfo(
 		const imtgql::CGqlRequest& /*gqlRequest*/,
 		QString& /*errorMessage*/) const
 {
