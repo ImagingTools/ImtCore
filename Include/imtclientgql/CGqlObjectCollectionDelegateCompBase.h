@@ -117,7 +117,7 @@ public:
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 
-protected:
+	// reimplemented (IGqlObjectCollectionRequestDelegate)
 	virtual imtgql::IGqlRequest* CreateGetElementType(const QByteArray& elementId) const override;
 	virtual imtgql::IGqlRequest* CreateGetNodeInfoRequest(const QByteArray& nodeId) const override;
 	virtual imtgql::IGqlRequest* CreateGetObjectInfoRequest(const QByteArray& objectId) const override;
