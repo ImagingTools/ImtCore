@@ -191,7 +191,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 
 		QByteArray objectId;
 
-		istd::IChangeable* newObject = CreateObject(inputParams, objectId, name, description, errorMessage);
+		istd::IChangeable* newObject = CreateObject(gqlRequest, objectId, name, description, errorMessage);
 		if (newObject != nullptr){
 			imtbase::IObjectCollection::DataPtr dataPtr;
 			if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
@@ -251,7 +251,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	QString name;
 	QString description;
 
-	istd::IChangeable* savedObject = CreateObject(inputParams, newObjectId, name, description, errorMessage);
+	istd::IChangeable* savedObject = CreateObject(gqlRequest, newObjectId, name, description, errorMessage);
 	if (savedObject != nullptr){
 		imtbase::IOperationContext* operationContextPtr = CreateOperationContext(gqlRequest, QString("Updated the object"));
 		if (!m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject, istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr)){
@@ -310,7 +310,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateCollection(
 
 				QByteArray objectId = objectIdsModel.GetData("Id", i).toByteArray();
 				if (!objectId.isEmpty()){
-					istd::IChangeable* savedObject = CreateObject(inputParams, objectId, name, description, errorMessage);
+					istd::IChangeable* savedObject = CreateObject(gqlRequest, objectId, name, description, errorMessage);
 					if (!m_objectCollectionCompPtr->SetObjectData(objectId, *savedObject)){
 						errorMessage += QObject::tr("Could not update object: %1; ").arg(qPrintable(objectId));
 						objectIdsModel.SetData("Failed", true, i);
@@ -808,6 +808,19 @@ istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(
 		QString& /*errorMessage*/) const
 {
 	return nullptr;
+}
+
+
+istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(
+			const imtgql::CGqlRequest& gqlRequest,
+			QByteArray& newObjectId,
+			QString& name,
+			QString& description,
+			QString& errorMessage) const
+{
+	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+
+	return CreateObject(inputParams, newObjectId, name, description, errorMessage);
 }
 
 

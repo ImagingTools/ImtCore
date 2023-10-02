@@ -33,8 +33,8 @@ Item {
         console.log("onVisibleChanged", tfc.width);
 
         if (filterPanelDecorator.visible){
-            animRect.to = tfc.width;
-            animRect.start();
+//            animRect.to = tfc.width;
+//            animRect.start();
         }
     }
 
@@ -44,13 +44,13 @@ Item {
         }
     }
 
-    NumberAnimation {
-        id: animRect;
-        target: tfc;
-        property: "width";
-        from: 0;
-        duration: 200;
-    }
+//    NumberAnimation {
+//        id: animRect;
+//        target: tfc;
+//        property: "width";
+//        from: 0;
+//        duration: 200;
+//    }
 
     CustomTextField {
         id: tfc;

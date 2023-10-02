@@ -188,6 +188,10 @@ Item {
             name = " ";
         }
 
+        if (commandsId === ""){
+            return;
+        }
+
         if (collectionViewContainer.isUsedDocumentManager){
             if (id === ""){
                 documentManager.addDocument({"Id": id, "Name": name, "CommandsId": commandsId, "Source": editorPath}, {}, false);
@@ -341,7 +345,7 @@ Item {
         }
 
         onSelectedItem: {
-            console.log("CollectionViewBase onItemSelected");
+            console.log("CollectionViewBase onItemSelected", commandsLoader, commandsLoader.item);
 
             if (id == ""){
                 commandsLoader.item.commandHandle("New");

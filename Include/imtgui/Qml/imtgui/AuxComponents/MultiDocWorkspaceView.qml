@@ -275,7 +275,7 @@ Item {
             force = false;
         }
 
-        let index = this.getDocumentIndexById(itemId);
+        let index = this.getDocumentIndexByUuid(itemId);
         if (index < 0){
             index = tabPanelInternal.selectedIndex;
         }
@@ -440,6 +440,20 @@ Item {
         return -1;
     }
 
+    function getDocumentIndexByUuid(uuid){
+        if (uuid !== ""){
+            for (var i = 0; i < documentsData.GetItemsCount(); i++){
+                let document = workspaceView.documentsData.GetData("Item", i);
+                let documentUuid = document.documentUuid;
+                if (documentUuid === uuid){
+                    return i;
+                }
+            }
+        }
+
+        return -1;
+    }
+
     function showAlertMessage(message){
         alertMessage.message = message;
 
@@ -472,17 +486,10 @@ Item {
         model: workspaceView.documentsData;
 
         onCloseItem: {
-//            let currentSelectedIndex = tabPanelInternal.selectedIndex;
-//            tabPanelInternal.selectedIndex = index;
             console.log("onCloseItem", index);
             let documentBase = workspaceView.documentsData.GetData("Item", index);
-            console.log("documentBase.itemId", documentBase.itemId);
-
-            workspaceView.closeDocument(documentBase.itemId);
-
-//            item.commandsDelegate.commandHandle("Close");
-
-//            tabPanelInternal.selectedIndex = currentSelectedIndex;
+            console.log("documentBase.itemId", documentBase.documentUuid);
+            workspaceView.closeDocument(documentBase.documentUuid);
         }
 
         onRightClicked: {
@@ -624,10 +631,13 @@ Item {
                     dataLoader.item.itemId = model.Id;
                     dataLoader.item.commandsId = model.CommandsId
 
-                    if (model.Id === ""){
-                        model.Id = dataLoader.item.documentUuid;
-                        dataLoader.item.itemId = dataLoader.item.documentUuid;
+                    if (dataLoader.item.documentUuid !== undefined){
+                        workspaceView.documentsData.SetData("DocumentUuid", dataLoader.item.documentUuid);
                     }
+//                    if (model.Id === ""){
+//                        model.Id = dataLoader.item.documentUuid;
+//                        dataLoader.item.itemId = dataLoader.item.documentUuid;
+//                    }
                 }
             }
         }

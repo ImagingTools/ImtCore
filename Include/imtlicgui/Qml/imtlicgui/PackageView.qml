@@ -134,6 +134,12 @@ DocumentBase {
         }
     }
 
+    function onEntered(value){
+        packageViewRoot.blockUpdatingModel = true;
+        packageViewRoot.documentModel.SetData("Name", value);
+        packageViewRoot.blockUpdatingModel = false;
+    }
+
     function blockEditing(){
         treeView.readOnly = true;
     }

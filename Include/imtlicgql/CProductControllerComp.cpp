@@ -69,6 +69,7 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 		return nullptr;
 	}
 
+	objectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
 		istd::TDelPtr<imtlic::IProductLicensingInfo> productPtr = m_productFactCompPtr.CreateInstance();
@@ -91,8 +92,16 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 		imtbase::CTreeItemModel itemModel;
 		itemModel.CreateFromJson(itemData);
 
-		if (itemModel.ContainsKey("Id")){
-			objectId = itemModel.GetData("Id").toByteArray();
+//		if (itemModel.ContainsKey("Id")){
+//			objectId = itemModel.GetData("Id").toByteArray();
+//		}
+		if (itemModel.ContainsKey("Name")){
+			name = itemModel.GetData("Name").toString();
+			productPtr->SetName(name);
+		}
+
+		if (objectId.isEmpty()){
+			objectId = name.toUtf8();
 		}
 
 		if (objectId.isEmpty()){
@@ -105,11 +114,6 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 		if (itemModel.ContainsKey("CategoryId")){
 			QByteArray categoryId = itemModel.GetData("CategoryId").toByteArray();
 			productPtr->SetCategoryId(categoryId);
-		}
-
-		if (itemModel.ContainsKey("Name")){
-			name = itemModel.GetData("Name").toString();
-			productPtr->SetName(name);
 		}
 
 		imtbase::CTreeItemModel *licenses = nullptr;

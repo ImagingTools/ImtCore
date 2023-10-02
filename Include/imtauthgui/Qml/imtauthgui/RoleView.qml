@@ -174,7 +174,7 @@ DocumentBase {
             width: 25;
             height: width;
 
-            iconSource: "../../.." + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal);
+            iconSource: "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal);
 
             onClicked: {
                 Events.sendEvent(container.documentUuid + "CommandActivated", "Close")

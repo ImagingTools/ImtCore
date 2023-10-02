@@ -199,10 +199,6 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 	if (representationModel.ContainsKey("Password")){
 		QByteArray password = representationModel.GetData("Password").toByteArray();
 
-//		if (m_hashCalculatorCompPtr.IsValid()){
-//			password = m_hashCalculatorCompPtr->GenerateHash(userInfoPtr->GetId() + password);
-//		}
-
 		userInfoPtr->SetPasswordHash(password);
 	}
 
@@ -373,12 +369,6 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 				}
 			}
 		}
-
-//		if (calculate){
-//			if (m_hashCalculatorCompPtr.IsValid()){
-//				password = m_hashCalculatorCompPtr->GenerateHash(username + password);
-//			}
-//		}
 
 		userInfoPtr->SetPasswordHash(password);
 

@@ -18,6 +18,7 @@
 #include <iqtgui/CHierarchicalCommand.h>
 #include <iqtgui/CCommandTools.h>
 #include <iwidgets/iwidgets.h>
+#include <idoc/IDocumentManager.h>
 
 // ImtCore includes
 #include <imtgui/IDocumentViewConstraints.h>

@@ -69,6 +69,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserGroupDatabaseDelegateComp::C
 					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 					.arg(checksum).toUtf8();
 
+			retVal.query += CreateOperationDescriptionQuery(objectId, operationContextPtr);
+
 			retVal.objectName = objectName;
 		}
 	}
@@ -157,6 +159,8 @@ QByteArray CUserGroupDatabaseDelegateComp::CreateUpdateObjectQuery(
 				.arg(SqlEncode(documentContent))
 				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 				.arg(checksum).toUtf8();
+
+		retVal += CreateOperationDescriptionQuery(objectId, operationContextPtr);
 	}
 
 	return retVal;

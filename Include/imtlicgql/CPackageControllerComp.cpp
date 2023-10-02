@@ -40,6 +40,7 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 		return nullptr;
 	}
 
+	objectId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
 	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
 	if (!itemData.isEmpty()){
 		istd::TDelPtr<imtlic::CFeaturePackage> featurePackagePtr = new imtlic::CFeaturePackage;
@@ -55,17 +56,21 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 			return nullptr;
 		}
 
-		if (itemModel.ContainsKey("Id")){
-			objectId = itemModel.GetData("Id").toByteArray();
+//		if (itemModel.ContainsKey("Id")){
+//			objectId = itemModel.GetData("Id").toByteArray();
+//		}
+
+		if (itemModel.ContainsKey("Name")){
+			name = itemModel.GetData("Name").toString();
+		}
+
+		if (objectId.isEmpty()){
+			objectId = name.toUtf8();
 		}
 
 		if (objectId.isEmpty()){
 			errorMessage = QT_TR_NOOP("Package-ID can not be empty!");
 			return nullptr;
-		}
-
-		if (itemModel.ContainsKey("Name")){
-			name = itemModel.GetData("Name").toString();
 		}
 
 		if (itemModel.ContainsKey("Description")){

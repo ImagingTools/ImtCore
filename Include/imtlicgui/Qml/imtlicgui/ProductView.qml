@@ -180,17 +180,19 @@ DocumentBase {
         }
     }
 
-    function updateModel(){
-        console.log("updateModel");
-        console.time('updateModel')
+    function onEntered(value){
+        productViewContainer.blockUpdatingModel = true;
+        productViewContainer.documentModel.SetData("Name", value);
+        productViewContainer.blockUpdatingModel = false;
+    }
 
+    function updateModel(){
         if (productViewContainer.blockUpdatingModel){
             return;
         }
 
         undoRedoManager.beginChanges();
 
-//        productViewContainer.documentModel.SetData("Id", productViewContainer.itemId);
         productViewContainer.documentModel.SetData("Name", productViewContainer.itemName);
 
         if (categoryComboBox.currentIndex == 0){
@@ -216,9 +218,6 @@ DocumentBase {
         }
 
         undoRedoManager.endChanges();
-
-        console.timeEnd('updateModel')
-
     }
 
     function updateGui(){

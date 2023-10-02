@@ -311,7 +311,6 @@ Rectangle {
         tableContainer.properties.clearInvisibleItems();
     }
 
-
     function getHeaderIndex(headerId){
         if (!tableContainer.headers){
             return -1;
@@ -343,9 +342,6 @@ Rectangle {
     }
 
     function setWidth(){
-        //console.log("widthRecalc:: table", 0);
-        console.log("tableContainer.widthDecorator", tableContainer.widthDecorator);
-        console.log("tableContainer.headers", tableContainer.headers);
         var headersCount = tableContainer.headers.GetItemsCount();
 
         if(!tableContainer.widthDecorator.GetItemsCount() && tableContainer.headers.GetItemsCount()){
@@ -358,7 +354,6 @@ Rectangle {
 
         tableContainer.widthDecoratorDynamic.Clear();
         tableContainer.widthDecoratorDynamic.Copy(tableContainer.widthDecorator);
-
 
         var count_ = 0;
         var lengthMinus = 0;
@@ -375,7 +370,6 @@ Rectangle {
                 widthPercent_ = widthPercent_ < 0 ? 0 : widthPercent_*tableContainer.width/100;
                 lengthMinus += Math.max(width_,widthPercent_);
             }
-
         }
 
         if((tableContainer.width - lengthMinus) < count_ * tableContainer.minCellWidth || count_ == tableContainer.widthDecorator.GetItemsCount() ){
@@ -1075,6 +1069,8 @@ Rectangle {
                 }
 
                 function selectionChanged(){
+                    console.log("tableContainer selectionChanged")
+
                     tableDelegate.selected = tableContainer.tableSelection.selectedIndexes.includes(model.index);
 
                     if (tableDelegate.selected){
@@ -1097,9 +1093,8 @@ Rectangle {
                 }
 
                 onClicked: {
-                    //                if (!tableContainer.tableSelection.isSelected(model.index)){
-                    //                    tableContainer.tableSelection.singleSelect(model.index);
-                    //                }
+                    console.log("tableContainer onClicked")
+
                     if (!tableContainer.selectable){
                         return;
                     }
@@ -1122,7 +1117,5 @@ Rectangle {
                     tableContainer.selectItem(model.Id, model.Name);
                 }
             }
-
-
     }//Elements ListView
 }

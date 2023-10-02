@@ -198,6 +198,10 @@ Item {
     property string customPanelDecoratorPath;
 
     function getDecorator(decorators, section, type){
+        if (!decorators || !section || !type){
+            return "";
+        }
+
         let dataModelLocal = decorators.GetData("Decorators");
         if (dataModelLocal.ContainsKey(section)){
             dataModelLocal = dataModelLocal.GetData(section);
@@ -208,58 +212,58 @@ Item {
     }
 
     function parseStyleTheme(themeType){
-        let dataSource = themeType.GetData("source");
-        Style.borderColor = styleContainer.getThemeColor("ActiveColors", "BorderColor", dataSource);
-        Style.baseColor = styleContainer.getThemeColor("ActiveColors", "Base", dataSource);
-        Style.alternateBaseColor = styleContainer.getThemeColor("ActiveColors", "AlternateBase", dataSource);
-        Style.backgroundColor = styleContainer.getThemeColor("ActiveColors", "Background", dataSource);
+        if (themeType.ContainsKey("source")){
+            let dataSource = themeType.GetData("source");
 
-        Style.textColor = styleContainer.getThemeColor("ActiveColors", "Text", dataSource);
-        Style.textSelected = styleContainer.getThemeColor("ActiveColors", "TextSelectedBackground", dataSource);
-        Style.inactive_textColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource);
+            Style.borderColor = styleContainer.getThemeColor("ActiveColors", "BorderColor", dataSource);
+            Style.baseColor = styleContainer.getThemeColor("ActiveColors", "Base", dataSource);
+            Style.alternateBaseColor = styleContainer.getThemeColor("ActiveColors", "AlternateBase", dataSource);
+            Style.backgroundColor = styleContainer.getThemeColor("ActiveColors", "Background", dataSource);
 
-        Style.selectedColor = styleContainer.getThemeColor("ActiveColors", "ItemSelected", dataSource);
+            Style.textColor = styleContainer.getThemeColor("ActiveColors", "Text", dataSource);
+            Style.textSelected = styleContainer.getThemeColor("ActiveColors", "TextSelectedBackground", dataSource);
+            Style.inactive_textColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource);
 
-        Style.buttonColor = styleContainer.getThemeColor("ActiveColors", "Button", dataSource);
-        Style.buttonBorderColor = styleContainer.getThemeColor("ActiveColors", "ButtonBorder", dataSource);
-        Style.inactive_buttonColor = styleContainer.getThemeColor("InactiveColors", "Button", dataSource);
-        Style.buttonText = styleContainer.getThemeColor("ActiveColors", "ButtonText", dataSource);
-        Style.inactive_buttonText = styleContainer.getThemeColor("InactiveColors", "ButtonText", dataSource);
+            Style.selectedColor = styleContainer.getThemeColor("ActiveColors", "ItemSelected", dataSource);
 
-        Style.disabledInActiveTextColor = styleContainer.getThemeColor("DisabledInActiveColors", "Text", dataSource);
+            Style.buttonColor = styleContainer.getThemeColor("ActiveColors", "Button", dataSource);
+            Style.buttonBorderColor = styleContainer.getThemeColor("ActiveColors", "ButtonBorder", dataSource);
+            Style.inactive_buttonColor = styleContainer.getThemeColor("InactiveColors", "Button", dataSource);
+            Style.buttonText = styleContainer.getThemeColor("ActiveColors", "ButtonText", dataSource);
+            Style.inactive_buttonText = styleContainer.getThemeColor("InactiveColors", "ButtonText", dataSource);
 
-        Style.hover = styleContainer.getThemeColor("ActiveColors", "Hover", dataSource);
+            Style.disabledInActiveTextColor = styleContainer.getThemeColor("DisabledInActiveColors", "Text", dataSource);
 
-//        Style.color_scrollBackground = styleContainer.getThemeColor("ActiveColors", "ScrollBackground", dataSource);
-//        Style.color_scrollIndicator = styleContainer.getThemeColor("ActiveColors", "ScrollIndicator", dataSource);
-//        Style.color_scrollHighlight = styleContainer.getThemeColor("ActiveColors", "ScrollHighlight", dataSource);
+            Style.hover = styleContainer.getThemeColor("ActiveColors", "Hover", dataSource);
 
-        Style.imagingToolsGradient0 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient0");
-        Style.imagingToolsGradient1 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient1");
-        Style.imagingToolsGradient2 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient2");
-        Style.imagingToolsGradient3 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient3");
-        Style.imagingToolsGradient4 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient4");
-        Style.greenColor = dataSource.GetData("ColorPalette").GetData("Green");
+            Style.imagingToolsGradient0 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient0");
+            Style.imagingToolsGradient1 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient1");
+            Style.imagingToolsGradient2 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient2");
+            Style.imagingToolsGradient3 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient3");
+            Style.imagingToolsGradient4 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient4");
+            Style.greenColor = dataSource.GetData("ColorPalette").GetData("Green");
 
-        Style.iconColorOnSelected = styleContainer.getThemeColor("IconColor", "OnSelected", dataSource);
-        Style.tabSelectedColor = styleContainer.getThemeColor("ActiveColors", "TabSelected", dataSource);
-        Style.errorTextColor = styleContainer.getThemeColor("ActiveColors", "ErrorText", dataSource);
+            Style.iconColorOnSelected = styleContainer.getThemeColor("IconColor", "OnSelected", dataSource);
+            Style.tabSelectedColor = styleContainer.getThemeColor("ActiveColors", "TabSelected", dataSource);
+            Style.errorTextColor = styleContainer.getThemeColor("ActiveColors", "ErrorText", dataSource);
 
-        Style.shadowColor = styleContainer.getThemeColor("ActiveColors", "Shadow", dataSource);
+            Style.shadowColor = styleContainer.getThemeColor("ActiveColors", "Shadow", dataSource);
+        }
 
-        let dataDecorators = themeType.GetData("decorators");
-
-        console.log('DEBUG::dataDecorators', dataDecorators)
-
-        Style.menuButtonDecoratorPath = styleContainer.getDecorator(dataDecorators, "MenuPanel", "MainButton");
-        Style.subMenuButtonDecoratorPath = styleContainer.getDecorator(dataDecorators, "MenuPanel", "SubButton");
-        Style.tabPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TabPanel", "Base");
-        Style.topPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "Base");
-        Style.filterPanelDecoratorPath = styleContainer.getDecorator(dataDecorators,"FilterPanel", "Base");
-        Style.topCenterPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "CenterPanel");
-        Style.topRightPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "RightPanel");
-        Style.topLeftPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "LeftPanel");
-        Style.customPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "CustomPanel", "Base");
+        if (themeType.ContainsKey("decorators")){
+            let dataDecorators = themeType.GetData("decorators");
+            if (dataDecorators){
+                Style.menuButtonDecoratorPath = styleContainer.getDecorator(dataDecorators, "MenuPanel", "MainButton");
+                Style.subMenuButtonDecoratorPath = styleContainer.getDecorator(dataDecorators, "MenuPanel", "SubButton");
+                Style.tabPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TabPanel", "Base");
+                Style.topPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "Base");
+                Style.filterPanelDecoratorPath = styleContainer.getDecorator(dataDecorators,"FilterPanel", "Base");
+                Style.topCenterPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "CenterPanel");
+                Style.topRightPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "RightPanel");
+                Style.topLeftPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "LeftPanel");
+                Style.customPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "CustomPanel", "Base");
+            }
+        }
     }
 
     GqlModel {

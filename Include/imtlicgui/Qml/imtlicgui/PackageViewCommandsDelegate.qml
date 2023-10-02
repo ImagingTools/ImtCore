@@ -14,8 +14,10 @@ DocumentWorkspaceCommandsDelegateBase {
     }
 
     onEntered: {
-        container.documentBase.documentModel.SetData("Id", value);
-        container.documentBase.documentModel.SetData("Name", value);
+        container.documentBase.itemId = value;
+        container.documentBase.itemName = value;
+//        container.documentBase.documentModel.SetData("Id", value);
+//        container.documentBase.documentModel.SetData("Name", value);
     }
 
     onTableTreeViewEditorChanged: {

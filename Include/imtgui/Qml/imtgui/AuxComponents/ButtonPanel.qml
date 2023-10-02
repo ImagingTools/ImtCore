@@ -249,10 +249,7 @@ Rectangle {
     }
 
     function setOpenButtonVisible(){
-        let count = 0;
-        if (buttonPanel.buttonModel){
-            count = buttonPanel.buttonModel.GetItemsCount();
-        }
+        let count = horizontalListView.count;
 
         openButton.visible = count && count > buttonPanel.horizCount;
     }

@@ -27,6 +27,10 @@ Item {
     signal settingsUpdate();
     signal localSettingsUpdated();
 
+    onUpdateSystemStatus: {
+        console.log("AppMain onUpdateSystemStatus");
+    }
+
     onLocalSettingsUpdated: {
         application.updateAllModels();
     }

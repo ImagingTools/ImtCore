@@ -24,10 +24,7 @@ QtObject {
         console.log("documentId", documentId);
 
         if (commandId === "Close"){
-            console.log("Close", documentId);
-            console.log("container.documentBase.documentModel", container.documentBase.documentModel.toJSON());
-
-            let itemId = container.documentBase.itemId;
+            let itemId = container.documentBase.documentUuid;
             let documentManager = container.documentBase.documentManager;
             documentManager.closeDocument(itemId);
         }
@@ -35,8 +32,7 @@ QtObject {
             if (container.documentBase.isDirty){
                 let itemId = container.documentBase.itemId;
                 let documentManager = container.documentBase.documentManager;
-//                documentManager.saveDocument(itemId);
-                documentManager.saveDocument(documentId);
+                documentManager.saveDocument(itemId);
             }
         }
 

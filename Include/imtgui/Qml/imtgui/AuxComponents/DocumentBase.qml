@@ -100,8 +100,6 @@ Item {
     Component.onDestruction: {
         Events.unSubscribeEvent(documentBaseRoot.documentUuid + "CommandActivated", documentBaseRoot.commandsDelegate.commandHandle);
         Events.unSubscribeEvent("OnLocalizationChanged", documentBaseRoot.onLocalizationChanged);
-
-//        documentBaseRoot.commandsProvider.modelLoaded.disconnect(documentBaseRoot.onCommandsModelLoaded);
     }
 
     property bool m_localizationChanged: false;
@@ -184,8 +182,6 @@ Item {
     }
 
     function onEntered(value){
-        documentBaseRoot.documentModel.SetData("Id", value);
-        documentBaseRoot.documentModel.SetData("Name", value);
     }
 
     function modelChanged(){

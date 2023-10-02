@@ -107,7 +107,7 @@ QtObject {
 
     property GqlModel gqlSetModel: GqlModel {
         function set(commandId, modelId, data){
-            var query = Gql.GqlRequest("query", commandId);
+            var query = Gql.GqlRequest("mutation", commandId);
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", modelId);

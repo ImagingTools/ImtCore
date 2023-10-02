@@ -52,7 +52,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CRoleDatabaseDelegateComp::Create
 			const QString& objectName,
 			const QString& /*objectDescription*/,
 			const istd::IChangeable* valuePtr,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	NewObjectQuery retVal;
 
@@ -76,6 +76,8 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CRoleDatabaseDelegateComp::Create
 						.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 						.arg(checksum).toUtf8();
 
+			retVal.query += CreateOperationDescriptionQuery(objectId, operationContextPtr);
+
 			retVal.objectName = objectName;
 		}
 	}
@@ -88,7 +90,7 @@ QByteArray CRoleDatabaseDelegateComp::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
 			const QByteArray& objectId,
 			const istd::IChangeable& object,
-			const imtbase::IOperationContext* /*operationContextPtr*/,
+			const imtbase::IOperationContext* operationContextPtr,
 			bool /*useExternDelegate*/) const
 {
 	QByteArray retVal;
@@ -102,6 +104,8 @@ QByteArray CRoleDatabaseDelegateComp::CreateUpdateObjectQuery(
 					.arg(SqlEncode(documentContent))
 					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
 					.arg(checksum).toUtf8();
+
+		retVal += CreateOperationDescriptionQuery(objectId, operationContextPtr);
 	}
 
 	return retVal;

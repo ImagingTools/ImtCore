@@ -69,6 +69,8 @@ Item {
     onCommandsIdChanged: {
         if (collectionViewBaseContainer.loadData){
             gqlModels.updateModels();
+
+//            collectionViewBaseContainer.registerSubscription();
         }
     }
 
@@ -364,4 +366,25 @@ Item {
             }
         }
     }
+
+    function registerSubscription(){
+        console.log("try registerSubscription OnObjectCollectionChanged");
+
+        var query = Gql.GqlRequest("subscription", "OnObjectCollectionChanged");
+        var queryFields = Gql.GqlObject("notification");
+        queryFields.InsertField("Id");
+        query.AddField(queryFields);
+        subscriptionManager.registerSubscription(query, subscriptionClient);
+    }
+
+//    SubscriptionClient {
+//        id: subscriptionClient;
+
+//        onStateChanged: {
+//            console.log("SubscriptionClient onStateChanged", state);
+//            if (state == "Registered"){
+//                gqlModels.updateItemsModel();
+//            }
+//        }
+//    }
 }

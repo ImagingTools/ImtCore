@@ -287,7 +287,7 @@ Item {
             var inputParams = Gql.GqlObject("input");
 
             if(itemId !== ""){
-                query = Gql.GqlRequest("query", containerBase.gqlModelRemove);
+                query = Gql.GqlRequest("mutation", containerBase.gqlModelRemove);
                 inputParams.InsertField("Id", itemId);
                 queryFields = Gql.GqlObject("removedNotification");
                 query.AddParam(inputParams);
@@ -368,7 +368,7 @@ Item {
             var queryFields;
             var inputParams = Gql.GqlObject("input");
 
-            query = Gql.GqlRequest("query", containerBase.gqlModelRename);
+            query = Gql.GqlRequest("mutation", containerBase.gqlModelRename);
 
             let itemIds = containerBase.tableData.getSelectedIds();
             inputParams.InsertField("Id", itemIds[0]);
@@ -446,7 +446,7 @@ Item {
             var queryFields;
             var inputParams = Gql.GqlObject("input");
 
-            query = Gql.GqlRequest("query", containerBase.gqlModelSetDescription);
+            query = Gql.GqlRequest("mutation", containerBase.gqlModelSetDescription);
 
             let itemIds = containerBase.tableData.getSelectedIds();
             inputParams.InsertField("Id", itemIds[0]);

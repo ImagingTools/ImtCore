@@ -42,9 +42,8 @@ QtObject {
 
     function updateModels(){
         console.log("CollectionView updateModels");
-        gqlModelBaseContainer.headerInfoModel.updateModel();
-
         gqlModelBaseContainer.objectViewModel.getObjectView();
+        gqlModelBaseContainer.headerInfoModel.updateModel();
     }
 
     function updateItemsModel(){

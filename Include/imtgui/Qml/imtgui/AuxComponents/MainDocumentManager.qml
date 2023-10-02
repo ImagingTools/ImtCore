@@ -40,7 +40,7 @@ Item {
     }
 
     function collectionUpdated(){
-        console.log('collectionUpdated')
+        console.log('MainDocumentManager collectionUpdated')
         if (root.openingDocumentInfo != null){
 
             openDocument(root.openingDocumentInfo["DocumentTypeId"], root.openingDocumentInfo["DocumentId"]);

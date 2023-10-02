@@ -22,8 +22,8 @@ namespace imtlicgql
 	This component accepts data and returns it in encrypted form
 */
 class CFeaturesExportProviderComp:
-		public imtbase::IBinaryDataProvider,
-		public ilog::CLoggerComponentBase
+			public imtbase::IBinaryDataProvider,
+			public ilog::CLoggerComponentBase
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
