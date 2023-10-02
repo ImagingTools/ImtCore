@@ -469,7 +469,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 		if (viewParamsGql != nullptr){
 			offset = viewParamsGql->GetFieldArgumentValue("Offset").toInt();
 			count = viewParamsGql->GetFieldArgumentValue("Count").toInt();
-			PrepareFilters(gqlRequest, *viewParamsGql, &filterParams);
+			PrepareFilters(gqlRequest, *viewParamsGql, filterParams);
 		}
 
 		int elementsCount = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
@@ -540,7 +540,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementsCount(c
 		iprm::CParamsSet filterParams;
 
 		if (viewParamsGql != nullptr){
-			PrepareFilters(gqlRequest, *viewParamsGql, &filterParams);
+			PrepareFilters(gqlRequest, *viewParamsGql, filterParams);
 		}
 
 		int elementsCount = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
@@ -586,7 +586,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementIds(cons
 		if (viewParamsGql != nullptr){
 			offset = viewParamsGql->GetFieldArgumentValue("Offset").toInt();
 			count = viewParamsGql->GetFieldArgumentValue("Count").toInt();
-			PrepareFilters(gqlRequest, *viewParamsGql, &filterParams);
+			PrepareFilters(gqlRequest, *viewParamsGql, filterParams);
 		}
 
 
@@ -917,11 +917,16 @@ istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(
 }
 
 
-void CObjectCollectionControllerCompBase::PrepareFilters(const imtgql::CGqlRequest& gqlRequest, const imtgql::CGqlObject& viewParamsGql, iprm::CParamsSet* filterParams) const
+void CObjectCollectionControllerCompBase::PrepareFilters(
+			const imtgql::CGqlRequest& gqlRequest,
+			const imtgql::CGqlObject& viewParamsGql,
+			iprm::CParamsSet& filterParams) const
 {
-	imtbase::CCollectionFilter m_filter;
-	iprm::CParamsSet objectFilter;
+	istd::TDelPtr<imtbase::CCollectionFilter> collectionFilterPtr;
+	collectionFilterPtr.SetPtr(new imtbase::CCollectionFilter);
 
+	istd::TDelPtr<iprm::CParamsSet> objectFilterPtr;
+	objectFilterPtr.SetPtr(new iprm::CParamsSet);
 
 	QByteArray filterBA = viewParamsGql.GetFieldArgumentValue("FilterModel").toByteArray();
 	if (!filterBA.isEmpty()){
@@ -937,12 +942,12 @@ void CObjectCollectionControllerCompBase::PrepareFilters(const imtgql::CGqlReque
 					filteringInfoIds << headerId;
 				}
 			}
-			m_filter.SetFilteringInfoIds(filteringInfoIds);
+			collectionFilterPtr->SetFilteringInfoIds(filteringInfoIds);
 		}
 
 		QString filterText = generalModel.GetData("TextFilter").toString();
 		if (!filterText.isEmpty()){
-			m_filter.SetTextFilter(filterText);
+			collectionFilterPtr->SetTextFilter(filterText);
 		}
 
 		imtbase::CTreeItemModel* sortModel = generalModel.GetTreeItemModel("Sort");
@@ -950,25 +955,25 @@ void CObjectCollectionControllerCompBase::PrepareFilters(const imtgql::CGqlReque
 			QByteArray headerId = sortModel->GetData("HeaderId").toByteArray();
 			QByteArray sortOrder = sortModel->GetData("SortOrder").toByteArray();
 			if (!headerId.isEmpty() && !sortOrder.isEmpty()){
-				m_filter.SetSortingOrder(sortOrder == "ASC" ? imtbase::ICollectionFilter::SO_ASC : imtbase::ICollectionFilter::SO_DESC);
-				m_filter.SetSortingInfoIds(QByteArrayList() << headerId);
+				collectionFilterPtr->SetSortingOrder(sortOrder == "ASC" ? imtbase::ICollectionFilter::SO_ASC : imtbase::ICollectionFilter::SO_DESC);
+				collectionFilterPtr->SetSortingInfoIds(QByteArrayList() << headerId);
 			}
 		}
 
 		if (generalModel.ContainsKey("ObjectFilter")){
-			imtbase::CTreeItemModel* objectFilterPtr = generalModel.GetTreeItemModel("ObjectFilter");
-			SetObjectFilter(gqlRequest, *objectFilterPtr, objectFilter);
+			imtbase::CTreeItemModel* objectFilterModelPtr = generalModel.GetTreeItemModel("ObjectFilter");
+			SetObjectFilter(gqlRequest, *objectFilterModelPtr, *objectFilterPtr);
 		}
 		else{
 			imtbase::CTreeItemModel objectFilterModel;
-			SetObjectFilter(gqlRequest, objectFilterModel, objectFilter);
+			SetObjectFilter(gqlRequest, objectFilterModel, *objectFilterPtr);
 		}
 	}
 
-	filterParams->SetEditableParameter("Filter", &m_filter);
-	filterParams->SetEditableParameter("ObjectFilter", &objectFilter);
+	filterParams.SetEditableParameter("Filter", collectionFilterPtr.PopPtr());
+	filterParams.SetEditableParameter("ObjectFilter", objectFilterPtr.PopPtr());
 
-	this->SetAdditionalFilters(viewParamsGql, filterParams);
+	this->SetAdditionalFilters(viewParamsGql, &filterParams);
 }
 
 
