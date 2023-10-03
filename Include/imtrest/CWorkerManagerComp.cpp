@@ -5,20 +5,16 @@
 #include <imtrest/IRequest.h>
 #include <imtrest/IResponse.h>
 #include <imtrest/ISender.h>
-#include <imtrest/CMultiThreadServer.h>
-#include <imtrest/CHttpRequest.h>
 
 
 namespace imtrest
 {
 
 
-// CWorker immlemented
 CWorker::CWorker(const imtrest::IRequestServlet* requestServletPtr, CWorkerThread* workerThread)
-			:m_requestServletPtr(requestServletPtr),
-			  m_workerThread(workerThread)
+	:m_requestServletPtr(requestServletPtr),
+	m_workerThread(workerThread)
 {
-
 }
 
 
@@ -27,47 +23,44 @@ void CWorker::ProcessRequest(const IRequest* request)
 	m_workerThread->SetStatus(CWorkerThread::ST_PROCESS);
 
 	if (m_requestServletPtr != nullptr && request != nullptr){
-		qptrdiff threadId = (qptrdiff)QThread::currentThreadId();
-		qDebug() << QString("CWorker GetConnectionName - %1").arg(threadId);
-
-		ConstResponsePtr ResponsePtr = m_requestServletPtr->ProcessRequest(*request);
-		if (ResponsePtr.IsValid()){
+		ConstResponsePtr responsePtr = m_requestServletPtr->ProcessRequest(*request);
+		if (responsePtr.IsValid()){
 			const ISender* sender = m_workerThread->GetSender(request->GetRequestId());
 			if (sender != nullptr){
-				sender->SendResponse(ResponsePtr);
+				sender->SendResponse(responsePtr);
 			}
-			qDebug() << "SendResponse" << "Request:" << request->GetCommandId() << "Body:" << request->GetBody();
 		}
 		else{
-			qDebug() << "Request result invalid !!!" ;
+			Q_ASSERT_X(false, __FILE__, "Request result invalid");
 		}
 	}
+
 	m_workerThread->SetStatus(CWorkerThread::ST_CLOSE);
-	emit FinishProcess(request);
+
+	Q_EMIT FinishProcess(request);
 }
 
 
-
-
-// CWorkerThread immlemented
 CWorkerThread::CWorkerThread(const CWorkerManagerComp* workerManager)
-	: m_status(ST_PROCESS),
-	  m_workerPtr(nullptr)
+	:m_status(ST_PROCESS),
+	m_workerPtr(nullptr)
 {
-	  m_workerManager = dynamic_cast<CWorkerManagerComp*>(const_cast<CWorkerManagerComp*>(workerManager));
+	m_workerManager = dynamic_cast<CWorkerManagerComp*>(const_cast<CWorkerManagerComp*>(workerManager));
 }
 
 
 CWorkerThread::Status CWorkerThread::GetStatus()
 {
-	QMutexLocker loc(&m_statusMutex);
+	QMutexLocker lock(&m_statusMutex);
+
 	return m_status;
 }
 
 
 void CWorkerThread::SetStatus(Status status)
 {
-	QMutexLocker loc(&m_statusMutex);
+	QMutexLocker lock(&m_statusMutex);
+
 	m_status = status;
 }
 
@@ -88,36 +81,50 @@ const ISender* CWorkerThread::GetSender(const QByteArray& requestId)
 }
 
 
+//reimplemented (QThread)
+
 void CWorkerThread::run()
 {
 	m_requestServletPtr = m_workerManager->CreateServlet();
+	if (m_requestServletPtr == nullptr){
+		Q_ASSERT(false);
+
+		return;
+	}
+
 	m_workerPtr.SetPtr(new CWorker(m_requestServletPtr, this));
+
 	connect(this, &CWorkerThread::StartProcess, m_workerPtr.GetPtr(), &CWorker::ProcessRequest); //, Qt::QueuedConnection
-	connect(m_workerPtr.GetPtr(), &CWorker::FinishProcess, this, &CWorkerThread::onFinishProcess, Qt::DirectConnection); //, Qt::QueuedConnection
-	qptrdiff threadId = (qptrdiff)QThread::currentThreadId();
-	qDebug() << QString("CWorker run GetConnectionName - %1").arg(threadId);
+	connect(m_workerPtr.GetPtr(), &CWorker::FinishProcess, this, &CWorkerThread::OnFinishProcess, Qt::DirectConnection); //, Qt::QueuedConnection
+
 	m_workerPtr->ProcessRequest(m_request);
+
 	exec();
 }
 
 
-void CWorkerThread::onStarted()
+void CWorkerThread::OnStarted()
 {
-	emit StartProcess(m_request);
+	Q_EMIT StartProcess(m_request);
 }
 
 
-void CWorkerThread::onFinishProcess(const IRequest* request)
+void CWorkerThread::OnFinishProcess(const IRequest* request)
 {
-	emit FinishProcess(request);
+	Q_EMIT FinishProcess(request);
 }
-
 
 
 CWorkerManagerComp::CWorkerManagerComp()
 {
-	connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, this, &CWorkerManagerComp::AboutToQuit, Qt::DirectConnection);
+	connect(
+				QCoreApplication::instance(),
+				&QCoreApplication::aboutToQuit,
+				this,
+				&CWorkerManagerComp::AboutToQuit,
+				Qt::DirectConnection);
 }
+
 
 IRequestServlet* CWorkerManagerComp::CreateServlet()
 {
@@ -127,6 +134,7 @@ IRequestServlet* CWorkerManagerComp::CreateServlet()
 
 	return nullptr;
 }
+
 
 const ISender* CWorkerManagerComp::GetSender(const QByteArray& requestId)
 {
@@ -138,9 +146,12 @@ const ISender* CWorkerManagerComp::GetSender(const QByteArray& requestId)
 }
 
 
+// reimplemented (IRequestHandler)
+
 ConstResponsePtr CWorkerManagerComp::ProcessRequest(const IRequest& request) const
 {
 	QMutexLocker loc(&m_requestListMutex);
+
 	ConstResponsePtr retVal;
 
 	m_requestList << &request;
@@ -148,10 +159,12 @@ ConstResponsePtr CWorkerManagerComp::ProcessRequest(const IRequest& request) con
 	for (CWorkerThread* workerPtr: m_workerList){
 		if (workerPtr->GetStatus() == CWorkerThread::ST_CLOSE){
 			const IRequest* requestPtr = m_requestList.at(0);
+
 			m_requestList.removeAt(0);
+
 			workerPtr->SetStatus(CWorkerThread::ST_PROCESS);
+
 			emit workerPtr->StartProcess(requestPtr);
-			qDebug() << m_workerList.count()  << "StartProcess1" << "Request:" << request.GetRequestId() << requestPtr->GetCommandId() << "Body:" << request.GetBody();
 
 			return retVal;
 		}
@@ -164,11 +177,11 @@ ConstResponsePtr CWorkerManagerComp::ProcessRequest(const IRequest& request) con
 
 		const IRequest* requestPtr = m_requestList.at(0);
 		m_requestList.removeAt(0);
-		workerPtr->SetRequest(requestPtr);
-		workerPtr->start();
-		qDebug() << m_workerList.count() << "StartProcess2" << "Request:" << request.GetRequestId() << request.GetCommandId() << requestPtr->GetCommandId() << "Body:" << request.GetBody();
-	}
 
+		workerPtr->SetRequest(requestPtr);
+
+		workerPtr->start();
+	}
 
 	return retVal;
 }
@@ -180,42 +193,41 @@ QByteArray CWorkerManagerComp::GetSupportedCommandId() const
 }
 
 
- void CWorkerManagerComp::OnFinish(const IRequest* request)
- {
-	 QMutexLocker loc(&m_requestListMutex);
-	 qDebug() << "FinishProcess" << "Request:" << request->GetRequestId();
-	 delete request;
-	 
-	 if (m_requestList.isEmpty()){
-		 return;
-	 }
+void CWorkerManagerComp::OnFinish(const IRequest* request)
+{
+	QMutexLocker loc(&m_requestListMutex);
 
-	 for (CWorkerThread* workerPtr: m_workerList){
-		 if (workerPtr->GetStatus() == CWorkerThread::ST_CLOSE){
-			 const IRequest* requestPtr = m_requestList.at(0);
-			 m_requestList.removeAt(0);
-			 workerPtr->SetStatus(CWorkerThread::ST_PROCESS);
-			 emit workerPtr->StartProcess(requestPtr);
-			 qDebug() << "StartProcess3" << "Request:" << requestPtr->GetCommandId() << "Body:" << requestPtr->GetBody();
+	delete request;
 
-			 return;
-		 }
-	 }
- }
+	if (m_requestList.isEmpty()){
+		return;
+	}
+
+	for (CWorkerThread* workerPtr : m_workerList){
+		if (workerPtr->GetStatus() == CWorkerThread::ST_CLOSE){
+			const IRequest* requestPtr = m_requestList.at(0);
+			m_requestList.removeAt(0);
+
+			workerPtr->SetStatus(CWorkerThread::ST_PROCESS);
+			emit workerPtr->StartProcess(requestPtr);
+
+			return;
+		}
+	}
+}
 
 
- void CWorkerManagerComp::AboutToQuit()
- {
-	 for (CWorkerThread* workerPtr: m_workerList){
-		 workerPtr->quit();
-		 workerPtr->wait(1000);
-		 workerPtr->deleteLater();
-	 }
+void CWorkerManagerComp::AboutToQuit()
+{
+	for (CWorkerThread* workerPtr : m_workerList){
+		workerPtr->quit();
+		workerPtr->wait(1000);
+		workerPtr->deleteLater();
+	}
 
-	 qDeleteAll(m_requestList);
-	 m_requestList.clear();
- }
-
+	qDeleteAll(m_requestList);
+	m_requestList.clear();
+}
 
 
 } // namespace imtrest
