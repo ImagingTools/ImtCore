@@ -7,13 +7,14 @@ Rectangle {
     color: Style.backgroundColor;
 
     property int type: 0x1;
+    property bool maHoverEnabled: true;
 
     MouseArea {
         id: splitterMA;
 
         anchors.fill: parent;
 
-        hoverEnabled: true;
+        hoverEnabled: splitterContainer.maHoverEnabled;
         acceptedButtons: Qt.LeftButton;
         cursorShape: Qt.SplitHCursor;
 
