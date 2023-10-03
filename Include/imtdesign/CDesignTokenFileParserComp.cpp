@@ -178,7 +178,7 @@ bool CDesignTokenFileParserComp::ParseFile()
 
 		ColorSchema schema;
 		schema.id = styleName.toLocal8Bit();
-		schema.stylePath = ":/Styles/" + styleName +  "/ImtColorStyle";
+		schema.stylePath = ":/" + styleName +  "/Styles/ImtColorStyle";
 		schema.palette = CDesignTokenStyleUtils::GetPaletteFromMultiEntry(styleEntry);
 
 		QJsonValue toolButtonGradientColorsObject = styleEntry["ToolButtonGradient"];

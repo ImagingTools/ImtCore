@@ -66,7 +66,7 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetMetaInf
 			switch (metainfoType){
 				case idoc::IDocumentMetaInfo::MIT_CREATION_TIME: case idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME:
 				{
-					QString timestr = metaInfo->GetMetaInfo(metainfoType).toString();
+					QString timestr = metaInfo->GetMetaInfo(metainfoType).toDateTime().toString(Qt::ISODate);
 					metaInfoModel->SetData(QString::number(metainfoType).toLocal8Bit(), timestr);
 					break;
 				}

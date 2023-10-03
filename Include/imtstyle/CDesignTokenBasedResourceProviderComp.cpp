@@ -235,7 +235,7 @@ void CDesignTokenBasedResourceProviderComp::CreateDefaultPalettes()
 	light.toolButtonGradientColors.endColor = QColor(235, 235, 238);
 	light.pressedToolButtonGradientColors.startColor = QColor(245, 245, 245);
 	light.pressedToolButtonGradientColors.endColor = QColor(245, 245, 245);
-	light.stylePath = ":/Styles/Light/ImtColorStyle";
+	light.stylePath = ":/Light/Styles/ImtColorStyle";
 
 	m_paletteMap["Light"] = light;
 	m_designSchemaList.InsertItem("Light", QObject::tr("Light"),"");
@@ -255,7 +255,7 @@ void CDesignTokenBasedResourceProviderComp::CreateDefaultPalettes()
 	dark.palette.setColor(QPalette::Link, QColor(42, 130, 218));
 	dark.palette.setColor(QPalette::Highlight, QColor("#1a76e7"));
 	dark.palette.setColor(QPalette::HighlightedText, Qt::white);
-	dark.stylePath = ":/Styles/Dark/ImtColorStyle";
+	dark.stylePath = ":/Dark/Styles/ImtColorStyle";
 
 	m_paletteMap["Dark"] = dark;
 	m_designSchemaList.InsertItem("Dark", QObject::tr("Dark"), "");
