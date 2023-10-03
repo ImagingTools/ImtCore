@@ -448,6 +448,8 @@ bool CGqlObjectCollectionComp::SetObjectData(
 				updateInfo.elementId = objectId;
 				changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_UPDATED, QVariant::fromValue(updateInfo));
 				istd::CChangeNotifier notifier(this, &changeSet);
+
+				return true;
 			}
 		}
 	}
@@ -487,10 +489,6 @@ QByteArray CGqlObjectCollectionComp::GetObjectTypeId(const Id& objectId) const
 {
 	if (m_delegateCompPtr.IsValid()){
 		return m_delegateCompPtr->GetObjectTypeId(objectId);
-//		imtgql::IGqlStructuredCollectionResponse::ObjectInfo info;
-//		if (m_delegateCompPtr->GetObjectInfo(objectId, info)){
-//			return info.typeId;
-//		}
 	}
 
 	return QByteArray();

@@ -187,7 +187,11 @@ QByteArray CGqlObjectCollectionDelegateComp::InsertObject(
 			if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 				QVariant variant;
 				if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+#if QT_VERSION < 0x060000
+					if (variant.type() == QMetaType::Bool){
+#else
 					if (variant.typeId() == QMetaType::Bool){
+#endif
 						return QByteArray();
 					}
 				}
@@ -217,7 +221,11 @@ bool CGqlObjectCollectionDelegateComp::GetObjectData(
 			if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 				QVariant variant;
 				if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+#if QT_VERSION < 0x060000
+					if (variant.type() == QMetaType::QByteArray || variant.type() == QMetaType::QString){
+#else
 					if (variant.typeId() == QMetaType::QByteArray || variant.typeId() == QMetaType::QString){
+#endif
 						QByteArray objectData = QByteArray::fromBase64(variant.toByteArray());
 						iser::ISerializable* object = dynamic_cast<iser::ISerializable*>(objectPtr.GetPtr());
 						if (object == nullptr){
@@ -268,9 +276,7 @@ bool CGqlObjectCollectionDelegateComp::SetObjectData(
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.typeId() == QMetaType::Bool){
-							return variant.toBool();
-						}
+						return true;
 					}
 				}
 			}
@@ -355,7 +361,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 	}
 	QByteArray data((char*)archive.GetBuffer(), archive.GetBufferSize());
 
-	QByteArray commandId = *m_collectionIdAttrPtr + "ObjectAdd";
+	QByteArray commandId = *m_collectionIdAttrPtr + "Add";
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
 	imtgql::CGqlObject input("input");
 	input.InsertField("Id", QVariant(proposedObjectId));
@@ -372,7 +378,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 
 imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetObjectRequest(const QByteArray& objectId) const
 {
-	QByteArray commandId = *m_collectionIdAttrPtr + "ObjectView";
+	QByteArray commandId = *m_collectionIdAttrPtr + "View";
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, commandId);
 	imtgql::CGqlObject input("input");
 	input.InsertField("Id", QVariant(objectId));
@@ -413,7 +419,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectRequest(
 
 	QByteArray data((char*)archive.GetBuffer(), archive.GetBufferSize());
 
-	QByteArray commandId = *m_collectionIdAttrPtr + "ObjectUpdate";
+	QByteArray commandId = *m_collectionIdAttrPtr + "Update";
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
 	imtgql::CGqlObject input("input");
 	input.InsertField("Id", QVariant(objectId));

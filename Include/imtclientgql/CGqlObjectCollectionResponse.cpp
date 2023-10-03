@@ -139,23 +139,23 @@ void CGqlObjectCollectionResponse::OnReply(const imtgql::IGqlRequest& request, c
 		m_isPrimitiveTypePresent = true;
 	}
 
-	if (data.contains("info")){
-		m_variant = data;
-		qDebug() << m_variant;
-		m_isPrimitiveTypePresent = true;
+	QByteArrayList keys;
+	keys << "info";
+	keys << "metaInfo";
+	keys << "dataMetaInfo";
+	keys << "addedNotification";
+	keys << "removedNotification";
+	keys << "updatedNotification";
+	keys << "updatedCollectionNotification";
+
+	for (QByteArray key: keys){
+		if (data.contains(key)){
+			m_variant = data;
+			qDebug() << m_variant;
+			m_isPrimitiveTypePresent = true;
+		}
 	}
 
-	if (data.contains("metaInfo")){
-		m_variant = data;
-		qDebug() << m_variant;
-		m_isPrimitiveTypePresent = true;
-	}
-
-	if (data.contains("dataMetaInfo")){
-		m_variant = data;
-		qDebug() << m_variant;
-		m_isPrimitiveTypePresent = true;
-	}
 }
 
 
