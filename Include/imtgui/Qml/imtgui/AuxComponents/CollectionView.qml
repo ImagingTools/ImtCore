@@ -97,9 +97,9 @@ Item {
     }
 
     onDocumentsDataChanged: {
-        console.log("CollectionView onDocumentsDataChanged");
-        collectionViewContainer.itemId = documentsData.GetData("Id", model.index);
-        collectionViewContainer.itemName = documentsData.GetData("Title", model.index);
+    	console.log("CollectionView onDocumentsDataChanged");
+        collectionViewContainer.itemId = collectionViewContainer.documentsData.GetData("Id", model.index);
+        collectionViewContainer.itemName = collectionViewContainer.documentsData.GetData("Title", model.index);
     }
 
     onCommandUpdateGuiChanged: {
