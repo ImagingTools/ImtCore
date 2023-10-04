@@ -512,8 +512,6 @@ QString CDatabaseEngineComp::GetConnectionName() const
 {
 	qptrdiff threadId = (qptrdiff)QThread::currentThreadId();
 
-	qDebug() << QString("GetConnectionName - %1").arg(threadId);
-
 	return GetDatabaseName() + QString(" - %1").arg(threadId);
 }
 

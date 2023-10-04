@@ -71,8 +71,6 @@ QVariant CStandardSqlMetaInfoTableDelegateComp::FromTableRepresentation(const QV
 
 		dataStream >> image;
 
-		qDebug() << image;
-
 		return image;
 	}
 
