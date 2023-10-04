@@ -680,7 +680,7 @@ QString CObjectCollectionViewDelegate::CreateFileImportFilter(bool useBundle) co
 		ifilegui::CFileDialogLoaderComp::AppendLoaderFilterList(*fileTypeInfoPtr, nullptr, -1, allExt, filters, false);
 	}
 
-	if (useBundle) {
+	if (useBundle){
 		filters.append("Compressed item folder (*.zip)");
 		allExt.append("zip");
 	}
@@ -925,7 +925,7 @@ void CObjectCollectionViewDelegate::OnRename(bool /*checked*/)
 		return;
 	}
 
-	for (QByteArray itemId : m_selectedItemIds) {
+	for (QByteArray itemId : m_selectedItemIds){
 		if (!itemId.isEmpty()){
 			RenameObject(itemId, "");
 		}
@@ -935,14 +935,14 @@ void CObjectCollectionViewDelegate::OnRename(bool /*checked*/)
 
 void CObjectCollectionViewDelegate::OnEditDescription(bool /*checked*/)
 {
-	if (m_selectedItemIds.count() != 1) {
+	if (m_selectedItemIds.count() != 1){
 		return;
 	}
 
 	Q_ASSERT(m_parentGuiPtr != nullptr);
 	Q_ASSERT(m_collectionPtr != nullptr);
 
-	for (const QByteArray& itemId : m_selectedItemIds) {
+	for (const QByteArray& itemId : m_selectedItemIds){
 		if (!itemId.isEmpty() && (m_collectionPtr != nullptr) && (m_parentGuiPtr != nullptr)){
 			QString description = m_collectionPtr->GetElementInfo(itemId, imtbase::IObjectCollectionInfo::EIT_DESCRIPTION).toString();
 
@@ -959,7 +959,7 @@ void CObjectCollectionViewDelegate::OnEditDescription(bool /*checked*/)
 void CObjectCollectionViewDelegate::OnEdit(bool /*checked*/)
 {
 	for (const QByteArray& itemId : m_selectedItemIds){
-		if (!itemId.isEmpty()) {
+		if (!itemId.isEmpty()){
 			OpenDocumentEditor(itemId);
 		}
 	}
