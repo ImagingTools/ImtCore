@@ -61,11 +61,7 @@ int main(int argc, char *argv[])
 	qmlRegisterModule("Qt5Compat.GraphicalEffects", 1, 0);
 #endif
 
-    QStringList list = QQuickStyle::availableStyles();
-    for(int i = 0; i< list.length(); i++){
-        qDebug() << "Style::: " << list.at(i);
-    }
-    QQuickStyle::setStyle("Material");
+	QQuickStyle::setStyle("Material");
 
 	ibase::IApplication* applicationPtr = instance.GetInterface<ibase::IApplication>();
 	if (applicationPtr != nullptr){

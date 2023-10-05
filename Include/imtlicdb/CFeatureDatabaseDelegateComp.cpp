@@ -19,7 +19,7 @@ bool CFeatureDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSe
 	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
 	if (!paramIds.isEmpty()){
 #if QT_VERSION >= 0x051500
-		QByteArrayList idsList(paramIds.cbegin(), paramIds.cend());
+		QByteArrayList idList(paramIds.cbegin(), paramIds.cend());
 #else
 		QByteArrayList idList = paramIds.toList();
 #endif
