@@ -1,6 +1,7 @@
 // Qt includes
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QStyleFactory>
+#include <QQuickStyle>
 
 // ACF includes
 #include <ibase/IApplication.h>
@@ -21,21 +22,22 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(ImtControlsGalleryWeb);
 #endif
 
-	Q_INIT_RESOURCE(imtguigql);
-	Q_INIT_RESOURCE(imtqml);
-	Q_INIT_RESOURCE(imtstyle);
-	Q_INIT_RESOURCE(imtstyleqml);
-	Q_INIT_RESOURCE(imtgui);
-	Q_INIT_RESOURCE(imtauthgui);
-	Q_INIT_RESOURCE(imtcontrols);
+    Q_INIT_RESOURCE(imtguigql);
+    Q_INIT_RESOURCE(imtqml);
+    Q_INIT_RESOURCE(imtstyle);
+    Q_INIT_RESOURCE(imtstylecontrolsqml);
+    Q_INIT_RESOURCE(imtcontrols);
+    Q_INIT_RESOURCE(imtgui);
+    Q_INIT_RESOURCE(imtauthgui);
 
 	Q_INIT_RESOURCE(imtresthtml);
 	Q_INIT_RESOURCE(ImtControlsGallery);
+    Q_INIT_RESOURCE(imtguiTheme);
 
 
 //	Q_INIT_RESOURCE(Webimt3dgui);
-	Q_INIT_RESOURCE(Webimtauthgui);
-	Q_INIT_RESOURCE(Webimtgui);
+//    Q_INIT_RESOURCE(Webimtauthgui);
+//    Q_INIT_RESOURCE(Webimtgui);
 //	Q_INIT_RESOURCE(Webimtcontrols);
 //	Q_INIT_RESOURCE(Webimtlicgui);
 
@@ -58,6 +60,12 @@ int main(int argc, char *argv[])
 	qmlRegisterModule("QtQuick.Dialogs", 6, 2);
 	qmlRegisterModule("Qt5Compat.GraphicalEffects", 1, 0);
 #endif
+
+    QStringList list = QQuickStyle::availableStyles();
+    for(int i = 0; i< list.length(); i++){
+        qDebug() << "Style::: " << list.at(i);
+    }
+    QQuickStyle::setStyle("Material");
 
 	ibase::IApplication* applicationPtr = instance.GetInterface<ibase::IApplication>();
 	if (applicationPtr != nullptr){

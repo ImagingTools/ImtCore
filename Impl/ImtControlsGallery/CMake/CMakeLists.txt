@@ -25,6 +25,7 @@ endif()
 
 find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS WebSockets REQUIRED)
 find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Quick Qml REQUIRED)
+find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS QuickControls2 REQUIRED)
 
 
 include(${IMTCOREDIR}/Config/CMake/WebCompiler.cmake)
@@ -32,6 +33,7 @@ include(${ACFDIR}/Config/CMake/CustomBuild.cmake)
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 include(${ACFDIR}/Config/CMake/AcfStd.cmake)
+include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 include(${ACFDIR}/Config/CMake/WindeployQt.cmake)
 
 if(DEFINED WEB_COMPILE AND  WEB_COMPILE)
@@ -40,10 +42,11 @@ endif()
 
 target_link_libraries(${PROJECT_NAME} iauth)
 target_link_libraries(${PROJECT_NAME} imtbase imtzip imtrest imtcrypt imtstyle imtqml imtdb imtfile)
-target_link_libraries(${PROJECT_NAME} imtlicgql imtguigql imtgql imtauthgui imtauthgql imtauthdb imtapp imtstyleqml imtcontrols)
+target_link_libraries(${PROJECT_NAME} imtlicgql imtguigql imtgql imtauthgui imtauthgql imtauthdb imtapp imtstylecontrolsqml imtcontrols)
 # target_link_libraries(${PROJECT_NAME} lisaqml ImtCoreLoc LisaLoc)
 target_link_libraries(${PROJECT_NAME} iqtgui)
 target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::Quick  Qt${QT_VERSION_MAJOR}::WebSockets)
+target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::QuickControls2)
 
 
 message("PROJECT_BINARY_DIR ${IMTCOREDIR}/Bin/web")
@@ -64,14 +67,18 @@ list(APPEND webdirs ${CMAKE_CURRENT_LIST_DIR}/../Resources/html)
 list(APPEND webdirs ${buildwebdir}/Resources)
 
 # copy base qml sources from to
-list(APPEND webdirs ${IMTCOREDIR}/Include/imtgui/Qml/Acf)
-list(APPEND webdirs ${buildwebdir}/src/Acf)
+#list(APPEND webdirs ${IMTCOREDIR}/Include/imtgui/Qml/Acf)
+#list(APPEND webdirs ${buildwebdir}/src/Acf)
 
 list(APPEND webdirs ${IMTCOREDIR}/Include/imtguigql/Qml/imtguigql)
 list(APPEND webdirs ${buildwebdir}/src/imtguigql)
 
 list(APPEND webdirs ${IMTCOREDIR}/Include/imtqml/Qml/imtqml)
 list(APPEND webdirs ${buildwebdir}/src/imtqml)
+
+#list(APPEND webdirs ${IMTCOREDIR}/Include/imtgui/Qml/imtgui)
+#list(APPEND webdirs ${buildwebdir}/src/imtgui)
+
 
 list(APPEND webdirs ${IMTCOREDIR}/Include/imtauthgui/Qml/imtauthgui)
 list(APPEND webdirs ${buildwebdir}/src/imtauthgui)
@@ -82,7 +89,7 @@ list(APPEND webdirs ${buildwebdir}/src/imtlicgui)
 list(APPEND webdirs ${IMTCOREDIR}/Include/imtcontrols/Qml/imtcontrols)
 list(APPEND webdirs ${buildwebdir}/src/imtcontrols)
 
-list(APPEND webdirs ${IMTCOREDIR}/Include/imtstyleqml/Qml/Acf)
+list(APPEND webdirs ${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml/Acf)
 list(APPEND webdirs ${buildwebdir}/src/Acf)
 
 message("LISADIR ${LISADIR}")
@@ -105,7 +112,9 @@ endif()
 
 if(WIN32)
 	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtqml/Resources/qml")
-	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtgui/Qml/imtgui")
+        list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtcontrols/Qml")
+        list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml")
+#	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtgui/Qml/imtgui")
 	set(files  \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
 
 	windeploy(${PROJECT_NAME} "${listOptions}" "${files}")
@@ -113,9 +122,10 @@ if(WIN32)
 endif()
 
 if(DEFINED CONTROLS_QML_DIRS AND CONTROLS_QML_DIRS)
-	list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtstyleqml/Qml")
+        list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml")
     list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtqml/Qml")
-	list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtauthgui/Qml")
+    list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtgui/Qml")
+        list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtauthgui/Qml")
     list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtguigql/Qml")
     list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtcontrols/Qml")
 	list(APPEND QML_IMPORT_DIRS "${CMAKE_CURRENT_LIST_DIR}/../Qml")
