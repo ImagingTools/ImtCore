@@ -89,8 +89,9 @@ endif()
 
 if(NOT DEFINED USE_QTQML OR USE_QTQML)
 	add_subdirectory("${INCLUDE_DIR}/imtqml/CMake" "${AUX_INCLUDE_DIR}/imtqml")
-	add_subdirectory("${INCLUDE_DIR}/imtstyleqml/CMake" "${AUX_INCLUDE_DIR}/imtstyleqml")
-	add_subdirectory("${INCLUDE_DIR}/imtcontrols/CMake" "${AUX_INCLUDE_DIR}/imtcontrols")
+        add_subdirectory("${INCLUDE_DIR}/imtstyleqml/CMake" "${AUX_INCLUDE_DIR}/imtstyleqml")
+        add_subdirectory("${INCLUDE_DIR}/imtstylecontrolsqml/CMake" "${AUX_INCLUDE_DIR}/imtstylecontrolsqml")
+        add_subdirectory("${INCLUDE_DIR}/imtcontrols/CMake" "${AUX_INCLUDE_DIR}/imtcontrols")
 endif()
 
 if(NOT DEFINED USE_QTDB OR USE_QTDB)
@@ -220,7 +221,7 @@ if(NOT ANDROID)
 	if(NOT DEFINED USE_QTQML OR USE_QTQML)
 		add_subdirectory("${IMPL_DIR}/ImtQmlPck/CMake" "${AUX_INCLUDE_DIR}/ImtQmlPck")
 		add_dependencies(ImtQmlPck imtqml)
-#		add_subdirectory("${IMPL_DIR}/ImtControlsGallery/CMake" "${AUX_INCLUDE_DIR}/ImtControlsGallery")
+                add_subdirectory("${IMPL_DIR}/ImtControlsGallery/CMake" "${AUX_INCLUDE_DIR}/ImtControlsGallery")
 
 	endif()
 
