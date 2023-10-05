@@ -77,7 +77,7 @@ export class Map extends Item {
                 }
             }
             // this.$p.zoomLevel.preventDefault = true
-            this.$p.center.preventDefault = true
+            this.$p.center.preventDefault = false
             // this.$p.bearing.preventDefault = true
             this.zoomLevel = this.$map.getView().getZoom()
 
@@ -88,6 +88,7 @@ export class Map extends Item {
             this.bearing = -this.$map.getView().getRotation()*180/Math.PI
         })
         this.$map.on('movestart', (e)=>{
+            this.$p.center.preventDefault = true
             // this.$p.zoomLevel.preventDefault = false
             // this.$p.center.preventDefault = false
             // this.$p.bearing.preventDefault = false

@@ -273,7 +273,7 @@ export class Text extends Item {
         }
     }
     $applyMetrics(){
-        let textMetrics = Core.measureText(this.text, this.font.pixelSize, this.font.family, this.$widthAuto ? 0 : this.width, this.wrapMode)
+        let textMetrics = Core.measureText(this.text ? this.text.toString() : '', this.font.pixelSize, this.font.family, this.$widthAuto ? 0 : this.width, this.wrapMode)
         this.impl.innerHTML = textMetrics.text
 
         if(this.$widthAuto){

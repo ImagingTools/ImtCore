@@ -65,6 +65,8 @@ global.UIDList = {}
 global.caller = null
 global.ReadyList = []
 
+Number.prototype.split=function(...args){return this.valueOf().toString().split(...args)}
+Number.prototype.includes=function(...args){return this.valueOf().toString().includes(...args)}
 
 
 let XMLProxy = XMLHttpRequest.prototype.open
