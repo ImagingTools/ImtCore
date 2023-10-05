@@ -151,8 +151,10 @@ void CGqlObjectCollectionResponse::OnReply(const imtgql::IGqlRequest& request, c
 	for (QByteArray key: keys){
 		if (data.contains(key)){
 			m_variant = data;
-			qDebug() << m_variant;
+//			qDebug() << m_variant;
 			m_isPrimitiveTypePresent = true;
+
+			break;
 		}
 	}
 

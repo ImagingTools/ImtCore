@@ -25,6 +25,9 @@
                     <AttributeInfo Id="GqlDatabaseDelegate" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GqlObjectCollectionDelegate"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="MetaInfoCreator" Type="Reference" ExportId="MetaInfoCreator">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="ObjectFactories">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

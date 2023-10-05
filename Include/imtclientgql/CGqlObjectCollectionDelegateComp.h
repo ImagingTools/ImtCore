@@ -90,6 +90,10 @@ public:
 	virtual imtgql::IGqlResponse* CreateResponse(const imtgql::IGqlRequest& request) const override;
 
 private:
+	bool SerializeObject(const istd::IPolymorphic* object, QByteArray& objectData) const;
+	bool DeSerializeObject(istd::IPolymorphic* object, const QByteArray& objectData) const;
+
+private:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
 };
 

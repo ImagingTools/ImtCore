@@ -30,7 +30,7 @@ void CObjectCollectionMetaInfoViewComp::FillWidget(QGridLayout* layoutPtr)
 
 		QString name = metaInfoPtr->GetMetaInfoName(type);
 		if (name.isEmpty()){
-			continue;
+//			continue;
 		}
 
 		QString textValue;

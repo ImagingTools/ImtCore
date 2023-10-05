@@ -9,6 +9,7 @@
 
 // ACF includes
 #include <idoc/CStandardDocumentMetaInfo.h>
+#include <imod/TModelWrap.h>
 
 // ImtCore includes
 #include <imtbase/CTempDir.h>
@@ -498,7 +499,15 @@ QByteArray CGqlObjectCollectionComp::GetObjectTypeId(const Id& objectId) const
 idoc::MetaInfoPtr CGqlObjectCollectionComp::GetDataMetaInfo(const Id& objectId) const
 {
 	if (m_delegateCompPtr.IsValid()){
-		idoc::MetaInfoPtr retVal(new idoc::CStandardDocumentMetaInfo());
+		idoc::MetaInfoPtr retVal;
+
+		if (m_metaInfoCreatorCompPtr.IsValid()){
+			QByteArray typeId = GetObjectTypeId(objectId);
+			m_metaInfoCreatorCompPtr->CreateMetaInfo(nullptr, typeId, retVal);
+		}
+		else{
+			retVal.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
+		}
 
 		if (m_delegateCompPtr->GetObjectDataMetaInfo(objectId, *retVal)){
 			return retVal;
@@ -776,7 +785,7 @@ bool CGqlObjectCollectionComp::GetObjectInfo(const QByteArray& objectId, imtgql:
 bool CGqlObjectCollectionComp::GetObjectMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& valueOut) const
 {
 	if (m_delegateCompPtr.IsValid()){
-		return m_delegateCompPtr->GetObjectDataMetaInfo(objectId, valueOut);
+		return m_delegateCompPtr->GetObjectMetaInfo(objectId, valueOut);
 	}
 
 	return false;

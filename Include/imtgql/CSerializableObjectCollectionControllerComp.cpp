@@ -57,24 +57,45 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetMetaInf
 		QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(Id);
 		dataModel->SetData("typeId", typeId);
 
-		imtbase::CTreeItemModel* metaInfoModel = dataModel->AddTreeModel("metaInfo");
+//		imtbase::CTreeItemModel* metaInfoModel = dataModel->AddTreeModel("metaInfo");
 
 		idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(Id);
-		idoc::IDocumentMetaInfo::MetaInfoTypes metainfoTypes = metaInfo->GetMetaInfoTypes();
-		for (int metainfoType: metainfoTypes){
-			QByteArray metainfoName = metaInfo->GetMetaInfoName(metainfoType).toUtf8();
-			switch (metainfoType){
-				case idoc::IDocumentMetaInfo::MIT_CREATION_TIME: case idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME:
-				{
-					QString timestr = metaInfo->GetMetaInfo(metainfoType).toDateTime().toString(Qt::ISODate);
-					metaInfoModel->SetData(QString::number(metainfoType).toLocal8Bit(), timestr);
-					break;
-				}
-				default:
-					QByteArray data = metaInfo->GetMetaInfo(metainfoType).toByteArray();
-					metaInfoModel->SetData(QString::number(metainfoType).toLocal8Bit(), data);
-			}
+		iser::ISerializable* serializableMetaInfo = dynamic_cast<iser::ISerializable*>(metaInfo.GetPtr());
+
+		if (serializableMetaInfo == nullptr){
+			Q_ASSERT(0);
+			errorMessage = QObject::tr("Object is not serializable").toUtf8();
+			SendErrorMessage(0, errorMessage);
+
+			return nullptr;
 		}
+
+		iser::CMemoryWriteArchive archive;
+		if (!serializableMetaInfo->Serialize(archive)){
+			errorMessage = QObject::tr("Error when serializing an object").toUtf8();
+			SendErrorMessage(0, errorMessage);
+
+			return nullptr;
+		}
+
+		QByteArray data((char*)archive.GetBuffer(), archive.GetBufferSize());
+		dataModel->SetData("metaInfo", data.toBase64());
+
+//		idoc::IDocumentMetaInfo::MetaInfoTypes metainfoTypes = metaInfo->GetMetaInfoTypes();
+//		for (int metainfoType: metainfoTypes){
+//			QByteArray metainfoName = metaInfo->GetMetaInfoName(metainfoType).toUtf8();
+//			switch (metainfoType){
+//				case idoc::IDocumentMetaInfo::MIT_CREATION_TIME: case idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME:
+//				{
+//					QString timestr = metaInfo->GetMetaInfo(metainfoType).toDateTime().toString(Qt::ISODate);
+//					metaInfoModel->SetData(QString::number(metainfoType).toLocal8Bit(), timestr);
+//					break;
+//				}
+//				default:
+//					QByteArray data = metaInfo->GetMetaInfo(metainfoType).toByteArray();
+//					metaInfoModel->SetData(QString::number(metainfoType).toLocal8Bit(), data);
+//			}
+//		}
 
 //		elementInfo = metaInfo->GetMetaInfo(imtauth::IUserInfo::MIT_USERNAME).toByteArray();
 //		dataModel->SetData("description", elementInfo);
@@ -194,14 +215,27 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetDataMet
 		QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(Id);
 		dataModel->SetData("typeId", typeId);
 
-		imtbase::CTreeItemModel* metaInfoModel = dataModel->AddTreeModel("dataMetaInfo");
-
 		idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(Id);
-		idoc::IDocumentMetaInfo::MetaInfoTypes metainfoTypes = metaInfo->GetMetaInfoTypes();
-		for (int metainfoType: metainfoTypes){
-			QByteArray metainfoName = metaInfo->GetMetaInfoName(metainfoType).toUtf8();
-			metaInfoModel->SetData(QString::number(metainfoType).toLocal8Bit(), metaInfo->GetMetaInfo(metainfoType));
+
+		iser::ISerializable* serializableMetaInfo = dynamic_cast<iser::ISerializable*>(metaInfo.GetPtr());
+		if (serializableMetaInfo == nullptr){
+			Q_ASSERT(0);
+			errorMessage = QObject::tr("Object is not serializable").toUtf8();
+			SendErrorMessage(0, errorMessage);
+
+			return nullptr;
 		}
+
+		iser::CMemoryWriteArchive archive;
+		if (!serializableMetaInfo->Serialize(archive)){
+			errorMessage = QObject::tr("Error when serializing an object").toUtf8();
+			SendErrorMessage(0, errorMessage);
+
+			return nullptr;
+		}
+
+		QByteArray data((char*)archive.GetBuffer(), archive.GetBufferSize());
+		dataModel->SetData("dataMetaInfo", data.toBase64());
 
 	}
 
@@ -275,7 +309,7 @@ istd::IChangeable* CSerializableObjectCollectionControllerComp::CreateObject(
 	QByteArray objectData64 = inputParams.at(0).GetFieldArgumentValue("item").toByteArray();
 	QByteArray objectData = QByteArray::fromBase64(objectData64);
 	if (objectData.isEmpty()){
-		errorMessage = QObject::tr("Can not create device: %1").arg(QString(objectId));
+		errorMessage = QObject::tr("Can not create object: %1").arg(QString(objectId));
 		SendErrorMessage(0, errorMessage);
 
 		return nullptr;
