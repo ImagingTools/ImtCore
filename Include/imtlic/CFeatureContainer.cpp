@@ -81,6 +81,22 @@ void CFeatureContainer::SetPackageId(const QByteArray& packageId)
 }
 
 
+QString CFeatureContainer::GetPackageName() const
+{
+	return m_packageName;
+}
+
+
+void CFeatureContainer::SetPackageName(const QString& packageName)
+{
+	if (m_packageName != packageName){
+		istd::CChangeNotifier notifier(this);
+
+		m_packageName = packageName;
+	}
+}
+
+
 // reimplemented (IFeatureInfoProvider)
 
 const imtbase::ICollectionInfo& CFeatureContainer::GetFeatureList() const
@@ -132,6 +148,11 @@ bool CFeatureContainer::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_packageId);
 	retVal = retVal && archive.EndTag(packageIdTag);
 
+	static iser::CArchiveTag packageNameTag("PackageName", "Name of the feature package", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(packageNameTag);
+	retVal = retVal && archive.Process(m_packageName);
+	retVal = retVal && archive.EndTag(packageNameTag);
+
 	return retVal;
 }
 
@@ -156,6 +177,7 @@ bool CFeatureContainer::CopyFrom(const IChangeable& object, CompatibilityMode mo
 	const CFeatureContainer* sourcePtr = dynamic_cast<const CFeatureContainer*>(&object);
 	if (sourcePtr != nullptr){
 		m_packageId = sourcePtr->m_packageId;
+		m_packageName = sourcePtr->m_packageName;
 		return true;
 	}
 
@@ -168,7 +190,7 @@ bool CFeatureContainer::IsEqual(const IChangeable& object) const
 	bool retVal = BaseClass::IsEqual(object);
 	const CFeatureContainer* sourcePtr = dynamic_cast<const CFeatureContainer*>(&object);
 	if (sourcePtr != nullptr && retVal){
-		return m_packageId == sourcePtr->m_packageId;
+		return m_packageId == sourcePtr->m_packageId && m_packageName == sourcePtr->m_packageName ;
 	}
 
 	return false;
@@ -182,6 +204,7 @@ bool CFeatureContainer::ResetData(CompatibilityMode mode)
 	}
 
 	m_packageId.clear();
+	m_packageName.clear();
 
 	return true;
 }

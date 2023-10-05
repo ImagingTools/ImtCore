@@ -56,7 +56,7 @@ Item {
                     height: width;
 
                     iconSource: enabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Normal) :
-                                                  "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Normal);
+                                                  "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled);
 
                     enabled: model.IsEnabled;
 

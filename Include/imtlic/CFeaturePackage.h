@@ -16,6 +16,8 @@ class CFeaturePackage:
 {
 
 public:
+	typedef CFeatureContainer BaseClass;
+
 	CFeaturePackage();
 
 	void SetParents(const QByteArrayList& parentIds);

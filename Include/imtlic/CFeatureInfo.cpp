@@ -16,7 +16,8 @@ namespace imtlic
 
 // public methods
 
-CFeatureInfo::CFeatureInfo() : m_packagePtr(nullptr), m_parentFeaturePtr(nullptr)
+CFeatureInfo::CFeatureInfo() :
+	m_parentFeaturePtr(nullptr)
 {
 }
 
@@ -61,13 +62,17 @@ void CFeatureInfo::SetParentFeature(const IFeatureInfo *parentFeaturePtr)
 }
 
 
-// reimplemented (IFeatureInfo)
-
-const imtlic::IFeatureInfoProvider* CFeatureInfo::GetFeaturePackage() const
+void CFeatureInfo::SetDependencies(QByteArrayList dependencies)
 {
-	return m_packagePtr;
+	if (m_dependencies != dependencies){
+		istd::CChangeNotifier notifier(this);
+
+		m_dependencies = dependencies;
+	}
 }
 
+
+// reimplemented (IFeatureInfo)
 
 QByteArray CFeatureInfo::GetFeatureId() const
 {
@@ -149,31 +154,39 @@ void CFeatureInfo::DeleteSubFeature(const QByteArray &subFeatureId)
 }
 
 
+QByteArrayList CFeatureInfo::GetDependencies() const
+{
+	return m_dependencies;
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CFeatureInfo::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	static iser::CArchiveTag featureIdTag("Id", "ID of the feature", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag featureIdTag("Id", "ID of the feature", iser::CArchiveTag::TT_LEAF);
 	bool retVal = archive.BeginTag(featureIdTag);
 	retVal = retVal && archive.Process(m_id);
 	retVal = retVal && archive.EndTag(featureIdTag);
 
 	QByteArray featureId = m_id;
 
-	static iser::CArchiveTag featureNameTag("Name", "Feature name", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag featureNameTag("Name", "Feature name", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(featureNameTag);
 	retVal = retVal && archive.Process(m_name);
 	retVal = retVal && archive.EndTag(featureNameTag);
 
-	static iser::CArchiveTag featureOptionalTag("Optional", "Optional of the feature", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag featureOptionalTag("Optional", "Optional of the feature", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(featureOptionalTag);
 	retVal = retVal && archive.Process(m_optional);
 	retVal = retVal && archive.EndTag(featureOptionalTag);
 
-	static iser::CArchiveTag subFeaturesTag("SubFeatures", "Subfeatures of the feature", iser::CArchiveTag::TT_MULTIPLE);
-	static iser::CArchiveTag subfeatureTag("Object", "Object item", iser::CArchiveTag::TT_GROUP, &subFeaturesTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_dependencies, "Dependencies", "Dependency");
+
+	iser::CArchiveTag subFeaturesTag("SubFeatures", "Subfeatures of the feature", iser::CArchiveTag::TT_MULTIPLE);
+	iser::CArchiveTag subfeatureTag("Object", "Object item", iser::CArchiveTag::TT_GROUP, &subFeaturesTag);
 
 	int subfeaturesCount = m_subFeatures.GetCount();
 
@@ -219,6 +232,7 @@ bool CFeatureInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 		m_id = sourcePtr->GetFeatureId();
 		m_name = sourcePtr->GetFeatureName();
 		m_optional = sourcePtr->IsOptional();
+		m_dependencies =  sourcePtr->m_dependencies;
 
 		m_subFeatures.Reset();
 
@@ -268,7 +282,8 @@ bool CFeatureInfo::IsEqual(const IChangeable& object) const
 		return (m_id == sourcePtr->GetFeatureId() &&
 				m_name == sourcePtr->GetFeatureName() &&
 				m_optional == sourcePtr->IsOptional() &&
-				m_parentFeaturePtr == sourcePtr->GetParentFeature());
+				m_parentFeaturePtr == sourcePtr->GetParentFeature() &&
+				m_dependencies == sourcePtr->m_dependencies);
 	}
 
 	return false;
@@ -294,6 +309,8 @@ bool CFeatureInfo::ResetData(CompatibilityMode /*mode*/)
 	m_name.clear();
 	m_subFeatures.Reset();
 	m_parentFeaturePtr = nullptr;
+	m_dependencies.clear();
+	m_optional = false;
 
 	return true;
 }

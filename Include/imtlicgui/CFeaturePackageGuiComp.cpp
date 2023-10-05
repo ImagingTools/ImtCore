@@ -393,6 +393,18 @@ void CFeaturePackageGuiComp::FeaturePackageProxy::SetPackageId(const QByteArray&
 }
 
 
+QString CFeaturePackageGuiComp::FeaturePackageProxy::GetPackageName() const
+{
+	return QString();
+}
+
+
+void CFeaturePackageGuiComp::FeaturePackageProxy::SetPackageName(const QString& packageName)
+{
+
+}
+
+
 // reimplemented (imtlic::IFeatureInfoProvider)
 
 const imtbase::IObjectCollection* CFeaturePackageGuiComp::FeaturePackageProxy::GetFeaturePackages() const

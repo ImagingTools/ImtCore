@@ -77,6 +77,7 @@ istd::IChangeable* CPackageControllerComp::CreateObject(
 			description = itemModel.GetData("Description").toString();
 		}
 
+		featurePackagePtr->SetPackageName(name);
 		featurePackagePtr->SetPackageId(objectId);
 		featurePackagePtr->SetElementDescription(objectId, description);
 
@@ -301,7 +302,8 @@ imtbase::CTreeItemModel* CPackageControllerComp::GetObject(const imtgql::CGqlReq
 		if (packagePtr != nullptr){
 			dataModelPtr->SetData("Id", packagePtr->GetPackageId());
 
-			QString name = m_objectCollectionCompPtr->GetElementInfo(packageId, imtbase::ICollectionInfo::EIT_NAME).toString();
+			QString name = packagePtr->GetPackageName();
+//			QString name = m_objectCollectionCompPtr->GetElementInfo(packageId, imtbase::ICollectionInfo::EIT_NAME).toString();
 			dataModelPtr->SetData("Name", name);
 
 			QString description = m_objectCollectionCompPtr->GetElementInfo(packageId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();

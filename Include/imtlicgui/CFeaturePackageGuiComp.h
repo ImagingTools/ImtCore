@@ -92,6 +92,8 @@ private:
 		// reimplemented (IFeaturePackage)
 		virtual QByteArray GetPackageId() const override;
 		virtual void SetPackageId(const QByteArray& packageId) override;
+		virtual QString GetPackageName() const override;
+		virtual void SetPackageName(const QString& packageName) override;
 
 		// reimplemented (imtlic::IFeatureInfoProvider)
 		virtual const imtbase::IObjectCollection* GetFeaturePackages() const override;

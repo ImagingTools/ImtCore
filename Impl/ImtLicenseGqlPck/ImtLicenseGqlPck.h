@@ -18,6 +18,8 @@
 #include <imtlicgql/CAccountControllerComp.h>
 #include <imtlicgql/CFeaturesExportProviderComp.h>
 #include <imtlicgql/CProductPermissionsControllerComp.h>
+#include <imtlicgql/CFeatureControllerComp.h>
+#include <imtlicgql/CFeatureCollectionControllerComp.h>
 
 
 /**
@@ -39,6 +41,8 @@ typedef imtlicgql::CInstallationCollectionControllerComp InstallationCollectionC
 typedef imtlicgql::CInstallationControllerComp InstallationController;
 typedef imtlicgql::CFeaturesExportProviderComp FeaturesExportProvider;
 typedef imtlicgql::CProductPermissionsControllerComp ProductPermissionController;
+typedef imtlicgql::CFeatureControllerComp FeatureController;
+typedef imtlicgql::CFeatureCollectionControllerComp FeatureCollectionController;
 
 
 } // namespace ImtLicenseGqlPck

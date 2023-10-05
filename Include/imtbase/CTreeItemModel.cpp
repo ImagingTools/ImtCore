@@ -101,6 +101,15 @@ void CTreeItemModel::InsertNewItemWithParameters(int index, const QVariantMap &m
 	m_isTransaction = true;
 
 	for(auto value = map.cbegin(); value != map.cend(); ++ value){
+		CTreeItemModel* treeItemModelPtr = nullptr;
+		if ((*value).isValid()){
+			treeItemModelPtr = (*value).value<CTreeItemModel*>();
+		}
+
+		if (treeItemModelPtr != nullptr){
+			treeItemModelPtr->SetParent(this);
+		}
+
 		SetData(value.key().toUtf8(), *value, index);
 	}
 
@@ -196,7 +205,6 @@ imtbase::CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray &key, int
 	}
 
 	CTreeItemModel* retVal = GetTreeItemModel(key, index);
-
 	if (retVal == nullptr){
 		retVal = new CTreeItemModel(this);
 

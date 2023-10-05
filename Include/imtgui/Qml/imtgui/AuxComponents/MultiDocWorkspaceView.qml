@@ -317,6 +317,8 @@ Item {
             documentIndex = this.getDocumentIndexById(documentId);
         }
 
+        console.log("documentIndex", documentIndex);
+
         if (documentIndex >= 0){
             let commandId = workspaceView.mainCollectionView.getEditorCommandId();
             documentController.documentTypeId = commandId;
@@ -512,24 +514,27 @@ Item {
 
         onDocumentModelChanged: {
             if (documentController.documentModel != null){
-                let documentId = documentController.documentModel.GetData("Id");
-                if (documentId !== ""){
-                    for (let i = 0; i < workspaceView.documentsData.GetItemsCount(); i++){
-                        let id = workspaceView.documentsData.GetData("Id", i);
-                        if (id === documentId){
-                            if (workspaceView.documentsData.ContainsKey("Item", i)){
-                                let item = workspaceView.documentsData.GetData("Item", i);
-                                item.documentModel = documentController.documentModel;
+//                let documentId = documentController.documentModel.GetData("Id");
+//                if (documentId !== ""){
+//                    for (let i = 0; i < workspaceView.documentsData.GetItemsCount(); i++){
+//                        let id = workspaceView.documentsData.GetData("Id", i);
+//                        if (id === documentId){
+//                            if (workspaceView.documentsData.ContainsKey("Item", i)){
+//                                let item = workspaceView.documentsData.GetData("Item", i);
+//                                item.documentModel = documentController.documentModel;
 
-                                break;
-                            }
-                        }
-                    }
-                }
-                else{
-                    let item = workspaceView.documentsData.GetData("Item", tabPanelInternal.selectedIndex);
-                    item.documentModel = documentController.documentModel;
-                }
+//                                break;
+//                            }
+//                        }
+//                    }
+//                }
+//                else{
+//                    let item = workspaceView.documentsData.GetData("Item", tabPanelInternal.selectedIndex);
+//                    item.documentModel = documentController.documentModel;
+//                }
+
+                let item = workspaceView.documentsData.GetData("Item", tabPanelInternal.selectedIndex);
+                item.documentModel = documentController.documentModel;
             }
         }
 

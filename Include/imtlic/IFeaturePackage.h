@@ -21,6 +21,9 @@ class IFeaturePackage: virtual public IFeatureInfoProvider, virtual public iser:
 public:
 	virtual QByteArray GetPackageId() const = 0;
 	virtual void SetPackageId(const QByteArray& packageId) = 0;
+
+	virtual QString GetPackageName() const = 0;
+	virtual void SetPackageName(const QString& packageName) = 0;
 };
 
 

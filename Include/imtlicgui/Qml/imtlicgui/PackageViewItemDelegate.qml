@@ -75,11 +75,11 @@ TreeViewItemDelegateBase {
 
                             model.Name = inputName.text;
 
-                            if (model.Id === ""){
+                            if (model.FeatureId === ""){
                                 let id = model.Name.replace(/\s+/g, '');
                                 let alreadyExists = packageTreeItemDelegate.root.featureIdExists(id);
                                 if (!alreadyExists){
-                                    model.Id = id;
+                                    model.FeatureId = id;
                                 }
                             }
                         }
@@ -104,7 +104,7 @@ TreeViewItemDelegateBase {
                     visible: !inputId.visible;
                     elide: Text.ElideRight;
 
-                    text: model.Id ? model.Id : "";
+                    text: model.FeatureId ? model.FeatureId : "";
                 }
 
                 MouseArea {
@@ -130,7 +130,7 @@ TreeViewItemDelegateBase {
                     width: parent.width - 10;
                     height: parent.height - 7;
 
-                    text: model.Id ? model.Id : "";
+                    text: model.FeatureId ? model.FeatureId : "";
 
                     visible: false;
 
@@ -147,12 +147,12 @@ TreeViewItemDelegateBase {
 
                         inputId.visible = false;
 
-                        if (model.Id !== inputId.text){
-                            let canRename = packageTreeItemDelegate.root.canRename(model.Id);
+                        if (model.FeatureId !== inputId.text){
+                            let canRename = packageTreeItemDelegate.root.canRename(model.FeatureId);
                             if (canRename){
                                 let alreadyExists = packageTreeItemDelegate.root.featureIdExists(inputId.text);
                                 if (!alreadyExists){
-                                    model.Id = inputId.text;
+                                    model.FeatureId = inputId.text;
 
                                     return;
                                 }

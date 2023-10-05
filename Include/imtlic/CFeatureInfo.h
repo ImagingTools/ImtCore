@@ -19,9 +19,9 @@ public:
 	void SetFeatureName(const QString& featureName);
 	void SetOptional(bool optional);
 	void SetParentFeature(const IFeatureInfo* parentFeaturePtr);
+	void SetDependencies(QByteArrayList dependencies);
 
 	// reimplemented (IFeatureInfo)
-	virtual const imtlic::IFeatureInfoProvider* GetFeaturePackage() const override;
 	virtual QByteArray GetFeatureId() const override;
 	virtual QString GetFeatureName() const override;
 	virtual bool IsOptional() const override;
@@ -31,6 +31,7 @@ public:
 	virtual const istd::TPointerVector<const IFeatureInfo>& GetSubFeatures() const override;
 	virtual bool InsertSubFeature(const IFeatureInfo* subFeatureInfo) override;
 	virtual void DeleteSubFeature(const QByteArray &subFeatureId) override;
+	virtual QByteArrayList GetDependencies() const override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -47,10 +48,10 @@ protected:
 	const IFeatureInfo* GetSubFeatureRecursive(const FeatureInfoList& subFeatures, const QByteArray& subfeatureId, int maxDepth, int currentDepth = 1) const;
 
 protected:
-	const imtlic::IFeatureInfoProvider* m_packagePtr;
 	QByteArray m_id;
 	QString m_name;
 	bool m_optional;
+	QByteArrayList m_dependencies;
 	FeatureInfoList m_subFeatures;
 	const IFeatureInfo* m_parentFeaturePtr;
 };

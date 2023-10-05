@@ -23,11 +23,6 @@ public:
 	typedef QSet<QByteArray> FeatureIds;
 
 	/**
-		Get the feature package for this feature.
-	*/
-	virtual const imtlic::IFeatureInfoProvider* GetFeaturePackage() const = 0;
-
-	/**
 		Get the feature ID.
 	*/
 	virtual QByteArray GetFeatureId() const = 0;
@@ -73,6 +68,11 @@ public:
 		Remove sub feature.
 	*/
 	virtual void DeleteSubFeature(const QByteArray& subFeatureId) = 0;
+
+	/**
+		Get list of features the given feature depends on.
+	*/
+	virtual QByteArrayList GetDependencies() const = 0;
 };
 
 

@@ -84,7 +84,7 @@ TableViewItemDelegateBase {
                     visible: treeDelegateBase.hasChild;
 
                     iconSource: treeDelegateBase.isOpened ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal) :
-                                             "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal);
+                                                            "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal);
 
                     onClicked: {
                         treeDelegateBase.isOpened = !treeDelegateBase.isOpened;
@@ -153,15 +153,25 @@ TableViewItemDelegateBase {
             property var childModel: treeDelegateBase.itemData.ChildModel ? model.ChildModel: 0;
             onChildModelChanged: {
                 if (childrenColumn.childModel){
+                    console.log("childrenColumn.childModel", childrenColumn.childModel.toJSON());
+
                     if (childrenColumn.childModel.GetItemsCount() > 0){
-                            treeDelegateBase.hasChild = true;
+                        treeDelegateBase.hasChild = true;
+
+                        childModelRepeater.model = childrenColumn.childModel;
                     }
 
-                    childModelRepeater.model = childrenColumn.childModel;
+//                    childrenColumn.childModel.dataChanged.connect(childrenColumn.dataChanged);
+
+//                    childModelRepeater.model = childrenColumn.childModel;
                 }
                 else{
                     treeDelegateBase.hasChild = false;
                 }
+            }
+
+            function dataChanged(t, b, r){
+                console.log("Repeater dataChanged", childrenColumn.childModel.toJSON());
             }
         }
     }

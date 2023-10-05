@@ -2,7 +2,7 @@ module imtlicgui
 
 EditDialog 1.0 EditDialog.qml
 MetaInfo 1.0 MetaInfo.qml
-FeaturesProvider 1.0 FeaturesProvider.qml
+singleton FeaturesProvider 1.0 FeaturesProvider.qml
 LicensesProvider 1.0 LicensesProvider.qml
 FeaturesDependenciesProvider 1.0 FeaturesDependenciesProvider.qml
 LicenseFeaturesModel 1.0 LicenseFeaturesModel.qml

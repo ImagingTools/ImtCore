@@ -34,12 +34,12 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetSelectionQuery(
 				.arg(qPrintable(objectId)).toUtf8();
 	}
 
-	iprm::TParamsPtr<iprm::IEnableableParam> enableableParamPtr(paramsPtr, "IsHistory");
-	if (enableableParamPtr.IsValid()){
-		if (enableableParamPtr->IsEnabled()){
-			return CreateObjectHistoryQuery(offset, count, paramsPtr);
-		}
-	}
+//	iprm::TParamsPtr<iprm::IEnableableParam> enableableParamPtr(paramsPtr, "IsHistory");
+//	if (enableableParamPtr.IsValid()){
+//		if (enableableParamPtr->IsEnabled()){
+//			return CreateObjectHistoryQuery(offset, count, paramsPtr);
+//		}
+//	}
 
 	QByteArray selectionQuery = BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
 

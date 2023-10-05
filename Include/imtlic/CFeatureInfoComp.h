@@ -29,15 +29,11 @@ public:
 		I_REGISTER_INTERFACE(iser::IObject);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_REGISTER_INTERFACE(istd::IChangeable);
-		I_ASSIGN(m_featurePackageCompPtr, "FeaturePackage", "Feature owner package", true, "");
 	I_END_COMPONENT
 
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
-
-protected:
-	I_REF(imtlic::IFeatureInfoProvider, m_featurePackageCompPtr);
 };
 
 

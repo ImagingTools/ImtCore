@@ -34,6 +34,8 @@ Item {
     property alias commandsDelegate: commandsDelegateBase.item;
     property alias commandsDelegateSourceComp: commandsDelegateBase.sourceComponent;
 
+    property var undoManager: null;
+
     property CommandsProvider commandsProvider: CommandsProvider {
         commandsId: documentBaseRoot.commandsId;
     }
@@ -145,7 +147,7 @@ Item {
     }
 
     onDocumentModelChanged: {
-        console.log("onDocumentModelChanged", documentBaseRoot.documentModel);
+        console.log("onDocumentModelChanged", JSON.stringify(documentBaseRoot.documentModel));
 
         documentBaseRoot.documentModel.dataChanged.connect(documentBaseRoot.onDataChanged);
 
@@ -197,6 +199,10 @@ Item {
 
         if (!documentBaseRoot.isDirty){
             documentBaseRoot.isDirty = true;
+        }
+
+        if (undoManager != null){
+            undoManager.makeChanges();
         }
     }
 
@@ -294,4 +300,25 @@ Item {
             documentBaseRoot.commandsDelegateLoaded();
         }
     }
+
+    // new functions
+
+    function doUpdateModel(){
+        if (!readOnly && !isUpdateBlocked()){
+            documentBaseRoot.blockUpdatingModel = true;
+
+            updateModel();
+
+            documentBaseRoot.blockUpdatingModel = false;
+        }
+    }
+
+    function doUpdate(changeSet){
+    }
+
+    function isUpdateBlocked(){
+        return documentBaseRoot.blockUpdatingModel;
+    }
 }
+
+

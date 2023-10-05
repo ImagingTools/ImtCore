@@ -32,6 +32,8 @@ public:
 	// reimplemented (IFeaturePackage)
 	virtual QByteArray GetPackageId() const override;
 	virtual void SetPackageId(const QByteArray& packageId) override;
+	virtual QString GetPackageName() const override;
+	virtual void SetPackageName(const QString& packageName) override;
 
 	// reimplemented (IFeatureInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetFeatureList() const override;
@@ -54,6 +56,7 @@ public:
 
 protected:
 	QByteArray m_packageId;
+	QString m_packageName;
 };
 
 

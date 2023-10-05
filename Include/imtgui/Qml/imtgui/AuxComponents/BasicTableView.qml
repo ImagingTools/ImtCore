@@ -7,6 +7,7 @@ FocusScope {
     clip: true;
 
     property bool headerVisible: true;
+    property bool contentVisible: true;
     property bool readOnly: false;
     property bool withoutSelection: false;
 
@@ -24,6 +25,7 @@ FocusScope {
     property var rowModel: ListModel {};
 
     onRowModelChanged: {
+        //console.log("onRowModelChanged", rowModel.toJSON());
         tableViewRoot.itemsList = []
     }
 
@@ -341,6 +343,8 @@ FocusScope {
         contentHeight: bodyColumn.height;
 
         boundsBehavior: Flickable.StopAtBounds;
+
+        visible: tableViewRoot.contentVisible;
 
         Column {
             id: bodyColumn;
