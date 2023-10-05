@@ -3,5 +3,6 @@
         <file alias="ImtControlsGalleryMain.qml">Qml/ImtControlsGalleryMain.qml</file>
         <file alias="ImtControlsGalleryWeb.qml">Qml/ImtControlsGalleryWeb.qml</file>
         <file alias="ButtonsRepresentaitonPage.qml">Qml/ButtonsRepresentaitonPage.qml</file>
+        <file alias="InputsRepresentaitonPage.qml">Qml/InputsRepresentaitonPage.qml</file>
     </qresource>
 </RCC>
