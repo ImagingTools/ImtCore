@@ -14,6 +14,9 @@ Item {
     property alias text: checkBoxText.text;
 
     property alias border: checkRect.border;
+	property alias borderWidth: checkRect.border.width;
+	property alias borderColor: checkRect.border.color;
+
     property alias color: checkRect.color;
     property alias radius: checkRect.radius;
 
