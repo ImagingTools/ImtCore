@@ -14,11 +14,7 @@ Rectangle {
     property string styleName: "Qt";
     property bool isQtStyle: false;
 
-    color: "red";
-
     Component.onCompleted: {
-        //iconButton.forceActiveFocus();
-        //iconButton.focus = true;
         Events.subscribeEvent("QtStyle", buttonsRepresentaitonPage.setQtStyle);
         Events.subscribeEvent("AcfStyle", buttonsRepresentaitonPage.setAcfStyle);
 
@@ -39,7 +35,14 @@ Rectangle {
 
     }
 
+    TextField{
+        anchors.centerIn: parent;
+        width: 200;
+        height: 30;
+    }
 
+
+    ///////////////////
 
     PauseAnimation {
         id: pauseMessage;

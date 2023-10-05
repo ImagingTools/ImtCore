@@ -30,26 +30,11 @@ Rectangle {
 
     function setQtStyle(){
         buttonsRepresentaitonPage.isQtStyle = true;
-//        textButton.forceActiveFocus();
-//        textButton.focus = true;
     }
 
     function setAcfStyle(){
         buttonsRepresentaitonPage.isQtStyle = false;
-//        textButton.forceActiveFocus();
-//        textButton.focus = true;
-
     }
-
-    //    TopPanel {
-    //        id: topPanel
-    //        anchors.top: parent.top
-    //        anchors.topMargin: 150
-    //        width: parent.width
-    //        //decoratorComponent: topPanelDecorator;
-
-    //    }
-
 
 
     Row{
@@ -66,7 +51,7 @@ Rectangle {
             anchors.verticalCenter:  parent.verticalCenter;
 
             decoratorComponent: buttonsRepresentaitonPage.isQtStyle?
-                                    DecoratorsQt.buttonDecorator : buttonDecorator;
+                                    DecoratorsQt.buttonDecorator : Decorators.buttonDecorator;
 
             KeyNavigation.right: roundButton
             KeyNavigation.tab: roundButton
@@ -86,7 +71,7 @@ Rectangle {
             KeyNavigation.tab: iconButton
 
             decoratorComponent: buttonsRepresentaitonPage.isQtStyle?
-                                    DecoratorsQt.roundButtonDecorator : roundButtonDecorator;
+                                    DecoratorsQt.roundButtonDecorator : Decorators.roundButtonDecorator;
 
             iconSource: "../../../" + Style.theme + "/Icons" + "/Close.svg";
             onClicked: {
@@ -104,7 +89,7 @@ Rectangle {
             KeyNavigation.tab: toggledButton
 
             decoratorComponent: buttonsRepresentaitonPage.isQtStyle?
-                                    DecoratorsQt.buttonDecorator : buttonDecorator;
+                                    DecoratorsQt.buttonDecorator : Decorators.buttonDecorator;
 
             iconSource: "../../../" + Style.theme + "/Icons" + "/Eye.svg";
 
@@ -128,7 +113,7 @@ Rectangle {
                 KeyNavigation.tab: textButton
 
                 decoratorComponent: buttonsRepresentaitonPage.isQtStyle?
-                                        DecoratorsQt.buttonDecorator : buttonDecorator;
+                                        DecoratorsQt.buttonDecorator : Decorators.buttonDecorator;
 
 
                 checkable: true
@@ -155,30 +140,7 @@ Rectangle {
     }
 
 
-    Component{
-        id: roundButtonDecorator;
-
-        ButtonDecorator{
-            width: 30;
-            height: width;
-            radius: width;
-            //            icon.width: 12;
-            //            icon.height: 12;
-        }
-    }
-
-    Component{
-        id: buttonDecorator;
-
-        ButtonDecorator{
-            width: 160;
-            height: 30;
-            radius: 4;
-            //            icon.width: 20;
-            //            icon.height: 20;
-
-        }
-    }
+    ///////////////////
 
     Component{
         id: toolButtonDecorator;
@@ -202,109 +164,7 @@ Rectangle {
         }
     }
 
-//    Component{
-//        id: topPanelDecorator;
-
-//        TopPanelDecorator{
-//            Button {
-//                id: but1
-//                anchors.left: parent.left
-//                anchors.leftMargin: Style.paddingSmall
-//                KeyNavigation.right: but2
-//                KeyNavigation.tab: but2
-//                decoratorComponent: topButtonDecorator;
-//                iconSource: "../../../Icons/" + Style.theme + "/Eye.svg";
-//                text: "Top button";
-//            }
-
-//            Button {
-//                id: but2
-//                anchors.left: but1.right
-//                anchors.leftMargin: Style.paddingLarge
-
-//                KeyNavigation.right: but3
-//                KeyNavigation.tab: but3
-//                decoratorComponent: topButtonDecoratorNew;
-
-//                iconSource: "../../../Icons/" + Style.theme + "/Eye.svg";
-//                text: "Top button new";
-//            }
-
-//            Button {
-//                id: but3
-//                anchors.left: but2.right
-//                anchors.leftMargin: Style.paddingLarge
-
-//                KeyNavigation.right: but1
-//                KeyNavigation.tab: but1
-//                decoratorComponent: topButtonDecoratorNew;
-//                checkable: true
-
-//                iconSource: "../../../Icons/" + Style.theme + "/Eye.svg";
-//                text: "Toggled button";
-//            }
-
-//            CommandsDecorator {
-//                id: commandsDecorator;
-//                anchors.left: but3.right
-//                anchors.leftMargin: Style.paddingSmall
-//                anchors.horizontalCenter: parent.horizontalCenter;
-//                onVisibleChanged: {
-//                    if (!commandsDecorator.visible){
-//                        Events.unSubscribeEvent("CommandsModelChanged", commandsDecorator.setCommandsModel);
-//                    }
-//                }
-
-//                TreeItemModel {
-//                    id: commandsModel
-//                    Component.onCompleted: {
-//                        let index = commandsModel.InsertNewItem()
-//                        commandsModel.SetData("Id", "edit", index);
-//                        commandsModel.SetData("Name", "Edit", index);
-//                        commandsModel.SetData("Description", "Edit description", index);
-//                        commandsModel.SetData("IsEnabled", true, index);
-//                        commandsModel.SetData("Visible", true, index);
-//                        commandsModel.SetData("Icon", "Edit", index);
-//                        commandsModel.SetData("Status", "", index);
-//                        index = commandsModel.InsertNewItem()
-//                        commandsModel.SetData("Id", "remove", index);
-//                        commandsModel.SetData("Name", "Remove", index);
-//                        commandsModel.SetData("Description", "Remove description", index);
-//                        commandsModel.SetData("IsEnabled", true, index);
-//                        commandsModel.SetData("Visible", true, index);
-//                        commandsModel.SetData("Icon", "Remove", index);
-//                        commandsModel.SetData("Status", "", index);
-//                        commandsDecorator.model = commandsModel
-//                        //                        let object = {}
-//                        //                        object["Model"] = commandsModel
-//                        //                        commandsDecorator.setCommandsModel(object)
-//                    }
-//                }
-
-//            }
-//            //            TopRightPanelDecorator{
-
-//            //            }
-//        }
-//    }
-
-
-
-    //    ListModel {
-    //        id: singleSelectionModel
-    //        property int selectedIndex
-    //        function
-    //    }
-
-
-    //    ButtonGroup
-
-    //     SegmentedButtons{
-    //         model: singleSelectionModel
-    //         onButtonSelected{
-
-    //         }
-    //     }
+    ///////////////////
 
     PauseAnimation {
         id: pauseMessage;
