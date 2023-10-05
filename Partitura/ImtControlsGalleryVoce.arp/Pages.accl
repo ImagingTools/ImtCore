@@ -2,19 +2,20 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5102" Description="ACF"/>
-            <Version Id="1" Number="2194" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5106" Description="ACF"/>
+            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="AdministrationPage" X="450" Y="650" Note=""/>
+        <Element ComponentName="AdministrationPage" X="450" Y="725" Note=""/>
         <Element ComponentName="ButtonsPage" X="100" Y="500" Note=""/>
         <Element ComponentName="Demultiplexer" X="575" Y="50" Note=""/>
+        <Element ComponentName="InputsPage" X="325" Y="500" Note=""/>
         <Element ComponentName="MultiPageRepresentationController" X="275" Y="175" Note=""/>
         <Element ComponentName="Pages" X="250" Y="350" Note=""/>
         <Element ComponentName="PagesRepresentation" X="800" Y="350" Note=""/>
-        <Element ComponentName="ProductsPage" X="275" Y="575" Note=""/>
+        <Element ComponentName="ProductsPage" X="150" Y="725" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
