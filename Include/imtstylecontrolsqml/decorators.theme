@@ -1,0 +1,21 @@
+{
+	"Decorators": {
+		"MenuPanel": {
+			"MainButton": "MenuPanelButtonDecorator.qml",
+			"SubButton": "SubMenuPanelButtonDecorator.qml"
+		},
+		"TabPanel": {
+			"Base": "TabPanelDecorator.qml"
+		},
+		"FilterPanel": {
+			"Base": "FilterPanelDecorator.qml"
+		},
+		"TopPanel": {
+			"Base": "TopPanelDecorator.qml",
+			"CenterPanel": "TopCenterPanelDecorator.qml",
+			"RightPanel": "TopRightPanelDecorator.qml"
+		}
+	}	
+}
+
+
