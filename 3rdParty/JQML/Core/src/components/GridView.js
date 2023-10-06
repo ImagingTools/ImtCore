@@ -65,7 +65,14 @@ export class GridView extends Flickable {
     // $contentXChanged(){
 
     // }
-    $updateGeometry(){
+    $calcContentGeometry(){
+        
+        // this.contentItem.dom.style.minHeight = '0px'
+        // this.contentItem.dom.style.height = '0px'
+        // this.contentHeight = this.contentItem.dom.scrollHeight
+        // this.contentItem.dom.style.minHeight = `${this.contentItem.dom.scrollHeight}px`
+        // this.contentItem.dom.style.height = `${this.contentItem.dom.scrollHeight}px`
+
         let width = this.$p.width.func ? this.$p.width.func() : this.width
         this.contentItem.width = width
         this.contentWidth = -1;
@@ -74,7 +81,10 @@ export class GridView extends Flickable {
         let contentHeight = Math.ceil(childLength / rowLength) * this.cellHeight
 
         this.contentHeight = contentHeight
-
+    }
+    $updateGeometry(){
+        this.$calcContentGeometry()
+  
         this.$updateChildren()
         // clearTimeout(this.$updateTimer)
         // this.$updateTimer = setTimeout(()=>{
@@ -180,7 +190,9 @@ export class GridView extends Flickable {
             } catch (error) {
                 console.error(error)
             }
+            this.$calcContentGeometry()
         }
+        
     }
 
     $append(wait = false){
@@ -208,6 +220,7 @@ export class GridView extends Flickable {
             } else {
                 try {
                     obj.$uP()
+                    this.$calcContentGeometry()
                 } catch (error) {
                     console.error(error)
                 }
@@ -230,6 +243,7 @@ export class GridView extends Flickable {
             childRecursive(this.contentItem.children[i], i)
         }
         this.count = this.contentItem.children.length
+        this.$calcContentGeometry()
     }
 
     $updateView(){
@@ -270,6 +284,7 @@ export class GridView extends Flickable {
             } else {
 
             }
+            this.$calcContentGeometry()
         }
     
     }
