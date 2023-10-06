@@ -54,7 +54,7 @@
 		<file alias="imtcontrols/Inputs/DatePicker.qml">Qml/imtcontrols/Inputs/DatePicker.qml</file>
 		<file alias="imtcontrols/Inputs/InputActions.qml">Qml/imtcontrols/Inputs/InputActions.qml</file>
 		<file alias="imtcontrols/Inputs/PathPicker.qml">Qml/imtcontrols/Inputs/PathPicker.qml</file>
-		<file alias="imtcontrols/Inputs/TextEdit.qml">Qml/imtcontrols/Inputs/TextEdit.qml</file>
+                <file alias="imtcontrols/Inputs/TextEditCustom.qml">Qml/imtcontrols/Inputs/TextEditCustom.qml</file>
 		<file alias="imtcontrols/Inputs/TextField.qml">Qml/imtcontrols/Inputs/TextField.qml</file>
 		<file alias="imtcontrols/Inputs/TextInputWithLabel.qml">Qml/imtcontrols/Inputs/TextInputWithLabel.qml</file>
 		<file alias="imtcontrols/Inputs/TimeIntervalPicker.qml">Qml/imtcontrols/Inputs/TimeIntervalPicker.qml</file>

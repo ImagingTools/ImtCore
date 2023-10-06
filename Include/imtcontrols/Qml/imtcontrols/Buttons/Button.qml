@@ -10,7 +10,7 @@ Item {
     height: decorator ? decorator.height : 0
 
     property Component decoratorComponent
-    property var decorator : null//: decoratorComponent ? decoratorComponent.createObject(baseButton) : undefined
+    property var decorator : null
 
     //required parameters in every decorator
     property string text: ""
@@ -49,14 +49,6 @@ Item {
     }
 
     Component.onCompleted: {
-//        if (decoratorComponent){
-//            //console.log("decoratorComponent::button", decoratorComponent)
-
-//            decorator = decoratorComponent.createObject(baseButton)
-//            decorator.baseButton = baseButton
-//            bindWidth.target = decorator
-//            bindHeight.target = decorator
-//        }
     }
 
     onDecoratorComponentChanged: {
@@ -67,7 +59,7 @@ Item {
                 decorator.destroy()
             }
             decorator = decoratorComponent.createObject(baseButton)
-            decorator.baseButton = baseButton
+            decorator.baseElement = baseButton
             bindWidth.target = decorator
             bindHeight.target = decorator
         }
@@ -102,6 +94,8 @@ Item {
         id: ma;
 
         anchors.fill: parent;
+
+        z: 10;
 
         enabled: baseButton.enabled;
         hoverEnabled: enabled;

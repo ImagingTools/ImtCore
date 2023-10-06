@@ -8,17 +8,17 @@ Rectangle{
     height: Style.buttonWidthMedium
     radius: Style.buttonRadius
 
-    property var baseButton;
+    property var baseElement;
     property alias icon: iconObj
 
-//    color: baseButton.down || baseButton.checked ? Style.buttonPressedColor : Style.buttonColor
+//    color: baseElement.down || baseElement.checked ? Style.buttonPressedColor : Style.buttonColor
 
 //    border.width: Style.buttonBorderWidth
-//    border.color: baseButton.hovered ? Style.iconColorOnSelected : commonButtonDecorator.baseButton.focus ? "gray" : Style.borderColor
-    color: !baseButton ? "transtarent" : baseButton.down || baseButton.checked ? Style.buttonPressedColor : baseButton.hovered ?  Style.buttonHoverColor : Style.buttonColor
+//    border.color: baseElement.hovered ? Style.iconColorOnSelected : commonButtonDecorator.baseElement.focus ? "gray" : Style.borderColor
+    color: !baseElement ? "transtarent" : baseElement.down || baseElement.checked ? Style.buttonPressedColor : baseElement.hovered ?  Style.buttonHoverColor : Style.buttonColor
 
     border.width: Style.buttonBorderWidth
-    border.color: !baseButton ? "transtarent" : baseButton.focus ? Style.borderFocusColor : Style.borderColor
+    border.color: !baseElement ? "transtarent" : baseElement.focus ? Style.borderFocusColor : Style.borderColor
 
     Image {
         id: iconObj
@@ -32,22 +32,22 @@ Rectangle{
 
         sourceSize.width: width
         sourceSize.height: height
-        source: !baseButton ? "" : baseButton.iconSource
+        source: !baseElement ? "" : baseElement.iconSource
     }
 
     Text {
         id: textObj
 
         anchors.verticalCenter: parent.verticalCenter
-        anchors.left: !baseButton ? parent.left : baseButton.iconSource === "" ? parent.left : iconObj.right
-        anchors.leftMargin: !baseButton ? 0 : baseButton.iconSource === "" ? parent.width/2 - width/2 : Style.paddingSmall
+        anchors.left: !baseElement ? parent.left : baseElement.iconSource === "" ? parent.left : iconObj.right
+        anchors.leftMargin: !baseElement ? 0 : baseElement.iconSource === "" ? parent.width/2 - width/2 : Style.paddingSmall
 
-        color: !baseButton ? "transtarent" : baseButton.enabled ? Style.textColor : Style.inactive_textColor
+        color: !baseElement ? "transtarent" : baseElement.enabled ? Style.textColor : Style.inactive_textColor
 
         font.pixelSize: Style.fontSize_common
         font.family: Style.fontFamily
 
-        text: !baseButton ? "" : baseButton.text
+        text: !baseElement ? "" : baseElement.text
 
     }
 

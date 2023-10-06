@@ -38,6 +38,37 @@ Rectangle {
         menuPanel.activePageIndex = -1;
     }
 
+    property bool isQtStyle: false;
+
+    Component.onCompleted: {
+        Events.subscribeEvent("QtStyle", menuPanel.setQtStyle);
+        Events.subscribeEvent("AcfStyle", menuPanel.setAcfStyle);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("QtStyle", menuPanel.setQtStyle);
+        Events.unSubscribeEvent("AcfStyle", menuPanel.setAcfStyle);
+
+    }
+
+    function setQtStyle(){
+        menuPanel.isQtStyle = true;
+    }
+
+    function setAcfStyle(){
+        menuPanel.isQtStyle = false;
+
+    }
+
+    function sendStyle(){
+        if(menuPanel.isQtStyle){
+            Events.sendEvent("QtStyle");
+        }
+        else {
+            Events.sendEvent("AcfStyle");
+        }
+    }
+
     onModelChanged: {
         let pageIndex = menuPanel.activePageIndex;
 
@@ -91,6 +122,7 @@ Rectangle {
                 menuPanel.activePageId = model["Id"];
 
                 lvPages.forceActiveFocus();
+                menuPanel.sendStyle();
             }
         }
     }

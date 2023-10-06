@@ -53,7 +53,7 @@ ComboBox 1.0 ./Inputs/ComboBox.qml
 DatePicker 1.0 ./Inputs/DatePicker.qml
 InputActions 1.0 ./Inputs/InputActions.qml
 PathPicker 1.0 ./Inputs/PathPicker.qml
-TextEdit 1.0 ./Inputs/TextEdit.qml
+TextEditCustom 1.0 ./Inputs/TextEditCustom.qml
 TextField 1.0 ./Inputs/TextField.qml
 TextInputWithLabel 1.0 ./Inputs/TextInputWithLabel.qml
 TimeIntervalPicker 1.0 ./Inputs/TimeIntervalPicker.qml

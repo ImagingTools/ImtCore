@@ -4,7 +4,11 @@ import Acf 1.0;
 FocusScope {
     id: containerTextField;
 
-    height: 40;
+    width: decorator ? decorator.width : 0
+    height: decorator ? decorator.height : 0
+
+    property Component decoratorComponent;
+    property var decorator : null;
 
     property alias text: textField.text;
     property alias acceptableInput: textField.acceptableInput;
@@ -13,9 +17,6 @@ FocusScope {
     property alias textInputValidator: textField.validator;
     property alias readOnly: textField.readOnly;
     property alias horizontalAlignment: textField.horizontalAlignment;
-    property alias borderWidth: mainRect.border.width;
-    property alias color: mainRect.color;
-
     property alias maximumLength: textField.maximumLength;
 
     property string placeHolderText;
@@ -24,7 +25,7 @@ FocusScope {
     property string fontColor: Style.textColor;
     property string placeHolderFontColor: "gray";
 
-    property color borderColor: containerTextField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
+    property color borderColor: textField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
 
     property string borderColorConst: "";
 
@@ -55,54 +56,85 @@ FocusScope {
     }
 
     function setFocus(value) {
-        textField.focus = value;
+
+        //textField.focus = value;
+        focus = value;
+        if(decorator.z < 0){
+            textField.focus = value;
+            if(value){
+                textField.forceActiveFocus()
+            }
+        }
+        else {
+            decorator.focus = value;
+            if(value){
+                decorator.forceActiveFocus()
+            }
+        }
     }
 
     function ensureVisible(pos) {
         textField.ensureVisible(pos);
     }
 
+    function openInputAction(pointX, pointY){
+        inputActions.open(pointX, pointY);
+    }
+
     onFocusChanged: {
         console.log("CustomTextField onFocusChanged", textField.text, containerTextField.focus);
 
         if (containerTextField.focus){
-            if (!containerTextField.readOnly){
+            if (!textField.readOnly){
                 textField.selectAll();
             }
 
+            textField.focus = true;
             textField.forceActiveFocus();
         }
     }
 
-    Rectangle {
-        id: mainRect;
 
-        anchors.fill: parent;
+    onDecoratorComponentChanged: {
+        if (decoratorComponent){
 
-        color: containerTextField.readOnly ? Style.alternateBaseColor : Style.baseColor;
+            if(decorator){
+                decorator.destroy()
+            }
+            decorator = decoratorComponent.createObject(containerTextField)
+            decorator.baseElement = containerTextField
+            bindWidth.target = decorator
+            bindHeight.target = decorator
+            bindText.target = decorator
+        }
 
-        radius: containerTextField.radius;
+//        if(decorator.z < 0){
+//            textField.focus = true;
+//            textField.forceActiveFocus()
+//        }
+//        else {
+//            decorator.focus = true;
+//            decorator.forceActiveFocus()
+//        }
 
-        border.color: containerTextField.borderColorConst !== "" ? containerTextField.borderColorConst: textField.activeFocus ? containerTextField.borderColor : Style.hover;
-
-        border.width: 1;
     }
 
-    MouseArea {
-        id: mouseArea;
+    Binding {
+        id: bindWidth
+        property: "width"
+        value: containerTextField.width;
+    }
 
-        anchors.fill: textField;
-        cursorShape: containerTextField.readOnly ? Qt.ArrowCursor : Qt.IBeamCursor;
+    Binding {
+        id: bindHeight
+        property: "height"
+        value: containerTextField.height;
+    }
 
-        visible: !containerTextField.readOnly;
-
-        acceptedButtons: Qt.RightButton;
-
-        onClicked: {
-            let point = mapToItem(null, mouse.x, mouse.y);
-
-            inputActions.open(point.x, point.y);
-        }
+    Binding {
+        id: bindText
+        property: "text"
+        value: containerTextField.text;
     }
 
     InputActions {
@@ -140,6 +172,7 @@ FocusScope {
         }
     }
 
+
     TextInput {
         id: textField;
 
@@ -158,6 +191,7 @@ FocusScope {
         selectionColor: Style.textSelected;
         selectByMouse: true;
         clip: true;
+        visible: containerTextField.decorator.z < 0;
 
         onAccepted: {
             containerTextField.accepted();
@@ -180,23 +214,5 @@ FocusScope {
             containerTextField.editingFinished();
         }
 
-        Text {
-            id: placeHolder;
-
-            anchors.left: textField.left;
-            anchors.verticalCenter: textField.verticalCenter;
-
-            font.pixelSize: containerTextField.placeHolderTextSize;
-            font.bold: containerTextField.fontBold;
-            font.family: Style.fontFamily;
-
-            //TODO -> Style
-            color: containerTextField.placeHolderFontColor;
-            opacity: containerTextField.placeHolderOpacity;
-
-            visible: textField.text == "";
-
-            text: containerTextField.placeHolderText;
-        }
     }
 }

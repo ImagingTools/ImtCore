@@ -19,6 +19,8 @@ Item {
     property bool selected: false;
     property string text;
 
+
+
     Image {
         id: image;
 

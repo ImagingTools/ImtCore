@@ -27,6 +27,8 @@ Item {
 
     signal clicked;
 
+
+
     onDecoratorSourceChanged: {
         console.log("onDecoratorSourceChanged", container.decoratorSource);
         loaderDecorator.source = container.decoratorSource;
