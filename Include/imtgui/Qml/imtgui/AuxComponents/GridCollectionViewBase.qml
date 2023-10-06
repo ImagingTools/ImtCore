@@ -345,6 +345,24 @@ Item {
 
     }
 
+    CustomScrollbar{
+        id: scrollBar;
+
+        anchors.right: parent.right;
+        anchors.rightMargin: 10;
+        anchors.bottom: gridInternal.bottom;
+
+        targetItem: gridInternal;
+
+        secondSize: 8;
+        radius: secondSize;
+        indicatorRadius: secondSize;
+        indicatorMargin: 0;
+
+        z: 20;
+
+    }
+
     Component{
         id: extendingInfoCompDefault;
 
@@ -380,7 +398,9 @@ Item {
         onCurrentValueChanged: {
             console.log("Pagination onCurrentValueChanged", paginationObj.currentValue);
             gridInternal.selectedIndex = -1;
-            baseCommands.updateModels();
+            if(this.commandsId){
+                baseCommands.updateModels();
+            }
             collectionViewBaseContainer.openST = false;
         }
     }
