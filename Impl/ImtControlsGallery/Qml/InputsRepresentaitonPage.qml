@@ -6,7 +6,7 @@ import imtcontrols 1.0
 
 
 Rectangle {
-    id: buttonsRepresentaitonPage;
+    id: inputsRepresentaitonPage;
 
     anchors.fill: parent;
 
@@ -15,31 +15,62 @@ Rectangle {
     property bool isQtStyle: false;
 
     Component.onCompleted: {
-        Events.subscribeEvent("QtStyle", buttonsRepresentaitonPage.setQtStyle);
-        Events.subscribeEvent("AcfStyle", buttonsRepresentaitonPage.setAcfStyle);
-
+        Events.subscribeEvent("QtStyle", inputsRepresentaitonPage.setQtStyle);
+        Events.subscribeEvent("AcfStyle", inputsRepresentaitonPage.setAcfStyle);
+        //textField.setFocus(true);
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("QtStyle", buttonsRepresentaitonPage.setQtStyle);
-        Events.unSubscribeEvent("AcfStyle", buttonsRepresentaitonPage.setAcfStyle);
+        Events.unSubscribeEvent("QtStyle", inputsRepresentaitonPage.setQtStyle);
+        Events.unSubscribeEvent("AcfStyle", inputsRepresentaitonPage.setAcfStyle);
 
     }
 
     function setQtStyle(){
-        buttonsRepresentaitonPage.isQtStyle = true;
+        inputsRepresentaitonPage.isQtStyle = true;
     }
 
     function setAcfStyle(){
-        buttonsRepresentaitonPage.isQtStyle = false;
+        inputsRepresentaitonPage.isQtStyle = false;
 
     }
 
-    TextField{
+    Row{
+        id: buttonsRow;
+
         anchors.centerIn: parent;
-        width: 200;
-        height: 30;
-    }
+        spacing: 50;
+
+        TextField{
+            id: textField;
+
+            anchors.verticalCenter: parent.verticalCenter;
+
+            decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.textFieldDecorator :
+                                                                  Decorators.textFieldDecorator;
+            placeHolderText: "placeHolder";
+        }
+
+        Rectangle{
+            width: textEdit.width + 20;
+            height: textEdit.height + 20;
+            anchors.verticalCenter:  parent.verticalCenter;
+            color: Style.backgroundColor;
+
+            TextEditCustom{
+                id: textEdit;
+
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.horizontalCenter: parent.horizontalCenter;
+
+                decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.textEditDecorator :
+                                                                      Decorators.textEditDecorator;
+
+                placeHolderText: "placeHolder";
+            }
+        }
+
+    }//row
 
 
     ///////////////////
