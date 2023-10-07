@@ -41,9 +41,9 @@ bool CProductMetaInfoCreatorComp::CreateMetaInfo(
 		return false;
 	}
 
-	metaInfoPtr->SetMetaInfo(IProductLicensingInfo::MIT_PRODUCT_NAME, productLicensingPtr->GetName());
+//	metaInfoPtr->SetMetaInfo(IProductLicensingInfo::MIT_PRODUCT_NAME, productLicensingPtr->GetName());
 //	metaInfoPtr->SetMetaInfo(IProductLicensingInfo::MIT_PRODUCT_PRODUCT_ID, productLicensingPtr->GetProductId());
-	metaInfoPtr->SetMetaInfo(IProductLicensingInfo::MIT_PRODUCT_CATEGORY_ID, productLicensingPtr->GetCategoryId());
+//	metaInfoPtr->SetMetaInfo(IProductLicensingInfo::MIT_PRODUCT_CATEGORY_ID, productLicensingPtr->GetCategoryId());
 
 	return true;
 }

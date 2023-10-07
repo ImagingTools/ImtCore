@@ -5,14 +5,14 @@ import imtgui 1.0
 CollectionViewCommandsDelegateBase {
     id: container;
 
-    removeDialogTitle: qsTr("Deleting a feature package");
-    removeMessage: qsTr("Delete the selected package ?");
+    removeDialogTitle: qsTr("Deleting a feature");
+    removeMessage: qsTr("Delete the selected feature ?");
 
     onRemoved: {
-        featuresProvider.updateModel();
+        FeaturesProvider.updateModel();
     }
 
     onRenamed: {
-        featuresProvider.updateModel();
+        FeaturesProvider.updateModel();
     }
 }

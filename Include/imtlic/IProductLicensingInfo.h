@@ -23,7 +23,7 @@ namespace imtlic
 	Common interface for access all available licenses of a product.
 	\ingroup LicenseManagement
 */
-class IProductLicensingInfo: virtual public ILicenseInfoProvider, virtual public IProductInfo
+class IProductLicensingInfo: virtual public ILicenseInfoProvider
 {
 public:
 	enum MetaInfoTypes
@@ -38,11 +38,6 @@ public:
 		*/
 		MIT_PRODUCT_CATEGORY_ID
 	};
-
-	/**
-		Get all available feature packages.
-	*/
-	virtual const imtbase::IObjectCollection* GetFeaturePackages() const = 0;
 };
 
 

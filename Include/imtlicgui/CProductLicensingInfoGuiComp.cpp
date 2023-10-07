@@ -189,8 +189,6 @@ void CProductLicensingInfoGuiComp::UpdateGui(const istd::IChangeable::ChangeSet&
 
 	UpdateItemTree();
 
-	ProductIdEdit->setText(qPrintable(productLicensingInfoPtr->GetProductId()));
-	ProductNameEdit->setText(productLicensingInfoPtr->GetName());
 }
 
 
@@ -236,9 +234,6 @@ void CProductLicensingInfoGuiComp::UpdateModel() const
 			break;
 		}
 	}
-
-	productLicensingInfoPtr->SetProductId(ProductIdEdit->text().toUtf8());
-	productLicensingInfoPtr->SetName(ProductNameEdit->text());
 }
 
 

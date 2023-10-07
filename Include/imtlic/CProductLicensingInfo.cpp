@@ -15,56 +15,7 @@ namespace imtlic
 // public methods
 
 CProductLicensingInfo::CProductLicensingInfo()
-	:m_featurePackagesPtr(nullptr)
 {
-}
-
-
-// reimplemented (imtlic::IProductLicensingInfo)
-
-const imtbase::IObjectCollection* CProductLicensingInfo::GetFeaturePackages() const
-{
-	return m_featurePackagesPtr;
-}
-
-
-// reimplemented (imtlic::IProductInfo)
-
-const IProductInfo* CProductLicensingInfo::GetProductFamilyInfo() const
-{
-	return nullptr;
-}
-
-
-QByteArray CProductLicensingInfo::GetProductId() const
-{
-	return m_productId;
-}
-
-
-void CProductLicensingInfo::SetProductId(const QByteArray& productId)
-{
-	if (m_productId != productId){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_productId = productId;
-	}
-}
-
-
-QByteArray CProductLicensingInfo::GetCategoryId() const
-{
-	return m_categoryId;
-}
-
-
-void CProductLicensingInfo::SetCategoryId(const QByteArray& categoryId)
-{
-	if (m_categoryId != categoryId){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_categoryId = categoryId;
-	}
 }
 
 
@@ -93,30 +44,6 @@ QByteArrayList CProductLicensingInfo::GetLicenseDependencies(const QByteArray& l
 	}
 
 	return QByteArrayList();
-}
-
-
-// reimplemented (iprm::INameParam)
-
-const QString& CProductLicensingInfo::GetName() const
-{
-	return m_productName;
-}
-
-
-void CProductLicensingInfo::SetName(const QString& name)
-{
-	if (m_productName != name){
-		istd::CChangeNotifier changeNotifier(this);
-
-		m_productName = name;
-	}
-}
-
-
-bool CProductLicensingInfo::IsNameFixed() const
-{
-	return false;
 }
 
 

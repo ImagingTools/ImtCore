@@ -7,6 +7,91 @@ DocumentBase {
 
     undoManager: undoRedoManager;
 
+    commandsDelegateSourceComp: Component {
+        DocumentWorkspaceCommandsDelegateBase {
+            onCommandActivated: {
+                console.log("FeatureViewCommands onCommandActivated", commandId);
+                if (commandId === "New"){
+                    let selectedIndex = tableView.selectedIndex;
+
+                    undoRedoManager.beginChanges();
+
+                    if (selectedIndex == null){
+                        let childModel = featureEditor.documentModel.GetData("ChildModel");
+                        if (!childModel){
+                            childModel = featureEditor.documentModel.AddTreeModel("ChildModel");
+                        }
+
+                        let emptyModel = featureEditor.treeItemModelComp.createObject(childModel);
+                        childModel.InsertNewItemWithParameters(0, {"FeatureId":"", "Name":"Feature Name", "Description":"", "Dependencies":"", "Optional":false, "ChildModel": emptyModel});
+
+                        tableView.rowModel = featureEditor.documentModel;
+                    }
+                    else{
+                        let subfeaturesModel = featureEditor.documentModel.GetData("ChildModel");
+                        if (!subfeaturesModel){
+                            subfeaturesModel = featureEditor.documentModel.AddTreeModel("ChildModel");
+                        }
+
+                        console.log("subfeaturesModel1", subfeaturesModel.toJSON());
+
+                        let index = selectedIndex.index;
+
+                        let parentModel = tableView.selectedIndex.getParentModel();
+                        let childModel = selectedIndex.getData("ChildModel");
+
+                        console.log("parentModel", parentModel);
+
+                        console.log("featureEditor.documentModel1", featureEditor.documentModel.toJSON());
+
+
+                        if (!childModel){
+                            if (parentModel){
+                                childModel = parentModel.AddTreeModel("ChildModel", index);
+                            }
+                            else{
+                                childModel = subfeaturesModel.AddTreeModel("ChildModel", index);
+                            }
+                        }
+
+                        console.log("featureEditor.documentModel2", featureEditor.documentModel.toJSON());
+
+                        let emptyModel = featureEditor.treeItemModelComp.createObject(childModel);
+                        childModel.InsertNewItemWithParameters(0, {"FeatureId":"", "Name":"Feature Name", "Description":"","Dependencies":"", "Optional":false, "ChildModel": emptyModel});
+
+                        console.log("childModel2", childModel.toJSON());
+                        console.log("featureEditor.documentModel3", featureEditor.documentModel.toJSON());
+                        tableView.rowModel = 0;
+                        tableView.rowModel = featureEditor.documentModel;
+                    }
+
+                    undoRedoManager.endChanges();
+                }
+                else if (commandId === "Remove"){
+                    if (tableView.selectedIndex != null){
+
+                        undoRedoManager.beginChanges();
+
+                        let index = tableView.selectedIndex.index;
+
+                        let parentModel = tableView.selectedIndex.getParentModel();
+                        if (parentModel){
+                            parentModel.RemoveItem(index);
+                        }
+                        else{
+                            let subfeaturesModel = featureEditor.documentModel.GetData("ChildModel");
+                            if (subfeaturesModel){
+                                subfeaturesModel.RemoveItem(index);
+                            }
+                        }
+
+                        undoRedoManager.endChanges();
+                    }
+                }
+            }
+        }
+    }
+
     property TreeItemModel dependenciewViewModel: TreeItemModel {}
 
     property Component treeItemModelComp: Component {
@@ -14,6 +99,8 @@ DocumentBase {
     }
 
     onModelIsReadyChanged: {
+        tableView.rowModel = documentModel;
+
         updateGui();
         undoRedoManager.registerModel(documentModel);
     }
@@ -77,7 +164,7 @@ DocumentBase {
         if (selectedIndex != null){
             let parent = selectedIndex.parentIndex;
 
-            while (parent){
+            while (parent && parent.itemData){
                 let parentId = parent.itemData.FeatureId
                 retVal.push(parentId);
                 parent = parent.parentIndex;
@@ -156,25 +243,11 @@ DocumentBase {
     }
 
     function updateGui(){
-        console.log("updateGui");
+        console.log("updateGui", documentModel.toJSON());
 
         blockUpdatingModel = true;
 
-        if (documentModel.ContainsKey("FeatureId")){
-            featureIdInput.text = documentModel.GetData("FeatureId");
-        }
-
-        if (documentModel.ContainsKey("Name")){
-            featureNameInput.text = documentModel.GetData("Name");
-        }
-
-        if (documentModel.ContainsKey("Description")){
-            descriptionInput.text = documentModel.GetData("Description");
-        }
-
-        if (documentModel.ContainsKey("ChildModel")){
-            tableView.rowModel = documentModel.GetData("ChildModel");
-        }
+        tableView.rowModel.Refresh();
 
         featureEditor.updateTreeViewGui();
 
@@ -190,9 +263,10 @@ DocumentBase {
 
         undoRedoManager.beginChanges();
 
-        documentModel.SetData("FeatureId", featureIdInput.text);
-        documentModel.SetData("Name", featureNameInput.text);
-        documentModel.SetData("Description", descriptionInput.text);
+        if (documentModel.GetItemsCount() !== 1){
+            let emptyModel = featureEditor.treeItemModelComp.createObject(documentModel);
+            documentModel.InsertNewItemWithParameters(0, {"FeatureId":"", "Name":"Feature Name", "Description":"", "Dependencies":"", "Optional":false, "ChildModel": emptyModel});
+        }
 
         undoRedoManager.endChanges();
     }
@@ -210,6 +284,8 @@ DocumentBase {
 
         width: column.width;
         height: 30;
+
+        visible: false;
 
         Text {
             id: title;
@@ -230,10 +306,13 @@ DocumentBase {
 
         anchors.top: mainHeader.bottom;
 
-        width: 300;
+        width: 0;
         height: featureInformationBlock.height + 25;
 
         color: "transparent";
+
+        visible: false;
+
 
         border.width: 1;
         border.color: Style.borderColor;
@@ -358,7 +437,9 @@ DocumentBase {
             anchors.leftMargin: 10;
 
             width: parent.width;
-            height: 30;
+            height: 0;
+
+            visible: false;
 
             Text {
                 id: titleTableView;
@@ -502,21 +583,34 @@ DocumentBase {
             }
 
             function featureIdExists(featureId){
+                console.log("featureIdExists", featureId);
+                let delegates = tableView.getItemsDataAsList();
+                for (let delegate of delegates){
+                    if (delegate.itemData.FeatureId === featureId){
+                        return true;
+                    }
+                }
+
                 return false;
             }
 
             onSelectedIndexChanged: {
-                // Commands
-                let isEnabled = selectedIndex == null;
-                commandsModel.SetData("IsEnabled", !isEnabled, 1);
-
                 if (selectedIndex != null){
-                    featureDependenciesView.contentVisible = true;
-                    updateTreeViewGui();
+                    let featureId = selectedIndex.getData("FeatureId");
+                    if (featureId !== ""){
+                        featureDependenciesView.contentVisible = true;
+                        updateTreeViewGui();
+                    }
                 }
                 else{
                     featureDependenciesView.contentVisible = false;
                 }
+
+                let newIsEnabled = selectedIndex != null;
+                let removeIsEnabled = selectedIndex != null && selectedIndex.depth > 0;
+
+                featureEditor.commandsProvider.setCommandIsEnabled("New", newIsEnabled)
+                featureEditor.commandsProvider.setCommandIsEnabled("Remove", removeIsEnabled)
             }
         }
     }
@@ -578,6 +672,10 @@ DocumentBase {
                 featureDependenciesView.rowModel = featureEditor.dependenciewViewModel;
 
                 FeaturesProvider.onModelChanged.connect(featureDependenciesView.onFeaturesProviderModelChanged);
+            }
+
+            Component.onDestruction: {
+                FeaturesProvider.onModelChanged.disconnect(featureDependenciesView.onFeaturesProviderModelChanged);
             }
 
             function onFeaturesProviderModelChanged(){

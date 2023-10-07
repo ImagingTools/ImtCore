@@ -25,10 +25,7 @@ public:
 	typedef CProductLicensingInfo BaseClass2;
 
 	I_BEGIN_COMPONENT(CProductLicensingInfoComp)
-		I_REGISTER_INTERFACE(INameParam);
 		I_REGISTER_INTERFACE(ILicenseInfoProvider);
-		I_REGISTER_INTERFACE(IProductInfo);
-		I_REGISTER_INTERFACE(IProductLicensingInfo);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_ASSIGN(m_featurePackagesCompPtr, "FeaturePackages", "Collection of all feature packages related to this product", false, "FeaturePackages");
 	I_END_COMPONENT

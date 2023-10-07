@@ -153,21 +153,15 @@ TableViewItemDelegateBase {
             property var childModel: treeDelegateBase.itemData.ChildModel ? model.ChildModel: 0;
             onChildModelChanged: {
                 if (childrenColumn.childModel){
-                    console.log("childrenColumn.childModel", childrenColumn.childModel.toJSON());
-
                     if (childrenColumn.childModel.GetItemsCount() > 0){
                         treeDelegateBase.hasChild = true;
-
                         childModelRepeater.model = childrenColumn.childModel;
+
+                        return;
                     }
-
-//                    childrenColumn.childModel.dataChanged.connect(childrenColumn.dataChanged);
-
-//                    childModelRepeater.model = childrenColumn.childModel;
                 }
-                else{
-                    treeDelegateBase.hasChild = false;
-                }
+
+                treeDelegateBase.hasChild = false;
             }
 
             function dataChanged(t, b, r){

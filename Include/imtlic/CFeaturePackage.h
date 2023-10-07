@@ -22,17 +22,12 @@ public:
 
 	void SetParents(const QByteArrayList& parentIds);
 
-	// reimplemented (IFeatureInfoProvider)
-	virtual const imtbase::IObjectCollection* GetFeaturePackages() const override;
 
 	// reimplemented (IFeatureDependenciesManager)
 	void SetFeatureDependencies(const QByteArray& featureId, const QByteArrayList& dependentIds) override;
 
 	// reimplemented (IFeatureDependenciesProvider)
 	virtual QByteArrayList GetFeatureDependencies(const QByteArray& featureId) const override;
-	virtual const IFeatureDependenciesProvider* GetDependenciesInfoProvider() const override;
-	virtual const imtbase::ICollectionInfo* GetParentFeatureInfoProviderList() const override;
-	virtual const IFeatureInfoProvider* GetParentFeatureInfoProvider(const QByteArray& parentId) const override;
 	virtual const IFeatureInfoProvider* GetDependencyContainer(const QByteArray& dependencyId) const override;
 
 	// reimplemented (IObjectCollection)

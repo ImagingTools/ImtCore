@@ -25,26 +25,11 @@ public:
 
 	CProductLicensingInfo();
 
-	// reimplemented (imtlic::IProductLicensingInfo)
-	virtual const imtbase::IObjectCollection* GetFeaturePackages() const override;
-
-	// reimplemented (imtlic::IProductInfo)
-	virtual const IProductInfo* GetProductFamilyInfo() const override;
-	virtual QByteArray GetProductId() const override;
-	virtual void SetProductId(const QByteArray& productId) override;
-	virtual QByteArray GetCategoryId() const override;
-	virtual void SetCategoryId(const QByteArray& categoryId) override;
-
 	// reimplemented (imtlic::ILicenseDependenciesManager)
 	virtual void SetLicenseDependencies(const QByteArray& licenseId, const QByteArrayList& dependentIds) override;
 
 	// reimplemented (imtlic::ILicenseDependenciesProvider)
 	virtual QByteArrayList GetLicenseDependencies(const QByteArray& licenseId) const override;
-
-	// reimplemented (iprm::INameParam)
-	virtual const QString& GetName() const override;
-	virtual void SetName(const QString& name) override;
-	virtual bool IsNameFixed() const override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;

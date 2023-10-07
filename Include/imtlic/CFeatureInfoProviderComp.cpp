@@ -47,33 +47,9 @@ const IFeatureInfo* CFeatureInfoProviderComp::GetFeatureInfo(const QByteArray& f
 }
 
 
-const imtbase::IObjectCollection * CFeatureInfoProviderComp::GetFeaturePackages() const
-{
-	return nullptr;
-}
-
-
 const imtbase::ICollectionInfo& CFeatureInfoProviderComp::GetFeatureList() const
 {
 	return imtbase::CCollectionInfo();
-}
-
-
-const IFeatureDependenciesProvider* CFeatureInfoProviderComp::GetDependenciesInfoProvider() const
-{
-	return nullptr;
-}
-
-
-const imtbase::ICollectionInfo* CFeatureInfoProviderComp::GetParentFeatureInfoProviderList() const
-{
-	return nullptr;
-}
-
-
-const imtlic::IFeatureInfoProvider* CFeatureInfoProviderComp::GetParentFeatureInfoProvider(const QByteArray& /*parentId*/) const
-{
-	return nullptr;
 }
 
 

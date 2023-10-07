@@ -44,25 +44,6 @@ CFeaturePackageCollectionUtility::FeatureDependencyMap CFeaturePackageCollection
 {
 	FeatureDependencyMap featureDependencyMap;
 
-	imtbase::ICollectionInfo::Ids packageCollectionIds = packageCollection.GetElementIds();
-	for (const QByteArray& packageCollectionId : packageCollectionIds){
-		const imtlic::IFeaturePackage* packagePtr = GetPackagePtr(packageCollection, packageCollectionId);
-		if (packagePtr != nullptr){
-			const imtlic::IFeatureDependenciesProvider* dependenciesProvider = packagePtr->GetDependenciesInfoProvider();
-			if (dependenciesProvider != nullptr){
-				imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();
-				for (const QByteArray& featureCollectionId : featureCollectionIds){
-					const imtlic::IFeatureInfo* featurePtr = packagePtr->GetFeatureInfo(featureCollectionId);
-					if (featurePtr != nullptr){
-						QByteArray featureId = featurePtr->GetFeatureId();
-
-						featureDependencyMap[featureId] = dependenciesProvider->GetFeatureDependencies(featureId);
-					}
-				}
-			}
-		}
-	}
-
 	return featureDependencyMap;
 }
 

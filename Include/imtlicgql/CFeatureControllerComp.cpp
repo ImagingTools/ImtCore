@@ -313,28 +313,32 @@ bool CFeatureControllerComp::CreateRepresentationModelFromFeatureInfo(
 	representationModel.SetData("Optional", isOptional);
 	representationModel.SetData("Description", "");
 	representationModel.SetData("Dependencies", dependencies.join(';'));
-	imtbase::CTreeItemModel* childModelPtr = representationModel.AddTreeModel("ChildModel");
-	Q_ASSERT(childModelPtr != nullptr);
+	representationModel.SetData("ChildModel", 0);
 
 	const imtlic::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
-	for (int i = 0; i < subFeatures.GetCount(); i++){
-		const imtlic::IFeatureInfo* featureInfoPtr = subFeatures.GetAt(i);
-		if (featureInfoPtr == nullptr){
-			errorMessage = QString("Unable to create representation model for invalid subfeature. Parent feature id: %1.").arg(qPrintable(featureId));
-			return false;
+	if (!subFeatures.IsEmpty()){
+		imtbase::CTreeItemModel* childModelPtr = representationModel.AddTreeModel("ChildModel");
+		Q_ASSERT(childModelPtr != nullptr);
+
+		for (int i = 0; i < subFeatures.GetCount(); i++){
+			const imtlic::IFeatureInfo* featureInfoPtr = subFeatures.GetAt(i);
+			if (featureInfoPtr == nullptr){
+				errorMessage = QString("Unable to create representation model for invalid subfeature. Parent feature id: %1.").arg(qPrintable(featureId));
+				return false;
+			}
+
+			const imtlic::CFeatureInfo* subFeatureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(featureInfoPtr);
+			Q_ASSERT(subFeatureInfoPtr != nullptr);
+
+			imtbase::CTreeItemModel subFeatureRepresentationModel;
+			bool ok = CreateRepresentationModelFromFeatureInfo(*subFeatureInfoPtr, subFeatureRepresentationModel, errorMessage);
+			if (!ok){
+				return false;
+			}
+
+			childModelPtr->InsertNewItem();
+			childModelPtr->CopyItemDataFromModel(i, &subFeatureRepresentationModel, 0);
 		}
-
-		const imtlic::CFeatureInfo* subFeatureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(featureInfoPtr);
-		Q_ASSERT(subFeatureInfoPtr != nullptr);
-
-		imtbase::CTreeItemModel subFeatureRepresentationModel;
-		bool ok = CreateRepresentationModelFromFeatureInfo(*subFeatureInfoPtr, subFeatureRepresentationModel, errorMessage);
-		if (!ok){
-			return false;
-		}
-
-		childModelPtr->InsertNewItem();
-		childModelPtr->CopyItemDataFromModel(i, &subFeatureRepresentationModel, 0);
 	}
 
 	return true;

@@ -8,6 +8,7 @@
 
 // ImtCore includes
 #include <imtlic/CLicenseInfo.h>
+#include <imtlic/IProductInfo.h>
 
 
 namespace imtlicgql
@@ -34,10 +35,10 @@ bool CProductCollectionControllerComp::SetupGqlItem(
 	QByteArrayList informationIds = GetInformationIds(gqlRequest, "items");
 
 	if (!informationIds.isEmpty() && m_objectCollectionCompPtr.IsValid()){
-		imtlic::IProductLicensingInfo* productLicensingInfoPtr = nullptr;
+		imtlic::IProductInfo* productLicensingInfoPtr = nullptr;
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (objectCollectionIterator->GetObjectData(dataPtr)){
-			productLicensingInfoPtr = dynamic_cast<imtlic::IProductLicensingInfo*>(dataPtr.GetPtr());
+			productLicensingInfoPtr = dynamic_cast<imtlic::IProductInfo*>(dataPtr.GetPtr());
 		}
 
 		QByteArray collectionId = objectCollectionIterator->GetObjectId();
@@ -47,7 +48,7 @@ bool CProductCollectionControllerComp::SetupGqlItem(
 				QVariant elementInformation;
 
 				if(informationId == "Id"){
-					elementInformation = productLicensingInfoPtr->GetProductId();
+					elementInformation = collectionId;
 				}
 				else if(informationId == "Name"){
 					elementInformation = productLicensingInfoPtr->GetName();
@@ -103,27 +104,6 @@ bool CProductCollectionControllerComp::SetupGqlItem(
 	}
 
 	return false;
-}
-
-
-QVariant CProductCollectionControllerComp::GetObjectInformation(
-		const QByteArray &informationId,
-		const QByteArray &objectId) const
-{
-	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
-	if (metaInfo.IsValid()){
-		if (informationId == QByteArray("CategoryId")){
-			return metaInfo->GetMetaInfo(imtlic::IProductLicensingInfo::MIT_PRODUCT_CATEGORY_ID);
-		}
-		else if (informationId == QByteArray("Added")){
-			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME);
-		}
-		else if (informationId == QByteArray("LastModified")){
-			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME);
-		}
-	}
-
-	return QVariant();
 }
 
 

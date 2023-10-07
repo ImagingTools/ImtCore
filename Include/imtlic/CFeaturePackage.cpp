@@ -219,48 +219,6 @@ bool CFeaturePackage::ResetData(CompatibilityMode mode)
 }
 
 
-// reimplemented (IFeatureInfoProvider)
-
-const imtbase::IObjectCollection* CFeaturePackage::GetFeaturePackages() const
-{
-	return m_featurePackageCollectionPtr;
-}
-
-
-const IFeatureDependenciesProvider* CFeaturePackage::GetDependenciesInfoProvider() const
-{
-	return this;
-}
-
-
-const imtbase::ICollectionInfo* CFeaturePackage::GetParentFeatureInfoProviderList() const
-{
-	return &m_parents;
-}
-
-
-const IFeatureInfoProvider* CFeaturePackage::GetParentFeatureInfoProvider(const QByteArray& parentId) const
-{
-	if (m_featurePackageCollectionPtr != nullptr){
-		if (m_parents.GetElementIds().contains(parentId)){
-			imtbase::ICollectionInfo::Ids featureInfoProviderIds = m_featurePackageCollectionPtr->GetElementIds();
-			for (const QByteArray& featureInfoProviderId : featureInfoProviderIds){
-				IFeatureInfoProvider* featureInfoProviderPtr = dynamic_cast<IFeatureInfoProvider*>(
-							const_cast<istd::IChangeable*>(m_featurePackageCollectionPtr->GetObjectPtr(featureInfoProviderId)));
-
-				if (featureInfoProviderPtr != nullptr){
-					if (featureInfoProviderId == parentId){
-						return featureInfoProviderPtr;
-					}
-				}
-			}
-		}
-	}
-
-	return nullptr;
-}
-
-
 // private pethods
 
 void CFeaturePackage::CleanupDependencies()

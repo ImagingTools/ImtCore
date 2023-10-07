@@ -17,7 +17,6 @@ namespace imtlic
 
 
 class IFeatureInfo;
-class IFeatureDependenciesProvider;
 
 
 /**
@@ -35,11 +34,6 @@ public:
 	};
 
 	/**
-		Get list of all available feature packages.
-	*/
-	virtual const imtbase::IObjectCollection* GetFeaturePackages() const = 0;
-
-	/**
 		Get feature info list.
 	*/
 	virtual const imtbase::ICollectionInfo& GetFeatureList() const = 0;
@@ -48,21 +42,6 @@ public:
 		Get feature info.
 	*/
 	virtual const IFeatureInfo* GetFeatureInfo(const QByteArray& featureId) const = 0;
-
-	/**
-		Get access to the feature dependency information.
-	*/
-	virtual const IFeatureDependenciesProvider* GetDependenciesInfoProvider() const = 0;
-
-	/**
-		Get parent feature info provider list.
-	*/
-	virtual const imtbase::ICollectionInfo* GetParentFeatureInfoProviderList() const = 0;
-
-	/**
-		Get parent feature info provider.
-	*/
-	virtual const IFeatureInfoProvider* GetParentFeatureInfoProvider(const QByteArray& parentId) const = 0;
 };
 
 

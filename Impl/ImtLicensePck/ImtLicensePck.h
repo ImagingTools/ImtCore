@@ -25,6 +25,7 @@
 #include <imtlic/CFeatureInfoProviderComp.h>
 #include <imtlic/CFeatureDependenciesProviderComp.h>
 #include <imtlic/CPermissionsProviderComp.h>
+#include <imtlic/CProductInfo.h>
 
 
 /**
@@ -77,7 +78,12 @@ typedef imtlic::CProductInfoProviderComp ProductInfoProvider;
 typedef imtlic::CFeatureInfoProviderComp FeatureInfoProvider;
 typedef imtlic::CFeatureDependenciesProviderComp FeatureDependenciesProvider;
 typedef imtlic::CPermissionsProviderComp PermissionsProvider;
-
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap<
+						imtlic::CProductInfo,
+						imtlic::IProductInfo,
+						iprm::INameParam,
+						iser::ISerializable>> ProductInfo;
 
 } // namespace ImtLicensePck
 

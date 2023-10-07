@@ -104,6 +104,11 @@ I_EXPORT_COMPONENT(
 			"Permissions provider",
 			"Feature Dependencies Provider Permissions");
 
+I_EXPORT_COMPONENT(
+			ProductInfo,
+			"Product info",
+			"Product License Feature");
+
 
 } // namespace ImtLicensePck
 

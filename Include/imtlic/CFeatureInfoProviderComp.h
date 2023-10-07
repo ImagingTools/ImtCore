@@ -29,11 +29,7 @@ public:
 
 	// reimplemented (IFeatureInfoProvider)
 	virtual const IFeatureInfo* GetFeatureInfo(const QByteArray& featureId) const override;
-	virtual const imtbase::IObjectCollection* GetFeaturePackages() const override;
 	virtual const imtbase::ICollectionInfo& GetFeatureList() const override;
-	virtual const IFeatureDependenciesProvider* GetDependenciesInfoProvider() const override;
-	virtual const imtbase::ICollectionInfo* GetParentFeatureInfoProviderList() const override;
-	virtual const IFeatureInfoProvider* GetParentFeatureInfoProvider(const QByteArray& parentId) const override;
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_packageCollectionCompPtr);

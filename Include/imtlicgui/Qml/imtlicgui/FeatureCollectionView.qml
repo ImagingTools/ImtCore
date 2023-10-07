@@ -10,6 +10,6 @@ import imtgui 1.0
 
      Component.onCompleted: {
          console.log("featureCollection onCompleted");
-//         packageCollectionViewContainer.commandsDelegatePath = "../../imtlicgui/PackageCollectionViewCommandsDelegate.qml";
+         featureCollectionViewContainer.commandsDelegatePath = "../../imtlicgui/PackageCollectionViewCommandsDelegate.qml";
      }
  }

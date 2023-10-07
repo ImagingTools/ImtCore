@@ -96,12 +96,8 @@ private:
 		virtual void SetPackageName(const QString& packageName) override;
 
 		// reimplemented (imtlic::IFeatureInfoProvider)
-		virtual const imtbase::IObjectCollection* GetFeaturePackages() const override;
 		virtual const imtbase::ICollectionInfo& GetFeatureList() const override;
 		virtual const imtlic::IFeatureInfo* GetFeatureInfo(const QByteArray& featureId) const override;
-		virtual const imtlic::IFeatureDependenciesProvider* GetDependenciesInfoProvider() const override;
-		virtual const imtbase::ICollectionInfo* GetParentFeatureInfoProviderList() const override;
-		virtual const IFeatureInfoProvider* GetParentFeatureInfoProvider(const QByteArray& parentId) const override;
 
 		// reimplemented (iser::ISerializable)
 		virtual bool Serialize(iser::IArchive& archive) override;

@@ -293,21 +293,6 @@ void CFeatureDependencyEditorBase::BuildDependencyMap(const imtbase::IObjectColl
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		packageCollection.GetObjectData(packageId, dataPtr);
 
-		const imtlic::IFeatureInfoProvider* packagePtr = dynamic_cast<const imtlic::IFeatureInfoProvider*>(dataPtr.GetPtr());
-		if (packagePtr != nullptr){
-			const imtlic::IFeatureDependenciesProvider* dependenciesProvider = packagePtr->GetDependenciesInfoProvider();
-			if (dependenciesProvider != nullptr){
-				imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();
-				for (const QByteArray& featureCollectionId : featureCollectionIds){
-					const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
-					if (featureInfoPtr != nullptr){
-						QByteArray featureId = featureInfoPtr->GetFeatureId();
-
-						m_packageDependenciyMap[featureId] = dependenciesProvider->GetFeatureDependencies(featureId);
-					}
-				}
-			}
-		}
 	}
 }
 

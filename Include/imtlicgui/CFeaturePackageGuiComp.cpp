@@ -196,24 +196,6 @@ void CFeaturePackageGuiComp::UpdateItemTree()
 						ownFeatureIds.append(featurePtr->GetFeatureId());
 					}
 				}
-
-				const imtlic::IFeatureDependenciesProvider* dependencyProviderPtr = packagePtr->GetDependenciesInfoProvider();
-				if (dependencyProviderPtr != nullptr){
-					QByteArrayList dependencyIds = dependencyProviderPtr->GetFeatureDependencies(m_selectedFeatureId);
-					for (const QByteArray& dependencyId : dependencyIds){
-						if (!packageCollectionFeatureIds.contains(dependencyId) && !ownFeatureIds.contains(dependencyId)){
-							CItem* missingItemObjectPtr = new CItem();
-							missingItemObjectPtr->SetItemChangeHandler(this);
-
-							ItemTreePtr missingItemPtr(missingItemObjectPtr);
-							missingItemPtr->SetId(dependencyId);
-							missingItemPtr->SetName(tr("ID: %1").arg(QString(dependencyId)));
-							missingItemPtr->SetActivationEnabled(true);
-							missingItemPtr->SetActivated(true);
-							missingItemsGroupPtr->AddChild(missingItemPtr);
-						}
-					}
-				}
 			}
 
 			if (missingItemsGroupPtr->GetChildsCount() > 0){
@@ -233,16 +215,9 @@ void CFeaturePackageGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*cha
 	imtlic::IFeaturePackage* packagePtr = GetObservedObject();
 	Q_ASSERT(packagePtr != nullptr);
 	
-	const imtlic::IFeatureDependenciesProvider* dependenciesProviderPtr = packagePtr->GetDependenciesInfoProvider();
-
 	imtbase::ICollectionInfo::Ids featureCollectionIds = packagePtr->GetFeatureList().GetElementIds();
 	for (const QByteArray& featureCollectionId : featureCollectionIds){
 		const imtlic::IFeatureInfo* featurePtr = packagePtr->GetFeatureInfo(featureCollectionId);
-
-		if (featurePtr != nullptr && dependenciesProviderPtr != nullptr){
-			QByteArray featureId = featurePtr->GetFeatureId();
-			m_dependencyMap[featureId] = dependenciesProviderPtr->GetFeatureDependencies(featureId);
-		}
 	}
 
 	UpdateItemTree();
@@ -280,14 +255,6 @@ void CFeaturePackageGuiComp::UpdateModel() const
 	if (!m_selectedFeatureId.isEmpty()){
 		imtlic::IFeaturePackage* packagePtr = GetObservedObject();
 
-		if (packagePtr != nullptr){
-			imtlic::IFeatureDependenciesManager* dependenciesManagerPtr = dynamic_cast<imtlic::IFeatureDependenciesManager*>(
-						const_cast<imtlic::IFeatureDependenciesProvider*>(packagePtr->GetDependenciesInfoProvider()));
-
-			if (dependenciesManagerPtr != nullptr){
-				dependenciesManagerPtr->SetFeatureDependencies(m_selectedFeatureId, m_dependencyMap[m_selectedFeatureId]);
-			}
-		}
 	}
 }
 
@@ -407,17 +374,6 @@ void CFeaturePackageGuiComp::FeaturePackageProxy::SetPackageName(const QString& 
 
 // reimplemented (imtlic::IFeatureInfoProvider)
 
-const imtbase::IObjectCollection* CFeaturePackageGuiComp::FeaturePackageProxy::GetFeaturePackages() const
-{
-	imtlic::IFeaturePackage* featurePackagePtr = m_parent.GetObservedObject();
-	if (featurePackagePtr != nullptr){
-		return featurePackagePtr->GetFeaturePackages();
-	}
-
-	return nullptr;
-}
-
-
 const imtbase::ICollectionInfo& CFeaturePackageGuiComp::FeaturePackageProxy::GetFeatureList() const
 {
 	imtlic::IFeaturePackage* featurePackagePtr = m_parent.GetObservedObject();
@@ -439,38 +395,6 @@ const imtlic::IFeatureInfo* CFeaturePackageGuiComp::FeaturePackageProxy::GetFeat
 	return nullptr;
 }
 
-
-const imtlic::IFeatureDependenciesProvider* CFeaturePackageGuiComp::FeaturePackageProxy::GetDependenciesInfoProvider() const
-{
-	imtlic::IFeatureInfoProvider* featurePackagePtr = m_parent.GetObservedObject();
-	if (featurePackagePtr != nullptr){
-		return featurePackagePtr->GetDependenciesInfoProvider();
-	}
-
-	return nullptr;
-}
-
-
-const imtbase::ICollectionInfo* CFeaturePackageGuiComp::FeaturePackageProxy::GetParentFeatureInfoProviderList() const
-{
-	imtlic::IFeaturePackage* featurePackagePtr = m_parent.GetObservedObject();
-	if (featurePackagePtr != nullptr){
-		return featurePackagePtr->GetParentFeatureInfoProviderList();
-	}
-
-	return nullptr;
-}
-
-
-const imtlic::IFeatureInfoProvider* CFeaturePackageGuiComp::FeaturePackageProxy::GetParentFeatureInfoProvider(const QByteArray& parentId) const
-{
-	imtlic::IFeaturePackage* featurePackagePtr = m_parent.GetObservedObject();
-	if (featurePackagePtr != nullptr){
-		return featurePackagePtr->GetParentFeatureInfoProvider(parentId);
-	}
-
-	return nullptr;
-}
 
 // reimplemented (iser::ISerializable)
 

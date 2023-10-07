@@ -6,6 +6,7 @@
 
 // ImtCore includes
 #include <imtlic/ILicenseInfoProvider.h>
+#include <imtlic/IFeatureInfoProvider.h>
 
 
 namespace imtlic
@@ -43,6 +44,21 @@ public:
 		Set category-ID.
 	*/
 	virtual void SetCategoryId(const QByteArray& categoryId) = 0;
+
+	/**
+		Get features includes in this product.
+	*/
+	virtual QByteArrayList GetFeatureIds() const = 0;
+
+	/**
+		Set features.
+	*/
+	virtual void SetFeatureIds(QByteArrayList featureIds) = 0;
+
+	/**
+		Get feature info provider.
+	*/
+	virtual IFeatureInfoProvider* GetFeatureInfoProvider() const = 0;
 };
 
 
