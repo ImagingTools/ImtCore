@@ -35,6 +35,8 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 	}
 
 	if (userId.isEmpty()){
+		errorMessage = "User-ID was not defined";
+
 		return nullptr;
 	}
 

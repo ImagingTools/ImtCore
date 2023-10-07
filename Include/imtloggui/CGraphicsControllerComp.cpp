@@ -357,7 +357,7 @@ void CGraphicsControllerComp::OnGroupChanged(int modelId)
 		QList<QGraphicsItem*> items = scenePtr->items();
 		for (QGraphicsItem* itemPtr : items){
 			QVariant data = itemPtr->data(0);
-			if (data.type() != QVariant::ByteArray){
+			if (data.typeId() != QMetaType::QByteArray){
 				continue;
 			}
 

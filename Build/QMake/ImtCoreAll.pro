@@ -270,6 +270,10 @@ SUBDIRS += ImtAuthGqlPck
 ImtAuthGqlPck.file = ../../Impl/ImtAuthGqlPck/QMake/ImtAuthGqlPck.pro
 ImtAuthGqlPck.depends = imtauthgql
 
+SUBDIRS += ImtClientGqlPck
+ImtClientGqlPck.file = ../../Impl/ImtClientGqlPck/QMake/ImtClientGqlPck.pro
+ImtClientGqlPck.depends = imtclientgql
+
 #SUBDIRS += ImtControlsGallery
 #ImtControlsGallery.file = ../../Impl/ImtControlsGallery/QMake/ImtControlsGallery.pro
 #ImtControlsGallery.depends = imtqml imtstyle imtcontrols

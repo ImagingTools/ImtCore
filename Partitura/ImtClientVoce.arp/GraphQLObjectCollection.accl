@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5118" Description="ACF"/>
+            <Version Id="1" Number="2196" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ApiClient" X="550" Y="375" Note=""/>
+        <Element ComponentName="GqlObjectCollection" X="550" Y="100" Note=""/>
+        <Element ComponentName="GqlObjectCollectionDelegate" X="550" Y="250" Note=""/>
+        <Element ComponentName="GraphQLClientEngine" X="550" Y="525" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

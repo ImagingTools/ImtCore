@@ -157,19 +157,17 @@ IRequest* CHttpProtocolEngineComp::CreateRequest(const IRequestServlet& requestH
 
 
 IRequest* CHttpProtocolEngineComp::CreateRequestForSend(
-		const IRequestServlet& requestHandler,
-		int statusCode,
-		const QByteArray& data,
-		const QByteArray& dataTypeId) const
+			const IRequestServlet& requestHandler,
+			int /*statusCode*/,
+			const QByteArray& /*data*/,
+			const QByteArray& /*dataTypeId*/) const
 {
-
 	return new CHttpRequest(requestHandler, *this);
-
 }
 
 
 IResponse* CHttpProtocolEngineComp::CreateResponse(
-			const IRequest& request,
+			const IRequest& /*request*/,
 			int statusCode,
 			const QByteArray& data,
 			const QByteArray& dataTypeId) const

@@ -72,7 +72,7 @@ QByteArrayList CGqlObjectCollectionComp::FindObjectParentNodes(const QByteArray&
 	if (m_delegateCompPtr.IsValid()){
 		imtgql::IGqlStructuredCollectionResponse::ElementInfo info;
 		if (m_delegateCompPtr->GetObjectInfo(objectId, info)){
-			for (imtgql::IGqlStructuredCollectionResponse::ElementInfo::PathItem& pathItem : info.path){
+			for (int i = 0; i < info.path.count(); ++i){
 				int index = info.path.count() - 1;
 				Q_ASSERT(index >= 0);
 
@@ -99,23 +99,27 @@ QByteArray CGqlObjectCollectionComp::InsertNewObject(
 			const imtbase::IOperationContext* operationContextPtr)
 {
 	if (m_delegateCompPtr.IsValid()){
-		QByteArray objectId = m_delegateCompPtr->InsertObject(
+		istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
+		imtbase::ICollectionInfo::ElementInsertInfo insertInfo;
+
+		QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray() : proposedObjectId;
+
+		insertInfo.elementId = objectId;
+		changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_INSERTED, QVariant::fromValue(insertInfo));
+		istd::CChangeNotifier notifier(this, &changeSet);
+
+		objectId = m_delegateCompPtr->InsertObject(
 					typeId,
 					name,
 					description,
 					*defaultValuePtr,
-					proposedObjectId,
+					objectId,
 					parentId,
 					dataMetaInfoPtr,
 					elementMetaInfoPtr,
 					operationContextPtr);
-
-		if (!objectId.isEmpty()){
-			istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
-			imtbase::ICollectionInfo::ElementInsertInfo insertInfo;
-			insertInfo.elementId = objectId;
-			changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_INSERTED, QVariant::fromValue(insertInfo));
-			istd::CChangeNotifier notifier(this, &changeSet);
+		if (objectId.isEmpty()){
+			notifier.Abort();
 		}
 
 		return objectId;
@@ -431,7 +435,7 @@ bool CGqlObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dataPt
 bool CGqlObjectCollectionComp::SetObjectData(
 			const Id& objectId,
 			const istd::IChangeable& object,
-			CompatibilityMode mode,
+			CompatibilityMode /*mode*/,
 			const imtbase::IOperationContext* operationContextPtr)
 {
 	if (m_delegateCompPtr.IsValid()){
@@ -707,24 +711,24 @@ void CGqlObjectCollectionComp::OnComponentCreated()
 	}
 
 	if (m_subscriptionManagerCompPtr.IsValid()){
-		imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, "onAddMeasurement");
+		imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, "onAddDocument");
 		imtgql::CGqlObject subscriptionField("data");
 		subscriptionField.InsertField("id");
 		subscriptionField.InsertField("name");
 		subscriptionField.InsertField("metadata");
-		//	subscriptionField.InsertField("folderId");
 		subscriptionField.InsertField("createdOn");
-		//	subscriptionField.InsertField("version");
 		gqlRequest.AddField(subscriptionField);
-		m_addMeasurementSubsriptionId = m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, this);
+		m_addDocumentSubscriptionId = m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, this);
 	}
 }
 
 
 void CGqlObjectCollectionComp::OnComponentDestroyed()
 {
-	if (m_subscriptionManagerCompPtr.IsValid() && !m_addMeasurementSubsriptionId.isEmpty()){
-		m_subscriptionManagerCompPtr->UnRegisterSubscription(m_addMeasurementSubsriptionId);
+	if (m_subscriptionManagerCompPtr.IsValid()){
+		if (!m_addDocumentSubscriptionId.isEmpty()){
+			m_subscriptionManagerCompPtr->UnregisterSubscription(m_addDocumentSubscriptionId);
+		}
 	}
 
 	BaseClass::OnComponentDestroyed();
@@ -737,8 +741,6 @@ imtbase::IObjectCollection::DataPtr CGqlObjectCollectionComp::GetObject(
 			const QByteArray& objectId,
 			const QByteArray& typeId) const
 {
-	imtbase::IObjectCollection::DataPtr documentPtr;
-
 	if (m_delegateCompPtr.IsValid()){
 		imtbase::IObjectCollection::DataPtr documentPtr = CreateObjectInstance(typeId);
 		if (documentPtr.IsValid()){
@@ -755,7 +757,9 @@ imtbase::IObjectCollection::DataPtr CGqlObjectCollectionComp::GetObject(
 bool CGqlObjectCollectionComp::GetElementType(const QByteArray& elementId, ElementType& valueOut) const
 {
 	if (m_delegateCompPtr.IsValid()){
-		return m_delegateCompPtr->GetElementType(elementId);
+		valueOut = m_delegateCompPtr->GetElementType(elementId);
+
+		return (valueOut != imtbase::IStructuredObjectCollectionInfo::ET_UNKNOWN);
 	}
 
 	return false;

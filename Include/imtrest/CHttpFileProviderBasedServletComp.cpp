@@ -1,14 +1,6 @@
 #include <imtrest/CHttpFileProviderBasedServletComp.h>
 
 
-// Qt includes
-#include <QtCore/QRegularExpression>
-#include <QtCore/QRegularExpressionMatch>
-
-// ACF includes
-#include <ilog/TLoggerCompWrap.h>
-#include <ifile/IFileNameParam.h>
-
 // ImtCore includes
 #include <imtrest/IRequestServlet.h>
 
@@ -22,12 +14,11 @@ QByteArray CHttpFileProviderBasedServletComp::GetMimeType(QByteArray fileSuffix)
 	if (fileSuffix.startsWith('.')){
 		fileSuffix = fileSuffix.remove(0,1);
 	}
+
 	auto setMimeTypeByExtention = [&retval, &fileSuffix](const QByteArray& mimeType, const std::initializer_list<QByteArray>& fileExtentions){
 		bool mimeTypeSetByExtentionResult = false;
-		for (const QString& ext: fileExtentions)
-		{
-			if (fileSuffix == ext)
-			{
+		for (const QString& ext: fileExtentions){
+			if (fileSuffix == ext){
 				retval = mimeType;
 				mimeTypeSetByExtentionResult = true;
 				break;
@@ -84,10 +75,10 @@ QByteArray CHttpFileProviderBasedServletComp::GetMimeType(QByteArray fileSuffix)
 // reimplemented (IRequestHandler)
 
 ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
-		const QByteArray& commandId,
-		const imtrest::IRequest::CommandParams& commandParams,
-		const HeadersMap& headers,
-		const imtrest::CHttpRequest& request) const
+			const QByteArray& /*commandId*/,
+			const imtrest::IRequest::CommandParams& commandParams,
+			const HeadersMap& /*headers*/,
+			const imtrest::CHttpRequest& request) const
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
 	QByteArray errorBody = "<html><head><title>Error</title></head><body><p>File resource was not found</p></body></html>";
@@ -127,7 +118,6 @@ ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
 		while (commandIdFileName.endsWith('/')){
 			commandIdFileName.chop(1);
 		}
-
 	}
 
 	bool loadRes = false;
@@ -143,14 +133,13 @@ ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
 			reponseTypeId = this->GetMimeType(fileSuffix);
 			break;
 		}
-
 	}
+
 	ConstResponsePtr responsePtr;
 
 	if (loadRes){
 		responsePtr = ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId));
 	}
-
 	else{
 		responsePtr = generateErrorResponsePtr(QByteArray("Unable to open file ") + commandIdFileName, IProtocolEngine::SC_NOT_FOUND);
 	}

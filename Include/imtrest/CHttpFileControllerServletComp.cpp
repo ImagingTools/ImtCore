@@ -17,8 +17,8 @@ namespace imtrest
 
 ConstResponsePtr CHttpFileControllerServletComp::OnPost(
 			const QByteArray& commandId,
-			const IRequest::CommandParams& commandParams,
-			const HeadersMap& headers,
+			const IRequest::CommandParams& /*commandParams*/,
+			const HeadersMap& /*headers*/,
 			const CHttpRequest& request) const
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
@@ -37,7 +37,6 @@ ConstResponsePtr CHttpFileControllerServletComp::OnPost(
 
 	QByteArray commandIdFileName;
 	{
-		QByteArray commandId = request.GetCommandId();
 		QByteArray commandIdBase = *m_commandIdAttrPtr;
 
 		if (commandIdBase.endsWith('*')){
@@ -83,9 +82,9 @@ ConstResponsePtr CHttpFileControllerServletComp::OnPost(
 
 
 ConstResponsePtr CHttpFileControllerServletComp::OnDelete(
-			const QByteArray& commandId,
-			const IRequest::CommandParams& commandParams,
-			const HeadersMap& headers,
+			const QByteArray& /*commandId*/,
+			const IRequest::CommandParams& /*commandParams*/,
+			const HeadersMap& /*headers*/,
 			const CHttpRequest& request) const
 {
 	const IProtocolEngine& engine = request.GetProtocolEngine();
@@ -104,14 +103,14 @@ ConstResponsePtr CHttpFileControllerServletComp::OnDelete(
 
 	QByteArray commandIdFileName;
 	{
-		QByteArray commandId = request.GetCommandId();
+		QByteArray requestCommandId = request.GetCommandId();
 		QByteArray commandIdBase = *m_commandIdAttrPtr;
 
 		if (commandIdBase.endsWith('*')){
 			commandIdBase.chop(1);
 		}
 
-		commandIdFileName = commandId;
+		commandIdFileName = requestCommandId;
 		commandIdFileName = commandIdFileName.replace(commandIdBase, "");
 
 		while (commandIdFileName.startsWith('/')){
@@ -121,7 +120,6 @@ ConstResponsePtr CHttpFileControllerServletComp::OnDelete(
 		while (commandIdFileName.endsWith('/')){
 			commandIdFileName.chop(1);
 		}
-
 	}
 
 	bool loadRes = false;

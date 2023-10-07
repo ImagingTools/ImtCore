@@ -45,7 +45,7 @@ void CEventItemMetaInfoViewComp::UpdateGui(const istd::IChangeable::ChangeSet& /
 
 			QVariant var = metaInfoPtr->GetMetaInfo(type);
 			QString value;
-			if (var.type() == QVariant::DateTime){
+			if (var.typeId() == QMetaType::QDateTime){
 				value = metaInfoPtr->GetMetaInfo(type).toDateTime().toString("dd.MM.yyyy HH:mm:ss.zzz");
 			}
 			else{

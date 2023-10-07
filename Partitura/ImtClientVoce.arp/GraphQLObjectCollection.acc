@@ -2,19 +2,28 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5108" Description="ACF"/>
-            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5118" Description="ACF"/>
+            <Version Id="1" Number="2196" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
-    <Description></Description>
-    <Keywords></Keywords>
+    <Description>Remote object/document collection that can be accessed by GraphQL protocol</Description>
+    <Keywords>GraphQL Client API Collection Document</Keywords>
     <ElementsList>
         <Element Id="ApiClient" PackageId="ImtClientGqlPck" ComponentId="ApiClient">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GraphQLClientEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Timeout" Type="Real" ExportId="CommunicationTimeout">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -22,8 +31,14 @@
         <Element Id="GqlObjectCollection" PackageId="ImtClientGqlPck" ComponentId="GqlObjectCollection">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="GqlDatabaseDelegate" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GqlObjectCollectionDelegate"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MetaInfoCreator" Type="Reference" ExportId="MetaInfoCreator">
                         <Data IsEnabled="false"/>
@@ -46,7 +61,13 @@
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApiClient"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="Id" Type="Id" ExportId="Id">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectTypeIds" Type="Id[]" ExportId="ObjectTypeIds">

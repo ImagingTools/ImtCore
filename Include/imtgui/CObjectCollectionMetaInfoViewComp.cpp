@@ -36,32 +36,32 @@ void CObjectCollectionMetaInfoViewComp::FillWidget(QGridLayout* layoutPtr)
 		QString textValue;
 		QVariant value = metaInfoPtr->GetMetaInfo(type);
 		QLocale locale;
-		switch (value.type()){
-		case QVariant::String:
+		switch (value.typeId()){
+		case QMetaType::QString:
 			textValue = value.toString();
 			break;
-		case QVariant::Date:
+		case QMetaType::QDate:
 			textValue = locale.toString(value.toDate(),QLocale::ShortFormat);
 			break;
-		case QVariant::DateTime:
+		case QMetaType::QDateTime:
 			textValue = locale.toString(value.toDateTime(),QLocale::ShortFormat);
 			break;
-		case QVariant::ByteArray:
+		case QMetaType::QByteArray:
 			textValue = value.toByteArray();
 			break;
-		case QVariant::Int:
+		case QMetaType::Int:
 			textValue = QString::number(value.toInt());
 			break;
-		case QVariant::UInt:
+		case QMetaType::UInt:
 			textValue = QString::number(value.toUInt());
 			break;
-		case QVariant::LongLong:
+		case QMetaType::LongLong:
 			textValue = QString::number(value.toLongLong());
 			break;
-		case QVariant::ULongLong:
+		case QMetaType::ULongLong:
 			textValue = QString::number(value.toULongLong());
 			break;
-		case QVariant::Double:
+		case QMetaType::Double:
 			textValue = QString::number(value.toDouble());
 		}
 

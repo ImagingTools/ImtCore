@@ -200,7 +200,7 @@ void CObjectCollectionViewComp::OnRestoreSettings(const QSettings& settings)
 	}
 	
 	QVariant settingsValue = settings.value(settingsKey);
-	if (settingsValue.type() != QVariant::ByteArray){
+	if (settingsValue.typeId() != QMetaType::QByteArray){
 		return;
 	}
 
@@ -632,12 +632,12 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 			QVariant varFieldId = settings["FieldId"];
 			QVariant varWidth = settings["Width"];
 
-			if (varFieldId.type() != QVariant::String){
+			if (varFieldId.typeId() != QMetaType::QString){
 				compareOk = false;
 				break;
 			}
 
-			if (varWidth.type() != QVariant::Double){
+			if (varWidth.typeId() != QMetaType::Double){
 				compareOk = false;
 				continue;
 			}
@@ -668,11 +668,11 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 			QVariant varFieldId = columnSettings["FieldId"];
 			QVariant varWidth = columnSettings["Width"];
 
-			if (varFieldId.type() != QVariant::String){
+			if (varFieldId.typeId() != QMetaType::QString){
 				continue;
 			}
 
-			if (varWidth.type() != QVariant::Double){
+			if (varWidth.typeId() != QMetaType::Double){
 				continue;
 			}
 

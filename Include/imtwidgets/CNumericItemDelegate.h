@@ -17,8 +17,8 @@ public:
 
 	enum Type
 	{
-		SpinInt = QVariant::Int,
-		SpinDouble = QVariant::Double,
+		SpinInt = QMetaType::Int,
+		SpinDouble = QMetaType::Double,
 	};
 
 	CNumericItemDelegate(Type type = CNumericItemDelegate::SpinInt, QObject* parent = 0);

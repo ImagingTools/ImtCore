@@ -29,7 +29,7 @@ public:
 protected:
 	virtual imtrest::ConstResponsePtr InitConnection(const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr RegisterSubscription(const imtrest::IRequest& request) const;
-	virtual imtrest::ConstResponsePtr UnRegisterSubscription(const imtrest::IRequest& request) const;
+	virtual imtrest::ConstResponsePtr UnregisterSubscription(const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr CreateDataResponse(QByteArray data, const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr CreateErrorResponse(QByteArray errorMessage, const imtrest::IRequest& request) const;
 

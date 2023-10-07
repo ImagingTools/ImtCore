@@ -39,7 +39,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::I
 			break;
 
 		case imtrest::CWebSocketRequest::MT_STOP:
-			return UnRegisterSubscription(request);
+			return UnregisterSubscription(request);
 			break;
 
 		default:{
@@ -138,7 +138,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 }
 
 
-imtrest::ConstResponsePtr CWebSocketServletComp::UnRegisterSubscription(const imtrest::IRequest& request) const
+imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const imtrest::IRequest& request) const
 {
 	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
 	if (webSocketRequest == nullptr){

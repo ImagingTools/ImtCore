@@ -189,7 +189,7 @@ bool CMultiParamsSetGuiComp::OnModelDetached(imod::IModel* modelPtr)
 }
 
 
-void CMultiParamsSetGuiComp::UpdateUiState(const istd::IChangeable::ChangeSet& changeSet, const iprm::IEnableableParam* aUiActivatorPtr)
+void CMultiParamsSetGuiComp::UpdateUiState(const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::IEnableableParam* aUiActivatorPtr)
 {
 	if (m_uiActivatorsCompPtr.IsValid() && m_uiActivatorsModelCompPtr.IsValid()){
 		int uiActivatorsCount = m_uiActivatorsCompPtr.GetCount();
