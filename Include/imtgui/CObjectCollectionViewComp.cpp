@@ -25,6 +25,9 @@
 #include <iqtgui/CHierarchicalCommand.h>
 #include <iwidgets/iwidgets.h>
 
+// IntCore includes
+#include <imtgui/ICollectionViewDelegate.h>
+
 
 namespace imtgui
 {
@@ -89,12 +92,7 @@ imtbase::ISelection::Ids CObjectCollectionViewComp::GetSelectedIds() const
 			}
 		}
 	}
-
-#if QT_VERSION < 0x060000
-	ISelection::Ids ids(itemIds.toList().toSet());
-#else
 	ISelection::Ids ids(itemIds.cbegin(), itemIds.cend());
-#endif
 
 	return ids;
 }
@@ -200,7 +198,11 @@ void CObjectCollectionViewComp::OnRestoreSettings(const QSettings& settings)
 	}
 	
 	QVariant settingsValue = settings.value(settingsKey);
+#if QT_VERSION < 0x060000
+	if (settingsValue.type() != QMetaType::QByteArray){
+#else
 	if (settingsValue.typeId() != QMetaType::QByteArray){
+#endif
 		return;
 	}
 
@@ -550,18 +552,15 @@ QStringList CObjectCollectionViewComp::GetMetaInfoHeaders(const QByteArray& type
 }
 
 
-CObjectCollectionViewComp::ObjectMetaInfo CObjectCollectionViewComp::GetMetaInfo(const QByteArray& itemId, const QByteArray& typeId) const
+ICollectionViewDelegate::ObjectMetaInfo CObjectCollectionViewComp::GetMetaInfo(const QByteArray& itemId, const QByteArray& typeId) const
 {
 	const ICollectionViewDelegate& viewDelegate = GetViewDelegate(typeId);
 	const imtbase::ICollectionInfo& fieldCollection = viewDelegate.GetSummaryInformationTypes();
 	QVector<QByteArray> fieldIds = fieldCollection.GetElementIds();
 
-	ObjectMetaInfo result;
+	ICollectionViewDelegate::ObjectMetaInfo result;
 
-	for (QByteArray fieldId : fieldIds){
-		ICollectionViewDelegate::SummaryInformation summaryInfo = viewDelegate.GetSummaryInformation(itemId, fieldId);
-		result.append(summaryInfo);
-	}
+	viewDelegate.GetSummaryInformation(itemId, fieldIds, result);
 
 	return result;
 }
@@ -632,12 +631,19 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 			QVariant varFieldId = settings["FieldId"];
 			QVariant varWidth = settings["Width"];
 
+#if QT_VERSION < 0x060000
+			if (varFieldId.type() != QMetaType::QString){
+#else
 			if (varFieldId.typeId() != QMetaType::QString){
+#endif
 				compareOk = false;
 				break;
 			}
-
+#if QT_VERSION < 0x060000
+			if (varWidth.type() != QMetaType::Double){
+#else
 			if (varWidth.typeId() != QMetaType::Double){
+#endif
 				compareOk = false;
 				continue;
 			}
@@ -668,6 +674,15 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 			QVariant varFieldId = columnSettings["FieldId"];
 			QVariant varWidth = columnSettings["Width"];
 
+#if QT_VERSION < 0x060000
+			if (varFieldId.type() != QMetaType::QString){
+				continue;
+			}
+
+			if (varWidth.type() != QMetaType::Double){
+				continue;
+			}
+#else
 			if (varFieldId.typeId() != QMetaType::QString){
 				continue;
 			}
@@ -675,6 +690,7 @@ void CObjectCollectionViewComp::RestoreColumnsSettings()
 			if (varWidth.typeId() != QMetaType::Double){
 				continue;
 			}
+#endif
 
 			QString fieldId;
 			fieldId = varFieldId.toString();
@@ -978,9 +994,10 @@ void CObjectCollectionViewComp::OnTypeChanged()
 	const imtbase::IObjectCollection* collectionPtr = GetObservedObject();
 	Q_ASSERT(collectionPtr != nullptr);
 
-	m_tableModel.SetCurrentTypeId(m_currentTypeId);
-
-	m_tableModel.UpdateFromData(*collectionPtr, istd::IChangeable::GetAnyChange());
+	if (!IsUpdateBlocked()){
+		m_tableModel.SetCurrentTypeId(m_currentTypeId);
+		m_tableModel.UpdateFromData(*collectionPtr, istd::IChangeable::GetAnyChange());
+	}
 
 	UpdateCommands();
 }
@@ -1334,6 +1351,10 @@ CObjectCollectionViewComp::TableModel::TableModel(CObjectCollectionViewComp& par
 
 void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjectCollection& collection, const istd::IChangeable::ChangeSet& /*changes*/)
 {
+	if (m_parent.IsUpdateBlocked()){
+		return;
+	}
+
 	m_isPageMode = m_parent.m_paginationGuiCompPtr.IsValid();
 	m_batchSize = m_isPageMode ? 25 : 50;
 
@@ -1426,7 +1447,7 @@ void CObjectCollectionViewComp::TableModel::UpdateItem(const imtbase::IObjectCol
 
 	QByteArray itemTypeId = objectCollectionPtr->GetObjectTypeId(objectId);
 
-	ObjectMetaInfo metaInfo = m_parent.GetMetaInfo(objectId, itemTypeId);
+	ICollectionViewDelegate::ObjectMetaInfo metaInfo = m_parent.GetMetaInfo(objectId, itemTypeId);
 	if (metaInfo.isEmpty()){
 		return;
 	}
@@ -1470,8 +1491,9 @@ void CObjectCollectionViewComp::TableModel::SetSorting(int logicalIndex, Qt::Sor
 
 	m_filter.SetSortingInfoIds(QByteArrayList() << informationIds[logicalIndex]);
 
-	if (objectCollectionPtr)
+	if (objectCollectionPtr != nullptr && !m_parent.IsUpdateBlocked()){
 		UpdateFromData(*objectCollectionPtr, istd::IChangeable::GetAnyChange());
+	}
 }
 
 
@@ -1547,7 +1569,7 @@ QVariant CObjectCollectionViewComp::TableModel::data(const QModelIndex& index, i
 	QByteArray objectId = m_ids[index.row()];
 
 	QByteArray itemTypeId;
-	ObjectMetaInfo metaInfo;
+	ICollectionViewDelegate::ObjectMetaInfo metaInfo;
 	if (m_metaInfoMap.contains(objectId)){
 		metaInfo = m_metaInfoMap[objectId];
 	}

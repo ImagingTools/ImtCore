@@ -13,35 +13,44 @@ namespace imtlicgui
 
 // reimplemented (imtgui::ICollectionViewDelegate)
 
-imtgui::ICollectionViewDelegate::SummaryInformation CFeatureCollectionViewDelegateComp::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
+bool CFeatureCollectionViewDelegateComp::GetSummaryInformation(
+			const QByteArray& objectId,
+			const QVector<QByteArray> fieldIds,
+			ObjectMetaInfo& objectMetaInfo)const
 {
-	SummaryInformation retVal;
+	if (m_collectionPtr == nullptr){
+		return false;
+	}
+	const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(m_collectionPtr->GetObjectPtr(objectId));
 
-	if (m_collectionPtr != nullptr){
-		const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(m_collectionPtr->GetObjectPtr(objectId));
+	for (const QByteArray& informationId: fieldIds){
+		SummaryInformation summaryInformation;
+		summaryInformation.infoId = informationId;
 		if (featureInfoPtr != nullptr){
 			if (informationId == QByteArray("Name")){
-				retVal.text = featureInfoPtr->GetFeatureName();
-				retVal.sortValue = retVal.text;
+				summaryInformation.text = featureInfoPtr->GetFeatureName();
+				summaryInformation.sortValue = summaryInformation.text;
+				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArray("Id")){
-				retVal.text = featureInfoPtr->GetFeatureId();
-				retVal.sortValue = retVal.text;
+				summaryInformation.text = featureInfoPtr->GetFeatureId();
+				summaryInformation.sortValue = summaryInformation.text;
+				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArray("Description")){
-				retVal.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
-				retVal.sortValue = retVal.text;
+				summaryInformation.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+				summaryInformation.sortValue = summaryInformation.text;
+				objectMetaInfo.append(summaryInformation);
 			}
 		}
 		else{
-			retVal.text = tr("Wrong object type");
-			retVal.sortValue = retVal.text;
+			summaryInformation.text = tr("Wrong object type");
+			summaryInformation.sortValue = summaryInformation.text;
+			objectMetaInfo.append(summaryInformation);
 		}
 	}
 
-	retVal.infoId = informationId;
-
-	return retVal;
+	return true;
 }
 
 

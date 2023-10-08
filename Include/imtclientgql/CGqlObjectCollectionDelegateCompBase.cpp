@@ -476,9 +476,7 @@ bool CGqlObjectCollectionDelegateCompBase::RemoveObject(const QByteArray& object
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
-							return variant.toBool();
-						}
+						return true;
 					}
 				}
 			}

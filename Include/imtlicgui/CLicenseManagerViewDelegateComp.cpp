@@ -78,30 +78,44 @@ QString CLicenseManagerViewDelegateComp::RenameObject(const QByteArray& objectId
 }
 
 
-imtgui::ICollectionViewDelegate::SummaryInformation CLicenseManagerViewDelegateComp::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
+bool CLicenseManagerViewDelegateComp::GetSummaryInformation(
+			const QByteArray& objectId,
+			const QVector<QByteArray> fieldIds,
+			ObjectMetaInfo& objectMetaInfo) const
 {
-	SummaryInformation result;
+	if (m_collectionPtr == nullptr){
+		return false;
+	}
 
 	const imtlic::ILicenseInfo* licenseInfoPtr = dynamic_cast<const imtlic::ILicenseInfo*>(m_collectionPtr->GetObjectPtr(objectId));
+	if (licenseInfoPtr == nullptr){
+		Q_ASSERT(0);
 
-	if (licenseInfoPtr != nullptr){
+		return false;
+	}
+
+	for (const QByteArray& informationId: fieldIds){
+		SummaryInformation summaryInformation;
+		summaryInformation.infoId = informationId;
 		if (informationId == QByteArray("Id")){
-			result.text = licenseInfoPtr->GetLicenseId();//Изменил LicenseId на Id
-			result.sortValue = result.text;
+			summaryInformation.text = licenseInfoPtr->GetLicenseId();//Изменил LicenseId на Id
+			summaryInformation.sortValue = summaryInformation.text;
+			objectMetaInfo.append(summaryInformation);
 		}
 		else if (informationId == QByteArray("Name")){
-			result.text = licenseInfoPtr->GetLicenseName();
-			result.sortValue = result.text;
+			summaryInformation.text = licenseInfoPtr->GetLicenseName();
+			summaryInformation.sortValue = summaryInformation.text;
+			objectMetaInfo.append(summaryInformation);
 		}
 		else if (informationId == QByteArray("Description")){
-			result.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
-			result.sortValue = result.text;
+			summaryInformation.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+			summaryInformation.sortValue = summaryInformation.text;
+			objectMetaInfo.append(summaryInformation);
 		}
 	}
 
-	result.infoId = informationId;
 
-	return result;
+	return true;
 }
 
 

@@ -206,15 +206,23 @@ void CEventViewComp::OnRestoreSettings(const QSettings& settings)
 	QByteArray settingsKey("EventViewSettings/EventViewWidth");
 	if (settings.contains(settingsKey)){
 		QVariant settingsValue = settings.value(settingsKey);
+#if QT_VERSION < 0x060000
+		if (settingsValue.type() == QMetaType::Int){
+#else
 		if (settingsValue.typeId() == QMetaType::Int){
-			viewWidth = settingsValue.toInt();
+#endif
+				viewWidth = settingsValue.toInt();
 		}
 	}
 
 	settingsKey = "EventViewSettings/RightPanelWidth";
 	if (settings.contains(settingsKey)){
 		QVariant settingsValue = settings.value(settingsKey);
+#if QT_VERSION < 0x060000
+		if (settingsValue.type() == QMetaType::Int){
+#else
 		if (settingsValue.typeId() == QMetaType::Int){
+#endif
 			rightPanelWidth = settingsValue.toInt();
 		}
 	}

@@ -850,31 +850,59 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 				iser::CArchiveTag keyTag(key, "key", iser::CArchiveTag::TT_LEAF);
 				retVal = retVal && archive.BeginTag(keyTag);
 				QVariant value = item->Value(key);
+#if QT_VERSION < 0x060000
+				if (value.type() == QMetaType::Int){
+#else
 				if (value.typeId() == QMetaType::Int){
+#endif
 					qint32 intVal = value.toInt();
 					retVal = retVal && archive.Process(intVal);
 				}
+#if QT_VERSION < 0x060000
+				else if (value.type() == QMetaType::UInt){
+#else
 				else if (value.typeId() == QMetaType::UInt){
+#endif
 					quint32 intVal = value.toUInt();
 					retVal = retVal && archive.Process(intVal);
 				}
+#if QT_VERSION < 0x060000
+				else if (value.type() == QMetaType::Double){
+#else
 				else if (value.typeId() == QMetaType::Double){
+#endif
 					double doubleVal = value.toDouble();
 					retVal = retVal && archive.Process(doubleVal);
 				}
+#if QT_VERSION < 0x060000
+				else if (value.type() == QMetaType::LongLong){
+#else
 				else if (value.typeId() == QMetaType::LongLong){
+#endif
 					qint64 intVal = value.toLongLong();
 					retVal = retVal && archive.Process(intVal);
 				}
+#if QT_VERSION < 0x060000
+				else if (value.type() == QMetaType::ULongLong){
+#else
 				else if (value.typeId() == QMetaType::ULongLong){
+#endif
 					quint64 intVal = value.toULongLong();
 					retVal = retVal && archive.Process(intVal);
 				}
+#if QT_VERSION < 0x060000
+				else if (value.type() == QMetaType::Bool){
+#else
 				else if (value.typeId() == QMetaType::Bool){
+#endif
 					bool boolVal = value.toBool();
 					retVal = retVal && archive.Process(boolVal);
 				}
+#if QT_VERSION < 0x060000
+				else if (value.type() == QMetaType::QString || value.type() == QMetaType::QByteArray){
+#else
 				else if (value.typeId() == QMetaType::QString || value.typeId() == QMetaType::QByteArray){
+#endif
 					QString strVal = value.toString();
 					retVal = retVal && archive.Process(strVal);
 				}

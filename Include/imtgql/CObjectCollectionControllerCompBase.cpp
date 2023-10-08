@@ -215,6 +215,15 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	QByteArray objectId;
 	QString name;
 	QString description;
+	QByteArray typeId = "DocumentInfo";
+
+	const QList<imtgql::CGqlObject> params = gqlRequest.GetParams();
+	int count = params.count();
+	for (int i = 0; i < count; i++){
+		if (params.at(i).GetFieldIds().contains("typeId")){
+			typeId = params.at(i).GetFieldArgumentValue("typeId").toByteArray();
+		}
+	}
 
 	istd::IChangeable* newObjectPtr = CreateObject(gqlRequest, objectId, name, description, errorMessage);
 	if (newObjectPtr == nullptr){
@@ -232,7 +241,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	}
 
 	imtbase::IOperationContext* operationContextPtr = CreateOperationContext(gqlRequest, QString("Created the object"));
-	QByteArray newObjectId = m_objectCollectionCompPtr->InsertNewObject("DocumentInfo", name, description, newObjectPtr, objectId, nullptr, nullptr, operationContextPtr);
+	QByteArray newObjectId = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, newObjectPtr, objectId, nullptr, nullptr, operationContextPtr);
 	if (newObjectId.isEmpty()){
 		errorMessage = QT_TR_NOOP(QString("Can not insert object: %1").arg(qPrintable(objectId)));
 		SendErrorMessage(0, QString("Can not insert object: %1").arg(qPrintable(objectId)), "Object collection controller");

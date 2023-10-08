@@ -201,12 +201,11 @@ QByteArray CGqlObjectCollectionDelegateComp::InsertObject(
 			if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 				QVariant variant;
 				if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-#if QT_VERSION < 0x060000
-					if (variant.type() == QMetaType::Bool){
-#else
-					if (variant.typeId() == QMetaType::Bool){
-#endif
-						return QByteArray();
+					if (variant.canConvert<QJsonObject>()){
+						QJsonObject jsonObject = variant.value<QJsonObject>();
+						jsonObject = jsonObject.value("addedNotification").toObject();
+						QByteArray objectId = jsonObject.value("Id").toString().toUtf8();
+						return objectId;
 					}
 				}
 			}
@@ -461,24 +460,19 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateRemoveObjectRequest
 			int clientElementVersion,
 			const imtbase::IOperationContext* operationContextPtr) const
 {
-	imtgql::CGqlRequest* queryPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, "Remove");
-	
-	imtgql::CGqlObject id;
-	id.InsertField("Id", QVariant(objectId));
-	queryPtr->AddParam(id);
-
-	imtgql::CGqlObject version;
-	version.InsertField("version", QVariant(clientElementVersion));
-	queryPtr->AddParam(version);
-
-	imtgql::CGqlObject operationContext;
+	QByteArray commandId = *m_collectionIdAttrPtr + "Remove";
 	QByteArray data;
+	imtgql::CGqlRequest* queryPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
+	
+	imtgql::CGqlObject input("input");
+	input.InsertField("Id", QVariant(objectId));
+	input.InsertField("version", QVariant(clientElementVersion));
 	SerializeObject(operationContextPtr,data);
-	operationContext.InsertField("operationContext", QVariant(data.toBase64()));
-	queryPtr->AddParam(operationContext);
+	input.InsertField("operationContext", QVariant(data.toBase64()));
+	queryPtr->AddParam(input);
 
-	imtgql::CGqlObject succeeded("succeeded");
-	queryPtr->AddField(succeeded);
+	imtgql::CGqlObject query("removedNotification");
+	queryPtr->AddField(query);
 
 	return queryPtr;
 }

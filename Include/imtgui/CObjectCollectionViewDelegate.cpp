@@ -330,52 +330,62 @@ const imtbase::ICollectionInfo& CObjectCollectionViewDelegate::GetSummaryInforma
 }
 
 
-ICollectionViewDelegate::SummaryInformation CObjectCollectionViewDelegate::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
+bool CObjectCollectionViewDelegate::GetSummaryInformation(
+			const QByteArray& objectId,
+			const QVector<QByteArray> fieldIds,
+			ObjectMetaInfo& objectMetaInfo) const
 {
-	SummaryInformation result;
+	if (m_collectionPtr == nullptr){
+		return false;
+	}
+	idoc::MetaInfoPtr metaInfo = m_collectionPtr->GetElementMetaInfo(objectId);
 
-	if (m_collectionPtr != nullptr){
+	for (const QByteArray& informationId: fieldIds){
+		SummaryInformation summaryInformation;
+		summaryInformation.infoId = informationId;
 		if (informationId == QByteArray("Name")){
-			result.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
-			result.sortValue = result.text;
+			summaryInformation.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+			summaryInformation.sortValue = summaryInformation.text;
+			objectMetaInfo.append(summaryInformation);
 		}
 		else if (informationId == QByteArray("TypeId")){
 			const iprm::IOptionsList* typeListInfoPtr = m_collectionPtr->GetObjectTypesInfo();
 			QByteArray typeId = m_collectionPtr->GetObjectTypeId(objectId);
 
 			if (typeListInfoPtr == nullptr){
-				result.text = typeId;
+				summaryInformation.text = typeId;
 			}
 			else{
 				int typeIndex = iprm::FindOptionIndexById(typeId, *typeListInfoPtr);
 				Q_ASSERT(typeIndex >= 0);
 
-				result.text = typeListInfoPtr->GetOptionName(typeIndex);
+				summaryInformation.text = typeListInfoPtr->GetOptionName(typeIndex);
 			}
 
-			result.sortValue = result.text;
+			summaryInformation.sortValue = summaryInformation.text;
+			objectMetaInfo.append(summaryInformation);
 		}
 		else if (informationId == QByteArray("Description")){
-			result.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
-			result.sortValue = result.text;
+			summaryInformation.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString();
+			summaryInformation.sortValue = summaryInformation.text;
+			objectMetaInfo.append(summaryInformation);
 		}
 
-		idoc::MetaInfoPtr metaInfo = m_collectionPtr->GetElementMetaInfo(objectId);
 		if (metaInfo.IsValid()){
 			if (informationId == QByteArray("Added")){
-				result.sortValue = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME);
-				result.text = result.sortValue.toDateTime().toString(s_dateTimeFormat);
+				summaryInformation.sortValue = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME);
+				summaryInformation.text = summaryInformation.sortValue.toDateTime().toString(s_dateTimeFormat);
+				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArray("ModificationTime")){
-				result.sortValue = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME);
-				result.text = result.sortValue.toDateTime().toString(s_dateTimeFormat);
+				summaryInformation.sortValue = metaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME);
+				summaryInformation.text = summaryInformation.sortValue.toDateTime().toString(s_dateTimeFormat);
+				objectMetaInfo.append(summaryInformation);
 			}
 		}
 	}
 
-	result.infoId = informationId;
-
-	return result;
+	return true;
 }
 
 

@@ -37,7 +37,10 @@ public:
 	CProductInstanceInfoViewDelegateComp();
 
 	// reimplemented (imtgui::ICollectionViewDelegate)
-	virtual SummaryInformation GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
+	virtual bool GetSummaryInformation(
+				const QByteArray& objectId,
+				const QVector<QByteArray> fieldIds,
+				ObjectMetaInfo& objectMetaInfo) const override;
 	virtual void UpdateItemSelection(const imtbase::ICollectionInfo::Ids& selectedItems, const QByteArray& selectedTypeId) override;
 
 protected:

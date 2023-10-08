@@ -36,7 +36,11 @@ void CObjectCollectionMetaInfoViewComp::FillWidget(QGridLayout* layoutPtr)
 		QString textValue;
 		QVariant value = metaInfoPtr->GetMetaInfo(type);
 		QLocale locale;
+#if QT_VERSION < 0x060000
+		switch (value.type()){
+#else
 		switch (value.typeId()){
+#endif
 		case QMetaType::QString:
 			textValue = value.toString();
 			break;

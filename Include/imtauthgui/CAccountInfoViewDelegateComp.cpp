@@ -13,35 +13,43 @@ namespace imtauthgui
 
 // reimplemented (imtgui::ICollectionViewDelegate)
 
-imtgui::ICollectionViewDelegate::SummaryInformation CAccountInfoViewDelegateComp::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
+bool CAccountInfoViewDelegateComp::GetSummaryInformation(
+			const QByteArray& objectId,
+			const QVector<QByteArray> fieldIds,
+			ObjectMetaInfo& objectMetaInfo) const
 {
-	SummaryInformation result;
-
-	if (m_collectionPtr != nullptr){
-		idoc::MetaInfoPtr metaInfoPtr = m_collectionPtr->GetDataMetaInfo(objectId);
+	if (m_collectionPtr == nullptr){
+		return false;
+	}
+	idoc::MetaInfoPtr metaInfoPtr = m_collectionPtr->GetDataMetaInfo(objectId);
+	for (const QByteArray& informationId: fieldIds){
+		SummaryInformation summaryInformation;
+		summaryInformation.infoId = informationId;
 		if (metaInfoPtr.IsValid()){
 			if (informationId == QByteArray("AccountName")){
-				result.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_NAME).toString();
-				result.sortValue = result.text;
+				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_NAME).toString();
+				summaryInformation.sortValue = summaryInformation.text;
+				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArray("Email")){
-				result.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_CONTACT_EMAIL).toString();
-				result.sortValue = result.text;
+				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_CONTACT_EMAIL).toString();
+				summaryInformation.sortValue = summaryInformation.text;
+				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArray("AccountType")){
-				result.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_TYPE).toString();
-				result.sortValue = result.text;
+				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_TYPE).toString();
+				summaryInformation.sortValue = summaryInformation.text;
+				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArray("AccountDesciption")){
-				result.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_DESCRIPTION).toString();
-				result.sortValue = result.text;
+				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IAccountInfo::MIT_ACCOUNT_DESCRIPTION).toString();
+				summaryInformation.sortValue = summaryInformation.text;
+				objectMetaInfo.append(summaryInformation);
 			}
 		}
 	}
 
-	result.infoId = informationId;
-
-	return result;
+	return true;
 }
 
 

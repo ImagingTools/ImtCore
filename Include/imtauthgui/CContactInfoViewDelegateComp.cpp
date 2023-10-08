@@ -13,41 +13,50 @@ namespace imtauthgui
 
 // reimplemented (imtgui::ICollectionViewDelegate)
 
-imtgui::ICollectionViewDelegate::SummaryInformation CContactInfoViewDelegateComp::GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const
+bool CContactInfoViewDelegateComp::GetSummaryInformation(
+			const QByteArray& objectId,
+			const QVector<QByteArray> fieldIds,
+			ObjectMetaInfo& objectMetaInfo) const
 {
-	SummaryInformation result;
-
-	if (m_collectionPtr != nullptr){
-		idoc::MetaInfoPtr metaInfoPtr = m_collectionPtr->GetDataMetaInfo(objectId);
+	if (m_collectionPtr == nullptr){
+		return false;
+	}
+	idoc::MetaInfoPtr metaInfoPtr = m_collectionPtr->GetDataMetaInfo(objectId);
+	for (const QByteArray& informationId: fieldIds){
+		SummaryInformation summaryInformation;
+		summaryInformation.infoId = informationId;
 		if (metaInfoPtr.IsValid()){
 			if (informationId == QByteArray("EMail")){
-				result.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_MAIL).toString();
-				result.sortValue = result.text;
+				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_MAIL).toString();
+				summaryInformation.sortValue = summaryInformation.text;
+				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArray("Birthday")){
 				QDate birthday = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_BIRTHDAY).toDate();
 				QLocale locale;
-				result.text = locale.toString(birthday, QLocale::ShortFormat);
-				result.sortValue = result.text;
+				summaryInformation.text = locale.toString(birthday, QLocale::ShortFormat);
+				summaryInformation.sortValue = summaryInformation.text;
+				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArray("FirstName")){
-				result.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_FIRST_NAME).toString();
-				result.sortValue = result.text;
+				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_FIRST_NAME).toString();
+				summaryInformation.sortValue = summaryInformation.text;
+				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArray("LastName")){
-				result.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_LAST_NAME).toString();
-				result.sortValue = result.text;
+				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_LAST_NAME).toString();
+				summaryInformation.sortValue = summaryInformation.text;
+				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArray("Nickname")){
-				result.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_NICKNAME).toString();
-				result.sortValue = result.text;
+				summaryInformation.text = metaInfoPtr->GetMetaInfo(imtauth::IContactInfo::MIT_NICKNAME).toString();
+				summaryInformation.sortValue = summaryInformation.text;
+				objectMetaInfo.append(summaryInformation);
 			}
 		}
 	}
 
-	result.infoId = informationId;
-
-	return result;
+	return true;
 }
 
 

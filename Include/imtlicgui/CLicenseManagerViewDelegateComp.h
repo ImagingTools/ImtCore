@@ -32,7 +32,10 @@ public:
 				const QString& description,
 				const istd::IChangeable* defaultDataPtr = nullptr) const override;
 	virtual QString RenameObject(const QByteArray& objectId, const QString& newName) const override;
-	virtual SummaryInformation GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
+	virtual bool GetSummaryInformation(
+				const QByteArray& objectId,
+				const QVector<QByteArray> fieldIds,
+				ObjectMetaInfo& objectMetaInfo) const override;
 
 protected:
 	// reimplemented (imtgui::CObjectCollectionViewDelegate)

@@ -24,43 +24,46 @@ CProductInstanceInfoViewDelegateComp::CProductInstanceInfoViewDelegateComp()
 
 // reimplemented (imtgui::ICollectionViewDelegate)
 
-imtgui::ICollectionViewDelegate::SummaryInformation CProductInstanceInfoViewDelegateComp::GetSummaryInformation(
+bool CProductInstanceInfoViewDelegateComp::GetSummaryInformation(
 			const QByteArray& objectId,
-			const QByteArray& informationId) const
+			const QVector<QByteArray> fieldIds,
+			ObjectMetaInfo& objectMetaInfo) const
 {
-	if (m_collectionPtr != nullptr){
-		idoc::MetaInfoPtr metaInfoPtr;
+	if (m_collectionPtr == nullptr){
+		return false;
+	}
+	idoc::MetaInfoPtr metaInfoPtr;
+	metaInfoPtr = m_collectionPtr->GetDataMetaInfo(objectId);
+	if (!metaInfoPtr.IsValid()){
+		Q_ASSERT(metaInfoPtr.IsValid());
+
+		return false;
+	}
+
+	for (const QByteArray& informationId: fieldIds){
+		SummaryInformation summaryInformation;
+		summaryInformation.infoId = informationId;
 		
 		if (informationId == QByteArray("InstanceId")){
-			metaInfoPtr = m_collectionPtr->GetDataMetaInfo(objectId);
-			if (metaInfoPtr.IsValid()){
-				Q_ASSERT(metaInfoPtr.IsValid());
+			Q_ASSERT(metaInfoPtr.IsValid());
 
-				imtgui::ICollectionViewDelegate::SummaryInformation retVal;
+			imtgui::ICollectionViewDelegate::SummaryInformation retVal;
 
-				retVal.text = qPrintable(metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_PRODUCT_INSTANCE_ID).toByteArray());
-				retVal.sortValue = retVal.text;
-
-				return retVal;
-			}
+			retVal.text = qPrintable(metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_PRODUCT_INSTANCE_ID).toByteArray());
+			retVal.sortValue = retVal.text;
+			objectMetaInfo.append(summaryInformation);
 		}
 		else if (informationId == QByteArray("Customer")){
-			metaInfoPtr = m_collectionPtr->GetDataMetaInfo(objectId);
-			if (metaInfoPtr.IsValid()){
-				Q_ASSERT(metaInfoPtr.IsValid());
+			imtgui::ICollectionViewDelegate::SummaryInformation retVal;
 
-				imtgui::ICollectionViewDelegate::SummaryInformation retVal;
-
-				retVal.text = qPrintable(metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_CUSTOMER_NAME).toString());
-				retVal.sortValue = retVal.text;
-				retVal.infoId = informationId;
-
-				return retVal;
-			}
+			retVal.text = qPrintable(metaInfoPtr->GetMetaInfo(imtlic::IProductInstanceInfo::MIT_CUSTOMER_NAME).toString());
+			retVal.sortValue = retVal.text;
+			retVal.infoId = informationId;
+			objectMetaInfo.append(summaryInformation);
 		}
 	}
 
-	return BaseClass::GetSummaryInformation(objectId, informationId);
+	return BaseClass::GetSummaryInformation(objectId, fieldIds, objectMetaInfo);
 }
 
 

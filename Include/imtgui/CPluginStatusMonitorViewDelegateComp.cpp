@@ -125,12 +125,11 @@ const imtbase::ICollectionInfo& CPluginStatusMonitorViewDelegateComp::GetSummary
 }
 
 
-ICollectionViewDelegate::SummaryInformation CPluginStatusMonitorViewDelegateComp::GetSummaryInformation(
+bool CPluginStatusMonitorViewDelegateComp::GetSummaryInformation(
 			const QByteArray& objectId,
-			const QByteArray& informationId) const
+			const QVector<QByteArray> fieldIds,
+			ObjectMetaInfo& objectMetaInfo) const
 {
-	SummaryInformation result;
-
 	static QIcon none(":/Icons/StateUnknown");
 	static QIcon ok(":/Icons/StateOk");
 	static QIcon warning(":/Icons/StateWarning");
@@ -138,56 +137,65 @@ ICollectionViewDelegate::SummaryInformation CPluginStatusMonitorViewDelegateComp
 	static QIcon error(":/Icons/Error");
 	static QIcon critical(":/Icons/StateInvalid");
 
-	if (m_collectionPtr != nullptr){
-		istd::IInformationProvider* informationProviderPtr = dynamic_cast<istd::IInformationProvider*>(
-			const_cast<istd::IChangeable*>(m_collectionPtr->GetObjectPtr(objectId)));
+	if (m_collectionPtr == nullptr){
+		return false;
+	}
+	istd::IInformationProvider* informationProviderPtr = dynamic_cast<istd::IInformationProvider*>(
+		const_cast<istd::IChangeable*>(m_collectionPtr->GetObjectPtr(objectId)));
+
+	for (const QByteArray& informationId: fieldIds){
+		SummaryInformation summaryInformation;
+		summaryInformation.infoId = informationId;
 
 		imtbase::IPluginStatusMonitor* pluginStatusMonitorPtr = dynamic_cast<imtbase::IPluginStatusMonitor*>(m_collectionPtr);
 
 		if (informationProviderPtr != nullptr && pluginStatusMonitorPtr != nullptr){
 			if (informationId == QByteArray("LoadedAt")){
-				result.text = informationProviderPtr->GetInformationTimeStamp().toString("dd.MM.yyyy hh:mm:ss");
-				result.sortValue = informationProviderPtr->GetInformationTimeStamp();
+				summaryInformation.text = informationProviderPtr->GetInformationTimeStamp().toString("dd.MM.yyyy hh:mm:ss");
+				summaryInformation.sortValue = informationProviderPtr->GetInformationTimeStamp();
+				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArray("Name")){
-				result.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
-				result.sortValue = result.text;
+				summaryInformation.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+				summaryInformation.sortValue = summaryInformation.text;
 				switch (informationProviderPtr->GetInformationCategory()){
 				case istd::IInformationProvider::IC_NONE:
-					result.icon = none;
+					summaryInformation.icon = none;
 					break;
 				case istd::IInformationProvider::IC_INFO:
-					result.icon = ok;
+					summaryInformation.icon = ok;
 					break;
 				case istd::IInformationProvider::IC_WARNING:
-					result.icon = warning;
+					summaryInformation.icon = warning;
 					break;
 				case istd::IInformationProvider::IC_ERROR:
-					result.icon = error;
+					summaryInformation.icon = error;
 					break;
 				case istd::IInformationProvider::IC_CRITICAL:
-					result.icon = critical;
+					summaryInformation.icon = critical;
 					break;
 				}
+				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArray("TypeId")){
-				result.text = pluginStatusMonitorPtr->GetPluginTypeId(objectId);
-				result.sortValue = result.text;
+				summaryInformation.text = pluginStatusMonitorPtr->GetPluginTypeId(objectId);
+				summaryInformation.sortValue = summaryInformation.text;
+				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArray("Path")){
-				result.text = informationProviderPtr->GetInformationSource();
-				result.sortValue = result.text;
+				summaryInformation.text = informationProviderPtr->GetInformationSource();
+				summaryInformation.sortValue = summaryInformation.text;
+				objectMetaInfo.append(summaryInformation);
 			}
 			else if (informationId == QByteArray("StatusMessage")){
-				result.text = informationProviderPtr->GetInformationDescription();
-				result.sortValue = result.text;
+				summaryInformation.text = informationProviderPtr->GetInformationDescription();
+				summaryInformation.sortValue = summaryInformation.text;
+				objectMetaInfo.append(summaryInformation);
 			}
 		}
 	}
 
-	result.infoId = informationId;
-
-	return result;
+	return true;
 }
 
 

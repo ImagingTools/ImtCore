@@ -188,7 +188,12 @@ public:
 	/**
 		Get summary information of a given type for a given object.
 	*/
-	virtual SummaryInformation GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const = 0;
+	typedef QVector<ICollectionViewDelegate::SummaryInformation> ObjectMetaInfo;
+
+	virtual bool GetSummaryInformation(
+				const QByteArray& objectId,
+				const QVector<QByteArray> fieldIds,
+				ObjectMetaInfo& objectMetaInfo) const = 0;
 
 	/**
 		Get summary information header info of a given type for a given object.

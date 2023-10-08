@@ -19,7 +19,10 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (ICollectionViewDelegate)
-	virtual SummaryInformation GetSummaryInformation(const QByteArray& objectId, const QByteArray& informationId) const override;
+	virtual bool GetSummaryInformation(
+				const QByteArray& objectId,
+				const QVector<QByteArray> fieldIds,
+				ObjectMetaInfo& objectMetaInfo) const override;
 	virtual bool IsCommandSupported(int commandId) const override;
 
 protected:

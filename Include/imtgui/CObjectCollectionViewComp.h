@@ -103,8 +103,6 @@ public:
 		MI_LAST = MI_DOCUMENT_TYPE_VISUAL_STATUS_BASE + 1000
 	};
 
-	typedef QVector<ICollectionViewDelegate::SummaryInformation> ObjectMetaInfo;
-
 	CObjectCollectionViewComp();
 
 	void SetFilterString(const QString& text);
@@ -229,7 +227,7 @@ private:
 
 	QVector<QByteArray> GetMetaInfoIds(const QByteArray& typeId) const;
 	QStringList GetMetaInfoHeaders(const QByteArray& typeId) const;
-	ObjectMetaInfo GetMetaInfo(const QByteArray& itemId, const QByteArray& typeId) const;
+	ICollectionViewDelegate::ObjectMetaInfo GetMetaInfo(const QByteArray& itemId, const QByteArray& typeId) const;
 
 	void EnsureColumnsSettingsSynchronized() const;
 	void RestoreColumnsSettings();
@@ -320,12 +318,12 @@ private:
 		int m_fetchedRowCount;
 		mutable imtbase::ICollectionInfo::Ids m_ids;
 		int m_totalRowCount;
-		ObjectMetaInfo m_metaInfo;
+		ICollectionViewDelegate::ObjectMetaInfo m_metaInfo;
 		QStringList m_columns;
 		bool m_isPageMode;
 
 		CObjectCollectionViewComp& m_parent;
-		mutable QMap<QByteArray, ObjectMetaInfo> m_metaInfoMap;
+		mutable QMap<QByteArray, ICollectionViewDelegate::ObjectMetaInfo> m_metaInfoMap;
 		imtbase::CCollectionFilter m_filter;
 	};
 
