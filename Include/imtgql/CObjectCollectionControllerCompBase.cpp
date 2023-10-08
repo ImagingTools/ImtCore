@@ -216,13 +216,12 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	QString name;
 	QString description;
 	QByteArray typeId = "DocumentInfo";
-
 	const QList<imtgql::CGqlObject> params = gqlRequest.GetParams();
-	int count = params.count();
-	for (int i = 0; i < count; i++){
-		if (params.at(i).GetFieldIds().contains("typeId")){
-			typeId = params.at(i).GetFieldArgumentValue("typeId").toByteArray();
-		}
+
+	if (params.size() > 0){
+		typeId = params.at(0).GetFieldArgumentValue("typeId").toByteArray();
+		name = params.at(0).GetFieldArgumentValue("name").toByteArray();
+		description = params.at(0).GetFieldArgumentValue("description").toString();
 	}
 
 	istd::IChangeable* newObjectPtr = CreateObject(gqlRequest, objectId, name, description, errorMessage);
@@ -288,6 +287,12 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 	QByteArray newObjectId;
 	QString name;
 	QString description;
+	const QList<imtgql::CGqlObject> params = gqlRequest.GetParams();
+
+	if (params.size() > 0){
+		name = params.at(0).GetFieldArgumentValue("name").toByteArray();
+		description = params.at(0).GetFieldArgumentValue("description").toString();
+	}
 
 	istd::IChangeable* savedObject = CreateObject(gqlRequest, newObjectId, name, description, errorMessage);
 	if (savedObject != nullptr){
