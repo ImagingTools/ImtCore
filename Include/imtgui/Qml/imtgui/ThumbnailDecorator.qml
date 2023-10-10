@@ -53,7 +53,7 @@ Rectangle {
 
     property SuperuserProvider superuserProvider : SuperuserProvider {
         onResult: {
-            console.log("SuperuserProvider onResult", exists);
+            console.log("SuperuserProvider onResult 2", exists, error);
             if (exists){
                 thumbnailDecoratorContainer.closeAllPages();
 
@@ -61,6 +61,7 @@ Rectangle {
             }
             else{
                 if (error === ""){
+                    console.log("superuserPasswordPage.visible = true");
                     superuserPasswordPage.visible = true;
                 }
                 else{
@@ -257,6 +258,12 @@ Rectangle {
 
         onBeforeSetted: {
             loading.start();
+        }
+
+        onVisibleChanged: {
+            if (visible){
+                loading.visible = false;
+            }
         }
 
         onPasswordSetted: {
