@@ -266,8 +266,8 @@ export class Text extends Item {
                 this.$heightAuto = true
             }
 
-            this.contentWidth = this.dom.scrollWidth
-            this.contentHeight = this.dom.scrollHeight
+            this.contentWidth = this.impl.scrollWidth
+            this.contentHeight = this.impl.scrollHeight
         } else {
             this.$applyMetrics()
         }
