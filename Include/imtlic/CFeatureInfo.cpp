@@ -42,6 +42,16 @@ void CFeatureInfo::SetFeatureName(const QString& featureName)
 }
 
 
+void CFeatureInfo::SetFeatureDescription(const QString& description)
+{
+	if (m_description != description){
+		istd::CChangeNotifier notifier(this);
+
+		m_description = description;
+	}
+}
+
+
 void CFeatureInfo::SetOptional(bool optional)
 {
 	if (m_optional != optional){
@@ -83,6 +93,12 @@ QByteArray CFeatureInfo::GetFeatureId() const
 QString CFeatureInfo::GetFeatureName() const
 {
 	return m_name;
+}
+
+
+QString CFeatureInfo::GetFeatureDescription() const
+{
+	return m_description;
 }
 
 
@@ -166,17 +182,20 @@ bool CFeatureInfo::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	iser::CArchiveTag featureIdTag("Id", "ID of the feature", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag featureIdTag("FeatureId", "ID of the feature", iser::CArchiveTag::TT_LEAF);
 	bool retVal = archive.BeginTag(featureIdTag);
 	retVal = retVal && archive.Process(m_id);
 	retVal = retVal && archive.EndTag(featureIdTag);
 
-	QByteArray featureId = m_id;
-
-	iser::CArchiveTag featureNameTag("Name", "Feature name", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag featureNameTag("FeatureName", "Feature name", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(featureNameTag);
 	retVal = retVal && archive.Process(m_name);
 	retVal = retVal && archive.EndTag(featureNameTag);
+
+	iser::CArchiveTag featureDescriptionTag("FeatureDescription", "Feature description", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(featureDescriptionTag);
+	retVal = retVal && archive.Process(m_description);
+	retVal = retVal && archive.EndTag(featureDescriptionTag);
 
 	iser::CArchiveTag featureOptionalTag("Optional", "Optional of the feature", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(featureOptionalTag);
@@ -229,9 +248,10 @@ bool CFeatureInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_id = sourcePtr->GetFeatureId();
-		m_name = sourcePtr->GetFeatureName();
-		m_optional = sourcePtr->IsOptional();
+		m_id = sourcePtr->m_id;
+		m_name = sourcePtr->m_name;
+		m_description = sourcePtr->m_description;
+		m_optional = sourcePtr->m_optional;
 		m_dependencies =  sourcePtr->m_dependencies;
 
 		m_subFeatures.Reset();
@@ -279,10 +299,11 @@ bool CFeatureInfo::IsEqual(const IChangeable& object) const
 			}
 		}
 
-		return (m_id == sourcePtr->GetFeatureId() &&
-				m_name == sourcePtr->GetFeatureName() &&
-				m_optional == sourcePtr->IsOptional() &&
-				m_parentFeaturePtr == sourcePtr->GetParentFeature() &&
+		return (m_id == sourcePtr->m_id &&
+				m_name == sourcePtr->m_name &&
+				m_description == sourcePtr->m_description &&
+				m_optional == sourcePtr->m_optional &&
+				m_parentFeaturePtr == sourcePtr->m_parentFeaturePtr &&
 				m_dependencies == sourcePtr->m_dependencies);
 	}
 
@@ -307,6 +328,7 @@ bool CFeatureInfo::ResetData(CompatibilityMode /*mode*/)
 
 	m_id.clear();
 	m_name.clear();
+	m_description.clear();
 	m_subFeatures.Reset();
 	m_parentFeaturePtr = nullptr;
 	m_dependencies.clear();

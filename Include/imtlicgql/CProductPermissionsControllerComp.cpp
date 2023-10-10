@@ -12,17 +12,24 @@ namespace imtlicgql
 imtbase::CTreeItemModel* CProductPermissionsControllerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_productProviderCompPtr.IsValid()){
+		SendErrorMessage(0, QString("Internal error."), "CProductPermissionsControllerComp");
+
 		return nullptr;
 	}
 
 	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
 
-	QByteArray productId;
-	if (!paramsPtr.empty()){
-		productId = paramsPtr.at(0).GetFieldArgumentValue("ProductId").toByteArray();
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	if (inputParamPtr == nullptr){
+		SendErrorMessage(0, QString("Unable to create object. GQL input params is invalid."), "CProductPermissionsControllerComp");
+
+		return nullptr;
 	}
 
+	QByteArray productId = inputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
 	if (productId.isEmpty()){
+		SendErrorMessage(0, QString("Unable to get permission for product with empty ID."), "CProductPermissionsControllerComp");
+
 		return nullptr;
 	}
 

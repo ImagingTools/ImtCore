@@ -22,7 +22,6 @@ imtbase::CTreeItemModel* CFeaturesProviderComp::CreateInternalResponse(const imt
 	for (const QByteArray& collectionId : collectionIds){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
-			const imtlic::CFeaturePackage* packagePtr  = dynamic_cast<const imtlic::CFeaturePackage*>(dataPtr.GetPtr());
 
 		}
 	}

@@ -345,14 +345,14 @@ QByteArray CProductInstanceInfo::GetFactoryId() const
 
 QByteArray CProductInstanceInfo::FindProductByName(const QString& productName) const
 {
-	if (m_productCollectionPtr != nullptr){
-		imtbase::ICollectionInfo::Ids productCollectionIds = m_productCollectionPtr->GetElementIds();
-		for (const QByteArray productCollectionId : productCollectionIds){
-			if (m_productCollectionPtr->GetElementInfo(productCollectionId, imtbase::ICollectionInfo::EIT_NAME).toString() == productName){
-				return productCollectionId;
-			}
-		}
-	}
+//	if (m_productCollectionPtr != nullptr){
+//		imtbase::ICollectionInfo::Ids productCollectionIds = m_productCollectionPtr->GetElementIds();
+//		for (const QByteArray productCollectionId : productCollectionIds){
+//			if (m_productCollectionPtr->GetElementInfo(productCollectionId, imtbase::ICollectionInfo::EIT_NAME).toString() == productName){
+//				return productCollectionId;
+//			}
+//		}
+//	}
 
 	return QByteArray();
 }

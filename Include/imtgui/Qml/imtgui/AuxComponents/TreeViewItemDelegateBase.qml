@@ -29,6 +29,14 @@ TableViewItemDelegateBase {
         }
     }
 
+    onIsOpenedChanged: {
+        console.log("onIsOpenedChanged", isOpened);
+        console.log("parentDelegate", parentDelegate);
+        if (parentDelegate != null){
+            parentDelegate.isOpened = isOpened;
+        }
+    }
+
     onChildrenCheckStateChanged: {
         let isAllChecked = treeDelegateBase.root.__checkState(treeDelegateBase.childrenDelegates, Qt.Checked);
         let isAllUnchecked = treeDelegateBase.root.__checkState(treeDelegateBase.childrenDelegates, Qt.Unchecked);

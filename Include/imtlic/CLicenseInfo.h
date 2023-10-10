@@ -2,7 +2,6 @@
 
 
 // ImtCore includes
-#include <imtbase/IObjectCollection.h>
 #include <imtlic/ILicenseInfo.h>
 
 
@@ -23,13 +22,16 @@ public:
 	CLicenseInfo();
 
 	// reimplemented (imtlic::ILicenseInfo)
-	virtual const imtbase::IObjectCollection* GetFeaturePackages() const override;
 	virtual QString GetLicenseName() const override;
 	void SetLicenseName(const QString& licenseName) override;
 	virtual QByteArray GetLicenseId() const override;
 	void SetLicenseId(const QByteArray& licenseId) override;
-	virtual FeatureInfos GetFeatureInfos() const override;
-	virtual void SetFeatureInfos(const FeatureInfos& featureInfos) override;
+	virtual QString GetLicenseDescription() const override;
+	virtual void SetLicenseDescription(const QString& licenseDescription) override;
+	virtual QByteArray GetProductId() const override;
+	virtual void SetProductId(const QByteArray& productId) override;
+	virtual QByteArrayList GetFeatures() const override;
+	virtual void SetFeatures(QByteArrayList features) override;
 
 	// reimplemented (iser::IObject)
 	virtual QByteArray GetFactoryId() const override;
@@ -44,10 +46,11 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	const imtbase::IObjectCollection* m_featurePackageCollectionPtr;
-	QString m_licenseName;
 	QByteArray m_licenseId;
-	FeatureInfos m_featureInfos;
+	QByteArray m_productId;
+	QString m_licenseName;
+	QString m_description;
+	QByteArrayList m_featureIds;
 };
 
 

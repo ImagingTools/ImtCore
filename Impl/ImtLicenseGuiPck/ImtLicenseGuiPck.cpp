@@ -20,16 +20,6 @@ I_EXPORT_COMPONENT(
 			"License Info Editor");
 
 I_EXPORT_COMPONENT(
-			FeaturePackageGui,
-			"Feature package editor",
-			"Feature License Editor Package Collection");
-
-I_EXPORT_COMPONENT(
-			ProductLicensingInfoGui,
-			"Product License Info Editor",
-			"Product License Info Editor");
-
-I_EXPORT_COMPONENT(
 			LicenseManagerViewDelegate,
 			"License manager view delegate",
 			"License Manager View Delegate");
@@ -55,24 +45,9 @@ I_EXPORT_COMPONENT(
 			"Feature Licensing Info Collection View Editor");
 
 I_EXPORT_COMPONENT(
-			FeaturePackageViewDelegate,
-			"Feature package view delegate",
-			"Feature Licensing Collection Package View Delegate");
-
-I_EXPORT_COMPONENT(
 			ProductInstanceInfoEditor,
 			"Product instance editor",
 			"Licensing Product Instance Installation");
-
-I_EXPORT_COMPONENT(
-			ProductInstanceInfoView,
-			"Viewer for information about the product instance",
-			"Licensing Product Instance View Information");
-
-I_EXPORT_COMPONENT(
-			FeatureTreeGui,
-			"Feature tree view",
-			"Licensing Feature Tree View Package");
 
 
 } // namespace ImtLicenseGuiPck

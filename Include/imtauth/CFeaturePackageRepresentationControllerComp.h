@@ -1,12 +1,9 @@
 #pragma once
 
 
-// ACF includes
-#include <icomp/CComponentBase.h>
-
 // ImtCore includes
 #include <imtbase/CObjectRepresentationControllerCompBase.h>
-#include <imtlic/CFeaturePackage.h>
+#include <imtlic/CFeatureInfo.h>
 
 
 namespace imtauth
@@ -28,13 +25,10 @@ protected:
 	// reimplemented (imtbase::IRepresentationController)
 	virtual bool IsModelSupported(const istd::IChangeable& dataModel) const override;
 	virtual bool GetDataModelFromRepresentation(const imtbase::CTreeItemModel& representation, istd::IChangeable& dataModel) const override;
+	virtual bool GetRepresentationFromDataModel(const istd::IChangeable& dataModel, imtbase::CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr = nullptr) const override;
 
 protected:
-	void InsertSubFeaturesToModelFromData(
-			const imtlic::IFeatureDependenciesManager& dependenciesManager,
-			const imtlic::FeatureInfoList& subFeaturesList,
-			imtbase::CTreeItemModel& subFeaturesModel,
-			imtbase::CTreeItemModel& dependenciesModel) const;
+	bool CreateRepresentationModelFromFeatureInfo(const imtlic::CFeatureInfo& featureInfo, imtbase::CTreeItemModel& representationModel, QString& errorMessage) const;
 };
 
 

@@ -8,28 +8,28 @@ namespace imtauth
 {
 
 
-const imtlic::ILicenseInfo::FeatureInfos CCollectionPermissionsProviderComp::GetPermissionInfos(const QByteArray& productId) const
+const QByteArrayList CCollectionPermissionsProviderComp::GetPermissionInfos(const QByteArray& productId) const
 {
-	imtlic::ILicenseInfo::FeatureInfos featureInfos;
+//	imtlic::ILicenseInfo::FeatureInfos featureInfos;
 
-	if (m_productCollectionCompPtr.IsValid()){
-		imtbase::IObjectCollection::DataPtr productDataPtr;
-		if (m_productCollectionCompPtr->GetObjectData(productId, productDataPtr)){
-			const imtlic::IProductLicensingInfo* productPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(productDataPtr.GetPtr());
+//	if (m_productCollectionCompPtr.IsValid()){
+//		imtbase::IObjectCollection::DataPtr productDataPtr;
+//		if (m_productCollectionCompPtr->GetObjectData(productId, productDataPtr)){
+//			const imtlic::IProductLicensingInfo* productPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(productDataPtr.GetPtr());
 
-			const imtbase::ICollectionInfo& licenseList = productPtr->GetLicenseList();
-			const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = licenseList.GetElementIds();
+//			const imtbase::ICollectionInfo& licenseList = productPtr->GetLicenseList();
+//			const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = licenseList.GetElementIds();
 
-			for (const QByteArray& licenseId : licenseCollectionIds){
-				const imtlic::ILicenseInfo* licenseInfoPtr = productPtr->GetLicenseInfo(licenseId);
-				if (licenseInfoPtr != nullptr){
-					featureInfos += licenseInfoPtr->GetFeatureInfos();
-				}
-			}
-		}
-	}
+//			for (const QByteArray& licenseId : licenseCollectionIds){
+//				const imtlic::ILicenseInfo* licenseInfoPtr = productPtr->GetLicenseInfo(licenseId);
+//				if (licenseInfoPtr != nullptr){
+//					featureInfos += licenseInfoPtr->GetFeatureInfos();
+//				}
+//			}
+//		}
+//	}
 
-	return featureInfos;
+	return QByteArrayList();
 }
 
 

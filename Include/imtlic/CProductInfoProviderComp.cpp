@@ -34,8 +34,6 @@ imtbase::CTreeItemModel* CProductInfoProviderComp::CreateInternalResponse(const 
 		}
 	}
 
-	QString json = rootModelPtr->toJSON();
-
 	return rootModelPtr.PopPtr();
 }
 

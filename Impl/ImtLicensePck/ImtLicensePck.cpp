@@ -20,11 +20,6 @@ I_EXPORT_COMPONENT(
 			"License Feature Information");
 
 I_EXPORT_COMPONENT(
-			FeaturePackage,
-			"Feature package",
-			"License Feature Container Collection Package");
-
-I_EXPORT_COMPONENT(
 			LicenseInfo,
 			"Single license information",
 			"License Information");
@@ -60,11 +55,6 @@ I_EXPORT_COMPONENT(
 			"License Products Installations");
 
 I_EXPORT_COMPONENT(
-			FeaturePackageMetaInfoCreator,
-			"Feature package metainfo creator",
-			"License Feature Package Metainfo Creator");
-
-I_EXPORT_COMPONENT(
 			ProductLicensingInfoMetaInfoCreator,
 			"Product licensing info metainfo creator",
 			"License Product Metainfo Creator");
@@ -78,11 +68,6 @@ I_EXPORT_COMPONENT(
 			LicenseController,
 			"Client-side license controller",
 			"License Product Instance Controller");
-
-I_EXPORT_COMPONENT(
-			FeatureContainer,
-			"Feature Container",
-			"Feature Container Collection Package");
 
 I_EXPORT_COMPONENT(
 			ProductInfoProvider,
@@ -108,6 +93,11 @@ I_EXPORT_COMPONENT(
 			ProductInfo,
 			"Product info",
 			"Product License Feature");
+
+I_EXPORT_COMPONENT(
+			FeatureContainer,
+			"Feature container",
+			"Feature Container Subfeature");
 
 
 } // namespace ImtLicensePck

@@ -57,12 +57,12 @@ istd::IChangeable* CFeatureControllerComp::CreateObject(
 		return nullptr;
 	}
 
-	if (featureModel.ContainsKey("Name")){
-		name = featureModel.GetData("Name").toString();
+	if (featureModel.ContainsKey("FeatureName")){
+		name = featureModel.GetData("FeatureName").toString();
 	}
 
-	if (featureModel.ContainsKey("Description")){
-		description = featureModel.GetData("Description").toString();
+	if (featureModel.ContainsKey("FeatureDescription")){
+		description = featureModel.GetData("FeatureDescription").toString();
 	}
 
 	istd::TDelPtr<imtlic::CFeatureInfo> featureInfoPtr;
@@ -107,7 +107,10 @@ imtbase::CTreeItemModel* CFeatureControllerComp::GetObject(const imtgql::CGqlReq
 
 			dataModelPtr->SetData("Id", objectId);
 
-			bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, *dataModelPtr, errorMessage);
+			dataModelPtr->SetData("RootFeatureId", featureInfoPtr->GetFeatureId());
+			dataModelPtr->SetData("ParentFeatureId", "");
+
+			bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, nullptr, *dataModelPtr, errorMessage);
 			if (!ok){
 				SendErrorMessage(0, errorMessage, "Feature controller");
 
@@ -138,22 +141,37 @@ imtbase::CTreeItemModel* CFeatureControllerComp::GetTreeItemModel(const imtgql::
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
+	dataModelPtr->SetIsArray(true);
+
 	imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
 	for (const QByteArray& collectionId : collectionIds){
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (m_objectCollectionCompPtr->GetObjectData(collectionId, dataPtr)){
 			const imtlic::CFeatureInfo* featureInfoPtr  = dynamic_cast<const imtlic::CFeatureInfo*>(dataPtr.GetPtr());
 			if (featureInfoPtr != nullptr){
+				QByteArray featureId = featureInfoPtr->GetFeatureId();
+
+				int index = dataModelPtr->InsertNewItem();
+				dataModelPtr->SetData("Id", collectionId, index);
+
 				istd::TDelPtr<imtbase::CTreeItemModel> featureModelPtr(new imtbase::CTreeItemModel);
-				bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, *featureModelPtr, errorMessage);
+
+				featureModelPtr->SetData("RootFeatureId", featureId);
+				featureModelPtr->SetData("ParentFeatureId", "");
+
+				bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, nullptr, *featureModelPtr, errorMessage);
 				if (!ok){
 					SendErrorMessage(0, errorMessage, "Feature controller");
 
 					return nullptr;
 				}
 
-				int index = dataModelPtr->InsertNewItem();
 				dataModelPtr->CopyItemDataFromModel(index, featureModelPtr.PopPtr(), 0);
+
+				dataModelPtr->SetData("RootFeatureId", featureId, index);
+				dataModelPtr->SetData("ParentFeatureId", "", index);
+
+				dataModelPtr->SetData("Id", collectionId, index);
 			}
 		}
 	}
@@ -224,8 +242,8 @@ bool CFeatureControllerComp::CreateFeatureFromRepresentationModel(
 	}
 
 	QString featureName;
-	if (representationModel.ContainsKey("Name")){
-		featureName = representationModel.GetData("Name").toString();
+	if (representationModel.ContainsKey("FeatureName")){
+		featureName = representationModel.GetData("FeatureName").toString();
 	}
 
 	if (featureName.isEmpty()){
@@ -262,9 +280,11 @@ bool CFeatureControllerComp::CreateFeatureFromRepresentationModel(
 	featureInfo.SetOptional(isOptional);
 
 	QString featureDescription;
-	if (representationModel.ContainsKey("Description")){
-		featureDescription = representationModel.GetData("Description").toString();
+	if (representationModel.ContainsKey("FeatureDescription")){
+		featureDescription = representationModel.GetData("FeatureDescription").toString();
 	}
+
+	featureInfo.SetFeatureDescription(featureDescription);
 
 	if (representationModel.ContainsKey("ChildModel")){
 		imtbase::CTreeItemModel* subFeaturesModelPtr = representationModel.GetTreeItemModel("ChildModel");
@@ -300,20 +320,28 @@ bool CFeatureControllerComp::CreateFeatureFromRepresentationModel(
 
 bool CFeatureControllerComp::CreateRepresentationModelFromFeatureInfo(
 			const imtlic::CFeatureInfo& featureInfo,
+			const imtbase::CTreeItemModel* parentModelPtr,
 			imtbase::CTreeItemModel& representationModel,
 			QString& errorMessage) const
 {
 	QByteArray featureId = featureInfo.GetFeatureId();
-	QString featureName = featureInfo.GetFeatureName();
-	bool isOptional = featureInfo.IsOptional();
-	QByteArrayList dependencies = featureInfo.GetDependencies();
 
 	representationModel.SetData("FeatureId", featureId);
-	representationModel.SetData("Name", featureName);
-	representationModel.SetData("Optional", isOptional);
-	representationModel.SetData("Description", "");
-	representationModel.SetData("Dependencies", dependencies.join(';'));
+	representationModel.SetData("FeatureName", featureInfo.GetFeatureName());
+	representationModel.SetData("Optional", featureInfo.IsOptional());
+	representationModel.SetData("FeatureDescription", featureInfo.GetFeatureDescription());
+	representationModel.SetData("Dependencies", featureInfo.GetDependencies().join(';'));
 	representationModel.SetData("ChildModel", 0);
+
+	if (parentModelPtr != nullptr){
+		if (parentModelPtr->ContainsKey("FeatureId")){
+			representationModel.SetData("ParentFeatureId", parentModelPtr->GetData("FeatureId"));
+		}
+
+		if (parentModelPtr->ContainsKey("RootFeatureId")){
+			representationModel.SetData("RootFeatureId", parentModelPtr->GetData("RootFeatureId"));
+		}
+	}
 
 	const imtlic::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
 	if (!subFeatures.IsEmpty()){
@@ -331,7 +359,7 @@ bool CFeatureControllerComp::CreateRepresentationModelFromFeatureInfo(
 			Q_ASSERT(subFeatureInfoPtr != nullptr);
 
 			imtbase::CTreeItemModel subFeatureRepresentationModel;
-			bool ok = CreateRepresentationModelFromFeatureInfo(*subFeatureInfoPtr, subFeatureRepresentationModel, errorMessage);
+			bool ok = CreateRepresentationModelFromFeatureInfo(*subFeatureInfoPtr, &representationModel, subFeatureRepresentationModel, errorMessage);
 			if (!ok){
 				return false;
 			}

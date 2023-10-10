@@ -1,6 +1,10 @@
 #include <imtauth/CFeaturePackageRepresentationControllerComp.h>
 
 
+// ImtCore includes
+#include <imtlic/CFeatureContainer.h>
+
+
 namespace imtauth
 {
 
@@ -12,43 +16,28 @@ namespace imtauth
 bool CFeaturePackageRepresentationControllerComp::GetRepresentationFromValue(
 			const istd::IChangeable& dataModel,
 			imtbase::CTreeItemModel& representation,
-			const iprm::IParamsSet* paramsPtr) const
+			const iprm::IParamsSet* /*paramsPtr*/) const
 {
-	const imtlic::IFeaturePackage* packagePtr = dynamic_cast<const imtlic::IFeaturePackage*>(&dataModel);
+	const imtlic::CFeatureContainer* packagePtr = dynamic_cast<const imtlic::CFeatureContainer*>(&dataModel);
 	Q_ASSERT(packagePtr != nullptr);
-
-	const imtlic::IFeatureDependenciesManager* dependenciesManagerPtr = dynamic_cast<const imtlic::IFeatureDependenciesManager*>(&dataModel);
-	Q_ASSERT(dependenciesManagerPtr != nullptr);
-
-	QByteArray packageId = packagePtr->GetPackageId();
-	representation.SetData("Id", packageId);
-
-	imtbase::CTreeItemModel* permissionsModelPtr = representation.AddTreeModel("Features");
-	imtbase::CTreeItemModel* dependenciesModelPtr = representation.AddTreeModel("Dependencies");
 
 	QByteArrayList featureCollectionIds = packagePtr->GetFeatureList().GetElementIds().toList();
 	for (const QByteArray& featureCollectionId : featureCollectionIds){
-		const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->GetFeatureInfo(featureCollectionId);
+		const imtlic::CFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(packagePtr->GetFeatureInfo(featureCollectionId));
 		if (featureInfoPtr != nullptr){
-			int index = permissionsModelPtr->InsertNewItem();
+			istd::TDelPtr<imtbase::CTreeItemModel> featureModelPtr(new imtbase::CTreeItemModel);
 
-			QByteArray featureId = featureInfoPtr->GetFeatureId();
-			QString featureName = featureInfoPtr->GetFeatureName();
+			QString errorMessage;
+			bool ok = CreateRepresentationModelFromFeatureInfo(*featureInfoPtr, *featureModelPtr, errorMessage);
+			if (!ok){
+				SendErrorMessage(0, errorMessage, "CObjectRepresentationControllerCompBase");
 
-			permissionsModelPtr->SetData("Id", featureId, index);
-			permissionsModelPtr->SetData("Name", featureName, index);
-
-			QByteArrayList featureDependenciesList = dependenciesManagerPtr->GetFeatureDependencies(featureId);
-			if (!featureDependenciesList.isEmpty()){
-				QByteArray dependencies = featureDependenciesList.join(';');
-				dependenciesModelPtr->SetData(featureId, dependencies);
+				return false;
 			}
 
-			const imtlic::FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
-			if (subFeatures.GetCount() > 0){
-				imtbase::CTreeItemModel* childModelPtr = permissionsModelPtr->AddTreeModel("ChildModel", index);
-				InsertSubFeaturesToModelFromData(*dependenciesManagerPtr, subFeatures, *childModelPtr, *dependenciesModelPtr);
-			}
+			int index = representation.InsertNewItem();
+			representation.CopyItemDataFromModel(index, featureModelPtr.PopPtr(), 0);
+			representation.SetData("Id", featureCollectionId, index);
 		}
 	}
 
@@ -60,10 +49,8 @@ bool CFeaturePackageRepresentationControllerComp::GetRepresentationFromValue(
 
 bool CFeaturePackageRepresentationControllerComp::IsModelSupported(const istd::IChangeable& dataModel) const
 {
-	const imtlic::IFeaturePackage* featurePackagePtr = dynamic_cast<const imtlic::IFeaturePackage*>(&dataModel);
-	const imtlic::IFeatureDependenciesManager* dependenciesManagerPtr = dynamic_cast<const imtlic::IFeatureDependenciesManager*>(&dataModel);
-
-	return (featurePackagePtr != nullptr) && (dependenciesManagerPtr != nullptr);
+	const imtlic::CFeatureContainer* featureContainerPtr = dynamic_cast<const imtlic::CFeatureContainer*>(&dataModel);
+	return featureContainerPtr != nullptr;
 }
 
 
@@ -75,37 +62,55 @@ bool CFeaturePackageRepresentationControllerComp::GetDataModelFromRepresentation
 }
 
 
-// private methods
-
-void CFeaturePackageRepresentationControllerComp::InsertSubFeaturesToModelFromData(
-			const imtlic::IFeatureDependenciesManager& dependenciesManager,
-			const imtlic::FeatureInfoList& subFeaturesList,
-			imtbase::CTreeItemModel& subFeaturesModel,
-			imtbase::CTreeItemModel& dependenciesModel) const
+bool CFeaturePackageRepresentationControllerComp::GetRepresentationFromDataModel(const istd::IChangeable& dataModel, imtbase::CTreeItemModel& representation, const iprm::IParamsSet* paramsPtr) const
 {
-	for (int i = 0; i < subFeaturesList.GetCount(); ++i){
-		const imtlic::IFeatureInfo* featureInfoPtr = subFeaturesList.GetAt(i);
-		if (featureInfoPtr != nullptr){
-			QByteArray featureId = featureInfoPtr->GetFeatureId();
-			QString featureName = featureInfoPtr->GetFeatureName();
+	return GetRepresentationFromValue(dataModel, representation, paramsPtr);
+}
 
-			int index = subFeaturesModel.InsertNewItem();
 
-			subFeaturesModel.SetData("Id", featureId, index);
-			subFeaturesModel.SetData("Name", featureName, index);
+// protected methods
 
-			QByteArrayList featureDependenciesList = dependenciesManager.GetFeatureDependencies(featureId);
-			if (!featureDependenciesList.isEmpty()){
-				QByteArray dependencies = featureDependenciesList.join(';');
-				dependenciesModel.SetData(featureId, dependencies);
+bool CFeaturePackageRepresentationControllerComp::CreateRepresentationModelFromFeatureInfo(
+			const imtlic::CFeatureInfo& featureInfo,
+			imtbase::CTreeItemModel& representationModel,
+			QString& errorMessage) const
+{
+	QByteArray featureId = featureInfo.GetFeatureId();
+
+	representationModel.SetData("FeatureId", featureId);
+	representationModel.SetData("FeatureName", featureInfo.GetFeatureName());
+	representationModel.SetData("Optional", featureInfo.IsOptional());
+	representationModel.SetData("FeatureDescription", featureInfo.GetFeatureDescription());
+	representationModel.SetData("Dependencies", featureInfo.GetDependencies().join(';'));
+	representationModel.SetData("ChildModel", 0);
+
+	const imtlic::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
+	if (!subFeatures.IsEmpty()){
+		imtbase::CTreeItemModel* childModelPtr = representationModel.AddTreeModel("ChildModel");
+		Q_ASSERT(childModelPtr != nullptr);
+
+		for (int i = 0; i < subFeatures.GetCount(); i++){
+			const imtlic::IFeatureInfo* featureInfoPtr = subFeatures.GetAt(i);
+			if (featureInfoPtr == nullptr){
+				errorMessage = QString("Unable to create representation model for invalid subfeature. Parent feature id: %1.").arg(qPrintable(featureId));
+				return false;
 			}
 
-			const imtlic::FeatureInfoList& subFeatures = featureInfoPtr->GetSubFeatures();
-			imtbase::CTreeItemModel* childModelPtr = subFeaturesModel.AddTreeModel("ChildModel", index);
+			const imtlic::CFeatureInfo* subFeatureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(featureInfoPtr);
+			Q_ASSERT(subFeatureInfoPtr != nullptr);
 
-			InsertSubFeaturesToModelFromData(dependenciesManager, subFeatures, *childModelPtr, dependenciesModel);
+			imtbase::CTreeItemModel subFeatureRepresentationModel;
+			bool ok = CreateRepresentationModelFromFeatureInfo(*subFeatureInfoPtr, subFeatureRepresentationModel, errorMessage);
+			if (!ok){
+				return false;
+			}
+
+			childModelPtr->InsertNewItem();
+			childModelPtr->CopyItemDataFromModel(i, &subFeatureRepresentationModel, 0);
 		}
 	}
+
+	return true;
 }
 
 

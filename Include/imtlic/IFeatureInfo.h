@@ -33,6 +33,11 @@ public:
 	virtual QString GetFeatureName() const = 0;
 
 	/**
+		Get the feature description.
+	*/
+	virtual QString GetFeatureDescription() const = 0;
+
+	/**
 		Get the feature ID.
 	*/
 	virtual bool IsOptional() const = 0;

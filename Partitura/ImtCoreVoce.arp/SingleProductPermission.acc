@@ -2,24 +2,30 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5075" Description="ACF"/>
-            <Version Id="1" Number="2183" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5122" Description="ACF"/>
+            <Version Id="1" Number="2196" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="FeaturePackage" PackageId="ImtLicensePck" ComponentId="FeaturePackage">
+        <Element Id="FeatureContainer" PackageId="ImtLicensePck" ComponentId="FeatureContainer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="FeaturePackageRepresentationController" PackageId="ImtAuthPck" ComponentId="FeaturePackageRepresentationController">
+        <Element Id="FeatureContainerRepresentationController" PackageId="ImtAuthPck" ComponentId="FeaturePackageRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="FeaturePackage"/>
+                        <Data IsEnabled="true" Value="FeatureContainer"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -27,14 +33,14 @@
         <Element Id="PermissionsProvider" PackageId="ImtLicensePck" ComponentId="PermissionsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="FeaturePackage" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="FeaturePackage"/>
+                    <AttributeInfo Id="FeatureContainer" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="FeatureContainer"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PackageRepresentation" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="FeaturePackageRepresentationController"/>
+                        <Data IsEnabled="true" Value="FeatureContainerRepresentationController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
@@ -74,7 +80,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TargetCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="FeaturePackage"/>
+                        <Data IsEnabled="true" Value="FeatureContainer"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -85,7 +91,5 @@
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="ProductInfoProvider"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="ProductInfoProvider"/>
     </ExportedInterfaces>
-    <ExportedComponents>
-        <Component ExportedId="FeaturePackage" ComponentId="FeaturePackage"/>
-    </ExportedComponents>
+    <ExportedComponents/>
 </Acf>

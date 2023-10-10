@@ -68,9 +68,13 @@ Item {
         for (let i = 0; i < itemsList.length; i++){
             let delegateItem = itemsList[i];
             let itemData = delegateItem.getItemData();
-            let id = itemData.Id;
+            let id = itemData.FeatureId;
             if (selectedPermissionsIds.includes(id)){
+                delegateItem.isOpened = true;
                 permissionsTable.checkItem(delegateItem);
+            }
+            else{
+                delegateItem.isOpened = false;
             }
         }
 
@@ -90,7 +94,7 @@ Item {
         let itemsList = permissionsTable.getCheckedItems();
         for (let delegate of itemsList){
             let itemData = delegate.getItemData();
-            let id = itemData.Id;
+            let id = itemData.FeatureId;
             selectedPermissionIds.push(id)
         }
 
@@ -173,12 +177,12 @@ Item {
         tristate: true;
 
         Component.onCompleted: {
-            permissionsTable.addColumn({"Id": "Name", "Name": "Permission"});
+            permissionsTable.addColumn({"Id": "FeatureName", "Name": "Permission"});
         }
 
         onSelectedIndexChanged: {
             if (selectedIndex != null && selectedIndex.itemData){
-                let selectedFeatureId = selectedIndex.itemData.Id;
+                let selectedFeatureId = selectedIndex.itemData.FeatureId;
 
                 let featureDependencies = dependenciesProvider.getAllDependencies(selectedFeatureId);
 
@@ -203,7 +207,7 @@ Item {
             let itemsList = permissionsTable.getCheckedItems();
             for (let delegate of itemsList){
                 let itemData = delegate.getItemData();
-                let id = itemData.Id;
+                let id = itemData.FeatureId;
                 selectedPermissionIds.push(id)
             }
 

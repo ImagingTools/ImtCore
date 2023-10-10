@@ -10,11 +10,12 @@
 
 // ImtCore includes
 #include <imtlic/ILicenseInstanceProvider.h>
+#include <imtbase/IObjectCollection.h>
 
 
 namespace imtbase
 {
-	class IObjectCollection;
+//	class IObjectCollection;
 }
 
 

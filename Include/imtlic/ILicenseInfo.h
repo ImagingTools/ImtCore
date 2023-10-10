@@ -10,12 +10,6 @@
 #include <iser/IObject.h>
 
 
-namespace imtbase
-{
-	class IObjectCollection;
-}
-
-
 namespace imtlic
 {
 
@@ -27,29 +21,6 @@ namespace imtlic
 class ILicenseInfo: virtual public iser::IObject
 {
 public:
-	struct FeatureInfo
-	{
-		QByteArray id;
-		QString name;
-
-		bool operator==(const FeatureInfo& other) const
-		{
-			return (id == other.id) && (name == other.name);
-		}
-	
-		bool operator!=(const FeatureInfo& other) const
-		{
-			return !operator==(other);
-		}
-	};
-
-	typedef QVector<FeatureInfo> FeatureInfos;
-
-	/**
-		Get list of all available feature packages for this license.
-	*/
-	virtual const imtbase::IObjectCollection* GetFeaturePackages() const = 0;
-
 	/**
 		Get human-readable name of the license.
 	*/
@@ -72,14 +43,34 @@ public:
 	virtual void SetLicenseId(const QByteArray& licenseId) = 0;
 
 	/**
+		Get description of the license.
+	*/
+	virtual QString GetLicenseDescription() const = 0;
+
+	/**
+		Set description of the license.
+	*/
+	virtual void SetLicenseDescription(const QString& licenseDescription) = 0;
+
+	/**
+		Get the product ID of the license.
+	*/
+	virtual QByteArray GetProductId() const = 0;
+
+	/**
+		Set product ID of the license.
+	*/
+	virtual void SetProductId(const QByteArray& productId) = 0;
+
+	/**
 		Get the list of feature-IDs supported by this license.
 	*/
-	virtual FeatureInfos GetFeatureInfos() const = 0;
+	virtual QByteArrayList GetFeatures() const = 0;
 
 	/**
 		Set the list of feature-IDs supported by this license.
 	*/
-	virtual void SetFeatureInfos(const FeatureInfos& featureInfos) = 0;
+	virtual void SetFeatures(QByteArrayList features) = 0;
 };
 
 

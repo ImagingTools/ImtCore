@@ -17,10 +17,9 @@ bool CPermissionsProviderComp::IsRequestSupported(const imtgql::CGqlRequest& /*g
 
 imtbase::CTreeItemModel* CPermissionsProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& /*gqlRequest*/, QString& /*errorMessage*/) const
 {
-	if (m_featurePackageCompPtr.IsValid() && m_featurePackageRepresentationCompPtr.IsValid()){
+	if (m_featureContainerCompPtr.IsValid() && m_featurePackageRepresentationCompPtr.IsValid()){
 		istd::TDelPtr<imtbase::CTreeItemModel> representationPtr(new imtbase::CTreeItemModel);
-		bool result = m_featurePackageRepresentationCompPtr->GetRepresentationFromDataModel(*m_featurePackageCompPtr, *representationPtr.GetPtr());
-		QString json = representationPtr->toJSON();
+		bool result = m_featurePackageRepresentationCompPtr->GetRepresentationFromDataModel(*m_featureContainerCompPtr, *representationPtr.GetPtr());
 		if (result){
 			return representationPtr.PopPtr();
 		}

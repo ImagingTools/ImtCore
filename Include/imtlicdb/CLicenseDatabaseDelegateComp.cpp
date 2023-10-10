@@ -1,8 +1,9 @@
 #include <imtlicdb/CLicenseDatabaseDelegateComp.h>
 
 
-// ImtCore includes
-#include <imtlic/CLicenseInfo.h>
+// ACF includes
+#include <iprm/TParamsPtr.h>
+#include <iprm/IIdParam.h>
 
 
 namespace imtlicdb
@@ -11,124 +12,50 @@ namespace imtlicdb
 
 // public methods
 
-// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
-
-istd::IChangeable* CLicenseDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
+QString CLicenseDatabaseDelegateComp::GetBaseSelectionQuery() const
 {
-	if (!m_databaseEngineCompPtr.IsValid()){
-		return nullptr;
-	}
+	return R"(
+			SELECT
+				"DocumentId",
+				"Document",
+				"LastModified",
+				(SELECT "LastModified" FROM "Licenses" as t2 WHERE "RevisionNumber" = 1 AND t2."DocumentId" = t1."DocumentId" LIMIT 1) as "Added",
+				(SELECT "Document"->>'ProductId' FROM "Products" as pr WHERE pr."DocumentId" = t1."Document"->>'ProductId' AND pr."IsActive" = true) as "ProductId"
+			FROM "Licenses" as t1 WHERE "IsActive" = true
+		)";
+}
 
-	istd::TDelPtr<imtlic::CLicenseInfo> licenseInfoPtr;
-	licenseInfoPtr.SetPtr(new imtlic::CLicenseInfo);
-	if (!licenseInfoPtr.IsValid()){
-		return nullptr;
-	}
 
-	QByteArray licenseId;
-	if (record.contains("Id")){
-		licenseId = record.value("Id").toByteArray();
+// reimplemented (imtdb::CSqlJsonDatabaseDelegateComp)
 
-		licenseInfoPtr->SetLicenseId(licenseId);
-	}
+bool CLicenseDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
+{
+	iprm::IParamsSet::Ids paramIds = filterParams.GetParamIds();
+	if (!paramIds.isEmpty()){
+#if QT_VERSION >= 0x051500
+		QByteArrayList idList(paramIds.cbegin(), paramIds.cend());
+#else
+		QByteArrayList idList = paramIds.toList();
+#endif
+		for (int i = 0; i < idList.size(); i++){
+			QByteArray key = idList[i];
 
-	QString licenseName;
-	if (record.contains("Name")){
-		licenseName = record.value("Name").toString();
+			iprm::TParamsPtr<iprm::IIdParam> idParamPtr(&filterParams, key);
+			if (!idParamPtr.IsValid()){
+				return false;
+			}
 
-		licenseInfoPtr->SetLicenseName(licenseName);
-	}
+			if (!filterQuery.isEmpty()){
+				filterQuery += " AND ";
+			}
 
-	imtlic::ILicenseInfo::FeatureInfos featuresInfo;
+			QByteArray value = idParamPtr->GetId();
 
-	QByteArray selectLicenseFeatures = QString("SELECT * FROM \"ProductLicenseFeatures\" WHERE \"LicenseId\" = '%1';").arg(qPrintable(licenseId)).toUtf8();
-
-	QSqlError error;
-	QSqlQuery productLicensesFeaturesQuery = m_databaseEngineCompPtr->ExecSqlQuery(selectLicenseFeatures, &error);
-
-	while (productLicensesFeaturesQuery.next()){
-		QSqlRecord licenseFeatureRecord = productLicensesFeaturesQuery.record();
-
-		QByteArray featureId;
-		QString featureName;
-
-		if (licenseFeatureRecord.contains("FeatureId")){
-			featureId = licenseFeatureRecord.value("FeatureId").toByteArray();
+			filterQuery = QString(R"((lower("Document"->>'%1') = lower('%2')))").arg(qPrintable(key)).arg(qPrintable(value));
 		}
-
-		imtlic::ILicenseInfo::FeatureInfo featureInfo;
-
-		QByteArray selectFeatures = QString("SELECT * FROM \"Features\" WHERE \"Id\" = '%1';").arg(qPrintable(featureId)).toUtf8();
-		QSqlQuery selectFeaturesQuery = m_databaseEngineCompPtr->ExecSqlQuery(selectFeatures, &error);
-
-		selectFeaturesQuery.next();
-
-		QSqlRecord featureRecord = selectFeaturesQuery.record();
-		if (featureRecord.contains("Name")){
-			featureName = featureRecord.value("Name").toString();
-		}
-
-		featureInfo.id = featureId;
-		featureInfo.name = featureName;
-
-		featuresInfo << featureInfo;
 	}
 
-	licenseInfoPtr->SetFeatureInfos(featuresInfo);
-
-	return licenseInfoPtr.PopPtr();
-}
-
-
-imtdb::IDatabaseObjectDelegate::NewObjectQuery CLicenseDatabaseDelegateComp::CreateNewObjectQuery(
-			const QByteArray& /*typeId*/,
-			const QByteArray& /*proposedObjectId*/,
-			const QString& /*objectName*/,
-			const QString& /*objectDescription*/,
-			const istd::IChangeable* /*valuePtr*/,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
-{
-	return imtdb::IDatabaseObjectDelegate::NewObjectQuery();
-}
-
-
-QByteArray CLicenseDatabaseDelegateComp::CreateDeleteObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& /*objectId*/,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
-{
-	return QByteArray();
-}
-
-
-QByteArray CLicenseDatabaseDelegateComp::CreateUpdateObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& /*objectId*/,
-			const istd::IChangeable& /*object*/,
-			const imtbase::IOperationContext* /*operationContextPtr*/,
-			bool /*useExternDelegate*/) const
-{
-	return QByteArray();
-}
-
-
-QByteArray CLicenseDatabaseDelegateComp::CreateRenameObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& /*objectId*/,
-			const QString& /*newObjectName*/,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
-{
-	return QByteArray();
-}
-
-
-QByteArray CLicenseDatabaseDelegateComp::CLicenseDatabaseDelegateComp::CreateDescriptionObjectQuery(
-			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& /*objectId*/,
-			const QString& /*description*/,
-			const imtbase::IOperationContext* /*operationContextPtr*/) const
-{
-	return QByteArray();
+	return true;
 }
 
 

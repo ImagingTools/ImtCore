@@ -2,50 +2,24 @@
 
 
 // ImtCore includes
-#include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
+#include <imtdb/CSqlJsonDatabaseDelegateComp.h>
 
 
 namespace imtlicdb
 {
 
 
-class CLicenseDatabaseDelegateComp: public imtdb::CSqlDatabaseObjectDelegateCompBase
+class CLicenseDatabaseDelegateComp: public imtdb::CSqlJsonDatabaseDelegateComp
 {
 public:
-	typedef imtdb::CSqlDatabaseObjectDelegateCompBase BaseClass;
+	typedef imtdb::CSqlJsonDatabaseDelegateComp BaseClass;
 
 	I_BEGIN_COMPONENT(CLicenseDatabaseDelegateComp)
 	I_END_COMPONENT
 
-	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
-	virtual istd::IChangeable* CreateObjectFromRecord(const QSqlRecord& record) const override;
-	virtual NewObjectQuery CreateNewObjectQuery(
-				const QByteArray& typeId,
-				const QByteArray& proposedObjectId,
-				const QString& objectName,
-				const QString& objectDescription,
-				const istd::IChangeable* valuePtr,
-				const imtbase::IOperationContext* operationContextPtr) const override;
-	virtual QByteArray CreateDeleteObjectQuery(
-				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
-				const imtbase::IOperationContext* operationContextPtr) const override;
-	virtual QByteArray CreateUpdateObjectQuery(
-				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
-				const istd::IChangeable& object,
-				const imtbase::IOperationContext* operationContextPtr,
-				bool useExternDelegate = true) const override;
-	virtual QByteArray CreateRenameObjectQuery(
-				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
-				const QString& newObjectName,
-				const imtbase::IOperationContext* operationContextPtr) const override;
-	virtual QByteArray CreateDescriptionObjectQuery(
-				const imtbase::IObjectCollection& collection,
-				const QByteArray& objectId,
-				const QString& description,
-				const imtbase::IOperationContext* operationContextPtr) const override;
+	// reimplemented (imtdb::CSqlJsonDatabaseDelegateComp)
+	virtual QString GetBaseSelectionQuery() const override;
+	virtual bool CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 };
 
 

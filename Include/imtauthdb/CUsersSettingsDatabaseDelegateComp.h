@@ -3,7 +3,6 @@
 
 // ImtCore includes
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
-#include <imtlic/CFeaturePackage.h>
 #include <imtauth/IUserSettings.h>
 
 

@@ -7,8 +7,6 @@
 
 // ImtCore includes
 #include <imtlic/CFeatureInfoComp.h>
-#include <imtlic/CFeaturePackageComp.h>
-#include <imtlic/CLicenseInfoComp.h>
 #include <imtlic/CLicenseInfoManager.h>
 #include <imtlic/CLicenseBasedRightsProviderComp.h>
 #include <imtlic/CProductLicensingInfo.h>
@@ -16,7 +14,6 @@
 #include <imtlic/CProductInstanceInfoComp.h>
 #include <imtlic/CProductInstanceCollection.h>
 #include <imtlic/CProductLicensingInfoComp.h>
-#include <imtlic/CFeaturePackageMetaInfoCreatorComp.h>
 #include <imtlic/CProductLicensingInfoMetaInfoCreatorComp.h>
 #include <imtlic/CProductInstanceMetaInfoCreatorComp.h>
 #include <imtlic/CLicenseControllerComp.h>
@@ -36,8 +33,6 @@ namespace ImtLicensePck
 
 
 typedef icomp::TModelCompWrap<imtlic::CFeatureInfoComp> FeatureInfo;
-typedef icomp::TModelCompWrap<imtlic::CFeaturePackageComp> FeaturePackage;
-typedef icomp::TModelCompWrap<imtlic::CLicenseInfoComp> LicenseInfo;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
 						imtlic::CLicenseInfoManager,
@@ -61,19 +56,9 @@ typedef icomp::TModelCompWrap<
 						imtlic::CProductInstanceCollection,
 						imtlic::IProductInstanceInfoProvider,
 						iser::ISerializable>> ProductInstanceCollection;
-typedef imtlic::CFeaturePackageMetaInfoCreatorComp FeaturePackageMetaInfoCreator;
 typedef imtlic::CProductLicensingInfoMetaInfoCreatorComp ProductLicensingInfoMetaInfoCreator;
 typedef imtlic::CProductInstanceMetaInfoCreatorComp ProductInstanceMetaInfoCreator;
 typedef imtlic::CLicenseControllerComp LicenseController;
-typedef icomp::TModelCompWrap<
-			icomp::TMakeComponentWrap<
-						imtlic::CFeatureContainer,
-						imtlic::IFeatureInfoProvider,
-						imtlic::IFeaturePackage,
-						imtbase::IObjectCollection,
-						imtbase::IObjectCollectionInfo,
-						imtbase::ICollectionInfo,
-						iser::ISerializable>> FeatureContainer;
 typedef imtlic::CProductInfoProviderComp ProductInfoProvider;
 typedef imtlic::CFeatureInfoProviderComp FeatureInfoProvider;
 typedef imtlic::CFeatureDependenciesProviderComp FeatureDependenciesProvider;
@@ -84,6 +69,18 @@ typedef icomp::TModelCompWrap<
 						imtlic::IProductInfo,
 						iprm::INameParam,
 						iser::ISerializable>> ProductInfo;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap<
+						imtlic::CLicenseInfo,
+						imtlic::ILicenseInfo,
+						iser::IObject,
+						iser::ISerializable>> LicenseInfo;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap<
+						imtlic::CFeatureContainer,
+						imtbase::IObjectCollection,
+						imtlic::IFeatureInfoProvider,
+						iser::ISerializable>> FeatureContainer;
 
 } // namespace ImtLicensePck
 

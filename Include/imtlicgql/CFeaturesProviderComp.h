@@ -3,7 +3,6 @@
 
 // ImtCore includes
 #include <imtgql/CGqlRequestHandlerCompBase.h>
-#include <imtlic/CFeaturePackage.h>
 
 
 namespace imtlicgql

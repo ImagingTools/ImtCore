@@ -8,11 +8,6 @@
 #include <iser/CArchiveTag.h>
 #include <iser/CPrimitiveTypesSerializer.h>
 
-// ImtCore includes
-#include <imtcore/Version.h>
-#include <imtlic/IFeatureInfoProvider.h>
-#include <imtlic/IFeatureInfo.h>
-
 
 namespace imtlic
 {
@@ -27,17 +22,11 @@ QByteArray CLicenseInfo::GetTypeId()
 
 
 CLicenseInfo::CLicenseInfo()
-	:m_featurePackageCollectionPtr(nullptr)
 {
 }
 
 
 // reimplemented (imtlic::ILicenseInfo)
-
-const imtbase::IObjectCollection* CLicenseInfo::GetFeaturePackages() const
-{
-	return m_featurePackageCollectionPtr;
-}
 
 
 QString CLicenseInfo::GetLicenseName() const
@@ -72,18 +61,50 @@ void CLicenseInfo::SetLicenseId(const QByteArray& licenseId)
 }
 
 
-CLicenseInfo::FeatureInfos CLicenseInfo::GetFeatureInfos() const
+QString CLicenseInfo::GetLicenseDescription() const
 {
-	return m_featureInfos;
+	return m_description;
 }
 
 
-void CLicenseInfo::SetFeatureInfos(const FeatureInfos& featureInfos)
+void CLicenseInfo::SetLicenseDescription(const QString& licenseDescription)
 {
-	if (m_featureInfos != featureInfos){
+	if (m_description != licenseDescription){
 		istd::CChangeNotifier notifier(this);
 
-		m_featureInfos = featureInfos;
+		m_description = licenseDescription;
+	}
+}
+
+
+QByteArray CLicenseInfo::GetProductId() const
+{
+	return m_productId;
+}
+
+
+void CLicenseInfo::SetProductId(const QByteArray& productId)
+{
+	if (m_productId != productId){
+		istd::CChangeNotifier notifier(this);
+
+		m_productId = productId;
+	}
+}
+
+
+QByteArrayList CLicenseInfo::GetFeatures() const
+{
+	return m_featureIds;
+}
+
+
+void CLicenseInfo::SetFeatures(QByteArrayList features)
+{
+	if (m_featureIds != features){
+		istd::CChangeNotifier notifier(this);
+
+		m_featureIds = features;
 	}
 }
 
@@ -102,67 +123,29 @@ bool CLicenseInfo::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	static iser::CArchiveTag licenseNameTag("LicenseName", "License name", iser::CArchiveTag::TT_LEAF);
-	bool retVal = archive.BeginTag(licenseNameTag);
-	retVal = retVal && archive.Process(m_licenseName);
-	retVal = retVal && archive.EndTag(licenseNameTag);
+	bool retVal = true;
 
-	static iser::CArchiveTag licenseIdTag("LicenseId", "ID of the license", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag licenseIdTag("LicenseId", "ID of the license", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(licenseIdTag);
 	retVal = retVal && archive.Process(m_licenseId);
 	retVal = retVal && archive.EndTag(licenseIdTag);
 
-	if (!archive.IsStoring()){
-		m_featureInfos.clear();
-	}
+	iser::CArchiveTag licenseNameTag("LicenseName", "License name", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(licenseNameTag);
+	retVal = retVal && archive.Process(m_licenseName);
+	retVal = retVal && archive.EndTag(licenseNameTag);
 
-	quint32 imtCoreVersion;
-	bool imtCoreVersionExists = archive.GetVersionInfo().GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion);
+	iser::CArchiveTag descriptionTag("LicenseDescription", "Description of the license", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(descriptionTag);
+	retVal = retVal && archive.Process(m_description);
+	retVal = retVal && archive.EndTag(descriptionTag);
 
-	bool oldVersion = (imtCoreVersionExists && imtCoreVersion < 3248);
+	iser::CArchiveTag productIdTag("ProductId", "Product ID of the license", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(productIdTag);
+	retVal = retVal && archive.Process(m_productId);
+	retVal = retVal && archive.EndTag(productIdTag);
 
-	if (!archive.IsStoring() && oldVersion){
-		QByteArrayList featureIds;
-		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, featureIds, "Features", "Feature");
-
-		if (retVal){
-			for (const QByteArray& featureId: featureIds){
-				FeatureInfo featureInfo;
-				featureInfo.id = featureId;
-
-				m_featureInfos.push_back(featureInfo);
-			}
-		}
-	}
-	else{
-		static iser::CArchiveTag featuresTag("Features", "List of license features", iser::CArchiveTag::TT_MULTIPLE);
-		static iser::CArchiveTag featureInfoTag("Feature", "Feature information", iser::CArchiveTag::TT_GROUP);
-
-		int featuresCount = m_featureInfos.count();
-		retVal = retVal && archive.BeginMultiTag(featuresTag, featureInfoTag, featuresCount);
-
-		if (retVal && !archive.IsStoring()){
-			m_featureInfos.resize(featuresCount);
-		}
-
-		for (int i = 0; i < featuresCount; ++i){
-			retVal = retVal && archive.BeginTag(featureInfoTag);
-
-			static iser::CArchiveTag featureIdTag("ID", "Feature ID", iser::CArchiveTag::TT_LEAF, &featureInfoTag);
-			retVal = retVal && archive.BeginTag(featureIdTag);
-			retVal = retVal && archive.Process(m_featureInfos[i].id);
-			retVal = retVal && archive.EndTag(featureIdTag);
-
-			static iser::CArchiveTag featureNameTag("Name", "Feature name", iser::CArchiveTag::TT_LEAF, &featureInfoTag);
-			retVal = retVal && archive.BeginTag(featureNameTag);
-			retVal = retVal && archive.Process(m_featureInfos[i].name);
-			retVal = retVal && archive.EndTag(featureNameTag);
-
-			retVal = retVal && archive.EndTag(featureInfoTag);
-		}
-
-		retVal = retVal && archive.EndTag(featuresTag);
-	}
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_featureIds, "Features", "Feature");
 
 	return retVal;
 }
@@ -178,13 +161,15 @@ int CLicenseInfo::GetSupportedOperations() const
 
 bool CLicenseInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const imtlic::ILicenseInfo* sourcePtr = dynamic_cast<const imtlic::ILicenseInfo*>(&object);
+	const imtlic::CLicenseInfo* sourcePtr = dynamic_cast<const imtlic::CLicenseInfo*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
-		m_licenseName = sourcePtr->GetLicenseName();
-		m_licenseId = sourcePtr->GetLicenseId();
-		m_featureInfos = sourcePtr->GetFeatureInfos();
+		m_licenseName = sourcePtr->m_licenseName;
+		m_licenseId = sourcePtr->m_licenseId;
+		m_description = sourcePtr->m_description;
+		m_productId = sourcePtr->m_productId;
+		m_featureIds = sourcePtr->m_featureIds;
 
 		return true;
 	}
@@ -210,7 +195,10 @@ bool CLicenseInfo::ResetData(CompatibilityMode /*mode*/)
 
 	m_licenseName.clear();
 	m_licenseId.clear();
-	m_featureInfos.clear();
+	m_description.clear();
+	m_licenseId.clear();
+	m_productId.clear();
+	m_featureIds.clear();
 
 	return true;
 }

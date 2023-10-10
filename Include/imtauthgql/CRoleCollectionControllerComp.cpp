@@ -6,7 +6,6 @@
 
 // ImtCore includes
 #include <imtlic/CFeatureInfo.h>
-#include <imtlic/CFeaturePackage.h>
 #include <imtauth/CRole.h>
 
 

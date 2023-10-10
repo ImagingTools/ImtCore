@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtgql/CObjectCollectionControllerCompBase.h>
-#include <imtlic/CFeaturePackage.h>
+#include <imtlic/CFeatureInfo.h>
 
 
 namespace imtlicgql
@@ -26,7 +26,7 @@ protected:
 	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlObject& gqlObject, QString& errorMessage, int& operationType) const override;
 
 	bool CreateFeatureFromRepresentationModel(const imtbase::CTreeItemModel& representationModel, imtlic::CFeatureInfo& featureInfo, const QByteArray& objectId, QString& errorMessage) const;
-	bool CreateRepresentationModelFromFeatureInfo(const imtlic::CFeatureInfo& featureInfo, imtbase::CTreeItemModel& representationModel, QString& errorMessage) const;
+	bool CreateRepresentationModelFromFeatureInfo(const imtlic::CFeatureInfo& featureInfo, const imtbase::CTreeItemModel* parentModelPtr, imtbase::CTreeItemModel& representationModel, QString& errorMessage) const;
 };
 
 

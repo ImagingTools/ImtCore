@@ -13,58 +13,72 @@ namespace imtlicgql
 
 // reimplemented (imtgql::CObjectCollectionControllerCompBase)
 
-imtbase::CTreeItemModel* CLicenseCollectionControllerComp::ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+bool CLicenseCollectionControllerComp::SetupGqlItem(
+			const imtgql::CGqlRequest& gqlRequest,
+			imtbase::CTreeItemModel& model,
+			int itemIndex,
+			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
+			QString& errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
-		return nullptr;
+	if (objectCollectionIterator == nullptr){
+		return false;
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+	bool retVal = true;
 
-	QByteArrayList fields;
+	QByteArrayList informationIds = GetInformationIds(gqlRequest, "items");
 
-	const imtgql::CGqlObject* fieldsParamPtr = gqlRequest.GetField("items");
-	if (fieldsParamPtr != nullptr){
-		fields = fieldsParamPtr->GetFieldIds();
-	}
+	if (!informationIds.isEmpty() && m_objectCollectionCompPtr.IsValid()){
+		QByteArray collectionId = objectCollectionIterator->GetObjectId();
 
-	const imtgql::CGqlObject* licensesParamPtr = gqlRequest.GetParam("licenses");
-	if (licensesParamPtr != nullptr){
-		QByteArrayList fieldIds = licensesParamPtr->GetFieldIds();
-
-		for (const QByteArray& licenseId : fieldIds){
-			imtbase::IObjectCollection::DataPtr dataPtr;
-			if (m_objectCollectionCompPtr->GetObjectData(licenseId, dataPtr)){
-				imtlic::ILicenseInfo* licenseInfoPtr = dynamic_cast<imtlic::ILicenseInfo*>(dataPtr.GetPtr());
-				if (licenseInfoPtr != nullptr){
-					int licenseIndex = dataModelPtr->InsertNewItem();
-
-					if (fields.contains("Id")){
-						dataModelPtr->SetData("Id", licenseInfoPtr->GetLicenseId(), licenseIndex);
-					}
-
-					if (fields.contains("Name")){
-						dataModelPtr->SetData("Name", licenseInfoPtr->GetLicenseName(), licenseIndex);
-					}
-
-					if (fields.contains("Features")){
-						imtbase::CTreeItemModel* featuresInfoModelPtr = dataModelPtr->AddTreeModel("FeaturesInfo", licenseIndex);
-
-						imtlic::ILicenseInfo::FeatureInfos featuresInfos = licenseInfoPtr->GetFeatureInfos();
-						for (const imtlic::ILicenseInfo::FeatureInfo& featureInfo : featuresInfos){
-							int index = featuresInfoModelPtr->InsertNewItem();
-
-							featuresInfoModelPtr->SetData("Id", featureInfo.id, index);
-							featuresInfoModelPtr->SetData("Name", featureInfo.name, index);
-						}
-					}
-				}
-			}
+		imtlic::ILicenseInfo* licenseInfoPtr = nullptr;
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (objectCollectionIterator->GetObjectData(dataPtr)){
+			licenseInfoPtr = dynamic_cast<imtlic::ILicenseInfo*>(dataPtr.GetPtr());
 		}
+
+		if (licenseInfoPtr == nullptr){
+			return false;
+		}
+
+		for (const QByteArray& informationId : informationIds){
+			QVariant elementInformation;
+
+			if(informationId == "Id"){
+				elementInformation = collectionId;
+			}
+			else if(informationId == "LicenseId"){
+				elementInformation = licenseInfoPtr->GetLicenseId();
+			}
+			else if(informationId == "LicenseName"){
+				elementInformation = licenseInfoPtr->GetLicenseName();
+			}
+			else if(informationId == "LicenseDescription"){
+				elementInformation = licenseInfoPtr->GetLicenseDescription();
+			}
+			else if(informationId == "Added"){
+				QDateTime addedTime =  objectCollectionIterator->GetElementInfo("Added").toDateTime();
+				elementInformation = addedTime.toString("dd.MM.yyyy hh:mm:ss");
+			}
+			else if(informationId == "LastModified"){
+				QDateTime lastTime =  objectCollectionIterator->GetElementInfo("LastModified").toDateTime();
+				elementInformation = lastTime.toString("dd.MM.yyyy hh:mm:ss");
+			}
+			else if(informationId == "ProductId"){
+				elementInformation = objectCollectionIterator->GetElementInfo("ProductId");
+			}
+
+			if (elementInformation.isNull()){
+				elementInformation = "";
+			}
+
+			retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
+		}
+
+		return true;
 	}
 
-	return rootModelPtr.PopPtr();
+	return false;
 }
 
 

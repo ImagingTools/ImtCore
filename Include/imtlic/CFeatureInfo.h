@@ -17,6 +17,7 @@ public:
 
 	void SetFeatureId(const QByteArray& featureId);
 	void SetFeatureName(const QString& featureName);
+	void SetFeatureDescription(const QString& description);
 	void SetOptional(bool optional);
 	void SetParentFeature(const IFeatureInfo* parentFeaturePtr);
 	void SetDependencies(QByteArrayList dependencies);
@@ -24,6 +25,7 @@ public:
 	// reimplemented (IFeatureInfo)
 	virtual QByteArray GetFeatureId() const override;
 	virtual QString GetFeatureName() const override;
+	virtual QString GetFeatureDescription() const override;
 	virtual bool IsOptional() const override;
 	virtual const IFeatureInfo* GetParentFeature() const override;
 	virtual QByteArrayList GetSubFeatureIds(int maxDepth = -1) const override;
@@ -50,6 +52,7 @@ protected:
 protected:
 	QByteArray m_id;
 	QString m_name;
+	QString m_description;
 	bool m_optional;
 	QByteArrayList m_dependencies;
 	FeatureInfoList m_subFeatures;

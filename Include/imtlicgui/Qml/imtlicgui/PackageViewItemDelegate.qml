@@ -33,7 +33,7 @@ TreeViewItemDelegateBase {
 
                     visible: !inputName.visible;
 
-                    text: model.Name ? model.Name : "";
+                    text: model.FeatureName ? model.FeatureName : "";
                 }
 
                 MouseArea {
@@ -59,7 +59,7 @@ TreeViewItemDelegateBase {
                     width: parent.width - 10;
                     height: parent.height - 7;
 
-                    text: model.Name ? model.Name : "";
+                    text: model.FeatureName ? model.FeatureName : "";
 
                     visible: false;
 
@@ -70,13 +70,13 @@ TreeViewItemDelegateBase {
                     onEditingFinished: {
                         inputName.visible = false;
 
-                        if (model.Name !== inputName.text){
+                        if (model.FeatureName !== inputName.text){
                             let id = inputName.text.replace(/\s+/g, '');
 
-                            model.Name = inputName.text;
+                            model.FeatureName = inputName.text;
 
                             if (model.FeatureId === ""){
-                                let id = model.Name.replace(/\s+/g, '');
+                                let id = model.FeatureName.replace(/\s+/g, '');
                                 let alreadyExists = packageTreeItemDelegate.root.featureIdExists(id);
                                 if (!alreadyExists){
                                     model.FeatureId = id;
@@ -185,7 +185,7 @@ TreeViewItemDelegateBase {
                     visible: !inputDescription.visible;
                     elide: Text.ElideRight;
 
-                    text: model.Description ? model.Description : "";
+                    text: model.FeatureDescription ? model.FeatureDescription : "";
                 }
 
                 MouseArea {
@@ -211,7 +211,7 @@ TreeViewItemDelegateBase {
                     width: parent.width - 10;
                     height: parent.height - 7;
 
-                    text: model.Description ? model.Description : "";
+                    text: model.FeatureDescription ? model.FeatureDescription : "";
 
                     visible: false;
 
@@ -222,8 +222,8 @@ TreeViewItemDelegateBase {
                     onEditingFinished: {
                         inputDescription.visible = false;
 
-                        if (model.Description !== inputDescription.text){
-                            model.Description = inputDescription.text;
+                        if (model.FeatureDescription !== inputDescription.text){
+                            model.FeatureDescription = inputDescription.text;
                         }
                     }
                 }

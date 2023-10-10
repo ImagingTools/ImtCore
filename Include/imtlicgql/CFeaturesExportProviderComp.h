@@ -31,7 +31,7 @@ public:
 	I_BEGIN_COMPONENT(CFeaturesExportProviderComp);
 		I_REGISTER_INTERFACE(imtbase::IBinaryDataProvider);
 		I_ASSIGN(m_productCollectionCompPtr, "ProductCollection", "Product collection", true, "ProductCollection");
-		I_ASSIGN(m_packageCollectionCompPtr, "PackageCollection", "Package collection", true, "PackageCollection");
+		I_ASSIGN(m_featureCollectionCompPtr, "FeatureCollection", "Feature collection", true, "FeatureCollection");
 	I_END_COMPONENT;
 
 	// reimplemented (imtbase::IBinaryDataProvider)
@@ -39,7 +39,7 @@ public:
 
 private:
 	I_REF(imtbase::IObjectCollection, m_productCollectionCompPtr);
-	I_REF(imtbase::IObjectCollection, m_packageCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_featureCollectionCompPtr);
 };
 
 

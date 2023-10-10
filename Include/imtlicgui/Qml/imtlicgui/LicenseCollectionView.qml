@@ -4,14 +4,9 @@ import imtqml 1.0
 import imtgui 1.0
 
  CollectionView {
-     id: featureCollectionViewContainer;
+     id: root;
 
      visibleMetaInfo: false;
-
-     Component.onCompleted: {
-         console.log("featureCollection onCompleted");
-         featureCollectionViewContainer.commandsDelegatePath = "../../imtlicgui/PackageCollectionViewCommandsDelegate.qml";
-     }
 
      function fillContextMenuModel(){
          contextMenuModel.clear();
@@ -20,5 +15,3 @@ import imtgui 1.0
          contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../" + Style.getIconPath("Icons/Remove", "On", "Normal")});
      }
  }
-
-

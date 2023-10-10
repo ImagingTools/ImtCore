@@ -32,5 +32,7 @@
         <file alias="imtlicgui/TreeViewDependencies.qml">Qml/imtlicgui/TreeViewDependencies.qml</file>
 	<file alias="imtlicgui/FeatureCollectionView.qml">Qml/imtlicgui/FeatureCollectionView.qml</file>
 	<file alias="imtlicgui/FeatureEditor.qml">Qml/imtlicgui/FeatureEditor.qml</file>
+	<file alias="imtlicgui/LicenseEditor.qml">Qml/imtlicgui/LicenseEditor.qml</file>
+	<file alias="imtlicgui/LicenseCollectionView.qml">Qml/imtlicgui/LicenseCollectionView.qml</file>
     </qresource>
 </RCC>

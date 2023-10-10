@@ -5,7 +5,6 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
-#include <imtlic/IFeaturePackage.h>
 #include <imtgql/CGqlRepresentationDataControllerComp.h>
 
 
@@ -19,8 +18,8 @@ public:
 	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CPermissionsProviderComp)
-		I_ASSIGN(m_featurePackageCompPtr, "FeaturePackage", "Feature package", true, "FeaturePackage");
 		I_ASSIGN(m_featurePackageRepresentationCompPtr, "PackageRepresentation", "Representation for feature package", true, "PackageRepresentation");
+		I_ASSIGN(m_featureContainerCompPtr, "FeatureContainer", "FeatureContainer", true, "FeatureContainer");
 	I_END_COMPONENT
 
 protected:
@@ -29,8 +28,8 @@ protected:
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
-	I_REF(imtlic::IFeaturePackage, m_featurePackageCompPtr);
 	I_REF(imtbase::IRepresentationController, m_featurePackageRepresentationCompPtr);
+	I_REF(istd::IChangeable, m_featureContainerCompPtr);
 };
 
 

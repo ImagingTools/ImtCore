@@ -8,7 +8,6 @@
 namespace imtbase
 {
 	class ICollectionInfo;
-	class IObjectCollection;
 }
 
 

@@ -40,7 +40,7 @@ DocumentBase {
     property TreeItemModel softwareHeadersModel: TreeItemModel {
         Component.onCompleted: {
             let index = productViewContainer.softwareHeadersModel.InsertNewItem();
-            productViewContainer.softwareHeadersModel.SetData("Id", "Name", index);
+            productViewContainer.softwareHeadersModel.SetData("Id", "FeatureName", index);
             productViewContainer.softwareHeadersModel.SetData("Name", qsTr("Feature Name"), index);
 
             index = productViewContainer.softwareHeadersModel.InsertNewItem();
@@ -48,7 +48,7 @@ DocumentBase {
             productViewContainer.softwareHeadersModel.SetData("Name", qsTr("Feature-ID"), index);
 
             index = productViewContainer.softwareHeadersModel.InsertNewItem();
-            productViewContainer.softwareHeadersModel.SetData("Id", "Description", index);
+            productViewContainer.softwareHeadersModel.SetData("Id", "FeatureDescription", index);
             productViewContainer.softwareHeadersModel.SetData("Name", qsTr("Description"), index);
 
             tableView.columnModel = productViewContainer.softwareHeadersModel;
@@ -58,15 +58,15 @@ DocumentBase {
     property TreeItemModel hardwareHeadersModel: TreeItemModel {
         Component.onCompleted: {
             let index = productViewContainer.hardwareHeadersModel.InsertNewItem();
-            productViewContainer.hardwareHeadersModel.SetData("Id", "Name", index);
+            productViewContainer.hardwareHeadersModel.SetData("Id", "FeatureName", index);
             productViewContainer.hardwareHeadersModel.SetData("Name", qsTr("Model Name"), index);
 
             index = productViewContainer.hardwareHeadersModel.InsertNewItem();
-            productViewContainer.hardwareHeadersModel.SetData("Id", "Id", index);
+            productViewContainer.hardwareHeadersModel.SetData("Id", "FeatureId", index);
             productViewContainer.hardwareHeadersModel.SetData("Name", qsTr("Model-ID"), index);
 
             index = productViewContainer.hardwareHeadersModel.InsertNewItem();
-            productViewContainer.hardwareHeadersModel.SetData("Id", "Description", index);
+            productViewContainer.hardwareHeadersModel.SetData("Id", "FeatureDescription", index);
             productViewContainer.hardwareHeadersModel.SetData("Name", qsTr("Description"), index);
         }
     }
@@ -133,9 +133,18 @@ DocumentBase {
     }
 
     function updateGui(){
-        console.time('updateGui')
-
         productViewContainer.blockUpdatingModel = true;
+
+        categoryComboBox.currentIndex = -1;
+        if (productViewContainer.documentModel.ContainsKey("CategoryId")){
+            let categoryId = productViewContainer.documentModel.GetData("CategoryId")
+            if (categoryId == "Software"){
+                categoryComboBox.currentIndex = 0;
+            }
+            else if (categoryId == "Hardware"){
+                categoryComboBox.currentIndex = 1;
+            }
+        }
 
         updateFeaturesGui();
 
@@ -157,7 +166,7 @@ DocumentBase {
 
         for (let featureId of featureIds){
             for (let i = 0; i < productViewContainer.allFeaturesModel.GetItemsCount(); i++){
-                let id = productViewContainer.allFeaturesModel.GetData("FeatureId", i);
+                let id = productViewContainer.allFeaturesModel.GetData("Id", i);
                 console.log("id", id);
 
                 if (featureId === id){
@@ -280,6 +289,10 @@ DocumentBase {
             radius: 0;
 
             onCurrentIndexChanged: {
+                if (productViewContainer.blockUpdatingModel){
+                    return;
+                }
+
                 let category = modelCategogy.GetData("Id", categoryComboBox.currentIndex);
                 productViewContainer.documentModel.SetData("CategoryId", category);
 
@@ -335,7 +348,7 @@ DocumentBase {
                         if (selectedIndex != null){
                             let index = selectedIndex.index;
 
-                            let featureId = tableView.rowModel.GetData("FeatureId", index);
+                            let featureId = tableView.rowModel.GetData("Id", index);
 
                             productViewContainer.removeFeature(featureId);
 
@@ -388,7 +401,7 @@ DocumentBase {
                 if (indexes.length > 0){
                     let index = indexes[0];
 
-                    let featureId = availableFeaturesTable.elements.GetData("FeatureId", index);
+                    let featureId = availableFeaturesTable.elements.GetData("Id", index);
 
                     productViewContainer.addFeature(featureId);
 
@@ -414,6 +427,8 @@ DocumentBase {
 
             anchors.fill: parent;
 
+            backgroundHeadersColor: Style.alternateBaseColor;
+
             Component.onCompleted: {
                 availableFeaturesTable.elements = FeaturesProvider.model;
             }
@@ -423,7 +438,7 @@ DocumentBase {
                 if (indexes.length === 1){
                     let index = indexes[0];
 
-                    let selectedFeatureId = availableFeaturesTable.elements.GetData("FeatureId", index);
+                    let selectedFeatureId = availableFeaturesTable.elements.GetData("Id", index);
 
                     let features = productViewContainer.documentModel.GetData("Features");
 
@@ -448,8 +463,8 @@ DocumentBase {
         Component.onCompleted: {
             let index = featuresHeaders.InsertNewItem();
 
-            featuresHeaders.SetData("Id", "Name", index);
-            featuresHeaders.SetData("Name", "Feature Name", index);
+            featuresHeaders.SetData("Id", "FeatureName", index);
+            featuresHeaders.SetData("Name", "Available features", index);
 
             availableFeaturesTable.headers = featuresHeaders;
         }

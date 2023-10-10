@@ -23,7 +23,7 @@ public:
 	/**
 		Get list of all permissions.
 	*/
-	virtual const imtlic::ILicenseInfo::FeatureInfos GetPermissionInfos(const QByteArray& productId) const = 0;
+	virtual const QByteArrayList GetPermissionInfos(const QByteArray& productId) const = 0;
 };
 
 

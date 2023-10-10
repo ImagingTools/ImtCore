@@ -16,18 +16,6 @@ I_EXPORT_PACKAGE(
 
 
 I_EXPORT_COMPONENT(
-		FeaturePackageCollectionController,
-		"FeaturePackageCollectionController",
-		"Feature Package Collection Controller");
-
-
-I_EXPORT_COMPONENT(
-		PackageController,
-		"PackageController",
-		"Package Controller");
-
-
-I_EXPORT_COMPONENT(
 		ProductCollectionController,
 		"ProductCollectionController",
 		"Product Collection Controller");
@@ -61,18 +49,6 @@ I_EXPORT_COMPONENT(
 		AccountController,
 		"AccountController",
 		"Account Controller");
-
-
-I_EXPORT_COMPONENT(
-		InstallationCollectionController,
-		"InstallationCollectionController",
-		"Installation Collection Controller");
-
-
-I_EXPORT_COMPONENT(
-		InstallationController,
-		"InstallationController",
-		"Installation Controller");
 
 
 I_EXPORT_COMPONENT(

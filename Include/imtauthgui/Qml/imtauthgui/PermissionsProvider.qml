@@ -49,13 +49,11 @@ Item {
                     dataModelLocal = permissionModel.GetData("data");
                     if (dataModelLocal.ContainsKey("ProductPermissions")){
                         dataModelLocal = dataModelLocal.GetData("ProductPermissions");
-                        if (dataModelLocal.ContainsKey("Features")){
-                            permissionsProvider.dataModel = dataModelLocal.GetData("Features");
-                        }
+                        permissionsProvider.dataModel = dataModelLocal;
 
-                        if (dataModelLocal.ContainsKey("Dependencies")){
-                            permissionsProvider.dependenciesModel = dataModelLocal.GetData("Dependencies");
-                        }
+//                        if (dataModelLocal.ContainsKey("Dependencies")){
+//                            permissionsProvider.dependenciesModel = dataModelLocal.GetData("Dependencies");
+//                        }
                     }
                 }
             }

@@ -5,6 +5,7 @@
 #include <icomp/CComponentBase.h>
 
 // ImtCore includes
+#include <imtbase/IObjectCollection.h>
 #include <imtlic/IFeatureInfoProvider.h>
 
 
@@ -24,7 +25,7 @@ public:
 
 	I_BEGIN_COMPONENT(CFeatureInfoProviderComp)
 		I_REGISTER_INTERFACE(IFeatureInfoProvider);
-		I_ASSIGN(m_packageCollectionCompPtr, "PackageCollection", "Package collection", true, "PackageCollection");
+		I_ASSIGN(m_featureCollectionCompPtr, "FeatureCollection", "Feature collection", true, "FeatureCollection");
 	I_END_COMPONENT
 
 	// reimplemented (IFeatureInfoProvider)
@@ -32,7 +33,7 @@ public:
 	virtual const imtbase::ICollectionInfo& GetFeatureList() const override;
 
 protected:
-	I_REF(imtbase::IObjectCollection, m_packageCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_featureCollectionCompPtr);
 };
 
 

@@ -50,7 +50,10 @@ bool CProductCollectionControllerComp::SetupGqlItem(
 				if(informationId == "Id"){
 					elementInformation = collectionId;
 				}
-				else if(informationId == "Name"){
+				if(informationId == "ProductId"){
+					elementInformation = productLicensingInfoPtr->GetProductId();
+				}
+				else if(informationId == "ProductName"){
 					elementInformation = productLicensingInfoPtr->GetName();
 				}
 				else if(informationId == "Description"){
@@ -67,29 +70,10 @@ bool CProductCollectionControllerComp::SetupGqlItem(
 				else if(informationId == "CategoryId"){
 					elementInformation = productLicensingInfoPtr->GetCategoryId();
 				}
-				else if(informationId == "Licenses"){
-					imtbase::CTreeItemModel* licenseModelPtr = model.AddTreeModel("Licenses", itemIndex);
+				else if(informationId == "Features"){
+					QByteArrayList featureList = productLicensingInfoPtr->GetFeatureIds();
 
-					imtbase::IObjectCollection* licenseCollectionPtr = dynamic_cast<imtbase::IObjectCollection*>(productLicensingInfoPtr);
-					if (licenseCollectionPtr == nullptr){
-						return false;
-					}
-
-					imtbase::ICollectionInfo::Ids elementIds = licenseCollectionPtr->GetElementIds();
-					for (const imtbase::ICollectionInfo::Id& elementId : elementIds){
-						imtbase::IObjectCollection::DataPtr elementDataPtr;
-						if (licenseCollectionPtr->GetObjectData(elementId, elementDataPtr)){
-							const imtlic::CLicenseInfo* licenseInfoPtr = dynamic_cast<const imtlic::CLicenseInfo*>(elementDataPtr.GetPtr());
-							if (licenseInfoPtr != nullptr){
-								int index = licenseModelPtr->InsertNewItem();
-
-								licenseModelPtr->SetData("Id", licenseInfoPtr->GetLicenseId(), index);
-								licenseModelPtr->SetData("Name", licenseInfoPtr->GetLicenseName(), index);
-							}
-						}
-					}
-
-					continue;
+					elementInformation = featureList.join(';');
 				}
 
 				if (elementInformation.isNull()){

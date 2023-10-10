@@ -10,9 +10,10 @@
 // ImtCore includes
 #include <imtlic/IProductInstanceInfo.h>
 #include <imtlic/CLicenseInfo.h>
+#include <imtlic/IProductInfo.h>
 #include <imtlic/IProductLicensingInfo.h>
 #include <imtbase/ICollectionInfo.h>
-#include <imtlic/CFeaturePackage.h>
+#include <imtlic/CFeatureContainer.h>
 #include <ifile/CCompactXmlFileWriteArchive.h>
 
 
@@ -26,74 +27,60 @@ namespace imtlicgql
 
 bool CFeaturesExportProviderComp::GetData(QByteArray& data, const QByteArray& dataId) const
 {
-	if (!m_productCollectionCompPtr.IsValid() || !m_packageCollectionCompPtr.IsValid()){
+	if (!m_productCollectionCompPtr.IsValid() || !m_featureCollectionCompPtr.IsValid()){
+		SendErrorMessage(0, QString("Internal error."), "CFeaturesExportProviderComp");
 		return false;
 	}
 
-	imtbase::IObjectCollection::DataPtr productDataPtr;
-	if (m_productCollectionCompPtr->GetObjectData(dataId, productDataPtr)){
-		const imtlic::IProductLicensingInfo* productPtr = dynamic_cast<const imtlic::IProductLicensingInfo*>(productDataPtr.GetPtr());
-		const imtbase::ICollectionInfo& licenseList = productPtr->GetLicenseList();
-		const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = licenseList.GetElementIds();
+	const imtlic::IProductInfo* productInfoPtr = nullptr;
 
-		istd::TDelPtr<imtlic::CFeaturePackage> resultPackagePtr = new imtlic::CFeaturePackage;
-		for (const QByteArray& licenseId : licenseCollectionIds){
-			const imtlic::ILicenseInfo* licenseInfoPtr = productPtr->GetLicenseInfo(licenseId);
-			if (licenseInfoPtr != nullptr){
-				imtlic::ILicenseInfo::FeatureInfos featureInfos = licenseInfoPtr->GetFeatureInfos();
-				for (int i = 0; i < featureInfos.size(); i++){
-					QByteArray featureId = featureInfos[i].id;
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_productCollectionCompPtr->GetObjectData(dataId, dataPtr)){
+		productInfoPtr = dynamic_cast<const imtlic::IProductInfo*>(dataPtr.GetPtr());
+	}
 
-					const imtbase::IObjectCollectionInfo::Ids packageIds = m_packageCollectionCompPtr->GetElementIds();
-					for (imtbase::IObjectCollectionInfo::Id packageId : packageIds){
-						imtbase::IObjectCollection::DataPtr packageDataPtr;
-						if (m_packageCollectionCompPtr->GetObjectData(packageId, packageDataPtr)){
-							const imtlic::CFeaturePackage* packagePtr  = dynamic_cast<const imtlic::CFeaturePackage*>(packageDataPtr.GetPtr());
-							if (packagePtr != nullptr){
-								const imtlic::IFeatureInfo* featureInfoPtr = packagePtr->FindFeatureById(featureId);
-								const imtlic::IFeatureInfo* findedFeatureInfoPtr = resultPackagePtr->FindFeatureById(featureId);
-								if (featureInfoPtr != nullptr && findedFeatureInfoPtr == nullptr){
-									QString featureName = featureInfoPtr->GetFeatureName();
+	if (productInfoPtr == nullptr){
+		SendErrorMessage(0, QString("Unable to get product with ID %1.").arg(qPrintable(dataId)), "CFeaturesExportProviderComp");
+		return false;
+	}
 
-									resultPackagePtr->InsertNewObject("FeatureInfo", featureName, "", featureInfoPtr);
+	imtlic::CFeatureContainer featureContainer;
 
-									QByteArrayList featureDependencies = packagePtr->GetFeatureDependencies(featureId);
-									if (!featureDependencies.empty()){
-										resultPackagePtr->SetFeatureDependencies(featureId, featureDependencies);
-									}
-
-									QByteArrayList allSubFeaturesList = featureInfoPtr->GetSubFeatureIds();
-									for (const QByteArray& subFeatureId : allSubFeaturesList){
-										QByteArrayList subfeatureDependencies = packagePtr->GetFeatureDependencies(subFeatureId);
-
-										if (!subfeatureDependencies.empty()){
-											resultPackagePtr->SetFeatureDependencies(subFeatureId, subfeatureDependencies);
-										}
-									}
-								}
-							}
-						}
-					}
+	QByteArrayList featureUuids = productInfoPtr->GetFeatureIds();
+	for (const QByteArray& featureUuid : featureUuids){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_featureCollectionCompPtr->GetObjectData(featureUuid, dataPtr)){
+			const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
+			if (featureInfoPtr != nullptr){
+				if (featureContainer.InsertNewObject(QByteArray("FeatureInfo"), "", "", featureInfoPtr, featureUuid) == QByteArray("")){
+					SendWarningMessage(0, QString("Unable to insert feature %1 to the container.").arg(qPrintable(featureUuid)), "CFeaturesExportProviderComp");
 				}
 			}
 		}
+	}
 
-		QString filePathTmp = QDir::tempPath() + "/"  + QUuid::createUuid().toString() + ".xml";
-		{
-			ifile::CCompactXmlFileWriteArchive writeArchive(filePathTmp);
+	QString filePathTmp = QDir::tempPath() + "/"  + QUuid::createUuid().toString() + ".xml";
+	{
+		ifile::CCompactXmlFileWriteArchive writeArchive(filePathTmp);
+		if (!featureContainer.Serialize(writeArchive)){
+			SendErrorMessage(0, QString("Error when trying to serialize a feature container. Product-ID: %1.").arg(qPrintable(dataId)), "CFeaturesExportProviderComp");
 
-			resultPackagePtr->Serialize(writeArchive);
-		}
-
-		QFile file(filePathTmp);
-		if (file.open(QIODevice::ReadOnly)){
-			data = file.readAll();
-			file.close();
-			QFile::remove(filePathTmp);
-
-			return true;
+			return false;
 		}
 	}
+
+	QFile file(filePathTmp);
+	if (file.open(QIODevice::ReadOnly)){
+		data = file.readAll();
+		file.close();
+		QFile::remove(filePathTmp);
+
+		SendInfoMessage(0, QString("The product features have been successfully exported. Product-ID: %1.").arg(qPrintable(dataId)), "CFeaturesExportProviderComp");
+
+		return true;
+	}
+
+	SendErrorMessage(0, QString("Error when trying to export product features. Product-ID: %1.").arg(qPrintable(dataId)), "CFeaturesExportProviderComp");
 
 	return false;
 }

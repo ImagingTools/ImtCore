@@ -3,7 +3,6 @@
 
 // ImtCore includes
 #include <imtdb/CSqlJsonDatabaseDelegateComp.h>
-#include <imtlic/IProductLicensingInfo.h>
 
 
 namespace imtlicdb
@@ -18,7 +17,7 @@ public:
 	I_BEGIN_COMPONENT(CProductsDatabaseDelegateComp)
 	I_END_COMPONENT
 
-	// reimplemented (imtdb::CSqlDatabaseDocumentDelegateComp)
+	// reimplemented (imtdb::CSqlJsonDatabaseDelegateComp)
 	virtual bool CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 };
 
