@@ -98,6 +98,7 @@ Item {
 
     function onBackgroundClicked(){
         popupMenuContainer.root.closeDialog();
+        popupMenuContainer.rootItem.isOpen = false;
         //		if (rootItem){
         //			popupMenuContainer.finished('', rootItem.currentIndex);
         //		}

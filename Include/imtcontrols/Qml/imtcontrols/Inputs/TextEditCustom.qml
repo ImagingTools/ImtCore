@@ -88,6 +88,10 @@ FocusScope {
 
             textEdit.forceActiveFocus();
         }
+
+        if(decorator && decorator.z >= 0){
+            decorator.focus = focus;
+        }
     }
 
     onDecoratorComponentChanged: {
@@ -104,6 +108,16 @@ FocusScope {
         }
 
         textEdit.setHeight();
+
+        if(decorator.z < 0){
+            if(focus){
+                textEdit.forceActiveFocus()
+            }
+        }
+        else {
+            decorator.focus = focus;
+        }
+
 
 //        if(decorator.z < 0){
 //            textEdit.focus = true;
@@ -133,6 +147,7 @@ FocusScope {
         property: "text"
         value: containerTextEdit.text;
     }
+
 
     Timer {
         id: editingFinishedTimer;
@@ -238,14 +253,16 @@ FocusScope {
             }
 
             function setHeight () {
-                if(containerTextEdit.isDinamicHeight && containerTextEdit.decorator.z < 0){
+                if(containerTextEdit.isDinamicHeight  && containerTextEdit.decorator && containerTextEdit.decorator.z < 0){
                     var newHeigth = textEdit.height + 2*containerTextEdit.margin;
                     if(newHeigth !== containerTextEdit.height){
                         containerTextEdit.height = newHeigth;
                     }
 
                 }
-                containerTextEdit.decorator.setHeight();
+                if(containerTextEdit.decorator){
+                    containerTextEdit.decorator.setHeight();
+                }
 
             }
 

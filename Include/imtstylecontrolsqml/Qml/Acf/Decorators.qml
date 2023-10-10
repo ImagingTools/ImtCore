@@ -13,6 +13,8 @@ Item {
     property Component textFieldDecorator: textFieldDecoratorComp
     property Component textEditDecorator: textEditDecoratorComp
 
+    property Component comboBoxDecorator: comboBoxDecoratorComp
+
     Component {
         id: topButtonDecoratorComp
 
@@ -62,6 +64,7 @@ Item {
             z: -1;
 
             property var baseElement;
+
             property string text: "";
 
             Rectangle {
@@ -133,6 +136,7 @@ Item {
             property string text: "";
 
             function setHeight(){
+                console.log("setHeight");
             }
 
             Rectangle {
@@ -188,6 +192,73 @@ Item {
                 }
             }
         }
+    }
+
+    Component{
+        id: comboBoxDecoratorComp;
+
+        Rectangle {
+            id: cbMainRect;
+
+            width: 200;
+            height: 30;
+
+            property var baseElement;
+            property var model;
+            property int currentIndex: -1;
+
+
+            border.color: !baseElement ? "transparent" : baseElement.borderColor;
+            border.width: 1;
+
+            radius: !baseElement ? 0 : baseElement.radius;
+            color: !baseElement ? "transparent" : baseElement.backgroundColor;
+
+            gradient: Gradient {
+                id: grad;
+                property bool isColor: !baseElement ? false : baseElement.isColor;
+
+                GradientStop { position: 0.0; color: grad.isColor ? cbMainRect.color : Style.imagingToolsGradient1; }
+                GradientStop { position: 0.97; color: grad.isColor ? cbMainRect.color : Style.imagingToolsGradient2; }
+                GradientStop { position: 0.98; color: grad.isColor ? cbMainRect.color : Style.imagingToolsGradient3; }
+                GradientStop { position: 1.0; color: grad.isColor ? cbMainRect.color : Style.imagingToolsGradient4; }
+
+            }
+
+            Text {
+                id: cbTitleTxt;
+
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: parent.left;
+                anchors.leftMargin: !baseElement ? 0 : baseElement.textCentered ? parent.width/2 - width/2 : 10;
+                anchors.right: parent.right;
+                anchors.rightMargin: 10;
+
+                color: !baseElement ? "transparent" : baseElement.fontColorTitle;
+                text: !baseElement ? "" : baseElement.currentText !== "" ? baseElement.currentText : baseElement.placeHolderText;
+                font.family: Style.fontFamily;
+                font.pixelSize: !baseElement ? 10 : baseElement.textSize;
+
+                elide: Text.ElideRight;
+            }
+
+            Image {
+                id: cbArrowIcon;
+
+                anchors.right: cbMainRect.right;
+                anchors.verticalCenter: cbMainRect.verticalCenter;
+                anchors.rightMargin: 5;
+
+                width: 12;
+                height: 10;
+                rotation: !baseElement ? 0 : baseElement.isOpen ? 180 : 0
+                source: "../../../" + Style.theme + "/Icons/" + "/" + "Down" + "_On_Normal.svg";
+
+                sourceSize.width: width;
+                sourceSize.height: height;
+            }
+        }
+
     }
 
 }

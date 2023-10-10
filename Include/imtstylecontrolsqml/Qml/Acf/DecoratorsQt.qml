@@ -10,6 +10,9 @@ Item {
     property Component textFieldDecorator: textFieldDecoratorComp
     property Component textEditDecorator: textEditDecoratorComp
 
+    property Component comboBoxDecorator: comboBoxDecoratorComp
+
+
     Component {
         id: buttonDecoratorComp
 
@@ -64,6 +67,7 @@ Item {
     Component {
         id: textFieldDecoratorComp
 
+
         TextField {
             width: 200;
             height: 40;
@@ -95,6 +99,13 @@ Item {
                 }
             }
 
+            onFocusChanged: {
+                console.log("focus", focus)
+                if(focus){
+                    forceActiveFocus();
+                }
+            }
+
         }
     }
 
@@ -105,7 +116,7 @@ Item {
             id: flick;
 
             width: 200;
-            height: 40;
+            height: 30;
 
             contentWidth: edit.paintedWidth;
             contentHeight: edit.paintedHeight;
@@ -115,6 +126,17 @@ Item {
             property var baseElement;
             property alias text: edit.text;
 
+            onHeightChanged: {
+                if(flick.baseElement){
+                    flick.baseElement.height = height;
+                }
+            }
+
+            onFocusChanged: {
+                if(focus){
+                    edit.forceActiveFocus();
+                }
+            }
 
             function ensureVisible(r)
             {
@@ -130,12 +152,7 @@ Item {
 
             function setHeight(){
                 console.log("setHeight")
-                height = 40;
-            }
-            onHeightChanged: {
-                if(flick.baseElement){
-                    flick.baseElement.height = height;
-                }
+                height = 30;
             }
 
             TextEdit {
@@ -166,30 +183,40 @@ Item {
             }
         }
 
+    }
 
-        //        TextEdit{
-        //            width: 200;
-        //            height: 40;
+    Component{
+        id: comboBoxDecoratorComp;
 
-        //            z: baseElement ? 1 : -1;
-        //            clip: true;
+        ComboBox{
+            width: 200;
+            height: 30;
 
-        //            property var baseElement;
-        //            property string text: "";
+            topInset: 0;
+            bottomInset: 0;
 
-        //            onTextChanged: {
-        //                if(baseElement){
-        //                    baseElement.text = text;
-        //                }
-        //            }
+            textRole: "Name"
+            displayText: currentIndex >= 0 ? currentText : "ComboBox"
 
-        //            onEditingFinished: {
-        //                if(baseElement){
-        //                    baseElement.editingFinished();
-        //                }
-        //            }
 
-        //        }
+            property var baseElement;
+            model: !baseElement ? 0 : baseElement.model;
+
+            onModelChanged: {
+                if(model){
+                    currentIndex = -1;
+                }
+            }
+
+            onActivated: {
+                var id = model.GetData("Id", currentIndex);
+                console.log("Activated", currentIndex, id)
+                if(baseElement){
+                    baseElement.finished(id, currentIndex);
+                }
+            }
+
+        }
     }
 
 }

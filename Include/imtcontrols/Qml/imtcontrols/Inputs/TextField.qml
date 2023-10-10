@@ -92,6 +92,11 @@ FocusScope {
             textField.focus = true;
             textField.forceActiveFocus();
         }
+
+        if(decorator && decorator.z >= 0){
+            decorator.focus = focus;
+        }
+
     }
 
 
@@ -107,6 +112,16 @@ FocusScope {
             bindHeight.target = decorator
             bindText.target = decorator
         }
+
+        if(decorator.z < 0){
+            if(focus){
+                textField.forceActiveFocus()
+            }
+        }
+        else {
+            decorator.focus = focus;
+        }
+
 
 //        if(decorator.z < 0){
 //            textField.focus = true;
@@ -136,6 +151,7 @@ FocusScope {
         property: "text"
         value: containerTextField.text;
     }
+
 
     InputActions {
         id: inputActions;

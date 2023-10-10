@@ -5,8 +5,11 @@ import imtcontrols 1.0
 FocusScope {
 	id: comboBoxContainer;
 
-	width: 90;
-	height: 30;
+    width: decorator ? decorator.width : 0
+    height: decorator ? decorator.height : 0
+
+    property Component decoratorComponent;
+    property var decorator : null;
 
 	property var model;
 
@@ -38,8 +41,6 @@ FocusScope {
 	property int radius: 5;
 	property int currentIndex: -1;
 
-	property alias titleTxt: cbTitleTxt;
-	property alias titleTxtColor: cbTitleTxt.color;
 
 	property string placeHolderText: "";
 
@@ -52,6 +53,8 @@ FocusScope {
     property int selectedIndex: -1;
     property bool hoverBlocked: true;
 
+
+
 	property Component delegate: PopupMenuDelegate{
 		width: comboBoxContainer.width;
 		height: comboBoxContainer.itemHeight;
@@ -63,12 +66,15 @@ FocusScope {
 		rootItem: comboBoxContainer;
 	   };
 
-	property alias image: cbArrowIcon;
-	property alias imageSource: cbArrowIcon.source;
-	property alias imageWidth:  cbArrowIcon.width;
-	property alias imageHeight: cbArrowIcon.height;
-	property alias imageRotation: cbArrowIcon.rotation;
-	property alias imageVisible: cbArrowIcon.visible;
+//	property alias image: cbArrowIcon;
+//	property alias imageSource: cbArrowIcon.source;
+//	property alias imageWidth:  cbArrowIcon.width;
+//	property alias imageHeight: cbArrowIcon.height;
+//	property alias imageRotation: cbArrowIcon.rotation;
+//	property alias imageVisible: cbArrowIcon.visible;
+//    property alias titleTxt: cbTitleTxt;
+//    property alias titleTxtColor: cbTitleTxt.color;
+
 
 	property alias containsMouse: cbMouseArea.containsMouse;
 
@@ -83,6 +89,12 @@ FocusScope {
 
 	signal clicked();
 	signal finished(string commandId, int index);
+
+    onFinished: {
+        console.log("ComboFinished")
+        comboBoxContainer.currentIndex = index;
+        comboBoxContainer.isOpen = false;
+    }
 
     onOpenSTChanged: {
         selectedIndex = -1;
@@ -115,6 +127,8 @@ FocusScope {
 		}
 	}
 
+
+
 	Component {
 		id: popupMenu;
 		PopupMenuDialog {
@@ -132,8 +146,8 @@ FocusScope {
 			rootItem: comboBoxContainer;
 			visibleScrollBar: comboBoxContainer.visibleScrollBar;
 			onFinished: {
-				comboBoxContainer.currentIndex = index;
-				comboBoxContainer.isOpen = false;
+                console.log("MenuFinished")
+
                 popup.root.closeDialog();
 			}
 			Component.onCompleted: {
@@ -142,16 +156,9 @@ FocusScope {
 		}
 	}
 
-	Component.onCompleted: {
-		if (comboBoxContainer.textCentered){
-			cbTitleTxt.anchors.horizontalCenter = cbMainRect.horizontalCenter;
-		}
-		else {
-			cbTitleTxt.anchors.left = cbMainRect.left;
-			cbTitleTxt.anchors.leftMargin = 10;
-		}
+    Component.onCompleted: {
 
-	}
+    }
 
 	onDialogsCountChanged: {
 		comboBoxContainer.openST = comboBoxContainer.dialogsCount > comboBoxContainer.dialogsCountPrev;
@@ -159,6 +166,38 @@ FocusScope {
 			comboBoxContainer.dialogsCountPrev = 1000;
 		}
 	}
+
+    onDecoratorComponentChanged: {
+        if(decorator){
+            decorator.destroy()
+        }
+        if (decoratorComponent){
+
+            decorator = decoratorComponent.createObject(comboBoxContainer)
+            decorator.baseElement = comboBoxContainer
+            bindWidth.target = decorator
+            bindHeight.target = decorator
+            bindCurrentIndex.target = decorator
+        }
+    }
+
+    Binding {
+        id: bindWidth
+        property: "width"
+        value: comboBoxContainer.width;
+    }
+
+    Binding {
+        id: bindHeight
+        property: "height"
+        value: comboBoxContainer.height;
+    }
+
+    Binding {
+        id: bindCurrentIndex;
+        property: "currentIndex"
+        value: comboBoxContainer.currentIndex;
+    }
 
 
 	function openPopupMenu(){
@@ -179,109 +218,60 @@ FocusScope {
 		comboBoxContainer.isOpen = false;
 	}
 
-	Rectangle {
-		id: cbMainRect;
 
-		anchors.fill: parent;
+    MouseArea {
+        id: cbMouseArea;
 
-		border.color: comboBoxContainer.borderColor;
-		border.width: 1;
+        anchors.fill: parent;
+        hoverEnabled: true;
 
-		radius: comboBoxContainer.radius;
-		color: comboBoxContainer.backgroundColor;
+        cursorShape: comboBoxContainer.changeable ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
-		gradient: Gradient {
+        onClicked: {
+            comboBoxContainer.focus = true;
+            comboBoxContainer.forceActiveFocus();
 
-			GradientStop { position: 0.0; color: comboBoxContainer.isColor ? cbMainRect.color : Style.imagingToolsGradient1; }
-			GradientStop { position: 0.97; color: comboBoxContainer.isColor ? cbMainRect.color : Style.imagingToolsGradient2; }
-			GradientStop { position: 0.98; color: comboBoxContainer.isColor ? cbMainRect.color : Style.imagingToolsGradient3; }
-			GradientStop { position: 1.0; color: comboBoxContainer.isColor ? cbMainRect.color : Style.imagingToolsGradient4; }
+            if (comboBoxContainer.changeable && comboBoxContainer.model !==undefined && comboBoxContainer.model.GetItemsCount() > 0){
+                comboBoxContainer.openPopupMenu();
+            }
 
-		}
+            comboBoxContainer.clicked();
+            console.log("comboBoxContainer.clicked()")
+        }
 
-		Text {
-			id: cbTitleTxt;
+        onPressed: {
+            if(tooltip.text !== ""){
+                tooltip.closeTooltip();
+            }
+        }
 
-			anchors.verticalCenter: parent.verticalCenter;
-			anchors.left: parent.left;
-			anchors.right: parent.right;
-			anchors.rightMargin: 10;
+        onEntered: {
+            if(tooltip.text !== ""){
+                pauseTooltip.stop();
+                pauseTooltip.start();
 
-			color: comboBoxContainer.fontColorTitle;
-			text: comboBoxContainer.currentText !== "" ? comboBoxContainer.currentText : comboBoxContainer.placeHolderText;
-			font.family: Style.fontFamily;
-			font.pixelSize: comboBoxContainer.textSize;
+            }
 
-			elide: Text.ElideRight;
-		}
+        }
 
-		Image {
-			id: cbArrowIcon;
+        onExited: {
+            if(tooltip.text !== ""){
+                pauseTooltip.stop();
+                tooltip.closeTooltip();
+            }
+        }
+    }
 
-			anchors.right: cbMainRect.right;
-			anchors.verticalCenter: cbMainRect.verticalCenter;
-			anchors.rightMargin: 5;
+    CustomTooltip{
+        id: tooltip;
+    }
 
-			width: 12;
-			height: 10;
-			rotation: comboBoxContainer.isOpen ? 180 : 0
-			source: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
+    PauseAnimation {
+        id: pauseTooltip;
 
-			sourceSize.width: width;
-			sourceSize.height: height;
-		}
-
-		MouseArea {
-			id: cbMouseArea;
-
-			anchors.fill: parent;
-			hoverEnabled: true;
-
-			cursorShape: comboBoxContainer.changeable ? Qt.PointingHandCursor : Qt.ArrowCursor;
-
-			onClicked: {
-                if (comboBoxContainer.changeable && comboBoxContainer.model !==undefined && comboBoxContainer.model.GetItemsCount() > 0){
-					comboBoxContainer.openPopupMenu();
-				}
-
-				comboBoxContainer.clicked();
-                console.log("comboBoxContainer.clicked()")
-			}
-
-			onPressed: {
-				if(tooltip.text !== ""){
-					tooltip.closeTooltip();
-				}
-			}
-
-			onEntered: {
-				if(tooltip.text !== ""){
-					pauseTooltip.stop();
-					pauseTooltip.start();
-
-				}
-
-			}
-
-			onExited: {
-				if(tooltip.text !== ""){
-					pauseTooltip.stop();
-					tooltip.closeTooltip();
-				}
-			}
-		}
-
-		CustomTooltip{
-			id: tooltip;
-		}
-
-		PauseAnimation {
-			id: pauseTooltip;
-
-			duration: tooltip.waitingDuration;
-			onFinished: {
-				tooltip.openTooltip(cbMouseArea.mouseX, cbMouseArea.mouseY);
-			}
-		}
-	}
+        duration: tooltip.waitingDuration;
+        onFinished: {
+            tooltip.openTooltip(cbMouseArea.mouseX, cbMouseArea.mouseY);
+        }
+    }
 }
