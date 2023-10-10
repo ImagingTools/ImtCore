@@ -35,6 +35,25 @@ Rectangle {
 
     }
 
+    TreeItemModel{
+        id: comboModel;
+
+        Component.onCompleted: {
+            var index = comboModel.InsertNewItem();
+            comboModel.SetData("Id",index, index);
+            comboModel.SetData("Name", "Name 1", index);
+
+            index = comboModel.InsertNewItem();
+            comboModel.SetData("Id",index, index);
+            comboModel.SetData("Name", "Name 2", index);
+
+            index = comboModel.InsertNewItem();
+            comboModel.SetData("Id",index, index);
+            comboModel.SetData("Name", "Name 3", index);
+        }
+
+    }
+
     Row{
         id: buttonsRow;
 
@@ -52,9 +71,13 @@ Rectangle {
         }
 
         Rectangle{
+            id: textEditBackground;
+
+            anchors.verticalCenter:  parent.verticalCenter;
+
             width: textEdit.width + 20;
             height: textEdit.height + 20;
-            anchors.verticalCenter:  parent.verticalCenter;
+
             color: Style.backgroundColor;
 
             TextEditCustom{
@@ -70,7 +93,60 @@ Rectangle {
             }
         }
 
+        ComboBox{
+            id: combobox;
+
+            anchors.verticalCenter: parent.verticalCenter;
+
+            model: comboModel;
+            placeHolderText: "ComboBox"
+            decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.comboBoxDecorator :
+                                                                  Decorators.comboBoxDecorator;
+
+        }
+
+//        Item{//test
+//            id: comboxQt;
+
+//            anchors.verticalCenter: parent.verticalCenter;
+
+//            width: 200;
+//            height: 30;
+
+//            property Component decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.comboBoxDecorator :
+//                                                                  Decorators.comboBoxDecorator;
+
+////            property Component decoratorComponent : DecoratorsQt.comboBoxDecorator;
+//            property var decorator : null;
+
+//            onDecoratorComponentChanged: {
+//                if(decorator){
+//                    decorator.destroy()
+//                }
+//                decorator = decoratorComponent.createObject(comboxQt)
+//                decorator.baseElement = comboxQt
+//                bindWidth.target = decorator
+//                bindHeight.target = decorator
+//                decorator.model = comboModel
+//            }
+
+//            Binding {
+//                id: bindWidth
+//                property: "width"
+//                value: comboxQt.width;
+//            }
+
+//            Binding {
+//                id: bindHeight
+//                property: "height"
+//                value: comboxQt.height;
+//            }
+
+//        }//test
+
     }//row
+
+
 
 
     ///////////////////
