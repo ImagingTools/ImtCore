@@ -81,7 +81,7 @@ Item {
         }
 
         if (!ok){
-            let hash = Qt.md5(usernameInput.text + passwordInput.text).toString();
+            let hash = passwordInput.text;
             userEditorContainer.documentModel.SetData("Password", hash);
         }
 

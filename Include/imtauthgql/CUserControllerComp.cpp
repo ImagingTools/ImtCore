@@ -164,8 +164,9 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 		return nullptr;
 	}
 
+	QByteArray username;
 	if (representationModel.ContainsKey("Username")){
-		QByteArray username = representationModel.GetData("Username").toByteArray();
+		username = representationModel.GetData("Username").toByteArray();
 
 		iprm::CParamsSet filterParam;
 		iprm::CParamsSet paramsSet;
@@ -196,11 +197,23 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 		userInfoPtr->SetName(name);
 	}
 
+	QByteArray password;
 	if (representationModel.ContainsKey("Password")){
-		QByteArray password = representationModel.GetData("Password").toByteArray();
-
-		userInfoPtr->SetPasswordHash(password);
+		password = representationModel.GetData("Password").toByteArray();
 	}
+
+	bool calculate = true;
+	if (userInfoPtr != nullptr){
+		if (userInfoPtr->GetPasswordHash() == password){
+			calculate = false;
+		}
+	}
+
+	if (calculate && m_hashCalculatorCompPtr.IsValid()){
+		password = m_hashCalculatorCompPtr->GenerateHash(username + password);
+	}
+
+	userInfoPtr->SetPasswordHash(password);
 
 	if (representationModel.ContainsKey("Email")){
 		QByteArray email = representationModel.GetData("Email").toByteArray();
@@ -353,21 +366,9 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 			return nullptr;
 		}
 
-		bool calculate = true;
-		const imtauth::IUserInfo* currentuserInfoPtr = nullptr;
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-			currentuserInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
-			if (currentuserInfoPtr != nullptr){
-				QByteArray currentPasswordHash = currentuserInfoPtr->GetPasswordHash();
-				if (currentPasswordHash == password){
-					calculate = false;
-				}
 
-				for (const QByteArray& userProductId : currentuserInfoPtr->GetProducts()){
-					userInfoPtr->SetRoles(userProductId, currentuserInfoPtr->GetRoles(userProductId));
-				}
-			}
+		if (m_hashCalculatorCompPtr.IsValid()){
+			password = m_hashCalculatorCompPtr->GenerateHash(username + password);
 		}
 
 		userInfoPtr->SetPasswordHash(password);
