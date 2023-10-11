@@ -62,9 +62,6 @@ protected:
 	const imtbase::IObjectCollection* m_productCollectionPtr;
 
 private:
-	QByteArray FindProductByName(const QString& productName) const;
-
-private:
 	typedef istd::TSmartPtr<CLicenseInstance> LicenseInstancePtr;
 	typedef QMap<QByteArray /*ID of the license definition in the product*/, LicenseInstancePtr> LicenseInstances;
 

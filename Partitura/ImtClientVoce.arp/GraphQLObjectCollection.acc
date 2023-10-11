@@ -16,9 +16,6 @@
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GraphQLClientEngine"/>
                     </AttributeInfo>
@@ -36,9 +33,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="GqlDatabaseDelegate" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GqlObjectCollectionDelegate"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MetaInfoCreator" Type="Reference" ExportId="MetaInfoCreator">
                         <Data IsEnabled="false"/>
@@ -65,9 +59,6 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Id" Type="Id" ExportId="Id">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectTypeIds" Type="Id[]" ExportId="ObjectTypeIds">

@@ -137,7 +137,7 @@ bool CProductInfo::Serialize(iser::IArchive& archive)
 
 // reimplemented (istd::IChangeable)
 
-bool CProductInfo::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+bool CProductInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
@@ -169,7 +169,7 @@ bool CProductInfo::IsEqual(const IChangeable& object) const
 }
 
 
-bool CProductInfo::ResetData(CompatibilityMode mode)
+bool CProductInfo::ResetData(CompatibilityMode /*mode*/)
 {
 	m_productId.clear();
 	m_productName.clear();
