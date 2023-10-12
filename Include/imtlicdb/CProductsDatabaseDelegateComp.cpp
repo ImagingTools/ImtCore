@@ -26,26 +26,51 @@ bool CProductsDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsS
 		for (int i = 0; i < idList.size(); i++){
 			QByteArray key = idList[i];
 
-			if (key == "ProductId"){
-				iprm::TParamsPtr<iprm::IIdParam> idParamPtr(&filterParams, key);
-				if (!idParamPtr.IsValid()){
-					return false;
-				}
-
-				QByteArray value = idParamPtr->GetId();
-
-				filterQuery = QString(R"(("Document"::text ILIKE '%"ProductId": "%1"%'))").arg(qPrintable(value));
+			iprm::TParamsPtr<iprm::IIdParam> idParamPtr(&filterParams, key);
+			if (!idParamPtr.IsValid()){
+				return false;
 			}
-			else if (key == "ProductName"){
-				iprm::TParamsPtr<iprm::IIdParam> nameParamPtr(&filterParams, key);
-				if (!nameParamPtr.IsValid()){
-					return false;
-				}
 
-				QByteArray value = nameParamPtr->GetId();
-
-				filterQuery = QString(R"(("Document"::text ILIKE '%"ProductName": "%1"%'))").arg(qPrintable(value));
+			if (!filterQuery.isEmpty()){
+				filterQuery += " AND ";
 			}
+
+			QByteArray value = idParamPtr->GetId();
+
+			filterQuery += QString(R"(("Document"->>'%1' = '%2'))").arg(qPrintable(key)).arg(qPrintable(value));
+//			if (key == "ProductId"){
+//				iprm::TParamsPtr<iprm::IIdParam> idParamPtr(&filterParams, key);
+//				if (!idParamPtr.IsValid()){
+//					return false;
+//				}
+
+//				QByteArray value = idParamPtr->GetId();
+
+//				filterQuery = QString(R"(("Document"::text ILIKE '%"ProductId": "%1"%'))").arg(qPrintable(value));
+//			}
+//			else if (key == "ProductName"){
+//				iprm::TParamsPtr<iprm::IIdParam> nameParamPtr(&filterParams, key);
+//				if (!nameParamPtr.IsValid()){
+//					return false;
+//				}
+
+//				QByteArray value = nameParamPtr->GetId();
+
+//				filterQuery = QString(R"(("Document"::text ILIKE '%"ProductName": "%1"%'))").arg(qPrintable(value));
+//			}
+//			else{
+
+//			}
+//			else if (key == "CategoryId"){
+//				iprm::TParamsPtr<iprm::IIdParam> nameParamPtr(&filterParams, key);
+//				if (!nameParamPtr.IsValid()){
+//					return false;
+//				}
+
+//				QByteArray value = nameParamPtr->GetId();
+
+//				filterQuery = QString(R"(("Document"->>'Category'))").arg(qPrintable(value));
+//			}
 		}
 	}
 

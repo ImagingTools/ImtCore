@@ -18,10 +18,10 @@ namespace imtlic
 
 // public methods
 
-CProductInstanceInfo::CProductInstanceInfo()
-	:m_customerCollectionPtr(nullptr),
-	  m_productCollectionPtr(nullptr),
-	  m_inUse(false)
+CProductInstanceInfo::CProductInstanceInfo():
+	m_customerCollectionPtr(nullptr),
+	m_productCollectionPtr(nullptr),
+	m_inUse(false)
 {
 }
 
@@ -193,45 +193,45 @@ bool CProductInstanceInfo::Serialize(iser::IArchive& archive)
 
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
-	static iser::CArchiveTag productIdTag("ProductId", "ID of the product", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag productIdTag("ProductId", "ID of the product", iser::CArchiveTag::TT_LEAF);
 	bool retVal = archive.BeginTag(productIdTag);
 	retVal = retVal && archive.Process(m_productId);
 	retVal = retVal && archive.EndTag(productIdTag);
 
 	if (imtCoreVersion >= 7003 || imtCoreVersion == 0){
-		static iser::CArchiveTag serialNumberTag("SerialNumber", "Serial Number of the product", iser::CArchiveTag::TT_LEAF);
+		iser::CArchiveTag serialNumberTag("SerialNumber", "Serial Number of the product", iser::CArchiveTag::TT_LEAF);
 		retVal = retVal && archive.BeginTag(serialNumberTag);
 		retVal = retVal && archive.Process(m_serialNumber);
 		retVal = retVal && archive.EndTag(serialNumberTag);
 	}
 
 	if (imtCoreVersion >= 7386){
-		static iser::CArchiveTag inUseTag("InUse", "In-Use", iser::CArchiveTag::TT_LEAF);
+		iser::CArchiveTag inUseTag("InUse", "In-Use", iser::CArchiveTag::TT_LEAF);
 		retVal = retVal && archive.BeginTag(inUseTag);
 		retVal = retVal && archive.Process(m_inUse);
 		retVal = retVal && archive.EndTag(inUseTag);
 	}
 
 	if (imtCoreVersion >= 7386){
-		static iser::CArchiveTag projectTag("Project", "Project", iser::CArchiveTag::TT_LEAF);
+		iser::CArchiveTag projectTag("Project", "Project", iser::CArchiveTag::TT_LEAF);
 		retVal = retVal && archive.BeginTag(projectTag);
 		retVal = retVal && archive.Process(m_project);
 		retVal = retVal && archive.EndTag(projectTag);
 	}
 
-	static iser::CArchiveTag instanceIdTag("InstanceId", "ID of the product instance", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag instanceIdTag("InstanceId", "ID of the product instance", iser::CArchiveTag::TT_LEAF);
 	retVal = archive.BeginTag(instanceIdTag);
 	retVal = retVal && archive.Process(m_instanceId);
 	retVal = retVal && archive.EndTag(instanceIdTag);
 
-	static iser::CArchiveTag customerIdTag("CustomerId", "ID of the customer", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag customerIdTag("CustomerId", "ID of the customer", iser::CArchiveTag::TT_LEAF);
 	retVal = archive.BeginTag(customerIdTag);
 	retVal = retVal && archive.Process(m_customerId);
 	retVal = retVal && archive.EndTag(customerIdTag);
 
-	static iser::CArchiveTag licensesTag("Licenses", "List of licenses", iser::CArchiveTag::TT_MULTIPLE);
-	static iser::CArchiveTag licenseInstanceTag("LicenseInstance", "License instance", iser::CArchiveTag::TT_GROUP);
-	static iser::CArchiveTag licenseTag("LicenseData", "License data", iser::CArchiveTag::TT_GROUP);
+	iser::CArchiveTag licensesTag("Licenses", "List of licenses", iser::CArchiveTag::TT_MULTIPLE);
+	iser::CArchiveTag licenseInstanceTag("LicenseInstance", "License instance", iser::CArchiveTag::TT_GROUP);
+	iser::CArchiveTag licenseTag("LicenseData", "License data", iser::CArchiveTag::TT_GROUP);
 
 	int licensesCount = m_licenses.count();
 

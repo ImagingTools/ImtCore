@@ -16,8 +16,8 @@ Rectangle {
 
     property int licenseState: model.LicenseState ? model.LicenseState : Qt.Unchecked;
     property string expiration: model.Expiration ? model.Expiration : "";
-    property string licenseId: model.Id ? model.Id : "";
-    property string licenseName: model.Name ? model.Name : "";
+    property string licenseId: model.LicenseId ? model.LicenseId : "";
+    property string licenseName: model.LicenseName ? model.LicenseName : "";
 
     property bool readOnly: false;
 
@@ -73,7 +73,7 @@ Rectangle {
                 wrapMode: Text.WordWrap;
                 elide: Text.ElideRight;
 
-                text: model.Name ? model.Name : "";
+                text: model.LicenseName ? model.LicenseName : "";
             }
         }
 
@@ -98,7 +98,7 @@ Rectangle {
                 wrapMode: Text.WordWrap;
                 elide: Text.ElideRight;
 
-                text: model.Id ? model.Id : "";
+                text: model.LicenseId ? model.LicenseId : "";
             }
         }
 

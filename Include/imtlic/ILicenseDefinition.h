@@ -18,9 +18,27 @@ namespace imtlic
 	Common information about a license.
 	\ingroup LicenseManagement
 */
-class ILicenseInfo: virtual public iser::IObject
+class ILicenseDefinition: virtual public iser::IObject
 {
 public:
+	struct FeatureInfo
+	{
+		QByteArray id;
+		QString name;
+
+		bool operator==(const FeatureInfo& other) const
+		{
+			return (id == other.id) && (name == other.name);
+		}
+
+		bool operator!=(const FeatureInfo& other) const
+		{
+			return !operator==(other);
+		}
+	};
+
+	typedef QVector<FeatureInfo> FeatureInfos;
+
 	/**
 		Get human-readable name of the license.
 	*/
@@ -62,15 +80,35 @@ public:
 	*/
 	virtual void SetProductId(const QByteArray& productId) = 0;
 
+//	/**
+//		Get the list of feature-IDs supported by this license.
+//	*/
+//	virtual QByteArrayList GetFeatures() const = 0;
+
+//	/**
+//		Set the list of feature-IDs supported by this license.
+//	*/
+//	virtual void SetFeatures(QByteArrayList features) = 0;
+
+	/**
+		Get list of licenses the given license depends on.
+	*/
+	virtual QByteArrayList GetDependencies() const = 0;
+
+	/**
+		Set dependencies.
+	*/
+	virtual void SetDependencies(QByteArrayList dependencies) = 0;
+
 	/**
 		Get the list of feature-IDs supported by this license.
 	*/
-	virtual QByteArrayList GetFeatures() const = 0;
+	virtual ILicenseDefinition::FeatureInfos GetFeatureInfos() const = 0;
 
 	/**
 		Set the list of feature-IDs supported by this license.
 	*/
-	virtual void SetFeatures(QByteArrayList features) = 0;
+	virtual void SetFeatureInfos(const ILicenseDefinition::FeatureInfos& featureInfos) = 0;
 };
 
 

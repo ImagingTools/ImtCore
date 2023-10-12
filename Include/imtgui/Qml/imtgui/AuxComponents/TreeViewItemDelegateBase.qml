@@ -13,7 +13,9 @@ TableViewItemDelegateBase {
 
     property bool tristate: true; //prefixRowItem.visible;
 
+    property var rootDelegate: treeDelegateBase.level === 0 ? treeDelegateBase : parentDelegate.rootDelegate;
     property var parentDelegate: null;
+
     property var childrenDelegates: [];
 
     level: treeDelegateBase.parentDelegate == null ? 0 : treeDelegateBase.parentDelegate.level + 1;
@@ -21,39 +23,41 @@ TableViewItemDelegateBase {
     signal parentCheckStateChanged(var delegate);
     signal childrenCheckStateChanged(var delegate);
 
+    property var childModel: model.ChildModel;
+
+    onChildModelChanged: {
+        console.log("Delegate onChildModelChanged", childModel);
+    }
+
     onParentCheckStateChanged: {
-        treeDelegateBase.checkState = delegate.checkState;
+        if (isCheckable){
+            treeDelegateBase.checkState = delegate.checkState;
+        }
 
         for (let childrenDelegate of treeDelegateBase.childrenDelegates){
             childrenDelegate.parentCheckStateChanged(treeDelegateBase);
         }
     }
 
-    onIsOpenedChanged: {
-        console.log("onIsOpenedChanged", isOpened);
-        console.log("parentDelegate", parentDelegate);
-        if (parentDelegate != null){
-            parentDelegate.isOpened = isOpened;
-        }
-    }
-
     onChildrenCheckStateChanged: {
-        let isAllChecked = treeDelegateBase.root.__checkState(treeDelegateBase.childrenDelegates, Qt.Checked);
-        let isAllUnchecked = treeDelegateBase.root.__checkState(treeDelegateBase.childrenDelegates, Qt.Unchecked);
+        if (isCheckable){
+            let isAllChecked = treeDelegateBase.root.__checkState(treeDelegateBase.childrenDelegates, Qt.Checked);
+            let isAllUnchecked = treeDelegateBase.root.__checkState(treeDelegateBase.childrenDelegates, Qt.Unchecked);
 
-        if (isAllChecked){
-            if (treeDelegateBase.checkState != Qt.Checked){
-                treeDelegateBase.checkState = Qt.Checked;
+            if (isAllChecked){
+                if (treeDelegateBase.checkState != Qt.Checked){
+                    treeDelegateBase.checkState = Qt.Checked;
+                }
             }
-        }
-        else if (isAllUnchecked){
-            if (treeDelegateBase.checkState!= Qt.Unchecked){
-                treeDelegateBase.checkState = Qt.Unchecked;
+            else if (isAllUnchecked){
+                if (treeDelegateBase.checkState!= Qt.Unchecked){
+                    treeDelegateBase.checkState = Qt.Unchecked;
+                }
             }
-        }
-        else if (!isAllChecked && !isAllUnchecked){
-            if (treeDelegateBase.checkState != Qt.PartiallyChecked){
-                treeDelegateBase.checkState = Qt.PartiallyChecked;
+            else if (!isAllChecked && !isAllUnchecked){
+                if (treeDelegateBase.checkState != Qt.PartiallyChecked){
+                    treeDelegateBase.checkState = Qt.PartiallyChecked;
+                }
             }
         }
 
@@ -135,7 +139,13 @@ TableViewItemDelegateBase {
             Repeater {
                 id: childModelRepeater;
 
+                model: treeDelegateBase.itemData.ChildModel ? treeDelegateBase.itemData.ChildModel: 0;
+
                 delegate: treeDelegateBase.root ? treeDelegateBase.root.rowDelegate : null;
+
+                onCountChanged: {
+                    treeDelegateBase.hasChild = count > 0;
+                }
 
                 onItemAdded: {
                     item.parentDelegate = treeDelegateBase;
@@ -143,6 +153,8 @@ TableViewItemDelegateBase {
 
                     item.modelIndex.parentIndex = treeDelegateBase.modelIndex;
                     treeDelegateBase.modelIndex.childModel.push(item.modelIndex);
+
+                    item.modelIndex.treeModel = childModelRepeater.model;
                 }
 
                 onItemRemoved: {
@@ -156,24 +168,6 @@ TableViewItemDelegateBase {
                         treeDelegateBase.modelIndex.childModel.splice(index, 1);
                     }
                 }
-            }
-
-            property var childModel: treeDelegateBase.itemData.ChildModel ? model.ChildModel: 0;
-            onChildModelChanged: {
-                if (childrenColumn.childModel){
-                    if (childrenColumn.childModel.GetItemsCount() > 0){
-                        treeDelegateBase.hasChild = true;
-                        childModelRepeater.model = childrenColumn.childModel;
-
-                        return;
-                    }
-                }
-
-                treeDelegateBase.hasChild = false;
-            }
-
-            function dataChanged(t, b, r){
-                console.log("Repeater dataChanged", childrenColumn.childModel.toJSON());
             }
         }
     }

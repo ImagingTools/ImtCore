@@ -30,7 +30,7 @@ public:
 
 	// reimplemented (ILicenseInfoProvider)
 	virtual const imtbase::ICollectionInfo& GetLicenseList() const override;
-	virtual const imtlic::ILicenseInfo* GetLicenseInfo(const QByteArray& licenseId) const override;
+	virtual const imtlic::ILicenseDefinition* GetLicenseInfo(const QByteArray& licenseId) const override;
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_productCollectionCompPtr);

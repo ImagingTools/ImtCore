@@ -58,8 +58,8 @@ protected:
 				QByteArrayList& removedLicenses,
 				QByteArrayList& updatedLicenses) const;
 
-	void GenerateDifferences(const imtlic::ILicenseInfo* currentLicensePtr,
-				const imtlic::ILicenseInfo* newLicensePtr,
+	void GenerateDifferences(const imtlic::ILicenseDefinition* currentLicensePtr,
+				const imtlic::ILicenseDefinition* newLicensePtr,
 				QByteArrayList& addFeatures,
 				QByteArrayList& removedFeatures) const;
 private:

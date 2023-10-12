@@ -13,77 +13,19 @@ DocumentBase {
                 console.log("FeatureViewCommands onCommandActivated", commandId);
                 if (commandId === "New"){
                     let selectedIndex = tableView.selectedIndex;
+                    if (selectedIndex != null){
+                        undoRedoManager.beginChanges();
 
-                    undoRedoManager.beginChanges();
+                        tableView.addChildItem(selectedIndex, {"FeatureId":"", "FeatureName":"Feature Name", "FeatureDescription":"", "Dependencies":"", "Optional":false, "ChildModel":0})
 
-                    if (selectedIndex == null){
-                        let childModel = featureEditor.documentModel.GetData("ChildModel");
-                        if (!childModel){
-                            childModel = featureEditor.documentModel.AddTreeModel("ChildModel");
-                        }
-
-                        let emptyModel = featureEditor.treeItemModelComp.createObject(childModel);
-                        childModel.InsertNewItemWithParameters(0, {"FeatureId":"", "FeatureName":"Feature Name", "FeatureDescription":"", "Dependencies":"", "Optional":false, "ChildModel": emptyModel});
-
-                        tableView.rowModel = featureEditor.documentModel;
+                        undoRedoManager.endChanges();
                     }
-                    else{
-                        let subfeaturesModel = featureEditor.documentModel.GetData("ChildModel");
-                        if (!subfeaturesModel){
-                            subfeaturesModel = featureEditor.documentModel.AddTreeModel("ChildModel");
-                        }
-
-                        console.log("subfeaturesModel1", subfeaturesModel.toJSON());
-
-                        let index = selectedIndex.index;
-
-                        let parentModel = tableView.selectedIndex.getParentModel();
-                        let childModel = selectedIndex.getData("ChildModel");
-
-                        console.log("parentModel", parentModel);
-
-                        console.log("featureEditor.documentModel1", featureEditor.documentModel.toJSON());
-
-
-                        if (!childModel){
-                            if (parentModel){
-                                childModel = parentModel.AddTreeModel("ChildModel", index);
-                            }
-                            else{
-                                childModel = subfeaturesModel.AddTreeModel("ChildModel", index);
-                            }
-                        }
-
-                        console.log("featureEditor.documentModel2", featureEditor.documentModel.toJSON());
-
-                        let emptyModel = featureEditor.treeItemModelComp.createObject(childModel);
-                        childModel.InsertNewItemWithParameters(0, {"FeatureId":"", "FeatureName":"Feature Name", "FeatureDescription":"","Dependencies":"", "Optional":false, "ChildModel": emptyModel});
-
-                        console.log("childModel2", childModel.toJSON());
-                        console.log("featureEditor.documentModel3", featureEditor.documentModel.toJSON());
-                        tableView.rowModel = 0;
-                        tableView.rowModel = featureEditor.documentModel;
-                    }
-
-                    undoRedoManager.endChanges();
                 }
                 else if (commandId === "Remove"){
                     if (tableView.selectedIndex != null){
-
                         undoRedoManager.beginChanges();
 
-                        let index = tableView.selectedIndex.index;
-
-                        let parentModel = tableView.selectedIndex.getParentModel();
-                        if (parentModel){
-                            parentModel.RemoveItem(index);
-                        }
-                        else{
-                            let subfeaturesModel = featureEditor.documentModel.GetData("ChildModel");
-                            if (subfeaturesModel){
-                                subfeaturesModel.RemoveItem(index);
-                            }
-                        }
+                        tableView.removeChildItem(tableView.selectedIndex);
 
                         undoRedoManager.endChanges();
                     }
@@ -333,7 +275,6 @@ DocumentBase {
                 }
 
                 KeyNavigation.tab: featureIdInput;
-
             }
 
             Text {
@@ -444,8 +385,6 @@ DocumentBase {
                         undoRedoManager.beginChanges();
 
                         if (selectedIndex == null){
-                            console.log("featureEditor.documentModel", JSON.stringify(featureEditor.documentModel));
-
                             let childModel = featureEditor.documentModel.GetData("ChildModel");
                             console.log("childModel", childModel);
                             if (!childModel){
@@ -570,16 +509,15 @@ DocumentBase {
             }
 
             onSelectedIndexChanged: {
+                let featureId = "";
                 if (selectedIndex != null){
-                    let featureId = selectedIndex.getData("FeatureId");
+                    featureId = selectedIndex.getData("FeatureId");
                     if (featureId !== ""){
-                        featureDependenciesView.contentVisible = true;
                         updateTreeViewGui();
                     }
                 }
-                else{
-                    featureDependenciesView.contentVisible = false;
-                }
+
+                featureDependenciesView.contentVisible = featureId !== "" && selectedIndex != null;
 
                 let newIsEnabled = selectedIndex != null;
                 let removeIsEnabled = selectedIndex != null && selectedIndex.depth > 0;
@@ -718,66 +656,66 @@ DocumentBase {
             }
 
             rowDelegate: Component {TreeViewItemDelegateBase {
-                id: delegate;
+                    id: delegate;
 
-                root: featureDependenciesView;
+                    root: featureDependenciesView;
 
-                onCheckStateChanged: {
-                    if (featureEditor.blockUpdatingModel){
-                        return;
-                    }
+                    onCheckStateChanged: {
+                        if (featureEditor.blockUpdatingModel){
+                            return;
+                        }
 
-                    if (tableView.selectedIndex != null){
-                        if (!featureDependenciesView.delegateUpdatingBlock){
-                            if (delegate.itemData.FeatureId !== ""){
-                                undoRedoManager.beginChanges();
+                        if (tableView.selectedIndex != null){
+                            if (!featureDependenciesView.delegateUpdatingBlock){
+                                if (delegate.itemData.FeatureId !== ""){
+                                    undoRedoManager.beginChanges();
 
-                                let featureId = delegate.itemData.FeatureId;
-                                let state = delegate.checkState;
+                                    let featureId = delegate.itemData.FeatureId;
+                                    let state = delegate.checkState;
 
-                                console.log("onCheckStateChanged", featureId, state);
+                                    console.log("onCheckStateChanged", featureId, state);
 
 
-                                let selectedId = tableView.selectedIndex.itemData.FeatureId;
-                                let dependencies = tableView.selectedIndex.itemData.Dependencies;
+                                    let selectedId = tableView.selectedIndex.itemData.FeatureId;
+                                    let dependencies = tableView.selectedIndex.itemData.Dependencies;
 
-                                console.log("selectedId", selectedId);
-                                console.log("dependencies1", dependencies);
+                                    console.log("selectedId", selectedId);
+                                    console.log("dependencies1", dependencies);
 
-                                let dependencyList = []
-                                if (dependencies != ""){
-                                    dependencyList = dependencies.split(';')
-                                }
-
-                                if (state == Qt.Checked){
-                                    if (!dependencyList.includes(featureId)){
-                                        dependencyList.push(featureId);
+                                    let dependencyList = []
+                                    if (dependencies != ""){
+                                        dependencyList = dependencies.split(';')
                                     }
-                                }
-                                else{
-                                    let pos = dependencyList.indexOf(featureId);
-                                    if (pos >= 0){
-                                        dependencyList.splice(pos, 1)
+
+                                    if (state == Qt.Checked){
+                                        if (!dependencyList.includes(featureId)){
+                                            dependencyList.push(featureId);
+                                        }
                                     }
+                                    else{
+                                        let pos = dependencyList.indexOf(featureId);
+                                        if (pos >= 0){
+                                            dependencyList.splice(pos, 1)
+                                        }
+                                    }
+
+                                    if (dependencyList.length > 0){
+                                        tableView.selectedIndex.itemData.Dependencies = dependencyList.join(';')
+                                    }
+                                    else{
+                                        tableView.selectedIndex.itemData.Dependencies = "";
+                                    }
+
+                                    console.log("dependencies2", tableView.selectedIndex.itemData.Dependencies);
+
+                                    undoRedoManager.endChanges();
+
+                                    featureEditor.updateTreeViewGui();
                                 }
-
-                                if (dependencyList.length > 0){
-                                    tableView.selectedIndex.itemData.Dependencies = dependencyList.join(';')
-                                }
-                                else{
-                                    tableView.selectedIndex.itemData.Dependencies = "";
-                                }
-
-                                console.log("dependencies2", tableView.selectedIndex.itemData.Dependencies);
-
-                                undoRedoManager.endChanges();
-
-                                featureEditor.updateTreeViewGui();
                             }
                         }
                     }
                 }
-            }
             }
 
             function findParentFeatureDependencies(featureId, retVal){

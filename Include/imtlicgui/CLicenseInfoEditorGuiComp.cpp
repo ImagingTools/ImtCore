@@ -18,7 +18,7 @@ namespace imtlicgui
 
 void CLicenseInfoEditorGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	imtlic::ILicenseInfo* licenseInfoPtr = GetObservedObject();
+	imtlic::ILicenseDefinition* licenseInfoPtr = GetObservedObject();
 	Q_ASSERT(licenseInfoPtr != nullptr);
 
 	IdEdit->setText(licenseInfoPtr->GetLicenseId());
@@ -28,7 +28,7 @@ void CLicenseInfoEditorGuiComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 
 void CLicenseInfoEditorGuiComp::UpdateModel() const
 {
-	imtlic::ILicenseInfo* licenseInfoPtr = GetObservedObject();
+	imtlic::ILicenseDefinition* licenseInfoPtr = GetObservedObject();
 	Q_ASSERT(licenseInfoPtr != nullptr);
 
 	istd::CChangeGroup changeGroup(licenseInfoPtr);

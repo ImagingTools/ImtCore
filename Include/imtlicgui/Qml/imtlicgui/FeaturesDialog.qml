@@ -5,13 +5,30 @@ import imtgui 1.0
 Dialog {
     id: featuresDialog;
 
-    width: 300;
+    width: 500;
 
     signal featureAdded(var modelIndex);
 
     property var selectedIndexes: [];
 
     property TreeItemModel featuresModel: TreeItemModel {}
+
+    property TreeItemModel tableModel: TreeItemModel {}
+
+    property var excludeFeatureIds: []
+
+    onFeaturesModelChanged: {
+        for (let i = 0; i < featuresModel.GetItemsCount(); i++){
+            let featureId = featuresModel.GetData("Id", i);
+            if (!excludeFeatureIds.includes(featureId)){
+                let index = tableModel.InsertNewItem();
+
+                tableModel.CopyItemDataFromModel(index, featuresModel, i)
+            }
+        }
+
+        updateGui();
+    }
 
     Component.onCompleted: {
         featuresDialog.buttons.addButton({"Id": "Add", "Name": "Add", "Enabled": false});
@@ -41,7 +58,7 @@ Dialog {
     }
 
     function updateGui(){
-        featuresDialog.contentItem.tableView.elements = featuresDialog.featuresModel;
+        featuresDialog.contentItem.tableView.elements = featuresDialog.tableModel;
     }
 
     contentComp: Component{ Item {
@@ -54,7 +71,7 @@ Dialog {
         property TreeItemModel headersModel: TreeItemModel {
             Component.onCompleted: {
                 let index = dialogBody.headersModel.InsertNewItem();
-                dialogBody.headersModel.SetData("Id", "Name", index);
+                dialogBody.headersModel.SetData("Id", "FeatureName", index);
                 dialogBody.headersModel.SetData("Name", "Feature Name", index);
 
                 tableTreeView.headers = dialogBody.headersModel;

@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtlic/ILicenseInfo.h>
+#include <imtlic/ILicenseDefinition.h>
 
 
 namespace imtlicgql
@@ -31,10 +31,10 @@ bool CLicenseCollectionControllerComp::SetupGqlItem(
 	if (!informationIds.isEmpty() && m_objectCollectionCompPtr.IsValid()){
 		QByteArray collectionId = objectCollectionIterator->GetObjectId();
 
-		imtlic::ILicenseInfo* licenseInfoPtr = nullptr;
+		imtlic::ILicenseDefinition* licenseInfoPtr = nullptr;
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		if (objectCollectionIterator->GetObjectData(dataPtr)){
-			licenseInfoPtr = dynamic_cast<imtlic::ILicenseInfo*>(dataPtr.GetPtr());
+			licenseInfoPtr = dynamic_cast<imtlic::ILicenseDefinition*>(dataPtr.GetPtr());
 		}
 
 		if (licenseInfoPtr == nullptr){
@@ -66,6 +66,12 @@ bool CLicenseCollectionControllerComp::SetupGqlItem(
 			}
 			else if(informationId == "ProductId"){
 				elementInformation = objectCollectionIterator->GetElementInfo("ProductId");
+			}
+			else if(informationId == "ProductUuid"){
+				elementInformation = licenseInfoPtr->GetProductId();
+			}
+			else if(informationId == "ParentLicenses"){
+				elementInformation = licenseInfoPtr->GetDependencies().join(';');
 			}
 
 			if (elementInformation.isNull()){

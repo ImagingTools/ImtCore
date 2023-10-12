@@ -5,11 +5,13 @@ QtObject {
 
     property var itemData;
 
-//    property var delegateItem: null; //Reference on the delegate from model.
+    property var delegateItem: null; //Reference on the delegate from model.
 
     property ModelIndex parentIndex: null; //Reference on the parent index model.
 
     property var childModel: []; //Reference on the all children index models.
+
+    property var treeModel: null; //Reference on the tree item model
 
     property int index: -1;
 
@@ -25,6 +27,10 @@ QtObject {
 
     function setData(key, value){
         root.itemData[key] = value;
+    }
+
+    function getModel(){
+        return treeModel;
     }
 
     function getParentModel(){

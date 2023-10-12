@@ -6,7 +6,6 @@
 #include <icomp/TMakeComponentWrap.h>
 
 // ImtCore includes
-#include <imtlic/CFeatureInfoComp.h>
 #include <imtlic/CLicenseInfoManager.h>
 #include <imtlic/CLicenseBasedRightsProviderComp.h>
 #include <imtlic/CProductLicensingInfo.h>
@@ -32,7 +31,6 @@ namespace ImtLicensePck
 {
 
 
-typedef icomp::TModelCompWrap<imtlic::CFeatureInfoComp> FeatureInfo;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
 						imtlic::CLicenseInfoManager,
@@ -71,10 +69,35 @@ typedef icomp::TModelCompWrap<
 						iser::ISerializable>> ProductInfo;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
-						imtlic::CLicenseInfo,
-						imtlic::ILicenseInfo,
+						imtlic::CIdentifiableProductInfo,
+						imtbase::IIdentifiable,
+						imtlic::IProductInfo,
+						iprm::INameParam,
+						iser::ISerializable>> IdentifiableProductInfo;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap<
+						imtlic::CLicenseDefinition,
+						imtlic::ILicenseDefinition,
 						iser::IObject,
 						iser::ISerializable>> LicenseInfo;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap<
+						imtlic::CIdentifiableLicenseDefinition,
+						imtbase::IIdentifiable,
+						imtlic::ILicenseDefinition,
+						iser::IObject,
+						iser::ISerializable>> IdentifiableLicenseInfo;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap<
+						imtlic::CFeatureInfo,
+						imtlic::IFeatureInfo,
+						iser::ISerializable>> FeatureInfo;
+typedef icomp::TModelCompWrap<
+			icomp::TMakeComponentWrap<
+						imtlic::CIdentifiableFeatureInfo,
+						imtbase::IIdentifiable,
+						imtlic::IFeatureInfo,
+						iser::ISerializable>> IdentifiableFeatureInfo;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
 						imtlic::CFeatureContainer,

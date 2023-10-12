@@ -5,9 +5,11 @@
 #include <idoc/IDocumentMetaInfo.h>
 #include <istd/TDelPtr.h>
 #include <iprm/CTextParam.h>
+#include <iprm/CIdParam.h>
+#include <iprm/CParamsSet.h>
 
 // ImtCore includes
-#include <imtlic/CLicenseInfo.h>
+#include <imtlic/CLicenseDefinition.h>
 #include <imtlic/IProductInfo.h>
 
 
@@ -74,6 +76,38 @@ bool CProductCollectionControllerComp::SetupGqlItem(
 					QByteArrayList featureList = productLicensingInfoPtr->GetFeatureIds();
 
 					elementInformation = featureList.join(';');
+				}
+				else if(informationId == "Licenses"){
+					if (m_licenseCollectionCompPtr.IsValid()){
+						imtbase::CTreeItemModel* licenseModelPtr = model.AddTreeModel("Licenses", itemIndex);
+
+						iprm::CIdParam idParam;
+						idParam.SetId(collectionId);
+
+						iprm::CParamsSet paramsSet1;
+						paramsSet1.SetEditableParameter("ProductId", &idParam);
+
+						iprm::CParamsSet filterParam;
+						filterParam.SetEditableParameter("ObjectFilter", &paramsSet1);
+
+						imtbase::ICollectionInfo::Ids licenseCollectionIds = m_licenseCollectionCompPtr->GetElementIds(0, -1, &filterParam);
+
+						for (const imtbase::ICollectionInfo::Id& licenseCollectionId : licenseCollectionIds){
+							imtbase::IObjectCollection::DataPtr dataPtr;
+							if (m_licenseCollectionCompPtr->GetObjectData(licenseCollectionId, dataPtr)){
+								const imtlic::CLicenseDefinition* licenseInfoPtr = dynamic_cast<const imtlic::CLicenseDefinition*>(dataPtr.GetPtr());
+								if (licenseInfoPtr != nullptr){
+									int index = licenseModelPtr->InsertNewItem();
+
+									licenseModelPtr->SetData("Id", licenseCollectionId, index);
+									licenseModelPtr->SetData("LicenseId", licenseInfoPtr->GetLicenseId(), index);
+									licenseModelPtr->SetData("LicenseName", licenseInfoPtr->GetLicenseName(), index);
+								}
+							}
+						}
+					}
+
+					continue;
 				}
 
 				if (elementInformation.isNull()){
@@ -148,8 +182,8 @@ void CProductCollectionControllerComp::SetObjectFilter(const imtgql::CGqlRequest
 	if (objectFilterModel.ContainsKey("CategoryId")){
 		QByteArray filterValue = objectFilterModel.GetData("CategoryId").toByteArray();
 		if (!filterValue.isEmpty()){
-			istd::TDelPtr<iprm::CTextParam> textParamPtr(new iprm::CTextParam());
-			textParamPtr->SetText(filterValue);
+			istd::TDelPtr<iprm::CIdParam> textParamPtr(new iprm::CIdParam());
+			textParamPtr->SetId(filterValue);
 			filterParams.SetEditableParameter("CategoryId", textParamPtr.PopPtr());
 		}
 	}

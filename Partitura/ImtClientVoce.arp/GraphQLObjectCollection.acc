@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5118" Description="ACF"/>
+            <Version Id="0" Number="5122" Description="ACF"/>
             <Version Id="1" Number="2196" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Remote object/document collection that can be accessed by GraphQL protocol</Description>
@@ -52,7 +52,7 @@
         <Element Id="GqlObjectCollectionDelegate" PackageId="ImtClientGqlPck" ComponentId="GqlObjectCollectionDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
                         <Data IsEnabled="true" Value="ApiClient"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">

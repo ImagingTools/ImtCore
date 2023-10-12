@@ -12,7 +12,7 @@
 // ImtCore includes
 #include <imtauth/IAccountInfo.h>
 #include <imtlic/IProductLicensingInfo.h>
-#include <imtlic/ILicenseInfo.h>
+#include <imtlic/ILicenseDefinition.h>
 #include <imtlic/ILicenseInstance.h>
 
 
@@ -334,7 +334,7 @@ void CProductInstanceInfoEditorComp::UpdateLicenseInstancesEdit()
 				const imtbase::ICollectionInfo& licenseList = licensingInfoPtr->GetLicenseList();
 				const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = licenseList.GetElementIds();
 				for (const QByteArray& collectionId : licenseCollectionIds){
-					const imtlic::ILicenseInfo* licenseInfoPtr = licensingInfoPtr->GetLicenseInfo(collectionId);
+					const imtlic::ILicenseDefinition* licenseInfoPtr = licensingInfoPtr->GetLicenseInfo(collectionId);
 					if (licenseInfoPtr != nullptr){
 						QString licenseName = licenseInfoPtr->GetLicenseName();
 						QByteArray licenseId = licenseInfoPtr->GetLicenseId();

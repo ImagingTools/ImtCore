@@ -8,14 +8,15 @@ DocumentBase {
     id: root;
 
     property TreeItemModel allFeaturesModel: TreeItemModel {}
-
     property TreeItemModel featuresModel: TreeItemModel {}
+    property TreeItemModel licensesModel: TreeItemModel {}
 
     Component.onCompleted: {
         productCollection.updateModel();
+        licenseCollection.updateModel();
     }
 
-    property bool allReady: modelIsReady && productCollection.completed;
+    property bool allReady: modelIsReady && productCollection.completed && licenseCollection.completed;
 
     onAllReadyChanged: {
         if (allReady){
@@ -61,6 +62,10 @@ DocumentBase {
             root.documentModel.SetData("Features", "");
         }
 
+        if (!root.documentModel.ContainsKey("ParentLicenses")){
+            root.documentModel.SetData("ParentLicenses", "");
+        }
+
         undoRedoManager.endChanges();
     }
 
@@ -93,6 +98,56 @@ DocumentBase {
         }
 
         updateFeaturesGui();
+        updateLicensesGui();
+
+        root.blockUpdatingModel = false;
+    }
+
+    function updateLicensesGui(){
+        console.log("updateLicensesGui");
+        root.blockUpdatingModel = true;
+
+        root.licensesModel.Clear();
+
+        if (productsCB.currentIndex >= 0){
+            let productId = productsCB.model.GetData("Id", productsCB.currentIndex);
+
+            for (let i = 0; i < licenseCollection.collectionModel.GetItemsCount(); i++){
+                let id = licenseCollection.collectionModel.GetData("Id", i)
+                let licenses = licenseCollection.collectionModel.GetData("ParentLicenses", i)
+
+                if (id === root.itemId || licenses.split(';').includes(root.itemId)){
+                    continue;
+                }
+
+                let productUuid = licenseCollection.collectionModel.GetData("ProductUuid", i)
+                if (productUuid === productId){
+                    let index = root.licensesModel.InsertNewItem();
+
+                    root.licensesModel.CopyItemDataFromModel(index, licenseCollection.collectionModel, i);
+                }
+            }
+        }
+
+        console.log("root.licensesModel", root.licensesModel.toJSON());
+
+        licensesTable.elements = root.licensesModel;
+
+        if (root.documentModel.ContainsKey("ParentLicenses")){
+            let licenses = root.documentModel.GetData("ParentLicenses");
+            let licenseIds = licenses.split(';');
+
+            licensesTable.uncheckAll();
+
+            if (licensesTable.elements){
+                for (let i = 0; i < licensesTable.elements.GetItemsCount(); i++){
+                    let id = licensesTable.elements.GetData("Id", i);
+                    if (licenseIds.includes(id)){
+                        licensesTable.checkItem(i);
+                    }
+                }
+            }
+        }
 
         root.blockUpdatingModel = false;
     }
@@ -150,6 +205,14 @@ DocumentBase {
                 productsCB.model = productCollection.collectionModel;
             }
         }
+    }
+
+    CollectionDataProvider {
+        id: licenseCollection;
+
+        commandId: "Licenses";
+
+        fields: ["Id", "ProductId", "LicenseId", "LicenseName", "ProductUuid", "ParentLicenses"];
     }
 
     Rectangle {
@@ -280,6 +343,7 @@ DocumentBase {
                     root.documentModel.SetData("Features", "");
 
                     root.updateFeaturesGui();
+                    root.updateLicensesGui();
 
                     undoRedoManager.makeChanges();
                 }
@@ -293,12 +357,75 @@ DocumentBase {
 
             text: qsTr("Features");
         }
+    }
+
+    AuxTable {
+        id: featuresTable;
+
+        anchors.top: column.bottom;
+        anchors.topMargin: column.spacing;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 10;
+
+        width: column.width;
+        height: 300;
+
+        checkable: true;
+
+        radius: 0;
+
+        onCheckedItemsChanged: {
+            if (root.blockUpdatingModel){
+                return;
+            }
+
+            let indexes = featuresTable.getCheckedItems();
+            let features = root.documentModel.GetData("Features");
+            let featuresIds = [];
+            for (let index of indexes){
+                let featureId = featuresTable.elements.GetData("Id", index);
+                featuresIds.push(featureId);
+            }
+
+            let newFeatures = featuresIds.join(';');
+            if (features !== newFeatures){
+                root.documentModel.SetData("Features", featuresIds.join(';'));
+
+                undoRedoManager.makeChanges();
+            }
+        }
+    }
+
+    Item {
+        id: dependenciesBlock;
+
+        width: 300;
+
+        anchors.top: parent.top;
+        anchors.left: column.right;
+        anchors.leftMargin: 10;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 10;
+
+        Text {
+            id: dependenciesTitle;
+
+            color: Style.textColor;
+            font.family: Style.fontFamilyBold;
+            font.pixelSize: Style.fontSize_common;
+
+            text: qsTr("Dependencies");
+        }
 
         AuxTable {
-            id: featuresTable;
+            id: licensesTable;
+
+            anchors.top: dependenciesTitle.bottom;
+            anchors.topMargin: 7;
+            anchors.bottom: parent.bottom;
 
             width: parent.width;
-            height: 300;
+//            height: parent.height - 50;
 
             checkable: true;
 
@@ -309,17 +436,17 @@ DocumentBase {
                     return;
                 }
 
-                let indexes = featuresTable.getCheckedItems();
-                let features = root.documentModel.GetData("Features");
-                let featuresIds = [];
+                let indexes = licensesTable.getCheckedItems();
+                let licenses = root.documentModel.GetData("ParentLicenses");
+                let licenseIds = [];
                 for (let index of indexes){
-                    let featureId = featuresTable.elements.GetData("Id", index);
-                    featuresIds.push(featureId);
+                    let id = licensesTable.elements.GetData("Id", index);
+                    licenseIds.push(id);
                 }
 
-                let newFeatures = featuresIds.join(';');
-                if (features !== newFeatures){
-                    root.documentModel.SetData("Features", featuresIds.join(';'));
+                let newLicenses = licenseIds.join(';');
+                if (licenses !== newLicenses){
+                    root.documentModel.SetData("ParentLicenses", licenseIds.join(';'));
 
                     undoRedoManager.makeChanges();
                 }
@@ -333,6 +460,30 @@ DocumentBase {
         Component.onCompleted: {
             root.updateHeaders();
         }
+    }
+
+    TreeItemModel {
+        id: licensesHeaders;
+
+        Component.onCompleted: {
+            root.updateLicensesHeaders();
+        }
+    }
+
+    function updateLicensesHeaders(){
+        licensesHeaders.Clear();
+
+        let index = licensesHeaders.InsertNewItem();
+
+        licensesHeaders.SetData("Id", "LicenseName", index);
+        licensesHeaders.SetData("Name", qsTr("License Name"), index);
+
+        index = licensesHeaders.InsertNewItem();
+
+        licensesHeaders.SetData("Id", "LicenseId", index);
+        licensesHeaders.SetData("Name", qsTr("License-ID"), index);
+
+        licensesTable.headers = licensesHeaders;
     }
 
     function updateHeaders(){

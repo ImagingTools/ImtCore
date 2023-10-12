@@ -9,7 +9,7 @@
 
 // ImtCore includes
 #include <imtlic/IProductInstanceInfo.h>
-#include <imtlic/CLicenseInfo.h>
+#include <imtlic/CLicenseDefinition.h>
 #include <imtlic/IProductInfo.h>
 #include <imtlic/IProductLicensingInfo.h>
 #include <imtbase/ICollectionInfo.h>

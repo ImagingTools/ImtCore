@@ -3,6 +3,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
+#include <imtbase/TIdentifiableWrap.h>
 #include <imtlic/IFeatureInfo.h>
 
 
@@ -58,6 +59,9 @@ protected:
 	FeatureInfoList m_subFeatures;
 	const IFeatureInfo* m_parentFeaturePtr;
 };
+
+
+typedef imtbase::TIdentifiableWrap<CFeatureInfo> CIdentifiableFeatureInfo;
 
 
 } // namespace imtlic

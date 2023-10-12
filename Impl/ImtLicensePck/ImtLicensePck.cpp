@@ -20,9 +20,19 @@ I_EXPORT_COMPONENT(
 			"License Feature Information");
 
 I_EXPORT_COMPONENT(
+			IdentifiableFeatureInfo,
+			"Identifiable Feature information",
+			"Identifiable License Feature Information");
+
+I_EXPORT_COMPONENT(
 			LicenseInfo,
 			"Single license information",
 			"License Information");
+
+I_EXPORT_COMPONENT(
+			IdentifiableLicenseInfo,
+			"Identifiable Single license information",
+			"Identifiable License Information");
 
 I_EXPORT_COMPONENT(
 			LicenseInfoManager,
@@ -93,6 +103,11 @@ I_EXPORT_COMPONENT(
 			ProductInfo,
 			"Product info",
 			"Product License Feature");
+
+I_EXPORT_COMPONENT(
+			IdentifiableProductInfo,
+			"Identifiable Product info",
+			"Identifiable Product License Feature");
 
 I_EXPORT_COMPONENT(
 			FeatureContainer,

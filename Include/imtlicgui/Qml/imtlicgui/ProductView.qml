@@ -164,10 +164,17 @@ DocumentBase {
         let featureIds = features.split(';')
         console.log("featureIds", featureIds);
 
+        tableView.selectedOptionalFeatures = [];
+
         for (let featureId of featureIds){
+            if (featureId.includes('/')){
+                tableView.selectedOptionalFeatures.push(featureId);
+
+                continue;
+            }
+
             for (let i = 0; i < productViewContainer.allFeaturesModel.GetItemsCount(); i++){
                 let id = productViewContainer.allFeaturesModel.GetData("Id", i);
-                console.log("id", id);
 
                 if (featureId === id){
                     let index = productViewContainer.productFeaturesViewModel.InsertNewItem();
@@ -322,37 +329,83 @@ DocumentBase {
 
         readOnly: false;
 
+        tristate: true;
+
+        property var selectedOptionalFeatures: [];
+
         rowDelegate: Component {
             TreeViewItemDelegateBase {
                 id: delegate;
 
                 root: tableView;
 
-                AuxButton {
-                  //  anchors.verticalCenter: delegate.rowBodyItem.verticalCenter;
-                    anchors.right: parent.right;
-                    anchors.rightMargin: 10;
+                isCheckable: model.Optional ? model.Optional : false;
 
-                    width: 18;
-                    height: 25;
+                onRootDelegateChanged: {
+                    if (rootDelegate !== null){
+                        let featureId = model.FeatureId;
+                        let rootFeatureUuid = rootDelegate.itemData.Id;
 
-                    iconSource: "../../../" + Style.getIconPath("Icons/Delete", Icon.State.On, Icon.Mode.Normal);
+                        let id = rootFeatureUuid + "/" + featureId;
 
-                    visible: delegate.modelIndex == tableView.selectedIndex && delegate.level === 0;
+                        if (tableView.selectedOptionalFeatures.includes(id)){
+                            delegate.checkState = Qt.Checked;
+                        }
+                    }
+                }
 
-                    iconWidth: 15;
-                    iconHeight: iconWidth;
+//                AuxButton {
+//                    anchors.right: parent.right;
+//                    anchors.rightMargin: 10;
 
-                    onClicked: {
-                        let selectedIndex = tableView.selectedIndex;
-                        if (selectedIndex != null){
-                            let index = selectedIndex.index;
+//                    width: 18;
+//                    height: 25;
 
-                            let featureId = tableView.rowModel.GetData("Id", index);
+//                    iconSource: "../../../" + Style.getIconPath("Icons/Delete", Icon.State.On, Icon.Mode.Normal);
 
-                            productViewContainer.removeFeature(featureId);
+//                    visible: delegate.modelIndex == tableView.selectedIndex && delegate.level === 0;
 
-                            productViewContainer.updateFeaturesGui();
+//                    iconWidth: 15;
+//                    iconHeight: iconWidth;
+
+//                    onClicked: {
+//                        let selectedIndex = tableView.selectedIndex;
+//                        if (selectedIndex != null){
+//                            let index = selectedIndex.index;
+
+//                            let featureId = tableView.rowModel.GetData("Id", index);
+
+//                            productViewContainer.removeFeature(featureId);
+
+//                            productViewContainer.updateFeaturesGui();
+//                        }
+//                    }
+//                }
+
+                onCheckStateChanged: {
+                    console.log("onCheckStateChanged", checkState);
+
+                    let featureId = model.FeatureId;
+                    let rootFeatureUuid = rootDelegate.itemData.Id;
+
+                    let id = rootFeatureUuid + "/" + featureId;
+
+                    let features = productViewContainer.documentModel.GetData("Features");
+
+                    let featureIds = []
+                    if (features !== ""){
+                        featureIds = features.split(';')
+                    }
+
+                    if (checkState == Qt.Checked){
+                        if (!featureIds.includes(id)){
+                            productViewContainer.addFeature(id);
+                        }
+
+                    }
+                    else if (checkState == Qt.Unchecked){
+                        if (featureIds.includes(id)){
+                            productViewContainer.removeFeature(id);
                         }
                     }
                 }
@@ -365,7 +418,9 @@ DocumentBase {
         x: productViewContainer.width - 250;
 
         height: parent.height;
-        width: 20;
+        width: 0;
+
+        visible: false;
 
         onXChanged: {
             if (!productViewContainer.visible){
@@ -420,7 +475,10 @@ DocumentBase {
         anchors.top: headerPanel.bottom;
         anchors.bottom: parent.bottom;
 
-        width: productViewContainer.width > 0 ? productViewContainer.width - tableView.width : 250;
+        width: 0;
+
+        visible: false;
+//        width: productViewContainer.width > 0 ? productViewContainer.width - tableView.width : 250;
 
         AuxTable {
             id: availableFeaturesTable;

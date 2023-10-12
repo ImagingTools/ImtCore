@@ -15,6 +15,7 @@ public:
 	typedef imtgql::CObjectCollectionControllerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CProductCollectionControllerComp);
+		I_ASSIGN(m_licenseCollectionCompPtr, "LicenseCollection", "License collection", true, "LicenseCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -30,6 +31,8 @@ protected:
 								 const imtbase::CTreeItemModel& objectFilterModel,
 								 iprm::CParamsSet& filterParams) const override;
 
+protected:
+	I_REF(imtbase::IObjectCollection, m_licenseCollectionCompPtr);
 };
 
 

@@ -2,6 +2,7 @@
 
 
 // ImtCore includes
+#include <imtbase/TIdentifiableWrap.h>
 #include <imtlic/IProductInfo.h>
 
 
@@ -45,6 +46,9 @@ protected:
 
 	IFeatureInfoProvider* m_featureInfoProviderPtr;
 };
+
+
+typedef imtbase::TIdentifiableWrap<CProductInfo> CIdentifiableProductInfo;
 
 
 } // namespace imtlic

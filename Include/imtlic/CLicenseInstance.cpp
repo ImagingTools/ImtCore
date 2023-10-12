@@ -8,6 +8,9 @@
 #include <iser/CArchiveTag.h>
 #include <iser/CPrimitiveTypesSerializer.h>
 
+// ImtCore includes
+#include <imtbase/imtbase.h>
+
 
 namespace imtlic
 {
@@ -15,7 +18,7 @@ namespace imtlic
 
 // public methods
 
-QByteArray CLicenseInstance::GetTypeId()
+QByteArray CLicenseInstance::GetTypeId() const
 {
 	return "LicenseInstance";
 }
@@ -55,7 +58,7 @@ bool CLicenseInstance::Serialize(iser::IArchive& archive)
 
 	bool retVal = BaseClass::Serialize(archive);
 
-	static iser::CArchiveTag expirationTimeTag("ExpirationTime", "Expired time stamp", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag expirationTimeTag("ExpirationTime", "Expired time stamp", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(expirationTimeTag);
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeDateTime(archive, m_expirationTime);
 	retVal = retVal && archive.EndTag(expirationTimeTag);
@@ -68,7 +71,7 @@ bool CLicenseInstance::Serialize(iser::IArchive& archive)
 
 bool CLicenseInstance::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
-	const imtlic::ILicenseInstance* sourcePtr = dynamic_cast<const imtlic::ILicenseInstance*>(&object);
+	const imtlic::CLicenseInstance* sourcePtr = dynamic_cast<const imtlic::CLicenseInstance*>(&object);
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
@@ -76,18 +79,6 @@ bool CLicenseInstance::CopyFrom(const IChangeable& object, CompatibilityMode /*m
 			m_expirationTime = sourcePtr->GetExpiration();
 
 			return true;
-		}
-	}
-	else{
-		const imtlic::ILicenseInfo* interfacePtr = dynamic_cast<const imtlic::ILicenseInfo*>(&object);
-		if (interfacePtr != nullptr){
-			istd::CChangeNotifier changeNotifier(this);
-
-			if (BaseClass::CopyFrom(object)){
-				m_expirationTime = QDateTime();
-
-				return true;
-			}
 		}
 	}
 
@@ -116,7 +107,7 @@ bool CLicenseInstance::ResetData(CompatibilityMode mode)
 		return true;
 	}
 
-	 return false;
+	return false;
 }
 
 

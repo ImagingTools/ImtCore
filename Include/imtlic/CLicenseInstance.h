@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtlic/ILicenseInstance.h>
-#include <imtlic/CLicenseInfo.h>
+#include <imtlic/CLicenseDefinition.h>
 
 
 namespace imtlic
@@ -12,15 +12,15 @@ namespace imtlic
 
 /**
 	Common implementation of the information about a single license.
-	\sa ILicenseInfo
+	\sa ILicenseDefinition
 	\ingroup LicenseManagement
 */
-class CLicenseInstance: virtual public imtlic::ILicenseInstance, public CLicenseInfo
+class CLicenseInstance: virtual public imtlic::ILicenseInstance, public CLicenseDefinition
 {
 public:
-	typedef CLicenseInfo BaseClass;
+	typedef CLicenseDefinition BaseClass;
 
-	static QByteArray GetTypeId();
+	QByteArray GetTypeId() const;
 
 	// reimplemented (imtlic::ILicenseInstance)
 	virtual QDateTime GetExpiration() const override;

@@ -36,6 +36,9 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 	}
 
 	objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+	if (objectId.isEmpty()){
+		objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	}
 
 	QByteArray jsonItemData = inputParamPtr->GetFieldArgumentValue("Item").toByteArray();
 	if (jsonItemData.isEmpty()){
@@ -53,12 +56,14 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 		return nullptr;
 	}
 
-	istd::TDelPtr<imtlic::CProductInfo> productInfoPtr;
-	productInfoPtr.SetPtr(new imtlic::CProductInfo);
+	istd::TDelPtr<imtlic::CIdentifiableProductInfo> productInfoPtr;
+	productInfoPtr.SetPtr(new imtlic::CIdentifiableProductInfo);
+
+	productInfoPtr->SetObjectUuid(objectId);
 
 	QByteArray productId;
 	if (productModel.ContainsKey("ProductId")){
-		productId = productModel.GetData("ProductId").toByteArray();
+		productId = productModel.GetData("ProductId").toByteArray().trimmed();
 	}
 
 	if (productId.isEmpty()){
@@ -90,7 +95,7 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 	productInfoPtr->SetProductId(productId);
 
 	if (productModel.ContainsKey("ProductName")){
-		name = productModel.GetData("ProductName").toString();
+		name = productModel.GetData("ProductName").toString().trimmed();
 	}
 
 	if (name.isEmpty()){
@@ -166,7 +171,7 @@ imtbase::CTreeItemModel* CProductControllerComp::GetObject(const imtgql::CGqlReq
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		const imtlic::CProductInfo* productInfoPtr = dynamic_cast<const imtlic::CProductInfo*>(dataPtr.GetPtr());
+		const imtlic::IProductInfo* productInfoPtr = dynamic_cast<const imtlic::IProductInfo*>(dataPtr.GetPtr());
 		if (productInfoPtr != nullptr){
 			istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 			imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");

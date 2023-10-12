@@ -4,7 +4,7 @@
 // ImtCore includes
 #include <imtbase/CCollectionInfo.h>
 #include <imtlic/IProductLicensingInfo.h>
-#include <imtlic/ILicenseInfo.h>
+#include <imtlic/ILicenseDefinition.h>
 
 
 namespace imtlic
@@ -21,7 +21,7 @@ const imtbase::ICollectionInfo& CLicenseInfoProviderComp::GetLicenseList() const
 }
 
 
-const imtlic::ILicenseInfo* CLicenseInfoProviderComp::GetLicenseInfo(const QByteArray& licenseId) const
+const imtlic::ILicenseDefinition* CLicenseInfoProviderComp::GetLicenseInfo(const QByteArray& licenseId) const
 {
 	imtbase::ICollectionInfo::Ids productIds = m_productCollectionCompPtr->GetElementIds();
 	for (const imtbase::ICollectionInfo::Id& productId : productIds){
@@ -32,9 +32,9 @@ const imtlic::ILicenseInfo* CLicenseInfoProviderComp::GetLicenseInfo(const QByte
 				const imtbase::ICollectionInfo& licenseList = productPtr->GetLicenseList();
 				const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = licenseList.GetElementIds();
 
-				const imtlic::ILicenseInfo* licenseInfoPtr = productPtr->GetLicenseInfo(licenseId);
+				const imtlic::ILicenseDefinition* licenseInfoPtr = productPtr->GetLicenseInfo(licenseId);
 				if (licenseInfoPtr != nullptr){
-					return dynamic_cast<const imtlic::ILicenseInfo*>(licenseInfoPtr->CloneMe());
+					return dynamic_cast<const imtlic::ILicenseDefinition*>(licenseInfoPtr->CloneMe());
 				}
 			}
 		}

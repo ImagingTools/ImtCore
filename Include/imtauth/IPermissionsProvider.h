@@ -6,7 +6,7 @@
 
 // ImtCore includes
 #include <imtlic/CFeatureContainer.h>
-#include <imtlic/ILicenseInfo.h>
+#include <imtlic/ILicenseDefinition.h>
 
 
 namespace imtauth

@@ -6,7 +6,7 @@
 
 // ImtCore includes
 #include <imtbase/ICollectionInfo.h>
-#include <imtlic/ILicenseInfo.h>
+#include <imtlic/ILicenseDefinition.h>
 #include <imtlic/IProductLicensingInfo.h>
 #include <imtlic/IProductLicensingInfoProvider.h>
 
@@ -44,7 +44,7 @@ bool CProductLicensingInfoMetaInfoCreatorComp::CreateMetaInfo(
 
 	imtbase::ICollectionInfo::Ids ids = productLicensingInfoPtr->GetLicenseList().GetElementIds();
 	for (imtbase::ICollectionInfo::Id id : ids){
-		const imtlic::ILicenseInfo* licenseInfoPtr = productLicensingInfoPtr->GetLicenseInfo(id);
+		const imtlic::ILicenseDefinition* licenseInfoPtr = productLicensingInfoPtr->GetLicenseInfo(id);
 		retVal += licenseInfoPtr->GetLicenseName() + " (" + licenseInfoPtr->GetLicenseId() + ")" + "\n";
 	}
 

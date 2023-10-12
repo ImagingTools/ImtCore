@@ -8,7 +8,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtlic/IFeatureInfoProvider.h>
-#include <imtlic/ILicenseInfo.h>
+#include <imtlic/ILicenseDefinition.h>
 #include <GeneratedFiles/imtlicgui/ui_CLicenseInfoEditorGuiComp.h>
 
 
@@ -22,13 +22,13 @@ namespace imtlicgui
 */
 class CLicenseInfoEditorGuiComp:
 			public iqtgui::TDesignerGuiObserverCompBase<
-						Ui::CLicenseInfoEditorGuiComp, imtlic::ILicenseInfo>
+						Ui::CLicenseInfoEditorGuiComp, imtlic::ILicenseDefinition>
 {
 	Q_OBJECT
 
 public:
 	typedef iqtgui::TDesignerGuiObserverCompBase<
-				Ui::CLicenseInfoEditorGuiComp, imtlic::ILicenseInfo> BaseClass;
+				Ui::CLicenseInfoEditorGuiComp, imtlic::ILicenseDefinition> BaseClass;
 
 	I_BEGIN_COMPONENT(CLicenseInfoEditorGuiComp);
 	I_END_COMPONENT;

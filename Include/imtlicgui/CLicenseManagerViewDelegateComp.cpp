@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtlic/CLicenseInfo.h>
+#include <imtlic/CLicenseDefinition.h>
 
 
 namespace imtlicgui
@@ -30,7 +30,7 @@ QByteArray CLicenseManagerViewDelegateComp::CreateNewObject(
 			const istd::IChangeable* /*defaultDataPtr*/) const
 {
 	if (m_collectionPtr != nullptr){
-		imtlic::CLicenseInfo licenseInfo;
+		imtlic::CLicenseDefinition licenseInfo;
 
 		QString objectName;
 
@@ -64,7 +64,7 @@ QString CLicenseManagerViewDelegateComp::RenameObject(const QByteArray& objectId
 		imtbase::IObjectCollection::DataPtr dataPtr;
 		m_collectionPtr->GetObjectData(objectId, dataPtr);
 
-		imtlic::CLicenseInfo* licenseInfoPtr = dynamic_cast<imtlic::CLicenseInfo*>(dataPtr.GetPtr());
+		imtlic::CLicenseDefinition* licenseInfoPtr = dynamic_cast<imtlic::CLicenseDefinition*>(dataPtr.GetPtr());
 		if (licenseInfoPtr != nullptr){
 			QString objectName = m_collectionPtr->GetElementInfo(objectId, imtbase::IObjectCollectionInfo::EIT_NAME).toString();
 			licenseInfoPtr->SetLicenseName(objectName);
@@ -87,7 +87,7 @@ bool CLicenseManagerViewDelegateComp::GetSummaryInformation(
 		return false;
 	}
 
-	const imtlic::ILicenseInfo* licenseInfoPtr = dynamic_cast<const imtlic::ILicenseInfo*>(m_collectionPtr->GetObjectPtr(objectId));
+	const imtlic::ILicenseDefinition* licenseInfoPtr = dynamic_cast<const imtlic::ILicenseDefinition*>(m_collectionPtr->GetObjectPtr(objectId));
 	if (licenseInfoPtr == nullptr){
 		Q_ASSERT(0);
 
@@ -128,7 +128,7 @@ void CLicenseManagerViewDelegateComp::OnDuplicateObject(const QByteArray& /*sour
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	m_collectionPtr->GetObjectData(destinationObjectId, dataPtr);
 
-	imtlic::CLicenseInfo* licenseInfoPtr = dynamic_cast<imtlic::CLicenseInfo*>(dataPtr.GetPtr());
+	imtlic::CLicenseDefinition* licenseInfoPtr = dynamic_cast<imtlic::CLicenseDefinition*>(dataPtr.GetPtr());
 	if (licenseInfoPtr != nullptr){
 		QString objectName = m_collectionPtr->GetElementInfo(destinationObjectId, imtbase::IObjectCollectionInfo::EIT_NAME).toString();
 		licenseInfoPtr->SetLicenseName(objectName);

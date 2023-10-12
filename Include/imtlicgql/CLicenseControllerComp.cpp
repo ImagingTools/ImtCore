@@ -6,7 +6,7 @@
 #include <iprm/CParamsSet.h>
 
 // ImtCore includes
-#include <imtlic/CLicenseInfo.h>
+#include <imtlic/CLicenseDefinition.h>
 
 
 namespace imtlicgql
@@ -36,6 +36,9 @@ istd::IChangeable* CLicenseControllerComp::CreateObject(
 	}
 
 	objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+	if (objectId.isEmpty()){
+		objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	}
 
 	QByteArray jsonItemData = inputParamPtr->GetFieldArgumentValue("Item").toByteArray();
 	if (jsonItemData.isEmpty()){
@@ -53,12 +56,14 @@ istd::IChangeable* CLicenseControllerComp::CreateObject(
 		return nullptr;
 	}
 
-	istd::TDelPtr<imtlic::CLicenseInfo> licenseInfoPtr;
-	licenseInfoPtr.SetPtr(new imtlic::CLicenseInfo);
+	istd::TDelPtr<imtlic::CIdentifiableLicenseDefinition> licenseInfoPtr;
+	licenseInfoPtr.SetPtr(new imtlic::CIdentifiableLicenseDefinition);
+
+	licenseInfoPtr->SetObjectUuid(objectId);
 
 	QByteArray licenseId;
 	if (licenseModel.ContainsKey("LicenseId")){
-		licenseId = licenseModel.GetData("LicenseId").toByteArray();
+		licenseId = licenseModel.GetData("LicenseId").toByteArray().trimmed();
 	}
 
 	if (licenseId.isEmpty()){
@@ -90,7 +95,7 @@ istd::IChangeable* CLicenseControllerComp::CreateObject(
 	licenseInfoPtr->SetLicenseId(licenseId);
 
 	if (licenseModel.ContainsKey("LicenseName")){
-		name = licenseModel.GetData("LicenseName").toString();
+		name = licenseModel.GetData("LicenseName").toString().trimmed();
 	}
 
 	iprm::CIdParam nameParam;
@@ -122,7 +127,7 @@ istd::IChangeable* CLicenseControllerComp::CreateObject(
 
 	QByteArray productId;
 	if (licenseModel.ContainsKey("ProductId")){
-		productId = licenseModel.GetData("ProductId").toByteArray();
+		productId = licenseModel.GetData("ProductId").toByteArray().trimmed();
 	}
 
 	licenseInfoPtr->SetProductId(productId);
@@ -137,7 +142,29 @@ istd::IChangeable* CLicenseControllerComp::CreateObject(
 		featureIds = features.split(';');
 	}
 
-	licenseInfoPtr->SetFeatures(featureIds);
+	imtlic::ILicenseDefinition::FeatureInfos featureInfos;
+	for (const QByteArray& featureUuid : featureIds){
+		imtlic::ILicenseDefinition::FeatureInfo featureInfo;
+
+		featureInfo.id = featureUuid;
+
+		featureInfos << featureInfo;
+	}
+
+	licenseInfoPtr->SetFeatureInfos(featureInfos);
+
+	QByteArray dependencies;
+	if (licenseModel.ContainsKey("ParentLicenses")){
+		dependencies = licenseModel.GetData("ParentLicenses").toByteArray();
+	}
+
+	QByteArrayList dependencyIds;
+
+	if (!dependencies.isEmpty()){
+		dependencyIds = dependencies.split(';');
+	}
+
+	licenseInfoPtr->SetDependencies(dependencyIds);
 
 	return licenseInfoPtr.PopPtr();
 }
@@ -164,7 +191,7 @@ imtbase::CTreeItemModel* CLicenseControllerComp::GetObject(const imtgql::CGqlReq
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		imtlic::ILicenseInfo* licenseInfoPtr = dynamic_cast<imtlic::ILicenseInfo*>(dataPtr.GetPtr());
+		imtlic::ILicenseDefinition* licenseInfoPtr = dynamic_cast<imtlic::ILicenseDefinition*>(dataPtr.GetPtr());
 		if (licenseInfoPtr != nullptr){
 			istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 			imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
@@ -176,7 +203,14 @@ imtbase::CTreeItemModel* CLicenseControllerComp::GetObject(const imtgql::CGqlReq
 			dataModelPtr->SetData("LicenseName", licenseInfoPtr->GetLicenseName());
 			dataModelPtr->SetData("LicenseDescription", licenseInfoPtr->GetLicenseDescription());
 			dataModelPtr->SetData("ProductId", licenseInfoPtr->GetProductId());
-			dataModelPtr->SetData("Features", licenseInfoPtr->GetFeatures().join(';'));
+
+			QByteArrayList featureUuids;
+			for (const imtlic::ILicenseDefinition::FeatureInfo& featureInfo : licenseInfoPtr->GetFeatureInfos()){
+				featureUuids << featureInfo.id;
+			}
+
+			dataModelPtr->SetData("Features", featureUuids.join(';'));
+			dataModelPtr->SetData("ParentLicenses", licenseInfoPtr->GetDependencies().join(';'));
 
 			return rootModelPtr.PopPtr();
 		}

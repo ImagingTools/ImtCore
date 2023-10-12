@@ -19,6 +19,8 @@ FocusScope {
         itemData: model;
         index: model.index;
         depth: delegate.level;
+        delegateItem: delegate;
+        treeModel: delegate.root ? delegate.root.rowModel : null;
     };
 
     property int level: 0;
@@ -142,14 +144,18 @@ FocusScope {
                 repeater.model = row.columnModel;
             }
 
+//            layoutDirection: Qt.RightToLeft;
+
             Repeater {
                 id: repeater;
 
                 delegate: Item {
                     id: repeaterItem;
 
-                    width: delegate.root ? delegate.root.width / delegate.root.columnCount : 0;
+                    width: calcWidth;
                     height: delegate.root ? delegate.root.rowItemHeight :0;
+
+                    property int calcWidth: delegate.root ? delegate.root.width / delegate.root.columnCount  : 0;
 
                     Text {
                         id: text_;

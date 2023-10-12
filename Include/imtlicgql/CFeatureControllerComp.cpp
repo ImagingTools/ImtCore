@@ -40,6 +40,9 @@ istd::IChangeable* CFeatureControllerComp::CreateObject(
 	}
 
 	objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+	if (objectId.isEmpty()){
+		objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+	}
 
 	QByteArray jsonItemData = inputParamPtr->GetFieldArgumentValue("Item").toByteArray();
 	if (jsonItemData.isEmpty()){
@@ -65,8 +68,10 @@ istd::IChangeable* CFeatureControllerComp::CreateObject(
 		description = featureModel.GetData("FeatureDescription").toString();
 	}
 
-	istd::TDelPtr<imtlic::CFeatureInfo> featureInfoPtr;
-	featureInfoPtr.SetPtr(new imtlic::CFeatureInfo);
+	istd::TDelPtr<imtlic::CIdentifiableFeatureInfo> featureInfoPtr;
+	featureInfoPtr.SetPtr(new imtlic::CIdentifiableFeatureInfo);
+
+	featureInfoPtr->SetObjectUuid(objectId);
 
 	bool ok = CreateFeatureFromRepresentationModel(featureModel, *featureInfoPtr, objectId, errorMessage);
 	if (!ok){
@@ -100,7 +105,7 @@ imtbase::CTreeItemModel* CFeatureControllerComp::GetObject(const imtgql::CGqlReq
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		const imtlic::CFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(dataPtr.GetPtr());
+		const imtlic::CIdentifiableFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::CIdentifiableFeatureInfo*>(dataPtr.GetPtr());
 		if (featureInfoPtr != nullptr){
 			istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 			imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
@@ -309,10 +314,12 @@ bool CFeatureControllerComp::CreateFeatureFromRepresentationModel(
 		dependencies = representationModel.GetData("Dependencies").toByteArray();
 	}
 
-	QByteArrayList featureIds = dependencies.split(';');
-	if (!featureIds.isEmpty()){
-		featureInfo.SetDependencies(featureIds);
+	QByteArrayList featureIds;
+	if (!dependencies.isEmpty()){
+		featureIds = dependencies.split(';');
 	}
+
+	featureInfo.SetDependencies(featureIds);
 
 	return true;
 }

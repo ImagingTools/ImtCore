@@ -2,7 +2,7 @@
 
 
 // ACF includes
-#include <imtlic/ILicenseInfo.h>
+#include <imtlic/ILicenseDefinition.h>
 
 
 
@@ -14,7 +14,7 @@ namespace imtlic
 	Common information about a license instance.
 	\ingroup LicenseManagement
 */
-class ILicenseInstance: virtual public ILicenseInfo
+class ILicenseInstance: virtual public ILicenseDefinition
 {
 public:
 	/**

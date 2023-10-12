@@ -34,7 +34,7 @@ bool CFeatureDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSe
 
 				QByteArray value = idParamPtr->GetId();
 
-				filterQuery = QString(R"(("Document"::text ILIKE '%"Id": "%1"%'))").arg(qPrintable(value));
+				filterQuery = QString(R"(("Document"::text ILIKE '%"FeatureId": "%1"%'))").arg(qPrintable(value));
 			}
 			else if (key == "FeatureName"){
 				iprm::TParamsPtr<iprm::IIdParam> nameParamPtr(&filterParams, key);
@@ -44,7 +44,7 @@ bool CFeatureDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSe
 
 				QByteArray value = nameParamPtr->GetId();
 
-				filterQuery = QString(R"(("Document"::text ILIKE '%"Name": "%1"%'))").arg(qPrintable(value));
+				filterQuery = QString(R"(("Document"::text ILIKE '%"FeatureName": "%1"%'))").arg(qPrintable(value));
 			}
 		}
 	}

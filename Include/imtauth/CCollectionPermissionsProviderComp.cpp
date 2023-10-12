@@ -10,7 +10,7 @@ namespace imtauth
 
 const QByteArrayList CCollectionPermissionsProviderComp::GetPermissionInfos(const QByteArray& productId) const
 {
-//	imtlic::ILicenseInfo::FeatureInfos featureInfos;
+//	imtlic::ILicenseDefinition::FeatureInfos featureInfos;
 
 //	if (m_productCollectionCompPtr.IsValid()){
 //		imtbase::IObjectCollection::DataPtr productDataPtr;
@@ -21,7 +21,7 @@ const QByteArrayList CCollectionPermissionsProviderComp::GetPermissionInfos(cons
 //			const imtbase::IObjectCollectionInfo::Ids licenseCollectionIds = licenseList.GetElementIds();
 
 //			for (const QByteArray& licenseId : licenseCollectionIds){
-//				const imtlic::ILicenseInfo* licenseInfoPtr = productPtr->GetLicenseInfo(licenseId);
+//				const imtlic::ILicenseDefinition* licenseInfoPtr = productPtr->GetLicenseInfo(licenseId);
 //				if (licenseInfoPtr != nullptr){
 //					featureInfos += licenseInfoPtr->GetFeatureInfos();
 //				}

@@ -15,7 +15,7 @@ namespace imtlic
 {
 
 
-class ILicenseInfo;
+class ILicenseDefinition;
 
 
 /**
@@ -33,7 +33,7 @@ public:
 	/**
 		Get license info for the given ID.
 	*/
-	virtual const imtlic::ILicenseInfo* GetLicenseInfo(const QByteArray& licenseId) const = 0;
+	virtual const imtlic::ILicenseDefinition* GetLicenseInfo(const QByteArray& licenseId) const = 0;
 };
 
 
