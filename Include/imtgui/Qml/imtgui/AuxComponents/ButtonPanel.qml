@@ -249,7 +249,15 @@ Rectangle {
     }
 
     function setOpenButtonVisible(){
-        let count = horizontalListView.count;
+        let count = 0;
+        if(buttonPanel.canChangeOrder){
+            if (buttonPanel.buttonModel){
+                count = buttonPanel.buttonModel.GetItemsCount();
+            }
+        }
+        else {
+            count = horizontalListView.count;
+        }
 
         openButton.visible = count && count > buttonPanel.horizCount;
     }
