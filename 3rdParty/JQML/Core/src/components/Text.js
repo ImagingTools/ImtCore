@@ -299,10 +299,10 @@ export class Text extends Item {
         // }
         // let realWidth = this.width + this.anchors.leftMargin + this.anchors.rightMargin
         switch(this.$p.horizontalAlignment.val){
-            case Text.AlignLeft: this.dom.style.justifyContent = 'flex-start'; break;
-            case Text.AlignRight: this.dom.style.justifyContent = 'dlex-end'; break;
-            case Text.AlignHCenter: this.dom.style.justifyContent = 'center'; break;
-            case Text.AlignJustify: this.dom.style.justifyContent = 'normal'; break;
+            case Text.AlignLeft: this.dom.style.justifyContent = 'flex-start'; this.dom.style.textAlign = 'left'; break;
+            case Text.AlignRight: this.dom.style.justifyContent = 'dlex-end'; this.dom.style.textAlign = 'right'; break;
+            case Text.AlignHCenter: this.dom.style.justifyContent = 'center'; this.dom.style.textAlign = 'center'; break;
+            case Text.AlignJustify: this.dom.style.justifyContent = 'normal'; this.dom.style.textAlign = 'unset'; break;
         }
     }
     $verticalAlignmentChanged(){
