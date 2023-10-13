@@ -54,97 +54,141 @@ Rectangle {
 
     }
 
-    Row{
-        id: buttonsRow;
-
+    Column{
         anchors.centerIn: parent;
         spacing: 50;
+        Row{
+            id: inputsRow;
 
-        TextField{
-            id: textField;
+            anchors.horizontalCenter: parent.horizontalCenter;
 
-            anchors.verticalCenter: parent.verticalCenter;
+            height: 40;
 
-            decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.textFieldDecorator :
-                                                                  Decorators.textFieldDecorator;
-            placeHolderText: "placeHolder";
-        }
+            spacing: 50;
 
-        Rectangle{
-            id: textEditBackground;
-
-            anchors.verticalCenter:  parent.verticalCenter;
-
-            width: textEdit.width + 20;
-            height: textEdit.height + 20;
-
-            color: Style.backgroundColor;
-
-            TextEditCustom{
-                id: textEdit;
+            TextField{
+                id: textField;
 
                 anchors.verticalCenter: parent.verticalCenter;
-                anchors.horizontalCenter: parent.horizontalCenter;
 
-                decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.textEditDecorator :
-                                                                      Decorators.textEditDecorator;
-
+                decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.textFieldDecorator :
+                                                                      Decorators.textFieldDecorator;
                 placeHolderText: "placeHolder";
             }
-        }
 
-        ComboBox{
-            id: combobox;
+            Rectangle{
+                id: textEditBackground;
 
-            anchors.verticalCenter: parent.verticalCenter;
+                anchors.verticalCenter:  parent.verticalCenter;
 
-            model: comboModel;
-            placeHolderText: "ComboBox"
-            decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.comboBoxDecorator :
-                                                                  Decorators.comboBoxDecorator;
+                width: textEdit.width + 20;
+                height: textEdit.height + 20;
 
-        }
+                color: Style.backgroundColor;
 
-//        Item{//test
-//            id: comboxQt;
+                TextEditCustom{
+                    id: textEdit;
 
-//            anchors.verticalCenter: parent.verticalCenter;
+                    anchors.verticalCenter: parent.verticalCenter;
+                    anchors.horizontalCenter: parent.horizontalCenter;
 
-//            width: 200;
-//            height: 30;
+                    decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.textEditDecorator :
+                                                                          Decorators.textEditDecorator;
 
-//            property Component decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.comboBoxDecorator :
-//                                                                  Decorators.comboBoxDecorator;
+                    placeHolderText: "placeHolder";
+                }
+            }
 
-////            property Component decoratorComponent : DecoratorsQt.comboBoxDecorator;
-//            property var decorator : null;
+            ComboBox{
+                id: combobox;
 
-//            onDecoratorComponentChanged: {
-//                if(decorator){
-//                    decorator.destroy()
+                anchors.verticalCenter: parent.verticalCenter;
+
+                model: comboModel;
+                placeHolderText: "ComboBox"
+                decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.comboBoxDecorator :
+                                                                      Decorators.comboBoxDecorator;
+
+            }
+
+
+
+        }//row
+
+        Row{
+            id: checkRow;
+
+            anchors.horizontalCenter: parent.horizontalCenter;
+            height: 40;
+            spacing: 50;
+
+            CheckBox{
+                id: checkBox;
+
+                anchors.verticalCenter: parent.verticalCenter;
+
+                //width: 20;
+                //height: 20;
+
+                decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.checkBoxDecorator :
+                                                                                            Decorators.checkBoxDecorator;
+                text: "text";
+
+
+                onClicked: {
+                    if(checkBox.checkState !== Qt.Checked){
+                        checkBox.checkState = Qt.Checked;
+                    }
+                    else {
+                        checkBox.checkState = Qt.Unchecked;
+                    }
+                }
+            }
+
+//            Item{//testElement
+//                id: testElement;
+
+//                anchors.verticalCenter: parent.verticalCenter;
+
+//                width: decorator ? decorator.width : 0;
+//                height: decorator ? decorator.height : 0;
+
+//                property Component decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.checkBoxDecorator :
+//                                                                                            Decorators.checkBoxDecorator;
+
+//                //property Component decoratorComponent : DecoratorsQt.checkBoxDecorator;
+//                property var decorator : null;
+
+//                onDecoratorComponentChanged: {
+//                    if(!decoratorComponent){
+//                        return;
+//                    }
+//                    if(decorator){
+//                        decorator.destroy()
+//                    }
+//                    decorator = decoratorComponent.createObject(testElement)
+//                    decorator.baseElement = testElement
+//                    bindWidth.target = decorator
+//                    bindHeight.target = decorator
 //                }
-//                decorator = decoratorComponent.createObject(comboxQt)
-//                decorator.baseElement = comboxQt
-//                bindWidth.target = decorator
-//                bindHeight.target = decorator
-//                decorator.model = comboModel
-//            }
 
-//            Binding {
-//                id: bindWidth
-//                property: "width"
-//                value: comboxQt.width;
-//            }
+//                Binding {
+//                    id: bindWidth
+//                    property: "width"
+//                    value: testElement.width;
+//                }
 
-//            Binding {
-//                id: bindHeight
-//                property: "height"
-//                value: comboxQt.height;
-//            }
+//                Binding {
+//                    id: bindHeight
+//                    property: "height"
+//                    value: testElement.height;
+//                }
 
-//        }//test
+//            }//testElement
 
-    }//row
+        }//row2
+    }//Column
+
 
 
 
