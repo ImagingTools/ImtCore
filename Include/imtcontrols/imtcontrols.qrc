@@ -59,6 +59,7 @@
 		<file alias="imtcontrols/Inputs/TextInputWithLabel.qml">Qml/imtcontrols/Inputs/TextInputWithLabel.qml</file>
 		<file alias="imtcontrols/Inputs/TimeIntervalPicker.qml">Qml/imtcontrols/Inputs/TimeIntervalPicker.qml</file>
 		<file alias="imtcontrols/Inputs/TimePicker.qml">Qml/imtcontrols/Inputs/TimePicker.qml</file>
+                <file alias="imtcontrols/Inputs/CheckBox.qml">Qml/imtcontrols/Inputs/CheckBox.qml</file>
 		<file alias="imtcontrols/Models/ModelIndex.qml">Qml/imtcontrols/Models/ModelIndex.qml</file>
 		<file alias="imtcontrols/Models/UuidGenerator.qml">Qml/imtcontrols/Models/UuidGenerator.qml</file>
 		<file alias="imtcontrols/Panels/CommandsDecorator.qml">Qml/imtcontrols/Panels/CommandsDecorator.qml</file>

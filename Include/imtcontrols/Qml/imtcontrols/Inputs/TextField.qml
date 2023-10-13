@@ -101,17 +101,17 @@ FocusScope {
 
 
     onDecoratorComponentChanged: {
-        if (decoratorComponent){
-
-            if(decorator){
-                decorator.destroy()
-            }
-            decorator = decoratorComponent.createObject(containerTextField)
-            decorator.baseElement = containerTextField
-            bindWidth.target = decorator
-            bindHeight.target = decorator
-            bindText.target = decorator
+        if(!decoratorComponent){
+            return;
         }
+        if(decorator){
+            decorator.destroy()
+        }
+        decorator = decoratorComponent.createObject(containerTextField)
+        decorator.baseElement = containerTextField
+        bindWidth.target = decorator
+        bindHeight.target = decorator
+        bindText.target = decorator
 
         if(decorator.z < 0){
             if(focus){
@@ -123,14 +123,14 @@ FocusScope {
         }
 
 
-//        if(decorator.z < 0){
-//            textField.focus = true;
-//            textField.forceActiveFocus()
-//        }
-//        else {
-//            decorator.focus = true;
-//            decorator.forceActiveFocus()
-//        }
+        //        if(decorator.z < 0){
+        //            textField.focus = true;
+        //            textField.forceActiveFocus()
+        //        }
+        //        else {
+        //            decorator.focus = true;
+        //            decorator.forceActiveFocus()
+        //        }
 
     }
 

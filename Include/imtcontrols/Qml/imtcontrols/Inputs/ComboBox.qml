@@ -3,7 +3,7 @@ import Acf 1.0
 import imtcontrols 1.0
 
 FocusScope {
-	id: comboBoxContainer;
+    id: comboBoxContainer;
 
     width: decorator ? decorator.width : 0
     height: decorator ? decorator.height : 0
@@ -11,84 +11,84 @@ FocusScope {
     property Component decoratorComponent;
     property var decorator : null;
 
-	property var model;
+    property var model;
 
-	property color borderColor: comboBoxContainer.focus ? Style.iconColorOnSelected : Style.borderColor;
+    property color borderColor: comboBoxContainer.focus ? Style.iconColorOnSelected : Style.borderColor;
 
-	property color backgroundColor: Style.baseColor;
+    property color backgroundColor: Style.baseColor;
 
-	property string currentText;
+    property string currentText;
 
-	property bool changeable: true;
+    property bool changeable: true;
 
-	property bool isColor: false;
+    property bool isColor: false;
 
-	property bool textCentered: false;
-	property bool menuVisible: false;
-	property bool hiddenBackground: true;
-	property bool openST: false;
-	property bool compTextCentered:  false;
-	property bool visibleScrollBar: true;
-	property string compMainColor: "transparent";
-	property string compSelectedColor: Style.selectedColor;
-	property bool moveToEnd: false;
-	property int moveToIndex: -1;
+    property bool textCentered: false;
+    property bool menuVisible: false;
+    property bool hiddenBackground: true;
+    property bool openST: false;
+    property bool compTextCentered:  false;
+    property bool visibleScrollBar: true;
+    property string compMainColor: "transparent";
+    property string compSelectedColor: Style.selectedColor;
+    property bool moveToEnd: false;
+    property int moveToIndex: -1;
 
-	property int dialogsCountPrev: 1000;
-	property int dialogsCount: modalDialogManager.count;
-	property int shownItemsCount: 5;
+    property int dialogsCountPrev: 1000;
+    property int dialogsCount: modalDialogManager.count;
+    property int shownItemsCount: 5;
 
-	property int radius: 5;
-	property int currentIndex: -1;
-
-
-	property string placeHolderText: "";
+    property int radius: 5;
+    property int currentIndex: -1;
 
 
-	property real contentY;
+    property string placeHolderText: "";
 
-	// ID for display in combo box delegates
-	property string nameId: "Name";
+
+    property real contentY;
+
+    // ID for display in combo box delegates
+    property string nameId: "Name";
 
     property int selectedIndex: -1;
     property bool hoverBlocked: true;
 
 
 
-	property Component delegate: PopupMenuDelegate{
-		width: comboBoxContainer.width;
-		height: comboBoxContainer.itemHeight;
-		textSize: comboBoxContainer.textSize;
-		fontColor: comboBoxContainer.fontColor;
-		textCentered: comboBoxContainer.compTextCentered;
-		mainColor: comboBoxContainer.compMainColor;
-		selectedColor: comboBoxContainer.compSelectedColor;
-		rootItem: comboBoxContainer;
-	   };
+    property Component delegate: PopupMenuDelegate{
+        width: comboBoxContainer.width;
+        height: comboBoxContainer.itemHeight;
+        textSize: comboBoxContainer.textSize;
+        fontColor: comboBoxContainer.fontColor;
+        textCentered: comboBoxContainer.compTextCentered;
+        mainColor: comboBoxContainer.compMainColor;
+        selectedColor: comboBoxContainer.compSelectedColor;
+        rootItem: comboBoxContainer;
+    };
 
-//	property alias image: cbArrowIcon;
-//	property alias imageSource: cbArrowIcon.source;
-//	property alias imageWidth:  cbArrowIcon.width;
-//	property alias imageHeight: cbArrowIcon.height;
-//	property alias imageRotation: cbArrowIcon.rotation;
-//	property alias imageVisible: cbArrowIcon.visible;
-//    property alias titleTxt: cbTitleTxt;
-//    property alias titleTxtColor: cbTitleTxt.color;
+    //	property alias image: cbArrowIcon;
+    //	property alias imageSource: cbArrowIcon.source;
+    //	property alias imageWidth:  cbArrowIcon.width;
+    //	property alias imageHeight: cbArrowIcon.height;
+    //	property alias imageRotation: cbArrowIcon.rotation;
+    //	property alias imageVisible: cbArrowIcon.visible;
+    //    property alias titleTxt: cbTitleTxt;
+    //    property alias titleTxtColor: cbTitleTxt.color;
 
 
-	property alias containsMouse: cbMouseArea.containsMouse;
+    property alias containsMouse: cbMouseArea.containsMouse;
 
-	property int textSize: Style.fontSize_common;
-	property int itemHeight: 26;
-	property string fontColor: Style.textColor;
-	property string fontColorTitle: fontColor;
+    property int textSize: Style.fontSize_common;
+    property int itemHeight: 26;
+    property string fontColor: Style.textColor;
+    property string fontColorTitle: fontColor;
 
-	property alias tooltipText: tooltip.text;
-	property alias tooltipItem: tooltip;
-	property bool isOpen: false;
+    property alias tooltipText: tooltip.text;
+    property alias tooltipItem: tooltip;
+    property bool isOpen: false;
 
-	signal clicked();
-	signal finished(string commandId, int index);
+    signal clicked();
+    signal finished(string commandId, int index);
 
     onFinished: {
         console.log("ComboFinished")
@@ -100,85 +100,86 @@ FocusScope {
         selectedIndex = -1;
     }
 
-	onModelChanged: {
-		if (!comboBoxContainer.model){
-			return;
-		}
+    onModelChanged: {
+        if (!comboBoxContainer.model){
+            return;
+        }
 
-		if (comboBoxContainer.currentIndex > -1){
-			comboBoxContainer.currentText = comboBoxContainer.model.GetData(comboBoxContainer.nameId);
-		}
-	}
+        if (comboBoxContainer.currentIndex > -1){
+            comboBoxContainer.currentText = comboBoxContainer.model.GetData(comboBoxContainer.nameId);
+        }
+    }
 
-	onCurrentIndexChanged: {
-		console.log("ComboBox onCurrentIndexChanged", comboBoxContainer.currentIndex);
-		if (!comboBoxContainer.model){
-			return;
-		}
+    onCurrentIndexChanged: {
+        console.log("ComboBox onCurrentIndexChanged", comboBoxContainer.currentIndex);
+        if (!comboBoxContainer.model){
+            return;
+        }
 
-		if (comboBoxContainer.currentIndex > -1){
-			if (comboBoxContainer.model.ContainsKey(comboBoxContainer.nameId, comboBoxContainer.currentIndex)){
-				let name = comboBoxContainer.model.GetData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
-				comboBoxContainer.currentText = name;
-			}
-		}
-		else{
-			comboBoxContainer.currentText = "";
-		}
-	}
+        if (comboBoxContainer.currentIndex > -1){
+            if (comboBoxContainer.model.ContainsKey(comboBoxContainer.nameId, comboBoxContainer.currentIndex)){
+                let name = comboBoxContainer.model.GetData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
+                comboBoxContainer.currentText = name;
+            }
+        }
+        else{
+            comboBoxContainer.currentText = "";
+        }
+    }
 
 
 
-	Component {
-		id: popupMenu;
-		PopupMenuDialog {
-			id: popup;
+    Component {
+        id: popupMenu;
+        PopupMenuDialog {
+            id: popup;
 
-			delegate: comboBoxContainer.delegate;
-			width: comboBoxContainer.width;
-			itemHeight: comboBoxContainer.itemHeight;
-			hiddenBackground: comboBoxContainer.hiddenBackground;
-			textSize: comboBoxContainer.textSize;
-			fontColor: comboBoxContainer.fontColor;
-			shownItemsCount: comboBoxContainer.shownItemsCount;
-			moveToEnd: comboBoxContainer.moveToEnd;
-			moveToIndex: comboBoxContainer.moveToIndex;
-			rootItem: comboBoxContainer;
-			visibleScrollBar: comboBoxContainer.visibleScrollBar;
-			onFinished: {
+            delegate: comboBoxContainer.delegate;
+            width: comboBoxContainer.width;
+            itemHeight: comboBoxContainer.itemHeight;
+            hiddenBackground: comboBoxContainer.hiddenBackground;
+            textSize: comboBoxContainer.textSize;
+            fontColor: comboBoxContainer.fontColor;
+            shownItemsCount: comboBoxContainer.shownItemsCount;
+            moveToEnd: comboBoxContainer.moveToEnd;
+            moveToIndex: comboBoxContainer.moveToIndex;
+            rootItem: comboBoxContainer;
+            visibleScrollBar: comboBoxContainer.visibleScrollBar;
+            onFinished: {
                 console.log("MenuFinished")
 
                 popup.root.closeDialog();
-			}
-			Component.onCompleted: {
-				comboBoxContainer.finished.connect(popup.finished);
-			}
-		}
-	}
+            }
+            Component.onCompleted: {
+                comboBoxContainer.finished.connect(popup.finished);
+            }
+        }
+    }
 
     Component.onCompleted: {
 
     }
 
-	onDialogsCountChanged: {
-		comboBoxContainer.openST = comboBoxContainer.dialogsCount > comboBoxContainer.dialogsCountPrev;
-		if(!comboBoxContainer.openST && comboBoxContainer.dialogsCountPrev < 1000){
-			comboBoxContainer.dialogsCountPrev = 1000;
-		}
-	}
+    onDialogsCountChanged: {
+        comboBoxContainer.openST = comboBoxContainer.dialogsCount > comboBoxContainer.dialogsCountPrev;
+        if(!comboBoxContainer.openST && comboBoxContainer.dialogsCountPrev < 1000){
+            comboBoxContainer.dialogsCountPrev = 1000;
+        }
+    }
 
     onDecoratorComponentChanged: {
+        if(!decoratorComponent){
+            return;
+        }
         if(decorator){
             decorator.destroy()
         }
-        if (decoratorComponent){
+        decorator = decoratorComponent.createObject(comboBoxContainer)
+        decorator.baseElement = comboBoxContainer
+        bindWidth.target = decorator
+        bindHeight.target = decorator
+        bindCurrentIndex.target = decorator
 
-            decorator = decoratorComponent.createObject(comboBoxContainer)
-            decorator.baseElement = comboBoxContainer
-            bindWidth.target = decorator
-            bindHeight.target = decorator
-            bindCurrentIndex.target = decorator
-        }
     }
 
     Binding {
@@ -200,23 +201,23 @@ FocusScope {
     }
 
 
-	function openPopupMenu(){
-		comboBoxContainer.isOpen = true;
-		comboBoxContainer.dialogsCountPrev = modalDialogManager.count;
-		//var point = comboBoxContainer.mapToItem(thumbnailDecoratorContainer, 0, comboBoxContainer.height);
-		var point = comboBoxContainer.mapToItem(null, 0, comboBoxContainer.height);
-		modalDialogManager.openDialog(popupMenu, { "x":     point.x,
-												   "y":     point.y,
-												   "model": comboBoxContainer.model,
-												   "width": comboBoxContainer.width,
-												   "countVisibleItem": 5 });
+    function openPopupMenu(){
+        comboBoxContainer.isOpen = true;
+        comboBoxContainer.dialogsCountPrev = modalDialogManager.count;
+        //var point = comboBoxContainer.mapToItem(thumbnailDecoratorContainer, 0, comboBoxContainer.height);
+        var point = comboBoxContainer.mapToItem(null, 0, comboBoxContainer.height);
+        modalDialogManager.openDialog(popupMenu, { "x":     point.x,
+                                          "y":     point.y,
+                                          "model": comboBoxContainer.model,
+                                          "width": comboBoxContainer.width,
+                                          "countVisibleItem": 5 });
 
-	}
+    }
 
-	function closePopupMenu(){
-		modalDialogManager.closeDialog();
-		comboBoxContainer.isOpen = false;
-	}
+    function closePopupMenu(){
+        modalDialogManager.closeDialog();
+        comboBoxContainer.isOpen = false;
+    }
 
 
     MouseArea {

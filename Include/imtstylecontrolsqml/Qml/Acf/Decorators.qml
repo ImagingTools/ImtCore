@@ -14,6 +14,7 @@ Item {
     property Component textEditDecorator: textEditDecoratorComp
 
     property Component comboBoxDecorator: comboBoxDecoratorComp
+    property Component checkBoxDecorator: checkBoxDecoratorComp
 
     Component {
         id: topButtonDecoratorComp
@@ -136,7 +137,7 @@ Item {
             property string text: "";
 
             function setHeight(){
-                console.log("setHeight");
+                //console.log("setHeight");
             }
 
             Rectangle {
@@ -257,6 +258,90 @@ Item {
                 sourceSize.width: width;
                 sourceSize.height: height;
             }
+        }
+
+    }
+
+    Component{
+        id: checkBoxDecoratorComp;
+
+        Item{
+            id: checkBoxItem;
+
+            width: checkBoxText.text == "" ? checkRect.width : checkRect.width + checkBoxText.width + checkBoxItem.mainMargin;
+            height: 20;
+
+            property var baseElement: null;
+
+            property int mainMargin: !checkBoxItem.baseElement ? 0 : 8;
+            property string text: !baseElement ? "" : baseElement.text == undefined ? "" : baseElement.text;
+            property string borderColor: !baseElement ? "" : baseElement.borderColor == undefined ? "" : baseElement.borderColor;
+            property int fontPixelSize: !baseElement ? 10 : baseElement.fontPixelSize == undefined ? 10 : baseElement.fontPixelSize;
+            property bool fontBold: !baseElement ? false : baseElement.fontBold == undefined ? false : baseElement.fontBold;
+
+            Rectangle {
+                id: checkRect;
+
+                anchors.left: parent.left;
+                anchors.leftMargin: !checkBoxItem.baseElement ? 0 : !checkBoxItem.baseElement.isLeftText ? 0 : checkBoxText.width + checkBoxItem.baseElement.mainMargin;
+                anchors.verticalCenter: parent.verticalCenter;
+
+                width: height;
+                height: parent.height;
+
+                color: "transparent";
+
+                border.width: 1;
+                border.color: !checkBoxItem.baseElement ? "transparent" : checkBoxItem.borderColor !=="" ? checkBoxItem.borderColor  : checkBoxItem.baseElement.isActive ? Style.borderColor : Style.disabledInActiveTextColor;
+
+                Image {
+                    id: image;
+
+                    anchors.centerIn: parent;
+
+                    height: checkRect.height - 1;
+                    width: height;
+
+                    sourceSize.width: width;
+                    sourceSize.height: height;
+
+                    visible: !checkBoxItem.baseElement ? false : checkBoxItem.baseElement.checkState != Qt.PartiallyChecked;
+                    source: !checkBoxItem.baseElement ? "" : checkBoxItem.baseElement.isActive ? checkBoxItem.baseElement.checkState == Qt.Checked ? checkBoxItem.baseElement.imageSourceActive : "" :
+                        checkBoxItem.baseElement.checkState == Qt.Checked ? checkBoxItem.baseElement.imageSourceNotActive : "";
+                }
+            }
+
+            Rectangle {
+                id: rect;
+
+                anchors.centerIn: checkRect;
+
+                height: checkRect.height - 4;
+                width: height;
+
+                color: Style.textColor;
+
+                visible: !checkBoxItem.baseElement ? false : checkBoxItem.baseElement.checkState == Qt.PartiallyChecked;
+            }
+
+
+
+            Text {
+                id: checkBoxText;
+
+                anchors.left: parent.left;
+                anchors.leftMargin: !checkBoxItem.baseElement ? 0 : checkBoxItem.baseElement.isLeftText ? 0 : checkRect.width + checkBoxItem.baseElement.mainMargin;
+                anchors.verticalCenter: parent.verticalCenter;
+
+                color: !checkBoxItem.baseElement ? "transparent" :  checkBoxItem.baseElement.enabled ? Style.buttonText : Style.inactive_buttonText;
+
+                font.pixelSize: checkBoxItem.fontPixelSize;
+                font.family: Style.fontFamily;
+                font.bold: checkBoxItem.fontBold;
+
+                text: checkBoxItem.text;
+            }
+
         }
 
     }

@@ -95,17 +95,19 @@ FocusScope {
     }
 
     onDecoratorComponentChanged: {
-        if (decoratorComponent){
-
-            if(decorator){
-                decorator.destroy()
-            }
-            decorator = decoratorComponent.createObject(containerTextEdit)
-            decorator.baseElement = containerTextEdit
-            bindWidth.target = decorator
-            bindHeight.target = decorator
-            bindText.target = decorator
+        if(!decoratorComponent){
+            return;
         }
+
+        if(decorator){
+            decorator.destroy()
+        }
+        decorator = decoratorComponent.createObject(containerTextEdit)
+        decorator.baseElement = containerTextEdit
+        bindWidth.target = decorator
+        bindHeight.target = decorator
+        bindText.target = decorator
+
 
         textEdit.setHeight();
 
@@ -119,14 +121,14 @@ FocusScope {
         }
 
 
-//        if(decorator.z < 0){
-//            textEdit.focus = true;
-//            textEdit.forceActiveFocus()
-//        }
-//        else {
-//            decorator.focus = true;
-//            decorator.forceActiveFocus()
-//        }
+        //        if(decorator.z < 0){
+        //            textEdit.focus = true;
+        //            textEdit.forceActiveFocus()
+        //        }
+        //        else {
+        //            decorator.focus = true;
+        //            decorator.forceActiveFocus()
+        //        }
 
     }
 
@@ -248,7 +250,7 @@ FocusScope {
             }
 
             onHeightChanged: {
-              setHeight();
+                setHeight();
 
             }
 

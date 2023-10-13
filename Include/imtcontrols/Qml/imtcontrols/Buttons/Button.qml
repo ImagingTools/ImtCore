@@ -52,17 +52,18 @@ Item {
     }
 
     onDecoratorComponentChanged: {
-        if (decoratorComponent){
-            //console.log("decoratorComponent::button", decoratorComponent)
-
-            if(decorator){
-                decorator.destroy()
-            }
-            decorator = decoratorComponent.createObject(baseButton)
-            decorator.baseElement = baseButton
-            bindWidth.target = decorator
-            bindHeight.target = decorator
+        if(!decoratorComponent){
+            return;
         }
+        //console.log("decoratorComponent::button", decoratorComponent)
+
+        if(decorator){
+            decorator.destroy()
+        }
+        decorator = decoratorComponent.createObject(baseButton)
+        decorator.baseElement = baseButton
+        bindWidth.target = decorator
+        bindHeight.target = decorator
 
         if(focus){
             forceActiveFocus()

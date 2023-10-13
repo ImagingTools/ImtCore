@@ -11,6 +11,7 @@ Item {
     property Component textEditDecorator: textEditDecoratorComp
 
     property Component comboBoxDecorator: comboBoxDecoratorComp
+    property Component checkBoxDecorator: checkBoxDecoratorComp
 
 
     Component {
@@ -151,7 +152,7 @@ Item {
             }
 
             function setHeight(){
-                console.log("setHeight")
+                //console.log("setHeight")
                 height = 30;
             }
 
@@ -199,8 +200,9 @@ Item {
             displayText: currentIndex >= 0 ? currentText : "ComboBox"
 
 
-            property var baseElement;
             model: !baseElement ? 0 : baseElement.model;
+
+            property var baseElement;
 
             onModelChanged: {
                 if(model){
@@ -219,4 +221,27 @@ Item {
         }
     }
 
+    Component{
+        id: checkBoxDecoratorComp;
+
+        CheckBox{
+            height: 30;
+
+            indicator.width: height - 10;
+            indicator.height: height - 10;
+
+            text: !baseElement ? "" : baseElement.text;
+            checkState: !baseElement ? 0 : baseElement.checkState;
+
+            property var baseElement;
+
+            onCheckStateChanged: {
+                if(baseElement){
+                    baseElement.checkState = checkState;
+                }
+            }
+
+        }
+
+    }
 }
