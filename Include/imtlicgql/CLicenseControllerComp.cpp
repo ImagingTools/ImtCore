@@ -98,25 +98,6 @@ istd::IChangeable* CLicenseControllerComp::CreateObject(
 		name = licenseModel.GetData("LicenseName").toString().trimmed();
 	}
 
-	iprm::CIdParam nameParam;
-	nameParam.SetId(name.toUtf8());
-
-	iprm::CParamsSet paramsSet2;
-	paramsSet2.SetEditableParameter("LicenseName", &nameParam);
-
-	iprm::CParamsSet filterParam2;
-	filterParam2.SetEditableParameter("ObjectFilter", &paramsSet2);
-
-	imtbase::ICollectionInfo::Ids collectionIds2 = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam2);
-	if (!collectionIds2.isEmpty()){
-		QByteArray id = collectionIds2[0];
-		if (objectId != id){
-			errorMessage = QT_TR_NOOP(QString("License Name: %1 already exists. Please rename.")).arg(qPrintable(name));
-
-			return nullptr;
-		}
-	}
-
 	licenseInfoPtr->SetLicenseName(name);
 
 	if (licenseModel.ContainsKey("LicenseDescription")){

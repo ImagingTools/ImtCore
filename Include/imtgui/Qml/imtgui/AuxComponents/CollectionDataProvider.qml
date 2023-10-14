@@ -57,6 +57,21 @@ QtObject {
         }
     }
 
+    function getData(objectId, value){
+        for (let i = 0; i < container.collectionModel.GetItemsCount(); i++){
+            let objectCollectionId = container.collectionModel.GetData("Id", i);
+            if (objectCollectionId === objectId){
+                if (container.collectionModel.ContainsKey(value, i)){
+                    return container.collectionModel.GetData(value, i);
+                }
+
+                break;
+            }
+        }
+
+        return null;
+    }
+
     property GqlModel itemsInfoModel: GqlModel {
         function updateModel(externInputParams, fields) {
             console.log( "gqlModelBaseContainer updateModel", container.commandId + "List");

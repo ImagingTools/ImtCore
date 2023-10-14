@@ -495,6 +495,42 @@ bool CSqlJsonDatabaseDelegateComp::ReadDataFromMemory(
 }
 
 
+imtbase::CTreeItemModel* CSqlJsonDatabaseDelegateComp::GetRemoteCollectionData(const QByteArray& collectionCommandId, QByteArrayList fields) const
+{
+	if (!m_gqlRequestHandlerCompPtr.IsValid()){
+		return nullptr;
+	}
+
+	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, collectionCommandId);
+
+	imtgql::CGqlObject itemsObject("items");
+
+	for (const QByteArray& fieldId : fields){
+		itemsObject.InsertField(fieldId);
+	}
+
+	request.AddField(itemsObject);
+
+	QString errorMessage;
+	imtbase::CTreeItemModel* modelPtr = m_gqlRequestHandlerCompPtr->CreateResponse(request, errorMessage);
+	if (modelPtr == nullptr){
+		return nullptr;
+	}
+
+	imtbase::CTreeItemModel* dataModelPtr = modelPtr->GetTreeItemModel("data");
+	if (dataModelPtr == nullptr){
+		return nullptr;
+	}
+
+	imtbase::CTreeItemModel* itemsModelPtr = dataModelPtr->GetTreeItemModel("items");
+	if (itemsModelPtr == nullptr){
+		return nullptr;
+	}
+
+	return itemsModelPtr;
+}
+
+
 } // namespace imtdb
 
 

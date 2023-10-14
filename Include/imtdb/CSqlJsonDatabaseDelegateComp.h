@@ -3,6 +3,8 @@
 
 // ImtCore includes
 #include <imtdb/CSqlDatabaseDocumentDelegateComp.h>
+#include <imtbase/CTreeItemModel.h>
+#include <imtgql/IGqlRequestHandler.h>
 
 
 namespace imtdb
@@ -17,6 +19,7 @@ public:
 	I_BEGIN_COMPONENT(CSqlJsonDatabaseDelegateComp)
 		I_ASSIGN(m_isMultiTypeAttrPtr, "IsMultiType", "Is document multitype supported", true, false);
 		I_ASSIGN_MULTI_0(m_documentFactoriesCompPtr, "DocumentFactories", "Factory list used for creation of the new document instance according to the given type-ID", true);
+		I_ASSIGN(m_gqlRequestHandlerCompPtr, "GqlRequest", "GraphQL request handler", false, "GqlRequest");
 	I_END_COMPONENT
 
 	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
@@ -68,8 +71,11 @@ protected:
 	virtual bool WriteDataToMemory(const QByteArray& typeId, const istd::IChangeable& object, QByteArray& data) const override;
 	virtual bool ReadDataFromMemory(const QByteArray& typeId, const QByteArray& data, istd::IChangeable& object) const override;
 
+	virtual imtbase::CTreeItemModel* GetRemoteCollectionData(const QByteArray& collectionCommandId, QByteArrayList fields) const;
+
 	I_ATTR(bool, m_isMultiTypeAttrPtr);
 	I_MULTIFACT(istd::IChangeable, m_documentFactoriesCompPtr);
+	I_REF(imtgql::IGqlRequestHandler, m_gqlRequestHandlerCompPtr);
 };
 
 

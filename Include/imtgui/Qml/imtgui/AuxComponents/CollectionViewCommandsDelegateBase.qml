@@ -227,8 +227,7 @@ Item {
         }
     }
 
-    Component {
-        id: renameDialog;
+    property Component renameDialog: Component {
         InputDialog {
             title: qsTr("Rename document");
             onFinished: {

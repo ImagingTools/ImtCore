@@ -203,58 +203,6 @@ imtbase::CTreeItemModel* CProductControllerComp::GetObject(const imtgql::CGqlReq
 }
 
 
-imtbase::CTreeItemModel* CProductControllerComp::RenameObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
-{
-	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
-		SendErrorMessage(0, errorMessage, "Product controller");
-
-		return nullptr;
-	}
-
-	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
-	if (inputParamPtr == nullptr){
-		errorMessage = QT_TR_NOOP("Unable to get object. GQL input params is invalid.");
-		SendErrorMessage(0, errorMessage, "CProductControllerComp");
-
-		return nullptr;
-	}
-
-	QString oldName;
-
-	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
-	QString newName = inputParamPtr->GetFieldArgumentValue("NewName").toByteArray();
-
-	imtbase::IObjectCollection::DataPtr dataPtr;
-	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		imtlic::CProductInfo* productInfoPtr = dynamic_cast<imtlic::CProductInfo*>(dataPtr.GetPtr());
-		if (productInfoPtr != nullptr){
-			oldName = productInfoPtr->GetName();
-
-			productInfoPtr->SetName(newName);
-			productInfoPtr->SetProductId(newName.replace(QRegularExpression("/\s+/g"), "").toUtf8());
-
-			if (!m_objectCollectionCompPtr->SetObjectData(objectId, *productInfoPtr)){
-				errorMessage = QString("Error when trying rename product with ID %1").arg(qPrintable(objectId));
-				SendErrorMessage(0, errorMessage, "CProductControllerComp");
-
-				return nullptr;
-			}
-		}
-	}
-
-	SendInfoMessage(0, QString("The product %1 successfully renamed to %2").arg(oldName).arg(newName));
-
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-
-	dataModelPtr->SetData("Id", objectId);
-	dataModelPtr->SetData("Name", newName);
-
-	return rootModelPtr.PopPtr();
-}
-
-
 } // namespace imtlicgql
 
 

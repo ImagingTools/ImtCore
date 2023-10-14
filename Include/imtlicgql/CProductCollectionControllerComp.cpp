@@ -10,7 +10,7 @@
 
 // ImtCore includes
 #include <imtlic/CLicenseDefinition.h>
-#include <imtlic/IProductInfo.h>
+#include <imtlic/CProductInfo.h>
 
 
 namespace imtlicgql
@@ -187,6 +187,60 @@ void CProductCollectionControllerComp::SetObjectFilter(const imtgql::CGqlRequest
 			filterParams.SetEditableParameter("CategoryId", textParamPtr.PopPtr());
 		}
 	}
+}
+
+
+imtbase::CTreeItemModel* CProductCollectionControllerComp::RenameObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	if (!m_objectCollectionCompPtr.IsValid()){
+		errorMessage = QObject::tr("Internal error").toUtf8();
+		SendErrorMessage(0, errorMessage, "Product controller");
+
+		return nullptr;
+	}
+
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	if (inputParamPtr == nullptr){
+		errorMessage = QT_TR_NOOP("Unable to get object. GQL input params is invalid.");
+		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
+
+		return nullptr;
+	}
+
+	QString oldName;
+
+	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+	QString newName = inputParamPtr->GetFieldArgumentValue("NewName").toByteArray();
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+		imtlic::CIdentifiableProductInfo* productInfoPtr = dynamic_cast<imtlic::CIdentifiableProductInfo*>(dataPtr.GetPtr());
+		if (productInfoPtr != nullptr){
+			oldName = productInfoPtr->GetName();
+			if (newName != oldName){
+				productInfoPtr->SetName(newName);
+				productInfoPtr->SetProductId(newName.replace(" ", "").toUtf8());
+
+				imtbase::IOperationContext* operationContextPtr = CreateOperationContext(gqlRequest, QString("Renamed the object"));
+				if (!m_objectCollectionCompPtr->SetObjectData(objectId, *productInfoPtr, istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr)){
+					errorMessage = QString("Error when trying rename product with ID %1").arg(qPrintable(objectId));
+					SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
+
+					return nullptr;
+				}
+			}
+		}
+	}
+
+	SendInfoMessage(0, QString("The product %1 successfully renamed to %2").arg(oldName).arg(newName));
+
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+
+	dataModelPtr->SetData("Id", objectId);
+	dataModelPtr->SetData("Name", newName);
+
+	return rootModelPtr.PopPtr();
 }
 
 

@@ -73,10 +73,10 @@ void CFeatureCollectionViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationTypes.ResetData();
 	m_summaryInformationHeaders.clear();
 
-	m_summaryInformationTypes.InsertItem("Name", tr("Feature Name"), "");//изменил FeatureId на Id
+	m_summaryInformationTypes.InsertItem("Name", tr("Feature Name"), "");
 	m_summaryInformationHeaders["Name"] = HeaderInfo(false, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
-	m_summaryInformationTypes.InsertItem("Id", tr("Feature-ID"), "");//изменил FeatureId на Id
+	m_summaryInformationTypes.InsertItem("Id", tr("Feature-ID"), "");
 	m_summaryInformationHeaders["Id"] = HeaderInfo(true, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
 	m_summaryInformationTypes.InsertItem("Description", tr("Description"), "");

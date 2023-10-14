@@ -41,6 +41,14 @@ CollectionViewCommandsDelegateBase {
         }
     }
 
+    function onRename(){
+        let indexes = tableData.getSelectedIndexes();
+        if (indexes.length > 0){
+            let selectedName = tableData.elements.GetData("ProductName", indexes[0]);
+            modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
+        }
+    }
+
     RemoteFileController {
         id: remoteFileController;
 
