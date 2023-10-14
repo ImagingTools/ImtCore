@@ -102,6 +102,9 @@ imt3dgui.depends = DesignTokenCreatorExe
 SUBDIRS += imtzip
 imtzip.file = ../../Include/imtzip/QMake/imtzip.pro
 
+SUBDIRS += imthttp
+imthttp.file = ../../Include/imthttp/QMake/imthttp.pro
+
 #!macx {
 #	SUBDIRS += imtpy
 #	imtpy.file = ../../Include/imtpy/QMake/imtpy.pro
@@ -273,6 +276,10 @@ ImtAuthGqlPck.depends = imtauthgql
 SUBDIRS += ImtClientGqlPck
 ImtClientGqlPck.file = ../../Impl/ImtClientGqlPck/QMake/ImtClientGqlPck.pro
 ImtClientGqlPck.depends = imtclientgql
+
+SUBDIRS += ImtHttpPck
+ImtHttpPck.file = ../../Impl/ImtHttpPck/QMake/ImtHttpPck.pro
+ImtHttpPck.depends = imthttp
 
 #SUBDIRS += ImtControlsGallery
 #ImtControlsGallery.file = ../../Impl/ImtControlsGallery/QMake/ImtControlsGallery.pro
