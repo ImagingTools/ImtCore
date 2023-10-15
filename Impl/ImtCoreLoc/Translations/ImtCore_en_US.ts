@@ -4,7 +4,7 @@
 <context>
     <name>AccountCollectionView</name>
     <message>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountCollectionView.qml" line="+13"/>
+        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AccountCollectionView.qml" line="+18"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
@@ -149,69 +149,70 @@
 <context>
     <name>Attribute</name>
     <message>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+303"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+259"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+239"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+261"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+181"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+317"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+276"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+255"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+81"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+321"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+265"/>
         <source>Report</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="-2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Report Files</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-116"/>
-        <location line="+2"/>
-        <location line="+32"/>
-        <location line="+2"/>
-        <location line="+36"/>
-        <location line="+2"/>
-        <location line="+32"/>
+        <location line="-114"/>
+        <location line="+50"/>
+        <location line="+38"/>
+        <location line="+14"/>
         <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-196"/>
-        <location line="+2"/>
-        <location line="+32"/>
-        <location line="+2"/>
-        <location line="+36"/>
-        <location line="+2"/>
-        <location line="+108"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-198"/>
+        <location line="+18"/>
+        <location line="+38"/>
+        <location line="+130"/>
         <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-196"/>
-        <location line="+2"/>
-        <location line="+32"/>
-        <location line="+2"/>
-        <location line="+36"/>
-        <location line="+2"/>
-        <location line="+110"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-210"/>
+        <location line="+34"/>
+        <location line="+38"/>
+        <location line="+130"/>
         <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-200"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-12"/>
+        <location line="+6"/>
+        <location line="+138"/>
         <location line="+2"/>
         <location line="+48"/>
         <location line="+2"/>
         <location line="+36"/>
         <location line="+2"/>
-        <location line="+4"/>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-140"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-210"/>
         <location line="+2"/>
-        <location line="+48"/>
+        <location line="+32"/>
         <location line="+2"/>
         <location line="+36"/>
         <location line="+2"/>
-        <location line="+40"/>
+        <location line="+30"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-210"/>
+        <location line="+2"/>
+        <location line="+52"/>
+        <location line="+2"/>
+        <location line="+36"/>
+        <location line="+2"/>
+        <location line="+124"/>
         <location line="+6"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-10"/>
+        <location line="-4"/>
         <location line="+2"/>
         <location line="+4"/>
         <location line="+2"/>
@@ -219,142 +220,172 @@
         <location line="+2"/>
         <location line="+4"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-8"/>
-        <location line="+4"/>
-        <location line="+2"/>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-10"/>
         <location line="+2"/>
         <location line="+4"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-8"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-236"/>
         <location line="+4"/>
         <location line="+2"/>
         <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-10"/>
+        <location line="+2"/>
+        <location line="+4"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-10"/>
+        <location line="+2"/>
+        <location line="+4"/>
+        <location line="+2"/>
         <source>Edit License</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-232"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+16"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+14"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+38"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+18"/>
+        <location line="-242"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+14"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+18"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+48"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+34"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-68"/>
         <source>(C) 2018 ImagingTools GmbH. All rights reserved.</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-34"/>
+        <location line="-32"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-94"/>
         <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-172"/>
-        <location line="+4"/>
         <source>Design token generator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
+        <location line="-6"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
         <source>Imaging tools</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
         <source>. Imaging tools</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
         <source>Client (CommandLine)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+16"/>
+        <location line="+22"/>
         <location line="+10"/>
-        <location line="+48"/>
+        <location line="+44"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-50"/>
-        <location line="+44"/>
-        <location line="+54"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-48"/>
-        <location line="+44"/>
-        <location line="+54"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+160"/>
-        <location line="+40"/>
-        <location line="+18"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
-        <location line="+42"/>
-        <location line="+16"/>
+        <location line="+48"/>
+        <location line="+50"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-52"/>
+        <location line="+48"/>
+        <location line="+50"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+68"/>
+        <location line="+14"/>
+        <location line="+46"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-4"/>
+        <location line="+46"/>
+        <location line="+20"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-12"/>
+        <location line="+8"/>
+        <location line="+46"/>
         <source>Server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-54"/>
+        <location line="-46"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-56"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-56"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-54"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-52"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-68"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-50"/>
         <source>(C) 2020 ImagingTools GmbH. All rights reserved.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+12"/>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+10"/>
+        <location line="-18"/>
+        <location line="+50"/>
+        <location line="+204"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-56"/>
+        <location line="+30"/>
+        <location line="+58"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-56"/>
+        <location line="+30"/>
+        <location line="+60"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-28"/>
+        <location line="+40"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+10"/>
         <location line="+24"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-52"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-50"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+12"/>
+        <location line="+22"/>
         <source>Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-24"/>
+        <location line="-226"/>
         <location line="+26"/>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-22"/>
+        <location line="+8"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-20"/>
         <location line="+26"/>
         <location line="+8"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-24"/>
         <location line="+26"/>
         <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location line="+18"/>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location line="+18"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-34"/>
+        <location line="+8"/>
+        <location line="+28"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-22"/>
+        <location line="+26"/>
+        <location line="+8"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-20"/>
+        <location line="+26"/>
         <location line="+6"/>
         <source>Preference File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-30"/>
-        <location line="+72"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-150"/>
-        <location line="+118"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-148"/>
-        <location line="+118"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-22"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-22"/>
+        <location line="-32"/>
+        <location line="+68"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-166"/>
+        <location line="+134"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-164"/>
+        <location line="+134"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-242"/>
+        <location line="+210"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-178"/>
+        <location line="+148"/>
         <source>Light</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-70"/>
-        <location line="+72"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-116"/>
-        <location line="+118"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-116"/>
-        <location line="+118"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="-66"/>
+        <location line="+68"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-132"/>
+        <location line="+134"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-132"/>
+        <location line="+134"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-36"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-208"/>
+        <location line="+210"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-146"/>
+        <location line="+148"/>
         <source>Dark</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-70"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
+        <location line="-66"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-34"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+6"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
         <source>Language</source>
         <translation type="unfinished"></translation>
@@ -362,87 +393,115 @@
     <message>
         <location line="+4"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
         <source>Design Schema</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
         <source>General</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location line="+134"/>
+        <location line="-38"/>
+        <location line="+254"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-72"/>
+        <location line="+30"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-76"/>
+        <location line="+30"/>
+        <source>http://localhost:7778</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-212"/>
+        <location line="+140"/>
         <location line="+34"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-202"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-168"/>
         <location line="+34"/>
-        <location line="+170"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-202"/>
+        <location line="+182"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-166"/>
         <location line="+34"/>
-        <location line="+170"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-132"/>
+        <location line="+182"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location line="+100"/>
         <location line="+34"/>
-        <location line="+104"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-140"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-144"/>
         <location line="+34"/>
-        <location line="+110"/>
+        <location line="+114"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-154"/>
+        <location line="+70"/>
+        <location line="+90"/>
         <source>DocumentInfo</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-166"/>
+        <location line="-172"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-132"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>localhost</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
         <source>Server URL</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-2"/>
+        <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
         <source>Network</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
+        <source>http://localhost:7776</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
-        <source>http://localhost:7776</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>qrc:/qml/imtgui/AuxComponents/SettingsTextInput.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+4"/>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+4"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+8"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+6"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+4"/>
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
         <location line="+2"/>
@@ -450,70 +509,95 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
         <source>^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+10"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+12"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+8"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+8"/>
         <source>Instance Mask</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-2"/>
+        <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>:/qml/imtgui/AuxComponents/SettingsTextInput.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-8"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
         <source>Database Settings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-2"/>
+        <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>:/qml/imtgui/AuxComponents/DatabaseInput.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+68"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-268"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-266"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-198"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-196"/>
+        <location line="+58"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-152"/>
+        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-146"/>
+        <location line="+6"/>
+        <source>../../InputsRepresentaitonPage.qml</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-4"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <source>Inputs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-128"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-134"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+104"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-214"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-222"/>
         <source>Users</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+74"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
-        <location line="+74"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-2"/>
+        <location line="+76"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
         <location line="+76"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
+        <location line="+76"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location line="+74"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
-        <location line="+76"/>
+        <location line="+112"/>
         <source>Roles</source>
         <translation type="unfinished"></translation>
     </message>
@@ -522,7 +606,8 @@
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-72"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-72"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-72"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-72"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-72"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-108"/>
         <source>RoleInfo</source>
         <translation type="unfinished"></translation>
     </message>
@@ -531,38 +616,101 @@
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Role Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location line="+4"/>
+        <location line="+50"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+26"/>
         <location line="+18"/>
-        <location line="+2"/>
-        <location line="+32"/>
-        <location line="+2"/>
-        <location line="+36"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+22"/>
-        <location line="+2"/>
-        <location line="+32"/>
-        <location line="+2"/>
-        <location line="+36"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+22"/>
-        <location line="+2"/>
-        <location line="+32"/>
-        <location line="+2"/>
-        <location line="+36"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+22"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
+        <location line="+34"/>
+        <location line="+38"/>
+        <source>Icons/Add</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-84"/>
+        <location line="+50"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-64"/>
+        <location line="+18"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-76"/>
+        <location line="+34"/>
+        <location line="+38"/>
+        <source>Icons/Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-84"/>
+        <location line="+50"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-52"/>
+        <location line="+18"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-76"/>
+        <location line="+34"/>
+        <location line="+38"/>
+        <source>Icons/Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-84"/>
+        <location line="+22"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-76"/>
+        <location line="+46"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-60"/>
+        <location line="+34"/>
+        <location line="+38"/>
+        <source>Icons/Redo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-56"/>
+        <location line="+22"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-72"/>
+        <location line="+46"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-68"/>
+        <location line="+34"/>
+        <location line="+38"/>
+        <source>Icons/Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-58"/>
+        <location line="+22"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-86"/>
+        <location line="+46"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-66"/>
+        <location line="+34"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+18"/>
         <location line="+2"/>
         <location line="+20"/>
         <location line="+2"/>
         <location line="+36"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+22"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+6"/>
         <location line="+2"/>
-        <location line="+20"/>
+        <location line="+32"/>
+        <location line="+2"/>
+        <location line="+36"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="+2"/>
+        <location line="+80"/>
         <location line="+2"/>
         <location line="+36"/>
         <location line="+2"/>
@@ -570,33 +718,30 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-70"/>
-        <location line="+2"/>
-        <location line="+32"/>
-        <location line="+2"/>
-        <location line="+36"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-82"/>
-        <location line="+2"/>
-        <location line="+32"/>
-        <location line="+2"/>
-        <location line="+36"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-70"/>
-        <location line="+2"/>
-        <location line="+32"/>
-        <location line="+2"/>
-        <location line="+36"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-70"/>
+        <location line="-68"/>
+        <location line="+22"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-92"/>
+        <location line="+46"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-80"/>
+        <location line="+34"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-54"/>
         <location line="+2"/>
         <location line="+20"/>
         <location line="+2"/>
         <location line="+36"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-66"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-70"/>
         <location line="+2"/>
-        <location line="+20"/>
+        <location line="+32"/>
+        <location line="+2"/>
+        <location line="+36"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-110"/>
+        <location line="+2"/>
+        <location line="+80"/>
         <location line="+2"/>
         <location line="+36"/>
         <location line="+2"/>
@@ -604,33 +749,30 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-82"/>
-        <location line="+2"/>
-        <location line="+32"/>
-        <location line="+2"/>
-        <location line="+36"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-70"/>
-        <location line="+2"/>
-        <location line="+32"/>
-        <location line="+2"/>
-        <location line="+36"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-86"/>
-        <location line="+2"/>
-        <location line="+32"/>
-        <location line="+2"/>
-        <location line="+36"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-58"/>
+        <location line="-56"/>
+        <location line="+22"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-72"/>
+        <location line="+46"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-68"/>
+        <location line="+34"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-74"/>
         <location line="+2"/>
         <location line="+20"/>
         <location line="+2"/>
         <location line="+36"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-54"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-82"/>
         <location line="+2"/>
-        <location line="+20"/>
+        <location line="+32"/>
+        <location line="+2"/>
+        <location line="+36"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-126"/>
+        <location line="+2"/>
+        <location line="+80"/>
         <location line="+2"/>
         <location line="+36"/>
         <location line="+2"/>
@@ -638,33 +780,30 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-62"/>
-        <location line="+2"/>
-        <location line="+32"/>
-        <location line="+2"/>
-        <location line="+36"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-66"/>
-        <location line="+2"/>
-        <location line="+32"/>
-        <location line="+2"/>
-        <location line="+36"/>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-70"/>
-        <location line="+2"/>
-        <location line="+32"/>
-        <location line="+2"/>
-        <location line="+36"/>
-        <location line="+2"/>
+        <location line="-52"/>
+        <location line="+22"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-92"/>
+        <location line="+46"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-64"/>
+        <location line="+34"/>
+        <location line="+38"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-54"/>
         <location line="+2"/>
         <location line="+20"/>
         <location line="+2"/>
         <location line="+36"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-74"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-62"/>
         <location line="+2"/>
-        <location line="+20"/>
+        <location line="+32"/>
+        <location line="+2"/>
+        <location line="+36"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-126"/>
+        <location line="+2"/>
+        <location line="+80"/>
         <location line="+2"/>
         <location line="+36"/>
         <location line="+2"/>
@@ -672,77 +811,70 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-94"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-98"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-90"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-82"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-64"/>
+        <location line="-84"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-64"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-88"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-78"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-60"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-100"/>
         <source>New</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location line="+34"/>
-        <location line="+38"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
-        <location line="+34"/>
-        <location line="+38"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location line="+34"/>
-        <location line="+38"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
         <location line="+50"/>
         <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-2"/>
+        <location line="+34"/>
+        <location line="+38"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
-        <location line="+50"/>
+        <location line="+54"/>
         <location line="+38"/>
         <source>Add</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-70"/>
-        <location line="+34"/>
-        <location line="+38"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-70"/>
-        <location line="+34"/>
-        <location line="+38"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-70"/>
-        <location line="+34"/>
-        <location line="+38"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-94"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+8"/>
         <location line="+50"/>
         <location line="+38"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-90"/>
-        <location line="+50"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-4"/>
+        <location line="+18"/>
         <location line="+38"/>
-        <source>Remove</source>
-        <translation type="unfinished">Remove</translation>
-    </message>
-    <message>
-        <location line="-70"/>
-        <location line="+34"/>
-        <location line="+38"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-70"/>
-        <location line="+34"/>
-        <location line="+38"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-70"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-8"/>
         <location line="+34"/>
         <location line="+38"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-86"/>
         <location line="+50"/>
         <location line="+38"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-90"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-74"/>
+        <location line="+34"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-94"/>
+        <location line="+54"/>
+        <location line="+38"/>
+        <source>Remove</source>
+        <translation type="unfinished">Remove</translation>
+    </message>
+    <message>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-86"/>
         <location line="+50"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-74"/>
+        <location line="+34"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-94"/>
+        <location line="+54"/>
         <location line="+38"/>
         <source>Delete</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-52"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-66"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-48"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-48"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-60"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-62"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-44"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-68"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-62"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
         <source>Group Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -751,25 +883,28 @@
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="+18"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+12"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+12"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+22"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+28"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+28"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+12"/>
         <source>Create new group</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+26"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+30"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+30"/>
+        <location line="+14"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+20"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+20"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+10"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+20"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -778,6 +913,7 @@
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Email</source>
         <translation type="unfinished"></translation>
@@ -787,74 +923,84 @@
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+4"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+4"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
         <source>Groups</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="+18"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+12"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+12"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+22"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+28"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+28"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+12"/>
         <source>Create new user</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-216"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+86"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+86"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+108"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+102"/>
+        <location line="-238"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+88"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+88"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-142"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+118"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+32"/>
         <source>Client</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-4"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
+        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
         <source>Client Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-2"/>
+        <location line="+2"/>
         <location line="+134"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-2"/>
-        <location line="+22"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
-        <location line="+22"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-208"/>
-        <location line="+206"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-106"/>
-        <location line="+104"/>
+        <location line="+26"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="+26"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
+        <location line="+156"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-258"/>
+        <location line="+260"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-164"/>
+        <location line="+166"/>
         <source>qrc:/qml/imtgui/AuxComponents/SettingsTextLabel.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="-2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-204"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-102"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-262"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-168"/>
         <source>Server Version</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-38"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-138"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-86"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+12"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-86"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+50"/>
         <location line="+2"/>
         <source>qrc:/qml/imtgui/AuxComponents/SettingsComboBox.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-96"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-94"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-6"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-6"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
         <source>Blue</source>
         <translation type="unfinished"></translation>
     </message>
@@ -862,107 +1008,157 @@
         <location line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Orange</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+14"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
+        <location line="+12"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+24"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+14"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+20"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+12"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+20"/>
         <source>Products</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-2"/>
+        <location line="+2"/>
         <location line="+8"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="+8"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-20"/>
+        <location line="+8"/>
+        <location line="+8"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-10"/>
+        <location line="+8"/>
+        <location line="+8"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-10"/>
         <location line="+14"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-2"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
+        <location line="+8"/>
         <source>Product</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-12"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-18"/>
+        <location line="-14"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-10"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-10"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
         <source>../../imtgui/AuxComponents/MultiDocWorkspacePageView.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location line="-6"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>../../imtlicgui/ProductCollectionView.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+12"/>
+        <location line="-6"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+14"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+14"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-14"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+18"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
         <source>Administration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
         <source>LightSettings</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>../../imtgui/AuxComponents/SingleDocumentWorkspaceView.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location line="-6"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>../../imtauthgui/AdministrationView.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-16"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+16"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+10"/>
+        <location line="+18"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-18"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-26"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-12"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+16"/>
         <source>Buttons</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
+        <location line="-2"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-6"/>
+        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-2"/>
         <source>../../ButtonsRepresentaitonPage.qml</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+20"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+6"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+6"/>
+        <location line="+10"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+28"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+26"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+20"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+14"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+4"/>
         <source>Lisa</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-120"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+36"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+36"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+124"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-112"/>
+        <location line="-124"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+40"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+40"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-162"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+110"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+72"/>
         <source>AddressElements</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+252"/>
+        <location line="+260"/>
         <location line="+6"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location line="+6"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+24"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+154"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+104"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="+6"/>
         <source>NO_USER_MANAGEMENT</source>
         <translation type="unfinished"></translation>
     </message>
@@ -973,8 +1169,12 @@
         <location line="+6"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
         <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-4"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
+        <location line="+6"/>
         <source>OPTIONAL_USER_MANAGEMENT</source>
         <translation type="unfinished"></translation>
     </message>
@@ -985,17 +1185,22 @@
         <location line="+6"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
         <location line="+6"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-4"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-4"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-4"/>
+        <location line="+6"/>
         <source>STRONG_USER_MANAGEMENT</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-198"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-46"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-26"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-44"/>
+        <location line="-208"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-50"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-50"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-112"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+16"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+94"/>
         <source>STL</source>
         <translation></translation>
     </message>
@@ -1004,6 +1209,7 @@
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>OBJ</source>
         <translation></translation>
@@ -1021,6 +1227,9 @@
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
         <location line="+2"/>
         <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
+        <location line="+2"/>
+        <location line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location line="+2"/>
         <location line="+2"/>
@@ -1032,6 +1241,7 @@
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Search radius</source>
         <translation></translation>
@@ -1041,6 +1251,7 @@
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Mu</source>
         <translation></translation>
@@ -1050,6 +1261,7 @@
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Minimum angle</source>
         <translation></translation>
@@ -1059,6 +1271,7 @@
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Maximum angle</source>
         <translation></translation>
@@ -1068,6 +1281,7 @@
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Maximum surface angle</source>
         <translation></translation>
@@ -1077,60 +1291,96 @@
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
         <source>Maximum nearest neighbors</source>
         <translation></translation>
     </message>
     <message>
-        <location line="+150"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+32"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+32"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-36"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+2"/>
+        <location line="+78"/>
+        <location line="+22"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-154"/>
+        <location line="+46"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-142"/>
+        <location line="+34"/>
+        <location line="+38"/>
+        <source>Icons/Close</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-56"/>
+        <location line="+22"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-88"/>
+        <location line="+46"/>
+        <location line="+38"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-68"/>
+        <location line="+34"/>
+        <location line="+38"/>
+        <source>Icons/Undo</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+18"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+114"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+106"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-34"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-34"/>
         <source>Text file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-172"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+78"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+78"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+92"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+72"/>
+        <location line="-182"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+76"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="+76"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+48"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+96"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-6"/>
         <source>ImtCore</source>
         <translation></translation>
     </message>
     <message>
         <location line="-70"/>
-        <location line="+4"/>
+        <location line="+8"/>
         <location line="+10"/>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-106"/>
-        <location line="+8"/>
-        <location line="+44"/>
         <location line="+2"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-106"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-110"/>
         <location line="+8"/>
-        <location line="+44"/>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="-48"/>
-        <location line="+4"/>
-        <location line="+50"/>
-        <location line="+4"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-46"/>
-        <location line="+2"/>
         <location line="+48"/>
+        <location line="+6"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-110"/>
         <location line="+8"/>
+        <location line="+48"/>
+        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/DesignTokenCreator/CDesignTokenCreator.cpp" line="+6"/>
+        <location line="+4"/>
+        <location line="+38"/>
+        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-54"/>
+        <location line="+4"/>
+        <location line="+58"/>
+        <location line="+4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtCoreLoc/CImtCoreLoc.cpp" line="-70"/>
+        <location line="+8"/>
+        <location line="+8"/>
+        <location line="+4"/>
         <source>ImagingTools GmbH</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-228"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-242"/>
+        <location line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="-276"/>
         <location line="+2"/>
         <source>ControlsGallery</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+2"/>
+        <location line="-4"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/ImtControlsGallery/CImtControlsGallery.cpp" line="+2"/>
         <source>http://localhost:5555</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1138,33 +1388,40 @@
 <context>
     <name>AuthorizationPage</name>
     <message>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AuthorizationPage.qml" line="+162"/>
+        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/AuthorizationPage.qml" line="+168"/>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Dialogs/AuthorizationPage.qml" line="+168"/>
         <source>Welcome</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+47"/>
+        <location line="+205"/>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Dialogs/AuthorizationPage.qml" line="+47"/>
         <location line="+206"/>
         <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-189"/>
+        <location line="-188"/>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Dialogs/AuthorizationPage.qml" line="-189"/>
         <source>Enter the login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+34"/>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Dialogs/AuthorizationPage.qml" line="+34"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+17"/>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Dialogs/AuthorizationPage.qml" line="+17"/>
         <source>Enter the password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+69"/>
+        <location line="+68"/>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Dialogs/AuthorizationPage.qml" line="+69"/>
         <source>Password recovery</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1631,48 +1888,56 @@
     <message>
         <location filename="../../../Include/imtdbgui/CDatabaseLoginSettingsEditorComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+123"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+123"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+20"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Host</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Port</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Database Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>User</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Test Connection</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+7"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtdbgui/ui_CDatabaseLoginSettingsEditorComp.h" line="+1"/>
         <source>Database connection is successful</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1752,8 +2017,6 @@
 <context>
     <name>CFeaturePackageGuiComp</name>
     <message>
-        <location filename="../../../Include/imtlicgui/CFeaturePackageGuiComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtlicgui/ui_CFeaturePackageGuiComp.h" line="+75"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtlicgui/ui_CFeaturePackageGuiComp.h" line="+75"/>
         <source>Feature Package</source>
         <translation type="unfinished"></translation>
@@ -1762,8 +2025,6 @@
 <context>
     <name>CFeatureTreeGuiComp</name>
     <message>
-        <location filename="../../../Include/imtlicgui/CFeatureTreeGuiComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtlicgui/ui_CFeatureTreeGuiComp.h" line="+57"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtlicgui/ui_CFeatureTreeGuiComp.h" line="+57"/>
         <source>Feature Tree</source>
         <translation type="unfinished"></translation>
@@ -1842,6 +2103,7 @@
     <message>
         <location filename="../../../Include/imtgui/CMultiParamsSetGuiComp.ui" line="+32"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtgui/ui_CMultiParamsSetGuiComp.h" line="+62"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtgui/ui_CMultiParamsSetGuiComp.h" line="+62"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2340,23 +2602,17 @@
 <context>
     <name>CProductLicensingInfoGuiComp</name>
     <message>
-        <location filename="../../../Include/imtlicgui/CProductLicensingInfoGuiComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtlicgui/ui_CProductLicensingInfoGuiComp.h" line="+126"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtlicgui/ui_CProductLicensingInfoGuiComp.h" line="+126"/>
         <source>Product Licensing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+77"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtlicgui/ui_CProductLicensingInfoGuiComp.h" line="+1"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtlicgui/ui_CProductLicensingInfoGuiComp.h" line="+1"/>
+        <location line="+1"/>
         <source>Product-ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+23"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtlicgui/ui_CProductLicensingInfoGuiComp.h" line="+1"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtlicgui/ui_CProductLicensingInfoGuiComp.h" line="+1"/>
+        <location line="+1"/>
         <source>Product Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2366,6 +2622,7 @@
     <message>
         <location filename="../../../Include/imtauthgui/CRemoteStandardLoginGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+390"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+390"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2374,60 +2631,71 @@
         <location line="+346"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <location line="+9"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
+        <location line="+9"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-339"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="-8"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="-8"/>
         <source>User</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>Remember me</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+2"/>
         <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+29"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>Please enter your credentials to log in.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+163"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+2"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+74"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>Please, enter the password for system administrator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+50"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+2"/>
         <source>Confirm Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+55"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>No connection to the server</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+38"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CRemoteStandardLoginGuiComp.h" line="+1"/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2516,14 +2784,14 @@
     <message>
         <location filename="../../../Include/imtauthgui/CStandardLoginGuiComp.ui" line="+14"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+358"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+159"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+358"/>
         <source>Form</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+96"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+2"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+1"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+2"/>
         <source>User</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2532,14 +2800,15 @@
         <location line="+346"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="-1"/>
         <location line="+9"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+1"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="-1"/>
+        <location line="+9"/>
         <source>Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-325"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="-7"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+1"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="-7"/>
         <source>Remember me</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2553,30 +2822,35 @@
     <message>
         <location line="+29"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+1"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+1"/>
         <source>Please enter your credentials to log in.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+163"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+2"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+74"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+1"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+1"/>
         <source>Please, enter the password for system administrator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+50"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+2"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+2"/>
         <source>Confirm Password</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+42"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+1"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtauthgui/ui_CStandardLoginGuiComp.h" line="+1"/>
         <source>No connection to the server</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2585,8 +2859,8 @@
     <name>CThumbnailDecoratorGuiComp</name>
     <message>
         <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.ui" line="+14"/>
-        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+456"/>
-        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+456"/>
+        <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+469"/>
+        <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+469"/>
         <source>Main Window</source>
         <translation></translation>
     </message>
@@ -2632,7 +2906,7 @@
         <translation>Dashboard</translation>
     </message>
     <message>
-        <location line="+47"/>
+        <location line="+74"/>
         <location filename="../../../AuxInclude/Qt5_VC16_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <location filename="../../../AuxInclude/Qt6_VC16_x64/GeneratedFiles/imtgui/ui_CThumbnailDecoratorGuiComp.h" line="+1"/>
         <source>Quit</source>
@@ -2769,22 +3043,26 @@
 <context>
     <name>CollectionView</name>
     <message>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Views/CollectionView.qml" line="+143"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionView.qml" line="+144"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionView.qml" line="+1"/>
         <source>Remove</source>
         <translation type="unfinished">Remove</translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionView.qml" line="+1"/>
         <source>Rename</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionView.qml" line="+1"/>
         <source>Set Description</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2792,32 +3070,38 @@
 <context>
     <name>CollectionViewCommandsDelegateBase</name>
     <message>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Views/CollectionViewCommandsDelegateBase.qml" line="+43"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionViewCommandsDelegateBase.qml" line="+43"/>
         <source>Deleting a selected element</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionViewCommandsDelegateBase.qml" line="+1"/>
         <source>Remove selected item from the collection ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+83"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionViewCommandsDelegateBase.qml" line="+83"/>
         <source>Please enter the name of the document:</source>
         <translation type="unfinished">Please enter the name of the product</translation>
     </message>
     <message>
         <location line="+14"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionViewCommandsDelegateBase.qml" line="+14"/>
         <source>Please enter the description of the document:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+94"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionViewCommandsDelegateBase.qml" line="+93"/>
         <source>Rename document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+14"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionViewCommandsDelegateBase.qml" line="+14"/>
         <source>Set description</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2825,6 +3109,7 @@
 <context>
     <name>CollectionViewCommandsObserver</name>
     <message>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Views/CollectionViewCommandsObserver.qml" line="+28"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/CollectionViewCommandsObserver.qml" line="+28"/>
         <source>Open</source>
         <translation type="unfinished"></translation>
@@ -2894,62 +3179,74 @@
 <context>
     <name>DatePicker</name>
     <message>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DatePicker.qml" line="+10"/>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Inputs/DatePicker.qml" line="+10"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DatePicker.qml" line="+11"/>
         <source>January</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DatePicker.qml" line="+1"/>
         <source>February</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DatePicker.qml" line="+1"/>
         <source>March</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DatePicker.qml" line="+1"/>
         <source>April</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DatePicker.qml" line="+1"/>
         <source>May</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DatePicker.qml" line="+1"/>
         <source>June</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DatePicker.qml" line="+1"/>
         <source>July</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DatePicker.qml" line="+1"/>
         <source>August</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DatePicker.qml" line="+1"/>
         <source>September</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DatePicker.qml" line="+1"/>
         <source>October</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DatePicker.qml" line="+1"/>
         <source>November</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DatePicker.qml" line="+1"/>
         <source>December</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2957,27 +3254,32 @@
 <context>
     <name>DocumentWorkspaceCommandsDelegate</name>
     <message>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Document/DocumentWorkspaceCommandsDelegate.qml" line="+43"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DocumentWorkspaceCommandsDelegate.qml" line="+43"/>
         <source>Remove selected item from the document ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+10"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DocumentWorkspaceCommandsDelegate.qml" line="+10"/>
         <source>Please enter the description of the item:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+61"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DocumentWorkspaceCommandsDelegate.qml" line="+61"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DocumentWorkspaceCommandsDelegate.qml" line="+1"/>
         <source>Remove</source>
         <translation type="unfinished">Remove</translation>
     </message>
     <message>
         <location line="+1"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/DocumentWorkspaceCommandsDelegate.qml" line="+1"/>
         <source>Set Description</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3029,6 +3331,7 @@
 <context>
     <name>ErrorDialog</name>
     <message>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Dialogs/ErrorDialog.qml" line="+8"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/Dialogs/ErrorDialog.qml" line="+8"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
@@ -3036,14 +3339,85 @@
     <message>
         <location line="+13"/>
         <location line="+4"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/Dialogs/ErrorDialog.qml" line="+15"/>
+        <location line="+4"/>
         <source>OK</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>FeatureCollectionView</name>
+    <message>
+        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/FeatureCollectionView.qml" line="+19"/>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Remove</source>
+        <translation type="unfinished">Remove</translation>
+    </message>
+</context>
+<context>
+    <name>FeatureEditor</name>
+    <message>
+        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/FeatureEditor.qml" line="+217"/>
+        <source>Feature Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+36"/>
+        <location line="+540"/>
+        <source>Feature Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-531"/>
+        <source>Enter the feature name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <location line="+510"/>
+        <source>Feature-ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-501"/>
+        <source>Enter the feature ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <location line="+486"/>
+        <source>Feature Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-477"/>
+        <source>Enter the description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+46"/>
+        <source>Subfeatures</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+241"/>
+        <source>Dependencies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+194"/>
+        <source>Optional</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>FeaturesDialog</name>
     <message>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/FeaturesDialog.qml" line="+20"/>
+        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/FeaturesDialog.qml" line="+37"/>
         <source>Select features</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3051,6 +3425,7 @@
 <context>
     <name>FilterPanelDecorator</name>
     <message>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Panels/FilterPanelDecorator.qml" line="+63"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/FilterPanelDecorator.qml" line="+65"/>
         <source>Enter some text to filter the item list</source>
         <translation type="unfinished"></translation>
@@ -3127,27 +3502,32 @@
 <context>
     <name>InputActions</name>
     <message>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Inputs/InputActions.qml" line="+36"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/InputActions.qml" line="+36"/>
         <source>Cut</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/InputActions.qml" line="+4"/>
         <source>Copy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/InputActions.qml" line="+4"/>
         <source>Paste</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+4"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/InputActions.qml" line="+4"/>
         <source>Remove</source>
         <translation type="unfinished">Remove</translation>
     </message>
     <message>
         <location line="+4"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/InputActions.qml" line="+4"/>
         <source>Select All</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3155,13 +3535,17 @@
 <context>
     <name>InputDialog</name>
     <message>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/Dialogs/InputDialog.qml" line="+25"/>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Dialogs/InputDialog.qml" line="+25"/>
+        <location line="+7"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/Dialogs/InputDialog.qml" line="+27"/>
         <location line="+7"/>
         <source>OK</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-6"/>
+        <location line="+7"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/Dialogs/InputDialog.qml" line="-6"/>
         <location line="+7"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
@@ -3214,6 +3598,74 @@
     </message>
 </context>
 <context>
+    <name>LicenseCollectionView</name>
+    <message>
+        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/LicenseCollectionView.qml" line="+14"/>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Remove</source>
+        <translation type="unfinished">Remove</translation>
+    </message>
+</context>
+<context>
+    <name>LicenseEditor</name>
+    <message>
+        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/LicenseEditor.qml" line="+238"/>
+        <location line="+241"/>
+        <source>License Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-232"/>
+        <source>Enter the license name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <location line="+218"/>
+        <source>License-ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-209"/>
+        <source>Enter the license ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+19"/>
+        <source>Description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Enter the license description</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>Product</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+41"/>
+        <source>Features</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+59"/>
+        <source>Dependencies</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+78"/>
+        <source>Feature Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>LicenseInstanceItemDelegate</name>
     <message>
         <location filename="../../../Include/imtlicgui/Qml/imtlicgui/LicenseInstanceItemDelegate.qml" line="+149"/>
@@ -3224,22 +3676,26 @@
 <context>
     <name>LoginDialog</name>
     <message>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Dialogs/LoginDialog.qml" line="+46"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/Dialogs/LoginDialog.qml" line="+46"/>
         <source>Welcome to Lisa</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+15"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/Dialogs/LoginDialog.qml" line="+15"/>
         <source>Please login</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+75"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/Dialogs/LoginDialog.qml" line="+75"/>
         <source>Remember me</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+30"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/Dialogs/LoginDialog.qml" line="+30"/>
         <source>Login</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3247,6 +3703,7 @@
 <context>
     <name>MessageDialog</name>
     <message>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Dialogs/MessageDialog.qml" line="+8"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/Dialogs/MessageDialog.qml" line="+8"/>
         <source>Message</source>
         <translation type="unfinished"></translation>
@@ -3254,11 +3711,15 @@
     <message>
         <location line="+15"/>
         <location line="+11"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/Dialogs/MessageDialog.qml" line="+17"/>
+        <location line="+11"/>
         <source>Yes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-10"/>
+        <location line="+11"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/Dialogs/MessageDialog.qml" line="-10"/>
         <location line="+11"/>
         <source>No</source>
         <translation type="unfinished"></translation>
@@ -3267,27 +3728,32 @@
 <context>
     <name>MultiDocWorkspaceView</name>
     <message>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/MultiDocWorkspaceView.qml" line="+344"/>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Document/MultiDocWorkspaceView.qml" line="+293"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/MultiDocWorkspaceView.qml" line="+345"/>
         <source>Please enter the name of the document:</source>
         <translation type="unfinished">Please enter the name of the product</translation>
     </message>
     <message>
         <location line="+12"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/MultiDocWorkspaceView.qml" line="+12"/>
         <source>Save document</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+2"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/MultiDocWorkspaceView.qml" line="+2"/>
         <source>Save all changes ?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/MultiDocWorkspaceView.qml" line="+3"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+25"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/MultiDocWorkspaceView.qml" line="+25"/>
         <source>Entering a name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3313,12 +3779,12 @@
     <name>PackageCollectionViewCommandsDelegate</name>
     <message>
         <location filename="../../../Include/imtlicgui/Qml/imtlicgui/PackageCollectionViewCommandsDelegate.qml" line="+8"/>
-        <source>Deleting a feature package</source>
+        <source>Deleting a feature</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+1"/>
-        <source>Delete the selected package ?</source>
+        <source>Delete the selected feature ?</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3349,7 +3815,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+374"/>
+        <location line="+380"/>
         <source>Dependencies</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3360,17 +3826,9 @@
     </message>
 </context>
 <context>
-    <name>PackageView2</name>
-    <message>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/PackageView2.qml" line="+307"/>
-        <source>Dependencies</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>PackageViewItemDelegate</name>
     <message>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/PackageViewItemDelegate.qml" line="+169"/>
+        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/PackageViewItemDelegate.qml" line="+160"/>
         <source>Feature-ID already exists (In this or another package)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3383,12 +3841,14 @@
 <context>
     <name>PageAboutProvider</name>
     <message>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Settings/PageAboutProvider.qml" line="+31"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/PageAboutProvider.qml" line="+26"/>
         <source>About</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+22"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/PageAboutProvider.qml" line="+28"/>
         <location line="+29"/>
         <source>Server Log</source>
         <translation type="unfinished"></translation>
@@ -3431,6 +3891,7 @@
 <context>
     <name>PathPicker</name>
     <message>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Inputs/PathPicker.qml" line="+69"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/PathPicker.qml" line="+69"/>
         <source>Select folder</source>
         <translation type="unfinished"></translation>
@@ -3439,25 +3900,33 @@
 <context>
     <name>PreferenceDialog</name>
     <message>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Dialogs/PreferenceDialog.qml" line="+186"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/PreferenceDialog.qml" line="+10"/>
         <source>Preferences</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+21"/>
-        <location line="+37"/>
+        <location line="+297"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/PreferenceDialog.qml" line="+21"/>
+        <location line="+41"/>
         <source>Apply</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-21"/>
+        <location line="+70"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/PreferenceDialog.qml" line="-21"/>
         <location line="+6"/>
         <location line="+16"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-7"/>
+        <location line="+127"/>
+        <source>Save file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/PreferenceDialog.qml" line="-7"/>
         <source>Cancel</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3465,6 +3934,9 @@
 <context>
     <name>PreferencePage</name>
     <message>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Dialogs/PreferencePage.qml" line="+178"/>
+        <location line="+42"/>
+        <location line="+6"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/PreferencePage.qml" line="+166"/>
         <location line="+42"/>
         <location line="+6"/>
@@ -3474,11 +3946,15 @@
     <message>
         <location line="-41"/>
         <location line="+218"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/PreferencePage.qml" line="-41"/>
+        <location line="+218"/>
         <source>Apply</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-215"/>
+        <location line="+216"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/PreferencePage.qml" line="-215"/>
         <location line="+216"/>
         <source>Close</source>
         <translation type="unfinished"></translation>
@@ -3502,7 +3978,12 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+28"/>
+        <location line="+23"/>
+        <source>Please enter the name of the document:</source>
+        <translation type="unfinished">Please enter the name of the product</translation>
+    </message>
+    <message>
+        <location line="+13"/>
         <source>Save file</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3510,62 +3991,41 @@
 <context>
     <name>ProductView</name>
     <message>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/ProductView.qml" line="+23"/>
-        <location line="+41"/>
-        <source>License Name</source>
+        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/ProductView.qml" line="+44"/>
+        <source>Feature Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-37"/>
-        <location line="+38"/>
-        <source>License-ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="-34"/>
-        <location line="+16"/>
-        <location line="+19"/>
         <location line="+4"/>
+        <source>Feature-ID</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
+        <location line="+18"/>
         <source>Description</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-31"/>
-        <location line="+29"/>
+        <location line="-8"/>
         <source>Model Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-25"/>
-        <location line="+26"/>
+        <location line="+4"/>
         <source>Model-ID</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+405"/>
+        <location line="+214"/>
         <source>Category</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+83"/>
-        <source>It is not possible to add features to a license with an empty ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+292"/>
-        <source>Dependencies</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+28"/>
-        <source>Dependencies cannot be setted</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>ProductViewItemDelegate</name>
     <message>
-        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/ProductViewItemDelegate.qml" line="+192"/>
+        <location filename="../../../Include/imtlicgui/Qml/imtlicgui/ProductViewItemDelegate.qml" line="+193"/>
         <source>License-ID already exists</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4012,7 +4472,7 @@ Errors: 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtbase/TPluginManagerCompBase.h" line="+213"/>
+        <location filename="../../../Include/imtbase/TPluginManagerCompBase.h" line="+215"/>
         <source>Plug-in loaded</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4042,7 +4502,7 @@ Errors: 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtgui/TStandardDocumentViewDecorator.h" line="+311"/>
+        <location filename="../../../Include/imtgui/TStandardDocumentViewDecorator.h" line="+315"/>
         <source>&amp;New</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4142,11 +4602,6 @@ Errors: 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtlic/CFeaturePackageMetaInfoCreatorComp.cpp" line="+63"/>
-        <source>Features</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../../../Include/imtlic/CProductInstanceMetaInfo.cpp" line="+17"/>
         <location filename="../../../Include/imtlic/CProductLicensingInfoMetaInfoCreatorComp.cpp" line="+67"/>
         <source>Licenses</source>
@@ -4189,16 +4644,14 @@ Errors: 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+172"/>
+        <location line="+157"/>
         <location line="+27"/>
-        <location filename="../../../Include/imtlicgui/CFeaturePackageGuiComp.cpp" line="+55"/>
         <source>Warning</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="-26"/>
         <location line="+27"/>
-        <location filename="../../../Include/imtlicgui/CFeaturePackageGuiComp.cpp" line="+1"/>
         <source>Feature with ID &apos;%1&apos; depends on feature with ID &apos;%2&apos;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4287,25 +4740,27 @@ Errors: 0</source>
     </message>
     <message>
         <location filename="../../../Include/imtauthgql/CRoleControllerComp.cpp" line="+18"/>
-        <location filename="../../../Include/imtauthgql/CUserControllerComp.cpp" line="+24"/>
+        <location filename="../../../Include/imtauthgql/CUserControllerComp.cpp" line="+25"/>
         <location filename="../../../Include/imtauthgql/CUserGroupControllerComp.cpp" line="+19"/>
         <location filename="../../../Include/imtgeo/CAddressCollectionControllerComp.cpp" line="+58"/>
         <location filename="../../../Include/imtgeo/CAddressControllerComp.cpp" line="+19"/>
-        <location line="+91"/>
+        <location line="+92"/>
         <location line="+147"/>
         <location filename="../../../Include/imtgql/CCollectionObjectProviderComp.cpp" line="+19"/>
+        <location filename="../../../Include/imtgql/CObjectMetaInfoCollectionControllerComp.cpp" line="+29"/>
+        <location filename="../../../Include/imtgql/CSerializableObjectCollectionControllerComp.cpp" line="+43"/>
+        <location line="+117"/>
+        <location line="+41"/>
+        <location line="+51"/>
         <location filename="../../../Include/imtguigql/CObjectCollectionControllerCompBase.cpp" line="+187"/>
         <location filename="../../../Include/imtguigql/CObjectMetaInfoCollectionControllerComp.cpp" line="+29"/>
         <location filename="../../../Include/imtlicgql/CAccountCollectionControllerComp.cpp" line="+30"/>
         <location filename="../../../Include/imtlicgql/CAccountControllerComp.cpp" line="+19"/>
-        <location filename="../../../Include/imtlicgql/CFeaturePackageCollectionControllerComp.cpp" line="+38"/>
-        <location filename="../../../Include/imtlicgql/CInstallationCollectionControllerComp.cpp" line="+54"/>
-        <location filename="../../../Include/imtlicgql/CInstallationControllerComp.cpp" line="+23"/>
-        <location filename="../../../Include/imtlicgql/CLicenseControllerComp.cpp" line="+15"/>
-        <location filename="../../../Include/imtlicgql/CPackageControllerComp.cpp" line="+271"/>
-        <location filename="../../../Include/imtlicgql/CProductCollectionControllerComp.cpp" line="+122"/>
-        <location filename="../../../Include/imtlicgql/CProductControllerComp.cpp" line="+206"/>
-        <location line="+130"/>
+        <location filename="../../../Include/imtlicgql/CLicenseControllerComp.cpp" line="+157"/>
+        <location filename="../../../Include/imtlicgql/CProductCollectionControllerComp.cpp" line="+131"/>
+        <location line="+65"/>
+        <location line="+54"/>
+        <location filename="../../../Include/imtlicgql/CProductControllerComp.cpp" line="+156"/>
         <source>Internal error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4327,12 +4782,14 @@ Errors: 0</source>
     </message>
     <message>
         <location line="+46"/>
+        <location filename="../../../Include/imtgql/CObjectCollectionControllerCompBase.cpp" line="+301"/>
         <location filename="../../../Include/imtguigql/CObjectCollectionControllerCompBase.cpp" line="+51"/>
         <source>Can not update object: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+12"/>
+        <location filename="../../../Include/imtgql/CObjectCollectionControllerCompBase.cpp" line="+5"/>
         <location filename="../../../Include/imtguigql/CObjectCollectionControllerCompBase.cpp" line="+5"/>
         <source>Can not create object for update: %1</source>
         <translation type="unfinished"></translation>
@@ -4437,7 +4894,16 @@ Errors: 0</source>
     </message>
     <message>
         <location line="+25"/>
+        <location filename="../../../Include/imtclientgql/CGqlObjectCollectionDelegateComp.cpp" line="+92"/>
+        <location line="+48"/>
+        <location line="+112"/>
+        <location line="+286"/>
+        <location line="+24"/>
         <location filename="../../../Include/imtgql/CCollectionObjectProviderComp.cpp" line="+10"/>
+        <location filename="../../../Include/imtgql/CSerializableObjectCollectionControllerComp.cpp" line="-177"/>
+        <location line="+156"/>
+        <location line="+50"/>
+        <location line="+47"/>
         <source>Error when serializing an object</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4454,18 +4920,19 @@ Errors: 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtauthgql/CUserControllerComp.cpp" line="+83"/>
+        <location filename="../../../Include/imtauthgql/CUserControllerComp.cpp" line="+89"/>
         <source>Object with ID %1 does not exist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+296"/>
+        <location line="+311"/>
         <source>Can not create user: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+20"/>
         <location filename="../../../Include/imtgeo/CAddressControllerComp.cpp" line="+35"/>
+        <location filename="../../../Include/imtgql/CObjectCollectionControllerCompBase.cpp" line="+335"/>
         <location filename="../../../Include/imtguigql/CObjectCollectionControllerCompBase.cpp" line="+286"/>
         <source>No object-ID could not be extracted from the request</source>
         <translation type="unfinished"></translation>
@@ -4477,6 +4944,7 @@ Errors: 0</source>
     </message>
     <message>
         <location line="+20"/>
+        <location filename="../../../Include/imtgql/CObjectCollectionControllerCompBase.cpp" line="+18"/>
         <location filename="../../../Include/imtguigql/CObjectCollectionControllerCompBase.cpp" line="+18"/>
         <source>Can&apos;t remove object: %1</source>
         <translation type="unfinished"></translation>
@@ -4497,22 +4965,22 @@ Errors: 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../../Include/imtgql/CGqlRemoteRepresentationControllerComp.cpp" line="+17"/>
+        <location filename="../../../Include/imtclientgql/CGqlRemoteRepresentationControllerComp.cpp" line="+18"/>
         <source>GraphQL-request is not supported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+10"/>
         <source>GraphQL-request could not be copied</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+11"/>
         <source>Creation of input parameters related to the GraphQL-request failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+22"/>
+        <location line="+23"/>
         <source>Failed to create a network request to a remote server</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4532,6 +5000,7 @@ Errors: 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../../../Include/imtgql/CObjectCollectionControllerCompBase.cpp" line="-301"/>
         <location filename="../../../Include/imtguigql/CObjectCollectionControllerCompBase.cpp" line="-252"/>
         <source>Could not update object: %1; </source>
         <translation type="unfinished"></translation>
@@ -4544,17 +5013,6 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtlicgql/CAccountControllerComp.cpp" line="+163"/>
         <source>Can not create account: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imtlicgql/CPackageControllerComp.cpp" line="-233"/>
-        <location line="+109"/>
-        <source>Can not create package: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../../Include/imtlicgql/CProductControllerComp.cpp" line="-139"/>
-        <source>Can not create product: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -4574,8 +5032,47 @@ Errors: 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+63"/>
+        <location line="+65"/>
         <source>The %1 server cannot be connected at %2.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtclientgql/CGqlObjectCollectionDelegateComp.cpp" line="-477"/>
+        <source>Object metainfo is not Serializable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+48"/>
+        <location line="+398"/>
+        <location line="+24"/>
+        <source>Object data metainfo is not Serializable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-310"/>
+        <location filename="../../../Include/imtgql/CSerializableObjectCollectionControllerComp.cpp" line="-55"/>
+        <source>Object is not Serializable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtgql/CSerializableObjectCollectionControllerComp.cpp" line="-206"/>
+        <location line="+156"/>
+        <source>Object is not serializable</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+82"/>
+        <source>Can not create Object: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Can not create object: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../../Include/imtlicgql/CFeatureControllerComp.cpp" line="+90"/>
+        <source>Internal error.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -4628,7 +5125,7 @@ Errors: 0</source>
 <context>
     <name>RolePermissions</name>
     <message>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/RolePermissions.qml" line="+186"/>
+        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/RolePermissions.qml" line="+190"/>
         <source>No dependencies</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4641,7 +5138,7 @@ Errors: 0</source>
 <context>
     <name>RoleView</name>
     <message>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/RoleView.qml" line="+18"/>
+        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/RoleView.qml" line="+19"/>
         <source>New Role</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4651,7 +5148,7 @@ Errors: 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+237"/>
+        <location line="+235"/>
         <source>General</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4693,12 +5190,13 @@ Errors: 0</source>
 <context>
     <name>ServerNoConnectionView</name>
     <message>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Application/ServerNoConnectionView.qml" line="+9"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/ServerNoConnectionView.qml" line="+9"/>
         <source>There is no connection to the server. Please check server url.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+54"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/ServerNoConnectionView.qml" line="+54"/>
         <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4706,7 +5204,8 @@ Errors: 0</source>
 <context>
     <name>SingleDocumentWorkspaceView</name>
     <message>
-        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/SingleDocumentWorkspaceView.qml" line="+141"/>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Document/SingleDocumentWorkspaceView.qml" line="+142"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/SingleDocumentWorkspaceView.qml" line="+144"/>
         <source>Save all changes ?</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4794,19 +5293,40 @@ Errors: 0</source>
     </message>
 </context>
 <context>
+    <name>ThumbnailDecorator</name>
+    <message>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Application/ThumbnailDecorator.qml" line="+294"/>
+        <source>Save dirty documents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Save all dirty documents ?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+2"/>
+        <source>Cancel</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TimeIntervalPicker</name>
     <message>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Inputs/TimeIntervalPicker.qml" line="+126"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/TimeIntervalPicker.qml" line="+126"/>
         <source>Days</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+26"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/TimeIntervalPicker.qml" line="+26"/>
         <source>Hours</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+26"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/TimeIntervalPicker.qml" line="+26"/>
         <source>Minutes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4814,12 +5334,14 @@ Errors: 0</source>
 <context>
     <name>TimePicker</name>
     <message>
+        <location filename="../../../Include/imtcontrols/Qml/imtcontrols/Inputs/TimePicker.qml" line="+95"/>
         <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/TimePicker.qml" line="+95"/>
         <source>Hours</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+26"/>
+        <location filename="../../../Include/imtgui/Qml/imtgui/AuxComponents/TimePicker.qml" line="+26"/>
         <source>Minutes</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4827,7 +5349,7 @@ Errors: 0</source>
 <context>
     <name>UserCollectionView</name>
     <message>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/UserCollectionView.qml" line="+18"/>
+        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/UserCollectionView.qml" line="+19"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4853,7 +5375,7 @@ Errors: 0</source>
 <context>
     <name>UserEditor</name>
     <message>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/UserEditor.qml" line="+151"/>
+        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/UserEditor.qml" line="+164"/>
         <source>Username</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4896,7 +5418,7 @@ Errors: 0</source>
 <context>
     <name>UserGroupCollectionView</name>
     <message>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/UserGroupCollectionView.qml" line="+13"/>
+        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/UserGroupCollectionView.qml" line="+14"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4927,7 +5449,7 @@ Errors: 0</source>
 <context>
     <name>UserGroupView</name>
     <message>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/UserGroupView.qml" line="+10"/>
+        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/UserGroupView.qml" line="+11"/>
         <source>User Groups</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4963,7 +5485,7 @@ Errors: 0</source>
 <context>
     <name>UserPanel</name>
     <message>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/UserPanel.qml" line="+133"/>
+        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/UserPanel.qml" line="+134"/>
         <source>Change Password</source>
         <translation type="unfinished"></translation>
     </message>
@@ -4994,7 +5516,7 @@ Errors: 0</source>
 <context>
     <name>UserRoles</name>
     <message>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/UserRoles.qml" line="+137"/>
+        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/UserRoles.qml" line="+135"/>
         <source>Roles</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5002,7 +5524,7 @@ Errors: 0</source>
 <context>
     <name>UserView</name>
     <message>
-        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/UserView.qml" line="+12"/>
+        <location filename="../../../Include/imtauthgui/Qml/imtauthgui/UserView.qml" line="+13"/>
         <source>Users</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5311,7 +5833,7 @@ Errors: 0</source>
 <context>
     <name>imtauthgql::CAuthorizationControllerComp</name>
     <message>
-        <location filename="../../../Include/imtauthgql/CAuthorizationControllerComp.cpp" line="+89"/>
+        <location filename="../../../Include/imtauthgql/CAuthorizationControllerComp.cpp" line="+90"/>
         <source>Invalid login or password</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5319,7 +5841,7 @@ Errors: 0</source>
 <context>
     <name>imtauthgql::CRoleCollectionControllerComp</name>
     <message>
-        <location filename="../../../Include/imtauthgql/CRoleCollectionControllerComp.cpp" line="+63"/>
+        <location filename="../../../Include/imtauthgql/CRoleCollectionControllerComp.cpp" line="+62"/>
         <source>Unable to get a role info</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5355,22 +5877,22 @@ Errors: 0</source>
 <context>
     <name>imtauthgql::CUserControllerComp</name>
     <message>
-        <location filename="../../../Include/imtauthgql/CUserControllerComp.cpp" line="-199"/>
+        <location filename="../../../Include/imtauthgql/CUserControllerComp.cpp" line="-186"/>
         <source>Unable to get an account info!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+16"/>
         <source>Username can&apos;t be empty!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+25"/>
+        <location line="+26"/>
         <source>Username already exists</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+22"/>
         <source>Password cannot be empty</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5434,7 +5956,7 @@ Errors: 0</source>
 <context>
     <name>imtauthgui::CAccountInfoViewDelegateComp</name>
     <message>
-        <location filename="../../../Include/imtauthgui/CAccountInfoViewDelegateComp.cpp" line="+67"/>
+        <location filename="../../../Include/imtauthgui/CAccountInfoViewDelegateComp.cpp" line="+75"/>
         <source>Account Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5475,7 +5997,7 @@ Errors: 0</source>
 <context>
     <name>imtauthgui::CContactInfoViewDelegateComp</name>
     <message>
-        <location filename="../../../Include/imtauthgui/CContactInfoViewDelegateComp.cpp" line="+73"/>
+        <location filename="../../../Include/imtauthgui/CContactInfoViewDelegateComp.cpp" line="+82"/>
         <source>E-Mail</source>
         <translation type="unfinished"></translation>
     </message>
@@ -5603,17 +6125,9 @@ Errors: 0</source>
     </message>
 </context>
 <context>
-    <name>imtgql::CGqlObjectCollectionComp</name>
-    <message>
-        <location filename="../../../Include/imtgql/CGqlObjectCollectionComp.cpp" line="+1120"/>
-        <source>CGqlObjectCollectionComp::ImportFile</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>imtgql::CGqlRequestHandlerCompBase</name>
     <message>
-        <location filename="../../../Include/imtgql/CGqlRequestHandlerCompBase.cpp" line="+43"/>
+        <location filename="../../../Include/imtgql/CGqlRequestHandlerCompBase.cpp" line="+46"/>
         <source>Invalid permissions for </source>
         <translation type="unfinished"></translation>
     </message>
@@ -5628,6 +6142,27 @@ Errors: 0</source>
     <message>
         <location line="+38"/>
         <source>Invalid permissions for </source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>imtgql::CObjectCollectionControllerCompBase</name>
+    <message>
+        <location filename="../../../Include/imtgql/CObjectCollectionControllerCompBase.cpp" line="-149"/>
+        <source>Internal error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+27"/>
+        <source>Object with this ID already exists</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>imtgql::CSerializableObjectCollectionControllerComp</name>
+    <message>
+        <location filename="../../../Include/imtgql/CSerializableObjectCollectionControllerComp.cpp" line="+8"/>
+        <source>Unable to get an Object!</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -5944,7 +6479,7 @@ Errors: 0</source>
 <context>
     <name>imtgui::CObjectCollectionViewComp</name>
     <message>
-        <location filename="../../../Include/imtgui/CObjectCollectionViewComp.cpp" line="+117"/>
+        <location filename="../../../Include/imtgui/CObjectCollectionViewComp.cpp" line="+115"/>
         <location line="+22"/>
         <source>Reading collection...</source>
         <translation></translation>
@@ -5959,34 +6494,34 @@ Errors: 0</source>
     <message>
         <location filename="../../../Include/imtgui/CObjectCollectionViewDelegate.cpp" line="+69"/>
         <location line="+149"/>
-        <location line="+511"/>
+        <location line="+521"/>
         <location line="+15"/>
         <source>New</source>
         <translation></translation>
     </message>
     <message>
-        <location line="-671"/>
-        <location line="+659"/>
+        <location line="-681"/>
+        <location line="+669"/>
         <location line="+15"/>
         <source>Import</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-673"/>
-        <location line="+659"/>
+        <location line="-683"/>
+        <location line="+669"/>
         <location line="+15"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-673"/>
-        <location line="+659"/>
+        <location line="-683"/>
+        <location line="+669"/>
         <location line="+15"/>
         <source>Restore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-433"/>
+        <location line="-443"/>
         <location line="+4"/>
         <source>Error</source>
         <translation type="unfinished"></translation>
@@ -5998,12 +6533,12 @@ Errors: 0</source>
     </message>
     <message>
         <location line="-18"/>
-        <location line="+186"/>
+        <location line="+196"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-418"/>
+        <location line="-428"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6018,7 +6553,7 @@ Errors: 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+114"/>
+        <location line="+124"/>
         <source>Set Description...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6143,20 +6678,20 @@ Errors: 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-685"/>
-        <location line="+466"/>
+        <location line="-695"/>
+        <location line="+476"/>
         <location line="+15"/>
         <source>Remove selected document from the collection</source>
         <translation>Remove selected file from the database</translation>
     </message>
     <message>
-        <location line="-678"/>
+        <location line="-688"/>
         <source>&amp;Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location line="+3"/>
-        <location line="+659"/>
+        <location line="+669"/>
         <location line="+15"/>
         <source>Duplicate</source>
         <translation></translation>
@@ -6168,9 +6703,9 @@ Errors: 0</source>
         <translation>New file could not be created</translation>
     </message>
     <message>
-        <location line="-737"/>
+        <location line="-747"/>
         <location line="+193"/>
-        <location line="+466"/>
+        <location line="+476"/>
         <location line="+15"/>
         <source>Remove</source>
         <translation></translation>
@@ -6187,7 +6722,7 @@ Errors: 0</source>
 <context>
     <name>imtgui::CPluginStatusMonitorViewDelegateComp</name>
     <message>
-        <location filename="../../../Include/imtgui/CPluginStatusMonitorViewDelegateComp.cpp" line="+244"/>
+        <location filename="../../../Include/imtgui/CPluginStatusMonitorViewDelegateComp.cpp" line="+252"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6250,7 +6785,7 @@ Errors: 0</source>
 <context>
     <name>imtgui::CThumbnailDecoratorGuiComp</name>
     <message>
-        <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.cpp" line="+411"/>
+        <location filename="../../../Include/imtgui/CThumbnailDecoratorGuiComp.cpp" line="+431"/>
         <location line="+286"/>
         <source>Login</source>
         <translation></translation>
@@ -6371,101 +6906,60 @@ Errors: 0</source>
     </message>
 </context>
 <context>
-    <name>imtlicgql::CFeaturePackageCollectionControllerComp</name>
+    <name>imtlicgql::CFeatureControllerComp</name>
     <message>
-        <location filename="../../../Include/imtlicgql/CFeaturePackageCollectionControllerComp.cpp" line="+11"/>
-        <source>Modification Time</source>
+        <location filename="../../../Include/imtlicgql/CFeatureControllerComp.cpp" line="-62"/>
+        <source>Internal error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+11"/>
-        <source>Unable to load an object data!</source>
+        <location line="+8"/>
+        <source>Unable to create object. GQL input params is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+6"/>
-        <source>Unable to get an package info provider!</source>
+        <location line="+13"/>
+        <source>Unable to create object from empty json.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+7"/>
-        <source>Features</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>imtlicgql::CInstallationCollectionControllerComp</name>
-    <message>
-        <location filename="../../../Include/imtlicgql/CInstallationCollectionControllerComp.cpp" line="+24"/>
-        <source>Instance-ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Unable to get an installation object data</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+6"/>
-        <source>Unable to get an installation info</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Product-ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+7"/>
-        <source>Account-ID</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+9"/>
-        <source>Licenses</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+11"/>
-        <source>Valid until</source>
+        <location line="+49"/>
+        <source>Unable to get object. GQL input params is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>imtlicgql::CInstallationControllerComp</name>
+    <name>imtlicgql::CLicenseControllerComp</name>
     <message>
-        <location filename="../../../Include/imtlicgql/CInstallationControllerComp.cpp" line="+23"/>
-        <source>Unable to get an product instance</source>
+        <location filename="../../../Include/imtlicgql/CLicenseControllerComp.cpp" line="-133"/>
+        <source>Internal error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+75"/>
-        <source>Installation-ID can not be empty!</source>
+        <location line="+8"/>
+        <source>Unable to create object. GQL input params is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+14"/>
-        <source>Account can not be empty!</source>
+        <location line="+13"/>
+        <source>Unable to create object from empty json.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+10"/>
-        <source>Product can not be empty!</source>
+        <location line="+25"/>
+        <source>Unable to create license with an empty License-ID.</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>imtlicgql::CPackageControllerComp</name>
     <message>
-        <location filename="../../../Include/imtlicgql/CPackageControllerComp.cpp" line="-84"/>
-        <source>Package-ID can not be empty!</source>
+        <location line="+95"/>
+        <source>Unable to get object. GQL input params is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>imtlicgql::CProductCollectionControllerComp</name>
     <message>
-        <location filename="../../../Include/imtlicgql/CProductCollectionControllerComp.cpp" line="+11"/>
+        <location filename="../../../Include/imtlicgql/CProductCollectionControllerComp.cpp" line="-108"/>
         <source>Modification Time</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6474,34 +6968,55 @@ Errors: 0</source>
         <source>Unable to load an object data</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location line="+51"/>
+        <location line="+54"/>
+        <source>Unable to get object. GQL input params is invalid.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>imtlicgql::CProductControllerComp</name>
     <message>
-        <location filename="../../../Include/imtlicgql/CProductControllerComp.cpp" line="-121"/>
-        <source>Unable to get an product pointer</source>
+        <location filename="../../../Include/imtlicgql/CProductControllerComp.cpp" line="-132"/>
+        <source>Internal error.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+11"/>
-        <source>Unable to get an license collection</source>
+        <location line="+8"/>
+        <source>Unable to create object. GQL input params is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+12"/>
-        <source>Product-ID cannot be empty</source>
+        <location line="+13"/>
+        <source>Unable to create object from empty json.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+25"/>
+        <source>Unable to create product with an empty product-ID.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+32"/>
+        <source>Unable to create product with an empty product name.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+62"/>
+        <source>Unable to get object. GQL input params is invalid.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>imtlicgui::CFeatureCollectionViewDelegateComp</name>
     <message>
-        <location filename="../../../Include/imtlicgui/CFeatureCollectionViewDelegateComp.cpp" line="+37"/>
+        <location filename="../../../Include/imtlicgui/CFeatureCollectionViewDelegateComp.cpp" line="+47"/>
         <source>Wrong object type</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+30"/>
+        <location line="+29"/>
         <source>Feature Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6517,24 +7032,6 @@ Errors: 0</source>
     </message>
 </context>
 <context>
-    <name>imtlicgui::CFeaturePackageGuiComp</name>
-    <message>
-        <location filename="../../../Include/imtlicgui/CFeaturePackageGuiComp.cpp" line="+54"/>
-        <source>Unsaved Features</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+76"/>
-        <source>Missing Features</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+24"/>
-        <source>ID: %1</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
     <name>imtlicgui::CLicenseManagerViewDelegateComp</name>
     <message>
         <location filename="../../../Include/imtlicgui/CLicenseManagerViewDelegateComp.cpp" line="+41"/>
@@ -6542,7 +7039,7 @@ Errors: 0</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+102"/>
+        <location line="+116"/>
         <source>License Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6631,7 +7128,7 @@ Errors: 0</source>
     <name>imtlicgui::CProductInstanceInfoViewDelegateComp</name>
     <message>
         <location filename="../../../Include/imtlicgui/CProductInstanceInfoViewDelegateComp.cpp" line="+20"/>
-        <location line="+95"/>
+        <location line="+98"/>
         <source>Create License File</source>
         <translation type="unfinished"></translation>
     </message>
@@ -6648,19 +7145,6 @@ Errors: 0</source>
     <message>
         <location line="+27"/>
         <source>Export existing product installation license to file</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>imtlicgui::CProductLicensingInfoGuiComp</name>
-    <message>
-        <location filename="../../../Include/imtlicgui/CProductLicensingInfoGuiComp.cpp" line="+135"/>
-        <source>Missing Features</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+24"/>
-        <source>ID: %1</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -6721,7 +7205,7 @@ Errors: 0</source>
 <context>
     <name>imtloggui::CEventViewComp</name>
     <message>
-        <location filename="../../../Include/imtloggui/CEventViewComp.cpp" line="+319"/>
+        <location filename="../../../Include/imtloggui/CEventViewComp.cpp" line="+327"/>
         <source>First event</source>
         <translation></translation>
     </message>
