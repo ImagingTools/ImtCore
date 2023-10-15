@@ -89,7 +89,9 @@ Item {
         modalDialogManager.closeDialog();
 
         if (containerBase.contextMenuModel != null){
-            modalDialogManager.openDialog(popupMenu, {"x": x, "y": y, "model": contextMenuModel});
+
+            let offset = 26 * contextMenuModel.count;
+            modalDialogManager.openDialog(popupMenu, {"x": x, "y": y - offset, "model": contextMenuModel});
         }
     }
 

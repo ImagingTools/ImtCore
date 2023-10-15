@@ -46,7 +46,7 @@ Item {
             var pathDir = fileDialogSave.folder.toString();
             remoteFileController.downloadedFileLocation = pathDir.replace('file:///', '');
             var fileName = fileDialogSave.fileUrl.toString().replace(pathDir + "/", '');
-            var id = "";
+            var id = "GetServerLog";
 
             if (fileName == ""){
                 fileName = {};

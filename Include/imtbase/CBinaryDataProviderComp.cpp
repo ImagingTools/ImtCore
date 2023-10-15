@@ -66,10 +66,6 @@ bool CBinaryDataProviderComp::GetData(QByteArray& data, const QByteArray& dataId
 			destinationFileAbsoluteFilePath.chop(1);
 		}
 
-//		if (destinationEntry.suffix().isEmpty()){
-//			destinationFileAbsoluteFilePath += ".svg";
-//		}
-
 		QFile destinationFile(destinationFileAbsoluteFilePath);
 
 		while (!destinationFile.open(QFile::ReadOnly)){

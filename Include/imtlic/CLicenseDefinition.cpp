@@ -153,6 +153,13 @@ QByteArray CLicenseDefinition::GetFactoryId() const
 
 bool CLicenseDefinition::Serialize(iser::IArchive& archive)
 {
+	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
+
+	quint32 imtCoreVersion;
+	if (!versionInfo.GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion)){
+		imtCoreVersion = 0;
+	}
+
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
 
 	bool retVal = true;
@@ -167,15 +174,17 @@ bool CLicenseDefinition::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_licenseName);
 	retVal = retVal && archive.EndTag(licenseNameTag);
 
-	iser::CArchiveTag descriptionTag("LicenseDescription", "Description of the license", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(descriptionTag);
-	retVal = retVal && archive.Process(m_description);
-	retVal = retVal && archive.EndTag(descriptionTag);
+	if (imtCoreVersion > 7605){
+		iser::CArchiveTag descriptionTag("LicenseDescription", "Description of the license", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(descriptionTag);
+		retVal = retVal && archive.Process(m_description);
+		retVal = retVal && archive.EndTag(descriptionTag);
 
-	iser::CArchiveTag productIdTag("ProductId", "Product ID of the license", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(productIdTag);
-	retVal = retVal && archive.Process(m_productId);
-	retVal = retVal && archive.EndTag(productIdTag);
+		iser::CArchiveTag productIdTag("ProductId", "Product ID of the license", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(productIdTag);
+		retVal = retVal && archive.Process(m_productId);
+		retVal = retVal && archive.EndTag(productIdTag);
+	}
 
 	if (!archive.IsStoring()){
 		m_featureInfos.clear();
@@ -209,8 +218,9 @@ bool CLicenseDefinition::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && archive.EndTag(featuresTag);
 
-//	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_featureIds, "Features", "Feature");
-	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_dependencies, "Dependencies", "Dependency");
+	if (imtCoreVersion > 7605){
+		retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_dependencies, "Dependencies", "Dependency");
+	}
 
 	return retVal;
 }

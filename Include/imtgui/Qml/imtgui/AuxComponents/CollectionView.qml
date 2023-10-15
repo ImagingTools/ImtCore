@@ -63,8 +63,6 @@ Item {
     Component.onCompleted: {
         Events.subscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
         Events.subscribeEvent("OnLocalizationChanged", collectionViewContainer.onLocalizationChanged);
-
-        collectionViewContainer.fillContextMenuModel();
     }
 
     Component.onDestruction: {
@@ -335,13 +333,6 @@ Item {
                     collectionMetaInfo.contentVisible = false
                 }
             }
-
-//            let itemIds = collectionViewContainer.getSelectedIds();
-//            if (itemIds.length > 0){
-//                let itemId = itemIds[0];
-
-//                documentHistoryProvider.updateModel(itemId);
-//            }
         }
 
         onSelectedItem: {
@@ -369,6 +360,8 @@ Item {
 
         onModelLoaded: {
             collectionViewContainer.onCommandsModelChanged();
+
+            collectionViewContainer.fillContextMenuModel();
         }
     }
 

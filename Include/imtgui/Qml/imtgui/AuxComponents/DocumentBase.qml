@@ -143,7 +143,10 @@ Item {
     }
 
     onBlockUpdatingModelChanged: {
-        Events.sendEvent("DocumentUpdating", documentBaseRoot.blockUpdatingModel);
+        console.log("onBlockUpdatingModelChanged", documentBaseRoot.blockUpdatingModel);
+
+        documentManager.documentLoading = documentBaseRoot.blockUpdatingModel;
+//        Events.sendEvent("DocumentUpdating", documentBaseRoot.blockUpdatingModel);
     }
 
     onDocumentModelChanged: {

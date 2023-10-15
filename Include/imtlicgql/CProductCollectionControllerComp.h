@@ -31,6 +31,7 @@ protected:
 								 const imtbase::CTreeItemModel& objectFilterModel,
 								 iprm::CParamsSet& filterParams) const override;
 	virtual imtbase::CTreeItemModel* RenameObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual imtbase::CTreeItemModel* SetObjectDescription(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_licenseCollectionCompPtr);

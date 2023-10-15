@@ -19,6 +19,8 @@ public:
 	virtual const IProductInfo* GetProductFamilyInfo() const override;
 	virtual QByteArray GetProductId() const override;
 	virtual void SetProductId(const QByteArray& productId) override;
+	virtual QString GetProductDescription() const override;
+	virtual void SetProductDescription(const QString& description) override;
 	virtual QByteArray GetCategoryId() const override;
 	virtual void SetCategoryId(const QByteArray& categoryId) override;
 	virtual QByteArrayList GetFeatureIds() const override;
@@ -41,6 +43,7 @@ public:
 protected:
 	QByteArray m_productId;
 	QString m_productName;
+	QString m_productDescription;
 	QByteArray m_categoryId;
 	QByteArrayList m_featureIds;
 

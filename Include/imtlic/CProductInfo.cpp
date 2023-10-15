@@ -44,6 +44,22 @@ void CProductInfo::SetProductId(const QByteArray& productId)
 }
 
 
+QString CProductInfo::GetProductDescription() const
+{
+	return m_productDescription;
+}
+
+
+void CProductInfo::SetProductDescription(const QString& description)
+{
+	if (m_productDescription != description){
+		istd::CChangeNotifier notifier(this);
+
+		m_productDescription = description;
+	}
+}
+
+
 QByteArray CProductInfo::GetCategoryId() const
 {
 	return m_categoryId;
@@ -124,6 +140,11 @@ bool CProductInfo::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_productName);
 	retVal = retVal && archive.EndTag(productNameTag);
 
+	iser::CArchiveTag productDescriptionTag("ProductDescription", "Description of the product", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(productDescriptionTag);
+	retVal = retVal && archive.Process(m_productDescription);
+	retVal = retVal && archive.EndTag(productDescriptionTag);
+
 	iser::CArchiveTag categoryIdTag("CategoryId", "ID of the product category", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(categoryIdTag);
 	retVal = retVal && archive.Process(m_categoryId);
@@ -145,6 +166,7 @@ bool CProductInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*
 	if (sourcePtr != nullptr){
 		m_productId = sourcePtr->m_productId;
 		m_productName = sourcePtr->m_productName;
+		m_productDescription = sourcePtr->m_productDescription;
 		m_categoryId = sourcePtr->m_categoryId;
 		m_featureIds = sourcePtr->m_featureIds;
 
@@ -161,6 +183,7 @@ bool CProductInfo::IsEqual(const IChangeable& object) const
 	if (sourcePtr != nullptr){
 		return	m_productId == sourcePtr->m_productId &&
 				m_productName == sourcePtr->m_productName &&
+				m_productDescription == sourcePtr->m_productDescription &&
 				m_categoryId == sourcePtr->m_categoryId &&
 				m_featureIds == sourcePtr->m_featureIds ;
 	}
@@ -173,6 +196,7 @@ bool CProductInfo::ResetData(CompatibilityMode /*mode*/)
 {
 	m_productId.clear();
 	m_productName.clear();
+	m_productDescription.clear();
 	m_categoryId.clear();
 	m_featureIds.clear();
 

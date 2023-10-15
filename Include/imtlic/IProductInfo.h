@@ -36,6 +36,16 @@ public:
 	virtual void SetProductId(const QByteArray& productId) = 0;
 
 	/**
+		Get a description of this product.
+	*/
+	virtual QString GetProductDescription() const = 0;
+
+	/**
+		Set product description.
+	*/
+	virtual void SetProductDescription(const QString& description) = 0;
+
+	/**
 		Get a category ID of this product.
 	*/
 	virtual QByteArray GetCategoryId() const = 0;

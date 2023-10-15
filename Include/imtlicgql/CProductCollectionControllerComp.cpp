@@ -58,8 +58,8 @@ bool CProductCollectionControllerComp::SetupGqlItem(
 				else if(informationId == "ProductName"){
 					elementInformation = productLicensingInfoPtr->GetName();
 				}
-				else if(informationId == "Description"){
-					elementInformation = objectCollectionIterator->GetElementInfo("Description");
+				else if(informationId == "ProductDescription"){
+					elementInformation = productLicensingInfoPtr->GetProductDescription();
 				}
 				else if(informationId == "Added"){
 					QDateTime addedTime =  objectCollectionIterator->GetElementInfo("Added").toDateTime();
@@ -239,6 +239,55 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::RenameObject(const im
 
 	dataModelPtr->SetData("Id", objectId);
 	dataModelPtr->SetData("Name", newName);
+
+	return rootModelPtr.PopPtr();
+}
+
+
+imtbase::CTreeItemModel* CProductCollectionControllerComp::SetObjectDescription(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	if (!m_objectCollectionCompPtr.IsValid()){
+		errorMessage = QObject::tr("Internal error").toUtf8();
+		SendErrorMessage(0, errorMessage, "Product controller");
+
+		return nullptr;
+	}
+
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	if (inputParamPtr == nullptr){
+		errorMessage = QT_TR_NOOP("Unable to get object. GQL input params is invalid.");
+		SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
+
+		return nullptr;
+	}
+
+	QByteArray objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+	QString description = inputParamPtr->GetFieldArgumentValue("Description").toByteArray();
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+		imtlic::CIdentifiableProductInfo* productInfoPtr = dynamic_cast<imtlic::CIdentifiableProductInfo*>(dataPtr.GetPtr());
+		if (productInfoPtr != nullptr){
+			QString oldDescription = productInfoPtr->GetProductDescription();
+			if (description != oldDescription){
+				productInfoPtr->SetProductDescription(description);
+
+				imtbase::IOperationContext* operationContextPtr = CreateOperationContext(gqlRequest, QString("Set description to the object"));
+				if (!m_objectCollectionCompPtr->SetObjectData(objectId, *productInfoPtr, istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr)){
+					errorMessage = QString("Error when trying set description product with ID %1").arg(qPrintable(objectId));
+					SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
+
+					return nullptr;
+				}
+			}
+		}
+	}
+
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+
+	dataModelPtr->SetData("Id", objectId);
+	dataModelPtr->SetData("Description", description);
 
 	return rootModelPtr.PopPtr();
 }

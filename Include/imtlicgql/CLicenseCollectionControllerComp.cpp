@@ -73,6 +73,15 @@ bool CLicenseCollectionControllerComp::SetupGqlItem(
 			else if(informationId == "ParentLicenses"){
 				elementInformation = licenseInfoPtr->GetDependencies().join(';');
 			}
+			else if(informationId == "Features"){
+				QByteArrayList retVal;
+
+				for (const imtlic::ILicenseDefinition::FeatureInfo& featureInfo : licenseInfoPtr->GetFeatureInfos()){
+					retVal << featureInfo.id;
+				}
+
+				elementInformation = retVal.join(';');
+			}
 
 			if (elementInformation.isNull()){
 				elementInformation = "";
