@@ -16,6 +16,7 @@
 #include <imtlicgql/CProductPermissionsControllerComp.h>
 #include <imtlicgql/CFeatureControllerComp.h>
 #include <imtlicgql/CFeatureCollectionControllerComp.h>
+#include <imtlicgql/CFeatureDependenciesProviderComp.h>
 
 
 /**
@@ -35,6 +36,7 @@ typedef imtlicgql::CFeaturesExportProviderComp FeaturesExportProvider;
 typedef imtlicgql::CProductPermissionsControllerComp ProductPermissionController;
 typedef imtlicgql::CFeatureControllerComp FeatureController;
 typedef imtlicgql::CFeatureCollectionControllerComp FeatureCollectionController;
+typedef imtlicgql::CFeatureDependenciesProviderComp FeatureDependenciesProvider;
 
 
 } // namespace ImtLicenseGqlPck

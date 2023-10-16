@@ -90,11 +90,6 @@ I_EXPORT_COMPONENT(
 			"Feature Info Provider");
 
 I_EXPORT_COMPONENT(
-			FeatureDependenciesProvider,
-			"Feature dependencies provider",
-			"Feature Dependencies Provider");
-
-I_EXPORT_COMPONENT(
 			PermissionsProvider,
 			"Permissions provider",
 			"Feature Dependencies Provider Permissions");

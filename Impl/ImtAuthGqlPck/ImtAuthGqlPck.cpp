@@ -89,6 +89,11 @@ I_EXPORT_COMPONENT(
 			"Simple login wrap",
 			"Simple Login Wrap");
 
+I_EXPORT_COMPONENT(
+			RemotePermissionChecker,
+			"Remote permission ckecker",
+			"Remote Permission Checker");
+
 
 } // namespace ImtAuthGqlPck
 

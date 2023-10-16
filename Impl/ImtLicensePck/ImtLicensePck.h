@@ -19,7 +19,6 @@
 #include <imtlic/CFeatureContainer.h>
 #include <imtlic/CProductInfoProviderComp.h>
 #include <imtlic/CFeatureInfoProviderComp.h>
-#include <imtlic/CFeatureDependenciesProviderComp.h>
 #include <imtlic/CPermissionsProviderComp.h>
 #include <imtlic/CProductInfo.h>
 
@@ -59,7 +58,6 @@ typedef imtlic::CProductInstanceMetaInfoCreatorComp ProductInstanceMetaInfoCreat
 typedef imtlic::CLicenseControllerComp LicenseController;
 typedef imtlic::CProductInfoProviderComp ProductInfoProvider;
 typedef imtlic::CFeatureInfoProviderComp FeatureInfoProvider;
-typedef imtlic::CFeatureDependenciesProviderComp FeatureDependenciesProvider;
 typedef imtlic::CPermissionsProviderComp PermissionsProvider;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
