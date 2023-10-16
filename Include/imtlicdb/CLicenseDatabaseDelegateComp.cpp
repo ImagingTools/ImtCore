@@ -59,6 +59,30 @@ bool CLicenseDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsSe
 }
 
 
+bool CLicenseDatabaseDelegateComp::CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const
+{
+	QByteArrayList filteringColumnIds = collectionFilter.GetFilteringInfoIds();
+	if (filteringColumnIds.isEmpty()){
+		return true;
+	}
+
+	QString textFilter = collectionFilter.GetTextFilter();
+	if (!textFilter.isEmpty()){
+		for (int i = 0; i < filteringColumnIds.size(); i++){
+			if (!textFilterQuery.isEmpty()){
+				textFilterQuery += " OR ";
+			}
+
+			if (filteringColumnIds[i] == "ProductId"){
+				textFilterQuery += QString("%1 ILIKE '%%2%'").arg(R"((SELECT "Document"->>'ProductId' FROM "Products" as pr WHERE pr."DocumentId" = t1."Document"->>'ProductId' AND pr."IsActive" = true))").arg(textFilter);
+			}
+		}
+	}
+
+	return true;
+}
+
+
 } // namespace imtlicdb
 
 

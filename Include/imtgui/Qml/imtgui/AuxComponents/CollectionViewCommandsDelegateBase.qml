@@ -24,6 +24,8 @@ Item {
 
     property string commandsId;
 
+    property string descriptionFieldId: "Description";
+
     property var contextMenuModel: null;
 
     signal commandActivated(string commandId);
@@ -134,8 +136,9 @@ Item {
         let indexes = containerBase.tableData.getSelectedIndexes();
         if (indexes.length > 0){
             let selectedDescription = "";
-            if (elements.ContainsKey("Description", indexes[0])){
-                selectedDescription = elements.GetData("Description", indexes[0]);
+
+            if (elements.ContainsKey(containerBase.descriptionFieldId, indexes[0])){
+                selectedDescription = elements.GetData(containerBase.descriptionFieldId, indexes[0]);
             }
 
             modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});

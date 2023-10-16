@@ -20,6 +20,7 @@ public:
 	// reimplemented (imtdb::CSqlJsonDatabaseDelegateComp)
 	virtual QString GetBaseSelectionQuery() const override;
 	virtual bool CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
+	virtual bool CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const override;
 };
 
 

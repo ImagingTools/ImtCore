@@ -9,6 +9,8 @@ CollectionViewCommandsDelegateBase {
     removeDialogTitle: qsTr("Deleting a product");
     removeMessage: qsTr("Delete the selected product ?");
 
+    descriptionFieldId: "ProductDescription";
+
     onSelectionChanged: {
         let indexes = container.tableData.getSelectedIndexes();
         let isEnabled = indexes.length === 1;
