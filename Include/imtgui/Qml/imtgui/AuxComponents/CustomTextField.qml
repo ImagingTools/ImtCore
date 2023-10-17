@@ -6,7 +6,8 @@ FocusScope {
 
     height: 40;
 
-    property alias text: textField.text;
+//    property alias text: textField.text;
+    property string text: textField.text; // for web TEMP!!!
     property alias acceptableInput: textField.acceptableInput;
     property alias textInputFocus: textField.focus;
     property alias textInputMask: textField.inputMask;
@@ -158,6 +159,7 @@ FocusScope {
         selectionColor: Style.textSelected;
         selectByMouse: true;
         clip: true;
+        text: containerTextField.text // for web TEMP!!!
 
         onAccepted: {
             containerTextField.accepted();
@@ -165,6 +167,7 @@ FocusScope {
 
         onTextEdited: {
             containerTextField.textEdited();
+            containerTextField.text = text // for web TEMP!!!
         }
 
         onAcceptableInputChanged: {
