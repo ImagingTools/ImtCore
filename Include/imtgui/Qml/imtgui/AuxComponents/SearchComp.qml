@@ -134,7 +134,13 @@ Rectangle{
             //searchTextField.currentIndex = -1;
             var addStrNew = addStr_ !== undefined ? addStr_ : "";
 
-            searchTextField.currentText = modelll.GetData(searchContainer.valueName, index_) + addStrNew;
+            var tempStr = currentText = modelll.GetData(searchContainer.valueName, index_) + addStrNew
+            if(tempStr[tempStr.length - 1] == ","){
+                tempStr = tempStr.slice(0, tempStr.length - 1);
+            }
+
+            searchTextField.currentText = tempStr;//modelll.GetData(searchContainer.valueName, index_) + addStrNew;
+
             var parentIds__ = modelll.GetData("ParentIds",index_) !== undefined ? modelll.GetData("ParentIds", index_) : "";
             if(parentIds__ !== ""){
                 parentIds__ = parentIds__ + ",";
