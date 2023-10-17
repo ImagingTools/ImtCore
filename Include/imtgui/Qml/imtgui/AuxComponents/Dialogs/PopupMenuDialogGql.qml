@@ -458,7 +458,9 @@ Item {
                     popupMenuContainer.contentYCorrection(true);
                 }
                 else if(popupMenuContainer.rootItem.selectedIndex == popupMenuContainer.model.GetItemsCount() - 1){
-                    popupMenuContainer.createAdditionalQuery();
+                    if(popupMenuContainer.rootItem.selectedIndex >=0 && popupMenuContainer.elementsCount -1 > popupMenuContainer.rootItem.selectedIndex){
+                        popupMenuContainer.createAdditionalQuery();
+                    }
                     //popupMenuListView.contentY += popupMenuContainer.itemHeight;
                 }
 
@@ -544,6 +546,7 @@ Item {
 
                             loadedRec.visible = false;
                             popupMenuContainer.endListStatus = false;
+                            popupMenuContainer.rootItem.selectedIndex = -1;
                         }
                         else{//OFSET !== 0
 
