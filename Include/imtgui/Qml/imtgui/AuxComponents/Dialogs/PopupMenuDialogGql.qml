@@ -78,6 +78,7 @@ Item {
     signal endList();
     signal textEdited();
     signal started();
+    signal clearSignal();
 
 
     function onBackgroundClicked(){
@@ -247,6 +248,8 @@ Item {
             visible: parent.visible;
 
             onClicked: {
+                //console.log("clearMouseArea")
+                popupMenuContainer.clearSignal();
                 filterField.text = "";
             }
 

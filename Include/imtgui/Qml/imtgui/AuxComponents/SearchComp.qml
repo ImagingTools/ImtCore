@@ -135,9 +135,9 @@ Rectangle{
             var addStrNew = addStr_ !== undefined ? addStr_ : "";
 
             var tempStr = currentText = modelll.GetData(searchContainer.valueName, index_) + addStrNew
-            if(tempStr[tempStr.length - 1] == ","){
-                tempStr = tempStr.slice(0, tempStr.length - 1);
-            }
+//            if(tempStr[tempStr.length - 1] == ","){
+//                tempStr = tempStr.slice(0, tempStr.length - 1);
+//            }
 
             searchTextField.currentText = tempStr;//modelll.GetData(searchContainer.valueName, index_) + addStrNew;
 
@@ -197,6 +197,9 @@ Rectangle{
     }
 
     function textChangeFunc(filterText){
+        if(!filterText){
+            return;
+        }
         //console.log("filterText:: " ,filterText);
         searchContainer.isTextIncrease = searchContainer.previousText.length < filterText.length;
         var comaDeleted = searchContainer.previousText[searchContainer.previousText.length -1] == "," && filterText[filterText.length -1] !== ",";
@@ -221,6 +224,7 @@ Rectangle{
                         }
 
                         searchContainer.selectedText = filterText;
+
                         searchTextField.excludeFilterPart = searchContainer.keepNElements(popup.filterText, keepCount);
                         searchContainer.parentIds = searchContainer.keepNElements(searchContainer.parentIds, keepCount);
                         setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
@@ -293,6 +297,10 @@ Rectangle{
         }
         else if(!searchTextField.openST && searchTextField.currentText !== ""){
             if(searchContainer.isAddressSearch){
+                if(searchTextField.currentText[searchTextField.currentText.length - 1] == ","){
+                    searchTextField.currentText = searchTextField.currentText.slice(0, searchTextField.currentText.length - 1);
+                }
+
                 var textArraySize = searchContainer.arraySize(searchTextField.currentText);
                 var parentIdsArraySize = searchContainer.arraySize(searchContainer.parentIds);
                 searchTextField.excludeFilterPart = searchContainer.removeLastElement(searchTextField.currentText);
@@ -494,6 +502,11 @@ Rectangle{
 
         canClose: true;
         doNotCorrectPosition : true;
+
+        onClearSignal:{
+            //console.log("onClearSignal");
+            searchContainer.clearSearchFunc();
+        }
 
         onInFocusChanged: {
 

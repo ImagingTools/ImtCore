@@ -96,6 +96,7 @@ Item {
     signal finished(string commandId, int index);
     signal editSignal();
     signal closeSignal(var model_);
+    signal clearSignal();
 
     onOpenSTChanged: {
         selectedIndex = -1;
@@ -152,6 +153,7 @@ Item {
 
             Component.onCompleted: {
                 comboBoxContainerGql.finished.connect(popup.finished);
+                popup.clearSignal.connect(comboBoxContainerGql.clearSignal);
             }
 
             onFilterTextChanged: {
