@@ -493,7 +493,7 @@ Rectangle{
         closeEmpty: true;
 
         canClose: true;
-        property bool doNotCorrectPosition : true;
+        doNotCorrectPosition : true;
 
         onInFocusChanged: {
 
