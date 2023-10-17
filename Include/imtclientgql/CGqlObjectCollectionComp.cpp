@@ -18,6 +18,7 @@
 #include <imtclientgql/CGqlObjectCollectionInfo.h>
 #include <imtgql/IGqlPrimitiveTypeResponse.h>
 #include <imtgql/IGqlStructuredCollectionResponse.h>
+#include <imtbase/CFilterCollectionProxy.h>
 
 
 namespace imtclientgql
@@ -464,10 +465,23 @@ bool CGqlObjectCollectionComp::SetObjectData(
 
 
 imtbase::IObjectCollection* CGqlObjectCollectionComp::CreateSubCollection(
-			int /*offset*/,
-			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr) const
 {
+	if (m_delegateCompPtr.IsValid()){
+		imtbase::IObjectCollection* collection = const_cast<imtbase::IObjectCollection*>(dynamic_cast<const imtbase::IObjectCollection*>(this));
+		imtbase::CFilterCollectionProxy* retVal = new imtbase::CFilterCollectionProxy(*collection);
+
+		m_delegateCompPtr->GetSubCollection(
+					retVal,
+					offset,
+					count,
+					selectionParamsPtr);
+
+		return retVal;
+	}
+
 	return nullptr;
 }
 
@@ -505,15 +519,7 @@ idoc::MetaInfoPtr CGqlObjectCollectionComp::GetDataMetaInfo(const Id& objectId) 
 	if (m_delegateCompPtr.IsValid()){
 		idoc::MetaInfoPtr retVal;
 
-		if (m_metaInfoCreatorCompPtr.IsValid()){
-			QByteArray typeId = GetObjectTypeId(objectId);
-			m_metaInfoCreatorCompPtr->CreateMetaInfo(nullptr, typeId, retVal);
-		}
-		else{
-			retVal.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
-		}
-
-		if (m_delegateCompPtr->GetObjectDataMetaInfo(objectId, *retVal)){
+		if (m_delegateCompPtr->GetObjectDataMetaInfo(objectId, retVal)){
 			return retVal;
 		}
 	}
@@ -604,9 +610,8 @@ idoc::MetaInfoPtr CGqlObjectCollectionComp::GetElementMetaInfo(const Id& element
 		}
 	}
 	else{
-		metaInfoPtr.SetPtr(new idoc::CStandardDocumentMetaInfo());
 
-		if (!GetObjectMetaInfo(elementId, *metaInfoPtr)){
+		if (!GetObjectMetaInfo(elementId, metaInfoPtr)){
 			metaInfoPtr.Reset();
 		}
 	}
@@ -786,7 +791,7 @@ bool CGqlObjectCollectionComp::GetObjectInfo(const QByteArray& objectId, imtgql:
 }
 
 
-bool CGqlObjectCollectionComp::GetObjectMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& valueOut) const
+bool CGqlObjectCollectionComp::GetObjectMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const
 {
 	if (m_delegateCompPtr.IsValid()){
 		return m_delegateCompPtr->GetObjectMetaInfo(objectId, valueOut);
@@ -796,7 +801,7 @@ bool CGqlObjectCollectionComp::GetObjectMetaInfo(const QByteArray& objectId, ido
 }
 
 
-bool CGqlObjectCollectionComp::GetObjectDataMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& valueOut) const
+bool CGqlObjectCollectionComp::GetObjectDataMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const
 {
 	if (m_delegateCompPtr.IsValid()){
 		return m_delegateCompPtr->GetObjectDataMetaInfo(objectId, valueOut);

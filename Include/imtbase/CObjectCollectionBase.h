@@ -155,7 +155,7 @@ protected:
 	virtual void RemoveAllObjects();
 
 
-private:
+protected:
 	imod::CModelUpdateBridge m_modelUpdateBridge;
 
 };

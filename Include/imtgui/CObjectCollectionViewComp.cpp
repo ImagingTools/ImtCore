@@ -1351,10 +1351,6 @@ CObjectCollectionViewComp::TableModel::TableModel(CObjectCollectionViewComp& par
 
 void CObjectCollectionViewComp::TableModel::UpdateFromData(const imtbase::IObjectCollection& collection, const istd::IChangeable::ChangeSet& /*changes*/)
 {
-	if (m_parent.IsUpdateBlocked()){
-		return;
-	}
-
 	m_isPageMode = m_parent.m_paginationGuiCompPtr.IsValid();
 	m_batchSize = m_isPageMode ? 25 : 50;
 

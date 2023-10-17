@@ -41,8 +41,8 @@ public:
 	virtual imtbase::IStructuredObjectCollectionInfo::ElementType GetElementType(const QByteArray& elementId) const = 0;
 	virtual bool GetNodeInfo(const QByteArray& nodeId, imtgql::IGqlStructuredCollectionResponse::NodeInfo& outInfo) const = 0;
 	virtual bool GetObjectInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& outInfo) const = 0;
-	virtual bool GetObjectMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& outInfo) const = 0;
-	virtual bool GetObjectDataMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& outInfo) const = 0;
+	virtual bool GetObjectMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& outInfo) const = 0;
+	virtual bool GetObjectDataMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& outInfo) const = 0;
 	virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const = 0;
 
 	/**
@@ -136,6 +136,11 @@ public:
 	virtual int GetElementCount(
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
 	virtual imtgql::IGqlStructuredCollectionResponse::ElementList GetElementList(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
+	virtual bool GetSubCollection(
+				imtbase::IObjectCollection* subcollection,
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;

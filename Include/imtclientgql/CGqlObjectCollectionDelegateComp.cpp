@@ -17,6 +17,8 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtclientgql/CGqlObjectCollectionResponse.h>
+#include <imtbase/CFilterCollectionProxy.h>
+#include <imtbase/COperationContext.h>
 
 
 namespace imtclientgql
@@ -61,9 +63,9 @@ bool CGqlObjectCollectionDelegateComp::GetObjectInfo(
 }
 
 
-bool CGqlObjectCollectionDelegateComp::GetObjectMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& outInfo) const
+bool CGqlObjectCollectionDelegateComp::GetObjectMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& outInfo) const
 {
-	outInfo.ResetData();
+	outInfo.SetPtr(new idoc::CStandardDocumentMetaInfo());
 
 	if (m_clientCompPtr.IsValid()){
 		istd::TDelPtr<imtgql::IGqlRequest> requestPtr = CreateGetObjectMetaInfoRequest(objectId);
@@ -80,23 +82,8 @@ bool CGqlObjectCollectionDelegateComp::GetObjectMetaInfo(const QByteArray& objec
 					if (variant.canConvert<QJsonObject>()){
 						QJsonObject jsonObject = variant.value<QJsonObject>();
 						QByteArray objectData = QByteArray::fromBase64(jsonObject.value("metaInfo").toString().toUtf8());
-						iser::ISerializable* object = dynamic_cast<iser::ISerializable*>(&outInfo);
-						if (object == nullptr){
-							QByteArray errorMessage = QObject::tr("Object metainfo is not Serializable").toUtf8();
-							SendErrorMessage(0, errorMessage);
 
-							return false;
-						}
-						iser::CMemoryReadArchive archive(objectData.data(), objectData.count());
-						if (!object->Serialize(archive)){
-							QByteArray errorMessage = QObject::tr("Error when serializing an object").toUtf8();
-							SendErrorMessage(0, errorMessage);
-
-							return false;
-						}
-
-						return true;
-
+						return DeSerializeObject(outInfo.GetPtr(), objectData);
 					}
 
 				}
@@ -109,10 +96,8 @@ bool CGqlObjectCollectionDelegateComp::GetObjectMetaInfo(const QByteArray& objec
 }
 
 
-bool CGqlObjectCollectionDelegateComp::GetObjectDataMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& outInfo) const
+bool CGqlObjectCollectionDelegateComp::GetObjectDataMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& outInfo) const
 {
-	outInfo.ResetData();
-
 	if (m_clientCompPtr.IsValid()){
 		istd::TDelPtr<imtgql::IGqlRequest> requestPtr = CreateGetObjectDataMetaInfoRequest(objectId);
 		if (!requestPtr.IsValid()){
@@ -128,23 +113,15 @@ bool CGqlObjectCollectionDelegateComp::GetObjectDataMetaInfo(const QByteArray& o
 					if (variant.canConvert<QJsonObject>()){
 						QJsonObject jsonObject = variant.value<QJsonObject>();
 						QByteArray objectData = QByteArray::fromBase64(jsonObject.value("dataMetaInfo").toString().toUtf8());
-						iser::ISerializable* object = dynamic_cast<iser::ISerializable*>(&outInfo);
-						if (object == nullptr){
-							QByteArray errorMessage = QObject::tr("Object data metainfo is not Serializable").toUtf8();
-							SendErrorMessage(0, errorMessage);
-
-							return false;
+						if (m_metaInfoCreatorCompPtr.IsValid()){
+							QByteArray typeId = GetObjectTypeId(objectId);
+							m_metaInfoCreatorCompPtr->CreateMetaInfo(nullptr, typeId, outInfo);
 						}
-						iser::CMemoryReadArchive archive(objectData.data(), objectData.count());
-						if (!object->Serialize(archive)){
-							QByteArray errorMessage = QObject::tr("Error when serializing an object").toUtf8();
-							SendErrorMessage(0, errorMessage);
-
-							return false;
+						else{
+							outInfo.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
 						}
 
-						return true;
-
+						return DeSerializeObject(outInfo.GetPtr(), objectData);
 					}
 				}
 			}
@@ -240,22 +217,8 @@ bool CGqlObjectCollectionDelegateComp::GetObjectData(
 					if (variant.typeId() == QMetaType::QByteArray || variant.typeId() == QMetaType::QString){
 #endif
 						QByteArray objectData = QByteArray::fromBase64(variant.toByteArray());
-						iser::ISerializable* object = dynamic_cast<iser::ISerializable*>(objectPtr.GetPtr());
-						if (object == nullptr){
-							QByteArray errorMessage = QObject::tr("Object is not Serializable").toUtf8();
-							SendErrorMessage(0, errorMessage);
 
-							return false;
-						}
-						iser::CMemoryReadArchive archive(objectData.data(), objectData.count());
-						if (!object->Serialize(archive)){
-							QByteArray errorMessage = QObject::tr("Error when serializing an object").toUtf8();
-							SendErrorMessage(0, errorMessage);
-
-							return false;
-						}
-
-						return true;
+						return DeSerializeObject(objectPtr.GetPtr(), objectData);
 					}
 				}
 			}
@@ -304,6 +267,81 @@ bool CGqlObjectCollectionDelegateComp::SetObjectData(
 	}
 
 	return false;
+}
+
+
+bool CGqlObjectCollectionDelegateComp::GetSubCollection(
+			imtbase::IObjectCollection* subcollection,
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr) const
+{
+	if (!m_clientCompPtr.IsValid() || subcollection == nullptr){
+		return false;
+	}
+
+	istd::TDelPtr<imtgql::IGqlRequest> requestPtr = CreateGetSubCollectionRequest(offset, count, selectionParamsPtr);
+	istd::TDelPtr<imtgql::IGqlPrimitiveTypeResponse> responsePtr;
+	responsePtr.SetCastedOrRemove(CreateResponse(*requestPtr));
+	if (responsePtr.IsValid()){
+		if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
+			QVariant variant;
+			if (responsePtr->IsSuccessfull()){
+				QVariant variant;
+				if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					if (variant.canConvert<QJsonObject>()){
+						QJsonObject jsonObject = variant.value<QJsonObject>();
+						QJsonArray items = jsonObject.value("items").toArray();
+						for (int index = 0; index < items.count(); index++){
+							jsonObject = items.at(index).toObject();
+							QJsonObject info = jsonObject.value("info").toObject();
+							QByteArray objectId = info.value("id").toString().toUtf8();
+							QByteArray typeId = info.value("typeId").toString().toUtf8();
+							int version = info.value("version").toInt();
+							QString name = info.value("name").toString();
+							QString description = info.value("description").toString();
+
+							imtbase::COperationContext operationContext;
+							idoc::CStandardDocumentMetaInfo metainfo;
+							idoc::MetaInfoPtr dataMetainfoPtr;
+
+							if (m_metaInfoCreatorCompPtr.IsValid()){
+								QByteArray typeId = GetObjectTypeId(objectId);
+								m_metaInfoCreatorCompPtr->CreateMetaInfo(nullptr, typeId, dataMetainfoPtr);
+							}
+							else{
+								dataMetainfoPtr.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
+							}
+
+							QByteArray objectData = QByteArray::fromBase64(jsonObject.value("metaInfo").toString().toUtf8());
+							bool res = DeSerializeObject(&metainfo, objectData);
+							Q_ASSERT(res);
+							objectData = QByteArray::fromBase64(jsonObject.value("dataMetaInfo").toString().toUtf8());
+							res = DeSerializeObject(dataMetainfoPtr.GetPtr(), objectData);
+							Q_ASSERT(res);
+							objectData = QByteArray::fromBase64(jsonObject.value("operationContext").toString().toUtf8());
+							DeSerializeObject(&operationContext, objectData);
+
+							subcollection->InsertNewObject(
+										typeId,
+										name,
+										description,
+										nullptr,
+										objectId,
+										dataMetainfoPtr.GetPtr(),
+										&metainfo,
+										&operationContext);
+
+							dataMetainfoPtr.SetPtr(nullptr);
+						}
+
+						return true;
+					}
+				}
+			}
+		}
+	}
+
 }
 
 
@@ -512,6 +550,87 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementListReque
 
 	return requestPtr;
 }
+
+
+imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetSubCollectionRequest(
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr) const
+{
+	QByteArray commandId = *m_collectionIdAttrPtr + "SubCollection";
+	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, commandId);
+	imtgql::CGqlObject input("input");
+
+	imtgql::CGqlObject viewParams("viewParams");
+	viewParams.InsertField("offset", QVariant(offset));
+	viewParams.InsertField("count", QVariant(count));
+	QByteArray data;
+	SerializeObject(selectionParamsPtr,data);
+	viewParams.InsertField("selectionParams", QVariant(data.toBase64()));
+	input.InsertField("viewParams", viewParams);
+
+	requestPtr->AddParam(input);
+
+	imtgql::CGqlObject query("items");
+	query.InsertField("info");
+	query.InsertField("metaInfo");
+	query.InsertField("dataMetaInfo");
+	query.InsertField("operationContext");
+	requestPtr->AddField(query);
+
+	return requestPtr;
+}
+
+
+imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectNameRequest(
+			const QByteArray& objectId,
+			const QString& name,
+			int clientVersion,
+			const imtbase::IOperationContext* operationContextPtr) const
+{
+	QByteArray commandId = *m_collectionIdAttrPtr + "SetName";
+	QByteArray data;
+	imtgql::CGqlRequest* queryPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
+
+	imtgql::CGqlObject input("input");
+	input.InsertField("id", QVariant(objectId));
+	input.InsertField("newName", QVariant(name));
+	input.InsertField("version", QVariant(clientVersion));
+	SerializeObject(operationContextPtr,data);
+	input.InsertField("operationContext", QVariant(data.toBase64()));
+	queryPtr->AddParam(input);
+
+	imtgql::CGqlObject query("rename");
+	queryPtr->AddField(query);
+
+	return queryPtr;
+}
+
+
+imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectDescriptionRequest(
+			const QByteArray& objectId,
+			const QString& description,
+			int clientVersion,
+			const imtbase::IOperationContext* operationContextPtr) const
+{
+	QByteArray commandId = *m_collectionIdAttrPtr + "SetDescription";
+	QByteArray data;
+	imtgql::CGqlRequest* queryPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
+
+	imtgql::CGqlObject input("input");
+	input.InsertField("id", QVariant(objectId));
+	input.InsertField("description", QVariant(description));
+	input.InsertField("version", QVariant(clientVersion));
+	SerializeObject(operationContextPtr,data);
+	input.InsertField("operationContext", QVariant(data.toBase64()));
+	queryPtr->AddParam(input);
+
+	imtgql::CGqlObject query("setDescription");
+	queryPtr->AddField(query);
+
+	return queryPtr;
+}
+
 
 
 imtgql::IGqlResponse* CGqlObjectCollectionDelegateComp::CreateResponse(const imtgql::IGqlRequest& /*request*/) const

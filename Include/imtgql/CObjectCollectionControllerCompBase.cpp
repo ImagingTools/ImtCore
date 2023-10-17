@@ -385,6 +385,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateCollection(
 	return rootModelPtr.PopPtr();
 }
 
+
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 		const imtgql::CGqlRequest& gqlRequest,
 		QString& /*errorMessage*/) const

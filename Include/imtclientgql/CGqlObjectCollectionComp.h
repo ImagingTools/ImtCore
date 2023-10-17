@@ -58,7 +58,6 @@ public:
 		I_REGISTER_INTERFACE(istd::IChangeable);
 		I_ASSIGN(m_subscriptionManagerCompPtr, "SubscriptionManager", "GraphQL subscription manager", false, "SubscriptionManager");
 		I_ASSIGN(m_delegateCompPtr, "GqlDatabaseDelegate", "GraphQL-based document delegate for database CRUD oeprations", true, "GqlObjectCollectionDelegate");
-		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta-info creator", false, "MetaInfoCreator");
 		I_ASSIGN_MULTI_0(m_typeIdsAttrPtr, "TypeIds", "List of type-ID corresponding to the registered factories", false);
 		I_ASSIGN_MULTI_0(m_typeNamesAttrPtr, "TypeNames", "List of type names corresponding to the registered factories", false);
 		I_ASSIGN_MULTI_0(m_objectFactoriesCompPtr, "ObjectFactories", "List of factories used for object creation", false);
@@ -196,13 +195,12 @@ private:
 	bool GetElementType(const QByteArray& elementId, ElementType& valueOut) const;
 	bool GetNodeInfo(const QByteArray& nodeId, imtgql::IGqlStructuredCollectionResponse::NodeInfo& valueOut) const;
 	bool GetObjectInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& valueOut) const;
-	bool GetObjectMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& valueOut) const;
-	bool GetObjectDataMetaInfo(const QByteArray& objectId, idoc::IDocumentMetaInfo& valueOut) const;
+	bool GetObjectMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const;
+	bool GetObjectDataMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const;
 
 protected:
 	I_REF(IGqlSubscriptionManager, m_subscriptionManagerCompPtr);
 	I_REF(IGqlObjectCollectionDelegate, m_delegateCompPtr);
-	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
 	I_MULTIATTR(QByteArray, m_typeIdsAttrPtr);
 	I_MULTITEXTATTR(m_typeNamesAttrPtr);
 	I_MULTIFACT(istd::IChangeable, m_objectFactoriesCompPtr);

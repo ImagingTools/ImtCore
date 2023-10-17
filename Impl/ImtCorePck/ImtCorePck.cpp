@@ -25,6 +25,11 @@ I_EXPORT_COMPONENT(
 			"Object Data Model Collection Container Composition");
 
 I_EXPORT_COMPONENT(
+			CachedObjectCollection,
+			"Cached collection of the data objects",
+			"Object Data Model Cached Collection Container Composition");
+
+I_EXPORT_COMPONENT(
 			DelegatedObjectContainerSupplier,
 			"Delegated provider of a composite object (object container)",
 			"Delegator Object Data Model Composition Supplier Provider");

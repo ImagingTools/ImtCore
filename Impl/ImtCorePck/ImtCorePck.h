@@ -48,6 +48,7 @@
 #include <imtbase/CSelectionAdapterComp.h>
 #include <imtbase/CSelectionParamAdapterComp.h>
 #include <imtbase/CSystemStatusComp.h>
+#include <imtbase/CCachedObjectCollectionComp.h>
 
 
 /**
@@ -59,6 +60,7 @@ namespace ImtCorePck
 
 typedef imtbase::TComponentFactoryComp<iinsp::ISupplier> SupplierFactory;
 typedef icomp::TModelCompWrap<imtbase::CObjectCollectionComp> ObjectCollection;
+typedef icomp::TModelCompWrap<imtbase::CCachedObjectCollectionComp> CachedObjectCollection;
 typedef icomp::TModelCompWrap<imtbase::CDelegatedObjectContainerSupplierComp> DelegatedObjectContainerSupplier;
 typedef icomp::TModelCompWrap<imtbase::CMultiStatusManagerComp> MultiStatusManager;
 typedef icomp::TModelCompWrap<imtbase::CStatusManagerComp> StatusManager;

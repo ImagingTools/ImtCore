@@ -9,27 +9,53 @@ namespace imtgql
 {
 
 
-//QVariant CSerializableObjectCollectionControllerComp::GetObjectInformation(const QByteArray &informationId, const QByteArray &objectId) const
-//{
-//	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
+bool CSerializableObjectCollectionControllerComp::SerializeObject(const istd::IPolymorphic* object, QByteArray& objectData) const
+{
+	objectData.clear();
 
-//	if (metaInfo.IsValid()){
-//		if (informationId == QByteArray("UserId")){
-//			return metaInfo->GetMetaInfo(imtauth::IUserInfo::MIT_USERNAME);
-//		}
-//		else if (informationId == QByteArray("Email")){
-//			return metaInfo->GetMetaInfo(imtauth::IUserInfo::MIT_EMAIL);
-//		}
-//		else if (informationId == QByteArray("Added")){
-//			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME);
-//		}
-//		else if (informationId == QByteArray("LastModified")){
-//			return metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME);
-//		}
-//	}
+	const iser::ISerializable* objectConst = dynamic_cast<const iser::ISerializable*>(object);
+	iser::ISerializable* serializableObject = dynamic_cast<iser::ISerializable*>(const_cast<iser::ISerializable*>(objectConst));
 
-//	return QVariant();
-//}
+	if (serializableObject == nullptr){
+		QByteArray errorMessage = QObject::tr("Object data metainfo is not Serializable").toUtf8();
+		SendErrorMessage(0, errorMessage);
+
+		return false;
+	}
+	iser::CMemoryWriteArchive archive;
+	if (!serializableObject->Serialize(archive)){
+		QByteArray errorMessage = QObject::tr("Error when serializing an object").toUtf8();
+		SendErrorMessage(0, errorMessage);
+
+		return false;
+	}
+	else{
+		objectData = QByteArray((char*)archive.GetBuffer(), archive.GetBufferSize());
+	}
+
+	return true;
+}
+
+
+bool CSerializableObjectCollectionControllerComp::DeSerializeObject(istd::IPolymorphic* object, const QByteArray& objectData) const
+{
+	iser::ISerializable* serializableObject = dynamic_cast<iser::ISerializable*>(object);
+	if (serializableObject == nullptr){
+		QByteArray errorMessage = QObject::tr("Object data metainfo is not Serializable").toUtf8();
+		SendErrorMessage(0, errorMessage);
+
+		return false;
+	}
+	iser::CMemoryReadArchive archive(objectData.data(), objectData.count());
+	if (!serializableObject->Serialize(archive)){
+		QByteArray errorMessage = QObject::tr("Error when serializing an object").toUtf8();
+		SendErrorMessage(0, errorMessage);
+
+		return false;
+	}
+
+	return true;
+}
 
 
 imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
@@ -57,90 +83,10 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetMetaInf
 		QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(Id);
 		dataModel->SetData("typeId", typeId);
 
-//		imtbase::CTreeItemModel* metaInfoModel = dataModel->AddTreeModel("metaInfo");
-
 		idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(Id);
-		iser::ISerializable* serializableMetaInfo = dynamic_cast<iser::ISerializable*>(metaInfo.GetPtr());
-
-		if (serializableMetaInfo == nullptr){
-			Q_ASSERT(0);
-			errorMessage = QObject::tr("Object is not serializable").toUtf8();
-			SendErrorMessage(0, errorMessage);
-
-			return nullptr;
-		}
-
-		iser::CMemoryWriteArchive archive;
-		if (!serializableMetaInfo->Serialize(archive)){
-			errorMessage = QObject::tr("Error when serializing an object").toUtf8();
-			SendErrorMessage(0, errorMessage);
-
-			return nullptr;
-		}
-
-		QByteArray data((char*)archive.GetBuffer(), archive.GetBufferSize());
+		QByteArray data;
+		SerializeObject(metaInfo.GetPtr(), data);
 		dataModel->SetData("metaInfo", data.toBase64());
-
-//		idoc::IDocumentMetaInfo::MetaInfoTypes metainfoTypes = metaInfo->GetMetaInfoTypes();
-//		for (int metainfoType: metainfoTypes){
-//			QByteArray metainfoName = metaInfo->GetMetaInfoName(metainfoType).toUtf8();
-//			switch (metainfoType){
-//				case idoc::IDocumentMetaInfo::MIT_CREATION_TIME: case idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME:
-//				{
-//					QString timestr = metaInfo->GetMetaInfo(metainfoType).toDateTime().toString(Qt::ISODate);
-//					metaInfoModel->SetData(QString::number(metainfoType).toLocal8Bit(), timestr);
-//					break;
-//				}
-//				default:
-//					QByteArray data = metaInfo->GetMetaInfo(metainfoType).toByteArray();
-//					metaInfoModel->SetData(QString::number(metainfoType).toLocal8Bit(), data);
-//			}
-//		}
-
-//		elementInfo = metaInfo->GetMetaInfo(imtauth::IUserInfo::MIT_USERNAME).toByteArray();
-//		dataModel->SetData("description", elementInfo);
-//		elementInfo = metaInfo->GetMetaInfo(imtauth::IUserInfo::MIT_USERNAME).toByteArray();
-//		dataModel->SetData("version", elementInfo);
-
-
-//			if (informationId == QByteArray("Name")){
-//				result.text = m_collectionPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
-//				result.sortValue = result.text;
-//			}
-
-//			idoc::MetaInfoPtr metaInfoPtr = m_collectionPtr->GetDataMetaInfo(objectId);
-//			if (metaInfoPtr.IsValid()){
-//				if (informationId == QByteArray("ApplicationId")){
-//					result.text = metaInfoPtr->GetMetaInfo(aculainsp::IInspectionApplicationDocument::MIT_APPLICATION_ID).toByteArray();
-//					result.sortValue = result.text;
-//				}
-//				else if (informationId == QByteArray("Version")){
-//					result.text = metaInfoPtr->GetMetaInfo(aculainsp::IInspectionApplicationDocument::MIT_VERSION).toByteArray();
-//					result.sortValue = result.text;
-//				}
-//			}
-
-//			idoc::MetaInfoPtr metaInfo = m_collectionPtr->GetElementMetaInfo(objectId);
-//			if (metaInfo.IsValid()){
-//				if (informationId == QByteArray("Added")){
-//					result.sortValue = metaInfo->GetMetaInfo(imtbase::ICollectionInfo::MIT_INSERTION_TIME);
-//					result.text = result.sortValue.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-//				}
-//				else if (informationId == QByteArray("ModificationTime")){
-//					result.sortValue = metaInfo->GetMetaInfo(imtbase::ICollectionInfo::MIT_LAST_OPERATION_TIME);
-//					result.text = result.sortValue.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-//				}
-//				else if (informationId == QByteArray("Revision")){
-//					QVariant revision = metaInfo->GetMetaInfo(imtbase::ICollectionInfo::MIT_REVISION);
-//					if (revision.isValid()){
-//						result.text = QString::number(revision.toInt());
-//					}
-
-//					result.sortValue = result.text;
-//				}
-
-
-
 
 	}
 
@@ -215,27 +161,11 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetDataMet
 		QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(Id);
 		dataModel->SetData("typeId", typeId);
 
+		QByteArray data;
 		idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(Id);
-
-		iser::ISerializable* serializableMetaInfo = dynamic_cast<iser::ISerializable*>(metaInfo.GetPtr());
-		if (serializableMetaInfo == nullptr){
-			Q_ASSERT(0);
-			errorMessage = QObject::tr("Object is not serializable").toUtf8();
-			SendErrorMessage(0, errorMessage);
-
-			return nullptr;
-		}
-
-		iser::CMemoryWriteArchive archive;
-		if (!serializableMetaInfo->Serialize(archive)){
-			errorMessage = QObject::tr("Error when serializing an object").toUtf8();
-			SendErrorMessage(0, errorMessage);
-
-			return nullptr;
-		}
-
-		QByteArray data((char*)archive.GetBuffer(), archive.GetBufferSize());
+		SerializeObject(metaInfo.GetPtr(), data);
 		dataModel->SetData("dataMetaInfo", data.toBase64());
+
 
 	}
 
@@ -315,7 +245,7 @@ istd::IChangeable* CSerializableObjectCollectionControllerComp::CreateObject(
 		return nullptr;
 	}
 
-	iser::ISerializable *objectPtr = m_objectFactCompPtr.CreateInstance();
+	istd::TDelPtr<iser::ISerializable> objectPtr(m_objectFactCompPtr.CreateInstance());
 	if (objectPtr == nullptr){
 		errorMessage = QT_TR_NOOP("Unable to get an Object!");
 		SendErrorMessage(0, errorMessage);
@@ -323,17 +253,167 @@ istd::IChangeable* CSerializableObjectCollectionControllerComp::CreateObject(
 		return nullptr;
 	}
 
-	iser::CMemoryReadArchive archive(objectData.data(), objectData.count());
-	if (!objectPtr->Serialize(archive)){
-		errorMessage = QObject::tr("Error when serializing an object").toUtf8();
-		SendErrorMessage(0, errorMessage);
+	if (DeSerializeObject(objectPtr.GetPtr(), objectData)){
+		return objectPtr.PopPtr();
+	}
 
+	return nullptr;
+}
+
+
+imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObjects(
+		const imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const
+{
+	if (!m_objectCollectionCompPtr.IsValid()){
 		return nullptr;
 	}
 
+	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
 
-	return objectPtr;
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+
+	imtbase::CTreeItemModel* dataModel = nullptr;
+	imtbase::CTreeItemModel* itemsModel = nullptr;
+	imtbase::CTreeItemModel* notificationModel = nullptr;
+
+	if (!errorMessage.isEmpty()){
+		imtbase::CTreeItemModel* errorsItemModel = rootModelPtr->AddTreeModel("errors");
+		errorsItemModel->SetData("message", errorMessage);
+	}
+	else{
+		dataModel = new imtbase::CTreeItemModel();
+		itemsModel = new imtbase::CTreeItemModel();
+		notificationModel = new imtbase::CTreeItemModel();
+
+		const imtgql::CGqlObject* viewParamsGql = nullptr;
+		if (inputParams.size() > 0){
+			viewParamsGql = inputParams.at(0).GetFieldArgumentObjectPtr("viewParams");
+		}
+
+		iprm::CParamsSet filterParams;
+
+		int offset = 0, count = -1;
+
+		if (viewParamsGql != nullptr){
+			offset = viewParamsGql->GetFieldArgumentValue("offset").toInt();
+			count = viewParamsGql->GetFieldArgumentValue("count").toInt();
+		}
+
+//		int elementsCount = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
+
+//		int pagesCount = std::ceil(elementsCount / (double)count);
+//		if (pagesCount <= 0){
+//			pagesCount = 1;
+//		}
+
+//		notificationModel->SetData("PagesCount", pagesCount);
+//		notificationModel->SetData("TotalCount", elementsCount);
+
+		QVector<QByteArray> ids = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
+		for (QByteArray id: ids){
+			int itemIndex = itemsModel->InsertNewItem();
+			imtbase::CTreeItemModel* infoModel = itemsModel->AddTreeModel("info", itemIndex);
+			const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+
+
+			infoModel->SetData("id", id);
+			QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(id);
+			infoModel->SetData("typeId", typeId);
+			QByteArray elementInfo = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toByteArray();
+			infoModel->SetData("name", elementInfo);
+			elementInfo = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toByteArray();
+			infoModel->SetData("description", elementInfo);
+			elementInfo = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_ENABLED).toByteArray();
+			infoModel->SetData("enabled", elementInfo);
+
+			QByteArray data;
+			idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(id);
+			SerializeObject(metaInfo.GetPtr(), data);
+			itemsModel->SetData("metaInfo", data.toBase64(), itemIndex);
+
+			data.clear();
+			idoc::MetaInfoPtr dataMetaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(id);
+			SerializeObject(dataMetaInfo.GetPtr(), data);
+			itemsModel->SetData("dataMetaInfo", data.toBase64(), itemIndex);
+		}
+
+		itemsModel->SetIsArray(true);
+
+
+		dataModel->SetExternTreeModel("items", itemsModel);
+		dataModel->SetExternTreeModel("notification", notificationModel);
+	}
+
+	rootModelPtr->SetExternTreeModel("data", dataModel);
+
+	return rootModelPtr.PopPtr();
 }
+
+
+imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::RenameObject(
+		const imtgql::CGqlRequest& gqlRequest,
+		QString& /*errorMessage*/) const
+{
+	if (!m_objectCollectionCompPtr.IsValid()){
+		return nullptr;
+	}
+
+	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+
+	QByteArray objectId;
+	QString newName;
+	if (inputParams.size() > 0){
+		objectId = inputParams.at(0).GetFieldArgumentValue("id").toByteArray();
+		newName = inputParams.at(0).GetFieldArgumentValue("newName").toString();
+	}
+
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
+	imtbase::CTreeItemModel* notifyModel = dataModel->AddTreeModel("renameNotification");
+
+	if (!objectId.isEmpty()){
+		notifyModel->SetData("id", objectId);
+		notifyModel->SetData("name", newName);
+
+		m_objectCollectionCompPtr->SetElementName(objectId, newName);
+	}
+
+	return rootModelPtr.PopPtr();
+}
+
+
+imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::SetObjectDescription(
+		const imtgql::CGqlRequest& gqlRequest,
+		QString& /*errorMessage*/) const
+{
+	if (!m_objectCollectionCompPtr.IsValid()){
+		return nullptr;
+	}
+
+	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+
+	QByteArray objectId;
+	QString description;
+
+	if (inputParams.size() > 0){
+		objectId = inputParams.at(0).GetFieldArgumentValue("id").toByteArray();
+		description = inputParams.at(0).GetFieldArgumentValue("description").toString();
+	}
+
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+	imtbase::CTreeItemModel* notifyModel = dataModelPtr->AddTreeModel("setDescriptionNotification");
+
+	if (!objectId.isEmpty()){
+		notifyModel->SetData("id", objectId);
+		notifyModel->SetData("description", description);
+		m_objectCollectionCompPtr->SetElementDescription(objectId, description);
+	}
+
+	return rootModelPtr.PopPtr();
+}
+
 
 
 } // namespace imtgql

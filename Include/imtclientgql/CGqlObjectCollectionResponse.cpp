@@ -139,6 +139,11 @@ void CGqlObjectCollectionResponse::OnReply(const imtgql::IGqlRequest& request, c
 		m_isPrimitiveTypePresent = true;
 	}
 
+	if (data.contains("renameNotification") || data.contains("setDescriptionNotification")){
+		m_variant = true;
+		m_isPrimitiveTypePresent = true;
+	}
+
 	QByteArrayList keys;
 	keys << "info";
 	keys << "metaInfo";
@@ -147,6 +152,7 @@ void CGqlObjectCollectionResponse::OnReply(const imtgql::IGqlRequest& request, c
 	keys << "removedNotification";
 	keys << "updatedNotification";
 	keys << "updatedCollectionNotification";
+	keys << "items";
 
 	for (QByteArray key: keys){
 		if (data.contains(key)){

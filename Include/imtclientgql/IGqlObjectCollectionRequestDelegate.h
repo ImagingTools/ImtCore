@@ -125,6 +125,10 @@ public:
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
+	virtual imtgql::IGqlRequest* CreateGetSubCollectionRequest(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
 
 	virtual imtgql::IGqlResponse* CreateResponse(const imtgql::IGqlRequest& request) const = 0;
 };
