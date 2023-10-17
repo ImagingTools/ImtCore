@@ -60,6 +60,7 @@ Item {
 
     property int selectedIndex: -1;
     property bool hoverBlocked: true;
+    property bool doNotCorrectPosition : false;
 
     property Component delegate: PopupMenuDelegate{
         width: comboBoxContainerGql.width;
@@ -140,6 +141,7 @@ Item {
             pauseDuration: comboBoxContainerGql.pauseDuration;
             excludeFilterPart: comboBoxContainerGql.excludeFilterPart;
             canUpdateModel: comboBoxContainerGql.canUpdateModel;
+            doNotCorrectPosition: comboBoxContainerGql.doNotCorrectPosition;
 //            function getCurrentText(index){
 //                return popup.model.GetData("Name",index);
 //            }

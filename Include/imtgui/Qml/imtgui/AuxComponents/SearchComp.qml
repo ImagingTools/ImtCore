@@ -131,6 +131,7 @@ Rectangle{
 
     function setCurrentTextAddressFunc(modelll, index_, addStr_){
         if(searchContainer.isAddressSearch){
+            //searchTextField.currentIndex = -1;
             var addStrNew = addStr_ !== undefined ? addStr_ : "";
 
             searchTextField.currentText = modelll.GetData(searchContainer.valueName, index_) + addStrNew;
@@ -167,6 +168,7 @@ Rectangle{
                 popup.modelFilterAlias.SetData("TextFilter", "");
                 popup.excludeFilterPart = searchContainer.currentText;
                 popup.filterText = searchContainer.currentText;
+
                 popup.updateModel();
 
             }
@@ -465,7 +467,7 @@ Rectangle{
         filterHeiht: height;
 
         commandId: searchContainer.commandId;
-        count: 5;
+        count: 6;
 
         gettedParams: searchContainer.gettedParamsModel;
         properties: searchContainer.propertiesModel;
@@ -485,6 +487,7 @@ Rectangle{
         closeEmpty: true;
 
         canClose: true;
+        property bool doNotCorrectPosition : true;
 
         onInFocusChanged: {
 

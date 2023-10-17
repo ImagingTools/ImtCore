@@ -34,6 +34,7 @@ Item {
     property bool canClose: true;
     property bool canUpdateModel: true;
     property bool preventFirstLoading: false;
+    property bool doNotCorrectPosition : false;
 
     property alias modelFilterAlias: modelFilter;
 
@@ -118,7 +119,15 @@ Item {
             modelFilter.SetData(popupMenuContainer.properties.GetData("Id", item),  popupMenuContainer.properties.GetData("Value", item));
         }
         //itemsModel.updateModel(0);
+        //popupMenuContainer.rootItem.currentIndex = -1;
     }
+//    onGettedParamsChanged: {
+//        popupMenuContainer.rootItem.currentIndex = -1;
+//    }
+//    onFilterIdsModelChanged: {
+//        popupMenuContainer.rootItem.currentIndex = -1;
+
+//    }
 
 
 
@@ -420,6 +429,9 @@ Item {
         sequence: "Up";
         enabled: true;
         onActivated: {
+            if(filterField.textInputFocus){
+                popupMenuContainer.setTextFocus(false)
+            }
             popupMenuContainer.hoverBlocked = true;
             if(popupMenuContainer.rootItem){
                 popupMenuContainer.rootItem.hoverBlocked = true;
@@ -435,6 +447,9 @@ Item {
         sequence: "Down";
         enabled: true;
         onActivated: {
+            if(filterField.textInputFocus){
+                popupMenuContainer.setTextFocus(false)
+            }
             popupMenuContainer.hoverBlocked = true;
             if(popupMenuContainer.rootItem){
                 popupMenuContainer.rootItem.hoverBlocked = true;
@@ -444,7 +459,7 @@ Item {
                 }
                 else if(popupMenuContainer.rootItem.selectedIndex == popupMenuContainer.model.GetItemsCount() - 1){
                     popupMenuContainer.createAdditionalQuery();
-                    popupMenuListView.contentY += popupMenuContainer.itemHeight;
+                    //popupMenuListView.contentY += popupMenuContainer.itemHeight;
                 }
 
             }
@@ -548,6 +563,11 @@ Item {
                                 popupMenuContainer.endListStatus = true;
                             }
                             loadedRec.visible = false;
+
+                            if(popupMenuContainer.rootItem.currentIndex >=0 && popupMenuContainer.elementsCount -1 > popupMenuContainer.rootItem.currentIndex){
+                                //popupMenuListView.contentY += popupMenuContainer.itemHeight;
+
+                            }
                         }
                     }
                     dataModelLocal.Refresh();
