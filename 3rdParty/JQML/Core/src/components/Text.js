@@ -96,7 +96,7 @@ export class Text extends Item {
     $textFormatChanged(){
         if(this.textFormat === Text.AutoText){
             let regexp = /<[^<>]+>/g
-            if(regexp.test(this.text)){
+            if(this.text && (regexp.test(this.text.toString()) || this.text.toString().indexOf('\n') >= 0)){
                 this.$isHTML = true
             } else {
                 this.$isHTML = false
@@ -114,7 +114,7 @@ export class Text extends Item {
     $textChanged(){
         if(this.textFormat === Text.AutoText){
             let regexp = /<[^<>]+>/g
-            if(regexp.test(this.text) || this.text.indexOf('\n')){
+            if(this.text && (regexp.test(this.text.toString()) || this.text.toString().indexOf('\n') >= 0)){
                 this.$isHTML = true
             } else {
                 this.$isHTML = false
