@@ -55,6 +55,10 @@ FocusScope {
         }
     }
 
+    onTextChanged: {
+        textField.text = text;// for web TEMP!!!
+    }
+
     function setFocus(value) {
         textField.focus = value;
     }
