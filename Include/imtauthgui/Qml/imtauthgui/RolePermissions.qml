@@ -184,17 +184,19 @@ Item {
             if (selectedIndex != null && selectedIndex.itemData){
                 let selectedFeatureId = selectedIndex.itemData.FeatureId;
 
-                let featureDependencies = dependenciesProvider.getAllDependencies(selectedFeatureId);
+                let dependencies = selectedIndex.itemData.Dependencies;
+
+                let featureDependencies = []
+
+                if (dependencies !== ""){
+                    featureDependencies = dependencies.split(';');
+                }
 
                 if (featureDependencies.length === 0){
                     featureDependencies.push(qsTr("No dependencies"))
                 }
 
                 repeater.model = featureDependencies;
-//                repeater.visible = true;
-            }
-            else{
-//                repeater.visible = false;
             }
         }
 
@@ -220,6 +222,10 @@ Item {
             }
         }
     }//BasicTableView
+
+    function updateTreeViewGui(){
+
+    }
 
     Item {
         id: informationBlock;
@@ -279,6 +285,30 @@ Item {
 
                         color: Style.textColor;
                         elide: Text.ElideRight;
+                    }
+                }
+            }
+        }
+    }
+
+    function findChildrenFeatureDependencies(featureId, retVal){
+        let itemsDataList = permissionsTable.getItemsDataAsList();
+        for (let i = 0; i < itemsDataList.length; i++){
+            let delegateItem = itemsDataList[i]
+            let itemData = delegateItem.getItemData();
+            let id = itemData.FeatureId;
+
+            if (featureId === id){
+                let dependencies = itemData.Dependencies;
+                if (dependencies && dependencies !== ""){
+                    let dependencyList = dependencies.split(';');
+
+                    for (let dependencyId of dependencyList){
+                        if (!retVal.includes(dependencyId)){
+                            retVal.push(dependencyId)
+
+                            findChildrenFeatureDependencies(dependencyId, retVal);
+                        }
                     }
                 }
             }

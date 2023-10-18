@@ -33,22 +33,28 @@ imtbase::CTreeItemModel* CFeatureDependenciesProviderComp::CreateInternalRespons
 		return nullptr;
 	}
 
-	QByteArray featureId = gqlInputParamPtr->GetFieldArgumentValue("FeatureId").toByteArray();
-	if (featureId.isEmpty()){
+	QByteArray features = gqlInputParamPtr->GetFieldArgumentValue("FeatureIds").toByteArray();
+	if (features.isEmpty()){
 		errorMessage = QString("Unable to get dependencies for feature with empty Feature-ID.");
 		SendErrorMessage(0, errorMessage, "CFeatureDependenciesProviderComp");
 
 		return nullptr;
 	}
 
-	QByteArrayList featureDependencies = GetFeatureDependencies(featureId);
+	QByteArrayList featureIds = features.split(';');
+
+	QByteArrayList retVal;
+
+	for (const QByteArray& featureId : featureIds){
+		retVal += GetFeatureDependencies(featureId);
+	}
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 	Q_ASSERT(dataModelPtr != nullptr);
 
-	dataModelPtr->SetData("FeatureId", featureId);
-	dataModelPtr->SetData("FeatureDependencies", featureDependencies.join(';'));
+	dataModelPtr->SetData("FeatureIds", features);
+	dataModelPtr->SetData("FeaturesDependencies", retVal.join(';'));
 
 	return rootModelPtr.PopPtr();
 }
@@ -83,7 +89,16 @@ QByteArrayList CFeatureDependenciesProviderComp::GetFeatureDependencies(const QB
 		if (m_featureCollectionCompPtr->GetObjectData(featureUuid, dataPtr)){
 			const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
 			if (featureInfoPtr != nullptr){
-				QByteArrayList featureDependencies = featureInfoPtr->GetDependencies();
+				QByteArrayList featureDependencies;
+				if (featureInfoPtr->GetFeatureId() != featureId){
+					const imtlic::IFeatureInfo* subfeatureInfoPtr = featureInfoPtr->GetSubFeature(featureId);
+					if (subfeatureInfoPtr != nullptr){
+						featureDependencies = subfeatureInfoPtr->GetDependencies();
+					}
+				}
+				else{
+					featureDependencies = featureInfoPtr->GetDependencies();
+				}
 
 				retVal += featureDependencies;
 

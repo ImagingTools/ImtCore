@@ -1,6 +1,10 @@
 #include <imtgql/imtgql.h>
 
 
+// ImtCore includes
+#include <imtbase/imtbase.h>
+
+
 namespace imtgql
 {
 
@@ -23,6 +27,23 @@ QByteArray GetLanguageIdFromRequest(const QList<imtgql::CGqlObject>& inputParams
 QByteArray GetDesignSchemeIdFromRequest(const QList<imtgql::CGqlObject>& /*inputParams*/)
 {
 	return QByteArray();
+}
+
+
+QByteArray GetTranslation(const iqt::ITranslationManager* translationManagerPtr, const imtgql::CGqlRequest& gqlRequest, const QByteArray& phrase, const QByteArray& context)
+{
+	if (translationManagerPtr == nullptr){
+		return phrase;
+	}
+
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr == nullptr){
+		return phrase;
+	}
+
+	QByteArray languageId = gqlContextPtr->GetLanguageId();
+
+	return imtbase::GetTranslation(translationManagerPtr, phrase, languageId, context);
 }
 
 

@@ -76,39 +76,4 @@ QtObject {
             }
         }
     }
-
-    // GqlModel for update feature dependencies model.
-    property GqlModel dependenciesModel : GqlModel {
-        function updateModel() {
-            var query = Gql.GqlRequest("query", "FeaturesDependencies");
-
-            var queryFields = Gql.GqlObject("dependencies");
-            queryFields.InsertField("TreeModel");
-            query.AddField(queryFields);
-
-            var gqlData = query.GetQuery();
-
-            this.SetGqlQuery(gqlData);
-        }
-
-        onStateChanged: {
-            console.log("State:", this.state, dependenciesModel);
-            if (this.state === "Ready"){
-                var dataModelLocal = this.GetData("data");
-
-                if (this.ContainsKey("data")){
-                    dataModelLocal = this.GetData("data");
-
-                    if (dataModelLocal.ContainsKey("FeaturesDependencies")){
-                        dataModelLocal = dataModelLocal.GetData("FeaturesDependencies");
-                    }
-                    else{
-                        dataModelLocal = dataModelLocal.AddTreeModel("FeaturesDependencies");
-                    }
-
-                    provider.model = dataModelLocal;
-                }
-            }
-        }
-    }
 }

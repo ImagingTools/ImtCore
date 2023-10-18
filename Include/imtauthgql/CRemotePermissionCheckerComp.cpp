@@ -15,6 +15,8 @@ namespace imtauthgql
 
 bool CRemotePermissionCheckerComp::CheckPermission(const imtauth::IUserInfo::FeatureIds& userPermissions, const QByteArrayList& permissions)
 {
+	qDebug() << "CheckPermission" << userPermissions << permissions;
+
 	if (!m_gqlRequestHandlerCompPtr.IsValid() || !m_permissionCheckerCompPtr.IsValid()){
 		SendErrorMessage(0, QString("Unable to check user permissions. Internal error."), "CRemotePermissionCheckerComp");
 
@@ -26,36 +28,44 @@ bool CRemotePermissionCheckerComp::CheckPermission(const imtauth::IUserInfo::Fea
 		return true;
 	}
 
+	imtgql::CGqlRequest gqlRequest(imtgql::CGqlRequest::RT_QUERY, "GetFeatureDependencies");
+	imtgql::CGqlObject inputParam("input");
+	inputParam.InsertField(QByteArray("FeatureIds"), QVariant(permissions.join(';')));
+	gqlRequest.AddParam(inputParam);
+
+	QString errorMessage;
+	imtbase::CTreeItemModel* responseModelPtr = m_gqlRequestHandlerCompPtr->CreateResponse(gqlRequest, errorMessage);
+	if (responseModelPtr == nullptr){
+		SendErrorMessage(0, errorMessage, "CRemotePermissionCheckerComp");
+
+		return false;
+	}
+
 	QByteArrayList result;
-	for (const QByteArray& featureId : userPermissions){
-		result << featureId;
 
-		imtgql::CGqlRequest gqlRequest(imtgql::CGqlRequest::RT_QUERY, "GetFeatureDependencies");
-		imtgql::CGqlObject inputParam("input");
-		inputParam.InsertField(QByteArray("FeatureId"), QVariant(featureId));
-		gqlRequest.AddParam(inputParam);
+	result << permissions;
 
-		QString errorMessage;
-		imtbase::CTreeItemModel* responseModelPtr = m_gqlRequestHandlerCompPtr->CreateResponse(gqlRequest, errorMessage);
-		if (responseModelPtr == nullptr){
-			SendErrorMessage(0, errorMessage, "CRemotePermissionCheckerComp");
+	if (responseModelPtr->ContainsKey("FeaturesDependencies")){
+		QByteArray featureDependencies = responseModelPtr->GetData("FeaturesDependencies").toByteArray();
+		if (!featureDependencies.isEmpty()){
+			QByteArrayList dependencyIds = featureDependencies.split(';');
 
-			return false;
+			qDebug() << "\n";
+			qDebug() << "Features: " << permissions;
+			qDebug() << "Dependencies: " << dependencyIds;
+			qDebug() << "\n";
+
+			result << dependencyIds;
 		}
+	}
 
-		if (responseModelPtr->ContainsKey("FeatureDependencies")){
-			QByteArray featureDependencies = responseModelPtr->GetData("FeatureDependencies").toByteArray();
-			if (!featureDependencies.isEmpty()){
-				QByteArrayList dependencyIds = featureDependencies.split(';');
+	ok = m_permissionCheckerCompPtr->CheckPermission(userPermissions, result);
 
-				result << dependencyIds;
-			}
-		}
+	qDebug() << "OK: " << ok;
+	qDebug() << "\n";
 
-		bool ok = m_permissionCheckerCompPtr->CheckPermission(result, permissions);
-		if (ok){
-			return true;
-		}
+	if (ok){
+		return true;
 	}
 
 	return false;
