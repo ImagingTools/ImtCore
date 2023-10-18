@@ -532,6 +532,16 @@ imtgql::IGqlStructuredCollectionResponse::ElementList CGqlObjectCollectionDelega
 }
 
 
+bool CGqlObjectCollectionDelegateCompBase::GetSubCollection(
+			imtbase::IObjectCollection* subcollection,
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr) const
+{
+	return false;
+}
+
+
 // protected methods
 
 imtgql::IGqlRequest* CGqlObjectCollectionDelegateCompBase::CreateGetElementType(const QByteArray& elementId) const
@@ -655,6 +665,15 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateCompBase::CreateGetElementCount
 
 
 imtgql::IGqlRequest* CGqlObjectCollectionDelegateCompBase::CreateGetElementListRequest(int offset, int count, const iprm::IParamsSet* selectionParamsPtr) const
+{
+	return nullptr;
+}
+
+
+imtgql::IGqlRequest* CGqlObjectCollectionDelegateCompBase::CreateGetSubCollectionRequest(
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr) const
 {
 	return nullptr;
 }

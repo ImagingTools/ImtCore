@@ -116,6 +116,11 @@ public:
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
+	virtual bool GetSubCollection(
+				imtbase::IObjectCollection* subcollection,
+				int offset,
+				int count,
+				const iprm::IParamsSet* selectionParamsPtr) const override;
 
 	// reimplemented (IGqlObjectCollectionRequestDelegate)
 	virtual imtgql::IGqlRequest* CreateGetElementType(const QByteArray& elementId) const override;
@@ -209,6 +214,10 @@ public:
 	virtual imtgql::IGqlRequest* CreateGetElementCountRequest(
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 	virtual imtgql::IGqlRequest* CreateGetElementListRequest(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
+	virtual imtgql::IGqlRequest* CreateGetSubCollectionRequest(
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
