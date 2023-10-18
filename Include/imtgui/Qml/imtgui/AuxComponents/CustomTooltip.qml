@@ -54,6 +54,11 @@ Item {
 
     }
 
+    function openTooltipWithText(xX, yY, text_){
+        customTooltip.text = text_;
+        openTooltip(xX, yY);
+    }
+
     function openTooltip(xX, yY){
         if(!customTooltip.openST){
             console.log("openTooltip", xX, yY);
@@ -79,8 +84,8 @@ Item {
                 point.y = point.y + customTooltip.componentMargin;
             }
 
-            modalDialogManager.openDialog(customTooltip.tooltipContentComp, {"x": point.x, "y": point.y});
-
+            modalDialogManager.openDialog(customTooltip.tooltipContentComp, {"x": point.x, "y": point.y, text: customTooltip.text});
+            console.log("TEXT::: ",customTooltip.text);
             modalDialogManager.backgroundItem.visible = false;
 
             customTooltip.openST = true;
@@ -147,6 +152,7 @@ Item {
             radius: customTooltip.radius;
 
             property Item root: null;
+            property string text:"";
 
             Text{
                 id: compText;
@@ -167,7 +173,7 @@ Item {
 
                 wrapMode: customTooltip.fitToTextWidth ? Text.NoWrap : Text.WrapAtWordBoundaryOrAnywhere;
 
-                text: qsTr(customTooltip.text);
+                text: compRec.text;//qsTr(customTooltip.text);
 
                 lineHeight: customTooltip.lineHeight;
             }
