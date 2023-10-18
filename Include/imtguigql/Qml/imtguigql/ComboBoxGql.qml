@@ -97,6 +97,7 @@ Item {
     signal editSignal();
     signal closeSignal(var model_);
     signal clearSignal();
+    signal closeEmptySignal();
 
     onOpenSTChanged: {
         selectedIndex = -1;
@@ -221,6 +222,7 @@ Item {
     function closeFunc(){
         if(comboBoxContainerGql.closeEmpty){
             modalDialogManager.closeDialog();
+            closeEmptySignal();
         }
     }
 
