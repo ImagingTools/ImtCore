@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5120" Description="ACF"/>
+            <Version Id="0" Number="5122" Description="ACF"/>
             <Version Id="1" Number="2196" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -52,13 +52,16 @@
         <Element Id="GqlObjectCollectionDelegate" PackageId="ImtClientGqlPck" ComponentId="GqlObjectCollectionDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
                         <Data IsEnabled="true" Value="ApiClient"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Id" Type="Id" ExportId="Id">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="MetaInfoCreator" Type="Reference" ExportId="MetaInfoCreator">
