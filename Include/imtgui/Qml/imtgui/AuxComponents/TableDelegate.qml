@@ -294,7 +294,12 @@ Rectangle {
         z: 1;
 
 		anchors.fill: parent;
-        hoverEnabled: true
+        hoverEnabled: true;
+
+        //visible: false;
+
+        //preventStealing: false;
+        propagateComposedEvents: true;
 
         acceptedButtons: Qt.LeftButton | Qt.RightButton;
 
@@ -332,6 +337,8 @@ Rectangle {
                 ma.clickCount = 0;
                 timer.stop();
             }
+
+            mouse.accepted = false;
         }
 //        onDoubleClicked: {
 //            console.log("onDoubleClicked")
