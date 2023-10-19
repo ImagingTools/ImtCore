@@ -526,7 +526,7 @@ Item {
 
                     if (dataModelLocal.ContainsKey(popupMenuContainer.commandId)){
                         dataModelLocal = dataModelLocal.GetData(popupMenuContainer.commandId);
-
+                        var isClosing = false;
                         if (dataModelLocal.ContainsKey("notification")){
                             var notifModel = dataModelLocal.GetData("notification");
                             if (notifModel.ContainsKey("ElementsCount")){
@@ -534,7 +534,8 @@ Item {
                             }
                             if(notifModel.ContainsKey("Close")){
                                 if(notifModel.GetData("Close")){
-                                    popupMenuContainer.rootItem.closeFunc();
+                                    isClosing = true;
+                                    //popupMenuContainer.rootItem.closeFunc();
                                 }
                             }
                         }
@@ -550,6 +551,9 @@ Item {
                             loadedRec.visible = false;
                             popupMenuContainer.endListStatus = false;
                             popupMenuContainer.rootItem.selectedIndex = -1;
+                            if(isClosing){
+                                popupMenuContainer.rootItem.closeFunc();
+                            }
                         }
                         else{//OFSET !== 0
 
