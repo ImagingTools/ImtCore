@@ -69,7 +69,7 @@ export class ListModel extends QtObject {
                 let listElement = new ListElement({parent:this,appended:true})
                 listElement.$cP('index', i)
                 for(let key in dict[i]){
-                    listElement.$cP(key, dict[i][key], ()=>{this.$dataChanged()})
+                    listElement.$cP(key, dict[i][key])
                     // listElement.$p[key].getSignal().connect(this.$modelChanged.bind(this))
                 }
                 this.data.push(listElement)
@@ -82,7 +82,7 @@ export class ListModel extends QtObject {
                 let listElement = new ListElement({parent:this,appended:true})
                 listElement.$cP('index', this.data.length)
                 for(let key in dict){
-                    listElement.$cP(key, dict[key], ()=>{this.$dataChanged();this.$modelChanged()})
+                    listElement.$cP(key, dict[key])
                     // listElement.$p[key].getSignal().connect(this.$modelChanged.bind(this))
                 }
                 this.data.push(listElement)
@@ -117,7 +117,7 @@ export class ListModel extends QtObject {
                 let listElement = new ListElement({parent:this,appended:true})
                 listElement.$cP('index', i)
                 for(let key in dict[i]){
-                    listElement.$cP(key, dict[i][key], ()=>{this.$dataChanged()})
+                    listElement.$cP(key, dict[i][key])
                     // listElement.$p[key].getSignal().connect(this.$modelChanged.bind(this))
                 }
                 this.data.splice(index + i, 0, listElement)
@@ -131,7 +131,7 @@ export class ListModel extends QtObject {
                 let listElement = new ListElement({parent:this,appended:true})
                 listElement.$cP('index', index)
                 for(let key in dict){
-                    listElement.$cP(key, dict[key], ()=>{this.$dataChanged();this.$modelChanged()})
+                    listElement.$cP(key, dict[key])
                     // listElement.$p[key].getSignal().connect(this.$modelChanged.bind(this))
                 }
                 this.data.splice(index, 0, listElement)

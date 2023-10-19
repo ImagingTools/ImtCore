@@ -558,6 +558,10 @@ export class QtObject {
                             this.$p[name].func = null
                             this.$p[name].val = newVal
                             
+                            if(this.$qmlClassName === 'ListElement' && this.parent){
+                                this.parent.$dataChanged()
+                                this.parent.$modelChanged()
+                            }
                             this.$p[name].getSignal()()
                         }
                         
