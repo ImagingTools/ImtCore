@@ -283,7 +283,7 @@ Item {
 //            text: delegateContainer.pTableDelegateContainer ? delegateContainer.columnIndex >= 0 ? delegateContainer.pTableDelegateContainer.dataModel[delegateContainer.pTableDelegateContainer.headers.GetData("Id", delegateContainer.columnIndex)] : "" : "";
 //            text: delegateContainer.pTableDelegateContainer.headers.GetData("Id", 1)
 
-            text: delegateContainer.getValue();
+            text: delegateContainer.getValue() !== undefined ? delegateContainer.getValue() : "";
             onTextChanged: {
                 // Multiline fit in one line
                 if(wrapMode == Text.NoWrap){

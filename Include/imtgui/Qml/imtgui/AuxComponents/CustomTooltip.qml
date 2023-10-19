@@ -84,8 +84,8 @@ Item {
                 point.y = point.y + customTooltip.componentMargin;
             }
 
-            modalDialogManager.openDialog(customTooltip.tooltipContentComp, {"x": point.x, "y": point.y, text: customTooltip.text});
-            console.log("TEXT::: ",customTooltip.text);
+            modalDialogManager.openDialog(customTooltip.tooltipContentComp, {"x": point.x, "y": point.y, text: qsTr(customTooltip.text)});
+            //console.log("TEXT::: ",customTooltip.text);
             modalDialogManager.backgroundItem.visible = false;
 
             customTooltip.openST = true;
