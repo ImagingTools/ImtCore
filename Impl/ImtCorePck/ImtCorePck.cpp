@@ -20,6 +20,16 @@ I_EXPORT_COMPONENT(
 			"Processing Supplier Factory");
 
 I_EXPORT_COMPONENT(
+			ParamsSetFactory,
+			"ParamsSet factory",
+			"Processing ParamsSet Factory");
+
+I_EXPORT_COMPONENT(
+			RepresentationControllerFactory,
+			"RepresentationController factory",
+			"Processing RepresentationController Factory");
+
+I_EXPORT_COMPONENT(
 			ObjectCollection,
 			"General collection of the data objects",
 			"Object Data Model Collection Container Composition");

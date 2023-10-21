@@ -59,6 +59,8 @@ namespace ImtCorePck
 
 
 typedef imtbase::TComponentFactoryComp<iinsp::ISupplier> SupplierFactory;
+typedef imtbase::TComponentFactoryComp<iprm::IParamsSet> ParamsSetFactory;
+typedef imtbase::TComponentFactoryComp<imtbase::IRepresentationController> RepresentationControllerFactory;
 typedef icomp::TModelCompWrap<imtbase::CObjectCollectionComp> ObjectCollection;
 typedef icomp::TModelCompWrap<imtbase::CCachedObjectCollectionComp> CachedObjectCollection;
 typedef icomp::TModelCompWrap<imtbase::CDelegatedObjectContainerSupplierComp> DelegatedObjectContainerSupplier;
