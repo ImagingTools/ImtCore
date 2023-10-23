@@ -14,6 +14,7 @@ Item {
     property Component checkBoxDecorator: checkBoxDecoratorComp
     property Component switchDecorator: switchDecoratorComp
     property Component sliderDecorator: sliderDecoratorComp
+    property Component rangeSliderDecorator: rangeSliderDecoratorComp
 
 
 
@@ -283,6 +284,28 @@ Item {
                     baseElement.position = position;
                 }
             }
+        }
+    }
+
+    Component{
+        id: rangeSliderDecoratorComp;
+
+        RangeSlider{
+            property var baseElement;
+            property real positionFirst: first.position;
+            property real positionSecond: second.position;
+
+            onPositionFirstChanged: {
+                if(baseElement && baseElement.from !== undefined && baseElement.to !== undefined){
+                    baseElement.positionFirst = positionFirst;
+                }
+            }
+            onPositionSecondChanged: {
+                if(baseElement && baseElement.from !== undefined && baseElement.to !== undefined){
+                    baseElement.positionSecond = positionSecond;
+                }
+            }
+
         }
     }
 }

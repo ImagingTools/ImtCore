@@ -17,6 +17,7 @@ Item {
     property Component checkBoxDecorator: checkBoxDecoratorComp
     property Component switchDecorator: switchDecoratorComp
     property Component sliderDecorator: sliderDecoratorComp
+    property Component rangeSliderDecorator: rangeSliderDecoratorComp
 
     Component {
         id: topButtonDecoratorComp
@@ -463,6 +464,72 @@ Item {
                 height: width;
                 radius: width;
                 color: !sliderItem.baseElement ? "transparent" : sliderItem.baseElement.controlColor;
+
+            }
+
+        }
+    }
+
+    Component{
+        id: rangeSliderDecoratorComp;
+
+        Item{
+            id: rangeSliderItem;
+
+            width: 150;
+            height: 20;
+
+            property var baseElement: null;
+            property real value: 0;
+
+            property string borderColor: !baseElement ? "" : baseElement.borderColor == undefined ? "" : baseElement.borderColor;
+
+            Rectangle{
+                id: backgroundRec;
+
+                anchors.left: parent.left;
+                anchors.verticalCenter: parent.verticalCenter;
+
+                width: parent.width;
+                height: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.backgroundHeight;
+                color: !rangeSliderItem.baseElement ? "transparent" : rangeSliderItem.baseElement.backgroundColor;
+
+                radius: height;
+
+                opacity: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.backgroundOpacity;
+
+                Rectangle{
+                    width: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlRecX + rangeSliderItem.baseElement.height/2;
+                    height: parent.height;
+                    radius: parent.radius;
+                    color: !rangeSliderItem.baseElement ? "transparent" : rangeSliderItem.baseElement.controlColor;
+                }
+
+            }
+
+            Rectangle{
+                id: controlRecFirst;
+
+                anchors.verticalCenter: parent.verticalCenter;
+
+                x: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlRecXFirst;
+                width: parent.height;
+                height: width;
+                radius: width;
+                color: !rangeSliderItem.baseElement ? "transparent" : rangeSliderItem.baseElement.controlColor;
+
+            }
+
+            Rectangle{
+                id: controlRecSecond;
+
+                anchors.verticalCenter: parent.verticalCenter;
+
+                x: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlRecXSecond;
+                width: parent.height;
+                height: width;
+                radius: width;
+                color: "green"//!rangeSliderItem.baseElement ? "transparent" : rangeSliderItem.baseElement.controlColor;
 
             }
 
