@@ -459,8 +459,8 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 		RemoveAllObjects();
 	}
 
-	static iser::CArchiveTag objectListTag("ObjectsList", "List of objects", iser::CArchiveTag::TT_MULTIPLE);
-	static iser::CArchiveTag objectTag("Object", "Object item", iser::CArchiveTag::TT_GROUP, &objectListTag);
+	iser::CArchiveTag objectListTag("ObjectsList", "List of objects", iser::CArchiveTag::TT_MULTIPLE);
+	iser::CArchiveTag objectTag("Object", "Object item", iser::CArchiveTag::TT_GROUP, &objectListTag);
 
 	bool retVal = true;
 
@@ -474,22 +474,22 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 			elementInfo = m_objects[i];
 		}
 
-		static iser::CArchiveTag objectIdTag("ID", "Object ID", iser::CArchiveTag::TT_LEAF, &objectTag);
+		iser::CArchiveTag objectIdTag("ID", "Object ID", iser::CArchiveTag::TT_LEAF, &objectTag);
 		retVal = retVal && archive.BeginTag(objectIdTag);
 		retVal = retVal && archive.Process(elementInfo.id);
 		retVal = retVal && archive.EndTag(objectIdTag);
 
-		static iser::CArchiveTag descriptionTag("Description", "Object description", iser::CArchiveTag::TT_LEAF, &objectTag);
+		iser::CArchiveTag descriptionTag("Description", "Object description", iser::CArchiveTag::TT_LEAF, &objectTag);
 		retVal = retVal && archive.BeginTag(descriptionTag);
 		retVal = retVal && archive.Process(elementInfo.description);
 		retVal = retVal && archive.EndTag(descriptionTag);
 
-		static iser::CArchiveTag typeIdTag("TypeId", "Object type-ID", iser::CArchiveTag::TT_LEAF, &objectTag);
+		iser::CArchiveTag typeIdTag("TypeId", "Object type-ID", iser::CArchiveTag::TT_LEAF, &objectTag);
 		retVal = retVal && archive.BeginTag(typeIdTag);
 		retVal = retVal && archive.Process(elementInfo.typeId);
 		retVal = retVal && archive.EndTag(typeIdTag);
 
-		static iser::CArchiveTag objectNameTag("Name", "Object name", iser::CArchiveTag::TT_LEAF, &objectTag);
+		iser::CArchiveTag objectNameTag("Name", "Object name", iser::CArchiveTag::TT_LEAF, &objectTag);
 		retVal = retVal && archive.BeginTag(objectNameTag);
 		retVal = retVal && archive.Process(elementInfo.name);
 		retVal = retVal && archive.EndTag(objectNameTag);
@@ -497,13 +497,13 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 		quint32 imtCoreVersion;
 		bool imtCoreVersionExists = archive.GetVersionInfo().GetVersionNumber(imtcore::VI_IMTCORE, imtCoreVersion);
 		if (imtCoreVersionExists && imtCoreVersion >= 3401){
-			static iser::CArchiveTag collectionMetaInfoTag("CollectionItemMeta", "Collection item meta information", iser::CArchiveTag::TT_GROUP, &objectTag);
+			iser::CArchiveTag collectionMetaInfoTag("CollectionItemMeta", "Collection item meta information", iser::CArchiveTag::TT_GROUP, &objectTag);
 			retVal = retVal && archive.BeginTag(collectionMetaInfoTag);
 			retVal = retVal && elementInfo.collectionItemMetaInfo.Serialize(archive);
 			retVal = retVal && archive.EndTag(collectionMetaInfoTag);
 		}
 
-		static iser::CArchiveTag objectDataTag("Data", "Object data", iser::CArchiveTag::TT_GROUP, &objectTag);
+		iser::CArchiveTag objectDataTag("Data", "Object data", iser::CArchiveTag::TT_GROUP, &objectTag);
 		retVal = retVal && archive.BeginTag(objectDataTag);
 
 		istd::IChangeable* objectPtr = nullptr;

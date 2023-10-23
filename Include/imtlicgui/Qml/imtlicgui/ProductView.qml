@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtauthgui 1.0
 import imtqml 1.0
 
 DocumentBase {
@@ -294,6 +295,11 @@ DocumentBase {
             currentIndex: 0;
 
             radius: 0;
+
+            Component.onCompleted: {
+                let ok = PermissionsController.checkPermission("ChangeProduct");
+                categoryComboBox.changeable = ok;
+            }
 
             onCurrentIndexChanged: {
                 if (productViewContainer.blockUpdatingModel){

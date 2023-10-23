@@ -35,7 +35,24 @@ QtObject {
                 documentManager.saveDocument(itemId);
             }
         }
+        else if (commandId === "History"){
+            let itemId = container.documentBase.itemId;
+
+            modalDialogManager.openDialog(documentHistoryDialogComp, {"documentId": itemId, "documentTypeId": container.documentBase.commandsId});
+        }
 
         container.commandActivated(commandId);
     }
+
+    property Component documentHistoryDialogComp: Component {
+        DocumentHistoryDialog {
+            title: qsTr("Document history");
+
+            onStarted: {
+                updateModel();
+            }
+        }
+    }
 }
+
+

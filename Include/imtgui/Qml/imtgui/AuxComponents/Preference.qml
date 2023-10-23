@@ -13,7 +13,11 @@ Rectangle {
 
     color: Style.backgroundColor;
 
-    property TreeItemModel settingsModel: TreeItemModel {};
+    property TreeItemModel settingsModel: TreeItemModel {
+            onDataChanged: {
+                console.log("settingsModel onDataChanged");
+            }
+      };
 
     property alias leftPanelWidth: mainPanelBackground.width;
     property alias mainWidth: root.width;
@@ -29,17 +33,23 @@ Rectangle {
     signal modelChanged();
 
     onModelChanged: {
-        console.log("onModelChanged");
         root.modelIsDirty = true;
     }
 
     onSettingsModelChanged: {
+        console.log("onSettingsModelChanged", settingsModel);
+
         if (root.settingsModel != null){
             console.log("connect");
             root.settingsModel.dataChanged.connect(root.modelChanged);
+            root.settingsModel.dataChanged.connect(root.test);
 
             root.updateGui();
         }
+    }
+
+    function test(){
+        console.log("test dataChanged");
     }
 
     function clearModels(){

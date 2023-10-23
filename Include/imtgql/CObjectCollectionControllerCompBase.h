@@ -8,6 +8,7 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtbase/IOperationContext.h>
+#include <imtbase/IDocumentChangeGenerator.h>
 #include <imtgql/CGqlRequestHandlerCompBase.h>
 
 
@@ -25,6 +26,7 @@ public:
 
 	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
+		I_ASSIGN(m_documentChangeGeneratorCompPtr, "DocumentChangeGenerator", "Change generator for the collection object", false, "DocumentChangeGenerator");
 		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Headers provider", false, "HeadersProvider");
 		I_ASSIGN(m_objectViewProviderCompPtr, "ObjectViewProvider", "Object view provider", false, "ObjectViewProvider");
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
@@ -50,6 +52,7 @@ public:
 		OT_OBJECT_VIEW,
 		OT_ELEMENTS_COUNT,
 		OT_ELEMENT_IDS,
+		OT_ELEMENT_HISTORY,
 		OT_USER_OPERATION = 1000
 	};
 
@@ -76,6 +79,7 @@ protected:
 	virtual imtbase::CTreeItemModel* GetInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetDataMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetObjectView(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* GetObjectHistory(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
 	virtual imtbase::IOperationContext* CreateOperationContext(const imtgql::CGqlRequest& gqlRequest, const QString& operationDescription) const;
 
@@ -135,6 +139,7 @@ protected:
 	virtual void OnComponentCreated() override;
 
 protected:
+	I_REF(imtbase::IDocumentChangeGenerator, m_documentChangeGeneratorCompPtr);
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imtgql::IGqlRequestHandler, m_headersProviderCompPtr);
 	I_REF(imtgql::IGqlRequestHandler, m_objectViewProviderCompPtr);

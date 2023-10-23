@@ -5,20 +5,26 @@ import imtqml 1.0
 QtObject {
     id: root;
 
-    property string commandId: "GetOrderHistory";
+    property string documentTypeId: "";
+    property string documentId: "";
 
     property TreeItemModel historyModel: TreeItemModel {}
 
+    property alias state: root.documentHistoryGqlModel.state;
+
     property GqlModel documentHistoryGqlModel: GqlModel {
         function getModel(documentId){
-            var query = Gql.GqlRequest("query", root.commandId);
+            var query = Gql.GqlRequest("query", root.documentTypeId + "History");
+
+            var queryFields = Gql.GqlObject("itemHistory");
+            queryFields.InsertField("Id");
+            query.AddField(queryFields);
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", documentId);
             query.AddParam(inputParams);
 
             var gqlData = query.GetQuery();
-            console.log("query", gqlData);
             this.SetGqlQuery(gqlData);
         }
 
@@ -33,8 +39,8 @@ QtObject {
                     var dataModelLocal = root.documentHistoryGqlModel.GetData("data");
 
                     if (dataModelLocal){
-                        if (dataModelLocal.ContainsKey(root.commandId)){
-                            dataModelLocal = dataModelLocal.GetData(root.commandId);
+                        if (dataModelLocal.ContainsKey(root.documentTypeId + "History")){
+                            dataModelLocal = dataModelLocal.GetData(root.documentTypeId + "History");
                             root.historyModel = dataModelLocal;
                         }
                     }
@@ -43,7 +49,8 @@ QtObject {
         }
     }
 
-    function updateModel(documentId){
+    function updateModel(documentType, documentId){
+        root.documentTypeId = documentType;
         root.documentHistoryGqlModel.getModel(documentId);
     }
 }

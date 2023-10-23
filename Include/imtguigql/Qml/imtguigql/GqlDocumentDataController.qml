@@ -149,11 +149,6 @@ QtObject {
                         dataModelLocal = dataModelLocal.GetData(container.updateCommandId);
                     }
 
-//                    if (dataModelLocal.ContainsKey("message")){
-//                        let message = dataModelLocal.GetData("message");
-//                        container.savingError(message);
-//                    }
-
                     let message = ""
                     if (dataModelLocal.ContainsKey("message")){
                         message = dataModelLocal.GetData("message");

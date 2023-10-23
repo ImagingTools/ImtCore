@@ -34,12 +34,12 @@ QByteArray CSqlJsonDatabaseDelegateComp::GetSelectionQuery(
 				.arg(qPrintable(objectId)).toUtf8();
 	}
 
-//	iprm::TParamsPtr<iprm::IEnableableParam> enableableParamPtr(paramsPtr, "IsHistory");
-//	if (enableableParamPtr.IsValid()){
-//		if (enableableParamPtr->IsEnabled()){
-//			return CreateObjectHistoryQuery(offset, count, paramsPtr);
-//		}
-//	}
+	iprm::TParamsPtr<iprm::IEnableableParam> enableableParamPtr(paramsPtr, "IsHistory");
+	if (enableableParamPtr.IsValid()){
+		if (enableableParamPtr->IsEnabled()){
+			return CreateObjectHistoryQuery(offset, count, paramsPtr);
+		}
+	}
 
 	QByteArray selectionQuery = BaseClass::GetSelectionQuery(objectId, offset, count, paramsPtr);
 
@@ -442,7 +442,7 @@ QByteArray CSqlJsonDatabaseDelegateComp::CreateObjectHistoryQuery(
 		QByteArray paginationQuery;
 		CreatePaginationQuery(offset, count, paginationQuery);
 
-		return QString(R"((SELECT * FROM "%1" WHERE "%2" = '%3' %4) ORDER BY "RevisionNumber" ASC;)")
+		return QString(R"((SELECT * FROM "%1" WHERE "%2" = '%3' %4) ORDER BY "RevisionNumber" DESC;)")
 					.arg(qPrintable(*m_tableNameAttrPtr))
 					.arg(qPrintable(*m_objectIdColumnAttrPtr))
 					.arg(qPrintable(objectId))

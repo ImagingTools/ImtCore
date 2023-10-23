@@ -14,15 +14,32 @@ Rectangle {
         repeaterColumn.model = container.historyModel;
     }
 
+    DocumentHistoryProvider {
+        id: documentHistoryProvider;
+
+        onHistoryModelChanged: {
+            container.historyModel = documentHistoryProvider.historyModel;
+        }
+
+        onStateChanged: {
+            if (state === "Loading"){
+                loading.visible = true;
+            }
+            else{
+                loading.visible = false;
+            }
+        }
+    }
+
+    function updateModel(documentTypeId, documentId){
+        documentHistoryProvider.updateModel(documentTypeId, documentId);
+    }
+
     Component {
         id: delegateComp;
 
         Column {
             width: parent.width;
-
-            Component.onCompleted: {
-                changesRepeater.model = model.ChangesModel;
-            }
 
             Item {
                 width: parent.width;
@@ -44,35 +61,45 @@ Rectangle {
                     elide: Text.ElideRight;
                     wrapMode: Text.WrapAnywhere ;
 
-                    text: model.User + ", " + model.DateTime;
+                    text: model.OwnerName + ", " + model.Time;
                 }
             }
 
-            Column {
+            Text {
                 width: parent.width;
 
-                Repeater {
-                    id: changesRepeater;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_small;
 
-                    delegate: Text {
-                        width: parent.width;
+                color: Style.textColor;
 
-                        font.family: Style.fontFamily;
-                        font.pixelSize: Style.fontSize_small;
+                wrapMode: Text.WrapAnywhere;
 
-                        color: Style.textColor;
-
-                        wrapMode: Text.WrapAnywhere;
-
-                        text: model.Change;
-                    }
-                }
+                text: model.OperationDescription;
             }
         }
     }
 
+    CustomScrollbar {
+        id: scrollbar;
+        z: 100;
+
+        anchors.right: flickable.right;
+        anchors.leftMargin: 5;
+        anchors.top: flickable.top;
+        anchors.bottom: flickable.bottom;
+
+        backgroundColor: "transparent";
+
+        secondSize: 10;
+        targetItem: flickable;
+
+        radius: 2;
+    }
+
+
     Flickable {
-        id: collectionMetaInfo;
+        id: flickable;
 
         anchors.fill: parent;
 
@@ -80,6 +107,8 @@ Rectangle {
         contentHeight: column.height;
 
         boundsBehavior: Flickable.StopAtBounds;
+
+        clip: true;
 
         Column {
             id: column;
@@ -97,6 +126,28 @@ Rectangle {
                 delegate: delegateComp;
             }
         }//Column main
+    }
+
+    Text {
+        anchors.centerIn: parent;
+
+        font.pixelSize: Style.fontSize_common;
+        font.family: Style.fontFamilyBold;
+        font.bold: true;
+
+        color: Style.textColor;
+
+        wrapMode: Text.WrapAnywhere;
+
+        text: qsTr("There is no history for this document");
+
+        visible: repeaterColumn.count == 0;
+    }
+
+    Loading {
+        id: loading;
+
+        anchors.fill: parent;
     }
 }
 

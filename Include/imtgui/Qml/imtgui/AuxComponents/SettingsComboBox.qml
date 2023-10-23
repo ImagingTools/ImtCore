@@ -31,7 +31,7 @@ Item {
         textCentered: false;
 
         onCurrentIndexChanged: {
-            console.log("onCurrentIndexChanged");
+            console.log("onCurrentIndexChanged", settingsComboBoxContainer.modelData);
             let modelValue = settingsComboBoxContainer.modelData.Value;
             console.log("modelValue", modelValue);
              console.log("settingsComboBox.currentIndex", settingsComboBox.currentIndex);

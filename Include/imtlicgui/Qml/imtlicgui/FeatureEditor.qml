@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtauthgui 1.0
 
 DocumentBase {
     id: featureEditor;
@@ -492,6 +493,11 @@ DocumentBase {
 
             rowDelegate: Component { PackageViewItemDelegate { root: tableView; } }
 
+            Component.onCompleted: {
+                let ok = PermissionsController.checkPermission("ChangeFeature");
+                tableView.readOnly = !ok;
+            }
+
             function canRename(id){
                 return true;
             }
@@ -629,6 +635,9 @@ DocumentBase {
             property bool delegateUpdatingBlock: false;
 
             Component.onCompleted: {
+                let ok = PermissionsController.checkPermission("ChangeFeature");
+                featureDependenciesView.readOnly = !ok;
+
                 featureDependenciesView.addColumn({"Id": "FeatureName", "Name": "Dependencies"});
                 console.log("FeaturesProvider.model", FeaturesProvider.model);
 

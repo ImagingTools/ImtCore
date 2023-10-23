@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtauthgui 1.0
 import imtqml 1.0
 import imtlicgui 1.0
 
@@ -246,6 +247,11 @@ DocumentBase {
 
             placeHolderText: qsTr("Enter the license name");
 
+            Component.onCompleted: {
+                let ok = PermissionsController.checkPermission("ChangeLicenseDefinition");
+                licenseNameInput.readOnly = !ok;
+            }
+
             onEditingFinished: {
                 let oldText = root.documentModel.GetData("LicenseName");
                 if (oldText && oldText !== licenseNameInput.text || !oldText && licenseNameInput.text !== ""){
@@ -273,6 +279,11 @@ DocumentBase {
             width: parent.width;
 
             placeHolderText: qsTr("Enter the license ID");
+
+            Component.onCompleted: {
+                let ok = PermissionsController.checkPermission("ChangeLicenseDefinition");
+                licenseIdInput.readOnly = !ok;
+            }
 
             onEditingFinished: {
                 let oldText = root.documentModel.GetData("LicenseId");
@@ -302,6 +313,11 @@ DocumentBase {
 
             placeHolderText: qsTr("Enter the license description");
 
+            Component.onCompleted: {
+                let ok = PermissionsController.checkPermission("ChangeLicenseDefinition");
+                descriptionInput.readOnly = !ok;
+            }
+
             onEditingFinished: {
                 let oldText = root.documentModel.GetData("LicenseDescription");
                 if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
@@ -329,6 +345,11 @@ DocumentBase {
             radius: 3;
 
             nameId: "ProductName";
+
+            Component.onCompleted: {
+                let ok = PermissionsController.checkPermission("ChangeLicenseDefinition");
+                productsCB.changeable = ok;
+            }
 
             onCurrentIndexChanged: {
                 if (root.blockUpdatingModel){
@@ -373,6 +394,11 @@ DocumentBase {
         checkable: true;
 
         radius: 0;
+
+        Component.onCompleted: {
+            let ok = PermissionsController.checkPermission("ChangeLicenseDefinition");
+            featuresTable.readOnly = !ok;
+        }
 
         onCheckedItemsChanged: {
             if (root.blockUpdatingModel){
@@ -430,6 +456,11 @@ DocumentBase {
             checkable: true;
 
             radius: 0;
+
+            Component.onCompleted: {
+                let ok = PermissionsController.checkPermission("ChangeLicenseDefinition");
+                licensesTable.readOnly = !ok;
+            }
 
             onCheckedItemsChanged: {
                 if (root.blockUpdatingModel){
