@@ -161,6 +161,7 @@ Rectangle {
                 //orientation: Qt.Vertical;
                 from: 10;
                 to: 100;
+                value: 50;
 
             }
 
@@ -172,6 +173,16 @@ Rectangle {
                 orientation: Qt.Vertical;
                 from: 10;
                 to: 100;
+
+            }
+
+            RangeSlider{
+                decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.rangeSliderDecorator :
+                                                                                            Decorators.rangeSliderDecorator;
+                //orientation: Qt.Vertical;
+                from: 10;
+                to: 100;
+                valueSecond: 80;
 
             }
 
