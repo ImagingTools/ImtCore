@@ -34,6 +34,12 @@ Item {
     property alias tooltipText: tooltip.text;
     property alias tooltipItem: tooltip;
 
+    Component.onCompleted: {
+        if(value !== from){
+            position = (value - from)/(to - from)
+            controlRecX = position * (width - controlWidth)
+        }
+    }
 
     onDecoratorComponentChanged: {
         if(!decoratorComponent){
