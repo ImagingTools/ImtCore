@@ -158,52 +158,63 @@ Rectangle {
 
                 decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.sliderDecorator :
                                                                                             Decorators.sliderDecorator;
-                //decoratorComponent: Decorators.sliderDecorator;
                 //orientation: Qt.Vertical;
-
+                from: 10;
+                to: 100;
 
             }
 
-            Item{//testElement
-                id: testElement;
-
+            Slider{
                 anchors.verticalCenter: parent.verticalCenter;
 
-                width: decorator ? decorator.width : 0;
-                height: decorator ? decorator.height : 0;
+                decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.sliderDecorator :
+                                                                                            Decorators.sliderDecorator;
+                orientation: Qt.Vertical;
+                from: 10;
+                to: 100;
 
-//                property Component decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.switchDecorator :
-//                                                                                            Decorators.switchDecorator;
+            }
 
-                property Component decoratorComponent : DecoratorsQt.sliderDecorator;
-                property var decorator : null;
+//            Item{//testElement
+//                id: testElement;
 
-                onDecoratorComponentChanged: {
-                    if(!decoratorComponent){
-                        return;
-                    }
-                    if(decorator){
-                        decorator.destroy()
-                    }
-                    decorator = decoratorComponent.createObject(testElement)
-                    decorator.baseElement = testElement
-                    bindWidth.target = decorator
-                    bindHeight.target = decorator
-                }
+//                anchors.verticalCenter: parent.verticalCenter;
 
-                Binding {
-                    id: bindWidth
-                    property: "width"
-                    value: testElement.width;
-                }
+//                width: decorator ? decorator.width : 0;
+//                height: decorator ? decorator.height : 0;
 
-                Binding {
-                    id: bindHeight
-                    property: "height"
-                    value: testElement.height;
-                }
+////                property Component decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.switchDecorator :
+////                                                                                            Decorators.switchDecorator;
 
-            }//testElement
+//                property Component decoratorComponent : DecoratorsQt.sliderDecorator;
+//                property var decorator : null;
+
+//                onDecoratorComponentChanged: {
+//                    if(!decoratorComponent){
+//                        return;
+//                    }
+//                    if(decorator){
+//                        decorator.destroy()
+//                    }
+//                    decorator = decoratorComponent.createObject(testElement)
+//                    decorator.baseElement = testElement
+//                    bindWidth.target = decorator
+//                    bindHeight.target = decorator
+//                }
+
+//                Binding {
+//                    id: bindWidth
+//                    property: "width"
+//                    value: testElement.width;
+//                }
+
+//                Binding {
+//                    id: bindHeight
+//                    property: "height"
+//                    value: testElement.height;
+//                }
+
+//            }//testElement
 
         }//row2
 
