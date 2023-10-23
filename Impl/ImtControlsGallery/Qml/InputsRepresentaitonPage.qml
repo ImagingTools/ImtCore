@@ -56,7 +56,7 @@ Rectangle {
 
     Column{
         anchors.centerIn: parent;
-        spacing: 50;
+        spacing: 100;
         Row{
             id: inputsRow;
 
@@ -127,9 +127,6 @@ Rectangle {
 
                 anchors.verticalCenter: parent.verticalCenter;
 
-                //width: 20;
-                //height: 20;
-
                 decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.checkBoxDecorator :
                                                                                             Decorators.checkBoxDecorator;
                 text: "text";
@@ -145,48 +142,71 @@ Rectangle {
                 }
             }
 
-//            Item{//testElement
-//                id: testElement;
+            SwitchCustom{
+                id: switchCustom;
 
-//                anchors.verticalCenter: parent.verticalCenter;
+                anchors.verticalCenter: parent.verticalCenter;
 
-//                width: decorator ? decorator.width : 0;
-//                height: decorator ? decorator.height : 0;
+                decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.switchDecorator :
+                                                                                            Decorators.switchDecorator;
+                text: "text";
 
-//                property Component decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.checkBoxDecorator :
-//                                                                                            Decorators.checkBoxDecorator;
+            }
 
-//                //property Component decoratorComponent : DecoratorsQt.checkBoxDecorator;
-//                property var decorator : null;
+            Slider{
+                anchors.verticalCenter: parent.verticalCenter;
 
-//                onDecoratorComponentChanged: {
-//                    if(!decoratorComponent){
-//                        return;
-//                    }
-//                    if(decorator){
-//                        decorator.destroy()
-//                    }
-//                    decorator = decoratorComponent.createObject(testElement)
-//                    decorator.baseElement = testElement
-//                    bindWidth.target = decorator
-//                    bindHeight.target = decorator
-//                }
+                decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.sliderDecorator :
+                                                                                            Decorators.sliderDecorator;
+                //decoratorComponent: Decorators.sliderDecorator;
+                //orientation: Qt.Vertical;
 
-//                Binding {
-//                    id: bindWidth
-//                    property: "width"
-//                    value: testElement.width;
-//                }
 
-//                Binding {
-//                    id: bindHeight
-//                    property: "height"
-//                    value: testElement.height;
-//                }
+            }
 
-//            }//testElement
+            Item{//testElement
+                id: testElement;
+
+                anchors.verticalCenter: parent.verticalCenter;
+
+                width: decorator ? decorator.width : 0;
+                height: decorator ? decorator.height : 0;
+
+//                property Component decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.switchDecorator :
+//                                                                                            Decorators.switchDecorator;
+
+                property Component decoratorComponent : DecoratorsQt.sliderDecorator;
+                property var decorator : null;
+
+                onDecoratorComponentChanged: {
+                    if(!decoratorComponent){
+                        return;
+                    }
+                    if(decorator){
+                        decorator.destroy()
+                    }
+                    decorator = decoratorComponent.createObject(testElement)
+                    decorator.baseElement = testElement
+                    bindWidth.target = decorator
+                    bindHeight.target = decorator
+                }
+
+                Binding {
+                    id: bindWidth
+                    property: "width"
+                    value: testElement.width;
+                }
+
+                Binding {
+                    id: bindHeight
+                    property: "height"
+                    value: testElement.height;
+                }
+
+            }//testElement
 
         }//row2
+
     }//Column
 
 
