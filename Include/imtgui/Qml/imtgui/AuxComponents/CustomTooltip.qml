@@ -45,7 +45,7 @@ Item {
 
             var point = mapToItem(null, xX, yY);
 
-            modalDialogManager.openDialog(customTooltip.tooltipContentComp, {"x": point.x, "y": point.y});
+            modalDialogManager.openDialog(customTooltip.tooltipContentComp, {"x": point.x, "y": point.y, text: qsTr(customTooltip.text)});
 
             modalDialogManager.backgroundItem.visible = false;
 
