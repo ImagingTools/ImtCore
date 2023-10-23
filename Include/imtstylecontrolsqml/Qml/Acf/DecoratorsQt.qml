@@ -12,6 +12,9 @@ Item {
 
     property Component comboBoxDecorator: comboBoxDecoratorComp
     property Component checkBoxDecorator: checkBoxDecoratorComp
+    property Component switchDecorator: switchDecoratorComp
+    property Component sliderDecorator: sliderDecoratorComp
+
 
 
     Component {
@@ -241,6 +244,44 @@ Item {
                 }
             }
 
+        }
+
+    }
+
+    Component{
+        id: switchDecoratorComp;
+
+        Switch{
+
+            height: 30;
+
+
+            text: !baseElement ? "" : baseElement.text;
+            checked: !baseElement ? false : baseElement.checked;
+
+            property real backgroundWidth: contentItem.width;
+            property var baseElement;
+
+            onCheckedChanged: {
+                if(baseElement){
+                    baseElement.checked = checked;
+                }
+            }
+
+        }
+
+    }
+
+    Component{
+        id: sliderDecoratorComp;
+
+        Slider{
+            property var baseElement;
+            onValueChanged: {
+                if(baseElement){
+                    baseElement.position = position;
+                }
+            }
         }
 
     }

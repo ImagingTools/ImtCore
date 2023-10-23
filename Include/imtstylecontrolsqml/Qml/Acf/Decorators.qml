@@ -15,6 +15,8 @@ Item {
 
     property Component comboBoxDecorator: comboBoxDecoratorComp
     property Component checkBoxDecorator: checkBoxDecoratorComp
+    property Component switchDecorator: switchDecoratorComp
+    property Component sliderDecorator: sliderDecoratorComp
 
     Component {
         id: topButtonDecoratorComp
@@ -344,6 +346,127 @@ Item {
 
         }
 
+    }
+
+    Component{
+        id: switchDecoratorComp;
+
+        Item{
+            id: switchItem;
+
+            width: switchText.text == "" ? backgroundRec.width : backgroundRec.width + switchText.width + switchItem.mainMargin;
+            height: 20;
+
+            property var baseElement: null;
+            property bool checked: !baseElement ? false : baseElement.checked;
+
+            property int mainMargin: !baseElement ? 0 : 8;
+            property string text: !baseElement ? "" : baseElement.text == undefined ? "" : baseElement.text;
+            property string borderColor: !baseElement ? "" : baseElement.borderColor == undefined ? "" : baseElement.borderColor;
+            property int fontPixelSize: !baseElement ? 10 : baseElement.fontPixelSize == undefined ? 10 : baseElement.fontPixelSize;
+            property bool fontBold: !baseElement ? false : baseElement.fontBold == undefined ? false : baseElement.fontBold;
+
+            property real backgroundWidth: 40;
+
+            Rectangle{
+                id: backgroundRec;
+
+                anchors.left: parent.left;
+                anchors.verticalCenter: parent.verticalCenter;
+
+                width: switchItem.backgroundWidth;
+                height: !switchItem.baseElement ? 0 : switchItem.baseElement.backgroundHeight;
+                color: !switchItem.baseElement ? "transparent" : switchItem.checked ? switchItem.baseElement.backgroundColor_checked :
+                                              switchItem.baseElement.backgroundColor;
+                radius: height;
+
+                opacity: !switchItem.baseElement ? 0 : switchItem.baseElement.backgroundOpacity;
+
+            }
+
+            Rectangle{
+                id: controlRec;
+
+                anchors.verticalCenter: parent.verticalCenter;
+
+                x: !switchItem.baseElement ? 0 : switchItem.baseElement.controlRecX;
+                width: parent.height;
+                height: width;
+                radius: width;
+                color: !switchItem.baseElement ? "transparent" : switchItem.checked ? switchItem.baseElement.controlColor_checked :
+                                              switchItem.baseElement.controlColor;
+            }
+
+            Text {
+                id: switchText;
+
+                anchors.left: parent.left;
+                anchors.leftMargin: !switchItem.baseElement ? 0 : switchItem.baseElement.isLeftText ? 0 : backgroundRec.width + switchItem.baseElement.mainMargin;
+                anchors.verticalCenter: parent.verticalCenter;
+
+                color: !switchItem.baseElement ? "transparent" :  switchItem.baseElement.enabled ? Style.buttonText : Style.inactive_buttonText;
+
+                font.pixelSize: switchItem.fontPixelSize;
+                font.family: Style.fontFamily;
+                font.bold: switchItem.fontBold;
+
+                text: switchItem.text;
+            }
+        }
+
+    }
+
+    Component{
+        id: sliderDecoratorComp;
+
+        Item{
+            id: sliderItem;
+
+            width: 150;
+            height: 20;
+
+            property var baseElement: null;
+            property real value: 0;
+
+            property string borderColor: !baseElement ? "" : baseElement.borderColor == undefined ? "" : baseElement.borderColor;
+
+            Rectangle{
+                id: backgroundRec;
+
+                anchors.left: parent.left;
+                anchors.verticalCenter: parent.verticalCenter;
+
+                width: parent.width;
+                height: !sliderItem.baseElement ? 0 : sliderItem.baseElement.backgroundHeight;
+                color: !sliderItem.baseElement ? "transparent" : sliderItem.baseElement.backgroundColor;
+
+                radius: height;
+
+                opacity: !sliderItem.baseElement ? 0 : sliderItem.baseElement.backgroundOpacity;
+
+                Rectangle{
+                    width: !sliderItem.baseElement ? 0 : sliderItem.baseElement.controlRecX + sliderItem.baseElement.height/2;
+                    height: parent.height;
+                    radius: parent.radius;
+                    color: !sliderItem.baseElement ? "transparent" : sliderItem.baseElement.controlColor;
+                }
+
+            }
+
+            Rectangle{
+                id: controlRec;
+
+                anchors.verticalCenter: parent.verticalCenter;
+
+                x: !sliderItem.baseElement ? 0 : sliderItem.baseElement.controlRecX;
+                width: parent.height;
+                height: width;
+                radius: width;
+                color: !sliderItem.baseElement ? "transparent" : sliderItem.baseElement.controlColor;
+
+            }
+
+        }
     }
 
 }

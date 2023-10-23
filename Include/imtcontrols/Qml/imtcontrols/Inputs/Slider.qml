@@ -3,43 +3,32 @@ import Acf 1.0;
 import imtqml 1.0
 import imtcontrols 1.0
 
-Rectangle {
-    id: switchCustom;
+Item {
+    id: slider;
 
     width: decorator ? decorator.width : 0
     height: decorator ? decorator.height : 0
+    rotation: orientation == Qt.Vertical ? -90 : 0;
 
     property Component decoratorComponent;
     property var decorator : null;
-    property string text: "";
 
-    property int backgroundWidth: decorator ? decorator.backgroundWidth : 0;
-    property int backgroundHeight: 14;
-    property string backgroundColor: "#E1E1E1";
-    property string controlColor: "#C4C4C4";
-    property string backgroundColor_checked: "#ffc0cb";
-    property string controlColor_checked: "#F7B6AE";
+    property int backgroundWidth: width;
+    property int backgroundHeight: 6;
+    property string backgroundColor: "#ffc0cb";
+    property string controlColor:  "#CB4154";//"#F7B6AE";
 
     property real backgroundOpacity: 1.;
-
-    property bool checked: false;
 
     property real controlRecX: 0;
     property real controlWidth: height > 0 ? height :20;
 
-    property bool isLeftText: false;
-    property int fontPixelSize: Style.fontSize_common;
-    property bool fontBold: false;
+    property int orientation: Qt.Horizontal;
+    property real position: controlRecX/(width - controlWidth);
 
-    property int mainMargin: 8;
 
     property alias tooltipText: tooltip.text;
     property alias tooltipItem: tooltip;
-
-    function setChecked(checkedVal){
-        switchCustom.checked = checkedVal;
-        switchCustom.controlRecX = switchCustom.checked * (switchCustom.backgroundWidth - switchCustom.controlWidth);
-    }
 
     onDecoratorComponentChanged: {
         if(!decoratorComponent){
@@ -48,24 +37,34 @@ Rectangle {
         if(decorator){
             decorator.destroy()
         }
-        decorator = decoratorComponent.createObject(switchCustom)
-        decorator.baseElement = switchCustom
+        decorator = decoratorComponent.createObject(slider)
+        decorator.baseElement = slider
         bindWidth.target = decorator
         bindHeight.target = decorator
-        setChecked(switchCustom.checked)
+        bindPosition.target = decorator
+
+        controlRecX = position * (width - controlWidth)
     }
 
     Binding {
         id: bindWidth
         property: "width"
-        value: switchCustom.width;
+        value: slider.width;
     }
 
     Binding {
         id: bindHeight
         property: "height"
-        value: switchCustom.height;
+        value: slider.height;
     }
+
+    Binding {
+        id: bindPosition;
+        property: "value"
+        value: slider.position;
+    }
+
+
 
     MouseArea{
         id: ma;
@@ -88,38 +87,37 @@ Rectangle {
         onReleased: {
             ma.canDrag = false;
             if(ma.canClick){
-                switchCustom.checked = !switchCustom.checked;
-                switchCustom.controlRecX = switchCustom.checked * (switchCustom.backgroundWidth - switchCustom.controlWidth);
+                //slider.controlRecX = slider.checked * (slider.backgroundWidth - slider.controlWidth);
             }
             ma.canClick = true;
 
-            if(switchCustom.controlRecX >= switchCustom.backgroundWidth/2 - switchCustom.controlWidth/2){
-                switchCustom.controlRecX = switchCustom.backgroundWidth - switchCustom.controlWidth;
-                switchCustom.checked = true;
-
+            if(mouse.x - slider.controlWidth/2 <= 0){
+                slider.controlRecX = 0;
+            }
+            else if(mouse.x - slider.controlWidth/2 >= slider.backgroundWidth - slider.controlWidth){
+                slider.controlRecX = slider.backgroundWidth - slider.controlWidth;
             }
             else {
-                switchCustom.controlRecX = 0;
-                switchCustom.checked = false;
+                slider.controlRecX = mouse.x - slider.controlWidth/2;
             }
 
-
         }
+
         onPositionChanged:  {
             if(ma.canDrag){
                 ma.canClick = false;
                 //console.log(mouse.x)
-                if(mouse.x <= 0){
-                    switchCustom.controlRecX = 0;
-                    switchCustom.checked = false;
+                if(mouse.x - slider.controlWidth/2 <= 0){
+                    slider.controlRecX = 0;
                 }
-                else if(mouse.x >= switchCustom.backgroundWidth - switchCustom.controlWidth){
-                    switchCustom.controlRecX = switchCustom.backgroundWidth - switchCustom.controlWidth;
-                    switchCustom.checked = true;
+                else if(mouse.x - slider.controlWidth/2 >= slider.backgroundWidth - slider.controlWidth){
+                    slider.controlRecX = slider.backgroundWidth - slider.controlWidth;
                 }
                 else {
-                    switchCustom.controlRecX = mouse.x;
+                    slider.controlRecX = mouse.x - slider.controlWidth/2;
                 }
+
+                slider.position = slider.controlRecX/(slider.width - slider.controlWidth);
             }
 
         }

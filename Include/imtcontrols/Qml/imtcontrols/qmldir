@@ -51,6 +51,8 @@ UndoRedoManager 1.0 ./Document/UndoRedoManager.qml
 Calendar 1.0 ./Inputs/Calendar.qml
 ComboBox 1.0 ./Inputs/ComboBox.qml
 CheckBox 1.0 ./Inputs/CheckBox.qml
+Slider 1.0 ./Inputs/Slider.qml
+RangeSlider 1.0 ./Inputs/RangeSlider.qml
 DatePicker 1.0 ./Inputs/DatePicker.qml
 InputActions 1.0 ./Inputs/InputActions.qml
 PathPicker 1.0 ./Inputs/PathPicker.qml
