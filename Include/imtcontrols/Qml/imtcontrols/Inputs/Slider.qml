@@ -6,8 +6,9 @@ import imtcontrols 1.0
 Item {
     id: slider;
 
-    width: decorator ? decorator.width : 0
-    height: decorator ? decorator.height : 0
+    width: decorator ? decorator.width : 150
+    height: decorator ? decorator.height : 30
+
     rotation: orientation == Qt.Vertical ? -90 : 0;
 
     property Component decoratorComponent;
@@ -16,7 +17,7 @@ Item {
     property int backgroundWidth: width;
     property int backgroundHeight: 6;
     property string backgroundColor: "#ffc0cb";
-    property string controlColor:  "#CB4154";//"#F7B6AE";
+    property string controlColor:  "#CB4154";
 
     property real backgroundOpacity: 1.;
 
@@ -26,9 +27,13 @@ Item {
     property int orientation: Qt.Horizontal;
     property real position: controlRecX/(width - controlWidth);
 
+    property real from: 0.0;
+    property real to: 1.0;
+    property real value: position * (to - from) + from;
 
     property alias tooltipText: tooltip.text;
     property alias tooltipItem: tooltip;
+
 
     onDecoratorComponentChanged: {
         if(!decoratorComponent){
@@ -37,13 +42,29 @@ Item {
         if(decorator){
             decorator.destroy()
         }
+
+        var width_ = width;
+
         decorator = decoratorComponent.createObject(slider)
         decorator.baseElement = slider
+
+        if(decorator.to !== undefined){
+            decorator.to = to;
+        }
+        if(decorator.from !== undefined){
+            decorator.from = from;
+        }
+
+        if(decorator.value !== undefined){
+            decorator.value = position * (to - from) + from;
+        }
+
         bindWidth.target = decorator
         bindHeight.target = decorator
-        bindPosition.target = decorator
 
         controlRecX = position * (width - controlWidth)
+
+
     }
 
     Binding {
@@ -57,13 +78,6 @@ Item {
         property: "height"
         value: slider.height;
     }
-
-    Binding {
-        id: bindPosition;
-        property: "value"
-        value: slider.position;
-    }
-
 
 
     MouseArea{
@@ -87,37 +101,43 @@ Item {
         onReleased: {
             ma.canDrag = false;
             if(ma.canClick){
-                //slider.controlRecX = slider.checked * (slider.backgroundWidth - slider.controlWidth);
             }
             ma.canClick = true;
 
-            if(mouse.x - slider.controlWidth/2 <= 0){
+            if(mouse.x - slider.controlWidth <= 0){
                 slider.controlRecX = 0;
             }
-            else if(mouse.x - slider.controlWidth/2 >= slider.backgroundWidth - slider.controlWidth){
+            else if(mouse.x - slider.controlWidth >= slider.backgroundWidth - slider.controlWidth){
                 slider.controlRecX = slider.backgroundWidth - slider.controlWidth;
             }
             else {
-                slider.controlRecX = mouse.x - slider.controlWidth/2;
+                slider.controlRecX = mouse.x - slider.controlWidth;
             }
+
+            slider.position = slider.controlRecX/(slider.backgroundWidth - slider.controlWidth);
 
         }
 
         onPositionChanged:  {
             if(ma.canDrag){
                 ma.canClick = false;
-                //console.log(mouse.x)
-                if(mouse.x - slider.controlWidth/2 <= 0){
+                if(mouse.x - slider.controlWidth <= 0){
                     slider.controlRecX = 0;
                 }
-                else if(mouse.x - slider.controlWidth/2 >= slider.backgroundWidth - slider.controlWidth){
+                else if(mouse.x - slider.controlWidth >= slider.backgroundWidth - slider.controlWidth){
                     slider.controlRecX = slider.backgroundWidth - slider.controlWidth;
                 }
                 else {
-                    slider.controlRecX = mouse.x - slider.controlWidth/2;
+                    slider.controlRecX = mouse.x - slider.controlWidth;
                 }
 
-                slider.position = slider.controlRecX/(slider.width - slider.controlWidth);
+                slider.position = slider.controlRecX/(slider.backgroundWidth - slider.controlWidth);
+                 if(slider.position > 0.95){
+                     slider.position = 1.
+                 }
+                 if(slider.position < 0.5){
+                     slider.position = 0.
+                 }
             }
 
         }

@@ -277,12 +277,12 @@ Item {
 
         Slider{
             property var baseElement;
-            onValueChanged: {
-                if(baseElement){
+
+            onPositionChanged: {
+                if(baseElement && baseElement.from !== undefined && baseElement.to !== undefined){
                     baseElement.position = position;
                 }
             }
         }
-
     }
 }
