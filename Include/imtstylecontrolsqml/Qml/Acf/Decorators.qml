@@ -499,7 +499,8 @@ Item {
                 opacity: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.backgroundOpacity;
 
                 Rectangle{
-                    width: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlRecX + rangeSliderItem.baseElement.height/2;
+                    x: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlRecXFirst + rangeSliderItem.baseElement.height/2
+                    width: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlRecXSecond - rangeSliderItem.baseElement.controlRecXFirst;
                     height: parent.height;
                     radius: parent.radius;
                     color: !rangeSliderItem.baseElement ? "transparent" : rangeSliderItem.baseElement.controlColor;
