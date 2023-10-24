@@ -278,10 +278,12 @@ Item {
 
         Slider{
             property var baseElement;
+            property bool compl: false;
 
             onPositionChanged: {
-                if(baseElement && baseElement.from !== undefined && baseElement.to !== undefined){
+                if(baseElement && compl && baseElement.from !== undefined && baseElement.to !== undefined){
                     baseElement.position = position;
+                    baseElement.value = value;
                 }
             }
         }
@@ -294,15 +296,20 @@ Item {
             property var baseElement;
             property real positionFirst: first.position;
             property real positionSecond: second.position;
+            property real valueFirst: first.value;
+            property real valueSecond: second.value;
+            property bool compl: false;
 
             onPositionFirstChanged: {
-                if(baseElement && baseElement.from !== undefined && baseElement.to !== undefined){
+                if(baseElement && compl && baseElement.from !== undefined && baseElement.to !== undefined){
                     baseElement.positionFirst = positionFirst;
+                    baseElement.valueFirst = valueFirst;
                 }
             }
             onPositionSecondChanged: {
-                if(baseElement && baseElement.from !== undefined && baseElement.to !== undefined){
+                if(baseElement && compl && baseElement.from !== undefined && baseElement.to !== undefined){
                     baseElement.positionSecond = positionSecond;
+                    baseElement.valueSecond = valueSecond;
                 }
             }
 

@@ -65,6 +65,10 @@ Item {
             decorator.value = position * (to - from) + from;
         }
 
+        if(decorator.compl !== undefined){
+            decorator.compl = true;
+        }
+
         bindWidth.target = decorator
         bindHeight.target = decorator
 
@@ -110,40 +114,46 @@ Item {
             }
             ma.canClick = true;
 
-            if(mouse.x - slider.controlWidth <= 0){
+            let x_ = mouse.x;
+
+            if(x_ - slider.controlWidth <= 0){
                 slider.controlRecX = 0;
             }
-            else if(mouse.x - slider.controlWidth >= slider.backgroundWidth - slider.controlWidth){
+            else if(x_ - slider.controlWidth >= slider.backgroundWidth - slider.controlWidth){
                 slider.controlRecX = slider.backgroundWidth - slider.controlWidth;
             }
             else {
-                slider.controlRecX = mouse.x - slider.controlWidth;
+                slider.controlRecX = x_ - slider.controlWidth;
             }
 
             slider.position = slider.controlRecX/(slider.backgroundWidth - slider.controlWidth);
-
+            slider.value = slider.position * (slider.to - slider.from) + slider.from;
         }
 
         onPositionChanged:  {
             if(ma.canDrag){
                 ma.canClick = false;
-                if(mouse.x - slider.controlWidth <= 0){
+
+                let x_ = mouse.x;
+
+                if(x_ - slider.controlWidth <= 0){
                     slider.controlRecX = 0;
                 }
-                else if(mouse.x - slider.controlWidth >= slider.backgroundWidth - slider.controlWidth){
+                else if(x_ - slider.controlWidth >= slider.backgroundWidth - slider.controlWidth){
                     slider.controlRecX = slider.backgroundWidth - slider.controlWidth;
                 }
                 else {
-                    slider.controlRecX = mouse.x - slider.controlWidth;
+                    slider.controlRecX = x_ - slider.controlWidth;
                 }
 
                 slider.position = slider.controlRecX/(slider.backgroundWidth - slider.controlWidth);
-                 if(slider.position > 0.95){
-                     slider.position = 1.
-                 }
-                 if(slider.position < 0.5){
-                     slider.position = 0.
-                 }
+                if(slider.position > 0.95){
+                    slider.position = 1.
+                }
+                if(slider.position < 0.05){
+                    slider.position = 0.
+                }
+                slider.value = slider.position * (slider.to - slider.from) + slider.from;
             }
 
         }
