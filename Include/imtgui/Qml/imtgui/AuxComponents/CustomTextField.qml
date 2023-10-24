@@ -173,9 +173,12 @@ FocusScope {
             containerTextField.accepted();
         }
 
+        onTextChanged: {
+            containerTextField.text = text // for web TEMP!!!
+        }
+
         onTextEdited: {
             containerTextField.textEdited();
-            containerTextField.text = text // for web TEMP!!!
         }
 
         onAcceptableInputChanged: {
