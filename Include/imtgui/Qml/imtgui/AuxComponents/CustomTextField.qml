@@ -75,7 +75,11 @@ FocusScope {
                 textField.selectAll();
             }
 
+            textField.focus = true;
             textField.forceActiveFocus();
+        }
+        else {
+            textField.focus = false;
         }
     }
 
