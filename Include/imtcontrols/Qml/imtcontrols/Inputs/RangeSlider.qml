@@ -217,7 +217,8 @@ Item {
             if(ma.canDrag){
                 ma.canClick = false;
 
-                let x_ = mouse.x;
+                let add = -slider.controlWidth/2;
+                let x_ = mouse.x + add;
 
                 if(ma.canMoveFirst){//first
                     if(x_ <= 0){
