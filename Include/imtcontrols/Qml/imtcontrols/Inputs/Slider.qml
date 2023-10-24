@@ -107,13 +107,6 @@ Item {
                 tooltip.closeTooltip();
             }
 
-        }
-        onReleased: {
-            ma.canDrag = false;
-            if(ma.canClick){
-            }
-            ma.canClick = true;
-
             let x_ = mouse.x;
 
             if(x_ - slider.controlWidth <= 0){
@@ -128,6 +121,15 @@ Item {
 
             slider.position = slider.controlRecX/(slider.backgroundWidth - slider.controlWidth);
             slider.value = slider.position * (slider.to - slider.from) + slider.from;
+
+
+        }
+        onReleased: {
+            ma.canDrag = false;
+            if(ma.canClick){
+            }
+            ma.canClick = true;
+
         }
 
         onPositionChanged:  {
