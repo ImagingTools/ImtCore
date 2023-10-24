@@ -100,8 +100,10 @@ Item {
         property int mouseX_prev: 0;
         property bool canDrag: false;
         property bool canClick: true;
+        property real pressedX: 0.0;
 
         onPressed: {
+            pressedX = mouse.x;
             ma.canDrag = true;
             if(tooltip.text !== ""){
                 tooltip.closeTooltip();
@@ -109,18 +111,20 @@ Item {
 
             let x_ = mouse.x;
 
-            if(x_ - slider.controlWidth <= 0){
-                slider.controlRecX = 0;
-            }
-            else if(x_ - slider.controlWidth >= slider.backgroundWidth - slider.controlWidth){
-                slider.controlRecX = slider.backgroundWidth - slider.controlWidth;
-            }
-            else {
-                slider.controlRecX = x_ - slider.controlWidth;
-            }
+            if(x_ < slider.controlRecX || x_ > slider.controlRecX + slider.controlWidth){
+                if(x_ <= 0){
+                    slider.controlRecX = 0;
+                }
+                else if(x_ >= slider.backgroundWidth - slider.controlWidth){
+                    slider.controlRecX = slider.backgroundWidth - slider.controlWidth;
+                }
+                else {
+                    slider.controlRecX = x_;
+                }
 
-            slider.position = slider.controlRecX/(slider.backgroundWidth - slider.controlWidth);
-            slider.value = slider.position * (slider.to - slider.from) + slider.from;
+                slider.position = slider.controlRecX/(slider.backgroundWidth - slider.controlWidth);
+                slider.value = slider.position * (slider.to - slider.from) + slider.from;
+            }
 
 
         }
@@ -136,16 +140,17 @@ Item {
             if(ma.canDrag){
                 ma.canClick = false;
 
-                let x_ = mouse.x;
+                let add = -slider.controlWidth/2;
+                let x_ = mouse.x + add;
 
-                if(x_ - slider.controlWidth <= 0){
+                if(x_ <= 0){
                     slider.controlRecX = 0;
                 }
-                else if(x_ - slider.controlWidth >= slider.backgroundWidth - slider.controlWidth){
+                else if(x_  >= slider.backgroundWidth - slider.controlWidth){
                     slider.controlRecX = slider.backgroundWidth - slider.controlWidth;
                 }
                 else {
-                    slider.controlRecX = x_ - slider.controlWidth;
+                    slider.controlRecX = x_;
                 }
 
                 slider.position = slider.controlRecX/(slider.backgroundWidth - slider.controlWidth);

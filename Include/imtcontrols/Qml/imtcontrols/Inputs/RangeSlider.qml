@@ -51,10 +51,10 @@ Item {
     }
 
     onPositionFirstChanged: {
-        console.log("PositionFirst:: ", positionFirst)
+        //console.log("PositionFirst:: ", positionFirst)
     }
     onPositionSecondChanged: {
-        console.log("PositionSecond:: ", positionSecond)
+        //console.log("PositionSecond:: ", positionSecond)
 
     }
 
