@@ -1,12 +1,10 @@
 project(ImtAuthPck LANGUAGES CXX)
 
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
-include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
-target_link_libraries(${PROJECT_NAME} idoc)
-target_link_libraries(${PROJECT_NAME} imtbase imtauth imtlic)
-
+target_link_libraries(${PROJECT_NAME} imtauth imtlic imtbase)
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
+include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 
 acf_use_qt_graphics_modules()

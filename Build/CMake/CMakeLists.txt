@@ -2,6 +2,12 @@ cmake_minimum_required(VERSION 3.1.0)
 
 project(ImtCore)
 
+if(UNIX AND NOT APPLE)
+	if (NOT CMAKE_SHARED_LINKER_FLAGS)
+		set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined")
+	endif()
+endif()
+
 if (NOT DEFINED IMTCOREDIR)
     set(IMTCOREDIR "$ENV{IMTCOREDIR}")
 endif ()
