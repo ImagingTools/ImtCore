@@ -167,14 +167,16 @@ FocusScope {
         selectionColor: Style.textSelected;
         selectByMouse: true;
         clip: true;
-        text: containerTextField.text // for web TEMP!!!
+        //text: containerTextField.text // for web TEMP!!!
 
         onAccepted: {
             containerTextField.accepted();
         }
 
         onTextChanged: {
-            containerTextField.text = text // for web TEMP!!!
+            if(containerTextField.text !== text){// for web TEMP!!!
+                containerTextField.text = text
+            }
         }
 
         onTextEdited: {
