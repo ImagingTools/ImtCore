@@ -77,6 +77,8 @@
         <file alias="imtgui/AuxComponents/SingleDocumentWorkspaceView.qml">Qml/imtgui/AuxComponents/SingleDocumentWorkspaceView.qml</file>
         <file alias="imtgui/AuxComponents/SubMenuPanelButtonDecorator.qml">Qml/imtgui/AuxComponents/SubMenuPanelButtonDecorator.qml</file>
         <file alias="imtgui/AuxComponents/StackView.qml">Qml/imtgui/AuxComponents/StackView.qml</file>
+        <file alias="imtgui/AuxComponents/ProgressBar.qml">Qml/imtgui/AuxComponents/ProgressBar.qml</file>
+        <file alias="imtgui/AuxComponents/CheckBoxMenu.qml">Qml/imtgui/AuxComponents/CheckBoxMenu.qml</file>
 
         <file alias="imtgui/AuxComponents/DatabaseInput.qml">Qml/imtgui/AuxComponents/DatabaseInput.qml</file>
 	<file alias="imtgui/AuxComponents/DatabaseBackupController.qml">Qml/imtgui/AuxComponents/DatabaseBackupController.qml</file>
