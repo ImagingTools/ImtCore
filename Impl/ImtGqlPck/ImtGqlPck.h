@@ -20,6 +20,7 @@
 #include <imtgql/CCollectionObjectProviderComp.h>
 #include <imtgql/CGqlControllerComp.h>
 #include <imtgql/COperationContextControllerComp.h>
+#include <imtgql/CDelegatedRequestHandlerComp.h>
 
 
 /**
@@ -43,6 +44,7 @@ typedef imtgql::CCollectionObjectProviderComp CollectionObjectProvider;
 typedef imtgql::CGqlControllerComp GqlController;
 typedef imtgql::CSerializableObjectCollectionControllerComp SerializableObjectCollectionController;
 typedef imtgql::COperationContextControllerComp OperationContextController;
+typedef imtgql::CDelegatedRequestHandlerComp DelegatedRequestHandler;
 
 
 } // namespace ImtGqlPck
