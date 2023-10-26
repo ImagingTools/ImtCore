@@ -77,7 +77,7 @@ QString CDocumentChangeGeneratorCompBase::GetOperationDescription(CObjectCollect
 				QByteArray newValue = operationDescriptionPtr->GetNewValue();
 
 				QString keyName = operationDescriptionPtr->GetKeyName();
-				keyName = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), keyName.toUtf8(), languageId, "imtbase::CDocumentChangeGeneratorCompBase");
+				keyName = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), keyName.toUtf8(), languageId, "Attribute");
 
 				if (typeId == QByteArray("Create")){
 					QString change = imtbase::GetTranslation(m_translationManagerCompPtr.GetPtr(), QT_TR_NOOP("Created the document"), languageId, "imtbase::CDocumentChangeGeneratorCompBase");
@@ -86,25 +86,34 @@ QString CDocumentChangeGeneratorCompBase::GetOperationDescription(CObjectCollect
 				else if (typeId == QByteArray("Change")){
 					QString change = imtbase::GetTranslation(
 								m_translationManagerCompPtr.GetPtr(),
-								QString(QT_TR_NOOP("%1 changed from %2 to %3")).arg(keyName).arg(qPrintable(oldValue)).arg(qPrintable(newValue)).toUtf8(),
+								QString(QT_TR_NOOP("%1 changed from %2 to %3")).toUtf8(),
 								languageId,
 								"imtbase::CDocumentChangeGeneratorCompBase");
+
+					change = change.arg(keyName).arg(qPrintable(oldValue)).arg(qPrintable(newValue));
+
 					retVal += change + "\n";
 				}
 				else if (typeId == QByteArray("Set")){
 					QString change = imtbase::GetTranslation(
 								m_translationManagerCompPtr.GetPtr(),
-								QString(QT_TR_NOOP("%1 was set to %2")).arg(keyName).arg(qPrintable(newValue)).toUtf8(),
+								QString(QT_TR_NOOP("%1 was set to %2")).toUtf8(),
 								languageId,
 								"imtbase::CDocumentChangeGeneratorCompBase");
+
+					change = change.arg(keyName).arg(qPrintable(newValue));
+
 					retVal += change + "\n";
 				}
 				else if (typeId == QByteArray("Clear")){
 					QString change = imtbase::GetTranslation(
 								m_translationManagerCompPtr.GetPtr(),
-								QString(QT_TR_NOOP("%1 was cleared")).arg(keyName).toUtf8(),
+								QString(QT_TR_NOOP("%1 was cleared")).toUtf8(),
 								languageId,
 								"imtbase::CDocumentChangeGeneratorCompBase");
+
+					change = change.arg(keyName);
+
 					retVal += change + "\n";
 				}
 			}
