@@ -1,13 +1,15 @@
 #pragma once
 
 
-// ImtCore includes
+// ACF includes
 #include <istd/IChangeable.h>
 
 
 namespace imtbase
 {
 
+
+class IObjectCollection;
 
 
 /**
@@ -44,6 +46,11 @@ public:
 		Description related to the operation.
 	*/
 	virtual QString GetOperationDescription() const = 0;
+
+	/**
+		Get changes collection.
+	*/
+	virtual imtbase::IObjectCollection* GetChangesCollection() = 0;
 };
 
 

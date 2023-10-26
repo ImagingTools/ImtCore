@@ -221,7 +221,11 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::RenameObject(const im
 				productInfoPtr->SetName(newName);
 				productInfoPtr->SetProductId(newName.replace(" ", "").toUtf8());
 
-				imtbase::IOperationContext* operationContextPtr = CreateOperationContext(gqlRequest, QString("Renamed the object"));
+				imtbase::IOperationContext* operationContextPtr =  nullptr;
+				if (m_operationContextControllerCompPtr.IsValid()){
+					operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_UPDATE, gqlRequest, objectId, productInfoPtr);
+				}
+
 				if (!m_objectCollectionCompPtr->SetObjectData(objectId, *productInfoPtr, istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr)){
 					errorMessage = QString("Error when trying rename product with ID %1").arg(qPrintable(objectId));
 					SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");
@@ -270,9 +274,13 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::SetObjectDescription(
 		if (productInfoPtr != nullptr){
 			QString oldDescription = productInfoPtr->GetProductDescription();
 			if (description != oldDescription){
-				productInfoPtr->SetProductDescription(description);
 
-				imtbase::IOperationContext* operationContextPtr = CreateOperationContext(gqlRequest, QString("Set description to the object"));
+				productInfoPtr->SetProductDescription(description);
+				imtbase::IOperationContext* operationContextPtr =  nullptr;
+				if (m_operationContextControllerCompPtr.IsValid()){
+					operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_UPDATE, gqlRequest, objectId, productInfoPtr);
+				}
+
 				if (!m_objectCollectionCompPtr->SetObjectData(objectId, *productInfoPtr, istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr)){
 					errorMessage = QString("Error when trying set description product with ID %1").arg(qPrintable(objectId));
 					SendErrorMessage(0, errorMessage, "CProductCollectionControllerComp");

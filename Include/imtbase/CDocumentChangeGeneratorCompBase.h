@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
+#include <iqt/ITranslationManager.h>
 
 // ImtCore includes
 #include <imtbase/IDocumentChangeGenerator.h>
@@ -24,16 +25,26 @@ public:
 	I_BEGIN_BASE_COMPONENT(CDocumentChangeGeneratorCompBase);
 		I_REGISTER_INTERFACE(imtbase::IDocumentChangeGenerator);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
+		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 	I_END_COMPONENT;
 
 protected:
 	// reimplemented (imtbase::IDocumentChangeGenerator)
-	virtual bool GenerateDocumentChanges(const QByteArray& documentId, const istd::IChangeable* documentPtr, CObjectCollection& documentChangeCollection, QString& errorMessage) override;
+	virtual bool GenerateDocumentChanges(
+				int operationType,
+				const QByteArray& documentId,
+				const istd::IChangeable* documentPtr,
+				CObjectCollection& documentChangeCollection,
+				QString& errorMessage,
+				const iprm::IParamsSet* paramsPtr) override;
+	virtual QString GetOperationDescription(CObjectCollection& documentChangeCollection, const QByteArray& languageId = QByteArray()) override;
+
 	virtual bool CompareDocuments(const istd::IChangeable* oldDocumentPtr, const istd::IChangeable* newDocumentPtr, CObjectCollection& documentChangeCollection, QString& errorMessage) = 0;
 	virtual imtbase::COperationDescription* CreateOperationDescription(const QByteArray& operationTypeId, const QByteArray& key, const QString& keyName, const QByteArray& oldValue, const QByteArray& newValue) const;
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
+	I_REF(iqt::ITranslationManager, m_translationManagerCompPtr);
 };
 
 

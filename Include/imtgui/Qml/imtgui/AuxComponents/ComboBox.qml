@@ -204,9 +204,8 @@ FocusScope {
 
 			anchors.verticalCenter: parent.verticalCenter;
 			anchors.left: parent.left;
-			anchors.right: parent.right;
+            anchors.right: cbArrowIcon.left;
 			anchors.rightMargin: 10;
-
 			color: comboBoxContainer.fontColorTitle;
 			text: comboBoxContainer.currentText !== "" ? comboBoxContainer.currentText : comboBoxContainer.placeHolderText;
 			font.family: Style.fontFamily;

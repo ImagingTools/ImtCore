@@ -3,6 +3,10 @@
 
 // ACF includes
 #include <istd/CChangeNotifier.h>
+#include <istd/TSingleFactory.h>
+
+// ImtCore includes
+#include <imtbase/COperationDescription.h>
 
 
 namespace imtbase
@@ -10,6 +14,13 @@ namespace imtbase
 
 
 // public methods
+
+COperationContext::COperationContext()
+{
+	typedef istd::TSingleFactory<istd::IChangeable, imtbase::COperationDescription> FactoryOperationDescriptionImpl;
+	m_changesCollection.RegisterFactory<FactoryOperationDescriptionImpl>("OperationInfo");
+}
+
 
 void COperationContext::SetOperationOwnerId(imtbase::IOperationContext::IdentifableObjectInfo operationOwnerId)
 {
@@ -42,6 +53,12 @@ imtbase::IOperationContext::IdentifableObjectInfo COperationContext::GetOperatio
 QString COperationContext::GetOperationDescription() const
 {
 	return m_operationDescription;
+}
+
+
+imtbase::IObjectCollection* COperationContext::GetChangesCollection()
+{
+	return &m_changesCollection;
 }
 
 

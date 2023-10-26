@@ -78,6 +78,13 @@ I_EXPORT_COMPONENT(
 			SerializableObjectCollectionController,
 			"Serializable object collection Gql controller for gql collection",
 			"GqlController Serializable Collection");
+
+I_EXPORT_COMPONENT(
+			OperationContextController,
+			"Operation context controller",
+			"Operation Context Controller");
+
+
 } // namespace ImtGqlPck
 
 

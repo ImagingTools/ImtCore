@@ -19,6 +19,7 @@
 #include <imtgql/CWebSocketServletComp.h>
 #include <imtgql/CCollectionObjectProviderComp.h>
 #include <imtgql/CGqlControllerComp.h>
+#include <imtgql/COperationContextControllerComp.h>
 
 
 /**
@@ -41,6 +42,7 @@ typedef imtgql::CObjectProviderComp ObjectProvider;
 typedef imtgql::CCollectionObjectProviderComp CollectionObjectProvider;
 typedef imtgql::CGqlControllerComp GqlController;
 typedef imtgql::CSerializableObjectCollectionControllerComp SerializableObjectCollectionController;
+typedef imtgql::COperationContextControllerComp OperationContextController;
 
 
 } // namespace ImtGqlPck

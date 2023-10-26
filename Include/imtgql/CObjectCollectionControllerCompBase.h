@@ -10,6 +10,7 @@
 #include <imtbase/IOperationContext.h>
 #include <imtbase/IDocumentChangeGenerator.h>
 #include <imtgql/CGqlRequestHandlerCompBase.h>
+#include <imtgql/IOperationContextController.h>
 
 
 #undef GetObject
@@ -31,6 +32,7 @@ public:
 		I_ASSIGN(m_objectViewProviderCompPtr, "ObjectViewProvider", "Object view provider", false, "ObjectViewProvider");
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
 		I_ASSIGN(m_separatorObjectIdAttrPtr, "SeparatorObjectId", "Separator of the object ID", false, "");
+		I_ASSIGN(m_operationContextControllerCompPtr, "OperationContextController", "Operation context controller", false, "OperationContextController");
 	I_END_COMPONENT;
 
 	enum OperationType
@@ -80,8 +82,6 @@ protected:
 	virtual imtbase::CTreeItemModel* GetDataMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetObjectView(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetObjectHistory(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-
-	virtual imtbase::IOperationContext* CreateOperationContext(const imtgql::CGqlRequest& gqlRequest, const QString& operationDescription) const;
 
 	/**
 		Setup a GraphQL item at the given position in the model based on the information about an element in the object collection.
@@ -143,6 +143,7 @@ protected:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imtgql::IGqlRequestHandler, m_headersProviderCompPtr);
 	I_REF(imtgql::IGqlRequestHandler, m_objectViewProviderCompPtr);
+	I_REF(imtgql::IOperationContextController, m_operationContextControllerCompPtr);
 	I_ATTR(QByteArray, m_separatorObjectIdAttrPtr);
 };
 

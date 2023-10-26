@@ -12,6 +12,9 @@
 #include <iser/CJsonMemWriteArchive.h>
 #include <iser/ISerializable.h>
 
+// ImtCore includes
+#include <imtbase/CObjectCollection.h>
+
 
 namespace imtdb
 {
@@ -416,14 +419,29 @@ bool CSqlJsonDatabaseDelegateComp::CreateTextFilterQuery(
 QByteArray CSqlJsonDatabaseDelegateComp::CreateOperationDescriptionQuery(const QByteArray& objectId, const imtbase::IOperationContext* operationContextPtr) const
 {
 	if (operationContextPtr != nullptr){
-		imtbase::IOperationContext::IdentifableObjectInfo objectInfo = operationContextPtr->GetOperationOwnerId();
-		return QString(R"(UPDATE "%1" SET "OwnerId" = '%2', "OwnerName" = '%3', "OperationDescription" = '%4' WHERE "IsActive" = true AND "DocumentId" = '%5';)")
-				.arg(qPrintable(*m_tableNameAttrPtr))
-				.arg(qPrintable(objectInfo.id))
-				.arg(objectInfo.name)
-				.arg(operationContextPtr->GetOperationDescription())
-				.arg(qPrintable(objectId))
-				.toUtf8();
+		imtbase::IOperationContext* operationPtr = const_cast<imtbase::IOperationContext*>(operationContextPtr);
+		if (operationPtr != nullptr){
+			imtbase::CObjectCollection* changeCollectionPtr = dynamic_cast<imtbase::CObjectCollection*>(operationPtr->GetChangesCollection());
+
+			QByteArray json;
+			{
+				iser::CJsonMemWriteArchive archive(json);
+				if (!changeCollectionPtr->Serialize(archive)){
+					qDebug() << QString("Unable to serialize a change object collection");
+				}
+			}
+
+			QString operationDescription = json;
+
+			imtbase::IOperationContext::IdentifableObjectInfo objectInfo = operationPtr->GetOperationOwnerId();
+			return QString(R"(UPDATE "%1" SET "OwnerId" = '%2', "OwnerName" = '%3', "OperationDescription" = '%4' WHERE "IsActive" = true AND "DocumentId" = '%5';)")
+					.arg(qPrintable(*m_tableNameAttrPtr))
+					.arg(qPrintable(objectInfo.id))
+					.arg(objectInfo.name)
+					.arg(operationDescription)
+					.arg(qPrintable(objectId))
+					.toUtf8();
+		}
 	}
 
 	return QByteArray();

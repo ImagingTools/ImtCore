@@ -198,6 +198,8 @@ Item {
             property real minWidth: 1000000;
             property bool headersCompl: false;
 
+            canMoveColumns: true;
+
             scrollbarRightMargin: -20;
 
             sortController: sortCont;

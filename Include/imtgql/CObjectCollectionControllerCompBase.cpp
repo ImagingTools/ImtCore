@@ -259,7 +259,12 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 		return nullptr;
 	}
 
-	imtbase::IOperationContext* operationContextPtr = CreateOperationContext(gqlRequest, QString("Created the object"));
+	imtbase::IOperationContext* operationContextPtr = nullptr;
+
+	if (m_operationContextControllerCompPtr.IsValid()){
+		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_CREATE, gqlRequest);
+	}
+
 	QByteArray newObjectId = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, newObjectPtr, objectId, nullptr, nullptr, operationContextPtr);
 	if (newObjectId.isEmpty()){
 		errorMessage = QT_TR_NOOP(QString("Can not insert object: %1").arg(qPrintable(objectId)));
@@ -319,33 +324,17 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 
 	istd::IChangeable* savedObject = CreateObject(gqlRequest, newObjectId, name, description, errorMessage);
 	if (savedObject != nullptr){
-		imtbase::CObjectCollection documentChangeCollection;
-		if (m_documentChangeGeneratorCompPtr.IsValid()){
-			if (!m_documentChangeGeneratorCompPtr->GenerateDocumentChanges(oldObjectId, savedObject, documentChangeCollection, errorMessage)){
-				qDebug() << QString("Unable to create changes for document with ID: %1").arg(qPrintable(oldObjectId));
-			}
+		imtbase::IOperationContext* operationContextPtr = nullptr;
+
+		if (m_operationContextControllerCompPtr.IsValid()){
+			operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_UPDATE, gqlRequest, oldObjectId, savedObject);
 		}
 
-		QString operationDescription = QString("Updated the document");
-		if (documentChangeCollection.GetElementsCount() > 0){
-			QByteArray json;
-
-			{
-				iser::CJsonMemWriteArchive archive(json);
-				if (!documentChangeCollection.Serialize(archive)){
-					qDebug() << QString("Unable to serialize a change object collection");
-				}
-			}
-
-			operationDescription = json;
-		}
-
-		imtbase::IOperationContext* operationContextPtr = CreateOperationContext(gqlRequest, operationDescription);
 		if (!m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject, istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr)){
 			errorMessage = QObject::tr("Can not update object: %1").arg(qPrintable(oldObjectId));
 		}
 	}
-	else {
+	else{
 		if (errorMessage.isEmpty()){
 			errorMessage = QObject::tr("Can not create object for update: %1").arg(qPrintable(oldObjectId));
 		}
@@ -711,7 +700,12 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
-	imtbase::IOperationContext* operationContextPtr = CreateOperationContext(gqlRequest, QString("Removed the object"));
+	imtbase::IOperationContext* operationContextPtr = nullptr;
+
+	if (m_operationContextControllerCompPtr.IsValid()){
+		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_REMOVE, gqlRequest);
+	}
+
 	if (m_objectCollectionCompPtr->RemoveElement(objectId, operationContextPtr)){
 		imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 		imtbase::CTreeItemModel* notificationModel = new imtbase::CTreeItemModel();
@@ -840,6 +834,12 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectHistory(c
 		return nullptr;
 	}
 
+	QByteArray languageId;
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		languageId = gqlContextPtr->GetLanguageId();
+	}
+
 	int offset = 0;
 	int count = -1;
 
@@ -863,14 +863,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectHistory(c
 	istd::TDelPtr<imtbase::IObjectCollectionIterator> objectCollectionIterator(m_objectCollectionCompPtr->CreateObjectCollectionIterator(offset, count, &filterParams));
 	if (objectCollectionIterator != nullptr){
 		while (objectCollectionIterator->Next()){
-			QByteArray json = objectCollectionIterator->GetElementInfo("Document").toByteArray();
-			QJsonDocument jsonDocument = QJsonDocument::fromJson(json);
-
-			QJsonObject jsonObject;
-			if (jsonDocument.isObject()){
-				jsonObject = jsonDocument.object();
-			}
-
 			QByteArray ownerId = objectCollectionIterator->GetElementInfo("OwnerId").toByteArray();
 			QString ownerName = objectCollectionIterator->GetElementInfo("OwnerName").toString();
 			QByteArray operationsDescriptionJson = objectCollectionIterator->GetElementInfo("OperationDescription").toByteArray();
@@ -882,79 +874,22 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectHistory(c
 				typedef istd::TSingleFactory<istd::IChangeable, imtbase::COperationDescription> FactoryOperationDescriptionImpl;
 				changeCollection.RegisterFactory<FactoryOperationDescriptionImpl>("OperationInfo");
 
-				QString operationDescription = operationsDescriptionJson;
 				iser::CJsonMemReadArchive archive(operationsDescriptionJson);
 				if (changeCollection.Serialize(archive)){
-					operationDescription = "";
+					QString operationDescription = m_documentChangeGeneratorCompPtr->GetOperationDescription(changeCollection, languageId);
 
-					imtbase::ICollectionInfo::Ids elementIds = changeCollection.GetElementIds();
-					for (const imtbase::ICollectionInfo::Id& elementId : elementIds){
-						imtbase::IObjectCollection::DataPtr dataPtr;
-						if (changeCollection.GetObjectData(elementId, dataPtr)){
-							const imtbase::COperationDescription* operationDescriptionPtr = dynamic_cast<const imtbase::COperationDescription*>(dataPtr.GetPtr());
-							if (operationDescriptionPtr != nullptr){
-								QByteArray operationTypeId = operationDescriptionPtr->GetOperationTypeId();
-								QByteArray key = operationDescriptionPtr->GetKey();
+					int index = dataModelPtr->InsertNewItem();
 
-								QString keyName = operationDescriptionPtr->GetKeyName();
-								keyName = imtgql::GetTranslation(m_translationManagerCompPtr.GetPtr(), gqlRequest, keyName.toUtf8(), "Attribute");
-
-								if (operationTypeId == QByteArray("Change")){
-									QString changes = QString(QT_TR_NOOP("%1 changed from %2 to %3"));
-									changes = imtgql::GetTranslation(m_translationManagerCompPtr.GetPtr(), gqlRequest, changes.toUtf8(), "imtgql::CObjectCollectionControllerCompBase");
-									operationDescription += changes
-												.arg(qPrintable(keyName))
-												.arg(qPrintable(operationDescriptionPtr->GetOldValue()))
-												.arg(qPrintable(operationDescriptionPtr->GetNewValue()));
-
-									operationDescription += "\n";
-								}
-							}
-						}
-					}
+					dataModelPtr->SetData("OwnerId", ownerId, index);
+					dataModelPtr->SetData("OwnerName", ownerName, index);
+					dataModelPtr->SetData("OperationDescription", operationDescription, index);
+					dataModelPtr->SetData("Time", lastModified.toString("dd.MM.yyyy hh:mm:ss"), index);
 				}
-
-				int index = dataModelPtr->InsertNewItem();
-
-				dataModelPtr->SetData("OwnerId", ownerId, index);
-				dataModelPtr->SetData("OwnerName", ownerName, index);
-				dataModelPtr->SetData("OperationDescription", operationDescription, index);
-				dataModelPtr->SetData("Time", lastModified.toString("dd.MM.yyyy hh:mm:ss"), index);
 			}
 		}
 	}
 
 	return rootModelPtr.PopPtr();
-}
-
-
-imtbase::IOperationContext* CObjectCollectionControllerCompBase::CreateOperationContext(const imtgql::CGqlRequest& gqlRequest, const QString& operationDescription) const
-{
-	imtgql::IGqlContext* requestContextPtr = gqlRequest.GetRequestContext();
-	if (requestContextPtr == nullptr){
-		SendErrorMessage(0, QString("Unable to create operation context. GraphQL context is nullptr."), "CObjectCollectionControllerCompBase");
-
-		return nullptr;
-	}
-
-	imtauth::IUserInfo* userInfoPtr = requestContextPtr->GetUserInfo();
-	if (userInfoPtr == nullptr){
-		SendErrorMessage(0, QString("Unable to create operation context. User info from GraphQL context is nullptr."), "CObjectCollectionControllerCompBase");
-
-		return nullptr;
-	}
-
-	imtbase::IOperationContext::IdentifableObjectInfo objectInfo;
-	objectInfo.id = userInfoPtr->GetId();
-	objectInfo.name = userInfoPtr->GetName();
-
-	istd::TDelPtr<imtbase::COperationContext> operationContextPtr;
-	operationContextPtr.SetPtr(new imtbase::COperationContext);
-
-	operationContextPtr->SetOperationOwnerId(objectInfo);
-	operationContextPtr->SetOperationDescription(operationDescription);
-
-	return operationContextPtr.PopPtr();
 }
 
 

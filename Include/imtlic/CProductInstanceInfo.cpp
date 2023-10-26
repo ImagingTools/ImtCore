@@ -83,6 +83,7 @@ void CProductInstanceInfo::ClearLicenses()
 	istd::CChangeNotifier changeNotifier(this);
 
 	m_licenses.clear();
+	m_licenseContainerInfo.ResetData();
 }
 
 
