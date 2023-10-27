@@ -235,13 +235,17 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	QByteArray objectId;
 	QString name;
 	QString description;
-	QByteArray typeId = "DocumentInfo";
+	QByteArray typeId;
 	const QList<imtgql::CGqlObject> params = gqlRequest.GetParams();
 
 	if (params.size() > 0){
 		typeId = params.at(0).GetFieldArgumentValue("typeId").toByteArray();
 		name = params.at(0).GetFieldArgumentValue("name").toByteArray();
 		description = params.at(0).GetFieldArgumentValue("description").toString();
+	}
+
+	if (typeId.isEmpty()){
+		typeId = "DocumentInfo";
 	}
 
 	istd::IChangeable* newObjectPtr = CreateObject(gqlRequest, objectId, name, description, errorMessage);
