@@ -9,7 +9,7 @@ FocusScope{
     id: checkBoxMenu;
 
     width: 300;
-    height: 40;
+    height: 34;
 
     property var model;
 
