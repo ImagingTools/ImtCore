@@ -1,4 +1,6 @@
 import QtQuick 2.12
+import Qt5Compat.GraphicalEffects 1.0
+import QtGraphicalEffects 1.12
 import Acf 1.0
 import imtqml 1.0
 import imtgui 1.0
@@ -182,6 +184,22 @@ FocusScope{
 //                    checkBoxMenu.currentText = currText;
 //                }
                 checkBoxMenu.currentText = currText;
+            }
+
+            DropShadow {
+                id: dropShadow;
+
+                anchors.fill: body;
+
+                z: body.z-1
+
+                horizontalOffset: 2;
+                verticalOffset: 2;
+
+                radius: 4;
+                color: Style.shadowColor;
+
+                source: body;
             }
 
             Rectangle{
