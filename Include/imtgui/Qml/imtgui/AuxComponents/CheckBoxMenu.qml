@@ -319,7 +319,7 @@ FocusScope{
                     delegate: Item{
                         width: listView.width;
                         height: visible ? 60 : 0;
-                        visible: searchTfc.text == "" ? true : checkBox.text.search(searchTfc.text) >= 0;
+                        visible: !searchTfc.text  ? true : checkBox.text.toLowerCase().search(searchTfc.text.toLowerCase()) >= 0;
 
                         CheckBox{
                             id: checkBox;
