@@ -40,6 +40,7 @@ Item {
                     cacheData.password = this.password;
 
                     userPanelDelegate.userModel.SetData("Password", this.password)
+                    userPanelDelegate.userModel.SetData("Username", login)
                     documentController.updateData(userPanelDelegate.userId, userPanelDelegate.userModel);
                 }
             }

@@ -881,13 +881,14 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectHistory(c
 				iser::CJsonMemReadArchive archive(operationsDescriptionJson);
 				if (changeCollection.Serialize(archive)){
 					QString operationDescription = m_documentChangeGeneratorCompPtr->GetOperationDescription(changeCollection, languageId);
+					if (!operationDescription.isEmpty()){
+						int index = dataModelPtr->InsertNewItem();
 
-					int index = dataModelPtr->InsertNewItem();
-
-					dataModelPtr->SetData("OwnerId", ownerId, index);
-					dataModelPtr->SetData("OwnerName", ownerName, index);
-					dataModelPtr->SetData("OperationDescription", operationDescription, index);
-					dataModelPtr->SetData("Time", lastModified.toString("dd.MM.yyyy hh:mm:ss"), index);
+						dataModelPtr->SetData("OwnerId", ownerId, index);
+						dataModelPtr->SetData("OwnerName", ownerName, index);
+						dataModelPtr->SetData("OperationDescription", operationDescription, index);
+						dataModelPtr->SetData("Time", lastModified.toString("dd.MM.yyyy hh:mm:ss"), index);
+					}
 				}
 			}
 		}
