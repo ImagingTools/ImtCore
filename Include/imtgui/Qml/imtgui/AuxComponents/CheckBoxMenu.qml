@@ -16,6 +16,8 @@ FocusScope{
     property int radius: 2;
     property int currentIndex: -1;
     property string placeHolderText: "";
+    property string multipleChoiceText: "Мультивыбор";//"Multiple choice";
+
 
     property color borderColor: checkBoxMenu.focus ? Style.iconColorOnSelected : Style.borderColor;
     property color backgroundColor: Style.baseColor;
@@ -47,32 +49,8 @@ FocusScope{
     signal finished();
 
     Component.onCompleted: {
-        //TEST
-        var index = dataModel.InsertNewItem();
-        dataModel.SetData("Name", "Service 1", index);
-        dataModel.SetData("Id", index, index);
 
-        index = dataModel.InsertNewItem();
-        dataModel.SetData("Name", "Service 2", index);
-        dataModel.SetData("Id", index, index);
-
-        index = dataModel.InsertNewItem();
-        dataModel.SetData("Name", "Service 13", index);
-        dataModel.SetData("Id", index, index);
-
-//        index = dataModel.InsertNewItem();
-//        dataModel.SetData("Name", "Service 24", index);
-//        dataModel.SetData("Id", index, index);
-
-//        index = dataModel.InsertNewItem();
-//        dataModel.SetData("Name", "Service 25", index);
-//        dataModel.SetData("Id", index, index);
-
-//        index = dataModel.InsertNewItem();
-//        dataModel.SetData("Name", "Service 6", index);
-//        dataModel.SetData("Id", index, index);
-
-    }//TEST
+    }
 
     onFinished: {
 
@@ -148,35 +126,62 @@ FocusScope{
                      popupMenuContainer.rootItem.dataModel.SetData("checkState", state_,i)
                  }
                  popupMenuContainer.setCheckedSignal();
+                 setCurrentText();
             }
 
             function setAllChecked(){
-                var count = 0;
+                let count = 0;
                 let itemsCount = popupMenuContainer.dataModel.GetItemsCount();
                 if(!itemsCount){
                     return;
                 }
                 for(var i = 0; i < itemsCount ; i++){
-                    var checkSt = popupMenuContainer.dataModel.IsValidData("checkState",i) ?
+                    let checkSt = popupMenuContainer.dataModel.IsValidData("checkState",i) ?
                                 popupMenuContainer.dataModel.GetData("checkState", i) : Qt.Unchecked
 
                     if(checkSt > 0){
                         count++;
                     }
                 }
-                var ok = count == itemsCount;
+                let ok = count == itemsCount;
                 if(ok){
                     checkBoxAll.checkState = Qt.Checked;
                 }
                 else {
                     checkBoxAll.checkState = Qt.Unchecked;
                 }
-                var retVal = ok ? Qt.Checked : Qt.Unchecked;
+                let retVal = ok ? Qt.Checked : Qt.Unchecked;
+                setCurrentText();
                 return retVal;
             }
 
             function setCurrentText(){
+                let currText = "";
+                let count = 0;
+                let itemsCount = popupMenuContainer.dataModel.GetItemsCount();
+                if(!itemsCount){
+                    return;
+                }
+                for(var i = 0; i < itemsCount ; i++){
+                    let checkSt = popupMenuContainer.dataModel.IsValidData("checkState",i) ?
+                                popupMenuContainer.dataModel.GetData("checkState", i) : Qt.Unchecked
 
+                    let name_ = popupMenuContainer.dataModel.GetData("Name",i);
+                    if(checkSt){
+                        if(currText !== ""){
+                            currText = currText + ", ";
+                        }
+                        currText = currText + name_;
+                        count++;
+                    }
+                }
+//                if(count > 1){
+//                    checkBoxMenu.currentText = checkBoxMenu.multipleChoiceText;
+//                }
+//                else {
+//                    checkBoxMenu.currentText = currText;
+//                }
+                checkBoxMenu.currentText = currText;
             }
 
             Rectangle{
