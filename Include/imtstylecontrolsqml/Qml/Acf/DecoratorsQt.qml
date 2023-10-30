@@ -15,6 +15,7 @@ Item {
     property Component switchDecorator: switchDecoratorComp
     property Component sliderDecorator: sliderDecoratorComp
     property Component rangeSliderDecorator: rangeSliderDecoratorComp
+    property Component radioButtonDecorator: radioButtonDecoratorComp
 
 
 
@@ -253,9 +254,7 @@ Item {
         id: switchDecoratorComp;
 
         Switch{
-
             height: 30;
-
 
             text: !baseElement ? "" : baseElement.text;
             checked: !baseElement ? false : baseElement.checked;
@@ -268,9 +267,7 @@ Item {
                     baseElement.checked = checked;
                 }
             }
-
         }
-
     }
 
     Component{
@@ -313,6 +310,24 @@ Item {
                 }
             }
 
+        }
+    }
+
+    Component{
+        id: radioButtonDecoratorComp;
+
+        RadioButton{
+            id: radioButtonItem;
+
+            property var baseElement: null;
+
+            autoExclusive: !baseElement ? true : !baseElement.autoExclusive;
+            text: !baseElement ? "" : baseElement.text;
+            onCheckedChanged: {
+                if(baseElement){
+                    baseElement.checked = checked;
+                }
+            }
         }
     }
 }

@@ -18,6 +18,8 @@ Item {
     property Component switchDecorator: switchDecoratorComp
     property Component sliderDecorator: sliderDecoratorComp
     property Component rangeSliderDecorator: rangeSliderDecoratorComp
+    property Component radioButtonDecorator: radioButtonDecoratorComp
+
 
     Component {
         id: topButtonDecoratorComp
@@ -534,6 +536,80 @@ Item {
 
             }
 
+        }
+    }
+
+    Component{
+        id: radioButtonDecoratorComp;
+
+        Item{
+            id: radioButtonItem;
+
+            width: radioButtonItem.text == "" ? radioRect.width :
+                                                  radioRect.width + radioButtonText.width + radioButtonText.anchors.leftMargin;
+            height: Math.max(checkSize, radioButtonText.height);
+
+            property var baseElement: null;
+            property int checkSize: !baseElement ? 0 : baseElement.checkSize;
+            property string text: !baseElement ? "" : baseElement.text;
+
+            Rectangle {
+                id: radioRect;
+
+                anchors.verticalCenter: parent.verticalCenter;
+
+                height: radioButtonItem.checkSize;
+                width: height;
+                radius: height;
+
+                color: "transparent";
+
+                border.width: 2;
+                border.color: !radioButtonItem.baseElement ? "transparent" : radioButtonItem.baseElement.selectedColor;
+
+
+                Rectangle{
+                    id: circle
+
+                    anchors.centerIn: parent;
+
+                    height: radioRect.height - 2*radioRect.border.width;
+                    width: height;
+                    radius: width;
+                    border.color: Style.borderColor;
+                    border.width: 1;
+                    color: "lightgrey";//Style.color_shadow;
+
+                    Rectangle{
+                        id: selectCircle
+
+                        anchors.centerIn: parent;
+
+                        height: circle.height - 8;
+                        width: height;
+                        radius: width;
+                        color: !radioButtonItem.baseElement ? "transparent" : radioButtonItem.baseElement.selectedColor;
+                        visible: !radioButtonItem.baseElement ? false : radioButtonItem.baseElement.checkState == Qt.Checked;
+                    }
+                }
+
+            }
+
+            Text {
+                id: radioButtonText;
+
+                anchors.left: radioRect.right;
+                anchors.leftMargin: !radioButtonItem.baseElement ? 0 : radioButtonItem.baseElement.mainMargin;
+                anchors.verticalCenter: radioButtonItem.verticalCenter;
+
+                color: !radioButtonItem.baseElement ? "transparent" : radioButtonItem.baseElement.enabled ? Style.buttonText : Style.inactive_buttonText;
+
+                font.pixelSize: !radioButtonItem.baseElement ? 8 : radioButtonItem.baseElement.fontPixelSize;
+                font.family: Style.fontFamily;
+                font.bold: !radioButtonItem.baseElement ? false : radioButtonItem.baseElement.fontBold;
+
+                text: radioButtonItem.text;
+            }
         }
     }
 

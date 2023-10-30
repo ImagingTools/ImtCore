@@ -14,7 +14,7 @@ AlertMessage 1.0 ./Application/AlertMessage.qml
 ApplicationInfoProvider 1.0 ./Application/ApplicationInfoProvider.qml
 Button 1.0 ./Buttons/Button.qml
 ButtonDecorator 1.0 ./Buttons/ButtonDecorator.qml
-CustomRadioButton 1.0 ./Buttons/CustomRadioButton.qml
+RadioButton 1.0 ./Buttons/RadioButton.qml
 IconButtonDecorator 1.0 ./Buttons/IconButtonDecorator.qml
 MenuPanelButton 1.0 ./Buttons/MenuPanelButton.qml
 MenuPanelButtonDecorator 1.0 ./Buttons/MenuPanelButtonDecorator.qml

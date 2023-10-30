@@ -15,7 +15,7 @@
 		<file alias="imtcontrols/Application/AlertMessage.qml">Qml/imtcontrols/Application/AlertMessage.qml</file>
 		<file alias="imtcontrols/Buttons/Button.qml">Qml/imtcontrols/Buttons/Button.qml</file>
 		<file alias="imtcontrols/Buttons/ButtonDecorator.qml">Qml/imtcontrols/Buttons/ButtonDecorator.qml</file>
-		<file alias="imtcontrols/Buttons/CustomRadioButton.qml">Qml/imtcontrols/Buttons/CustomRadioButton.qml</file>
+                <file alias="imtcontrols/Buttons/RadioButton.qml">Qml/imtcontrols/Buttons/RadioButton.qml</file>
 		<file alias="imtcontrols/Buttons/IconButtonDecorator.qml">Qml/imtcontrols/Buttons/IconButtonDecorator.qml</file>
 		<file alias="imtcontrols/Buttons/MenuPanelButton.qml">Qml/imtcontrols/Buttons/MenuPanelButton.qml</file>
 		<file alias="imtcontrols/Buttons/MenuPanelButtonDecorator.qml">Qml/imtcontrols/Buttons/MenuPanelButtonDecorator.qml</file>
