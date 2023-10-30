@@ -62,6 +62,8 @@
                 <file alias="imtcontrols/Inputs/CheckBox.qml">Qml/imtcontrols/Inputs/CheckBox.qml</file>
                 <file alias="imtcontrols/Inputs/Slider.qml">Qml/imtcontrols/Inputs/Slider.qml</file>
                 <file alias="imtcontrols/Inputs/RangeSlider.qml">Qml/imtcontrols/Inputs/RangeSlider.qml</file>
+                <file alias="imtcontrols/Inputs/TextArea.qml">Qml/imtcontrols/Inputs/TextArea.qml</file>
+                <file alias="imtcontrols/Inputs/SpinBox.qml">Qml/imtcontrols/Inputs/SpinBox.qml</file>
 		<file alias="imtcontrols/Models/ModelIndex.qml">Qml/imtcontrols/Models/ModelIndex.qml</file>
 		<file alias="imtcontrols/Models/UuidGenerator.qml">Qml/imtcontrols/Models/UuidGenerator.qml</file>
 		<file alias="imtcontrols/Panels/CommandsDecorator.qml">Qml/imtcontrols/Panels/CommandsDecorator.qml</file>
@@ -121,6 +123,7 @@
 		<file alias="imtcontrols/Views/TreeView.qml">Qml/imtcontrols/Views/TreeView.qml</file>
 		<file alias="imtcontrols/Views/TreeViewModelAdapter.qml">Qml/imtcontrols/Views/TreeViewModelAdapter.qml</file>
 		<file alias="imtcontrols/Views/TreeViewSelection.qml">Qml/imtcontrols/Views/TreeViewSelection.qml</file>
+                <file alias="imtcontrols/Views/ProgressBar.qml">Qml/imtcontrols/Views/ProgressBar.qml</file>
 		<file alias="imtcontrols/Views/Base/CollectionViewBase.qml">Qml/imtcontrols/Views/Base/CollectionViewBase.qml</file>
 		<file alias="imtcontrols/Views/Base/CollectionViewBaseGqlModels.qml">Qml/imtcontrols/Views/Base/CollectionViewBaseGqlModels.qml</file>
 		<file alias="imtcontrols/Views/Base/GridCollectionViewBase.qml">Qml/imtcontrols/Views/Base/GridCollectionViewBase.qml</file>

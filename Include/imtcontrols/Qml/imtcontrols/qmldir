@@ -61,6 +61,8 @@ TextField 1.0 ./Inputs/TextField.qml
 TextInputWithLabel 1.0 ./Inputs/TextInputWithLabel.qml
 TimeIntervalPicker 1.0 ./Inputs/TimeIntervalPicker.qml
 TimePicker 1.0 ./Inputs/TimePicker.qml
+TextArea 1.0 ./Inputs/TextArea.qml
+SpinBox 1.0 ./Inputs/SpinBox.qml
 ModelIndex 1.0 ./Models/ModelIndex.qml
 UuidGenerator 1.0 ./Models/UuidGenerator.qml
 CommandsDecorator 1.0 ./Panels/CommandsDecorator.qml
@@ -120,6 +122,7 @@ TreeItemModelObserver 1.0 ./Views/TreeItemModelObserver.qml
 TreeView 1.0 ./Views/TreeView.qml
 TreeViewModelAdapter 1.0 ./Views/TreeViewModelAdapter.qml
 TreeViewSelection 1.0 ./Views/TreeViewSelection.qml
+ProgressBar 1.0 ./Views/ProgressBar.qml
 CollectionViewBase 1.0 ./Views/Base/CollectionViewBase.qml
 CollectionViewBaseGqlModels 1.0 ./Views/Base/CollectionViewBaseGqlModels.qml
 GridCollectionViewBase 1.0 ./Views/Base/GridCollectionViewBase.qml
