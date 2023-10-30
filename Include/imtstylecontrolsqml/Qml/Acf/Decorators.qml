@@ -20,6 +20,19 @@ Item {
     property Component rangeSliderDecorator: rangeSliderDecoratorComp
     property Component radioButtonDecorator: radioButtonDecoratorComp
 
+    property Component textAreaDecorator: textAreaDecoratorComp
+    property Component spinBoxDecorator: spinBoxDecoratorComp
+
+    property Component progressBarDecorator: progressBarDecoratorComp
+    property Component busyIndicatorDecorator: busyIndicatorDecoratorComp
+    property Component tooltipDecorator: tooltipDecoratorComp
+
+    property Component dialogDecorator: dialogDecoratorComp
+
+    property Component splitViewDecorator: splitViewDecoratorComp
+    property Component stackViewDecorator: stackViewDecoratorComp
+    property Component swipeViewDecorator: swipeViewDecoratorComp
+
 
     Component {
         id: topButtonDecoratorComp
@@ -612,5 +625,91 @@ Item {
             }
         }
     }
+
+    Component{
+        id: textAreaDecoratorComp;
+        Item{
+            id: textAreaItem;
+
+            property var baseElement: null;
+        }
+    }
+
+
+    Component{
+        id: spinBoxDecoratorComp;
+        Item{
+            id: spinBoxItem;
+
+            property var baseElement: null;
+        }
+    }
+
+
+    Component{
+        id: progressBarDecoratorComp;
+        Item{
+            id: progressBarItem;
+
+            property var baseElement: null;
+        }
+    }
+
+    Component{
+        id: busyIndicatorDecoratorComp;
+        Item{
+            id: busyIndicatorItem;
+
+            property var baseElement: null;
+        }
+    }
+
+    Component{
+        id: tooltipDecoratorComp;
+        Item{
+            id: tooltipItem;
+
+            property var baseElement: null;
+        }
+    }
+
+    Component{
+        id: dialogDecoratorComp;
+        Item{
+            id: dialogItem;
+
+            property var baseElement: null;
+        }
+    }
+
+    Component{
+        id: splitViewDecoratorComp;
+        Item{
+            id: splitViewItem;
+
+            property var baseElement: null;
+        }
+    }
+
+
+    Component{
+        id: stackViewDecoratorComp;
+        Item{
+            id: stackViewItem;
+
+            property var baseElement: null;
+        }
+    }
+
+
+    Component{
+        id: swipeViewDecoratorComp;
+        Item{
+            id: swipeViewItem;
+
+            property var baseElement: null;
+        }
+    }
+
 
 }
