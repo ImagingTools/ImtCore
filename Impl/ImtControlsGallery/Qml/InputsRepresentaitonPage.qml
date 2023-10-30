@@ -113,7 +113,49 @@ Rectangle {
 
 
 
-        }//row
+        }//row - inputsRow
+
+        Row{
+            id: sliderRow;
+
+            anchors.horizontalCenter: parent.horizontalCenter;
+            height: 40;
+            spacing: 50;
+
+            Slider{
+                anchors.verticalCenter: parent.verticalCenter;
+
+                decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.sliderDecorator :
+                                                                                            Decorators.sliderDecorator;
+                //orientation: Qt.Vertical;
+                from: 10;
+                to: 100;
+                value: 50;
+
+            }
+
+            Slider{
+                anchors.verticalCenter: parent.verticalCenter;
+
+                decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.sliderDecorator :
+                                                                                            Decorators.sliderDecorator;
+                orientation: Qt.Vertical;
+                from: 10;
+                to: 100;
+
+            }
+
+            RangeSlider{
+                decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.rangeSliderDecorator :
+                                                                                            Decorators.rangeSliderDecorator;
+                //orientation: Qt.Vertical;
+                from: 10;
+                to: 100;
+                valueSecond: 80;
+
+            }
+
+        }//row2 - sliderRow
 
         Row{
             id: checkRow;
@@ -153,81 +195,69 @@ Rectangle {
 
             }
 
-            Slider{
+            RadioButton{
+
                 anchors.verticalCenter: parent.verticalCenter;
 
-                decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.sliderDecorator :
-                                                                                            Decorators.sliderDecorator;
-                //orientation: Qt.Vertical;
-                from: 10;
-                to: 100;
-                value: 50;
-
+                decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.radioButtonDecorator :
+                                                                                            Decorators.radioButtonDecorator;
+                autoExclusive: false;
+                text: "radioButton";
             }
 
-            Slider{
-                anchors.verticalCenter: parent.verticalCenter;
-
-                decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.sliderDecorator :
-                                                                                            Decorators.sliderDecorator;
-                orientation: Qt.Vertical;
-                from: 10;
-                to: 100;
-
-            }
-
-            RangeSlider{
-                decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.rangeSliderDecorator :
-                                                                                            Decorators.rangeSliderDecorator;
-                //orientation: Qt.Vertical;
-                from: 10;
-                to: 100;
-                valueSecond: 80;
-
-            }
-
-//            Item{//testElement
-//                id: testElement;
-
+//            RadioButton{
 //                anchors.verticalCenter: parent.verticalCenter;
 
-//                width: decorator ? decorator.width : 0;
-//                height: decorator ? decorator.height : 0;
+//                decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.radioButtonDecorator :
+//                                                                                            Decorators.radioButtonDecorator;
+//                autoExclusive: false;
+//                text: "radioButton2";
+//            }
 
-////                property Component decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.switchDecorator :
-////                                                                                            Decorators.switchDecorator;
+        }//row3 - checkRow
 
-//                property Component decoratorComponent : DecoratorsQt.sliderDecorator;
-//                property var decorator : null;
 
-//                onDecoratorComponentChanged: {
-//                    if(!decoratorComponent){
-//                        return;
-//                    }
-//                    if(decorator){
-//                        decorator.destroy()
-//                    }
-//                    decorator = decoratorComponent.createObject(testElement)
-//                    decorator.baseElement = testElement
-//                    bindWidth.target = decorator
-//                    bindHeight.target = decorator
-//                }
 
-//                Binding {
-//                    id: bindWidth
-//                    property: "width"
-//                    value: testElement.width;
-//                }
+        //            Item{//testElement
+        //                id: testElement;
 
-//                Binding {
-//                    id: bindHeight
-//                    property: "height"
-//                    value: testElement.height;
-//                }
+        //                anchors.verticalCenter: parent.verticalCenter;
 
-//            }//testElement
+        //                width: decorator ? decorator.width : 0;
+        //                height: decorator ? decorator.height : 0;
 
-        }//row2
+        ////                property Component decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.switchDecorator :
+        ////                                                                                            Decorators.switchDecorator;
+
+        //                property Component decoratorComponent : DecoratorsQt.sliderDecorator;
+        //                property var decorator : null;
+
+        //                onDecoratorComponentChanged: {
+        //                    if(!decoratorComponent){
+        //                        return;
+        //                    }
+        //                    if(decorator){
+        //                        decorator.destroy()
+        //                    }
+        //                    decorator = decoratorComponent.createObject(testElement)
+        //                    decorator.baseElement = testElement
+        //                    bindWidth.target = decorator
+        //                    bindHeight.target = decorator
+        //                }
+
+        //                Binding {
+        //                    id: bindWidth
+        //                    property: "width"
+        //                    value: testElement.width;
+        //                }
+
+        //                Binding {
+        //                    id: bindHeight
+        //                    property: "height"
+        //                    value: testElement.height;
+        //                }
+
+        //            }//testElement
 
     }//Column
 
