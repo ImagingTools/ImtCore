@@ -112,7 +112,6 @@ Rectangle {
             }
 
 
-
         }//row - inputsRow
 
         Row{
@@ -217,47 +216,47 @@ Rectangle {
         }//row3 - checkRow
 
 
+//        Item{//testElement
+//            id: testElement;
 
-        //            Item{//testElement
-        //                id: testElement;
+//            anchors.verticalCenter: parent.verticalCenter;
 
-        //                anchors.verticalCenter: parent.verticalCenter;
+//            width: decorator ? decorator.width : 0;
+//            height: decorator ? decorator.height : 0;
 
-        //                width: decorator ? decorator.width : 0;
-        //                height: decorator ? decorator.height : 0;
+//            //                property Component decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.switchDecorator :
+//            //                                                                                            Decorators.switchDecorator;
 
-        ////                property Component decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.switchDecorator :
-        ////                                                                                            Decorators.switchDecorator;
+//            property Component decoratorComponent : DecoratorsQt.textAreaDecorator;
+//            property var decorator : null;
 
-        //                property Component decoratorComponent : DecoratorsQt.sliderDecorator;
-        //                property var decorator : null;
+//            onDecoratorComponentChanged: {
+//                if(!decoratorComponent){
+//                    return;
+//                }
+//                if(decorator){
+//                    decorator.destroy()
+//                }
+//                decorator = decoratorComponent.createObject(testElement)
+//                decorator.baseElement = testElement
+//                bindWidth.target = decorator
+//                bindHeight.target = decorator
+//            }
 
-        //                onDecoratorComponentChanged: {
-        //                    if(!decoratorComponent){
-        //                        return;
-        //                    }
-        //                    if(decorator){
-        //                        decorator.destroy()
-        //                    }
-        //                    decorator = decoratorComponent.createObject(testElement)
-        //                    decorator.baseElement = testElement
-        //                    bindWidth.target = decorator
-        //                    bindHeight.target = decorator
-        //                }
+//            Binding {
+//                id: bindWidth
+//                property: "width"
+//                value: testElement.width;
+//            }
 
-        //                Binding {
-        //                    id: bindWidth
-        //                    property: "width"
-        //                    value: testElement.width;
-        //                }
+//            Binding {
+//                id: bindHeight
+//                property: "height"
+//                value: testElement.height;
+//            }
 
-        //                Binding {
-        //                    id: bindHeight
-        //                    property: "height"
-        //                    value: testElement.height;
-        //                }
+//        }//testElement
 
-        //            }//testElement
 
     }//Column
 
