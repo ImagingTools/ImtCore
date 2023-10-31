@@ -63,11 +63,15 @@ bool CProductCollectionControllerComp::SetupGqlItem(
 				}
 				else if(informationId == "Added"){
 					QDateTime addedTime =  objectCollectionIterator->GetElementInfo("Added").toDateTime();
-					elementInformation = addedTime.toString("dd.MM.yyyy hh:mm:ss");
+					addedTime.setTimeSpec(Qt::UTC);
+
+					elementInformation = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
 				else if(informationId == "LastModified"){
 					QDateTime lastTime =  objectCollectionIterator->GetElementInfo("LastModified").toDateTime();
-					elementInformation = lastTime.toString("dd.MM.yyyy hh:mm:ss");
+					lastTime.setTimeSpec(Qt::UTC);
+
+					elementInformation = lastTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
 				else if(informationId == "CategoryId"){
 					elementInformation = productLicensingInfoPtr->GetCategoryId();

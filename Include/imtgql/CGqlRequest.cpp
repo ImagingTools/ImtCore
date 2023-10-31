@@ -10,6 +10,9 @@
 #include <istd/TDelPtr.h>
 #include <istd/CChangeNotifier.h>
 
+// ImtCore includes
+#include <imtgql/CGqlContext.h>
+
 
 namespace imtgql
 {
@@ -507,7 +510,24 @@ bool CGqlRequest::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 			m_commandId = sourcePtr->m_commandId;
 			m_params = sourcePtr->m_params;
 			m_fields = sourcePtr->m_fields;
-			m_gqlContextPtr = sourcePtr->m_gqlContextPtr;
+
+			if (m_gqlContextPtr != nullptr){
+				m_gqlContextPtr->ResetData();
+			}
+
+			bool ok = false;
+			if (sourcePtr->m_gqlContextPtr != nullptr){
+				IChangeable* clonedContextPtr = sourcePtr->m_gqlContextPtr->CloneMe();
+				if (clonedContextPtr != nullptr){
+					m_gqlContextPtr = dynamic_cast<imtgql::IGqlContext*>(clonedContextPtr);
+
+					ok = true;
+				}
+			}
+
+			if (!ok){
+				m_gqlContextPtr = nullptr;
+			}
 
 			return true;
 		}
@@ -535,7 +555,11 @@ bool CGqlRequest::ResetData(istd::IChangeable::CompatibilityMode /*mode*/)
 	m_commandId.clear();
 	m_params.clear();
 	m_fields.clear();
-	m_gqlContextPtr = nullptr;
+
+	if (m_gqlContextPtr != nullptr){
+		m_gqlContextPtr->ResetData();
+		m_gqlContextPtr = nullptr;
+	}
 
 	return true;
 }

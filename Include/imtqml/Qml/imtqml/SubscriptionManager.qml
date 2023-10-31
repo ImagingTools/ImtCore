@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtWebSockets 1.15
 import Acf 1.0
+import imtqml 1.0
 
 WebSocket {
     id: container;
@@ -54,14 +55,11 @@ WebSocket {
         }
     }
 
+//    TreeItemModel {
+//        id: subscriptionModel
+//    }
 
-    TreeItemModel {
-        id: subscriptionModel
-    }
-
-    TreeItemModel {
-        id: socketModel
-    }
+    property TreeItemModel socketModel: TreeItemModel {}
 
     onTextMessageReceived:{
         console.log("onTextMessageReceived", message)
@@ -118,10 +116,8 @@ WebSocket {
         }
     }
 
-    function SetGlobalAccessToken(token){
-        console.log("SetGlobalAccessToken",token)
-        XMLHttpRequest.QMLAuthToken = token
-    }
-
-
+//    function SetGlobalAccessToken(token){
+//        console.log("SetGlobalAccessToken",token)
+//        XMLHttpRequest.QMLAuthToken = token
+//    }
 }

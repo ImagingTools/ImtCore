@@ -26,8 +26,6 @@ imtgql::CGqlContext::CGqlContext(): m_userInfoPtr(nullptr)
 
 imtgql::CGqlContext::~CGqlContext()
 {
-//	delete m_userInfoPtr;
-
 	ResetData();
 }
 
@@ -115,29 +113,30 @@ void CGqlContext::SetUserInfo(const imtauth::IUserInfo *userInfoPtr)
 bool CGqlContext::Serialize(iser::IArchive &archive)
 {
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
+
 	bool retVal = true;
 
-	static iser::CArchiveTag languageTag("LanguageId", "Language-ID", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag languageTag("LanguageId", "Language-ID", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(languageTag);
 	retVal = retVal && archive.Process(m_languageId);
 	retVal = retVal && archive.EndTag(languageTag);
 
-	static iser::CArchiveTag productTag("ProductId", "Product-ID", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag productTag("ProductId", "Product-ID", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(productTag);
 	retVal = retVal && archive.Process(m_productId);
 	retVal = retVal && archive.EndTag(productTag);
 
-	static iser::CArchiveTag designSchemeTag("DesignScheme", "Design scheme", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag designSchemeTag("DesignScheme", "Design scheme", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(designSchemeTag);
 	retVal = retVal && archive.Process(m_designScheme);
 	retVal = retVal && archive.EndTag(designSchemeTag);
 
-	static iser::CArchiveTag tokenTag("Token", "Token", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag tokenTag("Token", "Token", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(tokenTag);
 	retVal = retVal && archive.Process(m_token);
 	retVal = retVal && archive.EndTag(tokenTag);
 
-	static iser::CArchiveTag contactTag("UserInfo", "User info", iser::CArchiveTag::TT_GROUP);
+	iser::CArchiveTag contactTag("UserInfo", "User info", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(contactTag);
 	retVal = retVal && m_userInfoPtr->Serialize(archive);
 	retVal = retVal && archive.EndTag(contactTag);
@@ -161,8 +160,25 @@ bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/
 		m_languageId = sourcePtr->m_languageId;
 		m_designScheme = sourcePtr->m_designScheme;
 		m_token = sourcePtr->m_token;
-		m_userInfoPtr = sourcePtr->m_userInfoPtr;
 		m_productId = sourcePtr->m_productId;
+
+		if (m_userInfoPtr != nullptr){
+			m_userInfoPtr->ResetData();
+		}
+
+		bool ok = false;
+		if (sourcePtr->m_userInfoPtr != nullptr){
+			IChangeable* clonedUserPtr = sourcePtr->m_userInfoPtr->CloneMe();
+			if (clonedUserPtr != nullptr){
+				m_userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(clonedUserPtr);
+
+				ok = true;
+			}
+		}
+
+		if (!ok){
+			m_userInfoPtr = nullptr;
+		}
 
 		return true;
 	}
@@ -190,7 +206,11 @@ bool CGqlContext::ResetData(CompatibilityMode /*mode*/)
 	m_productId.clear();
 	m_designScheme.clear();
 	m_token.clear();
-	m_userInfoPtr = nullptr;
+
+	if (m_userInfoPtr != nullptr){
+		m_userInfoPtr->ResetData();
+		m_userInfoPtr = nullptr;
+	}
 
 	return true;
 }

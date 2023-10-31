@@ -121,6 +121,14 @@ Item {
         settingsProvider: application.settingsProvider;
     }
 
+//    SubscriptionManager {
+//        id: subscriptionManager;
+
+//        Component.onCompleted: {
+//            url = "ws://127.0.0.1:8112"
+//        }
+//    }
+
     ThumbnailDecorator {
         id: thumbnailDecorator;
 

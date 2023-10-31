@@ -88,6 +88,13 @@ I_EXPORT_COMPONENT(
 			DelegatedRequestHandler,
 			"Delegate for slave request handler",
 			"Delegate Request Handler");
+
+I_EXPORT_COMPONENT(
+			ObjectCollectionSubscriberController,
+			"Subscriprion controller for object collection",
+			"Subscriprion Subscriber Collection ObjectCollection");
+
+
 } // namespace ImtGqlPck
 
 

@@ -27,17 +27,19 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			const HeadersMap& headers,
 			const imtrest::CHttpRequest& request) const
 {
-	imtgql::CGqlRequest gqlRequest;
-	int errorPosition = -1;
+//	imtgql::CGqlRequest gqlRequest;
 
+	m_gqlRequest.ResetData();
+
+	int errorPosition = -1;
 	QByteArray requestBody = request.GetBody();
-	if (!gqlRequest.ParseQuery(requestBody, errorPosition)){
+	if (!m_gqlRequest.ParseQuery(requestBody, errorPosition)){
 		qCritical() << __FILE__ << __LINE__ << QString("Error when parsing request: %1; Error position: %2")
 						.arg(qPrintable(request.GetBody()))
 						.arg(errorPosition);
 	}
 
-	QByteArray gqlCommand = gqlRequest.GetCommandId();
+	QByteArray gqlCommand = m_gqlRequest.GetCommandId();
 
 	QByteArray userId;
 
@@ -45,10 +47,10 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	QByteArray accessToken = headers.value("X-authentication-token");
 	if (!accessToken.isEmpty() && m_gqlContextControllerCompPtr.IsValid()){
 		QString errorMessage;
-		gqlContextPtr = m_gqlContextControllerCompPtr->GetRequestContext(gqlRequest, accessToken, errorMessage);
+		gqlContextPtr = m_gqlContextControllerCompPtr->GetRequestContext(m_gqlRequest, accessToken, errorMessage);
 
 		if (gqlContextPtr != nullptr){
-			gqlRequest.SetGqlContext(gqlContextPtr);
+			m_gqlRequest.SetGqlContext(gqlContextPtr);
 
 			if (gqlContextPtr->GetUserInfo() != nullptr){
 				userId = gqlContextPtr->GetUserInfo()->GetId();
@@ -127,8 +129,8 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	for (int index = 0; index < dataControllersCount; index++){
 		const imtgql::IGqlRequestHandler* requestHandlerPtr = m_gqlRequestHandlerCompPtr[index];
 		if (requestHandlerPtr != nullptr){
-			if (requestHandlerPtr->IsRequestSupported(gqlRequest)){
-				imtbase::CTreeItemModel* sourceItemModel = requestHandlerPtr->CreateResponse(gqlRequest, errorMessage);
+			if (requestHandlerPtr->IsRequestSupported(m_gqlRequest)){
+				imtbase::CTreeItemModel* sourceItemModel = requestHandlerPtr->CreateResponse(m_gqlRequest, errorMessage);
 				if(sourceItemModel != nullptr){
 					imtbase::CTreeItemModel rootModel;
 					imtbase::CTreeItemModel* dataItemModel = rootModel.AddTreeModel("data");
@@ -194,6 +196,14 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	SendErrorMessage(0, QString("Internal server error for command %1").arg(qPrintable(gqlCommand)), "GraphQL - servlet");
 
 	return GenerateError(imtrest::IProtocolEngine::StatusCode::SC_INTERNAL_SERVER_ERROR,"Request incorrected",request);
+}
+
+
+// reimplemented (imtgql::IGqlRequestProvider)
+
+const IGqlRequest* CHttpGraphQLServletComp::GetGqlRequest() const
+{
+	return &m_gqlRequest;
 }
 
 

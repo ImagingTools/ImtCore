@@ -218,17 +218,17 @@ bool CUserCollectionControllerComp::SetupGqlItem(
 					}
 					elementInformation = resultList.join(';');
 				}
-				else{
-					if (elementMetaInfo.IsValid()){
-						if (informationId == QByteArray("Added")){
-							elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
-									.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-						}
-						else if (informationId == QByteArray("LastModified")){
-							elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME)
-									.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-						}
-					}
+				else if(informationId == "Added"){
+					QDateTime addedTime =  objectCollectionIterator->GetElementInfo("Added").toDateTime();
+					addedTime.setTimeSpec(Qt::UTC);
+
+					elementInformation = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+				}
+				else if(informationId == "LastModified"){
+					QDateTime lastTime =  objectCollectionIterator->GetElementInfo("LastModified").toDateTime();
+					lastTime.setTimeSpec(Qt::UTC);
+
+					elementInformation = lastTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
 
 				if(elementInformation.isNull()){

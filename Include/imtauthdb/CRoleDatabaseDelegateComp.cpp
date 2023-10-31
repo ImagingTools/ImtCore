@@ -73,7 +73,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CRoleDatabaseDelegateComp::Create
 						.arg(qPrintable(objectId))
 						.arg(SqlEncode(documentContent))
 						.arg(revisionVersion)
-						.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+						.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
 						.arg(checksum).toUtf8();
 
 			retVal.query += CreateOperationDescriptionQuery(objectId, operationContextPtr);
@@ -102,7 +102,7 @@ QByteArray CRoleDatabaseDelegateComp::CreateUpdateObjectQuery(
 					.arg(qPrintable(*m_tableNameAttrPtr))
 					.arg(qPrintable(objectId))
 					.arg(SqlEncode(documentContent))
-					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+					.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
 					.arg(checksum).toUtf8();
 
 		retVal += CreateOperationDescriptionQuery(objectId, operationContextPtr);

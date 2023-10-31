@@ -18,12 +18,12 @@ namespace imtauthdb
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
 imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::CreateNewObjectQuery(
-		const QByteArray& /*typeId*/,
-		const QByteArray& proposedObjectId,
-		const QString& objectName,
-		const QString& /*objectDescription*/,
-		const istd::IChangeable* valuePtr,
-		const imtbase::IOperationContext* operationContextPtr) const
+			const QByteArray& /*typeId*/,
+			const QByteArray& proposedObjectId,
+			const QString& objectName,
+			const QString& /*objectDescription*/,
+			const istd::IChangeable* valuePtr,
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	NewObjectQuery retVal;
 
@@ -68,7 +68,7 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 					.arg(qPrintable(objectId))
 					.arg(SqlEncode(documentContent))
 					.arg(revisionVersion)
-					.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+					.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
 					.arg(checksum).toUtf8();
 
 			retVal.query += CreateOperationDescriptionQuery(objectId, operationContextPtr);
@@ -82,11 +82,11 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUserDatabaseDelegateComp::Create
 
 
 QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
-		const imtbase::IObjectCollection& collection,
-		const QByteArray& objectId,
-		const istd::IChangeable& object,
-		const imtbase::IOperationContext* operationContextPtr,
-		bool useExternDelegate) const
+			const imtbase::IObjectCollection& collection,
+			const QByteArray& objectId,
+			const istd::IChangeable& object,
+			const imtbase::IOperationContext* operationContextPtr,
+			bool useExternDelegate) const
 {
 	const imtauth::IUserInfo* oldObjectPtr = nullptr;
 	imtbase::IObjectCollection::DataPtr objectPtr;
@@ -170,7 +170,7 @@ QByteArray CUserDatabaseDelegateComp::CreateUpdateObjectQuery(
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(qPrintable(objectId))
 				.arg(SqlEncode(documentContent))
-				.arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+				.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate))
 				.arg(checksum).toUtf8();
 
 		retVal += CreateOperationDescriptionQuery(objectId, operationContextPtr);

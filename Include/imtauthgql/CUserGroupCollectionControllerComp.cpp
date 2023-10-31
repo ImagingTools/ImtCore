@@ -94,11 +94,11 @@ imtbase::CTreeItemModel* CUserGroupCollectionControllerComp::GetMetaInfo(const i
 
 
 bool CUserGroupCollectionControllerComp::SetupGqlItem(
-		const imtgql::CGqlRequest& gqlRequest,
-		imtbase::CTreeItemModel& model,
-		int itemIndex,
-		const imtbase::IObjectCollectionIterator* objectCollectionIterator,
-		QString& /*errorMessage*/) const
+			const imtgql::CGqlRequest& gqlRequest,
+			imtbase::CTreeItemModel& model,
+			int itemIndex,
+			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
+			QString& /*errorMessage*/) const
 {
 	const QList<imtgql::CGqlObject> paramsPtr = gqlRequest.GetParams();
 
@@ -141,6 +141,18 @@ bool CUserGroupCollectionControllerComp::SetupGqlItem(
 				}
 				else if(informationId == "ParentGroups"){
 					elementInformation = userGroupInfoPtr->GetParentGroups().join(';');
+				}
+				else if(informationId == "Added"){
+					QDateTime addedTime =  objectCollectionIterator->GetElementInfo("Added").toDateTime();
+					addedTime.setTimeSpec(Qt::UTC);
+
+					elementInformation = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+				}
+				else if(informationId == "LastModified"){
+					QDateTime lastTime =  objectCollectionIterator->GetElementInfo("LastModified").toDateTime();
+					lastTime.setTimeSpec(Qt::UTC);
+
+					elementInformation = lastTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
 
 				if (elementInformation.isNull()){

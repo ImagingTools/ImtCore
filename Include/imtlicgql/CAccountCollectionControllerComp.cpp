@@ -53,8 +53,10 @@ imtbase::CTreeItemModel* CAccountCollectionControllerComp::GetMetaInfo(
 
 	idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(accountId);
 	if (metaInfo.IsValid()){
-		QString date = metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-		children->SetData("Value", date);
+		QDateTime lastTime = metaInfo->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME).toDateTime();
+		lastTime.setTimeSpec(Qt::UTC);
+
+		children->SetData("Value", lastTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"));
 	}
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
@@ -152,17 +154,29 @@ bool CAccountCollectionControllerComp::SetupGqlItem(
 				else if(informationId == "Email"){
 					elementInformation = companyInfoPtr->GetEmail();
 				}
-				else{
-					if (elementMetaInfo.IsValid()){
-						if (informationId == QByteArray("Added")){
-							elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
-									.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-						}
-						else if (informationId == QByteArray("LastModified")){
-							elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-						}
-					}
+				else if(informationId == "Added"){
+					QDateTime addedTime =  objectCollectionIterator->GetElementInfo("added").toDateTime();
+					addedTime.setTimeSpec(Qt::UTC);
+
+					elementInformation = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
+				else if(informationId == "LastModified"){
+					QDateTime lastTime =  objectCollectionIterator->GetElementInfo("lastmodified").toDateTime();
+					lastTime.setTimeSpec(Qt::UTC);
+
+					elementInformation = lastTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+				}
+//				else{
+//					if (elementMetaInfo.IsValid()){
+//						if (informationId == QByteArray("Added")){
+//							elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
+//									.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+//						}
+//						else if (informationId == QByteArray("LastModified")){
+//							elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
+//						}
+//					}
+//				}
 
 				if(elementInformation.isNull()){
 					elementInformation = GetObjectInformation(informationId, collectionId);

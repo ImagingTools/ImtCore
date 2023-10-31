@@ -67,14 +67,17 @@ Item {
         let itemsList = permissionsTable.getItemsDataAsList();
         for (let i = 0; i < itemsList.length; i++){
             let delegateItem = itemsList[i];
-            let itemData = delegateItem.getItemData();
-            let id = itemData.FeatureId;
-            if (selectedPermissionsIds.includes(id)){
-                delegateItem.isOpened = true;
-                permissionsTable.checkItem(delegateItem);
-            }
-            else{
-                delegateItem.isOpened = false;
+            if (!delegateItem.hasChild){
+                let itemData = delegateItem.getItemData();
+                let id = itemData.FeatureId;
+
+                if (selectedPermissionsIds.includes(id)){
+                    delegateItem.isOpened = true;
+                    permissionsTable.checkItem(delegateItem);
+                }
+                else{
+                    delegateItem.isOpened = false;
+                }
             }
         }
 
@@ -93,10 +96,23 @@ Item {
         let selectedPermissionIds = []
         let itemsList = permissionsTable.getCheckedItems();
         for (let delegate of itemsList){
-            let itemData = delegate.getItemData();
-            let id = itemData.FeatureId;
-            selectedPermissionIds.push(id)
+            if (!delegate.hasChild){
+                let itemData = delegate.getItemData();
+                let id = itemData.FeatureId;
+                selectedPermissionIds.push(id)
+            }
         }
+
+//        let delegates = permissionsTable.getItemsDataAsList();
+//        for (let delegate of delegates){
+//            if (itemsList.includes(delegate)){
+//                if (!delegate.hasChild){
+//                    let itemData = delegate.getItemData();
+//                    let id = itemData.FeatureId;
+//                    selectedPermissionIds.push(id)
+//                }
+//            }
+//        }
 
         rolePermissionsContainer.documentModel.SetData("Permissions", selectedPermissionIds.join(';'));
 
@@ -205,13 +221,31 @@ Item {
                 return;
             }
 
+//            let delegates = permissionsTable.getItemsDataAsList();
+
             let selectedPermissionIds = []
+
             let itemsList = permissionsTable.getCheckedItems();
+
             for (let delegate of itemsList){
-                let itemData = delegate.getItemData();
-                let id = itemData.FeatureId;
-                selectedPermissionIds.push(id)
+                if (!delegate.hasChild){
+                    let itemData = delegate.getItemData();
+                    let id = itemData.FeatureId;
+                    selectedPermissionIds.push(id)
+                }
             }
+
+//            for (let delegate of delegates){
+//                if (itemsList.includes(delegate)){
+//                    if (!delegate.hasChild){
+//                        delegate.isOpened = true;
+
+//                        let itemData = delegate.getItemData();
+//                        let id = itemData.FeatureId;
+//                        selectedPermissionIds.push(id)
+//                    }
+//                }
+//            }
 
             let newPermissions = selectedPermissionIds.join(';');
             let oldPermissions = rolePermissionsContainer.documentModel.GetData("Permissions");
@@ -224,7 +258,18 @@ Item {
     }//BasicTableView
 
     function updateTreeViewGui(){
+    }
 
+    function updatePermissionsModel(){
+        let selectedPermissionIds = []
+        let itemsList = permissionsTable.getCheckedItems();
+        for (let delegate of itemsList){
+            if (!delegate.hasChild){
+                let itemData = delegate.getItemData();
+                let id = itemData.FeatureId;
+                selectedPermissionIds.push(id)
+            }
+        }
     }
 
     Item {

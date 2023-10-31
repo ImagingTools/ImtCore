@@ -871,6 +871,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectHistory(c
 			QString ownerName = objectCollectionIterator->GetElementInfo("OwnerName").toString();
 			QByteArray operationsDescriptionJson = objectCollectionIterator->GetElementInfo("OperationDescription").toByteArray();
 			QDateTime lastModified =  objectCollectionIterator->GetElementInfo("LastModified").toDateTime();
+			lastModified.setTimeSpec(Qt::UTC);
 
 			if (!ownerId.isEmpty() && !operationsDescriptionJson.isEmpty()){
 				imtbase::CObjectCollection changeCollection;
@@ -887,7 +888,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectHistory(c
 						dataModelPtr->SetData("OwnerId", ownerId, index);
 						dataModelPtr->SetData("OwnerName", ownerName, index);
 						dataModelPtr->SetData("OperationDescription", operationDescription, index);
-						dataModelPtr->SetData("Time", lastModified.toString("dd.MM.yyyy hh:mm:ss"), index);
+						dataModelPtr->SetData("Time", lastModified.toLocalTime().toString("dd.MM.yyyy hh:mm:ss"), index);
 					}
 				}
 			}

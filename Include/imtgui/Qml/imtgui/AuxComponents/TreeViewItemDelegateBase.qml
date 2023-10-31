@@ -7,7 +7,7 @@ TableViewItemDelegateBase {
 
     height: !treeDelegateBase.root ? 0 : treeDelegateBase.isOpened ? treeDelegateBase.footerItem.height + treeDelegateBase.root.rowItemHeight: treeDelegateBase.root.rowItemHeight;
 
-    property bool isOpened: true;
+    property bool isOpened: false;
 
     property bool hasChild: false;
 
@@ -27,6 +27,21 @@ TableViewItemDelegateBase {
 
     onChildModelChanged: {
         console.log("Delegate onChildModelChanged", childModel);
+    }
+
+    Connections {
+        id: connections;
+
+        target: treeDelegateBase;
+
+        function onIsOpenedChanged(){
+            console.log("onIsOpenedChanged", treeDelegateBase.isOpened);
+            if (treeDelegateBase.parentDelegate != null && treeDelegateBase.isOpened){
+                treeDelegateBase.parentDelegate.isOpened = true;
+            }
+        }
+
+        enabled: true;
     }
 
     onParentCheckStateChanged: {
@@ -99,7 +114,9 @@ TableViewItemDelegateBase {
                                                             "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal);
 
                     onClicked: {
+                        connections.enabled = false;
                         treeDelegateBase.isOpened = !treeDelegateBase.isOpened;
+                        connections.enabled = true;
                     }
                 }
             }
