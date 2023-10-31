@@ -20,11 +20,11 @@ Item {
     property Component textAreaDecorator: textAreaDecoratorComp
     property Component spinBoxDecorator: spinBoxDecoratorComp
 
+    property Component dialogDecorator: dialogDecoratorComp
+
     property Component progressBarDecorator: progressBarDecoratorComp
     property Component busyIndicatorDecorator: busyIndicatorDecoratorComp
     property Component tooltipDecorator: tooltipDecoratorComp
-
-    property Component dialogDecorator: dialogDecoratorComp
 
     property Component splitViewDecorator: splitViewDecoratorComp
     property Component stackViewDecorator: stackViewDecoratorComp
@@ -343,9 +343,9 @@ Item {
         }
     }
 
-    Component{
+    Component {
         id: textAreaDecoratorComp;
-        Item{
+        Item {
             id: textAreaItem;
 
             property var baseElement: null;
@@ -353,9 +353,9 @@ Item {
     }
 
 
-    Component{
+    Component {
         id: spinBoxDecoratorComp;
-        Item{
+        Item {
             id: spinBoxItem;
 
             property var baseElement: null;
@@ -363,55 +363,94 @@ Item {
     }
 
 
-    Component{
+    Component {
         id: progressBarDecoratorComp;
-        Item{
+        Item {
             id: progressBarItem;
 
             property var baseElement: null;
         }
     }
 
-    Component{
+    Component {
         id: busyIndicatorDecoratorComp;
-        Item{
+        Item {
             id: busyIndicatorItem;
 
             property var baseElement: null;
         }
     }
 
-    Component{
+    Component {
         id: tooltipDecoratorComp;
-        Item{
+        Item {
             id: tooltipItem;
 
             property var baseElement: null;
         }
     }
 
-    Component{
+    Component {
         id: dialogDecoratorComp;
-        Item{
+        Item {
             id: dialogItem;
 
             property var baseElement: null;
         }
     }
 
-    Component{
+    Component {
         id: splitViewDecoratorComp;
-        Item{
+        Item {
             id: splitViewItem;
 
+            width: 800;
+            height: 200;
+
             property var baseElement: null;
+
+            SplitView {
+                anchors.fill: parent
+                orientation: Qt.Horizontal
+
+                Rectangle {
+                    implicitWidth: 200
+                    SplitView.maximumWidth: 400
+                    color: "lightblue"
+                    Label {
+                        text: "View 1"
+                        anchors.centerIn: parent
+                    }
+                }
+                Rectangle {
+                    id: centerItem
+
+                    SplitView.minimumWidth: 50
+                    SplitView.fillWidth: true
+
+                    color: "lightgray"
+                    Label {
+                        text: "View 2"
+                        anchors.centerIn: parent
+                    }
+                }
+                Rectangle {
+                    implicitWidth: 200
+                    color: "lightgreen"
+                    Label {
+                        text: "View 3"
+                        anchors.centerIn: parent
+                    }
+                }
+            }
+
         }
     }
 
 
-    Component{
+    Component {
         id: stackViewDecoratorComp;
-        Item{
+        Item {
             id: stackViewItem;
 
             property var baseElement: null;
@@ -419,9 +458,9 @@ Item {
     }
 
 
-    Component{
+    Component {
         id: swipeViewDecoratorComp;
-        Item{
+        Item {
             id: swipeViewItem;
 
             property var baseElement: null;

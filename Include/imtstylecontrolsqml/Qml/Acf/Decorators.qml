@@ -20,14 +20,15 @@ Item {
     property Component rangeSliderDecorator: rangeSliderDecoratorComp
     property Component radioButtonDecorator: radioButtonDecoratorComp
 
+    //to do
     property Component textAreaDecorator: textAreaDecoratorComp
     property Component spinBoxDecorator: spinBoxDecoratorComp
+
+    property Component dialogDecorator: dialogDecoratorComp
 
     property Component progressBarDecorator: progressBarDecoratorComp
     property Component busyIndicatorDecorator: busyIndicatorDecoratorComp
     property Component tooltipDecorator: tooltipDecoratorComp
-
-    property Component dialogDecorator: dialogDecoratorComp
 
     property Component splitViewDecorator: splitViewDecoratorComp
     property Component stackViewDecorator: stackViewDecoratorComp
@@ -626,9 +627,9 @@ Item {
         }
     }
 
-    Component{
+    Component {
         id: textAreaDecoratorComp;
-        Item{
+        Item {
             id: textAreaItem;
 
             property var baseElement: null;
@@ -636,9 +637,9 @@ Item {
     }
 
 
-    Component{
+    Component {
         id: spinBoxDecoratorComp;
-        Item{
+        Item {
             id: spinBoxItem;
 
             property var baseElement: null;
@@ -646,45 +647,45 @@ Item {
     }
 
 
-    Component{
+    Component {
         id: progressBarDecoratorComp;
-        Item{
+        Item {
             id: progressBarItem;
 
             property var baseElement: null;
         }
     }
 
-    Component{
+    Component {
         id: busyIndicatorDecoratorComp;
-        Item{
+        Item {
             id: busyIndicatorItem;
 
             property var baseElement: null;
         }
     }
 
-    Component{
+    Component {
         id: tooltipDecoratorComp;
-        Item{
+        Item {
             id: tooltipItem;
 
             property var baseElement: null;
         }
     }
 
-    Component{
+    Component {
         id: dialogDecoratorComp;
-        Item{
+        Item {
             id: dialogItem;
 
             property var baseElement: null;
         }
     }
 
-    Component{
+    Component {
         id: splitViewDecoratorComp;
-        Item{
+        Item {
             id: splitViewItem;
 
             property var baseElement: null;
@@ -692,9 +693,9 @@ Item {
     }
 
 
-    Component{
+    Component {
         id: stackViewDecoratorComp;
-        Item{
+        Item {
             id: stackViewItem;
 
             property var baseElement: null;
@@ -702,9 +703,9 @@ Item {
     }
 
 
-    Component{
+    Component {
         id: swipeViewDecoratorComp;
-        Item{
+        Item {
             id: swipeViewItem;
 
             property var baseElement: null;
