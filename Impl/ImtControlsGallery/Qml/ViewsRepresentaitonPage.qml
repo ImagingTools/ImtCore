@@ -42,114 +42,114 @@ Rectangle {
         width: parent.width;
         spacing: 100;
 
-    Rectangle{
-        //anchors.centerIn: parent;
-        anchors.horizontalCenter: parent.horizontalCenter;
+        Rectangle{
+            id: splitViewContainer;
 
-        width: splitView.orientation == Qt.Horizontal ? 800 : 200;
-        height: splitView.orientation == Qt.Horizontal ? 200 : 800;
-        color: "transparent";
-        border.color: "lightgreen";
+            anchors.horizontalCenter: parent.horizontalCenter;
 
-        SplitView{
-            id: splitView;
+            width: splitView.orientation == Qt.Horizontal ? 800 : 200;
+            height: splitView.orientation == Qt.Horizontal ? 200 : 800;
+            color: "transparent";
 
-            anchors.centerIn: parent;
+            SplitView{
+                id: splitView;
 
-            width: parent.width - 8;
-            height: parent.height -8;
+                anchors.centerIn: parent;
 
-            //orientation: Qt.Vertical;//!!!
+                width: parent.width;
+                height: parent.height;
 
-            Component.onCompleted: {
-                //sizeModel.SetData("MinimumWidth", 50, 0);
-            }
+                //orientation: Qt.Vertical;//!!!
 
-            Rectangle{
-                id: red;
-
-                width: splitView.orientation == Qt.Horizontal ? 100 : 0;
-                height: splitView.orientation == Qt.Vertical ? 100 : 0;
-
-                color: "red";
-                Text {
-                    anchors.centerIn: parent;
-                    text: "red";
+                Component.onCompleted: {
+                    //sizeModel.SetData("MinimumWidth", 50, 0);
+                    sizeModel.SetData("FillWidth", true, 0);
                 }
-            }
 
-            Rectangle{
-                id: green;
+                Rectangle{
+                    id: red;
 
-                width: splitView.orientation == Qt.Horizontal ? 200 : 0;
-                height: splitView.orientation == Qt.Vertical ? 200 : 0;
-                color: "green";
-                Text {
-                    anchors.centerIn: parent;
-                    text: "green";
+                    width: splitView.orientation == Qt.Horizontal ? 100 : 0;
+                    height: splitView.orientation == Qt.Vertical ? 100 : 0;
+
+                    color: "red";
+                    Text {
+                        anchors.centerIn: parent;
+                        text: "red";
+                    }
                 }
-            }
 
-            Rectangle{
-                id: yellow;
+                Rectangle{
+                    id: green;
 
-                width: splitView.orientation == Qt.Horizontal ? 400 : 0;
-                height: splitView.orientation == Qt.Vertical ? 400 : 0;
-                color: "yellow";
-                Text {
-                    anchors.centerIn: parent;
-                    text: "yellow";
+                    width: splitView.orientation == Qt.Horizontal ? 200 : 0;
+                    height: splitView.orientation == Qt.Vertical ? 200 : 0;
+                    color: "green";
+                    Text {
+                        anchors.centerIn: parent;
+                        text: "green";
+                    }
                 }
-            }
+
+                Rectangle{
+                    id: yellow;
+
+                    width: splitView.orientation == Qt.Horizontal ? 400 : 0;
+                    height: splitView.orientation == Qt.Vertical ? 400 : 0;
+                    color: "yellow";
+                    Text {
+                        anchors.centerIn: parent;
+                        text: "yellow";
+                    }
+                }
 
 
-        }//SplitView
+            }//SplitView
+
+        }//splitViewContainer
 
 
+//        Item{//testElement
+//            id: testElement;
 
-    }
+//            //anchors.verticalCenter: parent.verticalCenter;
+//            anchors.horizontalCenter: parent.horizontalCenter;
 
-//            Item{//testElement
-//                id: testElement;
+//            width: decorator ? decorator.width : 0;
+//            height: decorator ? decorator.height : 0;
 
-//                //anchors.verticalCenter: parent.verticalCenter;
-//                anchors.horizontalCenter: parent.horizontalCenter;
+//            //                property Component decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.switchDecorator :
+//            //                                                                                            Decorators.switchDecorator;
 
-//                width: decorator ? decorator.width : 0;
-//                height: decorator ? decorator.height : 0;
+//            property Component decoratorComponent : DecoratorsQt.splitViewDecorator;
+//            property var decorator : null;
 
-//                //                property Component decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.switchDecorator :
-//                //                                                                                            Decorators.switchDecorator;
-
-//                property Component decoratorComponent : DecoratorsQt.splitViewDecorator;
-//                property var decorator : null;
-
-//                onDecoratorComponentChanged: {
-//                    if(!decoratorComponent){
-//                        return;
-//                    }
-//                    if(decorator){
-//                        decorator.destroy()
-//                    }
-//                    decorator = decoratorComponent.createObject(testElement)
-//                    decorator.baseElement = testElement
-//                    bindWidth.target = decorator
-//                    bindHeight.target = decorator
+//            onDecoratorComponentChanged: {
+//                if(!decoratorComponent){
+//                    return;
 //                }
-
-//                Binding {
-//                    id: bindWidth
-//                    property: "width"
-//                    value: testElement.width;
+//                if(decorator){
+//                    decorator.destroy()
 //                }
+//                decorator = decoratorComponent.createObject(testElement)
+//                decorator.baseElement = testElement
+//                bindWidth.target = decorator
+//                bindHeight.target = decorator
+//            }
 
-//                Binding {
-//                    id: bindHeight
-//                    property: "height"
-//                    value: testElement.height;
-//                }
+//            Binding {
+//                id: bindWidth
+//                property: "width"
+//                value: testElement.width;
+//            }
 
-//            }//testElement
+//            Binding {
+//                id: bindHeight
+//                property: "height"
+//                value: testElement.height;
+//            }
+
+//        }//testElement
 
     }
 
