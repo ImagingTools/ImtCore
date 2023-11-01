@@ -38,10 +38,10 @@ bool CGqlSubscriberControllerCompBase::IsRequestSupported(const CGqlRequest &gql
 
 
 bool CGqlSubscriberControllerCompBase::RegisterSubscribtion(
-				const QByteArray& subscriptionId, 
-				const imtgql::CGqlRequest& gqlRequest,  
-				const imtrest::IRequest& networkRequest,
-				QString& errorMessage)
+			const QByteArray& subscriptionId,
+			const imtgql::CGqlRequest& gqlRequest,
+			const imtrest::IRequest& networkRequest,
+			QString& errorMessage)
 {
 	Q_ASSERT(IsRequestSupported(gqlRequest));
 

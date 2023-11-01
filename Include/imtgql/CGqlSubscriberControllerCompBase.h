@@ -34,7 +34,7 @@ public:
 		I_ASSIGN(m_commandPermissionsCompPtr, "CommandPermissions", "Command Permissions", false, "Command Permissions");
 		I_ASSIGN(m_checkPermissionCompPtr, "PermissionChecker", "Checker of the permissions", false, "PermissionChecker");
 		I_ASSIGN(m_translationManagerCompPtr, "TranslationManager", "Translation manager", false, "TranslationManager");
-		I_ASSIGN(m_requestHandlerCompPtr, "GqlRequestHandler", "Graphql request handler to create the subscription body", true, "GqlRequestHandler");
+		I_ASSIGN(m_requestHandlerCompPtr, "GqlRequestHandler", "Graphql request handler to create the subscription body", false, "GqlRequestHandler");
 		I_ASSIGN(m_requestManagerCompPtr, "RequestManager", "Request manager registered for the server", true, "RequestManager");
 		I_ASSIGN(m_requestHandlerCommandIdAtrPtr, "RequestHandlerCommandId", "Request handler commandId to create the subscription body", true, "");
 	I_END_COMPONENT;
@@ -46,21 +46,18 @@ public:
 
 	// reimplemented (imtgql::IGqlSubscriberController)
 	virtual bool RegisterSubscribtion(
-				const QByteArray& subscriptionId, 
-				const imtgql::CGqlRequest& gqlRequest,  
+				const QByteArray& subscriptionId,
+				const imtgql::CGqlRequest& gqlRequest,
 				const imtrest::IRequest& networkRequest,
 				QString& errorMessage) override;
 	virtual bool UnRegisterSubscribtion(const QByteArray& subscriptionId) override;
 
 	// reimplemented (imtrest::CWebSocketRequest::IDestroyObserver)
-	virtual void OnRequestDestroyed(imtrest::CWebSocketRequest* webSocketRequest);	
+	virtual void OnRequestDestroyed(imtrest::CWebSocketRequest* webSocketRequest);
 
 protected:
-	// Abstract methods
 	virtual bool SetSubscriptions();
-
 	virtual bool StartInternalSubscriber(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage);
-
 	virtual iprm::IParamsSet* CreateContextParams(const imtgql::CGqlRequest& gqlRequest) const;
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
