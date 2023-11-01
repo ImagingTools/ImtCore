@@ -23,6 +23,12 @@ public:
 	virtual bool SendResponse(ConstResponsePtr& response) const override;
 	virtual bool SendRequest(ConstRequestPtr& reguest) const override;
 
+public Q_SLOTS:
+	void OnSendTextMessage(const QByteArray& data) const;
+
+Q_SIGNALS:
+	void SendTextMessage(const QByteArray& data) const;
+
 private:
 	QWebSocket* m_webSocketPtr;
 };

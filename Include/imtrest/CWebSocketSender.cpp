@@ -18,8 +18,9 @@ namespace imtrest
 
 CWebSocketSender::CWebSocketSender(QWebSocket* webSocketPtr): m_webSocketPtr(webSocketPtr)
 {
-
+	QObject::connect(this, &CWebSocketSender::SendTextMessage, this, &CWebSocketSender::OnSendTextMessage, Qt::ConnectionType::QueuedConnection);
 }
+
 
 const QWebSocket* CWebSocketSender::GetSocket() const
 {
@@ -45,7 +46,7 @@ bool CWebSocketSender::SendResponse(ConstResponsePtr& response) const
 
 		const QByteArray& contentData = response->GetData();
 
-		m_webSocketPtr->sendTextMessage(contentData);
+		emit SendTextMessage(contentData);
 
 		return true;
 	}
@@ -63,13 +64,25 @@ bool CWebSocketSender::SendRequest(ConstRequestPtr& reguest) const
 
 		const QByteArray& contentData = reguest->GetBody();
 
-		m_webSocketPtr->sendTextMessage(contentData);
+		emit SendTextMessage(contentData);
 
 		return true;
 	}
 
 	return false;
 
+}
+
+
+void CWebSocketSender::OnSendTextMessage(const QByteArray& data) const
+{
+	if (m_webSocketPtr != nullptr){
+		if (!m_webSocketPtr->isValid()){
+			return;
+		}
+
+		m_webSocketPtr->sendTextMessage(data);
+	}
 }
 
 
