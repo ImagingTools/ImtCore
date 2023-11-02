@@ -21,7 +21,7 @@ Flickable{
     property real _movementStartContentY: 0;
 
     Component.onCompleted: {
-        console.log("swipe_children.length:: ", children[0].children.length)
+        //console.log("swipe_children.length:: ", children[0].children.length)
         for(let i = 0; i < children[0].children.length; i++){
             if(orientation == Qt.Horizontal){
                 children[0].children[i].height = height;
@@ -42,8 +42,8 @@ Flickable{
         if(orientation == Qt.Horizontal){
             //console.log("contentX:: ", contentX);
             let coeff = contentX - _movementStartContentX >= 0 ? 1 : -1;
-            if(coeff * (contentX - (currentIndex * height )) >= 0) {
-                cancelFlick();
+            if(coeff * (contentX - ((currentIndex + coeff * 1) * height )) >= 0) {
+                contentX = (currentIndex + coeff * 1) * height;
             }
         }
     }
@@ -52,13 +52,17 @@ Flickable{
         if(orientation == Qt.Vertical){
             //console.log("contentY:: ", contentY);
             let coeff = contentY - _movementStartContentY >= 0 ? 1 : -1;
-            if(coeff * (contentY - (currentIndex * width )) >= 0) {
-                cancelFlick();
+            if(coeff * (contentY - ((currentIndex + coeff * 1) * width )) >= 0) {
+                contentY = (currentIndex + coeff * 1) * width;
             }
         }
     }
 
     onMovementEnded: {
+        correctPosition();
+    }
+
+    function correctPosition(){
         if(orientation == Qt.Horizontal){
             let coeff = contentX - _movementStartContentX >= 0 ? 1 : -1;
 
@@ -108,7 +112,6 @@ Flickable{
 
         }
     }
-
 
     NumberAnimation {
         id: setCoordAnim;
