@@ -134,7 +134,11 @@ bool CRestoringDatabaseControllerComp::EnsureDataExists(const QByteArray& /*data
 
 // reimplemented (imtbase::IBinaryDataProvider)
 
-bool CRestoringDatabaseControllerComp::GetData(QByteArray& data, const QByteArray& dataId) const
+bool CRestoringDatabaseControllerComp::GetData(
+			QByteArray& data,
+			const QByteArray& dataId,
+			qint64 /*readFromPosition*/,
+			qint64 /*readMaxLength*/) const
 {
 	if (!m_databaseLoginSettingsCompPtr.IsValid()){
 		return false;

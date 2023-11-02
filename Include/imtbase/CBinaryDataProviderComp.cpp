@@ -12,10 +12,19 @@ namespace imtbase
 
 // reimplemented (IBinaryDataProvider)
 
-bool CBinaryDataProviderComp::GetData(QByteArray& data, const QByteArray& dataId) const
+bool CBinaryDataProviderComp::GetData(
+			QByteArray& data,
+			const QByteArray& dataId,
+			qint64 readFromPosition,
+			qint64 readMaxLength) const
 {
+	Q_ASSERT(readMaxLength != 0);
+	if (readFromPosition < 0){
+		I_CRITICAL();
+		return false;
+	}
+
 	QByteArray workingFileName = dataId;
-//	QString homeDirPath = *m_homeDirPathAttrPtr;
 	QString homeDirPath;
 
 	if (m_homeDirPathAttrPtr.IsValid()){
@@ -29,15 +38,12 @@ bool CBinaryDataProviderComp::GetData(QByteArray& data, const QByteArray& dataId
 	if (*m_pathsProblemsAutoSolveAttrPtr){
 		int indexOfPathSeparator = -1;
 		QRegularExpression regexp("(.\\/.)");
-
 		QRegularExpressionMatch indexOfPathSeparatorMatch = regexp.match(workingFileName);
-
 		if (indexOfPathSeparatorMatch.hasMatch() && (indexOfPathSeparatorMatch.capturedStart() + 1) != workingFileName.length()){
 			indexOfPathSeparator = indexOfPathSeparatorMatch.capturedStart() + 1;
 		}
 
 		if (indexOfPathSeparator > 0){
-
 			if (QFileInfo(homeDirPath + workingFileName.mid(0,indexOfPathSeparator)).isFile()){
 				workingFileName = workingFileName.remove(0, indexOfPathSeparator);
 			}
@@ -50,7 +56,6 @@ bool CBinaryDataProviderComp::GetData(QByteArray& data, const QByteArray& dataId
 
 	QString destinationEntryPath = homeDirPath + workingFileName;
 	QFileInfo destinationEntry(destinationEntryPath);
-
 	if (destinationEntry.isDir()){
 		return false;
 	}
@@ -67,7 +72,6 @@ bool CBinaryDataProviderComp::GetData(QByteArray& data, const QByteArray& dataId
 		}
 
 		QFile destinationFile(destinationFileAbsoluteFilePath);
-
 		while (!destinationFile.open(QFile::ReadOnly)){
 			QString fileName = destinationEntry.fileName();
 			QString filePath = destinationEntry.filePath();
@@ -86,7 +90,19 @@ bool CBinaryDataProviderComp::GetData(QByteArray& data, const QByteArray& dataId
 			}
 		}
 
-		data = destinationFile.readAll();
+		if (!destinationFile.seek(readFromPosition)){
+			SendErrorMessage(0, QString("Unable to seek in file. File: '%1', pos: %2").arg(destinationFileAbsoluteFilePath, QString::number(readFromPosition)));
+			destinationFile.errorString();
+
+			return false;
+		}
+
+		qint64 readLen = readMaxLength;
+		if (readLen < 0){
+			readLen = std::numeric_limits<qint64>().max();
+		}
+
+		data = destinationFile.read(readLen);
 		destinationFile.close();
 	}
 

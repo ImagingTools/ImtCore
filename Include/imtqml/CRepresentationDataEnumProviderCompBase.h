@@ -26,7 +26,11 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtbase::IBinaryDataProvider)
-	virtual bool GetData(QByteArray& data, const QByteArray& dataId) const override;
+	virtual bool GetData(
+				QByteArray& data,
+				const QByteArray& dataId,
+				qint64 readFromPosition = 0,
+				qint64 readMaxLength = -1) const override;
 
 protected:
 	// abstract methods

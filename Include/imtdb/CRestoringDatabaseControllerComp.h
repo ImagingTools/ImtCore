@@ -42,7 +42,11 @@ public:
 	virtual bool EnsureDataExists(const QByteArray& dataId) const override;
 
 	// reimplemented (imtbase::IBinaryDataProvider)
-	virtual bool GetData(QByteArray& data, const QByteArray& dataId) const override;
+	virtual bool GetData(
+				QByteArray& data,
+				const QByteArray& dataId,
+				qint64 readFromPosition = 0,
+				qint64 readMaxLength = -1) const override;
 
 protected:
 	 bool ExecuteCommand(QProcess& process, const QString& command) const;

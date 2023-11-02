@@ -15,7 +15,11 @@ namespace imtgui
 
 // reimplemented (IBinaryDataProvider)
 
-bool CIconDataProviderComp::GetData(QByteArray& data, const QByteArray& dataId) const
+bool CIconDataProviderComp::GetData(
+			QByteArray& data,
+			const QByteArray& dataId,
+			qint64 /*readFromPosition*/,
+			qint64 /*readMaxLength*/) const
 {
 	QByteArray workingFileName = dataId;
 	QString homeDirPath;

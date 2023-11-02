@@ -25,7 +25,11 @@ namespace imtlicgql
 
 // reimplemented (imtbase::IBinaryDataProvider)
 
-bool CFeaturesExportProviderComp::GetData(QByteArray& data, const QByteArray& dataId) const
+bool CFeaturesExportProviderComp::GetData(
+			QByteArray& data,
+			const QByteArray& dataId,
+			qint64 /*readFromPosition*/,
+			qint64 /*readMaxLength*/) const
 {
 	if (!m_productCollectionCompPtr.IsValid() || !m_featureCollectionCompPtr.IsValid()){
 		SendErrorMessage(0, QString("Internal error."), "CFeaturesExportProviderComp");
