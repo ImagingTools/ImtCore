@@ -75,7 +75,8 @@ Rectangle {
                     color: "red";
                     Text {
                         anchors.centerIn: parent;
-                        text: "red";
+                        font.pixelSize: 14;
+                        text: "SplitView red";
                     }
                 }
 
@@ -87,7 +88,8 @@ Rectangle {
                     color: "green";
                     Text {
                         anchors.centerIn: parent;
-                        text: "green";
+                        font.pixelSize: 14;
+                        text: "SplitView green";
                     }
                 }
 
@@ -99,7 +101,8 @@ Rectangle {
                     color: "yellow";
                     Text {
                         anchors.centerIn: parent;
-                        text: "yellow";
+                        font.pixelSize: 14;
+                        text: "SplitView yellow";
                     }
                 }
 
@@ -108,6 +111,53 @@ Rectangle {
 
         }//splitViewContainer
 
+        Rectangle{
+            id: swipeViewContainer;
+
+            anchors.horizontalCenter: parent.horizontalCenter;
+
+            width: 300;
+            height: 300;
+            color: "transparent";
+            border.color: "lightgreen";
+            SwipeView{
+                id: swipeView;
+
+                anchors.centerIn: parent;
+
+                width: parent.width - 8;
+                height: parent.height - 8;
+
+                //orientation: Qt.Vertical;
+
+                Rectangle{
+                    color: "red";
+                    Text {
+                        anchors.centerIn: parent;
+                        font.pixelSize: 14;
+                        text: "SwipeView red";
+                    }
+                }
+
+                Rectangle{
+                    color: "green";
+                    Text {
+                        anchors.centerIn: parent;
+                        font.pixelSize: 14;
+                        text: "SwipeView green";
+                    }
+                }
+
+                Rectangle{
+                    color: "yellow";
+                    Text {
+                        anchors.centerIn: parent;
+                        font.pixelSize: 14;
+                        text: "SwipeView yellow";
+                    }
+                }
+            }
+        }//SwipeView
 
 //        Item{//testElement
 //            id: testElement;
