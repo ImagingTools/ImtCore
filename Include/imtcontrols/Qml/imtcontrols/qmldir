@@ -124,6 +124,7 @@ TreeViewModelAdapter 1.0 ./Views/TreeViewModelAdapter.qml
 TreeViewSelection 1.0 ./Views/TreeViewSelection.qml
 ProgressBar 1.0 ./Views/ProgressBar.qml
 SplitView 1.0 ./Views/SplitView.qml
+SwipeView 1.0 ./Views/SwipeView.qml
 CollectionViewBase 1.0 ./Views/Base/CollectionViewBase.qml
 CollectionViewBaseGqlModels 1.0 ./Views/Base/CollectionViewBaseGqlModels.qml
 GridCollectionViewBase 1.0 ./Views/Base/GridCollectionViewBase.qml
