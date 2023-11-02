@@ -120,10 +120,22 @@ ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
 		}
 	}
 
-	bool loadRes = false;
+	bool isDataLoaded = false;
 
 	for (int i = 0; i < m_binaryDataProvidersCompPtr.GetCount(); ++i){
-		if ((loadRes = (m_binaryDataProvidersCompPtr[i]->GetData(body, commandIdFileName)))){
+		qint64 offset = 0;
+		const QByteArray offsetIdParam = m_offsetIdCommandParamAttrPtr->GetValue().toUtf8();
+		if (commandParams.contains(offsetIdParam)){
+			offset = commandParams[offsetIdParam].toLongLong();
+		}
+		qint64 limit = -1;
+		const QByteArray limitIdParam = m_limitIdCommandParamAttrPtr->GetValue().toUtf8();
+		if (commandParams.contains(limitIdParam)){
+			limit = commandParams[limitIdParam].toLongLong();
+		}
+
+		isDataLoaded = (m_binaryDataProvidersCompPtr[i]->GetData(body, commandIdFileName, offset, limit));
+		if (isDataLoaded){
 			QByteArray fileSuffix;
 			int index = commandIdFileName.lastIndexOf('.');
 			if (index > 0){
@@ -137,7 +149,7 @@ ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
 
 	ConstResponsePtr responsePtr;
 
-	if (loadRes){
+	if (isDataLoaded){
 		responsePtr = ConstResponsePtr(engine.CreateResponse(request, IProtocolEngine::SC_OK, body, reponseTypeId));
 	}
 	else{

@@ -33,6 +33,8 @@ public:
 	I_BEGIN_COMPONENT(CHttpFileProviderBasedServletComp);
 		I_REGISTER_INTERFACE(IRequestServlet);
 		I_ASSIGN(m_fileIdCommandParamAttrPtr, "FileIdCommandParam", "The command param for data providers", true, "FileId");
+		I_ASSIGN(m_limitIdCommandParamAttrPtr, "LimitIdCommandParam", "Defines maximum size of data to be read", true, "Limit");
+		I_ASSIGN(m_offsetIdCommandParamAttrPtr, "OffsetIdCommandParam", "Defines the position to start reading data", true, "Offset");
 
 		I_ASSIGN_MULTI_0(m_binaryDataProvidersCompPtr, "BinaryDataProviders", "Binary data providers", true);
 	I_END_COMPONENT
@@ -49,6 +51,8 @@ public:
 
 protected:
 	I_ATTR(QString, m_fileIdCommandParamAttrPtr);
+	I_ATTR(QString, m_limitIdCommandParamAttrPtr);
+	I_ATTR(QString, m_offsetIdCommandParamAttrPtr);
 	I_MULTIREF(imtbase::IBinaryDataProvider, m_binaryDataProvidersCompPtr);
 
 private:
