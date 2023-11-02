@@ -6,7 +6,7 @@ import imtcontrols 1.0
 
 
 Rectangle {
-    id: buttonsRepresentaitonPage;
+    id: viewsRepresentaitonPage;
 
     anchors.fill: parent;
 
@@ -15,23 +15,23 @@ Rectangle {
     property bool isQtStyle: false;
 
     Component.onCompleted: {
-        Events.subscribeEvent("QtStyle", buttonsRepresentaitonPage.setQtStyle);
-        Events.subscribeEvent("AcfStyle", buttonsRepresentaitonPage.setAcfStyle);
+        Events.subscribeEvent("QtStyle", viewsRepresentaitonPage.setQtStyle);
+        Events.subscribeEvent("AcfStyle", viewsRepresentaitonPage.setAcfStyle);
 
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("QtStyle", buttonsRepresentaitonPage.setQtStyle);
-        Events.unSubscribeEvent("AcfStyle", buttonsRepresentaitonPage.setAcfStyle);
+        Events.unSubscribeEvent("QtStyle", viewsRepresentaitonPage.setQtStyle);
+        Events.unSubscribeEvent("AcfStyle", viewsRepresentaitonPage.setAcfStyle);
 
     }
 
     function setQtStyle(){
-        buttonsRepresentaitonPage.isQtStyle = true;
+        viewsRepresentaitonPage.isQtStyle = true;
     }
 
     function setAcfStyle(){
-        buttonsRepresentaitonPage.isQtStyle = false;
+        viewsRepresentaitonPage.isQtStyle = false;
     }
 
     Column{
