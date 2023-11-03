@@ -365,10 +365,16 @@ Item {
 
     Component {
         id: progressBarDecoratorComp;
-        Item {
+        ProgressBar {
             id: progressBarItem;
 
             property var baseElement: null;
+
+            indeterminate: !baseElement ? false : baseElement.indeterminate;
+            from: !baseElement ? 0.0 : baseElement.from;
+            to: !baseElement ? 0.0 : baseElement.to;
+            value: !baseElement ? 0.0 : baseElement.value;
+
         }
     }
 
