@@ -248,7 +248,10 @@ Row{
             MouseArea {
                 id: splitterMA;
 
-                anchors.fill: parent;
+                anchors.centerIn: parent;
+
+                width: parent.width * 10;
+                height: parent.height;
 
                 hoverEnabled: true;
                 acceptedButtons: Qt.LeftButton;
@@ -313,7 +316,10 @@ Row{
             MouseArea {
                 id: splitterMAForVert;
 
-                anchors.fill: parent;
+                anchors.centerIn: parent;
+
+                width: parent.width;
+                height: parent.height * 10;
 
                 hoverEnabled: true;
                 acceptedButtons: Qt.LeftButton;
