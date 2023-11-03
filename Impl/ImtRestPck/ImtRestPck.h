@@ -20,6 +20,7 @@
 #include <imtrest/CHttpClientRequest.h>
 #include <imtrest/CHttpClientComp.h>
 #include <imtrest/CWorkerManagerComp.h>
+#include <imtrest/CServerLogDataProviderComp.h>
 
 
 /**
@@ -43,7 +44,7 @@ typedef imtrest::CHttpFileControllerServletComp HttpFileControllerServlet;
 typedef imtrest::CHttpClientComp HttpClientRequestManager;
 typedef icomp::TModelCompWrap<icomp::TMakeComponentWrap<imtrest::CHttpClientRequest>> HttpClientRequestFactory;
 typedef imtrest::CWorkerManagerComp WorkerManaqer;
-
+typedef imtrest::CServerLogDataProviderComp ServerLogDataProvider;
 
 
 } // namespace ImtRestPck

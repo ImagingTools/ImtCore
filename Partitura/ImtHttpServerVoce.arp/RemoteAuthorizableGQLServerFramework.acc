@@ -117,5 +117,6 @@
     <ExportedComponents>
         <Component ExportedId="LogFileDataProvider" ComponentId="GraphQlServerFramework/LogFileDataProvider"/>
         <Component ExportedId="RestoringDatabaseController" ComponentId="GraphQlServerFramework/RestoringDatabaseController"/>
+        <Component ExportedId="ServerLogDataProvider" ComponentId="GraphQlServerFramework/ServerLogDataProvider"/>
     </ExportedComponents>
 </Acf>

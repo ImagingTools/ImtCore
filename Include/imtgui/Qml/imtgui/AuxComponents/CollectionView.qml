@@ -444,7 +444,7 @@ Item {
         Rectangle {
             anchors.fill: parent;
 
-            color: "#ACE5EE";
+            color: Style.selectedColor;
 
             Image {
                 id: icon;

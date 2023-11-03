@@ -2,14 +2,15 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5102" Description="ACF"/>
-            <Version Id="1" Number="2194" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5126" Description="ACF"/>
+            <Version Id="1" Number="2197" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="NetworkSettings" X="575" Y="200" Note=""/>
-        <Element ComponentName="ServerUrl" X="575" Y="375" Note=""/>
+        <Element ComponentName="ServerUrl" X="900" Y="375" Note=""/>
+        <Element ComponentName="WebSocketServerUrl" X="300" Y="375" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

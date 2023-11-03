@@ -33,6 +33,12 @@ TreeItemModelObserver {
                 let newServerUrl = changeObj["newVal"];
                 container.onServerUrlChanged(newServerUrl);
             }
+            else if (ids.includes("WebSocketServerUrl")){
+                if (container.settingsProvider != null){
+                    let newVal = changeObj["newVal"];
+                    container.settingsProvider.setWebSocketServerUrl(newVal);
+                }
+            }
         }
     }
 

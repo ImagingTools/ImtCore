@@ -282,6 +282,12 @@ QtObject {
         container.localSettingsSaved();
     }
 
+    function setWebSocketServerUrl(webSocketServerUrl){
+        private_.setValueToLocalModel("NetworkSettings", "WebSocketServerUrl", webSocketServerUrl);
+
+        container.localSettingsSaved();
+    }
+
     function cacheServerModel(){
         container.rewriteModel(container.serverModel, container.localModel);
         container.localSettingsSaved();

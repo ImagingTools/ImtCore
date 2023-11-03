@@ -168,6 +168,21 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="ServerLogDataProvider" PackageId="ImtRestPck" ComponentId="ServerLogDataProvider">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Command-ID" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="GetServerLog"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HomePath" Type="Reference" ExportId="LogPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="ServerLogFileAccess" PackageId="ImtRestPck" ComponentId="HttpFileControllerServlet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -183,6 +198,7 @@
                             <Values>
                                 <Value>LogFileDataProvider</Value>
                                 <Value>RestoringDatabaseController</Value>
+                                <Value>ServerLogDataProvider</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -231,5 +247,6 @@
     <ExportedComponents>
         <Component ExportedId="LogFileDataProvider" ComponentId="LogFileDataProvider"/>
         <Component ExportedId="RestoringDatabaseController" ComponentId="RestoringDatabaseController"/>
+        <Component ExportedId="ServerLogDataProvider" ComponentId="ServerLogDataProvider"/>
     </ExportedComponents>
 </Acf>

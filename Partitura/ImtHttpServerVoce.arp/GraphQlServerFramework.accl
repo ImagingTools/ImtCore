@@ -12,10 +12,11 @@
         <Element ComponentName="HttpRedirect" X="150" Y="75" Note="HTTP redirect component used for web applications"/>
         <Element ComponentName="HttpRootHandler" X="600" Y="375" Note=""/>
         <Element ComponentName="IconDataProvider" X="800" Y="50" Note=""/>
-        <Element ComponentName="LogFileDataProvider" X="1050" Y="675" Note=""/>
+        <Element ComponentName="LogFileDataProvider" X="550" Y="550" Note=""/>
         <Element ComponentName="ResourcesPath" X="550" Y="125" Note=""/>
         <Element ComponentName="RessourcesProvider" X="800" Y="200" Note=""/>
         <Element ComponentName="RestoringDatabaseController" X="750" Y="675" Note=""/>
+        <Element ComponentName="ServerLogDataProvider" X="1050" Y="675" Note=""/>
         <Element ComponentName="ServerLogFileAccess" X="1050" Y="550" Note=""/>
         <Element ComponentName="WebResourcesServlet" X="1075" Y="125" Note="Handler for all compiled resources of the application. Primary used in the web application"/>
     </PositionMap>

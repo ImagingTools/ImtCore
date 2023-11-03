@@ -13,6 +13,10 @@ WebSocket {
     onStatusChanged: {
         console.log("SubscriptionManager onStatusChanged", status)
 
+        if (status == WebSocket.Error){
+            console.error("SubscriptionManager ERROR", errorString)
+        }
+
         if (status == WebSocket.Open){
             sendTextMessage("{ \"type\": \"connection_init\" }")
         }

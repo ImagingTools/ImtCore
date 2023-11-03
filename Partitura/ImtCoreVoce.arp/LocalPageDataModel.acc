@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5082" Description="ACF"/>
-            <Version Id="1" Number="2187" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5126" Description="ACF"/>
+            <Version Id="1" Number="2197" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -17,6 +17,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>ServerUrl</Value>
+                                <Value>WebSocketServerUr</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -24,6 +25,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>ServerUrl</Value>
+                                <Value>WebSocketServerUrl</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -34,6 +36,15 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DefaultText" Type="Text" ExportId="DefaultServerUrl">
+                        <Data IsEnabled="true" Value="localhost"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="WebSocketServerUr" PackageId="BasePck" ComponentId="TextParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultText" Type="Text" ExportId="DefaultWebSocketServerUrl">
                         <Data IsEnabled="true" Value="localhost"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

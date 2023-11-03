@@ -82,7 +82,12 @@ I_EXPORT_COMPONENT(
 I_EXPORT_COMPONENT(
 		WorkerManaqer,
 		"The manager of request handlers factory for 'CMultiThreadServer' ",
-        "Rest Http Handler Request Factory");
+		"Rest Http Handler Request Factory");
+
+I_EXPORT_COMPONENT(
+		ServerLogDataProvider,
+		"Component for providing the server log",
+		"Server Log Provider");
 
 
 } // namespace ImtRestPck
