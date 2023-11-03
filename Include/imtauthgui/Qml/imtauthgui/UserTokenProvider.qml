@@ -15,6 +15,20 @@ QtObject {
 
     property string modelState: container.authorizationGqlModel.state;
 
+    Component.onCompleted: {
+        Events.subscribeEvent("GetToken", container.getToken);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("GetToken", container.getToken);
+    }
+
+    function getToken(callback){
+        if (callback){
+            callback(token);
+        }
+    }
+
     function authorization(loginF, passwordF){
         container.authorizationGqlModel.authorization(loginF, passwordF);
     }
@@ -37,7 +51,12 @@ QtObject {
 
         onStateChanged: {
             console.log("User Token State:", this.state, container.authorizationGqlModel.toJSON());
-            if (this.state === "Ready"){
+
+            if (this.state === "NetworkError"){
+                let message = qsTr("There was a problem when trying to access the server. Check your network connection or contact your system administrator.");
+                Events.sendEvent("SendError", {"Message": message, "ErrorType": "Warning"})
+            }
+            else if (this.state === "Ready"){
                 var dataModelLocal;
 
                 if (container.authorizationGqlModel.ContainsKey("errors")){

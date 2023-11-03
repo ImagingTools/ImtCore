@@ -27,8 +27,6 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			const HeadersMap& headers,
 			const imtrest::CHttpRequest& request) const
 {
-//	imtgql::CGqlRequest gqlRequest;
-
 	m_gqlRequest.ResetData();
 
 	int errorPosition = -1;

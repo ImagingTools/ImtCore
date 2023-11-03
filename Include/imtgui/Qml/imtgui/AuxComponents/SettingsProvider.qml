@@ -310,6 +310,34 @@ QtObject {
         }
     }
 
+    function getValue(parameterId){
+        console.log("getValue", parameterId);
+        let settingsModel = getRepresentationModel();
+        console.log("settingsModel", settingsModel.toJSON());
+
+        return findValue(settingsModel, parameterId);
+    }
+
+    function findValue(model, parameterId){
+        for (let i = 0; i < model.GetItemsCount(); i++){
+            let paramId = model.GetData("Id", i);
+            if (String(paramId) === String(parameterId)){
+                return model.GetData("Value", i)
+            }
+
+            if (model.ContainsKey("Parameters", i)){
+                let parameters = model.GetData("Parameters", i);
+
+                let result = findValue(parameters, parameterId);
+                if (result !== ""){
+                    return result;
+                }
+            }
+        }
+
+        return "";
+    }
+
     property GqlModel settingsQuery: GqlModel {
         function getSettings() {
             console.log("GetSettings");

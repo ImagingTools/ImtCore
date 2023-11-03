@@ -184,7 +184,7 @@ Item {
     onRenamed: {
         containerBase.documentManager.setDocumentTitle({"Id": id, "Title": newName});
 
-        containerBase.collectionViewBase.updateGui();
+//        containerBase.collectionViewBase.updateGui();
     }
 
     onRemoved: {
@@ -193,11 +193,11 @@ Item {
             containerBase.documentManager.closeDocument(id, true);
         }
 
-        containerBase.collectionViewBase.updateGui();
+//        containerBase.collectionViewBase.updateGui();
     }
 
     onDescriptionSetted: {
-        containerBase.collectionViewBase.updateGui();
+//        containerBase.collectionViewBase.updateGui();
     }
 
     Component {
@@ -250,6 +250,12 @@ Item {
         InputDialog {
             title: qsTr("Set description");
             onFinished: {
+                let elements = containerBase.tableData.elements;
+                let indexes = containerBase.tableData.getSelectedIndexes();
+                if (indexes.length === 1){
+                    elements.SetData(containerBase.descriptionFieldId, inputValue);
+                }
+
                 if (buttonId == "Ok"){
                     setDescriptionQuery.setDescription(inputValue);
                 }

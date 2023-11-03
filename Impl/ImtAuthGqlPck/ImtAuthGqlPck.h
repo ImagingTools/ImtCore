@@ -22,6 +22,8 @@
 #include <imtauthgql/CSimpleLoginWrapComp.h>
 #include <imtauthgql/CCollectionUserInfoProviderComp.h>
 #include <imtauthgql/CRemotePermissionCheckerComp.h>
+#include <imtauthgql/CSessionModelObserverComp.h>
+#include <imtauthgql/CSessionModelSubscriberControllerComp.h>
 
 
 /**
@@ -47,6 +49,8 @@ typedef imtauthgql::CRemoteSuperuserControllerComp RemoteSuperuserController;
 typedef imtauthgql::CCollectionUserInfoProviderComp CollectionUserInfoProvider;
 typedef icomp::TModelCompWrap<imtauthgql::CSimpleLoginWrapComp> SimpleLoginWrap;
 typedef imtauthgql::CRemotePermissionCheckerComp RemotePermissionChecker;
+typedef imtauthgql::CSessionModelObserverComp SessionModelObserver;
+typedef imtauthgql::CSessionModelSubscriberControllerComp SessionModelSubscriberController;
 
 
 } // namespace ImtAuthGqlPck

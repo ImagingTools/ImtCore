@@ -119,10 +119,10 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		QString errorMessage;
 		if (subscriberControllerPtr->RegisterSubscribtion(webSocketRequest->GetSubscriptionId(), gqlRequest, request, errorMessage)){
 			QByteArray data = QString(R""(
-{
-"type": "start_ack",
-"id": "%1"
-}
+				{
+				"type": "start_ack",
+				"id": "%1"
+				}
 				)"" ).arg(QString(webSocketRequest->GetSubscriptionId())).toUtf8();
 			
 				return CreateDataResponse(data, request);
@@ -152,10 +152,10 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 		if ((controlerPtr != nullptr) && m_gqlSubscriberControllersCompPtr[index]->UnRegisterSubscribtion(webSocketRequest->GetSubscriptionId())){
 
 			QByteArray data = QString(R""(
-{
-"type": "stop",
-"id": "%1"
-}
+				{
+				"type": "stop",
+				"id": "%1"
+				}
 			)"" ).arg(QString(webSocketRequest->GetSubscriptionId())).toUtf8();
 			
 			return CreateDataResponse(data, request);

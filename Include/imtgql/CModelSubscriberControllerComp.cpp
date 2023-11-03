@@ -2,6 +2,7 @@
 
 
 // ImtCore includes
+#include<imtbase/IOperationContext.h>
 #include<imtrest/IProtocolEngine.h>
 
 
@@ -23,9 +24,9 @@ bool CModelSubscriberControllerComp::SetSubscriptions()
 			QByteArray body = QString(R"(
 										{
 											"type": "data",
-											"id": %1,
+											"id": "%1",
 											"payload": {
-												"data": %2
+												"data": "%2"
 											}
 										})")
 								.arg(QString(id))

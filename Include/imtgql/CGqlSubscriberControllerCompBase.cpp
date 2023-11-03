@@ -50,6 +50,13 @@ bool CGqlSubscriberControllerCompBase::RegisterSubscribtion(
 		return false;
 	}
 
+	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
+	if (gqlContextPtr != nullptr){
+		QByteArray token = gqlContextPtr->GetToken();
+
+		qDebug() << token;
+	}
+
 	if(CheckPermissions(gqlRequest, errorMessage)){
 		const imtrest::CWebSocketRequest* constWebSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&networkRequest);
 		imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<imtrest::CWebSocketRequest*>(const_cast<imtrest::CWebSocketRequest*>(constWebSocketRequest));

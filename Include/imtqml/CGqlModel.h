@@ -28,7 +28,6 @@ public:
 public Q_SLOTS:
 	bool SetGqlQuery(QString query);
 	void replyFinished();
-
 	static void SetGlobalAccessToken(const QString& accessToken);
 
 private:

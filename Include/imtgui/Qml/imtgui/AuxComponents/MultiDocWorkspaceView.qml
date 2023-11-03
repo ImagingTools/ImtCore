@@ -27,6 +27,8 @@ Item {
 
     property MainDocumentManager mainDocumentManager: null;
 
+    property alias alertPanelComp: alertPanel.sourceComponent;
+
     Component.onCompleted: {
         Events.subscribeEvent("DocumentIsDirtyChanged", workspaceView.documentIsDirtyChanged);
         Events.subscribeEvent("DocumentUpdating", workspaceView.documentUpdating);
@@ -214,7 +216,7 @@ Item {
         }
 
         if (workspaceView.mainCollectionView != null){
-            workspaceView.mainCollectionView.updateGui();
+//            workspaceView.mainCollectionView.updateGui();
         }
     }
 
@@ -459,7 +461,7 @@ Item {
     function showAlertMessage(message){
         alertMessage.message = message;
 
-        alertMessage.visible = true;
+//        alertMessage.visible = true;
     }
 
     function hideAlertMessage(){
@@ -477,10 +479,21 @@ Item {
         visible: false;
     }
 
+    Loader {
+        id: alertPanel;
+
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+
+        height: visible ? 40: 0;
+
+        visible: alertPanel.status == Loader.Ready;
+    }
+
     TabPanel {
         id: tabPanelInternal;
 
-        anchors.top: alertMessage.bottom;
+        anchors.top: alertPanel.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
 
@@ -514,25 +527,6 @@ Item {
 
         onDocumentModelChanged: {
             if (documentController.documentModel != null){
-//                let documentId = documentController.documentModel.GetData("Id");
-//                if (documentId !== ""){
-//                    for (let i = 0; i < workspaceView.documentsData.GetItemsCount(); i++){
-//                        let id = workspaceView.documentsData.GetData("Id", i);
-//                        if (id === documentId){
-//                            if (workspaceView.documentsData.ContainsKey("Item", i)){
-//                                let item = workspaceView.documentsData.GetData("Item", i);
-//                                item.documentModel = documentController.documentModel;
-
-//                                break;
-//                            }
-//                        }
-//                    }
-//                }
-//                else{
-//                    let item = workspaceView.documentsData.GetData("Item", tabPanelInternal.selectedIndex);
-//                    item.documentModel = documentController.documentModel;
-//                }
-
                 let item = workspaceView.documentsData.GetData("Item", tabPanelInternal.selectedIndex);
                 item.documentModel = documentController.documentModel;
             }
@@ -639,10 +633,6 @@ Item {
                     if (dataLoader.item.documentUuid !== undefined){
                         workspaceView.documentsData.SetData("DocumentUuid", dataLoader.item.documentUuid);
                     }
-//                    if (model.Id === ""){
-//                        model.Id = dataLoader.item.documentUuid;
-//                        dataLoader.item.itemId = dataLoader.item.documentUuid;
-//                    }
                 }
             }
         }

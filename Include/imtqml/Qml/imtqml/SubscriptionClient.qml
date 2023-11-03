@@ -6,11 +6,9 @@ GqlModel {
     id: container;
     property string subscriptionId;
 
-//    UuidGenerator {
-//        id: uuidGenerator;
-//    }
+    property UuidGenerator uuidGenerator: UuidGenerator {}
 
     Component.onCompleted: {
-        subscriptionId = "1111111" //uuidGenerator.generateUUID();
+        subscriptionId = uuidGenerator.generateUUID();
     }
 }

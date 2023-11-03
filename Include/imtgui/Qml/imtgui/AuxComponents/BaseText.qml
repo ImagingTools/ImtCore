@@ -8,6 +8,8 @@ Text {
     font.family: Style.fontFamily;
     font.pixelSize: Style.fontSize_common;
 
+    elide: Text.ElideRight;
+
     Component{
         id: emptyDecorator;
         Item{

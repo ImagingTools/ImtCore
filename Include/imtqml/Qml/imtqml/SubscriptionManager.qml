@@ -11,6 +11,8 @@ WebSocket {
     property var subscriptionModel: []
 
     onStatusChanged: {
+        console.log("SubscriptionManager onStatusChanged", status)
+
         if (status == WebSocket.Open){
             sendTextMessage("{ \"type\": \"connection_init\" }")
         }
@@ -21,7 +23,6 @@ WebSocket {
             }
         }
     }
-
 
     function registerSubscription(query, subscriptionClient){
         let index
@@ -62,13 +63,18 @@ WebSocket {
     property TreeItemModel socketModel: TreeItemModel {}
 
     onTextMessageReceived:{
-        console.log("onTextMessageReceived", message)
-        socketModel.CreateFromJson(message)
+        console.log("SubscriptionManager onTextMessageReceived", message)
+        let ok = socketModel.CreateFromJson(message)
+
+        if (ok){
+            console.log("socketModel", socketModel.toJSON())
+        }
+
         if (socketModel.GetData("type") == "connection_ack"){
             registerSubscriptionToServer()
         }
         else if (socketModel.GetData("type") == "start_ack"){
-            for (index = 0; index < subscriptionModel.length; index++){
+            for (let index = 0; index < subscriptionModel.length; index++){
                 if (subscriptionModel[index]["subscriptionId"] == socketModel.GetData("id")){
                     let subscription = subscriptionModel[index]["subscription"]
                     subscriptionModel[index]["status"] = "registered"
@@ -77,7 +83,7 @@ WebSocket {
             }
         }
         else if (socketModel.GetData("type") == "data"){
-            for (index = 0; index < subscriptionModel.length; index++){
+            for (let index = 0; index < subscriptionModel.length; index++){
                 if (subscriptionModel[index]["subscriptionId"] == socketModel.GetData("id")){
                     let subscription = subscriptionModel[index]["subscription"]
                     subscription.state = "Processing"
@@ -91,11 +97,10 @@ WebSocket {
                 }
             }
         }
-
     }
 
-
     function registerSubscriptionToServer(){
+        console.log("SubscriptionManager registerSubscriptionToServer")
         if (container.status != WebSocket.Open){
             return;
         }

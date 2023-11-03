@@ -94,6 +94,11 @@ I_EXPORT_COMPONENT(
 			"Subscriprion controller for object collection",
 			"Subscriprion Subscriber Collection ObjectCollection");
 
+I_EXPORT_COMPONENT(
+			ModelSubscriberController,
+			"Model subscriber controller",
+			"Model Subscriber Collection");
+
 
 } // namespace ImtGqlPck
 

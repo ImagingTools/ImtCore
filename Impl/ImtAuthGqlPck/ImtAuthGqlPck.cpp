@@ -94,6 +94,16 @@ I_EXPORT_COMPONENT(
 			"Remote permission ckecker",
 			"Remote Permission Checker");
 
+I_EXPORT_COMPONENT(
+			SessionModelObserver,
+			"Session model observer",
+			"Session Model Observer");
+
+I_EXPORT_COMPONENT(
+			SessionModelSubscriberController,
+			"Session subscriber controller",
+			"Session Subscriber Subscription Controller");
+
 
 } // namespace ImtAuthGqlPck
 

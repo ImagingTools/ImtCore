@@ -59,8 +59,15 @@ bool CGqlModel::SetGqlQuery(QString query)
 
 void CGqlModel::replyFinished()
 {
+	qDebug() << QString("replyFinished");
+
 	QNetworkReply* reply = dynamic_cast<QNetworkReply*>(sender());
 	if(reply){
+//		QNetworkReply::NetworkError error = reply->error();
+//		if (error != QNetworkReply::NetworkError::NoError){
+//			SetState("NetworkError");
+//		}
+
 		QByteArray representationData = reply->readAll();
 		qDebug() << representationData;
 
@@ -75,7 +82,6 @@ void CGqlModel::replyFinished()
 		else{
 			SetState("Error");
 		}
-
 		reply->deleteLater();
 	}
 }

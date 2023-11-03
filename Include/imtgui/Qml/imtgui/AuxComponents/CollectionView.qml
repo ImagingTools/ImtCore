@@ -55,6 +55,9 @@ Item {
 
     property alias commandsProvider: commandsProviderLocal;
 
+    property bool hasRemoteChanges: false;
+    property bool isLocalChanges: false;
+
     signal elementsChanged();
     signal headersChanged();
 
@@ -71,6 +74,12 @@ Item {
         Events.unSubscribeEvent("OnLocalizationChanged", collectionViewContainer.onLocalizationChanged);
         Events.unSubscribeEvent(collectionViewContainer.commandUpdateGui, collectionViewContainer.updateGui);
         Events.unSubscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
+    }
+
+    onHasRemoteChangesChanged: {
+        if (visible && hasRemoteChanges){
+            setAlertPanel(alertPanelComp)
+        }
     }
 
     property bool localizationChanged: false;
@@ -117,9 +126,17 @@ Item {
 
                 localizationChanged = false;
             }
+
+            if (hasRemoteChanges){
+                setAlertPanel(alertPanelComp);
+            }
         }
         else{
             Events.unSubscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
+
+            if (hasRemoteChanges){
+                setAlertPanel(undefined);
+            }
         }
     }
 
@@ -378,23 +395,105 @@ Item {
         visible: collectionViewContainer.visibleMetaInfo;
     }
 
-//    DocumentHistoryProvider {
-//        id: documentHistoryProvider;
+    SubscriptionClient {
+        id: subscriptionClient;
 
-//        onHistoryModelChanged: {
-//            console.log("onHistoryModelChanged", historyModel.toJSON());
+        property string commandId: collectionViewContainer.commandsId;
+        onCommandIdChanged: {
+            if (commandId !== ""){
+                let subscriptionRequestId = "On" + commandId + "CollectionChanged"
+                var query = Gql.GqlRequest("subscription", subscriptionRequestId);
+                var queryFields = Gql.GqlObject("notification");
+                queryFields.InsertField("Id");
+                query.AddField(queryFields);
+                subscriptionManager.registerSubscription(query, subscriptionClient);
+            }
+        }
 
-//            documentHistoryView.historyModel = historyModel;
-//        }
-//    }
+        onStateChanged: {
+            console.log("SubscriptionClient onStateChanged", state);
 
-//    DocumentHistoryView {
-//        id: documentHistoryView;
+            if (state === "Ready"){
+                if (subscriptionClient.ContainsKey("data")){
+                    let dataModelLocal = subscriptionClient.GetData("data")
+                    if (dataModelLocal.ContainsKey("token")){
+                        let accessToken = dataModelLocal.GetData("token");
+                        Events.sendEvent("GetToken", function (token){
+                            if (String(token) == String(accessToken)){
+                                collectionViewContainer.updateGui();
+                            }
+                            else{
+                                collectionViewContainer.hasRemoteChanges = true;
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    }
 
-//        anchors.right: parent.right;
+    function setAlertPanel(alertPanelComp){
+        if (collectionViewContainer.documentManager != null){
+            collectionViewContainer.documentManager.alertPanelComp = alertPanelComp;
+        }
+    }
 
-//        width: visible ? 200 : 1;
-//        height: parent.height;
-//    }
+    Component {
+        id: alertPanelComp;
+
+        Rectangle {
+            anchors.fill: parent;
+
+            color: "#ACE5EE";
+
+            Image {
+                id: icon;
+
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: parent.left;
+                anchors.leftMargin: 10;
+
+                width: 20;
+                height: 20;
+
+                sourceSize.height: height;
+                sourceSize.width: width;
+
+                source: "../../../" + Style.getIconPath("Icons/Lamp", Icon.State.On, Icon.Mode.Normal);
+            }
+
+            BaseText {
+                id: message;
+
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: icon.right;
+                anchors.leftMargin: 10;
+                anchors.right: updateButton.left;
+
+                text: qsTr("The collection has remote changes");
+            }
+
+            BaseButton {
+                id: updateButton;
+
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.right: parent.right;
+                anchors.rightMargin: 10;
+
+                width: 70;
+                height: 30;
+
+                text: qsTr("Update");
+
+                onClicked: {
+                    collectionViewContainer.updateGui();
+
+                    collectionViewContainer.hasRemoteChanges = false;
+
+                    collectionViewContainer.documentManager.alertPanelComp = undefined;
+                }
+            }
+        }
+    }
 }
 
