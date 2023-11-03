@@ -57,6 +57,9 @@ void CWebSocketServerComp::OnComponentCreated()
 			}
 		}
 	}
+
+	connect(&m_timer, &QTimer::timeout, this, &CWebSocketServerComp::OnTimeout);
+	m_timer.start(10000);
 }
 
 
@@ -196,6 +199,19 @@ void CWebSocketServerComp::OnError(QAbstractSocket::SocketError error)
 
 		SendErrorMessage(0, errorMessage, "CWebSocketServerComp");
 		qDebug() << errorMessage;
+	}
+}
+
+
+void CWebSocketServerComp::OnTimeout()
+{
+	for (const QByteArray& key: m_senders.keys()){
+		if (!m_senders[key].isNull()){
+			QWebSocket* webSocketPtr = const_cast<QWebSocket*>(m_senders[key]->GetSocket());
+			if (webSocketPtr != nullptr){
+				webSocketPtr->sendTextMessage(QString(R"({"type": "keep_alive"})"));
+			}
+		}
 	}
 }
 

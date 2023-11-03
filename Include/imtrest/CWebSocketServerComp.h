@@ -65,6 +65,13 @@ private Q_SLOTS:
 	void OnWebSocketTextMessage(const QString& textMessage);
 	void OnWebSocketBinaryMessage(const QByteArray& dataMessage);
 	void OnError(QAbstractSocket::SocketError error);
+	void OnTimeout();
+
+protected:
+	QTimer m_timer;
+	typedef QVector<QWebSocketServer*> Servers;
+	Servers m_servers;
+	QMap <QByteArray, QSharedPointer<CWebSocketSender>> m_senders;
 
 private:
 	I_REF(imtrest::IRequestServlet, m_requestHandlerCompPtr);
@@ -74,12 +81,6 @@ private:
 	I_ATTR(int, m_serverPortAttrPtr);
 	I_ATTR(bool, m_startServerOnCreateAttrPtr);
 	I_REF(iprm::ITextParam, m_webSocketServerPortCompPtr);
-
-	typedef QVector<QWebSocketServer*> Servers;
-
-	Servers m_servers;
-
-	QMap <QByteArray, QSharedPointer<CWebSocketSender>> m_senders;
 };
 
 
