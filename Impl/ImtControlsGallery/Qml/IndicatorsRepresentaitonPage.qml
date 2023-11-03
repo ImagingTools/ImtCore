@@ -42,6 +42,63 @@ Rectangle {
         width: parent.width;
         spacing: 100;
 
+        Row{
+            id: progressBarRow;
+
+            anchors.horizontalCenter: parent.horizontalCenter;
+
+            height:  100;
+            spacing: 100;
+
+            ProgressBar{
+                id: progressBar1;
+
+                anchors.verticalCenter:  parent.verticalCenter;
+
+                from: 10; to: 110;
+                value: 40;
+                text: value + " единиц (" + percent + " %)";
+
+                decoratorComponent: indicatorsRepresentaitonPage.isQtStyle ? DecoratorsQt.progressBarDecorator :
+                                                                      Decorators.progressBarDecorator;
+
+            }
+
+            ProgressBar{
+                id: progressBar2;
+
+                anchors.verticalCenter:  parent.verticalCenter;
+
+                from: 10; to: 110;
+                value: 60;
+                indeterminate: true;
+                text: percent + " %";
+
+                decoratorComponent: indicatorsRepresentaitonPage.isQtStyle ? DecoratorsQt.progressBarDecorator :
+                                                                      Decorators.progressBarDecorator;
+
+            }
+
+            ProgressBar{
+                id: progressBar3;
+
+                anchors.bottom:  parent.bottom;
+                anchors.bottomMargin: indicatorsRepresentaitonPage.isQtStyle ? (parent.height/2 - height/2) : 0;
+
+                width: 150;
+                from: 10; to: 110;
+                value: 60;
+                hasText: false;
+                hasTitle: false;
+                text: percent + " %";
+
+                decoratorComponent: indicatorsRepresentaitonPage.isQtStyle ? DecoratorsQt.progressBarDecorator :
+                                                                      Decorators.progressBarDecorator;
+
+            }
+
+
+        }//progressBarRow
 
 //        Item{//testElement
 //            id: testElement;
@@ -55,7 +112,7 @@ Rectangle {
 //            //                property Component decoratorComponent: inputsRepresentaitonPage.isQtStyle ? DecoratorsQt.switchDecorator :
 //            //                                                                                            Decorators.switchDecorator;
 
-//            property Component decoratorComponent : DecoratorsQt.splitViewDecorator;
+//            property Component decoratorComponent : DecoratorsQt.progressBarDecorator;
 //            property var decorator : null;
 
 //            onDecoratorComponentChanged: {

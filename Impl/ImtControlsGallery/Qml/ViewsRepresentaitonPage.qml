@@ -50,14 +50,15 @@ Rectangle {
             width: splitView.orientation == Qt.Horizontal ? 800 : 200;
             height: splitView.orientation == Qt.Horizontal ? 200 : 800;
             color: "transparent";
+            border.color: "lightgreen";
 
             SplitView{
                 id: splitView;
 
                 anchors.centerIn: parent;
 
-                width: parent.width;
-                height: parent.height;
+                width: parent.width - 8;
+                height: parent.height -8;
 
                 //orientation: Qt.Vertical;//!!!
 
