@@ -342,6 +342,7 @@ bool CGqlObjectCollectionDelegateComp::GetSubCollection(
 		}
 	}
 
+	return false;
 }
 
 
