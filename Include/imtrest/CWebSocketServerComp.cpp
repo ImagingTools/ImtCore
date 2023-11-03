@@ -98,9 +98,15 @@ void CWebSocketServerComp::HandleNewConnections()
 		if (m_subscriberEngineCompPtr.IsValid()){
 			m_subscriberEngineCompPtr->RegisterSubscriber(webSocketPtr, *m_requestHandlerCompPtr, *m_protocolEngineCompPtr);
 		}
+
+		QString message = QString("Handle new web socket connection");
+		SendInfoMessage(0, message, "CWebSocketServerComp");
+		qDebug() << message;
+
 		connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CWebSocketServerComp::OnWebSocketTextMessage);
 		connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CWebSocketServerComp::OnWebSocketBinaryMessage);
-
+		connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);
+		connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &CWebSocketServerComp::OnError);
 	}
 }
 
@@ -117,9 +123,18 @@ void CWebSocketServerComp::OnSocketDisconnected()
 	for (QByteArray key: m_senders.keys()){
 		if (socketObjectPtr == m_senders[key]->GetSocket()){
 			m_senders.remove(key);
+
+			QString message = QString("Web socket sender %1 removed").arg(qPrintable(key));
+			SendInfoMessage(0, message, "CWebSocketServerComp");
+			qDebug() << message;
+
 			break;
 		}
 	}
+
+	QString message = QString("Web socket disconnected");
+	SendInfoMessage(0, message, "CWebSocketServerComp");
+	qDebug() << message;
 
 	socketObjectPtr->deleteLater();
 }
@@ -136,6 +151,10 @@ void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 	if (webSocketPtr == nullptr){
 		return;
 	}
+
+	QString message = QString("Web socket text message received: %1").arg(textMessage);
+	SendInfoMessage(0, message, "CWebSocketServerComp");
+	qDebug() << message;
 
 	istd::TDelPtr<IRequest> newRequestPtr = m_protocolEngineCompPtr->CreateRequest(*m_requestHandlerCompPtr.GetPtr());
 	if (newRequestPtr.IsValid()){
@@ -163,8 +182,22 @@ void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 
 void CWebSocketServerComp::OnWebSocketBinaryMessage(const QByteArray& dataMessage)
 {
+	QString message = QString("Web socket binary message received: %1").arg(qPrintable(dataMessage));
+	SendInfoMessage(0, message, "CWebSocketServerComp");
+	qDebug() << message;
 }
 
+
+void CWebSocketServerComp::OnError(QAbstractSocket::SocketError error)
+{
+	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
+	if (webSocketPtr != nullptr){
+		QString errorMessage = QString("Web socket server error: %1").arg(webSocketPtr->errorString());
+
+		SendErrorMessage(0, errorMessage, "CWebSocketServerComp");
+		qDebug() << errorMessage;
+	}
+}
 
 
 } // namespace imtrest

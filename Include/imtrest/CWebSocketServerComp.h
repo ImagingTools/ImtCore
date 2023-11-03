@@ -64,6 +64,7 @@ private Q_SLOTS:
 	void OnSocketDisconnected();
 	void OnWebSocketTextMessage(const QString& textMessage);
 	void OnWebSocketBinaryMessage(const QByteArray& dataMessage);
+	void OnError(QAbstractSocket::SocketError error);
 
 private:
 	I_REF(imtrest::IRequestServlet, m_requestHandlerCompPtr);
@@ -78,9 +79,7 @@ private:
 
 	Servers m_servers;
 
-	//	typedef istd::TPointerVector<IRequest> Requests;
-	//	Requests m_requests;
-		QMap <QByteArray, QSharedPointer<CWebSocketSender>> m_senders;
+	QMap <QByteArray, QSharedPointer<CWebSocketSender>> m_senders;
 };
 
 
