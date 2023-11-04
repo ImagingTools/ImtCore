@@ -140,7 +140,7 @@ int COperationDescription::GetSupportedOperations() const
 }
 
 
-bool COperationDescription::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+bool COperationDescription::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	istd::CChangeGroup changeGroup(this);
 
@@ -172,7 +172,7 @@ istd::IChangeable* COperationDescription::CloneMe(CompatibilityMode mode) const
 }
 
 
-bool COperationDescription::ResetData(CompatibilityMode mode)
+bool COperationDescription::ResetData(CompatibilityMode /*mode*/)
 {
 	m_operationTypeId.clear();
 	m_key.clear();

@@ -22,7 +22,7 @@ CCachedObjectCollectionComp::CCachedObjectCollectionComp()
 }
 
 
-void CCachedObjectCollectionComp::SetOperationFlags(int flags, const QByteArray& objectId)
+void CCachedObjectCollectionComp::SetOperationFlags(int /*flags*/, const QByteArray& /*objectId*/)
 {
 	return;
 }
@@ -42,7 +42,7 @@ const ICollectionDataController* CCachedObjectCollectionComp::GetDataController(
 }
 
 
-int CCachedObjectCollectionComp::GetOperationFlags(const QByteArray& objectId) const
+int CCachedObjectCollectionComp::GetOperationFlags(const QByteArray& /*objectId*/) const
 {
 	return m_operationFlags;
 }
@@ -101,7 +101,7 @@ bool CCachedObjectCollectionComp::RemoveElement(const Id& elementId, const IOper
 }
 
 
-const istd::IChangeable* CCachedObjectCollectionComp::GetObjectPtr(const Id& objectId) const
+const istd::IChangeable* CCachedObjectCollectionComp::GetObjectPtr(const Id& /*objectId*/) const
 {
 	return nullptr;
 }
@@ -154,9 +154,9 @@ IObjectCollection* CCachedObjectCollectionComp::CreateSubCollection(int offset, 
 
 
 imtbase::IObjectCollectionIterator* CCachedObjectCollectionComp::CreateObjectCollectionIterator(
-			int offset,
-			int count,
-			const iprm::IParamsSet* selectionParamsPtr) const
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	return nullptr;
 }
@@ -217,10 +217,10 @@ ICollectionInfo::Ids CCachedObjectCollectionComp::GetElementIds(
 
 
 bool CCachedObjectCollectionComp::GetSubsetInfo(
-			ICollectionInfo& subsetInfo,
-			int offset,
-			int count,
-			const iprm::IParamsSet* selectionParamsPtr) const
+			ICollectionInfo& /*subsetInfo*/,
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	return false;
 }
