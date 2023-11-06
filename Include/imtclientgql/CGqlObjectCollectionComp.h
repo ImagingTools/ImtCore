@@ -18,7 +18,6 @@
 #include <imtbase/ICollectionDataController.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IMetaInfoCreator.h>
-
 #include <imtbase/TICollectionStructure.h>
 #include <imtbase/TIStructuredCollectionInfo.h>
 #include <imtbase/IStructuredCollectionInserter.h>
