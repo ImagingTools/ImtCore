@@ -99,6 +99,11 @@ I_EXPORT_COMPONENT(
 			"Model subscriber controller",
 			"Model Subscriber Collection");
 
+I_EXPORT_COMPONENT(
+			GqlFileRepository,
+			"File-based gql collection object provider",
+			IM_AUTHOR("Sergey Zastrovnyh")"File Repository GQL GraphQL Collection Object Provider");
+
 
 } // namespace ImtGqlPck
 
