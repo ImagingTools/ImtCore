@@ -62,7 +62,11 @@ int CObjectMetaInfoUniquenessValidatorComp::IsUniqueValue(const imtbase::IObject
 			}
 
 			QVariant metaInfoValue = metaInfoPtr->GetMetaInfo(metaInfoType);
+#if QT_VERSION < 0x060000
+			if (metaInfoValue.userType() != value.userType()){
+#else
 			if (metaInfoValue.typeId() != value.typeId()){
+#endif
 				retVal |= RF_INCOMPATIBLE_VALUE_TYPE;
 				continue;
 			}
