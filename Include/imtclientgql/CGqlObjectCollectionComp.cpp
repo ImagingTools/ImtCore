@@ -714,28 +714,11 @@ void CGqlObjectCollectionComp::OnComponentCreated()
 
 		m_typesInfo.InsertOption(typeName, typeId);
 	}
-
-	if (m_subscriptionManagerCompPtr.IsValid()){
-		imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, "onAddDocument");
-		imtgql::CGqlObject subscriptionField("data");
-		subscriptionField.InsertField("id");
-		subscriptionField.InsertField("name");
-		subscriptionField.InsertField("metadata");
-		subscriptionField.InsertField("createdOn");
-		gqlRequest.AddField(subscriptionField);
-		m_addDocumentSubscriptionId = m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, this);
-	}
 }
 
 
 void CGqlObjectCollectionComp::OnComponentDestroyed()
 {
-	if (m_subscriptionManagerCompPtr.IsValid()){
-		if (!m_addDocumentSubscriptionId.isEmpty()){
-			m_subscriptionManagerCompPtr->UnregisterSubscription(m_addDocumentSubscriptionId);
-		}
-	}
-
 	BaseClass::OnComponentDestroyed();
 }
 

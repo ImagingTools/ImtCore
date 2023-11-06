@@ -10,8 +10,8 @@
 // ImtCore includes
 #include <imtclientgql/IClientProtocolEngine.h>
 #include <imtclientgql/IGqlObjectCollectionDelegate.h>
-#include <imtclientgql/IGqlSubscriptionManager.h>
 #include <imtclientgql/IGqlClient.h>
+#include <imtclientgql/IGqlSubscriptionClient.h>
 #include <imtgql/IGqlStructuredCollectionResponse.h>
 #include <imtbase/CCollectionInfo.h>
 #include <imtbase/TModelUpdateBinder.h>
@@ -51,11 +51,11 @@ public:
 		I_REGISTER_INTERFACE(imtbase::IObjectCollectionStructure);
 		I_REGISTER_INTERFACE(imtbase::IObjectCollectionStructureInfo);
 		I_REGISTER_INTERFACE(imtbase::IStructuredCollectionInserter);
+		I_REGISTER_INTERFACE(IGqlSubscriptionClient);
 		I_REGISTER_INTERFACE(IObjectCollection);
 		I_REGISTER_INTERFACE(IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(ICollectionInfo);
 		I_REGISTER_INTERFACE(istd::IChangeable);
-		I_ASSIGN(m_subscriptionManagerCompPtr, "SubscriptionManager", "GraphQL subscription manager", false, "SubscriptionManager");
 		I_ASSIGN(m_delegateCompPtr, "GqlDatabaseDelegate", "GraphQL-based document delegate for database CRUD oeprations", true, "GqlObjectCollectionDelegate");
 		I_ASSIGN_MULTI_0(m_typeIdsAttrPtr, "TypeIds", "List of type-ID corresponding to the registered factories", false);
 		I_ASSIGN_MULTI_0(m_typeNamesAttrPtr, "TypeNames", "List of type names corresponding to the registered factories", false);
@@ -110,7 +110,6 @@ public:
 	virtual bool RemoveNode(
 				const QByteArray& nodeId,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
-
 	virtual bool AddObjectToNode(
 				const QByteArray& objectId,
 				const QByteArray& nodeId,
@@ -198,7 +197,6 @@ private:
 	bool GetObjectDataMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const;
 
 protected:
-	I_REF(IGqlSubscriptionManager, m_subscriptionManagerCompPtr);
 	I_REF(IGqlObjectCollectionDelegate, m_delegateCompPtr);
 	I_MULTIATTR(QByteArray, m_typeIdsAttrPtr);
 	I_MULTITEXTATTR(m_typeNamesAttrPtr);
@@ -207,8 +205,6 @@ protected:
 	typedef QMap<QByteArray, IGqlObjectCollectionDelegate*> DelegatesMap;
 
 	iprm::COptionsManager m_typesInfo;
-
-	QByteArray m_addDocumentSubscriptionId;
 };
 
 
