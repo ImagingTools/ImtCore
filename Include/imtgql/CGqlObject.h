@@ -39,6 +39,9 @@ public:
 	bool IsEnum(const QByteArray& fieldId) const;
 	bool IsObjectList(const QByteArray& fieldId) const;
 
+	// comfort
+	Q_REQUIRED_RESULT QVariant operator[](const QByteArray& fieldId) const;
+
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive &archive) override;
 
@@ -59,6 +62,13 @@ protected:
 	QByteArray m_objectId;
 	CGqlObject* m_parentPtr;
 };
+
+
+// inline methods
+inline QVariant CGqlObject::operator[](const QByteArray& fieldId) const
+{
+	return GetFieldArgumentValue(fieldId);
+}
 
 
 } // namespace imtgql
