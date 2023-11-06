@@ -7,7 +7,8 @@ namespace imtgql
 
 // public methods
 
-CGqlEnum::CGqlEnum(QByteArray value) : m_value(value)
+CGqlEnum::CGqlEnum(const QByteArray& value)
+	:m_value(value)
 {
 }
 

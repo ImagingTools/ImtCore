@@ -35,8 +35,10 @@ imtbase::CTreeItemModel* CCollectionObjectProviderComp::CreateInternalResponse(
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 		iser::IObject* objectInfoPtr = dynamic_cast<iser::IObject*>(dataPtr.GetPtr());
+		Q_ASSERT_X(objectInfoPtr != nullptr, __FILE__, "iser::IObject interface not supported");
 		if (objectInfoPtr == nullptr){
-			errorMessage = QObject::tr("Object conversing error").toUtf8();
+			errorMessage = QObject::tr("INTERNAL: Object implementation doesn't support iser::IObject interface").toUtf8();
+
 			SendErrorMessage(0, errorMessage);
 
 			return nullptr;
@@ -46,7 +48,8 @@ imtbase::CTreeItemModel* CCollectionObjectProviderComp::CreateInternalResponse(
 		{
 			iser::CJsonMemWriteArchive archive(json);
 			if (!objectInfoPtr->Serialize(archive)){
-				errorMessage = QObject::tr("Error when serializing an object").toUtf8();
+				errorMessage = QObject::tr("Object serialization failed").toUtf8();
+
 				SendErrorMessage(0, errorMessage);
 
 				return nullptr;
@@ -54,14 +57,16 @@ imtbase::CTreeItemModel* CCollectionObjectProviderComp::CreateInternalResponse(
 		}
 
 		if (!dataModelPtr->CreateFromJson(json)){
-			errorMessage = QObject::tr("Error when creating a tree model from json").toUtf8();
+			errorMessage = QObject::tr("Tree item model creation from JSON failed").toUtf8();
+
 			SendErrorMessage(0, errorMessage);
 
 			return nullptr;
 		}
 	}
 	else{
-		errorMessage = QObject::tr("Object with ID %1 not exists").arg(qPrintable(objectId)).toUtf8();
+		errorMessage = QObject::tr("Object with the ID '%1' doesn't exist").arg(qPrintable(objectId)).toUtf8();
+
 		SendErrorMessage(0, errorMessage);
 
 		return nullptr;

@@ -16,10 +16,12 @@ namespace imtgql
 
 // reimplemented (imtgql::IGqlRepresentationController)
 
-imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateRepresentationFromRequest(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
+imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateRepresentationFromRequest(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	if (!m_representationControllerCompPtr.IsValid() || !m_dataModelCompPtr.IsValid()){
-		SendErrorMessage(0, QString("Internal error"), "CGqlRepresentationDataControllerComp");
+		SendCriticalMessage(0, QString("Missing component references: 'DataModel' or 'RepresentationController'"));
 
 		return nullptr;
 	}
@@ -36,23 +38,27 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateRepresentat
 		return rootModelPtr.PopPtr();
 	}
 
-	SendErrorMessage(0, QString("Unable to get representation from data model. Command: %1.").arg(qPrintable(gqlRequest.GetCommandId())), "CGqlRepresentationDataControllerComp");
+	errorMessage = QString("Unable to get representation from the data model. Command-ID: %1").arg(qPrintable(gqlRequest.GetCommandId()));
+
+	SendErrorMessage(0, errorMessage);
 
 	return nullptr;
 }
 
 
-bool CGqlRepresentationDataControllerComp::UpdateModelFromRepresentation(const imtgql::CGqlRequest& request, imtbase::CTreeItemModel* representationPtr) const
+bool CGqlRepresentationDataControllerComp::UpdateModelFromRepresentation(
+			const imtgql::CGqlRequest& request,
+			imtbase::CTreeItemModel* representationPtr) const
 {
 	if (!m_representationControllerCompPtr.IsValid() || !m_dataModelCompPtr.IsValid()){
-		SendErrorMessage(0, QString("Internal error"), "CGqlRepresentationDataControllerComp");
+		SendErrorMessage(0, QString("Internal error"));
 
 		return false;
 	}
 
 	bool retVal = m_representationControllerCompPtr->GetDataModelFromRepresentation(*representationPtr, *m_dataModelCompPtr);
 	if (!retVal){
-		SendErrorMessage(0, QString("Unable to get data model from representation. Command: %1.").arg(qPrintable(request.GetCommandId())), "CGqlRepresentationDataControllerComp");
+		SendErrorMessage(0, QString("Unable to get data model from representation. Command: %1.").arg(qPrintable(request.GetCommandId())));
 	}
 
 	return retVal;
@@ -86,7 +92,9 @@ imtbase::CTreeItemModel* CGqlRepresentationDataControllerComp::CreateInternalRes
 		}
 	}
 
-	SendErrorMessage(0, QString("Unable to create internal response with command %1").arg(qPrintable(commandId)));
+	errorMessage = QString("Unable to create internal response with command %1").arg(qPrintable(commandId));
+
+	SendErrorMessage(0, errorMessage);
 
 	Q_ASSERT(false);
 

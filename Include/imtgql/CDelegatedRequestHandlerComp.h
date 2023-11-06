@@ -4,7 +4,6 @@
 // ACF includes
 #include <icomp/CComponentBase.h>
 #include <imtgql/IGqlRequestHandler.h>
-//#include <iqtgui/CHierarchicalCommand.h>
 
 
 namespace imtgql

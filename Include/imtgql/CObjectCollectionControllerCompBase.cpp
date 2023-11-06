@@ -1,15 +1,11 @@
 #include <imtgql/CObjectCollectionControllerCompBase.h>
 
 
-// STL includes
-#include <cmath>
-
 // ACF includes
 #include <iprm/CTextParam.h>
 #include <iprm/CIdParam.h>
 #include <iprm/CEnableableParam.h>
 #include <istd/TDelPtr.h>
-#include <iser/CJsonMemWriteArchive.h>
 #include <iser/CJsonMemReadArchive.h>
 #include <istd/TSingleFactory.h>
 
@@ -194,7 +190,8 @@ bool CObjectCollectionControllerCompBase::GetOperationFromRequest(
 		}
 	}
 
-	errorMessage = QString("Unable to get operation from request.");
+	errorMessage = QString("Unable to get the operation type from the request");
+
 	SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 	return false;
@@ -366,8 +363,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateCollection(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to update collection. Internal error.");
-		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		errorMessage = QString("Unable to update collection. Component reference 'ObjectCollection' was not set");
+
+		SendCriticalMessage(0, errorMessage);
 
 		return nullptr;
 	}
@@ -431,8 +429,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to rename object. Internal error.");
-		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		errorMessage = QString("Unable to rename object. Component reference 'ObjectCollection' was not set");
+
+		SendCriticalMessage(0, errorMessage);
 
 		return nullptr;
 	}
@@ -462,9 +461,13 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::RenameObject(
 
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::SetObjectDescription(
 			const imtgql::CGqlRequest& gqlRequest,
-			QString& /*errorMessage*/) const
+			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
+		errorMessage = QString("Unable to set the object description. Component reference 'ObjectCollection' was not set");
+
+		SendCriticalMessage(0, errorMessage);
+
 		return nullptr;
 	}
 
@@ -496,8 +499,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to get list objects. Internal error.");
-		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		errorMessage = QString("Unable to list objects. Component reference 'ObjectCollection' was not set");
+
+		SendCriticalMessage(0, errorMessage);
 
 		return nullptr;
 	}
@@ -582,8 +586,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::ListObjects(
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementsCount(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to get elements count. Internal error.");
-		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		errorMessage = QString("Unable to get the element count. Component reference 'ObjectCollection' was not set");
+
+		SendCriticalMessage(0, errorMessage);
 
 		return nullptr;
 	}
@@ -627,8 +632,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementsCount(c
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetElementIds(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to get elements IDs. Internal error.");
-		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		errorMessage = QString("Unable to get the element IDs. Component reference 'ObjectCollection' was not set");
+
+		SendCriticalMessage(0, errorMessage);
 
 		return nullptr;
 	}
@@ -686,8 +692,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = "No collection component was set";
-		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		errorMessage = QString("Unable to remove the object from the collection. Component reference 'ObjectCollection' was not set");
+
+		SendCriticalMessage(0, errorMessage);
 
 		return nullptr;
 	}
@@ -737,6 +744,10 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetHeaders(
 			QString& errorMessage) const
 {
 	if (!m_headersProviderCompPtr.IsValid()){
+		errorMessage = QString("Unable to get headers. Component reference 'HeadersProvider' was not set");
+
+		SendCriticalMessage(0, errorMessage);
+
 		return nullptr;
 	}
 
@@ -796,8 +807,9 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectView(
 			QString& errorMessage) const
 {
 	if (!m_objectViewProviderCompPtr.IsValid()){
-		errorMessage = QString("Unable to get view for object. Internal error.");
-		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		errorMessage = QString("Unable to get the object view. Component reference 'ObjectViewProvider' was not set");
+
+		SendCriticalMessage(0, errorMessage);
 
 		return nullptr;
 	}
@@ -816,24 +828,27 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectView(
 imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::GetObjectHistory(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to get history for an object. Internal error.");
-		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		errorMessage = QString("Unable to get the object history. Component reference 'ObjectCollection' was not set");
+
+		SendCriticalMessage(0, errorMessage);
 
 		return nullptr;
 	}
 
 	const imtgql::CGqlObject* gqlInputParamsPtr = gqlRequest.GetParam("input");
 	if (gqlInputParamsPtr == nullptr){
-		errorMessage = QString("Unable to get history for an object. GraphQL params is invalid.");
-		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		errorMessage = QString("Unable to get object history: GraphQL-parameters not set");
+
+		SendErrorMessage(0, errorMessage);
 
 		return nullptr;
 	}
 
 	QByteArray objectId = gqlInputParamsPtr->GetFieldArgumentValue("Id").toByteArray();
 	if (objectId.isEmpty()){
-		errorMessage = QString("Unable to get history for an object with empty ID.");
-		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
+		errorMessage = QString("Unable to get history for an object with empty ID");
+
+		SendErrorMessage(0, errorMessage);
 
 		return nullptr;
 	}

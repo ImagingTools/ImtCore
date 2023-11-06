@@ -39,8 +39,6 @@ public:
 		I_ASSIGN(m_requestHandlerCommandIdAtrPtr, "RequestHandlerCommandId", "Request handler commandId to create the subscription body", true, "");
 	I_END_COMPONENT;
 
-	CGqlSubscriberControllerCompBase();
-
 	// reimplemented (imtgql::IGqlRequestHandler)
 	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 

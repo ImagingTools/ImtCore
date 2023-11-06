@@ -1,5 +1,6 @@
 #include <imtgql/CSerializableObjectCollectionControllerComp.h>
 
+
 // ACF includes
 #include <iser/CMemoryWriteArchive.h>
 #include <iser/CMemoryReadArchive.h>
@@ -60,9 +61,7 @@ bool CSerializableObjectCollectionControllerComp::DeSerializeObject(istd::IPolym
 
 imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
 
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -74,16 +73,15 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetMetaInf
 		errorsItemModel->SetData("message", errorMessage);
 	}
 	else{
-		//ToDo Serial add
-
 		const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
 
-		QByteArray Id = GetObjectIdFromInputParams(inputParams);
-		dataModel->SetData("id", Id);
-		QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(Id);
+		QByteArray objectId = GetObjectIdFromInputParams(inputParams);
+		dataModel->SetData("id", objectId);
+
+		QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
 		dataModel->SetData("typeId", typeId);
 
-		idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(Id);
+		idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);
 		QByteArray data;
 		SerializeObject(metaInfo.GetPtr(), data);
 		dataModel->SetData("metaInfo", data.toBase64());
@@ -91,15 +89,12 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetMetaInf
 	}
 
 	return rootModelPtr.PopPtr();
-
 }
 
 
 imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
 
 	if (!m_objectCollectionCompPtr.IsValid()){
@@ -111,34 +106,31 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetInfo(co
 		errorsItemModel->SetData("message", errorMessage);
 	}
 	else{
-		//ToDo Serial add
-
 		imtbase::CTreeItemModel* infoModel = dataModel->AddTreeModel("info");
 		const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
 
-		QByteArray Id = GetObjectIdFromInputParams(inputParams);
+		QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 
-		infoModel->SetData("id", Id);
-		QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(Id);
+		infoModel->SetData("id", objectId);
+		QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
 		infoModel->SetData("typeId", typeId);
 //		imtbase::IObjectCollection::DataPtr dataPtr;
-		QByteArray elementInfo = m_objectCollectionCompPtr->GetElementInfo(Id, imtbase::ICollectionInfo::EIT_NAME).toByteArray();
+		QByteArray elementInfo = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toByteArray();
 		infoModel->SetData("name", elementInfo);
-		elementInfo = m_objectCollectionCompPtr->GetElementInfo(Id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toByteArray();
+		elementInfo = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toByteArray();
 		infoModel->SetData("description", elementInfo);
-		elementInfo = m_objectCollectionCompPtr->GetElementInfo(Id, imtbase::ICollectionInfo::EIT_ENABLED).toByteArray();
+		elementInfo = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_ENABLED).toByteArray();
 		infoModel->SetData("enabled", elementInfo);
 	}
 
 	return rootModelPtr.PopPtr();
-
 }
 
 
-
-imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetDataMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetDataMetaInfo(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
-
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");

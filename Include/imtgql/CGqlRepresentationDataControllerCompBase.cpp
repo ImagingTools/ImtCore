@@ -7,13 +7,17 @@ namespace imtgql
 
 // protected methods
 
-imtbase::CTreeItemModel* CGqlRepresentationControllerCompBase::CreateRepresentationFromRequest(const imtgql::CGqlRequest& /*gqlRequest*/, QString& /*errorMessage*/) const
+imtbase::CTreeItemModel* CGqlRepresentationControllerCompBase::CreateRepresentationFromRequest(
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
 	return nullptr;
 }
 
 
-bool CGqlRepresentationControllerCompBase::UpdateModelFromRepresentation(const imtgql::CGqlRequest& /*request*/, imtbase::CTreeItemModel* /*representationPtr*/) const
+bool CGqlRepresentationControllerCompBase::UpdateModelFromRepresentation(
+			const imtgql::CGqlRequest& /*request*/,
+			imtbase::CTreeItemModel* /*representationPtr*/) const
 {
 	return false;
 }

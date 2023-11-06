@@ -1,11 +1,7 @@
 #include <imtgql/CObjectMetaInfoCollectionControllerComp.h>
 
 
-// STL includes
-#include <cmath>
-
 // ImtCore includes
-#include <idoc/CStandardDocumentMetaInfo.h>
 #include <imtbase/CCollectionFilter.h>
 
 

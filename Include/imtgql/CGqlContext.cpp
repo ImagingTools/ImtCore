@@ -1,5 +1,6 @@
 #include <imtgql/CGqlContext.h>
 
+
 // Qt includes
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
@@ -19,7 +20,8 @@ namespace imtgql
 
 // public methods
 
-imtgql::CGqlContext::CGqlContext(): m_userInfoPtr(nullptr)
+imtgql::CGqlContext::CGqlContext()
+	:m_userInfoPtr(nullptr)
 {
 }
 
@@ -94,7 +96,7 @@ void CGqlContext::SetToken(const QByteArray &token)
 }
 
 
-imtauth::IUserInfo *CGqlContext::GetUserInfo() const
+imtauth::IUserInfo* CGqlContext::GetUserInfo() const
 {
 	return m_userInfoPtr;
 }
@@ -109,6 +111,8 @@ void CGqlContext::SetUserInfo(const imtauth::IUserInfo *userInfoPtr)
 	}
 }
 
+
+// reimplemented (iser::ISerializable)
 
 bool CGqlContext::Serialize(iser::IArchive &archive)
 {
@@ -144,6 +148,8 @@ bool CGqlContext::Serialize(iser::IArchive &archive)
 	return retVal;
 }
 
+
+// reimplemented (iser::IChangeable)
 
 int CGqlContext::GetSupportedOperations() const
 {
@@ -187,7 +193,7 @@ bool CGqlContext::CopyFrom(const IChangeable &object, CompatibilityMode /*mode*/
 }
 
 
-istd::IChangeable *CGqlContext::CloneMe(CompatibilityMode mode) const
+istd::IChangeable* CGqlContext::CloneMe(CompatibilityMode mode) const
 {
 	istd::TDelPtr<CGqlContext> clonePtr(new CGqlContext);
 	if (clonePtr->CopyFrom(*this, mode)){

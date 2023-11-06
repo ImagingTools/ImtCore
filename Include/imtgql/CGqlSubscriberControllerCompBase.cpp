@@ -16,11 +16,6 @@ namespace imtgql
 
 
 // public methods
-CGqlSubscriberControllerCompBase::CGqlSubscriberControllerCompBase()
-	:BaseClass()
-{
-}
-
 
 // reimplemented (imtgql::IGqlRequestHandler)
 

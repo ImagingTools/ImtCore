@@ -4,21 +4,22 @@
 // Qt includes
 #include <QtCore/QTimer>
 
-
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtgql/IGqlContextController.h>
-#include <imtgql/IGqlRequestHandler.h>
 
 
 namespace imtgql
 {
 
 
-class CGqlContextControllerComp: public QObject, public ilog::CLoggerComponentBase, virtual public imtgql::IGqlContextController
+class CGqlContextControllerComp:
+			public QObject,
+			public ilog::CLoggerComponentBase,
+			virtual public imtgql::IGqlContextController
 {
 	Q_OBJECT
 public:
@@ -31,7 +32,10 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtgql::IGqlContextController)
-	virtual imtgql::IGqlContext* GetRequestContext(const imtgql::CGqlRequest& gqlRequest, const QByteArray& token, QString& errorMessage) const override;
+	virtual imtgql::IGqlContext* GetRequestContext(
+				const imtgql::CGqlRequest& gqlRequest,
+				const QByteArray& token,
+				QString& errorMessage) const override;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_sessionCollectionCompPtr);

@@ -14,7 +14,8 @@ namespace imtgql
 class CGqlEnum
 {
 public:
-	CGqlEnum(QByteArray value = "");
+	CGqlEnum(const QByteArray& value = QByteArray());
+
 	QByteArray GetValue();
 	operator QVariant() const;
 

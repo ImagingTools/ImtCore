@@ -2,7 +2,6 @@
 
 
 // ImtCore includes
-#include <imtauth/CUserInfo.h>
 #include <imtauth/ISession.h>
 #include <imtauth/IUserInfo.h>
 #include <imtgql/CGqlContext.h>

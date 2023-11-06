@@ -27,9 +27,7 @@ imtbase::CTreeItemModel* CDelegatedRequestHandlerComp::CreateResponse(const imtg
 	}
 
 	return nullptr;
-
 }
-
 
 
 } // namespace imtgql

@@ -20,9 +20,6 @@ void CObjectCollectionSubscriberControllerComp::OnComponentCreated()
 	if (m_objectCollectionModelCompPtr.IsValid()) {
 		m_objectCollectionModelCompPtr->AttachObserver(this);
 	}
-
-//	QObject::connect(&m_timer, &QTimer::timeout, this, &CObjectCollectionSubscriberControllerComp::OnTimeout);
-//	m_timer.start(5000);
 }
 
 
