@@ -1,6 +1,9 @@
 #include <imtgql/CObjectCollectionControllerCompBase.h>
 
 
+// std includes
+#include <cmath>
+
 // ACF includes
 #include <iprm/CTextParam.h>
 #include <iprm/CIdParam.h>
@@ -979,7 +982,7 @@ bool CObjectCollectionControllerCompBase::SetupGqlItem(
 	if (objectCollectionIterator == nullptr){
 		return false;
 	}
-	
+
 	bool retVal = true;
 	QByteArray collectionId = objectCollectionIterator->GetObjectId();
 
