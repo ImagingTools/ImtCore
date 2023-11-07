@@ -7,6 +7,11 @@
 // Qt includes
 #include <QtCore/QFile>
 
+// Acf includes
+#include <iprm/TParamsPtr.h>
+#include <iprm/IIdParam.h>
+#include <ifile/IFileNameParam.h>
+
 // ImtCore includes
 #include <imtbase/IObjectCollectionIterator.h>
 
@@ -16,6 +21,8 @@ namespace imtgql
 
 
 // public methods
+
+// reimplemented(imtbase::IMetaInfoCreator)
 
 CGqlFileRepositoryComp::TypeIds CGqlFileRepositoryComp::GetSupportedTypeIds() const
 {
@@ -51,8 +58,7 @@ bool CGqlFileRepositoryComp::CreateMetaInfo(const istd::IChangeable* dataPtr, co
 	metaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, creationTime);
 	metaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, creationTime);
 
-	/// \todo create 'session manager' and get path from it
-	const QString tempFilePath = "";
+	const QString tempFilePath = GetFilePathFromRequestQueue((*dataParams)["Id"].toByteArray());
 	if (m_hashGeneratorCompPtr.IsValid()){
 		QFile tempFile(tempFilePath);
 		if (tempFile.open(QIODevice::ReadOnly)){
@@ -83,6 +89,43 @@ void CGqlFileRepositoryComp::SetErrorToModel(
 	dataModel.SetExternTreeModel("notification", &notificationModel);
 
 	rootModel.SetExternTreeModel("data", &dataModel);
+}
+
+
+
+QString CGqlFileRepositoryComp::GetFilePathFromRequestQueue(const QByteArray& queueRequestId) const
+{
+	QString filePath;
+	if (!m_requestCollectionCompPtr.IsValid()){
+		SendCriticalMessage(0, "Request collection is invalid");
+		I_CRITICAL();
+
+		return filePath;
+	}
+
+	imtbase::IObjectCollection& requestCollection = *m_requestCollectionCompPtr;
+	const istd::IChangeable* objectPtr = requestCollection.GetObjectPtr(queueRequestId);
+	if (objectPtr == nullptr){
+		SendCriticalMessage(0, QString("Unable to find request with ID: '%1'").arg(QString(queueRequestId)));
+		I_CRITICAL();
+
+		return filePath;
+	}
+
+	const iprm::IParamsSet* paramsSetPtr = dynamic_cast<const iprm::IParamsSet*>(objectPtr);
+	if (paramsSetPtr == nullptr){
+		SendCriticalMessage(0, QString("Model has unsupported modelType"));
+		I_CRITICAL();
+
+		return filePath;
+	}
+
+	iprm::TParamsPtr<ifile::IFileNameParam> fileNameParamPtr(paramsSetPtr, "FilePath");
+	if (fileNameParamPtr.IsValid()){
+		filePath = fileNameParamPtr->GetPath();
+	}
+
+	return filePath;
 }
 
 
@@ -121,9 +164,7 @@ imtbase::CTreeItemModel* CGqlFileRepositoryComp::InsertObject(
 	const QString name = (*dataParams)["Name"].toByteArray();
 	const QString description = (*dataParams)["Description"].toByteArray();
 
-	/// \todo create 'session manager' and get path from it
-
-	const QString tempFilePath = "";
+	const QString tempFilePath = GetFilePathFromRequestQueue((*dataParams)["Id"].toByteArray());;
 	const QByteArray createdFileId = m_fileObjectCollectionCompPtr->InsertFile(
 		tempFilePath,
 		typeId,
@@ -341,13 +382,14 @@ void CGqlFileRepositoryComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	// for object collection thread running
-	if (!m_objectCollectionCompPtr.EnsureInitialized()){
-		SendCriticalMessage(0, "Invalid object collection component");
+	if (!m_fileObjectCollectionCompPtr.IsValid()){
+		SendCriticalMessage(0, "Invalid file object collection component");
+		I_CRITICAL();
 	}
 
-	if (!m_fileObjectCollectionCompPtr.EnsureInitialized()){
-		SendCriticalMessage(0, "Invalid file object collection component");
+	if (!m_requestCollectionCompPtr.IsValid()){
+		SendCriticalMessage(0, "Invalid request collection component");
+		I_CRITICAL();
 	}
 }
 

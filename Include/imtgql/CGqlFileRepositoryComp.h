@@ -8,6 +8,7 @@
 #include <imtcrypt/IHashGenerator.h>
 #include <imtgql/CObjectCollectionControllerCompBase.h>
 #include <imtrepo/IFileObjectCollection.h>
+#include <imtbase/TModelUpdateBinder.h>
 
 #undef GetObject
 
@@ -32,9 +33,10 @@ public:
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN_TO(m_fileObjectCollectionCompPtr, m_objectCollectionCompPtr, true);
 		I_ASSIGN(m_hashGeneratorCompPtr, "HashGenerator", "The Generator, used to calc file's hash summ", false, "HashGenerator");
+		I_ASSIGN(m_requestCollectionCompPtr, "RequestCollection", "Collection, that stores uploaded/downloading files paths", true, "RequestCollection");
 	I_END_COMPONENT;
 
-	// reimplemented()
+	// reimplemented(imtbase::IMetaInfoCreator)
 	virtual TypeIds GetSupportedTypeIds() const override;
 	virtual bool CreateMetaInfo(const istd::IChangeable* dataPtr, const QByteArray& typeId, idoc::MetaInfoPtr& metaInfoPtr) const override;
 
@@ -45,6 +47,8 @@ protected:
 				imtbase::CTreeItemModel& itemsModel,
 				imtbase::CTreeItemModel& notificationModel,
 				const QString& errorMessage);
+
+	QString GetFilePathFromRequestQueue(const QByteArray& queueRequestId) const;
 
 	// reimplemented (CObjectCollectionControllerCompBase)
 	virtual imtbase::CTreeItemModel* InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
@@ -65,6 +69,7 @@ protected:
 	I_MULTIATTR(QByteArray, m_supportedTypeListAttrPtr);
 	I_REF(imtrepo::IFileObjectCollection, m_fileObjectCollectionCompPtr);
 	I_REF(imtcrypt::IHashGenerator, m_hashGeneratorCompPtr);
+	I_REF(imtbase::IObjectCollection, m_requestCollectionCompPtr);
 };
 
 
