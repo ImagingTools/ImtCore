@@ -1,14 +1,12 @@
 import QtQuick 2.12
 import Acf 1.0;
+import imtqml 1.0
+import imtcontrols 1.0
 
-FocusScope {
+ControlBase {
     id: containerTextField;
 
-    width: decorator ? decorator.width : 0
-    height: decorator ? decorator.height : 0
-
-    property Component decoratorComponent;
-    property var decorator : null;
+    decoratorComponent: Style.isQtStyle ? DecoratorsQt.textFieldDecorator: Decorators.textFieldDecorator;
 
     property alias text: textField.text;
     property alias acceptableInput: textField.acceptableInput;
@@ -43,6 +41,19 @@ FocusScope {
     signal cancelled();
     signal textEdited();
     signal editingFinished();
+
+    onDecoratorComponentChanged: {
+        bindText.target = decorator
+
+        if(decorator.z < 0){
+            if(focus){
+                textField.forceActiveFocus()
+            }
+        }
+        else {
+            decorator.focus = focus;
+        }
+    }
 
     Keys.onPressed: {
         if (containerTextField.activeFocus){
@@ -97,53 +108,6 @@ FocusScope {
             decorator.focus = focus;
         }
 
-    }
-
-
-    onDecoratorComponentChanged: {
-        if(!decoratorComponent){
-            return;
-        }
-        if(decorator){
-            decorator.destroy()
-        }
-        decorator = decoratorComponent.createObject(containerTextField)
-        decorator.baseElement = containerTextField
-        bindWidth.target = decorator
-        bindHeight.target = decorator
-        bindText.target = decorator
-
-        if(decorator.z < 0){
-            if(focus){
-                textField.forceActiveFocus()
-            }
-        }
-        else {
-            decorator.focus = focus;
-        }
-
-
-        //        if(decorator.z < 0){
-        //            textField.focus = true;
-        //            textField.forceActiveFocus()
-        //        }
-        //        else {
-        //            decorator.focus = true;
-        //            decorator.forceActiveFocus()
-        //        }
-
-    }
-
-    Binding {
-        id: bindWidth
-        property: "width"
-        value: containerTextField.width;
-    }
-
-    Binding {
-        id: bindHeight
-        property: "height"
-        value: containerTextField.height;
     }
 
     Binding {

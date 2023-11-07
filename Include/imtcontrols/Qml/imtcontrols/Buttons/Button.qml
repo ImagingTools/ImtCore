@@ -1,18 +1,13 @@
 import QtQuick 2.12
 import Acf 1.0
-//import imtcontrols 1.0
-//import imtqml 1.0
+import imtcontrols 1.0
+import imtqml 1.0
 
-Item {
+ControlBase {
     id: baseButton;
 
-    width: decorator ? decorator.width : 0
-    height: decorator ? decorator.height : 0
+    decoratorComponent: Style.isQtStyle ? DecoratorsQt.buttonDecorator: Decorators.buttonDecorator;
 
-    property Component decoratorComponent
-    property var decorator : null
-
-    //required parameters in every decorator
     property string text: ""
     property string iconSource: ""
 
@@ -52,23 +47,9 @@ Item {
     }
 
     onDecoratorComponentChanged: {
-        if(!decoratorComponent){
-            return;
-        }
-        //console.log("decoratorComponent::button", decoratorComponent)
-
-        if(decorator){
-            decorator.destroy()
-        }
-        decorator = decoratorComponent.createObject(baseButton)
-        decorator.baseElement = baseButton
-        bindWidth.target = decorator
-        bindHeight.target = decorator
-
         if(focus){
             forceActiveFocus()
         }
-
     }
 
 
@@ -77,18 +58,6 @@ Item {
             event.accepted = true;
             _private.onClicked()
         }
-    }
-
-    Binding {
-        id: bindWidth
-        property: "width"
-        value: baseButton.width;
-    }
-
-    Binding {
-        id: bindHeight
-        property: "height"
-        value: baseButton.height;
     }
 
     MouseArea{

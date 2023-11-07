@@ -2,14 +2,10 @@ import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
 
-FocusScope {
+ControlBase {
     id: comboBoxContainer;
 
-    width: decorator ? decorator.width : 0
-    height: decorator ? decorator.height : 0
-
-    property Component decoratorComponent;
-    property var decorator : null;
+    decoratorComponent: Style.isQtStyle ? DecoratorsQt.comboBoxDecorator: Decorators.comboBoxDecorator;
 
     property var model;
 
@@ -41,9 +37,7 @@ FocusScope {
     property int radius: 5;
     property int currentIndex: -1;
 
-
     property string placeHolderText: "";
-
 
     property real contentY;
 
@@ -52,8 +46,6 @@ FocusScope {
 
     property int selectedIndex: -1;
     property bool hoverBlocked: true;
-
-
 
     property Component delegate: PopupMenuDelegate{
         width: comboBoxContainer.width;
@@ -65,16 +57,6 @@ FocusScope {
         selectedColor: comboBoxContainer.compSelectedColor;
         rootItem: comboBoxContainer;
     };
-
-    //	property alias image: cbArrowIcon;
-    //	property alias imageSource: cbArrowIcon.source;
-    //	property alias imageWidth:  cbArrowIcon.width;
-    //	property alias imageHeight: cbArrowIcon.height;
-    //	property alias imageRotation: cbArrowIcon.rotation;
-    //	property alias imageVisible: cbArrowIcon.visible;
-    //    property alias titleTxt: cbTitleTxt;
-    //    property alias titleTxtColor: cbTitleTxt.color;
-
 
     property alias containsMouse: cbMouseArea.containsMouse;
 
@@ -127,8 +109,6 @@ FocusScope {
         }
     }
 
-
-
     Component {
         id: popupMenu;
         PopupMenuDialog {
@@ -160,6 +140,10 @@ FocusScope {
 
     }
 
+    onDecoratorComponentChanged: {
+        bindCurrentIndex.target = decorator
+    }
+
     onDialogsCountChanged: {
         comboBoxContainer.openST = comboBoxContainer.dialogsCount > comboBoxContainer.dialogsCountPrev;
         if(!comboBoxContainer.openST && comboBoxContainer.dialogsCountPrev < 1000){
@@ -167,39 +151,11 @@ FocusScope {
         }
     }
 
-    onDecoratorComponentChanged: {
-        if(!decoratorComponent){
-            return;
-        }
-        if(decorator){
-            decorator.destroy()
-        }
-        decorator = decoratorComponent.createObject(comboBoxContainer)
-        decorator.baseElement = comboBoxContainer
-        bindWidth.target = decorator
-        bindHeight.target = decorator
-        bindCurrentIndex.target = decorator
-
-    }
-
-    Binding {
-        id: bindWidth
-        property: "width"
-        value: comboBoxContainer.width;
-    }
-
-    Binding {
-        id: bindHeight
-        property: "height"
-        value: comboBoxContainer.height;
-    }
-
     Binding {
         id: bindCurrentIndex;
         property: "currentIndex"
         value: comboBoxContainer.currentIndex;
     }
-
 
     function openPopupMenu(){
         comboBoxContainer.isOpen = true;

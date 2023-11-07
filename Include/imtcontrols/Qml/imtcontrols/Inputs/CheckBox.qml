@@ -3,25 +3,12 @@ import Acf 1.0;
 import imtqml 1.0
 import imtcontrols 1.0
 
-Item {
+ControlBase {
     id: checkBox;
 
-    width: decorator ? decorator.width : 0
-    height: decorator ? decorator.height : 0
-
-    property Component decoratorComponent;
-    property var decorator : null;
+    decoratorComponent: Style.isQtStyle ? DecoratorsQt.checkBoxDecorator: Decorators.checkBoxDecorator;
 
     property string text: "";
-//    property alias checkSize: checkRect.height;
-//    property alias borderWidth: checkRect.border.width;
-//    property alias border: checkRect.border;
-//    property alias color: checkRect.color;
-//    property alias radius: checkRect.radius;
-//    property alias imageSource: image.source;
-//    property alias text: checkBoxText.text;
-//    property alias textObj: checkBoxText;
-//    property alias fontColor: checkBoxText.color;
 
     property alias tooltipText: tooltip.text;
     property alias tooltipItem: tooltip;
@@ -34,40 +21,13 @@ Item {
     property string imageSourceActive: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.On, Icon.Mode.Normal);
     property string imageSourceNotActive: "../../../" + Style.getIconPath("Icons/Ok", Icon.State.Off, Icon.Mode.Disabled);
 
-
     property int fontPixelSize: Style.fontSize_common;
     property bool fontBold: false;
     property bool isLeftText: false;
 
     property int mainMargin: 8;
 
-
     signal clicked();
-
-    onDecoratorComponentChanged: {
-        if(!decoratorComponent){
-            return;
-        }
-        if(decorator){
-            decorator.destroy()
-        }
-        decorator = decoratorComponent.createObject(checkBox)
-        decorator.baseElement = checkBox
-        bindWidth.target = decorator
-        bindHeight.target = decorator
-    }
-
-    Binding {
-        id: bindWidth
-        property: "width"
-        value: checkBox.width;
-    }
-
-    Binding {
-        id: bindHeight
-        property: "height"
-        value: checkBox.height;
-    }
 
     MouseArea {
         id: ma;

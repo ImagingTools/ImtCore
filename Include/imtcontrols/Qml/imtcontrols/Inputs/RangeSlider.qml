@@ -3,16 +3,12 @@ import Acf 1.0;
 import imtqml 1.0
 import imtcontrols 1.0
 
-Item {
+ControlBase {
     id: slider;
-
-    width: decorator ? decorator.width : 150
-    height: decorator ? decorator.height : 30
 
     rotation: orientation == Qt.Vertical ? -90 : 0;
 
-    property Component decoratorComponent;
-    property var decorator : null;
+    decoratorComponent: Style.isQtStyle ? DecoratorsQt.rangeSliderDecorator: Decorators.rangeSliderDecorator;
 
     property int backgroundWidth: width;
     property int backgroundHeight: 6;
@@ -50,27 +46,12 @@ Item {
 
     }
 
-    onPositionFirstChanged: {
-        //console.log("PositionFirst:: ", positionFirst)
+    function decoratorChangedFunc(){
+        console.log("RangeSlider: redefinition of base function");
     }
-    onPositionSecondChanged: {
-        //console.log("PositionSecond:: ", positionSecond)
-
-    }
-
 
     onDecoratorComponentChanged: {
-        if(!decoratorComponent){
-            return;
-        }
-        if(decorator){
-            decorator.destroy()
-        }
-
-        var width_ = width;
-
-        decorator = decoratorComponent.createObject(slider)
-        decorator.baseElement = slider
+        decoratorChangedFuncBase();
 
         if(decorator.to !== undefined){
             decorator.to = to;
@@ -88,13 +69,10 @@ Item {
             decorator.compl = true;
         }
 
-
-        bindWidth.target = decorator
-        bindHeight.target = decorator
+        setBindTargets();
 
         controlRecXFirst = positionFirst * (width - controlWidth)
         controlRecXSecond = positionSecond * (width - controlWidth)
-
     }
 
     Binding {

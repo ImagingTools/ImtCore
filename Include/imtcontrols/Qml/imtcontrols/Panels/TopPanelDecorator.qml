@@ -21,12 +21,7 @@ Rectangle {
     property bool isQtStyle: false;
 
     onIsQtStyleChanged: {
-        if(isQtStyle){
-            Events.sendEvent("QtStyle");
-        }
-        else {
-            Events.sendEvent("AcfStyle");
-        }
+        Style.isQtStyle = isQtStyle;
     }
 
     property Component buttonDecoratorAcf: buttonDecorator;

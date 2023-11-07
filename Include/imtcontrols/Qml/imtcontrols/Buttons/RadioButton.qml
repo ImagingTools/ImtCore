@@ -3,14 +3,10 @@ import Acf 1.0;
 import imtqml 1.0
 import imtcontrols 1.0
 
-Item {
+ControlBase {
     id: customRadioButton;
 
-    width: decorator ? decorator.width : 0
-    height: decorator ? decorator.height : 0
-
-    property Component decoratorComponent;
-    property var decorator : null;
+    decoratorComponent: Style.isQtStyle ? DecoratorsQt.radioButtonDecorator: Decorators.radioButtonDecorator;
 
     property string text: "";
 
@@ -42,20 +38,9 @@ Item {
     }
 
     onDecoratorComponentChanged: {
-        if(!decoratorComponent){
-            return;
-        }
-        if(decorator){
-            decorator.destroy()
-        }
-        decorator = decoratorComponent.createObject(customRadioButton)
-        decorator.baseElement = customRadioButton
-        bindWidth.target = decorator
-        bindHeight.target = decorator
         if(decorator.checked !==undefined){
             decorator.checked = checked;
         }
-
     }
 
     onClicked: {
@@ -87,19 +72,6 @@ Item {
             }
         }
     }
-
-    Binding {
-        id: bindWidth
-        property: "width"
-        value: customRadioButton.width;
-    }
-
-    Binding {
-        id: bindHeight
-        property: "height"
-        value: customRadioButton.height;
-    }
-
 
     MouseArea {
         id: ma;

@@ -12,6 +12,7 @@ ThumbnailDecorator 1.0 ./Application/ThumbnailDecorator.qml
 ServerNoConnectionView 1.0 ./Application/ServerNoConnectionView.qml
 AlertMessage 1.0 ./Application/AlertMessage.qml
 ApplicationInfoProvider 1.0 ./Application/ApplicationInfoProvider.qml
+ControlBase 1.0 ./Base/ControlBase.qml
 Button 1.0 ./Buttons/Button.qml
 ButtonDecorator 1.0 ./Buttons/ButtonDecorator.qml
 RadioButton 1.0 ./Buttons/RadioButton.qml

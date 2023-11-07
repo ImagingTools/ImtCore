@@ -3,14 +3,10 @@ import Acf 1.0
 import imtqml 1.0
 import imtcontrols 1.0
 
-Item {
+ControlBase {
     id: progressBar;
 
-    width: decorator ? decorator.width : 0;
-    height: decorator ? decorator.height : 0;
-
-    property Component decoratorComponent;
-    property var decorator : null;
+    decoratorComponent: Style.isQtStyle ? DecoratorsQt.progressBarDecorator: Decorators.progressBarDecorator;
 
     property int barHeight: 20;
 
@@ -26,32 +22,6 @@ Item {
     property real value: 0.0;
     property real position: (value - from)/(to - from);
     property bool indeterminate: false;
-
-    onDecoratorComponentChanged: {
-        if(!decoratorComponent){
-            return;
-        }
-        if(decorator){
-            decorator.destroy()
-        }
-        decorator = decoratorComponent.createObject(progressBar)
-        decorator.baseElement = progressBar
-        bindWidth.target = decorator
-        bindHeight.target = decorator
-    }
-
-
-    Binding {
-        id: bindWidth
-        property: "width"
-        value: progressBar.width;
-    }
-
-    Binding {
-        id: bindHeight
-        property: "height"
-        value: progressBar.height;
-    }
 
 }
 

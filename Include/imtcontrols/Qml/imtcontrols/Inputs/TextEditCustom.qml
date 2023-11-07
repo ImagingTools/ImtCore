@@ -1,14 +1,12 @@
 import QtQuick 2.12
 import Acf 1.0;
+import imtqml 1.0
+import imtcontrols 1.0
 
-FocusScope {
+ControlBase {
     id: containerTextEdit;
 
-    width: decorator ? decorator.width : 0
-    height: decorator ? decorator.height : 0
-
-    property Component decoratorComponent;
-    property var decorator : null;
+    decoratorComponent: Style.isQtStyle ? DecoratorsQt.textEditDecorator: Decorators.textEditDecorator;
 
     property bool isDinamicHeight: true;
 
@@ -20,7 +18,6 @@ FocusScope {
 
     //property alias borderWidth: mainRect.border.width;
     //property alias color: mainRect.color;
-
 
     property string placeHolderText;
     property string focusColor: Style.textSelected;
@@ -45,6 +42,21 @@ FocusScope {
     signal cancelled();
     signal textEdited();
     signal editingFinished();
+
+    onDecoratorComponentChanged: {
+        bindText.target = decorator
+
+        textEdit.setHeight();
+
+        if(decorator.z < 0){
+            if(focus){
+                textEdit.forceActiveFocus()
+            }
+        }
+        else {
+            decorator.focus = focus;
+        }
+    }
 
     Keys.onPressed: {
         if (containerTextEdit.activeFocus){
@@ -94,55 +106,7 @@ FocusScope {
         }
     }
 
-    onDecoratorComponentChanged: {
-        if(!decoratorComponent){
-            return;
-        }
 
-        if(decorator){
-            decorator.destroy()
-        }
-        decorator = decoratorComponent.createObject(containerTextEdit)
-        decorator.baseElement = containerTextEdit
-        bindWidth.target = decorator
-        bindHeight.target = decorator
-        bindText.target = decorator
-
-
-        textEdit.setHeight();
-
-        if(decorator.z < 0){
-            if(focus){
-                textEdit.forceActiveFocus()
-            }
-        }
-        else {
-            decorator.focus = focus;
-        }
-
-
-        //        if(decorator.z < 0){
-        //            textEdit.focus = true;
-        //            textEdit.forceActiveFocus()
-        //        }
-        //        else {
-        //            decorator.focus = true;
-        //            decorator.forceActiveFocus()
-        //        }
-
-    }
-
-    Binding {
-        id: bindWidth
-        property: "width"
-        value: containerTextEdit.width;
-    }
-
-    Binding {
-        id: bindHeight
-        property: "height"
-        value: containerTextEdit.height;
-    }
 
     Binding {
         id: bindText

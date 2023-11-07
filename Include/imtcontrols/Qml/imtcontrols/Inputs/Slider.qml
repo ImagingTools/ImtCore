@@ -3,16 +3,12 @@ import Acf 1.0;
 import imtqml 1.0
 import imtcontrols 1.0
 
-Item {
+ControlBase {
     id: slider;
-
-    width: decorator ? decorator.width : 150
-    height: decorator ? decorator.height : 30
 
     rotation: orientation == Qt.Vertical ? -90 : 0;
 
-    property Component decoratorComponent;
-    property var decorator : null;
+    decoratorComponent: Style.isQtStyle ? DecoratorsQt.sliderDecorator: Decorators.sliderDecorator;
 
     property int backgroundWidth: width;
     property int backgroundHeight: 6;
@@ -34,6 +30,7 @@ Item {
     property alias tooltipText: tooltip.text;
     property alias tooltipItem: tooltip;
 
+
     Component.onCompleted: {
         if(value !== from){
             position = (value - from)/(to - from)
@@ -41,18 +38,12 @@ Item {
         }
     }
 
+    function decoratorChangedFunc(){
+        console.log("Slider: redefinition of base function");
+    }
+
     onDecoratorComponentChanged: {
-        if(!decoratorComponent){
-            return;
-        }
-        if(decorator){
-            decorator.destroy()
-        }
-
-        var width_ = width;
-
-        decorator = decoratorComponent.createObject(slider)
-        decorator.baseElement = slider
+        decoratorChangedFuncBase();
 
         if(decorator.to !== undefined){
             decorator.to = to;
@@ -69,26 +60,11 @@ Item {
             decorator.compl = true;
         }
 
-        bindWidth.target = decorator
-        bindHeight.target = decorator
+        setBindTargets();
 
         controlRecX = position * (width - controlWidth)
 
-
     }
-
-    Binding {
-        id: bindWidth
-        property: "width"
-        value: slider.width;
-    }
-
-    Binding {
-        id: bindHeight
-        property: "height"
-        value: slider.height;
-    }
-
 
     MouseArea{
         id: ma;

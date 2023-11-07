@@ -13,7 +13,8 @@
 		<file alias="imtcontrols/Application/ServerNoConnectionView.qml">Qml/imtcontrols/Application/ServerNoConnectionView.qml</file>
 		<file alias="imtcontrols/Application/ApplicationInfoProvider.qml">Qml/imtcontrols/Application/ApplicationInfoProvider.qml</file>
 		<file alias="imtcontrols/Application/AlertMessage.qml">Qml/imtcontrols/Application/AlertMessage.qml</file>
-		<file alias="imtcontrols/Buttons/Button.qml">Qml/imtcontrols/Buttons/Button.qml</file>
+                <file alias="imtcontrols/Base/ControlBase.qml">Qml/imtcontrols/Base/ControlBase.qml</file>
+                <file alias="imtcontrols/Buttons/Button.qml">Qml/imtcontrols/Buttons/Button.qml</file>
 		<file alias="imtcontrols/Buttons/ButtonDecorator.qml">Qml/imtcontrols/Buttons/ButtonDecorator.qml</file>
                 <file alias="imtcontrols/Buttons/RadioButton.qml">Qml/imtcontrols/Buttons/RadioButton.qml</file>
 		<file alias="imtcontrols/Buttons/IconButtonDecorator.qml">Qml/imtcontrols/Buttons/IconButtonDecorator.qml</file>

@@ -3,14 +3,11 @@ import Acf 1.0;
 import imtqml 1.0
 import imtcontrols 1.0
 
-Rectangle {
+ControlBase {
     id: switchCustom;
 
-    width: decorator ? decorator.width : 0
-    height: decorator ? decorator.height : 0
+    decoratorComponent: Style.isQtStyle ? DecoratorsQt.switchDecorator : Decorators.switchDecorator;
 
-    property Component decoratorComponent;
-    property var decorator : null;
     property string text: "";
 
     property int backgroundWidth: decorator ? decorator.backgroundWidth : 0;
@@ -36,35 +33,13 @@ Rectangle {
     property alias tooltipText: tooltip.text;
     property alias tooltipItem: tooltip;
 
-    function setChecked(checkedVal){
-        switchCustom.checked = checkedVal;
-        switchCustom.controlRecX = switchCustom.checked * (switchCustom.backgroundWidth - switchCustom.controlWidth);
-    }
-
     onDecoratorComponentChanged: {
-        if(!decoratorComponent){
-            return;
-        }
-        if(decorator){
-            decorator.destroy()
-        }
-        decorator = decoratorComponent.createObject(switchCustom)
-        decorator.baseElement = switchCustom
-        bindWidth.target = decorator
-        bindHeight.target = decorator
         setChecked(switchCustom.checked)
     }
 
-    Binding {
-        id: bindWidth
-        property: "width"
-        value: switchCustom.width;
-    }
-
-    Binding {
-        id: bindHeight
-        property: "height"
-        value: switchCustom.height;
+    function setChecked(checkedVal){
+        switchCustom.checked = checkedVal;
+        switchCustom.controlRecX = switchCustom.checked * (switchCustom.backgroundWidth - switchCustom.controlWidth);
     }
 
     MouseArea{
