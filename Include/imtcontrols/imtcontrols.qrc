@@ -98,7 +98,8 @@
 		<file alias="imtcontrols/Views/Diagram.qml">Qml/imtcontrols/Views/Diagram.qml</file>
 		<file alias="imtcontrols/Views/GridCollectionView.qml">Qml/imtcontrols/Views/GridCollectionView.qml</file>
 		<file alias="imtcontrols/Views/GridExtendingBaseDelegate.qml">Qml/imtcontrols/Views/GridExtendingBaseDelegate.qml</file>
-		<file alias="imtcontrols/Views/Loading.qml">Qml/imtcontrols/Views/Loading.qml</file>
+                <file alias="imtcontrols/Views/BusyIndicator.qml">Qml/imtcontrols/Views/BusyIndicator.qml</file>
+                <file alias="imtcontrols/Views/Loading.qml">Qml/imtcontrols/Views/Loading.qml</file>
 		<file alias="imtcontrols/Views/MovingItem.qml">Qml/imtcontrols/Views/MovingItem.qml</file>
 		<file alias="imtcontrols/Views/Pagination.qml">Qml/imtcontrols/Views/Pagination.qml</file>
 		<file alias="imtcontrols/Views/PaintedCorner.qml">Qml/imtcontrols/Views/PaintedCorner.qml</file>

@@ -380,11 +380,24 @@ Item {
 
     Component {
         id: busyIndicatorDecoratorComp;
-        Item {
+
+        Rectangle {
             id: busyIndicatorItem;
 
+            anchors.fill: parent;
+
+            color: Style.backgroundColor;
+            visible: !busyIndicatorItem.baseElement ? false : busyIndicatorItem.baseElement.visible;
+
             property var baseElement: null;
+
+            BusyIndicator{
+                anchors.centerIn: parent;
+                running: busyIndicatorItem.visible;
+            }
+
         }
+
     }
 
     Component {

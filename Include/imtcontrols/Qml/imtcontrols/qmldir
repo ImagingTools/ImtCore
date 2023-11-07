@@ -97,6 +97,7 @@ CustomTooltip 1.0 ./Views/CustomTooltip.qml
 Diagram 1.0 ./Views/Diagram.qml
 GridCollectionView 1.0 ./Views/GridCollectionView.qml
 GridExtendingBaseDelegate 1.0 ./Views/GridExtendingBaseDelegate.qml
+BusyIndicator 1.0 ./Views/BusyIndicator.qml
 Loading 1.0 ./Views/Loading.qml
 MovingItem 1.0 ./Views/MovingItem.qml
 Pagination 1.0 ./Views/Pagination.qml
