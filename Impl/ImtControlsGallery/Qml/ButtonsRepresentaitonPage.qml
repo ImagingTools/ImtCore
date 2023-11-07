@@ -4,38 +4,15 @@ import imtqml 1.0
 import imtcontrols 1.0
 
 
-
 Rectangle {
     id: buttonsRepresentaitonPage;
 
     anchors.fill: parent;
 
-
-    property string styleName: "Qt";
-    property bool isQtStyle: false;
-
     Component.onCompleted: {
         iconButton.forceActiveFocus();
         iconButton.focus = true;
-        Events.subscribeEvent("QtStyle", buttonsRepresentaitonPage.setQtStyle);
-        Events.subscribeEvent("AcfStyle", buttonsRepresentaitonPage.setAcfStyle);
-
     }
-
-    Component.onDestruction: {
-        Events.unSubscribeEvent("QtStyle", buttonsRepresentaitonPage.setQtStyle);
-        Events.unSubscribeEvent("AcfStyle", buttonsRepresentaitonPage.setAcfStyle);
-
-    }
-
-    function setQtStyle(){
-        buttonsRepresentaitonPage.isQtStyle = true;
-    }
-
-    function setAcfStyle(){
-        buttonsRepresentaitonPage.isQtStyle = false;
-    }
-
 
     Row{
         id: buttonsRow;
@@ -49,9 +26,6 @@ Rectangle {
             id: textButton;
 
             anchors.verticalCenter:  parent.verticalCenter;
-
-            decoratorComponent: buttonsRepresentaitonPage.isQtStyle?
-                                    DecoratorsQt.buttonDecorator : Decorators.buttonDecorator;
 
             KeyNavigation.right: roundButton
             KeyNavigation.tab: roundButton
@@ -70,8 +44,8 @@ Rectangle {
             KeyNavigation.right: iconButton
             KeyNavigation.tab: iconButton
 
-            decoratorComponent: buttonsRepresentaitonPage.isQtStyle?
-                                    DecoratorsQt.roundButtonDecorator : Decorators.roundButtonDecorator;
+            decoratorComponent: Style.isQtStyle?
+                                    DecoratorsQt.roundButtonDecorator: Decorators.roundButtonDecorator;
 
             iconSource: "../../../" + Style.theme + "/Icons" + "/Close.svg";
             onClicked: {
@@ -87,9 +61,6 @@ Rectangle {
 
             KeyNavigation.right: toggledButton
             KeyNavigation.tab: toggledButton
-
-            decoratorComponent: buttonsRepresentaitonPage.isQtStyle?
-                                    DecoratorsQt.buttonDecorator : Decorators.buttonDecorator;
 
             iconSource: "../../../" + Style.theme + "/Icons" + "/Eye.svg";
 
@@ -111,10 +82,6 @@ Rectangle {
 
                 KeyNavigation.right: textButton
                 KeyNavigation.tab: textButton
-
-                decoratorComponent: buttonsRepresentaitonPage.isQtStyle?
-                                        DecoratorsQt.buttonDecorator : Decorators.buttonDecorator;
-
 
                 checkable: true
 
@@ -142,30 +109,6 @@ Rectangle {
 
     ///////////////////
 
-    Component{
-        id: toolButtonDecorator;
-
-        ToolButtonDecorator{
-
-        }
-    }
-
-    Component{
-        id: topButtonDecorator;
-
-        TopButtonDecorator{
-        }
-    }
-
-    Component{
-        id: topButtonDecoratorNew;
-
-        TopButtonDecoratorNew{
-        }
-    }
-
-    ///////////////////
-
     PauseAnimation {
         id: pauseMessage;
         function show(text) {
@@ -175,11 +118,9 @@ Rectangle {
 
         duration: 1000;
         onStarted: {
-            //console.log("onStarted", messageRec.visible)
             messageRec.visible = true;
         }
         onFinished: {
-            //console.log("onFinished", messageRec.visible)
             messageRec.visible = false;
         }
     }

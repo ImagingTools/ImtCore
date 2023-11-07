@@ -74,6 +74,43 @@ Rectangle {
         }
     }
 
+    ListModel{
+        id: listModel;
+        ListElement {text: "delegate 1"; color: "red";}
+        ListElement {text: "delegate 2"; color: "green";}
+        ListElement {text: "delegate 3"; color: "blue";}
+
+    }
+
+    ListView{
+        id: listView;
+
+        anchors.verticalCenter: parent.verticalCenter;
+        anchors.right: parent.right;
+        anchors.rightMargin: 100;
+
+        width: 150;
+        height: 100;
+        clip: true;
+        boundsBehavior: Flickable.StopAtBounds;
+        spacing: 30;
+        model: listModel;
+        delegate:
+            Rectangle{
+                width: listView.width;
+                height: 40;
+                property alias text: name.text;
+                property string modelColor: model.color;
+                color: model.color;
+                Text {
+                    id: name;
+
+                    anchors.centerIn: parent;
+                    text: model.text;
+                }
+            }
+        }
+
 
     ////////////////////Button//////////////////////////
     Rectangle{
@@ -142,6 +179,12 @@ Rectangle {
 //                row.children[0].width = 200;
                 //
 
+                //
+                let item = listView.children[0].children[1];
+                console.log(item.text /*alias*/,
+                            item.modelColor /*string*/,
+                            item.color /*color*/);
+                //
 
             }
             onPressed: {
