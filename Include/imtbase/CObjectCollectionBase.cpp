@@ -418,18 +418,21 @@ idoc::MetaInfoPtr CObjectCollectionBase::GetElementMetaInfo(const Id& elementId)
 
 bool CObjectCollectionBase::SetElementName(const Id& elementId, const QString& objectName)
 {
-	QWriteLocker locker(&m_lock);
+	QReadLocker locker(&m_lock);
 
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == elementId){
 			if (objectInfo.name != objectName){
 				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
 				changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+
 				istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+				m_lock.lockForWrite();
 
 				objectInfo.name = objectName;
 
-				locker.unlock();
+				m_lock.unlock();
 			}
 
 			return true;
@@ -442,16 +445,23 @@ bool CObjectCollectionBase::SetElementName(const Id& elementId, const QString& o
 
 bool CObjectCollectionBase::SetElementDescription(const Id& elementId, const QString& objectDescription)
 {
-	QWriteLocker locker(&m_lock);
+	QReadLocker locker(&m_lock);
+
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == elementId){
 			if (objectInfo.description != objectDescription){
 				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
 				changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+
+				locker.unlock();
+
 				istd::CChangeNotifier changeNotifier(this, &changeSet);
 
+				m_lock.lockForWrite();
+
 				objectInfo.description = objectDescription;
-				locker.unlock();
+
+				m_lock.unlock();
 			}
 
 			return true;
@@ -464,17 +474,23 @@ bool CObjectCollectionBase::SetElementDescription(const Id& elementId, const QSt
 
 bool CObjectCollectionBase::SetElementEnabled(const Id& elementId, bool isEnabled)
 {
-	QWriteLocker locker(&m_lock);
+	QReadLocker locker(&m_lock);
+
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == elementId){
 			if (objectInfo.isEnabled != isEnabled){
 				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
 				changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+
+				locker.unlock();
+
 				istd::CChangeNotifier changeNotifier(this, &changeSet);
 
+				m_lock.lockForWrite();
 
 				objectInfo.isEnabled = isEnabled;
-				locker.unlock();
+
+				m_lock.unlock();
 			}
 
 			return true;
