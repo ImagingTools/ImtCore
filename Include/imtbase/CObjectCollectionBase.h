@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtCore/QVector>
 #include <QtCore/QUuid>
+#include <QtCore/QReadWriteLock>
 
 // ACF includes
 #include <istd/TOptDelPtr.h>
@@ -157,7 +158,7 @@ protected:
 
 protected:
 	imod::CModelUpdateBridge m_modelUpdateBridge;
-
+	mutable QReadWriteLock m_lock;
 };
 
 

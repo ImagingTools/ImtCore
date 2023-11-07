@@ -24,13 +24,15 @@ namespace imtbase
 // public methods
 
 CObjectCollectionBase::CObjectCollectionBase()
-	:m_modelUpdateBridge(this)
+	:m_modelUpdateBridge(this),
+	m_lock(QReadWriteLock::Recursive)
 {
+
 }
 
 
 CObjectCollectionBase::~CObjectCollectionBase()
-{
+{	
 	RemoveAllObjects();
 }
 
@@ -98,6 +100,8 @@ const imtbase::ICollectionDataController* CObjectCollectionBase::GetDataControll
 
 int CObjectCollectionBase::GetOperationFlags(const Id& objectId) const
 {
+	QReadLocker locker(&m_lock);
+
 	if (!objectId.isEmpty()){
 		for (const ObjectInfo& objectInfo : m_objects){
 			if (objectInfo.id == objectId){
@@ -170,12 +174,16 @@ bool CObjectCollectionBase::RemoveElement(const Id& elementId, const IOperationC
 			changeSet.SetChangeInfo(CN_ELEMENT_REMOVED, elementId);
 			istd::CChangeNotifier changeNotifier(this, &changeSet);
 
+			QWriteLocker locker(&m_lock);
+
 			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>((*iter).objectPtr.GetPtr());
 			if (modelPtr != nullptr){
 				modelPtr->DetachObserver(&m_modelUpdateBridge);
 			}
 
 			m_objects.erase(iter);
+
+			locker.unlock();
 
 			break;
 		}
@@ -187,6 +195,8 @@ bool CObjectCollectionBase::RemoveElement(const Id& elementId, const IOperationC
 
 const istd::IChangeable* CObjectCollectionBase::GetObjectPtr(const Id& objectId) const
 {
+	QReadLocker locker(&m_lock);
+
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
 			return objectInfo.objectPtr.GetPtr();
@@ -199,6 +209,8 @@ const istd::IChangeable* CObjectCollectionBase::GetObjectPtr(const Id& objectId)
 
 bool CObjectCollectionBase::GetObjectData(const Id& objectId, DataPtr& dataPtr) const
 {
+	QReadLocker locker(&m_lock);
+
 	for (const ObjectInfo& objectInfo : m_objects){
 		if ((objectInfo.id == objectId) && objectInfo.objectPtr.IsValid()){
 			if (!dataPtr.IsValid()){
@@ -227,15 +239,20 @@ bool CObjectCollectionBase::SetObjectData(
 			CompatibilityMode mode,
 			const IOperationContext* /*operationContextPtr*/)
 {
+	QWriteLocker locker(&m_lock);
+
 	for (ObjectInfo& objectInfo : m_objects){
 		if ((objectInfo.id == objectId) && objectInfo.objectPtr.IsValid()){
 			istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
 			changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, objectId);
 			istd::CChangeNotifier changeNotifier(this, &changeSet);
 
-			objectInfo.copyMode = mode;
 
-			return objectInfo.objectPtr->CopyFrom(object, mode);
+			objectInfo.copyMode = mode;
+			bool retVal = objectInfo.objectPtr->CopyFrom(object, mode);
+			locker.unlock();
+
+			return retVal;
 		}
 	}
 
@@ -251,6 +268,8 @@ IObjectCollection* CObjectCollectionBase::CreateSubCollection(
 	imtbase::IObjectCollection* collectionPtr = new imtbase::CObjectCollection;
 
 	Q_ASSERT(offset >= 0);
+
+	QWriteLocker locker(&m_lock);
 
 	int objectsCount = count >= 0 ? qMin(count, m_objects.count()) : m_objects.count();
 
@@ -281,6 +300,8 @@ const iprm::IOptionsList* CObjectCollectionBase::GetObjectTypesInfo() const
 
 ICollectionInfo::Id CObjectCollectionBase::GetObjectTypeId(const Id& objectId) const
 {
+	QReadLocker locker(&m_lock);
+
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
 			return objectInfo.typeId;
@@ -294,6 +315,8 @@ ICollectionInfo::Id CObjectCollectionBase::GetObjectTypeId(const Id& objectId) c
 idoc::MetaInfoPtr CObjectCollectionBase::GetDataMetaInfo(const Id& objectId) const
 {
 	idoc::MetaInfoPtr metaInfoPtr;
+
+	QReadLocker locker(&m_lock);
 
 	for (const ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == objectId){
@@ -311,6 +334,8 @@ idoc::MetaInfoPtr CObjectCollectionBase::GetDataMetaInfo(const Id& objectId) con
 
 int CObjectCollectionBase::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
 {
+	QReadLocker locker(&m_lock);
+
 	return m_objects.count();
 }
 
@@ -323,6 +348,8 @@ ICollectionInfo::Ids CObjectCollectionBase::GetElementIds(
 	Ids retVal;
 
 	Q_ASSERT(offset >= 0);
+
+	QReadLocker locker(&m_lock);
 
 	int objectsCount = count >= 0 ? qMin(count, m_objects.count()) : m_objects.count();
 
@@ -346,6 +373,8 @@ bool CObjectCollectionBase::GetSubsetInfo(
 
 QVariant CObjectCollectionBase::GetElementInfo(const Id& elementId, int infoType) const
 {
+	QReadLocker locker(&m_lock);
+
 	int objectIndex = -1;
 	for (int i = 0; i < m_objects.count(); ++i){
 		if (m_objects[i].id == elementId){
@@ -373,6 +402,8 @@ QVariant CObjectCollectionBase::GetElementInfo(const Id& elementId, int infoType
 
 idoc::MetaInfoPtr CObjectCollectionBase::GetElementMetaInfo(const Id& elementId) const
 {
+	QReadLocker locker(&m_lock);
+
 	idoc::MetaInfoPtr metaInfoPtr;
 
 	for (const ObjectInfo& objectInfo : m_objects){
@@ -387,6 +418,8 @@ idoc::MetaInfoPtr CObjectCollectionBase::GetElementMetaInfo(const Id& elementId)
 
 bool CObjectCollectionBase::SetElementName(const Id& elementId, const QString& objectName)
 {
+	QWriteLocker locker(&m_lock);
+
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == elementId){
 			if (objectInfo.name != objectName){
@@ -395,6 +428,8 @@ bool CObjectCollectionBase::SetElementName(const Id& elementId, const QString& o
 				istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 				objectInfo.name = objectName;
+
+				locker.unlock();
 			}
 
 			return true;
@@ -407,6 +442,7 @@ bool CObjectCollectionBase::SetElementName(const Id& elementId, const QString& o
 
 bool CObjectCollectionBase::SetElementDescription(const Id& elementId, const QString& objectDescription)
 {
+	QWriteLocker locker(&m_lock);
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == elementId){
 			if (objectInfo.description != objectDescription){
@@ -415,6 +451,7 @@ bool CObjectCollectionBase::SetElementDescription(const Id& elementId, const QSt
 				istd::CChangeNotifier changeNotifier(this, &changeSet);
 
 				objectInfo.description = objectDescription;
+				locker.unlock();
 			}
 
 			return true;
@@ -427,6 +464,7 @@ bool CObjectCollectionBase::SetElementDescription(const Id& elementId, const QSt
 
 bool CObjectCollectionBase::SetElementEnabled(const Id& elementId, bool isEnabled)
 {
+	QWriteLocker locker(&m_lock);
 	for (ObjectInfo& objectInfo : m_objects){
 		if (objectInfo.id == elementId){
 			if (objectInfo.isEnabled != isEnabled){
@@ -434,7 +472,9 @@ bool CObjectCollectionBase::SetElementEnabled(const Id& elementId, bool isEnable
 				changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
 				istd::CChangeNotifier changeNotifier(this, &changeSet);
 
+
 				objectInfo.isEnabled = isEnabled;
+				locker.unlock();
 			}
 
 			return true;
@@ -449,6 +489,12 @@ bool CObjectCollectionBase::SetElementEnabled(const Id& elementId, bool isEnable
 
 bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 {
+	if (archive.IsStoring()){
+		m_lock.lockForRead();
+	}
+	else{
+		m_lock.lockForWrite();
+	}
 	int objectCount = m_objects.count();
 
 	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
@@ -532,6 +578,7 @@ bool CObjectCollectionBase::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && archive.EndTag(objectListTag);
 
+	m_lock.unlock();
 	return retVal;
 }
 
@@ -552,6 +599,7 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 
 		ICollectionInfo::Ids sourceElementIds = sourcePtr->GetElementIds();
 
+		QWriteLocker targetLock(&m_lock);
 		// Remove non-existing objects from the target collection:
 		QMutableVectorIterator<ObjectInfo> targetObjectsIter(m_objects);
 		while (targetObjectsIter.hasNext()){
@@ -562,6 +610,7 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 			}
 		}
 
+		QReadLocker sourceLock(&sourcePtr->m_lock);
 		for (const ObjectInfo& sourceObjectInfo : sourcePtr->m_objects){
 			ObjectInfo* targetObjectInfoPtr = GetObjectInfo(sourceObjectInfo.id);
 
@@ -658,6 +707,8 @@ bool CObjectCollectionBase::InsertObjectIntoCollection(ObjectInfo info)
 
 	Q_ASSERT(info.objectPtr.IsValid());
 
+	QWriteLocker locker(&m_lock);
+
 	m_objects.push_back(info);
 
 	return true;
@@ -672,6 +723,8 @@ int CObjectCollectionBase::GetItemDefaultFlags() const
 
 CObjectCollectionBase::ObjectInfo* CObjectCollectionBase::GetObjectInfo(const QByteArray& id) const
 {
+	QReadLocker locker(&m_lock);
+
 	for (int i = 0; i < m_objects.count(); ++i){
 		if (m_objects[i].id == id){
 			 return const_cast<CObjectCollectionBase::ObjectInfo*>(&m_objects[i]);
@@ -688,7 +741,11 @@ void CObjectCollectionBase::RemoveAllObjects()
 
 	istd::CChangeNotifier changeNotifier(this);
 
+	QWriteLocker locker(&m_lock);
+
 	m_objects.clear();
+
+	locker.unlock();
 }
 
 

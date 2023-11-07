@@ -3,6 +3,9 @@
 // std includes
 #include <cmath>
 
+// STL includes
+#include <cmath>
+
 // ImtCore includes
 #include <imtbase/CCollectionFilter.h>
 

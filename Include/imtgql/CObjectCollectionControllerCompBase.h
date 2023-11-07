@@ -58,7 +58,7 @@ public:
 		OT_USER_OPERATION = 1000
 	};
 
-	// reimplemented (imtgql::CCGqlRepresentationControllerCompBase)
+	// reimplemented (imtgql::CGqlRequestHandlerCompBase)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 protected:

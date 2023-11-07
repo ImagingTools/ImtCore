@@ -42,6 +42,15 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessRequest(const imtrest::I
 			return UnregisterSubscription(request);
 			break;
 
+		case imtrest::CWebSocketRequest::MT_QUERY:
+			return ProcessGqlRequest(request);
+			break;
+
+		case imtrest::CWebSocketRequest::MT_ERROR:
+			SendErrorMessage(0, "Error request");
+			return imtrest::ConstResponsePtr();
+			break;
+
 		default:{
 			QByteArray errorMessage = QString("Method type not correct: %1").arg(webSocketRequest->GetMethodType()).toUtf8();
 
@@ -73,7 +82,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::InitConnection(const imtrest::I
 	if (webSocketRequest != nullptr){
 	QByteArray data = QString(R""(
 {
-"type": "connection_ack",
+"type": "connection_ask",
 "payload": {
 	"connectionTimeoutMs": 300000
 }
@@ -84,6 +93,56 @@ imtrest::ConstResponsePtr CWebSocketServletComp::InitConnection(const imtrest::I
 	}
 
 	return imtrest::ConstResponsePtr();	
+}
+
+
+imtrest::ConstResponsePtr CWebSocketServletComp::ProcessGqlRequest(const imtrest::IRequest& request) const
+{
+	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
+	imtgql::CGqlRequest gqlRequest;
+	QByteArray body = request.GetBody();
+	QJsonDocument document = QJsonDocument::fromJson(body);
+	QJsonObject object = document.object();
+
+	body = object.value("payload").toObject().value("data").toString().toUtf8();
+
+	int errorPosition;
+	gqlRequest.ParseQuery(body, errorPosition);
+
+	QByteArray commandId = gqlRequest.GetCommandId();
+
+	if (commandId.isEmpty()){
+		QByteArray errorMessage = "Empty command-ID";
+
+		return CreateErrorResponse(errorMessage, request);
+	}
+
+	if (m_gqlRequestHandlerCompPtr.IsValid()){
+		QString errorMessage;
+		imtbase::CTreeItemModel* responseData = m_gqlRequestHandlerCompPtr->CreateResponse(gqlRequest, errorMessage);
+		if (responseData == nullptr){
+			return imtrest::ConstResponsePtr();
+		}
+
+		QByteArray data = QString(R""(
+{
+"type": "query_data",
+"id": "%1",
+"payload": {
+	"data": "%2"
+}
+}
+			)"" ).arg(object.value("id").toString()).arg(responseData->toJSON()).toUtf8();
+
+			return CreateDataResponse(data, request);
+	}
+	else{
+		QByteArray errorMessage = QString("The requested command could not be executed. No servlet was found for the given command: '%1")
+					.arg(QString(commandId)).toUtf8();
+		return CreateErrorResponse(errorMessage, request);
+	}
+
+	return imtrest::ConstResponsePtr();
 }
 
 
@@ -119,10 +178,10 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 		QString errorMessage;
 		if (subscriberControllerPtr->RegisterSubscribtion(webSocketRequest->GetSubscriptionId(), gqlRequest, request, errorMessage)){
 			QByteArray data = QString(R""(
-				{
-				"type": "start_ack",
-				"id": "%1"
-				}
+{
+"type": "start_ask",
+"id": "%1"
+}
 				)"" ).arg(QString(webSocketRequest->GetSubscriptionId())).toUtf8();
 			
 				return CreateDataResponse(data, request);
@@ -152,10 +211,10 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 		if ((controlerPtr != nullptr) && m_gqlSubscriberControllersCompPtr[index]->UnRegisterSubscribtion(webSocketRequest->GetSubscriptionId())){
 
 			QByteArray data = QString(R""(
-				{
-				"type": "stop",
-				"id": "%1"
-				}
+{
+"type": "stop",
+"id": "%1"
+}
 			)"" ).arg(QString(webSocketRequest->GetSubscriptionId())).toUtf8();
 			
 			return CreateDataResponse(data, request);

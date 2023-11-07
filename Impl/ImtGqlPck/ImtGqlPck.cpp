@@ -84,10 +84,7 @@ I_EXPORT_COMPONENT(
 			"Operation context controller",
 			"Operation Context Controller");
 
-I_EXPORT_COMPONENT(
-			DelegatedRequestHandler,
-			"Delegate for slave request handler",
-			"Delegate Request Handler");
+
 
 I_EXPORT_COMPONENT(
 			ObjectCollectionSubscriberController,

@@ -4,6 +4,7 @@
 // ImtCore includes
 #include <imtrest/CHttpRootServletComp.h>
 #include <imtgql/IGqlSubscriberController.h>
+#include <imtgql/IGqlRequestHandler.h>
 
 
 namespace imtgql
@@ -20,6 +21,7 @@ public:
 	I_BEGIN_COMPONENT(CWebSocketServletComp);
 		I_REGISTER_INTERFACE(IRequestServlet);
 		I_ASSIGN_MULTI_0(m_gqlSubscriberControllersCompPtr, "GqlSubscriberControllers", "List of gql subscriber controller for corresponding command-IDs", false);
+		I_ASSIGN(m_gqlRequestHandlerCompPtr, "GqlRequestHandler", "GraphQl request handler to create to create the response body", false, "GqlRequestHandler");
 	I_END_COMPONENT
 
 	// reimplemented (IRequestServlet)
@@ -28,6 +30,7 @@ public:
 
 protected:
 	virtual imtrest::ConstResponsePtr InitConnection(const imtrest::IRequest& request) const;
+	virtual imtrest::ConstResponsePtr ProcessGqlRequest(const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr RegisterSubscription(const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr UnregisterSubscription(const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr CreateDataResponse(QByteArray data, const imtrest::IRequest& request) const;
@@ -35,6 +38,7 @@ protected:
 
 private:
 	I_MULTIREF(IGqlSubscriberController, m_gqlSubscriberControllersCompPtr);
+	I_REF(imtgql::IGqlRequestHandler, m_gqlRequestHandlerCompPtr);
 
 	typedef QMap<QByteArray, IGqlSubscriberController*> SubscriberControllersMap;
 

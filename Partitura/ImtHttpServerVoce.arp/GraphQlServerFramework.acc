@@ -2,14 +2,23 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5126" Description="ACF"/>
-            <Version Id="1" Number="2197" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5120" Description="ACF"/>
+            <Version Id="1" Number="2196" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Server framework fpr GraphQ-based implementations</Description>
     <Keywords>Web GraphQL Server HTTP</Keywords>
     <ElementsList>
+        <Element Id="DelegatedBinaryDataProviders" PackageId="ImtCorePck" ComponentId="DelegatedBinaryDataProviders">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="SlaveBinaryDataProviders" Type="Reference[]" ExportId="BinaryDataProviders">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="GraphQlRoot" PackageId="ImtGqlPck" ComponentId="GraphQLServlet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -147,27 +156,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RestoringDatabaseController" PackageId="ImtDatabasePck" ComponentId="RestoringDatabaseController">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="BackupBeforeRestore" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="BackupSettings" Type="Reference" ExportId="BackupSettings">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Command-ID" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="GetBackupFile"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DatabaseLoginSettings" Type="Reference" ExportId="DatabaseAccessSettings">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="ServerLogDataProvider" PackageId="ImtRestPck" ComponentId="ServerLogDataProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -187,17 +175,13 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="BinaryDataControllers" Type="Reference[]" ExportId="BinaryDataControllers">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>RestoringDatabaseController</Value>
-                            </Values>
-                        </Data>
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="BinaryDataProviders" Type="Reference[]" ExportId="BinaryDataProviders">
+                    <AttributeInfo Id="BinaryDataProviders" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
+                                <Value>DelegatedBinaryDataProviders</Value>
                                 <Value>LogFileDataProvider</Value>
-                                <Value>RestoringDatabaseController</Value>
                                 <Value>ServerLogDataProvider</Value>
                             </Values>
                         </Data>
@@ -246,7 +230,6 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="LogFileDataProvider" ComponentId="LogFileDataProvider"/>
-        <Component ExportedId="RestoringDatabaseController" ComponentId="RestoringDatabaseController"/>
         <Component ExportedId="ServerLogDataProvider" ComponentId="ServerLogDataProvider"/>
     </ExportedComponents>
 </Acf>

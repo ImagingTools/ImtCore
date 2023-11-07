@@ -44,6 +44,16 @@ I_EXPORT_COMPONENT(
 			"Puma GraphQL remote representation controller",
 			"Puma GraphQL Gql Api Client Controller User");
 
+I_EXPORT_COMPONENT(
+			SubscriptionManager,
+			"Subscription manager for a client",
+			"GraphQl Service Subscription  Manager");
+
+I_EXPORT_COMPONENT(
+		WebSocketClient,
+		"The client for 'CWebSocketServer'",
+		"Rest WebSocket Client");
+
 
 } // namespace ImtClientGqlPck
 

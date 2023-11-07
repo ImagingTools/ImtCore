@@ -542,7 +542,9 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetElementListReque
 	input.InsertField("offset", QVariant(offset));
 	input.InsertField("count", QVariant(count));
 	QByteArray data;
-	SerializeObject(selectionParamsPtr,data);
+	if (selectionParamsPtr != nullptr){
+		SerializeObject(selectionParamsPtr,data);
+	}
 	input.InsertField("selectionParams", QVariant(data.toBase64()));
 	requestPtr->AddParam(input);
 
@@ -644,6 +646,10 @@ bool CGqlObjectCollectionDelegateComp::SerializeObject(const istd::IPolymorphic*
 {
 	objectData.clear();
 
+	if (object == nullptr){
+		return false;
+	}
+
 	const iser::ISerializable* objectConst = dynamic_cast<const iser::ISerializable*>(object);
 	iser::ISerializable* serializableObject = dynamic_cast<iser::ISerializable*>(const_cast<iser::ISerializable*>(objectConst));
 
@@ -670,6 +676,10 @@ bool CGqlObjectCollectionDelegateComp::SerializeObject(const istd::IPolymorphic*
 
 bool CGqlObjectCollectionDelegateComp::DeSerializeObject(istd::IPolymorphic* object, const QByteArray& objectData) const
 {
+	if (object == nullptr){
+		return false;
+	}
+
 	iser::ISerializable* serializableObject = dynamic_cast<iser::ISerializable*>(object);
 	if (serializableObject == nullptr){
 		QByteArray errorMessage = QObject::tr("Object data metainfo is not Serializable").toUtf8();

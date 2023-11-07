@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5105" Description="ACF"/>
-            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5120" Description="ACF"/>
+            <Version Id="1" Number="2196" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -97,6 +97,9 @@
         <Element Id="WebSocketServlet" PackageId="ImtGqlPck" ComponentId="WebSocketServlet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="GqlRequestHandler" Type="Reference" ExportId="GqlRequestHandler">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="GqlSubscriberControllers" Type="Reference[]" ExportId="GqlSubscriberControllers">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -131,6 +134,8 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="TcpServer"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="WebSocketProtocolEngine" ComponentId="WebSocketProtocolEngine"/>
         <Component ExportedId="WebSocketServer" ComponentId="WebSocketServer"/>
+        <Component ExportedId="WebSocketServlet" ComponentId="WebSocketServlet"/>
     </ExportedComponents>
 </Acf>

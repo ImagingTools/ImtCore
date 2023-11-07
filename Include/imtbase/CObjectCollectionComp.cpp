@@ -128,7 +128,7 @@ void CObjectCollectionComp::OnComponentCreated()
 
 void CObjectCollectionComp::OnComponentDestroyed()
 {
-	RemoveAllObjects();
+//	RemoveAllObjects();
 
 	BaseClass::OnComponentDestroyed();
 }

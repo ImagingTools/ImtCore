@@ -88,9 +88,11 @@ Item {
     }
 
     function openPopupMenu(x, y){
+        console.log("openPopupMenu")
         modalDialogManager.closeDialog();
 
         if (containerBase.contextMenuModel != null){
+            console.log("openPopupMenu", x, y)
 
             let offset = 26 * contextMenuModel.count;
             modalDialogManager.openDialog(popupMenu, {"x": x, "y": y - offset, "model": contextMenuModel});

@@ -39,7 +39,9 @@ public:
 		MT_ERROR,
 		MT_DATA,
 		MT_STOP,
-		MT_COMPLETE
+		MT_COMPLETE,
+		MT_QUERY,
+		MT_QUERY_DATA
 	};
 
 	CWebSocketRequest(const IRequestServlet& requestHandler, const IProtocolEngine& engine);

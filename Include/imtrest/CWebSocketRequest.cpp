@@ -88,15 +88,27 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 	QJsonObject object = document.object();
 	if (object.value("type") == "connection_init"){
 		m_type = MT_CONNECTION_INIT;
-	}	
+	}
+	if (object.value("type") == "connection_ask"){
+		m_type = MT_CONNECTION_ASK;
+	}
 	if (object.value("type") == "start"){
 		m_type = MT_START;
+	}
+	if (object.value("type") == "start_ask"){
+		m_type = MT_START_ASK;
 	}
 	if (object.value("type") == "error"){
 		m_type = MT_ERROR;
 	}
 	if (object.value("type") == "stop"){
 		m_type = MT_STOP;
+	}
+	if (object.value("type") == "data"){
+		m_type = MT_DATA;
+	}
+	if (object.value("type") == "query"){
+		m_type = MT_QUERY;
 	}
 
 	m_subscriptionId = object.value("id").toString().toUtf8();

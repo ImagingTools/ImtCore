@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5126" Description="ACF"/>
-            <Version Id="1" Number="2197" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5120" Description="ACF"/>
+            <Version Id="1" Number="2196" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -40,16 +40,10 @@
                     <AttributeInfo Id="AutoCompression" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="BackupSettings" Type="Reference" ExportId="BackupSettings">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="BinaryDataControllers" Type="Reference[]" ExportId="BinaryDataControllers">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="BinaryDataProviders" Type="Reference[]" ExportId="BinaryDataProviders">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DatabaseAccessSettings" Type="Reference" ExportId="DatabaseAccessSettings">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="FileAccessCommandId" Type="Id" ExportId="FileAccessCommandId">
@@ -116,7 +110,6 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="LogFileDataProvider" ComponentId="GraphQlServerFramework/LogFileDataProvider"/>
-        <Component ExportedId="RestoringDatabaseController" ComponentId="GraphQlServerFramework/RestoringDatabaseController"/>
         <Component ExportedId="ServerLogDataProvider" ComponentId="GraphQlServerFramework/ServerLogDataProvider"/>
     </ExportedComponents>
 </Acf>

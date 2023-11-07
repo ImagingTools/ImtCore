@@ -234,6 +234,11 @@ I_EXPORT_COMPONENT(
 			"System status",
 			"System Status");
 
+I_EXPORT_COMPONENT(
+			DelegatedBinaryDataProviders,
+			"Delegated provider of a slave data provider",
+			"Delegator Data Binary Provider");
+
 
 } // namespace ImtCorePck
 
