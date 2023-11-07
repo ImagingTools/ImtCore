@@ -62,6 +62,26 @@ Rectangle {
 
         }//progressBarRow
 
+        Row{
+            id: indicatorsRow;
+
+            anchors.horizontalCenter: parent.horizontalCenter;
+
+            height:  100;
+            spacing: 100;
+
+            BusyIndicator{
+                id: busyIndicator;
+
+                anchors.verticalCenter: parent.verticalCenter;
+
+                width: parent.height;
+                height: width;
+                visible: true;
+            }
+
+        }
+
     }
 
 }
