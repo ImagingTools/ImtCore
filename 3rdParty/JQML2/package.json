@@ -1,0 +1,19 @@
+{
+  "name": "jqml2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test/test.js",
+  "scripts": {
+    "build-core": "webpack --mode production --config webpack.config.js",
+    "build-core-dev": "webpack --mode development --config webpack.config.js",
+    "build-core-test": "webpack --mode development --config webpack.config.test.js",
+    "compile": "node ./compiler/compiler.js",
+    "compile-test": "node ./compiler/compiler.js ../test/qml",
+    "generate-anchors-test": "node ./test/anchors-test.js"
+  },
+  "author": "Artur Menshikov",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack-cli": "^5.1.4"
+  }
+}

@@ -1,0 +1,1159 @@
+const fs = require('fs')
+const path = require('path')
+const parser = require('./parser')
+const { listComponents } = require('../components/list')
+const { Qt } = require('../utils/Qt')
+const components = {}
+for(let componentName of listComponents){
+    const component = require(`../components/${componentName}`)[componentName]
+    components[componentName] = component
+}
+const listProperties = require('../utils/properties')
+
+const source = process.argv[2] || '../test/qml'
+if(!source) throw 'source not specified'
+
+function getFiles (dir, _files){
+    _files = _files || []
+    let files = fs.readdirSync(dir)
+    for (var i in files){
+        let name = dir + '/' + files[i]
+        if (fs.statSync(name).isDirectory()){
+            getFiles(name, _files)
+        } else {
+            if(path.extname(name) === '.qml') _files.push(name.replaceAll(/\\+/g, '/'))
+        }
+    }
+    return _files
+}
+
+const fileList = getFiles(path.resolve(__dirname, source))
+const compiledFiles = {}
+// console.log('fileList: ', fileList)
+
+UID = 0
+function getBaseStructure(){
+    UID++
+    return {
+        extends: undefined,
+        className: '',
+        Singleton: false,
+        fileName: '',
+        qmlFileName: '',
+        getQmlFileName: function(){
+            let qmlName = this.fileName.split('/').pop()
+            return qmlName
+        },
+        id: '',
+        properties: [],
+        propertiesNames: [],
+        js: {},
+        qml: [],
+        methods: {},
+        connectionSignals: [],
+        defineSignals: {},
+        children: [],
+        parent: null,
+        name: `el${UID}`,
+        UID: UID
+    }
+}
+
+function qmlpragma(m, instructions, file){
+    // for(let p of m){
+    //     if(p[0] === 'qmlpragma'){
+    //         if(p[1] === 'Singleton') {
+                
+    //             // instructions.SingletonName = name
+    //             instructions.Singleton = true
+    //         }
+    //     }
+    // }
+}
+function qmlimport(meta, compiledFile){
+    for(let imp of meta){
+        if(imp[0] === 'qmlimport'){
+            if(imp[1].indexOf('js') >= 0){
+                // jsName = imp[1]
+                // jsAs = imp[3]
+                // let path = file.split('/')
+                // path = path.slice(0, path.length-1).join('/') + '/' + jsName
+
+                // if(fs.existsSync(path)){
+                //     let content = fs.readFileSync(path, encoding='utf-8')
+                //     let meta = parser.jsparse(content)
+                    
+                //     instructions.js[jsName] = meta.source.replaceAll(/(?<=[^\\])[`]/g, '\\`') + (jsAs ? `\r\nvar ${jsAs} = {${meta.exports.join(',')}}\r\n` : '')
+                // } else {
+                //     console.log(`WARNING ${path} does not exist`)
+                // }
+                
+            } else {
+                compiledFile.imports.push({
+                    path: imp[1],
+                    as: imp[3],
+                })
+            }
+        }
+    }
+}
+// let ignoreSingletons = new Set()
+function qmlelem(meta, instructions){
+    let childInstructions = getBaseStructure()
+    instructions.children.push(childInstructions)
+    childInstructions.parent = instructions
+    childInstructions.fileName = instructions.fileName
+   
+    preCompile(meta[1], meta[3], meta[2], childInstructions) 
+
+
+    // if(instructions.class === 'Component'){
+    //     instructions.propertiesSpecial.createObject = childInstructions
+    // } else {
+    //     instructions.children.push(childInstructions)
+    // }
+    
+    
+}
+function qmlsignaldef(meta, instructions){
+    let params = []
+    for(let p of meta[2]){
+        params.push(`\`${p.name}\``)
+    }
+    instructions.defineSignals[meta[1]] = params//.join(',')
+}
+function qmlmethod(meta, instructions){
+    instructions.methods[meta[1]] = {
+        params: meta[1],
+        val: meta[2],
+    }
+}
+function qmlaliasdef(meta, instructions){
+    instructions.propertiesNames.push(meta[1])
+    instructions.properties.push({
+        name: meta[1],
+        type: 'QAlias',
+        val: meta[meta.length - 1] === '.' ? meta.slice(2, meta.length - 1) : meta.slice(2),
+        command: 'create',
+    })
+}
+function qmlpropdef(meta, instructions){
+    instructions.propertiesNames.push(meta[1])
+    if(meta[3] && meta[3][1][0] === 'qmlelem'){
+        let childInstructions = getBaseStructure()
+        childInstructions.parent = instructions
+        childInstructions.fileName = instructions.fileName
+    
+        preCompile(meta[3][1][1], meta[3][1][3], meta[3][1][2], childInstructions) 
+
+        let type = meta[2][0].toUpperCase()+meta[2].slice(1)
+
+        instructions.properties.push({
+            val: childInstructions,
+            name: meta[1],
+            type: listComponents.indexOf(type) >= 0 ? type : 'Q'+type,
+            command: 'create',
+            isElement: true
+        })
+    } else {
+        let type = meta[2][0].toUpperCase()+meta[2].slice(1)
+        
+        instructions.properties.push({
+            name: meta[1],
+            type: listComponents.indexOf(type) >= 0 ? type : 'Q'+type,
+            val: meta[3],
+            command: 'create'
+        })
+    }
+    
+}
+function qmlprop(meta, instructions){
+    if(meta[2][0] === "block" || meta[2][1][0] === "assign"){
+        if(meta[1][0] === "dot"){
+            let name = meta[1].slice(1)
+
+            if(name[1].slice(0, 2) === 'on'){
+                let signalName = name[1].slice(2)
+                signalName = signalName[0].toLowerCase() + signalName.slice(1)
+                instructions.connectionSignals.push({
+                    name: signalName,
+                    val: meta[2],
+                })
+            } else {
+                instructions.propertiesNames.push(name.join('.'))
+                if(meta[2][1][0] === 'qmlelem'){
+                    let childInstructions = getBaseStructure()
+                    childInstructions.parent = instructions
+                    childInstructions.fileName = instructions.fileName
+                
+                    preCompile(meta[2][1][1], meta[2][1][3], meta[2][1][2], childInstructions) 
+
+                    instructions.properties.push({
+                        name: name,
+                        val: childInstructions,
+                        isElement: true
+                    })
+                }
+                instructions.properties.push({
+                    name: name.join('.'),
+                    val: meta[2]
+                })
+            }
+             
+            
+        } else {
+            let name = meta[1]
+
+            if(name.slice(0, 2) === 'on'){
+                let signalName = name.slice(2)
+                signalName = signalName[0].toLowerCase() + signalName.slice(1)
+                instructions.connectionSignals.push({
+                    name: signalName,
+                    val: meta[2],
+                })
+            } else {
+                instructions.propertiesNames.push(name)
+
+                if(meta[2][1][0] === 'qmlelem'){
+                    let childInstructions = getBaseStructure()
+                    childInstructions.parent = instructions
+                    childInstructions.fileName = instructions.fileName
+                
+                    preCompile(meta[2][1][1], meta[2][1][3], meta[2][1][2], childInstructions) 
+
+                    instructions.properties.push({
+                        name: name,
+                        val: childInstructions,
+                        isElement: true
+                    })
+                }
+
+                instructions.properties.push({
+                    name: name,
+                    val: meta[2]
+                })
+            }
+        } 
+    } else if (meta[1][0] === "dot"){
+        let name = meta[1].slice(1).join('.')
+        instructions.propertiesNames.push(name)
+        instructions.properties.push({
+            name: name,
+            val: meta[2]
+        })
+    } else {
+        let name = meta[1]
+        if(name.slice(0, 2) === 'on'){
+            let signalName = name.slice(2)
+            signalName = signalName[0].toLowerCase() + signalName.slice(1)
+            instructions.connectionSignals.push({
+                name: signalName,
+                val: meta[2],
+            })
+        } else {
+            if(name === 'id'){
+                instructions.id = meta[2][1][1]
+                compiledFiles[instructions.fileName].context[instructions.id] = instructions
+            } else {
+                instructions.propertiesNames.push(name)
+
+                if(meta[2][1][0] === 'qmlelem'){
+                    let childInstructions = getBaseStructure()
+                    childInstructions.parent = instructions
+                    childInstructions.fileName = instructions.fileName
+                
+                    preCompile(meta[2][1][1], meta[2][1][3], meta[2][1][2], childInstructions) 
+
+                    instructions.properties.push({
+                        name: name,
+                        val: childInstructions,
+                        isElement: true
+                    })
+                } else {
+                    instructions.properties.push({
+                        name: name,
+                        val: meta[2]
+                    })
+                }
+
+                
+            }
+        }
+        
+        
+    }
+}
+function qmlobj(m, instructions, file){
+    let cls = 'QtObject'
+    let childInstructions = getBaseStructure()
+   
+    preCompile(cls, m[2], null, childInstructions, file) 
+    instructions.propertiesQML[m[1]] = childInstructions
+    
+}
+function preCompile(className, meta, on, instructions){
+    instructions.className = className[0] === 'dot' ? className.slice(1).pop() : className
+    // if(on) {
+    //     instructions.properties.properties = on
+    // }
+    for(let m of meta){
+        if(m){
+            if(m[0] === "qmlprop"){
+                qmlprop(m, instructions)
+            }
+            if(m[0] === "qmlpropdef"){
+                qmlpropdef(m, instructions)
+            }
+            if(m[0] === "qmlsignaldef"){
+                qmlsignaldef(m, instructions)
+            }
+            if(m[0] === "qmlaliasdef"){
+                qmlaliasdef(m, instructions)
+            }
+            if(m[0] === "qmlmethod"){
+                qmlmethod(m, instructions)
+            }
+            if(m[0] === "qmlelem"){
+                qmlelem(m, instructions)
+            }
+            // if(m[0] === "qmlobj"){
+            //     qmlobj(m, instructions)
+            // }
+        }
+    }
+}
+
+//preCompile
+
+for(let fileName of fileList){
+    UID = 0
+    let data = fs.readFileSync(fileName, {encoding:'utf8', flag:'r'}).replaceAll(/((?<![:\/])\/\/(.*?)\n)|(\/\*(.*?)\*\/)/gms, '\n')
+    let instructions = getBaseStructure()
+
+    parser.parse.nowParsingFile = fileName
+    let meta = parser.parse(data)
+    
+   
+    compiledFiles[fileName] = {
+        fileName: fileName,
+        context: {},
+        instructions: instructions,
+        namespace: path.relative(path.resolve(__dirname, source), fileName).replaceAll(/[\\,/]*\w+.qml/g, ''),
+        imports: [],
+    }
+    instructions.fileName = fileName
+
+    if(meta[3]) qmlpragma(meta[3], instructions)
+    qmlimport(meta[1], compiledFiles[fileName])
+
+    if(meta[2][0] === 'qmlelem'){
+        preCompile(meta[2][1], meta[2][3], meta[2][2], instructions)
+    }
+}
+
+function testName(name, currentInstructions){
+    if(currentInstructions.className === 'MouseArea' && (name === 'mouse' || name === 'wheel')) return true
+
+    let inExtends = false
+    if(currentInstructions.extends) inExtends = testName(name, currentInstructions.extends.instructions)
+    if(inExtends) return true
+    
+    let component = components[currentInstructions.className]
+    if(component)
+    while(component.defaultProperties){
+        if(name in component.defaultProperties){
+            return true
+        }
+        component = component.__proto__
+    }
+    for(let prop of currentInstructions.properties){
+        if(prop.name === name) return true
+    }
+    if(name in currentInstructions.defineSignals) return true
+    if(name in currentInstructions.methods) return true
+    return false
+}
+
+function prepare(tree, compiledFile, currentInstructions, stat = null, propValue = false, assign = false, prevCommand = '', currentObj = {}){ 
+    if(tree)
+    switch(tree[0]){
+        case 'return': {
+            stat.return = true
+            stat.value.push(`return `)
+            prepare(tree[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            break
+        }
+        case 'num': {
+            stat.value.push(tree[1])
+            break
+        }
+        case 'string': {
+            stat.value.push(`\`${tree[1]}\``)
+            break
+        }
+        case 'assign': {
+            stat.compute = true
+            prepare(tree[2], compiledFile, currentInstructions, stat, propValue, true, prevCommand, currentObj)
+            if(stat.value[stat.value.length-1].indexOf('getStatement') >= 0){
+                stat.value.push(`.reset(`)
+                prepare(tree[3], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+                stat.value.push(`)`)
+            } else {
+                stat.value.push(`=`)
+                prepare(tree[3], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            }
+            stat.value.push(`;`)
+            break
+        }
+        case 'name': {
+            if(tree[1] === 'parent') {
+                stat.compute = true
+                stat.value.push(`${currentInstructions.name}.parent()`)
+            } else if(tree[1] in compiledFile.context){
+                stat.compute = true
+                stat.value.push(`inCtx.get('${tree[1]}')`)
+                currentObj.name = `inCtx.${tree[1]}`
+            } else {
+                if(stat.ignore.indexOf(tree[1]) >= 0 || tree[1] === 'true' || tree[1] === 'false' || tree[1] === 'this'){
+                    stat.value.push(tree[1])
+                } else if(testName(tree[1], currentInstructions)){
+                    stat.compute = true
+                    stat.value.push(`${currentInstructions.name}.${tree[1]}`)
+                } else {
+                    try {
+                        if(!components[tree[1]]) eval(tree[1])
+                        stat.value.push(tree[1])
+                    } catch (error) {
+                        stat.compute = true
+                        stat.value.push(`inCtx.get('${tree[1]}')`)
+                    }
+                }
+                
+            }
+            break
+        }
+        case 'dot': {
+            stat.compute = true
+            prepare(tree[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push('.')
+            stat.value.push(tree[2])
+            break
+        }
+        case 'call': {
+            stat.compute = true
+            prepare(tree[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push('(')
+            for(let i = 0; i < tree[2].length; i++){
+                prepare(tree[2][i], compiledFile, currentInstructions, stat, propValue, assign, '', currentObj)
+                if(i < tree[2].length-1) stat.value.push(',')
+            }
+            stat.value.push(')\n')
+            break
+        }
+        case 'conditional': {
+            stat.compute = true
+            prepare(tree[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(' ? ')
+            prepare(tree[2], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(' : ')
+            prepare(tree[3], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            break
+        }
+        case 'binary': {
+            stat.compute = true
+            stat.value.push(`(`)
+            prepare(tree[2], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(` ${tree[1]} `)
+            prepare(tree[3], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(`)`)
+            stat.value.push(`\n`)
+            break
+        }
+        case 'let': {
+            stat.compute = true
+            stat.ignore.push(tree[1][0][0])
+            stat.value.push(`let ${tree[1][0][0]}`)
+            if(tree[1][0][1]){
+                stat.value.push(`=`)
+                prepare(tree[1][0][1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            }
+            stat.value.push(`;`)
+            break
+        }
+        case 'var': {
+            stat.compute = true
+            stat.ignore.push(tree[1][0][0])
+            stat.value.push(`var ${tree[1][0][0]}`)
+            if(tree[1][0][1]){
+                stat.value.push(`=`)
+                prepare(tree[1][0][1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            }
+            stat.value.push(`;`)
+            break
+        }
+        case 'unary-prefix': {
+            stat.compute = true
+            stat.value.push(tree[1])
+            prepare(tree[2], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)  
+            stat.value.push('\n')
+            break
+        }
+        case 'unary-postfix': {
+            stat.compute = true
+            prepare(tree[2], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(tree[1])
+            stat.value.push('\n')
+            break
+        }
+        case 'if': {
+            stat.value.push('if(')
+            prepare(tree[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(')')
+            stat.value.push('{')
+            prepare(tree[2], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push('}')
+            if(tree[3]){
+                stat.value.push('else{')
+                prepare(tree[3], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+                stat.value.push('}')
+            }
+            
+            break
+        }
+        case 'while': {
+            stat.compute = true
+            stat.value.push(`while(`)
+            prepare(tree[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(`)`)
+            stat.value.push(`{`)
+            prepare(tree[2], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(`};`)
+            break
+        }
+        case 'for': {
+            stat.compute = true
+            stat.value.push(`for(`)
+            prepare(tree[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            // stat.value.push(`;`)
+            prepare(tree[2], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(`;`)
+            prepare(tree[3], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(`){`)
+            prepare(tree[4], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(`};`)
+            break
+        }
+        case 'for-of': {
+            stat.compute = true
+            stat.value.push(`for(`)
+            prepare(tree[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value[stat.value.length-1] = stat.value[stat.value.length-1].replaceAll(';', '')
+            stat.value.push(` of `)
+            prepare(tree[3], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(`){`)
+            prepare(tree[4], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(`};`)
+            break
+        }
+        case 'for-in': {
+            stat.compute = true
+            stat.value.push(`for(`)
+            prepare(tree[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value[stat.value.length-1] = stat.value[stat.value.length-1].replaceAll(';', '')
+            // prepare(tree[2], compiledFile, currentInstructions, stat)
+            stat.value.push(` in `)
+            prepare(tree[3], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(`){`)
+            prepare(tree[4], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(`};`)
+            break
+        }
+        case 'function': {
+            stat.compute = true
+            stat.value.push(`function`)
+            if(tree[1]){
+                stat.ignore.push(tree[1])
+                stat.value.push(` ${tree[1]}`)
+            }
+            stat.value.push(`(`)
+            // for(let arg of tree[2]){
+            //     prepare(arg, compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            // }
+            for(let i = 0; i < tree[2].length; i++){
+                stat.value.push(tree[2][i])
+                stat.ignore.push(tree[2][i])
+                if(i < tree[2].length-1) stat.value.push(',')
+            }
+            stat.value.push(`)`)
+            stat.value.push(`{`)
+            prepare(tree[3], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(`}`)
+            break
+        }
+        case 'defun': {
+            stat.value.push(`function(`)
+            for(let i = 0; i < tree[2].length; i++){
+                stat.value.push(tree[2][i])
+                stat.ignore.push(tree[2][i])
+                if(i < tree[2].length-1) stat.value.push(',')
+            }
+            
+            stat.value.push(`)`)
+            stat.value.push(`{`)
+            prepare(tree[3], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(`}`)
+            break
+        }
+        case 'object': {
+            stat.value.push(`{`)
+            for(let d of tree[1]){
+                stat.value.push(`${d[0]}:`)
+                prepare(d[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+                stat.value.push(`,`)
+            }
+            stat.value.push(`}`)
+            break
+        }
+        case 'block': {
+            stat.compute = true
+            prepare(tree[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            break
+        }
+        case 'stat': {
+            prepare(tree[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, tree[1][0] === 'qmlelem' ? currentInstructions : currentObj)
+            break
+        }
+        case 'new': {
+            stat.value.push(` new `)
+            prepare(tree[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(`(`)
+            for(let i = 0; i < tree[2].length; i++){
+                prepare(tree[2][i], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+                if(i < tree[2].length-1) stat.value.push(',')
+            }
+            stat.value.push(`)`)
+            break
+        }
+        case 'sub': {
+            prepare(tree[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(`[`)
+            prepare(tree[2], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(`]\n`)
+            break
+        }
+        case 'array': {
+            stat.value.push(`[`)
+            for(let i = 0; i < tree[1].length; i++){
+                prepare(tree[1][i], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+                if(i < tree[1].length-1) stat.value.push(',')
+            }
+            stat.value.push(`]`)
+            break
+        }
+        case 'regexp': {
+            stat.value.push(`/${tree[1]}/${tree[2]}`)
+            break
+        }
+        case 'switch': {
+            stat.value.push(`switch(`)
+            prepare(tree[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(`){`)
+            for(let i = 0; i < tree[2].length; i++){
+                if(tree[2][i][0] === null){
+                    stat.value.push(`default: `)
+                    prepare(tree[2][i][1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+                } else {
+                    stat.value.push(`case `)
+                    prepare(tree[2][i][0], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+                    stat.value.push(`:`)
+                    prepare(tree[2][i][1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+                    
+                }
+                
+            }
+            stat.value.push(`}`)
+            break
+        }
+        case 'seq': {
+            stat.value.push(`(`)
+            for(let i = 1; i < tree.length; i++){
+                prepare(tree[i], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+                if(i < tree.length-1) stat.value.push(',')
+            }
+            stat.value.push(`)`)
+            break
+        }
+        case 'break': {
+            stat.value.push(`break;`)
+            break
+        }
+        case 'continue': {
+            stat.value.push(`continue;`)
+            break
+        }
+        default: {
+            if(stat.type !== 'QAlias'){
+                for(let t of tree){
+                    prepare(t, compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+                }
+            } else {
+                stat.compute = true
+                if(tree.length === 1){
+                    if(compiledFile.context[tree[0]]){
+                        stat.value.push(`inCtx.get('${tree[0]}')`)
+                    } else {
+                        stat.value.push(`${currentInstructions.name}.getStatement('${tree[0]}')`)
+                    }
+                } else if(tree.length === 2){
+                    if(compiledFile.context[tree[0]]){
+                        if(tree[1]){
+                            stat.value.push(`inCtx.get('${tree[0]}').getStatement('${tree[1]}')`)
+                        } else {
+                            stat.value.push(`inCtx.get('${tree[0]}')`)
+                        }
+                        
+                    } else {
+                        if(tree[1]){
+                            stat.value.push(`${currentInstructions.name}.getStatement('${tree[0]}').getStatement('${tree[1]}')`)
+                        } else {
+                            stat.value.push(`${currentInstructions.name}.getStatement('${tree[0]}')`)
+                        }
+                        
+                    }
+                }
+            }
+            
+            break
+        }
+    }
+}
+
+let code = []
+function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], updateList = [], step = 0, innerComponent = false){
+    if(listComponents.indexOf(currentInstructions.className)>=0){
+        // code.push(`class ${className} extends ${currentInstructions.className} {`)
+        code.push(currentInstructions.UID > 1 ? `let el${currentInstructions.UID} = new ${currentInstructions.className}(${innerComponent ? 'currParent' : currentInstructions.parent.name},inCtx)` : `let el${currentInstructions.UID} = this`)
+    } else {
+        let userClass = ''
+        for(let _fileName in compiledFiles){
+            let targetCompiledFile = compiledFiles[_fileName]
+            if(targetCompiledFile.instructions.getQmlFileName().replaceAll('.qml', '') === currentInstructions.className){
+                currentInstructions.extends = targetCompiledFile
+                let targetClassName = targetCompiledFile.namespace ? targetCompiledFile.namespace.split(/[/\\]+/g) : []
+                // targetClassName.push(targetCompiledFile.instructions.getQmlFileName().replaceAll('.qml', ''))
+                if(compiledFile.imports.indexOf(targetClassName.join('.'))) {
+                    targetClassName.push(currentInstructions.className)
+                    // code.push(`class ${className} extends ${targetClassName.join('_')} {`)
+                    code.push(currentInstructions.UID > 1 ? `let el${currentInstructions.UID} = new ${targetClassName.join('_')}(${innerComponent ? 'currParent' : currentInstructions.parent.name},inCtx)` : `let el${currentInstructions.UID} = this`)
+                    break
+                }
+                // if(compiledFile.imports.indexOf(targetCompiledFile[_fileName]))
+            }
+        }
+    }
+    let special = false
+    let tempInstruction = currentInstructions
+    while(tempInstruction){
+        if(tempInstruction.className === 'Loader' || tempInstruction.className === 'Repeater' || tempInstruction.className === 'ListView' || tempInstruction.className === 'GridView'){
+            special = true
+        }
+        tempInstruction = tempInstruction.extends
+    }
+    
+    if(currentInstructions.id) {
+        code.push(`inCtx.add('${currentInstructions.id}',el${currentInstructions.UID})`)
+        code.push(`el${currentInstructions.UID}.$id='${currentInstructions.id}'`)
+    }
+
+    if(special){
+        code.push(`el${currentInstructions.UID}.$exCtx=inCtx`)
+        code.push(`el${currentInstructions.UID}.$path='${compiledFile.namespace}'`)
+    }
+
+    let updateAnchors = false
+    let updateFont = false
+    // let updateList = []
+    // let updatePrimaryList = []
+
+    for(let property of currentInstructions.properties){
+        let pathName = property.name.split('.')
+        if(pathName[0] !== 'anchors' && pathName[0] !== 'font') continue
+
+        for(let i = 0; i < pathName.length; i++){
+            pathName[i] = `getStatement('${pathName[i]}')`
+        }
+        let stat = {
+            return: false,
+            compute: false,
+            subscribe: [],
+            value: [],
+            ignore: [],
+        }
+        if(property.val) {
+            try {
+                prepare(property.val, compiledFile, currentInstructions, stat, false, false, '', {})
+            } catch (error) {
+                console.log('error', compiledFile.fileName, 'property', property.name)
+            }
+            
+        }
+        if(stat.compute){
+            if(stat.subscribe.length){
+                let subscribe = []
+                for(let subs of stat.subscribe){
+                    subscribe.push(`${currentInstructions.name}.${pathName.join('.')}.subscribe(${subs})`)
+                }
+                if(property.command === 'create'){
+                    if(listProperties[property.type]){
+                        // code.push(`${currentInstructions.name}.${property.name} = new ${property.type}(function(){${subscribe.join(';')};${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                        code.push(`${currentInstructions.name}.createProperty('${property.name}',${property.type},function(){${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                    } else {
+                        code.push(`${currentInstructions.name}.createVariantProperty('${property.name},${property.type},function(){${subscribe.join(';')};${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                    }
+                    
+                } else {
+                    code.push(`${currentInstructions.name}.${pathName.join('.')}.setCompute(function(){${subscribe.join(';')};${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                }
+                
+            } else {
+                if(property.command === 'create'){
+                    if(listProperties[property.type]){
+                        // code.push(`${currentInstructions.name}.${property.name} = new ${property.type}(function(){${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                        code.push(`${currentInstructions.name}.createProperty('${property.name}',${property.type},function(){${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                    } else {
+                        code.push(`${currentInstructions.name}.createVariantProperty('${property.name}',${property.type},function(){${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                    }
+                    
+                } else {
+                    code.push(`${currentInstructions.name}.${pathName.join('.')}.setCompute(function(){${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                }
+                
+            }
+            if(!updateAnchors && property.name.split('.')[0] === 'anchors'){
+                updateAnchors = true
+                updatePrimaryList.push(`${currentInstructions.name}.${pathName[0]}.update()`)
+            }
+            if(!updateFont && property.name.split('.')[0] === 'font'){
+                updateFont = true
+                updatePrimaryList.push(`${currentInstructions.name}.${pathName[0]}.update()`)
+            }
+            
+        } else {
+            if(property.command === 'create'){
+                if(listProperties[property.type]){
+                    // code.push(`${currentInstructions.name}.${property.name} = new ${property.type}(${stat.value.join('')})`)
+                    code.push(`${currentInstructions.name}.createProperty('${property.name}',${property.type},${stat.value.join('')})`)
+                } else {
+                    code.push(`${currentInstructions.name}.createVariantProperty('${property.name}',${property.type},${stat.value.join('')})`)
+                }
+                
+            } else {
+                code.push(`${currentInstructions.name}.${property.name} = ${stat.value.join('')}`)
+            }
+            
+        }
+        
+    }
+
+    for(let signal of currentInstructions.connectionSignals){
+        if(currentInstructions.defineSignals[signal.name]) continue
+        
+        let name = signal.name
+        let linkedProperty = false
+        let index = name.indexOf('Changed')
+        if(index >= 0 && name !== 'positionChanged'){
+            linkedProperty = true
+            name = name.slice(0, index)
+            if(currentInstructions.propertiesNames.indexOf(name) >= 0) continue
+        }       
+        let stat = {
+            return: false,
+            compute: false,
+            subscribe: [],
+            value: [],
+            ignore: [],
+        }
+        
+        try {
+            prepare(signal.val, compiledFile, currentInstructions, stat, true, false, '', {})
+        } catch (error) {
+            console.log('error', compiledFile.fileName, 'signal', signal.name)
+        }
+        
+        if(linkedProperty){
+            code.push(`${currentInstructions.name}.getStatement('${name}').getNotify().connect(${currentInstructions.name}, function(){${stat.value.join('')}})`)
+        } else {
+            code.push(`${currentInstructions.name}.getStatement('${name}').connect(${currentInstructions.name}, function(){${stat.value.join('')}})`)
+        }
+        
+        
+    }
+
+    // if(currentInstructions.className === 'Component') {
+    //     code.push(`${currentInstructions.name}.createObject=(currParent)=>{`)
+    //     for(let i = currentInstructions.children.length-1; i >= 0; i--){      
+    //         // preTreeCompile(compiledFile, currentInstructions.children[i], true)
+    //         treeCompile(compiledFile, currentInstructions.children[i], true)
+    //     }
+    //     code.push(`}`)
+    // } else {
+    //     for(let i = currentInstructions.children.length-1; i >= 0; i--){      
+    //         preTreeCompile(compiledFile, currentInstructions.children[i], false)
+    //     }
+    // }
+
+
+
+
+
+    for(let property of currentInstructions.properties){
+        let pathName = property.name.split('.')
+
+        if(pathName[0] === 'anchors' || pathName[0] === 'font') continue
+
+        for(let i = 0; i < pathName.length; i++){
+            pathName[i] = `getStatement('${pathName[i]}')`
+        }
+        let stat = {
+            return: false,
+            compute: false,
+            subscribe: [],
+            value: [],
+            ignore: [],
+            type: property.type,
+        }
+        if(property.isElement){
+            if(property.command === 'create'){
+                treeCompile(compiledFile, property.val)
+                if(listProperties[property.type]){
+                    code.push(`${currentInstructions.name}.${property.name} = new ${property.type}(${property.val.name})`)
+                } else {
+                    code.push(`${currentInstructions.name}.createVariantProperty('${property.name}',${property.type},${property.val.name})`)
+                }
+                
+            } else {
+                if(property.val.className !== 'Component' && property.name === 'delegate' && (currentInstructions.className === 'ListView'|| currentInstructions.className === 'GridView' || currentInstructions.className === 'Repeater')){  
+                    // TEMP !!!
+                    code.push(`${currentInstructions.name}.$temp = new Component(${currentInstructions.name}, inCtx)`)
+                    code.push(`${currentInstructions.name}.$temp.createObject=function(currParent,exCtx){`)
+                    
+                    code.push(`let inCtx = new ContextController(exCtx)`)
+                    treeCompile(compiledFile, property.val, [], [], 0, true)
+                    code.push(`}`)
+
+                    code.push(`${currentInstructions.name}.${property.name} = ${currentInstructions.name}.$temp`)
+                    code.push(`delete ${currentInstructions.name}.$temp`)
+                } else {
+                    treeCompile(compiledFile, property.val)
+                    code.push(`${currentInstructions.name}.${property.name} = ${property.val.name}`)
+
+                }
+                
+            }
+        } else {
+            if(property.val) {
+                try {
+                    prepare(property.val, compiledFile, currentInstructions, stat, false, false, '', {})
+                } catch (error) {
+                    console.log('error', compiledFile.fileName, 'property', property.name)
+                }
+                
+            }
+            if(stat.compute){
+                if(stat.subscribe.length){
+                    let subscribe = []
+                    for(let subs of stat.subscribe){
+                        subscribe.push(`${currentInstructions.name}.${pathName.join('.')}.subscribe(${subs})`)
+                    }
+                    if(property.command === 'create'){
+                        if(listProperties[property.type]){
+                            // code.push(`${currentInstructions.name}.${property.name} = new ${property.type}(function(){${subscribe.join(';')};${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                            code.push(`${currentInstructions.name}.createProperty('${property.name}',${property.type},function(){${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                        } else {
+                            code.push(`${currentInstructions.name}.createVariantProperty('${property.name}',${property.type},function(){${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                        }
+                        
+                    } else {
+                        code.push(`${currentInstructions.name}.${pathName.join('.')}.setCompute(function(){${subscribe.join(';')};${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                    }
+                    
+                } else {
+                    if(property.command === 'create'){
+                        if(listProperties[property.type]){
+                            // code.push(`${currentInstructions.name}.${property.name} = new ${property.type}(function(){${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                            code.push(`${currentInstructions.name}.createProperty('${property.name}',${property.type},function(){${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                        } else {
+                            code.push(`${currentInstructions.name}.createVariantProperty('${property.name}',${property.type},function(){${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                        }
+                        
+                    } else {
+                        code.push(`${currentInstructions.name}.${pathName.join('.')}.setCompute(function(){${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                    }
+                    
+                }
+                updateList.push(`${currentInstructions.name}.${pathName[0]}.update()`)
+            } else {
+                if(property.command === 'create'){
+                    if(listProperties[property.type]){
+                        // code.push(`${currentInstructions.name}.${property.name} = new ${property.type}(${stat.value.join('')})`)
+                        code.push(`${currentInstructions.name}.createProperty('${property.name}',${property.type},${stat.value.join('')})`)
+                    } else {
+                        code.push(`${currentInstructions.name}.createVariantProperty('${property.name}',${property.type},${stat.value.join('')})`)
+                    }
+                    
+                } else {
+                    code.push(`${currentInstructions.name}.${property.name} = ${stat.value.join('')}`)
+                }
+                
+            }
+        }
+        
+        
+    }
+
+    for(let name in currentInstructions.defineSignals){
+        // prepare(currentInstructions.methods[name].val, compiledFile, currentInstructions, stat, true, false)
+        code.push(`${currentInstructions.name}.createSignal('${name}',${currentInstructions.defineSignals[name].join(',')})`)
+    }
+
+    for(let signal of currentInstructions.connectionSignals){
+        let name = signal.name
+        let linkedProperty = false
+        let index = name.indexOf('Changed')
+        if(index >= 0 && name !== 'positionChanged'){
+            linkedProperty = true
+            name = name.slice(0, index)
+            if(currentInstructions.propertiesNames.indexOf(name) < 0) continue
+        } else {
+            if(!currentInstructions.defineSignals[signal.name]) continue
+        }       
+        let stat = {
+            return: false,
+            compute: false,
+            subscribe: [],
+            value: [],
+            ignore: [],
+        }
+        try {
+            prepare(signal.val, compiledFile, currentInstructions, stat, true, false, '', {})
+        } catch (error) {
+            console.log('error', compiledFile.fileName, 'signal', signal.name)
+        }
+        
+        if(linkedProperty){
+            code.push(`${currentInstructions.name}.getStatement('${name}').getNotify().connect(${currentInstructions.name}, function(){${stat.value.join('')}})`)
+        } else {
+            code.push(`${currentInstructions.name}.getStatement('${name}').connect(${currentInstructions.name}, function(){${stat.value.join('')}})`)
+        }
+        
+        
+    }
+
+    for(let name in currentInstructions.methods){
+        let stat = {
+            return: false,
+            compute: false,
+            subscribe: [],
+            value: [],
+            ignore: [],
+        }
+        try {
+            prepare(currentInstructions.methods[name].val, compiledFile, currentInstructions, stat, true, false, '', {})
+        } catch (error) {
+            console.log('error', compiledFile.fileName, 'method', name)
+        }
+        
+        code.push(`${currentInstructions.name}.${name}=${stat.value.join('')}`)
+    }
+
+    if(currentInstructions.className === 'Component') {
+        code.push(`${currentInstructions.name}.createObject=function(currParent,exCtx){`)
+        code.push(`let inCtx = new ContextController(exCtx)`)
+        for(let i = currentInstructions.children.length-1; i >= 0; i--){
+            treeCompile(compiledFile, currentInstructions.children[i], [], [], 0, true)
+        }
+        code.push(`}`)
+    } else {    
+        // for(let i = currentInstructions.children.length-1; i >= 0; i--){
+        //     treeCompile(compiledFile, currentInstructions.children[i], updatePrimaryList, updateList, step + 1, false)
+        // }
+        for(let i = 0; i < currentInstructions.children.length; i++){
+            treeCompile(compiledFile, currentInstructions.children[i], updatePrimaryList, updateList, step + 1, false)
+        }
+    }
+
+    if(step === 0){
+        code.push('updateList.push(()=>{')
+        for(let i = updatePrimaryList.length-1; i >= 0; i--){
+            code.push(updatePrimaryList[i])
+        }
+    
+        for(let upd of updateList){
+            code.push(upd)
+        }
+        code.push('})')
+    }
+    
+    if(innerComponent) code.push(`return el${currentInstructions.UID}`)
+}
+let classList = []
+let queueFiles = []
+for(let fileName in compiledFiles){
+    queueFiles.push(fileName)
+}
+while(queueFiles.length){
+    let fileName = queueFiles.shift()
+    let compiledFile = compiledFiles[fileName]
+    let className = compiledFile.namespace ? compiledFile.namespace.split(/[/\\]+/g) : []
+    className.push(compiledFile.instructions.getQmlFileName().replaceAll('.qml', ''))
+    className = className.join('_')
+    // console.log(compiledFile.instructions.getQmlFileName().replaceAll('.qml', ''))
+    if(listComponents.indexOf(compiledFile.instructions.className)>=0){
+        if(className === compiledFile.instructions.className){
+            console.log(`Skip define class ${className}. Already exist`)
+            continue
+        }
+        code.push(`class ${className} extends ${compiledFile.instructions.className} {`)
+        classList.push(className)
+    } else {
+        let userClass = ''
+        let next = false
+        for(let _fileName in compiledFiles){
+            let targetCompiledFile = compiledFiles[_fileName]
+            if(targetCompiledFile.instructions.getQmlFileName().replaceAll('.qml', '') === compiledFile.instructions.className){
+                let targetClassName = targetCompiledFile.namespace ? targetCompiledFile.namespace.split(/[/\\]+/g) : []
+                // targetClassName.push(targetCompiledFile.instructions.getQmlFileName().replaceAll('.qml', ''))
+                if(compiledFile.imports.indexOf(targetClassName.join('.'))) {
+                    targetClassName.push(compiledFile.instructions.className)
+                    if(classList.indexOf(targetClassName.join('_')) < 0) {
+                        queueFiles.push(fileName)
+                        next = true
+                        break
+                    }
+                    code.push(`class ${className} extends ${targetClassName.join('_')} {`)
+                    classList.push(className)
+                    break
+                }
+                // if(compiledFile.imports.indexOf(targetCompiledFile[_fileName]))
+            }
+        }
+        if(next) continue
+    }
+    
+    code.push(`constructor(parent, exCtx) {`)
+    code.push(`super(parent, exCtx)`)
+    code.push(`let inCtx = new ContextController(exCtx)`)
+
+    treeCompile(compiledFile, compiledFile.instructions)
+
+    code.push(`}`)
+    code.push(`}`)
+}
+
+// console.log(code.join('\n'))
+fs.writeFileSync(path.resolve(__dirname, source, 'jqml.full.js'), code.join('\n'))
+
+// const crypto = require('crypto')
+// const zlib = require('zlib')
+
+// fs.writeFileSync(path.resolve(__dirname, source, 'jqml.full.js.gzip'), zlib.gzipSync(code.join('\n')))
