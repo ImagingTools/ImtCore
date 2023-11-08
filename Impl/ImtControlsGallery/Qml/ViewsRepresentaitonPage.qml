@@ -133,6 +133,50 @@ Rectangle {
                     }
                 }
             }
+
+            Button{
+                id: leftButton;
+
+                anchors.verticalCenter:  parent.verticalCenter;
+                anchors.right: parent.left;
+                anchors.rightMargin: 70;
+
+                width: 50;
+                height: width;
+
+                decoratorComponent: Style.isQtStyle?
+                                        DecoratorsQt.roundButtonDecorator: Decorators.roundButtonDecorator;
+
+                iconSource: "../../../" + Style.theme + "/Icons" + "/Left.svg";
+                onClicked: {
+                    if(swipeView.currentIndex > 0){
+                        swipeView.setCoordAnimFunc(swipeView.currentIndex * swipeView.width, (swipeView.currentIndex - 1) * swipeView.width)
+                        swipeView.currentIndex--;
+                    }
+                }
+            }
+
+            Button{
+                id: rightButton;
+
+                anchors.verticalCenter:  parent.verticalCenter;
+                anchors.left: parent.right;
+                anchors.leftMargin: 70;
+
+                width: 50;
+                height: width;
+
+                decoratorComponent: Style.isQtStyle?
+                                        DecoratorsQt.roundButtonDecorator: Decorators.roundButtonDecorator;
+
+                iconSource: "../../../" + Style.theme + "/Icons" + "/Right.svg";
+                onClicked: {
+                    if(swipeView.currentIndex < (swipeView.count - 1)){
+                        swipeView.setCoordAnimFunc(swipeView.currentIndex * swipeView.width, (swipeView.currentIndex + 1) * swipeView.width)
+                        swipeView.currentIndex++;
+                    }
+                }
+            }
         }//SwipeView
 
     }

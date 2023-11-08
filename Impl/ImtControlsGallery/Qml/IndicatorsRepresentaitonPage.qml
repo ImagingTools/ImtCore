@@ -80,6 +80,53 @@ Rectangle {
                 visible: true;
             }
 
+            Rectangle{
+                id: forTooltip;
+
+                anchors.verticalCenter:  parent.verticalCenter;
+
+                width: 150;
+                height: 40;
+
+                radius: 10;
+                color: "lightblue";
+                Text{
+                    anchors.centerIn: parent;
+
+                    text: "show tooltip";
+                    font.pixelSize: 18;
+                }
+
+                MouseArea{
+                    anchors.fill: parent;
+
+                    hoverEnabled: true;
+                    cursorShape: Qt.PointingHandCursor;
+
+//                    onEntered: {
+//                        tooltip.show(mouseX, mouseY);
+//                    }
+                    onPositionChanged: {
+                        tooltip.show(mouseX, mouseY);
+                    }
+
+                    onExited: {
+                        tooltip.hide();
+                    }
+                }
+                CustomTooltip{
+                    id: tooltip;
+
+                    text: "Tooltip!!!"
+                    fitToTextWidth: true;
+                    componentHeight: 30;
+                    timeout: 2000;
+                    fitToCenter: true;
+                }
+
+            }
+
+
         }
 
     }
