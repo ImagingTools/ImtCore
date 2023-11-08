@@ -402,10 +402,16 @@ Item {
 
     Component {
         id: tooltipDecoratorComp;
-        Item {
+        ToolTip {
             id: tooltipItem;
 
             property var baseElement: null;
+
+            parent: baseElement;
+
+            delay: !baseElement ? 0 : baseElement.delay;
+            timeout: !baseElement ? -1 : baseElement.timeout;
+            text: !baseElement ? "" : baseElement.text;
         }
     }
 

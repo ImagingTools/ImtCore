@@ -143,9 +143,7 @@ ControlBase {
 
         onEntered: {
             if(tooltip.text !== ""){
-                pauseTooltip.stop();
-                pauseTooltip.start();
-
+                pauseTooltip.restart();
             }
 
         }

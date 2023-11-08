@@ -123,5 +123,11 @@ Flickable{
         to:0;
     }
 
+    function setCoordAnimFunc(from_, to_){
+        setCoordAnim.from = from_;
+        setCoordAnim.to = to_;
+        setCoordAnim.start();
+    }
+
 }
 

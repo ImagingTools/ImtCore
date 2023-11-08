@@ -1,9 +1,13 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtqml 1.0
+import imtcontrols 1.0
 
 
-Item {
+ControlBase {
     id: customTooltip;
+
+    decoratorComponent: Style.isQtStyle ? DecoratorsQt.tooltipDecorator: Decorators.tooltipDecorator;
 
     property string text: "";
 
@@ -14,6 +18,7 @@ Item {
     property int componentMargin: 12;
 
     property bool fitToTextWidth: false;
+    property bool fitToCenter: false;
 
     property int componentHeight: Math.max(customTooltip.componentMinHeight, forHeightText.height + 2*customTooltip.textMargin);
 
@@ -30,11 +35,15 @@ Item {
     property string borderColor: "lightgray";
 
     property bool openST: false;
-    property int waitingDuration: 500;
+    property int waitingDuration: delay;
+    property int delay: 500;
+    property int timeout: -1;
 
     property real lineHeight: 1;
 
     property Component tooltipContentComp: hint;
+
+
 
     Component.onDestruction: {
         customTooltip.closeTooltip();
@@ -59,24 +68,25 @@ Item {
             console.log("openTooltip", xX, yY);
 
             var point = mapToItem(null, xX, yY);
+            var centeredAdd = customTooltip.fitToTextWidth ? customTooltip.fitToCenter * (forWidthText.width/2 + customTooltip.textMargin + customTooltip.componentMargin) :
+                                                             customTooltip.fitToCenter * (customTooltip.componentWidth/2 + customTooltip.componentMargin);
             if(point.x > modalDialogManager.width*2/3){
                 if(customTooltip.fitToTextWidth){
-                    point.x = point.x - forWidthText.width - 2*customTooltip.textMargin - customTooltip.componentMargin;
-
+                    point.x = point.x - forWidthText.width - 2*customTooltip.textMargin - customTooltip.componentMargin + centeredAdd;
                 }
                 else{
-                    point.x = point.x - customTooltip.componentWidth - customTooltip.componentMargin;
+                    point.x = point.x - customTooltip.componentWidth - customTooltip.componentMargin + centeredAdd;
                 }
             }
             else{
-                point.x = point.x + customTooltip.componentMargin;
+                point.x = point.x + customTooltip.componentMargin - centeredAdd;
             }
 
             if(point.y > modalDialogManager.height*2/3){
                 point.y = point.y - customTooltip.componentHeight - customTooltip.componentMargin;
             }
             else{
-                point.y = point.y + customTooltip.componentMargin;
+                point.y = point.y + 2*customTooltip.componentMargin;
             }
 
             modalDialogManager.openDialog(customTooltip.tooltipContentComp, {"x": point.x, "y": point.y});
@@ -97,6 +107,8 @@ Item {
         }
 
     }
+
+
 
     Text{
         id: forHeightText;
@@ -142,11 +154,38 @@ Item {
             height: customTooltip.componentHeight;
 
             color: customTooltip.color;
+            opacity: 0;
             border.color: customTooltip.borderColor;
             border.width: customTooltip.borderWidth;
             radius: customTooltip.radius;
 
             property Item root: null;
+
+            Component.onCompleted: {
+               opacityAnimTo.start();
+            }
+
+            function closeAnimFunc(){
+                opacityAnimFrom.start();
+            }
+
+            NumberAnimation {
+                id: opacityAnimTo;
+
+                target: compRec;
+                property: "opacity";
+                duration: 200
+                from: 0; to: 1;
+            }
+
+            NumberAnimation {
+                id: opacityAnimFrom;
+
+                target: compRec;
+                property: "opacity";
+                duration: 200
+                from: 1; to: 0;
+            }
 
             Text{
                 id: compText;
@@ -170,6 +209,70 @@ Item {
                 text: qsTr(customTooltip.text);
 
                 lineHeight: customTooltip.lineHeight;
+            }
+        }
+    }
+
+    PauseAnimation {
+        id: pauseOpenTooltip;
+
+        duration: customTooltip.delay;
+        property real x: 0;
+        property real y: 0;
+        onFinished: {
+            if(customTooltip.decorator && customTooltip.decorator.show !== undefined){
+                customTooltip.decorator.show(customTooltip.text, customTooltip.timeout);
+            }
+            else {
+                customTooltip.openTooltip(pauseOpenTooltip.x, pauseOpenTooltip.y);
+            }
+        }
+    }
+
+    PauseAnimation {
+        id: pauseCloseTooltip;
+
+        duration: customTooltip.timeout > 0 ? customTooltip.timeout : 1;
+        onFinished: {
+            customTooltip.closeTooltip();
+        }
+    }
+
+
+    PauseAnimation {
+        id: closeAnim;
+
+        duration: 200;
+        onFinished: {
+            closeTooltip();
+        }
+    }
+
+    function show(xX, yY){
+        pauseOpenTooltip.x = xX;
+        pauseOpenTooltip.y = yY;
+        pauseCloseTooltip.stop();
+        if(customTooltip.timeout > 0){
+            pauseCloseTooltip.start();
+        }
+        pauseOpenTooltip.restart();
+    }
+
+    function hide(){
+        pauseOpenTooltip.stop();
+        pauseCloseTooltip.stop();
+
+        if(customTooltip.decorator && customTooltip.decorator.hide !== undefined){
+            customTooltip.decorator.hide();
+        }
+        else {
+            let item = modalDialogManager.topItem;
+            if(item && item.closeAnimFunc !== undefined){
+                item.closeAnimFunc()
+                closeAnim.start();
+            }
+            else{
+                closeTooltip();
             }
         }
     }
