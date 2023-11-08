@@ -231,4 +231,34 @@ ControlBase {
             tooltip.openTooltip(cbMouseArea.mouseX, cbMouseArea.mouseY);
         }
     }
+
+    Shortcut {
+        sequence: "Space";
+        enabled: !comboBoxContainer.isOpen && comboBoxContainer.focus;
+        onActivated: {
+            openPopupMenu();
+        }
+    }
+
+    Shortcut {
+        sequence: "Down";
+        enabled: !comboBoxContainer.isOpen && comboBoxContainer.focus;
+        onActivated: {
+            if(comboBoxContainer.currentIndex < comboBoxContainer.model.GetItemsCount() - 1){
+                comboBoxContainer.currentIndex++;
+            }
+
+        }
+    }
+
+    Shortcut {
+        sequence: "Up";
+        enabled: !comboBoxContainer.isOpen && comboBoxContainer.focus;
+        onActivated: {
+            if(comboBoxContainer.currentIndex > 0){
+                comboBoxContainer.currentIndex--;
+            }
+        }
+    }
+
 }

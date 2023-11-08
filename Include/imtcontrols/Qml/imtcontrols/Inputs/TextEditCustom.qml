@@ -226,7 +226,7 @@ ControlBase {
                     }
 
                 }
-                if(containerTextEdit.decorator){
+                if(containerTextEdit.decorator && containerTextEdit.decorator.setHeight !== undefined){
                     containerTextEdit.decorator.setHeight();
                 }
 
