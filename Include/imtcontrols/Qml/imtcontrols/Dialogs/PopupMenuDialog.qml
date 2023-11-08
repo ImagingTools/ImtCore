@@ -217,7 +217,7 @@ Item {
             if(popupMenuContainer.rootItem){
                 if(popupMenuContainer.rootItem.selectedIndex >=0){
                     var id = popupMenuContainer.model.GetData("Id", popupMenuContainer.rootItem.selectedIndex);
-                    popupMenuContainer.finished(id, popupMenuContainer.rootItem.selectedIndex);
+                    popupMenuContainer.rootItem.finished(id, popupMenuContainer.rootItem.selectedIndex);
                 }
             }
         }
