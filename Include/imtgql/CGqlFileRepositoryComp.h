@@ -27,7 +27,7 @@ public:
 	I_BEGIN_COMPONENT(CGqlFileRepositoryComp);
 		I_REGISTER_INTERFACE(imtbase::IMetaInfoCreator);
 
-		I_ASSIGN_MULTI_2(m_supportedTypeListAttrPtr, "SupportedTypeList", "The type list, supported by repository", true, "File", "ZIP");
+		I_ASSIGN_MULTI_1(m_supportedTypeListAttrPtr, "SupportedTypeList", "The type list, supported by repository", true, "File");
 
 		// Known-Limitation: nedd to assign here for ASSIGN_TO instructions
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
