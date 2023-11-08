@@ -168,13 +168,17 @@ ICollectionInfo::Id CObjectCollectionBase::InsertNewObject(
 
 bool CObjectCollectionBase::RemoveElement(const Id& elementId, const IOperationContext* /*operationContextPtr*/)
 {
+	QReadLocker locker(&m_lock);
 	for (Objects::iterator iter = m_objects.begin(); iter != m_objects.end(); ++iter){
 		if ((*iter).id == elementId){
 			istd::IChangeable::ChangeSet changeSet(CF_REMOVED);
 			changeSet.SetChangeInfo(CN_ELEMENT_REMOVED, elementId);
+
+			locker.unlock();
+
 			istd::CChangeNotifier changeNotifier(this, &changeSet);
 
-			QWriteLocker locker(&m_lock);
+			m_lock.lockForWrite();
 
 			imod::IModel* modelPtr = dynamic_cast<imod::IModel*>((*iter).objectPtr.GetPtr());
 			if (modelPtr != nullptr){
@@ -183,7 +187,7 @@ bool CObjectCollectionBase::RemoveElement(const Id& elementId, const IOperationC
 
 			m_objects.erase(iter);
 
-			locker.unlock();
+			m_lock.unlock();
 
 			break;
 		}
@@ -239,18 +243,23 @@ bool CObjectCollectionBase::SetObjectData(
 			CompatibilityMode mode,
 			const IOperationContext* /*operationContextPtr*/)
 {
-	QWriteLocker locker(&m_lock);
+	QReadLocker locker(&m_lock);
 
 	for (ObjectInfo& objectInfo : m_objects){
 		if ((objectInfo.id == objectId) && objectInfo.objectPtr.IsValid()){
 			istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
 			changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, objectId);
+
+			locker.unlock();
+
 			istd::CChangeNotifier changeNotifier(this, &changeSet);
 
+			m_lock.lockForWrite();
 
 			objectInfo.copyMode = mode;
 			bool retVal = objectInfo.objectPtr->CopyFrom(object, mode);
-			locker.unlock();
+
+			m_lock.unlock();
 
 			return retVal;
 		}
@@ -425,6 +434,8 @@ bool CObjectCollectionBase::SetElementName(const Id& elementId, const QString& o
 			if (objectInfo.name != objectName){
 				istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
 				changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+
+				locker.unlock();
 
 				istd::CChangeNotifier changeNotifier(this, &changeSet);
 
@@ -626,9 +637,13 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 			}
 		}
 
+		targetLock.unlock();
+
 		QReadLocker sourceLock(&sourcePtr->m_lock);
 		for (const ObjectInfo& sourceObjectInfo : sourcePtr->m_objects){
+			sourceLock.unlock();
 			ObjectInfo* targetObjectInfoPtr = GetObjectInfo(sourceObjectInfo.id);
+			sourceLock.relock();
 
 			if (targetObjectInfoPtr == nullptr){
 				QByteArray newId = InsertNewObject(sourceObjectInfo.typeId, sourceObjectInfo.name, sourceObjectInfo.description, sourceObjectInfo.objectPtr.GetPtr());
@@ -637,14 +652,18 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 				}
 			}
 			else{
+				sourceLock.unlock();
 				const istd::IChangeable* dataPtr = sourcePtr->GetObjectPtr(sourceObjectInfo.id);
+				sourceLock.relock();
 				if (dataPtr != nullptr){
+					targetLock.relock();
 					if (targetObjectInfoPtr->objectPtr->CopyFrom(*dataPtr, sourceObjectInfo.copyMode)){
 						targetObjectInfoPtr->copyMode = sourceObjectInfo.copyMode;
 					}
 					else{
 						return false;
 					}
+					targetLock.unlock();
 				}
 				else{
 					return false;
