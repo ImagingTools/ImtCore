@@ -144,6 +144,8 @@ bool CDesignTokenStyleSheetProcessorComp::ProcesCssFile(const QByteArray& fileNa
 
 	CDesignTokenStyleUtils::SetVariables(fileData, '$', '(', ')', m_currentFontsCss);
 
+	CDesignTokenStyleUtils::SetVariables(fileData, '$', '{', '}', QVariantMap({ std::make_pair("Scheme", m_currentTheme) }));
+
 	QFile outputImageFile(outputFileName);
 	bool openOutputFile = outputImageFile.open(QFile::WriteOnly);
 	if(!openOutputFile){
