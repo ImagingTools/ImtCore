@@ -1,5 +1,5 @@
 import QtQuick 2.12
-import Qt5Compat.GraphicalEffects 1.0
+import Qt5Compat.GraphicalEffects 6.0
 import QtGraphicalEffects 1.12
 import Acf 1.0
 import imtcontrols 1.0

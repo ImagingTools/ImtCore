@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 	qmlRegisterModule("QtQuick.Dialogs", 1, 3);
 #else
 	qmlRegisterModule("QtQuick.Dialogs", 6, 2);
-	qmlRegisterModule("Qt5Compat.GraphicalEffects", 1, 0);
+	qmlRegisterModule("Qt5Compat.GraphicalEffects", 6, 0);
 #endif
 
 	QQuickStyle::setStyle("Material");
