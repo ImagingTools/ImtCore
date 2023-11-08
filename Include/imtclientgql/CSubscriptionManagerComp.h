@@ -36,6 +36,7 @@ public:
 
 	I_BEGIN_COMPONENT(CSubscriptionManagerComp);
 		I_REGISTER_INTERFACE(imtclientgql::IGqlSubscriptionManager);
+		I_REGISTER_INTERFACE(imtrest::IRequestServlet);
 		I_ASSIGN(m_subsctiptionSenderCompPtr, "SubsctiptionSender", "Subsctiption sender", true, "SubsctiptionSender");
 		I_ASSIGN(m_engineCompPtr, "ProtocolEngine", "Protocol engine for subscription", true, "ProtocolEngine");
 		I_ASSIGN(m_loginStatusCompPtr, "WebLoginStatus", "Web login status", true, "WebLoginStatus");

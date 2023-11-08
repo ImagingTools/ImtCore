@@ -54,6 +54,11 @@ I_EXPORT_COMPONENT(
 		"The client for 'CWebSocketServer'",
 		"Rest WebSocket Client");
 
+I_EXPORT_COMPONENT(
+		SubscriptionController,
+		"Subscription controller",
+		"Subscription Controller");
+
 
 } // namespace ImtClientGqlPck
 
