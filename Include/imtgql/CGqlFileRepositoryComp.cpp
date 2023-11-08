@@ -327,7 +327,7 @@ bool CGqlFileRepositoryComp::SetupGqlItem(
 	bool retVal = false;
 
 	const QByteArrayList metaInfoIdList = GetInformationIds(gqlRequest, "items");
-	idoc::MetaInfoPtr elementMetaInfoPtr = m_objectCollectionCompPtr->GetElementMetaInfo(objectId);
+	idoc::MetaInfoPtr elementMetaInfoPtr = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
 	if (!elementMetaInfoPtr.IsValid()){
 		errorMessage.append("\nUnable to get file metainfo");
 

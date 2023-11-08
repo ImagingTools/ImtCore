@@ -40,6 +40,7 @@ protected:
 
 private:
 	I_REF(imtbase::IObjectCollection, m_tempFileCollectionCompPtr);
+	I_REF(ifile::IFileNameParam, m_tempDirectoryPathCompPtr);
 };
 
 
