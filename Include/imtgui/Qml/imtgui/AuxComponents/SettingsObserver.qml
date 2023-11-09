@@ -37,6 +37,8 @@ TreeItemModelObserver {
                 if (container.settingsProvider != null){
                     let newVal = changeObj["newVal"];
                     container.settingsProvider.setWebSocketServerUrl(newVal);
+
+                    Events.sendEvent("SendWarningError", qsTr("Please restart the application so that the changes apply"));
                 }
             }
         }

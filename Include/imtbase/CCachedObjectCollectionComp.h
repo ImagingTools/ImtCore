@@ -6,6 +6,7 @@
 #include <icomp/CComponentBase.h>
 #include <istd/TDelPtr.h>
 #include <istd/TPointerVector.h>
+#include <imod/TSingleModelObserverBase.h>
 
 // ImtCore includes
 #include <imtbase/CFilterCollectionProxy.h>
@@ -21,24 +22,33 @@ namespace imtbase
 */
 class CCachedObjectCollectionComp:
 			public icomp::CComponentBase,
+			public imod::TSingleModelObserverBase<istd::IChangeable>,
 			public imtbase::IObjectCollection
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
+	typedef imod::TSingleModelObserverBase<istd::IChangeable> BaseClass2;
 
 	I_BEGIN_COMPONENT(CCachedObjectCollectionComp);
 		I_REGISTER_INTERFACE(IObjectCollection);
 		I_REGISTER_INTERFACE(IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(ICollectionInfo);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
+		I_ASSIGN_TO(m_objectCollectionModelCompPtr, m_objectCollectionCompPtr, true);
 		I_ASSIGN(m_isCacheObjectPtr, "IsCacheObject", "Is object data cached", true, false);
 		I_ASSIGN(m_cacheLimitPtr, "CacheLimit", "Limiting cached stack data", true, 1000);
 	I_END_COMPONENT;
 
-
 	CCachedObjectCollectionComp();
 
 	void SetOperationFlags(int flags, const QByteArray& objectId = QByteArray());
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
+
+	// reimplemented (imod::CSingleModelObserverBase)
+	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 	// reimplemented (IObjectCollection)
 	virtual const IRevisionController* GetRevisionController() const override;
@@ -103,8 +113,11 @@ protected:
 			int count = -1,
 			const iprm::IParamsSet* selectionParamsPtr = nullptr) const;
 
+	void ClearCache();
+
 private:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
+	I_REF(imod::IModel, m_objectCollectionModelCompPtr);
 	I_ATTR(bool, m_isCacheObjectPtr);
 	I_ATTR(int, m_cacheLimitPtr);
 

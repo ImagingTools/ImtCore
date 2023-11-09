@@ -17,9 +17,16 @@ namespace imtrest
 
 // public methods
 
+CWebSocketRequest::CWebSocketRequest(const IProtocolEngine& engine)
+	:m_engine(engine)
+{
+	m_requestId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+}
+
+
 CWebSocketRequest::CWebSocketRequest(const IRequestServlet& handler, const IProtocolEngine& engine)
 			:m_state(RS_NON_STARTED),
-			m_requestHandler(handler),
+			m_requestHandlerPtr(&handler),
 			m_engine(engine)
 
 {
@@ -115,6 +122,14 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 }
 
 
+void CWebSocketRequest::SetRequestHandler(const IRequestServlet* requestHandlerPtr)
+{
+	if (m_requestHandlerPtr != requestHandlerPtr){
+		m_requestHandlerPtr = requestHandlerPtr;
+	}
+}
+
+
 CWebSocketRequest::MethodType CWebSocketRequest::GetMethodType() const
 {
 	return m_type;
@@ -184,6 +199,7 @@ bool CWebSocketRequest::ResetData(CompatibilityMode /*mode*/)
 	m_url.clear();
 
 	m_state = RS_NON_STARTED;
+	m_requestHandlerPtr = nullptr;
 
 	return true;
 }

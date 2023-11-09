@@ -2,16 +2,20 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5127" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5125" Description="ACF"/>
+            <Version Id="1" Number="2197" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ApiClient" X="550" Y="375" Note=""/>
-        <Element ComponentName="GqlObjectCollection" X="550" Y="100" Note=""/>
-        <Element ComponentName="GqlObjectCollectionDelegate" X="550" Y="250" Note=""/>
-        <Element ComponentName="GraphQLClientEngine" X="550" Y="525" Note=""/>
+        <Element ComponentName="ApiClient" X="300" Y="400" Note=""/>
+        <Element ComponentName="GqlObjectCollection" X="300" Y="100" Note=""/>
+        <Element ComponentName="GqlObjectCollectionDelegate" X="300" Y="250" Note=""/>
+        <Element ComponentName="GraphQLClientEngine" X="300" Y="550" Note=""/>
+        <Element ComponentName="SubscriptionController" X="825" Y="100" Note=""/>
+        <Element ComponentName="SubscriptionManager" X="825" Y="250" Note=""/>
+        <Element ComponentName="WebSocketClient" X="575" Y="400" Note=""/>
+        <Element ComponentName="WebSocketProtocolEngine" X="975" Y="400" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

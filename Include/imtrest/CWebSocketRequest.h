@@ -44,6 +44,7 @@ public:
 		MT_QUERY_DATA
 	};
 
+	CWebSocketRequest(const IProtocolEngine& engine);
 	CWebSocketRequest(const IRequestServlet& requestHandler, const IProtocolEngine& engine);
 	~CWebSocketRequest();
 
@@ -52,6 +53,7 @@ public:
 	QUrl GetUrl() const;
 	QHostAddress GetRemoteAddress() const;
 	void SetBody(const QByteArray& body);
+	void SetRequestHandler(const IRequestServlet* requestHandlerPtr);
 	MethodType GetMethodType() const;
 	QByteArray GetSubscriptionId() const;
 	void RegisterDestroyObserver(IDestroyObserver* destroyObserver);
@@ -78,7 +80,7 @@ private:
 	QByteArray m_subscriptionId;
 	MethodType m_type;
 
-	const IRequestServlet& m_requestHandler;
+	const IRequestServlet* m_requestHandlerPtr;
 	const IProtocolEngine& m_engine;
 
 	typedef QMap<QByteArray, QByteArray> HeaderMap;

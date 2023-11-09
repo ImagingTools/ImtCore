@@ -255,7 +255,7 @@ Item {
                 let elements = containerBase.tableData.elements;
                 let indexes = containerBase.tableData.getSelectedIndexes();
                 if (indexes.length === 1){
-                    elements.SetData(containerBase.descriptionFieldId, inputValue);
+                    elements.SetData(containerBase.descriptionFieldId, inputValue, indexes[0]);
                 }
 
                 if (buttonId == "Ok"){

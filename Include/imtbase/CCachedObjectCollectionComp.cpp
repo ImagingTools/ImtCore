@@ -28,6 +28,38 @@ void CCachedObjectCollectionComp::SetOperationFlags(int /*flags*/, const QByteAr
 }
 
 
+// reimplemented (icomp::CComponentBase)
+
+void CCachedObjectCollectionComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	if (m_objectCollectionModelCompPtr.IsValid()) {
+		m_objectCollectionModelCompPtr->AttachObserver(this);
+	}
+}
+
+
+void CCachedObjectCollectionComp::OnComponentDestroyed()
+{
+	if (m_objectCollectionModelCompPtr.IsValid()){
+		m_objectCollectionModelCompPtr->DetachObserver(this);
+	}
+
+	BaseClass::OnComponentDestroyed();
+}
+
+
+// reimplemented (imod::CSingleModelObserverBase)
+
+void CCachedObjectCollectionComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+{
+	ClearCache();
+
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+}
+
+
 // reimplemented (imtbase::IObjectCollection)
 
 const IRevisionController* CCachedObjectCollectionComp::GetRevisionController() const
@@ -203,9 +235,9 @@ int CCachedObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* select
 
 
 ICollectionInfo::Ids CCachedObjectCollectionComp::GetElementIds(
-	int offset,
-	int count,
-	const iprm::IParamsSet* selectionParamsPtr) const
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr) const
 {
 	PaginationData* paginationDataPtr = CheckCache(offset, count, selectionParamsPtr);
 	if (paginationDataPtr != nullptr){
@@ -352,6 +384,12 @@ CCachedObjectCollectionComp::PaginationData* CCachedObjectCollectionComp::CheckC
 	m_paginationDataList.PushBack(new PaginationData(offset, count, data, subcollection));
 
 	return m_paginationDataList.GetAt(m_paginationDataList.GetCount() - 1);
+}
+
+
+void CCachedObjectCollectionComp::ClearCache()
+{
+	m_paginationDataList.Reset();
 }
 
 

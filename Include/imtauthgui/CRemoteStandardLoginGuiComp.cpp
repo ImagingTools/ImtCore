@@ -188,6 +188,8 @@ void CRemoteStandardLoginGuiComp::on_LoginButton_clicked()
 			PasswordLabel->setStyleSheet("color: red");
 			PasswordMessage->setStyleSheet("color: red");
 			PasswordMessage->setText(tr("Login failed"));
+
+			m_systemStatusCompPtr->UpdateSystemStatus();
 		}
 
 		StackedWidget->setCurrentIndex(0);

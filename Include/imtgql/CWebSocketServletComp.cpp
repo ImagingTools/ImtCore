@@ -169,8 +169,13 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 
 	IGqlSubscriberController* subscriberControllerPtr = nullptr;
 	for (int index = 0; index < m_gqlSubscriberControllersCompPtr.GetCount(); index++){
-		if (m_gqlSubscriberControllersCompPtr[index]->IsRequestSupported(gqlRequest)){
-			subscriberControllerPtr = m_gqlSubscriberControllersCompPtr[index];
+		IGqlSubscriberController* gqlSubscriberControllerPtr = m_gqlSubscriberControllersCompPtr[index];
+		if (gqlSubscriberControllerPtr != nullptr){
+			if (gqlSubscriberControllerPtr->IsRequestSupported(gqlRequest)){
+				subscriberControllerPtr = m_gqlSubscriberControllersCompPtr[index];
+
+				break;
+			}
 		}
 	}
 

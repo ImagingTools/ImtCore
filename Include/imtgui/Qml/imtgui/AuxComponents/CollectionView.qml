@@ -446,6 +446,24 @@ Item {
 
             color: Style.selectedColor;
 
+            property string commandId: collectionViewContainer.commandsId;
+
+            Component.onCompleted: {
+                if (commandId !== ""){
+                    Events.subscribeEvent("Update" + commandId);
+                }
+            }
+
+            Component.onDestruction: {
+                if (commandId !== ""){
+                    Events.unSubscribeEvent("Update" + commandId);
+                }
+            }
+
+            function updateData(){
+                updateButton.clicked();
+            }
+
             Image {
                 id: icon;
 
@@ -470,7 +488,7 @@ Item {
                 anchors.leftMargin: 10;
                 anchors.right: updateButton.left;
 
-                text: qsTr("The collection has remote changes");
+                text: qsTr("This collection has been modified from another computer");
             }
 
             BaseButton {

@@ -20,7 +20,6 @@
 #include <imtclientgql/IGqlClient.h>
 
 
-
 namespace imtclientgql
 {
 

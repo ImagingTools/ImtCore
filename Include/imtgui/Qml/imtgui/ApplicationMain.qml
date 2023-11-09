@@ -131,22 +131,13 @@ Item {
         property bool applyUrl: application.serverReady && application.settingsProvider.serverModel != null;
         onApplyUrlChanged: {
             if (applyUrl){
-//                let serverUrl = application.settingsProvider.getValue("ServerUrl");
-//                let webSocketServerPort = application.settingsProvider.getValue("WebSocketServerPort");
-
-//                console.log("serverUrl", serverUrl);
-//                console.log("webSocketServerPort", webSocketServerPort);
-
-//                let result = serverUrl.replace("http", "ws");
-//                let parts = result.split(':')
-//                result = parts[0] + ":" + parts[1] + ":" + webSocketServerPort;
-
                 let result = application.settingsProvider.getValue("WebSocketServerUrl");
-
-                console.log("onApplyUrlChanged", result);
-
                 subscriptionManager.url = result;
             }
+        }
+
+        onError: {
+            Events.sendEvent("SendWarningError", qsTr("There is no connection to the subscription server. Check the Web Server Socket Url in the settings or contact your system administrator."));
         }
     }
 
@@ -163,8 +154,6 @@ Item {
 
     function onLogout(){
         settingsProvider.serverModel = null;
-//        thumbnailDecorator.closeAllPages();
-//        firstModelsInit();
     }
 
     function onLocalizationChanged(language){

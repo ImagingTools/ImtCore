@@ -1,7 +1,7 @@
 import QtQuick 2.0
-import QtWebSockets 1.15
-import Acf 1.0
 import imtqml 1.0
+import Acf 1.0
+import QtWebSockets 1.15
 
 WebSocket {
     id: container;
@@ -10,18 +10,19 @@ WebSocket {
 
     property var subscriptionModel: []
 
+    signal error(string message);
+
     onStatusChanged: {
         console.log("SubscriptionManager onStatusChanged", status)
 
         if (status == WebSocket.Error){
             console.error("SubscriptionManager ERROR", errorString)
+            error(errorString);
         }
-
-        if (status == WebSocket.Open){
+        else if (status == WebSocket.Open){
             sendTextMessage("{ \"type\": \"connection_init\" }")
         }
-
-        if (status == WebSocket.Closed){
+        else if (status == WebSocket.Closed){
             for (let index = 0; index < subscriptionModel.length; index++){
                 subscriptionModel[index]["status"] = "unregistered"
             }
@@ -69,10 +70,6 @@ WebSocket {
     onTextMessageReceived:{
         console.log("SubscriptionManager onTextMessageReceived", message)
         let ok = socketModel.CreateFromJson(message)
-
-        if (ok){
-            console.log("socketModel", socketModel.toJSON())
-        }
 
         if (socketModel.GetData("type") == "connection_ack"){
             registerSubscriptionToServer()

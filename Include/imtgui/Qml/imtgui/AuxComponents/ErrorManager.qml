@@ -48,6 +48,7 @@ Item {
     Component {
         id: warningDialog;
         ErrorDialog {
+            title: qsTr("Warning message");
             onFinished: {}
         }
     }
