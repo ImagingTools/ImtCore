@@ -54,6 +54,7 @@ void CFullScreenCommandComp::OnComponentCreated()
 	connect(&m_switchCommand, SIGNAL(triggered()), this, SLOT(OnCommandActivated()));
 
 	EnableLocalization(true);
+	EnableDesignHandler(true);
 
 	QWidget* mainWidgetPtr = GetMainWidget();
 	if(mainWidgetPtr != nullptr){
