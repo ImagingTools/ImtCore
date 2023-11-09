@@ -355,10 +355,25 @@ Item {
 
     Component {
         id: spinBoxDecoratorComp;
-        Item {
+        SpinBox {
             id: spinBoxItem;
 
             property var baseElement: null;
+
+            value: !baseElement ? 0 : baseElement.startValue;
+
+            from: !baseElement ? 0 : baseElement.from;
+            to: !baseElement ? 99 : baseElement.to;
+            stepSize: !baseElement ? 1 : baseElement.stepSize;
+
+            editable: !baseElement ? true : baseElement.editable;
+            wrap: !baseElement ? false : baseElement.wrap;
+
+            onValueChanged: {
+                if(baseElement){
+                    baseElement.value = value;
+                }
+            }
         }
     }
 

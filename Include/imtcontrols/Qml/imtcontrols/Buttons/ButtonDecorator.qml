@@ -23,9 +23,9 @@ Rectangle{
     Image {
         id: iconObj
 
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.left: parent.left
-        anchors.leftMargin: textObj.text == "" ? parent.width/2 - width/2 : Style.paddingSmall
+        anchors.verticalCenter: commonButtonDecorator.verticalCenter
+        anchors.left: commonButtonDecorator.left
+        anchors.leftMargin: textObj.text == "" ? commonButtonDecorator.width/2 - width/2 : Style.paddingSmall
 
         width: source === "" ? 0 : Style.iconSizeSmall
         height: width
@@ -38,8 +38,8 @@ Rectangle{
     Text {
         id: textObj
 
-        anchors.verticalCenter: parent.verticalCenter
-        anchors.left: !baseElement ? parent.left : baseElement.iconSource === "" ? parent.left : iconObj.right
+        anchors.verticalCenter: commonButtonDecorator.verticalCenter
+        anchors.left: !baseElement ? commonButtonDecorator.left : baseElement.iconSource === "" ? parent.left : iconObj.right
         anchors.leftMargin: !baseElement ? 0 : baseElement.iconSource === "" ? parent.width/2 - width/2 : Style.paddingSmall
 
         color: !baseElement ? "transtarent" : baseElement.enabled ? Style.textColor : Style.inactive_textColor

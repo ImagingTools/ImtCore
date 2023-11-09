@@ -47,7 +47,7 @@ ControlBase {
     }
 
     function decoratorChangedFunc(){
-        console.log("RangeSlider: redefinition of base function");
+        //console.log("RangeSlider: redefinition of base function");
     }
 
     onDecoratorComponentChanged: {

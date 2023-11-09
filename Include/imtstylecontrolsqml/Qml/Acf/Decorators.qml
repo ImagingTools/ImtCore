@@ -87,10 +87,11 @@ Item {
 
             property string text: "";
 
+
             Rectangle {
                 id: mainRect;
 
-                anchors.fill: parent;
+                anchors.fill: textFieldItem;
 
                 color: !textFieldItem.baseElement ? "transparent" : textFieldItem.baseElement.readOnly ? Style.alternateBaseColor : Style.baseColor;
 
@@ -104,9 +105,9 @@ Item {
             Text {
                 id: placeHolder;
 
-                anchors.left: parent.left;
+                anchors.left: textFieldItem.left;
                 anchors.leftMargin: !textFieldItem.baseElement ? 0 : textFieldItem.baseElement.margin;
-                anchors.verticalCenter: parent.verticalCenter;
+                anchors.verticalCenter: textFieldItem.verticalCenter;
 
 
                 font.pixelSize: Style.fontSize_common;
@@ -119,6 +120,8 @@ Item {
                 visible: !textFieldItem.baseElement ? false : textFieldItem.baseElement.text == "";
 
                 text: !textFieldItem.baseElement ? "" : textFieldItem.baseElement.placeHolderText;
+
+
             }
 
             MouseArea {
@@ -639,11 +642,7 @@ Item {
 
     Component {
         id: spinBoxDecoratorComp;
-        Item {
-            id: spinBoxItem;
-
-            property var baseElement: null;
-        }
+        SpinBoxDecorator{}
     }
 
 

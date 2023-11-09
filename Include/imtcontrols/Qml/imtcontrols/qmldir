@@ -64,6 +64,7 @@ TimeIntervalPicker 1.0 ./Inputs/TimeIntervalPicker.qml
 TimePicker 1.0 ./Inputs/TimePicker.qml
 TextArea 1.0 ./Inputs/TextArea.qml
 SpinBox 1.0 ./Inputs/SpinBox.qml
+SpinBoxDecorator 1.0 ./Inputs/SpinBoxDecorator.qml
 ModelIndex 1.0 ./Models/ModelIndex.qml
 UuidGenerator 1.0 ./Models/UuidGenerator.qml
 CommandsDecorator 1.0 ./Panels/CommandsDecorator.qml
