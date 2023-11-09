@@ -99,7 +99,7 @@ bool CBinaryDataProviderComp::GetData(
 
 		qint64 readLen = readMaxLength;
 		if (readLen < 0){
-			readLen = std::numeric_limits<qint64>().max();
+			readLen = destinationFile.size() - readFromPosition;
 		}
 
 		data = destinationFile.read(readLen);

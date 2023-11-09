@@ -67,24 +67,27 @@ ConstResponsePtr CHttpFileBufferComp::OnGet(
 					request);
 	}
 	qint64 offset = 0;
-	qint64 limit = std::numeric_limits<qint64>().max();
-	if (commandParams.contains("Limit")){
-		bool isNumber = false;
-		limit = commandParams["Limit"].toLongLong(&isNumber);
-		if (!isNumber){
-			statusCode = imtrest::IProtocolEngine::SC_BAD_REQUEST;
-			return CreateDefaultErrorResponse(
-				QString(QT_TR_NOOP("Limit has wrong value '%1'")).arg(QString(commandParams["Limit"])).toUtf8(),
-				request);
-		}
-	}
 	if (commandParams.contains("Offset")){
 		bool isNumber = false;
 		offset = commandParams["Offset"].toLongLong(&isNumber);
 		if (!isNumber){
 			statusCode = imtrest::IProtocolEngine::SC_BAD_REQUEST;
+
 			return CreateDefaultErrorResponse(
 				QString(QT_TR_NOOP("Offset has wrong value '%1'")).arg(QString(commandParams["Offset"])).toUtf8(),
+				request);
+		}
+	}
+
+	qint64 limit = requestedFile.size() - offset;
+	if (commandParams.contains("Limit")){
+		bool isNumber = false;
+		limit = commandParams["Limit"].toLongLong(&isNumber);
+		if (!isNumber){
+			statusCode = imtrest::IProtocolEngine::SC_BAD_REQUEST;
+
+			return CreateDefaultErrorResponse(
+				QString(QT_TR_NOOP("Limit has wrong value '%1'")).arg(QString(commandParams["Limit"])).toUtf8(),
 				request);
 		}
 	}
