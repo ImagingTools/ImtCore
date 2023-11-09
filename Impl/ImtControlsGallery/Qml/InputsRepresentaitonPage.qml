@@ -9,6 +9,10 @@ Rectangle {
 
     anchors.fill: parent;
 
+    Component.onCompleted: {
+        spinBox.forceActiveFocus();
+    }
+
     TreeItemModel{
         id: comboModel;
 
@@ -165,6 +169,34 @@ Rectangle {
 //            }
 
         }//row3 - checkRow
+
+        Row{
+            id: boxRow;
+
+            anchors.horizontalCenter: parent.horizontalCenter;
+            height: 40;
+            spacing: 50;
+
+            Rectangle{
+                id: spinBoxContainer;
+
+                anchors.verticalCenter: parent.verticalCenter;
+
+                width: 160;
+                height: 60;
+
+                radius: 4;
+                color: "transparent";
+                //border.color: "lightgreen";
+
+                SpinBox{
+                    id: spinBox;
+
+                    anchors.centerIn: parent;
+                }
+            }
+
+        }//row4 - boxRow
 
     }//Column
 
