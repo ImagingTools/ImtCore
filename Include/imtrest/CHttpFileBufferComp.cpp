@@ -25,11 +25,74 @@ ConstResponsePtr CHttpFileBufferComp::OnGet(
 			const HeadersMap& headers,
 			const CHttpRequest& request) const
 {
+	int statusCode = imtrest::IProtocolEngine::SC_OK;
+	const QByteArray requestedFileId;
 
-	int statusCode = 200;
-	QByteArray payload;
+	imtbase::IObjectCollection& requestCollection = *m_tempFileCollectionCompPtr;
+	const istd::IChangeable* objectPtr = requestCollection.GetObjectPtr(requestedFileId);
+	if (objectPtr == nullptr){
+		statusCode = imtrest::IProtocolEngine::SC_NOT_FOUND;
+		SendCriticalMessage(0, QString("Unable to find request with ID: '%1'").arg(QString(requestedFileId)));
+		I_CRITICAL();
 
-	return ConstResponsePtr(request.GetProtocolEngine().CreateResponse(request, statusCode, payload, QByteArrayLiteral("application/json; charset=utf-8")));
+		return CreateDefaultErrorResponse(QT_TR_NOOP("Unable to find file"), request);
+	}
+
+	const iprm::IParamsSet* paramsSetPtr = dynamic_cast<const iprm::IParamsSet*>(objectPtr);
+	if (paramsSetPtr == nullptr){
+		statusCode = imtrest::IProtocolEngine::SC_INTERNAL_ERROR;
+		SendCriticalMessage(0, QString("Model has unsupported modelType"));
+		I_CRITICAL();
+
+		return CreateDefaultErrorResponse(QT_TR_NOOP("Model has unsupported modelType"), request);
+	}
+
+	iprm::TParamsPtr<ifile::IFileNameParam> fileNameParamPtr(paramsSetPtr, "FilePath");
+	if (!fileNameParamPtr.IsValid()){
+		statusCode = imtrest::IProtocolEngine::SC_INTERNAL_ERROR;
+		SendCriticalMessage(0, QString("Model has unsupported modelType"));
+
+		return CreateDefaultErrorResponse(QT_TR_NOOP("Model has unsupported modelType"), request);
+	}
+
+	QString filePath = fileNameParamPtr->GetPath();
+
+	QFile requestedFile(filePath);
+	if (!requestedFile.open(QIODevice::ReadOnly)){
+		statusCode = imtrest::IProtocolEngine::SC_INTERNAL_ERROR;
+		SendCriticalMessage(0, QString("Unable to open file: '%1'. Error: '%2'").arg(filePath, requestedFile.errorString()));
+
+		return CreateDefaultErrorResponse(
+					QString(QT_TR_NOOP("Unable to open file: '%1'. Error: '%2'")).arg(filePath, requestedFile.errorString()).toUtf8(),
+					request);
+	}
+	qint64 offset = 0;
+	qint64 limit = std::numeric_limits<qint64>().max();
+	if (commandParams.contains("Limit")){
+		bool isNumber = false;
+		limit = commandParams["Limit"].toLongLong(&isNumber);
+		if (!isNumber){
+			statusCode = imtrest::IProtocolEngine::SC_BAD_REQUEST;
+			return CreateDefaultErrorResponse(
+				QString(QT_TR_NOOP("Limit has wrong value '%1'")).arg(QString(commandParams["Limit"])).toUtf8(),
+				request);
+		}
+	}
+	if (commandParams.contains("Offset")){
+		bool isNumber = false;
+		offset = commandParams["Offset"].toLongLong(&isNumber);
+		if (!isNumber){
+			statusCode = imtrest::IProtocolEngine::SC_BAD_REQUEST;
+			return CreateDefaultErrorResponse(
+				QString(QT_TR_NOOP("Offset has wrong value '%1'")).arg(QString(commandParams["Offset"])).toUtf8(),
+				request);
+		}
+	}
+
+	requestedFile.seek(offset);
+	const QByteArray payload = requestedFile.read(limit);
+
+	return ConstResponsePtr(request.GetProtocolEngine().CreateResponse(request, statusCode, payload, QByteArrayLiteral("application/octet-stream; charset=utf-8")));
 }
 
 ConstResponsePtr CHttpFileBufferComp::OnPost(
