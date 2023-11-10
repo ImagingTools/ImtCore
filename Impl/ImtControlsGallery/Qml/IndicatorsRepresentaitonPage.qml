@@ -103,9 +103,6 @@ Rectangle {
                     hoverEnabled: true;
                     cursorShape: Qt.PointingHandCursor;
 
-//                    onEntered: {
-//                        tooltip.show(mouseX, mouseY);
-//                    }
                     onPositionChanged: {
                         tooltip.show(mouseX, mouseY);
                     }
@@ -121,12 +118,125 @@ Rectangle {
                     fitToTextWidth: true;
                     componentHeight: 30;
                     timeout: 2000;
-                    fitToCenter: true;
+                    fitToHCenter: true;
                 }
 
             }
 
+        }//indicatorsRow
 
+        Row{
+            id: scrollBarsRow;
+
+            anchors.horizontalCenter: parent.horizontalCenter;
+
+            height:  300;
+            spacing: 100;
+
+            Rectangle{
+                id: listViewVertContainer;
+
+                width: parent.height;
+                height: width;
+
+                radius: 4;
+                border.color: "lightgreen";
+
+                ListView{
+                    id: listVert;
+
+                    anchors.centerIn: parent;
+
+                    width: parent.width - 8;
+                    height: parent.height - 8;
+
+                    clip: true;
+                    boundsBehavior: Flickable.StopAtBounds;
+                    spacing: 20;
+
+                    model: 10;
+                    delegate: Rectangle{
+                        width: listVert.width - 10;
+                        height: 50;
+                        radius: 2;
+                        color: "lightblue";
+                        Text{
+                            anchors.centerIn: parent;
+
+                            font.pixelSize: 18;
+                            text: model.index + 1;
+                        }
+                    }
+
+                 }
+
+                CustomScrollbar{
+                    id: scrollVert;
+
+                    anchors.right: listVert.right;
+                    anchors.rightMargin: 1;
+
+                    anchors.bottom: listVert.bottom;
+
+                    secondSize: 8;
+
+                    targetItem: listVert;
+                }
+
+            }//listViewVertContainer
+
+            Rectangle{
+                id: listViewHorizContainer;
+
+                width: parent.height;
+                height: width;
+
+                radius: 4;
+                border.color: "lightgreen";
+
+                ListView{
+                    id: listHoriz;
+
+                    anchors.centerIn: parent;
+
+                    width: parent.width - 8;
+                    height: parent.height - 8;
+
+                    clip: true;
+                    boundsBehavior: Flickable.StopAtBounds;
+                    orientation: Qt.Horizontal;
+                    spacing: 20;
+
+                    model: 10;
+                    delegate: Rectangle{
+                        width: 50;
+                        height: listHoriz.height - 10;
+                        radius: 2;
+                        color: "lightblue";
+                        Text{
+                            anchors.centerIn: parent;
+
+                            font.pixelSize: 18;
+                            text: model.index + 1;
+                        }
+                    }
+
+                }
+
+                CustomScrollbar{
+                    id: scrollHoriz;
+
+                    anchors.right: listHoriz.right;
+                    anchors.bottom: listHoriz.bottom;
+                    anchors.bottomMargin: 1;
+
+                    secondSize: 8;
+
+                    vertical: false;
+                    targetItem: listHoriz;
+                }
+
+            }//listViewHorizContainer
         }
 
     }
