@@ -29,7 +29,6 @@
         <file alias="imtlicgui/PackageViewItemDelegate.qml">Qml/imtlicgui/PackageViewItemDelegate.qml</file>
         <file alias="imtlicgui/ProductViewItemDelegate.qml">Qml/imtlicgui/ProductViewItemDelegate.qml</file>
         <file alias="imtlicgui/LicenseInstanceItemDelegate.qml">Qml/imtlicgui/LicenseInstanceItemDelegate.qml</file>
-        <file alias="imtlicgui/TreeViewDependencies.qml">Qml/imtlicgui/TreeViewDependencies.qml</file>
 	<file alias="imtlicgui/FeatureCollectionView.qml">Qml/imtlicgui/FeatureCollectionView.qml</file>
 	<file alias="imtlicgui/FeatureEditor.qml">Qml/imtlicgui/FeatureEditor.qml</file>
 	<file alias="imtlicgui/LicenseEditor.qml">Qml/imtlicgui/LicenseEditor.qml</file>
