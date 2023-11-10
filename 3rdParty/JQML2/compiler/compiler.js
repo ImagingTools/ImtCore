@@ -11,7 +11,7 @@ for(let componentName of listComponents){
 const listProperties = require('../utils/properties')
 
 const source = process.argv[2] || '../test/qml'
-if(!source) throw 'source not specified'
+if(!source) throw 'error: source not specified'
 
 function getFiles (dir, _files){
     _files = _files || []
@@ -151,7 +151,7 @@ function qmlpropdef(meta, instructions){
         instructions.properties.push({
             val: childInstructions,
             name: meta[1],
-            type: listComponents.indexOf(type) >= 0 ? type : 'Q'+type,
+            type: listProperties['Q'+type] ? 'Q'+type : 'null', //temp
             command: 'create',
             isElement: true
         })
@@ -160,7 +160,7 @@ function qmlpropdef(meta, instructions){
         
         instructions.properties.push({
             name: meta[1],
-            type: listComponents.indexOf(type) >= 0 ? type : 'Q'+type,
+            type: listProperties['Q'+type] ? 'Q'+type : 'null', //temp
             val: meta[3],
             command: 'create'
         })
@@ -381,6 +381,7 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
             stat.return = true
             stat.value.push(`return `)
             prepare(tree[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(`;`)
             break
         }
         case 'num': {
@@ -932,17 +933,20 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
                 }
                 
             } else {
-                if(property.val.className !== 'Component' && property.name === 'delegate' && (currentInstructions.className === 'ListView'|| currentInstructions.className === 'GridView' || currentInstructions.className === 'Repeater')){  
+                if(property.val.className !== 'Component'){  
                     // TEMP !!!
-                    code.push(`${currentInstructions.name}.$temp = new Component(${currentInstructions.name}, inCtx)`)
-                    code.push(`${currentInstructions.name}.$temp.createObject=function(currParent,exCtx){`)
-                    
-                    code.push(`let inCtx = new ContextController(exCtx)`)
-                    treeCompile(compiledFile, property.val, [], [], 0, true)
-                    code.push(`}`)
+                    if((property.name === 'delegate' && (currentInstructions.className === 'ListView'|| currentInstructions.className === 'GridView' || currentInstructions.className === 'Repeater')) || (property.name === 'sourceComponent' && currentInstructions.className === 'Loader')){
+                        code.push(`${currentInstructions.name}.$temp = new Component(${currentInstructions.name}, inCtx)`)
+                        code.push(`${currentInstructions.name}.$temp.createObject=function(currParent,exCtx){`)
+                        
+                        code.push(`let inCtx = new ContextController(exCtx)`)
+                        treeCompile(compiledFile, property.val, [], [], 0, true)
+                        code.push(`}`)
 
-                    code.push(`${currentInstructions.name}.${property.name} = ${currentInstructions.name}.$temp`)
-                    code.push(`delete ${currentInstructions.name}.$temp`)
+                        code.push(`${currentInstructions.name}.${property.name} = ${currentInstructions.name}.$temp`)
+                        code.push(`delete ${currentInstructions.name}.$temp`)
+                    }
+                    
                 } else {
                     treeCompile(compiledFile, property.val)
                     code.push(`${currentInstructions.name}.${property.name} = ${property.val.name}`)
@@ -1118,6 +1122,7 @@ while(queueFiles.length){
     } else {
         let userClass = ''
         let next = false
+        let find = false
         for(let _fileName in compiledFiles){
             let targetCompiledFile = compiledFiles[_fileName]
             if(targetCompiledFile.instructions.getQmlFileName().replaceAll('.qml', '') === compiledFile.instructions.className){
@@ -1131,13 +1136,19 @@ while(queueFiles.length){
                         break
                     }
                     code.push(`class ${className} extends ${targetClassName.join('_')} {`)
+                    find = true
                     classList.push(className)
                     break
                 }
+
                 // if(compiledFile.imports.indexOf(targetCompiledFile[_fileName]))
             }
         }
-        if(next) continue
+        if(next) {
+            continue
+        } else if(!find) {
+            throw `error: class ${compiledFile.instructions.className} not found into file ${compiledFile.fileName}` 
+        }
     }
     
     code.push(`constructor(parent, exCtx) {`)

@@ -2,12 +2,13 @@ const { Qt } = require('./Qt')
 
 class MouseController {
     list = []
-    pressedList = []
+    flickList = []
     oldList = []
     originX = 0
     originY = 0
-    viewMode = false
-    // timestamp = 0
+
+    pressedMouseAreaInner = null
+    pressedMouseAreaOuter = null
 
     constructor(){
         window.onmousemove = (e)=>{
@@ -58,24 +59,35 @@ class MouseController {
     }
 
     get(x, y){
+        let elements = document.elementsFromPoint(x, y)
         let inner = []
-        let outer = []
-        let pressedInner = []
-        let pressedOuter = []
-        for(let i = this.list.length - 1; i >= 0; i--){
-            if(this.list[i].getStatement('enabled')){
-                let area = this.list[i].getDom().getBoundingClientRect()
-                if(x >= area.left && x <= area.right && y >= area.top && y <= area.bottom){
-                    inner.push(this.list[i])
-                    if(this.pressedList.indexOf(this.list[i]) >= 0) pressedInner.push(this.list[i])
-                } else {
-                    outer.push(this.list[i])
-                    if(this.pressedList.indexOf(this.list[i]) >= 0) pressedOuter.push(this.list[i])
-                }
+
+        for(let element of elements){
+            if(element.id && UIDList[element.id] && (UIDList[element.id].$mousearea || UIDList[element.id].$flickable) && UIDList[element.id].getPropertyValue('enabled') && UIDList[element.id].getPropertyValue('visible')){
+                inner.push(UIDList[element.id])
             }
-            
         }
-        return [inner, outer, pressedInner, pressedOuter]
+
+        return inner
+
+        // let inner = []
+        // let outer = []
+        // let pressedInner = []
+        // let pressedOuter = []
+        // for(let i = this.list.length - 1; i >= 0; i--){
+        //     if(this.list[i].getPropertyValue('enabled') && this.list[i].getPropertyValue('visible')){
+        //         let area = this.list[i].getDom().getBoundingClientRect()
+        //         if(x >= area.left && x <= area.right && y >= area.top && y <= area.bottom){
+        //             inner.push(this.list[i])
+        //             if(this.pressedList.indexOf(this.list[i]) >= 0) pressedInner.push(this.list[i])
+        //         } else {
+        //             outer.push(this.list[i])
+        //             if(this.pressedList.indexOf(this.list[i]) >= 0) pressedOuter.push(this.list[i])
+        //         }
+        //     }
+            
+        // }
+        // return [inner, outer, pressedInner, pressedOuter]
     }
 
     stopPropogation(obj){
@@ -83,15 +95,9 @@ class MouseController {
     }
 
     onWheel(x, y, deltaX, deltaY){
-        let res = this.get(x, y)
-        let inner = res[0]
-        let outer = res[1]
-        let pressedInner = res[2]
-        let pressedOuter = res[3]
-
-        this.stopPropogation(null)
+        let inner = this.get(x, y)
         for(let obj of inner){
-            if(!this.stopPropogate) obj.onWheel(x, y, deltaX, deltaY)
+            if(!obj.onWheel(x, y, deltaX, deltaY)) break
         }
     }
 
@@ -112,49 +118,51 @@ class MouseController {
     }
 
     onMouseDown(x, y, button){
-        let res = this.get(x, y)
-        let inner = res[0]
-        let outer = res[1]
-        let pressedInner = res[2]
-        let pressedOuter = res[3]
+        let inner = this.get(x, y)
+
         this.originX = x
         this.originY = y
-        // this.timestamp = (new Date()).getTime()
-        // console.log('MouseController',this.stopPropogate, this.viewMode, inner)
-        this.stopPropogation(null)
-        this.viewMode = false
-        for(let obj of inner){
-            this.pressedList.push(obj)
-            if(!this.stopPropogate || obj.$flickable) {  
-                obj.onMouseDown(x, y, button)
-            }  
-        }
-        // console.log(res)
-    }
-    onMouseUp(x, y, button){
-        let res = this.get(x, y)
-        let inner = res[0]
-        let outer = res[1]
-        let pressedInner = res[2]
-        let pressedOuter = res[3]
 
-        this.pressedList = []
-        // this.timestamp = (new Date()).getTime() - this.timestamp
-        
+        this.pressedMouseAreaInner = null
+        this.pressedMouseAreaOuter = null
 
-        // this.stopPropogation(null)
-        if(this.stopPropogate) {
-            this.stopPropogate.onMouseUp(x, y, button)
-        } else {
-            for(let obj of pressedInner){
-                if(!this.stopPropogate) {
-                    obj.onMouseUp(x, y, button)
-                }  
+        this.flickList = []
+
+        for(let i = 0; i < inner.length; i++){
+            if(inner[i].$mousearea && !this.pressedMouseAreaInner){
+                if(inner[i].onMouseDown(x, y)){
+                    for(let j = i+1; j < inner.length; j++){
+                        if(!inner[j].onMouseDown(x, y)){
+                            this.pressedMouseAreaInner = inner[j]
+                            break
+                        }
+                    }
+                } else {
+                    this.pressedMouseAreaInner = inner[i]
+                }
+            }
+
+            if(inner[i].$flickable){
+                inner[i].onMouseDown(x, y)
+                this.flickList.push(inner[i])
             }
         }
-        this.stopPropogation(null)
-        this.viewMode = false
-        // console.log(res)
+        // console.log(this.pressedList)
+    }
+    onMouseUp(x, y, button){
+        let inner = this.get(x, y)
+
+        if(this.pressedMouseAreaInner){
+            this.pressedMouseAreaInner.onMouseUp(x, y)
+        }
+
+        for(let obj of this.flickList){
+            obj.onMouseUp(x, y)
+        }
+
+        this.pressedMouseAreaInner = null
+        this.pressedMouseAreaOuter = null
+        this.flickList = []
     }
     checkView(x, y, obj){
         if(obj.$flickable){
@@ -165,69 +173,58 @@ class MouseController {
         }
     }
     onMouseMove(x, y){
-        let res = this.get(x, y)
-        let inner = res[0]
-        let outer = res[1]
-        let pressed = [].concat(res[2], res[3])
-        // let pressedInner = res[2]
-        // let pressedOuter = res[3]
-        
-        let isPressed = pressed.length ? true : false
-        if(!this.stopPropogate) document.body.style.cursor = 'default'
-        // console.log('MouseController',this.stopPropogate, this.viewMode, isPressed, inner, pressed, this.oldList)
+        let inner = this.get(x, y)
 
-        if(!isPressed){
-            for(let obj of this.oldList){
-                if(inner.indexOf(obj) < 0) {
-                    if(obj.$flickable) continue
-                    obj.onMouseMove(x, y)
-                }
+        document.body.style.cursor = 'default'
+
+
+        for(let obj of this.oldList){
+            if(obj.$mousearea && obj.getPropertyValue('hoverEnabled')) {
+                obj.onMouseMove(x, y, false)
+
             }
-            this.oldList = inner
+        }
+        this.oldList = inner
+
+
+        let pressedMouseArea = this.pressedMouseAreaInner ? this.pressedMouseAreaInner : this.pressedMouseAreaOuter
+
+
+        if(pressedMouseArea && !pressedMouseArea.getPropertyValue('preventStealing')){
+            if(Math.abs(this.originX - x) >= 10 || Math.abs(this.originY - y) >= 10){
+                pressedMouseArea = null
+                this.pressedMouseAreaInner = null
+                this.pressedMouseAreaOuter = null
+            }
+        }
+
+        if(pressedMouseArea){
+            if(pressedMouseArea.onMouseMove(x, y, true)){
+                this.pressedMouseAreaInner = pressedMouseArea
+                this.pressedMouseAreaOuter = null
+            } else {
+                this.pressedMouseAreaOuter = pressedMouseArea
+                this.pressedMouseAreaInner = null
+            }
         } else {
-            this.oldList = []
-        }
-
-  
-        for(let obj of isPressed ? pressed : inner){
-            if(!this.stopPropogate) {
-                if(!isPressed && obj.$flickable) continue
-                if(this.checkView(x, y, obj)) {
-                    if(!this.viewMode) continue
-                }
-                obj.onMouseMove(x, y)
-            }
-            
-            if(isPressed && this.checkView(x, y, obj)){
-                if(this.stopPropogate) {
-                    if(this.viewMode && this.stopPropogate.$mousearea && !this.stopPropogate.getPropertyValue('preventStealing')){
-                        this.stopPropogation(obj)
-                        obj.onMouseMove(x, y)
-                        // break
-                    }
+            while(this.flickList.length){
+                if(this.flickList[0].onMouseMove(x, y)) {
+                    this.flickList.shift()
                 } else {
-                    if(this.viewMode){
-                        this.stopPropogation(obj)
-                        obj.onMouseMove(x, y)
-                        // break
-                    }
-                    
+                    break
                 }
             }
-            
         }
-
-        if(this.stopPropogate) {
-            this.stopPropogate.onMouseMove(x, y)
-        }
-        
-
         
         
     }
 }
 class KeyboardController {
-
+    constructor(){
+        window.onkeydown = (e)=>{
+            // console.log(e)
+        }
+    }
 }
 class TextFontController {
     constructor(){

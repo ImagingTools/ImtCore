@@ -49,7 +49,7 @@ class MouseArea extends Item {
     }
 
     onDoubleClick(x, y, button){
-        if(this.getPropertyValue('enabled')) {
+        if(this.getPropertyValue('enabled') && this.getPropertyValue('visible')) {
             this.mouse.accepted = true
             let rect = this.getDom().getBoundingClientRect()
             this.mouse.x = x - rect.x
@@ -62,59 +62,59 @@ class MouseArea extends Item {
             if(!this.mouse.accepted) MouseController.stopPropogation(this)
         }
     }
-    onMouseDown(x, y, button){
-        if(this.getPropertyValue('enabled')) {
-            this.mouse.accepted = true
+    onMouseDown(x, y){
+        if(this.getPropertyValue('enabled') && this.getPropertyValue('visible')) {
             let rect = this.getDom().getBoundingClientRect()
             this.mouse.x = x - rect.x
             this.mouse.y = y - rect.y
             this.getStatement('mouseX').reset(x - rect.x)
             this.getStatement('mouseX').reset(y - rect.y)
+            this.mouse.accepted = true
+            this.$entered = true
 
-            if(this.$signals.entered) {
-                this.$entered = true
-                this.$signals.entered()
-            }
+            if(this.$signals.entered) this.$signals.entered()
+
+            this.mouse.accepted = true
             if(this.$signals.pressed) this.$signals.pressed()
-
-            if(this.$signals.pressAndHold){
-                clearTimeout(this.$timer)
-                this.$timer = setTimeout(()=>{
-                    this.$signals.pressAndHold()
-                }, this.getPropertyValue('pressAndHoldInterval'))
-            }
             
-            if(!this.mouse.accepted) MouseController.stopPropogation(this)
+
+            // if(this.$signals.pressAndHold){
+            //     clearTimeout(this.$timer)
+            //     this.$timer = setTimeout(()=>{
+            //         this.mouse.accepted = true
+            //         this.$signals.pressAndHold()
+            //         pressAndHold = this.mouse.accepted ? -1 : 1
+            //     }, this.getPropertyValue('pressAndHoldInterval'))
+            // }
+            
+            return !this.mouse.accepted
         }
     }
-    onMouseUp(x, y, button){
-        if(this.getPropertyValue('enabled')) {
-            this.mouse.accepted = true
+    onMouseUp(x, y){
+        if(this.getPropertyValue('enabled') && this.getPropertyValue('visible')) {
             let rect = this.getDom().getBoundingClientRect()
             this.mouse.x = x - rect.x
             this.mouse.y = y - rect.y
             this.getStatement('mouseX').reset(x - rect.x)
             this.getStatement('mouseX').reset(y - rect.y)
-
+            this.mouse.accepted = true
+  
             if(this.$signals.released) this.$signals.released()
-
+        
             if(this.$signals.clicked) this.$signals.clicked()
 
-            if(this.$signals.exited && this.$entered) {   
-                this.$signals.exited()
-            }
+            if(this.$signals.exited) this.$signals.exited()
+            
             delete this.$entered
-
-            if(this.$signals.pressAndHold){
-                clearTimeout(this.$timer)
-                delete this.$timer
-            }
-
-            if(!this.mouse.accepted) MouseController.stopPropogation(this)
-        } 
+            // if(this.$signals.pressAndHold){
+            //     clearTimeout(this.$timer)
+            //     delete this.$timer
+            // }
+            return !this.mouse.accepted
+        }
     }
-    onMouseMove(x, y){
-        if(this.getPropertyValue('enabled')) {
+    onMouseMove(x, y, pressed){
+        if(this.getPropertyValue('enabled') && this.getPropertyValue('visible')) {
             this.mouse.accepted = true
             let rect = this.getDom().getBoundingClientRect()
             this.mouse.x = x - rect.x
@@ -122,9 +122,8 @@ class MouseArea extends Item {
             this.getStatement('mouseX').reset(x - rect.x)
             this.getStatement('mouseY').reset(y - rect.y)
 
-            
 
-            if(this.positionChanged) this.positionChanged()
+            if(pressed && this.$signals.positionChanged) this.$signals.positionChanged()
 
             if(this.getPropertyValue('mouseX') >= 0 && this.getPropertyValue('mouseY') >= 0 && this.getPropertyValue('mouseX') <= this.getPropertyValue('width') && this.getPropertyValue('mouseY') <= this.getPropertyValue('height')){
                 this.getPropertyValue('context').setStyle({
@@ -143,22 +142,27 @@ class MouseArea extends Item {
                 delete this.$entered
             }
 
-            if(!this.mouse.accepted) MouseController.stopPropogation(this)
+            return this.$entered
         }
     }
     onWheel(x, y, deltaX, deltaY){
-        if(this.$signals.wheel) {
-            this.$signals.wheel.accepted = false
-            let rect = this.getDom().getBoundingClientRect()
-            this.$signals.wheel.x = x - rect.x
-            this.$signals.wheel.y = y - rect.y
-            this.$signals.wheel.angleDelta = {
-                x: deltaX / 8,
-                y: deltaY / 8
-            }
-            this.$signals.wheel()
+        if(this.getPropertyValue('enabled') && this.getPropertyValue('visible')) {
+            if(this.$signals.wheel) {
+                this.$signals.wheel.accepted = false
+                let rect = this.getDom().getBoundingClientRect()
+                this.$signals.wheel.x = x - rect.x
+                this.$signals.wheel.y = y - rect.y
+                this.$signals.wheel.angleDelta = {
+                    x: deltaX / 8,
+                    y: deltaY / 8
+                }
+                this.$signals.wheel()
 
-            if(!this.$signals.wheel.accepted) MouseController.stopPropogation(this)
+                // return false
+            }
+            return true
+        } else {
+            return true
         }
     }
 

@@ -360,33 +360,41 @@ class ListView extends Flickable {
     }
 
     onMouseMove(x, y){
-        if(this.getPropertyValue('enabled') && this.getPropertyValue('interactive')) {
+        if(this.getPropertyValue('enabled') && this.getPropertyValue('visible') && this.getPropertyValue('interactive')) {
 
             if(this.getPropertyValue('contentY') + (this.$mouseY - y) > this.getPropertyValue('originY') && this.getPropertyValue('contentY') + (this.$mouseY - y) < this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height')){
                 this.getStatement('contentY').reset(this.getPropertyValue('contentY') + (this.$mouseY - y))
+                return false
             } else {
                 if(this.getPropertyValue('contentY') + (this.$mouseY - y) <= this.getPropertyValue('originY')) {
                     this.getStatement('contentY').reset(this.getPropertyValue('originY'))
-                    MouseController.stopPropogation(null)
+                    // MouseController.stopPropogation(null)
                 }
                 if(this.getPropertyValue('contentY') + (this.$mouseY - y) >= this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height')) {
                     this.getStatement('contentY').reset(this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height'))
-                    MouseController.stopPropogation(null)
+                    // MouseController.stopPropogation(null)
                 }
+                return true
             }
+        } else {
+            return true
         }
     }
 
     onWheel(x, y, deltaX, deltaY){
-        if(this.getPropertyValue('enabled') && this.getPropertyValue('interactive')){
+        if(this.getPropertyValue('enabled') && this.getPropertyValue('visible') && this.getPropertyValue('interactive')){
             // this.getStatement('contentX').reset(this.getStatement('contentX').get()+deltaX)
             // this.getStatement('contentY').reset(this.getStatement('contentY').get()+deltaY)
             if(this.getPropertyValue('contentY') + deltaY > this.getPropertyValue('originY') && this.getPropertyValue('contentY') + deltaY < this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height')){
                 this.getStatement('contentY').reset(this.getPropertyValue('contentY') + deltaY)
+                return false
             } else {
                 if(this.getPropertyValue('contentY') + deltaY <= this.getPropertyValue('originY')) this.getStatement('contentY').reset(this.getPropertyValue('originY'))
                 if(this.getPropertyValue('contentY') + deltaY >= this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height')) this.getStatement('contentY').reset(this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height'))
+                return true
             }
+        } else {
+            return true
         }
     }
 }

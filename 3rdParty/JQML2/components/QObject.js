@@ -11,7 +11,7 @@ class QObject extends ComplexObject {
 
     static defaultSignals = {
         completed: { params: [] },
-        destroyed: { params: [] },
+        destruction: { params: [] },
     }
 
     constructor(parent){
@@ -78,7 +78,7 @@ class QObject extends ComplexObject {
             this.$signals[sigName].destroy()
         }
 
-        if(this.$signals.destroyed) this.$signals.destroyed()
+        if(this.$signals.destruction) this.$signals.destruction()
         if(this.$parent) {
             let index = this.$parent.$children.indexOf(this)
             if(index >= 0) this.$parent.$children.splice(index, 1)

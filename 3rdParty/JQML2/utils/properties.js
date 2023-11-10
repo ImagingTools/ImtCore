@@ -87,6 +87,10 @@ class QProperty {
         return this.notify
     }
 
+    connect(...args){
+        this.getNotify().connect(...args)
+    }
+
     addSubscriber(target){
         if(!this.subscribers) this.subscribers = []
         if(!this.notify) this.notify = new QSignal()
@@ -764,14 +768,14 @@ class MapGestureArea extends ComplexObject {
 }
 
 class QVariant extends QVar {
-    typeCasting(value){
-        if(value === undefined || value === null || value instanceof this.type) {
-            return value
-        } else {
-            throw `error class`
-        }
+    // typeCasting(value){
+    //     if(value === undefined || value === null || value instanceof this.type) {
+    //         return value
+    //     } else {
+    //         throw `error class`
+    //     }
         
-    }
+    // }
 }
 // class QComponent extends QVar {}
 // class QItem extends QVar {}

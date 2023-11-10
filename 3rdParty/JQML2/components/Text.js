@@ -189,11 +189,11 @@ class Text extends Item {
             fontWeight: this.getProperty('font').getPropertyValue('bold') ? 'bold' : 'normal',
             fontSize: this.getProperty('font').getPropertyValue('pixelSize')+'px',
             fontFamily: `'${this.getProperty('font').getPropertyValue('family')}'`,
-            // textDecoration: this.getProperty('font').getPropertyValue('underline') ? 'underline' : 'unset',
+            textDecoration: this.getProperty('font').getPropertyValue('underline') ? 'underline' : 'unset',
             
         })
         // for Mozilla Firefox
-        this.impl.style.borderBottom = this.getProperty('font').getPropertyValue('underline') ? `1px solid ${this.getPropertyValue('color')}` : 'unset'
+        // this.impl.style.borderBottom = this.getProperty('font').getPropertyValue('underline') ? `1px solid ${this.getPropertyValue('color')}` : 'unset'
         if(this.getPropertyValue('text')) this.applyMetrics()
     }
 

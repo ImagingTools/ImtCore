@@ -74,19 +74,23 @@ class Flickable extends Item {
     }
 
     onMouseDown(x, y, button){
-        if(this.getPropertyValue('enabled') && this.getPropertyValue('interactive')) {
+        if(this.getPropertyValue('enabled') && this.getPropertyValue('visible') && this.getPropertyValue('interactive')) {
             this.$mouseX = x
             this.$mouseY = y
+        } else {
+            return true
         }
     }
     onMouseUp(x, y, button){
-        if(this.getPropertyValue('enabled') && this.getPropertyValue('interactive')) {
+        if(this.getPropertyValue('enabled') && this.getPropertyValue('visible') && this.getPropertyValue('interactive')) {
             delete this.$mouseX
             delete this.$mouseY
-        } 
+        } else {
+            return true
+        }
     }
     onMouseMove(x, y){
-        if(this.getPropertyValue('enabled') && this.getPropertyValue('interactive')) {
+        if(this.getPropertyValue('enabled') && this.getPropertyValue('visible') && this.getPropertyValue('interactive')) {
             if(this.getPropertyValue('contentX') + (this.$mouseX - x) > 0 && this.getPropertyValue('contentX') + (this.$mouseX - x) < this.getPropertyValue('contentItem').getPropertyValue('width') - this.getPropertyValue('width')){
                 this.getStatement('contentX').reset(this.getPropertyValue('contentX') + (this.$mouseX - x))
             } else {
@@ -102,11 +106,13 @@ class Flickable extends Item {
             }
             this.$mouseX = x
             this.$mouseY = y
+        } else {
+            return true
         }
     }
 
     onWheel(x, y, deltaX, deltaY){
-        if(this.getPropertyValue('enabled') && this.getPropertyValue('interactive')){
+        if(this.getPropertyValue('enabled') && this.getPropertyValue('visible') && this.getPropertyValue('interactive')){
             if(this.getPropertyValue('contentX') + (deltaX) > 0 && this.getPropertyValue('contentX') + (deltaX) < this.getPropertyValue('contentItem').getPropertyValue('width') - this.getPropertyValue('width')){
                 this.getStatement('contentX').reset(this.getPropertyValue('contentX') + (deltaX))
             } else {
@@ -116,10 +122,14 @@ class Flickable extends Item {
 
             if(this.getPropertyValue('contentY') + (deltaY) > 0 && this.getPropertyValue('contentY') + (deltaY) < this.getPropertyValue('contentItem').getPropertyValue('height') - this.getPropertyValue('height')){
                 this.getStatement('contentY').reset(this.getPropertyValue('contentY') + (deltaY))
+                return false
             } else {
                 if(this.getPropertyValue('contentY') + (deltaY) <= 0) this.getStatement('contentY').reset(0)
                 if(this.getPropertyValue('contentY') + (deltaY) >= this.getPropertyValue('contentItem').getPropertyValue('height')) this.getStatement('contentY').reset(this.getPropertyValue('contentItem').getPropertyValue('height') - this.getPropertyValue('height'))
+                return true
             }
+        } else {
+            return true
         }
     }
 
