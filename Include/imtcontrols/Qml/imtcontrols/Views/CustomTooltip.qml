@@ -18,7 +18,7 @@ ControlBase {
     property int componentMargin: 12;
 
     property bool fitToTextWidth: false;
-    property bool fitToCenter: false;
+    property bool fitToHCenter: false;
 
     property int componentHeight: Math.max(customTooltip.componentMinHeight, forHeightText.height + 2*customTooltip.textMargin);
 
@@ -68,8 +68,8 @@ ControlBase {
             console.log("openTooltip", xX, yY);
 
             var point = mapToItem(null, xX, yY);
-            var centeredAdd = customTooltip.fitToTextWidth ? customTooltip.fitToCenter * (forWidthText.width/2 + customTooltip.textMargin + customTooltip.componentMargin) :
-                                                             customTooltip.fitToCenter * (customTooltip.componentWidth/2 + customTooltip.componentMargin);
+            var centeredAdd = customTooltip.fitToTextWidth ? customTooltip.fitToHCenter * (forWidthText.width/2 + customTooltip.textMargin + customTooltip.componentMargin) :
+                                                             customTooltip.fitToHCenter * (customTooltip.componentWidth/2 + customTooltip.componentMargin);
             if(point.x > modalDialogManager.width*2/3){
                 if(customTooltip.fitToTextWidth){
                     point.x = point.x - forWidthText.width - 2*customTooltip.textMargin - customTooltip.componentMargin + centeredAdd;

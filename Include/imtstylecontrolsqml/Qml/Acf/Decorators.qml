@@ -642,7 +642,7 @@ Item {
 
     Component {
         id: spinBoxDecoratorComp;
-        SpinBoxDecorator{}
+        SpinBoxComp{}
     }
 
 

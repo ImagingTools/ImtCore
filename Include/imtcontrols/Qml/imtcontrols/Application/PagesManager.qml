@@ -119,12 +119,12 @@ Item {
                             pagesLoader.item.mainDocumentManager = container.documentManager;
                         }
 
-//                        if(pagesLoader.item.startPageObj !== undefined){
+                        if(pagesLoader.item.startPageObj !== undefined){
                             pagesLoader.item.startPageObj = {"Id": model.Id,
                                 "Name": model.Name,
                                 "Source": model.StartItem,
                                 "CommandsId": model.Id};
-//                        }
+                        }
 
                     }
                 }
