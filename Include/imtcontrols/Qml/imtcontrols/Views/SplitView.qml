@@ -16,6 +16,7 @@ Row{
 
     property TreeItemModel sizeModel: TreeItemModel{};
 
+    clip: true;
 
     Component.onCompleted: {
         console.log("children.length:: ", children.length)
@@ -203,6 +204,7 @@ Row{
         id: column;
         Column{
             width: splitView.width;
+            clip: true;
         }
     }
 

@@ -15,7 +15,7 @@ Rectangle{
 
     property bool vertical: true;
 
-    property real minSize: 30;
+    property real minSize: 20;
     property real secondSize: 20;
     property int indicatorRadius: 4;
     property string backgroundColor: Style.color_scrollBackground !== undefined ? Style.color_scrollBackground  : "#efefef";
@@ -28,25 +28,37 @@ Rectangle{
     property int indicatorMargin: 0;
 
     property bool notUsed: !targetItem ? true : vertical ? targetItem.contentHeight <= targetItem.height:
-                                      targetItem.contentWidth <= targetItem.width;
+                                                           targetItem.contentWidth <= targetItem.width;
     property bool hideNotUsed: true;
-    property real koeff: vertical ? (!targetItem || scrollIndicator.height > scrollContainer.minSize ? 1 :(targetItem.height - scrollContainer.minSize)/(targetItem.contentHeight - targetItem.height)):
-                                    (!targetItem || scrollIndicator.width > scrollContainer.minSize ? 1 :(targetItem.width - scrollContainer.minSize)/(targetItem.contentWidth - targetItem.width));
+
+    property real koeff: !targetItem ? 1 : vertical ? (targetItem.height - scrollIndicator.height)/(targetItem.contentHeight - targetItem.height):
+                                    (targetItem.width - scrollIndicator.width)/(targetItem.contentWidth - targetItem.width);
+
 
     property bool visibleState: !canFade ? 1 : isMoving ? 1 : (scrollContainerMA.containsMouse || scrollMA.containsMouse) ? 1 : 0;
     property bool inSideTarget: false;
 
-    onHeightChanged: {
-        visible = vertical ? targetItem.contentHeight > scrollContainer.height : targetItem.contentWidth > scrollContainer.width;
-    }
-
     property int targetContentHeight: targetItem.contentHeight;
-    onTargetContentHeightChanged: {
-        visible = vertical ? targetItem.contentHeight > scrollContainer.height : targetItem.contentWidth > scrollContainer.width;
-    }
+    property int targetContentWidth: targetItem.contentWidth;
 
     Component.onCompleted: {
         scrollContainer.opacity = !scrollContainer.canFade;
+    }
+
+    onHeightChanged: {
+        setVisibleFunc();
+    }
+
+    onWidthChanged: {
+        setVisibleFunc();
+    }
+
+    onTargetContentHeightChanged: {
+        setVisibleFunc();
+    }
+
+    onTargetContentWidthChanged: {
+        setVisibleFunc();
     }
 
     onVisibleStateChanged: {
@@ -56,6 +68,18 @@ Rectangle{
         else {
             animFrom.start();
         }
+    }
+
+    function setVisibleFunc(){
+        if(targetItem){
+            if(vertical){
+                visible = targetItem.contentHeight > scrollContainer.height;
+            }
+            else {
+                visible = targetItem.contentWidth > scrollContainer.width;
+            }
+        }
+
     }
 
     PauseAnimation {
@@ -113,7 +137,7 @@ Rectangle{
 
         anchors.fill: parent;
 
-//        visible: scrollContainer.visible && !scrollContainer.notUsed;
+        //        visible: scrollContainer.visible && !scrollContainer.notUsed;
         visible: scrollContainer.visible;
         enabled: visible;
         hoverEnabled: enabled;
@@ -121,14 +145,15 @@ Rectangle{
         preventStealing: true;
         //cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor
         onClicked: {
-            var newCoords = mapToItem(scrollContainer,mouse.x,mouse.y);
+            var newCoords = mapToItem(scrollContainer, mouse.x, mouse.y);
             if(scrollContainer.vertical){
                 scrollContainer.targetItem.contentY = (newCoords.y >= scrollIndicator.y + scrollIndicator.height) ?
-                            (newCoords.y - scrollIndicator.height) / scrollContainer.koeff : newCoords.y / scrollContainer.koeff;
+                            (newCoords.y - scrollIndicator.height) / scrollContainer.koeff + scrollContainer.targetItem.originY : newCoords.y / scrollContainer.koeff + scrollContainer.targetItem.originY;
             }
-            else{
+
+            else{//horiz
                 scrollContainer.targetItem.contentX = (newCoords.x >= scrollIndicator.x + scrollIndicator.width) ?
-                            (newCoords.x - scrollIndicator.width) / scrollContainer.koeff : newCoords.x / scrollContainer.koeff;
+                            (newCoords.x - scrollIndicator.width) / scrollContainer.koeff + scrollContainer.targetItem.originX : newCoords.x / scrollContainer.koeff + scrollContainer.targetItem.originX;
 
             }
 
@@ -153,32 +178,32 @@ Rectangle{
 
                     if(scrollContainer.targetItem.contentHeight > scrollContainer.targetItem.height){
 
-                        if(wheel.angleDelta.y > 0){
-                            if((scrollContainer.targetItem.contentY - scrollContainerMA.delta)>=0){
+                        if(wheel.angleDelta.y > 0){//up
+                            if((scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY - scrollContainerMA.delta)>=0){
                                 //scrollContainer.targetItem.contentY -= scrollContainerMA.delta;
                                 animWheelY.from = scrollContainer.targetItem.contentY;
                                 animWheelY.to = scrollContainer.targetItem.contentY - scrollContainerMA.delta;
                                 animWheelY.start();
 
                             }
-                            else{
-                                //scrollContainer.targetItem.contentY = 0;
+                            else {
+                                //scrollContainer.targetItem.contentY = scrollContainer.targetItem.originY;
                                 animWheelY.from = scrollContainer.targetItem.contentY;
-                                animWheelY.to = 0;
+                                animWheelY.to = scrollContainer.targetItem.originY;
                                 animWheelY.start();
                             }
                         }
-                        else{
-                            if((scrollContainer.targetItem.contentY + scrollContainerMA.delta)< (scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height)){
+                        else {//down
+                            if((scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY + scrollContainerMA.delta)< (scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height)){
                                 //scrollContainer.targetItem.contentY += scrollContainerMA.delta;
                                 animWheelY.from = scrollContainer.targetItem.contentY;
                                 animWheelY.to = scrollContainer.targetItem.contentY + scrollContainerMA.delta;
                                 animWheelY.start();
                             }
                             else{
-                                //scrollContainer.targetItem.contentY = scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height;
+                                //scrollContainer.targetItem.contentY = scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height + scrollContainer.targetItem.originY;
                                 animWheelY.from = scrollContainer.targetItem.contentY;
-                                animWheelY.to = scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height;
+                                animWheelY.to = scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height + scrollContainer.targetItem.originY;
                                 animWheelY.start();
 
                             }
@@ -187,12 +212,12 @@ Rectangle{
 
                 }//vertical
 
-                else{
+                else{//horiz
 
                     if(scrollContainer.targetItem.contentWidth > scrollContainer.targetItem.width){
 
-                        if(wheel.angleDelta.y > 0){
-                            if((scrollContainer.targetItem.contentX - scrollContainerMA.delta) >= 0){
+                        if(wheel.angleDelta.y > 0){//left
+                            if((scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX - scrollContainerMA.delta) >= 0){
                                 //scrollContainer.targetItem.contentX -= scrollContainerMA.delta;
                                 animWheelX.from = scrollContainer.targetItem.contentX;
                                 animWheelX.to = scrollContainer.targetItem.contentX - scrollContainerMA.delta;
@@ -200,23 +225,23 @@ Rectangle{
 
                             }
                             else{
-                                //scrollContainer.targetItem.contentX = 0;
+                                //scrollContainer.targetItem.contentX = scrollContainer.targetItem.originX;
                                 animWheelX.from = scrollContainer.targetItem.contentX;
-                                animWheelX.to = 0;
+                                animWheelX.to = scrollContainer.targetItem.originX;
                                 animWheelX.start();
                             }
                         }
-                        else{
-                            if((scrollContainer.targetItem.contentX + scrollContainerMA.delta)< (scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width)){
+                        else {//right
+                            if((scrollContainer.targetItem.contentX  - scrollContainer.targetItem.originX + scrollContainerMA.delta)< (scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width)){
                                 //scrollContainer.targetItem.contentX += scrollContainerMA.delta;
                                 animWheelX.from = scrollContainer.targetItem.contentX;
                                 animWheelX.to = scrollContainer.targetItem.contentX + scrollContainerMA.delta;
                                 animWheelX.start();
                             }
                             else{
-                                //scrollContainer.targetItem.contentX = scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width;
+                                //scrollContainer.targetItem.contentX = scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width  + scrollContainer.targetItem.originY;
                                 animWheelX.from = scrollContainer.targetItem.contentX;
-                                animWheelX.to = scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width;
+                                animWheelX.to = scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width  + scrollContainer.targetItem.originY;
                                 animWheelX.start();
 
                             }
@@ -225,7 +250,7 @@ Rectangle{
 
                 }//horizontal
 
-                 wheel.accepted = true;
+                wheel.accepted = true;
             }//
         }//onWheel
     }
@@ -234,24 +259,22 @@ Rectangle{
         id:scrollIndicator;
 
         x: scrollContainer.vertical ? (parent.width - width)/2 :
-                                      (scrollIndicator.width > scrollContainer.minSize ?  scrollContainer.targetItem.contentX  - scrollContainer.targetItem.originX:
-                                                                                         (scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX)*(scrollContainer.targetItem.width - scrollContainer.minSize)/(scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width));
+           (scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX)*(scrollContainer.targetItem.width - scrollIndicator.width)/(scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width)
 
-        y: scrollContainer.vertical ? (scrollIndicator.height > scrollContainer.minSize ?  scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY:
-                                                                                          (scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY)*(scrollContainer.targetItem.height - scrollContainer.minSize)/(scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height)):
-                                      (parent.height - height)/2;
-
+        y: !scrollContainer.vertical ? (parent.height - height)/2:
+           (scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY)*(scrollContainer.targetItem.height - scrollIndicator.height)/(scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height)
 
         width: scrollContainer.vertical ? (parent.width - 2*scrollContainer.indicatorMargin) :
-                                          scrollContainer.targetItem.contentWidth <= scrollContainer.targetItem.width ? scrollContainer.targetItem.width :
-                                                                                                                        (scrollContainer.targetItem.width - (scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width)) < scrollContainer.minSize ? scrollContainer.minSize :
-                                                                                                                                                                                                                                                                      (scrollContainer.targetItem.width - (scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width));
+                                          (scrollContainer.targetItem.contentWidth <= scrollContainer.targetItem.width ? scrollContainer.targetItem.width :
+                                                                                                                           (scrollContainer.targetItem.width / scrollContainer.targetItem.contentWidth * scrollContainer.targetItem.width)) < scrollContainer.minSize ?
+                                                                                                                               scrollContainer.minSize :
+                                                                                                                               (scrollContainer.targetItem.width / scrollContainer.targetItem.contentWidth * scrollContainer.targetItem.width);
 
         height: !scrollContainer.vertical ? (parent.height - 2*scrollContainer.indicatorMargin) :
                                             (scrollContainer.targetItem.contentHeight <= scrollContainer.targetItem.height ? scrollContainer.targetItem.height :
-                                              (scrollContainer.targetItem.height - (scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height)) < scrollContainer.minSize ?
-                                                     scrollContainer.minSize :
-                                           (scrollContainer.targetItem.height - (scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height)));
+                                                                                                                             (scrollContainer.targetItem.height / scrollContainer.targetItem.contentHeight * scrollContainer.targetItem.height)) < scrollContainer.minSize ?
+                                                                                                                                 scrollContainer.minSize :
+                                                                                                                                 (scrollContainer.targetItem.height / scrollContainer.targetItem.contentHeight * scrollContainer.targetItem.height);
 
 
         radius: scrollContainer.indicatorRadius;
@@ -286,7 +309,7 @@ Rectangle{
 
             anchors.fill: parent;
 
-//            visible: parent.visible && !scrollContainer.notUsed;
+            //            visible: parent.visible && !scrollContainer.notUsed;
             visible: scrollContainer.visible;
             enabled: visible;
             hoverEnabled: enabled;
@@ -298,10 +321,10 @@ Rectangle{
                 //console.log("onDragEnabledChanged", dragEnabled)
             }
 
-            property var coord :mapToItem(scrollContainer,0,0);
+            property var coord: mapToItem(scrollContainer,0,0);
             //cursorShape: containsMouse ? Qt.PointingHandCursor: Qt.ArrowCursor;
             onWheel: {
-                //console.log("onWheel", scrollMA.dragEnabled);
+
                 if(scrollContainer.inSideTarget){
                     wheel.accepted = false;
                 }
@@ -311,32 +334,32 @@ Rectangle{
 
                         if(scrollContainer.targetItem.contentHeight > scrollContainer.targetItem.height){
 
-                            if(wheel.angleDelta.y > 0){
-                                if((scrollContainer.targetItem.contentY - scrollContainerMA.delta)>=0){
+                            if(wheel.angleDelta.y > 0){//up
+                                if((scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY - scrollContainerMA.delta)>=0){
                                     //scrollContainer.targetItem.contentY -= scrollContainerMA.delta;
                                     animWheelY.from = scrollContainer.targetItem.contentY;
                                     animWheelY.to = scrollContainer.targetItem.contentY - scrollContainerMA.delta;
                                     animWheelY.start();
 
                                 }
-                                else{
-                                    //scrollContainer.targetItem.contentY = 0;
+                                else {
+                                    //scrollContainer.targetItem.contentY = scrollContainer.targetItem.originY;
                                     animWheelY.from = scrollContainer.targetItem.contentY;
-                                    animWheelY.to = 0;
+                                    animWheelY.to = scrollContainer.targetItem.originY;
                                     animWheelY.start();
                                 }
                             }
-                            else{
-                                if((scrollContainer.targetItem.contentY + scrollContainerMA.delta)< (scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height)){
+                            else {//down
+                                if((scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY + scrollContainerMA.delta)< (scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height)){
                                     //scrollContainer.targetItem.contentY += scrollContainerMA.delta;
                                     animWheelY.from = scrollContainer.targetItem.contentY;
                                     animWheelY.to = scrollContainer.targetItem.contentY + scrollContainerMA.delta;
                                     animWheelY.start();
                                 }
                                 else{
-                                    //scrollContainer.targetItem.contentY = scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height;
+                                    //scrollContainer.targetItem.contentY = scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height + scrollContainer.targetItem.originY;
                                     animWheelY.from = scrollContainer.targetItem.contentY;
-                                    animWheelY.to = scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height;
+                                    animWheelY.to = scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height + scrollContainer.targetItem.originY;
                                     animWheelY.start();
 
                                 }
@@ -345,12 +368,12 @@ Rectangle{
 
                     }//vertical
 
-                    else{
+                    else{//horiz
 
                         if(scrollContainer.targetItem.contentWidth > scrollContainer.targetItem.width){
 
-                            if(wheel.angleDelta.y > 0){
-                                if((scrollContainer.targetItem.contentX - scrollContainerMA.delta) >= 0){
+                            if(wheel.angleDelta.y > 0){//left
+                                if((scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX - scrollContainerMA.delta) >= 0){
                                     //scrollContainer.targetItem.contentX -= scrollContainerMA.delta;
                                     animWheelX.from = scrollContainer.targetItem.contentX;
                                     animWheelX.to = scrollContainer.targetItem.contentX - scrollContainerMA.delta;
@@ -358,24 +381,23 @@ Rectangle{
 
                                 }
                                 else{
-                                    //scrollContainer.targetItem.contentX = 0;
+                                    //scrollContainer.targetItem.contentX = scrollContainer.targetItem.originX;
                                     animWheelX.from = scrollContainer.targetItem.contentX;
-                                    animWheelX.to = 0;
+                                    animWheelX.to = scrollContainer.targetItem.originX;
                                     animWheelX.start();
                                 }
                             }
-                            else{
-
-                                if((scrollContainer.targetItem.contentX + scrollContainerMA.delta)< (scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width)){
+                            else {//right
+                                if((scrollContainer.targetItem.contentX  - scrollContainer.targetItem.originX + scrollContainerMA.delta)< (scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width)){
                                     //scrollContainer.targetItem.contentX += scrollContainerMA.delta;
                                     animWheelX.from = scrollContainer.targetItem.contentX;
                                     animWheelX.to = scrollContainer.targetItem.contentX + scrollContainerMA.delta;
                                     animWheelX.start();
                                 }
                                 else{
-                                    //scrollContainer.targetItem.contentX = scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width;
+                                    //scrollContainer.targetItem.contentX = scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width  + scrollContainer.targetItem.originY;
                                     animWheelX.from = scrollContainer.targetItem.contentX;
-                                    animWheelX.to = scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width;
+                                    animWheelX.to = scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width  + scrollContainer.targetItem.originY;
                                     animWheelX.start();
 
                                 }
@@ -397,33 +419,33 @@ Rectangle{
                 scrollMA.dragEnabled = false;
             }
             onExited: {
-//                scrollMA.dragEnabled = false;
+                //                scrollMA.dragEnabled = false;
             }
             onPositionChanged: {
                 //console.log("onPositionChanged", scrollMA.dragEnabled);
                 if(scrollMA.dragEnabled)
                 {
-                    var newCoords = mapToItem(scrollContainer,mouse.x,mouse.y);
+                    var newCoords = mapToItem(scrollContainer, mouse.x, mouse.y);
 
                     if(scrollContainer.vertical){
                         var deltaY = newCoords.y - scrollMA.coord.y;
-                        if(scrollContainer.targetItem.contentY + deltaY <= 0){
-                            scrollContainer.targetItem.contentY = 0;
+                        if(scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY + deltaY <= 0){
+                            scrollContainer.targetItem.contentY = scrollContainer.targetItem.originY;
                         }
-                        else if(scrollContainer.targetItem.contentY + deltaY >= scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height){
-                            scrollContainer.targetItem.contentY = scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height;
+                        else if(scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY + deltaY >= scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height){
+                            scrollContainer.targetItem.contentY  = scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height + scrollContainer.targetItem.originY;
                         }
                         else {
                             scrollContainer.targetItem.contentY += deltaY/scrollContainer.koeff;
                         }
                     }
-                    else{
+                    else{//horiz
                         var deltaX = newCoords.x - scrollMA.coord.x;
-                        if(scrollContainer.targetItem.contentX + deltaX <= 0){
-                            scrollContainer.targetItem.contentX = 0;
+                        if(scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX + deltaX <= 0){
+                            scrollContainer.targetItem.contentX = scrollContainer.targetItem.originX;
                         }
-                        else if(scrollContainer.targetItem.contentX + deltaX >= scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width){
-                            scrollContainer.targetItem.contentX = scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width;
+                        else if(scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX + deltaX >= scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width){
+                            scrollContainer.targetItem.contentX = scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width + scrollContainer.targetItem.originX;
                         }
                         else {
                             scrollContainer.targetItem.contentX += deltaX/scrollContainer.koeff;
