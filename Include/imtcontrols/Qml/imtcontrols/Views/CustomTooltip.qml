@@ -234,7 +234,7 @@ ControlBase {
 
         duration: customTooltip.timeout > 0 ? customTooltip.timeout : 1;
         onFinished: {
-            customTooltip.closeTooltip();
+            customTooltip.hide();
         }
     }
 
