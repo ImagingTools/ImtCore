@@ -10,6 +10,7 @@ QtObject {
     property string commandsId;
     property string documentUuid;
     property bool isLoadData: true
+    property var additionInputParams: ({})
 
     signal modelLoaded();
     signal commandModeChanged(string commandId, bool newMode);
@@ -154,6 +155,15 @@ QtObject {
             }
 
             var query = Gql.GqlRequest("query", commandsProviderContainer.commandsId + "Commands");
+            if (Object.keys(additionInputParams).length > 0){
+                let inputParams = Gql.GqlObject("input");
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in gqlModelBaseContainer.additionInputParams){
+                    additionParams.InsertField(key, additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
+                query.AddParam(inputParams);
+            }
             var gqlData = query.GetQuery();
             this.SetGqlQuery(gqlData);
         }

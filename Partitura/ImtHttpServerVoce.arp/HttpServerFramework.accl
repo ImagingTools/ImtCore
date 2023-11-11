@@ -9,8 +9,9 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="HttpProtocolEngine" X="775" Y="550" Note=""/>
+        <Element ComponentName="SubscriptionManager" X="175" Y="475" Note=""/>
         <Element ComponentName="TcpServer" X="775" Y="375" Note=""/>
-        <Element ComponentName="WebSocketProtocolEngine" X="325" Y="550" Note=""/>
+        <Element ComponentName="WebSocketProtocolEngine" X="500" Y="475" Note=""/>
         <Element ComponentName="WebSocketServer" X="325" Y="375" Note=""/>
         <Element ComponentName="WebSocketServlet" X="325" Y="175" Note=""/>
         <Element ComponentName="WorkerManager" X="775" Y="175" Note=""/>

@@ -64,6 +64,11 @@ QUrl CWebSocketRequest::GetUrl() const
 }
 
 
+QByteArray CWebSocketRequest::GetClientId() const{
+	return m_clientId;
+}
+
+
 QByteArray CWebSocketRequest::GetBody() const
 {
 	return m_body;
@@ -119,6 +124,7 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 	}
 
 	m_subscriptionId = object.value("id").toString().toUtf8();
+	m_clientId = object.value("clientId").toString().toUtf8();
 }
 
 

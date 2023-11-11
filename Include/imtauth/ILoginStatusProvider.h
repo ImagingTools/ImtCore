@@ -35,7 +35,7 @@ public:
 		LSF_TRY_TO_REFRESH = 8
 	};
 
-	virtual int GetLoginStatus() const = 0;
+	virtual int GetLoginStatus(const QByteArray& clientId = QByteArray()) const = 0;
 };
 
 

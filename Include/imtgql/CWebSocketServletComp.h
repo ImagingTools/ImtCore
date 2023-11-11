@@ -28,6 +28,10 @@ public:
 	virtual imtrest::ConstResponsePtr ProcessRequest(const imtrest::IRequest& request) const override;
 	virtual QByteArray GetSupportedCommandId() const override;
 
+	// reimplemented (IGqlClient)
+//	virtual bool SendRequest(const imtgql::IGqlRequest& request, imtgql::IGqlResponseHandler& responseHandler) const override;
+
+
 protected:
 	virtual imtrest::ConstResponsePtr InitConnection(const imtrest::IRequest& request) const;
 	virtual imtrest::ConstResponsePtr ProcessGqlRequest(const imtrest::IRequest& request) const;

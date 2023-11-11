@@ -32,7 +32,7 @@ namespace ImtRestPck
 
 
 typedef imtrest::CTcpServerComp TcpServer;
-typedef imtrest::CWebSocketServerComp WebSocketServer;
+typedef icomp::TModelCompWrap<imtrest::CWebSocketServerComp> WebSocketServer;
 typedef imtrest::CWebSocketProtocolEngineComp WebSocketProtocolEngine;
 typedef imtrest::CHttpProtocolEngineComp HttpProtocolEngine;
 typedef imtrest::CHttpRootServletComp HttpRootServlet;

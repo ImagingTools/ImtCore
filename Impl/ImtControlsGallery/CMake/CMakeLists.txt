@@ -42,7 +42,7 @@ endif()
 
 target_link_libraries(${PROJECT_NAME} iauth)
 target_link_libraries(${PROJECT_NAME} imtbase imtzip imtrest imtcrypt imtstyle imtqml imtdb imtfile)
-target_link_libraries(${PROJECT_NAME} imtlicgql imtguigql imtgql imtauthgui imtauthgql imtauthdb imtapp imtstylecontrolsqml imtcontrols)
+target_link_libraries(${PROJECT_NAME} imtlicgql imtguigql imtgql imtclientgql imtauthgui imtauthgql imtauthdb imtapp imtstylecontrolsqml imtcontrols)
 # target_link_libraries(${PROJECT_NAME} lisaqml ImtCoreLoc LisaLoc)
 target_link_libraries(${PROJECT_NAME} iqtgui)
 target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::Quick  Qt${QT_VERSION_MAJOR}::WebSockets)
@@ -53,7 +53,7 @@ message("PROJECT_BINARY_DIR ${IMTCOREDIR}/Bin/web")
 set(buildwebdir ${CMAKE_CURRENT_LIST_DIR}/../../../Bin/web)
 message("LASA binary dir ${buildwebdir}")
 
-list(APPEND webdirs ${IMTCOREDIR}/3rdParty/JQML/Core/dist)
+list(APPEND webdirs ${IMTCOREDIR}/3rdParty/JQML2/Core/dist)
 list(APPEND webdirs ${buildwebdir}/Resources)
 
 # copy lisa qml from to
@@ -105,7 +105,7 @@ list(APPEND webdirs ${buildwebdir}/Resources)
 if(DEFINED WEB_COMPILE AND  WEB_COMPILE)
 	add_compile_definitions(WEB_COMPILE)
 	set(resname "controlsgallery")
-	jqml_compile_web("${webdirs}", "${buildwebdir}", "${resname}")
+	jqml_compile_web2("${webdirs}", "${buildwebdir}", "${resname}")
 endif()
 
 

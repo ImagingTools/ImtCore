@@ -51,6 +51,7 @@ public:
 	QByteArrayList GetHeaders() const;
 	QByteArray GetHeaderValue(const QByteArray& headerType) const;
 	QUrl GetUrl() const;
+	QByteArray GetClientId() const;
 	QHostAddress GetRemoteAddress() const;
 	void SetBody(const QByteArray& body);
 	void SetRequestHandler(const IRequestServlet* requestHandlerPtr);
@@ -77,6 +78,7 @@ private:
 	QUrl m_url;
 	RequestState m_state;
 	QByteArray m_body;
+	QByteArray m_clientId;
 	QByteArray m_subscriptionId;
 	MethodType m_type;
 

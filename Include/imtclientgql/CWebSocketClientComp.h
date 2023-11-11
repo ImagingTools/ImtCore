@@ -51,6 +51,8 @@ public:
 		I_ASSIGN(m_webSocketServerAddressCompPtr, "ServerAddressParam", "Parameter providing the server address to be connected", false, "ServerAddressParam");
 		I_ASSIGN(m_serverLoginAttrPtr, "ServerLoginParam", "Parameter providing the server login to be connected", false, "ServerLoginParam");
 		I_ASSIGN(m_serverPasswordAttrPtr, "ServerPasswordParam", "Parameter providing the server password to be connected", false, "ServerPasswordParam");
+		I_ASSIGN(m_clientIdAttrPtr, "ClientId", "Client id that needs to be identified on the server", false, "");
+		I_ASSIGN(m_clientIdCompPtr, "ClientIdParam", "Parameter providing the client id that needs to be identified on the server", false, "ClientIdParam");
 	I_END_COMPONENT;
 
 	CWebSocketClientComp();
@@ -63,7 +65,7 @@ public:
 	virtual bool SendRequest(imtrest::ConstRequestPtr& request) const override;
 
 	// reimplemented (imtauth::ILoginStatusProvider)
-	virtual int GetLoginStatus() const override;
+	virtual int GetLoginStatus(const QByteArray& clientId = QByteArray()) const override;
 
 	// reimplemented (imtrest::IRequestManager)
 	virtual const imtrest::IRequest* GetRequest(const QByteArray& requestId) const override;
@@ -77,7 +79,7 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 Q_SIGNALS:
-	void OnQueryDataReceived(int resultCode = 2);
+	void OnQueryDataReceived(int resultCode = 1);
 
 private Q_SLOTS:
 	void OnConnectedTimer();
@@ -112,10 +114,12 @@ private:
 	I_ATTR(int, m_serverPortAttrPtr);
 	I_ATTR(QByteArray, m_serverLoginAttrPtr);
 	I_ATTR(QByteArray, m_serverPasswordAttrPtr);
+	I_ATTR(QByteArray, m_clientIdAttrPtr);
 	I_REF(iprm::ITextParam, m_webSocketServerPortCompPtr);
 	I_REF(iprm::ITextParam, m_webSocketServerAddressCompPtr);
 	I_REF(iprm::ITextParam, m_webSocketServerLoginCompPtr);
 	I_REF(iprm::ITextParam, m_webSocketServerPasswordCompPtr);
+	I_REF(iprm::ITextParam, m_clientIdCompPtr);
 
 	mutable QWebSocket m_webSocket;
 	imtauth::ILoginStatusProvider::LoginStatusFlags m_loginStatus;

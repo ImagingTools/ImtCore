@@ -4,11 +4,13 @@
 // Acf includes
 #include <istd/TDelPtr.h>
 
+
 // ImtCore includes
 #include <imtrest/IRequest.h>
 #include <imtrest/IResponse.h>
 #include <imtrest/ISender.h>
 #include <imtrest/CWebSocketRequest.h>
+#include <imtauth/ILoginStatusProvider.h>
 
 
 namespace imtrest
@@ -43,7 +45,7 @@ void CWebSocketServerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_protocolEngineCompPtr.IsValid() && m_requestHandlerCompPtr.IsValid()){
+	if (m_protocolEngineCompPtr.IsValid()){
 		if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr){
 			if (m_serverAddressAttrPtr.IsValid() && m_webSocketServerPortCompPtr.IsValid()){
 				QString port = m_webSocketServerPortCompPtr->GetText();
@@ -60,6 +62,12 @@ void CWebSocketServerComp::OnComponentCreated()
 
 	connect(&m_timer, &QTimer::timeout, this, &CWebSocketServerComp::OnTimeout);
 	m_timer.start(10000);
+}
+
+
+int CWebSocketServerComp::GetLoginStatus(const QByteArray& clientId) const
+{
+	return m_senderLoginStatusMap.value(clientId, imtauth::ILoginStatusProvider::LSF_CACHED);
 }
 
 
@@ -99,7 +107,7 @@ void CWebSocketServerComp::HandleNewConnections()
 
 	while (QWebSocket* webSocketPtr = webSocketServerPtr->nextPendingConnection()){
 		if (m_subscriberEngineCompPtr.IsValid()){
-			m_subscriberEngineCompPtr->RegisterSubscriber(webSocketPtr, *m_requestHandlerCompPtr, *m_protocolEngineCompPtr);
+			m_subscriberEngineCompPtr->RegisterSubscriber(webSocketPtr, *m_requestServerHandlerCompPtr, *m_protocolEngineCompPtr);
 		}
 
 		QString message = QString("Handle new web socket connection");
@@ -127,6 +135,12 @@ void CWebSocketServerComp::OnSocketDisconnected()
 		if (socketObjectPtr == m_senders[key]->GetSocket()){
 			m_senders.remove(key);
 
+			int loginStatus = imtauth::ILoginStatusProvider::LSF_CACHED;
+			istd::IChangeable::ChangeSet loginChangeSet(loginStatus, QObject::tr("Logout"));
+			loginChangeSet.SetChangeInfo("ClientId", key);
+			istd::CChangeNotifier notifier(this, &loginChangeSet);
+			m_senderLoginStatusMap.remove(key);
+
 			QString message = QString("Web socket sender %1 removed").arg(qPrintable(key));
 			SendInfoMessage(0, message, "CWebSocketServerComp");
 			qDebug() << message;
@@ -145,7 +159,7 @@ void CWebSocketServerComp::OnSocketDisconnected()
 
 void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 {
-	if (!m_requestHandlerCompPtr.IsValid()){
+	if (!m_requestServerHandlerCompPtr.IsValid()){
 		return;
 	}
 
@@ -159,7 +173,7 @@ void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 	SendInfoMessage(0, message, "CWebSocketServerComp");
 	qDebug() << message;
 
-	istd::TDelPtr<IRequest> newRequestPtr = m_protocolEngineCompPtr->CreateRequest(*m_requestHandlerCompPtr.GetPtr());
+	istd::TDelPtr<IRequest> newRequestPtr = m_protocolEngineCompPtr->CreateRequest(*m_requestServerHandlerCompPtr.GetPtr());
 	if (newRequestPtr.IsValid()){
 		CWebSocketRequest* webSocketRequest = dynamic_cast<CWebSocketRequest*>(newRequestPtr.GetPtr());
 		if (webSocketRequest == nullptr){
@@ -167,14 +181,42 @@ void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 		}
 		webSocketRequest->SetBody(textMessage.toUtf8());
 
-		if (webSocketRequest->GetMethodType() == CWebSocketRequest::MT_START){
+		imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
+		if (methodType == CWebSocketRequest::MT_START){
 			newRequestPtr.PopPtr();
 			QSharedPointer<CWebSocketSender> socketSender(new CWebSocketSender(webSocketPtr));
 			m_senders.insert(webSocketRequest->GetRequestId(), socketSender);
 			QObject::connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);
 		}
 
-		imtrest::ConstResponsePtr responsePtr = m_requestHandlerCompPtr->ProcessRequest(*webSocketRequest);
+//		imtrest::ConstResponsePtr responsePtr = m_requestServerHandlerCompPtr->ProcessRequest(*webSocketRequest);
+		imtrest::ConstResponsePtr responsePtr;
+
+		if (
+					methodType == CWebSocketRequest::MT_CONNECTION_ASK ||
+					methodType == CWebSocketRequest::MT_START_ASK ||
+					methodType == CWebSocketRequest::MT_DATA ||
+					methodType == CWebSocketRequest::MT_QUERY_DATA	){
+			responsePtr = m_requestClientHandlerCompPtr->ProcessRequest(*webSocketRequest);
+		}
+		else{
+			if (methodType == CWebSocketRequest::MT_CONNECTION_INIT){
+				int loginStatus = imtauth::ILoginStatusProvider::LSF_LOGGED_IN;
+				QByteArray clientId = webSocketRequest->GetClientId();
+				istd::IChangeable::ChangeSet loginChangeSet(loginStatus, QObject::tr("Login"));
+				loginChangeSet.SetChangeInfo("ClientId", clientId);
+				istd::CChangeNotifier notifier(this, &loginChangeSet);
+				m_senderLoginStatusMap.insert(clientId, imtauth::ILoginStatusProvider::LSF_LOGGED_IN);
+				if (!clientId.isEmpty()){
+					newRequestPtr.PopPtr();
+					QSharedPointer<CWebSocketSender> socketSender(new CWebSocketSender(webSocketPtr));
+					m_senders.insert(clientId, socketSender);
+					QObject::connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);
+
+				}
+			}
+			responsePtr = m_requestServerHandlerCompPtr->ProcessRequest(*webSocketRequest);
+		}
 		if (responsePtr.IsValid()){
 			QByteArray data = responsePtr->GetData();
 			webSocketPtr->sendTextMessage(data);

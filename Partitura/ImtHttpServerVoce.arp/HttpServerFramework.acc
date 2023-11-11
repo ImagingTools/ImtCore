@@ -22,6 +22,21 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="SubscriptionManager" PackageId="ImtClientGqlPck" ComponentId="SubscriptionManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketProtocolEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketServer"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WebLoginStatus" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketServer"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="TcpServer" PackageId="ImtRestPck" ComponentId="TcpServer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -73,7 +88,10 @@
                     <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketProtocolEngine"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RequestHandler" Type="Reference" ExportId="">
+                    <AttributeInfo Id="RequestClientHandler" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SubscriptionManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestServerHandler" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketServlet"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ServerAddress" Type="Id" ExportId="">
@@ -134,6 +152,7 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="TcpServer"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="SubscriptionManager" ComponentId="SubscriptionManager"/>
         <Component ExportedId="WebSocketProtocolEngine" ComponentId="WebSocketProtocolEngine"/>
         <Component ExportedId="WebSocketServer" ComponentId="WebSocketServer"/>
         <Component ExportedId="WebSocketServlet" ComponentId="WebSocketServlet"/>

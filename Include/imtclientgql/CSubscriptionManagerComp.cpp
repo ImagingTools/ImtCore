@@ -83,12 +83,17 @@ void CSubscriptionManagerComp::OnUpdate(const istd::IChangeable::ChangeSet& chan
 		return;
 	}
 	m_loginStatus = (imtauth::ILoginStatusProvider::LoginStatusFlags)m_loginStatusCompPtr->GetLoginStatus();
+	QByteArray clientId = changeSet.GetChangeInfo("ClientId").toByteArray();
 	for (QByteArray subscriptionId : m_registeredClients.keys()){
 		if (m_loginStatus != imtauth::ILoginStatusProvider::LSF_LOGGED_IN){
-			m_registeredClients[subscriptionId].m_status = imtclientgql::IGqlSubscriptionClient::SS_IN_REGISTRATION;
+			if (subscriptionId == clientId){
+				m_registeredClients[subscriptionId].m_status = imtclientgql::IGqlSubscriptionClient::SS_IN_REGISTRATION;
+			}
 		}
 		else {
-			ServiceManagerRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
+			if (subscriptionId == clientId){
+				ServiceManagerRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
+			}
 		}
 	}
 }
@@ -148,6 +153,13 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 		}
 			break;
 
+		case imtrest::CWebSocketRequest::MT_QUERY_DATA:{
+				m_queryDataMap.insert(webSocketRequest->GetRequestId(), webSocketRequest->GetBody());
+
+				emit OnQueryDataReceived(1);
+		}
+			break;
+
 		default:{
 			QByteArray errorMessage = QString("Method type not correct: %1").arg(webSocketRequest->GetMethodType()).toUtf8();
 
@@ -170,6 +182,51 @@ QByteArray CSubscriptionManagerComp::GetSupportedCommandId() const
 {
 	return QByteArray();
 }
+
+
+// reimplemented (IGqlClient)
+bool CSubscriptionManagerComp::SendRequest(const imtgql::IGqlRequest& request, imtgql::IGqlResponseHandler& responseHandler) const
+{
+	QString key = QUuid::createUuid().toString(QUuid::WithoutBraces);
+
+	QJsonObject dataObject;
+	dataObject["type"] = "query";
+	dataObject["id"] = key;
+	QJsonObject payloadObject;
+	payloadObject["data"] = QString(request.GetQuery());
+	dataObject["payload"] = payloadObject;
+	QByteArray queryData = QJsonDocument(dataObject).toJson(QJsonDocument::Compact);
+
+	imtrest::ConstRequestPtr requestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, ""));
+
+
+//	m_webSocket.sendTextMessage(data);
+	NetworkOperation networkOperation(10000, this);
+
+	while(1){
+		if (!SendRequestInternal(request, requestPtr)){
+			return false;
+		}
+		int resultCode = networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
+		if(resultCode == 1){
+			if(m_queryDataMap.contains(key)){
+				responseHandler.OnReply(request, m_queryDataMap.value(key));
+				m_queryDataMap.remove(key);
+
+				return true;
+			}
+			continue;
+		}
+		else{
+			break;
+		}
+
+	}
+
+	return false;
+
+}
+
 
 
 // protected methods
@@ -200,17 +257,48 @@ void CSubscriptionManagerComp::ServiceManagerRegister(const imtgql::CGqlRequest&
 	payload["extensions"] = extensions;
 
 	QJsonObject registerSubscription;
-	//	registerSubscription["id"] = "ee849ef0-cf23-4cb8-9fcb-152ae4fd1e69";
 	registerSubscription["id"] = QString(subscriptionId);
 	registerSubscription["type"] = "start";
 	registerSubscription["payload"] = payload;
 
 	QByteArray queryData = QJsonDocument(registerSubscription).toJson(QJsonDocument::Compact);
 
-	imtrest::ConstRequestPtr requestPtr(m_engineCompPtr->CreateRequestForSend(*m_requestHandlerCompPtr, 0, queryData, ""));
-	m_subsctiptionSenderCompPtr->SendRequest(requestPtr);
+	imtrest::ConstRequestPtr requestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, ""));
+
+	SendRequestInternal(subscriptionRequest, requestPtr);
 }
 
+
+bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& request, imtrest::ConstRequestPtr& requestPtr) const
+{
+	bool retVal = false;
+	QByteArray clientId;
+	const imtgql::CGqlRequest* cGqlRequest = dynamic_cast<const imtgql::CGqlRequest*>(&request);
+	if (cGqlRequest != nullptr){
+	 cGqlRequest->GetParams();
+	 const imtgql::CGqlObject* input = cGqlRequest->GetParam("input");
+	 if (input != nullptr){
+		 const imtgql::CGqlObject* addition = input->GetFieldArgumentObjectPtr("addition");
+		 if (addition != nullptr){
+			 clientId = addition->GetFieldArgumentValue("clientId").toByteArray();
+		 }
+	 }
+	}
+	if (m_subsctiptionSenderCompPtr.IsValid()){
+		retVal = m_subsctiptionSenderCompPtr->SendRequest(requestPtr);
+	}
+	else if (m_requestManagerCompPtr.IsValid()){
+		const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(clientId);
+		if (sender != nullptr){
+			retVal = sender->SendRequest(requestPtr);
+		}
+	}
+
+	return retVal;
+}
+
+
+// reimplemented (icomp::CComponentBase)
 
 void CSubscriptionManagerComp::OnComponentCreated()
 {
@@ -253,6 +341,38 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::CreateErrorResponse(QByteArr
 
 	return responsePtr;
 }
+
+
+// public methods of the embedded class NetworkOperation
+
+CSubscriptionManagerComp::NetworkOperation::NetworkOperation(int timeout, const CSubscriptionManagerComp* parent)
+{
+	Q_ASSERT(parent != nullptr);
+
+	timerFlag = false;
+
+	// If the network reply is finished, the internal event loop will be finished:
+	QObject::connect(parent, &CSubscriptionManagerComp::OnQueryDataReceived, &connectionLoop, &QEventLoop::exit, Qt::DirectConnection);
+
+	// If the application will be finished, the internal event loop will be also finished:
+	QObject::connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
+
+	// If a timeout for the request was defined, start the timer:
+	if (timeout > 0){
+		timer.setSingleShot(true);
+
+		// If the timer is running out, the internal event loop will be finished:
+		QObject::connect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
+
+		timer.start(timeout);
+	}
+}
+
+CSubscriptionManagerComp::NetworkOperation::~NetworkOperation()
+{
+	timer.stop();
+}
+
 
 
 } // namespace imtclientgql

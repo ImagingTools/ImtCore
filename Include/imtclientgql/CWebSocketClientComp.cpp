@@ -23,7 +23,7 @@ namespace imtclientgql
 // public methods
 
 CWebSocketClientComp::CWebSocketClientComp()
-	: m_loginStatus(imtauth::ILoginStatusProvider::LSF_CACHED)
+			: m_loginStatus(imtauth::ILoginStatusProvider::LSF_CACHED)
 {
 }
 
@@ -44,14 +44,13 @@ bool CWebSocketClientComp::SendRequest(imtrest::ConstRequestPtr& request) const
 }
 
 
-int CWebSocketClientComp::GetLoginStatus() const
+int CWebSocketClientComp::GetLoginStatus(const QByteArray& /*clientId*/) const
 {
 	return m_loginStatus;
 }
 
 
 // reimplemented (imtrest::IRequestManager)
-
 const imtrest::IRequest* CWebSocketClientComp::GetRequest(const QByteArray& requestId) const
 {
 	return nullptr;
@@ -64,15 +63,12 @@ const imtrest::ISender* CWebSocketClientComp::GetSender(const QByteArray& reques
 }
 
 
+
+
 bool CWebSocketClientComp::SendRequest(const imtgql::IGqlRequest& request, imtgql::IGqlResponseHandler& responseHandler) const
 {
-	//	QString data = QString(R""(
-	//{
-	//"type": "query",
-	//"payload": %1
-	//}
-	//	)"" ).arg(QString(request.GetQuery()));
 	QString key = QUuid::createUuid().toString(QUuid::WithoutBraces);
+//	QString key = request.GetFactoryId();
 
 	QJsonObject dataObject;
 	dataObject["type"] = "query";
@@ -87,7 +83,7 @@ bool CWebSocketClientComp::SendRequest(const imtgql::IGqlRequest& request, imtgq
 
 	while(1){
 		int resultCode = networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
-		if(resultCode == 2){
+		if(resultCode == 1){
 			if(m_queryDataMap.contains(key)){
 				responseHandler.OnReply(request, m_queryDataMap.value(key));
 				m_queryDataMap.remove(key);
@@ -108,7 +104,7 @@ bool CWebSocketClientComp::SendRequest(const imtgql::IGqlRequest& request, imtgq
 
 // protected methods
 
-QByteArray CWebSocketClientComp::Sign(const QByteArray& message, const QByteArray& key) const
+	QByteArray CWebSocketClientComp::Sign(const QByteArray& message, const QByteArray& key) const
 {
 	if (!key.isEmpty()){
 		return QMessageAuthenticationCode::hash(message, key, QCryptographicHash::Sha256);
@@ -117,6 +113,7 @@ QByteArray CWebSocketClientComp::Sign(const QByteArray& message, const QByteArra
 		return QCryptographicHash::hash(message, QCryptographicHash::Sha256);
 	}
 }
+
 
 
 void CWebSocketClientComp::OnComponentCreated()
@@ -152,14 +149,26 @@ void CWebSocketClientComp::OnConnectedTimer()
 	Connect();
 }
 
-
 void CWebSocketClientComp::OnWebSocketConnected()
 {
 	m_loginStatus = imtauth::ILoginStatusProvider::LSF_LOGGED_IN;
 	istd::IChangeable::ChangeSet loginChangeSet(m_loginStatus, QObject::tr("Login"));
 	istd::CChangeNotifier notifier(this, &loginChangeSet);
 
-	m_webSocket.sendTextMessage("{ \"type\": \"connection_init\" }");
+	QString clientId = *m_clientIdAttrPtr;
+	if (m_clientIdCompPtr.IsValid()){
+		clientId = m_clientIdCompPtr->GetText();
+	}
+
+	QString body = "{ \"type\": \"connection_init\" %1}";
+	if (clientId.isEmpty()){
+		body = body.arg("");
+	}
+	else{
+		body = body.arg(", \"clientId\": \"" + clientId + "\"");
+	}
+
+	m_webSocket.sendTextMessage(body);
 }
 
 
@@ -188,34 +197,39 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 		return;
 	}
 
-	if (!m_protocolEngineCompPtr.IsValid()){
-		return;
-	}
+	istd::TDelPtr<imtrest::IRequest> newRequestPtr = m_protocolEngineCompPtr->CreateRequest(*m_serverRequestHandlerCompPtr);
+	istd::TDelPtr<imtrest::IRequest> newClientRequestPtr = m_protocolEngineCompPtr->CreateRequest(*m_clientRequestHandlerCompPtr);
+	if (newRequestPtr.IsValid()){
+		imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<imtrest::CWebSocketRequest*>(newRequestPtr.GetPtr());
+		if (webSocketRequest == nullptr){
+			return;
+		}
+		webSocketRequest->SetBody(message.toUtf8());
+		imtrest::ConstResponsePtr responsePtr;
+		imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
+		if (methodType == imtrest::CWebSocketRequest::MT_CONNECTION_ASK){
+//			m_loginStatus = imtauth::ILoginStatusProvider::LSF_LOGGED_IN;
+//			//			const istd::IChangeable::ChangeSet s_loginChangeSet(iauth::ILogin::CF_LOGIN, QObject::tr("Login"));
+//			istd::IChangeable::ChangeSet loginChangeSet(m_loginStatus, QObject::tr("Login"));
+//			istd::CChangeNotifier notifier(this, &loginChangeSet);
+		}
+		else if (methodType == imtrest::CWebSocketRequest::MT_QUERY_DATA){
+			m_queryDataMap.insert(webSocketRequest->GetRequestId(), webSocketRequest->GetBody());
 
-	imtrest::CWebSocketRequest webSocketRequest(*m_protocolEngineCompPtr.GetPtr());
-	webSocketRequest.SetBody(message.toUtf8());
-
-	imtrest::ConstResponsePtr responsePtr;
-	imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest.GetMethodType();
-	if (methodType == imtrest::CWebSocketRequest::MT_CONNECTION_ASK){
-	}
-	else if (methodType == imtrest::CWebSocketRequest::MT_QUERY_DATA){
-		m_queryDataMap.insert(webSocketRequest.GetRequestId(), webSocketRequest.GetBody());
-
-		emit OnQueryDataReceived(2);
-	}
-	else if (	methodType == imtrest::CWebSocketRequest::MT_ERROR ||
-				methodType == imtrest::CWebSocketRequest::MT_START_ASK ||
-				methodType == imtrest::CWebSocketRequest::MT_DATA){
-		responsePtr = m_clientRequestHandlerCompPtr->ProcessRequest(webSocketRequest);
-	}
-	else{
-		responsePtr = m_serverRequestHandlerCompPtr->ProcessRequest(webSocketRequest);
-	}
-
-	if (responsePtr.IsValid()){
-		QByteArray data = responsePtr->GetData();
-		webSocketPtr->sendTextMessage(data);
+			emit OnQueryDataReceived(1);
+		}
+		else if (methodType == imtrest::CWebSocketRequest::MT_ERROR
+					 || methodType == imtrest::CWebSocketRequest::MT_START_ASK
+					 || methodType == imtrest::CWebSocketRequest::MT_DATA){
+			responsePtr = m_clientRequestHandlerCompPtr->ProcessRequest(*newClientRequestPtr);
+		}
+		else{
+			responsePtr = m_serverRequestHandlerCompPtr->ProcessRequest(*webSocketRequest);
+		}
+		if (responsePtr.IsValid()){
+			QByteArray data = responsePtr->GetData();
+			webSocketPtr->sendTextMessage(data);
+		}
 	}
 }
 
@@ -252,15 +266,12 @@ void CWebSocketClientComp::Connect()
 	authorization["password"] = password;
 	QByteArray authHeader = QJsonDocument(authorization).toJson(QJsonDocument::Compact);
 
-	//	QUrl url = QUrl(host + "/realtime?header=" + authHeader.toBase64() + "&payload=e30=");
-	QUrl url;
-	url.setHost(host);
-	url.setPort(port.toInt());
+	QUrl url = QUrl(host + "/realtime?header=" + authHeader.toBase64() + "&payload=e30=");
 	url.setScheme("ws");
-	//	url.setPort(port.toInt());
+	url.setPort(port.toInt());
 	m_webSocket.open(url);
-}
 
+}
 
 // public methods of the embedded class NetworkOperation
 
@@ -279,7 +290,7 @@ CWebSocketClientComp::NetworkOperation::NetworkOperation(int timeout, const CWeb
 	// If a timeout for the request was defined, start the timer:
 	if (timeout > 0){
 		timer.setSingleShot(true);
-		//		QObject::connect(&timer, &QTimer::timeout, this, &CWebSocketClientComp::NetworkOperation::onTimer, Qt::DirectConnection);
+//		QObject::connect(&timer, &QTimer::timeout, this, &CWebSocketClientComp::NetworkOperation::onTimer, Qt::DirectConnection);
 
 		// If the timer is running out, the internal event loop will be finished:
 		QObject::connect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
@@ -292,6 +303,7 @@ CWebSocketClientComp::NetworkOperation::~NetworkOperation()
 {
 	timer.stop();
 }
+
 
 
 } // namespace imtclientgql

@@ -17,6 +17,8 @@ QtObject {
 
     property string commandsId;
 
+    property var additionInputParams: ({})
+
     property TreeItemModel headers: TreeItemModel {};
     property TreeItemModel items: TreeItemModel {};
 
@@ -53,6 +55,16 @@ QtObject {
     property GqlModel headerInfoModel: GqlModel {
         function updateModel() {
             var query = Gql.GqlRequest("query", gqlModelBaseContainer.gqlModelHeadersInfo);
+
+            if (Object.keys(additionInputParams).length > 0){
+                let inputParams = Gql.GqlObject("input");
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in gqlModelBaseContainer.additionInputParams){
+                    additionParams.InsertField(key, additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
+                query.AddParam(inputParams);
+            }
 
             var queryHeaders = Gql.GqlObject("headers");
             queryHeaders.InsertField("Id");
@@ -142,6 +154,13 @@ QtObject {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertFieldObject(viewParams);
+            if (Object.keys(additionInputParams).length > 0){
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in gqlModelBaseContainer.additionInputParams){
+                    additionParams.InsertField(key, additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
+            }
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");
@@ -226,6 +245,16 @@ QtObject {
         function getObjectView(){
             console.log( "CollectionView objectView");
             var query = Gql.GqlRequest("query", gqlModelBaseContainer.gqlModelObjectView);
+
+            if (Object.keys(additionInputParams).length > 0){
+                let inputParams = Gql.GqlObject("input");
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in gqlModelBaseContainer.additionInputParams){
+                    additionParams.InsertField(key, additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
+                query.AddParam(inputParams);
+            }
 
             var queryFields = Gql.GqlObject("objectView");
             queryFields.InsertField("Id");

@@ -164,12 +164,18 @@ Item {
         contextMenuModel.append({"Id": "SetDescription", "Name": qsTr("Set Description"), "IconSource": ""});
     }
 
+    function getAdditionalInputParams(){
+        return {}
+    }
+
     onCommandsIdChanged: {
         console.log("CollectionView onCommandsIdChanged", collectionViewContainer.commandsId);
 
+        commandsProviderLocal.additionInputParams = collectionViewContainer.getAdditionalInputParams();
         commandsProviderLocal.commandsId = collectionViewContainer.commandsId;
         commandsProviderLocal.documentUuid = collectionViewContainer.commandsId;
 
+        collectionViewBase.commands.additionInputParams = getAdditionalInputParams()
         collectionViewBase.commands.gqlModelObjectView = collectionViewContainer.commandsId + "ObjectView";
         collectionViewBase.commands.gqlModelHeadersInfo = collectionViewContainer.commandsId + "Info";
         collectionViewBase.commands.gqlModelItemsInfo = collectionViewContainer.commandsId + "List";
