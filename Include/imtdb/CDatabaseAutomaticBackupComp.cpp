@@ -41,6 +41,7 @@ void CDatabaseAutomaticBackupComp::OnComponentDestroyed()
 
 bool CDatabaseAutomaticBackupComp::Backup()
 {
+	return false;
 	if (!m_databaseLoginSettingsCompPtr.IsValid()){
 		return false;
 	}
@@ -99,8 +100,8 @@ bool CDatabaseAutomaticBackupComp::Backup()
 
 	m_lastBackupDateTime = QDateTime::currentDateTime();
 
-	process.waitForStarted();
-	process.waitForFinished();
+//	process.waitForStarted();
+//	process.waitForFinished();
 
 	return true;
 }

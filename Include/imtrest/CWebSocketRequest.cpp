@@ -122,6 +122,12 @@ void CWebSocketRequest::SetBody(const QByteArray &body)
 	if (object.value("type") == "query"){
 		m_type = MT_QUERY;
 	}
+	if (object.value("type") == "query_data"){
+		m_type = MT_QUERY_DATA;
+	}
+	if (object.value("type") == "keep_alive"){
+		m_type = MT_KEEP_ALIVE;
+	}
 
 	m_subscriptionId = object.value("id").toString().toUtf8();
 	m_clientId = object.value("clientId").toString().toUtf8();

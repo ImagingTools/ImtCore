@@ -119,20 +119,25 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessGqlRequest(const imtrest
 
 	if (m_gqlRequestHandlerCompPtr.IsValid()){
 		QString errorMessage;
-		imtbase::CTreeItemModel* responseData = m_gqlRequestHandlerCompPtr->CreateResponse(gqlRequest, errorMessage);
-		if (responseData == nullptr){
+		imtbase::CTreeItemModel* responseDataModel = m_gqlRequestHandlerCompPtr->CreateResponse(gqlRequest, errorMessage);
+		if (responseDataModel == nullptr){
 			return imtrest::ConstResponsePtr();
 		}
+
+		QString responseData = responseDataModel->toJSON();
+//		responseData.replace('\\', "\\\\");
+//		responseData.replace('\"', "\\\"");
+//		responseData.replace('\n', "\\n");
+//		responseData.replace('\r', "\\r");
+//		responseData.replace('\t', "\\t");
 
 		QByteArray data = QString(R""(
 {
 "type": "query_data",
 "id": "%1",
-"payload": {
-	"data": "%2"
+"payload": %2
 }
-}
-			)"" ).arg(object.value("id").toString()).arg(responseData->toJSON()).toUtf8();
+			)"" ).arg(object.value("id").toString()).arg(responseData).toUtf8();
 
 			return CreateDataResponse(data, request);
 	}

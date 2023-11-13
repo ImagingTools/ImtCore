@@ -196,6 +196,7 @@ void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 					methodType == CWebSocketRequest::MT_CONNECTION_ASK ||
 					methodType == CWebSocketRequest::MT_START_ASK ||
 					methodType == CWebSocketRequest::MT_DATA ||
+					methodType == CWebSocketRequest::MT_ERROR ||
 					methodType == CWebSocketRequest::MT_QUERY_DATA	){
 			responsePtr = m_requestClientHandlerCompPtr->ProcessRequest(*webSocketRequest);
 		}

@@ -207,7 +207,10 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 		webSocketRequest->SetBody(message.toUtf8());
 		imtrest::ConstResponsePtr responsePtr;
 		imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
-		if (methodType == imtrest::CWebSocketRequest::MT_CONNECTION_ASK){
+		if (
+				methodType == imtrest::CWebSocketRequest::MT_CONNECTION_ASK ||
+				methodType == imtrest::CWebSocketRequest::MT_KEEP_ALIVE
+				){
 //			m_loginStatus = imtauth::ILoginStatusProvider::LSF_LOGGED_IN;
 //			//			const istd::IChangeable::ChangeSet s_loginChangeSet(iauth::ILogin::CF_LOGIN, QObject::tr("Login"));
 //			istd::IChangeable::ChangeSet loginChangeSet(m_loginStatus, QObject::tr("Login"));

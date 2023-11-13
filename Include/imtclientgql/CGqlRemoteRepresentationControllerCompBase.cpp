@@ -74,6 +74,13 @@ void CGqlRemoteRepresentationControllerCompBase::Response::OnReply(const imtgql:
 				m_replyResultPtr->CreateFromJson(parserData);
 			}
 		}
+
+		dataObject = document.object().value("payload").toObject();
+		if (!dataObject.isEmpty()){
+			document.setObject(dataObject);
+			QByteArray parserData = document.toJson(QJsonDocument::Compact);
+			m_replyResultPtr->CreateFromJson(parserData);
+		}
 	}
 }
 

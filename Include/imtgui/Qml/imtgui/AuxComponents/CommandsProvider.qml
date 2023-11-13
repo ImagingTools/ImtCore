@@ -155,11 +155,11 @@ QtObject {
             }
 
             var query = Gql.GqlRequest("query", commandsProviderContainer.commandsId + "Commands");
-            if (Object.keys(additionInputParams).length > 0){
+            if (Object.keys(commandsProviderContainer.additionInputParams).length > 0){
                 let inputParams = Gql.GqlObject("input");
                 let additionParams = Gql.GqlObject("addition");
-                for (let key in gqlModelBaseContainer.additionInputParams){
-                    additionParams.InsertField(key, additionInputParams[key]);
+                for (let key in commandsProviderContainer.additionInputParams){
+                    additionParams.InsertField(key, commandsProviderContainer.additionInputParams[key]);
                 }
                 inputParams.InsertFieldObject(additionParams);
                 query.AddParam(inputParams);

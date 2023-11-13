@@ -56,11 +56,11 @@ QtObject {
         function updateModel() {
             var query = Gql.GqlRequest("query", gqlModelBaseContainer.gqlModelHeadersInfo);
 
-            if (Object.keys(additionInputParams).length > 0){
+            if (Object.keys(gqlModelBaseContainer.additionInputParams).length > 0){
                 let inputParams = Gql.GqlObject("input");
                 let additionParams = Gql.GqlObject("addition");
                 for (let key in gqlModelBaseContainer.additionInputParams){
-                    additionParams.InsertField(key, additionInputParams[key]);
+                    additionParams.InsertField(key, gqlModelBaseContainer.additionInputParams[key]);
                 }
                 inputParams.InsertFieldObject(additionParams);
                 query.AddParam(inputParams);
@@ -154,10 +154,10 @@ QtObject {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertFieldObject(viewParams);
-            if (Object.keys(additionInputParams).length > 0){
+            if (Object.keys(gqlModelBaseContainer.additionInputParams).length > 0){
                 let additionParams = Gql.GqlObject("addition");
                 for (let key in gqlModelBaseContainer.additionInputParams){
-                    additionParams.InsertField(key, additionInputParams[key]);
+                    additionParams.InsertField(key, gqlModelBaseContainer.additionInputParams[key]);
                 }
                 inputParams.InsertFieldObject(additionParams);
             }
@@ -246,11 +246,11 @@ QtObject {
             console.log( "CollectionView objectView");
             var query = Gql.GqlRequest("query", gqlModelBaseContainer.gqlModelObjectView);
 
-            if (Object.keys(additionInputParams).length > 0){
+            if (Object.keys(gqlModelBaseContainer.additionInputParams).length > 0){
                 let inputParams = Gql.GqlObject("input");
                 let additionParams = Gql.GqlObject("addition");
                 for (let key in gqlModelBaseContainer.additionInputParams){
-                    additionParams.InsertField(key, additionInputParams[key]);
+                    additionParams.InsertField(key, gqlModelBaseContainer.additionInputParams[key]);
                 }
                 inputParams.InsertFieldObject(additionParams);
                 query.AddParam(inputParams);

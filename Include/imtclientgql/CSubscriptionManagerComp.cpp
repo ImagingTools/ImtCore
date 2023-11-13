@@ -154,10 +154,14 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 			break;
 
 		case imtrest::CWebSocketRequest::MT_QUERY_DATA:{
-				m_queryDataMap.insert(webSocketRequest->GetRequestId(), webSocketRequest->GetBody());
+				m_queryDataMap.insert(webSocketRequest->GetSubscriptionId(), webSocketRequest->GetBody());
 
 				emit OnQueryDataReceived(1);
 		}
+			break;
+
+		case imtrest::CWebSocketRequest::MT_ERROR:
+			SendErrorMessage(0, message);
 			break;
 
 		default:{
@@ -203,10 +207,11 @@ bool CSubscriptionManagerComp::SendRequest(const imtgql::IGqlRequest& request, i
 //	m_webSocket.sendTextMessage(data);
 	NetworkOperation networkOperation(10000, this);
 
+	if (!SendRequestInternal(request, requestPtr)){
+		return false;
+	}
+
 	while(1){
-		if (!SendRequestInternal(request, requestPtr)){
-			return false;
-		}
 		int resultCode = networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
 		if(resultCode == 1){
 			if(m_queryDataMap.contains(key)){
