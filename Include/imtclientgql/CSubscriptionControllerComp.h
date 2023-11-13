@@ -16,6 +16,9 @@ namespace imtclientgql
 {
 
 
+/**
+	\todo Rename to CSubscriptionClientComp or CSubscriberComp
+*/
 class CSubscriptionControllerComp:
 			public ilog::CLoggerComponentBase,
 			virtual public imtclientgql::IGqlSubscriptionClient
@@ -35,15 +38,20 @@ protected:
 	virtual void OnComponentCreated() override;
 
 	// reimplemented (imtgql::IGqlSubscriptionClient)
-	virtual void OnResponseReceived(const QByteArray& subscriptionId, const QByteArray& subscriptionData) override;
-	virtual void OnSubscriptionStatusChanged(const QByteArray& subscriptionId, const SubscriptionStatus& status, const QString& message) override;
+	virtual void OnResponseReceived(
+				const QByteArray& subscriptionId,
+				const QByteArray& subscriptionData) override;
+	virtual void OnSubscriptionStatusChanged(
+				const QByteArray& subscriptionId,
+				const SubscriptionStatus& status,
+				const QString& message) override;
 
 private:
 	I_REF(imtclientgql::IGqlSubscriptionManager, m_subscriptionManagerCompPtr);
 	I_REF(istd::IChangeable, m_changeableModelCompPtr);
 	I_ATTR(QByteArray, m_commandAttrPtr);
 
-	QByteArray m_subsriptionId;
+	QByteArray m_subscriptionId;
 };
 
 

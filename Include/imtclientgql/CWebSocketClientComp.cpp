@@ -4,7 +4,6 @@
 // Qt includes
 #include <QtCore/QDebug>
 #include <QtCore/QMessageAuthenticationCode>
-#include <QtNetwork/QNetworkRequest>
 #include <QtCore/QUrl>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
@@ -51,13 +50,14 @@ int CWebSocketClientComp::GetLoginStatus(const QByteArray& /*clientId*/) const
 
 
 // reimplemented (imtrest::IRequestManager)
-const imtrest::IRequest* CWebSocketClientComp::GetRequest(const QByteArray& requestId) const
+
+const imtrest::IRequest* CWebSocketClientComp::GetRequest(const QByteArray& /*requestId*/) const
 {
 	return nullptr;
 }
 
 
-const imtrest::ISender* CWebSocketClientComp::GetSender(const QByteArray& requestId) const
+const imtrest::ISender* CWebSocketClientComp::GetSender(const QByteArray& /*requestId*/) const
 {
 	return this;
 }
@@ -182,10 +182,11 @@ void CWebSocketClientComp::OnWebSocketDisConnected()
 }
 
 
-void CWebSocketClientComp::OnWebSocketError(QAbstractSocket::SocketError error)
+void CWebSocketClientComp::OnWebSocketError(QAbstractSocket::SocketError /*error*/)
 {
-	QString stringError = m_webSocket.errorString();
-	qDebug() << "OnWebSocketError" << stringError;
+	QString errorText = m_webSocket.errorString();
+
+	qDebug() << "CWebSocketClientComp::OnWebSocketError: " << errorText;
 }
 
 
@@ -239,7 +240,7 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 
 void CWebSocketClientComp::OnWebSocketBinaryMessageReceived(const QByteArray& message)
 {
-	qDebug() << "OnWebSocketBinaryMessageReceived" << message;
+	qDebug() << "CWebSocketClientComp::OnWebSocketBinaryMessageReceived: " << message;
 }
 
 
@@ -293,7 +294,6 @@ CWebSocketClientComp::NetworkOperation::NetworkOperation(int timeout, const CWeb
 	// If a timeout for the request was defined, start the timer:
 	if (timeout > 0){
 		timer.setSingleShot(true);
-//		QObject::connect(&timer, &QTimer::timeout, this, &CWebSocketClientComp::NetworkOperation::onTimer, Qt::DirectConnection);
 
 		// If the timer is running out, the internal event loop will be finished:
 		QObject::connect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
@@ -302,11 +302,11 @@ CWebSocketClientComp::NetworkOperation::NetworkOperation(int timeout, const CWeb
 	}
 }
 
+
 CWebSocketClientComp::NetworkOperation::~NetworkOperation()
 {
 	timer.stop();
 }
-
 
 
 } // namespace imtclientgql

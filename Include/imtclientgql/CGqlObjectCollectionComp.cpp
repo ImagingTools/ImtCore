@@ -24,7 +24,10 @@
 namespace imtclientgql
 {
 
-bool operator==(const imtgql::IGqlStructuredCollectionResponse::ElementInfo::PathItem& a, const imtgql::IGqlStructuredCollectionResponse::ElementInfo::PathItem& b)
+
+bool operator==(
+			const imtgql::IGqlStructuredCollectionResponse::ElementInfo::PathItem& a,
+			const imtgql::IGqlStructuredCollectionResponse::ElementInfo::PathItem& b)
 {
 	bool retVal = a.id == b.id && a.name == b.name;
 
@@ -32,7 +35,9 @@ bool operator==(const imtgql::IGqlStructuredCollectionResponse::ElementInfo::Pat
 }
 
 
-bool operator==(const imtgql::IGqlStructuredCollectionResponse::ElementInfo& a, const imtgql::IGqlStructuredCollectionResponse::ElementInfo& b)
+bool operator==(
+			const imtgql::IGqlStructuredCollectionResponse::ElementInfo& a,
+			const imtgql::IGqlStructuredCollectionResponse::ElementInfo& b)
 {
 	bool retVal =
 		a.id == b.id &&

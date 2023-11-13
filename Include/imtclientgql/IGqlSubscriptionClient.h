@@ -15,15 +15,21 @@ namespace imtclientgql
 class IGqlSubscriptionClient: virtual public istd::IChangeable
 {
 public:
-	enum SubscriptionStatus{
+	enum SubscriptionStatus
+	{
 		SS_UNKNOWN = 0,
 		SS_UNREGISTERED,
 		SS_IN_REGISTRATION,
 		SS_REGISTERED
 	};
 
-	virtual void OnResponseReceived(const QByteArray& subscriptionId, const QByteArray& subscriptionData) = 0;
-	virtual void OnSubscriptionStatusChanged(const QByteArray& subscriptionId, const SubscriptionStatus& status, const QString& message) = 0;
+	virtual void OnResponseReceived(
+				const QByteArray& subscriptionId,
+				const QByteArray& subscriptionData) = 0;
+	virtual void OnSubscriptionStatusChanged(
+				const QByteArray& subscriptionId,
+				const SubscriptionStatus& status,
+				const QString& message) = 0;
 };
 
 

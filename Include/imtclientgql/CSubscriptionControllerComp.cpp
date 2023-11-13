@@ -14,23 +14,31 @@ namespace imtclientgql
 
 void CSubscriptionControllerComp::OnComponentCreated()
 {
+	BaseClass::OnComponentCreated();
+
 	if (m_subscriptionManagerCompPtr.IsValid()){
 		imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, *m_commandAttrPtr);
+
 		imtgql::CGqlObject subscriptionField("data");
 		subscriptionField.InsertField("id");
 		gqlRequest.AddField(subscriptionField);
-		m_subsriptionId = m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, this);
+
+		m_subscriptionId = m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, this);
 	}
 }
 
 
-void CSubscriptionControllerComp::OnResponseReceived(const QByteArray & subscriptionId, const QByteArray & subscriptionData)
+void CSubscriptionControllerComp::OnResponseReceived(
+			const QByteArray & subscriptionId,
+			const QByteArray & subscriptionData)
 {
 	istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
 	imtbase::ICollectionInfo::NotifierInfo notifierInfo;
+
 	QJsonDocument document = QJsonDocument::fromJson(subscriptionData);
 	QJsonObject subscriptionObject = document.object();
-	if (subscriptionId == m_subsriptionId){
+
+	if (subscriptionId == m_subscriptionId){
 		notifierInfo.elementId = subscriptionObject.value("id").toString().toUtf8();
 		changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ALL_CHANGED, QVariant::fromValue(notifierInfo));
 	}
@@ -41,7 +49,10 @@ void CSubscriptionControllerComp::OnResponseReceived(const QByteArray & subscrip
 }
 
 
-void CSubscriptionControllerComp::OnSubscriptionStatusChanged(const QByteArray & subscriptionId, const SubscriptionStatus & status, const QString & message)
+void CSubscriptionControllerComp::OnSubscriptionStatusChanged(
+			const QByteArray& /*subscriptionId*/,
+			const SubscriptionStatus& /*status*/,
+			const QString& /*message*/)
 {
 }
 

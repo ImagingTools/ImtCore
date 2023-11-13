@@ -9,7 +9,7 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 
-// Acf includes
+// ACF includes
 #include <istd/TDelPtr.h>
 
 // ImtCore includes
@@ -25,22 +25,20 @@ namespace imtclientgql
 // public methods
 
 CSubscriptionManagerComp::CSubscriptionManagerComp()
-			: m_loginStatus(imtauth::ILoginStatusProvider::LSF_CACHED)
+	:m_loginStatus(imtauth::ILoginStatusProvider::LSF_CACHED)
 {
 }
 
 
 // reimplemented (imtgql::IGqlSubscriptionManager)
 
-QByteArray CSubscriptionManagerComp::RegisterSubscription(const imtgql::CGqlRequest& subscriptionRequest, imtclientgql::IGqlSubscriptionClient* subscriptionClient)
+QByteArray CSubscriptionManagerComp::RegisterSubscription(
+			const imtgql::CGqlRequest& subscriptionRequest,
+			imtclientgql::IGqlSubscriptionClient* subscriptionClient)
 {
 	if (!subscriptionClient || !m_subsctiptionSenderCompPtr.IsValid()) {
 		return QByteArray();
 	}
-
-//	if (subscriptionRequest.GetRequestType() != imtgql::IGqlRequest::RT_SUBSCRIPTION){
-//		return QByteArray();
-//	}
 
 	for (QByteArray subscriptionId : m_registeredClients.keys()){
 		if (m_registeredClients[subscriptionId].m_request.IsEqual(subscriptionRequest)){
@@ -49,6 +47,7 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(const imtgql::CGqlRequ
 			return subscriptionId;
 		}
 	}
+
 	QString subscriptionId = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
 	SubscriptionHelper subscriptionHelper;
@@ -67,7 +66,7 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(const imtgql::CGqlRequ
 
 bool CSubscriptionManagerComp::UnregisterSubscription(const QByteArray& subscriptionId)
 {
-	if (m_registeredClients.contains(subscriptionId)) {
+	if (m_registeredClients.contains(subscriptionId)){
 		m_registeredClients.remove(subscriptionId);
 
 		return true;
@@ -82,15 +81,18 @@ void CSubscriptionManagerComp::OnUpdate(const istd::IChangeable::ChangeSet& chan
 	if (!m_loginStatusCompPtr.IsValid()){
 		return;
 	}
+
 	m_loginStatus = (imtauth::ILoginStatusProvider::LoginStatusFlags)m_loginStatusCompPtr->GetLoginStatus();
+
 	QByteArray clientId = changeSet.GetChangeInfo("ClientId").toByteArray();
+
 	for (QByteArray subscriptionId : m_registeredClients.keys()){
 		if (m_loginStatus != imtauth::ILoginStatusProvider::LSF_LOGGED_IN){
 			if (subscriptionId == clientId){
 				m_registeredClients[subscriptionId].m_status = imtclientgql::IGqlSubscriptionClient::SS_IN_REGISTRATION;
 			}
 		}
-		else {
+		else{
 			if (subscriptionId == clientId){
 				ServiceManagerRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
 			}
@@ -106,70 +108,78 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 	QByteArray commandId = request.GetCommandId();
 
 	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
-
 	if (webSocketRequest != nullptr){
 		QByteArray message = webSocketRequest->GetBody();
-		qDebug() << "OnWebSocketTextMessageReceived" << message;
-		QJsonDocument jsonDocunent = QJsonDocument::fromJson(message);
-		QJsonObject rootObject = jsonDocunent.object();
+
+		qDebug() << "OnWebSocketTextMessageReceived: " << message;
+
+		QJsonDocument jsonDocument = QJsonDocument::fromJson(message);
+
+		QJsonObject rootObject = jsonDocument.object();
+
 		switch (webSocketRequest->GetMethodType())
 		{
 		case imtrest::CWebSocketRequest::MT_CONNECTION_ASK:
 			m_loginStatus = imtauth::ILoginStatusProvider::LSF_LOGGED_IN;
+
 			for (QByteArray subscriptionId : m_registeredClients.keys()){
 				if (m_registeredClients[subscriptionId].m_status == imtclientgql::IGqlSubscriptionClient::SS_IN_REGISTRATION){
 					ServiceManagerRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
 				}
 			}
-			break;
+		break;
 
 		case imtrest::CWebSocketRequest::MT_START_ASK:{
 			QByteArray subscriptionId = rootObject.value("id").toString().toLocal8Bit();
 			if (m_registeredClients.contains(subscriptionId)){
 				m_registeredClients[subscriptionId].m_status = imtclientgql::IGqlSubscriptionClient::SS_REGISTERED;
-				for (imtclientgql::IGqlSubscriptionClient* subscriptionClient : m_registeredClients[subscriptionId].m_clients){
-					if (subscriptionClient != nullptr){
-						subscriptionClient->OnSubscriptionStatusChanged(subscriptionId, m_registeredClients[subscriptionId].m_status, message);
+
+				for (imtclientgql::IGqlSubscriptionClient* subscriptionClientPtr : m_registeredClients[subscriptionId].m_clients){
+					if (subscriptionClientPtr != nullptr){
+						subscriptionClientPtr->OnSubscriptionStatusChanged(subscriptionId, m_registeredClients[subscriptionId].m_status, message);
 					}
 				}
 			}
 		}
-			break;
+		break;
 
 		case imtrest::CWebSocketRequest::MT_DATA:{
 			QByteArray subscriptionId = rootObject.value("id").toString().toLocal8Bit();
 			if (m_registeredClients.contains(subscriptionId)){
-				for (imtclientgql::IGqlSubscriptionClient* subscriptionClient : m_registeredClients[subscriptionId].m_clients){
-					if (subscriptionClient != nullptr){
+				for (imtclientgql::IGqlSubscriptionClient* subscriptionClientPtr : m_registeredClients[subscriptionId].m_clients){
+					if (subscriptionClientPtr != nullptr){
 						QJsonObject payloadObject = rootObject.value("payload").toObject().value("data").toObject();
+
 						QJsonDocument document;
 						document.setObject(payloadObject);
+
 						QByteArray payload = document.toJson(QJsonDocument::Compact);
-						subscriptionClient->OnResponseReceived(subscriptionId, payload);
+
+						subscriptionClientPtr->OnResponseReceived(subscriptionId, payload);
 					}
 				}
-
 			}
 		}
-			break;
+		break;
 
 		case imtrest::CWebSocketRequest::MT_QUERY_DATA:{
-				m_queryDataMap.insert(webSocketRequest->GetSubscriptionId(), webSocketRequest->GetBody());
+			m_queryDataMap.insert(webSocketRequest->GetSubscriptionId(), webSocketRequest->GetBody());
 
-				emit OnQueryDataReceived(1);
+			Q_EMIT OnQueryDataReceived(1);
 		}
-			break;
+		break;
 
 		case imtrest::CWebSocketRequest::MT_ERROR:
 			SendErrorMessage(0, message);
 			break;
 
-		default:{
-			QByteArray errorMessage = QString("Method type not correct: %1").arg(webSocketRequest->GetMethodType()).toUtf8();
+		default:
+			{
+				QByteArray errorMessage = QString("Method type not correct: %1").arg(webSocketRequest->GetMethodType()).toUtf8();
 
-			return CreateErrorResponse(errorMessage, request);
+				return CreateErrorResponse(errorMessage, request);
 			}
-			break;
+		break;
 		}
 	}
 	else{
@@ -189,6 +199,7 @@ QByteArray CSubscriptionManagerComp::GetSupportedCommandId() const
 
 
 // reimplemented (IGqlClient)
+
 bool CSubscriptionManagerComp::SendRequest(const imtgql::IGqlRequest& request, imtgql::IGqlResponseHandler& responseHandler) const
 {
 	QString key = QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -203,19 +214,20 @@ bool CSubscriptionManagerComp::SendRequest(const imtgql::IGqlRequest& request, i
 
 	imtrest::ConstRequestPtr requestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, ""));
 
-
-//	m_webSocket.sendTextMessage(data);
 	NetworkOperation networkOperation(10000, this);
 
 	if (!SendRequestInternal(request, requestPtr)){
+		SendErrorMessage(0, QString("Request could not be sent: '%1'").arg(request.GetCommandId()));
+
 		return false;
 	}
 
-	while(1){
+	while(true){
 		int resultCode = networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
 		if(resultCode == 1){
 			if(m_queryDataMap.contains(key)){
 				responseHandler.OnReply(request, m_queryDataMap.value(key));
+
 				m_queryDataMap.remove(key);
 
 				return true;
@@ -225,13 +237,10 @@ bool CSubscriptionManagerComp::SendRequest(const imtgql::IGqlRequest& request, i
 		else{
 			break;
 		}
-
 	}
 
 	return false;
-
 }
-
 
 
 // protected methods

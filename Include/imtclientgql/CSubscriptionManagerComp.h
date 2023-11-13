@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QWebSocket>
+#include <QtWebSockets/QWebSocket>
 #include <QtCore/QTimer>
 
 // ACF includes
@@ -11,7 +11,6 @@
 #include <imod/CSingleModelObserverBase.h>
 
 // ImtCore includes
-#include <imtclientgql/IGqlSubscriptionManager.h>
 #include <imtauth/ILoginStatusProvider.h>
 #include <imtrest/ISender.h>
 #include <imtrest/IRequestManager.h>
@@ -19,7 +18,7 @@
 #include <imtrest/IProtocolEngine.h>
 #include <imtgql/IGqlResponseHandler.h>
 #include <imtclientgql/IGqlClient.h>
-
+#include <imtclientgql/IGqlSubscriptionManager.h>
 
 
 namespace imtclientgql
@@ -71,14 +70,11 @@ protected:
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
-//	virtual void OnComponentDestroyed() override;
-
 
 Q_SIGNALS:
 	void OnQueryDataReceived(int resultCode = 1) const;
 
 private:
-//	virtual void Connect();
 	virtual imtrest::ConstResponsePtr CreateErrorResponse(QByteArray errorMessage, const imtrest::IRequest& request) const;
 
 private:
@@ -87,7 +83,6 @@ private:
 	I_REF(imtauth::ILoginStatusProvider, m_loginStatusCompPtr);
 	I_REF(imod::IModel, m_webLoginStatusModelCompPtr);
 	I_REF(imtrest::IProtocolEngine, m_engineCompPtr);
-//	I_REF(imtrest::IRequestServlet, m_requestHandlerCompPtr);
 
 	class SubscriptionHelper
 	{
