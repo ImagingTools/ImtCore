@@ -49,33 +49,24 @@ ControlBase {
             }
         }
 
-        onEntered: {
+        onPositionChanged: {
             if(tooltip.text !== ""){
-                pauseTooltip.stop();
-                pauseTooltip.start();
-
+                tooltip.show(mouseX, mouseY);
             }
-
         }
 
         onExited: {
             if(tooltip.text !== ""){
-                pauseTooltip.stop();
-                tooltip.closeTooltip();
+                tooltip.hide();
             }
         }
     }
 
     CustomTooltip{
         id: tooltip;
+
+        fitToTextWidth: true;
     }
 
-    PauseAnimation {
-        id: pauseTooltip;
 
-        duration: tooltip.waitingDuration;
-        onFinished: {
-            tooltip.openTooltip(ma.mouseX, ma.mouseY);
-        }
-    }
 }
