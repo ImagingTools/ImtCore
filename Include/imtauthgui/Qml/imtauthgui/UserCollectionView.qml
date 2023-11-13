@@ -47,16 +47,16 @@ CollectionView {
                     arrowButton.visible = roles !== "";
                     if (roles !== ""){
                         let roleList = roles.split(';');
-                        name.text = "View roles" + "(" + roleList.length +  ")";
+                        name.text = qsTr("View roles") + "(" + roleList.length +  ")";
 
-                        let result = "<b><u>" + username + "</u></b> " + "has been assigned" + " <b>" + roleList.length + "</b> " + "roles:";
+                        let result = "<b><u>" + username + "</u></b> " + qsTr("has been assigned") + " <b>" + roleList.length + "</b> " + qsTr("roles:");
                         for (let i = 0; i < roleList.length; i++){
                             result += "<p>" + roleList[i] + "</p>";
                         }
                         arrowButton.tooltipText = result;
                     }
                     else{
-                        name.text = "No roles";
+                        name.text = qsTr("No roles");
                     }
                 }
             }
@@ -122,16 +122,16 @@ CollectionView {
                     arrowButton.visible = groups !== "";
                     if (groups !== ""){
                         let groupList = groups.split(';');
-                        name2.text = "View groups" + "(" + groupList.length +  ")";
+                        name2.text =  qsTr("View groups") + "(" + groupList.length +  ")";
 
-                        let result = "<b><u>" + username + "</u></b> " + "is included into" + " <b>" + groupList.length + "</b> " + "groups:";
+                        let result = "<b><u>" + username + "</u></b> " + qsTr("is included into") + " <b>" + groupList.length + "</b> " + qsTr("groups") + ":";
                         for (let i = 0; i < groupList.length; i++){
                             result += "<p>" + groupList[i] + "</p>";
                         }
                         arrowButton.tooltipText = result;
                     }
                     else{
-                        name2.text = "No groups";
+                        name2.text = qsTr("No groups");
                     }
                 }
             }

@@ -10,13 +10,7 @@ CollectionView {
 
     Component.onCompleted: {
         productCollectionViewContainer.commandsDelegatePath = "../../imtlicgui/ProductCollectionViewCommandsDelegate.qml";
+
+        baseCollectionView.commands.fieldsData.push("ProductId");
     }
-
-//    function fillContextMenuModel(){
-//        contextMenuModel.clear();
-
-//        contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../../" + Style.getIconPath("Icons/Edit", "On", "Normal")});
-//        contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../" + Style.getIconPath("Icons/Remove", "On", "Normal")});
-//        contextMenuModel.append({"Id": "Rename", "Name": qsTr("Rename"), "IconSource": ""});
-//    }
 }

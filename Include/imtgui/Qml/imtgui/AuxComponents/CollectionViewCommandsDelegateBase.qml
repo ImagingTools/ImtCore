@@ -28,6 +28,8 @@ Item {
 
     property var contextMenuModel: null;
 
+    property bool autoUpdateAfterChanges: false;
+
     signal commandActivated(string commandId);
 
     signal renamed(string id, string newName);
@@ -53,6 +55,12 @@ Item {
     property string gqlModelSetDescription;
     property string gqlModelItem;
     property string gqlModelMetaInfo;
+
+    onDescriptionSetted: {
+        if (autoUpdateAfterChanges){
+            containerBase.collectionViewBase.updateGui();
+        }
+    }
 
     onSelectionChanged: {
         let indexes = containerBase.tableData.getSelectedIndexes();
@@ -185,8 +193,9 @@ Item {
 
     onRenamed: {
         containerBase.documentManager.setDocumentTitle({"Id": id, "Title": newName});
-
-//        containerBase.collectionViewBase.updateGui();
+        if (autoUpdateAfterChanges){
+            containerBase.collectionViewBase.updateGui();
+        }
     }
 
     onRemoved: {
@@ -195,11 +204,9 @@ Item {
             containerBase.documentManager.closeDocument(id, true);
         }
 
-//        containerBase.collectionViewBase.updateGui();
-    }
-
-    onDescriptionSetted: {
-//        containerBase.collectionViewBase.updateGui();
+        if (autoUpdateAfterChanges){
+            containerBase.collectionViewBase.updateGui();
+        }
     }
 
     Component {
@@ -215,17 +222,13 @@ Item {
             title: containerBase.removeDialogTitle;
             onFinished: {
                 if (buttonId == "Yes"){
-//                    let itemId = containerBase.tableData.getSelectedId();
-//                    removeModel.updateModel(itemId);
+                    let indexes = containerBase.tableData.getSelectedIndexes();
+                    if (indexes.length > 0){
+                        let index = indexes[0];
+                        let id = containerBase.tableData.elements.GetData("Id", index);
 
-                    let itemIds = containerBase.tableData.getSelectedIds();
-                    let itemNames = containerBase.tableData.getSelectedNames();
-
-                    for (let i = 0; i < itemIds.length; i++){
-                        let itemId = itemIds[i];
-                        let itemName = itemNames[i];
-
-                        removeModel.updateModel(itemId);
+                        console.log("index", index);
+                        removeModel.updateModel(id);
                     }
                 }
 
@@ -338,11 +341,11 @@ Item {
                     }
 
                     Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
-//                    if (dataModelLocal.ContainsKey(containerBase.gqlModelRemove)){
-//                        dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelRemove);
-//                        var message = dataModelLocal.GetData("message");
-//                        modalDialogManager.openDialog(errorDialog, {"message": message});
-//                    }
+                    //                    if (dataModelLocal.ContainsKey(containerBase.gqlModelRemove)){
+                    //                        dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelRemove);
+                    //                        var message = dataModelLocal.GetData("message");
+                    //                        modalDialogManager.openDialog(errorDialog, {"message": message});
+                    //                    }
 
                     return;
                 }
@@ -423,10 +426,10 @@ Item {
 
                         Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
 
-//                        if (dataModelLocal.ContainsKey("message")){
-//                            var message = dataModelLocal.GetData("message");
-//                            modalDialogManager.openDialog(errorDialog, {"message": message});
-//                        }
+                        //                        if (dataModelLocal.ContainsKey("message")){
+                        //                            var message = dataModelLocal.GetData("message");
+                        //                            modalDialogManager.openDialog(errorDialog, {"message": message});
+                        //                        }
                     }
 
                     return;
@@ -488,10 +491,10 @@ Item {
                     if (dataModelLocal.ContainsKey(containerBase.gqlModelSetDescription)){
                         dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelSetDescription);
 
-//                        if (dataModelLocal.ContainsKey("message")){
-//                            var message = dataModelLocal.GetData("message");
-//                            modalDialogManager.openDialog(errorDialog, {"message": message});
-//                        }
+                        //                        if (dataModelLocal.ContainsKey("message")){
+                        //                            var message = dataModelLocal.GetData("message");
+                        //                            modalDialogManager.openDialog(errorDialog, {"message": message});
+                        //                        }
 
                         let message = ""
                         if (dataModelLocal.ContainsKey("message")){

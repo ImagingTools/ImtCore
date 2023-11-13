@@ -56,7 +56,6 @@ Item {
     property alias commandsProvider: commandsProviderLocal;
 
     property bool hasRemoteChanges: false;
-    property bool isLocalChanges: false;
 
     signal elementsChanged();
     signal headersChanged();
@@ -66,6 +65,7 @@ Item {
     Component.onCompleted: {
         Events.subscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
         Events.subscribeEvent("OnLocalizationChanged", collectionViewContainer.onLocalizationChanged);
+        Events.subscribeEvent("UpdateAllModels", collectionViewContainer.receiveRemoteChanges);
     }
 
     Component.onDestruction: {
@@ -74,11 +74,16 @@ Item {
         Events.unSubscribeEvent("OnLocalizationChanged", collectionViewContainer.onLocalizationChanged);
         Events.unSubscribeEvent(collectionViewContainer.commandUpdateGui, collectionViewContainer.updateGui);
         Events.unSubscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
+        Events.unSubscribeEvent("UpdateAllModels", collectionViewContainer.receiveRemoteChanges);
     }
 
     onHasRemoteChangesChanged: {
         if (visible && hasRemoteChanges){
             setAlertPanel(alertPanelComp)
+        }
+
+        if (hasRemoteChanges){
+            Events.sendEvent("HasRemoteChanges");
         }
     }
 
@@ -95,6 +100,14 @@ Item {
         }
 
         fillContextMenuModel();
+    }
+
+    function receiveRemoteChanges(){
+        if (hasRemoteChanges){
+            updateGui();
+            hasRemoteChanges = false;
+            collectionViewContainer.documentManager.alertPanelComp = undefined;
+        }
     }
 
     Keys.onPressed: {
@@ -452,22 +465,12 @@ Item {
 
             color: Style.selectedColor;
 
-            property string commandId: collectionViewContainer.commandsId;
-
             Component.onCompleted: {
-                if (commandId !== ""){
-                    Events.subscribeEvent("Update" + commandId);
-                }
+                Events.subscribeEvent("UpdateAllModels", updateButton.clicked);
             }
 
             Component.onDestruction: {
-                if (commandId !== ""){
-                    Events.unSubscribeEvent("Update" + commandId);
-                }
-            }
-
-            function updateData(){
-                updateButton.clicked();
+                Events.unSubscribeEvent("UpdateAllModels", updateButton.clicked);
             }
 
             Image {
@@ -510,11 +513,8 @@ Item {
                 text: qsTr("Update");
 
                 onClicked: {
-                    collectionViewContainer.updateGui();
-
-                    collectionViewContainer.hasRemoteChanges = false;
-
-                    collectionViewContainer.documentManager.alertPanelComp = undefined;
+//                    collectionViewContainer.receiveRemoteChanges();
+                    Events.sendEvent("UpdateAllModels");
                 }
             }
         }

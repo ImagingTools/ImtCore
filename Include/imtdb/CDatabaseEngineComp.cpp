@@ -492,7 +492,7 @@ bool CDatabaseEngineComp::EnsureDatabaseCreated() const
 			}
 		}
 		else{
-			SendErrorMessage(0, "Database server could not be connected", "Database Engine");
+			SendErrorMessage(0, QString("Database server could not be connected: %1").arg(errorMessage), "Database Engine");
 
 			return false;
 		}

@@ -15,6 +15,7 @@ Item {
     property var applicationInfo;
 
     property bool serverReady: false;
+    property bool useWebSocketSubscription: false;
 
     onApplicationInfoChanged: {
         console.log("onApplicationInfoChanged");
@@ -124,15 +125,22 @@ Item {
     SubscriptionManager {
         id: subscriptionManager;
 
-        Component.onCompleted: {
-//            url = "ws://127.0.0.1:8890"
-        }
+        active: application.useWebSocketSubscription;
 
         property bool applyUrl: application.serverReady && application.settingsProvider.serverModel != null;
         onApplyUrlChanged: {
             if (applyUrl){
-                let result = application.settingsProvider.getValue("WebSocketServerUrl");
-                subscriptionManager.url = result;
+                let serverUrl = application.settingsProvider.getValue("ServerUrl");
+
+                serverUrl = serverUrl.replace("http", "ws")
+
+                if (serverUrl[serverUrl.length - 1] !== '/'){
+                    serverUrl += "/";
+                }
+
+                serverUrl += "wssub";
+
+                subscriptionManager.url = serverUrl;
             }
         }
 

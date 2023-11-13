@@ -8,6 +8,8 @@ CollectionViewCommandsDelegateBase {
     removeDialogTitle: qsTr("Deleting a role");
     removeMessage: qsTr("Delete the selected role ?");
 
+    autoUpdateAfterChanges: true;
+
     function updateCommands(){
         console.log("RoleColelction updateCommands");
     }

@@ -7,6 +7,8 @@ Rectangle {
     property Item topPanel: null;
 
     property string decoratorSource;
+    property alias decoratorSourceComp: decoratorLoader.sourceComponent
+
     onDecoratorSourceChanged: {
         if (topLeftPanel.decoratorSource){
             decoratorLoader.source = topLeftPanel.decoratorSource;

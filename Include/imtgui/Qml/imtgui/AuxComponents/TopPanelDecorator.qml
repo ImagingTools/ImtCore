@@ -14,21 +14,17 @@ Item {
         console.log("topPanelDecorator base onCompleted")
     }
 
-
     TopCenterPanel {
         id: topCenterPanel;
 
-
         anchors.left: parent.left;
 
-//        width: 0.95 * topPanelDecorator.width;
         width: topPanelDecorator.width - rightPanel.width;
         height: topPanelDecorator.height;
 
         topPanel: topPanelDecorator.topPanel;
 
         decoratorSource: Style.topCenterPanelDecoratorPath;
-//        color: "blue"
 
         gradient: Gradient {
             GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
@@ -45,7 +41,6 @@ Item {
 
         anchors.right: parent.right;
 
-//        width: topPanelDecorator.width - topCenterPanel.width;
         width: 100;
         height: topPanelDecorator.height;
 

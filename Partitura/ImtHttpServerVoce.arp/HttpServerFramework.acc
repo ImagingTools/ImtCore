@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5120" Description="ACF"/>
-            <Version Id="1" Number="2196" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5127" Description="ACF"/>
+            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -25,6 +25,9 @@
         <Element Id="SubscriptionManager" PackageId="ImtClientGqlPck" ComponentId="SubscriptionManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketProtocolEngine"/>
                     </AttributeInfo>

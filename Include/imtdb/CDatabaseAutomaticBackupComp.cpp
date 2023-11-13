@@ -41,7 +41,6 @@ void CDatabaseAutomaticBackupComp::OnComponentDestroyed()
 
 bool CDatabaseAutomaticBackupComp::Backup()
 {
-	return false;
 	if (!m_databaseLoginSettingsCompPtr.IsValid()){
 		return false;
 	}

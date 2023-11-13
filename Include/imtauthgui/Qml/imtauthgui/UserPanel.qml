@@ -117,6 +117,8 @@ Item {
             }
 
             function onBackgroundClicked(){
+                console.log("onBackgroundClicked");
+
                 popupMenuDialog.root.closeDialog();
             }
         }

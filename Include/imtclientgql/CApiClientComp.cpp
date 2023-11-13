@@ -31,7 +31,6 @@ bool CApiClientComp::SendRequest(const imtgql::IGqlRequest& request, imtgql::IGq
 		imtgql::IGqlRequest::RequestType requestType = request.GetRequestType();
 		if ((requestType == imtgql::IGqlRequest::RT_QUERY) || (requestType == imtgql::IGqlRequest::RT_MUTATION)){
 			QNetworkRequest* networkRequestPtr = m_protocolEngineCompPtr->CreateNetworkRequest(request);
-
 			if (networkRequestPtr != nullptr){
 				QByteArray uuid = QUuid::createUuid().toByteArray();
 

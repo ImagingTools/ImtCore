@@ -109,9 +109,9 @@ protected:
 	};
 
 	FilteredCollection* CheckCache(
-			int offset = 0,
-			int count = -1,
-			const iprm::IParamsSet* selectionParamsPtr = nullptr) const;
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const;
 
 	void ClearCache();
 

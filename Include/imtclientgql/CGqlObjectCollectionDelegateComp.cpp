@@ -285,7 +285,6 @@ bool CGqlObjectCollectionDelegateComp::GetSubCollection(
 	responsePtr.SetCastedOrRemove(CreateResponse(*requestPtr));
 	if (responsePtr.IsValid()){
 		if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-			QVariant variant;
 			if (responsePtr->IsSuccessfull()){
 				QVariant variant;
 				if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
@@ -404,19 +403,6 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 			const imtbase::IOperationContext* operationContextPtr) const
 {
 	QByteArray data;
-//	const iser::ISerializable* objectConst = dynamic_cast<const iser::ISerializable*>(objectPtr);
-//	iser::ISerializable* object = dynamic_cast<iser::ISerializable*>(const_cast<iser::ISerializable*>(objectConst));
-//	if (object != nullptr){
-//		iser::CMemoryWriteArchive archive;
-//		if (!object->Serialize(archive)){
-//			QByteArray errorMessage = QObject::tr("Error when serializing an object").toUtf8();
-//			SendErrorMessage(0, errorMessage);
-//		}
-//		else{
-//			data = QByteArray((char*)archive.GetBuffer(), archive.GetBufferSize());
-//		}
-//	}
-
 	QByteArray commandId = *m_collectionIdAttrPtr + "Add";
 	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
 	imtgql::CGqlObject input("input");
@@ -682,7 +668,7 @@ bool CGqlObjectCollectionDelegateComp::DeSerializeObject(istd::IPolymorphic* obj
 
 	iser::ISerializable* serializableObject = dynamic_cast<iser::ISerializable*>(object);
 	if (serializableObject == nullptr){
-		QByteArray errorMessage = QObject::tr("Object data metainfo is not Serializable").toUtf8();
+		QByteArray errorMessage = QObject::tr("Object data metainfo is not serializable").toUtf8();
 		SendErrorMessage(0, errorMessage);
 
 		return false;

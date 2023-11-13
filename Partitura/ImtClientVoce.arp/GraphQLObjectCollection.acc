@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5125" Description="ACF"/>
-            <Version Id="1" Number="2197" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5127" Description="ACF"/>
+            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -92,7 +92,7 @@
             </Data>
         </Element>
         <Element Id="SubscriptionController" PackageId="ImtClientGqlPck" ComponentId="SubscriptionController">
-            <Data IsEnabled="true" Flags="1">
+            <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Command" Type="Id" ExportId="CommandID">
                         <Data IsEnabled="true" Value="OnCollectionChanged"/>

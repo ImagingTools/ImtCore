@@ -8,6 +8,8 @@ CollectionViewCommandsDelegateBase {
     removeDialogTitle: qsTr("Deleting an group of users");
     removeMessage: qsTr("Delete the selected group of users ?");
 
+    autoUpdateAfterChanges: true;
+
     function onEdit(){
         let itemIds = container.tableData.getSelectedIds();
         let itemNames = container.tableData.getSelectedNames();

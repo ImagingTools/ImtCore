@@ -8,6 +8,8 @@ CollectionViewCommandsDelegateBase {
     removeDialogTitle: qsTr("Deleting an user");
     removeMessage: qsTr("Delete the selected user ?");
 
+    autoUpdateAfterChanges: true;
+
     function onEdit(){
         console.log("UserCollectionView onEdit");
 

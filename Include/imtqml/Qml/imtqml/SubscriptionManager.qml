@@ -8,6 +8,8 @@ WebSocket {
 
     active: true
 
+    property TreeItemModel socketModel: TreeItemModel {}
+
     property var subscriptionModel: []
 
     signal error(string message);
@@ -29,49 +31,11 @@ WebSocket {
         }
     }
 
-    function registerSubscription(query, subscriptionClient){
-        let index
-        for (index = 0; index < subscriptionModel.length; index++){
-            if (subscriptionModel[index]["subscription"] == subscriptionClient){
-                return;
-            }
-        }
-        let commandId = query.GetCommandId()
-        subscriptionModel.push(
-        {
-            "commandId": commandId,
-            "subscriptionId": subscriptionClient.subscriptionId,
-            "query": query,
-            "status": "unregistered",
-            "subscription": subscriptionClient
-        }
-       )
-
-        registerSubscriptionToServer()
-    }
-
-
-    function unRegisterSubscription(subscriptionClient){
-        let index
-        for (index = 0; index < subscriptionModel.length; index++){
-            if (subscriptionModel[index]["subscription"] == subscriptionClient){
-                subscriptionModel.splice(index, 1)
-                return;
-            }
-        }
-    }
-
-//    TreeItemModel {
-//        id: subscriptionModel
-//    }
-
-    property TreeItemModel socketModel: TreeItemModel {}
-
     onTextMessageReceived:{
         console.log("SubscriptionManager onTextMessageReceived", message)
         let ok = socketModel.CreateFromJson(message)
 
-        if (socketModel.GetData("type") == "connection_ack"){
+        if (socketModel.GetData("type") == "connection_ask"){
             registerSubscriptionToServer()
         }
         else if (socketModel.GetData("type") == "start_ack"){
@@ -101,7 +65,7 @@ WebSocket {
     }
 
     function registerSubscriptionToServer(){
-        console.log("SubscriptionManager registerSubscriptionToServer")
+        console.log("SubscriptionManager registerSubscriptionToServer", container.status)
         if (container.status != WebSocket.Open){
             return;
         }
@@ -122,8 +86,34 @@ WebSocket {
         }
     }
 
-//    function SetGlobalAccessToken(token){
-//        console.log("SetGlobalAccessToken",token)
-//        XMLHttpRequest.QMLAuthToken = token
-//    }
+    function registerSubscription(query, subscriptionClient){
+        let index
+        for (index = 0; index < subscriptionModel.length; index++){
+            if (subscriptionModel[index]["subscription"] == subscriptionClient){
+                return;
+            }
+        }
+        let commandId = query.GetCommandId()
+        subscriptionModel.push(
+        {
+            "commandId": commandId,
+            "subscriptionId": subscriptionClient.subscriptionId,
+            "query": query,
+            "status": "unregistered",
+            "subscription": subscriptionClient
+        }
+       )
+
+        registerSubscriptionToServer()
+    }
+
+    function unRegisterSubscription(subscriptionClient){
+        let index
+        for (index = 0; index < subscriptionModel.length; index++){
+            if (subscriptionModel[index]["subscription"] == subscriptionClient){
+                subscriptionModel.splice(index, 1)
+                return;
+            }
+        }
+    }
 }

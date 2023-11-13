@@ -22,6 +22,8 @@ namespace imtdb
 bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArray& /*dataId*/) const
 {
 	if (!m_databaseLoginSettingsCompPtr.IsValid()){
+		SendErrorMessage(0, "Internal error. Attribute is invalid.", "CRestoringDatabaseControllerComp");
+
 		return false;
 	}
 
@@ -36,6 +38,8 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::WriteOnly)){
+		SendErrorMessage(0, QString("Unable to open file with name %1").arg(filePathTmp), "CRestoringDatabaseControllerComp");
+
 		return false;
 	}
 
@@ -67,13 +71,15 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 		QString fullPath = backupFolderPath + "/" + fileName;
 
 		QString pgDumpCommand = QString("pg_dump -h %1 -U %2 -p %3 -b -v -f \"%4\" \"%5\"")
-				.arg(host)
-				.arg(userName)
-				.arg(QString::number(port))
-				.arg(fullPath)
-				.arg(dbName);
+					.arg(host)
+					.arg(userName)
+					.arg(QString::number(port))
+					.arg(fullPath)
+					.arg(dbName);
 
 		if (!ExecuteCommand(process, pgDumpCommand)){
+			SendErrorMessage(0, QString("Unable to execute command %1").arg(pgDumpCommand), "CRestoringDatabaseControllerComp");
+
 			return false;
 		}
 	}
@@ -85,27 +91,33 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 			.arg(QString("DROP DATABASE \"%1\" WITH (FORCE)").arg(dbName));
 
 	if (!ExecuteCommand(process, dropCommand)){
+		SendErrorMessage(0, QString("Unable to execute command %1").arg(dropCommand), "CRestoringDatabaseControllerComp");
+
 		return false;
 	}
 
 	QString createCommand = QString("psql -h %1 -U %2 -p %3 -c \"%4\"")
-			.arg(host)
-			.arg(userName)
-			.arg(QString::number(port))
-			.arg(QString("CREATE DATABASE \"%1\"").arg(dbName));
+				.arg(host)
+				.arg(userName)
+				.arg(QString::number(port))
+				.arg(QString("CREATE DATABASE \"%1\"").arg(dbName));
 
 	if (!ExecuteCommand(process, createCommand)){
+		SendErrorMessage(0, QString("Unable to execute command %1").arg(createCommand), "CRestoringDatabaseControllerComp");
+
 		return false;
 	}
 
 	QString restoreCommand = QString("psql -h %1 -U %2 -p %3 -d \"%4\" -f \"%5\"")
-			.arg(host)
-			.arg(userName)
-			.arg(QString::number(port))
-			.arg(dbName)
-			.arg(filePathTmp);
+				.arg(host)
+				.arg(userName)
+				.arg(QString::number(port))
+				.arg(dbName)
+				.arg(filePathTmp);
 
 	if (!ExecuteCommand(process, restoreCommand)){
+		SendErrorMessage(0, QString("Unable to execute command %1").arg(restoreCommand), "CRestoringDatabaseControllerComp");
+
 		return false;
 	}
 
@@ -113,6 +125,8 @@ bool CRestoringDatabaseControllerComp::SetData(const QByteArray& data, QByteArra
 	QByteArray output = process.readAllStandardOutput();
 
 	if (!error.isEmpty()){
+		SendErrorMessage(0, QString("Unable to restore database: %1").arg(qPrintable(error)), "CRestoringDatabaseControllerComp");
+
 		return false;
 	}
 
@@ -141,10 +155,14 @@ bool CRestoringDatabaseControllerComp::GetData(
 			qint64 /*readMaxLength*/) const
 {
 	if (!m_databaseLoginSettingsCompPtr.IsValid()){
+		SendErrorMessage(0, "Internal error. Attribute is invalid.", "CRestoringDatabaseControllerComp");
+
 		return false;
 	}
 
 	if (*m_commandIdAttrPtr != dataId){
+		SendWarningMessage(0, QString("Unable to get data with command-ID %1").arg(qPrintable(dataId)), "CRestoringDatabaseControllerComp");
+
 		return false;
 	}
 
@@ -171,11 +189,15 @@ bool CRestoringDatabaseControllerComp::GetData(
 			.arg(dbName);
 
 	if (!ExecuteCommand(process, pgDumpCommand)){
+		SendErrorMessage(0, QString("Unable to execute command %1").arg(pgDumpCommand), "CRestoringDatabaseControllerComp");
+
 		return false;
 	}
 
 	QFile file(filePathTmp);
 	if (!file.open(QIODevice::ReadOnly)){
+		SendErrorMessage(0, QString("Unable to open file with name %1").arg(filePathTmp), "CRestoringDatabaseControllerComp");
+
 		return false;
 	}
 

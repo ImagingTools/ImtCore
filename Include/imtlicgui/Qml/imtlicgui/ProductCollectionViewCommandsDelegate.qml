@@ -32,14 +32,15 @@ CollectionViewCommandsDelegateBase {
         }
         else if (commandId === "Export"){
             console.log("Export");
+            let indexes = container.tableData.getSelectedIndexes();
+            if (indexes.length > 0){
+                let index = indexes[0];
+                let productId = container.tableData.elements.GetData("ProductId", index);
+                let fileName = productId + "Features"
 
-            let itemIds = container.tableData.getSelectedIds();
-
-            console.log("id", itemIds[0]);
-
-            fileDialogSave.currentFile = 'file:///' + itemIds[0] + ".xml";
-
-            fileDialogSave.open();
+                fileDialogSave.currentFile = 'file:///' + fileName + ".xml";
+                fileDialogSave.open();
+            }
         }
     }
 
@@ -70,12 +71,19 @@ CollectionViewCommandsDelegateBase {
             remoteFileController.downloadedFileLocation = pathDir.replace('file:///', '');
             var fileName = fileDialogSave.file.toString().replace(pathDir + "/", '');
 
-            let itemIds = container.tableData.getSelectedIds();
-            if (fileName == ""){
-                fileName = {};
-                fileName["name"] = itemIds[0] + ".xml";
+            let indexes = container.tableData.getSelectedIndexes();
+            if (indexes.length > 0){
+                let index = indexes[0];
+                let selectedProductId = container.tableData.elements.GetData("Id", index);
+                if (selectedProductId !== ""){
+                    if (fileName == ""){
+                        fileName = {};
+                        fileName["name"] = selectedProductId + ".xml";
+                    }
+
+                    remoteFileController.GetFile(selectedProductId, fileName);
+                }
             }
-            remoteFileController.GetFile(itemIds[0], fileName);
         }
     }
 }

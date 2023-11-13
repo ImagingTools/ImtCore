@@ -100,8 +100,12 @@ Item {
     }
 
     Component.onDestruction: {
+        console.log("Document onDestruction");
         Events.unSubscribeEvent(documentBaseRoot.documentUuid + "CommandActivated", documentBaseRoot.commandsDelegate.commandHandle);
         Events.unSubscribeEvent("OnLocalizationChanged", documentBaseRoot.onLocalizationChanged);
+
+        console.log("blockUpdatingModel", blockUpdatingModel);
+        documentManager.documentLoading = false;
     }
 
     property bool m_localizationChanged: false;

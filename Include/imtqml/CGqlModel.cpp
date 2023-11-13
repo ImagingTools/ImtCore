@@ -41,6 +41,7 @@ bool CGqlModel::SetGqlQuery(QString query)
 		requestUrl.setPath(urlPath);
 
 		QNetworkRequest networkRequest = QNetworkRequest(requestUrl);
+		networkRequest.setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/x-www-form-urlencoded"));
 
 		if (!s_accessToken.isEmpty()){
 			networkRequest.setRawHeader("X-authentication-token", s_accessToken.toUtf8());

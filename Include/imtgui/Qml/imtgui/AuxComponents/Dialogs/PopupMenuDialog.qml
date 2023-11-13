@@ -92,7 +92,7 @@ Item {
         /**
             Close the dialog by clicking on the background
         */
-//        Events.subscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
+        Events.subscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
     }
 
     function onBackgroundClicked(){

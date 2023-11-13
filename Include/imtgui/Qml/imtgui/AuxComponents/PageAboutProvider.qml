@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
+import imtauthgui 1.0
 
 QtObject {
     id: root;
@@ -48,11 +49,13 @@ QtObject {
             }
         }
 
-        index = parameters.InsertNewItem();
-
-        parameters.SetData("Id", "ServerLog", index);
-        parameters.SetData("Name", qsTr("Server Log"), index);
-        parameters.SetData("Source", "qrc:/qml/imtgui/AuxComponents/ServerLogProvider.qml", index);
+        let canReadServerLog = PermissionsController.checkPermission("ShowServerLog");
+        if (canReadServerLog){
+            index = parameters.InsertNewItem();
+            parameters.SetData("Id", "ServerLog", index);
+            parameters.SetData("Name", qsTr("Server Log"), index);
+            parameters.SetData("Source", "qrc:/qml/imtgui/AuxComponents/ServerLogProvider.qml", index);
+        }
 
         return root.representationModel;
     }
@@ -78,10 +81,13 @@ QtObject {
                 parameters.CopyItemDataFromModel(index, applicationInfoProvider.serverApplicationInfo)
             }
 
-            index = parameters.InsertNewItem();
-            parameters.SetData("Id", "ServerLog", index);
-            parameters.SetData("Name", qsTr("Server Log"), index);
-            parameters.SetData("Source", "qrc:/qml/imtgui/AuxComponents/ServerLogProvider.qml", index);
+            let canReadServerLog = PermissionsController.checkPermission("ShowServerLog");
+            if (canReadServerLog){
+                index = parameters.InsertNewItem();
+                parameters.SetData("Id", "ServerLog", index);
+                parameters.SetData("Name", qsTr("Server Log"), index);
+                parameters.SetData("Source", "qrc:/qml/imtgui/AuxComponents/ServerLogProvider.qml", index);
+            }
         }
     }
 
