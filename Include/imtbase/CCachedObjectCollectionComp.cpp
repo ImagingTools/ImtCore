@@ -6,8 +6,6 @@
 #include <istd/CChangeNotifier.h>
 #include <iser/CMemoryWriteArchive.h>
 
-#include <QtCore/QDebug>
-
 
 namespace imtbase
 {
