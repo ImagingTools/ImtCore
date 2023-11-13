@@ -13,6 +13,8 @@ Row{
     property int _splitterCount: !_childrenCount  ? 0 : _childrenCount -1;
 
     property bool compl: false;
+    property bool hasAnim: true;
+    property int animDuration: 70;
 
     property TreeItemModel sizeModel: TreeItemModel{};
 
@@ -230,10 +232,20 @@ Row{
                         splitView.children[rowIndex + 1].width - delta_ > splitView.sizeModel.GetData("MinimumWidth", nextModelIndex) &&
                         splitView.children[rowIndex + 1].width - delta_ <  splitView.sizeModel.GetData("MaximumWidth", nextModelIndex))
                 {
-                    splitView.children[rowIndex - 1].width += delta_;
-                    splitView.children[rowIndex + 1].width -= delta_;
+                    if(splitView.hasAnim){
+                        let width1 = splitView.children[rowIndex - 1].width;
+                        let width2 = splitView.children[rowIndex + 1].width;
+                        anim1.from = width1; anim1.to = width1 + delta_;
+                        anim2.from = width2; anim2.to = width2 - delta_;
+                        anim1.target = splitView.children[rowIndex - 1];
+                        anim2.target = splitView.children[rowIndex + 1];
+                        anim1.start(); anim2.start();
+                    }
+                    else {
+                        splitView.children[rowIndex - 1].width += delta_;
+                        splitView.children[rowIndex + 1].width -= delta_;
+                    }
                 }
-
             }
 
             Rectangle{
@@ -298,8 +310,21 @@ Row{
                         splitView.children[0].children[rowIndex + 1].height - delta_ > splitView.sizeModel.GetData("MinimumHeight", nextModelIndex) &&
                         splitView.children[0].children[rowIndex + 1].height - delta_ <  splitView.sizeModel.GetData("MaximumHeight", nextModelIndex))
                 {
-                    splitView.children[0].children[rowIndex - 1].height += delta_;
-                    splitView.children[0].children[rowIndex + 1].height -= delta_;
+
+                    if(splitView.hasAnim){
+                        let height1 = splitView.children[rowIndex - 1].height;
+                        let height2 = splitView.children[rowIndex + 1].height;
+                        anim1.from = height1; anim1.to = height1 + delta_;
+                        anim2.from = height2; anim2.to = height2 - delta_;
+                        anim1.target = splitView.children[rowIndex - 1];
+                        anim2.target = splitView.children[rowIndex + 1];
+                        anim1.start(); anim2.start();
+                    }
+                    else {
+                        splitView.children[0].children[rowIndex - 1].height += delta_;
+                        splitView.children[0].children[rowIndex + 1].height -= delta_;
+                    }
+
                 }
 
             }
@@ -342,6 +367,21 @@ Row{
                 }
             }
         }
+    }
+
+
+    NumberAnimation {
+        id: anim1;
+
+        property: splitView.orientation == Qt.Horizontal ? "width" : "height;"
+        duration: splitView.animDuration;
+    }
+
+    NumberAnimation {
+        id: anim2
+
+        property: splitView.orientation == Qt.Horizontal ? "width" : "height;"
+        duration: splitView.animDuration;
     }
 
 }
