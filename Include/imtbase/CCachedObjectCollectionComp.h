@@ -23,7 +23,7 @@ namespace imtbase
 class CCachedObjectCollectionComp:
 			public icomp::CComponentBase,
 			public imod::TSingleModelObserverBase<istd::IChangeable>,
-			public imtbase::IObjectCollection
+			virtual public imtbase::IObjectCollection
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
@@ -33,15 +33,12 @@ public:
 		I_REGISTER_INTERFACE(IObjectCollection);
 		I_REGISTER_INTERFACE(IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(ICollectionInfo);
-		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
+		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Base collection containing real data", true, "ObjectCollection");
 		I_ASSIGN_TO(m_objectCollectionModelCompPtr, m_objectCollectionCompPtr, true);
-		I_ASSIGN(m_isCacheObjectPtr, "IsCacheObject", "Is object data cached", true, false);
-		I_ASSIGN(m_cacheLimitPtr, "CacheLimit", "Limiting cached stack data", true, 1000);
+		I_ASSIGN(m_cacheLimitAttrPtr, "CacheLimit", "Maximal count of filter combinations stored in the ring buffer (cache)", true, 1000);
 	I_END_COMPONENT;
 
 	CCachedObjectCollectionComp();
-
-	void SetOperationFlags(int flags, const QByteArray& objectId = QByteArray());
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -96,10 +93,13 @@ public:
 	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true) override;
 
 protected:
-	struct PaginationData
+	struct FilteredCollection
 	{
-		PaginationData(int aOffset, int aCount, const QByteArray& aSelectionParamsData, IObjectCollection* aCachePtr)
-			: offset(aOffset), count(aCount), selectionParamsData(aSelectionParamsData), cachePtr(aCachePtr)
+		FilteredCollection(int aOffset, int aCount, const QByteArray& aSelectionParamsData, IObjectCollection* aCachePtr)
+			: offset(aOffset),
+			count(aCount),
+			selectionParamsData(aSelectionParamsData),
+			cachePtr(aCachePtr)
 		{
 		}
 		int offset;
@@ -108,7 +108,7 @@ protected:
 		istd::TDelPtr<IObjectCollection> cachePtr;
 	};
 
-	PaginationData* CheckCache(
+	FilteredCollection* CheckCache(
 			int offset = 0,
 			int count = -1,
 			const iprm::IParamsSet* selectionParamsPtr = nullptr) const;
@@ -118,13 +118,10 @@ protected:
 private:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imod::IModel, m_objectCollectionModelCompPtr);
-	I_ATTR(bool, m_isCacheObjectPtr);
-	I_ATTR(int, m_cacheLimitPtr);
+	I_ATTR(int, m_cacheLimitAttrPtr);
 
-	mutable istd::TPointerVector<PaginationData> m_paginationDataList;
+	mutable istd::TPointerVector<FilteredCollection> m_collectionCacheItems;
 	int m_operationFlags;
-	iprm::IParamsSet* m_selectionParamsCachePtr;
-	mutable QByteArray m_selectionParamsData;
 };
 
 
