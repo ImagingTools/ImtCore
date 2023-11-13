@@ -256,35 +256,25 @@ FocusScope {
 				}
 			}
 
-			onEntered: {
-				if(tooltip.text !== ""){
-					pauseTooltip.stop();
-					pauseTooltip.start();
+            onPositionChanged: {
+                if(tooltip.text !== ""){
+                    tooltip.show(mouseX, mouseY);
+                }
+            }
 
-				}
-
-			}
-
-			onExited: {
-				if(tooltip.text !== ""){
-					pauseTooltip.stop();
-					tooltip.closeTooltip();
-				}
-			}
+            onExited: {
+                if(tooltip.text !== ""){
+                    tooltip.hide();
+                }
+            }
 		}
 
-		CustomTooltip{
-			id: tooltip;
-		}
+        CustomTooltip{
+            id: tooltip;
 
-		PauseAnimation {
-			id: pauseTooltip;
+            fitToTextWidth: true;
+        }
 
-			duration: tooltip.waitingDuration;
-			onFinished: {
-				tooltip.openTooltip(cbMouseArea.mouseX, cbMouseArea.mouseY);
-			}
-		}
 	}
 
     Shortcut {

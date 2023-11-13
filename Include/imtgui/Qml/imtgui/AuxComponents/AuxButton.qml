@@ -53,18 +53,6 @@ Rectangle {
         }
     }
 
-    onContainsMouseChanged: {
-        if (containsMouse){
-            if(tooltip.text !== ""){
-                pauseTooltip.restart();
-            }
-        }
-        else{
-            pauseTooltip.stop();
-            tooltip.closeTooltip();
-        }
-    }
-
     Image {
         id: image;
 
@@ -124,33 +112,24 @@ Rectangle {
             auxButtonContainer.pressed = false;
         }
 
-//        onEntered: {
-//            if(tooltip.text !== ""){
-//                pauseTooltip.stop();
-//                pauseTooltip.start();
+        onPositionChanged: {
+            if(tooltip.text !== ""){
+                tooltip.show(mouseX, mouseY);
+            }
+        }
 
-//            }
+        onExited: {
+            if(tooltip.text !== ""){
+                tooltip.hide();
+            }
+        }
 
-//        }
-
-//        onExited: {
-//            if(tooltip.text !== ""){
-//                pauseTooltip.stop();
-//                tooltip.closeTooltip();
-//            }
-//        }
     }
 
     CustomTooltip{
         id: tooltip;
+
+        fitToTextWidth: true;
     }
 
-    PauseAnimation {
-        id: pauseTooltip;
-
-        duration: tooltip.waitingDuration;
-        onFinished: {
-            tooltip.openTooltip(ma.mouseX, ma.mouseY);
-        }
-    }
 }

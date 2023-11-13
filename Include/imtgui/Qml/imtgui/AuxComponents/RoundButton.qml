@@ -64,33 +64,27 @@ Rectangle {
         }
         onEntered: {
             roundButton.containsMouse = true;
-            if(tooltip.text !== ""){
-                pauseTooltip.stop();
-                pauseTooltip.start();
 
-            }
         }
         onExited: {
             roundButton.containsMouse = false;
             if(tooltip.text !== ""){
-                pauseTooltip.stop();
-                tooltip.closeTooltip();
+                tooltip.hide();
             }
         }
+        onPositionChanged: {
+            if(tooltip.text !== ""){
+                tooltip.show(mouseX, mouseY);
+            }
+        }
+
         onDoubleClicked: {}
     }
 
     CustomTooltip{
         id: tooltip;
-    }
 
-    PauseAnimation {
-        id: pauseTooltip;
-
-        duration: tooltip.waitingDuration;
-        onFinished: {
-            tooltip.openTooltip(ma.mouseX, ma.mouseY);
-        }
+        fitToTextWidth: true;
     }
 
 }

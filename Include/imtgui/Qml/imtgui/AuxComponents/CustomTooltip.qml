@@ -1,8 +1,9 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtqml 1.0
 
 
-Item {
+Item{
     id: customTooltip;
 
     property string text: "";
@@ -10,10 +11,11 @@ Item {
     property int componentWidth: 200;
     property int tooltipWidth: customTooltip.fitToTextWidth ? forWidthText.width + 2*customTooltip.textMargin : customTooltip.componentWidth;
 
-    property int componentMinHeight: 40;
+    property int componentMinHeight: 30;
     property int componentMargin: 12;
 
     property bool fitToTextWidth: false;
+    property bool fitToHCenter: false;
 
     property int componentHeight: Math.max(customTooltip.componentMinHeight, forHeightText.height + 2*customTooltip.textMargin);
 
@@ -30,11 +32,14 @@ Item {
     property string borderColor: "lightgray";
 
     property bool openST: false;
-    property int waitingDuration: 500;
+    property int waitingDuration: delay;
+    property int delay: 500;
+    property int timeout: -1;
 
     property real lineHeight: 1;
 
     property Component tooltipContentComp: hint;
+
 
     Component.onDestruction: {
         customTooltip.closeTooltip();
@@ -45,7 +50,7 @@ Item {
 
             var point = mapToItem(null, xX, yY);
 
-            modalDialogManager.openDialog(customTooltip.tooltipContentComp, {"x": point.x, "y": point.y, text: qsTr(customTooltip.text)});
+            modalDialogManager.openDialog(customTooltip.tooltipContentComp, {"x": point.x, "y": point.y});
 
             modalDialogManager.backgroundItem.visible = false;
 
@@ -54,38 +59,34 @@ Item {
 
     }
 
-    function openTooltipWithText(xX, yY, text_){
-        customTooltip.text = text_;
-        openTooltip(xX, yY);
-    }
-
     function openTooltip(xX, yY){
         if(!customTooltip.openST){
             console.log("openTooltip", xX, yY);
 
             var point = mapToItem(null, xX, yY);
+            var centeredAdd = customTooltip.fitToTextWidth ? customTooltip.fitToHCenter * (forWidthText.width/2 + customTooltip.textMargin + customTooltip.componentMargin) :
+                                                             customTooltip.fitToHCenter * (customTooltip.componentWidth/2 + customTooltip.componentMargin);
             if(point.x > modalDialogManager.width*2/3){
                 if(customTooltip.fitToTextWidth){
-                    point.x = point.x - forWidthText.width - 2*customTooltip.textMargin - customTooltip.componentMargin;
-
+                    point.x = point.x - forWidthText.width - 2*customTooltip.textMargin - customTooltip.componentMargin + centeredAdd;
                 }
                 else{
-                    point.x = point.x - customTooltip.componentWidth - customTooltip.componentMargin;
+                    point.x = point.x - customTooltip.componentWidth - customTooltip.componentMargin + centeredAdd;
                 }
             }
             else{
-                point.x = point.x + customTooltip.componentMargin;
+                point.x = point.x + customTooltip.componentMargin - centeredAdd;
             }
 
             if(point.y > modalDialogManager.height*2/3){
                 point.y = point.y - customTooltip.componentHeight - customTooltip.componentMargin;
             }
             else{
-                point.y = point.y + customTooltip.componentMargin;
+                point.y = point.y + 2*customTooltip.componentMargin;
             }
 
-            modalDialogManager.openDialog(customTooltip.tooltipContentComp, {"x": point.x, "y": point.y, text: qsTr(customTooltip.text)});
-            //console.log("TEXT::: ",customTooltip.text);
+            modalDialogManager.openDialog(customTooltip.tooltipContentComp, {"x": point.x, "y": point.y});
+
             modalDialogManager.backgroundItem.visible = false;
 
             customTooltip.openST = true;
@@ -103,12 +104,14 @@ Item {
 
     }
 
+
+
     Text{
         id: forHeightText;
 
         visible: false;
 
-       // width: customTooltip.componentWidth - 2*customTooltip.textMargin;
+        // width: customTooltip.componentWidth - 2*customTooltip.textMargin;
 
         font.family: Style.fontFamily;
         font.pixelSize:  customTooltip.fontPixelSize;
@@ -147,12 +150,38 @@ Item {
             height: customTooltip.componentHeight;
 
             color: customTooltip.color;
+            opacity: 0;
             border.color: customTooltip.borderColor;
             border.width: customTooltip.borderWidth;
             radius: customTooltip.radius;
 
             property Item root: null;
-            property string text:"";
+
+            Component.onCompleted: {
+                opacityAnimTo.start();
+            }
+
+            function closeAnimFunc(){
+                opacityAnimFrom.start();
+            }
+
+            NumberAnimation {
+                id: opacityAnimTo;
+
+                target: compRec;
+                property: "opacity";
+                duration: 200
+                from: 0; to: 1;
+            }
+
+            NumberAnimation {
+                id: opacityAnimFrom;
+
+                target: compRec;
+                property: "opacity";
+                duration: 200
+                from: 1; to: 0;
+            }
 
             Text{
                 id: compText;
@@ -173,11 +202,66 @@ Item {
 
                 wrapMode: customTooltip.fitToTextWidth ? Text.NoWrap : Text.WrapAtWordBoundaryOrAnywhere;
 
-                text: compRec.text;//qsTr(customTooltip.text);
+                text: qsTr(customTooltip.text);
 
                 lineHeight: customTooltip.lineHeight;
             }
         }
+    }
+
+    PauseAnimation {
+        id: pauseOpenTooltip;
+
+        duration: customTooltip.delay;
+        property real x: 0;
+        property real y: 0;
+        onFinished: {
+            customTooltip.openTooltip(pauseOpenTooltip.x, pauseOpenTooltip.y);
+        }
+    }
+
+    PauseAnimation {
+        id: pauseCloseTooltip;
+
+        duration: customTooltip.timeout > 0 ? customTooltip.timeout : 1;
+        onFinished: {
+            customTooltip.hide();
+        }
+    }
+
+
+    PauseAnimation {
+        id: closeAnim;
+
+        duration: 200;
+        onFinished: {
+            closeTooltip();
+        }
+    }
+
+    function show(xX, yY){
+        pauseOpenTooltip.x = xX;
+        pauseOpenTooltip.y = yY;
+        pauseCloseTooltip.stop();
+        if(customTooltip.timeout > 0){
+            pauseCloseTooltip.start();
+        }
+        pauseOpenTooltip.restart();
+    }
+
+    function hide(){
+        pauseOpenTooltip.stop();
+        pauseCloseTooltip.stop();
+
+        let item = modalDialogManager.topItem;
+        if(item && item.closeAnimFunc !== undefined){
+            item.closeAnimFunc()
+            closeAnim.start();
+        }
+        else{
+            closeTooltip();
+        }
+
     }
 
 }
