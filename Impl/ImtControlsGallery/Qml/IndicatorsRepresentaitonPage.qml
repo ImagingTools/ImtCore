@@ -3,6 +3,9 @@ import Acf 1.0
 import imtqml 1.0
 import imtcontrols 1.0
 
+//import QtQuick.Controls 2.15
+
+
 
 Rectangle {
     id: indicatorsRepresentaitonPage;
@@ -104,11 +107,15 @@ Rectangle {
                     cursorShape: Qt.PointingHandCursor;
 
                     onPositionChanged: {
-                        tooltip.show(mouseX, mouseY);
+                        if(tooltip.text !== ""){
+                            tooltip.show(mouseX, mouseY);
+                        }
                     }
 
                     onExited: {
-                        tooltip.hide();
+                        if(tooltip.text !== ""){
+                            tooltip.hide();
+                        }
                     }
                 }
                 CustomTooltip{
@@ -155,8 +162,10 @@ Rectangle {
                     spacing: 20;
 
                     model: 10;
+
+
                     delegate: Rectangle{
-                        width: listVert.width - 10;
+                        width: listVert.width - (scrollVert.width + 2);
                         height: 50;
                         radius: 2;
                         color: "lightblue";
@@ -168,7 +177,7 @@ Rectangle {
                         }
                     }
 
-                 }
+                 }//listVert
 
                 CustomScrollbar{
                     id: scrollVert;
@@ -210,7 +219,7 @@ Rectangle {
                     model: 10;
                     delegate: Rectangle{
                         width: 50;
-                        height: listHoriz.height - 10;
+                        height: listHoriz.height - (scrollHoriz.height + 2);
                         radius: 2;
                         color: "lightblue";
                         Text{
@@ -237,9 +246,9 @@ Rectangle {
                 }
 
             }//listViewHorizContainer
-        }
+        }//scrollBarsRow
 
-    }
+    }//Column
 
 }
 
