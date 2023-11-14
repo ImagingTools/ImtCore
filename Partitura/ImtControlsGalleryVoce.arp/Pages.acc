@@ -71,6 +71,27 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="DialogsRepresentaitonPage" PackageId="ImtQmlPck" ComponentId="PageGuiElementModel">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Product"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Id" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Dialogs"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Dialogs"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageQmlItem" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="../../DialogsRepresentaitonPage.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="StartQmlItem" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="../../DialogsRepresentaitonPage.qml"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="IndicatorsPage" PackageId="ImtQmlPck" ComponentId="PageGuiElementModel">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -151,6 +172,7 @@
                                 <Value>InputsPage</Value>
                                 <Value>ViewsPage</Value>
                                 <Value>IndicatorsPage</Value>
+                                <Value>DialogsRepresentaitonPage</Value>
                                 <Value>TestPage</Value>
                             </Values>
                         </Data>
