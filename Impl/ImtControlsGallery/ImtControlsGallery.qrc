@@ -6,6 +6,7 @@
         <file alias="InputsRepresentaitonPage.qml">Qml/InputsRepresentaitonPage.qml</file>
         <file alias="ViewsRepresentaitonPage.qml">Qml/ViewsRepresentaitonPage.qml</file>
         <file alias="IndicatorsRepresentaitonPage.qml">Qml/IndicatorsRepresentaitonPage.qml</file>
+        <file alias="DialogsRepresentaitonPage.qml">Qml/DialogsRepresentaitonPage.qml</file>
         <file alias="TestPage.qml">Qml/TestPage.qml</file>
     </qresource>
 </RCC>
