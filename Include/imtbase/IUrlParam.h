@@ -26,7 +26,7 @@ public:
 	/**
 		Set the object URL.
 	*/
-	virtual void SetUrl(const QUrl& url) = 0;
+	virtual bool SetUrl(const QUrl& url) = 0;
 
 	/**
 		Return \c true, if the URL is readonly.

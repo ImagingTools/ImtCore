@@ -14,7 +14,7 @@ class CUrlParam: virtual public IUrlParam
 public:
 	// reimplemented (IUrlParam)
 	virtual const QUrl& GetUrl() const override;
-	virtual void SetUrl(const QUrl& url) override;
+	virtual bool SetUrl(const QUrl& url) override;
 	virtual bool IsReadOnly() const override;
 
 	// reimplemented (iser::ISerializable)

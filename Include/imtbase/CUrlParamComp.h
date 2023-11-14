@@ -32,7 +32,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (IUrlParam)
-	virtual void SetUrl(const QUrl& url) override;
+	virtual bool SetUrl(const QUrl& url) override;
 	virtual bool IsReadOnly() const override;
 
 protected:

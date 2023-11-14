@@ -9,11 +9,13 @@ namespace imtbase
 
 // reimplemented (IUrlParam)
 
-void CUrlParamComp::SetUrl(const QUrl& url)
+bool CUrlParamComp::SetUrl(const QUrl& url)
 {
 	if (!*m_isReadOnlyAttrPtr){
-		BaseClass2::SetUrl(url);
+		return BaseClass2::SetUrl(url);
 	}
+
+	return false;
 }
 
 

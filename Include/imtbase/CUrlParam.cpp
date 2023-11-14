@@ -20,7 +20,7 @@ const QUrl& CUrlParam::GetUrl() const
 }
 
 
-void CUrlParam::SetUrl(const QUrl& url)
+bool CUrlParam::SetUrl(const QUrl& url)
 {
 	if (m_url != url){
 		istd::CChangeNotifier notifier(this);
@@ -28,6 +28,8 @@ void CUrlParam::SetUrl(const QUrl& url)
 
 		m_url = url;
 	}
+
+	return true;
 }
 
 
