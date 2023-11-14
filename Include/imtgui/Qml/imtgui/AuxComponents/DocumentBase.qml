@@ -35,6 +35,7 @@ Item {
     property alias commandsDelegateSourceComp: commandsDelegateBase.sourceComponent;
 
     property var undoManager: null;
+    property var parentRef: null;
 
     property CommandsProvider commandsProvider: CommandsProvider {
         commandsId: documentBaseRoot.commandsId;
@@ -44,6 +45,10 @@ Item {
     signal localizationChanged(string language);
 
     signal saved();
+
+    onParentRefChanged: {
+        console.log("Document onParentRefChanged",parentRef);
+    }
 
     UuidGenerator {
         id: uuidGenerator;

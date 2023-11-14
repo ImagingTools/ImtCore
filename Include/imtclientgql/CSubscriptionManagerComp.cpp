@@ -217,7 +217,7 @@ bool CSubscriptionManagerComp::SendRequest(const imtgql::IGqlRequest& request, i
 	NetworkOperation networkOperation(10000, this);
 
 	if (!SendRequestInternal(request, requestPtr)){
-		SendErrorMessage(0, QString("Request could not be sent: '%1'").arg(request.GetCommandId()));
+		SendErrorMessage(0, QString("Request could not be sent: '%1'").arg(QString(request.GetCommandId())));
 
 		return false;
 	}

@@ -50,6 +50,7 @@ Item {
     property TreeItemModel notificationModel: collectionViewBase.commands.notificationModel;
 
     property Item documentManager: null;
+    property var parentRef: null;
 
     property ListModel contextMenuModel: ListModel {}
 
@@ -75,6 +76,10 @@ Item {
         Events.unSubscribeEvent(collectionViewContainer.commandUpdateGui, collectionViewContainer.updateGui);
         Events.unSubscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
         Events.unSubscribeEvent("UpdateAllModels", collectionViewContainer.receiveRemoteChanges);
+    }
+
+    onParentRefChanged: {
+        console.log("CollectionView onParentRefChanged",parentRef);
     }
 
     onHasRemoteChangesChanged: {
@@ -228,10 +233,10 @@ Item {
 
         if (collectionViewContainer.isUsedDocumentManager){
             if (id === ""){
-                documentManager.addDocument({"Id": id, "Name": name, "CommandsId": commandsId, "Source": editorPath}, {}, false);
+                documentManager.addDocument({"Id": id, "Name": name, "CommandsId": commandsId, "Source": editorPath, "Parent": collectionViewContainer}, {}, false);
             }
             else{
-                documentManager.openDocument(id, {"Id": id, "Name": name, "CommandsId": commandsId, "Source": editorPath});
+                documentManager.openDocument(id, {"Id": id, "Name": name, "CommandsId": commandsId, "Source": editorPath, "Parent": collectionViewContainer});
             }
         }
         else{

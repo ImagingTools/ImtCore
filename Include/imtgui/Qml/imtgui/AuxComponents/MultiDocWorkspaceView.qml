@@ -237,10 +237,12 @@ Item {
         let commandId = documentObj["CommandsId"];
         let name = documentObj["Name"];
         let source = documentObj["Source"];
+        let parent = documentObj["Parent"];
 
         let index = workspaceView.documentsData.InsertNewItem();
 
         workspaceView.documentsData.SetData("Id", itemId, index);
+        workspaceView.documentsData.SetData("Parent", parent, index);
         workspaceView.documentsData.SetData("CommandsId", commandId, index);
         workspaceView.documentsData.SetData("Name", name, index);
         workspaceView.documentsData.SetData("Title", name, index);
@@ -632,6 +634,10 @@ Item {
 
                     if (dataLoader.item.documentUuid !== undefined){
                         workspaceView.documentsData.SetData("DocumentUuid", dataLoader.item.documentUuid);
+                    }
+
+                    if (dataLoader.item.parentRef !== undefined){
+                        dataLoader.item.parentRef = model.Parent;
                     }
                 }
             }
