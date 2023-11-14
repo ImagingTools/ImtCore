@@ -7,8 +7,8 @@ import imtcontrols 1.0
 FocusScope {
     id: controlBase;
     
-    width: decorator ? decorator.width : 150;
-    height: decorator ? decorator.height : 30;
+    width: decorator ? decorator.width : 0;
+    height: decorator ? decorator.height : 0;
 
     property Component decoratorComponent;
     property var decorator : null;

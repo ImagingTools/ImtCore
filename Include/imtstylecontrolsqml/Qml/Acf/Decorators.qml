@@ -30,10 +30,6 @@ Item {
     property Component busyIndicatorDecorator: busyIndicatorDecoratorComp
     property Component tooltipDecorator: tooltipDecoratorComp
 
-    property Component splitViewDecorator: splitViewDecoratorComp
-    property Component stackViewDecorator: stackViewDecoratorComp
-    property Component swipeViewDecorator: swipeViewDecoratorComp
-
 
     Component {
         id: topButtonDecoratorComp
@@ -1006,35 +1002,5 @@ Item {
             property var baseElement: null;
         }
     }
-
-    Component {
-        id: splitViewDecoratorComp;
-        Item {
-            id: splitViewItem;
-
-            property var baseElement: null;
-        }
-    }
-
-
-    Component {
-        id: stackViewDecoratorComp;
-        Item {
-            id: stackViewItem;
-
-            property var baseElement: null;
-        }
-    }
-
-
-    Component {
-        id: swipeViewDecoratorComp;
-        Item {
-            id: swipeViewItem;
-
-            property var baseElement: null;
-        }
-    }
-
 
 }

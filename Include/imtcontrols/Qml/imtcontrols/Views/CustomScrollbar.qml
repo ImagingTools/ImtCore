@@ -2,10 +2,10 @@ import QtQuick 2.12
 import Acf 1.0
 
 Rectangle{
-    id:scrollContainer;
+    id: scrollContainer;
 
-    height: targetItem && vertical ? targetItem.height : secondSize;
-    width: vertical ? secondSize : targetItem.width;
+    height: targetItem && vertical ? targetItem.height : !decorator ? secondSize : secondSizeDecorator;
+    width: targetItem && !vertical ? targetItem.width : !decorator ? secondSize : secondSizeDecorator;
     color: backgroundColor;
     radius: 4;
 
@@ -18,9 +18,9 @@ Rectangle{
     property real minSize: 20;
     property real secondSize: 20;
     property int indicatorRadius: 4;
-    property string backgroundColor: Style.color_scrollBackground !== undefined ? Style.color_scrollBackground  : "#efefef";
-    property string indicatorColor: Style.color_scrollIndicator !== undefined ? Style.color_scrollIndicator : "lightgray";
-    property string highlightColor: Style.color_scrollHighlight !== undefined ? Style.color_scrollHighlight : "lightgray";
+    property string backgroundColor: decorator ? "transparent" : Style.color_scrollBackground !== undefined ? Style.color_scrollBackground  : "#efefef";
+    property string indicatorColor: decorator ? "transparent" : Style.color_scrollIndicator !== undefined ? Style.color_scrollIndicator : "lightgray";
+    property string highlightColor: decorator ? "transparent" : Style.color_scrollHighlight !== undefined ? Style.color_scrollHighlight : "lightgray";
 
     property bool canFade: false;
     property bool isMoving: false;
@@ -40,6 +40,64 @@ Rectangle{
 
     property int targetContentHeight: targetItem.contentHeight;
     property int targetContentWidth: targetItem.contentWidth;
+
+
+    /*for Qt Style decoration*/
+    property Component decoratorComponent : Style.isQtStyle ? DecoratorsQt.scrollBarDecorator : null;
+    property var decorator : null;
+
+    property real scrollIndicatorY: scrollIndicator.y;
+    property real scrollIndicatorX: scrollIndicator.x;
+
+    property real secondSizeDecorator: !decorator ? 0 : vertical ? decorator.background.width : decorator.background.height;
+
+
+    onDecoratorComponentChanged: {
+        if(decorator){
+            decorator.destroy();
+        }
+
+        if(!decoratorComponent){
+            return;
+        }
+
+        decorator = decoratorComponent.createObject(scrollContainer);
+        decorator.baseElement = scrollContainer;
+
+        if(scrollContainer.vertical){
+            decorator.position = scrollIndicatorY/scrollContainer.height;
+        }
+        else {
+            decorator.position = scrollIndicatorX/scrollContainer.width;
+        }
+
+    }
+
+    onScrollIndicatorYChanged: {
+        if(decorator && vertical){
+            decorator.position = scrollIndicatorY/scrollContainer.height;
+        }
+    }
+
+    onScrollIndicatorXChanged: {
+        if(decorator && !vertical){
+            decorator.position = scrollIndicatorX/scrollContainer.width;
+        }
+    }
+
+    function setContentPositionFunc(position_){
+        if(scrollContainer.vertical){
+            scrollContainer.targetItem.contentY =
+            position_ * scrollContainer.height / scrollContainer.koeff + scrollContainer.targetItem.originY;
+        }
+        else {
+            scrollContainer.targetItem.contentX =
+            position_ * scrollContainer.width / scrollContainer.koeff + scrollContainer.targetItem.originX;
+        }
+
+    }
+    /*for Qt Style decoration*/
+
 
     Component.onCompleted: {
         scrollContainer.opacity = !scrollContainer.canFade;

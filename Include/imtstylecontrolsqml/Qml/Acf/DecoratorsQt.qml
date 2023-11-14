@@ -25,10 +25,7 @@ Item {
     property Component progressBarDecorator: progressBarDecoratorComp
     property Component busyIndicatorDecorator: busyIndicatorDecoratorComp
     property Component tooltipDecorator: tooltipDecoratorComp
-
-    property Component splitViewDecorator: splitViewDecoratorComp
-    property Component stackViewDecorator: stackViewDecoratorComp
-    property Component swipeViewDecorator: swipeViewDecoratorComp
+    property Component scrollBarDecorator: scrollBarDecoratorComp
 
 
     Component {
@@ -440,72 +437,32 @@ Item {
     }
 
     Component {
-        id: splitViewDecoratorComp;
-        Item {
-            id: splitViewItem;
+        id: scrollBarDecoratorComp;
 
-            width: 800;
-            height: 200;
+        ScrollBar{
+            id: scrollBarItem;
+
+            anchors.top : !baseElement ? undefined : orientation == Qt.Vertical ? baseElement.top : undefined;
+            anchors.left : !baseElement ? undefined : orientation == Qt.Horizontal ? baseElement.left : undefined;
+            anchors.bottom : !baseElement ? undefined : baseElement.bottom;
+            anchors.right : !baseElement ? undefined : baseElement.right;
+
+            active: false;
+            orientation: !baseElement ? Qt.Vertical : baseElement.vertical ? Qt.Vertical : Qt.Horizontal;
+            size: !targetItem ? 0 : orientation == Qt.Vertical ? targetItem.height / targetItem.contentHeight : targetItem.width / targetItem.contentWidth;
+            policy: ScrollBar.AlwaysOn;
+
 
             property var baseElement: null;
+            property var targetItem: !baseElement ? null : baseElement.targetItem;
 
-            SplitView {
-                anchors.fill: parent
-                orientation: Qt.Horizontal
-
-                Rectangle {
-                    implicitWidth: 200
-                    SplitView.maximumWidth: 400
-                    color: "lightblue"
-                    Label {
-                        text: "View 1"
-                        anchors.centerIn: parent
-                    }
-                }
-                Rectangle {
-                    id: centerItem
-
-                    SplitView.minimumWidth: 50
-                    SplitView.fillWidth: true
-
-                    color: "lightgray"
-                    Label {
-                        text: "View 2"
-                        anchors.centerIn: parent
-                    }
-                }
-                Rectangle {
-                    implicitWidth: 200
-                    color: "lightgreen"
-                    Label {
-                        text: "View 3"
-                        anchors.centerIn: parent
-                    }
+            onPositionChanged: {
+                if((pressed || hovered) && baseElement){
+                    baseElement.setContentPositionFunc(position);
                 }
             }
-
         }
     }
-
-
-    Component {
-        id: stackViewDecoratorComp;
-        Item {
-            id: stackViewItem;
-
-            property var baseElement: null;
-        }
-    }
-
-
-    Component {
-        id: swipeViewDecoratorComp;
-        Item {
-            id: swipeViewItem;
-
-            property var baseElement: null;
-        }
-    }
-
 
 }
+
