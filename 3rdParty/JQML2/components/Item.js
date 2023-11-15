@@ -32,7 +32,7 @@ class Item extends QtObject {
         rotation: { type: QReal, value: 0, changed: 'rotationAndScaleChanged' },
         transformOrigin: { type: QProperty, value: Item.Center, changed: 'transformOriginChanged' },
         anchors: { type: QAnchors, changed: 'anchorsChanged' },
-        keyNavigation: { type: QKeyNavigation, changed: 'keyNavigationChanged' },
+        KeyNavigation: { type: QKeyNavigation, changed: 'keyNavigationChanged' },
 
         // override getProperty
         left: { type: QAnchorLine, value: QAnchorLine.Left},

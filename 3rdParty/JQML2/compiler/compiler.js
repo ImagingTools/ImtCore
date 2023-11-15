@@ -28,6 +28,11 @@ function getFiles (dir, _files){
 }
 
 const fileList = getFiles(path.resolve(__dirname, source))
+const classList = []
+for(let i = 0; i < fileList.length; i++){
+    fileList[i] = fileList[i].replaceAll('/', '/').replaceAll('\\', '/')
+    classList.push(path.relative(path.resolve(__dirname, source), fileList[i]).replaceAll('/','_').replaceAll('\\','_').replaceAll('.qml',''))
+}
 const compiledFiles = {}
 // console.log('fileList: ', fileList)
 
@@ -37,12 +42,20 @@ function getBaseStructure(){
     return {
         extends: undefined,
         className: '',
+        // extendsClassName: '',
+        extends: null,
         Singleton: false,
         fileName: '',
-        qmlFileName: '',
-        getQmlFileName: function(){
-            let qmlName = this.fileName.split('/').pop()
-            return qmlName
+        // qmlFileName: '',
+        // getQmlFileName: function(){
+        //     let qmlName = this.fileName.split('/').pop()
+        //     return qmlName
+        // },
+        getClassName: function(){
+            return this.className
+        },
+        getExtendsClassName: function(){
+            return this.extends ? this.extends.instructions.getClassName() : ''
         },
         id: '',
         properties: [],
@@ -103,6 +116,7 @@ function qmlelem(meta, instructions){
     instructions.children.push(childInstructions)
     childInstructions.parent = instructions
     childInstructions.fileName = instructions.fileName
+    childInstructions.compiledFile = instructions.compiledFile
    
     preCompile(meta[1], meta[3], meta[2], childInstructions) 
 
@@ -143,6 +157,7 @@ function qmlpropdef(meta, instructions){
         let childInstructions = getBaseStructure()
         childInstructions.parent = instructions
         childInstructions.fileName = instructions.fileName
+        childInstructions.compiledFile = instructions.compiledFile
     
         preCompile(meta[3][1][1], meta[3][1][3], meta[3][1][2], childInstructions) 
 
@@ -218,6 +233,7 @@ function qmlprop(meta, instructions){
                     let childInstructions = getBaseStructure()
                     childInstructions.parent = instructions
                     childInstructions.fileName = instructions.fileName
+                    childInstructions.compiledFile = instructions.compiledFile
                 
                     preCompile(meta[2][1][1], meta[2][1][3], meta[2][1][2], childInstructions) 
 
@@ -261,6 +277,7 @@ function qmlprop(meta, instructions){
                     let childInstructions = getBaseStructure()
                     childInstructions.parent = instructions
                     childInstructions.fileName = instructions.fileName
+                    childInstructions.compiledFile = instructions.compiledFile
                 
                     preCompile(meta[2][1][1], meta[2][1][3], meta[2][1][2], childInstructions) 
 
@@ -292,7 +309,60 @@ function qmlobj(m, instructions, file){
     
 }
 function preCompile(className, meta, on, instructions){
-    instructions.className = className[0] === 'dot' ? className.slice(1).pop() : className
+    className = className[0] === 'dot' ? className.slice(1).pop() : className
+    if(listComponents.indexOf(className) >= 0){
+        instructions.className = className
+    } else {
+        // let compiledFile = compiledFiles[instructions.fileName]
+        // path.relative(path.resolve(__dirname, source), fileName).replaceAll('/','_').replaceAll('\\','_').replaceAll('.qml','')
+        let pathName = []
+        if(instructions.compiledFile.namespace) pathName.push(instructions.compiledFile.namespace)
+        pathName.push(className)
+        if(classList.indexOf(pathName.join('_')) >= 0){
+            instructions.className = pathName.join('_')
+        } else {
+            let find = false
+            for(let importObj of instructions.compiledFile.imports){
+                pathName = []
+                pathName.push(importObj.path)
+                let fileName = instructions.fileName.replaceAll('/','_').replaceAll('\\','_').split('_')
+                fileName.pop()
+                fileName = fileName.join('/')
+
+                let _pathName = path.relative(path.resolve(__dirname, source), path.resolve(fileName, pathName.join('/'))).replaceAll('/','_').replaceAll('\\','_')
+                if(classList.indexOf(_pathName + '_' + className) >= 0){
+                    instructions.className = _pathName + '_' + className
+                    find = true
+                    break
+                } else {
+                    // let test1 = path.resolve(__dirname, source)
+                    // let test2 = pathName.join('/')
+                    // let test3 = path.resolve(path.resolve(__dirname, source), pathName.join('/'))
+                    _pathName = path.relative(path.resolve(__dirname, source), path.resolve(path.resolve(__dirname, source), pathName.join('/'))).replaceAll('/','_').replaceAll('\\','_')
+                    if(classList.indexOf(_pathName + '_' + className) >= 0){
+                        instructions.className = _pathName + '_' + className
+                        find = true
+                        break
+                    }
+                }
+            }
+            if(!find){
+                console.log(`Warning: class ${className} not found into file ${instructions.fileName}`)
+                for(let _className of classList){
+                    if(_className === className || _className.split('_').pop() === className){
+                        instructions.className = _className
+                        find = true
+                        break
+                    }
+                }
+                if(!find) throw `Error: class ${className} not found into file ${instructions.fileName}`
+            } 
+            // instructions.className = ''
+        }
+        // instructions.className = path.relative(path.resolve(__dirname, source), instructions.fileName).replaceAll('/','_').replaceAll('\\','_').replaceAll('.qml','')
+    }
+    
+
     // if(on) {
     //     instructions.properties.properties = on
     // }
@@ -333,15 +403,20 @@ for(let fileName of fileList){
     parser.parse.nowParsingFile = fileName
     let meta = parser.parse(data)
     
+    let namespace = path.relative(path.resolve(__dirname, source), fileName).replaceAll('/', '_').replaceAll('\\', '_').split('_')
+    namespace.pop()
+    namespace = namespace.join('_')
+    // let test3 = test2.replaceAll(/[_]{1}\w+.qml/g, '').replaceAll(/\w+.qml/g, '')
    
     compiledFiles[fileName] = {
         fileName: fileName,
         context: {},
         instructions: instructions,
-        namespace: path.relative(path.resolve(__dirname, source), fileName).replaceAll(/[\\,/]*\w+.qml/g, ''),
+        namespace: namespace,
         imports: [],
     }
     instructions.fileName = fileName
+    instructions.compiledFile = compiledFiles[fileName]
 
     if(meta[3]) qmlpragma(meta[3], instructions)
     qmlimport(meta[1], compiledFiles[fileName])
@@ -352,13 +427,13 @@ for(let fileName of fileList){
 }
 
 function testName(name, currentInstructions){
-    if(currentInstructions.className === 'MouseArea' && (name === 'mouse' || name === 'wheel')) return true
+    if(currentInstructions.getClassName() === 'MouseArea' && (name === 'mouse' || name === 'wheel')) return true
 
     let inExtends = false
     if(currentInstructions.extends) inExtends = testName(name, currentInstructions.extends.instructions)
     if(inExtends) return true
     
-    let component = components[currentInstructions.className]
+    let component = components[currentInstructions.getClassName()]
     if(component)
     while(component.defaultProperties){
         if(name in component.defaultProperties){
@@ -371,6 +446,27 @@ function testName(name, currentInstructions){
     }
     if(name in currentInstructions.defineSignals) return true
     if(name in currentInstructions.methods) return true
+    return false
+}
+
+function testProperty(name, currentInstructions){
+    name = name.replaceAll('Changed','')
+
+    let inExtends = false
+    if(currentInstructions.extends) inExtends = testProperty(name, currentInstructions.extends.instructions)
+    if(inExtends) return true
+    
+    let component = components[currentInstructions.getClassName()]
+    if(component)
+    while(component.defaultProperties){
+        if(name in component.defaultProperties){
+            return true
+        }
+        component = component.__proto__
+    }
+    for(let prop of currentInstructions.properties){
+        if(prop.name === name) return true
+    }
     return false
 }
 
@@ -731,34 +827,22 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
 
 let code = []
 function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], updateList = [], step = 0, innerComponent = false){
-    if(listComponents.indexOf(currentInstructions.className)>=0){
-        // code.push(`class ${className} extends ${currentInstructions.className} {`)
-        code.push(currentInstructions.UID > 1 ? `let el${currentInstructions.UID} = new ${currentInstructions.className}(${innerComponent ? 'currParent' : currentInstructions.parent.name},inCtx)` : `let el${currentInstructions.UID} = this`)
-    } else {
-        let userClass = ''
-        for(let _fileName in compiledFiles){
-            let targetCompiledFile = compiledFiles[_fileName]
-            if(targetCompiledFile.instructions.getQmlFileName().replaceAll('.qml', '') === currentInstructions.className){
-                currentInstructions.extends = targetCompiledFile
-                let targetClassName = targetCompiledFile.namespace ? targetCompiledFile.namespace.split(/[/\\]+/g) : []
-                // targetClassName.push(targetCompiledFile.instructions.getQmlFileName().replaceAll('.qml', ''))
-                if(compiledFile.imports.indexOf(targetClassName.join('.'))) {
-                    targetClassName.push(currentInstructions.className)
-                    // code.push(`class ${className} extends ${targetClassName.join('_')} {`)
-                    code.push(currentInstructions.UID > 1 ? `let el${currentInstructions.UID} = new ${targetClassName.join('_')}(${innerComponent ? 'currParent' : currentInstructions.parent.name},inCtx)` : `let el${currentInstructions.UID} = this`)
-                    break
-                }
-                // if(compiledFile.imports.indexOf(targetCompiledFile[_fileName]))
-            }
-        }
+    code.push(currentInstructions.UID > 1 ? `let el${currentInstructions.UID} = new ${currentInstructions.getClassName()}(${innerComponent ? 'currParent' : currentInstructions.parent.name},inCtx)` : `let el${currentInstructions.UID} = this`)
+
+    let extendInstruction = currentInstructions
+    while(extendInstruction && listComponents.indexOf(extendInstruction.className) < 0){
+        let extendsFile = compiledFiles[path.resolve(path.resolve(__dirname, source), extendInstruction.className.replaceAll('_', '/')).replaceAll('\\', '/') + '.qml']
+        currentInstructions.extends = extendsFile
+        extendInstruction = extendsFile ? extendsFile.instructions : null
     }
+
     let special = false
     let tempInstruction = currentInstructions
     while(tempInstruction){
         if(tempInstruction.className === 'Loader' || tempInstruction.className === 'Repeater' || tempInstruction.className === 'ListView' || tempInstruction.className === 'GridView'){
             special = true
         }
-        tempInstruction = tempInstruction.extends
+        tempInstruction = tempInstruction.extends ? tempInstruction.extends.instructions : null
     }
     
     if(currentInstructions.id) {
@@ -855,18 +939,17 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
         }
         
     }
-
+    let readySignals = []
     for(let signal of currentInstructions.connectionSignals){
         if(currentInstructions.defineSignals[signal.name]) continue
         
         let name = signal.name
-        let linkedProperty = false
-        let index = name.indexOf('Changed')
-        if(index >= 0 && name !== 'positionChanged'){
-            linkedProperty = true
-            name = name.slice(0, index)
+        let linkedProperty = testProperty(name, currentInstructions)
+        if(linkedProperty){
+            name = name.replaceAll('Changed', '')
             if(currentInstructions.propertiesNames.indexOf(name) >= 0) continue
-        }       
+        }   
+        readySignals.push(name)    
         let stat = {
             return: false,
             compute: false,
@@ -936,15 +1019,13 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
                 if(property.val.className !== 'Component'){  
                     // TEMP !!!
                     if((property.name === 'delegate' && (currentInstructions.className === 'ListView'|| currentInstructions.className === 'GridView' || currentInstructions.className === 'Repeater')) || (property.name === 'sourceComponent' && currentInstructions.className === 'Loader')){
-                        code.push(`${currentInstructions.name}.$temp = new Component(${currentInstructions.name}, inCtx)`)
-                        code.push(`${currentInstructions.name}.$temp.createObject=function(currParent,exCtx){`)
+                        code.push(`${currentInstructions.name}.getStatement('${property.name}').value = new Component(${currentInstructions.name}, inCtx)`)
+                        code.push(`${currentInstructions.name}.getStatement('${property.name}').value.createObject=function(currParent,exCtx){`)
                         
                         code.push(`let inCtx = new ContextController(exCtx)`)
                         treeCompile(compiledFile, property.val, [], [], 0, true)
                         code.push(`}`)
-
-                        code.push(`${currentInstructions.name}.${property.name} = ${currentInstructions.name}.$temp`)
-                        code.push(`delete ${currentInstructions.name}.$temp`)
+                        updateList.push(`${currentInstructions.name}.getStatement('${property.name}').getNotify()()`)
                     }
                     
                 } else {
@@ -1022,15 +1103,12 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
 
     for(let signal of currentInstructions.connectionSignals){
         let name = signal.name
-        let linkedProperty = false
-        let index = name.indexOf('Changed')
-        if(index >= 0 && name !== 'positionChanged'){
-            linkedProperty = true
-            name = name.slice(0, index)
+        let linkedProperty = testProperty(name, currentInstructions)
+        if(linkedProperty){
+            name = name.replaceAll('Changed', '')
             if(currentInstructions.propertiesNames.indexOf(name) < 0) continue
-        } else {
-            if(!currentInstructions.defineSignals[signal.name]) continue
         }       
+        if(readySignals.indexOf(name) >= 0) continue
         let stat = {
             return: false,
             compute: false,
@@ -1100,7 +1178,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
     
     if(innerComponent) code.push(`return el${currentInstructions.UID}`)
 }
-let classList = []
+let queueList = []
 let queueFiles = []
 for(let fileName in compiledFiles){
     queueFiles.push(fileName)
@@ -1108,47 +1186,19 @@ for(let fileName in compiledFiles){
 while(queueFiles.length){
     let fileName = queueFiles.shift()
     let compiledFile = compiledFiles[fileName]
-    let className = compiledFile.namespace ? compiledFile.namespace.split(/[/\\]+/g) : []
-    className.push(compiledFile.instructions.getQmlFileName().replaceAll('.qml', ''))
-    className = className.join('_')
-    // console.log(compiledFile.instructions.getQmlFileName().replaceAll('.qml', ''))
-    if(listComponents.indexOf(compiledFile.instructions.className)>=0){
-        if(className === compiledFile.instructions.className){
-            console.log(`Skip define class ${className}. Already exist`)
-            continue
-        }
-        code.push(`class ${className} extends ${compiledFile.instructions.className} {`)
-        classList.push(className)
-    } else {
-        let userClass = ''
-        let next = false
-        let find = false
-        for(let _fileName in compiledFiles){
-            let targetCompiledFile = compiledFiles[_fileName]
-            if(targetCompiledFile.instructions.getQmlFileName().replaceAll('.qml', '') === compiledFile.instructions.className){
-                let targetClassName = targetCompiledFile.namespace ? targetCompiledFile.namespace.split(/[/\\]+/g) : []
-                // targetClassName.push(targetCompiledFile.instructions.getQmlFileName().replaceAll('.qml', ''))
-                if(compiledFile.imports.indexOf(targetClassName.join('.'))) {
-                    targetClassName.push(compiledFile.instructions.className)
-                    if(classList.indexOf(targetClassName.join('_')) < 0) {
-                        queueFiles.push(fileName)
-                        next = true
-                        break
-                    }
-                    code.push(`class ${className} extends ${targetClassName.join('_')} {`)
-                    find = true
-                    classList.push(className)
-                    break
-                }
 
-                // if(compiledFile.imports.indexOf(targetCompiledFile[_fileName]))
-            }
-        }
-        if(next) {
+    let className = path.relative(path.resolve(__dirname, source), fileName).replaceAll('/', '_').replaceAll('\\', '_').replaceAll('.qml', '')
+
+    if(listComponents.indexOf(className)>=0){
+        console.log(`Warning: skip define class ${className}`)
+        continue
+    } else {
+        let pathName = path.resolve(path.resolve(__dirname, source), compiledFile.instructions.getClassName().replaceAll('_', '/')).replaceAll('\\', '/') + '.qml'
+        if(queueFiles.indexOf(pathName) >= 0){
+            queueFiles.push(fileName)
             continue
-        } else if(!find) {
-            throw `error: class ${compiledFile.instructions.className} not found into file ${compiledFile.fileName}` 
         }
+        code.push(`class ${className} extends ${compiledFile.instructions.getClassName()} {`)
     }
     
     code.push(`constructor(parent, exCtx) {`)

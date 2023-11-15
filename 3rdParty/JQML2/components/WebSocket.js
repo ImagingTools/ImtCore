@@ -15,12 +15,13 @@ class WebSocket extends QtObject {
         errorString: { type: QString, value: '' },
         negotiatedSubprotocol: { type: QString, value: '' },
         requestedSubprotocols: { type: QVar, value: [] },
-        binaryMessageReceived: { type: QString, value: 'message' },
-        textMessageReceived: { type: QString, value: 'message' },
+
     }
 
     static defaultSignals = {
         triggered: { params: [] },
+        binaryMessageReceived: { params: ['message'] },
+        textMessageReceived: { params: ['message'] },
     }
 
     constructor(parent){

@@ -23,6 +23,11 @@ class ComplexObject {
                 this.getProperty(name).reset(newVal)
             }
         })
+        Object.defineProperty(this, name+'Changed', {
+            get: function(){
+                return this.getProperty(name).getNotify()
+            },
+        })
     }
 
     createVariantProperty(name, type, value){
@@ -37,6 +42,11 @@ class ComplexObject {
             set: function(newVal){
                 this.getProperty(name).reset(newVal)
             }
+        })
+        Object.defineProperty(this, name+'Changed', {
+            get: function(){
+                return this.getProperty(name).getNotify()
+            },
         })
     }
 

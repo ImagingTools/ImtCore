@@ -34,6 +34,7 @@ module.exports.listComponents = [
     'FocusScope',
     'GridView',
     'FontLoader',
+    'FileDialog',
     'TextInput',
     'TextEdit',
     'Shortcut',
@@ -48,4 +49,5 @@ module.exports.listComponents = [
     'MapPolyline',
     'MapQuickItem',
     'MapRectangle',
+    'Connections',
 ]
