@@ -519,8 +519,12 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
                         if(!components[tree[1]]) eval(tree[1])
                         stat.value.push(tree[1])
                     } catch (error) {
-                        stat.compute = true
-                        stat.value.push(`inCtx.get('${tree[1]}')`)
+                        if(tree[1] === 'XMLHttpRequest'){
+                            stat.value.push(`XMLHttpRequest`)
+                        } else {
+                            stat.compute = true
+                            stat.value.push(`inCtx.get('${tree[1]}')`)
+                        }
                     }
                 }
                 

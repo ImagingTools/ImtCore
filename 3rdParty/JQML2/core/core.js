@@ -15,7 +15,7 @@ class ContextController {
         } else if(name in Singletons){
             return Singletons[name]
         } else {
-            return undefined
+            return global[name]
         }
     }
 }
