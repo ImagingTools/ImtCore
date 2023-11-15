@@ -12,6 +12,8 @@ class ContextController {
             return this.internal[name]
         } else if(this.external) {
             return this.external.get(name)
+        } else if(name in Singletons){
+            return Singletons[name]
         } else {
             return undefined
         }
@@ -23,6 +25,7 @@ global.WebImage = Image
 global._WebSocket = WebSocket
 global.queueLink = []
 global.UIDList = {}
+global.Singletons = {}
 
 const listProperties = require('../utils/properties')
 for(let prop in listProperties){
@@ -87,6 +90,7 @@ for(let componentName of listComponents){
 }
 
 global.updateList = []
+global.SingletonClass = {}
 
 window.onload = ()=>{
     document.head.insertAdjacentHTML("beforeend", `
@@ -143,6 +147,12 @@ window.onload = ()=>{
     mainRoot.createProperty('application',QString,'location')
 
     console.time('build')
+    for(let name in SingletonClass){
+        let obj = new SingletonClass[name]()
+        Singletons[name] = obj
+        if(obj.$id) Singletons[obj.$id] = obj
+        obj.$complete()
+    }
     let root = new (Function('return '+document.body.dataset.qml.replace('.qml', ''))())(mainRoot)
     for(let update of updateList.splice(0, updateList.length)){
         update()

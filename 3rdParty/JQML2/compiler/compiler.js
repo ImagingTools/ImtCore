@@ -72,16 +72,14 @@ function getBaseStructure(){
     }
 }
 
-function qmlpragma(m, instructions, file){
-    // for(let p of m){
-    //     if(p[0] === 'qmlpragma'){
-    //         if(p[1] === 'Singleton') {
-                
-    //             // instructions.SingletonName = name
-    //             instructions.Singleton = true
-    //         }
-    //     }
-    // }
+function qmlpragma(meta, instructions){
+    for(let pragma of meta){
+        if(pragma[0] === 'qmlpragma'){
+            if(pragma[1] === 'Singleton') {
+                instructions.Singleton = true
+            }
+        }
+    }
 }
 function qmlimport(meta, compiledFile){
     for(let imp of meta){
@@ -1201,14 +1199,20 @@ while(queueFiles.length){
         code.push(`class ${className} extends ${compiledFile.instructions.getClassName()} {`)
     }
     
+    let SingletonName = className.split('_').pop()
     code.push(`constructor(parent, exCtx) {`)
+    if(compiledFile.instructions.Singleton) code.push(`if(Singletons['${SingletonName}']) return Singletons['${SingletonName}']`)
     code.push(`super(parent, exCtx)`)
+    if(compiledFile.instructions.Singleton) code.push(`Singletons['${SingletonName}'] = this`)
+    // if(compiledFile.instructions.Singleton) code.push(`Singletons['${SingletonName}'] = this`)
     code.push(`let inCtx = new ContextController(exCtx)`)
 
     treeCompile(compiledFile, compiledFile.instructions)
 
     code.push(`}`)
     code.push(`}`)
+    if(compiledFile.instructions.Singleton) code.push(`SingletonClass['${SingletonName}'] = ${className}`)
+
 }
 
 // console.log(code.join('\n'))
