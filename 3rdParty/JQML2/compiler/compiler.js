@@ -521,6 +521,9 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
                     } catch (error) {
                         if(tree[1] === 'XMLHttpRequest'){
                             stat.value.push(`XMLHttpRequest`)
+                        } else if(tree[1] in Qt){
+                            stat.compute = true
+                            stat.value.push(`Qt.${tree[1]}`)
                         } else {
                             stat.compute = true
                             stat.value.push(`inCtx.get('${tree[1]}')`)
@@ -592,7 +595,12 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
         }
         case 'unary-prefix': {
             stat.compute = true
-            stat.value.push(tree[1])
+            if(tree[1] === 'typeof'){
+                stat.value.push(`${tree[1]} `)
+            } else {
+                stat.value.push(tree[1])
+            }
+            
             prepare(tree[2], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)  
             stat.value.push('\n')
             break

@@ -67,6 +67,12 @@ class QObject extends ComplexObject {
         this.children().push(child)
     }
 
+    createComponent(path, parent){
+        let className = path.replaceAll('/', '_').replaceAll('\\', '_').replaceAll('.qml', '')
+        let cls = eval(className)
+        return new cls(parent)
+    }
+
     $destroy(){
         delete UIDList[this.UID]
 

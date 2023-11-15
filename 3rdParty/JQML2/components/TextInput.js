@@ -161,6 +161,9 @@ class TextInput extends Item {
         this.getProperty('contentHeight').reset(this.$input.scrollHeight)
     }
 
+    selectAll(){
+        this.$input.select()
+    }
 
     onWheel(x, y, deltaX, deltaY){
         if(this.getPropertyValue('enabled')) {
