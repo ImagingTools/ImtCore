@@ -468,6 +468,20 @@ function testProperty(name, currentInstructions){
     return false
 }
 
+function getSignalParams(name, currentInstructions){
+    let component = components[currentInstructions.getClassName()]
+    if(component)
+    while(component.defaultSignals){
+        if(name in component.defaultSignals){
+            return component.defaultSignals[name].params
+        }
+        component = component.__proto__
+    }
+    if(name in currentInstructions.defineSignals) return currentInstructions.defineSignals[name]
+    if(currentInstructions.extends) return getSignalParams(name, currentInstructions.extends.instructions)
+    return []
+}
+
 function prepare(tree, compiledFile, currentInstructions, stat = null, propValue = false, assign = false, prevCommand = '', currentObj = {}){ 
     if(tree)
     switch(tree[0]){
@@ -494,7 +508,13 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
                 prepare(tree[3], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
                 stat.value.push(`)`)
             } else {
-                stat.value.push(`=`)
+                if(tree[1] === true) {
+                    stat.value.push(`=`)
+                } else {
+                    if(tree[1]) stat.value.push(tree[1])
+                    stat.value.push(`=`)
+                }
+                
                 prepare(tree[3], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
             }
             stat.value.push(`;`)
@@ -509,7 +529,7 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
                 stat.value.push(`inCtx.get('${tree[1]}')`)
                 currentObj.name = `inCtx.${tree[1]}`
             } else {
-                if(stat.ignore.indexOf(tree[1]) >= 0 || tree[1] === 'true' || tree[1] === 'false' || tree[1] === 'this'){
+                if(stat.ignore.indexOf(tree[1]) >= 0 || stat.params.indexOf(tree[1]) >= 0 || tree[1] === 'true' || tree[1] === 'false' || tree[1] === 'this'){
                     stat.value.push(tree[1])
                 } else if(testName(tree[1], currentInstructions)){
                     stat.compute = true
@@ -883,6 +903,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             subscribe: [],
             value: [],
             ignore: [],
+            params: [],
         }
         if(property.val) {
             try {
@@ -966,6 +987,14 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             subscribe: [],
             value: [],
             ignore: [],
+            params: [],
+        }
+
+        if(!linkedProperty){
+            for(let p of getSignalParams(name, currentInstructions)){
+                stat.params.push(p.replaceAll('`', ''))
+                // stat.ignore.push(p.replaceAll('`', ''))
+            }
         }
         
         try {
@@ -973,11 +1002,16 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
         } catch (error) {
             console.log('error', compiledFile.fileName, 'signal', signal.name)
         }
+
+        for(let ignore of stat.ignore){
+            let index = stat.params.indexOf(ignore)
+            if(index >= 0) stat.params[index] = '$'+stat.params[index]
+        }
         
         if(linkedProperty){
             code.push(`${currentInstructions.name}.getStatement('${name}').getNotify().connect(${currentInstructions.name}, function(){${stat.value.join('')}})`)
         } else {
-            code.push(`${currentInstructions.name}.getStatement('${name}').connect(${currentInstructions.name}, function(){${stat.value.join('')}})`)
+            code.push(`${currentInstructions.name}.getStatement('${name}').connect(${currentInstructions.name}, function(${stat.params.join(',')}){${stat.value.join('')}})`)
         }
         
         
@@ -1015,6 +1049,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             value: [],
             ignore: [],
             type: property.type,
+            params: [],
         }
         if(property.isElement){
             if(property.command === 'create'){
@@ -1125,17 +1160,31 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             subscribe: [],
             value: [],
             ignore: [],
+            params: [],
         }
+
+        if(!linkedProperty){
+            for(let p of getSignalParams(name, currentInstructions)){
+                stat.params.push(p.replaceAll('`', ''))
+                // stat.ignore.push(p.replaceAll('`', ''))
+            }
+        }
+
         try {
             prepare(signal.val, compiledFile, currentInstructions, stat, true, false, '', {})
         } catch (error) {
             console.log('error', compiledFile.fileName, 'signal', signal.name)
         }
+
+        for(let ignore of stat.ignore){
+            let index = stat.params.indexOf(ignore)
+            if(index >= 0) stat.params[index] = '$'+stat.params[index]
+        }
         
         if(linkedProperty){
             code.push(`${currentInstructions.name}.getStatement('${name}').getNotify().connect(${currentInstructions.name}, function(){${stat.value.join('')}})`)
         } else {
-            code.push(`${currentInstructions.name}.getStatement('${name}').connect(${currentInstructions.name}, function(){${stat.value.join('')}})`)
+            code.push(`${currentInstructions.name}.getStatement('${name}').connect(${currentInstructions.name}, function(${stat.params.join(',')}){${stat.value.join('')}})`)
         }
         
         
@@ -1148,6 +1197,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             subscribe: [],
             value: [],
             ignore: [],
+            params: [],
         }
         try {
             prepare(currentInstructions.methods[name].val, compiledFile, currentInstructions, stat, true, false, '', {})

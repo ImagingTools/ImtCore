@@ -65,6 +65,7 @@ class Repeater extends Item {
         }
         delete this.parent().preventAutoUpdateGeometry
         if(this.parent().updateGeometry) this.parent().updateGeometry()
+        this.getProperty('count').reset(this.$items.length)
     }
 
 }
