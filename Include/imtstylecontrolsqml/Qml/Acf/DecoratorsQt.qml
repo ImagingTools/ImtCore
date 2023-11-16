@@ -438,22 +438,9 @@ Item {
 
             visible: true;
 
-            property int buttonIds: 0;//!baseElement ? 0 : baseElement.buttonIds;//  Dialog.Yes | Dialog.No;
+            property int buttonIds: 0;
             property var baseElement: null;
             property Item rootItem: null;
-
-            onButtonIdsChanged: {
-//                standardButtons = buttonIds;
-                console.log("DecoratorsQt::buttonIds ", buttonIds)
-            }
-
-            onAccepted: {
-                //console.log("DecoratorsQt::Dialog::accepted()");
-            }
-            onRejected: {
-                //console.log("DecoratorsQt::Dialog::rejected()");
-            }
-
         }
     }
 
