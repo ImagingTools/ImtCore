@@ -13,6 +13,7 @@ ServerNoConnectionView 1.0 ./Application/ServerNoConnectionView.qml
 AlertMessage 1.0 ./Application/AlertMessage.qml
 ApplicationInfoProvider 1.0 ./Application/ApplicationInfoProvider.qml
 ControlBase 1.0 ./Base/ControlBase.qml
+Enums 1.0 ./Base/Enums.qml
 Button 1.0 ./Buttons/Button.qml
 ButtonDecorator 1.0 ./Buttons/ButtonDecorator.qml
 RadioButton 1.0 ./Buttons/RadioButton.qml
@@ -25,6 +26,7 @@ TopButtonDecorator 1.0 ./Buttons/TopButtonDecorator.qml
 TopButtonDecoratorNew 1.0 ./Buttons/TopButtonDecoratorNew.qml
 ButtonsDialog 1.0 ./Dialogs/ButtonsDialog.qml
 Dialog 1.0 ./Dialogs/Dialog.qml
+DialogNew 1.0 ./Dialogs/DialogNew.qml
 ErrorDialog 1.0 ./Dialogs/ErrorDialog.qml
 InputDialog 1.0 ./Dialogs/InputDialog.qml
 InputDialogBody 1.0 ./Dialogs/InputDialogBody.qml

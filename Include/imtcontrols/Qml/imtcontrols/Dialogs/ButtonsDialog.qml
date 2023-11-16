@@ -9,7 +9,8 @@ Item {
     height: 30;
     width: rowButtons.width;
 
-    property alias buttons: buttonsModel;
+    property alias buttons: buttonsRepeater.model;
+    property int count: buttonsRepeater.count;
 
     signal buttonClicked(string buttonId);
 

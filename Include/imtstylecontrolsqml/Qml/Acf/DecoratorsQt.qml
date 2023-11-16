@@ -429,10 +429,31 @@ Item {
 
     Component {
         id: dialogDecoratorComp;
-        Item {
-            id: dialogItem;
 
+        Dialog {
+            id: confirmationDialog
+
+            title: !baseElement ? "Title" : baseElement.title;
+            standardButtons: buttonIds;
+
+            visible: true;
+
+            property int buttonIds: 0;//!baseElement ? 0 : baseElement.buttonIds;//  Dialog.Yes | Dialog.No;
             property var baseElement: null;
+            property Item rootItem: null;
+
+            onButtonIdsChanged: {
+//                standardButtons = buttonIds;
+                console.log("DecoratorsQt::buttonIds ", buttonIds)
+            }
+
+            onAccepted: {
+                //console.log("DecoratorsQt::Dialog::accepted()");
+            }
+            onRejected: {
+                //console.log("DecoratorsQt::Dialog::rejected()");
+            }
+
         }
     }
 

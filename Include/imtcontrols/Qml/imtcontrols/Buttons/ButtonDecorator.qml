@@ -39,8 +39,8 @@ Rectangle{
         id: textObj
 
         anchors.verticalCenter: commonButtonDecorator.verticalCenter
-        anchors.left: !baseElement ? commonButtonDecorator.left : baseElement.iconSource === "" ? parent.left : iconObj.right
-        anchors.leftMargin: !baseElement ? 0 : baseElement.iconSource === "" ? parent.width/2 - width/2 : Style.paddingSmall
+        anchors.left: !baseElement ? commonButtonDecorator.left : baseElement.iconSource === "" ? commonButtonDecorator.left : iconObj.right
+        anchors.leftMargin: !baseElement ? 0 : baseElement.iconSource === "" ? commonButtonDecorator.width/2 - width/2 : Style.paddingSmall
 
         color: !baseElement ? "transtarent" : baseElement.enabled ? Style.textColor : Style.inactive_textColor
 

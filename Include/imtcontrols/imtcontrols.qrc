@@ -14,6 +14,7 @@
 		<file alias="imtcontrols/Application/ApplicationInfoProvider.qml">Qml/imtcontrols/Application/ApplicationInfoProvider.qml</file>
 		<file alias="imtcontrols/Application/AlertMessage.qml">Qml/imtcontrols/Application/AlertMessage.qml</file>
                 <file alias="imtcontrols/Base/ControlBase.qml">Qml/imtcontrols/Base/ControlBase.qml</file>
+                <file alias="imtcontrols/Base/Enums.qml">Qml/imtcontrols/Base/Enums.qml</file>
                 <file alias="imtcontrols/Buttons/Button.qml">Qml/imtcontrols/Buttons/Button.qml</file>
 		<file alias="imtcontrols/Buttons/ButtonDecorator.qml">Qml/imtcontrols/Buttons/ButtonDecorator.qml</file>
                 <file alias="imtcontrols/Buttons/RadioButton.qml">Qml/imtcontrols/Buttons/RadioButton.qml</file>
@@ -24,8 +25,9 @@
 		<file alias="imtcontrols/Buttons/ToolButtonDecorator.qml">Qml/imtcontrols/Buttons/ToolButtonDecorator.qml</file>
 		<file alias="imtcontrols/Buttons/TopButtonDecorator.qml">Qml/imtcontrols/Buttons/TopButtonDecorator.qml</file>
 		<file alias="imtcontrols/Buttons/TopButtonDecoratorNew.qml">Qml/imtcontrols/Buttons/TopButtonDecoratorNew.qml</file>
-		<file alias="imtcontrols/Dialogs/ButtonsDialog.qml">Qml/imtcontrols/Dialogs/ButtonsDialog.qml</file>
+                <file alias="imtcontrols/Dialogs/ButtonsDialog.qml">Qml/imtcontrols/Dialogs/ButtonsDialog.qml</file>
 		<file alias="imtcontrols/Dialogs/Dialog.qml">Qml/imtcontrols/Dialogs/Dialog.qml</file>
+                <file alias="imtcontrols/Dialogs/DialogNew.qml">Qml/imtcontrols/Dialogs/DialogNew.qml</file>
 		<file alias="imtcontrols/Dialogs/ErrorDialog.qml">Qml/imtcontrols/Dialogs/ErrorDialog.qml</file>
 		<file alias="imtcontrols/Dialogs/InputDialog.qml">Qml/imtcontrols/Dialogs/InputDialog.qml</file>
 		<file alias="imtcontrols/Dialogs/InputDialogBody.qml">Qml/imtcontrols/Dialogs/InputDialogBody.qml</file>
