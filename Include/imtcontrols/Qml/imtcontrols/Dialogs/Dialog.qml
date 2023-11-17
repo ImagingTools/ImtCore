@@ -194,9 +194,10 @@ ControlBase {
                 dialogContainer.decorator.rightPadding;
             dialogContainer.decorator.width = Math.max(width_, dialogContainer.decorator.footer.width);
 
+            let hasButtons = dialogContainer.buttonIds !== 0;
             dialogContainer.decorator.height = content_.height +
                     dialogContainer.decorator.header.height +
-                    dialogContainer.decorator.footer.height +
+                    dialogContainer.decorator.footer.height * hasButtons +
                     dialogContainer.decorator.topPadding +
                     dialogContainer.decorator.bottomPadding;
         }
@@ -241,7 +242,7 @@ ControlBase {
         visible: !Style.isQtStyle;
         spacing: 10;
 
-        property real bodyWidth: !loaderBodyDialog.item ? 1 : loaderBodyDialog.item.width;
+        property real bodyWidth: !loaderBodyDialog.item ? 1 : loaderBodyDialog.item.width + 20;
         property real buttonsWidth: buttonsContainer.width + 2 * buttonsContainer.anchors.rightMargin;
 
         Item {
