@@ -342,10 +342,75 @@ Item {
 
     Component {
         id: textAreaDecoratorComp;
-        Item {
-            id: textAreaItem;
+        Flickable {
+            id: flick;
 
-            property var baseElement: null;
+            width: 200;
+            height: 30;
+
+            contentWidth: edit.paintedWidth;
+            contentHeight: edit.paintedHeight;
+            clip: true;
+            z: baseElement ? 1 : -1;
+
+            property var baseElement;
+            property alias text: edit.text;
+
+            onHeightChanged: {
+                if(flick.baseElement){
+                    flick.baseElement.height = height;
+                }
+            }
+
+            onFocusChanged: {
+                if(focus){
+                    edit.forceActiveFocus();
+                }
+            }
+
+            function ensureVisible(r)
+            {
+                if (contentX >= r.x)
+                    contentX = r.x;
+                else if (contentX+width <= r.x+r.width)
+                    contentX = r.x+r.width-width;
+                if (contentY >= r.y)
+                    contentY = r.y;
+                else if (contentY+height <= r.y+r.height)
+                    contentY = r.y+r.height-height;
+            }
+
+            function setHeight(){
+                //console.log("setHeight")
+                height = 30;
+            }
+
+            TextArea {
+                id: edit
+
+                width: flick.width;
+                focus: true;
+                wrapMode: TextEdit.Wrap;
+                font.pixelSize: 15;
+                clip: true;
+
+                onCursorRectangleChanged: {
+                    flick.ensureVisible(cursorRectangle);
+                }
+
+                onTextChanged: {
+                    if(flick.baseElement){
+                        flick.baseElement.text = text;
+                    }
+                }
+
+                onEditingFinished: {
+                    if(flick.baseElement){
+                        flick.baseElement.editingFinished();
+                    }
+                }
+
+            }
         }
     }
 

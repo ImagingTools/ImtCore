@@ -144,7 +144,7 @@ Item {
         id: textEditDecoratorComp;
 
         Item{
-            id: textEditItem;
+            id: textAreaItem;
 
             width: 200;
             height: 30;
@@ -162,11 +162,11 @@ Item {
 
                 anchors.fill: parent;
 
-                color: !textEditItem.baseElement ? "transparent" : textEditItem.baseElement.readOnly ? Style.alternateBaseColor : Style.baseColor;
+                color: !textAreaItem.baseElement ? "transparent" : textAreaItem.baseElement.readOnly ? Style.alternateBaseColor : Style.baseColor;
 
-                radius: !textEditItem.baseElement ? 0 : textEditItem.baseElement.radius;
+                radius: !textAreaItem.baseElement ? 0 : textAreaItem.baseElement.radius;
 
-                border.color: !textEditItem.baseElement ? "transparent" : textEditItem.baseElement.borderColorConst !== "" ? textEditItem.baseElement.borderColorConst: textEditItem.baseElement.activeFocus ? textEditItem.baseElement.borderColor : Style.hover;
+                border.color: !textAreaItem.baseElement ? "transparent" : textAreaItem.baseElement.borderColorConst !== "" ? textAreaItem.baseElement.borderColorConst: textAreaItem.baseElement.activeFocus ? textAreaItem.baseElement.borderColor : Style.hover;
 
                 border.width: 1;
             }
@@ -175,7 +175,7 @@ Item {
                 id: placeHolder;
 
                 anchors.left: parent.left;
-                anchors.leftMargin: !textEditItem.baseElement ? 0 : textEditItem.baseElement.margin;
+                anchors.leftMargin: !textAreaItem.baseElement ? 0 : textAreaItem.baseElement.margin;
                 anchors.verticalCenter: parent.verticalCenter;
 
 
@@ -183,29 +183,29 @@ Item {
                 font.family: Style.fontFamily;
 
                 //TODO -> Style
-                color: !textEditItem.baseElement ? "transparent" : textEditItem.baseElement.placeHolderFontColor;
-                opacity: !textEditItem.baseElement ? 0 : textEditItem.baseElement.placeHolderOpacity;
+                color: !textAreaItem.baseElement ? "transparent" : textAreaItem.baseElement.placeHolderFontColor;
+                opacity: !textAreaItem.baseElement ? 0 : textAreaItem.baseElement.placeHolderOpacity;
 
-                visible: !textEditItem.baseElement ? false : textEditItem.baseElement.text == "";
+                visible: !textAreaItem.baseElement ? false : textAreaItem.baseElement.text == "";
 
-                text: !textEditItem.baseElement ? "" : textEditItem.baseElement.placeHolderText;
+                text: !textAreaItem.baseElement ? "" : textAreaItem.baseElement.placeHolderText;
             }
 
             MouseArea {
                 id: mouseArea;
 
                 anchors.fill: parent;
-                cursorShape: !textEditItem.baseElement ? Qt.ArrowCursor : textEditItem.baseElement.readOnly ? Qt.ArrowCursor : Qt.IBeamCursor;
+                cursorShape: !textAreaItem.baseElement ? Qt.ArrowCursor : textAreaItem.baseElement.readOnly ? Qt.ArrowCursor : Qt.IBeamCursor;
 
-                visible: !textEditItem.baseElement ? false : !textEditItem.baseElement.readOnly;
+                visible: !textAreaItem.baseElement ? false : !textAreaItem.baseElement.readOnly;
 
                 acceptedButtons: Qt.RightButton;
 
                 onClicked: {
                     let point = mapToItem(null, mouse.x, mouse.y);
                     console.log("inputActions");
-                    if(textEditItem.baseElement){
-                        textEditItem.baseElement.openInputAction(point.x, point.y)
+                    if(textAreaItem.baseElement){
+                        textAreaItem.baseElement.openInputAction(point.x, point.y)
                     }
                 }
             }
@@ -627,10 +627,72 @@ Item {
 
     Component {
         id: textAreaDecoratorComp;
-        Item {
+        Item{
             id: textAreaItem;
 
-            property var baseElement: null;
+            width: 200;
+            height: 30;
+            z: -1;
+
+            property var baseElement;
+            property string text: "";
+
+            function setHeight(){
+                //console.log("setHeight");
+            }
+
+            Rectangle {
+                id: mainRect;
+
+                anchors.fill: parent;
+
+                color: !textAreaItem.baseElement ? "transparent" : textAreaItem.baseElement.readOnly ? Style.alternateBaseColor : Style.baseColor;
+
+                radius: !textAreaItem.baseElement ? 0 : textAreaItem.baseElement.radius;
+
+                border.color: !textAreaItem.baseElement ? "transparent" : textAreaItem.baseElement.borderColorConst !== "" ? textAreaItem.baseElement.borderColorConst: textAreaItem.baseElement.activeFocus ? textAreaItem.baseElement.borderColor : Style.hover;
+
+                border.width: 1;
+            }
+
+            Text {
+                id: placeHolder;
+
+                anchors.left: parent.left;
+                anchors.leftMargin: !textAreaItem.baseElement ? 0 : textAreaItem.baseElement.margin;
+                anchors.verticalCenter: parent.verticalCenter;
+
+
+                font.pixelSize: Style.fontSize_common;
+                font.family: Style.fontFamily;
+
+                //TODO -> Style
+                color: !textAreaItem.baseElement ? "transparent" : textAreaItem.baseElement.placeHolderFontColor;
+                opacity: !textAreaItem.baseElement ? 0 : textAreaItem.baseElement.placeHolderOpacity;
+
+                visible: !textAreaItem.baseElement ? false : textAreaItem.baseElement.text == "";
+
+                text: !textAreaItem.baseElement ? "" : textAreaItem.baseElement.placeHolderText;
+            }
+
+            MouseArea {
+                id: mouseArea;
+
+                anchors.fill: parent;
+                cursorShape: !textAreaItem.baseElement ? Qt.ArrowCursor : textAreaItem.baseElement.readOnly ? Qt.ArrowCursor : Qt.IBeamCursor;
+
+                visible: !textAreaItem.baseElement ? false : !textAreaItem.baseElement.readOnly;
+
+                acceptedButtons: Qt.RightButton;
+
+                onClicked: {
+                    let point = mapToItem(null, mouse.x, mouse.y);
+                    console.log("inputActions");
+                    if(textAreaItem.baseElement){
+                        textAreaItem.baseElement.openInputAction(point.x, point.y)
+                    }
+                }
+            }
         }
     }
 
