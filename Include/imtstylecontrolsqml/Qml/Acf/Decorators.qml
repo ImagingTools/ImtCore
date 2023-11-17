@@ -20,7 +20,6 @@ Item {
     property Component rangeSliderDecorator: rangeSliderDecoratorComp
     property Component radioButtonDecorator: radioButtonDecoratorComp
 
-    //to do
     property Component textAreaDecorator: textAreaDecoratorComp
     property Component spinBoxDecorator: spinBoxDecoratorComp
 

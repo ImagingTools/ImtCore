@@ -13,6 +13,13 @@ Item{
     property string backgroundColor: Style.backgroundColor;
     property int radius: 0;
 
+    property string notClosingButtons: "";
+    property bool centered: true;
+    property bool hasIcon: true;
+
+    property string bodySource;
+    property string topPanelSource;
+
     signal finished(string buttonId);
 
     signal accepted();
@@ -36,6 +43,13 @@ Item{
 
             backgroundColor: dialog.backgroundColor;
             radius: dialog.radius;
+
+            notClosingButtons: dialog.notClosingButtons;
+            centered: dialog.centered;
+            hasIcon: dialog.hasIcon;
+
+            bodySource: dialog.bodySource;
+            topPanelSource: dialog.topPanelSource;
 
             Component.onCompleted: {
                 dialogComponent.finished.connect(dialog.finished);
