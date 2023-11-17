@@ -48,12 +48,27 @@ QtObject {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", modelId);
+
             if (externInputParams){
                 let keys = Object.keys(externInputParams)
                 for (let key of keys){
-                    inputParams.InsertField(key, externInputParams[key]);
+                    if (typeof externInputParams[key] === "object"){
+                        let objectParams = externInputParams[key];
+                        console.log("_DEBUG_", objectParams)
+                        if (Object.keys(objectParams).length > 0){
+                            let inputObject = Gql.GqlObject(key);
+                            for (let keyObject in objectParams){
+                                inputObject.InsertField(keyObject, objectParams[keyObject]);
+                            }
+                            inputParams.InsertFieldObject(inputObject);
+                        }
+                    }
+                    else{
+                        inputParams.InsertField(key, externInputParams[key]);
+                    }
                 }
             }
+
             query.AddParam(inputParams);
 
             var gqlData = query.GetQuery();
