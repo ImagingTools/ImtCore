@@ -64,7 +64,7 @@ Item {
     property alias commandsProvider: commandsProvider;
     property alias paginationCurrentIndex: gridCollectionViewBase.paginationCurrentIndex;
     property alias paginationPageSize: gridCollectionViewBase.paginationPageSize;
-
+    property alias hasPagination: gridCollectionViewBase.hasPagination;
 
 
     Component.onCompleted: {

@@ -12,6 +12,8 @@ Item {
     property string systemStatus: "NO_ERROR";
     property alias localSettings: application.settingsProvider.localModel;
 
+    property alias thumbDecMenuPanelRadius: thumbnailDecorator.menuPanelRadius;
+
     property var applicationInfo;
 
     property bool serverReady: false;

@@ -28,6 +28,8 @@ Rectangle {
     property alias documentManager: mainDocumentManager;
     property alias dialogManager: modalDialogManager;
 
+    property alias menuPanelRadius: menuPanel.radius;
+
     property var applicationMain: null;
 
     property SettingsProvider settingsProvider: null;
