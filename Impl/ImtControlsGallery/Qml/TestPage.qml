@@ -236,4 +236,43 @@ Rectangle {
         color: "brown";
     }
 
+    //background change test
+    Rectangle{
+        id: backgroundTest;
+
+        anchors.centerIn: parent;
+
+        width: 100;
+        height: 100;
+        border.color: "brown";
+
+        property Item background: Rectangle{
+            anchors.fill: parent;
+            color: "orange";
+        };
+
+        function setBackgroud(){
+            if(!backgroundItem.children.length){
+                backgroundItem.children = [];
+                backgroundItem.children.push(background);
+            }
+        }
+        Component.onCompleted: {
+            setBackgroud();
+        }
+
+        onBackgroundChanged: {
+            setBackgroud();
+        }
+
+        Item{
+            id: backgroundItem;
+
+            anchors.centerIn: parent;
+
+            width: parent.width - 8;
+            height: parent.height - 8;
+        }
+    }
+
 }

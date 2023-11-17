@@ -49,7 +49,11 @@ Rectangle {
 
                 anchors.verticalCenter: parent.verticalCenter;
 
-                placeHolderText: "placeHolder";
+                placeHolderText: "TextField";
+
+                KeyNavigation.right: textEdit;
+                KeyNavigation.tab: textEdit;
+
             }
 
             Rectangle{
@@ -68,7 +72,33 @@ Rectangle {
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.horizontalCenter: parent.horizontalCenter;
 
-                    placeHolderText: "placeHolder";
+                    placeHolderText: "TextEdit";
+
+                    KeyNavigation.right: textArea;
+                    KeyNavigation.tab: textArea;
+                }
+            }
+
+            Rectangle{
+                id: textAreaBackground;
+
+                anchors.verticalCenter:  parent.verticalCenter;
+
+                width: textArea.width + 20;
+                height: textArea.height + 20;
+
+                color: Style.backgroundColor;
+
+                TextArea{
+                    id: textArea;
+
+                    anchors.verticalCenter: parent.verticalCenter;
+                    anchors.horizontalCenter: parent.horizontalCenter;
+
+                    placeHolderText: "TextArea";
+
+                    KeyNavigation.right: combobox;
+                    KeyNavigation.tab: combobox;
                 }
             }
 
@@ -79,6 +109,9 @@ Rectangle {
 
                 model: comboModel;
                 placeHolderText: "ComboBox"
+
+                KeyNavigation.right: textField;
+                KeyNavigation.tab: textField;
 
             }
 
