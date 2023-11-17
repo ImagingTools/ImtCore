@@ -8,5 +8,6 @@
         <file alias="IndicatorsRepresentaitonPage.qml">Qml/IndicatorsRepresentaitonPage.qml</file>
         <file alias="DialogsRepresentaitonPage.qml">Qml/DialogsRepresentaitonPage.qml</file>
         <file alias="TestPage.qml">Qml/TestPage.qml</file>
+        <file alias="CanvasTestPage.qml">Qml/CanvasTestPage.qml</file>
     </qresource>
 </RCC>
