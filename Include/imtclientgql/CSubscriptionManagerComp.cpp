@@ -40,8 +40,21 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 		return QByteArray();
 	}
 
+	QByteArray clientId;
+	const imtgql::CGqlRequest* cGqlRequest = dynamic_cast<const imtgql::CGqlRequest*>(&subscriptionRequest);
+	if (cGqlRequest != nullptr){
+	 cGqlRequest->GetParams();
+	 const imtgql::CGqlObject* input = cGqlRequest->GetParam("input");
+	 if (input != nullptr){
+		 const imtgql::CGqlObject* addition = input->GetFieldArgumentObjectPtr("addition");
+		 if (addition != nullptr){
+			 clientId = addition->GetFieldArgumentValue("clientId").toByteArray();
+		 }
+	 }
+	}
+
 	for (QByteArray subscriptionId : m_registeredClients.keys()){
-		if (m_registeredClients[subscriptionId].m_request.IsEqual(subscriptionRequest)){
+		if (m_registeredClients[subscriptionId].m_request.IsEqual(subscriptionRequest) && m_registeredClients[subscriptionId].m_clientId == clientId){
 			m_registeredClients[subscriptionId].m_clients.append(subscriptionClient);
 
 			return subscriptionId;
@@ -52,6 +65,7 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 
 	SubscriptionHelper subscriptionHelper;
 	subscriptionHelper.m_request = subscriptionRequest;
+	subscriptionHelper.m_clientId = clientId;
 	subscriptionHelper.m_status = imtclientgql::IGqlSubscriptionClient::SS_IN_REGISTRATION;
 	subscriptionHelper.m_clients.append(subscriptionClient);
 	m_registeredClients.insert(subscriptionId.toLocal8Bit(), subscriptionHelper);
@@ -88,12 +102,12 @@ void CSubscriptionManagerComp::OnUpdate(const istd::IChangeable::ChangeSet& chan
 
 	for (QByteArray subscriptionId : m_registeredClients.keys()){
 		if (m_loginStatus != imtauth::ILoginStatusProvider::LSF_LOGGED_IN){
-			if (subscriptionId == clientId){
+			if (m_registeredClients[subscriptionId].m_clientId == clientId){
 				m_registeredClients[subscriptionId].m_status = imtclientgql::IGqlSubscriptionClient::SS_IN_REGISTRATION;
 			}
 		}
 		else{
-			if (subscriptionId == clientId){
+			if (m_registeredClients[subscriptionId].m_clientId == clientId){
 				ServiceManagerRegister(m_registeredClients[subscriptionId].m_request, subscriptionId);
 			}
 		}
