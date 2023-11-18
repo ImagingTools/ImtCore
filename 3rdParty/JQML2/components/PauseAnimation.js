@@ -4,7 +4,7 @@ const { QReal } = require('../utils/properties')
 class PauseAnimation extends Animation {
 
     static defaultProperties = {
-        duration: { type: QReal, value: 250, changed: 'durationChanged' },
+        duration: { type: QReal, value: 250, changed: '$durationChanged' },
 
     }
 
@@ -25,7 +25,7 @@ class PauseAnimation extends Animation {
         }
     }
 
-    durationChanged(){
+    $durationChanged(){
         this.$duration = this.getPropertyValue('duration')
     }
 

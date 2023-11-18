@@ -9,12 +9,12 @@ class FontLoader extends QtObject {
 
     static defaultProperties = {
         name: { type: QString, value: '' },
-        source: { type: QString, value: '', changed: 'sourceChanged' },
+        source: { type: QString, value: '', changed: '$sourceChanged' },
         status: { type: QReal, value: FontLoader.Null },
     }
     
     
-    sourceChanged(){
+    $sourceChanged(){
         if(this.$font) document.fonts.delete(this.$font)
 
         let path = this.getPropertyValue('source').split('/')
@@ -23,8 +23,8 @@ class FontLoader extends QtObject {
         // let xhr = new XMLHttpRequest()
         // xhr.responseType = "arraybuffer"
         // xhr.open('GET', this.getPropertyValue('source'), true)
-        
-        this.$font = new FontFace(name, `url('${this.getPropertyValue('source')}')`)
+        path = rootPath+'/'+this.getProperty('source').get().replaceAll('../','')
+        this.$font = new FontFace(name, `url('${path.replaceAll('//','/')}')`)
         this.$font.load().then(()=>{
             document.fonts.add(this.$font)
             this.getProperty('name').reset(name)

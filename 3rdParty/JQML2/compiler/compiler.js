@@ -432,13 +432,18 @@ function testName(name, currentInstructions){
     if(inExtends) return true
     
     let component = components[currentInstructions.getClassName()]
-    if(component)
-    while(component.defaultProperties){
-        if(name in component.defaultProperties){
-            return true
+
+    if(component){
+        if(name in component.prototype) return true
+        while(component.defaultProperties){
+        
+            if(name in component.defaultProperties){
+                return true
+            }
+            component = component.__proto__
         }
-        component = component.__proto__
     }
+    
     for(let prop of currentInstructions.properties){
         if(prop.name === name) return true
     }
@@ -834,14 +839,22 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
                 } else if(tree.length === 2){
                     if(compiledFile.context[tree[0]]){
                         if(tree[1]){
-                            stat.value.push(`inCtx.get('${tree[0]}').getStatement('${tree[1]}')`)
+                            let path = tree[1].split('.')
+                            for(let i = 0; i < path.length; i++){
+                                path[i] = `getStatement('${path[i]}')`
+                            }
+                            stat.value.push(`inCtx.get('${tree[0]}').${path.join('.')}`)
                         } else {
                             stat.value.push(`inCtx.get('${tree[0]}')`)
                         }
                         
                     } else {
                         if(tree[1]){
-                            stat.value.push(`${currentInstructions.name}.getStatement('${tree[0]}').getStatement('${tree[1]}')`)
+                            let path = tree[1].split('.')
+                            for(let i = 0; i < path.length; i++){
+                                path[i] = `getStatement('${path[i]}')`
+                            }
+                            stat.value.push(`${currentInstructions.name}.getStatement('${tree[0]}').${path.join('.')}`)
                         } else {
                             stat.value.push(`${currentInstructions.name}.getStatement('${tree[0]}')`)
                         }

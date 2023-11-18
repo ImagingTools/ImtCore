@@ -7,7 +7,7 @@ class PropertyAnimation extends Animation {
         duration: { type: QReal, value: 250 },
         to: { type: QVar, value: undefined },
         from: { type: QVar, value: undefined },
-        property: { type: QString, value: '', changed: 'propertyChanged'},
+        property: { type: QString, value: '', changed: '$propertyChanged'},
         properties: { type: QString, value: '' },
         target: { type: QVar, value: undefined },
 
@@ -65,7 +65,7 @@ class PropertyAnimation extends Animation {
         }
     }
     
-    propertyChanged(){
+    $propertyChanged(){
         this.getProperty('properties').reset(this.getPropertyValue('property'))
     }
 

@@ -3,10 +3,10 @@ const { QColor, QBorder, QReal, QVar } = require('../utils/properties')
 
 class Rectangle extends Item {
     static defaultProperties = {
-        color: { type: QColor, value: 'white', changed: 'colorChanged' },
-        border: { type: QBorder, changed: 'borderChanged' },
-        gradient: { type: QVar, value: undefined, changed: 'gradientChanged' },
-        radius: { type: QReal, value: 0, changed: 'radiusChanged' },
+        color: { type: QColor, value: 'white', changed: '$colorChanged' },
+        border: { type: QBorder, changed: '$borderChanged' },
+        gradient: { type: QVar, value: undefined, changed: '$gradientChanged' },
+        radius: { type: QReal, value: 0, changed: '$radiusChanged' },
     }
 
     constructor(parent){
@@ -15,7 +15,7 @@ class Rectangle extends Item {
 
     }
 
-    gradientChanged(){
+    $gradientChanged(){
         if(this.getPropertyValue('gradient')) {
             let style = []
             
@@ -34,7 +34,7 @@ class Rectangle extends Item {
         }
     }
 
-    colorChanged(){
+    $colorChanged(){
         let rgba = this.getProperty('color').toRGBA()
         this.setStyle({
             opacity: 1,
@@ -42,20 +42,20 @@ class Rectangle extends Item {
         })
     }
 
-    radiusChanged(){
+    $radiusChanged(){
         this.setStyle({
             borderRadius: `${this.getProperty('radius').get()}px`
         })
     }
 
-    borderChanged(){
+    $borderChanged(){
         this.setStyle({
             outline: `${this.getProperty('border').getProperty('width').get()}px solid ${this.getProperty('border').getProperty('color').get()}`,
             outlineOffset: `-${this.getProperty('border').getProperty('width').get()}px`,
         })
     }
 
-    opacityChanged(){
+    $opacityChanged(){
         let rgba = this.getProperty('color').toRGBA()
         this.setStyle({
             opacity: 1,

@@ -1,5 +1,5 @@
 const { Item } = require('./Item')
-const { QColor, QBool, QReal, QFont, QVar, QString } = require('../utils/properties')
+const { QColor, QBool, QReal, QFont, QVar, QString, QInt } = require('../utils/properties')
 
 class TextInput extends Item {
     static AlignLeft = 0
@@ -21,20 +21,22 @@ class TextInput extends Item {
     static PasswordEchoOnEdit = 3
 
     static defaultProperties = {
-        text: { type: QString, value: '', changed: 'textChanged' },
-        color: { type: QColor, value: 'black', changed: 'colorChanged' },
-        selectionColor: { type: QColor, value: '#000080', changed: 'selectionColorChanged' },
-        selectedTextColor: { type: QColor, value: '#fff', changed: 'selectedTextColorChanged' },
-        horizontalAlignment: { type: QReal, value: TextInput.AlignLeft, changed: 'horizontalAlignmentChanged' },
-        verticalAlignment: { type: QReal, value: TextInput.AlignTop, changed: 'verticalAlignmentChanged' },
-        wrapMode: { type: QReal, value: TextInput.NoWrap, changed: 'wrapModeChanged' },
-        echoMode: { type: QReal, value: TextInput.Normal, changed: 'echoModeChanged' },
-        readOnly: { type: QBool, value: false, changed: 'readOnlyChanged' },
+        text: { type: QString, value: '', changed: '$textChanged' },
+        color: { type: QColor, value: 'black', changed: '$colorChanged' },
+        selectionColor: { type: QColor, value: '#000080', changed: '$selectionColorChanged' },
+        selectedTextColor: { type: QColor, value: '#fff', changed: '$selectedTextColorChanged' },
+        horizontalAlignment: { type: QReal, value: TextInput.AlignLeft, changed: '$horizontalAlignmentChanged' },
+        verticalAlignment: { type: QReal, value: TextInput.AlignTop, changed: '$verticalAlignmentChanged' },
+        wrapMode: { type: QReal, value: TextInput.NoWrap, changed: '$wrapModeChanged' },
+        echoMode: { type: QReal, value: TextInput.Normal, changed: '$echoModeChanged' },
+        readOnly: { type: QBool, value: false, changed: '$readOnlyChanged' },
         acceptableInput: { type: QBool, value: true },
         validator: { type: QVar, value: undefined },
-        font: { type: QFont, changed: 'fontChanged' },
+        font: { type: QFont, changed: '$fontChanged' },
         contentHeight: { type: QReal, value: 0 },
         contentWidth: { type: QReal, value: 0 },
+        inputMask: { type: QString, value: '' },
+        maximumLength: { type: QInt, value: 32767, changed: '$maximumLengthChanged' },
     }
 
     static defaultSignals = {
@@ -76,22 +78,26 @@ class TextInput extends Item {
         }
     }
 
-    colorChanged(){
+    $colorChanged(){
         let rgba = this.getProperty('color').toRGBA()
         this.setStyle({
             color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.getProperty('color').get() === 'transparent' ? 0 : rgba.a * this.getPropertyValue('opacity')})`
         })
     }
 
-    selectionColorChanged(){
+    $selectionColorChanged(){
 
     }
 
-    selectedTextColorChanged(){
+    $selectedTextColorChanged(){
 
     }
 
-    horizontalAlignmentChanged(){
+    $maximumLengthChanged(){
+        this.$input.maxlength = this.getPropertyValue('maximumLength')
+    }
+
+    $horizontalAlignmentChanged(){
         switch(this.getPropertyValue('horizontalAlignment')){
             case Text.AlignLeft: this.setStyle({ justifyContent: 'flex-start' }); break;
             case Text.AlignRight: this.setStyle({ justifyContent: 'flex-end' }); break;
@@ -100,7 +106,7 @@ class TextInput extends Item {
         }
     }
 
-    verticalAlignmentChanged(){
+    $verticalAlignmentChanged(){
         switch(this.getPropertyValue('verticalAlignment')){
             case Text.AlignTop: this.setStyle({ alignItems: 'flex-start' }); break;
             case Text.AlignBottom: this.setStyle({ alignItems: 'flex-end' }); break;
@@ -108,11 +114,11 @@ class TextInput extends Item {
         }
     }
 
-    wrapModeChanged(){
+    $wrapModeChanged(){
 
     }
 
-    echoModeChanged(){
+    $echoModeChanged(){
         switch(this.getPropertyValue('echoMode')){
 			case TextInput.Normal: {
 				this.$input.type = "text"
@@ -125,7 +131,7 @@ class TextInput extends Item {
 		}
     }
 
-    readOnlyChanged(){
+    $readOnlyChanged(){
         if(this.getPropertyValue('readOnly')){
             this.$input.readOnly = true
         } else {
@@ -133,12 +139,12 @@ class TextInput extends Item {
         }
     }
 
-    textChanged(){
+    $textChanged(){
         this.$input.value = this.getPropertyValue('text')
         this.applyMetrics()
     }
 
-    fontChanged(){
+    $fontChanged(){
         if(this.getPropertyValue('text')){
             this.setStyle({
                 fontWeight: this.getProperty('font').getPropertyValue('bold') ? 'bold' : 'normal',

@@ -14,16 +14,16 @@ class Flickable extends Item {
     static DragAndOvershootBounds = 3
 
     static defaultProperties = {
-        contentWidth: { type: QAutoGeometry, value: -1, changed: 'contentWidthChanged' },
-        contentHeight: { type: QAutoGeometry, value: -1, changed: 'contentHeightChanged' },
-        contentX: { type: QPositiveReal, value: 0, changed: 'contentXChanged' },
-        contentY: { type: QPositiveReal, value: 0, changed: 'contentYChanged' },
+        contentWidth: { type: QAutoGeometry, value: -1, changed: '$contentWidthChanged' },
+        contentHeight: { type: QAutoGeometry, value: -1, changed: '$contentHeightChanged' },
+        contentX: { type: QPositiveReal, value: 0, changed: '$contentXChanged' },
+        contentY: { type: QPositiveReal, value: 0, changed: '$contentYChanged' },
         originX: { type: QReal, value: 0 },
         originY: { type: QReal, value: 0 },
         interactive: { type: QBool, value: true },
         contentItem: { type: QVar, value: null },
-        flickableDirection: { type: QReal, value: Flickable.AutoFlickDirection, changed: 'flickableDirectionChanged' },
-        boundsBehavior: { type: QReal, value: Flickable.DragAndOvershootBounds, changed: 'boundsBehaviorChanged' },
+        flickableDirection: { type: QReal, value: Flickable.AutoFlickDirection, changed: '$flickableDirectionChanged' },
+        boundsBehavior: { type: QReal, value: Flickable.DragAndOvershootBounds, changed: '$boundsBehaviorChanged' },
     }
 
     static defaultSignals = {
@@ -42,30 +42,30 @@ class Flickable extends Item {
         MouseController.add(this)
     }
 
-    contentXChanged(){
+    $contentXChanged(){
         this.getStatement('contentItem').get().getStatement('x').reset(-this.getStatement('contentX').get())
     }
 
-    contentYChanged(){
+    $contentYChanged(){
         this.getStatement('contentItem').get().getStatement('y').reset(-this.getStatement('contentY').get())
     }
 
 
-    contentWidthChanged(){
+    $contentWidthChanged(){
         this.getStatement('contentItem').get().getStatement('width').reset(this.getStatement('contentWidth').get())
         if(this.getPropertyValue('contentX') > this.getPropertyValue('contentWidth') - this.getPropertyValue('width')){
             this.getProperty('contentX').reset(this.getPropertyValue('contentWidth') - this.getPropertyValue('width'))
         }
     }
 
-    contentHeightChanged(){
+    $contentHeightChanged(){
         this.getStatement('contentItem').get().getStatement('height').reset(this.getStatement('contentHeight').get())
         if(this.getPropertyValue('contentY') > this.getPropertyValue('contentHeight') - this.getPropertyValue('height')){
             this.getProperty('contentY').reset(this.getPropertyValue('contentHeight') - this.getPropertyValue('height'))
         }
     }
   
-    flickableDirectionChanged(){
+    $flickableDirectionChanged(){
 
     }
 

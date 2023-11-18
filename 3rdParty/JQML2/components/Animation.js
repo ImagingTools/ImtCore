@@ -5,10 +5,10 @@ class Animation extends QtObject {
     static Infinite = -1
 
     static defaultProperties = {
-        loops: { type: QInt, value: 1, changed: 'loopsChanged' },
-        running: { type: QBool, value: false, changed: 'runningChanged' },
-        paused: { type: QBool, value: false, changed: 'pausedChanged' },
-        alwaysRunToEnd: { type: QBool, value: false, changed: 'alwaysRunToEndChanged' },
+        loops: { type: QInt, value: 1, changed: '$loopsChanged' },
+        running: { type: QBool, value: false, changed: '$runningChanged' },
+        paused: { type: QBool, value: false, changed: '$pausedChanged' },
+        alwaysRunToEnd: { type: QBool, value: false, changed: '$alwaysRunToEndChanged' },
 
     }
 
@@ -29,16 +29,16 @@ class Animation extends QtObject {
     tick() {
 
     }
-    alwaysRunToEndChanged() {
+    $alwaysRunToEndChanged() {
 
     }
-    loopsChanged() {
+    $loopsChanged() {
         this.$loops = 0
     }
-    pausedChanged() {
+    $pausedChanged() {
 
     }
-    runningChanged() {
+    $runningChanged() {
 
     }
 

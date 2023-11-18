@@ -14,16 +14,16 @@ class ListView extends Flickable {
     static SnapOneItem = 2
 
     static defaultProperties = {
-        model: { type: QVar, value: undefined, changed: 'modelChanged' },
-        delegate: { type: QVar, changed: 'delegateChanged' },
-        contentX: { type: QReal, value: 0, changed: 'contentXChanged' },
-        contentY: { type: QReal, value: 0, changed: 'contentYChanged' },
-        orientation: { type: QReal, value: ListView.Vertical, changed: 'orientationChanged' },
-        spacing: { type: QReal, value: 0, changed: 'spacingChanged' },
-        currentIndex: { type: QReal, value: -1, changed: 'currentIndexChanged' },
+        model: { type: QVar, value: undefined, changed: '$modelChanged' },
+        delegate: { type: QVar, changed: '$delegateChanged' },
+        contentX: { type: QReal, value: 0, changed: '$contentXChanged' },
+        contentY: { type: QReal, value: 0, changed: '$contentYChanged' },
+        orientation: { type: QReal, value: ListView.Vertical, changed: '$orientationChanged' },
+        spacing: { type: QReal, value: 0, changed: '$spacingChanged' },
+        currentIndex: { type: QReal, value: -1, changed: '$currentIndexChanged' },
         currentItem: { type: QReal, value: undefined },
-        snapMode: { type: QReal, value: ListView.NoSnap, changed: 'snapModeChanged' },
-        cacheBuffer: { type: QReal, value: 320, changed: 'cacheBufferChanged' },
+        snapMode: { type: QReal, value: ListView.NoSnap, changed: '$snapModeChanged' },
+        cacheBuffer: { type: QReal, value: 320, changed: '$cacheBufferChanged' },
         count: { type: QReal, value: 0 },
     }
 
@@ -38,7 +38,7 @@ class ListView extends Flickable {
         })
     }
 
-    modelChanged(){
+    $modelChanged(){
         for(let key in this.$items){
             if(key !== 'length') {
                 this.$items[key].$destroy()
@@ -54,7 +54,7 @@ class ListView extends Flickable {
         this.$items.length.update()
     }
 
-    delegateChanged(){
+    $delegateChanged(){
         for(let key in this.$items){
             if(key !== 'length') {
                 this.$items[key].$destroy()
@@ -263,38 +263,38 @@ class ListView extends Flickable {
         this.getProperty('count').reset(this.$items.length.get())
     }
 
-    contentXChanged(){
-        super.contentXChanged()
+    $contentXChanged(){
+        super.$contentXChanged()
         this.updateView()
     }
-    contentYChanged(){
-        super.contentYChanged()
+    $contentYChanged(){
+        super.$contentYChanged()
         this.updateView()     
     }
-    contentWidthChanged(){
+    $contentWidthChanged(){
         this.getStatement('contentItem').get().getStatement('width').reset(this.getStatement('contentWidth').get())
         // if(this.getPropertyValue('contentX') > this.getPropertyValue('contentWidth') - this.getPropertyValue('width')){
         //     this.getProperty('contentX').reset(this.getPropertyValue('contentWidth') - this.getPropertyValue('width'))
         // }
     }
 
-    contentHeightChanged(){
+    $contentHeightChanged(){
         this.getStatement('contentItem').get().getStatement('height').reset(this.getStatement('contentHeight').get())
         // if(this.getPropertyValue('contentY') > this.getPropertyValue('contentHeight') - this.getPropertyValue('height')){
         //     this.getProperty('contentY').reset(this.getPropertyValue('contentHeight') - this.getPropertyValue('height'))
         // }
     }
-    widthChanged(){
-        super.widthChanged()
+    $widthChanged(){
+        super.$widthChanged()
         if(this.getPropertyValue('orientation') === ListView.Vertical) this.getProperty('contentWidth').reset(this.getPropertyValue('width'))
         this.updateView()
     }
-    heightChanged(){
-        super.heightChanged()
+    $heightChanged(){
+        super.$heightChanged()
         if(this.getPropertyValue('orientation') === ListView.Horizontal) this.getProperty('contentHeight').reset(this.getPropertyValue('height'))
         this.updateView()
     }
-    cacheBufferChanged(){
+    $cacheBufferChanged(){
         this.updateView()
     }
     createElement(index){

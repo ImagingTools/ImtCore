@@ -28,16 +28,16 @@ class Text extends Item {
     static ElideRight = 3
     
     static defaultProperties = {
-        text: { type: QString, value: '', changed: 'textChanged' },
-        color: { type: QColor, value: 'black', changed: 'colorChanged' },
-        font: { type: QFont, changed: 'fontChanged' },
+        text: { type: QString, value: '', changed: '$textChanged' },
+        color: { type: QColor, value: 'black', changed: '$colorChanged' },
+        font: { type: QFont, changed: '$fontChanged' },
         contentWidth: { type: QReal, value: 0 },
         contentHeight: { type: QReal, value: 0 },
-        horizontalAlignment: { type: QProperty, value: Text.AlignLeft, changed: 'horizontalAlignmentChanged' },
-        verticalAlignment: { type: QProperty, value: Text.AlignTop, changed: 'verticalAlignmentChanged' },
-        wrapMode: { type: QProperty, value: Text.NoWrap, changed: 'wrapModeChanged' },
-        textFormat: { type: QProperty, value: Text.AutoText, changed: 'textFormatChanged' },
-        elide: { type: QProperty, value: Text.ElideNone, changed: 'elideChanged' },
+        horizontalAlignment: { type: QProperty, value: Text.AlignLeft, changed: '$horizontalAlignmentChanged' },
+        verticalAlignment: { type: QProperty, value: Text.AlignTop, changed: '$verticalAlignmentChanged' },
+        wrapMode: { type: QProperty, value: Text.NoWrap, changed: '$wrapModeChanged' },
+        textFormat: { type: QProperty, value: Text.AutoText, changed: '$textFormatChanged' },
+        elide: { type: QProperty, value: Text.ElideNone, changed: '$elideChanged' },
     }
 
     static defaultSignals = {
@@ -115,17 +115,17 @@ class Text extends Item {
         
     }
 
-    widthChanged(){
-        super.widthChanged()
+    $widthChanged(){
+        super.$widthChanged()
         if(!this.getProperty('width').auto) this.applyMetrics()
     }
 
-    heightChanged(){
-        super.heightChanged()
+    $heightChanged(){
+        super.$heightChanged()
         if(!this.getProperty('height').auto) this.applyMetrics()
     }
 
-    horizontalAlignmentChanged(){
+    $horizontalAlignmentChanged(){
         switch(this.getPropertyValue('horizontalAlignment')){
             case Text.AlignLeft: this.setStyle({ justifyContent: 'flex-start' }); break;
             case Text.AlignRight: this.setStyle({ justifyContent: 'flex-end' }); break;
@@ -134,7 +134,7 @@ class Text extends Item {
         }
     }
 
-    verticalAlignmentChanged(){
+    $verticalAlignmentChanged(){
         switch(this.getPropertyValue('verticalAlignment')){
             case Text.AlignTop: this.setStyle({ alignItems: 'flex-start' }); break;
             case Text.AlignBottom: this.setStyle({ alignItems: 'flex-end' }); break;
@@ -142,7 +142,7 @@ class Text extends Item {
         }
     }
 
-    wrapModeChanged(){
+    $wrapModeChanged(){
         switch(this.getPropertyValue('wrapMode')){
             case Text.NoWrap: this.setStyle({ whiteSpace: 'pre' }); break;
             case Text.WordWrap: this.setStyle({ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }); break;
@@ -153,11 +153,11 @@ class Text extends Item {
         this.applyMetrics()
     }
 
-    textFormatChanged(){
+    $textFormatChanged(){
         this.applyMetrics()
     }
 
-    elideChanged(){
+    $elideChanged(){
         if(this.getPropertyValue('elide') === Text.ElideRight){
             this.setStyle({
                 textOverflow: 'ellipsis',
@@ -171,12 +171,12 @@ class Text extends Item {
         }
     }
 
-    textChanged(){
+    $textChanged(){
         // this.$dom.innerHTML = this.getPropertyValue('text')
         this.applyMetrics()
     }
 
-    colorChanged(){
+    $colorChanged(){
         let rgba = this.getProperty('color').toRGBA()
         this.setStyle({
             opacity: 1,
@@ -184,7 +184,7 @@ class Text extends Item {
         })
     }
 
-    fontChanged(){
+    $fontChanged(){
         this.setStyle({
             fontWeight: this.getProperty('font').getPropertyValue('bold') ? 'bold' : 'normal',
             fontSize: this.getProperty('font').getPropertyValue('pixelSize')+'px',
@@ -197,7 +197,7 @@ class Text extends Item {
         if(this.getPropertyValue('text')) this.applyMetrics()
     }
 
-    opacityChanged(){
+    $opacityChanged(){
         let rgba = this.getProperty('color').toRGBA()
         this.setStyle({
             opacity: 1,

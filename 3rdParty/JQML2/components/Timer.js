@@ -3,10 +3,10 @@ const { QReal, QBool } = require('../utils/properties')
 
 class Timer extends QtObject {
     static defaultProperties = {
-        interval: { type: QReal, value: 1000, changed: 'timerChanged' },
-        repeat: { type: QBool, value: false, changed: 'timerChanged' },
-        running: { type: QBool, value: false, changed: 'timerChanged' },
-        triggeredOnStart: { type: QBool, value: false, changed: 'timerChanged' },
+        interval: { type: QReal, value: 1000, changed: '$timerChanged' },
+        repeat: { type: QBool, value: false, changed: '$timerChanged' },
+        running: { type: QBool, value: false, changed: '$timerChanged' },
+        triggeredOnStart: { type: QBool, value: false, changed: '$timerChanged' },
     }
 
     static defaultSignals = {
@@ -39,7 +39,7 @@ class Timer extends QtObject {
         }
     }
 
-    timerChanged(){
+    $timerChanged(){
         if(this.$timer) clearTimeout(this.$timer)
         if(this.getPropertyValue('triggeredOnStart') && this.triggered) this.triggered()
 

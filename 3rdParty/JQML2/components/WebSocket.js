@@ -9,9 +9,9 @@ class WebSocket extends QtObject {
     static Error = 4
 
     static defaultProperties = {
-        status: { type: QReal, value: WebSocket.Closed, changed: 'statusChanged' },
-        url: { type: QString, value: '', changed: 'reconnectSocket' },
-        active: { type: QBool, value: false, changed: 'reconnectSocket' },
+        status: { type: QReal, value: WebSocket.Closed, changed: '$statusChanged' },
+        url: { type: QString, value: '', changed: '$reconnectSocket' },
+        active: { type: QBool, value: false, changed: '$reconnectSocket' },
         errorString: { type: QString, value: '' },
         negotiatedSubprotocol: { type: QString, value: '' },
         requestedSubprotocols: { type: QVar, value: [] },
@@ -30,7 +30,7 @@ class WebSocket extends QtObject {
         this.reconnect = false
     }
 
-    statusChanged() {
+    $statusChanged() {
         if (this.getPropertyValue('status') !== WebSocket.Error) {
             this.getProperty('errorString').reset('')
         }
@@ -61,7 +61,7 @@ class WebSocket extends QtObject {
             this.textMessageReceived(message.data)
         }
     }
-    reconnectSocket() {
+    $reconnectSocket() {
         this.reconnect = true
         if (this.getPropertyValue('status') === WebSocket.Open) {
             this.getProperty('status').reset(WebSocket.Closing)

@@ -3,7 +3,7 @@ const { QColor, QBorder, QReal } = require('../utils/properties')
 
 class Row extends Item {
     static defaultProperties = {
-        spacing: { type: QReal, value: 0, changed: 'spacingChanged' },
+        spacing: { type: QReal, value: 0, changed: '$spacingChanged' },
     }
 
     constructor(parent){
@@ -45,7 +45,7 @@ class Row extends Item {
         })
     }
 
-    spacingChanged(){
+    $spacingChanged(){
         this.setStyle({
             gap: `${this.getPropertyValue('spacing')}px`
         })

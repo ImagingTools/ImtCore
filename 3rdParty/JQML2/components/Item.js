@@ -17,22 +17,22 @@ class Item extends QtObject {
     static Center = 8
 
     static defaultProperties = {
-        x: { type: QAutoGeometry, value: 0, changed: 'xChanged' },
-        y: { type: QAutoGeometry, value: 0, changed: 'yChanged' },
-        z: { type: QInt, value: 0, changed: 'zChanged' },
-        width: { type: QAutoGeometry, value: 0, changed: 'widthChanged' },
-        height: { type: QAutoGeometry, value: 0, changed: 'heightChanged' },
-        visible: { type: QVisible, value: true, changed: 'visibleChanged' },
-        enabled: { type: QBool, value: true, changed: 'enabledChanged' },
-        clip: { type: QBool, value: false, changed: 'clipChanged' },
-        focus: { type: QBool, value: false, changed: 'focusChanged' },
-        activeFocus: { type: QBool, value: false, changed: 'activeFocusChanged' },
-        opacity: { type: QReal, value: 1, changed: 'opacityChanged' },
-        scale: { type: QReal, value: 1, changed: 'rotationAndScaleChanged' },
-        rotation: { type: QReal, value: 0, changed: 'rotationAndScaleChanged' },
-        transformOrigin: { type: QProperty, value: Item.Center, changed: 'transformOriginChanged' },
-        anchors: { type: QAnchors, changed: 'anchorsChanged' },
-        KeyNavigation: { type: QKeyNavigation, changed: 'keyNavigationChanged' },
+        x: { type: QAutoGeometry, value: 0, changed: '$xChanged' },
+        y: { type: QAutoGeometry, value: 0, changed: '$yChanged' },
+        z: { type: QInt, value: 0, changed: '$zChanged' },
+        width: { type: QAutoGeometry, value: 0, changed: '$widthChanged' },
+        height: { type: QAutoGeometry, value: 0, changed: '$heightChanged' },
+        visible: { type: QVisible, value: true, changed: '$visibleChanged' },
+        enabled: { type: QBool, value: true, changed: '$enabledChanged' },
+        clip: { type: QBool, value: false, changed: '$clipChanged' },
+        focus: { type: QBool, value: false, changed: '$focusChanged' },
+        activeFocus: { type: QBool, value: false, changed: '$activeFocusChanged' },
+        opacity: { type: QReal, value: 1, changed: '$opacityChanged' },
+        scale: { type: QReal, value: 1, changed: '$rotationAndScaleChanged' },
+        rotation: { type: QReal, value: 0, changed: '$rotationAndScaleChanged' },
+        transformOrigin: { type: QProperty, value: Item.Center, changed: '$transformOriginChanged' },
+        anchors: { type: QAnchors, changed: '$anchorsChanged' },
+        KeyNavigation: { type: QKeyNavigation, changed: '$keyNavigationChanged' },
 
         // override getProperty
         left: { type: QAnchorLine, value: QAnchorLine.Left},
@@ -179,14 +179,14 @@ class Item extends QtObject {
         
     }
 
-    clipChanged(){
+    $clipChanged(){
         this.setStyle({ overflow: this.getPropertyValue('clip') ? "hidden" : "unset" })
     }
 
-    rotationAndScaleChanged(){
+    $rotationAndScaleChanged(){
         this.setStyle({ transform: `scale(${this.getPropertyValue('scale')}) rotate(${this.getPropertyValue('rotation')}deg)` })
     }
-    transformOriginChanged(){
+    $transformOriginChanged(){
         switch(this.getPropertyValue('transformOrigin')){
             case Item.Center: this.setStyle({ transformOrigin: 'center' }); break;
             case Item.TopLeft: this.setStyle({ transformOrigin: 'top left' }); break;
@@ -201,43 +201,43 @@ class Item extends QtObject {
         
     }
 
-    focusChanged(){
+    $focusChanged(){
         
     }
 
-    activeFocusChanged(){
+    $activeFocusChanged(){
         
     }
 
-    enabledChanged(){
+    $enabledChanged(){
 
     }
 
-    opacityChanged(){
+    $opacityChanged(){
        
     }
 
-    keyNavigationChanged(){
+    $keyNavigationChanged(){
         
     }
 
-    visibleChanged(){
+    $visibleChanged(){
         this.setStyle({ display: this.getProperty('visible').get() ? Item.defaultCSS.display : 'none' })
     }
 
-    xChanged(){
+    $xChanged(){
         this.$dom.style.left = `${this.getProperty('x').get()}px`
     }
 
-    yChanged(){
+    $yChanged(){
         this.$dom.style.top = `${this.getProperty('y').get()}px`
     }
 
-    zChanged(){
+    $zChanged(){
         this.setStyle({ zIndex: this.getPropertyValue('z') })
     }
 
-    widthChanged(){
+    $widthChanged(){
         this.setStyle({
             width: `${this.getProperty('width').get()}px`,
             minWidth: `${this.getProperty('width').get()}px`,
@@ -245,7 +245,7 @@ class Item extends QtObject {
         // this.$dom.style.width = `${this.getProperty('width').get() > 0 ? this.getProperty('width').get() : 0}px`
     }
 
-    heightChanged(){
+    $heightChanged(){
         this.setStyle({
             height: `${this.getProperty('height').get()}px`,
             minHeight: `${this.getProperty('height').get()}px`,
@@ -253,7 +253,7 @@ class Item extends QtObject {
         // this.$dom.style.height = `${this.getProperty('height').get() > 0 ? this.getProperty('height').get() : 0}px`
     }
 
-    anchorsChanged(){
+    $anchorsChanged(){
         this.getProperty('x').unfreeze()
         this.getProperty('width').unfreeze()
         this.getProperty('y').unfreeze()

@@ -16,15 +16,15 @@ class TextEdit extends Item {
     static Wrap = 3
 
     static defaultProperties = {
-        text: { type: QString, value: '', changed: 'textChanged' },
-        color: { type: QColor, value: 'black', changed: 'colorChanged' },
-        selectionColor: { type: QColor, value: '#000080', changed: 'selectionColorChanged' },
-        selectedTextColor: { type: QColor, value: '#fff', changed: 'selectedTextColorChanged' },
-        horizontalAlignment: { type: QReal, value: TextEdit.AlignLeft, changed: 'horizontalAlignmentChanged' },
-        verticalAlignment: { type: QReal, value: TextEdit.AlignTop, changed: 'verticalAlignmentChanged' },
-        wrapMode: { type: QReal, value: TextEdit.NoWrap, changed: 'wrapModeChanged' },
-        readOnly: { type: QBool, value: false, changed: 'readOnlyChanged' },
-        font: { type: QFont, changed: 'fontChanged' },
+        text: { type: QString, value: '', changed: '$textChanged' },
+        color: { type: QColor, value: 'black', changed: '$colorChanged' },
+        selectionColor: { type: QColor, value: '#000080', changed: '$selectionColorChanged' },
+        selectedTextColor: { type: QColor, value: '#fff', changed: '$selectedTextColorChanged' },
+        horizontalAlignment: { type: QReal, value: TextEdit.AlignLeft, changed: '$horizontalAlignmentChanged' },
+        verticalAlignment: { type: QReal, value: TextEdit.AlignTop, changed: '$verticalAlignmentChanged' },
+        wrapMode: { type: QReal, value: TextEdit.NoWrap, changed: '$wrapModeChanged' },
+        readOnly: { type: QBool, value: false, changed: '$readOnlyChanged' },
+        font: { type: QFont, changed: '$fontChanged' },
         contentHeight: { type: QReal, value: 0 },
         contentWidth: { type: QReal, value: 0 },
     }
@@ -46,22 +46,22 @@ class TextEdit extends Item {
         MouseController.add(this)
     }
 
-    colorChanged(){
+    $colorChanged(){
         let rgba = this.getProperty('color').toRGBA()
         this.setStyle({
             color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.getProperty('color').get() === 'transparent' ? 0 : rgba.a * this.getPropertyValue('opacity')})`
         })
     }
 
-    selectionColorChanged(){
+    $selectionColorChanged(){
 
     }
 
-    selectedTextColorChanged(){
+    $selectedTextColorChanged(){
 
     }
 
-    horizontalAlignmentChanged(){
+    $horizontalAlignmentChanged(){
         switch(this.getPropertyValue('horizontalAlignment')){
             case Text.AlignLeft: this.setStyle({ justifyContent: 'flex-start' }); break;
             case Text.AlignRight: this.setStyle({ justifyContent: 'flex-end' }); break;
@@ -70,7 +70,7 @@ class TextEdit extends Item {
         }
     }
 
-    verticalAlignmentChanged(){
+    $verticalAlignmentChanged(){
         switch(this.getPropertyValue('verticalAlignment')){
             case Text.AlignTop: this.setStyle({ alignItems: 'flex-start' }); break;
             case Text.AlignBottom: this.setStyle({ alignItems: 'flex-end' }); break;
@@ -78,11 +78,11 @@ class TextEdit extends Item {
         }
     }
 
-    wrapModeChanged(){
+    $wrapModeChanged(){
 
     }
 
-    readOnlyChanged(){
+    $readOnlyChanged(){
         if(this.getPropertyValue('readOnly')){
             this.$input.readOnly = true
         } else {
@@ -90,12 +90,12 @@ class TextEdit extends Item {
         }
     }
 
-    textChanged(){
+    $textChanged(){
         this.$input.value = this.getPropertyValue('text')
         this.applyMetrics()
     }
 
-    fontChanged(){
+    $fontChanged(){
         if(this.getPropertyValue('text')){
             this.setStyle({
                 fontWeight: this.getProperty('font').getPropertyValue('bold') ? 'bold' : 'normal',

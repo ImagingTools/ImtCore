@@ -16,7 +16,7 @@ class WebView extends Item {
     static defaultSignals = {
         cookieAdded: { params: ['domain', 'name'] },
         cookieRemoved: { params: ['domain', 'name'] },
-        loadingChanged: { params: ['loadRequest'] },
+        // loadingChanged: { params: ['loadRequest'] },
 
     }
 

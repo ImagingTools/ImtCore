@@ -17,10 +17,10 @@ class Image extends Item {
     static Error = 3
 
     static defaultProperties = {
-        progress: { type: QReal, value: 0, changed: 'progressChanged' },
-        source: { type: QString, value: '', changed: 'sourceChanged' },
-        sourceSize: { type: QSourceSize, changed: 'sourceSizeChanged' },
-        fillMode: { type: QReal, value: Image.Stretch, changed: 'fillModeChanged' },
+        progress: { type: QReal, value: 0, changed: '$progressChanged' },
+        source: { type: QString, value: '', changed: '$sourceChanged' },
+        sourceSize: { type: QSourceSize, changed: '$sourceSizeChanged' },
+        fillMode: { type: QReal, value: Image.Stretch, changed: '$fillModeChanged' },
         status: { type: QReal, value: Image.Null },
     }
 
@@ -58,7 +58,7 @@ class Image extends Item {
         })
     }
 
-    sourceChanged(){
+    $sourceChanged(){
         if(!this.source) {
             this.setStyle({
                 backgroundImage: 'none'
@@ -67,15 +67,16 @@ class Image extends Item {
         }
 
         this.$img = new WebImage();
-
+        let path = rootPath+'/'+this.getProperty('source').get().replaceAll('../','')
         this.$img.onload = ()=>{
             if(!this.$img) return
             this.getProperty('sourceSize').getProperty('width').setAuto(this.$img.naturalWidth)
             this.getProperty('sourceSize').getProperty('height').setAuto(this.$img.naturalHeight)
 
             // this.dom.style.backgroundImage = `url("${this.$this.$img.src}")`
+            
             this.setStyle({
-                backgroundImage: `url("${this.getProperty('source').get()}")`
+                backgroundImage: `url("${path.replaceAll('//','/')}")`
             })
 
             this.getProperty('progress').reset(1)
@@ -90,7 +91,7 @@ class Image extends Item {
         }
 
         this.getProperty('status').reset(Image.Loading)
-        this.$img.src = this.getProperty('source').get()
+        this.$img.src = path.replaceAll('//','/')
     }
 
     updateImage(){
@@ -146,11 +147,11 @@ class Image extends Item {
         }
     }
 
-    fillModeChanged(){
+    $fillModeChanged(){
         this.updateImage()
     }
 
-    sourceSizeChanged(){
+    $sourceSizeChanged(){
         this.updateImage()
     }
 

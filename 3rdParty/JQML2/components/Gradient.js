@@ -6,17 +6,17 @@ class Gradient extends QtObject {
     static Horizontal = 1
 
     static defaultProperties = {
-        stops: { type: QVar, value: [], changed: 'gradientUpdate' },
-        orientation: { type: QReal, value:  Gradient.Vertical, changed: 'gradientUpdate' },
+        stops: { type: QVar, value: [], changed: '$gradientUpdate' },
+        orientation: { type: QReal, value:  Gradient.Vertical, changed: '$gradientUpdate' },
     }
 
     constructor(parent){
         super(parent)
     }
 
-    gradientUpdate(){
+    $gradientUpdate(){
         if(this.parent()){
-            this.parent().gradientChanged()
+            this.parent().$gradientChanged()
         }
     }
 }

@@ -27,6 +27,7 @@ global.queueLink = []
 global.UIDList = {}
 global.Singletons = {}
 
+
 const listProperties = require('../utils/properties')
 for(let prop in listProperties){
     global[prop] = listProperties[prop]
@@ -78,8 +79,14 @@ for(let componentName of listComponents){
                 this.getProperty(propName).reset(newVal)
             }
         })
+        Object.defineProperty(component.prototype, propName+'Changed', {
+            get: function(){
+                return this.getProperty(propName).getNotify()
+            },
+        })
     }
     for(let sigName in component.defaultSignals){
+        // if(!(sigName in component.prototype))
         Object.defineProperty(component.prototype, sigName, {
             get: function(){
                 return this.getSignal(sigName)
@@ -93,6 +100,7 @@ global.updateList = []
 global.SingletonClass = {}
 
 window.onload = ()=>{
+    global.rootPath = document.body.dataset.root
     document.head.insertAdjacentHTML("beforeend", `
     <style>
         *{padding:0;margin:0;border:0;overflow:hidden;-ms-overflow-style:none;scrollbar-width:none;user-select:none;}

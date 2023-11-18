@@ -3,20 +3,20 @@ const { QColor, QReal } = require('../utils/properties')
 
 class GradientStop extends QtObject {
     static defaultProperties = {
-        color: { type: QColor, value: 'black', changed: 'gradientUpdate' },
-        position: { type: QReal, value: 0, changed: 'gradientUpdate' },
+        color: { type: QColor, value: 'black', changed: '$gradientUpdate' },
+        position: { type: QReal, value: 0, changed: '$gradientUpdate' },
     }
 
     constructor(parent){
         super(parent)
 
         parent.getProperty('stops').get().push(this)
-        parent.gradientUpdate()
+        parent.$gradientUpdate()
     }
     
-    gradientUpdate(){
+    $gradientUpdate(){
         if(this.parent()){
-            this.parent().gradientUpdate()
+            this.parent().$gradientUpdate()
         }
     }
     $destroy(){

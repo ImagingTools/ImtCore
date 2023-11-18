@@ -12,15 +12,15 @@ class GridView extends Flickable {
     static BottomToTop = 3
 
     static defaultProperties = {
-        model: { type: QVar, value: undefined, changed: 'modelChanged' },
-        delegate: { type: QVar, changed: 'delegateChanged' },
-        layoutDirection: { type: QReal, value: GridView.LeftToRight, changed: 'directionChanged' },
-        verticalLayoutDirection: { type: QReal, value: GridView.TopToBottom, changed: 'directionChanged' },
+        model: { type: QVar, value: undefined, changed: '$modelChanged' },
+        delegate: { type: QVar, changed: '$delegateChanged' },
+        layoutDirection: { type: QReal, value: GridView.LeftToRight, changed: '$directionChanged' },
+        verticalLayoutDirection: { type: QReal, value: GridView.TopToBottom, changed: '$directionChanged' },
         currentIndex: { type: QReal, value: -1 },
         currentItem: { type: QReal, value: undefined },
         count: { type: QReal, value: 0 },
-        cellWidth: { type: QReal, value: 100, changed: 'cellChanged' },
-        cellHeight: { type: QReal, value: 100, changed: 'cellChanged' },
+        cellWidth: { type: QReal, value: 100, changed: '$cellChanged' },
+        cellHeight: { type: QReal, value: 100, changed: '$cellChanged' },
     }
 
     constructor(parent){
@@ -33,35 +33,35 @@ class GridView extends Flickable {
         this.$items = []
     }
 
-    widthChanged(){
-        super.widthChanged()
+    $widthChanged(){
+        super.$widthChanged()
         this.updateGeometry()
     }
 
-    heightChanged(){
-        super.heightChanged()
+    $heightChanged(){
+        super.$heightChanged()
         this.updateGeometry()
     }
 
-    contentWidthChanged(){
+    $contentWidthChanged(){
         this.getStatement('contentItem').get().getStatement('width').reset(this.getStatement('contentWidth').get())
         // if(this.getPropertyValue('contentX') > this.getPropertyValue('contentWidth') - this.getPropertyValue('width')){
         //     this.getProperty('contentX').reset(this.getPropertyValue('contentWidth') - this.getPropertyValue('width'))
         // }
     }
 
-    contentHeightChanged(){
+    $contentHeightChanged(){
         this.getStatement('contentItem').get().getStatement('height').reset(this.getStatement('contentHeight').get())
         // if(this.getPropertyValue('contentY') > this.getPropertyValue('contentHeight') - this.getPropertyValue('height')){
         //     this.getProperty('contentY').reset(this.getPropertyValue('contentHeight') - this.getPropertyValue('height'))
         // }
     }
 
-    modelChanged(){
+    $modelChanged(){
         this.updateView()
     }
 
-    delegateChanged(){
+    $delegateChanged(){
         this.updateView()
     }
 
@@ -145,14 +145,14 @@ class GridView extends Flickable {
         })
     }
 
-    cellChanged(){
+    $cellChanged(){
         this.updateGeometry()
         // for(let child of this.getProperty('contentItem').get().children()){
         //     child.getProperty('width').setCompute(this.getPropertyValue('cellWidth'))
         // }
     }
 
-    directionChanged(){
+    $directionChanged(){
         this.updateGeometry()
     }
 

@@ -3,8 +3,8 @@ const { QString } = require('../utils/properties')
 
 class PluginParameter extends QtObject {
     static defaultProperties = {
-        name: { type: QString, value: '', changed: 'parameterChanged' },
-        value: { type: QString, value: '', changed: 'parameterChanged' },
+        name: { type: QString, value: '', changed: '$parameterChanged' },
+        value: { type: QString, value: '', changed: '$parameterChanged' },
     }
 
     constructor(parent){
@@ -13,7 +13,7 @@ class PluginParameter extends QtObject {
         parent.getPropertyValue('parameters').push(this)
     }
 
-    parameterChanged(){
+    $parameterChanged(){
         this.parent().getProperty('parameters').getNotify()()
     }
 

@@ -34,12 +34,12 @@ class Canvas extends Item {
         }
     }
 
-    widthChanged(){
+    $widthChanged(){
         super.$widthChanged()
         this.getDom().setAttribute('width', this.getPropertyValue('width'))
         if(this.$signals.paint) this.$signals.paint()
     }
-    heightChanged(){
+    $heightChanged(){
         super.$heightChanged()
         this.getDom().setAttribute('height', this.getPropertyValue('height'))
         if(this.$signals.paint) this.$signals.paint()

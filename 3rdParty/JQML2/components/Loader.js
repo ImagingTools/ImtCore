@@ -11,8 +11,8 @@ class Loader extends Item {
         status: { type: QReal, value: Loader.Null },
         progress: { type: QReal, value: 0 },
         asynchronous: { type: QBool, value: false },
-        source: { type: QString, value: '', changed: 'sourceChanged' },
-        sourceComponent: { type: QVar, changed: 'sourceComponentChanged' },
+        source: { type: QString, value: '', changed: '$sourceChanged' },
+        sourceComponent: { type: QVar, changed: '$sourceComponentChanged' },
         item: { type: QVar },
     }
 
@@ -32,7 +32,7 @@ class Loader extends Item {
         super.$complete()
     }
 
-    sourceComponentChanged(){
+    $sourceComponentChanged(){
         if(!this.$completed) {
             this.$lazy = this.getProperty('sourceComponent').getNotify()
             return
@@ -107,6 +107,8 @@ class Loader extends Item {
             } else {
                 this.getStatement('status').reset(Loader.Error)
             }
+
+            if(this.$signals.loaded) this.$signals.loaded()
         } else {
             this.getStatement('item').reset(undefined)  
             this.getStatement('status').reset(Loader.Null)
@@ -115,7 +117,7 @@ class Loader extends Item {
         
     }
 
-    sourceChanged(){
+    $sourceChanged(){
         if(!this.$completed) {
             this.$lazy = this.getProperty('source').getNotify()
             return
@@ -199,6 +201,8 @@ class Loader extends Item {
             } else {
                 this.getStatement('status').reset(Loader.Error)
             }
+
+            if(this.$signals.loaded) this.$signals.loaded()
         } else {
             this.getStatement('item').reset(undefined)  
             this.getStatement('status').reset(Loader.Null)

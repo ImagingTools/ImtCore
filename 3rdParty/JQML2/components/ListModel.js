@@ -4,8 +4,8 @@ const { QReal, QVar } = require('../utils/properties')
 
 class ListModel extends QtObject {
     static defaultProperties = {
-        count: { type: QReal, value: 0, changed: 'countChanged' },
-        data: { type: QVar, value: undefined, changed: 'dataChanged' },
+        count: { type: QReal, value: 0, changed: '$countChanged' },
+        data: { type: QVar, value: undefined, changed: '$dataChanged' },
     }
 
     static defaultSignals = {
@@ -22,11 +22,11 @@ class ListModel extends QtObject {
         this.getStatement('count').reset(this.getStatement('data').get().length)
     }
 
-    countChanged(){
+    $countChanged(){
 
     }
 
-    dataChanged(){
+    $dataChanged(){
 
     }
 
@@ -172,13 +172,13 @@ class ListModel extends QtObject {
                 var modelVal = modelObject[property]
                 if (modelVal === null)
                     modelVal += "null"
-                else if(typeof modelVal === 'object' && modelVal.$qmlClassName === "ListModel"){
+                else if(typeof modelVal === 'object' && modelVal instanceof ListModel){
                     retVal += modelVal.toJSON()
                 }
                 else if(typeof modelVal === 'string' || modelVal instanceof String){
                     retVal += "\"" + modelVal + "\""
                 }
-                else if(typeof modelVal === 'object' && !modelVal.$qmlClassName){
+                else if(typeof modelVal === 'object' && !(modelVal instanceof QtObject)){
                     retVal += JSON.stringify(modelVal)
                 }else
                     retVal += modelVal

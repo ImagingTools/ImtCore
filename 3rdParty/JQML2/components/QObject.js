@@ -31,6 +31,7 @@ class QObject extends ComplexObject {
             }
 
             if(parent.constructor.name !== 'Repeater' && parent.constructor.name !== 'ListView' && parent.constructor.name !== 'GridView') this.getStatement('model').setCompute(()=>{return this.parent().model})
+            
             this.getStatement('index').setCompute(()=>{return this.parent().index})
             this.getStatement('context').setCompute(()=>{return this.parent().context})
 

@@ -3,8 +3,8 @@ const { QVar, QReal } = require('../utils/properties')
 
 class Repeater extends Item {
     static defaultProperties = {
-        model: { type: QVar, value: undefined, changed: 'modelChanged' },
-        delegate: { type: QVar, changed: 'delegateChanged' },
+        model: { type: QVar, value: undefined, changed: '$modelChanged' },
+        delegate: { type: QVar, changed: '$delegateChanged' },
         count: { type: QReal, value: 0 },
     }
 
@@ -22,11 +22,11 @@ class Repeater extends Item {
         this.$items = []
     }
 
-    modelChanged(){
+    $modelChanged(){
         this.updateView()
     }
 
-    delegateChanged(){
+    $delegateChanged(){
         this.updateView()
     }
 

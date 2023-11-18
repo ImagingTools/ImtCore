@@ -409,7 +409,7 @@ class QVar extends QProperty {
 class QAlias extends QProperty {
     constructor(getTargetProperty){
         super()
-        this.getTargetProperty = getTargetProperty     
+        this.getTargetProperty = getTargetProperty   
     }
     get(){
         if(!this.completed){
@@ -421,7 +421,7 @@ class QAlias extends QProperty {
     set(newValue){
         let targetProperty = this.getTargetProperty()
         let safeValue = targetProperty instanceof QProperty ? this.getTargetProperty().typeCasting.call(this, newValue) : newValue
-        if(safeValue !== this.value){
+        if(safeValue !== this.value || safeValue !== targetProperty.value){
             this.value = safeValue
             if(targetProperty instanceof QProperty) {
                 if(targetProperty.auto){
