@@ -276,6 +276,7 @@ class QColor extends QProperty {
     }
 
     toRGBA(){
+        if(!this.completed) this.update()
         if(!this.value){
             return {
                 r: 255,

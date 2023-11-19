@@ -1,6 +1,7 @@
 const { ComplexObject } = require('../utils/base')
 const { QVar, QReal } = require('../utils/properties')
 const { QSignal } = require('../utils/signal')
+
 var UID = 0
 class QObject extends ComplexObject {
     static defaultProperties = {
@@ -30,10 +31,12 @@ class QObject extends ComplexObject {
                 
             }
 
-            if(parent.constructor.name !== 'Repeater' && parent.constructor.name !== 'ListView' && parent.constructor.name !== 'GridView') this.getStatement('model').setCompute(()=>{return this.parent().model})
+            if(!(this instanceof Repeater) && !(this instanceof ListView) && !(this instanceof GridView) && !(this instanceof ListElement)) this.getStatement('model').setCompute(()=>{return this.parent().model})
             
-            this.getStatement('index').setCompute(()=>{return this.parent().index})
-            this.getStatement('context').setCompute(()=>{return this.parent().context})
+            if(!(this instanceof ListElement)) {
+                this.getStatement('index').setCompute(()=>{return this.parent().index})
+                this.getStatement('context').setCompute(()=>{return this.parent().context})
+            }
 
             parent.addChild(this)
             this.setParent(parent)
@@ -41,6 +44,14 @@ class QObject extends ComplexObject {
             
             // this.getStatement('model').update()
         }
+
+        // if(this.constructor.name !== 'Repeater' && this.constructor.name !== 'ListView' && this.constructor.name !== 'GridView'){
+        //     this.createProperty(model)
+        //     if(this.constructor.name !== 'ListElement'){
+
+        //     }
+        // }
+
     }
 
     $complete(){
