@@ -153,6 +153,7 @@ QtObject {
             if (!commandsProviderContainer.isLoadData){
                 return
             }
+            console.log("__DEBUG__modelCommands", commandsProviderContainer.commandsId, JSON.stringify(commandsProviderContainer.additionInputParams))
 
             var query = Gql.GqlRequest("query", commandsProviderContainer.commandsId + "Commands");
             if (Object.keys(commandsProviderContainer.additionInputParams).length > 0){

@@ -37,6 +37,8 @@ Item {
     property var undoManager: null;
     property var parentRef: null;
 
+    property var additionInputParams: ({})
+
     property CommandsProvider commandsProvider: CommandsProvider {
         commandsId: documentBaseRoot.commandsId;
     }
@@ -93,9 +95,19 @@ Item {
 
     function blockEditing(){}
 
+    function getAdditionalInputParams(){
+        return documentBaseRoot.additionInputParams
+    }
+
+    onAdditionInputParamsChanged: {
+        documentBaseRoot.commandsProvider.additionInputParams = documentBaseRoot.additionInputParams
+    }
+
     Component.onCompleted: {
         console.log("Document onCompleted", itemId);
         documentBaseRoot.documentUuid = uuidGenerator.generateUUID();
+
+        documentBaseRoot.commandsProvider.additionInputParams = getAdditionalInputParams()
 
         documentBaseRoot.commandsProvider.modelLoaded.connect(documentBaseRoot.onCommandsModelLoaded);
         documentBaseRoot.commandsProvider.commandsModelChanged.connect(documentBaseRoot.onCommandsModelChanged);

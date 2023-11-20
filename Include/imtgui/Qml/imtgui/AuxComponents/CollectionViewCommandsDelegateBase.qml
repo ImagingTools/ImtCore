@@ -63,6 +63,7 @@ Item {
     }
 
     onSelectionChanged: {
+        console.log("CollectionViewCommandsDelegateBase onSelectionChanged", containerBase.commandsProvider);
         let indexes = containerBase.tableData.getSelectedIndexes();
 
         let isEnabled = indexes.length > 0;

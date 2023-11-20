@@ -238,6 +238,7 @@ Item {
         let name = documentObj["Name"];
         let source = documentObj["Source"];
         let parent = documentObj["Parent"];
+        let addition = documentObj["addition"];
 
         let index = workspaceView.documentsData.InsertNewItem();
 
@@ -246,13 +247,15 @@ Item {
         workspaceView.documentsData.SetData("CommandsId", commandId, index);
         workspaceView.documentsData.SetData("Name", name, index);
         workspaceView.documentsData.SetData("Title", name, index);
+        workspaceView.documentsData.SetData("addition", addition, index);
         workspaceView.documentsData.SetData("Source", source, index);
+
+        tabPanelInternal.selectedIndex = index;
 
         if (isRequested){
             documentController.getData(itemId, params, commandId);
         }
 
-        tabPanelInternal.selectedIndex = index;
 
         return index;
     }
@@ -325,7 +328,9 @@ Item {
 
         if (documentIndex >= 0){
             let commandId = workspaceView.mainCollectionView.getEditorCommandId();
-            documentController.documentTypeId = commandId;
+            console.log("_DEBUG_commandId", commandId)
+
+//            documentController.documentTypeId = commandId;
 
             let documentBase = workspaceView.documentsData.GetData("Item", documentIndex);
 
@@ -340,17 +345,18 @@ Item {
             documentBase.updateModel();
 
             let documentData = documentBase.documentModel;
+            let additionInputParams = documentBase.additionInputParams;
 
             if (isNew){
                 if (!documentBase.nameOutsideEditor){
-                    documentController.setData(documentId, documentData);
+                    documentController.setData(documentId, documentData, additionInputParams);
                 }
                 else{
                     modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the document:")});
                 }
             }
             else{
-                documentController.updateData(documentId, documentData);
+                documentController.updateData(documentId, documentData, additionInputParams);
             }
         }
     }
@@ -530,7 +536,10 @@ Item {
         onDocumentModelChanged: {
             if (documentController.documentModel != null){
                 let item = workspaceView.documentsData.GetData("Item", tabPanelInternal.selectedIndex);
-                item.documentModel = documentController.documentModel;
+                if (item !== null){
+                    item.documentModel = documentController.documentModel;
+                    documentController.documentModel = null
+                }
             }
         }
 
@@ -617,11 +626,15 @@ Item {
                         workspaceView.activeItem = dataLoader.item;
                     }
 
-                    if(dataLoader.item.documentsData !==undefined){
+                    if(dataLoader.item.documentsData !== undefined){
                         dataLoader.item.documentsData = workspaceView.documentsData;
                     }
 
-                    if(dataLoader.item.documentManager !==undefined){
+                    if(dataLoader.item.additionInputParams !== undefined){
+                        dataLoader.item.additionInputParams = model.addition
+                    }
+
+                    if(dataLoader.item.documentManager !== undefined){
                         dataLoader.item.documentManager = workspaceView;
                     }
 
@@ -638,6 +651,11 @@ Item {
 
                     if (dataLoader.item.parentRef !== undefined){
                         dataLoader.item.parentRef = model.Parent;
+                    }
+
+                    if (documentController.documentModel != null){
+                        dataLoader.item.documentModel = documentController.documentModel;
+                        documentController.documentModel = null
                     }
                 }
             }

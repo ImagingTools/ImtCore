@@ -22,16 +22,21 @@ QtObject {
         if (typeId){
             container.documentTypeId = typeId;
         }
+        console.log("getData", documentId, typeId, "container.documentTypeId ", container.documentTypeId)
 
         container.gqlGetModel.getModelData(documentId, inputParams);
     }
 
-    function setData(documentId, documentData){
-        container.gqlSetModel.set(setCommandId, documentId, documentData);
+    function setData(documentId, documentData, additionInputParams){
+        container.gqlSetModel.set(setCommandId, documentId, documentData, additionInputParams);
     }
 
-    function updateData(documentId, documentData){
-        container.gqlSetModel.set(updateCommandId, documentId, documentData);
+    function updateData(documentId, documentData, additionInputParams){
+        container.gqlSetModel.set(updateCommandId, documentId, documentData, additionInputParams);
+    }
+
+    onDocumentTypeIdChanged: {
+        console.log("onDocumentTypeIdChanged", container.documentTypeId)
     }
 
     property string getModelState: gqlGetModel.state;
@@ -52,18 +57,19 @@ QtObject {
             if (externInputParams){
                 let keys = Object.keys(externInputParams)
                 for (let key of keys){
-                    if (typeof externInputParams[key] === "object"){
+//                    if (typeof externInputParams[key] === "object"){
+                    if (key === "addition"){
                         let objectParams = externInputParams[key];
-                        console.log("_DEBUG_", objectParams)
                         if (Object.keys(objectParams).length > 0){
                             let inputObject = Gql.GqlObject(key);
                             for (let keyObject in objectParams){
                                 inputObject.InsertField(keyObject, objectParams[keyObject]);
+                                console.log("_DEBUG_addition", keyObject, objectParams[keyObject])
                             }
                             inputParams.InsertFieldObject(inputObject);
                         }
                     }
-                    else{
+                    else if (key !== "Parent"){
                         inputParams.InsertField(key, externInputParams[key]);
                     }
                 }
@@ -121,13 +127,21 @@ QtObject {
     }//GqlModel itemModel
 
     property GqlModel gqlSetModel: GqlModel {
-        function set(commandId, modelId, data){
+        function set(commandId, modelId, data, additionInputParams){
+            console.log("query container.gqlSetModel", container.getCommandId, modelId);
             var query = Gql.GqlRequest("mutation", commandId);
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", modelId);
             var jsonString = data.toJSON();
             inputParams.InsertField ("Item", jsonString);
+            if (Object.keys(additionInputParams).length > 0){
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in additionInputParams){
+                    additionParams.InsertField(key, additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
+            }
             query.AddParam(inputParams);
 
             if (commandId === container.setCommandId){
