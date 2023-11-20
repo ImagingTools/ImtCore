@@ -45,7 +45,10 @@ export var Qt = {
     },
 
     point: function(x, y){
-        return {}
+        return {
+            x: x,
+            y: y,
+        }
     },
     
     openUrlExternally: function(url){
