@@ -4,6 +4,8 @@
 		<file alias="imtcontrols/Actions/Action.qml">Qml/imtcontrols/Actions/Action.qml</file>
 		<file alias="imtcontrols/Actions/PopupMenuDelegate.qml">Qml/imtcontrols/Actions/PopupMenuDelegate.qml</file>
 		<file alias="imtcontrols/Actions/ShortcutManager.qml">Qml/imtcontrols/Actions/ShortcutManager.qml</file>
+                <file alias="imtcontrols/Actions/MovingItem.qml">Qml/imtcontrols/Actions/MovingItem.qml</file>
+                <file alias="imtcontrols/Actions/MovingArea.qml">Qml/imtcontrols/Actions/MovingArea.qml</file>
 		<file alias="imtcontrols/Application/ApplicationMain.qml">Qml/imtcontrols/Application/ApplicationMain.qml</file>
 		<file alias="imtcontrols/Application/DesignSchemaProvider.qml">Qml/imtcontrols/Application/DesignSchemaProvider.qml</file>
 		<file alias="imtcontrols/Application/LanguageProvider.qml">Qml/imtcontrols/Application/LanguageProvider.qml</file>
@@ -103,7 +105,6 @@
 		<file alias="imtcontrols/Views/GridExtendingBaseDelegate.qml">Qml/imtcontrols/Views/GridExtendingBaseDelegate.qml</file>
                 <file alias="imtcontrols/Views/BusyIndicator.qml">Qml/imtcontrols/Views/BusyIndicator.qml</file>
                 <file alias="imtcontrols/Views/Loading.qml">Qml/imtcontrols/Views/Loading.qml</file>
-		<file alias="imtcontrols/Views/MovingItem.qml">Qml/imtcontrols/Views/MovingItem.qml</file>
 		<file alias="imtcontrols/Views/Pagination.qml">Qml/imtcontrols/Views/Pagination.qml</file>
 		<file alias="imtcontrols/Views/PaintedCorner.qml">Qml/imtcontrols/Views/PaintedCorner.qml</file>
 		<file alias="imtcontrols/Views/Piechart.qml">Qml/imtcontrols/Views/Piechart.qml</file>

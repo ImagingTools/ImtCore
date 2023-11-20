@@ -3,6 +3,8 @@ module imtcontrols
 Action 1.0 ./Actions/Action.qml
 PopupMenuDelegate 1.0 ./Actions/PopupMenuDelegate.qml
 ShortcutManager 1.0 ./Actions/ShortcutManager.qml
+MovingItem 1.0 ./Actions/MovingItem.qml
+MovingArea 1.0 ./Actions/MovingArea.qml
 ApplicationMain 1.0 ./Application/ApplicationMain.qml
 DesignSchemaProvider 1.0 ./Application/DesignSchemaProvider.qml
 LanguageProvider 1.0 ./Application/LanguageProvider.qml
@@ -102,7 +104,6 @@ GridCollectionView 1.0 ./Views/GridCollectionView.qml
 GridExtendingBaseDelegate 1.0 ./Views/GridExtendingBaseDelegate.qml
 BusyIndicator 1.0 ./Views/BusyIndicator.qml
 Loading 1.0 ./Views/Loading.qml
-MovingItem 1.0 ./Views/MovingItem.qml
 Pagination 1.0 ./Views/Pagination.qml
 PaintedCorner 1.0 ./Views/PaintedCorner.qml
 Piechart 1.0 ./Views/Piechart.qml
