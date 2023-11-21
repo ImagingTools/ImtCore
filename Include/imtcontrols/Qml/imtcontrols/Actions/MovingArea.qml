@@ -4,6 +4,7 @@ MouseArea{
     id: moving;
 
     preventStealing: true;
+    hoverEnabled: true;
 
     property Item movingItem: null;
     property Item wheelTargetItem: null;
@@ -15,11 +16,14 @@ MouseArea{
     property real scaleStep: 0.22;
 
     property bool wasMoving: false;
+    property bool isPressed: false;
 
     signal deltaSignal(point delta)
     signal wheelDeltaSignal(int wheelDelta)
+    signal positionSignal(point position)
 
     onPressed: {
+        isPressed = true;
         let coord_ = mapToItem(this, mouse.x, mouse.y);
         this.coord = coord_;
         this.coordPressed = coord_;
@@ -29,16 +33,24 @@ MouseArea{
 
         wasMoving = false;
     }
+    onReleased: {
+        isPressed = false;
+    }
 
     onPositionChanged: {
-        var newCoords = mapToItem(this, mouse.x, mouse.y);
-        var deltaX_ = newCoords.x - this.coord.x;
-        var deltaY_ = newCoords.y - this.coord.y;
-        this.coord = newCoords;
+        if(isPressed){
+            var newCoords = mapToItem(this, mouse.x, mouse.y);
+            var deltaX_ = newCoords.x - this.coord.x;
+            var deltaY_ = newCoords.y - this.coord.y;
+            this.coord = newCoords;
 
-        moving.deltaSignal(Qt.point(deltaX_, deltaY_));
+            moving.deltaSignal(Qt.point(deltaX_, deltaY_));
 
-        wasMoving = true;
+            wasMoving = true;
+        }
+        else {
+            moving.positionSignal(Qt.point(mouse.x, mouse.y))
+        }
     }
 
     onWheel: {
