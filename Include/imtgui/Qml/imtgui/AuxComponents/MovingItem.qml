@@ -33,10 +33,11 @@ MouseArea{
             checkCoord.x -= mouse.x
             checkCoord.y -= mouse.y
 
-            var ok = checkCoord.x + deltaX > moving.alwaysVisibleSize - moving.movingItem.width
-                    && checkCoord.x + deltaX < moving.globalParent.width - moving.alwaysVisibleSize
+            var ok = checkCoord.x + deltaX > Math.min(moving.alwaysVisibleSize - moving.movingItem.width, 10)
                     && checkCoord.y + deltaY > 10
-                    && checkCoord.y + deltaY < moving.globalParent.height - moving.alwaysVisibleSize ;
+                    && checkCoord.x + deltaX < moving.globalParent.width - Math.min(moving.alwaysVisibleSize, moving.movingItem.width + 10)
+                    && checkCoord.y + deltaY < moving.globalParent.height - Math.min(moving.alwaysVisibleSize, moving.movingItem.height + 10) ;
+
 
             if(ok){
                 moving.movingItem.x = newX;
