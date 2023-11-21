@@ -9,6 +9,24 @@ Rectangle {
 
     anchors.fill: parent;
 
+    property TreeItemModel mainModel: TreeItemModel{};
+
+    Component.onCompleted: {
+        let index = mainModel.InsertNewItem();
+        mainModel.SetData("X", 0.3, index);
+        mainModel.SetData("Y", 0.3, index);
+        mainModel.SetData("MainText", "Main text", index);
+        mainModel.SetData("SecondText", "Second text", index);
+
+        index = mainModel.InsertNewItem();
+        mainModel.SetData("X", 0.6, index);
+        mainModel.SetData("Y", 0.6, index);
+        mainModel.SetData("MainText", "Main text 2", index);
+        mainModel.SetData("SecondText", "Second text 2", index);
+
+        canvas.requestPaint()
+    }
+
     Rectangle{
         id: mainContainer;
 
@@ -39,7 +57,7 @@ Rectangle {
             }
 
             onPressed: {
-                insideMovingItem = checkInsideMovingItem(canvas.mainRec_x, canvas.mainRec_y, canvas.mainRec_width, canvas.mainRec_height);
+                insideMovingItem = checkInsideMovingItem(canvas.width * canvas.mainRec_x, canvas.height * canvas.mainRec_y, canvas.mainRec_width, canvas.mainRec_height);
             }
 
             onWheelDeltaSignal: {
@@ -54,12 +72,20 @@ Rectangle {
             }
 
             function movingFunction(delta){
-                let withinBorders_ = withinBorders(delta, canvas.mainRec_x, canvas.mainRec_y, canvas.mainRec_width, canvas.mainRec_height);
+                let withinBorders_ = withinBorders(delta, canvas.width * canvas.mainRec_x, canvas.height * canvas.mainRec_y, canvas.mainRec_width, canvas.mainRec_height);
 
                 if(insideMovingItem && withinBorders_){
 
-                    canvas.mainRec_x_norm = (canvas.mainRec_x + delta.x)/canvas.width;
-                    canvas.mainRec_y_norm = (canvas.mainRec_y + delta.y)/canvas.height;
+                    let newX = (canvas.width * canvasPage.mainModel.GetData("X",0) + delta.x)/canvas.width;
+                    let newY = (canvas.height * canvasPage.mainModel.GetData("Y",0) + delta.y)/canvas.height;
+
+                    canvasPage.mainModel.SetData("X",newX, 0)
+                    canvasPage.mainModel.SetData("Y",newY, 0)
+
+//                    canvas.mainRec_x = (canvas.width * canvas.mainRec_x + delta.x)/canvas.width;
+//                    canvas.mainRec_y = (canvas.height * canvas.mainRec_y + delta.y)/canvas.height;
+
+
                     canvas.requestPaint();
                 }
             }
@@ -84,18 +110,12 @@ Rectangle {
             property real mainRec_width: 250 * scaleCoeff;
             property real mainRec_height: 60 * scaleCoeff;
 
-            //
-            property real mainRec_x: canvas.width * mainRec_x_norm
-            property real mainRec_y: canvas.height * mainRec_y_norm
+            //Убрать!!!
+            property real mainRec_x:  0.3
+            property real mainRec_y:  0.3
 
-            property real mainRec_x2:  canvas.width * mainRec_x2_norm
-            property real mainRec_y2: canvas.height * mainRec_y2_norm
-
-            property real mainRec_x_norm:  0.3
-            property real mainRec_y_norm:  0.3
-
-            property real mainRec_x2_norm:  0.6
-            property real mainRec_y2_norm:  0.6
+            property real mainRec_x2:  0.6
+            property real mainRec_y2:  0.6
             //
 
             property int fontSize: 20 * scaleCoeff;
@@ -233,12 +253,36 @@ Rectangle {
                 var ctx = canvas.getContext('2d');
                 ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-                drawLink(ctx, mainRec_x2 + mainRec_width/2, mainRec_y2 + mainRec_height/2,
-                         mainRec_x + mainRec_width/2, mainRec_y + mainRec_height/2)
+                //TEST
+                let x1 = canvasPage.mainModel.GetData("X", 0);
+                let y1 = canvasPage.mainModel.GetData("Y", 0);
+                let x2 = canvasPage.mainModel.GetData("X", 1);
+                let y2 = canvasPage.mainModel.GetData("Y", 1);
 
-                //drawObject(ctx, mainRec_x, mainRec_y, "Main text Main text Main text", "Second text");
-                drawObject(ctx, mainRec_x, mainRec_y, "Main text", "Second text");
-                drawObject(ctx, mainRec_x2 , mainRec_y2, "Main text 2", "Second text 2");
+
+                drawLink(ctx, canvas.width * x2 + mainRec_width/2, canvas.height * y2 + mainRec_height/2,
+                         canvas.width * x1 + mainRec_width/2, canvas.height * y1 + mainRec_height/2)
+
+                //TEST
+
+//                drawLink(ctx, canvas.width * canvas.mainRec_x2 + mainRec_width/2, canvas.height * canvas.mainRec_y2 + mainRec_height/2,
+//                         canvas.width * canvas.mainRec_x + mainRec_width/2, canvas.height * canvas.mainRec_y + mainRec_height/2)
+
+                //drawObject(ctx, canvas.width * canvas.mainRec_x, canvas.height * canvas.mainRec_y, "Main text Main text Main text", "Second text");
+
+
+                //drawObject(ctx, canvas.width * canvas.mainRec_x, canvas.height * canvas.mainRec_y, "Main text", "Second text");
+                //drawObject(ctx, canvas.width * canvas.mainRec_x2 , canvas.height * canvas.mainRec_y2, "Main text 2", "Second text 2");
+
+                for(let i = 0; i < canvasPage.mainModel.GetItemsCount(); i++){
+                    let x_  = canvasPage.mainModel.GetData("X", i)
+                    let y_  = canvasPage.mainModel.GetData("Y", i)
+                    let mainText_  = canvasPage.mainModel.GetData("MainText", i)
+                    let secondText_  = canvasPage.mainModel.GetData("SecondText", i)
+                    drawObject(ctx, canvas.width * x_, canvas.height * y_, mainText_, secondText_);
+
+                }
+
 
             }//onPaint
 
