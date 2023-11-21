@@ -19,18 +19,14 @@ MouseArea{
     signal deltaSignal(point delta)
     signal wheelDeltaSignal(int wheelDelta)
 
-    onClicked: {
-        let coord_ = mapToItem(this, mouse.x, mouse.y);
-        this.coord = coord_;
-        this.coordPressed = coord_;
-        this.insideMovingItem = checkInsideMovingItem();
-    }
-
     onPressed: {
         let coord_ = mapToItem(this, mouse.x, mouse.y);
         this.coord = coord_;
         this.coordPressed = coord_;
-        this.insideMovingItem = checkInsideMovingItem();
+        if(movingItem){
+            this.insideMovingItem = checkInsideMovingItem(movingItem.x, movingItem.y, movingItem.width, movingItem.height);
+        }
+
         wasMoving = false;
     }
 
@@ -41,8 +37,8 @@ MouseArea{
         this.coord = newCoords;
 
         moving.deltaSignal(Qt.point(deltaX_, deltaY_));
-        wasMoving = true;
 
+        wasMoving = true;
     }
 
     onWheel: {
@@ -60,7 +56,7 @@ MouseArea{
 
     function movingFunction(delta){
         if(movingItem){
-            let withinBorders_ = withinBorders(delta);
+            let withinBorders_ = withinBorders(delta, movingItem.x, movingItem.y, movingItem.width, movingItem.height);
 
             if(insideMovingItem && withinBorders_){
                 movingItem.x += delta.x;
@@ -69,28 +65,24 @@ MouseArea{
         }
     }
 
-    function checkInsideMovingItem(){
+    function checkInsideMovingItem(x_, y_, width_, height_){
         let ok = false
-        if(movingItem){
-             ok = moving.coordPressed.x >= movingItem.x
-                && moving.coordPressed.y >= movingItem.y
-                && moving.coordPressed.x <= movingItem.x + movingItem.width
-                && moving.coordPressed.y <= movingItem.y + movingItem.height
-        }
+             ok = moving.coordPressed.x >= x_
+                && moving.coordPressed.y >= y_
+                && moving.coordPressed.x <= x_ + width_
+                && moving.coordPressed.y <= y_ + height_
         return ok
     }
 
 
 
-    function withinBorders(delta){
+    function withinBorders(delta, x_, y_, width_, height_){
         let ok = false
-        if(movingItem){
              ok =
-             movingItem.x + delta.x > 10
-             && movingItem.y + delta.y > 10
-             && movingItem.x + delta.x < moving.width - moving.movingItem.width - 10
-             && movingItem.y + delta.y < moving.height - moving.movingItem.height - 10;
-        }
+             x_ + delta.x > 10
+             && y_ + delta.y > 10
+             && x_ + delta.x < moving.width - width_ - 10
+             && y_ + delta.y < moving.height - height_ - 10;
         return ok
     }
 
@@ -107,6 +99,5 @@ MouseArea{
         }
     }
 
-    //реализация
 
 }//moving
