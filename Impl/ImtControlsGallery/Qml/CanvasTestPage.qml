@@ -86,7 +86,7 @@ Rectangle {
         property bool fill: true
         property bool stroke: true
 
-        //variants
+        //variables
         property real mainRec_width: 350;
         property real mainRec_height: 60;
         property real mainRec_x: canvas.width/2 - mainRec_width/2;
@@ -94,7 +94,7 @@ Rectangle {
         property int radius_: 4;
         property string fillColor: filled ? "#90EE90" : "#ffffff";
         property bool filled: false;
-        //variants
+        //variables
 
         onWidthChanged: {
             requestPaint()
@@ -110,10 +110,10 @@ Rectangle {
             ctx.lineCap = "round"
             ctx.lineJoin = "round"
             ctx.clearRect(0, 0, canvas.width, canvas.height)
-            ctx.strokeStyle = "#000000"
             ctx.lineWidth = canvas.lineWidth;
 
             //main rectangle
+            ctx.strokeStyle = "#000000"
             ctx.roundedRect(mainRec_x, mainRec_y, mainRec_width, mainRec_height, radius_, radius_);
             ctx.stroke();
 
