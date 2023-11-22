@@ -41,6 +41,10 @@ Item{
                 tabDelegate.width = loaderDecorator.item.width;
             }
         }
+
+        onLoaded: {
+            console.log("tabDelegate Loader onLoaded", tabDelegate.height);
+        }
     }
 
     MouseArea{

@@ -44,24 +44,24 @@ Item {
             wrapMode: Text.WordWrap;
         }
 
-        CustomTextField {
-            id: inputField;
+//        CustomTextField {
+//            id: inputField;
 
-            anchors.horizontalCenter: parent.horizontalCenter;
+//            anchors.horizontalCenter: parent.horizontalCenter;
 
-            width: columnBody.width;
-            height: 30;
+//            width: columnBody.width;
+//            height: 30;
 
-            text: inputDialogBodyContainer.inputValue;
+//            text: inputDialogBodyContainer.inputValue;
 
-            onTextChanged: {
-                inputDialogBodyContainer.inputValue = inputField.text;
-            }
+//            onTextChanged: {
+//                inputDialogBodyContainer.inputValue = inputField.text;
+//            }
 
-            onAccepted: {
-                inputDialogBodyContainer.rootItem.buttons.buttonClicked("Ok");
-            }
-        }
+//            onAccepted: {
+//                inputDialogBodyContainer.rootItem.buttons.buttonClicked("Ok");
+//            }
+//        }
     }
 }
 

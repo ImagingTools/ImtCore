@@ -220,7 +220,7 @@ QtObject {
                     dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelObjectView);
 
                     let objectView = dataModelLocal.GetData("Path");
-                    let objectViewCommandsId = dataModelLocal.GetData("CommandsId");
+                    let objectViewCommandsId = dataModelLocal.GetData("CommandId");
 
                     gqlModelBaseContainer.objectViewEditorPath = objectView;
                     gqlModelBaseContainer.objectViewEditorCommandsId = objectViewCommandsId;

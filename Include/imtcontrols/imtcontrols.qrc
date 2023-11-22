@@ -17,6 +17,7 @@
 		<file alias="imtcontrols/Application/AlertMessage.qml">Qml/imtcontrols/Application/AlertMessage.qml</file>
                 <file alias="imtcontrols/Base/ControlBase.qml">Qml/imtcontrols/Base/ControlBase.qml</file>
                 <file alias="imtcontrols/Base/Enums.qml">Qml/imtcontrols/Base/Enums.qml</file>
+		<file alias="imtcontrols/Buttons/AuxButton.qml">Qml/imtcontrols/Buttons/AuxButton.qml</file>
                 <file alias="imtcontrols/Buttons/Button.qml">Qml/imtcontrols/Buttons/Button.qml</file>
 		<file alias="imtcontrols/Buttons/ButtonDecorator.qml">Qml/imtcontrols/Buttons/ButtonDecorator.qml</file>
                 <file alias="imtcontrols/Buttons/RadioButton.qml">Qml/imtcontrols/Buttons/RadioButton.qml</file>
@@ -44,6 +45,7 @@
 		<file alias="imtcontrols/Dialogs/PreferenceDialog.qml">Qml/imtcontrols/Dialogs/PreferenceDialog.qml</file>
 		<file alias="imtcontrols/Dialogs/PreferencePage.qml">Qml/imtcontrols/Dialogs/PreferencePage.qml</file>
 		<file alias="imtcontrols/Dialogs/TopPanelDialog.qml">Qml/imtcontrols/Dialogs/TopPanelDialog.qml</file>
+		<file alias="imtcontrols/Document/CommandsProvider.qml">Qml/imtcontrols/Document/CommandsProvider.qml</file>
 		<file alias="imtcontrols/Document/DocumentBase.qml">Qml/imtcontrols/Document/DocumentBase.qml</file>
 		<file alias="imtcontrols/Document/DocumentDataProvider.qml">Qml/imtcontrols/Document/DocumentDataProvider.qml</file>
 		<file alias="imtcontrols/Document/DocumentWorkspaceCommandsDelegate.qml">Qml/imtcontrols/Document/DocumentWorkspaceCommandsDelegate.qml</file>
@@ -54,6 +56,10 @@
 		<file alias="imtcontrols/Document/SingleDocumentWorkspaceView.qml">Qml/imtcontrols/Document/SingleDocumentWorkspaceView.qml</file>
 		<file alias="imtcontrols/Document/UndoRedo.qml">Qml/imtcontrols/Document/UndoRedo.qml</file>
 		<file alias="imtcontrols/Document/UndoRedoManager.qml">Qml/imtcontrols/Document/UndoRedoManager.qml</file>
+		<file alias="imtcontrols/Document/DocumentData.qml">Qml/imtcontrols/Document/DocumentData.qml</file>
+		<file alias="imtcontrols/Document/DocumentManager.qml">Qml/imtcontrols/Document/DocumentManager.qml</file>
+		<file alias="imtcontrols/Document/DocumentView.qml">Qml/imtcontrols/Document/DocumentView.qml</file>
+		<file alias="imtcontrols/Inputs/CustomTextField.qml">Qml/imtcontrols/Inputs/CustomTextField.qml</file>
 		<file alias="imtcontrols/Inputs/Calendar.qml">Qml/imtcontrols/Inputs/Calendar.qml</file>
 		<file alias="imtcontrols/Inputs/ComboBox.qml">Qml/imtcontrols/Inputs/ComboBox.qml</file>
 		<file alias="imtcontrols/Inputs/DatePicker.qml">Qml/imtcontrols/Inputs/DatePicker.qml</file>
@@ -79,6 +85,8 @@
 		<file alias="imtcontrols/Panels/TopCenterPanelDecorator.qml">Qml/imtcontrols/Panels/TopCenterPanelDecorator.qml</file>
 		<file alias="imtcontrols/Panels/TopPanel.qml">Qml/imtcontrols/Panels/TopPanel.qml</file>
 		<file alias="imtcontrols/Panels/TopPanelDecorator.qml">Qml/imtcontrols/Panels/TopPanelDecorator.qml</file>
+		<file alias="imtcontrols/Panels/TabPanel.qml">Qml/imtcontrols/Panels/TabPanel.qml</file>
+		<file alias="imtcontrols/Panels/TabPanelDecorator.qml">Qml/imtcontrols/Panels/TabPanelDecorator.qml</file>	
 		<file alias="imtcontrols/Panels/TopRightPanelDecorator.qml">Qml/imtcontrols/Panels/TopRightPanelDecorator.qml</file>
 		<file alias="imtcontrols/Settings/LocalSettingsModelObserver.qml">Qml/imtcontrols/Settings/LocalSettingsModelObserver.qml</file>
 		<file alias="imtcontrols/Settings/PageAboutProvider.qml">Qml/imtcontrols/Settings/PageAboutProvider.qml</file>

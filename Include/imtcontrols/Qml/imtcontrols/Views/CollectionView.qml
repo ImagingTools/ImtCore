@@ -18,7 +18,7 @@ Item {
     property bool visibleMetaInfo: true;
     property bool hasFilter: true;
 
-    property string commandsId;
+    property string commandId;
     property string editorPath;
     property string commandsDelegatePath: "CollectionViewCommandsDelegateBase.qml";
     property string commandUpdateGui;
@@ -108,7 +108,7 @@ Item {
         console.log("CollectionView onVisibleChanged", visible, itemId, collectionViewContainer);
         if (collectionViewContainer.visible){
             Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderLocal.commandsModel,
-                                                      "CommandsId": commandsProviderLocal.commandsId});
+                                                      "CommandId": commandsProviderLocal.commandId});
 
             Events.subscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
 
@@ -146,27 +146,27 @@ Item {
         contextMenuModel.append({"Id": "SetDescription", "Name": qsTr("Set Description"), "IconSource": ""});
     }
 
-    onCommandsIdChanged: {
-        console.log("CollectionView onCommandsIdChanged", collectionViewContainer.commandsId);
+    onCommandIdChanged: {
+        console.log("CollectionView onCommandsIdChanged", collectionViewContainer.commandId);
 
-        commandsProviderLocal.commandsId = collectionViewContainer.commandsId;
-        commandsProviderLocal.documentUuid = collectionViewContainer.commandsId;
+        commandsProviderLocal.commandId = collectionViewContainer.commandId;
+        commandsProviderLocal.documentUuid = collectionViewContainer.commandId;
 
-        collectionViewBase.commands.gqlModelObjectView = collectionViewContainer.commandsId + "ObjectView";
-        collectionViewBase.commands.gqlModelHeadersInfo = collectionViewContainer.commandsId + "Info";
-        collectionViewBase.commands.gqlModelItemsInfo = collectionViewContainer.commandsId + "List";
+        collectionViewBase.commands.gqlModelObjectView = collectionViewContainer.commandId + "ObjectView";
+        collectionViewBase.commands.gqlModelHeadersInfo = collectionViewContainer.commandId + "Info";
+        collectionViewBase.commands.gqlModelItemsInfo = collectionViewContainer.commandId + "List";
 
-        collectionViewBase.commandsId = collectionViewContainer.commandsId;
+        collectionViewBase.commandsId = collectionViewContainer.commandId;
 
-        collectionMetaInfo.gqlModelMetaInfo = collectionViewContainer.commandsId + "MetaInfo";
+        collectionMetaInfo.gqlModelMetaInfo = collectionViewContainer.commandId + "MetaInfo";
 
         if (commandsLoader.item){
-            commandsLoader.item.commandsId = collectionViewContainer.commandsId;
+            commandsLoader.item.commandId = collectionViewContainer.commandId;
 
-            commandsLoader.item.gqlModelItem = commandsLoader.item.commandsId + "Item";
-            commandsLoader.item.gqlModelRemove = commandsLoader.item.commandsId + "Remove";
-            commandsLoader.item.gqlModelRename = commandsLoader.item.commandsId + "Rename";
-            commandsLoader.item.gqlModelSetDescription = commandsLoader.item.commandsId + "SetDescription";
+            commandsLoader.item.gqlModelItem = commandsLoader.item.commandId + "Item";
+            commandsLoader.item.gqlModelRemove = commandsLoader.item.commandId + "Remove";
+            commandsLoader.item.gqlModelRename = commandsLoader.item.commandId + "Rename";
+            commandsLoader.item.gqlModelSetDescription = commandsLoader.item.commandId + "SetDescription";
         }
     }
 
@@ -176,8 +176,8 @@ Item {
 
     function selectItem(id, name, index){
         let editorPath = collectionViewBase.commands.objectViewEditorPath;
-        let commandsId = collectionViewBase.commands.objectViewEditorCommandsId;
-        console.log("CollectionView selectItem", id, name, commandsId, editorPath);
+        let commandId = collectionViewBase.commands.objectViewEditorCommandsId;
+        console.log("CollectionView selectItem", id, name, commandId, editorPath);
 
         if(name === undefined){
             name = " ";
@@ -185,14 +185,14 @@ Item {
 
         if (collectionViewContainer.isUsedDocumentManager){
             if (id === ""){
-                documentManager.addDocument({"Id": id, "Name": name, "CommandsId": commandsId, "Source": editorPath}, {}, false);
+                documentManager.addDocument({"Id": id, "Name": name, "CommandId": commandId, "Source": editorPath}, {}, false);
             }
             else{
-                documentManager.openDocument(id, {"Id": id, "Name": name, "CommandsId": commandsId, "Source": editorPath});
+                documentManager.openDocument(id, {"Id": id, "Name": name, "CommandId": commandId, "Source": editorPath});
             }
         }
         else{
-            modalDialogManager.openDialog(contentDialog, {"contentId": id, "contentName": name, "contentCommandsId": commandsId,"contentSource": editorPath});
+            modalDialogManager.openDialog(contentDialog, {"contentId": id, "contentName": name, "contentCommandsId": commandId,"contentSource": editorPath});
         }
     }
 
@@ -242,7 +242,7 @@ Item {
                     contentLoader.height = item.height;
                     contentLoader.item.itemId = content.contentId;
                     contentLoader.item.itemName = content.contentName;
-                    contentLoader.item.commandsId = content.contentCommandsId;
+                    contentLoader.item.commandId = content.contentCommandsId;
                 }
             }
         }
@@ -266,10 +266,6 @@ Item {
 
             commandsLoader.item.contextMenuModel = collectionViewContainer.contextMenuModel;
         }
-    }
-
-    TreeItemModel {
-        id: collectionViewModel;
     }
 
     Rectangle {
@@ -301,7 +297,7 @@ Item {
 
         itemId: collectionViewContainer.itemId;
 
-        commandsId: parent.commandsId;
+        commandsId: parent.commandId;
         loadData: true;
         hasFilter: collectionViewContainer.hasFilter;
 

@@ -7,24 +7,41 @@ Rectangle {
     anchors.fill: parent;
 
     property var startPageObj;
-    property MainDocumentManager mainDocumentManager: null;
+//    property MainDocumentManager mainDocumentManager: null;
+
+    Component.onCompleted: {
+        console.log("multiDocPageView onCompleted");
+    }
 
     onStartPageObjChanged: {
         console.log("multiDocPageView onStartPageObjChanged");
-        documentManager.addDocument(multiDocPageView.startPageObj, {}, false)
 
-        if (multiDocPageView.mainDocumentManager != null){
-            multiDocPageView.mainDocumentManager.registerDocumentManager(multiDocPageView.startPageObj["CommandsId"], documentManager);
+        let source = startPageObj["Source"];
+        let typeId = startPageObj["CommandId"];
+
+        console.log("source", source);
+
+        var startItemComp = Qt.createComponent(source);
+        if (startItemComp.status !== Component.Ready) {
+            console.log("Start component not ready!", startItemComp.errorString());
+
+            return;
         }
 
-        documentManager.documentLoading = false;
+//        var startItemObj = startItemComp.createObject(documentManager);
+//        if (!startItemObj){
+//            console.log("Start item object not ready!");
+
+//            return;
+//        }
+
+        documentManager.registerDocument(typeId, startItemComp);
+        documentManager.insertNewDocument(typeId);
     }
 
     MultiDocWorkspaceView {
         id: documentManager;
 
         anchors.fill: parent;
-
-        mainDocumentManager: multiDocPageView.mainDocumentManager;
     }
 }

@@ -16,6 +16,7 @@ AlertMessage 1.0 ./Application/AlertMessage.qml
 ApplicationInfoProvider 1.0 ./Application/ApplicationInfoProvider.qml
 ControlBase 1.0 ./Base/ControlBase.qml
 Enums 1.0 ./Base/Enums.qml
+AuxButton 1.0 ./Buttons/AuxButton.qml
 Button 1.0 ./Buttons/Button.qml
 ButtonDecorator 1.0 ./Buttons/ButtonDecorator.qml
 RadioButton 1.0 ./Buttons/RadioButton.qml
@@ -44,6 +45,8 @@ PreferenceDialog 1.0 ./Dialogs/PreferenceDialog.qml
 PreferencePage 1.0 ./Dialogs/PreferencePage.qml
 TopPanelDialog 1.0 ./Dialogs/TopPanelDialog.qml
 DocumentBase 1.0 ./Document/DocumentBase.qml
+DocumentData 1.0 ./Document/DocumentData.qml
+CommandsProvider 1.0 ./Document/CommandsProvider.qml
 DocumentDataProvider 1.0 ./Document/DocumentDataProvider.qml
 DocumentWorkspaceCommandsDelegate 1.0 ./Document/DocumentWorkspaceCommandsDelegate.qml
 DocumentWorkspaceCommandsDelegateBase 1.0 ./Document/DocumentWorkspaceCommandsDelegateBase.qml
@@ -57,6 +60,7 @@ Calendar 1.0 ./Inputs/Calendar.qml
 ComboBox 1.0 ./Inputs/ComboBox.qml
 CheckBox 1.0 ./Inputs/CheckBox.qml
 Slider 1.0 ./Inputs/Slider.qml
+CustomTextField 1.0 ./Inputs/CustomTextField.qml
 RangeSlider 1.0 ./Inputs/RangeSlider.qml
 DatePicker 1.0 ./Inputs/DatePicker.qml
 InputActions 1.0 ./Inputs/InputActions.qml
@@ -77,6 +81,7 @@ FilterPanelDecorator 1.0 ./Panels/FilterPanelDecorator.qml
 MenuPanel 1.0 ./Panels/MenuPanel.qml
 TopCenterPanelDecorator 1.0 ./Panels/TopCenterPanelDecorator.qml
 TopPanel 1.0 ./Panels/TopPanel.qml
+TabPanel 1.0 ./Panels/TabPanel.qml
 TopPanelDecorator 1.0 ./Panels/TopPanelDecorator.qml
 TopRightPanelDecorator 1.0 ./Panels/TopRightPanelDecorator.qml
 LocalSettingsModelObserver 1.0 ./Settings/LocalSettingsModelObserver.qml
