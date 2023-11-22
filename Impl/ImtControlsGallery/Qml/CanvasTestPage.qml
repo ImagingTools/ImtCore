@@ -9,44 +9,74 @@ Rectangle {
 
     anchors.fill: parent;
 
-    property TreeItemModel mainModel: TreeItemModel{};
     property TreeItemModel objectModel: TreeItemModel{};
-    property TreeItemModel linkModel: TreeItemModel{};
 
     Component.onCompleted: {
+
+        let index_link = linkModel.InsertNewItem();
+        linkModel.SetData("ObjectId", "02", index_link);
+        index_link = linkModel.InsertNewItem();
+        linkModel.SetData("ObjectId", "03", index_link);
+        index_link = linkModel.InsertNewItem();
+        linkModel.SetData("ObjectId", "04", index_link);
+        index_link = linkModel.InsertNewItem();
+        linkModel.SetData("ObjectId", "05", index_link);
+        //
+
         let index = objectModel.InsertNewItem();
+        objectModel.SetData("Id", "01", index);
         objectModel.SetData("X", 0.3, index);
         objectModel.SetData("Y", 0.3, index);
         objectModel.SetData("MainText", "Main text Main text Main text", index);
         objectModel.SetData("SecondText", "Second text", index);
+        objectModel.SetExternTreeModel("Links", linkModel, index);
 
         index = objectModel.InsertNewItem();
+        objectModel.SetData("Id", "02", index);
         objectModel.SetData("X", 0.6, index);
         objectModel.SetData("Y", 0.6, index);
         objectModel.SetData("MainText", "Main text 2", index);
         objectModel.SetData("SecondText", "Second text 2", index);
 
         index = objectModel.InsertNewItem();
+        objectModel.SetData("Id", "03", index);
         objectModel.SetData("X", 0.1, index);
         objectModel.SetData("Y", 0.1, index);
         objectModel.SetData("MainText", "Main text 3", index);
         objectModel.SetData("SecondText", "Second text 3", index);
 
         index = objectModel.InsertNewItem();
+        objectModel.SetData("Id", "04", index);
         objectModel.SetData("X", 0.6, index);
         objectModel.SetData("Y", 0.1, index);
         objectModel.SetData("MainText", "Main text 4", index);
         objectModel.SetData("SecondText", "Second text 4", index);
 
         index = objectModel.InsertNewItem();
+        objectModel.SetData("Id", "05", index);
         objectModel.SetData("X", 0.1, index);
         objectModel.SetData("Y", 0.6, index);
         objectModel.SetData("MainText", "Main text 5", index);
         objectModel.SetData("SecondText", "Second text 5", index);
 
-
         canvas.requestPaint()
     }
+
+    function findModelIndex(id){
+        let ind = -1;
+        for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
+            if(canvasPage.objectModel.GetData("Id", i) == id){
+                ind = i;
+                break;
+            }
+        }
+        return ind;
+    }
+
+    TreeItemModel {//for test
+        id: linkModel;
+    }
+
 
     Rectangle{
         id: mainContainer;
@@ -226,12 +256,48 @@ Rectangle {
                 requestPaint()
             }
 
-            function drawObject(ctx, x_, y_, width_, mainText, secondText, selected, index){
-
-                ctx.lineCap = "round"
-                ctx.lineJoin = "round"
+            onPaint: {
+                var ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height)
 
                 //width calculation
+                for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
+                    setObjectWidth(ctx, i);
+                }
+
+                //drawLink
+                for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
+                    if(canvasPage.objectModel.GetData("Links", i) !==undefined){
+                        let links = objectModel.GetData("Links",i);
+                        for(let k = 0; k < links.GetItemsCount(); k++){
+                            let objectId = links.GetData("ObjectId", k);
+                            let ind = canvasPage.findModelIndex(objectId);
+                            canvas.drawLink(ctx, ind, i);
+                        }
+
+                    }
+                }
+
+                //drawObject
+                for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
+                    let x_  = canvasPage.objectModel.GetData("X", i)
+                    let y_  = canvasPage.objectModel.GetData("Y", i)
+                    let mainText_  = canvasPage.objectModel.GetData("MainText", i)
+                    let secondText_  = canvasPage.objectModel.GetData("SecondText", i)
+                    let width_ = canvasPage.objectModel.IsValidData("Width", i) ? canvasPage.objectModel.GetData("Width", i) * canvas.scaleCoeff : canvas.mainRec_width;
+                    let selected_ = canvasPage.objectModel.IsValidData("Selected", i) ? canvasPage.objectModel.GetData("Selected", i) : false;
+
+                    drawObject(ctx, canvas.width * x_, canvas.height * y_, width_, mainText_, secondText_, selected_, i);
+                }
+
+            }//onPaint
+
+            function setObjectWidth(ctx, index){
+                //width calculation
+                let mainText  = canvasPage.objectModel.GetData("MainText", index)
+                let secondText  = canvasPage.objectModel.GetData("SecondText", index)
+                let width_ = canvasPage.objectModel.IsValidData("Width", index) ? canvasPage.objectModel.GetData("Width", index) * canvas.scaleCoeff : canvas.mainRec_width;
+
                 ctx.lineWidth = 1;
                 let fontStr_main = String(canvas.fontSize) + "px sans-serif"
                 ctx.font = fontStr_main; //"20px sans-serif";
@@ -247,7 +313,17 @@ Rectangle {
                 let add = 2 * canvas.imageSize + 2 * canvas.imageMargin + 2 * canvas.borderShift + 30 * scaleCoeff;
                 let mainRecWidth = Math.max(textWidth_main + add, textWidth_second + add, width_)
                 canvasPage.objectModel.SetData("Width", mainRecWidth / scaleCoeff, index);
+
+                return mainRecWidth;
+            }
+
+            function drawObject(ctx, x_, y_, width_, mainText, secondText, selected, index){
+
+                ctx.lineCap = "round"
+                ctx.lineJoin = "round"
+
                 //width calculation
+                let mainRecWidth = setObjectWidth(ctx, index);
 
                 //shadow rectangle
                 let shadowSize = 6 * canvas.scaleCoeff;
@@ -437,27 +513,14 @@ Rectangle {
                 return Qt.point(px, py);
             }
 
-            onPaint: {
-                var ctx = canvas.getContext('2d');
-                ctx.clearRect(0, 0, canvas.width, canvas.height)
+        }//canvas
+    }//mainContainer
 
-                //TEST drawLink
-                drawLink(ctx, 1, 0)
-                //TEST drawLink
-
-                for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
-                    let x_  = canvasPage.objectModel.GetData("X", i)
-                    let y_  = canvasPage.objectModel.GetData("Y", i)
-                    let mainText_  = canvasPage.objectModel.GetData("MainText", i)
-                    let secondText_  = canvasPage.objectModel.GetData("SecondText", i)
-                    let width_ = canvasPage.objectModel.IsValidData("Width", i) ? canvasPage.objectModel.GetData("Width", i) * canvas.scaleCoeff : canvas.mainRec_width;
-                    let selected_ = canvasPage.objectModel.IsValidData("Selected", i) ? canvasPage.objectModel.GetData("Selected", i) : false;
-
-                    drawObject(ctx, canvas.width * x_, canvas.height * y_, width_, mainText_, secondText_, selected_, i);
-                }//for
-
-            }//onPaint
-
+    Shortcut {
+        sequence: "Ctrl+Z";
+        enabled: true;
+        onActivated: {
+            console.log("Ctrl+z");
         }
     }
 
