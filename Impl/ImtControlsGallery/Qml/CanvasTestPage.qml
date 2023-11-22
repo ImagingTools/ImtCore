@@ -86,7 +86,7 @@ Rectangle {
                 for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
                     let x_  = canvasPage.objectModel.GetData("X", i)
                     let y_  = canvasPage.objectModel.GetData("Y", i)
-                    let width_ = canvasPage.objectModel.IsValidData("Width", i) ? canvasPage.objectModel.GetData("Width", i) : canvas.mainRec_width;
+                    let width_ = canvasPage.objectModel.IsValidData("Width", i) ? canvasPage.objectModel.GetData("Width", i) * canvas.scaleCoeff : canvas.mainRec_width;
 
                     let ok = checkInsideMovingItem(canvas.width * x_, canvas.height * y_, width_, canvas.mainRec_height);
 
@@ -112,7 +112,7 @@ Rectangle {
                 if(canvas.foundIndex >= 0){
                     let x_  = canvasPage.objectModel.GetData("X", canvas.foundIndex);
                     let y_  = canvasPage.objectModel.GetData("Y", canvas.foundIndex);
-                    let width_ = canvasPage.objectModel.IsValidData("Width", canvas.foundIndex) ? canvasPage.objectModel.GetData("Width", canvas.foundIndex) : canvas.mainRec_width;
+                    let width_ = canvasPage.objectModel.IsValidData("Width", canvas.foundIndex) ? canvasPage.objectModel.GetData("Width", canvas.foundIndex) * canvas.scaleCoeff : canvas.mainRec_width;
 
                     let withinBorders_ = withinBorders(delta, canvas.width * x_, canvas.height * y_, width_, canvas.mainRec_height);
 
@@ -144,7 +144,7 @@ Rectangle {
                     for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
                         let x_  = canvasPage.objectModel.GetData("X", i)
                         let y_  = canvasPage.objectModel.GetData("Y", i)
-                        let width_ = canvasPage.objectModel.IsValidData("Width", i) ? canvasPage.objectModel.GetData("Width", i) : canvas.mainRec_width;
+                        let width_ = canvasPage.objectModel.IsValidData("Width", i) ? canvasPage.objectModel.GetData("Width", i) * canvas.scaleCoeff : canvas.mainRec_width;
 
                         let ok = moving.checkHoverItem(canvas.width * x_, canvas.height * y_, width_, canvas.mainRec_height, position);
                         if(ok){
@@ -246,9 +246,7 @@ Rectangle {
 
                 let add = 2 * canvas.imageSize + 2 * canvas.imageMargin + 2 * canvas.borderShift + 30 * scaleCoeff;
                 let mainRecWidth = Math.max(textWidth_main + add, textWidth_second + add, width_)
-                if(mainRecWidth > canvas.mainRec_width && index >= 0){
-                    canvasPage.objectModel.SetData("Width", mainRecWidth, index);
-                }
+                canvasPage.objectModel.SetData("Width", mainRecWidth / scaleCoeff, index);
                 //width calculation
 
                 //shadow rectangle
@@ -324,8 +322,8 @@ Rectangle {
                 let y1 = canvasPage.objectModel.GetData("Y", fromIndex);
                 let x2 = canvasPage.objectModel.GetData("X", toIndex);
                 let y2 = canvasPage.objectModel.GetData("Y", toIndex);
-                let width1 = canvasPage.objectModel.IsValidData("Width", fromIndex) ? canvasPage.objectModel.GetData("Width", fromIndex) : canvas.mainRec_width;
-                let width2 = canvasPage.objectModel.IsValidData("Width", toIndex) ? canvasPage.objectModel.GetData("Width", toIndex) : canvas.mainRec_width;
+                let width1 = canvasPage.objectModel.IsValidData("Width", fromIndex) ? canvasPage.objectModel.GetData("Width", fromIndex) * canvas.scaleCoeff : canvas.mainRec_width;
+                let width2 = canvasPage.objectModel.IsValidData("Width", toIndex) ? canvasPage.objectModel.GetData("Width", toIndex) * canvas.scaleCoeff : canvas.mainRec_width;
 
                 let x1_link = canvas.width * x1 + width1/2;
                 let y1_link = canvas.height * y1 + canvas.mainRec_height/2;
@@ -452,7 +450,7 @@ Rectangle {
                     let y_  = canvasPage.objectModel.GetData("Y", i)
                     let mainText_  = canvasPage.objectModel.GetData("MainText", i)
                     let secondText_  = canvasPage.objectModel.GetData("SecondText", i)
-                    let width_ = canvasPage.objectModel.IsValidData("Width", i) ? canvasPage.objectModel.GetData("Width", i) : canvas.mainRec_width;
+                    let width_ = canvasPage.objectModel.IsValidData("Width", i) ? canvasPage.objectModel.GetData("Width", i) * canvas.scaleCoeff : canvas.mainRec_width;
                     let selected_ = canvasPage.objectModel.IsValidData("Selected", i) ? canvasPage.objectModel.GetData("Selected", i) : false;
 
                     drawObject(ctx, canvas.width * x_, canvas.height * y_, width_, mainText_, secondText_, selected_, i);
