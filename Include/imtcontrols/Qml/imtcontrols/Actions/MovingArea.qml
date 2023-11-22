@@ -86,6 +86,15 @@ MouseArea{
         return ok
     }
 
+    function checkHoverItem(x_, y_, width_, height_, coord_){
+        let ok = false
+             ok = coord_.x >= x_
+                && coord_.y >= y_
+                && coord_.x <= x_ + width_
+                && coord_.y <= y_ + height_
+        return ok
+    }
+
 
 
     function withinBorders(delta, x_, y_, width_, height_){
