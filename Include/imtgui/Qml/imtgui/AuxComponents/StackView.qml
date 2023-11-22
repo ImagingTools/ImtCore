@@ -57,7 +57,7 @@ Item {
                 //dialogLoader.item.documentsData = model.documentsData;
                 dialogLoader.item.documentManager = model.documentManager;
                 dialogLoader.item.itemId = model.Id;
-                dialogLoader.item.commandsId = model.CommandsId;
+                dialogLoader.item.documentTypeId = model.CommandId;
                 dialogLoader.item.forceActiveFocus();
             }
         }

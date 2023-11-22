@@ -61,7 +61,7 @@ void CWebSocketServerComp::OnComponentCreated()
 	}
 
 	connect(&m_timer, &QTimer::timeout, this, &CWebSocketServerComp::OnTimeout);
-	m_timer.start(10000);
+	m_timer.start(15000);
 }
 
 
@@ -163,6 +163,8 @@ void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 		return;
 	}
 
+	qDebug() << "CWebSocketServerComp OnWebSocketTextMessage" << textMessage;
+
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
 
 	if (webSocketPtr == nullptr){
@@ -182,6 +184,7 @@ void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 		webSocketRequest->SetBody(textMessage.toUtf8());
 
 		imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
+		qDebug() << "methodType" << methodType;
 		if (methodType == CWebSocketRequest::MT_START){
 			newRequestPtr.PopPtr();
 			QSharedPointer<CWebSocketSender> socketSender(new CWebSocketSender(webSocketPtr));
@@ -248,10 +251,14 @@ void CWebSocketServerComp::OnError(QAbstractSocket::SocketError error)
 
 void CWebSocketServerComp::OnTimeout()
 {
+	qDebug() << "OnTimeout";
+	qDebug() << "Senders count: " << m_senders.count();
 	for (const QByteArray& key: m_senders.keys()){
 		if (!m_senders[key].isNull()){
 			QWebSocket* webSocketPtr = const_cast<QWebSocket*>(m_senders[key]->GetSocket());
 			if (webSocketPtr != nullptr){
+				qDebug() << "Key" << key << "send text message";
+
 				webSocketPtr->sendTextMessage(QString(R"({"type": "keep_alive"})"));
 			}
 		}

@@ -140,7 +140,9 @@ Item {
                     serverUrl += "/";
                 }
 
-                serverUrl += "wssub";
+                serverUrl += "Lisa/wssub";
+
+//                serverUrl = "ws://localhost:8776"
 
                 subscriptionManager.url = serverUrl;
             }

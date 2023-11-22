@@ -31,8 +31,6 @@ public:
 	virtual void SetLicenseDescription(const QString& licenseDescription) override;
 	virtual QByteArray GetProductId() const override;
 	virtual void SetProductId(const QByteArray& productId) override;
-//	virtual QByteArrayList GetFeatures() const override;
-//	virtual void SetFeatures(QByteArrayList features) override;
 	virtual QByteArrayList GetDependencies() const override;
 	virtual void SetDependencies(QByteArrayList dependencies) override;
 	virtual ILicenseDefinition::FeatureInfos GetFeatureInfos() const override;

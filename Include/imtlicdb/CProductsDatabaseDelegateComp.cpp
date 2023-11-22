@@ -5,6 +5,9 @@
 #include <iprm/TParamsPtr.h>
 #include <iprm/IIdParam.h>
 
+// ImtCore includes
+#include <imtlic/IProductInfo.h>
+
 
 namespace imtlicdb
 {
@@ -44,6 +47,31 @@ bool CProductsDatabaseDelegateComp::CreateObjectFilterQuery(const iprm::IParamsS
 	return true;
 }
 
+
+bool CProductsDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
+{
+	BaseClass::SetObjectMetaInfoFromRecord(record, metaInfo);
+
+	if (record.contains("Document")){
+		QByteArray json = record.value("Document").toByteArray();
+		QJsonDocument jsonDocument = QJsonDocument::fromJson(json);
+		if (!jsonDocument.isNull()){
+			QString productId = jsonDocument["ProductId"].toString();
+			metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_ID, productId);
+
+			QString productName = jsonDocument["ProductName"].toString();
+			metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_NAME, productName);
+
+			QString description = jsonDocument["ProductDescription"].toString();
+			metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_DESCRIPTION, description);
+
+			QString category = jsonDocument["CategoryId"].toString();
+			metaInfo.SetMetaInfo(imtlic::IProductInfo::MIT_PRODUCT_CATEGORY, category);
+		}
+	}
+
+	return true;
+}
 
 
 } // namespace imtlicdb

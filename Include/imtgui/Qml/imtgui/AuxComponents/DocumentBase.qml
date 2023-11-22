@@ -7,7 +7,7 @@ Item {
 
     property string itemId;
     property string itemName;
-    property string commandsId;
+    property string documentTypeId;
     property string documentUuid;
 
     property TreeItemModel documentModel: TreeItemModel {};
@@ -40,7 +40,7 @@ Item {
     property var additionInputParams: ({})
 
     property CommandsProvider commandsProvider: CommandsProvider {
-        commandsId: documentBaseRoot.commandsId;
+        commandId: documentBaseRoot.documentTypeId;
     }
 
     signal commandsDelegateLoaded();
@@ -198,7 +198,8 @@ Item {
         documentBaseRoot.commandsProvider.setCommandIsEnabled("Save", documentBaseRoot.isDirty);
     }
 
-    onCommandsIdChanged: {
+    onDocumentTypeIdChanged: {
+        console.log("onDocumentTypeIdChanged", documentBaseRoot.documentTypeId);
         if (documentBaseRoot.itemId === ""){
             documentBaseRoot.documentModel.dataChanged.connect(documentBaseRoot.onDataChanged);
 

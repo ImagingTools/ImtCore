@@ -12,6 +12,8 @@ Item {
 
     property bool documentLoading: false;
 
+    property alias alertPanelComp: alertPanel.sourceComponent;
+
     Component.onCompleted: {
         Events.subscribeEvent("DocumentUpdating", documentManager.documentUpdating);
     }
@@ -24,8 +26,8 @@ Item {
         console.log("onStartPageObjChanged", documentManager.startPageObj["Source"]);
         documentLoader.source = documentManager.startPageObj["Source"];
 
-        if (documentLoader.item.commandsId !== undefined){
-            documentLoader.item.commandsId = documentManager.startPageObj["CommandsId"];
+        if (documentLoader.item.commandId !== undefined){
+            documentLoader.item.commandId = documentManager.startPageObj["CommandId"];
         }
 
         if(documentLoader.item.documentManager !== undefined){
@@ -50,7 +52,7 @@ Item {
         let documentName = parameters["Name"];
 
         if(documentLoader.item){
-            documentLoader.item.updateGui();
+//            documentLoader.item.updateGui();
         }
 
         // Get last document in stack view and setting data
@@ -88,6 +90,8 @@ Item {
     }
 
     function addDocument(documentObj, params, isRequested){
+        console.log("addDocument" , documentObj, params, isRequested);
+
         if (isRequested === undefined){
             isRequested = false;
         }
@@ -97,8 +101,9 @@ Item {
     }
 
     function openDocument(itemId, document, isRequested){
+        console.log("openDocument" , itemId, document, isRequested);
+
         documentManager.documentLoading = true;
-        console.log("openDocument" , JSON.stringify(document));
         let keys = Object.keys(document);
 
         document["documentsData"] = documentsData;
@@ -109,7 +114,7 @@ Item {
         }
 
         let documentId = document["Id"];
-        let commandId = document["CommandsId"];
+        let commandId = document["CommandId"];
 
         if (isRequested){
         }
@@ -151,10 +156,24 @@ Item {
     function setDocumentTitle(){
     }
 
+    Loader {
+        id: alertPanel;
+
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+
+        height: visible ? 40: 0;
+
+        visible: alertPanel.status == Loader.Ready;
+    }
+
     StackView {
         id: stackView;
 
-        anchors.fill: parent;
+        anchors.top: alertPanel.bottom;
+        anchors.bottom: parent.bottom;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
     }
 
     GqlDocumentDataController {

@@ -15,7 +15,7 @@ CollectionView {
         width: baseCollectionView.table.width;
 
         selectedIndex: baseCollectionView.table.selectedIndex;
-        commandsId: roleCollectionViewContainer.commandsId;
+        commandsId: roleCollectionViewContainer.commandId;
         baseCollectionView: roleCollectionViewContainer.baseCollectionView;
         newIsEnabled: roleCollectionViewContainer.newCommandIsEnabled;
 
@@ -87,7 +87,7 @@ CollectionView {
         let elements = baseCollectionView.table.elements;
 
         let productId = elements.GetData("Id");
-        documentManager.openDocument(id, {"Id": id, "ProductId": productId, "Name": name, "Source": editorPath, "CommandsId": commandsId});
+        documentManager.openDocument(id, {"Id": id, "ProductId": productId, "Name": name, "Source": editorPath, "CommandId": commandsId});
     }
 
     function onCommandsModelChanged(){

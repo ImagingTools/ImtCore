@@ -7,7 +7,7 @@ QtObject {
 
     property TreeItemModel commandsModel: TreeItemModel {};
 
-    property string commandsId;
+    property string commandId;
     property string documentUuid;
     property bool isLoadData: true
     property var additionInputParams: ({})
@@ -16,10 +16,10 @@ QtObject {
     signal commandModeChanged(string commandId, bool newMode);
 
     Component.onDestruction: {
-        Events.unSubscribeEvent(commandsProviderContainer.documentUuid + "_CommandsUpdateModel", commandsProviderContainer.updateModel)
+        Events.unSubscribeEvent(commandsProviderContainer.documentUuid + "_CommandUpdateModel", commandsProviderContainer.updateModel)
     }
 
-    onCommandsIdChanged: {
+    onCommandIdChanged: {
         commandsProviderContainer.modelCommands.updateModel();
     }
 
@@ -31,11 +31,11 @@ QtObject {
     }
 
     onDocumentUuidChanged: {
-        Events.subscribeEvent(commandsProviderContainer.documentUuid + "_CommandsUpdateModel", commandsProviderContainer.updateModel)
+        Events.subscribeEvent(commandsProviderContainer.documentUuid + "_CommandUpdateModel", commandsProviderContainer.updateModel)
     }
 
     onCommandModeChanged: {
-        Events.sendEvent("CommandsEnabledChanged", {"CommandsId":commandsProviderContainer.documentUuid, "CommandId":commandId, "Enabled":newMode, "Model": commandsProviderContainer.commandsModel});
+        Events.sendEvent("CommandsEnabledChanged", {"CommandId":commandsProviderContainer.documentUuid, "CommandId":commandId, "Enabled":newMode, "Model": commandsProviderContainer.commandsModel});
 //        commandsProviderContainer.updateGui();
     }
 
@@ -45,7 +45,7 @@ QtObject {
 
     function updateGui(){
         Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderContainer.commandsModel,
-                             "CommandsId": commandsProviderContainer.documentUuid});
+                             "CommandId": commandsProviderContainer.documentUuid});
     }
 
     function setCommandIsEnabled(commandId, isEnabled){
@@ -153,9 +153,9 @@ QtObject {
             if (!commandsProviderContainer.isLoadData){
                 return
             }
-            console.log("__DEBUG__modelCommands", commandsProviderContainer.commandsId, JSON.stringify(commandsProviderContainer.additionInputParams))
+            console.log("__DEBUG__modelCommands", commandsProviderContainer.commandId, JSON.stringify(commandsProviderContainer.additionInputParams))
 
-            var query = Gql.GqlRequest("query", commandsProviderContainer.commandsId + "Commands");
+            var query = Gql.GqlRequest("query", commandsProviderContainer.commandId + "Commands");
             if (Object.keys(commandsProviderContainer.additionInputParams).length > 0){
                 let inputParams = Gql.GqlObject("input");
                 let additionParams = Gql.GqlObject("addition");
@@ -184,8 +184,8 @@ QtObject {
                         return;
                     }
 
-                    if(dataModelLocal.ContainsKey(commandsProviderContainer.commandsId + "Commands")){
-                        dataModelLocal = dataModelLocal.GetData(commandsProviderContainer.commandsId + "Commands");
+                    if(dataModelLocal.ContainsKey(commandsProviderContainer.commandId + "Commands")){
+                        dataModelLocal = dataModelLocal.GetData(commandsProviderContainer.commandId + "Commands");
 
                         commandsProviderContainer.setAdditionalProperties(dataModelLocal);
 

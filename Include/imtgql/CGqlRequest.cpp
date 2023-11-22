@@ -508,6 +508,7 @@ bool CGqlRequest::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/
 			istd::CChangeNotifier changeNotifier(this);
 
 			m_commandId = sourcePtr->m_commandId;
+
 			m_params = sourcePtr->m_params;
 			m_fields = sourcePtr->m_fields;
 

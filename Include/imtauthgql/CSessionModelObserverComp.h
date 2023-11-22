@@ -19,7 +19,6 @@ class CSessionModelObserverComp:
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
-	typedef imod::TSingleModelObserverBase<istd::IChangeable> BaseClass2;
 
 	I_BEGIN_COMPONENT(CSessionModelObserverComp);
 		I_ASSIGN(sessionChangeNotifierCompPtr, "SessionChangeNotifier", "Session change notifier", true, "SessionChangeNotifier");

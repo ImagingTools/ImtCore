@@ -31,16 +31,20 @@ WebSocket {
         }
     }
 
+    onUrlChanged: {
+        console.log("SubscriptionManager onUrlChanged", url)
+    }
+
     onTextMessageReceived:{
         console.log("SubscriptionManager onTextMessageReceived", message)
         let ok = socketModel.CreateFromJson(message)
 
-        if (socketModel.GetData("type") == "connection_ask"){
+        if (socketModel.GetData("type") === "connection_ask"){
             registerSubscriptionToServer()
         }
-        else if (socketModel.GetData("type") == "start_ack"){
+        else if (socketModel.GetData("type") === "start_ask"){
             for (let index = 0; index < subscriptionModel.length; index++){
-                if (subscriptionModel[index]["subscriptionId"] == socketModel.GetData("id")){
+                if (subscriptionModel[index]["subscriptionId"] === socketModel.GetData("id")){
                     let subscription = subscriptionModel[index]["subscription"]
                     subscriptionModel[index]["status"] = "registered"
                     subscription.state = "Registered"
@@ -87,13 +91,13 @@ WebSocket {
     }
 
     function registerSubscription(query, subscriptionClient){
-        let index
-        for (index = 0; index < subscriptionModel.length; index++){
+        for (let index = 0; index < subscriptionModel.length; index++){
             if (subscriptionModel[index]["subscription"] == subscriptionClient){
                 return;
             }
         }
         let commandId = query.GetCommandId()
+        console.log("registerSubscription", commandId);
         subscriptionModel.push(
         {
             "commandId": commandId,

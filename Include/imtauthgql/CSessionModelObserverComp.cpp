@@ -1,6 +1,9 @@
 #include <imtauthgql/CSessionModelObserverComp.h>
 
 
+// Qt includes
+#include <QtCore/QtDebug>
+
 // ImtCore includes
 #include <imtgql/IGqlRequestProvider.h>
 
@@ -16,15 +19,24 @@ namespace imtauthgql
 void CSessionModelObserverComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+	QByteArray contextId = GetComponentContext()->GetContextId();
 
-	if (m_modelCompPtr.IsValid()) {
-		m_modelCompPtr->AttachObserver(this);
+	qDebug() << "OnComponentCreated" << contextId << this;
+
+	if (m_modelCompPtr.IsValid()){
+		bool ok = m_modelCompPtr->AttachObserver(this);
+
+		qDebug() << "AttachObserver" << ok;
 	}
 }
 
 
 void CSessionModelObserverComp::OnComponentDestroyed()
 {
+	QByteArray contextId = GetComponentContext()->GetContextId();
+
+	qDebug() << "OnComponentDestroyed" << contextId;
+
 	if (m_modelCompPtr.IsValid()){
 		m_modelCompPtr->DetachObserver(this);
 	}
@@ -50,7 +62,13 @@ void CSessionModelObserverComp::OnUpdate(const istd::IChangeable::ChangeSet& cha
 			}
 		}
 
-		sessionChangeNotifierCompPtr->OnSessionModelChanged(changeSet, accessToken);
+		if (accessToken.isEmpty()){
+			accessToken = changeSet.GetChangeInfo("token").toByteArray();
+		}
+
+		if (!accessToken.isEmpty()){
+			sessionChangeNotifierCompPtr->OnSessionModelChanged(changeSet, accessToken);
+		}
 	}
 }
 

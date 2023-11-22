@@ -300,8 +300,6 @@ bool CGqlObjectCollectionDelegateComp::GetSubCollection(
 							QString name = info.value("name").toString();
 							QString description = info.value("description").toString();
 
-							imtbase::COperationContext operationContext;
-							idoc::CStandardDocumentMetaInfo metainfo;
 							idoc::MetaInfoPtr dataMetainfoPtr;
 
 							if (m_metaInfoCreatorCompPtr.IsValid()){
@@ -312,14 +310,26 @@ bool CGqlObjectCollectionDelegateComp::GetSubCollection(
 								dataMetainfoPtr.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
 							}
 
-							QByteArray objectData = QByteArray::fromBase64(jsonObject.value("metaInfo").toString().toUtf8());
-							bool res = DeSerializeObject(&metainfo, objectData);
-							Q_ASSERT(res);
-							objectData = QByteArray::fromBase64(jsonObject.value("dataMetaInfo").toString().toUtf8());
-							res = DeSerializeObject(dataMetainfoPtr.GetPtr(), objectData);
-							Q_ASSERT(res);
-							objectData = QByteArray::fromBase64(jsonObject.value("operationContext").toString().toUtf8());
-							DeSerializeObject(&operationContext, objectData);
+							idoc::CStandardDocumentMetaInfo metainfo;
+							if (jsonObject.contains("metaInfo")){
+								QByteArray metaInfoData = QByteArray::fromBase64(jsonObject.value("metaInfo").toString().toUtf8());
+								bool retVal = DeSerializeObject(&metainfo, metaInfoData);
+//								Q_ASSERT(retVal);
+							}
+
+							if (jsonObject.contains("dataMetaInfo")){
+								QByteArray dataMetaInfo = QByteArray::fromBase64(jsonObject.value("dataMetaInfo").toString().toUtf8());
+								bool retVal = DeSerializeObject(dataMetainfoPtr.GetPtr(), dataMetaInfo);
+								if (!retVal){
+									qDebug() << "Deserialize object was failed!";
+								}
+							}
+
+							imtbase::COperationContext operationContext;
+							if (jsonObject.contains("operationContext")){
+								QByteArray operationContextData = QByteArray::fromBase64(jsonObject.value("operationContext").toString().toUtf8());
+								DeSerializeObject(&operationContext, operationContextData);
+							}
 
 							subcollection->InsertNewObject(
 										typeId,
@@ -668,14 +678,15 @@ bool CGqlObjectCollectionDelegateComp::DeSerializeObject(istd::IPolymorphic* obj
 
 	iser::ISerializable* serializableObject = dynamic_cast<iser::ISerializable*>(object);
 	if (serializableObject == nullptr){
-		QByteArray errorMessage = QObject::tr("Object data metainfo is not serializable").toUtf8();
+		QByteArray errorMessage = QString("Object data metainfo is not serializable").toUtf8();
 		SendErrorMessage(0, errorMessage);
 
 		return false;
 	}
+
 	iser::CMemoryReadArchive archive(objectData.data(), objectData.count());
 	if (!serializableObject->Serialize(archive)){
-		QByteArray errorMessage = QObject::tr("Error when serializing an object").toUtf8();
+		QByteArray errorMessage = QString("Error when serializing an object").toUtf8();
 		SendErrorMessage(0, errorMessage);
 
 		return false;

@@ -234,7 +234,7 @@ Rectangle {
                 }
 
                 onLoaded: {
-                    bodyLoader.item.commandsId = model.Id;
+                    bodyLoader.item.commandId = model.Id;
 
                     if (documentManager != null && bodyLoader.item.documentManager !== undefined){
                         bodyLoader.item.documentManager = documentManager;

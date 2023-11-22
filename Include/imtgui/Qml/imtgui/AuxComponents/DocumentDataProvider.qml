@@ -43,7 +43,7 @@ Item {
     onVisibleChanged: {
         if (visible){
             Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
-                                                      "CommandsId": commandsProvider.commandsId});
+                                                      "CommandId": commandsProvider.commandsId});
 
             documentDataProvider.updateGui();
         }

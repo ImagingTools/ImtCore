@@ -23,7 +23,7 @@ imtbase::CTreeItemModel* CObjectViewDataProviderComp::CreateInternalResponse(
 		istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
 		rootModelPtr->SetData("Path", *m_objectViewPathAttrPtr);
-		rootModelPtr->SetData("CommandsId", *m_objectViewModelIdAttrPtr);
+		rootModelPtr->SetData("CommandId", *m_objectViewModelIdAttrPtr);
 
 		return rootModelPtr.PopPtr();
 	}

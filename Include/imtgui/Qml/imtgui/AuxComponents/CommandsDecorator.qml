@@ -7,7 +7,7 @@ Item {
 
     anchors.fill: parent;
 
-    property string commandsId;
+    property string commandId;
 
     Component.onCompleted: {
         Events.subscribeEvent("Logout", commandsDecoratorContainer.clearModel);
@@ -24,9 +24,9 @@ Item {
     function setCommandsModel(parameters){
         console.log("CommandsDecorator setCommandsModel", parameters, commandsDecoratorContainer);
         let model = parameters["Model"];
-        let commId = parameters["CommandsId"];
+        let commId = parameters["CommandId"];
 
-        commandsDecoratorContainer.commandsId = commId;
+        commandsDecoratorContainer.commandId = commId;
         buttonPanel.buttonModel = model;
         buttonPanel.updateModel();
     }
@@ -90,7 +90,7 @@ Item {
                     }
 
                     onClicked: {
-                        Events.sendEvent(commandsDecoratorContainer.commandsId + "CommandActivated", model.Id);
+                        Events.sendEvent(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);
                     }
 
                     Rectangle {
@@ -163,7 +163,7 @@ Item {
                                                        (model.Icon !== "" ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled) : "");
 
                         onClicked: {
-                            Events.sendEvent(commandsDecoratorContainer.commandsId + "CommandActivated", model.Id);
+                            Events.sendEvent(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);
                         }
                     }
 
@@ -187,7 +187,7 @@ Item {
                         property string id: model.Id !== undefined ? model.Id : "";
 
                         onClicked: {
-                            Events.sendEvent(commandsDecoratorContainer.commandsId + "CommandActivated", model.Id);
+                            Events.sendEvent(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);
                             rootItem.clicked(id);
                         }
                     }

@@ -15,7 +15,7 @@ Rectangle {
         documentManager_.addDocument(multiDocPageView.startPageObj, {}, false)
 
         if (multiDocPageView.mainDocumentManager != null){
-            multiDocPageView.mainDocumentManager.registerDocumentManager(multiDocPageView.startPageObj["CommandsId"], documentManager_);
+            multiDocPageView.mainDocumentManager.registerDocumentManager(multiDocPageView.startPageObj["CommandId"], documentManager_);
         }
 
         documentManager_.documentLoading = false;

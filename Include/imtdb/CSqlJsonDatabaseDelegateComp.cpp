@@ -11,6 +11,8 @@
 #include <iser/CJsonMemReadArchive.h>
 #include <iser/CJsonMemWriteArchive.h>
 #include <iser/ISerializable.h>
+#include <imod/TModelWrap.h>
+#include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <imtbase/CObjectCollection.h>
@@ -291,6 +293,25 @@ bool CSqlJsonDatabaseDelegateComp::SetCollectionItemMetaInfoFromRecord(const QSq
 }
 
 
+bool CSqlJsonDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
+{
+	if (record.contains("LastModified")){
+		QDateTime lastModificationTime = record.value("LastModified").toDateTime();
+
+		metaInfo.SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, lastModificationTime);
+		metaInfo.SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, lastModificationTime);
+	}
+
+	if (record.contains("RevisionNumber")){
+		qlonglong revisionNumber = record.value("RevisionNumber").toLongLong();
+
+		metaInfo.SetMetaInfo(imtbase::ICollectionInfo::MIT_REVISION, revisionNumber);
+	}
+
+	return true;
+}
+
+
 bool CSqlJsonDatabaseDelegateComp::CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const
 {
 	QByteArray columnId;
@@ -413,6 +434,12 @@ bool CSqlJsonDatabaseDelegateComp::CreateTextFilterQuery(
 	}
 
 	return true;
+}
+
+
+idoc::MetaInfoPtr CSqlJsonDatabaseDelegateComp::CreateObjectMetaInfo(const QByteArray& /*typeId*/) const
+{
+	return idoc::MetaInfoPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);
 }
 
 
@@ -546,6 +573,34 @@ imtbase::CTreeItemModel* CSqlJsonDatabaseDelegateComp::GetRemoteCollectionData(c
 	}
 
 	return itemsModelPtr;
+}
+
+
+bool CSqlJsonDatabaseDelegateComp::TableIsExists(const QString& tableName) const
+{
+	if (!m_databaseEngineCompPtr.IsValid()){
+		return false;
+	}
+
+	QString tableExistsQuery = QString(R"(SELECT EXISTS (SELECT FROM information_schema.tables WHERE table_name = '%1');)").arg(tableName);
+
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_databaseEngineCompPtr->ExecSqlQuery(tableExistsQuery.toUtf8(), &sqlError);
+
+	if (sqlError.type() != QSqlError::NoError){
+		return false;
+	}
+
+	if (!sqlQuery.next()){
+		return false;
+	}
+
+	QSqlRecord record = sqlQuery.record();
+	if (record.contains("exists")){
+		return record.value("exists").toBool();
+	}
+
+	return false;
 }
 
 

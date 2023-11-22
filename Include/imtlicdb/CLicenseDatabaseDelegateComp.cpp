@@ -5,6 +5,9 @@
 #include <iprm/TParamsPtr.h>
 #include <iprm/IIdParam.h>
 
+// ImtCore includes
+#include <imtlic/ILicenseDefinition.h>
+
 
 namespace imtlicdb
 {
@@ -76,6 +79,29 @@ bool CLicenseDatabaseDelegateComp::CreateTextFilterQuery(const imtbase::ICollect
 			if (filteringColumnIds[i] == "ProductId"){
 				textFilterQuery += QString("%1 ILIKE '%%2%'").arg(R"((SELECT "Document"->>'ProductId' FROM "Products" as pr WHERE pr."DocumentId" = t1."Document"->>'ProductId' AND pr."IsActive" = true))").arg(textFilter);
 			}
+		}
+	}
+
+	return true;
+}
+
+
+bool CLicenseDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
+{
+	BaseClass::SetObjectMetaInfoFromRecord(record, metaInfo);
+
+	if (record.contains("Document")){
+		QByteArray json = record.value("Document").toByteArray();
+		QJsonDocument jsonDocument = QJsonDocument::fromJson(json);
+		if (!jsonDocument.isNull()){
+			QString licenseId = jsonDocument["LicenseId"].toString();
+			metaInfo.SetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_ID, licenseId);
+
+			QString licenseName = jsonDocument["LicenseName"].toString();
+			metaInfo.SetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_NAME, licenseName);
+
+			QString licenseDescription = jsonDocument["LicenseDescription"].toString();
+			metaInfo.SetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_DESCRIPTION, licenseDescription);
 		}
 	}
 

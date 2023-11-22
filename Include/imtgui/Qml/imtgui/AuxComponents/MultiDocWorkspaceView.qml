@@ -18,8 +18,6 @@ Item {
 
     property alias pagesCount: docsData.count;
 
-    property string operation;
-
     property TreeItemModel documentsData: TreeItemModel {}
 
     property bool documentLoading: false;
@@ -118,7 +116,7 @@ Item {
 
     function getTypeId(){
         if (workspaceView.mainCollectionView != null){
-            return workspaceView.mainCollectionView.commandsId;
+            return workspaceView.mainCollectionView.commandId;
         }
 
         return "";
@@ -226,7 +224,8 @@ Item {
 
     // isRequested - if true, then the document model will be requested from the server
     function addDocument(documentObj, params, isRequested){
-        console.log();
+        console.log("addDocument", documentObj, params, isRequested);
+
         if (isRequested === undefined){
             isRequested = false;
         }
@@ -234,7 +233,7 @@ Item {
         workspaceView.documentLoading = true;
 
         let itemId = documentObj["Id"];
-        let commandId = documentObj["CommandsId"];
+        let commandId = documentObj["CommandId"];
         let name = documentObj["Name"];
         let source = documentObj["Source"];
         let parent = documentObj["Parent"];
@@ -242,20 +241,41 @@ Item {
 
         let index = workspaceView.documentsData.InsertNewItem();
 
-        workspaceView.documentsData.SetData("Id", itemId, index);
-        workspaceView.documentsData.SetData("Parent", parent, index);
-        workspaceView.documentsData.SetData("CommandsId", commandId, index);
-        workspaceView.documentsData.SetData("Name", name, index);
-        workspaceView.documentsData.SetData("Title", name, index);
         workspaceView.documentsData.SetData("addition", addition, index);
-        workspaceView.documentsData.SetData("Source", source, index);
 
-        tabPanelInternal.selectedIndex = index;
+        if ("Id" in documentObj){
+            workspaceView.documentsData.SetData("Id", documentObj["Id"], index);
+        }
+
+        if ("CommandId" in documentObj){
+            workspaceView.documentsData.SetData("CommandId", documentObj["CommandId"], index);
+        }
+
+//        if ("DocumentTypeId" in documentObj){
+//            console.log("DocumentTypeId", documentObj["DocumentTypeId"]);
+//            workspaceView.documentsData.SetData("DocumentTypeId", documentObj["DocumentTypeId"], index);
+//        }
+
+        if ("Parent" in documentObj){
+            workspaceView.documentsData.SetData("Parent", documentObj["Parent"], index);
+        }
+
+        if ("Name" in documentObj){
+            workspaceView.documentsData.SetData("Name", documentObj["Name"], index);
+            workspaceView.documentsData.SetData("Title", documentObj["Name"], index);
+        }
+
+        if ("Source" in documentObj){
+            workspaceView.documentsData.SetData("Source", documentObj["Source"], index);
+        }
 
         if (isRequested){
             documentController.getData(itemId, params, commandId);
         }
 
+        console.log("workspaceView.documentsData", workspaceView.documentsData.toJSON());
+
+        tabPanelInternal.selectedIndex = index;
 
         return index;
     }
@@ -328,9 +348,7 @@ Item {
 
         if (documentIndex >= 0){
             let commandId = workspaceView.mainCollectionView.getEditorCommandId();
-            console.log("_DEBUG_commandId", commandId)
-
-//            documentController.documentTypeId = commandId;
+            documentController.documentTypeId = commandId;
 
             let documentBase = workspaceView.documentsData.GetData("Item", documentIndex);
 
@@ -345,18 +363,17 @@ Item {
             documentBase.updateModel();
 
             let documentData = documentBase.documentModel;
-            let additionInputParams = documentBase.additionInputParams;
 
             if (isNew){
                 if (!documentBase.nameOutsideEditor){
-                    documentController.setData(documentId, documentData, additionInputParams);
+                    documentController.setData(documentId, documentData);
                 }
                 else{
                     modalDialogManager.openDialog(inputDialog, {"message": qsTr("Please enter the name of the document:")});
                 }
             }
             else{
-                documentController.updateData(documentId, documentData, additionInputParams);
+                documentController.updateData(documentId, documentData);
             }
         }
     }
@@ -536,10 +553,7 @@ Item {
         onDocumentModelChanged: {
             if (documentController.documentModel != null){
                 let item = workspaceView.documentsData.GetData("Item", tabPanelInternal.selectedIndex);
-                if (item !== null){
-                    item.documentModel = documentController.documentModel;
-                    documentController.documentModel = null
-                }
+                item.documentModel = documentController.documentModel;
             }
         }
 
@@ -626,15 +640,11 @@ Item {
                         workspaceView.activeItem = dataLoader.item;
                     }
 
-                    if(dataLoader.item.documentsData !== undefined){
+                    if(dataLoader.item.documentsData !==undefined){
                         dataLoader.item.documentsData = workspaceView.documentsData;
                     }
 
-                    if(dataLoader.item.additionInputParams !== undefined){
-                        dataLoader.item.additionInputParams = model.addition
-                    }
-
-                    if(dataLoader.item.documentManager !== undefined){
+                    if(dataLoader.item.documentManager !==undefined){
                         dataLoader.item.documentManager = workspaceView;
                     }
 
@@ -643,7 +653,14 @@ Item {
                     }
 
                     dataLoader.item.itemId = model.Id;
-                    dataLoader.item.commandsId = model.CommandsId
+
+                    if(dataLoader.item.commandId !== undefined){
+                        dataLoader.item.commandId = model.CommandId;
+                    }
+
+                    if(dataLoader.item.documentTypeId !== undefined){
+                        dataLoader.item.documentTypeId = model.CommandId;
+                    }
 
                     if (dataLoader.item.documentUuid !== undefined){
                         workspaceView.documentsData.SetData("DocumentUuid", dataLoader.item.documentUuid);
@@ -651,11 +668,6 @@ Item {
 
                     if (dataLoader.item.parentRef !== undefined){
                         dataLoader.item.parentRef = model.Parent;
-                    }
-
-                    if (documentController.documentModel != null){
-                        dataLoader.item.documentModel = documentController.documentModel;
-                        documentController.documentModel = null
                     }
                 }
             }

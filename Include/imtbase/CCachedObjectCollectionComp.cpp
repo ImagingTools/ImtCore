@@ -147,7 +147,6 @@ const istd::IChangeable* CCachedObjectCollectionComp::GetObjectPtr(const Id& obj
 }
 
 
-
 bool CCachedObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dataPtr) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){

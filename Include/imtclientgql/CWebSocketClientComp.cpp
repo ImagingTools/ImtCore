@@ -155,7 +155,11 @@ void CWebSocketClientComp::OnWebSocketConnected()
 	istd::IChangeable::ChangeSet loginChangeSet(m_loginStatus, QObject::tr("Login"));
 	istd::CChangeNotifier notifier(this, &loginChangeSet);
 
-	QString clientId = *m_clientIdAttrPtr;
+	QString clientId;
+	if (m_clientIdAttrPtr.IsValid()){
+		clientId = *m_clientIdAttrPtr;
+	}
+
 	if (m_clientIdCompPtr.IsValid()){
 		clientId = m_clientIdCompPtr->GetText();
 	}
@@ -192,48 +196,42 @@ void CWebSocketClientComp::OnWebSocketError(QAbstractSocket::SocketError /*error
 
 void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message)
 {
+	qDebug() << "CWebSocketClientComp::OnWebSocketTextMessageReceived: " << message;
+
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
 
 	if (webSocketPtr == nullptr){
 		return;
 	}
 
-	istd::TDelPtr<imtrest::IRequest> newRequestPtr = m_protocolEngineCompPtr->CreateRequest(*m_serverRequestHandlerCompPtr);
-	istd::TDelPtr<imtrest::IRequest> newClientRequestPtr = m_protocolEngineCompPtr->CreateRequest(*m_clientRequestHandlerCompPtr);
-	if (newRequestPtr.IsValid()){
-		imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<imtrest::CWebSocketRequest*>(newRequestPtr.GetPtr());
-		if (webSocketRequest == nullptr){
-			return;
-		}
-		webSocketRequest->SetBody(message.toUtf8());
-		imtrest::ConstResponsePtr responsePtr;
-		imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
-		if (
-				methodType == imtrest::CWebSocketRequest::MT_CONNECTION_ASK ||
-				methodType == imtrest::CWebSocketRequest::MT_KEEP_ALIVE
-				){
-//			m_loginStatus = imtauth::ILoginStatusProvider::LSF_LOGGED_IN;
-//			//			const istd::IChangeable::ChangeSet s_loginChangeSet(iauth::ILogin::CF_LOGIN, QObject::tr("Login"));
-//			istd::IChangeable::ChangeSet loginChangeSet(m_loginStatus, QObject::tr("Login"));
-//			istd::CChangeNotifier notifier(this, &loginChangeSet);
-		}
-		else if (methodType == imtrest::CWebSocketRequest::MT_QUERY_DATA){
-			m_queryDataMap.insert(webSocketRequest->GetRequestId(), webSocketRequest->GetBody());
+	if (!m_protocolEngineCompPtr.IsValid()){
+		return;
+	}
 
-			emit OnQueryDataReceived(1);
-		}
-		else if (methodType == imtrest::CWebSocketRequest::MT_ERROR
-					 || methodType == imtrest::CWebSocketRequest::MT_START_ASK
-					 || methodType == imtrest::CWebSocketRequest::MT_DATA){
-			responsePtr = m_clientRequestHandlerCompPtr->ProcessRequest(*newClientRequestPtr);
-		}
-		else{
-			responsePtr = m_serverRequestHandlerCompPtr->ProcessRequest(*webSocketRequest);
-		}
-		if (responsePtr.IsValid()){
-			QByteArray data = responsePtr->GetData();
-			webSocketPtr->sendTextMessage(data);
-		}
+	imtrest::CWebSocketRequest webSocketRequest(*m_protocolEngineCompPtr.GetPtr());
+	webSocketRequest.SetBody(message.toUtf8());
+
+	imtrest::ConstResponsePtr responsePtr;
+	imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest.GetMethodType();
+	if (methodType == imtrest::CWebSocketRequest::MT_CONNECTION_ASK){
+	}
+	else if (methodType == imtrest::CWebSocketRequest::MT_QUERY_DATA){
+		m_queryDataMap.insert(webSocketRequest.GetRequestId(), webSocketRequest.GetBody());
+
+		emit OnQueryDataReceived(2);
+	}
+	else if (	methodType == imtrest::CWebSocketRequest::MT_ERROR ||
+				methodType == imtrest::CWebSocketRequest::MT_START_ASK ||
+				methodType == imtrest::CWebSocketRequest::MT_DATA){
+		responsePtr = m_clientRequestHandlerCompPtr->ProcessRequest(webSocketRequest);
+	}
+	else{
+		responsePtr = m_serverRequestHandlerCompPtr->ProcessRequest(webSocketRequest);
+	}
+
+	if (responsePtr.IsValid()){
+		QByteArray data = responsePtr->GetData();
+		webSocketPtr->sendTextMessage(data);
 	}
 }
 
@@ -270,11 +268,16 @@ void CWebSocketClientComp::Connect()
 	authorization["password"] = password;
 	QByteArray authHeader = QJsonDocument(authorization).toJson(QJsonDocument::Compact);
 
-	QUrl url = QUrl(host + "/realtime?header=" + authHeader.toBase64() + "&payload=e30=");
+//	QUrl url = QUrl(host + "/realtime?header=" + authHeader.toBase64() + "&payload=e30=");
+//	url.setScheme("ws");
+//	url.setPort(port.toInt());
+//	m_webSocket.open(url);
+
+	QUrl url;
+	url.setHost(host);
 	url.setScheme("ws");
 	url.setPort(port.toInt());
 	m_webSocket.open(url);
-
 }
 
 // public methods of the embedded class NetworkOperation

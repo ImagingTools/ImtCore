@@ -140,9 +140,13 @@ Item {
                             "Id": model.Id,
                             "Name": model.Name,
                             "Source": model.StartItem,
-                            "CommandsId": model.Id
+                            "CommandId": model.Id
                         };
                     }
+                }
+
+                onStatusChanged: {
+                    console.log("Pages loader onStatusChanged", status);
                 }
             }
         }

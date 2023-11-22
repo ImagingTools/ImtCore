@@ -92,7 +92,7 @@
             </Data>
         </Element>
         <Element Id="SubscriptionController" PackageId="ImtClientGqlPck" ComponentId="SubscriptionController">
-            <Data IsEnabled="true" Flags="0">
+            <Data IsEnabled="true" Flags="1">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Command" Type="Id" ExportId="CommandID">
                         <Data IsEnabled="true" Value="OnCollectionChanged"/>
@@ -139,17 +139,23 @@
                     <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketProtocolEngine"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ServerAddress" Type="Id" ExportId="">
+                    <AttributeInfo Id="ServerAddress" Type="Id" ExportId="WebSocketServerAddress">
                         <Data IsEnabled="true" Value="localhost"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ServerLoginParam" Type="Id" ExportId="">
+                    <AttributeInfo Id="ServerAddressParam" Type="Reference" ExportId="WebSocketServerAddressParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerLoginParam" Type="Id" ExportId="WebSocketServerLoginParam">
                         <Data IsEnabled="true" Value="ServerLoginParam"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ServerPasswordParam" Type="Id" ExportId="">
+                    <AttributeInfo Id="ServerPasswordParam" Type="Id" ExportId="WebSocketServerPasswordParam">
                         <Data IsEnabled="true" Value="ServerPasswordParam"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ServerPort" Type="Integer" ExportId="">
+                    <AttributeInfo Id="ServerPort" Type="Integer" ExportId="WebSocketServerPort">
                         <Data IsEnabled="true" Value="8112"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerPortParam" Type="Reference" ExportId="WebSocketServerPortParam">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ServerRequestHandler" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="SubscriptionManager"/>

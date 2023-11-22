@@ -38,7 +38,7 @@ QtObject {
         else if (commandId === "History"){
             let itemId = container.documentBase.itemId;
 
-            modalDialogManager.openDialog(documentHistoryDialogComp, {"documentId": itemId, "documentTypeId": container.documentBase.commandsId});
+            modalDialogManager.openDialog(documentHistoryDialogComp, {"documentId": itemId, "documentTypeId": container.documentBase.commandId});
         }
 
         container.commandActivated(commandId);

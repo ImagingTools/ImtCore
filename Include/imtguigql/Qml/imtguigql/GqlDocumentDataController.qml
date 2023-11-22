@@ -18,13 +18,19 @@ QtObject {
 
     signal error(int type, string message);
 
-    function getData(documentId, inputParams, typeId){
+    signal result(var documentModel);
+
+    function getData(documentId, inputParams, typeId, callback){
         if (typeId){
             container.documentTypeId = typeId;
         }
         console.log("getData", documentId, typeId, "container.documentTypeId ", container.documentTypeId)
 
         container.gqlGetModel.getModelData(documentId, inputParams);
+
+        if (callback){
+            container.result.connect(callback)
+        }
     }
 
     function setData(documentId, documentData, additionInputParams){
@@ -118,6 +124,8 @@ QtObject {
                     dataModelLocal = dataModelLocal.GetData(container.getCommandId);
 
                     container.documentModel = dataModelLocal;
+
+                    container.result(dataModelLocal);
                 }
             }
             else if (this.state === "Error"){
@@ -135,12 +143,14 @@ QtObject {
             inputParams.InsertField("Id", modelId);
             var jsonString = data.toJSON();
             inputParams.InsertField ("Item", jsonString);
-            if (Object.keys(additionInputParams).length > 0){
-                let additionParams = Gql.GqlObject("addition");
-                for (let key in additionInputParams){
-                    additionParams.InsertField(key, additionInputParams[key]);
+            if (additionInputParams){
+                if (Object.keys(additionInputParams).length > 0){
+                    let additionParams = Gql.GqlObject("addition");
+                    for (let key in additionInputParams){
+                        additionParams.InsertField(key, additionInputParams[key]);
+                    }
+                    inputParams.InsertFieldObject(additionParams);
                 }
-                inputParams.InsertFieldObject(additionParams);
             }
             query.AddParam(inputParams);
 

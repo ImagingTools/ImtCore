@@ -4,6 +4,9 @@
 // ACF includes
 #include <iser/CMemoryWriteArchive.h>
 #include <iser/CMemoryReadArchive.h>
+#include <imod/TModelWrap.h>
+
+#include <imtlic/ILicenseDefinition.h>
 
 
 namespace imtgql
@@ -106,21 +109,21 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetInfo(co
 		errorsItemModel->SetData("message", errorMessage);
 	}
 	else{
-		imtbase::CTreeItemModel* infoModel = dataModel->AddTreeModel("info");
+		imtbase::CTreeItemModel* infoModelPtr = dataModel->AddTreeModel("info");
 		const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
 
 		QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 
-		infoModel->SetData("id", objectId);
+		infoModelPtr->SetData("id", objectId);
 		QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(objectId);
-		infoModel->SetData("typeId", typeId);
-//		imtbase::IObjectCollection::DataPtr dataPtr;
+		infoModelPtr->SetData("typeId", typeId);
+		//		imtbase::IObjectCollection::DataPtr dataPtr;
 		QByteArray elementInfo = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toByteArray();
-		infoModel->SetData("name", elementInfo);
+		infoModelPtr->SetData("name", elementInfo);
 		elementInfo = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toByteArray();
-		infoModel->SetData("description", elementInfo);
+		infoModelPtr->SetData("description", elementInfo);
 		elementInfo = m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_ENABLED).toByteArray();
-		infoModel->SetData("enabled", elementInfo);
+		infoModelPtr->SetData("enabled", elementInfo);
 	}
 
 	return rootModelPtr.PopPtr();
@@ -165,31 +168,31 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetDataMet
 }
 
 imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetObject(
-        const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-    imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
-    imtbase::CTreeItemModel* dataModel = nullptr;
+	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
+	imtbase::CTreeItemModel* dataModel = nullptr;
 
-    if (!m_objectCollectionCompPtr.IsValid()){
-        errorMessage = QObject::tr("Internal error").toUtf8();
-    }
+	if (!m_objectCollectionCompPtr.IsValid()){
+		errorMessage = QObject::tr("Internal error").toUtf8();
+	}
 
-    if (!errorMessage.isEmpty()){
-        imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
-        errorsItemModel->SetData("message", errorMessage);
-    }
-    else{
-        dataModel = new imtbase::CTreeItemModel();
+	if (!errorMessage.isEmpty()){
+		imtbase::CTreeItemModel* errorsItemModel = rootModel->AddTreeModel("errors");
+		errorsItemModel->SetData("message", errorMessage);
+	}
+	else{
+		dataModel = new imtbase::CTreeItemModel();
 
-        dataModel->SetData("Id", "");
-        //ToDo Serial add
+		dataModel->SetData("Id", "");
+		//ToDo Serial add
 
 		const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
 
 		QByteArray Id = GetObjectIdFromInputParams(inputParams);
 
-        imtbase::IObjectCollection::DataPtr dataPtr;
-        if (m_objectCollectionCompPtr->GetObjectData(Id, dataPtr)){
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (m_objectCollectionCompPtr->GetObjectData(Id, dataPtr)){
 			iser::ISerializable* object = dynamic_cast<iser::ISerializable*>(dataPtr.GetPtr());
 			if (object == nullptr){
 				errorMessage = QObject::tr("Object is not Serializable").toUtf8();
@@ -208,25 +211,25 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetObject(
 
 			QByteArray data((char*)archive.GetBuffer(), archive.GetBufferSize());
 			dataModel->SetData("objectData", data.toBase64());
-        }
-    }
-    rootModel->SetExternTreeModel("data", dataModel);
+		}
+	}
+	rootModel->SetExternTreeModel("data", dataModel);
 
-    return rootModel;
+	return rootModel;
 }
 
 
 istd::IChangeable* CSerializableObjectCollectionControllerComp::CreateObject(
-            const QList<imtgql::CGqlObject>& inputParams,
-            QByteArray &objectId,
-            QString &name,
-            QString &description,
-            QString& errorMessage) const
+			const QList<imtgql::CGqlObject>& inputParams,
+			QByteArray &objectId,
+			QString &name,
+			QString &description,
+			QString& errorMessage) const
 {
 	if (!m_objectFactCompPtr.IsValid()){
 		errorMessage = QObject::tr("Can not create Object: %1").arg(QString(objectId));
-        return nullptr;
-    }
+		return nullptr;
+	}
 
 	QByteArray objectData64 = inputParams.at(0).GetFieldArgumentValue("item").toByteArray();
 	QByteArray objectData = QByteArray::fromBase64(objectData64);
@@ -254,8 +257,8 @@ istd::IChangeable* CSerializableObjectCollectionControllerComp::CreateObject(
 
 
 imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObjects(
-		const imtgql::CGqlRequest& gqlRequest,
-		QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return nullptr;
@@ -292,32 +295,25 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 			count = viewParamsGql->GetFieldArgumentValue("count").toInt();
 		}
 
-//		int elementsCount = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
-
-//		int pagesCount = std::ceil(elementsCount / (double)count);
-//		if (pagesCount <= 0){
-//			pagesCount = 1;
-//		}
-
-//		notificationModel->SetData("PagesCount", pagesCount);
-//		notificationModel->SetData("TotalCount", elementsCount);
-
 		QVector<QByteArray> ids = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
-		for (QByteArray id: ids){
+		for (const QByteArray& id: ids){
 			int itemIndex = itemsModel->InsertNewItem();
-			imtbase::CTreeItemModel* infoModel = itemsModel->AddTreeModel("info", itemIndex);
-			const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
 
+			imtbase::CTreeItemModel* infoModelPtr = itemsModel->AddTreeModel("info", itemIndex);
 
-			infoModel->SetData("id", id);
+			infoModelPtr->SetData("id", id);
+
 			QByteArray typeId = m_objectCollectionCompPtr->GetObjectTypeId(id);
-			infoModel->SetData("typeId", typeId);
-			QByteArray elementInfo = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toByteArray();
-			infoModel->SetData("name", elementInfo);
-			elementInfo = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toByteArray();
-			infoModel->SetData("description", elementInfo);
-			elementInfo = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_ENABLED).toByteArray();
-			infoModel->SetData("enabled", elementInfo);
+			infoModelPtr->SetData("typeId", typeId);
+
+			QByteArray name = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toByteArray();
+			infoModelPtr->SetData("name", name);
+
+			QByteArray description = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_DESCRIPTION).toByteArray();
+			infoModelPtr->SetData("description", description);
+
+			QByteArray enabled = m_objectCollectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_ENABLED).toByteArray();
+			infoModelPtr->SetData("enabled", enabled);
 
 			QByteArray data;
 			idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetElementMetaInfo(id);
@@ -326,12 +322,17 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 
 			data.clear();
 			idoc::MetaInfoPtr dataMetaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(id);
+
+			QString r1 = dataMetaInfo->GetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_ID).toString();
+			QString r2 = dataMetaInfo->GetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_NAME).toString();
+			QString r3 = dataMetaInfo->GetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_DESCRIPTION).toString();
+
 			SerializeObject(dataMetaInfo.GetPtr(), data);
+
 			itemsModel->SetData("dataMetaInfo", data.toBase64(), itemIndex);
 		}
 
 		itemsModel->SetIsArray(true);
-
 
 		dataModel->SetExternTreeModel("items", itemsModel);
 		dataModel->SetExternTreeModel("notification", notificationModel);
@@ -344,8 +345,8 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 
 
 imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::RenameObject(
-		const imtgql::CGqlRequest& gqlRequest,
-		QString& /*errorMessage*/) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& /*errorMessage*/) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return nullptr;
@@ -376,8 +377,8 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::RenameObje
 
 
 imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::SetObjectDescription(
-		const imtgql::CGqlRequest& gqlRequest,
-		QString& /*errorMessage*/) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& /*errorMessage*/) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return nullptr;

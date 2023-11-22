@@ -20,6 +20,29 @@ namespace imtlic
 class IProductInfo: virtual public iprm::INameParam
 {
 public:
+	enum MetaInfoTypes
+	{
+		/**
+			Product Name given as QString.
+		*/
+		MIT_PRODUCT_NAME = idoc::IDocumentMetaInfo::MIT_USER,
+
+		/**
+			Product-ID given as QByteArray.
+		*/
+		MIT_PRODUCT_ID,
+
+		/**
+			Product Description given as QString.
+		*/
+		MIT_PRODUCT_DESCRIPTION,
+
+		/**
+			Product category given as QByteArray.
+		*/
+		MIT_PRODUCT_CATEGORY
+	};
+
 	/**
 		Get information about the related product family of this product, if available.
 	*/

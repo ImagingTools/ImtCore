@@ -20,6 +20,13 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 		return;
 	}
 
+	if (sessionId.isEmpty()){
+		return;
+	}
+
+	qDebug() << "OnSessionModelChanged" << sessionId;
+	qDebug() << "Count subscribers:" << m_registeredSubscribers.count();
+
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequest = requestNetworks.networkRequests[id];
@@ -33,6 +40,8 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 			if (responsePtr.IsValid()){
 				const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest->GetRequestId());
 				if (sender != nullptr){
+					qDebug() << "Send subscription" << body << "to the subscriber" << id;
+
 					sender->SendResponse(responsePtr);
 				}
 			}

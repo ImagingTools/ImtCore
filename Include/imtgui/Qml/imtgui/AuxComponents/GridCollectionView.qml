@@ -83,7 +83,7 @@ Item {
     onVisibleChanged: {
         if (visible){
             Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
-                                                      "CommandsId": commandsProvider.commandsId});
+                                                      "CommandId": commandsProvider.commandsId});
             console.log("IDTEST::Model", commandsProvider.commandsModel, "IDTEST::CommandsId", commandsProvider.commandsId);
         }
     }
@@ -123,7 +123,7 @@ Item {
         console.log("CollectionView selectItem", id, name, commandsId, editorPath);
 
         if (gridCollectionViewContainer.isUsedDocumentManager){
-            documentManager.addDocument({"Id": id, "Name": name, "Source": editorPath, "CommandsId": commandsId});
+            documentManager.addDocument({"Id": id, "Name": name, "Source": editorPath, "CommandId": commandsId});
         }
         else{
             modalDialogManager.openDialog(contentDialog, {"contentId": id, "contentName": name, "contentSource": editorPath, "contentCommandsId": commandsId});

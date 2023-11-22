@@ -164,7 +164,7 @@ Item {
                         pagesManager.activeItem.startPageObj = {"Id": model.PageId,
                             "Name": model.Name,
                             "Source": model.StartItem,
-                            "CommandsId": model.PageId};
+                            "CommandId": model.PageId};
                     }
                 }
             }

@@ -14,7 +14,7 @@ SingleDocumentWorkspaceView {
         startPageObj = {"Id": "Administration",
             "Name": "Administration",
             "Source": "../../imtauthgui/AdministrationView.qml",
-            "CommandsId": "Administration"};
+            "CommandId": "Administration"};
 
         Events.subscribeEvent("CommandsModelChanged", container.onCommandsModelUpdated);
         Events.subscribeEvent("CommandsEnabledChanged", container.onCommandsEnabledChanged);
@@ -53,7 +53,7 @@ SingleDocumentWorkspaceView {
         console.log("onCommandsModelUpdated");
         let model = parameters["Model"];
 
-        let commandsId = parameters["CommandsId"];
+        let commandsId = parameters["CommandId"];
         container.commandId = commandsId;
 
         container.commandsModelChanged(model);
@@ -71,7 +71,7 @@ SingleDocumentWorkspaceView {
 
     function updateModels(){
         console.log("updateModels");
-        Events.sendEvent(container.commandId + "_CommandsUpdateModel");
+        Events.sendEvent(container.commandId + "_CommandUpdateModel");
     }
 
     function firstModelsInit(){}

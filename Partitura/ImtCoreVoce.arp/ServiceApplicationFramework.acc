@@ -76,8 +76,8 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="ibase::IApplication" ComponentId="ServiceApplication"/>
-        <Interface InterfaceId="istd::IPolymorphic" ComponentId="ServiceApplication"/>
+        <Interface InterfaceId="ibase::IApplication" ComponentId="ConsoleApplicationFramework"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="ConsoleApplicationFramework"/>
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="ApplicationInfo" ComponentId="ConsoleApplicationFramework/ApplicationInfo"/>

@@ -28,7 +28,7 @@ CollectionViewCommandsDelegateBase {
             container.documentManager.addDocument({"Id":         itemId,
                                       "Name":       copyStr + itemName,
                                       "Source":     container.collectionViewBase.baseCollectionView.commands.objectViewEditorPath,
-                                      "CommandsId": container.collectionViewBase.baseCollectionView.commands.objectViewEditorCommandsId});
+                                      "CommandId": container.collectionViewBase.baseCollectionView.commands.objectViewEditorCommandsId});
         }
         else if (commandId === "Export"){
             console.log("Export");

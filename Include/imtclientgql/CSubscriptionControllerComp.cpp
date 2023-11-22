@@ -25,6 +25,8 @@ void CSubscriptionControllerComp::OnComponentCreated()
 
 		m_subscriptionId = m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, this);
 	}
+
+//	m_changeableModelCompPtr.EnsureInitialized();
 }
 
 
@@ -32,6 +34,8 @@ void CSubscriptionControllerComp::OnResponseReceived(
 			const QByteArray & subscriptionId,
 			const QByteArray & subscriptionData)
 {
+	qDebug() << "OnResponseReceived " << subscriptionId << subscriptionData;
+
 	istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
 	imtbase::ICollectionInfo::NotifierInfo notifierInfo;
 
@@ -39,8 +43,15 @@ void CSubscriptionControllerComp::OnResponseReceived(
 	QJsonObject subscriptionObject = document.object();
 
 	if (subscriptionId == m_subscriptionId){
-		notifierInfo.elementId = subscriptionObject.value("id").toString().toUtf8();
-		changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ALL_CHANGED, QVariant::fromValue(notifierInfo));
+		if (subscriptionObject.contains("id")){
+			notifierInfo.elementId = subscriptionObject.value("id").toString().toUtf8();
+			changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ALL_CHANGED, QVariant::fromValue(notifierInfo));
+		}
+
+		if (subscriptionObject.contains("token")){
+			QByteArray token = subscriptionObject.value("token").toString().toUtf8();
+			changeSet.SetChangeInfo("token", token);
+		}
 	}
 
 	if (m_changeableModelCompPtr.IsValid()){

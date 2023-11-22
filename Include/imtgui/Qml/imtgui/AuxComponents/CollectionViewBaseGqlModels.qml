@@ -5,9 +5,9 @@ import imtqml 1.0
 QtObject {
     id: gqlModelBaseContainer;
 
-    property string gqlModelHeadersInfo: commandsId + "Info";
-    property string gqlModelItemsInfo: commandsId + "List";
-    property string gqlModelObjectView: commandsId + "ObjectView";
+    property string gqlModelHeadersInfo: commandId + "Info";
+    property string gqlModelItemsInfo: commandId + "List";
+    property string gqlModelObjectView: commandId + "ObjectView";
 
     property string objectViewEditorPath;
     property string objectViewEditorCommandsId;
@@ -15,7 +15,7 @@ QtObject {
     property string itemId;
     property var table;
 
-    property string commandsId;
+    property string commandId;
 
     property var additionInputParams: ({})
 
@@ -232,7 +232,7 @@ QtObject {
                                 }
                             }
 
-                            Events.sendEvent(gqlModelBaseContainer.commandsId + "CollectionUpdated");
+                            Events.sendEvent(gqlModelBaseContainer.commandId + "CollectionUpdated");
                         }
                     }
                 }
@@ -300,7 +300,7 @@ QtObject {
                     dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelObjectView);
 
                     let objectView = dataModelLocal.GetData("Path");
-                    let objectViewCommandsId = dataModelLocal.GetData("CommandsId");
+                    let objectViewCommandsId = dataModelLocal.GetData("CommandId");
 
                     gqlModelBaseContainer.objectViewEditorPath = objectView;
                     gqlModelBaseContainer.objectViewEditorCommandsId = objectViewCommandsId;

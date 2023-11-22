@@ -8,6 +8,7 @@
 
 // ACF includes
 #include <iser/IObject.h>
+#include <idoc/IDocumentMetaInfo.h>
 
 
 namespace imtlic
@@ -21,6 +22,24 @@ namespace imtlic
 class ILicenseDefinition: virtual public iser::IObject
 {
 public:
+	enum MetaInfoTypes
+	{
+		/**
+			License Name given as QString.
+		*/
+		MIT_LICENSE_NAME = idoc::IDocumentMetaInfo::MIT_USER + 1,
+
+		/**
+			License-ID given as QByteArray.
+		*/
+		MIT_LICENSE_ID,
+
+		/**
+			License Description given as QString.
+		*/
+		MIT_LICENSE_DESCRIPTION
+	};
+
 	struct FeatureInfo
 	{
 		QByteArray id;
@@ -79,16 +98,6 @@ public:
 		Set product ID of the license.
 	*/
 	virtual void SetProductId(const QByteArray& productId) = 0;
-
-//	/**
-//		Get the list of feature-IDs supported by this license.
-//	*/
-//	virtual QByteArrayList GetFeatures() const = 0;
-
-//	/**
-//		Set the list of feature-IDs supported by this license.
-//	*/
-//	virtual void SetFeatures(QByteArrayList features) = 0;
 
 	/**
 		Get list of licenses the given license depends on.

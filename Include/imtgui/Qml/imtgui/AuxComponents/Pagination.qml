@@ -15,6 +15,8 @@ Row {
     // The number of elements on the page
     property int countElements: 25;
 
+    property int countAllElements: 0;
+
     property alias pageCount: listModel.count;
 
     Component.onCompleted: {
@@ -34,9 +36,15 @@ Row {
         id: listModel;
     }
 
+    QtObject {
+        id: props;
+
+        property int maxElementCount: 6;
+    }
+
     function refreshBtn(){
         listModel.clear();
-        if (paginationContainer.pagesSize < 10){
+        if (paginationContainer.pagesSize < props.maxElementCount){
             for (var i = 0; i < paginationContainer.pagesSize; i++){
                 listModel.append({number: i+1, selected: paginationContainer.currentIndex + 1 === i + 1});
             }
@@ -71,7 +79,7 @@ Row {
         onClicked: {
             if (paginationContainer.currentIndex >= 1){
                 paginationContainer.currentIndex--;
-                if (paginationContainer.pagesSize >= 10){
+                if (paginationContainer.pagesSize >= props.maxElementCount){
                     paginationContainer.refreshBtn();
                 }
             }
@@ -97,7 +105,7 @@ Row {
                 textButton: model.number === -1 ? "..." : model.number;
                 onClicked: {
                     paginationContainer.currentIndex = model.number - 1;
-                    if (paginationContainer.pagesSize >= 10){
+                    if (paginationContainer.pagesSize >= props.maxElementCount){
                         paginationContainer.refreshBtn();
                     }
                 }
@@ -108,7 +116,7 @@ Row {
                     height: 2;
 
                     color: Style.tabSelectedColor;
-                    visible: (model.index == undefined ||  model.selected == undefined) ? false : paginationContainer.pagesSize < 10 ? model.index === paginationContainer.currentIndex : model.selected;
+                    visible: (model.index == undefined ||  model.selected == undefined) ? false : paginationContainer.pagesSize < props.maxElementCount ? model.index === paginationContainer.currentIndex : model.selected;
                 }
             }
         }
@@ -132,9 +140,83 @@ Row {
         onClicked: {
             if (paginationContainer.currentIndex < paginationContainer.pagesSize - 1){
                 paginationContainer.currentIndex++;
-                if (paginationContainer.pagesSize >= 10){
+                if (paginationContainer.pagesSize >= props.maxElementCount){
                     paginationContainer.refreshBtn();
                 }
+            }
+        }
+    }
+
+    BaseText {
+        text: "(" + (currentIndex * countElements + 1) + "-" + ((pagesSize - 1 != currentIndex) ? currentValue * countElements : countAllElements) + "/" + countAllElements + ")"
+    }
+
+
+
+    Row {
+        spacing: 4;
+
+        BaseText {
+            text: qsTr("Per page: ")
+        }
+
+        AuxButton {
+            id: count25;
+
+            width: 20;
+            height: 20;
+
+            hasIcon: false;
+            hasText: true;
+
+            highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+
+            enabled: paginationContainer.countElements != 25;
+
+            textButton: "25";
+
+            onClicked: {
+                paginationContainer.countElements = 25;
+            }
+        }
+
+        AuxButton {
+            id: count50;
+
+            width: 20;
+            height: 20;
+
+            hasIcon: false;
+            hasText: true;
+
+            highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+
+            enabled: paginationContainer.countElements != 50;
+
+            textButton: "50";
+
+            onClicked: {
+                paginationContainer.countElements = 50;
+            }
+        }
+
+        AuxButton {
+            id: count100;
+
+            width: 20;
+            height: 20;
+
+            hasIcon: false;
+            hasText: true;
+
+            highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+
+            enabled: paginationContainer.countElements != 100;
+
+            textButton: "100";
+
+            onClicked: {
+                paginationContainer.countElements = 100;
             }
         }
     }

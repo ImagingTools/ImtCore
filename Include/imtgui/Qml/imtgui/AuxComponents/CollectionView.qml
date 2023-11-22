@@ -18,7 +18,9 @@ Item {
     property bool visibleMetaInfo: true;
     property bool hasFilter: true;
 
-    property string commandsId;
+    property string commandId;
+    property string documentTypeId;
+
     property string editorPath;
     property string commandsDelegatePath: "CollectionViewCommandsDelegateBase.qml";
     property string commandUpdateGui;
@@ -135,7 +137,7 @@ Item {
         console.log("CollectionView onVisibleChanged", visible, itemId, collectionViewContainer);
         if (collectionViewContainer.visible){
             Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderLocal.commandsModel,
-                                                      "CommandsId": commandsProviderLocal.commandsId});
+                                                      "CommandId": commandsProviderLocal.commandId});
 
             Events.subscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
 
@@ -186,61 +188,63 @@ Item {
         return {}
     }
 
-    onCommandsIdChanged: {
-        console.log("CollectionView onCommandsIdChanged", collectionViewContainer.commandsId);
+    onCommandIdChanged: {
+        console.log("CollectionView onCommandsIdChanged", collectionViewContainer.commandId);
 
         commandsProviderLocal.additionInputParams = collectionViewContainer.getAdditionalInputParams();
-        commandsProviderLocal.commandsId = collectionViewContainer.commandsId;
-        commandsProviderLocal.documentUuid = collectionViewContainer.commandsId;
+        commandsProviderLocal.commandId = collectionViewContainer.commandId;
+        commandsProviderLocal.documentUuid = collectionViewContainer.commandId;
 
         collectionViewBase.commands.additionInputParams = getAdditionalInputParams()
-        collectionViewBase.commands.gqlModelObjectView = collectionViewContainer.commandsId + "ObjectView";
-        collectionViewBase.commands.gqlModelHeadersInfo = collectionViewContainer.commandsId + "Info";
-        collectionViewBase.commands.gqlModelItemsInfo = collectionViewContainer.commandsId + "List";
+        collectionViewBase.commands.gqlModelObjectView = collectionViewContainer.commandId + "ObjectView";
+        collectionViewBase.commands.gqlModelHeadersInfo = collectionViewContainer.commandId + "Info";
+        collectionViewBase.commands.gqlModelItemsInfo = collectionViewContainer.commandId + "List";
 
-        collectionViewBase.commandsId = collectionViewContainer.commandsId;
+        collectionViewBase.commandId = collectionViewContainer.commandId;
 
-        collectionMetaInfo.gqlModelMetaInfo = collectionViewContainer.commandsId + "MetaInfo";
+        collectionMetaInfo.gqlModelMetaInfo = collectionViewContainer.commandId + "MetaInfo";
 
         if (commandsLoader.item){
-            commandsLoader.item.commandsId = collectionViewContainer.commandsId;
+            commandsLoader.item.commandId = collectionViewContainer.commandId;
 
-            commandsLoader.item.gqlModelItem = commandsLoader.item.commandsId + "Item";
-            commandsLoader.item.gqlModelRemove = commandsLoader.item.commandsId + "Remove";
-            commandsLoader.item.gqlModelRename = commandsLoader.item.commandsId + "Rename";
-            commandsLoader.item.gqlModelSetDescription = commandsLoader.item.commandsId + "SetDescription";
+            commandsLoader.item.gqlModelItem = commandsLoader.item.commandId + "Item";
+            commandsLoader.item.gqlModelRemove = commandsLoader.item.commandId + "Remove";
+            commandsLoader.item.gqlModelRename = commandsLoader.item.commandId + "Rename";
+            commandsLoader.item.gqlModelSetDescription = commandsLoader.item.commandId + "SetDescription";
         }
     }
 
     function updateGui(){
-        collectionViewBase.commands.updateModels();
+        collectionViewBase.updateModels();
     }
 
     function selectItem(id, name, index){
         Events.sendEvent("CommandsClearModel");
 
-        let editorPath = collectionViewBase.commands.objectViewEditorPath;
-        let commandsId = collectionViewBase.commands.objectViewEditorCommandsId;
-        console.log("CollectionView selectItem", id, name, commandsId, editorPath);
+        let editorPath = collectionViewContainer.getEditorPath();
+        let documentTypeId = collectionViewContainer.getEditorCommandId();
+        console.log("CollectionView selectItem", id, name, documentTypeId, editorPath);
 
         if(name === undefined){
             name = " ";
         }
 
-        if (commandsId === ""){
+        if (documentTypeId === ""){
             return;
         }
 
         if (collectionViewContainer.isUsedDocumentManager){
+            console.log("isUsedDocumentManager", isUsedDocumentManager);
+
             if (id === ""){
-                documentManager.addDocument({"Id": id, "Name": name, "CommandsId": commandsId, "Source": editorPath, "Parent": collectionViewContainer}, {}, false);
+                documentManager.addDocument({"Id": id, "Name": name, "CommandId": documentTypeId, "Source": editorPath, "Parent": collectionViewContainer}, {}, false);
             }
             else{
-                documentManager.openDocument(id, {"Id": id, "Name": name, "CommandsId": commandsId, "Source": editorPath, "Parent": collectionViewContainer});
+                documentManager.openDocument(id, {"Id": id, "Name": name, "CommandId": documentTypeId, "Source": editorPath, "Parent": collectionViewContainer});
             }
         }
         else{
-            modalDialogManager.openDialog(contentDialog, {"contentId": id, "contentName": name, "contentCommandsId": commandsId,"contentSource": editorPath});
+            modalDialogManager.openDialog(contentDialog, {"contentId": id, "contentName": name, "contentCommandsId": documentTypeId,"contentSource": editorPath});
         }
     }
 
@@ -290,7 +294,7 @@ Item {
                     contentLoader.height = item.height;
                     contentLoader.item.itemId = content.contentId;
                     contentLoader.item.itemName = content.contentName;
-                    contentLoader.item.commandsId = content.contentCommandsId;
+                    contentLoader.item.commandId = content.contentCommandsId;
                 }
             }
         }
@@ -349,7 +353,7 @@ Item {
 
         itemId: collectionViewContainer.itemId;
 
-        commandsId: parent.commandsId;
+        commandId: parent.commandId;
         loadData: true;
         hasFilter: collectionViewContainer.hasFilter;
 
@@ -422,7 +426,7 @@ Item {
     SubscriptionClient {
         id: subscriptionClient;
 
-        property string commandId: collectionViewContainer.commandsId;
+        property string commandId: collectionViewContainer.commandId;
         onCommandIdChanged: {
             if (commandId !== ""){
                 let subscriptionRequestId = "On" + commandId + "CollectionChanged"

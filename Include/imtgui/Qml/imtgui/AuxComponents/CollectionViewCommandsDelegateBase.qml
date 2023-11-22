@@ -22,7 +22,7 @@ Item {
     */
     property int selectedIndex: containerBase.tableData ? containerBase.tableData.selectedIndex: -1;
 
-    property string commandsId;
+    property string commandId;
 
     property string descriptionFieldId: "Description";
 
@@ -82,14 +82,14 @@ Item {
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent(containerBase.commandsId + "CommandActivated", containerBase.commandHandle);
+        Events.unSubscribeEvent(containerBase.commandId + "CommandActivated", containerBase.commandHandle);
         if (containerBase.tableData){
         }
     }
 
-    onCommandsIdChanged: {
-        console.log("CollectionCommands onCommandsIdChanged", containerBase.commandsId);
-        Events.subscribeEvent(containerBase.commandsId + "CommandActivated", containerBase.commandHandle);
+    onCommandIdChanged: {
+        console.log("CollectionCommands oncommandIdChanged", containerBase.commandId);
+        Events.subscribeEvent(containerBase.commandId + "CommandActivated", containerBase.commandHandle);
     }
 
     CollectionViewCommandsObserver {

@@ -412,7 +412,7 @@ Item {
         table: collectionViewBaseContainer.table;
 
         rootItem: collectionViewBaseContainer;
-        commandsId: collectionViewBaseContainer.commandsId;
+        commandId: collectionViewBaseContainer.commandsId;
         pagination: paginationObj;
 
         Component.onCompleted: {
@@ -420,8 +420,8 @@ Item {
         }
 
 
-        onCommandsIdChanged: {
-            console.log("CollectionViewBase onCommandsIdChanged", loadData, baseCommands.commandsId, baseCommands.gqlModelHeadersInfo);
+        onCommandIdChanged: {
+            console.log("CollectionViewBase onCommandsIdChanged", loadData, baseCommands.commandId, baseCommands.gqlModelHeadersInfo);
 
             if (loadData){
                 baseCommands.updateModels();

@@ -93,22 +93,6 @@ void CLicenseDefinition::SetProductId(const QByteArray& productId)
 }
 
 
-//QByteArrayList CLicenseDefinition::GetFeatures() const
-//{
-//	return m_featureIds;
-//}
-
-
-//void CLicenseDefinition::SetFeatures(QByteArrayList features)
-//{
-//	if (m_featureIds != features){
-//		istd::CChangeNotifier notifier(this);
-
-//		m_featureIds = features;
-//	}
-//}
-
-
 QByteArrayList CLicenseDefinition::GetDependencies() const
 {
 	return m_dependencies;

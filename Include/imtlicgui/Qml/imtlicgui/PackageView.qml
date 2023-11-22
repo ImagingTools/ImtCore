@@ -11,6 +11,8 @@ DocumentBase {
         PackageViewCommandsDelegate {}
     }
 
+    property var featuresProvider: null; //REMOVE
+
     nameOutsideEditor: true;
 
     property int packageIndex: -1;
@@ -76,7 +78,7 @@ DocumentBase {
         packageViewRoot.headersModel.Refresh();
     }
 
-    onCommandsIdChanged: {
+    onCommandIdChanged: {
         if (packageViewRoot.itemId === ""){
             packageViewRoot.commandsProvider.setCommandIsEnabled("Save", true);
         }

@@ -8,7 +8,7 @@ Item {
 
     property alias commands: gqlModels;
 
-    property string commandsId;
+    property string commandId;
 
     property alias tableElementsDelegate: tableInternal.delegate;
     property alias tableHeadersDelegate: tableInternal.headerDelegate;
@@ -66,11 +66,9 @@ Item {
     }
 
 
-    onCommandsIdChanged: {
+    onCommandIdChanged: {
         if (collectionViewBaseContainer.loadData){
             gqlModels.updateModels();
-
-//            collectionViewBaseContainer.registerSubscription();
         }
     }
 
@@ -114,6 +112,10 @@ Item {
     function onTextFilterChanged(index, text){
         console.log("onTextFilterChanged", text);
         modelFilterObj.SetData("TextFilter", text);
+        gqlModels.updateModels();
+    }
+
+    function updateModels(){
         gqlModels.updateModels();
     }
 
@@ -331,7 +333,7 @@ Item {
         itemId: collectionViewBaseContainer.itemId;
         table: collectionViewBaseContainer.table;
 
-        commandsId: collectionViewBaseContainer.commandsId;
+        commandId: collectionViewBaseContainer.commandId;
         rootItem: collectionViewBaseContainer;
 
         pagination: paginationObj;
@@ -368,25 +370,4 @@ Item {
             }
         }
     }
-
-    function registerSubscription(){
-        console.log("try registerSubscription OnObjectCollectionChanged");
-
-        var query = Gql.GqlRequest("subscription", "OnObjectCollectionChanged");
-        var queryFields = Gql.GqlObject("notification");
-        queryFields.InsertField("Id");
-        query.AddField(queryFields);
-        subscriptionManager.registerSubscription(query, subscriptionClient);
-    }
-
-//    SubscriptionClient {
-//        id: subscriptionClient;
-
-//        onStateChanged: {
-//            console.log("SubscriptionClient onStateChanged", state);
-//            if (state == "Registered"){
-//                gqlModels.updateItemsModel();
-//            }
-//        }
-//    }
 }

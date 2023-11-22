@@ -62,6 +62,7 @@ imtgql::IGqlContext* CGqlContextControllerComp::GetRequestContext(
 	imtgql::CGqlContext* gqlContextPtr = new imtgql::CGqlContext();
 
 	gqlContextPtr->SetUserInfo(userInfoClonedPtr);
+	gqlContextPtr->SetToken(token);
 
 	return gqlContextPtr;
 }

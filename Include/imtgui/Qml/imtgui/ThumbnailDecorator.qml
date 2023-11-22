@@ -369,25 +369,29 @@ Rectangle {
         visible: false;
     }
 
-//    Component {
-//        id: saveDialog;
-//        MessageDialog {
-//            title: qsTr("Save dirty documents");
-//            message: qsTr("Save all dirty documents ?");
-//            Component.onCompleted: {
-//                buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true});
-//            }
+    function closeApp(){
+        if (mainDocumentManager.dirtyDocumentsExists()){
+            modalDialogManager.openDialog(saveDialog, {});
+        }
+    }
 
-//            onFinished: {
-//                if (buttonId == "Yes"){
-//                    documentManager.saveDirtyDocuments();
-//                }
-//                else if (buttonId == "No"){
-//                    documentManager.closeAllDocuments();
+    Component {
+        id: saveDialog;
+        MessageDialog {
+            title: qsTr("Save dirty documents");
+            message: qsTr("Save all dirty documents ?");
+            Component.onCompleted: {
+                buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true});
+            }
 
-//                   // onLogout();
-//                }
-//            }
-//        }
-//    }
+            onFinished: {
+                if (buttonId == "Yes"){
+                    documentManager.saveDirtyDocuments();
+                }
+                else if (buttonId == "No"){
+                    documentManager.closeAllDocuments();
+                }
+            }
+        }
+    }
 }
