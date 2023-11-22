@@ -2,7 +2,7 @@
 
 
 // Qt includes
-#include <QWebSocket>
+#include <QtWebSockets/QWebSocket>
 #include <QtCore/QTimer>
 
 // ACF includes
