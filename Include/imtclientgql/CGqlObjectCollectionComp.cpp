@@ -40,15 +40,15 @@ bool operator==(
 			const imtgql::IGqlStructuredCollectionResponse::ElementInfo& b)
 {
 	bool retVal =
-		a.id == b.id &&
-		a.name == b.name &&
-		a.description == b.description &&
-		a.path == b.path &&
-		a.typeId == b.typeId &&
-		a.version == b.version &&
-		a.elementMetaInfoPtr.isNull() == b.elementMetaInfoPtr.isNull() &&
-		a.elementMetaInfoPtr.isNull() == b.elementMetaInfoPtr.isNull() &&
-		a.isNode == b.isNode;
+				a.id == b.id &&
+				a.name == b.name &&
+				a.description == b.description &&
+				a.path == b.path &&
+				a.typeId == b.typeId &&
+				a.version == b.version &&
+				a.elementMetaInfoPtr.isNull() == b.elementMetaInfoPtr.isNull() &&
+				a.elementMetaInfoPtr.isNull() == b.elementMetaInfoPtr.isNull() &&
+				a.isNode == b.isNode;
 
 	if (retVal && !a.elementMetaInfoPtr.isNull()){
 		retVal &= a.elementMetaInfoPtr->IsEqual(*b.elementMetaInfoPtr);
@@ -311,9 +311,9 @@ bool CGqlObjectCollectionComp::RemoveObjectFromNode(
 {
 	if (m_delegateCompPtr.IsValid()){
 		return m_delegateCompPtr->RemoveObjectFromNode(
-						objectId,
-						nodeId,
-						operationContextPtr);
+					objectId,
+					nodeId,
+					operationContextPtr);
 	}
 
 	return false;
@@ -759,7 +759,9 @@ bool CGqlObjectCollectionComp::GetElementType(const QByteArray& elementId, Eleme
 }
 
 
-bool CGqlObjectCollectionComp::GetNodeInfo(const QByteArray& nodeId, imtgql::IGqlStructuredCollectionResponse::NodeInfo& valueOut) const
+bool CGqlObjectCollectionComp::GetNodeInfo(
+			const QByteArray& nodeId,
+			imtgql::IGqlStructuredCollectionResponse::NodeInfo& valueOut) const
 {
 	if (m_delegateCompPtr.IsValid()){
 		return m_delegateCompPtr->GetNodeInfo(nodeId, valueOut);
@@ -769,7 +771,9 @@ bool CGqlObjectCollectionComp::GetNodeInfo(const QByteArray& nodeId, imtgql::IGq
 }
 
 
-bool CGqlObjectCollectionComp::GetObjectInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& valueOut) const
+bool CGqlObjectCollectionComp::GetObjectInfo(
+			const QByteArray& objectId,
+			imtgql::IGqlStructuredCollectionResponse::ObjectInfo& valueOut) const
 {
 	if (m_delegateCompPtr.IsValid()){
 		return m_delegateCompPtr->GetObjectInfo(objectId, valueOut);

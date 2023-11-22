@@ -58,7 +58,7 @@ bool CGqlObjectCollectionResponse::GetObjectInfo(ObjectInfo& out) const
 
 bool CGqlObjectCollectionResponse::GetElementInfo(ElementInfo& out) const
 {
-	if (m_isElementInfoPresent) {
+	if (m_isElementInfoPresent){
 		out = m_elementInfo;
 
 		return true;
@@ -69,7 +69,7 @@ bool CGqlObjectCollectionResponse::GetElementInfo(ElementInfo& out) const
 
 bool CGqlObjectCollectionResponse::GetElementList(ElementList& out) const
 {
-	if (m_isElementListPresent) {
+	if (m_isElementListPresent){
 		out = m_elementList;
 
 		return true;
@@ -83,7 +83,7 @@ bool CGqlObjectCollectionResponse::GetElementList(ElementList& out) const
 
 bool CGqlObjectCollectionResponse::GetValue(QVariant& out) const
 {
-	if (m_isPrimitiveTypePresent) {
+	if (m_isPrimitiveTypePresent){
 		out = m_variant;
 
 		return true;
@@ -172,7 +172,7 @@ void CGqlObjectCollectionResponse::OnReply(const imtgql::IGqlRequest& request, c
 void CGqlObjectCollectionResponse::ParseFolderContentReply()
 {
 	QJsonObject responseObject = m_json.object().value("data").toObject().value("getFolderContent").toObject();
-	if (responseObject.contains("folder") && responseObject.value("folder").isObject()) {
+	if (responseObject.contains("folder") && responseObject.value("folder").isObject()){
 		QJsonObject folder = responseObject.value("folder").toObject();
 
 		m_isElementInfoPresent = true;
@@ -182,7 +182,7 @@ void CGqlObjectCollectionResponse::ParseFolderContentReply()
 		m_elementInfo.name = folder.value("name").toString().toLatin1();
 
 		QJsonArray path = folder.value("fullPath").toArray();
-		for (int i = 0; i < path.size(); i++) {
+		for (int i = 0; i < path.size(); i++){
 			QByteArray id = path[i].toObject().value("id").toString().toLatin1();
 			//Q_ASSERT(i == 0 ? id.isEmpty() : !id.isEmpty());
 
@@ -192,9 +192,9 @@ void CGqlObjectCollectionResponse::ParseFolderContentReply()
 		m_elementInfo.isNode = true;
 	}
 
-	if (responseObject.contains("subfolders") && responseObject.value("subfolders").isArray()) {
+	if (responseObject.contains("subfolders") && responseObject.value("subfolders").isArray()){
 		QJsonArray arrayFolders = responseObject.value("subfolders").toArray();
-		for (int i = 0; i < arrayFolders.count(); ++i) {
+		for (int i = 0; i < arrayFolders.count(); ++i){
 			m_isElementListPresent = true;
 
 			QJsonObject jsonObject = arrayFolders[i].toObject();
@@ -209,9 +209,9 @@ void CGqlObjectCollectionResponse::ParseFolderContentReply()
 		}
 	}
 
-	if (responseObject.contains("measurements") && responseObject.value("measurements").isArray()) {
+	if (responseObject.contains("measurements") && responseObject.value("measurements").isArray()){
 		QJsonArray arrayDocuments = responseObject.value("measurements").toArray();
-		for (int i = 0; i < arrayDocuments.count(); ++i) {
+		for (int i = 0; i < arrayDocuments.count(); ++i){
 			m_isElementListPresent = true;
 
 			QJsonObject jsonObject = arrayDocuments[i].toObject();
@@ -239,18 +239,18 @@ void CGqlObjectCollectionResponse::ParseFolderContentReply()
 			QJsonObject metadata = QJsonDocument::fromJson(data).object();
 			QJsonArray inkNamesArray = metadata.value("InkNames").toArray();
 			QString inkNamesStr;
-			for (int inkIndex = 0; inkIndex < inkNamesArray.count(); ++inkIndex) {
+			for (int inkIndex = 0; inkIndex < inkNamesArray.count(); ++inkIndex){
 				inkNamesStr += inkNamesArray.at(inkIndex).toObject().value("Name").toString();
-				if (inkIndex < inkNamesArray.count() - 1) {
+				if (inkIndex < inkNamesArray.count() - 1){
 					inkNamesStr += " ";
 				}
 			}
 			QJsonArray measuringDevicesArray = metadata.value("MeasuringDevices").toArray();
 			QStringList measuringDeviceList;
 			QString measuringDevices;
-			for (int deviceIndex = 0; deviceIndex < measuringDevicesArray.count(); ++deviceIndex) {
+			for (int deviceIndex = 0; deviceIndex < measuringDevicesArray.count(); ++deviceIndex){
 				QString device = measuringDevicesArray.at(deviceIndex).toString();
-				if (!measuringDeviceList.contains(device)) {
+				if (!measuringDeviceList.contains(device)){
 					measuringDeviceList += device;
 					measuringDevices += device;
 					measuringDevices += " ";
@@ -260,9 +260,9 @@ void CGqlObjectCollectionResponse::ParseFolderContentReply()
 			QJsonArray measurementConditionsArray = metadata.value("MeasurementConditions").toArray();
 			QStringList measurementConditionList;
 			QString measurementConditions;
-			for (int conditionIndex = 0; conditionIndex < measurementConditionsArray.count(); ++conditionIndex) {
+			for (int conditionIndex = 0; conditionIndex < measurementConditionsArray.count(); ++conditionIndex){
 				QString condition = measurementConditionsArray.at(conditionIndex).toString();
-				if (!measurementConditionList.contains(condition)) {
+				if (!measurementConditionList.contains(condition)){
 					measurementConditionList += condition;
 					measurementConditions += condition;
 					measurementConditions += " ";
@@ -295,7 +295,7 @@ void CGqlObjectCollectionResponse::ParseCreateFolderReply()
 void CGqlObjectCollectionResponse::ParseDeleteFolderReply()
 {
 	QJsonObject responseObject = m_json.object().value("data").toObject().value("deleteFolder").toObject();
-	if (responseObject.contains("succeeded") && responseObject.value("succeeded").isBool()) {
+	if (responseObject.contains("succeeded") && responseObject.value("succeeded").isBool()){
 		m_isPrimitiveTypePresent = true;
 
 		m_variant = responseObject.value("succeeded").toBool();
@@ -306,9 +306,9 @@ void CGqlObjectCollectionResponse::ParseDeleteFolderReply()
 void CGqlObjectCollectionResponse::ParseAddMeasurementReply()
 {
 	QJsonObject responseObject = m_json.object().value("data").toObject().value("addMeasurement").toObject();
-	if (responseObject.contains("data") && responseObject.value("data").isObject()) {
+	if (responseObject.contains("data") && responseObject.value("data").isObject()){
 		QJsonObject data = responseObject.value("data").toObject();
-		if (data.contains("id") && data.value("id").isString()) {
+		if (data.contains("id") && data.value("id").isString()){
 			m_isPrimitiveTypePresent = true;
 
 			m_variant = data.value("id").toString().toLatin1();
@@ -320,7 +320,7 @@ void CGqlObjectCollectionResponse::ParseAddMeasurementReply()
 void CGqlObjectCollectionResponse::ParseReplaceMeasurementReply()
 {
 	QJsonObject responseObject = m_json.object().value("data").toObject().value("replaceMeasurement").toObject();
-	if (responseObject.contains("id") && responseObject.value("id").isString()) {
+	if (responseObject.contains("id") && responseObject.value("id").isString()){
 		m_isPrimitiveTypePresent = true;
 
 		m_variant = responseObject.value("id").toString().toLatin1();
@@ -331,7 +331,7 @@ void CGqlObjectCollectionResponse::ParseReplaceMeasurementReply()
 void CGqlObjectCollectionResponse::ParseRenameMeasurementReply()
 {
 	QJsonObject responseObject = m_json.object().value("data").toObject().value("renameMeasurement").toObject();
-	if (responseObject.contains("id") && responseObject.value("id").isString()) {
+	if (responseObject.contains("id") && responseObject.value("id").isString()){
 		m_isPrimitiveTypePresent = true;
 
 		m_variant = responseObject.value("id").toString().toLatin1();
@@ -342,7 +342,7 @@ void CGqlObjectCollectionResponse::ParseRenameMeasurementReply()
 void CGqlObjectCollectionResponse::ParseDeleteMeasurementReply()
 {
 	QJsonObject responseObject = m_json.object().value("data").toObject().value("deleteMeasurement").toObject();
-	if (responseObject.contains("succeeded") && responseObject.value("succeeded").isBool()) {
+	if (responseObject.contains("succeeded") && responseObject.value("succeeded").isBool()){
 		m_isPrimitiveTypePresent = true;
 
 		m_variant = responseObject.value("succeeded").toBool();
@@ -353,13 +353,13 @@ void CGqlObjectCollectionResponse::ParseDeleteMeasurementReply()
 void CGqlObjectCollectionResponse::ParseGetMeasurementUploadUrlsReply()
 {
 	QJsonObject responseObject = m_json.object().value("data").toObject().value("getMeasurementUploadUrls").toObject();
-	if (responseObject.contains("uploadUrls") && responseObject.value("uploadUrls").isArray()) {
+	if (responseObject.contains("uploadUrls") && responseObject.value("uploadUrls").isArray()){
 		QJsonArray uploadUrls = responseObject.value("uploadUrls").toArray();
 		QStringList urls;
 
-		for (int i = 0; i < uploadUrls.count(); i++) {
+		for (int i = 0; i < uploadUrls.count(); i++){
 			QJsonObject uploadUrl = uploadUrls[i].toObject();
-			if (uploadUrl.contains("url") && uploadUrl.value("url").isString()) {
+			if (uploadUrl.contains("url") && uploadUrl.value("url").isString()){
 				m_isPrimitiveTypePresent = true;
 
 				urls += uploadUrl.value("url").toString();
@@ -374,7 +374,7 @@ void CGqlObjectCollectionResponse::ParseGetMeasurementUploadUrlsReply()
 void CGqlObjectCollectionResponse::ParseGetMeasurementDownloadUrlsReply()
 {
 	QJsonObject responseObject = m_json.object().value("data").toObject().value("getMeasurementDownloadUrl").toObject();
-	if (responseObject.contains("url") && responseObject.value("url").isString()) {
+	if (responseObject.contains("url") && responseObject.value("url").isString()){
 		m_isPrimitiveTypePresent = true;
 
 		QStringList urls;

@@ -36,7 +36,7 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 			const imtgql::CGqlRequest& subscriptionRequest,
 			imtclientgql::IGqlSubscriptionClient* subscriptionClient)
 {
-	if (!subscriptionClient || !m_subsctiptionSenderCompPtr.IsValid()) {
+	if (!subscriptionClient || !m_subsctiptionSenderCompPtr.IsValid()){
 		return QByteArray();
 	}
 
@@ -332,7 +332,7 @@ void CSubscriptionManagerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_webLoginStatusModelCompPtr.IsValid()) {
+	if (m_webLoginStatusModelCompPtr.IsValid()){
 		m_webLoginStatusModelCompPtr->AttachObserver(this);
 	}
 }

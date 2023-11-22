@@ -25,8 +25,6 @@ void CSubscriptionControllerComp::OnComponentCreated()
 
 		m_subscriptionId = m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, this);
 	}
-
-//	m_changeableModelCompPtr.EnsureInitialized();
 }
 
 

@@ -22,7 +22,7 @@ namespace imtclientgql
 // public methods
 
 CWebSocketClientComp::CWebSocketClientComp()
-			: m_loginStatus(imtauth::ILoginStatusProvider::LSF_CACHED)
+	:m_loginStatus(imtauth::ILoginStatusProvider::LSF_CACHED)
 {
 }
 
@@ -63,12 +63,9 @@ const imtrest::ISender* CWebSocketClientComp::GetSender(const QByteArray& /*requ
 }
 
 
-
-
 bool CWebSocketClientComp::SendRequest(const imtgql::IGqlRequest& request, imtgql::IGqlResponseHandler& responseHandler) const
 {
 	QString key = QUuid::createUuid().toString(QUuid::WithoutBraces);
-//	QString key = request.GetFactoryId();
 
 	QJsonObject dataObject;
 	dataObject["type"] = "query";
@@ -95,7 +92,6 @@ bool CWebSocketClientComp::SendRequest(const imtgql::IGqlRequest& request, imtgq
 		else{
 			break;
 		}
-
 	}
 
 	return false;
@@ -104,14 +100,13 @@ bool CWebSocketClientComp::SendRequest(const imtgql::IGqlRequest& request, imtgq
 
 // protected methods
 
-	QByteArray CWebSocketClientComp::Sign(const QByteArray& message, const QByteArray& key) const
+QByteArray CWebSocketClientComp::Sign(const QByteArray& message, const QByteArray& key) const
 {
 	if (!key.isEmpty()){
 		return QMessageAuthenticationCode::hash(message, key, QCryptographicHash::Sha256);
 	}
-	else{
-		return QCryptographicHash::hash(message, QCryptographicHash::Sha256);
-	}
+
+	return QCryptographicHash::hash(message, QCryptographicHash::Sha256);
 }
 
 
@@ -130,6 +125,7 @@ void CWebSocketClientComp::OnComponentCreated()
 
 	m_refreshTimer.setSingleShot(true);
 	m_refreshTimer.setInterval(5000);
+
 	Connect();
 }
 

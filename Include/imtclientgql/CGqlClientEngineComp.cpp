@@ -20,7 +20,8 @@ CGqlClientEngineComp::CGqlClientEngineComp()
 
 // reimplemented (icomp::CComponentBase)
 
-void CGqlClientEngineComp::OnComponentCreated(){
+void CGqlClientEngineComp::OnComponentCreated()
+{
 	BaseClass::OnComponentCreated();
 
 	if (m_urlParamCompPtr.IsValid()){
@@ -32,7 +33,8 @@ void CGqlClientEngineComp::OnComponentCreated(){
 }
 
 
-void CGqlClientEngineComp::OnComponentDestroyed(){
+void CGqlClientEngineComp::OnComponentDestroyed()
+{
 	m_textParamObserver.UnregisterAllObjects();
 
 	BaseClass::OnComponentDestroyed();
@@ -75,7 +77,8 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 
 // protected methods
 
-void CGqlClientEngineComp::OnUrlParamChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::ITextParam* textParamPtr){
+void CGqlClientEngineComp::OnUrlParamChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::ITextParam* textParamPtr)
+{
 	Q_ASSERT(textParamPtr != nullptr);
 	if (textParamPtr != nullptr){
 		QString textParam = textParamPtr->GetText();

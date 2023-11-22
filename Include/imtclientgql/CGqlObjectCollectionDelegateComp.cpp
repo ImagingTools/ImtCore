@@ -85,11 +85,9 @@ bool CGqlObjectCollectionDelegateComp::GetObjectMetaInfo(const QByteArray& objec
 
 						return DeSerializeObject(outInfo.GetPtr(), objectData);
 					}
-
 				}
 			}
 		}
-
 	}
 
 	return false;
@@ -144,15 +142,15 @@ QByteArray CGqlObjectCollectionDelegateComp::GetObjectTypeId(const QByteArray& /
 
 
 QByteArray CGqlObjectCollectionDelegateComp::InsertObject(
-				const QByteArray& typeId,
-				const QString& name,
-				const QString& description,
-				const istd::IChangeable& object,
-				const QByteArray& proposedObjectId,
-				const QByteArray& nodeId,
-				const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
-				const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
-				const imtbase::IOperationContext* operationContextPtr) const
+			const QByteArray& typeId,
+			const QString& name,
+			const QString& description,
+			const istd::IChangeable& object,
+			const QByteArray& proposedObjectId,
+			const QByteArray& nodeId,
+			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
+			const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
+			const imtbase::IOperationContext* operationContextPtr) const
 {
 	if (m_clientCompPtr.IsValid()){
 		imtgql::IGqlStructuredCollectionResponse::ObjectInfo info;
@@ -186,7 +184,6 @@ QByteArray CGqlObjectCollectionDelegateComp::InsertObject(
 					}
 				}
 			}
-
 		}
 	}
 
@@ -314,20 +311,23 @@ bool CGqlObjectCollectionDelegateComp::GetSubCollection(
 							if (jsonObject.contains("metaInfo")){
 								QByteArray metaInfoData = QByteArray::fromBase64(jsonObject.value("metaInfo").toString().toUtf8());
 								bool retVal = DeSerializeObject(&metainfo, metaInfoData);
-//								Q_ASSERT(retVal);
+								if (!retVal){
+									qDebug() << "Deserialization of the meta.information was failed!";
+								}
 							}
 
 							if (jsonObject.contains("dataMetaInfo")){
 								QByteArray dataMetaInfo = QByteArray::fromBase64(jsonObject.value("dataMetaInfo").toString().toUtf8());
 								bool retVal = DeSerializeObject(dataMetainfoPtr.GetPtr(), dataMetaInfo);
 								if (!retVal){
-									qDebug() << "Deserialize object was failed!";
+									qDebug() << "Deserialization of the object was failed!";
 								}
 							}
 
 							imtbase::COperationContext operationContext;
 							if (jsonObject.contains("operationContext")){
 								QByteArray operationContextData = QByteArray::fromBase64(jsonObject.value("operationContext").toString().toUtf8());
+
 								DeSerializeObject(&operationContext, operationContextData);
 							}
 
