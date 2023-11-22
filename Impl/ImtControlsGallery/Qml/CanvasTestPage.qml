@@ -184,7 +184,7 @@ Rectangle {
 
                 let add = 2 * canvas.imageSize + 2 * canvas.imageMargin + 2 * canvas.borderShift + 30;
                 let mainRecWidth = Math.max(textWidth_main + add, textWidth_second + add, width_)
-                if(mainRecWidth > canvas.mainRec_width){
+                if(mainRecWidth > canvas.mainRec_width && index >= 0){
                     canvasPage.mainModel.SetData("Width", mainRecWidth, index);
                 }
                 //width calculation
@@ -248,7 +248,20 @@ Rectangle {
 
             }
 
-            function drawLink(ctx,x1, y1, x2, y2){
+            function drawLink(ctx, fromIndex, toIndex){
+
+                let x1 = canvasPage.mainModel.GetData("X", fromIndex);
+                let y1 = canvasPage.mainModel.GetData("Y", fromIndex);
+                let x2 = canvasPage.mainModel.GetData("X", toIndex);
+                let y2 = canvasPage.mainModel.GetData("Y", toIndex);
+                let width1 = canvasPage.mainModel.IsValidData("Width", fromIndex) ? canvasPage.mainModel.GetData("Width", fromIndex) : canvas.mainRec_width;
+                let width2 = canvasPage.mainModel.IsValidData("Width", toIndex) ? canvasPage.mainModel.GetData("Width", toIndex) : canvas.mainRec_width;
+
+                let x1_link = canvas.width * x1 + width1/2;
+                let y1_link = canvas.height * y1 + canvas.mainRec_height/2;
+                let x2_link = canvas.width * x2 + width2/2;
+                let y2_link = canvas.height * y2 + canvas.mainRec_height/2;
+
                 ctx.lineCap = "round"
                 ctx.lineJoin = "round"
                 ctx.lineWidth = 2;
@@ -256,9 +269,104 @@ Rectangle {
                 ctx.fillStyle = "#ff6600";
 
                 ctx.beginPath()
-                ctx.moveTo(x1, y1);
-                ctx.lineTo(x2, y2);
+                ctx.moveTo(x1_link, y1_link);
+                ctx.lineTo(x2_link, y2_link);
                 ctx.stroke();
+
+                //draw intersection
+                let x1_rec2;
+                let y1_rec2;
+                let x2_rec2;
+                let y2_rec2;
+
+                let intersection;
+
+                if(y1 > y2){
+                     x1_rec2 = canvas.width * x2;
+                     y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
+                     x2_rec2 = canvas.width * x2 + width2;
+                     y2_rec2 = canvas.height * y2 + canvas.mainRec_height;
+
+                     intersection = findIntersection(x1_link, y1_link, x2_link, y2_link, x1_rec2, y1_rec2, x2_rec2, y2_rec2);
+
+                    if(intersection.x < canvas.width * x2 + width2 && intersection.x > canvas.width * x2){
+                        x1_rec2 = canvas.width * x2;
+                        y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
+                        x2_rec2 = canvas.width * x2 + width2;
+                        y2_rec2 = canvas.height * y2 + canvas.mainRec_height;
+                    }
+                    else if(intersection.x >= canvas.width * x2 + width2){
+                        x1_rec2 = canvas.width * x2  + width2;
+                        y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
+                        x2_rec2 = canvas.width * x2 + width2;
+                        y2_rec2 = canvas.height * y2;
+                    }
+                    else if(intersection.x <= canvas.width * x2){
+                        x1_rec2 = canvas.width * x2;
+                        y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
+                        x2_rec2 = canvas.width * x2;
+                        y2_rec2 = canvas.height * y2;
+                    }
+
+                }
+                else {
+                     x1_rec2 = canvas.width * x2;
+                     y1_rec2 = canvas.height * y2;
+                     x2_rec2 = canvas.width * x2 + width2;
+                     y2_rec2 = canvas.height * y2;
+
+                     intersection = findIntersection(x1_link, y1_link, x2_link, y2_link, x1_rec2, y1_rec2, x2_rec2, y2_rec2);
+
+                    if(intersection.x < canvas.width * x2 + width2 && intersection.x > canvas.width * x2){
+                        x1_rec2 = canvas.width * x2;
+                        y1_rec2 = canvas.height * y2;
+                        x2_rec2 = canvas.width * x2 + width2;
+                        y2_rec2 = canvas.height * y2;
+                    }
+                    else if(intersection.x >= canvas.width * x2 + width2){
+                        x1_rec2 = canvas.width * x2  + width2;
+                        y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
+                        x2_rec2 = canvas.width * x2 + width2;
+                        y2_rec2 = canvas.height * y2;
+                    }
+                    else if(intersection.x <= canvas.width * x2){
+                        x1_rec2 = canvas.width * x2;
+                        y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
+                        x2_rec2 = canvas.width * x2;
+                        y2_rec2 = canvas.height * y2;
+                    }
+
+
+                }
+
+                intersection = findIntersection(x1_link, y1_link, x2_link, y2_link, x1_rec2, y1_rec2, x2_rec2, y2_rec2);
+
+                drawIntersection(ctx, intersection);
+
+            }
+
+            function drawIntersection(ctx, intersection){
+                let size = 20
+
+                ctx.lineWidth = 0.5;
+                ctx.strokeStyle = "#ff6600"
+                ctx.fillStyle = "#ff6600";
+                ctx.beginPath()
+                ctx.roundedRect(intersection.x - size/2, intersection.y  - size/2, size, size, size, size);
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            function findIntersection(x1, y1, x2, y2, x3, y3, x4, y4){
+
+                let px = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) /
+                    ((x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4));
+
+                let py = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) /
+                    ((x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4));
+
+
+                return Qt.point(px, py);
             }
 
             onPaint: {
@@ -266,17 +374,8 @@ Rectangle {
                 ctx.clearRect(0, 0, canvas.width, canvas.height)
 
                 //TEST drawLink
-                let x1 = canvasPage.mainModel.GetData("X", 0);
-                let y1 = canvasPage.mainModel.GetData("Y", 0);
-                let x2 = canvasPage.mainModel.GetData("X", 1);
-                let y2 = canvasPage.mainModel.GetData("Y", 1);
-                let width1 = canvasPage.mainModel.IsValidData("Width", 0) ? canvasPage.mainModel.GetData("Width", 0) : canvas.mainRec_width;
-                let width2 = canvasPage.mainModel.IsValidData("Width", 1) ? canvasPage.mainModel.GetData("Width", 1) : canvas.mainRec_width;
-
-                drawLink(ctx, canvas.width * x2 + width2/2, canvas.height * y2 + canvas.mainRec_height/2,
-                         canvas.width * x1 + width1/2, canvas.height * y1 + canvas.mainRec_height/2)
+                drawLink(ctx, 1, 0)
                 //TEST drawLink
-
 
                 for(let i = 0; i < canvasPage.mainModel.GetItemsCount(); i++){
                     let x_  = canvasPage.mainModel.GetData("X", i)
@@ -287,9 +386,7 @@ Rectangle {
                     let selected_ = canvasPage.mainModel.IsValidData("Selected", i) ? canvasPage.mainModel.GetData("Selected", i) : false;
 
                     drawObject(ctx, canvas.width * x_, canvas.height * y_, width_, mainText_, secondText_, selected_, i);
-
-                }
-
+                }//for
 
             }//onPaint
 
