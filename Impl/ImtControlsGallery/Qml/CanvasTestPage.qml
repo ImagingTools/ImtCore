@@ -26,6 +26,25 @@ Rectangle {
         objectModel.SetData("MainText", "Main text 2", index);
         objectModel.SetData("SecondText", "Second text 2", index);
 
+        index = objectModel.InsertNewItem();
+        objectModel.SetData("X", 0.1, index);
+        objectModel.SetData("Y", 0.1, index);
+        objectModel.SetData("MainText", "Main text 3", index);
+        objectModel.SetData("SecondText", "Second text 3", index);
+
+        index = objectModel.InsertNewItem();
+        objectModel.SetData("X", 0.6, index);
+        objectModel.SetData("Y", 0.1, index);
+        objectModel.SetData("MainText", "Main text 4", index);
+        objectModel.SetData("SecondText", "Second text 4", index);
+
+        index = objectModel.InsertNewItem();
+        objectModel.SetData("X", 0.1, index);
+        objectModel.SetData("Y", 0.6, index);
+        objectModel.SetData("MainText", "Main text 5", index);
+        objectModel.SetData("SecondText", "Second text 5", index);
+
+
         canvas.requestPaint()
     }
 
@@ -225,7 +244,7 @@ Rectangle {
                 let textStr_second = secondText;
                 let textWidth_second = ctx.measureText(secondText).width
 
-                let add = 2 * canvas.imageSize + 2 * canvas.imageMargin + 2 * canvas.borderShift + 30;
+                let add = 2 * canvas.imageSize + 2 * canvas.imageMargin + 2 * canvas.borderShift + 30 * scaleCoeff;
                 let mainRecWidth = Math.max(textWidth_main + add, textWidth_second + add, width_)
                 if(mainRecWidth > canvas.mainRec_width && index >= 0){
                     canvasPage.objectModel.SetData("Width", mainRecWidth, index);
@@ -233,7 +252,7 @@ Rectangle {
                 //width calculation
 
                 //shadow rectangle
-                let shadowSize = 6;
+                let shadowSize = 6 * canvas.scaleCoeff;
                 ctx.lineWidth = canvas.lineWidth;
                 ctx.fillStyle = selected ? Qt.rgba(0.2, 0.8, 0, 0.3) : Qt.rgba(0, 0, 0, 0.2);
                 ctx.beginPath()
@@ -315,7 +334,7 @@ Rectangle {
 
                 ctx.lineCap = "round"
                 ctx.lineJoin = "round"
-                ctx.lineWidth = 2;
+                ctx.lineWidth =  canvas.lineWidth;
                 ctx.strokeStyle = linkColor//"#ff6600"
                 ctx.fillStyle = linkColor//"#ff6600";
 
@@ -333,12 +352,12 @@ Rectangle {
                 let intersection;
 
                 if(y1 > y2){
-                     x1_rec2 = canvas.width * x2;
-                     y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
-                     x2_rec2 = canvas.width * x2 + width2;
-                     y2_rec2 = canvas.height * y2 + canvas.mainRec_height;
+                    x1_rec2 = canvas.width * x2;
+                    y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
+                    x2_rec2 = canvas.width * x2 + width2;
+                    y2_rec2 = canvas.height * y2 + canvas.mainRec_height;
 
-                     intersection = findIntersection(x1_link, y1_link, x2_link, y2_link, x1_rec2, y1_rec2, x2_rec2, y2_rec2);
+                    intersection = findIntersection(x1_link, y1_link, x2_link, y2_link, x1_rec2, y1_rec2, x2_rec2, y2_rec2);
 
                     if(intersection.x < canvas.width * x2 + width2 && intersection.x > canvas.width * x2){
                         x1_rec2 = canvas.width * x2;
@@ -361,12 +380,12 @@ Rectangle {
 
                 }
                 else {
-                     x1_rec2 = canvas.width * x2;
-                     y1_rec2 = canvas.height * y2;
-                     x2_rec2 = canvas.width * x2 + width2;
-                     y2_rec2 = canvas.height * y2;
+                    x1_rec2 = canvas.width * x2;
+                    y1_rec2 = canvas.height * y2;
+                    x2_rec2 = canvas.width * x2 + width2;
+                    y2_rec2 = canvas.height * y2;
 
-                     intersection = findIntersection(x1_link, y1_link, x2_link, y2_link, x1_rec2, y1_rec2, x2_rec2, y2_rec2);
+                    intersection = findIntersection(x1_link, y1_link, x2_link, y2_link, x1_rec2, y1_rec2, x2_rec2, y2_rec2);
 
                     if(intersection.x < canvas.width * x2 + width2 && intersection.x > canvas.width * x2){
                         x1_rec2 = canvas.width * x2;
@@ -397,9 +416,9 @@ Rectangle {
             }
 
             function drawIntersection(ctx, intersection){
-                let size = 20
+                let size = 20 * canvas.scaleCoeff
 
-                ctx.lineWidth = 0.5;
+                ctx.lineWidth = 0.5 * canvas.scaleCoeff;
                 ctx.strokeStyle = linkColor//"#ff6600"
                 ctx.fillStyle = linkColor//"#ff6600";
                 ctx.beginPath()
