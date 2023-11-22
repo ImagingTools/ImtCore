@@ -15,7 +15,7 @@ Rectangle {
         let index = mainModel.InsertNewItem();
         mainModel.SetData("X", 0.3, index);
         mainModel.SetData("Y", 0.3, index);
-        mainModel.SetData("MainText", "Main text", index);
+        mainModel.SetData("MainText", "Main text Main text Main text", index);
         mainModel.SetData("SecondText", "Second text", index);
 
         index = mainModel.InsertNewItem();
@@ -46,47 +46,64 @@ Rectangle {
 
             onClicked: {
                 if(!wasMoving){
-                    if(insideMovingItem){
-                        canvas.filled = !canvas.filled;
+                    if(canvas.foundIndex >= 0){
+                        for(let i = 0; i < canvasPage.mainModel.GetItemsCount(); i++){
+                            canvasPage.mainModel.SetData("Selected", (i == canvas.foundIndex), i);
+                        }
                     }
                     else {
-                        canvas.filled = false;
+                        for(let i = 0; i < canvasPage.mainModel.GetItemsCount(); i++){
+                            canvasPage.mainModel.SetData("Selected", false, i);
+                        }
                     }
                     canvas.requestPaint();
                 }
             }
 
             onPressed: {
-                insideMovingItem = checkInsideMovingItem(canvas.width * canvas.mainRec_x, canvas.height * canvas.mainRec_y, canvas.mainRec_width, canvas.mainRec_height);
+                canvas.foundIndex = -1;
+                for(let i = 0; i < canvasPage.mainModel.GetItemsCount(); i++){
+                    let x_  = canvasPage.mainModel.GetData("X", i)
+                    let y_  = canvasPage.mainModel.GetData("Y", i)
+                    let width_ = canvasPage.mainModel.IsValidData("Width", i) ? canvasPage.mainModel.GetData("Width", i) : canvas.mainRec_width;
+
+                    let ok = checkInsideMovingItem(canvas.width * x_, canvas.height * y_, width_, canvas.mainRec_height);
+
+                    if(ok){
+                        canvas.foundIndex = i;
+                        break;
+                    }
+                }
             }
 
             onWheelDeltaSignal: {
                 if(wheelDelta > 0){//up
-                    canvas.scaleCoeff += scaleStep
+                    canvas.scaleCoeff += scaleStep;
                 }
                 else{//down
                     if(canvas.scaleCoeff > scaleStep){
-                        canvas.scaleCoeff -= scaleStep
+                        canvas.scaleCoeff -= scaleStep;
                     }
                 }
             }
 
             function movingFunction(delta){
-                let withinBorders_ = withinBorders(delta, canvas.width * canvas.mainRec_x, canvas.height * canvas.mainRec_y, canvas.mainRec_width, canvas.mainRec_height);
+                if(canvas.foundIndex >= 0){
+                    let x_  = canvasPage.mainModel.GetData("X", canvas.foundIndex);
+                    let y_  = canvasPage.mainModel.GetData("Y", canvas.foundIndex);
+                    let width_ = canvasPage.mainModel.IsValidData("Width", canvas.foundIndex) ? canvasPage.mainModel.GetData("Width", canvas.foundIndex) : canvas.mainRec_width;
 
-                if(insideMovingItem && withinBorders_){
+                    let withinBorders_ = withinBorders(delta, canvas.width * x_, canvas.height * y_, width_, canvas.mainRec_height);
 
-                    let newX = (canvas.width * canvasPage.mainModel.GetData("X",0) + delta.x)/canvas.width;
-                    let newY = (canvas.height * canvasPage.mainModel.GetData("Y",0) + delta.y)/canvas.height;
+                    if(withinBorders_){
+                        let newX = (canvas.width * canvasPage.mainModel.GetData("X", canvas.foundIndex) + delta.x)/canvas.width;
+                        let newY = (canvas.height * canvasPage.mainModel.GetData("Y", canvas.foundIndex) + delta.y)/canvas.height;
 
-                    canvasPage.mainModel.SetData("X",newX, 0)
-                    canvasPage.mainModel.SetData("Y",newY, 0)
+                        canvasPage.mainModel.SetData("X",newX, canvas.foundIndex);
+                        canvasPage.mainModel.SetData("Y",newY, canvas.foundIndex);
 
-//                    canvas.mainRec_x = (canvas.width * canvas.mainRec_x + delta.x)/canvas.width;
-//                    canvas.mainRec_y = (canvas.height * canvas.mainRec_y + delta.y)/canvas.height;
-
-
-                    canvas.requestPaint();
+                        canvas.requestPaint();
+                    }
                 }
             }
 
@@ -110,13 +127,7 @@ Rectangle {
             property real mainRec_width: 250 * scaleCoeff;
             property real mainRec_height: 60 * scaleCoeff;
 
-            //Убрать!!!
-            property real mainRec_x:  0.3
-            property real mainRec_y:  0.3
-
-            property real mainRec_x2:  0.6
-            property real mainRec_y2:  0.6
-            //
+            property int foundIndex: -1;
 
             property int fontSize: 20 * scaleCoeff;
             property int fontSizeSmall: 14 * scaleCoeff;
@@ -128,8 +139,7 @@ Rectangle {
             property real imageSize: 20 * scaleCoeff;
             property real imageMargin: 4 * scaleCoeff;
 
-            property string fillColor: filled ? "#90EE90" : "#ffffff";
-            property bool filled: false;
+            property string selectedColor: "#90EE90";
             //variables
 
             Component.onCompleted: {
@@ -154,35 +164,37 @@ Rectangle {
                 requestPaint()
             }
 
-            function drawObject(ctx, x_, y_, mainText, secondText){
+            function drawObject(ctx, x_, y_, width_, mainText, secondText, selected, index){
 
                 ctx.lineCap = "round"
                 ctx.lineJoin = "round"
 
                 //width calculation
                 ctx.lineWidth = 1;
-                let fontStr_main = String(fontSize) + "px sans-serif"
+                let fontStr_main = String(canvas.fontSize) + "px sans-serif"
                 ctx.font = fontStr_main; //"20px sans-serif";
                 let textStr_main = mainText
                 let textWidth_main = ctx.measureText(mainText).width
 
                 ctx.lineWidth = 0.5;
-                let fontStr_second = String(fontSizeSmall) + "px sans-serif"
+                let fontStr_second = String(canvas.fontSizeSmall) + "px sans-serif"
                 ctx.font = fontStr_second;
                 let textStr_second = secondText;
                 let textWidth_second = ctx.measureText(secondText).width
 
-                let add = 2*imageSize + 2*imageMargin + 2*borderShift + 30;
-                let mainRecWidth = Math.max(textWidth_main + add, textWidth_second + add, mainRec_width)
+                let add = 2 * canvas.imageSize + 2 * canvas.imageMargin + 2 * canvas.borderShift + 30;
+                let mainRecWidth = Math.max(textWidth_main + add, textWidth_second + add, width_)
+                if(mainRecWidth > canvas.mainRec_width){
+                    canvasPage.mainModel.SetData("Width", mainRecWidth, index);
+                }
                 //width calculation
-                //TO DO: mainRecWidth to model --> checkInsideMovingItem
 
                 //main rectangle
                 ctx.lineWidth = canvas.lineWidth;
                 ctx.strokeStyle = "#ff6600"
-                ctx.fillStyle = canvas.fillColor;
+                ctx.fillStyle = selected ? canvas.selectedColor : "#ffffff";
                 ctx.beginPath()
-                ctx.roundedRect(x_, y_, mainRecWidth, mainRec_height, radius_, radius_);
+                ctx.roundedRect(x_, y_, mainRecWidth, canvas.mainRec_height, canvas.radius_, canvas.radius_);
                 ctx.fill();
                 ctx.stroke();
 
@@ -190,20 +202,20 @@ Rectangle {
                 ctx.strokeStyle = "#808080"
 
                 ctx.beginPath()
-                ctx.roundedRect(x_ + borderShift, y_ + borderShift, mainRecWidth - 2 * borderShift, mainRec_height - 2 * borderShift, radius_, radius_);
+                ctx.roundedRect(x_ + canvas.borderShift, y_ + canvas.borderShift, mainRecWidth - 2 * canvas.borderShift, canvas.mainRec_height - 2 * canvas.borderShift, canvas.radius_, canvas.radius_);
                 ctx.stroke();
 
                 //Main text
                 ctx.strokeStyle = "#000000"
                 ctx.fillStyle = "#000000"
                 ctx.lineWidth = 1;
-                let fontStr = String(fontSize) + "px sans-serif"
+                let fontStr = String(canvas.fontSize) + "px sans-serif"
                 ctx.font = fontStr; //"20px sans-serif";
                 let textStr = mainText
                 let textWidth = ctx.measureText(mainText).width
 
-                let text_x = x_ + borderShift + 8 * scaleCoeff;
-                let text_y = y_ + borderShift + 22 * scaleCoeff;
+                let text_x = x_ + canvas.borderShift + 8 * canvas.scaleCoeff;
+                let text_y = y_ + canvas.borderShift + 22 * canvas.scaleCoeff;
 
                 ctx.beginPath()
                 ctx.fillText(textStr, text_x, text_y);
@@ -213,26 +225,26 @@ Rectangle {
                 ctx.strokeStyle = "#808080"
                 ctx.fillStyle = "#808080"
                 ctx.lineWidth = 0.5;
-                let fontStr2 = String(fontSizeSmall) + "px sans-serif"
+                let fontStr2 = String(canvas.fontSizeSmall) + "px sans-serif"
                 ctx.font = fontStr2;
                 let textStr2 = secondText;
                 let textWidth2 = ctx.measureText(secondText).width
 
-                let text_x2 = x_ + borderShift + 8 * scaleCoeff;
-                let text_y2 = y_ + mainRec_height - borderShift - 8 * scaleCoeff;
+                let text_x2 = x_ + canvas.borderShift + 8 * canvas.scaleCoeff;
+                let text_y2 = y_ + canvas.mainRec_height - canvas.borderShift - 8 * canvas.scaleCoeff;
 
                 ctx.beginPath()
                 ctx.fillText(textStr2, text_x2, text_y2);
                 ctx.strokeText(textStr2, text_x2, text_y2);
 
                 //images
-                let image1_x = x_ + mainRecWidth - borderShift - imageSize - imageMargin;
-                let image1_y = text_y - imageSize + imageMargin;
-                let image2_x = image1_x - imageSize - imageMargin;
-                let image2_y = text_y - imageSize + imageMargin;
+                let image1_x = x_ + mainRecWidth - canvas.borderShift - canvas.imageSize - canvas.imageMargin;
+                let image1_y = text_y - canvas.imageSize + canvas.imageMargin;
+                let image2_x = image1_x - canvas.imageSize - canvas.imageMargin;
+                let image2_y = text_y - canvas.imageSize + canvas.imageMargin;
                 ctx.beginPath()
-                ctx.drawImage(imageUrl_1, image1_x, image1_y, imageSize, imageSize);
-                ctx.drawImage(imageUrl_2, image2_x, image2_y, imageSize, imageSize);
+                ctx.drawImage(imageUrl_1, image1_x, image1_y, canvas.imageSize, canvas.imageSize);
+                ctx.drawImage(imageUrl_2, image2_x, image2_y, canvas.imageSize, canvas.imageSize);
 
             }
 
@@ -253,33 +265,28 @@ Rectangle {
                 var ctx = canvas.getContext('2d');
                 ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-                //TEST
+                //TEST drawLink
                 let x1 = canvasPage.mainModel.GetData("X", 0);
                 let y1 = canvasPage.mainModel.GetData("Y", 0);
                 let x2 = canvasPage.mainModel.GetData("X", 1);
                 let y2 = canvasPage.mainModel.GetData("Y", 1);
+                let width1 = canvasPage.mainModel.IsValidData("Width", 0) ? canvasPage.mainModel.GetData("Width", 0) : canvas.mainRec_width;
+                let width2 = canvasPage.mainModel.IsValidData("Width", 1) ? canvasPage.mainModel.GetData("Width", 1) : canvas.mainRec_width;
 
+                drawLink(ctx, canvas.width * x2 + width2/2, canvas.height * y2 + canvas.mainRec_height/2,
+                         canvas.width * x1 + width1/2, canvas.height * y1 + canvas.mainRec_height/2)
+                //TEST drawLink
 
-                drawLink(ctx, canvas.width * x2 + mainRec_width/2, canvas.height * y2 + mainRec_height/2,
-                         canvas.width * x1 + mainRec_width/2, canvas.height * y1 + mainRec_height/2)
-
-                //TEST
-
-//                drawLink(ctx, canvas.width * canvas.mainRec_x2 + mainRec_width/2, canvas.height * canvas.mainRec_y2 + mainRec_height/2,
-//                         canvas.width * canvas.mainRec_x + mainRec_width/2, canvas.height * canvas.mainRec_y + mainRec_height/2)
-
-                //drawObject(ctx, canvas.width * canvas.mainRec_x, canvas.height * canvas.mainRec_y, "Main text Main text Main text", "Second text");
-
-
-                //drawObject(ctx, canvas.width * canvas.mainRec_x, canvas.height * canvas.mainRec_y, "Main text", "Second text");
-                //drawObject(ctx, canvas.width * canvas.mainRec_x2 , canvas.height * canvas.mainRec_y2, "Main text 2", "Second text 2");
 
                 for(let i = 0; i < canvasPage.mainModel.GetItemsCount(); i++){
                     let x_  = canvasPage.mainModel.GetData("X", i)
                     let y_  = canvasPage.mainModel.GetData("Y", i)
                     let mainText_  = canvasPage.mainModel.GetData("MainText", i)
                     let secondText_  = canvasPage.mainModel.GetData("SecondText", i)
-                    drawObject(ctx, canvas.width * x_, canvas.height * y_, mainText_, secondText_);
+                    let width_ = canvasPage.mainModel.IsValidData("Width", i) ? canvasPage.mainModel.GetData("Width", i) : canvas.mainRec_width;
+                    let selected_ = canvasPage.mainModel.IsValidData("Selected", i) ? canvasPage.mainModel.GetData("Selected", i) : false;
+
+                    drawObject(ctx, canvas.width * x_, canvas.height * y_, width_, mainText_, secondText_, selected_, i);
 
                 }
 
