@@ -12,7 +12,7 @@ Rectangle {
     property TreeItemModel objectModel: TreeItemModel{};
 
     Component.onCompleted: {
-
+        //TEST
         //links for test
         let index_link = linkModel.InsertNewItem();
         linkModel.SetData("ObjectId", "02", index_link);
@@ -32,7 +32,6 @@ Rectangle {
         linkModel3.SetData("ObjectId", "02", index_link3);
         index_link3 = linkModel3.InsertNewItem();
         linkModel3.SetData("ObjectId", "03", index_link3);
-
         //
 
         let index = objectModel.InsertNewItem();
@@ -57,7 +56,6 @@ Rectangle {
         objectModel.SetData("MainText", "Main text 3", index);
         objectModel.SetData("SecondText", "Second text 3", index);
 
-
         index = objectModel.InsertNewItem();
         objectModel.SetData("Id", "04", index);
         objectModel.SetData("X", 0.6, index);
@@ -74,7 +72,12 @@ Rectangle {
         objectModel.SetData("SecondText", "Second text 5", index);
         objectModel.SetExternTreeModel("Links", linkModel2, index);
 
-        canvas.requestPaint()
+        canvas.requestPaint();
+        //TEST
+    }
+
+    onObjectModelChanged: {
+        canvas.requestPaint();
     }
 
     function findModelIndex(id){
@@ -92,6 +95,13 @@ Rectangle {
     TreeItemModel {id: linkModel2;/*for test*/}
     TreeItemModel {id: linkModel3;/*for test*/}
 
+    TreeItemModel {
+        id: bufferModel;
+    }
+
+    TreeItemModel {
+        id: emptyModel;
+    }
 
     Rectangle{
         id: mainContainer;
@@ -137,7 +147,7 @@ Rectangle {
 
                     if(ok){
                         canvas.foundIndex = i;
-                        break;
+                        //break;
                     }
                 }
             }
@@ -198,8 +208,7 @@ Rectangle {
                         }
                     }
                     if(canvas.hoverIndex >=0){
-                        //console.log("FOUND")
-                        canvas.linkSelected = true;//TEST
+                        canvas.linkSelected = true;
                         canvas.requestPaint();
                     }
                     else if(canvas.linkSelected){
@@ -247,7 +256,7 @@ Rectangle {
 
             property string selectedLinkColor: "#90EE90";
             property string linkColor: "#ff6600";//linkSelected ? selectedLinkColor : ;
-            property bool linkSelected: false;//TEST
+            property bool linkSelected: false;
             //variables
 
             Component.onCompleted: {
@@ -566,7 +575,45 @@ Rectangle {
         sequence: "Ctrl+Z";
         enabled: true;
         onActivated: {
-            console.log("Ctrl+z");
+            console.log("Ctrl+Z");
+        }
+    }
+
+    Shortcut {
+        sequence: "Ctrl+C";
+        enabled: true;
+        onActivated: {
+            console.log("Ctrl+C");
+            if(canvas.foundIndex >= 0){
+                bufferModel.Clear();
+                bufferModel.CopyItemDataFromModel(0, canvasPage.objectModel, canvas.foundIndex);
+                console.log("bufferModel:: ", bufferModel.toJSON());
+            }
+        }
+    }
+
+    Shortcut {
+        sequence: "Ctrl+V";
+        enabled: true;
+        onActivated: {
+            console.log("Ctrl+V");
+            if(bufferModel.GetItemsCount()){
+                bufferModel.SetExternTreeModel("Links", emptyModel, 0);
+                let mainText = bufferModel.GetData("MainText") + "_1";
+                let secondText = bufferModel.GetData("SecondText") + "_1";
+                let x_ = bufferModel.GetData("X") + 10/canvas.width;
+                let y_ = bufferModel.GetData("Y") + 10/canvas.height;
+                bufferModel.SetData("MainText", mainText, 0);
+                bufferModel.SetData("SecondText", secondText, 0);
+                bufferModel.SetData("X", x_, 0);
+                bufferModel.SetData("Y", y_, 0);
+                bufferModel.SetData("Selected", false, 0);
+                let index = canvasPage.objectModel.InsertNewItem();
+                canvasPage.objectModel.CopyItemDataFromModel(index, bufferModel,0);
+
+                canvas.requestPaint();
+            }
+
         }
     }
 
