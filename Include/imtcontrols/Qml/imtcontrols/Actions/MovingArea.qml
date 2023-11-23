@@ -1,7 +1,7 @@
 import QtQuick 2.12
 
 MouseArea{
-    id: moving;
+    id: controlArea;
 
     preventStealing: true;
     hoverEnabled: true;
@@ -44,12 +44,12 @@ MouseArea{
             var deltaY_ = newCoords.y - this.coord.y;
             this.coord = newCoords;
 
-            moving.deltaSignal(Qt.point(deltaX_, deltaY_));
+            controlArea.deltaSignal(Qt.point(deltaX_, deltaY_));
 
             wasMoving = true;
         }
         else {
-            moving.positionSignal(Qt.point(mouse.x, mouse.y))
+            controlArea.positionSignal(Qt.point(mouse.x, mouse.y))
         }
     }
 
@@ -79,10 +79,10 @@ MouseArea{
 
     function checkInsideMovingItem(x_, y_, width_, height_){
         let ok = false
-             ok = moving.coordPressed.x >= x_
-                && moving.coordPressed.y >= y_
-                && moving.coordPressed.x <= x_ + width_
-                && moving.coordPressed.y <= y_ + height_
+             ok = controlArea.coordPressed.x >= x_
+                && controlArea.coordPressed.y >= y_
+                && controlArea.coordPressed.x <= x_ + width_
+                && controlArea.coordPressed.y <= y_ + height_
         return ok
     }
 
@@ -102,8 +102,8 @@ MouseArea{
              ok =
              x_ + delta.x > 10
              && y_ + delta.y > 10
-             && x_ + delta.x < moving.width - width_ - 10
-             && y_ + delta.y < moving.height - height_ - 10;
+             && x_ + delta.x < controlArea.width - width_ - 10
+             && y_ + delta.y < controlArea.height - height_ - 10;
         return ok
     }
 
@@ -121,4 +121,4 @@ MouseArea{
     }
 
 
-}//moving
+}//controlArea
