@@ -1,6 +1,6 @@
 const { QtObject } = require('./QtObject')
 const { ListElement } = require('./ListElement')
-const { QReal, QVar } = require('../utils/properties')
+const { QReal, QVar, QModelData } = require('../utils/properties')
 
 class ListModel extends QtObject {
     static defaultProperties = {
@@ -30,10 +30,12 @@ class ListModel extends QtObject {
 
     }
 
-    addChild(child){
-        super.addChild(child)
-        child.getStatement('index').reset(this.getStatement('data').get().length)
-        this.getStatement('data').get().push(child)
+    addResource(resource){
+        super.addResource(resource)
+        resource.getStatement('index').reset(this.getStatement('data').get().length)
+        let obj = resource
+        
+        this.getStatement('data').get().push(obj)
     }
     
     append(dict){
@@ -41,31 +43,17 @@ class ListModel extends QtObject {
 			if (dict.length === 0)
 				return
 
+      
             for(let i = 0; i < dict.length; i++){
-                let listElement = new ListElement(this, false)
-                // listElement.getStatement('index').reset(i)
-                for(let key in dict[i]){
-                    listElement.createProperty(key, QVar, dict[i][key])
-                    // listElement.getStatement(key).reset(dict[i][key])
-                }
-                // this.getStatement('data').get().push(listElement)
+                this.getStatement('data').get().push(new QModelData(dict[i], this.getStatement('data').get().length))
             }
 		} else {
-            let keys = Object.keys(dict)
-            let listElement = new ListElement(this, false)
-            // listElement.getStatement('index').reset(this.getStatement('data').get().length)
-            for(let key of keys){
-                listElement.createProperty(key, QVar, dict[key])
-                // listElement.getStatement(key).reset(dict[key])
-            }
-            // this.getStatement('data').get().push(listElement)
+            this.getStatement('data').get().push(new QModelData(dict, this.getStatement('data').get().length))
 		}
         
         this.getStatement('count').reset(this.getStatement('data').get().length)
         this.getStatement('data').getNotify()()
-        // for(let key in this.$deps){
-        //     this.$deps[key].$append(this.getStatement('data').get()[this.getStatement('data').get().length])
-        // }
+
     }
     clear(){
         this.getStatement('data').reset([])

@@ -408,6 +408,7 @@ class QVar extends QProperty {
 }
 
 class QAlias extends QProperty {
+    once = true
     constructor(getTargetProperty){
         super()
         this.getTargetProperty = getTargetProperty   
@@ -430,6 +431,11 @@ class QAlias extends QProperty {
                 } else {
                     targetProperty.set(safeValue)
                 }
+                if(this.once){
+                    delete this.once
+                    if(!targetProperty.compute) return
+                }
+                
             }
             if(this.notify) this.notify()
         }
@@ -778,9 +784,38 @@ class QVariant extends QVar {
         
     // }
 }
-// class QComponent extends QVar {}
-// class QItem extends QVar {}
-// class QRectangle extends QVar {}
+
+class QModelData {
+    constructor(data, index){
+        this.index = index
+
+        Object.assign(this, typeof data === 'object' ? data : {})
+
+        return new Proxy(this, {
+            has(target, name){
+                return true
+            },
+            get(target, name){
+                let caller = global.queueLink[global.queueLink.length-1]
+                if(caller) {
+                    if(!(target[name] instanceof QVar)) target[name] = new QVar(target[name])
+                    caller.subscribe(target[name])
+                }
+                return target[name] instanceof QVar ? target[name].get() : target[name]
+            },
+            set(target, name, value){
+                if(target[name] instanceof QVar){
+                    target[name].reset(value)
+                } else {
+                    target[name] = value
+                }
+                
+                return true
+            }
+        })
+
+    }
+}
 
 module.exports.QGeometry = QGeometry
 module.exports.QAutoGeometry = QAutoGeometry
@@ -804,8 +839,7 @@ module.exports.QSourceSize = QSourceSize
 module.exports.QKeyNavigation = QKeyNavigation
 module.exports.MapGestureArea = MapGestureArea
 
-// module.exports.QComponent = QComponent
-// module.exports.QItem = QItem
-// module.exports.QRectangle = QRectangle
+
 module.exports.QVariant = QVariant
+module.exports.QModelData = QModelData
 

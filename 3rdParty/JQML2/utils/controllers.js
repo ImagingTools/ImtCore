@@ -51,6 +51,9 @@ class MouseController {
     }
 
     remove(obj){
+        if(this.pressedMouseAreaInner === obj) this.pressedMouseAreaInner = null
+        if(this.pressedMouseAreaOuter === obj) this.pressedMouseAreaOuter = null
+
         let index = this.list.indexOf(obj)
         if(index >= 0) this.list.splice(index, 1)
 

@@ -14,6 +14,14 @@ class ListElement extends QtObject {
             return this.$properties[name]
         }
     }
+
+    createProperty(name, type, value){
+        if(name in this.$properties){
+            this.$properties[name].reset(value)
+        } else {
+            super.createProperty(name, type, value)
+        }
+    }
     
 }
 

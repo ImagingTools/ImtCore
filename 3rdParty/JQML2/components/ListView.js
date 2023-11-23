@@ -307,7 +307,7 @@ class ListView extends Flickable {
         } else {
             let model = this.getPropertyValue('model').getPropertyValue('data')[index]
             let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), this.$exCtx)
-            obj.getStatement('index').setCompute(()=>{obj.getStatement('index').subscribe(model.getStatement('index')); return model.getStatement('index').get()})
+            obj.getStatement('index').setCompute(()=>{return model.index})
             obj.getStatement('index').update()
             obj.getStatement('model').reset(model)
             this.$items[index] = obj   

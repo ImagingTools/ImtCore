@@ -63,7 +63,7 @@ class Repeater extends Item {
         } else {
             let model = this.getPropertyValue('model').getPropertyValue('data')[index]
             let obj = this.delegate.get().createObject(this.parent(), this.$exCtx)
-            obj.getStatement('index').setCompute(()=>{obj.getStatement('index').subscribe(model.getStatement('index')); return model.getStatement('index').get()})
+            obj.getStatement('index').setCompute(()=>{return model.index})
             obj.getStatement('index').update()
             obj.getStatement('model').reset(model)
             this.$items[index] = obj   
@@ -79,6 +79,13 @@ class Repeater extends Item {
     updateView(){
         if(!this.getPropertyValue('delegate') || this.getPropertyValue('model') === undefined || this.getPropertyValue('model') === null) return
         
+        for(let key in this.$items){
+            if(key !== 'length') {
+                this.$items[key].$destroy()
+                delete this.$items[key]
+            }
+        }
+
         this.parent().preventAutoUpdateGeometry = true
         for(let i = 0; i < this.$items.length.get(); i++){
             this.createElement(i)
@@ -90,12 +97,12 @@ class Repeater extends Item {
 
 
     $destroy(){
-        for(let key in this.$items){
-            if(key !== 'length') {
-                this.$items[key].$destroy()
-                delete this.$items[key]
-            }
-        }
+        // for(let key in this.$items){
+        //     if(key !== 'length') {
+        //         this.$items[key].$destroy()
+        //         delete this.$items[key]
+        //     }
+        // }
         this.$items.length.unsubscribe()
         super.$destroy()
     }

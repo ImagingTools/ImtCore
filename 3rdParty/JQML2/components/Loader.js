@@ -29,7 +29,8 @@ class Loader extends Item {
             this.$lazy()
             delete this.$lazy
         }
-        super.$complete()
+        // super.$complete()
+        if(this.$signals['Component.completed']) this.$signals['Component.completed']()
     }
 
     $sourceComponentChanged(){

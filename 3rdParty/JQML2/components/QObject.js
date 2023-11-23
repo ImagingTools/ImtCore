@@ -11,13 +11,15 @@ class QObject extends ComplexObject {
     }
 
     static defaultSignals = {
-        completed: { params: [] },
-        destruction: { params: [] },
+        'Component.completed': { params: [] },
+        'Component.destruction': { params: [] },
     }
 
     constructor(parent){
         super()
         this.$children = []
+        this.$resources = []
+        this.$data = []
         
         if(parent) {
             this.UID = UID++
@@ -38,7 +40,13 @@ class QObject extends ComplexObject {
                 this.getStatement('context').setCompute(()=>{return this.parent().context})
             }
 
-            parent.addChild(this)
+            if(this instanceof Item){
+                parent.addChild(this)
+            } else {
+                parent.addResource(this)
+            }
+            parent.addData(this)
+            
             this.setParent(parent)
 
             
@@ -55,9 +63,9 @@ class QObject extends ComplexObject {
     }
 
     $complete(){
-        if(this.$signals.completed) this.$signals.completed()
-        for(let i = this.$children.length - 1; i >= 0; i--){
-            this.$children[i].$complete()
+        if(this.$signals['Component.completed']) this.$signals['Component.completed']()
+        for(let i = this.$data.length - 1; i >= 0; i--){
+            this.$data[i].$complete()
         }
     }
 
@@ -79,6 +87,14 @@ class QObject extends ComplexObject {
         this.children().push(child)
     }
 
+    addResource(resource){
+        this.$resources.push(resource)
+    }
+
+    addData(data){
+        this.$data.push(data)
+    }
+
     createComponent(path, parent){
         let className = path.replaceAll('/', '_').replaceAll('\\', '_').replaceAll('.qml', '')
         let cls = eval(className)
@@ -88,6 +104,8 @@ class QObject extends ComplexObject {
     $destroy(){
         delete UIDList[this.UID]
 
+        if(this.$signals['Component.destruction']) this.$signals['Component.destruction']()
+
         for(let propName in this.$properties){
             if(this.$properties[propName].unsubscribe) this.$properties[propName].unsubscribe()
             if(this.$properties[propName].notify) this.$properties[propName].notify.destroy()
@@ -96,10 +114,15 @@ class QObject extends ComplexObject {
             this.$signals[sigName].destroy()
         }
 
-        if(this.$signals.destruction) this.$signals.destruction()
         if(this.$parent) {
             let index = this.$parent.$children.indexOf(this)
             if(index >= 0) this.$parent.$children.splice(index, 1)
+
+            index = this.$parent.$resources.indexOf(this)
+            if(index >= 0) this.$parent.$resources.splice(index, 1)
+
+            index = this.$parent.$data.indexOf(this)
+            if(index >= 0) this.$parent.$data.splice(index, 1)
         }
         for(let i = this.$children.length - 1; i >= 0; i--){
             this.$children[i].$destroy()

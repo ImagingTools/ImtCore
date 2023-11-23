@@ -164,7 +164,7 @@ function qmlpropdef(meta, instructions){
         instructions.properties.push({
             val: childInstructions,
             name: meta[1],
-            type: listProperties['Q'+type] ? 'Q'+type : 'null', //temp
+            type: listProperties['Q'+type] ? 'Q'+type : components[type] ? type : 'null', //temp
             command: 'create',
             isElement: true
         })
@@ -173,7 +173,7 @@ function qmlpropdef(meta, instructions){
         
         instructions.properties.push({
             name: meta[1],
-            type: listProperties['Q'+type] ? 'Q'+type : 'null', //temp
+            type: listProperties['Q'+type] ? 'Q'+type : components[type] ? type : 'null', //temp
             val: meta[3],
             command: 'create'
         })
@@ -189,7 +189,7 @@ function qmlprop(meta, instructions){
                 let signalName = name[1].slice(2)
                 signalName = signalName[0].toLowerCase() + signalName.slice(1)
                 instructions.connectionSignals.push({
-                    name: signalName,
+                    name: `${name[0]}.${signalName}`,
                     val: meta[2],
                 })
             } else {
@@ -934,14 +934,14 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
                 }
                 if(property.command === 'create'){
                     if(listProperties[property.type]){
-                        // code.push(`${currentInstructions.name}.${property.name} = new ${property.type}(function(){${subscribe.join(';')};${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                        // code.push(`${currentInstructions.name}.${property.name} = new ${property.type}(function(){${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
                         code.push(`${currentInstructions.name}.createProperty('${property.name}',${property.type},function(){${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
                     } else {
-                        code.push(`${currentInstructions.name}.createVariantProperty('${property.name},${property.type},function(){${subscribe.join(';')};${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                        code.push(`${currentInstructions.name}.createVariantProperty('${property.name},${property.type},function(){${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
                     }
                     
                 } else {
-                    code.push(`${currentInstructions.name}.${pathName.join('.')}.setCompute(function(){${subscribe.join(';')};${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                    code.push(`${currentInstructions.name}.${pathName.join('.')}.setCompute(function(){${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
                 }
                 
             } else {
@@ -1065,13 +1065,26 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             params: [],
         }
         if(property.isElement){
-            if(property.command === 'create'){
-                treeCompile(compiledFile, property.val)
-                if(listProperties[property.type]){
-                    code.push(`${currentInstructions.name}.${property.name} = new ${property.type}(${property.val.name})`)
+            if(property.command === 'create' && property.val.className !== 'Component'){
+                if(property.type === 'Component'){  
+                    code.push(`${currentInstructions.name}.$temp = new ${property.type}(${currentInstructions.name})`)
+                    code.push(`${currentInstructions.name}.$temp.createObject=function(currParent,exCtx){`)
+                    code.push(`let inCtx = new ContextController(exCtx)`)
+                    treeCompile(compiledFile, property.val, [], [], 0, true)
+                    code.push(`}`)
+                    
+                    // code.push(`${currentInstructions.name}.${property.name} = new ${property.type}(${property.val.name})`)
+                    code.push(`${currentInstructions.name}.${property.name} = ${currentInstructions.name}.$temp`)
+                    code.push(`delete ${currentInstructions.name}.$temp`)
                 } else {
-                    code.push(`${currentInstructions.name}.createVariantProperty('${property.name}',${property.type},${property.val.name})`)
+                    treeCompile(compiledFile, property.val)
+                    if(listProperties[property.type]){
+                        code.push(`${currentInstructions.name}.${property.name} = new ${property.type}(${property.val.name})`)
+                    } else {
+                        code.push(`${currentInstructions.name}.createVariantProperty('${property.name}',${property.type},${property.val.name})`)
+                    }
                 }
+                
                 
             } else {
                 if(property.val.className !== 'Component'){  
@@ -1110,14 +1123,14 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
                     }
                     if(property.command === 'create'){
                         if(listProperties[property.type]){
-                            // code.push(`${currentInstructions.name}.${property.name} = new ${property.type}(function(){${subscribe.join(';')};${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                            // code.push(`${currentInstructions.name}.${property.name} = new ${property.type}(function(){${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
                             code.push(`${currentInstructions.name}.createProperty('${property.name}',${property.type},function(){${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
                         } else {
                             code.push(`${currentInstructions.name}.createVariantProperty('${property.name}',${property.type},function(){${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
                         }
                         
                     } else {
-                        code.push(`${currentInstructions.name}.${pathName.join('.')}.setCompute(function(){${subscribe.join(';')};${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
+                        code.push(`${currentInstructions.name}.${pathName.join('.')}.setCompute(function(){${!stat.return ? 'return' : ''} ${stat.value.join('')}})`)
                     }
                     
                 } else {
