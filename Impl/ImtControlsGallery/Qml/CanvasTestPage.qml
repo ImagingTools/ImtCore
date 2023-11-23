@@ -105,8 +105,8 @@ Rectangle {
         border.width: 2;
         radius: 4;
 
-        MovingArea{
-            id: moving;
+        ControlArea{
+            id: controlArea;
 
             anchors.fill: parent;
 
@@ -191,7 +191,7 @@ Rectangle {
                         let y_  = canvasPage.objectModel.GetData("Y", i)
                         let width_ = canvasPage.objectModel.IsValidData("Width", i) ? canvasPage.objectModel.GetData("Width", i) * canvas.scaleCoeff : canvas.mainRec_width;
 
-                        let ok = moving.checkHoverItem(canvas.width * x_, canvas.height * y_, width_, canvas.mainRec_height, position);
+                        let ok = controlArea.checkHoverItem(canvas.width * x_, canvas.height * y_, width_, canvas.mainRec_height, position);
                         if(ok){
                             objectIndex = i;
                             break;
