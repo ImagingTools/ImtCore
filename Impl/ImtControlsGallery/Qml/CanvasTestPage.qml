@@ -8,6 +8,7 @@ Rectangle {
     id: canvasPage;
 
     anchors.fill: parent;
+    clip: true;
 
     property TreeItemModel objectModel: TreeItemModel{};
 
@@ -106,7 +107,9 @@ Rectangle {
     Rectangle{
         id: mainContainer;
 
-        anchors.centerIn: parent;
+        //anchors.centerIn: parent;
+        x: parent.width/2 - width/2;
+        y: parent.height/2 - height/2;
 
         width: parent.width * canvas.scaleCoeff;
         height:  parent.height * canvas.scaleCoeff;
@@ -114,6 +117,13 @@ Rectangle {
         border.color: "lightgrey";
         border.width: 2;
         radius: 4;
+        property real scaleCoeffContainer: canvas.scaleCoeff;
+//        onScaleCoeffContainerChanged: {
+//            if(scaleCoeffContainer < 1){
+//                x = parent.width/2 - width/2;
+//                y = parent.height/2 - height/2;
+//            }
+//        }
 
         ControlArea{
             id: controlArea;
@@ -181,6 +191,35 @@ Rectangle {
                         canvas.requestPaint();
                     }
                 }
+
+                //movingContainer
+//                else if(canvas.scaleCoeff !== 1){
+//                    moveContainerAnimX.from = mainContainer.x;
+//                    moveContainerAnimX.to = mainContainer.x + delta.x;
+//                    moveContainerAnimY.from = mainContainer.y;
+//                    moveContainerAnimY.to = mainContainer.y + delta.y;
+
+//                    moveContainerAnimX.start();
+//                    moveContainerAnimY.start();
+
+//                }
+            }
+
+
+            NumberAnimation {
+                id: moveContainerAnimX;
+
+                duration: 15;
+                target: mainContainer;
+                property: "x";
+            }
+
+            NumberAnimation {
+                id: moveContainerAnimY;
+
+                duration: moveContainerAnimX.duration;
+                target: mainContainer;
+                property: "y";
             }
 
             //hover reaction
