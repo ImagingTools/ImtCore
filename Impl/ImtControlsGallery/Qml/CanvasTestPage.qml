@@ -122,9 +122,9 @@ Rectangle {
 
             onClicked: {
                 if(!wasMoving){
-                    if(canvas.foundIndex >= 0){
+                    if(canvas.selectedIndex >= 0){
                         for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
-                            canvasPage.objectModel.SetData("Selected", (i == canvas.foundIndex), i);
+                            canvasPage.objectModel.SetData("Selected", (i == canvas.selectedIndex), i);
                         }
                     }
                     else {
@@ -137,7 +137,7 @@ Rectangle {
             }
 
             onPressed: {
-                canvas.foundIndex = -1;
+                canvas.selectedIndex = -1;
                 for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
                     let x_  = canvasPage.objectModel.GetData("X", i)
                     let y_  = canvasPage.objectModel.GetData("Y", i)
@@ -146,7 +146,7 @@ Rectangle {
                     let ok = checkInsideMovingItem(canvas.width * x_, canvas.height * y_, width_, canvas.mainRec_height);
 
                     if(ok){
-                        canvas.foundIndex = i;
+                        canvas.selectedIndex = i;
                         //break;
                     }
                 }
@@ -164,19 +164,19 @@ Rectangle {
             }
 
             function movingFunction(delta){
-                if(canvas.foundIndex >= 0){
-                    let x_  = canvasPage.objectModel.GetData("X", canvas.foundIndex);
-                    let y_  = canvasPage.objectModel.GetData("Y", canvas.foundIndex);
-                    let width_ = canvasPage.objectModel.IsValidData("Width", canvas.foundIndex) ? canvasPage.objectModel.GetData("Width", canvas.foundIndex) * canvas.scaleCoeff : canvas.mainRec_width;
+                if(canvas.selectedIndex >= 0){
+                    let x_  = canvasPage.objectModel.GetData("X", canvas.selectedIndex);
+                    let y_  = canvasPage.objectModel.GetData("Y", canvas.selectedIndex);
+                    let width_ = canvasPage.objectModel.IsValidData("Width", canvas.selectedIndex) ? canvasPage.objectModel.GetData("Width", canvas.selectedIndex) * canvas.scaleCoeff : canvas.mainRec_width;
 
                     let withinBorders_ = withinBorders(delta, canvas.width * x_, canvas.height * y_, width_, canvas.mainRec_height);
 
                     if(withinBorders_){
-                        let newX = (canvas.width * canvasPage.objectModel.GetData("X", canvas.foundIndex) + delta.x)/canvas.width;
-                        let newY = (canvas.height * canvasPage.objectModel.GetData("Y", canvas.foundIndex) + delta.y)/canvas.height;
+                        let newX = (canvas.width * canvasPage.objectModel.GetData("X", canvas.selectedIndex) + delta.x)/canvas.width;
+                        let newY = (canvas.height * canvasPage.objectModel.GetData("Y", canvas.selectedIndex) + delta.y)/canvas.height;
 
-                        canvasPage.objectModel.SetData("X",newX, canvas.foundIndex);
-                        canvasPage.objectModel.SetData("Y",newY, canvas.foundIndex);
+                        canvasPage.objectModel.SetData("X",newX, canvas.selectedIndex);
+                        canvasPage.objectModel.SetData("Y",newY, canvas.selectedIndex);
 
                         canvas.requestPaint();
                     }
@@ -239,7 +239,7 @@ Rectangle {
             property real mainRec_width: 250 * scaleCoeff;
             property real mainRec_height: 60 * scaleCoeff;
 
-            property int foundIndex: -1;
+            property int selectedIndex: -1;
             property int hoverIndex: -1;
 
             property int fontSize: 20 * scaleCoeff;
@@ -577,9 +577,9 @@ Rectangle {
         enabled: true;
         onActivated: {
             console.log("Ctrl+C");
-            if(canvas.foundIndex >= 0){
+            if(canvas.selectedIndex >= 0){
                 bufferModel.Clear();
-                bufferModel.CopyItemDataFromModel(0, canvasPage.objectModel, canvas.foundIndex);
+                bufferModel.CopyItemDataFromModel(0, canvasPage.objectModel, canvas.selectedIndex);
                 console.log("bufferModel:: ", bufferModel.toJSON());
             }
         }
@@ -596,6 +596,12 @@ Rectangle {
                 let secondText = bufferModel.GetData("SecondText") + "_1";
                 let x_ = bufferModel.GetData("X") + 10/canvas.width;
                 let y_ = bufferModel.GetData("Y") + 10/canvas.height;
+
+                //TO DO: unique Id
+                var date = new Date();
+                let datString = String(date.valueOf());
+                bufferModel.SetData("Id", datString, 0);
+
                 bufferModel.SetData("MainText", mainText, 0);
                 bufferModel.SetData("SecondText", secondText, 0);
                 bufferModel.SetData("X", x_, 0);
@@ -623,7 +629,7 @@ Rectangle {
         enabled: true;
         onActivated: {
             console.log("F2");
-            if(canvas.foundIndex >= 0){
+            if(canvas.selectedIndex >= 0){
             }
         }
     }
@@ -633,8 +639,8 @@ Rectangle {
         enabled: true;
         onActivated: {
             console.log("Delete");
-            if(canvas.foundIndex >= 0){
-                canvasPage.deleteObjectFunc(canvas.foundIndex);
+            if(canvas.selectedIndex >= 0){
+                canvasPage.deleteObjectFunc(canvas.selectedIndex);
             }
         }
     }
