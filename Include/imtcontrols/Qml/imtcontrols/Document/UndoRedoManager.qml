@@ -1,179 +1,147 @@
 import QtQuick 2.12
 import Acf 1.0;
 
-QtObject {
+Item {
     id: undoRedoManager;
 
-    // Model before saving
-    property TreeItemModel mainModel: TreeItemModel {};
-    property TreeItemModel observedModel: null;
-    property DocumentBase documentBase: null;
-    property UndoRedo undoRedo: UndoRedo {
-        onModelAdded: {
-            undoRedoManager.checkCommandMode();
-        }
 
-        onUndoChanged: {
-            undoRedoManager.checkCommandMode();
-        }
-
-        onRedoChanged: {
-            undoRedoManager.checkCommandMode();
-        }
+    function getAvailableUndoSteps()
+    {
+        return internal.m_undoStack.length;
     }
 
-    property Component treeItemModelComp: Component {
-        TreeItemModel {}
+
+    function getAvailableRedoSteps()
+    {
+        return internal.m_redoStack.length;
     }
 
-    property bool transaction: false;
-    property bool modelIsRegistered: false;
 
-    signal modelStateChanged();
-
-    Component.onDestruction: {
-        if (undoRedoManager.documentBase != null){
-            undoRedoManager.documentBase.saved.disconnect(undoRedoManager.documentSaved);
-            undoRedoManager.documentBase.commandsDelegateLoaded.disconnect(undoRedoManager.connectCommandHandle);
-            undoRedoManager.disconnectCommandHandle();
-        }
+    function resetUndo()
+    {
+        internal.m_undoStack = []
+        internal.m_redoStack = []
     }
 
-    onDocumentBaseChanged: {
-        if (undoRedoManager.documentBase != null){
-            undoRedoManager.documentBase.saved.connect(undoRedoManager.documentSaved);
-            undoRedoManager.documentBase.commandsDelegateLoaded.connect(undoRedoManager.connectCommandHandle);
-        }
+
+    function doUndo(steps = 1)
+    {
+        doListShift(steps, internal.m_undoStack, internal.m_redoStack);
     }
 
-    function connectCommandHandle(){
-        if (undoRedoManager.documentBase != null && undoRedoManager.documentBase.commandsDelegate){
-            undoRedoManager.documentBase.commandsDelegate.commandActivated.connect(undoRedoManager.commandHandle);
-        }
+
+    function doRedo(steps = 1)
+    {
+        doListShift(steps, internal.m_redoStack, internal.m_undoStack);
     }
 
-    function disconnectCommandHandle(){
-        if (undoRedoManager.documentBase != null && undoRedoManager.documentBase.commandsDelegate){
-            undoRedoManager.documentBase.commandsDelegate.commandActivated.disconnect(undoRedoManager.commandHandle);
-        }
-    }
 
-    function documentSaved(){
-        undoRedoManager.mainModel.Copy(undoRedoManager.documentBase.documentModel);
-    }
+    function doListShift(steps, fromList, toList)
+    {
+        internal.m_isBlocked = true;
 
-    function makeChanges(){
-        undoRedoManager.beginChanges()
-        undoRedoManager.endChanges()
-    }
-
-    function beginChanges(){
-        if (undoRedoManager.transaction || !undoRedoManager.modelIsRegistered){
-            console.warn("UndoRedoManager beginChanges failed!");
-            return;
-        }
-
-        undoRedoManager.transaction = true;
-    }
-
-    function endChanges(){
-        if (!undoRedoManager.transaction || !undoRedoManager.modelIsRegistered){
-            console.warn("UndoRedoManager endChanges failed!");
-            return;
-        }
-        else{
-            undoRedoManager.transaction = false;
-
-            undoRedoManager.modelUpdated();
-        }
-    }
-
-    function registerModel(model){
-        if (!model){
-            return;
-        }
-
-        if (undoRedoManager.observedModel !== model){
-            undoRedoManager.observedModel = model;
-
-            undoRedoManager.mainModel.Copy(undoRedoManager.observedModel);
-
-            let copyModel = undoRedoManager.getCopyFromModel(undoRedoManager.observedModel);
-            undoRedo.addModel(copyModel);
-
-            undoRedoManager.modelIsRegistered = true;
-        }
-    }
-
-    function getCopyFromModel(model){
-        let emptyModel = undoRedoManager.treeItemModelComp.createObject(undoRedo);
-        emptyModel.Copy(model)
-
-        return emptyModel;
-    }
-
-    function modelUpdated(){
-        if (!undoRedoManager.transaction){
-            let copyModel = undoRedoManager.getCopyFromModel(undoRedoManager.observedModel);
-
-            if (undoRedo.undoStack.length >= 1){
-                let lastModel = undoRedo.undoStack[undoRedo.undoStack.length - 1];
-                let isEqual = copyModel.IsEqualWithModel(lastModel);
-                if (isEqual){
-                    return;
-                }
-            }
-
-            undoRedo.addModel(copyModel);
-        }
-    }
-
-    function checkCommandMode(){
-        let isEnabled = undoRedo.undoStack.length > 1;
-        undoRedoManager.documentBase.commandsProvider.setCommandIsEnabled("Undo", isEnabled);
-
-        isEnabled = undoRedo.redoStack.length > 0;
-        undoRedoManager.documentBase.commandsProvider.setCommandIsEnabled("Redo", isEnabled);
-    }
-
-    function equalWithMainModel(externModel){
-        let isEqual = undoRedoManager.mainModel.IsEqualWithModel(externModel);
-
-        return isEqual;
-    }
-
-    function commandHandle(commandId){
-        let isEnabled = undoRedoManager.documentBase.commandsProvider.commandIsEnabled(commandId);
-        if (!isEnabled){
-            return;
-        }
-
-        let result = null;
-        if (commandId === "Undo"){
-            result = undoRedo.undo();
-        }
-        else if (commandId === "Redo"){
-            result = undoRedo.redo();
-        }
-
-        if (result !== null){
-            let isEqual = undoRedoManager.equalWithMainModel(result);
-            if (undoRedoManager.documentBase){
-                undoRedoManager.documentBase.isDirty = !isEqual;
-
-                undoRedoManager.documentBase.blockUpdatingModel = true;
-            }
-
-            undoRedoManager.createModel(result);
-            undoRedoManager.modelStateChanged();
-
-            if (undoRedoManager.documentBase){
-                undoRedoManager.documentBase.blockUpdatingModel = false;
+        if ((steps > 0) && (fromList.length >= steps)){
+            for (let i = 1; i < steps; ++i){
+                toList.push(fromList.pop())
             }
         }
+
+        internal.m_isBlocked = false;
     }
 
-    function createModel(obj){
-        undoRedoManager.observedModel.Copy(obj);
+
+    function registerModel(model)
+    {
+        if (modelIsRegistered()){
+            console.error("Model is already registered in the undo manager");
+
+            return;
+        }
+
+        internal.m_observerModel = model;
+        internal.m_undoStack.push(model.CopyMe())
+    }
+
+
+    function unregisterModel()
+    {
+        internal.m_observerModel = null;
+        resetUndo();
+    }
+
+
+    function modelIsRegistered()
+    {
+        return internal.m_observerModel != null;
+    }
+
+
+    function beginChanges()
+    {
+        if (!modelIsRegistered()){
+            console.error("Unable to begin changes. Model is not registered");
+
+            return;
+        }
+
+        if (internal.m_isBlocked){
+            console.error("The changes in the undo manager have already started");
+
+            return;
+        }
+
+        internal.m_isBlocked = true;
+    }
+
+
+    function endChanges()
+    {
+        if (!internal.m_isBlocked){
+            console.error("The changes in the undo manager have not started");
+
+            return;
+        }
+
+        makeChanges();
+
+        internal.m_isBlocked = false;
+    }
+
+
+    function makeChanges()
+    {
+        if (!modelIsRegistered()){
+            console.error("Unable to make changes. Model is not registered");
+
+            return;
+        }
+
+        internal.m_undoStack.push(internal.m_observerModel.CopyMe())
+    }
+
+
+    QtObject {
+        id: internal;
+
+        property bool m_isBlocked: false;
+        property TreeItemModel m_observerModel: null;
+
+        property var m_undoStack: [];
+        property var m_redoStack: [];
+    }
+
+
+    Connections {
+        target: internal.m_observerModel;
+
+        function onDataChanged(){
+            if (internal.m_isBlocked){
+                return;
+            }
+
+            internal.m_undoStack.push(internal.m_observerModel.CopyMe())
+        }
     }
 }
+
+

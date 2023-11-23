@@ -4,30 +4,33 @@ import Acf 1.0
 QtObject {
     id: container;
 
-    property Item documentBase: null;
+    property Item documentPtr: null;
 
-    property bool showInputIdDialog: false;
-
-    signal entered(string value);
-    signal saved(string id, string name);
-    signal closed();
     signal commandActivated(string commandId);
 
     function commandHandle(commandId){
-        let documentId = container.documentBase.documentModel.GetData("Id");
+        console.log("commandHandle", commandId);
+
         if (commandId === "Close"){
-            let itemId = container.documentBase.itemId;
-            let documentManager = container.documentBase.documentManager;
-            documentManager.closeDocument(itemId);
+            onClose();
         }
         else if (commandId === "Save"){
-            if (container.documentBase.isDirty){
-                    let itemId = container.documentBase.itemId;
-                    let documentManager = container.documentBase.documentManager;
-                    documentManager.saveDocument(itemId);
-            }
+            onSave();
         }
+        else{
+            container.commandActivated(commandId);
+        }
+    }
 
-        container.commandActivated(commandId);
+    function onClose(){
+        if (documentPtr && documentPtr.documentManagerPtr){
+            documentPtr.documentManagerPtr.closeDocument(documentPtr.uuid);
+        }
+    }
+
+    function onSave(){
+        if (documentPtr && documentPtr.documentManagerPtr){
+            documentPtr.documentManagerPtr.saveDocument(documentPtr.uuid);
+        }
     }
 }

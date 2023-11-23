@@ -22,7 +22,7 @@ Item {
     }
 
     function setCommandsModel(parameters){
-        console.log("CommandsDecorator setCommandsModel", parameters, commandsDecoratorContainer);
+        console.log("CommandsDecorator setCommandsModel", JSON.stringify(parameters));
         let model = parameters["Model"];
         let commId = parameters["CommandId"];
 

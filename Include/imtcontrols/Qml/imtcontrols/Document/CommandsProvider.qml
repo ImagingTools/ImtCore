@@ -9,7 +9,7 @@ QtObject {
 
     property string commandId;
     property string documentUuid;
-    property bool isLoadData: true
+
     property var additionInputParams: ({})
 
     signal modelLoaded();
@@ -20,6 +20,7 @@ QtObject {
     }
 
     onCommandIdChanged: {
+        console.log("onCommandIdChanged", commandId);
         commandsProviderContainer.modelCommands.updateModel();
     }
 
@@ -36,7 +37,6 @@ QtObject {
 
     onCommandModeChanged: {
         Events.sendEvent("CommandsEnabledChanged", {"CommandId":commandsProviderContainer.documentUuid, "CommandId":commandId, "Enabled":newMode, "Model": commandsProviderContainer.commandsModel});
-//        commandsProviderContainer.updateGui();
     }
 
     function updateModel(){
@@ -150,9 +150,6 @@ QtObject {
 
     property GqlModel modelCommands: GqlModel {
         function updateModel() {
-            if (!commandsProviderContainer.isLoadData){
-                return
-            }
             console.log("__DEBUG__modelCommands", commandsProviderContainer.commandsId, JSON.stringify(commandsProviderContainer.additionInputParams))
 
             var query = Gql.GqlRequest("query", commandsProviderContainer.commandId + "Commands");

@@ -3,81 +3,27 @@ import Acf 1.0
 import imtguigql 1.0
 import imtcontrols 1.0
 
+
 Item {
     id: documentManager;
 
-    property ListModel documentsModel: ListModel {}
+    property ListModel documentsModel: ListModel {
+        dynamicRoles: true;
+    }
 
-    signal documentClosed(int documentIndex, string documentUuid);
-    signal documentAdded(int documentIndex, string documentUuid);
+    property GqlDocumentDataController documentController: GqlDocumentDataController {}
 
     UuidGenerator {
         id: uuidGenerator;
     }
 
-    function getUndoManagerForDocument(documentPtr)
-    {
-        let documentsCount = getDocumentsCount();
-        for (let documentIndex = 0; documentIndex < documentsCount; ++documentIndex){
-            let info = privateMethods.getSingleDocumentData(documentIndex);
-            if (info.documentPtr === documentPtr){
-                return info.undoManagerPtr;
-            }
-        }
-
-        return null;
-    }
+    signal documentClosed(int documentIndex, string documentUuid);
+    signal documentAdded(int documentIndex, string documentUuid);
 
 
     function getDocumentsCount()
     {
-        return privateFields.m_documentInfos.length;
-    }
-
-
-    function getDocumentFromIndex(index, documentInfoPtr)
-    {
-        if (index < 0 || index >= privateFields.m_documentInfos.length){
-            return null;
-        }
-
-        let infoPtr = privateFields.m_documentInfos[index];
-
-        if (documentInfoPtr){
-            documentInfoPtr = infoPtr;
-        }
-
-        return infoPtr.documentPtr;
-    }
-
-
-    function getViewsCount(index)
-    {
-        if (index < 0 || index >= privateFields.m_documentInfos.length){
-            return -1;
-        }
-
-        let infoPtr = privateFields.m_documentInfos[index];
-
-        return infoPtr.views.length;
-    }
-
-
-    function getViewFromIndex(documentIndex, viewIndex)
-    {
-        if (documentIndex < 0 || documentIndex >= privateFields.m_documentInfos.length){
-            return -1;
-        }
-
-        if (viewIndex < 0 || viewIndex >= getViewsCount(documentIndex)){
-            return -1;
-        }
-
-        let infoPtr = privateFields.m_documentInfos[index];
-
-        let viewInfo = infoPtr.views[viewIndex];
-
-        return viewInfo.viewPtr;
+        return documentsModel.count;
     }
 
 
@@ -92,32 +38,6 @@ Item {
         if (privateFields.m_activeViewPtr !== viewPtr){
             privateFields.m_activeViewPtr = viewPtr;
         }
-    }
-
-
-    function getDocumentFromView(view, documentInfoPtr)
-    {
-        let infoPtr = getDocumentInfoFromView(view);
-        if (infoPtr){
-            if (documentInfoPtr){
-                documentInfoPtr = infoPtr;
-            }
-
-            return infoPtr.documentPtr;
-        }
-
-        return null;
-    }
-
-
-    function getDocumentInfos(){
-        return privateFields.m_documentInfos;
-    }
-
-
-    function addViewToDocument(document, viewTypeId)
-    {
-
     }
 
 
@@ -172,7 +92,14 @@ Item {
             return false;
         }
 
-        documentsModel.append({"Title": "<new item>", "DocumentPtr": documentData});
+        documentsModel.append({
+                                  "Uuid": uuidGenerator.generateUUID(),
+                                  "Title": "<new item>",
+                                  "TypeId": documentTypeId,
+                                  "Model": createDocumentModel(),
+                                  "DocumentComp": documentData,
+                                  "DocumentObj": null
+                              });
 
         documentAdded(documentsModel.count - 1, "");
 
@@ -189,16 +116,23 @@ Item {
 
         let callback = function(documentModel){
             if (documentModel){
-                documentData.documentModel = documentModel;
-
                 let documentName = ""
                 if (documentModel.ContainsKey("Name")){
                     documentName = documentModel.GetData("Name");
                 }
 
-                documentsModel.append({"Title": documentName, "DocumentPtr": documentData});
+                documentsModel.append({
+                                          "Uuid": uuidGenerator.generateUUID(),
+                                          "Title": documentName,
+                                          "TypeId": documentTypeId,
+                                          "Model": documentModel,
+                                          "DocumentComp": documentData,
+                                          "DocumentObj": null
+                                      });
 
                 documentAdded(documentsModel.count - 1, "");
+
+                documentController.result.disconnect(callback);
             }
         }
 
@@ -206,15 +140,55 @@ Item {
     }
 
 
-    function saveDocument(
-        documentIndex,
-        requestFileName,
-        savedMapPtr,
-        beQuiet,
-        ignoredPtr,
-        progressManagerPtr)
+    function saveDocument(documentUuid)
     {
+        let index = getDocumentIndexByUuid(documentUuid);
+        if (index >= 0){
+            let document = documentsModel.get(index).DocumentObj;
+            if (document.isDirty){
+                if (document.documentCanBeSaved()){
 
+                    let documentId = document.documentId;
+                    let documentModel = document.documentModel;
+
+                    if (documentId === ""){
+                        let callBack = function(documentId, documentName){
+                            document.documentId = documentId;
+                            document.isDirty = false;
+                            document.saved();
+
+                            documentController.documentAdded.disconnect(callBack);
+                        }
+
+                        documentController.setData(documentId, documentModel, {}, callBack);
+                    }
+                    else{
+                        let callBack = function(documentId, documentName){
+                            document.documentId = documentId;
+                            document.isDirty = false;
+                            document.saved();
+
+                            documentController.documentUpdated.disconnect(callBack);
+                        }
+
+                        documentController.updateData(documentId, documentModel, {}, callBack);
+                    }
+                }
+            }
+        }
+    }
+
+
+    function getDocumentIndexByUuid(documentUuid){
+        for (let i = 0; i < documentsModel.count; i++){
+            let uuid = documentsModel.get(i).Uuid;
+            console.log("uuid", uuid);
+            if (String(uuid) === String(documentUuid)){
+                return i;
+            }
+        }
+
+        return -1;
     }
 
 
@@ -234,35 +208,34 @@ Item {
     }
 
 
-    function closeDocument(documentIndex)
+    function closeDocumentByIndex(documentIndex)
     {
+        console.log("closeDocumentByIndex", documentIndex);
         if (documentIndex < 0 || documentIndex >= documentsModel.count){
             return;
         }
 
-        let documentData = documentsModel.get(documentIndex).DocumentPtr;
+        let documentData = documentsModel.get(documentIndex).DocumentObj;
         if (!documentData.isDirty){
             documentsModel.remove(documentIndex);
 
             documentClosed(documentIndex, "");
         }
+        else{
+            modalDialogManager.openDialog(saveDialog, {});
+        }
     }
 
 
-    function closeView(viewPtr, beQuiet, ignoredPtr)
+    function closeDocument(documentUuid)
     {
+        console.log("closeDocument", documentUuid);
 
+        let index = getDocumentIndexByUuid(documentUuid);
+
+        closeDocumentByIndex(index);
     }
 
-//    Component {
-//        id: documentComp;
-
-//        QtObject {
-//            property string uuid;
-//            property string title;
-//            property DocumentData documentPtr;
-//        }
-//    }
 
     function createDocumentComponent(documentTypeId)
     {
@@ -273,18 +246,21 @@ Item {
             return false;
         }
 
-//        let viewObject = viewComp.createObject(documentManager);
-//        if (!viewObject){
-//            console.error("Unable to create a document component.");
-
-//            return false;
-//        }
-
-//        viewObject.uuid = uuidGenerator.generateUUID();
-
         return viewComp;
     }
 
+
+    function createDocumentModel(parent)
+    {
+        return treeItemModelComp.createObject(parent);
+    }
+
+
+    Component {
+        id: treeItemModelComp;
+
+        TreeItemModel {}
+    }
 
     QtObject {
         id: privateMethods;
@@ -321,7 +297,25 @@ Item {
         property var m_activeViewPtr;
     }
 
-    GqlDocumentDataController {
-        id: documentController;
+
+    Component {
+        id: saveDialog;
+
+        MessageDialog {
+            title: qsTr("Save document");
+
+            message: qsTr("Save all changes ?")
+
+            Component.onCompleted: {
+                buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true});
+            }
+
+            onFinished: {
+                console.log("saveDialog onFinished", buttonId);
+                if (buttonId === Enums.ButtonType.Ok){
+                    console.log("Ok");
+                }
+            }
+        }
     }
 }

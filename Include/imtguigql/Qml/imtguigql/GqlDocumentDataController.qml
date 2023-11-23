@@ -33,12 +33,20 @@ QtObject {
         }
     }
 
-    function setData(documentId, documentData, additionInputParams){
+    function setData(documentId, documentData, additionInputParams, callback){
         container.gqlSetModel.set(setCommandId, documentId, documentData, additionInputParams);
+
+        if (callback){
+            container.documentAdded.connect(callback)
+        }
     }
 
-    function updateData(documentId, documentData, additionInputParams){
+    function updateData(documentId, documentData, additionInputParams, callback){
         container.gqlSetModel.set(updateCommandId, documentId, documentData, additionInputParams);
+
+        if (callback){
+            container.documentUpdated.connect(callback)
+        }
     }
 
     onDocumentTypeIdChanged: {

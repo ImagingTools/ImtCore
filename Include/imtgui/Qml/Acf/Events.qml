@@ -35,6 +35,15 @@ QtObject {
         }
     }
 
+    function unSubscribeAllFromSlot(slot){
+        for(let key in this.events){
+            let slots = this.events[key]
+            if (slots.includes(slot)){
+                this.unSubscribeEvent(key, slot);
+            }
+        }
+    }
+
     function unSubscribeEvent(key, slot){
         if(key in this.events){
             var indx = this.events[key].indexOf(slot)

@@ -41,7 +41,7 @@ DocumentManager {
         model: workspaceView.documentsModel;
 
         onCloseItem: {
-            workspaceView.closeDocument(index);
+            workspaceView.closeDocumentByIndex(index);
         }
     }
 
@@ -62,14 +62,30 @@ DocumentManager {
 
             visible: tabPanel.selectedIndex === model.index;
 
-            sourceComponent: model.DocumentPtr;
+            sourceComponent: model.DocumentComp;
 
             onLoaded: {
                 console.log("Document onLoaded");
 
+                if (item.uuid !== undefined){
+                    item.uuid = model.Uuid;
+                }
+
                 if (item.documentManagerPtr !== undefined){
                     item.documentManagerPtr = workspaceView;
                 }
+
+                if (item.documentTypeId !== undefined){
+                    item.documentTypeId = model.TypeId;
+                }
+
+                if (item.documentModel !== undefined){
+                    item.documentModel = model.Model;
+                }
+
+                workspaceView.documentsModel.setProperty(model.index, "DocumentObj", item);
+
+                itemConnections.enabled = true;
             }
 
             onStatusChanged: {
@@ -78,6 +94,69 @@ DocumentManager {
                     console.error("Document loading was failed", modelData);
                 }
             }
+
+            Connections {
+                id: itemConnections;
+
+                enabled: false;
+                target: documentLoader.item;
+
+                function onIsDirtyChanged(){
+                    let isDirty = documentLoader.item.isDirty;
+                    if (isDirty){
+                        let title = model.Title;
+
+                        workspaceView.setDocumentTitle(model.index, title + "*");
+                    }
+                    else{
+                        let title = model.Title;
+
+                        let lastSymbol = title.charAt(title.length - 1);
+
+                        if (lastSymbol === '*'){
+                            title = title.replace('*', '');
+                        }
+
+                        workspaceView.setDocumentTitle(model.index, title);
+                    }
+                }
+            }
         }
+    }
+
+    Connections {
+        target: documentController;
+
+        function onGetModelStateChanged(){
+            let state = documentController.getModelState;
+            if (state === "Loading"){
+                loading.start();
+            }
+            else{
+                loading.stop();
+            }
+        }
+
+        function onSetModelStateChanged(){
+            let state = documentController.setModelState;
+            if (state === "Loading"){
+                loading.start();
+            }
+            else{
+                loading.stop();
+            }
+        }
+
+        function onError(){
+            loading.stop();
+        }
+    }
+
+    Loading {
+        id: loading;
+
+        anchors.fill: parent;
+
+        visible: false;
     }
 }

@@ -219,7 +219,9 @@ Item {
     }
 
     function selectItem(id, name, index){
-        Events.sendEvent("CommandsClearModel");
+        if (isUsedDocumentManager){
+            Events.sendEvent("CommandsClearModel");
+        }
 
         let editorPath = collectionViewContainer.getEditorPath();
         let documentTypeId = collectionViewContainer.getEditorCommandId();
