@@ -13,6 +13,7 @@ Rectangle {
 
     Component.onCompleted: {
 
+        //links for test
         let index_link = linkModel.InsertNewItem();
         linkModel.SetData("ObjectId", "02", index_link);
         index_link = linkModel.InsertNewItem();
@@ -21,6 +22,17 @@ Rectangle {
         linkModel.SetData("ObjectId", "04", index_link);
         index_link = linkModel.InsertNewItem();
         linkModel.SetData("ObjectId", "05", index_link);
+
+        let index_link2 = linkModel2.InsertNewItem();
+        linkModel2.SetData("ObjectId", "02", index_link2);
+        index_link2 = linkModel2.InsertNewItem();
+        linkModel2.SetData("ObjectId", "03", index_link2);
+
+        let index_link3 = linkModel3.InsertNewItem();
+        linkModel3.SetData("ObjectId", "02", index_link3);
+        index_link3 = linkModel3.InsertNewItem();
+        linkModel3.SetData("ObjectId", "03", index_link3);
+
         //
 
         let index = objectModel.InsertNewItem();
@@ -45,12 +57,14 @@ Rectangle {
         objectModel.SetData("MainText", "Main text 3", index);
         objectModel.SetData("SecondText", "Second text 3", index);
 
+
         index = objectModel.InsertNewItem();
         objectModel.SetData("Id", "04", index);
         objectModel.SetData("X", 0.6, index);
         objectModel.SetData("Y", 0.1, index);
         objectModel.SetData("MainText", "Main text 4", index);
         objectModel.SetData("SecondText", "Second text 4", index);
+        objectModel.SetExternTreeModel("Links", linkModel3, index);
 
         index = objectModel.InsertNewItem();
         objectModel.SetData("Id", "05", index);
@@ -58,6 +72,7 @@ Rectangle {
         objectModel.SetData("Y", 0.6, index);
         objectModel.SetData("MainText", "Main text 5", index);
         objectModel.SetData("SecondText", "Second text 5", index);
+        objectModel.SetExternTreeModel("Links", linkModel2, index);
 
         canvas.requestPaint()
     }
@@ -73,9 +88,9 @@ Rectangle {
         return ind;
     }
 
-    TreeItemModel {//for test
-        id: linkModel;
-    }
+    TreeItemModel {id: linkModel;/*for test*/}
+    TreeItemModel {id: linkModel2;/*for test*/}
+    TreeItemModel {id: linkModel3;/*for test*/}
 
 
     Rectangle{
@@ -280,14 +295,7 @@ Rectangle {
 
                 //drawObject
                 for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
-                    let x_  = canvasPage.objectModel.GetData("X", i)
-                    let y_  = canvasPage.objectModel.GetData("Y", i)
-                    let mainText_  = canvasPage.objectModel.GetData("MainText", i)
-                    let secondText_  = canvasPage.objectModel.GetData("SecondText", i)
-                    let width_ = canvasPage.objectModel.IsValidData("Width", i) ? canvasPage.objectModel.GetData("Width", i) * canvas.scaleCoeff : canvas.mainRec_width;
-                    let selected_ = canvasPage.objectModel.IsValidData("Selected", i) ? canvasPage.objectModel.GetData("Selected", i) : false;
-
-                    drawObject(ctx, canvas.width * x_, canvas.height * y_, width_, mainText_, secondText_, selected_, i);
+                    drawObject(ctx, i);
                 }
 
             }//onPaint
@@ -317,7 +325,15 @@ Rectangle {
                 return mainRecWidth;
             }
 
-            function drawObject(ctx, x_, y_, width_, mainText, secondText, selected, index){
+            function drawObject(ctx, index){
+
+                let x_  = canvas.width * canvasPage.objectModel.GetData("X", index)
+                let y_  = canvas.height * canvasPage.objectModel.GetData("Y", index)
+                let width_ = canvasPage.objectModel.IsValidData("Width", index) ? canvasPage.objectModel.GetData("Width", index) * canvas.scaleCoeff : canvas.mainRec_width;
+                let mainText  = canvasPage.objectModel.GetData("MainText", index)
+                let secondText  = canvasPage.objectModel.GetData("SecondText", index)
+                let selected = canvasPage.objectModel.IsValidData("Selected", index) ? canvasPage.objectModel.GetData("Selected", index) : false;
+
 
                 ctx.lineCap = "round"
                 ctx.lineJoin = "round"
@@ -408,7 +424,7 @@ Rectangle {
 
                 ctx.lineCap = "round"
                 ctx.lineJoin = "round"
-                ctx.lineWidth =  canvas.lineWidth;
+                ctx.lineWidth = Math.max(canvas.lineWidth, 0.5);
                 ctx.strokeStyle = linkColor//"#ff6600"
                 ctx.fillStyle = linkColor//"#ff6600";
 
@@ -426,6 +442,7 @@ Rectangle {
                 let intersection;
 
                 if(y1 > y2){
+                    //bottom line
                     x1_rec2 = canvas.width * x2;
                     y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
                     x2_rec2 = canvas.width * x2 + width2;
@@ -434,26 +451,30 @@ Rectangle {
                     intersection = findIntersection(x1_link, y1_link, x2_link, y2_link, x1_rec2, y1_rec2, x2_rec2, y2_rec2);
 
                     if(intersection.x < canvas.width * x2 + width2 && intersection.x > canvas.width * x2){
+                        //bottom line
                         x1_rec2 = canvas.width * x2;
                         y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
                         x2_rec2 = canvas.width * x2 + width2;
                         y2_rec2 = canvas.height * y2 + canvas.mainRec_height;
                     }
                     else if(intersection.x >= canvas.width * x2 + width2){
+                        //right line
                         x1_rec2 = canvas.width * x2  + width2;
                         y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
                         x2_rec2 = canvas.width * x2 + width2;
                         y2_rec2 = canvas.height * y2;
                     }
                     else if(intersection.x <= canvas.width * x2){
+                        //left line
                         x1_rec2 = canvas.width * x2;
                         y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
                         x2_rec2 = canvas.width * x2;
                         y2_rec2 = canvas.height * y2;
                     }
+                }//y1 > y2
 
-                }
-                else {
+                else if (y1 < y2){
+                    //top line
                     x1_rec2 = canvas.width * x2;
                     y1_rec2 = canvas.height * y2;
                     x2_rec2 = canvas.width * x2 + width2;
@@ -462,26 +483,48 @@ Rectangle {
                     intersection = findIntersection(x1_link, y1_link, x2_link, y2_link, x1_rec2, y1_rec2, x2_rec2, y2_rec2);
 
                     if(intersection.x < canvas.width * x2 + width2 && intersection.x > canvas.width * x2){
+                        //top line
                         x1_rec2 = canvas.width * x2;
                         y1_rec2 = canvas.height * y2;
                         x2_rec2 = canvas.width * x2 + width2;
                         y2_rec2 = canvas.height * y2;
                     }
                     else if(intersection.x >= canvas.width * x2 + width2){
+                        //right line
                         x1_rec2 = canvas.width * x2  + width2;
                         y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
                         x2_rec2 = canvas.width * x2 + width2;
                         y2_rec2 = canvas.height * y2;
                     }
                     else if(intersection.x <= canvas.width * x2){
+                        //left line
                         x1_rec2 = canvas.width * x2;
                         y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
                         x2_rec2 = canvas.width * x2;
                         y2_rec2 = canvas.height * y2;
                     }
 
+                }//y1 < y2
 
-                }
+                else if(y1 == y2){
+                    if(x1 >= x2){
+                        //right line
+                        x1_rec2 = canvas.width * x2  + width2;
+                        y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
+                        x2_rec2 = canvas.width * x2 + width2;
+                        y2_rec2 = canvas.height * y2;
+
+
+                    }
+                    else {
+                        //left line
+                        x1_rec2 = canvas.width * x2;
+                        y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
+                        x2_rec2 = canvas.width * x2;
+                        y2_rec2 = canvas.height * y2;
+
+                    }
+                }//y1 == y2
 
                 intersection = findIntersection(x1_link, y1_link, x2_link, y2_link, x1_rec2, y1_rec2, x2_rec2, y2_rec2);
 
