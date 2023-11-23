@@ -185,7 +185,7 @@ Rectangle {
                 property point position;
                 onFinished: {
                     //console.log(position.x, position.y)
-                    let objectIndex = -1;
+                    canvas.hoverIndex = -1;
                     for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
                         let x_  = canvasPage.objectModel.GetData("X", i)
                         let y_  = canvasPage.objectModel.GetData("Y", i)
@@ -193,11 +193,11 @@ Rectangle {
 
                         let ok = controlArea.checkHoverItem(canvas.width * x_, canvas.height * y_, width_, canvas.mainRec_height, position);
                         if(ok){
-                            objectIndex = i;
+                            canvas.hoverIndex = i;
                             break;
                         }
                     }
-                    if(objectIndex >=0){
+                    if(canvas.hoverIndex >=0){
                         //console.log("FOUND")
                         canvas.linkSelected = true;//TEST
                         canvas.requestPaint();
@@ -231,6 +231,7 @@ Rectangle {
             property real mainRec_height: 60 * scaleCoeff;
 
             property int foundIndex: -1;
+            property int hoverIndex: -1;
 
             property int fontSize: 20 * scaleCoeff;
             property int fontSizeSmall: 14 * scaleCoeff;
@@ -245,7 +246,7 @@ Rectangle {
             property string selectedColor: "#90EE90";
 
             property string selectedLinkColor: "#90EE90";
-            property string linkColor: linkSelected ? selectedLinkColor : "#ff6600";
+            property string linkColor: "#ff6600";//linkSelected ? selectedLinkColor : ;
             property bool linkSelected: false;//TEST
             //variables
 
@@ -425,8 +426,10 @@ Rectangle {
                 ctx.lineCap = "round"
                 ctx.lineJoin = "round"
                 ctx.lineWidth = Math.max(canvas.lineWidth, 0.5);
-                ctx.strokeStyle = linkColor//"#ff6600"
-                ctx.fillStyle = linkColor//"#ff6600";
+
+                let selected = canvas.linkSelected && canvas.hoverIndex == fromIndex;
+                ctx.strokeStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
+                ctx.fillStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
 
                 ctx.beginPath()
                 ctx.moveTo(x1_link, y1_link);
@@ -528,16 +531,16 @@ Rectangle {
 
                 intersection = findIntersection(x1_link, y1_link, x2_link, y2_link, x1_rec2, y1_rec2, x2_rec2, y2_rec2);
 
-                drawIntersection(ctx, intersection);
+                drawIntersection(ctx, intersection, selected);
 
             }
 
-            function drawIntersection(ctx, intersection){
+            function drawIntersection(ctx, intersection, selected){
                 let size = 20 * canvas.scaleCoeff
 
                 ctx.lineWidth = 0.5 * canvas.scaleCoeff;
-                ctx.strokeStyle = linkColor//"#ff6600"
-                ctx.fillStyle = linkColor//"#ff6600";
+                ctx.strokeStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
+                ctx.fillStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
                 ctx.beginPath()
                 ctx.roundedRect(intersection.x - size/2, intersection.y  - size/2, size, size, size, size);
                 ctx.fill();
