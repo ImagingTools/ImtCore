@@ -647,6 +647,27 @@ Rectangle {
 
     function deleteObjectFunc(index){
         console.log("DELETE OBJECT: ", index);
+        let id = canvasPage.objectModel.GetData("Id", index);
+
+        //remove links
+        for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
+            let links = canvasPage.objectModel.GetData("Links", i);
+            if(links !== undefined){
+                for(let k = 0; k < links.GetItemsCount(); k++){
+                    let objectId = links.GetData("ObjectId", k);
+                    if(objectId == id){
+                        links.RemoveItem(k);
+                        break;
+                    }
+                }
+            }
+        }
+
+        //remove object
+        canvasPage.objectModel.RemoveItem(index);
+
+        canvas.requestPaint();
+
     }
 
 }
