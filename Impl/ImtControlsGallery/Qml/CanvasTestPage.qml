@@ -571,13 +571,6 @@ Rectangle {
         }//canvas
     }//mainContainer
 
-    Shortcut {
-        sequence: "Ctrl+Z";
-        enabled: true;
-        onActivated: {
-            console.log("Ctrl+Z");
-        }
-    }
 
     Shortcut {
         sequence: "Ctrl+C";
@@ -615,6 +608,39 @@ Rectangle {
             }
 
         }
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Z";
+        enabled: true;
+        onActivated: {
+            console.log("Ctrl+Z");
+        }
+    }
+
+    Shortcut {
+        sequence: "F2";
+        enabled: true;
+        onActivated: {
+            console.log("F2");
+            if(canvas.foundIndex >= 0){
+            }
+        }
+    }
+
+    Shortcut {
+        sequence: "Delete";
+        enabled: true;
+        onActivated: {
+            console.log("Delete");
+            if(canvas.foundIndex >= 0){
+                canvasPage.deleteObjectFunc(canvas.foundIndex);
+            }
+        }
+    }
+
+    function deleteObjectFunc(index){
+        console.log("DELETE OBJECT: ", index);
     }
 
 }
