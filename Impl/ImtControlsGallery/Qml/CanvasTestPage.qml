@@ -107,7 +107,6 @@ Rectangle {
     Rectangle{
         id: mainContainer;
 
-        //anchors.centerIn: parent;
         x: parent.width/2 - width/2;
         y: parent.height/2 - height/2;
 
@@ -118,12 +117,27 @@ Rectangle {
         border.width: 2;
         radius: 4;
         property real scaleCoeffContainer: canvas.scaleCoeff;
-//        onScaleCoeffContainerChanged: {
-//            if(scaleCoeffContainer < 1){
-//                x = parent.width/2 - width/2;
-//                y = parent.height/2 - height/2;
-//            }
-//        }
+        property real scaleCoeffContainerPrev: 1;
+        property bool hasPositionShift: false;
+        onScaleCoeffContainerChanged: {
+            let ok1 = scaleCoeffContainerPrev <= 1 && scaleCoeffContainer >= 1;
+            let ok2 = scaleCoeffContainerPrev >= 1 && scaleCoeffContainer <= 1;
+
+            let ok3 = scaleCoeffContainerPrev >= 1 && scaleCoeffContainer >= 1 && !hasPositionShift;
+            let ok4 = scaleCoeffContainerPrev <= 1 && scaleCoeffContainer <= 1 && !hasPositionShift;
+
+            if(ok1 || ok2){
+                x = parent.width/2 - width/2;
+                y = parent.height/2 - height/2;
+                hasPositionShift = false;
+            }
+            if(ok3 || ok4){
+                x = parent.width/2 - width/2;
+                y = parent.height/2 - height/2;
+            }
+
+            scaleCoeffContainerPrev = scaleCoeffContainer;
+        }
 
         ControlArea{
             id: controlArea;
@@ -192,17 +206,35 @@ Rectangle {
                     }
                 }
 
-                //movingContainer
-//                else if(canvas.scaleCoeff !== 1){
-//                    moveContainerAnimX.from = mainContainer.x;
-//                    moveContainerAnimX.to = mainContainer.x + delta.x;
-//                    moveContainerAnimY.from = mainContainer.y;
-//                    moveContainerAnimY.to = mainContainer.y + delta.y;
+                //move Container
+                else if(canvas.scaleCoeff !== 1){
+                    let ok = false;
 
-//                    moveContainerAnimX.start();
-//                    moveContainerAnimY.start();
+                    let x_new = mainContainer.x + delta.x * moveContainerAnimX.coeff;
+                    let y_new = mainContainer.y + delta.y  * moveContainerAnimX.coeff;
 
-//                }
+                    if(canvas.scaleCoeff < 1){
+                        ok = x_new > 0 && y_new > 0
+                                && x_new < canvasPage.width - mainContainer.width
+                                && y_new < canvasPage.height - mainContainer.height
+                    }
+
+                    else if(canvas.scaleCoeff > 1){
+                        ok = x_new > canvasPage.width - mainContainer.width
+                                && y_new > canvasPage.height - mainContainer.height
+                                && x_new < 0
+                                && y_new < 0
+                    }
+
+                    if(ok){
+                        mainContainer.hasPositionShift = true;
+
+                        moveContainerAnimX.delta = delta;
+                        moveContainerAnimY.delta = delta;
+                        moveContainerAnimX.start();
+                        moveContainerAnimY.start();
+                    }
+                }
             }
 
 
@@ -212,6 +244,10 @@ Rectangle {
                 duration: 15;
                 target: mainContainer;
                 property: "x";
+                from: mainContainer.x;
+                to: mainContainer.x + coeff * delta.x
+                property point delta;
+                property real coeff: 2.5;
             }
 
             NumberAnimation {
@@ -220,6 +256,11 @@ Rectangle {
                 duration: moveContainerAnimX.duration;
                 target: mainContainer;
                 property: "y";
+                from: mainContainer.y;
+                to: mainContainer.y + coeff * delta.y
+                property point delta;
+                property real coeff: moveContainerAnimX.coeff;
+
             }
 
             //hover reaction
