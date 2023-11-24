@@ -383,6 +383,8 @@ Rectangle {
                 var ctx = canvas.getContext('2d');
                 ctx.clearRect(0, 0, canvas.width, canvas.height)
 
+                drawBackground(ctx);
+
                 //width calculation
                 for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
                     setObjectWidth(ctx, i);
@@ -407,6 +409,41 @@ Rectangle {
                 }
 
             }//onPaint
+
+            function drawBackground(ctx){
+                let step = 30 * canvas.scaleCoeff;
+
+                ctx.lineCap = "round"
+                ctx.lineJoin = "round"
+                ctx.lineWidth = 1;
+                ctx.strokeStyle = "#add8e6"
+                ctx.fillStyle = "#add8e6"
+
+                for(let i = 1; i * step < canvas.width; i++){//vertical lines
+                    let x1 = i * step;
+                    let y1 = 0;
+                    let x2 = i * step;
+                    let y2 = canvas.height;
+
+                    ctx.beginPath()
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.stroke();
+                }
+
+                for(let i = 1; i * step < canvas.height; i++){//horizontal lines
+                    let x1 = 0;
+                    let y1 = i * step;
+                    let x2 = canvas.width;
+                    let y2 = i * step;
+
+                    ctx.beginPath()
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.stroke();
+                }
+
+            }
 
             function setObjectWidth(ctx, index){
                 //width calculation
