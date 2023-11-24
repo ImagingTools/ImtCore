@@ -143,6 +143,7 @@ Rectangle {
             id: controlArea;
 
             anchors.fill: parent;
+            cursorShape: Qt.OpenHandCursor;
 
             onClicked: {
                 if(!wasMoving){
@@ -173,6 +174,18 @@ Rectangle {
                         canvas.selectedIndex = i;
                         //break;
                     }
+                }
+                if(canvas.selectedIndex == -1){
+                    controlArea.cursorShape = Qt.ClosedHandCursor;
+                }
+            }
+
+            onReleased: {
+                if(canvas.selectedIndex >= 0){
+                    controlArea.cursorShape = Qt.ArrowCursor;
+                }
+                else {
+                    controlArea.cursorShape = Qt.OpenHandCursor
                 }
             }
 
@@ -288,12 +301,17 @@ Rectangle {
                         }
                     }
                     if(canvas.hoverIndex >=0){
+                        controlArea.cursorShape = Qt.ArrowCursor;
                         canvas.linkSelected = true;
                         canvas.requestPaint();
                     }
-                    else if(canvas.linkSelected){
-                        canvas.linkSelected = false;
-                        canvas.requestPaint();
+                    else {
+                        controlArea.cursorShape = Qt.OpenHandCursor;
+                        if(canvas.linkSelected){
+                            canvas.linkSelected = false;
+                            canvas.requestPaint();
+
+                        }
                     }
                 }
             }
