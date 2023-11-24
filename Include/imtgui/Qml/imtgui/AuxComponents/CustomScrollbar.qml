@@ -62,11 +62,13 @@ Rectangle{
     }
 
     onVisibleStateChanged: {
-        if(scrollContainer.visibleState){
-            animTo.start();
-        }
-        else {
-            animFrom.start();
+        if(canFade){
+            if(scrollContainer.visibleState){
+                animTo.start();
+            }
+            else {
+                animFrom.start();
+            }
         }
     }
 
