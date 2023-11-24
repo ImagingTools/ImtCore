@@ -12,6 +12,26 @@ Rectangle {
 
     property TreeItemModel objectModel: TreeItemModel{};
 
+    //for scrollBars
+    property real contentWidth: mainContainer.width;
+    property real contentHeight: mainContainer.height;
+    property real contentX: -mainContainer.x;
+    property real contentY: -mainContainer.y;
+    property real originX: 0;
+    property real originY: 0;
+    //for scrollBars
+
+    onContentXChanged: {
+        if(mainContainer.x !== - contentX){
+            mainContainer.x = - contentX;
+        }
+    }
+    onContentYChanged: {
+        if(mainContainer.y !== - contentY){
+            mainContainer.y = - contentY;
+        }
+    }
+
     Component.onCompleted: {
         //TEST
         //links for test
@@ -116,6 +136,7 @@ Rectangle {
         border.color: "lightgrey";
         border.width: 2;
         radius: 4;
+
         property real scaleCoeffContainer: canvas.scaleCoeff;
         property real scaleCoeffContainerPrev: 1;
         property bool hasPositionShift: false;
@@ -137,6 +158,18 @@ Rectangle {
             }
 
             scaleCoeffContainerPrev = scaleCoeffContainer;
+        }
+
+        onXChanged: {
+            if(canvasPage.contentX !== -x){
+                canvasPage.contentX = -x
+            }
+        }
+
+        onYChanged: {
+            if(canvasPage.contentY !== -y){
+                canvasPage.contentY = -y
+            }
         }
 
         ControlArea{
@@ -803,6 +836,37 @@ Rectangle {
 
         canvas.requestPaint();
 
+    }
+
+    CustomScrollbar{
+        id: scrollVert;
+
+        anchors.right: parent.right;
+        anchors.rightMargin: 1;
+        anchors.bottom: parent.bottom;
+
+        secondSize: 12;
+        backgroundColor: "transparent";
+        Component.onCompleted: {
+            opacity = 0.7;
+        }
+        targetItem: parent;
+    }
+
+    CustomScrollbar{
+        id: scrollHoriz;
+
+        anchors.right: parent.right;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 1;
+
+        secondSize: 12;
+        backgroundColor: "transparent";
+        Component.onCompleted: {
+            opacity = 0.7;
+        }
+        vertical: false;
+        targetItem: parent;
     }
 
 }
