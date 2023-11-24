@@ -107,6 +107,7 @@
 		<file alias="imtcontrols/Views/CollectionViewCommandsDelegateBase.qml">Qml/imtcontrols/Views/CollectionViewCommandsDelegateBase.qml</file>
 		<file alias="imtcontrols/Views/CollectionViewCommandsObserver.qml">Qml/imtcontrols/Views/CollectionViewCommandsObserver.qml</file>
 		<file alias="imtcontrols/Views/CustomScrollbar.qml">Qml/imtcontrols/Views/CustomScrollbar.qml</file>
+                <file alias="imtcontrols/Views/ScrollIndicator.qml">Qml/imtcontrols/Views/ScrollIndicator.qml</file>
 		<file alias="imtcontrols/Views/CustomTooltip.qml">Qml/imtcontrols/Views/CustomTooltip.qml</file>
 		<file alias="imtcontrols/Views/Diagram.qml">Qml/imtcontrols/Views/Diagram.qml</file>
 		<file alias="imtcontrols/Views/GridCollectionView.qml">Qml/imtcontrols/Views/GridCollectionView.qml</file>

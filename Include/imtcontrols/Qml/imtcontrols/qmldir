@@ -103,6 +103,7 @@ CollectionView 1.0 ./Views/CollectionView.qml
 CollectionViewCommandsDelegateBase 1.0 ./Views/CollectionViewCommandsDelegateBase.qml
 CollectionViewCommandsObserver 1.0 ./Views/CollectionViewCommandsObserver.qml
 CustomScrollbar 1.0 ./Views/CustomScrollbar.qml
+ScrollIndicator 1.0 ./Views/ScrollIndicator.qml
 CustomTooltip 1.0 ./Views/CustomTooltip.qml
 Diagram 1.0 ./Views/Diagram.qml
 GridCollectionView 1.0 ./Views/GridCollectionView.qml

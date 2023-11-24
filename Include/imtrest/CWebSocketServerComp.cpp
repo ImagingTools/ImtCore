@@ -251,8 +251,8 @@ void CWebSocketServerComp::OnError(QAbstractSocket::SocketError error)
 
 void CWebSocketServerComp::OnTimeout()
 {
-	qDebug() << "OnTimeout";
-	qDebug() << "Senders count: " << m_senders.count();
+    //qDebug() << "OnTimeout";
+    //qDebug() << "Senders count: " << m_senders.count();
 	for (const QByteArray& key: m_senders.keys()){
 		if (!m_senders[key].isNull()){
 			QWebSocket* webSocketPtr = const_cast<QWebSocket*>(m_senders[key]->GetSocket());
