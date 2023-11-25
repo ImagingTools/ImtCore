@@ -386,7 +386,7 @@ Rectangle {
             property string selectedColor: "#90EE90";
 
             property string selectedLinkColor: "#90EE90";
-            property string linkColor: "#ff6600";//linkSelected ? selectedLinkColor : ;
+            property string linkColor: "#335777"//"#ff6600";//linkSelected ? selectedLinkColor : ;
             property bool linkSelected: false;
             //variables
 
@@ -607,7 +607,7 @@ Rectangle {
 
                 ctx.lineCap = "round"
                 ctx.lineJoin = "round"
-                ctx.lineWidth = Math.max(canvas.lineWidth, 0.5);
+                ctx.lineWidth = Math.max(canvas.scaleCoeff *1, 0.5);
 
                 let selected = canvas.linkSelected && canvas.hoverIndex == fromIndex;
                 ctx.strokeStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
@@ -718,7 +718,7 @@ Rectangle {
             }
 
             function drawIntersection(ctx, intersection, selected){
-                let size = 20 * canvas.scaleCoeff
+                let size = 16 * canvas.scaleCoeff
 
                 ctx.lineWidth = 0.5 * canvas.scaleCoeff;
                 ctx.strokeStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
