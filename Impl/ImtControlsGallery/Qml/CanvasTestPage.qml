@@ -438,7 +438,12 @@ Rectangle {
 
                 //drawObject
                 for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
-                    drawObject(ctx, i);
+                    if(i !== canvas.selectedIndex){
+                        drawObject(ctx, i);
+                    }
+                }
+                if(canvas.selectedIndex >= 0){
+                    drawObject(ctx, canvas.selectedIndex);
                 }
 
             }//onPaint
