@@ -77,6 +77,7 @@ Rectangle {
         objectModel.SetData("Y", 0.1, index);
         objectModel.SetData("MainText", "Main text 3", index);
         objectModel.SetData("SecondText", "Second text 3", index);
+        objectModel.SetData("IsComposite", true, index);
 
         index = objectModel.InsertNewItem();
         objectModel.SetData("Id", "04", index);
@@ -111,6 +112,17 @@ Rectangle {
             }
         }
         return ind;
+    }
+
+    function goInside(){
+        if(objectModel.GetItemsCount() > canvas.selectedIndex && canvas.selectedIndex >= 0){
+            let isComposite = objectModel.IsValidData("IsComposite", canvas.selectedIndex) ? objectModel.GetData("IsComposite", canvas.selectedIndex) : false;
+            if(!isComposite){
+                return;
+            }
+            let id = objectModel.GetData("Id", canvas.selectedIndex);
+            console.log("Go inside");
+        }
     }
 
     TreeItemModel {id: linkModel;/*for test*/}
@@ -220,6 +232,12 @@ Rectangle {
                 }
                 else {
                     controlArea.cursorShape = Qt.OpenHandCursor
+                }
+            }
+
+            onDoubleClicked: {
+                if(canvas.selectedIndex >= 0){
+                    canvasPage.goInside();
                 }
             }
 
@@ -384,11 +402,13 @@ Rectangle {
             property real imageSize: 20 * scaleCoeff;
             property real imageMargin: 4 * scaleCoeff;
 
-            property string selectedColor: "#90EE90";
+            property string selectedColor: "#00ff00"//"#90EE90";
             property string mainColor: "#335777";
             property string errorColor: "#ff0000";
+            property string compositeColor: "#bcd2e8";
+            property string compositeSelectedColor: "#1167b1";
 
-            property string selectedLinkColor: "#90EE90";
+            property string selectedLinkColor: "#00ff00"//"#90EE90";
             property string linkColor: "#335777";
             property bool linkSelected: false;
             //variables
@@ -520,6 +540,7 @@ Rectangle {
                 let secondText  = canvasPage.objectModel.GetData("SecondText", index)
                 let selected = canvasPage.objectModel.IsValidData("Selected", index) ? canvasPage.objectModel.GetData("Selected", index) : false;
                 let hasError = canvasPage.objectModel.IsValidData("HasError", index) ? canvasPage.objectModel.GetData("HasError", index) : false;
+                let isComposite = canvasPage.objectModel.IsValidData("IsComposite", index) ? objectModel.GetData("IsComposite", index) : false;
 
                 ctx.lineCap = "round"
                 ctx.lineJoin = "round"
@@ -538,7 +559,9 @@ Rectangle {
                 //main rectangle
                 ctx.lineWidth = canvas.lineWidth;
                 ctx.strokeStyle = hasError ? canvas.errorColor : canvas.mainColor;
-                ctx.fillStyle = selected ? canvas.selectedColor : "#ffffff";
+                ctx.fillStyle = (!selected && !isComposite) ? "#ffffff" :
+                                                              (!selected && isComposite) ? canvas.compositeColor:
+                                                                    (selected && isComposite) ? canvas.compositeSelectedColor: (selected && !isComposite) ? canvas.selectedColor : "#ffffff";
                 ctx.beginPath()
                 ctx.roundedRect(x_, y_, mainRecWidth, canvas.mainRec_height, canvas.radius_, canvas.radius_);
                 ctx.fill();
