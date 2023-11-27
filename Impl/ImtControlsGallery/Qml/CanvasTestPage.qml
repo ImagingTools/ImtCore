@@ -13,10 +13,10 @@ Rectangle {
     property TreeItemModel objectModel: TreeItemModel{};
 
     //for scrollBars
-    property real contentWidth: mainContainer.width;
-    property real contentHeight: mainContainer.height;
-    property real contentX: -mainContainer.x;
-    property real contentY: -mainContainer.y;
+    property real contentWidth: mainContainer.width.toFixed(3);
+    property real contentHeight: mainContainer.height.toFixed(3);
+    property real contentX: -mainContainer.x.toFixed(3);
+    property real contentY: -mainContainer.y.toFixed(3);
     property real originX: 0;
     property real originY: 0;
     //for scrollBars
@@ -138,14 +138,17 @@ Rectangle {
         border.width: 2;
         radius: 4;
 
-        property real scaleCoeffContainer: canvas.scaleCoeff;
+        property real scaleCoeffContainer: canvas.scaleCoeff.toFixed(3);
         property real scaleCoeffContainerPrev: 1;
         property bool hasPositionShift: false;
         onScaleCoeffContainerChanged: {
+            //console.log("scaleCoeffContainer:: ", scaleCoeffContainer);
+
             let ok1 = scaleCoeffContainerPrev <= 1 && scaleCoeffContainer >= 1;
             let ok2 = scaleCoeffContainerPrev >= 1 && scaleCoeffContainer <= 1;
 
-            let ok3 = scaleCoeffContainerPrev >= 1 && scaleCoeffContainer >= 1;
+            let ok3 = scaleCoeffContainerPrev > 1 && scaleCoeffContainer > 1;
+
             let ok4 = scaleCoeffContainerPrev <= 1 && scaleCoeffContainer <= 1;
 
             let ok = ok3 && hasPositionShift ? false : true;
@@ -271,7 +274,7 @@ Rectangle {
                     }
 
                     if(ok){
-                        mainContainer.hasPositionShift = true;
+                        //mainContainer.hasPositionShift = true;
 
                         moveContainerAnimX.delta = delta;
                         moveContainerAnimY.delta = delta;
