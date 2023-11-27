@@ -52,7 +52,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="CanvasTestPage" PackageId="ImtQmlPck" ComponentId="PageGuiElementModel">
+        <Element Id="CanvasPage" PackageId="ImtQmlPck" ComponentId="PageGuiElementModel">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="IconPath" Type="Text" ExportId="">
@@ -65,10 +65,10 @@
                         <Data IsEnabled="true" Value="Canvas"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PageQmlItem" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="../../CanvasTestPage.qml"/>
+                        <Data IsEnabled="true" Value="../../CanvasPage.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="StartQmlItem" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value="../../CanvasTestPage.qml"/>
+                        <Data IsEnabled="true" Value="../../CanvasPage.qml"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -194,8 +194,8 @@
                                 <Value>ViewsPage</Value>
                                 <Value>IndicatorsPage</Value>
                                 <Value>DialogsRepresentaitonPage</Value>
+                                <Value>CanvasPage</Value>
                                 <Value>TestPage</Value>
-                                <Value>CanvasTestPage</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
