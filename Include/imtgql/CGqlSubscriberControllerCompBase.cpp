@@ -172,6 +172,42 @@ bool CGqlSubscriberControllerCompBase::SetSubscriptions()
 }
 
 
+bool CGqlSubscriberControllerCompBase::SetAllSubscriptions(const QByteArray& data)
+{
+	if (!m_requestManagerCompPtr.IsValid()){
+		return false;
+	}
+
+	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
+		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
+			const imtrest::IRequest* networkRequest = requestNetworks.networkRequests[id];
+			QByteArray body = QString(
+R"(
+	{
+	"type": "data",
+	"id": "%1",
+	"payload": {
+		"data": %2
+		}
+	}
+)").arg(QString(id)).arg(QString(data)).toUtf8();
+			QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
+			const imtrest::IProtocolEngine& engine = networkRequest->GetProtocolEngine();
+
+			imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
+			if (responsePtr.IsValid()){
+				const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest->GetRequestId());
+				if (sender != nullptr){
+					sender->SendResponse(responsePtr);
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+
 bool CGqlSubscriberControllerCompBase::StartInternalSubscriber(const imtgql::CGqlRequest& /*gqlRequest*/, QString& /*errorMessage*/)
 {
 	return true;

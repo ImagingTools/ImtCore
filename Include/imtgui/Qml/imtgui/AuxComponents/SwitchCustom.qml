@@ -1,6 +1,6 @@
 import QtQuick 2.12
 
-Rectangle {
+Item {
     id: switchCustom;
 
     width: 72;
@@ -44,7 +44,7 @@ Rectangle {
 
         anchors.verticalCenter: parent.verticalCenter;
 
-        x: 0;//switchCustom.checked ? switchCustom.width - width : 0;
+        x: switchCustom.checked * (switchCustom.width - controlRec.width)
         width: switchCustom.height;
         height: width;
         radius: width;
@@ -62,11 +62,8 @@ Rectangle {
         property int mouseX_prev: 0;
         property bool canDrag: false;
         property bool canClick: true;
-//        onClicked: {
 
-//        }
         onPressed: {
-//            ma.canDrag = true;
             if(tooltip.text !== ""){
                 tooltip.closeTooltip();
             }

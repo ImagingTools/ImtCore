@@ -8,6 +8,7 @@
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 #include <iprm/ITextParam.h>
+#include <istd/TPointerVector.h>
 
 // ImtCore includes
 #include <imtauth/ILoginStatusProvider.h>
@@ -125,6 +126,7 @@ private:
 	imtauth::ILoginStatusProvider::LoginStatusFlags m_loginStatus;
 	QTimer m_refreshTimer;
 	mutable QMap<QString, QByteArray> m_queryDataMap;
+	istd::TPointerVector<imtrest::IRequest> m_startQueries;
 };
 
 

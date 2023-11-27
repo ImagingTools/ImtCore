@@ -55,6 +55,7 @@ public:
 
 protected:
 	virtual bool SetSubscriptions();
+	virtual bool SetAllSubscriptions(const QByteArray& data);
 	virtual bool StartInternalSubscriber(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage);
 	virtual iprm::IParamsSet* CreateContextParams(const imtgql::CGqlRequest& gqlRequest) const;
 	virtual bool CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
@@ -72,6 +73,8 @@ protected:
 	{
 		imtgql::CGqlRequest gqlRequest;
 		QMap<QByteArray, const imtrest::IRequest*> networkRequests;
+
+		RequestNetworks():gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION){}
 	};
 	
 	QList<RequestNetworks> m_registeredSubscribers;

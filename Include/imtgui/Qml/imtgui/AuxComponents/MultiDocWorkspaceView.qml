@@ -654,11 +654,12 @@ Item {
 
                     dataLoader.item.itemId = model.Id;
 
+                    console.log("dataLoader.item.commandId", dataLoader.item.commandId, model.CommandId)
                     if(dataLoader.item.commandId !== undefined){
                         dataLoader.item.commandId = model.CommandId;
                     }
 
-                    if(dataLoader.item.documentTypeId !== undefined){
+                    if(dataLoader.item.documentTypeId !== undefined && model.CommandId !== undefined){
                         dataLoader.item.documentTypeId = model.CommandId;
                     }
 

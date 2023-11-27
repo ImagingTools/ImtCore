@@ -22,7 +22,7 @@ namespace imtclientgql
 // public methods
 
 CWebSocketClientComp::CWebSocketClientComp()
-	:m_loginStatus(imtauth::ILoginStatusProvider::LSF_CACHED)
+			: m_loginStatus(imtauth::ILoginStatusProvider::LSF_CACHED)
 {
 }
 
@@ -66,6 +66,7 @@ const imtrest::ISender* CWebSocketClientComp::GetSender(const QByteArray& /*requ
 bool CWebSocketClientComp::SendRequest(const imtgql::IGqlRequest& request, imtgql::IGqlResponseHandler& responseHandler) const
 {
 	QString key = QUuid::createUuid().toString(QUuid::WithoutBraces);
+//	QString key = request.GetFactoryId();
 
 	QJsonObject dataObject;
 	dataObject["type"] = "query";
@@ -125,7 +126,6 @@ void CWebSocketClientComp::OnComponentCreated()
 
 	m_refreshTimer.setSingleShot(true);
 	m_refreshTimer.setInterval(5000);
-
 	Connect();
 }
 
@@ -178,6 +178,8 @@ void CWebSocketClientComp::OnWebSocketDisConnected()
 	istd::IChangeable::ChangeSet loginChangeSet(m_loginStatus, QObject::tr("Logout"));
 	istd::CChangeNotifier notifier(this, &loginChangeSet);
 
+	m_startQueries.Reset();
+
 	m_refreshTimer.start();
 }
 
@@ -192,8 +194,6 @@ void CWebSocketClientComp::OnWebSocketError(QAbstractSocket::SocketError /*error
 
 void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message)
 {
-	qDebug() << "CWebSocketClientComp::OnWebSocketTextMessageReceived: " << message;
-
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
 
 	if (webSocketPtr == nullptr){
@@ -204,31 +204,49 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 		return;
 	}
 
-	imtrest::CWebSocketRequest webSocketRequest(*m_protocolEngineCompPtr.GetPtr());
-	webSocketRequest.SetBody(message.toUtf8());
+	istd::TDelPtr<imtrest::CWebSocketRequest> webSocketRequest(new imtrest::CWebSocketRequest(*m_protocolEngineCompPtr.GetPtr()));
+	webSocketRequest->SetBody(message.toUtf8());
 
-	imtrest::ConstResponsePtr responsePtr;
-	imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest.GetMethodType();
-	if (methodType == imtrest::CWebSocketRequest::MT_CONNECTION_ASK){
-	}
-	else if (methodType == imtrest::CWebSocketRequest::MT_QUERY_DATA){
-		m_queryDataMap.insert(webSocketRequest.GetRequestId(), webSocketRequest.GetBody());
+//	istd::TDelPtr<imtrest::IRequest> newRequestPtr = m_protocolEngineCompPtr->CreateRequest(*m_serverRequestHandlerCompPtr);
+//	istd::TDelPtr<imtrest::IRequest> newClientRequestPtr = m_protocolEngineCompPtr->CreateRequest(*m_clientRequestHandlerCompPtr);
+//	if (newRequestPtr.IsValid()){
+//		imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<imtrest::CWebSocketRequest*>(newRequestPtr.GetPtr());
+//		if (webSocketRequest == nullptr){
+//			return;
+//		}
+//		webSocketRequest->SetBody(message.toUtf8());
+		imtrest::ConstResponsePtr responsePtr;
+		imtrest::CWebSocketRequest::MethodType methodType = webSocketRequest->GetMethodType();
+		if (
+				methodType == imtrest::CWebSocketRequest::MT_CONNECTION_ASK ||
+				methodType == imtrest::CWebSocketRequest::MT_KEEP_ALIVE
+				){
+//			m_loginStatus = imtauth::ILoginStatusProvider::LSF_LOGGED_IN;
+//			//			const istd::IChangeable::ChangeSet s_loginChangeSet(iauth::ILogin::CF_LOGIN, QObject::tr("Login"));
+//			istd::IChangeable::ChangeSet loginChangeSet(m_loginStatus, QObject::tr("Login"));
+//			istd::CChangeNotifier notifier(this, &loginChangeSet);
+		}
+		else if (methodType == imtrest::CWebSocketRequest::MT_QUERY_DATA){
+			m_queryDataMap.insert(webSocketRequest->GetRequestId(), webSocketRequest->GetBody());
 
-		emit OnQueryDataReceived(2);
-	}
-	else if (	methodType == imtrest::CWebSocketRequest::MT_ERROR ||
-				methodType == imtrest::CWebSocketRequest::MT_START_ASK ||
-				methodType == imtrest::CWebSocketRequest::MT_DATA){
-		responsePtr = m_clientRequestHandlerCompPtr->ProcessRequest(webSocketRequest);
-	}
-	else{
-		responsePtr = m_serverRequestHandlerCompPtr->ProcessRequest(webSocketRequest);
-	}
-
-	if (responsePtr.IsValid()){
-		QByteArray data = responsePtr->GetData();
-		webSocketPtr->sendTextMessage(data);
-	}
+			emit OnQueryDataReceived(1);
+		}
+		else if (methodType == imtrest::CWebSocketRequest::MT_ERROR
+					 || methodType == imtrest::CWebSocketRequest::MT_START_ASK
+					 || methodType == imtrest::CWebSocketRequest::MT_DATA){
+			responsePtr = m_clientRequestHandlerCompPtr->ProcessRequest(*webSocketRequest);
+		}
+		else{
+			responsePtr = m_serverRequestHandlerCompPtr->ProcessRequest(*webSocketRequest);
+		}
+		if (responsePtr.IsValid()){
+			QByteArray data = responsePtr->GetData();
+			webSocketPtr->sendTextMessage(data);
+			if (methodType == imtrest::CWebSocketRequest::MT_START){
+				m_startQueries.PushBack(webSocketRequest.PopPtr());
+			}
+		}
+//	}
 }
 
 
@@ -264,16 +282,11 @@ void CWebSocketClientComp::Connect()
 	authorization["password"] = password;
 	QByteArray authHeader = QJsonDocument(authorization).toJson(QJsonDocument::Compact);
 
-//	QUrl url = QUrl(host + "/realtime?header=" + authHeader.toBase64() + "&payload=e30=");
-//	url.setScheme("ws");
-//	url.setPort(port.toInt());
-//	m_webSocket.open(url);
-
-	QUrl url;
-	url.setHost(host);
+	QUrl url = QUrl(host + "/realtime?header=" + authHeader.toBase64() + "&payload=e30=");
 	url.setScheme("ws");
 	url.setPort(port.toInt());
 	m_webSocket.open(url);
+
 }
 
 // public methods of the embedded class NetworkOperation
