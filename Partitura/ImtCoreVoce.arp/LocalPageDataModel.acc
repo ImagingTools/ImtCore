@@ -17,6 +17,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>ServerUrl</Value>
+                                <Value>WebSocketServerUr</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -24,6 +25,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>ServerUrl</Value>
+                                <Value>WebSocketServerUrl</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -43,7 +45,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DefaultText" Type="Text" ExportId="DefaultWebSocketServerUrl">
-                        <Data IsEnabled="true" Value="localhost"/>
+                        <Data IsEnabled="true" Value=""/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

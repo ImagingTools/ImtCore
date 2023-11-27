@@ -132,6 +132,13 @@ Item {
         property bool applyUrl: application.serverReady && application.settingsProvider.serverModel != null;
         onApplyUrlChanged: {
             if (applyUrl){
+                let webSocketServerUrl = application.settingsProvider.getValue("WebSocketServerUrl");
+                if (webSocketServerUrl && webSocketServerUrl !== ""){
+                    subscriptionManager.url = webSocketServerUrl;
+
+                    return;
+                }
+
                 let serverUrl = application.settingsProvider.getValue("ServerUrl");
 
                 serverUrl = serverUrl.replace("http", "ws")
@@ -141,8 +148,6 @@ Item {
                 }
 
                 serverUrl += "Lisa/wssub";
-
-//                serverUrl = "ws://localhost:8776"
 
                 subscriptionManager.url = serverUrl;
             }

@@ -23,6 +23,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>ServerUrl</Value>
+                                <Value>WebSocketServerUrl</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
