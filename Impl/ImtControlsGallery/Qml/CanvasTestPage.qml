@@ -145,17 +145,14 @@ Rectangle {
             let ok1 = scaleCoeffContainerPrev <= 1 && scaleCoeffContainer >= 1;
             let ok2 = scaleCoeffContainerPrev >= 1 && scaleCoeffContainer <= 1;
 
-            let ok3 = scaleCoeffContainerPrev >= 1 && scaleCoeffContainer >= 1 && !hasPositionShift;
-            let ok4 = scaleCoeffContainerPrev <= 1 && scaleCoeffContainer <= 1 && !hasPositionShift;
+            let ok3 = scaleCoeffContainerPrev >= 1 && scaleCoeffContainer >= 1;
+            let ok4 = scaleCoeffContainerPrev <= 1 && scaleCoeffContainer <= 1;
 
-            if(ok1 || ok2){
+            let ok = ok3 && hasPositionShift ? false : true;
+            if(ok){
                 x = parent.width/2 - width/2;
                 y = parent.height/2 - height/2;
                 hasPositionShift = false;
-            }
-            if(ok3 || ok4){
-                x = parent.width/2 - width/2;
-                y = parent.height/2 - height/2;
             }
 
             scaleCoeffContainerPrev = scaleCoeffContainer;
@@ -717,19 +714,39 @@ Rectangle {
                 intersection = findIntersection(x1_link, y1_link, x2_link, y2_link, x1_rec2, y1_rec2, x2_rec2, y2_rec2);
 
                 //for intersection margin
-                let hasMargin = false;
+                let angle
+                let hasMargin = true;
+                let complexIntersection = true;
                 if(hasMargin){
-                    let angle = findAngle(x1_link, y1_link,intersection.x, intersection.y)
-                    let offset = 30;
+                    angle = findAngle(x1_link, y1_link,intersection.x, intersection.y)
+                    //console.log("angle: ", angle)
+
+                    let quarter =  Math.trunc(angle/(Math.PI/2))
+                    let add = 0;
+
+                    //offset length correction
+                    if(quarter % 2){
+                        add = angle  - quarter * Math.PI/2  < Math.PI/4 ? Math.abs(Math.sin(angle)) : Math.abs(Math.cos(angle))
+                    }
+                    else {
+                        add = angle  - quarter * Math.PI/2  < Math.PI/4 ? Math.abs(Math.cos(angle)) : Math.abs(Math.sin(angle))
+                    }
+
+                    let offset = 20 * canvas.scaleCoeff * (1 + add);
                     let newX = intersection.x + offset * Math.cos(angle)
                     let newY = intersection.y + offset * Math.sin(angle)
+
                     intersection = Qt.point(newX, newY);
+
+                }//for intersection margin
+                if(complexIntersection && hasMargin){
+                    drawIntersectionExt(ctx, intersection,angle, selected);
+                    drawIntersectionArc(ctx, intersection, angle + Math.PI, selected)
+
                 }
-                //for intersection margin
-
-
-                drawIntersection(ctx, intersection, selected);
-
+                else {//simple
+                    drawIntersection(ctx, intersection, selected);
+                }
             }
 
             function drawIntersection(ctx, intersection, selected){
@@ -742,6 +759,51 @@ Rectangle {
                 ctx.roundedRect(intersection.x - size/2, intersection.y  - size/2, size, size, size, size);
                 ctx.fill();
                 ctx.stroke();
+            }
+
+            function drawIntersectionExt(ctx, intersection, angle, selected){
+                let size = 16 * canvas.scaleCoeff
+                let sizeSmall = 8 * canvas.scaleCoeff
+
+                ctx.lineWidth = 0.5 * canvas.scaleCoeff;
+                ctx.strokeStyle = "#ffffff";
+                ctx.fillStyle = "#ffffff";
+                ctx.beginPath()
+                ctx.roundedRect(intersection.x - size/2, intersection.y  - size/2, size, size, size, size);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.strokeStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
+                ctx.fillStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
+                ctx.beginPath()
+                ctx.roundedRect(intersection.x - sizeSmall/2, intersection.y  - sizeSmall/2, sizeSmall, sizeSmall, sizeSmall, sizeSmall);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(intersection.x, intersection.y)
+                ctx.lineWidth = Math.max(canvas.scaleCoeff *1, 0.5);
+                let offset = size/2;
+                let newX = intersection.x + offset * Math.cos(angle)
+                let newY = intersection.y + offset * Math.sin(angle)
+                ctx.lineTo(newX, newY);
+                ctx.stroke();
+
+            }
+
+            function drawIntersectionArc(ctx, point, angle, selected){
+                let rad = 8 * canvas.scaleCoeff;
+                let endAngle = 0.6 * Math.PI;
+                ctx.lineWidth = 2 * canvas.scaleCoeff;
+                ctx.strokeStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
+                ctx.fillStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
+                ctx.beginPath()
+                ctx.arc(point.x, point.y, rad, angle , angle - endAngle, true);
+                ctx.stroke();
+                ctx.beginPath()
+                ctx.arc(point.x, point.y, rad, angle , angle + endAngle, false);
+                ctx.stroke();
+
             }
 
             function findIntersection(x1, y1, x2, y2, x3, y3, x4, y4){
@@ -774,10 +836,10 @@ Rectangle {
                         angle = Math.PI;
                     }
                     else if((y1 < y2) && (x1 == x2)){
-                        angle = Math.PI / 2;
+                        angle = 1.5 * Math.PI;
                     }
                     else if((y1 > y2) && (x1 == x2)){
-                        angle = 1.5 * Math.PI;
+                        angle = Math.PI/2;
                     }
                     //
                     else if((y1 > y2) && (x1 < x2)){//boottom left
