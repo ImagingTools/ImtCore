@@ -69,6 +69,7 @@ Rectangle {
         objectModel.SetData("Y", 0.6, index);
         objectModel.SetData("MainText", "Main text 2", index);
         objectModel.SetData("SecondText", "Second text 2", index);
+        objectModel.SetData("HasError", true, index);
 
         index = objectModel.InsertNewItem();
         objectModel.SetData("Id", "03", index);
@@ -384,9 +385,11 @@ Rectangle {
             property real imageMargin: 4 * scaleCoeff;
 
             property string selectedColor: "#90EE90";
+            property string mainColor: "#335777";
+            property string errorColor: "#ff0000";
 
             property string selectedLinkColor: "#90EE90";
-            property string linkColor: "#335777"//"#ff6600";//linkSelected ? selectedLinkColor : ;
+            property string linkColor: "#335777";
             property bool linkSelected: false;
             //variables
 
@@ -516,7 +519,7 @@ Rectangle {
                 let mainText  = canvasPage.objectModel.GetData("MainText", index)
                 let secondText  = canvasPage.objectModel.GetData("SecondText", index)
                 let selected = canvasPage.objectModel.IsValidData("Selected", index) ? canvasPage.objectModel.GetData("Selected", index) : false;
-
+                let hasError = canvasPage.objectModel.IsValidData("HasError", index) ? canvasPage.objectModel.GetData("HasError", index) : false;
 
                 ctx.lineCap = "round"
                 ctx.lineJoin = "round"
@@ -534,7 +537,7 @@ Rectangle {
 
                 //main rectangle
                 ctx.lineWidth = canvas.lineWidth;
-                ctx.strokeStyle = "#ff6600"
+                ctx.strokeStyle = hasError ? canvas.errorColor : canvas.mainColor;
                 ctx.fillStyle = selected ? canvas.selectedColor : "#ffffff";
                 ctx.beginPath()
                 ctx.roundedRect(x_, y_, mainRecWidth, canvas.mainRec_height, canvas.radius_, canvas.radius_);
@@ -713,6 +716,18 @@ Rectangle {
 
                 intersection = findIntersection(x1_link, y1_link, x2_link, y2_link, x1_rec2, y1_rec2, x2_rec2, y2_rec2);
 
+                //for intersection margin
+                let hasMargin = false;
+                if(hasMargin){
+                    let angle = findAngle(x1_link, y1_link,intersection.x, intersection.y)
+                    let offset = 30;
+                    let newX = intersection.x + offset * Math.cos(angle)
+                    let newY = intersection.y + offset * Math.sin(angle)
+                    intersection = Qt.point(newX, newY);
+                }
+                //for intersection margin
+
+
                 drawIntersection(ctx, intersection, selected);
 
             }
@@ -739,6 +754,45 @@ Rectangle {
 
 
                 return Qt.point(px, py);
+            }
+
+            function findAngle(x1, y1, x2, y2){
+
+                let angle;
+                angle = Math.atan((y2 - y1) / (x2 - x1))
+
+                if((x2 == x1) && (y1 == y2)){
+                    angle = 0;
+                }
+                else {
+                    let angleBase = Math.atan((y2 - y1) / (x2 - x1))
+
+                    if((y1 == y2) && (x1 > x2)){
+                        angle = 0
+                    }
+                    else if((y1 == y2) && (x1 < x2)){
+                        angle = Math.PI;
+                    }
+                    else if((y1 < y2) && (x1 == x2)){
+                        angle = Math.PI / 2;
+                    }
+                    else if((y1 > y2) && (x1 == x2)){
+                        angle = 1.5 * Math.PI;
+                    }
+                    //
+                    else if((y1 > y2) && (x1 < x2)){//boottom left
+                        angle = angleBase + Math.PI;
+                    }
+                    else if((y1 < y2) && (x1 < x2)){//top left
+                        angle = angleBase + Math.PI;
+                    }
+                    else if((y1 < y2) && (x1 > x2)){//top right
+                        angle = angleBase + 2 * Math.PI;
+                    }
+
+                }
+
+                return angle;
             }
 
         }//canvas
@@ -782,6 +836,8 @@ Rectangle {
                 bufferModel.SetData("Selected", false, 0);
                 let index = canvasPage.objectModel.InsertNewItem();
                 canvasPage.objectModel.CopyItemDataFromModel(index, bufferModel,0);
+
+                canvas.selectedIndex = index;
 
                 canvas.requestPaint();
             }
@@ -838,6 +894,8 @@ Rectangle {
 
         //remove object
         canvasPage.objectModel.RemoveItem(index);
+
+        canvas.selectedIndex = -1;
 
         canvas.requestPaint();
 
