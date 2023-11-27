@@ -715,6 +715,8 @@ Rectangle {
 
                 //for intersection margin
                 let angle
+                let offset
+
                 let hasMargin = true;
                 let complexIntersection = true;
                 if(hasMargin){
@@ -732,16 +734,26 @@ Rectangle {
                         add = angle  - quarter * Math.PI/2  < Math.PI/4 ? Math.abs(Math.cos(angle)) : Math.abs(Math.sin(angle))
                     }
 
-                    let offset = 20 * canvas.scaleCoeff * (1 + add);
+                    let smallAngle = Math.abs(angle  - (quarter + 0) * Math.PI/2) < (Math.PI/180) * 30
+                        || Math.abs(angle  - (quarter + 1) * Math.PI/2) < (Math.PI/180) * 30;
+                    if(smallAngle){
+                        //add = 0.5;
+                    }
+                    //offset length correction
+
+                    offset = 20 * canvas.scaleCoeff * (1 + add);
+
                     let newX = intersection.x + offset * Math.cos(angle)
                     let newY = intersection.y + offset * Math.sin(angle)
 
                     intersection = Qt.point(newX, newY);
 
                 }//for intersection margin
+
                 if(complexIntersection && hasMargin){
                     drawIntersectionExt(ctx, intersection,angle, selected);
-                    drawIntersectionArc(ctx, intersection, angle + Math.PI, selected)
+                    let selectedArc = canvas.linkSelected && canvas.hoverIndex == toIndex;
+                    drawIntersectionArc(ctx, intersection, angle + Math.PI, offset, selectedArc)
 
                 }
                 else {//simple
@@ -765,6 +777,7 @@ Rectangle {
                 let size = 16 * canvas.scaleCoeff
                 let sizeSmall = 8 * canvas.scaleCoeff
 
+                //draw white circle
                 ctx.lineWidth = 0.5 * canvas.scaleCoeff;
                 ctx.strokeStyle = "#ffffff";
                 ctx.fillStyle = "#ffffff";
@@ -773,6 +786,7 @@ Rectangle {
                 ctx.fill();
                 ctx.stroke();
 
+                //draw colored circle
                 ctx.strokeStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
                 ctx.fillStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
                 ctx.beginPath()
@@ -780,6 +794,7 @@ Rectangle {
                 ctx.fill();
                 ctx.stroke();
 
+                //draw tail
                 ctx.beginPath();
                 ctx.moveTo(intersection.x, intersection.y)
                 ctx.lineWidth = Math.max(canvas.scaleCoeff *1, 0.5);
@@ -791,7 +806,7 @@ Rectangle {
 
             }
 
-            function drawIntersectionArc(ctx, point, angle, selected){
+            function drawIntersectionArc(ctx, point, angle, offset, selected){
                 let rad = 8 * canvas.scaleCoeff;
                 let endAngle = 0.6 * Math.PI;
                 ctx.lineWidth = 2 * canvas.scaleCoeff;
@@ -802,6 +817,16 @@ Rectangle {
                 ctx.stroke();
                 ctx.beginPath()
                 ctx.arc(point.x, point.y, rad, angle , angle + endAngle, false);
+                ctx.stroke();
+
+                ctx.beginPath();//draw tail
+                let startX = point.x + rad * Math.cos(angle);
+                let startY = point.y  + rad * Math.sin(angle);
+                ctx.moveTo(startX, startY);
+                ctx.lineWidth = Math.max(canvas.scaleCoeff * 1.2, 0.6);
+                let finishX = startX + offset * Math.cos(angle)
+                let finishY = startY + offset * Math.sin(angle)
+                ctx.lineTo(finishX, finishY);
                 ctx.stroke();
 
             }
