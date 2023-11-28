@@ -9,18 +9,21 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="AdministrationPage" X="1050" Y="750" Note=""/>
-        <Element ComponentName="ButtonsPage" X="100" Y="450" Note=""/>
-        <Element ComponentName="CanvasPage" X="725" Y="725" Note=""/>
+        <Element ComponentName="ButtonsPage" X="100" Y="525" Note=""/>
+        <Element ComponentName="CanvasPage" X="525" Y="725" Note=""/>
         <Element ComponentName="Demultiplexer" X="575" Y="50" Note=""/>
         <Element ComponentName="DialogsRepresentaitonPage" X="850" Y="525" Note=""/>
-        <Element ComponentName="IndicatorsPage" X="400" Y="475" Note=""/>
-        <Element ComponentName="InputsPage" X="150" Y="525" Note=""/>
+        <Element ComponentName="GridViewPage" X="100" Y="300" Note=""/>
+        <Element ComponentName="IndicatorsPage" X="375" Y="575" Note=""/>
+        <Element ComponentName="InputsPage" X="150" Y="625" Note=""/>
         <Element ComponentName="MultiPageRepresentationController" X="275" Y="175" Note=""/>
-        <Element ComponentName="Pages" X="250" Y="350" Note=""/>
+        <Element ComponentName="Pages" X="250" Y="400" Note=""/>
         <Element ComponentName="PagesRepresentation" X="925" Y="300" Note=""/>
         <Element ComponentName="ProductsPage" X="1050" Y="675" Note=""/>
-        <Element ComponentName="TestPage" X="525" Y="725" Note=""/>
-        <Element ComponentName="ViewsPage" X="250" Y="600" Note=""/>
+        <Element ComponentName="TablePage" X="600" Y="300" Note=""/>
+        <Element ComponentName="TestPage" X="725" Y="725" Note=""/>
+        <Element ComponentName="TreeViewPage" X="375" Y="300" Note=""/>
+        <Element ComponentName="ViewsPage" X="250" Y="750" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

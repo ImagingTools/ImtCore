@@ -113,6 +113,27 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="GridViewPage" PackageId="ImtQmlPck" ComponentId="PageGuiElementModel">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Product"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Id" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="GridView"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="GridView"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageQmlItem" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="../../GridViewPage.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="StartQmlItem" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="../../GridViewPage.qml"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="IndicatorsPage" PackageId="ImtQmlPck" ComponentId="PageGuiElementModel">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -194,6 +215,9 @@
                                 <Value>ViewsPage</Value>
                                 <Value>IndicatorsPage</Value>
                                 <Value>DialogsRepresentaitonPage</Value>
+                                <Value>TablePage</Value>
+                                <Value>GridViewPage</Value>
+                                <Value>TreeViewPage</Value>
                                 <Value>CanvasPage</Value>
                                 <Value>TestPage</Value>
                             </Values>
@@ -235,6 +259,27 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="TablePage" PackageId="ImtQmlPck" ComponentId="PageGuiElementModel">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Product"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Id" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Table"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Table"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageQmlItem" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="../../TablePage.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="StartQmlItem" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="../../TablePage.qml"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="TestPage" PackageId="ImtQmlPck" ComponentId="PageGuiElementModel">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -252,6 +297,27 @@
                     </AttributeInfo>
                     <AttributeInfo Id="StartQmlItem" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="../../TestPage.qml"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TreeViewPage" PackageId="ImtQmlPck" ComponentId="PageGuiElementModel">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="IconPath" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Product"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Id" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="TreeView"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Name" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="TreeView"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PageQmlItem" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="../../TreeViewPage.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="StartQmlItem" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="../../TreeViewPage.qml"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
