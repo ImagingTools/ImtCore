@@ -413,7 +413,7 @@ Rectangle {
             property string compositeColor: "#bcd2e8";
             property string compositeSelectedColor: "#1167b1";
             property string selectedLinkColor: "#00ff00"//"#90EE90";
-            property string linkColor: "#335777";            
+            property string linkColor: "#335777";
             property string mainTextColor: "#000000";
             property string secondTextColor: "#808080";
             property string backgroundGridColor: "#add8e6";
@@ -478,6 +478,13 @@ Rectangle {
                 }
 
             }//onPaint
+
+            onPainted: {
+                if(pasteShortcut.prevSelectedIndex >= 0){
+                    canvas.selectedIndex = pasteShortcut.prevSelectedIndex;
+                    pasteShortcut.prevSelectedIndex = -1;
+                }
+            }
 
             function drawBackground(ctx){
                 let step = canvas.backgroundStep;
@@ -569,7 +576,7 @@ Rectangle {
                 ctx.strokeStyle = hasError ? canvas.errorColor : canvas.mainColor;
                 ctx.fillStyle = (!selected && !isComposite) ? canvas.backgroundColor :
                                                               (!selected && isComposite) ? canvas.compositeColor:
-                                                                    (selected && isComposite) ? canvas.compositeSelectedColor: (selected && !isComposite) ? canvas.selectedColor : canvas.backgroundColor;
+                                                                                           (selected && isComposite) ? canvas.compositeSelectedColor: (selected && !isComposite) ? canvas.selectedColor : canvas.backgroundColor;
                 ctx.beginPath()
                 ctx.roundedRect(x_, y_, mainRecWidth, canvas.mainRec_height, canvas.radius_, canvas.radius_);
                 ctx.fill();
@@ -928,14 +935,17 @@ Rectangle {
             if(canvas.selectedIndex >= 0){
                 bufferModel.Clear();
                 bufferModel.CopyItemDataFromModel(0, canvasPage.objectModel, canvas.selectedIndex);
-                console.log("bufferModel:: ", bufferModel.toJSON());
+                //console.log("bufferModel:: ", bufferModel.toJSON());
             }
         }
     }
 
     Shortcut {
+        id: pasteShortcut;
+
         sequence: "Ctrl+V";
         enabled: true;
+        property int prevSelectedIndex: -1;
         onActivated: {
             console.log("Ctrl+V");
             if(bufferModel.GetItemsCount()){
@@ -958,9 +968,12 @@ Rectangle {
                 let index = canvasPage.objectModel.InsertNewItem();
                 canvasPage.objectModel.CopyItemDataFromModel(index, bufferModel,0);
 
+                prevSelectedIndex = canvas.selectedIndex;
+
                 canvas.selectedIndex = index;
 
                 canvas.requestPaint();
+
             }
 
         }
