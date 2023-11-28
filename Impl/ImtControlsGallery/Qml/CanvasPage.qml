@@ -375,43 +375,51 @@ Rectangle {
 
             id: canvas
 
-            anchors.fill: parent
+            anchors.fill: parent;
 
-            antialiasing: true
-
-            property color strokeStyle:  "#ff6600"
-            property color fillStyle: "#ff6600"
-            property int lineWidth: 2 * scaleCoeff;
+            antialiasing: true;
 
             property real scaleCoeff: 1.;
 
-            //variables
-            property real mainRec_width: 250 * scaleCoeff;
-            property real mainRec_height: 60 * scaleCoeff;
-
             property int selectedIndex: -1;
             property int hoverIndex: -1;
+            property bool linkSelected: false;
+
+            //sizes
+            property real mainRec_width: 250 * scaleCoeff;
+            property real mainRec_height: 60 * scaleCoeff;
 
             property int fontSize: 20 * scaleCoeff;
             property int fontSizeSmall: 14 * scaleCoeff;
             property int radius_: 2 * scaleCoeff;
             property int borderShift: 4 * scaleCoeff;
-
-            property string imageUrl_1: "../../../" + Style.theme + "/Icons" + "/AppIcon.svg"
-            property string imageUrl_2: "../../../" + Style.theme + "/Icons" + "/Sickle.svg"
+            property int shadowSize: 6 * scaleCoeff;
+            property int backgroundStep: 30 * scaleCoeff;
+            property int intersectionSize: 16 * scaleCoeff;
+            property int arcRadius: 8 * scaleCoeff;
+            property int textMargin: 8 * canvas.scaleCoeff;
+            property int textVerticalOffset: 22 * canvas.scaleCoeff;
             property real imageSize: 20 * scaleCoeff;
             property real imageMargin: 4 * scaleCoeff;
 
+            //image urls
+            property string imageUrl_1: "../../../" + Style.theme + "/Icons" + "/AppIcon.svg"
+            property string imageUrl_2: "../../../" + Style.theme + "/Icons" + "/Sickle.svg"
+
+            //colors
             property string selectedColor: "#00ff00"//"#90EE90";
             property string mainColor: "#335777";
             property string errorColor: "#ff0000";
             property string compositeColor: "#bcd2e8";
             property string compositeSelectedColor: "#1167b1";
-
             property string selectedLinkColor: "#00ff00"//"#90EE90";
-            property string linkColor: "#335777";
-            property bool linkSelected: false;
-            //variables
+            property string linkColor: "#335777";            
+            property string mainTextColor: "#000000";
+            property string secondTextColor: "#808080";
+            property string backgroundGridColor: "#add8e6";
+            property string backgroundColor: "#ffffff";
+            property string innerFrameColor: "#808080";
+
 
             Component.onCompleted: {
                 loadImage(imageUrl_1);
@@ -472,13 +480,13 @@ Rectangle {
             }//onPaint
 
             function drawBackground(ctx){
-                let step = 30 * canvas.scaleCoeff;
+                let step = canvas.backgroundStep;
 
                 ctx.lineCap = "round"
                 ctx.lineJoin = "round"
                 ctx.lineWidth = 1;
-                ctx.strokeStyle = "#add8e6"
-                ctx.fillStyle = "#add8e6"
+                ctx.strokeStyle = canvas.backgroundGridColor;
+                ctx.fillStyle = canvas.backgroundGridColor;
 
                 for(let i = 1; i * step < canvas.width; i++){//vertical lines
                     let x1 = i * step;
@@ -549,58 +557,58 @@ Rectangle {
                 let mainRecWidth = setObjectWidth(ctx, index);
 
                 //shadow rectangle
-                let shadowSize = 6 * canvas.scaleCoeff;
-                ctx.lineWidth = canvas.lineWidth;
+                let shadowSize = canvas.shadowSize;
+                ctx.lineWidth = 2 * canvas.scaleCoeff;
                 ctx.fillStyle = selected ? Qt.rgba(0.2, 0.8, 0, 0.3) : Qt.rgba(0, 0, 0, 0.2);
                 ctx.beginPath()
                 ctx.roundedRect(x_ + shadowSize, y_ + shadowSize, mainRecWidth, canvas.mainRec_height, canvas.radius_, canvas.radius_);
                 ctx.fill();
 
                 //main rectangle
-                ctx.lineWidth = canvas.lineWidth;
+                ctx.lineWidth = 2 * canvas.scaleCoeff;
                 ctx.strokeStyle = hasError ? canvas.errorColor : canvas.mainColor;
-                ctx.fillStyle = (!selected && !isComposite) ? "#ffffff" :
+                ctx.fillStyle = (!selected && !isComposite) ? canvas.backgroundColor :
                                                               (!selected && isComposite) ? canvas.compositeColor:
-                                                                    (selected && isComposite) ? canvas.compositeSelectedColor: (selected && !isComposite) ? canvas.selectedColor : "#ffffff";
+                                                                    (selected && isComposite) ? canvas.compositeSelectedColor: (selected && !isComposite) ? canvas.selectedColor : canvas.backgroundColor;
                 ctx.beginPath()
                 ctx.roundedRect(x_, y_, mainRecWidth, canvas.mainRec_height, canvas.radius_, canvas.radius_);
                 ctx.fill();
                 ctx.stroke();
 
                 //inner rectangle
-                ctx.strokeStyle = "#808080"
+                ctx.strokeStyle = canvas.innerFrameColor;
 
                 ctx.beginPath()
                 ctx.roundedRect(x_ + canvas.borderShift, y_ + canvas.borderShift, mainRecWidth - 2 * canvas.borderShift, canvas.mainRec_height - 2 * canvas.borderShift, canvas.radius_, canvas.radius_);
                 ctx.stroke();
 
                 //Main text
-                ctx.strokeStyle = "#000000"
-                ctx.fillStyle = "#000000"
+                ctx.strokeStyle = canvas.mainTextColor;
+                ctx.fillStyle = canvas.mainTextColor;
                 ctx.lineWidth = 1;
                 let fontStr = String(canvas.fontSize) + "px sans-serif"
                 ctx.font = fontStr; //"20px sans-serif";
                 let textStr = mainText
                 let textWidth = ctx.measureText(mainText).width
 
-                let text_x = x_ + canvas.borderShift + 8 * canvas.scaleCoeff;
-                let text_y = y_ + canvas.borderShift + 22 * canvas.scaleCoeff;
+                let text_x = x_ + canvas.borderShift + canvas.textMargin;
+                let text_y = y_ + canvas.borderShift + canvas.textVerticalOffset;
 
                 ctx.beginPath()
                 ctx.fillText(textStr, text_x, text_y);
                 ctx.strokeText(textStr, text_x, text_y);
 
                 //Second text
-                ctx.strokeStyle = "#808080"
-                ctx.fillStyle = "#808080"
+                ctx.strokeStyle = canvas.secondTextColor;
+                ctx.fillStyle = canvas.secondTextColor;
                 ctx.lineWidth = 0.5;
                 let fontStr2 = String(canvas.fontSizeSmall) + "px sans-serif"
                 ctx.font = fontStr2;
                 let textStr2 = secondText;
                 let textWidth2 = ctx.measureText(secondText).width
 
-                let text_x2 = x_ + canvas.borderShift + 8 * canvas.scaleCoeff;
-                let text_y2 = y_ + canvas.mainRec_height - canvas.borderShift - 8 * canvas.scaleCoeff;
+                let text_x2 = x_ + canvas.borderShift + canvas.textMargin;
+                let text_y2 = y_ + canvas.mainRec_height - canvas.borderShift - canvas.textMargin;
 
                 ctx.beginPath()
                 ctx.fillText(textStr2, text_x2, text_y2);
@@ -788,7 +796,7 @@ Rectangle {
             }
 
             function drawIntersection(ctx, intersection, selected){
-                let size = 16 * canvas.scaleCoeff
+                let size = canvas.intersectionSize;
 
                 ctx.lineWidth = 0.5 * canvas.scaleCoeff;
                 ctx.strokeStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
@@ -800,13 +808,13 @@ Rectangle {
             }
 
             function drawIntersectionExt(ctx, intersection, angle, selected){
-                let size = 16 * canvas.scaleCoeff
-                let sizeSmall = 8 * canvas.scaleCoeff
+                let size = canvas.intersectionSize;
+                let sizeSmall = size/2;
 
                 //draw white circle
                 ctx.lineWidth = 0.5 * canvas.scaleCoeff;
-                ctx.strokeStyle = "#ffffff";
-                ctx.fillStyle = "#ffffff";
+                ctx.strokeStyle = canvas.backgroundColor;
+                ctx.fillStyle = canvas.backgroundColor;
                 ctx.beginPath()
                 ctx.roundedRect(intersection.x - size/2, intersection.y  - size/2, size, size, size, size);
                 ctx.fill();
@@ -833,7 +841,7 @@ Rectangle {
             }
 
             function drawIntersectionArc(ctx, point, angle, offset, selected){
-                let rad = 8 * canvas.scaleCoeff;
+                let rad = canvas.arcRadius;
                 let endAngle = 0.6 * Math.PI;
                 ctx.lineWidth = 2 * canvas.scaleCoeff;
                 ctx.strokeStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
