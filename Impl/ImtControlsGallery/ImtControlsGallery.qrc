@@ -9,5 +9,8 @@
         <file alias="DialogsRepresentaitonPage.qml">Qml/DialogsRepresentaitonPage.qml</file>
         <file alias="TestPage.qml">Qml/TestPage.qml</file>
         <file alias="CanvasPage.qml">Qml/CanvasPage.qml</file>
+        <file alias="TablePage.qml">Qml/TablePage.qml</file>
+        <file alias="GridViewPage.qml">Qml/GridViewPage.qml</file>
+        <file alias="TreeViewPage.qml">Qml/TreeViewPage.qml</file>
     </qresource>
 </RCC>
