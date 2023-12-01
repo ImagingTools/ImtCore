@@ -90,11 +90,12 @@ Item {
     Text {
         id: mainText;
 
-        anchors.left: icon2.source != "" ? iconItem2.right : parent.left;
-        anchors.leftMargin: !popupMenuDelegate.textCentered ? 10 : (parent.width - width)/2;
-        anchors.right: parent.right;
-        anchors.rightMargin: 10;
+        anchors.left: !popupMenuDelegate.textCentered ? icon2.source != "" ? iconItem2.right : parent.left : undefined;
+        anchors.leftMargin: !popupMenuDelegate.textCentered ? 10 : 0;
+        anchors.right: !popupMenuDelegate.textCentered ? parent.right : undefined;
+        anchors.rightMargin: !popupMenuDelegate.textCentered ? 10 : 0;
         anchors.verticalCenter: parent.verticalCenter;
+        anchors.horizontalCenter: popupMenuDelegate.textCentered ? parent.horizontalCenter : undefined;
 
         color: popupMenuDelegate.fontColor;
         font.pixelSize: popupMenuDelegate.textSize;
