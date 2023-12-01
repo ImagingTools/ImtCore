@@ -20,9 +20,11 @@ class Loader extends Item {
         loaded: { params: [] },
     }
 
+    $widthAuto = true
+    $heightAuto = true
     $complete(){
-        this.$widthAuto = this.getProperty('width').auto
-        this.$heightAuto = this.getProperty('height').auto
+        // this.$widthAuto = this.getProperty('width').auto
+        // this.$heightAuto = this.getProperty('height').auto
 
         this.$completed = true
         if(this.$lazy){
@@ -34,10 +36,12 @@ class Loader extends Item {
     }
 
     $sourceComponentChanged(){
-        if(!this.$completed) {
-            this.$lazy = this.getProperty('sourceComponent').getNotify()
-            return
-        }
+        // if(this.$widthAuto && this.getProperty('width').compute) this.$widthAuto = false
+        // if(this.$heightAuto && this.getProperty('height').compute) this.$heightAuto = false
+        // if(!this.$completed) {
+        //     this.$lazy = this.getProperty('sourceComponent').getNotify()
+        //     return
+        // }
 
         this.getStatement('status').reset(Loader.Loading)
 
@@ -52,16 +56,18 @@ class Loader extends Item {
             // item.getProperty('y').getNotify().connect(()=>{
             //     this.getProperty('y').setAuto(item.getPropertyValue('y'))
             // })
-            item.getProperty('width').getNotify().connect(()=>{
+            if(item instanceof Item){
+                item.getProperty('width').getNotify().connect(()=>{
+                    this.getProperty('width').setAuto(item.getPropertyValue('width'))
+                })
+                item.getProperty('height').getNotify().connect(()=>{
+                    this.getProperty('height').setAuto(item.getPropertyValue('height'))
+                })
+                // this.getProperty('x').setAuto(item.getPropertyValue('x'))
+                // this.getProperty('y').setAuto(item.getPropertyValue('y'))
                 this.getProperty('width').setAuto(item.getPropertyValue('width'))
-            })
-            item.getProperty('height').getNotify().connect(()=>{
                 this.getProperty('height').setAuto(item.getPropertyValue('height'))
-            })
-            // this.getProperty('x').setAuto(item.getPropertyValue('x'))
-            // this.getProperty('y').setAuto(item.getPropertyValue('y'))
-            this.getProperty('width').setAuto(item.getPropertyValue('width'))
-            this.getProperty('height').setAuto(item.getPropertyValue('height'))
+            }
             
 
             for(let update of updateList.splice(0, updateList.length)){
@@ -83,21 +89,22 @@ class Loader extends Item {
             //     })
             //     item.getProperty('y').update()
             // }
+            if(item instanceof Item){
+                if(!this.$widthAuto) {
+                    item.getProperty('width').setCompute(()=>{
+                        item.getProperty('width').subscribe(this.getProperty('width'))
+                        return this.getPropertyValue('width')
+                    })
+                    item.getProperty('width').update()
+                }
 
-            if(!this.$widthAuto) {
-                item.getProperty('width').setCompute(()=>{
-                    item.getProperty('width').subscribe(this.getProperty('width'))
-                    return this.getPropertyValue('width')
-                })
-                item.getProperty('width').update()
-            }
-
-            if(!this.$heightAuto) {
-                item.getProperty('height').setCompute(()=>{
-                    item.getProperty('height').subscribe(this.getProperty('height'))
-                    return this.getPropertyValue('height')
-                })
-                item.getProperty('height').update()
+                if(!this.$heightAuto) {
+                    item.getProperty('height').setCompute(()=>{
+                        item.getProperty('height').subscribe(this.getProperty('height'))
+                        return this.getPropertyValue('height')
+                    })
+                    item.getProperty('height').update()
+                }
             }
 
             item.$complete()
@@ -119,10 +126,10 @@ class Loader extends Item {
     }
 
     $sourceChanged(){
-        if(!this.$completed) {
-            this.$lazy = this.getProperty('source').getNotify()
-            return
-        }
+        // if(!this.$completed) {
+        //     this.$lazy = this.getProperty('source').getNotify()
+        //     return
+        // }
 
         this.getStatement('status').reset(Loader.Loading)
 
@@ -133,7 +140,12 @@ class Loader extends Item {
             let fullPath = [].concat(this.$path ? this.$path.split('_') : [], path.split('_'))
             let dotIndex = fullPath.indexOf('..')
             while(dotIndex >= 0){
-                fullPath.splice(dotIndex-1, 2)
+                if(dotIndex > 0){
+                    fullPath.splice(dotIndex-1, 2)
+                } else {
+                    fullPath.splice(dotIndex, 2)
+                }
+                
                 dotIndex = fullPath.indexOf('..')
             }
 
@@ -146,12 +158,15 @@ class Loader extends Item {
             // item.getProperty('y').getNotify().connect(()=>{
             //     this.getProperty('y').setAuto(item.getPropertyValue('y'))
             // })
-            item.getProperty('width').getNotify().connect(()=>{
-                this.getProperty('width').setAuto(item.getPropertyValue('width'))
-            })
-            item.getProperty('height').getNotify().connect(()=>{
-                this.getProperty('height').setAuto(item.getPropertyValue('height'))
-            })
+            if(item instanceof Item){
+                item.getProperty('width').getNotify().connect(()=>{
+                    this.getProperty('width').setAuto(item.getPropertyValue('width'))
+                })
+                item.getProperty('height').getNotify().connect(()=>{
+                    this.getProperty('height').setAuto(item.getPropertyValue('height'))
+                })
+            }
+            
             // this.getProperty('x').setAuto(item.getPropertyValue('x'))
             // this.getProperty('y').setAuto(item.getPropertyValue('y'))
             this.getProperty('width').setAuto(item.getPropertyValue('width'))
@@ -178,20 +193,22 @@ class Loader extends Item {
             //     item.getProperty('y').update()
             // }
 
-            if(!this.$widthAuto) {
-                item.getProperty('width').setCompute(()=>{
-                    item.getProperty('width').subscribe(this.getProperty('width'))
-                    return this.getPropertyValue('width')
-                })
-                item.getProperty('width').update()
-            }
+            if(item instanceof Item){
+                if(!this.$widthAuto) {
+                    item.getProperty('width').setCompute(()=>{
+                        item.getProperty('width').subscribe(this.getProperty('width'))
+                        return this.getPropertyValue('width')
+                    })
+                    item.getProperty('width').update()
+                }
 
-            if(!this.$heightAuto) {
-                item.getProperty('height').setCompute(()=>{
-                    item.getProperty('height').subscribe(this.getProperty('height'))
-                    return this.getPropertyValue('height')
-                })
-                item.getProperty('height').update()
+                if(!this.$heightAuto) {
+                    item.getProperty('height').setCompute(()=>{
+                        item.getProperty('height').subscribe(this.getProperty('height'))
+                        return this.getPropertyValue('height')
+                    })
+                    item.getProperty('height').update()
+                }
             }
 
             item.$complete()

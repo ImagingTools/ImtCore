@@ -78,6 +78,7 @@ class QProperty {
     }
 
     setCompute(compute){
+        // updateList.push(this)
         this.compute = compute
         this.completed = false
     }
@@ -417,15 +418,36 @@ class QAlias extends QProperty {
         if(!this.completed){
             this.update()
         }   
-        return this.getTargetProperty().get()
+        let targetProperty = this.getTargetProperty()
+        if(targetProperty instanceof QProperty) {
+            return targetProperty.get()
+        } else {
+            return targetProperty
+        }
+        
     }
 
     set(newValue){
         let targetProperty = this.getTargetProperty()
         let safeValue = targetProperty instanceof QProperty ? this.getTargetProperty().typeCasting.call(this, newValue) : newValue
-        if(safeValue !== this.value || safeValue !== targetProperty.value){
+        if(safeValue !== this.value || ((targetProperty instanceof QProperty) && safeValue !== targetProperty.value)){
             this.value = safeValue
             if(targetProperty instanceof QProperty) {
+                if(this.compute){
+                //     // targetProperty.update()
+                //     if(targetProperty.compute){
+                //         global.queueLink.push(targetProperty)
+                //         try {
+                //             targetProperty.compute()
+                //         } catch (error) {
+                            
+                //         } finally {
+                //             global.queueLink.pop()
+                //         }   
+                //     } 
+
+                    targetProperty.updating = true
+                }
                 if(targetProperty.auto){
                     targetProperty.setAuto(safeValue)
                 } else {
@@ -457,7 +479,10 @@ class QAlias extends QProperty {
         this.updating = true
         global.queueLink.push(this)
         let value = this.value
-        if(this.getTargetProperty) this.subscribe(this.getTargetProperty())
+        
+        let targetProperty = this.getTargetProperty()
+        if(targetProperty instanceof QProperty) this.subscribe(targetProperty)
+
         try {
             value = this.compute ? this.compute() : this.getTargetProperty().get()
         } catch (error) {

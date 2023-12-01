@@ -79,6 +79,7 @@ for(let componentName of listComponents){
                 this.getProperty(propName).reset(newVal)
             }
         })
+        if(!component.defaultProperties[propName].signalWithout)
         Object.defineProperty(component.prototype, propName+'Changed', {
             get: function(){
                 return this.getProperty(propName).getNotify()

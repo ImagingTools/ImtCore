@@ -10,7 +10,7 @@ for(let componentName of listComponents){
 }
 const listProperties = require('../utils/properties')
 
-const source = process.argv[2] || '../test/qml'
+const source = process.argv[2] || '../test/qml'// 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src' // 
 if(!source) throw 'error: source not specified'
 
 function getFiles (dir, _files){
@@ -528,7 +528,7 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
         case 'name': {
             if(tree[1] === 'parent') {
                 stat.compute = true
-                stat.value.push(`${currentInstructions.name}.parent()`)
+                stat.value.push(`${currentInstructions.name}.parent`)
             } else if(tree[1] in compiledFile.context){
                 stat.compute = true
                 stat.value.push(`inCtx.get('${tree[1]}')`)
@@ -619,7 +619,6 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
             break
         }
         case 'unary-prefix': {
-            stat.compute = true
             if(tree[1] === 'typeof'){
                 stat.value.push(`${tree[1]} `)
             } else {
@@ -627,13 +626,14 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
             }
             
             prepare(tree[2], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)  
+
             stat.value.push('\n')
             break
         }
         case 'unary-postfix': {
-            stat.compute = true
             prepare(tree[2], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
             stat.value.push(tree[1])
+
             stat.value.push('\n')
             break
         }
@@ -880,8 +880,12 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
     }
 
     let special = false
+    let isLoader = false
     let tempInstruction = currentInstructions
     while(tempInstruction){
+        if(tempInstruction.className === 'Loader'){
+            isLoader = true
+        }
         if(tempInstruction.className === 'Loader' || tempInstruction.className === 'Repeater' || tempInstruction.className === 'ListView' || tempInstruction.className === 'GridView'){
             special = true
         }
@@ -909,6 +913,12 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
 
         for(let i = 0; i < pathName.length; i++){
             pathName[i] = `getStatement('${pathName[i]}')`
+        }
+        if(isLoader){
+            if(property.name === 'anchors.fill'){
+                code.push(`${currentInstructions.name}.$widthAuto=false`)
+                code.push(`${currentInstructions.name}.$heightAuto=false`)
+            }
         }
         let stat = {
             return: false,
@@ -1064,6 +1074,16 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             type: property.type,
             params: [],
         }
+
+        if(isLoader){
+            if(property.name === 'width'){
+                code.push(`${currentInstructions.name}.$widthAuto=false`)
+            }
+            if(property.name === 'height'){
+                code.push(`${currentInstructions.name}.$heightAuto=false`)
+            }
+        }
+        
         if(property.isElement){
             if(property.command === 'create' && property.val.className !== 'Component'){
                 if(property.type === 'Component'){  
@@ -1079,7 +1099,8 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
                 } else {
                     treeCompile(compiledFile, property.val)
                     if(listProperties[property.type]){
-                        code.push(`${currentInstructions.name}.${property.name} = new ${property.type}(${property.val.name})`)
+                        // code.push(`${currentInstructions.name}.${property.name} = new ${property.type}(${property.val.name})`)
+                        code.push(`${currentInstructions.name}.createProperty('${property.name}',${property.type},${property.val.name})`)
                     } else {
                         code.push(`${currentInstructions.name}.createVariantProperty('${property.name}',${property.type},${property.val.name})`)
                     }
@@ -1101,6 +1122,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
                     
                 } else {
                     treeCompile(compiledFile, property.val)
+                    // code.push(`${currentInstructions.name}.createVariantProperty('${property.name}',${property.type},${property.val.name})`)
                     code.push(`${currentInstructions.name}.${property.name} = ${property.val.name}`)
 
                 }

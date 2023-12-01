@@ -24,11 +24,11 @@ class Canvas extends Item {
     }
 
     createDom(tag = 'canvas', style){
-        if(this.parent() && this.parent().$dom){
+        if(this.parent && this.parent.$dom){
             this.$dom = document.createElement('canvas')
-            this.parent().$dom.appendChild(this.$dom)
+            this.parent.$dom.appendChild(this.$dom)
             this.setStyle(style)
-            this.parent().addDomChild(this)
+            this.parent.addDomChild(this)
             this.$dom.id = this.UID
             this.$dom.classList.add(this.constructor.name)
         }

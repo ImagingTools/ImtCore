@@ -10,6 +10,7 @@ class ComplexObject {
 
     createProperty(name, type, value){
         this.$properties[name] = new type(value)
+        // updateList.push(this.$properties[name])
         // this.$properties[name].debug = true
         // this.$properties[name].id = this.$id
         Object.defineProperty(this, name, {
@@ -23,6 +24,8 @@ class ComplexObject {
                 this.getProperty(name).reset(newVal)
             }
         })
+
+        // if(!(type instanceof QModelData))
         Object.defineProperty(this, name+'Changed', {
             get: function(){
                 return this.getProperty(name).getNotify()
@@ -32,6 +35,7 @@ class ComplexObject {
 
     createVariantProperty(name, type, value){
         this.$properties[name] = new QVariant(value, type)
+        // updateList.push(this.$properties[name])
         Object.defineProperty(this, name, {
             get: function(){
                 let property = this.getProperty(name)
@@ -43,6 +47,7 @@ class ComplexObject {
                 this.getProperty(name).reset(newVal)
             }
         })
+        // if(!(type instanceof QModelData))
         Object.defineProperty(this, name+'Changed', {
             get: function(){
                 return this.getProperty(name).getNotify()

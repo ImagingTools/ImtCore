@@ -1,11 +1,11 @@
 const { ComplexObject } = require('../utils/base')
-const { QVar, QReal } = require('../utils/properties')
+const { QVar, QReal, QModelData } = require('../utils/properties')
 const { QSignal } = require('../utils/signal')
 
 var UID = 0
 class QObject extends ComplexObject {
     static defaultProperties = {
-        model: { type: QVar, value: undefined },
+        model: { type: QVar, value: undefined, signalWithout: true },
         index: { type: QReal, value: 0 },
         context: { type: QVar, value: undefined },
     }
@@ -33,11 +33,11 @@ class QObject extends ComplexObject {
                 
             }
 
-            if(!(this instanceof Repeater) && !(this instanceof ListView) && !(this instanceof GridView) && !(this instanceof ListElement)) this.getStatement('model').setCompute(()=>{return this.parent().model})
+            if(!(this instanceof Repeater) && !(this instanceof ListView) && !(this instanceof GridView) && !(this instanceof ListElement)) this.getStatement('model').setCompute(()=>{return this.parent.model})
             
             if(!(this instanceof ListElement)) {
-                this.getStatement('index').setCompute(()=>{return this.parent().index})
-                this.getStatement('context').setCompute(()=>{return this.parent().context})
+                this.getStatement('index').setCompute(()=>{return this.parent.index})
+                this.getStatement('context').setCompute(()=>{return this.parent.context})
             }
 
             if(this instanceof Item){
@@ -69,10 +69,6 @@ class QObject extends ComplexObject {
         }
     }
 
-    parent(){
-        return this.$parent
-    }
-
     children(){
         if(!this.$children) this.$children = []
 
@@ -80,7 +76,7 @@ class QObject extends ComplexObject {
     }
 
     setParent(parent){
-        this.$parent = parent
+        this.parent = parent
     }
 
     addChild(child){
@@ -114,15 +110,15 @@ class QObject extends ComplexObject {
             this.$signals[sigName].destroy()
         }
 
-        if(this.$parent) {
-            let index = this.$parent.$children.indexOf(this)
-            if(index >= 0) this.$parent.$children.splice(index, 1)
+        if(this.parent) {
+            let index = this.parent.$children.indexOf(this)
+            if(index >= 0) this.parent.$children.splice(index, 1)
 
-            index = this.$parent.$resources.indexOf(this)
-            if(index >= 0) this.$parent.$resources.splice(index, 1)
+            index = this.parent.$resources.indexOf(this)
+            if(index >= 0) this.parent.$resources.splice(index, 1)
 
-            index = this.$parent.$data.indexOf(this)
-            if(index >= 0) this.$parent.$data.splice(index, 1)
+            index = this.parent.$data.indexOf(this)
+            if(index >= 0) this.parent.$data.splice(index, 1)
         }
         for(let i = this.$children.length - 1; i >= 0; i--){
             this.$children[i].$destroy()

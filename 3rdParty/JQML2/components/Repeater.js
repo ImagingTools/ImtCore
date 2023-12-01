@@ -56,13 +56,13 @@ class Repeater extends Item {
     createElement(index){
         if(this.$items[index]) return this.$items[index]
         if(typeof this.getPropertyValue('model') === 'number'){
-            let obj = this.delegate.get().createObject(this.parent(), this.$exCtx)
+            let obj = this.delegate.get().createObject(this.parent, this.$exCtx)
             obj.getStatement('index').reset(index)
             obj.getStatement('model').reset({index: index})
             this.$items[index] = obj
         } else {
             let model = this.getPropertyValue('model').getPropertyValue('data')[index]
-            let obj = this.delegate.get().createObject(this.parent(), this.$exCtx)
+            let obj = this.delegate.get().createObject(this.parent, this.$exCtx)
             obj.getStatement('index').setCompute(()=>{return model.index})
             obj.getStatement('index').update()
             obj.getStatement('model').reset(model)
@@ -86,12 +86,12 @@ class Repeater extends Item {
             }
         }
 
-        this.parent().preventAutoUpdateGeometry = true
+        this.parent.preventAutoUpdateGeometry = true
         for(let i = 0; i < this.$items.length.get(); i++){
             this.createElement(i)
         }
-        delete this.parent().preventAutoUpdateGeometry
-        if(this.parent().updateGeometry) this.parent().updateGeometry()
+        delete this.parent.preventAutoUpdateGeometry
+        if(this.parent.updateGeometry) this.parent.updateGeometry()
         this.getProperty('count').reset(this.$items.length)
     }
 

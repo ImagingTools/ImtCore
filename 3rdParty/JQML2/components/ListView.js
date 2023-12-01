@@ -361,7 +361,10 @@ class ListView extends Flickable {
 
     onMouseMove(x, y){
         if(this.getPropertyValue('enabled') && this.getPropertyValue('visible') && this.getPropertyValue('interactive')) {
-
+            if(this.getPropertyValue('contentHeight') <= this.getPropertyValue('height')){
+                this.getStatement('contentY').reset(0)
+                return true
+            }
             if(this.getPropertyValue('contentY') + (this.$mouseY - y) > this.getPropertyValue('originY') && this.getPropertyValue('contentY') + (this.$mouseY - y) < this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height')){
                 this.getStatement('contentY').reset(this.getPropertyValue('contentY') + (this.$mouseY - y))
                 return false
@@ -383,6 +386,14 @@ class ListView extends Flickable {
 
     onWheel(x, y, deltaX, deltaY){
         if(this.getPropertyValue('enabled') && this.getPropertyValue('visible') && this.getPropertyValue('interactive')){
+            if(this.getPropertyValue('contentHeight') <= this.getPropertyValue('height')){
+                this.getStatement('contentY').reset(0)
+                return true
+            }
+            if(this.getPropertyValue('contentWidth') <= this.getPropertyValue('width')){
+                this.getStatement('contentX').reset(0)
+                return true
+            }
             // this.getStatement('contentX').reset(this.getStatement('contentX').get()+deltaX)
             // this.getStatement('contentY').reset(this.getStatement('contentY').get()+deltaY)
             if(this.getPropertyValue('contentY') + deltaY > this.getPropertyValue('originY') && this.getPropertyValue('contentY') + deltaY < this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height')){

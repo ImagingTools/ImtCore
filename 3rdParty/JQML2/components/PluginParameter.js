@@ -14,12 +14,12 @@ class PluginParameter extends QtObject {
     }
 
     $parameterChanged(){
-        this.parent().getProperty('parameters').getNotify()()
+        this.parent.getProperty('parameters').getNotify()()
     }
 
     $destroy(){
-        let index = this.parent().getPropertyValue('parameters').indexOf(this)
-        if(index >= 0) this.parent().getPropertyValue('parameters').splice(index, 1)
+        let index = this.parent.getPropertyValue('parameters').indexOf(this)
+        if(index >= 0) this.parent.getPropertyValue('parameters').splice(index, 1)
     }
 }
 

@@ -116,11 +116,11 @@ class Item extends QtObject {
     }
     
     createDom(tag = 'div', style){
-        if(this.parent() && this.parent().$dom){
+        if(this.parent && this.parent.$dom){
             this.$dom = document.createElement(tag)
-            this.parent().$dom.appendChild(this.$dom)
+            this.parent.$dom.appendChild(this.$dom)
             this.setStyle(style)
-            this.parent().addDomChild(this)
+            this.parent.addDomChild(this)
             this.$dom.id = this.UID
             this.$dom.classList.add(this.constructor.name)
         }
@@ -265,7 +265,7 @@ class Item extends QtObject {
             this.getProperty('y').freeze()
             this.getProperty('height').freeze()
 
-            if(this.parent() === this.getProperty('anchors').getProperty('fill').get()){
+            if(this.parent === this.getProperty('anchors').getProperty('fill').get()){
                 this.getProperty('x').setCompute(()=>{
                     this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('leftMargin'))
                     return this.getProperty('anchors').getProperty('leftMargin').get()
@@ -300,7 +300,7 @@ class Item extends QtObject {
             this.getProperty('x').freeze()
             this.getProperty('y').freeze()
 
-            if(this.parent() === this.getProperty('anchors').getProperty('centerIn').get()){
+            if(this.parent === this.getProperty('anchors').getProperty('centerIn').get()){
                 this.getProperty('x').setCompute(()=>{
                     this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('centerIn').get().getProperty('width'), this.getProperty('width'), this.getProperty('anchors').getProperty('leftMargin'), this.getProperty('anchors').getProperty('rightMargin'))
                     return this.getProperty('anchors').getProperty('centerIn').get().getProperty('width').get() / 2 - this.getProperty('width').get() / 2
@@ -326,7 +326,7 @@ class Item extends QtObject {
                 this.getProperty('x').freeze()
                 this.getProperty('width').freeze()
 
-                if(this.parent() === this.getProperty('anchors').getProperty('left').get().target){
+                if(this.parent === this.getProperty('anchors').getProperty('left').get().target){
                     if(this.getProperty('anchors').getProperty('left').get().float === QAnchorLine.Left){
                         this.getProperty('x').setCompute(()=>{
                             this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('leftMargin'))
@@ -352,7 +352,7 @@ class Item extends QtObject {
                         })
                     }
                 }
-                if(this.parent() === this.getProperty('anchors').getProperty('right').get().target){
+                if(this.parent === this.getProperty('anchors').getProperty('right').get().target){
                     if(this.getProperty('anchors').getProperty('right').get().float === QAnchorLine.Left){
                         this.getProperty('width').setCompute(()=>{
                             this.getProperty('width').subscribePrimary(this.getProperty('x'), this.getProperty('anchors').getProperty('rightMargin'))
@@ -384,7 +384,7 @@ class Item extends QtObject {
             } else if(this.getProperty('anchors').getPropertyValue('left')){
                 this.getProperty('x').freeze()
 
-                if(this.parent() === this.getProperty('anchors').getProperty('left').get().target){
+                if(this.parent === this.getProperty('anchors').getProperty('left').get().target){
                     if(this.getProperty('anchors').getProperty('left').get().float === QAnchorLine.Left){
                         this.getProperty('x').setCompute(()=>{
                             this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('leftMargin'))
@@ -414,7 +414,7 @@ class Item extends QtObject {
             } else if(this.getProperty('anchors').getPropertyValue('right')){
                 this.getProperty('x').freeze()
 
-                if(this.parent() === this.getProperty('anchors').getProperty('right').get().target){
+                if(this.parent === this.getProperty('anchors').getProperty('right').get().target){
                     if(this.getProperty('anchors').getProperty('right').get().float === QAnchorLine.Left){
                         this.getProperty('x').setCompute(()=>{
                             this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('rightMargin'))
@@ -448,7 +448,7 @@ class Item extends QtObject {
                 this.getProperty('y').freeze()
                 this.getProperty('height').freeze()
 
-                if(this.parent() === this.getProperty('anchors').getProperty('top').get().target){
+                if(this.parent === this.getProperty('anchors').getProperty('top').get().target){
                     if(this.getProperty('anchors').getProperty('top').get().float === QAnchorLine.Top){
                         this.getProperty('y').setCompute(()=>{
                             this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('topMargin'))
@@ -474,7 +474,7 @@ class Item extends QtObject {
                         })
                     }
                 }
-                if(this.parent() === this.getProperty('anchors').getProperty('bottom').get().target){
+                if(this.parent === this.getProperty('anchors').getProperty('bottom').get().target){
                     if(this.getProperty('anchors').getProperty('bottom').get().float === QAnchorLine.Top){
                         this.getProperty('height').setCompute(()=>{
                             this.getProperty('height').subscribePrimary(this.getProperty('y'), this.getProperty('anchors').getProperty('bottomMargin'))
@@ -506,7 +506,7 @@ class Item extends QtObject {
             } else if(this.getProperty('anchors').getPropertyValue('top')){
                 this.getProperty('y').freeze()
 
-                if(this.parent() === this.getProperty('anchors').getProperty('top').get().target){
+                if(this.parent === this.getProperty('anchors').getProperty('top').get().target){
                     if(this.getProperty('anchors').getProperty('top').get().float === QAnchorLine.Top){
                         this.getProperty('y').setCompute(()=>{
                             this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('topMargin'))
@@ -536,7 +536,7 @@ class Item extends QtObject {
             } else if(this.getProperty('anchors').getPropertyValue('bottom')){
                 this.getProperty('y').freeze()
 
-                if(this.parent() === this.getProperty('anchors').getProperty('bottom').get().target){
+                if(this.parent === this.getProperty('anchors').getProperty('bottom').get().target){
                     if(this.getProperty('anchors').getProperty('bottom').get().float === QAnchorLine.Top){
                         this.getProperty('y').setCompute(()=>{
                             this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('bottomMargin'))
@@ -569,7 +569,7 @@ class Item extends QtObject {
         if(this.getProperty('anchors').getPropertyValue('verticalCenter')){
             this.getProperty('y').freeze()
 
-            if(this.parent() === this.getProperty('anchors').getProperty('verticalCenter').get().target){
+            if(this.parent === this.getProperty('anchors').getProperty('verticalCenter').get().target){
                 if(this.getProperty('anchors').getProperty('verticalCenter').get().float === QAnchorLine.Top){
                     this.getProperty('y').setCompute(()=>{
                         this.getProperty('y').subscribePrimary(this.getProperty('height'))
@@ -611,7 +611,7 @@ class Item extends QtObject {
         if(this.getProperty('anchors').getPropertyValue('horizontalCenter')){
             this.getProperty('x').freeze()
 
-            if(this.parent() === this.getProperty('anchors').getProperty('horizontalCenter').get().target){
+            if(this.parent === this.getProperty('anchors').getProperty('horizontalCenter').get().target){
                 if(this.getProperty('anchors').getProperty('horizontalCenter').get().float === QAnchorLine.Left){
                     this.getProperty('x').setCompute(()=>{
                         this.getProperty('x').subscribePrimary(this.getProperty('width'))

@@ -15,8 +15,8 @@ class Gradient extends QtObject {
     }
 
     $gradientUpdate(){
-        if(this.parent()){
-            this.parent().$gradientChanged()
+        if(this.parent){
+            this.parent.$gradientChanged()
         }
     }
 }
