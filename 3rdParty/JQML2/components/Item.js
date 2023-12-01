@@ -650,6 +650,11 @@ class Item extends QtObject {
             this.getProperty('x').update()
         }
     }
+
+    $destroy(){
+        this.$dom.remove()
+        super.$destroy()
+    }
 }
 
 

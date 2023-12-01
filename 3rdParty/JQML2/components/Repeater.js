@@ -81,6 +81,7 @@ class Repeater extends Item {
         
         for(let key in this.$items){
             if(key !== 'length') {
+                if(this.$signals.itemRemoved) this.$signals.itemRemoved(key, this.$items[key])
                 this.$items[key].$destroy()
                 delete this.$items[key]
             }
@@ -89,6 +90,7 @@ class Repeater extends Item {
         this.parent.preventAutoUpdateGeometry = true
         for(let i = 0; i < this.$items.length.get(); i++){
             this.createElement(i)
+            if(this.$signals.itemAdded) this.$signals.itemAdded(i, this.$items[i])
         }
         delete this.parent.preventAutoUpdateGeometry
         if(this.parent.updateGeometry) this.parent.updateGeometry()

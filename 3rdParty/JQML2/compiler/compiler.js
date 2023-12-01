@@ -881,6 +881,8 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
 
     let special = false
     let isLoader = false
+    let loaderLR = 0
+    let loaderTB = 0
     let tempInstruction = currentInstructions
     while(tempInstruction){
         if(tempInstruction.className === 'Loader'){
@@ -916,8 +918,23 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
         }
         if(isLoader){
             if(property.name === 'anchors.fill'){
+                loaderLR = 2
+                loaderTB = 2
+            }
+            if(property.name === 'anchors.left' || property.name === 'anchors.right'){
+                loaderLR += 1
+            }
+            if(property.name === 'anchors.top' || property.name === 'anchors.bottom'){
+                loaderTB += 1
+            }
+
+            if(loaderLR >= 2) {
                 code.push(`${currentInstructions.name}.$widthAuto=false`)
+                loaderLR = 0
+            }
+            if(loaderTB >= 2) {
                 code.push(`${currentInstructions.name}.$heightAuto=false`)
+                loaderTB = 0
             }
         }
         let stat = {

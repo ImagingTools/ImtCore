@@ -1,3 +1,20 @@
+Function.prototype.setDependsSignal=function(signal){
+    if(!this.depends) this.depends = []
+    if(this.depends.indexOf(signal) < 0) this.depends.push(signal)
+}
+Function.prototype.removeDependsSignal=function(signal){
+    let index = this.depends.indexOf(signal)
+    if(index >= 0) this.depends.splice(index, 1)
+    if(this.depends.length === 0) delete this.depends
+}
+Function.prototype.clearDependsSignal=function(){
+    while(this.depends && this.depends.length){
+        let signal = this.depends.pop()
+        signal.disconnect(this)
+    }
+    delete this.depends
+}
+
 class ContextController {
     internal = {}
 

@@ -101,7 +101,11 @@ class QObject extends ComplexObject {
         delete UIDList[this.UID]
 
         if(this.$signals['Component.destruction']) this.$signals['Component.destruction']()
-
+        for(let key in this){
+            if(!(key in this.$properties) && !(key in this.$signals) && this[key].clearDependsSignal){
+                this[key].clearDependsSignal()
+            }
+        }
         for(let propName in this.$properties){
             if(this.$properties[propName].unsubscribe) this.$properties[propName].unsubscribe()
             if(this.$properties[propName].notify) this.$properties[propName].notify.destroy()
@@ -123,9 +127,10 @@ class QObject extends ComplexObject {
         for(let i = this.$children.length - 1; i >= 0; i--){
             this.$children[i].$destroy()
         }
+        // this.$dom.remove()
         for(let key in this){
-            if(key === '$dom') this[key].remove()
-            if(this[key].destroy) this[key].destroy()
+            // if(key === '$dom') this[key].remove()
+            // if(this[key].destroy) this[key].destroy()
 
             delete this[key]
         }
