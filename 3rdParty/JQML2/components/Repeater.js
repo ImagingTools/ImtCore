@@ -2,10 +2,6 @@ const { Item } = require('./Item')
 const { QVar, QReal } = require('../utils/properties')
 
 class Repeater extends Item {
-    static defaultCSS = {
-        display: 'none'
-    }
-
     static defaultProperties = {
         model: { type: QVar, value: undefined, changed: '$modelChanged' },
         delegate: { type: QVar, changed: '$delegateChanged' },
@@ -50,6 +46,10 @@ class Repeater extends Item {
             this.$items.length.setCompute(()=>{this.$items.length.subscribe(this.getPropertyValue('model').getProperty('data')); return this.getPropertyValue('model').getPropertyValue('data').length}) 
         }
         this.$items.length.update()
+    }
+
+    $visibleChanged(){
+
     }
 
     $delegateChanged(){
