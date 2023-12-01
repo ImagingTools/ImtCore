@@ -207,6 +207,24 @@ Item {
             //            anchors.margins: thumbnailDecoratorContainer.mainMargin;
             //            property real minWidth: 1000000;
         }
+
+        CustomScrollbar{
+            id: scrollBar;
+
+            anchors.right: parent.right;
+            anchors.rightMargin: 10;
+            anchors.bottom: gridInternal.bottom;
+
+            targetItem: gridInternal;
+
+            secondSize: 8;
+            radius: secondSize;
+            indicatorRadius: secondSize;
+            indicatorMargin: 0;
+
+            z: 20;
+
+        }
     }
 
     Item{
@@ -342,24 +360,6 @@ Item {
             }
 
         }
-
-    }
-
-    CustomScrollbar{
-        id: scrollBar;
-
-        anchors.right: parent.right;
-        anchors.rightMargin: 10;
-        anchors.bottom: gridInternal.bottom;
-
-        targetItem: gridInternal;
-
-        secondSize: 8;
-        radius: secondSize;
-        indicatorRadius: secondSize;
-        indicatorMargin: 0;
-
-        z: 20;
 
     }
 
