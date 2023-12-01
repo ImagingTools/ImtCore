@@ -16,6 +16,7 @@ FocusScope {
     property alias horizontalAlignment: textField.horizontalAlignment;
     property alias borderWidth: mainRect.border.width;
     property alias color: mainRect.color;
+    property alias leftPadding: textField.leftPadding;
 
     property alias maximumLength: textField.maximumLength;
 

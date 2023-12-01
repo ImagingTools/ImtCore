@@ -75,6 +75,7 @@ Item {
     property string fontColor: Style.textColor;
     property string textFieldBorderColor: "";//textField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
     property int textFieldMargin: 5;
+    property int horizontalAlignment: TextInput.AlignHCenter;
     //buttons
     property int buttonWidth: 15;
     property int buttonHeight: 10;
@@ -376,7 +377,9 @@ Item {
                 borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
                 margin: datePicker.textFieldMargin;
 
-                horizontalAlignment: TextInput.AlignHCenter;
+
+                leftPadding: horizontalAlignment == TextInput.AlignLeft ? 4 : 0;
+                horizontalAlignment: datePicker.horizontalAlignment;
 
                 textInputValidator: yearValid;
 
@@ -513,7 +516,8 @@ Item {
 
                 readOnly: datePicker.readOnly;
 
-                horizontalAlignment: TextInput.AlignHCenter;
+                leftPadding: horizontalAlignment == TextInput.AlignLeft ? 4 : 0;
+                horizontalAlignment: datePicker.horizontalAlignment;
 
                 text: datePicker.monthNames[datePicker.selectedIndexMonth];
 
@@ -656,7 +660,9 @@ Item {
 
                 readOnly: datePicker.readOnly;
 
-                horizontalAlignment: TextInput.AlignHCenter;
+                leftPadding: horizontalAlignment == TextInput.AlignLeft ? 4 : 0;
+                horizontalAlignment: datePicker.horizontalAlignment;
+
                 textInputValidator: dayValid;
 
                 Keys.onUpPressed: {
