@@ -72,10 +72,10 @@ class GridView extends Flickable {
             item.$destroy()
         }
         this.$items = []
-
+        let ctx = new ContextController(this.$exCtx, this.delegate.get().$exCtx)
         if(typeof this.getPropertyValue('model') === 'number'){
             for(let i = 0; i < this.getPropertyValue('model'); i++){
-                let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), this.$exCtx)
+                let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), ctx)
                 obj.setStyle({
                     position: 'relative'
                 })
@@ -97,7 +97,7 @@ class GridView extends Flickable {
             }
         } else {
             for(let model of this.getPropertyValue('model').getPropertyValue('data')){
-                let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), this.$exCtx)
+                let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), ctx)
                 obj.setStyle({
                     position: 'relative'
                 })

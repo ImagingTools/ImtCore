@@ -18,8 +18,9 @@ Function.prototype.clearDependsSignal=function(){
 class ContextController {
     internal = {}
 
-    constructor(externalContext){
+    constructor(externalContext, externalContext2){
         this.external = externalContext
+        this.external2 = externalContext2
     }
     add(name, obj){
         this.internal[name] = obj
@@ -27,8 +28,12 @@ class ContextController {
     get(name){
         if(name in this.internal){
             return this.internal[name]
-        } else if(this.external) {
-            return this.external.get(name)
+        } else if(this.external || this.external2) {
+            let obj = undefined
+            if(this.external) obj = this.external.get(name)
+            if(obj) return obj
+            if(this.external2) obj = this.external2.get(name)
+            return obj
         } else if(name in Singletons){
             return Singletons[name]
         } else {

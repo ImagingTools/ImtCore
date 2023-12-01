@@ -39,6 +39,10 @@ class Flickable extends Item {
         super(parent)
         let contentItem = new Item(this)
         this.getStatement('contentItem').reset(contentItem)
+        contentItem.getProperty('width').setCompute(()=>{return this.width})
+        contentItem.getProperty('height').setCompute(()=>{return this.height})
+        contentItem.getProperty('width').update()
+        contentItem.getProperty('height').update()
         MouseController.add(this)
     }
 
@@ -52,14 +56,14 @@ class Flickable extends Item {
 
 
     $contentWidthChanged(){
-        this.getStatement('contentItem').get().getStatement('width').reset(this.getStatement('contentWidth').get())
+        this.getStatement('contentItem').get().getStatement('width').set(this.getStatement('contentWidth').get())
         if(this.getPropertyValue('contentX') > this.getPropertyValue('contentWidth') - this.getPropertyValue('width')){
             this.getProperty('contentX').reset(this.getPropertyValue('contentWidth') - this.getPropertyValue('width'))
         }
     }
 
     $contentHeightChanged(){
-        this.getStatement('contentItem').get().getStatement('height').reset(this.getStatement('contentHeight').get())
+        this.getStatement('contentItem').get().getStatement('height').set(this.getStatement('contentHeight').get())
         if(this.getPropertyValue('contentY') > this.getPropertyValue('contentHeight') - this.getPropertyValue('height')){
             this.getProperty('contentY').reset(this.getPropertyValue('contentHeight') - this.getPropertyValue('height'))
         }

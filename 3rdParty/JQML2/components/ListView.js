@@ -299,14 +299,15 @@ class ListView extends Flickable {
     }
     createElement(index){
         if(this.$items[index]) return this.$items[index]
+        let ctx = new ContextController(this.$exCtx, this.delegate.get().$exCtx)
         if(typeof this.getPropertyValue('model') === 'number'){
-            let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), this.$exCtx)
+            let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), ctx)
             obj.getStatement('index').reset(index)
             obj.getStatement('model').reset({index: index})
             this.$items[index] = obj
         } else {
             let model = this.getPropertyValue('model').getPropertyValue('data')[index]
-            let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), this.$exCtx)
+            let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), ctx)
             obj.getStatement('index').setCompute(()=>{return model.index})
             obj.getStatement('index').update()
             obj.getStatement('model').reset(model)

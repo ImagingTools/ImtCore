@@ -2,6 +2,10 @@ const { Item } = require('./Item')
 const { QVar, QReal } = require('../utils/properties')
 
 class Repeater extends Item {
+    static defaultCSS = {
+        display: 'none'
+    }
+
     static defaultProperties = {
         model: { type: QVar, value: undefined, changed: '$modelChanged' },
         delegate: { type: QVar, changed: '$delegateChanged' },
@@ -24,6 +28,11 @@ class Repeater extends Item {
         }
         this.$items.length.getNotify().connect(()=>{
             this.updateView()
+        })
+
+        this.setStyle({
+            maxWidth: '0px',
+            maxHeight: '0px',
         })
     }
 
@@ -55,14 +64,15 @@ class Repeater extends Item {
 
     createElement(index){
         if(this.$items[index]) return this.$items[index]
+        let ctx = new ContextController(this.$exCtx, this.delegate.get().$exCtx)
         if(typeof this.getPropertyValue('model') === 'number'){
-            let obj = this.delegate.get().createObject(this.parent, this.$exCtx)
+            let obj = this.delegate.get().createObject(this.parent, ctx)
             obj.getStatement('index').reset(index)
             obj.getStatement('model').reset({index: index})
             this.$items[index] = obj
         } else {
             let model = this.getPropertyValue('model').getPropertyValue('data')[index]
-            let obj = this.delegate.get().createObject(this.parent, this.$exCtx)
+            let obj = this.delegate.get().createObject(this.parent, ctx)
             obj.getStatement('index').setCompute(()=>{return model.index})
             obj.getStatement('index').update()
             obj.getStatement('model').reset(model)
@@ -94,7 +104,7 @@ class Repeater extends Item {
         }
         delete this.parent.preventAutoUpdateGeometry
         if(this.parent.updateGeometry) this.parent.updateGeometry()
-        this.getProperty('count').reset(this.$items.length)
+        this.getProperty('count').reset(this.$items.length.get())
     }
 
 
