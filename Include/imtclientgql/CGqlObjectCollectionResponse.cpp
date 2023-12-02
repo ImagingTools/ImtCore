@@ -135,7 +135,6 @@ void CGqlObjectCollectionResponse::OnReply(const imtgql::IGqlRequest& request, c
 
 	if (data.contains("objectData")){
 		m_variant = data.value("objectData").toVariant();
-		qDebug() << m_variant;
 		m_isPrimitiveTypePresent = true;
 	}
 
@@ -157,7 +156,6 @@ void CGqlObjectCollectionResponse::OnReply(const imtgql::IGqlRequest& request, c
 	for (QByteArray key: keys){
 		if (data.contains(key)){
 			m_variant = data;
-//			qDebug() << m_variant;
 			m_isPrimitiveTypePresent = true;
 
 			break;

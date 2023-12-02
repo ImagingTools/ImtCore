@@ -157,19 +157,28 @@ bool CObjectCollectionViewComp::Serialize(iser::IArchive& /*archive*/)
 
 // protected methods
 
-ICollectionViewDelegate& CObjectCollectionViewComp::GetViewDelegateRef(const QByteArray& typeId)
+ICollectionViewDelegate* CObjectCollectionViewComp::GetViewDelegatePtr(const QByteArray& typeId)
 {
-	if (m_viewDelegateMap.contains(typeId)){
-		return *m_viewDelegateMap[typeId];
+	if (typeId.isEmpty()){
+		return &m_defaultViewDelegate;
+	}
+	else{
+		if (m_viewDelegateMap.contains(typeId)){
+			return m_viewDelegateMap[typeId];
+		}
+		else{
+			QByteArray componentId = GetComponentId(GetComponentContext());
+			Q_ASSERT_X(false, qPrintable(QString("%1").arg(__LINE__)), qPrintable(QString("Type-ID of the view delegate: '%1' not found, %2").arg(qPrintable(typeId)).arg(qPrintable(componentId))));
+		}
 	}
 
-	return m_defaultViewDelegate;
+	return nullptr;
 }
 
 
-const ICollectionViewDelegate& CObjectCollectionViewComp::GetViewDelegate(const QByteArray& typeId) const
+const ICollectionViewDelegate* CObjectCollectionViewComp::GetViewDelegate(const QByteArray& typeId) const
 {
-	return (const_cast<CObjectCollectionViewComp*>(this))->GetViewDelegateRef(typeId);
+	return (const_cast<CObjectCollectionViewComp*>(this))->GetViewDelegatePtr(typeId);
 }
 
 
@@ -523,15 +532,21 @@ void CObjectCollectionViewComp::UpdateCommands()
 		}
 	}
 
-	GetViewDelegateRef(m_currentTypeId).UpdateItemSelection(itemIds, m_currentTypeId);
+	ICollectionViewDelegate* collectionViewDelegatePtr = GetViewDelegatePtr(m_currentTypeId);
+	if (collectionViewDelegatePtr != nullptr){
+		collectionViewDelegatePtr->UpdateItemSelection(itemIds, m_currentTypeId);
+	}
 }
 
 
 QVector<QByteArray> CObjectCollectionViewComp::GetMetaInfoIds(const QByteArray& typeId) const
 {
-	const ICollectionViewDelegate& viewDelegate = GetViewDelegate(typeId);
+	const ICollectionViewDelegate* viewDelegate = GetViewDelegate(typeId);
+	if (viewDelegate == nullptr){
+		return QVector<QByteArray>();
+	}
 
-	const imtbase::ICollectionInfo& fieldCollection = viewDelegate.GetSummaryInformationTypes();
+	const imtbase::ICollectionInfo& fieldCollection = viewDelegate->GetSummaryInformationTypes();
 
 	return fieldCollection.GetElementIds();
 }
@@ -539,8 +554,12 @@ QVector<QByteArray> CObjectCollectionViewComp::GetMetaInfoIds(const QByteArray& 
 
 QStringList CObjectCollectionViewComp::GetMetaInfoHeaders(const QByteArray& typeId) const
 {
-	const ICollectionViewDelegate& viewDelegate = GetViewDelegate(typeId);
-	const imtbase::ICollectionInfo& fieldCollection = viewDelegate.GetSummaryInformationTypes();
+	const ICollectionViewDelegate* viewDelegate = GetViewDelegate(typeId);
+	if (viewDelegate == nullptr){
+		return QStringList();
+	}
+
+	const imtbase::ICollectionInfo& fieldCollection = viewDelegate->GetSummaryInformationTypes();
 	QVector<QByteArray> fieldIds = fieldCollection.GetElementIds();
 
 	QStringList headers;
@@ -554,13 +573,17 @@ QStringList CObjectCollectionViewComp::GetMetaInfoHeaders(const QByteArray& type
 
 ICollectionViewDelegate::ObjectMetaInfo CObjectCollectionViewComp::GetMetaInfo(const QByteArray& itemId, const QByteArray& typeId) const
 {
-	const ICollectionViewDelegate& viewDelegate = GetViewDelegate(typeId);
-	const imtbase::ICollectionInfo& fieldCollection = viewDelegate.GetSummaryInformationTypes();
+	const ICollectionViewDelegate* viewDelegate = GetViewDelegate(typeId);
+	if (viewDelegate == nullptr){
+		return ICollectionViewDelegate::ObjectMetaInfo();
+	}
+
+	const imtbase::ICollectionInfo& fieldCollection = viewDelegate->GetSummaryInformationTypes();
 	QVector<QByteArray> fieldIds = fieldCollection.GetElementIds();
 
 	ICollectionViewDelegate::ObjectMetaInfo result;
 
-	viewDelegate.GetSummaryInformation(itemId, fieldIds, result);
+	viewDelegate->GetSummaryInformation(itemId, fieldIds, result);
 
 	return result;
 }
@@ -748,12 +771,16 @@ void CObjectCollectionViewComp::ValidateSectionSize(int logicalIndex, int newSiz
 		return;
 	}
 
-	const ICollectionViewDelegate& viewDelegate = GetViewDelegate(m_currentTypeId);
+	const ICollectionViewDelegate* viewDelegate = GetViewDelegate(m_currentTypeId);
+	if (viewDelegate == nullptr){
+		return;
+	}
+
 	QVector<QByteArray> ids = GetMetaInfoIds(m_currentTypeId);
 
 	Q_ASSERT(logicalIndex < ids.count());
 
-	ICollectionViewDelegate::HeaderInfo headerInfo = viewDelegate.GetSummaryInformationHeaderInfo(ids[logicalIndex]);
+	ICollectionViewDelegate::HeaderInfo headerInfo = viewDelegate->GetSummaryInformationHeaderInfo(ids[logicalIndex]);
 
 	if (newSize < headerInfo.minWidth){
 		ItemList->setColumnWidth(logicalIndex, headerInfo.minWidth);
@@ -819,14 +846,19 @@ void CObjectCollectionViewComp::OnItemDoubleClick(const QModelIndex &item)
 	int sourceRow = item.row();
 	QByteArray itemId = m_tableModel.data(m_tableModel.index(sourceRow, 0), DR_OBJECT_ID).toByteArray();
 
-	const ICollectionViewDelegate &delegate = GetViewDelegateRef(m_currentTypeId);
-	const imtbase::ICollectionInfo &collectionInfo = delegate.GetSummaryInformationTypes();
+	const ICollectionViewDelegate* delegate = GetViewDelegatePtr(m_currentTypeId);
+
+	if (delegate == nullptr){
+		return;
+	}
+
+	const imtbase::ICollectionInfo& collectionInfo = delegate->GetSummaryInformationTypes();
 
 	imtbase::ICollectionInfo::Ids ids = collectionInfo.GetElementIds();
 	int column = item.column();
 	if (column < ids.count()){
-		if (delegate.IsEditorEnabled(ids[column])){
-			delegate.OpenDocumentEditor(itemId);
+		if (delegate->IsEditorEnabled(ids[column])){
+			delegate->OpenDocumentEditor(itemId);
 		}
 	}
 }
@@ -841,9 +873,12 @@ void CObjectCollectionViewComp::OnCustomContextMenuRequested(const QPoint &point
 
 	QMenu menu(ItemList);
 
-	const imtgui::ICollectionViewDelegate& currentViewDelegate = GetViewDelegate(m_currentTypeId);
+	const imtgui::ICollectionViewDelegate* currentViewDelegatePtr = GetViewDelegate(m_currentTypeId);
+	if (currentViewDelegatePtr == nullptr){
+		return;
+	}
 
-	currentViewDelegate.SetupContextMenu(menu);
+	currentViewDelegatePtr->SetupContextMenu(menu);
 
 	if (menu.actions().count() > 0){
 		menu.exec(ItemList->viewport()->mapToGlobal(point));
@@ -872,7 +907,11 @@ void CObjectCollectionViewComp::OnSectionMoved(int logicalIndex, int /*oldVisual
 	SignalSemaphore semaphore(m_semaphoreCounter);
 
 	if (!m_currentTypeId.isEmpty()){
-		const ICollectionViewDelegate& viewDelegate = GetViewDelegate(m_currentTypeId);
+		const ICollectionViewDelegate* viewDelegate = GetViewDelegate(m_currentTypeId);
+		if (viewDelegate == nullptr){
+			return;
+		}
+
 		QVector<QByteArray> ids = GetMetaInfoIds(m_currentTypeId);
 
 		Q_ASSERT(logicalIndex < ids.count());
@@ -880,7 +919,7 @@ void CObjectCollectionViewComp::OnSectionMoved(int logicalIndex, int /*oldVisual
 		QList<ICollectionViewDelegate::HeaderInfo> infos;
 
 		for (int i = 0; i < ids.count(); i++){
-			ICollectionViewDelegate::HeaderInfo headerInfo = viewDelegate.GetSummaryInformationHeaderInfo(ids[i]);
+			ICollectionViewDelegate::HeaderInfo headerInfo = viewDelegate->GetSummaryInformationHeaderInfo(ids[i]);
 			infos.append(headerInfo);
 		}
 
@@ -946,11 +985,14 @@ void CObjectCollectionViewComp::OnTypeChanged()
 		}
 	}
 
-	ICollectionViewDelegate& viewDelegate = GetViewDelegateRef(m_currentTypeId);
+	ICollectionViewDelegate* viewDelegate = GetViewDelegatePtr(m_currentTypeId);
+	if (viewDelegate == nullptr){
+		return;
+	}
 
-	imtbase::ICollectionInfo::Ids informationIds = viewDelegate.GetSummaryInformationTypes().GetElementIds();
+	imtbase::ICollectionInfo::Ids informationIds = viewDelegate->GetSummaryInformationTypes().GetElementIds();
 	for (int i = 0; i < informationIds.count(); ++i){
-		ICollectionViewDelegate::HeaderInfo headerInfo = viewDelegate.GetSummaryInformationHeaderInfo(informationIds[i]);
+		ICollectionViewDelegate::HeaderInfo headerInfo = viewDelegate->GetSummaryInformationHeaderInfo(informationIds[i]);
 		if (headerInfo.flags & ICollectionViewDelegate::HeaderInfo::IF_SORT_BY_DEFAULT){
 			ItemList->header()->setSortIndicator(i, headerInfo.defaultSortOrder);
 		}
@@ -971,8 +1013,13 @@ void CObjectCollectionViewComp::OnTypeChanged()
 		iwidgets::ClearLayout(RightPanel->layout());
 	}
 
+	ICollectionViewDelegate* collectionViewDelegatePtr = GetViewDelegatePtr(m_currentTypeId);
+	if (collectionViewDelegatePtr == nullptr){
+		return;
+	}
+
 	if (!m_currentTypeId.isEmpty()){
-		m_currentInformationViewPtr = GetViewDelegateRef(m_currentTypeId).GetInformationView();
+		m_currentInformationViewPtr = collectionViewDelegatePtr->GetInformationView();
 		if (m_currentInformationViewPtr != nullptr){
 			m_currentInformationViewPtr->CreateGui(RightPanel);
 			if (*m_viewRightPanelAttrPtr){
@@ -982,12 +1029,12 @@ void CObjectCollectionViewComp::OnTypeChanged()
 	}
 
 	disconnect(m_renameShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnRenameShortCut);
-	if (GetViewDelegate(m_currentTypeId).IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_RENAME)){
+	if (collectionViewDelegatePtr->IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_RENAME)){
 		connect(m_renameShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnRenameShortCut);
 	}
 
 	disconnect(m_delShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnDelShortCut);
-	if (GetViewDelegate(m_currentTypeId).IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_REMOVE)){
+	if (collectionViewDelegatePtr->IsCommandSupported(imtgui::CObjectCollectionViewDelegate::CI_REMOVE)){
 		connect(m_delShortCutPtr, &QShortcut::activated, this, &CObjectCollectionViewComp::OnDelShortCut);
 	}
 
@@ -1128,15 +1175,17 @@ void CObjectCollectionViewComp::DoUpdateGui(const istd::IChangeable::ChangeSet& 
 
 				if (activeTypeItemPtr != nullptr){
 					activeTypeItemPtr->setSelected(true);
-					const ICollectionViewDelegate& delegate = GetViewDelegateRef(m_currentTypeId);
-					const imtbase::ICollectionInfo& collectionInfo = delegate.GetSummaryInformationTypes();
+					const ICollectionViewDelegate* delegatePtr = GetViewDelegatePtr(m_currentTypeId);
+					if (delegatePtr != nullptr){
+						const imtbase::ICollectionInfo& collectionInfo = delegatePtr->GetSummaryInformationTypes();
 
-					imtbase::ICollectionInfo::Ids ids = collectionInfo.GetElementIds();
-					for (int i = 0; i < ids.count(); ++i){
-						QByteArray id = ids[i];
-						ItemList->itemDelegateForColumn(i)->deleteLater();
-						QAbstractItemDelegate* itemDelegate = delegate.GetColumnItemDelegate(id);
-						ItemList->setItemDelegateForColumn(i, itemDelegate);
+						imtbase::ICollectionInfo::Ids ids = collectionInfo.GetElementIds();
+						for (int i = 0; i < ids.count(); ++i){
+							QByteArray id = ids[i];
+							ItemList->itemDelegateForColumn(i)->deleteLater();
+							QAbstractItemDelegate* itemDelegate = delegatePtr->GetColumnItemDelegate(id);
+							ItemList->setItemDelegateForColumn(i, itemDelegate);
+						}
 					}
 				}
 			}
@@ -1312,7 +1361,12 @@ const ibase::IHierarchicalCommand* CObjectCollectionViewComp::Commands::GetComma
 {
 	Q_ASSERT(m_parentPtr != nullptr);
 
-	return m_parentPtr->GetViewDelegate(m_parentPtr->m_currentTypeId).GetCommands();
+	const ICollectionViewDelegate* collectionViewDelegate = m_parentPtr->GetViewDelegate(m_parentPtr->m_currentTypeId);
+	if (collectionViewDelegate == nullptr){
+		return nullptr;
+	}
+
+	return collectionViewDelegate->GetCommands();
 }
 
 
@@ -1512,8 +1566,13 @@ void CObjectCollectionViewComp::TableModel::SetTextFilter(const QString& textFil
 
 	imtbase::ICollectionInfo::Ids informationIds = m_parent.GetMetaInfoIds(m_parent.m_currentTypeId);
 	QByteArrayList filterableInfoIds;
+	const ICollectionViewDelegate* collectionViewDelegate = m_parent.GetViewDelegate(m_parent.m_currentTypeId);
+	if (collectionViewDelegate == nullptr){
+		return;
+	}
+
 	for (const QByteArray& infoId : informationIds){
-		ICollectionViewDelegate::HeaderInfo headerInfo = m_parent.GetViewDelegate(m_parent.m_currentTypeId).GetSummaryInformationHeaderInfo(infoId);
+		ICollectionViewDelegate::HeaderInfo headerInfo = collectionViewDelegate->GetSummaryInformationHeaderInfo(infoId);
 		if (headerInfo.flags & ICollectionViewDelegate::HeaderInfo::IF_FILTERABLE){
 			filterableInfoIds.push_back(infoId);
 		}

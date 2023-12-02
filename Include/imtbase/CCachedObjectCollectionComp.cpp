@@ -110,9 +110,6 @@ ICollectionInfo::Id CCachedObjectCollectionComp::InsertNewObject(
 				dataMetaInfoPtr,
 				elementMetaInfoPtr,
 				operationContextPtr);
-	if (!id.isEmpty()){
-		Q_ASSERT(retVal == id);
-	}
 
 	return retVal;
 }

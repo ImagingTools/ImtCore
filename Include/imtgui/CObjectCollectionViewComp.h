@@ -127,8 +127,8 @@ public:
 	virtual bool Serialize(iser::IArchive& archive) override;
 
 protected:
-	ICollectionViewDelegate& GetViewDelegateRef(const QByteArray& typeId);
-	const ICollectionViewDelegate& GetViewDelegate(const QByteArray& typeId) const;
+	ICollectionViewDelegate* GetViewDelegatePtr(const QByteArray& typeId);
+	const ICollectionViewDelegate* GetViewDelegate(const QByteArray& typeId) const;
 
 	virtual void OnPageSelectionUpdated();
 
