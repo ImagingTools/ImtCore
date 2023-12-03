@@ -110,6 +110,9 @@ ICollectionInfo::Id CCachedObjectCollectionComp::InsertNewObject(
 				dataMetaInfoPtr,
 				elementMetaInfoPtr,
 				operationContextPtr);
+	if (retVal.isEmpty()){
+		changeNotifier.Abort();
+	}
 
 	return retVal;
 }
@@ -187,6 +190,9 @@ bool CCachedObjectCollectionComp::SetObjectData(
 	m_collectionCacheItems.Reset();
 
 	bool retVal = m_objectCollectionCompPtr->SetObjectData(objectId, object, mode, operationContextPtr);
+	if (!retVal){
+		changeNotifier.Abort();
+	}
 
 	return retVal;
 }
@@ -357,11 +363,13 @@ bool CCachedObjectCollectionComp::SetElementEnabled(const Id& elementId, bool is
 
 	m_collectionCacheItems.Reset();
 
+	istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
+	changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
 	bool retVal = m_objectCollectionCompPtr->SetElementEnabled(elementId, isEnabled);
-	if (retVal){
-		istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-		changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
-		istd::CChangeNotifier changeNotifier(this, &changeSet);
+	if (!retVal){
+		changeNotifier.Abort();
 	}
 
 	return retVal;
