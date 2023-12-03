@@ -37,7 +37,7 @@ bool CApiClientComp::SendRequest(const imtgql::IGqlRequest& request, imtgql::IGq
 				istd::IInformationProvider::InformationCategory category = istd::IInformationProvider::IC_INFO;
 				QString message = "Send request with ID " + uuid + "\n" + request.GetQuery();
 
-				SendInfoMessage(0, message, "API client");
+				SendVerboseMessage(message, "API client");
 
 				imtcom::CRequestSender requestSender;
 				QNetworkReply* replyPtr = requestSender.DoSyncPost(*networkRequestPtr, request.GetQuery(), m_timeout);
@@ -50,21 +50,22 @@ bool CApiClientComp::SendRequest(const imtgql::IGqlRequest& request, imtgql::IGq
 						responseHandler.OnReply(request, payload);
 
 						category = istd::IInformationProvider::IC_INFO;
-						message = "Response for request ID " + uuid + "\n" + payload;
 
 						retVal = true;
 					}
 					else{
 						category = istd::IInformationProvider::IC_ERROR;
-						message = "Response for request ID " + uuid + "\n" + replyPtr->errorString();
+						message = "Response for request-ID " + uuid + "\n" + replyPtr->errorString();
 					}
 				}
 				else{
 					category = istd::IInformationProvider::IC_ERROR;
-					message = "Response for request ID " + uuid + "\n" + replyPtr->errorString();
+					message = "Response for request-ID " + uuid + "\n" + replyPtr->errorString();
 				}
 
-				SendLogMessage(category, 0, message, "API Client");
+				if (category > istd::IInformationProvider::IC_INFO){
+					SendLogMessage(category, 0, message, "API Client");
+				}
 			}
 			else{
 				SendErrorMessage(0, "Failed to create network request", "API Client");
