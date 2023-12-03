@@ -384,6 +384,7 @@ Rectangle {
             property int selectedIndex: -1;
             property int hoverIndex: -1;
             property bool linkSelected: false;
+            property bool hasTailSelection: false;
 
             //sizes
             property real mainRec_width: 250 * scaleCoeff;
@@ -793,7 +794,8 @@ Rectangle {
 
                 if(complexIntersection && hasMargin){
                     drawIntersectionExt(ctx, intersection,angle, selected);
-                    let selectedArc = canvas.linkSelected && canvas.hoverIndex == toIndex;
+                    let selectedArcIndex = canvas.hasTailSelection ? toIndex : fromIndex;
+                    let selectedArc = canvas.linkSelected && canvas.hoverIndex == selectedArcIndex;
                     drawIntersectionArc(ctx, intersection, angle + Math.PI, offset, selectedArc)
 
                 }
@@ -836,6 +838,7 @@ Rectangle {
                 ctx.stroke();
 
                 //draw tail
+
                 ctx.beginPath();
                 ctx.moveTo(intersection.x, intersection.y)
                 ctx.lineWidth = Math.max(canvas.scaleCoeff *1, 0.5);
@@ -844,6 +847,7 @@ Rectangle {
                 let newY = intersection.y + offset * Math.sin(angle)
                 ctx.lineTo(newX, newY);
                 ctx.stroke();
+
 
             }
 
