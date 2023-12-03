@@ -150,7 +150,18 @@ bool CCachedObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dat
 		return false;
 	}
 
-	return  m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr);
+	if (m_cacheItems.contains(objectId)){
+		dataPtr = m_cacheItems[objectId];
+
+		return true;
+	}
+
+	bool retVal = m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr);
+	if (retVal == true){
+		m_cacheItems.insert(objectId, dataPtr);
+	}
+
+	return  retVal;
 }
 
 
@@ -399,6 +410,7 @@ CCachedObjectCollectionComp::FilteredCollection* CCachedObjectCollectionComp::Ch
 void CCachedObjectCollectionComp::ClearCache()
 {
 	m_collectionCacheItems.Reset();
+	m_cacheItems.clear();
 }
 
 

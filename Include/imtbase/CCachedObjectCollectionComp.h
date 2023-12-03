@@ -121,6 +121,7 @@ private:
 	I_ATTR(int, m_cacheLimitAttrPtr);
 
 	mutable istd::TPointerVector<FilteredCollection> m_collectionCacheItems;
+	mutable QMap<QByteArray, DataPtr> m_cacheItems;
 	int m_operationFlags;
 };
 
