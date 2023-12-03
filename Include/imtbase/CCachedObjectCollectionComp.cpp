@@ -45,9 +45,9 @@ void CCachedObjectCollectionComp::OnComponentDestroyed()
 
 void CCachedObjectCollectionComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
-	ClearCache();
-
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
+	ClearCache();
 }
 
 
@@ -151,14 +151,19 @@ bool CCachedObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dat
 	}
 
 	if (m_cacheItems.contains(objectId)){
-		dataPtr = m_cacheItems[objectId];
+		dataPtr = m_cacheItems[objectId].dataPtr;
 
 		return true;
 	}
 
+	int cacheSize = m_cacheItems.size();
+	if (cacheSize >= *m_objectCacheLimitAttrPtr){
+		RemoveOldestObjectFromCache();
+	}
+
 	bool retVal = m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr);
-	if (retVal == true){
-		m_cacheItems.insert(objectId, dataPtr);
+	if (retVal){
+		m_cacheItems.insert(objectId, {dataPtr, QDateTime::currentMSecsSinceEpoch()});
 	}
 
 	return  retVal;
@@ -310,11 +315,13 @@ bool CCachedObjectCollectionComp::SetElementName(const Id& elementId, const QStr
 
 	m_collectionCacheItems.Reset();
 
+	istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
+	changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
 	bool retVal =  m_objectCollectionCompPtr->SetElementName(elementId, name);
-	if (retVal){
-		istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-		changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
-		istd::CChangeNotifier changeNotifier(this, &changeSet);
+	if (!retVal){
+		changeNotifier.Abort();
 	}
 
 	return retVal;
@@ -329,11 +336,13 @@ bool CCachedObjectCollectionComp::SetElementDescription(const Id& elementId, con
 
 	m_collectionCacheItems.Reset();
 
+	istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
+	changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
+	istd::CChangeNotifier changeNotifier(this, &changeSet);
+
 	bool retVal = m_objectCollectionCompPtr->SetElementDescription(elementId, description);
-	if (retVal){
-		istd::IChangeable::ChangeSet changeSet(CF_UPDATED);
-		changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
-		istd::CChangeNotifier changeNotifier(this, &changeSet);
+	if (!retVal){
+		changeNotifier.Abort();
 	}
 
 	return retVal;
@@ -396,7 +405,7 @@ CCachedObjectCollectionComp::FilteredCollection* CCachedObjectCollectionComp::Ch
 	}
 
 	if (!m_collectionCacheItems.IsEmpty()){
-		if (m_collectionCacheItems.GetCount() > *m_cacheLimitAttrPtr){
+		if (m_collectionCacheItems.GetCount() >= *m_metaInfoCacheLimitAttrPtr){
 			m_collectionCacheItems.RemoveAt(0);
 		}
 	}
@@ -410,7 +419,31 @@ CCachedObjectCollectionComp::FilteredCollection* CCachedObjectCollectionComp::Ch
 void CCachedObjectCollectionComp::ClearCache()
 {
 	m_collectionCacheItems.Reset();
+
 	m_cacheItems.clear();
+}
+
+
+void CCachedObjectCollectionComp::RemoveOldestObjectFromCache() const
+{
+	QByteArray oldestObjectId;
+
+	if (!m_cacheItems.isEmpty()){
+		qint64 minTimeStamp = m_cacheItems.first().timestamp;
+
+		for (CacheItemMap::ConstIterator iter = m_cacheItems.constBegin(); iter != m_cacheItems.constEnd(); ++iter){
+			const CacheItem& item = iter.value();
+
+			if (item.timestamp < minTimeStamp){
+				minTimeStamp = item.timestamp;
+				oldestObjectId = iter.key();
+			}
+		}
+	}
+
+	if (!oldestObjectId.isEmpty()){
+		m_cacheItems.remove(oldestObjectId);
+	}
 }
 
 

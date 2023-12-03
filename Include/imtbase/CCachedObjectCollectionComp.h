@@ -35,7 +35,8 @@ public:
 		I_REGISTER_INTERFACE(ICollectionInfo);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Base collection containing real data", true, "ObjectCollection");
 		I_ASSIGN_TO(m_objectCollectionModelCompPtr, m_objectCollectionCompPtr, true);
-		I_ASSIGN(m_cacheLimitAttrPtr, "CacheLimit", "Maximal count of filter combinations stored in the ring buffer (cache)", true, 1000);
+		I_ASSIGN(m_metaInfoCacheLimitAttrPtr, "MetaInfoCacheLimit", "Maximal count of filter combinations stored in the ring buffer (meta info cache)", true, 1000);
+		I_ASSIGN(m_objectCacheLimitAttrPtr, "ObjectCacheLimit", "Maximal count of the data objects in the ring buffer (cache)", true, 100);
 	I_END_COMPONENT;
 
 	CCachedObjectCollectionComp();
@@ -96,7 +97,7 @@ protected:
 	struct FilteredCollection
 	{
 		FilteredCollection(int aOffset, int aCount, const QByteArray& aSelectionParamsData, IObjectCollection* aCachePtr)
-			: offset(aOffset),
+			:offset(aOffset),
 			count(aCount),
 			selectionParamsData(aSelectionParamsData),
 			cachePtr(aCachePtr)
@@ -114,14 +115,25 @@ protected:
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const;
 
 	void ClearCache();
+	void RemoveOldestObjectFromCache() const;
 
 private:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imod::IModel, m_objectCollectionModelCompPtr);
-	I_ATTR(int, m_cacheLimitAttrPtr);
+	I_ATTR(int, m_metaInfoCacheLimitAttrPtr);
+	I_ATTR(int, m_objectCacheLimitAttrPtr);
 
 	mutable istd::TPointerVector<FilteredCollection> m_collectionCacheItems;
-	mutable QMap<QByteArray, DataPtr> m_cacheItems;
+
+	struct CacheItem
+	{
+		DataPtr dataPtr;
+		qint64 timestamp = 0;
+	};
+
+	typedef QMap<QByteArray, CacheItem> CacheItemMap;
+	mutable CacheItemMap m_cacheItems;
+
 	int m_operationFlags;
 };
 
