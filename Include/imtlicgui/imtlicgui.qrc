@@ -15,7 +15,6 @@
         <file alias="imtlicgui/MetaInfo.qml">Qml/imtlicgui/MetaInfo.qml</file>
         <file alias="imtlicgui/ProductCollectionViewCommandsDelegate.qml">Qml/imtlicgui/ProductCollectionViewCommandsDelegate.qml</file>
         <file alias="imtlicgui/PackageCollectionViewCommandsDelegate.qml">Qml/imtlicgui/PackageCollectionViewCommandsDelegate.qml</file>
-	<file alias="imtlicgui/PackageCollectionViewCommandsDelegate2.qml">Qml/imtlicgui/PackageCollectionViewCommandsDelegate2.qml</file>
         <file alias="imtlicgui/InstallationCollectionViewCommandsDelegate.qml">Qml/imtlicgui/InstallationCollectionViewCommandsDelegate.qml</file>
         <file alias="imtlicgui/PackageViewCommandsDelegate.qml">Qml/imtlicgui/PackageViewCommandsDelegate.qml</file>
         <file alias="imtlicgui/ProductViewCommandsDelegate.qml">Qml/imtlicgui/ProductViewCommandsDelegate.qml</file>
