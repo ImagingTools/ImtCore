@@ -75,6 +75,8 @@ Item {
     }
 
     onHasRemoteChangesChanged: {
+        console.log("onHasRemoteChangesChanged", hasRemoteChanges)
+
         if (visible && hasRemoteChanges){
             setAlertPanel(alertPanelComp)
         }
@@ -141,7 +143,7 @@ Item {
 
         collectionViewBase.commands.additionInputParams = getAdditionalInputParams()
 
-        collectionViewBase.commandId = collectionViewContainer.commandId;
+//        collectionViewBase.commandId = collectionViewContainer.commandId;
 
         collectionMetaInfo.getMetaInfoGqlCommand = collectionViewContainer.commandId + "MetaInfo";
 
@@ -207,6 +209,11 @@ Item {
     function updateGui(){
         collectionViewBase.updateModels();
     }
+
+    function updateModel(){
+
+    }
+
 
     function selectItem(id, name){
         console.log("CollectionView selectItem", id, name);
@@ -345,6 +352,14 @@ Item {
 
         hasFilter: collectionViewContainer.hasFilter;
 
+        property bool ok: collectionViewContainer.visible && collectionViewContainer.commandId !== "";
+        onOkChanged: {
+            if (ok){
+                collectionViewBase.commandId = collectionViewContainer.commandId;
+//                collectionViewContainer.updateGui();
+            }
+        }
+
         onFilterDecoratorLoaded: {
             collectionViewContainer.filterDecoratorLoaded();
         }
@@ -450,11 +465,15 @@ Item {
             console.log("SubscriptionClient onStateChanged", state);
 
             if (state === "Ready"){
+                console.log("subscriptionClient", subscriptionClient.toJSON());
+
                 if (subscriptionClient.ContainsKey("data")){
                     let dataModelLocal = subscriptionClient.GetData("data")
                     if (dataModelLocal.ContainsKey("token")){
                         let accessToken = dataModelLocal.GetData("token");
                         Events.sendEvent("GetToken", function (token){
+                            console.log("local token", token);
+
                             if (String(token) == String(accessToken)){
                                 collectionViewContainer.updateGui();
                             }
@@ -470,7 +489,7 @@ Item {
 
     function setAlertPanel(alertPanelComp){
         if (collectionViewContainer.documentManagerPtr != null){
-            collectionViewContainer.documentManagerPtr.alertPanelComp = alertPanelComp;
+            collectionViewContainer.documentManagerPtr.setAlertPanel(alertPanelComp);
         }
     }
 

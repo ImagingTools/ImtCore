@@ -33,10 +33,14 @@ Item {
     }
 
     function clearModel(parameters){
-        let commandId = parameters["CommandId"];
-        if (commandId === commandsDecoratorContainer.commandId){
-            buttonPanel.clearModel();
+        if (parameters){
+            let commandId = parameters["CommandId"];
+            if (commandId !== commandsDecoratorContainer.commandId){
+                return;
+            }
         }
+
+        buttonPanel.clearModel();
     }
 
     function setVisible(visible){

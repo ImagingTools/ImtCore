@@ -11,6 +11,12 @@ DocumentManager {
 
     property var startPageObj;
 
+    Component.onCompleted: {
+        documentController.onSetModelStateChanged.connect(documentManager.onSetModelStateChanged);
+        documentController.onGetModelStateChanged.connect(documentManager.onGetModelStateChanged);
+        documentController.onUpdateModelStateChanged.connect(documentManager.onUpdateModelStateChanged);
+    }
+
     onStartPageObjChanged: {
         console.log("onStartPageObjChanged", startPageObj["Source"]);
         documentLoader.source = startPageObj["Source"];
@@ -34,6 +40,36 @@ DocumentManager {
         console.log("onDocumentClosed", documentIndex);
 
         stackView.pop();
+    }
+
+    function onGetModelStateChanged(){
+        let state = documentController.getModelState;
+        if (state === "Loading"){
+            loading.start();
+        }
+        else{
+            loading.stop();
+        }
+    }
+
+    function onSetModelStateChanged(){
+        let state = documentController.setModelState;
+        if (state === "Loading"){
+            loading.start();
+        }
+        else{
+            loading.stop();
+        }
+    }
+
+    function onUpdateModelStateChanged(){
+        let state = documentController.updateModelState;
+        if (state === "Loading"){
+            loading.start();
+        }
+        else{
+            loading.stop();
+        }
     }
 
     Loader {
@@ -83,36 +119,6 @@ DocumentManager {
                 console.error("Document loading was failed", documentLoader.source);
             }
         }
-    }
-
-    Connections {
-        target: documentController;
-
-        function onGetModelStateChanged(){
-            let state = documentController.getModelState;
-            if (state === "Loading"){
-                loading.start();
-            }
-            else{
-                loading.stop();
-            }
-        }
-
-        function onSetModelStateChanged(){
-            let state = documentController.setModelState;
-            if (state === "Loading"){
-                loading.start();
-            }
-            else{
-                loading.stop();
-            }
-        }
-
-//        function onError(){
-//            console.error("Unable to open document:", message);
-
-//            loading.stop();
-//        }
     }
 
     StackView {

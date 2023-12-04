@@ -61,7 +61,6 @@
         <file alias="imtgui/AuxComponents/Dialogs/InputDialogBody.qml">Qml/imtgui/AuxComponents/Dialogs/InputDialogBody.qml</file>
         <file alias="imtgui/AuxComponents/Dialogs/ModalDialogManager.qml">Qml/imtgui/AuxComponents/Dialogs/ModalDialogManager.qml</file>
         <file alias="imtgui/AuxComponents/Dialogs/MessageDialogBody.qml">Qml/imtgui/AuxComponents/Dialogs/MessageDialogBody.qml</file>
-        <file alias="imtgui/AuxComponents/UndoRedoManager.qml">Qml/imtgui/AuxComponents/UndoRedoManager.qml</file>
         <file alias="imtgui/AuxComponents/ServerNoConnectionView.qml">Qml/imtgui/AuxComponents/ServerNoConnectionView.qml</file>
         <file alias="imtgui/AuxComponents/PagesManager.qml">Qml/imtgui/AuxComponents/PagesManager.qml</file>
         <file alias="imtgui/AuxComponents/SortController.qml">Qml/imtgui/AuxComponents/SortController.qml</file>

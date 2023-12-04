@@ -9,6 +9,12 @@ DocumentManager {
 
     property alias alertPanelComp: alertPanel.sourceComponent;
 
+    Component.onCompleted: {
+        documentController.onSetModelStateChanged.connect(workspaceView.onSetModelStateChanged);
+        documentController.onGetModelStateChanged.connect(workspaceView.onGetModelStateChanged);
+        documentController.onUpdateModelStateChanged.connect(workspaceView.onUpdateModelStateChanged);
+    }
+
     onDocumentClosed: {
         if (documentIndex <= tabPanel.selectedIndex && documentIndex > 0){
             tabPanel.selectedIndex--;
@@ -19,7 +25,39 @@ DocumentManager {
         tabPanel.selectedIndex = documentIndex;
     }
 
+    function onGetModelStateChanged(){
+        let state = documentController.getModelState;
+        if (state === "Loading"){
+            loading.start();
+        }
+        else{
+            loading.stop();
+        }
+    }
+
+    function onSetModelStateChanged(){
+        let state = documentController.setModelState;
+        if (state === "Loading"){
+            loading.start();
+        }
+        else{
+            loading.stop();
+        }
+    }
+
+    function onUpdateModelStateChanged(){
+        let state = documentController.updateModelState;
+        if (state === "Loading"){
+            loading.start();
+        }
+        else{
+            loading.stop();
+        }
+    }
+
     function setAlertPanel(alertPanelComp){
+        console.log("DocumentManager setAlertPanel", alertPanelComp);
+
         alertPanel.sourceComponent = alertPanelComp;
     }
 
@@ -108,7 +146,13 @@ DocumentManager {
                         item.documentModel = model.Model;
                     }
 
-                    workspaceView.documentsModel.setProperty(model.index, "DocumentObj", item);
+                    if (documentLoader.item.isDirty !== undefined){
+                        documentLoader.item.onIsDirtyChanged.connect(documentLoader.onIsDirtyChanged);
+                    }
+
+                    if (workspaceView.documentsModel.count >= model.index){
+                        workspaceView.documentsModel.setProperty(model.index, "DocumentObj", item);
+                    }
 
                     workspaceView.updateDocumentTitle(model.index);
                 }
@@ -119,47 +163,14 @@ DocumentManager {
                         console.error("Document loading was failed", modelData);
                     }
                 }
-            }
-
-            Connections {
-                id: itemConnections;
-
-                enabled: documentLoader.item ? true : false;
-                target: documentLoader.item;
 
                 function onIsDirtyChanged(){
+                    console.log("DocumentManager onIsDirtyChanged");
+
                     workspaceView.updateDocumentTitle(model.index);
                 }
             }
         }
-    }
-
-    Connections {
-        target: documentController;
-
-        function onGetModelStateChanged(){
-            let state = documentController.getModelState;
-            if (state === "Loading"){
-                loading.start();
-            }
-            else{
-                loading.stop();
-            }
-        }
-
-        function onSetModelStateChanged(){
-            let state = documentController.setModelState;
-            if (state === "Loading"){
-                loading.start();
-            }
-            else{
-                loading.stop();
-            }
-        }
-
-//        function onError(){
-//            loading.stop();
-//        }
     }
 
     Loading {

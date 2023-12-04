@@ -141,12 +141,16 @@ Item {
 
         internal.m_observedModel = model;
 
+        internal.m_observedModel.dataChanged.connect(onDataChanged);
+
         setStandardModel(model);
     }
 
 
     function unregisterModel()
     {
+        internal.m_observedModel.dataChanged.disconnect(onDataChanged);
+
         internal.m_observedModel = null;
         resetUndo();
     }
@@ -258,22 +262,34 @@ Item {
         property var m_redoStack: [];
     }
 
-
-    Connections {
-        target: internal.m_observedModel;
-
-        function onDataChanged(){
-            if (internal.m_isBlocked){
-                return;
-            }
-
-            console.error("Undo manager onDataChanged");
-
-            undoRedoManager.makeChanges();
-
-            internal.m_beginStateModel = internal.m_observedModel.CopyMe();
+    function onDataChanged(){
+        if (internal.m_isBlocked){
+            return;
         }
+
+        console.error("Undo manager onDataChanged");
+
+        undoRedoManager.makeChanges();
+
+        internal.m_beginStateModel = internal.m_observedModel.CopyMe();
     }
+
+
+//    Connections {
+//        target: internal.m_observedModel;
+
+//        function onDataChanged(){
+//            if (internal.m_isBlocked){
+//                return;
+//            }
+
+//            console.error("Undo manager onDataChanged");
+
+//            undoRedoManager.makeChanges();
+
+//            internal.m_beginStateModel = internal.m_observedModel.CopyMe();
+//        }
+//    }
 
     function printInfo(){
         console.log("printInfo");

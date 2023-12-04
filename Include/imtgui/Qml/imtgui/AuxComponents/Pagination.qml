@@ -148,10 +148,11 @@ Row {
     }
 
     BaseText {
-        text: "(" + (currentIndex * countElements + 1) + "-" + ((pagesSize - 1 != currentIndex) ? currentValue * countElements : countAllElements) + "/" + countAllElements + ")"
+        text: "(" + (paginationContainer.currentIndex * paginationContainer.countElements + 1) + "-" +
+              ((paginationContainer.pagesSize - 1 != paginationContainer.currentIndex) ?
+                   paginationContainer.currentValue * paginationContainer.countElements :
+                   paginationContainer.countAllElements) + "/" + paginationContainer.countAllElements + ")"
     }
-
-
 
     Row {
         spacing: 4;

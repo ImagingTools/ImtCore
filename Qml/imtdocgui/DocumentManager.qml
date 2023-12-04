@@ -13,9 +13,11 @@ Item {
     }
 
     property GqlDocumentDataController documentController: GqlDocumentDataController {
-//        onError: {
-//            internal.m_closingDocuments = []
-//        }
+        onError: {
+            internal.m_closingDocuments = []
+
+            Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+        }
     }
 
     UuidGenerator {
@@ -206,10 +208,11 @@ Item {
     function onDocumentSaved(documentId, documentName, document, documentIndex)
     {
         document.documentId = documentId;
-        document.isDirty = false;
+        document.documentName = documentName;
+
         document.saved();
 
-        setDocumentTitle(documentIndex, documentName);
+        updateDocumentTitle(documentIndex);
 
         if (internal.m_closingDocuments.includes(document.uuid)){
             closeDocument(document.uuid);

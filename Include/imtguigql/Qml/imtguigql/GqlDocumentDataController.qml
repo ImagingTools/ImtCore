@@ -7,6 +7,9 @@ QtObject {
 
     property string getModelState: gqlGetModel.state;
     property string setModelState: gqlSetModel.state;
+    property string updateModelState: gqlUpdateModel.state;
+
+    signal error(string message, string type);
 
     function getData(documentTypeId, documentId, additionInputParams, callback){
         if (documentTypeId === ""){
@@ -38,7 +41,7 @@ QtObject {
 
     function updateData(documentTypeId, documentId, documentData, additionInputParams, callback){
         if (documentTypeId === ""){
-            console.error("Set data object was failed! DocumentTypeId is invalid.");
+            console.error("Update data object was failed! DocumentTypeId is invalid.");
             return;
         }
 
@@ -96,7 +99,7 @@ QtObject {
                             type = dataModelLocal.GetData("type");
                         }
 
-                        Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+                        container.error(message, type);
                     }
 
                     else if (container.gqlGetModel.ContainsKey("data")){
@@ -170,7 +173,7 @@ QtObject {
                             type = dataModelLocal.GetData("type");
                         }
 
-                        Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+                        container.error(message, type);
                     }
 
                     else if (container.gqlSetModel.ContainsKey("data")){
@@ -247,7 +250,7 @@ QtObject {
                             type = dataModelLocal.GetData("type");
                         }
 
-                        Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+                        container.error(message, type);
                     }
 
                     else if (container.gqlUpdateModel.ContainsKey("data")){

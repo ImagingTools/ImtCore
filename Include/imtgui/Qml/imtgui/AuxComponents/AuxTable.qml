@@ -903,7 +903,9 @@ Rectangle {
                     visible: tableContainer.canMoveColumns && model.index < headersList.count -1;
                     enabled: visible;
 
-                    cursorShape: containsPress ? Qt.PointingHandCursor : Qt.ArrowCursor;
+//                    hoverEnabled: true;
+                    cursorShape: containsMouse ? Qt.SplitHCursor : containsPress ? Qt.PointingHandCursor : Qt.ArrowCursor;
+//                    cursorShape: containsMouse ? Qt.SplitHCursor : Qt.ArrowCursor;
                     property var coord: mapToItem(moving,0,0);
                     onPressed: {
                         moving.coord = mapToItem(moving,mouse.x,mouse.y)
@@ -1114,6 +1116,8 @@ Rectangle {
                 onDoubleClicked: {
                     var point = mapToItem(null, mX, mY);
                     tableContainer.doubleClicked(point.x, point.y)
+
+                    console.log("selectItem", model.Id, model.Name)
                     tableContainer.selectItem(model.Id, model.Name);
                 }
             }

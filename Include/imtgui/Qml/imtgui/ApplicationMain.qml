@@ -150,9 +150,7 @@ Item {
                     serverUrl += "/";
                 }
 
-                console.log("serverUrl", serverUrl);
-
-//                serverUrl += "Lisa/wssub";
+                serverUrl += "ProLife/wssub";
 
                 subscriptionManager.url = serverUrl;
             }

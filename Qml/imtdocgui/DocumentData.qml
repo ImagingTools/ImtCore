@@ -10,13 +10,19 @@ Item {
 
     property string uuid;
     property string documentId;
+    property string documentName;
     property string documentTypeId;
 
     property bool isDirty: false;
     property bool readOnly: false;
     property bool documentCompleted: true;
 
-    property TreeItemModel documentModel: TreeItemModel {};
+    property TreeItemModel documentModel: TreeItemModel {
+        onDataChanged:{
+            documentData.onModelChanged();
+        }
+    };
+
     property UndoRedoManager undoManagerPtr: UndoRedoManager {
         onModelChanged: {
             let undoSteps = getAvailableUndoSteps();
@@ -93,6 +99,8 @@ Item {
     }
 
     onSaved: {
+        isDirty = false;
+
         if (undoManagerPtr){
             undoManagerPtr.setStandardModel(documentData.documentModel);
         }
@@ -114,6 +122,8 @@ Item {
     onDocumentModelChanged: {
         console.log("onDocumentModelChanged", documentModel.toJSON());
 
+        documentModel.dataChanged.connect(onModelChanged);
+
         beginDocumentModelChanged();
 
         if (documentModel.ContainsKey("Id")){
@@ -121,6 +131,13 @@ Item {
         }
         else{
             console.warn("The document model does not contain an identifier");
+        }
+
+        if (documentModel.ContainsKey("Name")){
+            documentName = documentModel.GetData("Name")
+        }
+        else{
+            console.warn("The document model does not contain a name");
         }
 
         // If model is empty then doUpdateModel
@@ -156,24 +173,11 @@ Item {
         commandsProvider.setCommandIsEnabled("Save", isDirty);
     }
 
-    Connections {
-        target: documentModel;
-
-        function onDataChanged(){
-            documentData.onModelChanged();
-        }
-    }
-
     function beginDocumentModelChanged(){}
     function endDocumentModelChanged(){}
 
     function getDocumentName()
     {
-        let documentName = "";
-        if (documentModel.ContainsKey("Name")){
-            documentName = documentModel.GetData("Name");
-        }
-
         return documentName;
     }
 

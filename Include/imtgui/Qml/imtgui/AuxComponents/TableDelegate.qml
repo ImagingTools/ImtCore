@@ -299,7 +299,7 @@ Rectangle {
         //visible: false;
 
         //preventStealing: false;
-        propagateComposedEvents: true;
+//        propagateComposedEvents: true;
 
         acceptedButtons: Qt.LeftButton | Qt.RightButton;
 
