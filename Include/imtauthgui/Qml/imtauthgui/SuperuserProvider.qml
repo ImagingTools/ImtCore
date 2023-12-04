@@ -9,22 +9,6 @@ QtObject {
 
     signal modelStateChanged(string state);
 
-//    property GqlDocumentDataController documentController: GqlDocumentDataController {
-//        onDocumentModelChanged: {
-//            console.log("onDocumentModelChanged", documentModel.toJSON());
-//            root.result(true, "");
-//        }
-
-//        onError: {
-//            console.log("onError", message);
-//            root.result(false, "");
-//        }
-
-//        onGetModelStateChanged: {
-//            root.modelStateChanged(this.getModelState);
-//        }
-//    }
-
     function superuserExists(){
         console.log("superuserExists");
 

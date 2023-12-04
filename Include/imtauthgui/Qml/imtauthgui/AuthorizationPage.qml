@@ -23,14 +23,11 @@ Rectangle {
     signal loginFailed();
 
     Component.onCompleted: {
-//        Events.subscribeEvent("Logout", authPageContainer.logout);
         decoratorPause.start();
-
         PermissionsController.authorizationPage = authPageContainer;
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("Logout", authPageContainer.logout);
     }
 
     onLoginSuccessful: {

@@ -30,94 +30,26 @@ QtObject {
         return root.items.includes(modelIndex);
     }
 
-//    function tableKeyPressed(event){
-//        if (tableViewRoot.selectedIndex == null){
-//            return;
-//        }
+//    function select(item){
+//        root.updateSelection();
 
-//        if (event.key == Qt.Key_Up) {
-//            let currentIndex = tableViewRoot.selectedIndex;
-//            let prevIndex = currentIndex.prevIndex;
-//            if (prevIndex == null){
-//                let parentIndex = currentIndex.parentIndex;
+//        item.Selected = true;
 
-//                prevIndex = parentIndex;
-//            }
-//            else if (prevIndex != null && prevIndex.itemData.IsOpen){
-//                // Если есть предыдущий смотрим его childModel
-//                while (prevIndex.childModel.length > 0){
-//                    prevIndex = prevIndex.childModel[prevIndex.childModel.length - 1];
-//                    if (!prevIndex.itemData.IsOpen){
-//                        break;
-//                    }
-//                }
-//            }
+//        root.items.push(item)
 
-//            if (prevIndex != null){
-//                root.select(prevIndex.itemData);
-//            }
-//        }
-//        else if (event.key == Qt.Key_Down) {
-//            let currentIndex = tableViewRoot.selectedIndex;
-//            if (currentIndex != null){
-//                let nextIndex;
-//                // Если есть дочерние индексы и элемент раскрыт => переходим к ним
-//                if (currentIndex.childModel.length > 0 && currentIndex.itemData.IsOpen){
-//                    nextIndex = currentIndex.childModel[0];
-//                }
-//                else{
-//                    nextIndex = tableViewRoot.selectedIndex.nextIndex;
-//                }
-
-//                // Если следующего нет => берем следующий у parent
-//                if (nextIndex == null){
-//                    let parent = currentIndex.parentIndex;
-
-//                    while (parent != null){
-//                        nextIndex = parent.nextIndex;
-//                        if (nextIndex != null){
-//                            break;
-//                        }
-
-//                        parent = parent.parentIndex;
-//                    }
-//                }
-
-//                if (nextIndex != null){
-//                    root.select(nextIndex.itemData);
-//                }
-//            }
-//        }
+//        root.selectionChanged();
 //    }
 
-    //    property var selectionMode: SelectionMode.SM_SINGLE_SELECTION;
+//    function deselect(item){
+//        item.Selected = false;
+//        let pos = root.items.indexOf(item)
 
-    //    enum SelectionMode {
-    //        SM_UNKNOWN,
-    //        SM_SINGLE_SELECTION,
-    //        SM_MULTI_SELECTION
-    //    }
+//        if (pos >= 0){
+//            root.items.splice(pos, 1)
+//        }
 
-    function select(item){
-        root.updateSelection();
-
-        item.Selected = true;
-
-        root.items.push(item)
-
-        root.selectionChanged();
-    }
-
-    function deselect(item){
-        item.Selected = false;
-        let pos = root.items.indexOf(item)
-
-        if (pos >= 0){
-            root.items.splice(pos, 1)
-        }
-
-        root.selectionChanged();
-    }
+//        root.selectionChanged();
+//    }
 
     function contains(item){
         return root.items.includes(item);

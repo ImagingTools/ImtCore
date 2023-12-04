@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtqml 1.0
 import imtcontrols 1.0
 
 TableViewItemDelegateBase {
@@ -13,7 +14,9 @@ TableViewItemDelegateBase {
 
     property bool tristate: true; //prefixRowItem.visible;
 
+    property var rootDelegate: treeDelegateBase.level === 0 ? treeDelegateBase : parentDelegate.rootDelegate;
     property var parentDelegate: null;
+
     property var childrenDelegates: [];
 
     level: treeDelegateBase.parentDelegate == null ? 0 : treeDelegateBase.parentDelegate.level + 1;
@@ -21,8 +24,31 @@ TableViewItemDelegateBase {
     signal parentCheckStateChanged(var delegate);
     signal childrenCheckStateChanged(var delegate);
 
+    property var childModel: model.ChildModel;
+
+    onChildModelChanged: {
+        console.log("Delegate onChildModelChanged", childModel);
+    }
+
+    Connections {
+        id: connections;
+
+        target: treeDelegateBase;
+
+        function onIsOpenedChanged(){
+            console.log("onIsOpenedChanged", treeDelegateBase.isOpened);
+            if (treeDelegateBase.parentDelegate != null && treeDelegateBase.isOpened){
+                treeDelegateBase.parentDelegate.isOpened = true;
+            }
+        }
+
+        enabled: true;
+    }
+
     onParentCheckStateChanged: {
-        treeDelegateBase.checkState = delegate.checkState;
+        if (isCheckable){
+            treeDelegateBase.checkState = delegate.checkState;
+        }
 
         for (let childrenDelegate of treeDelegateBase.childrenDelegates){
             childrenDelegate.parentCheckStateChanged(treeDelegateBase);
@@ -30,22 +56,24 @@ TableViewItemDelegateBase {
     }
 
     onChildrenCheckStateChanged: {
-        let isAllChecked = treeDelegateBase.root.__checkState(treeDelegateBase.childrenDelegates, Qt.Checked);
-        let isAllUnchecked = treeDelegateBase.root.__checkState(treeDelegateBase.childrenDelegates, Qt.Unchecked);
+        if (isCheckable){
+            let isAllChecked = treeDelegateBase.root.__checkState(treeDelegateBase.childrenDelegates, Qt.Checked);
+            let isAllUnchecked = treeDelegateBase.root.__checkState(treeDelegateBase.childrenDelegates, Qt.Unchecked);
 
-        if (isAllChecked){
-            if (treeDelegateBase.checkState != Qt.Checked){
-                treeDelegateBase.checkState = Qt.Checked;
+            if (isAllChecked){
+                if (treeDelegateBase.checkState != Qt.Checked){
+                    treeDelegateBase.checkState = Qt.Checked;
+                }
             }
-        }
-        else if (isAllUnchecked){
-            if (treeDelegateBase.checkState!= Qt.Unchecked){
-                treeDelegateBase.checkState = Qt.Unchecked;
+            else if (isAllUnchecked){
+                if (treeDelegateBase.checkState!= Qt.Unchecked){
+                    treeDelegateBase.checkState = Qt.Unchecked;
+                }
             }
-        }
-        else if (!isAllChecked && !isAllUnchecked){
-            if (treeDelegateBase.checkState != Qt.PartiallyChecked){
-                treeDelegateBase.checkState = Qt.PartiallyChecked;
+            else if (!isAllChecked && !isAllUnchecked){
+                if (treeDelegateBase.checkState != Qt.PartiallyChecked){
+                    treeDelegateBase.checkState = Qt.PartiallyChecked;
+                }
             }
         }
 
@@ -83,11 +111,13 @@ TableViewItemDelegateBase {
 
                     visible: treeDelegateBase.hasChild;
 
-                    iconSource: treeDelegateBase.isOpened ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
-                                                          "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
+                    iconSource: treeDelegateBase.isOpened ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal) :
+                                                            "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal);
 
                     onClicked: {
+                        connections.enabled = false;
                         treeDelegateBase.isOpened = !treeDelegateBase.isOpened;
+                        connections.enabled = true;
                     }
                 }
             }
@@ -127,7 +157,13 @@ TableViewItemDelegateBase {
             Repeater {
                 id: childModelRepeater;
 
+                model: treeDelegateBase.itemData.ChildModel ? treeDelegateBase.itemData.ChildModel: 0;
+
                 delegate: treeDelegateBase.root ? treeDelegateBase.root.rowDelegate : null;
+
+                onCountChanged: {
+                    treeDelegateBase.hasChild = count > 0;
+                }
 
                 onItemAdded: {
                     item.parentDelegate = treeDelegateBase;
@@ -135,6 +171,8 @@ TableViewItemDelegateBase {
 
                     item.modelIndex.parentIndex = treeDelegateBase.modelIndex;
                     treeDelegateBase.modelIndex.childModel.push(item.modelIndex);
+
+                    item.modelIndex.treeModel = childModelRepeater.model;
                 }
 
                 onItemRemoved: {
@@ -147,20 +185,6 @@ TableViewItemDelegateBase {
                     if (index > -1) {
                         treeDelegateBase.modelIndex.childModel.splice(index, 1);
                     }
-                }
-            }
-
-            property var childModel: treeDelegateBase.itemData.ChildModel ? model.ChildModel: 0;
-            onChildModelChanged: {
-                if (childrenColumn.childModel){
-                    if (childrenColumn.childModel.GetItemsCount() > 0){
-                            treeDelegateBase.hasChild = true;
-                    }
-
-                    childModelRepeater.model = childrenColumn.childModel;
-                }
-                else{
-                    treeDelegateBase.hasChild = false;
                 }
             }
         }

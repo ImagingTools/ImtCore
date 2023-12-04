@@ -147,6 +147,9 @@ imtimg.file = ../../Include/imtimg/QMake/imtimg.pro
 SUBDIRS += imtclientgql
 imtclientgql.file = ../../Include/imtclientgql/QMake/imtclientgql.pro
 
+SUBDIRS += imtdocgui
+imtdocgui.file = ../../Qml/imtdocgui/QMake/imtdocgui.pro
+
 ######### Component packages
 SUBDIRS += ImtCorePck
 ImtCorePck.file = ../../Impl/ImtCorePck/QMake/ImtCorePck.pro

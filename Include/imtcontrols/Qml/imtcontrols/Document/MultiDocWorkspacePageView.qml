@@ -28,13 +28,6 @@ Rectangle {
             return;
         }
 
-//        var startItemObj = startItemComp.createObject(documentManager);
-//        if (!startItemObj){
-//            console.log("Start item object not ready!");
-
-//            return;
-//        }
-
         documentManager.registerDocument(typeId, startItemComp);
         documentManager.insertNewDocument(typeId);
     }

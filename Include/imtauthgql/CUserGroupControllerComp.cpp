@@ -36,11 +36,6 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::GetObject(const imtgql::CGqlR
 		isJsonSerialized = inputParamPtr->GetFieldArgumentValue("IsJsonSerialized").toBool();
 	}
 
-	dataModel->SetData("Id", "");
-	dataModel->SetData("Name", "");
-	dataModel->SetData("Description", "");
-	dataModel->SetData("Users", "");
-
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(userGroupId, dataPtr)){
 		imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
@@ -66,25 +61,15 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::GetObject(const imtgql::CGqlR
 				dataModel->SetData("Id", userGroupId);
 				dataModel->SetData("Name", name);
 				dataModel->SetData("Description", description);
-				dataModel->SetData("Users", "");
 
 				imtauth::IUserGroupInfo::UserIds userGroupIds = userGroupInfoPtr->GetUsers();
-				if (!userGroupIds.empty()){
-					QByteArray users = userGroupIds.join(';');
-					dataModel->SetData("Users", users);
-				}
+				dataModel->SetData("Users", userGroupIds.join(';'));
 
 				imtauth::IUserGroupInfo::RoleIds roleIds = userGroupInfoPtr->GetRoles(productId);
-				if (!roleIds.empty()){
-					QByteArray roles = roleIds.join(';');
-					dataModel->SetData("Roles", roles);
-				}
+				dataModel->SetData("Roles", roleIds.join(';'));
 
 				imtauth::IUserGroupInfo::GroupIds groupIds = userGroupInfoPtr->GetParentGroups();
-				if (!groupIds.isEmpty()){
-					QByteArray groups = groupIds.join(';');
-					dataModel->SetData("ParentGroups", groups);
-				}
+				dataModel->SetData("ParentGroups", groupIds.join(';'));
 			}
 		}
 	}
@@ -96,11 +81,11 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::GetObject(const imtgql::CGqlR
 
 
 istd::IChangeable* CUserGroupControllerComp::CreateObject(
-		const QList<imtgql::CGqlObject>& inputParams,
-		QByteArray& objectId,
-		QString& name,
-		QString& /*description*/,
-		QString& errorMessage) const
+			const QList<imtgql::CGqlObject>& inputParams,
+			QByteArray& objectId,
+			QString& name,
+			QString& /*description*/,
+			QString& errorMessage) const
 {
 
 	if (!m_userGroupInfoFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){

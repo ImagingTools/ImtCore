@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtdocgui 1.0
 import imtqml 1.0
 
 Item {
@@ -13,7 +14,7 @@ Item {
 
     property Item collectionViewBase: null;
 
-    property Item documentManager: null;
+    property Item documentManagerPtr: null;
 
     property CommandsProvider commandsProvider: null;
 
@@ -30,12 +31,6 @@ Item {
 
     property bool autoUpdateAfterChanges: false;
 
-    signal commandActivated(string commandId);
-
-    signal renamed(string id, string newName);
-    signal descriptionSetted(string id, string description);
-    signal removed(string id);
-
     property alias removeGqlModel: removeModel;
     property alias renameGqlModel: renameQuery;
     property alias setDescriptionGqlModel: setDescriptionQuery;
@@ -50,11 +45,14 @@ Item {
     /**
         Requests IDs for GQL models
     */
-    property string gqlModelRemove;
-    property string gqlModelRename;
-    property string gqlModelSetDescription;
-    property string gqlModelItem;
-    property string gqlModelMetaInfo;
+    property string removeGqlCommand;
+    property string renameGqlCommand;
+    property string setDescriptionGqlCommand;
+
+    signal commandActivated(string commandId);
+    signal renamed(string id, string newName);
+    signal descriptionSetted(string id, string description);
+    signal removed(string id);
 
     onDescriptionSetted: {
         if (autoUpdateAfterChanges){
@@ -75,7 +73,9 @@ Item {
 
     onTableDataChanged: {
         if (containerBase.tableData){
-            containerBase.tableData.rightButtonMouseClicked.connect(openPopupMenu);
+            if (containerBase.tableData.rightButtonMouseClicked){
+                containerBase.tableData.rightButtonMouseClicked.connect(openPopupMenu);
+            }
 
             containerBase.tableData.selectionChanged.connect(containerBase.selectionChanged);
         }
@@ -83,13 +83,41 @@ Item {
 
     Component.onDestruction: {
         Events.unSubscribeEvent(containerBase.commandId + "CommandActivated", containerBase.commandHandle);
-        if (containerBase.tableData){
-        }
     }
 
     onCommandIdChanged: {
         console.log("CollectionCommands oncommandIdChanged", containerBase.commandId);
         Events.subscribeEvent(containerBase.commandId + "CommandActivated", containerBase.commandHandle);
+
+        if (containerBase.commandId !== ""){
+            removeGqlCommand = containerBase.commandId + "Remove";
+            renameGqlCommand = containerBase.commandId + "Rename";
+            setDescriptionGqlCommand = containerBase.commandId + "SetDescription";
+        }
+    }
+
+    onRenamed: {
+//        containerBase.documentManagerPtr.setDocumentTitle({"Id": id, "Title": newName});
+        if (autoUpdateAfterChanges){
+            containerBase.collectionViewBase.updateGui();
+        }
+    }
+
+    onRemoved: {
+        console.log('onRemoved',id)
+        console.log('documentManagerPtr',containerBase.documentManagerPtr)
+        if (containerBase.documentManagerPtr){
+            let documentIndex = containerBase.documentManagerPtr.getDocumentIndexByDocumentId(id);
+            console.log("documentIndex", documentIndex)
+
+            if (documentIndex >= 0){
+                containerBase.documentManagerPtr.closeDocumentByIndex(documentIndex, true);
+            }
+        }
+
+        if (autoUpdateAfterChanges){
+            containerBase.collectionViewBase.updateGui();
+        }
     }
 
     CollectionViewCommandsObserver {
@@ -121,19 +149,29 @@ Item {
 
             let itemId = elementsModel.GetData("Id", index);
             let itemName = elementsModel.GetData("Name", index);
-            containerBase.collectionViewBase.selectItem(itemId, itemName, index);
+            containerBase.collectionViewBase.selectItem(itemId, itemName);
         }
     }
 
     function onRemove(){
+        if (containerBase.commandId === "" || removeGqlCommand === ""){
+            console.error("Remove item was failed!")
+            return;
+        }
+
         modalDialogManager.openDialog(removeDialog, {});
     }
 
     function onNew(){
-        containerBase.collectionViewBase.selectItem("", "<new item>");
+        containerBase.collectionViewBase.selectItem("", "");
     }
 
     function onRename(){
+        if (containerBase.commandId === "" || renameGqlCommand === ""){
+            console.error("Rename item was failed!")
+            return;
+        }
+
         let indexes = containerBase.tableData.getSelectedIndexes();
         if (indexes.length > 0){
             let selectedName = containerBase.tableData.elements.GetData("Name", indexes[0]);
@@ -142,6 +180,11 @@ Item {
     }
 
     function onSetDescription(){
+        if (containerBase.commandId === "" || setDescriptionGqlCommand === ""){
+            console.error("Set description to the item was failed!")
+            return;
+        }
+
         let elements = containerBase.tableData.elements;
 
         let indexes = containerBase.tableData.getSelectedIndexes();
@@ -186,28 +229,13 @@ Item {
         }
 
         if (commandId === "Close"){
-            containerBase.documentManager.closeDocument(itemId);
+            if (containerBase.documentManagerPtr){
+                let uuid = containerBase.collectionViewBase.uuid;
+                containerBase.documentManagerPtr.closeDocument(uuid);
+            }
         }
 
         commandActivated(commandId);
-    }
-
-    onRenamed: {
-        containerBase.documentManager.setDocumentTitle({"Id": id, "Title": newName});
-        if (autoUpdateAfterChanges){
-            containerBase.collectionViewBase.updateGui();
-        }
-    }
-
-    onRemoved: {
-        console.log('onRemoved',id)
-        if (containerBase.documentManager){
-            containerBase.documentManager.closeDocument(id, true);
-        }
-
-        if (autoUpdateAfterChanges){
-            containerBase.collectionViewBase.updateGui();
-        }
     }
 
     Component {
@@ -303,7 +331,7 @@ Item {
             var inputParams = Gql.GqlObject("input");
 
             if(itemId !== ""){
-                query = Gql.GqlRequest("mutation", containerBase.gqlModelRemove);
+                query = Gql.GqlRequest("mutation", containerBase.removeGqlCommand);
                 inputParams.InsertField("Id", itemId);
                 queryFields = Gql.GqlObject("removedNotification");
                 query.AddParam(inputParams);
@@ -327,8 +355,8 @@ Item {
                 if (removeModel.ContainsKey("errors")){
                     dataModelLocal = removeModel.GetData("errors");
 
-                    if (dataModelLocal.ContainsKey(containerBase.gqlModelRemove)){
-                        dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelRemove);
+                    if (dataModelLocal.ContainsKey(containerBase.removeGqlCommand)){
+                        dataModelLocal = dataModelLocal.GetData(containerBase.removeGqlCommand);
                     }
 
                     let message = ""
@@ -342,8 +370,8 @@ Item {
                     }
 
                     Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
-                    //                    if (dataModelLocal.ContainsKey(containerBase.gqlModelRemove)){
-                    //                        dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelRemove);
+                    //                    if (dataModelLocal.ContainsKey(containerBase.removeGqlCommand)){
+                    //                        dataModelLocal = dataModelLocal.GetData(containerBase.removeGqlCommand);
                     //                        var message = dataModelLocal.GetData("message");
                     //                        modalDialogManager.openDialog(errorDialog, {"message": message});
                     //                    }
@@ -354,8 +382,8 @@ Item {
                 if (removeModel.ContainsKey("data")){
                     dataModelLocal = removeModel.GetData("data");
 
-                    if (dataModelLocal.ContainsKey(containerBase.gqlModelRemove)){
-                        dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelRemove);
+                    if (dataModelLocal.ContainsKey(containerBase.removeGqlCommand)){
+                        dataModelLocal = dataModelLocal.GetData(containerBase.removeGqlCommand);
 
                         if (dataModelLocal.ContainsKey("removedNotification")){
                             dataModelLocal = dataModelLocal.GetData("removedNotification");
@@ -384,7 +412,7 @@ Item {
             var queryFields;
             var inputParams = Gql.GqlObject("input");
 
-            query = Gql.GqlRequest("mutation", containerBase.gqlModelRename);
+            query = Gql.GqlRequest("mutation", containerBase.renameGqlCommand);
 
             let itemIds = containerBase.tableData.getSelectedIds();
             inputParams.InsertField("Id", itemIds[0]);
@@ -412,8 +440,8 @@ Item {
                 if (renameQuery.ContainsKey("errors")){
                     dataModelLocal = renameQuery.GetData("errors");
 
-                    if (dataModelLocal.ContainsKey(containerBase.gqlModelRename)){
-                        dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelRename);
+                    if (dataModelLocal.ContainsKey(containerBase.renameGqlCommand)){
+                        dataModelLocal = dataModelLocal.GetData(containerBase.renameGqlCommand);
 
                         let message = ""
                         if (dataModelLocal.ContainsKey("message")){
@@ -439,8 +467,8 @@ Item {
                 if (renameQuery.ContainsKey("data")){
                     dataModelLocal = renameQuery.GetData("data");
 
-                    if (dataModelLocal.ContainsKey(containerBase.gqlModelRename)) {
-                        dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelRename);
+                    if (dataModelLocal.ContainsKey(containerBase.renameGqlCommand)) {
+                        dataModelLocal = dataModelLocal.GetData(containerBase.renameGqlCommand);
 
                         let oldId = dataModelLocal.GetData("Id");
                         let newName = dataModelLocal.GetData("Name");
@@ -462,7 +490,7 @@ Item {
             var queryFields;
             var inputParams = Gql.GqlObject("input");
 
-            query = Gql.GqlRequest("mutation", containerBase.gqlModelSetDescription);
+            query = Gql.GqlRequest("mutation", containerBase.setDescriptionGqlCommand);
 
             let itemIds = containerBase.tableData.getSelectedIds();
             inputParams.InsertField("Id", itemIds[0]);
@@ -489,8 +517,8 @@ Item {
                 if (setDescriptionQuery.ContainsKey("errors")){
                     dataModelLocal = setDescriptionQuery.GetData("errors");
 
-                    if (dataModelLocal.ContainsKey(containerBase.gqlModelSetDescription)){
-                        dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelSetDescription);
+                    if (dataModelLocal.ContainsKey(containerBase.setDescriptionGqlCommand)){
+                        dataModelLocal = dataModelLocal.GetData(containerBase.setDescriptionGqlCommand);
 
                         //                        if (dataModelLocal.ContainsKey("message")){
                         //                            var message = dataModelLocal.GetData("message");
@@ -516,9 +544,9 @@ Item {
                 if (setDescriptionQuery.ContainsKey("data")){
                     dataModelLocal = setDescriptionQuery.GetData("data");
 
-                    if (dataModelLocal.ContainsKey(containerBase.gqlModelSetDescription)) {
+                    if (dataModelLocal.ContainsKey(containerBase.setDescriptionGqlCommand)) {
 
-                        dataModelLocal = dataModelLocal.GetData(containerBase.gqlModelSetDescription);
+                        dataModelLocal = dataModelLocal.GetData(containerBase.setDescriptionGqlCommand);
 
                         var id = dataModelLocal.GetData("Id");
                         var description = dataModelLocal.GetData("Description");

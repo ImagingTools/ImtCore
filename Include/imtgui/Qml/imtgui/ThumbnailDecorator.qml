@@ -2,6 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtauthgui 1.0
 import imtguigql 1.0
+import imtdocgui 1.0
 import 'AuxComponents'
 
 Rectangle {
@@ -115,9 +116,13 @@ Rectangle {
         pagesManager.clearModels();
 
         preferenceDialog.clearModels();
-        settingsProvider.clearModel();
 
-        mainDocumentManager.clear();
+        if (settingsProvider){
+            settingsProvider.clearModel();
+            settingsProvider.serverModel = null;
+        }
+
+//        mainDocumentManager.clear();
     }
 
     MenuPanel {
@@ -160,7 +165,15 @@ Rectangle {
     MainDocumentManager {
         id: mainDocumentManager;
 
-        menuPanelRef: menuPanel;
+        onDocumentOpened: {
+            for (let i = 0; i < menuPanel.model.GetItemsCount(); i++){
+                let pageId = menuPanel.model.GetData("Id", i);
+                if (pageId === typeId){
+                    menuPanel.activePageIndex = i;
+                    break;
+                }
+            }
+        }
     }
 
     PagesManager {

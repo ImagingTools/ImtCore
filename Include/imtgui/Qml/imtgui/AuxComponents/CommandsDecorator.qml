@@ -28,11 +28,15 @@ Item {
 
         commandsDecoratorContainer.commandId = commId;
         buttonPanel.buttonModel = model;
+
         buttonPanel.updateModel();
     }
 
-    function clearModel(){
-        buttonPanel.clearModel();
+    function clearModel(parameters){
+        let commandId = parameters["CommandId"];
+        if (commandId === commandsDecoratorContainer.commandId){
+            buttonPanel.clearModel();
+        }
     }
 
     function setVisible(visible){

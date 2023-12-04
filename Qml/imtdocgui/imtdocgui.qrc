@@ -1,0 +1,24 @@
+<RCC>
+    <qresource prefix="/qml">
+        <file alias="imtdocgui/qmldir">qmldir</file>
+        <file alias="imtdocgui/CommandsProvider.qml">CommandsProvider.qml</file>
+        <file alias="imtdocgui/DocumentBase.qml">DocumentBase.qml</file>
+        <file alias="imtdocgui/DocumentDataProvider.qml">DocumentDataProvider.qml</file>
+        <file alias="imtdocgui/DocumentWorkspaceCommandsDelegate.qml">DocumentWorkspaceCommandsDelegate.qml</file>
+        <file alias="imtdocgui/DocumentWorkspaceCommandsDelegateBase.qml">DocumentWorkspaceCommandsDelegateBase.qml</file>
+        <file alias="imtdocgui/MainDocumentManager.qml">MainDocumentManager.qml</file>
+        <file alias="imtdocgui/MultiDocWorkspacePageView.qml">MultiDocWorkspacePageView.qml</file>
+        <file alias="imtdocgui/MultiDocWorkspaceView.qml">MultiDocWorkspaceView.qml</file>
+        <file alias="imtdocgui/SingleDocumentWorkspaceView.qml">SingleDocumentWorkspaceView.qml</file>
+        <file alias="imtdocgui/UndoRedo.qml">UndoRedo.qml</file>
+        <file alias="imtdocgui/UndoRedoManager.qml">UndoRedoManager.qml</file>
+        <file alias="imtdocgui/DocumentData.qml">DocumentData.qml</file>
+        <file alias="imtdocgui/DocumentManager.qml">DocumentManager.qml</file>
+        <file alias="imtdocgui/DocumentView.qml">DocumentView.qml</file>
+
+        <file alias="imtdocgui/DocumentHistoryDialog.qml">DocumentHistoryDialog.qml</file>
+        <file alias="imtdocgui/DocumentHistoryProvider.qml">DocumentHistoryProvider.qml</file>
+        <file alias="imtdocgui/DocumentHistoryView.qml">DocumentHistoryView.qml</file>
+    </qresource>
+    <qresource prefix="/"/>
+</RCC>

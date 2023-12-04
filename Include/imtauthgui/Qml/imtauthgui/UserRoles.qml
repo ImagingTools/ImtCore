@@ -7,24 +7,14 @@ Item {
     id: userRolesContainer;
 
     property TreeItemModel documentModel: TreeItemModel {}
-    property UndoRedoManager undoRedoManager: null;
-
-    property bool blockUpdatingModel: false;
+    property Item documentPtr: null;
 
     property int radius: 3;
 
+    property bool completed: rolesProvider.completed;
+
     Component.onCompleted: {
         rolesProvider.updateModel();
-    }
-
-    onDocumentModelChanged: {
-        rolesProvider.updateModel();
-    }
-
-    onVisibleChanged: {
-        if (userRolesContainer.visible){
-            userRolesContainer.updateGui();
-        }
     }
 
     CollectionDataProvider {
@@ -39,8 +29,6 @@ Item {
                 if (rolesProvider.collectionModel.ContainsKey("Roles")){
                     let rolesModel = rolesProvider.collectionModel.GetData("Roles");
                     rolesTable.elements = rolesModel;
-
-                    userRolesContainer.updateGui();
                 }
             }
         }
@@ -52,8 +40,6 @@ Item {
 
     function updateGui(){
         console.log("UserRoles updateGui");
-        userRolesContainer.blockUpdatingModel = true;
-
         let roleIds = [];
         if (userRolesContainer.documentModel.ContainsKey("Roles")){
             let roles = userRolesContainer.documentModel.GetData("Roles")
@@ -72,20 +58,10 @@ Item {
                 }
             }
         }
-
-        userRolesContainer.blockUpdatingModel = false;
     }
 
     function updateModel(){
         console.log("UserRoles updateModel");
-        if (userRolesContainer.blockUpdatingModel){
-            return;
-        }
-
-        if (userRolesContainer.undoRedoManager){
-            userRolesContainer.undoRedoManager.beginChanges();
-        }
-
         let selectedRoleIds = []
         let indexes = rolesTable.getCheckedItems();
         for (let index of indexes){
@@ -95,10 +71,6 @@ Item {
 
         let result = selectedRoleIds.join(';');
         userRolesContainer.documentModel.SetData("Roles", result);
-
-        if (userRolesContainer.undoRedoManager){
-            userRolesContainer.undoRedoManager.endChanges();
-        }
     }
 
     Component{
@@ -168,22 +140,8 @@ Item {
         radius: userRolesContainer.radius;
 
         onCheckedItemsChanged: {
-            if (userRolesContainer.blockUpdatingModel){
-                return;
-            }
-
-            let indexes = rolesTable.getCheckedItems();
-            let roles = userRolesContainer.documentModel.GetData("Roles");
-            let roleIDs = [];
-            for (let index of indexes){
-                let groupId = rolesTable.elements.GetData("Id", index);
-                roleIDs.push(groupId);
-            }
-
-            let newRoles = roleIDs.join(';');
-            if (roles !== newRoles){
-                userRolesContainer.documentModel.SetData("Roles", roleIDs.join(';'));
-                undoRedoManager.makeChanges();
+            if (userRolesContainer.documentPtr){
+                userRolesContainer.documentPtr.doUpdateModel();
             }
         }
     }

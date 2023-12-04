@@ -8,8 +8,8 @@ Item {
 
     property TreeItemModel pageModel: TreeItemModel {};
     property Item activeItem: null;
-    property int activePageIndex: -1;
-    property MainDocumentManager documentManager: null;
+    property int activePageIndex: 0;
+    property var documentManager: null;
     property AuthorizationPage authorizationStatusProvider: null;
 
     Component.onCompleted: {
@@ -79,55 +79,52 @@ Item {
 
             visible: container.activePageIndex === model.index;
 
-            Component.onCompleted: {
-                if (container.documentManager != null){
-                    container.documentManager.registerDocumentManager(model.Id, null);
-                }
+//            Component.onCompleted: {
+//                if (container.documentManager != null){
+//                    container.documentManager.registerDocumentManager(model.Id, null);
+//                }
 
-                Events.subscribeEvent("PageNameChanged", pagesDeleg.onPageNameChanged);
-            }
+//                Events.subscribeEvent("PageNameChanged", pagesDeleg.onPageNameChanged);
+//            }
 
-            Component.onDestruction: {
-                Events.unSubscribeEvent("PageNameChanged", pagesDeleg.onPageNameChanged);
-            }
+//            Component.onDestruction: {
+//                Events.unSubscribeEvent("PageNameChanged", pagesDeleg.onPageNameChanged);
+//            }
 
-            function onPageNameChanged(parameters){
-                let pageId = parameters["Id"]
-                let pageName = parameters["Name"]
+//            function onPageNameChanged(parameters){
+//                let pageId = parameters["Id"]
+//                let pageName = parameters["Name"]
 
-                if (pageId == model.Id){
-                    model.Name = pageName;
-                }
-            }
+//                if (pageId == model.Id){
+//                    model.Name = pageName;
+//                }
+//            }
 
             /**
                 The page will be loaded only by click if it hasn't loaded yet
             */
-            onVisibleChanged: {
-                if(pagesDeleg.visible){
-                    if (!pagesLoader.item){
-                        if (container.pageModel && container.pageModel.ContainsKey("Source", model.index)){
-                            var source = container.pageModel.GetData("Source", model.index);
-                            if (source){
-                                pagesLoader.source = source;
-                            }
-                        }
-                    }
+//            onVisibleChanged: {
+//                if(pagesDeleg.visible){
+//                    if (!pagesLoader.item){
+//                        if (container.pageModel && container.pageModel.ContainsKey("Source", model.index)){
+//                            var source = container.pageModel.GetData("Source", model.index);
+//                            if (source){
+//                                pagesLoader.source = source;
+//                            }
+//                        }
+//                    }
 
-                    container.activeItem = pagesLoader.item;
-                }
-            }
-
-            function updateName(newName){
-                if (pagesLoader.item){
-                    pagesLoader.item.startPageObj["Name"] = newName;
-
-                }
-            }
+//                    container.activeItem = pagesLoader.item;
+//                }
+//            }
 
             Loader {
                 id: pagesLoader;
                 anchors.fill: parent;
+
+                source: model.Source;
+
+                visible: parent.visible;
 
                 onItemChanged: {
                     if (pagesLoader.item){
@@ -146,7 +143,11 @@ Item {
                 }
 
                 onStatusChanged: {
-                    console.log("Pages loader onStatusChanged", status);
+                    console.error("pagesLoader onStatusChanged", pagesLoader.source);
+
+                    if (status == Loader.Error){
+                        console.error("Loading page with source", pagesLoader.source, "was failed!");
+                    }
                 }
             }
         }

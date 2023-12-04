@@ -1,0 +1,113 @@
+import QtQuick 2.12
+import Acf 1.0
+import imtcontrols 1.0
+import imtqml 1.0
+
+Item {
+    id: commandsDecoratorContainer;
+
+    height: 30;
+    width: rowCommands.width;
+
+    property string commandsId
+    property alias model: repeaterCommands.model
+
+    Component.onCompleted: {
+        Events.subscribeEvent("Logout", commandsDecoratorContainer.clearModel);
+        Events.subscribeEvent("SetCommandsVisible", commandsDecoratorContainer.setVisible);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("Logout", commandsDecoratorContainer.clearModel);
+        Events.unSubscribeEvent("SetCommandsVisible", commandsDecoratorContainer.setVisible);
+    }
+
+    function onLocalizationChanged(language){
+    }
+
+    function setCommandsModel(parameters){
+        console.log("CommandsDecorator setCommandsModel", parameters, commandsDecoratorContainer);
+        let model = parameters["Model"];
+        let commId = parameters["CommandsId"];
+
+        repeaterCommands.model = model;
+        commandsDecoratorContainer.commandsId = commId;
+
+    }
+
+    function clearModel(){
+        repeaterCommands.model = 0;
+    }
+
+    function setVisible(visible){
+        rowCommands.visible = visible;
+    }
+
+
+    Row {
+        id: rowCommands;
+
+        height: parent.height;
+
+        spacing: 15;
+
+        Repeater {
+            id: repeaterCommands;
+
+            delegate:
+                Button {
+
+                id: topButtonDelegate;
+
+                decoratorComponent: Decorators.topButtonDecorator
+                iconSource: model.IsEnabled ? "../../../../Icons/" + Style.theme + "/" + model.Icon + "_Off_Normal.svg" :
+                                       "../../../../Icons/" + Style.theme + "/" + model.Icon + "_Off_Disabled.svg";
+
+                enabled: model.IsEnabled;
+
+                visible: model.Visible;
+
+                text: "test" // model.Name;
+
+                checked: checkable ? model.IsToggled !== undefined ? model.IsToggled : false : false;
+                checkable: model.IsToggleable !== undefined ? model.IsToggleable : false
+
+                Component.onCompleted: {
+                    console.log("Command onCompleted", model.Id);
+                }
+
+                onClicked: {
+                    Events.sendEvent(commandsDecoratorContainer.commandsId + "CommandActivated", model.Id);
+                }
+
+                Rectangle {
+                    id: notification;
+
+                    anchors.top: parent.top;
+                    anchors.right: parent.right;
+
+                    width: notificationText.width + 10;
+                    height: notificationText.height;
+
+                    color: Style.errorTextColor;
+                    radius: width;
+
+                    visible: model.Status && model.Status !== "";
+
+                    Text {
+                        id: notificationText;
+
+                        anchors.centerIn: notification;
+
+                        text: model.Status;
+
+                        font.family: Style.fontFamilyBold;
+                        font.pixelSize: Style.fontSize_common;
+
+                        color: Style.baseColor;
+                    }
+                }
+            }
+        }
+    }
+}

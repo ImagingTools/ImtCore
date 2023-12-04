@@ -7,7 +7,6 @@ import '../Actions'
 import '../Application'
 import '../Buttons'
 import '../Dialogs'
-import '../Document'
 import '../Inputs'
 import '../Models'
 import '../Panels'
@@ -19,7 +18,6 @@ Item {
     id: application;
 
     anchors.fill: parent;
-
 
 
     property string message;

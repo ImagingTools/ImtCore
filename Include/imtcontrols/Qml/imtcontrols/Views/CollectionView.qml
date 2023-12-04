@@ -161,7 +161,7 @@ Item {
         collectionMetaInfo.gqlModelMetaInfo = collectionViewContainer.commandId + "MetaInfo";
 
         if (commandsLoader.item){
-            commandsLoader.item.commandId = collectionViewContainer.commandId;
+            commandsLoader.item.commandsId = collectionViewContainer.commandId;
 
             commandsLoader.item.gqlModelItem = commandsLoader.item.commandId + "Item";
             commandsLoader.item.gqlModelRemove = commandsLoader.item.commandId + "Remove";
@@ -258,6 +258,9 @@ Item {
         }
 
         onLoaded: {
+            console.log("commandsLoader onLoaded");
+            commandsLoader.item.commandsId = collectionViewContainer.commandId;
+
             commandsLoader.item.tableData = collectionViewBase.table;
 
             commandsLoader.item.collectionViewBase = collectionViewContainer;
@@ -265,6 +268,10 @@ Item {
             commandsLoader.item.documentManager = collectionViewContainer.documentManager;
 
             commandsLoader.item.contextMenuModel = collectionViewContainer.contextMenuModel;
+        }
+
+        onStatusChanged: {
+            console.log("commandsLoader onStatusChanged", status);
         }
     }
 

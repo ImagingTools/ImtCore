@@ -6,67 +6,45 @@ Item {
     id: root;
 
     property var documentManagers: ({})
-    property MenuPanel menuPanelRef: null;
 
-    property bool openingDocument: false;
-    property string openingDocumentTypeId;
+    signal documentOpened(string typeId, string documentId, string documentTypeId);
 
-    property var openingDocumentInfo: null;
+    Component.onCompleted: {
+        Events.subscribeEvent("RegisterDocumentManager", registerDocumentManager);
+        Events.subscribeEvent("OpenDocument", openDocument);
+    }
 
     Component.onDestruction: {
-        root.unsubscribeAll();
+        Events.unSubscribeEvent("RegisterDocumentManager", registerDocumentManager);
+        Events.unSubscribeEvent("OpenDocument", openDocument);
     }
 
-    function clear(){
-        root.unsubscribeAll();
-        root.documentManagers = {};
-        root.openingDocumentInfo = null;
-    }
+    function registerDocumentManager(parameters){
+        console.log("registerDocumentManager");
 
-    function unsubscribeAll(){
-        let typeIds = Object.keys(root.documentManagers);
-        for (let i = 0; i < typeIds.length; i++){
-            Events.unSubscribeEvent(typeIds[i] + "CollectionUpdated", root.collectionUpdated);
-        }
-    }
+        let typeId = parameters["TypeId"];
+        let documentManager = parameters["DocumentManager"];
 
-    function registerDocumentManager(typeId, documentManager){
-        console.log("registerDocumentManager", typeId, documentManager);
         root.documentManagers[typeId] = documentManager;
-
-        Events.subscribeEvent(typeId + "CollectionUpdated", root.collectionUpdated);
 
         return true;
     }
 
-    function collectionUpdated(){
-        console.log('MainDocumentManager collectionUpdated')
-        if (root.openingDocumentInfo != null){
+    function openDocument(parameters){
+        let typeId = parameters["TypeId"];
+        let documentId = parameters["DocumentId"];
+        let documentTypeId = parameters["DocumentTypeId"];
 
-            openDocument(root.openingDocumentInfo["DocumentTypeId"], root.openingDocumentInfo["DocumentId"]);
-            root.openingDocumentInfo = null;
-        }
-    }
+        console.log('MainDocumentManager openDocument', typeId, documentId, documentTypeId)
 
-    function openDocument(typeId, documentId){
-        let typeIds = Object.keys(root.documentManagers);
-        let index = typeIds.indexOf(typeId);
-        if (index >= 0){
+        if (typeId in root.documentManagers){
             let documentManager = root.documentManagers[typeId];
             if (documentManager){
-                let mainCollection = documentManager.getMainCollectionView();
-                if (mainCollection !== null){
-                    mainCollection.selectItem(documentId, "Order");
-                }
-            }
-            else{
-                root.openingDocumentInfo = {"DocumentId": documentId, "DocumentTypeId": typeId}
-            }
-
-            if (root.menuPanelRef != null){
-                root.menuPanelRef.activePageIndex = index;
+                documentManager.openDocument(documentId, documentTypeId);
             }
         }
+
+        documentOpened(typeId, documentId ,documentTypeId);
     }
 
     function saveDirtyDocuments(){

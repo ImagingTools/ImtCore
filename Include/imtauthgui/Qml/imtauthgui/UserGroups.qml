@@ -7,13 +7,13 @@ Item {
     id: userGroupsContainer;
 
     property TreeItemModel documentModel: TreeItemModel {}
-    property UndoRedoManager undoRedoManager: null;
-
-    property bool blockUpdatingModel: false;
+    property Item documentPtr: null;
 
     property int radius: 3;
 
-    onDocumentModelChanged: {
+    property bool completed: groupsProvider.completed;
+
+    Component.onCompleted: {
         groupsProvider.updateModel();
     }
 
@@ -26,10 +26,7 @@ Item {
 
         onModelUpdated: {
             if (groupsProvider.collectionModel != null){
-
                 groupsTable.elements = groupsProvider.collectionModel;
-
-                userGroupsContainer.updateGui();
             }
         }
     }
@@ -40,7 +37,6 @@ Item {
 
     function updateGui(){
         console.log("UserGroups updateGui");
-        userGroupsContainer.blockUpdatingModel = true;
 
         let groupIds = []
         if (userGroupsContainer.documentModel.ContainsKey("Groups")){
@@ -59,20 +55,10 @@ Item {
                 }
             }
         }
-
-        userGroupsContainer.blockUpdatingModel = false;
     }
 
     function updateModel(){
         console.log("UserRoles updateModel");
-        if (userGroupsContainer.blockUpdatingModel){
-            return;
-        }
-
-        if (userGroupsContainer.undoRedoManager){
-            userGroupsContainer.undoRedoManager.beginChanges();
-        }
-
         let selectedGroupIds = []
 
         let indexes = groupsTable.getCheckedItems();
@@ -82,10 +68,6 @@ Item {
         }
 
         userGroupsContainer.documentModel.SetData("Groups", selectedGroupIds.join(';'));
-
-        if (userGroupsContainer.undoRedoManager){
-            userGroupsContainer.undoRedoManager.endChanges();
-        }
     }
 
     Component{
@@ -117,7 +99,6 @@ Item {
 
         anchors.top: parent.top;
         anchors.left: parent.left;
-        //        anchors.leftMargin: 10;
 
         text: qsTr("Groups");
         color: Style.textColor;
@@ -156,22 +137,8 @@ Item {
         radius: userGroupsContainer.radius;
 
         onCheckedItemsChanged: {
-            if (userGroupsContainer.blockUpdatingModel){
-                return;
-            }
-
-            let indexes = groupsTable.getCheckedItems();
-            let groups = userGroupsContainer.documentModel.GetData("Groups");
-            let groupIDs = [];
-            for (let index of indexes){
-                let groupId = groupsTable.elements.GetData("Id", index);
-                groupIDs.push(groupId);
-            }
-
-            let newGroups = groupIDs.join(';');
-            if (groups !== newGroups){
-                userGroupsContainer.documentModel.SetData("Groups", groupIDs.join(';'));
-                undoRedoManager.makeChanges();
+            if (userGroupsContainer.documentPtr){
+                userGroupsContainer.documentPtr.doUpdateModel();
             }
         }
     }

@@ -1,8 +1,8 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtguigql 1.0
-import imtcontrols 1.0
-
+import imtcontrols 1.0 as ImtControls
+import imtgui 1.0 as ImtGui
 
 Item {
     id: documentManager;
@@ -11,9 +11,13 @@ Item {
         dynamicRoles: true;
     }
 
-    property GqlDocumentDataController documentController: GqlDocumentDataController {}
+    property GqlDocumentDataController documentController: GqlDocumentDataController {
+        onError: {
+            internal.m_closingDocuments = []
+        }
+    }
 
-    UuidGenerator {
+    ImtControls.UuidGenerator {
         id: uuidGenerator;
     }
 
@@ -29,14 +33,14 @@ Item {
 
     function getActiveView()
     {
-        return privateFields.m_activeViewPtr;
+        return internal.m_activeViewPtr;
     }
 
 
     function setActiveView(viewPtr)
     {
-        if (privateFields.m_activeViewPtr !== viewPtr){
-            privateFields.m_activeViewPtr = viewPtr;
+        if (internal.m_activeViewPtr !== viewPtr){
+            internal.m_activeViewPtr = viewPtr;
         }
     }
 
@@ -45,7 +49,7 @@ Item {
     {
         let documentsCount = getDocumentsCount();
         for (let documentIndex = 0; documentIndex < documentsCount; ++documentIndex){
-            let info = privateMethods.getSingleDocumentData(documentIndex);
+            let info = internal.getSingleDocumentData(documentIndex);
             if (info.documentPtr === document){
                 return info.documentTypeId;
             }
@@ -61,7 +65,7 @@ Item {
             return false;
         }
 
-        privateFields.m_registeredView[documentTypeId] = viewComp;
+        internal.m_registeredView[documentTypeId] = viewComp;
 
         return true;
     }
@@ -75,13 +79,13 @@ Item {
             return null;
         }
 
-        return privateFields.m_registeredView[documentTypeId];
+        return internal.m_registeredView[documentTypeId];
     }
 
 
     function documentIsRegistered(documentTypeId)
     {
-        return documentTypeId in privateFields.m_registeredView;
+        return documentTypeId in internal.m_registeredView;
     }
 
 
@@ -109,9 +113,16 @@ Item {
 
     function openDocument(documentId, documentTypeId)
     {
+        let index = getDocumentIndexByDocumentId(documentId);
+        if (index >= 0){
+            documentAdded(index, "");
+
+            return;
+        }
+
         let documentData = createDocumentComponent(documentTypeId);
         if (!documentData){
-            return false;
+            return;
         }
 
         let callback = function(documentModel){
@@ -150,13 +161,13 @@ Item {
 
                     let documentId = document.documentId;
                     let documentModel = document.documentModel;
+                    let documentTypeId = document.documentTypeId;
+
+                    documentController.documentTypeId = documentTypeId;
 
                     if (documentId === ""){
                         let callBack = function(documentId, documentName){
-                            document.documentId = documentId;
-                            document.isDirty = false;
-                            document.saved();
-
+                            onDocumentSaved(documentId, documentName, document, index);
                             documentController.documentAdded.disconnect(callBack);
                         }
 
@@ -164,10 +175,7 @@ Item {
                     }
                     else{
                         let callBack = function(documentId, documentName){
-                            document.documentId = documentId;
-                            document.isDirty = false;
-                            document.saved();
-
+                            onDocumentSaved(documentId, documentName, document, index);
                             documentController.documentUpdated.disconnect(callBack);
                         }
 
@@ -179,10 +187,23 @@ Item {
     }
 
 
+    function onDocumentSaved(documentId, documentName, document, documentIndex)
+    {
+        document.documentId = documentId;
+        document.isDirty = false;
+        document.saved();
+
+        setDocumentTitle(documentIndex, documentName);
+
+        if (internal.m_closingDocuments.includes(document.uuid)){
+            closeDocument(document.uuid);
+        }
+    }
+
+
     function getDocumentIndexByUuid(documentUuid){
         for (let i = 0; i < documentsModel.count; i++){
             let uuid = documentsModel.get(i).Uuid;
-            console.log("uuid", uuid);
             if (String(uuid) === String(documentUuid)){
                 return i;
             }
@@ -190,6 +211,19 @@ Item {
 
         return -1;
     }
+
+
+    function getDocumentIndexByDocumentId(documentId){
+        for (let i = 0; i < documentsModel.count; i++){
+            let documentObj = documentsModel.get(i).DocumentObj;
+            if (documentObj && documentObj.documentId === documentId){
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
 
 
     function setDocumentTitle(documentIndex, title)
@@ -222,7 +256,23 @@ Item {
             documentClosed(documentIndex, "");
         }
         else{
-            modalDialogManager.openDialog(saveDialog, {});
+            let callback = function(result){
+                console.log("saveDialog callback", result);
+
+                if (result === "Yes"){
+                    internal.m_closingDocuments.push(documentData.uuid);
+                    saveDocument(documentData.uuid);
+                }
+                else if (result === "No"){
+                    documentData.isDirty = false;
+
+                    closeDocumentByIndex(documentIndex);
+                }
+
+                modalDialogManager.finished.disconnect(callback);
+            }
+
+            modalDialogManager.openDialog(saveDialog, {}, callback);
         }
     }
 
@@ -263,45 +313,42 @@ Item {
     }
 
     QtObject {
-        id: privateMethods;
+        id: internal;
 
         function getSingleDocumentData(index)
         {
-            if (index < 0 || index >= privateFields.m_documentInfos.length){
+            if (index < 0 || index >= internal.m_documentInfos.length){
                 return null;
             }
 
-            return privateFields.m_documentInfos[index];
+            return internal.m_documentInfos[index];
         }
 
         function getDocumentInfoFromView(view)
         {
             let documentsCount = documentManager.getDocumentsCount();
             for (let documentIndex = 0; documentIndex < documentsCount; ++documentIndex){
-                let info = privateMethods.getSingleDocumentData(documentIndex);
+                let info = internal.getSingleDocumentData(documentIndex);
 
                 for (let viewIndex = 0; viewIndex < documentsCount; ++viewIndex){
 
                 }
             }
 
-            return privateFields.m_activeViewPtr[index];
+            return internal.m_activeViewPtr[index];
         }
-    }
-
-    QtObject {
-        id: privateFields;
 
         property var m_registeredView: ({});
         property var m_documentInfos: [];
         property var m_activeViewPtr;
+        property var m_closingDocuments: [];
     }
 
 
     Component {
         id: saveDialog;
 
-        MessageDialog {
+        ImtGui.MessageDialog {
             title: qsTr("Save document");
 
             message: qsTr("Save all changes ?")
@@ -312,8 +359,7 @@ Item {
 
             onFinished: {
                 console.log("saveDialog onFinished", buttonId);
-                if (buttonId === Enums.ButtonType.Ok){
-                    console.log("Ok");
+                if (buttonId === "Yes"){
                 }
             }
         }

@@ -16,12 +16,11 @@ namespace imtlicgql
 imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
+		errorMessage = QString("Internal error");
+		SendErrorMessage(0, errorMessage, "CAccountControllerComp");
+
 		return nullptr;
 	}
-
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 
 	QByteArray accountId = GetObjectIdFromInputParams(gqlRequest.GetParams());
 
@@ -29,6 +28,9 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlReq
 	if (m_objectCollectionCompPtr->GetObjectData(accountId, dataPtr)){
 		const imtauth::CCompanyInfo* companyInfoPtr = dynamic_cast<const imtauth::CCompanyInfo*>(dataPtr.GetPtr());
 		if (companyInfoPtr != nullptr){
+			istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+			imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+
 			QString accountName = companyInfoPtr->GetName();
 			QString accountDescription = companyInfoPtr->GetDescription();
 			QString mail = companyInfoPtr->GetEmail();
@@ -40,39 +42,44 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlReq
 				for (const imtbase::ICollectionInfo::Id& addressId : addressesIds){
 					const imtauth::IAddress* addressPtr = addressProviderPtr->GetAddress(addressId);
 					if (addressPtr != nullptr){
-						dataModel->SetData("Country", addressPtr->GetCountry());
-						dataModel->SetData("City", addressPtr->GetCity());
-						dataModel->SetData("PostalCode", addressPtr->GetPostalCode());
-						dataModel->SetData("Street", addressPtr->GetStreet());
+						dataModelPtr->SetData("Country", addressPtr->GetCountry());
+						dataModelPtr->SetData("City", addressPtr->GetCity());
+						dataModelPtr->SetData("PostalCode", addressPtr->GetPostalCode());
+						dataModelPtr->SetData("Street", addressPtr->GetStreet());
 
 						break;
 					}
 				}
 			}
 
-			dataModel->SetData("Id", accountId);
-			dataModel->SetData("Name", accountName);
-			dataModel->SetData("Description", accountDescription);
-			dataModel->SetData("Email", mail);
-			dataModel->SetData("Groups", groups.join(';'));
+			dataModelPtr->SetData("Id", accountId);
+			dataModelPtr->SetData("Name", accountName);
+			dataModelPtr->SetData("Description", accountDescription);
+			dataModelPtr->SetData("Email", mail);
+			dataModelPtr->SetData("Groups", groups.join(';'));
+
+			return rootModelPtr.PopPtr();
 		}
 	}
 
-	rootModelPtr->SetExternTreeModel("data", dataModel);
+	errorMessage = QT_TR_NOOP(QString("Unable to get an account with ID: '%1'.").arg(qPrintable(accountId)));
+	SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
-	return rootModelPtr.PopPtr();
+	return nullptr;
 }
 
 
 istd::IChangeable* CAccountControllerComp::CreateObject(
-		const QList<imtgql::CGqlObject>& inputParams,
-		QByteArray &objectId,
-		QString &name,
-		QString &description,
-		QString& errorMessage) const
+			const QList<imtgql::CGqlObject>& inputParams,
+			QByteArray& objectId,
+			QString& name,
+			QString& description,
+			QString& errorMessage) const
 {
 	if (!m_accountInfoFactCompPtr.IsValid() || !m_objectCollectionCompPtr.IsValid()){
-		Q_ASSERT(false);
+		errorMessage = QString("Internal error");
+		SendErrorMessage(0, errorMessage, "CAccountControllerComp");
+
 		return nullptr;
 	}
 
@@ -85,12 +92,17 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 	if (!itemData.isEmpty()){
 		imtauth::ICompanyInfo* companyInstancePtr = m_accountInfoFactCompPtr.CreateInstance();
 		if (companyInstancePtr == nullptr){
+			errorMessage = QString("Unable to create an instance of the company object.");
+			SendErrorMessage(0, errorMessage, "CAccountControllerComp");
+
 			return nullptr;
 		}
 
 		imtauth::CIdentifiableCompanyInfo* companyInfoPtr = dynamic_cast<imtauth::CIdentifiableCompanyInfo*>(companyInstancePtr);
 		if (companyInfoPtr == nullptr){
 			errorMessage = QT_TR_NOOP("Unable to get an account info!");
+			SendErrorMessage(0, errorMessage, "CAccountControllerComp");
+
 			return nullptr;
 		}
 
@@ -105,6 +117,8 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 
 		if (name.isEmpty()){
 			errorMessage = QT_TR_NOOP("Account name can't be empty");
+			SendErrorMessage(0, errorMessage, "CAccountControllerComp");
+
 			return nullptr;
 		}
 
@@ -180,6 +194,7 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 	}
 
 	errorMessage = QObject::tr("Can not create account: %1").arg(QString(objectId));
+	SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
 	return nullptr;
 }

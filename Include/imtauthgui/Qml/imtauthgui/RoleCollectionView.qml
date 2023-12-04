@@ -11,6 +11,8 @@ CollectionView {
 
     property bool newCommandIsEnabled: true;
 
+    documentName: qsTr("Roles");
+
     tableElementsDelegate: Component { TableProductRolesDelegate {
         width: baseCollectionView.table.width;
 
@@ -37,12 +39,20 @@ CollectionView {
         elementsList.spacing = 10;
         baseCollectionView.table.showHeaders = false;
         baseCollectionView.hasPagination = false;
+
+        roleCollectionViewContainer.commandId = "Roles";
     }
 
     onElementsChanged: {
         if (elementsList.model.ContainsKey("Roles")){
             let elementsModel = elementsList.model.GetData("Roles");
             baseCollectionView.table.tableSelection.countElements = elementsModel.GetItemsCount();
+        }
+    }
+
+    onDocumentManagerPtrChanged: {
+        if (documentManagerPtr){
+            documentManagerPtr.registerDocument("Role", roleDocumentComp);
         }
     }
 
@@ -78,19 +88,29 @@ CollectionView {
         return retVal;
     }
 
-    function selectItem(id, name){
-        Events.sendEvent("CommandsClearModel");
+    function selectItem(id){
+        console.log("CollectionView selectItem", id);
 
-        let editorPath = baseCollectionView.commands.objectViewEditorPath;
-        let commandsId = baseCollectionView.commands.objectViewEditorCommandsId;
-
-        let elements = baseCollectionView.table.elements;
-
-        let productId = elements.GetData("Id");
-        documentManager.openDocument(id, {"Id": id, "ProductId": productId, "Name": name, "Source": editorPath, "CommandId": commandsId});
+        if (id === ""){
+            documentManagerPtr.insertNewDocument("Role");
+        }
+        else{
+            documentManagerPtr.openDocument(id, "Role");
+        }
     }
 
     function onCommandsModelChanged(){
         roleCollectionViewContainer.newCommandIsEnabled = commandsProvider.commandExists("New");
+    }
+
+    Component {
+        id: roleDocumentComp;
+
+        RoleView {
+            Component.onCompleted: {
+                let elements = baseCollectionView.table.elements;
+                productId = elements.GetData("Id")
+            }
+        }
     }
 }

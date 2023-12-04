@@ -1,77 +1,73 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtgui 1.0
 import imtauthgui 1.0
 import imtqml 1.0
 import imtlicgui 1.0
+import imtdocgui 1.0
+import imtgui 1.0
 
-DocumentBase {
+DocumentData {
     id: root;
 
     property TreeItemModel allFeaturesModel: TreeItemModel {}
     property TreeItemModel featuresModel: TreeItemModel {}
     property TreeItemModel licensesModel: TreeItemModel {}
 
+    documentCompleted: productCollection.completed && licenseCollection.completed;
+
     Component.onCompleted: {
         productCollection.updateModel();
         licenseCollection.updateModel();
     }
 
-    property bool allReady: modelIsReady && productCollection.completed && licenseCollection.completed;
-
-    onAllReadyChanged: {
-        if (allReady){
-            root.updateGui();
-
-            undoRedoManager.registerModel(documentModel);
-        }
-    }
-
     function blockEditing(){
     }
 
-    UndoRedoManager {
-        id: undoRedoManager;
-
-        documentBase: root;
-        onModelStateChanged: {
-            console.log("UndoRedoManager onModelStateChanged");
-
-            root.updateGui();
-        }
-    }
-
     function updateModel(){
-        if (root.blockUpdatingModel){
-            return;
-        }
-
-        undoRedoManager.beginChanges();
-
+        console.log("updateModel");
         root.documentModel.SetData("LicenseName", licenseNameInput.text);
         root.documentModel.SetData("LicenseId", licenseIdInput.text);
         root.documentModel.SetData("LicenseDescription", descriptionInput.text);
-
-        root.documentModel.SetData("ProductId", "");
 
         if (productsCB.currentIndex >= 0 && productsCB.model){
             let productId = productsCB.model.GetData("Id", productsCB.currentIndex);
             root.documentModel.SetData("ProductId", productId);
         }
+        else{
+            root.documentModel.SetData("ProductId", "")
+        }
 
-        if (!root.documentModel.ContainsKey("Features")){
+        let indexes = featuresTable.getCheckedItems();
+        if (indexes.length > 0 && featuresTable.elements){
+            let featuresIds = [];
+            for (let index of indexes){
+                let featureId = featuresTable.elements.GetData("Id", index);
+                featuresIds.push(featureId);
+            }
+
+            root.documentModel.SetData("Features", featuresIds.join(';'));
+        }
+        else{
             root.documentModel.SetData("Features", "");
         }
 
-        if (!root.documentModel.ContainsKey("ParentLicenses")){
+        let licensesIndexes = licensesTable.getCheckedItems();
+        if (licensesIndexes.length > 0 && licensesTable.elements){
+            let licenseIds = [];
+            for (let index of licensesIndexes){
+                let id = licensesTable.elements.GetData("Id", index);
+                licenseIds.push(id);
+            }
+
+            root.documentModel.SetData("ParentLicenses", licenseIds.join(';'));
+        }
+        else{
             root.documentModel.SetData("ParentLicenses", "");
         }
-
-        undoRedoManager.endChanges();
     }
 
     function updateGui(){
-        root.blockUpdatingModel = true;
+        console.log("updateGui");
 
         if (root.documentModel.ContainsKey("LicenseId")){
             licenseIdInput.text = root.documentModel.GetData("LicenseId")
@@ -85,55 +81,36 @@ DocumentBase {
             descriptionInput.text = root.documentModel.GetData("LicenseDescription")
         }
 
-        productsCB.currentIndex = -1;
+        let productFound = false;
+
         if (root.documentModel.ContainsKey("ProductId")){
             let productId = root.documentModel.GetData("ProductId");
-            let productModel = productsCB.model;
-            for (let i = 0; i < productModel.GetItemsCount(); i++){
-                let id = productModel.GetData("Id", i);
-                if (id === productId){
-                    productsCB.currentIndex = i;
-                    break;
+            if (productsCB.model){
+                let productModel = productsCB.model;
+                for (let i = 0; i < productModel.GetItemsCount(); i++){
+                    let id = productModel.GetData("Id", i);
+                    if (id === productId){
+                        productsCB.currentIndex = i;
+                        productFound = true;
+                        break;
+                    }
                 }
             }
+        }
+
+        if (!productFound){
+            productsCB.currentIndex = -1;
+        }
+        else{
+            updateFeaturesModel();
+            updateLicensesModel();
         }
 
         updateFeaturesGui();
         updateLicensesGui();
-
-        root.blockUpdatingModel = false;
     }
 
     function updateLicensesGui(){
-        console.log("updateLicensesGui");
-        root.blockUpdatingModel = true;
-
-        root.licensesModel.Clear();
-
-        if (productsCB.currentIndex >= 0){
-            let productId = productsCB.model.GetData("Id", productsCB.currentIndex);
-
-            for (let i = 0; i < licenseCollection.collectionModel.GetItemsCount(); i++){
-                let id = licenseCollection.collectionModel.GetData("Id", i)
-                let licenses = licenseCollection.collectionModel.GetData("ParentLicenses", i)
-
-                if (id === root.itemId || licenses.split(';').includes(root.itemId)){
-                    continue;
-                }
-
-                let productUuid = licenseCollection.collectionModel.GetData("ProductUuid", i)
-                if (productUuid === productId){
-                    let index = root.licensesModel.InsertNewItem();
-
-                    root.licensesModel.CopyItemDataFromModel(index, licenseCollection.collectionModel, i);
-                }
-            }
-        }
-
-        console.log("root.licensesModel", root.licensesModel.toJSON());
-
-        licensesTable.elements = root.licensesModel;
-
         if (root.documentModel.ContainsKey("ParentLicenses")){
             let licenses = root.documentModel.GetData("ParentLicenses");
             let licenseIds = licenses.split(';');
@@ -149,13 +126,35 @@ DocumentBase {
                 }
             }
         }
-
-        root.blockUpdatingModel = false;
     }
 
-    function updateFeaturesGui(){
-        root.blockUpdatingModel = true;
+    function updateLicensesModel(){
+        root.licensesModel.Clear();
 
+        if (productsCB.currentIndex >= 0 && productsCB.model){
+            let productId = productsCB.model.GetData("Id", productsCB.currentIndex);
+
+            for (let i = 0; i < licenseCollection.collectionModel.GetItemsCount(); i++){
+                let id = licenseCollection.collectionModel.GetData("Id", i)
+                let licenses = licenseCollection.collectionModel.GetData("ParentLicenses", i)
+
+                if (id === root.documentId || licenses.split(';').includes(root.documentId)){
+                    continue;
+                }
+
+                let productUuid = licenseCollection.collectionModel.GetData("ProductUuid", i)
+                if (productUuid === productId){
+                    let index = root.licensesModel.InsertNewItem();
+
+                    root.licensesModel.CopyItemDataFromModel(index, licenseCollection.collectionModel, i);
+                }
+            }
+        }
+
+        licensesTable.elements = root.licensesModel;
+    }
+
+    function updateFeaturesModel(){
         root.featuresModel.Clear();
 
         if (productsCB.currentIndex >= 0){
@@ -173,7 +172,9 @@ DocumentBase {
         }
 
         featuresTable.elements = root.featuresModel;
+    }
 
+    function updateFeaturesGui(){
         if (root.documentModel.ContainsKey("Features")){
             let licenseFeatures = root.documentModel.GetData("Features");
             let licenseFeatureIds = licenseFeatures.split(';');
@@ -189,8 +190,6 @@ DocumentBase {
                 }
             }
         }
-
-        root.blockUpdatingModel = false;
     }
 
     CollectionDataProvider {
@@ -253,10 +252,7 @@ DocumentBase {
             }
 
             onEditingFinished: {
-                let oldText = root.documentModel.GetData("LicenseName");
-                if (oldText && oldText !== licenseNameInput.text || !oldText && licenseNameInput.text !== ""){
-                    root.updateModel();
-                }
+                root.doUpdateModel();
             }
 
             KeyNavigation.tab: licenseIdInput;
@@ -286,10 +282,7 @@ DocumentBase {
             }
 
             onEditingFinished: {
-                let oldText = root.documentModel.GetData("LicenseId");
-                if (oldText && oldText !== licenseIdInput.text || !oldText && licenseIdInput.text !== ""){
-                    root.updateModel();
-                }
+                root.doUpdateModel();
             }
 
             KeyNavigation.tab: descriptionInput;
@@ -319,10 +312,7 @@ DocumentBase {
             }
 
             onEditingFinished: {
-                let oldText = root.documentModel.GetData("LicenseDescription");
-                if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
-                    root.updateModel();
-                }
+                root.doUpdateModel();
             }
 
             KeyNavigation.tab: licenseNameInput;
@@ -352,22 +342,9 @@ DocumentBase {
             }
 
             onCurrentIndexChanged: {
-                if (root.blockUpdatingModel){
-                    return;
-                }
-
-                if (productsCB.currentIndex >= 0){
-                    let productId = productsCB.model.GetData("Id", productsCB.currentIndex);
-                    let productFeatures = productsCB.model.GetData("Features", productsCB.currentIndex);
-
-                    root.documentModel.SetData("ProductId", productId);
-                    root.documentModel.SetData("Features", "");
-
-                    root.updateFeaturesGui();
-                    root.updateLicensesGui();
-
-                    undoRedoManager.makeChanges();
-                }
+                root.updateFeaturesModel()
+                root.updateLicensesModel()
+                root.doUpdateModel();
             }
         }
 
@@ -401,24 +378,7 @@ DocumentBase {
         }
 
         onCheckedItemsChanged: {
-            if (root.blockUpdatingModel){
-                return;
-            }
-
-            let indexes = featuresTable.getCheckedItems();
-            let features = root.documentModel.GetData("Features");
-            let featuresIds = [];
-            for (let index of indexes){
-                let featureId = featuresTable.elements.GetData("Id", index);
-                featuresIds.push(featureId);
-            }
-
-            let newFeatures = featuresIds.join(';');
-            if (features !== newFeatures){
-                root.documentModel.SetData("Features", featuresIds.join(';'));
-
-                undoRedoManager.makeChanges();
-            }
+            root.doUpdateModel();
         }
     }
 
@@ -451,7 +411,6 @@ DocumentBase {
             anchors.bottom: parent.bottom;
 
             width: parent.width;
-//            height: parent.height - 50;
 
             checkable: true;
 
@@ -463,24 +422,7 @@ DocumentBase {
             }
 
             onCheckedItemsChanged: {
-                if (root.blockUpdatingModel){
-                    return;
-                }
-
-                let indexes = licensesTable.getCheckedItems();
-                let licenses = root.documentModel.GetData("ParentLicenses");
-                let licenseIds = [];
-                for (let index of indexes){
-                    let id = licensesTable.elements.GetData("Id", index);
-                    licenseIds.push(id);
-                }
-
-                let newLicenses = licenseIds.join(';');
-                if (licenses !== newLicenses){
-                    root.documentModel.SetData("ParentLicenses", licenseIds.join(';'));
-
-                    undoRedoManager.makeChanges();
-                }
+                root.doUpdateModel();
             }
         }
     }

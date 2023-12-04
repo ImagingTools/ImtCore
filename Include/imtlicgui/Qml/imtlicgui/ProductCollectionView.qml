@@ -8,9 +8,34 @@ CollectionView {
 
     visibleMetaInfo: false;
 
+    documentName: qsTr("Products");
+
     Component.onCompleted: {
         productCollectionViewContainer.commandsDelegatePath = "../../imtlicgui/ProductCollectionViewCommandsDelegate.qml";
 
         baseCollectionView.commands.fieldsData.push("ProductId");
+
+        productCollectionViewContainer.commandId = "Products";
+    }
+
+    onDocumentManagerPtrChanged: {
+        if (documentManagerPtr){
+            documentManagerPtr.registerDocument("Product", productDocumentComp);
+        }
+    }
+
+    function selectItem(id){
+        if (id === ""){
+            documentManagerPtr.insertNewDocument("Product");
+        }
+        else{
+            documentManagerPtr.openDocument(id, "Product");
+        }
+    }
+
+    Component {
+        id: productDocumentComp;
+
+        ProductView {}
     }
 }

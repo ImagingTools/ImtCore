@@ -1,30 +1,24 @@
 import QtQuick 2.0
+import Acf 1.0
 import imtgui 1.0
 import imtqml 1.0
 import imtlicgui 1.0
-import Acf 1.0
 
 Item {
     id: userGroupEditorContainer;
 
     property TreeItemModel documentModel: TreeItemModel {}
-    property UndoRedoManager undoRedoManager: null;
-
-    property bool blockUpdatingModel: false;
+    property Item documentPtr: null;
 
     property int mainMargin: 0;
     property int panelWidth: 400;
 
     property int radius: 3;
 
-    onDocumentModelChanged: {
-        console.log("UserEditor onDocumentModelChanged", userGroupEditorContainer.documentModel);
+    property bool completed: groupsProvider.compl;
 
+    Component.onCompleted: {
         groupsProvider.updateModel();
-    }
-
-    onBlockUpdatingModelChanged: {
-        Events.sendEvent("DocumentUpdating", userGroupEditorContainer.blockUpdatingModel);
     }
 
     function getAllChildrenGroups(groupId, retVal){
@@ -64,6 +58,8 @@ Item {
         commandId: "Groups";
         fields: ["Id", "Name", "Description", "ParentGroups", "Roles"];
 
+        property bool compl: false;
+
         onModelUpdated: {
             if (groupsProvider.collectionModel != null){
                 let documentId = userGroupEditorContainer.documentModel.GetData("Id");
@@ -97,9 +93,7 @@ Item {
 
                 parentGroupsTable.elements = groupsProvider.collectionModel;
 
-                userGroupEditorContainer.updateGui();
-
-                nameInput.focus = true;
+                compl = true;
             }
         }
     }
@@ -107,14 +101,18 @@ Item {
     function updateGui(){
         console.log("GroupEditor updateGui");
 
-        userGroupEditorContainer.blockUpdatingModel = true;
-
         if (userGroupEditorContainer.documentModel.ContainsKey("Name")){
             nameInput.text = userGroupEditorContainer.documentModel.GetData("Name");
+        }
+        else{
+            nameInput.text = "";
         }
 
         if (userGroupEditorContainer.documentModel.ContainsKey("Description")){
             descriptionInput.text = userGroupEditorContainer.documentModel.GetData("Description");
+        }
+        else{
+            descriptionInput.text = "";
         }
 
         let parentGroupIds = []
@@ -134,19 +132,10 @@ Item {
                 }
             }
         }
-
-        userGroupEditorContainer.blockUpdatingModel = false;
     }
 
     function updateModel(){
-        console.log("GroupEditor updateModel");
-        if (userGroupEditorContainer.blockUpdatingModel){
-            return;
-        }
-
-        if (userGroupEditorContainer.undoRedoManager){
-            userGroupEditorContainer.undoRedoManager.beginChanges();
-        }
+        console.log("GroupEditor updateModel", userGroupEditorContainer.documentModel.toJSON());
 
         userGroupEditorContainer.documentModel.SetData("Description", descriptionInput.text);
         userGroupEditorContainer.documentModel.SetData("Name", nameInput.text);
@@ -159,11 +148,7 @@ Item {
         }
 
         userGroupEditorContainer.documentModel.SetData("ParentGroups", selectedGroupIds.join(';'));
-
-        if (userGroupEditorContainer.undoRedoManager){
-            userGroupEditorContainer.undoRedoManager.endChanges();
-        }
-        console.log("End updateModel");
+        console.log("GroupEditor end updateModel", userGroupEditorContainer.documentModel.toJSON());
     }
 
     Component{
@@ -227,7 +212,6 @@ Item {
                 id: titleName;
 
                 anchors.left: parent.left;
-//                anchors.leftMargin: 5;
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
@@ -245,9 +229,8 @@ Item {
                 placeHolderText: qsTr("Enter the name");
 
                 onEditingFinished: {
-                    let oldText = userGroupEditorContainer.documentModel.GetData("Name");
-                    if (oldText && oldText !== nameInput.text || !oldText && nameInput.text !== ""){
-                        userGroupEditorContainer.updateModel();
+                    if (userGroupEditorContainer.documentPtr){
+                        userGroupEditorContainer.documentPtr.doUpdateModel();
                     }
                 }
 
@@ -269,7 +252,6 @@ Item {
                 id: titleDescription;
 
                 anchors.left: parent.left;
-//                anchors.leftMargin: 5;
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
@@ -287,9 +269,8 @@ Item {
                 placeHolderText: qsTr("Enter the description");
 
                 onEditingFinished: {
-                    let oldText = userGroupEditorContainer.documentModel.GetData("Description");
-                    if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
-                        userGroupEditorContainer.updateModel();
+                    if (userGroupEditorContainer.documentPtr){
+                        userGroupEditorContainer.documentPtr.doUpdateModel();
                     }
                 }
 
@@ -350,22 +331,8 @@ Item {
         radius:userGroupEditorContainer.radius;
 
         onCheckedItemsChanged: {
-            if (userGroupEditorContainer.blockUpdatingModel){
-                return;
-            }
-
-            let indexes = parentGroupsTable.getCheckedItems();
-            let groups = userGroupEditorContainer.documentModel.GetData("ParentGroups");
-            let groupIDs = [];
-            for (let index of indexes){
-                let groupId = parentGroupsTable.elements.GetData("Id", index);
-                groupIDs.push(groupId);
-            }
-
-            let newGroups = groupIDs.join(';');
-            if (groups !== newGroups){
-                userGroupEditorContainer.documentModel.SetData("ParentGroups", groupIDs.join(';'));
-                undoRedoManager.makeChanges();
+            if (userGroupEditorContainer.documentPtr){
+                userGroupEditorContainer.documentPtr.doUpdateModel();
             }
         }
     }

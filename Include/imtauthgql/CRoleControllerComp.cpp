@@ -57,8 +57,6 @@ imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlReques
 			if (!dataModelPtr->CreateFromJson(roleJson)){
 				return nullptr;
 			}
-
-//			dataModelPtr->SetData("RoleJson", roleJson);
 		}
 		else{
 			QByteArray objectUuid = objectId;

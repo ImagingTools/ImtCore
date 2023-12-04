@@ -186,9 +186,9 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap& /*infoMap*/)
 		EndChanges(changeSet);
 	}
 
-	if (!m_isTransaction){
-		emit dataChanged(QModelIndex(), QModelIndex(), QVector<int>());
-	}
+//	if (!m_isTransaction){
+//		emit dataChanged(QModelIndex(), QModelIndex(), QVector<int>());
+//	}
 
 	return true;
 }
@@ -320,6 +320,10 @@ bool CTreeItemModel::SetData(const QByteArray& key, const QVariant& value, int i
 
 	Item* item = m_items[index];
 
+	if (item->Value(key) == value){
+		return true;
+	}
+
 	if (m_isUpdateEnabled){
 		IChangeable::ChangeSet changeSet = IChangeable::GetAnyChange();
 
@@ -339,23 +343,13 @@ bool CTreeItemModel::SetData(const QByteArray& key, const QVariant& value, int i
 		item->SetValue(key, value);
 	}
 
-	int keyRole = -1;
-	QList<int> keys = m_roleNames.keys();
-	for (int i : keys){
-		if (m_roleNames[i] == key){
-			keyRole = i;
-			break;
-		}
-	}
+	int keyRole = GetKeyRole(key);
 	if (keyRole > -1){
-		QModelIndex topLeft = QAbstractListModel::index(index - 1);
-		QModelIndex bottomRight = QAbstractListModel::index(index);
-
 		QVector<int> keyRoles;
 		keyRoles.append(keyRole);
 
 		if (!m_isTransaction){
-			emit dataChanged(topLeft, bottomRight, keyRoles);
+			emit dataChanged(QAbstractListModel::index(index - 1), QAbstractListModel::index(index), keyRoles);
 		}
 	}
 
@@ -389,19 +383,11 @@ bool CTreeItemModel::RemoveData(const QByteArray& key, int index, const ChangeIn
 		item->RemoveValue(key);
 	}
 
-	int keyRole = -1;
-	QList<int> keys = m_roleNames.keys();
-	for (int i : keys){
-		if (m_roleNames[i] == key){
-			keyRole = i;
-			break;
-		}
-	}
+	int keyRole = GetKeyRole(key);
 	if (keyRole > -1){
-		QModelIndex topLeft = QAbstractListModel::index(index);
 		QVector<int> roles;
 		roles.append(keyRole);
-		emit dataChanged(topLeft,topLeft,roles);
+		emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index), roles);
 	}
 
 	return true;
@@ -929,6 +915,19 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 }
 
 
+int CTreeItemModel::GetKeyRole(const QByteArray& key) const
+{
+	QList<int> keys = m_roleNames.keys();
+	for (int i : keys){
+		if (m_roleNames[i] == key){
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+
 bool CTreeItemModel::ParseRecursive(const QJsonObject& jsonObject, int index)
 {
 	bool retVal = true;
@@ -1000,6 +999,8 @@ void CTreeItemModel::subModelChanged(const CTreeItemModel *model, ChangeSet &cha
 void CTreeItemModel::OnEndChanges(const ChangeSet& changeSet)
 {
 	BaseClass::OnEndChanges(changeSet);
+
+	emit dataChanged(QModelIndex(), QModelIndex(), QVector<int>());
 }
 
 

@@ -16,6 +16,7 @@ include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
 
 set (INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
 set (IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
+set (QML_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Qml")
 set (TESTS_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Tests")
 set(AUX_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../AuxInclude/${TARGETNAME}/GeneratedFiles")
 set(ENABLE_TESTS_IMTCORE True CACHE STRING "Enable tests (True or False), defaults to True")
@@ -71,6 +72,9 @@ add_subdirectory("${INCLUDE_DIR}/imthttp/CMake" "${AUX_INCLUDE_DIR}/imthttp")
 add_dependencies(imthttp imtcom)
 add_subdirectory("${INCLUDE_DIR}/imtauthgql/CMake" "${AUX_INCLUDE_DIR}/imtauthgql")
 add_subdirectory("${INCLUDE_DIR}/imtauthdb/CMake" "${AUX_INCLUDE_DIR}/imtauthdb")
+
+#-------- Qml --------
+add_subdirectory("${QML_DIR}/imtdocgui/CMake" "${AUX_INCLUDE_DIR}/imtdocgui")
 
 if(NOT DEFINED USE_GEO OR USE_GEO)
 	add_subdirectory("${INCLUDE_DIR}/imtgeo/CMake" "${AUX_INCLUDE_DIR}/imtgeo")

@@ -4,6 +4,20 @@ import Acf 1.0;
 Item {
     id: undoRedoManager;
 
+    signal modelChanged();
+    signal undo();
+    signal redo();
+
+
+    function getCurrentStateModel()
+    {
+        if (internal.m_undoStack.length > 0){
+            return internal.m_undoStack[internal.m_undoStack.length - 1];
+        }
+
+        return null;
+    }
+
 
     function getAvailableUndoSteps()
     {
@@ -21,32 +35,91 @@ Item {
     {
         internal.m_undoStack = []
         internal.m_redoStack = []
+
+        modelChanged();
     }
 
 
-    function doUndo(steps = 1)
+    function doUndo(steps)
     {
-        doListShift(steps, internal.m_undoStack, internal.m_redoStack);
+        console.log("doUndo");
+
+        printInfo();
+
+        internal.m_isBlocked = true;
+
+        internal.m_redoStack.push(internal.m_observedModel.CopyMe());
+
+        let prevStateModel = internal.m_undoStack.pop();
+        if (internal.m_observedModel.Copy(prevStateModel)){
+            internal.m_observedModel.Refresh();
+        }
+
+        internal.m_isBlocked = false;
+
+        modelChanged();
+//        doListShift(steps, internal.m_undoStack, internal.m_redoStack);
+
+        printInfo();
+
+        undo();
     }
 
 
-    function doRedo(steps = 1)
+    function doRedo(steps)
     {
-        doListShift(steps, internal.m_redoStack, internal.m_undoStack);
+        console.log("doRedo");
+
+        printInfo();
+
+        internal.m_isBlocked = true;
+
+        internal.m_undoStack.push(internal.m_observedModel.CopyMe());
+
+        let nextStateModel = internal.m_redoStack.pop();
+        if (internal.m_observedModel.Copy(nextStateModel)){
+            internal.m_observedModel.Refresh();
+        }
+
+        internal.m_isBlocked = false;
+
+        modelChanged();
+//        doListShift(steps, internal.m_redoStack, internal.m_undoStack);
+
+        printInfo();
+        redo();
     }
 
 
     function doListShift(steps, fromList, toList)
     {
-        internal.m_isBlocked = true;
-
-        if ((steps > 0) && (fromList.length >= steps)){
-            for (let i = 1; i < steps; ++i){
-                toList.push(fromList.pop())
-            }
+        if (internal.m_isBlocked){
+            return;
         }
 
-        internal.m_isBlocked = false;
+        if ((steps > 0) && (fromList.length >= steps)){
+            internal.m_isBlocked = true;
+
+            printInfo();
+
+            let stateModel = fromList[fromList.length - steps];
+            if (internal.m_observedModel.Copy(stateModel)){
+                internal.m_observedModel.Refresh();
+            }
+            else{
+                console.log("Unable to copy observer model from current state model");
+            }
+
+            for (let i = 0; i < steps; ++i){
+                toList.push(fromList.pop())
+            }
+
+            modelChanged();
+
+            printInfo();
+
+            internal.m_isBlocked = false;
+        }
     }
 
 
@@ -58,21 +131,26 @@ Item {
             return;
         }
 
-        internal.m_observerModel = model;
-        internal.m_undoStack.push(model.CopyMe())
+        resetUndo();
+
+        internal.m_beginStateModel = model.CopyMe();
+
+        internal.m_observedModel = model;
+
+        setStandardModel(model);
     }
 
 
     function unregisterModel()
     {
-        internal.m_observerModel = null;
+        internal.m_observedModel = null;
         resetUndo();
     }
 
 
     function modelIsRegistered()
     {
-        return internal.m_observerModel != null;
+        return internal.m_observedModel != null;
     }
 
 
@@ -116,7 +194,48 @@ Item {
             return;
         }
 
-        internal.m_undoStack.push(internal.m_observerModel.CopyMe())
+        if (internal.m_beginStateModel != null){
+            let copiedModel = internal.m_beginStateModel.CopyMe();
+
+            internal.m_undoStack.push(copiedModel)
+            internal.m_redoStack = []
+
+            modelChanged();
+        }
+
+        printInfo();
+    }
+
+
+    function commandHandle(commandId)
+    {
+        if (commandId === "Undo"){
+            doUndo()
+        }
+        else if (commandId === "Redo"){
+            doRedo();
+        }
+    }
+
+
+    function setStandardModel(model)
+    {
+        if (!modelIsRegistered()){
+            console.error("Unable to set standard model. Model is not registered");
+
+            return;
+        }
+
+        let copiedModel = model.CopyMe();
+        internal.m_defaultStateModel = copiedModel;
+    }
+
+
+    // The first model in the stack is a copy of the observed model
+
+    function getStandardModel()
+    {
+        return internal.m_defaultStateModel;
     }
 
 
@@ -124,7 +243,10 @@ Item {
         id: internal;
 
         property bool m_isBlocked: false;
-        property TreeItemModel m_observerModel: null;
+
+        property TreeItemModel m_observedModel: null;
+        property TreeItemModel m_beginStateModel: null;
+        property TreeItemModel m_defaultStateModel: null;
 
         property var m_undoStack: [];
         property var m_redoStack: [];
@@ -132,15 +254,34 @@ Item {
 
 
     Connections {
-        target: internal.m_observerModel;
+        target: internal.m_observedModel;
 
         function onDataChanged(){
             if (internal.m_isBlocked){
                 return;
             }
 
-            internal.m_undoStack.push(internal.m_observerModel.CopyMe())
+            console.error("Undo manager onDataChanged");
+
+            undoRedoManager.makeChanges();
+
+            internal.m_beginStateModel = internal.m_observedModel.CopyMe();
         }
+    }
+
+    function printInfo(){
+        console.log("printInfo");
+        console.log("---------UNDO-----------");
+        for (let i = 0; i < internal.m_undoStack.length; ++i){
+            console.log(i, internal.m_undoStack[i].toJSON());
+        }
+        console.log("-------------------------");
+
+        console.log("---------REDO-----------");
+        for (let i = 0; i < internal.m_redoStack.length; ++i){
+            console.log(i, internal.m_redoStack[i].toJSON());
+        }
+        console.log("-------------------------");
     }
 }
 

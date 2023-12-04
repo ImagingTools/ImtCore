@@ -8,21 +8,16 @@ CollectionViewCommandsDelegateBase {
     removeDialogTitle: qsTr("Deleting an user");
     removeMessage: qsTr("Delete the selected user ?");
 
-//    autoUpdateAfterChanges: true;
-
     function onEdit(){
         console.log("UserCollectionView onEdit");
 
         let itemIds = container.tableData.getSelectedIds();
         let itemNames = container.tableData.getSelectedNames();
 
-        console.log("itemIds", itemIds);
-
         if (itemIds.length > 0){
             let itemId = itemIds[0];
-            let itemName = itemNames[0];
 
-            container.collectionViewBase.selectItem(itemId, itemName);
+            container.collectionViewBase.selectItem(itemId);
         }
     }
 }

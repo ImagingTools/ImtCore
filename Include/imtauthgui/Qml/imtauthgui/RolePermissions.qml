@@ -10,18 +10,18 @@ Item {
 //    anchors.fill: parent;
 
     property TreeItemModel documentModel: TreeItemModel {}
-    property UndoRedoManager undoRedoManager: null;
-
-    property bool blockUpdatingModel: false;
+    property Item documentPtr: null;
 
     property int mainMargin: 0;
     property int panelWidth: 400;
 
-    onDocumentModelChanged: {
-        console.log("RolePermissions onDocumentModelChanged");
-        if (rolePermissionsContainer.documentModel.ContainsKey("ProductId")){
-            let productId = rolePermissionsContainer.documentModel.GetData("ProductId");
+    property bool completed: permissionsProvider.compl;
 
+    property string productId: documentPtr ? documentPtr.productId : "";
+
+    onProductIdChanged: {
+        console.log("onProductIdChanged", productId);
+        if (productId !== ""){
             permissionsProvider.productId = productId;
 
             permissionsProvider.updateModel();
@@ -31,10 +31,13 @@ Item {
     PermissionsProvider {
         id: permissionsProvider;
 
+        property bool compl: false;
+
         onDataModelChanged: {
             if (permissionsProvider.dataModel != null){
                 permissionsTable.rowModel = permissionsProvider.dataModel;
-                rolePermissionsContainer.updateGui();
+
+                compl = true;
             }
         }
 
@@ -53,7 +56,6 @@ Item {
 
     function updateGui(){
         console.log("RolePermissions updateGui");
-        rolePermissionsContainer.blockUpdatingModel = true;
 
         let selectedPermissionsIds = [];
         if (rolePermissionsContainer.documentModel.ContainsKey("Permissions")){
@@ -64,6 +66,7 @@ Item {
         }
 
         permissionsTable.uncheckAll();
+
         let itemsList = permissionsTable.getItemsDataAsList();
         for (let i = 0; i < itemsList.length; i++){
             let delegateItem = itemsList[i];
@@ -80,19 +83,9 @@ Item {
                 }
             }
         }
-
-        rolePermissionsContainer.blockUpdatingModel = false;
     }
 
     function updateModel(){
-        if (rolePermissionsContainer.blockUpdatingModel){
-            return;
-        }
-
-        if (rolePermissionsContainer.undoRedoManager){
-            rolePermissionsContainer.undoRedoManager.beginChanges();
-        }
-
         let selectedPermissionIds = []
         let itemsList = permissionsTable.getCheckedItems();
         for (let delegate of itemsList){
@@ -103,22 +96,7 @@ Item {
             }
         }
 
-//        let delegates = permissionsTable.getItemsDataAsList();
-//        for (let delegate of delegates){
-//            if (itemsList.includes(delegate)){
-//                if (!delegate.hasChild){
-//                    let itemData = delegate.getItemData();
-//                    let id = itemData.FeatureId;
-//                    selectedPermissionIds.push(id)
-//                }
-//            }
-//        }
-
         rolePermissionsContainer.documentModel.SetData("Permissions", selectedPermissionIds.join(';'));
-
-        if (rolePermissionsContainer.undoRedoManager){
-            rolePermissionsContainer.undoRedoManager.endChanges();
-        }
     }
 
     Component{
@@ -168,8 +146,6 @@ Item {
     CustomScrollbar {
         id: scrollbar;
 
-        z: 100;
-
         anchors.right: permissionsTable.right;
         anchors.bottom: permissionsTable.bottom;
 
@@ -217,60 +193,11 @@ Item {
         }
 
         onCheckedItemsChanged: {
-            if (rolePermissionsContainer.blockUpdatingModel){
-                return;
-            }
-
-//            let delegates = permissionsTable.getItemsDataAsList();
-
-            let selectedPermissionIds = []
-
-            let itemsList = permissionsTable.getCheckedItems();
-
-            for (let delegate of itemsList){
-                if (!delegate.hasChild){
-                    let itemData = delegate.getItemData();
-                    let id = itemData.FeatureId;
-                    selectedPermissionIds.push(id)
-                }
-            }
-
-//            for (let delegate of delegates){
-//                if (itemsList.includes(delegate)){
-//                    if (!delegate.hasChild){
-//                        delegate.isOpened = true;
-
-//                        let itemData = delegate.getItemData();
-//                        let id = itemData.FeatureId;
-//                        selectedPermissionIds.push(id)
-//                    }
-//                }
-//            }
-
-            let newPermissions = selectedPermissionIds.join(';');
-            let oldPermissions = rolePermissionsContainer.documentModel.GetData("Permissions");
-
-            if (newPermissions !== oldPermissions){
-                rolePermissionsContainer.documentModel.SetData("Permissions", newPermissions);
-                undoRedoManager.makeChanges();
+            if (rolePermissionsContainer.documentPtr){
+                rolePermissionsContainer.documentPtr.doUpdateModel();
             }
         }
     }//BasicTableView
-
-    function updateTreeViewGui(){
-    }
-
-    function updatePermissionsModel(){
-        let selectedPermissionIds = []
-        let itemsList = permissionsTable.getCheckedItems();
-        for (let delegate of itemsList){
-            if (!delegate.hasChild){
-                let itemData = delegate.getItemData();
-                let id = itemData.FeatureId;
-                selectedPermissionIds.push(id)
-            }
-        }
-    }
 
     Item {
         id: informationBlock;

@@ -1,12 +1,12 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtqml 1.0
 import imtcontrols 1.0
 
 FocusScope {
     id: delegate;
 
     width: root ? root.width : 0;
-    //width: parent.width;
     height: root ? root.rowItemHeight : 0;
 
     visible: delegate.isVisible;
@@ -20,6 +20,8 @@ FocusScope {
         itemData: model;
         index: model.index;
         depth: delegate.level;
+        delegateItem: delegate;
+        treeModel: delegate.root ? delegate.root.rowModel : null;
     };
 
     property int level: 0;
@@ -66,13 +68,6 @@ FocusScope {
             delegate.root.tableSelection.selectionChanged.connect(delegate.selectionChanged);
         }
     }
-
-//    onRootChanged:  {
-//        if (delegate.root){
-//            delegate.root._addItem(delegate);
-//            delegate.root.tableSelection.selectionChanged.connect(delegate.selectionChanged);
-//        }
-//    }
 
     function selectionChanged(){
         if (delegate.root){
@@ -149,8 +144,10 @@ FocusScope {
                 delegate: Item {
                     id: repeaterItem;
 
-                    width: delegate.root ? delegate.root.width / delegate.root.columnCount : 0;
+                    width: calcWidth;
                     height: delegate.root ? delegate.root.rowItemHeight :0;
+
+                    property int calcWidth: delegate.root ? delegate.root.width / delegate.root.columnCount  : 0;
 
                     Text {
                         id: text_;

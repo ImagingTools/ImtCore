@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtdocgui 1.0
 import imtlicgui 1.0
 
 Item {
@@ -8,11 +9,14 @@ Item {
 
     clip: true;
 
+    property string uuid;
+    property var documentManagerPtr: null;
+    property string documentName;
+
     property int contentMargins: 0;
 
     property alias baseGridCollectionView: gridCollectionViewBase;
 
-    property string itemId;
     property string itemName;
     property bool isUsedDocumentManager: true;
     property bool visibleMetaInfo: true;
@@ -66,11 +70,10 @@ Item {
     property alias paginationPageSize: gridCollectionViewBase.paginationPageSize;
     property alias hasPagination: gridCollectionViewBase.hasPagination;
 
-
-    Component.onCompleted: {
-        itemId = documentsData.GetData("Id", model.index);
-        itemName = documentsData.GetData("Title", model.index);
-    }
+//    Component.onCompleted: {
+//        itemId = documentsData.GetData("Id", model.index);
+//        itemName = documentsData.GetData("Title", model.index);
+//    }
 
     Component.onDestruction: {
         Events.unSubscribeEvent(commandUpdateGui, updateGui);
@@ -80,34 +83,26 @@ Item {
         Events.subscribeEvent(commandUpdateGui, updateGui);
     }
 
-    onVisibleChanged: {
-        if (visible){
-            Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
-                                                      "CommandId": commandsProvider.commandsId});
-            console.log("IDTEST::Model", commandsProvider.commandsModel, "IDTEST::CommandsId", commandsProvider.commandsId);
-        }
-    }
+//    onVisibleChanged: {
+//        if (visible){
+//            Events.sendEvent("CommandsModelChanged", {"Model": commandsProvider.commandsModel,
+//                                                      "CommandId": commandsProvider.commandsId});
+//            console.log("IDTEST::Model", commandsProvider.commandsModel, "IDTEST::CommandsId", commandsProvider.commandsId);
+//        }
+//    }
 
     onCommandsIdChanged: {
         console.log("this onItemIdChanged", itemId, commandsId);
 
-        commandsProvider.commandsId = commandsId;
-
-        gridCollectionViewBase.gqlModelObjectView = commandsId + "ObjectView";
-        gridCollectionViewBase.gqlModelHeadersInfo = commandsId + "Info";
-        gridCollectionViewBase.gqlModelItemsInfo = commandsId + "List";
+        commandsProvider.commandId = commandsId;
+        commandsProvider.uuid = commandsId;
 
         gridCollectionViewBase.commandsId = commandsId;
 
         collectionMetaInfo.gqlModelMetaInfo = commandsId + "MetaInfo";
 
         if (commandsLoader.item){
-            commandsLoader.item.commandsId = commandsId;
-
-            commandsLoader.item.gqlModelItem = commandsLoader.item.commandsId + "Item";
-            commandsLoader.item.gqlModelRemove = commandsLoader.item.commandsId + "Remove";
-            commandsLoader.item.gqlModelRename = commandsLoader.item.commandsId + "Rename";
-            commandsLoader.item.gqlModelSetDescription = commandsLoader.item.commandsId + "SetDescription";
+            commandsLoader.item.commandId = commandsId;
         }
     }
 
@@ -123,7 +118,8 @@ Item {
         console.log("CollectionView selectItem", id, name, commandsId, editorPath);
 
         if (gridCollectionViewContainer.isUsedDocumentManager){
-            documentManager.addDocument({"Id": id, "Name": name, "Source": editorPath, "CommandId": commandsId});
+//            documentManagerPtr.addDocument({"Id": id, "Name": name, "Source": editorPath, "CommandId": commandsId});
+            documentManagerPtr.insertNewDocument(commandsId);
         }
         else{
             modalDialogManager.openDialog(contentDialog, {"contentId": id, "contentName": name, "contentSource": editorPath, "contentCommandsId": commandsId});
@@ -179,7 +175,9 @@ Item {
         }
 
         onLoaded: {
+            commandsLoader.item.commandId = gridCollectionViewBase.commandsId;
             commandsLoader.item.tableData = gridCollectionViewBase.grid;
+            commandsLoader.item.documentManagerPtr = gridCollectionViewBase.documentManagerPtr;
         }
     }
 
@@ -196,19 +194,11 @@ Item {
     GridCollectionViewBase {
         id: gridCollectionViewBase;
 
-//        anchors.right: collectionMetaInfo.left;
-//        anchors.left: parent.left;
-//        anchors.top: parent.top;
-//        anchors.bottom: parent.bottom;
-
         anchors.fill: parent;
 
         anchors.margins: parent.contentMargins;
 
-        itemId: gridCollectionViewContainer.itemId;
-
         commandsId: parent.commandsId;
-        loadData: true;
 
         onSelectedIndexChanged: {
             console.log("gridCollectionViewBase onSelectedIndexChanged");
@@ -221,11 +211,26 @@ Item {
             console.log("gridCollectionViewBase onItemSelected");
             selectItem(id, name);
         }
-
     }
 
     CommandsProvider {
         id: commandsProvider;
+
+        property bool ok: gridCollectionViewContainer.visible && commandId !== "";
+        onOkChanged: {
+            if (commandsModel == null){
+                commandsProvider.updateModel();
+
+                return;
+            }
+
+            if (ok){
+                commandsProvider.updateGui()
+            }
+            else{
+                commandsProvider.clearGui();
+            }
+        }
     }
 
     MetaInfo {

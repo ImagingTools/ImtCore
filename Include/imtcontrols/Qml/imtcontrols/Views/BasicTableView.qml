@@ -8,6 +8,7 @@ FocusScope {
     clip: true;
 
     property bool headerVisible: true;
+    property bool contentVisible: true;
     property bool readOnly: false;
     property bool withoutSelection: false;
 
@@ -25,6 +26,7 @@ FocusScope {
     property var rowModel: ListModel {};
 
     onRowModelChanged: {
+        //console.log("onRowModelChanged", rowModel.toJSON());
         tableViewRoot.itemsList = []
     }
 
@@ -34,12 +36,19 @@ FocusScope {
 
     property TreeViewSelection tableSelection: TreeViewSelection {
         onSelectionChanged: {
-            if (tableViewRoot.tableSelection.items.length > 0){
-                tableViewRoot.selectedIndex = tableViewRoot.tableSelection.items[0];
-            }
-            else{
-                tableViewRoot.selectedIndex = null;
-            }
+
+//            let selectedIndex = null;
+
+//            if (items.length > 0){
+//                selectedIndex = items.length[0];
+//            }
+
+//            if (tableViewRoot.tableSelection.items.length > 0){
+//                tableViewRoot.selectedIndex = tableViewRoot.tableSelection.items[0];
+//            }
+//            else{
+//                tableViewRoot.selectedIndex = null;
+//            }
 
             tableViewRoot.selectionChanged();
         }
@@ -182,26 +191,80 @@ FocusScope {
         tableViewRoot.tableSelection.singleSelect(item);
     }
 
-    function addChildItem(parentIndex, rowObj){
-        let count = tableViewRoot.rowModel.GetItemsCount();
-        if (parentIndex !== null){
-            let parentModel = parentIndex.getParentModel();
-            let childModel = parentIndex.getData("ChildModel");
-            if (!childModel){
-                if (parentModel){
-                    childModel = parentModel.AddTreeModel("ChildModel", parentIndex.getIndex());
-                }
-                else{
-                    parentModel = tableViewRoot.rowModel;
-                    childModel = tableViewRoot.rowModel.AddTreeModel("ChildModel", parentIndex.getIndex());
-                }
-            }
-            childModel.InsertNewItemWithParameters(count, rowObj)
+    function addChildItem(modelIndex, rowObj){
+        console.log("addChildItem", modelIndex, rowObj);
+
+        if (!rowObj){
+            return false;
+        }
+
+        let treeModel;
+        let currentIndex = 0;
+
+        if (modelIndex){
+            treeModel = modelIndex.getModel();
+            currentIndex = modelIndex.index;
         }
         else{
-            tableViewRoot.rowModel.InsertNewItemWithParameters(count, rowObj)
+            treeModel = rowModel;
         }
+
+        let childModel = modelIndex.getData("ChildModel");
+
+        if (!childModel){
+            childModel = treeModel.AddTreeModel("ChildModel", currentIndex);
+        }
+
+        if (!childModel){
+            return false;
+        }
+
+        console.log("childModel1", childModel.toJSON());
+
+        childModel.InsertNewItemWithParameters(0, rowObj)
+
+        console.log("childModel2", childModel.toJSON());
+
+        return false;
     }
+
+    function removeChildItem(modelIndex){
+        if (modelIndex){
+           let treeModel = modelIndex.getModel();
+            if (!treeModel){
+                return false;
+            }
+
+            let currentIndex = modelIndex.index;
+
+            treeModel.RemoveItem(currentIndex);
+
+            return true;
+        }
+
+        return false;
+    }
+
+//    function addChildItem(parentIndex, rowObj){
+//        let count = tableViewRoot.rowModel.GetItemsCount();
+//        if (parentIndex !== null){
+//            let parentModel = parentIndex.getParentModel();
+//            let childModel = parentIndex.getData("ChildModel");
+//            if (!childModel){
+//                if (parentModel){
+//                    childModel = parentModel.AddTreeModel("ChildModel", parentIndex.getIndex());
+//                }
+//                else{
+//                    parentModel = tableViewRoot.rowModel;
+//                    childModel = tableViewRoot.rowModel.AddTreeModel("ChildModel", parentIndex.getIndex());
+//                }
+//            }
+//            childModel.InsertNewItemWithParameters(count, rowObj)
+//        }
+//        else{
+//            tableViewRoot.rowModel.InsertNewItemWithParameters(count, rowObj)
+//        }
+//    }
 
     function removeByIndex(modelIndex){
         for (let i = 0; i < tableViewRoot.itemsList.length; i++){
@@ -342,6 +405,8 @@ FocusScope {
         contentHeight: bodyColumn.height;
 
         boundsBehavior: Flickable.StopAtBounds;
+
+        visible: tableViewRoot.contentVisible;
 
         Column {
             id: bodyColumn;

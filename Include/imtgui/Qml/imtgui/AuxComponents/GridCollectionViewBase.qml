@@ -7,9 +7,9 @@ Item {
 
     property alias commands: baseCommands;
 
-    property alias gqlModelObjectView: baseCommands.gqlModelObjectView;
-    property alias gqlModelHeadersInfo: baseCommands.gqlModelHeadersInfo;
-    property alias gqlModelItemsInfo: baseCommands.gqlModelItemsInfo;
+//    property alias gqlModelObjectView: baseCommands.gqlModelObjectView;
+//    property alias gqlModelHeadersInfo: baseCommands.gqlModelHeadersInfo;
+//    property alias gqlModelItemsInfo: baseCommands.gqlModelItemsInfo;
 
     property bool isWeb: Qt.platform.os == "web";
 
@@ -49,9 +49,6 @@ Item {
     property alias paginationCurrentIndex: paginationObj.currentIndex;
     property alias paginationPageSize: paginationObj.pagesSize;
     property string commandsId;
-    //    property alias elementsList: gridInternal.elementsList;
-    //    property alias gridItemHeight: gridInternal.itemHeight;
-    property string itemId;
 
     property alias grid: gridInternal;
     property alias indexSelected: gridInternal.selectedIndex;
@@ -62,20 +59,16 @@ Item {
     signal selectedIndexChanged(int index);
     signal elementsChanged();
 
-    /**
-        Если true -> данные будут запрошены с сервера,
-        иначе нужно будет подставлять данные вручную
-      */
-    property bool loadData;
-
     Component.onCompleted: {
         console.log("CollectionViewBase onCompleted");
 
         gridInternal.focus = true;
     }
 
-    onGridSelectedIndexInRowChanged: {
-        //console.log("GridSelectedIndexInRowChanged ", gridSelectedIndexInRow)
+    onCommandsIdChanged: {
+        baseCommands.commandId = commandsId;
+
+        baseCommands.updateModels();
     }
 
     onGridSelectedRowChanged: {
@@ -408,7 +401,6 @@ Item {
     CollectionViewBaseGqlModels {
         id: baseCommands;
 
-        itemId: collectionViewBaseContainer.itemId;
         table: collectionViewBaseContainer.table;
 
         rootItem: collectionViewBaseContainer;
@@ -421,16 +413,9 @@ Item {
 
 
         onCommandIdChanged: {
-            console.log("CollectionViewBase onCommandsIdChanged", loadData, baseCommands.commandId, baseCommands.gqlModelHeadersInfo);
+            console.log("CollectionViewBase onCommandsIdChanged");
 
-            if (loadData){
-                baseCommands.updateModels();
-            }
-        }
-
-        onHeadersChanged: {
-            //            gridInternal.headers = baseCommands.headers;
-            //            gridInternal.headersCompl = true;
+            baseCommands.updateModels();
         }
 
         onItemsChanged: {

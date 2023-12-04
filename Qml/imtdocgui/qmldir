@@ -1,0 +1,19 @@
+module imtdocgui
+
+DocumentBase 1.0 DocumentBase.qml
+DocumentData 1.0 DocumentData.qml
+CommandsProvider 1.0 CommandsProvider.qml
+DocumentDataProvider 1.0 DocumentDataProvider.qml
+DocumentWorkspaceCommandsDelegate 1.0 DocumentWorkspaceCommandsDelegate.qml
+DocumentWorkspaceCommandsDelegateBase 1.0 DocumentWorkspaceCommandsDelegateBase.qml
+MainDocumentManager 1.0 MainDocumentManager.qml
+MultiDocWorkspacePageView 1.0 MultiDocWorkspacePageView.qml
+MultiDocWorkspaceView 1.0 MultiDocWorkspaceView.qml
+SingleDocumentWorkspaceView 1.0 SingleDocumentWorkspaceView.qml
+UndoRedo 1.0 UndoRedo.qml
+UndoRedoManager 1.0 UndoRedoManager.qml
+
+DocumentHistoryDialog 1.0 DocumentHistoryDialog.qml
+DocumentHistoryProvider 1.0 DocumentHistoryProvider.qml
+DocumentHistoryView 1.0 DocumentHistoryView.qml
+

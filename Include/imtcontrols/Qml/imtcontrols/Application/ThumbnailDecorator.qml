@@ -3,6 +3,7 @@ import Acf 1.0
 import imtqml 1.0
 import imtauthgui 1.0
 import imtguigql 1.0
+import imtdocgui 1.0
 import imtcontrols 1.0
 
 
@@ -131,8 +132,6 @@ Rectangle {
 
     MainDocumentManager {
         id: mainDocumentManager;
-
-        menuPanelRef: menuPanel;
     }
 
     PagesManager {

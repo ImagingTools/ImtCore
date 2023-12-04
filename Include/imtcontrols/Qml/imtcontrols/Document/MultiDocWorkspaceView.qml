@@ -16,6 +16,8 @@ DocumentManager {
     }
 
     onDocumentAdded: {
+        Events.sendEvent("CommandsClearModel");
+
         tabPanel.selectedIndex = documentIndex;
     }
 
@@ -55,50 +57,81 @@ DocumentManager {
 
         model: workspaceView.documentsModel;
 
-        delegate: Loader {
-            id: documentLoader;
-
+        delegate: Item {
             anchors.fill: documentRepeater;
 
-            visible: tabPanel.selectedIndex === model.index;
+            Loader {
+                id: documentLoader;
 
-            sourceComponent: model.DocumentComp;
+                anchors.fill: parent;
 
-            onLoaded: {
-                console.log("Document onLoaded");
+                visible: tabPanel.selectedIndex === model.index;
 
-                if (item.uuid !== undefined){
-                    item.uuid = model.Uuid;
+                sourceComponent: model.DocumentComp;
+
+                onLoaded: {
+                    console.log("Document onLoaded");
+
+                    if (item.uuid !== undefined){
+                        item.uuid = model.Uuid;
+                    }
+
+                    if (item.documentManagerPtr !== undefined){
+                        item.documentManagerPtr = workspaceView;
+                    }
+
+                    if (item.documentTypeId !== undefined){
+                        item.documentTypeId = model.TypeId;
+                    }
+
+                    if (item.documentModel !== undefined){
+                        item.documentModel = model.Model;
+                    }
+
+                    workspaceView.documentsModel.setProperty(model.index, "DocumentObj", item);
+
+                    if (item.startLoading !== undefined){
+                        item.startLoading.connect(documentLoading.start);
+//                        documentLoading.visible = true;
+                    }
+
+                    if (item.stopLoading !== undefined){
+                        item.stopLoading.connect(documentLoading.stop);
+                    }
                 }
 
-                if (item.documentManagerPtr !== undefined){
-                    item.documentManagerPtr = workspaceView;
+                onStatusChanged: {
+                    console.log("Document onStatusChanged", documentLoader.status);
+                    if (status === Loader.Error){
+                        console.error("Document loading was failed", modelData);
+                    }
                 }
-
-                if (item.documentTypeId !== undefined){
-                    item.documentTypeId = model.TypeId;
-                }
-
-                if (item.documentModel !== undefined){
-                    item.documentModel = model.Model;
-                }
-
-                workspaceView.documentsModel.setProperty(model.index, "DocumentObj", item);
-
-                itemConnections.enabled = true;
             }
 
-            onStatusChanged: {
-                console.log("Document onStatusChanged", documentLoader.status);
-                if (status === Loader.Error){
-                    console.error("Document loading was failed", modelData);
+            Loading {
+                id: documentLoading;
+
+                anchors.fill: documentLoader;
+
+                visible: false;
+
+                function start(){
+                    console.log("documentLoading start");
+
+                    documentLoading.visible = true;
+                }
+
+                function stop(){
+                    console.log("documentLoading stop");
+
+                    documentLoading.visible = false;
                 }
             }
 
             Connections {
                 id: itemConnections;
 
-                enabled: false;
+                enabled: documentLoader.item ? true : false;
                 target: documentLoader.item;
 
                 function onIsDirtyChanged(){

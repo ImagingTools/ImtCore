@@ -26,21 +26,25 @@ Rectangle {
 
         root.userModel.SetData("Password", password);
 
-        documentController.setData("su", root.userModel);
+        let onResult = function(id, name){
+            root.passwordSetted();
+        }
+
+        documentController.setData("User", "su", root.userModel, {}, onResult);
     }
 
     GqlDocumentDataController{
         id: documentController;
 
-        documentTypeId: "User";
+//        documentTypeId: "User";
 
-        onDocumentAdded: {
-            root.passwordSetted();
-        }
+//        onDocumentAdded: {
+//            root.passwordSetted();
+//        }
 
-        onError: {
-            root.failed(message);
-        }
+//        onError: {
+//            root.failed(message);
+//        }
     }
 
     function checkPassword(){

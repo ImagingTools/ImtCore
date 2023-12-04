@@ -83,7 +83,7 @@ Item{
             sourceSize.height: height;
 
             fillMode: Image.PreserveAspectFit;
-            source: "../../../" + "Icons/" + Style.theme + "/" + "Close" + "_On_Normal.svg";
+            source: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
         }
 
         MouseArea{

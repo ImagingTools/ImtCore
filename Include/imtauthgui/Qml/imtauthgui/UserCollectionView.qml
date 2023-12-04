@@ -6,11 +6,21 @@ import imtqml 1.0
 CollectionView {
     id: userCollectionViewContainer;
 
+    documentName: qsTr("Users");
+
     Component.onCompleted: {
         userCollectionViewContainer.commandsDelegatePath = "../../imtauthgui/UserCollectionViewCommandsDelegate.qml";
 
         if (userCollectionViewContainer.baseCollectionView.table.headers){
             userCollectionViewContainer.baseCollectionView.table.onHeadersChanged.connect(userCollectionViewContainer.onHeadersChanged);
+        }
+
+        userCollectionViewContainer.commandId = "Users";
+    }
+
+    onDocumentManagerPtrChanged: {
+        if (documentManagerPtr){
+            documentManagerPtr.registerDocument("User", userDocumentComp);
         }
     }
 
@@ -26,6 +36,15 @@ CollectionView {
 
         userCollectionViewContainer.baseCollectionView.table.setColumnContentComponent(rolesIndex, dataComp);
         userCollectionViewContainer.baseCollectionView.table.setColumnContentComponent(groupsIndex, groupsContentComp);
+    }
+
+    function selectItem(id){
+        if (id === ""){
+            documentManagerPtr.insertNewDocument("User");
+        }
+        else{
+            documentManagerPtr.openDocument(id, "User");
+        }
     }
 
     Component {
@@ -168,6 +187,13 @@ CollectionView {
                     arrowButton.tooltipItem.lineHeight = 1;
                 }
             }
+        }
+    }
+
+    Component {
+        id: userDocumentComp;
+
+        UserView {
         }
     }
 }

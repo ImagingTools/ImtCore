@@ -41,7 +41,14 @@ Item {
 
                     userPanelDelegate.userModel.SetData("Password", this.password)
                     userPanelDelegate.userModel.SetData("Username", login)
-                    documentController.updateData(userPanelDelegate.userId, userPanelDelegate.userModel);
+
+                    let onResult = function(id, name){
+                        modalDialogManager.openDialog(savingErrorDialog, {"message" : qsTr("Password changed successfully")});
+
+                        userPanelDelegate.userUpdated();
+                    }
+
+                    documentController.updateData("User", userPanelDelegate.userId, userPanelDelegate.userModel, {}, onResult);
                 }
             }
         }
@@ -49,14 +56,6 @@ Item {
 
     GqlDocumentDataController{
         id: documentController;
-
-        documentTypeId: "User";
-
-        onDocumentUpdated: {
-            modalDialogManager.openDialog(savingErrorDialog, {"message" : qsTr("Password changed successfully")});
-
-            userPanelDelegate.userUpdated();
-        }
 
         onSetModelStateChanged: {
             if (setModelState === "Loading"){

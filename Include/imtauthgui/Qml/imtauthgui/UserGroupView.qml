@@ -1,12 +1,13 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtdocgui 1.0
 import imtqml 1.0
 
-DocumentBase {
+DocumentData {
     id: container;
 
-    saveIsBlocked: true;
+    documentCompleted: groupEditorCompleted && groupUsersCompleted && groupRolesCompleted;
 
     property string title: qsTr("User Groups");
     property string username: qsTr("New Group");
@@ -14,71 +15,90 @@ DocumentBase {
     property int mainMargin: 0;
     property int panelWidth: 150;
 
-    onItemNameChanged: {
+    onSaved: {
+        updateUsername();
+    }
+
+    function updateUsername(){
         if (container.documentModel.ContainsKey("Name")){
             let username = documentModel.GetData("Name");
-            if (username != ""){
+            if (username !== ""){
                 container.username = username;
             }
         }
     }
 
-    onDocumentModelChanged: {
-        if (container.documentModel.ContainsKey("Name")){
-            let username = documentModel.GetData("Name");
-            if (username != ""){
-                container.username = username;
-            }
+    function beginDocumentModelChanged(){
+        updateUsername();
+
+        let generalPage = multiPageView.getPageById("General");
+        let usersPage = multiPageView.getPageById("Users");
+        let groupsPage = multiPageView.getPageById("Roles");
+
+        if (generalPage){
+            generalPage.documentModel = documentModel;
         }
 
-        for (let index = 0; index < leftMenuModel.count; index++){
-            let loader = bodyRepeater.itemAt(index);
-            loader.item.undoRedoManager = undoRedoManager;
-            loader.item.documentModel = documentModel;
+        if (usersPage){
+            usersPage.documentModel = documentModel;
         }
 
-        undoRedoManager.registerModel(documentModel);
-    }
-
-    UndoRedoManager {
-        id: undoRedoManager;
-
-        documentBase: container;
-        onModelStateChanged: {
-            container.updateGui();
+        if (groupsPage){
+            groupsPage.documentModel = documentModel;
         }
     }
 
     function blockEditing(){
-        for (let index = 0; index < leftMenuModel.count; index++){
-            let loader = bodyRepeater.itemAt(index);
-            if (loader.item){
-                loader.item.blockEditing();
-            }
+        let generalPage = multiPageView.getPageById("General");
+        let usersPage = multiPageView.getPageById("Users");
+        let groupsPage = multiPageView.getPageById("Roles");
+
+        if (generalPage){
+            generalPage.blockEditing();
+        }
+
+        if (usersPage){
+            usersPage.blockEditing();
+        }
+
+        if (groupsPage){
+            groupsPage.blockEditing();
         }
     }
 
     function updateGui(){
-        container.blockUpdatingModel = true;
+        let generalPage = multiPageView.getPageById("General");
+        let usersPage = multiPageView.getPageById("Users");
+        let groupsPage = multiPageView.getPageById("Roles");
 
-        for (let index = 0; index < leftMenuModel.count; index++){
-            let loader = bodyRepeater.itemAt(index);
-            loader.item.updateGui();
+        if (generalPage){
+            generalPage.updateGui();
         }
 
-        container.blockUpdatingModel = false;
+        if (usersPage){
+            usersPage.updateGui();
+        }
+
+        if (groupsPage){
+            groupsPage.updateGui();
+        }
     }
 
     function updateModel(){
-        if (container.blockUpdatingModel){
-            return;
+        let generalPage = multiPageView.getPageById("General");
+        let usersPage = multiPageView.getPageById("Users");
+        let groupsPage = multiPageView.getPageById("Roles");
+
+        if (generalPage){
+            generalPage.updateModel();
         }
 
-        container.documentModel.SetData("Id", container.itemId);
+        if (usersPage){
+            usersPage.updateModel();
+        }
 
-        for (let index = 0; index < leftMenuModel.count; index++){
-            let loader = bodyRepeater.itemAt(index);
-            loader.item.updateModel();
+        if (groupsPage){
+            groupsPage.updateModel();
         }
     }
 
@@ -127,7 +147,7 @@ DocumentBase {
             iconSource: "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal);
 
             onClicked: {
-                Events.sendEvent(container.documentUuid + "CommandActivated", "Close")
+                Events.sendEvent(container.uuid + "CommandActivated", "Close")
             }
         }
 
@@ -156,147 +176,65 @@ DocumentBase {
         }
     }
 
-    Rectangle {
-        id: mainPanelBackground;
+    property bool groupEditorCompleted: false;
+    Component {
+        id: groupEditorComp;
 
-        anchors.top: header.bottom;
-        anchors.left: parent.left;
-        anchors.bottom: parent.bottom;
-        anchors.topMargin: container.mainMargin;
-        anchors.leftMargin: container.mainMargin;
+        GroupEditor {
+            documentPtr: container;
 
-
-        width: container.panelWidth;
-
-        color: Style.backgroundColor;
-
-        Loader{
-            id: mainPanelBackgroundDecoratorLoader;
-
-            sourceComponent: Style.backGroundDecorator !==undefined ? Style.backGroundDecorator: emptyDecorator;
-            onLoaded: {
-                if(mainPanelBackgroundDecoratorLoader.item){
-                    mainPanelBackgroundDecoratorLoader.item.rootItem = mainPanelBackground;
+            onCompletedChanged: {
+                if (completed){
+                    container.groupEditorCompleted = completed;
                 }
             }
-        }
-
-        Item{
-            id: columnContainer;
-            width: parent.width;
-            height: mainPanel.height + 2*mainPanel.anchors.topMargin;
-
-
-            Loader{
-                id: mainPanelFrameLoader;
-
-                anchors.fill: parent;
-
-                sourceComponent: Style.frame !==undefined ? Style.frame: emptyDecorator;
-
-                onLoaded: {
-                    if(mainPanelFrameLoader.item){
-//                        container.mainMargin = mainPanelFrameLoader.item.mainMargin;
-//                        container.panelWidth = mainPanelFrameLoader.item.panelWidth;
-                    }
-                }
-            }
-
-        }
-
-        Column {
-            id: mainPanel;
-
-            anchors.top: parent.top;
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-            anchors.topMargin: 10;
-
-            property int selectedIndex: -1;
-
-            spacing: 10;
-
-            ListModel{
-                id: leftMenuModel
-                Component.onCompleted: {
-                    leftMenuModel.append({Id: "General",  Name: qsTr("General"), Source: "qrc:/qml/imtauthgui/GroupEditor.qml"})
-                    leftMenuModel.append({Id: "Users",  Name: qsTr("Users"), Source: "qrc:/qml/imtauthgui/GroupUsers.qml"})
-                    leftMenuModel.append({Id: "Roles",  Name: qsTr("Roles"), Source: "qrc:/qml/imtauthgui/GroupRoles.qml"})
-                }
-            }
-
-            Component{
-                id: defaultButtonDecorator;
-
-                CommonButtonDecorator{
-                    height: 35;
-                    color: Style.alternateBaseColor;
-                }
-            }
-
-            Repeater {
-                id: mainPanelRepeater;
-
-                model: leftMenuModel;
-
-                delegate:
-
-                    BaseButton{
-                    id: buttonContainer;
-
-                    anchors.left: parent.left;
-                    anchors.leftMargin: 10;
-                    anchors.right: parent.right;
-                    anchors.rightMargin: 10;
-
-                    text:  model.Name;
-                    selected: mainPanel.selectedIndex == model.index;
-
-                    decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
-
-                    Component.onCompleted: {
-                        if (model.index === 0){
-                            clicked();
-                        }
-                    }
-
-                    onClicked: {
-                        if (mainPanel.selectedIndex !== model.index){
-                            mainPanel.selectedIndex = model.index;
-                        }
-                    }
-                }
-            }//Repeater
         }
     }
 
-    Rectangle {
-        id: bodyAdministration;
+    property bool groupUsersCompleted: false;
+    Component {
+        id: groupUsersComp;
 
-        anchors.left: mainPanelBackground.right;
-        anchors.top: header.bottom;
-        anchors.bottom: parent.bottom;
-        anchors.right: parent.right;
-        anchors.topMargin: container.mainMargin;
-        anchors.leftMargin: 10;//container.mainMargin;
-        anchors.rightMargin: container.mainMargin;
+        GroupUsers {
+            documentPtr: container;
 
-        color: Style.backgroundColor;
-
-        Repeater {
-            id: bodyRepeater;
-
-            model: leftMenuModel;
-
-            delegate: Loader {
-                id: bodyLoader;
-
-                anchors.fill: parent;
-
-                source: model.Source;
-
-                visible: mainPanel.selectedIndex == model.index;
+            onCompletedChanged: {
+                if (completed){
+                    container.groupUsersCompleted = completed;
+                }
             }
+        }
+    }
+
+    property bool groupRolesCompleted: false;
+    Component {
+        id: groupRolesComp;
+
+        GroupRoles {
+            documentPtr: container;
+
+            onCompletedChanged: {
+                if (completed){
+                    container.groupRolesCompleted = completed;
+                }
+            }
+        }
+    }
+
+    MultiPageView {
+        id: multiPageView;
+
+        anchors.top: header.bottom;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+        anchors.bottom: parent.bottom;
+
+        Component.onCompleted: {
+            multiPageView.addPage("General", "General", "qrc:/qml/imtauthgui/GroupEditor.qml", groupEditorComp);
+            multiPageView.addPage("Users", "Users", "qrc:/qml/imtauthgui/GroupUsers.qml", groupUsersComp);
+            multiPageView.addPage("Roles", "Roles", "qrc:/qml/imtauthgui/GroupRoles.qml", groupRolesComp);
+
+            multiPageView.selectedIndex = 0;
         }
     }
 }

@@ -31,8 +31,6 @@
         <file alias="imtgui/AuxComponents/Dialogs/PopupMenuDialog.qml">Qml/imtgui/AuxComponents/Dialogs/PopupMenuDialog.qml</file>
         <file alias="imtgui/AuxComponents/Dialogs/MessageDialog.qml">Qml/imtgui/AuxComponents/Dialogs/MessageDialog.qml</file>
 	<file alias="imtgui/AuxComponents/Dialogs/ErrorDialog.qml">Qml/imtgui/AuxComponents/Dialogs/ErrorDialog.qml</file>
-	<file alias="imtgui/AuxComponents/MainDocumentManager.qml">Qml/imtgui/AuxComponents/MainDocumentManager.qml</file>
-        <file alias="imtgui/AuxComponents/MultiDocWorkspaceView.qml">Qml/imtgui/AuxComponents/MultiDocWorkspaceView.qml</file>
         <file alias="imtgui/AuxComponents/Dialogs/InputDialog.qml">Qml/imtgui/AuxComponents/Dialogs/InputDialog.qml</file>
         <file alias="imtgui/AuxComponents/PreferencePage.qml">Qml/imtgui/AuxComponents/PreferencePage.qml</file>
         <file alias="imtgui/AuxComponents/Splitter.qml">Qml/imtgui/AuxComponents/Splitter.qml</file>
@@ -49,17 +47,13 @@
         <file alias="imtgui/AuxComponents/TopPanelDecorator.qml">Qml/imtgui/AuxComponents/TopPanelDecorator.qml</file>
         <file alias="imtgui/AuxComponents/TopRightPanelDecorator.qml">Qml/imtgui/AuxComponents/TopRightPanelDecorator.qml</file>
         <file alias="imtgui/AuxComponents/TopCenterPanelDecorator.qml">Qml/imtgui/AuxComponents/TopCenterPanelDecorator.qml</file>
-        <file alias="imtgui/AuxComponents/UndoRedo.qml">Qml/imtgui/AuxComponents/UndoRedo.qml</file>
         <file alias="imtgui/AuxComponents/CustomTextField.qml">Qml/imtgui/AuxComponents/CustomTextField.qml</file>
 	<file alias="imtgui/AuxComponents/TextFieldWithTitle.qml">Qml/imtgui/AuxComponents/TextFieldWithTitle.qml</file>
         <file alias="imtgui/AuxComponents/SettingsTextLabel.qml">Qml/imtgui/AuxComponents/SettingsTextLabel.qml</file>
         <file alias="imtgui/AuxComponents/CollectionViewBase.qml">Qml/imtgui/AuxComponents/CollectionViewBase.qml</file>
-        <file alias="imtgui/AuxComponents/MultiDocWorkspacePageView.qml">Qml/imtgui/AuxComponents/MultiDocWorkspacePageView.qml</file>
         <file alias="imtgui/AuxComponents/CollectionViewBaseGqlModels.qml">Qml/imtgui/AuxComponents/CollectionViewBaseGqlModels.qml</file>
-        <file alias="imtgui/AuxComponents/CommandsProvider.qml">Qml/imtgui/AuxComponents/CommandsProvider.qml</file>
         <file alias="imtgui/AuxComponents/CommandsDecorator.qml">Qml/imtgui/AuxComponents/CommandsDecorator.qml</file>
         <file alias="imtgui/AuxComponents/CollectionViewCommandsDelegateBase.qml">Qml/imtgui/AuxComponents/CollectionViewCommandsDelegateBase.qml</file>
-        <file alias="imtgui/AuxComponents/DocumentWorkspaceCommandsDelegate.qml">Qml/imtgui/AuxComponents/DocumentWorkspaceCommandsDelegate.qml</file>
         <file alias="imtgui/AuxComponents/Dialogs/LoginDialog.qml">Qml/imtgui/AuxComponents/Dialogs/LoginDialog.qml</file>
         <file alias="imtgui/AuxComponents/Dialogs/Dialog.qml">Qml/imtgui/AuxComponents/Dialogs/Dialog.qml</file>
         <file alias="imtgui/AuxComponents/Dialogs/ButtonsDialog.qml">Qml/imtgui/AuxComponents/Dialogs/ButtonsDialog.qml</file>
@@ -71,10 +65,7 @@
         <file alias="imtgui/AuxComponents/ServerNoConnectionView.qml">Qml/imtgui/AuxComponents/ServerNoConnectionView.qml</file>
         <file alias="imtgui/AuxComponents/PagesManager.qml">Qml/imtgui/AuxComponents/PagesManager.qml</file>
         <file alias="imtgui/AuxComponents/SortController.qml">Qml/imtgui/AuxComponents/SortController.qml</file>
-        <file alias="imtgui/AuxComponents/DocumentWorkspaceCommandsDelegateBase.qml">Qml/imtgui/AuxComponents/DocumentWorkspaceCommandsDelegateBase.qml</file>
         <file alias="imtgui/AuxComponents/DatePicker.qml">Qml/imtgui/AuxComponents/DatePicker.qml</file>
-        <file alias="imtgui/AuxComponents/DocumentBase.qml">Qml/imtgui/AuxComponents/DocumentBase.qml</file>
-        <file alias="imtgui/AuxComponents/SingleDocumentWorkspaceView.qml">Qml/imtgui/AuxComponents/SingleDocumentWorkspaceView.qml</file>
         <file alias="imtgui/AuxComponents/SubMenuPanelButtonDecorator.qml">Qml/imtgui/AuxComponents/SubMenuPanelButtonDecorator.qml</file>
         <file alias="imtgui/AuxComponents/StackView.qml">Qml/imtgui/AuxComponents/StackView.qml</file>
         <file alias="imtgui/AuxComponents/ProgressBar.qml">Qml/imtgui/AuxComponents/ProgressBar.qml</file>
@@ -94,7 +85,6 @@
 
         <file alias="imtgui/AuxComponents/BaseButton.qml">Qml/imtgui/AuxComponents/BaseButton.qml</file>
         <file alias="imtgui/AuxComponents/TopButtonDecorator.qml">Qml/imtgui/AuxComponents/TopButtonDecorator.qml</file>
-	<file alias="imtgui/AuxComponents/DocumentDataProvider.qml">Qml/imtgui/AuxComponents/DocumentDataProvider.qml</file>
  	<file alias="imtgui/AuxComponents/CommonButtonDecorator.qml">Qml/imtgui/AuxComponents/CommonButtonDecorator.qml</file>
         <file alias="imtgui/AuxComponents/BaseButtonDecorator.qml">Qml/imtgui/AuxComponents/BaseButtonDecorator.qml</file>
 
@@ -154,14 +144,11 @@
         <file alias="imtgui/AuxComponents/ChangeItemSize.qml">Qml/imtgui/AuxComponents/ChangeItemSize.qml</file>
         <file alias="imtgui/AuxComponents/TableCellDelegateSimple.qml">Qml/imtgui/AuxComponents/TableCellDelegateSimple.qml</file>
 	<file alias="imtgui/AuxComponents/AlertMessage.qml">Qml/imtgui/AuxComponents/AlertMessage.qml</file>
-	<file alias="imtgui/AuxComponents/DocumentHistoryView.qml">Qml/imtgui/AuxComponents/DocumentHistoryView.qml</file>
-	<file alias="imtgui/AuxComponents/DocumentHistoryProvider.qml">Qml/imtgui/AuxComponents/DocumentHistoryProvider.qml</file>
         <file alias="imtgui/AuxComponents/SpinBox.qml">Qml/imtgui/AuxComponents/SpinBox.qml</file>
 	<file alias="imtgui/AuxComponents/SettingsObserver.qml">Qml/imtgui/AuxComponents/SettingsObserver.qml</file>
 	<file alias="imtgui/AuxComponents/PreferenceDialog.qml">Qml/imtgui/AuxComponents/PreferenceDialog.qml</file>
 	<file alias="imtgui/AuxComponents/ErrorManager.qml">Qml/imtgui/AuxComponents/ErrorManager.qml</file>
-	<file alias="imtgui/AuxComponents/DocumentHistoryDialog.qml">Qml/imtgui/AuxComponents/DocumentHistoryDialog.qml</file>
-
+	<file alias="imtgui/AuxComponents/MultiPageView.qml">Qml/imtgui/AuxComponents/MultiPageView.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

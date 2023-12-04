@@ -5,7 +5,7 @@ import imtgui 1.0
 Item {
     id: root;
 
-    property CommandsProvider commandsProvider: null;
+    property var commandsProvider: null;
 
     Component.onDestruction: {
         if (root.orderCommandsProvider != null){
@@ -15,7 +15,7 @@ Item {
 
     onCommandsProviderChanged: {
         if (root.commandsProvider != null){
-            root.commandsProvider.modelLoaded.connect(root.commandsModelLoaded);
+//            root.commandsProvider.modelLoaded.connect(root.commandsModelLoaded);
         }
     }
 

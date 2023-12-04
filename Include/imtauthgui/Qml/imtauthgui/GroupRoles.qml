@@ -7,23 +7,14 @@ Item {
     id: groupRolesContainer;
 
     property TreeItemModel documentModel: TreeItemModel {}
-    property UndoRedoManager undoRedoManager: null;
-
-    property bool blockUpdatingModel: false;
+    property Item documentPtr: null;
 
     property int radius: 3;
 
-    onDocumentModelChanged: {
-        console.log("UserRoles onDocumentModelChanged", documentModel);
+    property bool completed: rolesProvider.compl;
 
-//        rolesProvider.updateModel({"ProductId" : window.productId});
+    Component.onCompleted: {
         rolesProvider.updateModel();
-    }
-
-    onVisibleChanged: {
-        if (groupRolesContainer.visible){
-            groupRolesContainer.updateGui();
-        }
     }
 
     function blockEditing(){
@@ -32,8 +23,6 @@ Item {
 
     function updateGui(){
         console.log("UserRoles updateGui");
-
-        groupRolesContainer.blockUpdatingModel = true;
 
         let roleIds = [];
         if (groupRolesContainer.documentModel.ContainsKey("Roles")){
@@ -52,19 +41,9 @@ Item {
                 }
             }
         }
-
-        groupRolesContainer.blockUpdatingModel = false;
     }
 
     function updateModel(){
-        if (groupRolesContainer.blockUpdatingModel){
-            return;
-        }
-
-        if (groupRolesContainer.undoRedoManager){
-            groupRolesContainer.undoRedoManager.beginChanges();
-        }
-
         let selectedRoleIds = []
         let indexes = rolesTable.getCheckedItems();
         for (let index of indexes){
@@ -74,10 +53,6 @@ Item {
 
         let result = selectedRoleIds.join(';');
         groupRolesContainer.documentModel.SetData("Roles", result);
-
-        if (groupRolesContainer.undoRedoManager){
-            groupRolesContainer.undoRedoManager.endChanges();
-        }
     }
 
     Component{
@@ -93,6 +68,7 @@ Item {
         commandId: "Roles";
 
         fields: ["Id", "Name"];
+        property bool compl: false;
 
         onModelUpdated: {
             if (rolesProvider.collectionModel != null){
@@ -100,7 +76,7 @@ Item {
                     let rolesModel = rolesProvider.collectionModel.GetData("Roles");
                     rolesTable.elements = rolesModel;
 
-                    groupRolesContainer.updateGui();
+                    compl = true;
                 }
             }
         }
@@ -157,7 +133,6 @@ Item {
         anchors.bottom: parent.bottom;
         anchors.bottomMargin: 10;
         anchors.left: parent.left;
-//        anchors.leftMargin: 10;
 
         width: 400;
 
@@ -167,22 +142,8 @@ Item {
         radius: groupRolesContainer.radius;
 
         onCheckedItemsChanged: {
-            if (groupRolesContainer.blockUpdatingModel){
-                return;
-            }
-
-            let indexes = rolesTable.getCheckedItems();
-            let roles = groupRolesContainer.documentModel.GetData("Roles");
-            let roleIDs = [];
-            for (let index of indexes){
-                let roleId = rolesTable.elements.GetData("Id", index);
-                roleIDs.push(roleId);
-            }
-
-            let newGroups = roleIDs.join(';');
-            if (roles !== newGroups){
-                groupRolesContainer.documentModel.SetData("Roles", roleIDs.join(';'));
-                undoRedoManager.makeChanges();
+            if (groupRolesContainer.documentPtr){
+                groupRolesContainer.documentPtr.doUpdateModel();
             }
         }
     }

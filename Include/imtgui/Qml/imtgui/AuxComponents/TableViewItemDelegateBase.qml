@@ -56,22 +56,24 @@ FocusScope {
     signal clicked();
 
     Component.onDestruction: {
-        delegate.root._removeItem(delegate);
+        console.log("delegate onDestruction");
+        if (delegate.root){
+            if (delegate.root.tableSelection.isSelected(delegate.modelIndex)){
+                delegate.root.tableSelection.resetSelection();
+            }
 
-        delegate.root.tableSelection.selectionChanged.disconnect(delegate.selectionChanged);
+            delegate.root._removeItem(delegate);
+
+            delegate.root.tableSelection.selectionChanged.disconnect(delegate.selectionChanged);
+        }
     }
 
     Component.onCompleted: {
+        console.log("delegate onCompleted");
+
         if (delegate.root){
             delegate.root._addItem(delegate);
             delegate.root.tableSelection.selectionChanged.connect(delegate.selectionChanged);
-
-//            console.log("IndexIsValid", model.IndexIsValid);
-//            console.log("model.index(0, 0)", delegate.root.rowModel.index(0, 0));
-//            console.log("hasIndex", delegate.root.rowModel.hasIndex(0, 3));
-
-//            let modelIndex = delegate.root.rowModel.index(0, 0)
-//            console.log("internalPointer", modelIndex.internalPointer);
         }
     }
 

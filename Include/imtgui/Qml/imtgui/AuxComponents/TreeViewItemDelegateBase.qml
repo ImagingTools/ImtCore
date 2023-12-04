@@ -7,7 +7,7 @@ TableViewItemDelegateBase {
 
     height: !treeDelegateBase.root ? 0 : treeDelegateBase.isOpened ? treeDelegateBase.footerItem.height + treeDelegateBase.root.rowItemHeight: treeDelegateBase.root.rowItemHeight;
 
-    property bool isOpened: false;
+    property bool isOpened: true;
 
     property bool hasChild: false;
 

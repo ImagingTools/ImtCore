@@ -8,15 +8,13 @@ Rectangle {
 
     color: Style.backgroundColor;
 
-    property string gqlModelMetaInfo;
+    property string getMetaInfoGqlCommand;
 
     property var modelData;
 
     property int elementHeight: 20;
 
     property bool contentVisible: true;
-
-    //    property Item tableData: null;
 
     function getMetaInfo(selectedId){
         metaInfo.getMetaInfo(selectedId);
@@ -140,7 +138,7 @@ Rectangle {
 
         function getMetaInfo(selectedId){
             console.log( "CollectionView metaInfo getMetaInfo");
-            var query = Gql.GqlRequest("query", container.gqlModelMetaInfo);
+            var query = Gql.GqlRequest("query", container.getMetaInfoGqlCommand);
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", selectedId);
@@ -182,8 +180,8 @@ Rectangle {
                 if (metaInfo.ContainsKey("data")){
                     dataModelLocal = metaInfo.GetData("data");
 
-                    if (dataModelLocal.ContainsKey(container.gqlModelMetaInfo)){
-                        dataModelLocal = dataModelLocal.GetData(container.gqlModelMetaInfo);
+                    if (dataModelLocal.ContainsKey(container.getMetaInfoGqlCommand)){
+                        dataModelLocal = dataModelLocal.GetData(container.getMetaInfoGqlCommand);
                         console.log( "dataModelLocal", dataModelLocal.toJSON());
 
                         container.modelData = dataModelLocal;

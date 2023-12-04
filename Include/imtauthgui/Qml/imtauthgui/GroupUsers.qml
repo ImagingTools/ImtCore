@@ -1,21 +1,19 @@
 import QtQuick 2.0
+import Acf 1.0
 import imtgui 1.0
 import imtqml 1.0
-import Acf 1.0
 
 Item {
     id: groupUsersContainer;
 
     property TreeItemModel documentModel: TreeItemModel {}
-    property UndoRedoManager undoRedoManager: null;
-
-    property bool blockUpdatingModel: false;
+    property Item documentPtr: null;
 
     property int radius: 3;
 
-    onDocumentModelChanged: {
-        console.log("GroupUsers onDocumentModelChanged", documentModel);
+    property bool completed: usersProvider.completed;
 
+    Component.onCompleted: {
         usersProvider.updateModel();
     }
 
@@ -25,7 +23,6 @@ Item {
 
     function updateGui(){
         console.log("GroupUsers updateGui");
-        groupUsersContainer.blockUpdatingModel = true;
 
         let userIds = [];
         if (groupUsersContainer.documentModel.ContainsKey("Users")){
@@ -45,18 +42,9 @@ Item {
             }
         }
 
-        groupUsersContainer.blockUpdatingModel = false;
     }
 
     function updateModel(){
-        if (groupUsersContainer.blockUpdatingModel){
-            return;
-        }
-
-        if (groupUsersContainer.undoRedoManager){
-            groupUsersContainer.undoRedoManager.beginChanges();
-        }
-
         let selectedUserIds = []
 
         let indexes = usersTable.getCheckedItems();
@@ -67,10 +55,6 @@ Item {
 
         let result = selectedUserIds.join(';');
         groupUsersContainer.documentModel.SetData("Users", result);
-
-        if (groupUsersContainer.undoRedoManager){
-            groupUsersContainer.undoRedoManager.endChanges();
-        }
     }
 
     Component{
@@ -90,7 +74,6 @@ Item {
         onModelUpdated: {
             if (usersProvider.collectionModel != null){
                 usersTable.elements = usersProvider.collectionModel;
-                groupUsersContainer.updateGui();
             }
         }
     }
@@ -117,7 +100,6 @@ Item {
 
         anchors.top: parent.top;
         anchors.left: parent.left;
-//        anchors.leftMargin: 10;
 
         text: qsTr("Users");
         color: Style.textColor;
@@ -146,7 +128,6 @@ Item {
         anchors.bottom: parent.bottom;
         anchors.bottomMargin: 10;
         anchors.left: parent.left;
-//        anchors.leftMargin: 10;
 
         width: 400;
 
@@ -154,22 +135,8 @@ Item {
         radius: groupUsersContainer.radius;
 
         onCheckedItemsChanged: {
-            if (groupUsersContainer.blockUpdatingModel){
-                return;
-            }
-
-            let indexes = usersTable.getCheckedItems();
-            let users = groupUsersContainer.documentModel.GetData("Users");
-            let userIDs = [];
-            for (let index of indexes){
-                let userId = usersTable.elements.GetData("Id", index);
-                userIDs.push(userId);
-            }
-
-            let newUsers = userIDs.join(';');
-            if (users !== newUsers){
-                groupUsersContainer.documentModel.SetData("Users", userIDs.join(';'));
-                undoRedoManager.makeChanges();
+            if (groupUsersContainer.documentPtr){
+                groupUsersContainer.documentPtr.doUpdateModel();
             }
         }
     }

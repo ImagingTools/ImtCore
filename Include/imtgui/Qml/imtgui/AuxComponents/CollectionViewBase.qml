@@ -24,7 +24,6 @@ Item {
     property alias tableWidth: tableInternal.width;
     property alias tableHeaders: tableInternal.headers;
 
-    property string itemId;
     property var table: tableInternal;
     property bool hasPagination: true;
     property bool hasFilter: true;
@@ -53,8 +52,6 @@ Item {
     signal selectionChanged(var selection);
     signal filterDecoratorLoaded();
 
-    property bool loadData;
-
     Component.onCompleted: {
         tableInternal.focus = true;
 
@@ -67,9 +64,9 @@ Item {
 
 
     onCommandIdChanged: {
-        if (collectionViewBaseContainer.loadData){
-            gqlModels.updateModels();
-        }
+        gqlModels.commandId = commandId;
+
+        gqlModels.updateModels();
     }
 
     Loader {
@@ -256,12 +253,11 @@ Item {
 
                     anchors.centerIn: parent;
 
-                    visible: collectionViewBaseContainer.hasFilter;
-                    highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
-
-//                    width: collectionViewBaseContainer.hasFilter ? tableRightPanel.width : 0;
                     width: Style.buttonWidthMedium;
                     height: width;
+
+                    visible: collectionViewBaseContainer.hasFilter;
+                    highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
                     iconWidth: Style.iconSizeSmall;
                     iconHeight: iconWidth;
@@ -319,9 +315,14 @@ Item {
 
         pagesSize: 1;
 
-        visible: collectionViewBaseContainer.hasPagination && paginationObj.pagesSize != 1;
+        visible: collectionViewBaseContainer.hasPagination /*&& pagesSize > 1*/;
 
         onCurrentIndexChanged: {
+            tableInternal.selectedIndex = -1;
+            gqlModels.updateModels();
+        }
+
+        onCountElementsChanged: {
             tableInternal.selectedIndex = -1;
             gqlModels.updateModels();
         }
@@ -330,14 +331,12 @@ Item {
     CollectionViewBaseGqlModels {
         id: gqlModels;
 
-        itemId: collectionViewBaseContainer.itemId;
         table: collectionViewBaseContainer.table;
 
         commandId: collectionViewBaseContainer.commandId;
         rootItem: collectionViewBaseContainer;
 
         pagination: paginationObj;
-        loading: ldng;
 
         onHeadersChanged: {
             let headersCount = gqlModels.headers.GetItemsCount();
@@ -367,6 +366,18 @@ Item {
             }
             else{
                 ldng.visible = false;
+            }
+        }
+
+        onNotificationModelChanged: {
+            if (notificationModel != null){
+                if (notificationModel.ContainsKey("PagesCount")){
+                    paginationObj.pagesSize = notificationModel.GetData("PagesCount");
+                }
+
+                if (notificationModel.ContainsKey("TotalCount")){
+                    paginationObj.countAllElements = notificationModel.GetData("TotalCount");
+                }
             }
         }
     }

@@ -46,7 +46,7 @@ Item {
         console.log("AppMain onCompleted");
 
         Events.subscribeEvent("UpdateModels", application.updateAllModels);
-        Events.subscribeEvent("Logout", application.onLogout);
+//        Events.subscribeEvent("Logout", application.onLogout);
         Events.subscribeEvent("UpdateSystemStatus", application.updateSystemStatus);
 
         thumbnailDecorator.userManagementProvider.updated.connect(application.onUserModeChanged);
@@ -56,7 +56,7 @@ Item {
 
     Component.onDestruction: {
         Events.unSubscribeEvent("UpdateModels", application.updateAllModels);
-        Events.unSubscribeEvent("Logout", application.onLogout);
+//        Events.unSubscribeEvent("Logout", application.onLogout);
         Events.unSubscribeEvent("UpdateSystemStatus", application.updateSystemStatus);
     }
 
@@ -132,8 +132,11 @@ Item {
         property bool applyUrl: application.serverReady && application.settingsProvider.serverModel != null;
         onApplyUrlChanged: {
             if (applyUrl){
+                console.log("onApplyUrlChanged");
                 let webSocketServerUrl = application.settingsProvider.getValue("WebSocketServerUrl");
+                console.log("webSocketServerUrl", webSocketServerUrl);
                 if (webSocketServerUrl && webSocketServerUrl !== ""){
+                    webSocketServerUrl =  webSocketServerUrl.replace("http", "ws")
                     subscriptionManager.url = webSocketServerUrl;
 
                     return;
@@ -147,7 +150,9 @@ Item {
                     serverUrl += "/";
                 }
 
-                serverUrl += "Lisa/wssub";
+                console.log("serverUrl", serverUrl);
+
+//                serverUrl += "Lisa/wssub";
 
                 subscriptionManager.url = serverUrl;
             }
@@ -169,9 +174,9 @@ Item {
         applicationMain: application;
     }
 
-    function onLogout(){
-        settingsProvider.serverModel = null;
-    }
+//    function onLogout(){
+//        settingsProvider.serverModel = null;
+//    }
 
     function onLocalizationChanged(language){
         console.log("Main onLocalizationChanged", language);

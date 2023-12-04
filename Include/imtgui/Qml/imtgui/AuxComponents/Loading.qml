@@ -12,8 +12,7 @@ Rectangle {
     function start(){
         console.log("Loading start");
 
-        root.stop();
-
+        root.visible = false;
         root.visible = true;
     }
 

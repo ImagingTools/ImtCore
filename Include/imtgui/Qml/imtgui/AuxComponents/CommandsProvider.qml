@@ -8,45 +8,48 @@ QtObject {
     property TreeItemModel commandsModel: TreeItemModel {};
 
     property string commandId;
-    property string documentUuid;
-    property bool isLoadData: true
     property var additionInputParams: ({})
 
-    signal modelLoaded();
+//    signal modelLoaded();
     signal commandModeChanged(string commandId, bool newMode);
 
-    Component.onDestruction: {
-        Events.unSubscribeEvent(commandsProviderContainer.documentUuid + "_CommandUpdateModel", commandsProviderContainer.updateModel)
-    }
+//    Component.onDestruction: {
+//        Events.unSubscribeEvent(commandsProviderContainer.documentUuid + "_CommandUpdateModel", commandsProviderContainer.updateModel)
+//    }
 
-    onCommandIdChanged: {
-        commandsProviderContainer.modelCommands.updateModel();
-    }
+//    onCommandIdChanged: {
+//        commandsProviderContainer.modelCommands.updateModel();
+//    }
 
-    onCommandsModelChanged: {
-        console.log("onCommandsModelChanged");
-        commandsProviderContainer.updateGui();
+//    onCommandsModelChanged: {
+//        console.log("onCommandsModelChanged");
+////        commandsProviderContainer.updateGui();
 
-        commandsProviderContainer.modelLoaded();
-    }
+//        commandsProviderContainer.modelLoaded();
+//    }
 
-    onDocumentUuidChanged: {
-        Events.subscribeEvent(commandsProviderContainer.documentUuid + "_CommandUpdateModel", commandsProviderContainer.updateModel)
-    }
+//    onDocumentUuidChanged: {
+//        Events.subscribeEvent(commandsProviderContainer.documentUuid + "_CommandUpdateModel", commandsProviderContainer.updateModel)
+//    }
 
-    onCommandModeChanged: {
-        Events.sendEvent("CommandsEnabledChanged", {"CommandId":commandsProviderContainer.documentUuid, "CommandId":commandId, "Enabled":newMode, "Model": commandsProviderContainer.commandsModel});
-//        commandsProviderContainer.updateGui();
-    }
+//    onCommandModeChanged: {
+//        Events.sendEvent("CommandsEnabledChanged", {"CommandId":commandsProviderContainer.documentUuid, "CommandId":commandId, "Enabled":newMode, "Model": commandsProviderContainer.commandsModel});
+////        commandsProviderContainer.updateGui();
+//    }
 
     function updateModel(){
+        if (commandId === ""){
+            console.error("Unable to update commands model. Command-ID is empty.");
+            return;
+        }
+
         commandsProviderContainer.modelCommands.updateModel();
     }
 
-    function updateGui(){
-        Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderContainer.commandsModel,
-                             "CommandId": commandsProviderContainer.documentUuid});
-    }
+//    function updateGui(){
+//        Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderContainer.commandsModel,
+//                             "CommandId": commandsProviderContainer.documentUuid});
+//    }
 
     function setCommandIsEnabled(commandId, isEnabled){
         if(commandsProviderContainer.commandsModel === undefined) return;
@@ -150,9 +153,6 @@ QtObject {
 
     property GqlModel modelCommands: GqlModel {
         function updateModel() {
-            if (!commandsProviderContainer.isLoadData){
-                return
-            }
             console.log("__DEBUG__modelCommands", commandsProviderContainer.commandId, JSON.stringify(commandsProviderContainer.additionInputParams))
 
             var query = Gql.GqlRequest("query", commandsProviderContainer.commandId + "Commands");

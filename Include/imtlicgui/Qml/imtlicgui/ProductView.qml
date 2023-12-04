@@ -3,20 +3,17 @@ import Acf 1.0
 import imtgui 1.0
 import imtauthgui 1.0
 import imtqml 1.0
+import imtdocgui 1.0
 
-DocumentBase {
+DocumentData {
     id: productViewContainer;
 
-    nameOutsideEditor: true;
-
-    commandsDelegateSourceComp: Component {
-        ProductViewCommandsDelegate {
-            tableData: tableView;
-        }
+    commandsDelegate: ProductViewCommandsDelegate {
+        tableData: tableView;
+        documentPtr: productViewContainer;
     }
 
     property TreeItemModel allFeaturesModel: TreeItemModel {}
-
     property TreeItemModel licensesModel: TreeItemModel {}
     property TreeItemModel productFeaturesViewModel: TreeItemModel {}
 
@@ -56,65 +53,14 @@ DocumentBase {
         }
     }
 
-    property TreeItemModel hardwareHeadersModel: TreeItemModel {
-        Component.onCompleted: {
-            let index = productViewContainer.hardwareHeadersModel.InsertNewItem();
-            productViewContainer.hardwareHeadersModel.SetData("Id", "FeatureName", index);
-            productViewContainer.hardwareHeadersModel.SetData("Name", qsTr("Model Name"), index);
-
-            index = productViewContainer.hardwareHeadersModel.InsertNewItem();
-            productViewContainer.hardwareHeadersModel.SetData("Id", "FeatureId", index);
-            productViewContainer.hardwareHeadersModel.SetData("Name", qsTr("Model-ID"), index);
-
-            index = productViewContainer.hardwareHeadersModel.InsertNewItem();
-            productViewContainer.hardwareHeadersModel.SetData("Id", "FeatureDescription", index);
-            productViewContainer.hardwareHeadersModel.SetData("Name", qsTr("Description"), index);
-        }
-    }
-
-    onWidthChanged: {
-        if (productViewContainer.width > 0 && productViewContainer.width - rightPanel.width > 250){
-            splitter.x = productViewContainer.width - rightPanel.width;
-        }
-    }
-
-    onModelIsReadyChanged: {
-        productViewContainer.updateGui();
-
-        undoRedoManager.registerModel(documentModel);
-    }
-
     function blockEditing(){
         tableView.readOnly = true;
         categoryComboBox.changeable = false;
     }
 
-    UndoRedoManager {
-        id: undoRedoManager;
-
-        documentBase: productViewContainer;
-        onModelStateChanged: {
-            console.log("UndoRedoManager onModelStateChanged");
-
-            productViewContainer.updateGui();
-        }
-    }
-
-    function onEntered(value){
-        productViewContainer.blockUpdatingModel = true;
-        productViewContainer.documentModel.SetData("ProductId", value);
-        productViewContainer.documentModel.SetData("ProductName", value);
-        productViewContainer.blockUpdatingModel = false;
-    }
-
     function updateModel(){
-        if (productViewContainer.blockUpdatingModel){
-            return;
-        }
-
-        undoRedoManager.beginChanges();
-
-        productViewContainer.documentModel.SetData("Name", productViewContainer.itemName);
+        productViewContainer.documentModel.SetData("ProductId", productNameInput.text);
+        productViewContainer.documentModel.SetData("ProductName", productNameInput.text);
 
         if (categoryComboBox.currentIndex == 0){
             productViewContainer.documentModel.SetData("CategoryId", "Software");
@@ -129,27 +75,34 @@ DocumentBase {
         if (!productViewContainer.documentModel.ContainsKey("Features")){
             productViewContainer.documentModel.SetData("Features", "");
         }
-
-        undoRedoManager.endChanges();
     }
 
     function updateGui(){
-        productViewContainer.blockUpdatingModel = true;
+        if (productViewContainer.documentModel.ContainsKey("ProductName")){
+            productNameInput.text = productViewContainer.documentModel.GetData("ProductName")
+        }
+        else{
+            productNameInput.text = "";
+        }
 
-        categoryComboBox.currentIndex = -1;
+        let categoryFound = false;
         if (productViewContainer.documentModel.ContainsKey("CategoryId")){
             let categoryId = productViewContainer.documentModel.GetData("CategoryId")
-            if (categoryId == "Software"){
+            if (categoryId === "Software"){
                 categoryComboBox.currentIndex = 0;
+                categoryFound = true;
             }
-            else if (categoryId == "Hardware"){
+            else if (categoryId === "Hardware"){
                 categoryComboBox.currentIndex = 1;
+                categoryFound = true;
             }
         }
 
-        updateFeaturesGui();
+        if (!categoryFound){
+            categoryComboBox.currentIndex = -1;
+        }
 
-        productViewContainer.blockUpdatingModel = false;
+        updateFeaturesGui();
     }
 
     function updateFeaturesGui(){
@@ -190,11 +143,7 @@ DocumentBase {
     }
 
     function addFeature(featureId){
-        if (productViewContainer.blockUpdatingModel){
-            return;
-        }
 
-        undoRedoManager.beginChanges();
         console.log("addFeature", featureId);
         let features = productViewContainer.documentModel.GetData("Features")
 
@@ -210,17 +159,9 @@ DocumentBase {
         productViewContainer.documentModel.SetData("Features", featureIds.join(';'))
 
         console.log("productViewContainer.documentModel", productViewContainer.documentModel.toJSON());
-
-        undoRedoManager.endChanges();
     }
 
     function removeFeature(featureId){
-        if (productViewContainer.blockUpdatingModel){
-            return;
-        }
-
-        undoRedoManager.beginChanges();
-
         let features = productViewContainer.documentModel.GetData("Features")
 
         let featureIds = []
@@ -235,8 +176,6 @@ DocumentBase {
         }
 
         productViewContainer.documentModel.SetData("Features", featureIds.join(';'))
-
-        undoRedoManager.endChanges();
     }
 
     TreeItemModel {
@@ -258,21 +197,50 @@ DocumentBase {
     }
 
     Rectangle {
+        anchors.fill: headerPanel;
+
+        color: Style.backgroundColor;
+    }
+
+    Row {
         id: headerPanel;
 
         width: parent.width;
-
-        color: Style.backgroundColor;
-
         height: 50;
+
+        spacing: 10;
+
+        Text {
+            id: productNameLable;
+
+            anchors.verticalCenter: headerPanel.verticalCenter;
+
+            color: Style.buttonText;
+            font.family: Style.fontFamilyBold;
+            font.pixelSize: Style.fontSize_common;
+
+            text: qsTr("Product Name");
+        }
+
+        CustomTextField {
+            id: productNameInput;
+
+            anchors.verticalCenter: headerPanel.verticalCenter;
+
+            height: 30;
+            width: 200;
+
+            placeHolderText: qsTr("Enter the product name");
+
+            onEditingFinished: {
+                productViewContainer.doUpdateModel();
+            }
+        }
 
         Text {
             id: categoryLable;
 
             anchors.verticalCenter: headerPanel.verticalCenter;
-
-            anchors.left: parent.left;
-            anchors.leftMargin: 10;
 
             color: Style.buttonText;
             font.family: Style.fontFamilyBold;
@@ -285,8 +253,6 @@ DocumentBase {
             id: categoryComboBox;
 
             anchors.verticalCenter: headerPanel.verticalCenter;
-            anchors.left: categoryLable.right;
-            anchors.leftMargin: 10
 
             height: 25;
             width: 140;
@@ -302,27 +268,9 @@ DocumentBase {
             }
 
             onCurrentIndexChanged: {
-                if (productViewContainer.blockUpdatingModel){
-                    return;
-                }
-
-                let category = modelCategogy.GetData("Id", categoryComboBox.currentIndex);
-                productViewContainer.documentModel.SetData("CategoryId", category);
-
-                if (category === "Software"){
-                    tableView.columnModel = productViewContainer.softwareHeadersModel;
-                }
-                else if (category === "Hardware"){
-                    tableView.columnModel = productViewContainer.hardwareHeadersModel;
-                }
-
-                productViewContainer.updateModel();
+                productViewContainer.doUpdateModel();
             }
         }
-    }
-
-    TreeItemModel {
-        id: filterFeatureModel;
     }
 
     BasicTreeView {
@@ -331,7 +279,7 @@ DocumentBase {
         anchors.top: headerPanel.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left;
-        anchors.right: splitter.left;
+        anchors.right: parent.right;
 
         readOnly: false;
 
@@ -360,37 +308,7 @@ DocumentBase {
                     }
                 }
 
-//                AuxButton {
-//                    anchors.right: parent.right;
-//                    anchors.rightMargin: 10;
-
-//                    width: 18;
-//                    height: 25;
-
-//                    iconSource: "../../../" + Style.getIconPath("Icons/Delete", Icon.State.On, Icon.Mode.Normal);
-
-//                    visible: delegate.modelIndex == tableView.selectedIndex && delegate.level === 0;
-
-//                    iconWidth: 15;
-//                    iconHeight: iconWidth;
-
-//                    onClicked: {
-//                        let selectedIndex = tableView.selectedIndex;
-//                        if (selectedIndex != null){
-//                            let index = selectedIndex.index;
-
-//                            let featureId = tableView.rowModel.GetData("Id", index);
-
-//                            productViewContainer.removeFeature(featureId);
-
-//                            productViewContainer.updateFeaturesGui();
-//                        }
-//                    }
-//                }
-
                 onCheckStateChanged: {
-                    console.log("onCheckStateChanged", checkState);
-
                     let featureId = model.FeatureId;
                     let rootFeatureUuid = rootDelegate.itemData.Id;
 
@@ -416,121 +334,6 @@ DocumentBase {
                     }
                 }
             }
-        }
-    }
-
-    Splitter {
-        id: splitter;
-        x: productViewContainer.width - 250;
-
-        height: parent.height;
-        width: 0;
-
-        visible: false;
-
-        onXChanged: {
-            if (!productViewContainer.visible){
-                return;
-            }
-
-            if (splitter.x <= 250){
-                splitter.x = 250;
-            }
-            else if (splitter.x > productViewContainer.width){
-                splitter.x = productViewContainer.width - splitter.width;
-            }
-        }
-
-        AuxButton {
-            id: addButton;
-
-            enabled: false;
-
-            anchors.verticalCenter: parent.verticalCenter;
-
-            width: 18;
-            height: 25;
-
-            iconSource: enabled ? "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal):
-                                  "../../../" + Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled)
-
-            iconWidth: 15;
-            iconHeight: iconWidth;
-
-            onClicked: {
-                let indexes = availableFeaturesTable.getSelectedIndexes();
-                if (indexes.length > 0){
-                    let index = indexes[0];
-
-                    let featureId = availableFeaturesTable.elements.GetData("Id", index);
-
-                    productViewContainer.addFeature(featureId);
-
-                    productViewContainer.updateFeaturesGui();
-
-                    addButton.enabled = false;
-                }
-            }
-        }
-    }
-
-    Item {
-        id: rightPanel;
-
-        anchors.left: splitter.right;
-        anchors.top: headerPanel.bottom;
-        anchors.bottom: parent.bottom;
-
-        width: 0;
-
-        visible: false;
-//        width: productViewContainer.width > 0 ? productViewContainer.width - tableView.width : 250;
-
-        AuxTable {
-            id: availableFeaturesTable;
-
-            anchors.fill: parent;
-
-            backgroundHeadersColor: Style.alternateBaseColor;
-
-            Component.onCompleted: {
-                availableFeaturesTable.elements = FeaturesProvider.model;
-            }
-
-            onSelectionChanged: {
-                let indexes = availableFeaturesTable.getSelectedIndexes();
-                if (indexes.length === 1){
-                    let index = indexes[0];
-
-                    let selectedFeatureId = availableFeaturesTable.elements.GetData("Id", index);
-
-                    let features = productViewContainer.documentModel.GetData("Features");
-
-                    let featureIds = []
-                    if (features !== ""){
-                        featureIds = features.split(';');
-                    }
-
-                    addButton.enabled = !featureIds.includes(selectedFeatureId);
-
-                    return;
-                }
-
-                addButton.enabled = false;
-            }
-        }
-    }
-
-    TreeItemModel {
-        id: featuresHeaders;
-
-        Component.onCompleted: {
-            let index = featuresHeaders.InsertNewItem();
-
-            featuresHeaders.SetData("Id", "FeatureName", index);
-            featuresHeaders.SetData("Name", "Available features", index);
-
-            availableFeaturesTable.headers = featuresHeaders;
         }
     }
 }

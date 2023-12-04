@@ -2,8 +2,9 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 import imtgui 1.0
+import imtdocgui 1.0
 
-DocumentBase {
+DocumentData {
     id: accountEditorContainer;
 
     anchors.fill: parent;
@@ -11,7 +12,8 @@ DocumentBase {
     property int radius: 3;
 
     property int textInputHeight: 30;
-    property bool modelsIsLoaded: groupsProvider.completed && accountEditorContainer.modelIsReady;
+
+    documentCompleted: groupsProvider.completed;
 
     Component.onCompleted: {
         groupsProvider.updateModel();
@@ -25,25 +27,6 @@ DocumentBase {
 
     function onLocalizationChanged(language){
         bodyColumn.updateHeaders();
-    }
-
-    onModelsIsLoadedChanged: {
-        if (accountEditorContainer.modelIsReady){
-            accountEditorContainer.updateGui();
-            undoRedoManager.registerModel(accountEditorContainer.documentModel);
-
-            accountNameInput.focus = true;
-        }
-    }
-
-    UndoRedoManager {
-        id: undoRedoManager;
-
-        documentBase: accountEditorContainer;
-
-        onModelStateChanged: {
-            accountEditorContainer.updateGui();
-        }
     }
 
     CollectionDataProvider {
@@ -71,34 +54,54 @@ DocumentBase {
 
     function updateGui(){
         console.log("AccountEditor updateGui");
-        accountEditorContainer.blockUpdatingModel = true;
 
         if (accountEditorContainer.documentModel.ContainsKey("Name")){
             accountNameInput.text = accountEditorContainer.documentModel.GetData("Name");
+        }
+        else{
+            accountNameInput.text = "";
         }
 
         if (accountEditorContainer.documentModel.ContainsKey("Description")){
             accountDescriptionInput.text = accountEditorContainer.documentModel.GetData("Description");
         }
+        else{
+            accountDescriptionInput.text = "";
+        }
 
         if (accountEditorContainer.documentModel.ContainsKey("Country")){
             countryInput.text = accountEditorContainer.documentModel.GetData("Country");
+        }
+        else{
+            countryInput.text = "";
         }
 
         if (accountEditorContainer.documentModel.ContainsKey("PostalCode")){
             postalCodeInput.text = accountEditorContainer.documentModel.GetData("PostalCode");
         }
+        else{
+            postalCodeInput.text = "";
+        }
 
         if (accountEditorContainer.documentModel.ContainsKey("City")){
             cityInput.text = accountEditorContainer.documentModel.GetData("City");
+        }
+        else{
+            cityInput.text = "";
         }
 
         if (accountEditorContainer.documentModel.ContainsKey("Street")){
             streetInput.text = accountEditorContainer.documentModel.GetData("Street");
         }
+        else{
+            streetInput.text = "";
+        }
 
         if (accountEditorContainer.documentModel.ContainsKey("Email")){
             emailInput.text = accountEditorContainer.documentModel.GetData("Email");
+        }
+        else{
+            emailInput.text = "";
         }
 
         let groupIds = [];
@@ -119,18 +122,10 @@ DocumentBase {
                 }
             }
         }
-
-        accountEditorContainer.blockUpdatingModel = false;
     }
 
     function updateModel(){
         console.log("updateModel");
-
-        if (accountEditorContainer.blockUpdatingModel){
-            return;
-        }
-
-        undoRedoManager.beginChanges();
 
         let name = accountNameInput.text;
         accountEditorContainer.documentModel.SetData("Name", name)
@@ -162,8 +157,6 @@ DocumentBase {
 
         let groups = selectedGroupIds.join(';');
         accountEditorContainer.documentModel.SetData("Groups", groups)
-
-        undoRedoManager.endChanges();
     }
 
     Rectangle {
@@ -174,7 +167,6 @@ DocumentBase {
 
     CustomScrollbar {
         id: scrollbar;
-        z: 100;
 
         anchors.left: flickable.right;
         anchors.leftMargin: 5;
@@ -185,6 +177,8 @@ DocumentBase {
 
         secondSize: 10;
         targetItem: flickable;
+
+        visible: accountEditorContainer.visible;
     }
 
     Flickable {
@@ -217,10 +211,7 @@ DocumentBase {
                 placeHolderText: qsTr("Enter the account name");
 
                 onEditingFinished: {
-                    let oldText = accountEditorContainer.documentModel.GetData("Name");
-                    if (oldText && oldText !== accountNameInput.text || !oldText && accountNameInput.text !== ""){
-                        accountEditorContainer.updateModel();
-                    }
+                    accountEditorContainer.doUpdateModel();
                 }
 
                 KeyNavigation.tab: accountDescriptionInput;
@@ -235,11 +226,7 @@ DocumentBase {
                 placeHolderText: qsTr("Enter the account description");
 
                 onEditingFinished: {
-                    console.log("accountDescriptionInput");
-                    let oldText = accountEditorContainer.documentModel.GetData("Description");
-                    if (oldText && oldText !== accountDescriptionInput.text || !oldText && accountDescriptionInput.text !== ""){
-                        accountEditorContainer.updateModel();
-                    }
+                    accountEditorContainer.doUpdateModel();
                 }
 
                 KeyNavigation.tab: emailInput;
@@ -256,11 +243,7 @@ DocumentBase {
                 textInputValidator: mailValid;
 
                 onEditingFinished: {
-                    console.log("emailInput");
-                    let oldText = accountEditorContainer.documentModel.GetData("Email");
-                    if (oldText && oldText !== emailInput.text || !oldText && emailInput.text !== ""){
-                        accountEditorContainer.updateModel();
-                    }
+                    accountEditorContainer.doUpdateModel();
                 }
 
                 KeyNavigation.tab: countryInput;
@@ -312,10 +295,7 @@ DocumentBase {
                         placeHolderText: qsTr("Enter the country");
 
                         onEditingFinished: {
-                            let oldText = accountEditorContainer.documentModel.GetData("Country");
-                            if (oldText && oldText !== countryInput.text || !oldText && countryInput.text !== ""){
-                                accountEditorContainer.updateModel();
-                            }
+                            accountEditorContainer.doUpdateModel();
                         }
 
                         KeyNavigation.tab: cityInput;
@@ -330,10 +310,7 @@ DocumentBase {
                         placeHolderText: qsTr("Enter the city");
 
                         onEditingFinished: {
-                            let oldText = accountEditorContainer.documentModel.GetData("City");
-                            if (oldText && oldText !== cityInput.text || !oldText && cityInput.text !== ""){
-                                accountEditorContainer.updateModel();
-                            }
+                            accountEditorContainer.doUpdateModel();
                         }
 
                         KeyNavigation.tab: postalCodeInput;
@@ -348,10 +325,7 @@ DocumentBase {
                         placeHolderText: qsTr("Enter the postal code");
 
                         onEditingFinished: {
-                            let oldText = String(accountEditorContainer.documentModel.GetData("PostalCode"));
-                            if (oldText && oldText !== postalCodeInput.text || !oldText && postalCodeInput.text !== ""){
-                                accountEditorContainer.updateModel();
-                            }
+                            accountEditorContainer.doUpdateModel();
                         }
 
                         KeyNavigation.tab: streetInput;
@@ -366,10 +340,7 @@ DocumentBase {
                         placeHolderText: qsTr("Enter the street");
 
                         onEditingFinished: {
-                            let oldText = accountEditorContainer.documentModel.GetData("Street");
-                            if (oldText && oldText !== streetInput.text || !oldText && streetInput.text !== ""){
-                                accountEditorContainer.updateModel();
-                            }
+                            accountEditorContainer.doUpdateModel();
                         }
 
                         KeyNavigation.tab: accountNameInput;
@@ -426,23 +397,7 @@ DocumentBase {
                     radius: accountEditorContainer.radius;
 
                     onCheckedItemsChanged: {
-                        if (accountEditorContainer.blockUpdatingModel){
-                            return;
-                        }
-
-                        let indexes = groupsTable.getCheckedItems();
-                        let groups = accountEditorContainer.documentModel.GetData("Groups");
-                        let groupIDs = [];
-                        for (let index of indexes){
-                            let groupId = groupsTable.elements.GetData("Id", index);
-                            groupIDs.push(groupId);
-                        }
-
-                        let newGroups = groupIDs.join(';');
-                        if (groups !== newGroups){
-                            accountEditorContainer.documentModel.SetData("Groups", groupIDs.join(';'));
-                            undoRedoManager.makeChanges();
-                        }
+                        accountEditorContainer.doUpdateModel();
                     }
                 }
             }

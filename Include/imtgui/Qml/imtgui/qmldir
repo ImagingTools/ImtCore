@@ -8,21 +8,10 @@ ErrorManager 1.0 ./AuxComponents/ErrorManager.qml
 CollectionView 1.0 ./AuxComponents/CollectionView.qml
 CollectionViewBase 1.0 ./AuxComponents/CollectionViewBase.qml
 CollectionViewCommandsDelegateBase 1.0 ./AuxComponents/CollectionViewCommandsDelegateBase.qml
-CommandsProvider 1.0 ./AuxComponents/CommandsProvider.qml
-DocumentWorkspaceCommandsDelegate 1.0 ./AuxComponents/DocumentWorkspaceCommandsDelegate.qml
-DocumentWorkspaceCommandsDelegateBase 1.0 ./AuxComponents/DocumentWorkspaceCommandsDelegateBase.qml
-MultiDocWorkspaceView 1.0 ./AuxComponents/MultiDocWorkspaceView.qml
-UndoRedo 1.0 ./AuxComponents/UndoRedo.qml
-DocumentBase 1.0 ./AuxComponents/DocumentBase.qml
-UndoRedoManager 1.0 ./AuxComponents/UndoRedoManager.qml
-DocumentViewBase 1.0 ./AuxComponents/DocumentViewBase.qml
+
 SettingsProvider 1.0 ./AuxComponents/SettingsProvider.qml
 SettingsObserver 1.0 ./AuxComponents/SettingsObserver.qml
-MainDocumentManager 1.0 ./AuxComponents/MainDocumentManager.qml
-DocumentDataProvider 1.0 ./AuxComponents/DocumentDataProvider.qml
-DocumentObserver 1.0 ./AuxComponents/DocumentObserver.qml
 CommandsDelegateBase 1.0 ./AuxComponents/CommandsDelegateBase.qml
-DocumentCommandsDelegate 1.0 ./AuxComponents/DocumentCommandsDelegate.qml
 
 AuxTable 1.0 ./AuxComponents/AuxTable.qml
 TableDelegate 1.0 ./AuxComponents/TableDelegate.qml
@@ -121,6 +110,5 @@ TreeViewModelAdapter 1.0 ./AuxComponents/TreeViewModelAdapter.qml
 TreeItemModelObserver 1.0 ./AuxComponents/TreeItemModelObserver.qml
 TreeItemModelConverter 1.0 ./AuxComponents/TreeItemModelConverter.qml
 
-SingleDocumentWorkspaceView 1.0 ./AuxComponents/SingleDocumentWorkspaceView.qml
-DocumentHistoryView 1.0 ./AuxComponents/DocumentHistoryView.qml
-DocumentHistoryProvider 1.0 ./AuxComponents/DocumentHistoryProvider.qml
+MultiPageView 1.0 ./AuxComponents/MultiPageView.qml
+AlertMessage 1.0 ./AuxComponents/AlertMessage.qml

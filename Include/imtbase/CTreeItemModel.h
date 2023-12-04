@@ -143,6 +143,7 @@ private:
 
 protected:
 	virtual bool SerializeRecursive(iser::IArchive& archive, const QByteArray &tagName);
+	virtual int GetKeyRole(const QByteArray& key) const;
 	virtual bool ParseRecursive(const QJsonObject &jsonObject, int index = 0);
 	virtual void subModelChanged(const CTreeItemModel* model, istd::IChangeable::ChangeSet& changeSet);
 };

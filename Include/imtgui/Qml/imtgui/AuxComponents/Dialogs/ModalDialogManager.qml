@@ -17,9 +17,20 @@ Item {
         id: modalDialogModels;
     }
 
-    function openDialog(comp, parameters){
-        console.log("DialogsManager addDialog", comp);
+    // Top level dialog finished
+    signal finished(string result);
+
+    onFinished: {
+        console.log("DialogsManager onFinished", result);
+    }
+
+    function openDialog(comp, parameters, callback){
+        console.log("DialogsManager addDialog", comp, parameters, callback);
         modalDialogModels.append({"Component": comp, "Parameters": parameters});
+
+        if (callback){
+            finished.connect(callback);
+        }
     }
 
     function closeDialog(){
@@ -143,6 +154,10 @@ Item {
 
                     if (dialogLoader.item.forceFocus === undefined || dialogLoader.item.forceFocus){
                         dialogLoader.item.forceActiveFocus();
+                    }
+
+                    if (dialogLoader.item.finished){
+                        dialogLoader.item.finished.connect(container.finished);
                     }
 
                     dialogLoader.mainWindowWidth_prev = container.width;
