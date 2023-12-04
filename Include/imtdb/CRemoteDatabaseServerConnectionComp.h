@@ -23,7 +23,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (IDatabaseServerConnectionChecker)
-	virtual bool IsDatabaseServerConnected(QString& errorMessage) const override;
+	virtual bool CheckDatabaseConnection(QString& errorMessage) const override;
 
 private:
 	I_ATTR(QByteArray, m_commandIdAttrPtr);

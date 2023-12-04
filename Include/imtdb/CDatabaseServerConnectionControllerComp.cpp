@@ -20,7 +20,7 @@ imtbase::CTreeItemModel* CDatabaseServerConnectionControllerComp::CreateInternal
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
 
-	bool isConnected = m_dbServerConnectionCheckerCompPtr->IsDatabaseServerConnected(errorMessage);
+	bool isConnected = m_dbServerConnectionCheckerCompPtr->CheckDatabaseConnection(errorMessage);
 
 	dataModelPtr->SetData("IsConnected", isConnected);
 

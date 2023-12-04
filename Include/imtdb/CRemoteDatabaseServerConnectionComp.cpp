@@ -11,7 +11,7 @@ namespace imtdb
 
 // reimplemented (IDatabaseServerConnectionChecker)
 
-bool CRemoteDatabaseServerConnectionComp::IsDatabaseServerConnected(QString& errorMessage) const
+bool CRemoteDatabaseServerConnectionComp::CheckDatabaseConnection(QString& errorMessage) const
 {
 	QByteArray commandID = m_commandIdAttrPtr.IsValid() ? *m_commandIdAttrPtr : QByteArrayLiteral("GetDatabaseStatus");
 

@@ -50,7 +50,8 @@ imtbase::CTreeItemModel* CAuthorizationOptionsControllerComp::CreateRepresentati
 		}
 
 		if (m_databaseServerConnectionChekerCompPtr.IsValid()){
-			bool isConnected = m_databaseServerConnectionChekerCompPtr->IsDatabaseServerConnected(errorMessage);
+			bool isConnected = m_databaseServerConnectionChekerCompPtr->CheckDatabaseConnection(errorMessage);
+
 			dataModelPtr->SetData("DatabaseConnectionState", isConnected);
 		}
 	}

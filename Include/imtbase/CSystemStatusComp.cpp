@@ -196,7 +196,7 @@ void CSystemStatusComp::CheckStatus()
 
 		if (m_dbServerConnectionCheckerCompPtr.IsValid()){
 			QString error;
-			bool isConnected = m_dbServerConnectionCheckerCompPtr->IsDatabaseServerConnected(error);
+			bool isConnected = m_dbServerConnectionCheckerCompPtr->CheckDatabaseConnection(error);
 			if (!isConnected){
 				error = QString("%1 %2").arg(qPrintable(*m_serverNameAttrPtr)).arg(error);
 				m_statusMessage = error;

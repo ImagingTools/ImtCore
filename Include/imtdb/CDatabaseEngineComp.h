@@ -69,7 +69,7 @@ public:
 	virtual QSqlQuery ExecSqlQueryFromFile(const QString& filePath, const QVariantMap& bindValues, QSqlError* sqlError = nullptr, bool isForwardOnly = false) const override;
 
 	// reimplemented (IDatabaseServerConnectionChecker)
-	virtual bool IsDatabaseServerConnected(QString& errorMessage) const override;
+	virtual bool CheckDatabaseConnection(QString& errorMessage) const override;
 
 	static void DrectBindValue(QByteArray* string, const QByteArray& what, const QByteArray& expr);
 	static void DrectBindValueInsertDefault(QByteArray* string, const QByteArray& what);
