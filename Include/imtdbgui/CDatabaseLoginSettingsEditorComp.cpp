@@ -77,6 +77,8 @@ void CDatabaseLoginSettingsEditorComp::OnGuiCreated()
 
 		SetReadOnly(!m_generalEditEnablerCompPtr->IsEnabled());
 	}
+
+	TestConnectionFrame->setVisible(m_databaseConnectionCheckerCompPtr.IsValid());
 }
 
 
@@ -119,6 +121,20 @@ void CDatabaseLoginSettingsEditorComp::on_UserEdit_editingFinished()
 void CDatabaseLoginSettingsEditorComp::on_PasswordEdit_editingFinished()
 {
 	DoUpdateModel();
+}
+
+
+void CDatabaseLoginSettingsEditorComp::on_TestConnectionButton_clicked()
+{
+	Q_ASSERT(m_databaseConnectionCheckerCompPtr.IsValid());
+
+	QString errorMessage;
+	bool connectionSuccessful = m_databaseConnectionCheckerCompPtr->CheckDatabaseConnection(errorMessage);
+	if (connectionSuccessful){
+		errorMessage = tr("Database connection test was successful");
+	}
+
+	ConnectionTestResultLabel->setText(errorMessage);
 }
 
 
