@@ -6,14 +6,17 @@
 
 // Qt includes
 #include <QtCore/QFile>
+#include <QtCore/QDir>
+#include <QtCore/QStandardPaths>
 
 // Acf includes
 #include <iprm/TParamsPtr.h>
 #include <iprm/IIdParam.h>
-#include <ifile/IFileNameParam.h>
+#include <ifile/CFileNameParam.h>
 
 // ImtCore includes
 #include <imtbase/IObjectCollectionIterator.h>
+#include <imtrepo/CFileCollectionItem.h>
 
 
 namespace imtgql
@@ -188,6 +191,60 @@ imtbase::CTreeItemModel* CGqlFileRepositoryComp::InsertObject(
 	rootModelPtr->SetExternTreeModel("data", dataModel);
 
 	return rootModelPtr;
+}
+
+
+
+imtbase::CTreeItemModel* CGqlFileRepositoryComp::GetObject(const CGqlRequest& gqlRequest, QString& errorMessage) const
+{
+	if (!m_fileObjectCollectionCompPtr.IsValid()){
+		errorMessage = QString("500: File collection is not set");
+		SendErrorMessage(500, errorMessage, "CGqlFileRepositoryComp::GetObject");
+
+		return nullptr;
+	}
+
+	QByteArray fileId = GetObjectIdFromInputParams(gqlRequest.GetParams());
+
+	imtrepo::CFileCollectionItem fileInfo;
+	if (m_fileObjectCollectionCompPtr->GetFileInfo(fileId, fileInfo)){
+
+		QString fileDirectoryPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "HttpFileBuffer";
+		if (m_tempDirectoryPathCompPtr.IsValid()){
+			fileDirectoryPath = m_tempDirectoryPathCompPtr->GetPath();
+		}
+		QString tempFilePath = (QDir::cleanPath(fileDirectoryPath + "/" + QUuid::createUuid().toString(QUuid::Id128)));
+		tempFilePath = m_fileObjectCollectionCompPtr->GetFile(fileId, tempFilePath);
+		if (tempFilePath.isEmpty()){
+			errorMessage = QString("500: Unable to prepare file");
+			SendErrorMessage(500, errorMessage, "CGqlFileRepositoryComp::GetObject");
+
+			return nullptr;
+		}
+
+		istd::TDelPtr<iprm::CParamsSet> paramsSetPtr = new iprm::CParamsSet;
+		ifile::CFileNameParam* fileNameParamPtr = new ifile::CFileNameParam;
+		fileNameParamPtr->SetPath(tempFilePath);
+		paramsSetPtr->SetEditableParameter("FilePath", fileNameParamPtr, true);
+		imtbase::CObjectCollectionBase::DataPtr valuePtr(paramsSetPtr.GetPtr());
+		const QByteArray createdFileId = m_requestCollectionCompPtr->InsertNewObject(
+			"File",
+			fileInfo.GetName(),
+			QString(),
+			valuePtr
+			);
+
+		istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+		imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+		dataModelPtr->SetData("Id", QString(createdFileId));
+
+		return rootModelPtr.PopPtr();
+	}
+
+	errorMessage = QT_TR_NOOP(QString("400: Unable to get an account with ID: '%1'.").arg(qPrintable(fileId)));
+	SendErrorMessage(400, errorMessage, "CGqlFileRepositoryComp::GetObject");
+
+	return nullptr;
 }
 
 

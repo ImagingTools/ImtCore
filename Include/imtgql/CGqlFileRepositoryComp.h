@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <iprm/CParamsSet.h>
+#include <ifile/IFileNameParam.h>
 
 // ImtCore includes
 #include <imtcrypt/IHashGenerator.h>
@@ -34,6 +35,7 @@ public:
 		I_ASSIGN_TO(m_fileObjectCollectionCompPtr, m_objectCollectionCompPtr, true);
 		I_ASSIGN(m_hashGeneratorCompPtr, "HashGenerator", "The Generator, used to calc file's hash summ", false, "HashGenerator");
 		I_ASSIGN(m_requestCollectionCompPtr, "RequestCollection", "Collection, that stores uploaded/downloading files paths", true, "RequestCollection");
+		I_ASSIGN(m_tempDirectoryPathCompPtr, "TempDirectoryPath", "The path where temp files will be stored, while it is required. \nWarning: this path will be cleared on suutdown", true, "TempDirectoryPath");
 	I_END_COMPONENT;
 
 	// reimplemented(imtbase::IMetaInfoCreator)
@@ -52,6 +54,7 @@ protected:
 
 	// reimplemented (CObjectCollectionControllerCompBase)
 	virtual imtbase::CTreeItemModel* InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* DeleteObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
@@ -70,6 +73,7 @@ protected:
 	I_REF(imtrepo::IFileObjectCollection, m_fileObjectCollectionCompPtr);
 	I_REF(imtcrypt::IHashGenerator, m_hashGeneratorCompPtr);
 	I_REF(imtbase::IObjectCollection, m_requestCollectionCompPtr);
+	I_REF(ifile::IFileNameParam, m_tempDirectoryPathCompPtr);
 };
 
 

@@ -94,8 +94,7 @@ ConstResponsePtr CHttpFileBufferComp::OnGet(
 		requestedFileId.chop(1);
 	}
 
-	imtbase::IObjectCollection& requestCollection = *m_tempFileCollectionCompPtr;
-	const istd::IChangeable* objectPtr = requestCollection.GetObjectPtr(requestedFileId);
+	const istd::IChangeable* objectPtr = m_tempFileCollectionCompPtr->GetObjectPtr(requestedFileId);
 	if (objectPtr == nullptr){
 		SendCriticalMessage(0, QString("Unable to find request with ID: '%1'").arg(QString(requestedFileId)));
 		I_CRITICAL();
@@ -213,11 +212,10 @@ ConstResponsePtr CHttpFileBufferComp::OnPost(
 
 	imtbase::CObjectCollectionBase::DataPtr valuePtr(paramsSetPtr.GetPtr());
 
-	// add TypeId, Name if error
 	/// \todo get name from request
 	const QByteArray createdFileId = m_tempFileCollectionCompPtr->InsertNewObject(
-		QByteArray(),
-		QString(),
+		"File",
+		tempFile.fileName(),
 		QString(),
 		valuePtr
 		);
