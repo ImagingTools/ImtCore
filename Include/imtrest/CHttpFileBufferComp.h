@@ -36,16 +36,22 @@ protected:
 
 	// reimplemented (CHttpServletCompBase)
 	virtual ConstResponsePtr OnGet(
-		const QByteArray& commandId,
-		const imtrest::IRequest::CommandParams& commandParams,
-		const HeadersMap& headers,
-		const imtrest::CHttpRequest& request) const override;
+				const QByteArray& commandId,
+				const imtrest::IRequest::CommandParams& commandParams,
+				const HeadersMap& headers,
+				const imtrest::CHttpRequest& request) const override;
 
 	virtual ConstResponsePtr OnPost(
-		const QByteArray& commandId,
-		const imtrest::IRequest::CommandParams& commandParams,
-		const HeadersMap& headers,
-		const imtrest::CHttpRequest& request) const override;
+				const QByteArray& commandId,
+				const imtrest::IRequest::CommandParams& commandParams,
+				const HeadersMap& headers,
+				const imtrest::CHttpRequest& request) const override;
+
+	virtual ConstResponsePtr OnHead(
+				const QByteArray& commandId,
+				const imtrest::IRequest::CommandParams& commandParams,
+				const HeadersMap& headers,
+				const imtrest::CHttpRequest& request) const override;
 
 
 

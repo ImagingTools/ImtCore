@@ -56,11 +56,11 @@ protected:
 	virtual imtbase::CTreeItemModel* DeleteObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 	virtual bool SetupGqlItem(
-			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
-			const QByteArray& objectId,
-			QString& errorMessage) const override;
+				const imtgql::CGqlRequest& gqlRequest,
+				imtbase::CTreeItemModel& model,
+				int itemIndex,
+				const QByteArray& objectId,
+				QString& errorMessage) const override;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;

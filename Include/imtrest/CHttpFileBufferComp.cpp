@@ -78,7 +78,21 @@ ConstResponsePtr CHttpFileBufferComp::OnGet(
 		return CreateDefaultErrorResponse(errorString.toUtf8(), IProtocolEngine::SC_INTERNAL_SERVER_ERROR, request);
 	}
 
-	const QByteArray requestedFileId;
+	QByteArray requestedFileId = commandId;
+	QByteArray commandIdBase = *m_commandIdAttrPtr;
+	if (commandIdBase.endsWith('*')){
+		commandIdBase.chop(1);
+	}
+
+	requestedFileId = requestedFileId.replace(commandIdBase, "");
+
+	while (requestedFileId.startsWith('/')){
+		requestedFileId.remove(0,1);
+	}
+
+	while (requestedFileId.endsWith('/')){
+		requestedFileId.chop(1);
+	}
 
 	imtbase::IObjectCollection& requestCollection = *m_tempFileCollectionCompPtr;
 	const istd::IChangeable* objectPtr = requestCollection.GetObjectPtr(requestedFileId);
@@ -100,6 +114,7 @@ ConstResponsePtr CHttpFileBufferComp::OnGet(
 	iprm::TParamsPtr<ifile::IFileNameParam> fileNameParamPtr(paramsSetPtr, "FilePath");
 	if (!fileNameParamPtr.IsValid()){
 		SendCriticalMessage(0, QString("Model has unsupported modelType"));
+		I_CRITICAL();
 
 		return CreateDefaultErrorResponse(QT_TR_NOOP("Model has unsupported modelType"), IProtocolEngine::SC_INTERNAL_ERROR,request);
 	}
@@ -109,14 +124,18 @@ ConstResponsePtr CHttpFileBufferComp::OnGet(
 	QFile requestedFile(filePath);
 	if (!requestedFile.open(QIODevice::ReadOnly)){
 		SendCriticalMessage(0, QString("Unable to open file: '%1'. Error: '%2'").arg(filePath, requestedFile.errorString()));
+		I_CRITICAL();
 
 		return CreateDefaultErrorResponse(
 					QString(QT_TR_NOOP("Unable to open file: '%1'. Error: '%2'")).arg(filePath, requestedFile.errorString()).toUtf8(),
 					IProtocolEngine::SC_INTERNAL_ERROR,
 					request);
 	}
+
+	/// \todo change it to HTTP-Range request
 	qint64 offset = 0;
 	if (commandParams.contains("Offset")){
+		I_CRITICAL();
 		bool isNumber = false;
 		offset = commandParams["Offset"].toLongLong(&isNumber);
 		if (!isNumber){
@@ -127,8 +146,10 @@ ConstResponsePtr CHttpFileBufferComp::OnGet(
 		}
 	}
 
+	/// \todo change it to HTTP-Range request
 	qint64 limit = requestedFile.size() - offset;
 	if (commandParams.contains("Limit")){
+		I_CRITICAL();
 		bool isNumber = false;
 		limit = commandParams["Limit"].toLongLong(&isNumber);
 		if (!isNumber){
@@ -141,6 +162,8 @@ ConstResponsePtr CHttpFileBufferComp::OnGet(
 
 	requestedFile.seek(offset);
 	const QByteArray payload = requestedFile.read(limit);
+
+	/// \todo add Content-Disposition header to define file name \code Content-Disposition: attachment; filename="filename.jpg"
 
 	return ConstResponsePtr(request.GetProtocolEngine().CreateResponse(request, IProtocolEngine::SC_OK, payload, QByteArrayLiteral("application/octet-stream; charset=utf-8")));
 }
@@ -191,6 +214,7 @@ ConstResponsePtr CHttpFileBufferComp::OnPost(
 	imtbase::CObjectCollectionBase::DataPtr valuePtr(paramsSetPtr.GetPtr());
 
 	// add TypeId, Name if error
+	/// \todo get name from request
 	const QByteArray createdFileId = m_tempFileCollectionCompPtr->InsertNewObject(
 		QByteArray(),
 		QString(),
@@ -207,6 +231,18 @@ ConstResponsePtr CHttpFileBufferComp::OnPost(
 	const QByteArray payload = createdFileId;
 
 	return ConstResponsePtr(request.GetProtocolEngine().CreateResponse(request, IProtocolEngine::SC_OK, payload, QByteArrayLiteral("application/json; charset=utf-8")));
+}
+
+
+ConstResponsePtr CHttpFileBufferComp::OnHead(
+			const QByteArray& commandId,
+			const IRequest::CommandParams& commandParams,
+			const HeadersMap& headers,
+			const CHttpRequest& request) const
+{
+	/// \todo add file info data return + range-based request headers
+	return ConstResponsePtr(request.GetProtocolEngine().CreateResponse(
+				request, IProtocolEngine::SC_NOT_IMPLEMENTED, "This method is not implemented yet", QByteArrayLiteral("text/plain; charset=utf-8")));
 }
 
 

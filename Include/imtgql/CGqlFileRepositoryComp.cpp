@@ -103,8 +103,7 @@ QString CGqlFileRepositoryComp::GetFilePathFromRequestQueue(const QByteArray& qu
 		return filePath;
 	}
 
-	imtbase::IObjectCollection& requestCollection = *m_requestCollectionCompPtr;
-	const istd::IChangeable* objectPtr = requestCollection.GetObjectPtr(queueRequestId);
+	const istd::IChangeable* objectPtr = m_requestCollectionCompPtr->GetObjectPtr(queueRequestId);
 	if (objectPtr == nullptr){
 		SendCriticalMessage(0, QString("Unable to find request with ID: '%1'").arg(QString(queueRequestId)));
 		I_CRITICAL();
@@ -318,11 +317,11 @@ imtbase::CTreeItemModel* CGqlFileRepositoryComp::DeleteObject(
 
 
 bool CGqlFileRepositoryComp::SetupGqlItem(
-	const imtgql::CGqlRequest& gqlRequest,
-	imtbase::CTreeItemModel& model,
-	int itemIndex,
-	const QByteArray& objectId,
-	QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			imtbase::CTreeItemModel& model,
+			int itemIndex,
+			const QByteArray& objectId,
+			QString& errorMessage) const
 {
 	bool retVal = false;
 
