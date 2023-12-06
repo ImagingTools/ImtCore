@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5133" Description="ACF"/>
+            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="FileCollection" X="800" Y="350" Note=""/>
+        <Element ComponentName="GqlFileRepository" X="575" Y="275" Note=""/>
+        <Element ComponentName="HttpFileBuffer" X="575" Y="450" Note=""/>
+        <Element ComponentName="MD5HashGenerator" X="575" Y="125" Note=""/>
+        <Element ComponentName="SystemLocation" X="175" Y="225" Note=""/>
+        <Element ComponentName="TempStoragePath" X="200" Y="350" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="ReportDocumentView">
+            <PositionMap>
+                <Element ComponentName="ComposedFilePersistence" X="400" Y="263" Note=""/>
+                <Element ComponentName="FileDialogPersistence" X="450" Y="625" Note=""/>
+                <Element ComponentName="ReportDocumentView" X="850" Y="675" Note=""/>
+                <Element ComponentName="ReportPdfPersistence" X="650" Y="100" Note=""/>
+                <Element ComponentName="ReportTiffPersistence" X="1000" Y="100" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="ReportDocument">
+            <PositionMap>
+                <Element ComponentName="InspectionReportBuilder" X="200" Y="425" Note=""/>
+                <Element ComponentName="InspectionReportSimulator" X="625" Y="175" Note=""/>
+                <Element ComponentName="ReportDocument" X="975" Y="425" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
+</Acf>

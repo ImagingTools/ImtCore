@@ -5,6 +5,7 @@
 #include <imtbase/CObjectCollectionComp.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CHttpServletCompBase.h>
+#include <imtrepo/IFileObjectCollection.h>
 
 
 namespace imtrest
@@ -22,8 +23,9 @@ public:
 	typedef CHttpServletCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CHttpFileBufferComp);
-		I_ASSIGN(m_tempFileCollectionCompPtr, "ObjectCollection", "The object collection, used to store temp files paths", true, "ObjectCollection");
+		I_ASSIGN(m_tempFileCollectionCompPtr, "TempRequestCollection", "The object collection, used to store temp files paths", false, "TempRequestCollection");
 		I_ASSIGN(m_tempDirectoryPathCompPtr, "TempDirectoryPath", "The path where temp files will be stored, while it is required. \nWarning: this path will be cleared on suutdown", true, "TempDirectoryPath");
+		I_ASSIGN(m_fileObjectCollectionCompPtr, "FileCollection", "The file collection, used to direct access to files", false, "FileCollection");
 	I_END_COMPONENT;
 
 
@@ -58,6 +60,7 @@ protected:
 private:
 	I_REF(imtbase::IObjectCollection, m_tempFileCollectionCompPtr);
 	I_REF(ifile::IFileNameParam, m_tempDirectoryPathCompPtr);
+	I_REF(imtrepo::IFileObjectCollection, m_fileObjectCollectionCompPtr);
 };
 
 

@@ -89,6 +89,11 @@ I_EXPORT_COMPONENT(
 		"Component for providing the server log",
 		"Server Log Provider");
 
+	I_EXPORT_COMPONENT(
+		HttpFileBuffer,
+		"Temporary storage for uploaded files to the server of files prepared to download to the client",
+		"HTTP Rest Flie Handler");
+
 
 } // namespace ImtRestPck
 

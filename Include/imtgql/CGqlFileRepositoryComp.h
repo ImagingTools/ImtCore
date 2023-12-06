@@ -34,7 +34,7 @@ public:
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN_TO(m_fileObjectCollectionCompPtr, m_objectCollectionCompPtr, true);
 		I_ASSIGN(m_hashGeneratorCompPtr, "HashGenerator", "The Generator, used to calc file's hash summ", false, "HashGenerator");
-		I_ASSIGN(m_requestCollectionCompPtr, "RequestCollection", "Collection, that stores uploaded/downloading files paths", true, "RequestCollection");
+		I_ASSIGN(m_requestCollectionCompPtr, "RequestCollection", "Collection, that stores uploaded/downloading files paths", false, "RequestCollection");
 		I_ASSIGN(m_tempDirectoryPathCompPtr, "TempDirectoryPath", "The path where temp files will be stored, while it is required. \nWarning: this path will be cleared on suutdown", true, "TempDirectoryPath");
 	I_END_COMPONENT;
 

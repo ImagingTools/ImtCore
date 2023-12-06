@@ -15,6 +15,7 @@
 
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
+#include <imtrepo/CFileCollectionItem.h>
 
 
 namespace imtrest
@@ -25,7 +26,39 @@ namespace imtrest
 
 ConstResponsePtr CHttpFileBufferComp::CreateDefaultErrorResponse(const QByteArray& errorString, IProtocolEngine::StatusCode statusCode, const CHttpRequest& request) const
 {
-	SendErrorMessage(0, errorString);
+	istd::IInformationProvider::InformationCategory informationCategory = istd::IInformationProvider::IC_ERROR;
+
+	// Server-side errors are critical. Must NOT occurred
+	switch (statusCode){
+	case IProtocolEngine::StatusCode:: SC_INTERNAL_ERROR:
+	case IProtocolEngine::StatusCode:: SC_INTERNAL_SERVER_ERROR:
+	case IProtocolEngine::StatusCode:: SC_NOT_IMPLEMENTED:
+	case IProtocolEngine::StatusCode:: SC_BAD_GATEWAY:
+	case IProtocolEngine::StatusCode:: SC_SERVICE_UNAVAILABLE:
+	case IProtocolEngine::StatusCode:: SC_GATEWAY_TIMEOUT:
+	case IProtocolEngine::StatusCode:: SC_HTTP_VERSION_NOT_SUPPORTED:
+	case IProtocolEngine::StatusCode:: SC_VARIANT_ALSO_NEGOTIATES:
+	case IProtocolEngine::StatusCode:: SC_INSUFFICIENT_STORAGE:
+	case IProtocolEngine::StatusCode:: SC_LOOP_DETECTED:
+	case IProtocolEngine::StatusCode:: SC_BANDWIDTH_LIMIT_EXCEEDED:
+	case IProtocolEngine::StatusCode:: SC_NOT_EXTENDED:
+	case IProtocolEngine::StatusCode:: SC_NETWORK_AUTHENTICATION_REQUIRED:
+	case IProtocolEngine::StatusCode:: SC_UNKNOWN_ERROR:
+	case IProtocolEngine::StatusCode:: SC_WEB_SERVER_IS_DOWN:
+	case IProtocolEngine::StatusCode:: SC_CONNECTION_TIMED_OUT:
+	case IProtocolEngine::StatusCode:: SC_ORIGIN_IS_UNREACHABLE:
+	case IProtocolEngine::StatusCode:: SC_A_TIMEOUT_OCCURRED:
+	case IProtocolEngine::StatusCode:: SC_SSL_HANDSHAKE_FAILED:
+	case IProtocolEngine::StatusCode:: SC_INVALID_SSL_CERTIFICATE:
+		informationCategory = istd::IInformationProvider::IC_CRITICAL;
+		Q_ASSERT_X(false, __FILE__, QString("Critical error! %1").arg(QString(errorString)).toLocal8Bit());
+
+		break;
+	default:
+		break;
+	}
+
+	SendLogMessage(informationCategory, statusCode, errorString, QString());
 
 	ConstResponsePtr retVal;
 
@@ -49,7 +82,7 @@ void CHttpFileBufferComp::OnComponentCreated()
 		istd::CSystem::EnsurePathExists(m_tempDirectoryPathCompPtr->GetPath());
 	}
 
-	/// \todo add observe the model to clean temp files immediately
+	/// \todo add observe tempDirectoryPath to clean temp files
 }
 
 
@@ -72,10 +105,7 @@ ConstResponsePtr CHttpFileBufferComp::OnGet(
 			const CHttpRequest& request) const
 {
 	if (!m_tempFileCollectionCompPtr.IsValid()){
-		const QString errorString = "Temp collection is invalid";
-		I_CRITICAL();
-
-		return CreateDefaultErrorResponse(errorString.toUtf8(), IProtocolEngine::SC_INTERNAL_SERVER_ERROR, request);
+		return CreateDefaultErrorResponse("Temp collection is invalid", IProtocolEngine::SC_INTERNAL_SERVER_ERROR, request);
 	}
 
 	QByteArray requestedFileId = commandId;
@@ -94,47 +124,54 @@ ConstResponsePtr CHttpFileBufferComp::OnGet(
 		requestedFileId.chop(1);
 	}
 
-	const istd::IChangeable* objectPtr = m_tempFileCollectionCompPtr->GetObjectPtr(requestedFileId);
-	if (objectPtr == nullptr){
-		SendCriticalMessage(0, QString("Unable to find request with ID: '%1'").arg(QString(requestedFileId)));
-		I_CRITICAL();
+	QString filePath;
 
-		return CreateDefaultErrorResponse(QT_TR_NOOP("Unable to find file"),IProtocolEngine::SC_NOT_FOUND, request);
+	// try to use direct access to the file from collection
+	if (m_fileObjectCollectionCompPtr.IsValid()){
+		imtrepo::CFileCollectionItem fileInfo;
+		bool isFileInfoExists = m_fileObjectCollectionCompPtr->GetFileInfo(requestedFileId, fileInfo);
+		if (!isFileInfoExists){
+			I_CRITICAL();
+
+			return CreateDefaultErrorResponse(QT_TR_NOOP(QString("Unable to find file with ID: '%1'").arg(QString(requestedFileId)).toUtf8()),IProtocolEngine::SC_NOT_FOUND, request);
+		}
+
+		filePath = fileInfo.GetFilePath();
 	}
+	else {
+		const istd::IChangeable* objectPtr = m_tempFileCollectionCompPtr->GetObjectPtr(requestedFileId);
+		if (objectPtr == nullptr){
+			I_CRITICAL();
 
-	const iprm::IParamsSet* paramsSetPtr = dynamic_cast<const iprm::IParamsSet*>(objectPtr);
-	if (paramsSetPtr == nullptr){
-		SendCriticalMessage(0, QString("Model has unsupported modelType"));
-		I_CRITICAL();
+			return CreateDefaultErrorResponse(QT_TR_NOOP(QString("Unable to find request with ID: '%1'").arg(QString(requestedFileId)).toUtf8()),IProtocolEngine::SC_NOT_FOUND, request);
+		}
 
-		return CreateDefaultErrorResponse(QT_TR_NOOP("Model has unsupported modelType"), IProtocolEngine::SC_INTERNAL_ERROR, request);
+		const iprm::IParamsSet* paramsSetPtr = dynamic_cast<const iprm::IParamsSet*>(objectPtr);
+		if (paramsSetPtr == nullptr){
+			return CreateDefaultErrorResponse(QT_TR_NOOP("Model has unsupported modelType"), IProtocolEngine::SC_INTERNAL_ERROR, request);
+		}
+
+		iprm::TParamsPtr<ifile::IFileNameParam> fileNameParamPtr(paramsSetPtr, "FilePath");
+		if (!fileNameParamPtr.IsValid()){
+			return CreateDefaultErrorResponse(QT_TR_NOOP("Model has unsupported modelType"), IProtocolEngine::SC_INTERNAL_ERROR,request);
+		}
+
+		filePath = fileNameParamPtr->GetPath();
 	}
-
-	iprm::TParamsPtr<ifile::IFileNameParam> fileNameParamPtr(paramsSetPtr, "FilePath");
-	if (!fileNameParamPtr.IsValid()){
-		SendCriticalMessage(0, QString("Model has unsupported modelType"));
-		I_CRITICAL();
-
-		return CreateDefaultErrorResponse(QT_TR_NOOP("Model has unsupported modelType"), IProtocolEngine::SC_INTERNAL_ERROR,request);
-	}
-
-	QString filePath = fileNameParamPtr->GetPath();
 
 	QFile requestedFile(filePath);
 	if (!requestedFile.open(QIODevice::ReadOnly)){
-		SendCriticalMessage(0, QString("Unable to open file: '%1'. Error: '%2'").arg(filePath, requestedFile.errorString()));
-		I_CRITICAL();
-
 		return CreateDefaultErrorResponse(
-					QString(QT_TR_NOOP("Unable to open file: '%1'. Error: '%2'")).arg(filePath, requestedFile.errorString()).toUtf8(),
+					(QString(QT_TR_NOOP("Unable to open file: [%1]'%2'. Error: '%3'")).arg(QString(requestedFileId), filePath, requestedFile.errorString())).toUtf8(),
 					IProtocolEngine::SC_INTERNAL_ERROR,
 					request);
 	}
 
-	/// \todo change it to HTTP-Range request
+	/// \todo change it to HTTP-Range request expect: \code "Range: bytes=0-1023" and reply: \code Content-Range: <unit> <range-start>-<range-end>/<size> \note don't forget status code \code SC_PARTIAL_CONTENT
 	qint64 offset = 0;
 	if (commandParams.contains("Offset")){
 		I_CRITICAL();
+
 		bool isNumber = false;
 		offset = commandParams["Offset"].toLongLong(&isNumber);
 		if (!isNumber){
@@ -149,6 +186,7 @@ ConstResponsePtr CHttpFileBufferComp::OnGet(
 	qint64 limit = requestedFile.size() - offset;
 	if (commandParams.contains("Limit")){
 		I_CRITICAL();
+
 		bool isNumber = false;
 		limit = commandParams["Limit"].toLongLong(&isNumber);
 		if (!isNumber){
@@ -175,10 +213,7 @@ ConstResponsePtr CHttpFileBufferComp::OnPost(
 			const CHttpRequest& request) const
 {
 	if (!m_tempFileCollectionCompPtr.IsValid()){
-		const QString errorString = "Temp collection is invalid";
-		I_CRITICAL();
-
-		return CreateDefaultErrorResponse(errorString.toUtf8(), IProtocolEngine::SC_INTERNAL_SERVER_ERROR, request);
+		return CreateDefaultErrorResponse("Temp collection is invalid", IProtocolEngine::SC_INTERNAL_SERVER_ERROR, request);
 	}
 
 	QString fileDirectoryPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "HttpFileBuffer";
@@ -189,19 +224,12 @@ ConstResponsePtr CHttpFileBufferComp::OnPost(
 	QFile tempFile(QDir::cleanPath(fileDirectoryPath + "/" + QUuid::createUuid().toString(QUuid::Id128)));
 	Q_ASSERT(!tempFile.exists());
 	if (!tempFile.open(QIODevice::WriteOnly)){
-		const QString errorString = QString(QT_TR_NOOP("Unable to save file: %1")).arg(tempFile.errorString());
-		I_CRITICAL();
-
-		return CreateDefaultErrorResponse(errorString.toUtf8(), IProtocolEngine::SC_INTERNAL_SERVER_ERROR, request);
+		return CreateDefaultErrorResponse(QString(QT_TR_NOOP("Unable to save file: %1")).arg(tempFile.errorString()).toUtf8(), IProtocolEngine::SC_INTERNAL_SERVER_ERROR, request);
 	}
 
 	quint64 writtenBytes = tempFile.write(request.GetBody());
 	if (writtenBytes != request.GetBody().size()){
-		const QString errorString = QString(QT_TR_NOOP("Saved file is corrupted!: %1")).arg(tempFile.errorString());
-		SendCriticalMessage(0, errorString);
-		I_CRITICAL();
-
-		return CreateDefaultErrorResponse(errorString.toUtf8(), IProtocolEngine::SC_INTERNAL_SERVER_ERROR, request);
+		return CreateDefaultErrorResponse(QString(QT_TR_NOOP("Saved file is corrupted!: %1")).arg(tempFile.errorString()).toUtf8(), IProtocolEngine::SC_INTERNAL_SERVER_ERROR, request);
 	}
 	tempFile.close();
 
@@ -221,8 +249,6 @@ ConstResponsePtr CHttpFileBufferComp::OnPost(
 		);
 
 	if (createdFileId.isEmpty()){
-		I_CRITICAL();
-
 		return CreateDefaultErrorResponse("Unable to save file", IProtocolEngine::SC_INTERNAL_SERVER_ERROR, request);
 	}
 

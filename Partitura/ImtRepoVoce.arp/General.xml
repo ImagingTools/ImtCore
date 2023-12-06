@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<Acf>
+  <AcfHeader>
+    <VersionInfos count="1">
+      <Version>
+        <Id>
+          0
+        </Id>
+        <Number>
+          1486
+        </Number>
+        <Description>
+          ACF
+        </Description>
+      </Version>
+    </VersionInfos>
+  </AcfHeader>
+  <Description>
+    Repository components of the ImagingTools SDK
+  </Description>
+  <Keywords>
+    Company='ImagingTools' Project='"ImagingTools Core Framework"'
+  </Keywords>
+</Acf>
