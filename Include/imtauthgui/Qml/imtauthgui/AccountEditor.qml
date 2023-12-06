@@ -215,6 +215,12 @@ DocumentData {
                 }
 
                 KeyNavigation.tab: accountDescriptionInput;
+
+                Component.onCompleted: {
+                    let ok = PermissionsController.checkPermission("ChangeAccount");
+
+                    accountNameInput.readOnly = !ok;
+                }
             }
 
             TextFieldWithTitle {
@@ -230,6 +236,12 @@ DocumentData {
                 }
 
                 KeyNavigation.tab: emailInput;
+
+                Component.onCompleted: {
+                    let ok = PermissionsController.checkPermission("ChangeAccount");
+
+                    accountDescriptionInput.readOnly = !ok;
+                }
             }
 
             TextFieldWithTitle {
@@ -247,6 +259,12 @@ DocumentData {
                 }
 
                 KeyNavigation.tab: countryInput;
+
+                Component.onCompleted: {
+                    let ok = PermissionsController.checkPermission("ChangeAccount");
+
+                    emailInput.readOnly = !ok;
+                }
             }
 
             RegExpValidator {
@@ -299,6 +317,12 @@ DocumentData {
                         }
 
                         KeyNavigation.tab: cityInput;
+
+                        Component.onCompleted: {
+                            let ok = PermissionsController.checkPermission("ChangeAccount");
+
+                            countryInput.readOnly = !ok;
+                        }
                     }
 
                     TextFieldWithTitle {
@@ -314,6 +338,12 @@ DocumentData {
                         }
 
                         KeyNavigation.tab: postalCodeInput;
+
+                        Component.onCompleted: {
+                            let ok = PermissionsController.checkPermission("ChangeAccount");
+
+                            cityInput.readOnly = !ok;
+                        }
                     }
 
                     TextFieldWithTitle {
@@ -329,6 +359,12 @@ DocumentData {
                         }
 
                         KeyNavigation.tab: streetInput;
+
+                        Component.onCompleted: {
+                            let ok = PermissionsController.checkPermission("ChangeAccount");
+
+                            postalCodeInput.readOnly = !ok;
+                        }
                     }
 
                     TextFieldWithTitle {
@@ -344,6 +380,12 @@ DocumentData {
                         }
 
                         KeyNavigation.tab: accountNameInput;
+
+                        Component.onCompleted: {
+                            let ok = PermissionsController.checkPermission("ChangeAccount");
+
+                            streetInput.readOnly = !ok;
+                        }
                     }
                 }// Company address block
             }//Company address block borders
@@ -398,6 +440,12 @@ DocumentData {
 
                     onCheckedItemsChanged: {
                         accountEditorContainer.doUpdateModel();
+                    }
+
+                    Component.onCompleted: {
+                        let ok = PermissionsController.checkPermission("ChangeAccount");
+
+                        groupsTable.readOnly = !ok;
                     }
                 }
             }

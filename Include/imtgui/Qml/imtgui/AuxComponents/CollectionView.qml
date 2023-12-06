@@ -69,6 +69,8 @@ Item {
     }
 
     Component.onDestruction: {
+        console.log("CollectionView onDestruction", commandId)
+
         Events.unSubscribeEvent("OnLocalizationChanged", collectionViewContainer.onLocalizationChanged);
         Events.unSubscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
         Events.unSubscribeEvent("UpdateAllModels", collectionViewContainer.receiveRemoteChanges);
@@ -153,7 +155,7 @@ Item {
     }
 
     function onLocalizationChanged(language){
-        console.log("CommandsDecorator onLocalizationChanged", language);
+        console.log("CommandsDecorator onLocalizationChanged", commandId, visible);
 
         if (visible){
             commandsProviderLocal.updateModel();
@@ -183,7 +185,8 @@ Item {
         if (hasRemoteChanges){
             updateGui();
             hasRemoteChanges = false;
-            collectionViewContainer.documentManagerPtr.alertPanelComp = undefined;
+
+            setAlertPanel(undefined);
         }
     }
 
@@ -354,6 +357,7 @@ Item {
 
         property bool ok: collectionViewContainer.visible && collectionViewContainer.commandId !== "";
         onOkChanged: {
+            console.log("CollectionViewBase onOkChanged", ok);
             if (ok){
                 collectionViewBase.commandId = collectionViewContainer.commandId;
 //                collectionViewContainer.updateGui();
@@ -449,14 +453,16 @@ Item {
     SubscriptionClient {
         id: subscriptionClient;
 
-        property string commandId: collectionViewContainer.commandId;
-        onCommandIdChanged: {
+        property string ok: collectionViewContainer.commandId !== "" && subscriptionClient.subscriptionId !== "";
+        onOkChanged: {
             if (commandId !== ""){
                 let subscriptionRequestId = "On" + commandId + "CollectionChanged"
                 var query = Gql.GqlRequest("subscription", subscriptionRequestId);
                 var queryFields = Gql.GqlObject("notification");
                 queryFields.InsertField("Id");
                 query.AddField(queryFields);
+
+                console.log("registerSubscription", subscriptionRequestId, subscriptionId)
                 subscriptionManager.registerSubscription(query, subscriptionClient);
             }
         }
@@ -465,7 +471,7 @@ Item {
             console.log("SubscriptionClient onStateChanged", state);
 
             if (state === "Ready"){
-                console.log("subscriptionClient", subscriptionClient.toJSON());
+                console.log("subscriptionClient Ready", subscriptionClient.commandId);
 
                 if (subscriptionClient.ContainsKey("data")){
                     let dataModelLocal = subscriptionClient.GetData("data")

@@ -42,33 +42,53 @@ DocumentManager {
         stackView.pop();
     }
 
-    function onGetModelStateChanged(){
-        let state = documentController.getModelState;
+    function checkState(state){
         if (state === "Loading"){
-            loading.start();
+            Events.sendEvent("StartLoading");
         }
         else{
-            loading.stop();
+            Events.sendEvent("StopLoading");
         }
+    }
+
+    function onGetModelStateChanged(){
+        checkState(documentController.getModelState);
     }
 
     function onSetModelStateChanged(){
-        let state = documentController.setModelState;
-        if (state === "Loading"){
-            loading.start();
-        }
-        else{
-            loading.stop();
-        }
+        checkState(documentController.setModelState);
     }
 
     function onUpdateModelStateChanged(){
-        let state = documentController.updateModelState;
-        if (state === "Loading"){
-            loading.start();
+        checkState(documentController.updateModelState);
+    }
+
+    function setAlertPanel(alertPanelComp){
+        console.log("DocumentManager setAlertPanel", alertPanelComp);
+
+        alertPanel.sourceComponent = alertPanelComp;
+    }
+
+    Loader {
+        id: documentLoader;
+
+        anchors.fill: parent;
+
+        visible: stackView.countPage == 0;
+
+        onLoaded: {
+            console.log("Document onLoaded");
+
+            if (item.documentManagerPtr !== undefined){
+                item.documentManagerPtr = documentManager;
+            }
         }
-        else{
-            loading.stop();
+
+        onStatusChanged: {
+            console.log("Document onStatusChanged", documentLoader.status);
+            if (status === Loader.Error){
+                console.error("Document loading was failed", documentLoader.source);
+            }
         }
     }
 
@@ -82,43 +102,6 @@ DocumentManager {
         height: visible ? 40: 0;
 
         visible: alertPanel.status == Loader.Ready;
-    }
-
-    Loader {
-        id: documentLoader;
-
-        anchors.fill: parent;
-
-        visible: stackView.countPage == 0;
-
-        onLoaded: {
-            console.log("Document onLoaded");
-
-            if (item.uuid !== undefined){
-                item.uuid = model.Uuid;
-            }
-
-            if (item.documentManagerPtr !== undefined){
-                item.documentManagerPtr = documentManager;
-            }
-
-            if (item.documentTypeId !== undefined){
-                item.documentTypeId = model.TypeId;
-            }
-
-            if (item.documentModel !== undefined){
-                item.documentModel = model.Model;
-            }
-
-            documentManager.documentsModel.setProperty(model.index, "DocumentObj", item);
-        }
-
-        onStatusChanged: {
-            console.log("Document onStatusChanged", documentLoader.status);
-            if (status === Loader.Error){
-                console.error("Document loading was failed", documentLoader.source);
-            }
-        }
     }
 
     StackView {

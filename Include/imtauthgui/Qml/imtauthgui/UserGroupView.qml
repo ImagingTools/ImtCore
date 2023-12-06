@@ -230,9 +230,9 @@ DocumentData {
         anchors.bottom: parent.bottom;
 
         Component.onCompleted: {
-            multiPageView.addPage("General", "General", "qrc:/qml/imtauthgui/GroupEditor.qml", groupEditorComp);
-            multiPageView.addPage("Users", "Users", "qrc:/qml/imtauthgui/GroupUsers.qml", groupUsersComp);
-            multiPageView.addPage("Roles", "Roles", "qrc:/qml/imtauthgui/GroupRoles.qml", groupRolesComp);
+            multiPageView.addPage("General", "General", groupEditorComp);
+            multiPageView.addPage("Users", "Users", groupUsersComp);
+            multiPageView.addPage("Roles", "Roles", groupRolesComp);
 
             multiPageView.selectedIndex = 0;
         }

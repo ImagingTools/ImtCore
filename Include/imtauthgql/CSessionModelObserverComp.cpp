@@ -21,12 +21,9 @@ void CSessionModelObserverComp::OnComponentCreated()
 	BaseClass::OnComponentCreated();
 	QByteArray contextId = GetComponentContext()->GetContextId();
 
-	qDebug() << "OnComponentCreated" << contextId << this;
 
 	if (m_modelCompPtr.IsValid()){
-		bool ok = m_modelCompPtr->AttachObserver(this);
-
-		qDebug() << "AttachObserver" << ok;
+		m_modelCompPtr->AttachObserver(this);
 	}
 }
 
@@ -34,8 +31,6 @@ void CSessionModelObserverComp::OnComponentCreated()
 void CSessionModelObserverComp::OnComponentDestroyed()
 {
 	QByteArray contextId = GetComponentContext()->GetContextId();
-
-	qDebug() << "OnComponentDestroyed" << contextId;
 
 	if (m_modelCompPtr.IsValid()){
 		m_modelCompPtr->DetachObserver(this);

@@ -25,34 +25,27 @@ DocumentManager {
         tabPanel.selectedIndex = documentIndex;
     }
 
-    function onGetModelStateChanged(){
-        let state = documentController.getModelState;
+    function checkState(state){
         if (state === "Loading"){
-            loading.start();
+            Events.sendEvent("StartLoading");
+//            loading.start();
         }
         else{
-            loading.stop();
+            Events.sendEvent("StopLoading");
+//            loading.stop();
         }
+    }
+
+    function onGetModelStateChanged(){
+        checkState(documentController.getModelState);
     }
 
     function onSetModelStateChanged(){
-        let state = documentController.setModelState;
-        if (state === "Loading"){
-            loading.start();
-        }
-        else{
-            loading.stop();
-        }
+        checkState(documentController.setModelState);
     }
 
     function onUpdateModelStateChanged(){
-        let state = documentController.updateModelState;
-        if (state === "Loading"){
-            loading.start();
-        }
-        else{
-            loading.stop();
-        }
+        checkState(documentController.updateModelState);
     }
 
     function setAlertPanel(alertPanelComp){

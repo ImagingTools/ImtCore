@@ -232,6 +232,11 @@ DocumentData {
 
             placeHolderText: qsTr("Enter the product name");
 
+            Component.onCompleted: {
+                let ok = PermissionsController.checkPermission("ChangeProduct");
+                productNameInput.readOnly = !ok;
+            }
+
             onEditingFinished: {
                 productViewContainer.doUpdateModel();
             }
@@ -286,6 +291,11 @@ DocumentData {
         tristate: true;
 
         property var selectedOptionalFeatures: [];
+
+        Component.onCompleted: {
+            let ok = PermissionsController.checkPermission("ChangeProduct");
+            tableView.readOnly = !ok;
+        }
 
         rowDelegate: Component {
             TreeViewItemDelegateBase {

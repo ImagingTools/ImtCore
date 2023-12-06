@@ -51,13 +51,14 @@ WebSocket {
                 }
             }
         }
-        else if (socketModel.GetData("type") == "data"){
+        else if (socketModel.GetData("type") === "data"){
             for (let index = 0; index < subscriptionModel.length; index++){
                 if (subscriptionModel[index]["subscriptionId"] == socketModel.GetData("id")){
                     let subscription = subscriptionModel[index]["subscription"]
                     subscription.state = "Processing"
                     let dataModelLocal = socketModel.GetData("payload");
                     console.log("dataModelLocal", dataModelLocal.toJSON());
+                    console.log("subscription", subscription);
                     // dataModelLocal = dataModelLocal.GetData("data");
                     subscription.Copy(dataModelLocal)
                     subscription.state = "Ready"
@@ -68,15 +69,17 @@ WebSocket {
         }
     }
 
+    function clear(){
+        container.subscriptionModel = []
+    }
+
     function registerSubscriptionToServer(){
-        console.log("SubscriptionManager registerSubscriptionToServer", container.status)
         if (container.status != WebSocket.Open){
             return;
         }
 
         for (let index = 0; index < subscriptionModel.length; index++){
-            if (subscriptionModel[index]["status"] == "unregistered"){
-               // let queryTxt = subscriptionModel.GetData("query", index).GetQuery();
+            if (subscriptionModel[index]["status"] === "unregistered"){
                 let request = {}
                 request["id"] = subscriptionModel[index]["subscriptionId"]
                 request["type"] = "start"
@@ -84,29 +87,31 @@ WebSocket {
                 let query = subscriptionModel[index]["query"]
                 payload["data"] = query.GetQuery()
                 request["payload"] = payload
-                console.log("registerSubscription", JSON.stringify(request))
+                console.log("registerSubscriptionToServer", JSON.stringify(request))
                 container.sendTextMessage(JSON.stringify(request))
             }
         }
     }
 
     function registerSubscription(query, subscriptionClient){
+//        console.log("registerSubscription", query, subscriptionClient.toJSON())
+
         for (let index = 0; index < subscriptionModel.length; index++){
-            if (subscriptionModel[index]["subscription"] == subscriptionClient){
+            if (subscriptionModel[index]["subscription"] === subscriptionClient){
                 return;
             }
         }
+
         let commandId = query.GetCommandId()
-        console.log("registerSubscription", commandId);
         subscriptionModel.push(
-        {
-            "commandId": commandId,
-            "subscriptionId": subscriptionClient.subscriptionId,
-            "query": query,
-            "status": "unregistered",
-            "subscription": subscriptionClient
-        }
-       )
+                    {
+                        "commandId": commandId,
+                        "subscriptionId": subscriptionClient.subscriptionId,
+                        "query": query,
+                        "status": "unregistered",
+                        "subscription": subscriptionClient
+                    }
+                    )
 
         registerSubscriptionToServer()
     }
@@ -114,7 +119,7 @@ WebSocket {
     function unRegisterSubscription(subscriptionClient){
         let index
         for (index = 0; index < subscriptionModel.length; index++){
-            if (subscriptionModel[index]["subscription"] == subscriptionClient){
+            if (subscriptionModel[index]["subscription"] === subscriptionClient){
                 subscriptionModel.splice(index, 1)
                 return;
             }

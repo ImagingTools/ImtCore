@@ -20,26 +20,19 @@ Rectangle {
     }
 
     Component.onDestruction: {
+        console.log("Administration onDestruction");
+
         Events.unSubscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
     }
 
     function onLocalizationChanged(language){
         console.log("Administration onLocalizationChanged", language);
 
-//        for (let i = 0; i < leftMenuModel.count; i++){
-//            let id = leftMenuModel.get(i).Id;
-//            if (id === "Roles"){
-//                console.log("id == Roles");
+//        multiPageView.updateModel();
+    }
 
-//                leftMenuModel.setProperty(i, "Name", qsTr("Roles"));
-//            }
-//            else if (id === "Users"){
-//                leftMenuModel.setProperty(i, "Name", qsTr("Users"));
-//            }
-//            else if (id === "Groups"){
-//                leftMenuModel.setProperty(i, "Name", qsTr("Groups"));
-//            }
-//        }
+    onDocumentManagerPtrChanged: {
+
     }
 
     Row {
@@ -98,17 +91,25 @@ Rectangle {
         anchors.bottom: parent.bottom;
 
         Component.onCompleted: {
-            multiPageView.addPage("Roles", "Roles", "RoleCollectionView.qml", roleCollectionComp);
-            multiPageView.addPage("Users", "Users", "UserCollectionView.qml", userCollectionComp);
-            multiPageView.addPage("Groups", "Groups", "UserGroupCollectionView.qml", userGroupCollectionComp);
-
-            multiPageView.selectedIndex = 0;
+            updateModel();
         }
 
         onSelectedIndexChanged: {
+            console.log("onSelectedIndexChanged", selectedIndex);
+
             if (selectedIndex >= 0){
                 headerText.text = qsTr("Administration") + " / " + pagesModel.get(selectedIndex).Name;
             }
+        }
+
+        function updateModel(){
+            multiPageView.clear();
+
+            multiPageView.addPage("Roles", qsTr("Roles"), roleCollectionComp);
+            multiPageView.addPage("Users", qsTr("Users"), userCollectionComp);
+            multiPageView.addPage("Groups", qsTr("Groups"), userGroupCollectionComp);
+
+            multiPageView.selectedIndex = 0;
         }
     }
 }

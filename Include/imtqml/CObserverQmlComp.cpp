@@ -104,15 +104,12 @@ void CObserverQmlComp::UpdateSettingsRepresentation()
 
 			quickItem->setProperty("localSettings", QVariant::fromValue(new imtbase::CTreeItemModel()));
 
-			qDebug() << "m_settingsModelPtr1" << m_settingsModelPtr->toJSON();
 			bool result = m_settingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*m_settingsCompPtr, *m_settingsModelPtr);
 			if (result){
 				if (m_settingsModelPtr->ContainsKey("Parameters")){
 					imtbase::CTreeItemModel* parametersPtr = m_settingsModelPtr->GetTreeItemModel("Parameters");
 					if (parametersPtr != nullptr){
 						QVariant data = QVariant::fromValue(parametersPtr);
-
-						qDebug() << "m_settingsModelPtr2" << m_settingsModelPtr->toJSON();
 
 						quickItem->setProperty("localSettings", data);
 					}

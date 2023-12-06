@@ -98,7 +98,7 @@ Item {
     }
 
     function onLocalizationChanged(language){
-        console.log("CollectionViewBase onLocalizationChanged", language);
+        console.log("CollectionViewBase onLocalizationChanged", commandId);
         gqlModels.updateModels();
     }
 

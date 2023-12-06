@@ -22,8 +22,12 @@ Item {
         }
     }
 
-    function addPage(pageId, pageName, pageSource, pageComp){
-        pagesModel.append({Id: pageId, Name: pageName, Source: pageSource, SourceComponent: pageComp})
+    function clear(){
+        pagesModel.clear();
+    }
+
+    function addPage(pageId, pageName, pageComp){
+        pagesModel.append({Id: pageId, Name: pageName, SourceComponent: pageComp})
     }
 
     function removePage(pageId){
@@ -147,12 +151,6 @@ Item {
 
                     decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
 
-//                    Component.onCompleted: {
-//                        if (model.index === 0){
-//                            clicked();
-//                        }
-//                    }
-
                     onClicked: {
                         if (root.selectedIndex !== model.index){
                             root.selectedIndex = model.index;
@@ -186,7 +184,6 @@ Item {
 
                 anchors.fill: parent;
 
-                source: model.Source;
                 sourceComponent: model.SourceComponent;
 
                 visible: root.selectedIndex == model.index;

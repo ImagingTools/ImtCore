@@ -46,7 +46,7 @@ Item {
         console.log("AppMain onCompleted");
 
         Events.subscribeEvent("UpdateModels", application.updateAllModels);
-//        Events.subscribeEvent("Logout", application.onLogout);
+        Events.subscribeEvent("Logout", application.onLogout);
         Events.subscribeEvent("UpdateSystemStatus", application.updateSystemStatus);
 
         thumbnailDecorator.userManagementProvider.updated.connect(application.onUserModeChanged);
@@ -56,7 +56,7 @@ Item {
 
     Component.onDestruction: {
         Events.unSubscribeEvent("UpdateModels", application.updateAllModels);
-//        Events.unSubscribeEvent("Logout", application.onLogout);
+        Events.unSubscribeEvent("Logout", application.onLogout);
         Events.unSubscribeEvent("UpdateSystemStatus", application.updateSystemStatus);
     }
 
@@ -150,7 +150,11 @@ Item {
                     serverUrl += "/";
                 }
 
-                serverUrl += "ProLife/wssub";
+                if (context.application){
+                    serverUrl += context.application + "/";
+                }
+
+                serverUrl += "wssub";
 
                 subscriptionManager.url = serverUrl;
             }
@@ -172,13 +176,10 @@ Item {
         applicationMain: application;
     }
 
-//    function onLogout(){
-//        settingsProvider.serverModel = null;
-//    }
+    function onLogout(){
+        settingsProvider.serverModel = null;
 
-    function onLocalizationChanged(language){
-        console.log("Main onLocalizationChanged", language);
-       // Events.sendEvent("OnLocalizationChanged", language);
+        subscriptionManager.clear();
     }
 
     function updateAllModels(){

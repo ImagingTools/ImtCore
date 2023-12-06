@@ -125,7 +125,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 	if (webSocketRequest != nullptr){
 		QByteArray message = webSocketRequest->GetBody();
 
-		qDebug() << "OnWebSocketTextMessageReceived: " << message;
+		qDebug() << "ProcessRequest: " << message;
 
 		QJsonDocument jsonDocument = QJsonDocument::fromJson(message);
 

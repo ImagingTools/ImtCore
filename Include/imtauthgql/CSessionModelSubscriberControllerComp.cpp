@@ -25,7 +25,6 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 	}
 
 	qDebug() << "OnSessionModelChanged" << sessionId;
-	qDebug() << "Count subscribers:" << m_registeredSubscribers.count();
 
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
@@ -40,7 +39,6 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 			if (responsePtr.IsValid()){
 				const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest->GetRequestId());
 				if (sender != nullptr){
-					qDebug() << "Send subscription" << body << "to the subscriber" << id;
 
 					sender->SendResponse(responsePtr);
 				}

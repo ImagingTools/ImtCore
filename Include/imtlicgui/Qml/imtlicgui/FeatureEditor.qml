@@ -1,10 +1,10 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtauthgui 1.0
-import imtdocgui 1.0 as ImtDocGui
-import imtgui 1.0 as ImtGui
+import imtdocgui 1.0
+import imtgui 1.0
 
-ImtDocGui.DocumentData {
+DocumentData {
     id: featureEditor;
 
     property TreeItemModel dependenciewViewModel: TreeItemModel {}
@@ -15,7 +15,7 @@ ImtDocGui.DocumentData {
         TreeItemModel {}
     }
 
-    commandsDelegate: ImtDocGui.DocumentWorkspaceCommandsDelegateBase {
+    commandsDelegate: DocumentWorkspaceCommandsDelegateBase {
         documentPtr: featureEditor;
 
         onCommandActivated: {
@@ -199,7 +199,7 @@ ImtDocGui.DocumentData {
             }
         }
 
-        ImtGui.BasicTreeView {
+        BasicTreeView {
             id: tableView;
 
             anchors.top: headerBlock.bottom;
@@ -352,7 +352,7 @@ ImtDocGui.DocumentData {
             }
         }
 
-        ImtGui.BasicTreeView {
+        BasicTreeView {
             id: featureDependenciesView;
 
             anchors.top: titleBlock.bottom;
@@ -398,7 +398,7 @@ ImtDocGui.DocumentData {
                 featureEditor.updateTreeViewGui();
             }
 
-            rowDelegate: Component {ImtGui.TreeViewItemDelegateBase {
+            rowDelegate: Component {TreeViewItemDelegateBase {
                     id: delegate;
 
                     root: featureDependenciesView;

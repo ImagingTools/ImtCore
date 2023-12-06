@@ -91,10 +91,12 @@ Item {
     }
 
     onStartLoading: {
+        Events.sendEvent("StartLoading");
         loading.start();
     }
 
     onStopLoading: {
+        Events.sendEvent("StopLoading");
         loading.stop();
     }
 
@@ -121,8 +123,6 @@ Item {
 
     onDocumentModelChanged: {
         console.log("onDocumentModelChanged", documentModel.toJSON());
-
-        documentModel.dataChanged.connect(onModelChanged);
 
         beginDocumentModelChanged();
 
@@ -166,6 +166,8 @@ Item {
         }
 
         endDocumentModelChanged();
+
+        documentModel.dataChanged.connect(onModelChanged);
     }
 
     onIsDirtyChanged: {
@@ -183,7 +185,7 @@ Item {
 
     function onModelChanged()
     {
-        if (internal.blockingUpdateGui){
+        if (internal.blockingUpdateGui || internal.blockingUpdateModel){
             internal.countIncomingChanges++;
             return;
         }
@@ -253,6 +255,14 @@ Item {
         return true;
     }
 
+    function setBlockingUpdateModel(value){
+        internal.blockingUpdateModel = value;
+    }
+
+    function setBlockingUpdateGui(value){
+        internal.blockingUpdateGui = value;
+    }
+
     QtObject {
         id: internal;
 
@@ -295,7 +305,9 @@ Item {
 
         onActivated: {
             console.log("Ctrl+S onActivated");
-            Events.sendEvent(documentData.uuid + "CommandActivated", "Save");
+            if (documentData.commandsProvider.commandExists("Save")){
+                Events.sendEvent(documentData.uuid + "CommandActivated", "Save");
+            }
         }
     }
 
@@ -306,7 +318,9 @@ Item {
 
         onActivated: {
             console.log("Ctrl+Z onActivated");
-            Events.sendEvent(documentData.uuid + "CommandActivated", "Undo");
+            if (documentData.commandsProvider.commandExists("Undo")){
+                Events.sendEvent(documentData.uuid + "CommandActivated", "Undo");
+            }
         }
     }
 
@@ -316,7 +330,9 @@ Item {
         enabled: documentData.visible;
 
         onActivated: {
-            Events.sendEvent(documentData.uuid + "CommandActivated", "Redo");
+            if (documentData.commandsProvider.commandExists("Redo")){
+                Events.sendEvent(documentData.uuid + "CommandActivated", "Redo");
+            }
         }
     }
 

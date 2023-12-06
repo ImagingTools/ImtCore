@@ -375,7 +375,7 @@ Rectangle {
     Loading {
         id: loading;
 
-        z: 100;
+        z: 999;
 
         anchors.fill: parent;
 

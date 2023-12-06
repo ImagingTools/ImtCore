@@ -28,6 +28,11 @@ Item {
     signal documentAdded(int documentIndex, string documentUuid);
 
 
+    function openErrorDialog(message){
+        modalDialogManager.openDialog(errorDialogComp, {"message": message});
+    }
+
+
     function getDocumentsCount()
     {
         return documentsModel.count;
@@ -184,6 +189,8 @@ Item {
                     let documentId = document.documentId;
                     let documentModel = document.documentModel;
                     let documentTypeId = document.documentTypeId;
+
+                    document.doUpdateModel();
 
                     let callBack = function(documentId, documentName){
                         onDocumentSaved(documentId, documentName, document, index);
@@ -420,6 +427,12 @@ Item {
         property var m_closingDocuments: [];
     }
 
+    Component {
+        id: errorDialogComp;
+
+        ErrorDialog {
+        }
+    }
 
     Component {
         id: saveDialog;

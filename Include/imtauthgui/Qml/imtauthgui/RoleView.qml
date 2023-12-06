@@ -184,6 +184,7 @@ DocumentData {
         id: roleEditorComp;
 
         RoleEditor {
+            documentPtr: container;
             onCompletedChanged: {
                 if (completed){
                     container.roleEditorCompleted = completed;
@@ -197,6 +198,7 @@ DocumentData {
         id: rolePermissionsComp;
 
         RolePermissions {
+            documentPtr: container;
             onCompletedChanged: {
                 if (completed){
                     container.rolePermissionsCompleted = completed;
@@ -214,18 +216,10 @@ DocumentData {
         anchors.bottom: parent.bottom;
 
         Component.onCompleted: {
-            multiPageView.addPage("General", "General", "qrc:/qml/imtauthgui/RoleEditor.qml", roleEditorComp);
-            multiPageView.addPage("Permissions", "Permissions", "qrc:/qml/imtauthgui/RolePermissions.qml", rolePermissionsComp);
+            multiPageView.addPage("General", "General", roleEditorComp);
+            multiPageView.addPage("Permissions", "Permissions", rolePermissionsComp);
 
             multiPageView.selectedIndex = 0;
-        }
-
-        onPageLoaded: {
-            console.log("MultiPageView onPageLoaded", pageItem);
-
-            if (pageItem.documentPtr !== undefined){
-                pageItem.documentPtr = container;
-            }
         }
     }
 }
