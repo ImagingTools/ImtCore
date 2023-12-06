@@ -19,6 +19,10 @@ Item {
         Events.unSubscribeEvent("OpenDocument", openDocument);
     }
 
+    function clear(){
+        root.documentManagers = {};
+    }
+
     function registerDocumentManager(parameters){
         console.log("registerDocumentManager");
 

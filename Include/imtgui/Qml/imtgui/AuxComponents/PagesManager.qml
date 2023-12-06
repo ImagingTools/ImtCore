@@ -12,6 +12,11 @@ Item {
     property var documentManager: null;
     property AuthorizationPage authorizationStatusProvider: null;
 
+    /**
+        The page will be loaded only by click if it hasn't loaded yet
+    */
+    property bool loadByClick: true;
+
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
     }
@@ -79,59 +84,32 @@ Item {
 
             visible: container.activePageIndex === model.index;
 
-//            Component.onCompleted: {
-//                if (container.documentManager != null){
-//                    container.documentManager.registerDocumentManager(model.Id, null);
-//                }
+            onVisibleChanged: {
+                if(pagesDeleg.visible && container.loadByClick){
+                    if (!pagesLoader.item){
+                        pagesLoader.source = model.Source;
+                    }
 
-//                Events.subscribeEvent("PageNameChanged", pagesDeleg.onPageNameChanged);
-//            }
+                    container.activeItem = pagesLoader.item;
+                }
+            }
 
-//            Component.onDestruction: {
-//                Events.unSubscribeEvent("PageNameChanged", pagesDeleg.onPageNameChanged);
-//            }
-
-//            function onPageNameChanged(parameters){
-//                let pageId = parameters["Id"]
-//                let pageName = parameters["Name"]
-
-//                if (pageId == model.Id){
-//                    model.Name = pageName;
-//                }
-//            }
-
-            /**
-                The page will be loaded only by click if it hasn't loaded yet
-            */
-//            onVisibleChanged: {
-//                if(pagesDeleg.visible){
-//                    if (!pagesLoader.item){
-//                        if (container.pageModel && container.pageModel.ContainsKey("Source", model.index)){
-//                            var source = container.pageModel.GetData("Source", model.index);
-//                            if (source){
-//                                pagesLoader.source = source;
-//                            }
-//                        }
-//                    }
-
-//                    container.activeItem = pagesLoader.item;
-//                }
-//            }
+            Component.onCompleted: {
+                if (!container.loadByClick){
+                    pagesLoader.source = model.Source;
+                }
+            }
 
             Loader {
                 id: pagesLoader;
                 anchors.fill: parent;
 
-                source: model.Source;
+//                source: model.Source;
 
                 visible: parent.visible;
 
                 onItemChanged: {
                     if (pagesLoader.item){
-                        if (pagesLoader.item.mainDocumentManager !== undefined){
-                            pagesLoader.item.mainDocumentManager = container.documentManager;
-                        }
-
                         pagesLoader.item.startPageObj =
                         {
                             "Id": model.Id,

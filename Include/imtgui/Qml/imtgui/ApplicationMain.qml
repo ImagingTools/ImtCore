@@ -19,6 +19,8 @@ Item {
     property bool serverReady: false;
     property bool useWebSocketSubscription: false;
 
+    property alias loadPageByClick: thumbnailDecorator.loadPageByClick;
+
     onApplicationInfoChanged: {
         console.log("onApplicationInfoChanged");
         if (application.applicationInfo){

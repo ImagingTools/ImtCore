@@ -7,7 +7,6 @@ Rectangle {
     anchors.fill: parent;
 
     property var startPageObj;
-//    property MainDocumentManager mainDocumentManager: null;
 
     Component.onCompleted: {
         console.log("multiDocPageView onCompleted");

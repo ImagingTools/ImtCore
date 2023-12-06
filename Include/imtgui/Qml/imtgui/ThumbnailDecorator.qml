@@ -30,6 +30,7 @@ Rectangle {
     property alias dialogManager: modalDialogManager;
 
     property alias menuPanelRadius: menuPanel.radius;
+    property alias loadPageByClick: pagesManager.loadByClick;
 
     property var applicationMain: null;
 
@@ -122,7 +123,7 @@ Rectangle {
             settingsProvider.serverModel = null;
         }
 
-//        mainDocumentManager.clear();
+        mainDocumentManager.clear();
     }
 
     MenuPanel {
