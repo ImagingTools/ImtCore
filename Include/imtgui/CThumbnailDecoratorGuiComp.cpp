@@ -179,6 +179,8 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 {
 	BaseClass::OnGuiCreated();
 
+	PreferencesButton->setVisible(m_preferencesDialogCompPtr.IsValid());
+
 	if (*m_hideHomeButtonAttrPtr){
 		HomeButton->hide();
 	}
@@ -491,6 +493,7 @@ void CThumbnailDecoratorGuiComp::OnGuiDesignChanged()
 		HomeButton->setIcon(GetIcon(":/ColorIcons/MenuRing"));
 		BackPageButton->setIcon(GetIcon(":/Icons/Left"));
 		NextPageButton->setIcon(GetIcon(":/Icons/Right"));
+		PreferencesButton->setIcon(GetIcon(":/Icons/Settings"));
 	}
 }
 
@@ -690,6 +693,14 @@ void CThumbnailDecoratorGuiComp::on_DashboardButton_clicked()
 		else if (ViewStack->currentIndex() == 0){
 			ViewStack->setCurrentIndex(1);
 		}
+	}
+}
+
+
+void CThumbnailDecoratorGuiComp::on_PreferencesButton_clicked()
+{
+	if (m_preferencesDialogCompPtr.IsValid()){
+		m_preferencesDialogCompPtr->ExecuteDialog(this);
 	}
 }
 

@@ -18,6 +18,7 @@
 #include <iprm/ISelectionParam.h>
 #include <iqtgui/CHierarchicalCommand.h>
 #include <iqtgui/TRestorableGuiWrap.h>
+#include <iqtgui/IDialog.h>
 #include <imeas/INumericValue.h>
 #include <iauth/ILogin.h>
 #include <iauth/IRightsProvider.h>
@@ -146,6 +147,7 @@ public:
 		I_ASSIGN(m_leftMenuPanelGuiCompPtr, "LeftMenuPanel", "Left menu panel", false, "LeftMenuPanel");
 		I_ASSIGN(m_pageNavigationControllerCompPtr, "NavigationController", "Page navigation controller", false, "NavigationController");
 		I_ASSIGN(m_dashboardGuiCompPtr, "Dashboard", "Dashboard UI", false, "Dashboard");
+		I_ASSIGN(m_preferencesDialogCompPtr, "PreferencesDialog", "Preferences dialog", false, "Preferences");
 	I_END_COMPONENT;
 
 	enum
@@ -216,6 +218,7 @@ private Q_SLOTS:
 	void on_BackPageButton_clicked();
 	void on_NextPageButton_clicked();
 	void on_DashboardButton_clicked();
+	void on_PreferencesButton_clicked();
 
 private:
 	void ShowLoginPage();
@@ -389,6 +392,7 @@ private:
 	I_REF(iqtgui::IGuiObject, m_leftMenuPanelGuiCompPtr);
 	I_REF(imtgui::IPageNavigationController, m_pageNavigationControllerCompPtr);
 	I_REF(iqtgui::IGuiObject, m_dashboardGuiCompPtr);
+	I_REF(iqtgui::IDialog, m_preferencesDialogCompPtr);
 
 	QToolBar* m_mainToolBar;
 	QToolBar* m_additionalCommandsToolBar;
