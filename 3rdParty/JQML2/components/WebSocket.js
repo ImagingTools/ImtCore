@@ -24,8 +24,8 @@ class WebSocket extends QtObject {
         textMessageReceived: { params: ['message'] },
     }
 
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
 
         this.reconnect = false
     }

@@ -49,8 +49,8 @@ class Image extends Item {
         this.$img.addEventListener("error", this.$imgError);
     */
 
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
         
         this.setStyle({
             backgroundRepeat: "no-repeat",

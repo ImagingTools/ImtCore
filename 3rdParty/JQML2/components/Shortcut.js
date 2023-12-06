@@ -19,8 +19,8 @@ class Shortcut extends QtObject {
         activatedAmbiguously: { params: [] },
     }
 
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
     }
 
 

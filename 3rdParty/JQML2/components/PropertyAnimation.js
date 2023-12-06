@@ -13,8 +13,8 @@ class PropertyAnimation extends Animation {
 
     }
 
-    constructor(parent) {
-        super(parent)
+    constructor(parent,exCtx,exModel) {
+        super(parent,exCtx,exModel)
 
         this.getProperty('target').reset(parent)
     }

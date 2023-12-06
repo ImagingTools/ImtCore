@@ -15,8 +15,8 @@ class DoubleValidator extends QtObject {
         notation: { type: QReal, value: DoubleValidator.ScientificNotation },
     }
 
-    constructor(args) {
-        super(args)
+    constructor(parent,exCtx,exModel) {
+        super(parent,exCtx,exModel)
     }
 
     getRegExpForNotation() {

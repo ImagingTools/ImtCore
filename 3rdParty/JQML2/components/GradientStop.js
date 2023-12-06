@@ -7,8 +7,8 @@ class GradientStop extends QtObject {
         position: { type: QReal, value: 0, changed: '$gradientUpdate' },
     }
 
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
 
         parent.getProperty('stops').get().push(this)
         parent.$gradientUpdate()

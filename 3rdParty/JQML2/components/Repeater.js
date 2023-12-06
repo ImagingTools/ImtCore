@@ -12,9 +12,12 @@ class Repeater extends Item {
         itemAdded: { params: ['index', 'item'] },
         itemRemoved: { params: ['index', 'item'] },
     }
-    constructor(parent){
-        super(parent)
-        
+
+    $repeater = true
+    
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
+        this.$exCtx = exCtx
         this.setStyle({
             display: 'none'
         })
@@ -66,16 +69,16 @@ class Repeater extends Item {
         if(this.$items[index]) return this.$items[index]
         let ctx = new ContextController(this.$exCtx, this.delegate.get().$exCtx)
         if(typeof this.getPropertyValue('model') === 'number'){
-            let obj = this.delegate.get().createObject(this.parent, ctx)
-            obj.getStatement('index').reset(index)
-            obj.getStatement('model').reset({index: index})
+            let obj = this.delegate.get().createObject(this.parent, ctx, {index: index})
+            // obj.getStatement('index').reset(index)
+            // obj.getStatement('model').reset({index: index})
             this.$items[index] = obj
         } else {
             let model = this.getPropertyValue('model').getPropertyValue('data')[index]
-            let obj = this.delegate.get().createObject(this.parent, ctx)
-            obj.getStatement('index').setCompute(()=>{return model.index})
-            obj.getStatement('index').update()
-            obj.getStatement('model').reset(model)
+            let obj = this.delegate.get().createObject(this.parent, ctx, model)
+            // obj.getStatement('index').setCompute(()=>{return model.index})
+            // obj.getStatement('index').update()
+            // obj.getStatement('model').reset(model)
             this.$items[index] = obj   
         }
         for(let update of updateList.splice(0, updateList.length)){
@@ -89,14 +92,18 @@ class Repeater extends Item {
     updateView(){
         if(!this.getPropertyValue('delegate') || this.getPropertyValue('model') === undefined || this.getPropertyValue('model') === null) return
         
-        for(let key in this.$items){
-            if(key !== 'length') {
-                if(this.$signals.itemRemoved) this.$signals.itemRemoved(key, this.$items[key])
-                this.$items[key].$destroy()
-                delete this.$items[key]
-            }
+        // for(let key in this.$items){
+        //     if(key !== 'length') {
+        //         if(this.$signals.itemRemoved) this.$signals.itemRemoved(key, this.$items[key])
+        //         this.$items[key].$destroy()
+        //         delete this.$items[key]
+        //     }
+        // }
+        if(this.$id === 'childModelRepeater'){
+            console.log('DEBUG:::this.$items.length =', this.$items.length.get())
+            console.log('DEBUG:::this.model.UID =', this.getProperty('model').get().UID)
         }
-
+        
         this.parent.preventAutoUpdateGeometry = true
         for(let i = 0; i < this.$items.length.get(); i++){
             this.createElement(i)
@@ -109,13 +116,16 @@ class Repeater extends Item {
 
 
     $destroy(){
-        // for(let key in this.$items){
-        //     if(key !== 'length') {
-        //         this.$items[key].$destroy()
-        //         delete this.$items[key]
-        //     }
-        // }
         this.$items.length.unsubscribe()
+
+        for(let key in this.$items){
+            if(key !== 'length') {
+                if(this.$signals.itemRemoved) this.$signals.itemRemoved(key, this.$items[key])
+                this.$items[key].$destroy()
+                delete this.$items[key]
+            }
+        }
+        
         super.$destroy()
     }
 }

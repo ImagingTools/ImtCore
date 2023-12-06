@@ -88,11 +88,12 @@ class Item extends QtObject {
         /* Keys */
     }
 
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
         this.createDom('div', {
-            'position': 'absolute',
-            'display': 'flex',
+            position: 'absolute',
+            display: 'flex',
+            overflow : 'unset',
         })
         
 

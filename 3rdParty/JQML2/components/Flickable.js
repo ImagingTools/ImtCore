@@ -35,8 +35,8 @@ class Flickable extends Item {
 
     $flickable = true
 
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
         let contentItem = new Item(this)
         this.getStatement('contentItem').reset(contentItem)
         contentItem.getProperty('width').setCompute(()=>{return this.width})

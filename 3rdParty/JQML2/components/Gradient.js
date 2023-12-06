@@ -10,8 +10,8 @@ class Gradient extends QtObject {
         orientation: { type: QReal, value:  Gradient.Vertical, changed: '$gradientUpdate' },
     }
 
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
     }
 
     $gradientUpdate(){

@@ -1,8 +1,8 @@
 const { QQmlComponent } = require('./QQmlComponent')
 
 class Component extends QQmlComponent {
-    constructor(parent, exCtx){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
         this.$exCtx = exCtx
     }
 }

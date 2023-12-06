@@ -44,8 +44,8 @@ class Text extends Item {
         linkActivated: { params: [] },
     }
 
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
         
         this.setStyle({
             display: 'flex',

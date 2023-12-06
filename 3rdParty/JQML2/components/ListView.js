@@ -27,9 +27,9 @@ class ListView extends Flickable {
         count: { type: QReal, value: 0 },
     }
 
-    constructor(parent){
-        super(parent)
-        
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
+        this.$exCtx = exCtx
         this.$items = {
             length: new QInt(0)
         }
@@ -301,16 +301,16 @@ class ListView extends Flickable {
         if(this.$items[index]) return this.$items[index]
         let ctx = new ContextController(this.$exCtx, this.delegate.get().$exCtx)
         if(typeof this.getPropertyValue('model') === 'number'){
-            let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), ctx)
-            obj.getStatement('index').reset(index)
-            obj.getStatement('model').reset({index: index})
+            let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), ctx, {index: index})
+            // obj.getStatement('index').reset(index)
+            // obj.getStatement('model').reset({index: index})
             this.$items[index] = obj
         } else {
             let model = this.getPropertyValue('model').getPropertyValue('data')[index]
-            let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), ctx)
-            obj.getStatement('index').setCompute(()=>{return model.index})
-            obj.getStatement('index').update()
-            obj.getStatement('model').reset(model)
+            let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), ctx, model)
+            // obj.getStatement('index').setCompute(()=>{return model.index})
+            // obj.getStatement('index').update()
+            // obj.getStatement('model').reset(model)
             this.$items[index] = obj   
         }
         for(let update of updateList.splice(0, updateList.length)){

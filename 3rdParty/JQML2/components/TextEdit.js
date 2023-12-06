@@ -33,8 +33,8 @@ class TextEdit extends Item {
 		editingFinished: { params: [] },
     }
 
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
         
         this.$input = document.createElement('textarea')
         this.$input.style.outline = 'none'

@@ -9,10 +9,12 @@ class Rectangle extends Item {
         radius: { type: QReal, value: 0, changed: '$radiusChanged' },
     }
 
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
         
-
+        this.setStyle({
+            backgroundColor: 'white',
+        })
     }
 
     $gradientChanged(){

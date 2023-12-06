@@ -22,6 +22,11 @@ class Loader extends Item {
 
     $widthAuto = true
     $heightAuto = true
+
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
+        this.$exCtx = exCtx
+    }
     $complete(){
         // this.$widthAuto = this.getProperty('width').auto
         // this.$heightAuto = this.getProperty('height').auto
@@ -138,7 +143,7 @@ class Loader extends Item {
         
         if(this.getPropertyValue('source')){
             let path = this.getStatement('source').get().replaceAll('/', '_').replaceAll('/', '_').replaceAll('.qml', '')
-            let fullPath = [].concat(this.$path ? this.$path.split('_') : [], path.split('_'))
+            let fullPath = path.indexOf('qrc:') >= 0 ? path.replaceAll('qrc:_qml_', '').split('_') : [].concat(this.$path ? this.$path.split('_') : [], path.split('_'))
             let dotIndex = fullPath.indexOf('..')
             while(dotIndex >= 0){
                 if(dotIndex > 0){

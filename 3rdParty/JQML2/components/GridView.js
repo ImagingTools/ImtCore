@@ -23,8 +23,9 @@ class GridView extends Flickable {
         cellHeight: { type: QReal, value: 100, changed: '$cellChanged' },
     }
 
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
+        this.$exCtx = exCtx
         this.getStatement('contentItem').get().setStyle({
             flexWrap: 'wrap'
         })
@@ -75,7 +76,7 @@ class GridView extends Flickable {
         let ctx = new ContextController(this.$exCtx, this.delegate.get().$exCtx)
         if(typeof this.getPropertyValue('model') === 'number'){
             for(let i = 0; i < this.getPropertyValue('model'); i++){
-                let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), ctx)
+                let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), ctx, {index: i})
                 obj.setStyle({
                     position: 'relative'
                 })
@@ -87,8 +88,8 @@ class GridView extends Flickable {
                 // obj.getProperty('height').getNotify().connect(()=>{
                 //     this.updateGeometry()
                 // })
-                obj.getStatement('index').reset(i)
-                obj.getStatement('model').reset({index: i})
+                // obj.getStatement('index').reset(i)
+                // obj.getStatement('model').reset({index: i})
                 for(let update of updateList.splice(0, updateList.length)){
                     update()
                 }
@@ -97,7 +98,7 @@ class GridView extends Flickable {
             }
         } else {
             for(let model of this.getPropertyValue('model').getPropertyValue('data')){
-                let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), ctx)
+                let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), ctx, model)
                 obj.setStyle({
                     position: 'relative'
                 })
@@ -109,9 +110,9 @@ class GridView extends Flickable {
                 // obj.getProperty('height').getNotify().connect(()=>{
                 //     this.updateGeometry()
                 // })
-                obj.getStatement('index').setCompute(()=>{obj.getStatement('index').subscribe(model.getStatement('index')); return model.getStatement('index').get()})
-                obj.getStatement('index').update()
-                obj.getStatement('model').reset(model)
+                // obj.getStatement('index').setCompute(()=>{obj.getStatement('index').subscribe(model.getStatement('index')); return model.getStatement('index').get()})
+                // obj.getStatement('index').update()
+                // obj.getStatement('model').reset(model)
                 for(let update of updateList.splice(0, updateList.length)){
                     update()
                 }

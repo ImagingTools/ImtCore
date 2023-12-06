@@ -44,8 +44,8 @@ class MouseArea extends Item {
 
     $mousearea = true
 
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
         MouseController.add(this)
     }
 

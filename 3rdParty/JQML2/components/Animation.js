@@ -18,8 +18,8 @@ class Animation extends QtObject {
         finished: { params: [] },
     }
 
-    constructor(parent) {
-        super(parent)
+    constructor(parent,exCtx,exModel) {
+        super(parent,exCtx,exModel)
         this.$loops = 0
 
         AnimationController.add(this)

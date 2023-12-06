@@ -6,8 +6,8 @@ class Column extends Item {
         spacing: { type: QReal, value: 0, changed: '$spacingChanged' },
     }
 
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
 
         this.setStyle({
             flexDirection: 'column'

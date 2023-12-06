@@ -2,8 +2,8 @@ const { QtObject } = require('./QtObject')
 const { QVar } = require('../utils/properties')
 
 class ListElement extends QtObject {
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
     }
     
     getStatement(name){

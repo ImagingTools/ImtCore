@@ -45,8 +45,8 @@ class TextInput extends Item {
 		textEdited: { params: [] },
     }
 
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
         
         this.$input = document.createElement('input')
         this.$input.type = 'text'

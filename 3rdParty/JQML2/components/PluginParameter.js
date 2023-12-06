@@ -7,8 +7,8 @@ class PluginParameter extends QtObject {
         value: { type: QString, value: '', changed: '$parameterChanged' },
     }
 
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
         
         parent.getPropertyValue('parameters').push(this)
     }

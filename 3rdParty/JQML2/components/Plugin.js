@@ -7,8 +7,8 @@ class Plugin extends QtObject {
         parameters: { type: QVar, value: [], changed: '$parametersChanged' },
     }
 
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
         this.$url = 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}@2x.png'
     }
 

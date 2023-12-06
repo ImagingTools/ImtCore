@@ -408,6 +408,13 @@ class QVar extends QProperty {
     
 }
 
+class QData extends QProperty {
+    getNotify(){
+        if(!this.notify) this.notify = new QSignal('topLeft', 'bottomRight', 'roles')
+        return this.notify
+    }
+}
+
 class QAlias extends QProperty {
     once = true
     constructor(getTargetProperty){
@@ -522,10 +529,10 @@ class QAnchors extends ComplexObject {
 
     marginsChanged(){
         if(this.completed) {
-            this.getStatement('leftMargin').reset(this.margins.get())
-            this.getStatement('rightMargin').reset(this.margins.get())
-            this.getStatement('topMargin').reset(this.margins.get())
-            this.getStatement('bottomMargin').reset(this.margins.get())
+            this.getStatement('leftMargin').reset(this.getStatement('margins').get())
+            this.getStatement('rightMargin').reset(this.getStatement('margins').get())
+            this.getStatement('topMargin').reset(this.getStatement('margins').get())
+            this.getStatement('bottomMargin').reset(this.getStatement('margins').get())
         }
     }
 
@@ -854,6 +861,7 @@ module.exports.QReal = QReal
 module.exports.QPositiveReal = QPositiveReal
 module.exports.QString = QString
 module.exports.QVar = QVar
+module.exports.QData = QData
 module.exports.QBool = QBool
 module.exports.QVisible = QVisible
 module.exports.QFont = QFont

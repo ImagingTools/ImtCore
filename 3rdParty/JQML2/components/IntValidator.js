@@ -8,8 +8,8 @@ class IntValidator extends QtObject {
         locale: { type: QString, value: '' },
     }
 
-    constructor(args) {
-        super(args)
+    constructor(parent,exCtx,exModel) {
+        super(parent,exCtx,exModel)
     }
 
     validate(str) {

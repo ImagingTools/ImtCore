@@ -6,8 +6,8 @@ class Href extends QtObject {
         url: { type: QString, value: '' },
     }
 
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
 
         this.$interval = setInterval(()=>{
             this.getProperty('url').reset(location.href)

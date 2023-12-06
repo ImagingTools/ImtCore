@@ -13,8 +13,8 @@ class Timer extends QtObject {
         triggered: { params: [] },
     }
 
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
     }
 
     restart(){

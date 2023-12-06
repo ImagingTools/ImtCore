@@ -870,7 +870,7 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
 
 let code = []
 function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], updateList = [], step = 0, innerComponent = false){
-    code.push(currentInstructions.UID > 1 ? `let el${currentInstructions.UID} = new ${currentInstructions.getClassName()}(${innerComponent ? 'currParent' : currentInstructions.parent.name},inCtx)` : `let el${currentInstructions.UID} = this`)
+    code.push(currentInstructions.UID > 1 ? `let el${currentInstructions.UID} = new ${currentInstructions.getClassName()}(${innerComponent ? 'currParent,inCtx,exModel' : currentInstructions.parent.name+',inCtx'})` : `let el${currentInstructions.UID} = this`)
 
     let extendInstruction = currentInstructions
     while(extendInstruction && listComponents.indexOf(extendInstruction.className) < 0){
@@ -900,7 +900,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
     }
 
     if(special){
-        code.push(`el${currentInstructions.UID}.$exCtx=inCtx`)
+        // code.push(`el${currentInstructions.UID}.$exCtx=inCtx`)
         code.push(`el${currentInstructions.UID}.$path='${compiledFile.namespace}'`)
     }
 
@@ -1105,7 +1105,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             if(property.command === 'create' && property.val.className !== 'Component'){
                 if(property.type === 'Component'){  
                     code.push(`${currentInstructions.name}.$temp = new ${property.type}(${currentInstructions.name})`)
-                    code.push(`${currentInstructions.name}.$temp.createObject=function(currParent,exCtx){`)
+                    code.push(`${currentInstructions.name}.$temp.createObject=function(currParent,exCtx,exModel){`)
                     code.push(`let inCtx = new ContextController(exCtx)`)
                     treeCompile(compiledFile, property.val, [], [], 0, true)
                     code.push(`}`)
@@ -1129,12 +1129,15 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
                     // TEMP !!!
                     if((property.name === 'delegate' && (currentInstructions.className === 'ListView'|| currentInstructions.className === 'GridView' || currentInstructions.className === 'Repeater')) || (property.name === 'sourceComponent' && currentInstructions.className === 'Loader')){
                         code.push(`${currentInstructions.name}.getStatement('${property.name}').value = new Component(${currentInstructions.name}, inCtx)`)
-                        code.push(`${currentInstructions.name}.getStatement('${property.name}').value.createObject=function(currParent,exCtx){`)
+                        code.push(`${currentInstructions.name}.getStatement('${property.name}').value.createObject=function(currParent,exCtx,exModel){`)
                         
                         code.push(`let inCtx = new ContextController(exCtx)`)
                         treeCompile(compiledFile, property.val, [], [], 0, true)
                         code.push(`}`)
                         updateList.push(`${currentInstructions.name}.getStatement('${property.name}').getNotify()()`)
+                    } else {
+                        treeCompile(compiledFile, property.val)
+                        code.push(`${currentInstructions.name}.${property.name} = ${property.val.name}`)
                     }
                     
                 } else {
@@ -1274,7 +1277,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
     }
 
     if(currentInstructions.className === 'Component') {
-        code.push(`${currentInstructions.name}.createObject=function(currParent,exCtx){`)
+        code.push(`${currentInstructions.name}.createObject=function(currParent,exCtx,exModel){`)
         code.push(`let inCtx = new ContextController(exCtx)`)
         for(let i = currentInstructions.children.length-1; i >= 0; i--){
             treeCompile(compiledFile, currentInstructions.children[i], [], [], 0, true)
@@ -1327,9 +1330,9 @@ while(queueFiles.length){
     }
     
     let SingletonName = className.split('_').pop()
-    code.push(`constructor(parent, exCtx) {`)
+    code.push(`constructor(parent, exCtx, exModel) {`)
     if(compiledFile.instructions.Singleton) code.push(`if(Singletons['${SingletonName}']) return Singletons['${SingletonName}']`)
-    code.push(`super(parent, exCtx)`)
+    code.push(`super(parent, exCtx, exModel)`)
     if(compiledFile.instructions.Singleton) code.push(`Singletons['${SingletonName}'] = this`)
     // if(compiledFile.instructions.Singleton) code.push(`Singletons['${SingletonName}'] = this`)
     code.push(`let inCtx = new ContextController(exCtx)`)

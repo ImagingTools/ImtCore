@@ -7,8 +7,8 @@ class RegExpValidator extends QtObject {
         regExp: { type: QVar, value: undefined },
     }
 
-    constructor(args) {
-        super(args)
+    constructor(parent,exCtx,exModel) {
+        super(parent,exCtx,exModel)
     }
 
     validate(str){

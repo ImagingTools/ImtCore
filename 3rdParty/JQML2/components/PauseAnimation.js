@@ -8,8 +8,8 @@ class PauseAnimation extends Animation {
 
     }
 
-    constructor(parent) {
-        super(parent)
+    constructor(parent,exCtx,exModel) {
+        super(parent,exCtx,exModel)
 
         this.$duration = this.getPropertyValue('duration')
     }

@@ -15,8 +15,8 @@ class QObject extends ComplexObject {
         'Component.destruction': { params: [] },
     }
 
-    constructor(parent){
-        super()
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
         this.$children = []
         this.$resources = []
         this.$data = []
@@ -26,19 +26,34 @@ class QObject extends ComplexObject {
             UIDList[this.UID] = this
             
             // console.log(parent.constructor.name)
-            if(parent.$flickable && this.constructor.name !== 'Component') {
+            // if(parent.$flickable && this.constructor.name !== 'Component') {
+            //     if(parent.getStatement('contentItem').get()){
+            //         parent = parent.getStatement('contentItem').get()
+            //     }
+                
+            // }
+
+            if(parent.$flickable && !(this instanceof Component)){
                 if(parent.getStatement('contentItem').get()){
                     parent = parent.getStatement('contentItem').get()
                 }
-                
+            } else if(parent.$repeater && !(this instanceof Component)){
+                parent = parent.parent
             }
-
             if(!(this instanceof Repeater) && !(this instanceof ListView) && !(this instanceof GridView) && !(this instanceof ListElement)) this.getStatement('model').setCompute(()=>{return this.parent.model})
-            
+
             if(!(this instanceof ListElement)) {
                 this.getStatement('index').setCompute(()=>{return this.parent.index})
                 this.getStatement('context').setCompute(()=>{return this.parent.context})
             }
+            
+            if(exModel){
+                this.getStatement('model').reset(exModel)
+                this.getStatement('index').setCompute(()=>{return exModel.index})
+                this.getStatement('index').update()
+            }
+            
+            
 
             if(this instanceof Item){
                 parent.addChild(this)
@@ -101,18 +116,6 @@ class QObject extends ComplexObject {
         delete UIDList[this.UID]
 
         if(this.$signals['Component.destruction']) this.$signals['Component.destruction']()
-        for(let key in this){
-            if(!(key in this.$properties) && !(key in this.$signals) && this[key].clearDependsSignal){
-                this[key].clearDependsSignal()
-            }
-        }
-        for(let propName in this.$properties){
-            if(this.$properties[propName].unsubscribe) this.$properties[propName].unsubscribe()
-            if(this.$properties[propName].notify) this.$properties[propName].notify.destroy()
-        }
-        for(let sigName in this.$signals){
-            this.$signals[sigName].destroy()
-        }
 
         if(this.parent) {
             let index = this.parent.$children.indexOf(this)
@@ -127,6 +130,21 @@ class QObject extends ComplexObject {
         for(let i = this.$children.length - 1; i >= 0; i--){
             this.$children[i].$destroy()
         }
+        
+        for(let key in this){
+            if(!(key in this.$properties) && !(key in this.$signals) && this[key].clearDependsSignal){
+                this[key].clearDependsSignal()
+            }
+        }
+        for(let propName in this.$properties){
+            if(this.$properties[propName].unsubscribe) this.$properties[propName].unsubscribe()
+            if(this.$properties[propName].notify) this.$properties[propName].notify.destroy()
+        }
+        for(let sigName in this.$signals){
+            this.$signals[sigName].destroy()
+        }
+
+        
         // this.$dom.remove()
         for(let key in this){
             // if(key === '$dom') this[key].remove()

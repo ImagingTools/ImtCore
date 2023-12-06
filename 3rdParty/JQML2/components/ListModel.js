@@ -1,19 +1,19 @@
 const { QtObject } = require('./QtObject')
 const { ListElement } = require('./ListElement')
-const { QReal, QVar, QModelData } = require('../utils/properties')
+const { QReal, QData, QModelData } = require('../utils/properties')
 
 class ListModel extends QtObject {
     static defaultProperties = {
         count: { type: QReal, value: 0, changed: '$countChanged' },
-        data: { type: QVar, value: undefined, changed: '$dataChanged' },
+        data: { type: QData, value: undefined, changed: '$dataChanged' },
     }
 
     static defaultSignals = {
         
     }
 
-    constructor(parent){
-        super(parent)
+    constructor(parent,exCtx,exModel){
+        super(parent,exCtx,exModel)
         this.getProperty('data').reset([])
     }
 
@@ -26,8 +26,8 @@ class ListModel extends QtObject {
 
     }
 
-    $dataChanged(){
-
+    $dataChanged(topLeft, bottomRight, roles){
+        // console.log('DEBUG:::dataChanged', topLeft, bottomRight, roles)
     }
 
     addResource(resource){
@@ -35,6 +35,7 @@ class ListModel extends QtObject {
         resource.getStatement('index').reset(this.getStatement('data').get().length)
         let obj = resource
         
+        if(resource instanceof ListElement)
         this.getStatement('data').get().push(obj)
     }
     
@@ -52,7 +53,7 @@ class ListModel extends QtObject {
 		}
         
         this.getStatement('count').reset(this.getStatement('data').get().length)
-        this.getStatement('data').getNotify()()
+        this.getStatement('data').getNotify()(this.getStatement('data').get().length-1, this.getStatement('data').get().length, 'append')
 
     }
     clear(){
@@ -73,34 +74,16 @@ class ListModel extends QtObject {
 			if (dict.length === 0)
 				return
 
+      
             for(let i = 0; i < dict.length; i++){
-                let listElement = new ListElement(this, false)
-                listElement.getStatement('index').reset(i)
-                for(let key in dict[i]){
-                    listElement.createProperty(key, QVar, dict[i][key])
-                    // listElement.getStatement(key).reset(dict[i][key])
-                }
-                this.getStatement('data').get().splice(index + i, 0, listElement)
+                this.getStatement('data').get().splice(index, 0, new QModelData(dict[i], this.getStatement('data').get().length))
             }
 		} else {
-            let keys = Object.keys(dict)
-            let listElement = new ListElement(this, false)
-            listElement.getStatement('index').reset(this.getStatement('data').get().length)
-            for(let key of keys){
-                listElement.createProperty(key, QVar, dict[key])
-                // listElement.getStatement(key).reset(dict[key])
-            }
-            this.getStatement('data').get().splice(index, 0, listElement)
+            this.getStatement('data').get().splice(index, 0, new QModelData(dict, this.getStatement('data').get().length))
 		}
-
-    
-        this.getStatement('count').reset(this.getStatement('data').get().length)
-        this.getStatement('data').getNotify()()
-        // for(let key in this.$deps){
-        //     this.$deps[key].$insert(index)
-        // }
         
-        // this.$notify()
+        this.getStatement('count').reset(this.getStatement('data').get().length)
+        this.getStatement('data').getNotify()(index, index+1, 'insert')
     }
     set(index, dict){
         this.getStatement('data').get()[index] = dict
@@ -119,7 +102,7 @@ class ListModel extends QtObject {
         //     this.$deps[key].$remove(index, count)
         // }
         // this.dataChanged(index, index+count)
-        this.getStatement('data').getNotify()()
+        this.getStatement('data').getNotify()(index, count, 'remove')
     }
     setProperty(index, property, value){
         this.getStatement('data').get()[index][property] = value
