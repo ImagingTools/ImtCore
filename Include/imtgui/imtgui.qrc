@@ -38,6 +38,7 @@
         <file alias="imtgui/AuxComponents/SettingsIntegerInput.qml">Qml/imtgui/AuxComponents/SettingsIntegerInput.qml</file>
         <file alias="imtgui/AuxComponents/SettingsTextInput.qml">Qml/imtgui/AuxComponents/SettingsTextInput.qml</file>
         <file alias="imtgui/AuxComponents/Calendar.qml">Qml/imtgui/AuxComponents/Calendar.qml</file>
+        <file alias="imtgui/AuxComponents/CalendarNew.qml">Qml/imtgui/AuxComponents/CalendarNew.qml</file>
         <file alias="imtgui/AuxComponents/Pagination.qml">Qml/imtgui/AuxComponents/Pagination.qml</file>
         <file alias="imtgui/AuxComponents/FilterMenu.qml">Qml/imtgui/AuxComponents/FilterMenu.qml</file>
         <file alias="imtgui/AuxComponents/MenuPanelButtonDecorator.qml">Qml/imtgui/AuxComponents/MenuPanelButtonDecorator.qml</file>

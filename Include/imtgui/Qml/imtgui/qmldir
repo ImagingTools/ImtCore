@@ -38,6 +38,7 @@ TextFieldWithTitle 1.0 ./AuxComponents/TextFieldWithTitle.qml
 CustomTextEdit 1.0 ./AuxComponents/CustomTextEdit.qml
 Splitter 1.0 ./AuxComponents/Splitter.qml
 Calendar 1.0 ./AuxComponents/Calendar.qml
+CalendarNew 1.0 ./AuxComponents/CalendarNew.qml
 Pagination 1.0 ./AuxComponents/Pagination.qml
 MenuPanel 1.0 ./AuxComponents/MenuPanel.qml
 TopPanel 1.0 ./AuxComponents/TopPanel.qml
