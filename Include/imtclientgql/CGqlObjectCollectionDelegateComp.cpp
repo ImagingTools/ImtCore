@@ -631,7 +631,6 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectDescriptio
 }
 
 
-
 imtgql::IGqlResponse* CGqlObjectCollectionDelegateComp::CreateResponse(const imtgql::IGqlRequest& /*request*/) const
 {
 	return new imtclientgql::CGqlObjectCollectionResponse();
