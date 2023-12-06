@@ -30,14 +30,14 @@ class ContextController {
             return this.internal[name]
         } else if(this.external || this.external2) {
             let obj = undefined
-            if(this.external2 && path.indexOf(this.external2) < 0) {
-                path.push(this.external2)
-                obj = this.external2.get(name, path)
-            }
-            if(obj) return obj
             if(this.external && path.indexOf(this.external) < 0) {
                 path.push(this.external)
                 obj = this.external.get(name, path)
+            }
+            if(obj) return obj
+            if(this.external2 && path.indexOf(this.external2) < 0) {
+                path.push(this.external2)
+                obj = this.external2.get(name, path)
             }
             return obj
         } else if(name in Singletons){

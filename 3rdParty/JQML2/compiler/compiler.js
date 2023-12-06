@@ -1111,7 +1111,8 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
                     code.push(`}`)
                     
                     // code.push(`${currentInstructions.name}.${property.name} = new ${property.type}(${property.val.name})`)
-                    code.push(`${currentInstructions.name}.${property.name} = ${currentInstructions.name}.$temp`)
+                    // code.push(`${currentInstructions.name}.${property.name} = ${currentInstructions.name}.$temp`)
+                    code.push(`${currentInstructions.name}.createVariantProperty('${property.name}',${property.type},${currentInstructions.name}.$temp)`)
                     code.push(`delete ${currentInstructions.name}.$temp`)
                 } else {
                     treeCompile(compiledFile, property.val)

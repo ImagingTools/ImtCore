@@ -67,7 +67,7 @@ class Repeater extends Item {
 
     createElement(index){
         if(this.$items[index]) return this.$items[index]
-        let ctx = new ContextController(this.$exCtx, this.delegate.get().$exCtx)
+        let ctx = new ContextController(this.delegate.get().$exCtx,this.$exCtx)
         if(typeof this.getPropertyValue('model') === 'number'){
             let obj = this.delegate.get().createObject(this.parent, ctx, {index: index})
             // obj.getStatement('index').reset(index)

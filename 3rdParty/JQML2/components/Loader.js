@@ -53,7 +53,7 @@ class Loader extends Item {
         if(this.getPropertyValue('item')) this.getPropertyValue('item').$destroy()
         
         if(this.getPropertyValue('sourceComponent')){
-            let ctx = new ContextController(this.$exCtx, this.getStatement('sourceComponent').get().$exCtx)
+            let ctx = new ContextController(this.getStatement('sourceComponent').get().$exCtx, this.$exCtx)
             let item = this.getStatement('sourceComponent').get().createObject(this,ctx)
 
             // item.getProperty('x').getNotify().connect(()=>{

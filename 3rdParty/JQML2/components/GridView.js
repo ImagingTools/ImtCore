@@ -73,7 +73,7 @@ class GridView extends Flickable {
             item.$destroy()
         }
         this.$items = []
-        let ctx = new ContextController(this.$exCtx, this.delegate.get().$exCtx)
+        let ctx = new ContextController(this.delegate.get().$exCtx, this.$exCtx)
         if(typeof this.getPropertyValue('model') === 'number'){
             for(let i = 0; i < this.getPropertyValue('model'); i++){
                 let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), ctx, {index: i})

@@ -187,6 +187,7 @@ class MouseController {
 
             }
         }
+        
         this.oldList = inner
 
 
@@ -210,13 +211,23 @@ class MouseController {
                 this.pressedMouseAreaInner = null
             }
         } else {
-            while(this.flickList.length){
-                if(this.flickList[0].onMouseMove(x, y)) {
-                    this.flickList.shift()
-                } else {
-                    break
+            if(this.flickList.length){
+                while(this.flickList.length){
+                    if(this.flickList[0].onMouseMove(x, y)) {
+                        this.flickList.shift()
+                    } else {
+                        break
+                    }
+                }
+            } else {
+                for(let obj of inner){
+                    if(obj.$mousearea && obj.getPropertyValue('hoverEnabled')) {
+                        obj.onMouseMove(x, y, false)
+        
+                    }
                 }
             }
+            
         }
         
         
