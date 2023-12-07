@@ -48,7 +48,15 @@ FocusScope{
     property TreeItemModel dataModel: TreeItemModel{};
     property TreeItemModel retModel: TreeItemModel{};
 
+    property var menuItem : null;
+    property bool canOpenMenu : true;
+    property bool hasSearch : true;
+
+    property int menuHeight: 400;
+    property int delegateHeight: 60;
+
     signal finished();
+    signal menuCreated();
 
     Component.onCompleted: {
 
@@ -77,6 +85,16 @@ FocusScope{
         modalDialogManager.closeDialog();
     }
 
+    function createMenuItem(){
+        if(!menuItem){
+            menuItem = popupMenu.createObject(checkBoxMenu);
+            menuItem.width = checkBoxMenu.width;
+            menuItem.dataModel = checkBoxMenu.dataModel;
+            menuItem.rootItem = checkBoxMenu;
+            menuCreated();
+        }
+    }
+
     Component {
         id: popupMenu;
 
@@ -84,7 +102,7 @@ FocusScope{
             id: popupMenuContainer;
 
             width: 400;
-            height: 300;
+            height: checkBoxMenu.menuHeight;
 
             property Item root: null;
             property Item rootItem: null;
@@ -183,7 +201,10 @@ FocusScope{
 //                else {
 //                    checkBoxMenu.currentText = currText;
 //                }
-                checkBoxMenu.currentText = currText;
+                //checkBoxMenu.currentText = currText;
+                if(popupMenuContainer.rootItem){
+                    popupMenuContainer.rootItem.currentText = currText;
+                }
             }
 
             DropShadow {
@@ -207,7 +228,7 @@ FocusScope{
 
                 width: popupMenuContainer.width;
                 height: popupMenuContainer.height;
-                radius: checkBoxMenu.radius;
+                radius: popupMenuContainer.rootItem ? popupMenuContainer.rootItem.radius : 0;
 
                 color: Style.baseColor;
 
@@ -248,8 +269,11 @@ FocusScope{
                     radius: 5
                     mainMargin: 16;
                     borderColor:Style.color_gray;
+                    borderWidth: 2;
 
-                    imageSource: checkState == Qt.Checked ? checkBoxMenu.checkImageSource: "";
+                    text: checkBoxMenu.hasSearch ? "" : "Все";
+
+                    imageSource: popupMenuContainer.rootItem && checkState == Qt.Checked ? popupMenuContainer.rootItem.checkImageSource: "";
 
                     onClicked: {
                         if(checkBoxAll.checkState == Qt.Unchecked){
@@ -281,6 +305,7 @@ FocusScope{
                     border.color: Style.color_gray;
                     radius: Style.size_TextFieldRadius;
 
+                    visible: checkBoxMenu.hasSearch;
 
                     CustomTextField {
                         id: searchTfc;
@@ -294,8 +319,9 @@ FocusScope{
                         color: "#ffffff";
                         fontColor: "#000000";
                         textSize: Style.fontSize_common;
-                        borderColor: "transparent";
+                        borderColorConst: "transparent";
                         placeHolderText: "Поиск";
+                        readOnly: !searchBlock.visible;
 
                     }
                 }
@@ -317,8 +343,9 @@ FocusScope{
                     spacing: 0;
                     model: popupMenuContainer.dataModel;
                     delegate: Item{
+
                         width: listView.width;
-                        height: visible ? 60 : 0;
+                        height: visible ? checkBoxMenu.delegateHeight: 0;
                         visible: !searchTfc.text  ? true : checkBox.text.toLowerCase().search(searchTfc.text.toLowerCase()) >= 0;
 
                         CheckBox{
@@ -332,7 +359,7 @@ FocusScope{
                             mainMargin: 16;
                             borderColor:Style.color_gray;
 
-                            imageSource: checkState == Qt.Checked ? checkBoxMenu.checkImageSource: "";
+                            imageSource: popupMenuContainer.rootItem && checkState == Qt.Checked ? popupMenuContainer.rootItem.checkImageSource: "";
                             text: model.Name;
                             Component.onCompleted: {
                                 popupMenuContainer.setCheckedSignal.connect(checkBox.setCheckState);
@@ -433,7 +460,7 @@ FocusScope{
             onClicked: {
                 checkBoxMenu.focus = true
 
-                if (checkBoxMenu.dataModel !==undefined && checkBoxMenu.dataModel !== null && checkBoxMenu.dataModel.GetItemsCount() > 0){
+                if (checkBoxMenu.canOpenMenu && heckBoxMenu.dataModel !==undefined && checkBoxMenu.dataModel !== null && checkBoxMenu.dataModel.GetItemsCount() > 0){
                     checkBoxMenu.openPopupMenu();
                 }
 
