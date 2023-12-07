@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5134" Description="ACF"/>
+            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>Remote object/document collection that can be accessed by GraphQL protocol</Description>
+    <Keywords>GraphQL Client API Collection Document</Keywords>
+    <ElementsList>
+        <Element Id="GqlObjectCollection" PackageId="ImtClientGqlPck" ComponentId="GqlObjectCollection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GqlDatabaseDelegate" Type="Reference" ExportId="GqlDatabaseDelegate">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="ObjectFactories">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="TypeIds">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeNames" Type="Text[]" ExportId="TypeNames">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SubscriptionController" PackageId="ImtClientGqlPck" ComponentId="SubscriptionController">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Command" Type="Id" ExportId="CommandID">
+                        <Data IsEnabled="true" Value="OnCollectionChanged"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Model" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GqlObjectCollection"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubscriptionManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SubscriptionManager"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SubscriptionManager" PackageId="ImtClientGqlPck" ComponentId="SubscriptionManager">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketProtocolEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubsctiptionSender" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketClient"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WebLoginStatus" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketClient"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="WebSocketClient" PackageId="ImtClientGqlPck" ComponentId="WebSocketClient">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ClientRequestHandler" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SubscriptionManager"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketProtocolEngine"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerAddress" Type="Id" ExportId="WebSocketServerAddress">
+                        <Data IsEnabled="true" Value="localhost"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerAddressParam" Type="Reference" ExportId="WebSocketServerAddressParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerLoginParam" Type="Id" ExportId="WebSocketServerLoginParam">
+                        <Data IsEnabled="true" Value="ServerLoginParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerPasswordParam" Type="Id" ExportId="WebSocketServerPasswordParam">
+                        <Data IsEnabled="true" Value="ServerPasswordParam"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerPort" Type="Integer" ExportId="WebSocketServerPort">
+                        <Data IsEnabled="true" Value="8112"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerPortParam" Type="Reference" ExportId="WebSocketServerPortParam">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServerRequestHandler" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SubscriptionManager"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="WebSocketProtocolEngine" PackageId="ImtRestPck" ComponentId="WebSocketProtocolEngine">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="GqlObjectCollection"/>
+        <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="GqlObjectCollection"/>
+        <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="GqlObjectCollection"/>
+        <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="GqlObjectCollection"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="GqlObjectCollection"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="GqlObjectCollection" ComponentId="GqlObjectCollection"/>
+    </ExportedComponents>
+</Acf>

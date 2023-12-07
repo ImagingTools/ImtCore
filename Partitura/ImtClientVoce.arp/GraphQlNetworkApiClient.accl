@@ -8,9 +8,8 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="GqlObjectCollectionDelegate" X="625" Y="450" Note=""/>
-        <Element ComponentName="GraphQLObjectCollectionBase" X="625" Y="325" Note=""/>
-        <Element ComponentName="GraphQlNetworkApiClient" X="625" Y="600" Note=""/>
+        <Element ComponentName="ApiClient" X="625" Y="500" Note=""/>
+        <Element ComponentName="GraphQLClientEngine" X="625" Y="325" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
