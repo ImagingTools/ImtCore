@@ -57,6 +57,7 @@ FocusScope{
 
     signal finished();
     signal menuCreated();
+    signal changedSignal()
 
     Component.onCompleted: {
 
@@ -284,6 +285,7 @@ FocusScope{
                             checkBoxAll.checkState = Qt.Unchecked;
                             popupMenuContainer.setAllCheckedInModel(Qt.Unchecked);
                         }
+                        popupMenuContainer.rootItem.changedSignal();
                     }
 
 
@@ -383,7 +385,7 @@ FocusScope{
                                 }
                                 checkBox.setCheckState();
                                 popupMenuContainer.setAllChecked();
-
+                                popupMenuContainer.rootItem.changedSignal();
                             }
                         }//CheckBox
 
