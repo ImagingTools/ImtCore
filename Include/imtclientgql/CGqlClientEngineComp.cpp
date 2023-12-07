@@ -46,7 +46,7 @@ void CGqlClientEngineComp::OnComponentDestroyed()
 QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRequest& request) const
 {
 	QNetworkRequest* networkRequest = new QNetworkRequest();
-	networkRequest->setHeader(QNetworkRequest::ContentTypeHeader, QVariant("application/x-www-form-urlencoded"));
+	networkRequest->setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/graphql"));
 
 	QByteArray url = m_workingUrl;
 
