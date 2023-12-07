@@ -166,7 +166,7 @@ imtbase::CTreeItemModel* CGqlFileRepositoryComp::InsertObject(
 	const QString name = (*dataParams)["Name"].toByteArray();
 	const QString description = (*dataParams)["Description"].toByteArray();
 
-	const QString tempFilePath = GetFilePathFromRequestQueue((*dataParams)["Id"].toByteArray());;
+	const QString tempFilePath = GetFilePathFromRequestQueue((*dataParams)["Id"].toByteArray());
 	const QByteArray createdFileId = m_fileObjectCollectionCompPtr->InsertFile(
 		tempFilePath,
 		typeId,
@@ -195,7 +195,7 @@ imtbase::CTreeItemModel* CGqlFileRepositoryComp::InsertObject(
 
 
 
-imtbase::CTreeItemModel* CGqlFileRepositoryComp::GetObject(const CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CGqlFileRepositoryComp::GetMetaInfo(const CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_fileObjectCollectionCompPtr.IsValid()){
 		errorMessage = QString("500: File collection is not set");
