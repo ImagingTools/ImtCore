@@ -50,7 +50,9 @@ Rectangle {
     property string maxMonthName:"";
     property int listViewContentX: 0;
 
-    property var monthNames:
+    property var monthNames: monthNamesRus;
+
+    property var monthNamesEng:
         [
         qsTr("January"),
         qsTr("February"),
@@ -64,6 +66,45 @@ Rectangle {
         qsTr("October"),
         qsTr("November"),
         qsTr("December")
+    ];
+
+    property var monthNamesRus:
+            [
+            qsTr("Январь"),
+            qsTr("Февраль"),
+            qsTr("Март"),
+            qsTr("Апрель"),
+            qsTr("Май"),
+            qsTr("Июнь"),
+            qsTr("Июль"),
+            qsTr("Август"),
+            qsTr("Сентябрь"),
+            qsTr("Октябрь"),
+            qsTr("Ноябрь"),
+            qsTr("Декабрь")
+        ];
+
+    property var dayOfWeek: dayOfWeekRus;
+
+    property var dayOfWeekRus:
+        [
+        qsTr("Пн"),
+        qsTr("Вт"),
+        qsTr("Ср"),
+        qsTr("Чт"),
+        qsTr("Пт"),
+        qsTr("Сб"),
+        qsTr("Вс"),
+    ];
+    property var dayOfWeekEng:
+        [
+        qsTr("Mo"),
+        qsTr("Tu"),
+        qsTr("We"),
+        qsTr("Th"),
+        qsTr("Fr"),
+        qsTr("Sa"),
+        qsTr("Su"),
     ];
     //read only
 
@@ -87,9 +128,9 @@ Rectangle {
     property int buttonRadius: 6;
     property alias leftImageSource: leftButton.iconSource;
     property alias rightImageSource: rightButton.iconSource;
-    property string okButtonText: "Ok";
-    property string cancelButtonText: "Cancel";
-    property string todayButtonText: "Today";
+    property string okButtonText: "Ок";
+    property string cancelButtonText: "Отмена";
+    property string todayButtonText: "Сегодня";
 
     //comboBox
     property bool hasMonthCombo: true;
@@ -162,7 +203,10 @@ Rectangle {
             calendar.fillYearComboModel();
             calendar.fillMonthComboModel();
 
-
+            for(let i = 0; i < dayOfWeek.length; i++){
+                let name = dayOfWeek[i];
+                dayOfWeekListModel.append({"name": name});
+            }
 
     }
 
@@ -284,36 +328,8 @@ Rectangle {
     }
 
     function monthName(ind){
-        var month;
+        let month;
         month = monthNames[ind]
-//        switch (ind)
-//        {
-
-//        case 0 :month = qsTr("January")
-//            break
-//        case 1 :month = qsTr("February")
-//            break
-//        case 2 :month = qsTr("March")
-//            break
-//        case 3 :month = qsTr("April")
-//            break
-//        case 4 :month = qsTr("May")
-//            break
-//        case 5 :month = qsTr("June")
-//            break
-//        case 6 :month = qsTr("July")
-//            break
-//        case 7 : month = qsTr("August")
-//            break
-//        case 8 : month = qsTr("September")
-//            break
-//        case 9 :month = qsTr("October")
-//            break
-//        case 10 :month = qsTr("November")
-//            break
-//        case 11 :month = qsTr("December")
-//            break
-//        }
         return month;
     }
 
@@ -585,28 +601,6 @@ Rectangle {
 
     ListModel{
         id: dayOfWeekListModel;
-
-        ListElement{name: qsTr("Пн");}
-        ListElement{name: qsTr("Вт");}
-        ListElement{name: qsTr("Ср");}
-        ListElement{name: qsTr("Чт");}
-        ListElement{name: qsTr("Пт");}
-        ListElement{name: qsTr("Сб");}
-        ListElement{name: qsTr("Вс");}
-
-    }
-
-    ListModel{
-        id: dayOfWeekListModelEng;
-
-        ListElement{name: qsTr("Mo");}
-        ListElement{name: qsTr("Tu");}
-        ListElement{name: qsTr("We");}
-        ListElement{name: qsTr("Th");}
-        ListElement{name: qsTr("Fr");}
-        ListElement{name: qsTr("Sa");}
-        ListElement{name: qsTr("Su");}
-
     }
 
     Rectangle{
@@ -935,7 +929,7 @@ Rectangle {
                     orientation: ListView.Horizontal;
                     boundsBehavior: Flickable.StopAtBounds;
                     clip: true;
-                    model: dayOfWeekListModelEng;
+                    model: dayOfWeekListModel;
                     delegate: Rectangle{
 
                         width: grid.cellWidth;
@@ -1156,7 +1150,7 @@ Rectangle {
 
             decorator: Style.calendarButtonDecorator !==undefined ? Style.calendarButtonDecorator : defaultButtonDecorator;
 
-            text: calendar.okButtonText;//qsTr("Ok");
+            text: calendar.okButtonText;
 
             onClicked:{
                 var dateStart;
@@ -1220,7 +1214,7 @@ Rectangle {
 
             decorator: Style.calendarButtonDecorator !==undefined ? Style.calendarButtonDecorator : defaultButtonDecorator;
 
-            text: calendar.cancelButtonText;//qsTr("Cancel");
+            text: calendar.cancelButtonText;
 
             onClicked:{
                 calendar.canceled();
@@ -1236,7 +1230,7 @@ Rectangle {
 
             decorator: Style.calendarButtonDecorator !==undefined ? Style.calendarButtonDecorator : defaultButtonDecorator;
 
-            text: calendar.todayButtonText;//qsTr("Today");
+            text: calendar.todayButtonText;
 
             onClicked:{
                 var date = new Date();
@@ -1300,9 +1294,6 @@ Rectangle {
 
 
     }
-
-
-
 
     MouseArea{
         id: blockingMA;

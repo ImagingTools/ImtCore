@@ -127,7 +127,7 @@ Item {
 
             backgroundColor: Style.baseColor;
 
-            secondSize: Style.isMobile == undefined ? 10 : Style.isMobile ? 4 : 10;
+            secondSize: !visibleScrollBar ? 0 : Style.isMobile == undefined ? 10 : Style.isMobile ? 4 : 10;
             targetItem: popupMenuListView;
             canFade: Style.isMobile == undefined ? false : Style.isMobile;
             //            visible: !popupMenuContainer.visibleScrollBar ? false : hideNotUsed ? !notUsed : true;
