@@ -87,6 +87,9 @@ Rectangle {
     property int buttonRadius: 6;
     property alias leftImageSource: leftButton.iconSource;
     property alias rightImageSource: rightButton.iconSource;
+    property string okButtonText: "Ok";
+    property string cancelButtonText: "Cancel";
+    property string todayButtonText: "Today";
 
     //comboBox
     property bool hasMonthCombo: true;
@@ -282,34 +285,35 @@ Rectangle {
 
     function monthName(ind){
         var month;
-        switch (ind)
-        {
+        month = monthNames[ind]
+//        switch (ind)
+//        {
 
-        case 0 :month = qsTr("January")
-            break
-        case 1 :month = qsTr("February")
-            break
-        case 2 :month = qsTr("March")
-            break
-        case 3 :month = qsTr("April")
-            break
-        case 4 :month = qsTr("May")
-            break
-        case 5 :month = qsTr("June")
-            break
-        case 6 :month = qsTr("July")
-            break
-        case 7 : month = qsTr("August")
-            break
-        case 8 : month = qsTr("September")
-            break
-        case 9 :month = qsTr("October")
-            break
-        case 10 :month = qsTr("November")
-            break
-        case 11 :month = qsTr("December")
-            break
-        }
+//        case 0 :month = qsTr("January")
+//            break
+//        case 1 :month = qsTr("February")
+//            break
+//        case 2 :month = qsTr("March")
+//            break
+//        case 3 :month = qsTr("April")
+//            break
+//        case 4 :month = qsTr("May")
+//            break
+//        case 5 :month = qsTr("June")
+//            break
+//        case 6 :month = qsTr("July")
+//            break
+//        case 7 : month = qsTr("August")
+//            break
+//        case 8 : month = qsTr("September")
+//            break
+//        case 9 :month = qsTr("October")
+//            break
+//        case 10 :month = qsTr("November")
+//            break
+//        case 11 :month = qsTr("December")
+//            break
+//        }
         return month;
     }
 
@@ -1152,7 +1156,7 @@ Rectangle {
 
             decorator: Style.calendarButtonDecorator !==undefined ? Style.calendarButtonDecorator : defaultButtonDecorator;
 
-            text: qsTr("Ok");
+            text: calendar.okButtonText;//qsTr("Ok");
 
             onClicked:{
                 var dateStart;
@@ -1216,7 +1220,7 @@ Rectangle {
 
             decorator: Style.calendarButtonDecorator !==undefined ? Style.calendarButtonDecorator : defaultButtonDecorator;
 
-            text:qsTr("Cancel");
+            text: calendar.cancelButtonText;//qsTr("Cancel");
 
             onClicked:{
                 calendar.canceled();
@@ -1232,7 +1236,7 @@ Rectangle {
 
             decorator: Style.calendarButtonDecorator !==undefined ? Style.calendarButtonDecorator : defaultButtonDecorator;
 
-            text: qsTr("Today");
+            text: calendar.todayButtonText;//qsTr("Today");
 
             onClicked:{
                 var date = new Date();
@@ -1275,7 +1279,7 @@ Rectangle {
                     anchors.fill: parent;
 
                     radius: calendar.buttonRadius;
-                    color: "#4682B4";
+                    color: calendar.buttonColor;
                     Text {
                         id: mainText;
 
