@@ -27,10 +27,7 @@ public:
 
 	I_BEGIN_COMPONENT(CGqlFileRepositoryComp);
 		I_REGISTER_INTERFACE(imtbase::IMetaInfoCreator);
-
 		I_ASSIGN_MULTI_1(m_supportedTypeListAttrPtr, "SupportedTypeList", "The type list, supported by repository", true, "File");
-
-		// Known-Limitation: nedd to assign here for ASSIGN_TO instructions
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN_TO(m_fileObjectCollectionCompPtr, m_objectCollectionCompPtr, true);
 		I_ASSIGN(m_hashGeneratorCompPtr, "HashGenerator", "The Generator, used to calc file's hash summ", false, "HashGenerator");

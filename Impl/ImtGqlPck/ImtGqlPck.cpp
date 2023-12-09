@@ -31,13 +31,13 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			GqlRepresentationDataController,
-			"Gql representation data controller",
+			"GraphQL-representation data controller",
 			"GraphQL Representation Controller Model");
 
 I_EXPORT_COMPONENT(
 			UserSettingsController,
 			"Client settings controller",
-			"GraphQL Gql Controller Model Client User");
+			"GraphQL Controller Model Client User");
 
 I_EXPORT_COMPONENT(
 			GqlRepresentationJoiner,
@@ -51,13 +51,13 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			RemoteGqlContextController,
-			"Remote gql context controller",
-			"Remote Gql Context Controller");
+			"Remote GraphQL-context controller",
+			"Remote GraphQL Context Controller");
 
 I_EXPORT_COMPONENT(
 			GqlContextController,
-			"Gql context controller",
-			"Gql Context Controller");
+			"GraphQL context controller",
+			"GraphQL Context Controller");
 
 I_EXPORT_COMPONENT(
 			ObjectProvider,
@@ -84,8 +84,6 @@ I_EXPORT_COMPONENT(
 			"Operation context controller",
 			"Operation Context Controller");
 
-
-
 I_EXPORT_COMPONENT(
 			ObjectCollectionSubscriberController,
 			"Subscriprion controller for object collection",
@@ -98,7 +96,7 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			GqlFileRepository,
-			"File-based gql collection object provider",
+			"File-based GraphQL-collection repository",
 			IM_AUTHOR("Sergey Zastrovnyh")"File Repository GQL GraphQL Collection Object Provider");
 
 

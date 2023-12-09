@@ -1,14 +1,14 @@
 #include<imtrest/CHttpFileBufferComp.h>
 
 
-//Qt includes
+// Qt includes
 #include <QtCore/QFile>
 #include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
 #include <QtCore/QUuid>
 #include <QtCore/QTimer>
 
-// Acf includes
+// ACF includes
 #include <istd/CSystem.h>
 #include <iprm/CParamsSet.h>
 #include <ifile/CFileNameParam.h>
@@ -62,11 +62,12 @@ ConstResponsePtr CHttpFileBufferComp::CreateDefaultErrorResponse(const QByteArra
 
 	ConstResponsePtr retVal;
 
-	retVal.SetPtr(request.GetProtocolEngine().CreateResponse(
-					  request,
-					  statusCode,
-					  errorString,
-					  QByteArray("text/plain; charset=utf-8")));
+	retVal.SetPtr(
+				request.GetProtocolEngine().CreateResponse(
+				request,
+				statusCode,
+				errorString,
+				QByteArray("text/plain; charset=utf-8")));
 
 	return retVal;
 }
@@ -242,11 +243,10 @@ ConstResponsePtr CHttpFileBufferComp::OnPost(
 
 	/// \todo get name from request
 	const QByteArray createdFileId = m_tempFileCollectionCompPtr->InsertNewObject(
-		"File",
-		tempFile.fileName(),
-		QString(),
-		valuePtr
-		);
+				"File",
+				tempFile.fileName(),
+				QString(),
+				valuePtr);
 
 	if (createdFileId.isEmpty()){
 		return CreateDefaultErrorResponse("Unable to save file", IProtocolEngine::SC_INTERNAL_SERVER_ERROR, request);
@@ -266,7 +266,10 @@ ConstResponsePtr CHttpFileBufferComp::OnHead(
 {
 	/// \todo add file info data return + range-based request headers
 	return ConstResponsePtr(request.GetProtocolEngine().CreateResponse(
-				request, IProtocolEngine::SC_NOT_IMPLEMENTED, "This method is not implemented yet", QByteArrayLiteral("text/plain; charset=utf-8")));
+				request,
+				IProtocolEngine::SC_NOT_IMPLEMENTED,
+				"This method is not implemented yet",
+				QByteArrayLiteral("text/plain; charset=utf-8")));
 }
 
 

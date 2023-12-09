@@ -17,8 +17,6 @@ namespace imtrest
 */
 class CHttpFileBufferComp: public CHttpServletCompBase
 {
-
-
 public:
 	typedef CHttpServletCompBase BaseClass;
 
@@ -28,9 +26,11 @@ public:
 		I_ASSIGN(m_fileObjectCollectionCompPtr, "FileCollection", "The file collection, used to direct access to files", false, "FileCollection");
 	I_END_COMPONENT;
 
-
 protected:
-	ConstResponsePtr CreateDefaultErrorResponse(const QByteArray& errorString, imtrest::IProtocolEngine::StatusCode statusCode, const imtrest::CHttpRequest& request) const;
+	ConstResponsePtr CreateDefaultErrorResponse(
+				const QByteArray& errorString,
+				imtrest::IProtocolEngine::StatusCode statusCode,
+				const imtrest::CHttpRequest& request) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -42,20 +42,16 @@ protected:
 				const imtrest::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
 				const imtrest::CHttpRequest& request) const override;
-
 	virtual ConstResponsePtr OnPost(
 				const QByteArray& commandId,
 				const imtrest::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
 				const imtrest::CHttpRequest& request) const override;
-
 	virtual ConstResponsePtr OnHead(
 				const QByteArray& commandId,
 				const imtrest::IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
 				const imtrest::CHttpRequest& request) const override;
-
-
 
 private:
 	I_REF(imtbase::IObjectCollection, m_tempFileCollectionCompPtr);

@@ -34,6 +34,7 @@ CGqlFileRepositoryComp::TypeIds CGqlFileRepositoryComp::GetSupportedTypeIds() co
 	for (int typeIndex = 0; typeIndex < typesCount; ++typeIndex){
 		supportedValues << m_supportedTypeListAttrPtr[typeIndex];
 	}
+
 	return supportedValues;
 }
 
@@ -44,6 +45,7 @@ bool CGqlFileRepositoryComp::CreateMetaInfo(const istd::IChangeable* dataPtr, co
 		SendErrorMessage(0, QString("Unsupported file type id: '%1'").arg(QString(typeId)), "CreateMetaInfo", __LINE__);
 
 		I_CRITICAL();
+
 		return false;
 	}
 
@@ -52,6 +54,7 @@ bool CGqlFileRepositoryComp::CreateMetaInfo(const istd::IChangeable* dataPtr, co
 		SendErrorMessage(0, "Unable to find data object");
 
 		I_CRITICAL();
+
 		return false;
 	}
 
@@ -70,6 +73,7 @@ bool CGqlFileRepositoryComp::CreateMetaInfo(const istd::IChangeable* dataPtr, co
 			metaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_CONTENT_CHECKSUM, checksumm);
 		}
 	}
+
 	metaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_REVISION, (*dataParams)["Revision"].toLongLong());
 
 	return true;
@@ -101,6 +105,7 @@ QString CGqlFileRepositoryComp::GetFilePathFromRequestQueue(const QByteArray& qu
 	QString filePath;
 	if (!m_requestCollectionCompPtr.IsValid()){
 		SendCriticalMessage(0, "Request collection is invalid");
+
 		I_CRITICAL();
 
 		return filePath;
@@ -109,6 +114,7 @@ QString CGqlFileRepositoryComp::GetFilePathFromRequestQueue(const QByteArray& qu
 	const istd::IChangeable* objectPtr = m_requestCollectionCompPtr->GetObjectPtr(queueRequestId);
 	if (objectPtr == nullptr){
 		SendCriticalMessage(0, QString("Unable to find request with ID: '%1'").arg(QString(queueRequestId)));
+
 		I_CRITICAL();
 
 		return filePath;
@@ -117,6 +123,7 @@ QString CGqlFileRepositoryComp::GetFilePathFromRequestQueue(const QByteArray& qu
 	const iprm::IParamsSet* paramsSetPtr = dynamic_cast<const iprm::IParamsSet*>(objectPtr);
 	if (paramsSetPtr == nullptr){
 		SendCriticalMessage(0, QString("Model has unsupported modelType"));
+
 		I_CRITICAL();
 
 		return filePath;
@@ -134,72 +141,82 @@ QString CGqlFileRepositoryComp::GetFilePathFromRequestQueue(const QByteArray& qu
 // reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
 imtbase::CTreeItemModel* CGqlFileRepositoryComp::InsertObject(
-	const imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
-	const imtgql::CGqlObject* dataParams = nullptr;
+	const imtgql::CGqlObject* dataParamsPtr = nullptr;
 	for(const imtgql::CGqlObject& gqlObject: inputParams){
-		dataParams = gqlObject.GetFieldArgumentObjectPtr("Data");
-		if (dataParams != nullptr){
+		dataParamsPtr = gqlObject.GetFieldArgumentObjectPtr("Data");
+		if (dataParamsPtr != nullptr){
 			break;
 		}
 	}
 
+	if (dataParamsPtr == nullptr) {
+		errorMessage = QT_TR_NOOP("Unable to extract parameter object from GraphQL-request");
+
+		SendErrorMessage(0, errorMessage);
+
+		I_CRITICAL();
+
+		return nullptr;
+	}
+
 	idoc::MetaInfoPtr metaInfoPtr;
-	if (!CreateMetaInfo(dataParams, QByteArray(), metaInfoPtr)){
-		errorMessage = QT_TR_NOOP("Unable to create MetaInfo");
-		SendErrorMessage(0, "Unable to create MetaInfo");
+	if (!CreateMetaInfo(dataParamsPtr, QByteArray(), metaInfoPtr)){
+		errorMessage = QT_TR_NOOP("Unable to create meta information for the data object");
+
+		SendErrorMessage(0, errorMessage);
 
 		I_CRITICAL();
-		return nullptr;
-	}
-	if (dataParams == nullptr){
-		errorMessage = QT_TR_NOOP("Unable to create MetaInfo");
-		SendErrorMessage(0, "Unable to create MetaInfo");
 
-		I_CRITICAL();
 		return nullptr;
 	}
 
-	const QByteArray typeId = (*dataParams)["Type"].toByteArray();
-	const QString name = (*dataParams)["Name"].toByteArray();
-	const QString description = (*dataParams)["Description"].toByteArray();
 
-	const QString tempFilePath = GetFilePathFromRequestQueue((*dataParams)["Id"].toByteArray());
+	const QByteArray typeId = (*dataParamsPtr)["Type"].toByteArray();
+	const QString name = (*dataParamsPtr)["Name"].toByteArray();
+	const QString description = (*dataParamsPtr)["Description"].toByteArray();
+
+	const QString tempFilePath = GetFilePathFromRequestQueue((*dataParamsPtr)["Id"].toByteArray());
 	const QByteArray createdFileId = m_fileObjectCollectionCompPtr->InsertFile(
-		tempFilePath,
-		typeId,
-		name,
-		description,
-		QByteArray(),
-		metaInfoPtr.GetPtr());
+				tempFilePath,
+				typeId,
+				name,
+				description,
+				QByteArray(),
+				metaInfoPtr.GetPtr());
 
 	if(createdFileId.isEmpty()){
 		errorMessage = QT_TR_NOOP("Unable to import file");
-		SendErrorMessage(0, "Unable to import file");
+
+		SendErrorMessage(0, errorMessage);
 
 		I_CRITICAL();
+
 		return nullptr;
 	}
 
-	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel;
-	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel;
 	imtbase::CTreeItemModel* itemsModel = new imtbase::CTreeItemModel;
 	itemsModel->SetData("Id", createdFileId);
+
+	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel;
 	dataModel->SetExternTreeModel("items", itemsModel);
+
+	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel;
 	rootModelPtr->SetExternTreeModel("data", dataModel);
 
 	return rootModelPtr;
 }
 
 
-
 imtbase::CTreeItemModel* CGqlFileRepositoryComp::GetMetaInfo(const CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_fileObjectCollectionCompPtr.IsValid()){
 		errorMessage = QString("500: File collection is not set");
-		SendErrorMessage(500, errorMessage, "CGqlFileRepositoryComp::GetObject");
+
+		SendErrorMessage(500, errorMessage, "CGqlFileRepositoryComp::GetMetaInfo");
 
 		return nullptr;
 	}
@@ -249,12 +266,13 @@ imtbase::CTreeItemModel* CGqlFileRepositoryComp::GetMetaInfo(const CGqlRequest& 
 
 
 imtbase::CTreeItemModel* CGqlFileRepositoryComp::ListObjects(
-	const imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QString("Unable to get list objects. Internal error.");
-		SendErrorMessage(0, errorMessage, "CGqlFileRepositoryComp");
+
+		SendErrorMessage(0, errorMessage, "CGqlFileRepositoryComp::ListObjects");
 
 		return nullptr;
 	}
@@ -323,8 +341,8 @@ imtbase::CTreeItemModel* CGqlFileRepositoryComp::ListObjects(
 
 
 imtbase::CTreeItemModel* CGqlFileRepositoryComp::DeleteObject(
-	const imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = "No collection component was set";
@@ -338,6 +356,7 @@ imtbase::CTreeItemModel* CGqlFileRepositoryComp::DeleteObject(
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 	if (objectId.isEmpty()){
 		errorMessage = QObject::tr("No object-ID could not be extracted from the request");
+
 		SendErrorMessage(0, errorMessage, "CGqlFileRepositoryComp");
 
 		return nullptr;
@@ -352,10 +371,10 @@ imtbase::CTreeItemModel* CGqlFileRepositoryComp::DeleteObject(
 	}
 
 	if (m_objectCollectionCompPtr->RemoveElement(objectId, operationContextPtr)){
-		imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 		imtbase::CTreeItemModel* notificationModel = new imtbase::CTreeItemModel();
-
 		notificationModel->SetData("Id", objectId);
+
+		imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 		dataModel->SetExternTreeModel("removedNotification", notificationModel);
 
 		rootModelPtr->SetExternTreeModel("data", dataModel);
@@ -388,6 +407,7 @@ bool CGqlFileRepositoryComp::SetupGqlItem(
 		errorMessage.append("\nUnable to get file metainfo");
 
 		SendErrorMessage(0, QString("Unable to get metainfo from file: '%1'").arg(QString(objectId)), "SetupGqlItem", __LINE__);
+
 		return retVal;
 	}
 
@@ -440,11 +460,13 @@ void CGqlFileRepositoryComp::OnComponentCreated()
 
 	if (!m_fileObjectCollectionCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid file object collection component");
+
 		I_CRITICAL();
 	}
 
 	if (!m_requestCollectionCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid request collection component");
+
 		I_CRITICAL();
 	}
 }
