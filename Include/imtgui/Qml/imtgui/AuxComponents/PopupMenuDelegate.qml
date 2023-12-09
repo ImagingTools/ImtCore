@@ -21,10 +21,6 @@ Item {
 
     signal clicked(string commandId, int index);
 
-    Component.onCompleted: {
-        //console.log("DEBUG::", model.Id, model.index, popupMenuDelegate.width, popupMenuDelegate.height, popupMenuDelegate.visible, popupMenuDelegate.x, popupMenuDelegate.y, popupMenuDelegate.z, popupMenuDelegate.parent)
-    }
-
     onIsSeparatorChanged: {
         if (isSeparator){
             mouseArea.visible = false;
@@ -100,7 +96,7 @@ Item {
         color: popupMenuDelegate.fontColor;
         font.pixelSize: popupMenuDelegate.textSize;
         font.family: Style.fontFamily;
-
+        width: contentWidth ? contentWidth : popupMenuDelegate.width; //temporary solution for web
 //        text: model.Name;
 
         text: model[popupMenuDelegate.rootItem.nameId];
