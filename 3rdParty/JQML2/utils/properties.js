@@ -415,6 +415,13 @@ class QData extends QProperty {
     }
 }
 
+// class QFocus extends QBool {
+//     getNotify(){
+//         if(!this.notify) this.notify = new QSignal('topLeft', 'bottomRight', 'roles')
+//         return this.notify
+//     }
+// }
+
 class QAlias extends QProperty {
     once = true
     constructor(getTargetProperty){

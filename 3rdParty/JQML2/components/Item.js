@@ -118,13 +118,14 @@ class Item extends QtObject {
     }
     
     createDom(tag = 'div', style){
+        this.$dom = document.createElement(tag)
+        this.setStyle(style)
+        this.$dom.id = this.UID
+        this.$dom.classList.add(this.constructor.name)
+
         if(this.parent && this.parent.$dom){
-            this.$dom = document.createElement(tag)
             this.parent.$dom.appendChild(this.$dom)
-            this.setStyle(style)
             this.parent.addDomChild(this)
-            this.$dom.id = this.UID
-            this.$dom.classList.add(this.constructor.name)
         }
     }
 

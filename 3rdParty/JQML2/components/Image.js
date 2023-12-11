@@ -66,7 +66,7 @@ class Image extends Item {
             return
         }
 
-        this.$img = new WebImage();
+        this.$img = new OriginImage();
         let path = rootPath+'/'+this.getProperty('source').get().replaceAll('../','')
         this.$img.onload = ()=>{
             if(!this.$img) return

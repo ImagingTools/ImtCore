@@ -298,12 +298,29 @@ function qmlprop(meta, instructions){
         
     }
 }
-function qmlobj(m, instructions, file){
-    let cls = 'QtObject'
-    let childInstructions = getBaseStructure()
+function qmlobj(meta, instructions){
+    // let cls = 'QtObject'
+    // let childInstructions = getBaseStructure()
    
-    preCompile(cls, m[2], null, childInstructions, file) 
-    instructions.propertiesQML[m[1]] = childInstructions
+    // preCompile(cls, m[2], null, childInstructions, file) 
+    // instructions.propertiesQML[m[1]] = childInstructions
+
+    let childInstructions = getBaseStructure()
+    // instructions.children.push(childInstructions)
+    childInstructions.parent = instructions
+    childInstructions.fileName = instructions.fileName
+    childInstructions.compiledFile = instructions.compiledFile
+
+    preCompile('QtObject', meta[2], null, childInstructions) 
+
+    console.log(meta[1])
+    instructions.properties.push({
+        val: childInstructions,
+        name: meta[1],
+        type: 'QtObject',
+        // command: 'create',
+        isElement: true
+    })
     
 }
 function preCompile(className, meta, on, instructions){
@@ -364,6 +381,7 @@ function preCompile(className, meta, on, instructions){
     // if(on) {
     //     instructions.properties.properties = on
     // }
+    if(meta)
     for(let m of meta){
         if(m){
             if(m[0] === "qmlprop"){
@@ -384,9 +402,9 @@ function preCompile(className, meta, on, instructions){
             if(m[0] === "qmlelem"){
                 qmlelem(m, instructions)
             }
-            // if(m[0] === "qmlobj"){
-            //     qmlobj(m, instructions)
-            // }
+            if(m[0] === "qmlobj"){
+                qmlobj(m, instructions)
+            }
         }
     }
 }
@@ -546,6 +564,8 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
                     } catch (error) {
                         if(tree[1] === 'XMLHttpRequest'){
                             stat.value.push(`XMLHttpRequest`)
+                        } else if(tree[1] === 'QtPositioning'){
+                            stat.value.push(`QtPositioning`)
                         } else if(tree[1] in Qt){
                             stat.compute = true
                             stat.value.push(`Qt.${tree[1]}`)

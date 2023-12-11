@@ -49,11 +49,45 @@ class ContextController {
 }
 
 global.ContextController = ContextController
-global.WebImage = Image
-global._WebSocket = WebSocket
+global.OriginImage = Image
+global.OriginWebSocket = WebSocket
 global.queueLink = []
 global.UIDList = {}
 global.Singletons = {}
+
+
+import Map from 'ol/Map.js'
+import OSM from 'ol/source/OSM.js'
+import TileLayer from 'ol/layer/Tile.js'
+import View from 'ol/View.js'
+import SourceVector from 'ol/source/Vector'
+import LayerVector from 'ol/layer/Vector'
+import { transform } from 'ol/proj'
+
+import Feature from 'ol/Feature.js'
+import Circle from 'ol/geom/Circle.js'
+import Polygon from 'ol/geom/Polygon'
+import LineString from 'ol/geom/LineString'
+import Overlay from 'ol/Overlay.js'
+import { Style, Fill, Stroke } from 'ol/style.js'
+
+global.OpenLayers = {
+    Map: Map,
+    OSM: OSM,
+    TileLayer: TileLayer,
+    View: View,
+    SourceVector: SourceVector,
+    LayerVector: LayerVector,
+    Feature: Feature,
+    Circle: Circle,
+    Polygon: Polygon,
+    Style: Style, 
+    Fill: Fill, 
+    Stroke: Stroke,
+    LineString: LineString,
+    Overlay: Overlay,
+    transform: transform,
+}
 
 
 const listProperties = require('../utils/properties')
@@ -86,6 +120,9 @@ global.QSignal = QSignal
 
 const { Qt } = require('../utils/Qt')
 global.Qt = Qt
+
+const { QtPositioning } = require('../utils/QtPositioning')
+global.QtPositioning = QtPositioning
 
 const listControllers = require('../utils/controllers')
 for(let prop in listControllers){
@@ -182,6 +219,13 @@ window.onload = ()=>{
     mainRoot.createProperty('history',QVar,history)
     mainRoot.createProperty('language',QString,'location')
     mainRoot.createProperty('application',QString,'location')
+    mainRoot.createProperty('mapTools',QBool,false)
+    mainRoot.getProperty('mapTools').getNotify().connect(mainRoot, ()=>{
+        let mapStyle = document.createElement('link')
+        mapStyle.rel = 'stylesheet'
+        mapStyle.href = 'https://cdn.jsdelivr.net/npm/ol@v7.3.0/ol.css'
+        document.head.appendChild(mapStyle)
+    })
 
     console.time('build')
     for(let name in SingletonClass){

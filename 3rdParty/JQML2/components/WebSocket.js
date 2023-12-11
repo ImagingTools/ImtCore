@@ -43,7 +43,7 @@ class WebSocket extends QtObject {
         }
 
         this.getProperty('status').reset(WebSocket.Connecting)
-        this.$socket = new _WebSocket(this.getPropertyValue('url'))
+        this.$socket = new OriginWebSocket(this.getPropertyValue('url'))
         this.$socket.onopen = () => {
             this.getProperty('status').reset(WebSocket.Open)
         }

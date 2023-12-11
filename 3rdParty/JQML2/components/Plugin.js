@@ -9,11 +9,12 @@ class Plugin extends QtObject {
 
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
-        this.$url = 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}@2x.png'
+        // this.$url = 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}@2x.png'
+        this.$url = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
     }
 
     $nameChanged(){
-        if(this.getPropertyValue('name') === 'osm') this.$url = 'https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}@2x.png'
+        if(this.getPropertyValue('name') === 'osm') this.$url = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
     }
 
     $parametersChanged(){
