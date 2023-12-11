@@ -12,6 +12,7 @@ FocusScope{
     height: 34;
 
     property var model;
+    property string nameId: "Name";
 
     property string currentText;
 
@@ -187,7 +188,7 @@ FocusScope{
                     let checkSt = popupMenuContainer.dataModel.IsValidData("checkState",i) ?
                                 popupMenuContainer.dataModel.GetData("checkState", i) : Qt.Unchecked
 
-                    let name_ = popupMenuContainer.dataModel.GetData("Name",i);
+                    let name_ = popupMenuContainer.dataModel.GetData(checkBoxMenu.nameId,i);
                     if(checkSt){
                         if(currText !== ""){
                             currText = currText + ", ";
@@ -362,7 +363,7 @@ FocusScope{
                             borderColor:Style.color_gray;
 
                             imageSource: popupMenuContainer.rootItem && checkState == Qt.Checked ? popupMenuContainer.rootItem.checkImageSource: "";
-                            text: model.Name;
+                            text: model[checkBoxMenu.nameId];
                             Component.onCompleted: {
                                 popupMenuContainer.setCheckedSignal.connect(checkBox.setCheckState);
                                 checkBox.setCheckState();
