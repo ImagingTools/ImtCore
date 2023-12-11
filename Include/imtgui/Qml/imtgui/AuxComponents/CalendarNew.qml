@@ -226,6 +226,13 @@ Rectangle {
         }
     }
 
+    onSelectedIndexMonthChanged: {
+        topPanelTextMonth.text = calendar.monthName(calendar.selectedIndexMonth);
+    }
+
+    onSelectedIndexYearChanged: {
+        topPanelTextYear.text = calendar.selectedIndexYear;
+    }
 
     function close(){
         if(calendar.root){
@@ -647,7 +654,7 @@ Rectangle {
                         font.pixelSize: calendar.fontSize_title;
                         font.bold: calendar.fontBold_title;
                         color: calendar.fontColor_title;
-                        text: calendar.monthName(calendar.selectedIndexMonth);
+                        //text: calendar.monthName(calendar.selectedIndexMonth);
 
                     }
 
@@ -721,7 +728,7 @@ Rectangle {
                         font.pixelSize: calendar.fontSize_title;
                         font.bold: calendar.fontBold_title;
                         color: calendar.fontColor_title;
-                        text: calendar.selectedIndexYear;
+                        //text: calendar.selectedIndexYear;
 
                     }
 
@@ -826,6 +833,7 @@ Rectangle {
             flickableDirection: Flickable.HorizontalFlick;
             property bool canFillModel: false;
             property bool canSetIndexes: true;
+            property real movementStartX: 0;
 
             function setSelectedMothAndYear(){
 
@@ -904,9 +912,25 @@ Rectangle {
 
                 }
 
-
             }
 
+            onMovementStarted: {
+                listview.movementStartX = listview.contentX;
+            }
+
+            onFlickStarted: {
+                let newMonth;
+                if(listview.contentX > listview.movementStartX){
+                    newMonth = calendar.selectedIndexMonth + 1;
+                }
+                else {
+                    newMonth = calendar.selectedIndexMonth - 1;
+                }
+                var date = new Date(calendar.selectedIndexYear, newMonth);
+                let monthIndex = date.getMonth();
+                topPanelTextMonth.text = calendar.monthName(monthIndex);
+                topPanelTextYear.text = date.getFullYear();
+            }
 
             model: calendar.monthTreeModel;
             delegate: Rectangle{
