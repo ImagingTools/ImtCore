@@ -6,12 +6,13 @@ class Gradient extends QtObject {
     static Horizontal = 1
 
     static defaultProperties = {
-        stops: { type: QVar, value: [], changed: '$gradientUpdate' },
+        stops: { type: QVar, undefined, changed: '$gradientUpdate' },
         orientation: { type: QReal, value:  Gradient.Vertical, changed: '$gradientUpdate' },
     }
 
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
+        this.getProperty('stops').reset([])
     }
 
     $gradientUpdate(){

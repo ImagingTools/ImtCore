@@ -48,6 +48,17 @@ class TextInput extends Item {
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
         
+        this.$form = document.createElement('form')
+        this.$form.style.outline = 'none'
+        this.$form.style.border = 'none'
+        this.$form.style.background = 'none'
+        this.$form.style.width = '100%'
+        this.$form.style.height = '1em'
+        this.$form.style.font = 'inherit'
+        this.$form.style.color = 'inherit'
+        this.$form.autocomplete = "off"
+        this.getDom().appendChild(this.$form)
+
         this.$input = document.createElement('input')
         this.$input.type = 'text'
         this.$input.style.outline = 'none'
@@ -57,7 +68,8 @@ class TextInput extends Item {
         this.$input.style.height = '1em'
         this.$input.style.font = 'inherit'
         this.$input.style.color = 'inherit'
-        this.getDom().appendChild(this.$input)
+        this.$input.autocomplete = "off"
+        this.$form.appendChild(this.$input)
         MouseController.add(this)
 
         this.$input.oninput = (e)=>{
@@ -167,6 +179,38 @@ class TextInput extends Item {
         this.getProperty('contentHeight').reset(this.$input.scrollHeight)
     }
 
+    cut(){
+
+    }
+
+    copy(){
+        
+    }
+
+    paste(){
+        
+    }
+
+    clear(){
+        
+    }
+
+    redo(){
+        
+    }
+
+    undo(){
+        
+    }
+
+    remove(start, end){
+
+    }
+
+    select(start, end){
+
+    }
+
     selectAll(){
         this.$input.select()
     }
@@ -195,6 +239,7 @@ class TextInput extends Item {
 
     $destroy(){
         this.$input.remove()
+        this.$form.remove()
         MouseController.remove(this)
         super.$destroy()     
     }

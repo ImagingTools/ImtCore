@@ -17,15 +17,19 @@ class MouseController {
         }
         window.ondblclick = (e)=>{
             // e.preventDefault()
-            this.onDoubleClick(e.pageX, e.pageY)
+            this.onDoubleClick(e.pageX, e.pageY, e.button)
         }
         window.onmousedown = (e)=>{
             // e.preventDefault()
-            this.onMouseDown(e.pageX, e.pageY)
+            this.onMouseDown(e.pageX, e.pageY, e.button)
         }
         window.onmouseup = (e)=>{
             // e.preventDefault()
-            this.onMouseUp(e.pageX, e.pageY)
+            this.onMouseUp(e.pageX, e.pageY, e.button)
+        }
+        window.oncontextmenu = (e)=>{
+            e.preventDefault()
+            this.onMouseDown(e.pageX, e.pageY, e.button)
         }
         window.ontouchstart = (e)=>{
             // e.preventDefault()
@@ -59,6 +63,9 @@ class MouseController {
 
         index = this.oldList.indexOf(obj)
         if(index >= 0) this.oldList.splice(index, 1)
+
+        index = this.flickList.indexOf(obj)
+        if(index >= 0) this.flickList.splice(index, 1)
     }
 
     get(x, y){
@@ -133,9 +140,9 @@ class MouseController {
 
         for(let i = 0; i < inner.length; i++){
             if(inner[i].$mousearea && !this.pressedMouseAreaInner){
-                if(inner[i].onMouseDown(x, y)){
+                if(inner[i].onMouseDown(x, y, button)){
                     for(let j = i+1; j < inner.length; j++){
-                        if(!inner[j].onMouseDown(x, y)){
+                        if(!inner[j].onMouseDown(x, y, button)){
                             this.pressedMouseAreaInner = inner[j]
                             break
                         }
@@ -146,7 +153,7 @@ class MouseController {
             }
 
             if(inner[i].$flickable){
-                inner[i].onMouseDown(x, y)
+                inner[i].onMouseDown(x, y, button)
                 this.flickList.push(inner[i])
             }
         }
@@ -156,11 +163,11 @@ class MouseController {
         let inner = this.get(x, y)
 
         if(this.pressedMouseAreaInner){
-            this.pressedMouseAreaInner.onMouseUp(x, y)
+            this.pressedMouseAreaInner.onMouseUp(x, y, button)
         }
 
         for(let obj of this.flickList){
-            obj.onMouseUp(x, y)
+            obj.onMouseUp(x, y, button)
         }
 
         this.pressedMouseAreaInner = null

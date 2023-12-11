@@ -49,8 +49,19 @@ class MouseArea extends Item {
         MouseController.add(this)
     }
 
+    availableButton(button){
+		let btn = 0
+		switch(button){
+			case 0: btn = Qt.LeftButton; break;
+			case 1: btn = Qt.MiddleButton; break;
+			case 2: btn = Qt.RightButton; break;
+		}	
+		if(this.getPropertyValue('acceptedButtons') & btn) return true
+		return false
+	}
+
     onDoubleClick(x, y, button){
-        if(this.getPropertyValue('enabled') && this.getPropertyValue('visible')) {
+        if(this.getPropertyValue('enabled') && this.getPropertyValue('visible') && this.availableButton(button)) {
             this.mouse.accepted = true
             let rect = this.getDom().getBoundingClientRect()
             this.mouse.x = x - rect.x
@@ -58,13 +69,13 @@ class MouseArea extends Item {
             this.getStatement('mouseX').reset(x - rect.x)
             this.getStatement('mouseX').reset(y - rect.y)
 
-            if(this.$signals.doubleClicked) this.$signals.doubleClicked()
+            if(this.$signals && this.$signals.doubleClicked) this.$signals.doubleClicked()
 
-            if(!this.mouse.accepted) MouseController.stopPropogation(this)
+            return this.mouse ? !this.mouse.accepted : true
         }
     }
-    onMouseDown(x, y){
-        if(this.getPropertyValue('enabled') && this.getPropertyValue('visible')) {
+    onMouseDown(x, y, button){
+        if(this.getPropertyValue('enabled') && this.getPropertyValue('visible') && this.availableButton(button)) {
             let rect = this.getDom().getBoundingClientRect()
             this.mouse.x = x - rect.x
             this.mouse.y = y - rect.y
@@ -73,13 +84,13 @@ class MouseArea extends Item {
             this.mouse.accepted = true
             this.$entered = true
 
-            if(this.$signals.entered) this.$signals.entered()
+            if(this.$signals && this.$signals.entered) this.$signals.entered()
 
             this.mouse.accepted = true
-            if(this.$signals.pressed) this.$signals.pressed()
+            if(this.$signals && this.$signals.pressed) this.$signals.pressed()
             
 
-            // if(this.$signals.pressAndHold){
+            // if(this.$signals && this.$signals.pressAndHold){
             //     clearTimeout(this.$timer)
             //     this.$timer = setTimeout(()=>{
             //         this.mouse.accepted = true
@@ -88,11 +99,11 @@ class MouseArea extends Item {
             //     }, this.getPropertyValue('pressAndHoldInterval'))
             // }
             
-            return !this.mouse.accepted
+            return this.mouse ? !this.mouse.accepted : true
         }
     }
-    onMouseUp(x, y){
-        if(this.getPropertyValue('enabled') && this.getPropertyValue('visible')) {
+    onMouseUp(x, y, button){
+        if(this.getPropertyValue('enabled') && this.getPropertyValue('visible') && this.availableButton(button)) {
             let rect = this.getDom().getBoundingClientRect()
             this.mouse.x = x - rect.x
             this.mouse.y = y - rect.y
@@ -100,18 +111,18 @@ class MouseArea extends Item {
             this.getStatement('mouseX').reset(y - rect.y)
             this.mouse.accepted = true
   
-            if(this.$signals.released) this.$signals.released()
+            if(this.$signals && this.$signals.released) this.$signals.released()
         
-            if(this.$signals.clicked) this.$signals.clicked()
+            if(this.$signals && this.$signals.clicked) this.$signals.clicked()
 
-            if(this.$signals.exited) this.$signals.exited()
+            if(this.$signals && this.$signals.exited) this.$signals.exited()
             
             delete this.$entered
-            // if(this.$signals.pressAndHold){
+            // if(this.$signals && this.$signals.pressAndHold){
             //     clearTimeout(this.$timer)
             //     delete this.$timer
             // }
-            return !this.mouse.accepted
+            return this.mouse ? !this.mouse.accepted : true
         }
     }
     onMouseMove(x, y, pressed){
@@ -131,13 +142,13 @@ class MouseArea extends Item {
                     cursor: this.getPropertyValue('cursorShape')
                 })
                 this.getProperty('containsMouse').reset(true)
-                if(this.$signals.entered && !this.$entered) {
+                if(this.$signals && this.$signals.entered && !this.$entered) {
                     this.$signals.entered()
                 }
                 this.$entered = true
             } else {
                 this.getProperty('containsMouse').reset(false) 
-                if(this.$signals.exited && this.$entered) {  
+                if(this.$signals && this.$signals.exited && this.$entered) {  
                     this.$signals.exited()
                 }
                 delete this.$entered
@@ -148,7 +159,7 @@ class MouseArea extends Item {
     }
     onWheel(x, y, deltaX, deltaY){
         if(this.getPropertyValue('enabled') && this.getPropertyValue('visible')) {
-            if(this.$signals.wheel) {
+            if(this.$signals && this.$signals.wheel) {
                 this.$signals.wheel.accepted = false
                 let rect = this.getDom().getBoundingClientRect()
                 this.$signals.wheel.x = x - rect.x

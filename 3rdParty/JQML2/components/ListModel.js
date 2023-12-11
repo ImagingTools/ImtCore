@@ -57,14 +57,12 @@ class ListModel extends QtObject {
 
     }
     clear(){
+        let leftTop = 0
+        let rightBottom = this.getStatement('data').get().length
         this.getStatement('data').reset([])
-        
-        // for(let key in this.$deps){
-        //     this.$deps[key].$clear()
-        //     this.$deps[key].$updateView()
-        // }
+
         this.getStatement('count').reset(0)
-        this.getStatement('data').getNotify()()
+        this.getStatement('data').getNotify()(leftTop, rightBottom, 'remove')
     }
     get(index){
         return index >= 0 && index < this.getStatement('data').get().length ? this.getStatement('data').get()[index] : undefined
@@ -102,7 +100,7 @@ class ListModel extends QtObject {
         //     this.$deps[key].$remove(index, count)
         // }
         // this.dataChanged(index, index+count)
-        this.getStatement('data').getNotify()(index, count, 'remove')
+        this.getStatement('data').getNotify()(index, index+count, 'remove')
     }
     setProperty(index, property, value){
         this.getStatement('data').get()[index][property] = value

@@ -138,8 +138,8 @@ class Flickable extends Item {
     }
 
     $destroy(){
-        super.$destroy()
         MouseController.remove(this)
+        super.$destroy()
     }
 }
 

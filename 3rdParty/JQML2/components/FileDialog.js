@@ -1,7 +1,16 @@
 const { Item } = require('./Item')
-const { QVar, QBool, QString } = require('../utils/properties')
+const { QVar, QBool, QString, QInt } = require('../utils/properties')
 
 class FileDialog extends Item {
+    static OpenFile = 0
+    static OpenFiles = 1
+    static SaveFile = 2
+
+    static DontResolveSymlinks = 0
+    static DontConfirmOverwrite = 0
+    static ReadOnly = 0
+    static HideNameFilterDetails = 0
+
     static defaultProperties = {
         selectMultiple: { type: QBool, value: false },
         defaultSuffix: { type: QString, value: '' },
@@ -13,27 +22,18 @@ class FileDialog extends Item {
         selectExisting: { type: QBool, value: false },
         shortcuts: { type: QVar, value: undefined },
 
+
+        acceptLabel: { type: QString, value: '' },
+        currentFile: { type: QString, value: '' },
+        currentFiles: { type: QVar, value: undefined },
+        fileMode: { type: QInt, value: FileDialog.OpenFile },
+        file: { type: QString, value: '' },
+        files: { type: QVar, value: undefined },
+        options: { type: QVar, value: undefined },
+        rejectLabel: { type: QString, value: '' },
+        seleectedNameFilter: { type: QVar, value: undefined },
     }
 
-    /*
-    this.$cP('selectMultiple', false, this.$selectMultipleChanged)
-        this.$cP('defaultSuffix', '')
-        this.$cP('title', '')
-        this.$cP('nameFilters', [], this.$nameFiltersChanged)
-        this.$cP('fileUrl', '')
-        this.$cP('fileUrls', [])
-        this.$cP('folder', '')
-        this.$cP('selectExisting', false)
-        this.$cP('shortcuts', {
-            'desktop': '',
-            'documents': '',
-            'home': '',
-            'music': '',
-            'movies': '',
-            'pictures': '',
-        })
-
-    */
 
     static defaultSignals = {
         accepted: { params: [] },

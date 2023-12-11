@@ -35,7 +35,31 @@ class Repeater extends Item {
         })
     }
 
+    $modelDataChanged(leftTop, bottomRight, roles){
+        if(roles === 'remove'){
+            for(let i = leftTop; i < bottomRight; i++){
+                if(this.$items[i]){
+                    this.$items[i].$destroy()
+                    delete this.$items[i]
+                }
+            }
+        }
+        console.log('DEBUG:::', leftTop, bottomRight, roles)
+    }
+    $disconnectModel(){
+        if(this.$model && this.$model instanceof ListModel && this.$model.UID){
+            this.$model.getProperty('data').getNotify().disconnect(this, this.$modelDataChanged)
+        }
+    }
+    $connectModel(model){
+        if(model && model instanceof ListModel){
+            this.$model = model
+            model.getProperty('data').getNotify().connect(this, this.$modelDataChanged)
+        }
+    }
+
     $modelChanged(){
+        this.$disconnectModel()
         for(let key in this.$items){
             if(key !== 'length') {
                 this.$items[key].$destroy()
@@ -46,6 +70,7 @@ class Repeater extends Item {
         if(typeof this.getPropertyValue('model') === 'number'){     
             this.$items.length.setCompute(()=>{this.$items.length.subscribe(this.getProperty('model')); return this.getPropertyValue('model')})
         } else {
+            this.$connectModel(this.getPropertyValue('model'))
             this.$items.length.setCompute(()=>{this.$items.length.subscribe(this.getPropertyValue('model').getProperty('data')); return this.getPropertyValue('model').getPropertyValue('data').length}) 
         }
         this.$items.length.update()
@@ -116,12 +141,16 @@ class Repeater extends Item {
 
 
     $destroy(){
+        this.$disconnectModel()
         this.$items.length.unsubscribe()
 
         for(let key in this.$items){
             if(key !== 'length') {
-                if(this.$signals.itemRemoved) this.$signals.itemRemoved(key, this.$items[key])
-                this.$items[key].$destroy()
+                if(this.$items[key].UID){
+                    if(this.$signals.itemRemoved) this.$signals.itemRemoved(key, this.$items[key])
+                    this.$items[key].$destroy()
+                }
+                
                 delete this.$items[key]
             }
         }

@@ -94,6 +94,7 @@ class Item extends QtObject {
             position: 'absolute',
             display: 'flex',
             overflow : 'unset',
+            zIndex: 0,
         })
         
 

@@ -46,7 +46,7 @@ class QObject extends ComplexObject {
                 this.getStatement('index').setCompute(()=>{return this.parent.index})
                 this.getStatement('context').setCompute(()=>{return this.parent.context})
             }
-            
+
             if(exModel){
                 this.getStatement('model').reset(exModel)
                 this.getStatement('index').setCompute(()=>{return exModel.index})
@@ -127,12 +127,12 @@ class QObject extends ComplexObject {
             index = this.parent.$data.indexOf(this)
             if(index >= 0) this.parent.$data.splice(index, 1)
         }
-        for(let i = this.$children.length - 1; i >= 0; i--){
-            this.$children[i].$destroy()
+        for(let i = this.$data.length - 1; i >= 0; i--){
+            this.$data[i].$destroy()
         }
         
         for(let key in this){
-            if(!(key in this.$properties) && !(key in this.$signals) && this[key].clearDependsSignal){
+            if(!(key in this.$properties) && !(key in this.$signals) && this[key] && this[key].clearDependsSignal){
                 this[key].clearDependsSignal()
             }
         }
