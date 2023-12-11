@@ -227,11 +227,15 @@ Rectangle {
     }
 
     onSelectedIndexMonthChanged: {
-        topPanelTextMonth.text = calendar.monthName(calendar.selectedIndexMonth);
+        if(topPanelTextMonth.text !== calendar.monthName(calendar.selectedIndexMonth)){
+            topPanelTextMonth.text = calendar.monthName(calendar.selectedIndexMonth);
+        }
     }
 
     onSelectedIndexYearChanged: {
-        topPanelTextYear.text = calendar.selectedIndexYear;
+        if(topPanelTextYear.text !== calendar.selectedIndexYear){
+            topPanelTextYear.text = calendar.selectedIndexYear;
+        }
     }
 
     function close(){

@@ -18,6 +18,10 @@ Item {
     property bool isOpen: false;
 
     function open(){
+        if(startWidth < 0 || finishWidth < 0 || startHeight < 0 || finishHeight < 0){
+            return;
+        }
+        //console.log("OPEN", finishWidth, finishHeight, isOpen)
         if(!isOpen){
             if(startWidth <= finishWidth){
                 animWidthTo.start();
@@ -29,6 +33,10 @@ Item {
     }
 
     function close(){
+        if(startWidth < 0 || finishWidth < 0 || startHeight < 0 || finishHeight < 0){
+            return;
+        }
+
         if(isOpen){
             if(startWidth <= finishWidth){
                 animWidthFrom.start();
