@@ -150,8 +150,8 @@ void CObserverQmlComp::OnSettingsChanged(const istd::IChangeable::ChangeSet& /*c
 
 void CObserverQmlComp::OnLanguageChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::ISelectionParam* /*objectPtr*/)
 {
-	UpdateSettingsRepresentation();
 	UpdateApplicationInfoRepresentation();
+	UpdateSettingsRepresentation();
 }
 
 
@@ -173,8 +173,8 @@ void CObserverQmlComp::OnComponentCreated()
 			}
 
 			UpdateLanguage();
-			UpdateSettingsRepresentation();
 			UpdateApplicationInfoRepresentation();
+			UpdateSettingsRepresentation();
 
 			ApplyUrl();
 

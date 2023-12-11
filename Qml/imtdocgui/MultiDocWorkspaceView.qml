@@ -84,6 +84,18 @@ DocumentManager {
         onCloseItem: {
             workspaceView.closeDocumentByIndex(index);
         }
+
+        onRightClicked: {
+            if (tabPanel.selectedIndex < workspaceView.documentsModel.count - 1){
+                tabPanel.selectedIndex++;
+            }
+        }
+
+        onLeftClicked: {
+            if (tabPanel.selectedIndex > 0){
+                tabPanel.selectedIndex--;
+            }
+        }
     }
 
     Repeater {

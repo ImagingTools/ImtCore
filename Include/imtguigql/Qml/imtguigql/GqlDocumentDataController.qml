@@ -81,7 +81,12 @@ QtObject {
                 let state = container.gqlGetModel.state;
                 console.log("onResult", state);
 
-                if (state === "Ready"){
+                if (state === "Error"){
+                    container.gqlGetModel.onStateChanged.disconnect(onResult);
+
+                    container.error("Network error", "Critical");
+                }
+                else if (state === "Ready"){
                     if (container.gqlGetModel.ContainsKey("errors")){
                         let dataModelLocal = container.gqlGetModel.GetData("errors");
 
@@ -154,6 +159,11 @@ QtObject {
                 let state = container.gqlSetModel.state;
                 console.log("onResult", state);
 
+                if (state === "Error"){
+                    container.gqlSetModel.onStateChanged.disconnect(onResult);
+
+                    container.error("Network error", "Critical");
+                }
                 if (state === "Ready"){
                     var dataModelLocal;
                     if (container.gqlSetModel.ContainsKey("errors")){
@@ -231,6 +241,11 @@ QtObject {
                 let state = container.gqlUpdateModel.state;
                 console.log("onResult", state);
 
+                if (state === "Error"){
+                    container.gqlUpdateModel.onStateChanged.disconnect(onResult);
+
+                    container.error("Network error", "Critical");
+                }
                 if (state === "Ready"){
                     var dataModelLocal;
                     if (container.gqlUpdateModel.ContainsKey("errors")){

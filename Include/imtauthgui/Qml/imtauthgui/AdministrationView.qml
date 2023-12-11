@@ -28,11 +28,24 @@ Rectangle {
     function onLocalizationChanged(language){
         console.log("Administration onLocalizationChanged", language);
 
-//        multiPageView.updateModel();
-    }
+        let rolesIndex = multiPageView.getIndexById("Roles");
+        if (rolesIndex >= 0){
+            multiPageView.pagesModel.setProperty(rolesIndex, "Name", qsTr("Roles"))
+        }
 
-    onDocumentManagerPtrChanged: {
+        let usersIndex = multiPageView.getIndexById("Users");
+        if (usersIndex >= 0){
+            multiPageView.pagesModel.setProperty(usersIndex, "Name", qsTr("Users"))
+        }
 
+        let groupsIndex = multiPageView.getIndexById("Groups");
+        if (groupsIndex >= 0){
+            multiPageView.pagesModel.setProperty(groupsIndex, "Name", qsTr("Groups"))
+        }
+
+        if (multiPageView.selectedIndex >= 0){
+            headerText.text = qsTr("Administration") + " / " + multiPageView.pagesModel.get(multiPageView.selectedIndex).Name;
+        }
     }
 
     Row {

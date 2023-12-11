@@ -13,8 +13,7 @@ namespace imtauth
 	Interface for describing an user.
 	\ingroup User
 */
-class IUserInfo:
-		virtual public IUserBaseInfo
+class IUserInfo: virtual public IUserBaseInfo
 {
 public:
 
@@ -47,24 +46,14 @@ public:
 	enum MetaInfoTypes
 	{
 		/**
-			Username given as QString.
-		*/
-		MIT_USERNAME,
-
-		/**
-			Name given as QString.
-		*/
-		MIT_NAME,
-
-		/**
-			User description given as QString.
-		*/
-		MIT_DESCRIPTION,
-
-		/**
 			Contact email given as QString.
 		*/
-		MIT_EMAIL
+		MIT_EMAIL = MIT_ROLES + 1,
+
+		/**
+			Groups given as QString.
+		*/
+		MIT_GROUPS
 	};
 
 	/**

@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5127" Description="ACF"/>
+            <Version Id="0" Number="5134" Description="ACF"/>
             <Version Id="1" Number="2198" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -10,6 +10,33 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
+        <Element Id="CachedGroupCollection" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserGroupRepository"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CachedRoleCollection" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="RoleRepository"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="CachedUserCollection" PackageId="ImtCorePck" ComponentId="CachedObjectCollection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="UserRepository"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="Role" PackageId="ImtAuthPck" ComponentId="Role">
             <Data IsEnabled="true" Flags="2">
                 <AttributeInfoMap/>
@@ -318,8 +345,11 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces/>
     <ExportedComponents>
+        <Component ExportedId="RoleRepository" ComponentId="CachedRoleCollection"/>
         <Component ExportedId="RolesSubscriberController" ComponentId="RolesSubscriberController"/>
+        <Component ExportedId="UserGroupRepository" ComponentId="CachedGroupCollection"/>
         <Component ExportedId="UserGroupsSubscriberController" ComponentId="UserGroupsSubscriberController"/>
+        <Component ExportedId="UserRepository" ComponentId="CachedUserCollection"/>
         <Component ExportedId="UsersSubscriberController" ComponentId="UsersSubscriberController"/>
     </ExportedComponents>
 </Acf>

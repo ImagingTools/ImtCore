@@ -96,6 +96,10 @@ Item {
             }
         }
 
+        console.log("selectedPermissionIds", selectedPermissionIds.join(';'));
+        let permissions = rolePermissionsContainer.documentModel.GetData("Permissions");
+        console.log("permissions", permissions);
+
         rolePermissionsContainer.documentModel.SetData("Permissions", selectedPermissionIds.join(';'));
     }
 

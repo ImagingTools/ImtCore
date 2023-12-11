@@ -35,7 +35,7 @@ Item {
     property alias filterMenuItem: filterMenuLocal.item;
     property alias filterMenuVisible: filterMenuLocal.visible;
     property alias modelFilter: modelFilterObj;
-    property alias pagination: paginationObj;
+    property alias pagination: pagination_;
 
     // Sort by default this index
     property int defaultSortHeaderIndex: 0;
@@ -306,25 +306,35 @@ Item {
         }
     }
 
-    Pagination {
+    Item {
         id: paginationObj;
 
         anchors.bottom: parent.bottom;
-        anchors.bottomMargin: 10;
+//        anchors.bottomMargin: 10;
         anchors.horizontalCenter: parent.horizontalCenter;
 
-        pagesSize: 1;
+        width: parent.width;
+        height: 30;
 
-        visible: collectionViewBaseContainer.hasPagination /*&& pagesSize > 1*/;
+        Pagination {
+            id: pagination_;
 
-        onCurrentIndexChanged: {
-            tableInternal.selectedIndex = -1;
-            gqlModels.updateModels();
-        }
+            anchors.horizontalCenter: parent.horizontalCenter;
+            anchors.verticalCenter: parent.verticalCenter;
 
-        onCountElementsChanged: {
-            tableInternal.selectedIndex = -1;
-            gqlModels.updateModels();
+            pagesSize: 1;
+
+            visible: collectionViewBaseContainer.hasPagination /*&& pagesSize > 1*/;
+
+            onCurrentIndexChanged: {
+                tableInternal.selectedIndex = -1;
+                gqlModels.updateModels();
+            }
+
+            onCountElementsChanged: {
+                tableInternal.selectedIndex = -1;
+                gqlModels.updateModels();
+            }
         }
     }
 
@@ -336,7 +346,7 @@ Item {
         commandId: collectionViewBaseContainer.commandId;
         rootItem: collectionViewBaseContainer;
 
-        pagination: paginationObj;
+        pagination: pagination_;
 
         onHeadersChanged: {
             let headersCount = gqlModels.headers.GetItemsCount();
@@ -372,11 +382,11 @@ Item {
         onNotificationModelChanged: {
             if (notificationModel != null){
                 if (notificationModel.ContainsKey("PagesCount")){
-                    paginationObj.pagesSize = notificationModel.GetData("PagesCount");
+                    pagination_.pagesSize = notificationModel.GetData("PagesCount");
                 }
 
                 if (notificationModel.ContainsKey("TotalCount")){
-                    paginationObj.countAllElements = notificationModel.GetData("TotalCount");
+                    pagination_.countAllElements = notificationModel.GetData("TotalCount");
                 }
             }
         }

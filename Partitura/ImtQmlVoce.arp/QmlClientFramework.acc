@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5126" Description="ACF"/>
-            <Version Id="1" Number="2197" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5127" Description="ACF"/>
+            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -103,7 +103,7 @@
         <Element Id="Context" PackageId="ImtQmlPck" ComponentId="ClientUserContext">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationLocalization"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -175,7 +175,7 @@
                     <AttributeInfo Id="SettingsRepresentationController" Type="Reference" ExportId="SettingsRepresentationController">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationLocalization"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -204,7 +204,7 @@
                     <AttributeInfo Id="TitleFormat" Type="String" ExportId="TitleFormat">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="ApplicationLocalization"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

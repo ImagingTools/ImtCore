@@ -2,21 +2,24 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5127" Description="ACF"/>
+            <Version Id="0" Number="5134" Description="ACF"/>
             <Version Id="1" Number="2198" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="Role" X="1050" Y="350" Note=""/>
-        <Element ComponentName="RoleCollectionObserver" X="550" Y="350" Note=""/>
-        <Element ComponentName="RoleRepository" X="850" Y="350" Note=""/>
-        <Element ComponentName="RolesSubscriberController" X="200" Y="350" Note=""/>
+        <Element ComponentName="CachedGroupCollection" X="850" Y="750" Note=""/>
+        <Element ComponentName="CachedRoleCollection" X="850" Y="350" Note=""/>
+        <Element ComponentName="CachedUserCollection" X="850" Y="75" Note=""/>
+        <Element ComponentName="Role" X="1075" Y="450" Note=""/>
+        <Element ComponentName="RoleCollectionObserver" X="525" Y="450" Note=""/>
+        <Element ComponentName="RoleRepository" X="850" Y="450" Note=""/>
+        <Element ComponentName="RolesSubscriberController" X="175" Y="450" Note=""/>
         <Element ComponentName="UserCollectionObserver" X="550" Y="175" Note=""/>
-        <Element ComponentName="UserGroupCollectionObserver" X="550" Y="525" Note=""/>
-        <Element ComponentName="UserGroupInfo" X="1075" Y="525" Note=""/>
-        <Element ComponentName="UserGroupRepository" X="850" Y="526" Note=""/>
-        <Element ComponentName="UserGroupsSubscriberController" X="200" Y="525" Note=""/>
+        <Element ComponentName="UserGroupCollectionObserver" X="550" Y="650" Note=""/>
+        <Element ComponentName="UserGroupInfo" X="1100" Y="650" Note=""/>
+        <Element ComponentName="UserGroupRepository" X="850" Y="650" Note=""/>
+        <Element ComponentName="UserGroupsSubscriberController" X="200" Y="650" Note=""/>
         <Element ComponentName="UserInfo" X="1075" Y="175" Note=""/>
         <Element ComponentName="UserRepository" X="850" Y="175" Note=""/>
         <Element ComponentName="UsersSubscriberController" X="200" Y="175" Note=""/>

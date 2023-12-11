@@ -3,6 +3,9 @@
 
 // ACF includes
 #include <istd/TOptDelPtr.h>
+#include <iprm/CParamsSet.h>
+#include <iprm/CIdParam.h>
+#include <imod/TModelWrap.h>
 
 
 namespace imtgql
@@ -29,6 +32,8 @@ imtbase::CTreeItemModel* CUserSettingsControllerComp::CreateRepresentationFromRe
 		return nullptr;
 	}
 
+	QByteArray languageId;
+
 	// Get user-ID from GqlContext
 	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
 	QByteArray userId;
@@ -37,7 +42,15 @@ imtbase::CTreeItemModel* CUserSettingsControllerComp::CreateRepresentationFromRe
 		if (userInfoPtr != nullptr){
 			userId = userInfoPtr->GetId();
 		}
+
+		languageId = gqlContextPtr->GetLanguageId();
 	}
+
+	istd::TDelPtr<iprm::CParamsSet> paramsPtr = new imod::TModelWrap<iprm::CParamsSet>();
+
+	istd::TDelPtr<iprm::IIdParam> languageIdParam = new iprm::CIdParam();
+	languageIdParam->SetId(languageId);
+	paramsPtr->SetEditableParameter("LanguageParam", languageIdParam.PopPtr(), true);
 
 	istd::TDelPtr<imtbase::CTreeItemModel> userSettingsRepresentation(new imtbase::CTreeItemModel);
 	imtbase::CTreeItemModel* dataModelPtr = userSettingsRepresentation->AddTreeModel("data");
@@ -66,7 +79,7 @@ imtbase::CTreeItemModel* CUserSettingsControllerComp::CreateRepresentationFromRe
 		return nullptr;
 	}
 
-	bool result = m_userSettingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*paramSetPtr, *dataModelPtr);
+	bool result = m_userSettingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*paramSetPtr, *dataModelPtr, paramsPtr.GetPtr());
 	if (!result){
 		return nullptr;
 	}

@@ -9,6 +9,8 @@ import imtgui 1.0
      visibleMetaInfo: false;
 
      documentName: qsTr("Licenses");
+     defaultSortHeaderIndex: 5;
+     defaultOrderType: "DESC";
 
      Component.onCompleted: {
          root.commandId = "Licenses";

@@ -9,6 +9,8 @@ import imtgui 1.0
      visibleMetaInfo: false;
 
      documentName: qsTr("Features");
+     defaultSortHeaderIndex: 4;
+     defaultOrderType: "DESC";
 
      Component.onCompleted: {
          console.log("featureCollection onCompleted");

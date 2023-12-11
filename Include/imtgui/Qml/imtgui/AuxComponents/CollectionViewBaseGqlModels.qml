@@ -81,6 +81,7 @@ QtObject {
 
         onStateChanged: {
             console.log("State:", this.state, gqlModelBaseContainer.headerInfoModel);
+
             if (this.state === "Ready"){
                 var dataModelLocal;
 

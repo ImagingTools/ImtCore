@@ -150,7 +150,12 @@ Item {
 
                     onEditingFinished: {
                         if (userEditorContainer.documentPtr){
-                            userEditorContainer.documentPtr.doUpdateModel();
+                            let oldText = userEditorContainer.documentModel.GetData("Username");
+                            if (oldText && oldText !== usernameInput.text || !oldText && usernameInput.text !== ""){
+                                userEditorContainer.documentPtr.doUpdateModel();
+                            }
+
+//                            userEditorContainer.documentPtr.doUpdateModel();
                         }
                     }
 
@@ -204,7 +209,11 @@ Item {
 
                     onEditingFinished: {
                         if (userEditorContainer.documentPtr){
-                            userEditorContainer.documentPtr.doUpdateModel();
+                            let oldText = userEditorContainer.documentModel.GetData("Password");
+                            if (oldText && oldText !== usernameInput.text || !oldText && usernameInput.text !== ""){
+                                userEditorContainer.documentPtr.doUpdateModel();
+                            }
+//                            userEditorContainer.documentPtr.doUpdateModel();
                         }
                     }
 
@@ -246,7 +255,11 @@ Item {
 
                     onEditingFinished: {
                         if (userEditorContainer.documentPtr){
-                            userEditorContainer.documentPtr.doUpdateModel();
+                            let oldText = userEditorContainer.documentModel.GetData("Name");
+                            if (oldText && oldText !== usernameInput.text || !oldText && usernameInput.text !== ""){
+                                userEditorContainer.documentPtr.doUpdateModel();
+                            }
+//                            userEditorContainer.documentPtr.doUpdateModel();
                         }
                     }
 

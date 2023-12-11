@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5127" Description="ACF"/>
+            <Version Id="0" Number="5134" Description="ACF"/>
             <Version Id="1" Number="2198" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -46,6 +46,7 @@
                                 <Value>UserDataController</Value>
                                 <Value>UserListController</Value>
                                 <Value>CollectionUserInfoProvider</Value>
+                                <Value>SerializableUserCollectionController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -74,6 +75,43 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectViewPath" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="../../imtauthgui/UserView.qml"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SerializableUserCollectionController" PackageId="ImtGqlPck" ComponentId="SerializableObjectCollectionController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>UserInfo</Value>
+                                <Value>UserDataMetaInfo</Value>
+                                <Value>UserMetaInfo</Value>
+                                <Value>UserList</Value>
+                                <Value>UserView</Value>
+                                <Value>UserRemove</Value>
+                                <Value>UserSetDescription</Value>
+                                <Value>UserAdd</Value>
+                                <Value>UserUpdate</Value>
+                                <Value>UserItem</Value>
+                                <Value>UserCount</Value>
+                                <Value>UserIds</Value>
+                                <Value>UserSubCollection</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="UserRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="UserInfo"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>

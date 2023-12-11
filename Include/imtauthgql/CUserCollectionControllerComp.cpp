@@ -26,7 +26,7 @@ QVariant CUserCollectionControllerComp::GetObjectInformation(const QByteArray &i
 
 	if (metaInfo.IsValid()){
 		if (informationId == QByteArray("UserId")){
-			return metaInfo->GetMetaInfo(imtauth::IUserInfo::MIT_USERNAME);
+//			return metaInfo->GetMetaInfo(imtauth::IUserInfo::MIT_USERNAME);
 		}
 		else if (informationId == QByteArray("Email")){
 			return metaInfo->GetMetaInfo(imtauth::IUserInfo::MIT_EMAIL);

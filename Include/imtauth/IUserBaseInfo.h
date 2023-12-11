@@ -24,6 +24,45 @@ public:
 	typedef QList<QByteArray> FeatureIds;
 	typedef QList<QByteArray> RoleIds;
 
+	enum MetaInfoTypes
+	{
+		/**
+			ID given as QString.
+		*/
+		MIT_ID = idoc::IDocumentMetaInfo::MIT_USER + 1,
+
+		/**
+			Name given as QString.
+		*/
+		MIT_NAME,
+
+		/**
+			Description given as QString.
+		*/
+		MIT_DESCRIPTION,
+
+		/**
+			Permissions given as QString.
+		*/
+		MIT_PERMISSIONS,
+
+		/**
+			Prohibitions given as QString.
+		*/
+		MIT_PROHIBITIONS,
+
+		/**
+			Products given as QString.
+		*/
+		MIT_PRODUCTS,
+
+		/**
+			Roles given as QString.
+		*/
+		MIT_ROLES
+	};
+
+
 	/**
 		Get list of all availiable permissions.
 	*/

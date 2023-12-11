@@ -104,8 +104,6 @@ Item {
                 id: pagesLoader;
                 anchors.fill: parent;
 
-//                source: model.Source;
-
                 visible: parent.visible;
 
                 onItemChanged: {
@@ -121,7 +119,7 @@ Item {
                 }
 
                 onStatusChanged: {
-                    console.error("pagesLoader onStatusChanged", pagesLoader.source);
+                    console.log("pagesLoader onStatusChanged", pagesLoader.source);
 
                     if (status == Loader.Error){
                         console.error("Loading page with source", pagesLoader.source, "was failed!");

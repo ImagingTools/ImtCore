@@ -6,7 +6,7 @@ Row {
     id: paginationContainer;
 
     height: visible ? 20 : 0;
-    spacing: 10;
+    spacing: 15;
 
     property int pagesSize: 1;
     property int currentValue: currentIndex + 1;
@@ -61,8 +61,19 @@ Row {
         repeaterPagination.model = listModel;
     }
 
+    BaseText {
+        anchors.verticalCenter: parent.verticalCenter;
+
+        text: "(" + (paginationContainer.currentIndex * paginationContainer.countElements + 1) + "-" +
+              ((paginationContainer.pagesSize - 1 != paginationContainer.currentIndex) ?
+                   paginationContainer.currentValue * paginationContainer.countElements :
+                   paginationContainer.countAllElements) + "/" + paginationContainer.countAllElements + ")"
+    }
+
     AuxButton {
         id: buttonDecr;
+
+        anchors.verticalCenter: parent.verticalCenter;
 
         height: 20;
         width: 24;
@@ -87,6 +98,8 @@ Row {
     }
 
     Row{
+        anchors.verticalCenter: parent.verticalCenter;
+
         Repeater {
             id: repeaterPagination;
 
@@ -125,6 +138,8 @@ Row {
     AuxButton {
         id: buttonIncr;
 
+        anchors.verticalCenter: parent.verticalCenter;
+
         height: 20;
         width: 24;
 
@@ -147,22 +162,20 @@ Row {
         }
     }
 
-    BaseText {
-        text: "(" + (paginationContainer.currentIndex * paginationContainer.countElements + 1) + "-" +
-              ((paginationContainer.pagesSize - 1 != paginationContainer.currentIndex) ?
-                   paginationContainer.currentValue * paginationContainer.countElements :
-                   paginationContainer.countAllElements) + "/" + paginationContainer.countAllElements + ")"
-    }
-
     Row {
+        anchors.verticalCenter: parent.verticalCenter;
+
         spacing: 4;
 
         BaseText {
+            anchors.verticalCenter: parent.verticalCenter;
             text: qsTr("Per page: ")
         }
 
         AuxButton {
             id: count25;
+
+            anchors.verticalCenter: parent.verticalCenter;
 
             width: 20;
             height: 20;
@@ -184,6 +197,8 @@ Row {
         AuxButton {
             id: count50;
 
+            anchors.verticalCenter: parent.verticalCenter;
+
             width: 20;
             height: 20;
 
@@ -203,6 +218,8 @@ Row {
 
         AuxButton {
             id: count100;
+
+            anchors.verticalCenter: parent.verticalCenter;
 
             width: 20;
             height: 20;

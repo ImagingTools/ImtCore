@@ -13,17 +13,10 @@ QtObject {
 
     signal modelChanged(var changeList);
 
-//    Component.onDestruction: {
-//        if (container.observedModel != null){
-//            container.observedModel.dataChanged.disconnect(container.observedModelDataChanged);
-//        }
-//    }
-
     function registerModel(model){
         console.log("PreferenceObserver registerModel", model);
 
         container.observedModel = model;
-//        container.observedModel.dataChanged.connect(container.observedModelDataChanged);
         container.private_.beginModel.Copy(container.observedModel);
     }
 

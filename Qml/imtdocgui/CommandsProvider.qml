@@ -14,6 +14,12 @@ QtObject {
 
     signal commandModeChanged(string commandId, bool newMode);
 
+    Component.onDestruction: {
+        if (commandsModel){
+            commandsModel.Clear();
+        }
+    }
+
     function updateModel(){
         if (commandId === ""){
             console.error("Unable to update commands model. Command-ID is empty.");

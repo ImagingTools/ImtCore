@@ -60,9 +60,6 @@
                     <AttributeInfo Id="ObjectName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Web Socket Server URL"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PathToQml" Type="Id" ExportId="ServerUrlPath">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

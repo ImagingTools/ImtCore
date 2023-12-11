@@ -183,8 +183,6 @@ Item {
     }
 
     function updateModel(){
-        console.log("RoleEditor start updateModel");
-
         roleEditorContainer.documentModel.SetData("RoleId", roleIdInput.text);
         roleEditorContainer.documentModel.SetData("Name", roleNameInput.text);
         roleEditorContainer.documentModel.SetData("Description", descriptionInput.text);
@@ -197,8 +195,6 @@ Item {
         }
 
         roleEditorContainer.documentModel.SetData("ParentRoles", selectedRoleIds.join(';'));
-
-        console.log("RoleEditor finish updateModel");
     }
 
     Item{
@@ -266,13 +262,12 @@ Item {
                 placeHolderText: qsTr("Enter the role name");
 
                 onEditingFinished: {
-                    console.log("roleNameInput onEditingFinished");
-
                     if (roleEditorContainer.documentPtr){
-                        console.log("roleNameInput onEditingFinished");
-                        roleIdInput.text = roleNameInput.text.replace(/\s+/g, '');
-
-                        roleEditorContainer.documentPtr.doUpdateModel();
+                        let oldText = roleEditorContainer.documentModel.GetData("Name");
+                        if (oldText && oldText !== roleNameInput.text || !oldText && roleNameInput.text !== ""){
+                            roleIdInput.text = roleNameInput.text.replace(/\s+/g, '');
+                            roleEditorContainer.documentPtr.doUpdateModel();
+                        }
                     }
                 }
 
@@ -368,9 +363,16 @@ Item {
                 placeHolderText: qsTr("Enter the description");
 
                 onEditingFinished: {
+//                    if (roleEditorContainer.documentPtr){
+//                        console.log("descriptionInput onEditingFinished");
+//                        roleEditorContainer.documentPtr.doUpdateModel();
+//                    }
+
                     if (roleEditorContainer.documentPtr){
-                        console.log("descriptionInput onEditingFinished");
-                        roleEditorContainer.documentPtr.doUpdateModel();
+                        let oldText = roleEditorContainer.documentModel.GetData("Description");
+                        if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
+                            roleEditorContainer.documentPtr.doUpdateModel();
+                        }
                     }
                 }
 

@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5105" Description="ACF"/>
-            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5134" Description="ACF"/>
+            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -18,21 +18,9 @@
         <Element ComponentName="RolesCommands" X="700" Y="325" Note=""/>
         <Element ComponentName="RolesDataController" X="1025" Y="325" Note=""/>
         <Element ComponentName="RolesHeadersDataProvider" X="800" Y="500" Note=""/>
+        <Element ComponentName="SerializableRoleCollectionController" X="550" Y="650" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
-        <EmbededRegistry Id="RolesCommands">
-            <PositionMap>
-                <Element ComponentName="CheckPermissionOr" X="750" Y="450" Note=""/>
-                <Element ComponentName="Commands" X="275" Y="250" Note=""/>
-                <Element ComponentName="CommandsRepresentation" X="1050" Y="250" Note=""/>
-                <Element ComponentName="Edit" X="475" Y="450" Note=""/>
-                <Element ComponentName="New" X="100" Y="450" Note=""/>
-                <Element ComponentName="Remove" X="275" Y="450" Note=""/>
-                <Element ComponentName="RolesCommandPermissions" X="1050" Y="450" Note=""/>
-                <Element ComponentName="RolesCommandsController" X="600" Y="75" Note=""/>
-            </PositionMap>
-            <EmbeddedRegistries/>
-        </EmbededRegistry>
         <EmbededRegistry Id="RoleCommands">
             <PositionMap>
                 <Element ComponentName="CheckPermissionOr" X="800" Y="500" Note=""/>
@@ -45,6 +33,19 @@
                 <Element ComponentName="RoleCommandsController" X="600" Y="75" Note=""/>
                 <Element ComponentName="Save" X="125" Y="650" Note=""/>
                 <Element ComponentName="Undo" X="125" Y="500" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="RolesCommands">
+            <PositionMap>
+                <Element ComponentName="CheckPermissionOr" X="750" Y="450" Note=""/>
+                <Element ComponentName="Commands" X="275" Y="250" Note=""/>
+                <Element ComponentName="CommandsRepresentation" X="1050" Y="250" Note=""/>
+                <Element ComponentName="Edit" X="475" Y="450" Note=""/>
+                <Element ComponentName="New" X="100" Y="450" Note=""/>
+                <Element ComponentName="Remove" X="275" Y="450" Note=""/>
+                <Element ComponentName="RolesCommandPermissions" X="1050" Y="450" Note=""/>
+                <Element ComponentName="RolesCommandsController" X="600" Y="75" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

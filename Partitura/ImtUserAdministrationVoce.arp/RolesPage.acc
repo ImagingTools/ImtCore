@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5105" Description="ACF"/>
-            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5134" Description="ACF"/>
+            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -21,6 +21,7 @@
                                 <Value>RolesCommands</Value>
                                 <Value>RoleCommands</Value>
                                 <Value>RoleProvider</Value>
+                                <Value>SerializableRoleCollectionController</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -226,6 +227,43 @@
                                 <Value>Name</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SerializableRoleCollectionController" PackageId="ImtGqlPck" ComponentId="SerializableObjectCollectionController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>RoleInfo</Value>
+                                <Value>RoleDataMetaInfo</Value>
+                                <Value>RoleMetaInfo</Value>
+                                <Value>RoleList</Value>
+                                <Value>RoleView</Value>
+                                <Value>RoleRemove</Value>
+                                <Value>RoleSetDescription</Value>
+                                <Value>RoleAdd</Value>
+                                <Value>RoleUpdate</Value>
+                                <Value>RoleItem</Value>
+                                <Value>RoleCount</Value>
+                                <Value>RoleIds</Value>
+                                <Value>RoleSubCollection</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectCollection" Type="Reference" ExportId="RoleRepository">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectFactory" Type="Factory" ExportId="">
+                        <Data IsEnabled="true" Value="Role"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>

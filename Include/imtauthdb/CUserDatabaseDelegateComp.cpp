@@ -209,6 +209,42 @@ QByteArray CUserDatabaseDelegateComp::CreateDeleteObjectQuery(
 }
 
 
+bool CUserDatabaseDelegateComp::SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const
+{
+	BaseClass::SetObjectMetaInfoFromRecord(record, metaInfo);
+
+	if (record.contains("Document")){
+		QByteArray json = record.value("Document").toByteArray();
+		QJsonDocument jsonDocument = QJsonDocument::fromJson(json);
+
+		if (!jsonDocument.isNull()){
+			QString userId = jsonDocument["Id"].toString();
+			metaInfo.SetMetaInfo(imtauth::IUserInfo::MIT_ID, userId);
+
+			QString username = jsonDocument["Name"].toString();
+			metaInfo.SetMetaInfo(imtauth::IUserInfo::MIT_NAME, username);
+
+			QString description = jsonDocument["Description"].toString();
+			metaInfo.SetMetaInfo(imtauth::IUserInfo::MIT_DESCRIPTION, description);
+
+			QString mail = jsonDocument["Mail"].toString();
+			metaInfo.SetMetaInfo(imtauth::IUserInfo::MIT_EMAIL, mail);
+
+			QJsonArray groupsArray = jsonDocument["Groups"].toArray();
+
+			QStringList groups;
+			for (const QJsonValue& jsonValue : groupsArray){
+				groups << jsonValue.toString();
+			}
+
+			metaInfo.SetMetaInfo(imtauth::IUserInfo::MIT_GROUPS, groups.join(';'));
+		}
+	}
+
+	return true;
+}
+
+
 } // namespace imtauthdb
 
 

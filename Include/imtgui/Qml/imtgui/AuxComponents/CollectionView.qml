@@ -539,7 +539,7 @@ Item {
                 anchors.leftMargin: 10;
                 anchors.right: updateButton.left;
 
-                text: qsTr("This collection has been modified from another computer");
+                text: qsTr("This table has been modified from another computer");
             }
 
             BaseButton {

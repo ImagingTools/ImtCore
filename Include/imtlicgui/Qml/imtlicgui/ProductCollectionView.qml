@@ -9,6 +9,8 @@ CollectionView {
     visibleMetaInfo: false;
 
     documentName: qsTr("Products");
+    defaultSortHeaderIndex: 4;
+    defaultOrderType: "DESC";
 
     Component.onCompleted: {
         productCollectionViewContainer.commandsDelegatePath = "../../imtlicgui/ProductCollectionViewCommandsDelegate.qml";

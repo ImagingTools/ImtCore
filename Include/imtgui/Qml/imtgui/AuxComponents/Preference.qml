@@ -195,10 +195,14 @@ Rectangle {
 
                     height: titleItem.height + rectSeparator.height + loader.height + 20;
 
+                    visible: loader.item;
+
                     Text {
                         id: titleItem;
 
                         text: model.Name;
+
+                        visible: loader.item;
 
                         font.pixelSize: root.fontSize;
                         color: root.fontColor;
@@ -214,6 +218,8 @@ Rectangle {
                         width: parent.width;
                         height: 1;
 
+                        visible: loader.item;
+
                         color: Style.buttonBorderColor;
                     }
 
@@ -224,7 +230,9 @@ Rectangle {
                         anchors.topMargin: 15;
 
                         Component.onCompleted: {
-                            loader.source = model.Source;
+                            if (model.Source && model.Source !== ""){
+                                loader.source = model.Source;
+                            }
                         }
 
                         onLoaded: {

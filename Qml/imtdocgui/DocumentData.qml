@@ -88,6 +88,8 @@ Item {
 
     Component.onDestruction: {
         Events.unSubscribeEvent(uuid + "CommandActivated", commandsDelegate.commandHandle);
+
+        documentData.documentModel.Clear();
     }
 
     onStartLoading: {
@@ -124,6 +126,8 @@ Item {
     onDocumentModelChanged: {
         console.log("onDocumentModelChanged", documentModel.toJSON());
 
+        let isEmpty = documentModel.GetItemsCount() === 0;
+
         beginDocumentModelChanged();
 
         if (documentModel.ContainsKey("Id")){
@@ -144,7 +148,7 @@ Item {
 
         console.log("GetItemsCount", documentModel.GetItemsCount());
 
-        if (documentModel.GetItemsCount() === 0){
+        if (isEmpty){
             doUpdateModel();
         }
 
@@ -174,6 +178,14 @@ Item {
         console.log("onIsDirtyChanged", isDirty);
         commandsProvider.setCommandIsEnabled("Save", isDirty);
     }
+
+//    Connections {
+//        target: documentData.documentModel;
+
+//        onDataChanged: {
+//            documentData.onModelChanged();
+//        }
+//    }
 
     function beginDocumentModelChanged(){}
     function endDocumentModelChanged(){}

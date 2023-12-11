@@ -243,6 +243,8 @@ TreeViewItemDelegateBase {
 
                     checkState: model.Optional ? Qt.Checked : Qt.Unchecked;
 
+                    isActive: packageTreeItemDelegate.root ? !packageTreeItemDelegate.root.readOnly : true;
+
                     visible: packageTreeItemDelegate.level !== 0 && !packageTreeItemDelegate.hasChild;
 
                     onClicked: {

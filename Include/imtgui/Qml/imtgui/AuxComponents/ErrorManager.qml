@@ -25,7 +25,7 @@ Item {
             root.errorPage.text = message;
             root.errorPage.visible = true;
 
-            Events.sendEvent("Logout");
+//            Events.sendEvent("Logout");
             Events.sendEvent("UpdateSystemStatus");
         }
     }
