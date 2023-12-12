@@ -71,6 +71,7 @@
         <file alias="imtgui/AuxComponents/ProgressBar.qml">Qml/imtgui/AuxComponents/ProgressBar.qml</file>
         <file alias="imtgui/AuxComponents/CheckBoxMenu.qml">Qml/imtgui/AuxComponents/CheckBoxMenu.qml</file>
         <file alias="imtgui/AuxComponents/ExpandingContainer.qml">Qml/imtgui/AuxComponents/ExpandingContainer.qml</file>
+        <file alias="imtgui/AuxComponents/Gallery.qml">Qml/imtgui/AuxComponents/Gallery.qml</file>
 
         <file alias="imtgui/AuxComponents/DatabaseInput.qml">Qml/imtgui/AuxComponents/DatabaseInput.qml</file>
 	<file alias="imtgui/AuxComponents/DatabaseBackupController.qml">Qml/imtgui/AuxComponents/DatabaseBackupController.qml</file>
