@@ -40,7 +40,7 @@ class QObject extends ComplexObject {
             } else if(parent.$repeater && !(this instanceof Component)){
                 parent = parent.parent
             }
-            if(!(this instanceof Repeater) && !(this instanceof ListView) && !(this instanceof GridView) && !(this instanceof ListElement)) this.getStatement('model').setCompute(()=>{return this.parent.model})
+            if(!(this instanceof MapItemView) && !(this instanceof Repeater) && !(this instanceof ListView) && !(this instanceof GridView) && !(this instanceof ListElement)) this.getStatement('model').setCompute(()=>{return this.parent.model})
 
             if(!(this instanceof ListElement)) {
                 this.getStatement('index').setCompute(()=>{return this.parent.index})

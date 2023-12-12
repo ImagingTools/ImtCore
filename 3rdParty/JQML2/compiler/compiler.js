@@ -1148,7 +1148,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             } else {
                 if(property.val.className !== 'Component'){  
                     // TEMP !!!
-                    if((property.name === 'delegate' && (currentInstructions.className === 'ListView'|| currentInstructions.className === 'GridView' || currentInstructions.className === 'Repeater')) || (property.name === 'sourceComponent' && currentInstructions.className === 'Loader')){
+                    if((property.name === 'delegate' && (currentInstructions.className === 'MapItemView'|| currentInstructions.className === 'ListView'|| currentInstructions.className === 'GridView' || currentInstructions.className === 'Repeater')) || (property.name === 'sourceComponent' && currentInstructions.className === 'Loader')){
                         code.push(`${currentInstructions.name}.getStatement('${property.name}').value = new Component(${currentInstructions.name}, inCtx)`)
                         code.push(`${currentInstructions.name}.getStatement('${property.name}').value.createObject=function(currParent,exCtx,exModel){`)
                         
