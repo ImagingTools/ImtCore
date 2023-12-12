@@ -42,14 +42,8 @@ bool CGqlSubscriberControllerCompBase::RegisterSubscribtion(
 
 	if (!IsRequestSupported(gqlRequest)){
 		errorMessage = QT_TR_NOOP("Request is not supported");
+
 		return false;
-	}
-
-	const imtgql::IGqlContext* gqlContextPtr = gqlRequest.GetRequestContext();
-	if (gqlContextPtr != nullptr){
-		QByteArray token = gqlContextPtr->GetToken();
-
-		qDebug() << token;
 	}
 
 	if(CheckPermissions(gqlRequest, errorMessage)){
@@ -62,7 +56,8 @@ bool CGqlSubscriberControllerCompBase::RegisterSubscribtion(
 		for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 			if (requestNetworks.gqlRequest.IsEqual(gqlRequest)){
 				requestNetworks.networkRequests.insert(subscriptionId, &networkRequest);
-				webSocketRequest->RegisterDestroyObserver(this);
+
+				webSocketRequest->RegisterRequestEventHandler(this);
 
 				return true;
 			}
@@ -72,14 +67,17 @@ bool CGqlSubscriberControllerCompBase::RegisterSubscribtion(
 		requestNetworks.gqlRequest.CopyFrom(gqlRequest);
 		requestNetworks.networkRequests.insert(subscriptionId, &networkRequest);
 		m_registeredSubscribers.append(requestNetworks);
-		webSocketRequest->RegisterDestroyObserver(this);
+
+		webSocketRequest->RegisterRequestEventHandler(this);
 
 		return true;
 	}
 
 	QString userName;
-	if (gqlRequest.GetRequestContext() != nullptr){
-		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetRequestContext()->GetUserInfo();
+	
+	const IGqlContext* requestContextPtr = gqlRequest.GetRequestContext();
+	if (requestContextPtr != nullptr){
+		const imtauth::IUserInfo* userInfoPtr = requestContextPtr->GetUserInfo();
 
 		if (userInfoPtr != nullptr){
 			userName = userInfoPtr->GetName();
@@ -106,10 +104,11 @@ bool CGqlSubscriberControllerCompBase::UnRegisterSubscribtion(const QByteArray& 
 }
 
 
-void CGqlSubscriberControllerCompBase::OnRequestDestroyed(imtrest::CWebSocketRequest* webSocketRequest)
+void CGqlSubscriberControllerCompBase::OnRequestDestroyed(imtrest::IRequest* request)
 {
-	if (webSocketRequest != nullptr){
-		UnRegisterSubscribtion(webSocketRequest->GetSubscriptionId());
+	imtrest::CWebSocketRequest* webSocketRequestPtr = dynamic_cast<imtrest::CWebSocketRequest*>(request);
+	if (webSocketRequestPtr != nullptr){
+		UnRegisterSubscribtion(webSocketRequestPtr->GetSubscriptionId());
 	}
 }
 

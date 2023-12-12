@@ -14,7 +14,7 @@ namespace imtauthgql
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IChangeable::ChangeSet& changeSet, const QByteArray& sessionId)
+void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const QByteArray& sessionId)
 {
 	if (!m_requestManagerCompPtr.IsValid()){
 		return;
@@ -23,8 +23,6 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 	if (sessionId.isEmpty()){
 		return;
 	}
-
-	qDebug() << "OnSessionModelChanged" << sessionId;
 
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){

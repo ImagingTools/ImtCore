@@ -547,10 +547,10 @@ idoc::MetaInfoPtr CFileRepositoryComp::GetDataMetaInfo(const Id& objectId) const
 
 // reimplemented (ICollectionInfo)
 
-int CFileRepositoryComp::GetElementsCount(const iprm::IParamsSet* selectionParamPtr) const
+int CFileRepositoryComp::GetElementsCount(const iprm::IParamsSet* selectionParamPtr, ilog::IMessageConsumer* logPtr) const
 {
 	if (m_documentInfoCollectionCompPtr.IsValid()){
-		return m_documentInfoCollectionCompPtr->GetElementsCount(selectionParamPtr);
+		return m_documentInfoCollectionCompPtr->GetElementsCount(selectionParamPtr, logPtr);
 	}
 
 	return 0;
@@ -560,10 +560,11 @@ int CFileRepositoryComp::GetElementsCount(const iprm::IParamsSet* selectionParam
 imtbase::ICollectionInfo::Ids CFileRepositoryComp::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamsPtr) const
+			const iprm::IParamsSet* selectionParamsPtr,
+			ilog::IMessageConsumer* logPtr) const
 {
 	if (m_documentInfoCollectionCompPtr.IsValid()){
-		return m_documentInfoCollectionCompPtr->GetElementIds(offset, count, selectionParamsPtr);
+		return m_documentInfoCollectionCompPtr->GetElementIds(offset, count, selectionParamsPtr, logPtr);
 	}
 
 	return Ids();
@@ -574,17 +575,18 @@ bool CFileRepositoryComp::GetSubsetInfo(
 			imtbase::ICollectionInfo& subsetInfo,
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamsPtr) const
+			const iprm::IParamsSet* selectionParamsPtr,
+			ilog::IMessageConsumer* logPtr) const
 {
 	if (m_documentInfoCollectionCompPtr.IsValid()){
-		return m_documentInfoCollectionCompPtr->GetSubsetInfo(subsetInfo, offset, count, selectionParamsPtr);
+		return m_documentInfoCollectionCompPtr->GetSubsetInfo(subsetInfo, offset, count, selectionParamsPtr, logPtr);
 	}
 
 	return false;
 }
 
 
-QVariant CFileRepositoryComp::GetElementInfo(const QByteArray& elementId, int infoType) const
+QVariant CFileRepositoryComp::GetElementInfo(const QByteArray& elementId, int infoType, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	CFileCollectionItem fileItemInfo;
 	if (!GetFileInfo(elementId, fileItemInfo)){
@@ -603,7 +605,7 @@ QVariant CFileRepositoryComp::GetElementInfo(const QByteArray& elementId, int in
 }
 
 
-idoc::MetaInfoPtr CFileRepositoryComp::GetElementMetaInfo(const Id& elementId) const
+idoc::MetaInfoPtr CFileRepositoryComp::GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	idoc::MetaInfoPtr metaInfoPtr;
 
@@ -618,19 +620,19 @@ idoc::MetaInfoPtr CFileRepositoryComp::GetElementMetaInfo(const Id& elementId) c
 }
 
 
-bool CFileRepositoryComp::SetElementName(const Id& /*elementId*/, const QString& /*name*/)
+bool CFileRepositoryComp::SetElementName(const Id& /*elementId*/, const QString& /*name*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
 
 
-bool CFileRepositoryComp::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/)
+bool CFileRepositoryComp::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
 
 
-bool CFileRepositoryComp::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/)
+bool CFileRepositoryComp::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }

@@ -23,7 +23,7 @@ namespace imtgql
 class CGqlSubscriberControllerCompBase:
 			public ilog::CLoggerComponentBase,
 			virtual public imtgql::IGqlSubscriberController,
-			virtual public imtrest::CWebSocketRequest::IDestroyObserver
+			virtual public imtrest::IRequestEventHandler
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
@@ -50,8 +50,8 @@ public:
 				QString& errorMessage) override;
 	virtual bool UnRegisterSubscribtion(const QByteArray& subscriptionId) override;
 
-	// reimplemented (imtrest::CWebSocketRequest::IDestroyObserver)
-	virtual void OnRequestDestroyed(imtrest::CWebSocketRequest* webSocketRequest);
+	// reimplemented (imtrest::IRequestEventHandler)
+	virtual void OnRequestDestroyed(imtrest::IRequest* request) override;
 
 protected:
 	virtual bool SetSubscriptions();

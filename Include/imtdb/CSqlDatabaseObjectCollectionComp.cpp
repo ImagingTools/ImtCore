@@ -306,7 +306,7 @@ idoc::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetDataMetaInfo(const Id& ob
 
 // reimplemented (ICollectionInfo)
 
-int CSqlDatabaseObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* selectionParamPtr) const
+int CSqlDatabaseObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* selectionParamPtr, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
@@ -347,7 +347,8 @@ int CSqlDatabaseObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* s
 imtbase::ICollectionInfo::Ids CSqlDatabaseObjectCollectionComp::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamsPtr) const
+			const iprm::IParamsSet* selectionParamsPtr,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	Ids retVal;
 
@@ -378,7 +379,8 @@ bool CSqlDatabaseObjectCollectionComp::GetSubsetInfo(
 			imtbase::ICollectionInfo& /*subsetInfo*/,
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return false;
 }
@@ -415,7 +417,7 @@ imtbase::IObjectCollectionIterator* CSqlDatabaseObjectCollectionComp::CreateObje
 }
 
 
-QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elementId, int infoType) const
+QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elementId, int infoType, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	if (m_objectDelegateCompPtr.IsValid()){
 		QSqlRecord record = GetObjectRecord(elementId);
@@ -442,7 +444,7 @@ QVariant CSqlDatabaseObjectCollectionComp::GetElementInfo(const QByteArray& elem
 }
 
 
-idoc::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetElementMetaInfo(const Id& elementId) const
+idoc::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	if (m_objectDelegateCompPtr.IsValid()){
 		QSqlRecord record = GetObjectRecord(elementId);
@@ -463,7 +465,7 @@ idoc::MetaInfoPtr CSqlDatabaseObjectCollectionComp::GetElementMetaInfo(const Id&
 }
 
 
-bool CSqlDatabaseObjectCollectionComp::SetElementName(const Id& elementId, const QString& name)
+bool CSqlDatabaseObjectCollectionComp::SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* /*logPtr*/)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
@@ -502,7 +504,7 @@ bool CSqlDatabaseObjectCollectionComp::SetElementName(const Id& elementId, const
 }
 
 
-bool CSqlDatabaseObjectCollectionComp::SetElementDescription(const Id& elementId, const QString& description)
+bool CSqlDatabaseObjectCollectionComp::SetElementDescription(const Id& elementId, const QString& description, ilog::IMessageConsumer* /*logPtr*/)
 {
 	if (!m_objectDelegateCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid component configuration: Object delegate missing", "Database collection");
@@ -532,7 +534,7 @@ bool CSqlDatabaseObjectCollectionComp::SetElementDescription(const Id& elementId
 }
 
 
-bool CSqlDatabaseObjectCollectionComp::SetElementEnabled(const Id& /*objectId*/, bool /*isEnabled*/)
+bool CSqlDatabaseObjectCollectionComp::SetElementEnabled(const Id& /*objectId*/, bool /*isEnabled*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }

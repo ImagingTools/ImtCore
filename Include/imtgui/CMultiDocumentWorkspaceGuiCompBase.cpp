@@ -683,11 +683,6 @@ bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::IsOptionEnabled(int /*ind
 
 // reimplemented (imtbase::IObjectCollectionInfo)
 
-idoc::MetaInfoPtr CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementMetaInfo(const Id& /*objectId*/) const
-{
-	return idoc::MetaInfoPtr();
-}
-
 idoc::MetaInfoPtr CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetDataMetaInfo(const Id& /*objectId*/) const
 {
 	return idoc::MetaInfoPtr();
@@ -710,7 +705,7 @@ imtbase::ICollectionInfo::Id CMultiDocumentWorkspaceGuiCompBase::DocumentList::G
 
 // reimplemented (imtbase::ICollectionInfo)
 
-int CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
+int CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return 0;
 }
@@ -719,7 +714,8 @@ int CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementsCount(const ipr
 imtbase::ICollectionInfo::Ids CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementIds(
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return Ids();
 }
@@ -729,31 +725,38 @@ bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetSubsetInfo(
 			imtbase::ICollectionInfo& /*subsetInfo*/,
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return false;
 }
 
 
-QVariant CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementInfo(const QByteArray& /*elementId*/, int /*infoType*/) const
+QVariant CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementInfo(const QByteArray& /*elementId*/, int /*infoType*/, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return QVariant();
 }
 
 
-bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::SetElementName(const Id& /*elementId*/, const QString& /*name*/)
+idoc::MetaInfoPtr CMultiDocumentWorkspaceGuiCompBase::DocumentList::GetElementMetaInfo(const Id& /*objectId*/, ilog::IMessageConsumer* /*logPtr*/) const
+{
+	return idoc::MetaInfoPtr();
+}
+
+
+bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::SetElementName(const Id& /*elementId*/, const QString& /*name*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
 
 
-bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/)
+bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
 
 
-bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/)
+bool CMultiDocumentWorkspaceGuiCompBase::DocumentList::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }

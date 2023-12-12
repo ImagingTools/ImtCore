@@ -1,4 +1,4 @@
-#include "CSelectionAdapterComp.h"
+#include <imtbase/CSelectionAdapterComp.h>
 
 
 namespace imtbase
@@ -179,7 +179,7 @@ void CSelectionAdapterComp::Constraints::SetParent(CSelectionAdapterComp* parent
 
 // reimplemented (ICollectionInfo)
 
-int CSelectionAdapterComp::Constraints::GetElementsCount(const iprm::IParamsSet* selectionParamPtr) const
+int CSelectionAdapterComp::Constraints::GetElementsCount(const iprm::IParamsSet* selectionParamPtr, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	Q_ASSERT(selectionParamPtr == nullptr);
 
@@ -187,7 +187,11 @@ int CSelectionAdapterComp::Constraints::GetElementsCount(const iprm::IParamsSet*
 }
 
 
-ICollectionInfo::Ids CSelectionAdapterComp::Constraints::GetElementIds(int offset, int count, const iprm::IParamsSet* selectionParamsPtr) const
+ICollectionInfo::Ids CSelectionAdapterComp::Constraints::GetElementIds(
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	Q_ASSERT(offset == 0);
 	Q_ASSERT(count == -1);
@@ -208,13 +212,14 @@ bool CSelectionAdapterComp::Constraints::GetSubsetInfo(
 			ICollectionInfo& /*subsetInfo*/,
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/, 
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return false;
 }
 
 
-QVariant CSelectionAdapterComp::Constraints::GetElementInfo(const Id& elementId, int infoType) const
+QVariant CSelectionAdapterComp::Constraints::GetElementInfo(const Id& elementId, int infoType, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	int index = m_parentPtr->GetOptionIndex(elementId);
 	Q_ASSERT(index >= 0);
@@ -249,25 +254,25 @@ QVariant CSelectionAdapterComp::Constraints::GetElementInfo(const Id& elementId,
 }
 
 
-idoc::MetaInfoPtr CSelectionAdapterComp::Constraints::GetElementMetaInfo(const Id& /*elementId*/) const
+idoc::MetaInfoPtr CSelectionAdapterComp::Constraints::GetElementMetaInfo(const Id& /*elementId*/, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return idoc::MetaInfoPtr();
 }
 
 
-bool CSelectionAdapterComp::Constraints::SetElementName(const Id& /*elementId*/, const QString& /*name*/)
+bool CSelectionAdapterComp::Constraints::SetElementName(const Id& /*elementId*/, const QString& /*name*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
 
 
-bool CSelectionAdapterComp::Constraints::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/)
+bool CSelectionAdapterComp::Constraints::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
 
 
-bool CSelectionAdapterComp::Constraints::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/)
+bool CSelectionAdapterComp::Constraints::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }

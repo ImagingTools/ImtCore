@@ -9,7 +9,7 @@ namespace imtlic
 {
 
 
-const IFeatureInfo* CFeatureInfoProviderComp::GetFeatureInfo(const QByteArray& featureId) const
+const IFeatureInfo* CFeatureInfoProviderComp::GetFeatureInfo(const QByteArray& /*featureId*/) const
 {
 	if (!m_featureCollectionCompPtr.IsValid()){
 		return nullptr;

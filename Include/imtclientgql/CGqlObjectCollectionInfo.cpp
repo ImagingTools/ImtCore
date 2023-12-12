@@ -80,7 +80,7 @@ imtbase::IStructuredObjectCollectionInfo::ElementType CGqlObjectCollectionInfo::
 }
 
 
-QByteArrayList CGqlObjectCollectionInfo::GetElementBasePath(const QByteArray& elementId) const
+QByteArrayList CGqlObjectCollectionInfo::GetElementBasePath(const QByteArray& /*elementId*/) const
 {
 	return m_basePath;
 }
@@ -118,7 +118,7 @@ idoc::MetaInfoPtr CGqlObjectCollectionInfo::GetDataMetaInfo(const Id& objectId) 
 
 // reimplemented (ICollectionInfo)
 
-int CGqlObjectCollectionInfo::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
+int CGqlObjectCollectionInfo::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	const_cast<CGqlObjectCollectionInfo*>(this)->UpdateCache();
 
@@ -129,7 +129,8 @@ int CGqlObjectCollectionInfo::GetElementsCount(const iprm::IParamsSet* /*selecti
 imtbase::ICollectionInfo::Ids CGqlObjectCollectionInfo::GetElementIds(
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	const_cast<CGqlObjectCollectionInfo*>(this)->UpdateCache();
 
@@ -148,13 +149,14 @@ bool CGqlObjectCollectionInfo::GetSubsetInfo(
 			imtbase::ICollectionInfo& /*subsetInfo*/,
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return false;
 }
 
 
-QVariant CGqlObjectCollectionInfo::GetElementInfo(const QByteArray& elementId, int infoType) const
+QVariant CGqlObjectCollectionInfo::GetElementInfo(const QByteArray& elementId, int infoType, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	int objectIndex = GetItemIndex(elementId);
 	if (objectIndex >= 0){
@@ -176,7 +178,7 @@ QVariant CGqlObjectCollectionInfo::GetElementInfo(const QByteArray& elementId, i
 	return QVariant();
 }
 
-idoc::MetaInfoPtr CGqlObjectCollectionInfo::GetElementMetaInfo(const Id& elementId) const
+idoc::MetaInfoPtr CGqlObjectCollectionInfo::GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	Item* itemPtr = FindItemById(elementId);
 	if (itemPtr != nullptr) {
@@ -187,19 +189,19 @@ idoc::MetaInfoPtr CGqlObjectCollectionInfo::GetElementMetaInfo(const Id& element
 }
 
 
-bool CGqlObjectCollectionInfo::SetElementName(const Id& elementId, const QString& name)
+bool CGqlObjectCollectionInfo::SetElementName(const Id& /*elementId*/, const QString& /*name*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
 
 
-bool CGqlObjectCollectionInfo::SetElementDescription(const Id& elementId, const QString& description)
+bool CGqlObjectCollectionInfo::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
 
 
-bool CGqlObjectCollectionInfo::SetElementEnabled(const Id& elementId, bool isEnabled)
+bool CGqlObjectCollectionInfo::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
@@ -213,7 +215,7 @@ int CGqlObjectCollectionInfo::GetSupportedOperations() const
 }
 
 
-bool CGqlObjectCollectionInfo::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
+bool CGqlObjectCollectionInfo::CopyFrom(const IChangeable& /*object*/, CompatibilityMode /*mode*/)
 {
 	return false;
 }
@@ -229,7 +231,7 @@ bool CGqlObjectCollectionInfo::IsEqual(const IChangeable & object) const
 	return false;
 }
 
-istd::IChangeable* CGqlObjectCollectionInfo::CloneMe(CompatibilityMode mode) const
+istd::IChangeable* CGqlObjectCollectionInfo::CloneMe(CompatibilityMode /*mode*/) const
 {
 	return nullptr;
 }

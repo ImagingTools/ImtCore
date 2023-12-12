@@ -95,7 +95,7 @@ void CCollectionInfo::UpdateItem(const QByteArray& id, const QString& name, cons
 
 // reimplemented (ICollectionInfo)
 
-int CCollectionInfo::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
+int CCollectionInfo::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return m_items.size();
 }
@@ -104,7 +104,8 @@ int CCollectionInfo::GetElementsCount(const iprm::IParamsSet* /*selectionParamPt
 ICollectionInfo::Ids CCollectionInfo::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	Ids retVal;
 
@@ -124,13 +125,14 @@ bool CCollectionInfo::GetSubsetInfo(
 			imtbase::ICollectionInfo& /*subsetInfo*/,
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return false;
 }
 
 
-QVariant CCollectionInfo::GetElementInfo(const QByteArray& elementId, int infoType) const
+QVariant CCollectionInfo::GetElementInfo(const QByteArray& elementId, int infoType, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	int objectIndex = GetItemIndex(elementId);
 	if (objectIndex >= 0){
@@ -151,13 +153,13 @@ QVariant CCollectionInfo::GetElementInfo(const QByteArray& elementId, int infoTy
 	return QVariant();
 }
 
-idoc::MetaInfoPtr CCollectionInfo::GetElementMetaInfo(const Id& /*elementId*/) const
+idoc::MetaInfoPtr CCollectionInfo::GetElementMetaInfo(const Id& /*elementId*/, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return idoc::MetaInfoPtr();
 }
 
 
-bool CCollectionInfo::SetElementName(const Id& elementId, const QString& name)
+bool CCollectionInfo::SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* /*logPtr*/)
 {
 	Item* itemPtr = FindItemById(elementId);
 	if (itemPtr != nullptr){
@@ -174,7 +176,7 @@ bool CCollectionInfo::SetElementName(const Id& elementId, const QString& name)
 }
 
 
-bool CCollectionInfo::SetElementDescription(const Id& elementId, const QString& description)
+bool CCollectionInfo::SetElementDescription(const Id& elementId, const QString& description, ilog::IMessageConsumer* /*logPtr*/)
 {
 	Item* itemPtr = FindItemById(elementId);
 	if (itemPtr != nullptr){
@@ -191,7 +193,7 @@ bool CCollectionInfo::SetElementDescription(const Id& elementId, const QString& 
 }
 
 
-bool CCollectionInfo::SetElementEnabled(const Id& elementId, bool isEnabled)
+bool CCollectionInfo::SetElementEnabled(const Id& elementId, bool isEnabled, ilog::IMessageConsumer* /*logPtr*/)
 {
 	Item* itemPtr = FindItemById(elementId);
 	if (itemPtr != nullptr){

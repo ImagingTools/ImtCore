@@ -12,7 +12,7 @@ namespace imtdb
 // public methods
 
 CSqlDatabaseObjectCollectionIterator::CSqlDatabaseObjectCollectionIterator(
-			QSqlQuery sqlQuery,
+			QSqlQuery& sqlQuery,
 			ISqlDatabaseObjectDelegate* databaseDelegatePtr)
 	:m_currentIndex(-1)
 {

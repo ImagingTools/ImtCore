@@ -23,11 +23,14 @@ public:
 	typedef Base BaseClass;
 
 	// pseudo-reimplemented (ICollectionInfo)
-	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr) const override;
+	virtual int GetElementsCount(
+				const iprm::IParamsSet* selectionParamPtr = nullptr,
+				ilog::IMessageConsumer* logPtr = nullptr) const override;
 	virtual imtbase::ICollectionInfo::Ids GetElementIds(
 			int offset = 0,
 			int count = -1,
-			const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
+			const iprm::IParamsSet* selectionParamsPtr = nullptr,
+			ilog::IMessageConsumer* logPtr = nullptr) const override;
 
 protected:
 	virtual imtbase::ICollectionInfo::Ids GetFilteredElementIds(const iprm::IParamsSet& filterParams) const;
@@ -41,13 +44,13 @@ protected:
 // reimplemented (ICollectionInfo)
 
 template <class Base>
-int TFilterableCollectionWrap<Base>::GetElementsCount(const iprm::IParamsSet* selectionParamPtr) const
+int TFilterableCollectionWrap<Base>::GetElementsCount(const iprm::IParamsSet* selectionParamPtr, ilog::IMessageConsumer* logPtr) const
 {
 	if (selectionParamPtr != nullptr){
 		return GetFilteredElementIds(*selectionParamPtr).count();
 	}
 
-	return BaseClass::GetElementsCount(selectionParamPtr);
+	return BaseClass::GetElementsCount(selectionParamPtr, logPtr);
 }
 
 
@@ -55,7 +58,8 @@ template <class Base>
 imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamPtr) const
+			const iprm::IParamsSet* selectionParamPtr,
+			ilog::IMessageConsumer* logPtr) const
 {
 	ICollectionInfo::Ids retVal;
 
@@ -78,7 +82,7 @@ imtbase::ICollectionInfo::Ids TFilterableCollectionWrap<Base>::GetElementIds(
 	}
 	}
 	else {
-		retVal = BaseClass::GetElementIds(offset, count, selectionParamPtr);
+		retVal = BaseClass::GetElementIds(offset, count, selectionParamPtr, logPtr);
 	}
 
 	return retVal;

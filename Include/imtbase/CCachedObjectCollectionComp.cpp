@@ -253,10 +253,10 @@ idoc::MetaInfoPtr CCachedObjectCollectionComp::GetDataMetaInfo(const Id& objectI
 }
 
 
-int CCachedObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* selectionParamsPtr) const
+int CCachedObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* selectionParamsPtr, ilog::IMessageConsumer* logPtr) const
 {
 	if (m_objectCollectionCompPtr.IsValid()){
-		return m_objectCollectionCompPtr->GetElementsCount(selectionParamsPtr);
+		return m_objectCollectionCompPtr->GetElementsCount(selectionParamsPtr, logPtr);
 	}
 
 	return 0;
@@ -266,11 +266,12 @@ int CCachedObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* select
 ICollectionInfo::Ids CCachedObjectCollectionComp::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamsPtr) const
+			const iprm::IParamsSet* selectionParamsPtr,
+			ilog::IMessageConsumer* logPtr) const
 {
 	FilteredCollection* collectionChacheItemPtr = CheckCache(offset, count, selectionParamsPtr);
 	if (collectionChacheItemPtr != nullptr){
-		return collectionChacheItemPtr->cachePtr->GetElementIds();
+		return collectionChacheItemPtr->cachePtr->GetElementIds(0, -1, nullptr, logPtr);
 	}
 
 	return ICollectionInfo::Ids();
@@ -281,18 +282,19 @@ bool CCachedObjectCollectionComp::GetSubsetInfo(
 			ICollectionInfo& /*subsetInfo*/,
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return false;
 }
 
 
-QVariant CCachedObjectCollectionComp::GetElementInfo(const Id& elementId, int infoType) const
+QVariant CCachedObjectCollectionComp::GetElementInfo(const Id& elementId, int infoType, ilog::IMessageConsumer* logPtr) const
 {
 	for (int index = 0; index < m_collectionCacheItems.GetCount(); index++){
 		FilteredCollection* collectionChacheItemPtr = m_collectionCacheItems.GetAt(index);
 		if (collectionChacheItemPtr->cachePtr->GetElementIds().contains(elementId)){
-			return collectionChacheItemPtr->cachePtr->GetElementInfo(elementId, infoType);
+			return collectionChacheItemPtr->cachePtr->GetElementInfo(elementId, infoType, logPtr);
 		}
 	}
 
@@ -300,12 +302,12 @@ QVariant CCachedObjectCollectionComp::GetElementInfo(const Id& elementId, int in
 }
 
 
-idoc::MetaInfoPtr CCachedObjectCollectionComp::GetElementMetaInfo(const Id& elementId) const
+idoc::MetaInfoPtr CCachedObjectCollectionComp::GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* logPtr) const
 {
 	for (int index = 0; index < m_collectionCacheItems.GetCount(); index++){
 		FilteredCollection* collectionChacheItemPtr = m_collectionCacheItems.GetAt(index);
 		if (collectionChacheItemPtr->cachePtr->GetElementIds().contains(elementId)){
-			return collectionChacheItemPtr->cachePtr->GetElementMetaInfo(elementId);
+			return collectionChacheItemPtr->cachePtr->GetElementMetaInfo(elementId, logPtr);
 		}
 	}
 
@@ -313,7 +315,7 @@ idoc::MetaInfoPtr CCachedObjectCollectionComp::GetElementMetaInfo(const Id& elem
 }
 
 
-bool CCachedObjectCollectionComp::SetElementName(const Id& elementId, const QString& name)
+bool CCachedObjectCollectionComp::SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* logPtr)
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return false;
@@ -334,7 +336,7 @@ bool CCachedObjectCollectionComp::SetElementName(const Id& elementId, const QStr
 }
 
 
-bool CCachedObjectCollectionComp::SetElementDescription(const Id& elementId, const QString& description)
+bool CCachedObjectCollectionComp::SetElementDescription(const Id& elementId, const QString& description, ilog::IMessageConsumer* logPtr)
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return false;
@@ -346,7 +348,7 @@ bool CCachedObjectCollectionComp::SetElementDescription(const Id& elementId, con
 	changeSet.SetChangeInfo(CN_ELEMENT_UPDATED, elementId);
 	istd::CChangeNotifier changeNotifier(this, &changeSet);
 
-	bool retVal = m_objectCollectionCompPtr->SetElementDescription(elementId, description);
+	bool retVal = m_objectCollectionCompPtr->SetElementDescription(elementId, description, logPtr);
 	if (!retVal){
 		changeNotifier.Abort();
 	}
@@ -355,7 +357,7 @@ bool CCachedObjectCollectionComp::SetElementDescription(const Id& elementId, con
 }
 
 
-bool CCachedObjectCollectionComp::SetElementEnabled(const Id& elementId, bool isEnabled)
+bool CCachedObjectCollectionComp::SetElementEnabled(const Id& elementId, bool isEnabled, ilog::IMessageConsumer* logPtr)
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return false;

@@ -75,21 +75,25 @@ public:
 	virtual idoc::MetaInfoPtr GetDataMetaInfo(const Id& objectId) const override;
 
 	// reimplemented (ICollectionInfo)
-	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr) const override;
+	virtual int GetElementsCount(
+				const iprm::IParamsSet* selectionParamPtr = nullptr,
+				ilog::IMessageConsumer* logPtr = nullptr) const override;
 	virtual Ids GetElementIds(
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				ilog::IMessageConsumer* logPtr = nullptr) const override;
 	virtual bool GetSubsetInfo(
 				ICollectionInfo& subsetInfo,
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
-	virtual QVariant GetElementInfo(const Id& elementId, int infoType) const override;
-	virtual idoc::MetaInfoPtr GetElementMetaInfo(const Id& elementId) const override;
-	virtual bool SetElementName(const Id& elementId, const QString& name) override;
-	virtual bool SetElementDescription(const Id& elementId, const QString& description) override;
-	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true) override;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				ilog::IMessageConsumer* logPtr = nullptr) const override;
+	virtual QVariant GetElementInfo(const Id& elementId, int infoType, ilog::IMessageConsumer* logPtr = nullptr) const override;
+	virtual idoc::MetaInfoPtr GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* logPtr = nullptr) const override;
+	virtual bool SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* logPtr = nullptr) override;
+	virtual bool SetElementDescription(const Id& elementId, const QString& description, ilog::IMessageConsumer* logPtr = nullptr) override;
+	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true, ilog::IMessageConsumer* logPtr = nullptr) override;
 
 	// (reimplemented from ISerializable)
 	virtual bool Serialize(iser::IArchive & archive) override;

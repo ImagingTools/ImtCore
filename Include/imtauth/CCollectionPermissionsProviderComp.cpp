@@ -8,7 +8,7 @@ namespace imtauth
 {
 
 
-const QByteArrayList CCollectionPermissionsProviderComp::GetPermissionInfos(const QByteArray& productId) const
+const QByteArrayList CCollectionPermissionsProviderComp::GetPermissionInfos(const QByteArray& /*productId*/) const
 {
 //	imtlic::ILicenseDefinition::FeatureInfos featureInfos;
 

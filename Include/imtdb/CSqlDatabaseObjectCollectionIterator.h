@@ -21,7 +21,7 @@ class CSqlDatabaseObjectCollectionIterator: virtual public imtbase::IObjectColle
 {
 	typedef imtbase::IObjectCollection::DataPtr DataPtr;
 public:
-	CSqlDatabaseObjectCollectionIterator(QSqlQuery sqlQuery, ISqlDatabaseObjectDelegate* databaseDelegate);
+	CSqlDatabaseObjectCollectionIterator(QSqlQuery& sqlQuery, ISqlDatabaseObjectDelegate* databaseDelegate);
 
 	// reimplemented (imtbase::IObjectCollectionIterator)
 	virtual bool Next() override;

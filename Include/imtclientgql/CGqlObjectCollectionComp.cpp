@@ -2,9 +2,6 @@
 
 
 // Qt includes
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonArray>
 #include <QtNetwork/QNetworkReply>
 
 // ACF includes
@@ -13,9 +10,7 @@
 
 // ImtCore includes
 #include <imtbase/CTempDir.h>
-#include <imtcom/CRequestSender.h>
 #include <imtgql/CGqlRequest.h>
-#include <imtclientgql/CGqlObjectCollectionInfo.h>
 #include <imtgql/IGqlPrimitiveTypeResponse.h>
 #include <imtgql/IGqlStructuredCollectionResponse.h>
 #include <imtbase/CFilterCollectionProxy.h>
@@ -246,7 +241,7 @@ bool CGqlObjectCollectionComp::MoveNode(
 			const imtbase::IOperationContext* operationContextPtr)
 {
 	if (m_delegateCompPtr.IsValid()){
-		return  m_delegateCompPtr->MoveNode(
+		return m_delegateCompPtr->MoveNode(
 					nodeId,
 					parentNodeId,
 					operationContextPtr);
@@ -535,7 +530,7 @@ idoc::MetaInfoPtr CGqlObjectCollectionComp::GetDataMetaInfo(const Id& objectId) 
 
 // reimplemented (ICollectionInfo)
 
-int CGqlObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* selectionParamsPtr) const
+int CGqlObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* selectionParamsPtr, ilog::IMessageConsumer* logPtr) const
 {
 	if (m_delegateCompPtr.IsValid()){
 		return m_delegateCompPtr->GetElementCount(selectionParamsPtr);
@@ -548,7 +543,8 @@ int CGqlObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* selection
 imtbase::ICollectionInfo::Ids CGqlObjectCollectionComp::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamsPtr) const
+			const iprm::IParamsSet* selectionParamsPtr,
+			ilog::IMessageConsumer* logPtr) const
 {
 	imtbase::ICollectionInfo::Ids retVal;
 
@@ -567,13 +563,18 @@ imtbase::ICollectionInfo::Ids CGqlObjectCollectionComp::GetElementIds(
 }
 
 
-bool CGqlObjectCollectionComp::GetSubsetInfo(ICollectionInfo& /*subsetInfo*/, int /*offset*/, int /*count*/, const iprm::IParamsSet* /*selectionParamsPtr*/) const
+bool CGqlObjectCollectionComp::GetSubsetInfo(
+			ICollectionInfo& /*subsetInfo*/,
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return false;
 }
 
 
-QVariant CGqlObjectCollectionComp::GetElementInfo(const Id& elementId, int infoType) const
+QVariant CGqlObjectCollectionComp::GetElementInfo(const Id& elementId, int infoType, ilog::IMessageConsumer* logPtr) const
 {
 	imtgql::IGqlStructuredCollectionResponse::ObjectInfo info;
 	bool isValid = false;
@@ -603,7 +604,7 @@ QVariant CGqlObjectCollectionComp::GetElementInfo(const Id& elementId, int infoT
 }
 
 
-idoc::MetaInfoPtr CGqlObjectCollectionComp::GetElementMetaInfo(const Id& elementId) const
+idoc::MetaInfoPtr CGqlObjectCollectionComp::GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* logPtr) const
 {
 	idoc::MetaInfoPtr metaInfoPtr;
 
@@ -625,7 +626,7 @@ idoc::MetaInfoPtr CGqlObjectCollectionComp::GetElementMetaInfo(const Id& element
 }
 
 
-bool CGqlObjectCollectionComp::SetElementName(const Id& elementId, const QString& name)
+bool CGqlObjectCollectionComp::SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* logPtr)
 {
 	if (m_delegateCompPtr.IsValid()){
 		istd::TDelPtr<imtgql::IGqlRequest> requestPtr;
@@ -643,7 +644,7 @@ bool CGqlObjectCollectionComp::SetElementName(const Id& elementId, const QString
 }
 
 
-bool CGqlObjectCollectionComp::SetElementDescription(const Id& elementId, const QString& description)
+bool CGqlObjectCollectionComp::SetElementDescription(const Id& elementId, const QString& description, ilog::IMessageConsumer* logPtr)
 {
 	if (m_delegateCompPtr.IsValid()){
 		istd::TDelPtr<imtgql::IGqlRequest> requestPtr;
@@ -661,7 +662,7 @@ bool CGqlObjectCollectionComp::SetElementDescription(const Id& elementId, const 
 }
 
 
-bool CGqlObjectCollectionComp::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/)
+bool CGqlObjectCollectionComp::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }

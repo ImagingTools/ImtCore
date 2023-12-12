@@ -53,7 +53,7 @@ public:
 	virtual bool RemoveElement(const Id& elementId, const imtbase::IOperationContext* operationContextPtr = nullptr) override;
 
 	// reimplemented (ICollectionInfo)
-	virtual bool SetElementName(const Id& elementId, const QString& name) override;
+	virtual bool SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* logPtr = nullptr) override;
 
 	// reimplemented (ICollectionDataController)
 	virtual bool ExportFile(const imtbase::IObjectCollection& collection, const Id& objectId, const QString& targetFilePath = QString()) const override;

@@ -69,21 +69,23 @@ public:
 	virtual idoc::MetaInfoPtr GetDataMetaInfo(const Id& objectId) const override;
 
 	// reimplemented (ICollectionInfo)
-	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr) const override;
+	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamPtr = nullptr, ilog::IMessageConsumer* logPtr = nullptr) const override;
 	virtual Ids GetElementIds(
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				ilog::IMessageConsumer* logPtr = nullptr) const override;
 	virtual bool GetSubsetInfo(
 				imtbase::ICollectionInfo& subsetInfo,
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
-	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType) const override;
-	virtual idoc::MetaInfoPtr GetElementMetaInfo(const Id& elementId) const override;
-	virtual bool SetElementName(const QByteArray& objectId, const QString& objectName) override;
-	virtual bool SetElementDescription(const QByteArray& objectId, const QString& objectDescription) override;
-	virtual bool SetElementEnabled(const QByteArray& objectId, bool isEnabled = true) override;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				ilog::IMessageConsumer* logPtr = nullptr) const override;
+	virtual QVariant GetElementInfo(const QByteArray& elementId, int infoType, ilog::IMessageConsumer* logPtr = nullptr) const override;
+	virtual idoc::MetaInfoPtr GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* logPtr = nullptr) const override;
+	virtual bool SetElementName(const QByteArray& objectId, const QString& objectName, ilog::IMessageConsumer* logPtr = nullptr) override;
+	virtual bool SetElementDescription(const QByteArray& objectId, const QString& objectDescription, ilog::IMessageConsumer* logPtr = nullptr) override;
+	virtual bool SetElementEnabled(const QByteArray& objectId, bool isEnabled = true, ilog::IMessageConsumer* logPtr = nullptr) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -263,9 +265,9 @@ inline idoc::MetaInfoPtr TAggergatedObjectCollectionWrap<BaseInterface, ObjectIm
 // reimplemented (ICollectionInfo)
 
 template<class BaseInterface, class ObjectImpl>
-inline int TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementsCount(const iprm::IParamsSet* selectionParamPtr) const
+inline int TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementsCount(const iprm::IParamsSet* selectionParamPtr, ilog::IMessageConsumer* logPtr) const
 {
-	return m_collection.GetElementsCount(selectionParamPtr);
+	return m_collection.GetElementsCount(selectionParamPtr, logPtr);
 }
 
 
@@ -273,55 +275,57 @@ template<class BaseInterface, class ObjectImpl>
 inline imtbase::ICollectionInfo::Ids TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* selectionParamsPtr) const
+			const iprm::IParamsSet* selectionParamsPtr,
+			ilog::IMessageConsumer* logPtr) const
 {
-	return m_collection.GetElementIds(offset, count, selectionParamsPtr);
+	return m_collection.GetElementIds(offset, count, selectionParamsPtr, logPtr);
 }
 
 
 template<class BaseInterface, class ObjectImpl>
 inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetSubsetInfo(
-			imtbase::ICollectionInfo& /*subsetInfo*/,
-			int /*offset*/,
-			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			imtbase::ICollectionInfo& subsetInfo,
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr,
+			ilog::IMessageConsumer* logPtr) const
 {
-	return false;
+	return m_collection.GetSubsetInfo(subsetInfo, offset, count, selectionParamsPtr, logPtr);
 }
 
 
 template<class BaseInterface, class ObjectImpl>
-inline QVariant TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementInfo(const QByteArray& elementId, int infoType) const
+inline QVariant TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementInfo(const QByteArray& elementId, int infoType, ilog::IMessageConsumer* logPtr) const
 {
-	return m_collection.GetElementInfo(elementId, infoType);
+	return m_collection.GetElementInfo(elementId, infoType, logPtr);
 }
 
 
 template<class BaseInterface, class ObjectImpl>
-inline idoc::MetaInfoPtr TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementMetaInfo(const Id& elementId) const
+inline idoc::MetaInfoPtr TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* logPtr) const
 {
-	return m_collection.GetElementMetaInfo(elementId);
+	return m_collection.GetElementMetaInfo(elementId, logPtr);
 }
 
 
 template<class BaseInterface, class ObjectImpl>
-inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetElementName(const QByteArray& objectId, const QString& objectName)
+inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetElementName(const QByteArray& objectId, const QString& objectName, ilog::IMessageConsumer* logPtr)
 {
-	return m_collection.SetElementName(objectId, objectName);
+	return m_collection.SetElementName(objectId, objectName, logPtr);
 }
 
 
 template<class BaseInterface, class ObjectImpl>
-inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetElementDescription(const QByteArray& objectId, const QString& objectDescription)
+inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetElementDescription(const QByteArray& objectId, const QString& objectDescription, ilog::IMessageConsumer* logPtr)
 {
-	return m_collection.SetElementDescription(objectId, objectDescription);
+	return m_collection.SetElementDescription(objectId, objectDescription, logPtr);
 }
 
 
 template<class BaseInterface, class ObjectImpl>
-inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetElementEnabled(const QByteArray& objectId, bool isEnabled)
+inline bool TAggergatedObjectCollectionWrap<BaseInterface, ObjectImpl>::SetElementEnabled(const QByteArray& objectId, bool isEnabled, ilog::IMessageConsumer* logPtr)
 {
-	return m_collection.SetElementEnabled(objectId, isEnabled);
+	return m_collection.SetElementEnabled(objectId, isEnabled, logPtr);
 }
 
 

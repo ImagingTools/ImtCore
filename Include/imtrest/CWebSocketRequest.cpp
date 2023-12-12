@@ -36,8 +36,8 @@ CWebSocketRequest::CWebSocketRequest(const IRequestServlet& handler, const IProt
 
 CWebSocketRequest::~CWebSocketRequest()
 {
-	for (int index = 0; index < m_destroyObserverList.count(); index++){
-		m_destroyObserverList[index]->OnRequestDestroyed(this);
+	for (int index = 0; index < m_requestEventHandlers.count(); index++){
+		m_requestEventHandlers[index]->OnRequestDestroyed(this);
 	}
 }
 
@@ -154,9 +154,11 @@ QByteArray CWebSocketRequest::GetSubscriptionId() const
 }
 
 
-void CWebSocketRequest::RegisterDestroyObserver(IDestroyObserver* destroyObserver)
+void CWebSocketRequest::RegisterRequestEventHandler(IRequestEventHandler* requestEventHandler)
 {
-	m_destroyObserverList.append(destroyObserver);
+	Q_ASSERT(requestEventHandler != nullptr);
+
+	m_requestEventHandlers.append(requestEventHandler);
 }
 
 

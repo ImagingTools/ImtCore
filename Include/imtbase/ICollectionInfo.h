@@ -7,6 +7,7 @@
 #include <QtCore/QVariant>
 
 // ACF includes
+#include <ilog/IMessageConsumer.h>
 #include <idoc/IDocumentMetaInfo.h>
 #include <iprm/IParamsSet.h>
 #include <istd/IChangeable.h>
@@ -130,7 +131,9 @@ public:
 	/**
 		Get number of elements in the collection
 	*/
-	virtual int GetElementsCount(const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
+	virtual int GetElementsCount(
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				ilog::IMessageConsumer* logPtr = nullptr) const = 0;
 
 	/**
 		Get IDs of the elements inside the collection for parent.
@@ -142,7 +145,8 @@ public:
 	virtual Ids GetElementIds(
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				ilog::IMessageConsumer* logPtr = nullptr) const = 0;
 	/**
 		Get information about the subset of the whole collection according to the given filtering/sorting parameters.
 		\param subsetInfo		collection information for the data subset.
@@ -155,12 +159,13 @@ public:
 				ICollectionInfo& subsetInfo,
 				int offset = 0,
 				int count = -1,
-				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
+				const iprm::IParamsSet* selectionParamsPtr = nullptr,
+				ilog::IMessageConsumer* logPtr = nullptr) const = 0;
 
 	/**
 		Get information about a given element.
 	*/
-	virtual QVariant GetElementInfo(const Id& elementId, int infoType) const = 0;
+	virtual QVariant GetElementInfo(const Id& elementId, int infoType, ilog::IMessageConsumer* logPtr = nullptr) const = 0;
 
 	/**
 		Get meta-information of the element in the collection.
@@ -168,22 +173,22 @@ public:
 		\param metaInfo			Meta-info to be filled by this method.
 		\return \c true if the operation was successful, and \c false if no information could be provided.
 	*/
-	virtual idoc::MetaInfoPtr GetElementMetaInfo(const Id& elementId) const = 0;
+	virtual idoc::MetaInfoPtr GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* logPtr = nullptr) const = 0;
 
 	/**
 		Set name of the element with the given ID.
 	*/
-	virtual bool SetElementName(const Id& elementId, const QString& name) = 0;
+	virtual bool SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* logPtr = nullptr) = 0;
 
 	/**
 		Set description of the element with the given ID.
 	*/
-	virtual bool SetElementDescription(const Id& elementId, const QString& description) = 0;
+	virtual bool SetElementDescription(const Id& elementId, const QString& description, ilog::IMessageConsumer* logPtr = nullptr) = 0;
 
 	/**
 		Enable/Disable element with the given ID.
 	*/
-	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true) = 0;
+	virtual bool SetElementEnabled(const Id& elementId, bool isEnabled = true, ilog::IMessageConsumer* logPtr = nullptr) = 0;
 };
 
 

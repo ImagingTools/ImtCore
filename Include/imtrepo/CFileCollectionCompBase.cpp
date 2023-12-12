@@ -673,7 +673,7 @@ idoc::MetaInfoPtr CFileCollectionCompBase::GetDataMetaInfo(const Id& objectId) c
 
 // reimplemented (ICollectionInfo)
 
-int CFileCollectionCompBase::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
+int CFileCollectionCompBase::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	m_filesLock.lockForRead();
 
@@ -688,7 +688,8 @@ int CFileCollectionCompBase::GetElementsCount(const iprm::IParamsSet* /*selectio
 imtbase::ICollectionInfo::Ids CFileCollectionCompBase::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	Ids retVal;
 
@@ -710,13 +711,14 @@ bool CFileCollectionCompBase::GetSubsetInfo(
 			imtbase::ICollectionInfo& /*subsetInfo*/,
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return false;
 }
 
 
-QVariant CFileCollectionCompBase::GetElementInfo(const QByteArray& elementId, int infoType) const
+QVariant CFileCollectionCompBase::GetElementInfo(const QByteArray& elementId, int infoType, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	QReadLocker locker(&m_filesLock);
 
@@ -737,7 +739,7 @@ QVariant CFileCollectionCompBase::GetElementInfo(const QByteArray& elementId, in
 }
 
 
-idoc::MetaInfoPtr CFileCollectionCompBase::GetElementMetaInfo(const Id& elementId) const
+idoc::MetaInfoPtr CFileCollectionCompBase::GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	idoc::MetaInfoPtr metaInfoPtr;
 
@@ -760,13 +762,13 @@ idoc::MetaInfoPtr CFileCollectionCompBase::GetElementMetaInfo(const Id& elementI
 }
 
 
-bool CFileCollectionCompBase::SetElementName(const Id& /*elementId*/, const QString& /*name*/)
+bool CFileCollectionCompBase::SetElementName(const Id& /*elementId*/, const QString& /*name*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
 
 
-bool CFileCollectionCompBase::SetElementDescription(const Id& elementId, const QString& description)
+bool CFileCollectionCompBase::SetElementDescription(const Id& elementId, const QString& description, ilog::IMessageConsumer* /*logPtr*/)
 {
 	QWriteLocker locker(&m_filesLock);
 
@@ -795,7 +797,7 @@ bool CFileCollectionCompBase::SetElementDescription(const Id& elementId, const Q
 }
 
 
-bool CFileCollectionCompBase::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/)
+bool CFileCollectionCompBase::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }

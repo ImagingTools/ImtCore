@@ -451,7 +451,7 @@ bool CFileCollectionComp::RemoveElement(const Id& elementId, const imtbase::IOpe
 
 // reimplemented (ICollectionInfo)
 
-bool CFileCollectionComp::SetElementName(const Id& elementId, const QString& name)
+bool CFileCollectionComp::SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* /*logPtr*/)
 {
 	QWriteLocker locker(&m_filesLock);
 
@@ -1021,7 +1021,9 @@ void CFileCollectionComp::OnComponentDestroyed()
 
 // reimplemented (imtbase::ICollectionInfo)
 
-int CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
+int CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementsCount(
+			const iprm::IParamsSet* /*selectionParamPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	QReadLocker locker(&m_lock);
 
@@ -1032,7 +1034,8 @@ int CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementsCount(const 
 imtbase::ICollectionInfo::Ids CFileCollectionComp::RepositoryItemInfoProvider::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	QReadLocker locker(&m_lock);
 
@@ -1054,37 +1057,38 @@ bool CFileCollectionCompBase::RepositoryItemInfoProvider::GetSubsetInfo(
 			imtbase::ICollectionInfo& /*subsetInfo*/,
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return false;
 }
 
 
-QVariant CFileCollectionComp::RepositoryItemInfoProvider::GetElementInfo(const QByteArray& /*elementId*/, int /*infoType*/) const
+QVariant CFileCollectionComp::RepositoryItemInfoProvider::GetElementInfo(const QByteArray& /*elementId*/, int /*infoType*/, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return QVariant();
 }
 
 
-idoc::MetaInfoPtr CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementMetaInfo(const Id& /*elementId*/) const
+idoc::MetaInfoPtr CFileCollectionCompBase::RepositoryItemInfoProvider::GetElementMetaInfo(const Id& /*elementId*/, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return idoc::MetaInfoPtr();
 }
 
 
-bool CFileCollectionCompBase::RepositoryItemInfoProvider::SetElementName(const Id& /*elementId*/, const QString& /*name*/)
+bool CFileCollectionCompBase::RepositoryItemInfoProvider::SetElementName(const Id& /*elementId*/, const QString& /*name*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
 
 
-bool CFileCollectionCompBase::RepositoryItemInfoProvider::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/)
+bool CFileCollectionCompBase::RepositoryItemInfoProvider::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
 
 
-bool CFileCollectionCompBase::RepositoryItemInfoProvider::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/)
+bool CFileCollectionCompBase::RepositoryItemInfoProvider::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }

@@ -341,7 +341,9 @@ idoc::MetaInfoPtr CObjectCollectionBase::GetDataMetaInfo(const Id& objectId) con
 
 // reimplemented (ICollectionInfo)
 
-int CObjectCollectionBase::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
+int CObjectCollectionBase::GetElementsCount(
+			const iprm::IParamsSet* /*selectionParamPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	QReadLocker locker(&m_lock);
 
@@ -352,7 +354,8 @@ int CObjectCollectionBase::GetElementsCount(const iprm::IParamsSet* /*selectionP
 ICollectionInfo::Ids CObjectCollectionBase::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	Ids retVal;
 
@@ -374,13 +377,14 @@ bool CObjectCollectionBase::GetSubsetInfo(
 			ICollectionInfo& /*subsetInfo*/,
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return false;
 }
 
 
-QVariant CObjectCollectionBase::GetElementInfo(const Id& elementId, int infoType) const
+QVariant CObjectCollectionBase::GetElementInfo(const Id& elementId, int infoType, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	QReadLocker locker(&m_lock);
 
@@ -409,7 +413,7 @@ QVariant CObjectCollectionBase::GetElementInfo(const Id& elementId, int infoType
 }
 
 
-idoc::MetaInfoPtr CObjectCollectionBase::GetElementMetaInfo(const Id& elementId) const
+idoc::MetaInfoPtr CObjectCollectionBase::GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	QReadLocker locker(&m_lock);
 
@@ -425,7 +429,7 @@ idoc::MetaInfoPtr CObjectCollectionBase::GetElementMetaInfo(const Id& elementId)
 }
 
 
-bool CObjectCollectionBase::SetElementName(const Id& elementId, const QString& objectName)
+bool CObjectCollectionBase::SetElementName(const Id& elementId, const QString& objectName, ilog::IMessageConsumer* /*logPtr*/)
 {
 	QReadLocker locker(&m_lock);
 
@@ -454,7 +458,7 @@ bool CObjectCollectionBase::SetElementName(const Id& elementId, const QString& o
 }
 
 
-bool CObjectCollectionBase::SetElementDescription(const Id& elementId, const QString& objectDescription)
+bool CObjectCollectionBase::SetElementDescription(const Id& elementId, const QString& objectDescription, ilog::IMessageConsumer* /*logPtr*/)
 {
 	QReadLocker locker(&m_lock);
 
@@ -483,7 +487,7 @@ bool CObjectCollectionBase::SetElementDescription(const Id& elementId, const QSt
 }
 
 
-bool CObjectCollectionBase::SetElementEnabled(const Id& elementId, bool isEnabled)
+bool CObjectCollectionBase::SetElementEnabled(const Id& elementId, bool isEnabled, ilog::IMessageConsumer* /*logPtr*/)
 {
 	QReadLocker locker(&m_lock);
 

@@ -101,7 +101,7 @@ idoc::MetaInfoPtr CSimpleReferenceCollection::GetDataMetaInfo(const Id& /*object
 
 // reimplemented (imtbase::ICollectionInfo)
 
-int CSimpleReferenceCollection::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/) const
+int CSimpleReferenceCollection::GetElementsCount(const iprm::IParamsSet* /*selectionParamPtr*/, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return m_references.count();
 }
@@ -110,7 +110,8 @@ int CSimpleReferenceCollection::GetElementsCount(const iprm::IParamsSet* /*selec
 imtbase::ICollectionInfo::Ids CSimpleReferenceCollection::GetElementIds(
 			int offset,
 			int count,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	Ids retVal;
 
@@ -130,13 +131,14 @@ bool CSimpleReferenceCollection::GetSubsetInfo(
 			imtbase::ICollectionInfo& /*subsetInfo*/,
 			int /*offset*/,
 			int /*count*/,
-			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return false;
 }
 
 
-QVariant CSimpleReferenceCollection::GetElementInfo(const QByteArray& elementId, int infoType) const
+QVariant CSimpleReferenceCollection::GetElementInfo(const QByteArray& elementId, int infoType, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	int index = FindReference(elementId);
 	if (index >= 0){
@@ -153,25 +155,25 @@ QVariant CSimpleReferenceCollection::GetElementInfo(const QByteArray& elementId,
 }
 
 
-idoc::MetaInfoPtr CSimpleReferenceCollection::GetElementMetaInfo(const Id& /*elementId*/) const
+idoc::MetaInfoPtr CSimpleReferenceCollection::GetElementMetaInfo(const Id& /*elementId*/, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	return idoc::MetaInfoPtr();
 }
 
 
-bool CSimpleReferenceCollection::SetElementName(const Id& /*elementId*/, const QString& /*name*/)
+bool CSimpleReferenceCollection::SetElementName(const Id& /*elementId*/, const QString& /*name*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
 
 
-bool CSimpleReferenceCollection::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/)
+bool CSimpleReferenceCollection::SetElementDescription(const Id& /*elementId*/, const QString& /*description*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }
 
 
-bool CSimpleReferenceCollection::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/)
+bool CSimpleReferenceCollection::SetElementEnabled(const Id& /*elementId*/, bool /*isEnabled*/, ilog::IMessageConsumer* /*logPtr*/)
 {
 	return false;
 }

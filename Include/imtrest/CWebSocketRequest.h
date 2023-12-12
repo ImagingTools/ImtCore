@@ -11,23 +11,23 @@
 // ImtCore includes
 #include <imtrest/IRequest.h>
 #include <imtrest/IRequestServlet.h>
-#include <imtrest/http_parser.h>
 
 
 namespace imtrest
 {
 
 
+class IRequestEventHandler: public istd::IPolymorphic
+{
+public:
+	virtual void OnRequestDestroyed(IRequest* request) = 0;
+};
+
+
 class CWebSocketRequest: public QObject, virtual public IRequest
 {
 	Q_OBJECT
 public:
-	class IDestroyObserver
-	{
-		public:
-		virtual void OnRequestDestroyed(CWebSocketRequest* webSocketRequest) = 0;
-	};
-
 	enum MethodType
 	{
 		MT_UNKNOWN = 0,
@@ -57,7 +57,7 @@ public:
 	void SetRequestHandler(const IRequestServlet* requestHandlerPtr);
 	MethodType GetMethodType() const;
 	QByteArray GetSubscriptionId() const;
-	void RegisterDestroyObserver(IDestroyObserver* destroyObserver);
+	void RegisterRequestEventHandler(IRequestEventHandler* requestEventHandler);
 
 	// reimplemented (IRequest)
 	virtual RequestState GetState() const override;
@@ -89,7 +89,7 @@ private:
 	HeaderMap m_headers;
 
 	QByteArray m_lastHeader;
-	QList<IDestroyObserver*> m_destroyObserverList;
+	QList<IRequestEventHandler*> m_requestEventHandlers;
 	QByteArray m_requestId;
 };
 
