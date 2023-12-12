@@ -55,24 +55,6 @@ bool CDatabaseAutomaticBackupComp::Backup()
 	QString userName = m_databaseLoginSettingsCompPtr->GetUserName();
 	int port = m_databaseLoginSettingsCompPtr->GetPort();
 
-	QProcess process(0);
-
-	QString program = "pg_dump";
-	QStringList arguments;
-
-	arguments << "-h";
-	arguments << host;
-
-	arguments << "-p";
-	arguments << QString::number(port);
-
-	arguments << "-U";
-	arguments << userName;
-
-	arguments << "-b";
-	arguments << "-v";
-	arguments << "-f";
-
 	iprm::TParamsPtr<ifile::IFileNameParam> fileNameParamPtr(m_backupSettingsCompPtr.GetPtr(), "BackupFolder");
 
 	QString backupFolderPath = ".";
@@ -87,20 +69,27 @@ bool CDatabaseAutomaticBackupComp::Backup()
 
 	QString fmt = "yyyyMMddhhmmss";
 	QString fileName = dbName + "_" + QDateTime::currentDateTime().toString(fmt);
-	arguments << backupFolderPath + "/" + fileName;
 
-	arguments << dbName;
+	QString pgDumpCommand = QString("pg_dump -h %1 -U %2 -p %3 -b -v -f \"%4\" \"%5\"")
+				.arg(host)
+				.arg(userName)
+				.arg(QString::number(port))
+				.arg(backupFolderPath + "/" + fileName)
+				.arg(dbName);
+
+	QProcess process;
 
 	QStringList envList;
 	envList << "PGPASSWORD=" + password;
 	process.setEnvironment(envList);
 
-	process.start(*m_programAttrPtr, arguments);
+	process.start(pgDumpCommand);
+
+	if(!process.waitForFinished()){
+		return false;
+	}
 
 	m_lastBackupDateTime = QDateTime::currentDateTime();
-
-//	process.waitForStarted();
-//	process.waitForFinished();
 
 	return true;
 }

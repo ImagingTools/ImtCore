@@ -182,11 +182,11 @@ bool CRestoringDatabaseControllerComp::GetData(
 	QString filePathTmp = tempDir.path() + "/" + QUuid::createUuid().toString() + ".backup";
 
 	QString pgDumpCommand = QString("pg_dump -h %1 -U %2 -p %3 -b -v -f \"%4\" \"%5\"")
-			.arg(host)
-			.arg(userName)
-			.arg(QString::number(port))
-			.arg(filePathTmp)
-			.arg(dbName);
+				.arg(host)
+				.arg(userName)
+				.arg(QString::number(port))
+				.arg(filePathTmp)
+				.arg(dbName);
 
 	if (!ExecuteCommand(process, pgDumpCommand)){
 		SendErrorMessage(0, QString("Unable to execute command %1").arg(pgDumpCommand), "CRestoringDatabaseControllerComp");
