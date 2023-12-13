@@ -124,10 +124,10 @@ I_EXPORT_COMPONENT(
 			"Parameter link controller",
 			"Parameter Controller");
 
-I_EXPORT_COMPONENT(
-			ObjectCollectionBasedPersistence,
-			"Object collection based persistence",
-			"Object Collection Persistence");
+// I_EXPORT_COMPONENT(
+// 			ObjectCollectionBasedPersistence,
+// 			"Object collection based persistence",
+// 			"Object Collection Persistence");
 
 I_EXPORT_COMPONENT(
 			TimeFilterParam,
@@ -238,6 +238,11 @@ I_EXPORT_COMPONENT(
 			DelegatedBinaryDataProviders,
 			"Delegated provider of a slave data provider",
 			"Delegator Data Binary Provider");
+
+I_EXPORT_COMPONENT(
+            HierarchicalStructure,
+            "Hierarchical structure",
+            "Hierarchical Structure");
 
 
 } // namespace ImtCorePck

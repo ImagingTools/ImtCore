@@ -1,4 +1,4 @@
-project(ImtCoreObjectCollectionTest)
+project(StructureTest)
 
 include(${ACFDIR}/Config/CMake/ApplicationConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
@@ -12,8 +12,8 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test)
 
 target_link_libraries(${PROJECT_NAME} Qt${QT_VERSION_MAJOR}::Test)
 
-imtcore_generate_tests(${TESTS_DIR}/ObjectCollectionTest)
-# file(COPY ../../Migrations DESTINATION ${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
+imtcore_generate_tests(${TESTS_DIR}/StructureTest)
+# file(COPY Migrations DESTINATION ${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
 if(WIN32)
         set(listFiles \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
 

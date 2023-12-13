@@ -59,6 +59,11 @@ I_EXPORT_COMPONENT(
 		"Subscription controller",
 		"Subscription Controller");
 
+I_EXPORT_COMPONENT(
+        GqlStructureDelegate,
+        "GraphQl structure delegate",
+        "GraphQl Structure Delegate");
+
 
 } // namespace ImtClientGqlPck
 

@@ -1,0 +1,1 @@
+ALTER TABLE "Tests" ADD COLUMN LongDescription VARCHAR(1000);

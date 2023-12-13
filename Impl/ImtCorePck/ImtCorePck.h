@@ -26,7 +26,7 @@
 #include <imtbase/CTextParamSummaryRepresentationControllerComp.h>
 #include <imtbase/CBinaryDataProviderComp.h>
 #include <imtbase/CParameterLinkControllerComp.h>
-#include <imtbase/CObjectCollectionBasedPersistenceComp.h>
+// #include <imtbase/CObjectCollectionBasedPersistenceComp.h>
 #include <imtbase/CTimeFilterParam.h>
 #include <imtbase/CCollectionDataControllerComp.h>
 #include <imtbase/CQtResourceLoaderComp.h>
@@ -50,6 +50,7 @@
 #include <imtbase/CSystemStatusComp.h>
 #include <imtbase/CCachedObjectCollectionComp.h>
 #include <imtbase/CDelegatedBinaryDataProviderComp.h>
+#include <imtbase/CCollectionStructureComp.h>
 
 
 /**
@@ -88,7 +89,7 @@ typedef imtbase::CNumericParamSummaryRepresentationControllerComp NumericParamSu
 typedef imtbase::CTextParamSummaryRepresentationControllerComp TextParamSummaryRepresentationController;
 typedef imtbase::CBinaryDataProviderComp BinaryDataProvider;
 typedef ibase::TModelObserverCompWrap<imtbase::CParameterLinkControllerComp> ParameterLinkController;
-typedef imtbase::CObjectCollectionBasedPersistenceComp ObjectCollectionBasedPersistence;
+// typedef imtbase::CObjectCollectionBasedPersistenceComp ObjectCollectionBasedPersistence;
 typedef icomp::TModelCompWrap<
 			icomp::TMakeComponentWrap<
 						imtbase::CTimeFilterParam,
@@ -115,6 +116,7 @@ typedef icomp::TModelCompWrap<imtbase::CSelectionAdapterComp> SelectionAdapter;
 typedef icomp::TModelCompWrap<imtbase::CSelectionParamAdapterComp> SelectionParamAdapter;
 typedef icomp::TModelCompWrap<imtbase::CSystemStatusComp> SystemStatus;
 typedef imtbase::CDelegatedBinaryDataProviderComp DelegatedBinaryDataProviders;
+typedef imtbase::CCollectionStructureComp HierarchicalStructure;
 
 
 } // namespace ImtCorePck

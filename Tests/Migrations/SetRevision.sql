@@ -1,0 +1,1 @@
+INSERT INTO "Revisions" (Revision) VALUES (:Revision);

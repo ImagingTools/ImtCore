@@ -17,6 +17,7 @@ class ICollectionStructure;
 class IRevisionController;
 class ICollectionDataController;
 class IObjectCollectionIterator;
+class ICollectionStructure;
 
 
 /**

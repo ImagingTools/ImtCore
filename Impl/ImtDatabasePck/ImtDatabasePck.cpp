@@ -65,6 +65,11 @@ I_EXPORT_COMPONENT(
 			"Restoring database controller",
 			"Restoring Restore Database Controller PostreSQL psql");
 
+I_EXPORT_COMPONENT(
+			SqlStructureDelegate,
+			"Delegate for the json-oriented hierarchical structure tables",
+			"Database Delegate Structure Json SQL");
+
 
 } // namespace ImtDatabasePck
 

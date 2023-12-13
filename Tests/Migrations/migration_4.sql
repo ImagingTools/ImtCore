@@ -1,0 +1,1 @@
+ALTER TABLE "Tests" DROP COLUMN LongDescription;

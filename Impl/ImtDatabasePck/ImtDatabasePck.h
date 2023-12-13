@@ -16,6 +16,7 @@
 #include <imtdb/CRemoteDatabaseServerConnectionComp.h>
 #include <imtdb/CDatabaseServerConnectionControllerComp.h>
 #include <imtdb/CRestoringDatabaseControllerComp.h>
+#include <imtdb/CSqlStructureDelegateComp.h>
 
 
 /**
@@ -35,6 +36,7 @@ typedef imtdb::CDatabaseAutomaticBackupComp DatabaseAutomaticBackup;
 typedef imtdb::CRemoteDatabaseServerConnectionComp RemoteDatabaseServerConnection;
 typedef imtdb::CDatabaseServerConnectionControllerComp DatabaseServerConnectionController;
 typedef imtdb::CRestoringDatabaseControllerComp RestoringDatabaseController;
+typedef imtdb::CSqlStructureDelegateComp SqlStructureDelegate;
 
 
 } // namespace ImtDatabasePck

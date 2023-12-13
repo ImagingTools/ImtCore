@@ -18,9 +18,11 @@
 #include <imtbase/ICollectionDataController.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IMetaInfoCreator.h>
-#include <imtbase/TICollectionStructure.h>
-#include <imtbase/TIStructuredCollectionInfo.h>
-#include <imtbase/IStructuredCollectionInserter.h>
+// #include <imtbase/TICollectionStructure.h>
+// #include <imtbase/TIStructuredCollectionInfo.h>
+// #include <imtbase/IStructuredCollectionInserter.h>
+#include <imtbase/ICollectionStructure.h>
+#include <imtbase/ICollectionStructureController.h>
 
 
 namespace imtbase
@@ -37,10 +39,9 @@ class CGqlObjectCollectionComp:
 			public QObject,
 			public ilog::TLoggerCompWrap<icomp::CComponentBase>,
 			virtual public imtbase::IObjectCollection,
-			virtual public imtbase::IObjectCollectionStructure,
-			virtual public imtbase::IStructuredObjectCollectionInfo,
-			virtual public imtbase::IStructuredCollectionInserter,
-			virtual public imtbase::IStructuredCollectionFinder,
+			// virtual public imtbase::ICollectionStructure,
+			// virtual public imtbase::ICollectionStructureInfo,
+			// virtual public imtbase::ICollectionStructureController,
 			virtual public IGqlSubscriptionClient
 {
 	Q_OBJECT
@@ -48,9 +49,9 @@ public:
 	typedef ilog::TLoggerCompWrap<icomp::CComponentBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlObjectCollectionComp);
-		I_REGISTER_INTERFACE(imtbase::IObjectCollectionStructure);
-		I_REGISTER_INTERFACE(imtbase::IObjectCollectionStructureInfo);
-		I_REGISTER_INTERFACE(imtbase::IStructuredCollectionInserter);
+		// I_REGISTER_INTERFACE(imtbase::ICollectionStructure);
+		// I_REGISTER_INTERFACE(imtbase::ICollectionStructureInfo);
+		// I_REGISTER_INTERFACE(imtbase::ICollectionStructureController);
 		I_REGISTER_INTERFACE(IGqlSubscriptionClient);
 		I_REGISTER_INTERFACE(IObjectCollection);
 		I_REGISTER_INTERFACE(IObjectCollectionInfo);
@@ -64,10 +65,10 @@ public:
 
 	CGqlObjectCollectionComp();
 
-	// reimplemented (imtbase::IStructuredCollectionFinder)
-	virtual QByteArrayList FindObjectParentNodes(const QByteArray& objectId) const override;
+	// // reimplemented (imtbase::IStructuredCollectionFinder)
+	// virtual QByteArrayList FindObjectParentNodes(const QByteArray& objectId) const override;
 
-	// reimpolemented (imtbase::IStructuredCollectionInserter)
+	// // reimpolemented (imtbase::IStructuredCollectionInserter)
 	virtual QByteArray InsertNewObject(
 				const QByteArray& typeId,
 				const QString& name,
@@ -77,57 +78,57 @@ public:
 				const Id& nodeId = Id(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+				const imtbase::IOperationContext* operationContextPtr = nullptr);
 
-	// reimpolemented (imtbase::TIStructuredCollectionInfo)
-	virtual ElementType GetElementType(const QByteArray& elementId) const override;
-	virtual QByteArrayList GetElementBasePath(const QByteArray& elementId) const override;
+	// // reimpolemented (imtbase::TIStructuredCollectionInfo)
+	// virtual ElementType GetElementType(const QByteArray& elementId) const override;
+	// virtual QByteArrayList GetElementBasePath(const QByteArray& elementId) const override;
 
-	// reimpolemented (imtbase::TICollectionStructure)
-	virtual QByteArray InsertNewNode(
-				const QString& name,
-				const QString& description = QString(),
-				const QByteArray& proposedNodeId = QByteArray(),
-				const QByteArray& parentNodeId = QByteArray(),
-				const idoc::IDocumentMetaInfo* metaInfoPtr = nullptr,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
-	virtual bool SetNodeName(
-				const QByteArray& nodeId,
-				const QString& name,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
-	virtual bool SetNodeDescription(
-				const QByteArray& nodeId,
-				const QString& description,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
-	virtual bool SetNodeMetaInfo(
-				const QByteArray& nodeId,
-				const idoc::IDocumentMetaInfo& metaInfo,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
-	virtual bool MoveNode(
-				const QByteArray& nodeId,
-				const QByteArray& parentNodeId,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
-	virtual bool RemoveNode(
-				const QByteArray& nodeId,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
-	virtual bool AddObjectToNode(
-				const QByteArray& objectId,
-				const QByteArray& nodeId,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
-	virtual bool MoveObjectToNode(
-				const QByteArray& objectId,
-				const QByteArray& fromNodeId,
-				const QByteArray& toNodeId,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
-	virtual bool RemoveObjectFromNode(
-				const QByteArray& objectId,
-				const QByteArray& nodeId,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	// // reimpolemented (imtbase::TICollectionStructure)
+	// virtual QByteArray InsertNewNode(
+	// 			const QString& name,
+	// 			const QString& description = QString(),
+	// 			const QByteArray& proposedNodeId = QByteArray(),
+	// 			const QByteArray& parentNodeId = QByteArray(),
+	// 			const idoc::IDocumentMetaInfo* metaInfoPtr = nullptr,
+	// 			const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	// virtual bool SetNodeName(
+	// 			const QByteArray& nodeId,
+	// 			const QString& name,
+	// 			const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	// virtual bool SetNodeDescription(
+	// 			const QByteArray& nodeId,
+	// 			const QString& description,
+	// 			const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	// virtual bool SetNodeMetaInfo(
+	// 			const QByteArray& nodeId,
+	// 			const idoc::IDocumentMetaInfo& metaInfo,
+	// 			const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	// virtual bool MoveNode(
+	// 			const QByteArray& nodeId,
+	// 			const QByteArray& parentNodeId,
+	// 			const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	// virtual bool RemoveNode(
+	// 			const QByteArray& nodeId,
+	// 			const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	// virtual bool AddObjectToNode(
+	// 			const QByteArray& objectId,
+	// 			const QByteArray& nodeId,
+	// 			const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	// virtual bool MoveObjectToNode(
+	// 			const QByteArray& objectId,
+	// 			const QByteArray& fromNodeId,
+	// 			const QByteArray& toNodeId,
+	// 			const imtbase::IOperationContext* operationContextPtr = nullptr) override;
+	// virtual bool RemoveObjectFromNode(
+	// 			const QByteArray& objectId,
+	// 			const QByteArray& nodeId,
+	// 			const imtbase::IOperationContext* operationContextPtr = nullptr) override;
 
-	// reimpolemented (imtbase::IObjectCollectionStructureInfo)
-	virtual QByteArrayList GetNodePath(const QByteArray& nodeId) const override;
-	virtual QSharedPointer<imtbase::IStructuredObjectCollectionInfo> GetNodeContent(const QByteArray& nodeId) const override;
-	virtual const imtbase::IStructuredCollectionFinder* GetCollectionFinder() const override;
+	// // reimpolemented (imtbase::IObjectCollectionStructureInfo)
+	// virtual QByteArrayList GetNodePath(const QByteArray& nodeId) const override;
+	// virtual QSharedPointer<imtbase::IStructuredObjectCollectionInfo> GetNodeContent(const QByteArray& nodeId) const override;
+	// virtual const imtbase::IStructuredCollectionFinder* GetCollectionFinder() const override;
 
 	// reimplemented (IObjectCollection)
 	virtual const imtbase::IRevisionController* GetRevisionController() const override;
@@ -194,7 +195,7 @@ protected:
 
 private:
 	IObjectCollection::DataPtr GetObject(const QByteArray& objectId, const QByteArray& typeId) const;
-	bool GetElementType(const QByteArray& elementId, ElementType& valueOut) const;
+	// bool GetElementType(const QByteArray& elementId, ElementType& valueOut) const;
 	bool GetNodeInfo(const QByteArray& nodeId, imtgql::IGqlStructuredCollectionResponse::NodeInfo& valueOut) const;
 	bool GetObjectInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& valueOut) const;
 	bool GetObjectMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const;
