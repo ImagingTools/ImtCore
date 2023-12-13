@@ -114,7 +114,12 @@ class Item extends QtObject {
 
             this.getProperty('visible').setOriginCompute(()=>{this.getProperty('visible').subscribe(parent.getProperty('visible')); return parent.getProperty('visible').get()})
             this.getProperty('visible').update()
+
+            this.getProperty('activeFocus').setCompute(()=>{this.getProperty('activeFocus').subscribe(this.getProperty('focus'));return this.getProperty('focus').get()})
+            this.getProperty('activeFocus').update()
         }
+
+        // this.getDom().onblur = (event) => {this.getProperty('focus').reset(false)}
     }
     
     createDom(tag = 'div', style){
@@ -179,7 +184,7 @@ class Item extends QtObject {
     }
 
     forceActiveFocus(){
-        
+        this.getProperty('focus').reset(true)
     }
 
     $clipChanged(){
@@ -205,7 +210,23 @@ class Item extends QtObject {
     }
 
     $focusChanged(){
+        if(this.getPropertyValue('focus')){
+            if(this.getPropertyValue('context').$focusedElement){
+                this.getPropertyValue('context').$focusedElement.getProperty('focus').reset(false)
+            }
+            this.getPropertyValue('context').$focusedElement = this
+        }
         
+        let parent = this.parent
+        while(parent){
+            if(parent instanceof FocusScope){
+                parent.getProperty('focus').reset(this.getPropertyValue('focus'))
+                break
+            } else {
+                parent = parent.parent
+            }
+        }
+        // this.getProperty('activeFocus').reset(this.getPropertyValue('focus'))
     }
 
     $activeFocusChanged(){

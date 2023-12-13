@@ -362,7 +362,7 @@ function preCompile(className, meta, on, instructions){
                 }
             }
             if(!find){
-                console.log(`Warning: class ${className} not found into file ${instructions.fileName}`)
+                // console.log(`Warning: class ${className} not found into file ${instructions.fileName}`)
                 for(let _className of classList){
                     if(_className === className || _className.split('_').pop() === className){
                         instructions.className = _className

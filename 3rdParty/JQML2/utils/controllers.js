@@ -20,11 +20,11 @@ class MouseController {
             this.onDoubleClick(e.pageX, e.pageY, e.button)
         }
         window.onmousedown = (e)=>{
-            // e.preventDefault()
+            e.preventDefault()
             this.onMouseDown(e.pageX, e.pageY, e.button)
         }
         window.onmouseup = (e)=>{
-            // e.preventDefault()
+            e.preventDefault()
             this.onMouseUp(e.pageX, e.pageY, e.button)
         }
         window.oncontextmenu = (e)=>{
@@ -32,15 +32,15 @@ class MouseController {
             this.onMouseDown(e.pageX, e.pageY, e.button)
         }
         window.ontouchstart = (e)=>{
-            // e.preventDefault()
+            e.preventDefault()
             this.onMouseDown(e.changedTouches[0].pageX, e.changedTouches[0].pageY)
         }
         window.ontouchend = (e)=>{
-            // e.preventDefault()
+            e.preventDefault()
             this.onMouseUp(e.changedTouches[0].pageX, e.changedTouches[0].pageY)
         }
         window.ontouchmove = (e)=>{
-            // e.preventDefault()
+            e.preventDefault()
             this.onMouseMove(e.changedTouches[0].pageX, e.changedTouches[0].pageY)
         }
 
@@ -73,7 +73,7 @@ class MouseController {
         let inner = []
 
         for(let element of elements){
-            if(element.id && UIDList[element.id] && (UIDList[element.id].$mousearea || UIDList[element.id].$flickable) && UIDList[element.id].getPropertyValue('enabled') && UIDList[element.id].getPropertyValue('visible')){
+            if(element.id && UIDList[element.id] && (UIDList[element.id].$mousearea || UIDList[element.id].$flickable || UIDList[element.id].$textinput) && UIDList[element.id].getPropertyValue('enabled') && UIDList[element.id].getPropertyValue('visible')){
                 inner.push(UIDList[element.id])
             }
         }
@@ -139,6 +139,10 @@ class MouseController {
         this.flickList = []
 
         for(let i = 0; i < inner.length; i++){
+            if(inner[i].$textinput && inner[i].onMouseDown(x, y, button)){
+                break
+            }
+
             if(inner[i].$mousearea && !this.pressedMouseAreaInner){
                 if(inner[i].onMouseDown(x, y, button)){
                     for(let j = i+1; j < inner.length; j++){
@@ -152,11 +156,21 @@ class MouseController {
                 }
             }
 
+            // if(inner[i].$textinput && !textinput){
+            //     textinput = inner[i]
+            // }
+
             if(inner[i].$flickable){
                 inner[i].onMouseDown(x, y, button)
                 this.flickList.push(inner[i])
             }
+
+            
         }
+
+        // if(textinput){
+        //     textinput.onMouseDown(x, y, button)
+        // }
         // console.log(this.pressedList)
     }
     onMouseUp(x, y, button){
@@ -187,11 +201,17 @@ class MouseController {
 
         document.body.style.cursor = 'default'
 
-
         for(let obj of this.oldList){
             if(obj.$mousearea && obj.getPropertyValue('hoverEnabled')) {
                 obj.onMouseMove(x, y, false)
 
+            }
+        }
+
+        for(let obj of inner){
+            if(obj.$textinput){
+                obj.onMouseMove(x, y)
+                break
             }
         }
         

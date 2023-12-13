@@ -33,6 +33,8 @@ class TextEdit extends Item {
 		editingFinished: { params: [] },
     }
 
+    $textinput = true
+
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
         
@@ -44,6 +46,42 @@ class TextEdit extends Item {
         this.$input.style.font = 'inherit'
         this.getDom().appendChild(this.$input)
         MouseController.add(this)
+    }
+
+    cut(){
+
+    }
+
+    copy(){
+        
+    }
+
+    paste(){
+        
+    }
+
+    clear(){
+        
+    }
+
+    redo(){
+        
+    }
+
+    undo(){
+        
+    }
+
+    remove(start, end){
+
+    }
+
+    select(start, end){
+
+    }
+
+    selectAll(){
+        this.$input.select()
     }
 
     $colorChanged(){
@@ -110,6 +148,15 @@ class TextEdit extends Item {
         }
     }
 
+    $focusChanged(){
+        if(this.getPropertyValue('focus')){
+            this.$input.focus()
+        } else {
+            this.$input.blur()
+        }
+        super.$focusChanged()
+    }
+
     applyMetrics(){
         let textMetrics = TextFontController.measureText(this.getPropertyValue('text'), this.getProperty('font').getPropertyValue('pixelSize'), this.getProperty('font').getPropertyValue('family'), this.getProperty('width').auto ? 0 : this.getProperty('width').get(), this.getPropertyValue('wrapMode'))
 
@@ -128,7 +175,18 @@ class TextEdit extends Item {
     
     onMouseDown(x, y, button){
         if(this.getPropertyValue('enabled')) {
-            
+            let btn = 0
+            switch(button){
+                case 0: btn = Qt.LeftButton; break;
+                case 1: btn = Qt.MiddleButton; break;
+                case 2: btn = Qt.RightButton; break;
+            }	
+            if(Qt.LeftButton & btn) {
+                this.getProperty('focus').reset(true)
+                this.$input.focus()
+                return true
+            }
+            return false
         }
     }
     onMouseUp(x, y, button){
@@ -138,7 +196,9 @@ class TextEdit extends Item {
     }
     onMouseMove(x, y){
         if(this.getPropertyValue('enabled')) {
-           
+            this.getPropertyValue('context').setStyle({
+                cursor: 'text'
+            })
         }
     }
 

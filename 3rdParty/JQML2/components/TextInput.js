@@ -45,6 +45,8 @@ class TextInput extends Item {
 		textEdited: { params: [] },
     }
 
+    $textinput = true
+
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
         
@@ -56,7 +58,7 @@ class TextInput extends Item {
         this.$form.style.height = '1em'
         this.$form.style.font = 'inherit'
         this.$form.style.color = 'inherit'
-        this.$form.autocomplete = "off"
+        this.$form.autocomplete = "new-password"
         this.getDom().appendChild(this.$form)
 
         this.$input = document.createElement('input')
@@ -68,7 +70,7 @@ class TextInput extends Item {
         this.$input.style.height = '1em'
         this.$input.style.font = 'inherit'
         this.$input.style.color = 'inherit'
-        this.$input.autocomplete = "off"
+        this.$input.autocomplete = "new-password"
         this.$form.appendChild(this.$input)
         MouseController.add(this)
 
@@ -171,6 +173,15 @@ class TextInput extends Item {
         }
     }
 
+    $focusChanged(){
+        if(this.getPropertyValue('focus')){
+            this.$input.focus()
+        } else {
+            this.$input.blur()
+        }
+        super.$focusChanged()
+    }
+
     applyMetrics(){
         let textMetrics = TextFontController.measureText(this.getPropertyValue('text'), this.getProperty('font').getPropertyValue('pixelSize'), this.getProperty('font').getPropertyValue('family'), this.getProperty('width').auto ? 0 : this.getProperty('width').get(), this.getPropertyValue('wrapMode'))
 
@@ -223,17 +234,31 @@ class TextInput extends Item {
 
     onMouseDown(x, y, button){
         if(this.getPropertyValue('enabled')) {
+            let btn = 0
+            switch(button){
+                case 0: btn = Qt.LeftButton; break;
+                case 1: btn = Qt.MiddleButton; break;
+                case 2: btn = Qt.RightButton; break;
+            }	
+            if(Qt.LeftButton & btn) {
+                this.getProperty('focus').reset(true)
+                this.$input.focus()
+                return true
+            }
+            return false
             
         }
     }
     onMouseUp(x, y, button){
         if(this.getPropertyValue('enabled')) {
-            this.$input.focus()
+            
         } 
     }
     onMouseMove(x, y){
         if(this.getPropertyValue('enabled')) {
-           
+            this.getPropertyValue('context').setStyle({
+                cursor: 'text'
+            })
         }
     }
 
