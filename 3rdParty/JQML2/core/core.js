@@ -215,10 +215,54 @@ window.onload = ()=>{
         }
     }
 
+    mainRoot.languages = {}
+    mainRoot.XMLParser = new DOMParser()
+    mainRoot.updateLanguage = ()=>{
+        if(mainRoot.application && mainRoot.language && !mainRoot.languages[mainRoot.language]){
+            let langPrefixList = []
+            if(typeof mainRoot.application === 'string'){
+                langPrefixList.push(mainRoot.application)
+            } else if(Array.isArray(mainRoot.application)){
+                langPrefixList = mainRoot.application
+            }
+            for(let langPrefix of langPrefixList){
+                let xhr = new XMLHttpRequest()
+                if(langPrefix){
+                    xhr.open('GET', `../Translations/${langPrefix}_${mainRoot.language}.ts`, false)
+                } else {
+                    xhr.open('GET', `../Translations/${mainRoot.language}.ts`, false)
+                }
+                xhr.onload = ()=>{
+                    if (xhr.readyState === XMLHttpRequest.DONE){
+                        let xml = mainRoot.XMLParser.parseFromString(xhr.responseText, 'text/xml')
+                        let messages = xml.getElementsByTagName('message')
+                        let dict = {}
+                        for(let message of messages){
+                            let source = message.getElementsByTagName('source')[0]
+                            let translation = message.getElementsByTagName('translation')[0]
+                            dict[source.innerHTML] = translation.innerHTML
+                        }
+                        if(!mainRoot.languages[mainRoot.language]){
+                            mainRoot.languages[mainRoot.language] = dict
+                        } else {
+                            Object.assign(mainRoot.languages[mainRoot.language], dict)
+                        }
+                    }
+                }
+                xhr.send()
+            }
+            
+        }
+        
+    }
+
     mainRoot.createProperty('location',QVar,location)
     mainRoot.createProperty('history',QVar,history)
-    mainRoot.createProperty('language',QString,'location')
-    mainRoot.createProperty('application',QString,'location')
+    mainRoot.createProperty('language',QString,'')
+    mainRoot.createProperty('application',QString,'')
+    mainRoot.getProperty('language').getNotify().connect(mainRoot, mainRoot.updateLanguage)
+    mainRoot.getProperty('application').getNotify().connect(mainRoot, mainRoot.updateLanguage)
+
     mainRoot.createProperty('mapTools',QBool,false)
     mainRoot.getProperty('mapTools').getNotify().connect(mainRoot, ()=>{
         let mapStyle = document.createElement('link')

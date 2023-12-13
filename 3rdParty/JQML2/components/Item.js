@@ -676,6 +676,7 @@ class Item extends QtObject {
     }
 
     $destroy(){
+        if(this.getPropertyValue('context').$focusedElement === this) this.getPropertyValue('context').$focusedElement = null
         this.$dom.remove()
         super.$destroy()
     }

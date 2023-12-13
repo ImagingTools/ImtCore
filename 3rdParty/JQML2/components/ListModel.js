@@ -27,6 +27,7 @@ class ListModel extends QtObject {
     }
 
     $dataChanged(topLeft, bottomRight, roles){
+        // if(this.parent && this.parent instanceof ListModel) this.parent.getProperty('data').getNotify()()
         // console.log('DEBUG:::dataChanged', topLeft, bottomRight, roles)
     }
 
