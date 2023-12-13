@@ -69,16 +69,16 @@ public:
 	// virtual QByteArrayList FindObjectParentNodes(const QByteArray& objectId) const override;
 
 	// // reimpolemented (imtbase::IStructuredCollectionInserter)
-	virtual QByteArray InsertNewObject(
-				const QByteArray& typeId,
-				const QString& name,
-				const QString& description,
-				IObjectCollection::DataPtr defaultValuePtr = IObjectCollection::DataPtr(),
-				const Id& proposedObjectId = Id(),
-				const Id& nodeId = Id(),
-				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
-				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
-				const imtbase::IOperationContext* operationContextPtr = nullptr);
+	//virtual QByteArray InsertNewObject(
+	//			const QByteArray& typeId,
+	//			const QString& name,
+	//			const QString& description,
+	//			IObjectCollection::DataPtr defaultValuePtr = IObjectCollection::DataPtr(),
+	//			const Id& proposedObjectId = Id(),
+	//			const Id& nodeId = Id(),
+	//			const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
+	//			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
+	//			const imtbase::IOperationContext* operationContextPtr = nullptr);
 
 	// // reimpolemented (imtbase::TIStructuredCollectionInfo)
 	// virtual ElementType GetElementType(const QByteArray& elementId) const override;

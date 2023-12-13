@@ -353,7 +353,7 @@ QList<imtbase::ICollectionStructureInfo::PathElement> CSqlStructureDelegateCompB
 		PathElement pathElement;
 		pathElement.id = sqlQuery.value("id").toByteArray();
 		pathElement.name = sqlQuery.value("name").toString();
-		retVal << pathElement;
+		retVal.prepend(pathElement);
 	}
 
 	return retVal;

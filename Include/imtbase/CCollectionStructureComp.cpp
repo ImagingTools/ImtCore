@@ -40,6 +40,10 @@ QByteArray CCollectionStructureComp::InsertNewNode(
 {
 	Id id;
 
+	if (name.isEmpty()) {
+		return id;
+	}
+
 	if (m_delegateCompPtr.IsValid()){
 		istd::IChangeable::ChangeSet changeSet;
 		NodeInsertInfo info;

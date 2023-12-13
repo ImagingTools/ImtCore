@@ -31,17 +31,16 @@ QByteArray CSqlStructureDelegateComp::CreateInsertNewNodeQuery(
 	const imtbase::IOperationContext* operationContextPtr)
 {
 	QJsonObject nodeInfo;
-	nodeInfo.insert("name", name);
-	nodeInfo.insert("description", description);
-
 	QJsonArray metaInfos = CtreateJsonFromMetaInfo(metaInfoPtr);
 	nodeInfo.insert("metaInfo", metaInfos);
 	QJsonDocument document;
 	document.setObject(nodeInfo);
 	QByteArray documentContent = document.toJson(QJsonDocument::Compact);
-	QString queryString = QString("INSERT INTO public.\"Nodes\"(\"NodeId\", \"ParentId\", \"NodeInfo\", \"LastModified\") VALUES ('%1', '%2', '%3', '%4');")
+	QString queryString = QString("INSERT INTO public.\"Nodes\"(\"NodeId\", \"ParentId\", \"Name\", \"Description\", \"NodeInfo\", \"LastModified\") VALUES ('%1', '%2', '%3', '%4', '%5', '%6');")
 				.arg(qPrintable(proposedNodeId))
 				.arg(qPrintable(parentNodeId))
+				.arg(name)
+				.arg(description)
 				.arg(SqlEncode(documentContent))
 				.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
 
@@ -54,7 +53,7 @@ QByteArray CSqlStructureDelegateComp::CreateSetNodeNameQuery(
 	const QString& name,
 	const imtbase::IOperationContext* operationContextPtr)
 {
-	QString query = QString("UPDATE  public.\"Nodes\" SET \"NodeInfo\"=jsonb_set(\"NodeInfo\"::jsonb, '{name}', '\"%1\"') WHERE \"NodeId\" = '%2';")
+	QString query = QString("UPDATE  public.\"Nodes\" SET \"Name\" = '%1' WHERE \"NodeId\" = '%2';")
 		.arg(name).arg(qPrintable(nodeId));
 
 	return query.toUtf8();
@@ -66,7 +65,7 @@ QByteArray CSqlStructureDelegateComp::CreateSetNodeDescriptionQuery(
 	const QString& description,
 	const imtbase::IOperationContext* operationContextPtr)
 {
-	QString query = QString("UPDATE  public.\"Nodes\" SET \"NodeInfo\"=jsonb_set(\"NodeInfo\"::jsonb, '{description}', '\"%1\"') WHERE \"NodeId\" = '%2';")
+	QString query = QString("UPDATE  public.\"Nodes\" SET \"Description\" = '%1' WHERE \"NodeId\" = '%2';")
 						.arg(description).arg(qPrintable(nodeId));
 
 	return query.toUtf8();
@@ -135,20 +134,20 @@ QByteArray CSqlStructureDelegateComp::CreateMoveObjectQuery(
 
 	if (!targetNodeId.isEmpty()){
 		query = QString(
-					"UPDATE  public.\"NodeDocuments\" SET \"NodeId\" = '%3'"
-					"FROM (SELECT count(*) FROM \"Nodes\" WHERE \"NodeId\" = '%3') AS subquery"
-					"WHERE \"DocumentId\"='%1'"
-					"AND \"NodeId\" = '%2'"
-						"AND  subquery.count = 1;"
+					"UPDATE  public.\"NodeDocuments\" SET \"NodeId\" = '%3' "
+					"FROM (SELECT count(*) FROM \"Nodes\" WHERE \"NodeId\" = '%3') AS subquery "
+					"WHERE \"DocumentId\"='%1' "
+					"AND \"NodeId\" = '%2' "
+					"AND  subquery.count = 1; "
 					).arg(qPrintable(objectId)).arg(qPrintable(sourceNodeId)).arg(qPrintable(targetNodeId));
 	}
 	else{
 		query = QString(
-					"UPDATE  public.\"NodeDocuments\" SET \"NodeId\" = '%3'"
-					"FROM (SELECT 1 AS count) AS subquery"
-					"WHERE \"DocumentId\"='%1'"
-					"AND \"NodeId\" = '%2'"
-					"AND  subquery.count = 1;"
+					"UPDATE  public.\"NodeDocuments\" SET \"NodeId\" = '%3' "
+					"FROM (SELECT 1 AS count) AS subquery "
+					"WHERE \"DocumentId\"='%1' "
+					"AND \"NodeId\" = '%2' "
+					"AND  subquery.count = 1; "
 					).arg(qPrintable(objectId)).arg(qPrintable(sourceNodeId)).arg(qPrintable(targetNodeId));
 	}
 
@@ -270,7 +269,10 @@ QByteArray CSqlStructureDelegateComp::CreateGetObjectIdsQuery(
 
 QByteArray CSqlStructureDelegateComp::CreateGetNodeInfoQuery(const Id& nodeId)
 {
-	return QByteArray();
+	QString query = QString("SELECT \"NodeId\", \"Name\", \"Description\" FROM public.\"Nodes\";")
+						.arg(qPrintable(nodeId));
+
+	return query.toUtf8();
 }
 
 

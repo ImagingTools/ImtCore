@@ -18,7 +18,7 @@ var_r record;
 BEGIN
  	IF node_id != ''  THEN
 		SELECT "ParentId" INTO parent_id FROM public."Nodes" WHERE "NodeId" = node_id LIMIT 1;
-		SELECT "NodeInfo"->>'name' INTO name FROM public."Nodes" WHERE "NodeId" = node_id LIMIT 1;
+		SELECT "Name" INTO name FROM public."Nodes" WHERE "NodeId" = node_id LIMIT 1;
 		RETURN QUERY SELECT node_id,  name;
 		IF parent_id != ''  THEN
 			RETURN QUERY SELECT * from get_node_path( parent_id );

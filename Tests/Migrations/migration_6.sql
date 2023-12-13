@@ -2,6 +2,8 @@ CREATE TABLE IF NOT EXISTS public."Nodes"
 (
     "NodeId" character varying(1000) COLLATE pg_catalog."default" NOT NULL,
     "ParentId" character varying(1000) COLLATE pg_catalog."default" NOT NULL,
+    "Name" character varying(1000) COLLATE pg_catalog."default",
+    "Description" character varying(1000) COLLATE pg_catalog."default",
     "NodeInfo" jsonb,
     "LastModified" timestamp without time zone,
     CONSTRAINT "NodeId_pkey" PRIMARY KEY ("NodeId")

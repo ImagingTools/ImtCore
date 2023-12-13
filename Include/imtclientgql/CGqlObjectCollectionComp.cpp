@@ -65,289 +65,289 @@ CGqlObjectCollectionComp::CGqlObjectCollectionComp()
 
 
 // reimplemented (imtbase::IStructuredCollectionFinder)
-
-QByteArrayList CGqlObjectCollectionComp::FindObjectParentNodes(const QByteArray& objectId) const
-{
-	QByteArrayList retVal;
-
-	if (m_delegateCompPtr.IsValid()){
-		imtgql::IGqlStructuredCollectionResponse::ElementInfo info;
-		if (m_delegateCompPtr->GetObjectInfo(objectId, info)){
-			for (int i = 0; i < info.path.count(); ++i){
-				int index = info.path.count() - 1;
-				Q_ASSERT(index >= 0);
-
-				retVal += info.path[info.path.count() - 1].id;
-			}
-		}
-	}
-
-	return retVal;
-}
-
-
-// reimpolemented (imtbase::IStructuredCollectionInserter)
-
-QByteArray CGqlObjectCollectionComp::InsertNewObject(
-			const QByteArray& typeId,
-			const QString& name,
-			const QString& description,
-			IObjectCollection::DataPtr defaultValuePtr,
-			const QByteArray& proposedObjectId,
-			const QByteArray& parentId,
-			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
-			const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
-			const imtbase::IOperationContext* operationContextPtr)
-{
-	if (m_delegateCompPtr.IsValid()){
-		istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
-		imtbase::ICollectionInfo::ElementInsertInfo insertInfo;
-
-		QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray() : proposedObjectId;
-
-		insertInfo.elementId = objectId;
-		changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_INSERTED, QVariant::fromValue(insertInfo));
-		istd::CChangeNotifier notifier(this, &changeSet);
-
-		objectId = m_delegateCompPtr->InsertObject(
-					typeId,
-					name,
-					description,
-					*defaultValuePtr,
-					objectId,
-					parentId,
-					dataMetaInfoPtr,
-					elementMetaInfoPtr,
-					operationContextPtr);
-		if (objectId.isEmpty()){
-			notifier.Abort();
-		}
-
-		return objectId;
-	}
-
-	return QByteArray();
-}
-
-
-// reimpolemented (imtbase::TIStructuredCollectionInfo)
-
-imtbase::IStructuredObjectCollectionInfo::ElementType CGqlObjectCollectionComp::GetElementType(const QByteArray& elementId) const
-{
-	if (m_delegateCompPtr.IsValid()){
-		return m_delegateCompPtr->GetElementType(elementId);
-	}
-
-	return ElementType::ET_UNKNOWN;
-}
-
-
-QByteArrayList CGqlObjectCollectionComp::GetElementBasePath(const QByteArray& elementId) const
-{
-	QByteArrayList retVal;
-
-	imtgql::IGqlStructuredCollectionResponse::ElementInfo elementInfo;
-
-	if (GetNodeInfo(elementId, elementInfo)){
-		for (const imtgql::IGqlStructuredCollectionResponse::ElementInfo::PathItem& item : elementInfo.path){
-			retVal += item.id;
-		}
-	}
-	else if (GetObjectInfo(elementId, elementInfo)){
-		for (const imtgql::IGqlStructuredCollectionResponse::ElementInfo::PathItem& item : elementInfo.path){
-			retVal += item.id;
-		}
-	}
-
-	return retVal;
-}
-
-
-// reimpolemented (imtbase::TICollectionStructure)
-
-QByteArray CGqlObjectCollectionComp::InsertNewNode(
-			const QString& name,
-			const QString& description,
-			const QByteArray& proposedNodeId,
-			const QByteArray& parentNodeId,
-			const idoc::IDocumentMetaInfo* metaInfoPtr,
-			const imtbase::IOperationContext* operationContextPtr)
-{
-	if (m_delegateCompPtr.IsValid()){
-		return m_delegateCompPtr->InsertNode(
-					name,
-					description,
-					proposedNodeId,
-					parentNodeId,
-					metaInfoPtr,
-					operationContextPtr);
-	}
-
-	return QByteArray();
-}
-
-
-bool CGqlObjectCollectionComp::SetNodeName(
-			const Id& nodeId,
-			const QString& name,
-			const imtbase::IOperationContext* operationContextPtr)
-{
-	if (m_delegateCompPtr.IsValid()){
-		return m_delegateCompPtr->SetNodeName(
-					nodeId,
-					name,
-					operationContextPtr);
-	}
-
-	return false;
-}
-
-
-bool CGqlObjectCollectionComp::SetNodeDescription(
-			const Id& nodeId,
-			const QString& description,
-			const imtbase::IOperationContext* operationContextPtr)
-{
-	if (m_delegateCompPtr.IsValid()){
-		return m_delegateCompPtr->SetNodeDescription(
-					nodeId,
-					description,
-					operationContextPtr);
-	}
-
-	return false;
-}
-
-
-bool CGqlObjectCollectionComp::SetNodeMetaInfo(
-			const Id& nodeId,
-			const idoc::IDocumentMetaInfo& metaInfo,
-			const imtbase::IOperationContext* operationContextPtr)
-{
-	if (m_delegateCompPtr.IsValid()){
-		return m_delegateCompPtr->SetNodeMetaInfo(
-					nodeId,
-					metaInfo,
-					operationContextPtr);
-	}
-
-	return false;
-}
-
-
-bool CGqlObjectCollectionComp::MoveNode(
-			const Id& nodeId,
-			const Id& parentNodeId,
-			const imtbase::IOperationContext* operationContextPtr)
-{
-	if (m_delegateCompPtr.IsValid()){
-		return m_delegateCompPtr->MoveNode(
-					nodeId,
-					parentNodeId,
-					operationContextPtr);
-	}
-
-	return false;
-}
-
-
-bool CGqlObjectCollectionComp::RemoveNode(
-			const Id& nodeId,
-			const imtbase::IOperationContext* operationContextPtr)
-{
-	if (m_delegateCompPtr.IsValid()){
-		m_delegateCompPtr->RemoveNode(
-					nodeId,
-					operationContextPtr);
-	}
-
-	return false;
-}
-
-
-bool CGqlObjectCollectionComp::AddObjectToNode(
-			const Id& objectId,
-			const Id& nodeId,
-			const imtbase::IOperationContext* operationContextPtr)
-{
-	if (m_delegateCompPtr.IsValid()){
-		return m_delegateCompPtr->AddObjectToNode(
-					objectId,
-					nodeId,
-					operationContextPtr);
-	}
-
-	return false;
-}
-
-
-bool CGqlObjectCollectionComp::MoveObjectToNode(
-			const Id& objectId,
-			const Id& parentNodeId,
-			const Id& newParentNodeId,
-			const imtbase::IOperationContext* operationContextPtr)
-{
-	if (m_delegateCompPtr.IsValid()){
-		return m_delegateCompPtr->MoveObjectToNode(
-						objectId,
-						parentNodeId,
-						newParentNodeId,
-						operationContextPtr);
-	}
-
-	return false;
-}
-
-
-bool CGqlObjectCollectionComp::RemoveObjectFromNode(
-			const Id& objectId,
-			const Id& nodeId,
-			const imtbase::IOperationContext* operationContextPtr)
-{
-	if (m_delegateCompPtr.IsValid()){
-		return m_delegateCompPtr->RemoveObjectFromNode(
-					objectId,
-					nodeId,
-					operationContextPtr);
-	}
-
-	return false;
-}
-
-
-// reimpolemented (imtbase::ICollectionStructureInfo)
-
-QByteArrayList CGqlObjectCollectionComp::GetNodePath(const QByteArray& nodeId) const
-{
-	QByteArrayList retVal;
-
-	if (m_delegateCompPtr.IsValid()){
-		imtgql::IGqlStructuredCollectionResponse::NodeInfo info;
-		if (m_delegateCompPtr->GetNodeInfo(nodeId, info)){
-			for (const imtgql::IGqlStructuredCollectionResponse::NodeInfo::PathItem& item : info.path){
-				retVal += item.id;
-			}
-		}
-	}
-
-	return retVal;
-}
-
-
-QSharedPointer<imtbase::IStructuredObjectCollectionInfo> CGqlObjectCollectionComp::GetNodeContent(const QByteArray& nodeId) const
-{
-	if (m_delegateCompPtr.IsValid()){
-		return m_delegateCompPtr->GetNodeContent(nodeId);
-	}
-
-	return QSharedPointer<imtbase::IStructuredObjectCollectionInfo>();
-}
-
-
-const imtbase::IStructuredCollectionFinder* CGqlObjectCollectionComp::GetCollectionFinder() const
-{
-	return this;
-}
+//
+//QByteArrayList CGqlObjectCollectionComp::FindObjectParentNodes(const QByteArray& objectId) const
+//{
+//	QByteArrayList retVal;
+//
+//	if (m_delegateCompPtr.IsValid()){
+//		imtgql::IGqlStructuredCollectionResponse::ElementInfo info;
+//		if (m_delegateCompPtr->GetObjectInfo(objectId, info)){
+//			for (int i = 0; i < info.path.count(); ++i){
+//				int index = info.path.count() - 1;
+//				Q_ASSERT(index >= 0);
+//
+//				retVal += info.path[info.path.count() - 1].id;
+//			}
+//		}
+//	}
+//
+//	return retVal;
+//}
+//
+//
+//// reimpolemented (imtbase::IStructuredCollectionInserter)
+//
+//QByteArray CGqlObjectCollectionComp::InsertNewObject(
+//			const QByteArray& typeId,
+//			const QString& name,
+//			const QString& description,
+//			IObjectCollection::DataPtr defaultValuePtr,
+//			const QByteArray& proposedObjectId,
+//			const QByteArray& parentId,
+//			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
+//			const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
+//			const imtbase::IOperationContext* operationContextPtr)
+//{
+//	if (m_delegateCompPtr.IsValid()){
+//		istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
+//		imtbase::ICollectionInfo::ElementInsertInfo insertInfo;
+//
+//		QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray() : proposedObjectId;
+//
+//		insertInfo.elementId = objectId;
+//		changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_INSERTED, QVariant::fromValue(insertInfo));
+//		istd::CChangeNotifier notifier(this, &changeSet);
+//
+//		objectId = m_delegateCompPtr->InsertObject(
+//					typeId,
+//					name,
+//					description,
+//					*defaultValuePtr,
+//					objectId,
+//					parentId,
+//					dataMetaInfoPtr,
+//					elementMetaInfoPtr,
+//					operationContextPtr);
+//		if (objectId.isEmpty()){
+//			notifier.Abort();
+//		}
+//
+//		return objectId;
+//	}
+//
+//	return QByteArray();
+//}
+//
+//
+//// reimpolemented (imtbase::TIStructuredCollectionInfo)
+//
+//imtbase::IStructuredObjectCollectionInfo::ElementType CGqlObjectCollectionComp::GetElementType(const QByteArray& elementId) const
+//{
+//	if (m_delegateCompPtr.IsValid()){
+//		return m_delegateCompPtr->GetElementType(elementId);
+//	}
+//
+//	return ElementType::ET_UNKNOWN;
+//}
+//
+//
+//QByteArrayList CGqlObjectCollectionComp::GetElementBasePath(const QByteArray& elementId) const
+//{
+//	QByteArrayList retVal;
+//
+//	imtgql::IGqlStructuredCollectionResponse::ElementInfo elementInfo;
+//
+//	if (GetNodeInfo(elementId, elementInfo)){
+//		for (const imtgql::IGqlStructuredCollectionResponse::ElementInfo::PathItem& item : elementInfo.path){
+//			retVal += item.id;
+//		}
+//	}
+//	else if (GetObjectInfo(elementId, elementInfo)){
+//		for (const imtgql::IGqlStructuredCollectionResponse::ElementInfo::PathItem& item : elementInfo.path){
+//			retVal += item.id;
+//		}
+//	}
+//
+//	return retVal;
+//}
+//
+//
+//// reimpolemented (imtbase::TICollectionStructure)
+//
+//QByteArray CGqlObjectCollectionComp::InsertNewNode(
+//			const QString& name,
+//			const QString& description,
+//			const QByteArray& proposedNodeId,
+//			const QByteArray& parentNodeId,
+//			const idoc::IDocumentMetaInfo* metaInfoPtr,
+//			const imtbase::IOperationContext* operationContextPtr)
+//{
+//	if (m_delegateCompPtr.IsValid()){
+//		return m_delegateCompPtr->InsertNode(
+//					name,
+//					description,
+//					proposedNodeId,
+//					parentNodeId,
+//					metaInfoPtr,
+//					operationContextPtr);
+//	}
+//
+//	return QByteArray();
+//}
+//
+//
+//bool CGqlObjectCollectionComp::SetNodeName(
+//			const Id& nodeId,
+//			const QString& name,
+//			const imtbase::IOperationContext* operationContextPtr)
+//{
+//	if (m_delegateCompPtr.IsValid()){
+//		return m_delegateCompPtr->SetNodeName(
+//					nodeId,
+//					name,
+//					operationContextPtr);
+//	}
+//
+//	return false;
+//}
+//
+//
+//bool CGqlObjectCollectionComp::SetNodeDescription(
+//			const Id& nodeId,
+//			const QString& description,
+//			const imtbase::IOperationContext* operationContextPtr)
+//{
+//	if (m_delegateCompPtr.IsValid()){
+//		return m_delegateCompPtr->SetNodeDescription(
+//					nodeId,
+//					description,
+//					operationContextPtr);
+//	}
+//
+//	return false;
+//}
+//
+//
+//bool CGqlObjectCollectionComp::SetNodeMetaInfo(
+//			const Id& nodeId,
+//			const idoc::IDocumentMetaInfo& metaInfo,
+//			const imtbase::IOperationContext* operationContextPtr)
+//{
+//	if (m_delegateCompPtr.IsValid()){
+//		return m_delegateCompPtr->SetNodeMetaInfo(
+//					nodeId,
+//					metaInfo,
+//					operationContextPtr);
+//	}
+//
+//	return false;
+//}
+//
+//
+//bool CGqlObjectCollectionComp::MoveNode(
+//			const Id& nodeId,
+//			const Id& parentNodeId,
+//			const imtbase::IOperationContext* operationContextPtr)
+//{
+//	if (m_delegateCompPtr.IsValid()){
+//		return m_delegateCompPtr->MoveNode(
+//					nodeId,
+//					parentNodeId,
+//					operationContextPtr);
+//	}
+//
+//	return false;
+//}
+//
+//
+//bool CGqlObjectCollectionComp::RemoveNode(
+//			const Id& nodeId,
+//			const imtbase::IOperationContext* operationContextPtr)
+//{
+//	if (m_delegateCompPtr.IsValid()){
+//		m_delegateCompPtr->RemoveNode(
+//					nodeId,
+//					operationContextPtr);
+//	}
+//
+//	return false;
+//}
+//
+//
+//bool CGqlObjectCollectionComp::AddObjectToNode(
+//			const Id& objectId,
+//			const Id& nodeId,
+//			const imtbase::IOperationContext* operationContextPtr)
+//{
+//	if (m_delegateCompPtr.IsValid()){
+//		return m_delegateCompPtr->AddObjectToNode(
+//					objectId,
+//					nodeId,
+//					operationContextPtr);
+//	}
+//
+//	return false;
+//}
+//
+//
+//bool CGqlObjectCollectionComp::MoveObjectToNode(
+//			const Id& objectId,
+//			const Id& parentNodeId,
+//			const Id& newParentNodeId,
+//			const imtbase::IOperationContext* operationContextPtr)
+//{
+//	if (m_delegateCompPtr.IsValid()){
+//		return m_delegateCompPtr->MoveObjectToNode(
+//						objectId,
+//						parentNodeId,
+//						newParentNodeId,
+//						operationContextPtr);
+//	}
+//
+//	return false;
+//}
+//
+//
+//bool CGqlObjectCollectionComp::RemoveObjectFromNode(
+//			const Id& objectId,
+//			const Id& nodeId,
+//			const imtbase::IOperationContext* operationContextPtr)
+//{
+//	if (m_delegateCompPtr.IsValid()){
+//		return m_delegateCompPtr->RemoveObjectFromNode(
+//					objectId,
+//					nodeId,
+//					operationContextPtr);
+//	}
+//
+//	return false;
+//}
+//
+//
+//// reimpolemented (imtbase::ICollectionStructureInfo)
+//
+//QByteArrayList CGqlObjectCollectionComp::GetNodePath(const QByteArray& nodeId) const
+//{
+//	QByteArrayList retVal;
+//
+//	if (m_delegateCompPtr.IsValid()){
+//		imtgql::IGqlStructuredCollectionResponse::NodeInfo info;
+//		if (m_delegateCompPtr->GetNodeInfo(nodeId, info)){
+//			for (const imtgql::IGqlStructuredCollectionResponse::NodeInfo::PathItem& item : info.path){
+//				retVal += item.id;
+//			}
+//		}
+//	}
+//
+//	return retVal;
+//}
+//
+//
+//QSharedPointer<imtbase::IStructuredObjectCollectionInfo> CGqlObjectCollectionComp::GetNodeContent(const QByteArray& nodeId) const
+//{
+//	if (m_delegateCompPtr.IsValid()){
+//		return m_delegateCompPtr->GetNodeContent(nodeId);
+//	}
+//
+//	return QSharedPointer<imtbase::IStructuredObjectCollectionInfo>();
+//}
+//
+//
+//const imtbase::IStructuredCollectionFinder* CGqlObjectCollectionComp::GetCollectionFinder() const
+//{
+//	return this;
+//}
 
 
 // reimplemented (IObjectCollection)
@@ -384,16 +384,17 @@ imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewObject(
 			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr,
 			const imtbase::IOperationContext* operationContextPtr)
 {
-	return InsertNewObject(
-				typeId,
-				name,
-				description,
-				defaultValuePtr,
-				proposedObjectId,
-				QByteArray(),
-				dataMetaInfoPtr,
-				collectionItemMetaInfoPtr,
-				operationContextPtr);
+	return imtbase::ICollectionInfo::Id();
+	//return InsertNewObject(
+	//			typeId,
+	//			name,
+	//			description,
+	//			defaultValuePtr,
+	//			proposedObjectId,
+	//			QByteArray(),
+	//			dataMetaInfoPtr,
+	//			collectionItemMetaInfoPtr,
+	//			operationContextPtr);
 }
 
 
@@ -748,16 +749,16 @@ imtbase::IObjectCollection::DataPtr CGqlObjectCollectionComp::GetObject(
 }
 
 
-bool CGqlObjectCollectionComp::GetElementType(const QByteArray& elementId, ElementType& valueOut) const
-{
-	if (m_delegateCompPtr.IsValid()){
-		valueOut = m_delegateCompPtr->GetElementType(elementId);
-
-		return (valueOut != imtbase::IStructuredObjectCollectionInfo::ET_UNKNOWN);
-	}
-
-	return false;
-}
+//bool CGqlObjectCollectionComp::GetElementType(const QByteArray& elementId, ElementType& valueOut) const
+//{
+//	if (m_delegateCompPtr.IsValid()){
+//		valueOut = m_delegateCompPtr->GetElementType(elementId);
+//
+//		return (valueOut != imtbase::IStructuredObjectCollectionInfo::ET_UNKNOWN);
+//	}
+//
+//	return false;
+//}
 
 
 bool CGqlObjectCollectionComp::GetNodeInfo(
