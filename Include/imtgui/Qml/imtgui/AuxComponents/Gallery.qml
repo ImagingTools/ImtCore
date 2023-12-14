@@ -13,6 +13,15 @@ Rectangle {
     property bool isOpen: visible;
     property int animDuration: 100;
 
+    signal deleteSignal(int index);
+
+    onDeleteSignal: {
+        console.log("Delete selected photo: ", index);
+        model.RemoveItem(index);
+        model.Refresh();
+        list.positionViewAtIndex(0, ListView.Center);
+        list.selectedIndex = 0;
+    }
 
     function open(){
         if(!gallery.visible && model && model.GetItemsCount()){
@@ -74,6 +83,36 @@ Rectangle {
 
             text: "Галерея";
 
+        }
+
+        AuxButton{
+            id: deleteButton;
+
+            anchors.verticalCenter: parent.verticalCenter;
+            anchors.left: parent.left;
+            anchors.leftMargin: Style.size_smallMargin;
+
+            width: 20;
+            height: width;
+            radius: width;
+
+            enabled: visible;
+
+            color: "transparent";
+
+            border.color: "transparent";
+            border.width: 0;
+            hasIcon: true;
+            iconSource:  "../../../" +Style.getIconPath("Icons/Clear", Icon.State.On, Icon.Mode.Normal);
+
+            iconWidth: width;
+            iconHeight: width;
+
+            onClicked: {
+                let param = {"centered" : true};
+                modalDialogManager.openDialog(confirmationComp, param);
+                //gallery.deleteSignal(list.selectedIndex);
+            }
         }
 
         AuxButton{
@@ -304,14 +343,109 @@ Rectangle {
         duration: 200;
     }
 
-//    Rectangle{//for testing
-//        id: centerLine;
 
-//        anchors.top: parent.top;
-//        anchors.bottom: parent.bottom;
-//        anchors.horizontalCenter: parent.horizontalCenter;
-//        width: 1;
-//        color: "gray";
-//    }
+    Component{
+        id:confirmationComp;
+        Dialog {
+            id: confirmation;
+
+            anchors.centerIn: parent;
+
+            width: gallery.width-40;
+            height: 200;
+            hasIcon: false;
+            radius:8;
+            color: Style.backgroundColor;
+
+            topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
+            title: qsTr("Удалить фото");
+
+            Text {
+                id: titleDialogText;
+
+                anchors.centerIn: parent;
+
+                width: parent.width - 20;
+                wrapMode: Text.WordWrap;
+                horizontalAlignment: Text.AlignHCenter;
+
+                color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_title;
+
+                text: "Вы уверены, что хотите удалить фото?";
+
+            }
+
+            AuxButton {
+                id: okButton;
+
+                anchors.bottom: parent.bottom;
+                anchors.right: cancelButton.left;
+                anchors.rightMargin: Style.size_smallMargin;
+                anchors.bottomMargin: Style.size_smallMargin;
+
+                width: (parent.width - 3 * Style.size_smallMargin)/2;
+                height: Style.size_ButtonHeight;
+                radius: Style.size_ButtonRadius;
+                color: "lightsteelblue";
+                fontPixelSize: Style.fontSize_common;
+                highlighted: false;
+
+                hasText: true;
+                hasIcon: false;
+
+                textButton: "Ок";
+
+                onClicked:{
+                    confirmation.finished("Ok");
+                }
+
+            }
+
+            AuxButton {
+                id: cancelButton;
+
+                anchors.bottom: parent.bottom;
+                anchors.right: parent.right;
+                anchors.rightMargin: Style.size_smallMargin;
+                anchors.bottomMargin: Style.size_smallMargin;
+
+                width: (parent.width - 3 * Style.size_smallMargin)/2;
+                height: Style.size_ButtonHeight;
+                radius: Style.size_ButtonRadius;
+                color: "lightsteelblue";
+                fontPixelSize: Style.fontSize_common;
+                highlighted: false;
+
+                hasText: true;
+                hasIcon: false;
+
+                textButton: "Отмена";
+
+                onClicked:{
+                    confirmation.finished("Cancel");
+                }
+            }
+
+            onFinished: {
+                if(buttonId == "Ok"){
+                    gallery.deleteSignal(list.selectedIndex);
+                }
+            }
+        }//confirmation
+
+    }////confirmationComp
+
+
+    //    Rectangle{//for testing
+    //        id: centerLine;
+
+    //        anchors.top: parent.top;
+    //        anchors.bottom: parent.bottom;
+    //        anchors.horizontalCenter: parent.horizontalCenter;
+    //        width: 1;
+    //        color: "gray";
+    //    }
 
 }
