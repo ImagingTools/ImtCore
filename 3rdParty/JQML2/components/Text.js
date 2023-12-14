@@ -56,6 +56,7 @@ class Text extends Item {
         })
 
         this.impl = document.createElement('span')
+        this.impl.style.textAlign = 'inherit'
         this.getDom().appendChild(this.impl)
 
         this.getProperty('visible').getNotify().connect(()=>{
@@ -127,10 +128,10 @@ class Text extends Item {
 
     $horizontalAlignmentChanged(){
         switch(this.getPropertyValue('horizontalAlignment')){
-            case Text.AlignLeft: this.setStyle({ justifyContent: 'flex-start' }); break;
-            case Text.AlignRight: this.setStyle({ justifyContent: 'flex-end' }); break;
-            case Text.AlignHCenter: this.setStyle({ justifyContent: 'center' }); break;
-            case Text.AlignJustify: this.setStyle({ justifyContent: 'normal' }); break;
+            case Text.AlignLeft: this.setStyle({ justifyContent: 'flex-start', textAlign: 'start' }); break;
+            case Text.AlignRight: this.setStyle({ justifyContent: 'flex-end', textAlign: 'end' }); break;
+            case Text.AlignHCenter: this.setStyle({ justifyContent: 'center', textAlign: 'center' }); break;
+            case Text.AlignJustify: this.setStyle({ justifyContent: 'normal', textAlign: 'justify' }); break;
         }
     }
 

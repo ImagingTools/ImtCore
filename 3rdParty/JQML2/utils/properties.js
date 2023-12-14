@@ -826,7 +826,7 @@ class QVariant extends QVar {
 
 class QModelData {
     constructor(data, index){
-        this.index = index
+        this.index = new QInt(index)
 
         Object.assign(this, typeof data === 'object' ? data : {})
 
@@ -837,13 +837,13 @@ class QModelData {
             get(target, name){
                 let caller = global.queueLink[global.queueLink.length-1]
                 if(caller) {
-                    if(!(target[name] instanceof QVar)) target[name] = new QVar(target[name])
+                    if(!(target[name] instanceof QProperty)) target[name] = new QVar(target[name])
                     caller.subscribe(target[name])
                 }
-                return target[name] instanceof QVar ? target[name].get() : target[name]
+                return target[name] instanceof QProperty ? target[name].get() : target[name]
             },
             set(target, name, value){
-                if(target[name] instanceof QVar){
+                if(target[name] instanceof QProperty){
                     target[name].reset(value)
                 } else {
                     target[name] = value

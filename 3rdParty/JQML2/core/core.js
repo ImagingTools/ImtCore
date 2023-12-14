@@ -14,6 +14,12 @@ Function.prototype.clearDependsSignal=function(){
     }
     delete this.depends
 }
+let XMLProxy = XMLHttpRequest.prototype.open
+XMLHttpRequest.prototype.open = function() {  
+    let opened = XMLProxy.apply(this, [].slice.call(arguments))
+    if(XMLHttpRequest.QMLAuthToken) this.setRequestHeader("X-authentication-token", XMLHttpRequest.QMLAuthToken)
+    return opened
+}
 
 class ContextController {
     internal = {}

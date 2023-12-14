@@ -27,6 +27,8 @@ class GridView extends Flickable {
         super(parent,exCtx,exModel)
         this.$exCtx = exCtx
         this.getStatement('contentItem').get().setStyle({
+            justifyContent: 'flex-start',
+            alignItems: 'flex-start',
             flexWrap: 'wrap'
         })
         this.getStatement('contentItem').get().getProperty('width').setCompute(()=>{this.getStatement('contentItem').get().getProperty('width').subscribe(this.getProperty('width')); return this.getProperty('width').get()})
@@ -77,9 +79,9 @@ class GridView extends Flickable {
         if(typeof this.getPropertyValue('model') === 'number'){
             for(let i = 0; i < this.getPropertyValue('model'); i++){
                 let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), ctx, {index: i})
-                obj.setStyle({
-                    position: 'relative'
-                })
+                // obj.setStyle({
+                //     position: 'relative'
+                // })
                 // obj.getProperty('width').setCompute(()=>{obj.getProperty('width').subscribe(this.getProperty('cellWidth')); return this.getProperty('cellWidth').get()})
                 // obj.getProperty('height').setCompute(()=>{obj.getProperty('height').subscribe(this.getProperty('cellHeight')); return this.getProperty('cellHeight').get()})
                 // obj.getProperty('width').getNotify().connect(()=>{
@@ -99,9 +101,10 @@ class GridView extends Flickable {
         } else {
             for(let model of this.getPropertyValue('model').getPropertyValue('data')){
                 let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), ctx, model)
-                obj.setStyle({
-                    position: 'relative'
-                })
+                
+                // obj.setStyle({
+                //     position: 'relative'
+                // })
                 // obj.getProperty('width').setCompute(()=>{obj.getProperty('width').subscribe(this.getProperty('cellWidth')); return this.getProperty('cellWidth').get()})
                 // obj.getProperty('height').setCompute(()=>{obj.getProperty('height').subscribe(this.getProperty('cellHeight')); return this.getProperty('cellHeight').get()})
                 // obj.getProperty('width').getNotify().connect(()=>{
@@ -124,26 +127,66 @@ class GridView extends Flickable {
         this.updateGeometry()
     }
 
-    updateGeometry(){
-        this.getProperty('contentItem').get().setStyle({
-            // width: `0px`,
-            // minWidth: `0px`,
-            height: `0px`,
-            minHeight: `0px`,
-        })
+    $calcContentGeometry(){
+        
+        // this.contentItem.dom.style.minHeight = '0px'
+        // this.contentItem.dom.style.height = '0px'
+        // this.contentHeight = this.contentItem.dom.scrollHeight
+        // this.contentItem.dom.style.minHeight = `${this.contentItem.dom.scrollHeight}px`
+        // this.contentItem.dom.style.height = `${this.contentItem.dom.scrollHeight}px`
 
-        // this.getProperty('width').setAuto(this.getStatement('contentItem').get().getDom().scrollWidth)
-        // this.getProperty('height').setAuto(this.getStatement('contentItem').get().getDom().scrollHeight)
+        this.getPropertyValue('contentItem').getProperty('width').setAuto(this.getPropertyValue('width'))
+        this.getProperty('contentWidth').reset(-1)
+        let childLength = typeof this.getPropertyValue('model') === 'number' ? this.getPropertyValue('model') : this.getPropertyValue('contentItem').$children.length
+        let rowLength = this.getPropertyValue('width') / this.getPropertyValue('cellWidth')  <= 1 ? 1 : Math.trunc(this.getPropertyValue('width') / this.getPropertyValue('cellWidth'))
+        let contentHeight = Math.ceil(childLength / rowLength) * this.getPropertyValue('cellHeight')
+
+        this.getProperty('contentHeight').reset(contentHeight)
+    }
+
+    updateGeometry(){
+        // this.getProperty('contentItem').get().setStyle({
+        //     // width: `0px`,
+        //     // minWidth: `0px`,
+        //     height: `0px`,
+        //     minHeight: `0px`,
+        // })
+
+        // // this.getProperty('width').setAuto(this.getStatement('contentItem').get().getDom().scrollWidth)
+        // // this.getProperty('height').setAuto(this.getStatement('contentItem').get().getDom().scrollHeight)
 
         
-        this.getProperty('contentHeight').setAuto(this.getProperty('contentItem').get().getDom().scrollHeight)
+        // this.getProperty('contentHeight').setAuto(this.getProperty('contentItem').get().getDom().scrollHeight)
 
-        this.getProperty('contentItem').get().setStyle({
-            // width: `${this.getProperty('width').get()}px`,
-            // minWidth: `${this.getProperty('width').get()}px`,
-            height: `${this.getProperty('contentItem').get().getDom().scrollHeight}px`,
-            minHeight: `${this.getProperty('contentItem').get().getDom().scrollHeight}px`,
-        })
+        // this.getProperty('contentItem').get().setStyle({
+        //     // width: `${this.getProperty('width').get()}px`,
+        //     // minWidth: `${this.getProperty('width').get()}px`,
+        //     height: `${this.getProperty('contentItem').get().getDom().scrollHeight}px`,
+        //     minHeight: `${this.getProperty('contentItem').get().getDom().scrollHeight}px`,
+        // })
+
+        this.$calcContentGeometry()
+  
+        this.$updateChildren()
+    }
+
+    $updateChildren(){
+        let x = 0
+        let y = 0
+        for(let i = 0; i < this.getPropertyValue('contentItem').$children.length; i++){
+            let child = this.getPropertyValue('contentItem').$children[i]
+
+            if(i > 0) {
+                x += this.cellWidth
+                if(x + this.cellWidth > this.width){
+                    x = 0
+                    y += this.cellHeight
+                }
+            }
+
+            child.x = x
+            child.y = y
+        }
     }
 
     $cellChanged(){
@@ -157,7 +200,12 @@ class GridView extends Flickable {
         this.updateGeometry()
     }
 
-    // not implemented yet
+    $destroy(){
+        for(let item of this.$items){
+            item.$destroy()
+        }
+        super.$destroy()
+    }
 
 }
 

@@ -547,7 +547,7 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
             if(tree[1] === 'parent') {
                 stat.compute = true
                 stat.value.push(`${currentInstructions.name}.parent`)
-            } else if(tree[1] in compiledFile.context){
+            } else if(tree[1] in compiledFile.context && stat.ignore.indexOf(tree[1]) < 0){
                 stat.compute = true
                 stat.value.push(`inCtx.get('${tree[1]}')`)
                 currentObj.name = `inCtx.${tree[1]}`
