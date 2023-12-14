@@ -143,7 +143,7 @@ class Loader extends Item {
         
         if(this.getPropertyValue('source')){
             let path = this.getStatement('source').get().replaceAll('/', '_').replaceAll('/', '_').replaceAll('.qml', '')
-            let fullPath = path.indexOf('qrc:') >= 0 ? path.replaceAll('qrc:_qml_', '').split('_') : [].concat(this.$path ? this.$path.split('_') : [], path.split('_'))
+            let fullPath = path.indexOf('qrc:') >= 0 ? path.replaceAll('qrc:_qml_', '').replaceAll('qrc:_', '').split('_') : [].concat(this.$path ? this.$path.split('_') : [], path.split('_'))
             let dotIndex = fullPath.indexOf('..')
             while(dotIndex >= 0){
                 if(dotIndex > 0){
@@ -155,7 +155,17 @@ class Loader extends Item {
                 dotIndex = fullPath.indexOf('..')
             }
 
-            let cls = eval(fullPath.join('_'))
+
+            let cls = null
+            while(!cls && fullPath.length){
+                try {
+                    cls = eval(fullPath.join('_'))
+                } catch (error) {
+                    cls = null
+                    fullPath.shift()
+                }
+            }
+            
             let item = new cls(this,this.$exCtx)
 
             // item.getProperty('x').getNotify().connect(()=>{
