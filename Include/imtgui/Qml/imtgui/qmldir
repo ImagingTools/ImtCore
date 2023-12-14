@@ -18,6 +18,7 @@ TableDelegate 1.0 ./AuxComponents/TableDelegate.qml
 TableCellDelegate 1.0 ./AuxComponents/TableCellDelegate.qml
 TableProperties 1.0 ./AuxComponents/TableProperties.qml
 TreeView 1.0 ./AuxComponents/TreeView.qml
+TreeViewGql 1.0 ./AuxComponents/TreeViewGql.qml
 TreeDelegate 1.0 ./AuxComponents/TreeDelegate.qml
 TreeItemDelegate 1.0 ./AuxComponents/TreeItemDelegate.qml
 BasicTableView 1.0 ./AuxComponents/BasicTableView.qml
