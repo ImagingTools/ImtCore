@@ -50,4 +50,5 @@ module.exports.listComponents = [
     'MapQuickItem',
     'MapRectangle',
     'Connections',
+    'Binding',
 ]
