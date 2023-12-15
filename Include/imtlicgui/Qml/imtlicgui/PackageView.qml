@@ -47,13 +47,13 @@ DocumentBase {
     Component.onCompleted: {
         commandsDelegate.tableTreeViewEditor = tableView;
         if (featuresProvider && featuresProvider.onModelChanged){
-            featuresProvider.onModelChanged.connect(packageViewRoot.updateTreeViewModel);
+            featuresProvider.modelChanged.connect(packageViewRoot.updateTreeViewModel);
         }
     }
 
     Component.onDestruction: {
         if (featuresProvider && featuresProvider.onModelChanged){
-            featuresProvider.onModelChanged.disconnect(packageViewRoot.updateTreeViewModel);
+            featuresProvider.modelChanged.disconnect(packageViewRoot.updateTreeViewModel);
         }
     }
 

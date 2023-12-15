@@ -92,8 +92,8 @@ Item {
         }
 
         onLoaded: {
-            filterMenuLocal.item.onTextFilterChanged.connect(collectionViewBaseContainer.onTextFilterChanged);
-            filterMenuLocal.item.onClosed.connect(collectionViewBaseContainer.onFilterClosed);
+            filterMenuLocal.item.textFilterChanged.connect(collectionViewBaseContainer.onTextFilterChanged);
+            filterMenuLocal.item.closed.connect(collectionViewBaseContainer.onFilterClosed);
         }
     }
 

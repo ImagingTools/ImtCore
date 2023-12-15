@@ -6,8 +6,6 @@ import imtqml 1.0
 CollectionView {
     id: userGroupCollectionViewContainer;
 
-    property string uuid;
-    property var documentManagerPtr: null;
     documentName: qsTr("Groups");
 
     Component.onCompleted: {

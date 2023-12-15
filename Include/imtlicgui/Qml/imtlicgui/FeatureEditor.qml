@@ -249,7 +249,7 @@ DocumentData {
                 if (selectedIndex != null){
                     featureId = selectedIndex.getData("FeatureId");
                     if (featureId !== ""){
-                        updateTreeViewGui();
+                        featureEditor.updateTreeViewGui();
                     }
                 }
 
@@ -378,11 +378,11 @@ DocumentData {
                 featureEditor.dependenciewViewModel.Copy(FeaturesProvider.model);
                 featureDependenciesView.rowModel = featureEditor.dependenciewViewModel;
 
-                FeaturesProvider.onModelChanged.connect(featureDependenciesView.onFeaturesProviderModelChanged);
+                FeaturesProvider.modelChanged.connect(featureDependenciesView.onFeaturesProviderModelChanged);
             }
 
             Component.onDestruction: {
-                FeaturesProvider.onModelChanged.disconnect(featureDependenciesView.onFeaturesProviderModelChanged);
+                FeaturesProvider.modelChanged.disconnect(featureDependenciesView.onFeaturesProviderModelChanged);
             }
 
             function onFeaturesProviderModelChanged(){
@@ -468,6 +468,9 @@ DocumentData {
                     let delegateItem = itemsDataList[i]
                     let itemData = delegateItem.getItemData();
                     let id = itemData.FeatureId;
+                    console.log('DEBUG:::=================')
+                    console.log('DEBUG:::', itemData)
+                    console.log('DEBUG:::', Object.keys(itemData))
                     let dependencies = itemData.Dependencies;
 
                     let rootId = itemData.RootFeatureId;

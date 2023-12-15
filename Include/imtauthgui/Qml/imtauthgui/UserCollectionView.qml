@@ -12,7 +12,7 @@ CollectionView {
         userCollectionViewContainer.commandsDelegatePath = "../../imtauthgui/UserCollectionViewCommandsDelegate.qml";
 
         if (userCollectionViewContainer.baseCollectionView.table.headers){
-            userCollectionViewContainer.baseCollectionView.table.onHeadersChanged.connect(userCollectionViewContainer.onHeadersChanged);
+            userCollectionViewContainer.baseCollectionView.table.headersChanged.connect(userCollectionViewContainer.onHeadersChanged);
         }
 
         userCollectionViewContainer.commandId = "Users";

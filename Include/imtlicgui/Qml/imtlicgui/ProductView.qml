@@ -20,11 +20,11 @@ DocumentData {
     Component.onCompleted: {
         productViewContainer.allFeaturesModel = FeaturesProvider.model;
 
-        FeaturesProvider.onModelChanged.connect(productViewContainer.onFeaturesChanged);
+        FeaturesProvider.modelChanged.connect(productViewContainer.onFeaturesChanged);
     }
 
     Component.onDestruction: {
-        FeaturesProvider.onModelChanged.disconnect(productViewContainer.onFeaturesChanged);
+        FeaturesProvider.modelChanged.disconnect(productViewContainer.onFeaturesChanged);
     }
 
     function onFeaturesChanged(){
