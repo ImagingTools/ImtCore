@@ -10,9 +10,9 @@ DocumentManager {
     property alias alertPanelComp: alertPanel.sourceComponent;
 
     Component.onCompleted: {
-        documentController.onSetModelStateChanged.connect(workspaceView.onSetModelStateChanged);
-        documentController.onGetModelStateChanged.connect(workspaceView.onGetModelStateChanged);
-        documentController.onUpdateModelStateChanged.connect(workspaceView.onUpdateModelStateChanged);
+        documentController.setModelStateChanged.connect(workspaceView.onSetModelStateChanged);
+        documentController.getModelStateChanged.connect(workspaceView.onGetModelStateChanged);
+        documentController.updateModelStateChanged.connect(workspaceView.onUpdateModelStateChanged);
     }
 
     onDocumentClosed: {
