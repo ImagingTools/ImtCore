@@ -38,6 +38,7 @@ class Text extends Item {
         wrapMode: { type: QProperty, value: Text.NoWrap, changed: '$wrapModeChanged' },
         textFormat: { type: QProperty, value: Text.AutoText, changed: '$textFormatChanged' },
         elide: { type: QProperty, value: Text.ElideNone, changed: '$elideChanged' },
+        lineHeight: { type: QReal, value: 0, changed: '$lineHeightChanged' },
     }
 
     static defaultSignals = {
@@ -114,6 +115,10 @@ class Text extends Item {
         
 
         
+    }
+
+    $lineHeightChanged(){
+
     }
 
     $widthChanged(){
