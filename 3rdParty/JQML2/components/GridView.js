@@ -36,6 +36,27 @@ class GridView extends Flickable {
         this.$items = []
     }
 
+    itemAtIndex(index){
+        return index >= 0 && index < this.$items.length ? this.$items[index] : undefined
+    }
+    positionViewAtBeginning(){
+        this.positionViewAtIndex(0, GridView.Beginning)
+    }
+    positionViewAtEnd(){
+        this.positionViewAtIndex(this.$items.length-1, GridView.Beginning)
+
+        
+    }
+    positionViewAtIndex(index, mode){
+        let pos = 'start'
+        switch(mode){
+            case GridView.Beginning: pos = 'start'; break;
+            case GridView.Center: pos = 'center'; break;
+            case GridView.End: pos = 'end'; break;
+        }
+
+    }
+
     $widthChanged(){
         super.$widthChanged()
         this.updateGeometry()
@@ -76,9 +97,12 @@ class GridView extends Flickable {
         }
         this.$items = []
         let ctx = new ContextController(this.delegate.get().$exCtx, this.$exCtx)
+        let createObject = this.getStatement('delegate').get().createObject
+        let cls = this.getStatement('delegate').get().constructor
+
         if(typeof this.getPropertyValue('model') === 'number'){
             for(let i = 0; i < this.getPropertyValue('model'); i++){
-                let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), ctx, {index: i})
+                let obj = createObject ? createObject(this.getStatement('contentItem').get(),ctx, {index: i}) : new cls(this.getStatement('contentItem').get(),ctx, {index: i})
                 // obj.setStyle({
                 //     position: 'relative'
                 // })
@@ -100,7 +124,7 @@ class GridView extends Flickable {
             }
         } else {
             for(let model of this.getPropertyValue('model').getPropertyValue('data')){
-                let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), ctx, model)
+                let obj = createObject ? createObject(this.getStatement('contentItem').get(),ctx, model) : new cls(this.getStatement('contentItem').get(),ctx, model)
                 
                 // obj.setStyle({
                 //     position: 'relative'

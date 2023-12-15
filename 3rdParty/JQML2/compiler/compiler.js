@@ -562,6 +562,10 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
                         if(!components[tree[1]]) eval(tree[1])
                         stat.value.push(tree[1])
                     } catch (error) {
+                        if(tree[1] === 'createComponent'){
+                            stat.createComponent = true
+                        }
+
                         if(tree[1] === 'XMLHttpRequest'){
                             stat.value.push(`XMLHttpRequest`)
                         } else if(tree[1] === 'QtPositioning'){
@@ -580,6 +584,10 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
             break
         }
         case 'dot': {
+            if(tree[2] === 'createComponent'){
+                stat.createComponent = true
+            }
+
             stat.compute = true
             prepare(tree[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
             stat.value.push('.')
@@ -590,6 +598,10 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
             stat.compute = true
             prepare(tree[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
             stat.value.push('(')
+            if(stat.createComponent){
+                stat.value.push(`'${compiledFile.namespace}',`)
+                stat.createComponent = false
+            }
             for(let i = 0; i < tree[2].length; i++){
                 prepare(tree[2][i], compiledFile, currentInstructions, stat, propValue, assign, '', currentObj)
                 if(i < tree[2].length-1) stat.value.push(',')

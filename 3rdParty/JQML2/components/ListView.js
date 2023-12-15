@@ -38,6 +38,27 @@ class ListView extends Flickable {
         })
     }
 
+    itemAtIndex(index){
+        return index >= 0 && index < this.$items.length.get() ? this.$items[index] : undefined
+    }
+    positionViewAtBeginning(){
+        this.positionViewAtIndex(0, ListView.Beginning)
+    }
+    positionViewAtEnd(){
+        this.positionViewAtIndex(this.$items.length.get()-1, ListView.Beginning)
+
+        
+    }
+    positionViewAtIndex(index, mode){
+        let pos = 'start'
+        switch(mode){
+            case ListView.Beginning: pos = 'start'; break;
+            case ListView.Center: pos = 'center'; break;
+            case ListView.End: pos = 'end'; break;
+        }
+
+    }
+
     $modelDataChanged(leftTop, bottomRight, roles){
         if(roles === 'remove'){
             for(let i = leftTop; i < bottomRight; i++){
@@ -47,7 +68,7 @@ class ListView extends Flickable {
                 }
             }
         }
-        console.log('DEBUG:::', leftTop, bottomRight, roles)
+        // console.log('DEBUG:::', leftTop, bottomRight, roles)
     }
     $disconnectModel(){
         if(this.$model && this.$model instanceof ListModel && this.$model.UID){
@@ -325,14 +346,17 @@ class ListView extends Flickable {
     createElement(index){
         if(this.$items[index]) return this.$items[index]
         let ctx = new ContextController(this.delegate.get().$exCtx, this.$exCtx)
+        let createObject = this.getStatement('delegate').get().createObject
+        let cls = this.getStatement('delegate').get().constructor
+
         if(typeof this.getPropertyValue('model') === 'number'){
-            let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), ctx, {index: index})
+            let obj = createObject ? createObject(this.getStatement('contentItem').get(),ctx, {index: index}) : new cls(this.getStatement('contentItem').get(),ctx, {index: index})
             // obj.getStatement('index').reset(index)
             // obj.getStatement('model').reset({index: index})
             this.$items[index] = obj
         } else {
             let model = this.getPropertyValue('model').getPropertyValue('data')[index]
-            let obj = this.delegate.get().createObject(this.getStatement('contentItem').get(), ctx, model)
+            let obj = createObject ? createObject(this.getStatement('contentItem').get(),ctx, model) : new cls(this.getStatement('contentItem').get(),ctx, model)
             // obj.getStatement('index').setCompute(()=>{return model.index})
             // obj.getStatement('index').update()
             // obj.getStatement('model').reset(model)

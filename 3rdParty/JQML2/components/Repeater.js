@@ -44,7 +44,7 @@ class Repeater extends Item {
                 }
             }
         }
-        console.log('DEBUG:::', leftTop, bottomRight, roles)
+        // console.log('DEBUG:::', leftTop, bottomRight, roles)
     }
     $disconnectModel(){
         if(this.$model && this.$model instanceof ListModel && this.$model.UID){
@@ -93,14 +93,17 @@ class Repeater extends Item {
     createElement(index){
         if(this.$items[index]) return this.$items[index]
         let ctx = new ContextController(this.delegate.get().$exCtx,this.$exCtx)
+        let createObject = this.getStatement('delegate').get().createObject
+        let cls = this.getStatement('delegate').get().constructor
+
         if(typeof this.getPropertyValue('model') === 'number'){
-            let obj = this.delegate.get().createObject(this.parent, ctx, {index: index})
+            let obj = createObject ? createObject(this.parent,ctx, {index: index}) : new cls(this.parent,ctx, {index: index})
             // obj.getStatement('index').reset(index)
             // obj.getStatement('model').reset({index: index})
             this.$items[index] = obj
         } else {
             let model = this.getPropertyValue('model').getPropertyValue('data')[index]
-            let obj = this.delegate.get().createObject(this.parent, ctx, model)
+            let obj = createObject ? createObject(this.parent,ctx, model) : new cls(this.parent,ctx, model)
             // obj.getStatement('index').setCompute(()=>{return model.index})
             // obj.getStatement('index').update()
             // obj.getStatement('model').reset(model)

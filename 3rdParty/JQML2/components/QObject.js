@@ -1,6 +1,7 @@
 const { ComplexObject } = require('../utils/base')
 const { QVar, QReal, QModelData } = require('../utils/properties')
 const { QSignal } = require('../utils/signal')
+const { Qt } = require('../utils/Qt')
 
 var UID = 0
 class QObject extends ComplexObject {
@@ -106,10 +107,8 @@ class QObject extends ComplexObject {
         this.$data.push(data)
     }
 
-    createComponent(path, parent){
-        let className = path.replaceAll('/', '_').replaceAll('\\', '_').replaceAll('.qml', '')
-        let cls = eval(className)
-        return new cls(parent)
+    createComponent(namespace, path, parent){
+        return Qt.createComponent(namespace, path, parent)
     }
 
     $destroy(){

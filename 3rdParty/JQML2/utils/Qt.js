@@ -55,6 +55,18 @@ var Qt = {
         let result = translate ? translate[sourceText] : sourceText
         return result ? result : sourceText
     },
+    createComponent(namespace, path, parent){
+        let className = namespace.split('_')
+        for(let name of path.replaceAll('/', '_').replaceAll('\\', '_').replaceAll('.qml', '').split('_')){
+            if(name === '..') {
+                className.pop()
+            } else {
+                if(className.indexOf(name) < 0) className.push(name)
+            }
+        }
+        let cls = eval(className.join('_'))
+        return new cls(parent)
+    },
 }
 
 module.exports.Qt = Qt
