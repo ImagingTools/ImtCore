@@ -164,7 +164,9 @@ class TextEdit extends Item {
         this.getProperty('contentHeight').reset(textMetrics.height)
     }
 
+    onKeyDown(key){
 
+    }
 
     onWheel(x, y, deltaX, deltaY){
         if(this.getPropertyValue('enabled')) {

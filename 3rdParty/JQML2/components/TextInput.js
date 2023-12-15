@@ -226,6 +226,25 @@ class TextInput extends Item {
         this.$input.select()
     }
 
+    onKeyDown(key){
+        if(key === 'Enter' || key === 'Return'){
+            if(this.getPropertyValue('validator')){
+                if(this.getPropertyValue('validator').validate(this.$input.value)){
+                    if(this.$signals.accepted) this.$signals.accepted()
+                    if(this.$signals.editingFinished) this.$signals.editingFinished()
+                    this.getProperty('acceptableInput').reset(true)
+                } else {
+                    this.getProperty('acceptableInput').reset(false)
+                }
+            } else {
+                if(this.$signals.accepted) this.$signals.accepted()
+                if(this.$signals.editingFinished) this.$signals.editingFinished()
+                this.getProperty('acceptableInput').reset(true)
+            }
+            
+        }
+    }
+
     onWheel(x, y, deltaX, deltaY){
         if(this.getPropertyValue('enabled')) {
             

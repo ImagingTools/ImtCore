@@ -263,7 +263,132 @@ class MouseController {
 class KeyboardController {
     constructor(){
         window.onkeydown = (e)=>{
-            // console.log(e)
+            if(!(mainRoot.$focusedElement instanceof TextInput) && !(mainRoot.$focusedElement instanceof TextEdit)){
+                
+                if(e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt') return
+                let key = e.key
+                if(e.key === 'ArrowLeft') key = 'Left'
+                if(e.key === 'ArrowRight') key = 'Right'
+                if(e.key === 'ArrowUp') key = 'Up'
+                if(e.key === 'ArrowDown') key = 'Down'
+                if(e.key === 'Return') key = 'Enter'
+
+
+                // let currentShortcuts = []
+                // for(let shortcut of this.shortcuts){
+                //     if(shortcut.enabled){
+                //         if(shortcut.sequence){
+                //             let stateKeys = {
+                //                 altKey: false,
+                //                 ctrlKey: false,
+                //                 shiftKey: false,
+                //                 key: ''
+                //             }
+                //             let skeys = shortcut.sequence.split('+')
+                //             for(let skey of skeys){
+                //                 if(skey === 'Shift') {
+                //                     stateKeys.shiftKey = true
+                //                 } else if(skey === 'Alt') {
+                //                     stateKeys.altKey = true
+                //                 } else if(skey === 'Ctrl') {
+                //                     stateKeys.ctrlKey = true
+                //                 } else {
+                //                     stateKeys.key = skey === 'Return' ? 'Enter' : skey
+                //                 }
+                //             }
+                //             if(stateKeys.key === key && stateKeys.shiftKey === e.shiftKey && stateKeys.ctrlKey === e.ctrlKey && stateKeys.altKey === e.altKey) {
+                //                 currentShortcuts.push(shortcut)
+                //             } 
+                //         } else if(shortcut.sequences.length) {
+                //             let i = 0
+                //             let find = false
+                //             while(i < shortcut.sequences.length && !find){
+                //                 let stateKeys = {
+                //                     altKey: false,
+                //                     ctrlKey: false,
+                //                     shiftKey: false,
+                //                     key: ''
+                //                 }
+                //                 let skeys = shortcut.sequences[i].split('+')
+                //                 for(let skey of skeys){
+                //                     if(skey === 'Shift') {
+                //                         stateKeys.shiftKey = true
+                //                     } else if(skey === 'Alt') {
+                //                         stateKeys.altKey = true
+                //                     } else if(skey === 'Ctrl') {
+                //                         stateKeys.ctrlKey = true
+                //                     } else {
+                //                         stateKeys.key = skey === 'Return' ? 'Enter' : skey
+                //                     }
+                //                 }
+                //                 if(stateKeys.key === key && stateKeys.shiftKey === e.shiftKey && stateKeys.ctrlKey === e.ctrlKey && stateKeys.altKey === e.altKey) {
+                //                     currentShortcuts.push(shortcut)
+                //                     find = true
+                //                 }
+                //                 i++
+                //             }
+                //         }
+                //     }
+                    
+                // }
+                // if(currentShortcuts.length >= 1){
+                //     e.preventDefault()
+                //     if(currentShortcuts.length === 1){
+                //         currentShortcuts[0].activated()
+                //     } else {
+                //         currentShortcuts[currentShortcuts.length-1].activatedAmbiguously()
+                //         Core.shortcuts.splice(Core.shortcuts.indexOf(currentShortcuts[currentShortcuts.length-1]), 1)
+                //         Core.shortcuts.unshift(currentShortcuts[currentShortcuts.length-1])
+                //     }
+                //     return
+                // }
+                
+            } else {
+                if(e.key === 'Enter' || e.key === 'Return'){
+                    e.preventDefault()
+                    mainRoot.$focusedElement.onKeyDown(e.key)
+                }
+            }
+            
+            if(mainRoot.$focusedElement && mainRoot.$focusedElement.$properties.KeyNavigation){
+                if(e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt') return
+
+                if(e.key === 'ArrowLeft') {
+                    if(mainRoot.$focusedElement.KeyNavigation.left){
+                        e.preventDefault()
+                        mainRoot.$focusedElement.KeyNavigation.left.focus = true
+                    }
+                }
+                if(e.key === 'ArrowRight') {
+                    if(mainRoot.$focusedElement.KeyNavigation.right){
+                        e.preventDefault()
+                        mainRoot.$focusedElement.KeyNavigation.right.focus = true
+                    }
+                }
+                if(e.key === 'ArrowUp') {
+                    if(mainRoot.$focusedElement.KeyNavigation.up){
+                        e.preventDefault()
+                        mainRoot.$focusedElement.KeyNavigation.up.focus = true
+                    }
+                }
+                if(e.key === 'ArrowDown') {
+                    if(mainRoot.$focusedElement.KeyNavigation.down){
+                        e.preventDefault()
+                        mainRoot.$focusedElement.KeyNavigation.down.focus = true
+                    }
+                }
+                if(e.key === 'Tab' && e.shiftKey) {
+                    if(mainRoot.$focusedElement.KeyNavigation.backtab){
+                        e.preventDefault()
+                        mainRoot.$focusedElement.KeyNavigation.backtab.focus = true
+                    }
+                } else if(e.key === 'Tab') {
+                    if(mainRoot.$focusedElement.KeyNavigation.tab){
+                        e.preventDefault()
+                        mainRoot.$focusedElement.KeyNavigation.tab.focus = true
+                    }
+                }
+            }
         }
     }
 }
