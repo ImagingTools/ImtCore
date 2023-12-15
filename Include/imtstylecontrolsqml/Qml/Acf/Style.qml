@@ -69,6 +69,8 @@ Item {
 	property real alternatingOpacity: 0.05
 	property bool enableHoverEffect: true
 
+    property int size_smallMargin: 8;
+    property int size_mainMargin: 16;
     property int size_indicatorHeight: 50;
     property int size_leftPanelWidth: 250;
     property string color_text_titles: "#7700FF";
