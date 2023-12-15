@@ -2,7 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 
-QtObject {
+Item {
     id: container;
 
     property TreeItemModel collectionModel: TreeItemModel {};
@@ -143,4 +143,31 @@ QtObject {
             }
         }
     }
+
+//    SubscriptionClient {
+//        id: subscriptionClient;
+
+//        property string ok: container.commandId !== "" && container.subscriptionId !== "";
+//        onOkChanged: {
+//            if (container.commandId !== ""){
+//                let subscriptionRequestId = "On" + container.commandId + "CollectionChanged"
+//                var query = Gql.GqlRequest("subscription", subscriptionRequestId);
+//                var queryFields = Gql.GqlObject("notification");
+//                queryFields.InsertField("Id");
+//                query.AddField(queryFields);
+
+//                console.log("CollectionDataProvider registerSubscription", subscriptionClient.commandId);
+
+//                subscriptionManager.registerSubscription(query, subscriptionClient);
+//            }
+//        }
+
+//        onStateChanged: {
+//            if (state === "Ready"){
+//                console.log("CollectionDataProvider subscriptionClient Ready", subscriptionClient.commandId);
+
+//                container.updateModel();
+//            }
+//        }
+//    }
 }

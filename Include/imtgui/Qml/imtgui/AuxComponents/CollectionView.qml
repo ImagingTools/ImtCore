@@ -455,8 +455,8 @@ Item {
 
         property string ok: collectionViewContainer.commandId !== "" && subscriptionClient.subscriptionId !== "";
         onOkChanged: {
-            if (commandId !== ""){
-                let subscriptionRequestId = "On" + commandId + "CollectionChanged"
+            if (collectionViewContainer.commandId !== ""){
+                let subscriptionRequestId = "On" + collectionViewContainer.commandId + "CollectionChanged"
                 var query = Gql.GqlRequest("subscription", subscriptionRequestId);
                 var queryFields = Gql.GqlObject("notification");
                 queryFields.InsertField("Id");

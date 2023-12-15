@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5091" Description="ACF"/>
-            <Version Id="1" Number="2192" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5136" Description="ACF"/>
+            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -63,6 +63,7 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="SimpleLoginWrap"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="ApiClient" ComponentId="ApiClient"/>
         <Component ExportedId="RemoteSuperuserController" ComponentId="SimpleLoginWrap/RemoteSuperuserController"/>
         <Component ExportedId="RemoteSuperuserProvider" ComponentId="SimpleLoginWrap/RemoteSuperuserProvider"/>
     </ExportedComponents>

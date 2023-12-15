@@ -16,6 +16,8 @@ void CSubscriptionControllerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
+	qDebug() << "CSubscriptionControllerComp" << *m_commandAttrPtr;
+
 	if (m_subscriptionManagerCompPtr.IsValid()){
 		imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, *m_commandAttrPtr);
 

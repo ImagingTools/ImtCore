@@ -21,6 +21,12 @@ DocumentManager {
         console.log("onStartPageObjChanged", startPageObj["Source"]);
         documentLoader.source = startPageObj["Source"];
 
+        if (!documentLoader.item){
+            console.error("QML not loaded: ", documentLoader.source);
+
+            return;
+        }
+
         if (documentLoader.item.commandId !== undefined){
             documentLoader.item.commandId = startPageObj["CommandId"];
         }

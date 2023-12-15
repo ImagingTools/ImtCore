@@ -194,6 +194,8 @@ void CWebSocketClientComp::OnWebSocketError(QAbstractSocket::SocketError /*error
 
 void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message)
 {
+	qDebug() << "OnWebSocketTextMessageReceived" << message;
+
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
 
 	if (webSocketPtr == nullptr){

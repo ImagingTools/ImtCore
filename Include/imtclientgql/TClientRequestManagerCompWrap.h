@@ -79,6 +79,8 @@ TClientRequestManagerCompWrap<Base>::Response::Response()
 template <class Base>
 imtbase::CTreeItemModel* TClientRequestManagerCompWrap<Base>::Response::GetResult()
 {
+	qDebug() << "GetResult";
+
 	return m_replyResultPtr;
 }
 
@@ -88,6 +90,8 @@ imtbase::CTreeItemModel* TClientRequestManagerCompWrap<Base>::Response::GetResul
 template <class Base>
 void TClientRequestManagerCompWrap<Base>::Response::OnReply(const imtgql::IGqlRequest& request, const QByteArray& replyData)
 {
+	qDebug() << "OnReply" << replyData;
+
 	QJsonDocument document = QJsonDocument::fromJson(replyData);
 	if (document.isObject()){
 		QJsonObject dataObject = document.object();

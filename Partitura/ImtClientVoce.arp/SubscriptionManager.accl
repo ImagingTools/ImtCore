@@ -8,10 +8,10 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="RemoteSystemStatusController" X="600" Y="50" Note=""/>
-        <Element ComponentName="Rights" X="600" Y="575" Note=""/>
-        <Element ComponentName="StandardLoginGui" X="600" Y="375" Note=""/>
-        <Element ComponentName="SystemStatusController" X="600" Y="200" Note=""/>
+        <Element ComponentName="SubscriptionController" X="550" Y="100" Note=""/>
+        <Element ComponentName="SubscriptionManager" X="550" Y="350" Note=""/>
+        <Element ComponentName="WebSocketClient" X="225" Y="550" Note=""/>
+        <Element ComponentName="WebSocketProtocolEngine" X="875" Y="550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>
