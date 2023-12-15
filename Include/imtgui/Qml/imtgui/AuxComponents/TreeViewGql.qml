@@ -202,15 +202,6 @@ Rectangle{
                     }
                 }
 
-                onWidthChanged:  {
-                    if(deleg.width > list.contentWidth){
-                        list.contentWidth = deleg.width;
-                        if(list.contentWidth > list.width){
-                            list.contentX = list.contentWidth - list.width + list.originX;
-                        }
-
-                    }
-                }
             }//delegate
 
         }//list
@@ -243,6 +234,26 @@ Rectangle{
     }//listContainer
 
 
+    function setContentWidth(){
+        let maxWidth = 0;
+        for(let i = 0; i < treeViewGql.model.GetItemsCount(); i++){
+            let level = treeViewGql.model.GetData("Level",i);
+            let visible = treeViewGql.model.GetData("Visible",i);
+            let width_ = !visible ? 0 : level * treeViewGql.shift + list.delegateWidth;
+            if(width_ > maxWidth){
+                maxWidth = width_;
+            }
+        }
+
+        list.contentWidth = maxWidth;
+        if(list.contentWidth > list.width){
+            list.contentX = list.contentWidth - list.width + list.originX;
+        }
+        else {
+            list.contentX = list.originX;
+        }
+    }
+
     function setVisibleElements(visible, index){
         console.log("SET VISIBLE", visible, index);
         let id = treeViewGql.model.GetData("Id", index);
@@ -250,7 +261,7 @@ Rectangle{
         let foundChangeCount = 0;
         for(let i = 0; i < treeViewGql.model.GetItemsCount(); i++){
             let parentId = treeViewGql.model.IsValidData("ParentId", i) ? treeViewGql.model.GetData("ParentId", i) : "";
-            console.log("parentId:: ", parentId)
+            //console.log("parentId:: ", parentId)
             let ok = false;
             let arr = parentId.split(",");
             let arrCounter = 0;
@@ -278,6 +289,8 @@ Rectangle{
                 treeViewGql.model.SetData("Visible", visible, i);
             }
         }
+
+        setContentWidth();
     }
 
     function insertTree(index, level, model_){
@@ -298,12 +311,11 @@ Rectangle{
             treeViewGql.model.SetData("HasBranch", false, newIndex);
 
             //УБРАТЬ!!!(TEST)
-
             //console.log(String(val + newIndex))
             treeViewGql.model.SetData("Id", String(val + newIndex), newIndex);
 
         }
-
+        setContentWidth();
     }
 
 
