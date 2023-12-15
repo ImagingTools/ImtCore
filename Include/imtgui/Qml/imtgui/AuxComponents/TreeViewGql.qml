@@ -19,8 +19,9 @@ Rectangle{
     Component.onCompleted: {//TEST
         let date = new Date();
         let val = date.valueOf();
-        let index = testInsertModelLevel0.InsertNewItem();
-        val = 0;
+        let index;
+
+        index = testInsertModelLevel0.InsertNewItem();
         testInsertModelLevel0.SetData("Id", String(val + index), index);
         testInsertModelLevel0.SetData("Name","ул. Ленина", index);
         testInsertModelLevel0.SetData("HasChildren", true, index);
