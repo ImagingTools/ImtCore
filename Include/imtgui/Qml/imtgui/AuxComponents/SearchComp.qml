@@ -563,7 +563,7 @@ Rectangle{
             }
         }
 
-        delegate:
+        delegate: Component{
             PopupMenuDelegate{
             id: searchDel;
 
@@ -603,7 +603,7 @@ Rectangle{
             onClicked: {
             }
 
-        }//delegate
+        }}//delegate
 
         onOpenSTChanged: {
             if(!searchTextField.openST){

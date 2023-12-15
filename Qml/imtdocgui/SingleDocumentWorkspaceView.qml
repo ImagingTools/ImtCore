@@ -12,9 +12,9 @@ DocumentManager {
     property var startPageObj;
 
     Component.onCompleted: {
-        documentController.onSetModelStateChanged.connect(documentManager.onSetModelStateChanged);
-        documentController.onGetModelStateChanged.connect(documentManager.onGetModelStateChanged);
-        documentController.onUpdateModelStateChanged.connect(documentManager.onUpdateModelStateChanged);
+        documentController.setModelStateChanged.connect(documentManager.onSetModelStateChanged);
+        documentController.getModelStateChanged.connect(documentManager.onGetModelStateChanged);
+        documentController.updateModelStateChanged.connect(documentManager.onUpdateModelStateChanged);
     }
 
     onStartPageObjChanged: {

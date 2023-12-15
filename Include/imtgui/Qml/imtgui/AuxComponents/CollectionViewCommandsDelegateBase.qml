@@ -76,8 +76,7 @@ Item {
             if (containerBase.tableData.rightButtonMouseClicked){
                 containerBase.tableData.rightButtonMouseClicked.connect(openPopupMenu);
             }
-
-            containerBase.tableData.selectionChanged.connect(containerBase.selectionChanged);
+            containerBase.selectionChanged.connect(containerBase.selectionChanged);
         }
     }
 
