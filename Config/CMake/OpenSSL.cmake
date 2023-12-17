@@ -1,5 +1,10 @@
 include_directories(${OPENSSLDIR})
 
+# Cross compile fix for WIN -> *NIX systems
+if (OPENSSLDIR)
+	string(REPLACE "\\" "/" OPENSSLDIR ${OPENSSLDIR})
+endif()
+
 if(WIN32)
     if(${CMAKE_CL_64} STREQUAL 1)
         target_link_libraries(${PROJECT_NAME} ${OPENSSLDIR}/lib/x64/libcrypto.lib)
