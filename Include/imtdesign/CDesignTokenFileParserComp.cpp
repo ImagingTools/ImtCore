@@ -75,7 +75,7 @@ bool CDesignTokenFileParserComp::SetFile(const QByteArray& filePath)
 		}
 	}
 	else{
-		qDebug(qPrintable(QString("Theme file doesn't exist: '%1'").arg(qPrintable(filePath))));
+		qDebug() << (qPrintable(QString("Theme file doesn't exist: '%1'").arg(qPrintable(filePath))));
 
 		return false;
 	}
