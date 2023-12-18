@@ -71,6 +71,22 @@ Rectangle {
                 width: 70;
                 height: width;
             }
+
+            ProgressRoundIndicator{
+                id: roundIndicatorInd;
+
+                anchors.bottom:  parent.bottom;
+                width: 70;
+                height: width;
+                indeterminate: true;
+                percent: 40;
+                MouseArea{
+                    anchors.fill: parent;
+                    onClicked: {
+                        roundIndicatorInd.indeterminate = !roundIndicatorInd.indeterminate;
+                    }
+                }
+            }
         }//progressBarRow
 
         Row{
