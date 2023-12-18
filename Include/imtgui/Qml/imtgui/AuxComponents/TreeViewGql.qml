@@ -21,70 +21,6 @@ Rectangle{
     signal doubleClicked(int index);
 
 
-
-    Component.onCompleted: {//TEST
-
-        let date = new Date();
-        let val = date.valueOf();
-        let index;
-
-        for(let i = 0; i < 300; i++){
-            index = testInsertModelLevel0.InsertNewItem();
-            testInsertModelLevel0.SetData("Id", String(val + index), index);
-            testInsertModelLevel0.SetData("Name","ул. Ленина", index);
-            testInsertModelLevel0.SetData("HasChildren", true, index);
-
-            index = testInsertModelLevel0.InsertNewItem();
-            testInsertModelLevel0.SetData("Id", String(val + index), index);
-            testInsertModelLevel0.SetData("Name","ул. Маркса", index);
-            testInsertModelLevel0.SetData("HasChildren", true, index);
-
-            index = testInsertModelLevel0.InsertNewItem();
-            testInsertModelLevel0.SetData("Id", String(val + index), index);
-            testInsertModelLevel0.SetData("Name","ул. Менделеева", index);
-            testInsertModelLevel0.SetData("HasChildren", true, index);
-
-            index = testInsertModelLevel0.InsertNewItem();
-            testInsertModelLevel0.SetData("Id", String(val + index), index);
-            testInsertModelLevel0.SetData("Name","ул. Королёва", index);
-            testInsertModelLevel0.SetData("HasChildren", true, index);
-
-            index = testInsertModelLevel0.InsertNewItem();
-            testInsertModelLevel0.SetData("Id", String(val + index), index);
-            testInsertModelLevel0.SetData("Name","ул. Гагарина", index);
-            testInsertModelLevel0.SetData("HasChildren", true, index);
-
-            index = testInsertModelLevel0.InsertNewItem();
-            testInsertModelLevel0.SetData("Id", String(val + index), index);
-            testInsertModelLevel0.SetData("Name","ул. Мира", index);
-            testInsertModelLevel0.SetData("HasChildren", false, index);
-
-        }
-        insertTree(-1,-1, testInsertModelLevel0);//!!!
-
-        index = testInsertModel.InsertNewItem();
-        testInsertModel.SetData("Name", "дом 1" , index);
-        testInsertModel.SetData("HasChildren", true, index);
-
-        index = testInsertModel.InsertNewItem();
-        testInsertModel.SetData("Name","дом 2" , index);
-        testInsertModel.SetData("HasChildren", true, index);
-
-        index = testInsertModel.InsertNewItem();
-        testInsertModel.SetData("Name", "дом 3" , index);
-        testInsertModel.SetData("HasChildren", false, index);
-
-
-    }
-
-    TreeItemModel{
-        id: testInsertModel;
-    }
-
-    TreeItemModel{
-        id: testInsertModelLevel0;
-    }
-
     Rectangle{
         id: listContainer;
 
@@ -152,7 +88,6 @@ Rectangle{
                                 if(!model.HasBranch){
                                     treeViewGql.model.SetData("HasBranch", true, model.index);
                                     treeViewGql.requestSignal(model.index, model.Level)
-                                    insertTree(model.index, model.Level, testInsertModel);
                                 }
                                 else {
                                     setVisibleElements(true, model.index)
