@@ -28,36 +28,38 @@ Rectangle{
         let val = date.valueOf();
         let index;
 
-        index = testInsertModelLevel0.InsertNewItem();
-        testInsertModelLevel0.SetData("Id", String(val + index), index);
-        testInsertModelLevel0.SetData("Name","ул. Ленина", index);
-        testInsertModelLevel0.SetData("HasChildren", true, index);
+        for(let i = 0; i < 300; i++){
+            index = testInsertModelLevel0.InsertNewItem();
+            testInsertModelLevel0.SetData("Id", String(val + index), index);
+            testInsertModelLevel0.SetData("Name","ул. Ленина", index);
+            testInsertModelLevel0.SetData("HasChildren", true, index);
 
-        index = testInsertModelLevel0.InsertNewItem();
-        testInsertModelLevel0.SetData("Id", String(val + index), index);
-        testInsertModelLevel0.SetData("Name","ул. Маркса", index);
-        testInsertModelLevel0.SetData("HasChildren", true, index);
+            index = testInsertModelLevel0.InsertNewItem();
+            testInsertModelLevel0.SetData("Id", String(val + index), index);
+            testInsertModelLevel0.SetData("Name","ул. Маркса", index);
+            testInsertModelLevel0.SetData("HasChildren", true, index);
 
-        index = testInsertModelLevel0.InsertNewItem();
-        testInsertModelLevel0.SetData("Id", String(val + index), index);
-        testInsertModelLevel0.SetData("Name","ул. Менделеева", index);
-        testInsertModelLevel0.SetData("HasChildren", true, index);
+            index = testInsertModelLevel0.InsertNewItem();
+            testInsertModelLevel0.SetData("Id", String(val + index), index);
+            testInsertModelLevel0.SetData("Name","ул. Менделеева", index);
+            testInsertModelLevel0.SetData("HasChildren", true, index);
 
-        index = testInsertModelLevel0.InsertNewItem();
-        testInsertModelLevel0.SetData("Id", String(val + index), index);
-        testInsertModelLevel0.SetData("Name","ул. Королёва", index);
-        testInsertModelLevel0.SetData("HasChildren", true, index);
+            index = testInsertModelLevel0.InsertNewItem();
+            testInsertModelLevel0.SetData("Id", String(val + index), index);
+            testInsertModelLevel0.SetData("Name","ул. Королёва", index);
+            testInsertModelLevel0.SetData("HasChildren", true, index);
 
-        index = testInsertModelLevel0.InsertNewItem();
-        testInsertModelLevel0.SetData("Id", String(val + index), index);
-        testInsertModelLevel0.SetData("Name","ул. Гагарина", index);
-        testInsertModelLevel0.SetData("HasChildren", true, index);
+            index = testInsertModelLevel0.InsertNewItem();
+            testInsertModelLevel0.SetData("Id", String(val + index), index);
+            testInsertModelLevel0.SetData("Name","ул. Гагарина", index);
+            testInsertModelLevel0.SetData("HasChildren", true, index);
 
-        index = testInsertModelLevel0.InsertNewItem();
-        testInsertModelLevel0.SetData("Id", String(val + index), index);
-        testInsertModelLevel0.SetData("Name","ул. Мира", index);
-        testInsertModelLevel0.SetData("HasChildren", false, index);
+            index = testInsertModelLevel0.InsertNewItem();
+            testInsertModelLevel0.SetData("Id", String(val + index), index);
+            testInsertModelLevel0.SetData("Name","ул. Мира", index);
+            testInsertModelLevel0.SetData("HasChildren", false, index);
 
+        }
         insertTree(-1,-1, testInsertModelLevel0);//!!!
 
         index = testInsertModel.InsertNewItem();
@@ -112,7 +114,8 @@ Rectangle{
 
                 width: model.Visible ? model.Level * treeViewGql.shift + list.delegateWidth : 0;
                 height: model.Visible ? 40 : 0;
-                property bool isOpen: false;
+                opacity: model.Visible;
+                property bool isOpen: model.IsOpen;
                 Rectangle{
                     anchors.left: parent.left;
                     anchors.leftMargin: model.Level * treeViewGql.shift;
@@ -124,7 +127,7 @@ Rectangle{
 
                         anchors.verticalCenter: parent.verticalCenter;
                         anchors.left: parent.left;
-                        anchors.leftMargin: Style.size_smallMargin;
+                        anchors.leftMargin: 8;
 
                         width: 16;
                         height: width;
@@ -154,10 +157,13 @@ Rectangle{
                                 else {
                                     setVisibleElements(true, model.index)
                                 }
-                                deleg.isOpen = true;
+                                //deleg.isOpen = true;
+                                treeViewGql.model.SetData("IsOpen", true, model.index);
+
                             }
                             else if(deleg.isOpen){
-                                deleg.isOpen = false;
+                                //deleg.isOpen = false;
+                                treeViewGql.model.SetData("IsOpen", false, model.index);
                                 setVisibleElements(false, model.index)
                             }
 
@@ -169,7 +175,7 @@ Rectangle{
 
                         anchors.verticalCenter: parent.verticalCenter;
                         anchors.left: openButton.right;
-                        anchors.leftMargin: Style.size_smallMargin;
+                        anchors.leftMargin: 8;
 
                         visible: model.HasChildren == undefined ? false : model.HasChildren;
 
@@ -179,7 +185,7 @@ Rectangle{
                         sourceSize.height: height;
                         property string imageName: deleg.isOpen ? "Icons/FolderOpened" : "Icons/FolderClosed";
 
-                        source:  "../../../" +Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
+                        source:  "../../../" + Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
 
                     }
 
@@ -192,7 +198,7 @@ Rectangle{
                         anchors.right: parent.right;
 
                         font.family: Style.fontFamily;
-                        font.pixelSize: Style.fontSize_subtitle;
+                        font.pixelSize: Style.fontSize_subtitle !==undefined ? Style.fontSize_subtitle : 18;
                         color: Style.textColor;
 
                         text: model[treeViewGql.nameId];
@@ -298,6 +304,7 @@ Rectangle{
             }
 
             if(foundChangeCount == 2){
+                console.log("StopINdex::", i);
                 break;
             }
 
@@ -308,6 +315,7 @@ Rectangle{
         }
 
         setContentWidth();
+
     }
 
     function insertTree(index, level, model_){
@@ -325,6 +333,7 @@ Rectangle{
             treeViewGql.model.SetData("Level",level + 1, newIndex);
             treeViewGql.model.SetData("BranchIds", parentId, newIndex);
             treeViewGql.model.SetData("Visible", true, newIndex);
+            treeViewGql.model.SetData("IsOpen", false, newIndex);
             treeViewGql.model.SetData("HasBranch", false, newIndex);
 
             //УБРАТЬ!!!(TEST)
