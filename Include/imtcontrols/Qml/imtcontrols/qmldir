@@ -123,6 +123,8 @@ TreeView 1.0 ./Views/TreeView.qml
 TreeViewModelAdapter 1.0 ./Views/TreeViewModelAdapter.qml
 TreeViewSelection 1.0 ./Views/TreeViewSelection.qml
 ProgressBar 1.0 ./Views/ProgressBar.qml
+ProgressRoundIndicator 1.0 ./Views/ProgressRoundIndicator.qml
+DrawingContainer 1.0 ./Views/DrawingContainer.qml
 SplitView 1.0 ./Views/SplitView.qml
 SwipeView 1.0 ./Views/SwipeView.qml
 CollectionViewBase 1.0 ./Views/Base/CollectionViewBase.qml

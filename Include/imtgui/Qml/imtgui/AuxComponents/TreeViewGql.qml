@@ -11,10 +11,14 @@ Rectangle{
     property TreeItemModel model: TreeItemModel{};
 
     property int shift: 70;
+    property string nameId: "Name";
     property alias delegateWidht: list.delegateWidth;
     property alias delegate: list.delegate;
 
     signal requestSignal(int index, int level);
+
+    signal clicked(int index);
+    signal doubleClicked(int index);
 
     Component.onCompleted: {//TEST
         let date = new Date();
@@ -140,6 +144,21 @@ Rectangle{
                         iconHeight: width;
 
                         onClicked: {
+                            if(!deleg.isOpen){
+                                if(!model.HasBranch){
+                                    treeViewGql.model.SetData("HasBranch", true, model.index);
+                                    treeViewGql.requestSignal(model.index, model.Level)
+                                    insertTree(model.index, model.Level, testInsertModel);
+                                }
+                                else {
+                                    setVisibleElements(true, model.index)
+                                }
+                                deleg.isOpen = true;
+                            }
+                            else if(deleg.isOpen){
+                                deleg.isOpen = false;
+                                setVisibleElements(false, model.index)
+                            }
 
                         }
                     }
@@ -175,30 +194,24 @@ Rectangle{
                         font.pixelSize: Style.fontSize_subtitle;
                         color: Style.textColor;
 
-                        text: model.Name;
+                        text: model[treeViewGql.nameId];
                     }
                     MouseArea{
-                        anchors.fill: parent;
+                        id: delegateMA;
+
+                        anchors.top: parent.top;
+                        anchors.bottom: parent.bottom;
+                        anchors.right: parent.right;
+                        anchors.left: nameText.left;
 
                         visible: model.HasChildren == undefined ? false : model.HasChildren;
-
+                        hoverEnabled: visible;
+                        cursorShape: Qt.PointingHandCursor;
                         onClicked: {
-                            if(!deleg.isOpen){
-                                if(!model.HasBranch){
-                                    treeViewGql.model.SetData("HasBranch", true, model.index);
-                                    treeViewGql.requestSignal(model.index, model.Level)
-                                    insertTree(model.index, model.Level, testInsertModel);
-                                }
-                                else {
-                                    setVisibleElements(true, model.index)
-                                }
-                                deleg.isOpen = true;
-                            }
-                            else if(deleg.isOpen){
-                                deleg.isOpen = false;
-                                setVisibleElements(false, model.index)
-                            }
-
+                            treeViewGql.clicked(model.index);
+                        }
+                        onDoubleClicked: {
+                            treeViewGql.doubleClicked(model.index);
                         }
                     }
                 }
@@ -261,7 +274,7 @@ Rectangle{
         let found = false;
         let foundChangeCount = 0;
         for(let i = 0; i < treeViewGql.model.GetItemsCount(); i++){
-            let parentId = treeViewGql.model.IsValidData("ParentId", i) ? treeViewGql.model.GetData("ParentId", i) : "";
+            let parentId = treeViewGql.model.IsValidData("BranchIds", i) ? treeViewGql.model.GetData("BranchIds", i) : "";
             //console.log("parentId:: ", parentId)
             let ok = false;
             let arr = parentId.split(",");
@@ -296,7 +309,7 @@ Rectangle{
 
     function insertTree(index, level, model_){
         console.log("INSERT TREE", index, level);
-        let parentId_parent = treeViewGql.model.IsValidData("ParentId", index) ? treeViewGql.model.GetData("ParentId", index) : "";
+        let parentId_parent = treeViewGql.model.IsValidData("BranchIds", index) ? treeViewGql.model.GetData("BranchIds", index) : "";
         let id_parent = treeViewGql.model.GetData("Id", index);
         let parentId = parentId_parent !== "" ? parentId_parent + "," + id_parent: id_parent;
 
@@ -307,7 +320,7 @@ Rectangle{
             treeViewGql.model.InsertNewItem(newIndex);
             treeViewGql.model.CopyItemDataFromModel(newIndex, model_, i);
             treeViewGql.model.SetData("Level",level + 1, newIndex);
-            treeViewGql.model.SetData("ParentId", parentId, newIndex);
+            treeViewGql.model.SetData("BranchIds", parentId, newIndex);
             treeViewGql.model.SetData("Visible", true, newIndex);
             treeViewGql.model.SetData("HasBranch", false, newIndex);
 

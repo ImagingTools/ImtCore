@@ -125,6 +125,8 @@
 		<file alias="imtcontrols/Views/TreeViewModelAdapter.qml">Qml/imtcontrols/Views/TreeViewModelAdapter.qml</file>
 		<file alias="imtcontrols/Views/TreeViewSelection.qml">Qml/imtcontrols/Views/TreeViewSelection.qml</file>
                 <file alias="imtcontrols/Views/ProgressBar.qml">Qml/imtcontrols/Views/ProgressBar.qml</file>
+                <file alias="imtcontrols/Views/ProgressRoundIndicator.qml">Qml/imtcontrols/Views/ProgressRoundIndicator.qml</file>
+                <file alias="imtcontrols/Views/DrawingContainer.qml">Qml/imtcontrols/Views/DrawingContainer.qml</file>
                 <file alias="imtcontrols/Views/SplitView.qml">Qml/imtcontrols/Views/SplitView.qml</file>
                 <file alias="imtcontrols/Views/SwipeView.qml">Qml/imtcontrols/Views/SwipeView.qml</file>
 		<file alias="imtcontrols/Views/Base/CollectionViewBase.qml">Qml/imtcontrols/Views/Base/CollectionViewBase.qml</file>
