@@ -3,7 +3,6 @@ import Acf 1.0
 import imtqml 1.0
 import imtcontrols 1.0
 
-//import QtQuick.Controls 2.15
 
 
 
@@ -11,6 +10,7 @@ Rectangle {
     id: indicatorsRepresentaitonPage;
 
     anchors.fill: parent;
+
 
     Column{
         id: column;
@@ -63,6 +63,14 @@ Rectangle {
                 text: percent + " %";
             }
 
+
+            ProgressRoundIndicator{
+                id: roundIndicator;
+
+                anchors.bottom:  parent.bottom;
+                width: 70;
+                height: width;
+            }
         }//progressBarRow
 
         Row{
@@ -249,6 +257,28 @@ Rectangle {
         }//scrollBarsRow
 
     }//Column
+
+    Timer{
+        id: timer;
+
+        running: true;
+        triggeredOnStart: true;
+        onTriggered: {
+            roundIndicatorAnim.start();
+        }
+        interval: 4000;
+        repeat: true;
+    }
+
+
+    NumberAnimation {
+        id: roundIndicatorAnim;
+
+        target: roundIndicator;
+        property: "percent";
+        duration: 3000;
+        from: 0; to: 100;
+    }
 
 }
 
