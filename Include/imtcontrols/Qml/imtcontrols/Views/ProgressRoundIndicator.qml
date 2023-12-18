@@ -4,106 +4,234 @@ import imtqml 1.0
 import imtcontrols 1.0
 
 Item{
-   id: roundIndicator;
+    id: roundIndicator;
 
-   property real percent: 0;
+    property real percent: 0;
 
-   property int lineWidth: 3;
-   property string mainColor: "green";
+    property int lineWidth: 3;
+    property string mainColor: "green";
 
-   property bool hasText: true;
-   property bool hasIcon: false;
+    property bool hasText: true;
+    property bool hasIcon: false;
 
-   property string imageSource: "../../../" +Style.getIconPath("Icons/Add", Icon.State.On, Icon.Mode.Normal);
+    property string imageSource: "../../../" +Style.getIconPath("Icons/Add", Icon.State.On, Icon.Mode.Normal);
 
-   property bool indeterminate: false;
+    property bool indeterminate: false;
+    property string indetMode: "Increase";
 
 
-   Component.onCompleted: {
-       canvas.requestPaint();
-   }
+    Component.onCompleted: {
+        canvas.requestPaint();
+    }
 
-   onPercentChanged: {
-       canvas.requestPaint();
-   }
+    onPercentChanged: {
+        canvas.requestPaint();
+    }
 
-   Canvas {
+    onIndeterminateChanged: {
+         canvas.requestPaint();
+    }
 
-       id: canvas
+    Canvas {
 
-       anchors.centerIn: parent;
+        id: canvas
 
-       width: parent.width - 2 * roundIndicator.lineWidth;
-       height: width;
+        anchors.centerIn: parent;
 
-       antialiasing: true;
+        width: parent.width - 2 * roundIndicator.lineWidth;
+        height: width;
 
-       onWidthChanged: {
-           requestPaint()
-       }
+        antialiasing: true;
 
-       onHeightChanged: {
-           requestPaint()
-       }
 
-       onPaint: {
-           var ctx = canvas.getContext('2d');
-           ctx.clearRect(0, 0, canvas.width, canvas.height)
+        property real increaseVal: 0;
+        property real rotationVal: 0;
+        property real decreaseVal: 0;
 
-           drawProgress(ctx);
 
-       }
+        //property var ctx: canvas.getContext('2d');
 
-       function drawProgress(ctx){
-           ctx.lineJoin = "round"
-           ctx.lineWidth = roundIndicator.lineWidth;
+        onWidthChanged: {
+            requestPaint()
+        }
 
-           ctx.strokeStyle = roundIndicator.mainColor;
-           ctx.fillStyle = roundIndicator.mainColor;
+        onHeightChanged: {
+            requestPaint()
+        }
+        onIncreaseValChanged: {
+            requestPaint();
+        }
+        onRotationValChanged: {
+            requestPaint();
+        }
 
-           ctx.beginPath()
-           ctx.arc(canvas.width/2, canvas.height/2, canvas.width/2 - roundIndicator.lineWidth, -Math.PI/2, (roundIndicator.percent/100) * 2 * Math.PI - Math.PI/2, false);
-           ctx.stroke();
-       }
+        onDecreaseValChanged: {
+            requestPaint();
+        }
 
-       function draw(ctx, startAngle, finishAngle){
-           ctx.lineJoin = "round"
-           ctx.lineWidth = roundIndicator.lineWidth;
 
-           ctx.strokeStyle = roundIndicator.mainColor;
-           ctx.fillStyle = roundIndicator.mainColor;
 
-           ctx.beginPath()
-           ctx.arc(canvas.width/2, canvas.height/2, canvas.width/2 - roundIndicator.lineWidth, startAngle, finishAngle, false);
-           ctx.stroke();
+        onPaint: {
+            var ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-       }
+            if(!roundIndicator.indeterminate){
+                drawProgress(ctx);
+            }
+            else if(roundIndicator.indetMode == "Increase"){
+                drawIncrease(ctx);
+            }
+            else if(roundIndicator.indetMode == "Rotation"){
+                drawRotation(ctx);
+            }
+            else if(roundIndicator.indetMode == "Decrease"){
+                drawDecrease(ctx);
+            }
 
-   }
+        }
 
-   Text{
-       anchors.centerIn: parent;
+        function drawProgress(ctx){
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            ctx.lineJoin = "round"
+            ctx.lineWidth = roundIndicator.lineWidth;
 
-       font.family: Style.fontFamily;
-       font.pixelSize: Style.fontSize_subtitle;
-       color: Style.textColor;
-       visible: !roundIndicator.indeterminate && roundIndicator.hasText && !roundIndicator.hasIcon && roundIndicator.percent > 0;
+            ctx.strokeStyle = roundIndicator.mainColor;
+            ctx.fillStyle = roundIndicator.mainColor;
 
-       text: Math.round(roundIndicator.percent) + "%";
+            ctx.beginPath()
+            ctx.arc(canvas.width/2, canvas.height/2, canvas.width/2 - roundIndicator.lineWidth,  - Math.PI/2, (roundIndicator.percent/100) * 2 * Math.PI - Math.PI/2, false);
+            ctx.stroke();
+        }
 
-   }
+        function drawIncrease(ctx){
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            ctx.lineJoin = "round"
+            ctx.lineWidth = roundIndicator.lineWidth;
 
-   Image{
-       anchors.centerIn: parent;
+            ctx.strokeStyle = roundIndicator.mainColor;
+            ctx.fillStyle = roundIndicator.mainColor;
 
-       width: parent.width/2;
-       height: parent.height/2;
-       sourceSize.width: width;
-       sourceSize.height: height;
-       source: roundIndicator.imageSource;
+            ctx.beginPath()
+            ctx.arc(canvas.width/2, canvas.height/2, canvas.width/2 - roundIndicator.lineWidth,  - Math.PI/2, (canvas.increaseVal/100) * 2 * Math.PI - Math.PI/2 , false);
+            ctx.stroke();
 
-       visible: !roundIndicator.indeterminate && roundIndicator.hasIcon && !roundIndicator.hasText;
-   }
+
+        }
+        function drawRotation(ctx){
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            ctx.lineJoin = "round"
+            ctx.lineWidth = roundIndicator.lineWidth;
+
+            ctx.strokeStyle = roundIndicator.mainColor;
+            ctx.fillStyle = roundIndicator.mainColor;
+
+            ctx.beginPath()
+            ctx.arc(canvas.width/2, canvas.height/2, canvas.width/2 - roundIndicator.lineWidth,  - Math.PI/2 + Math.PI * canvas.rotationVal / 180, (canvas.increaseVal/100) * 2 * Math.PI - Math.PI/2 + Math.PI * canvas.rotationVal / 180 , false);
+            ctx.stroke();
+
+        }
+
+        function drawDecrease(ctx){
+            ctx.clearRect(0, 0, canvas.width, canvas.height)
+            ctx.lineJoin = "round"
+            ctx.lineWidth = roundIndicator.lineWidth;
+
+            ctx.strokeStyle = roundIndicator.mainColor;
+            ctx.fillStyle = roundIndicator.mainColor;
+
+            ctx.beginPath()
+            ctx.arc(canvas.width/2, canvas.height/2, canvas.width/2 - roundIndicator.lineWidth, (canvas.decreaseVal/100) * 2 * Math.PI /*- Math.PI/2*/, 2 * Math.PI - Math.PI/2, false);
+            ctx.stroke();
+
+        }
+
+    }
+
+    Text{
+        anchors.centerIn: parent;
+
+        font.family: Style.fontFamily;
+        font.pixelSize: Style.fontSize_subtitle;
+        color: Style.textColor;
+        visible: !roundIndicator.indeterminate && roundIndicator.hasText && !roundIndicator.hasIcon && roundIndicator.percent > 0;
+
+        text: Math.round(roundIndicator.percent) + "%";
+
+    }
+
+    Image{
+        anchors.centerIn: parent;
+
+        width: parent.width/2;
+        height: parent.height/2;
+        sourceSize.width: width;
+        sourceSize.height: height;
+        source: roundIndicator.imageSource;
+
+        visible: !roundIndicator.indeterminate && roundIndicator.hasIcon && !roundIndicator.hasText;
+    }
     
+    Timer{
+        id: timer;
+
+        running: roundIndicator.indeterminate;
+        triggeredOnStart: true;
+        onTriggered: {
+            if(roundIndicator.indeterminate){
+                roundIndicatorAnimIncrease.start();
+            }
+        }
+        interval: 1500;
+        repeat: true;
+    }
+
+
+    NumberAnimation {
+        id: roundIndicatorAnimIncrease;
+
+        target: canvas;
+        property: "increaseVal";
+        duration: 400;
+        from: 0; to: 87;
+        onStarted: {
+            roundIndicator.indetMode = "Increase";
+        }
+        onFinished: {
+            if(roundIndicator.indeterminate){
+                roundIndicatorAnimRotation.start();
+            }
+
+        }
+    }
+    NumberAnimation {
+        id: roundIndicatorAnimRotation;
+
+        target: canvas;
+        property: "rotationVal";
+        duration: 200;
+        from: 0; to: 45;
+        onStarted: {
+            if(roundIndicator.indeterminate){
+                roundIndicator.indetMode = "Rotation";
+            }
+        }
+        onFinished: {
+            roundIndicatorAnimDecrease.start();
+        }
+    }
+
+    NumberAnimation {
+        id: roundIndicatorAnimDecrease;
+
+        target: canvas;
+        property: "decreaseVal";
+        duration: 400;
+        from: 0; to: 75;
+        onStarted: {
+            roundIndicator.indetMode = "Decrease";
+        }
+        onFinished: {
+        }
+    }
 }
 
