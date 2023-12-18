@@ -20,7 +20,10 @@ Rectangle{
     signal clicked(int index);
     signal doubleClicked(int index);
 
+
+
     Component.onCompleted: {//TEST
+
         let date = new Date();
         let val = date.valueOf();
         let index;
@@ -97,7 +100,6 @@ Rectangle{
             anchors.top: parent.top;
             anchors.bottom: parent.bottom;
 
-
             boundsBehavior: Flickable.StopAtBounds;
             contentWidth: delegateWidth;
             clip: true;
@@ -108,9 +110,8 @@ Rectangle{
             delegate: Item{
                 id: deleg;
 
-                width: visible ? model.Level * treeViewGql.shift + list.delegateWidth : 0;
-                height: visible ? 40 : 0;
-                visible: model.Visible;
+                width: model.Visible ? model.Level * treeViewGql.shift + list.delegateWidth : 0;
+                height: model.Visible ? 40 : 0;
                 property bool isOpen: false;
                 Rectangle{
                     anchors.left: parent.left;
@@ -215,6 +216,8 @@ Rectangle{
                         }
                     }
                 }
+
+
 
             }//delegate
 
