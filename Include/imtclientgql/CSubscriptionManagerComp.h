@@ -41,7 +41,7 @@ public:
 		I_REGISTER_INTERFACE(imtclientgql::IGqlSubscriptionManager);
 		I_REGISTER_INTERFACE(imtclientgql::IGqlClient);
 		I_REGISTER_INTERFACE(imtrest::IRequestServlet);
-		I_ASSIGN(m_subsctiptionSenderCompPtr, "SubsctiptionSender", "Subsctiption sender", false, "SubsctiptionSender");
+		I_ASSIGN(m_subscriptionSenderCompPtr, "SubscriptionSender", "Subscription sender", false, "SubscriptionSender");
 		I_ASSIGN(m_requestManagerCompPtr, "RequestManager", "Request manager for sending a request", false, "RequestManager");
 		I_ASSIGN(m_engineCompPtr, "ProtocolEngine", "Protocol engine for subscription", true, "ProtocolEngine");
 		I_ASSIGN(m_loginStatusCompPtr, "WebLoginStatus", "Web login status", false, "WebLoginStatus");
@@ -78,7 +78,7 @@ private:
 	virtual imtrest::ConstResponsePtr CreateErrorResponse(QByteArray errorMessage, const imtrest::IRequest& request) const;
 
 private:
-	I_REF(imtrest::ISender, m_subsctiptionSenderCompPtr);
+	I_REF(imtrest::ISender, m_subscriptionSenderCompPtr);
 	I_REF(imtrest::IRequestManager, m_requestManagerCompPtr);
 	I_REF(imtauth::ILoginStatusProvider, m_loginStatusCompPtr);
 	I_REF(imod::IModel, m_webLoginStatusModelCompPtr);

@@ -2,19 +2,19 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5127" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5088" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="HttpProtocolEngine" X="775" Y="550" Note=""/>
-        <Element ComponentName="SubscriptionManager" X="175" Y="475" Note=""/>
-        <Element ComponentName="TcpServer" X="775" Y="375" Note=""/>
-        <Element ComponentName="WebSocketProtocolEngine" X="500" Y="475" Note=""/>
-        <Element ComponentName="WebSocketServer" X="325" Y="375" Note=""/>
-        <Element ComponentName="WebSocketServlet" X="325" Y="175" Note=""/>
-        <Element ComponentName="WorkerManager" X="775" Y="175" Note=""/>
+        <Element ComponentName="HttpProtocolEngine" X="800" Y="400" Note=""/>
+        <Element ComponentName="SubscriptionManager" X="150" Y="650" Note=""/>
+        <Element ComponentName="TcpServer" X="800" Y="275" Note=""/>
+        <Element ComponentName="WebSocketProtocolEngine" X="650" Y="650" Note=""/>
+        <Element ComponentName="WebSocketServer" X="400" Y="375" Note=""/>
+        <Element ComponentName="WebSocketServlet" X="400" Y="275" Note=""/>
+        <Element ComponentName="WorkerManager" X="1050" Y="100" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

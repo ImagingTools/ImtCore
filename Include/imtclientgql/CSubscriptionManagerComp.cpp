@@ -301,19 +301,21 @@ bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& re
 {
 	bool retVal = false;
 	QByteArray clientId;
+
 	const imtgql::CGqlRequest* cGqlRequest = dynamic_cast<const imtgql::CGqlRequest*>(&request);
 	if (cGqlRequest != nullptr){
-	 cGqlRequest->GetParams();
-	 const imtgql::CGqlObject* input = cGqlRequest->GetParam("input");
-	 if (input != nullptr){
-		 const imtgql::CGqlObject* addition = input->GetFieldArgumentObjectPtr("addition");
-		 if (addition != nullptr){
-			 clientId = addition->GetFieldArgumentValue("clientId").toByteArray();
-		 }
-	 }
+		cGqlRequest->GetParams();
+		const imtgql::CGqlObject* input = cGqlRequest->GetParam("input");
+		if (input != nullptr) {
+			const imtgql::CGqlObject* addition = input->GetFieldArgumentObjectPtr("addition");
+			if (addition != nullptr) {
+				clientId = addition->GetFieldArgumentValue("clientId").toByteArray();
+			}
+		}
 	}
-	if (m_subsctiptionSenderCompPtr.IsValid()){
-		retVal = m_subsctiptionSenderCompPtr->SendRequest(requestPtr);
+
+	if (m_subscriptionSenderCompPtr.IsValid()){
+		retVal = m_subscriptionSenderCompPtr->SendRequest(requestPtr);
 	}
 	else if (m_requestManagerCompPtr.IsValid()){
 		const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(clientId);

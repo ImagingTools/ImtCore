@@ -2,12 +2,12 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5127" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5088" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
-    <Description>Server framework fpr GraphQ-based implementations</Description>
+    <Description>Server framework for GraphQL-based implementations</Description>
     <Keywords>Web GraphQL Server HTTP</Keywords>
     <ElementsList>
         <Element Id="DelegatedBinaryDataProviders" PackageId="ImtCorePck" ComponentId="DelegatedBinaryDataProviders">
@@ -86,7 +86,7 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="HttpRequestHandlers">
+                    <AttributeInfo Id="RequestHandlers" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>WebResourcesServlet</Value>

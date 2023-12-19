@@ -22,7 +22,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="RemoteContextGQLServerFramework" PackageId="ImtHttpServerVoce" ComponentId="RemoteAuthorizableGQLServerFramework">
+        <Element Id="RemoteContextGQLServerFramework" PackageId="ImtHttpServerVoce" ComponentId="RemoteAuthorizableServerFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="BackupSettings" Type="Reference" ExportId="BackupSettings">

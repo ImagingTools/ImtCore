@@ -61,7 +61,7 @@
                     <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketProtocolEngine"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SubsctiptionSender" Type="Reference" ExportId="">
+                    <AttributeInfo Id="SubscriptionSender" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketClient"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WebLoginStatus" Type="Reference" ExportId="">

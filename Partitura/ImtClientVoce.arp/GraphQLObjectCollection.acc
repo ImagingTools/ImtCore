@@ -14,7 +14,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
-                        <Data IsEnabled="true" Value="GraphQlNetworkApiClient"/>
+                        <Data IsEnabled="true" Value="GraphQlApiClient"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="false"/>
@@ -67,7 +67,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="GraphQlNetworkApiClient" PackageId="ImtClientVoce" ComponentId="GraphQlNetworkApiClient">
+        <Element Id="GraphQlApiClient" PackageId="ImtClientVoce" ComponentId="GraphQlApiClient">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommunicationTimeout" Type="Real" ExportId="CommunicationTimeout">

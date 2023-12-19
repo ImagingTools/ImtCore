@@ -2,49 +2,19 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5136" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5088" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Remote login client based on Puma-system</Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="ApiClient" PackageId="ImtClientGqlPck" ComponentId="ApiClient">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ProtocolEngine" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="GraphQLClientEngine"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Timeout" Type="Real" ExportId="Timeout">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="GraphQLClientEngine" PackageId="ImtClientGqlPck" ComponentId="GraphQLClientEngine">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="ServerPrefix">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Url" Type="Id" ExportId="DefaultUrl">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="UrlParam">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="SimpleLoginWrap" PackageId="ImtAuthVoce" ComponentId="PumaBasedRights">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="ApiClient"/>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
                         <Data IsEnabled="false"/>
@@ -63,7 +33,6 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="SimpleLoginWrap"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="ApiClient" ComponentId="ApiClient"/>
         <Component ExportedId="RemoteSuperuserController" ComponentId="SimpleLoginWrap/RemoteSuperuserController"/>
         <Component ExportedId="RemoteSuperuserProvider" ComponentId="SimpleLoginWrap/RemoteSuperuserProvider"/>
     </ExportedComponents>

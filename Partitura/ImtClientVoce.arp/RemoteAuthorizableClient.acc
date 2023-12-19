@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5136" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5088" Description="ACF"/>
+            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -28,16 +28,16 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ServerName" Type="Id" ExportId="RemoteServerName">
+                    <AttributeInfo Id="ServerName" Type="Id" ExportId="PumaServerName">
                         <Data IsEnabled="true" Value="Puma"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="ServerPrefix">
                         <Data IsEnabled="true" Value="/Puma"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Url" Type="Id" ExportId="Url">
+                    <AttributeInfo Id="Url" Type="Id" ExportId="DefaultPumaUrl">
                         <Data IsEnabled="true" Value="http://localhost:7788"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="RemoteUrlParam">
+                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="PumaUrlParam">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -46,19 +46,10 @@
         <Element Id="Rights" PackageId="ImtAuthVoce" ComponentId="LoginClient">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultUrl" Type="Id" ExportId="DefaultUrl">
-                        <Data IsEnabled="true" Value="http://localhost:8111"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ProductId" Type="Id" ExportId="ProductId">
-                        <Data IsEnabled="true" Value="Acula"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="ServerPrefix">
-                        <Data IsEnabled="true" Value="/Acula"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="UrlParam">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -92,28 +83,28 @@
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CheckCommandId" Type="Id" ExportId="CheckCommandId">
-                        <Data IsEnabled="true" Value="AculaTestConnection"/>
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="CheckInterval" Type="Integer" ExportId="CheckInterval">
                         <Data IsEnabled="true" Value="2"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DatabaseCheckerCommandId" Type="Id" ExportId="DatabaseCheckerCommandId">
-                        <Data IsEnabled="true" Value="AculaGetDatabaseStatus"/>
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ServerName" Type="Id" ExportId="ProductId">
-                        <Data IsEnabled="true" Value="Acula"/>
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="ServerPrefix">
-                        <Data IsEnabled="true" Value="/Acula"/>
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="SlaveSystemStatus" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="RemoteSystemStatusController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Url" Type="Id" ExportId="DefaultUrl">
-                        <Data IsEnabled="true" Value="http://localhost:8111"/>
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UrlParam" Type="Reference" ExportId="UrlParam">
                         <Data IsEnabled="false"/>
@@ -125,13 +116,11 @@
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
         <Interface InterfaceId="imtbase::ISystemStatus" ComponentId="SystemStatusController"/>
+        <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="StandardLoginGui"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="ApiClient" ComponentId="Rights/ApiClient"/>
         <Component ExportedId="RemoteSuperuserController" ComponentId="Rights/RemoteSuperuserController"/>
         <Component ExportedId="RemoteSuperuserProvider" ComponentId="Rights/RemoteSuperuserProvider"/>
         <Component ExportedId="Rights" ComponentId="Rights"/>
-        <Component ExportedId="StandardLoginGui" ComponentId="StandardLoginGui"/>
-        <Component ExportedId="SystemStatusController" ComponentId="SystemStatusController"/>
     </ExportedComponents>
 </Acf>

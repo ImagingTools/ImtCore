@@ -8,7 +8,10 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="SimpleLoginWrap" X="600" Y="325" Note=""/>
+        <Element ComponentName="ServerFramework" X="550" Y="125" Note=""/>
+        <Element ComponentName="SessionInfo" X="275" Y="500" Note=""/>
+        <Element ComponentName="UserInfo" X="825" Y="500" Note=""/>
+        <Element ComponentName="UserSessionContextController" X="550" Y="325" Note="Controller for creating the session information based on user/logon data received from Puma-server"/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

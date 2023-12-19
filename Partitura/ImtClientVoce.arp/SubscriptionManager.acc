@@ -40,7 +40,7 @@
                     <AttributeInfo Id="RequestManager" Type="Reference" ExportId="RequestManager">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SubsctiptionSender" Type="Reference" ExportId="">
+                    <AttributeInfo Id="SubscriptionSender" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketClient"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WebLoginStatus" Type="Reference" ExportId="">
