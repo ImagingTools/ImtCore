@@ -17,8 +17,21 @@ Rectangle{
 
     signal requestSignal(int index, int level);
 
-    signal clicked(int index);
-    signal doubleClicked(int index);
+    signal clicked(int index, int level);
+    signal doubleClicked(int index, int level);
+
+    function getIcon(type, isOpen){
+        let source = "";
+        let imageName = "";
+        if(type == "Node"){
+            imageName = isOpen ? "Icons/FolderOpened" : "Icons/FolderClosed";
+        }
+        else if(type == "Doc"){
+            imageName = "Icons/New";
+        }
+        source  =  "../../../" + Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
+        return source;
+    }
 
 
     Rectangle{
@@ -69,7 +82,7 @@ Rectangle{
                         height: width;
                         radius: width;
 
-                        visible: model.HasChildren == undefined ? false : model.HasChildren;
+                        visible: model.TypeId == undefined ? false : model.TypeId == "Node" ? true : false;
                         enabled: visible;
 
                         color: "transparent";
@@ -79,7 +92,6 @@ Rectangle{
                         hasIcon: true;
                         property string imageName: deleg.isOpen ? "Icons/Down" : "Icons/Right";
                         iconSource:  "../../../" +Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
-
                         iconWidth: width;
                         iconHeight: width;
 
@@ -92,12 +104,10 @@ Rectangle{
                                 else {
                                     setVisibleElements(true, model.index)
                                 }
-                                //deleg.isOpen = true;
                                 treeViewGql.model.SetData("IsOpen", true, model.index);
 
                             }
                             else if(deleg.isOpen){
-                                //deleg.isOpen = false;
                                 treeViewGql.model.SetData("IsOpen", false, model.index);
                                 setVisibleElements(false, model.index)
                             }
@@ -112,24 +122,20 @@ Rectangle{
                         anchors.left: openButton.right;
                         anchors.leftMargin: 8;
 
-                        visible: model.HasChildren == undefined ? false : model.HasChildren;
-
+                        visible: model.TypeId !== undefined;
                         width: 16;
                         height: width;
                         sourceSize.width: width;
                         sourceSize.height: height;
-                        property string imageName: deleg.isOpen ? "Icons/FolderOpened" : "Icons/FolderClosed";
-
-                        source:  "../../../" + Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
-
+                        source: treeViewGql.getIcon(model.TypeId, deleg.isOpen);
                     }
 
                     Text{
                         id: nameText;
 
                         anchors.verticalCenter: parent.verticalCenter;
-                        anchors.left: model.HasChildren == undefined ? folderImage.right : model.HasChildren ? folderImage.right : folderImage.left;
-                        anchors.leftMargin: model.HasChildren == undefined ? 0 : model.HasChildren ? Style.size_mainMargin : 0;
+                        anchors.left: model.TypeId == undefined ? folderImage.left : folderImage.right;
+                        anchors.leftMargin: model.TypeId == undefined ? 0 : 16;
                         anchors.right: parent.right;
 
                         font.family: Style.fontFamily;
@@ -146,14 +152,13 @@ Rectangle{
                         anchors.right: parent.right;
                         anchors.left: nameText.left;
 
-                        visible: model.HasChildren == undefined ? false : model.HasChildren;
                         hoverEnabled: visible;
                         cursorShape: Qt.PointingHandCursor;
                         onClicked: {
-                            treeViewGql.clicked(model.index);
+                            treeViewGql.clicked(model.index, model.Level);
                         }
                         onDoubleClicked: {
-                            treeViewGql.doubleClicked(model.index);
+                            treeViewGql.doubleClicked(model.index, model.Level);
                         }
                     }
                 }
@@ -214,17 +219,17 @@ Rectangle{
 
     function setVisibleElements(visible, index){
         console.log("SET VISIBLE", visible, index);
-        let id = treeViewGql.model.GetData("Id", index);
+        let innerId = treeViewGql.model.GetData("InnerId", index);
         let found = false;
         let foundChangeCount = 0;
         for(let i = 0; i < treeViewGql.model.GetItemsCount(); i++){
-            let parentId = treeViewGql.model.IsValidData("BranchIds", i) ? treeViewGql.model.GetData("BranchIds", i) : "";
-            //console.log("parentId:: ", parentId)
+            let branchIds = treeViewGql.model.IsValidData("BranchIds", i) ? treeViewGql.model.GetData("BranchIds", i) : "";
+            //console.log("branchIds:: ", branchIds)
             let ok = false;
-            let arr = parentId.split(",");
+            let arr = branchIds.split(",");
             let arrCounter = 0;
             for(let k = 0; k < arr.length; k++){
-                if(arr[k] == id){
+                if(arr[k] == innerId){
                     ok = true;
                     if(!found){
                         found = true;
@@ -255,25 +260,25 @@ Rectangle{
 
     function insertTree(index, level, model_){
         console.log("INSERT TREE", index, level);
-        let parentId_parent = treeViewGql.model.IsValidData("BranchIds", index) ? treeViewGql.model.GetData("BranchIds", index) : "";
-        let id_parent = treeViewGql.model.GetData("Id", index);
-        let parentId = parentId_parent !== "" ? parentId_parent + "," + id_parent: id_parent;
 
         let date = new Date();
         let val = date.valueOf();
+
+        let branchIds_parent = treeViewGql.model.IsValidData("BranchIds", index) ? treeViewGql.model.GetData("BranchIds", index) : "";
+        let innerId_parent = treeViewGql.model.IsValidData("InnerId", index) ? treeViewGql.model.GetData("InnerId", index) : "";
+        let branchIds = branchIds_parent !== "" ? branchIds_parent + "," + innerId_parent: innerId_parent;
+
+
         for(let i = 0; i < model_.GetItemsCount(); i++){
             let newIndex =  index + i + 1;
             treeViewGql.model.InsertNewItem(newIndex);
             treeViewGql.model.CopyItemDataFromModel(newIndex, model_, i);
             treeViewGql.model.SetData("Level",level + 1, newIndex);
-            treeViewGql.model.SetData("BranchIds", parentId, newIndex);
+            treeViewGql.model.SetData("BranchIds", branchIds, newIndex);
             treeViewGql.model.SetData("Visible", true, newIndex);
             treeViewGql.model.SetData("IsOpen", false, newIndex);
             treeViewGql.model.SetData("HasBranch", false, newIndex);
-
-            //УБРАТЬ!!!(TEST)
-            //console.log(String(val + newIndex))
-            treeViewGql.model.SetData("Id", String(val + newIndex), newIndex);
+            treeViewGql.model.SetData("InnerId", String(val + newIndex), newIndex);
 
         }
         setContentWidth();
