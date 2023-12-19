@@ -139,15 +139,15 @@ Item{
             anchors.fill: parent;
 
             property point startPoint;
-            property point startPointConst;
+            property int lastDeltaX: 0;
+            property int lastDeltaY: 0;
             onPressed: {
                 startPoint = mapToItem(drawer.parent, mouse.x, mouse.y);
-                startPointConst = mapToItem(drawer.parent, mouse.x, mouse.y);
             }
             onReleased: {
                 let position = mapToItem(drawer.parent, mouse.x, mouse.y)
-                let deltaX = startPointConst.x - position.x;
-                let deltaY = startPointConst.y - position.y;
+                let deltaX = lastDeltaX;
+                let deltaY = lastDeltaY;
                 if(drawer.edge == Qt.LeftEdge){
                     if(deltaX < 0){
                         animMargin.from = hiddenItem.addToMargin;
@@ -276,6 +276,8 @@ Item{
                     }
                 }//BottomEdge
 
+                lastDeltaX = startPoint.x - mousePos.x;
+                lastDeltaY = startPoint.y - mousePos.y;
                 startPoint = mousePos;
             }
         }
