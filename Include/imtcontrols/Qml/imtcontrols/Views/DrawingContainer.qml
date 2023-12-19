@@ -71,12 +71,16 @@ Item{
                 if(drawer.edge == Qt.LeftEdge || drawer.edge == Qt.RightEdge){
                     drawer.width = width_ + drawer.edgeSize;
                     drawer.height = height_;
-                    drawer.mainStep = width_;
+                    if(!drawer.steps.length){
+                        drawer.mainStep = width_;
+                    }
                 }
                 else if(drawer.edge == Qt.TopEdge || drawer.edge == Qt.BottomEdge){
                     drawer.width = width_;
                     drawer.height = height_ + drawer.edgeSize;
-                    drawer.mainStep = height_;
+                    if(!drawer.steps.length){
+                        drawer.mainStep = height_;
+                    }
                 }
 
             }
@@ -139,15 +143,27 @@ Item{
             anchors.fill: parent;
 
             property point startPoint;
+            property point startPointConst;
             property int lastDeltaX: 0;
             property int lastDeltaY: 0;
             onPressed: {
                 startPoint = mapToItem(drawer.parent, mouse.x, mouse.y);
+                startPointConst = mapToItem(drawer.parent, mouse.x, mouse.y);
             }
             onReleased: {
                 let position = mapToItem(drawer.parent, mouse.x, mouse.y)
-                let deltaX = lastDeltaX;
-                let deltaY = lastDeltaY;
+                let deltaX;
+                let deltaY;
+
+                if(position.x.toFixed(1) == startPointConst.x.toFixed(1) && position.y.toFixed(1) == startPointConst.y.toFixed(1)){
+                    deltaX = drawer.edge == Qt.LeftEdge ? -1 : 1;
+                    deltaY = drawer.edge == Qt.TopEdge ? -1 : 1;
+                }
+                else {
+                    deltaX = lastDeltaX;
+                    deltaY = lastDeltaY;
+                }
+
                 if(drawer.edge == Qt.LeftEdge){
                     if(deltaX < 0){
                         animMargin.from = hiddenItem.addToMargin;
