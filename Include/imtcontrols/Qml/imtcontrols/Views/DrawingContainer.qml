@@ -25,6 +25,12 @@ Item{
     Component.onCompleted: {
     }
 
+    onStepsChanged: {
+        if(steps.length){
+            mainStep = steps[steps.length - 1];
+        }
+    }
+
     function addStep(step){
         steps.push(step);
     }
@@ -131,29 +137,67 @@ Item{
             anchors.fill: parent;
 
             property point startPoint;
-            property real lastDeltaX;
+            property point startPointConst;
             onPressed: {
                 startPoint = mapToItem(drawer.parent, mouse.x, mouse.y);
+                startPointConst = mapToItem(drawer.parent, mouse.x, mouse.y);
             }
             onReleased: {
-                let position = mapToItem(drawer, mouse.x, 0)
-                //               if(position.x.toFixed(1) == startPoint.x.toFixed(1)){
-                //                   list.selectedIndex = model.index;
-                //                   list.positionViewAtIndex(model.index, ListView.Center);
-                //               }
+                let position = mapToItem(drawer.parent, mouse.x, mouse.y)
+                let deltaX = startPointConst.x - position.x;
+                let deltaY = startPointConst.y - position.y;
+                if(drawer.edge == Qt.LeftEdge){
+                    if(deltaX < 0){
+                        animMargin.from = hiddenItem.addToMargin;
+                        animMargin.to = drawer.mainStep;
+                        animMargin.start();
+                    }
+                    else {
+                        animMargin.from = hiddenItem.addToMargin;
+                        animMargin.to = 0;
+                        animMargin.start();
+                    }
+                }
+                else if(drawer.edge == Qt.RightEdge){
+                    if(deltaX < 0){
+                        animMargin.from = hiddenItem.addToMargin;
+                        animMargin.to = 0;
+                        animMargin.start();
 
-                //               else if(lastDeltaX > 0){//after moving
-                //                   if(listPreview.addToMargin > listPreview.selectedIndex * listPreview.delegateWidth){
-                //                       list.selectedIndex++;
-                //                       list.positionViewAtIndex(list.selectedIndex, ListView.Center);
-                //                   }
-                //               }
-                //               else {
-                //                   if(listPreview.addToMargin < listPreview.selectedIndex * listPreview.delegateWidth){
-                //                       list.selectedIndex--;
-                //                       list.positionViewAtIndex(list.selectedIndex, ListView.Center);
-                //                   }
-                //               }
+                    }
+                    else {
+                        animMargin.from = hiddenItem.addToMargin;
+                        animMargin.to = drawer.mainStep;
+                        animMargin.start();
+                    }
+
+                }
+                else if(drawer.edge == Qt.TopEdge){
+                    if(deltaY < 0){
+                        animMargin.from = hiddenItem.addToMargin;
+                        animMargin.to = drawer.mainStep;
+                        animMargin.start();
+                    }
+                    else {
+                        animMargin.from = hiddenItem.addToMargin;
+                        animMargin.to = 0;
+                        animMargin.start();
+                    }
+                }
+                else if(drawer.edge == Qt.BottomEdge){
+                    if(deltaY < 0){
+                        animMargin.from = hiddenItem.addToMargin;
+                        animMargin.to = 0;
+                        animMargin.start();
+
+                    }
+                    else {
+                        animMargin.from = hiddenItem.addToMargin;
+                        animMargin.to = drawer.mainStep;
+                        animMargin.start();
+                    }
+                }
+
             }
             onPositionChanged: {
                 let mousePos = mapToItem(drawer.parent, mouse.x, mouse.y)
@@ -194,7 +238,7 @@ Item{
                     }
                 }//RightEdge
 
-                if(drawer.edge == Qt.TopEdge){
+                else if(drawer.edge == Qt.TopEdge){
                     let delta = startPoint.y - mousePos.y;
                     //console.log(delta);
                     if(delta >= 0){
@@ -236,6 +280,14 @@ Item{
 
     }
 
+
+    NumberAnimation {
+        id: animMargin;
+
+        target: hiddenItem;
+        property: "addToMargin";
+        duration: 200;
+    }
 
     
 }
