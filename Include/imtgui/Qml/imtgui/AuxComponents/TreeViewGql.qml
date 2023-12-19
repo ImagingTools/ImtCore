@@ -102,14 +102,14 @@ Rectangle{
                                     treeViewGql.requestSignal(model.index, model.Level)
                                 }
                                 else {
-                                    setVisibleElements(true, model.index)
+                                    treeViewGql.setVisibleElements(true, model.index)
                                 }
                                 treeViewGql.model.SetData("IsOpen", true, model.index);
 
                             }
                             else if(deleg.isOpen){
                                 treeViewGql.model.SetData("IsOpen", false, model.index);
-                                setVisibleElements(false, model.index)
+                                treeViewGql.setVisibleElements(false, model.index)
                             }
 
                         }
@@ -254,7 +254,7 @@ Rectangle{
             }
         }
 
-        setContentWidth();
+        treeViewGql.setContentWidth();
 
     }
 
@@ -281,7 +281,7 @@ Rectangle{
             treeViewGql.model.SetData("InnerId", String(val + newIndex), newIndex);
 
         }
-        setContentWidth();
+        treeViewGql.setContentWidth();
     }
 
 
