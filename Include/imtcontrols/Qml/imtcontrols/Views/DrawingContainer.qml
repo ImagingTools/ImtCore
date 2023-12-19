@@ -6,10 +6,10 @@ import imtcontrols 1.0
 Item{
     id: drawer;
 
-    anchors.left: edge == Qt.LeftEdge ? parent.left : undefined;
-    anchors.right: edge == Qt.RightEdge ? parent.right : undefined;
-    anchors.top: edge == Qt.TopEdge ? parent.top : undefined;
-    anchors.bottom: edge == Qt.BottomEdge ? parent.bottom : undefined;
+    anchors.left: drawer.edge == Qt.LeftEdge ? parent.left : undefined;
+    anchors.right: drawer.edge == Qt.RightEdge ? parent.right : undefined;
+    anchors.top: drawer.edge == Qt.TopEdge ? parent.top : undefined;
+    anchors.bottom: drawer.edge == Qt.BottomEdge ? parent.bottom : undefined;
 
     clip: true;
 
@@ -41,6 +41,173 @@ Item{
         id: emptyComp;
         Item{}
     }
+
+    MouseArea{
+        id: controlMA;
+
+        anchors.left: drawer.edge == Qt.RightEdge ? controlRec.left : undefined;
+        anchors.right: drawer.edge == Qt.LeftEdge ? controlRec.right : undefined;
+        anchors.top: drawer.edge == Qt.BottomEdge ? controlRec.top : undefined;
+        anchors.bottom: drawer.edge == Qt.TopEdge ? controlRec.bottom : undefined;
+
+        width: (drawer.edge == Qt.LeftEdge || drawer.edge == Qt.RightEdge) ? (controlRec.width + hiddenItem.width) : parent.width;
+        height: (drawer.edge == Qt.LeftEdge || drawer.edge == Qt.RightEdge) ? parent.height : (controlRec.height + hiddenItem.height);
+
+        property point startPoint;
+        property point startPointConst;
+        property int lastDeltaX: 0;
+        property int lastDeltaY: 0;
+        onPressed: {
+            startPoint = mapToItem(drawer.parent, mouse.x, mouse.y);
+            startPointConst = mapToItem(drawer.parent, mouse.x, mouse.y);
+        }
+        onReleased: {
+            let position = mapToItem(drawer.parent, mouse.x, mouse.y)
+            let deltaX;
+            let deltaY;
+
+            if(position.x.toFixed(1) == startPointConst.x.toFixed(1) && position.y.toFixed(1) == startPointConst.y.toFixed(1)){
+                deltaX = drawer.edge == Qt.LeftEdge ? -1 : 1;
+                deltaY = drawer.edge == Qt.TopEdge ? -1 : 1;
+            }
+            else {
+                deltaX = lastDeltaX;
+                deltaY = lastDeltaY;
+            }
+
+            if(drawer.edge == Qt.LeftEdge){
+                if(deltaX < 0){
+                    animMargin.from = hiddenItem.addToMargin;
+                    animMargin.to = drawer.mainStep;
+                    animMargin.start();
+                }
+                else {
+                    animMargin.from = hiddenItem.addToMargin;
+                    animMargin.to = 0;
+                    animMargin.start();
+                }
+            }
+            else if(drawer.edge == Qt.RightEdge){
+                if(deltaX < 0){
+                    animMargin.from = hiddenItem.addToMargin;
+                    animMargin.to = 0;
+                    animMargin.start();
+
+                }
+                else {
+                    animMargin.from = hiddenItem.addToMargin;
+                    animMargin.to = drawer.mainStep;
+                    animMargin.start();
+                }
+
+            }
+            else if(drawer.edge == Qt.TopEdge){
+                if(deltaY < 0){
+                    animMargin.from = hiddenItem.addToMargin;
+                    animMargin.to = drawer.mainStep;
+                    animMargin.start();
+                }
+                else {
+                    animMargin.from = hiddenItem.addToMargin;
+                    animMargin.to = 0;
+                    animMargin.start();
+                }
+            }
+            else if(drawer.edge == Qt.BottomEdge){
+                if(deltaY < 0){
+                    animMargin.from = hiddenItem.addToMargin;
+                    animMargin.to = 0;
+                    animMargin.start();
+
+                }
+                else {
+                    animMargin.from = hiddenItem.addToMargin;
+                    animMargin.to = drawer.mainStep;
+                    animMargin.start();
+                }
+            }
+
+        }
+        onPositionChanged: {
+            let mousePos = mapToItem(drawer.parent, mouse.x, mouse.y)
+
+            if(drawer.edge == Qt.LeftEdge){
+                let delta = startPoint.x - mousePos.x;
+                //console.log(delta); //влево +, вправо -
+                if(delta >= 0){
+                    let ok  = hiddenItem.addToMargin - delta >= 0;
+                    if(ok){
+                        hiddenItem.addToMargin -= delta;
+                    }
+                }
+                else {
+                    let ok  = hiddenItem.addToMargin -delta <= drawer.mainStep;
+                    if(ok){
+                        hiddenItem.addToMargin -= delta;
+                    }
+
+                }
+            }//LeftEdge
+
+            else if(drawer.edge == Qt.RightEdge){
+                let delta = startPoint.x - mousePos.x;
+                //console.log(delta); //влево +, вправо -
+                if(delta >= 0){
+                    let ok  = hiddenItem.addToMargin +delta <= drawer.mainStep;
+                    if(ok){
+                        hiddenItem.addToMargin += delta;
+                    }
+                }
+                else {
+                    let ok  = hiddenItem.addToMargin + delta >= 0;
+                    if(ok){
+                        hiddenItem.addToMargin += delta;
+                    }
+
+                }
+            }//RightEdge
+
+            else if(drawer.edge == Qt.TopEdge){
+                let delta = startPoint.y - mousePos.y;
+                //console.log(delta);
+                if(delta >= 0){
+                    let ok  = hiddenItem.addToMargin - delta >= 0;
+                    if(ok){
+                        hiddenItem.addToMargin -= delta;
+                    }
+                }
+                else {
+                    let ok  = hiddenItem.addToMargin -delta <= drawer.mainStep;
+                    if(ok){
+                        hiddenItem.addToMargin -= delta;
+                    }
+
+                }
+            }//TopEdge
+
+            else if(drawer.edge == Qt.BottomEdge){
+                let delta = startPoint.y - mousePos.y;
+                //console.log(delta);
+                if(delta >= 0){
+                    let ok  = hiddenItem.addToMargin +delta <= drawer.mainStep;
+                    if(ok){
+                        hiddenItem.addToMargin += delta;
+                    }
+                }
+                else {
+                    let ok  = hiddenItem.addToMargin + delta >= 0;
+                    if(ok){
+                        hiddenItem.addToMargin += delta;
+                    }
+
+                }
+            }//BottomEdge
+
+            lastDeltaX = startPoint.x - mousePos.x;
+            lastDeltaY = startPoint.y - mousePos.y;
+            startPoint = mousePos;
+        }
+    }//MouseArea
 
     Item{
         id: hiddenItem;
@@ -139,166 +306,10 @@ Item{
 
         }
 
-        MouseArea{
-            anchors.fill: parent;
 
-            property point startPoint;
-            property point startPointConst;
-            property int lastDeltaX: 0;
-            property int lastDeltaY: 0;
-            onPressed: {
-                startPoint = mapToItem(drawer.parent, mouse.x, mouse.y);
-                startPointConst = mapToItem(drawer.parent, mouse.x, mouse.y);
-            }
-            onReleased: {
-                let position = mapToItem(drawer.parent, mouse.x, mouse.y)
-                let deltaX;
-                let deltaY;
 
-                if(position.x.toFixed(1) == startPointConst.x.toFixed(1) && position.y.toFixed(1) == startPointConst.y.toFixed(1)){
-                    deltaX = drawer.edge == Qt.LeftEdge ? -1 : 1;
-                    deltaY = drawer.edge == Qt.TopEdge ? -1 : 1;
-                }
-                else {
-                    deltaX = lastDeltaX;
-                    deltaY = lastDeltaY;
-                }
+    }//controlRec
 
-                if(drawer.edge == Qt.LeftEdge){
-                    if(deltaX < 0){
-                        animMargin.from = hiddenItem.addToMargin;
-                        animMargin.to = drawer.mainStep;
-                        animMargin.start();
-                    }
-                    else {
-                        animMargin.from = hiddenItem.addToMargin;
-                        animMargin.to = 0;
-                        animMargin.start();
-                    }
-                }
-                else if(drawer.edge == Qt.RightEdge){
-                    if(deltaX < 0){
-                        animMargin.from = hiddenItem.addToMargin;
-                        animMargin.to = 0;
-                        animMargin.start();
-
-                    }
-                    else {
-                        animMargin.from = hiddenItem.addToMargin;
-                        animMargin.to = drawer.mainStep;
-                        animMargin.start();
-                    }
-
-                }
-                else if(drawer.edge == Qt.TopEdge){
-                    if(deltaY < 0){
-                        animMargin.from = hiddenItem.addToMargin;
-                        animMargin.to = drawer.mainStep;
-                        animMargin.start();
-                    }
-                    else {
-                        animMargin.from = hiddenItem.addToMargin;
-                        animMargin.to = 0;
-                        animMargin.start();
-                    }
-                }
-                else if(drawer.edge == Qt.BottomEdge){
-                    if(deltaY < 0){
-                        animMargin.from = hiddenItem.addToMargin;
-                        animMargin.to = 0;
-                        animMargin.start();
-
-                    }
-                    else {
-                        animMargin.from = hiddenItem.addToMargin;
-                        animMargin.to = drawer.mainStep;
-                        animMargin.start();
-                    }
-                }
-
-            }
-            onPositionChanged: {
-                let mousePos = mapToItem(drawer.parent, mouse.x, mouse.y)
-
-                if(drawer.edge == Qt.LeftEdge){
-                    let delta = startPoint.x - mousePos.x;
-                    //console.log(delta); //влево +, вправо -
-                    if(delta >= 0){
-                        let ok  = hiddenItem.addToMargin - delta >= 0;
-                        if(ok){
-                            hiddenItem.addToMargin -= delta;
-                        }
-                    }
-                    else {
-                        let ok  = hiddenItem.addToMargin -delta <= drawer.mainStep;
-                        if(ok){
-                            hiddenItem.addToMargin -= delta;
-                        }
-
-                    }
-                }//LeftEdge
-
-                else if(drawer.edge == Qt.RightEdge){
-                    let delta = startPoint.x - mousePos.x;
-                    //console.log(delta); //влево +, вправо -
-                    if(delta >= 0){
-                        let ok  = hiddenItem.addToMargin +delta <= drawer.mainStep;
-                        if(ok){
-                            hiddenItem.addToMargin += delta;
-                        }
-                    }
-                    else {
-                        let ok  = hiddenItem.addToMargin + delta >= 0;
-                        if(ok){
-                            hiddenItem.addToMargin += delta;
-                        }
-
-                    }
-                }//RightEdge
-
-                else if(drawer.edge == Qt.TopEdge){
-                    let delta = startPoint.y - mousePos.y;
-                    //console.log(delta);
-                    if(delta >= 0){
-                        let ok  = hiddenItem.addToMargin - delta >= 0;
-                        if(ok){
-                            hiddenItem.addToMargin -= delta;
-                        }
-                    }
-                    else {
-                        let ok  = hiddenItem.addToMargin -delta <= drawer.mainStep;
-                        if(ok){
-                            hiddenItem.addToMargin -= delta;
-                        }
-
-                    }
-                }//TopEdge
-
-                else if(drawer.edge == Qt.BottomEdge){
-                    let delta = startPoint.y - mousePos.y;
-                    //console.log(delta);
-                    if(delta >= 0){
-                        let ok  = hiddenItem.addToMargin +delta <= drawer.mainStep;
-                        if(ok){
-                            hiddenItem.addToMargin += delta;
-                        }
-                    }
-                    else {
-                        let ok  = hiddenItem.addToMargin + delta >= 0;
-                        if(ok){
-                            hiddenItem.addToMargin += delta;
-                        }
-
-                    }
-                }//BottomEdge
-
-                lastDeltaX = startPoint.x - mousePos.x;
-                lastDeltaY = startPoint.y - mousePos.y;
-                startPoint = mousePos;
-            }
-        }
-
-    }
 
 
     NumberAnimation {
