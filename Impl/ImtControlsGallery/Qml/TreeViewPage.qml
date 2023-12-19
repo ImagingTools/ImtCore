@@ -23,36 +23,36 @@ Rectangle {
             let val = date.valueOf();
             let index;
 
-            for(let i = 0; i < 300; i++){
+            for(let i = 0; i < 10; i++){
                 index = testInsertModelLevel0.InsertNewItem();
                 testInsertModelLevel0.SetData("Id", String(val + index), index);
                 testInsertModelLevel0.SetData("Name","ул. Ленина", index);
-                testInsertModelLevel0.SetData("HasChildren", true, index);
+                testInsertModelLevel0.SetData("TypeId", "Node", index);
 
                 index = testInsertModelLevel0.InsertNewItem();
                 testInsertModelLevel0.SetData("Id", String(val + index), index);
                 testInsertModelLevel0.SetData("Name","ул. Маркса", index);
-                testInsertModelLevel0.SetData("HasChildren", true, index);
+                testInsertModelLevel0.SetData("TypeId", "Node", index);
 
                 index = testInsertModelLevel0.InsertNewItem();
                 testInsertModelLevel0.SetData("Id", String(val + index), index);
                 testInsertModelLevel0.SetData("Name","ул. Менделеева", index);
-                testInsertModelLevel0.SetData("HasChildren", true, index);
+                testInsertModelLevel0.SetData("TypeId", "Node", index);
 
                 index = testInsertModelLevel0.InsertNewItem();
                 testInsertModelLevel0.SetData("Id", String(val + index), index);
                 testInsertModelLevel0.SetData("Name","ул. Королёва", index);
-                testInsertModelLevel0.SetData("HasChildren", true, index);
+                testInsertModelLevel0.SetData("TypeId", "Node", index);
 
                 index = testInsertModelLevel0.InsertNewItem();
                 testInsertModelLevel0.SetData("Id", String(val + index), index);
                 testInsertModelLevel0.SetData("Name","ул. Гагарина", index);
-                testInsertModelLevel0.SetData("HasChildren", true, index);
+                testInsertModelLevel0.SetData("TypeId", "Node", index);
 
                 index = testInsertModelLevel0.InsertNewItem();
                 testInsertModelLevel0.SetData("Id", String(val + index), index);
                 testInsertModelLevel0.SetData("Name","ул. Мира", index);
-                testInsertModelLevel0.SetData("HasChildren", false, index);
+                testInsertModelLevel0.SetData("TypeId", "Doc", index);
 
             }
 
@@ -60,15 +60,15 @@ Rectangle {
 
             index = testInsertModel.InsertNewItem();
             testInsertModel.SetData("Name", "дом 1" , index);
-            testInsertModel.SetData("HasChildren", true, index);
+            testInsertModel.SetData("TypeId", "Node", index);
 
             index = testInsertModel.InsertNewItem();
             testInsertModel.SetData("Name","дом 2" , index);
-            testInsertModel.SetData("HasChildren", true, index);
+            testInsertModel.SetData("TypeId", "Node", index);
 
             index = testInsertModel.InsertNewItem();
             testInsertModel.SetData("Name", "дом 3" , index);
-            testInsertModel.SetData("HasChildren", false, index);
+            testInsertModel.SetData("TypeId", "Doc", index);
 
         }
 
