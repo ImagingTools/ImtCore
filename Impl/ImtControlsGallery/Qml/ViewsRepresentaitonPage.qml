@@ -179,6 +179,58 @@ Rectangle {
             }
         }//SwipeView
 
+    }//Column
+
+    DrawingContainer{
+        anchors.verticalCenter: parent.verticalCenter;
+        content : contentRec;
+    }
+
+    DrawingContainer{
+        anchors.verticalCenter: parent.verticalCenter;
+        edge: Qt.RightEdge;
+        content : contentRec;
+    }
+
+    DrawingContainer{
+        anchors.horizontalCenter: parent.horizontalCenter;
+        edge: Qt.TopEdge;
+        content : contentRec;
+    }
+
+    DrawingContainer{
+        anchors.horizontalCenter:  parent.horizontalCenter;
+        edge: Qt.BottomEdge;
+        content : contentRec;
+    }
+
+    Component{
+        id: contentRec
+        Rectangle{
+            width: 200;
+            height: 200;
+            border.color: "lightgray";
+            radius: 2;
+            Rectangle{
+                anchors.centerIn: parent;
+                width: parent.width - 20;
+                height: parent.height - 20;
+                radius: 8;
+                border.color: Style.textColor;
+                Text{
+                    anchors.centerIn: parent;
+
+                    font.family: Style.fontFamily;
+                    font.pixelSize: Style.fontSize_subtitle;
+                    color: Style.textColor;
+                    width: parent.width - 20;
+                    wrapMode: Text.WordWrap;
+
+                    text: "Vita nostra brevis est, Brevi finietur. Venit mors velociter, Rapit nos atrociter, Nemini parcetur!";
+                }
+
+            }
+        }
     }
 
 }
