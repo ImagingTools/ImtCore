@@ -17,6 +17,8 @@ Item{
     property Component content : emptyComp;
     property var steps: [];
     property int mainStep: 0;
+    property int currentStep: 0;
+    property int currentStepIndex: 0;
     property bool isOpen: hiddenItem.addToMargin > 0;
 
     property int edgeSize: 12;
