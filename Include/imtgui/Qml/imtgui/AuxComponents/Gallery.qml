@@ -12,6 +12,7 @@ Rectangle {
     property string nameId: "Source";
     property bool isOpen: visible;
     property int animDuration: 100;
+    property bool isFullScreen: false;
 
     signal deleteSignal(int index);
 
@@ -36,6 +37,7 @@ Rectangle {
             widthAnimFrom.start();
         }
     }
+
 
     NumberAnimation {
         id: widthAnimTo;
@@ -147,71 +149,102 @@ Rectangle {
     Rectangle{
         anchors.left: parent.left;
         anchors.right: parent.right;
-        anchors.bottom: list.top;
-        anchors.bottomMargin: 5;
+        anchors.bottom: listContainer.top;
+        anchors.bottomMargin: gallery.isFullScreen ? - 5 : 5;
         height: 1;
         color: "gray";
         opacity: 0.2;
         visible: false;
     }
 
-    ListView{
-        id: list;
+    Rectangle{
+        id: listContainer;
 
-        anchors.top: header.bottom;
-        anchors.topMargin: 10;
+        anchors.top: gallery.isFullScreen ? parent.top : header.bottom;
+        anchors.topMargin: gallery.isFullScreen ? 0 :10;
         anchors.bottom: parent.bottom;
-        anchors.bottomMargin: 150;
+        anchors.bottomMargin: gallery.isFullScreen ? 0 : 100;
         anchors.left: parent.left;
         anchors.right: parent.right;
 
-        clip: true;
-        boundsBehavior: Flickable.StopAtBounds;
-        snapMode: ListView.SnapOneItem;
-        orientation: ListView.Horizontal;
-        model: gallery.model;
-        delegate: Rectangle{
-            width: list.width;
-            height: list.height;
-            color: "transparent";
-            Image{
-                id: image;
+        z: 20;
 
-                anchors.fill: parent;
-                fillMode: Image.PreserveAspectFit;
-                verticalAlignment: Image.AlignTop;
-                horizontalAlignment: Image.AlignHCenter;
+        color: "#000000";
 
-                source: model[gallery.nameId]
+        MouseArea{
+            anchors.fill: parent;
+            onClicked: {
+                mouse.accepted = true;
             }
         }
-        property int selectedIndex: 0;
-        property real movementStartedX: 0;
-        onMovementStarted: {
-            movementStartedX = contentX;
-        }
-        onFlickStarted: {
-            if(movementStartedX > contentX){
-                if(selectedIndex > 0){
-                    selectedIndex--;
+
+        ListView{
+            id: list;
+
+            anchors.fill: parent;
+
+            clip: true;
+            boundsBehavior: Flickable.StopAtBounds;
+            snapMode: ListView.SnapOneItem;
+            orientation: ListView.Horizontal;
+            model: gallery.model;
+            delegate: Rectangle{
+                width: list.width;
+                height: list.height;
+                color: "transparent";
+                Image{
+                    id: image;
+
+                    anchors.fill: parent;
+                    fillMode: Image.PreserveAspectFit;
+                    verticalAlignment: gallery.isFullScreen ? Image.AlignVCenter : Image.AlignTop;
+                    horizontalAlignment: Image.AlignHCenter;
+
+                    source: model[gallery.nameId]
+                }
+                MouseArea{
+                    anchors.fill: parent;
+                    property real pressedX: 0;
+                    onPressed: {
+                        pressedX = mouse.x;
+                    }
+                    onReleased: {
+                        if(mouse.x.toFixed() == pressedX.toFixed()){
+                            gallery.isFullScreen = !gallery.isFullScreen;
+                        }
+                    }
+
                 }
             }
-            else {
-                if(selectedIndex < list.count - 1){
-                    selectedIndex++;
+            property int selectedIndex: 0;
+            property real movementStartedX: 0;
+            onMovementStarted: {
+                movementStartedX = contentX;
+            }
+            onFlickStarted: {
+                if(movementStartedX > contentX){
+                    if(selectedIndex > 0){
+                        selectedIndex--;
+                    }
                 }
+                else {
+                    if(selectedIndex < list.count - 1){
+                        selectedIndex++;
+                    }
+                }
+
             }
 
-        }
 
+        }//list
 
-    }//list
+    }//listContainer
 
     Rectangle{
         anchors.left: parent.left;
         anchors.right: parent.right;
-        anchors.top: list.bottom;
-        anchors.topMargin: 5;
+        anchors.top: listContainer.bottom;
+        anchors.topMargin: gallery.isFullScreen ? - 5 : 5;
         height: 1;
         color: "gray";
         opacity: 0.2;
@@ -219,8 +252,9 @@ Rectangle {
 
     Item{
         id: listPreviewContainer;
-        anchors.top: list.bottom;
-        anchors.topMargin: 20;
+
+        anchors.top: listContainer.bottom;
+        anchors.topMargin: gallery.isFullScreen ? - 200 :20;
         anchors.bottom: parent.bottom;
         anchors.bottomMargin: 10;
         anchors.left: parent.left;
