@@ -74,7 +74,7 @@ Item{
             //steps
             if(drawer.steps.length){
                 let positionInDrawer = mapToItem(drawer, mouse.x, mouse.y)
-                console.log(positionInDrawer.x, positionInDrawer.y)
+                //console.log(positionInDrawer.x, positionInDrawer.y)
                 let releasedVal;
 
                 if(drawer.edge == Qt.LeftEdge){
@@ -95,10 +95,10 @@ Item{
                 if(releasedVal > drawer.mainStep){
                     releasedVal = drawer.mainStep;
                 }
-                console.log("releasedVal:: ", releasedVal)
+                //console.log("releasedVal:: ", releasedVal)
 
                 if(isClick){
-                    console.log("isClick", isClick)
+                    //console.log("isClick", isClick)
                     let clickVal;
                     if(drawer.edge == Qt.LeftEdge){
                         clickVal = positionInDrawer.x;
@@ -167,7 +167,7 @@ Item{
 
                     }//for
                 }
-                console.log("VALUES:: ", minVal, maxVal);
+                //console.log("VALUES:: ", minVal, maxVal);
             }//steps
 
             //on click
