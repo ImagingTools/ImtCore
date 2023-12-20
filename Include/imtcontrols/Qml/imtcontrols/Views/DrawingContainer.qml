@@ -71,9 +71,32 @@ Item{
             let minVal = 0;
             let maxVal = drawer.mainStep;
 
+            let positionInDrawer = mapToItem(drawer, mouse.x, mouse.y)
+            let clickVal;
+            if(drawer.edge == Qt.LeftEdge){
+                clickVal = positionInDrawer.x;
+            }
+            else if(drawer.edge == Qt.RightEdge){
+                clickVal = drawer.width - positionInDrawer.x;
+            }
+            else if(drawer.edge == Qt.TopEdge){
+                clickVal = positionInDrawer.y;
+            }
+            else if(drawer.edge == Qt.BottomEdge){
+                clickVal = drawer.height - positionInDrawer.y;
+            }
+            //console.log("clickVal - hiddenItem.addToMargin:: ", clickVal - hiddenItem.addToMargin)
+
+
+            if(isClick && (clickVal - hiddenItem.addToMargin > 0) && (hiddenItem.addToMargin.toFixed() == drawer.mainStep.toFixed())){
+                animMargin.from = hiddenItem.addToMargin;
+                animMargin.to = 0;
+                animMargin.start();
+                return;
+            }
+
             //steps
             if(drawer.steps.length){
-                let positionInDrawer = mapToItem(drawer, mouse.x, mouse.y)
                 //console.log(positionInDrawer.x, positionInDrawer.y)
                 let releasedVal;
 
@@ -99,20 +122,6 @@ Item{
 
                 if(isClick){
                     //console.log("isClick", isClick)
-                    let clickVal;
-                    if(drawer.edge == Qt.LeftEdge){
-                        clickVal = positionInDrawer.x;
-                    }
-                    else if(drawer.edge == Qt.RightEdge){
-                        clickVal = drawer.width - positionInDrawer.x;
-                    }
-                    else if(drawer.edge == Qt.TopEdge){
-                        clickVal = positionInDrawer.y;
-                    }
-                    else if(drawer.edge == Qt.BottomEdge){
-                        clickVal = drawer.height - positionInDrawer.y;
-                    }
-                    //console.log("clickVal - hiddenItem.addToMargin:: ", clickVal - hiddenItem.addToMargin)
                     if(clickVal - hiddenItem.addToMargin > 0){
                         if(hiddenItem.addToMargin.toFixed() == 0){
                             minVal = 0;
@@ -403,7 +412,7 @@ Item{
             sourceSize.width: width;
             sourceSize.height: height;
 
-            property string imageName: drawer.isOpen ? "Icons/Delete" : "Icons/Up";
+            property string imageName: hiddenItem.addToMargin.toFixed() == drawer.mainStep ? "Icons/Close" : drawer.isOpen ? "Icons/Delete" : "Icons/Up";
             source: "../../../" + Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
 
             rotation: drawer.isOpen &&  (drawer.edge == Qt.LeftEdge || drawer.edge == Qt.RightEdge) ? 90 :
