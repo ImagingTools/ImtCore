@@ -14,11 +14,28 @@ Rectangle{
     property string nameId: "Name";
     property alias delegateWidht: list.delegateWidth;
     property alias delegate: list.delegate;
+    property bool hasSelection: false;
+    property int selectedIndex: -1;
 
-    signal requestSignal(int index, int level);
+    property string selectionColor: Style.selectedColor !== undefined ? Style.selectedColor : "lightsteelblue";
+    property real selectionOpacity: 0.5;
 
-    signal clicked(int index, int level);
-    signal doubleClicked(int index, int level);
+    signal requestSignal(int index);
+
+    signal clicked(int index);
+    signal doubleClicked(int index);
+
+    onClicked: {
+        selectedIndex = index;
+    }
+
+    function getData(key,index){
+        return treeViewGql.model.GetData(key, index);
+    }
+
+    function getSelectedIndex(){
+        return selectedIndex;
+    }
 
     function getIcon(type, isOpen){
         let source = "";
@@ -64,6 +81,7 @@ Rectangle{
                 width: model.Visible ? model.Level * treeViewGql.shift + list.delegateWidth : 0;
                 height: model.Visible ? 40 : 0;
                 opacity: model.Visible;
+                clip: true;
                 property bool isOpen: model.IsOpen;
                 Rectangle{
                     anchors.left: parent.left;
@@ -71,6 +89,21 @@ Rectangle{
                     width: list.delegateWidth;
                     height: parent.height;
                     color: "transparent";
+                    Rectangle{
+                        id: selectionRec;
+
+                        anchors.left: parent.left;
+                        anchors.leftMargin: folderImage.x - 4;
+                        anchors.top: parent.top;
+                        anchors.bottom: parent.bottom;
+                        width: Math.min(parent.width - anchors.leftMargin, nameText.x + nameText.width + 4  - anchors.leftMargin);
+
+                        radius: 4;
+                        opacity: treeViewGql.selectionOpacity;
+                        color: treeViewGql.selectionColor;
+                        visible: !treeViewGql.hasSelection ? false : model.index == treeViewGql.selectedIndex;
+                    }
+
                     AuxButton{
                         id: openButton;
 
@@ -136,7 +169,7 @@ Rectangle{
                         anchors.verticalCenter: parent.verticalCenter;
                         anchors.left: model.TypeId == undefined ? folderImage.left : folderImage.right;
                         anchors.leftMargin: model.TypeId == undefined ? 0 : 16;
-                        anchors.right: parent.right;
+                        //anchors.right: parent.right;
 
                         font.family: Style.fontFamily;
                         font.pixelSize: Style.fontSize_subtitle !==undefined ? Style.fontSize_subtitle : 18;
@@ -144,6 +177,9 @@ Rectangle{
 
                         text: model[treeViewGql.nameId];
                     }
+
+
+
                     MouseArea{
                         id: delegateMA;
 
@@ -258,8 +294,10 @@ Rectangle{
 
     }
 
-    function insertTree(index, level, model_){
-        console.log("INSERT TREE", index, level);
+    function insertTree(index, model_){
+
+        let level_ = treeViewGql.model.IsValidData("Level", index) ? treeViewGql.model.GetData("Level", index) : -1;
+        console.log("INSERT TREE", index, level_);
 
         let date = new Date();
         let val = date.valueOf();
@@ -273,7 +311,7 @@ Rectangle{
             let newIndex =  index + i + 1;
             treeViewGql.model.InsertNewItem(newIndex);
             treeViewGql.model.CopyItemDataFromModel(newIndex, model_, i);
-            treeViewGql.model.SetData("Level",level + 1, newIndex);
+            treeViewGql.model.SetData("Level", level_ + 1, newIndex);
             treeViewGql.model.SetData("BranchIds", branchIds, newIndex);
             treeViewGql.model.SetData("Visible", true, newIndex);
             treeViewGql.model.SetData("IsOpen", false, newIndex);
