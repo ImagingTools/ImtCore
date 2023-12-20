@@ -16,6 +16,7 @@ Rectangle {
 
         width: parent.width - 200;
         height: parent.height - 200;
+        hasSelection: true;
 
         Component.onCompleted: {//TEST
 
@@ -56,7 +57,7 @@ Rectangle {
 
             }
 
-            treeView.insertTree(-1,-1, testInsertModelLevel0);//!!!
+            treeView.insertTree(-1, testInsertModelLevel0);//!!!
 
             index = testInsertModel.InsertNewItem();
             testInsertModel.SetData("Name", "дом 1" , index);
@@ -73,7 +74,7 @@ Rectangle {
         }
 
         onRequestSignal: {
-            treeView.insertTree(index, level, testInsertModel);
+            treeView.insertTree(index, testInsertModel);
         }
     }
 
