@@ -184,31 +184,39 @@ Rectangle {
     DrawingContainer{
         anchors.verticalCenter: parent.verticalCenter;
         content : contentRec;
+
     }
 
     DrawingContainer{
         anchors.verticalCenter: parent.verticalCenter;
         edge: Qt.RightEdge;
         content : contentRec;
+        Component.onCompleted: {
+            addStep(100)
+            addStep(200)
+            addStep(300)
+        }
     }
 
     DrawingContainer{
         anchors.horizontalCenter: parent.horizontalCenter;
         edge: Qt.TopEdge;
         content : contentRec;
+
     }
 
     DrawingContainer{
         anchors.horizontalCenter:  parent.horizontalCenter;
         edge: Qt.BottomEdge;
         content : contentRec;
+
     }
 
     Component{
         id: contentRec
         Rectangle{
-            width: 200;
-            height: 200;
+            width: 300;
+            height: 300;
             border.color: "lightgray";
             radius: 2;
             Rectangle{
@@ -225,6 +233,7 @@ Rectangle {
                     color: Style.textColor;
                     width: parent.width - 20;
                     wrapMode: Text.WordWrap;
+                    horizontalAlignment: Text.AlignHCenter;
 
                     text: "Vita nostra brevis est, Brevi finietur. Venit mors velociter, Rapit nos atrociter, Nemini parcetur!";
                 }
