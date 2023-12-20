@@ -16,6 +16,7 @@ Item{
     property int edge: Qt.LeftEdge;//Qt.TopEdge, Qt.BottomEdge, Qt.RightEdge
     property Component content : emptyComp;
     property var steps: [];
+    property int stepsLength: steps.length;
     property int mainStep: 0;
     property int currentStep: 0;
     property int currentStepIndex: 0;
@@ -27,7 +28,7 @@ Item{
     Component.onCompleted: {
     }
 
-    onStepsChanged: {
+    onStepsLengthChanged: {
         if(steps.length){
             mainStep = steps[steps.length - 1];
         }
@@ -63,13 +64,118 @@ Item{
         }
         onReleased: {
             let position = mapToItem(drawer.parent, mouse.x, mouse.y)
+            let isClick = position.x.toFixed(1) == startPointConst.x.toFixed(1) && position.y.toFixed(1) == startPointConst.y.toFixed(1)
             let deltaX;
             let deltaY;
 
-            if(position.x.toFixed(1) == startPointConst.x.toFixed(1) && position.y.toFixed(1) == startPointConst.y.toFixed(1)){
+            let minVal = 0;
+            let maxVal = drawer.mainStep;
+
+            //steps
+            if(drawer.steps.length){
+                let positionInDrawer = mapToItem(drawer, mouse.x, mouse.y)
+                console.log(positionInDrawer.x, positionInDrawer.y)
+                let releasedVal;
+
+                if(drawer.edge == Qt.LeftEdge){
+                    releasedVal = hiddenItem.addToMargin + lastDeltaX;
+                }
+                else if(drawer.edge == Qt.RightEdge){
+                    releasedVal = hiddenItem.addToMargin + lastDeltaX;
+                }
+                else if(drawer.edge == Qt.TopEdge){
+                    releasedVal = hiddenItem.addToMargin + lastDeltaY;
+                }
+                else if(drawer.edge == Qt.BottomEdge){
+                    releasedVal = hiddenItem.addToMargin + lastDeltaY;
+                }
+                if(releasedVal < 0){
+                    releasedVal = 0;
+                }
+                if(releasedVal > drawer.mainStep){
+                    releasedVal = drawer.mainStep;
+                }
+                console.log("releasedVal:: ", releasedVal)
+
+                if(isClick){
+                    console.log("isClick", isClick)
+                    let clickVal;
+                    if(drawer.edge == Qt.LeftEdge){
+                        clickVal = positionInDrawer.x;
+                    }
+                    else if(drawer.edge == Qt.RightEdge){
+                        clickVal = drawer.width - positionInDrawer.x;
+                    }
+                    else if(drawer.edge == Qt.TopEdge){
+                        clickVal = positionInDrawer.y;
+                    }
+                    else if(drawer.edge == Qt.BottomEdge){
+                        clickVal = drawer.height - positionInDrawer.y;
+                    }
+                    //console.log("clickVal - hiddenItem.addToMargin:: ", clickVal - hiddenItem.addToMargin)
+                    if(clickVal - hiddenItem.addToMargin > 0){
+                        if(hiddenItem.addToMargin.toFixed() == 0){
+                            minVal = 0;
+                            maxVal = drawer.steps[0];
+                        }
+                        else if(hiddenItem.addToMargin.toFixed() == drawer.mainStep.toFixed()){
+                            minVal = drawer.steps[drawer.steps.length - 1];
+                            maxVal = minVal;
+                        }
+                        else {
+                            let index_= 0
+                            for(let i = 0; i < (drawer.steps.length); i++){
+                                let currVal = drawer.steps[i];
+                                if(hiddenItem.addToMargin.toFixed() == currVal.toFixed()){
+                                    index_ = i;
+                                    break;
+                                }
+                            }
+                            minVal = drawer.steps[index_];
+                            maxVal = drawer.steps[index_ + 1];
+                        }
+                    }
+                    else {//click into body field
+                        return;
+                    }
+
+
+                }
+
+                //not click
+                else if(releasedVal >= 0 && releasedVal <= drawer.mainStep){
+                    for(let i = 0; i < (drawer.steps.length); i++){
+                        let ok;
+                        if(i == 0){
+                            ok = releasedVal >= 0 &&
+                                releasedVal < drawer.steps[i];
+                            if(ok){
+                                minVal = 0;
+                                maxVal = drawer.steps[i];
+                                break
+                            }
+                        }
+                        else {
+                            ok = releasedVal >= drawer.steps[i-1] &&
+                                releasedVal < drawer.steps[i];
+                            if(ok){
+                                minVal = drawer.steps[i-1];
+                                maxVal = drawer.steps[i];
+                                break;
+                            }
+                        }
+
+                    }//for
+                }
+                console.log("VALUES:: ", minVal, maxVal);
+            }//steps
+
+            //on click
+            if(isClick){
                 deltaX = drawer.edge == Qt.LeftEdge ? -1 : 1;
                 deltaY = drawer.edge == Qt.TopEdge ? -1 : 1;
             }
+            //not on click
             else {
                 deltaX = lastDeltaX;
                 deltaY = lastDeltaY;
@@ -78,25 +184,25 @@ Item{
             if(drawer.edge == Qt.LeftEdge){
                 if(deltaX < 0){
                     animMargin.from = hiddenItem.addToMargin;
-                    animMargin.to = drawer.mainStep;
+                    animMargin.to = maxVal;
                     animMargin.start();
                 }
                 else {
                     animMargin.from = hiddenItem.addToMargin;
-                    animMargin.to = 0;
+                    animMargin.to = minVal;
                     animMargin.start();
                 }
             }
             else if(drawer.edge == Qt.RightEdge){
                 if(deltaX < 0){
                     animMargin.from = hiddenItem.addToMargin;
-                    animMargin.to = 0;
+                    animMargin.to = minVal;
                     animMargin.start();
 
                 }
                 else {
                     animMargin.from = hiddenItem.addToMargin;
-                    animMargin.to = drawer.mainStep;
+                    animMargin.to = maxVal;
                     animMargin.start();
                 }
 
@@ -104,30 +210,31 @@ Item{
             else if(drawer.edge == Qt.TopEdge){
                 if(deltaY < 0){
                     animMargin.from = hiddenItem.addToMargin;
-                    animMargin.to = drawer.mainStep;
+                    animMargin.to = maxVal;
                     animMargin.start();
                 }
                 else {
                     animMargin.from = hiddenItem.addToMargin;
-                    animMargin.to = 0;
+                    animMargin.to = minVal;
                     animMargin.start();
                 }
             }
             else if(drawer.edge == Qt.BottomEdge){
                 if(deltaY < 0){
                     animMargin.from = hiddenItem.addToMargin;
-                    animMargin.to = 0;
+                    animMargin.to = minVal;
                     animMargin.start();
 
                 }
                 else {
                     animMargin.from = hiddenItem.addToMargin;
-                    animMargin.to = drawer.mainStep;
+                    animMargin.to = maxVal;
                     animMargin.start();
                 }
             }
 
         }
+
         onPositionChanged: {
             let mousePos = mapToItem(drawer.parent, mouse.x, mouse.y)
 
