@@ -200,7 +200,6 @@ Rectangle{
                 }
 
 
-
             }//delegate
 
         }//list
@@ -254,7 +253,7 @@ Rectangle{
     }
 
     function setVisibleElements(visible, index){
-        console.log("SET VISIBLE", visible, index);
+        //console.log("SET VISIBLE", visible, index);
         let innerId = treeViewGql.model.GetData("InnerId", index);
         let found = false;
         let foundChangeCount = 0;
@@ -280,7 +279,7 @@ Rectangle{
             }
 
             if(foundChangeCount == 2){
-                console.log("StopINdex::", i);
+                //console.log("StopINdex::", i);
                 break;
             }
 
