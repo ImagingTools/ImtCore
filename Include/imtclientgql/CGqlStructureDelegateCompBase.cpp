@@ -332,6 +332,15 @@ imtbase::ICollectionStructureInfo::Ids CGqlStructureDelegateCompBase::GetNodeIds
 }
 
 
+imtbase::ICollectionStructureIterator* CGqlStructureDelegateCompBase::CreateCollectionStructureIterator(
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/) const
+{
+	return nullptr;
+}
+
+
 imtbase::ICollectionStructureInfo::NodeInfo CGqlStructureDelegateCompBase::GetNodeInfo(const Id& nodeId)
 {
 	if (m_clientCompPtr.IsValid()){

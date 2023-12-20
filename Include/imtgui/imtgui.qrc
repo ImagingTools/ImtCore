@@ -152,6 +152,12 @@
 	<file alias="imtgui/AuxComponents/PreferenceDialog.qml">Qml/imtgui/AuxComponents/PreferenceDialog.qml</file>
 	<file alias="imtgui/AuxComponents/ErrorManager.qml">Qml/imtgui/AuxComponents/ErrorManager.qml</file>
 	<file alias="imtgui/AuxComponents/MultiPageView.qml">Qml/imtgui/AuxComponents/MultiPageView.qml</file>
+
+	<file alias="imtgui/AuxComponents/CollectionStructureBaseGqlModels.qml">Qml/imtgui/AuxComponents/CollectionStructureBaseGqlModels.qml</file>
+	<file alias="imtgui/AuxComponents/CollectionStructureCommandsDelegateBase.qml">Qml/imtgui/AuxComponents/CollectionStructureCommandsDelegateBase.qml</file>
+	<file alias="imtgui/AuxComponents/CollectionStructureDataProvider.qml">Qml/imtgui/AuxComponents/CollectionStructureDataProvider.qml</file>
+	<file alias="imtgui/AuxComponents/CollectionStructure.qml">Qml/imtgui/AuxComponents/CollectionStructure.qml</file>
+	<file alias="imtgui/AuxComponents/CollectionStructureBase.qml">Qml/imtgui/AuxComponents/CollectionStructureBase.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

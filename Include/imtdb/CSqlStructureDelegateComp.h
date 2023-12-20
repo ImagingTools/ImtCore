@@ -75,8 +75,8 @@ protected:
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
-	virtual QByteArray CreateGetNodeInfoQuery(const Id& nodeId) override;
-	virtual QByteArray GetNodePathQuery(const Id& nodeId) override;
+	virtual QByteArray CreateGetNodeInfoQuery(const Id& nodeId) const override;
+	virtual QByteArray CreateGetNodePathQuery(const Id& nodeId) const override;
 	virtual QByteArray CreateGetObjectParentNodeIdsQuery(const Id& objectId) const override;
 
 private:

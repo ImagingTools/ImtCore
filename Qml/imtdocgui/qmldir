@@ -12,7 +12,7 @@ MultiDocWorkspaceView 1.0 MultiDocWorkspaceView.qml
 SingleDocumentWorkspaceView 1.0 SingleDocumentWorkspaceView.qml
 UndoRedo 1.0 UndoRedo.qml
 UndoRedoManager 1.0 UndoRedoManager.qml
-
+DocumentManager 1.0 DocumentManager.qml
 DocumentHistoryDialog 1.0 DocumentHistoryDialog.qml
 DocumentHistoryProvider 1.0 DocumentHistoryProvider.qml
 DocumentHistoryView 1.0 DocumentHistoryView.qml

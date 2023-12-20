@@ -138,7 +138,7 @@ QByteArray CSqlStructureDelegateComp::CreateMoveObjectQuery(
 					"FROM (SELECT count(*) FROM \"Nodes\" WHERE \"NodeId\" = '%3') AS subquery "
 					"WHERE \"DocumentId\"='%1' "
 					"AND \"NodeId\" = '%2' "
-					"AND  subquery.count = 1; "
+					"AND  subquery.count = 1;"
 					).arg(qPrintable(objectId)).arg(qPrintable(sourceNodeId)).arg(qPrintable(targetNodeId));
 	}
 	else{
@@ -147,7 +147,7 @@ QByteArray CSqlStructureDelegateComp::CreateMoveObjectQuery(
 					"FROM (SELECT 1 AS count) AS subquery "
 					"WHERE \"DocumentId\"='%1' "
 					"AND \"NodeId\" = '%2' "
-					"AND  subquery.count = 1; "
+					"AND  subquery.count = 1;"
 					).arg(qPrintable(objectId)).arg(qPrintable(sourceNodeId)).arg(qPrintable(targetNodeId));
 	}
 
@@ -215,7 +215,7 @@ QByteArray CSqlStructureDelegateComp::CreateGetNodeIdsQuery(
 		return QByteArray();
 	}
 
-	QString baseSelelectionQuery = "SELECT \"NodeId\" FROM public.\"Nodes\"";
+	QString baseSelelectionQuery = "SELECT * FROM public.\"Nodes\"";
 
 	// Due to a bug in qt in the context of resolving of an expression like this: '%<SOME_NUMBER>%'
 	QString retVal = "(" + baseSelelectionQuery;
@@ -267,7 +267,7 @@ QByteArray CSqlStructureDelegateComp::CreateGetObjectIdsQuery(
 }
 
 
-QByteArray CSqlStructureDelegateComp::CreateGetNodeInfoQuery(const Id& nodeId)
+QByteArray CSqlStructureDelegateComp::CreateGetNodeInfoQuery(const Id& nodeId) const
 {
 	QString query = QString("SELECT \"NodeId\", \"Name\", \"Description\" FROM public.\"Nodes\";")
 						.arg(qPrintable(nodeId));
@@ -276,9 +276,9 @@ QByteArray CSqlStructureDelegateComp::CreateGetNodeInfoQuery(const Id& nodeId)
 }
 
 
-QByteArray CSqlStructureDelegateComp::GetNodePathQuery(const Id& nodeId)
+QByteArray CSqlStructureDelegateComp::CreateGetNodePathQuery(const Id& nodeId) const
 {
-	QString query = QString("SELECT (*) FROM get_node_path('%1');")
+	QString query = QString("SELECT * FROM get_node_path('%1');")
 						.arg(qPrintable(nodeId));
 
 	return query.toUtf8();

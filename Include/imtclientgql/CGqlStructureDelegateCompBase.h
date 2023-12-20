@@ -76,6 +76,10 @@ public:
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
+	virtual imtbase::ICollectionStructureIterator* CreateCollectionStructureIterator(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 	virtual NodeInfo GetNodeInfo(const Id& nodeId) override;
 	virtual Ids GetObjectParentNodeIds(const Id& objectId) const override;
 	virtual imtbase::ICollectionStructureController* GetHierarchicalStructureController() override;

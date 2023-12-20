@@ -24,15 +24,16 @@ private slots:
 	//void cleanup();
 	void InsertNewNodeWithRequiredParamsTest_data();
 	void InsertNewNodeWithRequiredParamsTest();
-	//void SetNodeNameTest();
-	//void SetNodeDescriptionTest();
-	//void MoveNodeTest();
-	//void RemoveNodeTest();
-	//void InsertObjectWithRequiredParamsTest_data();
-	//void InsertObjectWithRequiredParamsTest();
-	//void MoveObjectTest();
-	//void RemoveObjectTest();
-	//void cleanupTestCase();
+	void SetNodeNameTest();
+	void SetNodeDescriptionTest();
+	void MoveNodeTest();
+	void RemoveNodeTest();
+	void InsertObjectWithRequiredParamsTest_data();
+	void InsertObjectWithRequiredParamsTest();
+	void MoveObjectTest();
+	void RemoveObjectTest();
+	void GetNodePathTest();
+	void cleanupTestCase();
 
 protected:
     QString m_imtCorePath;

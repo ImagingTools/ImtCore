@@ -3,6 +3,9 @@
 // Qt includes
 #include <QtCore/QUuid>
 
+// ImtCore includes
+#include <imtdb/CSqlDatabaseCollectionStructureIterator.h>
+
 
 namespace imtdb
 {
@@ -183,6 +186,12 @@ bool CSqlStructureDelegateCompBase::MoveObject(
 			const Id& targetNodeId,
 			const imtbase::IOperationContext* operationContextPtr)
 {
+	if (!m_dbEngineCompPtr.IsValid()) {
+		SendCriticalMessage(0, "Invalid component configuration: Database engine missing", "Hierarchical structure info");
+
+		return false;
+	}
+
 	QByteArray query = CreateMoveObjectQuery(
 					objectId,
 					sourceNodeId,
@@ -194,7 +203,21 @@ bool CSqlStructureDelegateCompBase::MoveObject(
 		return false;
 	}
 
-	if (ExecuteTransaction(query)){
+	QSqlError error;
+
+	QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(query, &error);
+	if (error.type() != QSqlError::NoError) {
+		SendErrorMessage(0, error.text(), "Hierarchical structure info");
+
+		qDebug() << "SQL-error: " << query;
+
+		m_dbEngineCompPtr->CancelTransaction();
+
+		return false;
+	}
+
+	int count = sqlQuery.numRowsAffected();
+	if (count > 0) {
 		return true;
 	}
 
@@ -207,6 +230,12 @@ bool CSqlStructureDelegateCompBase::RemoveObject(
 			const Id& nodeId,
 			const imtbase::IOperationContext* operationContextPtr)
 {
+	if (!m_dbEngineCompPtr.IsValid()) {
+		SendCriticalMessage(0, "Invalid component configuration: Database engine missing", "Hierarchical structure info");
+
+		return false;
+	}
+
 	QByteArray query = CreateRemoveObjectQuery(
 					objectId,
 					nodeId,
@@ -217,7 +246,21 @@ bool CSqlStructureDelegateCompBase::RemoveObject(
 		return false;
 	}
 
-	if (ExecuteTransaction(query)){
+	QSqlError error;
+
+	QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(query, &error);
+	if (error.type() != QSqlError::NoError) {
+		SendErrorMessage(0, error.text(), "Hierarchical structure info");
+
+		qDebug() << "SQL-error: " << query;
+
+		m_dbEngineCompPtr->CancelTransaction();
+
+		return false;
+	}
+
+	int count = sqlQuery.numRowsAffected();
+	if (count > 0) {
 		return true;
 	}
 
@@ -254,9 +297,9 @@ imtbase::ICollectionStructureInfo::Ids CSqlStructureDelegateCompBase::GetNodeIds
 			const iprm::IParamsSet* selectionParamsPtr) const
 {
 	QByteArray query = CreateGetNodeIdsQuery(
-					offset,
-					count,
-					selectionParamsPtr);
+				offset,
+				count,
+				selectionParamsPtr);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Hierarchical structure info");
 
@@ -278,34 +321,29 @@ imtbase::ICollectionStructureInfo::Ids CSqlStructureDelegateCompBase::GetNodeIds
 }
 
 
-// imtbase::ICollectionStructureInfo::Ids CSqlStructureDelegateCompBase::GetObjectIds(
-// 	int offset,
-// 	int count,
-// 	const iprm::IParamsSet* selectionParamsPtr) const
-// {
-// 	QByteArray query = CreateGetObjectIdsQuery(
-// 		offset,
-// 		count,
-// 		selectionParamsPtr);
-// 	if (query.isEmpty()){
-// 		SendErrorMessage(0, "Database query could not be created", "Hierarchical structure info");
+imtbase::ICollectionStructureIterator* CSqlStructureDelegateCompBase::CreateCollectionStructureIterator(
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr) const
+{
+	QByteArray query = CreateGetNodeIdsQuery(
+				offset,
+				count,
+				selectionParamsPtr);
+	if (query.isEmpty()){
+		SendErrorMessage(0, "Database query could not be created", "Hierarchical structure info");
 
-// 		return Ids();
-// 	}
+		return nullptr;
+	}
 
-// 	QSqlError sqlError;
-// 	QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(query, &sqlError, true);
-// 	if (sqlError.type() != QSqlError::NoError){
-// 		SendErrorMessage(0, sqlError.text(), "Hierarchical structure info");
-// 	}
+	QSqlError sqlError;
+	QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(query, &sqlError, true);
+	if (sqlError.type() != QSqlError::NoError){
+		SendErrorMessage(0, sqlError.text(), "Hierarchical structure info");
+	}
 
-// 	Ids retVal;
-// 	while (sqlQuery.next()){
-// 		retVal << sqlQuery.value("").toByteArray();
-// 	}
-
-// 	return retVal;
-// }
+	return new CSqlDatabaseCollectionStructureIterator(sqlQuery);
+}
 
 
 imtbase::ICollectionStructureInfo::NodeInfo CSqlStructureDelegateCompBase::GetNodeInfo(const Id& nodeId)
@@ -336,7 +374,7 @@ imtbase::ICollectionStructureInfo::NodeInfo CSqlStructureDelegateCompBase::GetNo
 QList<imtbase::ICollectionStructureInfo::PathElement> CSqlStructureDelegateCompBase::GetNodePath(const Id& nodeId) const
 {
 	NodePath retVal;
-	QByteArray query = CreateGetObjectParentNodeIdsQuery(nodeId);
+	QByteArray query = CreateGetNodePathQuery(nodeId);
 	if (query.isEmpty()){
 		SendErrorMessage(0, "Database query could not be created", "Hierarchical structure info");
 

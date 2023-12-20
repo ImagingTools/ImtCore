@@ -18,6 +18,8 @@ namespace iprm
 namespace imtbase
 {
 
+class ICollectionStructureIterator;
+
 
 class ICollectionStructureInfo : virtual public istd::IChangeable
 {
@@ -78,6 +80,17 @@ public:
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
+	/**
+		Create a structure iterator according to the given filtering/sorting parameters.
+		\param offset				[optional] Index offset of the first node
+		\param count				[optional] If positive, the number of nodes should be returned.
+		\param selectionParamsPtr	[optional] Additional parameters for filtering/ordering nodes.
+	*/
+	virtual imtbase::ICollectionStructureIterator* CreateCollectionStructureIterator(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
+
 	virtual NodeInfo GetNodeInfo(const Id& nodeId) = 0;
 	virtual Ids GetObjectParentNodeIds(const Id& objectId) const = 0;
 

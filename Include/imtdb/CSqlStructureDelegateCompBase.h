@@ -77,10 +77,10 @@ public:
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
-	// virtual Ids GetObjectIds(
-	// 			int offset = 0,
-	// 			int count = -1,
-	// 	const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
+	virtual imtbase::ICollectionStructureIterator* CreateCollectionStructureIterator(
+				int offset = 0,
+				int count = -1,
+				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 	virtual NodeInfo GetNodeInfo(const Id& nodeId) override;
 	virtual QList<PathElement> GetNodePath(const Id& nodeId) const override;
 	virtual Ids GetObjectParentNodeIds(const Id& objectId) const override;
@@ -136,8 +136,8 @@ protected:
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
-	virtual QByteArray CreateGetNodeInfoQuery(const Id& nodeId) = 0;
-	virtual QByteArray GetNodePathQuery(const Id& nodeId) = 0;
+	virtual QByteArray CreateGetNodeInfoQuery(const Id& nodeId) const = 0;
+	virtual QByteArray CreateGetNodePathQuery(const Id& nodeId) const = 0;
 	virtual QByteArray CreateGetObjectParentNodeIdsQuery(const Id& objectId) const = 0;
 	virtual bool ExecuteTransaction(const QByteArray& sqlQuery) const;
 

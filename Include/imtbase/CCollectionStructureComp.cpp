@@ -302,6 +302,25 @@ imtbase::ICollectionStructureInfo::Ids CCollectionStructureComp::GetNodeIds(
 }
 
 
+imtbase::ICollectionStructureIterator* CCollectionStructureComp::CreateCollectionStructureIterator(
+			int offset,
+			int count,
+			const iprm::IParamsSet* selectionParamsPtr) const
+{
+	imtbase::ICollectionStructureIterator* retVal = nullptr;
+
+	if (m_delegateCompPtr.IsValid()){
+
+		retVal = m_delegateCompPtr->CreateCollectionStructureIterator(
+					offset,
+					count,
+					selectionParamsPtr);
+	}
+
+	return retVal;
+}
+
+
 imtbase::ICollectionStructureInfo::NodeInfo CCollectionStructureComp::GetNodeInfo(const QByteArray& nodeId)
 {
     return imtbase::ICollectionStructureInfo::NodeInfo();

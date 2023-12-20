@@ -116,3 +116,10 @@ TreeItemModelConverter 1.0 ./AuxComponents/TreeItemModelConverter.qml
 
 MultiPageView 1.0 ./AuxComponents/MultiPageView.qml
 AlertMessage 1.0 ./AuxComponents/AlertMessage.qml
+
+CollectionStructureBaseGqlModels 1.0 ./AuxComponents/CollectionStructureBaseGqlModels.qml
+CollectionStructureCommandsDelegateBase 1.0 ./AuxComponents/CollectionStructureCommandsDelegateBase.qml
+CollectionStructureCommandsObserver 1.0 ./AuxComponents/CollectionStructureCommandsObserver.qml
+CollectionStructureDataProvider 1.0 ./AuxComponents/CollectionStructureDataProvider.qml
+CollectionStructure 1.0 ./AuxComponents/CollectionStructure.qml
+CollectionStructureBase 1.0 ./AuxComponents/CollectionStructureBase.qml
