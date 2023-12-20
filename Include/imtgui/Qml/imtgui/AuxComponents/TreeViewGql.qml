@@ -12,7 +12,8 @@ Rectangle{
 
     property int shift: 70;
     property string nameId: "Name";
-    property alias delegateWidht: list.delegateWidth;
+    property int delegateWidht: 200;
+    property int delegateHeight: 40;
     property alias delegate: list.delegate;
     property bool hasSelection: false;
     property int selectedIndex: -1;
@@ -60,6 +61,19 @@ Rectangle{
 
         border.color: "lightgrey";
 
+        Item{
+            id: listFrame;
+
+            width: list.width;
+            height: list.height;
+
+            property real contentY: list.contentY;
+            property real originY: 0;//list.originY;
+            property real contentWidth: list.contentWidth;
+            property real contentHeight: height;
+
+        }
+
         ListView{
             id: list;
 
@@ -71,7 +85,7 @@ Rectangle{
             boundsBehavior: Flickable.StopAtBounds;
             contentWidth: delegateWidth;
             clip: true;
-            property int delegateWidth: 200;
+            property int delegateWidth: treeViewGql.delegateWidht;
 
             model: treeViewGql.model;
 
@@ -79,7 +93,7 @@ Rectangle{
                 id: deleg;
 
                 width: model.Visible ? model.Level * treeViewGql.shift + list.delegateWidth : 0;
-                height: model.Visible ? 40 : 0;
+                height: model.Visible ? treeViewGql.delegateHeight : 0;
                 opacity: model.Visible;
                 clip: true;
                 property bool isOpen: model.IsOpen;
@@ -202,19 +216,20 @@ Rectangle{
 
             }//delegate
 
+
         }//list
 
         CustomScrollbar{
             id: scrollVert;
 
-            anchors.left: list.right;
+            anchors.left: listFrame.right;
             anchors.leftMargin: 1;
 
-            anchors.bottom: list.bottom;
+            anchors.bottom: listFrame.bottom;
 
             secondSize: 12;
 
-            targetItem: list;
+            targetItem: listFrame;
         }
 
         CustomScrollbar{
@@ -286,6 +301,8 @@ Rectangle{
             //
             if(ok){
                 treeViewGql.model.SetData("Visible", visible, i);
+                let coeff = visible ? 1 : -1;
+                listFrame.contentHeight += coeff * treeViewGql.delegateHeight;
             }
         }
 
@@ -317,6 +334,12 @@ Rectangle{
             treeViewGql.model.SetData("HasBranch", false, newIndex);
             treeViewGql.model.SetData("InnerId", String(val + newIndex), newIndex);
 
+            if(i == 0 && level_ == -1){
+                listFrame.contentHeight = treeViewGql.delegateHeight;
+            }
+            else {
+                listFrame.contentHeight += treeViewGql.delegateHeight;
+            }
         }
         treeViewGql.setContentWidth();
     }
