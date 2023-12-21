@@ -7,6 +7,8 @@ import imtqml 1.0
 SingleDocumentWorkspaceView {
     id: container;
 
+    anchors.fill: parent;
+
     property string commandId;
 
     signal commandsModelChanged(var commandsModel);
@@ -14,7 +16,7 @@ SingleDocumentWorkspaceView {
     Component.onCompleted: {
         startPageObj = {"Id": "Administration",
             "Name": "Administration",
-            "Source": "../../imtauthgui/AdministrationView.qml",
+            "Source": "../imtauthgui/AdministrationView.qml",
             "CommandId": "Administration"};
 
         Events.subscribeEvent("CommandsModelChanged", container.onCommandsModelUpdated);
@@ -41,6 +43,10 @@ SingleDocumentWorkspaceView {
         id: modalDialogManager;
         z: 30;
         anchors.fill: parent;
+    }
+
+    SubscriptionManager {
+        id: subscriptionManager;
     }
 
     function login(login, password){

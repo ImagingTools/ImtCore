@@ -8,9 +8,8 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="SubscriptionManager" X="550" Y="300" Note=""/>
-        <Element ComponentName="WebSocketClient" X="225" Y="550" Note=""/>
-        <Element ComponentName="WebSocketProtocolEngine" X="875" Y="550" Note=""/>
+        <Element ComponentName="SubscriptionController" X="550" Y="100" Note=""/>
+        <Element ComponentName="SubscriptionManager" X="550" Y="350" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

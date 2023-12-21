@@ -14,7 +14,7 @@
 #include <imtclientgql/CGqlRemoteRepresentationControllerComp.h>
 #include <imtclientgql/CSubscriptionManagerComp.h>
 #include <imtclientgql/CWebSocketClientComp.h>
-#include <imtclientgql/CSubscriptionControllerComp.h>
+#include <imtclientgql/CModelSubscriberComp.h>
 #include <imtclientgql/CGqlStructureDelegateComp.h>
 
 
@@ -33,7 +33,7 @@ typedef imtclientgql::CGqlRemoteRepresentationControllerCompBase GraphQLRemoteRe
 typedef imtclientgql::CGqlRemoteRepresentationControllerComp PumaGqlRemoteRepresentationController;
 typedef imtclientgql::CSubscriptionManagerComp SubscriptionManager;
 typedef icomp::TModelCompWrap<imtclientgql::CWebSocketClientComp> WebSocketClient;
-typedef imtclientgql::CSubscriptionControllerComp SubscriptionController;
+typedef imtclientgql::CModelSubscriberComp ModelSubscriber;
 typedef imtclientgql::CGqlStructureDelegateComp GqlStructureDelegate;
 
 

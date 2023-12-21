@@ -7,7 +7,7 @@ namespace imtgql
 
 // public methods
 
-// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+// reimplemented (imtgql::IGqlRequestHandler)
 
 bool CGqlDemultiplexerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
 {
@@ -28,7 +28,7 @@ bool CGqlDemultiplexerComp::IsRequestSupported(const imtgql::CGqlRequest& gqlReq
 
 // reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-imtbase::CTreeItemModel* CGqlDemultiplexerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CGqlDemultiplexerComp::CreateResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	for (int i = 0; i < m_gqlRequestHandlersCompPtr.GetCount(); i++){
 		const imtgql::IGqlRequestHandler* gqlRequestHahdlerPtr = m_gqlRequestHandlersCompPtr[i];

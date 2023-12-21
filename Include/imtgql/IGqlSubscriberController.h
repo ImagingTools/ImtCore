@@ -21,12 +21,12 @@ public:
 	/**
 		Register subscriprion for a GraphQL-based request.
 	*/
-	virtual bool RegisterSubscribtion(
+	virtual bool RegisterSubscription(
 				const QByteArray& subscriptionId,
 				const imtgql::CGqlRequest& gqlRequest,
 				const imtrest::IRequest& networkRequest,
 				QString& errorMessage) = 0;
-	virtual bool UnRegisterSubscribtion(const QByteArray& subscriptionId) = 0;
+	virtual bool UnRegisterSubscription(const QByteArray& subscriptionId) = 0;
 };
 
 

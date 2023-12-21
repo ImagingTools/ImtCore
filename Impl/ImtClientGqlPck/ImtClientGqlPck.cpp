@@ -55,7 +55,7 @@ I_EXPORT_COMPONENT(
 		"Rest WebSocket Client");
 
 I_EXPORT_COMPONENT(
-		SubscriptionController,
+		ModelSubscriber,
 		"Subscription controller",
 		"Subscription Controller");
 

@@ -23,6 +23,7 @@
 #include <imtgql/CObjectCollectionSubscriberControllerComp.h>
 #include <imtgql/CModelSubscriberControllerComp.h>
 #include <imtgql/CGqlFileRepositoryComp.h>
+#include <imtgql/CPermissibleGqlRequestHandlerComp.h>
 
 
 /**
@@ -49,6 +50,7 @@ typedef imtgql::COperationContextControllerComp OperationContextController;
 typedef imtgql::CObjectCollectionSubscriberControllerComp ObjectCollectionSubscriberController;
 typedef imtgql::CModelSubscriberControllerComp ModelSubscriberController;
 typedef imtgql::CGqlFileRepositoryComp GqlFileRepository;
+//typedef imtgql::CPermissibleGqlRequestHandlerComp PermissibleGqlRequestHandler;
 
 
 } // namespace ImtGqlPck

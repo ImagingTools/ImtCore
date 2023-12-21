@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5088" Description="ACF"/>
-            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5136" Description="ACF"/>
+            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Server framework for GraphQL-based implementations</Description>
@@ -23,7 +23,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="GraphQlCommandId">
-                        <Data IsEnabled="true" Value="Acula/graphql"/>
+                        <Data IsEnabled="true" Value="&lt;ProductName&gt;/graphql"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
@@ -56,7 +56,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="RedirectToCommandId" Type="Id" ExportId="RedirectToCommandId">
-                        <Data IsEnabled="true" Value="Acula/Views/html/index.html?item=Pages/StartPage.qml"/>
+                        <Data IsEnabled="true" Value="&lt;ProductName&gt;/Views/html/index.html?item=Pages/StartPage.qml"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -187,7 +187,7 @@
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="FileAccessCommandId">
-                        <Data IsEnabled="true" Value="Acula/files*"/>
+                        <Data IsEnabled="true" Value="&lt;ProductName&gt;/files*"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
@@ -210,7 +210,7 @@
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="CommandId" Type="Id" ExportId="WebCommandId">
-                        <Data IsEnabled="true" Value="Acula/Views*"/>
+                        <Data IsEnabled="true" Value="&lt;ProductName&gt;/Views*"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>

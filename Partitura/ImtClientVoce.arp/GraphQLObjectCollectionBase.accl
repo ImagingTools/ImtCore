@@ -2,17 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5134" Description="ACF"/>
+            <Version Id="0" Number="5136" Description="ACF"/>
             <Version Id="1" Number="2198" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="GqlObjectCollection" X="450" Y="325" Note=""/>
-        <Element ComponentName="SubscriptionController" X="800" Y="325" Note=""/>
-        <Element ComponentName="SubscriptionManager" X="800" Y="475" Note=""/>
-        <Element ComponentName="WebSocketClient" X="500" Y="600" Note=""/>
-        <Element ComponentName="WebSocketProtocolEngine" X="950" Y="600" Note=""/>
+        <Element ComponentName="GqlObjectCollection" X="425" Y="325" Note=""/>
+        <Element ComponentName="ModelSubscriptionManager" X="825" Y="325" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

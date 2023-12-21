@@ -10,24 +10,6 @@
     <Description></Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="SubscriptionController" PackageId="ImtClientGqlPck" ComponentId="SubscriptionController">
-            <Data IsEnabled="true" Flags="1">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="Command" Type="Id" ExportId="SubscriptionCommandId">
-                        <Data IsEnabled="true" Value=""/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Model" Type="Reference" ExportId="DefaultModel">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SubscriptionManager" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SubscriptionManager"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="SubscriptionManager" PackageId="ImtClientGqlPck" ComponentId="SubscriptionManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -74,7 +56,7 @@
                         <Data IsEnabled="true" Value="ServerPasswordParam"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ServerPort" Type="Integer" ExportId="WebSocketServerPort">
-                        <Data IsEnabled="true" Value="8112"/>
+                        <Data IsEnabled="true" Value="0"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ServerPortParam" Type="Reference" ExportId="WebSocketServerPortParam">
                         <Data IsEnabled="false"/>
@@ -96,6 +78,11 @@
         </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
-    <ExportedInterfaces/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtclientgql::IGqlClient" ComponentId="SubscriptionManager"/>
+        <Interface InterfaceId="imtclientgql::IGqlSubscriptionManager" ComponentId="SubscriptionManager"/>
+        <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="SubscriptionManager"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="SubscriptionManager"/>
+    </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

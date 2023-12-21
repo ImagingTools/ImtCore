@@ -99,6 +99,11 @@ I_EXPORT_COMPONENT(
 			"File-based GraphQL-collection repository",
 			IM_AUTHOR("Sergey Zastrovnyh")"File Repository GQL GraphQL Collection Object Provider");
 
+//I_EXPORT_COMPONENT(
+//			PermissibleGqlRequestHandler,
+//			"GraphQL request handler with permission checker",
+//			"GraphQL GQL Request Permission Checker Handler Controller");
+
 
 } // namespace ImtGqlPck
 

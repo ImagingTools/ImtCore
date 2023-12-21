@@ -18,21 +18,10 @@ bool CModelSubscriberControllerComp::SetSubscriptions()
 		return false;
 	}
 
-	qDebug() << "SetSubscriptions" << m_registeredSubscribers.count();
-
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequest = requestNetworks.networkRequests[id];
-			QByteArray body = QString(R"(
-										{
-											"type": "data",
-											"id": "%1",
-											"payload": {
-												"data": "%2"
-											}
-										})")
-								.arg(QString(id))
-								.arg(QString("Change")).toUtf8();
+			QByteArray body = QString(R"({"type": "data","id": "%1","payload": {"data": "%2"}})").arg(qPrintable(id)).arg(qPrintable("Change")).toUtf8();
 			QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
 			const imtrest::IProtocolEngine& engine = networkRequest->GetProtocolEngine();
 
@@ -40,6 +29,8 @@ bool CModelSubscriberControllerComp::SetSubscriptions()
 			if (responsePtr.IsValid()){
 				const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest->GetRequestId());
 				if (sender != nullptr){
+					qDebug() << "SetSubscriptions";
+
 					sender->SendResponse(responsePtr);
 				}
 			}
@@ -75,6 +66,7 @@ void CModelSubscriberControllerComp::OnComponentDestroyed()
 
 void CModelSubscriberControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
+	qDebug() << "Model OnUpdate";
 	SetSubscriptions();
 }
 

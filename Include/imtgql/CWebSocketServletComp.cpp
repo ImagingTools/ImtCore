@@ -186,7 +186,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::RegisterSubscription(const imtr
 
 	if (subscriberControllerPtr != nullptr){
 		QString errorMessage;
-		if (subscriberControllerPtr->RegisterSubscribtion(webSocketRequest->GetSubscriptionId(), gqlRequest, request, errorMessage)){
+		if (subscriberControllerPtr->RegisterSubscription(webSocketRequest->GetSubscriptionId(), gqlRequest, request, errorMessage)){
 			QByteArray data = QString(R""(
 {
 "type": "start_ask",
@@ -218,7 +218,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::UnregisterSubscription(const im
 
 	for (int index = 0; index < m_gqlSubscriberControllersCompPtr.GetCount(); index++){
 		IGqlSubscriberController* controlerPtr = m_gqlSubscriberControllersCompPtr[index];
-		if ((controlerPtr != nullptr) && m_gqlSubscriberControllersCompPtr[index]->UnRegisterSubscribtion(webSocketRequest->GetSubscriptionId())){
+		if ((controlerPtr != nullptr) && m_gqlSubscriberControllersCompPtr[index]->UnRegisterSubscription(webSocketRequest->GetSubscriptionId())){
 
 			QByteArray data = QString(R""(
 {

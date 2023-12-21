@@ -9,8 +9,8 @@
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtbase/IOperationContext.h>
 #include <imtbase/IDocumentChangeGenerator.h>
-#include <imtgql/CGqlRequestHandlerCompBase.h>
 #include <imtgql/IOperationContextController.h>
+#include <imtgql/CPermissibleGqlRequestHandlerComp.h>
 
 
 #undef GetObject
@@ -20,7 +20,7 @@ namespace imtgql
 {
 
 
-class CObjectCollectionControllerCompBase: public imtgql::CGqlRequestHandlerCompBase
+class CObjectCollectionControllerCompBase: public imtgql::CPermissibleGqlRequestHandlerComp
 {
 public:
 	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;

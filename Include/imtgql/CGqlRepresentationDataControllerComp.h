@@ -5,6 +5,7 @@
 #include <imtbase/IRepresentationController.h>
 #include <imtgql/IGqlRepresentationController.h>
 #include <imtgql/CGqlRequestHandlerCompBase.h>
+#include <imtgql/CPermissibleGqlRequestHandlerComp.h>
 
 
 namespace imtgql
@@ -13,10 +14,10 @@ namespace imtgql
 
 class CGqlRepresentationDataControllerComp:
 			virtual public IGqlRepresentationController,
-			public CGqlRequestHandlerCompBase
+			public imtgql::CPermissibleGqlRequestHandlerComp
 {
 public:
-	typedef CGqlRequestHandlerCompBase BaseClass;
+	typedef imtgql::CPermissibleGqlRequestHandlerComp BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlRepresentationDataControllerComp);
 		I_REGISTER_INTERFACE(IGqlRepresentationController);

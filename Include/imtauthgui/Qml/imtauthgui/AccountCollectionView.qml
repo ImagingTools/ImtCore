@@ -26,6 +26,7 @@ CollectionView {
     function fillContextMenuModel(){
         contextMenuModel.clear();
 
+
         contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../" + Style.getIconPath("Icons/Edit", Icon.State.On, Icon.Mode.Normal)});
         contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../" + Style.getIconPath("Icons/Remove", Icon.State.On, Icon.Mode.Normal)});
         contextMenuModel.append({"Id": "SetDescription", "Name": qsTr("Set Description"), "IconSource": ""});

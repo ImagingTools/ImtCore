@@ -3,7 +3,6 @@
 
 // ACF includes
 #include<istd/TDelPtr.h>
-#include<imod/IModel.h>
 
 // ImtCore includes
 #include<imtrest/IProtocolEngine.h>
@@ -17,9 +16,9 @@ namespace imtgql
 
 // public methods
 
-// reimplemented (imtgql::IGqlRequestHandler)
+// reimplemented (imtgql::IGqlSubscriberController)
 
-bool CGqlSubscriberControllerCompBase::IsRequestSupported(const CGqlRequest &gqlRequest) const
+bool CGqlSubscriberControllerCompBase::IsRequestSupported(const CGqlRequest& gqlRequest) const
 {
 	const QList<CGqlObject> fieldsPtr = gqlRequest.GetFields();
 	if (fieldsPtr.isEmpty()){
@@ -32,7 +31,7 @@ bool CGqlSubscriberControllerCompBase::IsRequestSupported(const CGqlRequest &gql
 }
 
 
-bool CGqlSubscriberControllerCompBase::RegisterSubscribtion(
+bool CGqlSubscriberControllerCompBase::RegisterSubscription(
 			const QByteArray& subscriptionId,
 			const imtgql::CGqlRequest& gqlRequest,
 			const imtrest::IRequest& networkRequest,
@@ -41,56 +40,43 @@ bool CGqlSubscriberControllerCompBase::RegisterSubscribtion(
 	Q_ASSERT(IsRequestSupported(gqlRequest));
 
 	if (!IsRequestSupported(gqlRequest)){
-		errorMessage = QT_TR_NOOP("Request is not supported");
+		errorMessage = QString("Request with Command-ID: '%1 'is not supported").arg(qPrintable(gqlRequest.GetCommandId()));
+		SendErrorMessage(0, errorMessage, "CGqlSubscriberControllerCompBase");
 
 		return false;
 	}
 
-	if(CheckPermissions(gqlRequest, errorMessage)){
-		const imtrest::CWebSocketRequest* constWebSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&networkRequest);
-		imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<imtrest::CWebSocketRequest*>(const_cast<imtrest::CWebSocketRequest*>(constWebSocketRequest));
-		if (webSocketRequest == nullptr){
-			return false;
-		}
+	const imtrest::CWebSocketRequest* constWebSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&networkRequest);
+	imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<imtrest::CWebSocketRequest*>(const_cast<imtrest::CWebSocketRequest*>(constWebSocketRequest));
+	if (webSocketRequest == nullptr){
+		errorMessage = QString("Internal error");
+		SendErrorMessage(0, errorMessage, "CGqlSubscriberControllerCompBase");
 
-		for (RequestNetworks& requestNetworks: m_registeredSubscribers){
-			if (requestNetworks.gqlRequest.IsEqual(gqlRequest)){
-				requestNetworks.networkRequests.insert(subscriptionId, &networkRequest);
-
-				webSocketRequest->RegisterRequestEventHandler(this);
-
-				return true;
-			}
-		}
-
-		RequestNetworks requestNetworks;
-		requestNetworks.gqlRequest.CopyFrom(gqlRequest);
-		requestNetworks.networkRequests.insert(subscriptionId, &networkRequest);
-		m_registeredSubscribers.append(requestNetworks);
-
-		webSocketRequest->RegisterRequestEventHandler(this);
-
-		return true;
+		return false;
 	}
 
-	QString userName;
-	
-	const IGqlContext* requestContextPtr = gqlRequest.GetRequestContext();
-	if (requestContextPtr != nullptr){
-		const imtauth::IUserInfo* userInfoPtr = requestContextPtr->GetUserInfo();
+	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
+		if (requestNetworks.gqlRequest.IsEqual(gqlRequest)){
+			requestNetworks.networkRequests.insert(subscriptionId, &networkRequest);
 
-		if (userInfoPtr != nullptr){
-			userName = userInfoPtr->GetName();
+			webSocketRequest->RegisterRequestEventHandler(this);
+
+			return true;
 		}
 	}
 
-	errorMessage = QT_TR_NOOP("Invalid permissions for " + userName);
+	RequestNetworks requestNetworks;
+	requestNetworks.gqlRequest.CopyFrom(gqlRequest);
+	requestNetworks.networkRequests.insert(subscriptionId, &networkRequest);
+	m_registeredSubscribers.append(requestNetworks);
 
-	return false;
+	webSocketRequest->RegisterRequestEventHandler(this);
+
+	return true;
 }
 
 
-bool CGqlSubscriberControllerCompBase::UnRegisterSubscribtion(const QByteArray& subscriptionId) 
+bool CGqlSubscriberControllerCompBase::UnRegisterSubscription(const QByteArray& subscriptionId)
 {
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		if (requestNetworks.networkRequests.contains(subscriptionId)){
@@ -108,7 +94,7 @@ void CGqlSubscriberControllerCompBase::OnRequestDestroyed(imtrest::IRequest* req
 {
 	imtrest::CWebSocketRequest* webSocketRequestPtr = dynamic_cast<imtrest::CWebSocketRequest*>(request);
 	if (webSocketRequestPtr != nullptr){
-		UnRegisterSubscribtion(webSocketRequestPtr->GetSubscriptionId());
+		UnRegisterSubscription(webSocketRequestPtr->GetSubscriptionId());
 	}
 }
 
@@ -136,32 +122,49 @@ bool CGqlSubscriberControllerCompBase::SetSubscriptions()
 		clonedRequest.SetCommandId(*m_requestHandlerCommandIdAtrPtr);
 
 		QString errorMessage;
-		istd::TDelPtr<imtbase::CTreeItemModel> resultModel = m_requestHandlerCompPtr->CreateResponse(clonedRequest, errorMessage);
+		istd::TDelPtr<imtbase::CTreeItemModel> resultModelPtr = m_requestHandlerCompPtr->CreateResponse(clonedRequest, errorMessage);
+		if (!resultModelPtr.IsValid()){
+			errorMessage = QString("Unable to send response to the subscribers result model is invalid");
+			SendErrorMessage(0, errorMessage, "CGqlSubscriberControllerCompBase");
 
-		for (QByteArray id: requestNetworks.networkRequests.keys()){
-			const imtrest::IRequest* networkRequest = requestNetworks.networkRequests[id];
-			imtbase::CTreeItemModel* dataModel = resultModel->GetTreeItemModel("data");
-			if (dataModel == nullptr){
-				continue;
-			}
-			QByteArray data =  dataModel->toJSON().toUtf8();
-			QByteArray body = QString(R""(
-{
-	"type": "data",
-	"id": %1,
-	"payload": {
-		"data": %2
+			return false;
+		}
+
+		imtbase::CTreeItemModel* dataModelPtr = resultModelPtr->GetTreeItemModel("data");
+		if (dataModelPtr == nullptr){
+			errorMessage = QString("Unable to send response to the subscribers result model is invalid");
+			SendErrorMessage(0, errorMessage, "CGqlSubscriberControllerCompBase");
+
+			return false;
+		}
+
+		QByteArray data =  dataModelPtr->toJSON().toUtf8();
+
+		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
+			const imtrest::IRequest* networkRequestPtr = requestNetworks.networkRequests[id];
+			if (networkRequestPtr != nullptr){
+				QByteArray body = QString(R""(
+	{
+		"type": "data",
+		"id": "%1",
+		"payload": {
+			"data": "%2"
+		}
 	}
-}
-	)"" ).arg(QString(id)).arg(QString(data)).toUtf8();
-			QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
-			const imtrest::IProtocolEngine&  engine = networkRequest->GetProtocolEngine();
+		)"" ).arg(QString(id)).arg(QString(data)).toUtf8();
+				QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
+				const imtrest::IProtocolEngine&  engine = networkRequestPtr->GetProtocolEngine();
 
-			 imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
-			if (responsePtr.IsValid()){
-				const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest->GetRequestId());
-				if (sender != nullptr){
-					sender->SendResponse(responsePtr);
+				imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequestPtr, imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
+				if (responsePtr.IsValid()){
+					const imtrest::ISender* senderPtr = m_requestManagerCompPtr->GetSender(networkRequestPtr->GetRequestId());
+					if (senderPtr != nullptr){
+						senderPtr->SendResponse(responsePtr);
+					}
+				}
+				else{
+					errorMessage = QString("Unable to create a response: '%1").arg(qPrintable(body));
+					SendErrorMessage(0, errorMessage, "CGqlSubscriberControllerCompBase");
 				}
 			}
 		}
@@ -179,25 +182,18 @@ bool CGqlSubscriberControllerCompBase::SetAllSubscriptions(const QByteArray& dat
 
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
-			const imtrest::IRequest* networkRequest = requestNetworks.networkRequests[id];
-			QByteArray body = QString(
-R"(
-	{
-	"type": "data",
-	"id": "%1",
-	"payload": {
-		"data": %2
-		}
-	}
-)").arg(QString(id)).arg(QString(data)).toUtf8();
-			QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
-			const imtrest::IProtocolEngine& engine = networkRequest->GetProtocolEngine();
+			const imtrest::IRequest* networkRequestPtr = requestNetworks.networkRequests[id];
+			if (networkRequestPtr != nullptr){
+				QByteArray body = QString(R"({"type": "data","id": "%1","payload": {"data": "%2"}})").arg(qPrintable(id)).arg(qPrintable(data)).toUtf8();
+				QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
+				const imtrest::IProtocolEngine& engine = networkRequestPtr->GetProtocolEngine();
 
-			imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
-			if (responsePtr.IsValid()){
-				const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest->GetRequestId());
-				if (sender != nullptr){
-					sender->SendResponse(responsePtr);
+				imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequestPtr, imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
+				if (responsePtr.IsValid()){
+					const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequestPtr->GetRequestId());
+					if (sender != nullptr){
+						sender->SendResponse(responsePtr);
+					}
 				}
 			}
 		}
@@ -210,40 +206,6 @@ R"(
 bool CGqlSubscriberControllerCompBase::StartInternalSubscriber(const imtgql::CGqlRequest& /*gqlRequest*/, QString& /*errorMessage*/)
 {
 	return true;
-}
-
-
-iprm::IParamsSet *CGqlSubscriberControllerCompBase::CreateContextParams(const imtgql::CGqlRequest& /*gqlRequest*/) const
-{
-	return nullptr;
-}
-
-
-bool CGqlSubscriberControllerCompBase::CheckPermissions(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
-{
-	bool result = true;
-	if (gqlRequest.GetRequestContext() != nullptr){
-		const imtauth::IUserInfo* userInfoPtr = gqlRequest.GetRequestContext()->GetUserInfo();
-		Q_ASSERT(userInfoPtr != nullptr);
-		if (userInfoPtr != nullptr){
-			QByteArray userId = userInfoPtr->GetId();
-			if (!userInfoPtr->IsAdmin()){
-				if(m_commandPermissionsCompPtr.IsValid()){
-					imtauth::IUserInfo::FeatureIds permissions = userInfoPtr->GetPermissions();
-					QByteArray gqlCommand = gqlRequest.GetCommandId();
-					QByteArrayList commandIds = m_commandPermissionsCompPtr->GetCommandIds();
-					if(commandIds.contains(gqlCommand)){
-						QByteArrayList permissionIds = m_commandPermissionsCompPtr->GetCommandPermissions(gqlCommand);
-						if (m_checkPermissionCompPtr.IsValid()){
-							result = m_checkPermissionCompPtr->CheckPermission(permissions, permissionIds);
-						}
-					}
-				}
-			}
-		}
-	}
-
-	return result;
 }
 
 

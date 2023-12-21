@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5088" Description="ACF"/>
-            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5136" Description="ACF"/>
+            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -32,12 +32,12 @@
                         <Data IsEnabled="true" Value="Puma"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="ServerPrefix">
-                        <Data IsEnabled="true" Value="/Puma"/>
+                        <Data IsEnabled="true" Value=""/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Url" Type="Id" ExportId="DefaultPumaUrl">
-                        <Data IsEnabled="true" Value="http://localhost:7788"/>
+                    <AttributeInfo Id="Url" Type="Id" ExportId="DefaultUrl">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="PumaUrlParam">
+                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="ServerUrlParam">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -106,7 +106,7 @@
                     <AttributeInfo Id="Url" Type="Id" ExportId="DefaultUrl">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="UrlParam">
+                    <AttributeInfo Id="UrlParam" Type="Reference" ExportId="ServerUrlParam">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>

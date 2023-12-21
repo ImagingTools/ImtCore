@@ -126,8 +126,16 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 		QByteArray message = webSocketRequest->GetBody();
 
 		qDebug() << "ProcessRequest: " << message;
+		qDebug() << "MethodType: " << webSocketRequest->GetMethodType();
 
-		QJsonDocument jsonDocument = QJsonDocument::fromJson(message);
+		QJsonParseError jsonError;
+		QJsonDocument jsonDocument = QJsonDocument::fromJson(message, &jsonError);
+		if (jsonDocument.isNull()){
+			QByteArray errorMessage = QString("Unable to convert message to JSON: '%1'").arg(qPrintable(jsonError.errorString())).toUtf8();
+			qDebug() << errorMessage;
+
+			return CreateErrorResponse(errorMessage, request);
+		}
 
 		QJsonObject rootObject = jsonDocument.object();
 
@@ -162,10 +170,18 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 			if (m_registeredClients.contains(subscriptionId)){
 				for (imtclientgql::IGqlSubscriptionClient* subscriptionClientPtr : m_registeredClients[subscriptionId].m_clients){
 					if (subscriptionClientPtr != nullptr){
-						QJsonObject payloadObject = rootObject.value("payload").toObject().value("data").toObject();
+						if (!rootObject.contains("payload")){
+							qDebug() << "rootObject not contains 'payload'";
+
+							break;
+						}
+
+						QJsonObject payloadObject = rootObject.value("payload").toObject();
 
 						QJsonDocument document;
 						document.setObject(payloadObject);
+
+						qDebug() << "document" << document.toJson();
 
 						QByteArray payload = document.toJson(QJsonDocument::Compact);
 

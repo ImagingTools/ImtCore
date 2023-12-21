@@ -257,7 +257,7 @@ void CWebSocketClientComp::Connect()
 	QJsonObject authorization;
 
 	if (m_webSocketServerAddressCompPtr.IsValid()){
-		host = m_webSocketServerPortCompPtr->GetText();
+		host = m_webSocketServerAddressCompPtr->GetText();
 	}
 	if (m_webSocketServerPortCompPtr.IsValid()){
 		port = m_webSocketServerPortCompPtr->GetText();
@@ -266,7 +266,7 @@ void CWebSocketClientComp::Connect()
 		login = m_webSocketServerLoginCompPtr->GetText();
 	}
 	if (m_webSocketServerPasswordCompPtr.IsValid()){
-		port = m_webSocketServerPasswordCompPtr->GetText();
+		password = m_webSocketServerPasswordCompPtr->GetText();
 	}
 	authorization["host"] = host;
 	authorization["port"] = port;

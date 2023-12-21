@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5134" Description="ACF"/>
+            <Version Id="0" Number="5136" Description="ACF"/>
             <Version Id="1" Number="2198" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -13,7 +13,7 @@
         <Element Id="GqlObjectCollectionDelegate" PackageId="ImtClientGqlPck" ComponentId="GqlObjectCollectionDelegate">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="ApiClient">
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GraphQlApiClient"/>
                     </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
@@ -37,7 +37,7 @@
         <Element Id="GraphQLObjectCollectionBase" PackageId="ImtClientVoce" ComponentId="GraphQLObjectCollectionBase">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="CommandID" Type="Id" ExportId="CommandID">
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="GqlDatabaseDelegate" Type="Reference" ExportId="">
@@ -47,6 +47,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="ObjectFactories">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubscriptionCommandId" Type="Id" ExportId="SubscriptionCommandId">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TypeIds" Type="Id[]" ExportId="TypeIds">
@@ -62,6 +65,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="WebSocketServerPort" Type="Integer" ExportId="WebSocketServerPort">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="WebSocketServerPortParam" Type="Reference" ExportId="WebSocketServerPortParam">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -101,9 +107,6 @@
         <Interface InterfaceId="imtbase::ICollectionInfo" ComponentId="GraphQLObjectCollectionBase"/>
         <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="GraphQLObjectCollectionBase"/>
         <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="GraphQLObjectCollectionBase"/>
-        <Interface InterfaceId="imtbase::IStructuredCollectionInserter" ComponentId="GraphQLObjectCollectionBase/GqlObjectCollection"/>
-        <Interface InterfaceId="imtbase::TICollectionStructure&lt;imtbase::TICollectionStructureInfo&lt;imtbase::TIStructuredCollectionInfo&lt;imtbase::IObjectCollectionInfo&gt; &gt; &gt;" ComponentId="GraphQLObjectCollectionBase/GqlObjectCollection"/>
-        <Interface InterfaceId="imtbase::TICollectionStructureInfo&lt;imtbase::TIStructuredCollectionInfo&lt;imtbase::IObjectCollectionInfo&gt; &gt;" ComponentId="GraphQLObjectCollectionBase/GqlObjectCollection"/>
         <Interface InterfaceId="imtclientgql::IGqlSubscriptionClient" ComponentId="GraphQLObjectCollectionBase/GqlObjectCollection"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="GraphQLObjectCollectionBase"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="GraphQLObjectCollectionBase/GqlObjectCollection"/>
