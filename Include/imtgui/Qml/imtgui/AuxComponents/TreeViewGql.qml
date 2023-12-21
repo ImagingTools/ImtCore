@@ -17,6 +17,7 @@ Rectangle{
     property alias delegate: list.delegate;
     property bool hasSelection: false;
     property int selectedIndex: -1;
+    property int scrollSize: 12;
 
     property string selectionColor: Style.selectedColor !== undefined ? Style.selectedColor : "lightsteelblue";
     property real selectionOpacity: 0.5;
@@ -59,7 +60,8 @@ Rectangle{
         height: treeViewGql.height -10;
         radius: 4;
 
-        border.color: "lightgrey";
+        color : treeViewGql.color;
+        //border.color: "lightgrey";
 
         Item{
             id: listFrame;
@@ -227,9 +229,13 @@ Rectangle{
 
             anchors.bottom: listFrame.bottom;
 
-            secondSize: 12;
-
             targetItem: listFrame;
+
+            secondSize: treeViewGql.scrollSize;
+            radius: secondSize;
+            indicatorRadius: secondSize;
+            indicatorMargin: 0;
+
         }
 
         CustomScrollbar{
@@ -239,7 +245,7 @@ Rectangle{
             anchors.top: list.bottom;
             anchors.topMargin: 1 ;
 
-            secondSize: 12;
+            secondSize: treeViewGql.scrollSize;
 
             vertical: false;
             targetItem: list;
