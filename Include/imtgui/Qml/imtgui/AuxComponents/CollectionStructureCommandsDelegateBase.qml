@@ -10,7 +10,7 @@ Item {
     /**
         The table inside collection view
     */
-    property Item tableData: null;
+    property TreeViewGql treeView
 
     property Item collectionStructureBase: null;
 
@@ -21,7 +21,7 @@ Item {
     /**
         The property for tracking changes to the selected item
     */
-    property int selectedIndex: containerBase.tableData ? containerBase.tableData.selectedIndex: -1;
+    // property int selectedIndex: containerBase.tableData ? containerBase.tableData.selectedIndex: -1;
 
     property string commandId;
 
@@ -47,6 +47,7 @@ Item {
     */
     property string removeGqlCommand;
     property string renameGqlCommand;
+    property string newNodeGqlCommand;
     property string setDescriptionGqlCommand;
 
     signal commandActivated(string commandId);
@@ -61,20 +62,20 @@ Item {
     }
 
     onSelectionChanged: {
-        console.log("CollectionViewCommandsDelegateBase onSelectionChanged", containerBase.commandsProvider);
-        let indexes = containerBase.tableData.getSelectedIndexes();
+        console.log("CollectionStructureCommandsDelegateBase onSelectionChanged", containerBase.commandsProvider);
+        let index = containerBase.treeView.selectedIndex;
 
-        let isEnabled = indexes.length > 0;
+        let isEnabled = (indexes >= 0)
         if(containerBase.commandsProvider){
             containerBase.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
             containerBase.commandsProvider.setCommandIsEnabled("Edit", isEnabled);
         }
     }
 
-    onTableDataChanged: {
-        if (containerBase.tableData){
-            if (containerBase.tableData.rightButtonMouseClicked){
-                containerBase.tableData.rightButtonMouseClicked.connect(openPopupMenu);
+    onTreeViewChanged: {
+        if (containerBase.treeView){
+            if (containerBase.treeView.rightButtonMouseClicked){
+                containerBase.treeView.rightButtonMouseClicked.connect(openPopupMenu);
             }
             containerBase.selectionChanged.connect(containerBase.selectionChanged);
         }
@@ -85,12 +86,13 @@ Item {
     }
 
     onCommandIdChanged: {
-        console.log("CollectionCommands oncommandIdChanged", containerBase.commandId);
+        console.log("CollectionStructureCommands oncommandIdChanged", containerBase.commandId);
         Events.subscribeEvent(containerBase.commandId + "CommandActivated", containerBase.commandHandle);
 
         if (containerBase.commandId !== ""){
             removeGqlCommand = containerBase.commandId + "Remove";
             renameGqlCommand = containerBase.commandId + "Rename";
+            newNodeGqlCommand = containerBase.commandId + "InsertNewNode";
             setDescriptionGqlCommand = containerBase.commandId + "SetDescription";
         }
     }
@@ -132,16 +134,14 @@ Item {
     }
 
     function onEdit(){
-        console.log("CollectionView onEdit");
+        console.log("CollectionStructure onEdit");
         let elementsModel = containerBase.tableData.elements;
         if (!elementsModel){
             return;
         }
 
-        let indexes = containerBase.tableData.getSelectedIndexes();
-        if (indexes.length > 0){
-            let index = indexes[0];
-
+        let index = containerBase.treeView.selectedIndex
+        if (index >= 0){
             let itemId = elementsModel.GetData("Id", index);
             let itemName = elementsModel.GetData("Name", index);
             containerBase.collectionStructureBase.selectItem(itemId, itemName);
@@ -162,16 +162,17 @@ Item {
     }
 
     function onNewNode(){
-        if (containerBase.commandId === "" || renameGqlCommand === ""){
-            console.error("Rename item was failed!")
+        if (containerBase.commandId === "" || newNodeGqlCommand === ""){
+            console.error("Insert new node was failed!")
             return;
         }
 
-        let indexes = containerBase.tableData.getSelectedIndexes();
-        if (indexes.length > 0){
-            let selectedName = containerBase.tableData.elements.GetData("Name", indexes[0]);
-            modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
+        let index = -1
+        if (containerBase.treeView.selectedIndex){
+            index = containerBase.treeView.selectedIndex
         }
+        // let selectedName = containerBase.treeView.GetData("Name", index);
+        modalDialogManager.openDialog(newNodeDialog, {"message": qsTr("Please enter the name of the new node"), "inputValue": ""});
     }
 
     function onRename(){
@@ -180,9 +181,8 @@ Item {
             return;
         }
 
-        let indexes = containerBase.tableData.getSelectedIndexes();
-        if (indexes.length > 0){
-            let selectedName = containerBase.tableData.elements.GetData("Name", indexes[0]);
+        let index = containerBase.treeView.selectedIndex
+        if (index >= 0){            let selectedName = containerBase.tableData.elements.GetData("Name", indexes[0]);
             modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
         }
     }
@@ -223,6 +223,9 @@ Item {
             }
             else if (commandId === "Edit"){
                 containerBase.onEdit();
+            }
+            else if (commandId === "NewNode"){
+                containerBase.onNewNode();
             }
         }
 
@@ -292,10 +295,10 @@ Item {
             title: qsTr("New node");
             onFinished: {
                 if (buttonId == "Ok"){
-                    renameQuery.rename(inputValue);
+                    newNodeQuery.newNode(inputValue);
                 }
 
-                containerBase.tableData.forceActiveFocus();
+                containerBase.treeView.forceActiveFocus();
             }
         }
     }
@@ -327,7 +330,7 @@ Item {
             id: popupMenuDialog;
 
             onFinished: {
-                console.log("CollectionView PopupMenuDialog", commandId);
+                console.log("CollectionStructure PopupMenuDialog", commandId);
                 popupMenuDialog.root.closeDialog();
                 containerBase.commandHandle(commandId);
             }
@@ -423,32 +426,35 @@ Item {
         }
     }
 
+    UuidGenerator {
+        id: uuidGenerator;
+    }
+
     GqlModel {
         id: newNodeQuery;
 
-        function rename(newName) {
+        function newNode(newName) {
             console.log( "CollectionStructure newNodeQuery");
 
             var query;
             var queryFields;
             var inputParams = Gql.GqlObject("input");
 
-            query = Gql.GqlRequest("mutation", containerBase.renameGqlCommand);
+            query = Gql.GqlRequest("mutation", containerBase.newNodeGqlCommand);
 
-            let itemIds = containerBase.tableData.getSelectedIds();
-            inputParams.InsertField("Id", itemIds[0]);
+            let uuid = uuidGenerator.generateUUID();
+            inputParams.InsertField("Id", uuid);
 
             inputParams.InsertField("NewName", newName);
 
             query.AddParam(inputParams);
 
-            queryFields = Gql.GqlObject("rename");
-            queryFields.InsertField("NewName");
+            queryFields = Gql.GqlObject("successful");
 
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            console.log("CollectionView renameQuery rename", gqlData);
+            console.log("CollectionStructure newNodeQuery", gqlData);
 
             this.SetGqlQuery(gqlData);
         }
@@ -506,7 +512,7 @@ Item {
         id: renameQuery;
 
         function rename(newName) {
-            console.log( "CollectionView renameQuery rename");
+            console.log( "CollectionStructure renameQuery rename");
 
             var query;
             var queryFields;
@@ -527,7 +533,7 @@ Item {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            console.log("CollectionView renameQuery rename", gqlData);
+            console.log("CollectionStructure renameQuery rename", gqlData);
 
             this.SetGqlQuery(gqlData);
         }
@@ -584,7 +590,7 @@ Item {
         id: setDescriptionQuery;
 
         function setDescription(description){
-            console.log( "CollectionView setDescriptionQuery");
+            console.log( "CollectionStructure setDescriptionQuery");
 
             var query;
             var queryFields;
@@ -605,7 +611,7 @@ Item {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            console.log("CollectionView setDescription query ", gqlData);
+            console.log("CollectionStructure setDescription query ", gqlData);
             this.SetGqlQuery(gqlData);
         }
 

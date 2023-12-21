@@ -23,7 +23,7 @@ Item {
     property string commandId;
     property string documentTypeId;
 
-    property string commandsDelegatePath: "CollectionViewCommandsDelegateBase.qml";
+    property string commandsDelegatePath: "CollectionStructureCommandsDelegateBase.qml";
     property alias commandsDelegate: commandsDelegateLoader.item;
 
     property alias treeView: collectionStructureBase.treeView;
@@ -123,7 +123,7 @@ Item {
     }
 
     onCommandIdChanged: {
-        console.log("CollectionView onCommandsIdChanged", collectionStructureContainer.commandId);
+        console.log("CollectionStructure onCommandsIdChanged", collectionStructureContainer.commandId);
 
         commandsProviderLocal.additionInputParams = collectionStructureContainer.getAdditionalInputParams();
         commandsProviderLocal.commandId = collectionStructureContainer.commandId;
@@ -308,7 +308,7 @@ Item {
         onLoaded: {
             commandsDelegateLoader.item.commandId = collectionStructureContainer.commandId;
 
-            // commandsDelegateLoader.item.tableData = collectionStructureBase.table;
+            commandsDelegateLoader.item.treeView = collectionStructureBase.treeView;
 
             commandsDelegateLoader.item.collectionStructureBase = collectionStructureContainer;
             commandsDelegateLoader.item.commandsProvider = commandsProviderLocal;
