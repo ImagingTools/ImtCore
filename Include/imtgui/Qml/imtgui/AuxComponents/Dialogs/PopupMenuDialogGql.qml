@@ -97,7 +97,7 @@ Item {
 
     Component.onCompleted: {
         //console.log("_____________POPUP_COMPL_____________", popupMenuContainer.preventFirstLoading);
-
+        popupMenuContainer.forceActiveFocus();
         modelFilter.AddTreeModel("FilterIds");
         modelFilter.SetData("FilterIds", popupMenuContainer.filterIdsModel)
         modelFilter.AddTreeModel("Sort");

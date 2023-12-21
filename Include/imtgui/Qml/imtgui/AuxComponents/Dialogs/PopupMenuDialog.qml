@@ -57,6 +57,7 @@ Item {
 
     //forShortcutEnter
     Component.onCompleted: {
+        popupMenuContainer.forceActiveFocus();
 //        forShortcutEnter.forceActiveFocus();
 //        forShortcutEnter.focus = true;
     }
