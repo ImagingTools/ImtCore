@@ -6,8 +6,8 @@ import imtlicgui 1.0
 Rectangle {
     id: gridExtendingBaseDelegate;
 
-    anchors.top: parent.top;
-    anchors.topMargin: !rootItem ? O :rootItem.gridCellHeightMin * rowNumber  + rootItem.gridAddHeight * rootItem.openST * belowSelectedRow;
+    anchors.top: !parent ? undefined : parent.top;
+    anchors.topMargin: !rootItem ? 0 :rootItem.gridCellHeightMin * rowNumber  + rootItem.gridAddHeight * rootItem.openST * belowSelectedRow;
 //    y: !rootItem ? O :rootItem.gridCellHeightMin * rowNumber  + rootItem.gridAddHeight * rootItem.openST * belowSelectedRow;
 
     color: "transparent";
