@@ -129,7 +129,6 @@ Rectangle {
         hasSort: false;
         cacheBuffer: 0;
         canSetBorderParams: true;
-        canSetBorderParams_deleg: true;
         enableAlternating : false;
         canMoveColumns: true;
         elements: tablePage.items;
