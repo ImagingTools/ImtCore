@@ -904,7 +904,7 @@ Rectangle {
                     visible: tableContainer.canMoveColumns && model.index < headersList.count -1;
                     enabled: visible;
 
-                    //                    hoverEnabled: true;
+                    hoverEnabled: true;
                     cursorShape: Qt.SplitHCursor;//containsMouse ? Qt.SplitHCursor : containsPress ? Qt.PointingHandCursor : Qt.ArrowCursor;
                     //                    cursorShape: containsMouse ? Qt.SplitHCursor : Qt.ArrowCursor;
                     property var coord: mapToItem(moving,0,0);
