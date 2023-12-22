@@ -129,24 +129,10 @@ Rectangle {
         hasSort: false;
         cacheBuffer: 0;
         canSetBorderParams: true;
+        canSetBorderParams_deleg: true;
         enableAlternating : false;
         canMoveColumns: true;
         elements: tablePage.items;
-
-        delegate:
-            TableDelegate {
-                id: tableRow;
-
-                minHeight: tableDecor.itemHeight;
-                width: tableDecor.width;
-
-                cellDecorator: tableDecor.cellDecorator;
-                widthDecorator: tableDecor.widthDecorator;
-                canSetBorderParams: true;
-                wrapMode: Text.NoWrap;
-                headers: tableHeaderModel;
-                tableItem: tableDecor;
-        }
 
         onSelectItem: {
         }
