@@ -131,7 +131,7 @@ Rectangle{
                         height: width;
                         radius: width;
 
-                        visible: model.TypeId == undefined ? false : model.TypeId == "Node" ? true : false;
+                        visible: model.HasChildren == undefined ? false : model.HasChildren;
                         enabled: visible;
 
                         color: "transparent";
@@ -145,20 +145,22 @@ Rectangle{
                         iconHeight: width;
 
                         onClicked: {
-                            if(!deleg.isOpen){
-                                if(!model.HasBranch){
-                                    treeViewGql.model.SetData("HasBranch", true, model.index);
-                                    treeViewGql.requestSignal(model.index, model.Level)
-                                }
-                                else {
-                                    treeViewGql.setVisibleElements(true, model.index)
-                                }
-                                treeViewGql.model.SetData("IsOpen", true, model.index);
+                            if(model.HasChildren){
+                                if(!deleg.isOpen){
+                                    if(!model.HasBranch){
+                                        treeViewGql.model.SetData("HasBranch", true, model.index);
+                                        treeViewGql.requestSignal(model.index, model.Level)
+                                    }
+                                    else {
+                                        treeViewGql.setVisibleElements(true, model.index)
+                                    }
+                                    treeViewGql.model.SetData("IsOpen", true, model.index);
 
-                            }
-                            else if(deleg.isOpen){
-                                treeViewGql.model.SetData("IsOpen", false, model.index);
-                                treeViewGql.setVisibleElements(false, model.index)
+                                }
+                                else if(deleg.isOpen){
+                                    treeViewGql.model.SetData("IsOpen", false, model.index);
+                                    treeViewGql.setVisibleElements(false, model.index)
+                                }
                             }
 
                         }
