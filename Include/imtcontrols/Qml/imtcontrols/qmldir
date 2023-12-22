@@ -127,6 +127,7 @@ ProgressRoundIndicator 1.0 ./Views/ProgressRoundIndicator.qml
 DrawingContainer 1.0 ./Views/DrawingContainer.qml
 SplitView 1.0 ./Views/SplitView.qml
 SwipeView 1.0 ./Views/SwipeView.qml
+TableDecorator 1.0 ./Views/TableDecorator.qml
 CollectionViewBase 1.0 ./Views/Base/CollectionViewBase.qml
 CollectionViewBaseGqlModels 1.0 ./Views/Base/CollectionViewBaseGqlModels.qml
 GridCollectionViewBase 1.0 ./Views/Base/GridCollectionViewBase.qml

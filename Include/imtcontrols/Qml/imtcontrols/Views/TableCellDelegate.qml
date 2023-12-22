@@ -216,6 +216,8 @@ Item {
         anchors.right: mainRec.right;
         anchors.leftMargin: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.textLeftMargin: 0;
 
+        property var cellDelegate: delegateContainer;
+
         onLoaded: {
             if (contentLoader.item.tableCellDelegate !== undefined){
                 contentLoader.item.tableCellDelegate = delegateContainer;
@@ -281,7 +283,7 @@ Item {
 //            text: delegateContainer.pTableDelegateContainer ? delegateContainer.columnIndex >= 0 ? delegateContainer.pTableDelegateContainer.dataModel[delegateContainer.pTableDelegateContainer.headers.GetData("Id", delegateContainer.columnIndex)] : "" : "";
 //            text: delegateContainer.pTableDelegateContainer.headers.GetData("Id", 1)
 
-            text: delegateContainer.getValue();
+            text: delegateContainer.getValue() !== undefined ? delegateContainer.getValue() : "";
             onTextChanged: {
                 // Multiline fit in one line
                 if(wrapMode == Text.NoWrap){
@@ -292,7 +294,7 @@ Item {
                 }
             }
             onHeightChanged: {
-                if(!delegateContainer.pTableDelegateContainer.tableItem || !delegateContainer.pTableDelegateContainer.tableItem.canFitHeight ){
+                if(!delegateContainer.pTableDelegateContainer || !delegateContainer.pTableDelegateContainer.tableItem || !delegateContainer.pTableDelegateContainer.tableItem.canFitHeight ){
                     return;
                 }
                 if(wrapMode !== Text.NoWrap && delegateContainer.pTableDelegateContainer){

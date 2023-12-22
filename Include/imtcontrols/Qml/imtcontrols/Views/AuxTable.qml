@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtqml 1.0
 import imtcontrols 1.0
 
 Rectangle {
@@ -27,7 +28,7 @@ Rectangle {
     property bool hoverEnabled: (Style.enableHoverEffect !== undefined && Style.enableHoverEffect !== null) ? Style.enableHoverEffect : true;
 
     property alias separatorVisible: bottomLine.visible;
-    property string sortIndicatorIcon: "../../../Icons/" + Style.theme + "/Down_On_Normal.svg";
+    property string sortIndicatorIcon: "../../../" +  Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
 
     property TreeItemModel headers : TreeItemModel{};
 
@@ -160,6 +161,28 @@ Rectangle {
     }
 
     onTableDecoratorChanged: {
+        setDecorators();
+    }
+
+    onWidthChanged: {
+        tableContainer.setWidth();
+        if(tableContainer.wrapMode !== Text.NoWrap){
+            pauseHeight.stop();
+            pauseHeight.start();
+        }
+    }
+
+    onHeadersChanged: {
+        tableContainer.columnContentComps = [];
+
+        for (let i = 0; i < tableContainer.headers.GetItemsCount(); i++){
+            tableContainer.columnContentComps.push(null);
+        }
+
+
+    }
+
+    function setDecorators(){
         console.log("onTableDecoratorChanged");
 
         tableContainer.headerDecorator = tableContainer.tableDecorator.GetTreeItemModel("Headers");
@@ -184,22 +207,7 @@ Rectangle {
             pauseHeight.stop();
             pauseHeight.start();
         }
-    }
 
-    onWidthChanged: {
-        tableContainer.setWidth();
-        if(tableContainer.wrapMode !== Text.NoWrap){
-            pauseHeight.stop();
-            pauseHeight.start();
-        }
-    }
-
-    onHeadersChanged: {
-        tableContainer.columnContentComps = [];
-
-        for (let i = 0; i < tableContainer.headers.GetItemsCount(); i++){
-            tableContainer.columnContentComps.push(null);
-        }
 
     }
 
@@ -304,7 +312,6 @@ Rectangle {
         tableContainer.properties.clearInvisibleItems();
     }
 
-
     function getHeaderIndex(headerId){
         if (!tableContainer.headers){
             return -1;
@@ -336,8 +343,6 @@ Rectangle {
     }
 
     function setWidth(){
-        //console.log("widthRecalc:: table", 0);
-
         var headersCount = tableContainer.headers.GetItemsCount();
 
         if(!tableContainer.widthDecorator.GetItemsCount() && tableContainer.headers.GetItemsCount()){
@@ -350,7 +355,6 @@ Rectangle {
 
         tableContainer.widthDecoratorDynamic.Clear();
         tableContainer.widthDecoratorDynamic.Copy(tableContainer.widthDecorator);
-
 
         var count_ = 0;
         var lengthMinus = 0;
@@ -367,7 +371,6 @@ Rectangle {
                 widthPercent_ = widthPercent_ < 0 ? 0 : widthPercent_*tableContainer.width/100;
                 lengthMinus += Math.max(width_,widthPercent_);
             }
-
         }
 
         if((tableContainer.width - lengthMinus) < count_ * tableContainer.minCellWidth || count_ == tableContainer.widthDecorator.GetItemsCount() ){
@@ -573,6 +576,7 @@ Rectangle {
             Component.onCompleted: {
                 headersList.compl = true;
             }
+
             delegate: Item{
                 id: deleg;
 
@@ -593,7 +597,7 @@ Rectangle {
                 }
 
                 function setCellWidth(){
-                    if(!deleg || !deleg.complCompl){
+                    if(!deleg || !deleg.complCompl || !headersList){
                         return;
                     }
 
@@ -719,9 +723,6 @@ Rectangle {
                         visible: tableContainer.emptyDecorHeader ? true :
                                                                    tableContainer.headerDecorator.IsValidData("LeftBottomRound", model.index) ?
                                                                        !tableContainer.headerDecorator.GetData("LeftBottomRound", model.index) :true;
-
-
-
                     }
 
                     Rectangle{
@@ -734,7 +735,6 @@ Rectangle {
                         visible: tableContainer.emptyDecorHeader ? true :
                                                                    tableContainer.headerDecorator.IsValidData("RightBottomRound", model.index) ?
                                                                        !tableContainer.headerDecorator.GetData("RightBottomRound", model.index) :true;
-
                     }
                     //cornerPatches
 
@@ -856,8 +856,7 @@ Rectangle {
                     sourceSize.width: width;
                     sourceSize.height: height;
 
-                    source: tableContainer.sortIndicatorIcon
-
+                    source: tableContainer.sortIndicatorIcon;
                 }
 
                 ////
@@ -898,31 +897,36 @@ Rectangle {
                     id: moving;
 
                     anchors.right:  parent.right;
+                    anchors.rightMargin: -width/2;
 
                     height: parent.height;
-                    width: 20;
+                    width: 30;
 
                     visible: tableContainer.canMoveColumns && model.index < headersList.count -1;
                     enabled: visible;
 
-                    cursorShape: containsPress ? Qt.PointingHandCursor : Qt.ArrowCursor;
+                    hoverEnabled: true;
+                    cursorShape: Qt.SplitHCursor;//containsMouse ? Qt.SplitHCursor : containsPress ? Qt.PointingHandCursor : Qt.ArrowCursor;
+//                    cursorShape: containsMouse ? Qt.SplitHCursor : Qt.ArrowCursor;
                     property var coord: mapToItem(moving,0,0);
                     onPressed: {
                         moving.coord = mapToItem(moving,mouse.x,mouse.y)
                     }
                     onPositionChanged: {
-                        var newCoords = mapToItem(moving,mouse.x,mouse.y);
-                        var deltaX = Math.trunc(newCoords.x - moving.coord.x);
-                        var width_ = tableContainer.widthDecoratorDynamic.GetData("Width", model.index);
-                        var width_next = tableContainer.widthDecoratorDynamic.GetData("Width", model.index+1);
+                        if(pressed){
+                            var newCoords = mapToItem(moving,mouse.x,mouse.y);
+                            var deltaX = Math.trunc(newCoords.x - moving.coord.x);
+                            var width_ = tableContainer.widthDecoratorDynamic.GetData("Width", model.index);
+                            var width_next = tableContainer.widthDecoratorDynamic.GetData("Width", model.index+1);
 
-                        width_ += deltaX;
-                        width_next -= deltaX
-                        if(width_ > tableContainer.minCellWidth && width_next > tableContainer.minCellWidth){
-                            tableContainer.widthDecorator.SetData("Width", width_, model.index);
-                            tableContainer.widthDecorator.SetData("Width", width_next, model.index+1);
+                            width_ += deltaX;
+                            width_next -= deltaX
+                            if(width_ > tableContainer.minCellWidth && width_next > tableContainer.minCellWidth){
+                                tableContainer.widthDecorator.SetData("Width", width_, model.index);
+                                tableContainer.widthDecorator.SetData("Width", width_next, model.index+1);
 
-                            tableContainer.setWidth();
+                                tableContainer.setWidth();
+                            }
                         }
 
                     }
@@ -1057,7 +1061,7 @@ Rectangle {
 
                     tableContainer.properties.visibleItemsChanged.connect(tableDelegate.visibleItemsChanged);
                     tableContainer.properties.stateItemsChanged.connect(tableDelegate.enabledItemsChanged);
-
+                    mouseArea.visible = tableContainer.hoverEnabled
                 }
 
                 Component.onDestruction: {
@@ -1071,6 +1075,8 @@ Rectangle {
                 }
 
                 function selectionChanged(){
+                    console.log("tableContainer selectionChanged")
+
                     tableDelegate.selected = tableContainer.tableSelection.selectedIndexes.includes(model.index);
 
                     if (tableDelegate.selected){
@@ -1093,9 +1099,8 @@ Rectangle {
                 }
 
                 onClicked: {
-                    //                if (!tableContainer.tableSelection.isSelected(model.index)){
-                    //                    tableContainer.tableSelection.singleSelect(model.index);
-                    //                }
+                    console.log("tableContainer onClicked")
+
                     if (!tableContainer.selectable){
                         return;
                     }
@@ -1115,10 +1120,10 @@ Rectangle {
                 onDoubleClicked: {
                     var point = mapToItem(null, mX, mY);
                     tableContainer.doubleClicked(point.x, point.y)
+
+                    console.log("selectItem", model.Id, model.Name)
                     tableContainer.selectItem(model.Id, model.Name);
                 }
             }
-
-
     }//Elements ListView
 }

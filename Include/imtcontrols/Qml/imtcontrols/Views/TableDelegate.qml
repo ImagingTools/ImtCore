@@ -1,5 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
+
+import imtqml 1.0
 import imtcontrols 1.0
 
 Rectangle {
@@ -274,20 +276,20 @@ Rectangle {
         delegate: tableDelegateContainer.cellDelegate;
     }//dataList
 
-	Rectangle{
+    Rectangle{
         id: alternatingRect;
 
         anchors.fill: parent;
 
-		color: tableDelegateContainer.tableItem.hoverEnabled && ma.containsMouse ? Style.selectedColor :
+        color: tableDelegateContainer.tableItem.hoverEnabled && ma.containsMouse ? Style.selectedColor :
             tableDelegateContainer.tableItem.enableAlternating ? tableDelegateContainer.tableItem.alternatingColor : 'transparent';
 
-		opacity: tableDelegateContainer.selected ? tableDelegateContainer.selectedOpacity :
-				tableDelegateContainer.tableItem.hoverEnabled && ma.containsMouse ? tableDelegateContainer.hoverOpacity :
+        opacity: tableDelegateContainer.selected ? tableDelegateContainer.selectedOpacity :
+                tableDelegateContainer.tableItem.hoverEnabled && ma.containsMouse ? tableDelegateContainer.hoverOpacity :
                 tableDelegateContainer.tableItem.enableAlternating && model.index % 2 === 0 ? tableDelegateContainer.tableItem.alternatingOpacity: 0;
 
         visible: !tableDelegateContainer.selected;
-	}
+    }
 
     MouseArea {
         id: ma;
@@ -295,24 +297,59 @@ Rectangle {
         z: 1;
 
 		anchors.fill: parent;
-        hoverEnabled: true
+        hoverEnabled: true;
+
+        //visible: false;
+
+        //preventStealing: false;
+//        propagateComposedEvents: true;
 
         acceptedButtons: Qt.LeftButton | Qt.RightButton;
 
+        Timer{
+            id:timer
+            interval: 300
+            onTriggered: {
+                ma.clickCount = 0;
+            }
+        }
+
+        property int clickCount: 0;
+
         onClicked: {
-            console.log("onClicked", model["Id"])
-            if (mouse.button === Qt.RightButton) {
-                tableDelegateContainer.rightButtonMouseClicked(this.mouseX, this.mouseY);
-            }
-            tableDelegateContainer.clicked();
-        }
+            clickCount++;
 
-        onDoubleClicked: {
-            if (mouse.button === Qt.RightButton) {
-                return;
+            if ( ma.clickCount == 1){
+                console.log("onClicked", model["Id"])
+                if (mouse.button === Qt.RightButton) {
+                    tableDelegateContainer.rightButtonMouseClicked(this.mouseX, this.mouseY);
+                }
+                tableDelegateContainer.clicked();
+
+                timer.start();
             }
 
-            tableDelegateContainer.doubleClicked(this.mouseX, this.mouseY);
+            if ( ma.clickCount == 2){
+                console.log("onDoubleClicked")
+                if (mouse.button === Qt.RightButton) {
+                    return;
+                }
+
+                tableDelegateContainer.doubleClicked(this.mouseX, this.mouseY);
+
+                ma.clickCount = 0;
+                timer.stop();
+            }
+
+            mouse.accepted = false;
         }
+//        onDoubleClicked: {
+//            console.log("onDoubleClicked")
+//            if (mouse.button === Qt.RightButton) {
+//                return;
+//            }
+
+//            tableDelegateContainer.doubleClicked(this.mouseX, this.mouseY);
+//        }
     }
 }
