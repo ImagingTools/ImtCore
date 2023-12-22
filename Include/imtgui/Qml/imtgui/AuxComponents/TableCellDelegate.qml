@@ -294,7 +294,7 @@ Item {
                 }
             }
             onHeightChanged: {
-                if(!delegateContainer.pTableDelegateContainer.tableItem || !delegateContainer.pTableDelegateContainer.tableItem.canFitHeight ){
+                if(!delegateContainer.pTableDelegateContainer || !delegateContainer.pTableDelegateContainer.tableItem || !delegateContainer.pTableDelegateContainer.tableItem.canFitHeight ){
                     return;
                 }
                 if(wrapMode !== Text.NoWrap && delegateContainer.pTableDelegateContainer){

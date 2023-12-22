@@ -541,7 +541,7 @@ Rectangle {
 
         anchors.left: parent.left;
         anchors.right: parent.right;
-       // anchors.rightMargin: 5;
+        // anchors.rightMargin: 5;
         anchors.top: parent.top;
 
         height: visible ? tableContainer.headerHeight: 0;
@@ -896,33 +896,36 @@ Rectangle {
                     id: moving;
 
                     anchors.right:  parent.right;
+                    anchors.rightMargin: -width/2;
 
                     height: parent.height;
-                    width: 20;
+                    width: 30;
 
                     visible: tableContainer.canMoveColumns && model.index < headersList.count -1;
                     enabled: visible;
 
-//                    hoverEnabled: true;
-                    cursorShape: containsMouse ? Qt.SplitHCursor : containsPress ? Qt.PointingHandCursor : Qt.ArrowCursor;
-//                    cursorShape: containsMouse ? Qt.SplitHCursor : Qt.ArrowCursor;
+                    //                    hoverEnabled: true;
+                    cursorShape: Qt.SplitHCursor;//containsMouse ? Qt.SplitHCursor : containsPress ? Qt.PointingHandCursor : Qt.ArrowCursor;
+                    //                    cursorShape: containsMouse ? Qt.SplitHCursor : Qt.ArrowCursor;
                     property var coord: mapToItem(moving,0,0);
                     onPressed: {
                         moving.coord = mapToItem(moving,mouse.x,mouse.y)
                     }
                     onPositionChanged: {
-                        var newCoords = mapToItem(moving,mouse.x,mouse.y);
-                        var deltaX = Math.trunc(newCoords.x - moving.coord.x);
-                        var width_ = tableContainer.widthDecoratorDynamic.GetData("Width", model.index);
-                        var width_next = tableContainer.widthDecoratorDynamic.GetData("Width", model.index+1);
+                        if(pressed){
+                            var newCoords = mapToItem(moving,mouse.x,mouse.y);
+                            var deltaX = Math.trunc(newCoords.x - moving.coord.x);
+                            var width_ = tableContainer.widthDecoratorDynamic.GetData("Width", model.index);
+                            var width_next = tableContainer.widthDecoratorDynamic.GetData("Width", model.index+1);
 
-                        width_ += deltaX;
-                        width_next -= deltaX
-                        if(width_ > tableContainer.minCellWidth && width_next > tableContainer.minCellWidth){
-                            tableContainer.widthDecorator.SetData("Width", width_, model.index);
-                            tableContainer.widthDecorator.SetData("Width", width_next, model.index+1);
+                            width_ += deltaX;
+                            width_next -= deltaX
+                            if(width_ > tableContainer.minCellWidth && width_next > tableContainer.minCellWidth){
+                                tableContainer.widthDecorator.SetData("Width", width_, model.index);
+                                tableContainer.widthDecorator.SetData("Width", width_next, model.index+1);
 
-                            tableContainer.setWidth();
+                                tableContainer.setWidth();
+                            }
                         }
 
                     }
@@ -1009,117 +1012,117 @@ Rectangle {
         delegate:
             TableDelegate {
 
-                id: tableDelegate;
+            id: tableDelegate;
 
-                height: visible ? tableContainer.itemHeight : 0;
-                width: elementsListObj.width;
-                minHeight: tableContainer.itemHeight;
-                headers: tableContainer.headers;
+            height: visible ? tableContainer.itemHeight : 0;
+            width: elementsListObj.width;
+            minHeight: tableContainer.itemHeight;
+            headers: tableContainer.headers;
 
-                tableItem: tableContainer;
+            tableItem: tableContainer;
 
-                readOnly: tableContainer.readOnly;
+            readOnly: tableContainer.readOnly;
 
-                selected: tableContainer.tableSelection.selectedIndexes.includes(model.index)
-                enabled: tableContainer.properties.itemIsEnabled(model.index);
-                checkedState: tableContainer.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
+            selected: tableContainer.tableSelection.selectedIndexes.includes(model.index)
+            enabled: tableContainer.properties.itemIsEnabled(model.index);
+            checkedState: tableContainer.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
 
-                onCheckedStateChanged: {
-                    tableContainer.isAllItemChecked = tableContainer.isAllChecked();
-                }
+            onCheckedStateChanged: {
+                tableContainer.isAllItemChecked = tableContainer.isAllChecked();
+            }
 
-                cellDecorator: tableContainer.cellDecorator;
-                widthDecorator: tableContainer.widthDecorator;
+            cellDecorator: tableContainer.cellDecorator;
+            widthDecorator: tableContainer.widthDecorator;
 
-                borderColorHorizontal: tableContainer.borderColorHorizontal_deleg;
-                borderColorVertical: tableContainer.borderColorVertical_deleg;
-                horizontalBorderSize: tableContainer.horizontalBorderSize_deleg;
-                verticalBorderSize: tableContainer.verticalBorderSize_deleg;
+            borderColorHorizontal: tableContainer.borderColorHorizontal_deleg;
+            borderColorVertical: tableContainer.borderColorVertical_deleg;
+            horizontalBorderSize: tableContainer.horizontalBorderSize_deleg;
+            verticalBorderSize: tableContainer.verticalBorderSize_deleg;
 
-                visibleLeftBorderFirst: tableContainer.visibleLeftBorderFirst_deleg;
-                visibleRightBorderLast: tableContainer.visibleRightBorderLast_deleg;
-                visibleTopBorderFirst: tableContainer.visibleTopBorderFirst_deleg;
-                visibleBottomBorderLast: tableContainer.visibleBottomBorderLast_deleg;
+            visibleLeftBorderFirst: tableContainer.visibleLeftBorderFirst_deleg;
+            visibleRightBorderLast: tableContainer.visibleRightBorderLast_deleg;
+            visibleTopBorderFirst: tableContainer.visibleTopBorderFirst_deleg;
+            visibleBottomBorderLast: tableContainer.visibleBottomBorderLast_deleg;
 
-                canSetBorderParams: tableContainer.canSetBorderParams_deleg;
-                wrapMode:  tableContainer.wrapMode_deleg;
-                elideMode: tableContainer.elideMode_deleg;
-                isRightBorder: tableContainer.isRightBorder_deleg;
+            canSetBorderParams: tableContainer.canSetBorderParams_deleg;
+            wrapMode:  tableContainer.wrapMode_deleg;
+            elideMode: tableContainer.elideMode_deleg;
+            isRightBorder: tableContainer.isRightBorder_deleg;
 
-                textMarginHor: tableContainer.textMarginHor_deleg;
-                textMarginVer: tableContainer.textMarginVer_deleg;
+            textMarginHor: tableContainer.textMarginHor_deleg;
+            textMarginVer: tableContainer.textMarginVer_deleg;
 
-                //!!!
+            //!!!
 
-                Component.onCompleted: {
-                    tableContainer.tableSelection.selectionChanged.connect(tableDelegate.selectionChanged);
-                    tableContainer.checkedItemsChanged.connect(tableDelegate.checkedItemsChanged);
+            Component.onCompleted: {
+                tableContainer.tableSelection.selectionChanged.connect(tableDelegate.selectionChanged);
+                tableContainer.checkedItemsChanged.connect(tableDelegate.checkedItemsChanged);
 
-                    tableContainer.properties.visibleItemsChanged.connect(tableDelegate.visibleItemsChanged);
-                    tableContainer.properties.stateItemsChanged.connect(tableDelegate.enabledItemsChanged);
-                    mouseArea.visible = tableContainer.hoverEnabled
-                }
+                tableContainer.properties.visibleItemsChanged.connect(tableDelegate.visibleItemsChanged);
+                tableContainer.properties.stateItemsChanged.connect(tableDelegate.enabledItemsChanged);
+                mouseArea.visible = tableContainer.hoverEnabled
+            }
 
-                Component.onDestruction: {
-                    if (tableContainer){
-                        tableContainer.tableSelection.selectionChanged.disconnect(tableDelegate.selectionChanged);
-                        tableContainer.checkedItemsChanged.disconnect(tableDelegate.checkedItemsChanged);
+            Component.onDestruction: {
+                if (tableContainer){
+                    tableContainer.tableSelection.selectionChanged.disconnect(tableDelegate.selectionChanged);
+                    tableContainer.checkedItemsChanged.disconnect(tableDelegate.checkedItemsChanged);
 
-                        tableContainer.properties.visibleItemsChanged.disconnect(tableDelegate.visibleItemsChanged);
-                        tableContainer.properties.stateItemsChanged.disconnect(tableDelegate.enabledItemsChanged);
-                    }
-                }
-
-                function selectionChanged(){
-                    console.log("tableContainer selectionChanged")
-
-                    tableDelegate.selected = tableContainer.tableSelection.selectedIndexes.includes(model.index);
-
-                    if (tableDelegate.selected){
-                        //elementsListObj.positionViewAtIndex(model.index, ListView.Visible);
-                    }
-                }
-
-                function checkedItemsChanged(){
-                    tableDelegate.checkedState = tableContainer.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
-                }
-
-                function visibleItemsChanged(){
-                    tableDelegate.visible = tableContainer.properties.itemIsVisible(model.index);
-                }
-
-                function enabledItemsChanged(){
-                    tableDelegate.enabled = tableContainer.properties.itemIsEnabled(model.index);
-
-                    tableDelegate.readOnly = !tableDelegate.enabled;
-                }
-
-                onClicked: {
-                    console.log("tableContainer onClicked")
-
-                    if (!tableContainer.selectable){
-                        return;
-                    }
-
-                    tableContainer.tableSelection.singleSelect(model.index);
-
-                    console.log("tableContainer.tableSelection", tableContainer.tableSelection.selectedIndexes)
-                    elementsListObj.forceActiveFocus();
-                }
-
-                onRightButtonMouseClicked: {
-                    console.log("onRightButtonMouseClicked")
-                    var point = mapToItem(null, mX, mY);
-                    tableContainer.rightButtonMouseClicked(point.x, point.y);
-                }
-
-                onDoubleClicked: {
-                    var point = mapToItem(null, mX, mY);
-                    tableContainer.doubleClicked(point.x, point.y)
-
-                    console.log("selectItem", model.Id, model.Name)
-                    tableContainer.selectItem(model.Id, model.Name);
+                    tableContainer.properties.visibleItemsChanged.disconnect(tableDelegate.visibleItemsChanged);
+                    tableContainer.properties.stateItemsChanged.disconnect(tableDelegate.enabledItemsChanged);
                 }
             }
+
+            function selectionChanged(){
+                console.log("tableContainer selectionChanged")
+
+                tableDelegate.selected = tableContainer.tableSelection.selectedIndexes.includes(model.index);
+
+                if (tableDelegate.selected){
+                    //elementsListObj.positionViewAtIndex(model.index, ListView.Visible);
+                }
+            }
+
+            function checkedItemsChanged(){
+                tableDelegate.checkedState = tableContainer.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
+            }
+
+            function visibleItemsChanged(){
+                tableDelegate.visible = tableContainer.properties.itemIsVisible(model.index);
+            }
+
+            function enabledItemsChanged(){
+                tableDelegate.enabled = tableContainer.properties.itemIsEnabled(model.index);
+
+                tableDelegate.readOnly = !tableDelegate.enabled;
+            }
+
+            onClicked: {
+                console.log("tableContainer onClicked")
+
+                if (!tableContainer.selectable){
+                    return;
+                }
+
+                tableContainer.tableSelection.singleSelect(model.index);
+
+                console.log("tableContainer.tableSelection", tableContainer.tableSelection.selectedIndexes)
+                elementsListObj.forceActiveFocus();
+            }
+
+            onRightButtonMouseClicked: {
+                console.log("onRightButtonMouseClicked")
+                var point = mapToItem(null, mX, mY);
+                tableContainer.rightButtonMouseClicked(point.x, point.y);
+            }
+
+            onDoubleClicked: {
+                var point = mapToItem(null, mX, mY);
+                tableContainer.doubleClicked(point.x, point.y)
+
+                console.log("selectItem", model.Id, model.Name)
+                tableContainer.selectItem(model.Id, model.Name);
+            }
+        }
     }//Elements ListView
 }

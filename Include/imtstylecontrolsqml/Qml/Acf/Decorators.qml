@@ -299,9 +299,9 @@ Item {
             Rectangle {
                 id: checkRect;
 
-                anchors.left: parent.left;
+                anchors.left: parent ? parent.left : undefined;
                 anchors.leftMargin: !checkBoxItem.baseElement ? 0 : !checkBoxItem.baseElement.isLeftText ? 0 : checkBoxText.width + checkBoxItem.baseElement.mainMargin;
-                anchors.verticalCenter: parent.verticalCenter;
+                anchors.verticalCenter: parent ? parent.verticalCenter : undefined;
 
                 width: height;
                 height: parent.height;
@@ -346,9 +346,9 @@ Item {
             Text {
                 id: checkBoxText;
 
-                anchors.left: parent.left;
+                anchors.left: parent ? parent.left : undefined;
                 anchors.leftMargin: !checkBoxItem.baseElement ? 0 : checkBoxItem.baseElement.isLeftText ? 0 : checkRect.width + checkBoxItem.baseElement.mainMargin;
-                anchors.verticalCenter: parent.verticalCenter;
+                anchors.verticalCenter: parent ? parent.verticalCenter : undefined;
 
                 color: !checkBoxItem.baseElement ? "transparent" :  checkBoxItem.baseElement.enabled ? Style.buttonText : Style.inactive_buttonText;
 
