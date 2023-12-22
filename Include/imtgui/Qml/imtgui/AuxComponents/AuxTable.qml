@@ -108,7 +108,7 @@ Rectangle {
     property bool visibleTopBorderFirst_deleg: false;
     property bool visibleBottomBorderLast_deleg: true;
 
-    property bool canSetBorderParams_deleg: false;
+    property bool canSetBorderParams_deleg: canSetBorderParams;
     property int wrapMode_deleg: Text.NoWrap;
     property int elideMode_deleg: Text.ElideRight;
     property bool isRightBorder_deleg: false;
