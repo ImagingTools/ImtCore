@@ -139,7 +139,7 @@ QByteArray CGqlObjectCollectionDelegateCompBase::InsertNode(
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::ByteArray){
+						if (variant.typeId() == QMetaType::QByteArray){
 							return variant.toByteArray();
 						}
 					}
@@ -177,7 +177,7 @@ bool CGqlObjectCollectionDelegateCompBase::SetNodeName(const QByteArray& nodeId,
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
+						if (variant.typeId() == QMetaType::Bool){
 							return variant.toBool();
 						}
 					}
@@ -204,7 +204,7 @@ bool CGqlObjectCollectionDelegateCompBase::SetNodeDescription(const QByteArray& 
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
+						if (variant.typeId() == QMetaType::Bool){
 							return variant.toBool();
 						}
 					}
@@ -231,7 +231,7 @@ bool CGqlObjectCollectionDelegateCompBase::SetNodeMetaInfo(const QByteArray& nod
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
+						if (variant.typeId() == QMetaType::Bool){
 							return variant.toBool();
 						}
 					}
@@ -258,7 +258,7 @@ bool CGqlObjectCollectionDelegateCompBase::MoveNode(const QByteArray& nodeId, co
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
+						if (variant.typeId() == QMetaType::Bool){
 							return variant.toBool();
 						}
 					}
@@ -284,7 +284,7 @@ bool CGqlObjectCollectionDelegateCompBase::RemoveNode(const QByteArray& nodeId, 
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
+						if (variant.typeId() == QMetaType::Bool){
 							return variant.toBool();
 						}
 					}
@@ -313,7 +313,7 @@ bool CGqlObjectCollectionDelegateCompBase::AddObjectToNode(const QByteArray& obj
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
+						if (variant.typeId() == QMetaType::Bool){
 							return variant.toBool();
 						}
 					}
@@ -343,7 +343,7 @@ bool CGqlObjectCollectionDelegateCompBase::MoveObjectToNode(const QByteArray& ob
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
+						if (variant.typeId() == QMetaType::Bool){
 							return variant.toBool();
 						}
 					}
@@ -372,7 +372,7 @@ bool CGqlObjectCollectionDelegateCompBase::RemoveObjectFromNode(const QByteArray
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
+						if (variant.typeId() == QMetaType::Bool){
 							return variant.toBool();
 						}
 					}
@@ -397,7 +397,7 @@ bool CGqlObjectCollectionDelegateCompBase::SetObjectName(const QByteArray& objec
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
+						if (variant.typeId() == QMetaType::Bool){
 							return variant.toBool();
 						}
 					}
@@ -422,7 +422,7 @@ bool CGqlObjectCollectionDelegateCompBase::SetObjectDescription(const QByteArray
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
+						if (variant.typeId() == QMetaType::Bool){
 							return variant.toBool();
 						}
 					}
@@ -451,7 +451,7 @@ bool CGqlObjectCollectionDelegateCompBase::SetObjectMetaInfo(const QByteArray& o
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
+						if (variant.typeId() == QMetaType::Bool){
 							return variant.toBool();
 						}
 					}
@@ -497,7 +497,7 @@ int CGqlObjectCollectionDelegateCompBase::GetElementCount(const iprm::IParamsSet
 			if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 				QVariant variant;
 				if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-					if (variant.type() == QVariant::Int || variant.type() == QVariant::LongLong){
+					if (variant.typeId() == QMetaType::Int || variant.typeId() == QMetaType::LongLong){
 						return variant.toInt();
 					}
 				}

@@ -9,7 +9,7 @@ namespace imtgql
 
 // reimplemented (imtgql::CGqlRequestHandlerCompBase)
 
-imtbase::CTreeItemModel* CGqlControllerComp::CreateInternalResponse(const CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
+imtbase::CTreeItemModel* CGqlControllerComp::CreateInternalResponse(const CGqlRequest& /*gqlRequest*/, QString& /*errorMessage*/) const
 {
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");

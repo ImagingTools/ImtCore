@@ -98,8 +98,8 @@ imtrest::ConstResponsePtr CWebSocketServletComp::InitConnection(const imtrest::I
 
 imtrest::ConstResponsePtr CWebSocketServletComp::ProcessGqlRequest(const imtrest::IRequest& request) const
 {
-	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
 	imtgql::CGqlRequest gqlRequest;
+
 	QByteArray body = request.GetBody();
 	QJsonDocument document = QJsonDocument::fromJson(body);
 	QJsonObject object = document.object();
@@ -110,7 +110,6 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessGqlRequest(const imtrest
 	gqlRequest.ParseQuery(body, errorPosition);
 
 	QByteArray commandId = gqlRequest.GetCommandId();
-
 	if (commandId.isEmpty()){
 		QByteArray errorMessage = "Empty command-ID";
 

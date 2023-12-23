@@ -7,6 +7,7 @@
 // ImtCore includes
 #include <imtgql/IGqlContext.h>
 
+
 namespace imtgql
 {
 

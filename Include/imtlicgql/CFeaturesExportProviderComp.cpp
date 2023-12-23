@@ -52,9 +52,9 @@ bool CFeaturesExportProviderComp::GetData(
 
 	QByteArrayList featureUuids = productInfoPtr->GetFeatureIds();
 	for (const QByteArray& featureUuid : featureUuids){
-		imtbase::IObjectCollection::DataPtr dataPtr;
-		if (m_featureCollectionCompPtr->GetObjectData(featureUuid, dataPtr)){
-			const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(dataPtr.GetPtr());
+		imtbase::IObjectCollection::DataPtr featureDataPtr;
+		if (m_featureCollectionCompPtr->GetObjectData(featureUuid, featureDataPtr)){
+			const imtlic::IFeatureInfo* featureInfoPtr = dynamic_cast<const imtlic::IFeatureInfo*>(featureDataPtr.GetPtr());
 			if (featureInfoPtr != nullptr){
 				if (featureContainer.InsertNewObject(QByteArray("FeatureInfo"), "", "", featureInfoPtr, featureUuid) == QByteArray("")){
 					SendWarningMessage(0, QString("Unable to insert feature %1 to the container.").arg(qPrintable(featureUuid)), "CFeaturesExportProviderComp");

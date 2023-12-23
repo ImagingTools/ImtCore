@@ -17,7 +17,7 @@ namespace imtlicgql
 
 // reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-bool CFeatureDependenciesProviderComp::IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const
+bool CFeatureDependenciesProviderComp::IsRequestSupported(const imtgql::CGqlRequest& /*gqlRequest*/) const
 {
 	return true;
 }
@@ -102,7 +102,7 @@ QByteArrayList CFeatureDependenciesProviderComp::GetFeatureDependencies(const QB
 
 				retVal += featureDependencies;
 
-				for (const QByteArray& dependencyId : qAsConst(featureDependencies)){
+				for (const QByteArray& dependencyId : std::as_const(featureDependencies)){
 					retVal += GetFeatureDependencies(dependencyId);
 				}
 			}
@@ -113,7 +113,7 @@ QByteArrayList CFeatureDependenciesProviderComp::GetFeatureDependencies(const QB
 }
 
 
-const imtlic::IFeatureInfoProvider* CFeatureDependenciesProviderComp::GetDependencyContainer(const QByteArray& dependencyId) const
+const imtlic::IFeatureInfoProvider* CFeatureDependenciesProviderComp::GetDependencyContainer(const QByteArray& /*dependencyId*/) const
 {
 	return nullptr;
 }

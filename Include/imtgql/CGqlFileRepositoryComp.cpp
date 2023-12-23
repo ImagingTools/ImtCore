@@ -313,8 +313,7 @@ imtbase::CTreeItemModel* CGqlFileRepositoryComp::ListObjects(
 	notificationModel->SetData("TotalCount", elementsCount);
 
 	imtbase::IObjectCollection::Ids elementIds = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
-	for (const imtbase::IObjectCollection::Id& elementId: qAsConst(elementIds)){
-
+	for (const imtbase::IObjectCollection::Id& elementId: std::as_const(elementIds)){
 		int itemIndex = itemsModel->InsertNewItem();
 		if (itemIndex >= 0){
 			if (!SetupGqlItem(gqlRequest, *itemsModel, itemIndex, elementId, errorMessage)){

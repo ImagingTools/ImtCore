@@ -22,18 +22,18 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(ImtControlsGalleryWeb);
 #endif
 
-    Q_INIT_RESOURCE(imtguigql);
-    Q_INIT_RESOURCE(imtqml);
-    Q_INIT_RESOURCE(imtstyle);
-    Q_INIT_RESOURCE(imtstylecontrolsqml);
-    Q_INIT_RESOURCE(imtcontrols);
-    Q_INIT_RESOURCE(imtgui);
+	Q_INIT_RESOURCE(imtguigql);
+	Q_INIT_RESOURCE(imtqml);
+	Q_INIT_RESOURCE(imtstyle);
+	Q_INIT_RESOURCE(imtstylecontrolsqml);
+	Q_INIT_RESOURCE(imtcontrols);
+	Q_INIT_RESOURCE(imtgui);
 	Q_INIT_RESOURCE(imtdocgui);
-    Q_INIT_RESOURCE(imtauthgui);
+	Q_INIT_RESOURCE(imtauthgui);
 
 	Q_INIT_RESOURCE(imtresthtml);
 	Q_INIT_RESOURCE(ImtControlsGallery);
-    Q_INIT_RESOURCE(imtguiTheme);
+	Q_INIT_RESOURCE(imtguiTheme);
 
 
 //	Q_INIT_RESOURCE(Webimt3dgui);

@@ -50,7 +50,7 @@ bool CSerializableObjectCollectionControllerComp::DeSerializeObject(istd::IPolym
 
 		return false;
 	}
-	iser::CMemoryReadArchive archive(objectData.data(), objectData.count());
+	iser::CMemoryReadArchive archive(objectData.data(), objectData.length());
 	if (!serializableObject->Serialize(archive)){
 		QByteArray errorMessage = QObject::tr("Error when serializing an object").toUtf8();
 		SendErrorMessage(0, errorMessage);
@@ -221,9 +221,9 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetObject(
 
 istd::IChangeable* CSerializableObjectCollectionControllerComp::CreateObject(
 			const QList<imtgql::CGqlObject>& inputParams,
-			QByteArray &objectId,
-			QString &name,
-			QString &description,
+			QByteArray& objectId,
+			QString& name,
+			QString& description,
 			QString& errorMessage) const
 {
 	if (!m_objectFactCompPtr.IsValid()){

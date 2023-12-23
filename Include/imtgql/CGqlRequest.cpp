@@ -686,8 +686,8 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlObject &gqlObject) const
 QByteArray CGqlRequest::AddObjectParamValue(const QVariant &value) const
 {
 	QByteArray retVal;
-	int valueType = value.type();
-	if (valueType == QVariant::List || valueType == QVariant::StringList){
+	int valueType = value.typeId();
+	if (valueType == QMetaType::QVariantList || valueType == QMetaType::QStringList){
 		QVariantList variantList = value.toList();
 		retVal += "[";
 		for (int i = 0; i < variantList.count(); i++){
@@ -698,7 +698,7 @@ QByteArray CGqlRequest::AddObjectParamValue(const QVariant &value) const
 		}
 		retVal += "]";
 	}
-	else if (valueType == QVariant::String || valueType == QVariant::ByteArray){
+	else if (valueType == QMetaType::QString || valueType == QMetaType::QByteArray){
 		retVal += "\\\"";
 		QByteArray data = value.toByteArray();
 		data = data.replace("\\", "\\\\\\\\");

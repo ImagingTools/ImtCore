@@ -1,6 +1,8 @@
-#include "imtclientgql/CSubscriberCompBase.h"
-#include "qdebug.h"
+#include <imtclientgql/CSubscriberCompBase.h>
 
+
+// ImtCore includes
+#include <imtgql/CGqlRequest.h>
 
 
 namespace imtclientgql
@@ -12,8 +14,6 @@ namespace imtclientgql
 void CSubscriberCompBase::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
-
-	qDebug() << "Component with ID" << GetComponentId(GetComponentContext()) << "succesfully created";
 
 	if (m_subscriptionManagerCompPtr.IsValid()){
 		imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, *m_commandAttrPtr);

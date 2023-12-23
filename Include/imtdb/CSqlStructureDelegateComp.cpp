@@ -304,7 +304,7 @@ QJsonArray CSqlStructureDelegateComp::CtreateJsonFromMetaInfo(const idoc::IDocum
 			QJsonObject metaInfoObject;
 			metaInfoObject.insert("type", type);
 			metaInfoObject.insert("typeName", metaInfo.typeName());
-			if (metaInfo.type() == QVariant::DateTime || metaInfo.type() == QVariant::Date){
+			if (metaInfo.typeId() == QMetaType::QDateTime || metaInfo.typeId() == QMetaType::QDate){
 				metaInfoObject.insert("value", metaInfo.toDateTime().toString(Qt::ISODate));
 			}
 			else{

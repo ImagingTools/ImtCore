@@ -17,6 +17,7 @@
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtgql/IGqlResponseHandler.h>
+#include <imtgql/CGqlRequest.h>
 #include <imtclientgql/IGqlClient.h>
 #include <imtclientgql/IGqlSubscriptionManager.h>
 
@@ -51,7 +52,7 @@ public:
 	CSubscriptionManagerComp();
 
 	// reimplemented (imtclientgql::IGqlSubscriptionManager)
-	virtual QByteArray RegisterSubscription(const imtgql::CGqlRequest& subscriptionRequest, imtclientgql::IGqlSubscriptionClient * subscriptionClient) override;
+	virtual QByteArray RegisterSubscription(const imtgql::IGqlRequest& subscriptionRequest, imtclientgql::IGqlSubscriptionClient * subscriptionClientPtr) override;
 	virtual bool UnregisterSubscription(const QByteArray& subscriptionId) override;
 
 	// reimplemented (imod::CSingleModelObserverBase)

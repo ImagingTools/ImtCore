@@ -5,6 +5,7 @@
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
+#include <imtgql/CGqlRequest.h>
 #include <imtclientgql/IGqlSubscriptionManager.h>
 
 

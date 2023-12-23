@@ -13,8 +13,6 @@
 #include <istd/TDelPtr.h>
 
 // ImtCore includes
-#include <imtgql/CGqlRequest.h>
-#include <imtbase/CTreeItemModel.h>
 #include <imtrest/CWebSocketRequest.h>
 
 
@@ -33,24 +31,24 @@ CSubscriptionManagerComp::CSubscriptionManagerComp()
 // reimplemented (imtgql::IGqlSubscriptionManager)
 
 QByteArray CSubscriptionManagerComp::RegisterSubscription(
-			const imtgql::CGqlRequest& subscriptionRequest,
+			const imtgql::IGqlRequest& subscriptionRequest,
 			imtclientgql::IGqlSubscriptionClient* subscriptionClient)
 {
-	if (!subscriptionClient) {
+	if (!subscriptionClient){
 		return QByteArray();
 	}
 
 	QByteArray clientId;
-	const imtgql::CGqlRequest* cGqlRequest = dynamic_cast<const imtgql::CGqlRequest*>(&subscriptionRequest);
-	if (cGqlRequest != nullptr){
-	 cGqlRequest->GetParams();
-	 const imtgql::CGqlObject* input = cGqlRequest->GetParam("input");
-	 if (input != nullptr){
-		 const imtgql::CGqlObject* addition = input->GetFieldArgumentObjectPtr("addition");
-		 if (addition != nullptr){
-			 clientId = addition->GetFieldArgumentValue("clientId").toByteArray();
-		 }
-	 }
+	const imtgql::CGqlRequest* requestImplPtr = dynamic_cast<const imtgql::CGqlRequest*>(&subscriptionRequest);
+	if (requestImplPtr != nullptr) {
+		requestImplPtr->GetParams();
+		const imtgql::CGqlObject* input = requestImplPtr->GetParam("input");
+		if (input != nullptr) {
+			const imtgql::CGqlObject* addition = input->GetFieldArgumentObjectPtr("addition");
+			if (addition != nullptr) {
+				clientId = addition->GetFieldArgumentValue("clientId").toByteArray();
+			}
+		}
 	}
 
 	for (QByteArray subscriptionId : m_registeredClients.keys()){
@@ -64,14 +62,14 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 	QString subscriptionId = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
 	SubscriptionHelper subscriptionHelper;
-	subscriptionHelper.m_request = subscriptionRequest;
+	subscriptionHelper.m_request = *requestImplPtr;
 	subscriptionHelper.m_clientId = clientId;
 	subscriptionHelper.m_status = imtclientgql::IGqlSubscriptionClient::SS_IN_REGISTRATION;
 	subscriptionHelper.m_clients.append(subscriptionClient);
 	m_registeredClients.insert(subscriptionId.toLocal8Bit(), subscriptionHelper);
 
 	if (m_loginStatus == imtauth::ILoginStatusProvider::LSF_LOGGED_IN){
-		ServiceManagerRegister(subscriptionRequest, subscriptionId.toLocal8Bit());
+		ServiceManagerRegister(*requestImplPtr, subscriptionId.toLocal8Bit());
 	}
 
 	return subscriptionId.toLocal8Bit();
@@ -318,13 +316,13 @@ bool CSubscriptionManagerComp::SendRequestInternal(const imtgql::IGqlRequest& re
 	bool retVal = false;
 	QByteArray clientId;
 
-	const imtgql::CGqlRequest* cGqlRequest = dynamic_cast<const imtgql::CGqlRequest*>(&request);
-	if (cGqlRequest != nullptr){
-		cGqlRequest->GetParams();
-		const imtgql::CGqlObject* input = cGqlRequest->GetParam("input");
-		if (input != nullptr) {
+	const imtgql::CGqlRequest* requestImplPtr = dynamic_cast<const imtgql::CGqlRequest*>(&request);
+	if (requestImplPtr != nullptr){
+		requestImplPtr->GetParams();
+		const imtgql::CGqlObject* input = requestImplPtr->GetParam("input");
+		if (input != nullptr){
 			const imtgql::CGqlObject* addition = input->GetFieldArgumentObjectPtr("addition");
-			if (addition != nullptr) {
+			if (addition != nullptr){
 				clientId = addition->GetFieldArgumentValue("clientId").toByteArray();
 			}
 		}
@@ -350,7 +348,7 @@ void CSubscriptionManagerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_webLoginStatusModelCompPtr.IsValid()) {
+	if (m_webLoginStatusModelCompPtr.IsValid()){
 		m_webLoginStatusModelCompPtr->AttachObserver(this);
 	}
 }
@@ -414,11 +412,11 @@ CSubscriptionManagerComp::NetworkOperation::NetworkOperation(int timeout, const 
 	}
 }
 
+
 CSubscriptionManagerComp::NetworkOperation::~NetworkOperation()
 {
 	timer.stop();
 }
-
 
 
 } // namespace imtclientgql

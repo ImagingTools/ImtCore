@@ -32,7 +32,7 @@ imtbase::ICollectionStructureInfo::Id CGqlStructureDelegateCompBase::InsertNewNo
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::ByteArray){
+						if (variant.typeId() == QMetaType::QByteArray){
 							return variant.toByteArray();
 						}
 					}
@@ -62,7 +62,7 @@ bool CGqlStructureDelegateCompBase::SetNodeName(
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
+						if (variant.typeId() == QMetaType::Bool){
 							return variant.toBool();
 						}
 					}
@@ -89,7 +89,7 @@ bool CGqlStructureDelegateCompBase::SetNodeDescription(const Id& nodeId, const Q
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
+						if (variant.typeId() == QMetaType::Bool){
 							return variant.toBool();
 						}
 					}
@@ -119,7 +119,7 @@ bool CGqlStructureDelegateCompBase::SetNodeMetaInfo(
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
+						if (variant.typeId() == QMetaType::Bool){
 							return variant.toBool();
 						}
 					}
@@ -149,7 +149,7 @@ bool CGqlStructureDelegateCompBase::MoveNode(
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
+						if (variant.typeId() == QMetaType::Bool){
 							return variant.toBool();
 						}
 					}
@@ -175,7 +175,7 @@ bool CGqlStructureDelegateCompBase::RemoveNode(const Id& nodeId, const imtbase::
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
+						if (variant.typeId() == QMetaType::Bool){
 							return variant.toBool();
 						}
 					}
@@ -205,7 +205,7 @@ bool CGqlStructureDelegateCompBase::AssignObject(
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
+						if (variant.typeId() == QMetaType::Bool){
 							return variant.toBool();
 						}
 					}
@@ -237,7 +237,7 @@ bool CGqlStructureDelegateCompBase::MoveObject(
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
+						if (variant.typeId() == QMetaType::Bool){
 							return variant.toBool();
 						}
 					}
@@ -267,7 +267,7 @@ bool CGqlStructureDelegateCompBase::RemoveObject(
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Bool){
+						if (variant.typeId() == QMetaType::Bool){
 							return variant.toBool();
 						}
 					}
@@ -291,7 +291,7 @@ int CGqlStructureDelegateCompBase::GetNodeCount(const iprm::IParamsSet* selectio
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.type() == QVariant::Int){
+						if (variant.typeId() == QMetaType::Int){
 							return variant.toInt();
 						}
 					}

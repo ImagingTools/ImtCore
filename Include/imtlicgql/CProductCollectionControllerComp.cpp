@@ -26,7 +26,7 @@ bool CProductCollectionControllerComp::SetupGqlItem(
 			imtbase::CTreeItemModel& model,
 			int itemIndex,
 			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
-			QString& errorMessage) const
+			QString& /*errorMessage*/) const
 {
 	if (objectCollectionIterator == nullptr){
 		return false;
@@ -97,9 +97,9 @@ bool CProductCollectionControllerComp::SetupGqlItem(
 						imtbase::ICollectionInfo::Ids licenseCollectionIds = m_licenseCollectionCompPtr->GetElementIds(0, -1, &filterParam);
 
 						for (const imtbase::ICollectionInfo::Id& licenseCollectionId : licenseCollectionIds){
-							imtbase::IObjectCollection::DataPtr dataPtr;
-							if (m_licenseCollectionCompPtr->GetObjectData(licenseCollectionId, dataPtr)){
-								const imtlic::CLicenseDefinition* licenseInfoPtr = dynamic_cast<const imtlic::CLicenseDefinition*>(dataPtr.GetPtr());
+							imtbase::IObjectCollection::DataPtr licenseDataPtr;
+							if (m_licenseCollectionCompPtr->GetObjectData(licenseCollectionId, licenseDataPtr)){
+								const imtlic::CLicenseDefinition* licenseInfoPtr = dynamic_cast<const imtlic::CLicenseDefinition*>(licenseDataPtr.GetPtr());
 								if (licenseInfoPtr != nullptr){
 									int index = licenseModelPtr->InsertNewItem();
 
