@@ -26,9 +26,9 @@ int CDesignTokenQrcUpdaterComp::Exec()
 	m_designTokenFileParserAttrPtr->ParseFile();
 	QVector<QByteArray> styles = m_designTokenFileParserAttrPtr->GetDesignSchemaList().GetElementIds();
 
-	for (const QByteArray& styleName: ::qAsConst(styles)){
+	for (const QByteArray& styleName: ::std::as_const(styles)){
 		QStringList dirsForTheme;
-		for(const QString& resType: ::qAsConst(typesOfResources)) {
+		for(const QString& resType: ::std::as_const(typesOfResources)) {
 			dirsForTheme << outputDirName  + dirSeparator + "Resources" + dirSeparator + resType + dirSeparator + styleName;
 		}
 		if(!CreateQrcForDirs(dirsForTheme, QByteArray(outputDirName) + dirSeparator + projectName + styleName.toLower() + ".qrc")){
@@ -58,7 +58,7 @@ bool CDesignTokenQrcUpdaterComp::CreateQrc(const QString& prefix, const QString&
 	xmlWriter.writeStartElement("qresource");
 	xmlWriter.writeAttribute("prefix", prefix);
 
-	for (const QFileInfo& file: ::qAsConst(files)){
+	for (const QFileInfo& file: ::std::as_const(files)){
 		xmlWriter.writeStartElement("file");
 		xmlWriter.writeAttribute("alias", file.baseName());
 		xmlWriter.writeCharacters(path + '/' + file.fileName());
@@ -90,7 +90,7 @@ bool CDesignTokenQrcUpdaterComp::CreateQrcRecursivly(const QString& inputDirName
 	QDir::SortFlags sort = QDir::SortFlag::Name;
 	QFileInfoList dirs = QDir(inputDirName).entryInfoList(filters, sort);
 
-	for (const QFileInfo& dir: ::qAsConst(dirs)){
+	for (const QFileInfo& dir: ::std::as_const(dirs)){
 		CreateSingleEntry(QString('/') + dir.baseName(), dir.absolutePath(), GetPathOverFile(dir.absolutePath(), outputFileName), xmlWriter);
 	}
 
@@ -117,7 +117,7 @@ bool CDesignTokenQrcUpdaterComp::CreateQrcForDirs(const QStringList& inputDirNam
 
 	xmlWriter.writeStartElement("RCC");
 
-	for (const QString& dir : ::qAsConst(inputDirNames)){
+	for (const QString& dir : ::std::as_const(inputDirNames)){
 		QString prefix = "/";
 		QStringList dirParts = dir.split(QDir::separator());
 		if (dirParts.size() > 2){
@@ -157,7 +157,7 @@ bool CDesignTokenQrcUpdaterComp::CreateSingleEntry(const QString& prefix, const 
 
 	xmlWriter.writeAttribute("prefix", prefix);
 
-	for (const QFileInfo& file : ::qAsConst(files)){
+	for (const QFileInfo& file : ::std::as_const(files)){
 		if(file.isFile()){
 			xmlWriter.writeStartElement("file");
 			xmlWriter.writeAttribute("alias", file.baseName());
@@ -170,9 +170,9 @@ bool CDesignTokenQrcUpdaterComp::CreateSingleEntry(const QString& prefix, const 
 
 	filters = QDir::Filter::Dirs | QDir::NoDotAndDotDot;
 	files = QDir(inputDirPath).entryInfoList(filters, sort);
-	for (const QFileInfo& file : ::qAsConst(files)){
+	for (const QFileInfo& file : ::std::as_const(files)){
 		if(prefix.contains("/Icons") && file.baseName() == "Color"){
-			QString theme = prefix.left(prefix.count() - 6);
+			QString theme = prefix.left(prefix.length() - 6);
 			CreateSingleEntry(theme + "/ColorIcons",file.absoluteFilePath(), path + QDir::separator().toLatin1() + file.fileName(),xmlWriter);
 		}
 		else{
@@ -190,7 +190,7 @@ bool CDesignTokenQrcUpdaterComp::CreateSingleEntryInCurrentPrefix(const QString&
 	QDir::SortFlags sort = QDir::SortFlag::Name;
 	QFileInfoList files = QDir(inputDirPath).entryInfoList(filters, sort);
 
-	for (const QFileInfo& file : ::qAsConst(files)){
+	for (const QFileInfo& file : ::std::as_const(files)){
 		if(file.isFile()){
 			xmlWriter.writeStartElement("file");
 			xmlWriter.writeAttribute("alias", file.baseName());

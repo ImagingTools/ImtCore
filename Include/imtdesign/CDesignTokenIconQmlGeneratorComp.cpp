@@ -52,13 +52,13 @@ int CDesignTokenIconQmlGeneratorComp::Exec()
 	out << "Item {" << QT_ENDL;
 
 
-	for (const QByteArray& dir: ::qAsConst(argumentsDirs)){
+	for (const QByteArray& dir: ::std::as_const(argumentsDirs)){
 		QFileInfoList filesDir = QDir(dir).entryInfoList(filters, sort);
-		for (const QFileInfo& fileInfo: ::qAsConst(filesDir)){
+		for (const QFileInfo& fileInfo: ::std::as_const(filesDir)){
 			if (!fileInfo.baseName().isEmpty() && !properties.contains(fileInfo.baseName()))
 			{
-				for (const QString& typesActive: ::qAsConst(typesOfActive)){
-					for (const QString& typesState: ::qAsConst(typesOfState)){
+				for (const QString& typesActive: ::std::as_const(typesOfActive)){
+					for (const QString& typesState: ::std::as_const(typesOfState)){
 						QString propertyName = "icon_" + fileInfo.baseName() + '_' + typesActive + '_' + typesState;
 						out << "property string " + propertyName + ";" << QT_ENDL;
 					}
@@ -100,7 +100,7 @@ bool CDesignTokenIconQmlGeneratorComp::CreateQrc(const QString& prefix, const QS
 	xmlWriter.writeStartElement("qresource");
 	xmlWriter.writeAttribute("prefix", prefix);
 
-	for (const QFileInfo& file: ::qAsConst(files)){
+	for (const QFileInfo& file: ::std::as_const(files)){
 		xmlWriter.writeStartElement("file");
 		xmlWriter.writeAttribute("alias", file.baseName());
 		xmlWriter.writeCharacters(path + '/' + file.fileName());
@@ -132,7 +132,7 @@ bool CDesignTokenIconQmlGeneratorComp::CreateQrcRecursivly(const QString& inputD
 	QDir::SortFlags sort = QDir::SortFlag::Name;
 	QFileInfoList dirs = QDir(inputDirName).entryInfoList(filters, sort);
 
-	for (const QFileInfo& dir: ::qAsConst(dirs)){
+	for (const QFileInfo& dir: ::std::as_const(dirs)){
 		CreateSingleEntry(QString('/') + dir.baseName(), dir.absolutePath(), GetPathOverFile(dir.absolutePath(), outputFileName), xmlWriter);
 	}
 
@@ -159,7 +159,7 @@ bool CDesignTokenIconQmlGeneratorComp::CreateQrcForDirs(const QStringList& input
 
 	xmlWriter.writeStartElement("RCC");
 
-	for (const QString& dir : ::qAsConst(inputDirNames)){
+	for (const QString& dir : ::std::as_const(inputDirNames)){
 		QString prefix = "/";
 		QStringList dirParts = dir.split(QDir::separator());
 		if (dirParts.size() > 2){
@@ -197,7 +197,7 @@ bool CDesignTokenIconQmlGeneratorComp::CreateSingleEntry(const QString& prefix, 
 
 	xmlWriter.writeAttribute("prefix", prefix);
 
-	for (const QFileInfo& file : ::qAsConst(files)){
+	for (const QFileInfo& file : ::std::as_const(files)){
 		if(file.isFile()){
 			xmlWriter.writeStartElement("file");
 //			xmlWriter.writeAttribute("alias", file.baseName() + '.' + file.suffix());//FIX
@@ -211,7 +211,7 @@ bool CDesignTokenIconQmlGeneratorComp::CreateSingleEntry(const QString& prefix, 
 
 	filters = QDir::Filter::Dirs | QDir::NoDotAndDotDot;
 	files = QDir(inputDirPath).entryInfoList(filters, sort);
-	for (const QFileInfo& file : ::qAsConst(files)){
+	for (const QFileInfo& file : ::std::as_const(files)){
 		if(prefix == "/Icons" && file.baseName() == "Color"){
 			CreateSingleEntry("/ColorIcons",file.absoluteFilePath(), path + QDir::separator().toLatin1() + file.fileName(),xmlWriter);
 		}
@@ -230,7 +230,7 @@ bool CDesignTokenIconQmlGeneratorComp::CreateSingleEntryInCurrentPrefix(const QS
 	QDir::SortFlags sort = QDir::SortFlag::Name;
 	QFileInfoList files = QDir(inputDirPath).entryInfoList(filters, sort);
 
-	for (const QFileInfo& file : ::qAsConst(files)){
+	for (const QFileInfo& file : ::std::as_const(files)){
 		if(file.isFile()){
 			xmlWriter.writeStartElement("file");
 			xmlWriter.writeAttribute("alias", file.baseName());

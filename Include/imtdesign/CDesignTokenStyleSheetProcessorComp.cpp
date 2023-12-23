@@ -54,7 +54,7 @@ int CDesignTokenStyleSheetProcessorComp::Exec()
 		return 0;
 	}
 
-	for (const QByteArray& styleName: ::qAsConst(styles)){
+	for (const QByteArray& styleName: ::std::as_const(styles)){
 		m_currentTheme = styleName;
 		QVariantMap palette;
 		QVariantMap currentBasePalette;
@@ -67,7 +67,7 @@ int CDesignTokenStyleSheetProcessorComp::Exec()
 
 		m_currentFontsCss.clear();
 		QVector<QByteArray> fonts = m_designTokenFileParserAttrPtr->GetFontList(styleName).GetElementIds();
-		for(const QByteArray& fontName: ::qAsConst(fonts)){
+		for(const QByteArray& fontName: ::std::as_const(fonts)){
 			QFont font;
 			QByteArray cssFont;
 			m_designTokenFileParserAttrPtr->GetFont(styleName, fontName,font);
@@ -103,7 +103,7 @@ bool CDesignTokenStyleSheetProcessorComp::ProcessAllCssFilesInDir(const QByteArr
 	QDir::SortFlags sort = QDir::SortFlag::Name;
 	QFileInfoList inputFiles = inputDir.entryInfoList(nameFilters, filters, sort);
 
-	for (const QFileInfo& inputFile: ::qAsConst(inputFiles)){
+	for (const QFileInfo& inputFile: ::std::as_const(inputFiles)){
 
 		QByteArray inputFileBaseName = inputFile.baseName().toLocal8Bit();
 		if(inputFileBaseName.endsWith('.')){

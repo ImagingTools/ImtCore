@@ -56,7 +56,7 @@ public:
 	/**
 		Get statistics item.
 	*/
-	virtual const StatisticsItem& GetStatisticsItem(quint64 index) const = 0;
+	virtual StatisticsItem GetStatisticsItem(quint64 index) const = 0;
 };
 
 

@@ -133,7 +133,7 @@ QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem& /*option*/, const
 
 	QVariant isHidden = index.data(CMenuPanel::DR_PAGE_HIDDEN_WHILE_COLLAPSED);
 
-	if (isHidden.isValid() && isHidden.type() == QVariant::Bool){
+	if (isHidden.isValid() && isHidden.typeId() == QVariant::Bool){
 		if (isHidden.toBool()){
 			size.setHeight(size.height() - m_height);
 		}

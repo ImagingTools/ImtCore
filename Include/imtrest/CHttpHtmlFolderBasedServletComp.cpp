@@ -70,7 +70,7 @@ QByteArray CHttpHtmlFolderBasedServletComp::Generate(const QString& directoryPat
 			dirFilters |= _dfs::NoDotDot;
 		}
 		QFileInfoList diryEnties = dir.entryInfoList(dirFilters, QDir::SortFlag::Type | QDir::SortFlag::Name);
-		for (const auto& entry: ::qAsConst(diryEnties)){
+		for (const auto& entry: ::std::as_const(diryEnties)){
 			retval.append(this->GenerateSingleEntry(entry, commandId)).append('\n');
 		}
 		retval.append(this->m_endOfMessage);

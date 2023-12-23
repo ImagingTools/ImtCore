@@ -452,7 +452,7 @@ QList<CCluster*> CClusterCreator::createMapClusters(const QList<CPositionIdentif
         cluster->SetZoom(zoomLevel);
         QStringList ids = clusterModel->GetData("ObjectIds", i).toStringList();
         QByteArrayList idsBA;
-        for(const QString& id: qAsConst(ids)){
+        for(const QString& id: std::as_const(ids)){
             idsBA.append(id.toUtf8());
         }
         cluster->SetChildrenIds(idsBA);

@@ -19,7 +19,7 @@ QByteArray CDesignTokenFileParserComp::GetRawColor(
 			QPalette::ColorGroup group,
 			QPalette::ColorRole role) const
 {
-	for(const RawColor& color: ::qAsConst(m_styleSheetColors)){
+	for(const RawColor& color: ::std::as_const(m_styleSheetColors)){
 		if (color.group == group && color.role == role){
 			return color.value;
 		}
@@ -139,7 +139,7 @@ bool CDesignTokenFileParserComp::ParseFile()
 
 	const QString designTokenFileFileBaseName(QFileInfo(designTokenFile).baseName());
 
-	for (const QJsonValue& style : ::qAsConst(designTokenStylesArray)){
+	for (const QJsonValue& style : ::std::as_const(designTokenStylesArray)){
 		QJsonObject styleEntry = style.toObject();
 		QString styleName = styleEntry["Name"].toString();
 
@@ -259,7 +259,7 @@ bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const Q
 
 	QJsonObject designTokenObjectSplitted = designTokenObject;
 
-	for (const QJsonValue& style: ::qAsConst(designTokenStylesArray)){
+	for (const QJsonValue& style: ::std::as_const(designTokenStylesArray)){
 		QJsonArray stylesArray;
 
 		QJsonObject styleEntry = style.toObject();
@@ -389,7 +389,7 @@ void CDesignTokenFileParserComp::ReplaceColorNames(QJsonObject& json, const QVar
 void CDesignTokenFileParserComp::ReplaceColorNamesRecursive(QJsonObject& json, const QVariantMap& variableMaps)
 {
 	QStringList keys = json.keys();
-	for (const QString& key : ::qAsConst(keys)){
+	for (const QString& key : ::std::as_const(keys)){
 		QJsonValue jsonValue = json[key];
 		if(jsonValue.isObject()){
 			QJsonObject jsonObject = jsonValue.toObject();

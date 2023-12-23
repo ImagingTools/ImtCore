@@ -82,7 +82,7 @@ void CHttpClientComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/
 
 		L_CT::Ids elementIds = collection->GetElementIds();
 
-		for (const QByteArray& id: ::qAsConst(elementIds)){
+		for (const QByteArray& id: ::std::as_const(elementIds)){
 
 			const IHttpClientRequest* httpRequest = dynamic_cast<const IHttpClientRequest*>(collection->GetObjectPtr(id));
 

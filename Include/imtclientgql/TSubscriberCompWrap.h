@@ -69,17 +69,17 @@ void TSubscriberCompWrap<Base>::RegisterSubscription()
 
 template<class Base>
 void TSubscriberCompWrap<Base>::OnResponseReceived(
-			const QByteArray& subscriptionId,
-			const QByteArray& subscriptionData)
+			const QByteArray& /*subscriptionId*/,
+			const QByteArray& /*subscriptionData*/)
 {
 }
 
 
 template<class Base>
 void TSubscriberCompWrap<Base>::OnSubscriptionStatusChanged(
-			const QByteArray& subscriptionId,
-			const SubscriptionStatus& status,
-			const QString& message)
+			const QByteArray& /*subscriptionId*/,
+			const SubscriptionStatus& /*status*/,
+			const QString& /*message*/)
 {
 }
 

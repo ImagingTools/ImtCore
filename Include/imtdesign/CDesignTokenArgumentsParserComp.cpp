@@ -11,7 +11,7 @@ bool CDesignTokenArgumentsParserComp::CheckArgument(AvailableArguments argument)
 
 	QByteArrayList args = m_commands.values(argument);
 
-	for(const QByteArray &arg : ::qAsConst(args)){
+	for(const QByteArray &arg : ::std::as_const(args)){
 		if(m_arguments.contains(arg)){
 			retval = true;
 			break;
@@ -29,7 +29,7 @@ QByteArray CDesignTokenArgumentsParserComp::GetArgumentKey(AvailableArguments ar
 	QByteArrayList args = m_commands.values(argument);
 	QByteArray argKey;
 
-	for(const QByteArray &arg : ::qAsConst(args)){
+	for(const QByteArray &arg : ::std::as_const(args)){
 		if(m_arguments.contains(arg)){
 			argKey = arg;
 			break;
@@ -68,7 +68,7 @@ QByteArrayList CDesignTokenArgumentsParserComp::GetArgumentValueMulti(AvailableA
 	QByteArrayList args = m_commands.values(argument);
 	QByteArray argValue;
 
-	for(const QByteArray &arg : ::qAsConst(args)){
+	for(const QByteArray &arg : ::std::as_const(args)){
 		if(m_arguments.contains(arg)){
 			argValue = arg;
 			break;

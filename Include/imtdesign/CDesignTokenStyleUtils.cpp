@@ -151,7 +151,7 @@ QPalette CDesignTokenStyleUtils::GetPaletteFromMultiEntry(const QJsonValue& styl
 					if(s_colorRolesNamesMap.contains(jsonColorValue.key())){
 						QColor color;
 						if (!CDesignTokenStyleUtils::CreateColorFromGrb(jsonColorValue->toString(), color)){
-							color.setNamedColor(jsonColorValue->toString());
+							color.fromString(jsonColorValue->toString());
 						}
 						if (color.isValid()){
 							palette.setColor(colorRoleGroup, s_colorRolesNamesMap[jsonColorValue.key()], color);
@@ -345,7 +345,7 @@ QPalette CDesignTokenStyleUtils::GetPaletteFromEntry(const QJsonValue& paletteEn
 
 		QColor color;
 		if (!CDesignTokenStyleUtils::CreateColorFromGrb(value->toString(), color)){
-			color.setNamedColor(value->toString());
+			color.fromString(value->toString());
 		}
 		if(color.isValid()){
 			palette.setColor(colorGroup, colorRole, color);
@@ -851,7 +851,7 @@ bool CDesignTokenStyleUtils::FindColorEnrty(const QByteArray& name, const QVaria
 
 	QStringList keys = variantMap.keys();
 
-	for (const QString& key: ::qAsConst(keys)){
+	for (const QString& key: std::as_const(keys)){
 		QString clearKey = key;
 		if(appendix.length() && key.endsWith(appendix, Qt::CaseInsensitive)){
 			clearKey = clearKey.chopped(appendix.length());

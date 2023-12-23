@@ -30,10 +30,10 @@ int CDesignTokenWebQrcGeneratorComp::Exec()
 	QDir::SortFlags sort = QDir::SortFlag::Name;
 	QFileInfoList dirs = QDir(resourceDirPath).entryInfoList(filters, sort);
 
-	for (const QFileInfo& fileInFo: ::qAsConst(dirs)){
+	for (const QFileInfo& fileInFo: ::std::as_const(dirs)){
 		if (typesOfResources.contains(fileInFo.fileName())){
 			QFileInfoList iconsDirs = QDir(fileInFo.absoluteFilePath()).entryInfoList(filters, sort);
-			for (const QFileInfo& iconsFileInFo: ::qAsConst(iconsDirs)){
+			for (const QFileInfo& iconsFileInFo: ::std::as_const(iconsDirs)){
 				if (!iconsFileInFo.baseName().isEmpty()){
 					styles << iconsFileInFo.fileName().toUtf8();
 				}
@@ -42,8 +42,8 @@ int CDesignTokenWebQrcGeneratorComp::Exec()
 	}
 
 	QStringList dirsForTheme;
-	for (const QByteArray& styleName: ::qAsConst(styles)){
-		for(const QString& resType: ::qAsConst(typesOfResources)){
+	for (const QByteArray& styleName: ::std::as_const(styles)){
+		for(const QString& resType: ::std::as_const(typesOfResources)){
 			 dirsForTheme << resourceDirPath + dirSeparator + resType + dirSeparator + styleName;
 		}
 	}
@@ -74,7 +74,7 @@ bool CDesignTokenWebQrcGeneratorComp::CreateQrc(const QString& prefix, const QSt
 	xmlWriter.writeStartElement("qresource");
 	xmlWriter.writeAttribute("prefix", prefix);
 
-	for (const QFileInfo& file: ::qAsConst(files)){
+	for (const QFileInfo& file: ::std::as_const(files)){
 		xmlWriter.writeStartElement("file");
 		xmlWriter.writeAttribute("alias", file.baseName());
 		xmlWriter.writeCharacters(path + '/' + file.fileName());
@@ -106,7 +106,7 @@ bool CDesignTokenWebQrcGeneratorComp::CreateQrcRecursivly(const QString& inputDi
 	QDir::SortFlags sort = QDir::SortFlag::Name;
 	QFileInfoList dirs = QDir(inputDirName).entryInfoList(filters, sort);
 
-	for (const QFileInfo& dir: ::qAsConst(dirs)){
+	for (const QFileInfo& dir: ::std::as_const(dirs)){
 		CreateSingleEntry(QString('/') + dir.baseName(), dir.absolutePath(), GetPathOverFile(dir.absolutePath(), outputFileName), xmlWriter);
 	}
 
@@ -133,7 +133,7 @@ bool CDesignTokenWebQrcGeneratorComp::CreateQrcForDirs(const QStringList& inputD
 
 	xmlWriter.writeStartElement("RCC");
 
-	for (const QString& dir : ::qAsConst(inputDirNames)){
+	for (const QString& dir : ::std::as_const(inputDirNames)){
 		QString prefix = "/";
 		QStringList dirParts = dir.split(QDir::separator());
 		if (dirParts.size() > 2){
@@ -173,7 +173,7 @@ bool CDesignTokenWebQrcGeneratorComp::CreateSingleEntry(const QString& prefix, c
 
 	xmlWriter.writeAttribute("prefix", prefix);
 
-	for (const QFileInfo& file : ::qAsConst(files)){
+	for (const QFileInfo& file : ::std::as_const(files)){
 		if(file.isFile()){
 			xmlWriter.writeStartElement("file");
 			xmlWriter.writeAttribute("alias", file.fileName());
@@ -193,7 +193,7 @@ bool CDesignTokenWebQrcGeneratorComp::CreateSingleEntryInCurrentPrefix(const QSt
 	QDir::SortFlags sort = QDir::SortFlag::Name;
 	QFileInfoList files = QDir(inputDirPath).entryInfoList(filters, sort);
 
-	for (const QFileInfo& file : ::qAsConst(files)){
+	for (const QFileInfo& file : ::std::as_const(files)){
 		if(file.isFile()){
 			xmlWriter.writeStartElement("file");
 			xmlWriter.writeAttribute("alias", file.baseName());

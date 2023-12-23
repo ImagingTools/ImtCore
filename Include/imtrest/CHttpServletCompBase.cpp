@@ -230,7 +230,7 @@ void CHttpServletCompBase::ExtractRequestInfo(
 	commandParams = request.GetCommandParams();
 
 	QByteArrayList headersKeys = request.GetHeaders();
-	for (const QByteArray& key : ::qAsConst(headersKeys)){
+	for (const QByteArray& key : ::std::as_const(headersKeys)){
 		headers.insert(key, request.GetHeaderValue(key));
 	}
 }

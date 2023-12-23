@@ -56,7 +56,7 @@ int CDesignTokenIconProcessorComp::Exec()
 			return 0;
 		}
 
-		for (const QByteArray& styleName : ::qAsConst(styles)){
+		for (const QByteArray& styleName : ::std::as_const(styles)){
 			m_templateIconColor = m_designTokenFileParserAttrPtr->GetTemplateIconColor(styleName);
 			m_normalColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_NORMAL);
 			m_offNormalColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_OFF_NORMAL);
@@ -83,7 +83,7 @@ int CDesignTokenIconProcessorComp::Exec()
 			QDir outputDir(outputDirName);
 			QFileInfoList outputDirEntries = outputDir.entryInfoList(QDir::Files);
 
-			for (const QFileInfo& outputDirEntry : ::qAsConst(outputDirEntries)){
+			for (const QFileInfo& outputDirEntry : ::std::as_const(outputDirEntries)){
 				if (outputDirEntry.isFile()){
 					QFile file(outputDirEntry.absoluteFilePath());
 					file.setPermissions(
@@ -326,7 +326,7 @@ bool CDesignTokenIconProcessorComp::SetColorAllFilesInDir(const QByteArray& inpu
 	QDir::SortFlags sort = QDir::SortFlag::Name;
 	QFileInfoList inputFiles = inputDir.entryInfoList(nameFilters, filters, sort);
 
-	for (const QFileInfo& inputFile : ::qAsConst(inputFiles)){
+	for (const QFileInfo& inputFile : ::std::as_const(inputFiles)){
 		if (!IgnoreFile(inputFile)){
 			if (!SetColorForAllModeState(inputFile.absoluteFilePath().toLocal8Bit(), outputDirName)){
 				return false;
