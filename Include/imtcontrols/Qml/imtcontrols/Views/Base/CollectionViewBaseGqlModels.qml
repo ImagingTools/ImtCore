@@ -5,57 +5,69 @@ import imtqml 1.0
 QtObject {
     id: gqlModelBaseContainer;
 
-    property string gqlModelHeadersInfo: commandsId + "Info";
-    property string gqlModelItemsInfo: commandsId + "List";
-    property string gqlModelObjectView: commandsId + "ObjectView";
-
+    property string getHeadersGqlCommand;
+    property string getItemsGqlCommand;
+    property string getObjectViewGqlCommand;
     property string objectViewEditorPath;
     property string objectViewEditorCommandsId;
+    property string commandId;
 
-    property string itemId;
     property var table;
-
-    property string commandsId;
+    property var additionInputParams: ({})
 
     property TreeItemModel headers: TreeItemModel {};
     property TreeItemModel items: TreeItemModel {};
-
     property TreeItemModel notificationModel: null;
-
-    signal itemsInfoGqlStateChanged(string state);
-
-    onNotificationModelChanged: {
-        if (gqlModelBaseContainer.notificationModel != null){
-            if (gqlModelBaseContainer.notificationModel.ContainsKey("PagesCount")){
-                gqlModelBaseContainer.rootItem.pagination.pagesSize = gqlModelBaseContainer.notificationModel.GetData("PagesCount");
-            }
-        }
-    }
 
     property Item rootItem: null;
     property Item pagination: null;
 
-    property Item loading: null;
-
     // Поля которые запросятся для модели коллекции
     property var fieldsData: ["Id", "Name"]
 
+    signal itemsInfoGqlStateChanged(string state);
+
+    onCommandIdChanged: {
+        if (commandId !== ""){
+            getHeadersGqlCommand = commandId + "Info";
+            getItemsGqlCommand = commandId + "List";
+            getObjectViewGqlCommand = commandId + "ObjectView";
+        }
+    }
+
     function updateModels(){
         console.log("CollectionView updateModels");
-        gqlModelBaseContainer.headerInfoModel.updateModel();
+        if (commandId === ""){
+            console.error("Update model was failed! Command-ID is invalid.");
+            return;
+        }
 
         gqlModelBaseContainer.objectViewModel.getObjectView();
+        gqlModelBaseContainer.headerInfoModel.updateModel();
     }
 
     function updateItemsModel(){
+        if (commandId === ""){
+            console.error("Update model was failed! Command-ID is invalid.");
+            return;
+        }
+
         gqlModelBaseContainer.itemsInfoModel.updateModel();
     }
 
     property GqlModel headerInfoModel: GqlModel {
         function updateModel() {
-            console.log( "headerInfoModel update", gqlModelBaseContainer.gqlModelHeadersInfo);
+            var query = Gql.GqlRequest("query", gqlModelBaseContainer.getHeadersGqlCommand);
 
-            var query = Gql.GqlRequest("query", gqlModelBaseContainer.gqlModelHeadersInfo);
+            if (Object.keys(gqlModelBaseContainer.additionInputParams).length > 0){
+                let inputParams = Gql.GqlObject("input");
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in gqlModelBaseContainer.additionInputParams){
+                    additionParams.InsertField(key, gqlModelBaseContainer.additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
+                query.AddParam(inputParams);
+            }
 
             var queryHeaders = Gql.GqlObject("headers");
             queryHeaders.InsertField("Id");
@@ -69,12 +81,28 @@ QtObject {
 
         onStateChanged: {
             console.log("State:", this.state, gqlModelBaseContainer.headerInfoModel);
-            if (this.state === "Ready"){
-                console.log("onStateChanged Ready", gqlModelBaseContainer.gqlModelHeadersInfo);
 
+            if (this.state === "Ready"){
                 var dataModelLocal;
 
                 if (gqlModelBaseContainer.headerInfoModel.ContainsKey("errors")){
+                    dataModelLocal = gqlModelBaseContainer.headerInfoModel.GetData("errors");
+
+                    if (dataModelLocal.ContainsKey(gqlModelBaseContainer.getHeadersGqlCommand)){
+                        dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.getHeadersGqlCommand);
+                    }
+
+                    let message = ""
+                    if (dataModelLocal.ContainsKey("message")){
+                        message = dataModelLocal.GetData("message");
+                    }
+
+                    let type;
+                    if (dataModelLocal.ContainsKey("type")){
+                        type = dataModelLocal.GetData("type");
+                    }
+
+                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
 
                     return;
                 }
@@ -82,8 +110,11 @@ QtObject {
                 if (gqlModelBaseContainer.headerInfoModel.ContainsKey("data")){
                     dataModelLocal = gqlModelBaseContainer.headerInfoModel.GetData("data");
 
-                    if (dataModelLocal.ContainsKey(gqlModelBaseContainer.gqlModelHeadersInfo)){
-                        dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelHeadersInfo);
+                    if (dataModelLocal.ContainsKey(gqlModelBaseContainer.getHeadersGqlCommand)){
+                        dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.getHeadersGqlCommand);
+                        if (!dataModelLocal){
+                            return;
+                        }
 
                         if (dataModelLocal.ContainsKey("FilterSearch")){
                             let filterSearchModel = dataModelLocal.GetData("FilterSearch")
@@ -111,8 +142,7 @@ QtObject {
 
     property GqlModel itemsInfoModel: GqlModel {
         function updateModel() {
-            console.log( "gqlModelBaseContainer updateModel", gqlModelBaseContainer.gqlModelItemsInfo, gqlModelBaseContainer.itemId);
-            var query = Gql.GqlRequest("query", gqlModelBaseContainer.gqlModelItemsInfo);
+            var query = Gql.GqlRequest("query", gqlModelBaseContainer.getItemsGqlCommand);
             let count = gqlModelBaseContainer.pagination.countElements;
             let offset = (gqlModelBaseContainer.pagination.currentIndex) * count;
 
@@ -127,6 +157,13 @@ QtObject {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertFieldObject(viewParams);
+            if (Object.keys(gqlModelBaseContainer.additionInputParams).length > 0){
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in gqlModelBaseContainer.additionInputParams){
+                    additionParams.InsertField(key, gqlModelBaseContainer.additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
+            }
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");
@@ -148,13 +185,31 @@ QtObject {
             if (this.state === "Ready"){
                 var dataModelLocal;
                 if (gqlModelBaseContainer.itemsInfoModel.ContainsKey("errors")){
+                    dataModelLocal = gqlModelBaseContainer.itemsInfoModel.GetData("errors");
+
+                    if (dataModelLocal.ContainsKey(gqlModelBaseContainer.getItemsGqlCommand)){
+                        dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.getItemsGqlCommand);
+                    }
+
+                    let message = ""
+                    if (dataModelLocal.ContainsKey("message")){
+                        message = dataModelLocal.GetData("message");
+                    }
+
+                    let type;
+                    if (dataModelLocal.ContainsKey("type")){
+                        type = dataModelLocal.GetData("type");
+                    }
+
+                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+
                     return;
                 }
 
                 if (gqlModelBaseContainer.itemsInfoModel.ContainsKey("data")){
                     dataModelLocal = gqlModelBaseContainer.itemsInfoModel.GetData("data");
-                    if (dataModelLocal.ContainsKey(gqlModelBaseContainer.gqlModelItemsInfo)){
-                        dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelItemsInfo);
+                    if (dataModelLocal.ContainsKey(gqlModelBaseContainer.getItemsGqlCommand)){
+                        dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.getItemsGqlCommand);
                         if (dataModelLocal.ContainsKey("notification")){
                             gqlModelBaseContainer.notificationModel = dataModelLocal.GetData("notification");
                         }
@@ -180,7 +235,7 @@ QtObject {
                                 }
                             }
 
-                            Events.sendEvent(gqlModelBaseContainer.commandsId + "CollectionUpdated");
+                            Events.sendEvent(gqlModelBaseContainer.commandId + "CollectionUpdated");
                         }
                     }
                 }
@@ -192,7 +247,17 @@ QtObject {
 
         function getObjectView(){
             console.log( "CollectionView objectView");
-            var query = Gql.GqlRequest("query", gqlModelBaseContainer.gqlModelObjectView);
+            var query = Gql.GqlRequest("query", gqlModelBaseContainer.getObjectViewGqlCommand);
+
+            if (Object.keys(gqlModelBaseContainer.additionInputParams).length > 0){
+                let inputParams = Gql.GqlObject("input");
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in gqlModelBaseContainer.additionInputParams){
+                    additionParams.InsertField(key, gqlModelBaseContainer.additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
+                query.AddParam(inputParams);
+            }
 
             var queryFields = Gql.GqlObject("objectView");
             queryFields.InsertField("Id");
@@ -210,14 +275,32 @@ QtObject {
                 var dataModelLocal;
 
                 if (gqlModelBaseContainer.objectViewModel.ContainsKey("errors")){
+                    dataModelLocal = gqlModelBaseContainer.objectViewModel.GetData("errors");
+
+                    if (dataModelLocal.ContainsKey(gqlModelBaseContainer.getObjectViewGqlCommand)){
+                        dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.getObjectViewGqlCommand);
+                    }
+
+                    let message = ""
+                    if (dataModelLocal.ContainsKey("message")){
+                        message = dataModelLocal.GetData("message");
+                    }
+
+                    let type;
+                    if (dataModelLocal.ContainsKey("type")){
+                        type = dataModelLocal.GetData("type");
+                    }
+
+                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+
                     return;
                 }
 
                 dataModelLocal = gqlModelBaseContainer.objectViewModel.GetData("data");
                 if(!dataModelLocal)
                     return;
-                if (dataModelLocal.ContainsKey(gqlModelBaseContainer.gqlModelObjectView)){
-                    dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.gqlModelObjectView);
+                if (dataModelLocal.ContainsKey(gqlModelBaseContainer.getObjectViewGqlCommand)){
+                    dataModelLocal = dataModelLocal.GetData(gqlModelBaseContainer.getObjectViewGqlCommand);
 
                     let objectView = dataModelLocal.GetData("Path");
                     let objectViewCommandsId = dataModelLocal.GetData("CommandId");

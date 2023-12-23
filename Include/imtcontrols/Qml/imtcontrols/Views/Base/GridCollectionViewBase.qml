@@ -7,9 +7,9 @@ Item {
 
     property alias commands: baseCommands;
 
-    property alias gqlModelObjectView: baseCommands.gqlModelObjectView;
-    property alias gqlModelHeadersInfo: baseCommands.gqlModelHeadersInfo;
-    property alias gqlModelItemsInfo: baseCommands.gqlModelItemsInfo;
+//    property alias gqlModelObjectView: baseCommands.gqlModelObjectView;
+//    property alias gqlModelHeadersInfo: baseCommands.gqlModelHeadersInfo;
+//    property alias gqlModelItemsInfo: baseCommands.gqlModelItemsInfo;
 
     property bool isWeb: Qt.platform.os == "web";
 
@@ -49,9 +49,6 @@ Item {
     property alias paginationCurrentIndex: paginationObj.currentIndex;
     property alias paginationPageSize: paginationObj.pagesSize;
     property string commandsId;
-    //    property alias elementsList: gridInternal.elementsList;
-    //    property alias gridItemHeight: gridInternal.itemHeight;
-    property string itemId;
 
     property alias grid: gridInternal;
     property alias selectedIndex: gridInternal.selectedIndex;
@@ -62,24 +59,21 @@ Item {
     signal selectedIndexChangedSignal(int index);
     signal elementsChanged();
 
-    /**
-        Если true -> данные будут запрошены с сервера,
-        иначе нужно будет подставлять данные вручную
-      */
-    property bool loadData;
-
     Component.onCompleted: {
         console.log("CollectionViewBase onCompleted");
 
         gridInternal.focus = true;
     }
 
-    onGridSelectedIndexInRowChanged: {
-        //console.log("GridSelectedIndexInRowChanged ", gridSelectedIndexInRow)
+    onCommandsIdChanged: {
+        baseCommands.commandId = commandsId;
+
+        baseCommands.updateModels();
     }
 
     onGridSelectedRowChanged: {
         if(gridSelectedRow >=0){
+
             var selectedRowY = collectionViewBaseContainer.gridSelectedRow * collectionViewBaseContainer.gridCellHeightMin - gridInternal.contentY;
             var selectedRowBottomY = (collectionViewBaseContainer.gridSelectedRow + 1) * collectionViewBaseContainer.gridCellHeightMin - gridInternal.contentY;
             var infonYBottom = (collectionViewBaseContainer.gridSelectedRow + 1) * collectionViewBaseContainer.gridCellHeightMin
@@ -104,7 +98,6 @@ Item {
 
         }
     }
-
 
     Rectangle {
         id: backgroundTable;
@@ -206,6 +199,24 @@ Item {
             //            anchors.bottom: pagination.visible ? pagination.top : parent.bottom;
             //            anchors.margins: thumbnailDecoratorContainer.mainMargin;
             //            property real minWidth: 1000000;
+        }
+
+        CustomScrollbar{
+            id: scrollBar;
+
+            anchors.right: parent.right;
+            anchors.rightMargin: 10;
+            anchors.bottom: gridInternal.bottom;
+
+            targetItem: gridInternal;
+
+            secondSize: 8;
+            radius: secondSize;
+            indicatorRadius: secondSize;
+            indicatorMargin: 0;
+
+            z: 20;
+
         }
     }
 
@@ -380,7 +391,9 @@ Item {
         onCurrentValueChanged: {
             console.log("Pagination onCurrentValueChanged", paginationObj.currentValue);
             gridInternal.selectedIndex = -1;
-            baseCommands.updateModels();
+            if(this.commandsId){
+                baseCommands.updateModels();
+            }
             collectionViewBaseContainer.openST = false;
         }
     }
@@ -388,11 +401,10 @@ Item {
     CollectionViewBaseGqlModels {
         id: baseCommands;
 
-        itemId: collectionViewBaseContainer.itemId;
         table: collectionViewBaseContainer.table;
 
         rootItem: collectionViewBaseContainer;
-        commandsId: collectionViewBaseContainer.commandsId;
+        commandId: collectionViewBaseContainer.commandsId;
         pagination: paginationObj;
 
         Component.onCompleted: {
@@ -400,17 +412,10 @@ Item {
         }
 
 
-        onCommandsIdChanged: {
-            console.log("CollectionViewBase onCommandsIdChanged", loadData, baseCommands.commandsId, baseCommands.gqlModelHeadersInfo);
+        onCommandIdChanged: {
+            console.log("CollectionViewBase onCommandsIdChanged");
 
-            if (loadData){
-                baseCommands.updateModels();
-            }
-        }
-
-        onHeadersChanged: {
-            //            gridInternal.headers = baseCommands.headers;
-            //            gridInternal.headersCompl = true;
+            baseCommands.updateModels();
         }
 
         onItemsChanged: {
