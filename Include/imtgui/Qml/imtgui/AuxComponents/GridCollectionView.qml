@@ -58,7 +58,7 @@ Item {
     property alias gridElementsDelegate: gridCollectionViewBase.gridElementsDelegate;
     property alias gridElementsModel: gridCollectionViewBase.gridElementsModel;
     //property alias selectedIndex: gridCollectionViewBase.grid.selectedIndex;
-    property alias selectedIndex: gridCollectionViewBase.indexSelected;
+    property alias selectedIndex: gridCollectionViewBase.selectedIndex;
 //    property alias elementsList: gridCollectionViewBase.elementsList;
 //    property alias gridMinWidth: gridCollectionViewBase.gridMinWidth;
     property alias gridDecoratorPath: gridCollectionViewBase.gridDecoratorPath;
@@ -200,7 +200,7 @@ Item {
 
         commandsId: parent.commandsId;
 
-        onSelectedIndexChanged: {
+        onSelectedIndexChangedSignal: {
             console.log("gridCollectionViewBase onSelectedIndexChanged");
             if(gridCollectionViewContainer.hasMetaInfo){
                 collectionMetaInfo.getMetaInfo();

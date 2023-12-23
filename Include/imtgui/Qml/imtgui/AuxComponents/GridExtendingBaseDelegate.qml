@@ -16,7 +16,7 @@ Rectangle {
 
     property bool selected: !rootItem ? false : rootItem.selectedIndex === model.index;
 
-    property int rowNumber: !rootItem ? O : Math.trunc(model.index/rootItem.gridCountInLine);
+    property int rowNumber: !rootItem ? 0 : Math.trunc(model.index/rootItem.gridCountInLine);
     property bool belowSelectedRow: !rootItem ? false : model.index >= (rootItem.gridSelectedRow + 1) * rootItem.gridCountInLine;
     property bool inLastRow: !rootItem ? false : model.index >= (rootItem.gridRowCount - 1) * rootItem.gridCountInLine;
 

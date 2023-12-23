@@ -54,12 +54,12 @@ Item {
     property string itemId;
 
     property alias grid: gridInternal;
-    property alias indexSelected: gridInternal.selectedIndex;
+    property alias selectedIndex: gridInternal.selectedIndex;
 
     property bool hasPagination: true;
 
     signal selectedItem(string id, string name);
-    signal selectedIndexChanged(int index);
+    signal selectedIndexChangedSignal(int index);
     signal elementsChanged();
 
     /**
@@ -80,7 +80,6 @@ Item {
 
     onGridSelectedRowChanged: {
         if(gridSelectedRow >=0){
-
             var selectedRowY = collectionViewBaseContainer.gridSelectedRow * collectionViewBaseContainer.gridCellHeightMin - gridInternal.contentY;
             var selectedRowBottomY = (collectionViewBaseContainer.gridSelectedRow + 1) * collectionViewBaseContainer.gridCellHeightMin - gridInternal.contentY;
             var infonYBottom = (collectionViewBaseContainer.gridSelectedRow + 1) * collectionViewBaseContainer.gridCellHeightMin
@@ -105,6 +104,7 @@ Item {
 
         }
     }
+
 
     Rectangle {
         id: backgroundTable;
@@ -193,7 +193,7 @@ Item {
 
             onSelectedIndexChanged: {
                 console.log("CollectionView GridView onSelectedIndexChanged");
-                collectionViewBaseContainer.selectedIndexChanged(gridInternal.selectedIndex);
+                collectionViewBaseContainer.selectedIndexChangedSignal(gridInternal.selectedIndex);
             }
 
             //            onElementsChanged: {

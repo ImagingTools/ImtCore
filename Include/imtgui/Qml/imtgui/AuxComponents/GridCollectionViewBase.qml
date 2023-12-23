@@ -51,12 +51,12 @@ Item {
     property string commandsId;
 
     property alias grid: gridInternal;
-    property alias indexSelected: gridInternal.selectedIndex;
+    property alias selectedIndex: gridInternal.selectedIndex;
 
     property bool hasPagination: true;
 
     signal selectedItem(string id, string name);
-    signal selectedIndexChanged(int index);
+    signal selectedIndexChangedSignal(int index);
     signal elementsChanged();
 
     Component.onCompleted: {
@@ -186,7 +186,7 @@ Item {
 
             onSelectedIndexChanged: {
                 console.log("CollectionView GridView onSelectedIndexChanged");
-                collectionViewBaseContainer.selectedIndexChanged(gridInternal.selectedIndex);
+                collectionViewBaseContainer.selectedIndexChangedSignal(gridInternal.selectedIndex);
             }
 
             //            onElementsChanged: {
