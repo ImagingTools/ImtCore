@@ -89,6 +89,10 @@ Rectangle{
             clip: true;
             property int delegateWidth: treeViewGql.delegateWidht;
 
+            onContentYChanged: {
+                listFrame.contentY = contentY;
+            }
+
             model: treeViewGql.model;
 
             delegate: Item{
@@ -237,6 +241,10 @@ Rectangle{
             radius: secondSize;
             indicatorRadius: secondSize;
             indicatorMargin: 0;
+
+            onContentYSignal:{
+                list.contentY = contentY;
+            }
 
         }
 

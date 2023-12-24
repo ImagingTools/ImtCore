@@ -19,7 +19,7 @@ Item {
     property alias gridElementsDelegate: gridInternal.delegate;
     property alias gridElementsModel: gridInternal.model;
     property alias gridCellWidth: gridInternal.cellWidth;
-    property alias gridCellHeight: gridInternal.cellHeight;
+    property alias gridCellHeight: collectionViewBaseContainer.gridCellHeightMin;
     property alias gridContentHeight: gridInternal.contentHeight;
     property alias gridContentY: gridInternal.contentY;
     property alias gridBottomMargin: backgroundTable.anchors.bottomMargin;
@@ -31,7 +31,7 @@ Item {
     property bool gridIsLastRow: gridSelectedRow == gridRowCount -1;
     property int gridSelectedIndexInRow: gridSelectedRow < 0 ? 0 : gridInternal.selectedIndex - gridSelectedRow * gridCountInLine;
     property real gridAddHeight: 110*3;
-    property int gridCellHeightMin: 110;//???
+    property int gridCellHeightMin: 110;
     property int gridCellHeightMax: (gridCellHeightMin * gridRowCount + gridAddHeight) / gridRowCount + !isWeb * gridIsLastRow * gridAddHeight;
     property int gridDelegateMargin: 10;
 
@@ -42,7 +42,6 @@ Item {
 
     property alias extendingInfoComp: extendingInfoLoader.sourceComponent;
 
-    //    property alias gridMinWidth: gridInternal.minWidth;
     property alias gridDecoratorPath: loaderTableDecorator.source;
     property alias modelFilter: modelFilterObj;
     property alias pagination: paginationObj;
@@ -58,6 +57,7 @@ Item {
     signal selectedItem(string id, string name);
     signal selectedIndexChangedSignal(int index);
     signal elementsChanged();
+
 
     Component.onCompleted: {
         console.log("CollectionViewBase onCompleted");
@@ -164,6 +164,17 @@ Item {
         }
 
 
+        Item{
+            id: gridFrame;
+
+            width: gridInternal.width;
+            height: gridInternal.height;
+
+            property real contentWidth: gridInternal.contentWidth;
+            property real contentY: gridInternal.contentY;
+            property real originY: 0;
+            property real contentHeight: collectionViewBaseContainer.openST ? collectionViewBaseContainer.gridRowCount * collectionViewBaseContainer.gridCellHeightMin + collectionViewBaseContainer.gridAddHeight + !collectionViewBaseContainer.isWeb /** collectionViewBaseContainer.gridIsLastRow*/ * collectionViewBaseContainer.gridAddHeight / collectionViewBaseContainer.gridRowCount : collectionViewBaseContainer.gridRowCount * collectionViewBaseContainer.gridCellHeightMin;
+        }
 
         GridView {
             id: gridInternal;
@@ -178,6 +189,11 @@ Item {
             property int selectedIndex: -1;
             //            property alias elements: model;
             signal selectItem(string idSelected, string name);
+
+            onContentYChanged: {
+                gridFrame.contentY = contentY;
+            }
+
 
             onSelectItem: {
                 console.log("MEGATEST1")
@@ -201,6 +217,7 @@ Item {
             //            property real minWidth: 1000000;
         }
 
+
         CustomScrollbar{
             id: scrollBar;
 
@@ -208,7 +225,7 @@ Item {
             anchors.rightMargin: 10;
             anchors.bottom: gridInternal.bottom;
 
-            targetItem: gridInternal;
+            targetItem: gridFrame;
 
             secondSize: 8;
             radius: secondSize;
@@ -216,6 +233,9 @@ Item {
             indicatorMargin: 0;
 
             z: 20;
+            onContentYSignal:{
+                gridInternal.contentY = contentY;
+            }
 
         }
     }

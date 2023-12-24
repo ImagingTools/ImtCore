@@ -1,13 +1,14 @@
 import QtQuick 2.12
 import Acf 1.0
 
-Rectangle {
+Item {
     id: gridExtendingBaseDelegate;
 
     anchors.top: parent ? parent.top : undefined;
     anchors.topMargin: !rootItem ? 0 :rootItem.gridCellHeightMin * rowNumber  + rootItem.gridAddHeight * rootItem.openST * belowSelectedRow;
 
-    color: "transparent";
+    width: !rootItem ? 0 : rootItem.gridCellWidth -rootItem.gridDelegateMargin;
+    height: !rootItem ? 0 : rootItem.openST ? rootItem.gridCellHeightMax  : rootItem.gridCellHeightMin;
 
     property Item rootItem: null;
 
@@ -28,7 +29,7 @@ Rectangle {
                 rootItem.openST = true;
             }
 
-            rootItem.selectedIndex = -1;
+            //rootItem.selectedIndex = -1;
         }
     }
 
