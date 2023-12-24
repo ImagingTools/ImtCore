@@ -7,9 +7,9 @@
 
 // ACF includes
 #include <icomp/CComponentBase.h>
-#include <iprm/ITextParam.h>
 
 // ImtCore includes
+#include <imtbase/IUrlParam.h>
 #include <imtcom/IConnectionStatusProvider.h>
 
 
@@ -28,7 +28,6 @@ public:
 
 	I_BEGIN_COMPONENT(CAsyncConnectionCheckerComp);
 		I_REGISTER_INTERFACE(IConnectionStatusProvider);
-		I_ASSIGN(m_urlAttrPtr, "Url", "The property holds connection's url.", true, "localhost");
 		I_ASSIGN(m_prefixServer, "ServerPrefix", "Server prefix", true, "ServerPrefix");
 		I_ASSIGN(m_urlParamCompPtr, "UrlParam", "The object holds connection's url.", false, "UrlParam");
 		I_ASSIGN(m_checkIntervalAttrPtr, "CheckInterval", "Interval for backup timer (in sec)", false, 60);
@@ -57,7 +56,7 @@ private:
 
 private:
 	I_ATTR(QByteArray, m_urlAttrPtr);
-	I_REF(iprm::ITextParam, m_urlParamCompPtr);
+	I_REF(imtbase::IUrlParam, m_urlParamCompPtr);
 	I_ATTR(QByteArray, m_prefixServer);
 	I_ATTR(int, m_checkIntervalAttrPtr);
 };

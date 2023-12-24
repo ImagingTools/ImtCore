@@ -1,14 +1,10 @@
 #include <imtrest/CWebSocketServerComp.h>
 
 
-// Acf includes
+// ACF includes
 #include <istd/TDelPtr.h>
 
-
 // ImtCore includes
-#include <imtrest/IRequest.h>
-#include <imtrest/IResponse.h>
-#include <imtrest/ISender.h>
 #include <imtrest/CWebSocketRequest.h>
 #include <imtauth/ILoginStatusProvider.h>
 
@@ -20,7 +16,7 @@ namespace imtrest
 // public methods
 
 
-const IRequest* CWebSocketServerComp::GetRequest(const QByteArray& requestId) const
+const IRequest* CWebSocketServerComp::GetRequest(const QByteArray& /*requestId*/) const
 {
 	return nullptr;
 }
@@ -47,12 +43,10 @@ void CWebSocketServerComp::OnComponentCreated()
 
 	if (m_protocolEngineCompPtr.IsValid()){
 		if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr){
-			if (m_serverAddressAttrPtr.IsValid() && m_webSocketServerPortCompPtr.IsValid()){
-				QString port = m_webSocketServerPortCompPtr->GetText();
-				StartListening(QHostAddress((*m_serverAddressAttrPtr).toStdString().c_str()), port.toInt());
-			}
-			else if (m_serverAddressAttrPtr.IsValid() && m_serverPortAttrPtr.IsValid()){
-				StartListening(QHostAddress((*m_serverAddressAttrPtr).toStdString().c_str()), *m_serverPortAttrPtr);
+			if (m_webSocketServerPortCompPtr.IsValid()){
+				int port = m_webSocketServerPortCompPtr->GetUrl().port();
+
+				StartListening(QHostAddress::LocalHost, port);
 			}
 			else{
 				StartListening();
@@ -61,6 +55,7 @@ void CWebSocketServerComp::OnComponentCreated()
 	}
 
 	connect(&m_timer, &QTimer::timeout, this, &CWebSocketServerComp::OnTimeout);
+
 	m_timer.start(10000);
 }
 
@@ -230,7 +225,7 @@ void CWebSocketServerComp::OnWebSocketBinaryMessage(const QByteArray& dataMessag
 }
 
 
-void CWebSocketServerComp::OnError(QAbstractSocket::SocketError error)
+void CWebSocketServerComp::OnError(QAbstractSocket::SocketError /*error*/)
 {
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
 	if (webSocketPtr != nullptr){

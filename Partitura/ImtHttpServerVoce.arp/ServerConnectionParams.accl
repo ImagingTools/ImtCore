@@ -8,9 +8,9 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="GqlObjectCollectionDelegate" X="575" Y="375" Note=""/>
-        <Element ComponentName="GraphQLObjectCollectionBase" X="575" Y="200" Note=""/>
-        <Element ComponentName="GraphQlApiClient" X="575" Y="575" Note=""/>
+        <Element ComponentName="ServerConnectionParams" X="550" Y="325" Note=""/>
+        <Element ComponentName="ServerPort" X="300" Y="525" Note=""/>
+        <Element ComponentName="WebSocketServerPort" X="825" Y="525" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

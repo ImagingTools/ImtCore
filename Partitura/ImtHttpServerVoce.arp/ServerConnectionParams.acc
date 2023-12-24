@@ -7,50 +7,47 @@
             <Version Id="1023" Number="394753" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
-    <Description></Description>
-    <Keywords></Keywords>
+    <Description>Connection parameters for the server side</Description>
+    <Keywords>Port Host Server</Keywords>
     <ElementsList>
-        <Element Id="Local" PackageId="BasePck" ComponentId="ComposedParamsSet">
+        <Element Id="ServerConnectionParams" PackageId="BasePck" ComponentId="ComposedParamsSet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ServerUrl</Value>
-                                <Value>WebSocketServerUr</Value>
+                                <Value>ServerPort</Value>
+                                <Value>WebSocketServerPort</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
                         <Data IsEnabled="true">
                             <Values>
-                                <Value>ServerUrl</Value>
-                                <Value>WebSocketServerUrl</Value>
+                                <Value>ServerPort</Value>
+                                <Value>WebSocketServerPort</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Default"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ServerUrl" PackageId="ImtCorePck" ComponentId="UrlParam">
+        <Element Id="ServerPort" PackageId="ImtCorePck" ComponentId="UrlParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultHost" Type="String" ExportId="DefaultServerHost">
-                        <Data IsEnabled="true" Value="localhost"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="DefaultServerPort">
+                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="DefaultPort">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="WebSocketServerUr" PackageId="ImtCorePck" ComponentId="UrlParam">
+        <Element Id="WebSocketServerPort" PackageId="ImtCorePck" ComponentId="UrlParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="DefaultHost" Type="String" ExportId="DefaultWebSocketServerHost">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="DefaultWebSocketServerPort">
+                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="WebSocketDefaultPort">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -59,10 +56,15 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="iser::ISerializable" ComponentId="Local"/>
+        <Interface InterfaceId="imod::IModel" ComponentId="ServerConnectionParams"/>
+        <Interface InterfaceId="iprm::IParamsSet" ComponentId="ServerConnectionParams"/>
+        <Interface InterfaceId="iser::ISerializable" ComponentId="ServerConnectionParams"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="ServerConnectionParams"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="ServerConnectionParams"/>
+        <Interface InterfaceId="istd::TIHierarchical&lt;istd::IPolymorphic&gt;" ComponentId="ServerConnectionParams"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="ServerUrl" ComponentId="ServerUrl"/>
-        <Component ExportedId="WebSocketServerUr" ComponentId="WebSocketServerUr"/>
+        <Component ExportedId="ServerPort" ComponentId="ServerPort"/>
+        <Component ExportedId="WebSocketServerPort" ComponentId="WebSocketServerPort"/>
     </ExportedComponents>
 </Acf>

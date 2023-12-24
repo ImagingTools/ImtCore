@@ -9,15 +9,14 @@
 #include <istd/TPointerVector.h>
 #include <ibase/TRuntimeStatusHanderCompWrap.h>
 #include <ilog/TLoggerCompWrap.h>
-#include <iprm/ITextParam.h>
 #include <istd/TDelPtr.h>
 
 // ImtCore includes
+#include <imtbase/IUrlParam.h>
 #include <imtrest/IRequest.h>
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/IRequestManager.h>
-
 
 
 namespace imtrest
@@ -25,6 +24,7 @@ namespace imtrest
 
 
 class CMultiThreadServer;
+
 
 /**
 	TCP-based communication server.
@@ -44,18 +44,16 @@ public:
 		I_ASSIGN(m_requestHandlerCompPtr, "RequestHandler", "Request handler registered for the server", true, "RequestHandler");
 		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used in the server", true, "ProtocolEngine");
 		I_ASSIGN(m_threadsLimitAttrPtr, "ThreadsLimit", "Limit of threads", true, 5);
-		I_ASSIGN(m_serverAddressAttrPtr, "ServerAddress", "Server address to be listened", false, "ServerAddress");
-		I_ASSIGN(m_serverPortAttrPtr, "ServerPort", "Server port to be listened", false, 0);
 		I_ASSIGN(m_startServerOnCreateAttrPtr, "StartServerOnCreate", "If enabled, the server will be started on after component creation", true, true);
-		I_ASSIGN(m_serverPortCompPtr, "ServerPortParam", "Parameter providing the server port to be listened", false, "ServerPortParam");
+		I_ASSIGN(m_serverPortCompPtr, "ServerPort", "Parameter providing the server port to be listened", true, "ServerPort");
 	I_END_COMPONENT
 
 	CTcpServerComp();
 	~CTcpServerComp();
 
-    imtrest::IRequestServlet* GetRequestServlet();
-    imtrest::IProtocolEngine* GetProtocolEngine();
-	int GetThreadsLimit();    
+	imtrest::IRequestServlet* GetRequestServlet();
+	imtrest::IProtocolEngine* GetProtocolEngine();
+	int GetThreadsLimit();
 
 protected:
 	// reimplemented (ibase::TRuntimeStatusHanderCompWrap)
@@ -72,18 +70,15 @@ private:
 	bool StartListening(const QHostAddress& address = QHostAddress::Any, quint16 port = 0);
 
 private Q_SLOTS:
-    void OnNewThreadConnection(const IRequest* request);
+	void OnNewThreadConnection(const IRequest* request);
 
 private:
-    I_REF(imtrest::IRequestServlet, m_requestHandlerCompPtr);
-    I_REF(IProtocolEngine, m_protocolEngineCompPtr);
+	I_REF(imtrest::IRequestServlet, m_requestHandlerCompPtr);
+	I_REF(IProtocolEngine, m_protocolEngineCompPtr);
+	I_REF(imtbase::IUrlParam, m_serverPortCompPtr);
 	I_ATTR(int, m_threadsLimitAttrPtr);
-	I_ATTR(QByteArray, m_serverAddressAttrPtr);
-	I_ATTR(int, m_serverPortAttrPtr);
 	I_ATTR(bool, m_startServerOnCreateAttrPtr);
-	I_REF(iprm::ITextParam, m_serverPortCompPtr);
 	I_ATTR(bool, m_isMultiThreadingAttrPtr);
-
 
 	istd::TDelPtr<CMultiThreadServer> m_server;
 

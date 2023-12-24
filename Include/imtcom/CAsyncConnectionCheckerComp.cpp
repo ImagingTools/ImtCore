@@ -26,12 +26,9 @@ CAsyncConnectionCheckerComp::CAsyncConnectionCheckerComp()
 void CAsyncConnectionCheckerComp::SendRequest()
 {
 	if (m_managerPtr != nullptr){
-		QByteArray url;
+		QString url;
 		if (m_urlParamCompPtr.IsValid()){
-			url = m_urlParamCompPtr->GetText().toUtf8();
-		}
-		else{
-			url = *m_urlAttrPtr;
+			url = m_urlParamCompPtr->GetUrl().toString();
 		}
 
 		if (m_prefixServer.IsValid()){
@@ -111,6 +108,7 @@ void CAsyncConnectionCheckerComp::ReplyFinished()
 		QByteArray representationData = reply->readAll();
 
 		imtbase::CTreeItemModel representationModel;
+
 		qDebug() << "representationData" << representationData;
 
 		bool result = representationModel.CreateFromJson(representationData);
@@ -128,8 +126,6 @@ void CAsyncConnectionCheckerComp::ReplyFinished()
 
 void CAsyncConnectionCheckerComp::OnTimeout()
 {
-	qDebug() << "CAsyncConnectionCheckerComp OnTimeout";
-
 	SendRequest();
 }
 

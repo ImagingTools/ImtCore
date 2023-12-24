@@ -7,10 +7,11 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
-#include <iprm/ITextParam.h>
 #include <istd/TPointerVector.h>
+#include <iprm/ITextParam.h>
 
 // ImtCore includes
+#include <imtbase/IUrlParam.h>
 #include <imtauth/ILoginStatusProvider.h>
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
@@ -45,15 +46,12 @@ public:
 		I_ASSIGN(m_serverRequestHandlerCompPtr, "ServerRequestHandler", "Request handler registered for the server", false, "ServerRequestHandler");
 		I_ASSIGN(m_clientRequestHandlerCompPtr, "ClientRequestHandler", "Request handler registered for the client", false, "ClientRequestHandler");
 		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used in the server", true, "ProtocolEngine");
-		I_ASSIGN(m_serverAddressAttrPtr, "ServerAddress", "Server address to be listened", false, "ServerAddress");
-		I_ASSIGN(m_serverPortAttrPtr, "ServerPort", "Server port to be listened", false, 0);
 		I_ASSIGN(m_connectOnCreateAttrPtr, "ConnectOnCreate", "If enabled, the client will be connect to server on after component creation", true, true);
-		I_ASSIGN(m_webSocketServerPortCompPtr, "ServerPortParam", "Parameter providing the server port to be connected", false, "ServerPortParam");
-		I_ASSIGN(m_webSocketServerAddressCompPtr, "ServerAddressParam", "Parameter providing the server address to be connected", false, "ServerAddressParam");
+		I_ASSIGN(m_webSocketServerAddressCompPtr, "WebSocketServerAddress", "Parameter providing the websocket-server address to be connected", true, "WebSocketServerAddress");
 		I_ASSIGN(m_serverLoginAttrPtr, "ServerLoginParam", "Parameter providing the server login to be connected", false, "ServerLoginParam");
 		I_ASSIGN(m_serverPasswordAttrPtr, "ServerPasswordParam", "Parameter providing the server password to be connected", false, "ServerPasswordParam");
-		I_ASSIGN(m_clientIdAttrPtr, "ClientId", "Client id that needs to be identified on the server", false, "");
-		I_ASSIGN(m_clientIdCompPtr, "ClientIdParam", "Parameter providing the client id that needs to be identified on the server", false, "ClientIdParam");
+		I_ASSIGN(m_clientIdAttrPtr, "ClientId", "ID of the client that needs to be identified on the server", false, "");
+		I_ASSIGN(m_clientIdCompPtr, "ClientIdParam", "Parameter providing the client-ID that needs to be identified on the server", false, "ClientIdParam");
 	I_END_COMPONENT;
 
 	CWebSocketClientComp();
@@ -90,7 +88,6 @@ private Q_SLOTS:
 	void OnWebSocketTextMessageReceived(const QString& message);
 	void OnWebSocketBinaryMessageReceived(const QByteArray& message);
 
-
 private:
 	class NetworkOperation
 	{
@@ -107,20 +104,17 @@ private:
 	virtual void Connect();
 
 private:
-	I_ATTR(bool, m_connectOnCreateAttrPtr);
 	I_REF(imtrest::IRequestServlet, m_serverRequestHandlerCompPtr);
 	I_REF(imtrest::IRequestServlet, m_clientRequestHandlerCompPtr);
 	I_REF(imtrest::IProtocolEngine, m_protocolEngineCompPtr);
-	I_ATTR(QByteArray, m_serverAddressAttrPtr);
-	I_ATTR(int, m_serverPortAttrPtr);
-	I_ATTR(QByteArray, m_serverLoginAttrPtr);
-	I_ATTR(QByteArray, m_serverPasswordAttrPtr);
-	I_ATTR(QByteArray, m_clientIdAttrPtr);
-	I_REF(iprm::ITextParam, m_webSocketServerPortCompPtr);
-	I_REF(iprm::ITextParam, m_webSocketServerAddressCompPtr);
+	I_REF(imtbase::IUrlParam, m_webSocketServerAddressCompPtr);
 	I_REF(iprm::ITextParam, m_webSocketServerLoginCompPtr);
 	I_REF(iprm::ITextParam, m_webSocketServerPasswordCompPtr);
 	I_REF(iprm::ITextParam, m_clientIdCompPtr);
+	I_ATTR(bool, m_connectOnCreateAttrPtr);
+	I_ATTR(QByteArray, m_serverLoginAttrPtr);
+	I_ATTR(QByteArray, m_serverPasswordAttrPtr);
+	I_ATTR(QByteArray, m_clientIdAttrPtr);
 
 	mutable QWebSocket m_webSocket;
 	imtauth::ILoginStatusProvider::LoginStatusFlags m_loginStatus;

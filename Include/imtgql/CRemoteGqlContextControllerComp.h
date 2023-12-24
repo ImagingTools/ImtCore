@@ -40,7 +40,10 @@ public:
 	CRemoteGqlContextControllerComp();
 
 	// reimplemented (imtgql::IGqlContextController)
-	virtual imtgql::IGqlContext* GetRequestContext(const imtgql::CGqlRequest& gqlRequest, const QByteArray& token, QString &errorMessage) const override;
+	virtual imtgql::IGqlContext* GetRequestContext(
+				const imtgql::CGqlRequest& gqlRequest,
+				const QByteArray& token,
+				QString &errorMessage) const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)

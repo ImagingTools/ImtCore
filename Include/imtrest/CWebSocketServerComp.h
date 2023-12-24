@@ -9,9 +9,9 @@
 // ACF includes
 #include <istd/TPointerVector.h>
 #include <ilog/TLoggerCompWrap.h>
-#include <iprm/ITextParam.h>
 
 // ImtCore includes
+#include <imtbase/IUrlParam.h>
 #include <imtrest/IRequest.h>
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
@@ -47,10 +47,8 @@ public:
 		I_ASSIGN(m_requestClientHandlerCompPtr, "RequestClientHandler", "Request handler registered for the client", true, "RequestClientHandler");
 		I_ASSIGN(m_protocolEngineCompPtr, "ProtocolEngine", "Protocol engine used in the server", true, "ProtocolEngine");
 		I_ASSIGN(m_subscriberEngineCompPtr, "SubscriberEngine", "Subscriber engine used in the server", false, "SubscriberEngine");
-		I_ASSIGN(m_serverAddressAttrPtr, "ServerAddress", "Server address to be listened", false, "ServerAddress");
-		I_ASSIGN(m_serverPortAttrPtr, "ServerPort", "Server port to be listened", false, 0);
 		I_ASSIGN(m_startServerOnCreateAttrPtr, "StartServerOnCreate", "If enabled, the server will be started on after component creation", true, true);
-		I_ASSIGN(m_webSocketServerPortCompPtr, "ServerPortParam", "Parameter providing the server port to be listened", false, "ServerPortParam");
+		I_ASSIGN(m_webSocketServerPortCompPtr, "WebSocketServerPort", "Parameter providing the WebSocket-server port to be listened", false, "WebSocketServerPort");
 	I_END_COMPONENT
 
 	// reimplemented (icomp::IRequestManager)
@@ -87,10 +85,8 @@ private:
 	I_REF(imtrest::IRequestServlet, m_requestClientHandlerCompPtr);
 	I_REF(IProtocolEngine, m_protocolEngineCompPtr);
 	I_REF(ISubscriberEngine, m_subscriberEngineCompPtr);
-	I_ATTR(QByteArray, m_serverAddressAttrPtr);
-	I_ATTR(int, m_serverPortAttrPtr);
 	I_ATTR(bool, m_startServerOnCreateAttrPtr);
-	I_REF(iprm::ITextParam, m_webSocketServerPortCompPtr);
+	I_REF(imtbase::IUrlParam, m_webSocketServerPortCompPtr);
 };
 
 

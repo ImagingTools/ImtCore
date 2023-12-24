@@ -22,7 +22,7 @@ namespace imtclientgql
 // public methods
 
 CWebSocketClientComp::CWebSocketClientComp()
-	: m_loginStatus(imtauth::ILoginStatusProvider::LSF_CACHED)
+	:m_loginStatus(imtauth::ILoginStatusProvider::LSF_CACHED)
 {
 }
 
@@ -66,7 +66,6 @@ const imtrest::ISender* CWebSocketClientComp::GetSender(const QByteArray& /*requ
 bool CWebSocketClientComp::SendRequest(const imtgql::IGqlRequest& request, imtgql::IGqlResponseHandler& responseHandler) const
 {
 	QString key = QUuid::createUuid().toString(QUuid::WithoutBraces);
-	//	QString key = request.GetFactoryId();
 
 	QJsonObject dataObject;
 	dataObject["type"] = "query";
@@ -126,6 +125,7 @@ void CWebSocketClientComp::OnComponentCreated()
 
 	m_refreshTimer.setSingleShot(true);
 	m_refreshTimer.setInterval(5000);
+
 	Connect();
 }
 
@@ -240,27 +240,25 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 }
 
 
-void CWebSocketClientComp::OnWebSocketBinaryMessageReceived(const QByteArray& message)
+void CWebSocketClientComp::OnWebSocketBinaryMessageReceived(const QByteArray& /*message*/)
 {
-	//	qDebug() << "CWebSocketClientComp::OnWebSocketBinaryMessageReceived: " << message;
 }
 
 
 void CWebSocketClientComp::Connect()
 {
-	qDebug() << "CWebSocketClientComp Connect";
+	qDebug() << "CWebSocketClientComp::Connect";
 
-	QString host = *m_serverAddressAttrPtr;
-	QString port = QString::number(*m_serverPortAttrPtr);
+	QString host;
+	int port = 0;
+
 	QString login = *m_serverLoginAttrPtr;
 	QString password = *m_serverPasswordAttrPtr;
 	QJsonObject authorization;
 
 	if (m_webSocketServerAddressCompPtr.IsValid()){
-		host = m_webSocketServerAddressCompPtr->GetText();
-	}
-	if (m_webSocketServerPortCompPtr.IsValid()){
-		port = m_webSocketServerPortCompPtr->GetText();
+		host = m_webSocketServerAddressCompPtr->GetUrl().host();
+		port = m_webSocketServerAddressCompPtr->GetUrl().port();
 	}
 	if (m_webSocketServerLoginCompPtr.IsValid()){
 		login = m_webSocketServerLoginCompPtr->GetText();
@@ -269,7 +267,7 @@ void CWebSocketClientComp::Connect()
 		password = m_webSocketServerPasswordCompPtr->GetText();
 	}
 	authorization["host"] = host;
-	authorization["port"] = port;
+	authorization["port"] = QString::number(port);
 	authorization["login"] = login;
 	authorization["password"] = password;
 	QByteArray authHeader = QJsonDocument(authorization).toJson(QJsonDocument::Compact);
@@ -279,8 +277,10 @@ void CWebSocketClientComp::Connect()
 	url.setPath("/realtime");
 	url.setQuery("header=" + authHeader.toBase64() + "&payload=e30=");
 	url.setScheme("ws");
-	url.setPort(port.toInt());
+	url.setPort(port);
+
 	qDebug() << "url" << url;
+
 	m_webSocket.open(url);
 }
 

@@ -18,7 +18,7 @@ namespace imtbase
 CSystemStatusComp::CSystemStatusComp()
 	:m_status(SystemStatus::SS_UNKNOWN_ERROR),
 	m_futureResultStatus(SystemStatus::SS_UNKNOWN_ERROR),
-	m_textParamObserver(*this),
+	m_urlParamObserver(*this),
 	m_singleCheck(false),
 	m_autoCheck(true)
 {
@@ -41,7 +41,10 @@ void CSystemStatusComp::UpdateSystemStatus()
 		m_slaveSystemStatusCompPtr->UpdateSystemStatus();
 	}
 
-	m_statusMessage = QObject::tr("Try connection to the address %1 ...").arg(qPrintable(m_workingUrl));
+	QString urlString = m_workingUrl.toString();
+
+	m_statusMessage = tr("Try connect to: '%1' ...").arg(urlString);
+
 	SetStatus(ISystemStatus::SS_TRY_CONNECTING_SERVER);
 
 	StartCheckSystemStatus();
@@ -75,6 +78,7 @@ bool CSystemStatusComp::StartCheckSystemStatus()
 bool CSystemStatusComp::StopCheckSystemStatus()
 {
 	m_timer.stop();
+
 	m_autoCheck = false;
 
 	return true;
@@ -97,7 +101,7 @@ void CSystemStatusComp::OnComponentCreated()
 	connect(&m_checkStatusFutureWatcher, &QFutureWatcher<void>::finished, this, &CSystemStatusComp::OnCheckStatusFinished);
 
 	if (m_urlParamCompPtr.IsValid()){
-		m_textParamObserver.RegisterObject(m_urlParamCompPtr.GetPtr(), &CSystemStatusComp::OnUrlParamChanged);
+		m_urlParamObserver.RegisterObject(m_urlParamCompPtr.GetPtr(), &CSystemStatusComp::OnUrlParamChanged);
 	}
 	else{
 		m_timer.start();
@@ -108,7 +112,8 @@ void CSystemStatusComp::OnComponentCreated()
 void CSystemStatusComp::OnComponentDestroyed()
 {
 	m_checkStatusFutureWatcher.waitForFinished();
-	m_textParamObserver.UnregisterAllObjects();
+
+	m_urlParamObserver.UnregisterAllObjects();
 
 	BaseClass::OnComponentDestroyed();
 }
@@ -116,14 +121,15 @@ void CSystemStatusComp::OnComponentDestroyed()
 
 void CSystemStatusComp::OnUrlParamChanged(
 			const istd::IChangeable::ChangeSet& /*changeSet*/,
-			const iprm::ITextParam* textParamPtr){
-	Q_ASSERT(textParamPtr != nullptr);
-	if (textParamPtr != nullptr){
-		QString textParam = textParamPtr->GetText();
+			const imtbase::IUrlParam* urlParamPtr)
+{
+	Q_ASSERT(urlParamPtr != nullptr);
+	if (urlParamPtr != nullptr){
+		m_workingUrl = urlParamPtr->GetUrl();
 
-		m_workingUrl = textParam.toUtf8();
+		QString urlString = m_workingUrl.toString();
 
-		m_statusMessage = QObject::tr("Try connection to the address %1 ...").arg(qPrintable(m_workingUrl));
+		m_statusMessage = tr("Try connect to: '%1' ...").arg(urlString);
 
 		SetStatus(ISystemStatus::SS_TRY_CONNECTING_SERVER);
 
@@ -136,7 +142,6 @@ void CSystemStatusComp::OnUrlParamChanged(
 
 void CSystemStatusComp::SetStatus(ISystemStatus::SystemStatus status)
 {
-	qDebug() << "System Status: " << status;
 	if (m_status != status){
 		istd::CChangeNotifier notifier(this);
 		Q_UNUSED(notifier);
@@ -188,7 +193,7 @@ void CSystemStatusComp::CheckStatus()
 	if (m_connectionStatusProviderCompPtr.IsValid()){
 		imtcom::IConnectionStatusProvider::ConnectionStatus serverConnectionStatus = m_connectionStatusProviderCompPtr->GetConnectionStatus();
 		if (serverConnectionStatus != imtcom::IConnectionStatusProvider::ConnectionStatus::CS_CONNECTED){
-			m_statusMessage = QObject::tr("The %1 server cannot be connected at %2.").arg(qPrintable(*m_serverNameAttrPtr)).arg(qPrintable(m_workingUrl));
+			m_statusMessage = QObject::tr("The %1 server cannot be connected at %2.").arg(qPrintable(*m_serverNameAttrPtr)).arg(m_workingUrl.toString());
 			m_futureResultStatus = ISystemStatus::SS_SERVER_CONNECTION_ERROR;
 
 			return;

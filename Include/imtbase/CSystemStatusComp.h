@@ -8,11 +8,11 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
-#include <iprm/ITextParam.h>
 
 // ImtCore includes
 #include <imtbase/ISystemStatus.h>
 #include <imtbase/TModelUpdateBinder.h>
+#include <imtbase/IUrlParam.h>
 #include <imtcom/IConnectionStatusProvider.h>
 #include <imtdb/IDatabaseServerConnectionChecker.h>
 
@@ -56,7 +56,7 @@ protected:
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
 
-	void OnUrlParamChanged(const istd::IChangeable::ChangeSet& changeSet, const iprm::ITextParam* textParamPtr);
+	void OnUrlParamChanged(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IUrlParam* urlParamPtr);
 private:
 	void SetStatus(SystemStatus status);
 	void OnCheckStatusFinished();
@@ -69,8 +69,8 @@ private:
 	QTimer m_timer;
 	QFutureWatcher<void> m_checkStatusFutureWatcher;
 	SystemStatus m_futureResultStatus;
-	imtbase::TModelUpdateBinder<iprm::ITextParam, CSystemStatusComp> m_textParamObserver;
-	QByteArray m_workingUrl;
+	imtbase::TModelUpdateBinder<imtbase::IUrlParam, CSystemStatusComp> m_urlParamObserver;
+	QUrl m_workingUrl;
 
 	bool m_singleCheck;
 	bool m_autoCheck;
@@ -83,7 +83,7 @@ private:
 	I_ATTR(bool, m_autoCheckStatusAttrPtr);
 	I_ATTR(bool, m_checkDbStatusAttrPtr);
 	I_ATTR(QByteArray, m_serverNameAttrPtr);
-	I_REF(iprm::ITextParam, m_urlParamCompPtr);
+	I_REF(imtbase::IUrlParam, m_urlParamCompPtr);
 };
 
 

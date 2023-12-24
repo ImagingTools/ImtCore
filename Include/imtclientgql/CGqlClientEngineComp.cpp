@@ -13,31 +13,8 @@ namespace imtclientgql
 // public methods
 
 CGqlClientEngineComp::CGqlClientEngineComp()
-	:m_textParamObserver(*this)
+	:m_urlParamObserver(*this)
 {
-}
-
-
-// reimplemented (icomp::CComponentBase)
-
-void CGqlClientEngineComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-
-	if (m_urlParamCompPtr.IsValid()){
-		m_textParamObserver.RegisterObject(m_urlParamCompPtr.GetPtr(), &CGqlClientEngineComp::OnUrlParamChanged);
-	}
-	else{
-		m_workingUrl = m_urlAttrPtr->GetValue();
-	}
-}
-
-
-void CGqlClientEngineComp::OnComponentDestroyed()
-{
-	m_textParamObserver.UnregisterAllObjects();
-
-	BaseClass::OnComponentDestroyed();
 }
 
 
@@ -48,20 +25,20 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 	QNetworkRequest* networkRequest = new QNetworkRequest();
 	networkRequest->setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/graphql"));
 
-	QByteArray url = m_workingUrl;
+	QString urlString = m_workingUrl.toString();
 
-	if (m_prefixServer.IsValid()){
-		QByteArray prefix = *m_prefixServer;
+	if (m_prefixServerAttrPtr.IsValid()){
+		QByteArray prefix = *m_prefixServerAttrPtr;
 		if (!prefix.startsWith('/')){
 			prefix.prepend('/');
 		}
 
-		url.append(prefix);
+		urlString.append(prefix);
 	}
 
-	url.append("/graphql");
+	urlString.append("/graphql");
 
-	networkRequest->setUrl(QUrl(url));
+	networkRequest->setUrl(QUrl(urlString));
 
 	imtgql::IGqlContext* contextPtr = request.GetRequestContext();
 	if (contextPtr != nullptr){
@@ -77,14 +54,36 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 
 // protected methods
 
-void CGqlClientEngineComp::OnUrlParamChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const iprm::ITextParam* textParamPtr)
+void CGqlClientEngineComp::OnUrlParamChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const imtbase::IUrlParam* urlParamPtr)
 {
-	Q_ASSERT(textParamPtr != nullptr);
-	if (textParamPtr != nullptr){
-		QString textParam = textParamPtr->GetText();
+	Q_ASSERT(urlParamPtr != nullptr);
+	if (urlParamPtr != nullptr){
+		QUrl url = urlParamPtr->GetUrl();
 
-		m_workingUrl = textParam.toUtf8();
+		m_workingUrl = url;
 	}
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CGqlClientEngineComp::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	if (m_urlParamCompPtr.IsValid()) {
+		m_urlParamObserver.RegisterObject(m_urlParamCompPtr.GetPtr(), &CGqlClientEngineComp::OnUrlParamChanged);
+
+		m_workingUrl = m_urlParamCompPtr->GetUrl();
+	}
+}
+
+
+void CGqlClientEngineComp::OnComponentDestroyed()
+{
+	m_urlParamObserver.UnregisterAllObjects();
+
+	BaseClass::OnComponentDestroyed();
 }
 
 

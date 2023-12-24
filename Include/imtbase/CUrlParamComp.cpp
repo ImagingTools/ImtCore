@@ -33,9 +33,15 @@ void CUrlParamComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	if (m_defaultUrlAttrPtr.IsValid()){
-		BaseClass2::SetUrl(*m_defaultUrlAttrPtr);
-	}
+	QUrl url;
+
+	QString host = *m_defaultHostAttrPtr;
+	url.setHost(host);
+
+	int port = *m_defaultPortAttrPtr;
+	url.setPort(port);
+
+	BaseClass2::SetUrl(url);
 }
 
 

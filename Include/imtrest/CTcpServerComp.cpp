@@ -14,15 +14,15 @@ namespace imtrest
 
 // public methods
 
-CTcpServerComp::CTcpServerComp(): m_server(new CMultiThreadServer(this))
+CTcpServerComp::CTcpServerComp()
+	:m_server(new CMultiThreadServer(this))
 {
-
 }
 
 
 CTcpServerComp::~CTcpServerComp()
 {
-	delete m_server.PopPtr();
+	m_server.Reset();
 }
 
 
@@ -32,7 +32,7 @@ imtrest::IRequestServlet* CTcpServerComp::GetRequestServlet()
 		return nullptr;
 	}
 
-    return m_requestHandlerCompPtr.GetPtr();
+	return m_requestHandlerCompPtr.GetPtr();
 }
 
 
@@ -42,7 +42,7 @@ imtrest::IProtocolEngine* CTcpServerComp::GetProtocolEngine()
 		return nullptr;
 	}
 
-    return m_protocolEngineCompPtr.GetPtr();
+	return m_protocolEngineCompPtr.GetPtr();
 }
 
 
@@ -66,13 +66,12 @@ void CTcpServerComp::OnSystemShutdown()
 void CTcpServerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
 	if (m_startServerOnCreateAttrPtr.IsValid() && *m_startServerOnCreateAttrPtr){
-		if (m_serverAddressAttrPtr.IsValid() && m_serverPortCompPtr.IsValid()){
-			QString port = m_serverPortCompPtr->GetText();
-			StartListening(QHostAddress((*m_serverAddressAttrPtr).toStdString().c_str()), port.toInt());
-		}
-		else if (m_serverAddressAttrPtr.IsValid() && m_serverPortAttrPtr.IsValid()){
-			StartListening(QHostAddress((*m_serverAddressAttrPtr).toStdString().c_str()), *m_serverPortAttrPtr);
+		if (m_serverPortCompPtr.IsValid()){
+			int port = m_serverPortCompPtr->GetUrl().port();
+
+			StartListening(QHostAddress::LocalHost, port);
 		}
 		else{
 			StartListening();
@@ -83,17 +82,17 @@ void CTcpServerComp::OnComponentCreated()
 
 const IRequest* CTcpServerComp::GetRequest(const QByteArray& requestId) const
 {
-	const IRequest* retVal = m_server->GetRequest(requestId);
+	const IRequest* requestPtr = m_server->GetRequest(requestId);
 
-	return retVal;
+	return requestPtr;
 }
 
 
 const ISender* CTcpServerComp::GetSender(const QByteArray& requestId) const
 {
-	const ISender* retVal = m_server->GetSender(requestId);
+	const ISender* senderPtr = m_server->GetSender(requestId);
 
-	return retVal;
+	return senderPtr;
 }
 
 
@@ -103,14 +102,17 @@ bool CTcpServerComp::StartListening(const QHostAddress &address, quint16 port)
 {
 	if (m_server->listen(address, port)){
 		SendInfoMessage(0, QString("Server successfully started on %1:%2").arg(address.toString()).arg(port));
+
 		qDebug() << QString("Server successfully started on %1:%2").arg(address.toString()).arg(port);
 
-		connect(m_server.GetPtr(), &CMultiThreadServer::NewThreadConnection, this, &CTcpServerComp::OnNewThreadConnection); //, Qt::QueuedConnection
+		connect(m_server.GetPtr(), &CMultiThreadServer::NewThreadConnection, this, &CTcpServerComp::OnNewThreadConnection);
 
 		return true;
 	}
 	else{
-		SendErrorMessage(0, QString("Server could not be started on %1:%2").arg(address.toString()).arg(port));
+		QString errorMessage = m_server->errorString();
+
+		SendErrorMessage(0, QString("Server could not be started on %1:%2. Error: %3").arg(address.toString()).arg(port).arg(errorMessage));
 	}
 
 	return false;
@@ -119,12 +121,9 @@ bool CTcpServerComp::StartListening(const QHostAddress &address, quint16 port)
 
 void CTcpServerComp::OnNewThreadConnection(const IRequest* request)
 {
-//    qDebug() << "OnNewThreadConnection" << "Request:" << request->GetCommandId() << "Body:" << request->GetBody();
-
-    if (m_requestHandlerCompPtr.IsValid()){
-        m_requestHandlerCompPtr->ProcessRequest(*request);
-    }
-
+	if (m_requestHandlerCompPtr.IsValid()){
+		m_requestHandlerCompPtr->ProcessRequest(*request);
+	}
 }
 
 

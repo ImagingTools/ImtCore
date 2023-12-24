@@ -13,7 +13,7 @@ namespace imtbase
 
 
 /**
-	Component for automatic creation of the Universally Unique Identifier (UUID)
+	Component-based implementation of the URL parameter.
 */
 class CUrlParamComp:
 			public icomp::CComponentBase,
@@ -27,7 +27,8 @@ public:
 		I_REGISTER_INTERFACE(IUrlParam);
 		I_REGISTER_INTERFACE(iser::ISerializable);
 		I_REGISTER_INTERFACE(istd::IChangeable);
-		I_ASSIGN(m_defaultUrlAttrPtr, "DefaultUrl", "Default URL", false, "");
+		I_ASSIGN(m_defaultHostAttrPtr, "DefaultHost", "Default host", true, "");
+		I_ASSIGN(m_defaultPortAttrPtr, "DefaultPort", "Default port", true, 80);
 		I_ASSIGN(m_isReadOnlyAttrPtr, "IsReadOnly", "When enabled, the URL is fixed and cannot be changed during run tume", true, false);
 	I_END_COMPONENT;
 
@@ -40,7 +41,8 @@ protected:
 	virtual void OnComponentCreated();
 
 private:
-	I_ATTR(QString, m_defaultUrlAttrPtr);
+	I_ATTR(QString, m_defaultHostAttrPtr);
+	I_ATTR(int, m_defaultPortAttrPtr);
 	I_ATTR(bool, m_isReadOnlyAttrPtr);
 };
 
