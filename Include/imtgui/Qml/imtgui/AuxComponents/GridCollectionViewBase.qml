@@ -27,7 +27,7 @@ Item {
     property alias gridCount: gridInternal.count;
     property int gridCountInLine: Math.trunc(width/gridCellWidth);
     property int gridRowCount : Math.ceil(gridCount/gridCountInLine);
-    property int gridSelectedRow: gridInternal.selectedIndex < 0 ? -1 : Math.trunc(gridInternal.selectedIndex/gridCountInLine);
+    property int gridSelectedRow: gridInternal.selectedIndex < 0 ? 0 : Math.trunc(gridInternal.selectedIndex/gridCountInLine);
     property bool gridIsLastRow: gridSelectedRow == gridRowCount -1;
     property int gridSelectedIndexInRow: gridSelectedRow < 0 ? 0 : gridInternal.selectedIndex - gridSelectedRow * gridCountInLine;
     property real gridAddHeight: 110*3;
