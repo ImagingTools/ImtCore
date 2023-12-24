@@ -33,44 +33,46 @@ Rectangle {
         anchors.margins:  20;
 
         gridCellWidth: 110;
-        gridAddHeight: 110*4;
+        gridAddHeight: 110*3;
 
         extendingInfoComp: detailComp;
         gridIndicatorMainColor: "lightblue";
 
-        gridElementsModel : 220;
+        gridElementsModel : 60;
 
 
         gridElementsDelegate:
             Component{
             GridExtendingBaseDelegate{
                 id: gridItem;
-
-                width: 100;
-                height: 100;
-
-                color:  "lightblue";
-                border.color: "gray";
-                border.width: 2;
-                radius: 10;
                 rootItem : gridBase;
-                Text{
-                    anchors.centerIn: parent;
+                Rectangle{
+                    width: parent.width;
+                    height: gridBase.gridCellHeightMin - 10;
+                    color:  "lightblue";
+                    border.color: "gray";
+                    border.width: 2;
+                    radius: 10;
 
-                    font.family: Style.fontFamily;
-                    font.pixelSize: 14;
-                    color: Style.textColor;
-                    text: "Cell " + String(model.index + 1);
-                }
-                MouseArea{
-                    anchors.fill: parent;
+                    Text{
+                        anchors.centerIn: parent;
 
-                    cursorShape: Qt.PointingHandCursor;
-                    onClicked: {
-                        gridItem.setOpenST();
-                        gridBase.selectedIndex = model.index;
+                        font.family: Style.fontFamily;
+                        font.pixelSize: 14;
+                        color: Style.textColor;
+                        text: "Cell " + String(model.index + 1);
+                    }
+                    MouseArea{
+                        anchors.fill: parent;
+
+                        cursorShape: Qt.PointingHandCursor;
+                        onClicked: {
+                            gridItem.setOpenST();
+                            gridBase.selectedIndex = model.index;
+                        }
                     }
                 }
+
 
 
             }//delegate
