@@ -41,6 +41,10 @@ Rectangle{
     property int targetContentHeight: targetItem.contentHeight;
     property int targetContentWidth: targetItem.contentWidth;
 
+    signal contentXSignal(real contentX);
+    signal contentYSignal(real contentY);
+
+
     Component.onCompleted: {
         scrollContainer.opacity = !scrollContainer.canFade;
     }
@@ -122,6 +126,9 @@ Rectangle{
         property: "contentY";
         duration: 50;
         from: 0; to: 1;
+        onFinished: {
+            scrollContainer.contentYSignal(scrollContainer.targetItem.contentY);
+        }
     }
 
     NumberAnimation {
@@ -131,6 +138,9 @@ Rectangle{
         property: "contentX";
         duration: 50;
         from: 0; to: 1;
+        onFinished: {
+            scrollContainer.contentXSignal(scrollContainer.targetItem.contentX);
+        }
     }
 
 
@@ -151,11 +161,16 @@ Rectangle{
             if(scrollContainer.vertical){
                 scrollContainer.targetItem.contentY = (newCoords.y >= scrollIndicator.y + scrollIndicator.height) ?
                             (newCoords.y - scrollIndicator.height) / scrollContainer.koeff + scrollContainer.targetItem.originY : newCoords.y / scrollContainer.koeff + scrollContainer.targetItem.originY;
+
+                scrollContainer.contentYSignal(scrollContainer.targetItem.contentY);
             }
 
             else{//horiz
                 scrollContainer.targetItem.contentX = (newCoords.x >= scrollIndicator.x + scrollIndicator.width) ?
                             (newCoords.x - scrollIndicator.width) / scrollContainer.koeff + scrollContainer.targetItem.originX : newCoords.x / scrollContainer.koeff + scrollContainer.targetItem.originX;
+
+
+                scrollContainer.contentXSignal(scrollContainer.targetItem.contentX);
 
             }
 
@@ -440,6 +455,9 @@ Rectangle{
                         else {
                             scrollContainer.targetItem.contentY += deltaY/scrollContainer.koeff;
                         }
+
+                        scrollContainer.contentYSignal(scrollContainer.targetItem.contentY);
+
                     }
                     else{//horiz
                         var deltaX = newCoords.x - scrollMA.coord.x;
@@ -452,6 +470,9 @@ Rectangle{
                         else {
                             scrollContainer.targetItem.contentX += deltaX/scrollContainer.koeff;
                         }
+
+                        scrollContainer.contentXSignal(scrollContainer.targetItem.contentX);
+
                     }
 
                     scrollMA.coord = newCoords;
