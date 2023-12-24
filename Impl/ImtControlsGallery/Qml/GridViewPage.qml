@@ -38,7 +38,7 @@ Rectangle {
         extendingInfoComp: detailComp;
         gridIndicatorMainColor: "lightblue";
 
-        gridElementsModel : 60;
+        gridElementsModel : 160;
 
 
         gridElementsDelegate:
