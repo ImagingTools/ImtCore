@@ -179,9 +179,10 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(const imt
 }
 
 
-void CProductCollectionControllerComp::SetObjectFilter(const imtgql::CGqlRequest &gqlRequest,
-			const imtbase::CTreeItemModel &objectFilterModel,
-			iprm::CParamsSet &filterParams) const
+void CProductCollectionControllerComp::SetObjectFilter(
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			const imtbase::CTreeItemModel& objectFilterModel,
+			iprm::CParamsSet& filterParams) const
 {
 	if (objectFilterModel.ContainsKey("CategoryId")){
 		QByteArray filterValue = objectFilterModel.GetData("CategoryId").toByteArray();
