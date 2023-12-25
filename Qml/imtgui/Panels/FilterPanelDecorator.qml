@@ -1,14 +1,16 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtcontrols 1.0
+import imtgui 1.0
+import imtqml 1.0
 
 Item {
     id: filterPanelDecorator;
 
-//    height: 30;
     width: 325;
 
     property Item rootLoader: null;
+
+    property alias textInputWidth: tfc.width;
 
     function calcWidth(){
         console.log("calcWidth");
@@ -31,8 +33,8 @@ Item {
         console.log("onVisibleChanged", tfc.width);
 
         if (filterPanelDecorator.visible){
-            animRect.to = tfc.width;
-            animRect.start();
+//            animRect.to = tfc.width;
+//            animRect.start();
         }
     }
 
@@ -42,13 +44,13 @@ Item {
         }
     }
 
-    NumberAnimation {
-        id: animRect;
-        target: tfc;
-        property: "width";
-        from: 0;
-        duration: 200;
-    }
+//    NumberAnimation {
+//        id: animRect;
+//        target: tfc;
+//        property: "width";
+//        from: 0;
+//        duration: 200;
+//    }
 
     CustomTextField {
         id: tfc;
@@ -78,7 +80,7 @@ Item {
 
             visible: tfc.text != "";
 
-            iconSource: "../../../" + "Icons/" + Style.theme + "/Close_On_Normal.svg";
+            iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
             iconWidth: Style.iconSizeExtraSmall;
             iconHeight: iconWidth;
 
@@ -97,7 +99,7 @@ Item {
         width: Style.buttonWidthMedium;
         height: width;
 
-        iconSource: "../../../" + "Icons/" + Style.theme + "/Close_On_Normal.svg";
+        iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
         iconWidth: Style.iconSizeSmall;
         iconHeight: iconWidth;

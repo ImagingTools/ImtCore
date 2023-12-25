@@ -1,97 +1,59 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
-import imtcontrols 1.0
+import imtgui 1.0
 
-Rectangle {
+Item {
     id: topPanelDecorator;
 
-    z: -1
-
-    width: 100;
     height: 60;
 
+    property Item centerPanel: null;
+    property Item topPanel: null;
 
-    gradient: Gradient {
-        GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
-        GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
-        GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
-        GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
-    }
-    property bool isQtStyle: false;
-
-    onIsQtStyleChanged: {
-        Style.isQtStyle = isQtStyle;
+    Component.onCompleted: {
+        console.log("topPanelDecorator base onCompleted")
     }
 
-    property Component buttonDecoratorAcf: buttonDecorator;
-    property Component buttonDecoratorQt: DecoratorsQt.buttonDecorator;
+    TopCenterPanel {
+        id: topCenterPanel;
 
+        anchors.left: parent.left;
 
-    Row{
-        id: buttonRow;
+        width: topPanelDecorator.width - rightPanel.width;
+        height: topPanelDecorator.height;
 
-        anchors.centerIn: parent;
-        spacing: 40;
+        topPanel: topPanelDecorator.topPanel;
 
-        Button{
-            id: themeButton;
+        decoratorSource: Style.topCenterPanelDecoratorPath;
 
-            anchors.verticalCenter:  parent.verticalCenter;
-
-            decoratorComponent: topPanelDecorator.isQtStyle ? topPanelDecorator.buttonDecoratorQt: topPanelDecorator.buttonDecoratorAcf;
-            //decoratorComponent: DecoratorsQt.buttonDecorator;
-            //KeyNavigation.right: roundButton
-            //KeyNavigation.tab: roundButton
-
-            text: "Dark theme";
-            onClicked: {
-            }
-        }
-
-        Button{
-            id: qtStyleButton;
-
-            anchors.verticalCenter:  parent.verticalCenter;
-
-            decoratorComponent: topPanelDecorator.isQtStyle ? topPanelDecorator.buttonDecoratorQt: topPanelDecorator.buttonDecoratorAcf;
-            //decoratorComponent: DecoratorsQt.buttonDecorator;
-            //KeyNavigation.right: roundButton
-            //KeyNavigation.tab: roundButton
-
-            text: "Qt style";
-            onClicked: {
-                topPanelDecorator.isQtStyle = true;
-            }
-        }
-
-        Button{
-            id: acfStyleButton;
-
-            anchors.verticalCenter:  parent.verticalCenter;
-
-            decoratorComponent: topPanelDecorator.isQtStyle ? topPanelDecorator.buttonDecoratorQt: topPanelDecorator.buttonDecoratorAcf;
-            //decoratorComponent: DecoratorsQt.buttonDecorator;
-            //KeyNavigation.right: roundButton
-            //KeyNavigation.tab: roundButton
-
-            text: "Acf style";
-            onClicked: {
-                topPanelDecorator.isQtStyle = false;
-            }
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
+            GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
+            GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
+            GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
         }
     }
 
-    Component{
-        id: buttonDecorator;
+    TopRightPanel {
+        id: rightPanel;
 
-        ButtonDecorator{
-            width: 140;
-            height: 30;
-            radius: 4;
-            //            icon.width: 20;
-            //            icon.height: 20;
+        z: 100;
+
+        anchors.right: parent.right;
+
+        width: 100;
+        height: topPanelDecorator.height;
+
+        decoratorSource: Style.topRightPanelDecoratorPath;
+
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
+            GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
+            GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
+            GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
         }
+
     }
 }
 

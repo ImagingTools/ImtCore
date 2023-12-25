@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/qml">
+	<file alias="imtguigql/GqlModelObserver.qml">GqlModelObserver.qml</file>
+	<file alias="imtguigql/GqlDocumentObserver.qml">GqlDocumentObserver.qml</file>
+	<file alias="imtguigql/GqlDocumentDataController.qml">GqlDocumentDataController.qml</file>
+	<file alias="imtguigql/ComboBoxGql.qml">ComboBoxGql.qml</file>
+
+	<file alias="imtguigql/qmldir">qmldir</file>
+    </qresource>
+</RCC>

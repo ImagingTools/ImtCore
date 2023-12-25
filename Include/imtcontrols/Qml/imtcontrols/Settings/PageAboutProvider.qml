@@ -51,7 +51,7 @@ Item {
             index = parameters.InsertNewItem();
             parameters.SetData("Id", "ServerLog", index);
             parameters.SetData("Name", qsTr("Server Log"), index);
-            parameters.SetData("Source", "qrc:/qml/imtgui/AuxComponents/ServerLogProvider.qml", index);
+            parameters.SetData("Source", "qrc:/qml/imtgui/ServerLogProvider.qml", index);
         }
     }
 

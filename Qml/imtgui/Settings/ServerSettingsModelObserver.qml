@@ -1,7 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtcontrols 1.0
-import imtqml 1.0
+import imtgui 1.0
 
 TreeItemModelObserver {
     id: container;
@@ -19,6 +18,8 @@ TreeItemModelObserver {
             let changeObj = changeList[i]
             let changeId = changeObj["id"];
 
+            console.log("changeId", changeId)
+
             let ids = changeId.split('/')
             if (ids.includes("Language")){
                 let language = languageProvider.getLanguage()
@@ -33,6 +34,8 @@ TreeItemModelObserver {
             }
             else if (ids.includes("Database")){
                 Events.sendEvent("UpdateModels");
+            }
+            else if (ids.includes("ServerUrl")){
             }
         }
     }

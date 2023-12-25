@@ -1,10 +1,10 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtqml 1.0
 import imtauthgui 1.0
 import imtguigql 1.0
-import imtcontrols 1.0
-
+import imtdocgui 1.0
+import imtgui 1.0
+//import 'AuxComponents'
 
 Rectangle {
     id: thumbnailDecoratorContainer;
@@ -13,22 +13,34 @@ Rectangle {
 
     color: Style.backgroundColor;
 
-    property alias settingsProvider: preferenceDialog.settingsProvider;
-    property alias applicationInfoProvider: preferenceDialog.applicationInfoProvider;
+//    property alias settingsProvider: preferenceDialog.settingsProvider;
+//    property alias applicationInfoProvider: preferenceDialog.applicationInfoProvider;
 
     property alias errorPage: serverNoConnectionView;
     property alias loadingPage: loading;
 
-    property int mainMargin: 0;
+    property int mainMargin: Style.mainWindowMargin !== undefined ? Style.mainWindowMargin : 0;
     property int mainRadius: 0;
 
     property alias authorizationPageAlias: authorizationPage;
+    property alias superuserPasswordPageAlias: superuserPasswordPage;
+
     property alias preferencePage: preferenceDialog;
     property alias userManagementProvider: userManagement;
     property alias documentManager: mainDocumentManager;
     property alias dialogManager: modalDialogManager;
 
+    property alias menuPanelRadius: menuPanel.radius;
+    property alias loadPageByClick: pagesManager.loadByClick;
+
+    property var applicationMain: null;
+
+    property SettingsProvider settingsProvider: null;
+    property SettingsObserver settingsObserver: null;
+
     Component.onCompleted: {
+        console.log("Thumbnail onCompleted");
+
         Events.subscribeEvent("StartLoading", loading.start);
         Events.subscribeEvent("StopLoading", loading.stop);
 
@@ -46,15 +58,26 @@ Rectangle {
 
     property SuperuserProvider superuserProvider : SuperuserProvider {
         onResult: {
+            console.log("SuperuserProvider onResult 2", exists, error);
             if (exists){
+                thumbnailDecoratorContainer.closeAllPages();
+
                 authorizationPage.visible = true;
             }
             else{
-                superuserPasswordPage.visible = true;
+                if (error === ""){
+                    console.log("superuserPasswordPage.visible = true");
+                    superuserPasswordPage.visible = true;
+                }
+                else{
+                    Events.sendEvent("SendCriticalError", error);
+                }
             }
         }
 
         onModelStateChanged: {
+            console.log("Superuser onModelStateChanged", state);
+
             if (state === "Ready"){
                 console.log("SuperuserProvider Ready", state);
                 loading.stop();
@@ -67,6 +90,14 @@ Rectangle {
 
     function updateModels(){
         pagesManager.updateModel();
+    }
+
+    function closeAllPages(){
+        authorizationPage.visible = false;
+        superuserPasswordPage.visible = false;
+        loading.visible = false;
+        serverNoConnectionView.visible = false;
+        preferenceDialog.visible = false;
     }
 
     function onLogout(){
@@ -87,9 +118,13 @@ Rectangle {
         pagesManager.clearModels();
 
         preferenceDialog.clearModels();
-        settingsProvider.clearModel();
 
-        mainDocumentManager.documentManagers = {}
+        if (settingsProvider){
+            settingsProvider.clearModel();
+            settingsProvider.serverModel = null;
+        }
+
+        mainDocumentManager.clear();
     }
 
     MenuPanel {
@@ -104,7 +139,7 @@ Rectangle {
 
         model: pagesManager.pageModel;
 
-        color: Style.imagingToolsGradient1;
+        color: Style.color_menuPanel !==undefined ? Style.color_menuPanel : Style.imagingToolsGradient1;
     }
 
     Item {
@@ -132,7 +167,15 @@ Rectangle {
     MainDocumentManager {
         id: mainDocumentManager;
 
-        menuPanelRef: menuPanel;
+        onDocumentOpened: {
+            for (let i = 0; i < menuPanel.model.GetItemsCount(); i++){
+                let pageId = menuPanel.model.GetData("Id", i);
+                if (pageId === typeId){
+                    menuPanel.activePageIndex = i;
+                    break;
+                }
+            }
+        }
     }
 
     PagesManager {
@@ -146,6 +189,8 @@ Rectangle {
         activePageIndex: menuPanel.activePageIndex;
 
         documentManager: mainDocumentManager;
+
+        authorizationStatusProvider: authorizationPage;
 
         onModelStateChanged: {
             console.log("PagesManager onModelStateChanged", pagesManager.modelState);
@@ -165,9 +210,10 @@ Rectangle {
         z: 10;
 
         anchors.top: parent.top;
+        anchors.topMargin: thumbnailDecoratorContainer.mainMargin;
 
         width: parent.width;
-        height: 60;
+        height: Style.size_panelsHeight !== undefined ? Style.size_panelsHeight : 60;
     }
 
     ServerNoConnectionView {
@@ -181,11 +227,26 @@ Rectangle {
 
         onVisibleChanged: {
             Events.sendEvent("SetCommandsVisible", !visible);
+            Events.sendEvent("SetUserPanelVisible", !visible);
+        }
+
+        onRefresh: {
+            if (thumbnailDecoratorContainer.applicationMain != null){
+                thumbnailDecoratorContainer.applicationMain.updateSystemStatus();
+            }
         }
     }
 
     function showPreferencePage(){
-        preferenceDialog.visible = true;
+        if (thumbnailDecoratorContainer.settingsProvider != null){
+            let representationModel = thumbnailDecoratorContainer.settingsProvider.getRepresentationModel();
+
+            if (thumbnailDecoratorContainer.settingsObserver != null){
+                thumbnailDecoratorContainer.settingsObserver.registerModel(representationModel);
+            }
+
+            modalDialogManager.openDialog(preferenceDialogComp, {"settingsModel": representationModel, "settingsProvider": settingsProvider });
+        }
     }
 
     AuthorizationPage {
@@ -198,20 +259,11 @@ Rectangle {
 
         onLoginSuccessful: {
             authorizationPage.visible = false;
+            authorizationPage.state = "authorized";
 
-            Events.sendEvent("UpdateModels");
             Events.sendEvent("UpdateSettings");
+            Events.sendEvent("UpdateModels");
         }
-
-//        onModelStateChanged: {
-//            if (authorizationPage.modelState === "Ready"){
-//                console.log("AuthorizationPage Ready", modelState);
-//                loading.stop();
-//            }
-//            else{
-//                loading.start();
-//            }
-//        }
     }
 
     SuperuserPasswordPage {
@@ -225,6 +277,12 @@ Rectangle {
             loading.start();
         }
 
+        onVisibleChanged: {
+            if (visible){
+                loading.visible = false;
+            }
+        }
+
         onPasswordSetted: {
             console.log("onPasswordSetted Ready");
 
@@ -236,11 +294,26 @@ Rectangle {
 
         onFailed: {
             console.log("onFailed Ready");
-            loading.stop();
+//            loading.stop();
+
+            closeAllPages();
         }
     }
 
-    PreferencePage {
+    Component {
+        id: preferenceDialogComp;
+        PreferenceDialog {
+            onFinished: {
+                if (buttonId == "Apply"){
+                    if (thumbnailDecoratorContainer.settingsObserver != null){
+                        thumbnailDecoratorContainer.settingsObserver.observedModelDataChanged();
+                    }
+                }
+            }
+        }
+    }
+
+    Preference {
         id: preferenceDialog;
 
         z: 20;
@@ -248,6 +321,19 @@ Rectangle {
         anchors.fill: parent;
 
         visible: false;
+
+        onVisibleChanged: {
+            if (visible){
+                if (thumbnailDecoratorContainer.settingsProvider != null){
+                    let representationModel = thumbnailDecoratorContainer.settingsProvider.getRepresentationModel();
+
+                    preferenceDialog.settingsModel = representationModel;
+                }
+            }
+            else{
+                preferenceDialog.clearModels();
+            }
+        }
     }
 
     ModalDialogManager {
@@ -266,26 +352,42 @@ Rectangle {
 
     UserManagementProvider {
         id: userManagement;
-
-//        onUpdated: {
-//            if (userMode == "NO_USER_MANAGEMENT" || userMode == "OPTIONAL_USER_MANAGEMENT"){
-//                Events.sendEvent("UpdateModels");
-//            }
-//        }
     }
 
     ShortcutManager {
         id: shortcutManager;
     }
 
+    property Component errorDialog: Component {
+        ErrorDialog {
+            onFinished: {}
+        }
+    }
+
+    ErrorManager {
+        id: errorManager;
+
+        anchors.fill: parent;
+
+        errorPage: serverNoConnectionView;
+
+        visible: false;
+    }
+
     Loading {
         id: loading;
 
-        z: 100;
+        z: 999;
 
         anchors.fill: parent;
 
         visible: false;
+    }
+
+    function closeApp(){
+        if (mainDocumentManager.dirtyDocumentsExists()){
+            modalDialogManager.openDialog(saveDialog, {});
+        }
     }
 
     Component {
@@ -303,8 +405,6 @@ Rectangle {
                 }
                 else if (buttonId == "No"){
                     documentManager.closeAllDocuments();
-
-                   // onLogout();
                 }
             }
         }

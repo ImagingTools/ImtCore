@@ -5,15 +5,6 @@ PopupMenuDelegate 1.0 ./Actions/PopupMenuDelegate.qml
 ShortcutManager 1.0 ./Actions/ShortcutManager.qml
 MovingItem 1.0 ./Actions/MovingItem.qml
 ControlArea 1.0 ./Actions/ControlArea.qml
-ApplicationMain 1.0 ./Application/ApplicationMain.qml
-DesignSchemaProvider 1.0 ./Application/DesignSchemaProvider.qml
-LanguageProvider 1.0 ./Application/LanguageProvider.qml
-PagesManager 1.0 ./Application/PagesManager.qml
-PagesProvider 1.0 ./Application/PagesProvider.qml
-ThumbnailDecorator 1.0 ./Application/ThumbnailDecorator.qml
-ServerNoConnectionView 1.0 ./Application/ServerNoConnectionView.qml
-AlertMessage 1.0 ./Application/AlertMessage.qml
-ApplicationInfoProvider 1.0 ./Application/ApplicationInfoProvider.qml
 ControlBase 1.0 ./Base/ControlBase.qml
 Enums 1.0 ./Base/Enums.qml
 AuxButton 1.0 ./Buttons/AuxButton.qml

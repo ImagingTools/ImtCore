@@ -2,39 +2,32 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 
-Item {
+Rectangle {
     id: topPanel;
 
-    height: decorator ? decorator.height : 0
+    color: Style.backgroundColor;
 
-    property var decorator: null;
-    property Component decoratorComponent: Decorators.topPanelDecorator;
+    onWidthChanged: {
+         if (topPanelDecoratorLoader.item){
+             topPanelDecoratorLoader.item.width = topPanel.width;
+         }
+    }
 
-    Component.onCompleted: {
-        if (decoratorComponent){
-            //console.log("decoratorComponent::", decoratorComponent)
-            decorator = decoratorComponent.createObject(topPanel)
-//            decorator.baseButton = baseButton
-            bindWidth.target = decorator
-            bindHeight.target = decorator
-//            bindHeight.target = decorator.baseButton
+    Loader {
+        id: topPanelDecoratorLoader;
+
+        source: Style.topPanelDecoratorPath;
+        onSourceChanged: {
+            console.log("topPanelDecoratorLoader onSourceChanged", topPanelDecoratorLoader.source)
+        }
+
+        onItemChanged: {
+            if (topPanelDecoratorLoader.item){
+                topPanelDecoratorLoader.item.width = topPanel.width;
+                topPanelDecoratorLoader.item.height = topPanel.height;
+                topPanelDecoratorLoader.item.topPanel = topPanel;
+            }
         }
     }
-
-    Binding {
-        id: bindWidth;
-
-        //target: topPanel.decorator ? topPanel.decorator : null
-        property: "width"
-        value: topPanel.width;
-    }
-
-    Binding {
-        id: bindHeight
-
-        property: "height"
-        value: topPanel.height;
-    }
-
 }
 

@@ -1,6 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtcontrols 1.0
+import imtgui 1.0
 
 TreeItemModelObserver {
     id: container;
@@ -11,7 +11,6 @@ TreeItemModelObserver {
     onModelChanged: {
         console.log("LocalSettingsModelObserver changes:");
         for (let i = 0; i < changeList.length; i++){
-
             console.log("change", JSON.stringify(changeList[i]));
             let changeObj = changeList[i]
             let changeId = changeObj["id"];

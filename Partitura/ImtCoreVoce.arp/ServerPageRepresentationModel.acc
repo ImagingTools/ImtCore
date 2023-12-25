@@ -23,7 +23,7 @@
                         <Data IsEnabled="true" Value="Database Settings"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value=":/qml/imtgui/AuxComponents/DatabaseInput.qml"/>
+					    <Data IsEnabled="true" Value=":/qml/imtgui/Settings/DatabaseInput.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
@@ -44,7 +44,7 @@
                         <Data IsEnabled="true" Value="Instance Mask"/>
                     </AttributeInfo>
                     <AttributeInfo Id="PathToQml" Type="Text" ExportId="">
-                        <Data IsEnabled="true" Value=":/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
+					    <Data IsEnabled="true" Value=":/qml/imtgui/Settings/SettingsTextInput.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>

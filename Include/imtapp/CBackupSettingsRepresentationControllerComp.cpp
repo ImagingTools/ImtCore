@@ -34,7 +34,7 @@ bool CBackupSettingsRepresentationControllerComp::GetRepresentationFromValue(
 	elementsModelPtr->SetData("Id", "StartTime", index);
 	elementsModelPtr->SetData("Name", QT_TR_NOOP("Start Time"), index);
 	elementsModelPtr->SetData("Value", startTime.toString("HH:mm"), index);
-	elementsModelPtr->SetData("Source", "qrc:/qml/imtgui/AuxComponents/SettingsTimePicker.qml", index);
+	elementsModelPtr->SetData("Source", "qrc:/qml/imtgui/Settings/SettingsTimePicker.qml", index);
 
 	index = elementsModelPtr->InsertNewItem();
 
@@ -43,7 +43,7 @@ bool CBackupSettingsRepresentationControllerComp::GetRepresentationFromValue(
 	elementsModelPtr->SetData("Id", "BackupFolder", index);
 	elementsModelPtr->SetData("Name", QT_TR_NOOP("Backup Folder"), index);
 	elementsModelPtr->SetData("Value", backupFolderPath, index);
-	elementsModelPtr->SetData("Source", "qrc:/qml/imtgui/AuxComponents/PathPicker.qml", index);
+	elementsModelPtr->SetData("Source", "qrc:/qml/imtgui/PathPicker.qml", index);
 
 	index = elementsModelPtr->InsertNewItem();
 
@@ -52,7 +52,7 @@ bool CBackupSettingsRepresentationControllerComp::GetRepresentationFromValue(
 	elementsModelPtr->SetData("Id", "Interval", index);
 	elementsModelPtr->SetData("Name", QT_TR_NOOP("Backup Interval"), index);
 	elementsModelPtr->SetData("Value", backupInterval, index);
-	elementsModelPtr->SetData("Source", "qrc:/qml/imtgui/AuxComponents/SettingIntegerInput.qml", index);
+	elementsModelPtr->SetData("Source", "qrc:/qml/imtgui/Settings/SettingIntegerInput.qml", index);
 
 	return true;
 }

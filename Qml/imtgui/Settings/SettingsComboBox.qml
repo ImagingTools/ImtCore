@@ -1,6 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtcontrols 1.0
+import imtgui 1.0
 
 Item {
     id: settingsComboBoxContainer;
@@ -31,7 +31,7 @@ Item {
         textCentered: false;
 
         onCurrentIndexChanged: {
-            console.log("onCurrentIndexChanged");
+            console.log("onCurrentIndexChanged", settingsComboBoxContainer.modelData);
             let modelValue = settingsComboBoxContainer.modelData.Value;
             console.log("modelValue", modelValue);
              console.log("settingsComboBox.currentIndex", settingsComboBox.currentIndex);

@@ -1,7 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
-import imtcontrols 1.0
 
 QtObject {
     id: pagesProvider;
@@ -38,7 +37,7 @@ QtObject {
         }
 
         onStateChanged: {
-            console.log("State:",this.state, pagesGqlModel)
+            console.log("Pages Provider State:",this.state, pagesGqlModel)
             if (this.state === "Ready"){
                 if (this.ContainsKey("data")){
                     var dataModelLocal = this.GetData("data");
@@ -52,6 +51,9 @@ QtObject {
                         pagesProvider.pagesModel = dataModelLocal;
                     }
                 }
+            }
+            else if (this.state === "Error"){
+                Events.sendEvent("SendError", {"Message": "Request failed", "ErrorType": "Critical"})
             }
         }
     }

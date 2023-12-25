@@ -15,10 +15,6 @@ Item {
         }
     }
 
-    Component.onCompleted: {
-        console.log("tabPanelDecorator onCompleted");
-    }
-
     Rectangle {
         anchors.fill: parent;
         color: tabPanelDecorator.rootItem ? tabPanelDecorator.rootItem.selected ? Style.baseColor: "transparent": "transparent";

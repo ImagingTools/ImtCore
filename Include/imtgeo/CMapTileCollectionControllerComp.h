@@ -4,7 +4,7 @@
 
 
 // ImtCore includes
-#include <imtguigql/CObjectCollectionControllerCompBase.h>
+#include <imtgql/CObjectCollectionControllerCompBase.h>
 #include <imtgeo/CTileProvider.h>
 
 
@@ -12,10 +12,10 @@ namespace imtgeo
 {
 
 
-class CMapTileCollectionControllerComp: public imtguigql::CObjectCollectionControllerCompBase, imtgeo::CTileProvider
+class CMapTileCollectionControllerComp: public imtgql::CObjectCollectionControllerCompBase, imtgeo::CTileProvider
 {
 public:
-	typedef imtguigql::CObjectCollectionControllerCompBase BaseClass;
+	typedef imtgql::CObjectCollectionControllerCompBase BaseClass;
 
     I_BEGIN_COMPONENT(CMapTileCollectionControllerComp);
 	I_END_COMPONENT;

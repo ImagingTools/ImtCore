@@ -15,17 +15,6 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools") "GraphQL");
 
 I_EXPORT_COMPONENT(
-			PagesDataController,
-			"Pages data controller",
-			"Pages Data Controller" IM_AUTHOR("\"Viktor Shcherbina\""));
-
-I_EXPORT_COMPONENT(
-			CommandsDataController,
-			"Commands data controller",
-			"Commands Data Controller" IM_AUTHOR("\"Viktor Shcherbina\""));
-
-
-I_EXPORT_COMPONENT(
 			GetStyleDataController,
 			"Controller providing application style in GraphQL representation",
 			"Style Data Controller" IM_AUTHOR("\"Viktor Shcherbina\""));

@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtcontrols 1.0
+import imtgui 1.0
+import imtqml 1.0
 
 Rectangle {
     id: alertMessage;
@@ -13,7 +14,7 @@ Rectangle {
     property int margin: 10;
     property string message: "";
     property string colorText: Style.textColor;
-    property string iconSource: "qrc:/Icons/Light/Alert_On_Active";
+    property string iconSource: "../../../" + Style.getIconPath("Icons/Alert", Icon.State.On, Icon.Mode.Normal);
 
     Image {
         id: icon;

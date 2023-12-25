@@ -1,18 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtcontrols 1.0
+import imtgui 1.0
 import imtqml 1.0
-
-import '../Actions'
-import '../Application'
-import '../Buttons'
-import '../Dialogs'
-import '../Document'
-import '../Inputs'
-import '../Models'
-import '../Panels'
-import '../Settings'
-import '../Views'
 
 
 Item {
@@ -20,22 +9,48 @@ Item {
 
     anchors.fill: parent;
 
-
-
     property string message;
-    property string systemStatus: "UNKNOWN_ERROR";
+    property string systemStatus: "NO_ERROR";
     property alias localSettings: application.settingsProvider.localModel;
+
+    property alias thumbDecMenuPanelRadius: thumbnailDecorator.menuPanelRadius;
+
+    property var applicationInfo;
+
+    property bool serverReady: false;
+    property bool useWebSocketSubscription: false;
+
+    property alias loadPageByClick: thumbnailDecorator.loadPageByClick;
+
+    onApplicationInfoChanged: {
+        console.log("onApplicationInfoChanged");
+        if (application.applicationInfo){
+            applicationInfoProvider.clientApplicationInfo = application.applicationInfo;
+        }
+    }
 
     signal updateSystemStatus();
     signal settingsUpdate();
     signal localSettingsUpdated();
 
+    onUpdateSystemStatus: {
+        console.log("AppMain onUpdateSystemStatus");
+    }
+
     onLocalSettingsUpdated: {
         application.updateAllModels();
     }
 
+    onSystemStatusChanged: {
+        Events.sendEvent("SystemStatusChanged", application.systemStatus)
+    }
+
     Component.onCompleted: {
+        console.log("AppMain onCompleted");
+
         Events.subscribeEvent("UpdateModels", application.updateAllModels);
+        Events.subscribeEvent("Logout", application.onLogout);
+        Events.subscribeEvent("UpdateSystemStatus", application.updateSystemStatus);
 
         thumbnailDecorator.userManagementProvider.updated.connect(application.onUserModeChanged);
 
@@ -44,12 +59,8 @@ Item {
 
     Component.onDestruction: {
         Events.unSubscribeEvent("UpdateModels", application.updateAllModels);
-    }
-
-    onSystemStatusChanged: {
-        console.log("onSystemStatusChanged", application.systemStatus);
-
-        application.run();
+        Events.unSubscribeEvent("Logout", application.onLogout);
+        Events.unSubscribeEvent("UpdateSystemStatus", application.updateSystemStatus);
     }
 
     property alias thumbnailDecoratorGui: thumbnailDecorator;
@@ -58,48 +69,52 @@ Item {
     {
     }
 
+    property SettingsObserver settingsObserver : SettingsObserver
+    {
+        designProvider: application.designProvider;
+        languageProvider: application.languageProvider;
+        settingsProvider: application.settingsProvider;
+    }
+
     property SettingsProvider settingsProvider : SettingsProvider
     {
+        applicationInfoProvider: application.applicationInfoProvider;
+
         onServerModelChanged: {
-            application.serverSettingsObserver.registerModel(serverModel);
-            application.designProvider.applyDesignSchema();
+            let design = application.designProvider.getDesignSchema();
+
+            console.log("design", design);
+
+            let index = application.designProvider.getDesignSchemaIndex(design);
+            if (index >= 0){
+                application.settingsObserver.onDesignSchemaChanged(index);
+            }
         }
 
         onLocalModelChanged: {
-            localSettingsObserver.registerModel(localModel);
-            timer.start();
-        }
-
-        onServerSettingsSaved: {
-            serverSettingsObserver.observedModelDataChanged();
+            application.designProvider.applyCachedDesignSchema();
         }
 
         onLocalSettingsSaved: {
             application.settingsUpdate();
         }
-    }
 
-    // Timer for updating design schema when start application, without this timer request does not come
-    Timer {
-        id: timer;
-
-        interval: 100;
-
-        onTriggered: {
-            designProvider.applyDesignSchema();
+        property bool applyCachedLanguage: application.serverReady && application.settingsProvider.serverModel != null;
+        onApplyCachedLanguageChanged: {
+            console.log("onApplyCachedLanguageChanged", applyCachedLanguage);
+            if (applyCachedLanguage){
+                let lang = application.languageProvider.getLanguage();
+                application.languageProvider.setLanguage(lang);
+            }
         }
-    }
 
-    property ServerSettingsModelObserver serverSettingsObserver : ServerSettingsModelObserver
-    {
-        designProvider: application.designProvider;
-        languageProvider: application.languageProvider;
-    }
-
-    property LocalSettingsModelObserver localSettingsObserver : LocalSettingsModelObserver
-    {
-        designProvider: application.designProvider;
-        languageProvider: application.languageProvider;
+        property bool applyCachedSchema: application.serverReady && application.settingsProvider.localModel != null;
+        onApplyCachedSchemaChanged: {
+            console.log("onApplyCachedSchemaChanged", applyCachedSchema);
+            if (applyCachedSchema){
+                application.designProvider.applyCachedDesignSchema();
+            }
+        }
     }
 
     property DesignSchemaProvider designProvider : DesignSchemaProvider
@@ -112,20 +127,62 @@ Item {
         settingsProvider: application.settingsProvider;
     }
 
+    SubscriptionManager {
+        id: subscriptionManager;
+
+        active: application.useWebSocketSubscription;
+
+        property bool applyUrl: application.serverReady && application.settingsProvider.serverModel != null;
+        onApplyUrlChanged: {
+            if (applyUrl){
+                console.log("onApplyUrlChanged");
+                let webSocketServerUrl = application.settingsProvider.getValue("WebSocketServerUrl");
+                console.log("webSocketServerUrl", webSocketServerUrl);
+                if (webSocketServerUrl && webSocketServerUrl !== ""){
+                    webSocketServerUrl =  webSocketServerUrl.replace("http", "ws")
+                    subscriptionManager.url = webSocketServerUrl;
+
+                    return;
+                }
+
+                let serverUrl = application.settingsProvider.getValue("ServerUrl");
+
+                serverUrl = serverUrl.replace("http", "ws")
+
+                if (serverUrl[serverUrl.length - 1] !== '/'){
+                    serverUrl += "/";
+                }
+
+                if (context.application){
+                    serverUrl += context.application + "/";
+                }
+
+                serverUrl += "wssub";
+
+                subscriptionManager.url = serverUrl;
+            }
+        }
+
+        onError: {
+            Events.sendEvent("SendWarningError", qsTr("There is no connection to the subscription server. Check the Web Server Socket Url in the settings or contact your system administrator."));
+        }
+    }
+
     ThumbnailDecorator {
         id: thumbnailDecorator;
 
         anchors.fill: parent;
 
         settingsProvider: application.settingsProvider;
-        applicationInfoProvider: application.applicationInfoProvider;
+        settingsObserver: application.settingsObserver;
+
+        applicationMain: application;
     }
 
+    function onLogout(){
+        settingsProvider.serverModel = null;
 
-
-    function onLocalizationChanged(){
-        console.log("Main onLocalizationChanged");
-        Events.sendEvent("OnLocalizationChanged");
+        subscriptionManager.clear();
     }
 
     function updateAllModels(){
@@ -133,28 +190,8 @@ Item {
         applicationInfoProvider.updateModel();
     }
 
-    function onUserModeChanged(){
-        application.run();
-    }
-
-    function run(){
-        console.log("run");
-
-        let userMode = thumbnailDecorator.userManagementProvider.userMode;
-        let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
-
-        // If no user management - update all model without login
-        if (userMode == "NO_USER_MANAGEMENT" || userMode == "OPTIONAL_USER_MANAGEMENT"){
-            application.onSimpleUserManagement();
-        }
-        else if (userMode == "STRONG_USER_MANAGEMENT"){
-            application.onStrongUserManagement();
-        }
-    }
-
     function onSimpleUserManagement(){
         let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
-
         if (loggedUserId === ""){
             thumbnailDecorator.authorizationPageAlias.setLoggedUserId("Anonim");
 
@@ -164,42 +201,67 @@ Item {
 
     function onStrongUserManagement(){
         let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
-
-        if (application.systemStatus == "NO_ERROR"){
-            thumbnailDecorator.errorPage.visible = false;
-
-            // If user is logged in the system - continue, else check supeuser
-            if (loggedUserId === ""){
-                thumbnailDecorator.superuserProvider.superuserExists();
-            }
-        }
-        else{
-            application.showErrorPage(application.message);
+        if (loggedUserId === ""){
+            thumbnailDecorator.superuserProvider.superuserExists();
         }
     }
 
     function setSystemStatus(status, message){
         console.log("setSystemStatus", status, message);
         application.message = message;
-
         application.systemStatus = status;
-    }
 
-    function showErrorPage(errorMessage){
-        console.log("showErrorPage", errorMessage);
+        if (application.systemStatus == "NO_ERROR"){
+            thumbnailDecorator.errorPage.visible = false;
 
-        if (errorMessage && errorMessage !== ""){
-            thumbnailDecorator.errorPage.text = errorMessage;
+            let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
+            if (loggedUserId === ""){
+                thumbnailDecorator.closeAllPages();
+
+                firstModelsInit();
+            }
         }
+        else if (application.systemStatus == "UNKNOWN_ERROR"){
 
-        thumbnailDecorator.errorPage.visible = true;
+        }
+        else if (application.systemStatus == "CONNECTION_ERROR"){
+            thumbnailDecorator.closeAllPages();
+
+            thumbnailDecorator.errorPage.text = message;
+            thumbnailDecorator.errorPage.visible = true;
+        }
+        else if (application.systemStatus == "DATABASE_CONNECTION_ERROR"){
+            thumbnailDecorator.closeAllPages();
+
+            thumbnailDecorator.errorPage.text = message;
+            thumbnailDecorator.errorPage.visible = true;
+        }
+        else if (application.systemStatus == "TRY_CONNECTING"){
+            thumbnailDecorator.closeAllPages();
+
+            thumbnailDecorator.errorPage.text = message;
+            thumbnailDecorator.errorPage.visible = true;
+        }
     }
 
     function firstModelsInit(){
         console.log("firstModelsInit");
-        thumbnailDecorator.userManagementProvider.updateModel();
+        if (application.systemStatus == "NO_ERROR"){
+            thumbnailDecorator.userManagementProvider.updateModel();
+        }
     }
 
+    function onUserModeChanged(){
+        let userMode = thumbnailDecorator.userManagementProvider.userMode;
+        let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
+
+        if (userMode == "NO_USER_MANAGEMENT" || userMode == "OPTIONAL_USER_MANAGEMENT"){
+            application.onSimpleUserManagement();
+        }
+        else if (userMode == "STRONG_USER_MANAGEMENT"){
+            application.onStrongUserManagement();
+        }
+    }
 //    Connections {
 //        target: Qt.application;
 
@@ -211,5 +273,4 @@ Item {
 //            console.log("dirtyDocumentsExists", dirtyDocumentsExists);
 //        }
 //    }
-
 }

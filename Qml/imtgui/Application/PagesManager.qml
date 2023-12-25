@@ -1,15 +1,21 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
-import imtcontrols 1.0
+import imtauthgui 1.0
 
 Item {
     id: container;
 
     property TreeItemModel pageModel: TreeItemModel {};
     property Item activeItem: null;
-    property int activePageIndex: -1;
-    property MainDocumentManager documentManager: null;
+    property int activePageIndex: 0;
+    property var documentManager: null;
+    property AuthorizationPage authorizationStatusProvider: null;
+
+    /**
+        The page will be loaded only by click if it hasn't loaded yet
+    */
+    property bool loadByClick: true;
 
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
@@ -31,8 +37,12 @@ Item {
 
     function onLocalizationChanged(language){
         console.log("pagesProvider onLocalizationChanged", language);
-
-        pagesProvider.updateModel();
+        if (container.authorizationStatusProvider != null){
+            let loggedUserId = container.authorizationStatusProvider.getLoggedUserId();
+            if (loggedUserId !== ""){
+                pagesProvider.updateModel();
+            }
+        }
     }
 
     property alias modelState: pagesProvider.modelState;
@@ -50,8 +60,6 @@ Item {
                     updateRepeaterModel = false;
                 }
             }
-
-            console.log("updateRepeaterModel", updateRepeaterModel);
 
             if (updateRepeaterModel){
                 pagesData.model = pagesProvider.pagesModel;
@@ -76,36 +84,19 @@ Item {
 
             visible: container.activePageIndex === model.index;
 
-            Component.onCompleted: {
-                console.log("pagesDeleg onCompleted", model.Id);
-
-                if (container.documentManager != null){
-                    container.documentManager.registerDocumentManager(model.Id, null);
-                }
-            }
-
-            Component.onDestruction: {
-                console.log("pagesDeleg onDestruction", model.Id);
-            }
-
-            /**
-                The page will be loaded only by click if it hasn't loaded yet
-            */
             onVisibleChanged: {
-                console.log("pagesDeleg onVisibleChanged", visible, model.Id);
-                console.log("container.activePageIndex", container.activePageIndex);
-                console.log("model.index", model.index);
-                if(pagesDeleg.visible){
+                if(pagesDeleg.visible && container.loadByClick){
                     if (!pagesLoader.item){
-                        if (container.pageModel && container.pageModel.ContainsKey("Source", model.index)){
-                            var source = container.pageModel.GetData("Source", model.index);
-                            if (source){
-                                pagesLoader.source = source;
-                            }
-                        }
+                        pagesLoader.source = model.Source;
                     }
 
                     container.activeItem = pagesLoader.item;
+                }
+            }
+
+            Component.onCompleted: {
+                if (!container.loadByClick){
+                    pagesLoader.source = model.Source;
                 }
             }
 
@@ -113,19 +104,25 @@ Item {
                 id: pagesLoader;
                 anchors.fill: parent;
 
+                visible: parent.visible;
+
                 onItemChanged: {
                     if (pagesLoader.item){
-                        if (pagesLoader.item.mainDocumentManager !== undefined){
-                            pagesLoader.item.mainDocumentManager = container.documentManager;
-                        }
+                        pagesLoader.item.startPageObj =
+                        {
+                            "Id": model.Id,
+                            "Name": model.Name,
+                            "Source": model.StartItem,
+                            "CommandId": model.Id
+                        };
+                    }
+                }
 
-                        if(pagesLoader.item.startPageObj !== undefined){
-                            pagesLoader.item.startPageObj = {"Id": model.Id,
-                                "Name": model.Name,
-                                "Source": model.StartItem,
-                                "CommandsId": model.Id};
-                        }
+                onStatusChanged: {
+                    console.log("pagesLoader onStatusChanged", pagesLoader.source);
 
+                    if (status == Loader.Error){
+                        console.error("Loading page with source", pagesLoader.source, "was failed!");
                     }
                 }
             }

@@ -1,7 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
-import imtcontrols 1.0
+import imtgui 1.0
 
 Rectangle {
     id: tabPanelContainer;
@@ -23,10 +23,6 @@ Rectangle {
     signal rightClicked();
     signal leftClicked();
 
-    Component.onCompleted: {
-        console.log("TabPanel onCompleted", height);
-    }
-
     function viewTabInListView(index) {
         list.positionViewAtIndex(index, ListView.Contain);
     }
@@ -45,20 +41,7 @@ Rectangle {
         spacing: 0;
 
         delegate: TabDelegate {
-
-            Component.onCompleted: {
-                console.log("TabDelegate onCompleted", model.Title);
-            }
-
             height: list.height;
-
-            onHeightChanged: {
-                console.log("TabDelegate onHeightChanged", height);
-            }
-
-            onWidthChanged: {
-                console.log("TabDelegate onWidthChanged", width);
-            }
 
 //            width: 100;
 
@@ -69,8 +52,7 @@ Rectangle {
             text: model.Title ? model.Title : "";
             isCloseEnable: tabPanelContainer.isCloseEnable;
 
-//            decoratorSource: Style.tabPanelDecoratorPath;
-            decoratorSource: "qrc:/qml/imtcontrols/Panels/TabPanelDecorator.qml";
+            decoratorSource: Style.tabPanelDecoratorPath;
 
             onClicked: {
                 tabPanelContainer.selectedIndex = model.index;

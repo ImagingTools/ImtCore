@@ -53,10 +53,10 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DesignPathToQml" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsComboBox.qml"/>
+					    <Data IsEnabled="true" Value="qrc:/qml/imtgui/Settings/SettingsComboBox.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LanguagePathToQml" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsComboBox.qml"/>
+					    <Data IsEnabled="true" Value="qrc:/qml/imtgui/Settings/SettingsComboBox.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
@@ -77,7 +77,7 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ServerUrlPath" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="qrc:/qml/imtgui/AuxComponents/SettingsTextInput.qml"/>
+					    <Data IsEnabled="true" Value="qrc:/qml/imtgui/Settings/SettingsTextInput.qml"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>

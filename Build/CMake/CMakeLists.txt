@@ -75,6 +75,11 @@ add_subdirectory("${INCLUDE_DIR}/imtauthdb/CMake" "${AUX_INCLUDE_DIR}/imtauthdb"
 
 #-------- Qml --------
 add_subdirectory("${QML_DIR}/imtdocgui/CMake" "${AUX_INCLUDE_DIR}/imtdocgui")
+add_subdirectory("${QML_DIR}/imtauthgui/CMake" "${AUX_INCLUDE_DIR}/imtauthguiqml")
+add_subdirectory("${QML_DIR}/imtcolqml/CMake" "${AUX_INCLUDE_DIR}/imtcolqml")
+add_subdirectory("${QML_DIR}/imtgui/CMake" "${AUX_INCLUDE_DIR}/imtguiqml")
+add_subdirectory("${QML_DIR}/imtguigql/CMake" "${AUX_INCLUDE_DIR}/imtguigqlqml")
+add_subdirectory("${QML_DIR}/imtlicgui/CMake" "${AUX_INCLUDE_DIR}/imtlicguiqml")
 
 if(NOT DEFINED USE_GEO OR USE_GEO)
 	add_subdirectory("${INCLUDE_DIR}/imtgeo/CMake" "${AUX_INCLUDE_DIR}/imtgeo")

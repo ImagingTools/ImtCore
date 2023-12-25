@@ -1,7 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
-import imtcontrols 1.0
 
 Rectangle {
     id: menuPanel;
@@ -33,39 +32,65 @@ Rectangle {
 
     signal activePageChanged;
 
+    Component.onCompleted: {
+        Events.subscribeEvent("ChangePage", menuPanel.changePage);
+        Events.subscribeEvent("UpdatePageVisualStatus", menuPanel.updateVisualStatus);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("ChangePage", menuPanel.changePage);
+        Events.unSubscribeEvent("UpdatePageVisualStatus", menuPanel.updateVisualStatus);
+    }
+
+    function updateVisualStatus(data){
+        if (!data){
+            return;
+        }
+
+        if (!('Id' in data)){
+            return;
+        }
+        let pageId = data["Id"];
+
+        if ('Name' in data){
+            let pageName = data["Name"];
+
+            for (let i = 0; i < menuPanel.model.GetItemsCount(); i++){
+                let id = menuPanel.model.GetData("Id", i);
+                if (pageId == id){
+                    menuPanel.model.SetData("Name", pageName,  i);
+
+                    break;
+                }
+            }
+        }
+
+        if ('Icon' in data){
+            let pageIcon = data["Icon"];
+
+            for (let i = 0; i < menuPanel.model.GetItemsCount(); i++){
+                let id = menuPanel.model.GetData("Id", i);
+                if (pageId == id){
+                    menuPanel.model.SetData("Icon", pageIcon,  i);
+
+                    break;
+                }
+            }
+        }
+    }
+
     function clearModels(){
         lvPages.model = 0;
         menuPanel.activePageIndex = -1;
     }
 
-    property bool isQtStyle: false;
-
-    Component.onCompleted: {
-        Events.subscribeEvent("QtStyle", menuPanel.setQtStyle);
-        Events.subscribeEvent("AcfStyle", menuPanel.setAcfStyle);
-    }
-
-    Component.onDestruction: {
-        Events.unSubscribeEvent("QtStyle", menuPanel.setQtStyle);
-        Events.unSubscribeEvent("AcfStyle", menuPanel.setAcfStyle);
-
-    }
-
-    function setQtStyle(){
-        menuPanel.isQtStyle = true;
-    }
-
-    function setAcfStyle(){
-        menuPanel.isQtStyle = false;
-
-    }
-
-    function sendStyle(){
-        if(menuPanel.isQtStyle){
-            Events.sendEvent("QtStyle");
-        }
-        else {
-            Events.sendEvent("AcfStyle");
+    function changePage(pageId){
+        console.log("MenuPanel onChangePage", pageId);
+        for(var i = 0; i < lvPages.count; ++i){
+            let item = lvPages.itemAtIndex(i);
+            if(item.pageId === pageId){
+                item.clicked();
+            }
         }
     }
 
@@ -105,16 +130,24 @@ Rectangle {
                 }
             }
 
+            property string pageName: model["Name"];
+            onPageNameChanged: {
+                Events.sendEvent("PageNameChanged", {"Id": model["Id"], "Name": model["Name"]})
+            }
+
             text:  model["Name"];
             textColor: Style.textColor;
             fontName: menuPanel.fontName;
-            imageSource: (highlighted || selected) ? "../../../" + Style.theme + "/Icons/" + model["Icon"] + "_On_Selected.svg":
-                                                     "../../../" + Style.theme + "/Icons/" + model["Icon"] + "_On_Normal.svg";
+
+            imageSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["Icon"], "On", "Selected"):
+                                                     "../../../" + Style.getIconPath(model["Icon"], "On", "Normal");
+
             decoratorSource : Style.menuButtonDecoratorPath;
             selected: menuPanel.activePageIndex === model.index;
+            property string pageId: model["Id"];
 
             onClicked: {
-//                lvPages.currentIndex = model.index;
+                //                lvPages.currentIndex = model.index;
                 console.log("MenuPanel onClicked", model.index);
                 menuPanel.activePageIndex = model.index;
                 menuPanel.activePageName = model["Name"];
@@ -122,7 +155,6 @@ Rectangle {
                 menuPanel.activePageId = model["Id"];
 
                 lvPages.forceActiveFocus();
-                menuPanel.sendStyle();
             }
         }
     }

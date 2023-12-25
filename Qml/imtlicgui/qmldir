@@ -1,0 +1,9 @@
+module imtlicgui
+
+singleton FeaturesProvider 1.0 FeaturesProvider.qml
+LicensesProvider 1.0 LicensesProvider.qml
+FeaturesDependenciesProvider 1.0 FeaturesDependenciesProvider.qml
+
+FeatureCollectionView 1.0 FeatureCollectionView.qml
+FeatureEditor 1.0 FeatureEditor.qml
+PackageCollectionViewCommandsDelegate 1.0 PackageCollectionViewCommandsDelegate.qml

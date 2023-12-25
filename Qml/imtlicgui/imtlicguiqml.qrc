@@ -1,0 +1,29 @@
+<RCC>
+    <qresource prefix="/qml">
+        <file alias="imtlicgui/qmldir">qmldir</file>
+        <file alias="imtlicgui/FeaturesProvider.qml">FeaturesProvider.qml</file>
+        <file alias="imtlicgui/FeaturesDialog.qml">FeaturesDialog.qml</file>
+        <file alias="imtlicgui/FeaturesTableItemDelegate.qml">FeaturesTableItemDelegate.qml</file>
+        <file alias="imtlicgui/FeatureEditor.qml">FeatureEditor.qml</file>
+        <file alias="imtlicgui/FeatureCollectionView.qml">FeatureCollectionView.qml</file>
+        <file alias="imtlicgui/FeaturesDependenciesProvider.qml">FeaturesDependenciesProvider.qml</file>
+
+        <file alias="imtlicgui/PackageCollectionViewCommandsDelegate.qml">PackageCollectionViewCommandsDelegate.qml</file>
+        <file alias="imtlicgui/PackageViewCommandsDelegate.qml">PackageViewCommandsDelegate.qml</file>
+        <file alias="imtlicgui/PackageTreeItemDelegate.qml">PackageTreeItemDelegate.qml</file>
+        <file alias="imtlicgui/PackageViewItemDelegate.qml">PackageViewItemDelegate.qml</file>
+        
+        <file alias="imtlicgui/ProductViewItemDelegate.qml">ProductViewItemDelegate.qml</file>
+        <file alias="imtlicgui/ProductViewTableItemDelegate.qml">ProductViewTableItemDelegate.qml</file>
+        <file alias="imtlicgui/ProductViewTableItemDelegate.qml">ProductViewTableItemDelegate.qml</file>
+        <file alias="imtlicgui/ProductViewCommandsDelegate.qml">ProductViewCommandsDelegate.qml</file>
+        <file alias="imtlicgui/ProductView.qml">ProductView.qml</file>
+        <file alias="imtlicgui/ProductCollectionView.qml">ProductCollectionView.qml</file>
+        <file alias="imtlicgui/ProductCollectionViewCommandsDelegate.qml">ProductCollectionViewCommandsDelegate.qml</file>
+
+        <file alias="imtlicgui/LicenseEditor.qml">LicenseEditor.qml</file>
+        <file alias="imtlicgui/LicenseCollectionView.qml">LicenseCollectionView.qml</file>
+        <file alias="imtlicgui/LicensesProvider.qml">LicensesProvider.qml</file>
+        <file alias="imtlicgui/TableInstanceLicensesDelegate.qml">TableInstanceLicensesDelegate.qml</file>
+    </qresource>
+</RCC>
