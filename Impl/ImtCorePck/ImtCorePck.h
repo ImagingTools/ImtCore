@@ -26,7 +26,6 @@
 #include <imtbase/CTextParamSummaryRepresentationControllerComp.h>
 #include <imtbase/CBinaryDataProviderComp.h>
 #include <imtbase/CParameterLinkControllerComp.h>
-// #include <imtbase/CObjectCollectionBasedPersistenceComp.h>
 #include <imtbase/CTimeFilterParam.h>
 #include <imtbase/CCollectionDataControllerComp.h>
 #include <imtbase/CQtResourceLoaderComp.h>
@@ -38,6 +37,7 @@
 #include <imtbase/CParamSetRepresentationControllerComp.h>
 #include <imtbase/CSelectionParamRepresentationControllerComp.h>
 #include <imtbase/CTextParamRepresentationControllerComp.h>
+#include <imtbase/CUrlParamRepresentationControllerComp.h>
 #include <imtbase/CDatabaseAccessSettingsRepresentationControllerComp.h>
 #include <imtbase/CGuiElementRepresentationControllerComp.h>
 #include <imtbase/CPageBasedGuiRepresentationControllerComp.h>
@@ -105,6 +105,7 @@ typedef ibase::TModelObserverCompWrap<icomp::TModelCompWrap<imtbase::CTransactio
 typedef imtbase::CParamSetRepresentationControllerComp ParamSetRepresentationController;
 typedef imtbase::CSelectionParamRepresentationControllerComp SelectionParamRepresentationController;
 typedef imtbase::CTextParamRepresentationControllerComp TextParamRepresentationController;
+typedef imtbase::CUrlParamRepresentationControllerComp UrlParamRepresentationController;
 typedef imtbase::CDatabaseAccessSettingsRepresentationControllerComp DatabaseAccessSettingsRepresentationController;
 typedef imtbase::CPageBasedGuiRepresentationControllerComp PageBasedGuiRepresentationController;
 typedef imtbase::CGuiElementRepresentationControllerComp GuiElementRepresentationController;

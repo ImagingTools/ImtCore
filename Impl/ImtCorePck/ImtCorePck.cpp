@@ -124,11 +124,6 @@ I_EXPORT_COMPONENT(
 			"Parameter link controller",
 			"Parameter Controller");
 
-// I_EXPORT_COMPONENT(
-// 			ObjectCollectionBasedPersistence,
-// 			"Object collection based persistence",
-// 			"Object Collection Persistence");
-
 I_EXPORT_COMPONENT(
 			TimeFilterParam,
 			"Time-based filter parameter",
@@ -178,6 +173,11 @@ I_EXPORT_COMPONENT(
 			TextParamRepresentationController,
 			"Text param representation controller",
 			"Text Param Representation Controller");
+
+I_EXPORT_COMPONENT(
+			UrlParamRepresentationController,
+			"URL param representation controller",
+			"URL Param Representation Controller");
 
 I_EXPORT_COMPONENT(
 			SelectionParamRepresentationController,
