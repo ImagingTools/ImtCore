@@ -1,0 +1,41 @@
+module imtgui
+
+BaseText 1.0 BaseText.qml
+
+ComboBox 1.0 ComboBox.qml
+CheckBox 1.0 CheckBox.qml
+DatePicker 1.0 DatePicker.qml
+AuxButton 1.0 AuxButton.qml
+PreferenceButton 1.0 PreferenceButton.qml
+TextButton 1.0 TextButton.qml
+CustomTextField 1.0 CustomTextField.qml
+TextFieldWithTitle 1.0 TextFieldWithTitle.qml
+CustomTextEdit 1.0 CustomTextEdit.qml
+Splitter 1.0 Splitter.qml
+Calendar 1.0 Calendar.qml
+CalendarNew 1.0 CalendarNew.qml
+
+CustomScrollbar 1.0 CustomScrollbar.qml
+SwitchCustom 1.0 SwitchCustom.qml
+CustomTooltip 1.0 CustomTooltip.qml
+TopButtonDecorator 1.0 TopButtonDecorator.qml
+CommonButtonDecorator 1.0 CommonButtonDecorator.qml
+BaseButtonDecorator 1.0 BaseButtonDecorator.qml
+BaseButton 1.0 BaseButton.qml
+RoundButton 1.0 RoundButton.qml
+CustomRadioButton 1.0 CustomRadioButton.qml
+RadioBox 1.0 RadioBox.qml
+
+ButtonPanel 1.0 ButtonPanel.qml
+Diagram 1.0 Diagram.qml
+BarChart 1.0 BarChart.qml
+Piechart 1.0 Piechart.qml
+PaintedCorner 1.0 PaintedCorner.qml
+SearchComp 1.0 SearchComp.qml
+MovingItem 1.0 MovingItem.qml
+ChangeItemSize 1.0 ChangeItemSize.qml
+SpinBox 1.0 SpinBox.qml
+ProgressBar 1.0 ProgressBar.qml
+CheckBoxMenu 1.0 CheckBoxMenu.qml
+ExpandingContainer 1.0 ExpandingContainer.qml
+Gallery 1.0 Gallery.qml

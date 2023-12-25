@@ -1,0 +1,485 @@
+import QtQuick 2.12
+import Acf 1.0
+import imtgui 1.0
+import imtqml 1.0
+
+Rectangle {
+    id: gallery;
+
+    color: "#000000";
+
+    property TreeItemModel model: TreeItemModel{};
+    property string nameId: "Source";
+    property bool isOpen: visible;
+    property int animDuration: 100;
+    property bool isFullScreen: false;
+
+    signal deleteSignal(int index);
+
+    onDeleteSignal: {
+        console.log("Delete selected photo: ", index);
+        model.RemoveItem(index);
+        model.Refresh();
+        list.positionViewAtIndex(0, ListView.Center);
+        list.selectedIndex = 0;
+    }
+
+    function open(){
+        if(!gallery.visible && model && model.GetItemsCount()){
+            gallery.width = 0;
+            gallery.visible = true;
+            widthAnimTo.start();
+        }
+    }
+
+    function close(){
+        if(gallery.visible){
+            widthAnimFrom.start();
+        }
+    }
+
+
+    NumberAnimation {
+        id: widthAnimTo;
+
+        target: gallery
+        property: "width"
+        duration: gallery.animDuration;
+        from: 0; to: parent.width;
+    }
+
+    NumberAnimation {
+        id: widthAnimFrom;
+
+        target: gallery
+        property: "width"
+        duration: gallery.animDuration;
+        from: parent.width; to: 0;
+        onFinished: {
+            gallery.visible = false;
+        }
+    }
+
+    MouseArea{
+        anchors.fill: parent;
+
+        visible: parent.visible;
+        enabled: visible;
+        hoverEnabled: visible;
+    }
+
+    Item{
+        id: header;
+
+        width: parent.width;
+        height: 50;
+
+        Text {
+            id: titleText;
+
+            anchors.centerIn: parent;
+
+            color: Style.textColor;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_title;
+
+            text: "Галерея";
+
+        }
+
+        AuxButton{
+            id: deleteButton;
+
+            anchors.verticalCenter: parent.verticalCenter;
+            anchors.left: parent.left;
+            anchors.leftMargin: Style.size_smallMargin;
+
+            width: 20;
+            height: width;
+            radius: width;
+
+            enabled: visible;
+
+            color: "transparent";
+
+            border.color: "transparent";
+            border.width: 0;
+            hasIcon: true;
+            iconSource:  "../../../" +Style.getIconPath("Icons/Clear", Icon.State.On, Icon.Mode.Normal);
+
+            iconWidth: width;
+            iconHeight: width;
+
+            onClicked: {
+                let param = {"centered" : true};
+                modalDialogManager.openDialog(confirmationComp, param);
+                //gallery.deleteSignal(list.selectedIndex);
+            }
+        }
+
+        AuxButton{
+            id: closeButton;
+
+            anchors.verticalCenter: parent.verticalCenter;
+            anchors.right: parent.right;
+            anchors.rightMargin: Style.size_smallMargin;
+
+            width: 20;
+            height: width;
+            radius: width;
+
+            enabled: visible;
+
+            color: "transparent";
+
+            border.color: "transparent";
+            border.width: 0;
+            hasIcon: true;
+            iconSource:  "../../../" +Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
+
+            iconWidth: width;
+            iconHeight: width;
+
+            onClicked: {
+                gallery.close();
+            }
+        }
+    }
+
+    Rectangle{
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+        anchors.bottom: listContainer.top;
+        anchors.bottomMargin: gallery.isFullScreen ? - 5 : 5;
+        height: 1;
+        color: "gray";
+        opacity: 0.2;
+        visible: false;
+    }
+
+    Rectangle{
+        id: listContainer;
+
+        anchors.top: gallery.isFullScreen ? parent.top : header.bottom;
+        anchors.topMargin: gallery.isFullScreen ? 0 :10;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: gallery.isFullScreen ? 0 : 100;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+
+        z: 20;
+
+        color: "#000000";
+
+        MouseArea{
+            anchors.fill: parent;
+            onClicked: {
+                mouse.accepted = true;
+            }
+        }
+
+        ListView{
+            id: list;
+
+            anchors.fill: parent;
+
+            clip: true;
+            boundsBehavior: Flickable.StopAtBounds;
+            snapMode: ListView.SnapOneItem;
+            orientation: ListView.Horizontal;
+            model: gallery.model;
+            delegate: Rectangle{
+                width: list.width;
+                height: list.height;
+                color: "transparent";
+                Image{
+                    id: image;
+
+                    anchors.fill: parent;
+                    fillMode: Image.PreserveAspectFit;
+                    verticalAlignment: gallery.isFullScreen ? Image.AlignVCenter : Image.AlignTop;
+                    horizontalAlignment: Image.AlignHCenter;
+
+                    source: model[gallery.nameId]
+                }
+                MouseArea{
+                    anchors.fill: parent;
+                    property real pressedX: 0;
+                    onPressed: {
+                        pressedX = mouse.x;
+                    }
+                    onReleased: {
+                        if(mouse.x.toFixed() == pressedX.toFixed()){
+                            gallery.isFullScreen = !gallery.isFullScreen;
+                        }
+                    }
+
+                }
+            }
+            property int selectedIndex: 0;
+            property real movementStartedX: 0;
+            onMovementStarted: {
+                movementStartedX = contentX;
+            }
+            onFlickStarted: {
+                if(movementStartedX > contentX){
+                    if(selectedIndex > 0){
+                        selectedIndex--;
+                    }
+                }
+                else {
+                    if(selectedIndex < list.count - 1){
+                        selectedIndex++;
+                    }
+                }
+
+            }
+
+
+        }//list
+
+    }//listContainer
+
+    Rectangle{
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+        anchors.top: listContainer.bottom;
+        anchors.topMargin: gallery.isFullScreen ? - 5 : 5;
+        height: 1;
+        color: "gray";
+        opacity: 0.2;
+    }
+
+    Item{
+        id: listPreviewContainer;
+
+        anchors.top: listContainer.bottom;
+        anchors.topMargin: gallery.isFullScreen ? - 200 :20;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 10;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+        anchors.leftMargin: 10;
+        anchors.rightMargin: 10;
+
+        clip: true;
+
+        ListView{
+            id: listPreview;
+
+            anchors.top: parent.top;
+            anchors.bottom: parent.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin:  listWidth/2 - delegateWidth/2 - addToMargin;
+            width: contentWidth;
+
+            clip: true;
+            boundsBehavior: Flickable.StopAtBounds;
+            snapMode: ListView.SnapOneItem;
+            orientation: ListView.Horizontal;
+
+            model: gallery.model;
+            delegate: Rectangle{
+                width: listPreview.delegateWidth;
+                height: listPreview.height;
+                radius: 2;
+                color: "transparent";
+                border.color: listPreview.selectedIndex == model.index ? Style.textColor : "transparent";
+                Item{
+                    id: imageContainer;
+
+                    anchors.centerIn: parent;
+
+                    width: parent.width - 8;
+                    height:  parent.height - 8;
+
+                    Image{
+                        id: imagePreview;
+
+                        anchors.fill: parent;
+                        fillMode: Image.PreserveAspectFit;
+                        verticalAlignment: Image.AlignTop;
+                        horizontalAlignment: Image.AlignHCenter;
+
+                        source: model[gallery.nameId]
+                    }
+                }
+                MouseArea{
+                    anchors.fill: parent;
+
+                    property real startX: 0;
+                    property point startPoint;
+                    property real lastDeltaX;
+                    onPressed: {
+                        startPoint = mapToItem(gallery, mouse.x, 0);
+                        startX = mouse.x;
+                    }
+                    onReleased: {
+                        let position = mapToItem(gallery, mouse.x, 0)
+                        if(position.x.toFixed(1) == startPoint.x.toFixed(1)){
+                            list.selectedIndex = model.index;
+                            list.positionViewAtIndex(model.index, ListView.Center);
+                        }
+
+                        else if(lastDeltaX > 0){//after moving
+                            if(listPreview.addToMargin > listPreview.selectedIndex * listPreview.delegateWidth){
+                                list.selectedIndex++;
+                                list.positionViewAtIndex(list.selectedIndex, ListView.Center);
+                            }
+                        }
+                        else {
+                            if(listPreview.addToMargin < listPreview.selectedIndex * listPreview.delegateWidth){
+                                list.selectedIndex--;
+                                list.positionViewAtIndex(list.selectedIndex, ListView.Center);
+                            }
+                        }
+                    }
+                    onPositionChanged: {
+                        let delta = startX - mouse.x;
+                        lastDeltaX = delta;
+                        //console.log(delta); //влево +, вправо -
+                        if(delta > 0){
+                            let ok  = (listPreview.addToMargin + delta) < (listPreview.selectedIndex + 1) * listPreview.delegateWidth && (listPreview.selectedIndex + 1) < listPreview.count;
+                            if(ok){
+                                listPreview.addToMargin += delta;
+                            }
+                        }
+                        else {
+                            let ok  = (listPreview.addToMargin + delta) > (listPreview.selectedIndex - 1) * listPreview.delegateWidth && (listPreview.selectedIndex - 1) >= 0;
+                            if(ok){
+                                listPreview.addToMargin += delta;
+                            }
+
+                        }
+                    }
+                }
+            }
+            property real listWidth: parent.width;
+            property real delegateWidth: 80;
+            property real addToMargin: 0;//  selectedIndex * delegateWidth;
+
+            property int selectedIndex: list.selectedIndex;
+            onSelectedIndexChanged: {
+                addToMagrinAnim.from = addToMargin;
+                addToMagrinAnim.to =   selectedIndex * delegateWidth;
+                addToMagrinAnim.start();
+            }
+
+        }//listPreview
+    }//listPreviewContainer;
+
+
+    NumberAnimation {
+        id: addToMagrinAnim;
+
+        target: listPreview;
+        property: "addToMargin";
+        duration: 200;
+    }
+
+
+    Component{
+        id:confirmationComp;
+        Dialog {
+            id: confirmation;
+
+            anchors.centerIn: parent;
+
+            width: gallery.width-40;
+            height: 200;
+            hasIcon: false;
+            radius:8;
+            color: Style.backgroundColor;
+
+            topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
+            title: qsTr("Удалить фото");
+
+            Text {
+                id: titleDialogText;
+
+                anchors.centerIn: parent;
+
+                width: parent.width - 20;
+                wrapMode: Text.WordWrap;
+                horizontalAlignment: Text.AlignHCenter;
+
+                color: Style.textColor;
+                font.family: Style.fontFamily;
+                font.pixelSize: Style.fontSize_title;
+
+                text: "Вы уверены, что хотите удалить фото?";
+
+            }
+
+            AuxButton {
+                id: okButton;
+
+                anchors.bottom: parent.bottom;
+                anchors.right: cancelButton.left;
+                anchors.rightMargin: Style.size_smallMargin;
+                anchors.bottomMargin: Style.size_smallMargin;
+
+                width: (parent.width - 3 * Style.size_smallMargin)/2;
+                height: Style.size_ButtonHeight;
+                radius: Style.size_ButtonRadius;
+                color: "lightsteelblue";
+                fontPixelSize: Style.fontSize_common;
+                highlighted: false;
+
+                hasText: true;
+                hasIcon: false;
+
+                textButton: "Ок";
+
+                onClicked:{
+                    confirmation.finished("Ok");
+                }
+
+            }
+
+            AuxButton {
+                id: cancelButton;
+
+                anchors.bottom: parent.bottom;
+                anchors.right: parent.right;
+                anchors.rightMargin: Style.size_smallMargin;
+                anchors.bottomMargin: Style.size_smallMargin;
+
+                width: (parent.width - 3 * Style.size_smallMargin)/2;
+                height: Style.size_ButtonHeight;
+                radius: Style.size_ButtonRadius;
+                color: "lightsteelblue";
+                fontPixelSize: Style.fontSize_common;
+                highlighted: false;
+
+                hasText: true;
+                hasIcon: false;
+
+                textButton: "Отмена";
+
+                onClicked:{
+                    confirmation.finished("Cancel");
+                }
+            }
+
+            onFinished: {
+                if(buttonId == "Ok"){
+                    gallery.deleteSignal(list.selectedIndex);
+                }
+            }
+        }//confirmation
+
+    }////confirmationComp
+
+
+    //    Rectangle{//for testing
+    //        id: centerLine;
+
+    //        anchors.top: parent.top;
+    //        anchors.bottom: parent.bottom;
+    //        anchors.horizontalCenter: parent.horizontalCenter;
+    //        width: 1;
+    //        color: "gray";
+    //    }
+
+}
