@@ -49,6 +49,11 @@ I_EXPORT_COMPONENT(
 			"Product instance editor",
 			"Licensing Product Instance Installation");
 
+I_EXPORT_COMPONENT(
+			ProductInstanceInfoView,
+			"Viewer for information about the product instance",
+			"Licensing Product Instance View Information");
+
 
 } // namespace ImtLicenseGuiPck
 
