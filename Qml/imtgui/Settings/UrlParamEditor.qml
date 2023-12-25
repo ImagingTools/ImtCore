@@ -4,23 +4,45 @@ import imtqml 1.0
 import imtgui 1.0
 
 Item {
-    id: settingsTextInputContainer;
+    id: urlEditor;
 
     width: 270;
-    height: 30;
+    height: content.height;
 
-    CustomTextField {
-        id: tfcTextInput;
+    Column {
+        id: content;
 
-        anchors.fill: parent;
+        width: parent.width;
 
-        text: model.Value;
+        spacing: 10;
 
-        echoMode: model.Id === "Password" ? TextInput.Password: TextInput.Normal;
+        CustomTextField {
+            id: hostInput;
 
-        onTextChanged: {
-            if (model.Value != tfcTextInput.text){
-                model.Value = tfcTextInput.text;
+            width: parent.width;
+            height: 30;
+
+            text: model.Host;
+
+            onTextChanged: {
+                if (model.Host !== hostInput.text){
+                    model.Host = hostInput.text;
+                }
+            }
+        }
+
+        CustomTextField {
+            id: portInput;
+
+            width: parent.width;
+            height: 30;
+
+            text: model.Port;
+
+            onTextChanged: {
+                if (model.Port !== portInput.text){
+                    model.Port = portInput.text;
+                }
             }
         }
     }
