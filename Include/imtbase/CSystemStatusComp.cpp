@@ -106,6 +106,8 @@ void CSystemStatusComp::OnComponentCreated()
 	else{
 		m_timer.start();
 	}
+
+	m_workingUrl.setScheme("http");
 }
 
 
@@ -131,7 +133,7 @@ void CSystemStatusComp::OnUrlParamChanged(
 
 		m_statusMessage = tr("Try connect to: '%1' ...").arg(urlString);
 
-		SetStatus(ISystemStatus::SS_TRY_CONNECTING_SERVER);
+//		SetStatus(ISystemStatus::SS_TRY_CONNECTING_SERVER);
 
 		m_timer.start();
 	}

@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5127" Description="ACF"/>
+            <Version Id="0" Number="5136" Description="ACF"/>
             <Version Id="1" Number="2198" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -13,6 +13,9 @@
         <Element Id="NetworkSettings" PackageId="ImtCorePck" ComponentId="ParamSetRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="NetworkSettings"/>
                     </AttributeInfo>
@@ -33,9 +36,12 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ServerUrl" PackageId="ImtCorePck" ComponentId="TextParamRepresentationController">
+        <Element Id="ServerUrl" PackageId="ImtCorePck" ComponentId="UrlParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="ServerUrl"/>
                     </AttributeInfo>
@@ -51,14 +57,20 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="WebSocketServerUrl" PackageId="ImtCorePck" ComponentId="TextParamRepresentationController">
+        <Element Id="WebSocketServerUrl" PackageId="ImtCorePck" ComponentId="UrlParamRepresentationController">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ObjectId" Type="Id" ExportId="">
                         <Data IsEnabled="true" Value="WebSocketServerUrl"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ObjectName" Type="Text" ExportId="">
                         <Data IsEnabled="true" Value="Web Socket Server URL"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="PathToQml" Type="Id" ExportId="WebSocketServerUrlPath">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>

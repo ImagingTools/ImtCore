@@ -18,7 +18,8 @@ CObserverQmlComp::CObserverQmlComp()
 	:m_settingsModelPtr(nullptr),
 	m_applicationInfoModelPtr(nullptr),
 	m_settingsObserver(*this),
-	m_languageParamObserver(*this)
+	m_languageParamObserver(*this),
+	m_urlParamObserver(*this)
 {
 }
 
@@ -37,18 +38,14 @@ void CObserverQmlComp::ApplyUrl() const
 	QQmlEngine* engine = qmlEngine(quickItem);
 	Q_ASSERT(engine != nullptr);
 
-	QString serverUrl;
-	iprm::TParamsPtr<iprm::ITextParam> serverUrlDataPtr(m_settingsCompPtr.GetPtr(), "NetworkSettings/ServerUrl");
-	if (serverUrlDataPtr.IsValid()){
-		serverUrl = serverUrlDataPtr->GetText();
+	QUrl url;
+	if (m_urlParamPtr.IsValid()){
+		url = m_urlParamPtr->GetUrl();
 	}
 
-	QUrl newUrl = serverUrl + *m_prefixServer;
-	engine->setBaseUrl(newUrl);
-
-	qDebug() << QString("Server URL changed to %1").arg(newUrl.toString());
-
-	SendInfoMessage(0, QString("Server URL changed to %1").arg(newUrl.toString()));
+	url.setScheme("http");
+	QUrl serverUrl = url.toString() + *m_prefixServer;
+	engine->setBaseUrl(serverUrl);
 
 	quickItem->setProperty("serverReady", true);
 }
@@ -90,8 +87,6 @@ void CObserverQmlComp::UpdateLanguage() const
 
 void CObserverQmlComp::UpdateSettingsRepresentation()
 {
-	qDebug() << "UpdateSettingsRepresentation";
-
 	if (m_quickObjectCompPtr.IsValid() && m_settingsCompPtr.IsValid()){
 		QQuickItem* quickItem = m_quickObjectCompPtr->GetQuickItem();
 		if (quickItem != nullptr){
@@ -101,8 +96,6 @@ void CObserverQmlComp::UpdateSettingsRepresentation()
 			else{
 				m_settingsModelPtr->Clear();
 			}
-
-			quickItem->setProperty("localSettings", QVariant::fromValue(new imtbase::CTreeItemModel()));
 
 			bool result = m_settingsRepresentationControllerCompPtr->GetRepresentationFromDataModel(*m_settingsCompPtr, *m_settingsModelPtr);
 			if (result){
@@ -155,6 +148,12 @@ void CObserverQmlComp::OnLanguageChanged(const istd::IChangeable::ChangeSet& /*c
 }
 
 
+void CObserverQmlComp::OnUrlParamChanged(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IUrlParam* urlParamPtr)
+{
+	ApplyUrl();
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CObserverQmlComp::OnComponentCreated()
@@ -170,6 +169,10 @@ void CObserverQmlComp::OnComponentCreated()
 
 			if (m_languageParamPtr.IsValid()){
 				m_languageParamObserver.RegisterObject(m_languageParamPtr.GetPtr(), &CObserverQmlComp::OnLanguageChanged);
+			}
+
+			if (m_urlParamPtr.IsValid()){
+				m_urlParamObserver.RegisterObject(m_urlParamPtr.GetPtr(), &CObserverQmlComp::OnUrlParamChanged);
 			}
 
 			UpdateLanguage();
@@ -203,6 +206,7 @@ void CObserverQmlComp::OnComponentDestroyed()
 
 	m_settingsObserver.UnregisterAllObjects();
 	m_languageParamObserver.UnregisterAllObjects();
+	m_urlParamObserver.UnregisterAllObjects();
 
 	BaseClass::OnComponentDestroyed();
 }
@@ -221,14 +225,9 @@ void CObserverQmlComp::OnChangeSourceItem(QString src)
 
 void CObserverQmlComp::OnGuiChanged()
 {
-	qDebug() << "OnGuiChanged";
-
 	if (m_settingsRepresentationControllerCompPtr.IsValid() && m_settingsCompPtr.IsValid()){
 		if (m_settingsModelPtr != nullptr){
-			bool ok = m_settingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(*m_settingsModelPtr, *m_settingsCompPtr);
-			qDebug() << "ok" << ok;
-
-			ApplyUrl();
+			m_settingsRepresentationControllerCompPtr->GetDataModelFromRepresentation(*m_settingsModelPtr, *m_settingsCompPtr);
 		}
 	}
 }

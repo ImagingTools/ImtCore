@@ -24,8 +24,7 @@ bool CUrlParamRepresentationControllerComp::GetRepresentationFromValue(
 
 	const QUrl url = urlParamPtr->GetUrl();
 
-	representation.SetData("Host", url.host());
-	representation.SetData("Port", url.port());
+	representation.SetData("Value", url.toString());
 
 	return true;
 }
@@ -51,16 +50,10 @@ bool CUrlParamRepresentationControllerComp::GetDataModelFromRepresentation(const
 
 	QUrl url;
 
-	if (representation.ContainsKey("Host")){
-		QString host = representation.GetData("Host").toString();
+	if (representation.ContainsKey("Value")){
+		QString urlValue = representation.GetData("Value").toString();
 
-		url.setHost(host);
-	}
-
-	if (representation.ContainsKey("Port")){
-		int port = representation.GetData("Port").toInt();
-
-		url.setPort(port);
+		url = QUrl(urlValue);
 	}
 
 	urlParamPtr->SetUrl(url);

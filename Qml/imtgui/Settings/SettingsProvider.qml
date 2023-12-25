@@ -222,8 +222,6 @@ QtObject {
             }
         }
 
-        console.log("model", model.toJSON());
-
         if (container.serverModel){
             container.cacheServerModel();
 

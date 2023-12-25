@@ -8,6 +8,7 @@
 #include <iprm/ISelectionParam.h>
 
 // ImtCore includes
+#include <imtbase/IUrlParam.h>
 #include <imtbase/IApplicationInfoRepresentation.h>
 #include <imtbase/CTreeItemModel.h>
 #include <imtbase/IRepresentationController.h>
@@ -29,6 +30,7 @@ public:
 		I_ASSIGN(m_settingsRepresentationControllerCompPtr, "SettingsRepresentationController", "Controller for representation settings", true, "");
 		I_ASSIGN(m_settingsCompPtr, "Settings", "Settings", false, "Settings");
 		I_ASSIGN(m_languageParamPtr, "LanguageParam", "Language selection param", false, "LanguageParam");
+		I_ASSIGN(m_urlParamPtr, "UrlParam", "Server URL param", false, "UrlParam");
 		I_ASSIGN(m_quickObjectCompPtr, "QuickObject", "Main QML Component", true, "QuickObject");
 		I_ASSIGN(m_prefixServer, "ServerPrefix", "Prefix Server", true, "/");
 		I_ASSIGN(m_applicationInfoRepresentationCompPtr, "ApplicationInfoRepresentation", "Application info representation", true, "ApplicationInfoRepresentation");
@@ -46,6 +48,7 @@ protected:
 
 	void OnSettingsChanged(const istd::IChangeable::ChangeSet& changeSet, const iprm::IParamsSet* objectPtr);
 	void OnLanguageChanged(const istd::IChangeable::ChangeSet& changeSet, const iprm::ISelectionParam* objectPtr);
+	void OnUrlParamChanged(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IUrlParam* urlParamPtr);
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -58,6 +61,7 @@ private Q_SLOTS:
 private:
 	I_ATTR(QByteArray, m_prefixServer);
 	I_REF(iprm::IParamsSet, m_settingsCompPtr);
+	I_REF(imtbase::IUrlParam, m_urlParamPtr);
 	I_REF(iprm::ISelectionParam, m_languageParamPtr);
 	I_REF(imtbase::IRepresentationController, m_settingsRepresentationControllerCompPtr);
 	I_REF(imtqml::IQuickObject, m_quickObjectCompPtr);
@@ -71,6 +75,7 @@ private:
 
 	imtbase::TModelUpdateBinder<iprm::IParamsSet, CObserverQmlComp> m_settingsObserver;
 	imtbase::TModelUpdateBinder<iprm::ISelectionParam, CObserverQmlComp> m_languageParamObserver;
+	imtbase::TModelUpdateBinder<imtbase::IUrlParam, CObserverQmlComp> m_urlParamObserver;
 };
 
 

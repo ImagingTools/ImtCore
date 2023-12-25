@@ -42,14 +42,9 @@ Rectangle {
         if (root.settingsModel != null){
             console.log("connect");
             root.settingsModel.dataChanged.connect(root.modelChanged);
-            root.settingsModel.dataChanged.connect(root.test);
 
             root.updateGui();
         }
-    }
-
-    function test(){
-        console.log("test dataChanged");
     }
 
     function clearModels(){

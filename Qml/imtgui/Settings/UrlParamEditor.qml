@@ -16,34 +16,55 @@ Item {
 
         spacing: 10;
 
+//        BaseText {
+//            width: parent.width;
+//            text: qsTr("Host");
+//        }
+
         CustomTextField {
             id: hostInput;
 
             width: parent.width;
             height: 30;
 
-            text: model.Host;
+            text: model.Value;
 
             onTextChanged: {
-                if (model.Host !== hostInput.text){
-                    model.Host = hostInput.text;
+                console.log("onTextChanged", hostInput.text);
+                if (model.Value !== hostInput.text){
+                    model.Value = hostInput.text;
                 }
+
+                console.log("model.Host", model.Value);
             }
         }
 
-        CustomTextField {
-            id: portInput;
+//        BaseText {
+//            width: parent.width;
+//            text: qsTr("Port");
+//        }
 
-            width: parent.width;
-            height: 30;
+//        CustomTextField {
+//            id: portInput;
 
-            text: model.Port;
+//            width: parent.width;
+//            height: 30;
 
-            onTextChanged: {
-                if (model.Port !== portInput.text){
-                    model.Port = portInput.text;
-                }
-            }
-        }
+//            text: model.Port;
+
+//            textInputValidator: intValid;
+
+//            onTextChanged: {
+//                if (model.Port !== portInput.text){
+//                    model.Port = portInput.text;
+//                }
+//            }
+//        }
+
+//        RegExpValidator {
+//            id: intValid;
+
+//            regExp: /^[1-9]\d*$/;
+//        }
     }
 }

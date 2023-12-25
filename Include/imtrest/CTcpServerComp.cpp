@@ -101,18 +101,20 @@ const ISender* CTcpServerComp::GetSender(const QByteArray& requestId) const
 bool CTcpServerComp::StartListening(const QHostAddress &address, quint16 port)
 {
 	if (m_server->listen(address, port)){
-		SendInfoMessage(0, QString("Server successfully started on %1:%2").arg(address.toString()).arg(port));
+		QString message = QString("Server successfully started on %1:%2").arg(address.toString()).arg(port);
 
-		qDebug() << QString("Server successfully started on %1:%2").arg(address.toString()).arg(port);
+		qDebug() << message;
+		SendInfoMessage(0, message);
 
 		connect(m_server.GetPtr(), &CMultiThreadServer::NewThreadConnection, this, &CTcpServerComp::OnNewThreadConnection);
 
 		return true;
 	}
 	else{
-		QString errorMessage = m_server->errorString();
+		QString errorMessage = QString("Server could not be started on %1:%2. Error: %3").arg(address.toString()).arg(port).arg(m_server->errorString());
+		qDebug() << errorMessage;
 
-		SendErrorMessage(0, QString("Server could not be started on %1:%2. Error: %3").arg(address.toString()).arg(port).arg(errorMessage));
+		SendErrorMessage(0, errorMessage);
 	}
 
 	return false;

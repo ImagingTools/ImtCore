@@ -45,7 +45,7 @@ private:
 
 	imtbase::TModelUpdateBinder<imtbase::IUrlParam, CGqlClientEngineComp> m_urlParamObserver;
 
-	QUrl m_workingUrl;
+	mutable QUrl m_workingUrl;
 };
 
 

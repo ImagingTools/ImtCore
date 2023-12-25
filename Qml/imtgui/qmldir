@@ -96,11 +96,11 @@ TreeViewItemDelegateBase 1.0 View/TreeViewItemDelegateBase.qml
 TreeViewModelAdapter 1.0 View/TreeViewModelAdapter.qml
 TreeViewSelection 1.0 View/TreeViewSelection.qml
 
-BaseText 1.0 BaseText.qml
-
+BaseText 1.0 qrc:/qml/imtgui/BaseText.qml
 ComboBox 1.0 qrc:/qml/imtgui/ComboBox.qml
 CheckBox 1.0 qrc:/qml/imtgui/CheckBox.qml
 DatePicker 1.0 qrc:/qml/imtgui/DatePicker.qml
+TimePicker 1.0 qrc:/qml/imtgui/TimePicker.qml
 AuxButton 1.0 qrc:/qml/imtgui/AuxButton.qml
 TextButton 1.0 qrc:/qml/imtgui/TextButton.qml
 CustomTextField 1.0 qrc:/qml/imtgui/CustomTextField.qml

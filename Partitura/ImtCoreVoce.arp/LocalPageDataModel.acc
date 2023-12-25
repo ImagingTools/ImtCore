@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5137" Description="ACF"/>
+            <Version Id="0" Number="5136" Description="ACF"/>
             <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394753" Description="Qt Framework"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -17,7 +17,7 @@
                         <Data IsEnabled="true">
                             <Values>
                                 <Value>ServerUrl</Value>
-                                <Value>WebSocketServerUr</Value>
+                                <Value>WebSocketServerUrl</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -44,7 +44,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="WebSocketServerUr" PackageId="ImtCorePck" ComponentId="UrlParam">
+        <Element Id="WebSocketServerUrl" PackageId="ImtCorePck" ComponentId="UrlParam">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="DefaultHost" Type="String" ExportId="DefaultWebSocketServerHost">
@@ -63,6 +63,6 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="ServerUrl" ComponentId="ServerUrl"/>
-        <Component ExportedId="WebSocketServerUr" ComponentId="WebSocketServerUr"/>
+        <Component ExportedId="WebSocketServerUr" ComponentId="WebSocketServerUrl"/>
     </ExportedComponents>
 </Acf>
