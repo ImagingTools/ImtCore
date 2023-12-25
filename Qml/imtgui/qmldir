@@ -1,0 +1,135 @@
+module imtgui
+
+ApplicationMain 1.0 ./Application/ApplicationMain.qml
+AlertMessage 1.0 ./Application/AlertMessage.qml
+ApplicationInfoProvider 1.0 ./Application/ApplicationInfoProvider.qml
+DatabaseBackupController 1.0 ./Application/DatabaseBackupController.qml
+DesignSchemaProvider 1.0 ./Application/DesignSchemaProvider.qml
+ErrorManager 1.0 ./Application/ErrorManager.qml
+LanguageProvider 1.0 ./Application/LanguageProvider.qml
+PagesManager 1.0 ./Application/PagesManager.qml
+PagesProvider 1.0 ./Application/PagesProvider.qml
+SchedulerParams 1.0 ./Application/SchedulerParams.qml
+ShortcutManager 1.0 ./Application/ShortcutManager.qml
+ThumbnailDecorator 1.0 ./Application/ThumbnailDecorator.qml
+
+ButtonsDialog 1.0 Dialogs/ButtonsDialog.qml
+Dialog 1.0 Dialogs/Dialog.qml
+ErrorDialog 1.0 Dialogs/ErrorDialog.qml
+InputDialog 1.0 Dialogs/InputDialog.qml
+InputDialogBody 1.0 Dialogs/InputDialogBody.qml
+LoginDialog 1.0 Dialogs/LoginDialog.qml
+MessageDialog 1.0 Dialogs/MessageDialog.qml
+MessageDialogBody 1.0 Dialogs/MessageDialogBody.qml
+ModalDialogManager 1.0 Dialogs/ModalDialogManager.qml
+PopupMenuDialog 1.0 Dialogs/PopupMenuDialog.qml
+PopupMenuDelegate 1.0 Dialogs/PopupMenuDelegate.qml
+PopupMenuDialogGql 1.0 Dialogs/PopupMenuDialogGql.qml
+TopPanelDialog 1.0 Dialogs/TopPanelDialog.qml
+
+ModelIndex 1.0 Models/ModelIndex.qml
+SortController 1.0 Models/SortController.qml
+StateMachine 1.0 Models/StateMachine.qml
+TableProperties 1.0 Models/TableProperties.qml
+TableSelection 1.0 Models/TableSelection.qml
+TreeItemModelConverter 1.0 Models/TreeItemModelConverter.qml
+TreeItemModelObserver 1.0 Models/TreeItemModelObserver.qml
+UuidGenerator 1.0 Models/UuidGenerator.qml
+
+CommandsDecorator 1.0 Panels/CommandsDecorator.qml
+FilterMenu 1.0 Panels/FilterMenu.qml
+FilterPanelDecorator 1.0 Panels/FilterPanelDecorator.qml
+MenuPanel 1.0 Panels/MenuPanel.qml
+MenuPanelButton 1.0 Panels/MenuPanelButton.qml
+MenuPanelButtonDecorator 1.0 Panels/MenuPanelButtonDecorator.qml
+SubMenuPanelButtonDecorator 1.0 Panels/SubMenuPanelButtonDecorator.qml
+TabDelegate 1.0 Panels/TabDelegate.qml
+TabPanel 1.0 Panels/TabPanel.qml
+TabPanelDecorator 1.0 Panels/TabPanelDecorator.qml
+TopButtonDecorator 1.0 Panels/TopButtonDecorator.qml
+TopCenterPanel 1.0 Panels/TopCenterPanel.qml
+TopCenterPanelDecorator 1.0 Panels/TopCenterPanelDecorator.qml
+TopLeftPanel 1.0 Panels/TopLeftPanel.qml
+TopPanel 1.0 Panels/TopPanel.qml
+TopPanelDecorator 1.0 Panels/TopPanelDecorator.qml
+TopRightPanel 1.0 Panels/TopRightPanel.qml
+TopRightPanelDecorator 1.0 Panels/TopRightPanelDecorator.qml
+
+DatabaseInput 1.0 Settings/DatabaseInput.qml
+LocalSettingsModelObserver 1.0 Settings/LocalSettingsModelObserver.qml
+PageAboutProvider 1.0 Settings/PageAboutProvider.qml
+Preference 1.0 Settings/Preference.qml
+PreferenceDialog 1.0 Settings/PreferenceDialog.qml
+PreferenceButton 1.0 Settings/PreferenceButton.qml
+PreferencePage 1.0 Settings/PreferencePage.qml
+ServerLogProvider 1.0 Settings/ServerLogProvider.qml
+ServerSettingsModelObserver 1.0 Settings/ServerSettingsModelObserver.qml
+SettingsComboBox 1.0 Settings/SettingsComboBox.qml
+SettingsIntegerInput 1.0 Settings/SettingsIntegerInput.qml
+SettingsObserver 1.0 Settings/SettingsObserver.qml
+SettingsProvider 1.0 Settings/SettingsProvider.qml
+SettingsTextInput 1.0 Settings/SettingsTextInput.qml
+SettingsTextLabel 1.0 Settings/SettingsTextLabel.qml
+SettingsTimePicker 1.0 Settings/SettingsTimePicker.qml
+UrlParamEditor 1.0 Settings/UrlParamEditor.qml
+
+AuxTable 1.0 View/AuxTable.qml
+BasicTableView 1.0 View/BasicTableView.qml
+BasicTreeView 1.0 View/BasicTreeView.qml
+Loading 1.0 View/Loading.qml
+MultiPageView 1.0 View/MultiPageView.qml
+Pagination 1.0 View/Pagination.qml
+ServerNoConnectionView 1.0 View/ServerNoConnectionView.qml
+StackView 1.0 View/StackView.qml
+SimpleCommandsDecorator 1.0 View/SimpleCommandsDecorator.qml
+TableCellDelegate 1.0 View/TableCellDelegate.qml
+TableCellDelegateSimple 1.0 View/TableCellDelegateSimple.qml
+TableDelegate 1.0 View/TableDelegate.qml
+TableTreeItemDelegate 1.0 View/TableTreeItemDelegate.qml
+TableViewItemDelegateBase 1.0 View/TableViewItemDelegateBase.qml
+TreeDelegate1.0 View/TreeDelegate.qml
+TreeItemDelegate 1.0 View/TreeItemDelegate.qml
+TreeView 1.0 View/TreeView.qml
+TreeViewCommandsDelegateBase 1.0 View/TreeViewCommandsDelegateBase.qml
+TreeViewGql 1.0 View/TreeViewGql.qml
+TreeViewItemDelegateBase 1.0 View/TreeViewItemDelegateBase.qml
+TreeViewModelAdapter 1.0 View/TreeViewModelAdapter.qml
+TreeViewSelection 1.0 View/TreeViewSelection.qml
+
+BaseText 1.0 BaseText.qml
+
+ComboBox 1.0 qrc:/qml/imtgui/ComboBox.qml
+CheckBox 1.0 qrc:/qml/imtgui/CheckBox.qml
+DatePicker 1.0 qrc:/qml/imtgui/DatePicker.qml
+AuxButton 1.0 qrc:/qml/imtgui/AuxButton.qml
+TextButton 1.0 qrc:/qml/imtgui/TextButton.qml
+CustomTextField 1.0 qrc:/qml/imtgui/CustomTextField.qml
+TextFieldWithTitle 1.0 qrc:/qml/imtgui/TextFieldWithTitle.qml
+CustomTextEdit 1.0 qrc:/qml/imtgui/CustomTextEdit.qml
+Splitter 1.0 qrc:/qml/imtgui/Splitter.qml
+Calendar 1.0 qrc:/qml/imtgui/Calendar.qml
+CalendarNew 1.0 qrc:/qml/imtgui/CalendarNew.qml
+
+CustomScrollbar 1.0 qrc:/qml/imtgui/CustomScrollbar.qml
+SwitchCustom 1.0 qrc:/qml/imtgui/SwitchCustom.qml
+CustomTooltip 1.0 qrc:/qml/imtgui/CustomTooltip.qml
+CommonButtonDecorator 1.0 qrc:/qml/imtgui/CommonButtonDecorator.qml
+BaseButtonDecorator 1.0 qrc:/qml/imtgui/BaseButtonDecorator.qml
+BaseButton 1.0 qrc:/qml/imtgui/BaseButton.qml
+RoundButton 1.0 qrc:/qml/imtgui/RoundButton.qml
+CustomRadioButton 1.0 qrc:/qml/imtgui/CustomRadioButton.qml
+RadioBox 1.0 qrc:/qml/imtgui/RadioBox.qml
+
+ButtonPanel 1.0 qrc:/qml/imtgui/ButtonPanel.qml
+Diagram 1.0 qrc:/qml/imtgui/Diagram.qml
+BarChart 1.0 qrc:/qml/imtgui/BarChart.qml
+Piechart 1.0 qrc:/qml/imtgui/Piechart.qml
+PaintedCorner 1.0 qrc:/qml/imtgui/PaintedCorner.qml
+SearchComp 1.0 qrc:/qml/imtgui/SearchComp.qml
+MovingItem 1.0 qrc:/qml/imtgui/MovingItem.qml
+ChangeItemSize 1.0 qrc:/qml/imtgui/ChangeItemSize.qml
+SpinBox 1.0 qrc:/qml/imtgui/SpinBox.qml
+ProgressBar 1.0 qrc:/qml/imtgui/ProgressBar.qml
+CheckBoxMenu 1.0 qrc:/qml/imtgui/CheckBoxMenu.qml
+ExpandingContainer 1.0 qrc:/qml/imtgui/ExpandingContainer.qml
+Gallery 1.0 qrc:/qml/imtgui/Gallery.qml
