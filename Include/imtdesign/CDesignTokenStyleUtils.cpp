@@ -151,7 +151,11 @@ QPalette CDesignTokenStyleUtils::GetPaletteFromMultiEntry(const QJsonValue& styl
 					if(s_colorRolesNamesMap.contains(jsonColorValue.key())){
 						QColor color;
 						if (!CDesignTokenStyleUtils::CreateColorFromGrb(jsonColorValue->toString(), color)){
+							#if QT_VERSION >= 0x060000
 							color.fromString(jsonColorValue->toString());
+							#else
+							color.setNamedColor(jsonColorValue->toString());
+							#endif
 						}
 						if (color.isValid()){
 							palette.setColor(colorRoleGroup, s_colorRolesNamesMap[jsonColorValue.key()], color);
@@ -345,7 +349,11 @@ QPalette CDesignTokenStyleUtils::GetPaletteFromEntry(const QJsonValue& paletteEn
 
 		QColor color;
 		if (!CDesignTokenStyleUtils::CreateColorFromGrb(value->toString(), color)){
+			#if QT_VERSION >= 0x060000
 			color.fromString(value->toString());
+			#else
+			color.setNamedColor(value->toString());
+			#endif
 		}
 		if(color.isValid()){
 			palette.setColor(colorGroup, colorRole, color);

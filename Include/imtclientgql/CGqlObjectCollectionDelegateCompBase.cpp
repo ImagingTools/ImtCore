@@ -139,7 +139,11 @@ QByteArray CGqlObjectCollectionDelegateCompBase::InsertNode(
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-						if (variant.typeId() == QMetaType::QByteArray){
+						#if QT_VERSION >= 0x060000
+							if (variant.typeId() == QMetaType::QByteArray){
+						#else
+							if (variant.type() == QMetaType::QByteArray){
+						#endif
 							return variant.toByteArray();
 						}
 					}
@@ -177,7 +181,11 @@ bool CGqlObjectCollectionDelegateCompBase::SetNodeName(const QByteArray& nodeId,
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Bool){
+					#else
+						if (variant.type() == QMetaType::Bool){
+					#endif
 							return variant.toBool();
 						}
 					}
@@ -204,7 +212,11 @@ bool CGqlObjectCollectionDelegateCompBase::SetNodeDescription(const QByteArray& 
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Bool){
+					#else
+						if (variant.type() == QMetaType::Bool){
+					#endif
 							return variant.toBool();
 						}
 					}
@@ -231,7 +243,11 @@ bool CGqlObjectCollectionDelegateCompBase::SetNodeMetaInfo(const QByteArray& nod
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Bool){
+					#else
+						if (variant.type() == QMetaType::Bool){
+					#endif
 							return variant.toBool();
 						}
 					}
@@ -258,7 +274,11 @@ bool CGqlObjectCollectionDelegateCompBase::MoveNode(const QByteArray& nodeId, co
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Bool){
+					#else
+						if (variant.type() == QMetaType::Bool){
+					#endif
 							return variant.toBool();
 						}
 					}
@@ -284,7 +304,11 @@ bool CGqlObjectCollectionDelegateCompBase::RemoveNode(const QByteArray& nodeId, 
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Bool){
+					#else
+						if (variant.type() == QMetaType::Bool){
+					#endif
 							return variant.toBool();
 						}
 					}
@@ -313,7 +337,11 @@ bool CGqlObjectCollectionDelegateCompBase::AddObjectToNode(const QByteArray& obj
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Bool){
+					#else
+						if (variant.type() == QMetaType::Bool){
+					#endif
 							return variant.toBool();
 						}
 					}
@@ -343,7 +371,11 @@ bool CGqlObjectCollectionDelegateCompBase::MoveObjectToNode(const QByteArray& ob
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Bool){
+					#else
+						if (variant.type() == QMetaType::Bool){
+					#endif
 							return variant.toBool();
 						}
 					}
@@ -372,7 +404,11 @@ bool CGqlObjectCollectionDelegateCompBase::RemoveObjectFromNode(const QByteArray
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Bool){
+					#else
+						if (variant.type() == QMetaType::Bool){
+					#endif
 							return variant.toBool();
 						}
 					}
@@ -397,7 +433,11 @@ bool CGqlObjectCollectionDelegateCompBase::SetObjectName(const QByteArray& objec
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Bool){
+					#else
+						if (variant.type() == QMetaType::Bool){
+					#endif
 							return variant.toBool();
 						}
 					}
@@ -422,7 +462,11 @@ bool CGqlObjectCollectionDelegateCompBase::SetObjectDescription(const QByteArray
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Bool){
+					#else
+						if (variant.type() == QMetaType::Bool){
+					#endif
 							return variant.toBool();
 						}
 					}
@@ -451,7 +495,11 @@ bool CGqlObjectCollectionDelegateCompBase::SetObjectMetaInfo(const QByteArray& o
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Bool){
+					#else
+						if (variant.type() == QMetaType::Bool){
+					#endif
 							return variant.toBool();
 						}
 					}
@@ -497,7 +545,11 @@ int CGqlObjectCollectionDelegateCompBase::GetElementCount(const iprm::IParamsSet
 			if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 				QVariant variant;
 				if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
-					if (variant.typeId() == QMetaType::Int || variant.typeId() == QMetaType::LongLong){
+				#if QT_VERSION >= 0x060000
+					if (variant.typeId() == QMetaType::Bool || variant.typeId() == QMetaType::LongLong){
+				#else
+					if (variant.type() == QMetaType::Bool || variant.type() == QMetaType::LongLong){
+				#endif
 						return variant.toInt();
 					}
 				}

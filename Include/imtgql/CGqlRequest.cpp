@@ -686,7 +686,11 @@ QByteArray CGqlRequest::AddObjectParamPart(const CGqlObject &gqlObject) const
 QByteArray CGqlRequest::AddObjectParamValue(const QVariant &value) const
 {
 	QByteArray retVal;
+#if QT_VERSION >= 0x060000
 	int valueType = value.typeId();
+#else
+	int valueType = value.type();
+#endif
 	if (valueType == QMetaType::QVariantList || valueType == QMetaType::QStringList){
 		QVariantList variantList = value.toList();
 		retVal += "[";

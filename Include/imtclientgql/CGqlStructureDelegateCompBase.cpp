@@ -32,7 +32,11 @@ imtbase::ICollectionStructureInfo::Id CGqlStructureDelegateCompBase::InsertNewNo
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::QByteArray){
+					#else
+						if (variant.type() == QMetaType::QByteArray){
+					#endif
 							return variant.toByteArray();
 						}
 					}
@@ -62,7 +66,11 @@ bool CGqlStructureDelegateCompBase::SetNodeName(
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Bool){
+					#else
+						if (variant.type() == QMetaType::Bool){
+					#endif
 							return variant.toBool();
 						}
 					}
@@ -89,7 +97,11 @@ bool CGqlStructureDelegateCompBase::SetNodeDescription(const Id& nodeId, const Q
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Bool){
+					#else
+						if (variant.type() == QMetaType::Bool){
+					#endif
 							return variant.toBool();
 						}
 					}
@@ -119,7 +131,11 @@ bool CGqlStructureDelegateCompBase::SetNodeMetaInfo(
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Bool){
+					#else
+						if (variant.type() == QMetaType::Bool){
+					#endif
 							return variant.toBool();
 						}
 					}
@@ -149,7 +165,11 @@ bool CGqlStructureDelegateCompBase::MoveNode(
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Bool){
+					#else
+						if (variant.type() == QMetaType::Bool){
+					#endif
 							return variant.toBool();
 						}
 					}
@@ -175,7 +195,11 @@ bool CGqlStructureDelegateCompBase::RemoveNode(const Id& nodeId, const imtbase::
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Bool){
+					#else
+						if (variant.type() == QMetaType::Bool){
+					#endif
 							return variant.toBool();
 						}
 					}
@@ -205,7 +229,11 @@ bool CGqlStructureDelegateCompBase::AssignObject(
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Bool){
+					#else
+						if (variant.type() == QMetaType::Bool){
+					#endif
 							return variant.toBool();
 						}
 					}
@@ -237,7 +265,11 @@ bool CGqlStructureDelegateCompBase::MoveObject(
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Bool){
+					#else
+						if (variant.type() == QMetaType::Bool){
+					#endif
 							return variant.toBool();
 						}
 					}
@@ -267,7 +299,11 @@ bool CGqlStructureDelegateCompBase::RemoveObject(
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Bool){
+					#else
+						if (variant.type() == QMetaType::Bool){
+					#endif
 							return variant.toBool();
 						}
 					}
@@ -291,7 +327,11 @@ int CGqlStructureDelegateCompBase::GetNodeCount(const iprm::IParamsSet* selectio
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					QVariant variant;
 					if (responsePtr->IsSuccessfull() && responsePtr->GetValue(variant)){
+					#if QT_VERSION >= 0x060000
 						if (variant.typeId() == QMetaType::Int){
+					#else
+						if (variant.type() == QMetaType::Int){
+					#endif
 							return variant.toInt();
 						}
 					}
