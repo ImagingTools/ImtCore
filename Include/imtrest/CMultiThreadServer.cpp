@@ -13,7 +13,7 @@
 namespace imtrest {
 
 CSocket::CSocket(CSocketThread* rootSocket, IRequest* request, qintptr socketDescriptor)
-	: QObject(rootSocket),
+	: QObject(),
 	m_rootSocket(rootSocket),
 	m_socket(new QTcpSocket()),
 	m_requestPtr(request)
@@ -24,6 +24,12 @@ CSocket::CSocket(CSocketThread* rootSocket, IRequest* request, qintptr socketDes
 		emit m_rootSocket->Error(m_socket->error());
 		return;
 	}
+
+	qDebug() << "socketDescriptor" << m_socket->socketDescriptor() << " New socket";
+
+	connect(&m_startTimer, &QTimer::timeout, this, QOverload<>::of(&CSocket::TimeOut));
+	m_startTimer.setSingleShot(true);
+	m_startTimer.start(5000);
 
 	connect(m_socket.GetPtr(), &QTcpSocket::disconnected, this, &CSocket::Disconnected, Qt::DirectConnection);
 	connect(m_socket.GetPtr(), &QTcpSocket::readyRead, this, &CSocket::HandleReadyRead, Qt::DirectConnection);
@@ -39,8 +45,17 @@ void CSocket::Abort()
 }
 
 
+void CSocket::TimeOut()
+{
+	if (m_socket != nullptr){
+		m_socket->disconnect();
+	}
+}
+
+
 void CSocket::HandleReadyRead()
 {
+	m_startTimer.stop();
 	imtrest::IRequestServlet* requestHandlerPtr = m_rootSocket->GetRequestServlet();
 	Q_ASSERT(requestHandlerPtr != nullptr);
 

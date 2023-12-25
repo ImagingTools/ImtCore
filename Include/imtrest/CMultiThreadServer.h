@@ -30,8 +30,10 @@ public Q_SLOTS:
 	void Disconnected();
 	void OnSendResponse(ConstResponsePtr response);
 	void Abort();
+	void TimeOut();
 
 private:
+	QTimer m_startTimer;
 	CSocketThread* m_rootSocket;
 	istd::TDelPtr<QTcpSocket> m_socket;
 	istd::TDelPtr<IRequest> m_requestPtr;
