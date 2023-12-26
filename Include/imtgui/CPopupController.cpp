@@ -4,10 +4,11 @@
 // Qt includes
 #include <QtCore/QDebug>
 #include <QtCore/QRect>
+#include <QtCore/QThread>
 #include <QtCore/QUuid>
 #include <QtGui/QGuiApplication>
-#include <QtWidgets/QLayout>
 #include <QtGui/QScreen>
+#include <QtWidgets/QLayout>
 
 // ImtCore includes
 #include <imtgui/CStandardPopupWidget.h>
@@ -31,9 +32,9 @@ CPopupController::CPopupController()
 	m_widgetFactoryPtr(nullptr),
 	m_mouseOnPopup(false)
 {
-
-	qRegisterMetaType<MessagePtr>("MessagePtr");
 	connect(this, &CPopupController::EmitAddMessage, this, &CPopupController::OnAddMessage, Qt::QueuedConnection);
+	connect(this, &CPopupController::EmitAddPopup, this, &CPopupController::OnAddPopup, Qt::QueuedConnection);
+	connect(this, &CPopupController::EmitClosePopup, this, &CPopupController::OnClosePopup, Qt::QueuedConnection);
 }
 
 
@@ -112,18 +113,6 @@ void CPopupController::SetPopupWidgetFactory(IPopupWidgetFactory* factoryPtr)
 }
 
 
-QByteArray CPopupController::AddPopupEvenHandler(IPopupEventHandler* /*handlerPtr*/)
-{
-	return QByteArray();
-}
-
-
-QByteArray CPopupController::RemovePopupEvenHandler(QByteArray)
-{
-	return QByteArray();
-}
-
-
 void CPopupController::SetEnabled(bool /*enable*/)
 {
 }
@@ -131,32 +120,51 @@ void CPopupController::SetEnabled(bool /*enable*/)
 
 // reimplemented (IPopupController)
 
-QByteArray CPopupController::AddPopup(const MessagePtr& messagePtr, int timeout, bool isClosingOnMouseClickAllowed, QWidget* contentWidgetPtr)
+QByteArray CPopupController::AddPopup(
+	const MessagePtr& messagePtr,
+	int timeout,
+	bool isClosingOnMouseClickAllowed,
+	QWidget* contentWidgetPtr)
 {
-	return CreatePopupItem(messagePtr, timeout, isClosingOnMouseClickAllowed, contentWidgetPtr);
+	QByteArray id = QUuid::createUuid().toByteArray();
+
+	if (QThread::currentThread() == qApp->thread()){
+		OnAddPopup(id, messagePtr, timeout, isClosingOnMouseClickAllowed, contentWidgetPtr);
+	}
+	else{
+		Q_EMIT EmitAddPopup(id, messagePtr, timeout, isClosingOnMouseClickAllowed, contentWidgetPtr);
+	}
+
+	return id;
 }
 
 
-bool CPopupController::ClosePopup(const QByteArray& popupId)
+void CPopupController::ClosePopup(const QByteArray& popupId)
 {
-	int index = GetVisibleItemIndex(popupId);
-	if (index >= 0){
-		QByteArray id = m_visibleItems[index]->id;
-
-		m_visibleItems[index]->widgetPtr->hide();
-		m_visibleItems.removeAt(index);
-
-		for (IPopupEventHandler* handlerPtr : m_handlers){
-			handlerPtr->OnPopupClosed(id);
-		}
-
-		ShowItems();
-		ArrangeVisibleItems();
-
-		return true;
+	if (QThread::currentThread() == qApp->thread()){
+		OnClosePopup(popupId);
 	}
+	else{
+		Q_EMIT EmitClosePopup(popupId);
+	}
+}
 
-	return false;
+
+void CPopupController::RegisterEventHandler(IPopupEventHandler* handlerPtr)
+{
+	QMutexLocker locker(&m_eventHandlersMutex);
+	if (handlerPtr != nullptr && !m_eventHandlers.contains(handlerPtr)){
+		m_eventHandlers.append(handlerPtr);
+	}
+}
+
+
+void CPopupController::UnRegisterEventHandler(IPopupEventHandler* handlerPtr)
+{
+	QMutexLocker locker(&m_eventHandlersMutex);
+	if (handlerPtr != nullptr && m_eventHandlers.contains(handlerPtr)){
+		m_eventHandlers.removeAll(handlerPtr);
+	}
 }
 
 
@@ -173,7 +181,14 @@ bool CPopupController::IsMessageSupported(
 
 void CPopupController::AddMessage(const MessagePtr& messagePtr)
 {
-	Q_EMIT EmitAddMessage(messagePtr);
+	QByteArray id = QUuid::createUuid().toByteArray();
+
+	if (QThread::currentThread() == qApp->thread()){
+		OnAddMessage(id, messagePtr);
+	}
+	else{
+		Q_EMIT EmitAddMessage(id, messagePtr);
+	}
 }
 
 
@@ -181,9 +196,56 @@ void CPopupController::AddMessage(const MessagePtr& messagePtr)
 
 // private slots
 
-void CPopupController::OnAddMessage(const MessagePtr& messagePtr)
+void CPopupController::OnAddMessage(const QByteArray& id, const MessagePtr& messagePtr)
 {
-	CreatePopupItem(messagePtr, m_timeout, true, nullptr);
+	CreatePopupItem(id, messagePtr, m_timeout, true, nullptr);
+}
+
+
+void CPopupController::OnAddPopup(
+	const QByteArray& id,
+	const MessagePtr& messagePtr,
+	int timeout,
+	bool isClosingOnMouseClickAllowed,
+	QWidget* contentWidgetPtr)
+{
+	CreatePopupItem(id, messagePtr, m_timeout, isClosingOnMouseClickAllowed, contentWidgetPtr);
+}
+
+
+void CPopupController::OnClosePopup(const QByteArray& popupId)
+{
+	int index = GetVisibleItemIndex(popupId);
+	if (index >= 0){
+		QByteArray id = m_visibleItems[index]->id;
+
+		m_visibleItems[index]->widgetPtr->hide();
+
+		m_eventHandlersMutex.lock();
+		for (int i = 0; i < m_eventHandlers.count(); i++){
+			m_eventHandlers[i]->OnPopupClosed(id);
+		}
+		m_eventHandlersMutex.unlock();
+
+		m_visibleItems.removeAt(index);
+
+		ShowItems();
+		ArrangeVisibleItems();
+	}
+	else{
+		index = GetInvisibleItemIndex(popupId);
+		if (index >= 0){
+			QByteArray id = m_items[index]->id;
+
+			m_eventHandlersMutex.lock();
+			for (int i = 0; i < m_eventHandlers.count(); i++){
+				m_eventHandlers[i]->OnPopupClosed(id);
+			}
+			m_eventHandlersMutex.unlock();
+
+			m_items.removeAt(index);
+		}
+	}
 }
 
 
@@ -247,9 +309,7 @@ void CPopupController::OnFadeFinished()
 
 		if (m_visibleItems[index]->effect.opacity() == 0){
 			m_visibleItems[index]->widgetPtr->hide();
-			m_visibleItems.removeAt(index);
-			ShowItems();
-			ArrangeVisibleItems();
+			ClosePopup(m_visibleItems[index]->id);
 		}
 	}
 }
@@ -257,7 +317,12 @@ void CPopupController::OnFadeFinished()
 
 // private methods
 
-QByteArray CPopupController::CreatePopupItem(const MessagePtr& messagePtr, int timeout, bool isClosingOnMouseClickAllowed, QWidget* contentWidgetPtr)
+void CPopupController::CreatePopupItem(
+	const QByteArray& id,
+	const MessagePtr& messagePtr,
+	int timeout,
+	bool isClosingOnMouseClickAllowed,
+	QWidget* contentWidgetPtr)
 {
 	istd::TDelPtr<IPopupWidget> popupWidgetPtr;
 	if (m_widgetFactoryPtr != nullptr){
@@ -267,17 +332,19 @@ QByteArray CPopupController::CreatePopupItem(const MessagePtr& messagePtr, int t
 		popupWidgetPtr.SetPtr(new CStandardPopupWidget());
 	}
 
+	Q_ASSERT(popupWidgetPtr.IsValid());
+
 	CPopupWidgetBase* widgetPtr = dynamic_cast<CPopupWidgetBase*>(popupWidgetPtr.GetPtr());
 	if (widgetPtr != nullptr){
-		widgetPtr->setParent(m_parentPtr);
 		widgetPtr->AllowClosingOnMouseClick(isClosingOnMouseClickAllowed);
-		popupWidgetPtr->SetContent(messagePtr, contentWidgetPtr);
+		widgetPtr->SetContent(messagePtr, contentWidgetPtr);
 		popupWidgetPtr.PopPtr();
 
 		PopupItemPtr itemPtr(new PopupItem());
-		itemPtr->id = QUuid::createUuid().toByteArray();
+		itemPtr->id = id;
 		itemPtr->widgetPtr = widgetPtr;
 		itemPtr->widgetPtr->setGraphicsEffect(&itemPtr->effect);
+		itemPtr->widgetPtr->setParent(m_parentPtr);
 		itemPtr->timeout = timeout;
 
 		connect(widgetPtr, &CPopupWidgetBase::EmitHoverEnter, this, &CPopupController::OnHoverEnter);
@@ -291,10 +358,10 @@ QByteArray CPopupController::CreatePopupItem(const MessagePtr& messagePtr, int t
 		ShowItems();
 		ArrangeVisibleItems();
 
-		return itemPtr->id;
+		return;
 	}
 
-	return QByteArray();
+	qFatal("");
 }
 
 
@@ -308,6 +375,18 @@ int CPopupController::GetVisibleItemIndex(const QByteArray& id)
 {
 	for (int i = 0; i < m_visibleItems.count(); i++){
 		if (m_visibleItems[i]->id == id){
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+
+int CPopupController::GetInvisibleItemIndex(const QByteArray& id)
+{
+	for (int i = 0; i < m_items.count(); i++){
+		if (m_items[i]->id == id){
 			return i;
 		}
 	}
@@ -431,13 +510,13 @@ void CPopupController::HideItems()
 
 bool CPopupController::eventFilter(QObject* /*watched*/, QEvent* event)
 {
-	if (event->type() == QEvent::Resize){
+	if (event->type() == QEvent::Resize || event->type() == QEvent::Move){
 		QSize size = m_parentPtr->size();
 		m_rect = QRect(0, 0, size.width(), size.height());
-	}
 
-	ValidateVisibleItems();
-	ArrangeVisibleItems();
+		ValidateVisibleItems();
+		ArrangeVisibleItems();
+	}
 
 	return false;
 }

@@ -100,7 +100,7 @@ void TPopupControllerCompWrap<GuiObject>::OnComponentCreated()
 	m_controller.SetPopupWidgetFactory(m_popupWidgetFactoryCompPtr.GetPtr());
 	for (int i = 0; i < m_popupEventHandlerCompPtr.GetCount(); i++){
 		if (m_popupEventHandlerCompPtr[i] != nullptr){
-			m_controller.AddPopupEvenHandler(m_popupEventHandlerCompPtr[i]);
+			m_controller.RegisterEventHandler(m_popupEventHandlerCompPtr[i]);
 		}
 	}
 }

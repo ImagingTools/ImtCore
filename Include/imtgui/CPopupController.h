@@ -28,7 +28,6 @@ namespace imtgui
 
 class CPopupController:
 			public QObject,
-			virtual public ilog::IMessageConsumer,
 			virtual public IPopupController
 {
 	Q_OBJECT
@@ -45,14 +44,14 @@ public:
 	void SetSpacing(double spacing);
 	void SetDefaultTimeOut(int msec);
 	void SetPopupWidgetFactory(IPopupWidgetFactory* factoryPtr);
-	QByteArray AddPopupEvenHandler(IPopupEventHandler* handlerPtr);
-	QByteArray RemovePopupEvenHandler(QByteArray);
 
 	void SetEnabled(bool enable);
 
 	// reimplemented (IPopupController)
 	virtual QByteArray AddPopup(const MessagePtr& messagePtr, int timeout = -1, bool isClosingOnMouseClickAllowed = true, QWidget* contentWidgetPtr = nullptr) override;
-	virtual bool ClosePopup(const QByteArray& popupId) override;
+	virtual void ClosePopup(const QByteArray& popupId) override;
+	virtual void RegisterEventHandler(IPopupEventHandler* handlerPtr) override;
+	virtual void UnRegisterEventHandler(IPopupEventHandler* handlerPtr) override;
 
 	// reimplemented (ilog::IMessageConsumer)
 	virtual bool IsMessageSupported(
@@ -61,25 +60,47 @@ public:
 				const istd::IInformationProvider* messagePtr = NULL) const override;
 	virtual void AddMessage(const MessagePtr& messagePtr) override;
 
+Q_SIGNALS:
+	void EmitAddMessage(const QByteArray& id, const MessagePtr& messagePtr);
+	void EmitAddPopup(
+		const QByteArray& id,
+		const MessagePtr& messagePtr,
+		int timeout,
+		bool isClosingOnMouseClickAllowed,
+		QWidget* contentWidgetPtr);
+	void EmitClosePopup(const QByteArray& popupId);
+
 private Q_SLOTS:
-	void OnAddMessage(const MessagePtr& messagePtr);
+	void OnAddMessage(const QByteArray& id, const MessagePtr& messagePtr);
+	void OnAddPopup(
+		const QByteArray& id,
+		const MessagePtr& messagePtr,
+		int timeout,
+		bool isClosingOnMouseClickAllowed,
+		QWidget* contentWidgetPtr);
+	void OnClosePopup(const QByteArray& popupId);
+
 	void OnScreenGeometryChanged(const QRect& rect);
+
 	void OnHoverEnter(QEvent* event);
 	void OnHoverLeave(QEvent* event);
 	void OnCloseRequest();
 	void OnPopupTimeout();
 	void OnFadeFinished();
 
-Q_SIGNALS:
-	void EmitAddMessage(const MessagePtr& messagePtr);
-
 private:
 	struct PopupItem;
 
-	QByteArray CreatePopupItem(const MessagePtr& messagePtr, int timeout, bool isClosingOnMouseClickAllowed, QWidget* contentWidgetPtr);
+	void CreatePopupItem(
+		const QByteArray& id,
+		const MessagePtr& messagePtr,
+		int timeout,
+		bool isClosingOnMouseClickAllowed,
+		QWidget* contentWidgetPtr);
 	void RemovePopupItem(int index);
 	int GetVisibleItemIndex(const QByteArray& id);
 	int GetVisibleItemIndex(const QObject* memberPtr);
+	int GetInvisibleItemIndex(const QByteArray& id);
 
 	void ValidateVisibleItems();
 	void ArrangeVisibleItems();
@@ -131,7 +152,8 @@ private:
 	int m_timeout;
 	IPopupWidgetFactory* m_widgetFactoryPtr;
 
-	QMap<QByteArray, IPopupEventHandler*> m_handlers;
+	QList<IPopupEventHandler*> m_eventHandlers;
+	QMutex m_eventHandlersMutex;
 
 	QList<PopupItemPtr> m_items;
 	QList<PopupItemPtr> m_visibleItems;

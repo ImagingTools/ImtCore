@@ -34,7 +34,7 @@ QByteArray CPopupControllerComp::AddPopup(const MessagePtr& messagePtr, int time
 }
 
 
-bool CPopupControllerComp::ClosePopup(const QByteArray& popupId)
+void CPopupControllerComp::ClosePopup(const QByteArray& popupId)
 {
 	int index = GetVisibleItemIndex(popupId);
 	if (index >= 0){
@@ -52,11 +52,22 @@ bool CPopupControllerComp::ClosePopup(const QByteArray& popupId)
 		ShowItems();
 		ArrangeVisibleItems();
 
-		return true;
+		return;
 	}
 
-	return false;
+	return;
 }
+
+
+void CPopupControllerComp::RegisterEventHandler(IPopupEventHandler* handlerPtr)
+{
+}
+
+
+void CPopupControllerComp::UnRegisterEventHandler(IPopupEventHandler* handlerPtr)
+{
+}
+
 
 
 // reimplemented (ilog::IMessageConsumer)

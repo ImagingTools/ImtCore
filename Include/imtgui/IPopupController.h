@@ -4,6 +4,9 @@
 // ACF includes
 #include <ilog/IMessageConsumer.h>
 
+// ImtCore includes
+#include <imtgui/IPopupEventHandler.h>
+
 
 namespace imtgui
 {
@@ -20,7 +23,9 @@ public:
 		\return					assigned popup ID.
 	*/
 	virtual QByteArray AddPopup(const MessagePtr& messagePtr, int timeout = -1, bool isClosingOnMouseClickAllowed = true, QWidget* contentWidgetPtr = nullptr) = 0;
-	virtual bool ClosePopup(const QByteArray& popupId) = 0;
+	virtual void ClosePopup(const QByteArray& popupId) = 0;
+	virtual void RegisterEventHandler(IPopupEventHandler* handlerPtr) = 0;
+	virtual void UnRegisterEventHandler(IPopupEventHandler* handlerPtr) = 0;
 };
 
 

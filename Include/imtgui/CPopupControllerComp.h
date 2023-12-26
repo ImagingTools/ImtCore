@@ -50,7 +50,9 @@ public:
 
 	// reimplemented (IPopupController)
 	virtual QByteArray AddPopup(const MessagePtr& messagePtr, int timeout = -1, bool isClosingOnMouseClickAllowed = true, QWidget* contentWidgetPtr = nullptr) override;
-	virtual bool ClosePopup(const QByteArray& popupId) override;
+	virtual void ClosePopup(const QByteArray& popupId) override;
+	virtual void RegisterEventHandler(IPopupEventHandler* handlerPtr) override;
+	virtual void UnRegisterEventHandler(IPopupEventHandler* handlerPtr) override;
 
 	// reimplemented (ilog::IMessageConsumer)
 	virtual bool IsMessageSupported(
