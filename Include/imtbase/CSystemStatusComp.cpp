@@ -106,8 +106,6 @@ void CSystemStatusComp::OnComponentCreated()
 	else{
 		m_timer.start();
 	}
-
-	m_workingUrl.setScheme("http");
 }
 
 
