@@ -12,6 +12,7 @@ Item {
     property string documentId;
     property string documentName;
     property string documentTypeId;
+    property string gqlAddCommandId: documentTypeId + "Add";
 
     property bool isDirty: false;
     property bool readOnly: false;

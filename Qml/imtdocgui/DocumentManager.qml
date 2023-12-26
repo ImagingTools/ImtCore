@@ -201,7 +201,7 @@ Item {
                     }
 
                     if (documentId === ""){
-                        documentController.setData(documentTypeId, documentId, documentModel, additionInputParams, callBack);
+                        documentController.setData(document.gqlAddCommandId, documentId, documentModel, additionInputParams, callBack);
                     }
                     else{
                         documentController.updateData(documentTypeId, documentId, documentModel, additionInputParams, callBack);
@@ -272,7 +272,7 @@ Item {
         let title = defaultDocumentName;
 
         let documentData = documentsModel.get(documentIndex).DocumentObj;
-
+        console.log("documentData", documentData)
         let documentName = documentData.getDocumentName();
         if (documentName && documentName !== ""){
             title = documentName;
