@@ -10,6 +10,7 @@
 #include <iser/CMemoryWriteArchive.h>
 #include <iser/CPrimitiveTypesSerializer.h>
 #include <icalib/CAffineCalibration2d.h>
+#include <iimg/CScanlineMask.h>
 
 
 namespace imt3d
@@ -21,6 +22,7 @@ namespace imt3d
 CDepthBitmap::CDepthBitmap()
 	:m_colorMapType(CMT_GRAY)
 {
+	BaseClass::CreateBitmap(PF_FLOAT32, istd::CIndex2d(0, 0));
 }
 
 
@@ -31,7 +33,8 @@ void CDepthBitmap::SetDepthRange(const istd::CRange & depthRange)
 
 		m_depthRange = depthRange;
 
-		EnsureMetaInfoCreated();
+		SetMetaInfo(MIT_MIN_DEPTH, m_depthRange.GetMinValue());
+		SetMetaInfo(MIT_MAX_DEPTH, m_depthRange.GetMaxValue());
 	}
 
 	InvalidateCache(istd::IChangeable::GetNoChanges());
@@ -57,11 +60,84 @@ void CDepthBitmap::SetCalibration3d(const CImage3dCalibration& calibration3d)
 	EnsureMetaInfoCreated();
 }
 
+
 void CDepthBitmap::SetReferenceBitmap(const iimg::CGeneralBitmap & referenceBitmap)
 {
 	m_referenceBitmap.CopyFrom(referenceBitmap);
 
 	EnsureMetaInfoCreated();
+}
+
+
+void CDepthBitmap::ResetReferenceBitmap()
+{
+	m_referenceBitmap.ResetImage();
+
+	EnsureMetaInfoCreated();
+}
+
+
+bool CDepthBitmap::ComputeDepthRange(const i2d::IObject2d* aoiPtr, istd::CRange& depthRange) const
+{
+	float rangeMin = std::numeric_limits<float>::max();
+	float rangeMax = std::numeric_limits<float>::min();
+
+	istd::CIndex2d imageSize = this->GetImageSize();
+
+	if (aoiPtr != nullptr){
+		iimg::CScanlineMask mask;
+		i2d::CRect clipArea(imageSize);
+		//mask.SetCalibration(this->GetCalibration());
+
+		if (mask.CreateFromGeometry(*aoiPtr, &clipArea)){
+
+			istd::CIntRange lineRange(0, imageSize.GetX());
+
+#pragma omp parallel for
+
+			for (int y = 0; y < imageSize.GetY(); ++y){
+				const float* oneLinePtr = (float*)this->GetLinePtr(y);
+				const istd::CIntRanges* maskRangesPtr = mask.GetPixelRanges(y);
+				if (maskRangesPtr != NULL){
+					istd::CIntRanges::RangeList rangeList;
+					maskRangesPtr->GetAsList(lineRange, rangeList);
+					for (istd::CIntRanges::RangeList::ConstIterator iter=rangeList.constBegin(); iter != rangeList.constEnd(); ++iter){
+
+						const istd::CIntRange& rangeH = *iter;
+						for (int x = rangeH.GetMinValue(); x < rangeH.GetMaxValue(); ++x){
+							if (!isnan(oneLinePtr[x]) && (oneLinePtr[x] < rangeMin))
+								rangeMin = oneLinePtr[x];
+							if (!isnan(oneLinePtr[x]) && (oneLinePtr[x] > rangeMax))
+								rangeMax = oneLinePtr[x];
+						}
+					}
+				}
+			}
+			depthRange.SetMinValue(rangeMin);
+			depthRange.SetMaxValue(rangeMax);
+
+			return true;
+		}
+	}
+	else { // entire image
+		for (int y = 0; y < imageSize.GetY(); ++y) {
+			const float* oneLinePtr = (float*)this->GetLinePtr(y);
+			for (int x = 0; x < imageSize.GetX(); ++x) {
+				if (!isnan(oneLinePtr[x]) && (oneLinePtr[x] < rangeMin))
+					rangeMin = oneLinePtr[x];
+
+				if (!isnan(oneLinePtr[x]) && (oneLinePtr[x] > rangeMax))
+					rangeMax = oneLinePtr[x];
+			}
+		}
+		depthRange.SetMinValue(rangeMin);
+		depthRange.SetMaxValue(rangeMax);
+
+		return true;
+	}
+
+	return false;
+
 }
 
 
@@ -233,10 +309,17 @@ bool CDepthBitmap::CopyFrom(const istd::IChangeable& object, CompatibilityMode m
 
 		m_depthRange = sourcePtr->m_depthRange;
 		m_colorMapType = sourcePtr->m_colorMapType;
-		m_calibration3d.CopyFrom(sourcePtr->m_calibration3d);
-		m_referenceBitmap.CopyFrom(sourcePtr->m_referenceBitmap);
+		if (!m_calibration3d.CopyFrom(sourcePtr->m_calibration3d)) {
+			m_calibration3d.ResetData();
+		}
+
+		if (!m_referenceBitmap.CopyFrom(sourcePtr->m_referenceBitmap)) {
+			m_referenceBitmap.ResetImage();
+		}
 
 		InvalidateCache(istd::IChangeable::GetNoChanges());
+
+		EnsureMetaInfoCreated();
 
 		BaseClass2::CopyFrom(object, mode);
 	

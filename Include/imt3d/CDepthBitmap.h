@@ -56,6 +56,8 @@ public:
 	void SetColorMap(ColorMapType colorMapType);
 	void SetCalibration3d(const CImage3dCalibration& calibration3d);
 	void SetReferenceBitmap(const iimg::CGeneralBitmap& referenceBitmap);
+	void ResetReferenceBitmap();
+	bool ComputeDepthRange(const i2d::IObject2d* aoi, istd::CRange& depthRange) const;
 
 	// reimplemented (IDepthBitmap)
 	istd::CRange GetDepthRange() const override;
