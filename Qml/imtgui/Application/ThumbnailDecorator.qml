@@ -13,9 +13,6 @@ Rectangle {
 
     color: Style.backgroundColor;
 
-//    property alias settingsProvider: preferenceDialog.settingsProvider;
-//    property alias applicationInfoProvider: preferenceDialog.applicationInfoProvider;
-
     property alias errorPage: serverNoConnectionView;
     property alias loadingPage: loading;
 
@@ -58,7 +55,6 @@ Rectangle {
 
     property SuperuserProvider superuserProvider : SuperuserProvider {
         onResult: {
-            console.log("SuperuserProvider onResult 2", exists, error);
             if (exists){
                 thumbnailDecoratorContainer.closeAllPages();
 

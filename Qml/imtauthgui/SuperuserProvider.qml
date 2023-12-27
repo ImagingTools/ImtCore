@@ -48,22 +48,6 @@ QtObject {
                 if (root.gqlGetModel.ContainsKey("errors")){
                     dataModelLocal = root.gqlGetModel.GetData("errors");
 
-//                    if (dataModelLocal.ContainsKey(root.getCommandId)){
-//                        dataModelLocal = dataModelLocal.GetData(root.getCommandId);
-//                    }
-
-//                    let message = ""
-//                    if (dataModelLocal.ContainsKey("message")){
-//                        message = dataModelLocal.GetData("message");
-//                    }
-
-//                    let type;
-//                    if (dataModelLocal.ContainsKey("type")){
-//                        type = dataModelLocal.GetData("type");
-//                    }
-
-//                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
-
                     root.result(false, "");
 
                     return;
@@ -72,9 +56,6 @@ QtObject {
                 if (root.gqlGetModel.ContainsKey("data")){
                     root.result(true, "");
                 }
-            }
-            else if (this.state === "Error"){
-//                Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
             }
         }
     }//GqlModel itemModel

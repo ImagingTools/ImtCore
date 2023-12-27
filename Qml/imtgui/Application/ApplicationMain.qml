@@ -33,21 +33,16 @@ Item {
     signal settingsUpdate();
     signal localSettingsUpdated();
 
-    onUpdateSystemStatus: {
-        console.log("AppMain onUpdateSystemStatus");
-    }
-
     onLocalSettingsUpdated: {
         application.updateAllModels();
     }
 
-    onSystemStatusChanged: {
-        Events.sendEvent("SystemStatusChanged", application.systemStatus)
-    }
+//    onSystemStatusChanged: {
+//        let parameters = {"Status": application.systemStatus, "Message": application.message}
+//        Events.sendEvent("SystemStatusChanged", parameters)
+//    }
 
     Component.onCompleted: {
-        console.log("AppMain onCompleted");
-
         Events.subscribeEvent("UpdateModels", application.updateAllModels);
         Events.subscribeEvent("Logout", application.onLogout);
         Events.subscribeEvent("UpdateSystemStatus", application.updateSystemStatus);
@@ -208,39 +203,28 @@ Item {
 
     function setSystemStatus(status, message){
         console.log("setSystemStatus", status, message);
-        application.message = message;
-        application.systemStatus = status;
 
-        if (application.systemStatus == "NO_ERROR"){
-            thumbnailDecorator.errorPage.visible = false;
+        if (application.systemStatus !== status){
+            application.message = message;
+            application.systemStatus = status;
 
-            let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
-            if (loggedUserId === ""){
-                thumbnailDecorator.closeAllPages();
+            let parameters = {"Status": application.systemStatus, "Message": application.message}
+            Events.sendEvent("SystemStatusChanged", parameters)
 
-                firstModelsInit();
+            if (status === "NO_ERROR"){
+                thumbnailDecorator.errorPage.visible = false;
+
+                let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
+                if (loggedUserId === ""){
+                    thumbnailDecorator.closeAllPages();
+
+                    firstModelsInit();
+                }
             }
-        }
-        else if (application.systemStatus == "UNKNOWN_ERROR"){
-
-        }
-        else if (application.systemStatus == "CONNECTION_ERROR"){
-            thumbnailDecorator.closeAllPages();
-
-            thumbnailDecorator.errorPage.text = message;
-            thumbnailDecorator.errorPage.visible = true;
-        }
-        else if (application.systemStatus == "DATABASE_CONNECTION_ERROR"){
-            thumbnailDecorator.closeAllPages();
-
-            thumbnailDecorator.errorPage.text = message;
-            thumbnailDecorator.errorPage.visible = true;
-        }
-        else if (application.systemStatus == "TRY_CONNECTING"){
-            thumbnailDecorator.closeAllPages();
-
-            thumbnailDecorator.errorPage.text = message;
-            thumbnailDecorator.errorPage.visible = true;
+            else{
+                thumbnailDecorator.closeAllPages();
+                thumbnailDecorator.errorPage.visible = true;
+            }
         }
     }
 

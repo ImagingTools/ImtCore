@@ -19,62 +19,74 @@ Rectangle {
         Events.unSubscribeEvent("SystemStatusChanged", container.onSystemStatusChanged)
     }
 
-    function onSystemStatusChanged(status){
-        if (status === "TRY_CONNECTING"){
-            loading.visible = true;
-        }
-        else{
-            loading.visible = false;
-        }
+    function onSystemStatusChanged(parameters){
+        console.log("onSystemStatusChanged");
+
+        let status = parameters["Status"];
+        let message = parameters["Message"];
+
+        console.log("status", status);
+
+        loading.visible = status === "TRY_CONNECTING";
+        textNoConnection.text = message;
     }
 
-    Text {
-        id: textNoConnection;
+    Column {
+        id: content;
 
         anchors.centerIn: parent;
 
         width: parent.width - 100;
 
-        text: container.text;
+        spacing: 10;
 
-        horizontalAlignment: Text.AlignHCenter;
+        Text {
+            id: textNoConnection;
 
-        color: Style.textColor;
-        font.pixelSize: Style.fontSize_title;
-        font.family: Style.fontFamily;
+            anchors.horizontalCenter: parent.horizontalCenter;
 
-        wrapMode: Text.Wrap;
-    }
+            horizontalAlignment: Text.AlignHCenter;
 
-    Loading {
-        id: loading;
+            color: Style.textColor;
+            font.pixelSize: Style.fontSize_title;
+            font.family: Style.fontFamily;
 
-        anchors.fill: textNoConnection;
+            wrapMode: Text.Wrap;
+        }
 
-        visible: false;
-    }
+        Loading {
+            id: loading;
 
-    BaseButton{
-        id: buttonContainer;
+            anchors.horizontalCenter: parent.horizontalCenter;
 
-        anchors.top: textNoConnection.bottom;
-        anchors.topMargin: 20;
-        anchors.horizontalCenter: parent.horizontalCenter;
+            width: 100;
+            height: 100;
 
-        text: qsTr("Refresh");
-
-        visible: false;
-
-        decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
-
-        onClicked: {
-            container.refresh();
+            visible: false;
         }
     }
 
-    Component{
-        id: defaultButtonDecorator;
-        CommonButtonDecorator{
-        }
-    }
+//    BaseButton{
+//        id: buttonContainer;
+
+//        anchors.top: textNoConnection.bottom;
+//        anchors.topMargin: 20;
+//        anchors.horizontalCenter: parent.horizontalCenter;
+
+//        text: qsTr("Refresh");
+
+//        visible: false;
+
+//        decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
+
+//        onClicked: {
+//            container.refresh();
+//        }
+//    }
+
+//    Component{
+//        id: defaultButtonDecorator;
+//        CommonButtonDecorator{
+//        }
+//    }
 }

@@ -5,7 +5,7 @@ import imtqml 1.0
 import imtlicgui 1.0
 import imtdocgui 1.0
 import imtgui 1.0
-import imtcolqml 1.0
+import imtcolgui 1.0
 
 DocumentData {
     id: root;

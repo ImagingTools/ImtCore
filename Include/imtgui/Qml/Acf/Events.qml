@@ -12,6 +12,7 @@ QtObject {
     function sendEvent(key, parameters){
         if(key in this.events){
             for(var i = 0; i < this.events[key].length; i++){
+
                 if (parameters !== undefined){
                     this.events[key][i](parameters)
                 }

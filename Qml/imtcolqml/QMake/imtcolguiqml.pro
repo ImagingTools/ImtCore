@@ -1,4 +1,4 @@
-TARGET = imtcolqml
+TARGET = imtcolguiqml
 
 include($(ACFCONFIGDIR)/QMake/StaticConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtGuiBaseConfig.pri)

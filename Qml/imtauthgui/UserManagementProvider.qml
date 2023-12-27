@@ -108,16 +108,6 @@ QtObject {
                         dataModelLocal = dataModelLocal.GetData("UserMode");
                     }
 
-//                    if (dataModelLocal.ContainsKey("DatabaseConnectionState")){
-//                        let databaseState = dataModelLocal.GetData("DatabaseConnectionState");
-//                        if (databaseState === false){
-//                            let message = qsTr("Please сheck the data to connect to the database");
-//                            modalDialogManager.openDialog(errorDialog, {"message": message});
-
-//                            return;
-//                        }
-//                    }
-
                     if (dataModelLocal.ContainsKey("Parameters")){
                         let parameters = dataModelLocal.GetData("Parameters");
                         let value = dataModelLocal.GetData("Value");
@@ -125,22 +115,6 @@ QtObject {
                             container.userMode = parameters.GetData("Id", value);
                         }
                     }
-
-//                    if (dataModelLocal.ContainsKey("SuperUserExists")){
-//                        let superUserExists = dataModelLocal.GetData("SuperUserExists");
-
-//                        container.superuserExists = Boolean(superUserExists);
-//                    }
-
-//                    if (!container.superuserExists){
-//                        if (dataModelLocal.ContainsKey("ErrorMessage")){
-//                            let errorMessage = dataModelLocal.GetData("ErrorMessage");
-
-//                            modalDialogManager.openDialog(errorDialog, {"message": errorMessage});
-
-//                            return;
-//                        }
-//                    }
                 }
 
                 container.updated();

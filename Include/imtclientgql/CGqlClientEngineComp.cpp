@@ -25,7 +25,6 @@ QNetworkRequest* CGqlClientEngineComp::CreateNetworkRequest(const imtgql::IGqlRe
 	QNetworkRequest* networkRequest = new QNetworkRequest();
 	networkRequest->setHeader(QNetworkRequest::ContentTypeHeader, QStringLiteral("application/graphql"));
 
-	m_workingUrl.setScheme("http");
 	QString urlString = m_workingUrl.toString();
 
 	if (m_prefixServerAttrPtr.IsValid()){

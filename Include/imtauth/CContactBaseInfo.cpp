@@ -119,24 +119,24 @@ bool CContactBaseInfo::Serialize(iser::IArchive& archive)
 
 	bool retVal = true;
 
-	static iser::CArchiveTag accountNameTag("Name", "Name", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag accountNameTag("Name", "Name", iser::CArchiveTag::TT_LEAF);
 	retVal = archive.BeginTag(accountNameTag);
 	retVal = retVal && archive.Process(m_name);
 	retVal = retVal && archive.EndTag(accountNameTag);
 
-	static iser::CArchiveTag accountDescriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag accountDescriptionTag("Description", "Description", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(accountDescriptionTag);
 	retVal = retVal && archive.Process(m_description);
 	retVal = retVal && archive.EndTag(accountDescriptionTag);
 
-	static iser::CArchiveTag mailTag("Email", "Email", iser::CArchiveTag::TT_LEAF);
+	iser::CArchiveTag mailTag("Email", "Email", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(mailTag);
 	retVal = retVal && archive.Process(m_email);
 	retVal = retVal && archive.EndTag(mailTag);
 
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer<QByteArrayList>(archive, m_groupIds, "Groups", "Group");
 
-	static iser::CArchiveTag pictureTag("Picture", "Picture", iser::CArchiveTag::TT_GROUP);
+	iser::CArchiveTag pictureTag("Picture", "Picture", iser::CArchiveTag::TT_GROUP);
 	retVal = retVal && archive.BeginTag(pictureTag);
 	retVal = retVal && m_picture.Serialize(archive);
 	retVal = retVal && archive.EndTag(pictureTag);

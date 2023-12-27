@@ -6,15 +6,6 @@
     <file alias="imtcontrols/Actions/ShortcutManager.qml">Qml/imtcontrols/Actions/ShortcutManager.qml</file>
     <file alias="imtcontrols/Actions/MovingItem.qml">Qml/imtcontrols/Actions/MovingItem.qml</file>
     <file alias="imtcontrols/Actions/ControlArea.qml">Qml/imtcontrols/Actions/ControlArea.qml</file>
-    <file alias="imtcontrols/Application/ApplicationMain.qml">Qml/imtcontrols/Application/ApplicationMain.qml</file>
-    <file alias="imtcontrols/Application/DesignSchemaProvider.qml">Qml/imtcontrols/Application/DesignSchemaProvider.qml</file>
-    <file alias="imtcontrols/Application/LanguageProvider.qml">Qml/imtcontrols/Application/LanguageProvider.qml</file>
-    <file alias="imtcontrols/Application/PagesManager.qml">Qml/imtcontrols/Application/PagesManager.qml</file>
-    <file alias="imtcontrols/Application/PagesProvider.qml">Qml/imtcontrols/Application/PagesProvider.qml</file>
-    <file alias="imtcontrols/Application/ThumbnailDecorator.qml">Qml/imtcontrols/Application/ThumbnailDecorator.qml</file>
-    <file alias="imtcontrols/Application/ServerNoConnectionView.qml">Qml/imtcontrols/Application/ServerNoConnectionView.qml</file>
-    <file alias="imtcontrols/Application/ApplicationInfoProvider.qml">Qml/imtcontrols/Application/ApplicationInfoProvider.qml</file>
-    <file alias="imtcontrols/Application/AlertMessage.qml">Qml/imtcontrols/Application/AlertMessage.qml</file>
     <file alias="imtcontrols/Base/ControlBase.qml">Qml/imtcontrols/Base/ControlBase.qml</file>
     <file alias="imtcontrols/Base/Enums.qml">Qml/imtcontrols/Base/Enums.qml</file>
     <file alias="imtcontrols/Buttons/AuxButton.qml">Qml/imtcontrols/Buttons/AuxButton.qml</file>

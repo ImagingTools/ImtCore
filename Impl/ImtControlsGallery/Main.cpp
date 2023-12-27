@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(imtstylecontrolsqml);
     Q_INIT_RESOURCE(imtcontrols);
     Q_INIT_RESOURCE(imtgui);
-	Q_INIT_RESOURCE(imtdocgui);
+	Q_INIT_RESOURCE(imtdocguiqml);
 	Q_INIT_RESOURCE(imtauthguiqml);
 
 	Q_INIT_RESOURCE(imtresthtml);

@@ -43,7 +43,6 @@ void CObserverQmlComp::ApplyUrl() const
 		url = m_urlParamPtr->GetUrl();
 	}
 
-	url.setScheme("http");
 	QUrl serverUrl = url.toString() + *m_prefixServer;
 	engine->setBaseUrl(serverUrl);
 
