@@ -18,9 +18,7 @@ namespace imtbase
 CSystemStatusComp::CSystemStatusComp()
 	:m_status(SystemStatus::SS_UNKNOWN_ERROR),
 	m_futureResultStatus(SystemStatus::SS_UNKNOWN_ERROR),
-	m_urlParamObserver(*this),
-	m_singleCheck(false),
-	m_autoCheck(true)
+	m_urlParamObserver(*this)
 {
 }
 
@@ -60,28 +58,6 @@ imtcom::IConnectionStatusProvider* CSystemStatusComp::GetConnectionStatusProvide
 imtdb::IDatabaseServerConnectionChecker* CSystemStatusComp::GetDatabaseServerConnectionStatusProvider() const
 {
 	return m_dbServerConnectionCheckerCompPtr.GetPtr();
-}
-
-
-bool CSystemStatusComp::StartCheckSystemStatus()
-{
-//	m_autoCheck = true;
-
-	if (!m_timer.isActive()){
-		m_timer.start();
-	}
-
-	return true;
-}
-
-
-bool CSystemStatusComp::StopCheckSystemStatus()
-{
-	m_timer.stop();
-
-//	m_autoCheck = false;
-
-	return true;
 }
 
 
@@ -140,10 +116,26 @@ void CSystemStatusComp::OnUrlParamChanged(
 
 // private methods
 
+bool CSystemStatusComp::StartCheckSystemStatus()
+{
+	if (!m_timer.isActive()){
+		m_timer.start();
+	}
+
+	return true;
+}
+
+
+bool CSystemStatusComp::StopCheckSystemStatus()
+{
+	m_timer.stop();
+
+	return true;
+}
+
+
 void CSystemStatusComp::SetStatus(ISystemStatus::SystemStatus status)
 {
-	qDebug() << "SetStatus" << status;
-
 	if (m_status != status){
 		istd::CChangeNotifier notifier(this);
 		Q_UNUSED(notifier);
@@ -167,15 +159,6 @@ void CSystemStatusComp::OnCheckStatusFinished()
 
 	int interval = m_checkIntervalAttrPtr.IsValid() ? *m_checkIntervalAttrPtr * 1000 : 60000;
 	m_timer.start(interval);
-
-//	if (m_autoCheck && !m_singleCheck){
-//		int interval = m_checkIntervalAttrPtr.IsValid() ? *m_checkIntervalAttrPtr * 1000 : 60000;
-//		m_timer.start(interval);
-//	}
-
-//	if (m_singleCheck){
-//		m_singleCheck = false;
-//	}
 }
 
 
@@ -195,11 +178,6 @@ void CSystemStatusComp::OnTimeout()
 
 void CSystemStatusComp::CheckStatus()
 {
-	qDebug() << "CheckStatus";
-
-	m_statusMessage = "";
-	m_futureResultStatus = ISystemStatus::SS_NO_ERROR;
-
 	if (m_connectionStatusProviderCompPtr.IsValid()){
 		imtcom::IConnectionStatusProvider::ConnectionStatus serverConnectionStatus = m_connectionStatusProviderCompPtr->GetConnectionStatus();
 		if (serverConnectionStatus != imtcom::IConnectionStatusProvider::ConnectionStatus::CS_CONNECTED){
@@ -229,8 +207,13 @@ void CSystemStatusComp::CheckStatus()
 		if (slaveStatus != SS_NO_ERROR){
 			m_statusMessage = error;
 			m_futureResultStatus = slaveStatus;
+
+			return;
 		}
 	}
+
+	m_statusMessage = "";
+	m_futureResultStatus = ISystemStatus::SS_NO_ERROR;
 }
 
 

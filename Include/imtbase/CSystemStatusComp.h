@@ -35,7 +35,6 @@ public:
 		I_ASSIGN(m_dbServerConnectionCheckerCompPtr, "DatabaseServerConnectionChecker", "Database server connection status provider", false, "DatabaseServerConnectionChecker");
 		I_ASSIGN(m_slaveSystemStatusCompPtr, "SlaveSystemStatus", "Slave system status", false, "SlaveSystemStatus");
 		I_ASSIGN(m_checkIntervalAttrPtr, "CheckInterval", "Interval for backup timer (in sec)", false, 60);
-		I_ASSIGN(m_autoCheckStatusAttrPtr, "AutoCheckStatus", "Auto-check system status", false, false);
 		I_ASSIGN(m_checkDbStatusAttrPtr, "CheckDatabaseStatus", "Check database system status", false, true);
 		I_ASSIGN(m_serverNameAttrPtr, "ServerName", "The name of the server to which the connection is being checked", false, "");
 		I_ASSIGN(m_urlParamCompPtr, "UrlParam", "The object holds connection's url.", false, "UrlParam");
@@ -48,8 +47,6 @@ public:
 	virtual void UpdateSystemStatus() override;
 	virtual imtcom::IConnectionStatusProvider* GetConnectionStatusProvider() const override;
 	virtual imtdb::IDatabaseServerConnectionChecker* GetDatabaseServerConnectionStatusProvider() const override;
-	virtual bool StartCheckSystemStatus() override;
-	virtual bool StopCheckSystemStatus() override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)
@@ -57,7 +54,10 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 	void OnUrlParamChanged(const istd::IChangeable::ChangeSet& changeSet, const imtbase::IUrlParam* urlParamPtr);
+
 private:
+	virtual bool StartCheckSystemStatus();
+	virtual bool StopCheckSystemStatus();
 	void SetStatus(SystemStatus status);
 	void OnCheckStatusFinished();
 	void OnTimeout();
@@ -72,15 +72,11 @@ private:
 	imtbase::TModelUpdateBinder<imtbase::IUrlParam, CSystemStatusComp> m_urlParamObserver;
 	QUrl m_workingUrl;
 
-	bool m_singleCheck;
-	bool m_autoCheck;
-
 private:
 	I_REF(imtcom::IConnectionStatusProvider, m_connectionStatusProviderCompPtr);
 	I_REF(imtdb::IDatabaseServerConnectionChecker, m_dbServerConnectionCheckerCompPtr);
 	I_REF(imtbase::ISystemStatus, m_slaveSystemStatusCompPtr);
 	I_ATTR(int, m_checkIntervalAttrPtr);
-	I_ATTR(bool, m_autoCheckStatusAttrPtr);
 	I_ATTR(bool, m_checkDbStatusAttrPtr);
 	I_ATTR(QByteArray, m_serverNameAttrPtr);
 	I_REF(imtbase::IUrlParam, m_urlParamCompPtr);

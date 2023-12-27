@@ -26,8 +26,14 @@ Rectangle {
         let message = parameters["Message"];
 
         console.log("status", status);
+        console.log("message", message);
 
-        loading.visible = status === "TRY_CONNECTING";
+        loading.visible = false;
+
+        if (status === "TRY_CONNECTING"){
+            loading.visible = true;
+        }
+
         textNoConnection.text = message;
     }
 
