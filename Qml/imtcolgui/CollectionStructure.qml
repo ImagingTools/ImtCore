@@ -192,7 +192,15 @@ Item {
     }
 
     function getAdditionalInputParams(){
-        return {}
+        let additionalInputParams = {}
+        let nodeId = treeView.getData("Id", treeView.selectedIndex)
+        additionalInputParams["nodeId"] = ""
+        if (nodeId !== undefined){
+            additionalInputParams["nodeId"] = nodeId
+        }
+        // console.log("nodeId", additionalInputParams["nodeId"])
+
+        return additionalInputParams
     }
 
     function updateGui(){
@@ -439,7 +447,7 @@ Item {
         property string ok: collectionStructureContainer.commandId !== "" && subscriptionClient.subscriptionId !== "";
         onOkChanged: {
             if (collectionStructureContainer.commandId !== ""){
-                let subscriptionRequestId = "On" + collectionStructureContainer.commandId + "CollectionChanged"
+                let subscriptionRequestId = "On" + collectionStructureContainer.commandId + "BranchChanged"
                 var query = Gql.GqlRequest("subscription", subscriptionRequestId);
                 var queryFields = Gql.GqlObject("notification");
                 queryFields.InsertField("Id");
@@ -454,22 +462,15 @@ Item {
             console.log("SubscriptionClient onStateChanged", state);
 
             if (state === "Ready"){
-                console.log("subscriptionClient Ready", subscriptionClient.commandId);
+                console.log("subscriptionClient Ready");
 
                 if (subscriptionClient.ContainsKey("data")){
                     let dataModelLocal = subscriptionClient.GetData("data")
-                    if (dataModelLocal.ContainsKey("token")){
-                        let accessToken = dataModelLocal.GetData("token");
-                        Events.sendEvent("GetToken", function (token){
-                            console.log("local token", token);
-
-                            if (String(token) == String(accessToken)){
-                                collectionStructureContainer.updateGui();
-                            }
-                            else{
-                                collectionStructureContainer.hasRemoteChanges = true;
-                            }
-                        });
+                    if (dataModelLocal.ContainsKey("NodeId")){
+                        let nodeId = dataModelLocal.GetData("NodeId");
+                        if (nodeId !== ""){
+                            collectionStructureBase.updateBranch(nodeId)
+                        }
                     }
                 }
             }

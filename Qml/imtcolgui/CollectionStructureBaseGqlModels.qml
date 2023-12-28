@@ -13,7 +13,7 @@ QtObject {
 
     property var additionInputParams: ({})
 
-    property TreeItemModel items: TreeItemModel {};
+    // property TreeItemModel items: TreeItemModel {};
     property TreeItemModel notificationModel: null;
 
     property Item rootItem: null;
@@ -22,36 +22,38 @@ QtObject {
     property var fieldsData: ["Id", "Name"]
 
     signal itemsInfoGqlStateChanged(string state);
+    signal itemsReceived(var selectIndex, var items)
 
     onCommandIdChanged: {
         if (commandId !== ""){
-            getItemsGqlCommand = commandId + "List";
+            getItemsGqlCommand = commandId + "GetElements";
             getObjectViewGqlCommand = commandId + "ObjectView";
         }
     }
 
     function updateModels(){
-        console.log("CollectionView updateModels");
+        console.log("CollectionStructure updateModels");
         if (commandId === ""){
             console.error("Update model was failed! Command-ID is invalid.");
             return;
         }
 
         gqlModelBaseContainer.objectViewModel.getObjectView();
+        gqlModelBaseContainer.itemsInfoModel.updateModel("");
     }
 
-    function updateItemsModel(){
+    function updateItemsModel(selectIndex){
         if (commandId === ""){
             console.error("Update model was failed! Command-ID is invalid.");
             return;
         }
 
-        gqlModelBaseContainer.itemsInfoModel.updateModel();
+        gqlModelBaseContainer.itemsInfoModel.updateModel(selectIndex);
     }
 
 
     property GqlModel itemsInfoModel: GqlModel {
-        function updateModel() {
+        function updateModel(selectIndex) {
             var query = Gql.GqlRequest("query", gqlModelBaseContainer.getItemsGqlCommand);
             let count = -1;
             let offset = 0;
@@ -67,13 +69,19 @@ QtObject {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertFieldObject(viewParams);
+            // let parentNodeId = treeViewInternal.getData("Id", selectIndex)
+            // if (parentNodeId === undefined){
+            //     parentNodeId = ""
+            // }
+            inputParams.InsertField("ParentNodeId", selectIndex);
+            let additionParams = Gql.GqlObject("addition");
             if (Object.keys(gqlModelBaseContainer.additionInputParams).length > 0){
-                let additionParams = Gql.GqlObject("addition");
                 for (let key in gqlModelBaseContainer.additionInputParams){
                     additionParams.InsertField(key, gqlModelBaseContainer.additionInputParams[key]);
                 }
-                inputParams.InsertFieldObject(additionParams);
             }
+            additionParams.InsertField("selectIndex", selectIndex)
+            inputParams.InsertFieldObject(additionParams);
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("items");
@@ -93,7 +101,7 @@ QtObject {
             console.log("State:", this.state, gqlModelBaseContainer.itemsInfoModel);
             gqlModelBaseContainer.itemsInfoGqlStateChanged(this.state);
             if (this.state === "Ready"){
-                var dataModelLocal;
+                let dataModelLocal;
                 if (gqlModelBaseContainer.itemsInfoModel.ContainsKey("errors")){
                     dataModelLocal = gqlModelBaseContainer.itemsInfoModel.GetData("errors");
 
@@ -129,11 +137,11 @@ QtObject {
                         }
 
                         if (dataModelLocal.ContainsKey("items")){
+                            let items = dataModelLocal.GetData("items");
+                            let selectIndex = dataModelLocal.GetData("selectIndex");
+                            itemsReceived(selectIndex, items)
 
-                            gqlModelBaseContainer.items.Clear();
-                            gqlModelBaseContainer.items = dataModelLocal.GetData("items");
-
-                            Events.sendEvent(gqlModelBaseContainer.commandId + "StructureUpdated");
+                            // Events.sendEvent(gqlModelBaseContainer.commandId + "StructureUpdated");
                         }
                     }
                 }

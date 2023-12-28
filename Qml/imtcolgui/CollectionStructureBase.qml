@@ -58,6 +58,7 @@ Item {
         gqlModels.commandId = commandId;
 
         gqlModels.updateModels();
+        // gqlModels.updateItemsModel()
     }
 
     Loader {
@@ -107,6 +108,15 @@ Item {
         gqlModels.updateModels();
     }
 
+    function updateBranch(nodeId){
+        let index = treeViewInternal.findIndexById(nodeId)
+        if (index > -1){
+            treeViewInternal.deleteBranch(index)
+            treeViewInternal.model.SetData("IsOpen", true, index);
+            gqlModels.updateItemsModel(nodeId)
+        }
+    }
+
     Rectangle {
         id: backgroundTreeView;
 
@@ -116,7 +126,7 @@ Item {
 
         width: parent.width
 
-        anchors.bottom: parent.top;
+        anchors.bottom: parent.bottom;
 
         color: Style.baseColor;
 
@@ -178,11 +188,33 @@ Item {
             }
         }
 
+        TreeViewSelection {
+            id: visualControl
+        }
+
         TreeViewGql{
             id: treeViewInternal
             anchors.left: parent.left;
             anchors.right: rightPanel.left;
             anchors.top: parent.top;
+            anchors.bottom: parent.bottom;
+            hasSelection: true
+            onRequestSignal: {
+                let nodeId = treeViewInternal.getData("Id", index)
+                if (nodeId === -1){
+                    nodeId = ""
+                }
+                gqlModels.updateItemsModel(nodeId)
+            }
+            onOpenBranch: {
+                let nodeId = treeViewInternal.getData("Id", index)
+                visualControl.select(nodeId)
+            }
+            onCloseBranch: {
+                let nodeId = treeViewInternal.getData("Id", index)
+                visualControl.deselect(nodeId)
+                treeViewInternal.deleteBranch(index)
+            }
         }
 
 
@@ -214,8 +246,18 @@ Item {
         commandId: collectionStructureBaseContainer.commandId;
         rootItem: collectionStructureBaseContainer;
 
-        onItemsChanged: {
-            treeViewInternal.elements = gqlModels.items;
+        onItemsReceived: {
+            let index = treeViewInternal.findIndexById(selectIndex)
+            console.log("onItemsReceived", selectIndex, index)
+            treeViewInternal.insertTree(index, items)
+            treeViewInternal.model.SetData("IsOpen", true, index);
+            for (let i = 0; i < items.GetItemsCount(); i++){
+                let nodeId = items.GetData("Id", i)
+                if (visualControl.contains(nodeId)){
+                    gqlModels.updateItemsModel(nodeId)
+                }
+            }
+
         }
 
         onItemsInfoGqlStateChanged: {

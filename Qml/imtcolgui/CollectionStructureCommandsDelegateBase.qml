@@ -38,6 +38,9 @@ Item {
     property alias setDescriptionDialogComp : setDescriptionDialog;
 
     signal selectionChanged();
+    function test(){
+        console.log("test")
+    }
 
     property string removeDialogTitle: qsTr("Deleting a selected element");
     property string removeMessage: qsTr("Remove selected item from the collection ?");
@@ -45,7 +48,8 @@ Item {
     /**
         Requests IDs for GQL models
     */
-    property string removeGqlCommand;
+    property string removeNodeGqlCommand;
+    property string removeObjectGqlCommand;
     property string renameGqlCommand;
     property string newNodeGqlCommand;
     property string setDescriptionGqlCommand;
@@ -65,7 +69,7 @@ Item {
         console.log("CollectionStructureCommandsDelegateBase onSelectionChanged", containerBase.commandsProvider);
         let index = containerBase.treeView.selectedIndex;
 
-        let isEnabled = (indexes >= 0)
+        let isEnabled = (index >= 0)
         if(containerBase.commandsProvider){
             containerBase.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
             containerBase.commandsProvider.setCommandIsEnabled("Edit", isEnabled);
@@ -77,7 +81,7 @@ Item {
             if (containerBase.treeView.rightButtonMouseClicked){
                 containerBase.treeView.rightButtonMouseClicked.connect(openPopupMenu);
             }
-            containerBase.selectionChanged.connect(containerBase.selectionChanged);
+            containerBase.treeView.selectionChanged.connect(containerBase.selectionChanged);
         }
     }
 
@@ -90,7 +94,8 @@ Item {
         Events.subscribeEvent(containerBase.commandId + "CommandActivated", containerBase.commandHandle);
 
         if (containerBase.commandId !== ""){
-            removeGqlCommand = containerBase.commandId + "Remove";
+            removeNodeGqlCommand = containerBase.commandId + "RemoveNode";
+            removeObjectGqlCommand = containerBase.commandId + "RemoveObject";
             renameGqlCommand = containerBase.commandId + "Rename";
             newNodeGqlCommand = containerBase.commandId + "InsertNewNode";
             setDescriptionGqlCommand = containerBase.commandId + "SetDescription";
@@ -135,15 +140,15 @@ Item {
 
     function onEdit(){
         console.log("CollectionStructure onEdit");
-        let elementsModel = containerBase.tableData.elements;
+        let elementsModel = containerBase.treeView;
         if (!elementsModel){
             return;
         }
 
         let index = containerBase.treeView.selectedIndex
         if (index >= 0){
-            let itemId = elementsModel.GetData("Id", index);
-            let itemName = elementsModel.GetData("Name", index);
+            let itemId = elementsModel.getData("Id", index);
+            let itemName = elementsModel.getData("Name", index);
             containerBase.collectionStructureBase.selectItem(itemId, itemName);
         }
     }
@@ -169,7 +174,7 @@ Item {
 
         let index = -1
         if (containerBase.treeView.selectedIndex){
-            index = containerBase.treeView.selectedIndex
+            index = containerBase.treeView.findParentIndex(containerBase.treeView.selectedIndex)
         }
         // let selectedName = containerBase.treeView.GetData("Name", index);
         modalDialogManager.openDialog(newNodeDialog, {"message": qsTr("Please enter the name of the new node"), "inputValue": ""});
@@ -214,6 +219,7 @@ Item {
         }
 
         let commandIsEnabled = containerBase.commandsProvider.commandIsEnabled(commandId);
+        commandIsEnabled = true
         if (commandIsEnabled){
             if (commandId === "New"){
                 containerBase.onNewDocument();
@@ -261,18 +267,16 @@ Item {
             message: containerBase.removeMessage;
             title: containerBase.removeDialogTitle;
             onFinished: {
-                if (buttonId == "Yes"){
-                    let indexes = containerBase.tableData.getSelectedIndexes();
-                    if (indexes.length > 0){
-                        let index = indexes[0];
-                        let id = containerBase.tableData.elements.GetData("Id", index);
-
-                        console.log("index", index);
-                        removeModel.updateModel(id);
+                if (buttonId == "Yes"){                    
+                    let index = containerBase.treeView.selectedIndex;
+                    let id = containerBase.treeView.getData("Id", index);
+                    let typeId = containerBase.treeView.getData("TypeId", index);
+                    if (id !== ""){
+                        removeModel.updateModel(id, typeId);
                     }
                 }
 
-                containerBase.tableData.forceActiveFocus();
+                containerBase.treeView.forceActiveFocus();
             }
         }
     }
@@ -347,15 +351,21 @@ Item {
     GqlModel {
         id: removeModel;
 
-        function updateModel(itemId) {
-            console.log( "updateModel removeModel");
+        function updateModel(itemId, typeId) {
+            console.log( "updateModel removeModel", itemId, typeId);
 
-            var query;
-            var queryFields;
-            var inputParams = Gql.GqlObject("input");
+            let query;
+            let queryFields;
+            let inputParams = Gql.GqlObject("input");
 
             if(itemId !== ""){
-                query = Gql.GqlRequest("mutation", containerBase.removeGqlCommand);
+                if (typeId == "Node"){
+                    query = Gql.GqlRequest("mutation", containerBase.removeNodeGqlCommand);
+                }
+                else{
+                    query = Gql.GqlRequest("mutation", containerBase.removeObjectGqlCommand);
+                }
+
                 inputParams.InsertField("Id", itemId);
                 queryFields = Gql.GqlObject("removedNotification");
                 query.AddParam(inputParams);
@@ -446,6 +456,23 @@ Item {
             inputParams.InsertField("Id", uuid);
 
             inputParams.InsertField("NewName", newName);
+
+            let parentIndex = -1
+            let selectedIndex = containerBase.treeView.selectedIndex
+            if (containerBase.treeView.selectedIndex > -1){
+                if (containerBase.treeView.getData("TypeId", selectedIndex) === "Node"){
+                    parentIndex = selectedIndex
+                }
+                else{
+                    parentIndex = containerBase.treeView.findParentIndex(containerBase.treeView.selectedIndex)
+                }
+            }
+
+            let parentNodeId = containerBase.treeView.getData("Id", parentIndex)
+            if (parentNodeId === undefined){
+                parentNodeId = ""
+            }
+            inputParams.InsertField("ParentNodeId", parentNodeId);
 
             query.AddParam(inputParams);
 
