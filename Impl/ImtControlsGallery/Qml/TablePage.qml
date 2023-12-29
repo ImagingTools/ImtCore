@@ -89,7 +89,6 @@ Rectangle {
         visibleLeftBorderFirst: false;
         hasFilter: false;
         hasSort: false;
-        cacheBuffer: 0;
         canSetBorderParams: true;
         elements: tablePage.items;
 
@@ -127,7 +126,6 @@ Rectangle {
         visibleLeftBorderFirst: false;
         hasFilter: false;
         hasSort: false;
-        cacheBuffer: 0;
         canSetBorderParams: true;
         enableAlternating : false;
         canMoveColumns: true;
