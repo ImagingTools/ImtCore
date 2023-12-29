@@ -110,11 +110,11 @@ Item {
 
     function updateBranch(nodeId){
         let index = treeViewInternal.findIndexById(nodeId)
-        if (index > -1){
+        // if (index > -1){
             treeViewInternal.deleteBranch(index)
             treeViewInternal.model.SetData("IsOpen", true, index);
             gqlModels.updateItemsModel(nodeId)
-        }
+        // }
     }
 
     Rectangle {

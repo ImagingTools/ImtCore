@@ -1,0 +1,375 @@
+import QtQuick 2.12
+import Acf 1.0
+import imtcontrols 1.0
+import imtlicgui 1.0
+import imtqml 1.0
+
+Item {
+    id: collectionViewContainer;
+
+
+    property int contentMargins: 0;
+
+    property alias baseCollectionView: collectionViewBase;
+
+    property string itemId;
+    property string itemName;
+    property bool isUsedDocumentManager: true;
+    property bool visibleMetaInfo: true;
+    property bool hasFilter: true;
+
+    property string commandId;
+    property string editorPath;
+    property string commandsDelegatePath: "CollectionViewCommandsDelegateBase.qml";
+    property string commandUpdateGui;
+    property alias commandsDelegate: commandsLoader.item;
+
+    property alias table: collectionViewBase.table;
+    property alias tableElementsDelegate: collectionViewBase.tableElementsDelegate;
+    property alias tableHeadersDelegate: collectionViewBase.tableHeadersDelegate;
+    property alias elementsList: collectionViewBase.elementsList;
+    property alias tableMinWidth: collectionViewBase.tableMinWidth;
+    property alias tableDecoratorPath: collectionViewBase.tableDecoratorPath;
+    property alias tableDecoratorComp: collectionViewBase.tableDecoratorComp;
+    property alias tableHeaderHeight: collectionViewBase.tableHeaderHeight;
+    property alias tableItemHeight: collectionViewBase.tableItemHeight;
+    property alias metaInfo: collectionMetaInfo;
+    property alias tableCellDecorator: collectionViewBase.tableCellDecorator;
+    property alias tableWidthDecorator: collectionViewBase.tableWidthDecorator;
+    property alias tableWidth: collectionViewBase.tableWidth;
+    property alias tableHeaders: collectionViewBase.tableHeaders;
+
+
+    property alias filterMenu: collectionViewBase.filterMenu;
+    property alias filterMenuVisible: collectionViewBase.filterMenuVisible;
+    property alias modelFilter: collectionViewBase.modelFilter;
+    property alias defaultSortHeaderIndex: collectionViewBase.defaultSortHeaderIndex;
+    property alias defaultOrderType: collectionViewBase.defaultOrderType;
+
+    property TreeItemModel documentsData: TreeItemModel {}
+    property Item documentManager: null;
+
+    property ListModel contextMenuModel: ListModel {}
+
+    property alias commandsProvider: commandsProviderLocal;
+
+    signal elementsChanged();
+    signal headersChanged();
+
+    signal filterDecoratorLoaded();
+
+    Component.onCompleted: {
+        Events.subscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
+        Events.subscribeEvent("OnLocalizationChanged", collectionViewContainer.onLocalizationChanged);
+
+        collectionViewContainer.fillContextMenuModel();
+    }
+
+    Component.onDestruction: {
+        console.log("CollectionView onDestruction", itemId, collectionViewContainer);
+
+        Events.unSubscribeEvent("OnLocalizationChanged", collectionViewContainer.onLocalizationChanged);
+        Events.unSubscribeEvent(collectionViewContainer.commandUpdateGui, collectionViewContainer.updateGui);
+        Events.unSubscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
+    }
+
+    property bool localizationChanged: false;
+
+    function onLocalizationChanged(language){
+        console.log("CommandsDecorator onLocalizationChanged", language);
+
+        if (visible){
+            commandsProviderLocal.updateModel();
+        }
+        else{
+            localizationChanged = true;
+        }
+
+        fillContextMenuModel();
+    }
+
+    Keys.onPressed: {
+        if (event.key === Qt.Key_Delete){
+            commandsLoader.item.commandHandle("Remove");
+        }
+    }
+
+    onDocumentsDataChanged: {
+        console.log("CollectionView onDocumentsDataChanged");
+        collectionViewContainer.itemId = documentsData.GetData("Id", model.index);
+        collectionViewContainer.itemName = documentsData.GetData("Title", model.index);
+    }
+
+    onCommandUpdateGuiChanged: {
+        Events.subscribeEvent(collectionViewContainer.commandUpdateGui, collectionViewContainer.updateGui);
+    }
+
+    onVisibleChanged: {
+        console.log("CollectionView onVisibleChanged", visible, itemId, collectionViewContainer);
+        if (collectionViewContainer.visible){
+            Events.sendEvent("CommandsModelChanged", {"Model": commandsProviderLocal.commandsModel,
+                                                      "CommandId": commandsProviderLocal.commandId});
+
+            Events.subscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
+
+            if (localizationChanged){
+                commandsProviderLocal.updateModel();
+
+                localizationChanged = false;
+            }
+        }
+        else{
+            Events.unSubscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
+        }
+    }
+
+    onDocumentManagerChanged: {
+        console.log("onDocumentManagerChanged", collectionViewContainer.documentManager);
+        if (collectionViewContainer.documentManager != null){
+            if (commandsLoader.item && commandsLoader.item.documentManager !== undefined){
+                commandsLoader.item.documentManager = collectionViewContainer.documentManager;
+            }
+        }
+    }
+
+    function filterMenuActivate(){
+        if (collectionViewContainer.hasFilter){
+            collectionViewContainer.filterMenuVisible = !collectionViewContainer.filterMenuVisible;
+        }
+    }
+
+    function fillContextMenuModel(){
+        contextMenuModel.clear();
+        contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../../Icons/Light/Edit_On_Normal.svg"});
+        contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../Icons/Light/Remove_On_Normal.svg"});
+        contextMenuModel.append({"Id": "Rename", "Name": qsTr("Rename"), "IconSource": ""});
+        contextMenuModel.append({"Id": "SetDescription", "Name": qsTr("Set Description"), "IconSource": ""});
+    }
+
+    onCommandIdChanged: {
+        console.log("CollectionView onCommandsIdChanged", collectionViewContainer.commandId);
+
+        commandsProviderLocal.commandId = collectionViewContainer.commandId;
+        commandsProviderLocal.documentUuid = collectionViewContainer.commandId;
+
+        collectionViewBase.commands.gqlModelObjectView = collectionViewContainer.commandId + "ObjectView";
+        collectionViewBase.commands.gqlModelHeadersInfo = collectionViewContainer.commandId + "Info";
+        collectionViewBase.commands.gqlModelItemsInfo = collectionViewContainer.commandId + "List";
+
+        collectionViewBase.commandsId = collectionViewContainer.commandId;
+
+        collectionMetaInfo.gqlModelMetaInfo = collectionViewContainer.commandId + "MetaInfo";
+
+        if (commandsLoader.item){
+            commandsLoader.item.commandsId = collectionViewContainer.commandId;
+
+            commandsLoader.item.gqlModelItem = commandsLoader.item.commandId + "Item";
+            commandsLoader.item.gqlModelRemove = commandsLoader.item.commandId + "Remove";
+            commandsLoader.item.gqlModelRename = commandsLoader.item.commandId + "Rename";
+            commandsLoader.item.gqlModelSetDescription = commandsLoader.item.commandId + "SetDescription";
+        }
+    }
+
+    function updateGui(){
+        collectionViewBase.commands.updateModels();
+    }
+
+    function selectItem(id, name, index){
+        let editorPath = collectionViewBase.commands.objectViewEditorPath;
+        let commandId = collectionViewBase.commands.objectViewEditorCommandsId;
+        console.log("CollectionView selectItem", id, name, commandId, editorPath);
+
+        if(name === undefined){
+            name = " ";
+        }
+
+        if (collectionViewContainer.isUsedDocumentManager){
+            if (id === ""){
+                documentManager.addDocument({"Id": id, "Name": name, "CommandId": commandId, "Source": editorPath}, {}, false);
+            }
+            else{
+                documentManager.openDocument(id, {"Id": id, "Name": name, "CommandId": commandId, "Source": editorPath});
+            }
+        }
+        else{
+            modalDialogManager.openDialog(contentDialog, {"contentId": id, "contentName": name, "contentCommandsId": commandId,"contentSource": editorPath});
+        }
+    }
+
+    function getEditorPath(){
+        return collectionViewBase.commands.objectViewEditorPath;
+    }
+
+    function getEditorCommandId(){
+        return collectionViewBase.commands.objectViewEditorCommandsId;
+    }
+
+    Component {
+        id: contentDialog;
+        Item {
+            id: content;
+            property Item root: null;
+            property Item rootItem:collectionViewContainer;
+            property bool centered: true;
+            property string contentId;
+            property string contentName;
+            property string contentSource;
+            property string contentCommandsId;
+            width: contentLoader.width;
+            height: contentLoader.height;
+
+            onRootChanged: {
+                if(contentLoader.item){
+                    contentLoader.item.root = content.root;
+                }
+            }
+            onRootItemChanged: {
+                if(contentLoader.item){
+                    contentLoader.item.rootItem = content.rootItem;
+                }
+            }
+
+            Loader {
+                id: contentLoader;
+                anchors.centerIn: parent;
+                source: content.contentSource;
+                onLoaded: {
+                    console.log("contentLoader onLoaded");
+
+                    contentLoader.item.root = content.root;
+                    contentLoader.item.rootItem = content.rootItem;
+                    contentLoader.width = item.width;
+                    contentLoader.height = item.height;
+                    contentLoader.item.itemId = content.contentId;
+                    contentLoader.item.itemName = content.contentName;
+                    contentLoader.item.commandId = content.contentCommandsId;
+                }
+            }
+        }
+
+    }
+
+    Loader {
+        id: commandsLoader;
+
+        Component.onCompleted: {
+            console.log("commandsLoader.source", parent.commandsDelegatePath);
+            commandsLoader.source = parent.commandsDelegatePath;
+        }
+
+        onLoaded: {
+            console.log("commandsLoader onLoaded");
+            commandsLoader.item.commandsId = collectionViewContainer.commandId;
+
+            commandsLoader.item.tableData = collectionViewBase.table;
+
+            commandsLoader.item.collectionViewBase = collectionViewContainer;
+            commandsLoader.item.commandsProvider = commandsProviderLocal;
+            commandsLoader.item.documentManager = collectionViewContainer.documentManager;
+
+            commandsLoader.item.contextMenuModel = collectionViewContainer.contextMenuModel;
+        }
+
+        onStatusChanged: {
+            console.log("commandsLoader onStatusChanged", status);
+        }
+    }
+
+    Rectangle {
+        anchors.fill: parent;
+
+        color: Style.baseColor;
+    }
+
+    function getSelectedIds(){
+        return collectionViewBase.table.getSelectedIds();
+    }
+
+    function getSelectedIndexes(){
+        return collectionViewBase.table.getSelectedIndexes();
+    }
+
+    function getSelectedNames(){
+        return collectionViewBase.table.getSelectedNames();
+    }
+
+    CollectionViewBase {
+        id: collectionViewBase;
+
+        anchors.right: collectionMetaInfo.left;
+        anchors.left: parent.left;
+        anchors.top: parent.top;
+        anchors.bottom: parent.bottom;
+        anchors.margins: parent.contentMargins;
+
+        itemId: collectionViewContainer.itemId;
+
+        commandsId: parent.commandId;
+        loadData: true;
+        hasFilter: collectionViewContainer.hasFilter;
+
+        onFilterDecoratorLoaded: {
+            collectionViewContainer.filterDecoratorLoaded();
+        }
+
+        onSelectionChanged: {
+            if (collectionMetaInfo.visible){
+                if (selection.length === 1){
+                    let itemIds = collectionViewContainer.getSelectedIds();
+                    let itemNames = collectionViewContainer.getSelectedNames();
+
+                    if (itemIds.length > 0){
+                        let itemId = itemIds[0];
+                        collectionMetaInfo.getMetaInfo(itemId);
+                    }
+
+                    collectionMetaInfo.contentVisible = true;
+                }
+                else{
+                    collectionMetaInfo.contentVisible = false
+                }
+            }
+        }
+
+        onSelectedItem: {
+            console.log("CollectionViewBase onItemSelected");
+
+            if (id == ""){
+                commandsLoader.item.commandHandle("New");
+            }
+            else{
+                commandsLoader.item.commandHandle("Edit");
+            }
+        }
+
+        onElementsChanged: {
+            collectionViewContainer.elementsChanged();
+        }
+
+        onHeadersChanged: {
+            collectionViewContainer.headersChanged();
+        }
+    }
+
+    CommandsProvider {
+        id: commandsProviderLocal;
+
+        onModelLoaded: {
+            collectionViewContainer.onCommandsModelChanged();
+        }
+    }
+
+    function onCommandsModelChanged(){}
+
+    MetaInfo {
+        id: collectionMetaInfo;
+
+        anchors.right: parent.right;
+
+        width: visible ? 200 : 1;
+        height: parent.height;
+
+        visible: collectionViewContainer.visibleMetaInfo;
+    }
+}
+

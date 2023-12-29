@@ -24,11 +24,11 @@ QtObject {
         container.gqlGetModel.getData(documentTypeId, documentId, additionInputParams, callback);
     }
 
-    function setData(documentTypeId, documentId, documentData, additionInputParams, callback){
-        console.log("setData", documentTypeId, documentId, documentData, callback);
+    function setData(addCommandId, documentId, documentData, additionInputParams, callback){
+        console.log("setData", addCommandId, documentId, documentData, callback);
 
-        if (documentTypeId === ""){
-            console.error("Set data object was failed! DocumentTypeId is invalid.");
+        if (addCommandId === ""){
+            console.error("Set data object was failed! addCommandId is invalid.");
             return;
         }
 
@@ -36,7 +36,7 @@ QtObject {
             additionInputParams = {}
         }
 
-        container.gqlSetModel.setData(documentTypeId, documentId, documentData, additionInputParams, callback);
+        container.gqlSetModel.setData(addCommandId, documentId, documentData, additionInputParams, callback);
     }
 
     function updateData(documentTypeId, documentId, documentData, additionInputParams, callback){
@@ -128,10 +128,10 @@ QtObject {
     }//GqlModel itemModel
 
     property GqlModel gqlSetModel: GqlModel {
-        function setData(documentTypeId, documentId, documentData, additionInputParams, callback){
+        function setData(addCommandId, documentId, documentData, additionInputParams, callback){
 
             console.log("gqlSetModel additionInputParams", JSON.stringify(additionInputParams));
-            var query = Gql.GqlRequest("mutation", documentTypeId + "Add");
+            var query = Gql.GqlRequest("mutation", addCommandId);
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", documentId);
@@ -169,8 +169,8 @@ QtObject {
                     if (container.gqlSetModel.ContainsKey("errors")){
                         dataModelLocal = container.gqlSetModel.GetData("errors");
 
-                        if (dataModelLocal.ContainsKey(documentTypeId + "Add")){
-                            dataModelLocal = dataModelLocal.GetData(documentTypeId + "Add");
+                        if (dataModelLocal.ContainsKeya(addCommandId)){
+                            dataModelLocal = dataModelLocal.GetData(addCommandId);
                         }
 
                         let message = ""
@@ -189,8 +189,8 @@ QtObject {
                     else if (container.gqlSetModel.ContainsKey("data")){
                         dataModelLocal = container.gqlSetModel.GetData("data");
 
-                        if (dataModelLocal.ContainsKey(documentTypeId + "Add")){
-                            dataModelLocal = dataModelLocal.GetData(documentTypeId + "Add");
+                        if (dataModelLocal.ContainsKey(addCommandId)){
+                            dataModelLocal = dataModelLocal.GetData(addCommandId);
                             dataModelLocal = dataModelLocal.GetData("addedNotification");
 
                             let documentId = dataModelLocal.GetData("Id");

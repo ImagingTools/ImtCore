@@ -468,9 +468,7 @@ Item {
                     let dataModelLocal = subscriptionClient.GetData("data")
                     if (dataModelLocal.ContainsKey("NodeId")){
                         let nodeId = dataModelLocal.GetData("NodeId");
-                        if (nodeId !== ""){
                             collectionStructureBase.updateBranch(nodeId)
-                        }
                     }
                 }
             }

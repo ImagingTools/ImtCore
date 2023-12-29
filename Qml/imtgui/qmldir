@@ -32,8 +32,8 @@ SortController 1.0 Models/SortController.qml
 StateMachine 1.0 Models/StateMachine.qml
 TableProperties 1.0 Models/TableProperties.qml
 TableSelection 1.0 Models/TableSelection.qml
-TreeItemModelConverter 1.0 Models/TreeItemModelConverter.qml
-TreeItemModelObserver 1.0 Models/TreeItemModelObserver.qml
+TreeItemModelConverter 1.0 ./Models/TreeItemModelConverter.qml
+TreeItemModelObserver 1.0 ./Models/TreeItemModelObserver.qml
 UuidGenerator 1.0 Models/UuidGenerator.qml
 
 CommandsDecorator 1.0 Panels/CommandsDecorator.qml
@@ -91,10 +91,25 @@ TreeDelegate1.0 View/TreeDelegate.qml
 TreeItemDelegate 1.0 View/TreeItemDelegate.qml
 TreeView 1.0 View/TreeView.qml
 TreeViewCommandsDelegateBase 1.0 View/TreeViewCommandsDelegateBase.qml
-TreeViewGql 1.0 View/TreeViewGql.qml
+TreeViewGql 1.0 ./View/TreeViewGql.qml
 TreeViewItemDelegateBase 1.0 View/TreeViewItemDelegateBase.qml
 TreeViewModelAdapter 1.0 View/TreeViewModelAdapter.qml
 TreeViewSelection 1.0 View/TreeViewSelection.qml
+
+ButtonPanel 1.0 qrc:/qml/imtgui/ButtonPanel.qml
+Diagram 1.0 qrc:/qml/imtgui/Diagram.qml
+BarChart 1.0 qrc:/qml/imtgui/BarChart.qml
+Piechart 1.0 qrc:/qml/imtgui/Piechart.qml
+PaintedCorner 1.0 qrc:/qml/imtgui/PaintedCorner.qml
+SearchComp 1.0 qrc:/qml/imtgui/SearchComp.qml
+MovingItem 1.0 qrc:/qml/imtgui/MovingItem.qml
+ChangeItemSize 1.0 qrc:/qml/imtgui/ChangeItemSize.qml
+SpinBox 1.0 qrc:/qml/imtgui/SpinBox.qml
+ProgressBar 1.0 qrc:/qml/imtgui/ProgressBar.qml
+CheckBoxMenu 1.0 qrc:/qml/imtgui/CheckBoxMenu.qml
+ExpandingContainer 1.0 qrc:/qml/imtgui/ExpandingContainer.qml
+Gallery 1.0 qrc:/qml/imtgui/Gallery.qml
+
 
 BaseText 1.0 qrc:/qml/imtgui/BaseText.qml
 ComboBox 1.0 qrc:/qml/imtgui/ComboBox.qml
@@ -119,17 +134,3 @@ BaseButton 1.0 qrc:/qml/imtgui/BaseButton.qml
 RoundButton 1.0 qrc:/qml/imtgui/RoundButton.qml
 CustomRadioButton 1.0 qrc:/qml/imtgui/CustomRadioButton.qml
 RadioBox 1.0 qrc:/qml/imtgui/RadioBox.qml
-
-ButtonPanel 1.0 qrc:/qml/imtgui/ButtonPanel.qml
-Diagram 1.0 qrc:/qml/imtgui/Diagram.qml
-BarChart 1.0 qrc:/qml/imtgui/BarChart.qml
-Piechart 1.0 qrc:/qml/imtgui/Piechart.qml
-PaintedCorner 1.0 qrc:/qml/imtgui/PaintedCorner.qml
-SearchComp 1.0 qrc:/qml/imtgui/SearchComp.qml
-MovingItem 1.0 qrc:/qml/imtgui/MovingItem.qml
-ChangeItemSize 1.0 qrc:/qml/imtgui/ChangeItemSize.qml
-SpinBox 1.0 qrc:/qml/imtgui/SpinBox.qml
-ProgressBar 1.0 qrc:/qml/imtgui/ProgressBar.qml
-CheckBoxMenu 1.0 qrc:/qml/imtgui/CheckBoxMenu.qml
-ExpandingContainer 1.0 qrc:/qml/imtgui/ExpandingContainer.qml
-Gallery 1.0 qrc:/qml/imtgui/Gallery.qml

@@ -154,7 +154,7 @@ Item {
     }
 
     function onRemove(){
-        if (containerBase.commandId === "" || removeGqlCommand === ""){
+        if (containerBase.commandId === ""){
             console.error("Remove item was failed!")
             return;
         }

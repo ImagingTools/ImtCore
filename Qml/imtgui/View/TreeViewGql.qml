@@ -23,12 +23,23 @@ Rectangle{
     property real selectionOpacity: 0.5;
 
     signal requestSignal(int index);
+    signal rightButtonMouseClicked(int mX, int mY);
 
     signal clicked(int index);
     signal doubleClicked(int index);
+    signal selectionChanged();
+    signal openBranch(int index)
+    signal closeBranch(int index)
 
-    onClicked: {
-        selectedIndex = index;
+    // onClicked: {
+    //     if (selectedIndex != index ){
+    //         selectedIndex = index
+    //         treeViewGql.selectionChanged()
+    //     }
+
+    // }
+
+    onDoubleClicked: {
     }
 
     function getData(key,index){
@@ -61,7 +72,6 @@ Rectangle{
         radius: 4;
 
         color : treeViewGql.color;
-        //border.color: "lightgrey";
 
         Item{
             id: listFrame;
@@ -88,6 +98,8 @@ Rectangle{
             contentWidth: delegateWidth;
             clip: true;
             property int delegateWidth: treeViewGql.delegateWidht;
+            property int delegateWidthFull: list.maxLevel * treeViewGql.shift + list.delegateWidth;
+            property int maxLevel: 1;
 
             onContentYChanged: {
                 listFrame.contentY = contentY;
@@ -98,31 +110,29 @@ Rectangle{
             delegate: Item{
                 id: deleg;
 
-                width: model.Visible ? model.Level * treeViewGql.shift + list.delegateWidth : 0;
+                width: !model.Visible ? 0 : Math.max(list.width, list.delegateWidthFull);
                 height: model.Visible ? treeViewGql.delegateHeight : 0;
                 opacity: model.Visible;
-                clip: true;
-                property bool isOpen: model.IsOpen;
+                property bool isOpen: model.IsOpen == undefined ? false : model.IsOpen;
+
+                Rectangle{
+                    id: selectionRec;
+
+                    anchors.fill: parent;
+
+                    radius: 2;
+                    opacity: treeViewGql.selectionOpacity;
+                    color: treeViewGql.selectionColor;
+                    visible: !treeViewGql.hasSelection ? false : model.index == treeViewGql.selectedIndex;
+                }
+
                 Rectangle{
                     anchors.left: parent.left;
-                    anchors.leftMargin: model.Level * treeViewGql.shift;
+                    anchors.leftMargin: model.Level !== undefined ? model.Level * treeViewGql.shift : 0;
                     width: list.delegateWidth;
                     height: parent.height;
                     color: "transparent";
-                    Rectangle{
-                        id: selectionRec;
 
-                        anchors.left: parent.left;
-                        anchors.leftMargin: folderImage.x - 4;
-                        anchors.top: parent.top;
-                        anchors.bottom: parent.bottom;
-                        width: Math.min(parent.width - anchors.leftMargin, nameText.x + nameText.width + 4  - anchors.leftMargin);
-
-                        radius: 4;
-                        opacity: treeViewGql.selectionOpacity;
-                        color: treeViewGql.selectionColor;
-                        visible: !treeViewGql.hasSelection ? false : model.index == treeViewGql.selectedIndex;
-                    }
 
                     AuxButton{
                         id: openButton;
@@ -159,11 +169,12 @@ Rectangle{
                                         treeViewGql.setVisibleElements(true, model.index)
                                     }
                                     treeViewGql.model.SetData("IsOpen", true, model.index);
-
+                                    treeViewGql.openBranch(model.index)
                                 }
                                 else if(deleg.isOpen){
                                     treeViewGql.model.SetData("IsOpen", false, model.index);
                                     treeViewGql.setVisibleElements(false, model.index)
+                                    treeViewGql.closeBranch(model.index)
                                 }
                             }
 
@@ -182,7 +193,7 @@ Rectangle{
                         height: width;
                         sourceSize.width: width;
                         sourceSize.height: height;
-                        source: treeViewGql.getIcon(model.TypeId, deleg.isOpen);
+                        source: model.TypeId == undefined ? "" : treeViewGql.getIcon(model.TypeId, deleg.isOpen);
                     }
 
                     Text{
@@ -197,7 +208,7 @@ Rectangle{
                         font.pixelSize: Style.fontSize_subtitle !==undefined ? Style.fontSize_subtitle : 18;
                         color: Style.textColor;
 
-                        text: model[treeViewGql.nameId];
+                        text: model[treeViewGql.nameId] !== undefined ? model[treeViewGql.nameId] : "";
                     }
 
 
@@ -208,12 +219,25 @@ Rectangle{
                         anchors.top: parent.top;
                         anchors.bottom: parent.bottom;
                         anchors.right: parent.right;
-                        anchors.left: nameText.left;
+                        anchors.left: folderImage.left;
+
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton;
 
                         hoverEnabled: visible;
                         cursorShape: Qt.PointingHandCursor;
                         onClicked: {
-                            treeViewGql.clicked(model.index, model.Level);
+                            if (treeViewGql.selectedIndex !== model.index ){
+                                treeViewGql.selectedIndex = model.index
+                                treeViewGql.selectionChanged()
+                            }
+                            treeViewGql.clicked(model.index);
+
+                            if (mouse.button === Qt.RightButton) {
+                                console.log("TreeViewGqlDelegate onRightButtonMouseClicked");
+
+                                var point = mapToItem(null, this.mouseX, this.mouseY);
+                                treeViewGql.rightButtonMouseClicked(point.x, point.y);
+                            }
                         }
                         onDoubleClicked: {
                             treeViewGql.doubleClicked(model.index, model.Level);
@@ -288,7 +312,7 @@ Rectangle{
         let innerId = treeViewGql.model.GetData("InnerId", index);
         let found = false;
         let foundChangeCount = 0;
-        for(let i = 0; i < treeViewGql.model.GetItemsCount(); i++){
+        for(let i = index + 1; i < treeViewGql.model.GetItemsCount(); i++){
             let branchIds = treeViewGql.model.IsValidData("BranchIds", i) ? treeViewGql.model.GetData("BranchIds", i) : "";
             //console.log("branchIds:: ", branchIds)
             let ok = false;
@@ -326,10 +350,100 @@ Rectangle{
 
     }
 
+    function findIndexById(id){
+        let foundIndex = -1;
+        for(let i = 0; i < treeViewGql.model.GetItemsCount(); i++){
+            let id_curr = treeViewGql.model.IsValidData("Id", i) ? treeViewGql.model.GetData("Id", i) : "";
+            if(id_curr == id){
+                foundIndex = i;
+                break;
+            }
+        }
+        return foundIndex;
+    }
+
+    function findParentIndex(index){
+        let foundIndex = -1;
+        let branchIds = treeViewGql.model.IsValidData("BranchIds", index) ? treeViewGql.model.GetData("BranchIds", index) : "";
+        if(branchIds == ""){
+            //console.log("FOUND_INDEX_ RETURN ", foundIndex);
+            return -1;
+        }
+        let arr = branchIds.split(",");
+        let parentId = arr[arr.length - 1];
+        for(let i = index - 1; i >=0; i--){
+            let innerId = treeViewGql.model.GetData("InnerId", i);
+            if(innerId == parentId){
+                foundIndex =  i;
+                break;
+            }
+        }
+        //console.log("FOUND_INDEX ", foundIndex);
+        return foundIndex;
+    }
+
+    function deleteBranch(index){
+        //console.log("DELETE BRANCH", index);
+        if (index < 0){
+            treeViewGql.model.Clear()
+
+            return
+        }
+
+        let innerId = treeViewGql.model.GetData("InnerId", index);
+        let found = false;
+        let foundChangeCount = 0;
+        for(let i = index + 1; i < treeViewGql.model.GetItemsCount(); i++){
+            let branchIds = treeViewGql.model.IsValidData("BranchIds", i) ? treeViewGql.model.GetData("BranchIds", i) : "";
+            //console.log("branchIds:: ", branchIds)
+            let ok = false;
+            let arr = branchIds.split(",");
+            let arrCounter = 0;
+            for(let k = 0; k < arr.length; k++){
+                if(arr[k] == innerId){
+                    ok = true;
+                    if(!found){
+                        found = true;
+                        foundChangeCount = 1;
+                    }
+                    break;
+                }
+                arrCounter++;
+            }
+            if(arrCounter == arr.length && found){
+                foundChangeCount = 2;
+            }
+
+            if(foundChangeCount == 2){
+                //console.log("StopINdex::", i);
+                break;
+            }
+            //
+            if(ok){
+                treeViewGql.model.RemoveItem(i);
+                listFrame.contentHeight -= treeViewGql.delegateHeight;
+                treeViewGql.deleteBranch(index);
+            }
+        }
+
+        treeViewGql.model.SetData("IsOpen", false, index);
+        treeViewGql.model.SetData("HasBranch", false, index);
+
+        treeViewGql.setContentWidth();
+    }
+
     function insertTree(index, model_){
+
+        if(!model_ || !model_.GetItemsCount()){
+            return;
+        }
 
         let level_ = treeViewGql.model.IsValidData("Level", index) ? treeViewGql.model.GetData("Level", index) : -1;
         console.log("INSERT TREE", index, level_);
+
+        if((level_ + 1) > list.maxLevel){
+            list.maxLevel = level_ + 1;
+        }
 
         let date = new Date();
         let val = date.valueOf();
@@ -360,5 +474,5 @@ Rectangle{
         treeViewGql.setContentWidth();
     }
 
-
 }
+
