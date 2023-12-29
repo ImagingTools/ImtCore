@@ -43,6 +43,7 @@ FocusScope {
 
 	property string placeHolderText: "";
 
+    property bool editable: false;
 
 	property real contentY;
 
@@ -52,16 +53,71 @@ FocusScope {
     property int selectedIndex: -1;
     property bool hoverBlocked: true;
 
-	property Component delegate: PopupMenuDelegate{
-		width: comboBoxContainer.width;
-		height: comboBoxContainer.itemHeight;
-		textSize: comboBoxContainer.textSize;
-		fontColor: comboBoxContainer.fontColor;
-		textCentered: comboBoxContainer.compTextCentered;
-		mainColor: comboBoxContainer.compMainColor;
-		selectedColor: comboBoxContainer.compSelectedColor;
-		rootItem: comboBoxContainer;
-	   };
+    property Component delegate: Component
+    {
+        Item {
+            width: comboBoxContainer.width;
+            height: visible ? comboBoxContainer.itemHeight : 0;
+
+            property string displayText: model[comboBoxContainer.nameId];
+            property string filter: comboBoxContainer.currentText;
+
+            onFilterChanged: {
+                if (comboBoxContainer.editable){
+                    visible = displayText.indexOf(filter) >= 0;
+                }
+            }
+
+            Rectangle{
+                id: background;
+                anchors.fill: parent;
+
+                color: comboBoxContainer.currentIndex == model.index ? Style.selectedColor : "transparent";
+            }
+
+            Text {
+                id: mainText;
+
+                anchors.left: parent.left;
+                anchors.leftMargin: 10;
+                anchors.right: parent.right;
+                anchors.rightMargin: 10;
+                anchors.verticalCenter: parent.verticalCenter;
+//                anchors.horizontalCenter: popupMenuDelegate.textCentered ? parent.horizontalCenter : undefined;
+
+                color: Style.textColor;
+                font.pixelSize: Style.fontSize_common;
+                font.family: Style.fontFamily;
+
+                text: parent.displayText;
+
+                elide: Text.ElideRight;
+            }
+
+            MouseArea {
+                id: mouseArea;
+
+                anchors.fill: parent;
+
+                hoverEnabled: true;
+                cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+
+                visible: !comboBoxContainer ? true : !comboBoxContainer.hoverBlocked;
+                onEntered: {
+                    if(comboBoxContainer && comboBoxContainer.selectedIndex !== undefined)
+                    {
+                        comboBoxContainer.selectedIndex = model.index;
+                    }
+                }
+
+                onClicked: {
+                    //console.log("DEBUG::2022-11-13")
+                    popupMenuDelegate.clicked(model.Id, model.index);
+                    comboBoxContainer.finished(model.Id, model.index)
+                }
+            }
+        }
+    };
 
 	property alias image: cbArrowIcon;
 	property alias imageSource: cbArrowIcon.source;
@@ -92,6 +148,8 @@ FocusScope {
 		if (!comboBoxContainer.model){
 			return;
 		}
+
+        console.log("onModelChanged", comboBoxContainer.model.toJSON());
 
 		if (comboBoxContainer.currentIndex > -1){
 			comboBoxContainer.currentText = comboBoxContainer.model.GetData(comboBoxContainer.nameId);
@@ -171,7 +229,6 @@ FocusScope {
 												   "model": comboBoxContainer.model,
 												   "width": comboBoxContainer.width,
 												   "countVisibleItem": 5 });
-
 	}
 
 	function closePopupMenu(){
@@ -197,21 +254,6 @@ FocusScope {
 			GradientStop { position: 0.98; color: comboBoxContainer.isColor ? cbMainRect.color : Style.imagingToolsGradient3; }
 			GradientStop { position: 1.0; color: comboBoxContainer.isColor ? cbMainRect.color : Style.imagingToolsGradient4; }
 
-		}
-
-		Text {
-			id: cbTitleTxt;
-
-			anchors.verticalCenter: parent.verticalCenter;
-			anchors.left: parent.left;
-            anchors.right: cbArrowIcon.left;
-			anchors.rightMargin: 10;
-			color: comboBoxContainer.fontColorTitle;
-			text: comboBoxContainer.currentText !== "" ? comboBoxContainer.currentText : comboBoxContainer.placeHolderText;
-			font.family: Style.fontFamily;
-			font.pixelSize: comboBoxContainer.textSize;
-
-			elide: Text.ElideRight;
 		}
 
 		Image {
@@ -269,40 +311,27 @@ FocusScope {
             }
 		}
 
+        CustomTextField {
+            id: cbTitleTxt;
+
+//            anchors.verticalCenter: parent.verticalCenter;
+            anchors.left: parent.left;
+            anchors.right: cbArrowIcon.left;
+            anchors.rightMargin: 10;
+
+            height: parent.height;
+
+            text: comboBoxContainer.currentText !== "" ? comboBoxContainer.currentText : comboBoxContainer.placeHolderText;
+
+            onTextChanged: {
+                comboBoxContainer.currentText = cbTitleTxt.text;
+            }
+        }
+
         CustomTooltip{
             id: tooltip;
 
             fitToTextWidth: true;
         }
-
 	}
-
-    Shortcut {
-        sequence: "Space";
-        enabled: !comboBoxContainer.isOpen && comboBoxContainer.focus;
-        onActivated: {
-            openPopupMenu();
-        }
-    }
-
-    Shortcut {
-        sequence: "Down";
-        enabled: !comboBoxContainer.isOpen && comboBoxContainer.focus;
-        onActivated: {
-            if(comboBoxContainer.currentIndex < comboBoxContainer.model.GetItemsCount() - 1){
-                comboBoxContainer.currentIndex++;
-            }
-
-        }
-    }
-
-    Shortcut {
-        sequence: "Up";
-        enabled: !comboBoxContainer.isOpen && comboBoxContainer.focus;
-        onActivated: {
-            if(comboBoxContainer.currentIndex > 0){
-                comboBoxContainer.currentIndex--;
-            }
-        }
-    }
 }

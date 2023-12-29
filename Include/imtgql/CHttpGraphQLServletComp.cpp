@@ -128,13 +128,15 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		const imtgql::IGqlRequestHandler* requestHandlerPtr = m_gqlRequestHandlerCompPtr[index];
 		if (requestHandlerPtr != nullptr){
 			if (requestHandlerPtr->IsRequestSupported(m_gqlRequest)){
-				imtbase::CTreeItemModel* sourceItemModel = requestHandlerPtr->CreateResponse(m_gqlRequest, errorMessage);
-				if(sourceItemModel != nullptr){
+				istd::TDelPtr<imtbase::CTreeItemModel> sourceItemModelPtr;
+				sourceItemModelPtr.SetPtr(requestHandlerPtr->CreateResponse(m_gqlRequest, errorMessage));
+
+				if(sourceItemModelPtr.IsValid()){
 					imtbase::CTreeItemModel rootModel;
 					imtbase::CTreeItemModel* dataItemModel = rootModel.AddTreeModel("data");
-					dataItemModel->SetExternTreeModel(gqlCommand, sourceItemModel->GetTreeItemModel("data"));
+					dataItemModel->SetExternTreeModel(gqlCommand, sourceItemModelPtr->GetTreeItemModel("data"));
 
-					imtbase::CTreeItemModel* errorsSourceItemModel = sourceItemModel->GetTreeItemModel("errors");
+					imtbase::CTreeItemModel* errorsSourceItemModel = sourceItemModelPtr->GetTreeItemModel("errors");
 					if (errorsSourceItemModel != nullptr){
 						imtbase::CTreeItemModel* errorsItemModel = rootModel.GetTreeItemModel("errors");
 						if (errorsItemModel == nullptr){

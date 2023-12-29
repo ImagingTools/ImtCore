@@ -226,6 +226,10 @@ imtbase::IObjectCollection* CSqlDatabaseObjectCollectionComp::CreateSubCollectio
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
 {
+	if (!m_objectCollectionFactoryCompPtr.IsValid()){
+		return nullptr;
+	}
+
 	imtbase::IObjectCollection* collectionPtr = m_objectCollectionFactoryCompPtr.CreateInstance();
 	imtbase::CParamsSetJoiner filterParams(selectionParamsPtr, m_filterParamsCompPtr.GetPtr());
 
@@ -248,9 +252,12 @@ imtbase::IObjectCollection* CSqlDatabaseObjectCollectionComp::CreateSubCollectio
 
 			QByteArray typeId = m_objectDelegateCompPtr->GetObjectTypeId(objectId);
 
-			collectionPtr->InsertNewObject(typeId, "", "", dataPtr, objectId);
+			if (collectionPtr != nullptr){
+				collectionPtr->InsertNewObject(typeId, "", "", dataPtr, objectId);
+			}
 		}
 	}
+
 	return collectionPtr;
 }
 

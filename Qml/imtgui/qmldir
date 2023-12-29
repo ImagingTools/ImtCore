@@ -113,6 +113,7 @@ Gallery 1.0 qrc:/qml/imtgui/Gallery.qml
 
 BaseText 1.0 qrc:/qml/imtgui/BaseText.qml
 ComboBox 1.0 qrc:/qml/imtgui/ComboBox.qml
+FilterableComboBox 1.0 qrc:/qml/imtgui/FilterableComboBox.qml
 CheckBox 1.0 qrc:/qml/imtgui/CheckBox.qml
 DatePicker 1.0 qrc:/qml/imtgui/DatePicker.qml
 TimePicker 1.0 qrc:/qml/imtgui/TimePicker.qml

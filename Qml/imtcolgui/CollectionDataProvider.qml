@@ -15,6 +15,9 @@ Item {
     // Fields to get from server
     property var fields: [];
 
+    property string orderType: "ASC";
+    property string sortByField;
+
     property alias stateModel: container.itemsInfoModel.state;
 
     property int offset: 0;
@@ -39,6 +42,16 @@ Item {
         container.itemsInfoModel.updateModel(inputParams, container.fields);
     }
 
+    Component.onCompleted: {
+        let sortModel = filterModel.GetTreeItemModel("Sort");
+        if (!sortModel){
+            sortModel = filterModel.AddTreeModel("Sort")
+        }
+
+        sortModel.SetData("SortOrder", orderType);
+        sortModel.SetData("HeaderId", sortByField);
+    }
+
     Component.onDestruction: {
         if (container.commandId !== ""){
             Events.unSubscribeEvent(container.commandId + "CollectionUpdated", container.updateModel);
@@ -49,6 +62,32 @@ Item {
         if (container.commandId !== ""){
             Events.subscribeEvent(container.commandId + "CollectionUpdated", container.updateModel);
         }
+    }
+
+    onOrderTypeChanged: {
+        let sortModel = filterModel.GetTreeItemModel("Sort");
+        if (!sortModel){
+            sortModel = filterModel.AddTreeModel("Sort")
+        }
+
+        sortModel.SetData("SortOrder", orderType);
+    }
+
+    onSortByFieldChanged: {
+        let sortModel = filterModel.GetTreeItemModel("Sort");
+        if (!sortModel){
+            sortModel = filterModel.AddTreeModel("Sort")
+        }
+
+        sortModel.SetData("HeaderId", sortByField);
+    }
+
+    function setSortingHeader(headerId){
+        container.sortByField = headerId;
+    }
+
+    function setOrderType(orderType){
+        container.orderType = orderType;
     }
 
     function onModelUpdated(){

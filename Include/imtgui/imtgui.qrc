@@ -49,6 +49,7 @@
         <file alias="imtgui/MovingItem.qml">Qml/imtgui/MovingItem.qml</file>
         <file alias="imtgui/ChangeItemSize.qml">Qml/imtgui/ChangeItemSize.qml</file>
         <file alias="imtgui/SpinBox.qml">Qml/imtgui/SpinBox.qml</file>
+        <file alias="imtgui/FilterableComboBox.qml">Qml/imtgui/FilterableComboBox.qml</file>
     </qresource>
     <qresource prefix="/Fonts">
         <file alias="Ubuntu-Light.ttf">Qml/Fonts/Ubuntu-Light.ttf</file>

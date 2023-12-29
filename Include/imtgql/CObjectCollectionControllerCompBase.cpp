@@ -270,13 +270,13 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 		return nullptr;
 	}
 
-	imtbase::IOperationContext* operationContextPtr = nullptr;
+	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
 
 	if (m_operationContextControllerCompPtr.IsValid()){
 		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_CREATE, gqlRequest);
 	}
 
-	QByteArray newObjectId = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, newObjectPtr, objectId, nullptr, nullptr, operationContextPtr);
+	QByteArray newObjectId = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, newObjectPtr, objectId, nullptr, nullptr, operationContextPtr.GetPtr());
 	if (newObjectId.isEmpty()){
 		errorMessage = QT_TR_NOOP(QString("Can not insert object: %1").arg(qPrintable(objectId)));
 		SendErrorMessage(0, QString("Can not insert object: %1").arg(qPrintable(objectId)), "Object collection controller");
@@ -335,13 +335,13 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 
 	istd::IChangeable* savedObject = CreateObject(gqlRequest, newObjectId, name, description, errorMessage);
 	if (savedObject != nullptr){
-		imtbase::IOperationContext* operationContextPtr = nullptr;
+		istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
 
 		if (m_operationContextControllerCompPtr.IsValid()){
 			operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_UPDATE, gqlRequest, oldObjectId, savedObject);
 		}
 
-		if (!m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject, istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr)){
+		if (!m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject, istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
 			errorMessage = QObject::tr("Can not update object: %1").arg(qPrintable(oldObjectId));
 		}
 	}
@@ -721,13 +721,13 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
-	imtbase::IOperationContext* operationContextPtr = nullptr;
+	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr = nullptr;
 
 	if (m_operationContextControllerCompPtr.IsValid()){
 		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_REMOVE, gqlRequest);
 	}
 
-	if (m_objectCollectionCompPtr->RemoveElement(objectId, operationContextPtr)){
+	if (m_objectCollectionCompPtr->RemoveElement(objectId, operationContextPtr.GetPtr())){
 		imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
 		imtbase::CTreeItemModel* notificationModel = new imtbase::CTreeItemModel();
 
