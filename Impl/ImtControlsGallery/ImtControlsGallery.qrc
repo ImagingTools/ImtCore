@@ -12,5 +12,6 @@
         <file alias="TablePage.qml">Qml/TablePage.qml</file>
         <file alias="GridViewPage.qml">Qml/GridViewPage.qml</file>
         <file alias="TreeViewPage.qml">Qml/TreeViewPage.qml</file>
+        <file alias="TableTreeViewPage.qml">Qml/TableTreeViewPage.qml</file>
     </qresource>
 </RCC>
