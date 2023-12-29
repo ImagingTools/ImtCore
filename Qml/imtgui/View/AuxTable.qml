@@ -49,6 +49,11 @@ Rectangle {
     property alias elementsList: elementsListObj;
     property alias cacheBuffer: elementsListObj.cacheBuffer;
     property alias contentHeight: elementsListObj.contentHeight;
+    property alias contentWidth: elementsListObj.contentWidth;
+    property alias originX: elementsListObj.originX;
+    property alias contentX: elementsListObj.contentX;
+    property alias elementsListWidth: elementsListObj.width;
+    property alias elementsCount: elementsListObj.count;
 
     property alias headerDelegate: headersList.delegate;
     property real headerElementWidth: (headersList.width)/headersList.count;
@@ -82,6 +87,7 @@ Rectangle {
     property bool readOnly: false;
     property bool canFitHeight : false;
     property bool canMoveColumns : false;
+    property bool isFrameScrolling : false;
     property int minCellWidth : 30;
 
     property alias isMultiSelect: tableContainer.tableSelection.isMultiSelect;
@@ -179,7 +185,7 @@ Rectangle {
             tableContainer.columnContentComps.push(null);
         }
 
-
+        setWidth();
     }
 
     function setDecorators(){
@@ -344,6 +350,7 @@ Rectangle {
 
     function setWidth(){
         var headersCount = tableContainer.headers.GetItemsCount();
+        var tableWidth_ = Math.max(tableContainer.width, tableContainer.contentWidth);
 
         if(!tableContainer.widthDecorator.GetItemsCount() && tableContainer.headers.GetItemsCount()){
             for(var ind = 0; ind < headersCount ; ind++){
@@ -368,16 +375,15 @@ Rectangle {
             }
             else{
                 width_ = width_< 0 ? 0 : width_;
-                widthPercent_ = widthPercent_ < 0 ? 0 : widthPercent_*tableContainer.width/100;
+                widthPercent_ = widthPercent_ < 0 ? 0 : widthPercent_* tableWidth_/100;
                 lengthMinus += Math.max(width_,widthPercent_);
             }
         }
-
-        if((tableContainer.width - lengthMinus) < count_ * tableContainer.minCellWidth || count_ == tableContainer.widthDecorator.GetItemsCount() ){
+        if((tableWidth_ - lengthMinus) < count_ * tableContainer.minCellWidth || count_ == tableContainer.widthDecorator.GetItemsCount() ){
             tableContainer.widthDecoratorDynamic.Clear();
             for(let ind = 0; ind < headersCount; ind++){
                 let index = tableContainer.widthDecoratorDynamic.InsertNewItem();
-                tableContainer.widthDecoratorDynamic.SetData("Width",tableContainer.width/headersCount,index);
+                tableContainer.widthDecoratorDynamic.SetData("Width",tableWidth_/headersCount,index);
             }
             tableContainer.widthRecalc();
             return;
@@ -389,11 +395,11 @@ Rectangle {
 
             if(width_ < 0  && widthPercent_ < 0 ){
                 if(count_){
-                    tableContainer.widthDecoratorDynamic.SetData("Width",(tableContainer.width - lengthMinus)/count_,i);
+                    tableContainer.widthDecoratorDynamic.SetData("Width",(tableWidth_ - lengthMinus)/count_,i);
                 }
             }
             else if(width_ < 0  && widthPercent_ >= 0){
-                tableContainer.widthDecoratorDynamic.SetData("Width", widthPercent_*tableContainer.width/100,i);
+                tableContainer.widthDecoratorDynamic.SetData("Width", widthPercent_*tableWidth_/100,i);
             }
 
             else if(width_ >= 0  && widthPercent_ < 0){
@@ -517,6 +523,14 @@ Rectangle {
     }
 
 
+    function setContentHeight(content_height){
+        elementsBg.contentHeight = content_height;
+    }
+    function getContentHeight(){
+       return elementsBg.contentHeight;
+    }
+
+
     PauseAnimation {
         id: pauseWidth;
         duration: 100;
@@ -565,6 +579,9 @@ Rectangle {
             spacing: 0;
             model: tableContainer.headers;
             boundsBehavior: Flickable.StopAtBounds;
+            contentX: elementsList.contentX;
+            contentWidth: elementsList.contentWidth;
+            interactive: false;
             property bool compl: false;
 
             property int currentIndex: 0;
@@ -918,10 +935,13 @@ Rectangle {
                             var deltaX = Math.trunc(newCoords.x - moving.coord.x);
                             var width_ = tableContainer.widthDecoratorDynamic.GetData("Width", model.index);
                             var width_next = tableContainer.widthDecoratorDynamic.GetData("Width", model.index+1);
+                            var width_min = tableContainer.widthDecoratorDynamic.IsValidData("MinWidth", model.index) ? tableContainer.widthDecoratorDynamic.GetData("MinWidth", model.index) : tableContainer.minCellWidth;
+                            var width_next_min = tableContainer.widthDecoratorDynamic.IsValidData("MinWidth", model.index+1) ? tableContainer.widthDecoratorDynamic.GetData("MinWidth", model.index+1) : tableContainer.minCellWidth;
+
 
                             width_ += deltaX;
                             width_next -= deltaX
-                            if(width_ > tableContainer.minCellWidth && width_next > tableContainer.minCellWidth){
+                            if(width_ > width_min && width_next > width_next_min){
                                 tableContainer.widthDecorator.SetData("Width", width_, model.index);
                                 tableContainer.widthDecorator.SetData("Width", width_next, model.index+1);
 
@@ -961,6 +981,11 @@ Rectangle {
         color: Style.baseColor;
 
         radius: tableContainer.radius;
+
+        property real contentY: elementsListObj.contentY;
+        property real originY: 0;
+        property real contentWidth: elementsListObj.contentWidth;
+        property real contentHeight: height;
     }
 
     property int scrollbarRightMargin: 0;
@@ -976,6 +1001,27 @@ Rectangle {
         anchors.top: elementsListObj.top;
 
         secondSize: 10;
+        targetItem: tableContainer.isFrameScrolling ? elementsBg : elementsListObj;
+
+        onContentYSignal:{
+            if(tableContainer.isFrameScrolling){
+                elementsListObj.contentY = contentY;
+            }
+        }
+    }
+
+    CustomScrollbar{
+        id: scrollHoriz;
+
+        z: 101;
+
+        anchors.right: elementsListObj.right;
+        anchors.top: elementsListObj.bottom;
+        anchors.topMargin: 1 ;
+
+        secondSize: 10;
+
+        vertical: false;
         targetItem: elementsListObj;
     }
 
@@ -986,12 +1032,17 @@ Rectangle {
         anchors.right: headersPanel.right;
         anchors.top: headersPanel.bottom;
         anchors.bottom: parent.bottom;
+        anchors.bottomMargin: scrollHoriz.secondSize + scrollHoriz.anchors.topMargin;
 
         boundsBehavior: Flickable.StopAtBounds;
 
-        cacheBuffer: 1000;
+        cacheBuffer: count * tableContainer.itemHeight;
 
         clip: true;
+
+        onContentXChanged: {
+            headersList.contentX = contentX + headersList.originX
+        }
 
         Keys.onUpPressed: {
             tableContainer.tableSelection.up();
@@ -1007,6 +1058,12 @@ Rectangle {
             }
             else{
                 tableContainer.tableSelection.unsubscribeEvents();
+            }
+        }
+
+        onContentYChanged: {
+            if(tableContainer.isFrameScrolling){
+                elementsBg.contentY = elementsListObj.contentY;
             }
         }
 
