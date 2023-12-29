@@ -19,15 +19,19 @@
 int main(int argc, char *argv[])
 {
 #ifdef WEB_COMPILE
-	Q_INIT_RESOURCE(ImtControlsGalleryWeb);
+//	Q_INIT_RESOURCE(ImtControlsGalleryWeb);
 #endif
 
 	Q_INIT_RESOURCE(imtguigqlqml);
     Q_INIT_RESOURCE(imtqml);
-    Q_INIT_RESOURCE(imtstyle);
+	Q_INIT_RESOURCE(imtstyle);
     Q_INIT_RESOURCE(imtstylecontrolsqml);
-    Q_INIT_RESOURCE(imtcontrols);
-    Q_INIT_RESOURCE(imtgui);
+	Q_INIT_RESOURCE(imtcontrolsqml);
+	Q_INIT_RESOURCE(imtgui);
+	Q_INIT_RESOURCE(imtguiqml);
+	// Q_INIT_RESOURCE(imtcolguiqml);
+	// Q_INIT_RESOURCE(imtdocgui);
+	// Q_INIT_RESOURCE(imtgui);
 	Q_INIT_RESOURCE(imtdocguiqml);
 	Q_INIT_RESOURCE(imtauthguiqml);
 

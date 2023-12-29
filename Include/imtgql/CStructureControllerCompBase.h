@@ -11,6 +11,7 @@
 #include <imtbase/IDocumentChangeGenerator.h>
 #include <imtgql/CGqlRequestHandlerCompBase.h>
 #include <imtgql/IOperationContextController.h>
+#include <imtgql/IGqlRequestExtractor.h>
 
 
 #undef GetObject
@@ -27,6 +28,8 @@ public:
 
     I_BEGIN_COMPONENT(CStructureControllerCompBase);
 		I_ASSIGN(m_collectionStructureCompPtr, "CollectionStructure", "Collection structure", true, "CollectionStructure");
+		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
+		I_ASSIGN(m_gqlRequestExtractorCompPtr, "GqlRequestExtractor", "GraphQL request extractor", true, "GqlRequestExtractor");
 		I_ASSIGN(m_operationContextControllerCompPtr, "OperationContextController", "Operation context controller", false, "OperationContextController");
 		I_ASSIGN(m_structureIdAttrPtr, "StructureId", "Ctructure ID", true, "");
 	I_END_COMPONENT;
@@ -48,6 +51,7 @@ public:
         OT_GET_NODE_INFO,
         OT_GET_OBJECT_PARENT_NODE_IDS,
 		OT_GET_NODES,
+		OT_GET_ELEMENTS,
 		OT_USER_OPERATION = 1000
 	};
 
@@ -77,11 +81,12 @@ protected:
     virtual imtbase::CTreeItemModel* GetNodeInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
     virtual imtbase::CTreeItemModel* GetObjectParentNodeIds(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetNodes(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* GetElements(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 
 	/**
-		Setup a GraphQL item at the given position in the model based on the information about an element in the object collection.
+		Setup a GraphQL item at the given position in the model based on the information about an node in the collection structure.
 	*/
-	virtual bool SetupGqlItem(
+	virtual bool SetupNodeItem(
 			const imtgql::CGqlRequest& gqlRequest,
 			imtbase::CTreeItemModel& model,
 			int itemIndex,
@@ -89,42 +94,25 @@ protected:
 			QString& errorMessage) const;
 
 	/**
+		Setup a GraphQL item at the given position in the model based on the information about an element in the object collection.
+	*/
+	virtual bool SetupObjectItem(
+			const imtgql::CGqlRequest& gqlRequest,
+			imtbase::CTreeItemModel& model,
+			int itemIndex,
+			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
+			QString& errorMessage) const;
+
+	/**
 		Extract information-IDs from the GraphQL object.
 	*/
 	virtual QByteArrayList GetInformationIds(const imtgql::CGqlRequest& gqlRequest, const QByteArray& objectId) const;
 
-	/**
-		Get specific information about the the object in the collection.
-	*/
-	virtual QVariant GetObjectInformation(const QByteArray& informationId, const QByteArray& objectId) const;
-
-	/**
-		Create object from the GraphQL
-	*/
-	virtual istd::IChangeable* CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString &name, QString &description, QString& errorMessage) const;
-
-	/**
-		Create object from the GraphQL
-	*/
-	virtual istd::IChangeable* CreateObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const;
-
-	/**
-		Prepare filters from the GraphQL
-	*/
-	virtual void PrepareFilters(const imtgql::CGqlRequest& gqlRequest, const imtgql::CGqlObject& viewParamsGql, iprm::CParamsSet& filterParams) const;
-
-	/**
-		Set multiple optional additional filters to initially get a more refined collection.
-	*/
-	virtual void SetAdditionalFilters(const imtgql::CGqlObject& viewParamsGql, iprm::CParamsSet* filterParams) const;
-
-	/**
-		Set object filter.
-	*/
-	virtual void SetObjectFilter(const imtgql::CGqlRequest& gqlRequest, const imtbase::CTreeItemModel& objectFilterModel, iprm::CParamsSet& filterParams) const;
 
 protected:
 	I_REF(imtbase::ICollectionStructure, m_collectionStructureCompPtr);
+	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
+	I_REF(imtgql::IGqlRequestExtractor, m_gqlRequestExtractorCompPtr);
 	I_REF(imtgql::IOperationContextController, m_operationContextControllerCompPtr);
     I_ATTR(QByteArray, m_structureIdAttrPtr);
 };

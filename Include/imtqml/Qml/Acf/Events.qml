@@ -12,6 +12,7 @@ QtObject {
     function sendEvent(key, parameters){
         if(key in this.events){
             for(var i = 0; i < this.events[key].length; i++){
+
                 if (parameters !== undefined){
                     this.events[key][i](parameters)
                 }
@@ -32,6 +33,15 @@ QtObject {
         }
         else {
             this.events[key] = [slot]
+        }
+    }
+
+    function unSubscribeAllFromSlot(slot){
+        for(let key in this.events){
+            let slots = this.events[key]
+            if (slots.includes(slot)){
+                this.unSubscribeEvent(key, slot);
+            }
         }
     }
 

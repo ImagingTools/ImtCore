@@ -6,6 +6,9 @@
 #include <imtrest/IResponse.h>
 #include <imtrest/ISender.h>
 
+// Qt includes
+#include <QtCore/QDebug>
+
 
 namespace imtrest
 {
@@ -23,6 +26,12 @@ void CWorker::ProcessRequest(const IRequest* request)
 	m_workerThread->SetStatus(CWorkerThread::ST_PROCESS);
 
 	if (m_requestServletPtr != nullptr && request != nullptr){
+		QByteArray body = request->GetBody();
+		if (body.size() > 100){
+			body.resize(100);
+			body += "...";
+		}
+		qDebug() << "Start process " << request->GetCommandId() << body;
 		ConstResponsePtr responsePtr = m_requestServletPtr->ProcessRequest(*request);
 		if (responsePtr.IsValid()){
 			const ISender* sender = m_workerThread->GetSender(request->GetRequestId());

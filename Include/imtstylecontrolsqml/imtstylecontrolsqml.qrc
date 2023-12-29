@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/qml">
-<!--	    <file alias="Acf/qmldir">Qml/Acf/qmldir</file>-->
 		<file alias="Acf/Style.qml">Qml/Acf/Style.qml</file>
 		<file alias="Acf/Decorators.qml">Qml/Acf/Decorators.qml</file>
                 <file alias="Acf/DecoratorsQt.qml">Qml/Acf/DecoratorsQt.qml</file>

@@ -20,10 +20,10 @@
         <file alias="imtgui/ExpandingContainer.qml">Qml/imtgui/ExpandingContainer.qml</file>
         <file alias="imtgui/Gallery.qml">Qml/imtgui/Gallery.qml</file>
 
-        <file alias="imtgui/CustomScrollbar.qml">Qml/imtgui/CustomScrollbar.qml</file>
+<file alias="imtgui/CustomScrollbar.qml">Qml/imtgui/CustomScrollbar.qml</file>
 
-        <file alias="imtgui/BaseButton.qml">Qml/imtgui/BaseButton.qml</file>
- 	<file alias="imtgui/CommonButtonDecorator.qml">Qml/imtgui/CommonButtonDecorator.qml</file>
+<file alias="imtgui/BaseButton.qml">Qml/imtgui/BaseButton.qml</file>
+		<file alias="imtgui/CommonButtonDecorator.qml">Qml/imtgui/CommonButtonDecorator.qml</file>
         <file alias="imtgui/BaseButtonDecorator.qml">Qml/imtgui/BaseButtonDecorator.qml</file>
 
         <file alias="imtgui/SwitchCustom.qml">Qml/imtgui/SwitchCustom.qml</file>

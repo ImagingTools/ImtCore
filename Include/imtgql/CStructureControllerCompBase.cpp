@@ -18,6 +18,7 @@
 #include <imtbase/COperationContext.h>
 // #include <imtbase/CObjectCollection.h>
 #include <imtbase/COperationDescription.h>
+#include <imtbase/ICollectionStructureController.h>
 #include <imtgql/imtgql.h>
 
 
@@ -87,6 +88,8 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::CreateInternalResponse(
         return GetNodeInfo(gqlRequest, errorMessage);
     case OT_GET_OBJECT_PARENT_NODE_IDS:
         return GetObjectParentNodeIds(gqlRequest, errorMessage);
+	case OT_GET_ELEMENTS:
+		return GetElements(gqlRequest, errorMessage);
 	}
 
 	errorMessage = QString("Unable to create internal response. Operation is not supported");
@@ -138,7 +141,7 @@ bool CStructureControllerCompBase::GetOperationFromRequest(
         operationType = OT_REMOVE_NODE;
         return true;
     }
-    if (commandId == *m_structureIdAttrPtr + "UpdatedNotification"){
+	if (commandId == *m_structureIdAttrPtr + "InsertNewObject"){
         operationType = OT_INSERT_NEW_OBJECT;
         return true;
     }
@@ -166,6 +169,15 @@ bool CStructureControllerCompBase::GetOperationFromRequest(
         operationType = OT_GET_OBJECT_PARENT_NODE_IDS;
         return true;
     }
+	if (commandId == *m_structureIdAttrPtr + "GetNodes"){
+		operationType = OT_GET_NODES;
+		return true;
+	}
+	if (commandId == *m_structureIdAttrPtr + "GetElements"){
+		operationType = OT_GET_ELEMENTS;
+		return true;
+	}
+
 
 	errorMessage = QString("Unable to get the operation type from the request");
 
@@ -188,18 +200,82 @@ QByteArray CStructureControllerCompBase::GetObjectIdFromInputParams(const QList<
 
 
 imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewNode(
-		const imtgql::CGqlRequest& /*gqlRequest*/,
-		QString& /*errorMessage*/) const
+		const imtgql::CGqlRequest& gqlRequest,
+		QString& errorMessage) const
 {
-	return nullptr;
+	if (!m_collectionStructureCompPtr.IsValid()){
+		errorMessage = QString("Unable to insert new node. Component reference 'CollectionStructure' was not set");
+
+		SendCriticalMessage(0, errorMessage);
+
+		return nullptr;
+	}
+
+	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+
+	QByteArray nodeId;
+	QByteArray parentNodeId;
+	QString newName;
+	QString description;
+	if (inputParams.size() > 0){
+		nodeId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
+		parentNodeId = inputParams.at(0).GetFieldArgumentValue("ParentNodeId").toByteArray();
+		newName = inputParams.at(0).GetFieldArgumentValue("NewName").toString();
+		description = inputParams.at(0).GetFieldArgumentValue("Description").toString();
+	}
+
+	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr;
+
+	if (m_operationContextControllerCompPtr.IsValid()){
+		operationContextPtr.SetPtr(m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_CREATE, gqlRequest));
+	}
+
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
+
+	if (!nodeId.isEmpty()){
+		nodeId = m_collectionStructureCompPtr->InsertNewNode(newName, description, nodeId, parentNodeId, nullptr, operationContextPtr.GetPtr());
+		dataModel->SetData("Id", nodeId);
+		dataModel->SetData("ParentNodeId", parentNodeId);
+		dataModel->SetData("successful", !nodeId.isEmpty());
+	}
+
+	return rootModelPtr.PopPtr();
 }
 
 
 imtbase::CTreeItemModel* CStructureControllerCompBase::SetNodeName(
-    const imtgql::CGqlRequest& /*gqlRequest*/,
-    QString& /*errorMessage*/) const
+	const imtgql::CGqlRequest& gqlRequest,
+	QString& errorMessage) const
 {
-    return nullptr;
+	if (!m_collectionStructureCompPtr.IsValid()){
+		errorMessage = QString("Unable to rename object. Component reference 'CollectionStructure' was not set");
+
+		SendCriticalMessage(0, errorMessage);
+
+		return nullptr;
+	}
+
+	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
+
+	QByteArray nodeId;
+	QString newName;
+	if (inputParams.size() > 0){
+		nodeId = inputParams.at(0).GetFieldArgumentValue("Id").toByteArray();
+		newName = inputParams.at(0).GetFieldArgumentValue("NewName").toString();
+	}
+
+	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
+
+	if (!nodeId.isEmpty()){
+		dataModel->SetData("Id", nodeId);
+		dataModel->SetData("Name", newName);
+		bool successful = m_collectionStructureCompPtr->SetNodeName(nodeId, newName);
+		dataModel->SetData("successful", successful);
+	}
+
+	return rootModelPtr.PopPtr();
 }
 
 
@@ -236,10 +312,84 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::RemoveNode(
 
 
 imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewObject(
-    const imtgql::CGqlRequest& /*gqlRequest*/,
-    QString& /*errorMessage*/) const
+	const imtgql::CGqlRequest& gqlRequest,
+	QString& errorMessage) const
 {
-    return nullptr;
+	if (!m_objectCollectionCompPtr.IsValid() || !m_collectionStructureCompPtr.IsValid() || !m_gqlRequestExtractorCompPtr.IsValid()){
+		errorMessage = QT_TR_NOOP("Internal error");
+		SendErrorMessage(0, "Internal error", "Structure controller");
+
+		return nullptr;
+	}
+
+	QByteArray objectId;
+	QString name;
+	QString description;
+	QByteArray typeId;
+	QByteArray nodeId;
+	QByteArray selectIndex;
+	const QList<imtgql::CGqlObject> params = gqlRequest.GetParams();
+
+	if (params.size() > 0){
+		// typeId = params.at(0).GetFieldArgumentValue("typeId").toByteArray();
+		// name = params.at(0).GetFieldArgumentValue("name").toByteArray();
+		// description = params.at(0).GetFieldArgumentValue("description").toString();
+		const CGqlObject* additionObject = params.at(0).GetFieldArgumentObjectPtr("addition");
+		if (additionObject != nullptr){
+			nodeId = additionObject->GetFieldArgumentValue("nodeId").toByteArray();
+			selectIndex = additionObject->GetFieldArgumentValue("selectIndex").toByteArray();
+		}
+	}
+
+	if (typeId.isEmpty()){
+		typeId = "DocumentInfo";
+	}
+
+	istd::IChangeable* newObjectPtr = m_gqlRequestExtractorCompPtr->ExtractObject(gqlRequest, objectId, name, description, errorMessage);
+	if (newObjectPtr == nullptr){
+		SendErrorMessage(0, "Unable to create object from gql request", "Object collection controller");
+
+		return nullptr;
+	}
+
+	// imtbase::IObjectCollection::DataPtr dataPtr;
+	// if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
+	// 	errorMessage = QT_TR_NOOP("Object with this ID already exists");
+	// 	SendErrorMessage(0, QString("Object with ID: %1 already exists").arg(qPrintable(objectId)), "Object collection controller");
+
+	// 	return nullptr;
+	// }
+
+	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr;
+
+	if (m_operationContextControllerCompPtr.IsValid()){
+		operationContextPtr.SetPtr(m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_CREATE, gqlRequest));
+	}
+	imtbase::ICollectionStructureController* collectionStructureController = m_collectionStructureCompPtr->GetHierarchicalStructureController();
+	if (collectionStructureController == nullptr){
+		return nullptr;
+	}
+
+	QByteArray newObjectId =  collectionStructureController->InsertNewObjectIntoCollection(m_objectCollectionCompPtr.GetPtr(), nodeId, typeId, name, description, newObjectPtr, objectId, nullptr, nullptr, operationContextPtr.GetPtr());
+	if (newObjectId.isEmpty()){
+		errorMessage = QT_TR_NOOP(QString("Can not insert object: %1").arg(qPrintable(objectId)));
+		SendErrorMessage(0, QString("Can not insert object: %1").arg(qPrintable(objectId)), "Object collection controller");
+
+		return nullptr;
+	}
+
+	imtbase::CTreeItemModel* rootModelPtr(new imtbase::CTreeItemModel());
+
+	imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+	Q_ASSERT(dataModelPtr != nullptr);
+
+	imtbase::CTreeItemModel* notificationModelPtr = dataModelPtr->AddTreeModel("addedNotification");
+	Q_ASSERT(notificationModelPtr != nullptr);
+
+	notificationModelPtr->SetData("Id", newObjectId);
+	notificationModelPtr->SetData("Name", name);
+
+	return rootModelPtr;
 }
 
 
@@ -306,7 +456,6 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 
 		return nullptr;
 	}
-	m_collectionStructureCompPtr->GetNodeIds();
 
 	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
 
@@ -337,18 +486,18 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 		if (viewParamsGql != nullptr){
 			offset = viewParamsGql->GetFieldArgumentValue("Offset").toInt();
 			count = viewParamsGql->GetFieldArgumentValue("Count").toInt();
-			PrepareFilters(gqlRequest, *viewParamsGql, filterParams);
+			// PrepareFilters(gqlRequest, *viewParamsGql, filterParams);
 		}
 
-		int elementsCount = m_collectionStructureCompPtr->GetNodeCount(&filterParams);
+		int nodesCount = m_collectionStructureCompPtr->GetNodeCount(&filterParams);
 
-		int pagesCount = std::ceil(elementsCount / (double)count); /// count == 0
+		int pagesCount = std::ceil(nodesCount / (double)count); /// count == 0
 		if (pagesCount <= 0){
 			pagesCount = 1;
 		}
 
 		notificationModel->SetData("PagesCount", pagesCount);
-		notificationModel->SetData("TotalCount", elementsCount);
+		notificationModel->SetData("TotalCount", nodesCount);
 
 		istd::TDelPtr<imtbase::ICollectionStructureIterator> collectionStructureIterator(m_collectionStructureCompPtr->CreateCollectionStructureIterator(offset, count, &filterParams));
 		if (collectionStructureIterator != nullptr){
@@ -356,7 +505,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 				imtbase::ICollectionStructureInfo::NodeInfo nodeInfo = collectionStructureIterator->GetNodeInfo();
 				int itemIndex = itemsModel->InsertNewItem();
 				if (itemIndex >= 0){
-					if (!SetupGqlItem(gqlRequest, *itemsModel, itemIndex, collectionStructureIterator.GetPtr(), errorMessage)){
+					if (!SetupNodeItem(gqlRequest, *itemsModel, itemIndex, collectionStructureIterator.GetPtr(), errorMessage)){
 						SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 						return nullptr;
@@ -378,15 +527,35 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 }
 
 
-bool CStructureControllerCompBase::SetupGqlItem(
+imtbase::CTreeItemModel* CStructureControllerCompBase::GetElements(
 	const imtgql::CGqlRequest& gqlRequest,
-	imtbase::CTreeItemModel& model,
-	int itemIndex,
-	const imtbase::ICollectionStructureIterator* collectionStructureIterator,
 	QString& errorMessage) const
+{
+	return nullptr;
+}
+
+
+bool CStructureControllerCompBase::SetupNodeItem(
+			const imtgql::CGqlRequest& gqlRequest,
+			imtbase::CTreeItemModel& model,
+			int itemIndex,
+			const imtbase::ICollectionStructureIterator* collectionStructureIterator,
+			QString& errorMessage) const
 {
 	return false;
 }
+
+
+bool CStructureControllerCompBase::SetupObjectItem(
+			const imtgql::CGqlRequest& gqlRequest,
+			imtbase::CTreeItemModel& model,
+			int itemIndex,
+			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
+			QString& errorMessage) const
+{
+	return false;
+}
+
 
 QByteArrayList CStructureControllerCompBase::GetInformationIds(const imtgql::CGqlRequest& gqlRequest, const QByteArray& objectId) const
 {
@@ -401,133 +570,6 @@ QByteArrayList CStructureControllerCompBase::GetInformationIds(const imtgql::CGq
 	return QByteArrayList();
 }
 
-
-QVariant CStructureControllerCompBase::GetObjectInformation(const QByteArray& /*informationId*/, const QByteArray& /*objectId*/) const
-{
-	return QVariant();
-}
-
-
-istd::IChangeable* CStructureControllerCompBase::CreateObject(
-			const QList<imtgql::CGqlObject>& /*inputParams*/,
-			QByteArray& /*objectId*/,
-			QString& /*name*/,
-			QString& /*description*/,
-			QString& /*errorMessage*/) const
-{
-	return nullptr;
-}
-
-
-istd::IChangeable* CStructureControllerCompBase::CreateObject(
-			const imtgql::CGqlRequest& gqlRequest,
-			QByteArray& newObjectId,
-			QString& name,
-			QString& description,
-			QString& errorMessage) const
-{
-	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
-
-	return CreateObject(inputParams, newObjectId, name, description, errorMessage);
-}
-
-
-void CStructureControllerCompBase::PrepareFilters(
-		const imtgql::CGqlRequest& gqlRequest,
-		const imtgql::CGqlObject& viewParamsGql,
-		iprm::CParamsSet& filterParams) const
-{
-    // istd::TDelPtr<imtbase::CCollectionFilter> collectionFilterPtr;
-    // collectionFilterPtr.SetPtr(new imtbase::CCollectionFilter);
-
-    // istd::TDelPtr<iprm::CParamsSet> objectFilterPtr;
-    // objectFilterPtr.SetPtr(new iprm::CParamsSet);
-
-    // QByteArray filterBA = viewParamsGql.GetFieldArgumentValue("FilterModel").toByteArray();
-    // if (!filterBA.isEmpty()){
-    // 	imtbase::CTreeItemModel generalModel;
-    // 	generalModel.CreateFromJson(filterBA);
-
-    // 	imtbase::CTreeItemModel* filterModel = generalModel.GetTreeItemModel("FilterIds");
-    // 	if (filterModel != nullptr){
-    // 		QByteArrayList filteringInfoIds;
-    // 		for (int i = 0; i < filterModel->GetItemsCount(); i++){
-    // 			QByteArray headerId = filterModel->GetData("Id", i).toByteArray();
-    // 			if (!headerId.isEmpty()){
-    // 				filteringInfoIds << headerId;
-    // 			}
-    // 		}
-    // 		collectionFilterPtr->SetFilteringInfoIds(filteringInfoIds);
-    // 	}
-
-    // 	QString filterText = generalModel.GetData("TextFilter").toString();
-    // 	if (!filterText.isEmpty()){
-    // 		collectionFilterPtr->SetTextFilter(filterText);
-    // 	}
-
-    // 	imtbase::CTreeItemModel* sortModel = generalModel.GetTreeItemModel("Sort");
-    // 	if (sortModel != nullptr){
-    // 		QByteArray headerId = sortModel->GetData("HeaderId").toByteArray();
-    // 		QByteArray sortOrder = sortModel->GetData("SortOrder").toByteArray();
-    // 		if (!headerId.isEmpty() && !sortOrder.isEmpty()){
-    // 			collectionFilterPtr->SetSortingOrder(sortOrder == "ASC" ? imtbase::ICollectionFilter::SO_ASC : imtbase::ICollectionFilter::SO_DESC);
-    // 			collectionFilterPtr->SetSortingInfoIds(QByteArrayList() << headerId);
-    // 		}
-    // 	}
-
-    // 	if (generalModel.ContainsKey("ObjectFilter")){
-    // 		imtbase::CTreeItemModel* objectFilterModelPtr = generalModel.GetTreeItemModel("ObjectFilter");
-    // 		SetObjectFilter(gqlRequest, *objectFilterModelPtr, *objectFilterPtr);
-    // 	}
-    // 	else{
-    // 		imtbase::CTreeItemModel objectFilterModel;
-    // 		SetObjectFilter(gqlRequest, objectFilterModel, *objectFilterPtr);
-    // 	}
-    // }
-
-    // filterParams.SetEditableParameter("Filter", collectionFilterPtr.PopPtr());
-    // filterParams.SetEditableParameter("ObjectFilter", objectFilterPtr.PopPtr());
-
-    // this->SetAdditionalFilters(viewParamsGql, &filterParams);
-}
-
-
-void CStructureControllerCompBase::SetAdditionalFilters(const imtgql::CGqlObject& /*viewParamsGql*/, iprm::CParamsSet* /*filterParams*/) const
-{
-}
-
-
-void CStructureControllerCompBase::SetObjectFilter(
-		const imtgql::CGqlRequest& /*gqlRequest*/,
-		const imtbase::CTreeItemModel& objectFilterModel,
-		iprm::CParamsSet& filterParams) const
-{
-	QByteArray key;
-	if (objectFilterModel.ContainsKey("Key")){
-		key = objectFilterModel.GetData("Key").toByteArray();
-	}
-
-	istd::TDelPtr<iprm::CTextParam> textParamPtr(new iprm::CTextParam());
-	if (objectFilterModel.ContainsKey("Value")){
-		QString value = objectFilterModel.GetData("Value").toString();
-		textParamPtr->SetText(value);
-	}
-
-	istd::TDelPtr<iprm::CEnableableParam> enableableParamPtr(new iprm::CEnableableParam());
-	if (objectFilterModel.ContainsKey("IsEqual")){
-		bool isEqual = objectFilterModel.GetData("IsEqual").toBool();
-		enableableParamPtr->SetEnabled(isEqual);
-
-		istd::TDelPtr<iprm::CParamsSet> paramsSetPtr(new iprm::CParamsSet());
-		paramsSetPtr->SetEditableParameter("Value", textParamPtr.PopPtr());
-		paramsSetPtr->SetEditableParameter("IsEqual", enableableParamPtr.PopPtr());
-
-		filterParams.SetEditableParameter(key, paramsSetPtr.PopPtr());
-	}
-	else{
-		filterParams.SetEditableParameter(key, textParamPtr.PopPtr());
-	}
-}
 
 
 } // namespace imtgql

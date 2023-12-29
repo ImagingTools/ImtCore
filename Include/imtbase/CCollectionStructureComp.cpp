@@ -45,10 +45,11 @@ QByteArray CCollectionStructureComp::InsertNewNode(
 	}
 
 	if (m_delegateCompPtr.IsValid()){
-		istd::IChangeable::ChangeSet changeSet;
+		istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
 		NodeInsertInfo info;
 		info.id = id;
 		info.parentNodeId = parentNodeId;
+		changeSet.SetChangeInfo("InsertInfo", QVariant::fromValue(info));
 		istd::CChangeNotifier notifier(this, &changeSet);
 		id = m_delegateCompPtr->InsertNewNode(
 					name,
@@ -384,7 +385,7 @@ imtbase::ICollectionStructureInfo::Id CCollectionStructureComp::InsertNewObjectI
 				operationContextPtr);
 
 	if (!newObjectId.isEmpty()){
-		AssignObject(newObjectId, nodeId);
+		AssignObject(newObjectId, nodeId, operationContextPtr);
 
 		return newObjectId;
 	}

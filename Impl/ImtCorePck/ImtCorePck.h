@@ -117,7 +117,7 @@ typedef icomp::TModelCompWrap<imtbase::CSelectionAdapterComp> SelectionAdapter;
 typedef icomp::TModelCompWrap<imtbase::CSelectionParamAdapterComp> SelectionParamAdapter;
 typedef icomp::TModelCompWrap<imtbase::CSystemStatusComp> SystemStatus;
 typedef imtbase::CDelegatedBinaryDataProviderComp DelegatedBinaryDataProviders;
-typedef imtbase::CCollectionStructureComp HierarchicalStructure;
+typedef icomp::TModelCompWrap<imtbase::CCollectionStructureComp> HierarchicalStructure;
 
 
 } // namespace ImtCorePck

@@ -101,4 +101,6 @@ public:
 
 } // namespace imtbase
 
+Q_DECLARE_METATYPE(imtbase::ICollectionStructureInfo::NotifierInfo2);
+
 

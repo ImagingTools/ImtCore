@@ -11,6 +11,7 @@
 #include <imtbase/IDocumentChangeGenerator.h>
 #include <imtgql/IOperationContextController.h>
 #include <imtgql/CPermissibleGqlRequestHandlerComp.h>
+#include <imtgql/IGqlRequestExtractor.h>
 
 
 #undef GetObject
@@ -20,12 +21,15 @@ namespace imtgql
 {
 
 
-class CObjectCollectionControllerCompBase: public imtgql::CPermissibleGqlRequestHandlerComp
+class CObjectCollectionControllerCompBase:
+			public imtgql::CPermissibleGqlRequestHandlerComp,
+			public imtgql::IGqlRequestExtractor
 {
 public:
 	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
+		I_REGISTER_INTERFACE(imtgql::IGqlRequestExtractor)
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN(m_documentChangeGeneratorCompPtr, "DocumentChangeGenerator", "Change generator for the collection object", false, "DocumentChangeGenerator");
 		I_ASSIGN(m_headersProviderCompPtr, "HeadersProvider", "Headers provider", false, "HeadersProvider");
@@ -60,6 +64,8 @@ public:
 
 	// reimplemented (imtgql::CGqlRequestHandlerCompBase)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
+	// reimplemented (imtgql::IGqlRequestExtractor)
+	virtual istd::IChangeable* ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const override;
 
 protected:
 	virtual bool GetOperationFromRequest(const imtgql::CGqlRequest& gqlRequest, imtgql::CGqlObject& gqlObject, QString& errorMessage, int& operationType) const;

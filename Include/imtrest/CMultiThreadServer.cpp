@@ -25,8 +25,6 @@ CSocket::CSocket(CSocketThread* rootSocket, IRequest* request, qintptr socketDes
 		return;
 	}
 
-	qDebug() << "socketDescriptor" << m_socket->socketDescriptor() << " New socket";
-
 	connect(&m_startTimer, &QTimer::timeout, this, QOverload<>::of(&CSocket::TimeOut));
 	m_startTimer.setSingleShot(true);
 	m_startTimer.start(5000);
@@ -48,6 +46,7 @@ void CSocket::Abort()
 void CSocket::TimeOut()
 {
 	if (m_socket != nullptr){
+		qDebug() << m_socket->socketDescriptor() << " Time out";
 		m_socket->disconnect();
 	}
 }
@@ -55,7 +54,6 @@ void CSocket::TimeOut()
 
 void CSocket::HandleReadyRead()
 {
-	m_startTimer.stop();
 	imtrest::IRequestServlet* requestHandlerPtr = m_rootSocket->GetRequestServlet();
 	Q_ASSERT(requestHandlerPtr != nullptr);
 
@@ -64,7 +62,11 @@ void CSocket::HandleReadyRead()
 	}
 
 	if (!m_socket->isOpen()){
-		m_socket->open(QIODevice::ReadWrite);
+		if (m_socket->open(QIODevice::ReadWrite)){
+			m_startTimer.stop();
+			m_startTimer.setInterval(20000);
+			m_startTimer.start();
+		}
 	}
 
 	if (!m_socket->isTransactionStarted()){
@@ -77,6 +79,7 @@ void CSocket::HandleReadyRead()
 
 	// Get state of request data:
 	if (!m_requestPtr->ParseDeviceData(*m_socket)){
+		m_startTimer.stop();
 		m_socket->disconnect();
 
 		return;
@@ -90,6 +93,8 @@ void CSocket::HandleReadyRead()
 
 	// All request data was read:
 	m_socket->commitTransaction();
+
+	m_startTimer.stop();
 
 	// Start request handler:
 	requestHandlerPtr->ProcessRequest(*m_requestPtr.PopPtr());

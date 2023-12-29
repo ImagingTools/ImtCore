@@ -99,6 +99,13 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::CreateInternalResp
 }
 
 
+// reimplemented (imtgql::IGqlRequestExtractor)
+istd::IChangeable* CObjectCollectionControllerCompBase::ExtractObject(const imtgql::CGqlRequest& gqlRequest, QByteArray& newObjectId, QString& name, QString& description, QString& errorMessage) const
+{
+	return CreateObject(gqlRequest, newObjectId, name, description, errorMessage);
+}
+
+
 // protected methods
 
 bool CObjectCollectionControllerCompBase::GetOperationFromRequest(

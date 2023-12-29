@@ -41,18 +41,16 @@ JSONListModel {
         var modelObject = this.get(row)
         var retVal = modelObject ? modelObject[key] : null
 
-//        if(retVal === undefined){
-//            modelObject = this.get(0)[row]
-//            retVal = modelObject.$data[0][key]
-//        }
-
         if (retVal === null)
             return null
-        if(typeof retVal === 'object' && !retVal.$qmlClassName){
+
+        if(typeof retVal === 'object' && !(retVal instanceof QtObject)){
             var retModel
             retModel = this.createComponent("imtqml/TreeItemModel.qml", this);
+            modelObject[key] = retModel
             retModel.isUpdateEnabled = this.isUpdateEnabled
-			retModel.$sP('isUpdateEnabled', function (){return this.isUpdateEnabled}.bind(this))
+            retModel.getProperty('isUpdateEnabled').setCompute(function(){return this.isUpdateEnabled}.bind(this))
+            retModel.getProperty('isUpdateEnabled').update()
             retModel.append(retVal);
 
             return  retModel
@@ -76,11 +74,7 @@ JSONListModel {
         if (modelObject === null)
             console.log("modelObject is null")
 
-        if(key in modelObject.$p){
-            modelObject[key] = value
-        } else {
-            modelObject.$cP(key, value)
-        }
+        modelObject[key] = value
 
         if (isUpdateEnabled){
             this.modelChanged()
@@ -99,7 +93,12 @@ JSONListModel {
         if (modelObject === null)
             console.log("modelObject is null")
 
-        delete modelObject.$p[key]
+        if(key in modelObject){
+            modelObject[key].unsubscribe()
+            delete modelObject[key]
+        }
+
+
 
         if (isUpdateEnabled){
             this.modelChanged()
@@ -225,7 +224,10 @@ JSONListModel {
         var keys = []
         if(this.count > 0){
             var modelObject = this.get(index)
-            keys = Object.keys(modelObject.$p)
+            for(let key in modelObject){
+                if(key === 'index' || key === 'model' || key === 'context') continue
+                keys.push(key)
+            }
 
             keys = keys.filter(function(arrFiltered) { return arrFiltered !== 'index' })
 
@@ -241,7 +243,7 @@ JSONListModel {
         if(row === null)
             row = 0
         if(this.count > row)
-            return this.get(row).$p.hasOwnProperty(key)
+            return this.get(row).hasOwnProperty(key)
         return false
     }
 
@@ -328,26 +330,37 @@ JSONListModel {
             if (this.isArray || this.count > 1)
                 retVal += "{"
 
-            var j = 0;
-            for (var property in modelObject.$p) {
-                if (j > 0)
-                    retVal += ","
-                j++;
-                retVal += "\"" + property + "\":"
-                var modelVal = modelObject.$p[property].val
-                if (modelVal === null)
-                    modelVal += "null"
-                else if(typeof modelVal === 'object' && (modelVal._qmlName === 'TreeItemModel.qml' || modelVal.$qmlClassName === "ListModel")){
-                    retVal += modelVal.toJSON()
+
+
+            let recurciveJSON = function(modelData){
+                if (modelData === null) {
+                    retVal += "null"
+                } else if(typeof modelData === 'object'){
+                    if(modelData instanceof QModelData){
+                        let j = 0
+                        for (var property in modelObject) {
+                            if (j > 0) retVal += ","
+                            j++;
+                            retVal += "\"" + property + "\":"
+
+                            recurciveJSON(modelData[property])
+                        }
+                    } else if(modelData.constructor.name.indexOf('TreeItemModel') >= 0){
+                        retVal += modelData.toJSON()
+                    } else if(modelData instanceof QtObject){
+                        retVal += "null"
+                    } else {
+                        retVal += JSON.stringify(modelData)
+                    }
+                } else if(typeof modelData === 'string'){
+                    retVal += "\"" + modelData + "\""
+                } else {
+                    retVal += modelData
                 }
-                else if(typeof modelVal === 'string' || modelVal instanceof String){
-                    retVal += "\"" + modelVal + "\""
-                }
-                else if(typeof modelVal === 'object' && !modelVal.$qmlClassName){
-                    retVal += JSON.stringify(modelVal)
-                }else
-                    retVal += modelVal
             }
+
+            recurciveJSON(modelObject)
+
             if (this.isArray || this.count > 1)
                 retVal += "}"
 
@@ -364,13 +377,15 @@ JSONListModel {
 //        console.log("updateTreeItemJSONModel")
         for(var row = 0; row < this.GetItemsCount(); row++){
             var modelObject = this.get(row)
-            var keys = Object.keys(modelObject.$p)
+            var keys = Object.keys(modelObject)
             for ( var index in keys ) {
-                var retVal = modelObject.$p[keys[index]].val
-                if(retVal !== null && typeof retVal === 'object' && retVal._qmlName !== 'TreeItemModel.qml'){
+                var retVal = modelObject[keys[index]]
+                if(retVal !== null && typeof retVal === 'object' && !(retVal instanceof QtObject)){
                     var retModel = this.createComponent("imtqml/TreeItemModel.qml", this);
+                    modelObject[keys[index]] = retModel
                     retModel.isUpdateEnabled = this.isUpdateEnabled
-			        retModel.$sP('isUpdateEnabled', function (){return this.isUpdateEnabled}.bind(this))
+                    retModel.getProperty('isUpdateEnabled').setCompute(function(){return this.isUpdateEnabled}.bind(this))
+                    retModel.getProperty('isUpdateEnabled').update()
                     retModel.append(retVal);
                     retVal = retModel
                     retVal.updateTreeItemJSONModel()

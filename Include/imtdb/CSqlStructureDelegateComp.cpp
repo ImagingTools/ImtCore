@@ -10,10 +10,13 @@
 #include <istd/CCrcCalculator.h>
 #include <iprm/TParamsPtr.h>
 #include <iprm/ITextParam.h>
+#include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <imtdb/imtdb.h>
 #include <imtbase/ICollectionFilter.h>
+#include <imtbase/ICollectionInfo.h>
+#include <imtbase/IObjectCollection.h>
 
 
 namespace imtdb
@@ -36,13 +39,19 @@ QByteArray CSqlStructureDelegateComp::CreateInsertNewNodeQuery(
 	QJsonDocument document;
 	document.setObject(nodeInfo);
 	QByteArray documentContent = document.toJson(QJsonDocument::Compact);
-	QString queryString = QString("INSERT INTO public.\"Nodes\"(\"NodeId\", \"ParentId\", \"Name\", \"Description\", \"NodeInfo\", \"LastModified\") VALUES ('%1', '%2', '%3', '%4', '%5', '%6');")
+	QByteArray userId;
+	if (operationContextPtr != nullptr){
+		userId = operationContextPtr->GetOperationOwnerId().id;
+	}
+	QString queryString = QString(R"(
+INSERT INTO public."Nodes" ("UserId", "NodeId", "ParentId", "Name", "Description", "NodeInfo", "OwnerId")
+VALUES ('%1', '%2', '%3', '%4', '%5', '%6', '%1');)")
+				.arg(qPrintable(userId))
 				.arg(qPrintable(proposedNodeId))
 				.arg(qPrintable(parentNodeId))
 				.arg(name)
 				.arg(description)
-				.arg(SqlEncode(documentContent))
-				.arg(QDateTime::currentDateTimeUtc().toString(Qt::ISODate));
+				.arg(SqlEncode(documentContent));
 
 	return queryString.toUtf8();
 }
@@ -116,9 +125,40 @@ QByteArray CSqlStructureDelegateComp::CreateInsertNewObjectQuery(
 	const Id& nodeId,
 	const imtbase::IOperationContext* operationContextPtr)
 {
-	QString queryString = QString("INSERT INTO public.\"NodeDocuments\"(\"DocumentId\", \"NodeId\") VALUES ('%1', '%2');")
-							  .arg(qPrintable(objectId))
-							  .arg(qPrintable(nodeId));
+	if (!m_objectCollectionCompPtr.IsValid() || !m_metaInfoCreatorCompPtr.IsValid()){
+		return QByteArray();
+	}
+	// imtbase::IObjectCollection::DataPtr
+	QString userId;
+	QString typeId = "Doc";
+	QString name;
+	QString description;
+
+	imtbase::IObjectCollection::DataPtr documentDataPtr;
+	if (m_objectCollectionCompPtr->GetObjectData(objectId, documentDataPtr)){
+		istd::IChangeable* document = documentDataPtr.GetPtr();
+		if (document != nullptr){
+			istd::TSmartPtr<idoc::IDocumentMetaInfo> documentMetaInfoPtr;
+			if (m_metaInfoCreatorCompPtr->CreateMetaInfo(document, "", documentMetaInfoPtr)){
+				name = documentMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE).toString();
+				description = documentMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_DESCRIPTION).toString();
+			}
+		}
+	}
+
+	if (operationContextPtr != nullptr){
+		userId = operationContextPtr->GetOperationOwnerId().id;
+	}
+
+	QString queryString = QString(R"(INSERT INTO public."NodeDocuments"(
+	"UserId", "DocumentId", "NodeId", "TypeId", "Name", "Description", "Size", "Permissions", "OwnerId")
+	VALUES ('%1', '%2', '%3', '%4', '%5', '%6', 0, 0, '%1');)")
+				.arg(userId)
+				.arg(qPrintable(objectId))
+				.arg(qPrintable(nodeId))
+				.arg(typeId)
+				.arg(name)
+				.arg(description);
 
 	return queryString.toUtf8();
 }

@@ -9,6 +9,7 @@
 // ImtCore includes
 #include <imtdb/CSqlStructureDelegateCompBase.h>
 #include <imtbase/ICollectionFilter.h>
+#include <imtbase/IMetaInfoCreator.h>
 
 
 namespace imtdb
@@ -22,6 +23,8 @@ public:
 	typedef CSqlStructureDelegateCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSqlStructureDelegateComp);
+		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
+		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta-info creator", true, "MetaInfoCreator");
 	I_END_COMPONENT;
 
 protected:
@@ -92,6 +95,10 @@ private:
 	virtual bool CreateSortQuery(
 				const imtbase::ICollectionFilter& collectionFilter,
 				QString& sortQuery) const;
+protected:
+	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
+	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
+
 };
 
 

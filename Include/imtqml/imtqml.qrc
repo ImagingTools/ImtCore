@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/qml">
         <file alias="Acf/qmldir">Qml/Acf/qmldir</file>
+        <file alias="Acf/Events.qml">Qml/Acf/Events.qml</file>
 
         <file alias="MainWindow.qml">Qml/MainWindow.qml</file>
         <file alias="WrapItem.qml">Qml/WrapItem.qml</file>

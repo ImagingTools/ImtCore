@@ -4,7 +4,7 @@ message("QT_VERSION_MAJOR " ${QT_VERSION_MAJOR})
 
 
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
-target_link_libraries(${PROJECT_NAME} imtgql imtrepo imtcom imtrest imtfile imtbase)
+target_link_libraries(${PROJECT_NAME} imtgql imtrepo imtcom imtrest imtfile imtbase imtdb)
 
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)
