@@ -200,7 +200,6 @@ Rectangle{
 
     }
 
-
     MouseArea{
         id:scrollContainerMA;
 
@@ -504,10 +503,10 @@ Rectangle{
 
                     if(scrollContainer.vertical){
                         var deltaY = newCoords.y - scrollMA.coord.y;
-                        if(scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY + deltaY <= 0){
+                        if(scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY + deltaY/scrollContainer.koeff <= 0){
                             scrollContainer.targetItem.contentY = scrollContainer.targetItem.originY;
                         }
-                        else if(scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY + deltaY >= scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height){
+                        else if(scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY + deltaY/scrollContainer.koeff >= scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height){
                             scrollContainer.targetItem.contentY  = scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height + scrollContainer.targetItem.originY;
                         }
                         else {
@@ -515,12 +514,13 @@ Rectangle{
                         }
                         scrollContainer.contentYSignal(scrollContainer.targetItem.contentY);
                     }
+
                     else{//horiz
                         var deltaX = newCoords.x - scrollMA.coord.x;
-                        if(scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX + deltaX <= 0){
+                        if(scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX + deltaX/scrollContainer.koeff <= 0){
                             scrollContainer.targetItem.contentX = scrollContainer.targetItem.originX;
                         }
-                        else if(scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX + deltaX >= scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width){
+                        else if(scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX + deltaX/scrollContainer.koeff >= scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width){
                             scrollContainer.targetItem.contentX = scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width + scrollContainer.targetItem.originX;
                         }
                         else {

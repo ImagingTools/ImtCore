@@ -105,6 +105,8 @@
     <file alias="imtcontrols/Views/DrawingContainer.qml">Views/DrawingContainer.qml</file>
     <file alias="imtcontrols/Views/SplitView.qml">Views/SplitView.qml</file>
     <file alias="imtcontrols/Views/SwipeView.qml">Views/SwipeView.qml</file>
+    <file alias="imtcontrols/Views/TableTreeView.qml">Views/TableTreeView.qml</file>
+    <file alias="imtcontrols/Views/TableTreeDecorator.qml">Views/TableTreeDecorator.qml</file>
     <file alias="imtcontrols/Views/TableDecorator.qml">Views/TableDecorator.qml</file>
 	<file alias="imtcontrols/Views/BaseText.qml">Views/BaseText.qml</file>
 	<file alias="imtcontrols/Views/Base/CollectionViewBase.qml">Views/Base/CollectionViewBase.qml</file>
