@@ -52,14 +52,15 @@ Item {
 
     property bool hoverBlocked: true;
 
+    property alias topContentLoaderSourceComp: topContentLoader.sourceComponent;
+    property alias bottomContentLoaderSourceComp: bottomContentLoader.sourceComponent;
+
     signal finished(string commandId, int index);
     signal started();
 
     //forShortcutEnter
     Component.onCompleted: {
         popupMenuContainer.forceActiveFocus();
-//        forShortcutEnter.forceActiveFocus();
-//        forShortcutEnter.focus = true;
     }
 
     Component.onDestruction: {
@@ -67,7 +68,6 @@ Item {
     }
 
     onFinished: {
-        //popupMenuContainer.root.closeDialog();
     }
 
     onModelChanged: {
@@ -107,8 +107,14 @@ Item {
         popupMenuContainer.rootItem.contentY = popupMenuContainer.contentY;
     }
 
+    Loader {
+        id: topContentLoader;
+    }
+
     Rectangle {
         id: itemBody;
+
+        anchors.top: topContentLoader.bottom;
 
         width: popupMenuContainer.width;
         height: popupMenuListView.height;
@@ -131,17 +137,12 @@ Item {
             secondSize: !visibleScrollBar ? 0 : Style.isMobile == undefined ? 10 : Style.isMobile ? 4 : 10;
             targetItem: popupMenuListView;
             canFade: Style.isMobile == undefined ? false : Style.isMobile;
-            //            visible: !popupMenuContainer.visibleScrollBar ? false : hideNotUsed ? !notUsed : true;
-
         }
 
         ListView {
             id: popupMenuListView;
 
             width: popupMenuContainer.width;
-            //            height: (parent.countVisibleItem == -1 || parent.countVisibleItem > popupMenuListView.count) ?
-            //                        popupMenuListView.count * popupMenuContainer.itemHeight :
-            //                        parent.countVisibleItem * popupMenuContainer.itemHeight;
             height: Math.min(popupMenuContainer.shownItemsCount * popupMenuContainer.itemHeight, contentHeight);
 
             boundsBehavior: Flickable.StopAtBounds;
@@ -163,6 +164,10 @@ Item {
             }
         }
     }//ItemListView
+
+    Loader {
+        id: bottomContentLoader;
+    }
 
     DropShadow {
         id: dropShadow;
@@ -201,8 +206,6 @@ Item {
 
         }
     }
-
-
 
     Shortcut {
         sequence: "Escape";
@@ -258,5 +261,4 @@ Item {
             }
         }
     }
-
 }

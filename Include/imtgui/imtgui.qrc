@@ -1,8 +1,5 @@
 <RCC>
     <qresource prefix="/qml">
-        <file alias="Acf/qmldir">Qml/Acf/qmldir</file>
-	<file alias="Acf/Events.qml">Qml/Acf/Events.qml</file>
-
 	<file alias="imtgui/BaseText.qml">Qml/imtgui/BaseText.qml</file>
         <file alias="imtgui/AuxButton.qml">Qml/imtgui/AuxButton.qml</file>
         <file alias="imtgui/TextButton.qml">Qml/imtgui/TextButton.qml</file>
