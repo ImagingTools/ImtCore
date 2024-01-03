@@ -2,6 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 import imtgui 1.0
+import imtcontrols 1.0
 
 Rectangle {
     id: tabPanelContainer;
@@ -43,8 +44,6 @@ Rectangle {
         delegate: TabDelegate {
             height: list.height;
 
-//            width: 100;
-
             selected: model.index === tabPanelContainer.selectedIndex;
             firstElement: model.index === 0;
             lastElement: model.index === list.count - 1;
@@ -52,7 +51,7 @@ Rectangle {
             text: model.Title ? model.Title : "";
             isCloseEnable: tabPanelContainer.isCloseEnable;
 
-            decoratorSource: Style.tabPanelDecoratorPath;
+            // decoratorSource:  "qrc:/qml/imtgui/Panels/TabPanelDecorator.qml"  //Style.tabPanelDecoratorPath;
 
             onClicked: {
                 tabPanelContainer.selectedIndex = model.index;
@@ -61,7 +60,12 @@ Rectangle {
             onCloseSignal: {
                 tabPanelContainer.closeItem(model.index);
             }
+
+            Component.onCompleted: {
+                console.log("tabPanelDecorator", Style.tabPanelDecorator)
+            }
         }
+
     }
 
     Rectangle {

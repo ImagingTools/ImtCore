@@ -6,7 +6,8 @@ import imtqml 1.0
 ControlBase {
     id: baseButton;
 
-    decoratorComponent: Style.isQtStyle ? DecoratorsQt.buttonDecorator: Decorators.buttonDecorator;
+    // decoratorComponent: Style.isQtStyle ? DecoratorsQt.buttonDecorator: Decorators.buttonDecorator;
+    decoratorComponent: Style.buttonDecorator
 
     property string text: ""
     property string iconSource: ""

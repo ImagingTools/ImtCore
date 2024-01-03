@@ -4,11 +4,12 @@ import imtqml 1.0
 
 Item {
     id: tabPanelDecorator;
-
     width: texttabDelegate.width + imagetabDelegate.width + 40;
-    property Item rootItem: null;
+    height: baseElement ? baseElement.height : 50
 
-    property string firstElementImageSource: tabPanelDecorator.rootItem ? tabPanelDecorator.rootItem.firstElementImageSource : "";
+    property Item baseElement: null;
+
+    property string firstElementImageSource: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.firstElementImageSource : "";
     onFirstElementImageSourceChanged: {
         if (tabPanelDecorator.firstElementImageSource !== ""){
             firsElementImage.source = "../../../" + Style.getIconPath(tabPanelDecorator.firstElementImageSource, Icon.State.On, Icon.Mode.Normal);
@@ -17,7 +18,7 @@ Item {
 
     Rectangle {
         anchors.fill: parent;
-        color: tabPanelDecorator.rootItem ? tabPanelDecorator.rootItem.selected ? Style.baseColor: "transparent": "transparent";
+        color: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected ? Style.baseColor: "transparent": "transparent";
     }
 
     Rectangle{
@@ -30,7 +31,7 @@ Item {
         height: 2;
 
         color: Style.tabSelectedColor;
-        visible: tabPanelDecorator.rootItem ? tabPanelDecorator.rootItem.selected: false;
+        visible: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected: false;
     }
 
     Item {
@@ -39,7 +40,7 @@ Item {
         height: parent.height;
         width: visible ? height : 1;
 
-        visible: tabPanelDecorator.rootItem ? tabPanelDecorator.rootItem.firstElement: false;
+        visible: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.firstElement: false;
 
         Image {
             id: firsElementImage;
@@ -62,7 +63,7 @@ Item {
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
         anchors.left: imagetabDelegate.right;
-        anchors.leftMargin: tabPanelDecorator.rootItem ? tabPanelDecorator.rootItem.firstElement ? 0 :10 : 0;
+        anchors.leftMargin: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.firstElement ? 0 :10 : 0;
 
         width: text.width;
 
@@ -74,7 +75,48 @@ Item {
             color: Style.textColor;
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_common;
-            text: tabPanelDecorator.rootItem ? tabPanelDecorator.rootItem.text : "";
+            text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
+        }
+    }
+
+    Item {
+        id: closeButton;
+        anchors.right: parent.right;
+        anchors.rightMargin: 8;
+        anchors.verticalCenter: parent.verticalCenter;
+
+        height: parent.height;
+        width: closeImage.width;
+
+        visible: !tabPanelDecorator.baseElement.firstElement && tabPanelDecorator.baseElement.isCloseEnable;
+
+        Image {
+            id: closeImage;
+
+            anchors.centerIn: parent;
+
+            width: 13;
+            height: width;
+
+            sourceSize.width: width;
+            sourceSize.height: height;
+
+            fillMode: Image.PreserveAspectFit;
+            source: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
+        }
+
+        MouseArea{
+            id: closeMA;
+
+            anchors.fill: parent;
+
+            enabled: closeButton.visible;
+            hoverEnabled: enabled;
+            cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+
+            onClicked: {
+                tabPanelDecorator.baseElement.closeSignal();
+            }
         }
     }
 }

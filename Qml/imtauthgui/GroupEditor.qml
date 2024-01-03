@@ -4,6 +4,7 @@ import imtgui 1.0
 import imtqml 1.0
 import imtcolgui 1.0
 import imtlicgui 1.0
+import imtcontrols 1.0
 
 Item {
     id: userGroupEditorContainer;

@@ -7,7 +7,9 @@ import imtcontrols 1.0
 ControlBase {
     id: customTooltip;
 
-    decoratorComponent: Style.isQtStyle ? DecoratorsQt.tooltipDecorator: Decorators.tooltipDecorator;
+    decoratorComponent: Style.tooltipDecorator
+
+    //decoratorComponent: Style.isQtStyle ? DecoratorsQt.tooltipDecorator: Decorators.tooltipDecorator;
 
     property string text: "";
 

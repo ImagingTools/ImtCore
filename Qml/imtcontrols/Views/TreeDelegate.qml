@@ -288,8 +288,8 @@ Rectangle {
 
         visible: treeDelegate.hasChildren;
 
-        iconSource: treeDelegate.opened ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
-                                        "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
+        iconSource: treeDelegate.opened ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal) :
+                                        "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal);
 
         onClicked: {
             treeDelegate.opened = !treeDelegate.opened;

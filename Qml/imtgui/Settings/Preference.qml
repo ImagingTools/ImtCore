@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtcontrols 1.0
 
 Rectangle {
     id: root;
@@ -108,7 +109,7 @@ Rectangle {
                 id: mainPanelRepeater;
 
                 delegate:
-                    BaseButton{
+                    Button{
 
                     id: buttonContainer;
 
@@ -117,9 +118,10 @@ Rectangle {
                     anchors.right: parent.right;
                     anchors.rightMargin: 10;
 
-                    decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
+                    // decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
 
-                    selected: mainPanel.selectedIndex === model.index;
+                    // selected: mainPanel.selectedIndex === model.index;
+                    focus: mainPanel.selectedIndex === model.index;
                     text: model.Name;
 
                     Component.onCompleted: {

@@ -1,11 +1,12 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtqml 1.0
+import imtcontrols 1.0
 
-Item{
+ControlBase {
     id: tabDelegate;
 
-    height: 40;
+    // height: 40;
+
 //    width: loaderDecorator.width + closeButton.width;
 
     property bool selected: false;
@@ -15,34 +16,41 @@ Item{
     property bool isCloseEnable: true;
 
     property string text;
-    property string firstElementImageSource:  "";
+    property string firstElementImageSource:  "../../../" + "Icons/" + Style.theme + "/" + "Workflow" + "_On_Normal.svg";
 
-    property string decoratorSource;
+    // property string decoratorSource;
+    decoratorComponent: Style.tabPanelDecorator
 
     signal clicked;
     signal closeSignal;
 
-    onDecoratorSourceChanged: {
-        loaderDecorator.source = tabDelegate.decoratorSource;
-    }
+    // onDecoratorSourceChanged: {
+    //     loaderDecorator.source = tabDelegate.decoratorSource;
+    // }
 
-    Loader {
-        id: loaderDecorator;
-        height: tabDelegate.height;
+    // Loader {
+    //     id: loaderDecorator;
+    //     height: tabDelegate.height;
 
-        onItemChanged: {
-            tabDelegate.width = loaderDecorator.item.width;
-            if(loaderDecorator.item.rootItem !== undefined){
-                loaderDecorator.item.rootItem = tabDelegate;
-            }
-        }
+    //     onItemChanged: {
+    //         if (loaderDecorator.item){
+    //             tabDelegate.width = loaderDecorator.item.width;
+    //             if(loaderDecorator.item.rootItem !== undefined){
+    //                 loaderDecorator.item.rootItem = tabDelegate;
+    //             }
+    //         }
+    //     }
 
-        onWidthChanged: {
-            if (loaderDecorator.item){
-                tabDelegate.width = loaderDecorator.item.width;
-            }
-        }
-    }
+    //     onWidthChanged: {
+    //         if (loaderDecorator.item){
+    //             tabDelegate.width = loaderDecorator.item.width;
+    //         }
+    //     }
+
+    //     onLoaded: {
+    //         console.log("tabDelegate Loader onLoaded", tabDelegate.height);
+    //     }
+    // }
 
     MouseArea{
         id: ma;
@@ -55,47 +63,5 @@ Item{
         }
     }
 
-    Item {
-        id: closeButton;
 
-//        anchors.right: parent.right;
-        anchors.right: loaderDecorator.right;
-        anchors.rightMargin: 8;
-        anchors.verticalCenter: parent.verticalCenter;
-
-        height: parent.height;
-        width: closeImage.width;
-
-        visible: !parent.firstElement && tabDelegate.isCloseEnable;
-
-        Image {
-            id: closeImage;
-
-            anchors.centerIn: parent;
-
-            width: 13;
-            height: width;
-
-            sourceSize.width: width;
-            sourceSize.height: height;
-
-            fillMode: Image.PreserveAspectFit;
-
-            source: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
-        }
-
-        MouseArea{
-            id: closeMA;
-
-            anchors.fill: parent;
-
-            enabled: tabDelegate.visible;
-            hoverEnabled: enabled;
-            cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
-
-            onClicked: {
-                tabDelegate.closeSignal();
-            }
-        }
-    }
 }

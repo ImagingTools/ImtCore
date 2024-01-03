@@ -1,7 +1,8 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtgui 1.0
+import imtqml 1.0
 import imtcontrols 1.0
-
 
 Rectangle {
     id: topPanelDialogContainer;
@@ -29,7 +30,7 @@ Rectangle {
         sourceSize.height: height;
         sourceSize.width: width;
 
-        source: "../../../../" + "Icons/" + Style.theme + "/LisaIcon.svg";
+        source: "../../../../" + Style.getIconPath("Icons/AppIcon", Icon.State.On, Icon.Mode.Normal)
 
         visible: topPanelDialogContainer.hasIcon;
     }
@@ -40,7 +41,7 @@ Rectangle {
         anchors.left: topPanelDialogContainer.hasIcon ? iconDialog.right : parent.left;
         anchors.leftMargin: topPanelDialogContainer.hasIcon ? 10 : 15;
         anchors.verticalCenter: topPanelDialogContainer.verticalCenter;
-        anchors.right: parent.right;
+        anchors.right: closeButton.left;
         anchors.rightMargin: 10;
 
         color: Style.textColor;
@@ -52,7 +53,7 @@ Rectangle {
         elide: Text.ElideRight;
     }
 
-    Button {
+    AuxButton {
         id: closeButton;
 
         anchors.right: topPanelDialogContainer.right;
@@ -62,7 +63,7 @@ Rectangle {
         width: 20;
         height: 20;
 
-        iconSource: "../../../../" + "Icons/" + Style.theme + "/" + "Close" + "_" + "On" + "_" + "Normal" + ".svg";
+        iconSource: "../../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
         onClicked: {
             topPanelDialogContainer.closeButtonClicked("Exit");

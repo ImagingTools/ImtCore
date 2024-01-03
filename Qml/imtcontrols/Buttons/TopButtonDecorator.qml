@@ -10,12 +10,14 @@ Item {
     width: isEmpty ? 20 : 60;
     height: 28;
 
-    property var baseButton;
+    property var baseElement;
     property string textColor: Style.textColor;
     property string textColorDisabled: "gray";
-    property real fontSize: Style.fontSize_small;
+    // property real fontSize: Style.fontSize_small;
     property int radius: 4;
-    property bool isEmpty: baseButton.text === "";
+    property bool isEmpty: baseElement.text === "";
+
+    visible: !isEmpty;
 
     DropShadow {
        id: dropShadow;
@@ -30,20 +32,20 @@ Item {
        source: button;
 
 //       visible: topButtonDecorator.isToggleable ? !topButtonDecorator.isToggled : button.visible && !topButtonDecorator.isHighlighted;
-       visible: !(baseButton.checked || baseButton.down)
+       visible: !(baseElement.checked || baseElement.down)
 
     }
 
     Rectangle{
         id: button;
 
-        anchors.top: parent.top;
+        anchors.top: topButtonDecorator.top;
         anchors.topMargin: 6;
-        anchors.left: parent.left;
-        anchors.horizontalCenter: parent.horizontalCenter;
+        anchors.left: topButtonDecorator.left;
+        anchors.horizontalCenter: topButtonDecorator.horizontalCenter;
 
-        width: parent.width;
-        height: parent.height;
+        width: topButtonDecorator.width;
+        height: topButtonDecorator.height;
 
         radius: topButtonDecorator.radius;
 //        visible: !topButtonDecorator.isEmpty;
@@ -51,7 +53,7 @@ Item {
         color: Style.baseColor;
 
 //        gradient: topButtonDecorator.isHighlighted || topButtonDecorator.isToggled ? pressedGradientButton : standardGradientButton;
-        gradient: baseButton.checked || baseButton.down ? pressedGradientButton : standardGradientButton;
+        gradient: baseElement.checked || baseElement.down ? pressedGradientButton : standardGradientButton;
 
         Gradient {
             id: standardGradientButton;
@@ -75,7 +77,7 @@ Item {
             height: parent.height - 8;
             width: height;
 
-            source: baseButton.iconSource;
+            source: baseElement.iconSource;
             fillMode: Image.PreserveAspectFit;
 
             sourceSize.width: width;
@@ -97,7 +99,7 @@ Item {
 
         samples: 16;
 //        visible: topButtonDecorator.isToggleable ? topButtonDecorator.isToggled : button.visible && topButtonDecorator.isHighlighted;
-        visible: baseButton.checked || baseButton.down
+        visible: baseElement.checked || baseElement.down
 
     }
 
@@ -105,7 +107,7 @@ Item {
         id: selection;
 
         anchors.top: button.bottom;
-        anchors.horizontalCenter: parent.horizontalCenter;
+        anchors.horizontalCenter: topButtonDecorator.horizontalCenter;
 
         height: 4;
         width: button.width/1.8;
@@ -118,14 +120,14 @@ Item {
 
         anchors.top: selection.bottom;
         anchors.topMargin: 0;
-        anchors.horizontalCenter: parent.horizontalCenter;
+        anchors.horizontalCenter: topButtonDecorator.horizontalCenter;
 
         color: topButtonDecorator.enabled ? topButtonDecorator.textColor : topButtonDecorator.textColorDisabled;
-        font.pixelSize: topButtonDecorator.fontSize;
 
-        font.family: Style.fontFamily;
+        font.pixelSize: Style.fontSize_small
+        font.family: Style.fontFamily
 
-        text: baseButton.text;
+        text: !baseElement ? "" : baseElement.text
     }
 }
 

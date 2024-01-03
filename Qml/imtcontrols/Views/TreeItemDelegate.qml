@@ -85,8 +85,8 @@ Item {
 
                 visible: treeItemDelegate.childrenCount > 0;
 
-                source: model.Opened ? "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg" :
-                                         "../../../" + "Icons/" + Style.theme + "/" + "Right" + "_On_Normal.svg";
+                source: model.Opened ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal) :
+                                         "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal);
 
                 sourceSize.height: height;
                 sourceSize.width: width;

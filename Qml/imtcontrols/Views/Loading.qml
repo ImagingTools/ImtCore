@@ -1,11 +1,12 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtcontrols 1.0
 
 Rectangle {
     id: root;
 
     color: Style.backgroundColor;
+
+    property int indicatorSize: 50;
 
     function start(){
         console.log("Loading start");
@@ -24,8 +25,8 @@ Rectangle {
 
         anchors.centerIn: parent
         property double minimum: Math.min(root.width, root.height);
-        width: 50;
-        height: 50;
+        width: root.indicatorSize;
+        height: width;
 
         Repeater {
             id: repeater;

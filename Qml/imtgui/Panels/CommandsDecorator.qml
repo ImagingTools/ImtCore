@@ -2,6 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtqml 1.0
 import imtgui 1.0
+import imtcontrols 1.0
 
 Item {
     id: commandsDecoratorContainer;
@@ -76,13 +77,15 @@ Item {
                 height: topButtonDelegate.height;
 
                 property bool isHorizontal: model.IsHorizontal == undefined ? true : model.IsHorizontal;
-                BaseButton {
+                Button {
 
                     id: topButtonDelegate;
 
-                    decorator: Style.topButtonDecorator !==undefined ? Style.topButtonDecorator: defaultButtonDecorator;
+                    // decorator: Style.topButtonDecorator !==undefined ? Style.topButtonDecorator: defaultButtonDecorator;
 
-                    imageSource: model.IsEnabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) :
+                    decoratorComponent: Style.topButtonDecorator
+
+                    iconSource: model.Icon === "" ? "" : model.IsEnabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) :
                                                    "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled);
 
                     enabled: model.IsEnabled;
@@ -91,8 +94,10 @@ Item {
 
                     text: model.Name;
 
-                    isToggled: isToggleable ? model.IsToggled !== undefined ? model.IsToggled : false : false;
-                    isToggleable: model.IsToggleable !== undefined ? model.IsToggleable : false
+                    // isToggled: isToggleable ? model.IsToggled !== undefined ? model.IsToggled : false : false;
+                    // isToggleable: model.IsToggleable !== undefined ? model.IsToggleable : false
+                    checked: checkable ? model.IsToggled !== undefined ? model.IsToggled : false : false;
+                    checkable: model.IsToggleable !== undefined ? model.IsToggleable : false
 
                     Component.onCompleted: {
                         console.log("Command onCompleted", model.Id);
@@ -144,64 +149,31 @@ Item {
 
                 property bool isHorizontal: model.IsHorizontal == undefined ? true : model.IsHorizontal;
 
-                Item{
+                Button {
                     id: textButtonDelegateContainer;
-
-                    anchors.top: parent.top;
-
-                    width: imageButton.width + textButtonDelegate.width + 5;
-                    height: Math.max(textButtonDelegate.height, imageButton.height);
                     visible: model.Name !== "";
+                    iconSource: model.IsEnabled !== "" ? (model.Icon !== "" ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) : "") :
+                                                         (model.Icon !== "" ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled) : "");
+                    enabled: model.IsEnabled;
+                    text: model.Name !== undefined ? model.Name : "";
+                    checked: checkable ? model.IsToggled !== undefined ? model.IsToggled : false : false;
+                    checkable: model.IsToggleable !== undefined ? model.IsToggleable : false
 
-                    AuxButton{
-                        id: imageButton;
-
-                        anchors.verticalCenter: parent.verticalCenter;
-
-                        width: textButtonDelegate.height + 5;
-                        height: textButtonDelegate.height;
-                        iconWidth: width - 8;
-
-                        enabled: model.IsEnabled;
-                        hasIcon: true;
-                        hasText: false;
-                        highlighted: false;
-                        color: "transparent";
-
-                        iconSource: model.IsEnabled !== "" ? (model.Icon !== "" ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) : "") :
-                                                       (model.Icon !== "" ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled) : "");
-
-                        onClicked: {
-                            Events.sendEvent(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);
+                    decoratorComponent: Component {
+                        ButtonDecorator {
+                            color: !baseElement ? "transtarent" : baseElement.down || baseElement.checked ? Style.buttonPressedColor : baseElement.hovered ?  Style.buttonHoverColor : "transparent"
+                            border.color: "transparent"
                         }
                     }
 
-                    TextButton{
-                        id: textButtonDelegate;
+                    property string id: model.Id !== undefined ? model.Id : "";
 
-                        anchors.left: imageButton.right;
-                        anchors.verticalCenter: parent.verticalCenter;
-
-                        legendColor: model.IsEnabled ? Style.textColor : "gray";
-                        indicatorColor: "transparent";
-
-                        enabled: model.IsEnabled;
-                        legend: model.Name !== undefined ? model.Name : "";
-                        active: model.Active !== undefined ? model.Active : false;
-                        fontFamily: Style.fontFamily;
-                        hasIndicator: false;
-                        fontBold: true;
-                        fontPixelSize: Style.fontSize_common;
-                        property Item rootItem: buttonPanel;
-                        property string id: model.Id !== undefined ? model.Id : "";
-
-                        onClicked: {
-                            Events.sendEvent(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);
-                            rootItem.clicked(id);
-                        }
+                    onClicked: {
+                        console.log("onClicked", commandsDecoratorContainer.commandId + "CommandActivated " + model.Id)
+                        Events.sendEvent(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);
+                        buttonPanel.clicked(id);
                     }
                 }
-
 
 
                 Rectangle{

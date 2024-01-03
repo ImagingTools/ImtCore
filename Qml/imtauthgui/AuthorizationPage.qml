@@ -2,6 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 import imtqml 1.0
+import imtcontrols 1.0
 
 Rectangle {
     id: authPageContainer;
@@ -399,7 +400,7 @@ Rectangle {
                 width: parent.width;
                 height: 70;
 
-                BaseButton{
+                Button{
                     id: loginButton;
 
                     anchors.centerIn: parent;
@@ -411,7 +412,7 @@ Rectangle {
                         }
                     }
 
-                    decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
+                    // decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
                     enabled: loginTextInput.text != "" && passwordTextInput.text != "";
 
                     text: qsTr("Login");
@@ -422,9 +423,9 @@ Rectangle {
                         userTokenProvider.authorization(loginTextInput.text, passwordTextInput.text);
                     }
 
-                    onDecoratorChanged: {
-                        loginButton.loadingCount++;
-                    }
+                    // onDecoratorChanged: {
+                    //     loginButton.loadingCount++;
+                    // }
                 }
             }//
         }//bodyColumn
@@ -433,7 +434,7 @@ Rectangle {
     Component{
         id: defaultButtonDecorator;
 
-        CommonButtonDecorator{
+        ButtonDecorator{
             width: 100;
             height: 30;
             color: Style.buttonColor;

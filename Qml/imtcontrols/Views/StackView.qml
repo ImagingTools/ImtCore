@@ -7,6 +7,8 @@ Item {
 
     property int countPage: pagesModel.count;
 
+    signal itemAdded(Item item)
+
     Component.onDestruction: {
         pagesModel.clear();
     }
@@ -59,6 +61,7 @@ Item {
                 dialogLoader.item.itemId = model.Id;
                 dialogLoader.item.commandId = model.CommandId;
                 dialogLoader.item.forceActiveFocus();
+                container.itemAdded(dialogLoader.item)
             }
         }
     }

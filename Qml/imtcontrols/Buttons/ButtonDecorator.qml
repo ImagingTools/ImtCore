@@ -10,6 +10,7 @@ Rectangle{
 
     property var baseElement;
     property alias icon: iconObj
+    property alias font: textObj.font
 
 //    color: baseElement.down || baseElement.checked ? Style.buttonPressedColor : Style.buttonColor
 

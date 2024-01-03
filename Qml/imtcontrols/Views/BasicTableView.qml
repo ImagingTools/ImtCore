@@ -36,19 +36,12 @@ FocusScope {
 
     property TreeViewSelection tableSelection: TreeViewSelection {
         onSelectionChanged: {
-
-//            let selectedIndex = null;
-
-//            if (items.length > 0){
-//                selectedIndex = items.length[0];
-//            }
-
-//            if (tableViewRoot.tableSelection.items.length > 0){
-//                tableViewRoot.selectedIndex = tableViewRoot.tableSelection.items[0];
-//            }
-//            else{
-//                tableViewRoot.selectedIndex = null;
-//            }
+            if (tableViewRoot.tableSelection.items.length > 0){
+                tableViewRoot.selectedIndex = tableViewRoot.tableSelection.items[0];
+            }
+            else{
+                tableViewRoot.selectedIndex = null;
+            }
 
             tableViewRoot.selectionChanged();
         }

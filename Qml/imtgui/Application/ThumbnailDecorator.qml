@@ -4,6 +4,7 @@ import imtauthgui 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
 import imtgui 1.0
+import imtcontrols 1.0
 //import 'AuxComponents'
 
 Rectangle {
@@ -79,7 +80,7 @@ Rectangle {
                 loading.stop();
             }
             else{
-                loading.start();
+                // loading.start();
             }
         }
     }
@@ -195,7 +196,7 @@ Rectangle {
                 loading.stop();
             }
             else{
-                loading.start();
+                // loading.start();
             }
         }
     }
@@ -270,7 +271,7 @@ Rectangle {
         visible: false;
 
         onBeforeSetted: {
-            loading.start();
+            // loading.start();
         }
 
         onVisibleChanged: {
@@ -373,7 +374,7 @@ Rectangle {
     Loading {
         id: loading;
 
-        z: 999;
+        z: -1;
 
         anchors.fill: parent;
 
