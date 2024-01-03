@@ -166,6 +166,9 @@ imtguigqlqml.file = ../../Qml/imtguigql/QMake/imtguigqlqml.pro
 SUBDIRS += imtcontrolsqml
 imtcontrolsqml.file = ../../Qml/imtcontrols/QMake/imtcontrolsqml.pro
 
+SUBDIRS += imtlicguiqml
+imtlicguiqml.file = ../../Qml/imtlicgui/QMake/imtlicguiqml.pro
+
 
 ######### Component packages
 SUBDIRS += ImtCorePck
