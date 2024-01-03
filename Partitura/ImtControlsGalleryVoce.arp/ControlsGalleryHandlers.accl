@@ -9,7 +9,7 @@
     </AcfHeader>
     <PositionMap>
         <Element ComponentName="ApplicationController" X="575" Y="350" Note=""/>
-        <Element ComponentName="GQLServerFramework" X="575" Y="125" Note=""/>
+        <Element ComponentName="RemoteContextGQLServerFramework" X="600" Y="125" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

@@ -8,9 +8,9 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ClientApplication" X="550" Y="400" Note=""/>
-        <Element ComponentName="ControlsGalleryServer" X="575" Y="175" Note=""/>
-        <Element ComponentName="LocalSettings" X="575" Y="625" Note=""/>
+        <Element ComponentName="ClientApplication" X="525" Y="400" Note=""/>
+        <Element ComponentName="ControlsGalleryServer" X="350" Y="175" Note=""/>
+        <Element ComponentName="LocalSettings" X="650" Y="200" Note=""/>
         <Element ComponentName="VersionInfo" X="1050" Y="200" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>

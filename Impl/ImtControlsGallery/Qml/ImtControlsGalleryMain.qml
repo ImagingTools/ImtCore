@@ -10,6 +10,8 @@ ApplicationMain{
 
     function updateAllModels(){
         console.log("settingsProviderLocal.updateModel", Style.textColor);
+        Style.setDecorators(Decorators)
+
         thumbnailDecoratorGui.updateModels();
 
         applicationInfoProvider.updateModel();
