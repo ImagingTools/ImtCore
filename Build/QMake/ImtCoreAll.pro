@@ -147,8 +147,25 @@ imtimg.file = ../../Include/imtimg/QMake/imtimg.pro
 SUBDIRS += imtclientgql
 imtclientgql.file = ../../Include/imtclientgql/QMake/imtclientgql.pro
 
-SUBDIRS += imtdocgui
-imtdocgui.file = ../../Qml/imtdocgui/QMake/imtdocgui.pro
+# QML modules
+SUBDIRS += imtguiqml
+imtguiqml.file = ../../Qml/imtgui/QMake/imtguiqml.pro
+
+SUBDIRS += imtdocguiqml
+imtdocguiqml.file = ../../Qml/imtdocgui/QMake/imtdocguiqml.pro
+
+SUBDIRS += imtcolguiqml
+imtcolguiqml.file = ../../Qml/imtcolgui/QMake/imtcolguiqml.pro
+
+SUBDIRS += imtauthguiqml
+imtauthguiqml.file = ../../Qml/imtauthgui/QMake/imtauthguiqml.pro
+
+SUBDIRS += imtguigqlqml
+imtguigqlqml.file = ../../Qml/imtguigql/QMake/imtguigqlqml.pro
+
+SUBDIRS += imtcontrolsqml
+imtcontrolsqml.file = ../../Qml/imtcontrols/QMake/imtcontrolsqml.pro
+
 
 ######### Component packages
 SUBDIRS += ImtCorePck

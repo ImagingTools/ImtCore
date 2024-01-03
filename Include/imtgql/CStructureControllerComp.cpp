@@ -1,24 +1,13 @@
 #include <imtgql/CStructureControllerComp.h>
 
 
-// std includes
-#include <cmath>
-
 // ACF includes
 #include <iprm/CTextParam.h>
 #include <iprm/CIdParam.h>
 #include <iprm/TParamsPtr.h>
-#include <iprm/CEnableableParam.h>
-#include <istd/TDelPtr.h>
-#include <iser/CJsonMemReadArchive.h>
-#include <istd/TSingleFactory.h>
 
 // ImtCore includes
-#include <imtbase/CCollectionFilter.h>
 #include <imtbase/ICollectionStructureIterator.h>
-#include <imtbase/COperationContext.h>
-// #include <imtbase/CObjectCollection.h>
-#include <imtbase/COperationDescription.h>
 #include <imtgql/imtgql.h>
 
 
@@ -113,7 +102,6 @@ imtbase::CTreeItemModel* CStructureControllerComp::GetElements(
 			SendErrorMessage(0, "Database query could not be created", "Database collection");
 		}
 
-
 		notificationModel->SetData("PagesCount", 0);
 		notificationModel->SetData("TotalCount", -1);
 
@@ -134,7 +122,6 @@ imtbase::CTreeItemModel* CStructureControllerComp::GetElements(
 		}
 
 		itemsModel->SetIsArray(true);
-
 
 		dataModel->SetExternTreeModel("items", itemsModel);
 		dataModel->SetExternTreeModel("notification", notificationModel);
