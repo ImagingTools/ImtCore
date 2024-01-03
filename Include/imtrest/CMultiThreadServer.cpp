@@ -79,6 +79,7 @@ void CSocket::HandleReadyRead()
 
 	// Get state of request data:
 	if (!m_requestPtr->ParseDeviceData(*m_socket)){
+		qDebug() << "ParseDeviceData error";
 		m_startTimer.stop();
 		m_socket->disconnect();
 
@@ -87,6 +88,7 @@ void CSocket::HandleReadyRead()
 
 	// Not all data was read:
 	if (m_requestPtr->GetState() != IRequest::RS_MESSAGE_COMPLETE){
+		qDebug() << "Not all data was read";
 
 		return;
 	}
