@@ -2,7 +2,7 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5133" Description="ACF"/>
+            <Version Id="0" Number="5174" Description="ACF"/>
             <Version Id="1" Number="2198" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
@@ -76,13 +76,15 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="FileObject" PackageId="" ComponentId="FileObject">
+            <Data IsEnabled="true" Flags="2">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
         <Element Id="GqlFileRepository" PackageId="ImtGqlPck" ComponentId="GqlFileRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="GqlCommandId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="CommandPermissions" Type="Reference" ExportId="CommandPermissions">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DocumentChangeGenerator" Type="Reference" ExportId="DocumentChangeGenerator">
@@ -109,12 +111,6 @@
                     <AttributeInfo Id="OperationContextController" Type="Reference" ExportId="OperationContextController">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PermissionChecker" Type="Reference" ExportId="PermissionChecker">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="RequestCollection" Type="Reference" ExportId="RequestCollection">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="SeparatorObjectId" Type="Id" ExportId="SeparatorObjectId">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -126,6 +122,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="TempDirectoryPath" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TempStoragePath"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TempRequestCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TempObjectCollection"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
@@ -154,6 +153,9 @@
                     <AttributeInfo Id="TempDirectoryPath" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="TempStoragePath"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="TempRequestCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TempObjectCollection"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
@@ -170,6 +172,33 @@
                     </AttributeInfo>
                     <AttributeInfo Id="LocationType" Type="Integer" ExportId="TempStorageDirectoryPathType">
                         <Data IsEnabled="true" Value="7"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TempObjectCollection" PackageId="ImtCorePck" ComponentId="ObjectCollection">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="FixedObjectTypeIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>File</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FixedObjectTypeNames" Type="Text[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>File</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>FileObject</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -191,121 +220,49 @@
         </Element>
     </ElementsList>
     <EmbeddedRegistriesList>
-        <EmbeddedRegistry Id="ReportDocument">
+        <EmbeddedRegistry Id="FileObject">
             <Data Description="" Keywords="">
                 <ElementsList>
-                    <Element Id="InspectionReportBuilder" PackageId="ImtReportPck" ComponentId="InspectionReportBuilder">
+                    <Element Id="ComposedParamsSet" PackageId="BasePck" ComponentId="ComposedParamsSet">
                         <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap/>
-                        </Data>
-                    </Element>
-                    <Element Id="InspectionReportSimulator" PackageId="ImtReportPck" ComponentId="InspectionReportSimulator">
-                        <Data IsEnabled="true" Flags="1">
                             <AttributeInfoMap>
-                                <AttributeInfo Id="InspectionReportBuilder" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="InspectionReportBuilder"/>
+                                <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>FileNameParam</Value>
+                                        </Values>
+                                    </Data>
                                 </AttributeInfo>
-                                <AttributeInfo Id="ReportDocument" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="ReportDocument"/>
+                                <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
+                                    <Data IsEnabled="true">
+                                        <Values>
+                                            <Value>FilePath</Value>
+                                        </Values>
+                                    </Data>
                                 </AttributeInfo>
                             </AttributeInfoMap>
                         </Data>
                     </Element>
-                    <Element Id="ReportDocument" PackageId="ImtReportPck" ComponentId="ReportDocument">
+                    <Element Id="FileNameParam" PackageId="FilePck" ComponentId="FileNameParam">
                         <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap/>
+                            <AttributeInfoMap>
+                                <AttributeInfo Id="PathType" Type="Integer" ExportId="">
+                                    <Data IsEnabled="true" Value="1"/>
+                                </AttributeInfo>
+                            </AttributeInfoMap>
                         </Data>
                     </Element>
                 </ElementsList>
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces>
-                    <Interface InterfaceId="idoc::IMultiPageDocument" ComponentId="ReportDocument"/>
-                    <Interface InterfaceId="imod::IModel" ComponentId="ReportDocument"/>
-                    <Interface InterfaceId="imtreport::IReportDocument" ComponentId="ReportDocument"/>
-                    <Interface InterfaceId="iser::ISerializable" ComponentId="ReportDocument"/>
-                    <Interface InterfaceId="istd::IChangeable" ComponentId="ReportDocument"/>
-                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="ReportDocument"/>
+                    <Interface InterfaceId="imod::IModel" ComponentId="ComposedParamsSet"/>
+                    <Interface InterfaceId="iprm::IParamsSet" ComponentId="ComposedParamsSet"/>
+                    <Interface InterfaceId="iser::ISerializable" ComponentId="ComposedParamsSet"/>
+                    <Interface InterfaceId="istd::IChangeable" ComponentId="ComposedParamsSet"/>
+                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="ComposedParamsSet"/>
+                    <Interface InterfaceId="istd::TIHierarchical&lt;istd::IPolymorphic&gt;" ComponentId="ComposedParamsSet"/>
                 </ExportedInterfaces>
                 <ExportedComponents/>
-            </Data>
-        </EmbeddedRegistry>
-        <EmbeddedRegistry Id="ReportDocumentView">
-            <Data Description="" Keywords="">
-                <ElementsList>
-                    <Element Id="ComposedFilePersistence" PackageId="FilePck" ComponentId="ComposedFilePersistence">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="SlaveLoaders" Type="Reference[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>ReportPdfPersistence</Value>
-                                        </Values>
-                                    </Data>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="FileDialogPersistence" PackageId="FileGuiPck" ComponentId="FileDialogLoader">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="Loaders" Type="Reference[]" ExportId="">
-                                    <Data IsEnabled="true">
-                                        <Values>
-                                            <Value>ComposedFilePersistence</Value>
-                                        </Values>
-                                    </Data>
-                                </AttributeInfo>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                                    <Data IsEnabled="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="ReportDocumentView" PackageId="ImtReportGuiPck" ComponentId="ReportDocumentView">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="ReportDocumentPdfPersistence" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="FileDialogPersistence"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="ReportDocumentTiffPersistence" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="FileDialogPersistence"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="ReportPdfPersistence" PackageId="ImtReportGuiPck" ComponentId="ReportPdfPersistence">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="ReportDocumentView"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                    <Element Id="ReportTiffPersistence" PackageId="ImtReportGuiPck" ComponentId="ReportTiffPersistence">
-                        <Data IsEnabled="true" Flags="0">
-                            <AttributeInfoMap>
-                                <AttributeInfo Id="Log" Type="Reference" ExportId="">
-                                    <Data IsEnabled="true" Value="ReportDocumentView"/>
-                                </AttributeInfo>
-                                <AttributeInfo Id="SaveFirstPageOnly" Type="Boolean" ExportId="">
-                                    <Data IsEnabled="true" Value="false"/>
-                                </AttributeInfo>
-                            </AttributeInfoMap>
-                        </Data>
-                    </Element>
-                </ElementsList>
-                <EmbeddedRegistriesList/>
-                <ExportedInterfaces>
-                    <Interface InterfaceId="ibase::ICommandsProvider" ComponentId="ReportDocumentView"/>
-                    <Interface InterfaceId="imod::IModelEditor" ComponentId="ReportDocumentView"/>
-                    <Interface InterfaceId="imod::IObserver" ComponentId="ReportDocumentView"/>
-                    <Interface InterfaceId="iqtgui::IGuiObject" ComponentId="ReportDocumentView"/>
-                    <Interface InterfaceId="istd::IPolymorphic" ComponentId="ReportDocumentView"/>
-                </ExportedInterfaces>
-                <ExportedComponents>
-                    <Component ExportedId="VisualStatus" ComponentId="ReportDocumentView/VisualStatus"/>
-                </ExportedComponents>
             </Data>
         </EmbeddedRegistry>
     </EmbeddedRegistriesList>

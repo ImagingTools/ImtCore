@@ -31,7 +31,7 @@ public:
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN_TO(m_fileObjectCollectionCompPtr, m_objectCollectionCompPtr, true);
 		I_ASSIGN(m_hashGeneratorCompPtr, "HashGenerator", "The Generator, used to calc file's hash summ", false, "HashGenerator");
-		I_ASSIGN(m_requestCollectionCompPtr, "RequestCollection", "Collection, that stores uploaded/downloading files paths", false, "RequestCollection");
+		I_ASSIGN(m_tempRequestCollectionCompPtr, "TempRequestCollection", "Collection, that temporary stores uploaded/downloading files paths", true, "TempRequestCollection");
 		I_ASSIGN(m_tempDirectoryPathCompPtr, "TempDirectoryPath", "The path where temp files will be stored, while it is required. \nWarning: this path will be cleared on suutdown", true, "TempDirectoryPath");
 	I_END_COMPONENT;
 
@@ -48,8 +48,10 @@ protected:
 				const QString& errorMessage);
 
 	QString GetFilePathFromRequestQueue(const QByteArray& queueRequestId) const;
+	QByteArray CreateNewFilePathInRequestQueue(const QString& filePath) const;
 
 	// reimplemented (CObjectCollectionControllerCompBase)
+	virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* InsertObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual imtbase::CTreeItemModel* ListObjects(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
@@ -69,7 +71,7 @@ protected:
 	I_MULTIATTR(QByteArray, m_supportedTypeListAttrPtr);
 	I_REF(imtrepo::IFileObjectCollection, m_fileObjectCollectionCompPtr);
 	I_REF(imtcrypt::IHashGenerator, m_hashGeneratorCompPtr);
-	I_REF(imtbase::IObjectCollection, m_requestCollectionCompPtr);
+	I_REF(imtbase::IObjectCollection, m_tempRequestCollectionCompPtr);
 	I_REF(ifile::IFileNameParam, m_tempDirectoryPathCompPtr);
 };
 
