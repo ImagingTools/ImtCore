@@ -1,9 +1,11 @@
-pragma Singleton
+// pragma Singleton
 import QtQuick 2.12
 // import Acf 1.0
 import QtQuick.Controls 2.15
 
 Item {
+    property string styleId: "StyleQt"
+
     property Component buttonDecorator: buttonDecoratorComp
     property Component roundButtonDecorator: roundButtonDecoratorComp
 

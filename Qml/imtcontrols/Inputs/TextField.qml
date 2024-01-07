@@ -1,12 +1,11 @@
 import QtQuick 2.12
 import Acf 1.0;
-import imtqml 1.0
 import imtcontrols 1.0
 
 ControlBase {
     id: containerTextField;
 
-    decoratorComponent: Style.isQtStyle ? DecoratorsQt.textFieldDecorator: Decorators.textFieldDecorator;
+    decoratorComponent: Style.textFieldDecorator
 
     property alias text: textField.text;
     property alias acceptableInput: textField.acceptableInput;

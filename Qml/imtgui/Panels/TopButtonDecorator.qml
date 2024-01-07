@@ -3,6 +3,7 @@ import Acf 1.0
 import QtGraphicalEffects 1.0
 import Qt5Compat.GraphicalEffects 6.0
 import imtgui 1.0
+import imtcontrols 1.0
 
 BaseButtonDecorator {
     id: topButtonDecorator;

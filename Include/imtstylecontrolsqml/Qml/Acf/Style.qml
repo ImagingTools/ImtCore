@@ -1,14 +1,15 @@
 pragma Singleton
 import QtQuick 2.0
 import Acf 1.0
-import imtqml 1.0
+import imtguigql 1.0
 //import imtcontrols 1.0
 
 Item {
     id: styleContainer;
 
 
-    property bool isQtStyle: false;
+    property bool isQtStyle: false;  // deprecated
+    property string styleId: "StyleAcf"
     property int fontSizeExtraLarge: 64
 	property int fontSizeHuge: 32
 	property int fontSizeLarge: 24
@@ -215,25 +216,66 @@ Item {
     property Component tooltipDecorator
 
     function setDecorators(sourceDecorators){
-        styleContainer.topButtonDecorator = sourceDecorators.topButtonDecorator
-        styleContainer.topPanelDecorator = sourceDecorators.topPanelDecorator
-        styleContainer.tabPanelDecorator = sourceDecorators.tabPanelDecorator
-        styleContainer.buttonDecorator = sourceDecorators.buttonDecorator
-        styleContainer.roundButtonDecorator = sourceDecorators.roundButtonDecorator
-        styleContainer.textFieldDecorator = sourceDecorators.textFieldDecorator
-        styleContainer.textEditDecorator = sourceDecorators.textEditDecorator
-        styleContainer.comboBoxDecorator = sourceDecorators.comboBoxDecorator
-        styleContainer.checkBoxDecorator = sourceDecorators.checkBoxDecorator
-        styleContainer.switchDecorator = sourceDecorators.switchDecorator
-        styleContainer.sliderDecorator = sourceDecorators.sliderDecorator
-        styleContainer.rangeSliderDecorator = sourceDecorators.rangeSliderDecorator
-        styleContainer.radioButtonDecorator = sourceDecorators.radioButtonDecorator
-        styleContainer.textAreaDecorator = sourceDecorators.textAreaDecorator
-        styleContainer.spinBoxDecorator = sourceDecorators.spinBoxDecorator
-        styleContainer.dialogDecorator = sourceDecorators.dialogDecorator
-        styleContainer.progressBarDecorator = sourceDecorators.progressBarDecorator
-        styleContainer.busyIndicatorDecorator = sourceDecorators.busyIndicatorDecorator
-        styleContainer.tooltipDecorator = sourceDecorators.tooltipDecorator
+        if (sourceDecorators.styleId){
+            styleContainer.styleId = sourceDecorators.styleId
+        }
+        if (sourceDecorators.topButtonDecorator){
+            styleContainer.topButtonDecorator = sourceDecorators.topButtonDecorator
+        }
+        if (sourceDecorators.topPanelDecorator){
+            styleContainer.topPanelDecorator = sourceDecorators.topPanelDecorator
+        }
+        if (sourceDecorators.tabPanelDecorator){
+            styleContainer.tabPanelDecorator = sourceDecorators.tabPanelDecorator
+        }
+        if (sourceDecorators.buttonDecorator){
+            styleContainer.buttonDecorator = sourceDecorators.buttonDecorator
+        }
+        if (sourceDecorators.roundButtonDecorator){
+            styleContainer.roundButtonDecorator = sourceDecorators.roundButtonDecorator
+        }
+        if (sourceDecorators.textFieldDecorator){
+            styleContainer.textFieldDecorator = sourceDecorators.textFieldDecorator
+        }
+        if (sourceDecorators.textEditDecorator){
+            styleContainer.textEditDecorator = sourceDecorators.textEditDecorator
+        }
+        if (sourceDecorators.comboBoxDecorator){
+            styleContainer.comboBoxDecorator = sourceDecorators.comboBoxDecorator
+        }
+        if (sourceDecorators.checkBoxDecorator){
+            styleContainer.checkBoxDecorator = sourceDecorators.checkBoxDecorator
+        }
+        if (sourceDecorators.switchDecorator){
+            styleContainer.switchDecorator = sourceDecorators.switchDecorator
+        }
+        if (sourceDecorators.sliderDecorator){
+            styleContainer.sliderDecorator = sourceDecorators.sliderDecorator
+        }
+        if (sourceDecorators.rangeSliderDecorator){
+            styleContainer.rangeSliderDecorator = sourceDecorators.rangeSliderDecorator
+        }
+        if (sourceDecorators.radioButtonDecorator){
+            styleContainer.radioButtonDecorator = sourceDecorators.radioButtonDecorator
+        }
+        if (sourceDecorators.textAreaDecorator){
+            styleContainer.textAreaDecorator = sourceDecorators.textAreaDecorator
+        }
+        if (sourceDecorators.spinBoxDecorator){
+            styleContainer.spinBoxDecorator = sourceDecorators.spinBoxDecorator
+        }
+        if (sourceDecorators.dialogDecorator){
+            styleContainer.dialogDecorator = sourceDecorators.dialogDecorator
+        }
+        if (sourceDecorators.progressBarDecorator){
+            styleContainer.progressBarDecorator = sourceDecorators.progressBarDecorator
+        }
+        if (sourceDecorators.busyIndicatorDecorator){
+            styleContainer.busyIndicatorDecorator = sourceDecorators.busyIndicatorDecorator
+        }
+        if (sourceDecorators.tooltipDecorator){
+            styleContainer.tooltipDecorator = sourceDecorators.tooltipDecorator
+        }
     }
 
     property string menuButtonDecoratorPath: "MenuPanelButtonDecorator.qml";

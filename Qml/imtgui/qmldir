@@ -14,6 +14,7 @@ ShortcutManager 1.0 ./Application/ShortcutManager.qml
 ThumbnailDecorator 1.0 ./Application/ThumbnailDecorator.qml
 
 LoginDialog 1.0 Dialogs/LoginDialog.qml
+PopupMenuDialogGql 1.0 ./Dialogs/PopupMenuDialogGql.qml
 
 ButtonPanel 1.0 Panels/ButtonPanel.qml
 CommandsDecorator 1.0 Panels/CommandsDecorator.qml

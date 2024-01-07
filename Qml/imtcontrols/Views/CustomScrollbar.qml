@@ -43,7 +43,7 @@ Rectangle{
 
 
     /*for Qt Style decoration*/
-    property Component decoratorComponent : Style.isQtStyle ? DecoratorsQt.scrollBarDecorator : null;
+    property Component decoratorComponent : Style.scrollBarDecorator ? Style.scrollBarDecorator : null
     property var decorator : null;
 
     property real scrollIndicatorY: scrollIndicator.y;

@@ -5,7 +5,7 @@ import imtcontrols 1.0
 ControlBase {
     id: comboBoxContainer;
 
-    decoratorComponent: Style.isQtStyle ? DecoratorsQt.comboBoxDecorator: Decorators.comboBoxDecorator;
+    decoratorComponent: Style.comboBoxDecorator
 
     property var model;
 

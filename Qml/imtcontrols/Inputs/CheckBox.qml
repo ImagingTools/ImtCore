@@ -1,12 +1,11 @@
 import QtQuick 2.12
 import Acf 1.0;
-import imtqml 1.0
 import imtcontrols 1.0
 
 ControlBase {
     id: checkBox;
 
-    decoratorComponent: Style.isQtStyle ? DecoratorsQt.checkBoxDecorator: Decorators.checkBoxDecorator;
+    decoratorComponent: Style.checkBoxDecorator
 
     property string text: "";
 

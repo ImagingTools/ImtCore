@@ -21,10 +21,11 @@ Item {
         qsTr("December")
     ];
 
-    property int startYear: 1900;
-    property int lastYear: 2100;
+    property int startYear: 2010;
+    property int lastYear: 2040;
 
     property int todayYear;
+    property int todayMonth;
 
     property int selectedIndexMonth;
 
@@ -52,12 +53,14 @@ Item {
     property alias dayCombo: dayComboObj;
 
     property bool openST: monthComboObj.openST || yearComboObj.openST || dayComboObj.openST;
+    property bool endComboOnCurrentMonth: false;
+    property bool readOnly: false;
 
     //icons
     property int iconWidth: 12;
     property int iconHeight: 10;
-    property string iconUpSource: "../../../" + "Icons/" + Style.theme + "/" + "Up" + "_On_Normal.svg";
-    property string iconDownSource: "../../../" + "Icons/" + Style.theme + "/" + "Down" + "_On_Normal.svg";
+    property string iconUpSource: "../../../" + Style.getIconPath("Icons/Up", Icon.State.On, Icon.Mode.Normal);
+    property string iconDownSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
     //margins
     property int mainMargin: 0;
     //CustomTextField
@@ -71,6 +74,7 @@ Item {
     property string fontColor: Style.textColor;
     property string textFieldBorderColor: "";//textField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
     property int textFieldMargin: 5;
+    property int horizontalAlignment: TextInput.AlignHCenter;
     //buttons
     property int buttonWidth: 15;
     property int buttonHeight: 10;
@@ -82,11 +86,12 @@ Item {
     signal dateChanged();
 
     Component.onCompleted: {
-        console.log("onCompleted");
+        console.log("DatePicker onCompleted");
 
         var date_ = new Date();
 
         datePicker.selectedIndexMonth = date_.getMonth();
+        datePicker.todayMonth = date_.getMonth();
         datePicker.todayYear = date_.getFullYear();
 
         if (datePicker.startWithCurrentDay){
@@ -104,7 +109,13 @@ Item {
         }
 
         if(datePicker.hasMonthCombo){
-            for(var i = 0; i < datePicker.monthNames.length; i++){
+            let monthCount = datePicker.monthNames.length;
+
+            if(datePicker.endComboOnCurrentMonth){
+                monthCount = date_.getMonth() + 1;
+            }
+
+            for(var i = 0; i < monthCount; i++){
                 var index = monthTreeModel.InsertNewItem();
                 monthTreeModel.SetData("Id", index, index);
                 monthTreeModel.SetData("Name",qsTr(datePicker.monthNames[i]),index);
@@ -144,11 +155,14 @@ Item {
 
     onSelectedYearChanged: {
         console.log("onSelectedYearChanged");
-        if (datePicker.completed){
-            datePicker.dateChanged();
+        if(datePicker.hasMonthCombo && datePicker.endComboOnCurrentMonth && datePicker.completed){
+            datePicker.fillMonthModel();
         }
         if(datePicker.hasDayCombo && datePicker.completed){
             datePicker.fillDayModel();
+        }
+        if (datePicker.completed){
+            datePicker.dateChanged();
         }
     }
 
@@ -231,7 +245,28 @@ Item {
 
     }
 
+    function fillMonthModel(){
+        monthTreeModel.Clear();
 
+        let monthCount = datePicker.monthNames.length;
+        let monthComboIndexPrev = datePicker.selectedIndexMonth;
+
+        if(Number(datePicker.selectedYear) === datePicker.todayYear){
+            monthCount = Number(datePicker.todayMonth) + 1;
+        }
+
+        for(var i = 0; i < monthCount; i++){
+            var index = monthTreeModel.InsertNewItem();
+            monthTreeModel.SetData("Id", index, index);
+            monthTreeModel.SetData("Name",qsTr(datePicker.monthNames[i]),index);
+        }
+
+        if(monthComboIndexPrev > monthTreeModel.GetItemsCount() - 1){
+            monthComboIndexPrev = 0;
+        }
+
+        monthComboObj.currentIndex = monthComboIndexPrev;
+    }
 
     function getLastDayOfMonth(month){
 
@@ -341,7 +376,9 @@ Item {
                 borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
                 margin: datePicker.textFieldMargin;
 
-                horizontalAlignment: TextInput.AlignHCenter;
+
+                leftPadding: horizontalAlignment == TextInput.AlignLeft ? 4 : 0;
+                horizontalAlignment: datePicker.horizontalAlignment;
 
                 textInputValidator: yearValid;
 
@@ -352,6 +389,8 @@ Item {
                 Keys.onDownPressed: {
                     yearDownButton.clicked();
                 }
+
+                readOnly: datePicker.readOnly;
 
                 ComboBox {
                     id: yearComboObj;
@@ -372,6 +411,8 @@ Item {
                     moveToIndex : datePicker.todayYear - datePicker.startYear - datePicker.shownItemsCountCombo +1;
                     visibleScrollBar: false;
                     isColor: true;
+
+                    changeable: !datePicker.readOnly;
 
                     onCurrentIndexChanged:{
                         if(yearComboObj.currentIndex >=0){
@@ -406,7 +447,13 @@ Item {
                     highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
                     color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
 
+                    enabled: !datePicker.readOnly;
+
                     onClicked: {
+                        if (!enabled){
+                            return;
+                        }
+
                         let selectedYear = Number(yearField.text);
 
                         let newYear = String(selectedYear + 1);
@@ -430,8 +477,13 @@ Item {
                     highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
                     color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
 
+                    enabled: !datePicker.readOnly;
 
                     onClicked: {
+                        if (!enabled){
+                            return;
+                        }
+
                         if (yearField.text == ""){
                             return;
                         }
@@ -461,8 +513,10 @@ Item {
                 borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
                 margin: datePicker.textFieldMargin;
 
-                readOnly: true;
-                horizontalAlignment: TextInput.AlignHCenter;
+                readOnly: datePicker.readOnly;
+
+                leftPadding: horizontalAlignment == TextInput.AlignLeft ? 4 : 0;
+                horizontalAlignment: datePicker.horizontalAlignment;
 
                 text: datePicker.monthNames[datePicker.selectedIndexMonth];
 
@@ -494,6 +548,8 @@ Item {
                     visibleScrollBar: false;
                     isColor: true;
 
+                    changeable: !datePicker.readOnly;
+
                     onCurrentIndexChanged:{
                         if(monthComboObj.currentIndex >= 0){
                             if (datePicker.checkDate(Number(yearField.text), monthComboObj.currentIndex, Number(dayField.text))){
@@ -524,9 +580,12 @@ Item {
                     highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
                     color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
 
+                    enabled: !datePicker.readOnly;
 
                     onClicked: {
-
+                        if (!enabled){
+                            return;
+                        }
                         let index;
                         if (datePicker.selectedIndexMonth < 11){
                             index = datePicker.selectedIndexMonth + 1;
@@ -554,8 +613,13 @@ Item {
                     highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
                     color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
 
+                    enabled: !datePicker.readOnly;
 
                     onClicked: {
+                        if (!enabled){
+                            return;
+                        }
+
                         let index;
                         if (datePicker.selectedIndexMonth > 0){
                             index = datePicker.selectedIndexMonth - 1;
@@ -593,14 +657,25 @@ Item {
                 borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
                 margin: datePicker.textFieldMargin;
 
-                horizontalAlignment: TextInput.AlignHCenter;
+                readOnly: datePicker.readOnly;
+
+                leftPadding: horizontalAlignment == TextInput.AlignLeft ? 4 : 0;
+                horizontalAlignment: datePicker.horizontalAlignment;
+
                 textInputValidator: dayValid;
 
                 Keys.onUpPressed: {
+                    if (readOnly){
+                        return;
+                    }
+
                     dayUpButton.clicked();
                 }
 
                 Keys.onDownPressed: {
+                    if (readOnly){
+                        return;
+                    }
                     dayDownButton.clicked();
                 }
 
@@ -609,6 +684,7 @@ Item {
 
                     visible: datePicker.hasDayCombo;
                     enabled: visible;
+
                     model: dayTreeModel;
                     anchors.fill: parent;
 
@@ -623,7 +699,7 @@ Item {
 
                     visibleScrollBar: false;
                     isColor: true;
-
+                    changeable: !datePicker.readOnly;
 
                     onCurrentIndexChanged:{
                         if(dayComboObj.currentIndex >=0){
@@ -662,8 +738,13 @@ Item {
                     highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
                     color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
 
+                    enabled: !datePicker.readOnly;
 
                     onClicked: {
+                        if (!enabled){
+                            return;
+                        }
+
                         let selectedDay = Number(dayField.text);
                         if (selectedDay < 31){
                             let newDay = String(selectedDay + 1)
@@ -688,8 +769,13 @@ Item {
                     highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
                     color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
 
+                    enabled: !datePicker.readOnly;
 
                     onClicked: {
+                        if (!enabled){
+                            return;
+                        }
+
                         let selectedDay = Number(dayField.text);
                         if (selectedDay > 1){
                             let newDay = String(selectedDay - 1);

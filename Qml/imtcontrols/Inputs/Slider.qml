@@ -1,6 +1,5 @@
 import QtQuick 2.12
 import Acf 1.0;
-import imtqml 1.0
 import imtcontrols 1.0
 
 ControlBase {
@@ -8,7 +7,7 @@ ControlBase {
 
     rotation: orientation == Qt.Vertical ? -90 : 0;
 
-    decoratorComponent: Style.isQtStyle ? DecoratorsQt.sliderDecorator: Decorators.sliderDecorator;
+    decoratorComponent: Style.sliderDecorator
 
     property int backgroundWidth: width;
     property int backgroundHeight: 6;

@@ -1,4 +1,6 @@
 module Acf
-singleton Decorators 1.0 Decorators.qml
-singleton DecoratorsQt 1.0 DecoratorsQt.qml
 singleton Style 1.0 Style.qml
+
+Decorators 1.0 Decorators.qml
+DecoratorsQt 1.0 DecoratorsQt.qml
+

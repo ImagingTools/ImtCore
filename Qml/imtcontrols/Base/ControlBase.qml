@@ -1,6 +1,5 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtqml 1.0
 import imtcontrols 1.0
 
 
@@ -23,7 +22,7 @@ FocusScope {
     }
 
     function decoratorChangedFuncBase(){
-        if(!decoratorComponent){
+        if(decoratorComponent == null || decoratorComponent == undefined){
             return;
         }
         if(decorator){

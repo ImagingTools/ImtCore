@@ -74,7 +74,7 @@ Item {
 
                 text: model.Name;
 
-                decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
+                // decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
 
 //                onLoaded: {
 //                    buttonsDialogContainer.height = buttonContainer.height;

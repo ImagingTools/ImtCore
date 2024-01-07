@@ -1,12 +1,21 @@
 module imtcontrols
 
+singleton Events 1.0 ./Base/Events.qml
+ControlBase 1.0 ./Base/ControlBase.qml
+DecoratorBase 1.0 ./Base/DecoratorBase.qml
+MainWindow 1.0 MainWindow.qml
+WrapItem 1.0 WrapItem.qml
+Enums 1.0 ./Base/Enums.qml
+ButtonType 1.0 ./Base/ButtonType.js
+Icon 1.0 ./Base/Icon.js
+
+
 Action 1.0 ./Actions/Action.qml
 PopupMenuDelegate 1.0 ./Actions/PopupMenuDelegate.qml
 ShortcutManager 1.0 ./Actions/ShortcutManager.qml
 MovingItem 1.0 ./Actions/MovingItem.qml
 ControlArea 1.0 ./Actions/ControlArea.qml
-ControlBase 1.0 ./Base/ControlBase.qml
-Enums 1.0 ./Base/Enums.qml
+
 AuxButton 1.0 ./Buttons/AuxButton.qml
 Button 1.0 ./Buttons/Button.qml
 TextButton 1.0 ./Buttons/TextButton.qml
@@ -33,9 +42,9 @@ MessageDialog 1.0 ./Dialogs/MessageDialog.qml
 MessageDialogBody 1.0 ./Dialogs/MessageDialogBody.qml
 ModalDialogManager 1.0 ./Dialogs/ModalDialogManager.qml
 PopupMenuDialog 1.0 ./Dialogs/PopupMenuDialog.qml
-PopupMenuDialogGql 1.0 ./Dialogs/PopupMenuDialogGql.qml
 Calendar 1.0 ./Inputs/Calendar.qml
 ComboBox 1.0 ./Inputs/ComboBox.qml
+FilterableComboBox 1.0 ./Inputs/FilterableComboBox.qml
 CheckBox 1.0 ./Inputs/CheckBox.qml
 Slider 1.0 ./Inputs/Slider.qml
 CustomTextField 1.0 ./Inputs/CustomTextField.qml

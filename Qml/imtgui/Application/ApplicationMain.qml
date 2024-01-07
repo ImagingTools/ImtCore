@@ -1,7 +1,8 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
-import imtqml 1.0
+import imtguigql 1.0
+import imtcontrols 1.0
 
 
 Item {
@@ -42,7 +43,16 @@ Item {
 //        Events.sendEvent("SystemStatusChanged", parameters)
 //    }
 
+    Decorators {
+        id: decorators
+    }
+
+    function setDecorators(){
+        Style.setDecorators(decorators)
+    }
+
     Component.onCompleted: {
+        setDecorators()
         Events.subscribeEvent("UpdateModels", application.updateAllModels);
         Events.subscribeEvent("Logout", application.onLogout);
         Events.subscribeEvent("UpdateSystemStatus", application.updateSystemStatus);
@@ -161,6 +171,14 @@ Item {
         onError: {
             Events.sendEvent("SendWarningError", qsTr("There is no connection to the subscription server. Check the Web Server Socket Url in the settings or contact your system administrator."));
         }
+    }
+
+    ModalDialogManager {
+        id: modalDialogManager;
+
+        z: 30;
+
+        anchors.fill: parent;
     }
 
     ThumbnailDecorator {

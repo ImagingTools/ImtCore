@@ -6,7 +6,8 @@ FocusScope {
 
     height: 40;
 
-    property alias text: textField.text;
+//    property alias text: textField.text;
+    property string text: textField.text; // for web TEMP!!!
     property alias acceptableInput: textField.acceptableInput;
     property alias textInputFocus: textField.focus;
     property alias textInputMask: textField.inputMask;
@@ -15,6 +16,7 @@ FocusScope {
     property alias horizontalAlignment: textField.horizontalAlignment;
     property alias borderWidth: mainRect.border.width;
     property alias color: mainRect.color;
+    property alias leftPadding: textField.leftPadding;
 
     property alias maximumLength: textField.maximumLength;
 
@@ -54,6 +56,10 @@ FocusScope {
         }
     }
 
+    onTextChanged: {
+        textField.text = text;// for web TEMP!!!
+    }
+
     function setFocus(value) {
         textField.focus = value;
     }
@@ -70,7 +76,11 @@ FocusScope {
                 textField.selectAll();
             }
 
+            textField.focus = true;
             textField.forceActiveFocus();
+        }
+        else {
+            textField.focus = false;
         }
     }
 
@@ -158,9 +168,16 @@ FocusScope {
         selectionColor: Style.textSelected;
         selectByMouse: true;
         clip: true;
+        //text: containerTextField.text // for web TEMP!!!
 
         onAccepted: {
             containerTextField.accepted();
+        }
+
+        onTextChanged: {
+            if(containerTextField.text !== text){// for web TEMP!!!
+                containerTextField.text = text
+            }
         }
 
         onTextEdited: {
@@ -194,7 +211,7 @@ FocusScope {
             color: containerTextField.placeHolderFontColor;
             opacity: containerTextField.placeHolderOpacity;
 
-            visible: textField.text == "";
+            visible: textField.text !== "" ? false :  !textField.focus;
 
             text: containerTextField.placeHolderText;
         }

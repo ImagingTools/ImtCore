@@ -13,5 +13,6 @@
         <file alias="GridViewPage.qml">Qml/GridViewPage.qml</file>
         <file alias="TreeViewPage.qml">Qml/TreeViewPage.qml</file>
         <file alias="TableTreeViewPage.qml">Qml/TableTreeViewPage.qml</file>
+        <file alias="TopPanelDecoratorCustom.qml">Qml/TopPanelDecoratorCustom.qml</file>
     </qresource>
 </RCC>

@@ -1,10 +1,11 @@
-pragma Singleton
+// pragma Singleton
 import QtQuick 2.12
 // import Acf 1.0
 import imtcontrols 1.0
 import imtgui 1.0
 
 Item {
+    property string styleId: "StyleAcf"
     property Component topButtonDecorator: topButtonDecoratorComp
     property Component topPanelDecorator: topPanelDecoratorComp
 

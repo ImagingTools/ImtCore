@@ -5,7 +5,6 @@ import imtguigql 1.0
 import imtdocgui 1.0
 import imtgui 1.0
 import imtcontrols 1.0
-//import 'AuxComponents'
 
 Rectangle {
     id: thumbnailDecoratorContainer;
@@ -26,7 +25,7 @@ Rectangle {
     property alias preferencePage: preferenceDialog;
     property alias userManagementProvider: userManagement;
     property alias documentManager: mainDocumentManager;
-    property alias dialogManager: modalDialogManager;
+    property Item dialogManager: modalDialogManager;
 
     property alias menuPanelRadius: menuPanel.radius;
     property alias loadPageByClick: pagesManager.loadByClick;
@@ -331,14 +330,6 @@ Rectangle {
                 preferenceDialog.clearModels();
             }
         }
-    }
-
-    ModalDialogManager {
-        id: modalDialogManager;
-
-        z: 30;
-
-        anchors.fill: parent;
     }
 
     GqlModelObserver {

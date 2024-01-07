@@ -5,7 +5,7 @@ import imtcontrols 1.0
 ControlBase{
     id: busyIndicator;
 
-    decoratorComponent: Style.isQtStyle ? DecoratorsQt.busyIndicatorDecorator: Decorators.busyIndicatorDecorator;
+    decoratorComponent: Style.busyIndicatorDecorator;
 
     function start(){
         console.log("BusyIndicator start");

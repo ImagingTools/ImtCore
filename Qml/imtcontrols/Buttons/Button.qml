@@ -1,12 +1,10 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
-import imtqml 1.0
 
 ControlBase {
     id: baseButton;
 
-    // decoratorComponent: Style.isQtStyle ? DecoratorsQt.buttonDecorator: Decorators.buttonDecorator;
     decoratorComponent: Style.buttonDecorator
 
     property string text: ""

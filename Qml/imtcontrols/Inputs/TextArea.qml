@@ -1,12 +1,11 @@
 import QtQuick 2.12
 import Acf 1.0;
-import imtqml 1.0
 import imtcontrols 1.0
 
 ControlBase {
     id: containerTextArea;
 
-    decoratorComponent: Style.isQtStyle ? DecoratorsQt.textAreaDecorator: Decorators.textAreaDecorator;
+    decoratorComponent: Style.textAreaDecorator
 
     property bool isDinamicHeight: true;
 

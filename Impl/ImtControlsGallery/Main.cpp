@@ -23,7 +23,6 @@ int main(int argc, char *argv[])
 #endif
 
 	Q_INIT_RESOURCE(imtguigqlqml);
-    Q_INIT_RESOURCE(imtqml);
 	Q_INIT_RESOURCE(imtstyle);
     Q_INIT_RESOURCE(imtstylecontrolsqml);
 	Q_INIT_RESOURCE(imtcontrolsqml);

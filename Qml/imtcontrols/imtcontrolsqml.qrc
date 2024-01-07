@@ -6,8 +6,17 @@
 		<file alias="imtcontrols/Actions/ShortcutManager.qml">Actions/ShortcutManager.qml</file>
 		<file alias="imtcontrols/Actions/MovingItem.qml">Actions/MovingItem.qml</file>
 		<file alias="imtcontrols/Actions/ControlArea.qml">Actions/ControlArea.qml</file>
+
 		<file alias="imtcontrols/Base/ControlBase.qml">Base/ControlBase.qml</file>
+		<file alias="imtcontrols/Base/DecoratorBase.qml">Base/DecoratorBase.qml</file>
+		<file alias="imtcontrols/Base/Events.qml">Base/Events.qml</file>
 		<file alias="imtcontrols/Base/Enums.qml">Base/Enums.qml</file>
+		<file alias="imtcontrols/Base/ButtonType.js">Base/ButtonType.js</file>
+		<file alias="imtcontrols/Base/Icon.js">Base/Icon.js</file>
+		<file alias="imtcontrols/Base/jsonpath.js">Base/jsonpath.js</file>
+        	<file alias="MainWindow.qml">Base/MainWindow.qml</file>
+        	<file alias="WrapItem.qml">Base/WrapItem.qml</file>
+
 		<file alias="imtcontrols/Buttons/AuxButton.qml">Buttons/AuxButton.qml</file>
 		<file alias="imtcontrols/Buttons/Button.qml">Buttons/Button.qml</file>
 		<file alias="imtcontrols/Buttons/TextButton.qml">Buttons/TextButton.qml</file>
@@ -35,11 +44,11 @@
 		<file alias="imtcontrols/Dialogs/MessageDialogBody.qml">Dialogs/MessageDialogBody.qml</file>
 		<file alias="imtcontrols/Dialogs/ModalDialogManager.qml">Dialogs/ModalDialogManager.qml</file>
 		<file alias="imtcontrols/Dialogs/PopupMenuDialog.qml">Dialogs/PopupMenuDialog.qml</file>
-		<file alias="imtcontrols/Dialogs/PopupMenuDialogGql.qml">Dialogs/PopupMenuDialogGql.qml</file>
 
 		<file alias="imtcontrols/Inputs/CustomTextField.qml">Inputs/CustomTextField.qml</file>
 		<file alias="imtcontrols/Inputs/Calendar.qml">Inputs/Calendar.qml</file>
 		<file alias="imtcontrols/Inputs/ComboBox.qml">Inputs/ComboBox.qml</file>
+		<file alias="imtcontrols/Inputs/FilterableComboBox.qml">Inputs/FilterableComboBox.qml</file>
 		<file alias="imtcontrols/Inputs/DatePicker.qml">Inputs/DatePicker.qml</file>
 		<file alias="imtcontrols/Inputs/InputActions.qml">Inputs/InputActions.qml</file>
 		<file alias="imtcontrols/Inputs/PathPicker.qml">Inputs/PathPicker.qml</file>

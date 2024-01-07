@@ -1,6 +1,5 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtqml 1.0
 import imtcontrols 1.0
 
 
@@ -44,8 +43,7 @@ Rectangle {
             KeyNavigation.right: iconButton
             KeyNavigation.tab: iconButton
 
-            decoratorComponent: Style.isQtStyle?
-                                    DecoratorsQt.roundButtonDecorator: Decorators.roundButtonDecorator;
+            decoratorComponent: Style.roundButtonDecorator;
 
             iconSource: "../../../" + Style.theme + "/Icons" + "/Close.svg";
             onClicked: {

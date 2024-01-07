@@ -1,6 +1,5 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtqml 1.0
 import imtcontrols 1.0
 
 
@@ -144,8 +143,7 @@ Rectangle {
                 width: 50;
                 height: width;
 
-                decoratorComponent: Style.isQtStyle?
-                                        DecoratorsQt.roundButtonDecorator: Decorators.roundButtonDecorator;
+                decoratorComponent: Style.roundButtonDecorator;
 
                 iconSource: "../../../" + Style.theme + "/Icons" + "/Left.svg";
                 onClicked: {
@@ -166,8 +164,7 @@ Rectangle {
                 width: 50;
                 height: width;
 
-                decoratorComponent: Style.isQtStyle?
-                                        DecoratorsQt.roundButtonDecorator: Decorators.roundButtonDecorator;
+                decoratorComponent: Style.roundButtonDecorator;
 
                 iconSource: "../../../" + Style.theme + "/Icons" + "/Right.svg";
                 onClicked: {

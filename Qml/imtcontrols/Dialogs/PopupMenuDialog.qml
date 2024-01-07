@@ -2,9 +2,8 @@ import QtQuick 2.12
 import Qt5Compat.GraphicalEffects 6.0
 import QtGraphicalEffects 1.12
 import Acf 1.0
-import imtcontrols 1.0
-import imtqml 1.0
 import imtgui 1.0
+import imtcontrols 1.0
 
 Item {
     id: popupMenuContainer;
@@ -36,7 +35,6 @@ Item {
     property string nameId: "Name";
 
     property Component delegate: PopupMenuDelegate{
-
         width: popupMenuContainer.width;
         height: popupMenuContainer.itemHeight;
         textSize: popupMenuContainer.textSize;
@@ -54,13 +52,15 @@ Item {
 
     property bool hoverBlocked: true;
 
+    property alias topContentLoaderSourceComp: topContentLoader.sourceComponent;
+    property alias bottomContentLoaderSourceComp: bottomContentLoader.sourceComponent;
+
     signal finished(string commandId, int index);
     signal started();
 
     //forShortcutEnter
     Component.onCompleted: {
-//        forShortcutEnter.forceActiveFocus();
-//        forShortcutEnter.focus = true;
+        popupMenuContainer.forceActiveFocus();
     }
 
     Component.onDestruction: {
@@ -68,7 +68,6 @@ Item {
     }
 
     onFinished: {
-        //popupMenuContainer.root.closeDialog();
     }
 
     onModelChanged: {
@@ -98,19 +97,24 @@ Item {
     }
 
     function onBackgroundClicked(){
-        popupMenuContainer.root.closeDialog();
-        popupMenuContainer.rootItem.isOpen = false;
-        //		if (rootItem){
-        //			popupMenuContainer.finished('', rootItem.currentIndex);
-        //		}
+        console.log("PopupMenuDialog onBackgroundClicked");
+        if (rootItem){
+            popupMenuContainer.finished('', rootItem.currentIndex);
+        }
     }
 
     onContentYChanged: {
         popupMenuContainer.rootItem.contentY = popupMenuContainer.contentY;
     }
 
+    Loader {
+        id: topContentLoader;
+    }
+
     Rectangle {
         id: itemBody;
+
+        anchors.top: topContentLoader.bottom;
 
         width: popupMenuContainer.width;
         height: popupMenuListView.height;
@@ -130,19 +134,15 @@ Item {
 
             backgroundColor: Style.baseColor;
 
-            secondSize: 10;
+            secondSize: !visibleScrollBar ? 0 : Style.isMobile == undefined ? 10 : Style.isMobile ? 4 : 10;
             targetItem: popupMenuListView;
-            //            visible: !popupMenuContainer.visibleScrollBar ? false : hideNotUsed ? !notUsed : true;
-
+            canFade: Style.isMobile == undefined ? false : Style.isMobile;
         }
 
         ListView {
             id: popupMenuListView;
 
             width: popupMenuContainer.width;
-            //            height: (parent.countVisibleItem == -1 || parent.countVisibleItem > popupMenuListView.count) ?
-            //                        popupMenuListView.count * popupMenuContainer.itemHeight :
-            //                        parent.countVisibleItem * popupMenuContainer.itemHeight;
             height: Math.min(popupMenuContainer.shownItemsCount * popupMenuContainer.itemHeight, contentHeight);
 
             boundsBehavior: Flickable.StopAtBounds;
@@ -165,10 +165,16 @@ Item {
         }
     }//ItemListView
 
+    Loader {
+        id: bottomContentLoader;
+    }
+
     DropShadow {
         id: dropShadow;
 
         anchors.fill: itemBody;
+
+		z: itemBody.z-1
 
         horizontalOffset: 2;
         verticalOffset: 2;
@@ -201,12 +207,13 @@ Item {
         }
     }
 
-
-
     Shortcut {
         sequence: "Escape";
         enabled: true;
         onActivated: {
+            if (rootItem){
+                popupMenuContainer.finished('', rootItem.currentIndex);
+            }
             root.closeDialog();
         }
     }
@@ -254,5 +261,4 @@ Item {
             }
         }
     }
-
 }

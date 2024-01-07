@@ -111,34 +111,39 @@ if(DEFINED WEB_COMPILE AND  WEB_COMPILE)
 endif()
 
 if(WIN32)
-	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtqml/Resources/qml")
-	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtqml/Qml")
-	# list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtcontrols/Qml")
-        list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml")
-#	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtgui/Qml/imtgui")
+	# list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtqml/Resources/qml")
+	# list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtqml/Qml")
+	# # list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtcontrols/Qml")
+	#        list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml")
+	#	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtgui/Qml/imtgui")
+	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Qml")
 	set(files  \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
 
 	windeploy(${PROJECT_NAME} "${listOptions}" "${files}")
 	unset(listOptions)
 endif()
 
+
+
+
 if(DEFINED CONTROLS_QML_DIRS AND CONTROLS_QML_DIRS)
-        list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml")
-    list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtqml/Qml")
-	# list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtgui/Qml")
-	list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtauthgui/Qml")
-    list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtguigql/Qml")
+	message("CONTROLS_QML_DIRS ${CONTROLS_QML_DIRS}")
+	list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml")
+	# list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtqml/Qml")
+	 # list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtgui/Qml")
+	# list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtauthgui/Qml")
+	# list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtguigql/Qml")
 	# list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtcontrols/Qml")
 	list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Qml")
-	list(APPEND QML_IMPORT_DIRS "${CMAKE_CURRENT_LIST_DIR}/../Qml")
+	# list(APPEND QML_IMPORT_DIRS "${CMAKE_CURRENT_LIST_DIR}/../Qml")
 
-    # Prevent adding duplicate values at each run of CMake.
-    list(REMOVE_DUPLICATES QML_IMPORT_DIRS)
+	# Prevent adding duplicate values at each run of CMake.
+	list(REMOVE_DUPLICATES QML_IMPORT_DIRS)
 
-    # The variable is cached in ${BUILD_DIR}/CMakeCache.txt. We need FORCE to
-    # change it there immediately. Also, add a comment to the cache file.
-    set(QML_IMPORT_PATH ${QML_IMPORT_DIRS}
-        CACHE STRING "Qt Creator extra qml import paths for ${PROJECT_NAME}"
-        FORCE
-    )
+	# The variable is cached in ${BUILD_DIR}/CMakeCache.txt. We need FORCE to
+	# change it there immediately. Also, add a comment to the cache file.
+	set(QML_IMPORT_PATH ${QML_IMPORT_DIRS}
+		CACHE STRING "Qt Creator extra qml import paths for ${PROJECT_NAME}"
+		FORCE
+	)
 endif()

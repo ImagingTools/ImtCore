@@ -1,7 +1,6 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
-import imtqml 1.0
 import imtcontrols 1.0
 
 Rectangle {
@@ -404,6 +403,8 @@ Rectangle {
                     id: loginButton;
 
                     anchors.centerIn: parent;
+                    width: 100;
+                    height: 30;
 
                     property int loadingCount: 0;//for web
                     function setItemPropertiesAdd(){
@@ -412,7 +413,6 @@ Rectangle {
                         }
                     }
 
-                    // decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
                     enabled: loginTextInput.text != "" && passwordTextInput.text != "";
 
                     text: qsTr("Login");
@@ -422,23 +422,9 @@ Rectangle {
 //                        userTokenProvider.authorization(loginTextInput.text, passwordHash);
                         userTokenProvider.authorization(loginTextInput.text, passwordTextInput.text);
                     }
-
-                    // onDecoratorChanged: {
-                    //     loginButton.loadingCount++;
-                    // }
                 }
             }//
         }//bodyColumn
-    }
-
-    Component{
-        id: defaultButtonDecorator;
-
-        ButtonDecorator{
-            width: 100;
-            height: 30;
-            color: Style.buttonColor;
-        }
     }
 
     UserTokenProvider {

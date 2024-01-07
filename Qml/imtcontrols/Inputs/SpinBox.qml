@@ -1,12 +1,11 @@
 import QtQuick 2.12
 import Acf 1.0
-import imtqml 1.0
 import imtcontrols 1.0
 
 ControlBase{
     id: spinBox;
 
-    decoratorComponent: Style.isQtStyle ? DecoratorsQt.spinBoxDecorator: Decorators.spinBoxDecorator;
+    decoratorComponent: Style.spinBoxDecorator
 
     property var numberReg: /^\-{0,1}\d*\.{0,1}\d*$/;
 

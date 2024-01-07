@@ -1,10 +1,13 @@
 <RCC>
     <qresource prefix="/qml">
+	<file alias="imtguigql/qmldir">qmldir</file>
+	<file alias="imtguigql/GraphQLRequest.js">GraphQLRequest.js</file>
 	<file alias="imtguigql/GqlModelObserver.qml">GqlModelObserver.qml</file>
 	<file alias="imtguigql/GqlDocumentObserver.qml">GqlDocumentObserver.qml</file>
 	<file alias="imtguigql/GqlDocumentDataController.qml">GqlDocumentDataController.qml</file>
 	<file alias="imtguigql/ComboBoxGql.qml">ComboBoxGql.qml</file>
-
-	<file alias="imtguigql/qmldir">qmldir</file>
+	<file alias="imtguigql/RemoteFileController.qml">RemoteFileController.qml</file>
+	<file alias="imtguigql/SubscriptionClient.qml">SubscriptionClient.qml</file>
+	<file alias="imtguigql/SubscriptionManager.qml">SubscriptionManager.qml</file>
     </qresource>
 </RCC>
