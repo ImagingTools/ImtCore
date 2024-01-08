@@ -4,6 +4,7 @@
 // ACF includes
 #include <iprm/CParamsSet.h>
 #include <ifile/IFileNameParam.h>
+#include <ifile/ITempFileManager.h>
 
 // ImtCore includes
 #include <imtcrypt/IHashGenerator.h>
@@ -31,8 +32,7 @@ public:
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN_TO(m_fileObjectCollectionCompPtr, m_objectCollectionCompPtr, true);
 		I_ASSIGN(m_hashGeneratorCompPtr, "HashGenerator", "The Generator, used to calc file's hash summ", false, "HashGenerator");
-		I_ASSIGN(m_tempRequestCollectionCompPtr, "TempRequestCollection", "Collection, that temporary stores uploaded/downloading files paths", true, "TempRequestCollection");
-		I_ASSIGN(m_tempDirectoryPathCompPtr, "TempDirectoryPath", "The path where temp files will be stored, while it is required. \nWarning: this path will be cleared on suutdown", true, "TempDirectoryPath");
+		I_ASSIGN(m_tempFileManagerCompPtr, "TempFileManager", "Temporary file manager used to store uploading files", true, "TempFileManager");
 	I_END_COMPONENT;
 
 	// reimplemented(imtbase::IMetaInfoCreator)
@@ -46,9 +46,6 @@ protected:
 				imtbase::CTreeItemModel& itemsModel,
 				imtbase::CTreeItemModel& notificationModel,
 				const QString& errorMessage);
-
-	QString GetFilePathFromRequestQueue(const QByteArray& queueRequestId) const;
-	QByteArray CreateNewFilePathInRequestQueue(const QString& filePath) const;
 
 	// reimplemented (CObjectCollectionControllerCompBase)
 	virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
@@ -66,13 +63,13 @@ protected:
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
+	virtual void OnComponentDestroyed() override;
 
 protected:
 	I_MULTIATTR(QByteArray, m_supportedTypeListAttrPtr);
 	I_REF(imtrepo::IFileObjectCollection, m_fileObjectCollectionCompPtr);
 	I_REF(imtcrypt::IHashGenerator, m_hashGeneratorCompPtr);
-	I_REF(imtbase::IObjectCollection, m_tempRequestCollectionCompPtr);
-	I_REF(ifile::IFileNameParam, m_tempDirectoryPathCompPtr);
+	I_REF(ifile::ITempFileManager, m_tempFileManagerCompPtr);
 };
 
 
