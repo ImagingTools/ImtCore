@@ -136,7 +136,7 @@ int CQuickApplicationComp::Execute(int argc, char** argv)
 
 		HideSplashScreen();
 
-		QTimer::singleShot(0, this, SLOT(OnEventLoopStarted()));
+		QTimer::singleShot(0, this, &CQuickApplicationComp::OnEventLoopStarted);
 
 		// Start application loop:
 		retVal = QGuiApplication::exec();

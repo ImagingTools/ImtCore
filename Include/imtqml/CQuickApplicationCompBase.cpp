@@ -44,7 +44,7 @@ bool CQuickApplicationCompBase::InitializeApplication(int argc, char** argv)
 
 	if (!m_applicationPtr.IsValid()){
 		s_argc = argc;
-        m_applicationPtr.SetPtr(new QGuiApplication(s_argc, argv));
+		m_applicationPtr.SetPtr(new QGuiApplication(s_argc, argv));
 		if (!m_applicationPtr.IsValid()){
 			return false;
 		}
