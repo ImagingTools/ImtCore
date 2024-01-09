@@ -19,24 +19,24 @@ def copy(folder_from, folder_to):
                     os.mkdir(os.path.join(folder_to))
                 shutil.copy(os.path.join(folder_from, f), os.path.join(folder_to, f))
 
-if len(sys.argv) > 3:
-    for i in range(1, len(sys.argv) - 3, 2):
+if len(sys.argv) > 1:
+    for i in range(1, len(sys.argv) - 1, 2):
         copy(sys.argv[i], sys.argv[i + 1])
 
-    GRAPHQL_REQUEST_PATH = ""
-    BUILD_DIR = sys.argv[len(sys.argv) - 1]
-    BUILD_DIST_DIR = BUILD_DIR + "/Resources"
-    print("BUILD_DIR", BUILD_DIR)
+#    GRAPHQL_REQUEST_PATH = ""
+#    BUILD_DIR = sys.argv[len(sys.argv) - 1]
+#    BUILD_DIST_DIR = BUILD_DIR + "/Resources"
+#    print("BUILD_DIR", BUILD_DIR)
 
-    for dir in sys.argv:
-        if dir.replace("\\", "/").endswith("ImtCore/Include/imtqml/Qml/imtqml"):
-            GRAPHQL_REQUEST_PATH = dir + "/GraphQLRequest.js"
+#    for dir in sys.argv:
+#        if dir.replace("\\", "/").endswith("ImtCore/Include/imtqml/Qml/imtqml"):
+#            GRAPHQL_REQUEST_PATH = dir + "/GraphQLRequest.js"
 
-    if os.path.isfile(GRAPHQL_REQUEST_PATH):
-        print("copy from ", GRAPHQL_REQUEST_PATH, " to ", BUILD_DIST_DIR)
-        shutil.copy(GRAPHQL_REQUEST_PATH, BUILD_DIST_DIR)
-    else:
-        print("GraphQLRequest.js file not found!")
+#    if os.path.isfile(GRAPHQL_REQUEST_PATH):
+#        print("copy from ", GRAPHQL_REQUEST_PATH, " to ", BUILD_DIST_DIR)
+#        shutil.copy(GRAPHQL_REQUEST_PATH, BUILD_DIST_DIR)
+#    else:
+#        print("GraphQLRequest.js file not found!")
 
 #    python_path = sys.argv[len(sys.argv) - 1]
 #    print("python_path", python_path)
