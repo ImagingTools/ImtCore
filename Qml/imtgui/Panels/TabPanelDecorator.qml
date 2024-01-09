@@ -4,8 +4,12 @@ import imtcontrols 1.0
 
 Item {
     id: tabPanelDecorator;
+
+//    width: Math.min(texttabDelegate.width + imagetabDelegate.width + 40, 200);
     width: texttabDelegate.width + imagetabDelegate.width + 40;
     height: baseElement ? baseElement.height : 50
+
+//    clip: true;
 
     property Item baseElement: null;
 
@@ -17,16 +21,16 @@ Item {
     }
 
     Rectangle {
-        anchors.fill: parent;
+        anchors.fill: tabPanelDecorator;
         color: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected ? Style.baseColor: "transparent": "transparent";
     }
 
     Rectangle{
         id: selection;
 
-        anchors.bottom: parent.bottom;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
+        anchors.bottom: tabPanelDecorator.bottom;
+        anchors.left: tabPanelDecorator.left;
+        anchors.right: tabPanelDecorator.right;
 
         height: 2;
 
@@ -37,7 +41,7 @@ Item {
     Item {
         id: imagetabDelegate;
 
-        height: parent.height;
+        height: tabPanelDecorator.height;
         width: visible ? height : 1;
 
         visible: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.firstElement: false;
@@ -45,10 +49,10 @@ Item {
         Image {
             id: firsElementImage;
 
-            anchors.centerIn: parent;
+            anchors.centerIn: imagetabDelegate;
 
-            width: parent.width * 0.6;
-            height: parent.height * 0.6;
+            width: imagetabDelegate.width * 0.6;
+            height: imagetabDelegate.height * 0.6;
 
             sourceSize.width: width;
             sourceSize.height: height;
@@ -60,8 +64,8 @@ Item {
     Item {
         id: texttabDelegate;
 
-        anchors.top: parent.top;
-        anchors.bottom: parent.bottom;
+        anchors.top: tabPanelDecorator.top;
+        anchors.bottom: tabPanelDecorator.bottom;
         anchors.left: imagetabDelegate.right;
         anchors.leftMargin: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.firstElement ? 0 :10 : 0;
 
@@ -70,7 +74,7 @@ Item {
         Text {
             id: text;
 
-            anchors.centerIn: parent;
+            anchors.centerIn: texttabDelegate;
 
             color: Style.textColor;
             font.family: Style.fontFamily;
@@ -81,11 +85,11 @@ Item {
 
     Item {
         id: closeButton;
-        anchors.right: parent.right;
+        anchors.right: tabPanelDecorator.right;
         anchors.rightMargin: 8;
-        anchors.verticalCenter: parent.verticalCenter;
+        anchors.verticalCenter: tabPanelDecorator.verticalCenter;
 
-        height: parent.height;
+        height: tabPanelDecorator.height;
         width: closeImage.width;
 
         visible: !tabPanelDecorator.baseElement.firstElement && tabPanelDecorator.baseElement.isCloseEnable;
@@ -93,7 +97,7 @@ Item {
         Image {
             id: closeImage;
 
-            anchors.centerIn: parent;
+            anchors.centerIn: closeButton;
 
             width: 13;
             height: width;
@@ -108,7 +112,7 @@ Item {
         MouseArea{
             id: closeMA;
 
-            anchors.fill: parent;
+            anchors.fill: closeButton;
 
             enabled: closeButton.visible;
             hoverEnabled: enabled;

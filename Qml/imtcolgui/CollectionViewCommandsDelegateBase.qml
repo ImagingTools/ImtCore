@@ -252,7 +252,7 @@ Item {
             message: containerBase.removeMessage;
             title: containerBase.removeDialogTitle;
             onFinished: {
-                if (buttonId == "Yes"){
+                if (buttonId == Enums.ButtonType.Yes){
                     let indexes = containerBase.tableData.getSelectedIndexes();
                     if (indexes.length > 0){
                         let index = indexes[0];
@@ -272,7 +272,7 @@ Item {
         InputDialog {
             title: qsTr("Rename document");
             onFinished: {
-                if (buttonId == "Ok"){
+                if (buttonId == Enums.ButtonType.Ok){
                     renameQuery.rename(inputValue);
                 }
 
@@ -292,7 +292,7 @@ Item {
                     elements.SetData(containerBase.descriptionFieldId, inputValue, indexes[0]);
                 }
 
-                if (buttonId == "Ok"){
+                if (buttonId == Enums.ButtonType.Ok){
                     setDescriptionQuery.setDescription(inputValue);
                 }
 

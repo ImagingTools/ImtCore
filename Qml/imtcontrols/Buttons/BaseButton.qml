@@ -56,19 +56,61 @@ Item {
 
         baseButton.setItemPropertiesAdd()
 
-        loader.item.text = baseButton.text;
-        loader.item.imageSource = baseButton.imageSource;
-        loader.item.isActive = baseButton.isActive;
-        loader.item.isFocused = baseButton.isFocused;
-        loader.item.isPressed = baseButton.isPressed;
-        loader.item.isHovered = baseButton.isHovered;
-        loader.item.isMainButton = baseButton.isMainButton;
-        loader.item.enabled = baseButton.enabled;
-        loader.item.isHighlighted = baseButton.isHighlighted;
-        loader.item.isToggled = baseButton.isToggled;
-        loader.item.isToggleable = baseButton.isToggleable;
-        loader.item.selected = baseButton.selected;
-        loader.item.color = baseButton.color;
+        if (!loader.item){
+            return;
+        }
+
+        if (loader.item.text !== undefined){
+            loader.item.text = baseButton.text;
+        }
+
+        if (loader.item.imageSource !== undefined){
+            loader.item.imageSource = baseButton.imageSource;
+        }
+
+        if (loader.item.isActive !== undefined){
+            loader.item.isActive = baseButton.isActive;
+        }
+
+        if (loader.item.isFocused !== undefined){
+            loader.item.isFocused = baseButton.isFocused;
+        }
+
+        if (loader.item.isPressed !== undefined){
+            loader.item.isPressed = baseButton.isPressed;
+        }
+
+        if (loader.item.isHovered !== undefined){
+            loader.item.isHovered = baseButton.isHovered;
+        }
+
+        if (loader.item.isMainButton !== undefined){
+            loader.item.isMainButton = baseButton.isMainButton;
+        }
+
+        if (loader.item.enabled !== undefined){
+            loader.item.enabled = baseButton.enabled;
+        }
+
+        if (loader.item.isHighlighted !== undefined){
+            loader.item.isHighlighted = baseButton.isHighlighted;
+        }
+
+        if (loader.item.isToggled !== undefined){
+            loader.item.isToggled = baseButton.isToggled;
+        }
+
+        if (loader.item.isToggleable !== undefined){
+            loader.item.isToggleable = baseButton.isToggleable;
+        }
+
+        if (loader.item.selected !== undefined){
+            loader.item.selected = baseButton.selected;
+        }
+
+        if (loader.item.color !== undefined){
+            loader.item.color = baseButton.color;
+        }
 
         loader.width = loader.item.width;
         loader.height = loader.item.height;

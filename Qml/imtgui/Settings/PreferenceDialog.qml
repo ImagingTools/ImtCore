@@ -14,6 +14,11 @@ Dialog {
 
     topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
 
+    buttonsModel: ListModel{
+        ListElement{Id: Enums.ButtonType.Apply; Name:qsTr("Apply"); Enabled: true}
+        ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Cancel"); Enabled: true}
+    }
+
     property TreeItemModel settingsModel: TreeItemModel {};
     property SettingsProvider settingsProvider: null;
 
@@ -48,13 +53,13 @@ Dialog {
             messageDialog.contentItem.settingsModel = representatioModel
         }
 
-        messageDialog.buttons.setButtonState("Apply", false);
+        messageDialog.buttons.setButtonState(Enums.ButtonType.Apply, false);
         messageDialog.buttonsModel.setProperty(1, "Name", qsTr("Close"));
     }
 
     onFinished: {
-        if (buttonId === "Apply"){
-            messageDialog.buttons.setButtonState("Apply", false);
+        if (buttonId == Enums.ButtonType.Apply){
+            messageDialog.buttons.setButtonState(Enums.ButtonType.Apply, false);
             messageDialog.buttonsModel.setProperty(1, "Name", qsTr("Close"));
         }
     }
@@ -62,16 +67,11 @@ Dialog {
     contentComp: Component {
         Preference {
             onModelChanged: {
-                messageDialog.buttons.setButtonState("Apply", true);
+                messageDialog.buttons.setButtonState(Enums.ButtonType.Apply, true);
 
                 messageDialog.buttonsModel.setProperty(1, "Name", qsTr("Cancel"));
             }
         }
-    }
-
-    Component.onCompleted: {
-        messageDialog.buttons.addButton({"Id":"Apply", "Name": qsTr("Apply"), "Enabled": false});
-        messageDialog.buttons.addButton({"Id":"Close", "Name": qsTr("Close"), "Enabled": true});
     }
 
     Component{

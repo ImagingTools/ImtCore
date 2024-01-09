@@ -300,7 +300,7 @@ Rectangle {
         id: preferenceDialogComp;
         PreferenceDialog {
             onFinished: {
-                if (buttonId == "Apply"){
+                if (buttonId == Enums.ButtonType.Apply){
                     if (thumbnailDecoratorContainer.settingsObserver != null){
                         thumbnailDecoratorContainer.settingsObserver.observedModelDataChanged();
                     }
@@ -378,23 +378,23 @@ Rectangle {
         }
     }
 
-    Component {
-        id: saveDialog;
-        MessageDialog {
-            title: qsTr("Save dirty documents");
-            message: qsTr("Save all dirty documents ?");
-            Component.onCompleted: {
-                buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true});
-            }
+//    Component {
+//        id: saveDialog;
+//        MessageDialog {
+//            title: qsTr("Save dirty documents");
+//            message: qsTr("Save all dirty documents ?");
+//            Component.onCompleted: {
+//                buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true});
+//            }
 
-            onFinished: {
-                if (buttonId == "Yes"){
-                    documentManager.saveDirtyDocuments();
-                }
-                else if (buttonId == "No"){
-                    documentManager.closeAllDocuments();
-                }
-            }
-        }
-    }
+//            onFinished: {
+//                if (buttonId == "Yes"){
+//                    documentManager.saveDirtyDocuments();
+//                }
+//                else if (buttonId == "No"){
+//                    documentManager.closeAllDocuments();
+//                }
+//            }
+//        }
+//    }
 }

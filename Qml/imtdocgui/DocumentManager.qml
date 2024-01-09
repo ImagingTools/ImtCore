@@ -122,7 +122,7 @@ Item {
     }
 
     /*!
-        Open document bu documentId.
+        Open document by documentId.
 
         \param    documentId             Document-ID
         \param    documentTypeId         Document Type-ID
@@ -202,10 +202,12 @@ Item {
                     }
 
                     if (documentId === ""){
-                        documentController.setData(document.gqlAddCommandId, documentId, documentModel, additionInputParams, callBack);
+//                        documentController.setData(document.gqlAddCommandId, documentId, documentModel, additionInputParams, callBack);
+                        documentController.setData(documentTypeId, documentId, documentModel, additionInputParams, callBack);
                     }
                     else{
                         documentController.updateData(documentTypeId, documentId, documentModel, additionInputParams, callBack);
+//                        documentController.updateData(document.gqlUpdateCommandId, documentId, documentModel, additionInputParams, callBack);
                     }
                 }
             }
@@ -241,9 +243,6 @@ Item {
 
 
     function getDocumentIndexByDocumentId(documentId){
-        console.log('getDocumentIndexByDocumentId', documentId)
-        console.log('documentsModel.count', documentsModel.count)
-
         for (let i = 0; i < documentsModel.count; i++){
             let documentObj = documentsModel.get(i).DocumentObj;
             if (documentObj && documentObj.documentId === documentId){
@@ -273,7 +272,6 @@ Item {
         let title = defaultDocumentName;
 
         let documentData = documentsModel.get(documentIndex).DocumentObj;
-        console.log("documentData", documentData)
         let documentName = documentData.getDocumentName();
         if (documentName && documentName !== ""){
             title = documentName;
@@ -336,13 +334,13 @@ Item {
 
         if (documentData.isDirty && !force){
             let callback = function(result){
-                console.log("saveDialog callback", result);
-
-                if (result === "Yes"){
+                console.log("result", result);
+                console.log("==", result == Enums.ButtonType.No);
+                if (result == Enums.ButtonType.Yes){
                     internal.m_closingDocuments.push(documentData.uuid);
                     saveDocument(documentData.uuid);
                 }
-                else if (result === "No"){
+                else if (result == Enums.ButtonType.No){
                     documentData.isDirty = false;
 
                     closeDocumentByIndex(documentIndex);
@@ -443,13 +441,19 @@ Item {
 
             message: qsTr("Save all changes ?")
 
+            buttonsModel: ListModel{
+                ListElement{Id: Enums.ButtonType.Yes; Name:qsTr("Yes"); Enabled: true}
+                ListElement{Id: Enums.ButtonType.No; Name:qsTr("No"); Enabled: true}
+                ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Cancel"); Enabled: true}
+            }
+
             Component.onCompleted: {
-                buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true});
+//                buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true});
+//                buttons.addButton({Id: Enums.ButtonType.Cancel, Name:qsTr("Cancel"), Enabled: true});
             }
 
             onFinished: {
-                console.log("saveDialog onFinished", buttonId);
-                if (buttonId === "Yes"){
+                if (buttonId === Enums.ButtonType.Yes){
                 }
             }
         }

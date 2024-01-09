@@ -169,7 +169,7 @@ QtObject {
                     if (container.gqlSetModel.ContainsKey("errors")){
                         dataModelLocal = container.gqlSetModel.GetData("errors");
 
-                        if (dataModelLocal.ContainsKeya(addCommandId)){
+                        if (dataModelLocal.ContainsKey(addCommandId)){
                             dataModelLocal = dataModelLocal.GetData(addCommandId);
                         }
 

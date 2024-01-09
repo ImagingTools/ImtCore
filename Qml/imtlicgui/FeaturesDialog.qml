@@ -5,7 +5,14 @@ import imtcontrols 1.0
 Dialog {
     id: featuresDialog;
 
+    buttonsModel: ListModel{
+        ListElement{Id: Enums.ButtonType.Ok; Name:qsTr("Add"); Enabled: true}
+        ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Cancel"); Enabled: true}
+    }
+
     width: 500;
+
+    title: qsTr("Select features");
 
     signal featureAdded(var modelIndex);
 
@@ -31,29 +38,29 @@ Dialog {
     }
 
     Component.onCompleted: {
-        featuresDialog.buttons.addButton({"Id": "Add", "Name": "Add", "Enabled": false});
-        featuresDialog.buttons.addButton({"Id": "Cancel", "Name": "Cancel", "Enabled": true});
+//        featuresDialog.buttons.addButton({"Id": "Add", "Name": "Add", "Enabled": false});
+//        featuresDialog.buttons.addButton({"Id": "Cancel", "Name": "Cancel", "Enabled": true});
 
-        featuresDialog.title = qsTr("Select features");
+//        featuresDialog.title = qsTr("Select features");
 
         updateGui();
     }
 
     onFinished: {
-        if (buttonId == "Add"){
+        if (buttonId == Enums.ButtonType.Ok){
             featuresDialog.selectedIndexes = featuresDialog.contentItem.tableView.getSelectedIndexes();
         }
     }
 
     Keys.onPressed: {
         if (event.key === Qt.Key_Return){
-            let enabled = featuresDialog.buttons.getButtonState("Add");
+            let enabled = featuresDialog.buttons.getButtonState(Enums.ButtonType.Ok);
             if (enabled){
-                featuresDialog.finished("Add");
+                featuresDialog.finished(Enums.ButtonType.Ok);
             }
         }
         else if (event.key === Qt.Key_Escape){
-            featuresDialog.finished("Cancel");
+            featuresDialog.finished(Enums.ButtonType.Cancel);
         }
     }
 
@@ -64,6 +71,7 @@ Dialog {
     contentComp: Component{ Item {
         id: dialogBody;
 
+        width: featuresDialog.width;
         height: bodyColumn.height + 40;
 
         property alias tableView: tableTreeView;
@@ -99,7 +107,7 @@ Dialog {
 
                 onSelectionChanged: {
                     let indexes = tableTreeView.getSelectedIndexes();
-                    featuresDialog.buttons.setButtonState("Add", indexes.length > 0);
+                    featuresDialog.buttons.setButtonState(Enums.ButtonType.Ok, indexes.length > 0);
                 }
             }
         }

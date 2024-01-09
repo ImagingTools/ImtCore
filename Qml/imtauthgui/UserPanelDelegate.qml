@@ -36,7 +36,7 @@ Item {
             login: userPanelDelegate.login;
 
             onFinished: {
-                if (buttonId === "Ok"){
+                if (buttonId == Enums.ButtonType.Ok){
                     cacheData.login = login;
                     cacheData.password = this.password;
 

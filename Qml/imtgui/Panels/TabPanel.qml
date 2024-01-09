@@ -64,7 +64,6 @@ Rectangle {
                 console.log("tabPanelDecorator", Style.tabPanelDecorator)
             }
         }
-
     }
 
     Rectangle {

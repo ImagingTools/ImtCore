@@ -5,6 +5,11 @@ import imtcontrols 1.0
 Dialog {
     id: messageDialog;
 
+    buttonsModel: ListModel{
+        ListElement{Id: Enums.ButtonType.Yes; Name:qsTr("Yes"); Enabled: true}
+        ListElement{Id: Enums.ButtonType.No; Name:qsTr("No"); Enabled: true}
+    }
+
     title: qsTr("Message");
 
     topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
@@ -17,7 +22,7 @@ Dialog {
         console.log("MessageDialog onPressed", event.key);
 
         if (event.key == Qt.Key_Return){
-            messageDialog.finished("Yes");
+            messageDialog.finished(Enums.ButtonType.Yes);
         }
     }
 
@@ -28,13 +33,9 @@ Dialog {
 
     contentComp: Component {
         MessageDialogBody {
+            width: messageDialog.width;
             message: messageDialog.message;
         }
-    }
-
-    Component.onCompleted: {
-        messageDialog.buttons.addButton({"Id":"Yes", "Name":qsTr("Yes"), "Enabled": true});
-        messageDialog.buttons.addButton({"Id":"No", "Name":qsTr("No"), "Enabled": true});
     }
 
     Component{

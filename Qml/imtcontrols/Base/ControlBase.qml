@@ -12,6 +12,9 @@ FocusScope {
     property Component decoratorComponent;
     property var decorator : null;
 
+    property alias bindWidthAlias: bindWidth;
+    property alias bindHeightAlias: bindHeight;
+
     onDecoratorComponentChanged: {
         decoratorChangedFunc();
     }

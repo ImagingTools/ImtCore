@@ -53,17 +53,17 @@ Item {
         sortModel.SetData("HeaderId", sortByField);
     }
 
-    Component.onDestruction: {
-        if (container.commandId !== ""){
-            Events.unSubscribeEvent(container.commandId + "CollectionUpdated", container.updateModel);
-        }
-    }
+//    Component.onDestruction: {
+//        if (container.commandId !== ""){
+//            Events.unSubscribeEvent(container.commandId + "CollectionUpdated", container.updateModel);
+//        }
+//    }
 
-    onCommandIdChanged: {
-        if (container.commandId !== ""){
-            Events.subscribeEvent(container.commandId + "CollectionUpdated", container.updateModel);
-        }
-    }
+//    onCommandIdChanged: {
+//        if (container.commandId !== ""){
+//            Events.subscribeEvent(container.commandId + "CollectionUpdated", container.updateModel);
+//        }
+//    }
 
     onOrderTypeChanged: {
         let sortModel = filterModel.GetTreeItemModel("Sort");
@@ -184,30 +184,28 @@ Item {
         }
     }
 
-//    SubscriptionClient {
-//        id: subscriptionClient;
+    SubscriptionClient {
+        id: subscriptionClient;
 
-//        property string ok: container.commandId !== "" && container.subscriptionId !== "";
-//        onOkChanged: {
-//            if (container.commandId !== ""){
-//                let subscriptionRequestId = "On" + container.commandId + "CollectionChanged"
-//                var query = Gql.GqlRequest("subscription", subscriptionRequestId);
-//                var queryFields = Gql.GqlObject("notification");
-//                queryFields.InsertField("Id");
-//                query.AddField(queryFields);
+        property string ok: container.commandId !== "" && container.subscriptionId !== "";
+        onOkChanged: {
+            if (container.commandId !== ""){
+                let subscriptionRequestId = "On" + container.commandId + "CollectionChanged"
+                var query = Gql.GqlRequest("subscription", subscriptionRequestId);
+                var queryFields = Gql.GqlObject("notification");
+                queryFields.InsertField("Id");
+                query.AddField(queryFields);
 
-//                console.log("CollectionDataProvider registerSubscription", subscriptionClient.commandId);
+                subscriptionManager.registerSubscription(query, subscriptionClient);
+            }
+        }
 
-//                subscriptionManager.registerSubscription(query, subscriptionClient);
-//            }
-//        }
+        onStateChanged: {
+            if (state === "Ready"){
+                console.log("CollectionDataProvider subscriptionClient Ready", subscriptionClient.commandId);
 
-//        onStateChanged: {
-//            if (state === "Ready"){
-//                console.log("CollectionDataProvider subscriptionClient Ready", subscriptionClient.commandId);
-
-//                container.updateModel();
-//            }
-//        }
-//    }
+                container.updateModel();
+            }
+        }
+    }
 }

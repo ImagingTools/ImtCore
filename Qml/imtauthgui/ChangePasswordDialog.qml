@@ -6,25 +6,23 @@ import imtcontrols 1.0
 Dialog {
     id: rootDialog;
 
-    width: 400;
+    width: 500;
+
+    buttonsModel: ListModel{
+        ListElement{Id: Enums.ButtonType.Ok; Name:qsTr("Ok"); Enabled: true}
+        ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Cancel"); Enabled: true}
+    }
 
     property string password: contentItem.password;
 
     property string userPasswordHash;
     property string login;
 
-    Component.onCompleted: {
-        console.log("InputDialog onCompleted", rootDialog);
-
-        rootDialog.buttons.addButton({"Id":"Ok", "Name":qsTr("OK"), "Enabled": false, "Active": true});
-        rootDialog.buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true, "Active": true});
-    }
-
     Keys.onPressed: {
         if (event.key === Qt.Key_Return){
-            let enabled = rootDialog.buttons.getButtonState("Ok");
+            let enabled = rootDialog.buttons.getButtonState(Enums.ButtonType.Ok);
             if (enabled){
-                rootDialog.finished("Ok")
+                rootDialog.finished(Enums.ButtonType.Ok)
             }
         }
     }
@@ -32,6 +30,10 @@ Dialog {
     contentComp: Component { Item {
         id: contentItem;
 
+        anchors.horizontalCenter: parent.horizontalCenter;
+        anchors.verticalCenter: parent.verticalCenter;
+
+        width: rootDialog.width;
         height: columnBodyMain.height + 30;
 
         property alias password: columnBody.password;
@@ -132,7 +134,7 @@ Dialog {
 
                     onAcceptedChanged: {
                         if (rootDialog.buttons){
-                            rootDialog.buttons.setButtonState("Ok", columnBody.accepted)
+                            rootDialog.buttons.setButtonState(Enums.ButtonType.Ok, columnBody.accepted)
                         }
                     }
                 }
@@ -156,7 +158,7 @@ Dialog {
                 messageDecoratorLoader.item.rootItem = rootDialog;
             }
 
-            rootDialog.width = 400;
+            rootDialog.width = 500;
         }
     }
 }

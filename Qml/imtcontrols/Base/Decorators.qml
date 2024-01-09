@@ -290,10 +290,10 @@ Item {
             Text {
                 id: cbTitleTxt;
 
-                anchors.verticalCenter: parent.verticalCenter;
-                anchors.left: parent.left;
-                anchors.leftMargin: !baseElement ? 0 : baseElement.textCentered ? parent.width/2 - width/2 : 10;
-                anchors.right: parent.right;
+                anchors.verticalCenter: cbMainRect.verticalCenter;
+                anchors.left: cbMainRect.left;
+                anchors.leftMargin: !baseElement ? 0 : baseElement.textCentered ? cbMainRect.width/2 - width/2 : 10;
+                anchors.right: cbMainRect.right;
                 anchors.rightMargin: 10;
 
                 color: !baseElement ? "transparent" : baseElement.fontColorTitle;

@@ -12,7 +12,15 @@ Item {
     property string documentId;
     property string documentName;
     property string documentTypeId;
-    property string gqlAddCommandId: documentTypeId + "Add";
+
+//    // GraphQL command for creating a new document
+//    property string gqlAddCommandId: documentTypeId + "Add";
+
+//    // GraphQL command for updating a document
+//    property string gqlUpdateCommandId: documentTypeId + "Update";
+
+//    // GraphQL command for getting document data
+//    property string gqlGetCommandId: documentTypeId + "Item";
 
     property bool isDirty: false;
     property bool readOnly: false;
@@ -112,8 +120,6 @@ Item {
     }
 
     onUuidChanged: {
-        console.log("onUuidChanged", uuid);
-
         if (uuid !== ""){
             Events.unSubscribeAllFromSlot(commandsDelegate.commandHandle);
             Events.subscribeEvent(uuid + "CommandActivated", commandsDelegate.commandHandle);
@@ -125,8 +131,6 @@ Item {
     }
 
     onDocumentModelChanged: {
-        console.log("onDocumentModelChanged", documentModel.toJSON());
-
         let isEmpty = documentModel.GetItemsCount() === 0;
 
         beginDocumentModelChanged();
@@ -146,9 +150,6 @@ Item {
         }
 
         // If model is empty then doUpdateModel
-
-        console.log("GetItemsCount", documentModel.GetItemsCount());
-
         if (isEmpty){
             doUpdateModel();
         }
@@ -176,7 +177,6 @@ Item {
     }
 
     onIsDirtyChanged: {
-        console.log("onIsDirtyChanged", isDirty);
         commandsProvider.setCommandIsEnabled("Save", isDirty);
     }
 
@@ -203,8 +203,6 @@ Item {
             return;
         }
 
-        console.log("onModelChanged", documentModel.toJSON());
-
         isDirty = true;
 
         doUpdateGui();
@@ -212,8 +210,6 @@ Item {
 
     function getAdditionalInputParams()
     {
-        console.log("Document getAdditionalInputParams");
-
         return {}
     }
 
@@ -225,11 +221,7 @@ Item {
 
     function doUpdateModel()
     {
-        console.log("start doUpdateModel", JSON.stringify(documentModel));
-
         if (readOnly || internal.blockingUpdateModel){
-            console.log("doUpdateModel cancelled");
-
             return;
         }
 
@@ -238,14 +230,10 @@ Item {
         updateModel();
 
         internal.blockingUpdateGui = false;
-
-        console.log("finish doUpdateModel", JSON.stringify(documentModel));
     }
 
     function doUpdateGui()
     {
-        console.log("start doUpdateGui");
-
         if (readOnly){
             return;
         }
@@ -255,8 +243,6 @@ Item {
         updateGui();
 
         internal.blockingUpdateModel = false;
-
-        console.log("finish doUpdateGui");
     }
 
     function updateCommands(){
@@ -285,7 +271,6 @@ Item {
         property int countIncomingChanges: 0;
 
         onBlockingUpdateGuiChanged: {
-            console.log("onBlockingUpdateGuiChanged", blockingUpdateGui);
             if (blockingUpdateGui){
                 documentData.startLoading();
             }
@@ -300,8 +285,6 @@ Item {
         }
 
         onBlockingUpdateModelChanged: {
-            console.log("onBlockingUpdateModelChanged", blockingUpdateModel);
-
             if (blockingUpdateModel){
                 documentData.startLoading();
             }
@@ -317,7 +300,6 @@ Item {
         enabled: documentData.visible;
 
         onActivated: {
-            console.log("Ctrl+S onActivated");
             if (documentData.commandsProvider.commandExists("Save")){
                 Events.sendEvent(documentData.uuid + "CommandActivated", "Save");
             }
@@ -330,7 +312,6 @@ Item {
         enabled: documentData.visible;
 
         onActivated: {
-            console.log("Ctrl+Z onActivated");
             if (documentData.commandsProvider.commandExists("Undo")){
                 Events.sendEvent(documentData.uuid + "CommandActivated", "Undo");
             }

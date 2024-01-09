@@ -50,7 +50,7 @@ ControlBase {
         TopPanelDialog {}
     }
 
-    signal finished(string buttonId);
+    signal finished(int buttonId);
     signal started();
     signal localizationChanged(string language);
 
@@ -148,7 +148,7 @@ ControlBase {
                 decorator.applied.connect(this.applied);
             }
 
-           addContentItemToDecorator();
+            addContentItemToDecorator();
         }
     }
 
@@ -171,19 +171,22 @@ ControlBase {
 
 
     function setButtonIds(){
-            let buttonIds = 0;
-            for(let i = 0; i < buttonsDialog.buttons.count; i++){
-                let id = buttonsDialog.buttons.get(i).Id;
-                if(i == 0){
-                    buttonIds = id;
-
-                }
-                else {
-                    buttonIds = buttonIds | id;
-                }
+        let buttonIds = 0;
+        for(let i = 0; i < buttonsDialog.buttons.count; i++){
+            let id = buttonsDialog.buttons.get(i).Id;
+            if(i == 0){
+                buttonIds = id;
 
             }
-            dialogContainer.buttonIds = buttonIds;
+            else {
+                buttonIds = buttonIds | id;
+            }
+
+        }
+
+        console.log("buttonIds", buttonIds);
+
+        dialogContainer.buttonIds = buttonIds;
     }
 
     function setDecoratorSize(content_){

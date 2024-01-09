@@ -22,7 +22,6 @@ public:
 
 protected:
 	// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
-	virtual bool IsRequestSupported(const imtgql::CGqlRequest& gqlRequest) const override;
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 	// reimplemented (imtlic::IFeatureDependenciesProvider)

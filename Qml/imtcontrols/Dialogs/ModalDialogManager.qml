@@ -18,9 +18,20 @@ Item {
         id: modalDialogModels;
     }
 
-    function openDialog(comp, parameters){
-        console.log("DialogsManager addDialog", comp);
+    // Top level dialog finished
+    signal finished(string result);
+
+    onFinished: {
+        console.log("DialogsManager onFinished", result);
+    }
+
+    function openDialog(comp, parameters, callback){
+        console.log("DialogsManager addDialog", comp, parameters, callback);
         modalDialogModels.append({"Component": comp, "Parameters": parameters});
+
+        if (callback){
+            finished.connect(callback);
+        }
     }
 
     function closeDialog(){
@@ -87,28 +98,37 @@ Item {
                 property real  mainWindowWidth_prev: 0;
                 property real  mainWindowHeight_prev: 0;
 
-                onMainWindowWidthChanged: {
-                    if(dialogLoader.item && dialogLoader.item.centered){
-                        dialogLoader.x = container.width/2 - dialogLoader.width/2;
-                        dialogLoader.y = container.height/2 - dialogLoader.height/2;
-                    }
-                    else if(dialogLoader.item && !dialogLoader.item.centered){
-                        var deltaWidth = mainWindowWidth - mainWindowWidth_prev;
-                        mainWindowWidth_prev = mainWindowWidth;
-                        dialogLoader.x += deltaWidth/2;
-                    }
+                clip: false;
 
+                onMainWindowWidthChanged: {
+                    var doNotCorrectPosition = !dialogLoader.item ? false : dialogLoader.item.doNotCorrectPosition == undefined ? false : dialogLoader.item.doNotCorrectPosition;
+                    var centered = !dialogLoader.item ? false : dialogLoader.item.centered == undefined ? false : dialogLoader.item.centered;
+                    if(dialogLoader.item && !doNotCorrectPosition){
+                        if(dialogLoader.item && centered){
+                            dialogLoader.x = container.width/2 - dialogLoader.width/2;
+                            dialogLoader.y = container.height/2 - dialogLoader.height/2;
+                        }
+                        else if(dialogLoader.item && !centered){
+                            var deltaWidth = mainWindowWidth - mainWindowWidth_prev;
+                            mainWindowWidth_prev = mainWindowWidth;
+                            dialogLoader.x += deltaWidth/2;
+                        }
+                    }
 
                 }
                 onMainWindowHeightChanged: {
-                    if(dialogLoader.item && dialogLoader.item.centered){
-                        dialogLoader.x = container.width/2 - dialogLoader.width/2;
-                        dialogLoader.y = container.height/2 - dialogLoader.height/2;
-                    }
-                    else if(dialogLoader.item && !dialogLoader.item.centered){
-                        var deltaHeight = mainWindowHeight - mainWindowHeight_prev;
-                        mainWindowHeight_prev = mainWindowHeight;
-                        dialogLoader.y += deltaHeight/2;
+                    var doNotCorrectPosition = !dialogLoader.item ? false : dialogLoader.item.doNotCorrectPosition == undefined ? false : dialogLoader.item.doNotCorrectPosition;
+                    var centered = !dialogLoader.item ? false : dialogLoader.item.centered == undefined ? false : dialogLoader.item.centered;
+                    if(dialogLoader.item && !doNotCorrectPosition){
+                        if(dialogLoader.item && centered){
+                            dialogLoader.x = container.width/2 - dialogLoader.width/2;
+                            dialogLoader.y = container.height/2 - dialogLoader.height/2;
+                        }
+                        else if(dialogLoader.item && !centered){
+                            var deltaHeight = mainWindowHeight - mainWindowHeight_prev;
+                            mainWindowHeight_prev = mainWindowHeight;
+                            dialogLoader.y += deltaHeight/2;
+                        }
                     }
                 }
 
@@ -135,6 +155,10 @@ Item {
 
                     if (dialogLoader.item.forceFocus === undefined || dialogLoader.item.forceFocus){
                         dialogLoader.item.forceActiveFocus();
+                    }
+
+                    if (dialogLoader.item.finished){
+                        dialogLoader.item.finished.connect(container.finished);
                     }
 
                     dialogLoader.mainWindowWidth_prev = container.width;

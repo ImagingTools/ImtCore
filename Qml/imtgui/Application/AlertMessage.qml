@@ -2,7 +2,6 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
-import "Icon.js" as Icon
 
 Rectangle {
     id: alertMessage;
@@ -15,7 +14,7 @@ Rectangle {
     property int margin: 10;
     property string message: "";
     property string colorText: Style.textColor;
-    property string iconSource: "../../../" + Style.getIconPath("Icons/Alert", IconTest.state.on, Icon.Mode.Normal);
+    property string iconSource: "../../../" + Style.getIconPath("Icons/Alert", Icon.State.On, Icon.Mode.Normal);
 
     Image {
         id: icon;

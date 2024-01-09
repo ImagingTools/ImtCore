@@ -5,17 +5,22 @@ import imtcontrols 1.0
 Dialog {
     id: inputDialogContainer;
 
+    buttonsModel: ListModel{
+        ListElement{Id: Enums.ButtonType.Ok; Name:qsTr("OK"); Enabled: true}
+        ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Cancel"); Enabled: true}
+    }
+
     property string message;
     property string inputValue;
 
     Keys.onPressed: {
         if (event.key == Qt.Key_Enter){
-            inputDialogContainer.finished("Ok");
+            inputDialogContainer.finished(Enums.ButtonType.Ok);
         }
     }
 
     onFinished: {
-        if (buttonId === "Ok"){
+        if (buttonId == Enums.ButtonType.Ok){
             inputDialogContainer.inputValue = inputDialogContainer.bodyItem.inputValue;
         }
     }
@@ -25,16 +30,11 @@ Dialog {
         inputDialogContainer.buttonsModel.setProperty(1, "Name", qsTr("Cancel"));
     }
 
-    Component.onCompleted: {
-        console.log("InputDialog onCompleted", inputDialogContainer);
-
-        inputDialogContainer.buttons.addButton({"Id":"Ok", "Name":qsTr("OK"), "Enabled": true, "Active": true});
-        inputDialogContainer.buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true, "Active": false});
-    }
-
     contentComp: Component { InputDialogBody {
-        message: inputDialogContainer.message;
-        inputValue: inputDialogContainer.inputValue;
-    } }
+            width: inputDialogContainer.width;
+
+            message: inputDialogContainer.message;
+            inputValue: inputDialogContainer.inputValue;
+        } }
 }
 

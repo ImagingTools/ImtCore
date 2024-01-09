@@ -5,14 +5,14 @@ import imtcontrols 1.0
 Dialog {
     id: documentHistoryDialog;
 
+    buttonsModel: ListModel{
+        ListElement{Id: Enums.ButtonType.Ok; Name:qsTr("Ok"); Enabled: true}
+    }
+
     width: 500;
 
     property string documentTypeId: "";
     property string documentId: "";
-
-    Component.onCompleted: {
-        buttons.addButton({"Id": "Ok", "Name": qsTr("OK"), "Enabled": true});
-    }
 
     function updateModel(){
         documentHistoryDialog.bodyItem.updateModel(documentTypeId, documentId);
@@ -22,6 +22,7 @@ Dialog {
         id: productPairEditor;
 
         DocumentHistoryView {
+            width: documentHistoryDialog.width;
             height: 500;
         }
     }

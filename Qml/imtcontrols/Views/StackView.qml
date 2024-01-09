@@ -5,27 +5,24 @@ Item {
 
     visible: countPage > 0;
 
-    property int countPage: pagesModel.count;
+    property int countPage: repeaterView.count;
 
-    signal itemAdded(Item item)
+    property ListModel pagesModel: ListModel {}
 
-    Component.onDestruction: {
-        pagesModel.clear();
-    }
+    signal itemAdded(int index, var item);
+    signal itemRemoved(int index, var item);
 
-    ListModel {
-        id: pagesModel;
-    }
+    function push(item){
+        console.log("StackView push", item);
 
-    function push(parameters){
-        console.log("StackView openPage");
-        pagesModel.append(parameters);
+        pagesModel.append({"Component": item})
     }
 
     function pop(){
-        if (pagesModel.count > 0){
-            pagesModel.remove(pagesModel.count - 1);
-        }
+        let loader = repeaterView.itemAt(repeaterView.count - 1);
+        pagesModel.remove(pagesModel.count - 1)
+
+        return loader.item;
     }
 
     function peek(){
@@ -43,8 +40,6 @@ Item {
 
         anchors.fill: parent;
 
-        visible: pagesModel.count > 0;
-
         model: pagesModel;
 
         delegate: Loader {
@@ -52,17 +47,28 @@ Item {
 
             anchors.fill: parent;
 
-            source: model.Source;
+            sourceComponent: model.Component;
 
             onLoaded: {
-                let object = pagesModel.get(model.index);
-                //dialogLoader.item.documentsData = model.documentsData;
-                dialogLoader.item.documentManager = model.documentManager;
-                dialogLoader.item.itemId = model.Id;
-                dialogLoader.item.commandId = model.CommandId;
-                dialogLoader.item.forceActiveFocus();
-                container.itemAdded(dialogLoader.item)
+                console.log("StackView onLoaded", item);
+
+                container.itemAdded(pagesModel.count - 1, item);
             }
+
+            onStatusChanged: {
+                console.log("StackView Loader onStatusChanged", status);
+                if (status === Loader.Error){
+                    console.error("StackView item loading was failed!");
+                }
+            }
+
+            Component.onCompleted: {
+                console.log("StackView Loader onCompleted");
+            }
+        }
+
+        onItemRemoved: {
+            container.itemRemoved(index, item);
         }
     }
 }

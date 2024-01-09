@@ -1,8 +1,15 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtcontrols 1.0
 
 Dialog {
     id: messageDialog;
+
+    width: 400;
+
+    buttonsModel: ListModel{
+        ListElement{Id: Enums.ButtonType.Ok; Name:qsTr("OK"); Enabled: true}
+    }
 
     title: qsTr("Error");
 
@@ -12,21 +19,18 @@ Dialog {
 
     Keys.onPressed: {
         if (event.key == Qt.Key_Enter){
-            messageDialog.finished("Ok");
+            messageDialog.finished(Enums.ButtonType.Ok);
         }
     }
 
-    Component.onCompleted: {
-        messageDialog.buttons.addButton({"Id":"Ok", "Name":qsTr("OK"), "Enabled": true});
-    }
-
     onLocalizationChanged: {
-         messageDialog.buttonsModel.setProperty(0, "Name", qsTr("OK"));
+        messageDialog.buttonsModel.setProperty(0, "Name", qsTr("OK"));
     }
 
     contentComp: Component { MessageDialogBody {
-        message: messageDialog.message;
-    } }
+            width: messageDialog.width;
+            message: messageDialog.message;
+        } }
 
     Component{
         id: emptyDecorator;

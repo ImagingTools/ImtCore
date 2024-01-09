@@ -17,12 +17,6 @@ namespace imtlicgql
 
 // reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-bool CFeatureDependenciesProviderComp::IsRequestSupported(const imtgql::CGqlRequest& /*gqlRequest*/) const
-{
-	return true;
-}
-
-
 imtbase::CTreeItemModel* CFeatureDependenciesProviderComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	const imtgql::CGqlObject* gqlInputParamPtr = gqlRequest.GetParam("input");
