@@ -60,6 +60,7 @@ global.OriginWebSocket = WebSocket
 global.queueLink = []
 global.UIDList = {}
 global.Singletons = {}
+global.classList = {}
 
 
 import Map from 'ol/Map.js'
@@ -280,9 +281,28 @@ window.onload = ()=>{
     console.time('build')
     for(let name in SingletonClass){
         let obj = new SingletonClass[name]()
-        Singletons[name] = obj
-        if(obj.$id) Singletons[obj.$id] = obj
-        obj.$complete()
+
+        Object.defineProperty(Singletons, name, {
+            get(){
+                obj.$complete()
+                return obj
+            }
+        })
+        if(obj.$id){
+            Object.defineProperty(Singletons, obj.$id, {
+                get(){
+                    obj.$complete()
+                    return obj
+                }
+            })
+        }
+        
+        // Singletons[name] = obj
+        // if(obj.$id) Singletons[obj.$id] = obj
+        // obj.$complete()
+    }
+    for(let name in Singletons){
+        Singletons[name].$complete()
     }
     let root = new (Function('return '+document.body.dataset.qml.replace('.qml', ''))())(mainRoot)
     for(let update of updateList.splice(0, updateList.length)){

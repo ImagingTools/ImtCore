@@ -79,6 +79,9 @@ class QObject extends ComplexObject {
     }
 
     $complete(){
+        if(this.$completed) return
+        
+        this.$completed = true
         if(this.$signals['Component.completed']) this.$signals['Component.completed']()
         for(let i = this.$data.length - 1; i >= 0; i--){
             this.$data[i].$complete()

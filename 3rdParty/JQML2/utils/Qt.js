@@ -64,7 +64,19 @@ var Qt = {
                 if(className.indexOf(name) < 0) className.push(name)
             }
         }
-        let cls = eval(className.join('_'))
+        let cls
+        try {
+            cls = eval(className.join('_'))
+        } catch (error) {
+            let name = path.replaceAll('/', '_').replaceAll('\\', '_').replaceAll('.qml', '').split('_').pop()
+            for(let key in classList){
+                if(key.indexOf(name) >= 0){
+                    cls = classList[key]
+                    break
+                }
+            }
+        }
+        
         return new cls(parent)
     },
 }

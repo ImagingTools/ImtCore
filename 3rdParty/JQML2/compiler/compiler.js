@@ -1375,6 +1375,7 @@ while(queueFiles.length){
     code.push(`}`)
     code.push(`}`)
     if(compiledFile.instructions.Singleton) code.push(`SingletonClass['${SingletonName}'] = ${className}`)
+    code.push(`classList['${className}'] = ${className}`)
 
 }
 
