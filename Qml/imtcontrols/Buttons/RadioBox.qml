@@ -28,8 +28,7 @@ Rectangle{
         clip: true;
         property int selectedIndex: -1;
         model: 5;
-        delegate:
-            CustomRadioButton{
+        delegate: RadioButton{
             anchors.verticalCenter: parent.verticalCenter;
             text: model.text;
             checkState: model.index == list.selectedIndex ? Qt.Checked : Qt.Unchecked;
