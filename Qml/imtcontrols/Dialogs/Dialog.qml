@@ -11,7 +11,7 @@ ControlBase {
     width: Style.isQtStyle ? !decorator ? 0 : decorator.width : dialogColumn.width;
     height: Style.isQtStyle ? !decorator ? 0 : decorator.height : dialogColumn.height;
 
-    decoratorComponent: Style.isQtStyle ? DecoratorsQt.dialogDecorator: Decorators.dialogDecorator;
+    decoratorComponent: Style.dialogDecorator;
     property var decoratorItem: null;
 
     property string title;
@@ -270,7 +270,7 @@ ControlBase {
             Loader {
                 id: loaderTopPanel;
 
-                source: "../../../../qml/imtgui/AuxComponents/Dialogs/TopPanelDialog.qml";
+                source: "TopPanelDialog.qml";
                 onLoaded:  {
                     console.log("loaderTopPanel onLoaded");
 

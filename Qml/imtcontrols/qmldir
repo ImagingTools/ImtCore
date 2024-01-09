@@ -1,13 +1,19 @@
 module imtcontrols
 
 singleton Events 1.0 ./Base/Events.qml
+singleton Enums 1.0 ./Base/Enums.qml
+
+Icon 1.0 ./Base/Icon.js
+Mode 1.0 ./Base/Mode.js
+
 ControlBase 1.0 ./Base/ControlBase.qml
 DecoratorBase 1.0 ./Base/DecoratorBase.qml
+Decorators 1.0 ./Base/Decorators.qml
+DecoratorsQt 1.0 ./Base/DecoratorsQt.qml
+StyleBase 1.0 ./Base/StyleBase.qml
 MainWindow 1.0 MainWindow.qml
 WrapItem 1.0 WrapItem.qml
-Enums 1.0 ./Base/Enums.qml
 ButtonType 1.0 ./Base/ButtonType.js
-Icon 1.0 ./Base/Icon.js
 
 
 Action 1.0 ./Actions/Action.qml

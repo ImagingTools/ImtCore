@@ -31,6 +31,7 @@ TopButtonDecorator_ 1.0 Panels/TopButtonDecorator.qml
 TopCenterPanel 1.0 Panels/TopCenterPanel.qml
 TopCenterPanelDecorator 1.0 Panels/TopCenterPanelDecorator.qml
 TopLeftPanel 1.0 Panels/TopLeftPanel.qml
+TopLeftPanelDecorator 1.0 Panels/TopLeftPanelDecorator.qml
 TopPanel 1.0 Panels/TopPanel.qml
 TopPanelDecorator 1.0 Panels/TopPanelDecorator.qml
 TopRightPanel 1.0 Panels/TopRightPanel.qml

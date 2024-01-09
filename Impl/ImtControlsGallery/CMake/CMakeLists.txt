@@ -135,6 +135,7 @@ if(DEFINED CONTROLS_QML_DIRS AND CONTROLS_QML_DIRS)
 	# list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtguigql/Qml")
 	# list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtcontrols/Qml")
 	list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Qml")
+	list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Qml/imtcontrols/Base")
 	# list(APPEND QML_IMPORT_DIRS "${CMAKE_CURRENT_LIST_DIR}/../Qml")
 
 	# Prevent adding duplicate values at each run of CMake.

@@ -1,7 +1,18 @@
+pragma Singleton
 import QtQuick 2.12
 //import QtQuick.Controls 2.15
 
+import "./Icon.js" as Icon2
+
 QtObject {
+    property int ok: 1024
+    property int yes: 16384
+
+    function test (){
+
+    }
+
+
 
     enum ButtonType {
         Ok = 1024,

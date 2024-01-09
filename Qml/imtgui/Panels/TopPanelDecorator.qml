@@ -15,6 +15,17 @@ DecoratorBase {
         console.log("topPanelDecorator base onCompleted")
     }
 
+    Rectangle {
+        anchors.fill: parent
+
+        gradient: Gradient {
+            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
+            GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
+            GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
+            GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
+        }
+    }
+
     TopCenterPanel {
         id: topCenterPanel;
 
@@ -23,16 +34,11 @@ DecoratorBase {
         width: topPanelDecorator.width - rightPanel.width;
         height: topPanelDecorator.height;
 
-        topPanel: topPanelDecorator.topPanel;
+        // topPanel: topPanelDecorator.topPanel;
 
-        decoratorSource: Style.topCenterPanelDecoratorPath;
+        // decoratorSource: Style.topCenterPanelDecoratorPath;
 
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
-            GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
-            GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
-            GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
-        }
+
     }
 
     TopRightPanel {
@@ -45,14 +51,14 @@ DecoratorBase {
         width: 100;
         height: topPanelDecorator.height;
 
-        decoratorSource: Style.topRightPanelDecoratorPath;
+        // decoratorSource: Style.topRightPanelDecoratorPath;
 
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
-            GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
-            GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
-            GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
-        }
+        // gradient: Gradient {
+        //     GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
+        //     GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
+        //     GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
+        //     GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
+        // }
 
     }
 }

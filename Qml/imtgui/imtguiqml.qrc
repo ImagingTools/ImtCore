@@ -14,17 +14,17 @@
         <file alias="imtgui/Application/ShortcutManager.qml">Application/ShortcutManager.qml</file>
         <file alias="imtgui/Application/ThumbnailDecorator.qml">Application/ThumbnailDecorator.qml</file>
       
-	<file alias="imtgui/Dialogs/LoginDialog.qml">Dialogs/LoginDialog.qml</file>
-	<file alias="imtcontrols/Dialogs/PopupMenuDialogGql.qml">Dialogs/PopupMenuDialogGql.qml</file>
+<file alias="imtgui/Dialogs/LoginDialog.qml">Dialogs/LoginDialog.qml</file>
+		<file alias="imtgui/Dialogs/PopupMenuDialogGql.qml">Dialogs/PopupMenuDialogGql.qml</file>
 
-	<file alias="imtgui/Panels/ButtonPanel.qml">Panels/ButtonPanel.qml</file>	
-	<file alias="imtgui/Panels/CommandsDecorator.qml">Panels/CommandsDecorator.qml</file>
-	<file alias="imtgui/Panels/FilterMenu.qml">Panels/FilterMenu.qml</file>
-	<file alias="imtgui/Panels/FilterPanelDecorator.qml">Panels/FilterPanelDecorator.qml</file>
-	<file alias="imtgui/Panels/MenuPanel.qml">Panels/MenuPanel.qml</file>
-	<file alias="imtgui/Panels/MenuPanelButton.qml">Panels/MenuPanelButton.qml</file>
-	<file alias="imtgui/Panels/MenuPanelButtonDecorator.qml">Panels/MenuPanelButtonDecorator.qml</file>
-	<file alias="imtgui/Panels/SubMenuPanelButtonDecorator.qml">Panels/SubMenuPanelButtonDecorator.qml</file>
+<file alias="imtgui/Panels/ButtonPanel.qml">Panels/ButtonPanel.qml</file>
+		<file alias="imtgui/Panels/CommandsDecorator.qml">Panels/CommandsDecorator.qml</file>
+		<file alias="imtgui/Panels/FilterMenu.qml">Panels/FilterMenu.qml</file>
+		<file alias="imtgui/Panels/FilterPanelDecorator.qml">Panels/FilterPanelDecorator.qml</file>
+		<file alias="imtgui/Panels/MenuPanel.qml">Panels/MenuPanel.qml</file>
+		<file alias="imtgui/Panels/MenuPanelButton.qml">Panels/MenuPanelButton.qml</file>
+		<file alias="imtgui/Panels/MenuPanelButtonDecorator.qml">Panels/MenuPanelButtonDecorator.qml</file>
+		<file alias="imtgui/Panels/SubMenuPanelButtonDecorator.qml">Panels/SubMenuPanelButtonDecorator.qml</file>
 		<file alias="imtgui/Panels/TabDelegate.qml">Panels/TabDelegate.qml</file>
 		<file alias="imtgui/Panels/TabPanel.qml">Panels/TabPanel.qml</file>
 		<file alias="imtgui/Panels/TabPanelDecorator.qml">Panels/TabPanelDecorator.qml</file>
@@ -32,6 +32,7 @@
 		<file alias="imtgui/Panels/TopCenterPanel.qml">Panels/TopCenterPanel.qml</file>
 		<file alias="imtgui/Panels/TopCenterPanelDecorator.qml">Panels/TopCenterPanelDecorator.qml</file>
 		<file alias="imtgui/Panels/TopLeftPanel.qml">Panels/TopLeftPanel.qml</file>
+		<file alias="imtgui/Panels/TopLeftPanelDecorator.qml">Panels/TopLeftPanelDecorator.qml</file>
 		<file alias="imtgui/Panels/TopPanel.qml">Panels/TopPanel.qml</file>
 		<file alias="imtgui/Panels/TopPanelDecorator.qml">Panels/TopPanelDecorator.qml</file>
 		<file alias="imtgui/Panels/TopRightPanel.qml">Panels/TopRightPanel.qml</file>

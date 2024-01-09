@@ -1,21 +1,27 @@
 <RCC>
     <qresource prefix="/qml">
-	<file alias="imtcontrols/qmldir">qmldir</file>
+		<file alias="imtcontrols/qmldir">qmldir</file>
+
+		<file alias="imtcontrols/Base/StyleBase.qml">Base/StyleBase.qml</file>
+		<file alias="imtcontrols/Base/ControlBase.qml">Base/ControlBase.qml</file>
+		<file alias="imtcontrols/Base/DecoratorBase.qml">Base/DecoratorBase.qml</file>
+		<file alias="imtcontrols/Base/DecoratorsQt.qml">Base/DecoratorsQt.qml</file>
+		<file alias="imtcontrols/Base/Decorators.qml">Base/Decorators.qml</file>
+		<file alias="imtcontrols/Base/Events.qml">Base/Events.qml</file>
+		<file alias="imtcontrols/Base/Enums.qml">Base/Enums.qml</file>
+		<file alias="imtcontrols/Base/ButtonType.js">Base/ButtonType.js</file>
+		<file alias="imtcontrols/Base/IconTest.qml">Base/IconTest.qml</file>
+		<file alias="imtcontrols/Base/Icon.js">Base/Icon.js</file>
+		<file alias="imtcontrols/Base/Mode.js">Base/Mode.js</file>
+		<file alias="imtcontrols/Base/jsonpath.js">Base/jsonpath.js</file>
+		<file alias="MainWindow.qml">Base/MainWindow.qml</file>
+		<file alias="WrapItem.qml">Base/WrapItem.qml</file>
+
 		<file alias="imtcontrols/Actions/Action.qml">Actions/Action.qml</file>
 		<file alias="imtcontrols/Actions/PopupMenuDelegate.qml">Actions/PopupMenuDelegate.qml</file>
 		<file alias="imtcontrols/Actions/ShortcutManager.qml">Actions/ShortcutManager.qml</file>
 		<file alias="imtcontrols/Actions/MovingItem.qml">Actions/MovingItem.qml</file>
 		<file alias="imtcontrols/Actions/ControlArea.qml">Actions/ControlArea.qml</file>
-
-		<file alias="imtcontrols/Base/ControlBase.qml">Base/ControlBase.qml</file>
-		<file alias="imtcontrols/Base/DecoratorBase.qml">Base/DecoratorBase.qml</file>
-		<file alias="imtcontrols/Base/Events.qml">Base/Events.qml</file>
-		<file alias="imtcontrols/Base/Enums.qml">Base/Enums.qml</file>
-		<file alias="imtcontrols/Base/ButtonType.js">Base/ButtonType.js</file>
-		<file alias="imtcontrols/Base/Icon.js">Base/Icon.js</file>
-		<file alias="imtcontrols/Base/jsonpath.js">Base/jsonpath.js</file>
-        	<file alias="MainWindow.qml">Base/MainWindow.qml</file>
-        	<file alias="WrapItem.qml">Base/WrapItem.qml</file>
 
 		<file alias="imtcontrols/Buttons/AuxButton.qml">Buttons/AuxButton.qml</file>
 		<file alias="imtcontrols/Buttons/Button.qml">Buttons/Button.qml</file>
@@ -59,11 +65,11 @@
 		<file alias="imtcontrols/Inputs/TimeIntervalPicker.qml">Inputs/TimeIntervalPicker.qml</file>
 		<file alias="imtcontrols/Inputs/TimePicker.qml">Inputs/TimePicker.qml</file>
 		<file alias="imtcontrols/Inputs/CheckBox.qml">Inputs/CheckBox.qml</file>
-				<file alias="imtcontrols/Inputs/Slider.qml">Inputs/Slider.qml</file>
-				<file alias="imtcontrols/Inputs/RangeSlider.qml">Inputs/RangeSlider.qml</file>
-				<file alias="imtcontrols/Inputs/TextArea.qml">Inputs/TextArea.qml</file>
-				<file alias="imtcontrols/Inputs/SpinBox.qml">Inputs/SpinBox.qml</file>
-				<file alias="imtcontrols/Inputs/SpinBoxComp.qml">Inputs/SpinBoxComp.qml</file>
+		<file alias="imtcontrols/Inputs/Slider.qml">Inputs/Slider.qml</file>
+		<file alias="imtcontrols/Inputs/RangeSlider.qml">Inputs/RangeSlider.qml</file>
+		<file alias="imtcontrols/Inputs/TextArea.qml">Inputs/TextArea.qml</file>
+		<file alias="imtcontrols/Inputs/SpinBox.qml">Inputs/SpinBox.qml</file>
+		<file alias="imtcontrols/Inputs/SpinBoxComp.qml">Inputs/SpinBoxComp.qml</file>
 
 		<file alias="imtcontrols/Models/ModelIndex.qml">Models/ModelIndex.qml</file>
 		<file alias="imtcontrols/Models/UuidGenerator.qml">Models/UuidGenerator.qml</file>
@@ -108,13 +114,13 @@
 		<file alias="imtcontrols/Views/TreeViewModelAdapter.qml">Views/TreeViewModelAdapter.qml</file>
 		<file alias="imtcontrols/Views/TreeViewSelection.qml">Views/TreeViewSelection.qml</file>
 		<file alias="imtcontrols/Views/ProgressBar.qml">Views/ProgressBar.qml</file>
-				<file alias="imtcontrols/Views/ProgressRoundIndicator.qml">Views/ProgressRoundIndicator.qml</file>
-				<file alias="imtcontrols/Views/DrawingContainer.qml">Views/DrawingContainer.qml</file>
-				<file alias="imtcontrols/Views/SplitView.qml">Views/SplitView.qml</file>
-				<file alias="imtcontrols/Views/SwipeView.qml">Views/SwipeView.qml</file>
-				<file alias="imtcontrols/Views/TableTreeView.qml">Views/TableTreeView.qml</file>
-				<file alias="imtcontrols/Views/TableDecorator.qml">Views/TableDecorator.qml</file>
-				<file alias="imtcontrols/Views/TableTreeDecorator.qml">Views/TableTreeDecorator.qml</file>
+		<file alias="imtcontrols/Views/ProgressRoundIndicator.qml">Views/ProgressRoundIndicator.qml</file>
+		<file alias="imtcontrols/Views/DrawingContainer.qml">Views/DrawingContainer.qml</file>
+		<file alias="imtcontrols/Views/SplitView.qml">Views/SplitView.qml</file>
+		<file alias="imtcontrols/Views/SwipeView.qml">Views/SwipeView.qml</file>
+		<file alias="imtcontrols/Views/TableTreeView.qml">Views/TableTreeView.qml</file>
+		<file alias="imtcontrols/Views/TableDecorator.qml">Views/TableDecorator.qml</file>
+		<file alias="imtcontrols/Views/TableTreeDecorator.qml">Views/TableTreeDecorator.qml</file>
 		<file alias="imtcontrols/Views/TableViewItemDelegateBase.qml">Views/TableViewItemDelegateBase.qml</file>
 		<file alias="imtcontrols/Views/TreeViewCommandsDelegateBase.qml">Views/TreeViewCommandsDelegateBase.qml</file>
 		<file alias="imtcontrols/Views/TreeViewItemDelegateBase.qml">Views/TreeViewItemDelegateBase.qml</file>

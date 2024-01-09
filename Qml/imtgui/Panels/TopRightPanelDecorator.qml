@@ -4,12 +4,8 @@ import imtauthgui 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 
-Rectangle {
+DecoratorBase {
     id: topRightPanelDecorator;
-
-    color: "transparent";
-
-    radius: 7;
 
     Component.onCompleted: {
         Events.subscribeEvent("UserModeChanged", topRightPanelDecorator.onUserModeChanged);
