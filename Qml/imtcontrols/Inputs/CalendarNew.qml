@@ -3,11 +3,13 @@ import QtGraphicalEffects 1.12
 
 import Acf 1.0
 import imtgui 1.0
+import imtqml 1.0
+
 
 Rectangle {
     id: calendar;
 
-    width:400;
+    width: 400;
     height: 480;
     radius: 8;
 
@@ -67,20 +69,20 @@ Rectangle {
     ];
 
     property var monthNamesRus:
-            [
-            qsTr("Январь"),
-            qsTr("Февраль"),
-            qsTr("Март"),
-            qsTr("Апрель"),
-            qsTr("Май"),
-            qsTr("Июнь"),
-            qsTr("Июль"),
-            qsTr("Август"),
-            qsTr("Сентябрь"),
-            qsTr("Октябрь"),
-            qsTr("Ноябрь"),
-            qsTr("Декабрь")
-        ];
+        [
+        qsTr("Январь"),
+        qsTr("Февраль"),
+        qsTr("Март"),
+        qsTr("Апрель"),
+        qsTr("Май"),
+        qsTr("Июнь"),
+        qsTr("Июль"),
+        qsTr("Август"),
+        qsTr("Сентябрь"),
+        qsTr("Октябрь"),
+        qsTr("Ноябрь"),
+        qsTr("Декабрь")
+    ];
 
     property var dayOfWeek: dayOfWeekRus;
 
@@ -138,6 +140,7 @@ Rectangle {
     property alias yearCombo: yearComboObj;
 
     property alias topPanel: topPanelObj;
+    property alias topPanelHeight: topPanelObj.height;
 
     property bool compl: false;
 
@@ -164,8 +167,57 @@ Rectangle {
 
     Component.onCompleted: {
 
-            calendar.setMaxMonthName();
+        calendar.setMaxMonthName();
 
+        var date = new Date();
+
+        calendar.dateStart = date;
+        calendar.dateFinish = date;
+        calendar.today = date;
+
+        calendar.todayDay = date.getDate();
+        calendar.todayMonth = date.getMonth();
+        calendar.todayYear = date.getFullYear();
+
+        calendar.selectedIndexYear = date.getFullYear();
+        calendar.selectedIndexMonth = date.getMonth();
+        calendar.selectedMonthName  = calendar.monthName(calendar.selectedIndexMonth);
+        topPanelTextMonth.text = calendar.monthName(calendar.selectedIndexMonth);
+
+        if(calendar.startYear < 1 || calendar.lastYear < 1){
+            calendar.startYear = 1900;
+            calendar.lastYear = 2100;
+        }
+        if(calendar.startYear > calendar.todayYear || calendar.lastYear < calendar.todayYear){
+            calendar.startYear = 1900;
+            calendar.lastYear = 2100;
+        }
+
+        if(calendar.startYear > calendar.lastYear){
+            var temp = calendar.startYear;
+            calendar.startYear = calendar.lastYear;
+            calendar.lastYear = temp;
+        }
+
+        calendar.fillMonthModel(calendar.selectedIndexMonth, calendar.selectedIndexYear);
+        listview.canFillModel = true;
+
+        calendar.fillYearComboModel();
+        calendar.fillMonthComboModel();
+
+        for(let i = 0; i < dayOfWeek.length; i++){
+            let name = dayOfWeek[i];
+            dayOfWeekListModel.append({"name": name});
+        }
+
+    }
+
+    onRootChanged: {
+        calendar.root.backgroundItem.opacity = 0.4;
+    }
+
+    onVisibleChanged: {
+        if(calendar.visible){
             var date = new Date();
 
             calendar.dateStart = date;
@@ -179,48 +231,8 @@ Rectangle {
             calendar.selectedIndexYear = date.getFullYear();
             calendar.selectedIndexMonth = date.getMonth();
             calendar.selectedMonthName  = calendar.monthName(calendar.selectedIndexMonth);
+            topPanelTextMonth.text = calendar.monthName(calendar.selectedIndexMonth);
 
-            if(calendar.startYear < 1 || calendar.lastYear < 1){
-                calendar.startYear = 1900;
-                calendar.lastYear = 2100;
-            }
-            if(calendar.startYear > calendar.todayYear || calendar.lastYear < calendar.todayYear){
-                calendar.startYear = 1900;
-                calendar.lastYear = 2100;
-            }
-
-            if(calendar.startYear > calendar.lastYear){
-                var temp = calendar.startYear;
-                calendar.startYear = calendar.lastYear;
-                calendar.lastYear = temp;
-            }
-
-            calendar.fillMonthModel(calendar.selectedIndexMonth, calendar.selectedIndexYear);
-            listview.canFillModel = true;
-
-            calendar.fillYearComboModel();
-            calendar.fillMonthComboModel();
-
-            for(let i = 0; i < dayOfWeek.length; i++){
-                let name = dayOfWeek[i];
-                dayOfWeekListModel.append({"name": name});
-            }
-
-    }
-
-    onRootChanged: {
-        calendar.root.backgroundItem.opacity = 0.4;
-    }
-
-    onVisibleChanged: {
-        if(calendar.visible){
-            var date = new Date();
-
-            calendar.today = date;
-
-            calendar.todayDay = date.getDate();
-            calendar.todayMonth = date.getMonth();
-            calendar.todayYear = date.getFullYear();
         }
     }
 
