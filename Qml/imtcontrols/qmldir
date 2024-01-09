@@ -4,7 +4,6 @@ singleton Events 1.0 ./Base/Events.qml
 singleton Enums 1.0 ./Base/Enums.qml
 
 Icon 1.0 ./Base/Icon.js
-Mode 1.0 ./Base/Mode.js
 
 ControlBase 1.0 ./Base/ControlBase.qml
 DecoratorBase 1.0 ./Base/DecoratorBase.qml

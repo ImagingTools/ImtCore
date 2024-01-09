@@ -12,7 +12,6 @@
 		<file alias="imtcontrols/Base/ButtonType.js">Base/ButtonType.js</file>
 		<file alias="imtcontrols/Base/IconTest.qml">Base/IconTest.qml</file>
 		<file alias="imtcontrols/Base/Icon.js">Base/Icon.js</file>
-		<file alias="imtcontrols/Base/Mode.js">Base/Mode.js</file>
 		<file alias="imtcontrols/Base/jsonpath.js">Base/jsonpath.js</file>
 		<file alias="MainWindow.qml">Base/MainWindow.qml</file>
 		<file alias="WrapItem.qml">Base/WrapItem.qml</file>

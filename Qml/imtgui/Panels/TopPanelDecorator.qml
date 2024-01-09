@@ -1,5 +1,4 @@
 import QtQuick 2.12
-import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 
@@ -33,12 +32,6 @@ DecoratorBase {
 
         width: topPanelDecorator.width - rightPanel.width;
         height: topPanelDecorator.height;
-
-        // topPanel: topPanelDecorator.topPanel;
-
-        // decoratorSource: Style.topCenterPanelDecoratorPath;
-
-
     }
 
     TopRightPanel {
@@ -50,16 +43,6 @@ DecoratorBase {
 
         width: 100;
         height: topPanelDecorator.height;
-
-        // decoratorSource: Style.topRightPanelDecoratorPath;
-
-        // gradient: Gradient {
-        //     GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
-        //     GradientStop { position: 0.97; color: Style.imagingToolsGradient2; }
-        //     GradientStop { position: 0.98; color: Style.imagingToolsGradient3; }
-        //     GradientStop { position: 1.0; color: Style.imagingToolsGradient4; }
-        // }
-
     }
 }
 
