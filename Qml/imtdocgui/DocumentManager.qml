@@ -202,12 +202,12 @@ Item {
                     }
 
                     if (documentId === ""){
-//                        documentController.setData(document.gqlAddCommandId, documentId, documentModel, additionInputParams, callBack);
-                        documentController.setData(documentTypeId, documentId, documentModel, additionInputParams, callBack);
+                        documentController.setData(document.gqlAddCommandId, documentId, documentModel, additionInputParams, callBack);
+//                        documentController.setData(documentTypeId, documentId, documentModel, additionInputParams, callBack);
                     }
                     else{
-                        documentController.updateData(documentTypeId, documentId, documentModel, additionInputParams, callBack);
-//                        documentController.updateData(document.gqlUpdateCommandId, documentId, documentModel, additionInputParams, callBack);
+//                        documentController.updateData(documentTypeId, documentId, documentModel, additionInputParams, callBack);
+                        documentController.updateData(document.gqlUpdateCommandId, documentId, documentModel, additionInputParams, callBack);
                     }
                 }
             }

@@ -14,10 +14,10 @@ Item {
     property string documentTypeId;
 
 //    // GraphQL command for creating a new document
-//    property string gqlAddCommandId: documentTypeId + "Add";
+    property string gqlAddCommandId: documentTypeId + "Add";
 
 //    // GraphQL command for updating a document
-//    property string gqlUpdateCommandId: documentTypeId + "Update";
+    property string gqlUpdateCommandId: documentTypeId + "Update";
 
 //    // GraphQL command for getting document data
 //    property string gqlGetCommandId: documentTypeId + "Item";

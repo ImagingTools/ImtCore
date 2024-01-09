@@ -211,8 +211,8 @@ QtObject {
     }
 
     property GqlModel gqlUpdateModel: GqlModel {
-        function setData(documentTypeId, documentId, documentData, additionInputParams, callback){
-            var query = Gql.GqlRequest("mutation", documentTypeId + "Update");
+        function setData(updateCommandId, documentId, documentData, additionInputParams, callback){
+            var query = Gql.GqlRequest("mutation", updateCommandId);
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", documentId);
@@ -251,8 +251,8 @@ QtObject {
                     if (container.gqlUpdateModel.ContainsKey("errors")){
                         dataModelLocal = container.gqlUpdateModel.GetData("errors");
 
-                        if (dataModelLocal.ContainsKey(documentTypeId + "Update")){
-                            dataModelLocal = dataModelLocal.GetData(documentTypeId + "Update");
+                        if (dataModelLocal.ContainsKey(updateCommandId)){
+                            dataModelLocal = dataModelLocal.GetData(updateCommandId);
                         }
 
                         let message = ""
@@ -271,8 +271,8 @@ QtObject {
                     else if (container.gqlUpdateModel.ContainsKey("data")){
                         dataModelLocal = container.gqlUpdateModel.GetData("data");
 
-                        if (dataModelLocal.ContainsKey(documentTypeId + "Update")){
-                            dataModelLocal = dataModelLocal.GetData(documentTypeId + "Update");
+                        if (dataModelLocal.ContainsKey(updateCommandId)){
+                            dataModelLocal = dataModelLocal.GetData(updateCommandId);
                             dataModelLocal = dataModelLocal.GetData("updatedNotification");
 
                             let documentId = dataModelLocal.GetData("Id");
