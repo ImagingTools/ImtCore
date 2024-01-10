@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
+import QtQuick.Window 2.2
 
 Item {
     id: container;
@@ -25,13 +26,22 @@ Item {
         console.log("DialogsManager onFinished", result);
     }
 
-    function openDialog(comp, parameters, callback){
-        console.log("DialogsManager addDialog", comp, parameters, callback);
-        modalDialogModels.append({"Component": comp, "Parameters": parameters});
+    function openDialog(comp, parameters, mode, callback){
+        console.log("DialogsManager addDialog", comp, parameters, mode, callback);
+        let dialogMode = mode !== undefined ? mode : Style.dialogMode !== undefined ? Style.dialogMode: "Internal";
 
-        if (callback){
-            finished.connect(callback);
+        /*for Windows style dialogs*/
+        if(dialogMode == "External"){
+            container.openWindow(comp, parameters);
         }
+        else {
+            modalDialogModels.append({"Component": comp, "Parameters": parameters});
+
+            if (callback){
+                finished.connect(callback);
+            }
+        }
+
     }
 
     function closeDialog(){
@@ -166,5 +176,82 @@ Item {
                 }
             }
         }
+    }
+
+    /*for Windows style dialogs*/
+    function openWindow(comp, parameters){
+        console.log("DialogsManager addWindow", comp);
+        let obj = windowComp.createObject(container);
+        obj.parameters = parameters;
+        obj.sourceComponent = comp;
+        for (let key in parameters) {
+            if(key == "modality"){
+                obj[key] = parameters[key];
+            }
+        }
+        obj.show();
+    }
+
+    Component {
+        id: windowComp;
+
+        Window {
+            id: windowObj;
+
+            title: " ";
+
+            flags: Qt.Dialog;
+            modality: Qt.NonModal;//Qt.WindowModal
+
+            width: 100;
+            height: 100;
+
+            property var parameters;
+            property alias sourceComponent: windowLoader.sourceComponent;
+            property Item item: !windowLoader.item ? null : windowLoader.item;
+
+            function closeFunc(buttonId){
+                windowObj.close();
+            }
+
+            Component.onDestruction:  {
+            }
+
+            onClosing:{
+                console.log("closing window")
+                windowObj.destroy();
+            }
+
+            onWidthChanged: {
+                if(windowLoader.item){
+                    windowLoader.item.width = windowObj.width;
+                }
+            }
+
+            onHeightChanged: {
+                if(windowLoader.item){
+                    windowLoader.item.height = windowObj.height;
+                }
+            }
+
+            Loader{
+                id: windowLoader;
+
+                onLoaded: {
+                    item.finished.connect(windowObj.closeFunc);
+                    windowObj.width = item.width;
+                    windowObj.height = item.height;
+
+                    for (let key in windowObj.parameters) {
+                        if(item[key] !== undefined){
+                            item[key] = windowObj.parameters[key];
+                        }
+                    }
+
+                }
+            }
+
+        }
+
     }
 }
