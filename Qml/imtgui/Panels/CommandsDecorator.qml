@@ -103,11 +103,14 @@ Item {
                     }
 
                     onClicked: {
+                        console.log("onClicked");
                         Events.sendEvent(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);
                     }
 
                     Rectangle {
                         id: notification;
+
+                        z: parent.z + 1;
 
                         anchors.top: parent.top;
                         anchors.right: parent.right;

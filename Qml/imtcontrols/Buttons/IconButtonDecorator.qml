@@ -1,7 +1,8 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtcontrols 1.0
 
-Item {
+DecoratorBase {
     id: commonButtonDecorator;
 
     width: iconObj.width + textObj.width + Style.paddingSmall * 3;
@@ -13,8 +14,6 @@ Item {
     property alias color: mainRec.color;
     property alias icon: iconObj;
 
-
-
     Rectangle{
         id: mainRec;
 
@@ -22,9 +21,6 @@ Item {
 
         radius: 2;
 
-//        color: baseButton.pressed || baseButton.checked ? Style.buttonPressedColor : baseButton.hoverEnabled && baseButton.hovered ? Style.hover :
-//                                                                              baseButton.hovered ? Style.selectedColor:
-//                                                                              Style.buttonColor;
         color: baseButton.pressed || baseButton.checked ? Style.buttonPressedColor : Style.buttonColor;
 
         border.width: 1;

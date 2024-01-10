@@ -17,7 +17,7 @@ Item {
 
         spacing: 10;
 
-        AuxButton {
+        Button {
             id: backupButton;
 
             width: 70;
@@ -35,7 +35,7 @@ Item {
             }
         }
 
-        AuxButton {
+        Button {
             id: restoreButton;
 
             width: 70;

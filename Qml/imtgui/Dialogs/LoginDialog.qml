@@ -153,7 +153,7 @@ Rectangle {
             }
         }
     }
-    AuxButton {
+    Button {
         id: loginButton;
 
         anchors.top: footerRec.bottom;

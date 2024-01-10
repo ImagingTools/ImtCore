@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.15
 import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
@@ -270,7 +270,7 @@ Item {
 
                         sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
                         onLoaded: {
-                            if(inputDecoratorLoader3.item){
+                            if(inputDecoratorLoader3.item && inputDecoratorLoader3.item.rootItem){
                                 inputDecoratorLoader3.item.rootItem = nameInput;
                             }
                         }
@@ -301,10 +301,10 @@ Item {
                     }
                 }
 
-                RegExpValidator {
+                RegularExpressionValidator {
                     id: mailValid;
 
-                    regExp: /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+                    regularExpression: /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
                 }
 
                 CustomTextField {

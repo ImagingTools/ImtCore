@@ -24,23 +24,27 @@ Item {
     property int offset: 0;
     property int count: -1;
 
+    property bool hasRemoteChanges: false;
+
     property TreeItemModel filterModel: TreeItemModel {};
 
     signal modelUpdated();
     signal failed();
 
     function updateModel(inputParams){
-        if (container.commandId == ""){
-            console.log( "ERROR: CollectionDataProvider commandId is empty!");
+        if (!completed || hasRemoteChanges){
+            if (container.commandId == ""){
+                console.log( "ERROR: CollectionDataProvider commandId is empty!");
 
-            return;
+                return;
+            }
+
+            if (!inputParams){
+                inputParams = {}
+            }
+
+            container.itemsInfoModel.updateModel(inputParams, container.fields);
         }
-
-        if (!inputParams){
-            inputParams = {}
-        }
-
-        container.itemsInfoModel.updateModel(inputParams, container.fields);
     }
 
     Component.onCompleted: {
@@ -52,18 +56,6 @@ Item {
         sortModel.SetData("SortOrder", orderType);
         sortModel.SetData("HeaderId", sortByField);
     }
-
-//    Component.onDestruction: {
-//        if (container.commandId !== ""){
-//            Events.unSubscribeEvent(container.commandId + "CollectionUpdated", container.updateModel);
-//        }
-//    }
-
-//    onCommandIdChanged: {
-//        if (container.commandId !== ""){
-//            Events.subscribeEvent(container.commandId + "CollectionUpdated", container.updateModel);
-//        }
-//    }
 
     onOrderTypeChanged: {
         let sortModel = filterModel.GetTreeItemModel("Sort");
@@ -81,6 +73,12 @@ Item {
         }
 
         sortModel.SetData("HeaderId", sortByField);
+    }
+
+    onHasRemoteChangesChanged: {
+        if (hasRemoteChanges){
+            updateModel();
+        }
     }
 
     function setSortingHeader(headerId){
@@ -173,6 +171,7 @@ Item {
                         container.modelUpdated();
 
                         container.completed = true;
+                        container.hasRemoteChanges = false;
                     }
                 }
             }
@@ -187,24 +186,26 @@ Item {
     SubscriptionClient {
         id: subscriptionClient;
 
-        property string ok: container.commandId !== "" && container.subscriptionId !== "";
+        property bool ok: container.commandId !== "" && subscriptionClient.subscriptionId !== "";
         onOkChanged: {
-            if (container.commandId !== ""){
+            if (ok){
                 let subscriptionRequestId = "On" + container.commandId + "CollectionChanged"
                 var query = Gql.GqlRequest("subscription", subscriptionRequestId);
                 var queryFields = Gql.GqlObject("notification");
                 queryFields.InsertField("Id");
                 query.AddField(queryFields);
 
-                subscriptionManager.registerSubscription(query, subscriptionClient);
+                console.log("CollectionDataProvider subscriptionClient register", subscriptionRequestId, subscriptionClient.subscriptionId);
+
+                Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient});
             }
         }
 
         onStateChanged: {
             if (state === "Ready"){
-                console.log("CollectionDataProvider subscriptionClient Ready", subscriptionClient.commandId);
+                console.log("CollectionDataProvider subscriptionClient Ready", subscriptionClient.subscriptionId);
 
-                container.updateModel();
+                container.hasRemoteChanges = true;
             }
         }
     }

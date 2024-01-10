@@ -15,11 +15,6 @@ Item {
 
         spacing: 10;
 
-//        BaseText {
-//            width: parent.width;
-//            text: qsTr("Host");
-//        }
-
         CustomTextField {
             id: hostInput;
 
@@ -37,33 +32,5 @@ Item {
                 console.log("model.Host", model.Value);
             }
         }
-
-//        BaseText {
-//            width: parent.width;
-//            text: qsTr("Port");
-//        }
-
-//        CustomTextField {
-//            id: portInput;
-
-//            width: parent.width;
-//            height: 30;
-
-//            text: model.Port;
-
-//            textInputValidator: intValid;
-
-//            onTextChanged: {
-//                if (model.Port !== portInput.text){
-//                    model.Port = portInput.text;
-//                }
-//            }
-//        }
-
-//        RegExpValidator {
-//            id: intValid;
-
-//            regExp: /^[1-9]\d*$/;
-//        }
     }
 }

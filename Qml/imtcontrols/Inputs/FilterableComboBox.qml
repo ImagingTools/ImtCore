@@ -52,13 +52,20 @@ FocusScope {
     property int selectedIndex: -1;
     property bool hoverBlocked: true;
 
-    property string filter: currentText;
+    property string filter;
 
     property Component delegate: Component
     {
         Item {
             width: comboBoxContainer.width;
-            height: visible ? comboBoxContainer.itemHeight : 0;
+//            height: visible ? comboBoxContainer.itemHeight : 0;
+            height: comboBoxContainer.itemHeight;
+
+            onVisibleChanged: {
+                console.log("delegate onVisibleChanged", visible);
+
+                height = visible ? comboBoxContainer.itemHeight : 0;
+            }
 
             property string displayText: model[comboBoxContainer.nameId];
             property string filter: comboBoxContainer.filter;
@@ -225,7 +232,6 @@ FocusScope {
                         text: comboBoxContainer.currentText;
 
                         onTextChanged: {
-                            console.log("Filter TEXT changed ", text);
                             if (!contentItem.filterEnabled){
                                 contentItem.filterEnabled = true;
 

@@ -168,7 +168,7 @@ Rectangle {
                 text: qsTr("Passwords don't match");
             }
 
-            BaseButton {
+            Button {
                 id: okButton;
 
                 anchors.right: parent.right;

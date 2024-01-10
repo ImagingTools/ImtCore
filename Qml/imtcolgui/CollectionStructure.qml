@@ -525,7 +525,7 @@ Item {
                 text: qsTr("This table has been modified from another computer");
             }
 
-            BaseButton {
+            Button {
                 id: updateButton;
 
                 anchors.verticalCenter: parent.verticalCenter;

@@ -138,7 +138,7 @@ Item {
                 model: root.pagesModel;
 
                 delegate:
-                    BaseButton{
+                    Button{
                     id: buttonContainer;
 
                     anchors.left: parent.left;
@@ -147,9 +147,9 @@ Item {
                     anchors.rightMargin: 10;
 
                     text:  model.Name;
-                    selected: root.selectedIndex === model.index;
+//                    selected: root.selectedIndex === model.index;
 
-                    decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
+//                    decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
 
                     onClicked: {
                         if (root.selectedIndex !== model.index){

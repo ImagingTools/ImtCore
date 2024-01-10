@@ -16,41 +16,37 @@ Item {
 
     function addButton(buttonObj){
         console.log("buttonsDialogContainer addButton");
-        buttonsModel.append(buttonObj)
+        buttonsRepeater.model.append(buttonObj)
     }
 
     function setButtonState(buttonId, state){
-        for (let i = 0; i < buttonsModel.count; i++){
-            let id = buttonsModel.get(i).Id;
-            if (id === buttonId){
-                buttonsModel.setProperty(i, "Enabled", state);
+        console.log("setButtonState", buttonId, state);
+        for (let i = 0; i < buttonsRepeater.model.count; i++){
+            let id = buttonsRepeater.model.get(i).Id;
+            console.log("id", id);
+
+            if (id == buttonId){
+                console.log("==");
+                buttonsRepeater.model.setProperty(i, "Enabled", state);
                 break;
             }
         }
     }
 
     function getButtonState(buttonId){
-        for (let i = 0; i < buttonsModel.count; i++){
-            let id = buttonsModel.get(i).Id;
-            if (id === buttonId){
-                return buttonsModel.get(i).Enabled;
+        for (let i = 0; i < buttonsRepeater.model.count; i++){
+            let id = buttonsRepeater.model.get(i).Id;
+            if (id == buttonId){
+                return buttonsRepeater.model.get(i).Enabled;
             }
         }
 
         return false;
     }
 
-    ListModel {
-        id: buttonsModel;
-    }
-
-    Component{
-        id: defaultButtonDecorator;
-        ButtonDecorator{
-            width: 70;
-            height: 25;
-        }
-    }
+//    ListModel {
+//        id: buttonsRepeater.model;
+//    }
 
     Row {
         id: rowButtons;
@@ -62,7 +58,8 @@ Item {
         Repeater {
             id: buttonsRepeater;
 
-            model: buttonsModel;
+            model: ListModel {
+            }
 
             delegate:
 
@@ -74,12 +71,6 @@ Item {
 
                 text: model.Name;
 
-                // decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
-
-//                onLoaded: {
-//                    buttonsDialogContainer.height = buttonContainer.height;
-//                }
-
                 onClicked: {
                     console.log("Button onClicked", model.Id);
                     buttonsDialogContainer.buttonClicked(model.Id);
@@ -88,3 +79,4 @@ Item {
         }
     }
 }
+

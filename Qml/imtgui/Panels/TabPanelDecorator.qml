@@ -5,11 +5,8 @@ import imtcontrols 1.0
 Item {
     id: tabPanelDecorator;
 
-//    width: Math.min(texttabDelegate.width + imagetabDelegate.width + 40, 200);
     width: texttabDelegate.width + imagetabDelegate.width + 40;
     height: baseElement ? baseElement.height : 50
-
-//    clip: true;
 
     property Item baseElement: null;
 
@@ -18,6 +15,10 @@ Item {
         if (tabPanelDecorator.firstElementImageSource !== ""){
             firsElementImage.source = "../../../" + Style.getIconPath(tabPanelDecorator.firstElementImageSource, Icon.State.On, Icon.Mode.Normal);
         }
+    }
+
+    onWidthChanged: {
+        console.log("tabPanelDecorator onWidthChanged", width);
     }
 
     Rectangle {

@@ -1,4 +1,4 @@
-import QtQuick 2.12
+import QtQuick 2.15
 import Acf 1.0
 import imtcontrols 1.0
 import imtgui 1.0
@@ -268,10 +268,10 @@ DocumentData {
                 }
             }
 
-            RegExpValidator {
+            RegularExpressionValidator {
                 id: mailValid;
 
-                regExp: /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+                regularExpression: /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
             }
 
             Text {

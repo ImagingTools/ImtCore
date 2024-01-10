@@ -72,28 +72,4 @@ Rectangle {
             visible: false;
         }
     }
-
-//    BaseButton{
-//        id: buttonContainer;
-
-//        anchors.top: textNoConnection.bottom;
-//        anchors.topMargin: 20;
-//        anchors.horizontalCenter: parent.horizontalCenter;
-
-//        text: qsTr("Refresh");
-
-//        visible: false;
-
-//        decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
-
-//        onClicked: {
-//            container.refresh();
-//        }
-//    }
-
-//    Component{
-//        id: defaultButtonDecorator;
-//        CommonButtonDecorator{
-//        }
-//    }
 }

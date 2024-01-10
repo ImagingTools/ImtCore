@@ -52,7 +52,7 @@ Item {
             Repeater {
                 id: repeater;
 
-                delegate: AuxButton {
+                delegate: Button {
                     width: 18;
                     height: width;
 

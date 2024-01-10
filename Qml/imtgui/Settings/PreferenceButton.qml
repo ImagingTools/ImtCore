@@ -4,10 +4,8 @@ import imtcontrols 1.0
 
 Item {
     property alias iconSource: preferenceButton.iconSource;
-    property alias color: preferenceButton.color;
-    property alias highlighted: preferenceButton.highlighted;
 
-    AuxButton {
+    Button {
         id: preferenceButton;
 
         anchors.verticalCenter: parent ? parent.verticalCenter : undefined;

@@ -11,12 +11,6 @@ CollectionDataProvider {
     commandId: "Accounts";
 
     sortByField: "LicenseName";
-
-    function updateModel(){
-        if (container.collectionModel.GetItemsCount() === 0){
-            container.itemsInfoModel.updateModel({}, container.fields);
-        }
-    }
 }
 
 

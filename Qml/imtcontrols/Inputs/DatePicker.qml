@@ -435,18 +435,18 @@ Item {
 
             Column {
                 anchors.verticalCenter: parent.verticalCenter;
-                AuxButton {
+                Button {
                     id: yearUpButton;
 
                     width: datePicker.buttonWidth;
                     height: datePicker.buttonHeight;
 
-                    iconWidth: datePicker.iconWidth;
-                    iconHeight: datePicker.iconHeight;
+//                    iconWidth: datePicker.iconWidth;
+//                    iconHeight: datePicker.iconHeight;
                     iconSource: datePicker.iconUpSource;
 
-                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
-                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
+//                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
+//                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
 
                     enabled: !datePicker.readOnly;
 
@@ -465,18 +465,18 @@ Item {
                     }
                 }
 
-                AuxButton {
+                Button {
                     id: yearDownButton;
 
                     width: datePicker.buttonWidth;
                     height: datePicker.buttonHeight;
 
-                    iconWidth: datePicker.iconWidth;
-                    iconHeight: datePicker.iconHeight;
+//                    iconWidth: datePicker.iconWidth;
+//                    iconHeight: datePicker.iconHeight;
                     iconSource: datePicker.iconDownSource;
 
-                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
-                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
+//                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
+//                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
 
                     enabled: !datePicker.readOnly;
 
@@ -568,18 +568,18 @@ Item {
 
             Column {
                 anchors.verticalCenter: parent.verticalCenter;
-                AuxButton {
+                Button {
                     id: monthUpButton;
 
                     width: datePicker.buttonWidth;
                     height: datePicker.buttonHeight;
 
-                    iconWidth: datePicker.iconWidth;
-                    iconHeight: datePicker.iconHeight;
+//                    iconWidth: datePicker.iconWidth;
+//                    iconHeight: datePicker.iconHeight;
                     iconSource: datePicker.iconUpSource;
 
-                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
-                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
+//                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
+//                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
 
                     enabled: !datePicker.readOnly;
 
@@ -601,18 +601,18 @@ Item {
                     }
                 }
 
-                AuxButton {
+                Button {
                     id: monthDownButton;
 
                     width: datePicker.buttonWidth;
                     height: datePicker.buttonHeight;
 
-                    iconWidth: datePicker.iconWidth;
-                    iconHeight: datePicker.iconHeight;
+//                    iconWidth: datePicker.iconWidth;
+//                    iconHeight: datePicker.iconHeight;
                     iconSource: datePicker.iconDownSource;
 
-                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
-                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
+//                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
+//                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
 
                     enabled: !datePicker.readOnly;
 
@@ -726,18 +726,18 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter;
                 visible: datePicker.hasDay;
 
-                AuxButton {
+                Button {
                     id: dayUpButton;
 
                     width: datePicker.buttonWidth;
                     height: datePicker.buttonHeight;
 
-                    iconWidth: datePicker.iconWidth;
-                    iconHeight: datePicker.iconHeight;
+//                    iconWidth: datePicker.iconWidth;
+//                    iconHeight: datePicker.iconHeight;
                     iconSource: datePicker.iconUpSource;
 
-                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
-                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
+//                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
+//                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
 
                     enabled: !datePicker.readOnly;
 
@@ -757,18 +757,18 @@ Item {
                     }
                 }
 
-                AuxButton {
+                Button {
                     id: dayDownButton;
 
                     width: datePicker.buttonWidth;
                     height: datePicker.buttonHeight;
 
-                    iconWidth: datePicker.iconWidth;
-                    iconHeight: datePicker.iconHeight;
+//                    iconWidth: datePicker.iconWidth;
+//                    iconHeight: datePicker.iconHeight;
                     iconSource: datePicker.iconDownSource;
 
-                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
-                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
+//                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
+//                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
 
                     enabled: !datePicker.readOnly;
 

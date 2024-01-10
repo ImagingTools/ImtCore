@@ -79,7 +79,7 @@ Rectangle {
                 loading.stop();
             }
             else{
-                // loading.start();
+                 loading.start();
             }
         }
     }
@@ -182,7 +182,7 @@ Rectangle {
                 loading.stop();
             }
             else{
-                // loading.start();
+                 loading.start();
             }
         }
     }
@@ -257,7 +257,7 @@ Rectangle {
         visible: false;
 
         onBeforeSetted: {
-            // loading.start();
+             loading.start();
         }
 
         onVisibleChanged: {
@@ -277,7 +277,7 @@ Rectangle {
 
         onFailed: {
             console.log("onFailed Ready");
-//            loading.stop();
+            loading.stop();
 
             closeAllPages();
         }
@@ -352,7 +352,7 @@ Rectangle {
     Loading {
         id: loading;
 
-        z: -1;
+        z: topPanel.z + 1;
 
         anchors.fill: parent;
 

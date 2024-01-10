@@ -10,12 +10,12 @@ Dialog {
 
     title: qsTr("Preferences");
 
-    notClosingButtons: "Apply";
+    notClosingButtons: Enums.ButtonType.Apply;
 
     topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
 
     buttonsModel: ListModel{
-        ListElement{Id: Enums.ButtonType.Apply; Name:qsTr("Apply"); Enabled: true}
+        ListElement{Id: Enums.ButtonType.Apply; Name:qsTr("Apply"); Enabled: false}
         ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Cancel"); Enabled: true}
     }
 
@@ -67,17 +67,12 @@ Dialog {
     contentComp: Component {
         Preference {
             onModelChanged: {
+                console.log("onModelChanged");
+
                 messageDialog.buttons.setButtonState(Enums.ButtonType.Apply, true);
 
                 messageDialog.buttonsModel.setProperty(1, "Name", qsTr("Cancel"));
             }
-        }
-    }
-
-    Component{
-        id: emptyDecorator;
-        Item{
-            property Item rootItem: null;
         }
     }
 }

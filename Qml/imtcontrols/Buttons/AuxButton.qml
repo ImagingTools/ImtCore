@@ -48,7 +48,7 @@ Rectangle {
     }
 
     Keys.onPressed: {
-        console.log("AuxButton Key pressed!")
+        console.log("Button Key pressed!")
         if (event.key === Qt.Key_Return){
             auxButtonContainer.clicked();
         }

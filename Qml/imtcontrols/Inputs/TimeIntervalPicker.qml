@@ -281,7 +281,7 @@ Item {
 
     //        Column {
     //            anchors.verticalCenter: parent.verticalCenter;
-    //            AuxButton {
+    //            Button {
     //                id: upButton;
 
     //                width: root.buttonWidth;
@@ -299,7 +299,7 @@ Item {
     //                }
     //            }
 
-    //            AuxButton {
+    //            Button {
     //                id: downButton;
 
     //                width: root.buttonWidth;

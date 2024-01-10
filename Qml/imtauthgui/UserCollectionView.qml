@@ -93,7 +93,7 @@ CollectionView {
                 elide: Text.ElideRight;
             }
 
-            AuxButton {
+            Button {
                 id: arrowButton;
 
                 anchors.verticalCenter: parent.verticalCenter;
@@ -106,7 +106,7 @@ CollectionView {
                 iconSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
 
                 onClicked: {
-                    console.log("Roles AuxButton onClicked");
+                    console.log("Roles Button onClicked");
                 }
 
                 Component.onCompleted: {
@@ -168,7 +168,7 @@ CollectionView {
                 elide: Text.ElideRight;
             }
 
-            AuxButton {
+            Button {
                 id: arrowButton;
 
                 anchors.verticalCenter: parent.verticalCenter;

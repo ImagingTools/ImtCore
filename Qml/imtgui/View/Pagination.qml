@@ -71,7 +71,7 @@ Row {
                    paginationContainer.countAllElements) + "/" + paginationContainer.countAllElements + ")"
     }
 
-    AuxButton {
+    Button {
         id: buttonDecr;
 
         anchors.verticalCenter: parent.verticalCenter;
@@ -79,9 +79,9 @@ Row {
         height: 20;
         width: 24;
 
-        hasIcon: true;
-        hasText: false;
-        highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+//        hasIcon: true;
+//        hasText: false;
+//        highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
         enabled: listModel.count > 1 && paginationContainer.currentIndex != 0;
 
@@ -104,19 +104,20 @@ Row {
         Repeater {
             id: repeaterPagination;
 
-            delegate: AuxButton {
+            delegate: Button {
                 id: buttonDelegate;
 
                 height: 20;
-                width: Math.max(24, textWidth + 10);
+//                width: Math.max(24, textWidth + 10);
+                width: 24;
 
-                hasIcon: false;
-                hasText: true;
-                highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+//                hasIcon: false;
+//                hasText: true;
+//                highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
 
                 enabled: model.number !== -1 && paginationContainer.currentIndex !== model.number - 1;
-                textButton: model.number === -1 ? "..." : model.number;
+                text: model.number === -1 ? "..." : model.number;
                 onClicked: {
                     paginationContainer.currentIndex = model.number - 1;
                     if (paginationContainer.pagesSize >= props.maxElementCount){
@@ -136,7 +137,7 @@ Row {
         }
     }
 
-    AuxButton {
+    Button {
         id: buttonIncr;
 
         anchors.verticalCenter: parent.verticalCenter;
@@ -144,9 +145,7 @@ Row {
         height: 20;
         width: 24;
 
-        hasIcon: true;
-        hasText: false;
-        highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+//        highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
         enabled: listModel.count > 1 && paginationContainer.currentIndex != paginationContainer.pagesSize - 1;
 
@@ -173,7 +172,7 @@ Row {
             text: qsTr("Per page: ")
         }
 
-        AuxButton {
+        Button {
             id: count25;
 
             anchors.verticalCenter: parent.verticalCenter;
@@ -181,21 +180,18 @@ Row {
             width: 20;
             height: 20;
 
-            hasIcon: false;
-            hasText: true;
-
-            highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+//            highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
             enabled: paginationContainer.countElements != 25;
 
-            textButton: "25";
+            text: "25";
 
             onClicked: {
                 paginationContainer.countElements = 25;
             }
         }
 
-        AuxButton {
+        Button {
             id: count50;
 
             anchors.verticalCenter: parent.verticalCenter;
@@ -203,21 +199,18 @@ Row {
             width: 20;
             height: 20;
 
-            hasIcon: false;
-            hasText: true;
-
-            highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+//            highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
             enabled: paginationContainer.countElements != 50;
 
-            textButton: "50";
+            text: "50";
 
             onClicked: {
                 paginationContainer.countElements = 50;
             }
         }
 
-        AuxButton {
+        Button {
             id: count100;
 
             anchors.verticalCenter: parent.verticalCenter;
@@ -225,14 +218,11 @@ Row {
             width: 20;
             height: 20;
 
-            hasIcon: false;
-            hasText: true;
-
-            highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+//            highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
             enabled: paginationContainer.countElements != 100;
 
-            textButton: "100";
+            text: "100";
 
             onClicked: {
                 paginationContainer.countElements = 100;

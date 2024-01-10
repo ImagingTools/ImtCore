@@ -36,9 +36,9 @@ ControlBase {
                 baseButton.checked = !baseButton.checked
                 baseButton.toggled()
             }
-            else{
+//            else{
                 baseButton.clicked();
-            }
+//            }
         }
     }
 
@@ -71,7 +71,9 @@ ControlBase {
         cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
         onClicked: {
-            _private.onClicked()
+            if (baseButton.enabled){
+                _private.onClicked()
+            }
         }
         onDoubleClicked: {
             baseButton.doubleClicked();

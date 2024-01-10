@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtcontrols 1.0
 
 Dialog {
     id: inputDialogContainer;
@@ -13,7 +14,7 @@ Dialog {
     Component.onCompleted: {
         console.log("InputDialog onCompleted", inputDialogContainer);
 
-        inputDialogContainer.buttons.addButton({"Id":"Ok", "Name":"OK", "Enabled": false, "Active": true});
+        inputDialogContainer.buttons.addButton({"Id":"Ok", "Name":qsTr("OK"), "Enabled": false, "Active": true});
     }
 
     onFinished: {
@@ -25,6 +26,7 @@ Dialog {
     contentComp: Component { Item {
         id: inputDialogBodyContainer;
 
+        width: inputDialogContainer.width;
         height: columnBody.height + 30;
 
         property alias inputValue: inputField.text;
@@ -95,7 +97,7 @@ Dialog {
                     }
                 }
 
-                AuxButton {
+                Button {
                     id: eyeButton;
 
                     anchors.verticalCenter: parent.verticalCenter;
@@ -105,7 +107,7 @@ Dialog {
                     height: Math.min(24, parent.height - 10);
                     width: height;
 
-                    highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+//                    highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
 //                    iconSource: "../../.." + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal);
 

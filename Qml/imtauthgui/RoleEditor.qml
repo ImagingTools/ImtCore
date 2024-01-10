@@ -279,7 +279,7 @@ Item {
 
                     sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
                     onLoaded: {
-                        if(inputDecoratorLoader1.item){
+                        if(inputDecoratorLoader1.item && inputDecoratorLoader1.item.rootItem){
                             inputDecoratorLoader1.item.rootItem = roleNameInput;
                         }
                     }

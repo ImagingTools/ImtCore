@@ -134,7 +134,7 @@ Rectangle{
                     color: "transparent";
 
 
-                    AuxButton{
+                    Button{
                         id: openButton;
 
                         anchors.verticalCenter: parent.verticalCenter;

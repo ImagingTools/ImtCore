@@ -202,7 +202,7 @@ StyleComponents {
             MouseArea {
                 id: mouseArea;
 
-                anchors.fill: parent;
+                anchors.fill: textFieldItem;
                 cursorShape: !textFieldItem.baseElement ? Qt.ArrowCursor : textFieldItem.baseElement.readOnly ? Qt.ArrowCursor : Qt.IBeamCursor;
 
                 visible: !textFieldItem.baseElement ? false : !textFieldItem.baseElement.readOnly;
@@ -240,7 +240,7 @@ StyleComponents {
             Rectangle {
                 id: mainRect;
 
-                anchors.fill: parent;
+                anchors.fill: textAreaItem;
 
                 color: !textAreaItem.baseElement ? "transparent" : textAreaItem.baseElement.readOnly ? Style.alternateBaseColor : Style.baseColor;
 
@@ -254,9 +254,9 @@ StyleComponents {
             Text {
                 id: placeHolder;
 
-                anchors.left: parent.left;
+                anchors.left: textAreaItem.left;
                 anchors.leftMargin: !textAreaItem.baseElement ? 0 : textAreaItem.baseElement.margin;
-                anchors.verticalCenter: parent.verticalCenter;
+                anchors.verticalCenter: textAreaItem.verticalCenter;
 
 
                 font.pixelSize: Style.fontSize_common;
@@ -274,7 +274,7 @@ StyleComponents {
             MouseArea {
                 id: mouseArea;
 
-                anchors.fill: parent;
+                anchors.fill: textAreaItem;
                 cursorShape: !textAreaItem.baseElement ? Qt.ArrowCursor : textAreaItem.baseElement.readOnly ? Qt.ArrowCursor : Qt.IBeamCursor;
 
                 visible: !textAreaItem.baseElement ? false : !textAreaItem.baseElement.readOnly;
@@ -379,12 +379,12 @@ StyleComponents {
             Rectangle {
                 id: checkRect;
 
-                anchors.left: parent ? parent.left : undefined;
+                anchors.left: checkBoxItem ? checkBoxItem.left : undefined;
                 anchors.leftMargin: !checkBoxItem.baseElement ? 0 : !checkBoxItem.baseElement.isLeftText ? 0 : checkBoxText.width + checkBoxItem.baseElement.mainMargin;
-                anchors.verticalCenter: parent ? parent.verticalCenter : undefined;
+                anchors.verticalCenter: checkBoxItem ? checkBoxItem.verticalCenter : undefined;
 
                 width: height;
-                height: parent.height;
+                height: checkBoxItem.height;
 
                 color: "transparent";
 
@@ -394,7 +394,7 @@ StyleComponents {
                 Image {
                     id: image;
 
-                    anchors.centerIn: parent;
+                    anchors.centerIn: checkRect;
 
                     height: checkRect.height - 1;
                     width: height;
@@ -426,9 +426,9 @@ StyleComponents {
             Text {
                 id: checkBoxText;
 
-                anchors.left: parent ? parent.left : undefined;
+                anchors.left: checkBoxItem ? checkBoxItem.left : undefined;
                 anchors.leftMargin: !checkBoxItem.baseElement ? 0 : checkBoxItem.baseElement.isLeftText ? 0 : checkRect.width + checkBoxItem.baseElement.mainMargin;
-                anchors.verticalCenter: parent ? parent.verticalCenter : undefined;
+                anchors.verticalCenter: checkBoxItem ? checkBoxItem.verticalCenter : undefined;
 
                 color: !checkBoxItem.baseElement ? "transparent" :  checkBoxItem.baseElement.enabled ? Style.buttonText : Style.inactive_buttonText;
 
@@ -466,8 +466,8 @@ StyleComponents {
             Rectangle{
                 id: backgroundRec;
 
-                anchors.left: parent.left;
-                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: switchItem.left;
+                anchors.verticalCenter: switchItem.verticalCenter;
 
                 width: switchItem.backgroundWidth;
                 height: !switchItem.baseElement ? 0 : switchItem.baseElement.backgroundHeight;
@@ -482,10 +482,10 @@ StyleComponents {
             Rectangle{
                 id: controlRec;
 
-                anchors.verticalCenter: parent.verticalCenter;
+                anchors.verticalCenter: switchItem.verticalCenter;
 
                 x: !switchItem.baseElement ? 0 : switchItem.baseElement.controlRecX;
-                width: parent.height;
+                width: switchItem.height;
                 height: width;
                 radius: width;
                 color: !switchItem.baseElement ? "transparent" : switchItem.checked ? switchItem.baseElement.controlColor_checked :
@@ -495,9 +495,9 @@ StyleComponents {
             Text {
                 id: switchText;
 
-                anchors.left: parent.left;
+                anchors.left: switchItem.left;
                 anchors.leftMargin: !switchItem.baseElement ? 0 : switchItem.baseElement.isLeftText ? 0 : backgroundRec.width + switchItem.baseElement.mainMargin;
-                anchors.verticalCenter: parent.verticalCenter;
+                anchors.verticalCenter: switchItem.verticalCenter;
 
                 color: !switchItem.baseElement ? "transparent" :  switchItem.baseElement.enabled ? Style.buttonText : Style.inactive_buttonText;
 
@@ -528,10 +528,10 @@ StyleComponents {
             Rectangle{
                 id: backgroundRec;
 
-                anchors.left: parent.left;
-                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: sliderItem.left;
+                anchors.verticalCenter: sliderItem.verticalCenter;
 
-                width: parent.width;
+                width: sliderItem.width;
                 height: !sliderItem.baseElement ? 0 : sliderItem.baseElement.backgroundHeight;
                 color: !sliderItem.baseElement ? "transparent" : sliderItem.baseElement.backgroundColor;
 
@@ -541,8 +541,8 @@ StyleComponents {
 
                 Rectangle{
                     width: !sliderItem.baseElement ? 0 : sliderItem.baseElement.controlRecX + sliderItem.baseElement.height/2;
-                    height: parent.height;
-                    radius: parent.radius;
+                    height: backgroundRec.height;
+                    radius: backgroundRec.radius;
                     color: !sliderItem.baseElement ? "transparent" : sliderItem.baseElement.controlColor;
                 }
 
@@ -551,10 +551,10 @@ StyleComponents {
             Rectangle{
                 id: controlRec;
 
-                anchors.verticalCenter: parent.verticalCenter;
+                anchors.verticalCenter: sliderItem.verticalCenter;
 
                 x: !sliderItem.baseElement ? 0 : sliderItem.baseElement.controlRecX;
-                width: parent.height;
+                width: sliderItem.height;
                 height: width;
                 radius: width;
                 color: !sliderItem.baseElement ? "transparent" : sliderItem.baseElement.controlColor;
@@ -581,10 +581,10 @@ StyleComponents {
             Rectangle{
                 id: backgroundRec;
 
-                anchors.left: parent.left;
-                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: rangeSliderItem.left;
+                anchors.verticalCenter: rangeSliderItem.verticalCenter;
 
-                width: parent.width;
+                width: rangeSliderItem.width;
                 height: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.backgroundHeight;
                 color: !rangeSliderItem.baseElement ? "transparent" : rangeSliderItem.baseElement.backgroundColor;
 
@@ -595,8 +595,8 @@ StyleComponents {
                 Rectangle{
                     x: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlRecXFirst + rangeSliderItem.baseElement.height/2
                     width: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlRecXSecond - rangeSliderItem.baseElement.controlRecXFirst;
-                    height: parent.height;
-                    radius: parent.radius;
+                    height: backgroundRec.height;
+                    radius: backgroundRec.radius;
                     color: !rangeSliderItem.baseElement ? "transparent" : rangeSliderItem.baseElement.controlColor;
                 }
 
@@ -605,10 +605,10 @@ StyleComponents {
             Rectangle{
                 id: controlRecFirst;
 
-                anchors.verticalCenter: parent.verticalCenter;
+                anchors.verticalCenter: rangeSliderItem.verticalCenter;
 
                 x: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlRecXFirst;
-                width: parent.height;
+                width: rangeSliderItem.height;
                 height: width;
                 radius: width;
                 color: !rangeSliderItem.baseElement ? "transparent" : rangeSliderItem.baseElement.controlColor;
@@ -618,10 +618,10 @@ StyleComponents {
             Rectangle{
                 id: controlRecSecond;
 
-                anchors.verticalCenter: parent.verticalCenter;
+                anchors.verticalCenter: rangeSliderItem.verticalCenter;
 
                 x: !rangeSliderItem.baseElement ? 0 : rangeSliderItem.baseElement.controlRecXSecond;
-                width: parent.height;
+                width: rangeSliderItem.height;
                 height: width;
                 radius: width;
                 color: "green"//!rangeSliderItem.baseElement ? "transparent" : rangeSliderItem.baseElement.controlColor;
@@ -648,7 +648,7 @@ StyleComponents {
             Rectangle {
                 id: radioRect;
 
-                anchors.verticalCenter: parent.verticalCenter;
+                anchors.verticalCenter: radioButtonItem.verticalCenter;
 
                 height: radioButtonItem.checkSize;
                 width: height;
@@ -663,7 +663,7 @@ StyleComponents {
                 Rectangle{
                     id: circle
 
-                    anchors.centerIn: parent;
+                    anchors.centerIn: radioRect;
 
                     height: radioRect.height - 2*radioRect.border.width;
                     width: height;
@@ -675,7 +675,7 @@ StyleComponents {
                     Rectangle{
                         id: selectCircle
 
-                        anchors.centerIn: parent;
+                        anchors.centerIn: circle;
 
                         height: circle.height - 8;
                         width: height;
@@ -724,7 +724,7 @@ StyleComponents {
             Rectangle {
                 id: mainRect;
 
-                anchors.fill: parent;
+                anchors.fill: textAreaItem;
 
                 color: !textAreaItem.baseElement ? "transparent" : textAreaItem.baseElement.readOnly ? Style.alternateBaseColor : Style.baseColor;
 
@@ -738,9 +738,9 @@ StyleComponents {
             Text {
                 id: placeHolder;
 
-                anchors.left: parent.left;
+                anchors.left: textAreaItem.left;
                 anchors.leftMargin: !textAreaItem.baseElement ? 0 : textAreaItem.baseElement.margin;
-                anchors.verticalCenter: parent.verticalCenter;
+                anchors.verticalCenter: textAreaItem.verticalCenter;
 
 
                 font.pixelSize: Style.fontSize_common;
@@ -758,7 +758,7 @@ StyleComponents {
             MouseArea {
                 id: mouseArea;
 
-                anchors.fill: parent;
+                anchors.fill: textAreaItem;
                 cursorShape: !textAreaItem.baseElement ? Qt.ArrowCursor : textAreaItem.baseElement.readOnly ? Qt.ArrowCursor : Qt.IBeamCursor;
 
                 visible: !textAreaItem.baseElement ? false : !textAreaItem.baseElement.readOnly;
@@ -851,7 +851,7 @@ StyleComponents {
             Text {
                 id: mainTitle;
 
-                anchors.top: parent.top;
+                anchors.top: progressBar.top;
 
                 color: Style.color_text_common !==undefined ? Style.color_text_common : "#000000";
                 font.family: Style.fontFamily;
@@ -865,7 +865,7 @@ StyleComponents {
             Text {
                 id: progressText;
 
-                anchors.top: parent.top;
+                anchors.top: progressBar.top;
                 anchors.topMargin: mainTitle.visible * (mainTitle.height + 10);
 
                 color: Style.color_text_common !==undefined ? Style.color_text_common : "#000000";
@@ -881,12 +881,12 @@ StyleComponents {
             Rectangle{
                 id: progressContainer;
 
-                anchors.top: parent.top;
+                anchors.top: progressBar.top;
                 anchors.topMargin: mainTitle.visible * mainTitle.height +
                                    progressText.visible * (progressText.height + mainTitle.visible * 10)
                                    + !onlyBar * 10;
-                anchors.left: parent.left;
-                anchors.right: parent.right;
+                anchors.left: progressBar.left;
+                anchors.right: progressBar.right;
 
                 height: progressBar.barHeight;
                 radius: progressBar.barRadius;
@@ -898,16 +898,16 @@ StyleComponents {
                 Rectangle{
                     id: bar;
 
-                    anchors.left: parent.left;
+                    anchors.left: progressContainer.left;
                     anchors.leftMargin: progressContainer.border.width;
-                    anchors.verticalCenter: parent.verticalCenter;
+                    anchors.verticalCenter: progressContainer.verticalCenter;
 
-                    height: parent.height - 2* anchors.leftMargin;
+                    height: progressContainer.height - 2* anchors.leftMargin;
                     width: progressBar.percent < 0 ? 0 : progressBar.percent > 100 ?
-                                                         (parent.width - 2* anchors.leftMargin) :
-                                                         (parent.width - 2* anchors.leftMargin) * progressBar.percent/100;
+                                                         (progressContainer.width - 2* anchors.leftMargin) :
+                                                         (progressContainer.width - 2* anchors.leftMargin) * progressBar.percent/100;
 
-                    radius: parent.radius;
+                    radius: progressContainer.radius;
                     color: progressBar.barColor;
                     visible: !progressBar.indeterminate;
 
@@ -916,30 +916,30 @@ StyleComponents {
                 Rectangle{
                     id: barIndeterminate1;
 
-                    anchors.verticalCenter: parent.verticalCenter;
+                    anchors.verticalCenter: progressContainer.verticalCenter;
 
-                    height: parent.height - 2* progressContainer.border.width;
+                    height: progressContainer.height - 2* progressContainer.border.width;
                     width: 0;
 
-                    radius: parent.radius;
+                    radius: progressContainer.radius;
                     color: progressBar.barColor;
                     visible: progressBar.indeterminate;
-                    property real maxWidth: parent.width/5;
+                    property real maxWidth: progressContainer.width/5;
 
                 }
 
                 Rectangle{
                     id: barIndeterminate2;
 
-                    anchors.verticalCenter: parent.verticalCenter;
+                    anchors.verticalCenter: progressContainer.verticalCenter;
 
-                    height: parent.height - 2* progressContainer.border.width;
+                    height: progressContainer.height - 2* progressContainer.border.width;
                     width: 0;
 
-                    radius: parent.radius;
+                    radius: progressContainer.radius;
                     color: progressBar.barColor;
                     visible: progressBar.indeterminate;
-                    property real maxWidth: parent.width/5;
+                    property real maxWidth: progressContainer.width/5;
 
                 }
 
@@ -1084,7 +1084,7 @@ StyleComponents {
             Item { // square
                 id: square;
 
-                anchors.centerIn: parent
+                anchors.centerIn: busyIndicatorItem
                 property double minimum: Math.min(busyIndicatorItem.width, busyIndicatorItem.height);
                 width: 50;
                 height: 50;
@@ -1110,7 +1110,7 @@ StyleComponents {
             }
 
             MouseArea {
-                anchors.fill: parent;
+                anchors.fill: busyIndicatorItem;
             }
 
             Timer {

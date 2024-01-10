@@ -165,7 +165,7 @@ Item {
                 width: parent.width;
                 height: treeViewInternal.headerHeight;
 
-                AuxButton {
+                Button {
                     id: iconFilter;
 
                     anchors.centerIn: parent;

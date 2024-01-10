@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Acf 1.0
-import QtWebSockets 1.15
+import QtWebSockets 1.2
+import imtcontrols 1.0
 
 WebSocket {
     id: container;
@@ -12,6 +13,14 @@ WebSocket {
     property var subscriptionModel: []
 
     signal error(string message);
+
+    Component.onCompleted: {
+        Events.subscribeEvent("RegisterSubscription", container.registerSubscriptionEvent);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("RegisterSubscription", container.registerSubscriptionEvent);
+    }
 
     onStatusChanged: {
         console.log("SubscriptionManager onStatusChanged", status)
@@ -68,6 +77,17 @@ WebSocket {
         }
     }
 
+    function registerSubscriptionEvent(parameters){
+        console.log("registerSubscriptionEvent");
+
+        let query = parameters["Query"];
+        let client = parameters["Client"];
+
+        console.log("client", client.subscriptionId);
+
+        registerSubscription(query, client);
+    }
+
     function clear(){
         container.subscriptionModel = []
     }
@@ -93,7 +113,7 @@ WebSocket {
     }
 
     function registerSubscription(query, subscriptionClient){
-//        console.log("registerSubscription", query, subscriptionClient.toJSON())
+        console.log("registerSubscription", query, subscriptionClient.subscriptionId);
 
         for (let index = 0; index < subscriptionModel.length; index++){
             if (subscriptionModel[index]["subscription"] === subscriptionClient){

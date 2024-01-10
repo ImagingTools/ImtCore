@@ -67,25 +67,26 @@ Rectangle {
     Component {
         id: defaultDelegate;
 
-        AuxButton {
+        Button {
             id: button;
 
             width: buttonPanel.delegateWidth;
             height: buttonPanel.delegateHeight;
 
-            radius: Style.size_ButtonRadius;
-            color:  pressed ? Style.color_button_active : containsMouse ? Style.color_button_hovered : Style.color_button;
-            fontColor: pressed ? "#ffffff" : Style.color_buttonText;
-            fontPixelSize: Style.fontSize_common;
-            highlighted: false;
-            border.color:  "transparent";
+//            radius: Style.size_ButtonRadius;
+//            color:  pressed ? Style.color_button_active : containsMouse ? Style.color_button_hovered : Style.color_button;
+//            fontColor: pressed ? "#ffffff" : Style.color_buttonText;
+//            fontPixelSize: Style.fontSize_common;
+//            highlighted: false;
+//            border.color:  "transparent";
 
-            hasText: true;
-            hasIcon: false;
 
-            backgroundColor: Style.alternateBaseColor;
+//            hasText: true;
+//            hasIcon: false;
 
-            textButton: model.Name;
+//            backgroundColor: Style.alternateBaseColor;
+
+            text: model.Name;
 
             property bool active: model.Active !== undefined ? model.Active : false;
             property string id: model.Id;
@@ -693,7 +694,7 @@ Rectangle {
 
         width: parent.width - openButton.width - buttonPanel.mainMargin ;
         height: parent.height;
-        clip: true;
+//        clip: true;
         color: "transparent";
 
         ListView{
@@ -706,7 +707,7 @@ Rectangle {
             width: Math.min(contentWidth, parent.width);
             height: parent.height;
 
-            clip: true;
+//            clip: true;
             boundsBehavior: Flickable.StopAtBounds;
             orientation: ListView.Horizontal;
 
@@ -720,7 +721,7 @@ Rectangle {
 
     }//horizontalListViewContainer
 
-    AuxButton{
+    Button{
         id: openButton;
 
         anchors.verticalCenter: parent ? parent.verticalCenter : undefined;
@@ -729,15 +730,15 @@ Rectangle {
 
         width: buttonPanel.openButtonWidth;
         height: buttonPanel.openButtonHeight;
-        radius: 4;
-        hasText: buttonPanel.openButtonText !== "";
-        hasIcon: buttonPanel.openButtonImageSource !== 0;
-        textButton: buttonPanel.openButtonText;
+//        radius: 4;
+//        hasText: buttonPanel.openButtonText !== "";
+//        hasIcon: buttonPanel.openButtonImageSource !== 0;
+        text: buttonPanel.openButtonText;
         iconSource: buttonPanel.openButtonImageSource;
-        fontPixelSize: 30;
-        fontColor: containsMouse ? "black" : "gray";
-        pressed: buttonPanel.openST;
-        color: buttonPanel.openST ? Style.hover : defaultColor;
+//        fontPixelSize: 30;
+//        fontColor: containsMouse ? "black" : "gray";
+//        pressed: buttonPanel.openST;
+//        color: buttonPanel.openST ? Style.hover : defaultColor;
 
         visible: false;//buttonPanel.buttonModel.GetItemsCount() && buttonPanel.buttonModel.GetItemsCount() > buttonPanel.horizCount;
 

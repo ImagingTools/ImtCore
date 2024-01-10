@@ -52,7 +52,7 @@ Rectangle {
         elide: Text.ElideRight;
     }
 
-    AuxButton {
+    Button {
         id: closeButton;
 
         anchors.right: topPanelDialogContainer.right;

@@ -79,10 +79,6 @@
     <file alias="imtcontrols/Views/BasicTableView.qml">Qml/imtcontrols/Views/BasicTableView.qml</file>
     <file alias="imtcontrols/Views/BasicTreeView.qml">Qml/imtcontrols/Views/BasicTreeView.qml</file>
     <file alias="imtcontrols/Views/ChangeItemSize.qml">Qml/imtcontrols/Views/ChangeItemSize.qml</file>
-    <file alias="imtcontrols/Views/CollectionDataProvider.qml">Qml/imtcontrols/Views/CollectionDataProvider.qml</file>
-    <file alias="imtcontrols/Views/CollectionView.qml">Qml/imtcontrols/Views/CollectionView.qml</file>
-    <file alias="imtcontrols/Views/CollectionViewCommandsDelegateBase.qml">Qml/imtcontrols/Views/CollectionViewCommandsDelegateBase.qml</file>
-    <file alias="imtcontrols/Views/CollectionViewCommandsObserver.qml">Qml/imtcontrols/Views/CollectionViewCommandsObserver.qml</file>
     <file alias="imtcontrols/Views/CustomScrollbar.qml">Qml/imtcontrols/Views/CustomScrollbar.qml</file>
     <file alias="imtcontrols/Views/ScrollIndicator.qml">Qml/imtcontrols/Views/ScrollIndicator.qml</file>
     <file alias="imtcontrols/Views/CustomTooltip.qml">Qml/imtcontrols/Views/CustomTooltip.qml</file>
@@ -121,9 +117,6 @@
     <file alias="imtcontrols/Views/SplitView.qml">Qml/imtcontrols/Views/SplitView.qml</file>
     <file alias="imtcontrols/Views/SwipeView.qml">Qml/imtcontrols/Views/SwipeView.qml</file>
     <file alias="imtcontrols/Views/TableDecorator.qml">Qml/imtcontrols/Views/TableDecorator.qml</file>
-    <file alias="imtcontrols/Views/Base/CollectionViewBase.qml">Qml/imtcontrols/Views/Base/CollectionViewBase.qml</file>
-    <file alias="imtcontrols/Views/Base/CollectionViewBaseGqlModels.qml">Qml/imtcontrols/Views/Base/CollectionViewBaseGqlModels.qml</file>
-    <file alias="imtcontrols/Views/Base/GridCollectionViewBase.qml">Qml/imtcontrols/Views/Base/GridCollectionViewBase.qml</file>
     <file alias="imtcontrols/Views/Base/TableViewItemDelegateBase.qml">Qml/imtcontrols/Views/Base/TableViewItemDelegateBase.qml</file>
     <file alias="imtcontrols/Views/Base/TreeViewCommandsDelegateBase.qml">Qml/imtcontrols/Views/Base/TreeViewCommandsDelegateBase.qml</file>
     <file alias="imtcontrols/Views/Base/TreeViewItemDelegateBase.qml">Qml/imtcontrols/Views/Base/TreeViewItemDelegateBase.qml</file>

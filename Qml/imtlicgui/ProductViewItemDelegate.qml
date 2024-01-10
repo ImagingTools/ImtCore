@@ -276,7 +276,7 @@ TreeViewItemDelegateBase {
 
                 visible: productTreeItemDelegate.level == 0 && productTreeItemDelegate.selected && !productTreeItemDelegate.root.readOnly;
 
-                AuxButton {
+                Button {
                     anchors.verticalCenter: addButtonRect.verticalCenter;
                     anchors.horizontalCenter: addButtonRect.horizontalCenter;
 
@@ -306,7 +306,7 @@ TreeViewItemDelegateBase {
 
                 visible: productTreeItemDelegate.level == 1 && productTreeItemDelegate.selected && !productTreeItemDelegate.root.readOnly;
 
-                AuxButton {
+                Button {
                     anchors.verticalCenter: removeButtonRect.verticalCenter;
                     anchors.horizontalCenter: removeButtonRect.horizontalCenter;
 

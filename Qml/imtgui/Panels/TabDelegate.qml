@@ -16,16 +16,10 @@ ControlBase {
 
     decorator: Style.tabPanelDecorator
 
+    widthFromDecorator: true;
+
     signal clicked;
     signal closeSignal;
-
-    function setBindTargets(){
-        bindWidthAlias.value = decorator_.width;
-        bindWidthAlias.property = "width";
-        bindWidthAlias.target = tabDelegate;
-
-        bindHeightAlias.target = decorator_;
-    }
 
     MouseArea{
         id: ma;

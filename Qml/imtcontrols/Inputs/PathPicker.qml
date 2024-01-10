@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import Acf 1.0
 import QtQuick.Dialogs 1.3
+import imtcontrols 1.0
 
 Item {
     id: root;
@@ -40,7 +41,7 @@ Item {
             readOnly: true;
         }
 
-        BaseButton {
+        Button {
             id: button;
 
             anchors.right: parent.right;
@@ -48,7 +49,7 @@ Item {
 
             text: "Browse...";
 
-            decorator: defaultButtonDecorator;
+//            decorator: defaultButtonDecorator;
 
             onClicked: {
                 fileDialog.open();

@@ -241,10 +241,12 @@ ControlBase {
         id: dialogColumn;
 
         width: Math.max(buttonsWidth, bodyWidth)//buttonsWidth;
+
         visible: !Style.isQtStyle;
         spacing: 10;
 
-        property real bodyWidth: !loaderBodyDialog.item ? 1 : loaderBodyDialog.item.width + 20;
+//        property real bodyWidth: !loaderBodyDialog.item ? 1 : loaderBodyDialog.item.width + 20;
+        property real bodyWidth: !loaderBodyDialog.item ? 1 : loaderBodyDialog.item.width;
         property real buttonsWidth: buttonsContainer.width + 2 * buttonsContainer.anchors.rightMargin;
 
         Item {
@@ -252,16 +254,6 @@ ControlBase {
 
             width: loaderTopPanel.width;
             height: loaderTopPanel.height;
-
-            onWidthChanged: {
-                console.log("topPanelContainer onWidthChanged", width);
-
-            }
-
-            onHeightChanged: {
-                console.log("topPanelContainer onHeightChanged", height);
-
-            }
 
             MovingItem {
                 visible: dialogContainer.canMove;

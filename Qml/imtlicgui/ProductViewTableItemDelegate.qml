@@ -152,7 +152,7 @@ Item {
             width: parent.width / treeItemDelegate.headersCount - model.Level * 10;
             height: parent.height;
 
-            AuxButton {
+            Button {
                 id: arrowButton;
 
                 anchors.left: parent.left;
@@ -334,7 +334,7 @@ Item {
 
             visible: model.Level === 0;
 
-            AuxButton {
+            Button {
                 anchors.verticalCenter: buttonRect.verticalCenter;
                 anchors.horizontalCenter: buttonRect.horizontalCenter;
 

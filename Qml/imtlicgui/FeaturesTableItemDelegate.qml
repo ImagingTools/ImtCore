@@ -61,7 +61,7 @@ Item {
             width: parent.width / tableItemDelegate.headersCount - model.Level * 10;
             height: parent.height;
 
-            AuxButton {
+            Button {
                 id: arrowButton;
 
                 anchors.left: parent.left;
@@ -144,7 +144,7 @@ Item {
 
             visible: model.Level == 1;
 
-            AuxButton {
+            Button {
                 anchors.verticalCenter: buttonRect.verticalCenter;
                 anchors.horizontalCenter: buttonRect.horizontalCenter;
 

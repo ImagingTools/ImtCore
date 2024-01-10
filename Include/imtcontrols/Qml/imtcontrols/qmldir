@@ -77,16 +77,10 @@ BarChart 1.0 ./Views/BarChart.qml
 BasicTableView 1.0 ./Views/BasicTableView.qml
 BasicTreeView 1.0 ./Views/BasicTreeView.qml
 ChangeItemSize 1.0 ./Views/ChangeItemSize.qml
-CollectionDataProvider 1.0 ./Views/CollectionDataProvider.qml
-CollectionView 1.0 ./Views/CollectionView.qml
-CollectionViewCommandsDelegateBase 1.0 ./Views/CollectionViewCommandsDelegateBase.qml
-CollectionViewCommandsObserver 1.0 ./Views/CollectionViewCommandsObserver.qml
 CustomScrollbar 1.0 ./Views/CustomScrollbar.qml
 ScrollIndicator 1.0 ./Views/ScrollIndicator.qml
 CustomTooltip 1.0 ./Views/CustomTooltip.qml
 Diagram 1.0 ./Views/Diagram.qml
-GridCollectionView 1.0 ./Views/GridCollectionView.qml
-GridExtendingBaseDelegate 1.0 ./Views/GridExtendingBaseDelegate.qml
 BusyIndicator 1.0 ./Views/BusyIndicator.qml
 Loading 1.0 ./Views/Loading.qml
 Pagination 1.0 ./Views/Pagination.qml
@@ -119,9 +113,6 @@ DrawingContainer 1.0 ./Views/DrawingContainer.qml
 SplitView 1.0 ./Views/SplitView.qml
 SwipeView 1.0 ./Views/SwipeView.qml
 TableDecorator 1.0 ./Views/TableDecorator.qml
-CollectionViewBase 1.0 ./Views/Base/CollectionViewBase.qml
-CollectionViewBaseGqlModels 1.0 ./Views/Base/CollectionViewBaseGqlModels.qml
-GridCollectionViewBase 1.0 ./Views/Base/GridCollectionViewBase.qml
 TableViewItemDelegateBase 1.0 ./Views/Base/TableViewItemDelegateBase.qml
 TreeViewCommandsDelegateBase 1.0 ./Views/Base/TreeViewCommandsDelegateBase.qml
 TreeViewItemDelegateBase 1.0 ./Views/Base/TreeViewItemDelegateBase.qml

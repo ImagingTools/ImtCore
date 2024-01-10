@@ -248,7 +248,7 @@ Item {
                 width: parent.width;
                 height: tableInternal.headerHeight;
 
-                AuxButton {
+                Button {
                     id: iconFilter;
 
                     anchors.centerIn: parent;
@@ -257,10 +257,10 @@ Item {
                     height: width;
 
                     visible: collectionViewBaseContainer.hasFilter;
-                    highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+//                    highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
-                    iconWidth: Style.iconSizeSmall;
-                    iconHeight: iconWidth;
+//                    iconWidth: Style.iconSizeSmall;
+//                    iconHeight: iconWidth;
 
                     iconSource: "../../../" + Style.getIconPath("Icons/Filter", Icon.State.On, Icon.Mode.Normal);
 

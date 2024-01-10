@@ -9,6 +9,11 @@ Dialog {
     width: 500;
 
     buttonsModel: ListModel{
+//        Component.onCompleted: {
+//            append({Id: Enums.ok, Name:qsTr("Ok"), Enabled: true})
+//            append({Id: Enums.ok, Name:qsTr("Ok"), Enabled: true})
+//        }
+
         ListElement{Id: Enums.ButtonType.Ok; Name:qsTr("Ok"); Enabled: true}
         ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Cancel"); Enabled: true}
     }
@@ -17,6 +22,7 @@ Dialog {
 
     property string userPasswordHash;
     property string login;
+
 
     Keys.onPressed: {
         if (event.key === Qt.Key_Return){

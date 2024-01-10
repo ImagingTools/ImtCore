@@ -70,6 +70,12 @@ Item {
     onFinished: {
     }
 
+    onMoveToIndexChanged: {
+        if(popupMenuContainer.moveToIndex >= 0 && popupMenuContainer.moveToIndex < popupMenuListView.count){
+            popupMenuListView.positionViewAtIndex(popupMenuContainer.moveToIndex, ListView.Beginning);
+        }
+    }
+
     onModelChanged: {
         popupMenuListView.model = popupMenuContainer.model;
 

@@ -458,9 +458,9 @@ Item {
     SubscriptionClient {
         id: subscriptionClient;
 
-        property string ok: collectionViewContainer.commandId !== "" && subscriptionClient.subscriptionId !== "";
+        property bool ok: collectionViewContainer.commandId !== "" && subscriptionClient.subscriptionId !== "";
         onOkChanged: {
-            if (collectionViewContainer.commandId !== ""){
+            if (ok){
                 let subscriptionRequestId = "On" + collectionViewContainer.commandId + "CollectionChanged"
                 var query = Gql.GqlRequest("subscription", subscriptionRequestId);
                 var queryFields = Gql.GqlObject("notification");
@@ -547,7 +547,7 @@ Item {
                 text: qsTr("This table has been modified from another computer");
             }
 
-            BaseButton {
+            Button {
                 id: updateButton;
 
                 anchors.verticalCenter: parent.verticalCenter;

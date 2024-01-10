@@ -275,7 +275,7 @@ Rectangle {
         visible: treeDelegate.selected;
     }
 
-    AuxButton {
+    Button {
         id: arrowButton;
 
         z: 1000;

@@ -77,20 +77,15 @@ Rectangle {
     }
 
     function setDecorators(){
-        if(inputDecoratorLoader1.item){
+        if(inputDecoratorLoader1.item && inputDecoratorLoader1.item.rootItem){
             inputDecoratorLoader1.item.rootItem = loginTextInput;
         }
-        if(inputDecoratorLoader1.item){
-            inputDecoratorLoader1.item.rootItem = loginTextInput;
-        }
-        if(titleDecoratorLoader2.item){
+        if(titleDecoratorLoader2.item && inputDecoratorLoader2.item.rootItem){
             titleDecoratorLoader2.item.rootItem = titlePassword;
         }
-        if(inputDecoratorLoader2.item){
+        if(inputDecoratorLoader2.item && inputDecoratorLoader2.item.rootItem){
             inputDecoratorLoader2.item.rootItem = passwordTextInput;
         }
-
-        //loginButton.width = 150;
     }
 
 
@@ -303,7 +298,7 @@ Rectangle {
                     }
                 }
 
-                AuxButton {
+                Button {
                     id: eyeButton;
 
                     anchors.verticalCenter: parent.verticalCenter;
@@ -313,7 +308,7 @@ Rectangle {
                     height: Math.min(24, parent.height - 10);
                     width: height;
 
-                    highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+//                    highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
                     iconSource: passwordTextInput.echoMode == TextInput.Password ? "../../../" + Style.getIconPath("Icons/ShownPassword", Icon.State.On, Icon.Mode.Normal) :
                                                                                    "../../../" + Style.getIconPath("Icons/HiddenPassword", Icon.State.On, Icon.Mode.Normal) ;

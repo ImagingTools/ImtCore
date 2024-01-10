@@ -28,7 +28,7 @@ ControlBase {
     property string compMainColor: "transparent";
     property string compSelectedColor: Style.selectedColor;
     property bool moveToEnd: false;
-    property int moveToIndex: -1;
+    property int moveToIndex: currentIndex;
 
     property int dialogsCountPrev: 1000;
     property int dialogsCount: modalDialogManager.count;

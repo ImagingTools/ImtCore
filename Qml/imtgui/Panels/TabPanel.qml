@@ -50,8 +50,6 @@ Rectangle {
             text: model.Title ? model.Title : "";
             isCloseEnable: tabPanelContainer.isCloseEnable;
 
-            // decoratorSource:  "qrc:/qml/imtgui/Panels/TabPanelDecorator.qml"  //Style.tabPanelDecoratorPath;
-
             onClicked: {
                 tabPanelContainer.selectedIndex = model.index;
             }
@@ -98,7 +96,7 @@ Rectangle {
             anchors.fill: parent;
         }
 
-        AuxButton {
+        Button {
             id: leftButton;
 
             anchors.left: externButtons.left;
@@ -107,22 +105,21 @@ Rectangle {
             width: externButtons.width / 2;
             height: externButtons.height;
 
+//            hasIcon: true;
+//            hasText: false;
 
-            hasIcon: true;
-            hasText: false;
-
-            iconHeight: 10;
-            iconWidth: 10;
+//            iconHeight: 10;
+//            iconWidth: 10;
 
             iconSource: "../../../" +  Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal);
-            borderColor: Style.buttonColor;
+//            borderColor: Style.buttonColor;
 
             onClicked: {
                 tabPanelContainer.leftClicked();
             }
         }
 
-        AuxButton {
+        Button {
             id: rightButton;
 
             anchors.right: externButtons.right;
@@ -131,12 +128,12 @@ Rectangle {
             width: externButtons.width / 2;
             height: externButtons.height;
 
-            hasIcon: true;
-            hasText: false;
-            iconHeight: 10;
-            iconWidth: 10;
+//            hasIcon: true;
+//            hasText: false;
+//            iconHeight: 10;
+//            iconWidth: 10;
             iconSource: "../../../" +  Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal);
-            borderColor: Style.buttonColor;
+//            borderColor: Style.buttonColor;
 
             onClicked: {
                 tabPanelContainer.rightClicked();

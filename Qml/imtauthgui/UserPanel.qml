@@ -70,7 +70,7 @@ Item {
         text: root.username;
     }
 
-    AuxButton {
+    Button {
         id: loginButton;
 
         anchors.right: parent ? parent.right : undefined;
@@ -79,7 +79,7 @@ Item {
         width: Style.buttonWidthMedium;
         height: width;
 
-        highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+//        highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
         iconSource: "../../../" + Style.getIconPath("Icons/Account", Icon.State.On, Icon.Mode.Normal);
 

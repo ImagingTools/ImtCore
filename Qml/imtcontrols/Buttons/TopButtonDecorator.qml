@@ -1,7 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import QtGraphicalEffects 1.0
-
+import Qt5Compat.GraphicalEffects 6.0
 
 
 Item {
@@ -33,7 +33,6 @@ Item {
 
 //       visible: topButtonDecorator.isToggleable ? !topButtonDecorator.isToggled : button.visible && !topButtonDecorator.isHighlighted;
        visible: !(baseElement.checked || baseElement.down)
-
     }
 
     Rectangle{
@@ -85,23 +84,23 @@ Item {
         }
     }
 
-    InnerShadow {
-        id: innerShadow;
+//    InnerShadow {
+//        id: innerShadow;
 
-        anchors.fill: button;
+//        anchors.fill: button;
 
-        verticalOffset: 1;
-        horizontalOffset: 1;
+//        verticalOffset: 1;
+//        horizontalOffset: 1;
 
-        radius: 2;
-        color: Style.shadowColor;
-        source: button;
+//        radius: 2;
+//        color: Style.shadowColor;
+//        source: button;
 
-        samples: 16;
-//        visible: topButtonDecorator.isToggleable ? topButtonDecorator.isToggled : button.visible && topButtonDecorator.isHighlighted;
-        visible: baseElement.checked || baseElement.down
+//        samples: 16;
+////        visible: topButtonDecorator.isToggleable ? topButtonDecorator.isToggled : button.visible && topButtonDecorator.isHighlighted;
+//        visible: baseElement.checked || baseElement.down
 
-    }
+//    }
 
     Rectangle{
         id: selection;

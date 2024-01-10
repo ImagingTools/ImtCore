@@ -99,7 +99,7 @@ TableViewItemDelegateBase {
                 width: 15;
                 height: prefixRow.height;
 
-                AuxButton {
+                Button {
                     id: arrowButton;
 
                     anchors.verticalCenter: parent.verticalCenter;

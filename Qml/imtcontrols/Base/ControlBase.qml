@@ -15,6 +15,9 @@ FocusScope {
     property alias bindWidthAlias: bindWidth;
     property alias bindHeightAlias: bindHeight;
 
+    property bool widthFromDecorator: false;
+    property bool heightFromDecorator: false;
+
     onDecoratorChanged: {
         decoratorChangedFunc();
     }
@@ -36,8 +39,13 @@ FocusScope {
     }
 
     function setBindTargets(){
-        bindWidth.target = decorator_;
-        bindHeight.target = decorator_;
+        if (!widthFromDecorator){
+            bindWidth.target = decorator_;
+        }
+
+        if (!heightFromDecorator){
+            bindHeight.target = decorator_;
+        }
     }
 
     Binding {

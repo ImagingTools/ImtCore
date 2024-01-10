@@ -174,7 +174,7 @@ Item {
             width: parent.width / treeItemDelegate.headersCount - model.Level * 10 + 10;
             height: parent.height;
 
-            AuxButton {
+            Button {
                 id: arrowButton;
 
                 anchors.left: parent.left;

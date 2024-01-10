@@ -81,7 +81,7 @@ Item {
             text: model.Name;
         }
 
-        AuxButton {
+        Button {
             id: buttonNew;
 
             anchors.verticalCenter: parent.verticalCenter;

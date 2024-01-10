@@ -99,7 +99,7 @@ AuxTable{
                 color: "transparent";
                 //color: "lightgreen";
 
-                AuxButton{
+                Button{
                     id: openButton;
 
                     anchors.verticalCenter: parent.verticalCenter;

@@ -67,7 +67,7 @@ Item {
             filterPanelDecorator.rootLoader.textChanged(model.index, tfc.text);
         }
 
-        AuxButton {
+        Button {
             id: iconClear;
 
             anchors.right: parent.right;
@@ -80,8 +80,6 @@ Item {
             visible: tfc.text != "";
 
             iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
-            iconWidth: Style.iconSizeExtraSmall;
-            iconHeight: iconWidth;
 
             onClicked: {
                 tfc.text = "";
@@ -89,7 +87,7 @@ Item {
         }
     }
 
-    AuxButton {
+    Button {
         id: closeButton;
 
         anchors.verticalCenter: parent.verticalCenter;
@@ -99,9 +97,6 @@ Item {
         height: width;
 
         iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
-
-        iconWidth: Style.iconSizeSmall;
-        iconHeight: iconWidth;
 
         onClicked: {
             tfc.text = "";
