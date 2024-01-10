@@ -8,6 +8,7 @@ Rectangle {
     id: tablePage;
 
     anchors.fill: parent;
+    clip: true;
 
     property TreeItemModel items: TreeItemModel{};
 

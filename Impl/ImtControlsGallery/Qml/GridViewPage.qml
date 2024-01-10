@@ -9,6 +9,7 @@ Rectangle {
     id: gridViewPage;
 
     anchors.fill: parent;
+    clip: true;
 
     Text{
         id: title;

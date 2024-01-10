@@ -9,7 +9,7 @@ Rectangle {
     id: indicatorsRepresentaitonPage;
 
     anchors.fill: parent;
-
+    clip: true;
 
     Column{
         id: column;

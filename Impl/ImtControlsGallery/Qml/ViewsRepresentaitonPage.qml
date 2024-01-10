@@ -7,6 +7,7 @@ Rectangle {
     id: viewsRepresentaitonPage;
 
     anchors.fill: parent;
+    clip: true;
 
     Column{
         id: column;

@@ -8,6 +8,7 @@ Rectangle {
     id: tableTreeViewPage;
 
     anchors.fill: parent;
+    clip: true;
 
     property int size_: 100;
 

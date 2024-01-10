@@ -8,6 +8,7 @@ Rectangle {
     id: treeViewPage;
 
     anchors.fill: parent;
+    clip: true;
 
     TreeViewGql{
         id: treeView;

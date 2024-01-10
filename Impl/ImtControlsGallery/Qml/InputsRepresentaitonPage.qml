@@ -7,6 +7,7 @@ Rectangle {
     id: inputsRepresentaitonPage;
 
     anchors.fill: parent;
+    clip: true;
 
     Component.onCompleted: {
         spinBox.forceActiveFocus();

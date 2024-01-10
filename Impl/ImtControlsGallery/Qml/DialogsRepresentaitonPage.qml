@@ -7,7 +7,7 @@ Rectangle {
     id: dialogsRepresentaitonPage;
 
     anchors.fill: parent;
-
+    clip: true;
 
 
     Column{
@@ -88,6 +88,20 @@ Rectangle {
                 text: "Open new dialog";
                 onClicked: {
                     dialog_new.open();
+                }
+            }
+
+            Button{
+                id: windowDialogButton;
+
+                anchors.verticalCenter:  parent.verticalCenter;
+
+                visible: Style.styleId == "StyleQt";
+                text: "window style";
+                onClicked: {
+                    //var parameters = {"title": "Confirmation(window)", "modality": Qt.WindowModal};
+                    var parameters = {"title": "Confirmation(window)"};
+                    modalDialogManager.openDialog(confirmationDialogComp, parameters, "External");
                 }
             }
         }
@@ -203,6 +217,14 @@ Rectangle {
                 backgroundColor: "white";
                 radius: 2;
 
+                onFinished: {
+                    if(buttonId == Enums.ButtonType.Ok || buttonId == Enums.ButtonType.Yes){
+                        console.log("Dialog Finished::Yes");
+                    }
+                    else if(buttonId == Enums.ButtonType.Cancel || buttonId == Enums.ButtonType.No){
+                        console.log("Dialog Finished::No");
+                    }
+                }
             }
         }//confirmationDialogComp
 

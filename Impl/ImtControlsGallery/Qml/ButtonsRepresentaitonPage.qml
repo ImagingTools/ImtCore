@@ -7,6 +7,7 @@ Rectangle {
     id: buttonsRepresentaitonPage;
 
     anchors.fill: parent;
+    clip: true;
 
     Component.onCompleted: {
         iconButton.forceActiveFocus();
