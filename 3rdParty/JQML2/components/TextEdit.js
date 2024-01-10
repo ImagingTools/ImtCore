@@ -204,10 +204,10 @@ class TextEdit extends Item {
         }
     }
 
-    $destroy(){
+    destroy(){
         this.$input.remove()
         MouseController.remove(this)
-        super.$destroy()     
+        super.destroy()     
     }
 }
 

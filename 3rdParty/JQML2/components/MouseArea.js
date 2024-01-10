@@ -178,11 +178,11 @@ class MouseArea extends Item {
         }
     }
 
-    $destroy(){
+    destroy(){
         clearTimeout(this.$timer)
         delete this.$timer
         MouseController.remove(this)
-        super.$destroy()
+        super.destroy()
     }
 }
 

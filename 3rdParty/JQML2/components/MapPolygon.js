@@ -54,9 +54,9 @@ class MapPolygon extends QtObject {
         }
     }
 
-    $destroy(){
+    destroy(){
         if(this.$feature && this.parent.$map) this.parent.$source.removeFeature(this.$feature)
-        super.$destroy()
+        super.destroy()
     }
    
 }

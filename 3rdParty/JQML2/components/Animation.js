@@ -63,9 +63,9 @@ class Animation extends QtObject {
         if(this.$signals.started) this.$signals.started()
     }
 
-    $destroy(){
+    destroy(){
         AnimationController.remove(this)
-        super.$destroy()
+        super.destroy()
     }
 
 }

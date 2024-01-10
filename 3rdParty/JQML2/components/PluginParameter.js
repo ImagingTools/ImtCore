@@ -17,7 +17,7 @@ class PluginParameter extends QtObject {
         this.parent.getProperty('parameters').getNotify()()
     }
 
-    $destroy(){
+    destroy(){
         let index = this.parent.getPropertyValue('parameters').indexOf(this)
         if(index >= 0) this.parent.getPropertyValue('parameters').splice(index, 1)
     }

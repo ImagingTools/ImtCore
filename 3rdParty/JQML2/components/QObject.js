@@ -80,7 +80,7 @@ class QObject extends ComplexObject {
 
     $complete(){
         if(this.$completed) return
-        
+
         this.$completed = true
         if(this.$signals['Component.completed']) this.$signals['Component.completed']()
         for(let i = this.$data.length - 1; i >= 0; i--){
@@ -114,7 +114,7 @@ class QObject extends ComplexObject {
         return Qt.createComponent(namespace, path, parent)
     }
 
-    $destroy(){
+    destroy(){
         delete UIDList[this.UID]
 
         if(this.$signals['Component.destruction']) this.$signals['Component.destruction']()
@@ -130,7 +130,7 @@ class QObject extends ComplexObject {
             if(index >= 0) this.parent.$data.splice(index, 1)
         }
         for(let i = this.$data.length - 1; i >= 0; i--){
-            this.$data[i].$destroy()
+            this.$data[i].destroy()
         }
         
         for(let key in this){

@@ -44,10 +44,10 @@ class MapCircle extends QtObject {
             }))
         }
     }
-    $destroy(){
+    destroy(){
         if(this.$feature && this.parent.$map) this.parent.$source.removeFeature(this.$feature)
-        if(!this.center) this.center.$destroy()
-        super.$destroy()
+        if(!this.center) this.center.destroy()
+        super.destroy()
     }
 }
 

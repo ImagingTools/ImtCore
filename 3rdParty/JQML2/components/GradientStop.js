@@ -19,7 +19,7 @@ class GradientStop extends QtObject {
             this.parent.$gradientUpdate()
         }
     }
-    $destroy(){
+    destroy(){
         if(this.parent){
             let index = this.parent.getProperty('stops').get().indexOf(this)
             if(index >= 0){
@@ -28,7 +28,7 @@ class GradientStop extends QtObject {
             }
         }
         
-        super.$destroy()
+        super.destroy()
     }
     
 }

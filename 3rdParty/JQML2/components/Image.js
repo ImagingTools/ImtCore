@@ -155,9 +155,9 @@ class Image extends Item {
         this.updateImage()
     }
 
-    $destroy(){
+    destroy(){
         if(this.$img) this.$img.remove()
-        super.$destroy()
+        super.destroy()
     }
 }
 

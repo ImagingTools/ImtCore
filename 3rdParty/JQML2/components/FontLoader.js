@@ -69,9 +69,9 @@ class FontLoader extends QtObject {
 
     }
     
-    $destroy(){
+    destroy(){
         document.fonts.delete(this.$font)
-        super.$destroy()
+        super.destroy()
     }
 }
 

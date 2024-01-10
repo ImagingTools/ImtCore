@@ -82,12 +82,12 @@ class WebSocket extends QtObject {
         }
     }
 
-    $destroy() {
+    destroy() {
         if(this.$socket){
             this.$socket.close()
             delete this.$socket
         }
-        super.$destroy()
+        super.destroy()
     }
     
 }

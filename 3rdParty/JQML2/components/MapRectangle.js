@@ -49,11 +49,11 @@ class MapRectangle extends QtObject {
         }
     }
 
-    $destroy(){
+    destroy(){
         if(this.$feature && this.parent.$map) this.parent.$source.removeFeature(this.$feature)
-        if(!this.topLeft) this.topLeft.$destroy()
-        if(!this.bottomRight) this.bottomRight.$destroy()
-        super.$destroy()
+        if(!this.topLeft) this.topLeft.destroy()
+        if(!this.bottomRight) this.bottomRight.destroy()
+        super.destroy()
     }
    
 }

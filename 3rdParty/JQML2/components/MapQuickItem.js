@@ -48,9 +48,9 @@ class MapQuickItem extends QtObject {
         if(added) this.parent.addMapItem(this)
     }
 
-    $destroy(){
+    destroy(){
         if(this.$overlay && this.parent.$map) this.parent.$map.removeOverlay(this.$overlay)
-        super.$destroy()
+        super.destroy()
     }
    
 }

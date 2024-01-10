@@ -281,11 +281,11 @@ class TextInput extends Item {
         }
     }
 
-    $destroy(){
+    destroy(){
         this.$input.remove()
         this.$form.remove()
         MouseController.remove(this)
-        super.$destroy()     
+        super.destroy()     
     }
 }
 

@@ -49,10 +49,10 @@ class Timer extends QtObject {
         }, this.getPropertyValue('interval'))
     }
 
-    $destroy(){
+    destroy(){
         clearTimeout(this.$timer)
         delete this.$timer
-        super.$destroy()
+        super.destroy()
     }
     
 }

@@ -93,7 +93,7 @@ class GridView extends Flickable {
         if(!this.getPropertyValue('delegate') || this.getPropertyValue('model') === undefined || this.getPropertyValue('model') === null) return
 
         for(let item of this.$items){
-            item.$destroy()
+            item.destroy()
         }
         this.$items = []
         let ctx = new ContextController(this.delegate.get().$exCtx, this.$exCtx)
@@ -102,7 +102,7 @@ class GridView extends Flickable {
 
         if(typeof this.getPropertyValue('model') === 'number'){
             for(let i = 0; i < this.getPropertyValue('model'); i++){
-                let obj = createObject ? createObject(this.getStatement('contentItem').get(),ctx, {index: i}) : new cls(this.getStatement('contentItem').get(),ctx, {index: i})
+                let obj = createObject ? createObject(this.getStatement('contentItem').get(),ctx, {index: i}, false) : new cls(this.getStatement('contentItem').get(),ctx, {index: i})
                 // obj.setStyle({
                 //     position: 'relative'
                 // })
@@ -124,7 +124,7 @@ class GridView extends Flickable {
             }
         } else {
             for(let model of this.getPropertyValue('model').getPropertyValue('data')){
-                let obj = createObject ? createObject(this.getStatement('contentItem').get(),ctx, model) : new cls(this.getStatement('contentItem').get(),ctx, model)
+                let obj = createObject ? createObject(this.getStatement('contentItem').get(),ctx, model, false) : new cls(this.getStatement('contentItem').get(),ctx, model)
                 
                 // obj.setStyle({
                 //     position: 'relative'
@@ -224,11 +224,11 @@ class GridView extends Flickable {
         this.updateGeometry()
     }
 
-    $destroy(){
+    destroy(){
         for(let item of this.$items){
-            item.$destroy()
+            item.destroy()
         }
-        super.$destroy()
+        super.destroy()
     }
 
 }

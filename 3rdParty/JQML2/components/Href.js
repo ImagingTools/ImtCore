@@ -14,9 +14,9 @@ class Href extends QtObject {
         }, 50)
     }
 
-    $destroy(){
+    destroy(){
         clearInterval(this.$interval)
-        super.$destroy()
+        super.destroy()
     }
     
 }

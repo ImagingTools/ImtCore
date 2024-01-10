@@ -24,9 +24,9 @@ class Shortcut extends QtObject {
     }
 
 
-    $destroy(){
+    destroy(){
 
-        super.$destroy()
+        super.destroy()
     }
     
 }

@@ -109,7 +109,7 @@ class Map extends Item {
         }
     }
     removeMapItem(item){
-        item.$destroy()
+        item.destroy()
     }
 
     $mapReadyChanged(){
@@ -148,9 +148,9 @@ class Map extends Item {
             this.$map.getView().setZoom(this.zoomLevel)
         }
     }
-    $destroy(){
+    destroy(){
         this.$queue.clear()
-        super.$destroy()
+        super.destroy()
     }
 }
 

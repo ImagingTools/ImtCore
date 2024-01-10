@@ -211,8 +211,8 @@ class Text extends Item {
         })
     }
 
-    $destroy(){
-        super.$destroy()
+    destroy(){
+        super.destroy()
     }
 }
 

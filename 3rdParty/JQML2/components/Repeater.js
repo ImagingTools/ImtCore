@@ -39,7 +39,7 @@ class Repeater extends Item {
         if(roles === 'remove'){
             for(let i = leftTop; i < bottomRight; i++){
                 if(this.$items[i]){
-                    this.$items[i].$destroy()
+                    this.$items[i].destroy()
                     delete this.$items[i]
                 }
             }
@@ -62,7 +62,7 @@ class Repeater extends Item {
         this.$disconnectModel()
         for(let key in this.$items){
             if(key !== 'length') {
-                this.$items[key].$destroy()
+                this.$items[key].destroy()
                 delete this.$items[key]
             }
         }
@@ -83,7 +83,7 @@ class Repeater extends Item {
     $delegateChanged(){
         for(let key in this.$items){
             if(key !== 'length') {
-                this.$items[key].$destroy()
+                this.$items[key].destroy()
                 delete this.$items[key]
             }
         }
@@ -97,13 +97,13 @@ class Repeater extends Item {
         let cls = this.getStatement('delegate').get().constructor
 
         if(typeof this.getPropertyValue('model') === 'number'){
-            let obj = createObject ? createObject(this.parent,ctx, {index: index}) : new cls(this.parent,ctx, {index: index})
+            let obj = createObject ? createObject(this.parent,ctx, {index: index}, false) : new cls(this.parent,ctx, {index: index})
             // obj.getStatement('index').reset(index)
             // obj.getStatement('model').reset({index: index})
             this.$items[index] = obj
         } else {
             let model = this.getPropertyValue('model').getPropertyValue('data')[index]
-            let obj = createObject ? createObject(this.parent,ctx, model) : new cls(this.parent,ctx, model)
+            let obj = createObject ? createObject(this.parent,ctx, model, false) : new cls(this.parent,ctx, model)
             // obj.getStatement('index').setCompute(()=>{return model.index})
             // obj.getStatement('index').update()
             // obj.getStatement('model').reset(model)
@@ -123,7 +123,7 @@ class Repeater extends Item {
         // for(let key in this.$items){
         //     if(key !== 'length') {
         //         if(this.$signals.itemRemoved) this.$signals.itemRemoved(key, this.$items[key])
-        //         this.$items[key].$destroy()
+        //         this.$items[key].destroy()
         //         delete this.$items[key]
         //     }
         // }
@@ -143,7 +143,7 @@ class Repeater extends Item {
     }
 
 
-    $destroy(){
+    destroy(){
         this.$disconnectModel()
         this.$items.length.unsubscribe()
 
@@ -151,14 +151,14 @@ class Repeater extends Item {
             if(key !== 'length') {
                 if(this.$items[key].UID){
                     if(this.$signals.itemRemoved) this.$signals.itemRemoved(key, this.$items[key])
-                    this.$items[key].$destroy()
+                    this.$items[key].destroy()
                 }
                 
                 delete this.$items[key]
             }
         }
         
-        super.$destroy()
+        super.destroy()
     }
 }
 

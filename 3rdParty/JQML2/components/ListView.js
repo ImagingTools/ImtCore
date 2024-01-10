@@ -63,7 +63,7 @@ class ListView extends Flickable {
         if(roles === 'remove'){
             for(let i = leftTop; i < bottomRight; i++){
                 if(this.$items[i]){
-                    this.$items[i].$destroy()
+                    this.$items[i].destroy()
                     delete this.$items[i]
                 }
             }
@@ -85,7 +85,7 @@ class ListView extends Flickable {
         this.$disconnectModel()
         for(let key in this.$items){
             if(key !== 'length') {
-                this.$items[key].$destroy()
+                this.$items[key].destroy()
                 delete this.$items[key]
             }
         }
@@ -103,7 +103,7 @@ class ListView extends Flickable {
     $delegateChanged(){
         for(let key in this.$items){
             if(key !== 'length') {
-                this.$items[key].$destroy()
+                this.$items[key].destroy()
                 delete this.$items[key]
             }
         }
@@ -192,14 +192,14 @@ class ListView extends Flickable {
             if(this.getPropertyValue('orientation') === ListView.Horizontal){            
                 if(child.getPropertyValue('x') + child.getPropertyValue('width') < this.getPropertyValue('contentX')-this.getPropertyValue('cacheBuffer') || child.getPropertyValue('x') > this.getPropertyValue('contentX') + this.getPropertyValue('width') + this.getPropertyValue('cacheBuffer')) {
                     delete this.$items[child.getStatement('index').get()]
-                    child.$destroy()
+                    child.destroy()
                     this.updateGeometry()
                 }
             } else {
                 
                 if(child.getPropertyValue('y') + child.getPropertyValue('height') < this.getPropertyValue('contentY')-this.getPropertyValue('cacheBuffer') || child.getPropertyValue('y') > this.getPropertyValue('contentY') + this.getPropertyValue('height') + this.getPropertyValue('cacheBuffer')) {
                     delete this.$items[child.getStatement('index').get()]
-                    child.$destroy()
+                    child.destroy()
                     this.updateGeometry()
                 }
             }
@@ -350,13 +350,13 @@ class ListView extends Flickable {
         let cls = this.getStatement('delegate').get().constructor
 
         if(typeof this.getPropertyValue('model') === 'number'){
-            let obj = createObject ? createObject(this.getStatement('contentItem').get(),ctx, {index: index}) : new cls(this.getStatement('contentItem').get(),ctx, {index: index})
+            let obj = createObject ? createObject(this.getStatement('contentItem').get(),ctx, {index: index}, false) : new cls(this.getStatement('contentItem').get(),ctx, {index: index})
             // obj.getStatement('index').reset(index)
             // obj.getStatement('model').reset({index: index})
             this.$items[index] = obj
         } else {
             let model = this.getPropertyValue('model').getPropertyValue('data')[index]
-            let obj = createObject ? createObject(this.getStatement('contentItem').get(),ctx, model) : new cls(this.getStatement('contentItem').get(),ctx, model)
+            let obj = createObject ? createObject(this.getStatement('contentItem').get(),ctx, model, false) : new cls(this.getStatement('contentItem').get(),ctx, model)
             // obj.getStatement('index').setCompute(()=>{return model.index})
             // obj.getStatement('index').update()
             // obj.getStatement('model').reset(model)
@@ -459,19 +459,19 @@ class ListView extends Flickable {
         }
     }
 
-    $destroy(){
+    destroy(){
         this.$disconnectModel()
 
         this.$items.length.unsubscribe()
 
         for(let key in this.$items){
             if(key !== 'length') {
-                this.$items[key].$destroy()
+                this.$items[key].destroy()
                 delete this.$items[key]
             }
         }
         
-        super.$destroy()
+        super.destroy()
     }
 }
 
