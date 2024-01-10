@@ -465,7 +465,7 @@ Item {
 
             anchors.fill: parent;
 
-            color: Style.backgroundColor;
+            color: "transparent";//Style.backgroundColor;
             visible: !busyIndicatorItem.baseElement ? false : busyIndicatorItem.baseElement.visible;
 
             property var baseElement: null;
