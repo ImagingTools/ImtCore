@@ -30,7 +30,7 @@ DecoratorBase {
     UserPanel {
         id: userPanel;
 
-        anchors.verticalCenter: parent.verticalCenter;
+        anchors.verticalCenter: parent ? parent.verticalCenter : undefined;
 
         visible: false;
     }
@@ -40,7 +40,7 @@ DecoratorBase {
 
         anchors.left: userPanel.right;
         anchors.leftMargin: 10;
-        anchors.verticalCenter: parent.verticalCenter;
+        anchors.verticalCenter: parent ? parent.verticalCenter : undefined;
 
         width: 24;
         height: 24;

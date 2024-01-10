@@ -14,7 +14,7 @@ DecoratorBase {
     CommandsDecorator {
         id: commandsDecorator;
 
-        anchors.horizontalCenter: parent.horizontalCenter;
+        anchors.horizontalCenter: parent ? parent.horizontalCenter : undefined;
 
         onVisibleChanged: {
             if (!commandsDecorator.visible){

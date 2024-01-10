@@ -9,7 +9,8 @@ Item {
 
     AuxButton {
         id: preferenceButton;
-        anchors.verticalCenter: parent.verticalCenter;
+
+        anchors.verticalCenter: parent ? parent.verticalCenter : undefined;
 
         width: Style.buttonWidthMedium;
         height: width;

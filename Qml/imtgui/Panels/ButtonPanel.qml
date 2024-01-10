@@ -625,7 +625,7 @@ Rectangle {
     Repeater {
         id: buttonSizeRep;
 
-        anchors.right: parent.right;
+        anchors.right: parent ? parent.right : undefined;
 
         width: 0; height: 0;
 
@@ -657,7 +657,7 @@ Rectangle {
     Repeater {
         id: buttonSizeRepVert;
 
-        anchors.right: parent.right;
+        anchors.right: parent ? parent.right : undefined;
 
         width: 0; height: 0;
 
@@ -699,9 +699,9 @@ Rectangle {
         ListView{
             id: horizontalListView;
 
-            anchors.verticalCenter: parent.verticalCenter;
-            anchors.left: parent.left;
-            anchors.leftMargin: !buttonPanel.centered ? 0 : parent.width/2 - width/2;
+            anchors.verticalCenter: parent ? parent.verticalCenter : undefined;
+            anchors.left: parent ? parent.left : undefined;
+            anchors.leftMargin: !parent ? 0 : !buttonPanel.centered ? 0 : parent.width/2 - width/2;
 
             width: Math.min(contentWidth, parent.width);
             height: parent.height;
@@ -723,7 +723,7 @@ Rectangle {
     AuxButton{
         id: openButton;
 
-        anchors.verticalCenter: parent.verticalCenter;
+        anchors.verticalCenter: parent ? parent.verticalCenter : undefined;
         anchors.left: horizontalListViewContainer.right;
         anchors.leftMargin: buttonPanel.mainMargin;
 

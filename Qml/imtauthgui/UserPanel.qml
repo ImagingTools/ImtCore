@@ -73,7 +73,7 @@ Item {
     AuxButton {
         id: loginButton;
 
-        anchors.right: parent.right;
+        anchors.right: parent ? parent.right : undefined;
         anchors.verticalCenter: root.verticalCenter;
 
         width: Style.buttonWidthMedium;

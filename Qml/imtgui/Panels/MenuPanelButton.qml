@@ -28,10 +28,6 @@ ControlBase {
 
     signal clicked;
 
-    onDecoratorSourceChanged: {
-        console.log("onDecoratorSourceChanged", container.decoratorSource);
-        loaderDecorator.source = container.decoratorSource;
-    }
 
     onContentWidthChanged: {
         if (menuPanel.contentWidth != container.contentWidth){

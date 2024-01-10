@@ -107,7 +107,7 @@ Item {
                 visible: parent.visible;
 
                 onItemChanged: {
-                    if (pagesLoader.item){
+                    if (pagesLoader.item && pagesLoader.item.startPageObj !==undefined){
                         pagesLoader.item.startPageObj =
                         {
                             "Id": model.Id,
