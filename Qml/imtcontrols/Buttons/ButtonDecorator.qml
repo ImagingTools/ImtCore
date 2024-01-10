@@ -19,9 +19,9 @@ DecoratorBase {
 
         anchors.fill: parent
         radius: Style.buttonRadius
-        color: !baseElement ? "transtarent" : baseElement.down || baseElement.checked ? Style.buttonPressedColor : baseElement.hovered ?  Style.buttonHoverColor : Style.buttonColor
+        color: !commonButtonDecorator.baseElement ? "transtarent" : commonButtonDecorator.baseElement.down || commonButtonDecorator.baseElement.checked ? Style.buttonPressedColor : commonButtonDecorator.baseElement.hovered ?  Style.buttonHoverColor : Style.buttonColor
         border.width: Style.buttonBorderWidth
-        border.color: !baseElement ? "transtarent" : baseElement.focus ? Style.borderFocusColor : Style.borderColor
+        border.color: !commonButtonDecorator.baseElement ? "transtarent" : commonButtonDecorator.baseElement.focus ? Style.borderFocusColor : Style.borderColor
     }
 
     Image {
@@ -36,17 +36,17 @@ DecoratorBase {
 
         sourceSize.width: width
         sourceSize.height: height
-        source: !baseElement ? "" : baseElement.iconSource
+        source: !commonButtonDecorator.baseElement ? "" : commonButtonDecorator.baseElement.iconSource
     }
 
     Text {
         id: textObj
 
         anchors.verticalCenter: commonButtonDecorator.verticalCenter
-        anchors.left: !baseElement ? commonButtonDecorator.left : baseElement.iconSource === "" ? commonButtonDecorator.left : iconObj.right
-        anchors.leftMargin: !baseElement ? 0 : baseElement.iconSource === "" ? commonButtonDecorator.width/2 - width/2 : Style.paddingSmall
+        anchors.left: !commonButtonDecorator.baseElement ? commonButtonDecorator.left : commonButtonDecorator.baseElement.iconSource === "" ? commonButtonDecorator.left : iconObj.right
+        anchors.leftMargin: !commonButtonDecorator.baseElement ? 0 : commonButtonDecorator.baseElement.iconSource === "" ? commonButtonDecorator.width/2 - width/2 : Style.paddingSmall
 
-        color: !baseElement ? "transtarent" : baseElement.enabled ? Style.textColor : Style.inactive_textColor
+        color: !commonButtonDecorator.baseElement ? "transtarent" : commonButtonDecorator.baseElement.enabled ? Style.textColor : Style.inactive_textColor
 
         font.pixelSize: Style.fontSize_common
         font.family: Style.fontFamily
