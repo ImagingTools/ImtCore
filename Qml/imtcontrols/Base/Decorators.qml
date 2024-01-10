@@ -39,6 +39,7 @@ StyleComponents {
     progressBarDecorator: progressBarDecoratorComp
     busyIndicatorDecorator: busyIndicatorDecoratorComp
     tooltipDecorator: tooltipDecoratorComp
+    scrollBarDecorator: null;
 
     Component {
         id: menuPanelButtonDecoratorComp

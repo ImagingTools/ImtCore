@@ -28,6 +28,7 @@ Item {
     property Component progressBarDecorator
     property Component busyIndicatorDecorator
     property Component tooltipDecorator
+    property Component scrollBarDecorator
 
     property Component backGroundDecorator
     property Component messageDecorator

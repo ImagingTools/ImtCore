@@ -277,6 +277,9 @@ StyleComponents {
         if (sourceDecorators.tooltipDecorator){
             styleContainer.tooltipDecorator = sourceDecorators.tooltipDecorator
         }
+        if (1){
+            styleContainer.scrollBarDecorator = sourceDecorators.scrollBarDecorator
+        }
 
         if (sourceDecorators.backGroundDecorator){
             styleContainer.backGroundDecorator = sourceDecorators.backGroundDecorator
