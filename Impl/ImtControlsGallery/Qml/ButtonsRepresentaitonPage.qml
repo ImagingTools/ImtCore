@@ -44,7 +44,7 @@ Rectangle {
             KeyNavigation.right: iconButton
             KeyNavigation.tab: iconButton
 
-            decoratorComponent: Style.roundButtonDecorator;
+            decorator: Style.roundButtonDecorator;
 
             iconSource: "../../../" + Style.theme + "/Icons" + "/Close.svg";
             onClicked: {

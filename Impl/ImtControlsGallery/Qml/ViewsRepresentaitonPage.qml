@@ -144,7 +144,7 @@ Rectangle {
                 width: 50;
                 height: width;
 
-                decoratorComponent: Style.roundButtonDecorator;
+                decorator: Style.roundButtonDecorator;
 
                 iconSource: "../../../" + Style.theme + "/Icons" + "/Left.svg";
                 onClicked: {
@@ -165,7 +165,7 @@ Rectangle {
                 width: 50;
                 height: width;
 
-                decoratorComponent: Style.roundButtonDecorator;
+                decorator: Style.roundButtonDecorator;
 
                 iconSource: "../../../" + Style.theme + "/Icons" + "/Right.svg";
                 onClicked: {
