@@ -5,7 +5,7 @@ import imtcontrols 1.0
 ControlBase{
     id: spinBox;
 
-    decoratorComponent: Style.spinBoxDecorator
+    decorator: Style.spinBoxDecorator
 
     property var numberReg: /^\-{0,1}\d*\.{0,1}\d*$/;
 
@@ -24,8 +24,8 @@ ControlBase{
     property string fontColor: "#000000";
     property int fontSize: Style.fontSize_common;
 
-    onDecoratorComponentChanged: {
-        bindValue.target = decorator;
+    onDecoratorChanged: {
+        bindValue.target = decorator_;
     }
 
     Binding {

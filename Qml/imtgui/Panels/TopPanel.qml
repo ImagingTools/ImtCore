@@ -5,6 +5,6 @@ import imtcontrols 1.0
 ControlBase {
     id: topPanel;
 
-    decoratorComponent: Style.topPanelDecorator
+    decorator: Style.topPanelDecorator
 }
 

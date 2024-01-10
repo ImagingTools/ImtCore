@@ -8,10 +8,10 @@ import imtcontrols 1.0
 ControlBase {
     id: dialogContainer;
 
-    width: Style.isQtStyle ? !decorator ? 0 : decorator.width : dialogColumn.width;
-    height: Style.isQtStyle ? !decorator ? 0 : decorator.height : dialogColumn.height;
+    width: Style.isQtStyle ? !decorator_ ? 0 : decorator_.width : dialogColumn.width;
+    height: Style.isQtStyle ? !decorator_ ? 0 : decorator_.height : dialogColumn.height;
 
-    decoratorComponent: Style.dialogDecorator;
+    decorator: Style.dialogDecorator;
     property var decoratorItem: null;
 
     property string title;
@@ -44,7 +44,7 @@ ControlBase {
     property int buttonIds: 0;//81920;
 
     property bool canMove: false;
-    property bool decoratorVisible: !decorator ? true: decorator.visible;
+    property bool decoratorVisible: !decorator_ ? true: decorator_.visible;
 
     property Component topPanelDefault: Component{
         TopPanelDialog {}
@@ -136,16 +136,16 @@ ControlBase {
     }
 
 
-    onDecoratorComponentChanged: {
-        if(decorator){
-            if(decorator.accepted !==undefined){
-                decorator.accepted.connect(this.accepted);
+    onDecoratorChanged: {
+        if(decorator_){
+            if(decorator_.accepted !==undefined){
+                decorator_.accepted.connect(this.accepted);
             }
-            if(decorator.rejected !==undefined){
-                decorator.rejected.connect(this.canceled);
+            if(decorator_.rejected !==undefined){
+                decorator_.rejected.connect(this.canceled);
             }
-            if(decorator.applied !==undefined){
-                decorator.applied.connect(this.applied);
+            if(decorator_.applied !==undefined){
+                decorator_.applied.connect(this.applied);
             }
 
             addContentItemToDecorator();
@@ -154,16 +154,16 @@ ControlBase {
 
     function addContentItemToDecorator(){
         if(Style.isQtStyle){
-            decorator.buttonIds = dialogContainer.buttonIds;
-            var content_ = dialogContainer.contentComp.createObject(decorator);
-            dialogContainer.decorator.contentItem.children.push(content_);
+            decorator_.buttonIds = dialogContainer.buttonIds;
+            var content_ = dialogContainer.contentComp.createObject(decorator_);
+            dialogContainer.decorator_.contentItem.children.push(content_);
 
             dialogContainer.decoratorItem = content_;
 
             setDecoratorSize(content_)
 
-            if(decorator.rootItem !==undefined){
-                decorator.rootItem = dialogContainer;
+            if(decorator_.rootItem !==undefined){
+                decorator_.rootItem = dialogContainer;
             }
 
         }//if(Style.isQtStyle)
@@ -192,20 +192,20 @@ ControlBase {
     function setDecoratorSize(content_){
         if(Style.isQtStyle){
             let width_  = content_.width +
-                dialogContainer.decorator.leftPadding +
-                dialogContainer.decorator.rightPadding;
-            dialogContainer.decorator.width = Math.max(width_, dialogContainer.decorator.footer.width);
+                dialogContainer.decorator_.leftPadding +
+                dialogContainer.decorator_.rightPadding;
+            dialogContainer.decorator_.width = Math.max(width_, dialogContainer.decorator_.footer.width);
 
             let hasButtons = dialogContainer.buttonIds !== 0;
-            dialogContainer.decorator.height = content_.height +
-                    dialogContainer.decorator.header.height +
-                    dialogContainer.decorator.footer.height * hasButtons +
-                    dialogContainer.decorator.topPadding +
-                    dialogContainer.decorator.bottomPadding;
+            dialogContainer.decorator_.height = content_.height +
+                    dialogContainer.decorator_.header.height +
+                    dialogContainer.decorator_.footer.height * hasButtons +
+                    dialogContainer.decorator_.topPadding +
+                    dialogContainer.decorator_.bottomPadding;
         }
 
-        content_.x = (dialogContainer.decorator.width - content_.width)/2 -
-                dialogContainer.decorator.leftPadding;
+        content_.x = (dialogContainer.decorator_.width - content_.width)/2 -
+                dialogContainer.decorator_.leftPadding;
     }
 
 

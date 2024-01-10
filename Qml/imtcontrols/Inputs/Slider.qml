@@ -7,7 +7,7 @@ ControlBase {
 
     rotation: orientation == Qt.Vertical ? -90 : 0;
 
-    decoratorComponent: Style.sliderDecorator
+    decorator: Style.sliderDecorator
 
     property int backgroundWidth: width;
     property int backgroundHeight: 6;
@@ -41,22 +41,22 @@ ControlBase {
         //console.log("Slider: redefinition of base function");
     }
 
-    onDecoratorComponentChanged: {
+    onDecoratorChanged: {
         decoratorChangedFuncBase();
 
-        if(decorator.to !== undefined){
-            decorator.to = to;
+        if(decorator_.to !== undefined){
+            decorator_.to = to;
         }
-        if(decorator.from !== undefined){
-            decorator.from = from;
-        }
-
-        if(decorator.value !== undefined){
-            decorator.value = position * (to - from) + from;
+        if(decorator_.from !== undefined){
+            decorator_.from = from;
         }
 
-        if(decorator.compl !== undefined){
-            decorator.compl = true;
+        if(decorator_.value !== undefined){
+            decorator_.value = position * (to - from) + from;
+        }
+
+        if(decorator_.compl !== undefined){
+            decorator_.compl = true;
         }
 
         setBindTargets();

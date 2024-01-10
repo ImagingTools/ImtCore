@@ -5,7 +5,7 @@ import imtcontrols 1.0
 ControlBase {
     id: containerTextArea;
 
-    decoratorComponent: Style.textAreaDecorator
+    decorator: Style.textAreaDecorator
 
     property bool isDinamicHeight: true;
 
@@ -42,18 +42,18 @@ ControlBase {
     signal textEdited();
     signal editingFinished();
 
-    onDecoratorComponentChanged: {
-        bindText.target = decorator
+    onDecoratorChanged: {
+        bindText.target = decorator_
 
         textArea.setHeight();
 
-        if(decorator.z < 0){
+        if(decorator_.z < 0){
             if(focus){
                 textArea.forceActiveFocus()
             }
         }
         else {
-            decorator.focus = focus;
+            decorator_.focus = focus;
         }
     }
 
@@ -71,16 +71,16 @@ ControlBase {
     function setFocus(value) {
         //textArea.focus = value;
         focus = value;
-        if(decorator.z < 0){
+        if(decorator_.z < 0){
             textArea.focus = value;
             if(value){
                 textArea.forceActiveFocus()
             }
         }
         else {
-            decorator.focus = value;
+            decorator_.focus = value;
             if(value){
-                decorator.forceActiveFocus()
+                decorator_.forceActiveFocus()
             }
         }
     }
@@ -100,8 +100,8 @@ ControlBase {
             textArea.forceActiveFocus();
         }
 
-        if(decorator && decorator.z >= 0){
-            decorator.focus = focus;
+        if(decorator_ && decorator_.z >= 0){
+            decorator_.focus = focus;
         }
     }
 
@@ -202,7 +202,7 @@ ControlBase {
             selectByMouse: true;
             wrapMode: TextEdit.WordWrap;
             clip: true;
-            visible: containerTextArea.decorator.z < 0;
+            visible: containerTextArea.decorator_.z < 0;
 
 
             //for web, do not remove!!!
@@ -218,15 +218,15 @@ ControlBase {
             }
 
             function setHeight () {
-                if(containerTextArea.isDinamicHeight  && containerTextArea.decorator && containerTextArea.decorator.z < 0){
+                if(containerTextArea.isDinamicHeight  && containerTextArea.decorator_ && containerTextArea.decorator_.z < 0){
                     var newHeigth = textArea.height + 2*containerTextArea.margin;
                     if(newHeigth !== containerTextArea.height){
                         containerTextArea.height = newHeigth;
                     }
 
                 }
-                if(containerTextArea.decorator && containerTextArea.decorator.setHeight !== undefined){
-                    containerTextArea.decorator.setHeight();
+                if(containerTextArea.decorator_ && containerTextArea.decorator_.setHeight !== undefined){
+                    containerTextArea.decorator_.setHeight();
                 }
 
             }

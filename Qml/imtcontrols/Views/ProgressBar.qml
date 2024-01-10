@@ -5,7 +5,7 @@ import imtcontrols 1.0
 ControlBase {
     id: progressBar;
 
-    decoratorComponent: Style.progressBarDecorator;
+    decorator: Style.progressBarDecorator;
 
     property int barHeight: 20;
 

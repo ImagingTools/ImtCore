@@ -82,7 +82,7 @@ Item {
 
                     // decorator: Style.topButtonDecorator !==undefined ? Style.topButtonDecorator: defaultButtonDecorator;
 
-                    decoratorComponent: Style.topButtonDecorator
+                    decorator: Style.topButtonDecorator
 
                     iconSource: model.Icon === "" ? "" : model.IsEnabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal) :
                                                    "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled);
@@ -158,7 +158,7 @@ Item {
                     checked: checkable ? model.IsToggled !== undefined ? model.IsToggled : false : false;
                     checkable: model.IsToggleable !== undefined ? model.IsToggleable : false
 
-                    decoratorComponent: Component {
+                    decorator: Component {
                         ButtonDecorator {
                             color: !baseElement ? "transtarent" : baseElement.down || baseElement.checked ? Style.buttonPressedColor : baseElement.hovered ?  Style.buttonHoverColor : "transparent"
                             border.color: "transparent"

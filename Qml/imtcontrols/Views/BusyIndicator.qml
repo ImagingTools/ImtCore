@@ -5,7 +5,7 @@ import imtcontrols 1.0
 ControlBase{
     id: busyIndicator;
 
-    decoratorComponent: Style.busyIndicatorDecorator;
+    decorator: Style.busyIndicatorDecorator;
 
     function start(){
         console.log("BusyIndicator start");

@@ -5,7 +5,7 @@ import imtcontrols 1.0
 ControlBase {
     id: customRadioButton;
 
-    decoratorComponent: Style.radioButtonDecorator
+    decorator: Style.radioButtonDecorator
 
     property string text: "";
 
@@ -36,9 +36,9 @@ ControlBase {
         Events.unSubscribeEvent("RadioButtonUnchecked", customRadioButton.onRadioButtonUnchecked)
     }
 
-    onDecoratorComponentChanged: {
-        if(decorator.checked !==undefined){
-            decorator.checked = checked;
+    onDecoratorChanged: {
+        if(customRadioButton.decorator_.checked !==undefined){
+            customRadioButton.decorator_.checked = checked;
         }
     }
 

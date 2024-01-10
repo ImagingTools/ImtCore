@@ -5,7 +5,7 @@ import imtcontrols 1.0
 ControlBase {
     id: comboBoxContainer;
 
-    decoratorComponent: Style.comboBoxDecorator
+    decorator: Style.comboBoxDecorator
 
     property var model;
 
@@ -140,8 +140,8 @@ ControlBase {
 
     }
 
-    onDecoratorComponentChanged: {
-        bindCurrentIndex.target = decorator
+    onDecoratorChanged: {
+        bindCurrentIndex.target = decorator_
     }
 
     onDialogsCountChanged: {

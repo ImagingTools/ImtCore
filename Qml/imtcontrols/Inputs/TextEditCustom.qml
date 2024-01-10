@@ -5,7 +5,7 @@ import imtcontrols 1.0
 ControlBase {
     id: containerTextEdit;
 
-    decoratorComponent: Style.textEditDecorator
+    decorator: Style.textEditDecorator
 
     property bool isDinamicHeight: true;
 
@@ -42,18 +42,18 @@ ControlBase {
     signal textEdited();
     signal editingFinished();
 
-    onDecoratorComponentChanged: {
-        bindText.target = decorator
+    onDecoratorChanged: {
+        bindText.target = decorator_
 
         textEdit.setHeight();
 
-        if(decorator.z < 0){
+        if(decorator_.z < 0){
             if(focus){
                 textEdit.forceActiveFocus()
             }
         }
         else {
-            decorator.focus = focus;
+            decorator_.focus = focus;
         }
     }
 
@@ -71,16 +71,16 @@ ControlBase {
     function setFocus(value) {
         //textEdit.focus = value;
         focus = value;
-        if(decorator.z < 0){
+        if(decorator_.z < 0){
             textEdit.focus = value;
             if(value){
                 textEdit.forceActiveFocus()
             }
         }
         else {
-            decorator.focus = value;
+            decorator_.focus = value;
             if(value){
-                decorator.forceActiveFocus()
+                decorator_.forceActiveFocus()
             }
         }
     }
@@ -100,8 +100,8 @@ ControlBase {
             textEdit.forceActiveFocus();
         }
 
-        if(decorator && decorator.z >= 0){
-            decorator.focus = focus;
+        if(decorator_ && decorator_.z >= 0){
+            decorator_.focus = focus;
         }
     }
 
@@ -202,7 +202,7 @@ ControlBase {
             selectByMouse: true;
             wrapMode: TextEdit.WordWrap;
             clip: true;
-            visible: containerTextEdit.decorator.z < 0;
+            visible: containerTextEdit.decorator_.z < 0;
 
 
             //for web, do not remove!!!
@@ -218,15 +218,15 @@ ControlBase {
             }
 
             function setHeight () {
-                if(containerTextEdit.isDinamicHeight  && containerTextEdit.decorator && containerTextEdit.decorator.z < 0){
+                if(containerTextEdit.isDinamicHeight  && containerTextEdit.decorator_ && containerTextEdit.decorator_.z < 0){
                     var newHeigth = textEdit.height + 2*containerTextEdit.margin;
                     if(newHeigth !== containerTextEdit.height){
                         containerTextEdit.height = newHeigth;
                     }
 
                 }
-                if(containerTextEdit.decorator && containerTextEdit.decorator.setHeight !== undefined){
-                    containerTextEdit.decorator.setHeight();
+                if(containerTextEdit.decorator_ && containerTextEdit.decorator_.setHeight !== undefined){
+                    containerTextEdit.decorator_.setHeight();
                 }
 
             }

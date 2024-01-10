@@ -5,7 +5,7 @@ import imtcontrols 1.0
 ControlBase {
     id: baseButton;
 
-    decoratorComponent: Style.buttonDecorator
+    decorator: Style.buttonDecorator
 
     property string text: ""
     property string iconSource: ""
@@ -45,7 +45,7 @@ ControlBase {
     Component.onCompleted: {
     }
 
-    onDecoratorComponentChanged: {
+    onDecoratorChanged: {
         if(focus){
             forceActiveFocus()
         }

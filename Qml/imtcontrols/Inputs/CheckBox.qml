@@ -5,7 +5,7 @@ import imtcontrols 1.0
 ControlBase {
     id: checkBox;
 
-    decoratorComponent: Style.checkBoxDecorator
+    decorator: Style.checkBoxDecorator
 
     property string text: "";
 

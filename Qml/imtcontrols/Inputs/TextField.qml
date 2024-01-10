@@ -5,7 +5,7 @@ import imtcontrols 1.0
 ControlBase {
     id: containerTextField;
 
-    decoratorComponent: Style.textFieldDecorator
+    decorator: Style.textFieldDecorator
 
     property alias text: textField.text;
     property alias acceptableInput: textField.acceptableInput;
@@ -41,16 +41,16 @@ ControlBase {
     signal textEdited();
     signal editingFinished();
 
-    onDecoratorComponentChanged: {
-        bindText.target = decorator
+    onDecoratorChanged: {
+        bindText.target = decorator_
 
-        if(decorator.z < 0){
+        if(decorator_.z < 0){
             if(focus){
                 textField.forceActiveFocus()
             }
         }
         else {
-            decorator.focus = focus;
+            decorator_.focus = focus;
         }
     }
 
@@ -69,16 +69,16 @@ ControlBase {
 
         //textField.focus = value;
         focus = value;
-        if(decorator.z < 0){
+        if(decorator_.z < 0){
             textField.focus = value;
             if(value){
                 textField.forceActiveFocus()
             }
         }
         else {
-            decorator.focus = value;
+            decorator_.focus = value;
             if(value){
-                decorator.forceActiveFocus()
+                decorator_.forceActiveFocus()
             }
         }
     }
@@ -103,8 +103,8 @@ ControlBase {
             textField.forceActiveFocus();
         }
 
-        if(decorator && decorator.z >= 0){
-            decorator.focus = focus;
+        if(decorator_ && decorator_.z >= 0){
+            decorator_.focus = focus;
         }
 
     }
@@ -170,7 +170,7 @@ ControlBase {
         selectionColor: Style.textSelected;
         selectByMouse: true;
         clip: true;
-        visible: containerTextField.decorator.z < 0;
+        visible: containerTextField.decorator_.z < 0;
 
         onAccepted: {
             containerTextField.accepted();

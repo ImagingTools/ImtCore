@@ -14,17 +14,17 @@ ControlBase {
     property string text;
     property string firstElementImageSource:  "../../../" + "Icons/" + Style.theme + "/" + "Workflow" + "_On_Normal.svg";
 
-    decoratorComponent: Style.tabPanelDecorator
+    decorator: Style.tabPanelDecorator
 
     signal clicked;
     signal closeSignal;
 
     function setBindTargets(){
-        bindWidthAlias.value = decorator.width;
+        bindWidthAlias.value = decorator_.width;
         bindWidthAlias.property = "width";
         bindWidthAlias.target = tabDelegate;
 
-        bindHeightAlias.target = decorator;
+        bindHeightAlias.target = decorator_;
     }
 
     MouseArea{

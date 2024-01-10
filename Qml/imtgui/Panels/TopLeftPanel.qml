@@ -6,6 +6,6 @@ ControlBase {
     id: topLeftPanel;
 
     property Item topPanel: null;
-    decoratorComponent: Style.topLeftPanelDecorator
+    decorator: Style.topLeftPanelDecorator
 }
 

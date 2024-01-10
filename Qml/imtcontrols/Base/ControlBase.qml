@@ -6,16 +6,16 @@ import imtcontrols 1.0
 FocusScope {
     id: controlBase;
     
-    width: decorator ? decorator.width : 0;
-    height: decorator ? decorator.height : 0;
+    width: decorator_ ? decorator_.width : 0;
+    height: decorator_ ? decorator_.height : 0;
 
-    property Component decoratorComponent;
-    property var decorator : null;
+    property Component decorator;
+    property var decorator_ : null;
 
     property alias bindWidthAlias: bindWidth;
     property alias bindHeightAlias: bindHeight;
 
-    onDecoratorComponentChanged: {
+    onDecoratorChanged: {
         decoratorChangedFunc();
     }
 
@@ -25,19 +25,19 @@ FocusScope {
     }
 
     function decoratorChangedFuncBase(){
-        if(decoratorComponent == null || decoratorComponent == undefined){
+        if(decorator == null || decorator == undefined){
             return;
         }
-        if(decorator){
-            decorator.destroy();
+        if(decorator_){
+            decorator_.destroy();
         }
-        decorator = decoratorComponent.createObject(controlBase);
-        decorator.baseElement = controlBase;
+        decorator_ = decorator.createObject(controlBase);
+        decorator_.baseElement = controlBase;
     }
 
     function setBindTargets(){
-        bindWidth.target = decorator;
-        bindHeight.target = decorator;
+        bindWidth.target = decorator_;
+        bindHeight.target = decorator_;
     }
 
     Binding {

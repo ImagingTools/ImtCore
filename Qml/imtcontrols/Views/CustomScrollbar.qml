@@ -4,8 +4,8 @@ import Acf 1.0
 Rectangle{
     id: scrollContainer;
 
-    height: targetItem && vertical ? targetItem.height : !decorator ? secondSize : secondSizeDecorator;
-    width: targetItem && !vertical ? targetItem.width : !decorator ? secondSize : secondSizeDecorator;
+    height: targetItem && vertical ? targetItem.height : !decorator_ ? secondSize : secondSizeDecorator;
+    width: targetItem && !vertical ? targetItem.width : !decorator_ ? secondSize : secondSizeDecorator;
     color: backgroundColor;
     radius: 4;
 
@@ -18,9 +18,9 @@ Rectangle{
     property real minSize: 20;
     property real secondSize: 20;
     property int indicatorRadius: 4;
-    property string backgroundColor: decorator ? "transparent" : Style.color_scrollBackground !== undefined ? Style.color_scrollBackground  : "#efefef";
-    property string indicatorColor: decorator ? "transparent" : Style.color_scrollIndicator !== undefined ? Style.color_scrollIndicator : "lightgray";
-    property string highlightColor: decorator ? "transparent" : Style.color_scrollHighlight !== undefined ? Style.color_scrollHighlight : "lightgray";
+    property string backgroundColor: decorator_ ? "transparent" : Style.color_scrollBackground !== undefined ? Style.color_scrollBackground  : "#efefef";
+    property string indicatorColor: decorator_ ? "transparent" : Style.color_scrollIndicator !== undefined ? Style.color_scrollIndicator : "lightgray";
+    property string highlightColor: decorator_ ? "transparent" : Style.color_scrollHighlight !== undefined ? Style.color_scrollHighlight : "lightgray";
 
     property bool canFade: false;
     property bool isMoving: false;
@@ -43,47 +43,47 @@ Rectangle{
 
 
     /*for Qt Style decoration*/
-    property Component decoratorComponent : Style.scrollBarDecorator ? Style.scrollBarDecorator : null
-    property var decorator : null;
+    property Component decorator : Style.scrollBarDecorator ? Style.scrollBarDecorator : null
+    property var decorator_ : null;
 
     property real scrollIndicatorY: scrollIndicator.y;
     property real scrollIndicatorX: scrollIndicator.x;
 
-    property real secondSizeDecorator: !decorator ? 0 : vertical ? decorator.background.width : decorator.background.height;
+    property real secondSizeDecorator: !decorator_ ? 0 : vertical ? decorator_.background.width : decorator_.background.height;
 
     signal contentXSignal(real contentX);
     signal contentYSignal(real contentY);
 
-    onDecoratorComponentChanged: {
-        if(decorator){
-            decorator.destroy();
+    onDecoratorChanged: {
+        if(decorator_){
+            decorator_.destroy();
         }
 
-        if(!decoratorComponent){
+        if(!decorator){
             return;
         }
 
-        decorator = decoratorComponent.createObject(scrollContainer);
-        decorator.baseElement = scrollContainer;
+        decorator_ = decorator.createObject(scrollContainer);
+        decorator_.baseElement = scrollContainer;
 
         if(scrollContainer.vertical){
-            decorator.position = scrollIndicatorY/scrollContainer.height;
+            decorator_.position = scrollIndicatorY/scrollContainer.height;
         }
         else {
-            decorator.position = scrollIndicatorX/scrollContainer.width;
+            decorator_.position = scrollIndicatorX/scrollContainer.width;
         }
 
     }
 
     onScrollIndicatorYChanged: {
-        if(decorator && vertical){
-            decorator.position = scrollIndicatorY/scrollContainer.height;
+        if(decorator_ && vertical){
+            decorator_.position = scrollIndicatorY/scrollContainer.height;
         }
     }
 
     onScrollIndicatorXChanged: {
-        if(decorator && !vertical){
-            decorator.position = scrollIndicatorX/scrollContainer.width;
+        if(decorator_ && !vertical){
+            decorator_.position = scrollIndicatorX/scrollContainer.width;
         }
     }
 

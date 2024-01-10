@@ -5,11 +5,11 @@ import imtcontrols 1.0
 ControlBase {
     id: switchCustom;
 
-    decoratorComponent: Style.switchDecorator
+    decorator: Style.switchDecorator
 
     property string text: "";
 
-    property int backgroundWidth: decorator ? decorator.backgroundWidth : 0;
+    property int backgroundWidth: decorator_ ? decorator_.backgroundWidth : 0;
     property int backgroundHeight: 14;
     property string backgroundColor: "#E1E1E1";
     property string controlColor: "#C4C4C4";
@@ -32,7 +32,7 @@ ControlBase {
     property alias tooltipText: tooltip.text;
     property alias tooltipItem: tooltip;
 
-    onDecoratorComponentChanged: {
+    onDecoratorChanged: {
         setChecked(switchCustom.checked)
     }
 

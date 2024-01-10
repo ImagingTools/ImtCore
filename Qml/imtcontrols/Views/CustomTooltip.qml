@@ -6,7 +6,7 @@ import imtcontrols 1.0
 ControlBase {
     id: customTooltip;
 
-    decoratorComponent: Style.tooltipDecorator
+    decorator: Style.tooltipDecorator
 
     property string text: "";
 
@@ -219,8 +219,8 @@ ControlBase {
         property real x: 0;
         property real y: 0;
         onFinished: {
-            if(customTooltip.decorator && customTooltip.decorator.show !== undefined){
-                customTooltip.decorator.show(customTooltip.text, customTooltip.timeout);
+            if(customTooltip.decorator_ && customTooltip.decorator_.show !== undefined){
+                customTooltip.decorator_.show(customTooltip.text, customTooltip.timeout);
             }
             else {
                 customTooltip.openTooltip(pauseOpenTooltip.x, pauseOpenTooltip.y);
@@ -261,8 +261,8 @@ ControlBase {
         pauseOpenTooltip.stop();
         pauseCloseTooltip.stop();
 
-        if(customTooltip.decorator && customTooltip.decorator.hide !== undefined){
-            customTooltip.decorator.hide();
+        if(customTooltip.decorator_ && customTooltip.decorator_.hide !== undefined){
+            customTooltip.decorator_.hide();
         }
         else {
             let item = modalDialogManager.topItem;
