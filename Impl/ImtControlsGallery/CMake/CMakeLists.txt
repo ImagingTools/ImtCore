@@ -75,16 +75,6 @@ list(APPEND webdirs ${buildwebdir}/Resources)
 list(APPEND webdirs ${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml/Acf)
 list(APPEND webdirs ${buildwebdir}/src/Acf)
 
-# copy base qml sources from to
-#list(APPEND webdirs ${IMTCOREDIR}/Include/imtgui/Qml/Acf)
-#list(APPEND webdirs ${buildwebdir}/src/Acf)
-
-# list(APPEND webdirs ${IMTCOREDIR}/Include/imtguigql/Qml/imtguigql)
-# list(APPEND webdirs ${buildwebdir}/src/imtguigql)
-
-# list(APPEND webdirs ${IMTCOREDIR}/Include/imtqml/Qml/imtqml)
-# list(APPEND webdirs ${buildwebdir}/src/imtqml)
-
 list(APPEND webdirs ${IMTCOREDIR}/Qml/imtgui)
 list(APPEND webdirs ${buildwebdir}/src/imtgui)
 
@@ -135,26 +125,20 @@ endif()
 
 
 
+list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Qml")
+list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Qml/imtcontrols/Base")
 
-if(DEFINED CONTROLS_QML_DIRS AND CONTROLS_QML_DIRS)
+if(DEFINED QML_DIRS_CONTROLS AND QML_DIRS_CONTROLS)
 	message("CONTROLS_QML_DIRS ${CONTROLS_QML_DIRS}")
 	list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml")
-	# list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtqml/Qml")
-	 # list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtgui/Qml")
-	# list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtauthgui/Qml")
-	# list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtguigql/Qml")
-	# list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Include/imtcontrols/Qml")
-	list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Qml")
-	list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Qml/imtcontrols/Base")
-	# list(APPEND QML_IMPORT_DIRS "${CMAKE_CURRENT_LIST_DIR}/../Qml")
-
-	# Prevent adding duplicate values at each run of CMake.
-	list(REMOVE_DUPLICATES QML_IMPORT_DIRS)
-
-	# The variable is cached in ${BUILD_DIR}/CMakeCache.txt. We need FORCE to
-	# change it there immediately. Also, add a comment to the cache file.
-	set(QML_IMPORT_PATH ${QML_IMPORT_DIRS}
-		CACHE STRING "Qt Creator extra qml import paths for ${PROJECT_NAME}"
-		FORCE
-	)
 endif()
+
+# Prevent adding duplicate values at each run of CMake.
+list(REMOVE_DUPLICATES QML_IMPORT_DIRS)
+
+# The variable is cached in ${BUILD_DIR}/CMakeCache.txt. We need FORCE to
+# change it there immediately. Also, add a comment to the cache file.
+set(QML_IMPORT_PATH ${QML_IMPORT_DIRS}
+	CACHE STRING "Qt Creator extra qml import paths for ${PROJECT_NAME}"
+	FORCE
+)

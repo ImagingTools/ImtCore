@@ -3,6 +3,7 @@
 		<file alias="imtcontrols/qmldir">qmldir</file>
 
 		<file alias="imtcontrols/Base/StyleBase.qml">Base/StyleBase.qml</file>
+		<file alias="imtcontrols/Base/StyleComponents.qml">Base/StyleComponents.qml</file>
 		<file alias="imtcontrols/Base/ControlBase.qml">Base/ControlBase.qml</file>
 		<file alias="imtcontrols/Base/DecoratorBase.qml">Base/DecoratorBase.qml</file>
 		<file alias="imtcontrols/Base/DecoratorsQt.qml">Base/DecoratorsQt.qml</file>
@@ -28,8 +29,6 @@
 		<file alias="imtcontrols/Buttons/ButtonDecorator.qml">Buttons/ButtonDecorator.qml</file>
 		<file alias="imtcontrols/Buttons/RadioButton.qml">Buttons/RadioButton.qml</file>
 		<file alias="imtcontrols/Buttons/IconButtonDecorator.qml">Buttons/IconButtonDecorator.qml</file>
-		<file alias="imtcontrols/Buttons/MenuPanelButton.qml">Buttons/MenuPanelButton.qml</file>
-		<file alias="imtcontrols/Buttons/MenuPanelButtonDecorator.qml">Buttons/MenuPanelButtonDecorator.qml</file>
 		<file alias="imtcontrols/Buttons/TextButtonDecorator.qml">Buttons/TextButtonDecorator.qml</file>
 		<file alias="imtcontrols/Buttons/ToolButtonDecorator.qml">Buttons/ToolButtonDecorator.qml</file>
 		<file alias="imtcontrols/Buttons/TopButtonDecorator.qml">Buttons/TopButtonDecorator.qml</file>

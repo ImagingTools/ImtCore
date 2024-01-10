@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtcontrols 1.0
 
 Item {
     id: comboBoxContainerGql;
@@ -142,7 +143,8 @@ Item {
             pauseDuration: comboBoxContainerGql.pauseDuration;
             excludeFilterPart: comboBoxContainerGql.excludeFilterPart;
             canUpdateModel: comboBoxContainerGql.canUpdateModel;
-            doNotCorrectPosition: comboBoxContainerGql.doNotCorrectPosition;
+            // doNotCorrectPosition: comboBoxContainerGql.doNotCorrectPosition; !!!!!!!!!!!!
+
 //            function getCurrentText(index){
 //                return popup.model.GetData("Name",index);
 //            }

@@ -4,38 +4,73 @@ import Acf 1.0
 import imtcontrols 1.0
 import imtgui 1.0
 
-Item {
+StyleComponents {
     property string styleId: "StyleAcf"
-    property Component topButtonDecorator: topButtonDecoratorComp
-    property Component topPanelDecorator: topPanelDecoratorComp
-    property Component topCenterPanelDecorator: topCenterPanelDecoratorComp
-    property Component topLeftPanelDecorator: topLeftPanelDecoratorComp
-    property Component topRightPanelDecorator: topRightPanelDecoratorComp
+    menuPanelButtonDecorator: menuPanelButtonDecoratorComp
+    subMenuPanelButtonDecorator: subMenuPanelButtonDecoratorComp
+    filterPanelDecorator: filterPanelDecoratorComp
+    // bottomPanelDecorator: bottomPanelDecoratorComp
+    topButtonDecorator: topButtonDecoratorComp
+    topPanelDecorator: topPanelDecoratorComp
+    topCenterPanelDecorator: topCenterPanelDecoratorComp
+    topLeftPanelDecorator: topLeftPanelDecoratorComp
+    topRightPanelDecorator: topRightPanelDecoratorComp
 
-    property Component tabPanelDecorator: tabPanelDecoratorComp
+    tabPanelDecorator: tabPanelDecoratorComp
 
-    property Component buttonDecorator: buttonDecoratorComp
-    property Component roundButtonDecorator: roundButtonDecoratorComp
+    buttonDecorator: buttonDecoratorComp
+    roundButtonDecorator: roundButtonDecoratorComp
 
-    property Component textFieldDecorator: textFieldDecoratorComp
-    property Component textEditDecorator: textEditDecoratorComp
+    textFieldDecorator: textFieldDecoratorComp
+    textEditDecorator: textEditDecoratorComp
 
-    property Component comboBoxDecorator: comboBoxDecoratorComp
-    property Component checkBoxDecorator: checkBoxDecoratorComp
-    property Component switchDecorator: switchDecoratorComp
-    property Component sliderDecorator: sliderDecoratorComp
-    property Component rangeSliderDecorator: rangeSliderDecoratorComp
-    property Component radioButtonDecorator: radioButtonDecoratorComp
+    comboBoxDecorator: comboBoxDecoratorComp
+    checkBoxDecorator: checkBoxDecoratorComp
+    switchDecorator: switchDecoratorComp
+    sliderDecorator: sliderDecoratorComp
+    rangeSliderDecorator: rangeSliderDecoratorComp
+    radioButtonDecorator: radioButtonDecoratorComp
 
-    property Component textAreaDecorator: textAreaDecoratorComp
-    property Component spinBoxDecorator: spinBoxDecoratorComp
+    textAreaDecorator: textAreaDecoratorComp
+    spinBoxDecorator: spinBoxDecoratorComp
 
-    property Component dialogDecorator: dialogDecoratorComp
+    dialogDecorator: dialogDecoratorComp
 
-    property Component progressBarDecorator: progressBarDecoratorComp
-    property Component busyIndicatorDecorator: busyIndicatorDecoratorComp
-    property Component tooltipDecorator: tooltipDecoratorComp
+    progressBarDecorator: progressBarDecoratorComp
+    busyIndicatorDecorator: busyIndicatorDecoratorComp
+    tooltipDecorator: tooltipDecoratorComp
 
+    Component {
+        id: menuPanelButtonDecoratorComp
+
+        MenuPanelButtonDecorator{
+
+        }
+    }
+
+    Component {
+        id: subMenuPanelButtonDecoratorComp
+
+        SubMenuPanelButtonDecorator{
+
+        }
+    }
+
+    Component {
+        id: filterPanelDecoratorComp
+
+        FilterPanelDecorator{
+
+        }
+    }
+
+    // Component {
+    //     id: bottomPanelDecoratorComp
+
+    //     BottomPanelDecorator{
+
+    //     }
+    // }
 
     Component {
         id: topButtonDecoratorComp

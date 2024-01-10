@@ -4,16 +4,16 @@ singleton Events 1.0 ./Base/Events.qml
 singleton Enums 1.0 ./Base/Enums.qml
 
 Icon 1.0 ./Base/Icon.js
+ButtonType 1.0 ./Base/ButtonType.js
 
 ControlBase 1.0 ./Base/ControlBase.qml
 DecoratorBase 1.0 ./Base/DecoratorBase.qml
 Decorators 1.0 ./Base/Decorators.qml
 DecoratorsQt 1.0 ./Base/DecoratorsQt.qml
 StyleBase 1.0 ./Base/StyleBase.qml
+StyleComponents 1.0 ./Base/StyleComponents.qml
 MainWindow 1.0 MainWindow.qml
 WrapItem 1.0 WrapItem.qml
-ButtonType 1.0 ./Base/ButtonType.js
-
 
 Action 1.0 ./Actions/Action.qml
 PopupMenuDelegate 1.0 ./Actions/PopupMenuDelegate.qml
@@ -30,8 +30,6 @@ CommonButtonDecorator 1.0 ./Buttons/CommonButtonDecorator.qml
 ButtonDecorator 1.0 ./Buttons/ButtonDecorator.qml
 RadioButton 1.0 ./Buttons/RadioButton.qml
 IconButtonDecorator 1.0 ./Buttons/IconButtonDecorator.qml
-MenuPanelButton 1.0 ./Buttons/MenuPanelButton.qml
-MenuPanelButtonDecorator 1.0 ./Buttons/MenuPanelButtonDecorator.qml
 TextButtonDecorator 1.0 ./Buttons/TextButtonDecorator.qml
 ToolButtonDecorator 1.0 ./Buttons/ToolButtonDecorator.qml
 TopButtonDecorator 1.0 ./Buttons/TopButtonDecorator.qml

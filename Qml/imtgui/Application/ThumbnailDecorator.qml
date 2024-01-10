@@ -130,7 +130,7 @@ Rectangle {
         anchors.leftMargin: thumbnailDecoratorContainer.mainMargin;
         anchors.top: topPanel.bottom;
         anchors.topMargin: thumbnailDecoratorContainer.mainMargin;
-        anchors.bottom: customPanel.top;
+        anchors.bottom: bottomPanel.top;
         anchors.bottomMargin: thumbnailDecoratorContainer.mainMargin;
 
         model: pagesManager.pageModel;
@@ -138,26 +138,13 @@ Rectangle {
         color: Style.color_menuPanel !==undefined ? Style.color_menuPanel : Style.imagingToolsGradient1;
     }
 
-    Item {
-        id: customPanel;
+    BottomPanel {
+        id: bottomPanel;
 
         anchors.left: parent.left;
         anchors.leftMargin: thumbnailDecoratorContainer.mainMargin;
         anchors.bottom: parent.bottom;
         anchors.bottomMargin: thumbnailDecoratorContainer.mainMargin;
-
-        Loader {
-            id: loaderCustomPanel;
-
-            source: Style.customPanelDecoratorPath;
-
-            onItemChanged: {
-                if (loaderCustomPanel.item){
-                    customPanel.height = loaderCustomPanel.item.height;
-                    customPanel.width = loaderCustomPanel.item.width;
-                }
-            }
-        }
     }
 
     MainDocumentManager {

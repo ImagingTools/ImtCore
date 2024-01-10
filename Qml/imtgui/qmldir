@@ -33,6 +33,7 @@ TopCenterPanelDecorator 1.0 Panels/TopCenterPanelDecorator.qml
 TopLeftPanel 1.0 Panels/TopLeftPanel.qml
 TopLeftPanelDecorator 1.0 Panels/TopLeftPanelDecorator.qml
 TopPanel 1.0 Panels/TopPanel.qml
+BottomPanel 1.0 Panels/BottomPanel.qml
 TopPanelDecorator 1.0 Panels/TopPanelDecorator.qml
 TopRightPanel 1.0 Panels/TopRightPanel.qml
 TopRightPanelDecorator 1.0 Panels/TopRightPanelDecorator.qml
@@ -59,5 +60,5 @@ MultiPageView 1.0 View/MultiPageView.qml
 Pagination 1.0 View/Pagination.qml
 ServerNoConnectionView 1.0 View/ServerNoConnectionView.qml
 SimpleCommandsDecorator 1.0 View/SimpleCommandsDecorator.qml
-
+SearchComp 1.0 View/SearchComp.qml
 

@@ -95,6 +95,7 @@ Rectangle {
     }
 
     onModelChanged: {
+        console.log("MenuPanel onModelChanged", menuPanel.model.toJSON())
         let pageIndex = menuPanel.activePageIndex;
 
         lvPages.model = 0;

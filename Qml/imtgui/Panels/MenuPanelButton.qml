@@ -1,7 +1,8 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtcontrols 1.0
 
-Item {
+ControlBase {
     id: container;
 
     width: container.contentWidth;
@@ -20,8 +21,8 @@ Item {
     property real imageSelectedCoeff: 0.73;
     property real fontSize: 11;
 
-    property int contentWidth;
-    property int contentHeight;
+    property int contentWidth: menuPanelButtonDecorator.width
+    property int contentHeight: menuPanelButtonDecorator.height
 
     property string decoratorSource;
 
@@ -38,29 +39,19 @@ Item {
         }
     }
 
-    onSelectedChanged: {
-        console.log("onSelectedChanged", container.selected);
-        if (loaderDecorator.item){
-            loaderDecorator.item.selected = container.selected;
-        }
-    }
-
-    onHighlightedChanged: {
-        if (loaderDecorator.item){
-            loaderDecorator.item.highlighted = container.highlighted;
-        }
-    }
-
-    onImageSourceChanged: {
-        if (loaderDecorator.item){
-            loaderDecorator.item.imageSource = container.imageSource;
-        }
-    }
 
     Component.onCompleted: {
         if (model.SubPages){
             subPagesRepeater.model = model.SubPages;
         }
+    }
+
+    MenuPanelButtonDecorator {
+        id: menuPanelButtonDecorator
+        imageSource: container.imageSource
+        highlighted: container.highlighted
+        selected: container.selected
+        title: container.text
     }
 
     Rectangle {
@@ -73,24 +64,6 @@ Item {
 
         color: "transparent";
 
-        Loader {
-            id: loaderDecorator;
-
-            onItemChanged: {
-                if (loaderDecorator.item){
-                    loaderDecorator.item.imageSource = container.imageSource;
-                    loaderDecorator.item.highlighted = container.highlighted;
-                    loaderDecorator.item.selected = container.selected;
-                    loaderDecorator.item.title = container.text;
-
-                    container.contentWidth = loaderDecorator.item.width;
-                    container.contentHeight = loaderDecorator.item.height;
-
-                    console.log("container.contentWidth", container.contentWidth);
-                    console.log("container.contentHeight", container.contentHeight);
-                }
-            }
-        }
 
         MouseArea{
             id: ma;
@@ -124,32 +97,15 @@ Item {
         Repeater {
             id: subPagesRepeater;
 
-            delegate: Item {
+            delegate: SubMenuPanelButtonDecorator {
                 id: subPageDelegate;
 
                 width: subPagesColumn.width;
-                height: 50;
+                height: container.height
 
-                property bool selected: subPagesColumn.currentIndex == model.index;
+                selected: subPagesColumn.currentIndex == model.index;
+                title: model["Name"]
 
-                onSelectedChanged: {
-                    if (subPagesDecorator.item){
-                        subPagesDecorator.item.selected = subPageDelegate.selected;
-                    }
-                }
-
-                Loader {
-                    id: subPagesDecorator;
-
-                    source: Style.subMenuButtonDecoratorPath;
-
-                    onLoaded: {
-                        subPagesDecorator.item.width = container.width;
-                        subPagesDecorator.item.height = container.height;
-                        subPagesDecorator.item.selected = subPageDelegate.selected;
-                        subPagesDecorator.item.title = model["Name"];
-                    }
-                }
 
                 MouseArea{
                     anchors.fill: parent;

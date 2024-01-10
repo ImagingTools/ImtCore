@@ -10,6 +10,7 @@ DecoratorBase {
 
     property alias icon: iconObj
     property alias font: textObj.font
+    property alias textColor: textObj.color
     property alias color: background.color
     property alias radius: background.radius
     property alias border: background.border

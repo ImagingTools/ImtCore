@@ -47,6 +47,9 @@ void CSocket::TimeOut()
 {
 	if (m_socket != nullptr){
 		qDebug() << m_socket->socketDescriptor() << " Time out";
+		if (m_socket->isTransactionStarted()){
+			m_socket->commitTransaction();
+		}
 		m_socket->disconnect();
 	}
 }
@@ -81,6 +84,9 @@ void CSocket::HandleReadyRead()
 	if (!m_requestPtr->ParseDeviceData(*m_socket)){
 		qDebug() << "ParseDeviceData error";
 		m_startTimer.stop();
+		if (m_socket->isTransactionStarted()){
+			m_socket->commitTransaction();
+		}
 		m_socket->disconnect();
 
 		return;

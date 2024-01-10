@@ -3,7 +3,7 @@ import Acf 1.0
 import imtguigql 1.0
 //import imtcontrols 1.0
 
-Item {
+StyleComponents {
     id: styleContainer;
 
 
@@ -194,32 +194,22 @@ Item {
         return themeType.GetData("ColorPalette").GetData(colorPalette);
     }
 
-    property Component topButtonDecorator
-    property Component topPanelDecorator
-    property Component topCenterPanelDecorator
-    property Component topLeftPanelDecorator
-    property Component topRightPanelDecorator
-    property Component tabPanelDecorator
-    property Component buttonDecorator
-    property Component roundButtonDecorator
-    property Component textFieldDecorator
-    property Component textEditDecorator
-    property Component comboBoxDecorator
-    property Component checkBoxDecorator
-    property Component switchDecorator
-    property Component sliderDecorator
-    property Component rangeSliderDecorator
-    property Component radioButtonDecorator
-    property Component textAreaDecorator
-    property Component spinBoxDecorator
-    property Component dialogDecorator
-    property Component progressBarDecorator
-    property Component busyIndicatorDecorator
-    property Component tooltipDecorator
-
     function setDecorators(sourceDecorators){
         if (sourceDecorators.styleId){
             styleContainer.styleId = sourceDecorators.styleId
+        }
+
+        if (sourceDecorators.menuPanelButtonDecorator){
+            styleContainer.menuPanelButtonDecorator = sourceDecorators.menuPanelButtonDecorator
+        }
+        if (sourceDecorators.subMenuPanelButtonDecorator){
+            styleContainer.subMenuPanelButtonDecorator = sourceDecorators.subMenuPanelButtonDecorator
+        }
+        if (sourceDecorators.filterPanelDecorator){
+            styleContainer.filterPanelDecorator = sourceDecorators.filterPanelDecorator
+        }
+        if (sourceDecorators.bottomPanelDecorator){
+            styleContainer.bottomPanelDecorator = sourceDecorators.bottomPanelDecorator
         }
         if (sourceDecorators.topButtonDecorator){
             styleContainer.topButtonDecorator = sourceDecorators.topButtonDecorator
@@ -286,6 +276,34 @@ Item {
         }
         if (sourceDecorators.tooltipDecorator){
             styleContainer.tooltipDecorator = sourceDecorators.tooltipDecorator
+        }
+
+        if (sourceDecorators.backGroundDecorator){
+            styleContainer.backGroundDecorator = sourceDecorators.backGroundDecorator
+        }
+
+        if (sourceDecorators.messageDecorator){
+            styleContainer.messageDecorator = sourceDecorators.messageDecorator
+        }
+
+        if (sourceDecorators.titleDecorator){
+            styleContainer.titleDecorator = sourceDecorators.titleDecorator
+        }
+
+        if (sourceDecorators.inputTitleDecorator){
+            styleContainer.inputTitleDecorator = sourceDecorators.inputTitleDecorator
+        }
+
+        if (sourceDecorators.frame){
+            styleContainer.frame = sourceDecorators.frame
+        }
+
+        if (sourceDecorators.commonButtonDecorator){
+            styleContainer.commonButtonDecorator = sourceDecorators.commonButtonDecorator
+        }
+
+        if (sourceDecorators.topPanelDialogDecorator){
+            styleContainer.topPanelDialogDecorator = sourceDecorators.topPanelDialogDecorator
         }
     }
 
@@ -359,24 +377,6 @@ Item {
             Style.shadowColor = styleContainer.getThemeColor("ActiveColors", "Shadow", dataSource);
         }
 
-        if (themeType.ContainsKey("decorators")){
-
-            let dataDecorators = themeType.GetData("decorators");
-            if (dataDecorators){
-
-                console.log('DEBUG::dataDecorators', dataDecorators)
-
-                Style.menuButtonDecoratorPath = styleContainer.getDecorator(dataDecorators, "MenuPanel", "MainButton");
-                Style.subMenuButtonDecoratorPath = styleContainer.getDecorator(dataDecorators, "MenuPanel", "SubButton");
-                Style.tabPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TabPanel", "Base");
-                Style.topPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "Base");
-                Style.filterPanelDecoratorPath = styleContainer.getDecorator(dataDecorators,"FilterPanel", "Base");
-                Style.topCenterPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "CenterPanel");
-                Style.topRightPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "RightPanel");
-                Style.topLeftPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "TopPanel", "LeftPanel");
-                Style.customPanelDecoratorPath = styleContainer.getDecorator(dataDecorators, "CustomPanel", "Base");
-            }
-        }
     }
 
     GqlModel {

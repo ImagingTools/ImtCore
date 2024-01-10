@@ -10,6 +10,8 @@ Item {
 
     anchors.fill: parent;
 
+    property Decorators decorators: decorators_
+
     property string message;
     property string systemStatus: "NO_ERROR";
     property alias localSettings: application.settingsProvider.localModel;
@@ -44,7 +46,7 @@ Item {
 //    }
 
     Decorators {
-        id: decorators
+        id: decorators_
     }
 
     function setDecorators(){
