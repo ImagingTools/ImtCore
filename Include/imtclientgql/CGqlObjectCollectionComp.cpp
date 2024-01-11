@@ -64,6 +64,48 @@ CGqlObjectCollectionComp::CGqlObjectCollectionComp()
 }
 
 
+QByteArray CGqlObjectCollectionComp::InsertNewObject(
+			const QByteArray& typeId,
+			const QString& name,
+			const QString& description,
+			IObjectCollection::DataPtr defaultValuePtr,
+			const QByteArray& proposedObjectId,
+			const QByteArray& parentId,
+			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
+			const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
+			const imtbase::IOperationContext* operationContextPtr)
+{
+	if (m_delegateCompPtr.IsValid()){
+		istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
+		imtbase::ICollectionInfo::ElementInsertInfo insertInfo;
+
+		QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray() : proposedObjectId;
+
+		insertInfo.elementId = objectId;
+		changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_INSERTED, QVariant::fromValue(insertInfo));
+		istd::CChangeNotifier notifier(this, &changeSet);
+
+		objectId = m_delegateCompPtr->InsertObject(
+					typeId,
+					name,
+					description,
+					*defaultValuePtr,
+					objectId,
+					parentId,
+					dataMetaInfoPtr,
+					elementMetaInfoPtr,
+					operationContextPtr);
+		if (objectId.isEmpty()){
+			notifier.Abort();
+		}
+
+		return objectId;
+	}
+
+	return QByteArray();
+}
+
+
 // reimplemented (imtbase::IStructuredCollectionFinder)
 //
 //QByteArrayList CGqlObjectCollectionComp::FindObjectParentNodes(const QByteArray& objectId) const
@@ -85,49 +127,6 @@ CGqlObjectCollectionComp::CGqlObjectCollectionComp()
 //	return retVal;
 //}
 //
-//
-//// reimpolemented (imtbase::IStructuredCollectionInserter)
-//
-//QByteArray CGqlObjectCollectionComp::InsertNewObject(
-//			const QByteArray& typeId,
-//			const QString& name,
-//			const QString& description,
-//			IObjectCollection::DataPtr defaultValuePtr,
-//			const QByteArray& proposedObjectId,
-//			const QByteArray& parentId,
-//			const idoc::IDocumentMetaInfo* dataMetaInfoPtr,
-//			const idoc::IDocumentMetaInfo* elementMetaInfoPtr,
-//			const imtbase::IOperationContext* operationContextPtr)
-//{
-//	if (m_delegateCompPtr.IsValid()){
-//		istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
-//		imtbase::ICollectionInfo::ElementInsertInfo insertInfo;
-//
-//		QByteArray objectId = proposedObjectId.isEmpty() ? QUuid::createUuid().toByteArray() : proposedObjectId;
-//
-//		insertInfo.elementId = objectId;
-//		changeSet.SetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_INSERTED, QVariant::fromValue(insertInfo));
-//		istd::CChangeNotifier notifier(this, &changeSet);
-//
-//		objectId = m_delegateCompPtr->InsertObject(
-//					typeId,
-//					name,
-//					description,
-//					*defaultValuePtr,
-//					objectId,
-//					parentId,
-//					dataMetaInfoPtr,
-//					elementMetaInfoPtr,
-//					operationContextPtr);
-//		if (objectId.isEmpty()){
-//			notifier.Abort();
-//		}
-//
-//		return objectId;
-//	}
-//
-//	return QByteArray();
-//}
 //
 //
 //// reimpolemented (imtbase::TIStructuredCollectionInfo)
@@ -384,17 +383,17 @@ imtbase::ICollectionInfo::Id CGqlObjectCollectionComp::InsertNewObject(
 			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr,
 			const imtbase::IOperationContext* operationContextPtr)
 {
-	return imtbase::ICollectionInfo::Id();
-	//return InsertNewObject(
-	//			typeId,
-	//			name,
-	//			description,
-	//			defaultValuePtr,
-	//			proposedObjectId,
-	//			QByteArray(),
-	//			dataMetaInfoPtr,
-	//			collectionItemMetaInfoPtr,
-	//			operationContextPtr);
+	// return imtbase::ICollectionInfo::Id();
+	return InsertNewObject(
+				typeId,
+				name,
+				description,
+				defaultValuePtr,
+				proposedObjectId,
+				QByteArray(),
+				dataMetaInfoPtr,
+				collectionItemMetaInfoPtr,
+				operationContextPtr);
 }
 
 
