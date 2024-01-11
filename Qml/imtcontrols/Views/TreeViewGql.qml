@@ -32,9 +32,7 @@ Rectangle{
     signal closeBranch(int index)
 
     onWidthChanged: {
-        //if(width > list.contentWidth){
-            list.contentX = list.originX;
-        //}
+        list.contentX = list.originX;
     }
 
     // onClicked: {
