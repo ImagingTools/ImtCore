@@ -31,6 +31,12 @@ Rectangle{
     signal openBranch(int index)
     signal closeBranch(int index)
 
+    onWidthChanged: {
+        //if(width > list.contentWidth){
+            list.contentX = list.originX;
+        //}
+    }
+
     // onClicked: {
     //     if (selectedIndex != index ){
     //         selectedIndex = index
@@ -143,20 +149,17 @@ Rectangle{
 
                         width: 16;
                         height: width;
-                        radius: width;
 
                         visible: model.HasChildren == undefined ? false : model.HasChildren;
                         enabled: visible;
 
-                        color: "transparent";
-
-                        border.color: "transparent";
-                        border.width: 0;
-                        hasIcon: true;
                         property string imageName: deleg.isOpen ? "Icons/Down" : "Icons/Right";
-                        iconSource:  "../../../" +Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
-                        iconWidth: width;
-                        iconHeight: width;
+                        iconSource:  "../../../" + Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
+
+                        decorator: ButtonDecorator{
+                            color: "transparent";
+                            border.color: "transparent";
+                        }
 
                         onClicked: {
                             if(model.HasChildren){

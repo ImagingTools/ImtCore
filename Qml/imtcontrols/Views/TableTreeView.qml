@@ -97,7 +97,6 @@ AuxTable{
                 width: tableTreeView.delegateWidth;
                 height: parent.height;
                 color: "transparent";
-                //color: "lightgreen";
 
                 Button{
                     id: openButton;
@@ -108,20 +107,17 @@ AuxTable{
 
                     width: 16;
                     height: width;
-                    radius: width;
 
                     visible: model.HasChildren == undefined ? false : model.HasChildren;
                     enabled: visible;
 
-                    color: "transparent";
-
-                    border.color: "transparent";
-                    border.width: 0;
-                    hasIcon: true;
                     property string imageName: deleg.isOpen ? "Icons/Down" : "Icons/Right";
                     iconSource:  "../../../" +Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
-                    iconWidth: width;
-                    iconHeight: width;
+
+                    decorator: ButtonDecorator{
+                        color: "transparent";
+                        border.color: "transparent";
+                    }
 
                     onClicked: {
                         tableTreeView.selectedIndex = model.index;
