@@ -290,10 +290,14 @@ Rectangle{
 
     function setContentWidth(){
         let maxWidth = 0;
+        let maxLevel_= 0;
         for(let i = 0; i < treeViewGql.model.GetItemsCount(); i++){
-            let level = treeViewGql.model.GetData("Level",i);
             let visible = treeViewGql.model.GetData("Visible",i);
+            let level = !visible ? 0 : treeViewGql.model.GetData("Level",i);
             let width_ = !visible ? 0 : level * treeViewGql.shift + list.delegateWidth;
+            if(level > maxLevel_){
+                maxLevel_ = level;
+            }
             if(width_ > maxWidth){
                 maxWidth = width_;
             }
@@ -301,7 +305,7 @@ Rectangle{
 
         list.contentWidth = maxWidth;
         if(list.contentWidth > list.width){
-            list.contentX = list.contentWidth - list.width + list.originX;
+            list.contentX = Math.min((maxLevel_-1) * treeViewGql.shift + list.originX, list.contentWidth - list.width + list.originX);
         }
         else {
             list.contentX = list.originX;

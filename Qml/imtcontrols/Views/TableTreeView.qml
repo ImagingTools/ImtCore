@@ -231,8 +231,7 @@ AuxTable{
             tableTreeView.contentWidth = tableTreeView.elementsListWidth;
         }
         if(tableTreeView.contentWidth > tableTreeView.elementsListWidth){
-            //tableTreeView.contentX = tableTreeView.contentWidth - tableTreeView.elementsListWidth + tableTreeView.originX;
-            tableTreeView.contentX = Math.min(tableTreeView.contentX + tableTreeView.shift, tableTreeView.contentWidth - tableTreeView.elementsListWidth + tableTreeView.originX);
+            tableTreeView.contentX = Math.min((maxLevel_-1) * tableTreeView.shift + tableTreeView.originX, tableTreeView.contentWidth - tableTreeView.elementsListWidth + tableTreeView.originX);
         }
         else {
             tableTreeView.contentX = tableTreeView.originX;
