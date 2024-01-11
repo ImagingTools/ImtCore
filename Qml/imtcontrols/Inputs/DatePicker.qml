@@ -1,4 +1,4 @@
-import QtQuick 2.12
+import QtQuick 2.15
 import Acf 1.0
 import imtcontrols 1.0
 
@@ -352,10 +352,10 @@ Item {
 
         spacing: 10;
 
-        RegExpValidator {
+        RegularExpressionValidator {
             id: yearValid;
 
-            regExp: /^(19|20)\d{2}$/;
+            regularExpression: /^(19|20)\d{2}$/;
         }
 
         Row {
@@ -636,10 +636,10 @@ Item {
                 }
             }
 
-            RegExpValidator {
+            RegularExpressionValidator {
                 id: dayValid;
 
-                regExp: /\b([1-9]|[12][0-9]|3[01])\b/;
+                regularExpression: /\b([1-9]|[12][0-9]|3[01])\b/;
             }
 
             CustomTextField {

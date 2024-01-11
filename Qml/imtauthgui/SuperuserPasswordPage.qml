@@ -31,21 +31,11 @@ Rectangle {
             root.passwordSetted();
         }
 
-        documentController.setData("User", "su", root.userModel, {}, onResult);
+        documentController.setData("UserAdd", "su", root.userModel, {}, onResult);
     }
 
     GqlDocumentDataController{
         id: documentController;
-
-//        documentTypeId: "User";
-
-//        onDocumentAdded: {
-//            root.passwordSetted();
-//        }
-
-//        onError: {
-//            root.failed(message);
-//        }
     }
 
     function checkPassword(){
@@ -180,6 +170,12 @@ Rectangle {
 
                 onClicked: {
                     root.setSuperuserPassword(passwordTextInput.text);
+                }
+
+                decorator: ButtonDecorator{
+                    width: 70;
+                    height: 23;
+                    radius: deviceEditorContainer.radius;
                 }
             }
         }

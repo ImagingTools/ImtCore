@@ -96,9 +96,16 @@ Item {
             iconSource: "../../../../" + Style.getIconPath("Icons/Add", Icon.State.On, Icon.Mode.Normal);
 
             onClicked: {
-                console.log("productRolesDelegate.index", productRolesDelegate.index);
-              //  productRolesDelegate.clicked(productRolesDelegate.index);
                 Events.sendEvent(productRolesDelegate.commandsId + "CommandActivated", "New");
+            }
+
+            decorator: Component {
+                id: buttonDecorator;
+
+                ButtonDecorator {
+                    color: buttonNew.hovered ? Style.buttonHoverColor : "transparent";
+                    border.width: 0;
+                }
             }
         }
     }

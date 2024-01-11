@@ -76,7 +76,7 @@ Item {
                 updateGui()
             }
             else{
-                clearGui();
+//                clearGui();
             }
         }
 
@@ -96,6 +96,8 @@ Item {
     signal stopLoading();
 
     Component.onDestruction: {
+        console.log("Document onDestruction");
+
         Events.unSubscribeEvent(uuid + "CommandActivated", commandsDelegate.commandHandle);
 
         documentData.documentModel.Clear();

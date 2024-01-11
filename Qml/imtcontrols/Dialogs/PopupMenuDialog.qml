@@ -61,10 +61,13 @@ Item {
     //forShortcutEnter
     Component.onCompleted: {
         popupMenuContainer.forceActiveFocus();
+
+        Events.subscribeEvent("AppSizeChanged", onAppSizeChanged);
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
+        Events.unSubscribeEvent("AppSizeChanged", onAppSizeChanged);
     }
 
     onFinished: {
@@ -100,6 +103,10 @@ Item {
             Close the dialog by clicking on the background
         */
         Events.subscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
+    }
+
+    function onAppSizeChanged(parameters){
+        onBackgroundClicked();
     }
 
     function onBackgroundClicked(){
@@ -155,6 +162,9 @@ Item {
             clip: true;
 
             delegate: popupMenuContainer.delegate;
+
+            cacheBuffer: count * popupMenuContainer.itemHeight;
+//            cacheBuffer: 999999999;
         }//ListView
 
         MouseArea{

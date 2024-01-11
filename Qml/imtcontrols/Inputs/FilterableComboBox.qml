@@ -58,21 +58,14 @@ FocusScope {
     {
         Item {
             width: comboBoxContainer.width;
-//            height: visible ? comboBoxContainer.itemHeight : 0;
-            height: comboBoxContainer.itemHeight;
-
-            onVisibleChanged: {
-                console.log("delegate onVisibleChanged", visible);
-
-                height = visible ? comboBoxContainer.itemHeight : 0;
-            }
+            height: acceptable ? comboBoxContainer.itemHeight : 0;
 
             property string displayText: model[comboBoxContainer.nameId];
             property string filter: comboBoxContainer.filter;
 
-            onFilterChanged: {
-                visible = displayText.indexOf(filter) >= 0;
-            }
+            visible: height > 0;
+
+            property bool acceptable: displayText.indexOf(filter) >= 0;
 
             Rectangle{
                 id: background;
@@ -107,7 +100,7 @@ FocusScope {
                 hoverEnabled: true;
                 cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
-                visible: !comboBoxContainer ? true : !comboBoxContainer.hoverBlocked;
+                visible: !comboBoxContainer ? true : !comboBoxContainer.hoverBlocked/* && parent.height > 0*/;
                 onEntered: {
                     if(comboBoxContainer && comboBoxContainer.selectedIndex !== undefined)
                     {

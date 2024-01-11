@@ -10,7 +10,7 @@ Item {
     }
 
     property int selectedIndex: -1;
-    property int mainMargin: 0;
+    property int mainMargin: Style.size_mainMargin;
     property int panelWidth: 150;
 
     signal pageLoaded(int index, var pageItem);
@@ -119,9 +119,9 @@ Item {
             anchors.top: parent.top;
             anchors.left: parent.left;
             anchors.right: parent.right;
-            anchors.topMargin: 10;
+            anchors.topMargin: root.mainMargin;
 
-            spacing: 10;
+            spacing: Style.size_mainMargin;
 
             Component{
                 id: defaultButtonDecorator;
@@ -142,14 +142,22 @@ Item {
                     id: buttonContainer;
 
                     anchors.left: parent.left;
-                    anchors.leftMargin: 10;
+                    anchors.leftMargin: root.mainMargin;
                     anchors.right: parent.right;
-                    anchors.rightMargin: 10;
+                    anchors.rightMargin: root.mainMargin;
 
                     text:  model.Name;
-//                    selected: root.selectedIndex === model.index;
 
-//                    decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
+                    property bool selected: root.selectedIndex === model.index;
+
+                    decorator: ButtonDecorator {
+                        width: 160;
+                        height: 30;
+
+                        radius: 4;
+
+                        border.color: buttonContainer.selected ? Style.borderFocusColor : "transparent";
+                    }
 
                     onClicked: {
                         if (root.selectedIndex !== model.index){

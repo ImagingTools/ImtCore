@@ -68,6 +68,11 @@ Item {
                     onClicked: {
                         container.commandActivated(model.Id);
                     }
+
+                    decorator: ButtonDecorator {
+                        color: parent.hovered ? Style.buttonHoverColor : "transparent";
+                        border.width: 0;
+                    }
                 }
 
                 onItemAdded: {

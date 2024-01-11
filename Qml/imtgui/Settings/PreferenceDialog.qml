@@ -66,6 +66,8 @@ Dialog {
 
     contentComp: Component {
         Preference {
+            width: messageDialog.width;
+
             onModelChanged: {
                 console.log("onModelChanged");
 

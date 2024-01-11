@@ -14,7 +14,7 @@ Dialog {
 //            append({Id: Enums.ok, Name:qsTr("Ok"), Enabled: true})
 //        }
 
-        ListElement{Id: Enums.ButtonType.Ok; Name:qsTr("Ok"); Enabled: true}
+        ListElement{Id: Enums.ButtonType.Ok; Name:qsTr("OK"); Enabled: false}
         ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Cancel"); Enabled: true}
     }
 

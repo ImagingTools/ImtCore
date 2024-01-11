@@ -79,18 +79,26 @@ Item {
         width: Style.buttonWidthMedium;
         height: width;
 
-//        highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
-
         iconSource: "../../../" + Style.getIconPath("Icons/Account", Icon.State.On, Icon.Mode.Normal);
 
         enabled: root.enabled;
+
+        decorator: Component {
+            id: buttonDecorator;
+
+            ButtonDecorator {
+                color: loginButton.hovered ? Style.buttonHoverColor : "transparent";
+                border.width: 0;
+
+                icon.width: 20;
+            }
+        }
 
         onClicked: {
             if(root.isExitButton){
                 panelDelegate.logout();
             }
             else{
-                //var point = mapToItem(thumbnailDecoratorContainer, x - width, y + height);
                 var point = mapToItem(null, x - width, y + height);
                 point.x = point.x - 200;
                 modalDialogManager.openDialog(popupMenu, {"x": point.x, "y": point.y, "model": contextMenuModel});
@@ -105,7 +113,6 @@ Item {
             id: popupMenuDialog;
 
             onFinished: {
-                console.log("CollectionView PopupMenuDialog", commandId);
                 this.root.closeDialog();
 
                 if (commandId == "Logout"){
@@ -117,8 +124,6 @@ Item {
             }
 
             function onBackgroundClicked(){
-                console.log("onBackgroundClicked");
-
                 popupMenuDialog.root.closeDialog();
             }
         }

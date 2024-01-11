@@ -14,7 +14,7 @@ Rectangle {
     property string title;
     property bool hasIcon: true;
 
-    signal closeButtonClicked(string buttonId);
+    signal closeButtonClicked(int buttonId);
 
     Image {
         id: iconDialog;
@@ -65,7 +65,17 @@ Rectangle {
         iconSource: "../../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
         onClicked: {
-            topPanelDialogContainer.closeButtonClicked("Exit");
+            console.log("closeButtonClicked");
+            topPanelDialogContainer.closeButtonClicked(Enums.ButtonType.Cancel);
+        }
+
+        decorator: Component {
+            id: buttonDecorator;
+
+            ButtonDecorator {
+                color: closeButton.hovered ? Style.buttonHoverColor : "transparent";
+                border.width: 0;
+            }
         }
     }
 }

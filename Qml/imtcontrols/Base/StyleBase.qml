@@ -350,17 +350,19 @@ StyleComponents {
 
             Style.selectedColor = styleContainer.getThemeColor("ActiveColors", "ItemSelected", dataSource);
 
-            //        Style.buttonColor = styleContainer.getThemeColor("ActiveColors", "Button", dataSource);
-            //        Style.buttonBorderColor = styleContainer.getThemeColor("ActiveColors", "ButtonBorder", dataSource);
+            Style.buttonColor = styleContainer.getThemeColor("ActiveColors", "Button", dataSource);
+            Style.buttonBorderColor = styleContainer.getThemeColor("ActiveColors", "ButtonBorder", dataSource);
             Style.inactive_buttonColor = styleContainer.getThemeColor("InactiveColors", "Button", dataSource);
             Style.buttonText = styleContainer.getThemeColor("ActiveColors", "ButtonText", dataSource);
             Style.inactive_buttonText = styleContainer.getThemeColor("InactiveColors", "ButtonText", dataSource);
 
             Style.disabledInActiveTextColor = styleContainer.getThemeColor("DisabledInActiveColors", "Text", dataSource);
 
-            Style.hover = styleContainer.getThemeColor("ActiveColors", "Hover", dataSource);
-            //        Style.buttonHoverColor = styleContainer.getThemeColor("ActiveColors", "Hover", dataSource);
-            //        Style.buttonPressedColor = styleContainer.getThemeColor("ActiveColors", "BackgroundSelected", dataSource);
+//            Style.hover = Style.imagingToolsGradient2
+//            Style.hover = styleContainer.getThemeColor("ActiveColors", "Hover", dataSource);
+            Style.buttonHoverColor = Style.alternateBaseColor;
+//            Style.buttonHoverColor = styleContainer.getThemeColor("ActiveColors", "Hover", dataSource);
+            Style.buttonPressedColor = styleContainer.getThemeColor("ActiveColors", "BackgroundSelected", dataSource);
 
             //        Style.color_scrollBackground = styleContainer.getThemeColor("ActiveColors", "ScrollBackground", dataSource);
             //        Style.color_scrollIndicator = styleContainer.getThemeColor("ActiveColors", "ScrollIndicator", dataSource);

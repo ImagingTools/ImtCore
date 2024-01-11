@@ -308,8 +308,6 @@ Rectangle {
                     height: Math.min(24, parent.height - 10);
                     width: height;
 
-//                    highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
-
                     iconSource: passwordTextInput.echoMode == TextInput.Password ? "../../../" + Style.getIconPath("Icons/ShownPassword", Icon.State.On, Icon.Mode.Normal) :
                                                                                    "../../../" + Style.getIconPath("Icons/HiddenPassword", Icon.State.On, Icon.Mode.Normal) ;
 
@@ -319,6 +317,15 @@ Rectangle {
                         }
                         else if(passwordTextInput.echoMode == TextInput.Normal){
                             passwordTextInput.echoMode = TextInput.Password;
+                        }
+                    }
+
+                    decorator: Component {
+                        id: buttonDecorator;
+
+                        ButtonDecorator {
+                            color: loginButton.hovered ? Style.buttonHoverColor : "transparent";
+                            border.width: 0;
                         }
                     }
                 }

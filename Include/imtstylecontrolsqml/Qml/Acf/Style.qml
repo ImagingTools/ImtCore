@@ -6,5 +6,5 @@ import imtcontrols 1.0
 StyleBase {
     id: styleContainer;
 
-    size_mainMargin: 0;
+    size_mainMargin: 10;
 }

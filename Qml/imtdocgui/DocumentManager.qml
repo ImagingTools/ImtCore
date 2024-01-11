@@ -334,8 +334,6 @@ Item {
 
         if (documentData.isDirty && !force){
             let callback = function(result){
-                console.log("result", result);
-                console.log("==", result == Enums.ButtonType.No);
                 if (result == Enums.ButtonType.Yes){
                     internal.m_closingDocuments.push(documentData.uuid);
                     saveDocument(documentData.uuid);
@@ -349,7 +347,7 @@ Item {
                 modalDialogManager.finished.disconnect(callback);
             }
 
-            modalDialogManager.openDialog(saveDialog, {}, callback);
+            modalDialogManager.openDialog(saveDialog, {}, "", callback);
         }
         else{
             documentsModel.remove(documentIndex);
@@ -361,8 +359,6 @@ Item {
 
     function closeDocument(documentUuid, force)
     {
-        console.log("closeDocument", documentUuid);
-
         let index = getDocumentIndexByUuid(documentUuid, force);
 
         closeDocumentByIndex(index);

@@ -114,6 +114,11 @@ CollectionView {
                     arrowButton.tooltipItem.horizontalAlignment = Text.AlignLeft;
                     arrowButton.tooltipItem.lineHeight = 1;
                 }
+
+                decorator: ButtonDecorator {
+                    color: parent.hovered ? Style.buttonHoverColor : "transparent";
+                    border.width: 0;
+                }
             }
         }
     }
@@ -186,6 +191,11 @@ CollectionView {
                     arrowButton.tooltipItem.componentWidth = 300;
                     arrowButton.tooltipItem.horizontalAlignment = Text.AlignLeft;
                     arrowButton.tooltipItem.lineHeight = 1;
+                }
+
+                decorator: ButtonDecorator {
+                    color: parent.hovered ? Style.buttonHoverColor : "transparent";
+                    border.width: 0;
                 }
             }
         }

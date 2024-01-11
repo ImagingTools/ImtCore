@@ -33,6 +33,15 @@ Row {
         paginationContainer.refreshBtn();
     }
 
+    Component {
+        id: buttonDecorator;
+
+        ButtonDecorator {
+            color: "transparent";
+            border.width: 0;
+        }
+    }
+
     ListModel {
         id: listModel;
     }
@@ -79,14 +88,12 @@ Row {
         height: 20;
         width: 24;
 
-//        hasIcon: true;
-//        hasText: false;
-//        highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
-
         enabled: listModel.count > 1 && paginationContainer.currentIndex != 0;
 
         iconSource: buttonDecr.enabled ? "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal):
                                          "../../../" + Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled);
+
+        decorator: buttonDecorator;
 
         onClicked: {
             if (paginationContainer.currentIndex >= 1){
@@ -107,14 +114,10 @@ Row {
             delegate: Button {
                 id: buttonDelegate;
 
-                height: 20;
-//                width: Math.max(24, textWidth + 10);
                 width: 24;
+                height: 20;
 
-//                hasIcon: false;
-//                hasText: true;
-//                highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
-
+                decorator: buttonDecorator;
 
                 enabled: model.number !== -1 && paginationContainer.currentIndex !== model.number - 1;
                 text: model.number === -1 ? "..." : model.number;
@@ -142,10 +145,10 @@ Row {
 
         anchors.verticalCenter: parent.verticalCenter;
 
-        height: 20;
         width: 24;
+        height: 20;
 
-//        highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+        decorator: buttonDecorator;
 
         enabled: listModel.count > 1 && paginationContainer.currentIndex != paginationContainer.pagesSize - 1;
 
@@ -180,7 +183,7 @@ Row {
             width: 20;
             height: 20;
 
-//            highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+            decorator: buttonDecorator;
 
             enabled: paginationContainer.countElements != 25;
 
@@ -199,7 +202,7 @@ Row {
             width: 20;
             height: 20;
 
-//            highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+            decorator: buttonDecorator;
 
             enabled: paginationContainer.countElements != 50;
 
@@ -218,7 +221,7 @@ Row {
             width: 20;
             height: 20;
 
-//            highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+            decorator: buttonDecorator;
 
             enabled: paginationContainer.countElements != 100;
 

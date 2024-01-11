@@ -12,10 +12,8 @@ Item {
     property alias textInputWidth: tfc.width;
 
     function calcWidth(){
-        console.log("calcWidth");
 
         if (filterPanelDecorator.rootLoader){
-            console.log("parent.width", filterPanelDecorator.rootLoader.parent.width);
             let width = filterPanelDecorator.rootLoader.parent.width - 30;
             if (width <= tfc.width){
                 tfc.width = width;
@@ -23,17 +21,6 @@ Item {
             else{
                 tfc.width = 270;
             }
-
-            console.log("tfc.width", tfc.width);
-        }
-    }
-
-    onVisibleChanged: {
-        console.log("onVisibleChanged", tfc.width);
-
-        if (filterPanelDecorator.visible){
-//            animRect.to = tfc.width;
-//            animRect.start();
         }
     }
 
@@ -42,14 +29,6 @@ Item {
             tfc.forceActiveFocus();
         }
     }
-
-//    NumberAnimation {
-//        id: animRect;
-//        target: tfc;
-//        property: "width";
-//        from: 0;
-//        duration: 200;
-//    }
 
     CustomTextField {
         id: tfc;
@@ -64,7 +43,17 @@ Item {
         placeHolderText: qsTr("Enter some text to filter the item list");
 
         onTextChanged: {
-            filterPanelDecorator.rootLoader.textChanged(model.index, tfc.text);
+            timer.restart();
+        }
+
+        Timer {
+            id: timer;
+
+            interval: 600;
+
+            onTriggered: {
+                filterPanelDecorator.rootLoader.textChanged(model.index, tfc.text);
+            }
         }
 
         Button {
@@ -78,6 +67,15 @@ Item {
             height: width;
 
             visible: tfc.text != "";
+
+            decorator: Component {
+                ButtonDecorator {
+                    width: 10;
+
+                    color: "transparent";
+                    border.width: 0;
+                }
+            }
 
             iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
@@ -95,6 +93,13 @@ Item {
 
         width: Style.buttonWidthMedium;
         height: width;
+
+        decorator: Component {
+            ButtonDecorator {
+                color: "transparent";
+                border.width: 0;
+            }
+        }
 
         iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 

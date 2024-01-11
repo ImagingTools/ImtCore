@@ -257,10 +257,15 @@ Item {
                     height: width;
 
                     visible: collectionViewBaseContainer.hasFilter;
-//                    highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
 
-//                    iconWidth: Style.iconSizeSmall;
-//                    iconHeight: iconWidth;
+                    decorator: Component {
+                        id: buttonDecorator;
+
+                        ButtonDecorator {
+                            color: "transparent";
+                            border.width: 0;
+                        }
+                    }
 
                     iconSource: "../../../" + Style.getIconPath("Icons/Filter", Icon.State.On, Icon.Mode.Normal);
 

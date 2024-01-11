@@ -20,7 +20,10 @@ DecoratorBase {
 
         anchors.fill: parent
         radius: Style.buttonRadius
-        color: !commonButtonDecorator.baseElement ? "transtarent" : commonButtonDecorator.baseElement.down || commonButtonDecorator.baseElement.checked ? Style.buttonPressedColor : commonButtonDecorator.baseElement.hovered ?  Style.buttonHoverColor : Style.buttonColor
+        color: !commonButtonDecorator.baseElement ? "transtarent" :
+                                                    commonButtonDecorator.baseElement.down || commonButtonDecorator.baseElement.checked ?
+                                                        Style.buttonPressedColor : commonButtonDecorator.baseElement.hovered ?
+                                                            Style.buttonHoverColor : Style.buttonColor
         border.width: Style.buttonBorderWidth
         border.color: !commonButtonDecorator.baseElement ? "transtarent" : commonButtonDecorator.baseElement.focus ? Style.borderFocusColor : Style.borderColor
     }

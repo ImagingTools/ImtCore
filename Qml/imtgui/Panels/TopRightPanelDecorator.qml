@@ -15,7 +15,6 @@ DecoratorBase {
     }
 
     function onUserModeChanged(userMode){
-        console.log("onUserModeChanged", userMode);
         if (userMode === "NO_USER_MANAGEMENT"){
             userPanel.visible = false;
         }

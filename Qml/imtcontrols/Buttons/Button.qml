@@ -29,20 +29,18 @@ ControlBase {
 
     QtObject {
         id: _private
+
         function onClicked(){
             baseButton.focus = true;
             baseButton.forceActiveFocus();
+
             if (baseButton.checkable){
                 baseButton.checked = !baseButton.checked
                 baseButton.toggled()
             }
-//            else{
-                baseButton.clicked();
-//            }
-        }
-    }
 
-    Component.onCompleted: {
+            baseButton.clicked();
+        }
     }
 
     onDecoratorChanged: {
@@ -75,25 +73,27 @@ ControlBase {
                 _private.onClicked()
             }
         }
+
         onDoubleClicked: {
             baseButton.doubleClicked();
         }
+
         onPressed: {
             baseButton.down = true
             baseButton.pressed();
-
         }
+
         onReleased: {
             baseButton.down = false
             baseButton.released();
         }
+
         onEntered: {
             baseButton.entered();
         }
+
         onExited: {
             baseButton.exited();
         }
-
     }
-
 }

@@ -49,7 +49,7 @@ Item {
                         userPanelDelegate.userUpdated();
                     }
 
-                    documentController.updateData("User", userPanelDelegate.userId, userPanelDelegate.userModel, {}, onResult);
+                    documentController.updateData("UserUpdate", userPanelDelegate.userId, userPanelDelegate.userModel, {}, onResult);
                 }
             }
         }

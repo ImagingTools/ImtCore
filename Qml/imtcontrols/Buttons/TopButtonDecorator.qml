@@ -99,7 +99,6 @@ Item {
 //        samples: 16;
 ////        visible: topButtonDecorator.isToggleable ? topButtonDecorator.isToggled : button.visible && topButtonDecorator.isHighlighted;
 //        visible: baseElement.checked || baseElement.down
-
 //    }
 
     Rectangle{

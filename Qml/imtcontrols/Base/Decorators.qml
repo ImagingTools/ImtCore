@@ -134,7 +134,6 @@ StyleComponents {
             width: 160;
             height: 30;
             radius: 4;
-
         }
     }
 
@@ -366,7 +365,7 @@ StyleComponents {
             id: checkBoxItem;
 
             width: checkBoxText.text == "" ? checkRect.width : checkRect.width + checkBoxText.width + checkBoxItem.mainMargin;
-            height: 20;
+            height: 15;
 
             property var baseElement: null;
 

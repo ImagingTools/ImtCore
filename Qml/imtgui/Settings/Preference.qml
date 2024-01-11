@@ -79,7 +79,7 @@ Rectangle {
         anchors.top: parent.top;
         anchors.left: parent.left;
         anchors.bottom: parent.bottom;
-        anchors.margins: 10;
+        anchors.margins: Style.size_mainMargin;
 
         width: 150;
         height: parent.height;
@@ -99,11 +99,11 @@ Rectangle {
             id: mainPanel;
 
             anchors.fill: parent;
-            anchors.topMargin: 10;
+            anchors.topMargin: Style.size_mainMargin;
 
             property int selectedIndex: -1;
 
-            spacing: 5;
+            spacing: Style.size_mainMargin;
 
             Repeater {
                 id: mainPanelRepeater;
@@ -114,9 +114,9 @@ Rectangle {
                     id: buttonContainer;
 
                     anchors.left: parent.left;
-                    anchors.leftMargin: 10;
+                    anchors.leftMargin: Style.size_mainMargin;
                     anchors.right: parent.right;
-                    anchors.rightMargin: 10;
+                    anchors.rightMargin: Style.size_mainMargin;
 
                     // decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
 
@@ -162,13 +162,13 @@ Rectangle {
         id: flickable;
 
         anchors.top: parent.top;
-        anchors.topMargin: 10;
+        anchors.topMargin: Style.size_mainMargin;
         anchors.left: mainPanelBackground.right;
-        anchors.leftMargin: 10;
+        anchors.leftMargin: Style.size_mainMargin;
         anchors.right: parent.right;
-        anchors.rightMargin: 10;
+        anchors.rightMargin: Style.size_mainMargin;
         anchors.bottom: parent.bottom;
-        anchors.bottomMargin: 10;
+        anchors.bottomMargin: Style.size_mainMargin;
 
         clip: true;
 
@@ -210,7 +210,7 @@ Rectangle {
                         id: rectSeparator;
 
                         anchors.top: titleItem.bottom;
-                        anchors.topMargin: 5;
+                        anchors.topMargin: Style.size_smallMargin;
 
                         width: parent.width;
                         height: 1;
@@ -224,7 +224,7 @@ Rectangle {
                         id: loader;
 
                         anchors.top: rectSeparator.bottom;
-                        anchors.topMargin: 15;
+                        anchors.topMargin: Style.size_mainMargin;
 
                         Component.onCompleted: {
                             if (model.Source && model.Source !== ""){

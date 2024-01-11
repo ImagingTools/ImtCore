@@ -25,6 +25,14 @@ Item {
 
     property alias loadPageByClick: thumbnailDecorator.loadPageByClick;
 
+    onWidthChanged: {
+        Events.sendEvent("AppSizeChanged", {"Width": width, "Height": height})
+    }
+
+    onHeightChanged: {
+        Events.sendEvent("AppSizeChanged", {"Width": width, "Height": height})
+    }
+
     onApplicationInfoChanged: {
         console.log("onApplicationInfoChanged");
         if (application.applicationInfo){

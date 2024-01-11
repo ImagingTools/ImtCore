@@ -34,6 +34,8 @@ Item {
     }
 
     function clearModel(parameters){
+        console.log("CommandsDecorator clearModel", JSON.stringify(parameters));
+
         if (parameters){
             let commandId = parameters["CommandId"];
             if (commandId !== commandsDecoratorContainer.commandId){

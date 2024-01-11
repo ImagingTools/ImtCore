@@ -15,6 +15,17 @@ Item {
 
         iconSource: "../../../" + Style.getIconPath("Icons/Settings", "On", "Normal");
 
+        decorator: Component {
+            id: buttonDecorator;
+
+            ButtonDecorator {
+                color: preferenceButton.hovered ? Style.buttonHoverColor : "transparent";
+                border.width: 0;
+
+                icon.width: 20;
+            }
+        }
+
         onClicked: {
             console.log("Preference button clicked !");
             Events.sendEvent("ShowPreferencePage");

@@ -16,15 +16,12 @@ Item {
     property bool textCentered: false;
 
     property bool selected: !rootItem ? false : rootItem.selectedIndex == model.index ;
-    property bool isSeparator: model.Id === "Separator";
+    property bool isSeparator: model.Id == "Separator";
 
     signal clicked(string commandId, int index);
 
-    Component.onCompleted: {
-        //console.log("DEBUG::", model.Id, model.index, popupMenuDelegate.width, popupMenuDelegate.height, popupMenuDelegate.visible, popupMenuDelegate.x, popupMenuDelegate.y, popupMenuDelegate.z, popupMenuDelegate.parent)
-    }
-
     onIsSeparatorChanged: {
+        console.log("onIsSeparatorChanged", isSeparator);
         if (isSeparator){
             mouseArea.visible = false;
 
