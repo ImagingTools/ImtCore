@@ -20,6 +20,15 @@ AuxTable{
     signal requestSignal(int index);
     signal clicked(int index);
 
+    onWidthChanged: {
+        if(tableTreeView.model.GetItemsCount()){
+            setContentWidth();
+        }
+        tableTreeView.contentX = tableTreeView.originX;
+    }
+
+
+
     onClicked: {
         selectedIndex = index;
     }
@@ -222,7 +231,8 @@ AuxTable{
             tableTreeView.contentWidth = tableTreeView.elementsListWidth;
         }
         if(tableTreeView.contentWidth > tableTreeView.elementsListWidth){
-            tableTreeView.contentX = tableTreeView.contentWidth - tableTreeView.elementsListWidth + tableTreeView.originX;
+            //tableTreeView.contentX = tableTreeView.contentWidth - tableTreeView.elementsListWidth + tableTreeView.originX;
+            tableTreeView.contentX = Math.min(tableTreeView.contentX + tableTreeView.shift, tableTreeView.contentWidth - tableTreeView.elementsListWidth + tableTreeView.originX);
         }
         else {
             tableTreeView.contentX = tableTreeView.originX;
@@ -277,7 +287,7 @@ AuxTable{
                 ok_visible = true;
             }
             else if(level_curr > currClosedLevel && currClosedLevel >= 0){
-                 ok_visible = false;
+                ok_visible = false;
             }
             //*****************for closed*************//
 

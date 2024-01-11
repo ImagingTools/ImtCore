@@ -581,6 +581,7 @@ Rectangle {
             contentX: elementsList.contentX;
             contentWidth: elementsList.contentWidth;
             interactive: false;
+            cacheBuffer: contentWidth;
             property bool compl: false;
 
             property int currentIndex: 0;
