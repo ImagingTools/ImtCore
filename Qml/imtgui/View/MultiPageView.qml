@@ -156,6 +156,7 @@ Item {
 
                         radius: 4;
 
+                        border.width: 1;
                         border.color: buttonContainer.selected ? Style.borderFocusColor : "transparent";
                     }
 

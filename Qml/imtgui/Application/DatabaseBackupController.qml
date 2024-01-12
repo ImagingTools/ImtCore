@@ -23,12 +23,7 @@ Item {
             width: 70;
             height: 25;
 
-            hasText: true;
-            hasIcon: false;
-
-            textButton: qsTr("Backup");
-            borderColor: (backupButton.highlighted || backupButton.focus) ? Style.iconColorOnSelected : Style.buttonColor;
-            backgroundColor: Style.imagingToolsGradient2;
+            text: qsTr("Backup");
 
             onClicked: {
                 fileDialogSave.open();
@@ -41,12 +36,7 @@ Item {
             width: 70;
             height: 25;
 
-            hasText: true;
-            hasIcon: false;
-
-            textButton: qsTr("Restore");
-            borderColor: (restoreButton.highlighted || restoreButton.focus) ? Style.iconColorOnSelected : Style.buttonColor;
-            backgroundColor: Style.imagingToolsGradient2;
+            text: qsTr("Restore");
 
             onClicked: {
                 fileDialog.open();

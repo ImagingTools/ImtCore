@@ -16,7 +16,7 @@ Dialog {
 
     buttonsModel: ListModel{
         ListElement{Id: Enums.ButtonType.Apply; Name:qsTr("Apply"); Enabled: false}
-        ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Cancel"); Enabled: true}
+        ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Close"); Enabled: true}
     }
 
     property TreeItemModel settingsModel: TreeItemModel {};

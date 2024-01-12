@@ -13,7 +13,6 @@ Item {
     property var baseElement;
     property string textColor: Style.textColor;
     property string textColorDisabled: "gray";
-    // property real fontSize: Style.fontSize_small;
     property int radius: 4;
     property bool isEmpty: baseElement.text === "";
 
@@ -31,7 +30,6 @@ Item {
        color: Style.shadowColor;
        source: button;
 
-//       visible: topButtonDecorator.isToggleable ? !topButtonDecorator.isToggled : button.visible && !topButtonDecorator.isHighlighted;
        visible: !(baseElement.checked || baseElement.down)
     }
 
@@ -47,11 +45,9 @@ Item {
         height: topButtonDecorator.height;
 
         radius: topButtonDecorator.radius;
-//        visible: !topButtonDecorator.isEmpty;
 
         color: Style.baseColor;
 
-//        gradient: topButtonDecorator.isHighlighted || topButtonDecorator.isToggled ? pressedGradientButton : standardGradientButton;
         gradient: baseElement.checked || baseElement.down ? pressedGradientButton : standardGradientButton;
 
         Gradient {
@@ -84,22 +80,20 @@ Item {
         }
     }
 
-//    InnerShadow {
-//        id: innerShadow;
+    DropShadow {
+        id: innerShadow;
 
-//        anchors.fill: button;
+        anchors.fill: button;
 
-//        verticalOffset: 1;
-//        horizontalOffset: 1;
+        verticalOffset: -1;
+        horizontalOffset: -1;
 
-//        radius: 2;
-//        color: Style.shadowColor;
-//        source: button;
+        radius: 2;
+        color: Style.shadowColor;
+        source: button;
 
-//        samples: 16;
-////        visible: topButtonDecorator.isToggleable ? topButtonDecorator.isToggled : button.visible && topButtonDecorator.isHighlighted;
-//        visible: baseElement.checked || baseElement.down
-//    }
+        visible: baseElement.checked || baseElement.down
+    }
 
     Rectangle{
         id: selection;

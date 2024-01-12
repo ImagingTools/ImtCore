@@ -1,6 +1,7 @@
-import QtQuick 2.0
+import QtQuick 2.15
 import Acf 1.0
 import imtgui 1.0
+import imtcontrols 1.0
 
 Item {
     id: settingsIntegerInputContainer;
@@ -8,10 +9,10 @@ Item {
     width: 270;
     height: 30;
 
-    RegExpValidator {
+    RegularExpressionValidator {
         id: intValid;
 
-        regExp: /^[1-9]\d*$/;
+        regularExpression: /^[1-9]\d*$/;
     }
 
     CustomTextField {

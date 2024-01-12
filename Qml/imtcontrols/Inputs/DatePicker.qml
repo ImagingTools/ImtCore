@@ -441,14 +441,14 @@ Item {
                     width: datePicker.buttonWidth;
                     height: datePicker.buttonHeight;
 
-//                    iconWidth: datePicker.iconWidth;
-//                    iconHeight: datePicker.iconHeight;
                     iconSource: datePicker.iconUpSource;
 
-//                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
-//                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
-
                     enabled: !datePicker.readOnly;
+
+                    decorator: ButtonDecorator {
+                        color: yearUpButton.hovered ? Style.buttonHoverColor : "transparent";
+                        border.width: 0;
+                    }
 
                     onClicked: {
                         if (!enabled){
@@ -471,14 +471,14 @@ Item {
                     width: datePicker.buttonWidth;
                     height: datePicker.buttonHeight;
 
-//                    iconWidth: datePicker.iconWidth;
-//                    iconHeight: datePicker.iconHeight;
                     iconSource: datePicker.iconDownSource;
 
-//                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
-//                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
-
                     enabled: !datePicker.readOnly;
+
+                    decorator: ButtonDecorator {
+                        color: yearDownButton.hovered ? Style.buttonHoverColor : "transparent";
+                        border.width: 0;
+                    }
 
                     onClicked: {
                         if (!enabled){
@@ -574,14 +574,14 @@ Item {
                     width: datePicker.buttonWidth;
                     height: datePicker.buttonHeight;
 
-//                    iconWidth: datePicker.iconWidth;
-//                    iconHeight: datePicker.iconHeight;
                     iconSource: datePicker.iconUpSource;
 
-//                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
-//                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
-
                     enabled: !datePicker.readOnly;
+
+                    decorator: ButtonDecorator {
+                        color: monthUpButton.hovered ? Style.buttonHoverColor : "transparent";
+                        border.width: 0;
+                    }
 
                     onClicked: {
                         if (!enabled){
@@ -607,14 +607,14 @@ Item {
                     width: datePicker.buttonWidth;
                     height: datePicker.buttonHeight;
 
-//                    iconWidth: datePicker.iconWidth;
-//                    iconHeight: datePicker.iconHeight;
                     iconSource: datePicker.iconDownSource;
 
-//                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
-//                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
-
                     enabled: !datePicker.readOnly;
+
+                    decorator: ButtonDecorator {
+                        color: monthDownButton.hovered ? Style.buttonHoverColor : "transparent";
+                        border.width: 0;
+                    }
 
                     onClicked: {
                         if (!enabled){
@@ -732,14 +732,13 @@ Item {
                     width: datePicker.buttonWidth;
                     height: datePicker.buttonHeight;
 
-//                    iconWidth: datePicker.iconWidth;
-//                    iconHeight: datePicker.iconHeight;
                     iconSource: datePicker.iconUpSource;
-
-//                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
-//                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
-
                     enabled: !datePicker.readOnly;
+
+                    decorator: ButtonDecorator {
+                        color: dayUpButton.hovered ? Style.buttonHoverColor : "transparent";
+                        border.width: 0;
+                    }
 
                     onClicked: {
                         if (!enabled){
@@ -763,14 +762,14 @@ Item {
                     width: datePicker.buttonWidth;
                     height: datePicker.buttonHeight;
 
-//                    iconWidth: datePicker.iconWidth;
-//                    iconHeight: datePicker.iconHeight;
                     iconSource: datePicker.iconDownSource;
 
-//                    highlighted: datePicker.buttonHighlighted >= 0 ? datePicker.buttonHighlighted : containsMouse;
-//                    color: datePicker.buttonColor !== "" ? datePicker.buttonColor : defaultColor;
-
                     enabled: !datePicker.readOnly;
+
+                    decorator: ButtonDecorator {
+                        color: dayDownButton.hovered ? Style.buttonHoverColor : "transparent";
+                        border.width: 0;
+                    }
 
                     onClicked: {
                         if (!enabled){
