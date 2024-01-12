@@ -38,14 +38,10 @@ ControlBase {
                 baseButton.checked = !baseButton.checked
                 baseButton.toggled()
             }
-//            else{
-                baseButton.clicked();
-//            }
+            baseButton.clicked();
         }
     }
 
-    Component.onCompleted: {
-    }
 
     onDecoratorChanged: {
         if(focus){
