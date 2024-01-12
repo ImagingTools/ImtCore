@@ -17,6 +17,7 @@ Rectangle {
     Row{
         id: buttonsRow;
 
+        anchors.verticalCenterOffset: 0;
         anchors.centerIn: parent;
         spacing: 50;
 
@@ -31,6 +32,7 @@ Rectangle {
             KeyNavigation.tab: roundButton
 
             text: "Text button";
+            tooltipText: "Hellow!!!";
             onClicked: {
                 pauseMessage.show("Text button clicked!")
             }
