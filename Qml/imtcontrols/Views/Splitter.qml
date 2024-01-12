@@ -8,6 +8,9 @@ Rectangle {
     color: Style.backgroundColor;
 
     property int type: 0x1;
+    property bool isPressed: false;
+    property int leftLimit: 0;
+    property int rightLimit: 1000000;
 
     MouseArea {
         id: splitterMA;
@@ -18,13 +21,23 @@ Rectangle {
         acceptedButtons: Qt.LeftButton;
         cursorShape: Qt.SplitHCursor;
 
+        onPressed: {
+            splitterContainer.isPressed = true;
+        }
+        onReleased: {
+            splitterContainer.isPressed = false;
+        }
+
         onMouseXChanged: {
             if (splitterContainer.type !== 0x1){
                 return;
             }
 
-            if (splitterMA.pressed){
-                splitterContainer.x += mouseX;
+            if (splitterContainer.isPressed){
+                let newX = splitterContainer.x + mouseX;
+                if(newX > splitterContainer.leftLimit && newX < splitterContainer.rightLimit){
+                    splitterContainer.x += mouseX;
+                }
             }
         }
     }
