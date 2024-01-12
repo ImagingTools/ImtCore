@@ -581,7 +581,7 @@ Rectangle {
             contentX: elementsList.contentX;
             contentWidth: elementsList.contentWidth;
             interactive: false;
-            cacheBuffer: contentWidth;
+            cacheBuffer: Math.max(contentWidth, tableContainer.width);
             property bool compl: false;
 
             property int currentIndex: 0;
