@@ -2,7 +2,6 @@
 
 
 // ImtCore includes
-#include <imtbase/CObjectCollectionComp.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CHttpServletCompBase.h>
 #include <imtrepo/IFileObjectCollection.h>

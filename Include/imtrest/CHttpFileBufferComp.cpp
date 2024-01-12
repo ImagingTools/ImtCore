@@ -10,6 +10,7 @@
 
 // ACF includes
 #include <istd/CSystem.h>
+#include <iprm/TParamsPtr.h>
 #include <iprm/CParamsSet.h>
 #include <ifile/CFileNameParam.h>
 
@@ -102,7 +103,7 @@ void CHttpFileBufferComp::OnComponentDestroyed()
 ConstResponsePtr CHttpFileBufferComp::OnGet(
 			const QByteArray& commandId,
 			const IRequest::CommandParams& commandParams,
-			const HeadersMap& headers,
+			const HeadersMap& /*headers*/,
 			const CHttpRequest& request) const
 {
 	if (!m_tempFileCollectionCompPtr.IsValid()){
@@ -208,9 +209,9 @@ ConstResponsePtr CHttpFileBufferComp::OnGet(
 
 
 ConstResponsePtr CHttpFileBufferComp::OnPost(
-			const QByteArray& commandId,
-			const IRequest::CommandParams& commandParams,
-			const HeadersMap& headers,
+			const QByteArray& /*commandId*/,
+			const IRequest::CommandParams& /*commandParams*/,
+			const HeadersMap& /*headers*/,
 			const CHttpRequest& request) const
 {
 	if (!m_tempFileCollectionCompPtr.IsValid()){
@@ -229,7 +230,7 @@ ConstResponsePtr CHttpFileBufferComp::OnPost(
 	}
 
 	quint64 writtenBytes = tempFile.write(request.GetBody());
-	if (writtenBytes != request.GetBody().size()){
+	if (writtenBytes != quint64(request.GetBody().size())){
 		return CreateDefaultErrorResponse(QString(QT_TR_NOOP("Saved file is corrupted!: %1")).arg(tempFile.errorString()).toUtf8(), IProtocolEngine::SC_INTERNAL_SERVER_ERROR, request);
 	}
 	tempFile.close();
@@ -239,7 +240,7 @@ ConstResponsePtr CHttpFileBufferComp::OnPost(
 	fileNameParamPtr->SetPath(tempFile.fileName());
 	paramsSetPtr->SetEditableParameter("FilePath", fileNameParamPtr, true);
 
-	imtbase::CObjectCollectionBase::DataPtr valuePtr(paramsSetPtr.GetPtr());
+	imtbase::IObjectCollection::DataPtr valuePtr(paramsSetPtr.GetPtr());
 
 	/// \todo get name from request
 	const QByteArray createdFileId = m_tempFileCollectionCompPtr->InsertNewObject(
@@ -259,9 +260,9 @@ ConstResponsePtr CHttpFileBufferComp::OnPost(
 
 
 ConstResponsePtr CHttpFileBufferComp::OnHead(
-			const QByteArray& commandId,
-			const IRequest::CommandParams& commandParams,
-			const HeadersMap& headers,
+			const QByteArray& /*commandId*/,
+			const IRequest::CommandParams& /*commandParams*/,
+			const HeadersMap& /*headers*/,
 			const CHttpRequest& request) const
 {
 	/// \todo add file info data return + range-based request headers
