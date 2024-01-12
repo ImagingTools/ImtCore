@@ -24,6 +24,7 @@ Item {
     property bool useWebSocketSubscription: false;
 
     property alias loadPageByClick: thumbnailDecorator.loadPageByClick;
+    property alias modalDialogManager: modalDialogManager_;
 
     onWidthChanged: {
         Events.sendEvent("AppSizeChanged", {"Width": width, "Height": height})
@@ -184,7 +185,7 @@ Item {
     }
 
     ModalDialogManager {
-        id: modalDialogManager;
+        id: modalDialogManager_;
 
         z: 30;
 
