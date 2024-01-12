@@ -9,6 +9,7 @@ ControlBase {
 
     property string text: ""
     property string iconSource: ""
+    property string tooltipText: ""
 
     property bool down: false
     property bool hoverEnabled: true
@@ -23,24 +24,27 @@ ControlBase {
     signal doubleClicked();
     signal pressed();
     signal released();
-    signal entered();
-    signal exited();
+    signal entered(real mouseX, real mouseY);
+    signal exited(real mouseX, real mouseY);
+    signal positionChanged(real mouseX, real mouseY);
     signal toggled();
 
     QtObject {
         id: _private
-
         function onClicked(){
             baseButton.focus = true;
             baseButton.forceActiveFocus();
-
             if (baseButton.checkable){
                 baseButton.checked = !baseButton.checked
                 baseButton.toggled()
             }
-
-            baseButton.clicked();
+//            else{
+                baseButton.clicked();
+//            }
         }
+    }
+
+    Component.onCompleted: {
     }
 
     onDecoratorChanged: {
@@ -73,27 +77,28 @@ ControlBase {
                 _private.onClicked()
             }
         }
-
         onDoubleClicked: {
             baseButton.doubleClicked();
         }
-
         onPressed: {
             baseButton.down = true
             baseButton.pressed();
-        }
 
+        }
         onReleased: {
             baseButton.down = false
             baseButton.released();
         }
-
         onEntered: {
-            baseButton.entered();
+            baseButton.entered(mouseX, mouseY);
+        }
+        onExited: {
+            baseButton.exited(mouseX, mouseY);
+        }
+        onPositionChanged: {
+            baseButton.positionChanged(mouse.x, mouse.y);
         }
 
-        onExited: {
-            baseButton.exited();
-        }
     }
+
 }

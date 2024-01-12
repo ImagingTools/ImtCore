@@ -15,6 +15,33 @@ DecoratorBase {
     property alias radius: background.radius
     property alias border: background.border
 
+    property string tooltipText: baseElement ? baseElement.tooltipText : "";
+
+    signal mouseEntered(real mouseX, real mouseY);
+    signal mouseExited(real mouseX, real mouseY);
+    signal mousePositionChanged(real mouseX, real mouseY);
+
+    onBaseElementChanged: {
+        if(baseElement){
+            baseElement.exited.connect(commonButtonDecorator.mouseExited);
+            baseElement.entered.connect(commonButtonDecorator.mouseEntered);
+            baseElement.positionChanged.connect(commonButtonDecorator.mousePositionChanged);
+        }
+
+    }
+
+    onMousePositionChanged: {
+        if(tooltip.text !== ""){
+            tooltip.show(mouseX, mouseY);
+        }
+    }
+
+    onMouseExited: {
+        if(tooltip.text !== ""){
+            tooltip.hide();
+        }
+    }
+
     Rectangle {
         id: background
 
@@ -56,6 +83,16 @@ DecoratorBase {
         font.family: Style.fontFamily
 
         text: !baseElement ? "" : baseElement.text
+    }
+
+    CustomTooltip{
+        id: tooltip;
+
+        text: commonButtonDecorator.tooltipText;
+        fitToTextWidth: true;
+        componentHeight: 30;
+        timeout: 2000;
+        fitToHCenter: true;
     }
 
 }
