@@ -26,14 +26,12 @@ protected:
 				const QByteArray& commandId,
 				const IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
-				const CHttpRequest& request
-				) const override;
+				const CHttpRequest& request) const override;
 	ConstResponsePtr OnDelete(
 				const QByteArray& commandId,
 				const IRequest::CommandParams& commandParams,
 				const HeadersMap& headers,
-				const CHttpRequest& request
-				) const override;
+				const CHttpRequest& request) const override;
 
 private:
 	I_MULTIREF(imtbase::IBinaryDataController, m_binaryDataControllersCompPtr);

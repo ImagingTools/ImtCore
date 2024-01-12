@@ -1,6 +1,12 @@
 #include <imtrest/CHttpRootServletComp.h>
 
 
+// Qt i ncludes
+#include <QtCore/QDataStream>
+
+// 3rdParty includes
+#include "zlib.h"
+
 // ImtCore includes
 #include <imtrest/IRequest.h>
 #include <imtrest/ISender.h>
@@ -8,11 +14,6 @@
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/CHttpResponse.h>
 #include <imtrest/CHttpRequest.h>
-
-// Qt i ncludes
-#include <QtCore/QDataStream>
-
-#include "zlib.h"
 
 
 namespace imtrest
@@ -22,7 +23,6 @@ namespace imtrest
 // public methods
 
 // reimplemented (IRequestHandler)
-
 
 ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request) const
 {
@@ -75,8 +75,8 @@ ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request) c
 				QByteArray data = responsePtr->GetData();
 				QByteArray qData = qCompress(data, 8);
 				qData.remove(0, 6);
-				qData.remove(qData.count() - 4, 4);
-				int crc = (int)crc32(0, (unsigned char *)qData.data(), qData.count());
+				qData.remove(qData.length() - 4, 4);
+				int crc = (int)crc32(0, (unsigned char *)qData.data(), qData.length());
 				const char gzipheader[] = {
 						 0x1f, static_cast<char>(0x8b)      // gzip magic number
 						 , 8             // compress method "defalte"
@@ -90,7 +90,7 @@ ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request) c
 				datastream.device()->write(gzipheader,10);
 				datastream.device()->write(qData);
 				datastream << crc;
-				datastream << qData.count();
+				datastream << qData.length();
 				httpResponsePtr->SetData(outData);
 				IResponse::Headers headers = responsePtr->GetHeaders();
 				headers.insert("Content-Encoding", "gzip");

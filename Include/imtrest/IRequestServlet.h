@@ -20,8 +20,6 @@ class IResponse;
 class IRequestServlet: virtual public istd::IPolymorphic
 {
 public:
-//	typedef istd::TSmartPtr<const imtrest::IResponse> ConstResponsePtr;
-
 	virtual ConstResponsePtr ProcessRequest(const IRequest& request) const = 0;
 	virtual QByteArray GetSupportedCommandId() const = 0;
 };

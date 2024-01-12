@@ -35,7 +35,8 @@ public:
 	virtual QByteArray GetSupportedCommandId() const override;
 
 protected:
-	enum EncodingType {
+	enum EncodingType
+	{
 		ET_NONE,
 		ET_GZIP,
 		ET_DEFLATE

@@ -1,12 +1,20 @@
 #include <imtrest/CHttpFileProviderBasedServletComp.h>
 
 
+// Qt includes
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+#include <QtCore/QTextStream>
+
 // ImtCore includes
-#include <imtrest/IRequestServlet.h>
+#include <imtrest/IProtocolEngine.h>
 
 
 namespace imtrest
 {
+
+
+// public methods
 
 QByteArray CHttpFileProviderBasedServletComp::GetMimeType(QByteArray fileSuffix) const
 {
@@ -139,7 +147,7 @@ ConstResponsePtr CHttpFileProviderBasedServletComp:: OnGet(
 			QByteArray fileSuffix;
 			int index = commandIdFileName.lastIndexOf('.');
 			if (index > 0){
-				index = commandIdFileName.count() - index;
+				index = commandIdFileName.length() - index;
 				fileSuffix = commandIdFileName.right(index);
 			}
 			reponseTypeId = this->GetMimeType(fileSuffix);

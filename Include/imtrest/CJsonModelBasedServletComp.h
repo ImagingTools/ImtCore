@@ -8,8 +8,6 @@
 // ImtCore includes
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
-
-// ImtCore includes
 #include <imtrest/IRepresentationDataProvider.h>
 
 

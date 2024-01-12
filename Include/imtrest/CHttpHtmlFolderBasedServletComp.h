@@ -1,22 +1,17 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QDir>
+#include <QtCore/QFile>
+#include <QtCore/QTextStream>
+
 // ACF includes
 #include <ifile/IFileNameParam.h>
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
 #include <imtrest/IRequestServlet.h>
-
-// Qt includes
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-#include <QtCore/QTextStream>
-
-// ImtCore includes
-#include <imtrest/IRequest.h>
-#include <imtrest/IResponse.h>
-#include <imtrest/IProtocolEngine.h>
 
 
 namespace imtrest

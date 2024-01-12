@@ -1,5 +1,6 @@
 #include <imtrest/CMultiThreadServer.h>
 
+
 // Qt includes
 #include <QtCore/QCoreApplication>
 
@@ -10,18 +11,22 @@
 #include <imtrest/CHttpSender.h>
 
 
-namespace imtrest {
+namespace imtrest
+{
+
 
 CSocket::CSocket(CSocketThread* rootSocket, IRequest* request, qintptr socketDescriptor)
-	: QObject(),
+	:QObject(),
 	m_rootSocket(rootSocket),
 	m_socket(new QTcpSocket()),
 	m_requestPtr(request)
 {
 	if (!m_socket->setSocketDescriptor(socketDescriptor)){
 		qDebug() << "Socket error" << m_socket->error();
-		// something's wrong, we just emit a signal
-		emit m_rootSocket->Error(m_socket->error());
+
+		// something's wrong, we just Q_EMIT a signal
+		Q_EMIT m_rootSocket->Error(m_socket->error());
+
 		return;
 	}
 
@@ -47,9 +52,11 @@ void CSocket::TimeOut()
 {
 	if (m_socket != nullptr){
 		qDebug() << m_socket->socketDescriptor() << " Time out";
+
 		if (m_socket->isTransactionStarted()){
 			m_socket->commitTransaction();
 		}
+
 		m_socket->disconnect();
 	}
 }
@@ -113,23 +120,24 @@ void CSocket::Disconnected()
 {
 	qDebug() << m_socket->socketDescriptor() << " Disconnected";
 
-	emit m_rootSocket->SocketDisconnected(m_rootSocket->GetRequestId());
+	Q_EMIT m_rootSocket->SocketDisconnected(m_rootSocket->GetRequestId());
 }
 
 
 void CSocket::OnSendResponse(ConstResponsePtr response)
 {
-	CHttpSender cHttpSender(m_socket.GetPtr());
-	cHttpSender.SendResponse(response);
+	CHttpSender sender(m_socket.GetPtr());
+
+	sender.SendResponse(response);
 }
 
 
-CSocketThread::CSocketThread(qintptr ID, CMultiThreadServer* parent) :
-	QThread(parent),
+CSocketThread::CSocketThread(qintptr socketId, CMultiThreadServer* parent)
+	:QThread(parent),
 	m_status(ST_START)
 {
 	qRegisterMetaType<ConstResponsePtr>("ConstResponsePtr");
-	this->m_socketDescriptor = ID;
+	this->m_socketDescriptor = socketId;
 
 	m_server = parent;
 
@@ -140,7 +148,8 @@ CSocketThread::CSocketThread(qintptr ID, CMultiThreadServer* parent) :
 
 void CSocketThread::SetSocketDescriptor(qintptr socketDescriptor)
 {
-	QMutexLocker loc(&m_socketDescriptorMutex);
+	QMutexLocker lock(&m_socketDescriptorMutex);
+
 	m_socketDescriptor = socketDescriptor;
 }
 
@@ -152,7 +161,8 @@ qintptr CSocketThread::GetSocketDescriptor()
 
 void CSocketThread::SetSocketStatus(Status socketStatus)
 {
-	QMutexLocker loc(&m_statusMutex);
+	QMutexLocker lock(&m_statusMutex);
+
 	m_status = socketStatus;
 }
 
@@ -168,6 +178,7 @@ QByteArray CSocketThread::GetRequestId()
 	return m_requestId;
 }
 
+
 imtrest::IRequestServlet* CSocketThread::GetRequestServlet()
 {
 	return m_requestHandlerPtr;
@@ -176,14 +187,15 @@ imtrest::IRequestServlet* CSocketThread::GetRequestServlet()
 
 void CSocketThread::run()
 {
-
 	if (m_server == nullptr){
 		return;
 	}
 
 	imtrest::IRequest* newRequestPtr = m_enginePtr->CreateRequest(*this);
 	m_socket.SetPtr(new CSocket(this, newRequestPtr, m_socketDescriptor));
+
 	m_requestId = newRequestPtr->GetRequestId();
+
 	qDebug() << m_socketDescriptor << connect(this, &CSocketThread::OnSendResponse, m_socket.GetPtr(), &CSocket::OnSendResponse, Qt::QueuedConnection);
 	qDebug() << m_socketDescriptor << connect(this, &CSocketThread::Abort, m_socket.GetPtr(), &CSocket::Abort, Qt::QueuedConnection);
 
@@ -195,10 +207,9 @@ void CSocketThread::run()
 
 ConstResponsePtr CSocketThread::ProcessRequest(const IRequest& request) const
 {
-	emit m_server->NewThreadConnection(&request);
-	ConstResponsePtr retVal;
+	Q_EMIT m_server->NewThreadConnection(&request);
 
-	return retVal;
+	return ConstResponsePtr();
 }
 
 
@@ -209,9 +220,10 @@ QByteArray CSocketThread::GetSupportedCommandId() const
 
 
 // reimplemented (ISender)
+
 bool CSocketThread::SendResponse(ConstResponsePtr& response) const
 {
-	emit OnSendResponse(response);
+	Q_EMIT OnSendResponse(response);
 
 	return true;
 }
@@ -223,8 +235,8 @@ bool CSocketThread::SendRequest(ConstRequestPtr& reguest) const
 }
 
 
-CMultiThreadServer::CMultiThreadServer(CTcpServerComp* rootServer) :
-	QTcpServer((QObject*)rootServer),
+CMultiThreadServer::CMultiThreadServer(CTcpServerComp* rootServer)
+	:QTcpServer((QObject*)rootServer),
 	m_rootServer(*rootServer),
 	m_isActive(true)
 {
@@ -245,10 +257,12 @@ imtrest::IProtocolEngine* CMultiThreadServer::GetProtocolEngine()
 
 
 // reimplemented (imtrest::IRequestManager)
+
 const IRequest* CMultiThreadServer::GetRequest(const QByteArray& requestId) const
 {
 	return nullptr;
 }
+
 
 const ISender* CMultiThreadServer::GetSender(const QByteArray& requestId) const
 {
@@ -293,9 +307,11 @@ void CMultiThreadServer::AboutToQuit()
 	m_isActive = false;
 
 	for (CSocketThread* socket : m_threadSocketList){
-		emit socket->Abort();
+		Q_EMIT socket->Abort();
+
 		socket->wait(1000);
 		socket->quit();
+
 		socket->wait(1000);
 		socket->deleteLater();
 	}
@@ -304,7 +320,7 @@ void CMultiThreadServer::AboutToQuit()
 
 void CMultiThreadServer::AddSocketDescriptor(qintptr socketDescriptor)
 {
-	QMutexLocker loc(&m_descriptorListMutex);
+	QMutexLocker lock(&m_descriptorListMutex);
 
 	m_descriptorList << socketDescriptor;
 }
@@ -312,7 +328,7 @@ void CMultiThreadServer::AddSocketDescriptor(qintptr socketDescriptor)
 
 qintptr CMultiThreadServer::GetFirstSocketDescriptor()
 {
-	QMutexLocker loc(&m_descriptorListMutex);
+	QMutexLocker lock(&m_descriptorListMutex);
 
 	qintptr retVal = m_descriptorList[0];
 	m_descriptorList.removeAt(0);
@@ -321,14 +337,12 @@ qintptr CMultiThreadServer::GetFirstSocketDescriptor()
 }
 
 
-// This function is called by QTcpServer when a new connection is available.
 void CMultiThreadServer::incomingConnection(qintptr socketDescriptor)
 {
 	if (!m_isActive){
 		return;
 	}
 
-	// We have a new connection
 	qDebug() << socketDescriptor << " Connecting..." << m_rootServer.GetThreadsLimit();
 
 	AddSocketDescriptor(socketDescriptor);
@@ -345,6 +359,7 @@ void CMultiThreadServer::incomingConnection(qintptr socketDescriptor)
 			// Every new connection will be run in a newly created thread
 			qintptr descriptor = GetFirstSocketDescriptor();
 			threadSocket = new CSocketThread(descriptor, this);
+
 			m_threadSocketList.append(threadSocket);
 			qDebug() << "new socket thread" << m_threadSocketList.count();
 
@@ -352,9 +367,10 @@ void CMultiThreadServer::incomingConnection(qintptr socketDescriptor)
 
 			connect(threadSocket, &CSocketThread::SocketDisconnected, this, &CMultiThreadServer::Disconnected, Qt::QueuedConnection);
 		}
-
 	}
 }
 
 
 } // namespace imtrest
+
+

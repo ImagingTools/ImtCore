@@ -1,5 +1,6 @@
 #pragma once
 
+
 // Qt includes
 #include <QtNetwork/QTcpServer>
 #include <QtNetwork/QTcpSocket>
@@ -13,13 +14,15 @@
 #include <imtrest/IRequestManager.h>
 
 
+namespace imtrest
+{
 
-namespace imtrest {
 
 class CMultiThreadServer;
 class CSocketThread;
 
-class CSocket : public QObject
+
+class CSocket: public QObject
 {
 	Q_OBJECT
 public:
@@ -40,10 +43,13 @@ private:
 };
 
 
-class CSocketThread : public QThread, virtual public IRequestServlet, virtual public ISender
+class CSocketThread:
+			public QThread,
+			virtual public IRequestServlet,
+			virtual public ISender
 {
 	Q_OBJECT
-  public:
+public:
 	enum Status
 	{
 		ST_START,
@@ -59,7 +65,6 @@ class CSocketThread : public QThread, virtual public IRequestServlet, virtual pu
 	QByteArray GetRequestId();
 	imtrest::IRequestServlet* GetRequestServlet();
 
-
 	// reimplemented (QThread)
 	void run() override;
 
@@ -74,15 +79,14 @@ class CSocketThread : public QThread, virtual public IRequestServlet, virtual pu
 Q_SIGNALS:
 	void Error(QTcpSocket::SocketError socketerror);
 	void SocketDisconnected(QByteArray requestId);
-//	void ParcerFinished(const IRequest* request) const;
 	void OnSendResponse(ConstResponsePtr response) const;
 	void Abort();
 
-  private:
+private:
 	CMultiThreadServer* m_server;
 	qintptr m_socketDescriptor;
-    imtrest::IProtocolEngine* m_enginePtr;
-    imtrest::IRequestServlet* m_requestHandlerPtr;
+	imtrest::IProtocolEngine* m_enginePtr;
+	imtrest::IRequestServlet* m_requestHandlerPtr;
 	mutable QMutex m_socketDescriptorMutex;
 	mutable QMutex m_statusMutex;
 	Status m_status;
@@ -92,15 +96,13 @@ Q_SIGNALS:
 };
 
 
-
 class CMultiThreadServer : public QTcpServer, virtual public IRequestManager
 {
 	Q_OBJECT
 public:
 	explicit CMultiThreadServer(CTcpServerComp* rootServer);
-    imtrest::IRequestServlet* GetRequestServlet();
-    imtrest::IProtocolEngine* GetProtocolEngine();
-
+	imtrest::IRequestServlet* GetRequestServlet();
+	imtrest::IProtocolEngine* GetProtocolEngine();
 
 	// reimplemented (imtrest::IRequestManager)
 	virtual const IRequest* GetRequest(const QByteArray& requestId) const override;
@@ -120,6 +122,7 @@ protected:
 	// reimplemented (QTcpServer)
 	void incomingConnection(qintptr socketDescriptor) override;
 
+protected:
 	QList<CSocketThread*> m_threadSocketList;
 	CTcpServerComp& m_rootServer;
 	mutable QList<qintptr> m_descriptorList;
@@ -129,3 +132,5 @@ protected:
 
 
 } // namespace imtrest
+
+

@@ -1,23 +1,14 @@
 #pragma once
 
+
 // ACF includes
 #include <ifile/IFileNameParam.h>
 #include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
-#include <imtrest/IRequestServlet.h>
-
-// Qt includes
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-#include <QtCore/QTextStream>
-
-// ImtCore includes
 #include <imtbase/IBinaryDataProvider.h>
-#include <imtrest/IRequest.h>
-#include <imtrest/IResponse.h>
-#include <imtrest/IProtocolEngine.h>
 #include <imtrest/CHttpServletCompBase.h>
+
 
 namespace imtrest
 {
@@ -31,11 +22,9 @@ public:
 	typedef CHttpServletCompBase BaseClass;
 
 	I_BEGIN_COMPONENT(CHttpFileProviderBasedServletComp);
-		I_REGISTER_INTERFACE(IRequestServlet);
 		I_ASSIGN(m_fileIdCommandParamAttrPtr, "FileIdCommandParam", "The command param for data providers", true, "FileId");
 		I_ASSIGN(m_limitIdCommandParamAttrPtr, "LimitIdCommandParam", "Defines maximum size of data to be read", true, "Limit");
 		I_ASSIGN(m_offsetIdCommandParamAttrPtr, "OffsetIdCommandParam", "Defines the position to start reading data", true, "Offset");
-
 		I_ASSIGN_MULTI_0(m_binaryDataProvidersCompPtr, "BinaryDataProviders", "Binary data providers", true);
 	I_END_COMPONENT
 

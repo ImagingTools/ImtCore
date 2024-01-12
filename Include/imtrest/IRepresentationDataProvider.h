@@ -28,7 +28,8 @@ public:
 	virtual bool GetRepresentationData(
 				Format format,
 				QByteArray& representationData,
-				const QList<QByteArray>& query, const imtrest::QueryParams& params) = 0;
+				const QList<QByteArray>& query,
+				const imtrest::QueryParams& params) = 0;
 	virtual bool SetRepresentationData(
 				Format format,
 				QByteArray& representationData,

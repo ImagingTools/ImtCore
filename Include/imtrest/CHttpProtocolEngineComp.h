@@ -9,7 +9,6 @@
 
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
-//#include <imtrest/http_parser.h>
 
 
 namespace imtrest
@@ -43,10 +42,6 @@ public:
 				int statusCode,
 				const QByteArray& data,
 				const QByteArray& dataTypeId) const override;
-
-protected:
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
 };
 
 

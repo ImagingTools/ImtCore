@@ -11,6 +11,8 @@
 
 // ImtCore includes
 #include <imtrest/IRequestServlet.h>
+#include <imtrest/IRequest.h>
+#include <imtrest/IProtocolEngine.h>
 
 
 namespace imtrest

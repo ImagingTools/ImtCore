@@ -176,16 +176,6 @@ IResponse* CHttpProtocolEngineComp::CreateResponse(
 }
 
 
-// protected methods
-
-// reimplemented (icomp::CComponentBase)
-
-void CHttpProtocolEngineComp::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-}
-
-
 } // namespace imtrest
 
 
