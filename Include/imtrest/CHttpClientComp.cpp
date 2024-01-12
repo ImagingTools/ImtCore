@@ -1,8 +1,8 @@
 #include <imtrest/CHttpClientComp.h>
 
 
-// Qt includes
-#include <QtCore/QObject>
+// ImtCore includes
+#include <imtrest/IHttpClientRequest.h>
 
 
 namespace imtrest
@@ -73,18 +73,13 @@ void CHttpClientComp::OnComponentDestroyed()
 
 void CHttpClientComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	/// The collection type name
-	using L_CT = imtbase::IObjectCollection;
+	imtbase::IObjectCollection* collectionPtr = imod::TSingleModelObserverBase<imtbase::IObjectCollection>::GetObservedObject();
 
-	L_CT* collection = imod::TSingleModelObserverBase<L_CT>::GetObservedObject();
-
-	if (collection != nullptr){
-
-		L_CT::Ids elementIds = collection->GetElementIds();
+	if (collectionPtr != nullptr){
+		imtbase::IObjectCollection::Ids elementIds = collectionPtr->GetElementIds();
 
 		for (const QByteArray& id: ::std::as_const(elementIds)){
-
-			const IHttpClientRequest* httpRequest = dynamic_cast<const IHttpClientRequest*>(collection->GetObjectPtr(id));
+			const IHttpClientRequest* httpRequest = dynamic_cast<const IHttpClientRequest*>(collectionPtr->GetObjectPtr(id));
 
 			if (httpRequest != nullptr){
 				// Looking for request that ready to be proceed
@@ -140,10 +135,10 @@ void CHttpClientComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/
 					QNetworkAccessManager::Operation requestType = httpRequest->GetRequestType();
 
 					switch (requestType){
-
 					case QNetworkAccessManager::Operation::GetOperation:
 						const_cast<IHttpClientRequest*>(httpRequest)->SetReply(m_networkAccessManager.get(request));
 						break;
+
 					case QNetworkAccessManager::Operation::PostOperation:
 						request.setHeader(QNetworkRequest::KnownHeaders::ContentLengthHeader, httpRequest->GetRequestBody().length());
 
@@ -168,9 +163,6 @@ void CHttpClientComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/
 }
 
 
-
-
 } // namespace imtrest
-
 
 

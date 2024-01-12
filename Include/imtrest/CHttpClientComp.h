@@ -1,31 +1,30 @@
 #pragma once
 
+
 // Qt includes
-#include <QtCore/QObject>
-#include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkAccessManager>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
 #include <imod/TSingleModelObserverBase.h>
-#include <istd/IChangeable.h>
 
+// ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtbase/CObjectCollectionBase.h>
-#include <imtrest/IHttpClientRequest.h>
 
 
 namespace imtrest
 {
 
-/*!
-	\brief The CHttpClientComp is a manager of generated http requests created by other modules of THIS application. It's is an observer of requests queue.
+
+/**
+	The CHttpClientComp is a manager of generated HTTP-requests created by other modules of THIS application.
+	It's is an observer of requests queue.
 	\warning Do not forget to create instance of this component!
 */
-class CHttpClientComp: public ilog::CLoggerComponentBase,
-		public imod::TSingleModelObserverBase<imtbase::IObjectCollection>
+class CHttpClientComp:
+			public ilog::CLoggerComponentBase,
+			protected imod::TSingleModelObserverBase<imtbase::IObjectCollection>
 {
-
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 

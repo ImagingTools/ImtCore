@@ -5,9 +5,6 @@
 #include <QtCore/QUrl>
 #include <QtNetwork/QHostAddress>
 
-// ACF includes
-#include <ilog/TLoggerCompWrap.h>
-
 // ImtCore includes
 #include <imtrest/IRequest.h>
 #include <imtrest/IRequestServlet.h>
@@ -69,12 +66,6 @@ public:
 public:
 	virtual bool ParseDeviceData(QIODevice& device) override;
 	virtual bool ExecuteHttpParser(const QByteArray& data, const QObject* socketObjectPtr);
-
-//private Q_SLOTS:
-//	void HandleReadyRead();
-//	void SocketDisconnected();
-//	void OnWebSocketTextMessage(const QString& textMessage);
-//	void OnWebSocketBinaryMessage(const QByteArray& dataMessage);
 
 private:
 	static bool ParseUrl(const char *at, size_t length, bool connect, QUrl& url);
