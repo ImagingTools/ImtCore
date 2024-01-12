@@ -3,11 +3,9 @@
 
 // Qt includes
 #include <QtCore/QFile>
-#include <QtCore/QTextStream>
 
 // ImtCore includes
 #include <imtrest/IRequest.h>
-#include <imtrest/IResponse.h>
 #include <imtrest/IProtocolEngine.h>
 
 
