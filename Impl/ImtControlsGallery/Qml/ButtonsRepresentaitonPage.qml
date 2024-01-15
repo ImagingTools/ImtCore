@@ -33,6 +33,7 @@ Rectangle {
 
             text: "Text button";
             tooltipText: "Hellow!!!";
+            //tooltipText: "ffff fffff  ffff    fffffff ffff jkljlkjklj ljlkj klkjkljk jkljlk ljj jkljlk jkljklj jklj kljkljkl jklljklj kljklj kljklj jlkjklj !!!";
             onClicked: {
                 pauseMessage.show("Text button clicked!")
             }
