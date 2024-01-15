@@ -65,7 +65,6 @@ void CGqlModel::replyFinished()
 	QNetworkReply* reply = dynamic_cast<QNetworkReply*>(sender());
 	if(reply){
 		QByteArray representationData = reply->readAll();
-		qDebug() << representationData;
 
 		bool result = CreateFromJson(representationData);
 		if (result){
