@@ -56,7 +56,7 @@ class Loader extends Item {
             let ctx = new ContextController(this.getStatement('sourceComponent').get().$exCtx, this.$exCtx)
             let createObject = this.getStatement('sourceComponent').get().createObject
             let cls = this.getStatement('sourceComponent').get().constructor
-            let item =  createObject ? createObject(this,ctx) : new cls(this,ctx)
+            let item =  createObject ? createObject(this,ctx,null,false) : new cls(this,ctx)
 
             // item.getProperty('x').getNotify().connect(()=>{
             //     this.getProperty('x').setAuto(item.getPropertyValue('x'))

@@ -128,10 +128,37 @@ class Item extends QtObject {
         this.$dom.id = this.UID
         this.$dom.classList.add(this.constructor.name)
 
-        if(this.parent && this.parent.$dom){
-            this.parent.$dom.appendChild(this.$dom)
-            this.parent.addDomChild(this)
+        if(this.getProperty('parent').get() && this.getProperty('parent').get().$dom){
+            this.getProperty('parent').get().$dom.appendChild(this.$dom)
+            this.getProperty('parent').get().addDomChild(this)
         }
+    }
+
+    $parentChanged(){
+        if(this.getProperty('parent').get() && this.getProperty('parent').get().$dom && this.$dom){
+            let index = this.getProperty('parent').get().getProperty('children').get().indexOf(this)
+            if(index > 0){
+                this.getProperty('parent').get().$dom.insertBefore(this.$dom, this.getProperty('parent').get().getProperty('children').get()[index-1].$dom.nextSibling)
+            } else {
+                this.getProperty('parent').get().$dom.appendChild(this.$dom)
+            }
+            this.getProperty('parent').get().addDomChild(this)
+        }
+        super.$parentChanged()
+    }
+
+    $childrenChanged(topLeft, bottomRight, roles){
+        if(roles === 'append'){
+            for(let index = topLeft; index < bottomRight; index++){
+                if(this.getProperty('children').get().length > 1 && index > 0){
+                    this.$dom.insertBefore(this.getProperty('children').get()[index].$dom, this.getProperty('children').get()[index-1].$dom.nextSibling)
+                } else {
+                    this.$dom.insertBefore(this.getProperty('children').get()[index].$dom, null)
+                    // this.$dom.appendChild(this.getProperty('children').get()[index].$dom)
+                }
+            }
+        }  
+        super.$childrenChanged(topLeft, bottomRight, roles)
     }
 
     addDomChild(child){

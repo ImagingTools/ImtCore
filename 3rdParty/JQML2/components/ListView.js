@@ -119,29 +119,29 @@ class ListView extends Flickable {
         let minY = Infinity
 
         if(this.getPropertyValue('orientation') === ListView.Horizontal){
-            for(let child of this.getStatement('contentItem').get().children()){  
+            for(let child of this.getStatement('contentItem').get().getProperty('children').get()){  
                 if(child.getStatement('index').get() < firstIndex) firstIndex = child.getStatement('index').get()
                 if(child.getStatement('index').get() > lastIndex) lastIndex = child.getStatement('index').get()
                 if(child.getPropertyValue('x') < minX) minX = child.getPropertyValue('x')
                 visibleContentWidth += child.getPropertyValue('width')
             }
-            let middleWidth = this.getStatement('contentItem').get().children().length ? visibleContentWidth / this.getStatement('contentItem').get().children().length : 0
+            let middleWidth = this.getStatement('contentItem').get().getProperty('children').get().length ? visibleContentWidth / this.getStatement('contentItem').get().getProperty('children').get().length : 0
 
-            this.getStatement('contentWidth').reset(visibleContentWidth + Math.round(middleWidth)*(this.$items.length.get()-this.getStatement('contentItem').get().children().length) + this.getPropertyValue('spacing') * (this.$items.length.get()-1))
+            this.getStatement('contentWidth').reset(visibleContentWidth + Math.round(middleWidth)*(this.$items.length.get()-this.getStatement('contentItem').get().getProperty('children').get().length) + this.getPropertyValue('spacing') * (this.$items.length.get()-1))
             let originX = (minX - firstIndex*(Math.round(middleWidth+this.getPropertyValue('spacing'))))
             if(originX && originX !== Infinity && originX !== -Infinity) this.getStatement('originX').reset(originX)
             
             this.getStatement('contentHeight').setAuto(this.getPropertyValue('height'))
         } else {
-            for(let child of this.getStatement('contentItem').get().children()){  
+            for(let child of this.getStatement('contentItem').get().getProperty('children').get()){  
                 if(child.getStatement('index').get() < firstIndex) firstIndex = child.getStatement('index').get()
                 if(child.getStatement('index').get() > lastIndex) lastIndex = child.getStatement('index').get()
                 if(child.getPropertyValue('y') < minY) minY = child.getPropertyValue('y')
                 visibleContentHeight += child.getPropertyValue('height')
             }
-            let middleHeight = this.getStatement('contentItem').get().children().length ? visibleContentHeight / this.getStatement('contentItem').get().children().length : 0
+            let middleHeight = this.getStatement('contentItem').get().getProperty('children').get().length ? visibleContentHeight / this.getStatement('contentItem').get().getProperty('children').get().length : 0
 
-            this.getStatement('contentHeight').reset(visibleContentHeight + Math.round(middleHeight)*(this.$items.length.get()-this.getStatement('contentItem').get().children().length) + this.getPropertyValue('spacing') * (this.$items.length.get()-1))
+            this.getStatement('contentHeight').reset(visibleContentHeight + Math.round(middleHeight)*(this.$items.length.get()-this.getStatement('contentItem').get().getProperty('children').get().length) + this.getPropertyValue('spacing') * (this.$items.length.get()-1))
             let originY = (minY - firstIndex*(Math.round(middleHeight+this.getPropertyValue('spacing'))))
             if(originY && originY !== Infinity && originY !== -Infinity) this.getStatement('originY').reset(originY)
 
@@ -152,11 +152,11 @@ class ListView extends Flickable {
     }
 
     prepare(){
-        let children = this.getStatement('contentItem').get().children().slice()
+        let children = this.getStatement('contentItem').get().getProperty('children').get().slice()
 
-        let leftIndex = this.getStatement('contentItem').get().children().length ? this.getStatement('contentItem').get().children()[0].getStatement('index').get() : 0
+        let leftIndex = this.getStatement('contentItem').get().getProperty('children').get().length ? this.getStatement('contentItem').get().getProperty('children').get()[0].getStatement('index').get() : 0
         let rightIndex = 0
-        let visibleCount = this.getStatement('contentItem').get().children().length
+        let visibleCount = this.getStatement('contentItem').get().getProperty('children').get().length
         let maxX = 0
         let maxY = 0
         let minX = 0
@@ -209,7 +209,7 @@ class ListView extends Flickable {
         middleHeight = visibleCount ? middleHeight / visibleCount : 0
         let currentIndex = 0
 
-        if(this.getStatement('contentItem').get().children().length === 0){
+        if(this.getStatement('contentItem').get().getProperty('children').get().length === 0){
             if(this.getPropertyValue('orientation') === ListView.Horizontal){
                 if(this.getPropertyValue('contentX') <= minX){
                     currentIndex = leftIndex + Math.ceil((this.getPropertyValue('contentX') - minX + (middleWidth ? this.getPropertyValue('spacing') : 0))/(Math.round(middleWidth + (middleWidth ? this.getPropertyValue('spacing') : 0))))

@@ -73,6 +73,8 @@ class ComplexObject {
             return this.$signals[name]
         } else if(this.existDefaultSignal(name)){
             return this.getSignal(name)
+        } else if(this.$properties[name.replaceAll('Changed', '')]){
+            return this.$properties[name.replaceAll('Changed', '')]
         }
     }
 

@@ -161,7 +161,7 @@ class GridView extends Flickable {
 
         this.getPropertyValue('contentItem').getProperty('width').setAuto(this.getPropertyValue('width'))
         this.getProperty('contentWidth').reset(-1)
-        let childLength = typeof this.getPropertyValue('model') === 'number' ? this.getPropertyValue('model') : this.getPropertyValue('contentItem').$children.length
+        let childLength = typeof this.getPropertyValue('model') === 'number' ? this.getPropertyValue('model') : this.getPropertyValue('contentItem').getProperty('children').get().length
         let rowLength = this.getPropertyValue('width') / this.getPropertyValue('cellWidth')  <= 1 ? 1 : Math.trunc(this.getPropertyValue('width') / this.getPropertyValue('cellWidth'))
         let contentHeight = Math.ceil(childLength / rowLength) * this.getPropertyValue('cellHeight')
 
@@ -197,8 +197,8 @@ class GridView extends Flickable {
     $updateChildren(){
         let x = 0
         let y = 0
-        for(let i = 0; i < this.getPropertyValue('contentItem').$children.length; i++){
-            let child = this.getPropertyValue('contentItem').$children[i]
+        for(let i = 0; i < this.getPropertyValue('contentItem').getProperty('children').get().length; i++){
+            let child = this.getPropertyValue('contentItem').getProperty('children').get()[i]
 
             if(i > 0) {
                 x += this.cellWidth

@@ -40,6 +40,9 @@ var Qt = {
     PartiallyChecked: 1,
     Checked: 2,
 
+    Horizontal: 0,
+    Vertical: 1,
+
     platform: {
         os: 'web',
     },

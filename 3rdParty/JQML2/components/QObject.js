@@ -1,5 +1,5 @@
 const { ComplexObject } = require('../utils/base')
-const { QVar, QReal, QModelData } = require('../utils/properties')
+const { QVar, QReal, QList } = require('../utils/properties')
 const { QSignal } = require('../utils/signal')
 const { Qt } = require('../utils/Qt')
 
@@ -9,6 +9,10 @@ class QObject extends ComplexObject {
         model: { type: QVar, value: undefined, signalWithout: true },
         index: { type: QReal, value: 0 },
         context: { type: QVar, value: undefined },
+        parent: { type: QVar, value: undefined, changed: '$parentChanged' },
+        children: { type: QList, changed: '$childrenChanged' },
+        resources: { type: QList, changed: '$resourcesChanged' },
+        data: { type: QList, changed: '$dataChanged' },
     }
 
     static defaultSignals = {
@@ -18,9 +22,13 @@ class QObject extends ComplexObject {
 
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
-        this.$children = []
-        this.$resources = []
-        this.$data = []
+        // this.$children = []
+        // this.$resources = []
+        // this.$data = []
+
+        // this.getProperty('children').reset([])
+        // this.getProperty('resources').reset([])
+        // this.getProperty('data').reset([])
         
         if(parent) {
             this.UID = UID++
@@ -56,12 +64,7 @@ class QObject extends ComplexObject {
             
             
 
-            if(this instanceof Item){
-                parent.addChild(this)
-            } else {
-                parent.addResource(this)
-            }
-            parent.addData(this)
+            
             
             this.setParent(parent)
 
@@ -83,31 +86,74 @@ class QObject extends ComplexObject {
 
         this.$completed = true
         if(this.$signals['Component.completed']) this.$signals['Component.completed']()
-        for(let i = this.$data.length - 1; i >= 0; i--){
-            this.$data[i].$complete()
+        let data = this.getProperty('data').get()
+        for(let i = data.length - 1; i >= 0; i--){
+            if(data[i] instanceof QObject) data[i].$complete()
         }
     }
 
-    children(){
-        if(!this.$children) this.$children = []
+    $childrenChanged(topLeft, bottomRight, roles){
+        if(roles === 'append'){
+            for(let index = topLeft; index < bottomRight; index++){
+                this.getProperty('children').get()[index].getProperty('parent').reset(this)
+            }
+        }  
+    }
 
-        return this.$children
+    $resourcesChanged(topLeft, bottomRight, roles){
+        if(roles === 'append'){
+            for(let index = topLeft; index < bottomRight; index++){
+                this.getProperty('resources').get()[index].getProperty('parent').reset(this)
+            }
+        }
+    }
+
+    $dataChanged(topLeft, bottomRight, roles){
+        if(roles === 'append'){
+            for(let index = topLeft; index < bottomRight; index++){
+                this.getProperty('data').get()[index].getProperty('parent').reset(this)
+            }
+        }
+    }
+
+    // children(){
+    //     if(!this.$children) this.$children = []
+
+    //     return this.$children
+    // }
+
+    $parentChanged(){
+        if(this.$parent) {
+            let index = this.$parent.getProperty('children').get().indexOf(this)
+            if(index >= 0) this.$parent.getProperty('children').get().splice(index, 1)
+            index = this.$parent.getProperty('resources').get().indexOf(this)
+            if(index >= 0) this.$parent.getProperty('resources').get().splice(index, 1)
+            index = this.$parent.getProperty('data').get().indexOf(this)
+            if(index >= 0) this.$parent.getProperty('data').get().splice(index, 1)
+        }
+        this.$parent = this.getProperty('parent').get()
+        if(this instanceof Item){
+            this.getProperty('parent').get().addChild(this)
+        } else {
+            this.getProperty('parent').get().addResource(this)
+        }
+        this.getProperty('parent').get().addData(this)
     }
 
     setParent(parent){
-        this.parent = parent
+        this.getProperty('parent').reset(parent)
     }
 
     addChild(child){
-        this.children().push(child)
+        if(this.getProperty('children').get().indexOf(child) < 0) this.getProperty('children').get().push(child)
     }
 
     addResource(resource){
-        this.$resources.push(resource)
+        if(this.getProperty('resources').get().indexOf(resource) < 0) this.getProperty('resources').get().push(resource)
     }
 
     addData(data){
-        this.$data.push(data)
+        if(this.getProperty('data').get().indexOf(data) < 0) this.getProperty('data').get().push(data)
     }
 
     createComponent(namespace, path, parent){
@@ -120,17 +166,18 @@ class QObject extends ComplexObject {
         if(this.$signals['Component.destruction']) this.$signals['Component.destruction']()
 
         if(this.parent) {
-            let index = this.parent.$children.indexOf(this)
-            if(index >= 0) this.parent.$children.splice(index, 1)
+            let index = this.parent.getProperty('children').get().indexOf(this)
+            if(index >= 0) this.parent.getProperty('children').get().splice(index, 1)
 
-            index = this.parent.$resources.indexOf(this)
-            if(index >= 0) this.parent.$resources.splice(index, 1)
+            index = this.parent.getProperty('resources').get().indexOf(this)
+            if(index >= 0) this.parent.getProperty('resources').get().splice(index, 1)
 
-            index = this.parent.$data.indexOf(this)
-            if(index >= 0) this.parent.$data.splice(index, 1)
+            index = this.parent.getProperty('data').get().indexOf(this)
+            if(index >= 0) this.parent.getProperty('data').get().splice(index, 1)
         }
-        for(let i = this.$data.length - 1; i >= 0; i--){
-            this.$data[i].destroy()
+        let data = this.getProperty('data').get()
+        for(let i = data.length - 1; i >= 0; i--){
+            if(data[i] instanceof QObject) data[i].destroy()
         }
         
         for(let key in this){

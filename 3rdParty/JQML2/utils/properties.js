@@ -511,6 +511,40 @@ class QAlias extends QProperty {
     }
 }
 
+class QList extends QProperty {
+    getDefaultValue(){
+        return []
+    }
+    typeCasting(value){
+        let push = value.push
+        value.push = (...args)=>{
+            push.value.call(args)
+            if(this.notify) this.notify(value.length-1, value.length, 'append')
+        }
+        return value
+    }
+    getNotify(){
+        if(!this.notify) this.notify = new QSignal('topLeft', 'bottomRight', 'roles')
+        return this.notify
+    }
+    set(newValue){
+        let safeValue = this.value
+        try {
+            safeValue = this.typeCasting(newValue)
+        } catch (error) {
+            console.error(error)
+        }
+        if(safeValue !== this.value){
+            let removed = this.value.splice()
+            while(removed.length){
+                removed.pop().destroy()
+            }
+            this.value = safeValue
+            if(this.notify) this.notify(0, this.value.length, 'append')
+        }
+    }
+}
+
 class QAnchors extends ComplexObject {
     static defaultProperties = {
         fill: { type: QVar, value: undefined, changed: 'mainChanged' },
@@ -859,6 +893,7 @@ class QModelData {
 module.exports.QGeometry = QGeometry
 module.exports.QAutoGeometry = QAutoGeometry
 module.exports.QAlias = QAlias
+module.exports.QList = QList
 module.exports.QAnchorLine = QAnchorLine
 module.exports.QAnchors = QAnchors
 module.exports.QColor = QColor

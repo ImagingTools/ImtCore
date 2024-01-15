@@ -27,6 +27,7 @@ class TextEdit extends Item {
         font: { type: QFont, changed: '$fontChanged' },
         contentHeight: { type: QReal, value: 0 },
         contentWidth: { type: QReal, value: 0 },
+        cursorRectangle: { type: QVar, value: undefined },
     }
 
     static defaultSignals = {

@@ -17,6 +17,11 @@ class Timer extends QtObject {
         super(parent,exCtx,exModel)
     }
 
+    $complete(){
+        super.$complete()
+        if(this.getPropertyValue('triggeredOnStart') && this.$signals.triggered && this.$completed) this.$signals.triggered()
+    }
+
     restart(){
         this.stop()
         this.start()
@@ -41,7 +46,7 @@ class Timer extends QtObject {
 
     $timerChanged(){
         if(this.$timer) clearTimeout(this.$timer)
-        if(this.getPropertyValue('triggeredOnStart') && this.triggered) this.triggered()
+        if(this.getPropertyValue('triggeredOnStart') && this.$signals.triggered && this.$completed) this.$signals.triggered()
 
         if(this.getPropertyValue('running'))
         this.$timer = setTimeout(()=>{
