@@ -26,8 +26,8 @@ Rectangle {
                 index = testInsertModelLevel0.InsertNewItem();
                 testInsertModelLevel0.SetData("Id", String(val + index), index);
                 testInsertModelLevel0.SetData("Name","ул. Ленина", index);
-                testInsertModelLevel0.SetData("TypeId", "Node", index);
-                testInsertModelLevel0.SetData("HasChildren", true, index);
+                testInsertModelLevel0.SetData("TypeId__", "Node", index);
+                testInsertModelLevel0.SetData("HasChildren__", true, index);
 
                 testInsertModelLevel0.SetData("Date", "26.12.23", index);
                 testInsertModelLevel0.SetData("Size",  String(tableTreeViewPage.size_ + index +1), index);
@@ -38,8 +38,8 @@ Rectangle {
                 index = testInsertModelLevel0.InsertNewItem();
                 testInsertModelLevel0.SetData("Id", String(val + index), index);
                 testInsertModelLevel0.SetData("Name","ул. Маркса", index);
-                testInsertModelLevel0.SetData("TypeId", "Node", index);
-                testInsertModelLevel0.SetData("HasChildren", true, index);
+                testInsertModelLevel0.SetData("TypeId__", "Node", index);
+                testInsertModelLevel0.SetData("HasChildren__", true, index);
 
                 testInsertModelLevel0.SetData("Date", "26.12.23", index);
                 testInsertModelLevel0.SetData("Size",  String(tableTreeViewPage.size_ + index +1), index);
@@ -50,8 +50,8 @@ Rectangle {
                 index = testInsertModelLevel0.InsertNewItem();
                 testInsertModelLevel0.SetData("Id", String(val + index), index);
                 testInsertModelLevel0.SetData("Name","ул. Менделеева", index);
-                testInsertModelLevel0.SetData("TypeId", "Node", index);
-                testInsertModelLevel0.SetData("HasChildren", true, index);
+                testInsertModelLevel0.SetData("TypeId__", "Node", index);
+                testInsertModelLevel0.SetData("HasChildren__", true, index);
 
                 testInsertModelLevel0.SetData("Date", "26.12.23", index);
                 testInsertModelLevel0.SetData("Size",  String(tableTreeViewPage.size_ + index +1), index);
@@ -62,8 +62,8 @@ Rectangle {
                 index = testInsertModelLevel0.InsertNewItem();
                 testInsertModelLevel0.SetData("Id", String(val + index), index);
                 testInsertModelLevel0.SetData("Name","ул. Королёва", index);
-                testInsertModelLevel0.SetData("TypeId", "Node", index);
-                testInsertModelLevel0.SetData("HasChildren", true, index);
+                testInsertModelLevel0.SetData("TypeId__", "Node", index);
+                testInsertModelLevel0.SetData("HasChildren__", true, index);
 
                 testInsertModelLevel0.SetData("Date", "26.12.23", index);
                 testInsertModelLevel0.SetData("Size",  String(tableTreeViewPage.size_ + index +1), index);
@@ -74,8 +74,8 @@ Rectangle {
                 index = testInsertModelLevel0.InsertNewItem();
                 testInsertModelLevel0.SetData("Id", String(val + index), index);
                 testInsertModelLevel0.SetData("Name","ул. Гагарина", index);
-                testInsertModelLevel0.SetData("TypeId", "Node", index);
-                testInsertModelLevel0.SetData("HasChildren", false, index);
+                testInsertModelLevel0.SetData("TypeId__", "Node", index);
+                testInsertModelLevel0.SetData("HasChildren__", false, index);
 
                 testInsertModelLevel0.SetData("Date", "26.12.23", index);
                 testInsertModelLevel0.SetData("Size",  String(tableTreeViewPage.size_ + index +1), index);
@@ -86,8 +86,8 @@ Rectangle {
                 index = testInsertModelLevel0.InsertNewItem();
                 testInsertModelLevel0.SetData("Id", String(val + index), index);
                 testInsertModelLevel0.SetData("Name","ул. Мира", index);
-                testInsertModelLevel0.SetData("TypeId", "Doc", index);
-                testInsertModelLevel0.SetData("HasChildren", false, index);
+                testInsertModelLevel0.SetData("TypeId__", "Doc", index);
+                testInsertModelLevel0.SetData("HasChildren__", false, index);
 
                 testInsertModelLevel0.SetData("Date", "26.12.23", index);
                 testInsertModelLevel0.SetData("Size",  String(tableTreeViewPage.size_ + index +1), index);
@@ -112,8 +112,8 @@ Rectangle {
 
             index = testInsertModel.InsertNewItem();
             testInsertModel.SetData("Name", "дом 1" , index);
-            testInsertModel.SetData("TypeId", "Node", index);
-            testInsertModel.SetData("HasChildren", true, index);
+            testInsertModel.SetData("TypeId__", "Node", index);
+            testInsertModel.SetData("HasChildren__", true, index);
 
             testInsertModel.SetData("Date", "26.12.23", index);
             testInsertModel.SetData("Size",  String(tableTreeViewPage.size_ + index +1), index);
@@ -123,8 +123,8 @@ Rectangle {
 
             index = testInsertModel.InsertNewItem();
             testInsertModel.SetData("Name","дом 2" , index);
-            testInsertModel.SetData("TypeId", "Node", index);
-            testInsertModel.SetData("HasChildren", true, index);
+            testInsertModel.SetData("TypeId__", "Node", index);
+            testInsertModel.SetData("HasChildren__", true, index);
 
             testInsertModel.SetData("Date", "26.12.23", index);
             testInsertModel.SetData("Size",  String(tableTreeViewPage.size_ + index +1), index);
@@ -134,8 +134,8 @@ Rectangle {
 
             index = testInsertModel.InsertNewItem();
             testInsertModel.SetData("Name", "дом 3" , index);
-            testInsertModel.SetData("TypeId", "Doc", index);
-            testInsertModel.SetData("HasChildren", false, index);
+            testInsertModel.SetData("TypeId__", "Doc", index);
+            testInsertModel.SetData("HasChildren__", false, index);
 
             testInsertModel.SetData("Date", "26.12.23", index);
             testInsertModel.SetData("Size",  String(tableTreeViewPage.size_ + index +1), index);
