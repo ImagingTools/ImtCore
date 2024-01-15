@@ -212,7 +212,7 @@ Item {
             topInset: 0;
             bottomInset: 0;
 
-            textRole: "Name"
+            textRole: !baseElement ? "Name" : baseElement.nameId;
             displayText: currentIndex >= 0 ? currentText : "ComboBox"
 
 
