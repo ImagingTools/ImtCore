@@ -1627,7 +1627,33 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     return a;
   }
 
-  function qmlpropdef() {
+  function qmlenumdef(){
+    var name = S.token.value;
+    next();
+    if (is("punc", "{")){
+      next();
+      var res = {}
+      while(!is("punc", "}")){
+        var key = S.token.value
+        var val = undefined
+        next();
+        if(is("operator", "=")){
+          next();
+          if(!is("punc", "}")){
+            val = S.token.value
+            res[key] = val
+            next();
+            if(is("punc", ",")) next();
+          }
+        }
+      }
+      next();
+      return as("qmlenumdef", name, res);
+    }
+    return as("qmlenumdef", name, {});
+  }
+
+  function qmlpropdef(attrs) {
     var type = S.token.value;
     next();
 
@@ -1660,10 +1686,10 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
     if (is("punc", ":")) {
       next();
       statement.in_qmlprop = true;
-      return as_statement("qmlpropdef", name, type);
+      return as_statement("qmlpropdef", attrs, name, type);
     } else if (is("punc", ";"))
       next();
-    return as("qmlpropdef", name, type);
+    return as("qmlpropdef", attrs, name, type);
   }
 
   function qmldefaultprop() {
@@ -1717,9 +1743,23 @@ function qmlweb_parse($TEXT, document_type, exigent_mode) {
         return qmlsignaldef();
       }
     } else if (S.token.type == "name") {
+      if(S.token.value == "enum"){
+        next();
+        return qmlenumdef();
+      }
+      var attrs = [false, false, false] // default, required, readonly
+
+      while (S.token.value == "default" || S.token.value == "required" || S.token.value == "readonly") {
+        switch(S.token.value){
+          case "default": attrs[0] = true; next(); break;
+          case "required": attrs[1] = true; next(); break;
+          case "readonly": attrs[2] = true; next(); break;
+        }
+      }
+
       if (S.token.value == "property" && !is_token(peek(), "punc", ":")) {
         next();
-        return qmlpropdef();
+        return qmlpropdef(attrs);
       }
 
       var propname = subscripts(as_name(), false);

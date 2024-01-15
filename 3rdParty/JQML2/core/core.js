@@ -96,6 +96,7 @@ global.OpenLayers = {
     transform: transform,
 }
 
+global.Enums = {}
 
 const listProperties = require('../utils/properties')
 for(let prop in listProperties){

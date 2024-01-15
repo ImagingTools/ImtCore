@@ -34,6 +34,7 @@ for(let i = 0; i < fileList.length; i++){
     classList.push(path.relative(path.resolve(__dirname, source), fileList[i]).replaceAll('/','_').replaceAll('\\','_').replaceAll('.qml',''))
 }
 const compiledFiles = {}
+const Enums = {}
 // console.log('fileList: ', fileList)
 
 UID = 0
@@ -150,31 +151,31 @@ function qmlaliasdef(meta, instructions){
     })
 }
 function qmlpropdef(meta, instructions){
-    instructions.propertiesNames.push(meta[1])
-    if(meta[3] && meta[3][1][0] === 'qmlelem'){
+    instructions.propertiesNames.push(meta[2])
+    if(meta[4] && meta[4][1][0] === 'qmlelem'){
         let childInstructions = getBaseStructure()
         childInstructions.parent = instructions
         childInstructions.fileName = instructions.fileName
         childInstructions.compiledFile = instructions.compiledFile
     
-        preCompile(meta[3][1][1], meta[3][1][3], meta[3][1][2], childInstructions) 
+        preCompile(meta[4][1][1], meta[4][1][3], meta[4][1][2], childInstructions) 
 
-        let type = meta[2][0].toUpperCase()+meta[2].slice(1)
+        let type = meta[3][0].toUpperCase()+meta[3].slice(1)
 
         instructions.properties.push({
             val: childInstructions,
-            name: meta[1],
+            name: meta[2],
             type: listProperties['Q'+type] ? 'Q'+type : components[type] ? type : 'null', //temp
             command: 'create',
             isElement: true
         })
     } else {
-        let type = meta[2][0].toUpperCase()+meta[2].slice(1)
+        let type = meta[3][0].toUpperCase()+meta[3].slice(1)
         
         instructions.properties.push({
-            name: meta[1],
+            name: meta[2],
             type: listProperties['Q'+type] ? 'Q'+type : components[type] ? type : 'null', //temp
-            val: meta[3],
+            val: meta[4],
             command: 'create'
         })
     }
@@ -323,6 +324,9 @@ function qmlobj(meta, instructions){
     })
     
 }
+function qmlenumdef(meta, instructions){
+    Enums[meta[1]] = meta[2]
+}
 function preCompile(className, meta, on, instructions){
     className = className[0] === 'dot' ? className.slice(1).pop() : className
     if(listComponents.indexOf(className) >= 0){
@@ -405,6 +409,9 @@ function preCompile(className, meta, on, instructions){
             if(m[0] === "qmlobj"){
                 qmlobj(m, instructions)
             }
+            if(m[0] === "qmlenumdef"){
+                qmlenumdef(m, instructions)
+            }
         }
     }
 }
@@ -423,7 +430,7 @@ for(let fileName of fileList){
     namespace.pop()
     namespace = namespace.join('_')
     // let test3 = test2.replaceAll(/[_]{1}\w+.qml/g, '').replaceAll(/\w+.qml/g, '')
-   
+
     compiledFiles[fileName] = {
         fileName: fileName,
         context: {},
@@ -1383,7 +1390,7 @@ while(queueFiles.length){
 }
 
 // console.log(code.join('\n'))
-fs.writeFileSync(path.resolve(__dirname, source, 'jqml.full.js'), code.join('\n'))
+fs.writeFileSync(path.resolve(__dirname, source, 'jqml.full.js'), 'Enums = ' + JSON.stringify(Enums) + '\n' + code.join('\n'))
 
 // const crypto = require('crypto')
 // const zlib = require('zlib')
