@@ -213,7 +213,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 		}
 	}
 
-	if (m_rightsCommandsCompPtr.IsValid()){
+	if (m_rightsCommandsCompPtr.IsValid()) {
 		const iqtgui::CHierarchicalCommand* commandPtr = dynamic_cast<const iqtgui::CHierarchicalCommand*>(m_rightsCommandsCompPtr->GetCommands());
 		if (commandPtr != nullptr){
 			if (m_rightsCommandsToolBar == nullptr){
@@ -384,6 +384,7 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	}
 
 	CurrentPageLabel->setVisible(showPageTitle);
+
 }
 
 
@@ -485,7 +486,7 @@ void CThumbnailDecoratorGuiComp::OnGuiDesignChanged()
 {
 	BaseClass::OnGuiDesignChanged();
 
-	if (IsGuiCreated()){
+	if (IsGuiCreated()) {
 		iqtgui::SetStyleSheetFromFile(GetWidget(), GetStyleSheetPath(":/Styles/ThumbnailDecoratorGui"));
 
 		LoginControlButton->setIcon(GetIcon(":/Icons/Account"));
@@ -510,8 +511,8 @@ void CThumbnailDecoratorGuiComp::OnComponentCreated()
 			if (modelPtr != nullptr){
 				m_additionalCommandActivatorsObserver.RegisterModel(modelPtr, i);
 			}
-		}
 	}
+}
 }
 
 
@@ -1053,9 +1054,12 @@ void CThumbnailDecoratorGuiComp::UpdatePageState()
 							subPageIter.key()->setDisabled(!isPageEnabled);
 
 							if (subPageVisualStatusProviderPtr != nullptr){
-								const iqtgui::IVisualStatus* subPageStatusPtr = subPageVisualStatusProviderPtr->GetVisualStatus(subPageIndex);
-								if (subPageStatusPtr != nullptr){
-									subPageIter.key()->setIcon(0, subPageStatusPtr->GetStatusIcon());
+								int count = subPageVisualStatusProviderPtr->GetStatusesCount();
+								if (subPageIndex < count) {
+									const iqtgui::IVisualStatus* subPageStatusPtr = subPageVisualStatusProviderPtr->GetVisualStatus(subPageIndex);
+									if (subPageStatusPtr != nullptr) {
+										subPageIter.key()->setIcon(0, subPageStatusPtr->GetStatusIcon());
+									}
 								}
 							}
 						}
@@ -1175,16 +1179,16 @@ bool CThumbnailDecoratorGuiComp::IsUserActionAllowed(UserAction action)
 
 	switch (action){
 	case UA_APPLICATION_EXIT:
-		return hasCloseRight;
+	return hasCloseRight;
 	case UA_HOME_ENABLED:
-		return isHomeEnabled;
+	return isHomeEnabled;
 	case UA_LOGIN_CONTROL_ENABLED:
-		return isLoginControlEnabled;
+	return isLoginControlEnabled;
 	case UA_LOGIN_ENABLED:
-		return !isLogged;
+	return !isLogged;
 
 	default:
-		return false;
+	return false;
 	}
 }
 
