@@ -58,10 +58,10 @@ AuxTable{
 
         width: Math.max(tableTreeView.width, tableTreeView.contentWidth);
 
-        height: model.Visible ? tableTreeView.delegateHeight : 0;
-        opacity: model.Visible;
+        height: model.Visible__ ? tableTreeView.delegateHeight : 0;
+        opacity: model.Visible__;
         clip: true;
-        property bool isOpen: model.IsOpen == undefined ? false : model.IsOpen;
+        property bool isOpen: model.IsOpen__ == undefined ? false : model.IsOpen__;
 
 
         TableDelegate {
@@ -102,7 +102,7 @@ AuxTable{
             Rectangle{
 
                 anchors.left: parent.left;
-                anchors.leftMargin: model.Level !== undefined ? model.Level * tableTreeView.shift : 0;
+                anchors.leftMargin: model.Level__ !== undefined ? model.Level__ * tableTreeView.shift : 0;
                 width: tableTreeView.delegateWidth;
                 height: parent.height;
                 color: "transparent";
@@ -117,7 +117,7 @@ AuxTable{
                     width: 16;
                     height: width;
 
-                    visible: model.HasChildren == undefined ? false : model.HasChildren;
+                    visible: model.HasChildren__ == undefined ? false : model.HasChildren__;
                     enabled: visible;
 
                     property string imageName: deleg.isOpen ? "Icons/Down" : "Icons/Right";
@@ -130,22 +130,22 @@ AuxTable{
 
                     onClicked: {
                         tableTreeView.selectedIndex = model.index;
-                        if(model.HasChildren){
+                        if(model.HasChildren__){
                             if(!deleg.isOpen){
-                                if(!model.HasBranch){
-                                    tableTreeView.model.SetData("HasBranch", true, model.index);
-                                    tableTreeView.requestSignal(model.index, model.Level)
+                                if(!model.HasBranch__){
+                                    tableTreeView.model.SetData("HasBranch__", true, model.index);
+                                    tableTreeView.requestSignal(model.index, model.Level__)
                                 }
                                 else {
                                     tableTreeView.setVisibleElements(true, model.index)
                                 }
-                                tableTreeView.model.SetData("IsOpen", true, model.index);
-                                tableTreeView.model.SetData("OpenState", 1, model.index);
+                                tableTreeView.model.SetData("IsOpen__", true, model.index);
+                                tableTreeView.model.SetData("OpenState__", 1, model.index);
 
                             }
                             else if(deleg.isOpen){
-                                tableTreeView.model.SetData("IsOpen", false, model.index);
-                                tableTreeView.model.SetData("OpenState", 0, model.index);
+                                tableTreeView.model.SetData("IsOpen__", false, model.index);
+                                tableTreeView.model.SetData("OpenState__", 0, model.index);
                                 tableTreeView.setVisibleElements(false, model.index)
                             }
                         }
@@ -160,20 +160,20 @@ AuxTable{
                     anchors.left: openButton.right;
                     anchors.leftMargin: 8;
 
-                    visible: model.TypeId !== undefined;
+                    visible: model.TypeId__ !== undefined;
                     width: 16;
                     height: width;
                     sourceSize.width: width;
                     sourceSize.height: height;
-                    source: model.TypeId == undefined ? "" : tableTreeView.getIcon(model.TypeId, deleg.isOpen);
+                    source: model.TypeId__ == undefined ? "" : tableTreeView.getIcon(model.TypeId__, deleg.isOpen);
                 }
 
                 Text{
                     id: nameText;
 
                     anchors.verticalCenter: parent.verticalCenter;
-                    anchors.left: model.TypeId == undefined ? folderImage.left : folderImage.right;
-                    anchors.leftMargin: model.TypeId == undefined ? 0 : 16;
+                    anchors.left: model.TypeId__ == undefined ? folderImage.left : folderImage.right;
+                    anchors.leftMargin: model.TypeId__ == undefined ? 0 : 16;
                     //anchors.right: parent.right;
 
                     font.family: Style.fontFamily;
@@ -206,8 +206,8 @@ AuxTable{
         let maxWidth = 0;
         let maxLevel_= 0;
         for(let i = 0; i < tableTreeView.model.GetItemsCount(); i++){
-            let visible = tableTreeView.model.GetData("Visible",i);
-            let level = !visible ? 0 : tableTreeView.model.GetData("Level",i);
+            let visible = tableTreeView.model.GetData("Visible__",i);
+            let level = !visible ? 0 : tableTreeView.model.GetData("Level__",i);
             let width_ = !visible ? 0 : level * tableTreeView.shift + tableTreeView.delegateWidth;
             if(level > maxLevel_){
                 maxLevel_ = level;
@@ -251,8 +251,8 @@ AuxTable{
 
     function setVisibleElements(visible, index){
         // console.log("SET VISIBLE", visible, index);
-        let innerId = tableTreeView.model.GetData("InnerId", index);
-        let level = tableTreeView.model.GetData("Level", index);
+        let innerId = tableTreeView.model.GetData("InnerId__", index);
+        let level = tableTreeView.model.GetData("Level__", index);
         let found = false;
         let foundChangeCount = 0;
 
@@ -260,7 +260,7 @@ AuxTable{
         let currClosedLevel = -1;
 
         for(let i = index + 1; i < tableTreeView.model.GetItemsCount(); i++){
-            let branchIds = tableTreeView.model.IsValidData("BranchIds", i) ? tableTreeView.model.GetData("BranchIds", i) : "";
+            let branchIds = tableTreeView.model.IsValidData("BranchIds__", i) ? tableTreeView.model.GetData("BranchIds__", i) : "";
             //console.log("branchIds:: ", branchIds)
 
             let ok = false;
@@ -268,8 +268,8 @@ AuxTable{
             let arrCounter = 0;
 
             //*****************for closed*************//
-            let openST = tableTreeView.model.GetData("OpenState", i);
-            let level_curr = tableTreeView.model.GetData("Level", i);
+            let openST = tableTreeView.model.GetData("OpenState__", i);
+            let level_curr = tableTreeView.model.GetData("Level__", i);
 
             if(level_curr <= currClosedLevel){
                 currClosedLevel = -1;
@@ -312,7 +312,7 @@ AuxTable{
 
             //
             if(ok){
-                tableTreeView.model.SetData("Visible", visible && ok_visible, i);
+                tableTreeView.model.SetData("Visible__", visible && ok_visible, i);
                 let coeff = visible ? 1 : -1;
                 let content_height = tableTreeView.getContentHeight();
                 content_height += coeff * tableTreeView.delegateHeight;
@@ -338,7 +338,7 @@ AuxTable{
 
     function findParentIndex(index){
         let foundIndex = -1;
-        let branchIds = tableTreeView.model.IsValidData("BranchIds", index) ? tableTreeView.model.GetData("BranchIds", index) : "";
+        let branchIds = tableTreeView.model.IsValidData("BranchIds__", index) ? tableTreeView.model.GetData("BranchIds__", index) : "";
         if(branchIds == ""){
             //console.log("FOUND_INDEX_ RETURN ", foundIndex);
             return -1;
@@ -346,7 +346,7 @@ AuxTable{
         let arr = branchIds.split(",");
         let parentId = arr[arr.length - 1];
         for(let i = index - 1; i >=0; i--){
-            let innerId = tableTreeView.model.GetData("InnerId", i);
+            let innerId = tableTreeView.model.GetData("InnerId__", i);
             if(innerId == parentId){
                 foundIndex =  i;
                 break;
@@ -358,11 +358,11 @@ AuxTable{
 
     function deleteBranch(index){
         //console.log("DELETE BRANCH", index);
-        let innerId = tableTreeView.model.GetData("InnerId", index);
+        let innerId = tableTreeView.model.GetData("InnerId__", index);
         let found = false;
         let foundChangeCount = 0;
         for(let i = index + 1; i < tableTreeView.model.GetItemsCount(); i++){
-            let branchIds = tableTreeView.model.IsValidData("BranchIds", i) ? tableTreeView.model.GetData("BranchIds", i) : "";
+            let branchIds = tableTreeView.model.IsValidData("BranchIds__", i) ? tableTreeView.model.GetData("BranchIds__", i) : "";
             //console.log("branchIds:: ", branchIds)
             let ok = false;
             let arr = branchIds.split(",");
@@ -397,8 +397,8 @@ AuxTable{
             }
         }
 
-        tableTreeView.model.SetData("IsOpen", false, index);
-        tableTreeView.model.SetData("HasBranch", false, index);
+        tableTreeView.model.SetData("IsOpen__", false, index);
+        tableTreeView.model.SetData("HasBranch__", false, index);
 
         tableTreeView.setContentWidth();
     }
@@ -409,7 +409,7 @@ AuxTable{
             return;
         }
 
-        let level_ = tableTreeView.model.IsValidData("Level", index) ? tableTreeView.model.GetData("Level", index) : -1;
+        let level_ = tableTreeView.model.IsValidData("Level__", index) ? tableTreeView.model.GetData("Level__", index) : -1;
         //console.log("INSERT TREE", index, level_);
 
         if((level_ + 1) > tableTreeView.maxLevel){
@@ -419,8 +419,8 @@ AuxTable{
         let date = new Date();
         let val = date.valueOf();
 
-        let branchIds_parent = tableTreeView.model.IsValidData("BranchIds", index) ? tableTreeView.model.GetData("BranchIds", index) : "";
-        let innerId_parent = tableTreeView.model.IsValidData("InnerId", index) ? tableTreeView.model.GetData("InnerId", index) : "";
+        let branchIds_parent = tableTreeView.model.IsValidData("BranchIds__", index) ? tableTreeView.model.GetData("BranchIds__", index) : "";
+        let innerId_parent = tableTreeView.model.IsValidData("InnerId__", index) ? tableTreeView.model.GetData("InnerId__", index) : "";
         let branchIds = branchIds_parent !== "" ? branchIds_parent + "," + innerId_parent: innerId_parent;
 
 
@@ -428,13 +428,13 @@ AuxTable{
             let newIndex =  index + i + 1;
             tableTreeView.model.InsertNewItem(newIndex);
             tableTreeView.model.CopyItemDataFromModel(newIndex, model_, i);
-            tableTreeView.model.SetData("Level", level_ + 1, newIndex);
-            tableTreeView.model.SetData("BranchIds", branchIds, newIndex);
-            tableTreeView.model.SetData("Visible", true, newIndex);
-            tableTreeView.model.SetData("IsOpen", false, newIndex);
-            tableTreeView.model.SetData("OpenState", -1, newIndex);
-            tableTreeView.model.SetData("HasBranch", false, newIndex);
-            tableTreeView.model.SetData("InnerId", String(val + newIndex), newIndex);
+            tableTreeView.model.SetData("Level__", level_ + 1, newIndex);
+            tableTreeView.model.SetData("BranchIds__", branchIds, newIndex);
+            tableTreeView.model.SetData("Visible__", true, newIndex);
+            tableTreeView.model.SetData("IsOpen__", false, newIndex);
+            tableTreeView.model.SetData("OpenState__", -1, newIndex);
+            tableTreeView.model.SetData("HasBranch__", false, newIndex);
+            tableTreeView.model.SetData("InnerId__", String(val + newIndex), newIndex);
 
             if(i == 0 && level_ == -1){
                 tableTreeView.setContentHeight(tableTreeView.delegateHeight);
@@ -463,6 +463,9 @@ AuxTable{
             imageName = isOpen ? "Icons/FolderOpened" : "Icons/FolderClosed";
         }
         else if(type == "Doc"){
+            imageName = "Icons/New";
+        }
+        else {
             imageName = "Icons/New";
         }
         source  =  "../../../" + Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
