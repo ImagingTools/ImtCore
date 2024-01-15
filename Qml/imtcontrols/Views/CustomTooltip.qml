@@ -11,7 +11,7 @@ ControlBase {
     property string text: "";
 
     property int componentWidth: 200;
-    property int tooltipWidth: customTooltip.fitToTextWidth ? forWidthText.width + 2*customTooltip.textMargin : customTooltip.componentWidth;
+    property int tooltipWidth: customTooltip.fitToTextWidth ? forWidthText.width + 2*customTooltip.textMargin : Math.min(customTooltip.componentWidth, forWidthText.width + 2*customTooltip.textMargin);
 
     property int componentMinHeight: 40;
     property int componentMargin: 12;
@@ -25,7 +25,7 @@ ControlBase {
     property int fontPixelSize: Style.fontSize_common;
     property bool fontBold: false;
     property string fontColor: Style.textColor;
-    property int textMargin: 8;
+    property int textMargin: 4;
     property int horizontalAlignment: Text.AlignHCenter;
 
     property int radius: 4;
@@ -68,13 +68,13 @@ ControlBase {
 
             var point = mapToItem(null, xX, yY);
             var centeredAdd = customTooltip.fitToTextWidth ? customTooltip.fitToHCenter * (forWidthText.width/2 + customTooltip.textMargin + customTooltip.componentMargin) :
-                                                             customTooltip.fitToHCenter * (customTooltip.componentWidth/2 + customTooltip.componentMargin);
+                                                             customTooltip.fitToHCenter * (customTooltip.tooltipWidth/2 + customTooltip.componentMargin);
             if(point.x > modalDialogManager.width*2/3){
                 if(customTooltip.fitToTextWidth){
                     point.x = point.x - forWidthText.width - 2*customTooltip.textMargin - customTooltip.componentMargin + centeredAdd;
                 }
                 else{
-                    point.x = point.x - customTooltip.componentWidth - customTooltip.componentMargin + centeredAdd;
+                    point.x = point.x - customTooltip.tooltipWidth - customTooltip.componentMargin + centeredAdd;
                 }
             }
             else{
@@ -114,7 +114,7 @@ ControlBase {
 
         visible: false;
 
-       // width: customTooltip.componentWidth - 2*customTooltip.textMargin;
+        width: customTooltip.tooltipWidth - 2*customTooltip.textMargin;
 
         font.family: Style.fontFamily;
         font.pixelSize:  customTooltip.fontPixelSize;
@@ -149,7 +149,7 @@ ControlBase {
         Rectangle{
             id: compRec;
 
-            width: customTooltip.fitToTextWidth ? forWidthText.width + 2*customTooltip.textMargin : customTooltip.componentWidth;
+            width: customTooltip.tooltipWidth;
             height: customTooltip.componentHeight;
 
             color: customTooltip.color;
