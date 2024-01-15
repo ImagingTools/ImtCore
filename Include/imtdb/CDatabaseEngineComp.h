@@ -78,8 +78,15 @@ public:
 	QString GetConnectionName() const;
 
 protected:
+	enum DatabaseCreationFlags
+	{
+		DCF_CREATE_DATABASE = 1,
+		DCF_CREATE_DATABASE_META = 2,
+		DCF_EXECUTE_PATCHES = 4,
+		DCF_ALL = 0xffff
+	};
 	virtual bool OpenDatabase() const;
-	virtual bool CreateDatabase() const;
+	virtual bool CreateDatabase(int flags) const;
 	virtual bool ExecuteDatabasePatches() const;
 	virtual bool ExecuteTransaction(const QByteArray& sqlQuery) const;
 	void OnDatabaseAccessChanged(const istd::IChangeable::ChangeSet& changeSet, const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr);
@@ -96,7 +103,25 @@ private:
 	 */
 	bool EnsureDatabaseConnected(QSqlError* sqlError = nullptr) const;
 
+	/**
+		Ensure that the database is created and ready to use.
+	*/
 	bool EnsureDatabaseCreated() const;
+
+	/**
+		Ensure that the database in the consistent state.
+	*/
+	bool EnsureDatabaseConsistency() const;
+
+	/**
+		Create the database instance (an empty database)
+	*/
+	bool CreateDatabaseInstance() const;
+
+	/**
+		Create special meta-info tables for the database (Revision etc.)
+	*/
+	bool CreateDatabaseMetaInfo() const;
 
 	QString GetDatabaseName() const;
 	QString GetDatabasePath() const;

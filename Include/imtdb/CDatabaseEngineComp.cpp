@@ -238,7 +238,7 @@ bool CDatabaseEngineComp::OpenDatabase() const
 }
 
 
-bool CDatabaseEngineComp::CreateDatabase() const
+bool CDatabaseEngineComp::CreateDatabase(int flags) const
 {
 	if (!m_migrationFolderPathCompPtr.IsValid()){
 		SendCriticalMessage(0, QString("Wrong component configuration: 'MigrationFolderPath' component was not set"));
@@ -259,95 +259,49 @@ bool CDatabaseEngineComp::CreateDatabase() const
 		return false;
 	}
 
-	qDebug() << GetHostName() << GetUserName() << GetPassword() << GetDatabaseName();
+	bool retVal = true;
+	QString rollbackQuery;
 
-	bool retVal = false;
-	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, *m_maintenanceDatabaseNameAttrPtr);
-	maintainanceDb.setHostName(GetHostName());
-	maintainanceDb.setUserName(GetUserName());
-	maintainanceDb.setPassword(GetPassword());
-	maintainanceDb.setDatabaseName(*m_maintenanceDatabaseNameAttrPtr);
-	maintainanceDb.setPort(GetPort());
+	if (flags & DCF_CREATE_DATABASE) {
+		retVal = CreateDatabaseInstance();
 
-	retVal = maintainanceDb.open();
-	if (retVal){
-		QString createDatabaseQuery;
+		rollbackQuery = QString("DROP DATABASE %1").arg(GetDatabaseName());
+	}
 
-		if (QFile(migrationsFolder.filePath("CreateDatabase.sql")).exists()){
-			QFile scriptFile(migrationsFolder.filePath("CreateDatabase.sql"));
+	if (retVal) {
+		// Initialize a new connection to the "real" database:
+		QSqlDatabase databaseConnection = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, GetConnectionName());
 
-			scriptFile.open(QFile::ReadOnly);
+		databaseConnection.setHostName(GetHostName());
+		databaseConnection.setUserName(GetUserName());
+		databaseConnection.setPassword(GetPassword());
+		databaseConnection.setDatabaseName(GetDatabaseName());
+		databaseConnection.setPort(GetPort());
 
-			createDatabaseQuery = scriptFile.readAll();
-
-			createDatabaseQuery.replace(":DatabaseName", GetDatabaseName());
-
-			scriptFile.close();
-		}
-
-		maintainanceDb.exec(createDatabaseQuery);
-		QSqlError sqlError = maintainanceDb.lastError();
-
-		QString rollbackQuery = QString("DROP DATABASE %1").arg(GetDatabaseName());
-
-		maintainanceDb.close();
-
-		retVal = bool(sqlError.type() == QSqlError::ErrorType::NoError);
-		if (retVal){
-			// Close connection to the service database:
-			QSqlDatabase::removeDatabase(*m_maintenanceDatabaseNameAttrPtr);
-
-			// Initialize a new connection to the "real" database:
-			QSqlDatabase databaseConnection = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, GetConnectionName());
-
-			databaseConnection.setHostName(GetHostName());
-			databaseConnection.setUserName(GetUserName());
-			databaseConnection.setPassword(GetPassword());
-			databaseConnection.setDatabaseName(GetDatabaseName());
-			databaseConnection.setPort(GetPort());
-
-			// Open the database
-			retVal = databaseConnection.open();
-			if (retVal){
-				// Create revision table in the database:
-				ExecSqlQueryFromFile(migrationsFolder.filePath("CreateRevision.sql"), &sqlError);
-				if (sqlError.type() != QSqlError::NoError){
+		// Open the database
+		retVal = databaseConnection.open();
+		if (retVal) {
+			if (flags & DCF_CREATE_DATABASE_META) {
+				retVal = CreateDatabaseMetaInfo();
+				if (!retVal && !rollbackQuery.isEmpty()) {
 					// If the creation of the revision tables was failed, remove newly created database:
 					ExecSqlQuery(rollbackQuery.toUtf8());
-
-					SendErrorMessage(0, QString("\n\t| Revision table could not be created""\n\t| Error: %1").arg(sqlError.text()));
-
-					retVal = false;
 				}
+			}
 
-				if (retVal && (*m_autoCreateTablesAttrPtr > 0)){
+			if (flags & DCF_EXECUTE_PATCHES) {
+				if (retVal && (*m_autoCreateTablesAttrPtr > 0)) {
 					retVal = ExecuteDatabasePatches();
-					if (!retVal){
+					if (!retVal && !rollbackQuery.isEmpty()) {
 						// If the execution of patches was failed, remove newly created database:
 						ExecSqlQuery(rollbackQuery.toLocal8Bit());
 					}
 				}
 			}
-			else{
-				SendErrorMessage(0, QString("\n\t| Database could not be connected""\n\t| Error: %1").arg(databaseConnection.lastError().text()));
-			}
 		}
-		else{
-			qCritical() << __FILE__ << __LINE__
-						<< "\n\t| Database could not be created"
-						<< "\n\t| Error: " << sqlError
-						<< "\n\t| Query: " << createDatabaseQuery;
-			SendErrorMessage(0, QString("\n\t| Database could not be created"
-						"\n\t| Error: %1"
-						"\n\t| Query: %2")
-						.arg(sqlError.text())
-						.arg(createDatabaseQuery));
+		else {
+			SendErrorMessage(0, QString("\n\t| Database could not be connected""\n\t| Error: %1").arg(databaseConnection.lastError().text()));
 		}
-	}
-	else{
-		SendErrorMessage(0, QString("Maintanance database could not be opened. Error message: '%1'").arg(maintainanceDb.lastError().text()));
-
-		return false;
 	}
 
 	return retVal;
@@ -482,13 +436,13 @@ bool CDatabaseEngineComp::EnsureDatabaseConnected(QSqlError* sqlError) const
 
 bool CDatabaseEngineComp::EnsureDatabaseCreated() const
 {
-	bool isOpened = OpenDatabase();
-	if (!isOpened){
+	bool retVal = OpenDatabase();
+	if (!retVal){
 		QString errorMessage;
 		bool isServerConnected = CheckDatabaseConnection(errorMessage);
 		if (isServerConnected){
 			if (*m_autoCreateDatabaseAttrPtr >= 1){
-				return CreateDatabase();
+				return CreateDatabase(DCF_ALL);
 			}
 		}
 		else{
@@ -499,9 +453,134 @@ bool CDatabaseEngineComp::EnsureDatabaseCreated() const
 	}
 	else {
 		if (*m_autoCreateDatabaseAttrPtr == 2){
-			return CreateDatabase();
+			retVal = retVal && CreateDatabase(DCF_ALL);
 		}
-		ExecuteDatabasePatches();
+
+		retVal = retVal && EnsureDatabaseConsistency();
+
+		retVal = retVal && ExecuteDatabasePatches();
+	}
+
+	return retVal;
+}
+
+
+bool CDatabaseEngineComp::EnsureDatabaseConsistency() const
+{
+	int databaseVersion = GetDatabaseVersion();
+	// Database tables were not created
+	if (databaseVersion < 0) {
+		return CreateDatabase(DCF_CREATE_DATABASE_META | DCF_EXECUTE_PATCHES);
+	}
+
+	return true;
+}
+
+
+bool CDatabaseEngineComp::CreateDatabaseInstance() const
+{
+	if (!m_migrationFolderPathCompPtr.IsValid()) {
+		SendCriticalMessage(0, QString("Wrong component configuration: 'MigrationFolderPath' component was not set"));
+
+		return false;
+	}
+
+	QDir migrationsFolder(m_migrationFolderPathCompPtr->GetPath());
+	if (!migrationsFolder.exists()) {
+		SendErrorMessage(0, QString("Folder containing SQL scripts doesn't exist: %1").arg(m_migrationFolderPathCompPtr->GetPath()));
+
+		return false;
+	}
+
+	if ((*m_maintenanceDatabaseNameAttrPtr).isEmpty()) {
+		SendCriticalMessage(0, QString("Maintenance database name not was not set"));
+
+		return false;
+	}
+
+	qDebug() << GetHostName() << GetUserName() << GetPassword() << GetDatabaseName();
+
+	bool retVal = false;
+	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, *m_maintenanceDatabaseNameAttrPtr);
+	maintainanceDb.setHostName(GetHostName());
+	maintainanceDb.setUserName(GetUserName());
+	maintainanceDb.setPassword(GetPassword());
+	maintainanceDb.setDatabaseName(*m_maintenanceDatabaseNameAttrPtr);
+	maintainanceDb.setPort(GetPort());
+
+	retVal = maintainanceDb.open();
+	if (retVal) {
+		QString createDatabaseQuery;
+
+		if (QFile(migrationsFolder.filePath("CreateDatabase.sql")).exists()) {
+			QFile scriptFile(migrationsFolder.filePath("CreateDatabase.sql"));
+
+			scriptFile.open(QFile::ReadOnly);
+
+			createDatabaseQuery = scriptFile.readAll();
+
+			createDatabaseQuery.replace(":DatabaseName", GetDatabaseName());
+
+			scriptFile.close();
+		}
+
+		maintainanceDb.exec(createDatabaseQuery);
+
+		QSqlError sqlError = maintainanceDb.lastError();
+
+		retVal = bool(sqlError.type() == QSqlError::ErrorType::NoError);
+		if (!retVal) {
+			qCritical() << __FILE__ << __LINE__
+				<< "\n\t| Database could not be created"
+				<< "\n\t| Error: " << sqlError
+				<< "\n\t| Query: " << createDatabaseQuery;
+
+			SendErrorMessage(0, QString("\n\t| Database could not be created"
+				"\n\t| Error: %1"
+				"\n\t| Query: %2")
+				.arg(sqlError.text())
+				.arg(createDatabaseQuery));
+
+		}
+
+		maintainanceDb.close();
+
+		// Close connection to the service database:
+		QSqlDatabase::removeDatabase(*m_maintenanceDatabaseNameAttrPtr);
+
+		return retVal;
+	}
+	else {
+		SendErrorMessage(0, QString("Maintanance database could not be opened. Error message: '%1'").arg(maintainanceDb.lastError().text()));
+	}
+
+	return false;
+}
+
+
+bool CDatabaseEngineComp::CreateDatabaseMetaInfo() const
+{
+	if (!m_migrationFolderPathCompPtr.IsValid()) {
+		SendCriticalMessage(0, QString("Wrong component configuration: 'MigrationFolderPath' component was not set"));
+
+		return false;
+	}
+
+	QDir migrationsFolder(m_migrationFolderPathCompPtr->GetPath());
+	if (!migrationsFolder.exists()) {
+		SendErrorMessage(0, QString("Folder containing SQL scripts doesn't exist: %1").arg(m_migrationFolderPathCompPtr->GetPath()));
+
+		return false;
+	}
+
+	QSqlError sqlError;
+
+	// Create revision table in the database:
+	ExecSqlQueryFromFile(migrationsFolder.filePath("CreateRevision.sql"), &sqlError);
+	if (sqlError.type() != QSqlError::NoError) {
+		SendErrorMessage(0, QString("\n\t| Revision table could not be created""\n\t| Error: %1").arg(sqlError.text()));
+
+		return false;
 	}
 
 	return true;
