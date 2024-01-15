@@ -10,6 +10,7 @@ class MouseArea extends Item {
         hoverEnabled: { type: QBool, value: false },
         propagateComposedEvents: { type: QBool, value: false },
         preventStealing: { type: QBool, value: false },
+        pressed: { type: QBool, value: false },
         pressAndHoldInterval: { type: QReal, value: 800 },
         mouseX: { type: QReal, value: 0 },
         mouseY: { type: QReal, value: 0 },
@@ -23,7 +24,7 @@ class MouseArea extends Item {
 		exited: { params: [] },
 		canceled: { params: [] },
 		pressAndHold: { params: [] },
-		pressed: { params: [] },
+		// pressed: { params: [] },
 		released: { params: [] },
 		wheel: { params: [] },
 		doubleClicked: { params: [] },
@@ -76,6 +77,7 @@ class MouseArea extends Item {
     }
     onMouseDown(x, y, button){
         if(this.getPropertyValue('enabled') && this.getPropertyValue('visible') && this.availableButton(button)) {
+            
             let rect = this.getDom().getBoundingClientRect()
             this.mouse.x = x - rect.x
             this.mouse.y = y - rect.y
@@ -87,7 +89,8 @@ class MouseArea extends Item {
             if(this.$signals && this.$signals.entered) this.$signals.entered()
 
             this.mouse.accepted = true
-            if(this.$signals && this.$signals.pressed) this.$signals.pressed()
+            this.getStatement('pressed').value = true
+            if(this.$properties && this.$properties.pressed && this.$properties.pressed.notify) this.$properties.pressed.notify()
             
 
             // if(this.$signals && this.$signals.pressAndHold){
@@ -104,6 +107,7 @@ class MouseArea extends Item {
     }
     onMouseUp(x, y, button){
         if(this.getPropertyValue('enabled') && this.getPropertyValue('visible') && this.availableButton(button)) {
+            this.getStatement('pressed').value = false
             let rect = this.getDom().getBoundingClientRect()
             this.mouse.x = x - rect.x
             this.mouse.y = y - rect.y
@@ -127,6 +131,7 @@ class MouseArea extends Item {
     }
     onMouseMove(x, y, pressed){
         if(this.getPropertyValue('enabled') && this.getPropertyValue('visible')) {
+            this.getStatement('pressed').value = pressed
             this.mouse.accepted = true
             let rect = this.getDom().getBoundingClientRect()
             this.mouse.x = x - rect.x
