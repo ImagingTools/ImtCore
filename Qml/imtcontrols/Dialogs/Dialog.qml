@@ -8,11 +8,13 @@ import imtcontrols 1.0
 ControlBase {
     id: dialogContainer;
 
-    width: Style.isQtStyle ? !decorator_ ? 0 : decorator_.width : dialogColumn.width;
-    height: Style.isQtStyle ? !decorator_ ? 0 : decorator_.height : dialogColumn.height;
+    width:  !decorator_ ? 0 : !emptyDecorator ? decorator_.width : dialogColumn.width;
+    height:  !decorator_ ? 0 : !emptyDecorator ? decorator_.height : dialogColumn.height;
+
 
     decorator: Style.dialogDecorator;
     property var decoratorItem: null;
+    property bool emptyDecorator: !decorator_ ? true : decorator_.isEmpty == undefined ? false : decorator_.isEmpty;
 
     property string title;
     property string bodySource;
@@ -148,25 +150,7 @@ ControlBase {
                 decorator_.applied.connect(this.applied);
             }
 
-            addContentItemToDecorator();
         }
-    }
-
-    function addContentItemToDecorator(){
-        if(Style.isQtStyle){
-            decorator_.buttonIds = dialogContainer.buttonIds;
-            var content_ = dialogContainer.contentComp.createObject(decorator_);
-            dialogContainer.decorator_.contentItem.children.push(content_);
-
-            dialogContainer.decoratorItem = content_;
-
-            setDecoratorSize(content_)
-
-            if(decorator_.rootItem !==undefined){
-                decorator_.rootItem = dialogContainer;
-            }
-
-        }//if(Style.isQtStyle)
     }
 
 
@@ -189,26 +173,6 @@ ControlBase {
         dialogContainer.buttonIds = buttonIds;
     }
 
-    function setDecoratorSize(content_){
-        if(Style.isQtStyle){
-            let width_  = content_.width +
-                dialogContainer.decorator_.leftPadding +
-                dialogContainer.decorator_.rightPadding;
-            dialogContainer.decorator_.width = Math.max(width_, dialogContainer.decorator_.footer.width);
-
-            let hasButtons = dialogContainer.buttonIds !== 0;
-            dialogContainer.decorator_.height = content_.height +
-                    dialogContainer.decorator_.header.height +
-                    dialogContainer.decorator_.footer.height * hasButtons +
-                    dialogContainer.decorator_.topPadding +
-                    dialogContainer.decorator_.bottomPadding;
-        }
-
-        content_.x = (dialogContainer.decorator_.width - content_.width)/2 -
-                dialogContainer.decorator_.leftPadding;
-    }
-
-
     MouseArea {
         anchors.fill: parent;
         onClicked: {}
@@ -220,7 +184,7 @@ ControlBase {
         anchors.fill: parent;
 
         color: dialogContainer.backgroundColor;
-        visible: !Style.isQtStyle;
+        visible: dialogContainer.emptyDecorator;
     }
 
     DropShadow {
@@ -242,7 +206,7 @@ ControlBase {
 
         width: Math.max(buttonsWidth, bodyWidth)//buttonsWidth;
 
-        visible: !Style.isQtStyle;
+        visible: dialogContainer.emptyDecorator;
         spacing: 10;
 
 //        property real bodyWidth: !loaderBodyDialog.item ? 1 : loaderBodyDialog.item.width + 20;
@@ -302,7 +266,7 @@ ControlBase {
 
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            sourceComponent: !Style.isQtStyle ? dialogContainer.contentComp : dialogContainer.emptyComp;
+            sourceComponent: dialogContainer.emptyDecorator ? dialogContainer.contentComp : dialogContainer.emptyComp;
             onLoaded: {
                 //loaderBodyDialog.item.width = dialogContainer.width;
                 if(loaderBodyDialog.item.rootItem !== undefined){

@@ -498,7 +498,7 @@ Item {
         id: dialogDecoratorComp;
 
         Dialog {
-            id: confirmationDialog
+            id: dialogContainer
 
             title: !baseElement ? "Title" : baseElement.title;
             standardButtons: buttonIds;
@@ -508,6 +508,42 @@ Item {
             property int buttonIds: 0;
             property var baseElement: null;
             property Item rootItem: null;
+            onBaseElementChanged: {
+                if(baseElement){
+                    addContentItemToDecorator();
+                }
+            }
+
+            function addContentItemToDecorator(){
+                dialogContainer.buttonIds = dialogContainer.baseElement.buttonIds;
+                var content_ = dialogContainer.baseElement.contentComp.createObject(dialogContainer);
+                dialogContainer.contentItem.children.push(content_);
+
+                dialogContainer.baseElement.decoratorItem = content_;
+
+                setDecoratorSize(content_)
+
+                dialogContainer.rootItem = dialogContainer.baseElement;
+
+            }
+
+
+            function setDecoratorSize(content_){
+                let width_  = content_.width +
+                    dialogContainer.leftPadding +
+                    dialogContainer.rightPadding;
+                dialogContainer.width = Math.max(width_, dialogContainer.footer.width);
+
+                let hasButtons = dialogContainer.buttonIds !== 0;
+                dialogContainer.height = content_.height +
+                        dialogContainer.header.height +
+                        dialogContainer.footer.height * hasButtons +
+                        dialogContainer.topPadding +
+                        dialogContainer.bottomPadding;
+
+                content_.x = (dialogContainer.width - content_.width)/2 -
+                        dialogContainer.leftPadding;
+            }
         }
     }
 

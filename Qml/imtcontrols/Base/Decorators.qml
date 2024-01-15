@@ -1139,6 +1139,8 @@ StyleComponents {
         Item {
             id: dialogItem;
 
+            property bool isEmpty: true;
+
             property var baseElement: null;
         }
     }
