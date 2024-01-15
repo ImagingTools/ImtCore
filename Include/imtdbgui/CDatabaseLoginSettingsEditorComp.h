@@ -52,6 +52,7 @@ private Q_SLOTS:
 	void on_UserEdit_editingFinished();
 	void on_PasswordEdit_editingFinished();
 	void on_TestConnectionButton_clicked();
+	void on_UseSslCheck_stateChanged();
 
 private:
 	void OnAddressEditEnabled(const istd::IChangeable::ChangeSet& changeSet, const iprm::IEnableableParam* objectPtr);

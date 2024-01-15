@@ -125,12 +125,15 @@ private:
 
 	QString GetDatabaseName() const;
 	QString GetDatabasePath() const;
+	bool IsSslConnectionRequired() const;
 	QString GetHostName() const;
 	int GetPort() const;
 	QString GetUserName() const;
 	QString GetPassword() const;
 	int GetLastMigration() const;
 	int GetDatabaseVersion() const;
+
+	QString GetConnectionOptionsString(const QByteArray& databaseDriverId) const;
 
 	template <typename Interface>
 	static Interface* ExtractDatabaseAccessSettings(CDatabaseEngineComp& component)

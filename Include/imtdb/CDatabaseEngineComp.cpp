@@ -158,7 +158,7 @@ bool CDatabaseEngineComp::CheckDatabaseConnection(QString& errorMessage) const
 
 	maintainanceDb.close();
 
-	if (!isConnected) {
+	if (!isConnected){
 		QSqlError sqlError = maintainanceDb.lastError();
 		errorMessage = sqlError.text();
 	}
@@ -217,21 +217,27 @@ bool CDatabaseEngineComp::OpenDatabase() const
 		databaseConnection.close();
 	}
 
-	databaseConnection = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, GetConnectionName());
-	QString databaseName = GetDatabaseName();
-	if (m_dbTypeAttrPtr->GetValue().compare(QByteArray("QODBC"), Qt::CaseInsensitive) == 0){
+	QByteArray databaseDriverTypeId = *m_dbTypeAttrPtr;
 
+	databaseConnection = QSqlDatabase::addDatabase(databaseDriverTypeId, GetConnectionName());
+
+	databaseConnection.setConnectOptions(GetConnectionOptionsString(databaseDriverTypeId));
+
+	QString databaseName = GetDatabaseName();
+	if (databaseDriverTypeId.compare(QByteArray("QODBC"), Qt::CaseInsensitive) == 0){
 	}
-	else if (m_dbTypeAttrPtr->GetValue().compare(QByteArray("QSQLITE"), Qt::CaseInsensitive) == 0){
+	else if (databaseDriverTypeId.compare(QByteArray("QSQLITE"), Qt::CaseInsensitive) == 0){
 		 databaseName = GetDatabasePath();
 	}
-	else {
+	else{
 		databaseConnection.setHostName(GetHostName());
 		databaseConnection.setUserName(GetUserName());
 		databaseConnection.setPassword(GetPassword());
 		databaseConnection.setPort(GetPort());
 	}
+
 	databaseConnection.setDatabaseName(databaseName);
+
 	retVal = databaseConnection.open();
 
 	return retVal;
@@ -262,13 +268,13 @@ bool CDatabaseEngineComp::CreateDatabase(int flags) const
 	bool retVal = true;
 	QString rollbackQuery;
 
-	if (flags & DCF_CREATE_DATABASE) {
+	if (flags & DCF_CREATE_DATABASE){
 		retVal = CreateDatabaseInstance();
 
 		rollbackQuery = QString("DROP DATABASE %1").arg(GetDatabaseName());
 	}
 
-	if (retVal) {
+	if (retVal){
 		// Initialize a new connection to the "real" database:
 		QSqlDatabase databaseConnection = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, GetConnectionName());
 
@@ -280,19 +286,19 @@ bool CDatabaseEngineComp::CreateDatabase(int flags) const
 
 		// Open the database
 		retVal = databaseConnection.open();
-		if (retVal) {
-			if (flags & DCF_CREATE_DATABASE_META) {
+		if (retVal){
+			if (flags & DCF_CREATE_DATABASE_META){
 				retVal = CreateDatabaseMetaInfo();
-				if (!retVal && !rollbackQuery.isEmpty()) {
+				if (!retVal && !rollbackQuery.isEmpty()){
 					// If the creation of the revision tables was failed, remove newly created database:
 					ExecSqlQuery(rollbackQuery.toUtf8());
 				}
 			}
 
-			if (flags & DCF_EXECUTE_PATCHES) {
-				if (retVal && (*m_autoCreateTablesAttrPtr > 0)) {
+			if (flags & DCF_EXECUTE_PATCHES){
+				if (retVal && (*m_autoCreateTablesAttrPtr > 0)){
 					retVal = ExecuteDatabasePatches();
-					if (!retVal && !rollbackQuery.isEmpty()) {
+					if (!retVal && !rollbackQuery.isEmpty()){
 						// If the execution of patches was failed, remove newly created database:
 						ExecSqlQuery(rollbackQuery.toLocal8Bit());
 					}
@@ -469,7 +475,7 @@ bool CDatabaseEngineComp::EnsureDatabaseConsistency() const
 {
 	int databaseVersion = GetDatabaseVersion();
 	// Database tables were not created
-	if (databaseVersion < 0) {
+	if (databaseVersion < 0){
 		return CreateDatabase(DCF_CREATE_DATABASE_META | DCF_EXECUTE_PATCHES);
 	}
 
@@ -479,20 +485,20 @@ bool CDatabaseEngineComp::EnsureDatabaseConsistency() const
 
 bool CDatabaseEngineComp::CreateDatabaseInstance() const
 {
-	if (!m_migrationFolderPathCompPtr.IsValid()) {
+	if (!m_migrationFolderPathCompPtr.IsValid()){
 		SendCriticalMessage(0, QString("Wrong component configuration: 'MigrationFolderPath' component was not set"));
 
 		return false;
 	}
 
 	QDir migrationsFolder(m_migrationFolderPathCompPtr->GetPath());
-	if (!migrationsFolder.exists()) {
+	if (!migrationsFolder.exists()){
 		SendErrorMessage(0, QString("Folder containing SQL scripts doesn't exist: %1").arg(m_migrationFolderPathCompPtr->GetPath()));
 
 		return false;
 	}
 
-	if ((*m_maintenanceDatabaseNameAttrPtr).isEmpty()) {
+	if ((*m_maintenanceDatabaseNameAttrPtr).isEmpty()){
 		SendCriticalMessage(0, QString("Maintenance database name not was not set"));
 
 		return false;
@@ -509,10 +515,10 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 	maintainanceDb.setPort(GetPort());
 
 	retVal = maintainanceDb.open();
-	if (retVal) {
+	if (retVal){
 		QString createDatabaseQuery;
 
-		if (QFile(migrationsFolder.filePath("CreateDatabase.sql")).exists()) {
+		if (QFile(migrationsFolder.filePath("CreateDatabase.sql")).exists()){
 			QFile scriptFile(migrationsFolder.filePath("CreateDatabase.sql"));
 
 			scriptFile.open(QFile::ReadOnly);
@@ -529,7 +535,7 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 		QSqlError sqlError = maintainanceDb.lastError();
 
 		retVal = bool(sqlError.type() == QSqlError::ErrorType::NoError);
-		if (!retVal) {
+		if (!retVal){
 			qCritical() << __FILE__ << __LINE__
 				<< "\n\t| Database could not be created"
 				<< "\n\t| Error: " << sqlError
@@ -560,14 +566,14 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 
 bool CDatabaseEngineComp::CreateDatabaseMetaInfo() const
 {
-	if (!m_migrationFolderPathCompPtr.IsValid()) {
+	if (!m_migrationFolderPathCompPtr.IsValid()){
 		SendCriticalMessage(0, QString("Wrong component configuration: 'MigrationFolderPath' component was not set"));
 
 		return false;
 	}
 
 	QDir migrationsFolder(m_migrationFolderPathCompPtr->GetPath());
-	if (!migrationsFolder.exists()) {
+	if (!migrationsFolder.exists()){
 		SendErrorMessage(0, QString("Folder containing SQL scripts doesn't exist: %1").arg(m_migrationFolderPathCompPtr->GetPath()));
 
 		return false;
@@ -577,7 +583,7 @@ bool CDatabaseEngineComp::CreateDatabaseMetaInfo() const
 
 	// Create revision table in the database:
 	ExecSqlQueryFromFile(migrationsFolder.filePath("CreateRevision.sql"), &sqlError);
-	if (sqlError.type() != QSqlError::NoError) {
+	if (sqlError.type() != QSqlError::NoError){
 		SendErrorMessage(0, QString("\n\t| Revision table could not be created""\n\t| Error: %1").arg(sqlError.text()));
 
 		return false;
@@ -612,6 +618,16 @@ QString CDatabaseEngineComp::GetDatabasePath() const
 	}
 
 	return *m_dbPathAttrPtr;
+}
+
+
+bool CDatabaseEngineComp::IsSslConnectionRequired() const
+{
+	if (m_databaseAccessSettingsCompPtr.IsValid()){
+		return m_databaseAccessSettingsCompPtr->GetConnectionFlags() & IDatabaseLoginSettings::COF_SSL;
+	}
+
+	return false;
 }
 
 
@@ -706,6 +722,25 @@ int CDatabaseEngineComp::GetDatabaseVersion() const
 		}
 	}
 	return -1;
+}
+
+
+QString CDatabaseEngineComp::GetConnectionOptionsString(const QByteArray& databaseDriverId) const
+{
+	QString retVal;
+
+	if (m_databaseAccessSettingsCompPtr.IsValid()){
+		int flags = m_databaseAccessSettingsCompPtr->GetConnectionFlags();
+		if (flags > 0){
+			if (databaseDriverId == "PSQL"){
+				if (flags & imtdb::IDatabaseLoginSettings::COF_SSL){
+					retVal += "requiressl=1";
+				}
+			}
+		}
+	}
+
+	return retVal;
 }
 
 

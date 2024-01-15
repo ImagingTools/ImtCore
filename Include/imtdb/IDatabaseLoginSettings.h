@@ -18,6 +18,16 @@ namespace imtdb
 class IDatabaseLoginSettings: virtual public istd::IChangeable
 {
 public:
+	enum ConnectionOptionFlags
+	{
+		/**
+			If the flag is enabled, SSL connection should be used.
+		*/
+		COF_SSL = 1
+	};
+
+	I_DECLARE_FLAGS(ConnectionOptionFlags, COF_SSL);
+
 	virtual QString GetHost() const = 0;
 	virtual void SetHost(const QString& host) = 0;
 	virtual int GetPort() const = 0;
@@ -30,6 +40,8 @@ public:
 	virtual void SetUserName(const QString& userName) = 0;
 	virtual QString GetPassword() const = 0;
 	virtual void SetPassword(const QString& password) = 0;
+	virtual int GetConnectionFlags() const = 0;
+	virtual void SetConnectionFlags(int connectionFlags) = 0;
 };
 
 

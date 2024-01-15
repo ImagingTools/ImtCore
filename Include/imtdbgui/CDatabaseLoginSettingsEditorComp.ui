@@ -70,6 +70,13 @@
        </property>
       </widget>
      </item>
+     <item row="5" column="1">
+      <widget class="QCheckBox" name="UseSslCheck">
+       <property name="text">
+        <string>Use SSL</string>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>

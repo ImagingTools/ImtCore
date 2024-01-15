@@ -30,6 +30,8 @@ public:
 	virtual void SetUserName(const QString& userName) override;
 	virtual QString GetPassword() const override;
 	virtual void SetPassword(const QString& password) override;
+	virtual int GetConnectionFlags() const override;
+	virtual void SetConnectionFlags(int connectionFlags) override;
 
 	// reimplemented (iser::ISerializable)
 	virtual bool Serialize(iser::IArchive& archive) override;
@@ -48,6 +50,7 @@ protected:
 	QString m_databasePath;
 	QString m_userName;
 	QString m_password;
+	int m_connectionOptionFlags;
 };
 
 

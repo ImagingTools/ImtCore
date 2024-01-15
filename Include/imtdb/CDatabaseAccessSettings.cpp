@@ -6,6 +6,10 @@
 #include <istd/CChangeNotifier.h>
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
+#include <iser/CPrimitiveTypesSerializer.h>
+
+// ImtCore includes
+#include <imtcore/Version.h>
 
 
 namespace imtdb
@@ -15,7 +19,8 @@ namespace imtdb
 // public methods
 
 CDatabaseAccessSettings::CDatabaseAccessSettings()
-	:m_port(0)
+	:m_port(0),
+	m_connectionOptionFlags(0)
 {
 }
 
@@ -118,6 +123,22 @@ void CDatabaseAccessSettings::SetPassword(const QString& password)
 }
 
 
+int CDatabaseAccessSettings::GetConnectionFlags() const
+{
+	return m_connectionOptionFlags;
+}
+
+
+void CDatabaseAccessSettings::SetConnectionFlags(int connectionFlags)
+{
+	if (m_connectionOptionFlags != connectionFlags){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_connectionOptionFlags = connectionFlags;
+	}
+}
+
+
 // reimplemented (iser::ISerializable)
 
 bool CDatabaseAccessSettings::Serialize(iser::IArchive& archive)
@@ -153,6 +174,20 @@ bool CDatabaseAccessSettings::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.BeginTag(databasePathTag);
 	retVal = retVal && archive.Process(m_databasePath);
 	retVal = retVal && archive.EndTag(databasePathTag);
+
+
+	const iser::IVersionInfo& versionInfo = archive.GetVersionInfo();
+	quint32 moduleVersion;
+	if (!versionInfo.GetVersionNumber(imtcore::VI_IMTCORE, moduleVersion)){
+		moduleVersion = 0;
+	}
+
+	if (moduleVersion > 8434){
+		iser::CArchiveTag databaseConnectionFlags("DatabaseConnectionFlags", "Database connection settings", iser::CArchiveTag::TT_LEAF);
+		retVal = retVal && archive.BeginTag(databaseConnectionFlags);
+		retVal = retVal && I_SERIALIZE_FLAG(ConnectionOptionFlags, archive, m_connectionOptionFlags);
+		retVal = retVal && archive.EndTag(databaseConnectionFlags);
+	}
 
 	return retVal;
 }

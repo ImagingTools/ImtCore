@@ -35,6 +35,11 @@ void CDatabaseLoginSettingsEditorComp::UpdateModel() const
 	objectPtr->SetDatabaseName(DatabaseNameEdit->text());
 	objectPtr->SetUserName(UserEdit->text());
 	objectPtr->SetPassword(PasswordEdit->text());
+
+	int options = objectPtr->GetConnectionFlags();
+	int newOptions = UseSslCheck->isChecked() ? imtdb::IDatabaseLoginSettings::COF_SSL : 0;
+
+	objectPtr->SetConnectionFlags(options | newOptions);
 }
 
 
@@ -50,6 +55,10 @@ void CDatabaseLoginSettingsEditorComp::UpdateGui(const istd::IChangeable::Change
 	DatabaseNameEdit->setText(objectPtr->GetDatabaseName());
 	UserEdit->setText(objectPtr->GetUserName());
 	PasswordEdit->setText(objectPtr->GetPassword());
+
+	bool useSsl = objectPtr->GetConnectionFlags() & imtdb::IDatabaseLoginSettings::COF_SSL;
+	
+	UseSslCheck->setChecked(useSsl);
 }
 
 
@@ -135,6 +144,12 @@ void CDatabaseLoginSettingsEditorComp::on_TestConnectionButton_clicked()
 	}
 
 	ConnectionTestResultLabel->setText(errorMessage);
+}
+
+
+void CDatabaseLoginSettingsEditorComp::on_UseSslCheck_stateChanged()
+{
+	DoUpdateModel();
 }
 
 
