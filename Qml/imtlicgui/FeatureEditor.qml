@@ -29,11 +29,14 @@ DocumentData {
             if (commandId === "New"){
                 if (selectedIndex != null){
                     tableView.addChildItem(selectedIndex, {"FeatureId":"", "FeatureName":"Feature Name", "FeatureDescription":"", "Dependencies":"", "Optional":false, "ChildModel":0})
+
+                    featureEditor.documentModel.dataChanged(null, null);
                 }
             }
             else if (commandId === "Remove"){
                 if (selectedIndex != null){
                     tableView.removeChildItem(selectedIndex);
+                    featureEditor.documentModel.dataChanged(null, null);
                 }
             }
         }

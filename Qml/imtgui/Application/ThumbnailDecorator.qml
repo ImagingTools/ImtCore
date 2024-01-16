@@ -352,7 +352,7 @@ Rectangle {
     Loading {
         id: loading;
 
-        z: topPanel.z + 1;
+        z: 10000;
 
         anchors.fill: parent;
 

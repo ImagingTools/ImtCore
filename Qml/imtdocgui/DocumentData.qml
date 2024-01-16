@@ -75,9 +75,6 @@ Item {
             if (documentVisible){
                 updateGui()
             }
-            else{
-//                clearGui();
-            }
         }
 
         onCommandsModelChanged: {
@@ -105,12 +102,12 @@ Item {
 
     onStartLoading: {
         Events.sendEvent("StartLoading");
-        loading.start();
+//        loading.start();
     }
 
     onStopLoading: {
         Events.sendEvent("StopLoading");
-        loading.stop();
+//        loading.stop();
     }
 
     onSaved: {
@@ -288,10 +285,12 @@ Item {
 
         onBlockingUpdateModelChanged: {
             if (blockingUpdateModel){
-                documentData.startLoading();
+//                documentData.startLoading();
+                loading.start();
             }
             else{
-                documentData.stopLoading();
+//                documentData.stopLoading();
+                loading.stop();
             }
         }
     }

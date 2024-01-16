@@ -87,6 +87,7 @@ ControlBase {
             return;
         }
 
+//        comboBoxContainer.currentIndex = -1;
         if (comboBoxContainer.currentIndex > -1){
             comboBoxContainer.currentText = comboBoxContainer.model.GetData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
         }

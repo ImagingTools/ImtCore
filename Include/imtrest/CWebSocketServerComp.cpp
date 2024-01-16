@@ -164,6 +164,8 @@ void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 	QString message = QString("Web socket text message received: %1").arg(textMessage);
 	SendInfoMessage(0, message, "CWebSocketServerComp");
 
+	qDebug() << message;
+
 	istd::TDelPtr<IRequest> newRequestPtr = m_protocolEngineCompPtr->CreateRequest(*m_requestServerHandlerCompPtr.GetPtr());
 	if (newRequestPtr.IsValid()){
 		CWebSocketRequest* webSocketRequest = dynamic_cast<CWebSocketRequest*>(newRequestPtr.GetPtr());

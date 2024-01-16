@@ -58,8 +58,13 @@ Item {
         id: decorators_
     }
 
+    DecoratorsQt {
+        id: decoratorsQt;
+    }
+
     function setDecorators(){
         Style.setDecorators(decorators)
+//        Style.setDecorators(decoratorsQt)
     }
 
     Component.onCompleted: {
@@ -181,6 +186,7 @@ Item {
 
         onError: {
             Events.sendEvent("SendWarningError", qsTr("There is no connection to the subscription server. Check the Web Server Socket Url in the settings or contact your system administrator."));
+            Events.sendEvent("SendCriticalError");
         }
     }
 
@@ -232,6 +238,7 @@ Item {
 
     function setSystemStatus(status, message){
         console.log("setSystemStatus", status, message);
+        console.log("current systemStatus", application.systemStatus);
 
         if (application.systemStatus !== status){
             application.message = message;

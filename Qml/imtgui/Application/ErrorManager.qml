@@ -23,7 +23,11 @@ Item {
     function showCriticalError(message){
         console.log("showCriticalError", message);
         if (root.errorPage != null){
-            root.errorPage.text = message;
+
+            if (message){
+                root.errorPage.text = message;
+            }
+
             root.errorPage.visible = true;
 
 //            Events.sendEvent("Logout");

@@ -73,6 +73,7 @@ CollectionView {
                         for (let i = 0; i < roleList.length; i++){
                             result += "<p>" + roleList[i] + "</p>";
                         }
+
                         arrowButton.tooltipText = result;
                     }
                     else{
@@ -110,9 +111,9 @@ CollectionView {
                 }
 
                 Component.onCompleted: {
-                    arrowButton.tooltipItem.componentWidth = 300;
-                    arrowButton.tooltipItem.horizontalAlignment = Text.AlignLeft;
-                    arrowButton.tooltipItem.lineHeight = 1;
+//                    arrowButton.tooltipItem.componentWidth = 300;
+//                    arrowButton.tooltipItem.horizontalAlignment = Text.AlignLeft;
+//                    arrowButton.tooltipItem.lineHeight = 1;
                 }
 
                 decorator: ButtonDecorator {
@@ -188,9 +189,9 @@ CollectionView {
                 iconSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
 
                 Component.onCompleted: {
-                    arrowButton.tooltipItem.componentWidth = 300;
-                    arrowButton.tooltipItem.horizontalAlignment = Text.AlignLeft;
-                    arrowButton.tooltipItem.lineHeight = 1;
+//                    arrowButton.tooltipItem.componentWidth = 300;
+//                    arrowButton.tooltipItem.horizontalAlignment = Text.AlignLeft;
+//                    arrowButton.tooltipItem.lineHeight = 1;
                 }
 
                 decorator: ButtonDecorator {

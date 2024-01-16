@@ -81,27 +81,14 @@ Rectangle {
         }
     }
 
-    CustomScrollbar {
-        id: scrollbar;
-
-        anchors.right: flickable.right;
-        anchors.leftMargin: 5;
-        anchors.top: flickable.top;
-        anchors.bottom: flickable.bottom;
-
-        backgroundColor: "transparent";
-
-        secondSize: 10;
-        targetItem: flickable;
-
-        radius: 2;
-    }
-
-
     Flickable {
         id: flickable;
 
-        anchors.fill: parent;
+//        anchors.fill: parent;
+        anchors.top: parent.top;
+        anchors.bottom: parent.bottom;
+
+        width: parent.width;
 
         contentWidth: width;
         contentHeight: column.height;
@@ -118,7 +105,7 @@ Rectangle {
             anchors.rightMargin: 5;
             anchors.leftMargin: 5;
 
-            spacing: 20;
+            spacing: 2 * Style.size_mainMargin;
 
             Repeater {
                 id: repeaterColumn;
@@ -126,6 +113,21 @@ Rectangle {
                 delegate: delegateComp;
             }
         }//Column main
+    }
+
+    CustomScrollbar {
+        id: scrollbar;
+
+        anchors.right: flickable.right;
+        anchors.rightMargin: 5;
+        anchors.bottom: flickable.bottom;
+
+        backgroundColor: "transparent";
+
+        secondSize: 10;
+        targetItem: flickable;
+
+        radius: 2;
     }
 
     Text {

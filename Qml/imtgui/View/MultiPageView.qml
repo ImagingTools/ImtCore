@@ -1,4 +1,5 @@
 import QtQuick 2.12
+//import QtQuick.Controls
 import Acf 1.0
 import imtcontrols 1.0
 
@@ -47,15 +48,12 @@ Item {
     }
 
     function getPageByIndex(index){
-        console.log("getPageByIndex", index);
-        console.log("bodyRepeater.count", bodyRepeater.count);
+
         if (index < 0 || bodyRepeater.count <= index){
             return null;
         }
 
         let loaderItem = bodyRepeater.itemAt(index)
-
-        console.log("loaderItem", loaderItem.item);
         return loaderItem.item;
     }
 
@@ -132,33 +130,18 @@ Item {
                 }
             }
 
-            Repeater {
+            ListView {
                 id: mainPanelRepeater;
+
+                width: parent.width;
+                height: contentHeight;
 
                 model: root.pagesModel;
 
-                delegate:
-                    Button{
-                    id: buttonContainer;
+                spacing: Style.size_mainMargin;
 
-                    anchors.left: parent.left;
-                    anchors.leftMargin: root.mainMargin;
-                    anchors.right: parent.right;
-                    anchors.rightMargin: root.mainMargin;
-
-                    text:  model.Name;
-
-                    property bool selected: root.selectedIndex === model.index;
-
-                    decorator: ButtonDecorator {
-                        width: 160;
-                        height: 30;
-
-                        radius: 4;
-
-                        border.width: 1;
-                        border.color: buttonContainer.selected ? Style.borderFocusColor : "transparent";
-                    }
+                delegate: ItemDelegate {
+                    text: model.Name;
 
                     onClicked: {
                         if (root.selectedIndex !== model.index){
@@ -166,6 +149,36 @@ Item {
                         }
                     }
                 }
+
+//                delegate:
+//                    Button{
+//                    id: buttonContainer;
+
+//                    anchors.left: parent.left;
+//                    anchors.leftMargin: root.mainMargin;
+//                    anchors.right: parent.right;
+//                    anchors.rightMargin: root.mainMargin;
+
+//                    text:  model.Name;
+
+//                    property bool selected: root.selectedIndex === model.index;
+
+//                    decorator: ButtonDecorator {
+//                        width: 160;
+//                        height: 30;
+
+//                        radius: 4;
+
+//                        border.width: 1;
+//                        border.color: buttonContainer.selected ? Style.borderFocusColor : "transparent";
+//                    }
+
+//                    onClicked: {
+//                        if (root.selectedIndex !== model.index){
+//                            root.selectedIndex = model.index;
+//                        }
+//                    }
+//                }
             }
         }
     }

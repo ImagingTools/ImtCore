@@ -5,7 +5,10 @@ import imtcontrols 1.0
 TableViewItemDelegateBase {
     id: treeDelegateBase;
 
-    height: !treeDelegateBase.root ? 0 : treeDelegateBase.isOpened ? treeDelegateBase.footerItem.height + treeDelegateBase.root.rowItemHeight: treeDelegateBase.root.rowItemHeight;
+    height: !treeDelegateBase.root ? 0 :
+                                     treeDelegateBase.isOpened && treeDelegateBase.footerItem ?
+                                         treeDelegateBase.footerItem.height + treeDelegateBase.root.rowItemHeight:
+                                         treeDelegateBase.root.rowItemHeight;
 
     property bool isOpened: true;
 

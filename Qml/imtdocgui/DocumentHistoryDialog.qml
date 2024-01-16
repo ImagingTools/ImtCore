@@ -6,7 +6,7 @@ Dialog {
     id: documentHistoryDialog;
 
     buttonsModel: ListModel{
-        ListElement{Id: Enums.ButtonType.Ok; Name:qsTr("Ok"); Enabled: true}
+        ListElement{Id: Enums.ButtonType.Ok; Name:qsTr("OK"); Enabled: true}
     }
 
     width: 500;

@@ -187,6 +187,15 @@ Rectangle {
         setWidth();
     }
 
+    onVisibleChanged: {
+        if (visible){
+            let indexes = tableContainer.tableSelection.selectedIndexes;
+            if (indexes.length > 0){
+                elementsListObj.positionViewAtIndex(indexes[0], ListView.Beginning)
+            }
+        }
+    }
+
     function setDecorators(){
         console.log("onTableDecoratorChanged");
 
@@ -968,8 +977,7 @@ Rectangle {
 
             height: 1;
 
-            //TODO -> Style
-            color: "lightgray";
+            color: Style.borderColor;
             visible: tableContainer.emptyDecor;
         }
     }//headers

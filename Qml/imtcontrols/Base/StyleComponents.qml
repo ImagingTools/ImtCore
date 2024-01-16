@@ -37,4 +37,5 @@ Item {
     property Component frame
     property Component commonButtonDecorator
     property Component topPanelDialogDecorator
+    property Component itemDelegateDecorator
 }

@@ -512,14 +512,6 @@ Item {
 
             color: Style.selectedColor;
 
-            Component.onCompleted: {
-                Events.subscribeEvent("UpdateAllModels", updateButton.clicked);
-            }
-
-            Component.onDestruction: {
-                Events.unSubscribeEvent("UpdateAllModels", updateButton.clicked);
-            }
-
             Image {
                 id: icon;
 

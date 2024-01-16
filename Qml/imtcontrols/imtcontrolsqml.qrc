@@ -123,6 +123,7 @@
 		<file alias="imtcontrols/Views/TreeViewCommandsDelegateBase.qml">Views/TreeViewCommandsDelegateBase.qml</file>
 		<file alias="imtcontrols/Views/TreeViewItemDelegateBase.qml">Views/TreeViewItemDelegateBase.qml</file>
 		<file alias="imtcontrols/Views/BaseText.qml">Views/BaseText.qml</file>
+		<file alias="imtcontrols/Views/ItemDelegate.qml">Views/ItemDelegate.qml</file>
     </qresource>
     <qresource prefix="/">
     </qresource>

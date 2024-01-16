@@ -214,7 +214,9 @@ FocusScope {
 
         console.log("childModel1", childModel.toJSON());
 
+//        childModel.SetUpdateEnabled(true);
         childModel.InsertNewItemWithParameters(0, rowObj)
+//        childModel.SetUpdateEnabled(false);
 
         console.log("childModel2", childModel.toJSON());
 

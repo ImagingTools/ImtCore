@@ -57,10 +57,6 @@ Rectangle {
             onCloseSignal: {
                 tabPanelContainer.closeItem(model.index);
             }
-
-            Component.onCompleted: {
-                console.log("tabPanelDecorator", Style.tabPanelDecorator)
-            }
         }
     }
 

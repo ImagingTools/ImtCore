@@ -115,4 +115,4 @@ TableViewItemDelegateBase 1.0 ./Views/TableViewItemDelegateBase.qml
 TreeViewCommandsDelegateBase 1.0 ./Views/TreeViewCommandsDelegateBase.qml
 TreeViewItemDelegateBase 1.0 ./Views/TreeViewItemDelegateBase.qml
 BaseText 1.0 ./Views/BaseText.qml
-
+ItemDelegate 1.0 ./Views/ItemDelegate.qml

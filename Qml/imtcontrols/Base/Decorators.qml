@@ -44,6 +44,15 @@ StyleComponents {
     tooltipDecorator: tooltipDecoratorComp
     scrollBarDecorator: null;
 
+    itemDelegateDecorator: itemDelegateDecoratorComp;
+
+    Component {
+        id: itemDelegateDecoratorComp;
+
+        ButtonDecorator {
+        }
+    }
+
     Component {
         id: menuPanelButtonDecoratorComp
 
