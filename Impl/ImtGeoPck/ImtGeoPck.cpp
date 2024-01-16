@@ -45,6 +45,11 @@ I_EXPORT_COMPONENT(
             "Address Collection Controller");
 
 I_EXPORT_COMPONENT(
+            AddressTreeCollectionController,
+            "Address Tree Collection Controller",
+            "Address Tree Collection Controller");
+
+I_EXPORT_COMPONENT(
             MapTileCollectionController,
             "Map Tile Cluster Collection Controller",
             "Map Tile Cluster Collection Controller");

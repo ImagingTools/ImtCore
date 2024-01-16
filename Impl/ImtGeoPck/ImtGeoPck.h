@@ -11,6 +11,7 @@
 #include <imtgeo/CAddressTypeDatabaseDelegateComp.h>
 #include <imtgeo/CAddressTypeInfo.h>
 #include <imtgeo/CAddressCollectionControllerComp.h>
+#include <imtgeo/CAddressTreeCollectionControllerComp.h>
 #include <imtgeo/CMapTileCollectionControllerComp.h>
 #include <imtgeo/CCluster.h>
 #include <imtgeo/CMapClusterDatabaseDelegateComp.h>
@@ -52,6 +53,7 @@ typedef icomp::TModelCompWrap<
 typedef imtgeo::CAddressTypeDatabaseDelegateComp AddressTypeDatabaseDelegate;
 typedef imtgeo::CAddressElementDatabaseDelegateComp AddressElementDatabaseDelegate;
 typedef imtgeo::CAddressCollectionControllerComp AddressCollectionController;
+typedef imtgeo::CAddressTreeCollectionControllerComp AddressTreeCollectionController;
 typedef imtgeo::CMapTileCollectionControllerComp MapTileCollectionController;
 typedef imtgeo::CMapClusterDatabaseDelegateComp MapClusterDatabaseDelegate;
 
