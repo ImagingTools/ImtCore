@@ -234,7 +234,6 @@ Rectangle {
             Dialog {
 
                 title: "Content";
-
                 contentComp: Rectangle{
                     width: 300;
                     height: contentText.height + 10;
@@ -336,14 +335,18 @@ Rectangle {
 
                 }
 
-                buttonsModel: ListModel{
-                    ListElement{Id: Enums.ButtonType.Ok; Name:qsTr("Ok"); Enabled: true}
-                    ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Cancel"); Enabled: true}
-                }
+//                buttonsModel: ListModel{
+//                    ListElement{Id: Enums.ButtonType.Ok; Name:qsTr("Ok"); Enabled: true}
+//                    ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Cancel"); Enabled: true}
+//                }
 
                 backgroundColor: "white";
                 radius: 2;
 
+                Component.onCompleted: {
+                    buttonsModel.append({Id: Enums.ButtonType.Ok, Name:qsTr("Ok"), Enabled: true})
+                    buttonsModel.append({Id: Enums.ButtonType.Cancel, Name:qsTr("Cancel"), Enabled: true})
+                }
             }
         }//inputDialogComp
 
