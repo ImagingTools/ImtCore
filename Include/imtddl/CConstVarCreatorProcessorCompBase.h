@@ -1,0 +1,47 @@
+#pragma once
+
+// ACF includes
+#include <ilog/TLoggerCompWrap.h>
+#include <iproc/TSyncProcessorCompBase.h>
+
+// ImtCore includes
+#include <imtddl/IDdlCodeCreatorArgumentsParser.h>
+
+// Qt includes
+#include <QtCore/QJsonDocument>
+#include <QtCore/QFile>
+
+
+namespace imtddl
+{
+
+class CConstVarCreatorProcessorCompBase: public iproc::CSyncProcessorCompBase
+{
+public:
+	typedef iproc::CSyncProcessorCompBase BaseClass;
+
+protected:
+	virtual bool OpenFiles(const iprm::IParamsSet* paramsPtr);
+	virtual bool OpenFile(const QString filePath, QFile& file, QFile::OpenMode openMode = QFile::ReadOnly);
+	virtual bool CloseFiles(const iprm::IParamsSet* paramsPtr);
+	virtual QString GetTemplateDirPath(const iprm::IParamsSet* paramsPtr) const;
+	virtual QString GetCppDirPath(const iprm::IParamsSet* paramsPtr) const;
+	virtual QString GetQmlDirPath(const iprm::IParamsSet* paramsPtr) const;
+//	virtual QByteArray GetOutputFileKey();
+	virtual QString GetModuleName(const iprm::IParamsSet* paramsPtr);
+	virtual bool CreateBody(const QString moduleName, const QJsonDocument& templateDocument, const iprm::IParamsSet* paramsPtr);
+
+	// reimplemented (iproc::IProcessor)
+	virtual int DoProcessing(
+		const iprm::IParamsSet* paramsPtr,
+		const istd::IPolymorphic* inputPtr,
+		istd::IChangeable* outputPtr,
+		ibase::IProgressManager* progressManagerPtr = NULL) override;
+
+protected:
+//	I_REF(IDdlCodeCreatorArgumentsParser, m_argumentParserAttrPtr);
+};
+
+
+} // namespace imtddl
+

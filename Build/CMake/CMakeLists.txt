@@ -38,6 +38,15 @@ add_dependencies(DesignTokenCreator imtbase imtdesign)
 add_subdirectory("${INCLUDE_DIR}/imtstyle/CMake" "${AUX_INCLUDE_DIR}/imtstyle")
 add_dependencies(imtstyle DesignTokenCreator)
 
+#------ DDLCodeCreator ------
+
+add_subdirectory("${INCLUDE_DIR}/imtddl/CMake" "${AUX_INCLUDE_DIR}/imtddl")
+
+add_subdirectory("${IMPL_DIR}/ImtDdlPck/CMake" "${AUX_INCLUDE_DIR}/ImtDdlPck")
+add_dependencies(ImtDdlPck imtddl)
+
+add_subdirectory("${IMPL_DIR}/ConstVarCreatorExe/CMake" "${AUX_INCLUDE_DIR}/ConstVarCreator")
+add_dependencies(ConstVarCreator imtddl)
 
 #-------- Include --------
 
