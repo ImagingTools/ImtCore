@@ -30,6 +30,7 @@
 		<file alias="imtcontrols/Buttons/RadioButton.qml">Buttons/RadioButton.qml</file>
 		<file alias="imtcontrols/Buttons/IconButtonDecorator.qml">Buttons/IconButtonDecorator.qml</file>
 		<file alias="imtcontrols/Buttons/TextButtonDecorator.qml">Buttons/TextButtonDecorator.qml</file>
+		<file alias="imtcontrols/Buttons/ToolButton.qml">Buttons/ToolButton.qml</file>
 		<file alias="imtcontrols/Buttons/ToolButtonDecorator.qml">Buttons/ToolButtonDecorator.qml</file>
 		<file alias="imtcontrols/Buttons/TopButtonDecorator.qml">Buttons/TopButtonDecorator.qml</file>
 		<file alias="imtcontrols/Buttons/TopButtonDecoratorNew.qml">Buttons/TopButtonDecoratorNew.qml</file>
@@ -124,6 +125,7 @@
 		<file alias="imtcontrols/Views/TreeViewItemDelegateBase.qml">Views/TreeViewItemDelegateBase.qml</file>
 		<file alias="imtcontrols/Views/BaseText.qml">Views/BaseText.qml</file>
 		<file alias="imtcontrols/Views/ItemDelegate.qml">Views/ItemDelegate.qml</file>
+		<file alias="imtcontrols/Views/ItemDelegateDecorator.qml">Views/ItemDelegateDecorator.qml</file>
     </qresource>
     <qresource prefix="/">
     </qresource>

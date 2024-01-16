@@ -10,7 +10,8 @@ Item {
         dynamicRoles: true;
     }
 
-    property int selectedIndex: -1;
+    property alias currentIndex: mainPanelRepeater.currentIndex;
+
     property int mainMargin: Style.size_mainMargin;
     property int panelWidth: 150;
 
@@ -143,10 +144,10 @@ Item {
                 delegate: ItemDelegate {
                     text: model.Name;
 
+                    highlighted: mainPanelRepeater.currentIndex == model.index;
+
                     onClicked: {
-                        if (root.selectedIndex !== model.index){
-                            root.selectedIndex = model.index;
-                        }
+                        mainPanelRepeater.currentIndex = model.index;
                     }
                 }
 
@@ -208,7 +209,7 @@ Item {
 
                 sourceComponent: model.SourceComponent;
 
-                visible: root.selectedIndex == model.index;
+                visible: mainPanelRepeater.currentIndex == model.index;
 
                 onLoaded: {
                     root.pageLoaded(model.index, item);

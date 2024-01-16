@@ -311,6 +311,10 @@ StyleComponents {
         if (sourceDecorators.itemDelegateDecorator){
             styleContainer.itemDelegateDecorator = sourceDecorators.itemDelegateDecorator
         }
+
+        if (sourceDecorators.toolButtonDecorator){
+            styleContainer.toolButtonDecorator = sourceDecorators.itemDelegateDecorator
+        }
     }
 
     property string menuButtonDecoratorPath: "MenuPanelButtonDecorator.qml";

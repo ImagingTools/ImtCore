@@ -11,7 +11,7 @@ ControlBase {
     property string iconSource: ""
     property string tooltipText: ""
 
-    property bool enabled: true;
+//    property bool enabled: true;
     property bool down: false
     property bool hoverEnabled: true
     property bool hovered: enabled && hoverEnabled ? ma.containsMouse : false;

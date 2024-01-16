@@ -22,6 +22,8 @@ StyleComponents {
     tabPanelDecorator: tabPanelDecoratorComp
 
     buttonDecorator: buttonDecoratorComp
+    toolButtonDecorator: toolButtonDecoratorComp;
+
     roundButtonDecorator: roundButtonDecoratorComp
 
     textFieldDecorator: textFieldDecoratorComp
@@ -49,7 +51,8 @@ StyleComponents {
     Component {
         id: itemDelegateDecoratorComp;
 
-        ButtonDecorator {
+        ItemDelegateDecorator {
+
         }
     }
 
@@ -146,6 +149,13 @@ StyleComponents {
             width: 160;
             height: 30;
             radius: 4;
+        }
+    }
+
+    Component{
+        id: toolButtonDecoratorComp;
+
+        ToolButtonDecorator{
         }
     }
 

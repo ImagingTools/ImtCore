@@ -31,6 +31,7 @@ ButtonDecorator 1.0 ./Buttons/ButtonDecorator.qml
 RadioButton 1.0 ./Buttons/RadioButton.qml
 IconButtonDecorator 1.0 ./Buttons/IconButtonDecorator.qml
 TextButtonDecorator 1.0 ./Buttons/TextButtonDecorator.qml
+ToolButton 1.0 ./Buttons/ToolButton.qml
 ToolButtonDecorator 1.0 ./Buttons/ToolButtonDecorator.qml
 TopButtonDecorator 1.0 ./Buttons/TopButtonDecorator.qml
 TopButtonDecoratorNew 1.0 ./Buttons/TopButtonDecoratorNew.qml
@@ -116,3 +117,5 @@ TreeViewCommandsDelegateBase 1.0 ./Views/TreeViewCommandsDelegateBase.qml
 TreeViewItemDelegateBase 1.0 ./Views/TreeViewItemDelegateBase.qml
 BaseText 1.0 ./Views/BaseText.qml
 ItemDelegate 1.0 ./Views/ItemDelegate.qml
+ItemDelegateDecorator 1.0 ./Views/ItemDelegateDecorator.qml
+

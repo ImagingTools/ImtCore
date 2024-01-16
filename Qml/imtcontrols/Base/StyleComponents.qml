@@ -13,6 +13,7 @@ Item {
     property Component topRightPanelDecorator
     property Component tabPanelDecorator
     property Component buttonDecorator
+    property Component toolButtonDecorator
     property Component roundButtonDecorator
     property Component textFieldDecorator
     property Component textEditDecorator

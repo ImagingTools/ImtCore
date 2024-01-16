@@ -10,9 +10,5 @@ Button {
 
     decorator: Style.itemDelegateDecorator;
 
-    onDecoratorChanged: {
-        console.log("onDecoratorChanged", Style.itemDelegateDecorator);
-    }
-
-    property bool selected: false;
+    property bool highlighted: false;
 }
