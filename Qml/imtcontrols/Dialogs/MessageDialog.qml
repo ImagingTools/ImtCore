@@ -15,6 +15,7 @@ Dialog {
     topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
 
     property string message;
+    property int contentWidth: 300;
 
     canMove: true;
 
@@ -33,7 +34,7 @@ Dialog {
 
     contentComp: Component {
         MessageDialogBody {
-            width: messageDialog.width;
+            width: messageDialog.contentWidth;
             message: messageDialog.message;
         }
     }

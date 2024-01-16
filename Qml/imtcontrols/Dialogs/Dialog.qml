@@ -24,33 +24,25 @@ ControlBase {
     property Item root: null;
     property Item rootItem: null;
 
-    property Item topPanel: null;
-    property Item contentItem: null;
-    property Item bodyItem: null;
-
-    property Item buttons: null;
-
     property ListModel buttonsModel: ListModel{};
     property int buttonsModelCount: buttonsModel.count;
+    property string notClosingButtons: "";
+    property int buttonIds: 0;//81920;
 
     property string backgroundColor: Style.backgroundColor;
     property int radius: 0;
 
-    property string notClosingButtons: "";
-
-    property Component topPanelComp: Component{TopPanelDialog{}};
-
-    property Component contentComp;
-    property Component emptyComp : Component{Item {}};
-
-    property int buttonIds: 0;//81920;
-
     property bool canMove: false;
     property bool decoratorVisible: !decorator_ ? true: decorator_.visible;
 
-    property Component topPanelDefault: Component{
-        TopPanelDialog {}
-    }
+    property Component topPanelComp: Component{TopPanelDialog{}};
+    property Component topPanelDefault: Component{TopPanelDialog{}};
+    property Component contentComp: null;
+
+    property Item topPanel: null;
+    property Item contentItem: null;
+    property Item bodyItem: null;
+    property Item buttons: null;
 
     signal finished(int buttonId);
     signal started();
@@ -59,7 +51,6 @@ ControlBase {
     signal accepted();
     signal canceled();
     signal applied();
-
 
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", dialogContainer.onLocalizationChanged);

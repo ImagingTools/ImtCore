@@ -45,6 +45,7 @@ StyleComponents {
     busyIndicatorDecorator: busyIndicatorDecoratorComp
     tooltipDecorator: tooltipDecoratorComp
     scrollBarDecorator: null;
+    topPanelDialogDecorator: Component{TopPanelDialog{}}
 
     itemDelegateDecorator: itemDelegateDecoratorComp;
 
@@ -1166,25 +1167,21 @@ StyleComponents {
 
             property var baseElement: null;
             property string title : baseElement ? baseElement.title : "";
-            property Component topPanelComp : baseElement ? baseElement.topPanelComp : null;
-            property bool baseElementFocus: baseElement ? baseElement.focus : false;
             property string bodySource: baseElement ? baseElement.bodySource : "";
             property string topPanelSource: baseElement ? baseElement.topPanelSource : "";
-
+            property bool baseElementFocus: baseElement ? baseElement.focus : false;
+            property Component topPanelComp : !baseElement ? undefined : baseElement.topPanelComp;
             onBaseElementChanged: {
                 baseElement.buttons = buttonsDialog;
             }
 
-            onTopPanelCompChanged: {
-                loaderTopPanel.sourceComponent = topPanelComp;
-            }
-            onBodySourceChanged: {
-                loaderBodyDialog.source = dialogContainer.bodySource;
-            }
+//            onBodySourceChanged: {
+//                loaderBodyDialog.source = dialogContainer.bodySource;
+//            }
 
-            onTopPanelSourceChanged: {
-                loaderTopPanel.source = dialogContainer.topPanelSource;
-            }
+//            onTopPanelSourceChanged: {
+//                loaderTopPanel.source = dialogContainer.topPanelSource;
+//            }
 
             onBaseElementFocusChanged: {
                 console.log("Dialog onFocusChanged", dialogContainer.baseElementFocus);
@@ -1273,6 +1270,8 @@ StyleComponents {
                     Loader {
                         id: loaderTopPanel;
 
+                        sourceComponent: dialogContainer.topPanelComp;
+
                         onLoaded:  {
                             console.log("loaderTopPanel onLoaded");
 
@@ -1311,7 +1310,7 @@ StyleComponents {
 
                     anchors.horizontalCenter: !parent ? undefined : parent.horizontalCenter;
 
-                    sourceComponent:  dialogContainer.baseElement.contentComp ;
+                    sourceComponent: dialogContainer.baseElement ? dialogContainer.baseElement.contentComp : undefined;
                     onLoaded: {
                         loaderBodyDialog.width = loaderBodyDialog.item.width;
                         loaderBodyDialog.height = loaderBodyDialog.item.height;

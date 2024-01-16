@@ -12,6 +12,7 @@ Dialog {
 
     property string message;
     property string inputValue;
+    property int contentWidth: 300;
 
     Keys.onPressed: {
         if (event.key == Qt.Key_Enter){
@@ -31,8 +32,7 @@ Dialog {
     }
 
     contentComp: Component { InputDialogBody {
-            width: inputDialogContainer.width;
-
+            width: inputDialogContainer.contentWidth;
             message: inputDialogContainer.message;
             inputValue: inputDialogContainer.inputValue;
         } }
