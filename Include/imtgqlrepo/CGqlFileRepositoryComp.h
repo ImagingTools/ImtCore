@@ -15,7 +15,7 @@
 #undef GetObject
 
 
-namespace imtgql
+namespace imtgqlrepo
 {
 
 
@@ -73,6 +73,6 @@ protected:
 };
 
 
-} // namespace imtguigql
+} // namespace imtgqlrepo
 
 

@@ -1,4 +1,4 @@
-#include <imtgql/CGqlFileRepositoryComp.h>
+#include <imtgqlrepo/CGqlRemoteFileRepositoryComp.h>
 
 
 // STL includes
@@ -10,7 +10,6 @@
 #include <QtCore/QStandardPaths>
 
 // Acf includes
-#include <istd/CSystem.h>
 #include <iprm/TParamsPtr.h>
 #include <iprm/IIdParam.h>
 #include <ifile/CFileNameParam.h>
@@ -20,7 +19,7 @@
 #include <imtrepo/CFileCollectionItem.h>
 
 
-namespace imtgql
+namespace imtgqlrepo
 {
 
 
@@ -28,46 +27,42 @@ namespace imtgql
 
 // reimplemented(imtbase::IMetaInfoCreator)
 
-CGqlFileRepositoryComp::TypeIds CGqlFileRepositoryComp::GetSupportedTypeIds() const
+CGqlRemoteFileRepositoryComp::TypeIds CGqlRemoteFileRepositoryComp::GetSupportedTypeIds() const
 {
 	TypeIds supportedValues;
 	const int typesCount = m_supportedTypeListAttrPtr.GetCount();
 	for (int typeIndex = 0; typeIndex < typesCount; ++typeIndex){
 		supportedValues << m_supportedTypeListAttrPtr[typeIndex];
 	}
-
 	return supportedValues;
 }
 
 
-bool CGqlFileRepositoryComp::CreateMetaInfo(const istd::IChangeable* dataPtr, const QByteArray& typeId, idoc::MetaInfoPtr& metaInfoPtr) const
+bool CGqlRemoteFileRepositoryComp::CreateMetaInfo(const istd::IChangeable* dataPtr, const QByteArray& typeId, idoc::MetaInfoPtr& metaInfoPtr) const
 {
 	if (!GetSupportedTypeIds().contains(typeId)){
 		SendErrorMessage(0, QString("Unsupported file type id: '%1'").arg(QString(typeId)), "CreateMetaInfo", __LINE__);
 
 		I_CRITICAL();
-
 		return false;
 	}
 
-	const imtgql::CGqlObject* dataParamsPtr = dynamic_cast<const imtgql::CGqlObject*>(dataPtr);
-	if (dataParamsPtr == nullptr){
+	const imtgql::CGqlObject* dataParams = dynamic_cast<const imtgql::CGqlObject*>(dataPtr);
+	if (dataParams == nullptr){
 		SendErrorMessage(0, "Unable to find data object");
 
 		I_CRITICAL();
-
 		return false;
 	}
 
 	metaInfoPtr.SetPtr(new idoc::CStandardDocumentMetaInfo);
+
 	QDateTime creationTime = QDateTime::currentDateTimeUtc();
 	metaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, creationTime);
-	metaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME, creationTime);
-	metaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_REVISION, (*dataParamsPtr)["Revision"].toLongLong());
+	metaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, creationTime);
 
-	const QByteArray sessionId = (*dataParamsPtr)["Id"].toByteArray();
-	const QString tempFilePath = m_tempFileManagerCompPtr->GetPath(sessionId, sessionId);
-	if (!tempFilePath.isEmpty() && m_hashGeneratorCompPtr.IsValid()){
+	const QString tempFilePath = GetFilePathFromRequestQueue((*dataParams)["Id"].toByteArray());
+	if (m_hashGeneratorCompPtr.IsValid()){
 		QFile tempFile(tempFilePath);
 		if (tempFile.open(QIODevice::ReadOnly)){
 			const QByteArray fileData = tempFile.readAll();
@@ -75,6 +70,7 @@ bool CGqlFileRepositoryComp::CreateMetaInfo(const istd::IChangeable* dataPtr, co
 			metaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_CONTENT_CHECKSUM, checksumm);
 		}
 	}
+	metaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_REVISION, (*dataParams)["Revision"].toLongLong());
 
 	return true;
 }
@@ -82,7 +78,7 @@ bool CGqlFileRepositoryComp::CreateMetaInfo(const istd::IChangeable* dataPtr, co
 
 // protected methods
 
-void CGqlFileRepositoryComp::SetErrorToModel(
+void CGqlRemoteFileRepositoryComp::SetErrorToModel(
 	imtbase::CTreeItemModel& rootModel,
 	imtbase::CTreeItemModel& dataModel,
 	imtbase::CTreeItemModel& itemsModel,
@@ -99,204 +95,166 @@ void CGqlFileRepositoryComp::SetErrorToModel(
 }
 
 
-// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
-imtbase::CTreeItemModel* CGqlFileRepositoryComp::GetObject(const CGqlRequest& gqlRequest, QString& errorMessage) const
+QString CGqlRemoteFileRepositoryComp::GetFilePathFromRequestQueue(const QByteArray& queueRequestId) const
 {
-	const QByteArray fileId = GetObjectIdFromInputParams(gqlRequest.GetParams());
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel);
-	istd::TDelPtr<imtbase::CTreeItemModel> dataModelPtr(new imtbase::CTreeItemModel);
-	istd::TDelPtr<imtbase::CTreeItemModel> itemsModelPtr(new imtbase::CTreeItemModel);
-	istd::TDelPtr<imtbase::CTreeItemModel> notificationModelPtr(new imtbase::CTreeItemModel);
-
-	imtrepo::CFileCollectionItem fileItem;
-	if (!m_fileObjectCollectionCompPtr->GetFileInfo(fileId, fileItem)){
-		errorMessage = QT_TR_NOOP(QString("400: File with id '%1' does not exsists").arg(QString(fileId)));
-		SetErrorToModel(*rootModelPtr, *dataModelPtr.PopPtr(), *itemsModelPtr.PopPtr(), *notificationModelPtr.PopPtr(), errorMessage);
-		SendErrorMessage(400, errorMessage);
+	QString filePath;
+	if (!m_requestCollectionCompPtr.IsValid()){
+		SendCriticalMessage(0, "Request collection is invalid");
 		I_CRITICAL();
 
-		return rootModelPtr.PopPtr();
+		return filePath;
 	}
 
-	QFile requestedFile(fileItem.GetFilePath());
-	if (!requestedFile.open(QIODevice::ReadOnly)){
-		errorMessage = QT_TR_NOOP(QString("400: Unable to open file '%1'. Error: %2").arg(QString(requestedFile.fileName()), requestedFile.errorString()));
-		SetErrorToModel(*rootModelPtr, *dataModelPtr.PopPtr(), *itemsModelPtr.PopPtr(), *notificationModelPtr.PopPtr(), errorMessage);
-		SendErrorMessage(400, errorMessage);
+	const istd::IChangeable* objectPtr = m_requestCollectionCompPtr->GetObjectPtr(queueRequestId);
+	if (objectPtr == nullptr){
+		SendCriticalMessage(0, QString("Unable to find request with ID: '%1'").arg(QString(queueRequestId)));
 		I_CRITICAL();
 
-		return rootModelPtr.PopPtr();
+		return filePath;
 	}
 
-	QByteArray fileData = requestedFile.readAll().toBase64();
-	dataModelPtr->SetData("Id", fileId);
-	dataModelPtr->SetData("Data", fileData);
+	const iprm::IParamsSet* paramsSetPtr = dynamic_cast<const iprm::IParamsSet*>(objectPtr);
+	if (paramsSetPtr == nullptr){
+		SendCriticalMessage(0, QString("Model has unsupported modelType"));
+		I_CRITICAL();
 
-	rootModelPtr->SetExternTreeModel("data", dataModelPtr.PopPtr());
+		return filePath;
+	}
 
-	return rootModelPtr.PopPtr();
+	iprm::TParamsPtr<ifile::IFileNameParam> fileNameParamPtr(paramsSetPtr, "FilePath");
+	if (fileNameParamPtr.IsValid()){
+		filePath = fileNameParamPtr->GetPath();
+	}
+
+	return filePath;
 }
 
 
-imtbase::CTreeItemModel* CGqlFileRepositoryComp::InsertObject(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
+
+imtbase::CTreeItemModel* CGqlRemoteFileRepositoryComp::InsertObject(
+	const imtgql::CGqlRequest& gqlRequest,
+	QString& errorMessage) const
 {
 	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
-	const imtgql::CGqlObject* dataParamsPtr = nullptr;
+	const imtgql::CGqlObject* dataParams = nullptr;
 	for(const imtgql::CGqlObject& gqlObject: inputParams){
-		dataParamsPtr = gqlObject.GetFieldArgumentObjectPtr("Data");
-		if (dataParamsPtr != nullptr){
+		dataParams = gqlObject.GetFieldArgumentObjectPtr("Data");
+		if (dataParams != nullptr){
 			break;
 		}
 	}
 
-	if (dataParamsPtr == nullptr) {
-		errorMessage = QT_TR_NOOP("400: 'Data' parameter object is not provided in request");
-		SendErrorMessage(400, errorMessage);
-		I_CRITICAL();
-
-		return nullptr;
-	}
-
-	const QByteArray typeId = (*dataParamsPtr)["Type"].toByteArray();
-	const QString name = (*dataParamsPtr)["Name"].toString();
-	const QString description = (*dataParamsPtr)["Description"].toString();
-	const QByteArray insertionType = (*dataParamsPtr)["InsertionType"].toByteArray();
-
 	idoc::MetaInfoPtr metaInfoPtr;
-	if (!CreateMetaInfo(dataParamsPtr, typeId, metaInfoPtr)){
-		errorMessage = QT_TR_NOOP("500: Unable to create meta information for the data object");
-		SendErrorMessage(500, errorMessage);
-		I_CRITICAL();
+	if (!CreateMetaInfo(dataParams, QByteArray(), metaInfoPtr)){
+		errorMessage = QT_TR_NOOP("Unable to create MetaInfo");
+		SendErrorMessage(0, "Unable to create MetaInfo");
 
+		I_CRITICAL();
+		return nullptr;
+	}
+	if (dataParams == nullptr){
+		errorMessage = QT_TR_NOOP("Unable to create MetaInfo");
+		SendErrorMessage(0, "Unable to create MetaInfo");
+
+		I_CRITICAL();
 		return nullptr;
 	}
 
-	const QByteArray tempFileSesionId = m_tempFileManagerCompPtr->BeginSession();
-	const QByteArray tempFileId = m_tempFileManagerCompPtr->AddFileItem(tempFileSesionId, name);
-	QString tempFilePath = m_tempFileManagerCompPtr->GetPath(tempFileSesionId, tempFileId);
-	if (insertionType == QByteArrayLiteral("FromQueue")){
-		const QByteArray sessionId = (*dataParamsPtr)["Id"].toByteArray();
-		tempFilePath = m_tempFileManagerCompPtr->GetPath(sessionId, sessionId);
-	}
-	// From GQL-Reauest (use base-64 encoding) (default)
-	else {
-		QFile tempFile(tempFilePath);
-		if (!tempFile.open(QIODevice::WriteOnly)){
-			errorMessage = QT_TR_NOOP("500: Unable to create file");
-			SendErrorMessage(500, errorMessage);
-			I_CRITICAL();
+	const QByteArray typeId = (*dataParams)["Type"].toByteArray();
+	const QString name = (*dataParams)["Name"].toByteArray();
+	const QString description = (*dataParams)["Description"].toByteArray();
 
-			return nullptr;
-		}
-
-		const QByteArray::FromBase64Result decodeResult = QByteArray::fromBase64Encoding((*dataParamsPtr)["FileData"].toByteArray());
-		if (decodeResult.decodingStatus != QByteArray::Base64DecodingStatus::Ok){
-			errorMessage = QT_TR_NOOP(QString("400: Decoding error '%1'").arg(QString::number(int(decodeResult.decodingStatus))));
-			SendErrorMessage(400, errorMessage);
-			tempFile.close();
-			m_tempFileManagerCompPtr->FinishSession(tempFileSesionId);
-
-			I_CRITICAL();
-
-			return nullptr;
-		}
-
-		const qint64 writtenBytes = tempFile.write(decodeResult.decoded);
-		if (writtenBytes != decodeResult.decoded.size()){
-			SendErrorMessage(500, QString("500: Writtem file corrupted: '%1'. error: '%2'. Written: %3 OF %4").arg(
-									tempFilePath,
-									tempFile.errorString(),
-									QString::number(writtenBytes),
-									QString::number(decodeResult.decoded.size())));
-			tempFile.close();
-			m_tempFileManagerCompPtr->FinishSession(tempFileSesionId);
-
-			I_CRITICAL();
-
-			return nullptr;
-		}
-
-		if (m_hashGeneratorCompPtr.IsValid()){
-			const QByteArray checksumm = m_hashGeneratorCompPtr->GenerateHash(decodeResult.decoded);
-			metaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_CONTENT_CHECKSUM, checksumm);
-		}
-	}
-
+	const QString tempFilePath = GetFilePathFromRequestQueue((*dataParams)["Id"].toByteArray());;
 	const QByteArray createdFileId = m_fileObjectCollectionCompPtr->InsertFile(
-				tempFilePath,
-				typeId,
-				name,
-				description,
-				QByteArray(),
-				metaInfoPtr.GetPtr());
-
-	m_tempFileManagerCompPtr->FinishSession(tempFileSesionId);
-	m_tempFileManagerCompPtr->FinishSession((*dataParamsPtr)["Id"].toByteArray());
+		tempFilePath,
+		typeId,
+		name,
+		description,
+		QByteArray(),
+		metaInfoPtr.GetPtr());
 
 	if(createdFileId.isEmpty()){
-		errorMessage = QT_TR_NOOP("500: Unable to import file");
-		SendErrorMessage(500, errorMessage);
-		I_CRITICAL();
+		errorMessage = QT_TR_NOOP("Unable to import file");
+		SendErrorMessage(0, "Unable to import file");
 
+		I_CRITICAL();
 		return nullptr;
 	}
 
+	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel;
+	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel;
 	imtbase::CTreeItemModel* itemsModel = new imtbase::CTreeItemModel;
 	itemsModel->SetData("Id", createdFileId);
-
-	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel;
 	dataModel->SetExternTreeModel("items", itemsModel);
-
-	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel;
 	rootModelPtr->SetExternTreeModel("data", dataModel);
 
 	return rootModelPtr;
 }
 
 
-imtbase::CTreeItemModel* CGqlFileRepositoryComp::GetMetaInfo(const CGqlRequest& gqlRequest, QString& errorMessage) const
+
+imtbase::CTreeItemModel* CGqlRemoteFileRepositoryComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
-	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to get list objects. Internal error.");
-		SendErrorMessage(500, errorMessage, "CGqlFileRepositoryComp::ListObjects");
+	if (!m_fileObjectCollectionCompPtr.IsValid()){
+		errorMessage = QString("500: File collection is not set");
+		SendErrorMessage(500, errorMessage, "CGqlRemoteFileRepositoryComp::GetObject");
 
 		return nullptr;
 	}
 
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel;
-	imtbase::CTreeItemModel* itemsModel = new imtbase::CTreeItemModel;
-	imtbase::CTreeItemModel* notificationModel = new imtbase::CTreeItemModel;
+	QByteArray fileId = GetObjectIdFromInputParams(gqlRequest.GetParams());
 
-	const QByteArray elementId = GetObjectIdFromInputParams(gqlRequest.GetParams());
-	int itemIndex = itemsModel->InsertNewItem();
-	if (itemIndex >= 0){
-		if (!SetupGqlItem(gqlRequest, *itemsModel, itemIndex, elementId, errorMessage)){
-			SetErrorToModel(*rootModelPtr, *dataModel, *itemsModel, *notificationModel, errorMessage);
+	imtrepo::CFileCollectionItem fileInfo;
+	if (m_fileObjectCollectionCompPtr->GetFileInfo(fileId, fileInfo)){
 
-			return rootModelPtr.PopPtr();
+		QString fileDirectoryPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "HttpFileBuffer";
+		if (m_tempDirectoryPathCompPtr.IsValid()){
+			fileDirectoryPath = m_tempDirectoryPathCompPtr->GetPath();
 		}
+		QString tempFilePath = (QDir::cleanPath(fileDirectoryPath + "/" + QUuid::createUuid().toString(QUuid::Id128)));
+		tempFilePath = m_fileObjectCollectionCompPtr->GetFile(fileId, tempFilePath);
+		if (tempFilePath.isEmpty()){
+			errorMessage = QString("500: Unable to prepare file");
+			SendErrorMessage(500, errorMessage, "CGqlRemoteFileRepositoryComp::GetObject");
+
+			return nullptr;
+		}
+
+		istd::TDelPtr<iprm::CParamsSet> paramsSetPtr = new iprm::CParamsSet;
+		ifile::CFileNameParam* fileNameParamPtr = new ifile::CFileNameParam;
+		fileNameParamPtr->SetPath(tempFilePath);
+		paramsSetPtr->SetEditableParameter("FilePath", fileNameParamPtr, true);
+		imtbase::CObjectCollectionBase::DataPtr valuePtr(paramsSetPtr.GetPtr());
+		const QByteArray createdFileId = m_requestCollectionCompPtr->InsertNewObject(
+			"File",
+			fileInfo.GetName(),
+			QString(),
+			valuePtr
+			);
+
+		istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
+		imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
+		dataModelPtr->SetData("Id", QString(createdFileId));
+
+		return rootModelPtr.PopPtr();
 	}
 
-	itemsModel->SetIsArray(true);
-	dataModel->SetExternTreeModel("items", itemsModel);
-	dataModel->SetExternTreeModel("notification", notificationModel);
-	rootModelPtr->SetExternTreeModel("data", dataModel);
+	errorMessage = QT_TR_NOOP(QString("400: Unable to get an account with ID: '%1'.").arg(qPrintable(fileId)));
+	SendErrorMessage(400, errorMessage, "CGqlRemoteFileRepositoryComp::GetObject");
 
-	return rootModelPtr.PopPtr();
+	return nullptr;
 }
 
 
-imtbase::CTreeItemModel* CGqlFileRepositoryComp::ListObjects(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+imtbase::CTreeItemModel* CGqlRemoteFileRepositoryComp::ListObjects(
+	const imtgql::CGqlRequest& gqlRequest,
+	QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = QString("Unable to get list objects. Internal error.");
-		SendErrorMessage(500, errorMessage, "CGqlFileRepositoryComp::ListObjects");
+		SendErrorMessage(0, errorMessage, "CGqlRemoteFileRepositoryComp");
 
 		return nullptr;
 	}
@@ -337,7 +295,8 @@ imtbase::CTreeItemModel* CGqlFileRepositoryComp::ListObjects(
 	notificationModel->SetData("TotalCount", elementsCount);
 
 	imtbase::IObjectCollection::Ids elementIds = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
-	for (const imtbase::IObjectCollection::Id& elementId: std::as_const(elementIds)){
+	for (const imtbase::IObjectCollection::Id& elementId: qAsConst(elementIds)){
+
 		int itemIndex = itemsModel->InsertNewItem();
 		if (itemIndex >= 0){
 			if (!SetupGqlItem(gqlRequest, *itemsModel, itemIndex, elementId, errorMessage)){
@@ -363,13 +322,13 @@ imtbase::CTreeItemModel* CGqlFileRepositoryComp::ListObjects(
 }
 
 
-imtbase::CTreeItemModel* CGqlFileRepositoryComp::DeleteObject(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+imtbase::CTreeItemModel* CGqlRemoteFileRepositoryComp::DeleteObject(
+	const imtgql::CGqlRequest& gqlRequest,
+	QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		errorMessage = "No collection component was set";
-		SendErrorMessage(0, errorMessage, "CGqlFileRepositoryComp");
+		SendErrorMessage(0, errorMessage, "CGqlRemoteFileRepositoryComp");
 
 		return nullptr;
 	}
@@ -379,8 +338,7 @@ imtbase::CTreeItemModel* CGqlFileRepositoryComp::DeleteObject(
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 	if (objectId.isEmpty()){
 		errorMessage = QObject::tr("No object-ID could not be extracted from the request");
-
-		SendErrorMessage(0, errorMessage, "CGqlFileRepositoryComp");
+		SendErrorMessage(0, errorMessage, "CGqlRemoteFileRepositoryComp");
 
 		return nullptr;
 	}
@@ -394,10 +352,10 @@ imtbase::CTreeItemModel* CGqlFileRepositoryComp::DeleteObject(
 	}
 
 	if (m_objectCollectionCompPtr->RemoveElement(objectId, operationContextPtr)){
-		imtbase::CTreeItemModel* notificationModel = new imtbase::CTreeItemModel();
-		notificationModel->SetData("Id", objectId);
-
 		imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
+		imtbase::CTreeItemModel* notificationModel = new imtbase::CTreeItemModel();
+
+		notificationModel->SetData("Id", objectId);
 		dataModel->SetExternTreeModel("removedNotification", notificationModel);
 
 		rootModelPtr->SetExternTreeModel("data", dataModel);
@@ -415,7 +373,7 @@ imtbase::CTreeItemModel* CGqlFileRepositoryComp::DeleteObject(
 }
 
 
-bool CGqlFileRepositoryComp::SetupGqlItem(
+bool CGqlRemoteFileRepositoryComp::SetupGqlItem(
 			const imtgql::CGqlRequest& gqlRequest,
 			imtbase::CTreeItemModel& model,
 			int itemIndex,
@@ -430,7 +388,6 @@ bool CGqlFileRepositoryComp::SetupGqlItem(
 		errorMessage.append("\nUnable to get file metainfo");
 
 		SendErrorMessage(0, QString("Unable to get metainfo from file: '%1'").arg(QString(objectId)), "SetupGqlItem", __LINE__);
-
 		return retVal;
 	}
 
@@ -477,33 +434,22 @@ bool CGqlFileRepositoryComp::SetupGqlItem(
 
 // reimplemented (icomp::CComponentBase)
 
-void CGqlFileRepositoryComp::OnComponentCreated()
+void CGqlRemoteFileRepositoryComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
 	if (!m_fileObjectCollectionCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid file object collection component");
-
 		I_CRITICAL();
 	}
 
-	if (!m_tempFileManagerCompPtr.IsValid()){
+	if (!m_requestCollectionCompPtr.IsValid()){
 		SendCriticalMessage(0, "Invalid request collection component");
-
 		I_CRITICAL();
 	}
 }
 
 
-void CGqlFileRepositoryComp::OnComponentDestroyed()
-{
-	if (m_tempFileManagerCompPtr.IsValid()){
-		m_tempFileManagerCompPtr->ResetAllSessions();
-	}
+} // namespace imtgqlrepo
 
-	BaseClass::OnComponentDestroyed();
-}
-
-
-} // namespace imtgql
 

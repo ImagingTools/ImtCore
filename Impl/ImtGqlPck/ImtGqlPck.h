@@ -22,7 +22,6 @@
 #include <imtgql/COperationContextControllerComp.h>
 #include <imtgql/CObjectCollectionSubscriberControllerComp.h>
 #include <imtgql/CModelSubscriberControllerComp.h>
-#include <imtgql/CGqlFileRepositoryComp.h>
 #include <imtgql/CStructureControllerComp.h>
 #include <imtgql/CStructureSubscriberControllerComp.h>
 
@@ -50,7 +49,6 @@ typedef imtgql::CSerializableObjectCollectionControllerComp SerializableObjectCo
 typedef imtgql::COperationContextControllerComp OperationContextController;
 typedef imtgql::CObjectCollectionSubscriberControllerComp ObjectCollectionSubscriberController;
 typedef imtgql::CModelSubscriberControllerComp ModelSubscriberController;
-typedef imtgql::CGqlFileRepositoryComp GqlFileRepository;
 typedef imtgql::CStructureControllerComp StructureController;
 typedef imtgql::CStructureSubscriberControllerComp StructureSubscriberController;
 

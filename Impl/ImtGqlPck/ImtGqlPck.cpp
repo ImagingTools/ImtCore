@@ -95,11 +95,6 @@ I_EXPORT_COMPONENT(
 			"Model Subscriber Collection");
 
 I_EXPORT_COMPONENT(
-			GqlFileRepository,
-			"File-based GraphQL-collection repository",
-			IM_AUTHOR("Sergey Zastrovnyh")"File Repository GQL GraphQL Collection Object Provider");
-
-I_EXPORT_COMPONENT(
 			StructureController,
 			"GraphQL-structure base controller",
 			"GQL GraphQL Structure Controller");

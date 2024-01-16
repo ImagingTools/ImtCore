@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5174" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5181" Description="ACF"/>
+            <Version Id="1" Number="2199" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -76,12 +76,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="FileObject" PackageId="" ComponentId="FileObject">
-            <Data IsEnabled="true" Flags="2">
-                <AttributeInfoMap/>
-            </Data>
-        </Element>
-        <Element Id="GqlFileRepository" PackageId="ImtGqlPck" ComponentId="GqlFileRepository">
+        <Element Id="GqlFileRepository" PackageId="ImtGqlRepoPck" ComponentId="GqlFileRepository">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="GqlCommandId">
@@ -120,41 +115,11 @@
                     <AttributeInfo Id="SupportedTypeList" Type="Id[]" ExportId="SupportedTypeList">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="TempDirectoryPath" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TempStoragePath"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TempRequestCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TempObjectCollection"/>
+                    <AttributeInfo Id="TempFileManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TempFileManager"/>
                     </AttributeInfo>
                     <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
                         <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
-        <Element Id="HttpFileBuffer" PackageId="ImtRestPck" ComponentId="HttpFileBuffer">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="CommandId" Type="Id" ExportId="HttpCommandId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="FileCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="FileCollection"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TempDirectoryPath" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TempStoragePath"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TempRequestCollection" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="TempObjectCollection"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -176,29 +141,11 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="TempObjectCollection" PackageId="ImtCorePck" ComponentId="ObjectCollection">
+        <Element Id="TempFileManager" PackageId="FilePck" ComponentId="TempFileManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="FixedObjectTypeIds" Type="Id[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>File</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="FixedObjectTypeNames" Type="Text[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>File</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ObjectFactories" Type="Factory[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>FileObject</Value>
-                            </Values>
-                        </Data>
+                    <AttributeInfo Id="RootFolder" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="TempStoragePath"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -272,10 +219,10 @@
         <Interface InterfaceId="imtbase::IMetaInfoCreator" ComponentId="GqlFileRepository"/>
         <Interface InterfaceId="imtbase::IObjectCollection" ComponentId="FileCollection"/>
         <Interface InterfaceId="imtbase::IObjectCollectionInfo" ComponentId="FileCollection"/>
+        <Interface InterfaceId="imtgql::IGqlRequestExtractor" ComponentId="GqlFileRepository"/>
         <Interface InterfaceId="imtgql::IGqlRequestHandler" ComponentId="GqlFileRepository"/>
         <Interface InterfaceId="imtrepo::IFileCollectionInfo" ComponentId="FileCollection"/>
         <Interface InterfaceId="imtrepo::IFileObjectCollection" ComponentId="FileCollection"/>
-        <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="HttpFileBuffer"/>
         <Interface InterfaceId="istd::IChangeable" ComponentId="FileCollection"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="GqlFileRepository"/>
     </ExportedInterfaces>

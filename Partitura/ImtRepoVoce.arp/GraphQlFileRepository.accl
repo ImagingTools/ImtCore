@@ -2,20 +2,18 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5174" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5181" Description="ACF"/>
+            <Version Id="1" Number="2199" Description="ACF-Solutions"/>
             <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="FileCollection" X="1100" Y="525" Note=""/>
-        <Element ComponentName="FileObject" X="800" Y="500" Note=""/>
-        <Element ComponentName="GqlFileRepository" X="575" Y="300" Note=""/>
-        <Element ComponentName="HttpFileBuffer" X="600" Y="750" Note=""/>
+        <Element ComponentName="FileCollection" X="1000" Y="550" Note=""/>
+        <Element ComponentName="GqlFileRepository" X="575" Y="325" Note=""/>
         <Element ComponentName="MD5HashGenerator" X="575" Y="75" Note=""/>
-        <Element ComponentName="SystemLocation" X="100" Y="225" Note=""/>
-        <Element ComponentName="TempObjectCollection" X="525" Y="500" Note=""/>
-        <Element ComponentName="TempStoragePath" X="225" Y="500" Note=""/>
+        <Element ComponentName="SystemLocation" X="275" Y="700" Note=""/>
+        <Element ComponentName="TempFileManager" X="275" Y="425" Note=""/>
+        <Element ComponentName="TempStoragePath" X="275" Y="550" Note=""/>
     </PositionMap>
     <EmbeddedRegistries>
         <EmbededRegistry Id="FileObject">
