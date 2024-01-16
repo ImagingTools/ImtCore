@@ -371,7 +371,7 @@ Rectangle {
 //            title: qsTr("Save dirty documents");
 //            message: qsTr("Save all dirty documents ?");
 //            Component.onCompleted: {
-//                buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true});
+//                buttonsModel.append({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true});
 //            }
 
 //            onFinished: {

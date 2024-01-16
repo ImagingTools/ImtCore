@@ -14,7 +14,7 @@ Dialog {
     Component.onCompleted: {
         console.log("InputDialog onCompleted", inputDialogContainer);
 
-        inputDialogContainer.buttons.addButton({"Id":"Ok", "Name":qsTr("OK"), "Enabled": false, "Active": true});
+        inputDialogContainer.buttonsModel.append({"Id":"Ok", "Name":qsTr("OK"), "Enabled": false, "Active": true});
     }
 
     onFinished: {

@@ -34,7 +34,7 @@ TextButtonDecorator 1.0 ./Buttons/TextButtonDecorator.qml
 ToolButtonDecorator 1.0 ./Buttons/ToolButtonDecorator.qml
 TopButtonDecorator 1.0 ./Buttons/TopButtonDecorator.qml
 TopButtonDecoratorNew 1.0 ./Buttons/TopButtonDecoratorNew.qml
-ButtonsDialog 1.0 ./Dialogs/ButtonsDialog.qml
+DialogButtons 1.0 ./Dialogs/DialogButtons.qml
 Dialog 1.0 ./Dialogs/Dialog.qml
 TopPanelDialog 1.0 ./Dialogs/TopPanelDialog.qml
 DialogNew 1.0 ./Dialogs/DialogNew.qml

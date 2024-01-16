@@ -38,8 +38,8 @@ Dialog {
     }
 
     Component.onCompleted: {
-//        featuresDialog.buttons.addButton({"Id": "Add", "Name": "Add", "Enabled": false});
-//        featuresDialog.buttons.addButton({"Id": "Cancel", "Name": "Cancel", "Enabled": true});
+//        featuresDialog.buttonsModel.append({"Id": "Add", "Name": "Add", "Enabled": false});
+//        featuresDialog.buttonsModel.append({"Id": "Cancel", "Name": "Cancel", "Enabled": true});
 
 //        featuresDialog.title = qsTr("Select features");
 

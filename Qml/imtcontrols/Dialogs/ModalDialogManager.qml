@@ -108,6 +108,9 @@ Item {
                 property real  mainWindowWidth_prev: 0;
                 property real  mainWindowHeight_prev: 0;
 
+                property real itemWidth: item.width;
+                property real itemHeight: item.height;
+
                 clip: false;
 
                 onMainWindowWidthChanged: {
@@ -139,6 +142,19 @@ Item {
                             mainWindowHeight_prev = mainWindowHeight;
                             dialogLoader.y += deltaHeight/2;
                         }
+                    }
+                }
+
+                onItemWidthChanged: {
+                    if (dialogLoader.item.centered){
+                        dialogLoader.x = container.width/2 - dialogLoader.width/2;
+                        dialogLoader.y = container.height/2 - dialogLoader.height/2;
+                    }
+                }
+                onItemHeightChanged: {
+                    if (dialogLoader.item.centered){
+                        dialogLoader.x = container.width/2 - dialogLoader.width/2;
+                        dialogLoader.y = container.height/2 - dialogLoader.height/2;
                     }
                 }
 
@@ -177,6 +193,7 @@ Item {
             }
         }
     }
+
 
     /*for Windows style dialogs*/
     function openWindow(comp, parameters){

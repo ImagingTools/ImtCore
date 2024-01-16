@@ -1,6 +1,5 @@
 import QtQuick 2.12
-import Qt5Compat.GraphicalEffects 6.0
-import QtGraphicalEffects 1.12
+
 import Acf 1.0
 import imtcontrols 1.0
 
@@ -8,13 +7,11 @@ import imtcontrols 1.0
 ControlBase {
     id: dialogContainer;
 
-    width:  !decorator_ ? 0 : !emptyDecorator ? decorator_.width : dialogColumn.width;
-    height:  !decorator_ ? 0 : !emptyDecorator ? decorator_.height : dialogColumn.height;
-
+    width:  !decorator_ ? 0 :  decorator_.width ;
+    height:  !decorator_ ? 0 :  decorator_.height ;
 
     decorator: Style.dialogDecorator;
     property var decoratorItem: null;
-    property bool emptyDecorator: !decorator_ ? true : decorator_.isEmpty == undefined ? false : decorator_.isEmpty;
 
     property string title;
     property string bodySource;
@@ -22,25 +19,28 @@ ControlBase {
 
     property bool centered: true;
     property bool hasIcon: true;
+    property bool modal: false;
 
     property Item root: null;
     property Item rootItem: null;
-    property Item bodyItem: loaderBodyDialog.item;
 
-    property alias topPanel: loaderTopPanel.item;
-    property alias buttons: buttonsDialog;
-    property alias buttonsModel: buttonsDialog.buttons;
+    property Item topPanel: null;
+    property Item contentItem: null;
+    property Item bodyItem: null;
+
+    property Item buttons: null;
+
+    property ListModel buttonsModel: ListModel{};
+    property int buttonsModelCount: buttonsModel.count;
 
     property string backgroundColor: Style.backgroundColor;
-    property alias radius: background.radius;
+    property int radius: 0;
 
     property string notClosingButtons: "";
 
+    property Component topPanelComp: Component{TopPanelDialog{}};
 
-    property alias topPanelComp: loaderTopPanel.sourceComponent;
-    property alias contentItem: loaderBodyDialog.item;
-
-    property Component contentComp;//: loaderBodyDialog.sourceComponent;
+    property Component contentComp;
     property Component emptyComp : Component{Item {}};
 
     property int buttonIds: 0;//81920;
@@ -77,24 +77,6 @@ ControlBase {
         console.log("Dialog onPressed", event.key);
     }
 
-    onFocusChanged: {
-        console.log("Dialog onFocusChanged", dialogContainer.focus);
-
-        if (dialogContainer.focus && loaderBodyDialog.item){
-            loaderBodyDialog.item.focus = true;
-        }
-    }
-
-    onWidthChanged: {
-        if (loaderTopPanel && loaderTopPanel.item){
-            loaderTopPanel.item.width = dialogContainer.width;
-        }
-
-        if (loaderBodyDialog && loaderBodyDialog.item){
-            //loaderBodyDialog.item.width = dialogContainer.width;
-        }
-    }
-
     onRootChanged: {
         root.backgroundItem.opacity = 0.4;
     }
@@ -105,21 +87,6 @@ ControlBase {
                 dialogContainer.root.closeDialog();
             }
         }
-    }
-
-    onTitleChanged: {
-        if(loaderTopPanel.item){
-            console.log("Dialog onTitleChanged", dialogContainer.title);
-            loaderTopPanel.item.title = dialogContainer.title;
-        }
-    }
-
-    onBodySourceChanged: {
-        loaderBodyDialog.source = dialogContainer.bodySource;
-    }
-
-    onTopPanelSourceChanged: {
-        loaderTopPanel.source = dialogContainer.topPanelSource;
     }
 
     onAccepted: {
@@ -137,7 +104,6 @@ ControlBase {
         }
     }
 
-
     onDecoratorChanged: {
         if(decorator_){
             if(decorator_.accepted !==undefined){
@@ -153,167 +119,32 @@ ControlBase {
         }
     }
 
+    onButtonsModelChanged: {
+        setButtonIds();
+    }
+
+    onButtonsModelCountChanged: {
+        setButtonIds();
+    }
 
     function setButtonIds(){
+        if(!buttonsModel){
+            return;
+        }
         let buttonIds = 0;
-        for(let i = 0; i < buttonsDialog.buttons.count; i++){
-            let id = buttonsDialog.buttons.get(i).Id;
+        for(let i = 0; i < dialogContainer.buttonsModel.count; i++){
+            let id = dialogContainer.buttonsModel.get(i).Id;
             if(i == 0){
                 buttonIds = id;
-
             }
             else {
                 buttonIds = buttonIds | id;
             }
-
         }
-
         console.log("buttonIds", buttonIds);
 
         dialogContainer.buttonIds = buttonIds;
     }
-
-    MouseArea {
-        anchors.fill: parent;
-        onClicked: {}
-    }
-
-    Rectangle{
-        id: background;
-
-        anchors.fill: parent;
-
-        color: dialogContainer.backgroundColor;
-        visible: dialogContainer.emptyDecorator;
-    }
-
-    DropShadow {
-        id: dropShadow;
-
-        anchors.fill: background;
-
-        horizontalOffset: 2;
-        verticalOffset: 2;
-
-        radius: background.radius;
-        color: Style.shadowColor;
-
-        source: background;
-    }
-
-    Column {
-        id: dialogColumn;
-
-        width: Math.max(buttonsWidth, bodyWidth)//buttonsWidth;
-
-        visible: dialogContainer.emptyDecorator;
-        spacing: 10;
-
-//        property real bodyWidth: !loaderBodyDialog.item ? 1 : loaderBodyDialog.item.width + 20;
-        property real bodyWidth: !loaderBodyDialog.item ? 1 : loaderBodyDialog.item.width;
-        property real buttonsWidth: buttonsContainer.width + 2 * buttonsContainer.anchors.rightMargin;
-
-        Item {
-            id: topPanelContainer;
-
-            width: loaderTopPanel.width;
-            height: loaderTopPanel.height;
-
-            MovingItem {
-                visible: dialogContainer.canMove;
-                containerItem: topPanelContainer;
-                globalParent: dialogContainer.root;
-                movingItem: dialogContainer;
-            }
-
-            Loader {
-                id: loaderTopPanel;
-
-                source: "TopPanelDialog.qml";
-                onLoaded:  {
-                    console.log("loaderTopPanel onLoaded");
-
-                    loaderTopPanel.item.width = dialogContainer.width;
-                    if(loaderTopPanel.item.title !== undefined){
-                        loaderTopPanel.item.title = dialogContainer.title;
-                    }
-
-                    console.log("loaderTopPanel.item.height", loaderTopPanel.item.height);
-
-                    loaderTopPanel.width = loaderTopPanel.item.width;
-                    loaderTopPanel.height = loaderTopPanel.item.height;
-
-                    if (loaderTopPanel.item.closeButtonClicked){
-                        loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
-                    }
-                }
-                onItemChanged: {
-                    console.log("loaderTopPanel onItemChanged");
-
-                    //loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
-                    if(loaderTopPanel.item){
-                        loaderTopPanel.item.width = dialogContainer.width;
-                        if(loaderTopPanel.item.title !== undefined){
-                            loaderTopPanel.item.title = dialogContainer.title;
-                        }
-                    }
-                }
-            }
-        }
-
-        Loader {
-            id: loaderBodyDialog;
-
-            anchors.horizontalCenter: parent.horizontalCenter;
-
-            sourceComponent: dialogContainer.emptyDecorator ? dialogContainer.contentComp : dialogContainer.emptyComp;
-            onLoaded: {
-                //loaderBodyDialog.item.width = dialogContainer.width;
-                if(loaderBodyDialog.item.rootItem !== undefined){
-                    loaderBodyDialog.item.rootItem = dialogContainer;
-                }
-            }
-
-            onItemChanged: {
-                if (loaderBodyDialog.item){
-                    //loaderBodyDialog.item.width = dialogContainer.width;
-                }
-            }
-        }
-
-        Item {
-            id: buttonsContainer;
-
-            anchors.right: parent.right;
-            anchors.rightMargin: 10;
-
-            width: buttonsDialog.width;
-            height: buttonsDialog.height + 2* buttonsDialog.anchors.bottomMargin;
-
-            ButtonsDialog {
-                id: buttonsDialog;
-
-                anchors.right: parent.right;
-                anchors.bottom: parent.bottom;
-                anchors.bottomMargin: 10;
-
-                onButtonsChanged: {
-                    dialogContainer.setButtonIds();
-                }
-
-                onCountChanged: {
-                    dialogContainer.setButtonIds();
-                }
-
-                onButtonClicked: {
-                    console.log("ButtonsDialog onButtonClicked", buttonId);
-                    dialogContainer.finished(buttonId);
-                }
-            }
-        }
-    }
-
-
 
     Shortcut {
         sequence: "Escape";

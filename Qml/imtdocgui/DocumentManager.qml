@@ -444,8 +444,8 @@ Item {
             }
 
             Component.onCompleted: {
-//                buttons.addButton({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true});
-//                buttons.addButton({Id: Enums.ButtonType.Cancel, Name:qsTr("Cancel"), Enabled: true});
+//                buttonsModel.append({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true});
+//                buttonsModel.append({Id: Enums.ButtonType.Cancel, Name:qsTr("Cancel"), Enabled: true});
             }
 
             onFinished: {

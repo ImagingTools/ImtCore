@@ -379,7 +379,7 @@ Rectangle {
             }//Column
         }//Flickable
 
-        ButtonsDialog {
+        DialogButtons {
             id: buttonsDialog;
 
             anchors.right: parent.right;
@@ -393,7 +393,7 @@ Rectangle {
             }
 
             onButtonClicked: {
-                console.log("ButtonsDialog onButtonClicked", buttonId);
+                console.log("DialogButtons onButtonClicked", buttonId);
 
                 if (buttonId == "Close"){
                     container.visible = false;

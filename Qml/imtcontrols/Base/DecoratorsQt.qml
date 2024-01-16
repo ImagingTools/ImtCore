@@ -504,31 +504,47 @@ Item {
             standardButtons: buttonIds;
 
             visible: true;
+            modal: baseElement ? baseElement.modal : false;
 
             property int buttonIds: 0;
             property var baseElement: null;
             property Item rootItem: null;
+            property Item content_: null;
+
+            property var buttonsModel: baseElement ? baseElement.buttonsModel : null;
+            property int buttonsModelCount: baseElement ? baseElement.buttonsModelCount : 0;
+
             onBaseElementChanged: {
                 if(baseElement){
                     addContentItemToDecorator();
                 }
             }
+            onButtonsModelCountChanged: {
+                //dialogContainer.buttonIds = dialogContainer.baseElement.buttonIds;
+                //setDecoratorSize(dialogContainer.content_)
+                buttonIdsPause.restart();
+            }
 
             function addContentItemToDecorator(){
-                dialogContainer.buttonIds = dialogContainer.baseElement.buttonIds;
+
                 var content_ = dialogContainer.baseElement.contentComp.createObject(dialogContainer);
+                dialogContainer.content_ = content_
                 dialogContainer.contentItem.children.push(content_);
-
                 dialogContainer.baseElement.decoratorItem = content_;
+                dialogContainer.rootItem = dialogContainer.baseElement;
 
+                //buttonIdsPause.restart();
+                //dialogContainer.buttonIds = dialogContainer.baseElement.buttonIds;
                 setDecoratorSize(content_)
 
-                dialogContainer.rootItem = dialogContainer.baseElement;
 
             }
 
 
             function setDecoratorSize(content_){
+                if(!content_){
+                    return;
+                }
                 let width_  = content_.width +
                     dialogContainer.leftPadding +
                     dialogContainer.rightPadding;
@@ -544,6 +560,19 @@ Item {
                 content_.x = (dialogContainer.width - content_.width)/2 -
                         dialogContainer.leftPadding;
             }
+
+
+            PauseAnimation {
+                id: buttonIdsPause;
+
+                duration: 20;
+                onFinished: {
+                    dialogContainer.buttonIds = dialogContainer.baseElement.buttonIds;
+                    setDecoratorSize(dialogContainer.content_)
+
+                }
+            }
+
         }
     }
 

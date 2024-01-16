@@ -37,7 +37,7 @@
 		<file alias="imtcontrols/Buttons/BaseButtonDecorator.qml">Buttons/BaseButtonDecorator.qml</file>
 		<file alias="imtcontrols/Buttons/CommonButtonDecorator.qml">Buttons/CommonButtonDecorator.qml</file>
 
-		<file alias="imtcontrols/Dialogs/ButtonsDialog.qml">Dialogs/ButtonsDialog.qml</file>
+                <file alias="imtcontrols/Dialogs/DialogButtons.qml">Dialogs/DialogButtons.qml</file>
 		<file alias="imtcontrols/Dialogs/Dialog.qml">Dialogs/Dialog.qml</file>
 		<file alias="imtcontrols/Dialogs/TopPanelDialog.qml">Dialogs/TopPanelDialog.qml</file>
 		<file alias="imtcontrols/Dialogs/DialogNew.qml">Dialogs/DialogNew.qml</file>
