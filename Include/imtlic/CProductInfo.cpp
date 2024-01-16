@@ -185,7 +185,7 @@ bool CProductInfo::IsEqual(const IChangeable& object) const
 				m_productName == sourcePtr->m_productName &&
 				m_productDescription == sourcePtr->m_productDescription &&
 				m_categoryId == sourcePtr->m_categoryId &&
-				m_featureIds == sourcePtr->m_featureIds ;
+                m_featureIds == sourcePtr->m_featureIds;
 	}
 
 	return false;

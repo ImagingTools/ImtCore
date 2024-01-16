@@ -237,7 +237,7 @@ imtgql::IGqlRequest* CGqlStructureDelegateComp::CreateRemoveObjectRequest(
 }
 
 
-imtgql::IGqlRequest* CGqlStructureDelegateComp::CreateGetNodeCountRequest(const iprm::IParamsSet* selectionParamsPtr) const
+imtgql::IGqlRequest* CGqlStructureDelegateComp::CreateGetNodeCountRequest(const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	imtgql::CGqlRequest* requestPtr = nullptr;
 
@@ -265,9 +265,9 @@ imtgql::IGqlRequest* CGqlStructureDelegateComp::CreateGetNodeCountRequest(const 
 
 
 imtgql::IGqlRequest* CGqlStructureDelegateComp::CreateGetNodeIdsRequest(
-			int offset,
-			int count,
-			const iprm::IParamsSet* selectionParamsPtr) const
+            int /*offset*/,
+            int /*count*/,
+            const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
 	imtgql::CGqlRequest* requestPtr = nullptr;
 

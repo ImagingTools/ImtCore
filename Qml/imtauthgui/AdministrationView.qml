@@ -2,8 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
-import QtQuick
-import Qt.labs.qmlmodels
+import Qt.labs.qmlmodels 1.1
 
 Rectangle {
     id: container;

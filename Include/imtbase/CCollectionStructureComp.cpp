@@ -295,8 +295,8 @@ int CCollectionStructureComp::GetNodeCount(const iprm::IParamsSet* /*selectionPa
 
 
 imtbase::ICollectionStructureInfo::Ids CCollectionStructureComp::GetNodeIds(
-            int offset,
-            int count ,
+            int /*offset*/,
+            int /*count*/ ,
             const iprm::IParamsSet* /*selectionParamsPtr*/) const
 {
     return imtbase::ICollectionStructureInfo::Ids();
@@ -322,13 +322,13 @@ imtbase::ICollectionStructureIterator* CCollectionStructureComp::CreateCollectio
 }
 
 
-imtbase::ICollectionStructureInfo::NodeInfo CCollectionStructureComp::GetNodeInfo(const QByteArray& nodeId)
+imtbase::ICollectionStructureInfo::NodeInfo CCollectionStructureComp::GetNodeInfo(const QByteArray& /*nodeId*/)
 {
     return imtbase::ICollectionStructureInfo::NodeInfo();
 }
 
 
-imtbase::ICollectionStructureInfo::Ids CCollectionStructureComp::GetObjectParentNodeIds(const QByteArray& objectId) const
+imtbase::ICollectionStructureInfo::Ids CCollectionStructureComp::GetObjectParentNodeIds(const QByteArray& /*objectId*/) const
 {
     imtbase::ICollectionStructureInfo::Ids retVal;
 

@@ -315,7 +315,7 @@ idoc::MetaInfoPtr CCachedObjectCollectionComp::GetElementMetaInfo(const Id& elem
 }
 
 
-bool CCachedObjectCollectionComp::SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* logPtr)
+bool CCachedObjectCollectionComp::SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* /*logPtr*/)
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return false;
@@ -357,7 +357,7 @@ bool CCachedObjectCollectionComp::SetElementDescription(const Id& elementId, con
 }
 
 
-bool CCachedObjectCollectionComp::SetElementEnabled(const Id& elementId, bool isEnabled, ilog::IMessageConsumer* logPtr)
+bool CCachedObjectCollectionComp::SetElementEnabled(const Id& elementId, bool isEnabled, ilog::IMessageConsumer* /*logPtr*/)
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
 		return false;

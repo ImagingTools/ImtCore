@@ -1,4 +1,4 @@
-TARGET = imtstyleqml
+TARGET = imtstylecontrolsqml
 
 include($(ACFCONFIGDIR)/QMake/StaticConfig.pri)
 include($$PWD/../../../Config/QMake/ImtCore.pri)

@@ -81,7 +81,7 @@ QByteArray CWebSocketRequest::GetRequestId() const
 }
 
 
-bool CWebSocketRequest::ParseDeviceData(QIODevice& device)
+bool CWebSocketRequest::ParseDeviceData(QIODevice& /*device*/)
 {
 	return false;
 }

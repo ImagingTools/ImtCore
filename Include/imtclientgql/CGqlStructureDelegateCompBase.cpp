@@ -431,7 +431,7 @@ imtbase::ICollectionStructureController* CGqlStructureDelegateCompBase::GetHiera
 }
 
 
-imtbase::ICollectionStructure::NodePath CGqlStructureDelegateCompBase::GetNodePath(const Id& nodeId) const
+imtbase::ICollectionStructure::NodePath CGqlStructureDelegateCompBase::GetNodePath(const Id& /*nodeId*/) const
 {
 	return imtbase::ICollectionStructure::NodePath();
 }

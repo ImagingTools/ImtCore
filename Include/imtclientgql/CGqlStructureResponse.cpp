@@ -39,7 +39,7 @@ void CGqlStructureResponse::SetRequest(const imtgql::CGqlRequest& request)
 
 // reimplemented (imtgql::IGqlStructuredCollectionResponse)
 
-bool CGqlStructureResponse::GetNodeInfo(NodeInfo& out) const
+bool CGqlStructureResponse::GetNodeInfo(NodeInfo& /*out*/) const
 {
     // if (m_isNodeInfoPresent){
     //     out = m_elementInfo;
@@ -50,7 +50,7 @@ bool CGqlStructureResponse::GetNodeInfo(NodeInfo& out) const
     return false;
 }
 
-bool CGqlStructureResponse::GetObjectInfo(ObjectInfo& out) const
+bool CGqlStructureResponse::GetObjectInfo(ObjectInfo& /*out*/) const
 {
     // if (m_isObjectInfoPresent){
     //     out = m_elementInfo;
@@ -61,7 +61,7 @@ bool CGqlStructureResponse::GetObjectInfo(ObjectInfo& out) const
     return false;
 }
 
-bool CGqlStructureResponse::GetElementInfo(ElementInfo& out) const
+bool CGqlStructureResponse::GetElementInfo(ElementInfo& /*out*/) const
 {
     // if (m_isElementInfoPresent){
     //     out = m_elementInfo;
@@ -72,7 +72,7 @@ bool CGqlStructureResponse::GetElementInfo(ElementInfo& out) const
     return false;
 }
 
-bool CGqlStructureResponse::GetElementList(ElementList& out) const
+bool CGqlStructureResponse::GetElementList(ElementList& /*out*/) const
 {
     // if (m_isElementListPresent){
     //     out = m_elementList;

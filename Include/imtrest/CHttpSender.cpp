@@ -67,10 +67,11 @@ bool CHttpSender::SendResponse(ConstResponsePtr& response) const
 }
 
 
-bool imtrest::CHttpSender::SendRequest(ConstRequestPtr& reguest) const
+bool imtrest::CHttpSender::SendRequest(ConstRequestPtr& /*reguest*/) const
 {
 	return false;
 }
+
 
 // protected methods
 

@@ -26,9 +26,6 @@ ImtDevPck.depends = imtdev
 SUBDIRS += imtstyle
 imtstyle.file = ../../Include/imtstyle/QMake/imtstyle.pro
 imtstyle.depends = DesignTokenCreator
-SUBDIRS += imtstyleqml
-imtstyleqml.file = ../../Include/imtstyleqml/QMake/imtstyleqml.pro
-imtstyleqml.depends = imtstyle
 
 SUBDIRS += ImtStylePck
 ImtStylePck.file = ../../Impl/ImtStylePck/QMake/ImtStylePck.pro
