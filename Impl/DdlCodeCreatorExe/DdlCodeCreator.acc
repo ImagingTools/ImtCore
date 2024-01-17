@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5177" Description="ACF"/>
+            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="ApplicationInfo" PackageId="BasePck" ComponentId="ApplicationInfo">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Design token generator"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationType" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Client (CommandLine)"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CompanyName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Imaging tools"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LegalCopyright" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="� Imaging tools"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductName" Type="Text" ExportId="">
+                        <Data IsEnabled="true" Value="Design token generator"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="VersionInfo"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ConsoleApplication" PackageId="BasePck" ComponentId="ConsoleApplication">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ApplicationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ComponentsToInitialize" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>DdlCodeCreatorProcessorsController</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConsoleLog"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ConsoleLog" PackageId="BasePck" ComponentId="ConsoleLog">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+        <Element Id="DdlCodeCreatorArgumentsParser" PackageId="ImtDdlPck" ComponentId="DdlCodeCreatorArgumentsParser">
+            <Data IsEnabled="true" Flags="1">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConsoleLog"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="DdlCodeCreatorProcessorsController" PackageId="ImtDdlPck" ComponentId="DdlCodeCreatorProcessorsController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DdlCodeCreatorArgumentsParser"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DesignTokenProcessors" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>Processors/ConstVarHCreatorProcessor</Value>
+                                <Value>Processors/ConstVarCppCreatorProcessor</Value>
+                                <Value>Processors/ConstVarQmlCreatorProcessor</Value>
+                                <Value>Processors/ConstVarQmldirCreatorProcessor</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConsoleLog"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="Processors" PackageId="" ComponentId="Processors">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="DdlCodeCreatorArgumentsParser"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConsoleLog"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="VersionInfo" PackageId="BasePck" ComponentId="VersionInfo">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList>
+        <EmbeddedRegistry Id="Processors">
+            <Data Description="" Keywords="">
+                <ElementsList>
+                    <Element Id="ConstVarCppCreatorProcessor" PackageId="ImtDdlPck" ComponentId="ConstVarCppCreatorProcessor">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                    <Element Id="ConstVarHCreatorProcessor" PackageId="ImtDdlPck" ComponentId="ConstVarHCreatorProcessor">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                    <Element Id="ConstVarQmlCreatorProcessor" PackageId="ImtDdlPck" ComponentId="ConstVarQmlCreatorProcessor">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                    <Element Id="ConstVarQmldirCreatorProcessor" PackageId="ImtDdlPck" ComponentId="ConstVarQmldirCreatorProcessor">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
+                </ElementsList>
+                <EmbeddedRegistriesList/>
+                <ExportedInterfaces/>
+                <ExportedComponents>
+                    <Component ExportedId="ConstVarCppCreatorProcessor" ComponentId="ConstVarCppCreatorProcessor"/>
+                    <Component ExportedId="ConstVarHCreatorProcessor" ComponentId="ConstVarHCreatorProcessor"/>
+                    <Component ExportedId="ConstVarQmlCreatorProcessor" ComponentId="ConstVarQmlCreatorProcessor"/>
+                    <Component ExportedId="ConstVarQmldirCreatorProcessor" ComponentId="ConstVarQmldirCreatorProcessor"/>
+                </ExportedComponents>
+            </Data>
+        </EmbeddedRegistry>
+    </EmbeddedRegistriesList>
+    <ExportedInterfaces>
+        <Interface InterfaceId="ibase::IApplication" ComponentId="ConsoleApplication"/>
+        <Interface InterfaceId="imtddl::IDdlCodeCreatorArgumentsParser" ComponentId="DdlCodeCreatorArgumentsParser"/>
+    </ExportedInterfaces>
+    <ExportedComponents/>
+</Acf>

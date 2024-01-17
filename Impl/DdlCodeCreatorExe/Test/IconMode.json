@@ -1,0 +1,24 @@
+{
+"$schema": "https://json-schema.org/draft/2020-12/schema",
+"name": "IconMode",
+"type": "object",
+"properties": {
+	"Normal": {
+		"type": "string",
+		"value": "Normal"
+	},
+	"Disabled": {
+		"type": "string",
+		"value": "Normal"
+	},
+	"Active": {
+		"type": "string",
+		"value": "Normal"
+	},
+	"Selected": {
+		"type": "string",
+		"value": "Normal"
+	}
+}
+}
+

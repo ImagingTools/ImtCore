@@ -1,0 +1,1 @@
+--template-file Test/IconMode.json --output-cpp-file Test/IconMode.h --output-qml-file Test/IconMode.qml --output-qmldir-file Test/qmldir

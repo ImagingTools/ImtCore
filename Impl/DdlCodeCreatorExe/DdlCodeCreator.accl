@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5177" Description="ACF"/>
+            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ApplicationInfo" X="850" Y="25" Note=""/>
+        <Element ComponentName="ConsoleApplication" X="550" Y="175" Note=""/>
+        <Element ComponentName="ConsoleLog" X="225" Y="425" Note=""/>
+        <Element ComponentName="DdlCodeCreatorArgumentsParser" X="925" Y="450" Note=""/>
+        <Element ComponentName="DdlCodeCreatorProcessorsController" X="550" Y="325" Note=""/>
+        <Element ComponentName="Processors" X="550" Y="625" Note=""/>
+        <Element ComponentName="VersionInfo" X="1075" Y="25" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="Processors">
+            <PositionMap>
+                <Element ComponentName="ConstVarCppCreatorProcessor" X="450" Y="175" Note=""/>
+                <Element ComponentName="ConstVarHCreatorProcessor" X="450" Y="250" Note=""/>
+                <Element ComponentName="ConstVarQmlCreatorProcessor" X="450" Y="350" Note=""/>
+                <Element ComponentName="ConstVarQmldirCreatorProcessor" X="450" Y="450" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
+</Acf>

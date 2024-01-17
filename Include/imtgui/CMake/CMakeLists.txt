@@ -16,7 +16,7 @@ set(DDL_QML_OUTPUT_DIR "${AUX_INCLUDE_DIR}/${PROJECT_NAME}/Ddl/Qml")
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../../Config/CMake/DdlCreator.cmake)
 
-GenerateConstVarExt(${MODULE_CPP_NAME}
+GenerateDdlCodeExt(${MODULE_CPP_NAME}
 					${MODULE_QML_NAME}
 					${DDL_CONST_VAR_TEMPLATE_INPUT_DIR}
 					${DDL_CPP_OUTPUT_DIR}
