@@ -271,16 +271,10 @@ imtbase::CTreeItemModel* CAddressTreeCollectionControllerComp::ListObjects(const
 
 bool CAddressTreeCollectionControllerComp::checkHasChildren(const QString& id) const
 {
-    //qDebug() << "CheckHasChildren";
-
     QString sql = QString("(SELECT * FROM public.\"AddressElements\" WHERE '[\"%1\"]' <@ (\"ParentIds\") LIMIT 1)")
                       .arg(id);
 
     QSqlQuery sqlQuery = m_engineCompChr3->ExecSqlQuery(sql.toUtf8());
-//    while(sqlQuery.next()){
-//        qDebug() << "АДРЕС_____" << sqlQuery.value("Name").toString();
-//    }
-    //qDebug() << "SIZE:: " << sqlQuery.size();
     return (sqlQuery.size() > 0);
 }
 
