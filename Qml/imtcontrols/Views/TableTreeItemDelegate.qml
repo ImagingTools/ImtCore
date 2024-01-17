@@ -352,7 +352,7 @@ Item {
         anchors.top: rowBody.bottom;
         anchors.right: parent.right;
 
-        visible: isOpen;
+        visible: treeItemDelegate.isOpen;
 
         Repeater {
             id: childModelRepeater;
@@ -360,8 +360,8 @@ Item {
             delegate: delegateComp;
 
             onItemAdded: {
-                item.modelIndex.parentIndex = modelIndex;
-                modelIndex.childModel.push(item.modelIndex);
+                item.modelIndex.parentIndex = treeItemDelegate.modelIndex;
+                treeItemDelegate.modelIndex.childModel.push(item.modelIndex);
             }
         }
     }

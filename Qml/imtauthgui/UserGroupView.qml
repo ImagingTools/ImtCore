@@ -234,7 +234,7 @@ DocumentData {
             multiPageView.addPage("Users", "Users", groupUsersComp);
             multiPageView.addPage("Roles", "Roles", groupRolesComp);
 
-            multiPageView.selectedIndex = 0;
+            multiPageView.currentIndex = 0;
         }
     }
 }

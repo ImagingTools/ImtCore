@@ -45,8 +45,8 @@ Rectangle {
             multiPageView.pagesModel.setProperty(groupsIndex, "Name", qsTr("Groups"))
         }
 
-        if (multiPageView.selectedIndex >= 0){
-            headerText.text = qsTr("Administration") + " / " + multiPageView.pagesModel.get(multiPageView.selectedIndex).Name;
+        if (multiPageView.currentIndex >= 0){
+            headerText.text = qsTr("Administration") + " / " + multiPageView.pagesModel.get(multiPageView.currentIndex).Name;
         }
     }
 
@@ -160,11 +160,11 @@ Rectangle {
             updateModel();
         }
 
-        onSelectedIndexChanged: {
-            console.log("onSelectedIndexChanged", selectedIndex);
+        onCurrentIndexChanged: {
+            console.log("onSelectedIndexChanged", currentIndex);
 
-            if (selectedIndex >= 0){
-                headerText.text = qsTr("Administration") + " / " + pagesModel.get(selectedIndex).Name;
+            if (currentIndex >= 0){
+                headerText.text = qsTr("Administration") + " / " + pagesModel.get(currentIndex).Name;
             }
         }
 
@@ -175,7 +175,7 @@ Rectangle {
             multiPageView.addPage("Users", qsTr("Users"), userCollectionComp);
             multiPageView.addPage("Groups", qsTr("Groups"), userGroupCollectionComp);
 
-            multiPageView.selectedIndex = 0;
+            multiPageView.currentIndex = 0;
         }
     }
 }

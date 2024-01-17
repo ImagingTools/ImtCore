@@ -16,7 +16,7 @@ QtObject {
         pagesModel.Clear();
     }
 
-    property string modelState: pagesGqlModel.state;
+    property string modelState: pagesProvider.pagesGqlModel.state;
 
     property GqlModel pagesGqlModel : GqlModel {
         function updateModel(){
@@ -38,7 +38,7 @@ QtObject {
         }
 
         onStateChanged: {
-            console.log("Pages Provider State:",this.state, pagesGqlModel)
+            console.log("Pages Provider State:",this.state, pagesProvider.pagesGqlModel)
             if (this.state === "Ready"){
                 if (this.ContainsKey("data")){
                     var dataModelLocal = this.GetData("data");

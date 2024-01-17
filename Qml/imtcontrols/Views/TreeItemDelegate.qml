@@ -172,7 +172,7 @@ Item {
 
 
             onItemAdded: {
-                console.log('Repeater onItemAdded', itemData.Level);
+                console.log('Repeater onItemAdded',  treeItemDelegate.itemData.Level);
 
                 if (treeItemDelegate.itemData.Level >= 1){
                     item.itemData.Parent = treeItemDelegate.itemData;

@@ -40,7 +40,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter;
 
         color: parent.selected ? Style.iconColorOnSelected: Style.textColor;
-        font.pixelSize: container.fontSize;
+//        font.pixelSize: container.fontSize;
         font.family: Style.fontFamily;
 
         text: parent.title;

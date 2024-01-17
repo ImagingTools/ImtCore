@@ -7,4 +7,6 @@ StyleBase {
     id: styleContainer;
 
     size_mainMargin: 10;
+
+    buttonWidthMedium: 20;
 }

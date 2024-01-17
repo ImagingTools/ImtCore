@@ -36,7 +36,6 @@ Item {
         id: fileDialogSave;
 
         title: qsTr("Save file");
-//        folder: shortcuts.home;
 
         fileMode: FileDialog.SaveFile;
 

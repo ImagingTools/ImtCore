@@ -279,7 +279,7 @@ Rectangle {
             console.log("onFailed Ready");
             loading.stop();
 
-            closeAllPages();
+            thumbnailDecoratorContainer.closeAllPages();
         }
     }
 

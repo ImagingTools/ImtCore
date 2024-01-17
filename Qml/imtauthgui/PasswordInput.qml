@@ -64,13 +64,6 @@ Column {
         KeyNavigation.tab: confirmPasswordInput;
 
         readOnly: root.readOnly;
-
-        Loader{
-            id: inputDecoratorLoader1;
-
-            sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-            onLoaded: {}
-        }
     }
 
     BaseText {
@@ -89,13 +82,6 @@ Column {
         echoMode: TextInput.Password;
 
         readOnly: root.readOnly;
-
-        Loader{
-            id: inputDecoratorLoader2;
-
-            sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-            onLoaded: {}
-        }
     }
 
     Item {

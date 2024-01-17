@@ -61,13 +61,13 @@ Item {
     property var documentManagerPtr: null;
 
     property CommandsProvider commandsProvider: CommandsProvider {
-        commandId: documentTypeId;
+        commandId: documentData.documentTypeId;
         uuid: documentData.uuid;
 
         property bool documentVisible: documentData.visible && uuid !== "";
         onDocumentVisibleChanged: {
             if (commandsModel == null){
-                commandsProvider.additionInputParams = getAdditionalInputParams();
+                commandsProvider.additionInputParams = documentData.getAdditionalInputParams();
 
                 updateModel();
             }
@@ -93,8 +93,6 @@ Item {
     signal stopLoading();
 
     Component.onDestruction: {
-        console.log("Document onDestruction");
-
         Events.unSubscribeEvent(uuid + "CommandActivated", commandsDelegate.commandHandle);
 
         documentData.documentModel.Clear();
@@ -102,12 +100,10 @@ Item {
 
     onStartLoading: {
         Events.sendEvent("StartLoading");
-//        loading.start();
     }
 
     onStopLoading: {
         Events.sendEvent("StopLoading");
-//        loading.stop();
     }
 
     onSaved: {
@@ -160,14 +156,14 @@ Item {
                 undoManagerPtr.registerModel(documentModel);
             }
 
-            onDocumentCompletedChanged.disconnect(callback);
+            documentData.documentCompletedChanged.disconnect(callback);
         }
 
         if (documentCompleted){
             callback();
         }
         else{
-            onDocumentCompletedChanged.connect(callback);
+            documentData.documentCompletedChanged.connect(callback);
         }
 
         endDocumentModelChanged();
@@ -178,14 +174,6 @@ Item {
     onIsDirtyChanged: {
         commandsProvider.setCommandIsEnabled("Save", isDirty);
     }
-
-//    Connections {
-//        target: documentData.documentModel;
-
-//        onDataChanged: {
-//            documentData.onModelChanged();
-//        }
-//    }
 
     function beginDocumentModelChanged(){}
     function endDocumentModelChanged(){}
@@ -285,11 +273,9 @@ Item {
 
         onBlockingUpdateModelChanged: {
             if (blockingUpdateModel){
-//                documentData.startLoading();
                 loading.start();
             }
             else{
-//                documentData.stopLoading();
                 loading.stop();
             }
         }

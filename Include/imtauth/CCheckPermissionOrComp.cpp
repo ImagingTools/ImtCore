@@ -5,6 +5,10 @@ namespace imtauth
 {
 
 
+// public methods
+
+// reimplemented (imtauth::IPermissionChecker)
+
 bool CCheckPermissionOrComp::CheckPermission(const IUserInfo::FeatureIds &userPermissions, const QByteArrayList &permissionIds)
 {
 	for (const QByteArray& permissionId : permissionIds){
@@ -18,3 +22,5 @@ bool CCheckPermissionOrComp::CheckPermission(const IUserInfo::FeatureIds &userPe
 
 
 } // namespace imtauth
+
+

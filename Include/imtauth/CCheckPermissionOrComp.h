@@ -12,8 +12,8 @@ namespace imtauth
 
 
 class CCheckPermissionOrComp:
-		public icomp::CComponentBase,
-		virtual public imtauth::IPermissionChecker
+			public icomp::CComponentBase,
+			virtual public imtauth::IPermissionChecker
 {
 
 public:

@@ -145,7 +145,7 @@ Item {
             textCentered: false;
 
             onCurrentIndexChanged: {
-                console.log("onCurrentIndexChanged", itemData.Interval);
+                console.log("onCurrentIndexChanged", root.itemData.Interval);
                 if (comboBox.currentIndex >= 0){
                     let id = comboBox.model.GetData("Id", comboBox.currentIndex);
                     let secondsInHour = 3600;
@@ -161,18 +161,18 @@ Item {
                         newInterval = 24 * secondsInHour * 30;
                     }
 
-                    console.log("itemData.Interval", itemData.Interval);
+                    console.log("itemData.Interval", root.itemData.Interval);
                     console.log("newInterval", newInterval);
 
-                    if (newInterval !== -1 && itemData.Interval !== newInterval){
+                    if (newInterval !== -1 && root.itemData.Interval !== newInterval){
                         console.log("itemData.Interval = ", newInterval);
-                        itemData.Interval = newInterval;
+                        root.itemData.Interval = newInterval;
                     }
                 }
             }
 
             onModelChanged: {
-                let seconds = Number(itemData.Interval);
+                let seconds = Number(root.itemData.Interval);
                 console.log("seconds", seconds);
                 var d = Math.floor(seconds / (3600*24));
                 console.log("d", d);

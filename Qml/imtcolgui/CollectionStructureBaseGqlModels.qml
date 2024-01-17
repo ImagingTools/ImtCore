@@ -140,7 +140,7 @@ QtObject {
                         if (dataModelLocal.ContainsKey("items")){
                             let items = dataModelLocal.GetData("items");
                             let selectIndex = dataModelLocal.GetData("selectIndex");
-                            itemsReceived(selectIndex, items)
+                            gqlModelBaseContainer.itemsReceived(selectIndex, items)
 
                             // Events.sendEvent(gqlModelBaseContainer.commandId + "StructureUpdated");
                         }

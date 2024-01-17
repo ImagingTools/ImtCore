@@ -219,7 +219,7 @@ DocumentData {
             multiPageView.addPage("General", "General", roleEditorComp);
             multiPageView.addPage("Permissions", "Permissions", rolePermissionsComp);
 
-            multiPageView.selectedIndex = 0;
+            multiPageView.currentIndex = 0;
         }
     }
 }

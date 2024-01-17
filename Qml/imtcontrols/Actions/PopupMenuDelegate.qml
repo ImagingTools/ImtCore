@@ -16,9 +16,16 @@ Item {
     property bool textCentered: false;
 
     property bool selected: !rootItem ? false : rootItem.selectedIndex == model.index ;
-    property bool isSeparator: model.Id == "Separator";
+    property bool isSeparator: model.Id == "";
 
     signal clicked(string commandId, int index);
+
+    onHeightChanged: {
+        console.log("onHeightChanged", model.Id, height)
+        if (isSeparator){
+            popupMenuDelegate.height = 5;
+        }
+    }
 
     onIsSeparatorChanged: {
         console.log("onIsSeparatorChanged", isSeparator);
@@ -45,12 +52,11 @@ Item {
         anchors.rightMargin: 5;
         anchors.verticalCenter: parent.verticalCenter;
 
-//        width: parent.width;
         height: 1;
 
         color: popupMenuDelegate.fontColor;
 
-        visible: isSeparator;
+        visible: popupMenuDelegate.isSeparator;
     }
 
     Rectangle {

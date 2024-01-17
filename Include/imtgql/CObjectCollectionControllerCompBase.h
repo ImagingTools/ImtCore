@@ -22,11 +22,11 @@ namespace imtgql
 
 
 class CObjectCollectionControllerCompBase:
-			public imtgql::CPermissibleGqlRequestHandlerComp,
-			public imtgql::IGqlRequestExtractor
+			public imtgql::IGqlRequestExtractor,
+			public imtgql::CPermissibleGqlRequestHandlerComp
 {
 public:
-	typedef imtgql::CGqlRequestHandlerCompBase BaseClass;
+	typedef imtgql::CPermissibleGqlRequestHandlerComp BaseClass;
 
 	I_BEGIN_COMPONENT(CObjectCollectionControllerCompBase);
 		I_REGISTER_INTERFACE(imtgql::IGqlRequestExtractor)

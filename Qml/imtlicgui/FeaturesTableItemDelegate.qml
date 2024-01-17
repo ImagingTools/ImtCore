@@ -37,7 +37,7 @@ Item {
         width: parent.width;
         height: tableItemDelegate.itemHeight;
 
-        color: tableItemDelegate.modelIndex.equal(tableTreeView.selectedIndex) ? Style.selectedColor : "transparent";
+//        color: tableItemDelegate.modelIndex.equal(tableTreeView.selectedIndex) ? Style.selectedColor : "transparent";
 
         MouseArea {
             id: rowMouseArea;
@@ -176,7 +176,7 @@ Item {
         Repeater {
             id: childModelRepeater;
 
-            delegate: tableTreeView.delegateComp;
+//            delegate: tableTreeView.delegateComp;
 
             onItemAdded: {
 

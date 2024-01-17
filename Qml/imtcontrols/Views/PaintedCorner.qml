@@ -40,7 +40,7 @@ Rectangle {
 
             //            ctx.arcTo(0, canvas.height, canvas.width, 0, 5);
 
-            ctx.arc(canvas.width,  0,  r, 0, 90*Math.PI/180, true);
+            ctx.arc(canvas.width,  0,  paintedCorner.r, 0, 90*Math.PI/180, true);
             //                ctx.strokeStyle = canvas.strokeStyle;
             ctx.lineTo(0, canvas.height);
             ctx.lineTo(0, 0);

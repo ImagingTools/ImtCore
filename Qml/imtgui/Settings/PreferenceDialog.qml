@@ -12,7 +12,7 @@ Dialog {
 
     notClosingButtons: Enums.ButtonType.Apply;
 
-    topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
+//    topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
 
     buttonsModel: ListModel{
         ListElement{Id: Enums.ButtonType.Apply; Name:qsTr("Apply"); Enabled: false}

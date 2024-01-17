@@ -236,7 +236,7 @@ Item {
             anchors.rightMargin: 5;
             anchors.bottom: parent.bottom;
 
-            width: hasFilter ? 35 : 10;
+            width: collectionViewBaseContainer.hasFilter ? 35 : 10;
 
             visible: tableInternal.width > 0;
 
@@ -248,7 +248,7 @@ Item {
                 width: parent.width;
                 height: tableInternal.headerHeight;
 
-                Button {
+                ToolButton {
                     id: iconFilter;
 
                     anchors.centerIn: parent;
@@ -257,15 +257,6 @@ Item {
                     height: width;
 
                     visible: collectionViewBaseContainer.hasFilter;
-
-                    decorator: Component {
-                        id: buttonDecorator;
-
-                        ButtonDecorator {
-                            color: "transparent";
-                            border.width: 0;
-                        }
-                    }
 
                     iconSource: "../../../" + Style.getIconPath("Icons/Filter", Icon.State.On, Icon.Mode.Normal);
 

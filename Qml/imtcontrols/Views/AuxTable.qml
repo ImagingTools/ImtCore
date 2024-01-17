@@ -587,8 +587,8 @@ Rectangle {
             spacing: 0;
             model: tableContainer.headers;
             boundsBehavior: Flickable.StopAtBounds;
-            contentX: elementsList.contentX;
-            contentWidth: elementsList.contentWidth;
+            contentX: tableContainer.elementsList.contentX;
+            contentWidth: tableContainer.elementsList.contentWidth;
             interactive: false;
             cacheBuffer: Math.max(contentWidth, tableContainer.width, 0);
             property bool compl: false;

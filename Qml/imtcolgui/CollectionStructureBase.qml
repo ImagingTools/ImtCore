@@ -174,10 +174,6 @@ Item {
                     height: width;
 
                     visible: collectionStructureBaseContainer.hasFilter;
-                    highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
-
-                    iconWidth: Style.iconSizeSmall;
-                    iconHeight: iconWidth;
 
                     iconSource: "../../../" + Style.getIconPath("Icons/Filter", Icon.State.On, Icon.Mode.Normal);
 

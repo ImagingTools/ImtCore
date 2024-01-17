@@ -74,16 +74,6 @@ Item {
         anchors.fill: parent;
 
         color: Style.backgroundColor;
-        Loader{
-            id: backgroundDecoratorLoader;
-
-            sourceComponent: Style.backGroundDecorator !==undefined ? Style.backGroundDecorator: emptyDecorator;
-            onLoaded: {
-                if(backgroundDecoratorLoader.item){
-                    backgroundDecoratorLoader.item.rootItem = background;
-                }
-            }
-        }
 
         //
         Item{
@@ -91,13 +81,6 @@ Item {
 
             width: userEditorContainer.panelWidth;
             height: bodyColumn.height + 2*bodyColumn.anchors.topMargin;
-            Loader{
-                id: mainPanelFrameLoader;
-
-                anchors.fill: parent;
-
-                sourceComponent: Style.frame !==undefined ? Style.frame: emptyDecorator;
-            }//Loader
 
             Column {
                 id: bodyColumn;
@@ -127,17 +110,6 @@ Item {
                     font.pixelSize: Style.fontSize_common;
 
                     text: qsTr("Username");
-
-                    Loader{
-                        id: titleDecoratorLoader1;
-
-                        sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
-                        onLoaded: {
-                            if(titleDecoratorLoader1.item){
-                                titleDecoratorLoader1.item.rootItem = titleUsername;
-                            }
-                        }
-                    }
                 }
 
                 CustomTextField {
@@ -160,41 +132,18 @@ Item {
                     }
 
                     KeyNavigation.tab: passwordInput;
-
-                    Loader{
-                        id: inputDecoratorLoader1;
-
-                        sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-                        onLoaded: {
-                            if(inputDecoratorLoader1.item){
-                                inputDecoratorLoader1.item.rootItem = usernameInput;
-                            }
-                        }
-                    }
                 }
 
                 Text {
                     id: titlePassword;
 
                     anchors.left: parent.left;
-//                    anchors.leftMargin: 5;
 
                     color: Style.textColor;
                     font.family: Style.fontFamily;
                     font.pixelSize: Style.fontSize_common;
 
                     text: qsTr("Password");
-
-                    Loader{
-                        id: titleDecoratorLoader2;
-
-                        sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
-                        onLoaded: {
-                            if(titleDecoratorLoader2.item){
-                                titleDecoratorLoader2.item.rootItem = titlePassword;
-                            }
-                        }
-                    }
                 }
 
                 CustomTextField {
@@ -218,17 +167,6 @@ Item {
                     }
 
                     KeyNavigation.tab: nameInput;
-
-                    Loader{
-                        id: inputDecoratorLoader2;
-
-                        sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-                        onLoaded: {
-                            if(inputDecoratorLoader2.item){
-                                inputDecoratorLoader2.item.rootItem = passwordInput;
-                            }
-                        }
-                    }
                 }
 
                 Text {
@@ -264,17 +202,6 @@ Item {
                     }
 
                     KeyNavigation.tab: mailInput;
-
-                    Loader{
-                        id: inputDecoratorLoader3;
-
-                        sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-                        onLoaded: {
-                            if(inputDecoratorLoader3.item && inputDecoratorLoader3.item.rootItem){
-                                inputDecoratorLoader3.item.rootItem = nameInput;
-                            }
-                        }
-                    }
                 }
 
                 Text {
@@ -288,17 +215,6 @@ Item {
                     font.pixelSize: Style.fontSize_common;
 
                     text: qsTr("Email address");
-
-                    Loader{
-                        id: titleDecoratorLoader4;
-
-                        sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
-                        onLoaded: {
-                            if(titleDecoratorLoader4.item){
-                                titleDecoratorLoader4.item.rootItem = titleMail;
-                            }
-                        }
-                    }
                 }
 
                 RegularExpressionValidator {
@@ -324,17 +240,6 @@ Item {
                     }
 
                     KeyNavigation.tab: usernameInput;
-
-                    Loader{
-                        id: inputDecoratorLoader4;
-
-                        sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-                        onLoaded: {
-                            if(inputDecoratorLoader4.item){
-                                inputDecoratorLoader4.item.rootItem = mailInput;
-                            }
-                        }
-                    }
                 }
             }//Column bodyColumn
         }//columnContainer

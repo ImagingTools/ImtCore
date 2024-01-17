@@ -47,7 +47,7 @@ CollectionView {
     onElementsChanged: {
         if (elementsList.model.ContainsKey("Roles")){
             let elementsModel = elementsList.model.GetData("Roles");
-            baseCollectionView.table.tableSelection.countElements = elementsModel.GetItemsCount();
+            roleCollectionViewContainer.baseCollectionView.table.tableSelection.countElements = elementsModel.GetItemsCount();
         }
     }
 
@@ -109,7 +109,7 @@ CollectionView {
 
         RoleView {
             Component.onCompleted: {
-                let elements = baseCollectionView.table.elements;
+                let elements = roleCollectionViewContainer.baseCollectionView.table.elements;
                 productId = elements.GetData("Id")
             }
         }

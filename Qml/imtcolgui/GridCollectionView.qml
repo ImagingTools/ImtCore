@@ -93,8 +93,6 @@ Item {
 //    }
 
     onCommandsIdChanged: {
-        console.log("this onItemIdChanged", itemId, commandsId);
-
         commandsProvider.commandId = commandsId;
         commandsProvider.uuid = commandsId;
 
@@ -210,7 +208,7 @@ Item {
 
         onSelectedItem: {
             console.log("gridCollectionViewBase onItemSelected");
-            selectItem(id, name);
+            gridCollectionViewContainer.selectItem(id, name);
         }
     }
 

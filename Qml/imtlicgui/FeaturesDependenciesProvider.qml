@@ -6,11 +6,6 @@ QtObject {
 
     property TreeItemModel model: TreeItemModel {};
 
-    // Update feature dependencies model.
-    function updateModel(){
-        dependenciesModel.updateModel();
-    }
-
     // Get all dependencies together with children elements.
     function getAllDependencies(featureId){
         let result = [];
@@ -25,7 +20,7 @@ QtObject {
         let result = [];
 
         if (provider.model.ContainsKey(featureId)){
-            let dependencies = dependenciesModel.GetData(featureId);
+            let dependencies = provider.model.GetData(featureId);
             result =  dependencies.split(';');
         }
 

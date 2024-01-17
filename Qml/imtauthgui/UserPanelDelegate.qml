@@ -37,8 +37,8 @@ Item {
 
             onFinished: {
                 if (buttonId == Enums.ButtonType.Ok){
-                    cacheData.login = login;
-                    cacheData.password = this.password;
+                    userPanelDelegate.cacheData.login = this.login;
+                    userPanelDelegate.cacheData.password = this.password;
 
                     userPanelDelegate.userModel.SetData("Password", this.password)
                     userPanelDelegate.userModel.SetData("Username", login)

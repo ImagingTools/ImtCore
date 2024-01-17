@@ -232,7 +232,7 @@ DocumentData {
             multiPageView.addPage("Roles", "Roles", userRolesComp);
             multiPageView.addPage("Groups", "Groups", userGroupsComp);
 
-            multiPageView.selectedIndex = 0;
+            multiPageView.currentIndex = 0;
         }
     }
 }

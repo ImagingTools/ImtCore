@@ -12,8 +12,6 @@ Dialog {
 
     title: qsTr("Message");
 
-    topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
-
     property string message;
     property int contentWidth: 300;
 
@@ -34,26 +32,8 @@ Dialog {
 
     contentComp: Component {
         MessageDialogBody {
-            width: messageDialog.contentWidth;
+            width: messageDialog.width;
             message: messageDialog.message;
-        }
-    }
-
-    Component{
-        id: emptyDecorator;
-        Item{
-            property Item rootItem: null;
-        }
-    }
-
-    Loader{
-        id: messageDecoratorLoader;
-
-        sourceComponent: Style.messageDecorator !==undefined ? Style.messageDecorator: emptyDecorator;
-        onLoaded: {
-            if(messageDecoratorLoader.item){
-                messageDecoratorLoader.item.rootItem = messageDialog;
-            }
         }
     }
 }

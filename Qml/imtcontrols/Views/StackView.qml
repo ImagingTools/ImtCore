@@ -40,7 +40,7 @@ Item {
 
         anchors.fill: parent;
 
-        model: pagesModel;
+        model: container.pagesModel;
 
         delegate: Loader {
             id: dialogLoader;
@@ -52,7 +52,7 @@ Item {
             onLoaded: {
                 console.log("StackView onLoaded", item);
 
-                container.itemAdded(pagesModel.count - 1, item);
+                container.itemAdded(container.pagesModel.count - 1, item);
             }
 
             onStatusChanged: {

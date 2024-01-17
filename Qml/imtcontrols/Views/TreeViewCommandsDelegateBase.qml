@@ -8,24 +8,22 @@ Item {
     property TreeItemModel treeViewModel;
 
 
-    property int selectedCount: table.selectedElements.count;
+    property int selectedCount;
 
     signal commandActivated(string commandId);
 
     Component.onCompleted: {
-        Events.subscribeEvent(treeViewContainer.commandsId + "CommandActivated", treeViewDelegate.commandHandle);
+//        Events.subscribeEvent(treeViewContainer.commandsId + "CommandActivated", treeViewDelegate.commandHandle);
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent(treeViewContainer.commandsId + "CommandActivated", treeViewDelegate.commandHandle)
+//        Events.unSubscribeEvent(treeViewContainer.commandsId + "CommandActivated", treeViewDelegate.commandHandle)
     }
 
     onSelectedCountChanged: {
         console.log("onSelectedCountChanged", treeViewDelegate.selectedCount);
         let isEnabled = treeViewDelegate.selectedCount > 0;
 
-        commandsProvider.setCommandIsEnabled("New", isEnabled);
-        commandsProvider.setCommandIsEnabled("Remove", isEnabled);
     }
 
     function insertNewItem(model){

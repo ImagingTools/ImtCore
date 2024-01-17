@@ -313,7 +313,7 @@ StyleComponents {
         }
 
         if (sourceDecorators.toolButtonDecorator){
-            styleContainer.toolButtonDecorator = sourceDecorators.itemDelegateDecorator
+            styleContainer.toolButtonDecorator = sourceDecorators.toolButtonDecorator
         }
     }
 

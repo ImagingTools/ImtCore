@@ -147,24 +147,4 @@ Dialog {
             }
         }
     } }
-
-    Component{
-        id: emptyDecorator;
-        Item{
-            property Item rootItem: null;
-        }
-    }
-
-    Loader{
-        id: messageDecoratorLoader;
-
-        sourceComponent: Style.messageDecorator !==undefined ? Style.messageDecorator: emptyDecorator;
-        onLoaded: {
-            if(messageDecoratorLoader.item){
-                messageDecoratorLoader.item.rootItem = rootDialog;
-            }
-
-            rootDialog.width = 500;
-        }
-    }
 }

@@ -112,11 +112,11 @@ ControlBase {
                     onClicked: {
                         subPagesColumn.currentIndex = model.index;
 
-                        console.log("pagesManager.activeItem", pagesManager.activeItem);
-                        pagesManager.activeItem.startPageObj = {"Id": model.PageId,
-                            "Name": model.Name,
-                            "Source": model.StartItem,
-                            "CommandId": model.PageId};
+//                        console.log("pagesManager.activeItem", pagesManager.activeItem);
+//                        pagesManager.activeItem.startPageObj = {"Id": model.PageId,
+//                            "Name": model.Name,
+//                            "Source": model.StartItem,
+//                            "CommandId": model.PageId};
                     }
                 }
             }

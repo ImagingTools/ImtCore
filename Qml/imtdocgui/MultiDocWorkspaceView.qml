@@ -165,7 +165,7 @@ DocumentManager {
                 onStatusChanged: {
                     console.log("Document onStatusChanged", documentLoader.status);
                     if (status === Loader.Error){
-                        console.error("Document loading was failed", modelData);
+                        console.error("Document loading was failed");
                     }
                 }
 

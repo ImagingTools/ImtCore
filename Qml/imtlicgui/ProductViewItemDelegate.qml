@@ -68,7 +68,7 @@ TreeViewItemDelegateBase {
                     //                    visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
 
                     onClicked: {
-                        mouseArea.clicked(null);
+//                        mouseArea.clicked(null);
                     }
 
                     onDoubleClicked: {
@@ -149,7 +149,7 @@ TreeViewItemDelegateBase {
                         //                        visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && model.Level == 0 : false;
 
                         onClicked: {
-                            mouseArea.clicked(null);
+//                            mouseArea.clicked(null);
                         }
 
                         onDoubleClicked: {
@@ -230,7 +230,7 @@ TreeViewItemDelegateBase {
                         visible: productTreeItemDelegate.root ? !productTreeItemDelegate.root.readOnly && productTreeItemDelegate.level == 0 : false;
 
                         onClicked: {
-                            mouseArea.clicked(null);
+//                            mouseArea.clicked(null);
                         }
 
                         onDoubleClicked: {

@@ -94,7 +94,7 @@ CollectionView {
                 elide: Text.ElideRight;
             }
 
-            Button {
+            ToolButton {
                 id: arrowButton;
 
                 anchors.verticalCenter: parent.verticalCenter;
@@ -108,17 +108,6 @@ CollectionView {
 
                 onClicked: {
                     console.log("Roles Button onClicked");
-                }
-
-                Component.onCompleted: {
-//                    arrowButton.tooltipItem.componentWidth = 300;
-//                    arrowButton.tooltipItem.horizontalAlignment = Text.AlignLeft;
-//                    arrowButton.tooltipItem.lineHeight = 1;
-                }
-
-                decorator: ButtonDecorator {
-                    color: parent.hovered ? Style.buttonHoverColor : "transparent";
-                    border.width: 0;
                 }
             }
         }
@@ -174,7 +163,7 @@ CollectionView {
                 elide: Text.ElideRight;
             }
 
-            Button {
+            ToolButton {
                 id: arrowButton;
 
                 anchors.verticalCenter: parent.verticalCenter;
@@ -187,17 +176,6 @@ CollectionView {
                 visible: name2.text !== "";
 
                 iconSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
-
-                Component.onCompleted: {
-//                    arrowButton.tooltipItem.componentWidth = 300;
-//                    arrowButton.tooltipItem.horizontalAlignment = Text.AlignLeft;
-//                    arrowButton.tooltipItem.lineHeight = 1;
-                }
-
-                decorator: ButtonDecorator {
-                    color: parent.hovered ? Style.buttonHoverColor : "transparent";
-                    border.width: 0;
-                }
             }
         }
     }

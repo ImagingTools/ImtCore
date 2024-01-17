@@ -100,7 +100,7 @@ Rectangle {
         }
 
         onMovementEnded: {
-            var centralIndex = listView.indexAt(listView.contentX+1,listView.contentY+itemHeight+itemHeight/2)
+            var centralIndex = listView.indexAt(listView.contentX+1,listView.contentY+root.itemHeight+root.itemHeight/2)
             root.gotoIndex(centralIndex)
         }
     }

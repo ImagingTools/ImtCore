@@ -298,7 +298,7 @@ Rectangle {
                     }
                 }
 
-                Button {
+                ToolButton {
                     id: eyeButton;
 
                     anchors.verticalCenter: parent.verticalCenter;
@@ -317,15 +317,6 @@ Rectangle {
                         }
                         else if(passwordTextInput.echoMode == TextInput.Normal){
                             passwordTextInput.echoMode = TextInput.Password;
-                        }
-                    }
-
-                    decorator: Component {
-                        id: buttonDecorator;
-
-                        ButtonDecorator {
-                            color: loginButton.hovered ? Style.buttonHoverColor : "transparent";
-                            border.width: 0;
                         }
                     }
                 }

@@ -70,7 +70,7 @@ Item {
         text: root.username;
     }
 
-    Button {
+    ToolButton {
         id: loginButton;
 
         anchors.right: parent ? parent.right : undefined;
@@ -82,17 +82,6 @@ Item {
         iconSource: "../../../" + Style.getIconPath("Icons/Account", Icon.State.On, Icon.Mode.Normal);
 
         enabled: root.enabled;
-
-        decorator: Component {
-            id: buttonDecorator;
-
-            ButtonDecorator {
-                color: loginButton.hovered ? Style.buttonHoverColor : "transparent";
-                border.width: 0;
-
-                icon.width: 20;
-            }
-        }
 
         onClicked: {
             if(root.isExitButton){
@@ -139,7 +128,7 @@ Item {
         function fillModel(){
             contextMenuModel.clear();
             contextMenuModel.append({"Id": "ChangePassword", "Name": qsTr("Change Password"), "IconSource": ""});
-            contextMenuModel.append({"Id": "Separator", "Name": "", "IconSource": ""});
+            contextMenuModel.append({"Id": "", "Name": "", "IconSource": ""});
             contextMenuModel.append({"Id": "Logout", "Name": qsTr("Logout"), "IconSource": ""});
         }
     }

@@ -147,7 +147,7 @@ Item {
 
             backgroundColor: Style.baseColor;
 
-            secondSize: !visibleScrollBar ? 0 : Style.isMobile == undefined ? 10 : Style.isMobile ? 4 : 10;
+            secondSize: !popupMenuContainer.visibleScrollBar ? 0 : Style.isMobile == undefined ? 10 : Style.isMobile ? 4 : 10;
             targetItem: popupMenuListView;
             canFade: Style.isMobile == undefined ? false : Style.isMobile;
         }
@@ -164,7 +164,6 @@ Item {
             delegate: popupMenuContainer.delegate;
 
             cacheBuffer: count * popupMenuContainer.itemHeight;
-//            cacheBuffer: 999999999;
         }//ListView
 
         MouseArea{
@@ -227,10 +226,10 @@ Item {
         sequence: "Escape";
         enabled: true;
         onActivated: {
-            if (rootItem){
-                popupMenuContainer.finished('', rootItem.currentIndex);
+            if (popupMenuContainer.rootItem){
+                popupMenuContainer.finished('', popupMenuContainer.rootItem.currentIndex);
             }
-            root.closeDialog();
+            popupMenuContainer.root.closeDialog();
         }
     }
 

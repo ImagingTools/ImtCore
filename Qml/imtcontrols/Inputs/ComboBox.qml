@@ -227,7 +227,7 @@ ControlBase {
         sequence: "Space";
         enabled: !comboBoxContainer.isOpen && comboBoxContainer.focus;
         onActivated: {
-            openPopupMenu();
+            comboBoxContainer.openPopupMenu();
         }
     }
 

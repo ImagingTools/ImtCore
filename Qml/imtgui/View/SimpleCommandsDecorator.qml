@@ -52,7 +52,7 @@ Item {
             Repeater {
                 id: repeater;
 
-                delegate: Button {
+                delegate: ToolButton {
                     width: 18;
                     height: width;
 
@@ -67,11 +67,6 @@ Item {
 
                     onClicked: {
                         container.commandActivated(model.Id);
-                    }
-
-                    decorator: ButtonDecorator {
-                        color: parent.hovered ? Style.buttonHoverColor : "transparent";
-                        border.width: 0;
                     }
                 }
 

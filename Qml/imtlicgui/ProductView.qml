@@ -30,7 +30,7 @@ DocumentData {
     function onFeaturesChanged(){
         productViewContainer.allFeaturesModel = FeaturesProvider.model;
 
-        availableFeaturesTable.elements = productViewContainer.allFeaturesModel;
+//        availableFeaturesTable.elements = productViewContainer.allFeaturesModel;
 
         productViewContainer.updateFeaturesGui();
     }
@@ -306,9 +306,9 @@ DocumentData {
                 isCheckable: model.Optional ? model.Optional : false;
 
                 onRootDelegateChanged: {
-                    if (rootDelegate !== null){
+                    if (delegate.rootDelegate !== null){
                         let featureId = model.FeatureId;
-                        let rootFeatureUuid = rootDelegate.itemData.Id;
+                        let rootFeatureUuid = delegate.rootDelegate.itemData.Id;
 
                         let id = rootFeatureUuid + "/" + featureId;
 
@@ -318,9 +318,12 @@ DocumentData {
                     }
                 }
 
+
+
+
                 onCheckStateChanged: {
                     let featureId = model.FeatureId;
-                    let rootFeatureUuid = rootDelegate.itemData.Id;
+                    let rootFeatureUuid = delegate.rootDelegate.itemData.Id;
 
                     let id = rootFeatureUuid + "/" + featureId;
 

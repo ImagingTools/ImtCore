@@ -45,7 +45,7 @@ Item {
         //console.log("__________ELEMENTS_COUNT____________",elementsCount);
     }
 
-    property bool ready: root && rootItem && gettedParams && filterIdsModel && properties;
+    property bool ready: popupMenuContainer.root && rootItem && gettedParams && filterIdsModel && properties;
 
     // ID for display in combo box delegates
     property string nameId: "Name";
@@ -399,7 +399,7 @@ Item {
         sequence: "Escape";
         enabled: true;
         onActivated: {
-            root.closeDialog();
+            popupMenuContainer.root.closeDialog();
         }
     }
 

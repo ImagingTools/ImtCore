@@ -58,13 +58,13 @@ DocumentWorkspaceCommandsDelegateBase {
     property Component featuresDialogComp: Component {
         FeaturesDialog {
             onFinished: {
-                if (selectedIndexes.length > 0){
-                    let index = selectedIndexes[0];
+                if (this.selectedIndexes.length > 0){
+                    let index = this.selectedIndexes[0];
 
                     let featureId = tableModel.GetData("Id", index);
 
-                    documentPtr.addFeature(featureId);
-                    documentPtr.updateFeaturesGui();
+                    container.documentPtr.addFeature(featureId);
+                    container.documentPtr.updateFeaturesGui();
                 }
             }
         }

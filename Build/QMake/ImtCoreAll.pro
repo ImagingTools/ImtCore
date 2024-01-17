@@ -110,6 +110,9 @@ imthttp.file = ../../Include/imthttp/QMake/imthttp.pro
 SUBDIRS += imtqml
 imtqml.file = ../../Include/imtqml/QMake/imtqml.pro
 
+SUBDIRS += imtstylecontrolsqml
+imtstylecontrolsqml.file = ../../Include/imtstylecontrolsqml/QMake/imtstylecontrolsqml.pro
+
 SUBDIRS += imtcontrols
 imtcontrols.file = ../../Include/imtcontrols/QMake/imtcontrols.pro
 

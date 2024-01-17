@@ -101,42 +101,62 @@ Rectangle {
             anchors.fill: parent;
             anchors.topMargin: Style.size_mainMargin;
 
-            property int selectedIndex: -1;
+            property alias selectedIndex: mainPanelRepeater.currentIndex;
 
             spacing: Style.size_mainMargin;
 
-            Repeater {
+            ListView {
                 id: mainPanelRepeater;
 
-                delegate:
-                    Button{
+                anchors.left: parent.left;
+                anchors.leftMargin: Style.size_mainMargin;
+                anchors.right: parent.right;
+                anchors.rightMargin: Style.size_mainMargin;
 
-                    id: buttonContainer;
+                height: contentHeight;
 
-                    anchors.left: parent.left;
-                    anchors.leftMargin: Style.size_mainMargin;
-                    anchors.right: parent.right;
-                    anchors.rightMargin: Style.size_mainMargin;
+                spacing: Style.size_mainMargin;
 
-                    // decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
-
-                    // selected: mainPanel.selectedIndex === model.index;
-                    focus: mainPanel.selectedIndex === model.index;
+                delegate: ItemDelegate {
                     text: model.Name;
 
-                    Component.onCompleted: {
-                        if (model.index === 0){
-                            clicked();
-                        }
-                    }
+                    highlighted: mainPanelRepeater.currentIndex == model.index;
 
                     onClicked: {
-                        if (mainPanel.selectedIndex !== model.index){
-                            bodyPanelRepeater.model = model.Parameters;
-                            mainPanel.selectedIndex = model.index;
-                        }
+                        mainPanelRepeater.currentIndex = model.index;
+                        bodyPanelRepeater.model = model.Parameters;
                     }
-                }//delegate
+                }
+
+//                delegate:
+//                    Button{
+
+//                    id: buttonContainer;
+
+//                    anchors.left: parent.left;
+//                    anchors.leftMargin: Style.size_mainMargin;
+//                    anchors.right: parent.right;
+//                    anchors.rightMargin: Style.size_mainMargin;
+
+//                    // decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
+
+//                    // selected: mainPanel.selectedIndex === model.index;
+//                    focus: mainPanel.selectedIndex === model.index;
+//                    text: model.Name;
+
+//                    Component.onCompleted: {
+//                        if (model.index === 0){
+//                            clicked();
+//                        }
+//                    }
+
+//                    onClicked: {
+//                        if (mainPanel.selectedIndex !== model.index){
+//                            bodyPanelRepeater.model = model.Parameters;
+//                            mainPanel.selectedIndex = model.index;
+//                        }
+//                    }
+//                }//delegate
             }
 
             onSelectedIndexChanged: {}

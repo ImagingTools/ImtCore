@@ -1,7 +1,8 @@
 import QtQuick 2.0
 import Acf 1.0
-import QtQuick.Dialogs 1.3
+//import QtQuick.Dialogs 1.3
 import imtcontrols 1.0
+import Qt.labs.platform 1.1
 
 Item {
     id: root;
@@ -20,7 +21,7 @@ Item {
     }
 
     Component.onCompleted: {
-        fileDialog.setFolder('file:///' + model.Path)
+        fileDialog.currentFolder = model.Path;
     }
 
     Item {
@@ -49,35 +50,20 @@ Item {
 
             text: "Browse...";
 
-//            decorator: defaultButtonDecorator;
-
             onClicked: {
                 fileDialog.open();
             }
         }
-
-        Component{
-            id: defaultButtonDecorator;
-
-            CommonButtonDecorator{
-            }
-        }
     }
 
-    FileDialog {
-        id: fileDialog;
+//    FolderDialog {
+//        id: fileDialog;
 
-        title: qsTr("Select folder");
-        selectExisting: false;
-        folder: shortcuts.home;
-
-        selectFolder: true;
-
-        onAccepted: {
-            var pathDir = fileDialog.fileUrl.toString();
-            console.log("fileUrl", fileDialog.fileUrl);
-            pathDir = pathDir.replace('file:///', '')
-            root.path = pathDir;
-        }
-    }
+//        onAccepted: {
+//            var pathDir = fileDialog.folder.toString();
+//            console.log("fileUrl", fileDialog.folder);
+//            pathDir = pathDir.replace('file:///', '')
+//            root.path = pathDir;
+//        }
+//    }
 }

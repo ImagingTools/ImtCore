@@ -5,7 +5,7 @@ import imtcontrols 1.0
 Item {
     property alias iconSource: preferenceButton.iconSource;
 
-    Button {
+    ToolButton {
         id: preferenceButton;
 
         anchors.verticalCenter: parent ? parent.verticalCenter : undefined;
@@ -15,16 +15,16 @@ Item {
 
         iconSource: "../../../" + Style.getIconPath("Icons/Settings", "On", "Normal");
 
-        decorator: Component {
-            id: buttonDecorator;
+//        decorator: Component {
+//            id: buttonDecorator;
 
-            ButtonDecorator {
-                color: preferenceButton.hovered ? Style.buttonHoverColor : "transparent";
-                border.width: 0;
+//            ButtonDecorator {
+//                color: preferenceButton.hovered ? Style.buttonHoverColor : "transparent";
+//                border.width: 0;
 
-                icon.width: 20;
-            }
-        }
+//                icon.width: 20;
+//            }
+//        }
 
         onClicked: {
             console.log("Preference button clicked !");

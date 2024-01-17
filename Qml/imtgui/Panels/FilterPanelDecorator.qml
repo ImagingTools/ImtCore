@@ -56,7 +56,7 @@ Item {
             }
         }
 
-        Button {
+        ToolButton {
             id: iconClear;
 
             anchors.right: parent.right;
@@ -68,15 +68,6 @@ Item {
 
             visible: tfc.text != "";
 
-            decorator: Component {
-                ButtonDecorator {
-                    width: 10;
-
-                    color: "transparent";
-                    border.width: 0;
-                }
-            }
-
             iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
             onClicked: {
@@ -85,7 +76,7 @@ Item {
         }
     }
 
-    Button {
+    ToolButton {
         id: closeButton;
 
         anchors.verticalCenter: parent.verticalCenter;
@@ -93,13 +84,6 @@ Item {
 
         width: Style.buttonWidthMedium;
         height: width;
-
-        decorator: Component {
-            ButtonDecorator {
-                color: "transparent";
-                border.width: 0;
-            }
-        }
 
         iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 

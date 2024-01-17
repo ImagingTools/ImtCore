@@ -9,7 +9,7 @@ Dialog {
         ListElement{Id: Enums.ButtonType.Ok; Name:qsTr("OK"); Enabled: true}
     }
 
-    width: 500;
+//    width: 500;
 
     property string documentTypeId: "";
     property string documentId: "";
@@ -22,7 +22,7 @@ Dialog {
         id: productPairEditor;
 
         DocumentHistoryView {
-            width: documentHistoryDialog.width;
+            width: 500;
             height: 500;
         }
     }

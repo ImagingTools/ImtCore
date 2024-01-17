@@ -243,7 +243,7 @@ ControlBase {
 
         duration: 200;
         onFinished: {
-            closeTooltip();
+            customTooltip.closeTooltip();
         }
     }
 
@@ -271,7 +271,7 @@ ControlBase {
                 closeAnim.start();
             }
             else{
-                closeTooltip();
+                customTooltip.closeTooltip();
             }
         }
     }

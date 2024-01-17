@@ -86,7 +86,7 @@ TreeItemDelegate {
                         model.State = Qt.Checked - model.State;
                     }
 
-                    treeView.itemsStateChanged(treeItemDelegate.itemData);
+//                    treeView.itemsStateChanged(treeItemDelegate.itemData);
 
                     //                treeView.childrenStateChanged(itemData, model.State);
                     //                treeView.parentStateChanged(itemData, model.State);

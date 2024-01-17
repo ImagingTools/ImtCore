@@ -7,6 +7,7 @@ Item {
     property string styleId: "StyleQt"
 
     property Component buttonDecorator: buttonDecoratorComp
+    property Component toolButtonDecorator: toolButtonDecoratorComp
     property Component roundButtonDecorator: roundButtonDecoratorComp
 
     property Component textFieldDecorator: textFieldDecoratorComp
@@ -28,7 +29,7 @@ Item {
     property Component busyIndicatorDecorator: busyIndicatorDecoratorComp
     property Component tooltipDecorator: tooltipDecoratorComp
     property Component scrollBarDecorator: scrollBarDecoratorComp
-
+    property Component itemDelegateDecorator: itemDelegateDecoratorComp
 
     Component {
         id: buttonDecoratorComp
@@ -60,6 +61,35 @@ Item {
         }
     }
 
+    Component{
+        id: toolButtonDecoratorComp;
+
+        ToolButton{
+            width: 160;
+            height: 40;
+            text: !baseElement ? "" : baseElement.text;
+            icon.source: !baseElement ? "" : baseElement.iconSource;
+            checkable: !baseElement ? false : baseElement.checkable;
+            checked: !baseElement ? false : !baseElement.checkable ? false : baseElement.checked;
+            highlighted: !baseElement ? false : baseElement.focus;
+
+            property var baseElement;
+            onClicked: {
+                if(baseElement){
+                    baseElement.clicked()
+                }
+            }
+
+            onToggled: {
+                if(checked){
+                    if(baseElement){
+                        baseElement.toggled()
+                    }
+                }
+            }
+        }
+    }
+
     Component {
         id: roundButtonDecoratorComp
 
@@ -78,6 +108,28 @@ Item {
                 }
             }
 
+        }
+    }
+
+    Component {
+        id: itemDelegateDecoratorComp;
+
+        ItemDelegate {
+            width: parent.width;
+            height: 30;
+
+            text: !baseElement ? "" : baseElement.text;
+            highlighted: !baseElement ? false : baseElement.highlighted;
+            checkable: !baseElement ? false : baseElement.checkable;
+            checked: !baseElement ? false : !baseElement.checkable ? false : baseElement.checked;
+            down: !baseElement ? false : baseElement.down;
+
+            property var baseElement;
+            onClicked: {
+                if(baseElement){
+                    baseElement.clicked()
+                }
+            }
         }
     }
 

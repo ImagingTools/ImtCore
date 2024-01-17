@@ -150,36 +150,6 @@ Item {
                         mainPanelRepeater.currentIndex = model.index;
                     }
                 }
-
-//                delegate:
-//                    Button{
-//                    id: buttonContainer;
-
-//                    anchors.left: parent.left;
-//                    anchors.leftMargin: root.mainMargin;
-//                    anchors.right: parent.right;
-//                    anchors.rightMargin: root.mainMargin;
-
-//                    text:  model.Name;
-
-//                    property bool selected: root.selectedIndex === model.index;
-
-//                    decorator: ButtonDecorator {
-//                        width: 160;
-//                        height: 30;
-
-//                        radius: 4;
-
-//                        border.width: 1;
-//                        border.color: buttonContainer.selected ? Style.borderFocusColor : "transparent";
-//                    }
-
-//                    onClicked: {
-//                        if (root.selectedIndex !== model.index){
-//                            root.selectedIndex = model.index;
-//                        }
-//                    }
-//                }
             }
         }
     }

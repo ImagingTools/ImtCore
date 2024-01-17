@@ -52,7 +52,7 @@ Item {
         width: parent.width;
         height: treeItemDelegate.itemHeight;
 
-        color: treeItemDelegate.modelIndex.equal(collectionView.selectedIndex) ? Style.selectedColor : "transparent";
+//        color: treeItemDelegate.modelIndex.equal(collectionView.selectedIndex) ? Style.selectedColor : "transparent";
 
         MouseArea {
             id: rowMouseArea;
@@ -361,7 +361,7 @@ Item {
         Repeater {
             id: childModelRepeater;
 
-            delegate: collectionView.delegateComp;
+//            delegate: collectionView.delegateComp;
 
             onItemAdded: {
                 item.modelIndex.parentIndex = treeItemDelegate.modelIndex;

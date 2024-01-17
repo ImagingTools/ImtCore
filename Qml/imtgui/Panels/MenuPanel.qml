@@ -127,7 +127,7 @@ Rectangle {
         delegate: MenuPanelButton {
             Component.onCompleted: {
                 if (model.index === 0 && menuPanel.activePageIndex === -1){
-                    clicked();
+                    this.clicked();
                 }
             }
 

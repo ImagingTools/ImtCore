@@ -128,7 +128,7 @@ Rectangle {
                     rootItem.clicked(id);
                 }
                 Component.onCompleted: {
-                    decorator.font.bold = true
+//                    decorator.font.bold = true
                 }
             }
 
@@ -351,6 +351,10 @@ Rectangle {
         duration: 200;
 
         onFinished: {
+            if (!buttonPanel.buttonModel){
+                return;
+            }
+
             if(buttonPanel.buttonModel.GetItemsCount() !== undefined && buttonPanel.buttonModel.GetItemsCount()){
                 buttonPanel.setModels();
             }
