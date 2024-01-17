@@ -49,7 +49,7 @@ class Text extends Item {
         super(parent,exCtx,exModel)
         
         this.setStyle({
-            display: 'flex',
+            // display: 'flex',
             textAlign: 'inherit',
             whiteSpace: 'pre',
             lineHeight: 'normal',

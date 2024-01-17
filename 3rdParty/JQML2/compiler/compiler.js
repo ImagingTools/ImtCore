@@ -10,7 +10,7 @@ for(let componentName of listComponents){
 }
 const listProperties = require('../utils/properties')
 
-const source = process.argv[2] || '../test/qml'// 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src' // 
+const source = process.argv[2] || 'C:\\projects\\ImagingTools\\ItDevelopment\\ImtCore\\Bin\\web\\src'//'../test/qml'// 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src' // 
 if(!source) throw 'error: source not specified'
 
 function getFiles (dir, _files){
@@ -921,7 +921,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
     let extendInstruction = currentInstructions
     while(extendInstruction && listComponents.indexOf(extendInstruction.className) < 0){
         let extendsFile = compiledFiles[path.resolve(path.resolve(__dirname, source), extendInstruction.className.replaceAll('_', '/')).replaceAll('\\', '/') + '.qml']
-        currentInstructions.extends = extendsFile
+        extendInstruction.extends = extendsFile
         extendInstruction = extendsFile ? extendsFile.instructions : null
     }
 
