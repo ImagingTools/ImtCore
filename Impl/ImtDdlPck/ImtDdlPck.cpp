@@ -1,0 +1,50 @@
+#include "ImtDdlPck.h"
+
+
+// ACF includes
+#include <icomp/export.h>
+
+
+namespace ImtDdlPck
+{
+
+
+I_EXPORT_PACKAGE(
+			"ImtDdlPck",
+			"Data Definition Language (DDL) package",
+			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
+
+I_EXPORT_COMPONENT(
+		DdlCodeCreatorProcessorsController,
+		"DDL code creator processor controller",
+		"DDL Creator Processor Controller");
+
+I_EXPORT_COMPONENT(
+		DdlCodeCreatorArgumentsParser,
+		"DDL code creator arguments parser",
+		"DDL Creator Parser");
+
+I_EXPORT_COMPONENT(
+		ConstVarCppCreatorProcessor,
+		"Creates ddl for cpp code",
+		"DDL Creator Cpp Processor");
+
+I_EXPORT_COMPONENT(
+		ConstVarHCreatorProcessor,
+		"Creates ddl for h code",
+		"DDL Creator Cpp Processor");
+
+I_EXPORT_COMPONENT(
+		ConstVarQmlCreatorProcessor,
+		"Creates ddl for qml code",
+		"DDL Creator Qml Processor");
+
+I_EXPORT_COMPONENT(
+		ConstVarQmldirCreatorProcessor,
+		"Creates ddl for qmldir code",
+		"DDL Creator Qmldir Processor");
+
+
+} // namespace ImtDdlPck
+
+
