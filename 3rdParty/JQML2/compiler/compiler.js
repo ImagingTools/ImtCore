@@ -10,7 +10,7 @@ for(let componentName of listComponents){
 }
 const listProperties = require('../utils/properties')
 
-const source = process.argv[2] || '../test/qml'// 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src' // 
+const source = process.argv[2] || 'C:\\projects\\ImagingTools\\ItDevelopment\\ImtCore\\Bin\\web\\src'//'../test/qml'// 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src' // 
 if(!source) throw 'error: source not specified'
 
 function getFiles (dir, _files){
@@ -35,6 +35,7 @@ for(let i = 0; i < fileList.length; i++){
 }
 const compiledFiles = {}
 const Enums = {}
+const SingletonList = []
 // console.log('fileList: ', fileList)
 
 UID = 0
@@ -78,6 +79,8 @@ function qmlpragma(meta, instructions){
         if(pragma[0] === 'qmlpragma'){
             if(pragma[1] === 'Singleton') {
                 instructions.Singleton = true
+                let SingletonName = instructions.fileName.replaceAll('/','_').replaceAll('\\','_').replaceAll('.qml','').split('_').pop()
+                SingletonList.push(SingletonName)
             }
         }
     }
@@ -580,7 +583,11 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
                         } else if(tree[1] in Qt){
                             stat.compute = true
                             stat.value.push(`Qt.${tree[1]}`)
+                        } else if(SingletonList.indexOf(tree[1]) >= 0){
+                            stat.compute = true
+                            stat.value.push(`inCtx.get('${tree[1]}')`)
                         } else {
+                            console.log(`Warning: name ${tree[1]} into ${compiledFile.fileName} not found`)
                             stat.compute = true
                             stat.value.push(`inCtx.get('${tree[1]}')`)
                         }
@@ -988,7 +995,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             try {
                 prepare(property.val, compiledFile, currentInstructions, stat, false, false, '', {})
             } catch (error) {
-                console.log('error', compiledFile.fileName, 'property', property.name)
+                console.log('Error:', compiledFile.fileName, 'property', property.name)
             }
             
         }
@@ -1079,7 +1086,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
         try {
             prepare(signal.val, compiledFile, currentInstructions, stat, true, false, '', {})
         } catch (error) {
-            console.log('error', compiledFile.fileName, 'signal', signal.name)
+            console.log('Error:', compiledFile.fileName, 'signal', signal.name)
         }
 
         for(let ignore of stat.ignore){
@@ -1193,7 +1200,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
                 try {
                     prepare(property.val, compiledFile, currentInstructions, stat, false, false, '', {})
                 } catch (error) {
-                    console.log('error', compiledFile.fileName, 'property', property.name)
+                    console.log('Error:', compiledFile.fileName, 'property', property.name)
                 }
                 
             }
@@ -1281,7 +1288,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
         try {
             prepare(signal.val, compiledFile, currentInstructions, stat, true, false, '', {})
         } catch (error) {
-            console.log('error', compiledFile.fileName, 'signal', signal.name)
+            console.log('Error:', compiledFile.fileName, 'signal', signal.name)
         }
 
         for(let ignore of stat.ignore){
@@ -1310,7 +1317,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
         try {
             prepare(currentInstructions.methods[name].val, compiledFile, currentInstructions, stat, true, false, '', {})
         } catch (error) {
-            console.log('error', compiledFile.fileName, 'method', name)
+            console.log('Error:', compiledFile.fileName, 'method', name)
         }
         
         code.push(`${currentInstructions.name}.${name}=${stat.value.join('')}`)

@@ -267,7 +267,7 @@ window.onload = ()=>{
     mainRoot.createProperty('location',QVar,location)
     mainRoot.createProperty('history',QVar,history)
     mainRoot.createProperty('language',QString,'')
-    mainRoot.createProperty('application',QString,'')
+    mainRoot.createProperty('application',QVar,'')
     mainRoot.getProperty('language').getNotify().connect(mainRoot, mainRoot.updateLanguage)
     mainRoot.getProperty('application').getNotify().connect(mainRoot, mainRoot.updateLanguage)
 
