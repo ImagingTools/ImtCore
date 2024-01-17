@@ -524,7 +524,13 @@ var Qt = {
     },
 
     point(x, y){
-        return {}
+        return {
+            x: x,
+            y: y,
+        }
+    },
+    rgba(r, g, b, a){
+        return `rgba(${Math.trunc(r*255)},${Math.trunc(g*255)},${Math.trunc(b*255)},${Math.trunc(a*255)})`
     },
     openUrlExternally: function(url){
         return window.open(url, '_blank')

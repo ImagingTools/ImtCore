@@ -49,7 +49,29 @@ class Canvas extends Item {
 
     }
     getContext(contextId, ...args){
-        return this.getDom().getContext(contextId)
+        let ctx = this.getDom().getContext(contextId)
+        ctx.roundedRect = (...args)=>{ctx.roundRect(...args)}
+        let originDrawImage = ctx.drawImage
+        ctx.drawImage = (...args)=>{
+            if(typeof args[0] === 'string'){
+                let img = new OriginImage();
+                let path = rootPath+'/'+args[0].replaceAll('../','')
+                img.onload = ()=>{
+                    args[0] = img
+                    originDrawImage.call(ctx, ...args)
+                    img.remove()
+                }
+                img.onerror = ()=>{
+                    img.remove()
+                }
+
+                img.src = path.replaceAll('//','/')
+            } else {
+                originDrawImage.call(ctx, ...args)
+            }
+            
+        }
+        return ctx
     }
     isImageError(image){
 
@@ -70,7 +92,7 @@ class Canvas extends Item {
 
     }
     requestPaint(){
-
+        if(this.$signals.paint) this.$signals.paint()
     }
     save(filename, imageSize){
 

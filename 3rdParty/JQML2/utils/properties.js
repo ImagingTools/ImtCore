@@ -704,6 +704,19 @@ class QPoint extends ComplexObject {
         y: { type: QReal, value: 0, changed: 'mainChanged' },
     }
 
+    reset(point){
+        let changed = false
+        if(this.getProperty('x').value !== point.x) {
+            this.getProperty('x').value = point.x
+            changed = true
+        }
+        if(this.getProperty('y').value !== point.y) {
+            this.getProperty('y').value = point.y
+            changed = true
+        }
+        if(changed) this.mainChanged()
+    }
+
     mainChanged(){
         this.getNotify()()
     }
