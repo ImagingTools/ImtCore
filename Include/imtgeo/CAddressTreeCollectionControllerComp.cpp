@@ -93,7 +93,7 @@ imtbase::CTreeItemModel* CAddressTreeCollectionControllerComp::ListObjects(const
                 imtbase::CTreeItemModel generalModel;
                 generalModel.CreateFromJson(filterBA);
 
-                //parentIds = "{00000817-0000-0000-0000-000000000000}";//generalModel.GetData("ParentId").toString();
+                //parentIds = "00000002-0000-0000-0000-000000000000";//generalModel.GetData("ParentId").toString();
 
                 parentIds = generalModel.GetData("ParentIds").toString();
                 //qDebug()<< "filter::: parentIds::: " << parentIds;
@@ -231,8 +231,12 @@ imtbase::CTreeItemModel* CAddressTreeCollectionControllerComp::ListObjects(const
                         itemsModel->SetData("TypeId", typeAddressId, itemIndex);
                         itemsModel->SetData("ParentId", addressParentId, itemIndex);
                         itemsModel->SetData("ParentIds", parentsStr, itemIndex);
-                        itemsModel->SetData("TypeId__", "Node", itemIndex);
-                        itemsModel->SetData("HasChildren__", true, itemIndex);
+
+                        bool isNode = false;
+                        isNode = checkHasChildren(addressId);
+                        QString typeId__ = isNode ? "Node" : "Doc";
+                        itemsModel->SetData("TypeId__", typeId__, itemIndex);
+                        itemsModel->SetData("HasChildren__", isNode, itemIndex);
 
                     }
 
@@ -264,6 +268,20 @@ imtbase::CTreeItemModel* CAddressTreeCollectionControllerComp::ListObjects(const
     return rootModelPtr.PopPtr();
 }
 
+bool CAddressTreeCollectionControllerComp::checkHasChildren(const QString& id) const
+{
+    //qDebug() << "CheckHasChildren";
+
+    QString sql = QString("(SELECT * FROM public.\"AddressElements\" WHERE '[\"%1\"]' <@ (\"ParentIds\") LIMIT 1)")
+                      .arg(id);
+
+    QSqlQuery sqlQuery = m_engineCompChr3->ExecSqlQuery(sql.toUtf8());
+//    while(sqlQuery.next()){
+//        qDebug() << "АДРЕС_____" << sqlQuery.value("Name").toString();
+//    }
+    //qDebug() << "SIZE:: " << sqlQuery.size();
+    return (sqlQuery.size() > 0);
+}
 
 } // namespace imtgeo
 
