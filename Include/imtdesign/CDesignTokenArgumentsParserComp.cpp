@@ -204,7 +204,7 @@ QByteArray CDesignTokenArgumentsParserComp::GetProjectName() const
 
 QByteArray CDesignTokenArgumentsParserComp::GetOutputDirectoryPath() const
 {
-	return this->GetArgumentValue(AA_OUTPUT_DIRECTORY_PATH);
+	return QDir(this->GetArgumentValue(AA_OUTPUT_DIRECTORY_PATH)).canonicalPath().toUtf8();
 }
 
 
