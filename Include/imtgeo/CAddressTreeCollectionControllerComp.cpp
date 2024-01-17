@@ -233,7 +233,8 @@ imtbase::CTreeItemModel* CAddressTreeCollectionControllerComp::ListObjects(const
                         itemsModel->SetData("ParentIds", parentsStr, itemIndex);
 
                         bool isNode = false;
-                        isNode = checkHasChildren(addressId);
+                        //isNode = checkHasChildren(addressId);//DO NOT REMOVE!!!
+                        isNode = true;//УБРАТЬ!!!
                         QString typeId__ = isNode ? "Node" : "Doc";
                         itemsModel->SetData("TypeId__", typeId__, itemIndex);
                         itemsModel->SetData("HasChildren__", isNode, itemIndex);
