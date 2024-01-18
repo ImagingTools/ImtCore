@@ -12,31 +12,36 @@
 #include <istd/ILogger.h>
 
 // imtsdl includes
-#include <imtsdl/imtsdl.h>
-#include <imtsdl/CSdlType.h>
-#include <imtsdl/CSdlField.h>
-#include <imtsdl/CSdlMethod.h>
+#include <imtsdl/ISdlTypeListProvider.h>
 
 
 namespace imtsdl
 {
 
-
+/**
+	The CGqlSchemaParser class
+ */
 class CGqlSchemaParser:
 			public virtual istd::IPolymorphic,
+			public virtual ISdlTypeListProvider,
 			protected istd::ILogger
 {
 
 	Q_DISABLE_COPY(CGqlSchemaParser)
 
+protected:
+	CGqlSchemaParser();
+
 public:
 	CGqlSchemaParser(QIODevice& device);
 
-	SdlTypeList GetTypes() const;
-	QStringList GetTypeNames() const;
-	SdlFieldList GetFields(const QString typeName) const;
+	virtual bool ParseGqlSchema();
 
-	bool ParseGqlSchema();
+	// reimplemented (ISdlTypeListProvider)
+	virtual QStringList GetTypeNames() const override;
+	virtual SdlTypeList GetSdlTypes() const override;
+	virtual SdlFieldList GetFields(const QString typeName) const override;
+
 protected:
 	virtual bool ProcessSchema();
 	virtual bool ProcessType();
@@ -52,6 +57,7 @@ protected:
 	virtual bool ProcessSubscription();
 	virtual bool ProcessValue(SdlFieldList& output, bool* endOfReadPtr);
 
+	void SetDevice(QIODevice& device);
 	bool ReadToDelimeter(
 				const QByteArray& delimeters,
 				QByteArray& result,
@@ -69,7 +75,7 @@ protected:
 	bool MoveToCharType(const QList<QChar::Category>& categoryList, char* foundDelimeterPtr = nullptr, bool skipDelimeter = false);
 	bool MoveToNextReaddableSymbol(char* foundDelimeterPtr = nullptr, bool skipDelimeter = false);
 
-private:
+protected:
 	QTextStream m_stream;
 	char m_lastReadChar;
 	qulonglong m_lastReadLine;
@@ -77,8 +83,6 @@ private:
 	QMap<KeyId, QByteArray> m_keywordMap;
 
 	SdlTypeList m_sdlTypes;
-	SdlMethodList m_sdlQueries;
-	SdlMethodList m_sdlMutations;
 };
 
 

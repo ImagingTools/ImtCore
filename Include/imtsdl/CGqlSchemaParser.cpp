@@ -5,60 +5,19 @@ namespace imtsdl
 {
 
 
-// public methods
-
-CGqlSchemaParser::CGqlSchemaParser(QIODevice& device):
+CGqlSchemaParser::CGqlSchemaParser():
 	m_lastReadChar(0),
 	m_lastReadLine(0),
-	m_useLastReadChar(false),
-	m_stream(&device)
+	m_useLastReadChar(false)
 {
-	if (!device.isReadable()){
-		SendLogMessage(
-					istd::IInformationProvider::InformationCategory::IC_ERROR,
-					0,
-					"Unable to open device",
-					"CGqlSchemaParser");
-		Q_ASSERT(false);
-
-		return;
-	}
 }
 
 
-SdlTypeList CGqlSchemaParser::GetTypes() const
+// public methods
+
+CGqlSchemaParser::CGqlSchemaParser(QIODevice& device): CGqlSchemaParser()
 {
-	return m_sdlTypes;
-}
-
-
-QStringList CGqlSchemaParser::GetTypeNames() const
-{
-	QStringList retVal;
-
-	for (const CSdlType& type: m_sdlTypes){
-		retVal << type.GetName();
-	}
-
-	return retVal;
-}
-
-
-SdlFieldList CGqlSchemaParser::GetFields(const QString typeName) const
-{
-	for (const CSdlType& type: m_sdlTypes){
-		if (type.GetName() == typeName){
-			return type.GetFields();
-		}
-	}
-	SendLogMessage(
-				istd::IInformationProvider::InformationCategory::IC_ERROR,
-				0,
-				QString("Unable to find type name '%1'").arg(typeName),
-				"CGqlSchemaParser");
-	Q_ASSERT(false);
-
-	return {CSdlField()};
+	SetDevice(device);
 }
 
 
@@ -127,6 +86,44 @@ bool CGqlSchemaParser::ParseGqlSchema()
 	Q_ASSERT(retVal);
 
 	return retVal;
+}
+
+
+// reimplemented (ISdlTypeListProvider)
+
+SdlTypeList CGqlSchemaParser::GetSdlTypes() const
+{
+	return m_sdlTypes;
+}
+
+
+QStringList CGqlSchemaParser::GetTypeNames() const
+{
+	QStringList retVal;
+
+	for (const CSdlType& type: m_sdlTypes){
+		retVal << type.GetName();
+	}
+
+	return retVal;
+}
+
+
+SdlFieldList CGqlSchemaParser::GetFields(const QString typeName) const
+{
+	for (const CSdlType& type: m_sdlTypes){
+		if (type.GetName() == typeName){
+			return type.GetFields();
+		}
+	}
+	SendLogMessage(
+				istd::IInformationProvider::InformationCategory::IC_ERROR,
+				0,
+				QString("Unable to find type name '%1'").arg(typeName),
+				"CGqlSchemaParser");
+	Q_ASSERT(false);
+
+	return {CSdlField()};
 }
 
 
@@ -399,6 +396,23 @@ bool CGqlSchemaParser::ProcessValue(SdlFieldList& output, bool* endOfReadPtr)
 	Q_ASSERT(m_lastReadChar == '}' || QChar(m_lastReadChar).isLetter());
 
 	return retVal;
+}
+
+
+void CGqlSchemaParser::SetDevice(QIODevice& device)
+{
+	m_stream.setDevice(&device);
+
+	if (!device.isReadable()){
+		SendLogMessage(
+					istd::IInformationProvider::InformationCategory::IC_ERROR,
+					0,
+					"Unable to open device",
+					"CGqlSchemaParser");
+		Q_ASSERT(false);
+
+		return;
+	}
 }
 
 

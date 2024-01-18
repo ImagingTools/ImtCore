@@ -1,0 +1,26 @@
+#pragma once
+
+
+//Acf includes
+#include <istd/IPolymorphic.h>
+
+// imtsdl includes
+#include <imtsdl/imtsdl.h>
+
+
+namespace imtsdl
+{
+
+
+class ISdlProcessArgumentsParser: virtual public istd::IPolymorphic
+{
+public:
+	virtual bool SetArguments(int argc, char** argv) = 0;
+	virtual QString GetSchemaFilePath() const = 0;
+	virtual QString GetOutputDirectoryPath() const = 0;
+};
+
+
+} // namespace imtsdl
+
+
