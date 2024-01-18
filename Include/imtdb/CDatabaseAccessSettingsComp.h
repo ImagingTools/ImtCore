@@ -29,6 +29,7 @@ public:
 		I_ASSIGN(m_paswordAttrPtr, "Pasword", "The property holds connection's password.", true, "12345");
 		I_ASSIGN(m_hostNameAttrPtr, "HostName", "The property holds connection's host name.", true, "localhost");
 		I_ASSIGN(m_portAttrPtr, "Port", "The property holds connection's port number", true, 5432);
+		I_ASSIGN(m_useSslAttrPtr, "UseSSL", "If enabled, SSL connection will be used", true, false);
 	I_END_COMPONENT;
 
 protected:
@@ -42,6 +43,7 @@ private:
 	I_ATTR(QByteArray, m_paswordAttrPtr);
 	I_ATTR(QByteArray, m_hostNameAttrPtr);
 	I_ATTR(int, m_portAttrPtr);
+	I_ATTR(bool, m_useSslAttrPtr);
 };
 
 

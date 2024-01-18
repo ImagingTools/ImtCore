@@ -17,6 +17,10 @@ void CDatabaseAccessSettingsComp::OnComponentCreated()
 	BaseClass2::SetPassword(*m_paswordAttrPtr);
 	BaseClass2::SetHost(*m_hostNameAttrPtr);
 	BaseClass2::SetPort(*m_portAttrPtr);
+
+	if (*m_useSslAttrPtr) {
+		BaseClass2::SetConnectionFlags(BaseClass2::GetConnectionFlags() | COF_SSL);
+	}
 }
 
 
