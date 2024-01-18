@@ -57,7 +57,7 @@ win32{
 TEMPLATE_FILES ~= s,/,\\,g
 }
 
-ddl$${TARGET}.name = Ddl Files
+ddl$${TARGET}.name = DDL Files
 ddl$${TARGET}.commands = $${DDL_CODE_CREATOR_COMMAND} && $${GENERATE_RESOURCE_COMMANDS}
 ddl$${TARGET}.input = DDL_TEMPLATE_INPUT_DIR
 ddl$${TARGET}.output = $${GENERATED_RESOURCE_OUTPUT}
