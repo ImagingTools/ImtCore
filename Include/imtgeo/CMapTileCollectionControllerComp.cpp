@@ -37,8 +37,8 @@ QVariant CMapTileCollectionControllerComp::GetObjectInformation(
 
 
 imtbase::CTreeItemModel* CMapTileCollectionControllerComp::GetMetaInfo(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+            const imtgql::CGqlRequest& /*gqlRequest*/,
+            QString& /*errorMessage*/) const
 {
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
