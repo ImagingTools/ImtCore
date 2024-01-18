@@ -8,18 +8,21 @@ namespace imtsdl
 // public methods
 
 CGqlSchemaParser::CGqlSchemaParser(QIODevice& device):
-	m_stream(&device),
 	m_lastReadChar(0),
 	m_lastReadLine(0),
-	m_useLastReadChar(false)
+	m_useLastReadChar(false),
+	m_stream(&device)
 {
 	if (!device.isReadable()){
+		SendLogMessage(
+					istd::IInformationProvider::InformationCategory::IC_ERROR,
+					0,
+					"Unable to open device",
+					"CGqlSchemaParser");
 		Q_ASSERT(false);
 
 		return;
 	}
-
-	ParseGqlSchema();
 }
 
 
@@ -48,14 +51,16 @@ SdlFieldList CGqlSchemaParser::GetFields(const QString typeName) const
 			return type.GetFields();
 		}
 	}
-
+	SendLogMessage(
+				istd::IInformationProvider::InformationCategory::IC_ERROR,
+				0,
+				QString("Unable to find type name '%1'").arg(typeName),
+				"CGqlSchemaParser");
 	Q_ASSERT(false);
 
 	return {CSdlField()};
 }
 
-
-// private methods
 
 bool CGqlSchemaParser::ParseGqlSchema()
 {
@@ -107,6 +112,11 @@ bool CGqlSchemaParser::ParseGqlSchema()
 		retVal = retVal && ProcessSubscription();
 	}
 	else {
+		SendLogMessage(
+					istd::IInformationProvider::InformationCategory::IC_ERROR,
+					0,
+					QString("Unexpected derictive '%1' at %2 line").arg(keyword, QString::number(m_lastReadLine + 1)),
+					"CGqlSchemaParser");
 		Q_ASSERT(false);
 
 		return false;
@@ -119,6 +129,8 @@ bool CGqlSchemaParser::ParseGqlSchema()
 	return retVal;
 }
 
+
+// protected methods
 
 bool CGqlSchemaParser::ProcessSchema()
 {
@@ -155,12 +167,23 @@ bool CGqlSchemaParser::ProcessSchema()
 			// schema parsing is done nothing to do anymore
 		}
 		else {
+			SendLogMessage(
+						istd::IInformationProvider::InformationCategory::IC_ERROR,
+						0,
+						QString("Unexpected derictive '%1' at %2 line").arg(schemaType, QString::number(m_lastReadLine + 1)),
+						"CGqlSchemaParser");
 			Q_ASSERT(false);
 		}
 	}
 	while(foundDelimiter != '}');
 
-	Q_ASSERT(!m_keywordMap.isEmpty());
+	if (m_keywordMap.isEmpty()){
+		SendLogMessage(
+					istd::IInformationProvider::InformationCategory::IC_WARNING,
+					0,
+					QString("Schema does not contains keywords"),
+					"CGqlSchemaParser");
+	}
 
 	return retVal;
 }
@@ -191,7 +214,12 @@ bool CGqlSchemaParser::ProcessType()
 bool CGqlSchemaParser::ProcessInterface()
 {
 	bool retVal = false;
-	Q_ASSERT(false);
+	SendLogMessage(
+				istd::IInformationProvider::InformationCategory::IC_CRITICAL,
+				0,
+				QString("Process interface is not implemented yet"),
+				"CGqlSchemaParser");
+	Q_ASSERT(retVal);
 
 	return retVal;
 }
@@ -200,7 +228,12 @@ bool CGqlSchemaParser::ProcessInterface()
 bool CGqlSchemaParser::ProcessUnion()
 {
 	bool retVal = false;
-	Q_ASSERT(false);
+		SendLogMessage(
+				istd::IInformationProvider::InformationCategory::IC_CRITICAL,
+				0,
+				QString("Process union is not implemented yet"),
+				"CGqlSchemaParser");
+	Q_ASSERT(retVal);
 
 	return retVal;
 }
@@ -209,7 +242,12 @@ bool CGqlSchemaParser::ProcessUnion()
 bool CGqlSchemaParser::ProcessScalar()
 {
 	bool retVal = false;
-	Q_ASSERT(false);
+		SendLogMessage(
+				istd::IInformationProvider::InformationCategory::IC_CRITICAL,
+				0,
+				QString("Process scalar is not implemented yet"),
+				"CGqlSchemaParser");
+	Q_ASSERT(retVal);
 
 	return retVal;
 }
@@ -218,7 +256,12 @@ bool CGqlSchemaParser::ProcessScalar()
 bool CGqlSchemaParser::ProcessEnum()
 {
 	bool retVal = false;
-	Q_ASSERT(false);
+		SendLogMessage(
+				istd::IInformationProvider::InformationCategory::IC_CRITICAL,
+				0,
+				QString("Process enum is not implemented yet"),
+				"CGqlSchemaParser");
+	Q_ASSERT(retVal);
 
 	return retVal;
 }
@@ -233,7 +276,12 @@ bool CGqlSchemaParser::ProcessInput()
 bool CGqlSchemaParser::ProcessExtend()
 {
 	bool retVal = false;
-	Q_ASSERT(false);
+		SendLogMessage(
+				istd::IInformationProvider::InformationCategory::IC_CRITICAL,
+				0,
+				QString("Process extend is not implemented yet"),
+				"CGqlSchemaParser");
+	Q_ASSERT(retVal);
 
 	return retVal;
 }
@@ -242,7 +290,12 @@ bool CGqlSchemaParser::ProcessExtend()
 bool CGqlSchemaParser::ProcessDirective()
 {
 	bool retVal = false;
-	Q_ASSERT(false);
+		SendLogMessage(
+				istd::IInformationProvider::InformationCategory::IC_CRITICAL,
+				0,
+				QString("Process directive is not implemented yet"),
+				"CGqlSchemaParser");
+	Q_ASSERT(retVal);
 
 	return retVal;
 }
@@ -251,7 +304,12 @@ bool CGqlSchemaParser::ProcessDirective()
 bool CGqlSchemaParser::ProcessQuery()
 {
 	bool retVal = false;
-	Q_ASSERT(false);
+		SendLogMessage(
+				istd::IInformationProvider::InformationCategory::IC_CRITICAL,
+				0,
+				QString("Process query is not implemented yet"),
+				"CGqlSchemaParser");
+	Q_ASSERT(retVal);
 
 	return retVal;
 }
@@ -260,7 +318,12 @@ bool CGqlSchemaParser::ProcessQuery()
 bool CGqlSchemaParser::ProcessMutation()
 {
 	bool retVal = false;
-	Q_ASSERT(false);
+		SendLogMessage(
+				istd::IInformationProvider::InformationCategory::IC_CRITICAL,
+				0,
+				QString("Process mutation is not implemented yet"),
+				"CGqlSchemaParser");
+	Q_ASSERT(retVal);
 
 	return retVal;
 }
@@ -269,7 +332,12 @@ bool CGqlSchemaParser::ProcessMutation()
 bool CGqlSchemaParser::ProcessSubscription()
 {
 	bool retVal = false;
-	Q_ASSERT(false);
+		SendLogMessage(
+				istd::IInformationProvider::InformationCategory::IC_CRITICAL,
+				0,
+				QString("Process subscription is not implemented yet"),
+				"CGqlSchemaParser");
+	Q_ASSERT(retVal);
 
 	return retVal;
 }

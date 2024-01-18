@@ -1,12 +1,17 @@
 #include <imtsdl/CSdlMethod.h>
 
 // Acf includes
-#include<istd/CChangeNotifier.h>
+#include <istd/CChangeNotifier.h>
+#include <iser/CArchiveTag.h>
+#include <iser/IArchive.h>
+#include <iser/CPrimitiveTypesSerializer.h>
 
 
 namespace imtsdl
 {
 
+
+// public methods
 
 QString CSdlMethod::GetName() const
 {
@@ -53,11 +58,28 @@ void CSdlMethod::SetOutputTypeId(const QString& outputTypeId)
 }
 
 
+// reimplemented(iser::ISerializable)
+
 bool CSdlMethod::Serialize(iser::IArchive& archive)
 {
-	bool retVal = false;
+	bool retVal = true;
+
+	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
+
+	iser::CArchiveTag nameTag("Name", "", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(nameTag);
+	retVal = retVal && archive.Process(m_name);
+	retVal = retVal && archive.EndTag(nameTag);
+
+	retVal = retVal && CSdlField::SerializeSdlFieldList(archive, m_arguments, "ArgumentList", "Argument");
+
+	iser::CArchiveTag outputTag("OutputTypeId", "", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(outputTag);
+	retVal = retVal && archive.Process(m_outputTypeId);
+	retVal = retVal && archive.BeginTag(outputTag);
 
 	return retVal;
 }
+
 
 } // namespace imtsdl

@@ -1,17 +1,74 @@
 #include <imtsdl/CSdlField.h>
 
+//Acf includes
 #include <istd/CChangeNotifier.h>
+#include <iser/CArchiveTag.h>
+#include <iser/IArchive.h>
+
 
 
 namespace imtsdl
 {
 
 
+// public static methods
+
+bool CSdlField::SerializeSdlFieldList(
+			iser::IArchive& archive,
+			QList<CSdlField>& container,
+			const QByteArray& containerTagName,
+			const QByteArray& elementTagName)
+{
+	iser::CArchiveTag elementsTag(containerTagName, "List of elements", iser::CArchiveTag::TT_MULTIPLE);
+	iser::CArchiveTag elementTag(elementTagName, "Single element", iser::CArchiveTag::TT_LEAF, &elementsTag);
+
+	bool retVal = true;
+
+	bool isStoring = archive.IsStoring();
+	int elementsCount = container.count();
+
+	retVal = retVal && archive.BeginMultiTag(elementsTag, elementTag, elementsCount);
+	if (!retVal){
+		return false;
+	}
+
+	if (isStoring){
+		for (int i = 0; i < elementsCount; ++i){
+			CSdlField sdlField = container[i];
+
+			retVal = retVal && archive.BeginTag(elementTag);
+			retVal = retVal && sdlField.Serialize(archive);
+			retVal = retVal && archive.EndTag(elementTag);
+		}
+	}
+	else{
+		container.clear();
+
+		for (int i = 0; i < elementsCount; ++i){
+			CSdlField sdlField;
+			retVal = retVal && archive.BeginTag(elementTag);
+			retVal = retVal && sdlField.Serialize(archive);
+			retVal = retVal && archive.EndTag(elementTag);
+
+			if (retVal){
+				container.push_back(sdlField);
+			}
+		}
+	}
+
+	retVal = retVal && archive.EndTag(elementsTag);
+
+	return retVal;
+}
+
+
+// public methods
+
 CSdlField::CSdlField():
 	m_isRequired(false),
 	m_isArray(false),
 	m_isNonEmpty(false),
-	m_type("INVALID")
+	m_type("<INVALID>")
 {
 }
 
@@ -95,6 +152,7 @@ void CSdlField::SetId(const QString& id)
 	}
 }
 
+
 bool CSdlField::operator==(const CSdlField& other) const
 {
 	bool retVal = true;
@@ -110,10 +168,37 @@ bool CSdlField::operator==(const CSdlField& other) const
 
 
 // reimplemented(iser::ISerializable)
+
 bool CSdlField::Serialize(iser::IArchive& archive)
 {
 	bool retVal = true;
 
+	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
+
+	static iser::CArchiveTag idTag("Id", "", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(idTag);
+	retVal = retVal && archive.Process(m_id);
+	retVal = retVal && archive.EndTag(idTag);
+
+	static iser::CArchiveTag typeTag("Type", "", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(typeTag);
+	retVal = retVal && archive.Process(m_type);
+	retVal = retVal && archive.EndTag(typeTag);
+
+	static iser::CArchiveTag nonEmptyTag("IsNonEmpty", "", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(nonEmptyTag);
+	retVal = retVal && archive.Process(m_isNonEmpty);
+	retVal = retVal && archive.EndTag(nonEmptyTag);
+
+	static iser::CArchiveTag arrayTag("IsArray", "", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(arrayTag);
+	retVal = retVal && archive.Process(m_isArray);
+	retVal = retVal && archive.EndTag(arrayTag);
+
+	static iser::CArchiveTag requireTag("IsRequired", "", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(requireTag);
+	retVal = retVal && archive.Process(m_isRequired);
+	retVal = retVal && archive.BeginTag(requireTag);
 
 	return retVal;
 }

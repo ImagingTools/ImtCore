@@ -15,6 +15,14 @@ namespace imtsdl
 
 class CSdlField: public iser::ISerializable
 {
+
+public:
+	static bool SerializeSdlFieldList(
+		iser::IArchive& archive,
+		QList<CSdlField>& container,
+		const QByteArray& containerTagName,
+		const QByteArray& elementTagName);
+
 public:
 	CSdlField();
 
