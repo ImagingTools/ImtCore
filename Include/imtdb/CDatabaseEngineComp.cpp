@@ -148,12 +148,15 @@ bool CDatabaseEngineComp::CheckDatabaseConnection(QString& errorMessage) const
 {
 	QSqlDatabase::removeDatabase(*m_maintenanceDatabaseNameAttrPtr);
 	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, *m_maintenanceDatabaseNameAttrPtr);
+
+	maintainanceDb.setConnectOptions(GetConnectionOptionsString(*m_dbTypeAttrPtr));
+
 	maintainanceDb.setHostName(GetHostName());
 	maintainanceDb.setUserName(GetUserName());
 	maintainanceDb.setPassword(GetPassword());
 	maintainanceDb.setDatabaseName(*m_maintenanceDatabaseNameAttrPtr);
 	maintainanceDb.setPort(GetPort());
-
+	
 	bool isConnected = maintainanceDb.open();
 
 	maintainanceDb.close();
@@ -277,6 +280,8 @@ bool CDatabaseEngineComp::CreateDatabase(int flags) const
 	if (retVal){
 		// Initialize a new connection to the "real" database:
 		QSqlDatabase databaseConnection = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, GetConnectionName());
+
+		databaseConnection.setConnectOptions(GetConnectionOptionsString(*m_dbTypeAttrPtr));
 
 		databaseConnection.setHostName(GetHostName());
 		databaseConnection.setUserName(GetUserName());
@@ -508,6 +513,9 @@ bool CDatabaseEngineComp::CreateDatabaseInstance() const
 
 	bool retVal = false;
 	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, *m_maintenanceDatabaseNameAttrPtr);
+
+	maintainanceDb.setConnectOptions(GetConnectionOptionsString(*m_dbTypeAttrPtr));
+
 	maintainanceDb.setHostName(GetHostName());
 	maintainanceDb.setUserName(GetUserName());
 	maintainanceDb.setPassword(GetPassword());
