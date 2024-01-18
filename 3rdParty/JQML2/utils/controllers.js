@@ -220,8 +220,9 @@ class MouseController {
 
         let pressedMouseArea = this.pressedMouseAreaInner ? this.pressedMouseAreaInner : this.pressedMouseAreaOuter
 
+        // console.log(pressedMouseArea)
 
-        if(pressedMouseArea && !pressedMouseArea.getPropertyValue('preventStealing')){
+        if(pressedMouseArea && !pressedMouseArea.getPropertyValue('preventStealing') && this.flickList.length){
             if(Math.abs(this.originX - x) >= 10 || Math.abs(this.originY - y) >= 10){
                 pressedMouseArea = null
                 this.pressedMouseAreaInner = null
