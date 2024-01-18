@@ -23,10 +23,10 @@ class Row extends Item {
         this.getProperty('height').setAuto(this.getDom().scrollHeight)
 
         this.setStyle({
-            width: `${this.getProperty('width').get()}px`,
-            minWidth: `${this.getProperty('width').get()}px`,
-            height: `${this.getProperty('height').get()}px`,
-            minHeight: `${this.getProperty('height').get()}px`,
+            width: `${this.getProperty('width').value}px`,
+            minWidth: `${this.getProperty('width').value}px`,
+            height: `${this.getProperty('height').value}px`,
+            minHeight: `${this.getProperty('height').value}px`,
         })
     }
 

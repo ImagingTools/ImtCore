@@ -10,7 +10,7 @@ for(let componentName of listComponents){
 }
 const listProperties = require('../utils/properties')
 
-const source = process.argv[2] || 'C:\\projects\\ImagingTools\\ItDevelopment\\ImtCore\\Bin\\web\\src'//'../test/qml'// 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src' // 
+const source = process.argv[2] || '../test/qml'// 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src' // 
 if(!source) throw 'error: source not specified'
 
 function getFiles (dir, _files){
