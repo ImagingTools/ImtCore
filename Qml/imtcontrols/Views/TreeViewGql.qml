@@ -173,10 +173,13 @@ Rectangle{
                                         treeViewGql.setVisibleElements(true, model.index)
                                     }
                                     treeViewGql.model.SetData("IsOpen__", true, model.index);
+                                    treeViewGql.model.SetData("OpenState__", 1, model.index);
+
                                     treeViewGql.openBranch(model.index)
                                 }
                                 else if(deleg.isOpen){
                                     treeViewGql.model.SetData("IsOpen__", false, model.index);
+                                    treeViewGql.model.SetData("OpenState__", 0, model.index);
                                     treeViewGql.setVisibleElements(false, model.index)
                                     treeViewGql.closeBranch(model.index)
                                 }
@@ -320,12 +323,40 @@ Rectangle{
         let innerId = treeViewGql.model.GetData("InnerId__", index);
         let found = false;
         let foundChangeCount = 0;
+
+        //for closed
+        let currClosedLevel = -1;
+
         for(let i = index + 1; i < treeViewGql.model.GetItemsCount(); i++){
             let branchIds = treeViewGql.model.IsValidData("BranchIds__", i) ? treeViewGql.model.GetData("BranchIds__", i) : "";
             //console.log("branchIds:: ", branchIds)
             let ok = false;
             let arr = branchIds.split(",");
             let arrCounter = 0;
+
+            //*****************for closed*************//
+            let openST = treeViewGql.model.GetData("OpenState__", i);
+            let level_curr = treeViewGql.model.GetData("Level__", i);
+
+            if(level_curr <= currClosedLevel){
+                currClosedLevel = -1;
+            }
+            if(visible && openST == 0){
+                currClosedLevel = level_curr;
+            }
+
+            let ok_visible = true;
+            if(!visible){
+                ok_visible = true;
+            }
+            else if(currClosedLevel == -1){
+                ok_visible = true;
+            }
+            else if(level_curr > currClosedLevel && currClosedLevel >= 0){
+                ok_visible = false;
+            }
+            //*****************for closed*************//
+
             for(let k = 0; k < arr.length; k++){
                 if(arr[k] == innerId){
                     ok = true;
@@ -348,7 +379,7 @@ Rectangle{
 
             //
             if(ok){
-                treeViewGql.model.SetData("Visible__", visible, i);
+                treeViewGql.model.SetData("Visible__", visible && ok_visible, i);
                 let coeff = visible ? 1 : -1;
                 listFrame.contentHeight += coeff * treeViewGql.delegateHeight;
             }
@@ -469,6 +500,7 @@ Rectangle{
             treeViewGql.model.SetData("BranchIds__", branchIds, newIndex);
             treeViewGql.model.SetData("Visible__", true, newIndex);
             treeViewGql.model.SetData("IsOpen__", false, newIndex);
+            treeViewGql.model.SetData("OpenState__", -1, newIndex);
             treeViewGql.model.SetData("HasBranch__", false, newIndex);
             treeViewGql.model.SetData("InnerId__", String(val + newIndex), newIndex);
 
