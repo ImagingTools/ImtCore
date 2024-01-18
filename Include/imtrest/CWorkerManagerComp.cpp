@@ -74,9 +74,9 @@ void CWorkerThread::SetStatus(Status status)
 }
 
 
-void CWorkerThread::SetRequest(const IRequest* request)
+void CWorkerThread::SetRequestPtr(const IRequest* requestPtr)
 {
-	m_request = request;
+	m_requestPtr = requestPtr;
 }
 
 
@@ -106,7 +106,7 @@ void CWorkerThread::run()
 	connect(this, &CWorkerThread::StartProcess, m_workerPtr.GetPtr(), &CWorker::ProcessRequest); //, Qt::QueuedConnection
 	connect(m_workerPtr.GetPtr(), &CWorker::FinishProcess, this, &CWorkerThread::OnFinishProcess, Qt::DirectConnection); //, Qt::QueuedConnection
 
-	m_workerPtr->ProcessRequest(m_request);
+	m_workerPtr->ProcessRequest(m_requestPtr);
 
 	exec();
 }
@@ -114,7 +114,7 @@ void CWorkerThread::run()
 
 void CWorkerThread::OnStarted()
 {
-	Q_EMIT StartProcess(m_request);
+	Q_EMIT StartProcess(m_requestPtr);
 }
 
 
@@ -173,7 +173,7 @@ ConstResponsePtr CWorkerManagerComp::ProcessRequest(const IRequest& request) con
 
 			workerPtr->SetStatus(CWorkerThread::ST_PROCESS);
 
-			emit workerPtr->StartProcess(requestPtr);
+			Q_EMIT workerPtr->StartProcess(requestPtr);
 
 			return retVal;
 		}
@@ -184,11 +184,14 @@ ConstResponsePtr CWorkerManagerComp::ProcessRequest(const IRequest& request) con
 		connect(workerPtr, &CWorkerThread::FinishProcess, this, &CWorkerManagerComp::OnFinish); //, Qt::QueuedConnection
 		m_workerList.append(workerPtr);
 
+		// Pop request from the queue:
 		const IRequest* requestPtr = m_requestList.at(0);
 		m_requestList.removeAt(0);
 
-		workerPtr->SetRequest(requestPtr);
+		// Set popped request to the worker thread:
+		workerPtr->SetRequestPtr(requestPtr);
 
+		// Start processing of the request:
 		workerPtr->start();
 	}
 
@@ -218,7 +221,7 @@ void CWorkerManagerComp::OnFinish(const IRequest* request)
 			m_requestList.removeAt(0);
 
 			workerPtr->SetStatus(CWorkerThread::ST_PROCESS);
-			emit workerPtr->StartProcess(requestPtr);
+			Q_EMIT workerPtr->StartProcess(requestPtr);
 
 			return;
 		}

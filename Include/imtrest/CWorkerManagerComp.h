@@ -54,7 +54,7 @@ public:
 
 	Status GetStatus();
 	void SetStatus(Status status);
-	void SetRequest(const IRequest* request);
+	void SetRequestPtr(const IRequest* requestPtr);
 	const ISender* GetSender(const QByteArray& requestId);
 
 	//reimplemented (QThread)
@@ -73,7 +73,7 @@ private:
 	Status m_status;
 	mutable CWorkerManagerComp* m_workerManager;
 	istd::TDelPtr<CWorker> m_workerPtr;
-	const IRequest* m_request;
+	const IRequest* m_requestPtr;
 	mutable QMutex m_statusMutex;
 };
 

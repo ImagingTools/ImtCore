@@ -18,7 +18,7 @@ bool CLicenseCollectionControllerComp::SetupGqlItem(
 			imtbase::CTreeItemModel& model,
 			int itemIndex,
 			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
-			QString& errorMessage) const
+			QString& /*errorMessage*/) const
 {
 	if (objectCollectionIterator == nullptr){
 		return false;

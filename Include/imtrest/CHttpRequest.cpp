@@ -350,7 +350,7 @@ bool CHttpRequest::ExecuteHttpParser(const QByteArray& data, const QObject* sock
 	}
 #endif
 
-	int parsedCount = http_parser_execute(
+	qsizetype parsedCount = http_parser_execute(
 		&m_httpParser,
 		&s_httpParserSettings,
 		data.constData(),

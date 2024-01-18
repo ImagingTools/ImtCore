@@ -40,9 +40,9 @@ I_EXPORT_COMPONENT(
 			"HTTP REST Root Protocol");
 
 I_EXPORT_COMPONENT(
-            HttpFileBasedServlet,
-            "HTTP file servlet",
-            "HTTP File Template");
+			HttpFileBasedServlet,
+			"HTTP file servlet",
+			"HTTP File Template");
 
 I_EXPORT_COMPONENT(
 		HttpHtmlFolderBasedServlet,
@@ -70,29 +70,19 @@ I_EXPORT_COMPONENT(
 		"JSON Model");
 
 I_EXPORT_COMPONENT(
-		HttpClientRequestManager,
-		"The CHttpClientComp is a manager of generated http requests created by other modules of THIS application. It's is an observer of requests queue.",
-		"Rest Http Client Request Manager");
-
-I_EXPORT_COMPONENT(
 		HttpClientRequestFactory,
 		"The factory for creting http client requests for 'HttpClientRequestManager'",
-		"Rest Http Client Request Factory");
+		"REST HTTP Client Request Factory");
 
 I_EXPORT_COMPONENT(
 		WorkerManaqer,
-		"The manager of request handlers factory for 'CMultiThreadServer' ",
-		"Rest Http Handler Request Factory");
+		"The manager of request handlers factory for multi-thread request server",
+		"REST HTTP Handler Request Factory");
 
 I_EXPORT_COMPONENT(
 		ServerLogDataProvider,
 		"Component for providing the server log",
 		"Server Log Provider");
-
-	I_EXPORT_COMPONENT(
-		HttpFileBuffer,
-		"Temporary storage for uploaded files to the server of files prepared to download to the client",
-		"HTTP Rest Flie Handler");
 
 
 } // namespace ImtRestPck
