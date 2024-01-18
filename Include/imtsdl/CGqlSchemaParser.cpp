@@ -546,12 +546,12 @@ bool CGqlSchemaParser::MoveToCharType(
 }
 
 
-bool CGqlSchemaParser::MoveToNextReaddableSymbol(char* foundDelimeterPtr, bool skipDelimeter)
+bool CGqlSchemaParser::MoveToNextReadableSymbol(char* foundDelimeterPtr, bool skipDelimeter)
 {
 	return MoveToCharType(QList<QChar::Category>()
 				<< QChar::Letter_Uppercase
 				<< QChar::Letter_Lowercase
-				<< QChar::Letter_Titlecase
+				<< QChar::MoveToNextReadableSymbol
 				<< QChar::Letter_Modifier
 				<< QChar::Letter_Other
 				<< QChar::Punctuation_Connector

@@ -37,8 +37,8 @@ QVariant CMapTileCollectionControllerComp::GetObjectInformation(
 
 
 imtbase::CTreeItemModel* CMapTileCollectionControllerComp::GetMetaInfo(
-            const imtgql::CGqlRequest& /*gqlRequest*/,
-            QString& /*errorMessage*/) const
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 
@@ -92,11 +92,11 @@ imtbase::CTreeItemModel* CMapTileCollectionControllerComp::ListObjects(const imt
 			}
 		}
 
-        {
-			if (tileList.count()){
+		{
+			if (tileList.count()) {
 				int itemIndex = 0;
 				int z = tileList.at(0).second;
-				for (int i = 0; i < tileList.size(); i++){
+				for (int i = 0; i < tileList.size(); i++) {
 
 					double lat = 0;
 					double lon = 0;
@@ -111,9 +111,7 @@ imtbase::CTreeItemModel* CMapTileCollectionControllerComp::ListObjects(const imt
 
 				}
 			}
-
-        }
-
+		}
 
 		itemsModel->SetIsArray(true);
 		dataModel->SetExternTreeModel("items", itemsModel);
@@ -122,8 +120,6 @@ imtbase::CTreeItemModel* CMapTileCollectionControllerComp::ListObjects(const imt
 	rootModelPtr->SetExternTreeModel("data", dataModel);
 
 	return rootModelPtr.PopPtr();
-
-
 }
 
 
