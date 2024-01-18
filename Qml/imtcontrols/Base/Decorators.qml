@@ -336,7 +336,7 @@ StyleComponents {
 
             gradient: Gradient {
                 id: grad;
-                property bool isColor: !baseElement ? false : baseElement.isColor;
+                property bool isColor: !cbMainRect.baseElement ? false : cbMainRect.baseElement.isColor;
 
                 GradientStop { position: 0.0; color: grad.isColor ? cbMainRect.color : Style.imagingToolsGradient1; }
                 GradientStop { position: 0.97; color: grad.isColor ? cbMainRect.color : Style.imagingToolsGradient2; }
@@ -350,14 +350,14 @@ StyleComponents {
 
                 anchors.verticalCenter: cbMainRect.verticalCenter;
                 anchors.left: cbMainRect.left;
-                anchors.leftMargin: !baseElement ? 0 : baseElement.textCentered ? cbMainRect.width/2 - width/2 : 10;
+                anchors.leftMargin: !cbMainRect.baseElement ? 0 : cbMainRect.baseElement.textCentered ? cbMainRect.width/2 - width/2 : 10;
                 anchors.right: cbMainRect.right;
                 anchors.rightMargin: 10;
 
-                color: !baseElement ? "transparent" : baseElement.fontColorTitle;
-                text: !baseElement ? "" : baseElement.currentText !== "" ? baseElement.currentText : baseElement.placeHolderText;
+                color: !cbMainRect.baseElement ? "transparent" : cbMainRect.baseElement.fontColorTitle;
+                text: !cbMainRect.baseElement ? "" : cbMainRect.baseElement.currentText !== "" ? cbMainRect.baseElement.currentText : cbMainRect.baseElement.placeHolderText;
                 font.family: Style.fontFamily;
-                font.pixelSize: !baseElement ? 10 : baseElement.textSize;
+                font.pixelSize: !cbMainRect.baseElement ? 10 : cbMainRect.baseElement.textSize;
 
                 elide: Text.ElideRight;
             }
@@ -371,7 +371,7 @@ StyleComponents {
 
                 width: 12;
                 height: 10;
-                rotation: !baseElement ? 0 : baseElement.isOpen ? 180 : 0
+                rotation: !cbMainRect.baseElement ? 0 : cbMainRect.baseElement.isOpen ? 180 : 0
                 source: "../../../" + Style.theme + "/Icons/" + "/" + "Down" + "_On_Normal.svg";
 
                 sourceSize.width: width;
