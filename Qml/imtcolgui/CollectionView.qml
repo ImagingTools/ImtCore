@@ -468,7 +468,8 @@ Item {
                 query.AddField(queryFields);
 
                 console.log("registerSubscription", subscriptionRequestId, subscriptionId)
-                subscriptionManager.registerSubscription(query, subscriptionClient);
+
+                Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient});
             }
         }
 

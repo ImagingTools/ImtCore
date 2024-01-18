@@ -98,9 +98,7 @@ TableDelegate 1.0 ./Views/TableDelegate.qml
 TableProperties 1.0 ./Views/TableProperties.qml
 TableSelection 1.0 ./Views/TableSelection.qml
 TableTreeItemDelegate 1.0 ./Views/TableTreeItemDelegate.qml
-TreeDelegate 1.0 ./Views/TreeDelegate.qml
 TreeItemDelegate 1.0 ./Views/TreeItemDelegate.qml
-TreeView 1.0 ./Views/TreeView.qml
 TreeViewGql 1.0 ./Views/TreeViewGql.qml
 TreeViewModelAdapter 1.0 ./Views/TreeViewModelAdapter.qml
 TreeViewSelection 1.0 ./Views/TreeViewSelection.qml

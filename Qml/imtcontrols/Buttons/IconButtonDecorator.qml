@@ -21,10 +21,10 @@ DecoratorBase {
 
         radius: 2;
 
-        color: baseButton.pressed || baseButton.checked ? Style.buttonPressedColor : Style.buttonColor;
+        color: commonButtonDecorator.baseButton.pressed || commonButtonDecorator.baseButton.checked ? Style.buttonPressedColor : Style.buttonColor;
 
         border.width: 1;
-        border.color: baseButton.hovered || baseButton.selected ? Style.iconColorOnSelected : commonButtonDecorator.baseButton.focus ? "gray" : Style.borderColor;
+        border.color: commonButtonDecorator.baseButton.hovered || commonButtonDecorator.baseButton.selected ? Style.iconColorOnSelected : commonButtonDecorator.baseButton.focus ? "gray" : Style.borderColor;
 
         Image {
             id: iconObj;
@@ -38,22 +38,22 @@ DecoratorBase {
 
             sourceSize.width: width;
             sourceSize.height: height;
-            source: baseButton.iconSource;
+            source: commonButtonDecorator.baseButton.iconSource;
         }
 
         Text {
             id: textObj;
 
             anchors.verticalCenter: parent.verticalCenter;
-            anchors.left: baseButton.imageSource ? iconObj.right : parent.left;
-            anchors.leftMargin: baseButton.imageSource ? Style.paddingSmall : baseButton.width/2 - width/2;
+            anchors.left: commonButtonDecorator.baseButton.imageSource ? iconObj.right : parent.left;
+            anchors.leftMargin: commonButtonDecorator.baseButton.imageSource ? Style.paddingSmall : commonButtonDecorator.baseButton.width/2 - width/2;
 
-            color: baseButton.enabled ? Style.textColor : Style.inactive_textColor;
+            color: commonButtonDecorator.baseButton.enabled ? Style.textColor : Style.inactive_textColor;
 
             font.pixelSize: Style.fontSize_common;
             font.family: Style.fontFamily;
 
-            text: baseButton.text;
+            text: commonButtonDecorator.baseButton.text;
 
         }
 

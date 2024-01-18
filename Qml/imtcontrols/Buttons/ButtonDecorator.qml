@@ -82,7 +82,7 @@ DecoratorBase {
         font.pixelSize: Style.fontSize_common
         font.family: Style.fontFamily
 
-        text: !baseElement ? "" : baseElement.text
+        text: !commonButtonDecorator.baseElement ? "" : commonButtonDecorator.baseElement.text
     }
 
     CustomTooltip{

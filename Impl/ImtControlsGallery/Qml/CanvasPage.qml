@@ -457,7 +457,7 @@ Rectangle {
                 //drawLink
                 for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
                     if(canvasPage.objectModel.GetData("Links", i) !==undefined){
-                        let links = objectModel.GetData("Links",i);
+                        let links = canvasPage.objectModel.GetData("Links",i);
                         for(let k = 0; k < links.GetItemsCount(); k++){
                             let objectId = links.GetData("ObjectId", k);
                             let ind = canvasPage.findModelIndex(objectId);
@@ -555,7 +555,7 @@ Rectangle {
                 let secondText  = canvasPage.objectModel.GetData("SecondText", index)
                 let selected = canvasPage.objectModel.IsValidData("Selected", index) ? canvasPage.objectModel.GetData("Selected", index) : false;
                 let hasError = canvasPage.objectModel.IsValidData("HasError", index) ? canvasPage.objectModel.GetData("HasError", index) : false;
-                let isComposite = canvasPage.objectModel.IsValidData("IsComposite", index) ? objectModel.GetData("IsComposite", index) : false;
+                let isComposite = canvasPage.objectModel.IsValidData("IsComposite", index) ? canvasPage.objectModel.GetData("IsComposite", index) : false;
 
                 ctx.lineCap = "round"
                 ctx.lineJoin = "round"

@@ -27,6 +27,10 @@ void CModelSubscriberComp::OnResponseReceived(const QByteArray & subscriptionId,
 	QJsonDocument document = QJsonDocument::fromJson(subscriptionData);
 	QJsonObject subscriptionObject = document.object();
 
+	if (subscriptionObject.contains("data")){
+		subscriptionObject = subscriptionObject.value("data").toObject();
+	}
+
 	if (subscriptionId == m_subscriptionId){
 		if (subscriptionObject.contains("id")){
 			notifierInfo.elementId = subscriptionObject.value("id").toString().toUtf8();

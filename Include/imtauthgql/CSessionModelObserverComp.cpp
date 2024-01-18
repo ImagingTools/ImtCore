@@ -44,6 +44,7 @@ void CSessionModelObserverComp::OnComponentDestroyed()
 
 void CSessionModelObserverComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
+	qDebug() << "CSessionModelObserverComp OnUpdate";
 	if (sessionChangeNotifierCompPtr.IsValid()){
 		QByteArray accessToken;
 		imtgql::IGqlRequestProvider* gqlRequestProviderPtr = QueryInterface<imtgql::IGqlRequestProvider>(this);

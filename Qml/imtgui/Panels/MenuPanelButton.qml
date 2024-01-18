@@ -26,15 +26,19 @@ ControlBase {
 
     property string decoratorSource;
 
+    property Item menuPanelRef: null;
+
     signal clicked;
 
-
     onContentWidthChanged: {
-        if (menuPanel.contentWidth != container.contentWidth){
-            menuPanel.contentWidth = container.contentWidth;
+        if (!menuPanelRef){
+            return;
+        }
+
+        if (menuPanelRef.contentWidth != container.contentWidth){
+            menuPanelRef.contentWidth = container.contentWidth;
         }
     }
-
 
     Component.onCompleted: {
         if (model.SubPages){

@@ -140,6 +140,8 @@ Rectangle {
             textColor: Style.textColor;
             fontName: menuPanel.fontName;
 
+            menuPanelRef: menuPanel;
+
             imageSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["Icon"], "On", "Selected"):
                                                      "../../../" + Style.getIconPath(model["Icon"], "On", "Normal");
 

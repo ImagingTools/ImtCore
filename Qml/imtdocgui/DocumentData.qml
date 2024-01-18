@@ -67,7 +67,7 @@ Item {
         property bool documentVisible: documentData.visible && uuid !== "";
         onDocumentVisibleChanged: {
             if (commandsModel == null){
-                commandsProvider.additionInputParams = documentData.getAdditionalInputParams();
+                documentData.commandsProvider.additionInputParams = documentData.getAdditionalInputParams();
 
                 updateModel();
             }

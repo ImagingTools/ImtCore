@@ -463,7 +463,7 @@ FocusScope{
             onClicked: {
                 checkBoxMenu.focus = true
 
-                if (checkBoxMenu.canOpenMenu && heckBoxMenu.dataModel !==undefined && checkBoxMenu.dataModel !== null && checkBoxMenu.dataModel.GetItemsCount() > 0){
+                if (checkBoxMenu.canOpenMenu && checkBoxMenu.dataModel !==undefined && checkBoxMenu.dataModel !== null && checkBoxMenu.dataModel.GetItemsCount() > 0){
                     checkBoxMenu.openPopupMenu();
                 }
 

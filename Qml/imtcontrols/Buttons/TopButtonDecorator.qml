@@ -30,7 +30,7 @@ Item {
        color: Style.shadowColor;
        source: button;
 
-       visible: !(baseElement.checked || baseElement.down)
+       visible: !(topButtonDecorator.baseElement.checked || topButtonDecorator.baseElement.down)
     }
 
     Rectangle{
@@ -48,7 +48,7 @@ Item {
 
         color: Style.baseColor;
 
-        gradient: baseElement.checked || baseElement.down ? pressedGradientButton : standardGradientButton;
+        gradient: topButtonDecorator.baseElement.checked || topButtonDecorator.baseElement.down ? pressedGradientButton : standardGradientButton;
 
         Gradient {
             id: standardGradientButton;
@@ -72,7 +72,7 @@ Item {
             height: parent.height - 8;
             width: height;
 
-            source: baseElement.iconSource;
+            source: topButtonDecorator.baseElement.iconSource;
             fillMode: Image.PreserveAspectFit;
 
             sourceSize.width: width;
@@ -92,7 +92,7 @@ Item {
         color: Style.shadowColor;
         source: button;
 
-        visible: baseElement.checked || baseElement.down
+        visible: topButtonDecorator.baseElement.checked || topButtonDecorator.baseElement.down
     }
 
     Rectangle{
@@ -119,7 +119,7 @@ Item {
         font.pixelSize: Style.fontSize_small
         font.family: Style.fontFamily
 
-        text: !baseElement ? "" : baseElement.text
+        text: !topButtonDecorator.baseElement ? "" : topButtonDecorator.baseElement.text
     }
 }
 

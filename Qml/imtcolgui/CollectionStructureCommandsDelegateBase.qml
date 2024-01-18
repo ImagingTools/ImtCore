@@ -188,7 +188,7 @@ Item {
         }
 
         let index = containerBase.treeView.selectedIndex
-        if (index >= 0){            let selectedName = containerBase.tableData.elements.GetData("Name", indexes[0]);
+        if (index >= 0){            let selectedName = containerBase.tableData.elements.GetData("Name", index);
             modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
         }
     }

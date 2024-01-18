@@ -16,6 +16,7 @@ namespace imtauthgql
 
 void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IChangeable::ChangeSet& /*changeSet*/, const QByteArray& sessionId)
 {
+	qDebug() << "CSessionModelSubscriberControllerComp OnSessionModelChanged" << sessionId;
 	if (!m_requestManagerCompPtr.IsValid()){
 		return;
 	}
@@ -23,6 +24,8 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 	if (sessionId.isEmpty()){
 		return;
 	}
+
+	qDebug() << "m_registeredSubscribers" << m_registeredSubscribers.count();
 
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
@@ -37,6 +40,7 @@ void CSessionModelSubscriberControllerComp::OnSessionModelChanged(const istd::IC
 			if (responsePtr.IsValid()){
 				const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest->GetRequestId());
 				if (sender != nullptr){
+					qDebug() << "SendResponse";
 
 					sender->SendResponse(responsePtr);
 				}

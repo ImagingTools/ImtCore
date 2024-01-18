@@ -21,28 +21,28 @@ Item {
 
         radius: 2;
 
-        color: commonButtonDecorator.baseButton.focus ? "red" : baseButton.color !== "" ? baseButton.color : baseButton.isHighlighted && baseButton.isHovered ? Style.hover :
-                                                                              baseButton.isHovered ? Style.selectedColor:
+        color: commonButtonDecorator.baseButton.focus ? "red" : commonButtonDecorator.baseButton.color !== "" ? commonButtonDecorator.baseButton.color : commonButtonDecorator.baseButton.isHighlighted && commonButtonDecorator.baseButton.isHovered ? Style.hover :
+                                                                              commonButtonDecorator.baseButton.isHovered ? Style.selectedColor:
                                                                               Style.buttonColor;
 
 
         border.width: 1;
-        border.color: baseButton.isHovered || baseButton.selected ? Style.iconColorOnSelected : Style.borderColor;
+        border.color: commonButtonDecorator.baseButton.isHovered || commonButtonDecorator.baseButton.selected ? Style.iconColorOnSelected : Style.borderColor;
 
 
         Text {
             id: textObj;
 
             anchors.verticalCenter: parent.verticalCenter;
-            anchors.left: baseButton.imageSource ? iconObj.right : parent.left;
-            anchors.leftMargin: baseButton.imageSource ? Style.paddingSmall : baseButton.width/2 - width/2;
+            anchors.left: commonButtonDecorator.baseButton.imageSource ? iconObj.right : parent.left;
+            anchors.leftMargin: commonButtonDecorator.baseButton.imageSource ? Style.paddingSmall : commonButtonDecorator.baseButton.width/2 - width/2;
 
-            color: baseButton.enabled ? Style.textColor : Style.inactive_textColor;
+            color: commonButtonDecorator.baseButton.enabled ? Style.textColor : Style.inactive_textColor;
 
             font.pixelSize: Style.fontSize_common;
             font.family: Style.fontFamily;
 
-            text: baseButton.text;
+            text: commonButtonDecorator.baseButton.text;
 
         }
 

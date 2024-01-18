@@ -359,11 +359,12 @@ Rectangle {
         visible: false;
     }
 
-    function closeApp(){
-        if (mainDocumentManager.dirtyDocumentsExists()){
-            modalDialogManager.openDialog(saveDialog, {});
-        }
-    }
+    // TODO
+//    function closeApp(){
+//        if (mainDocumentManager.dirtyDocumentsExists()){
+//            modalDialogManager.openDialog(saveDialog, {});
+//        }
+//    }
 
 //    Component {
 //        id: saveDialog;

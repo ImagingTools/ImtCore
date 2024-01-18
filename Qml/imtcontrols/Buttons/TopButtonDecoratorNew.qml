@@ -17,7 +17,7 @@ Item {
     property string textColorDisabled: "gray";
     property real fontSize: Style.fontSize_small;
     property int radius: 4;
-    property bool isEmpty: baseButton.text === "";
+    property bool isEmpty: topButtonDecorator.baseButton.text === "";
 
     Rectangle{
         id: button;
@@ -32,10 +32,10 @@ Item {
 
         radius: topButtonDecorator.radius;
 
-        color: baseButton.down || baseButton.checked ? Style.buttonPressedColor : baseButton.hovered ?  Style.buttonHoverColor : "transparent"
+        color: topButtonDecorator.baseButton.down || topButtonDecorator.baseButton.checked ? Style.buttonPressedColor : topButtonDecorator.baseButton.hovered ?  Style.buttonHoverColor : "transparent"
 
         border.width: Style.buttonBorderWidth
-        border.color: baseButton.focus ? Style.borderFocusColor : "transparent"
+        border.color: topButtonDecorator.baseButton.focus ? Style.borderFocusColor : "transparent"
 
         Image {
             id: image;
@@ -45,7 +45,7 @@ Item {
             height: parent.height - 8;
             width: height;
 
-            source: baseButton.iconSource;
+            source: topButtonDecorator.baseButton.iconSource;
 
             sourceSize.width: width;
             sourceSize.height: height;
@@ -64,7 +64,7 @@ Item {
 
         font.family: Style.fontFamily;
 
-        text: baseButton.text;
+        text: topButtonDecorator.baseButton.text;
     }
 
 
