@@ -11,6 +11,7 @@
 #include <imtddl/CConstVarHCreatorProcessorComp.h>
 #include <imtddl/CConstVarQmlCreatorProcessorComp.h>
 #include <imtddl/CConstVarQmldirCreatorProcessorComp.h>
+#include <imtddl/CConstVarQrcCreatorProcessorComp.h>
 
 
 /**
@@ -26,6 +27,7 @@ typedef imtddl::CConstVarCppCreatorProcessorComp ConstVarCppCreatorProcessor;
 typedef imtddl::CConstVarHCreatorProcessorComp ConstVarHCreatorProcessor;
 typedef imtddl::CConstVarQmlCreatorProcessorComp ConstVarQmlCreatorProcessor;
 typedef imtddl::CConstVarQmldirCreatorProcessorComp ConstVarQmldirCreatorProcessor;
+typedef imtddl::CConstVarQrcCreatorProcessorComp ConstVarQrcCreatorProcessor;
 
 
 } // namespace ImtDdlPck

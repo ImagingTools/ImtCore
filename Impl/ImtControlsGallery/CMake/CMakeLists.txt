@@ -123,6 +123,9 @@ if(WIN32)
 	unset(listOptions)
 endif()
 
+set(QML_IMPORT_DIRS ${QML_IMPORT_PATH})
+
+# message("QML_IMPORT_PATH ${QML_IMPORT_PATH}")
 
 
 list(APPEND QML_IMPORT_DIRS "${IMTCOREDIR}/Qml")

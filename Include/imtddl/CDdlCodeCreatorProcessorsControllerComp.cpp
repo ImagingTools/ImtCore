@@ -68,7 +68,7 @@ void CDdlCodeCreatorProcessorsControllerComp::OnComponentCreated()
 		const QString moduleQmlName = m_argumentParserAttrPtr->GetModuleQmlName();
 		if(!moduleQmlName.isEmpty()){
 			beginInfoString += "\n\t| Module qml name: " + moduleQmlName;
-			moduleQmlNameParam.SetText(moduleCppName);
+			moduleQmlNameParam.SetText(moduleQmlName);
 			ddlParams.SetEditableParameter("ModuleQmlName", &moduleQmlNameParam);
 		}
 

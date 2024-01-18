@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5177" Description="ACF"/>
+            <Version Id="0" Number="5134" Description="ACF"/>
             <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -80,6 +80,7 @@
                                 <Value>Processors/ConstVarCppCreatorProcessor</Value>
                                 <Value>Processors/ConstVarQmlCreatorProcessor</Value>
                                 <Value>Processors/ConstVarQmldirCreatorProcessor</Value>
+                                <Value>Processors/ConstVarQrcCreatorProcessor</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -131,6 +132,11 @@
                             <AttributeInfoMap/>
                         </Data>
                     </Element>
+                    <Element Id="ConstVarQrcCreatorProcessor" PackageId="ImtDdlPck" ComponentId="ConstVarQrcCreatorProcessor">
+                        <Data IsEnabled="true" Flags="0">
+                            <AttributeInfoMap/>
+                        </Data>
+                    </Element>
                 </ElementsList>
                 <EmbeddedRegistriesList/>
                 <ExportedInterfaces/>
@@ -139,6 +145,7 @@
                     <Component ExportedId="ConstVarHCreatorProcessor" ComponentId="ConstVarHCreatorProcessor"/>
                     <Component ExportedId="ConstVarQmlCreatorProcessor" ComponentId="ConstVarQmlCreatorProcessor"/>
                     <Component ExportedId="ConstVarQmldirCreatorProcessor" ComponentId="ConstVarQmldirCreatorProcessor"/>
+                    <Component ExportedId="ConstVarQrcCreatorProcessor" ComponentId="ConstVarQrcCreatorProcessor"/>
                 </ExportedComponents>
             </Data>
         </EmbeddedRegistry>

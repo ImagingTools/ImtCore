@@ -40,6 +40,8 @@ int main(int argc, char *argv[])
 	Q_INIT_RESOURCE(imtauthguiTheme);
 	Q_INIT_RESOURCE(imtguiTheme);
 
+	Q_INIT_RESOURCE(imtguivars);
+
 
 //	Q_INIT_RESOURCE(Webimt3dgui);
 //    Q_INIT_RESOURCE(Webimtauthgui);

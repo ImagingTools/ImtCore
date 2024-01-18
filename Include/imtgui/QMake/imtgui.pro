@@ -11,6 +11,13 @@ DESIGN_TOKEN_CREATOR_INPUT_THEME_BASE_PATH = $$(IMTCOREDIR)/Include/imtstyle
 
 include($$PWD/../../../Config/QMake/DesignTokenCreator.pri)
 
+MODULE_CPP_NAME = imtgui
+MODULE_QML_NAME = imtguivars
+DDL_TEMPLATE_INPUT_DIR = $$_PRO_FILE_/../../Resources/Ddl
+DDL_OUTPUT_DIR = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET/Ddl
+
+include($$PWD/../../../Config/QMake/DdlCodeCreator.pri)
+
 FORMS += $$files($$_PRO_FILE_PWD_/../*.ui, false)
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 

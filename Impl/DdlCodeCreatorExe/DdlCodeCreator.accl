@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5177" Description="ACF"/>
+            <Version Id="0" Number="5134" Description="ACF"/>
             <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
@@ -23,6 +23,7 @@
                 <Element ComponentName="ConstVarHCreatorProcessor" X="450" Y="250" Note=""/>
                 <Element ComponentName="ConstVarQmlCreatorProcessor" X="450" Y="350" Note=""/>
                 <Element ComponentName="ConstVarQmldirCreatorProcessor" X="450" Y="450" Note=""/>
+                <Element ComponentName="ConstVarQrcCreatorProcessor" X="450" Y="550" Note=""/>
             </PositionMap>
             <EmbeddedRegistries/>
         </EmbededRegistry>

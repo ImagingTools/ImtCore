@@ -16,6 +16,17 @@ SUBDIRS += DesignTokenCreator
 DesignTokenCreator.file = ../../Impl/DesignTokenCreatorExe/QMake/DesignTokenCreatorExe.pro
 DesignTokenCreator.depends = imtbase imtdesign ImtDesignPck
 
+SUBDIRS += imtddl
+imtddl.file = ../../Include/imtddl/QMake/imtddl.pro
+
+SUBDIRS += ImtDdlPck
+ImtDdlPck.file = ../../Impl/ImtDdlPck/QMake/ImtDdlPck.pro
+ImtDdlPck.depends = imtddl
+
+SUBDIRS += DdlCodeCreator
+DdlCodeCreator.file = ../../Impl/DdlCodeCreatorExe/QMake/DdlCodeCreatorExe.pro
+DdlCodeCreator.depends = imtddl ImtDdlPck
+
 SUBDIRS += imtdev
 imtdev.file = ../../Include/imtdev/QMake/imtdev.pro
 
@@ -30,6 +41,9 @@ imtstyle.depends = DesignTokenCreator
 SUBDIRS += ImtStylePck
 ImtStylePck.file = ../../Impl/ImtStylePck/QMake/ImtStylePck.pro
 ImtStylePck.depends = imtstyle DesignTokenCreator
+
+SUBDIRS += imtstylecontrolsqml
+imtstylecontrolsqml.file = ../../Include/imtstylecontrolsqml/QMake/imtstylecontrolsqml.pro
 
 SUBDIRS += imtapp
 imtapp.file = ../../Include/imtapp/QMake/imtapp.pro
@@ -76,7 +90,7 @@ imt3d.file = ../../Include/imt3d/QMake/imt3d.pro
 
 SUBDIRS += imtgui
 imtgui.file = ../../Include/imtgui/QMake/imtgui.pro
-imtgui.depends = imtstyle imtwidgets DesignTokenCreator
+imtgui.depends = imtstyle imtwidgets DesignTokenCreator DdlCodeCreator
 
 SUBDIRS += imtloggui
 imtloggui.file = ../../Include/imtloggui/QMake/imtloggui.pro
@@ -304,7 +318,7 @@ SUBDIRS += ImtHttpPck
 ImtHttpPck.file = ../../Impl/ImtHttpPck/QMake/ImtHttpPck.pro
 ImtHttpPck.depends = imthttp
 
-#SUBDIRS += ImtControlsGallery
-#ImtControlsGallery.file = ../../Impl/ImtControlsGallery/QMake/ImtControlsGallery.pro
-#ImtControlsGallery.depends = imtqml imtstyle imtcontrols
+SUBDIRS += ImtControlsGallery
+ImtControlsGallery.file = ../../Impl/ImtControlsGallery/QMake/ImtControlsGallery.pro
+ImtControlsGallery.depends = imtgui imtqml imtstyle imtstylecontrolsqml
 

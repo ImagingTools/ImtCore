@@ -1,19 +1,20 @@
-TARGET = LisaQmlExe
+TARGET = ImtControlsGallery
 
-include($(ACFDIR)/Config/QMake/ApplicationConfig.pri)
-include($(ACFDIR)/Config/QMake/QtBaseConfig.pri)
-include($(IMTCOREDIR)/Config/QMake/OpenSSL.pri)
-include($(LISADIR)/Config/QMake/Lisa.pri)
+include($(ACFCONFIGDIR)/QMake/ApplicationConfig.pri)
+include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
+include($$PWD/../../../Config/QMake/ImtCore.pri)
 
-HEADERS =
 QT += xml network sql quick qml
+
+QT += quickcontrols2
 
 RESOURCES += $$files($$_PRO_FILE_PWD_/../*.qrc, false)
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -liauth -liqtgui -liservice
-LIBS += -limtbase -limtgui -limtauth -limtauthgui -limtlicdb -limtlic -limtlicgui -lImtCoreLoc -limtwidgets -limtzip -limtrest -limtcrypt -limt3dgui -limtrepo -limtstyle -limtqml -limtdb -limtfile
+LIBS += -L../../../Lib/$$COMPILER_DIR -liauth -limtauthdb -limtclientgql -limtauthgui
+LIBS += -limtbase -limtzip -limtrest  -limtstyle -limtqml -limtauth -limtgui
+LIBS += -limtguigqlqml -limtauthguiqml -limtguiqml -limtcolguiqml
+LIBS += -limtstylecontrolsqml -limtcontrolsqml -limtdocguiqml
 LIBS += -limtlicgql -limtguigql -limtgql -limtauthgql -limtauthdb -limtcom -limtapp
-LIBS += -llisaqml -lImtCoreLoc -lLisaLoc
 
 # Set OS-specific build options:
 win32-msvc*{
@@ -25,20 +26,20 @@ win32-msvc*{
 
 # Set configuration of custom builds:
 # ARX Compiler:
-ARXC_CONFIG = $$PWD/../../../Config/Lisa.awc
-ARXC_FILES += $$PWD/../LisaQmlExe.acc
+ARXC_CONFIG = $$PWD/../../../Config/ImtCore.awc
+ARXC_FILES += $$PWD/../ImtControlsGallery.acc
 ARXC_OUTDIR = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
 
 # Conversion of resource templates:
 win*{
     # File transformation
-	ACF_CONVERT_FILES = $$PWD/../VC/LisaQml.rc.xtracf
-	ACF_CONVERT_OUTDIR = $$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
-	ACF_CONVERT_REGISTRY =  $$PWD/../VC/FileSubstitCopyApp.acc
-	ACF_CONVERT_CONFIG = $$PWD/../../../Config/BaseOnly.awc
+	# ACF_CONVERT_FILES = $$PWD/../VC/LisaQml.rc.xtracf
+	# ACF_CONVERT_OUTDIR = $$AUXINCLUDEPATH/GeneratedFiles/$$TARGET
+	# ACF_CONVERT_REGISTRY =  $$PWD/../VC/FileSubstitCopyApp.acc
+	# ACF_CONVERT_CONFIG = $$PWD/../../../Config/BaseOnly.awc
 
-    RC_FILE = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET/LisaQml.rc
-	RC_INCLUDEPATH = $$_PRO_FILE_PWD_
+#    RC_FILE = $$OUT_PWD/$$AUXINCLUDEPATH/GeneratedFiles/$$TARGET/LisaQml.rc
+# RC_INCLUDEPATH = $$_PRO_FILE_PWD_
 }
 
 include($(ACFDIR)/Config/QMake/AcfQt.pri)

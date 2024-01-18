@@ -44,6 +44,11 @@ I_EXPORT_COMPONENT(
 		"Creates ddl for qmldir code",
 		"DDL Creator Qmldir Processor");
 
+I_EXPORT_COMPONENT(
+		ConstVarQrcCreatorProcessor,
+		"Creates qrc file for qml code",
+		"DDL Creator Qrc Qml Processor");
+
 
 } // namespace ImtDdlPck
 
