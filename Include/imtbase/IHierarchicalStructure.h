@@ -46,17 +46,18 @@ public:
 		Insert a reference to an item into the given node.
 		This method creates a leaf inside of the given parent node.
 	*/
-	virtual bool InsertItem(
-				const Id& itemId,
+	virtual bool InsertLeaf(
+				const Id& leafId,
 				const Id& nodeId,
+				const QString& leafName,
 				const IOperationContext* operationContextPtr = nullptr) = 0;
-	virtual bool MoveItem(
-				const Id& itemId,
+	virtual bool MoveLeaf(
+				const Id& leafId,
 				const Id& sourceNodeId,
 				const Id& targetNodeId,
 				const IOperationContext* operationContextPtr = nullptr) = 0;
-	virtual bool RemoveItem(
-				const Id& itemId,
+	virtual bool RemoveLeaf(
+				const Id& leafId,
 				const Id& nodeId,
 				const IOperationContext* operationContextPtr = nullptr) = 0;
 };

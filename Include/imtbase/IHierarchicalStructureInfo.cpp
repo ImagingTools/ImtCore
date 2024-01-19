@@ -14,9 +14,9 @@ const QByteArray IHierarchicalStructureInfo::CN_NODE_INSERTED = QByteArrayLitera
 const QByteArray IHierarchicalStructureInfo::CN_NODE_UPDATED = QByteArrayLiteral("imtbase:IHierarchicalStructureInfo::NodeUpdated");
 const QByteArray IHierarchicalStructureInfo::CN_NODE_MOVED = QByteArrayLiteral("imtbase:IHierarchicalStructureInfo::NodeMoved");
 const QByteArray IHierarchicalStructureInfo::CN_NODE_REMOVED = QByteArrayLiteral("imtbase:IHierarchicalStructureInfo::NodeRemoved");
-const QByteArray IHierarchicalStructureInfo::CN_OBJECT_INSERTED = QByteArrayLiteral("imtbase:IHierarchicalStructureInfo::ObjectInserted");
-const QByteArray IHierarchicalStructureInfo::CN_OBJECT_MOVED = QByteArrayLiteral("imtbase:IHierarchicalStructureInfo::ObjectMoved");
-const QByteArray IHierarchicalStructureInfo::CN_OBJECT_REMOVED = QByteArrayLiteral("imtbase:IHierarchicalStructureInfo::ObjectRemoved");
+const QByteArray IHierarchicalStructureInfo::CN_LEAF_INSERTED = QByteArrayLiteral("imtbase:IHierarchicalStructureInfo::LeafInserted");
+const QByteArray IHierarchicalStructureInfo::CN_LEAF_MOVED = QByteArrayLiteral("imtbase:IHierarchicalStructureInfo::LeafMoved");
+const QByteArray IHierarchicalStructureInfo::CN_LEAF_REMOVED = QByteArrayLiteral("imtbase:IHierarchicalStructureInfo::LeafRemoved");
 
 
 } // namespace imtbase
