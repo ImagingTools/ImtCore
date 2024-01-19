@@ -103,6 +103,7 @@ public:
 		I_ASSIGN_MULTI_0(m_additionalCommandActivatorsCompPtr, "AdditionalCommandActivators", "Additional command activators that allow the display of commands", false);
 		I_ASSIGN(m_rightsCommandsCompPtr, "RightsCommands", "Additional tool commands showed on the right side of the login button", false, "RightsCommands");
 		I_ASSIGN(m_fullscreenCommandCompPtr, "FullscreenCommand", "Tool command to switch an application to full screen mode", false, "FullscreenCommand");
+		I_ASSIGN(m_appLogoPathAttrPtr, "AppLogoPath", "Path to the application logo in resources", true, "");
 	I_END_COMPONENT;
 
 protected:
@@ -117,6 +118,7 @@ protected:
 	I_MULTIREF(iprm::IEnableableParam, m_additionalCommandActivatorsCompPtr);
 	I_REF(ibase::ICommandsProvider, m_rightsCommandsCompPtr);
 	I_REF(ibase::ICommandsProvider, m_fullscreenCommandCompPtr);
+	I_ATTR(QString, m_appLogoPathAttrPtr);
 };
 
 
