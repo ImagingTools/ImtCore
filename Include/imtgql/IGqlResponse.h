@@ -17,7 +17,8 @@ class IGqlResponse:
 			virtual public ilog::IMessageContainer
 {
 public:
-	virtual bool IsSuccessfull() const = 0;
+	virtual bool IsSuccessful() const = 0;
+	virtual QVariant GetResult() const = 0;
 };
 
 
