@@ -384,7 +384,6 @@ void CThumbnailDecoratorGuiComp::OnGuiCreated()
 	}
 
 	CurrentPageLabel->setVisible(showPageTitle);
-
 }
 
 
@@ -495,15 +494,15 @@ void CThumbnailDecoratorGuiComp::OnGuiDesignChanged()
 		BackPageButton->setIcon(GetIcon(":/Icons/Left"));
 		NextPageButton->setIcon(GetIcon(":/Icons/Right"));
 		PreferencesButton->setIcon(GetIcon(":/Icons/Settings"));
-	}
 
-	AppLogoFrame->hide();
+		AppLogoFrame->hide();
 
-	QIcon appLogo = GetIcon(*m_appLogoPathAttrPtr);
+		QIcon appLogo = GetIcon(*m_appLogoPathAttrPtr);
 
-	if (!appLogo.isNull()){
-		AppLogo->setPixmap(appLogo.pixmap(1000, AppLogo->height() - 12));
-		AppLogoFrame->show();
+		if (!appLogo.isNull()){
+			AppLogo->setPixmap(appLogo.pixmap(1000, AppLogo->height() - 12));
+			AppLogoFrame->show();
+		}
 	}
 }
 
@@ -520,8 +519,8 @@ void CThumbnailDecoratorGuiComp::OnComponentCreated()
 			if (modelPtr != nullptr){
 				m_additionalCommandActivatorsObserver.RegisterModel(modelPtr, i);
 			}
+		}
 	}
-}
 }
 
 
