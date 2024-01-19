@@ -70,6 +70,9 @@ Rectangle{
         return source;
     }
 
+    function checkIsOpen(index){
+        return model.GetData("IsOpen__", index);
+    }
 
     Rectangle{
         id: listContainer;
