@@ -25,7 +25,7 @@ bool CGqlSchemaParser::ParseGqlSchema()
 {
 	bool retVal = true;
 
-	retVal = retVal && MoveToNextReaddableSymbol();
+	retVal = retVal && MoveToNextReadableSymbol();
 	QByteArray keyword;
 	retVal = retVal && ReadToDelimeterOrSpace("{", keyword);
 
@@ -147,7 +147,7 @@ bool CGqlSchemaParser::ProcessSchema()
 		}
 
 		QByteArray schemaSynonym;
-		retVal = retVal && MoveToNextReaddableSymbol();
+		retVal = retVal && MoveToNextReadableSymbol();
 		retVal = retVal && ReadToDelimeterOrSpace("}", schemaSynonym, &foundDelimiter);
 		schemaSynonym = schemaSynonym.trimmed();
 
@@ -195,7 +195,7 @@ bool CGqlSchemaParser::ProcessType()
 	CSdlType gqlType;
 	gqlType.SetName(QString(typeName.trimmed()));
 
-	retVal = retVal && MoveToNextReaddableSymbol();
+	retVal = retVal && MoveToNextReadableSymbol();
 	bool atEnd = false;
 	SdlFieldList fieldList;
 	while (!atEnd){
@@ -351,10 +351,10 @@ bool CGqlSchemaParser::ProcessValue(SdlFieldList& output, bool* endOfReadPtr)
 	if (foundDelimeter == ':'){
 		field.SetId(valueId);
 	}
-	retVal = retVal && MoveToNextReaddableSymbol();
+	retVal = retVal && MoveToNextReadableSymbol();
 	// process arrays
 	if (m_lastReadChar == '['){
-		retVal = retVal && MoveToNextReaddableSymbol();
+		retVal = retVal && MoveToNextReadableSymbol();
 		field.SetIsArray(true);
 		QByteArray valueType;
 		char foundDelimeter = ';';
@@ -365,10 +365,10 @@ bool CGqlSchemaParser::ProcessValue(SdlFieldList& output, bool* endOfReadPtr)
 		field.SetType(valueType);
 
 		retVal = retVal && ReadToDelimeter("]", valueType);
-		retVal = retVal && MoveToNextReaddableSymbol(&foundDelimeter);
+		retVal = retVal && MoveToNextReadableSymbol(&foundDelimeter);
 		if (m_lastReadChar == '!'){
 			field.SetIsRequired(true);
-			retVal = retVal && MoveToNextReaddableSymbol(&foundDelimeter);
+			retVal = retVal && MoveToNextReadableSymbol(&foundDelimeter);
 		}
 	}
 	// process scalar values
@@ -380,7 +380,7 @@ bool CGqlSchemaParser::ProcessValue(SdlFieldList& output, bool* endOfReadPtr)
 		if (foundDelimeter == '!'){
 			field.SetIsRequired(true);
 		}
-		retVal = retVal && MoveToNextReaddableSymbol(&foundDelimeter);
+		retVal = retVal && MoveToNextReadableSymbol(&foundDelimeter);
 
 		if (endOfReadPtr != nullptr){
 			*endOfReadPtr = bool(foundDelimeter == '}');
@@ -551,7 +551,7 @@ bool CGqlSchemaParser::MoveToNextReadableSymbol(char* foundDelimeterPtr, bool sk
 	return MoveToCharType(QList<QChar::Category>()
 				<< QChar::Letter_Uppercase
 				<< QChar::Letter_Lowercase
-				<< QChar::MoveToNextReadableSymbol
+				<< QChar::Letter_Titlecase
 				<< QChar::Letter_Modifier
 				<< QChar::Letter_Other
 				<< QChar::Punctuation_Connector

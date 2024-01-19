@@ -73,7 +73,7 @@ protected:
 
 	bool MoveToCharType(QChar::Category category, char* foundDelimeterPtr = nullptr, bool skipDelimeter = false);
 	bool MoveToCharType(const QList<QChar::Category>& categoryList, char* foundDelimeterPtr = nullptr, bool skipDelimeter = false);
-	bool MoveToNextReaddableSymbol(char* foundDelimeterPtr = nullptr, bool skipDelimeter = false);
+	bool MoveToNextReadableSymbol(char* foundDelimeterPtr = nullptr, bool skipDelimeter = false);
 
 protected:
 	QTextStream m_stream;
