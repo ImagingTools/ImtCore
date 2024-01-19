@@ -1,7 +1,7 @@
 #include "CStructureTest.h"
 
 // // ImtCore includes
-// #include <imtbase/ICollectionStructure.h>
+// #include <imtbase/IHierarchicalStructure.h>
 
 // // #include <imtbase/IObjectCollection.h>
 // #include <ifile/CCompactXmlFileReadArchive.h>
@@ -61,7 +61,7 @@
 // 	if (compositePtr.IsValid()){
 
 // 		// get component hierarchical structure
-// 		imtbase::ICollectionStructure* hierarchicalStructurePtr = compositePtr->GetComponentInterface<imtbase::ICollectionStructure>();
+// 		imtbase::IHierarchicalStructure* hierarchicalStructurePtr = compositePtr->GetComponentInterface<imtbase::IHierarchicalStructure>();
 // 		if (hierarchicalStructurePtr != nullptr){
 
 // 			// reset data from hierarchical structure

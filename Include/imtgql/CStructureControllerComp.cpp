@@ -7,7 +7,7 @@
 #include <iprm/TParamsPtr.h>
 
 // ImtCore includes
-#include <imtbase/ICollectionStructureIterator.h>
+#include <imtbase/IHierarchicalStructureIterator.h>
 #include <imtgql/imtgql.h>
 
 

@@ -7,12 +7,12 @@
 // ImtCore includes
 #include <imtbase/TIStructuredCollectionInfo.h>
 #include <imtbase/IObjectCollection.h>
-#include <imtbase/ICollectionStructure.h>
+#include <imtbase/IHierarchicalStructure.h>
+#include <imtbase/IStructuredObjectCollectionController.h>
 #include <imtbase/IOperationContext.h>
 #include <imtclientgql/IGqlClient.h>
 #include <imtgql/IGqlPrimitiveTypeResponse.h>
 #include <imtgql/IGqlStructuredCollectionResponse.h>
-//#include <imtgql/IGqlStructurereq.h>
 
 
 namespace imtclientgql
@@ -20,7 +20,7 @@ namespace imtclientgql
 
 
 class IGqlStructureDelegate:
-			virtual public imtbase::ICollectionStructure//,
+			virtual public imtbase::IHierarchicalStructure//,
 			//virtual public IGqlStructureRequestDelegate
 {
 public:
@@ -32,11 +32,11 @@ public:
 	//			int offset = 0,
 	//			int count = -1,
 	//			const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
-	//virtual imtbase::ICollectionStructureInfo::ElementType GetElementType(const QByteArray& elementId) const = 0;
+	//virtual imtbase::IHierarchicalStructureInfo::ElementType GetElementType(const QByteArray& elementId) const = 0;
 	//virtual QByteArrayList GetElementBasePath(const QByteArray& elementId) const = 0;
 	//virtual QByteArrayList GetObjectParentNodes(const QByteArray& objectId) const = 0;
 
-	//virtual imtbase::ICollectionStructureInfo::NodeInfo GetNodeInfo(const QByteArray& nodeId);
+	//virtual imtbase::IHierarchicalStructureInfo::NodeInfo GetNodeInfo(const QByteArray& nodeId);
 
 	///**
 	//	Structure manipulations

@@ -48,7 +48,7 @@ void CStructureSubscriberControllerComp::OnUpdate(const istd::IChangeable::Chang
 		return;
 	}
 
-	imtbase::ICollectionStructure::NodeInsertInfo info = changeSet.GetChangeInfo("InsertInfo").value<imtbase::ICollectionStructure::NodeInsertInfo>();
+	imtbase::IHierarchicalStructure::NodeInsertInfo info = changeSet.GetChangeInfo("InsertInfo").value<imtbase::IHierarchicalStructure::NodeInsertInfo>();
 	QString data = QString("{\"NodeId\": \"%1\"}").arg(qPrintable(info.parentNodeId));
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){

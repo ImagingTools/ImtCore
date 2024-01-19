@@ -50,7 +50,6 @@
 #include <imtbase/CSystemStatusComp.h>
 #include <imtbase/CCachedObjectCollectionComp.h>
 #include <imtbase/CDelegatedBinaryDataProviderComp.h>
-#include <imtbase/CCollectionStructureComp.h>
 
 
 /**
@@ -117,7 +116,6 @@ typedef icomp::TModelCompWrap<imtbase::CSelectionAdapterComp> SelectionAdapter;
 typedef icomp::TModelCompWrap<imtbase::CSelectionParamAdapterComp> SelectionParamAdapter;
 typedef icomp::TModelCompWrap<imtbase::CSystemStatusComp> SystemStatus;
 typedef imtbase::CDelegatedBinaryDataProviderComp DelegatedBinaryDataProviders;
-typedef icomp::TModelCompWrap<imtbase::CCollectionStructureComp> HierarchicalStructure;
 
 
 } // namespace ImtCorePck

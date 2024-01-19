@@ -21,7 +21,7 @@ CSqlDatabaseCollectionStructureIterator::CSqlDatabaseCollectionStructureIterator
 }
 
 
-// reimplemented (imtbase::ICollectionStructureIterator)
+// reimplemented (imtbase::IHierarchicalStructureIterator)
 
 bool CSqlDatabaseCollectionStructureIterator::Next()
 {
@@ -48,17 +48,17 @@ bool CSqlDatabaseCollectionStructureIterator::Previous()
 }
 
 
-imtbase::ICollectionStructureInfo::Id CSqlDatabaseCollectionStructureIterator::GetNodeId() const
+imtbase::IHierarchicalStructureInfo::Id CSqlDatabaseCollectionStructureIterator::GetNodeId() const
 {
-	imtbase::ICollectionStructureInfo::Id nodeId = m_records[m_currentIndex].value("Id").toByteArray();
+	imtbase::IHierarchicalStructureInfo::Id nodeId = m_records[m_currentIndex].value("Id").toByteArray();
 
 	return nodeId;
 }
 
 
-imtbase::ICollectionStructureInfo::NodeInfo CSqlDatabaseCollectionStructureIterator::GetNodeInfo() const
+imtbase::IHierarchicalStructureInfo::NodeInfo CSqlDatabaseCollectionStructureIterator::GetNodeInfo() const
 {
-	imtbase::ICollectionStructureInfo::NodeInfo nodeInfo;
+	imtbase::IHierarchicalStructureInfo::NodeInfo nodeInfo;
 	nodeInfo.id = m_records[m_currentIndex].value("Id").toByteArray();
 	nodeInfo.name = m_records[m_currentIndex].value("Name").toByteArray();
 	nodeInfo.description = m_records[m_currentIndex].value("Description").toByteArray();

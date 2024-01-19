@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtbase/ICollectionStructureInfo.h>
+#include <imtbase/IHierarchicalStructureInfo.h>
 
 
 namespace imtbase
@@ -13,7 +13,7 @@ namespace imtbase
 	Interface for an object collection iteration.
 	\ingroup Collection
 */
-class ICollectionStructureIterator: virtual public istd::IPolymorphic
+class IHierarchicalStructureIterator: virtual public istd::IPolymorphic
 {
 public:
 	/**
@@ -29,12 +29,12 @@ public:
 	/**
 		Get node-ID at the current iterator position.
 	*/
-	virtual ICollectionStructureInfo::Id GetNodeId() const = 0;
+	virtual IHierarchicalStructureInfo::Id GetNodeId() const = 0;
 
 	/**
 		Get node info at the current iterator position.
 	*/
-	virtual ICollectionStructureInfo::NodeInfo GetNodeInfo() const = 0;
+	virtual IHierarchicalStructureInfo::NodeInfo GetNodeInfo() const = 0;
 };
 
 

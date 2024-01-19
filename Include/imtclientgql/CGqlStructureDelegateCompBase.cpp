@@ -9,7 +9,7 @@ namespace imtclientgql
 
 // reimplemented (IGqlStructureDelegate)
 
-imtbase::ICollectionStructureInfo::Id CGqlStructureDelegateCompBase::InsertNewNode(
+imtbase::IHierarchicalStructureInfo::Id CGqlStructureDelegateCompBase::InsertNewNode(
 			const QString& name,
 			const QString& description,
 			const Id& proposedNodeId,
@@ -344,7 +344,7 @@ int CGqlStructureDelegateCompBase::GetNodeCount(const iprm::IParamsSet* selectio
 }
 
 
-imtbase::ICollectionStructureInfo::Ids CGqlStructureDelegateCompBase::GetNodeIds(
+imtbase::IHierarchicalStructureInfo::Ids CGqlStructureDelegateCompBase::GetNodeIds(
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
@@ -372,7 +372,7 @@ imtbase::ICollectionStructureInfo::Ids CGqlStructureDelegateCompBase::GetNodeIds
 }
 
 
-imtbase::ICollectionStructureIterator* CGqlStructureDelegateCompBase::CreateCollectionStructureIterator(
+imtbase::IHierarchicalStructureIterator* CGqlStructureDelegateCompBase::CreateCollectionStructureIterator(
 			int /*offset*/,
 			int /*count*/,
 			const iprm::IParamsSet* /*selectionParamsPtr*/) const
@@ -381,7 +381,7 @@ imtbase::ICollectionStructureIterator* CGqlStructureDelegateCompBase::CreateColl
 }
 
 
-imtbase::ICollectionStructureInfo::NodeInfo CGqlStructureDelegateCompBase::GetNodeInfo(const Id& nodeId)
+imtbase::IHierarchicalStructureInfo::NodeInfo CGqlStructureDelegateCompBase::GetNodeInfo(const Id& nodeId)
 {
 	if (m_clientCompPtr.IsValid()){
 		istd::TDelPtr<imtgql::IGqlRequest> requestPtr = CreateGetNodeInfoRequest(nodeId);
@@ -403,7 +403,7 @@ imtbase::ICollectionStructureInfo::NodeInfo CGqlStructureDelegateCompBase::GetNo
 }
 
 
-imtbase::ICollectionStructureInfo::Ids CGqlStructureDelegateCompBase::GetObjectParentNodeIds(const Id& objectId) const
+imtbase::IHierarchicalStructureInfo::Ids CGqlStructureDelegateCompBase::GetObjectParentNodeIds(const Id& objectId) const
 {
 	if (m_clientCompPtr.IsValid()){
 		istd::TDelPtr<imtgql::IGqlRequest> requestPtr = CreateGetObjectParentNodeIdsRequest(objectId);
@@ -425,15 +425,15 @@ imtbase::ICollectionStructureInfo::Ids CGqlStructureDelegateCompBase::GetObjectP
 }
 
 
-imtbase::ICollectionStructureController* CGqlStructureDelegateCompBase::GetHierarchicalStructureController()
+imtbase::IStructuredObjectCollectionController* CGqlStructureDelegateCompBase::GetHierarchicalStructureController()
 {
 	return nullptr;
 }
 
 
-imtbase::ICollectionStructure::NodePath CGqlStructureDelegateCompBase::GetNodePath(const Id& /*nodeId*/) const
+imtbase::IHierarchicalStructure::NodePath CGqlStructureDelegateCompBase::GetNodePath(const Id& /*nodeId*/) const
 {
-	return imtbase::ICollectionStructure::NodePath();
+	return imtbase::IHierarchicalStructure::NodePath();
 }
 
 

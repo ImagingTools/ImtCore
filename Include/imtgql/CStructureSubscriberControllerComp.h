@@ -6,7 +6,7 @@
 
 // ImtCore includes
 #include <imtgql/CGqlSubscriberControllerCompBase.h>
-#include <imtbase/ICollectionStructure.h>
+#include <imtbase/IHierarchicalStructure.h>
 
 
 namespace imtgql
@@ -36,7 +36,7 @@ protected:
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 protected:
-	I_REF(imtbase::ICollectionStructure, m_collectionStructureCompPtr);
+	I_REF(imtbase::IHierarchicalStructure, m_collectionStructureCompPtr);
 	I_REF(imod::IModel, m_modelCompPtr);
 
 };

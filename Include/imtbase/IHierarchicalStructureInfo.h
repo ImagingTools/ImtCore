@@ -5,7 +5,6 @@
 #include <QtCore/QSharedPointer>
 
 // ACF includes
-#include <istd/IChangeable.h>
 #include <idoc/IDocumentMetaInfo.h>
 
 
@@ -18,10 +17,10 @@ namespace iprm
 namespace imtbase
 {
 
-class ICollectionStructureIterator;
+class IHierarchicalStructureIterator;
 
 
-class ICollectionStructureInfo : virtual public istd::IChangeable
+class IHierarchicalStructureInfo : virtual public istd::IChangeable
 {
 public:
 	typedef QByteArray Id;
@@ -75,6 +74,24 @@ public:
 		Ids childNodeIds;
 	};
 
+	struct Node
+	{
+		QString name;
+		QString description;
+		QSharedPointer<idoc::IDocumentMetaInfo> metaInfo;
+		Id parentId;
+		Ids childs;
+	};
+
+	struct Leaf
+	{
+		QString name;
+		Id parentId;
+		Id itemId;
+	};
+
+	typedef QList<PathElement> NodePath;
+
 	virtual int GetNodeCount(const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
 	virtual Ids GetNodeIds(
 				int offset = 0,
@@ -86,21 +103,17 @@ public:
 		\param count				[optional] If positive, the number of nodes should be returned.
 		\param selectionParamsPtr	[optional] Additional parameters for filtering/ordering nodes.
 	*/
-	virtual imtbase::ICollectionStructureIterator* CreateCollectionStructureIterator(
+	virtual imtbase::IHierarchicalStructureIterator* CreateCollectionStructureIterator(
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
-
 	virtual NodeInfo GetNodeInfo(const Id& nodeId) = 0;
-	virtual Ids GetObjectParentNodeIds(const Id& objectId) const = 0;
-
-	typedef QList<PathElement> NodePath;
 	virtual NodePath GetNodePath(const Id& nodeId) const = 0;
 };
 
 
 } // namespace imtbase
 
-Q_DECLARE_METATYPE(imtbase::ICollectionStructureInfo::NotifierInfo2);
+Q_DECLARE_METATYPE(imtbase::IHierarchicalStructureInfo::NotifierInfo2);
 
 

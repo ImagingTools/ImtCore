@@ -56,7 +56,7 @@ public:
 };
 
 
-typedef TICollectionStructure<ICollectionStructureInfo> ICCollectionStructure;
+typedef TICollectionStructure<IHierarchicalStructureInfo> ICCollectionStructure;
 typedef TICollectionStructure<IObjectCollectionStructureInfo> IObjectCollectionStructure;
 
 

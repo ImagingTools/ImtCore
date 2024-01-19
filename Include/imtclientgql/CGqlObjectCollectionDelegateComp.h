@@ -27,7 +27,7 @@ public:
 
 	I_BEGIN_COMPONENT(CGqlObjectCollectionDelegateComp);
 		I_REGISTER_INTERFACE(IGqlObjectCollectionDelegate);
-		I_ASSIGN(m_collectionIdAttrPtr, "Id", "Collection ID", false, "");
+		I_ASSIGN(m_collectionIdAttrPtr, "Id", "Collection-ID", false, "");
 		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta-info creator", false, "MetaInfoCreator");
 	I_END_COMPONENT;
 

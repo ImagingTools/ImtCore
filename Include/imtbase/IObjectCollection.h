@@ -13,11 +13,11 @@ namespace imtbase
 {
 
 
-class ICollectionStructure;
+class IHierarchicalStructure;
 class IRevisionController;
 class ICollectionDataController;
 class IObjectCollectionIterator;
-class ICollectionStructure;
+class IHierarchicalStructure;
 
 
 /**
@@ -107,7 +107,7 @@ public:
 		virtual istd::IFactoryInfo::KeyList GetFactoryKeys() const = 0;
 	};
 
-	virtual ICollectionStructure* GetCollectionStructure() const;
+	virtual IHierarchicalStructure* GetCollectionStructure() const;
 
 	/**
 		Get access to the revision controller of the collection, if available.
@@ -168,8 +168,8 @@ public:
 		Set data for the entry with the given ID.
 	*/
 	virtual bool SetObjectData(
-				const Id& objectId, 
-				const istd::IChangeable& object, 
+				const Id& objectId,
+				const istd::IChangeable& object,
 				CompatibilityMode mode = CM_WITHOUT_REFS,
 				const IOperationContext* operationContextPtr = nullptr) = 0;
 

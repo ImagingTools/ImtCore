@@ -239,11 +239,6 @@ I_EXPORT_COMPONENT(
 			"Delegated provider of a slave data provider",
 			"Delegator Data Binary Provider");
 
-I_EXPORT_COMPONENT(
-            HierarchicalStructure,
-            "Hierarchical structure",
-            "Hierarchical Structure");
-
 
 } // namespace ImtCorePck
 

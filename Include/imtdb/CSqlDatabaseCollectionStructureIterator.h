@@ -5,7 +5,7 @@
 #include <QtSql/QtSql>
 
 // ImtCore includes
-#include <imtbase/ICollectionStructureIterator.h>
+#include <imtbase/IHierarchicalStructureIterator.h>
 #include <imtdb/ISqlDatabaseObjectDelegate.h>
 
 
@@ -17,7 +17,7 @@ namespace imtdb
 	Common interface for a object collection query.
 	\ingroup Collection
 */
-class CSqlDatabaseCollectionStructureIterator: virtual public imtbase::ICollectionStructureIterator
+class CSqlDatabaseCollectionStructureIterator: virtual public imtbase::IHierarchicalStructureIterator
 {
 	typedef imtbase::IObjectCollection::DataPtr DataPtr;
 public:
@@ -26,8 +26,8 @@ public:
 	// reimplemented (imtbase::IObjectCollectionIterator)
 	virtual bool Next() override;
 	virtual bool Previous() override;
-	virtual imtbase::ICollectionStructureInfo::Id GetNodeId() const override;
-	virtual imtbase::ICollectionStructureInfo::NodeInfo GetNodeInfo() const override;
+	virtual imtbase::IHierarchicalStructureInfo::Id GetNodeId() const override;
+	virtual imtbase::IHierarchicalStructureInfo::NodeInfo GetNodeInfo() const override;
 private:
 	QList<QSqlRecord> m_records;
 

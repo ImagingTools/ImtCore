@@ -11,7 +11,6 @@
 // GmgCore includes
 #include <imtclientgql/CGqlObjectCollectionInfo.h>
 #include <imtclientgql/IGqlObjectCollectionDelegate.h>
-#include <imtclientgql/IGqlObjectCollectionRequestDelegate.h>
 
 
 namespace imtclientgql
@@ -20,32 +19,22 @@ namespace imtclientgql
 
 class CGqlObjectCollectionDelegateCompBase:
 			public ilog::CLoggerComponentBase,
-			virtual public IGqlObjectCollectionDelegate,
-			virtual public IGqlObjectCollectionRequestDelegate
+			virtual public IGqlObjectCollectionDelegate
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CGqlObjectCollectionDelegateCompBase);
 		I_REGISTER_INTERFACE(IGqlObjectCollectionDelegate);
-		I_REGISTER_INTERFACE(IGqlObjectCollectionRequestDelegate);
 		I_ASSIGN_MULTI_0(m_objectTypeIdsAttrPtr, "ObjectTypeIds", "ID of the supported object type for this delegate", true);
 		I_ASSIGN(m_clientCompPtr, "ApiClient", "GraphQL API client", true, "ApiClient");
 	I_END_COMPONENT;
 
 	// reimplemented (IGqlObjectCollectionDelegate)
 	virtual QByteArrayList GetSupportedObjectTypeIds() const override;
-
-	/**
-		Infos
-	*/
 	virtual imtbase::IStructuredObjectCollectionInfo::ElementType GetElementType(const QByteArray& elementId) const override;
 	virtual bool GetNodeInfo(const QByteArray& nodeId, imtgql::IGqlStructuredCollectionResponse::NodeInfo& outInfo) const override;
 	virtual bool GetObjectInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& outInfo) const override;
-
-	/**
-		Structure manipulations
-	*/
 	virtual QByteArray InsertNode(
 				const QString& name,
 				const QString& description,
@@ -73,7 +62,6 @@ public:
 	virtual bool RemoveNode(
 				const QByteArray& nodeId,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
-
 	virtual bool AddObjectToNode(
 				const QByteArray& objectId,
 				const QByteArray& nodeId,
@@ -87,10 +75,6 @@ public:
 				const QByteArray& objectId,
 				const QByteArray& nodeId,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
-
-	/**
-		Object manipulations
-	*/
 	virtual bool SetObjectName(
 				const QByteArray& objectId,
 				const QString& name,
@@ -106,10 +90,6 @@ public:
 	virtual bool RemoveObject(
 				const QByteArray& objectId,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
-
-	/**
-		Enumeration
-	*/
 	virtual int GetElementCount(
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 	virtual imtgql::IGqlStructuredCollectionResponse::ElementList GetElementList(
@@ -126,7 +106,6 @@ public:
 	virtual imtgql::IGqlRequest* CreateGetElementType(const QByteArray& elementId) const override;
 	virtual imtgql::IGqlRequest* CreateGetNodeInfoRequest(const QByteArray& nodeId) const override;
 	virtual imtgql::IGqlRequest* CreateGetObjectInfoRequest(const QByteArray& objectId) const override;
-
 	virtual imtgql::IGqlRequest* CreateInsertNodeRequest(
 				const QString& name,
 				const QString& description,
@@ -153,7 +132,6 @@ public:
 	virtual imtgql::IGqlRequest* CreateRemoveNodeRequest(
 				const QByteArray& nodeId,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
-
 	virtual imtgql::IGqlRequest* CreateAddObjectToNodeRequest(
 				const QByteArray& objectId,
 				const QByteArray& nodeId,
@@ -170,7 +148,6 @@ public:
 				const QByteArray& nodeId,
 				int clientVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
-
 	virtual imtgql::IGqlRequest* CreateInsertObjectRequest(
 				const QByteArray& typeId,
 				const QString& name,
@@ -210,7 +187,6 @@ public:
 				const QByteArray& objectId,
 				int clientElementVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
-
 	virtual imtgql::IGqlRequest* CreateGetElementCountRequest(
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 	virtual imtgql::IGqlRequest* CreateGetElementListRequest(

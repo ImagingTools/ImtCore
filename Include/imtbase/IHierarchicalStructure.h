@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtbase/ICollectionStructureInfo.h>
+#include <imtbase/IHierarchicalStructureInfo.h>
 
 
 namespace imtbase
@@ -10,10 +10,9 @@ namespace imtbase
 
 
 class IOperationContext;
-class ICollectionStructureController;
 
 
-class ICollectionStructure: virtual public ICollectionStructureInfo
+class IHierarchicalStructure: virtual public IHierarchicalStructureInfo
 {
 public:
 	virtual Id InsertNewNode(
@@ -33,7 +32,7 @@ public:
 				const IOperationContext* operationContextPtr = nullptr) = 0;
 	virtual bool SetNodeMetaInfo(
 				const Id& nodeId,
-				const idoc::IDocumentMetaInfo &metaInfo,
+				const idoc::IDocumentMetaInfo& metaInfo,
 				const IOperationContext* operationContextPtr = nullptr) = 0;
 	virtual bool MoveNode(
 				const Id& nodeId,
@@ -42,20 +41,24 @@ public:
 	virtual bool RemoveNode(
 				const Id& nodeId,
 				const IOperationContext* operationContextPtr = nullptr) = 0;
-	virtual bool AssignObject(
-				const Id& objectId,
+
+	/**
+		Insert a reference to an item into the given node.
+		This method creates a leaf inside of the given parent node.
+	*/
+	virtual bool InsertItem(
+				const Id& itemId,
 				const Id& nodeId,
 				const IOperationContext* operationContextPtr = nullptr) = 0;
-	virtual bool MoveObject(
-				const Id& objectId,
+	virtual bool MoveItem(
+				const Id& itemId,
 				const Id& sourceNodeId,
 				const Id& targetNodeId,
 				const IOperationContext* operationContextPtr = nullptr) = 0;
-	virtual bool RemoveObject(
-				const Id& objectId,
+	virtual bool RemoveItem(
+				const Id& itemId,
 				const Id& nodeId,
 				const IOperationContext* operationContextPtr = nullptr) = 0;
-	virtual ICollectionStructureController* GetHierarchicalStructureController() = 0;
 };
 
 

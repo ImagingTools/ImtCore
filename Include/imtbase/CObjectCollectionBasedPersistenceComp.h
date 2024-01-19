@@ -7,7 +7,7 @@
 
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
-#include <imtbase/IStructuredCollectionInserter.h>
+#include <imtbase/IStructuredObjectCollectionController.h>
 #include <imtbase/TICollectionStructure.h>
 
 
@@ -64,7 +64,7 @@ private:
 	I_MULTITEXTATTR(m_extensionDescAttrPtr);
 	I_REF(imtbase::IObjectCollection, m_collectionCompPtr);
 	I_REF(imtbase::IObjectCollectionStructure, m_collectionStructureCompPtr);
-	I_REF(imtbase::IStructuredCollectionInserter, m_collectionInserterCompPtr);
+	I_REF(imtbase::IStructuredObjectCollectionController, m_collectionInserterCompPtr);
 	I_REF(ifile::IFileTypeInfo, m_fileTypeInfoCompPtr);
 };
 

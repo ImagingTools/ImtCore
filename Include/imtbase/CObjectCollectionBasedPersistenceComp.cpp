@@ -122,7 +122,14 @@ int CObjectCollectionBasedPersistenceComp::SaveToFile(
 
 						QByteArray insertedObjectId;
 						if (m_collectionInserterCompPtr.IsValid()){
-							insertedObjectId = m_collectionInserterCompPtr->InsertNewObject(*m_objectTypeIdAttrPtr, objectName, "", &data, objectId, nodeId);
+							insertedObjectId = m_collectionInserterCompPtr->InsertNewObjectIntoCollection(
+										m_collectionCompPtr.GetPtr(),
+										nodeId,
+										*m_objectTypeIdAttrPtr,
+										objectName,
+										"",
+										&data,
+										objectId);
 						}
 						else{
 							insertedObjectId = m_collectionCompPtr->InsertNewObject(*m_objectTypeIdAttrPtr, objectName, "", &data, objectId);
@@ -153,7 +160,7 @@ int CObjectCollectionBasedPersistenceComp::SaveToFile(
 
 							QByteArray insertedObjectId;
 							if (m_collectionInserterCompPtr.IsValid()){
-								insertedObjectId = m_collectionInserterCompPtr->InsertNewObject(*m_objectTypeIdAttrPtr, objectName, "", &data, objectId, nodeId);
+								insertedObjectId = m_collectionInserterCompPtr->InsertNewObjectIntoCollection(m_collectionCompPtr .GetPtr(), *m_objectTypeIdAttrPtr, nodeId, objectName, "", &data, objectId);
 							}
 							else{
 								insertedObjectId = m_collectionCompPtr->InsertNewObject(*m_objectTypeIdAttrPtr, objectName, "", &data, objectId);

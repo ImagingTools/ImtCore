@@ -14,8 +14,8 @@
 // #include <imtdb/IDatabaseObjectDelegate.h>
 #include <imtdb/IDatabaseEngine.h>
 // #include <imtdb/IDatabaseLoginSettings.h>
-#include <imtbase/ICollectionStructure.h>
-#include <imtbase/ICollectionStructureController.h>
+#include <imtbase/IHierarchicalStructure.h>
+#include <imtbase/IStructuredObjectCollectionController.h>
 #include <imttest/CTestInfo.h>
 #include <imttest/ITestInfo.h>
 #include <imttest/CTestMetaInfo.h>
@@ -67,7 +67,7 @@ void CStructurePartituraTestBase::InsertNewNodeWithRequiredParamsTest()
 	if (compositePtr.IsValid()){
 
 		// get component hierarchical structure
-		imtbase::ICollectionStructure* hierarchicalStructurePtr = compositePtr->GetComponentInterface<imtbase::ICollectionStructure>();
+		imtbase::IHierarchicalStructure* hierarchicalStructurePtr = compositePtr->GetComponentInterface<imtbase::IHierarchicalStructure>();
 		if (hierarchicalStructurePtr != nullptr){
 
 			// reset data from hierarchical structure
@@ -98,7 +98,7 @@ void CStructurePartituraTestBase::SetNodeNameTest()
 	if (compositePtr.IsValid()){
 
 		// get component hierarchical structure
-		imtbase::ICollectionStructure* hierarchicalStructurePtr = compositePtr->GetComponentInterface<imtbase::ICollectionStructure>();
+		imtbase::IHierarchicalStructure* hierarchicalStructurePtr = compositePtr->GetComponentInterface<imtbase::IHierarchicalStructure>();
 		if (hierarchicalStructurePtr != nullptr){
 
 			// reset data from hierarchical structure
@@ -129,7 +129,7 @@ void CStructurePartituraTestBase::SetNodeDescriptionTest()
 	if (compositePtr.IsValid()){
 
 		// get component hierarchical structure
-		imtbase::ICollectionStructure* hierarchicalStructurePtr = compositePtr->GetComponentInterface<imtbase::ICollectionStructure>();
+		imtbase::IHierarchicalStructure* hierarchicalStructurePtr = compositePtr->GetComponentInterface<imtbase::IHierarchicalStructure>();
 		if (hierarchicalStructurePtr != nullptr){
 
 			// reset data from hierarchical structure
@@ -160,7 +160,7 @@ void CStructurePartituraTestBase::MoveNodeTest()
 	if (compositePtr.IsValid()) {
 
 		// get component hierarchical structure
-		imtbase::ICollectionStructure* hierarchicalStructurePtr = compositePtr->GetComponentInterface<imtbase::ICollectionStructure>();
+		imtbase::IHierarchicalStructure* hierarchicalStructurePtr = compositePtr->GetComponentInterface<imtbase::IHierarchicalStructure>();
 		if (hierarchicalStructurePtr != nullptr) {
 
 			// reset data from hierarchical structure
@@ -191,7 +191,7 @@ void CStructurePartituraTestBase::RemoveNodeTest()
 	if (compositePtr.IsValid()) {
 
 		// get component hierarchical structure
-		imtbase::ICollectionStructure* hierarchicalStructurePtr = compositePtr->GetComponentInterface<imtbase::ICollectionStructure>();
+		imtbase::IHierarchicalStructure* hierarchicalStructurePtr = compositePtr->GetComponentInterface<imtbase::IHierarchicalStructure>();
 		if (hierarchicalStructurePtr != nullptr) {
 
 			// reset data from hierarchical structure
@@ -274,7 +274,7 @@ void CStructurePartituraTestBase::InsertObjectWithRequiredParamsTest()
 		}
 
 		// get component hierarchical structure
-		imtbase::ICollectionStructureController* collectionStructureControllerPtr = compositePtr->GetComponentInterface<imtbase::ICollectionStructureController>();
+		imtbase::IStructuredObjectCollectionController* collectionStructureControllerPtr = compositePtr->GetComponentInterface<imtbase::IStructuredObjectCollectionController>();
 		if (collectionStructureControllerPtr != nullptr) {
 
 			QByteArray idNewObject = collectionStructureControllerPtr->InsertNewObjectIntoCollection(objectCollectionPtr, nodeId, typeId, name, description, imtbase::IObjectCollection::DataPtr(), objectId);
@@ -304,7 +304,7 @@ void CStructurePartituraTestBase::MoveObjectTest()
 	if (compositePtr.IsValid()) {
 
 		// get component hierarchical structure
-		imtbase::ICollectionStructure* hierarchicalStructurePtr = compositePtr->GetComponentInterface<imtbase::ICollectionStructure>();
+		imtbase::IHierarchicalStructure* hierarchicalStructurePtr = compositePtr->GetComponentInterface<imtbase::IHierarchicalStructure>();
 		if (hierarchicalStructurePtr != nullptr) {
 
 			// reset data from hierarchical structure
@@ -335,7 +335,7 @@ void CStructurePartituraTestBase::RemoveObjectTest()
 	if (compositePtr.IsValid()) {
 
 		// get component hierarchical structure
-		imtbase::ICollectionStructure* hierarchicalStructurePtr = compositePtr->GetComponentInterface<imtbase::ICollectionStructure>();
+		imtbase::IHierarchicalStructure* hierarchicalStructurePtr = compositePtr->GetComponentInterface<imtbase::IHierarchicalStructure>();
 		if (hierarchicalStructurePtr != nullptr) {
 
 			// reset data from hierarchical structure
@@ -366,13 +366,13 @@ void CStructurePartituraTestBase::GetNodePathTest()
 	if (compositePtr.IsValid()) {
 
 		// get component hierarchical structure
-		imtbase::ICollectionStructure* hierarchicalStructurePtr = compositePtr->GetComponentInterface<imtbase::ICollectionStructure>();
+		imtbase::IHierarchicalStructure* hierarchicalStructurePtr = compositePtr->GetComponentInterface<imtbase::IHierarchicalStructure>();
 		if (hierarchicalStructurePtr != nullptr) {
 
 			// reset data from hierarchical structure
 			hierarchicalStructurePtr->ResetData();
 
-			imtbase::ICollectionStructureInfo::NodePath nodePath = hierarchicalStructurePtr->GetNodePath("83465a08-b435-44b8-99e3-b2e72e50b205");
+			imtbase::IHierarchicalStructureInfo::NodePath nodePath = hierarchicalStructurePtr->GetNodePath("83465a08-b435-44b8-99e3-b2e72e50b205");
 
 			// check get correct result
 			QVERIFY2(nodePath.count() == 2, "Failed in get node path");

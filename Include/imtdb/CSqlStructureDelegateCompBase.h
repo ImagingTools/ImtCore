@@ -10,9 +10,9 @@
 
 // GmgCore includes
 #include <imtbase/IOperationContext.h>
-#include <imtbase/ICollectionStructure.h>
+#include <imtbase/IHierarchicalStructure.h>
+#include <imtbase/IStructuredCollectionFinder.h>
 #include <imtdb/IDatabaseEngine.h>
-// #include <imtclientgql/IGqlStructureResponse.h>
 
 
 namespace imtdb
@@ -21,13 +21,15 @@ namespace imtdb
 
 class CSqlStructureDelegateCompBase:
 			public ilog::CLoggerComponentBase,
-			virtual public imtbase::ICollectionStructure
+			virtual public imtbase::IHierarchicalStructure,
+			virtual public imtbase::IStructuredCollectionFinder
 {
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_BASE_COMPONENT(CSqlStructureDelegateCompBase);
-		I_REGISTER_INTERFACE(imtbase::ICollectionStructure);
+		I_REGISTER_INTERFACE(imtbase::IHierarchicalStructure);
+		I_REGISTER_INTERFACE(imtbase::IStructuredCollectionFinder);
 		I_ASSIGN(m_dbEngineCompPtr, "DatabaseEngine", "Database engine used for low level SQL quering", true, "DatabaseEngine");
 	I_END_COMPONENT;
 
@@ -58,16 +60,16 @@ public:
 				const Id& nodeId,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
 
-	virtual bool AssignObject(
+	virtual bool InsertItem(
 				const Id& objectId,
 				const Id& nodeId,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
-	virtual bool MoveObject(
+	virtual bool MoveItem(
 				const Id& objectId,
 				const Id& sourceNodeId,
 				const Id& targetNodeId,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
-	virtual bool RemoveObject(
+	virtual bool RemoveItem(
 				const Id& objectId,
 				const Id& nodeId,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
@@ -77,14 +79,15 @@ public:
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
-	virtual imtbase::ICollectionStructureIterator* CreateCollectionStructureIterator(
+	virtual imtbase::IHierarchicalStructureIterator* CreateCollectionStructureIterator(
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 	virtual NodeInfo GetNodeInfo(const Id& nodeId) override;
 	virtual QList<PathElement> GetNodePath(const Id& nodeId) const override;
-	virtual Ids GetObjectParentNodeIds(const Id& objectId) const override;
-	virtual imtbase::ICollectionStructureController* GetHierarchicalStructureController() override;
+
+	// reimplemented (imtbase::IStructuredCollectionFinder)
+	virtual Ids FindObjectParentNodes(const Id& objectId) const override;
 
 protected:
 	virtual QByteArray CreateInsertNewNodeQuery(

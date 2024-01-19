@@ -13,12 +13,10 @@
 #include <istd/TSingleFactory.h>
 
 // ImtCore includes
-// #include <imtbase/CCollectionFilter.h>
-#include <imtbase/ICollectionStructureIterator.h>
+#include <imtbase/IHierarchicalStructureIterator.h>
 #include <imtbase/COperationContext.h>
-// #include <imtbase/CObjectCollection.h>
 #include <imtbase/COperationDescription.h>
-#include <imtbase/ICollectionStructureController.h>
+#include <imtbase/IStructuredObjectCollectionController.h>
 #include <imtgql/imtgql.h>
 
 
@@ -30,27 +28,27 @@ namespace imtgql
 
 bool CStructureControllerCompBase::IsRequestSupported(const CGqlRequest& gqlRequest) const
 {
-    bool retVal = false;
+	bool retVal = false;
 
-    QByteArray commandId = gqlRequest.GetCommandId();
+	QByteArray commandId = gqlRequest.GetCommandId();
 
-    for (int index = 0; index < m_commandIdsAttrPtr.GetCount(); index++){
-        if (commandId == *m_structureIdAttrPtr + m_commandIdsAttrPtr[index]){
-            retVal = true;
+	for (int index = 0; index < m_commandIdsAttrPtr.GetCount(); index++){
+		if (commandId == *m_structureIdAttrPtr + m_commandIdsAttrPtr[index]){
+			retVal = true;
 
-            break;
-        }
-    }
+			break;
+		}
+	}
 
-    return retVal;
+	return retVal;
 }
 
 
 // reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 
 imtbase::CTreeItemModel* CStructureControllerCompBase::CreateInternalResponse(
-			const imtgql::CGqlRequest& gqlRequest,
-			QString& errorMessage) const
+	const imtgql::CGqlRequest& gqlRequest,
+	QString& errorMessage) const
 {
 	imtgql::CGqlObject gqlObject;
 
@@ -62,38 +60,38 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::CreateInternalResponse(
 	Q_ASSERT(operationType != OT_UNKNOWN);
 
 	switch (operationType){
-    case OT_INSERT_NEW_NODE:
-        return InsertNewNode(gqlRequest, errorMessage);
-    case OT_SET_NODE_NAME:
-        return SetNodeName(gqlRequest, errorMessage);
-    case OT_SET_NODE_DESCRIPTION:
-        return SetNodeDescription(gqlRequest, errorMessage);
-    case OT_SET_NODE_METAINFO:
-        return SetNodeMetaInfo(gqlRequest, errorMessage);
-    case OT_MOVE_NODE:
-        return MoveNode(gqlRequest, errorMessage);
-    case OT_REMOVE_NODE:
-        return RemoveNode(gqlRequest, errorMessage);
-    case OT_INSERT_NEW_OBJECT:
-        return InsertNewObject(gqlRequest, errorMessage);
-    case OT_MOVE_OBJECT:
-        return MoveObject(gqlRequest, errorMessage);
-    case OT_REMOVE_OBJECT:
-        return RemoveObject(gqlRequest, errorMessage);
-    case OT_GET_NODE_COUNT:
-        return GetNodeCount(gqlRequest, errorMessage);
-    case OT_GET_NODE_IDS:
-        return GetNodeIds(gqlRequest, errorMessage);
-    case OT_GET_NODE_INFO:
-        return GetNodeInfo(gqlRequest, errorMessage);
-    case OT_GET_OBJECT_PARENT_NODE_IDS:
-        return GetObjectParentNodeIds(gqlRequest, errorMessage);
+	case OT_INSERT_NEW_NODE:
+		return InsertNewNode(gqlRequest, errorMessage);
+	case OT_SET_NODE_NAME:
+		return SetNodeName(gqlRequest, errorMessage);
+	case OT_SET_NODE_DESCRIPTION:
+		return SetNodeDescription(gqlRequest, errorMessage);
+	case OT_SET_NODE_METAINFO:
+		return SetNodeMetaInfo(gqlRequest, errorMessage);
+	case OT_MOVE_NODE:
+		return MoveNode(gqlRequest, errorMessage);
+	case OT_REMOVE_NODE:
+		return RemoveNode(gqlRequest, errorMessage);
+	case OT_INSERT_NEW_OBJECT:
+		return InsertNewObject(gqlRequest, errorMessage);
+	case OT_MOVE_OBJECT:
+		return MoveObject(gqlRequest, errorMessage);
+	case OT_REMOVE_OBJECT:
+		return RemoveObject(gqlRequest, errorMessage);
+	case OT_GET_NODE_COUNT:
+		return GetNodeCount(gqlRequest, errorMessage);
+	case OT_GET_NODE_IDS:
+		return GetNodeIds(gqlRequest, errorMessage);
+	case OT_GET_NODE_INFO:
+		return GetNodeInfo(gqlRequest, errorMessage);
+	case OT_GET_OBJECT_PARENT_NODE_IDS:
+		return GetObjectParentNodeIds(gqlRequest, errorMessage);
 	case OT_GET_ELEMENTS:
 		return GetElements(gqlRequest, errorMessage);
 	}
 
 	errorMessage = QString("Unable to create internal response. Operation is not supported");
-    SendErrorMessage(0, errorMessage, "CStructureControllerCompBase");
+	SendErrorMessage(0, errorMessage, "CStructureControllerCompBase");
 
 	return nullptr;
 }
@@ -103,72 +101,72 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::CreateInternalResponse(
 
 void CStructureControllerCompBase::OnComponentCreated()
 {
-    BaseClass::OnComponentCreated();
+	BaseClass::OnComponentCreated();
 }
 
 
 // protected methods
 
 bool CStructureControllerCompBase::GetOperationFromRequest(
-			const imtgql::CGqlRequest& gqlRequest,
-			imtgql::CGqlObject& gqlObject,
-			QString& errorMessage,
-			int& operationType) const
+	const imtgql::CGqlRequest& gqlRequest,
+	imtgql::CGqlObject& gqlObject,
+	QString& errorMessage,
+	int& operationType) const
 {
-    QByteArray commandId = gqlRequest.GetCommandId();
+	QByteArray commandId = gqlRequest.GetCommandId();
 
-    if (commandId == *m_structureIdAttrPtr + "InsertNewNode"){
-        operationType = OT_INSERT_NEW_NODE;
-        return true;
-    }
-    if (commandId == *m_structureIdAttrPtr + "SetNodeName"){
-        operationType = OT_SET_NODE_NAME;
-        return true;
-    }
-    if (commandId == *m_structureIdAttrPtr + "SetNodeDescription"){
-        operationType = OT_SET_NODE_DESCRIPTION;
-        return true;
-    }
-    if (commandId == *m_structureIdAttrPtr + "SetNodeMetaInfo"){
-        operationType = OT_SET_NODE_METAINFO;
-        return true;
-    }
-    if (commandId == *m_structureIdAttrPtr + "MoveNode"){
-        operationType = OT_MOVE_NODE;
-        return true;
-    }
-    if (commandId == *m_structureIdAttrPtr + "RemoveNode"){
-        operationType = OT_REMOVE_NODE;
-        return true;
-    }
+	if (commandId == *m_structureIdAttrPtr + "InsertNewNode"){
+		operationType = OT_INSERT_NEW_NODE;
+		return true;
+	}
+	if (commandId == *m_structureIdAttrPtr + "SetNodeName"){
+		operationType = OT_SET_NODE_NAME;
+		return true;
+	}
+	if (commandId == *m_structureIdAttrPtr + "SetNodeDescription"){
+		operationType = OT_SET_NODE_DESCRIPTION;
+		return true;
+	}
+	if (commandId == *m_structureIdAttrPtr + "SetNodeMetaInfo"){
+		operationType = OT_SET_NODE_METAINFO;
+		return true;
+	}
+	if (commandId == *m_structureIdAttrPtr + "MoveNode"){
+		operationType = OT_MOVE_NODE;
+		return true;
+	}
+	if (commandId == *m_structureIdAttrPtr + "RemoveNode"){
+		operationType = OT_REMOVE_NODE;
+		return true;
+	}
 	if (commandId == *m_structureIdAttrPtr + "InsertNewObject"){
-        operationType = OT_INSERT_NEW_OBJECT;
-        return true;
-    }
-    if (commandId == *m_structureIdAttrPtr + "MoveObject"){
-        operationType = OT_MOVE_OBJECT;
-        return true;
-    }
-    if (commandId == *m_structureIdAttrPtr + "RemoveObject"){
-        operationType = OT_REMOVE_OBJECT;
-        return true;
-    }
-    if (commandId == *m_structureIdAttrPtr + "GetNodeCount"){
-        operationType = OT_GET_NODE_COUNT;
-        return true;
-    }
-    if (commandId == *m_structureIdAttrPtr + "GetNodeIds"){
-        operationType = OT_GET_NODE_IDS;
-        return true;
-    }
-    if (commandId == *m_structureIdAttrPtr + "GetNodeInfo"){
-        operationType = OT_GET_NODE_INFO;
-        return true;
-    }
-    if (commandId == *m_structureIdAttrPtr + "GetObjectParentNodeIds"){
-        operationType = OT_GET_OBJECT_PARENT_NODE_IDS;
-        return true;
-    }
+		operationType = OT_INSERT_NEW_OBJECT;
+		return true;
+	}
+	if (commandId == *m_structureIdAttrPtr + "MoveObject"){
+		operationType = OT_MOVE_OBJECT;
+		return true;
+	}
+	if (commandId == *m_structureIdAttrPtr + "RemoveObject"){
+		operationType = OT_REMOVE_OBJECT;
+		return true;
+	}
+	if (commandId == *m_structureIdAttrPtr + "GetNodeCount"){
+		operationType = OT_GET_NODE_COUNT;
+		return true;
+	}
+	if (commandId == *m_structureIdAttrPtr + "GetNodeIds"){
+		operationType = OT_GET_NODE_IDS;
+		return true;
+	}
+	if (commandId == *m_structureIdAttrPtr + "GetNodeInfo"){
+		operationType = OT_GET_NODE_INFO;
+		return true;
+	}
+	if (commandId == *m_structureIdAttrPtr + "GetObjectParentNodeIds"){
+		operationType = OT_GET_OBJECT_PARENT_NODE_IDS;
+		return true;
+	}
 	if (commandId == *m_structureIdAttrPtr + "GetNodes"){
 		operationType = OT_GET_NODES;
 		return true;
@@ -178,10 +176,9 @@ bool CStructureControllerCompBase::GetOperationFromRequest(
 		return true;
 	}
 
-
 	errorMessage = QString("Unable to get the operation type from the request");
 
-    SendErrorMessage(0, errorMessage, "CStructureControllerCompBase");
+	SendErrorMessage(0, errorMessage, "CStructureControllerCompBase");
 
 	return false;
 }
@@ -245,8 +242,8 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewNode(
 
 
 imtbase::CTreeItemModel* CStructureControllerCompBase::SetNodeName(
-	const imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	if (!m_collectionStructureCompPtr.IsValid()){
 		errorMessage = QString("Unable to rename object. Component reference 'CollectionStructure' was not set");
@@ -280,40 +277,40 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::SetNodeName(
 
 
 imtbase::CTreeItemModel* CStructureControllerCompBase::SetNodeDescription(
-    const imtgql::CGqlRequest& /*gqlRequest*/,
-    QString& /*errorMessage*/) const
+	const imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
 {
-    return nullptr;
+	return nullptr;
 }
 
 
 imtbase::CTreeItemModel* CStructureControllerCompBase::SetNodeMetaInfo(
-    const imtgql::CGqlRequest& /*gqlRequest*/,
-    QString& /*errorMessage*/) const
+	const imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
 {
-    return nullptr;
+	return nullptr;
 }
 
 
 imtbase::CTreeItemModel* CStructureControllerCompBase::MoveNode(
-    const imtgql::CGqlRequest& /*gqlRequest*/,
-    QString& /*errorMessage*/) const
+	const imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
 {
-    return nullptr;
+	return nullptr;
 }
 
 
 imtbase::CTreeItemModel* CStructureControllerCompBase::RemoveNode(
-    const imtgql::CGqlRequest& /*gqlRequest*/,
-    QString& /*errorMessage*/) const
+	const imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
 {
-    return nullptr;
+	return nullptr;
 }
 
 
 imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewObject(
-	const imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid() || !m_collectionStructureCompPtr.IsValid() || !m_gqlRequestExtractorCompPtr.IsValid()){
 		errorMessage = QT_TR_NOOP("Internal error");
@@ -331,9 +328,6 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewObject(
 	const QList<imtgql::CGqlObject> params = gqlRequest.GetParams();
 
 	if (params.size() > 0){
-		// typeId = params.at(0).GetFieldArgumentValue("typeId").toByteArray();
-		// name = params.at(0).GetFieldArgumentValue("name").toByteArray();
-		// description = params.at(0).GetFieldArgumentValue("description").toString();
 		const CGqlObject* additionObject = params.at(0).GetFieldArgumentObjectPtr("addition");
 		if (additionObject != nullptr){
 			nodeId = additionObject->GetFieldArgumentValue("nodeId").toByteArray();
@@ -352,20 +346,13 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewObject(
 		return nullptr;
 	}
 
-	// imtbase::IObjectCollection::DataPtr dataPtr;
-	// if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-	// 	errorMessage = QT_TR_NOOP("Object with this ID already exists");
-	// 	SendErrorMessage(0, QString("Object with ID: %1 already exists").arg(qPrintable(objectId)), "Object collection controller");
-
-	// 	return nullptr;
-	// }
-
 	istd::TDelPtr<imtbase::IOperationContext> operationContextPtr;
 
 	if (m_operationContextControllerCompPtr.IsValid()){
 		operationContextPtr.SetPtr(m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_CREATE, gqlRequest));
 	}
-	imtbase::ICollectionStructureController* collectionStructureController = m_collectionStructureCompPtr->GetHierarchicalStructureController();
+
+	imtbase::IStructuredObjectCollectionController* collectionStructureController = nullptr; // connect via I_REF 
 	if (collectionStructureController == nullptr){
 		return nullptr;
 	}
@@ -394,34 +381,34 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::InsertNewObject(
 
 
 imtbase::CTreeItemModel* CStructureControllerCompBase::MoveObject(
-    const imtgql::CGqlRequest& /*gqlRequest*/,
-    QString& /*errorMessage*/) const
+	const imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
 {
-    return nullptr;
+	return nullptr;
 }
 
 
 imtbase::CTreeItemModel* CStructureControllerCompBase::RemoveObject(
-    const imtgql::CGqlRequest& /*gqlRequest*/,
-    QString& /*errorMessage*/) const
+	const imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
 {
-    return nullptr;
+	return nullptr;
 }
 
 
 imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodeCount(
-    const imtgql::CGqlRequest& /*gqlRequest*/,
-    QString& /*errorMessage*/) const
+	const imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
 {
-    return nullptr;
+	return nullptr;
 }
 
 
 imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodeIds(
-    const imtgql::CGqlRequest& /*gqlRequest*/,
-    QString& /*errorMessage*/) const
+	const imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
 {
-	if (!m_collectionStructureCompPtr.IsValid()){
+	if (!m_collectionStructureCompPtr.IsValid()) {
 		return nullptr;
 	}
 
@@ -430,18 +417,18 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodeIds(
 
 
 imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodeInfo(
-    const imtgql::CGqlRequest& /*gqlRequest*/,
-    QString& /*errorMessage*/) const
+	const imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
 {
-    return nullptr;
+	return nullptr;
 }
 
 
 imtbase::CTreeItemModel* CStructureControllerCompBase::GetObjectParentNodeIds(
-    const imtgql::CGqlRequest& /*gqlRequest*/,
-    QString& /*errorMessage*/) const
+	const imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
 {
-    return nullptr;
+	return nullptr;
 }
 
 
@@ -449,7 +436,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 	const imtgql::CGqlRequest& gqlRequest,
 	QString& errorMessage) const
 {
-	if (!m_collectionStructureCompPtr.IsValid()){
+	if (!m_collectionStructureCompPtr.IsValid()) {
 		errorMessage = QString("Unable to list nodes. Component reference 'CollectionStructure' was not set");
 
 		SendCriticalMessage(0, errorMessage);
@@ -465,7 +452,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 	imtbase::CTreeItemModel* itemsModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
 
-	if (!errorMessage.isEmpty()){
+	if (!errorMessage.isEmpty()) {
 		imtbase::CTreeItemModel* errorsItemModel = rootModelPtr->AddTreeModel("errors");
 		errorsItemModel->SetData("message", errorMessage);
 	}
@@ -499,10 +486,10 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 		notificationModel->SetData("PagesCount", pagesCount);
 		notificationModel->SetData("TotalCount", nodesCount);
 
-		istd::TDelPtr<imtbase::ICollectionStructureIterator> collectionStructureIterator(m_collectionStructureCompPtr->CreateCollectionStructureIterator(offset, count, &filterParams));
+		istd::TDelPtr<imtbase::IHierarchicalStructureIterator> collectionStructureIterator(m_collectionStructureCompPtr->CreateCollectionStructureIterator(offset, count, &filterParams));
 		if (collectionStructureIterator != nullptr){
 			while (collectionStructureIterator->Next()){
-				imtbase::ICollectionStructureInfo::NodeInfo nodeInfo = collectionStructureIterator->GetNodeInfo();
+				imtbase::IHierarchicalStructureInfo::NodeInfo nodeInfo = collectionStructureIterator->GetNodeInfo();
 				int itemIndex = itemsModel->InsertNewItem();
 				if (itemIndex >= 0){
 					if (!SetupNodeItem(gqlRequest, *itemsModel, itemIndex, collectionStructureIterator.GetPtr(), errorMessage)){
@@ -539,7 +526,7 @@ bool CStructureControllerCompBase::SetupNodeItem(
 			const imtgql::CGqlRequest& gqlRequest,
 			imtbase::CTreeItemModel& model,
 			int itemIndex,
-			const imtbase::ICollectionStructureIterator* collectionStructureIterator,
+			const imtbase::IHierarchicalStructureIterator* collectionStructureIterator,
 			QString& errorMessage) const
 {
 	return false;

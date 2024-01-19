@@ -1,5 +1,6 @@
 #include <imtdb/CSqlStructureDelegateCompBase.h>
 
+
 // Qt includes
 #include <QtCore/QUuid>
 
@@ -15,7 +16,7 @@ namespace imtdb
 
 // reimplemented (IGqlStructureDelegate)
 
-imtbase::ICollectionStructureInfo::Id CSqlStructureDelegateCompBase::InsertNewNode(
+imtbase::IHierarchicalStructureInfo::Id CSqlStructureDelegateCompBase::InsertNewNode(
 			const QString& name,
 			const QString& description,
 			const Id& proposedNodeId,
@@ -157,7 +158,7 @@ bool CSqlStructureDelegateCompBase::RemoveNode(const Id& nodeId, const imtbase::
 }
 
 
-bool CSqlStructureDelegateCompBase::AssignObject(
+bool CSqlStructureDelegateCompBase::InsertItem(
 			const Id& objectId,
 			const Id& nodeId,
 			const imtbase::IOperationContext* operationContextPtr)
@@ -180,7 +181,7 @@ bool CSqlStructureDelegateCompBase::AssignObject(
 }
 
 
-bool CSqlStructureDelegateCompBase::MoveObject(
+bool CSqlStructureDelegateCompBase::MoveItem(
 			const Id& objectId,
 			const Id& sourceNodeId,
 			const Id& targetNodeId,
@@ -225,7 +226,7 @@ bool CSqlStructureDelegateCompBase::MoveObject(
 }
 
 
-bool CSqlStructureDelegateCompBase::RemoveObject(
+bool CSqlStructureDelegateCompBase::RemoveItem(
 			const Id& objectId,
 			const Id& nodeId,
 			const imtbase::IOperationContext* operationContextPtr)
@@ -291,7 +292,7 @@ int CSqlStructureDelegateCompBase::GetNodeCount(const iprm::IParamsSet* selectio
 }
 
 
-imtbase::ICollectionStructureInfo::Ids CSqlStructureDelegateCompBase::GetNodeIds(
+imtbase::IHierarchicalStructureInfo::Ids CSqlStructureDelegateCompBase::GetNodeIds(
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
@@ -321,7 +322,7 @@ imtbase::ICollectionStructureInfo::Ids CSqlStructureDelegateCompBase::GetNodeIds
 }
 
 
-imtbase::ICollectionStructureIterator* CSqlStructureDelegateCompBase::CreateCollectionStructureIterator(
+imtbase::IHierarchicalStructureIterator* CSqlStructureDelegateCompBase::CreateCollectionStructureIterator(
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
@@ -346,7 +347,7 @@ imtbase::ICollectionStructureIterator* CSqlStructureDelegateCompBase::CreateColl
 }
 
 
-imtbase::ICollectionStructureInfo::NodeInfo CSqlStructureDelegateCompBase::GetNodeInfo(const Id& nodeId)
+imtbase::IHierarchicalStructureInfo::NodeInfo CSqlStructureDelegateCompBase::GetNodeInfo(const Id& nodeId)
 {
 	QByteArray query = CreateGetNodeInfoQuery(nodeId);
 	if (query.isEmpty()){
@@ -362,7 +363,7 @@ imtbase::ICollectionStructureInfo::NodeInfo CSqlStructureDelegateCompBase::GetNo
 	}
 
 	if (sqlQuery.next()){
-		imtbase::ICollectionStructureInfo::NodeInfo nodeInfo;
+		imtbase::IHierarchicalStructureInfo::NodeInfo nodeInfo;
 		nodeInfo.name = sqlQuery.value("Name").toString();
 		nodeInfo.description = sqlQuery.value("Description").toString();
 	}
@@ -371,7 +372,7 @@ imtbase::ICollectionStructureInfo::NodeInfo CSqlStructureDelegateCompBase::GetNo
 }
 
 
-QList<imtbase::ICollectionStructureInfo::PathElement> CSqlStructureDelegateCompBase::GetNodePath(const Id& nodeId) const
+QList<imtbase::IHierarchicalStructureInfo::PathElement> CSqlStructureDelegateCompBase::GetNodePath(const Id& nodeId) const
 {
 	NodePath retVal;
 	QByteArray query = CreateGetNodePathQuery(nodeId);
@@ -398,7 +399,9 @@ QList<imtbase::ICollectionStructureInfo::PathElement> CSqlStructureDelegateCompB
 }
 
 
-imtbase::ICollectionStructureInfo::Ids CSqlStructureDelegateCompBase::GetObjectParentNodeIds(const Id& objectId) const
+// reimplemented (imtbase::IStructuredCollectionFinder)
+
+imtbase::IHierarchicalStructureInfo::Ids CSqlStructureDelegateCompBase::FindObjectParentNodes(const Id& objectId) const
 {
 	QByteArray query = CreateGetObjectParentNodeIdsQuery(objectId);
 	if (query.isEmpty()){
@@ -419,12 +422,6 @@ imtbase::ICollectionStructureInfo::Ids CSqlStructureDelegateCompBase::GetObjectP
 	}
 
 	return retVal;
-}
-
-
-imtbase::ICollectionStructureController* CSqlStructureDelegateCompBase::GetHierarchicalStructureController()
-{
-	return nullptr;
 }
 
 

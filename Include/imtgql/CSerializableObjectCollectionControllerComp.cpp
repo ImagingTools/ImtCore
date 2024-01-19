@@ -6,6 +6,7 @@
 #include <iser/CMemoryReadArchive.h>
 #include <imod/TModelWrap.h>
 
+// ImtCore includes
 #include <imtlic/ILicenseDefinition.h>
 
 
@@ -13,13 +14,14 @@ namespace imtgql
 {
 
 
-bool CSerializableObjectCollectionControllerComp::SerializeObject(const istd::IPolymorphic* object, QByteArray& objectData) const
+bool CSerializableObjectCollectionControllerComp::SerializeObject(
+			const istd::IPolymorphic* object,
+			QByteArray& objectData) const
 {
 	objectData.clear();
 
 	const iser::ISerializable* objectConst = dynamic_cast<const iser::ISerializable*>(object);
 	iser::ISerializable* serializableObject = dynamic_cast<iser::ISerializable*>(const_cast<iser::ISerializable*>(objectConst));
-
 	if (serializableObject == nullptr){
 		QByteArray errorMessage = QObject::tr("Object data metainfo is not Serializable").toUtf8();
 		SendErrorMessage(0, errorMessage);
@@ -41,7 +43,9 @@ bool CSerializableObjectCollectionControllerComp::SerializeObject(const istd::IP
 }
 
 
-bool CSerializableObjectCollectionControllerComp::DeSerializeObject(istd::IPolymorphic* object, const QByteArray& objectData) const
+bool CSerializableObjectCollectionControllerComp::DeSerializeObject(
+			istd::IPolymorphic* object,
+			const QByteArray& objectData) const
 {
 	iser::ISerializable* serializableObject = dynamic_cast<iser::ISerializable*>(object);
 	if (serializableObject == nullptr){
@@ -62,7 +66,9 @@ bool CSerializableObjectCollectionControllerComp::DeSerializeObject(istd::IPolym
 }
 
 
-imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetMetaInfo(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
@@ -95,7 +101,9 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetMetaInf
 }
 
 
-imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetInfo(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
 	imtbase::CTreeItemModel* dataModel = rootModelPtr->AddTreeModel("data");
@@ -160,15 +168,15 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetDataMet
 		idoc::MetaInfoPtr metaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(Id);
 		SerializeObject(metaInfo.GetPtr(), data);
 		dataModel->SetData("dataMetaInfo", data.toBase64());
-
-
 	}
 
 	return rootModelPtr.PopPtr();
 }
 
+
 imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetObject(
-			const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
 {
 	imtbase::CTreeItemModel* rootModel = new imtbase::CTreeItemModel();
 	imtbase::CTreeItemModel* dataModel = nullptr;
@@ -408,11 +416,6 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::SetObjectD
 }
 
 
-
 } // namespace imtgql
-
-
-
-
 
 
