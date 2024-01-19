@@ -6,6 +6,8 @@
 
 namespace imtsdl
 {
+
+
 class CSdlField;
 class CSdlType;
 class CSdlMethod;

@@ -3,9 +3,9 @@
 
 // Acf includes
 #include <ilog/TLoggerCompWrap.h>
+#include <iprm/IParamsSet.h>
 
 // imtsdl includes
-#include <imtsdl/imtsdl.h>
 #include <imtsdl/ISdlProcessArgumentsParser.h>
 
 
@@ -23,6 +23,7 @@ public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSdlProcessArgumentsParserComp)
+		I_REGISTER_INTERFACE(ISdlProcessArgumentsParser)
 	I_END_COMPONENT;
 
 	// reimplemented (ISdlProcessArgumentsParser)

@@ -5,6 +5,9 @@
 #include <QtCore/QCommandLineParser>
 #include <QtCore/QCommandLineOption>
 
+// imtsdl includes
+#include <imtsdl/imtsdl.h>
+
 
 namespace imtsdl
 {
@@ -12,12 +15,12 @@ namespace imtsdl
 bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 {
 	QStringList arguments;
-	for (int i = 1; i < argc; ++i){
+	for (int i = 0; i < argc; ++i){
 		arguments << QString(argv[i]);
 	}
 
 	QCommandLineOption schemaFilePathOption({"S","schema-file",}, "SDL schema file path", "SchemaFilePath");
-	QCommandLineOption outputDirectoryPathOption({"OD","output-directory",}, "Directory where created files will be created", "OutputDirectoryPath");
+	QCommandLineOption outputDirectoryPathOption({"O","output-directory",}, "Directory where created files will be created", "OutputDirectoryPath");
 
 	QCommandLineParser commandLineParser;
 	bool isOptionsAdded = commandLineParser.addOptions({schemaFilePathOption, outputDirectoryPathOption});

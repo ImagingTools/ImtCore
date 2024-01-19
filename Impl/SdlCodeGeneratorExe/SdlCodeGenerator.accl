@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5181" Description="ACF"/>
+            <Version Id="1" Number="2199" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="ApplicationInfo" X="575" Y="175" Note=""/>
+        <Element ComponentName="ConsoleApplication" X="575" Y="350" Note=""/>
+        <Element ComponentName="ConsoleLog" X="875" Y="500" Note=""/>
+        <Element ComponentName="SdlClassCodeGenerator" X="575" Y="650" Note=""/>
+        <Element ComponentName="SdlCoreFramework" X="567" Y="509" Note=""/>
+        <Element ComponentName="VersionInfo" X="575" Y="50" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

@@ -48,6 +48,16 @@ add_dependencies(ImtDdlPck imtddl)
 add_subdirectory("${IMPL_DIR}/DdlCodeCreatorExe/CMake" "${AUX_INCLUDE_DIR}/DdlCodeCreator")
 add_dependencies(DdlCodeCreator imtddl)
 
+#------ SDL ------
+
+add_subdirectory("${INCLUDE_DIR}/imtsdl/CMake" "${AUX_INCLUDE_DIR}/imtsdl")
+
+add_subdirectory("${IMPL_DIR}/ImtSdlPck/CMake" "${AUX_INCLUDE_DIR}/ImtSdlPck")
+add_dependencies(ImtSdlPck imtsdl)
+
+add_subdirectory("${IMPL_DIR}/SdlCodeGeneratorExe/CMake" "${AUX_INCLUDE_DIR}/SdlCodeGenerator")
+add_dependencies(SdlCodeGenerator ImtSdlPck imtsdl)
+
 #-------- Include --------
 
 add_subdirectory("${INCLUDE_DIR}/imtapp/CMake" "${AUX_INCLUDE_DIR}/imtapp")

@@ -8,6 +8,7 @@
 #include <iproc/TSyncProcessorCompBase.h>
 
 // imtsdl includes
+#include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/CGqlSchemaParser.h>
 
 
@@ -26,6 +27,7 @@ public:
 
 	I_BEGIN_COMPONENT(CGqlSchemaParserComp)
 		I_REGISTER_INTERFACE(ISdlTypeListProvider)
+		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
 	I_END_COMPONENT;
 
 	//reimplemented(iproc::IProcessor)
@@ -36,7 +38,8 @@ public:
 				ibase::IProgressManager* progressManagerPtr = NULL) override;
 
 private:
-	istd::TDelPtr<QFile> m_currentInputFile;
+	I_REF(ISdlProcessArgumentsParser, m_argumentParserCompPtr);
+	istd::TDelPtr<QFile> m_currentInputFilePtr;
 };
 
 
