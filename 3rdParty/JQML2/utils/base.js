@@ -9,6 +9,11 @@ class ComplexObject {
     }
 
     createProperty(name, type, value){
+        if(name in this.$properties){
+            console.log('Warning: redefine property', name)
+            this.$properties[name].reset(value)
+            return
+        }
         this.$properties[name] = new type(value)
         // updateList.push(this.$properties[name])
         // this.$properties[name].debug = true
