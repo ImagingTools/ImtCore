@@ -10,8 +10,9 @@ namespace imtclientgql
 {
 
 
-class IGqlResponseCreator : virtual public istd::IPolymorphic
+class IGqlResponseCreator: virtual public istd::IPolymorphic
 {
+public:
 	virtual imtgql::IGqlResponse* CreateResponse(const imtgql::IGqlRequest& request) const = 0;
 };
 
