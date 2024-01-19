@@ -91,7 +91,11 @@
         </Element>
         <Element Id="VersionInfo" PackageId="BasePck" ComponentId="VersionInfo">
             <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap/>
+                <AttributeInfoMap>
+                    <AttributeInfo Id="VersionId" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="2000"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
             </Data>
         </Element>
     </ElementsList>
