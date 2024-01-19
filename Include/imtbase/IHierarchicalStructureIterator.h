@@ -34,7 +34,7 @@ public:
 	/**
 		Get node info at the current iterator position.
 	*/
-	virtual IHierarchicalStructureInfo::NodeInfo GetNodeInfo() const = 0;
+	virtual IHierarchicalStructureInfo::ItemInfo GetNodeInfo() const = 0;
 };
 
 
