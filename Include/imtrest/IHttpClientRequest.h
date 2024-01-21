@@ -15,7 +15,9 @@ namespace imtrest
 {
 
 
-/// The IHttpClientRequest class is a container that containing information about http requests (is an unit of model).
+/**
+	Interface for a container that containing information about HTTP requests(is an unit of model).
+*/
 class IHttpClientRequest: virtual public istd::IChangeable
 {
 public:

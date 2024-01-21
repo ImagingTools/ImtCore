@@ -13,8 +13,6 @@ namespace imtrest
 
 
 class IRequest;
-class IProtocolEngine;
-class IResponse;
 
 
 class IRequestServlet: virtual public istd::IPolymorphic

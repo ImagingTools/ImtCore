@@ -18,7 +18,6 @@ namespace imtgeo
 bool CMapClusterDatabaseDelegateComp::CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const
 {
 	QString objectFilterQuery;
-	bool retVal = true;
 
 	QString zoomLevelFilterQuery;
 	iprm::TParamsPtr<imtbase::ICollectionFilter> zoomLevelFilterParamPtr(&filterParams, "ZoomLevel");
