@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5137" Description="ACF"/>
+            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>Base framework for service/damon-based applications</Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="QuickApplicationFramework" PackageId="ImtCoreVoce" ComponentId="QuickApplicationFramework">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationName" Type="Text" ExportId="ApplicationName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationSubname" Type="Text" ExportId="ApplicationSubname">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationType" Type="Text" ExportId="ApplicationType">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CompanyName" Type="Text" ExportId="CompanyName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ComponentsToInitialize" Type="Reference[]" ExportId="ComponentsToInitialize">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LogLocationType" Type="Integer" ExportId="LogLocationType">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LogPath" Type="String" ExportId="LogPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MainVersionId" Type="Integer" ExportId="MainVersionId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductEdition" Type="Text" ExportId="ProductEdition">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductName" Type="Text" ExportId="ProductName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ServiceApplication" PackageId="QtExPck" ComponentId="ServiceApplication">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInstance" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="QuickApplicationFramework"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="QuickApplicationFramework/Log"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ManualStartup" Type="Boolean" ExportId="ManualStartup">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SeriviceDescription" Type="Text" ExportId="SeriviceDescription">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ServiceName" Type="String" ExportId="ServiceName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="ibase::IApplication" ComponentId="QuickApplicationFramework"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="QuickApplicationFramework"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="ApplicationInfo" ComponentId="QuickApplicationFramework/ApplicationInfo"/>
+        <Component ExportedId="Log" ComponentId="QuickApplicationFramework/Log"/>
+        <Component ExportedId="LogFilePath" ComponentId="QuickApplicationFramework/LogFilePath"/>
+        <Component ExportedId="RuntimeStatus" ComponentId="QuickApplicationFramework/RuntimeStatus"/>
+    </ExportedComponents>
+</Acf>
