@@ -60,31 +60,36 @@ public:
 				const Id& nodeId,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
 
-	virtual bool InsertItem(
-				const Id& objectId,
+	virtual bool InsertLeaf(
+				const Id& leafId,
 				const Id& nodeId,
+				const QString& leafName,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
-	virtual bool MoveItem(
-				const Id& objectId,
+
+	virtual bool MoveLeaf(
+				const Id& leafId,
 				const Id& sourceNodeId,
 				const Id& targetNodeId,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
-	virtual bool RemoveItem(
-				const Id& objectId,
+
+	virtual bool RemoveLeaf(
+				const Id& leafId,
 				const Id& nodeId,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) override;
 
-	virtual int GetNodeCount(const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
-	virtual Ids GetNodeIds(
+	virtual int GetItemCount(const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
+	virtual Ids GetItemIds(
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
-	virtual imtbase::IHierarchicalStructureIterator* CreateCollectionStructureIterator(
+	virtual imtbase::IHierarchicalStructureIterator* CreateHierarchicalStructureIterator(
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
-	virtual NodeInfo GetNodeInfo(const Id& nodeId) override;
-	virtual QList<PathElement> GetNodePath(const Id& nodeId) const override;
+	// virtual NodeInfo GetItemInfo(const Id& nodeId) override;
+	// virtual QList<PathElement> GetNodePath(const Id& nodeId) const override;
+	virtual ItemInfoList GetItemInfos(const Ids& itemIds) override;
+	virtual Ids GetItemPath(const Id& itemId) const override;
 
 	// reimplemented (imtbase::IStructuredCollectionFinder)
 	virtual Ids FindObjectParentNodes(const Id& objectId) const override;

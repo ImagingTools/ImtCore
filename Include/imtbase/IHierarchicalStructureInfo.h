@@ -85,7 +85,7 @@ public:
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
 
 	virtual ItemInfoList GetItemInfos(const Ids& itemIds) = 0;
-	virtual QByteArrayList GetItemPath(const Id& itemId) const = 0;
+	virtual Ids GetItemPath(const Id& itemId) const = 0;
 
 	/**
 		Create a structure iterator according to the given filtering/sorting parameters.

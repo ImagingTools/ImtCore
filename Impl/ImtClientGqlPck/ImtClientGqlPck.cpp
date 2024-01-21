@@ -50,19 +50,19 @@ I_EXPORT_COMPONENT(
 			"GraphQl Service Subscription  Manager");
 
 I_EXPORT_COMPONENT(
-		WebSocketClient,
-		"The client for 'CWebSocketServer'",
-		"Rest WebSocket Client");
+			WebSocketClient,
+			"The client for 'CWebSocketServer'",
+			"Rest WebSocket Client");
 
 I_EXPORT_COMPONENT(
-		ModelSubscriber,
-		"Subscription controller",
-		"Subscription Controller");
+			ModelSubscriber,
+			"Subscription controller",
+			"Subscription Controller");
 
 I_EXPORT_COMPONENT(
-        GqlStructureDelegate,
-        "GraphQl structure delegate",
-        "GraphQl Structure Delegate");
+			GqlHierarchicalStructureDelegate,
+			"GraphQl structure delegate",
+			"GraphQl Hierarchical Structure Delegate");
 
 
 } // namespace ImtClientGqlPck

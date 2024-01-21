@@ -78,7 +78,7 @@ protected:
 	virtual imtbase::CTreeItemModel* RemoveObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetNodeCount(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetNodeIds(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
-	virtual imtbase::CTreeItemModel* GetNodeInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
+	virtual imtbase::CTreeItemModel* GetItemInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetObjectParentNodeIds(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetNodes(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;
 	virtual imtbase::CTreeItemModel* GetElements(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const;

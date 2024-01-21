@@ -333,9 +333,7 @@ QString CSdlClassCodeGeneratorComp::GetCapitalizedValue(const QString& inputValu
 	}
 
 	QString retVal = inputValue;
-
-	QChar& firstChar = retVal[0];
-	firstChar = firstChar.toUpper();
+	retVal[0] = retVal[0].toUpper();
 
 	return retVal;
 }
@@ -348,9 +346,7 @@ QString CSdlClassCodeGeneratorComp::GetDecapitalizedValue(const QString& inputVa
 	}
 
 	QString retVal = inputValue;
-
-	QChar& firstChar = retVal[0];
-	firstChar = firstChar.toLower();
+	retVal[0] = retVal[0].toLower();
 
 	return retVal;
 }

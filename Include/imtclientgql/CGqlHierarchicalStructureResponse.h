@@ -11,8 +11,8 @@
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
-#include <imtgql/IGqlStructuredCollectionResponse.h>
 #include <imtgql/IGqlResponseHandler.h>
+#include <imtclientgql/IGqlStructureResponse.h>
 
 
 namespace imtclientgql
@@ -21,10 +21,14 @@ namespace imtclientgql
 
 class CGqlHierarchicalStructureResponse:
 			public ilog::CMessageContainer,
-			virtual public imtgql::IGqlResponse
+			virtual public imtclientgql::IGqlStructureResponse
 {
 public:
 	void SetRequest(const imtgql::CGqlRequest& request);
+
+	// reimplemented (imtgql::IGqlResponse)
+	virtual imtbase::IHierarchicalStructureInfo::Ids GetNodeIds() const override;
+	virtual imtbase::IHierarchicalStructureInfo::ItemInfo GetItemInfo() const override;
 
 	// reimplemented (imtgql::IGqlResponse)
 	virtual bool IsSuccessful() const override;

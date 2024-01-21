@@ -34,21 +34,10 @@ CGqlObjectCollectionResponse::CGqlObjectCollectionResponse()
 
 // reimplemented (imtgql::IGqlStructuredCollectionResponse)
 
-bool CGqlObjectCollectionResponse::GetNodeInfo(NodeInfo& out) const
-{
-	if (m_isNodeInfoPresent){
-		out = m_elementInfo;
-
-		return true;
-	}
-
-	return false;
-}
-
 bool CGqlObjectCollectionResponse::GetObjectInfo(ObjectInfo& out) const
 {
 	if (m_isObjectInfoPresent){
-		out = m_elementInfo;
+		out = m_objectInfo;
 
 		return true;
 	}
@@ -56,21 +45,11 @@ bool CGqlObjectCollectionResponse::GetObjectInfo(ObjectInfo& out) const
 	return false;
 }
 
-bool CGqlObjectCollectionResponse::GetElementInfo(ElementInfo& out) const
-{
-	if (m_isElementInfoPresent){
-		out = m_elementInfo;
 
-		return true;
-	}
-
-	return false;
-}
-
-bool CGqlObjectCollectionResponse::GetElementList(ElementList& out) const
+bool CGqlObjectCollectionResponse::GetObjectList(ObjectList& out) const
 {
 	if (m_isElementListPresent){
-		out = m_elementList;
+		out = m_objectList;
 
 		return true;
 	}
@@ -81,21 +60,19 @@ bool CGqlObjectCollectionResponse::GetElementList(ElementList& out) const
 
 // reimplemented (imtgql::IGqlResponse)
 
-bool CGqlObjectCollectionResponse::GetValue(QVariant& out) const
+QVariant CGqlObjectCollectionResponse::GetResult() const
 {
 	if (m_isPrimitiveTypePresent){
-		out = m_variant;
-
-		return true;
+		return m_variant;
 	}
 
-	return false;
+	return QVariant();
 }
 
 
 // reimplemented (imtgql::IGqlResponse)
 
-bool CGqlObjectCollectionResponse::IsSuccessfull() const
+bool CGqlObjectCollectionResponse::IsSuccessful() const
 {
 	return !m_json.object().contains("errors");
 }
@@ -123,12 +100,11 @@ void CGqlObjectCollectionResponse::OnReply(const imtgql::IGqlRequest& request, c
 
 	if (data.contains("itemIds")){
 		QStringList itemIdsData = data.value("itemIds").toString().split(";");
-		ElementInfo itemInfo;
+		ObjectInfo itemInfo;
 
 		for (QString id: itemIdsData){
-			itemInfo.isNode = false;
 			itemInfo.id = id.toLatin1();
-			m_elementList.push_back(itemInfo);
+			m_objectList.push_back(itemInfo);
 		}
 		m_isElementListPresent = true;
 	}
@@ -176,18 +152,16 @@ void CGqlObjectCollectionResponse::ParseFolderContentReply()
 		m_isElementInfoPresent = true;
 		m_isNodeInfoPresent = true;
 
-		m_elementInfo.id = folder.value("id").toString().toLatin1();
-		m_elementInfo.name = folder.value("name").toString().toLatin1();
+		m_objectInfo.id = folder.value("id").toString().toLatin1();
+		m_objectInfo.name = folder.value("name").toString().toLatin1();
 
 		QJsonArray path = folder.value("fullPath").toArray();
 		for (int i = 0; i < path.size(); i++){
 			QByteArray id = path[i].toObject().value("id").toString().toLatin1();
 			//Q_ASSERT(i == 0 ? id.isEmpty() : !id.isEmpty());
 
-//			m_elementInfo.path += id;
+//			m_objectInfo.path += id;
 		}
-
-		m_elementInfo.isNode = true;
 	}
 
 	if (responseObject.contains("subfolders") && responseObject.value("subfolders").isArray()){
@@ -197,13 +171,12 @@ void CGqlObjectCollectionResponse::ParseFolderContentReply()
 
 			QJsonObject jsonObject = arrayFolders[i].toObject();
 
-			ElementInfo folderInfo;
+			ObjectInfo folderInfo;
 
-			folderInfo.isNode = true;
 			folderInfo.id = jsonObject.value("id").toString().toLatin1();
 			folderInfo.name = jsonObject.value("name").toString();
 
-			m_elementList.push_back(folderInfo);
+			m_objectList.push_back(folderInfo);
 		}
 	}
 
@@ -214,9 +187,8 @@ void CGqlObjectCollectionResponse::ParseFolderContentReply()
 
 			QJsonObject jsonObject = arrayDocuments[i].toObject();
 
-			ElementInfo documentInfo;
+			ObjectInfo documentInfo;
 
-			documentInfo.isNode = false;
 			documentInfo.id = jsonObject.value("id").toString().toLatin1();
 			documentInfo.name = jsonObject.value("name").toString();
 			documentInfo.typeId = "Measurement";
@@ -227,11 +199,11 @@ void CGqlObjectCollectionResponse::ParseFolderContentReply()
 				documentInfo.version = versionInformation.value("version").toInt();
 			}
 
-			documentInfo.elementMetaInfoPtr.reset(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);
+			documentInfo.dataMetaInfoPtr.reset(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);
 			QString timeStr = jsonObject.value("createdOn").toString();
-			documentInfo.elementMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME, QDateTime::fromString(timeStr, Qt::ISODate));
+			documentInfo.dataMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME, QDateTime::fromString(timeStr, Qt::ISODate));
 			timeStr = jsonObject.value("timestamp").toString();
-			documentInfo.elementMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, QDateTime::fromString(timeStr, Qt::ISODate));
+			documentInfo.dataMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, QDateTime::fromString(timeStr, Qt::ISODate));
 
 			QByteArray data = jsonObject.value("metadata").toString().toUtf8();
 			QJsonObject metadata = QJsonDocument::fromJson(data).object();
@@ -269,12 +241,12 @@ void CGqlObjectCollectionResponse::ParseFolderContentReply()
 
 			documentInfo.dataMetaInfoPtr.reset(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);
 			documentInfo.dataMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE, documentInfo.name);
-			documentInfo.dataMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME, documentInfo.elementMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME));
-			documentInfo.dataMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, documentInfo.elementMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME));
-			documentInfo.dataMetaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME, documentInfo.elementMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME));
-			documentInfo.dataMetaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, documentInfo.elementMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME));
+			documentInfo.dataMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME, documentInfo.dataMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME));
+			documentInfo.dataMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, documentInfo.dataMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME));
+			documentInfo.dataMetaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME, documentInfo.dataMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME));
+			documentInfo.dataMetaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, documentInfo.dataMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME));
 
-			m_elementList.push_back(documentInfo);
+			m_objectList.push_back(documentInfo);
 		}
 	}
 }

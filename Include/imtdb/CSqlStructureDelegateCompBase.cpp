@@ -158,13 +158,14 @@ bool CSqlStructureDelegateCompBase::RemoveNode(const Id& nodeId, const imtbase::
 }
 
 
-bool CSqlStructureDelegateCompBase::InsertItem(
-			const Id& objectId,
+bool CSqlStructureDelegateCompBase::InsertLeaf(
+			const Id& leafId,
 			const Id& nodeId,
+			const QString& leafName,
 			const imtbase::IOperationContext* operationContextPtr)
 {
 	QByteArray query = CreateInsertNewObjectQuery(
-					objectId,
+					leafId,
 					nodeId,
 					operationContextPtr);
 	if (query.isEmpty()){
@@ -181,8 +182,8 @@ bool CSqlStructureDelegateCompBase::InsertItem(
 }
 
 
-bool CSqlStructureDelegateCompBase::MoveItem(
-			const Id& objectId,
+bool CSqlStructureDelegateCompBase::MoveLeaf(
+			const Id& leafId,
 			const Id& sourceNodeId,
 			const Id& targetNodeId,
 			const imtbase::IOperationContext* operationContextPtr)
@@ -194,7 +195,7 @@ bool CSqlStructureDelegateCompBase::MoveItem(
 	}
 
 	QByteArray query = CreateMoveObjectQuery(
-					objectId,
+					leafId,
 					sourceNodeId,
 					targetNodeId,
 					operationContextPtr);
@@ -226,8 +227,8 @@ bool CSqlStructureDelegateCompBase::MoveItem(
 }
 
 
-bool CSqlStructureDelegateCompBase::RemoveItem(
-			const Id& objectId,
+bool CSqlStructureDelegateCompBase::RemoveLeaf(
+			const Id& leafId,
 			const Id& nodeId,
 			const imtbase::IOperationContext* operationContextPtr)
 {
@@ -238,7 +239,7 @@ bool CSqlStructureDelegateCompBase::RemoveItem(
 	}
 
 	QByteArray query = CreateRemoveObjectQuery(
-					objectId,
+					leafId,
 					nodeId,
 					operationContextPtr);
 	if (query.isEmpty()){
@@ -269,7 +270,7 @@ bool CSqlStructureDelegateCompBase::RemoveItem(
 }
 
 
-int CSqlStructureDelegateCompBase::GetNodeCount(const iprm::IParamsSet* selectionParamsPtr) const
+int CSqlStructureDelegateCompBase::GetItemCount(const iprm::IParamsSet* selectionParamsPtr) const
 {
 	QByteArray query = CreateGetNodeCountQuery(selectionParamsPtr);
 	if (query.isEmpty()){
@@ -292,7 +293,7 @@ int CSqlStructureDelegateCompBase::GetNodeCount(const iprm::IParamsSet* selectio
 }
 
 
-imtbase::IHierarchicalStructureInfo::Ids CSqlStructureDelegateCompBase::GetNodeIds(
+imtbase::IHierarchicalStructureInfo::Ids CSqlStructureDelegateCompBase::GetItemIds(
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
@@ -322,7 +323,7 @@ imtbase::IHierarchicalStructureInfo::Ids CSqlStructureDelegateCompBase::GetNodeI
 }
 
 
-imtbase::IHierarchicalStructureIterator* CSqlStructureDelegateCompBase::CreateCollectionStructureIterator(
+imtbase::IHierarchicalStructureIterator* CSqlStructureDelegateCompBase::CreateHierarchicalStructureIterator(
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
@@ -347,55 +348,58 @@ imtbase::IHierarchicalStructureIterator* CSqlStructureDelegateCompBase::CreateCo
 }
 
 
-imtbase::IHierarchicalStructureInfo::NodeInfo CSqlStructureDelegateCompBase::GetNodeInfo(const Id& nodeId)
+imtbase::IHierarchicalStructureInfo::ItemInfoList CSqlStructureDelegateCompBase::GetItemInfos(const Ids& itemIds)
 {
-	QByteArray query = CreateGetNodeInfoQuery(nodeId);
-	if (query.isEmpty()){
-		SendErrorMessage(0, "Database query could not be created", "Hierarchical structure info");
+	// QByteArray query = CreateGetNodeInfoQuery(nodeId);
+	// if (query.isEmpty()){
+	// 	SendErrorMessage(0, "Database query could not be created", "Hierarchical structure info");
 
-		return NodeInfo();
-	}
+	// 	return NodeInfo();
+	// }
 
-	QSqlError sqlError;
-	QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(query, &sqlError, true);
-	if (sqlError.type() != QSqlError::NoError){
-		SendErrorMessage(0, sqlError.text(), "Hierarchical structure info");
-	}
+	// QSqlError sqlError;
+	// QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(query, &sqlError, true);
+	// if (sqlError.type() != QSqlError::NoError){
+	// 	SendErrorMessage(0, sqlError.text(), "Hierarchical structure info");
+	// }
 
-	if (sqlQuery.next()){
-		imtbase::IHierarchicalStructureInfo::NodeInfo nodeInfo;
-		nodeInfo.name = sqlQuery.value("Name").toString();
-		nodeInfo.description = sqlQuery.value("Description").toString();
-	}
+	// if (sqlQuery.next()){
+	// 	imtbase::IHierarchicalStructureInfo::ItemInfo nodeInfo;
+	// 	nodeInfo.name = sqlQuery.value("Name").toString();
+	// 	nodeInfo.description = sqlQuery.value("Description").toString();
+	// }
 
-	return NodeInfo();
+	// return NodeInfo();
+	return imtbase::IHierarchicalStructureInfo::ItemInfoList();
 }
 
 
-QList<imtbase::IHierarchicalStructureInfo::PathElement> CSqlStructureDelegateCompBase::GetNodePath(const Id& nodeId) const
+imtbase::IHierarchicalStructureInfo::Ids CSqlStructureDelegateCompBase::GetItemPath(const Id& itemId) const
 {
-	NodePath retVal;
-	QByteArray query = CreateGetNodePathQuery(nodeId);
-	if (query.isEmpty()){
-		SendErrorMessage(0, "Database query could not be created", "Hierarchical structure info");
+	// NodePath retVal;
+	// QByteArray query = CreateGetNodePathQuery(nodeId);
+	// if (query.isEmpty()){
+	// 	SendErrorMessage(0, "Database query could not be created", "Hierarchical structure info");
 
-		return retVal;
-	}
+	// 	return retVal;
+	// }
 
-	QSqlError sqlError;
-	QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(query, &sqlError, true);
-	if (sqlError.type() != QSqlError::NoError){
-		SendErrorMessage(0, sqlError.text(), "Hierarchical structure info");
-	}
+	// QSqlError sqlError;
+	// QSqlQuery sqlQuery = m_dbEngineCompPtr->ExecSqlQuery(query, &sqlError, true);
+	// if (sqlError.type() != QSqlError::NoError){
+	// 	SendErrorMessage(0, sqlError.text(), "Hierarchical structure info");
+	// }
 
-	while (sqlQuery.next()){
-		PathElement pathElement;
-		pathElement.id = sqlQuery.value("id").toByteArray();
-		pathElement.name = sqlQuery.value("name").toString();
-		retVal.prepend(pathElement);
-	}
+	// while (sqlQuery.next()){
+	// 	PathElement pathElement;
+	// 	pathElement.id = sqlQuery.value("id").toByteArray();
+	// 	pathElement.name = sqlQuery.value("name").toString();
+	// 	retVal.prepend(pathElement);
+	// }
 
-	return retVal;
+	// return retVal;
+
+	return imtbase::IHierarchicalStructureInfo::Ids();
 }
 
 

@@ -32,9 +32,15 @@ public:
 	virtual IHierarchicalStructureInfo::Id GetNodeId() const = 0;
 
 	/**
-		Get node info at the current iterator position.
+		Get item info at the current iterator position.
 	*/
-	virtual IHierarchicalStructureInfo::ItemInfo GetNodeInfo() const = 0;
+	virtual IHierarchicalStructureInfo::ItemInfo GetItemInfo() const = 0;
+
+	/**
+		Get item count for current subquery.
+	*/
+	virtual int GetItemCount() const = 0;
+
 };
 
 

@@ -9,7 +9,7 @@
 
 // ImtCore includes
 #include <imtbase/IHierarchicalStructure.h>
-#include <imtgql/IGqlHierarchicalStructureResponse.h>
+#include <imtclientgql/IGqlStructureResponse.h>
 #include <imtclientgql/IGqlHierarchicalStructureDelegate.h>
 #include <imtclientgql/IGqlClient.h>
 #include <imtclientgql/IGqlSubscriptionClient.h>
@@ -103,12 +103,12 @@ public:
 	virtual void OnComponentDestroyed() override;
 
 private:
-	IObjectCollection::DataPtr GetObject(const QByteArray& objectId, const QByteArray& typeId) const;
-	// bool GetElementType(const QByteArray& elementId, ElementType& valueOut) const;
-	bool GetNodeInfo(const QByteArray& nodeId, imtgql::IGqlStructuredCollectionResponse::NodeInfo& valueOut) const;
-	bool GetObjectInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& valueOut) const;
-	bool GetObjectMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const;
-	bool GetObjectDataMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const;
+	// imtbase::IObjectCollection::DataPtr GetObject(const QByteArray& objectId, const QByteArray& typeId) const;
+	// // bool GetElementType(const QByteArray& elementId, ElementType& valueOut) const;
+	// bool GetItemInfo(const QByteArray& nodeId, imtbase::IHierarchicalStructureInfo::ItemInfo& valueOut) const;
+	// bool GetObjectInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& valueOut) const;
+	// bool GetObjectMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const;
+	// bool GetObjectDataMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const;
 
 protected:
 	I_REF(IGqlClient, m_clientCompPtr);

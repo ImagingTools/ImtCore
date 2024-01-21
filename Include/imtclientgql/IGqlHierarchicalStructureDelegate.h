@@ -9,7 +9,6 @@
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IOperationContext.h>
 #include <imtgql/IGqlRequest.h>
-#include <imtgql/IGqlHierarchicalStructureResponse.h>
 #include <imtclientgql/IGqlResponseCreator.h>
 
 

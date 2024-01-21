@@ -15,7 +15,8 @@
 #include <imtclientgql/CSubscriptionManagerComp.h>
 #include <imtclientgql/CWebSocketClientComp.h>
 #include <imtclientgql/CModelSubscriberComp.h>
-#include <imtclientgql/CGqlStructureDelegateComp.h>
+#include <imtclientgql/CGqlHierarchicalStructureDelegateComp.h>
+#include <imtclientgql/CGqlObjectCollectionDelegateComp.h>
 
 
 /**
@@ -34,7 +35,7 @@ typedef imtclientgql::CGqlRemoteRepresentationControllerComp PumaGqlRemoteRepres
 typedef imtclientgql::CSubscriptionManagerComp SubscriptionManager;
 typedef icomp::TModelCompWrap<imtclientgql::CWebSocketClientComp> WebSocketClient;
 typedef imtclientgql::CModelSubscriberComp ModelSubscriber;
-typedef imtclientgql::CGqlStructureDelegateComp GqlStructureDelegate;
+typedef imtclientgql::CGqlHierarchicalStructureDelegateComp GqlHierarchicalStructureDelegate;
 
 
 } // namespace ImtClientGqlPck

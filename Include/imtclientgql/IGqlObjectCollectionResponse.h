@@ -1,0 +1,50 @@
+#pragma once
+
+
+// ACF includes
+#include <idoc/IDocumentMetaInfo.h>
+
+// ImtCore includes
+#include <imtgql/IGqlResponse.h>
+
+
+namespace imtclientgql
+{
+
+ 
+class IGqlObjectCollectionResponse : virtual public imtgql::IGqlResponse
+{
+public:
+	struct ObjectInfo
+	{
+		ObjectInfo()
+			:version(-1)
+		{
+		}
+
+		QByteArray id;
+		QString name;
+		QString description;
+
+		QByteArray typeId;
+		QSharedPointer<idoc::IDocumentMetaInfo> dataMetaInfoPtr;
+
+		/**
+			The server assigns the version to the document to be used when updating the data.
+			When we want to change a document or information about it on the server,
+			this version must be passed in the request. The version is used to synchronize
+			simultaneous access to a document by multiple clients.
+		*/
+		int version;
+	};
+	typedef QList<ObjectInfo> ObjectList;
+
+	virtual bool GetObjectInfo(ObjectInfo& out) const = 0;
+	// virtual bool GetElementInfo(ElementInfo& out) const override;
+	virtual bool GetObjectList(ObjectList& out) const = 0;
+};
+
+
+} // namespace imtclientgql
+
+

@@ -83,7 +83,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::CreateInternalResponse(
 	case OT_GET_NODE_IDS:
 		return GetNodeIds(gqlRequest, errorMessage);
 	case OT_GET_NODE_INFO:
-		return GetNodeInfo(gqlRequest, errorMessage);
+		return GetItemInfo(gqlRequest, errorMessage);
 	case OT_GET_OBJECT_PARENT_NODE_IDS:
 		return GetObjectParentNodeIds(gqlRequest, errorMessage);
 	case OT_GET_ELEMENTS:
@@ -159,7 +159,7 @@ bool CStructureControllerCompBase::GetOperationFromRequest(
 		operationType = OT_GET_NODE_IDS;
 		return true;
 	}
-	if (commandId == *m_structureIdAttrPtr + "GetNodeInfo"){
+	if (commandId == *m_structureIdAttrPtr + "GetItemInfo"){
 		operationType = OT_GET_NODE_INFO;
 		return true;
 	}
@@ -416,7 +416,7 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodeIds(
 }
 
 
-imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodeInfo(
+imtbase::CTreeItemModel* CStructureControllerCompBase::GetItemInfo(
 	const imtgql::CGqlRequest& /*gqlRequest*/,
 	QString& /*errorMessage*/) const
 {
@@ -476,20 +476,20 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 			// PrepareFilters(gqlRequest, *viewParamsGql, filterParams);
 		}
 
-		int nodesCount = m_collectionStructureCompPtr->GetNodeCount(&filterParams);
+		int itemCount = m_collectionStructureCompPtr->GetItemCount(&filterParams);
 
-		int pagesCount = std::ceil(nodesCount / (double)count); /// count == 0
+		int pagesCount = std::ceil(itemCount / (double)count); /// count == 0
 		if (pagesCount <= 0){
 			pagesCount = 1;
 		}
 
 		notificationModel->SetData("PagesCount", pagesCount);
-		notificationModel->SetData("TotalCount", nodesCount);
+		notificationModel->SetData("TotalCount", itemCount);
 
-		istd::TDelPtr<imtbase::IHierarchicalStructureIterator> collectionStructureIterator(m_collectionStructureCompPtr->CreateCollectionStructureIterator(offset, count, &filterParams));
+		istd::TDelPtr<imtbase::IHierarchicalStructureIterator> collectionStructureIterator(m_collectionStructureCompPtr->CreateHierarchicalStructureIterator(offset, count, &filterParams));
 		if (collectionStructureIterator != nullptr){
 			while (collectionStructureIterator->Next()){
-				imtbase::IHierarchicalStructureInfo::NodeInfo nodeInfo = collectionStructureIterator->GetNodeInfo();
+				imtbase::IHierarchicalStructureInfo::ItemInfo nodeInfo = collectionStructureIterator->GetItemInfo();
 				int itemIndex = itemsModel->InsertNewItem();
 				if (itemIndex >= 0){
 					if (!SetupNodeItem(gqlRequest, *itemsModel, itemIndex, collectionStructureIterator.GetPtr(), errorMessage)){

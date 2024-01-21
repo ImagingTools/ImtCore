@@ -13,12 +13,11 @@
 #include <imtbase/ICollectionDataController.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IMetaInfoCreator.h>
-#include <imtbase/IHierarchicalStructure.h>
-#include <imtgql/IGqlStructuredCollectionResponse.h>
 #include <imtclientgql/IClientProtocolEngine.h>
 #include <imtclientgql/IGqlObjectCollectionDelegate.h>
 #include <imtclientgql/IGqlClient.h>
 #include <imtclientgql/IGqlSubscriptionClient.h>
+#include <imtclientgql/IGqlObjectCollectionResponse.h>
 
 
 namespace imtbase
@@ -51,20 +50,12 @@ public:
 		I_ASSIGN_MULTI_0(m_typeIdsAttrPtr, "TypeIds", "List of type-ID corresponding to the registered factories", false);
 		I_ASSIGN_MULTI_0(m_typeNamesAttrPtr, "TypeNames", "List of type names corresponding to the registered factories", false);
 		I_ASSIGN_MULTI_0(m_objectFactoriesCompPtr, "ObjectFactories", "List of factories used for object creation", false);
+		I_ASSIGN(m_clientCompPtr, "ApiClient", "GraphQL API client", true, "ApiClient");
+		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta-info creator", false, "MetaInfoCreator");
 	I_END_COMPONENT;
 
 	CGqlObjectCollectionComp();
 
-	virtual QByteArray InsertNewObject(
-		const QByteArray& typeId,
-		const QString& name,
-		const QString& description,
-		IObjectCollection::DataPtr defaultValuePtr = IObjectCollection::DataPtr(),
-		const Id& proposedObjectId = Id(),
-		const Id& nodeId = Id(),
-		const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
-		const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
-		const imtbase::IOperationContext* operationContextPtr = nullptr);
 
 	// reimplemented (IObjectCollection)
 	virtual const imtbase::IRevisionController* GetRevisionController() const override;
@@ -132,16 +123,20 @@ protected:
 private:
 	IObjectCollection::DataPtr GetObject(const QByteArray& objectId, const QByteArray& typeId) const;
 	// bool GetElementType(const QByteArray& elementId, ElementType& valueOut) const;
-	bool GetNodeInfo(const QByteArray& nodeId, imtgql::IGqlStructuredCollectionResponse::NodeInfo& valueOut) const;
-	bool GetObjectInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& valueOut) const;
+	bool GetObjectInfo(const QByteArray& objectId, imtclientgql::IGqlObjectCollectionResponse::ObjectInfo& valueOut) const;
+	// bool GetObjectInfo(const QByteArray& objectId, imtclientgql::IGqlStructureResponse::ObjectInfo& valueOut) const;
 	bool GetObjectMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const;
 	bool GetObjectDataMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const;
+	bool SerializeObject(const istd::IPolymorphic* object, QByteArray& objectData) const;
+	bool DeSerializeObject(istd::IPolymorphic* object, const QByteArray& objectData) const;
 
 protected:
 	I_REF(IGqlObjectCollectionDelegate, m_delegateCompPtr);
 	I_MULTIATTR(QByteArray, m_typeIdsAttrPtr);
 	I_MULTITEXTATTR(m_typeNamesAttrPtr);
 	I_MULTIFACT(istd::IChangeable, m_objectFactoriesCompPtr);
+	I_REF(IGqlClient, m_clientCompPtr);
+	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
 
 	typedef QMap<QByteArray, IGqlObjectCollectionDelegate*> DelegatesMap;
 

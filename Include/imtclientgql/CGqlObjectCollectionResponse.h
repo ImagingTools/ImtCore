@@ -10,8 +10,7 @@
 #include <ilog/CMessageContainer.h>
 
 // ImtCore includes
-#include <imtgql/IGqlStructuredCollectionResponse.h>
-#include <imtgql/IGqlPrimitiveTypeResponse.h>
+#include <imtclientgql/IGqlObjectCollectionResponse.h>
 
 
 namespace imtclientgql
@@ -20,23 +19,22 @@ namespace imtclientgql
 
 class CGqlObjectCollectionResponse:
 			public ilog::CMessageContainer,
-			virtual public imtgql::IGqlPrimitiveTypeResponse,
-			virtual public imtgql::IGqlStructuredCollectionResponse
+			virtual public imtclientgql::IGqlObjectCollectionResponse
 {
 public:
 	CGqlObjectCollectionResponse();
 
 	// reimplemented (imtgql::IGqlStructuredCollectionResponse)
-	virtual bool GetNodeInfo(NodeInfo& out) const override;
+	// virtual bool GetItemInfo(NodeInfo& out) const override;
 	virtual bool GetObjectInfo(ObjectInfo& out) const override;
-	virtual bool GetElementInfo(ElementInfo& out) const override;
-	virtual bool GetElementList(ElementList& out) const override;
-
-	// reimplemented (imtgql::IGqlPrimitiveTypeResponse)
-	virtual bool GetValue(QVariant& out) const override;
+	// virtual bool GetElementInfo(ElementInfo& out) const override;
+	virtual bool GetObjectList(ObjectList& out) const override;
 
 	// reimplemented (imtgql::IGqlResponse)
-	virtual bool IsSuccessfull() const override;
+	virtual QVariant GetResult() const override;
+
+	// reimplemented (imtgql::IGqlResponse)
+	virtual bool IsSuccessful() const override;
 
 	// reimplemented (imtclientgql::IGqlClient::ResponseHandler)
 	virtual void OnReply(const imtgql::IGqlRequest& request, const QByteArray& replyData) override;
@@ -57,8 +55,8 @@ private:
 	QByteArray m_commandId;
 	QJsonDocument m_json;
 
-	ElementInfo m_elementInfo;
-	ElementList m_elementList;
+	ObjectInfo m_objectInfo;
+	ObjectList m_objectList;
 	QVariant m_variant;
 
 	bool m_isNodeInfoPresent;

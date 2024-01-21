@@ -11,50 +11,12 @@
 // ImtCore includes
 #include <imtbase/CTempDir.h>
 #include <imtgql/CGqlRequest.h>
-#include <imtgql/IGqlPrimitiveTypeResponse.h>
-#include <imtgql/IGqlHierarchicalStructureResponse.h>
+#include <imtclientgql/IGqlStructureResponse.h>
 #include <imtbase/CFilterCollectionProxy.h>
 
 
 namespace imtclientgql
 {
-
-
-//bool operator==(
-//			const imtgql::IGqlStructuredCollectionResponse::ElementInfo::PathItem& a,
-//			const imtgql::IGqlStructuredCollectionResponse::ElementInfo::PathItem& b)
-//{
-//	bool retVal = a.id == b.id && a.name == b.name;
-//
-//	return retVal;
-//}
-//
-//
-//bool operator==(
-//			const imtgql::IGqlHierarchicalStructureResponse::ElementInfo& a,
-//			const imtgql::IGqlHierarchicalStructureResponse::ElementInfo& b)
-//{
-//	bool retVal =
-//				a.id == b.id &&
-//				a.name == b.name &&
-//				a.description == b.description &&
-//				a.path == b.path &&
-//				a.typeId == b.typeId &&
-//				a.version == b.version &&
-//				a.elementMetaInfoPtr.isNull() == b.elementMetaInfoPtr.isNull() &&
-//				a.elementMetaInfoPtr.isNull() == b.elementMetaInfoPtr.isNull() &&
-//				a.isNode == b.isNode;
-//
-//	if (retVal && !a.elementMetaInfoPtr.isNull()){
-//		retVal &= a.elementMetaInfoPtr->IsEqual(*b.elementMetaInfoPtr);
-//	}
-//
-//	if (retVal && !a.dataMetaInfoPtr.isNull()){
-//		retVal &= a.dataMetaInfoPtr->IsEqual(*b.dataMetaInfoPtr);
-//	}
-//
-//	return retVal;
-//}
 
 
 // public methods
@@ -86,7 +48,7 @@ imtbase::IHierarchicalStructureInfo::Id CGqlHierarchicalStructureComp::InsertNew
 						QVariant result = responsePtr->GetResult();
 						Q_ASSERT(result.isValid());
 						if (result.isValid()){
-							if (result.canConvert(QMetaType(QMetaType::QByteArray))){
+							if (result.canConvert(QMetaType::QByteArray)){
 								return result.toByteArray();
 							}
 						}
@@ -119,7 +81,7 @@ bool CGqlHierarchicalStructureComp::SetNodeName(
 						QVariant result = responsePtr->GetResult();
 						Q_ASSERT(result.isValid());
 						if (result.isValid()){
-							if (result.canConvert(QMetaType(QMetaType::Bool))){
+							if (result.canConvert(QMetaType::Bool)){
 								return result.toBool();
 							}
 						}
@@ -152,7 +114,7 @@ bool CGqlHierarchicalStructureComp::SetNodeDescription(
 						QVariant result = responsePtr->GetResult();
 						Q_ASSERT(result.isValid());
 						if (result.isValid()){
-							if (result.canConvert(QMetaType(QMetaType::Bool))){
+							if (result.canConvert(QMetaType::Bool)){
 								return result.toBool();
 							}
 						}
@@ -185,7 +147,7 @@ bool CGqlHierarchicalStructureComp::SetNodeMetaInfo(
 						QVariant result = responsePtr->GetResult();
 						Q_ASSERT(result.isValid());
 						if (result.isValid()){
-							if (result.canConvert(QMetaType(QMetaType::Bool))){
+							if (result.canConvert(QMetaType::Bool)){
 								return result.toBool();
 							}
 						}
@@ -217,7 +179,7 @@ bool CGqlHierarchicalStructureComp::MoveNode(
 						QVariant result = responsePtr->GetResult();
 						Q_ASSERT(result.isValid());
 						if (result.isValid()){
-							if (result.canConvert(QMetaType(QMetaType::Bool))){
+							if (result.canConvert(QMetaType::Bool)){
 								return result.toBool();
 							}
 						}
@@ -248,7 +210,7 @@ bool CGqlHierarchicalStructureComp::RemoveNode(
 						QVariant result = responsePtr->GetResult();
 						Q_ASSERT(result.isValid());
 						if (result.isValid()){
-							if (result.canConvert(QMetaType(QMetaType::Bool))){
+							if (result.canConvert(QMetaType::Bool)){
 								return result.toBool();
 							}
 						}
@@ -283,7 +245,7 @@ bool CGqlHierarchicalStructureComp::InsertLeaf(
 						QVariant result = responsePtr->GetResult();
 						Q_ASSERT(result.isValid());
 						if (result.isValid()){
-							if (result.canConvert(QMetaType(QMetaType::Bool))){
+							if (result.canConvert(QMetaType::Bool)){
 								return result.toBool();
 							}
 						}
@@ -318,7 +280,7 @@ bool CGqlHierarchicalStructureComp::MoveLeaf(
 						QVariant result = responsePtr->GetResult();
 						Q_ASSERT(result.isValid());
 						if (result.isValid()){
-							if (result.canConvert(QMetaType(QMetaType::Bool))){
+							if (result.canConvert(QMetaType::Bool)){
 								return result.toBool();
 							}
 						}
@@ -351,7 +313,7 @@ bool CGqlHierarchicalStructureComp::RemoveLeaf(
 						QVariant result = responsePtr->GetResult();
 						Q_ASSERT(result.isValid());
 						if (result.isValid()){
-							if (result.canConvert(QMetaType(QMetaType::Bool))){
+							if (result.canConvert(QMetaType::Bool)){
 								return result.toBool();
 							}
 						}
@@ -381,7 +343,7 @@ int CGqlHierarchicalStructureComp::GetItemCount(const iprm::IParamsSet* selectio
 						QVariant result = responsePtr->GetResult();
 						Q_ASSERT(result.isValid());
 						if (result.isValid()){
-							if (result.canConvert(QMetaType(QMetaType::Int))){
+							if (result.canConvert(QMetaType::Int)){
 								return result.toInt();
 							}
 						}
@@ -414,7 +376,7 @@ imtbase::IHierarchicalStructureInfo::Ids CGqlHierarchicalStructureComp::GetItemI
 						QVariant result = responsePtr->GetResult();
 						Q_ASSERT(result.isValid());
 						if (result.isValid()){
-							if (result.canConvert(QMetaType(QMetaType::QByteArrayList))){
+							if (result.canConvert(QMetaType::QByteArrayList)){
 								Ids retVal = result.value<QByteArrayList>();
 
 								return retVal;
@@ -472,7 +434,7 @@ imtbase::IHierarchicalStructureInfo::Ids CGqlHierarchicalStructureComp::GetItemP
 						QVariant result = responsePtr->GetResult();
 						Q_ASSERT(result.isValid());
 						if (result.isValid()){
-							if (result.canConvert(QMetaType(QMetaType::QByteArrayList))){
+							if (result.canConvert(QMetaType::QByteArrayList)){
 								Ids retVal = result.value<QByteArrayList>();
 
 								return retVal;

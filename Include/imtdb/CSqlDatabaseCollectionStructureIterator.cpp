@@ -56,15 +56,22 @@ imtbase::IHierarchicalStructureInfo::Id CSqlDatabaseCollectionStructureIterator:
 }
 
 
-imtbase::IHierarchicalStructureInfo::NodeInfo CSqlDatabaseCollectionStructureIterator::GetNodeInfo() const
+imtbase::IHierarchicalStructureInfo::ItemInfo CSqlDatabaseCollectionStructureIterator::GetItemInfo() const
 {
-	imtbase::IHierarchicalStructureInfo::NodeInfo nodeInfo;
-	nodeInfo.id = m_records[m_currentIndex].value("Id").toByteArray();
-	nodeInfo.name = m_records[m_currentIndex].value("Name").toByteArray();
-	nodeInfo.description = m_records[m_currentIndex].value("Description").toByteArray();
+	imtbase::IHierarchicalStructureInfo::ItemInfo itemInfo;
+	itemInfo.itemId = m_records[m_currentIndex].value("Id").toByteArray();
+	itemInfo.name = m_records[m_currentIndex].value("Name").toByteArray();
+	// itemInfo.description = m_records[m_currentIndex].value("Description").toByteArray();
 
-	return nodeInfo;
+	return itemInfo;
 }
+
+
+int CSqlDatabaseCollectionStructureIterator::GetItemCount() const
+{
+	return m_records.count();
+}
+
 
 
 } // namespace imtdb

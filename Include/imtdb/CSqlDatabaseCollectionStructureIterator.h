@@ -27,7 +27,8 @@ public:
 	virtual bool Next() override;
 	virtual bool Previous() override;
 	virtual imtbase::IHierarchicalStructureInfo::Id GetNodeId() const override;
-	virtual imtbase::IHierarchicalStructureInfo::NodeInfo GetNodeInfo() const override;
+	virtual imtbase::IHierarchicalStructureInfo::ItemInfo GetItemInfo() const override;
+	virtual int GetItemCount() const override;
 private:
 	QList<QSqlRecord> m_records;
 

@@ -29,7 +29,7 @@ protected:
 				QString& errorMessage) const override;
 
 protected:
-	class Response: public ilog::CMessageContainer, virtual public imtgql::IGqlResponse
+	class Response: public ilog::CMessageContainer, virtual public imtgql::IGqlResponseHandler
 	{
 	public:
 		Response();
@@ -38,7 +38,7 @@ protected:
 		// reimplemented (imtclientgql::IGqlClient::ResponseHandler)
 		virtual void OnReply(const imtgql::IGqlRequest& request, const QByteArray& replyData) override;
 
-		virtual bool IsSuccessfull() const override { return false; }
+		// virtual bool IsSuccessful() const override { return false; }
 
 	private:
 		imtbase::CTreeItemModel* m_replyResultPtr;
