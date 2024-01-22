@@ -40,20 +40,25 @@ public:
 				ibase::IProgressManager* progressManagerPtr = NULL) override;
 
 private:
+	bool ReOpenFiles();
+	bool CloseFiles();
 	bool BeginClassFiles(const CSdlType& sdlType);
 	bool BeginHeaderClassFile(const CSdlType& sdlType);
+	bool EndHeaderClassFile(const CSdlType& sdlType);
 	bool BeginSourceClassFile(const CSdlType& sdlType);
-	bool EndClassFiles();
+	bool EndClassFiles(const CSdlType& sdlType);
 	void AbortCurrentProcessing();
 	QString GenerateAccessMethods(const CSdlField& sdlField, uint indents = 1, bool generateGetter = true, bool generateSetter = true);
 	QString GenerateAccessMethodsImpl(const QString className, const CSdlField& sdlField, uint indents = 0, bool generateGetter = true, bool generateSetter = true);
 
-	QString ConvertType(const CSdlField& sdlField, bool* isCustomPtr = nullptr) const;
-	QString ConvertType(const QString& sdlTypeName, bool* isCustomPtr = nullptr) const;
-	void FeedStream(QTextStream& stream, uint lines = 1, bool flush = true)const;
+	QString ConvertType(const CSdlField& sdlField, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr, bool* isArrayPtr = nullptr) const;
+	QString ConvertType(const QString& sdlTypeName, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr) const;
+	void FeedStream(QTextStream& stream, uint lines = 1, bool flush = true) const;
 	void FeedLineHorizontally(QString& line, uint indents = 1, char indentDelimiter = '\t') const;
 	QString GetCapitalizedValue(const QString& inputValue) const;
 	QString GetDecapitalizedValue(const QString& inputValue) const;
+	bool IsTypeHasFundamentalTypes(const CSdlType& sdlType, QSet<QString>* foundTypesPtr =  nullptr) const;
+	bool IsTypeHasNonFundamentalTypes(const CSdlType& sdlType, QSet<QString>* foundTypesPtr =  nullptr) const;
 
 private:
 	I_REF(ISdlProcessArgumentsParser, m_argumentParserCompPtr);

@@ -47,6 +47,15 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 		m_sourceFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".cpp"));
 		BeginClassFiles(sdlType);
 
+		// Close files so that extenders can make their own changes
+		if (!CloseFiles()){
+			SendErrorMessage(0, QString("Unable to close files"));
+			I_CRITICAL();
+
+			return iproc::IProcessor::TS_INVALID;
+		}
+
+		// Then let extenders to make changes
 		const int extendersCount = m_codeGeneratorExtenderListCompPtr.GetCount();
 		for (int i = 0; i < extendersCount; ++i){
 			iproc::IProcessor* extenderPtr = m_codeGeneratorExtenderListCompPtr[i];
@@ -59,8 +68,62 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 			retVal = qMax(retVal, extenderResult);
 		}
 
-		EndClassFiles();
+		// Reopen files to complete processing
+		if (!ReOpenFiles()){
+			SendErrorMessage(0, QString("Unable to reopen files"));
+			I_CRITICAL();
+
+			return iproc::IProcessor::TS_INVALID;
+		}
+
+		// And complete the processing
+		EndClassFiles(sdlType);
 	}
+
+	return retVal;
+}
+
+
+// private methods
+
+bool CSdlClassCodeGeneratorComp::ReOpenFiles()
+{
+	if (!m_headerFilePtr->open(QIODevice::WriteOnly | QIODevice::Append)){
+		SendErrorMessage(0,
+					QString("Unable to open file: '%1'. Error: %2")
+						.arg(m_headerFilePtr->fileName(), m_headerFilePtr->errorString()));
+
+		AbortCurrentProcessing();
+
+		return false;
+	}
+
+	if (!m_sourceFilePtr->open(QIODevice::WriteOnly | QIODevice::Append)){
+		SendErrorMessage(0,
+						QString("Unable to open file: '%1'. Error: %2")
+							.arg(m_sourceFilePtr->fileName(), m_sourceFilePtr->errorString()));
+
+		AbortCurrentProcessing();
+
+		return false;
+	}
+
+	return true;
+}
+
+
+bool CSdlClassCodeGeneratorComp::CloseFiles()
+{
+	bool retVal = true;
+
+	retVal = m_headerFilePtr->flush();
+	Q_ASSERT(retVal);
+
+	retVal = m_sourceFilePtr->flush() && retVal;
+	Q_ASSERT(retVal);
+
+	m_headerFilePtr->close();
+	m_sourceFilePtr->close();
 
 	return retVal;
 }
@@ -103,10 +166,53 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType)
 	ifStream << QStringLiteral("#pragma once");
 	FeedStream(ifStream, 3, false);
 
-	/// \todo optimize it exclude extra if has only Fundamental types and add custom value's header
-	ifStream << QStringLiteral("#include <QtCore/QByteArray>") << '\n';
-	ifStream << QStringLiteral("#include <QtCore/QString>") << '\n';
-	ifStream << QStringLiteral("#include <QtCore/QList>") << '\n';
+	QSet<QString> complexTypeList;
+	if (IsTypeHasNonFundamentalTypes(sdlType, &complexTypeList)){
+
+		// Add Qt types
+		bool isQtCommentAdded = false;
+		if (complexTypeList.contains(QStringLiteral("QByteArray"))){
+			if (!isQtCommentAdded){
+				ifStream << QStringLiteral("// Qt includes\n");
+				isQtCommentAdded = true;
+			}
+			ifStream << QStringLiteral("#include <QtCore/QByteArray>\n");
+		}
+		if (complexTypeList.contains(QStringLiteral("QString"))){
+			if (!isQtCommentAdded){
+				ifStream << QStringLiteral("// Qt includes\n");
+				isQtCommentAdded = true;
+			}
+			ifStream << QStringLiteral("#include <QtCore/QString>\n");
+		}
+		if (complexTypeList.contains(QStringLiteral("QList"))){
+			if (!isQtCommentAdded){
+				ifStream << QStringLiteral("// Qt includes\n");
+				isQtCommentAdded = true;
+			}
+			ifStream << QStringLiteral("#include <QtCore/QList>\n");
+		}
+
+		// remove qt types from list
+		complexTypeList.remove(QStringLiteral("QByteArray"));
+		complexTypeList.remove(QStringLiteral("QString"));
+		complexTypeList.remove(QStringLiteral("QList"));
+		if (!complexTypeList.isEmpty()){
+			FeedStream(ifStream, 2, false);
+		}
+
+		// Add user custom types
+		bool isCustomGeneratedCommentAdded = false;
+		for (QSet<QString>::const_iterator complexIter = complexTypeList.cbegin(); complexIter != complexTypeList.cend(); ++complexIter){
+			if (!isCustomGeneratedCommentAdded){
+				ifStream << QStringLiteral("// ") << m_argumentParserCompPtr->GetNamespace() << QStringLiteral(" includes\n");
+				isCustomGeneratedCommentAdded = true;
+			}
+
+			const QString& complexTypeName = *complexIter;
+			ifStream << QStringLiteral("#include \"") << complexTypeName << QStringLiteral(".h\"\n");
+		}
+	}
 	FeedStream(ifStream, 2, false);
 
 
@@ -121,35 +227,44 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType)
 
 	if (!namespaceString.isEmpty()){
 		ifStream << namespaceString;
-		FeedStream(ifStream, 2, false);
+		FeedStream(ifStream, 3, false);
 	}
 
 	// class begin
 	ifStream << QStringLiteral("class C") << sdlType.GetName() << '\n';
 	ifStream << QStringLiteral("{");
-	FeedStream(ifStream);
+	FeedStream(ifStream, 1, false);
 
-	// defining class members
-	for (const CSdlField& sdlField: sdlType.GetFields()){
-		ifStream << '\t' << ConvertType(sdlField) << " m_" << GetDecapitalizedValue(sdlField.GetId()) << "; \n";
-	}
-	FeedStream(ifStream);
-
-	ifStream << QStringLiteral("public:\n");
+	ifStream << QStringLiteral("public:");
+	FeedStream(ifStream, 1, false);
 
 	// default constructor for defining primitive types
-	/// \todo optimize it add only if has Fundamental types \warning remove impl
-	ifStream << QStringLiteral("\tC") << sdlType.GetName() << QStringLiteral("(){};\n");
-	FeedStream(ifStream);
+	if (IsTypeHasFundamentalTypes(sdlType)){
+		ifStream << QStringLiteral("\tC") << sdlType.GetName() << QStringLiteral("();\n");
+		FeedStream(ifStream);
+	}
 
 	// defining member's access methods
 	for (const CSdlField& sdlField: sdlType.GetFields()){
 		ifStream << GenerateAccessMethods(sdlField);
 		FeedStream(ifStream);
 	}
+	ifStream.flush();
 
-	// remove last line after access methods definition
-	ifStream.seek(ifStream.pos() - 1);
+	return true;
+}
+
+
+bool CSdlClassCodeGeneratorComp::EndHeaderClassFile(const CSdlType& sdlType)
+{
+	QTextStream ifStream(m_headerFilePtr.GetPtr());
+
+	// defining class members
+	ifStream << QStringLiteral("private:\n");
+	for (const CSdlField& sdlField: sdlType.GetFields()){
+		ifStream << '\t' << ConvertType(sdlField) << " m_" << GetDecapitalizedValue(sdlField.GetId()) << ";\n";
+	}
+	ifStream.flush();
 
 	return true;
 }
@@ -179,9 +294,50 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const CSdlType& sdlType)
 	}
 
 	// default constructor implementation
-	/// \todo add it if has Fundamental types
+	if (IsTypeHasFundamentalTypes(sdlType)){
+		ifStream << ConvertType(sdlType.GetName()) << QStringLiteral("::") << ConvertType(sdlType.GetName());
+		ifStream << QStringLiteral("()\n:");
+		bool isAdded = false;
 
-	// method implementation
+		SdlFieldList sdlFieldList = sdlType.GetFields();
+
+		for (int i = 0; i < sdlFieldList.count(); ++i){
+			CSdlField& sdlField = sdlFieldList[i];
+			bool isComplex = true;
+			bool isArray = true;
+			const QString convertedType = ConvertType(sdlField, nullptr, &isComplex, &isArray);
+			if (isComplex || isArray){
+				// we need to initialize only fundamental types
+				continue;
+			}
+
+			if (isAdded){
+				ifStream << QStringLiteral(",\n");
+			}
+
+			ifStream << '\t' << "m_" << GetDecapitalizedValue(sdlField.GetId()) << '\(';
+
+			if (convertedType == QStringLiteral("int")){
+				ifStream << QStringLiteral("0");
+			}
+			else if (convertedType == QStringLiteral("float")){
+				ifStream << QStringLiteral("0.00f");
+			}
+			else if (convertedType == QStringLiteral("double")){
+				ifStream << QStringLiteral("0.00");
+			}
+			else if (convertedType == QStringLiteral("bool")){
+				ifStream << QStringLiteral("false");
+			}
+			ifStream << (')');
+			isAdded = true;
+		}
+
+		ifStream << QStringLiteral("\n{\n}");
+		FeedStream(ifStream, 2);
+	}
+
+	// access methods implementation
 	for (const CSdlField& sdlField: sdlType.GetFields()){
 		ifStream << GenerateAccessMethodsImpl(sdlType.GetName(), sdlField);
 	}
@@ -190,7 +346,7 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const CSdlType& sdlType)
 }
 
 
-bool CSdlClassCodeGeneratorComp::EndClassFiles()
+bool CSdlClassCodeGeneratorComp::EndClassFiles(const CSdlType& sdlType)
 {
 	QString namespaceString;
 	// end of namespace
@@ -200,6 +356,7 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles()
 		namespaceString += sdlNamespace;
 	}
 
+	EndHeaderClassFile(sdlType);
 	QTextStream headerStream(m_headerFilePtr.GetPtr());
 	headerStream << QStringLiteral("};");
 	FeedStream(headerStream, 3, false);
@@ -216,8 +373,7 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles()
 	}
 	sourceStream.flush();
 
-	m_headerFilePtr->close();
-	m_sourceFilePtr->close();
+	CloseFiles();
 
 	return true;
 }
@@ -334,7 +490,7 @@ QString CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(const QString clas
 		retVal += GetDecapitalizedValue(sdlField.GetId());
 		retVal += QStringLiteral(" != m_");
 		retVal += GetDecapitalizedValue(sdlField.GetId());
-		retVal += QStringLiteral(" ){\n");
+		retVal += QStringLiteral("){\n");
 		FeedLineHorizontally(retVal, indents + 2);
 		retVal += QStringLiteral("m_");
 		retVal += GetDecapitalizedValue(sdlField.GetId());
@@ -351,14 +507,22 @@ QString CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(const QString clas
 }
 
 
-QString CSdlClassCodeGeneratorComp::ConvertType(const CSdlField& sdlField, bool* isCustomPtr) const
+QString CSdlClassCodeGeneratorComp::ConvertType(const CSdlField& sdlField, bool* isCustomPtr, bool* isComplexPtr, bool* isArrayPtr) const
 {
 	QString retVal;
 	if (sdlField.IsArray()){
 		retVal += QStringLiteral("QList<");
+		if (isArrayPtr != nullptr){
+			*isArrayPtr = true;
+		}
+	}
+	else {
+		if (isArrayPtr != nullptr){
+			*isArrayPtr = false;
+		}
 	}
 
-	retVal += ConvertType(sdlField.GetType(), isCustomPtr);
+	retVal += ConvertType(sdlField.GetType(), isCustomPtr, isComplexPtr);
 
 	if (sdlField.IsArray()){
 		retVal += QStringLiteral(">");
@@ -368,12 +532,15 @@ QString CSdlClassCodeGeneratorComp::ConvertType(const CSdlField& sdlField, bool*
 }
 
 
-QString CSdlClassCodeGeneratorComp::ConvertType(const QString& sdlType, bool* isCustomPtr) const
+QString CSdlClassCodeGeneratorComp::ConvertType(const QString& sdlType, bool* isCustomPtr, bool* isComplexPtr) const
 {
 	// A signed 32‐bit integer
 	if (sdlType == QStringLiteral("Int") || sdlType == QStringLiteral("Integer")){
 		if (isCustomPtr != nullptr){
 			*isCustomPtr = false;
+		}
+		if (isComplexPtr != nullptr){
+			*isComplexPtr = false;
 		}
 
 		return QStringLiteral("int");
@@ -384,6 +551,9 @@ QString CSdlClassCodeGeneratorComp::ConvertType(const QString& sdlType, bool* is
 		if (isCustomPtr != nullptr){
 			*isCustomPtr = false;
 		}
+		if (isComplexPtr != nullptr){
+			*isComplexPtr = false;
+		}
 
 		return QStringLiteral("float");
 	}
@@ -392,6 +562,9 @@ QString CSdlClassCodeGeneratorComp::ConvertType(const QString& sdlType, bool* is
 	if (sdlType == QStringLiteral("Double")){
 		if (isCustomPtr != nullptr){
 			*isCustomPtr = false;
+		}
+		if (isComplexPtr != nullptr){
+			*isComplexPtr = false;
 		}
 
 		return QStringLiteral("double");
@@ -402,6 +575,9 @@ QString CSdlClassCodeGeneratorComp::ConvertType(const QString& sdlType, bool* is
 		if (isCustomPtr != nullptr){
 			*isCustomPtr = false;
 		}
+		if (isComplexPtr != nullptr){
+			*isComplexPtr = true;
+		}
 
 		return QStringLiteral("QString");
 	}
@@ -410,6 +586,9 @@ QString CSdlClassCodeGeneratorComp::ConvertType(const QString& sdlType, bool* is
 	if (sdlType == QStringLiteral("Boolean") || sdlType == QStringLiteral("Bool")){
 		if (isCustomPtr != nullptr){
 			*isCustomPtr = false;
+		}
+		if (isComplexPtr != nullptr){
+			*isComplexPtr = false;
 		}
 
 		return QStringLiteral("bool");
@@ -420,6 +599,9 @@ QString CSdlClassCodeGeneratorComp::ConvertType(const QString& sdlType, bool* is
 		if (isCustomPtr != nullptr){
 			*isCustomPtr = false;
 		}
+		if (isComplexPtr != nullptr){
+			*isComplexPtr = true;
+		}
 
 		return QStringLiteral("QByteArray");
 	}
@@ -428,8 +610,11 @@ QString CSdlClassCodeGeneratorComp::ConvertType(const QString& sdlType, bool* is
 	if (isCustomPtr != nullptr){
 		*isCustomPtr = true;
 	}
+	if (isComplexPtr != nullptr){
+		*isComplexPtr = true;
+	}
 	
-	return sdlType;
+	return QStringLiteral("C") + sdlType;
 }
 
 
@@ -476,6 +661,52 @@ QString CSdlClassCodeGeneratorComp::GetDecapitalizedValue(const QString& inputVa
 	retVal[0] = retVal[0].toLower();
 
 	return retVal;
+}
+
+
+bool CSdlClassCodeGeneratorComp::IsTypeHasFundamentalTypes(const CSdlType& sdlType, QSet<QString>* foundTypesPtr) const
+{
+	bool retVal = false;
+
+	for(const CSdlField& sdlField: sdlType.GetFields()){
+		bool isComplex = true;
+		bool isArray = false;
+		const QString convertedType = ConvertType(sdlField, nullptr, &isComplex, &isArray);
+		isComplex = isComplex || isArray;
+
+		if (foundTypesPtr != nullptr && !isComplex){
+			foundTypesPtr->insert(convertedType);
+		}
+
+		retVal = retVal || !isComplex;
+	}
+
+	return retVal;
+}
+
+
+bool CSdlClassCodeGeneratorComp::IsTypeHasNonFundamentalTypes(const CSdlType& sdlType, QSet<QString>* foundTypesPtr) const
+{
+	bool retVal = false;
+
+	for(const CSdlField& sdlField: sdlType.GetFields()){
+		bool isComplex = false;
+		bool isArray = false;
+		ConvertType(sdlField, nullptr, &isComplex, &isArray);
+
+		if (foundTypesPtr != nullptr && isComplex){
+			foundTypesPtr->insert(ConvertType(sdlField.GetType()));
+		}
+
+		// add QList as non fundamental type (for includes)
+		if (foundTypesPtr != nullptr && isArray){
+			foundTypesPtr->insert(QStringLiteral("QList"));
+		}
+
+		retVal = retVal || isComplex;
+	}
+
+	return true;
 }
 
 
