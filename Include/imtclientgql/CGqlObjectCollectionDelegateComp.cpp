@@ -16,7 +16,7 @@
 // ImtCore includes
 #include <imtbase/IObjectCollection.h>
 #include <imtgql/CGqlRequest.h>
-#include <imtclientgql/CGqlObjectCollectionResponse.h>
+#include <imtclientgql/CGqlHierarchicalStructureResponse.h>
 #include <imtbase/CFilterCollectionProxy.h>
 #include <imtbase/COperationContext.h>
 
@@ -109,66 +109,6 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateInsertObjectRequest
 	requestPtr->AddField(query);
 
 	return requestPtr;
-}
-
-
-imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectNameRequest(
-			const QByteArray& objectId,
-			const QString& name,
-			int clientVersion,
-			const imtbase::IOperationContext* operationContextPtr) const
-{
-	QByteArray commandId = *m_collectionIdAttrPtr + "SetName";
-	QByteArray data;
-	imtgql::CGqlRequest* queryPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
-
-	imtgql::CGqlObject input("input");
-	input.InsertField("id", QVariant(objectId));
-	input.InsertField("newName", QVariant(name));
-	input.InsertField("version", QVariant(clientVersion));
-	SerializeObject(operationContextPtr, data);
-	input.InsertField("operationContext", QVariant(data.toBase64()));
-	queryPtr->AddParam(input);
-
-	imtgql::CGqlObject query("rename");
-	queryPtr->AddField(query);
-
-	return queryPtr;
-}
-
-
-imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectDescriptionRequest(
-			const QByteArray& objectId,
-			const QString& description,
-			int clientVersion,
-			const imtbase::IOperationContext* operationContextPtr) const
-{
-	QByteArray commandId = *m_collectionIdAttrPtr + "SetDescription";
-	QByteArray data;
-	imtgql::CGqlRequest* queryPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
-
-	imtgql::CGqlObject input("input");
-	input.InsertField("id", QVariant(objectId));
-	input.InsertField("description", QVariant(description));
-	input.InsertField("version", QVariant(clientVersion));
-	SerializeObject(operationContextPtr, data);
-	input.InsertField("operationContext", QVariant(data.toBase64()));
-	queryPtr->AddParam(input);
-
-	imtgql::CGqlObject query("setDescription");
-	queryPtr->AddField(query);
-
-	return queryPtr;
-}
-
-
-imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectMetaInfoRequest(
-			const QByteArray& objectId,
-			const idoc::IDocumentMetaInfo& metaInfo,
-			int clientVersion,
-			const imtbase::IOperationContext* operationContextPtr) const
-{
-	return nullptr;
 }
 
 
@@ -313,18 +253,61 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateGetSubCollectionReq
 }
 
 
-imtgql::IGqlResponse* CGqlObjectCollectionDelegateComp::CreateResponse(const imtgql::IGqlRequest& request) const
+imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectNameRequest(
+			const QByteArray& objectId,
+			const QString& name,
+			int clientVersion,
+			const imtbase::IOperationContext* operationContextPtr) const
 {
-	const imtgql::CGqlRequest* requestPtr = dynamic_cast<const imtgql::CGqlRequest*>(&request);
-	if (requestPtr != nullptr){
-		return new CGqlObjectCollectionResponse(*requestPtr);
-	}
+	QByteArray commandId = *m_collectionIdAttrPtr + "SetName";
+	QByteArray data;
+	imtgql::CGqlRequest* queryPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
 
-	return nullptr;
+	imtgql::CGqlObject input("input");
+	input.InsertField("id", QVariant(objectId));
+	input.InsertField("newName", QVariant(name));
+	input.InsertField("version", QVariant(clientVersion));
+	SerializeObject(operationContextPtr,data);
+	input.InsertField("operationContext", QVariant(data.toBase64()));
+	queryPtr->AddParam(input);
+
+	imtgql::CGqlObject query("rename");
+	queryPtr->AddField(query);
+
+	return queryPtr;
 }
 
 
-// private methods
+imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectDescriptionRequest(
+			const QByteArray& objectId,
+			const QString& description,
+			int clientVersion,
+			const imtbase::IOperationContext* operationContextPtr) const
+{
+	QByteArray commandId = *m_collectionIdAttrPtr + "SetDescription";
+	QByteArray data;
+	imtgql::CGqlRequest* queryPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_MUTATION, commandId);
+
+	imtgql::CGqlObject input("input");
+	input.InsertField("id", QVariant(objectId));
+	input.InsertField("description", QVariant(description));
+	input.InsertField("version", QVariant(clientVersion));
+	SerializeObject(operationContextPtr,data);
+	input.InsertField("operationContext", QVariant(data.toBase64()));
+	queryPtr->AddParam(input);
+
+	imtgql::CGqlObject query("setDescription");
+	queryPtr->AddField(query);
+
+	return queryPtr;
+}
+
+
+imtgql::IGqlResponse* CGqlObjectCollectionDelegateComp::CreateResponse(const imtgql::IGqlRequest& /*request*/) const
+{
+	return new imtclientgql::CGqlHierarchicalStructureResponse();
+}
+
 
 bool CGqlObjectCollectionDelegateComp::SerializeObject(const istd::IPolymorphic* object, QByteArray& objectData) const
 {

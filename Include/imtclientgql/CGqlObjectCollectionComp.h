@@ -56,6 +56,7 @@ public:
 
 	CGqlObjectCollectionComp();
 
+
 	// reimplemented (IObjectCollection)
 	virtual const imtbase::IRevisionController* GetRevisionController() const override;
 	virtual const imtbase::ICollectionDataController* GetDataController() const override;
@@ -120,7 +121,12 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 private:
+	IObjectCollection::DataPtr GetObject(const QByteArray& objectId, const QByteArray& typeId) const;
+	// bool GetElementType(const QByteArray& elementId, ElementType& valueOut) const;
 	bool GetObjectInfo(const QByteArray& objectId, imtclientgql::IGqlObjectCollectionResponse::ObjectInfo& valueOut) const;
+	// bool GetObjectInfo(const QByteArray& objectId, imtclientgql::IGqlStructureResponse::ObjectInfo& valueOut) const;
+	bool GetObjectMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const;
+	bool GetObjectDataMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const;
 	bool SerializeObject(const istd::IPolymorphic* object, QByteArray& objectData) const;
 	bool DeSerializeObject(istd::IPolymorphic* object, const QByteArray& objectData) const;
 

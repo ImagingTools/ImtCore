@@ -22,14 +22,13 @@ namespace imtclientgql
 
 // public methods
 
-CGqlObjectCollectionResponse::CGqlObjectCollectionResponse(const imtgql::CGqlRequest& request)
-	: m_request(request),
-	m_isNodeInfoPresent(false),
-	m_isObjectInfoPresent(false),
-	m_isElementInfoPresent(false),
-	m_isElementListPresent(false),
-	m_isPrimitiveTypePresent(false)
+CGqlObjectCollectionResponse::CGqlObjectCollectionResponse()
 {
+	m_isNodeInfoPresent = false;
+	m_isObjectInfoPresent = false;
+	m_isElementInfoPresent = false;
+	m_isElementListPresent = false;
+	m_isPrimitiveTypePresent = false;
 }
 
 
@@ -55,18 +54,6 @@ bool CGqlObjectCollectionResponse::GetObjectList(ObjectList& out) const
 		return true;
 	}
 
-	return false;
-}
-
-
-bool CGqlObjectCollectionResponse::GetMetaInfo(idoc::IDocumentMetaInfo& out) const
-{
-	return false;
-}
-
-
-bool CGqlObjectCollectionResponse::DeSerializeObject(istd::IChangeable& object) const
-{
 	return false;
 }
 
@@ -155,6 +142,115 @@ void CGqlObjectCollectionResponse::OnReply(const imtgql::IGqlRequest& request, c
 
 
 // private methods
+
+void CGqlObjectCollectionResponse::ParseFolderContentReply()
+{
+	QJsonObject responseObject = m_json.object().value("data").toObject().value("getFolderContent").toObject();
+	if (responseObject.contains("folder") && responseObject.value("folder").isObject()){
+		QJsonObject folder = responseObject.value("folder").toObject();
+
+		m_isElementInfoPresent = true;
+		m_isNodeInfoPresent = true;
+
+		m_objectInfo.id = folder.value("id").toString().toLatin1();
+		m_objectInfo.name = folder.value("name").toString().toLatin1();
+
+		QJsonArray path = folder.value("fullPath").toArray();
+		for (int i = 0; i < path.size(); i++){
+			QByteArray id = path[i].toObject().value("id").toString().toLatin1();
+			//Q_ASSERT(i == 0 ? id.isEmpty() : !id.isEmpty());
+
+//			m_objectInfo.path += id;
+		}
+	}
+
+	if (responseObject.contains("subfolders") && responseObject.value("subfolders").isArray()){
+		QJsonArray arrayFolders = responseObject.value("subfolders").toArray();
+		for (int i = 0; i < arrayFolders.count(); ++i){
+			m_isElementListPresent = true;
+
+			QJsonObject jsonObject = arrayFolders[i].toObject();
+
+			ObjectInfo folderInfo;
+
+			folderInfo.id = jsonObject.value("id").toString().toLatin1();
+			folderInfo.name = jsonObject.value("name").toString();
+
+			m_objectList.push_back(folderInfo);
+		}
+	}
+
+	if (responseObject.contains("measurements") && responseObject.value("measurements").isArray()){
+		QJsonArray arrayDocuments = responseObject.value("measurements").toArray();
+		for (int i = 0; i < arrayDocuments.count(); ++i){
+			m_isElementListPresent = true;
+
+			QJsonObject jsonObject = arrayDocuments[i].toObject();
+
+			ObjectInfo documentInfo;
+
+			documentInfo.id = jsonObject.value("id").toString().toLatin1();
+			documentInfo.name = jsonObject.value("name").toString();
+			documentInfo.typeId = "Measurement";
+			documentInfo.version = -1;
+			if (jsonObject.contains("versionInformation")){
+				QJsonObject versionInformation = jsonObject.value("versionInformation").toObject();
+
+				documentInfo.version = versionInformation.value("version").toInt();
+			}
+
+			documentInfo.dataMetaInfoPtr.reset(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);
+			QString timeStr = jsonObject.value("createdOn").toString();
+			documentInfo.dataMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME, QDateTime::fromString(timeStr, Qt::ISODate));
+			timeStr = jsonObject.value("timestamp").toString();
+			documentInfo.dataMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, QDateTime::fromString(timeStr, Qt::ISODate));
+
+			QByteArray data = jsonObject.value("metadata").toString().toUtf8();
+			QJsonObject metadata = QJsonDocument::fromJson(data).object();
+			QJsonArray inkNamesArray = metadata.value("InkNames").toArray();
+			QString inkNamesStr;
+			for (int inkIndex = 0; inkIndex < inkNamesArray.count(); ++inkIndex){
+				inkNamesStr += inkNamesArray.at(inkIndex).toObject().value("Name").toString();
+				if (inkIndex < inkNamesArray.count() - 1){
+					inkNamesStr += " ";
+				}
+			}
+			QJsonArray measuringDevicesArray = metadata.value("MeasuringDevices").toArray();
+			QStringList measuringDeviceList;
+			QString measuringDevices;
+			for (int deviceIndex = 0; deviceIndex < measuringDevicesArray.count(); ++deviceIndex){
+				QString device = measuringDevicesArray.at(deviceIndex).toString();
+				if (!measuringDeviceList.contains(device)){
+					measuringDeviceList += device;
+					measuringDevices += device;
+					measuringDevices += " ";
+				}
+			}
+
+			QJsonArray measurementConditionsArray = metadata.value("MeasurementConditions").toArray();
+			QStringList measurementConditionList;
+			QString measurementConditions;
+			for (int conditionIndex = 0; conditionIndex < measurementConditionsArray.count(); ++conditionIndex){
+				QString condition = measurementConditionsArray.at(conditionIndex).toString();
+				if (!measurementConditionList.contains(condition)){
+					measurementConditionList += condition;
+					measurementConditions += condition;
+					measurementConditions += " ";
+				}
+			}
+
+			documentInfo.dataMetaInfoPtr.reset(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>);
+			documentInfo.dataMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_TITLE, documentInfo.name);
+			documentInfo.dataMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME, documentInfo.dataMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME));
+			documentInfo.dataMetaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME, documentInfo.dataMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME));
+			documentInfo.dataMetaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME, documentInfo.dataMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CREATION_TIME));
+			documentInfo.dataMetaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, documentInfo.dataMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_MODIFICATION_TIME));
+
+			m_objectList.push_back(documentInfo);
+		}
+	}
+}
+
 
 void CGqlObjectCollectionResponse::ParseCreateFolderReply()
 {
