@@ -21,9 +21,9 @@ namespace imtclientgql
 
 // public methods
 
-void CGqlHierarchicalStructureResponse::SetRequest(const imtgql::CGqlRequest& request)
+CGqlHierarchicalStructureResponse::CGqlHierarchicalStructureResponse(const imtgql::CGqlRequest& request)
+	:m_request(request)
 {
-	m_request = request;
 }
 
 

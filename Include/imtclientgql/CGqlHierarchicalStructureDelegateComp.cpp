@@ -367,8 +367,7 @@ imtgql::IGqlResponse* CGqlHierarchicalStructureDelegateComp::CreateResponse(cons
 			commandId == "GetItemInfos" ||
 			commandId == "GetItemPath"){
 
-			CGqlHierarchicalStructureResponse* responsePtr = new CGqlHierarchicalStructureResponse();
-			responsePtr->SetRequest(*requestPtr);
+			CGqlHierarchicalStructureResponse* responsePtr = new CGqlHierarchicalStructureResponse(*requestPtr);
 
 			return responsePtr;
 		}

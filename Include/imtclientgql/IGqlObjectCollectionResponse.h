@@ -1,6 +1,9 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QMap>
+
 // ACF includes
 #include <idoc/IDocumentMetaInfo.h>
 
@@ -23,11 +26,11 @@ public:
 		}
 
 		QByteArray id;
+		QByteArray typeId;
 		QString name;
 		QString description;
 
-		QByteArray typeId;
-		QSharedPointer<idoc::IDocumentMetaInfo> dataMetaInfoPtr;
+		QMap<int, QVariant> elementInfo;
 
 		/**
 			The server assigns the version to the document to be used when updating the data.
@@ -40,8 +43,9 @@ public:
 	typedef QList<ObjectInfo> ObjectList;
 
 	virtual bool GetObjectInfo(ObjectInfo& out) const = 0;
-	// virtual bool GetElementInfo(ElementInfo& out) const override;
 	virtual bool GetObjectList(ObjectList& out) const = 0;
+	virtual bool GetMetaInfo(idoc::IDocumentMetaInfo& out) const = 0;
+	virtual bool DeSerializeObject(istd::IChangeable& object) const = 0;
 };
 
 

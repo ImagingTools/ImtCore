@@ -15,59 +15,6 @@ namespace imtclientgql
 {
 
 
-// class IGqlObjectCollectionStructureDelegate: virtual public IGqlResponseCreator
-// {
-// 	// GQL context business logic of the structure management.
-// 	virtual imtgql::IGqlRequest* CreateGetNodeInfoRequest(const QByteArray& nodeId) const = 0;
-// 	/**
-// 		Structure manipulations
-// 	*/
-// 	virtual imtgql::IGqlRequest* CreateInsertNodeRequest(
-// 		const QString& name,
-// 		const QString& description,
-// 		const QByteArray& proposedNodeId = QByteArray(),
-// 		const QByteArray& parentNodeId = QByteArray(),
-// 		const idoc::IDocumentMetaInfo* metaInfoPtr = nullptr,
-// 		const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-// 	virtual imtgql::IGqlRequest* CreateSetNodeNameRequest(
-// 		const QByteArray& nodeId,
-// 		const QString& name,
-// 		const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-// 	virtual imtgql::IGqlRequest* CreateSetNodeDescriptionRequest(
-// 		const QByteArray& nodeId,
-// 		const QString& description,
-// 		const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-// 	virtual imtgql::IGqlRequest* CreateSetNodeMetaInfoRequest(
-// 		const QByteArray& nodeId,
-// 		const idoc::IDocumentMetaInfo& metaInfo,
-// 		const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-// 	virtual imtgql::IGqlRequest* CreateMoveNodeRequest(
-// 		const QByteArray& nodeId,
-// 		const QByteArray& parentNodeId,
-// 		const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-// 	virtual imtgql::IGqlRequest* CreateRemoveNodeRequest(
-// 		const QByteArray& nodeId,
-// 		const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-
-// 	virtual imtgql::IGqlRequest* CreateAddObjectToNodeRequest(
-// 		const QByteArray& objectId,
-// 		const QByteArray& nodeId,
-// 		int clientVersion = -1,
-// 		const imtbase::IOperationContext* operationContextPtr = nullptr) = 0;
-// 	virtual imtgql::IGqlRequest* CreateMoveObjectToNodeRequest(
-// 		const QByteArray& objectId,
-// 		const QByteArray& nodeId,
-// 		const QByteArray& newNodeId,
-// 		int clientVersion = -1,
-// 		const imtbase::IOperationContext* operationContextPtr = nullptr) = 0;
-// 	virtual imtgql::IGqlRequest* CreateRemoveObjectFromNodeRequest(
-// 		const QByteArray& objectId,
-// 		const QByteArray& nodeId,
-// 		int clientVersion = -1,
-// 		const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-// };
-
-
 class IGqlObjectCollectionDelegate: virtual public IGqlResponseCreator
 {
 public:

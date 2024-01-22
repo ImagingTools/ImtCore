@@ -10,6 +10,7 @@
 #include <ilog/CMessageContainer.h>
 
 // ImtCore includes
+#include <imtbase/IHierarchicalStructureInfo.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlResponse.h>
 
@@ -23,7 +24,8 @@ class CGqlHierarchicalStructureResponse:
 			virtual public imtgql::IGqlResponse
 {
 public:
-	void SetRequest(const imtgql::CGqlRequest& request);
+	CGqlHierarchicalStructureResponse() = delete;
+	CGqlHierarchicalStructureResponse(const imtgql::CGqlRequest& request);
 
 	// reimplemented (imtgql::IGqlResponse)
 	virtual bool IsSuccessful() const override;

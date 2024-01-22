@@ -155,11 +155,30 @@ bool CGqlObjectCollectionComp::GetObjectData(const Id& objectId, DataPtr& dataPt
 {
 	QByteArray typeId = GetObjectTypeId(objectId);
 
-	DataPtr retVal = GetObject(objectId, typeId);
-	if (retVal.IsValid()){
-		dataPtr = retVal;
+	if (m_delegateCompPtr.IsValid()){
+		imtbase::IObjectCollection::DataPtr documentPtr = CreateObjectInstance(typeId);
+		if (documentPtr.IsValid()){
+			if (m_clientCompPtr.IsValid()){
+				istd::TDelPtr<imtgql::IGqlRequest> requestPtr = m_delegateCompPtr->CreateGetObjectRequest(objectId);
+				if (!requestPtr.IsValid()){
+					return false;
+				}
 
-		return true;
+				istd::TDelPtr < imtclientgql::IGqlObjectCollectionResponse> responsePtr;
+				responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+				if (responsePtr.IsValid()){
+					if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
+						if (responsePtr->IsSuccessful()){
+							if (responsePtr->DeSerializeObject(*documentPtr)){
+								dataPtr = documentPtr;
+
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	return false;
@@ -354,42 +373,30 @@ QByteArray CGqlObjectCollectionComp::GetObjectTypeId(const Id& objectId) const
 
 idoc::MetaInfoPtr CGqlObjectCollectionComp::GetDataMetaInfo(const Id& objectId) const
 {
+	idoc::MetaInfoPtr outInfo;
+
 	if (m_delegateCompPtr.IsValid()){
-		idoc::MetaInfoPtr outInfo;
 		if (m_clientCompPtr.IsValid()){
 			istd::TDelPtr<imtgql::IGqlRequest> requestPtr = m_delegateCompPtr->CreateGetObjectDataMetaInfoRequest(objectId);
 			if (!requestPtr.IsValid()){
 				return idoc::MetaInfoPtr();
 			}
 
-			istd::TDelPtr<imtgql::IGqlResponse> responsePtr;
+			istd::TDelPtr<imtclientgql::IGqlObjectCollectionResponse> responsePtr;
 			responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
 			if (responsePtr.IsValid()){
 				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 					if (responsePtr->IsSuccessful()){
-						QVariant variant = responsePtr->GetResult();
-						if (variant.canConvert<QJsonObject>()){
-							QJsonObject jsonObject = variant.value<QJsonObject>();
-							QByteArray objectData = QByteArray::fromBase64(jsonObject.value("dataMetaInfo").toString().toUtf8());
-							if (m_metaInfoCreatorCompPtr.IsValid()){
-								QByteArray typeId = GetObjectTypeId(objectId);
-								m_metaInfoCreatorCompPtr->CreateMetaInfo(nullptr, typeId, outInfo);
-							}
-							else{
-								outInfo.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
-							}
-							DeSerializeObject(outInfo.GetPtr(), objectData);
+						outInfo.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
 
-							return outInfo;
-						}
+						responsePtr->GetMetaInfo(*outInfo);
 					}
 				}
 			}
 		}
-
 	}
 
-	return idoc::MetaInfoPtr();
+	return outInfo;
 }
 
 
@@ -502,17 +509,22 @@ idoc::MetaInfoPtr CGqlObjectCollectionComp::GetElementMetaInfo(const Id& element
 {
 	idoc::MetaInfoPtr metaInfoPtr;
 
-	imtclientgql::IGqlObjectCollectionResponse::ObjectInfo info;
+	if (!m_delegateCompPtr.IsValid()){
+		metaInfoPtr.SetPtr(new idoc::CStandardDocumentMetaInfo());
 
-	if (GetObjectInfo(elementId, info)){
-		if (!info.dataMetaInfoPtr.isNull()){
-			metaInfoPtr.SetCastedOrRemove(info.dataMetaInfoPtr->CloneMe());
-		}
-	}
-	else{
-
-		if (!GetObjectMetaInfo(elementId, metaInfoPtr)){
-			metaInfoPtr.Reset();
+		if (m_clientCompPtr.IsValid()){
+			istd::TDelPtr<imtgql::IGqlRequest> requestPtr = m_delegateCompPtr->CreateGetObjectMetaInfoRequest(elementId);
+			if (!requestPtr.IsValid()){
+				istd::TDelPtr<imtclientgql::IGqlObjectCollectionResponse> responsePtr;
+				responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
+				if (responsePtr.IsValid()){
+					if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
+						if (responsePtr->IsSuccessful()){
+							responsePtr->GetMetaInfo(*metaInfoPtr);
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -661,48 +673,6 @@ void CGqlObjectCollectionComp::OnComponentDestroyed()
 
 // private methods
 
-imtbase::IObjectCollection::DataPtr CGqlObjectCollectionComp::GetObject(
-			const QByteArray& objectId,
-			const QByteArray& typeId) const
-{
-	if (m_delegateCompPtr.IsValid()){
-		imtbase::IObjectCollection::DataPtr documentPtr = CreateObjectInstance(typeId);
-		if (documentPtr.IsValid()){
-			if (m_clientCompPtr.IsValid()){
-				istd::TDelPtr<imtgql::IGqlRequest> requestPtr = m_delegateCompPtr->CreateGetObjectRequest(objectId);
-				if (!requestPtr.IsValid()){
-					return imtbase::IObjectCollection::DataPtr();
-				}
-
-				istd::TDelPtr<imtgql::IGqlResponse> responsePtr;
-				responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
-				if (responsePtr.IsValid()){
-					if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-						if (responsePtr->IsSuccessful()){
-							QVariant variant = responsePtr->GetResult();
-#if QT_VERSION < 0x060000
-							if (variant.type() == QMetaType::QByteArray || variant.type() == QMetaType::QString){
-#else
-							if (variant.typeId() == QMetaType::QByteArray || variant.typeId() == QMetaType::QString){
-#endif
-								QByteArray objectData = QByteArray::fromBase64(variant.toByteArray());
-								DeSerializeObject(documentPtr.GetPtr(), objectData);
-
-								return documentPtr;
-							}
-						}
-					}
-
-				}
-			}
-
-		}
-	}
-
-	return imtbase::IObjectCollection::DataPtr();
-}
-
-
 bool CGqlObjectCollectionComp::GetObjectInfo(
 			const QByteArray& objectId,
 			imtclientgql::IGqlObjectCollectionResponse::ObjectInfo& valueOut) const
@@ -713,99 +683,12 @@ bool CGqlObjectCollectionComp::GetObjectInfo(
 			return false;
 		}
 
-		istd::TDelPtr<imtgql::IGqlResponse> responsePtr;
+		istd::TDelPtr<imtclientgql::IGqlObjectCollectionResponse> responsePtr;
 		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
 		if (responsePtr.IsValid()){
 			if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
 				if (responsePtr->IsSuccessful()){
-					QVariant variant = responsePtr->GetResult();
-					if (variant.canConvert<QJsonObject>()){
-						QJsonObject object = variant.value<QJsonObject>();
-						object = object.value("info").toObject();
-						valueOut.id = objectId;
-						valueOut.typeId = object.value("typeId").toString().toUtf8();
-						valueOut.version = object.value("version").toInt();
-						valueOut.name = object.value("name").toString();
-						valueOut.description = object.value("description").toString();
-
-						return true;
-					}
-				}
-			}
-		}
-	}
-
-	return false;
-	return false;
-}
-
-
-bool CGqlObjectCollectionComp::GetObjectMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const
-{
-	if (!m_delegateCompPtr.IsValid()){
-		return false;
-	}
-
-	valueOut.SetPtr(new idoc::CStandardDocumentMetaInfo());
-
-	if (m_clientCompPtr.IsValid()){
-		istd::TDelPtr<imtgql::IGqlRequest> requestPtr = m_delegateCompPtr->CreateGetObjectMetaInfoRequest(objectId);
-		if (!requestPtr.IsValid()){
-			return false;
-		}
-
-		istd::TDelPtr<imtgql::IGqlResponse> responsePtr;
-		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
-		if (responsePtr.IsValid()){
-			if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-				if (responsePtr->IsSuccessful()){
-					QVariant variant = responsePtr->GetResult();
-					if (variant.canConvert<QJsonObject>()){
-						QJsonObject jsonObject = variant.value<QJsonObject>();
-						QByteArray objectData = QByteArray::fromBase64(jsonObject.value("metaInfo").toString().toUtf8());
-
-						return DeSerializeObject(valueOut.GetPtr(), objectData);
-					}
-				}
-			}
-		}
-	}
-
-	return false;
-}
-
-
-bool CGqlObjectCollectionComp::GetObjectDataMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const
-{
-	if (!m_delegateCompPtr.IsValid()){
-		return false;
-	}
-
-	if (m_clientCompPtr.IsValid()){
-		istd::TDelPtr<imtgql::IGqlRequest> requestPtr = m_delegateCompPtr->CreateGetObjectDataMetaInfoRequest(objectId);
-		if (!requestPtr.IsValid()){
-			return false;
-		}
-
-		istd::TDelPtr<imtgql::IGqlResponse> responsePtr;
-		responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
-		if (responsePtr.IsValid()){
-			if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-				if (responsePtr->IsSuccessful()){
-					QVariant variant = responsePtr->GetResult();
-					if (variant.canConvert<QJsonObject>()){
-						QJsonObject jsonObject = variant.value<QJsonObject>();
-						QByteArray objectData = QByteArray::fromBase64(jsonObject.value("dataMetaInfo").toString().toUtf8());
-						if (m_metaInfoCreatorCompPtr.IsValid()){
-							QByteArray typeId = GetObjectTypeId(objectId);
-							m_metaInfoCreatorCompPtr->CreateMetaInfo(nullptr, typeId, valueOut);
-						}
-						else{
-							valueOut.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
-						}
-
-						return DeSerializeObject(valueOut.GetPtr(), objectData);
-					}
+					return responsePtr->GetObjectInfo(valueOut);
 				}
 			}
 		}
