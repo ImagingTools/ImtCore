@@ -363,8 +363,10 @@ bool CGqlSchemaParser::ProcessValue(SdlFieldList& output, bool* endOfReadPtr)
 			field.SetIsNonEmpty(true);
 		}
 		field.SetType(valueType);
+		if (foundDelimeter != ']'){
+			retVal = retVal && ReadToDelimeter("]", valueType);
+		}
 
-		retVal = retVal && ReadToDelimeter("]", valueType);
 		retVal = retVal && MoveToNextReadableSymbol(&foundDelimeter);
 		if (m_lastReadChar == '!'){
 			field.SetIsRequired(true);

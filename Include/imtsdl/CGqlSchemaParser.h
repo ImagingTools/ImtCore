@@ -21,9 +21,9 @@ namespace imtsdl
 	The CGqlSchemaParser class
  */
 class CGqlSchemaParser:
-			public virtual istd::IPolymorphic,
-			public virtual ISdlTypeListProvider,
-			protected istd::ILogger
+			virtual public istd::IPolymorphic,
+			virtual public ISdlTypeListProvider,
+			virtual protected istd::ILogger
 {
 
 	Q_DISABLE_COPY(CGqlSchemaParser)
