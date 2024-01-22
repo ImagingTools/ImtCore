@@ -18,6 +18,7 @@ public:
 	virtual bool SetArguments(int argc, char** argv) = 0;
 	virtual QString GetSchemaFilePath() const = 0;
 	virtual QString GetOutputDirectoryPath() const = 0;
+	virtual QString GetNamespace() const = 0;
 };
 
 

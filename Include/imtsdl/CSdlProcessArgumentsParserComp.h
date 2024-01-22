@@ -30,12 +30,14 @@ public:
 	virtual bool SetArguments(int argc, char** argv) override;
 	virtual QString GetSchemaFilePath() const override;
 	virtual QString GetOutputDirectoryPath() const override;
+	virtual QString GetNamespace() const override;
 
 private:
 	QString m_schemaFilePath;
 	QString m_outputDirectoryPath;
 	QString m_headerFileExctention;
 	QString m_sourceCodeFileExctention;
+	QString m_namespace;
 };
 
 

@@ -21,9 +21,10 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 
 	QCommandLineOption schemaFilePathOption({"S","schema-file",}, "SDL schema file path", "SchemaFilePath");
 	QCommandLineOption outputDirectoryPathOption({"O","output-directory",}, "Directory where created files will be created", "OutputDirectoryPath");
+	QCommandLineOption namespaceOption({"N","namespace",}, "Namespace, used in source and header files", "Namespace");
 
 	QCommandLineParser commandLineParser;
-	bool isOptionsAdded = commandLineParser.addOptions({schemaFilePathOption, outputDirectoryPathOption});
+	bool isOptionsAdded = commandLineParser.addOptions({schemaFilePathOption, outputDirectoryPathOption, namespaceOption});
 	if (!isOptionsAdded){
 		Q_ASSERT(false);
 
@@ -36,6 +37,9 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	}
 	if (commandLineParser.isSet(outputDirectoryPathOption)){
 		m_outputDirectoryPath = commandLineParser.value(outputDirectoryPathOption);
+	}
+	if (commandLineParser.isSet(namespaceOption)){
+		m_namespace = commandLineParser.value(namespaceOption);
 	}
 
 	return true;
@@ -55,6 +59,14 @@ QString CSdlProcessArgumentsParserComp::GetOutputDirectoryPath() const
 	Q_ASSERT(!m_outputDirectoryPath.isNull());
 
 	return m_outputDirectoryPath;
+}
+
+
+QString CSdlProcessArgumentsParserComp::GetNamespace() const
+{
+	Q_ASSERT(!m_namespace.isNull());
+
+	return m_namespace;
 }
 
 

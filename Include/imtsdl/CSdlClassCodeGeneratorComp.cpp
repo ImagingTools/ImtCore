@@ -103,12 +103,28 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType)
 	ifStream << QStringLiteral("#pragma once");
 	FeedStream(ifStream, 3, false);
 
-	/// \todo optimize it (exclude extra) and add custom value's header
+	/// \todo optimize it exclude extra if has only Fundamental types and add custom value's header
 	ifStream << QStringLiteral("#include <QtCore/QByteArray>") << '\n';
 	ifStream << QStringLiteral("#include <QtCore/QString>") << '\n';
 	ifStream << QStringLiteral("#include <QtCore/QList>") << '\n';
 	FeedStream(ifStream, 2, false);
 
+
+	// namespace begin
+	QString namespaceString;
+	const QString sdlNamespace = m_argumentParserCompPtr->GetNamespace();
+	if (!sdlNamespace.isEmpty()){
+		namespaceString = QStringLiteral("namespace ");
+		namespaceString+= sdlNamespace;
+		namespaceString += QStringLiteral("\n{");
+	}
+
+	if (!namespaceString.isEmpty()){
+		ifStream << namespaceString;
+		FeedStream(ifStream, 2, false);
+	}
+
+	// class begin
 	ifStream << QStringLiteral("class C") << sdlType.GetName() << '\n';
 	ifStream << QStringLiteral("{");
 	FeedStream(ifStream);
@@ -122,7 +138,8 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType)
 	ifStream << QStringLiteral("public:\n");
 
 	// default constructor for defining primitive types
-	ifStream << QStringLiteral("\tC") << sdlType.GetName() << QStringLiteral("();\n");
+	/// \todo optimize it add only if has Fundamental types \warning remove impl
+	ifStream << QStringLiteral("\tC") << sdlType.GetName() << QStringLiteral("(){};\n");
 	FeedStream(ifStream);
 
 	// defining member's access methods
@@ -147,7 +164,22 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const CSdlType& sdlType)
 	ifStream << sdlType.GetName() << QStringLiteral(".h\"");
 	FeedStream(ifStream, 3);
 
+	// namespace begin
+	QString namespaceString;
+	const QString sdlNamespace = m_argumentParserCompPtr->GetNamespace();
+	if (!sdlNamespace.isEmpty()){
+		namespaceString = QStringLiteral("namespace ");
+		namespaceString+= sdlNamespace;
+		namespaceString += QStringLiteral("\n{");
+	}
+
+	if (!namespaceString.isEmpty()){
+		ifStream << namespaceString;
+		FeedStream(ifStream, 3);
+	}
+
 	// default constructor implementation
+	/// \todo add it if has Fundamental types
 
 	// method implementation
 	for (const CSdlField& sdlField: sdlType.GetFields()){
@@ -160,11 +192,28 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const CSdlType& sdlType)
 
 bool CSdlClassCodeGeneratorComp::EndClassFiles()
 {
+	QString namespaceString;
+	// end of namespace
+	const QString sdlNamespace = m_argumentParserCompPtr->GetNamespace();
+	if (!sdlNamespace.isEmpty()){
+		namespaceString += QStringLiteral("} // namespace ");
+		namespaceString += sdlNamespace;
+	}
+
 	QTextStream headerStream(m_headerFilePtr.GetPtr());
-	headerStream << QStringLiteral("};\n");
+	headerStream << QStringLiteral("};");
+	FeedStream(headerStream, 3, false);
+	if (!namespaceString.isEmpty()){
+		headerStream << namespaceString;
+		FeedStream(headerStream, 2, false);
+	}
 	headerStream.flush();
 
 	QTextStream sourceStream(m_sourceFilePtr.GetPtr());
+	if (!namespaceString.isEmpty()){
+		sourceStream << namespaceString;
+		FeedStream(sourceStream, 2);
+	}
 	sourceStream.flush();
 
 	m_headerFilePtr->close();
