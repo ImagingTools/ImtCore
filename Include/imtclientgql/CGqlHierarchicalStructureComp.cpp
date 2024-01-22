@@ -11,7 +11,6 @@
 // ImtCore includes
 #include <imtbase/CTempDir.h>
 #include <imtgql/CGqlRequest.h>
-#include <imtclientgql/IGqlStructureResponse.h>
 #include <imtbase/CFilterCollectionProxy.h>
 
 

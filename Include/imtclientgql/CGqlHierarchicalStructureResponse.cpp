@@ -29,20 +29,6 @@ void CGqlHierarchicalStructureResponse::SetRequest(const imtgql::CGqlRequest& re
 
 // reimplemented (imtgql::IGqlResponse)
 
-imtbase::IHierarchicalStructureInfo::Ids CGqlHierarchicalStructureResponse::GetNodeIds() const
-{
-	return imtbase::IHierarchicalStructureInfo::Ids();
-}
-
-
-imtbase::IHierarchicalStructureInfo::ItemInfo CGqlHierarchicalStructureResponse::GetItemInfo() const
-{
-	return imtbase::IHierarchicalStructureInfo::ItemInfo();
-}
-
-
-// reimplemented (imtgql::IGqlResponse)
-
 bool CGqlHierarchicalStructureResponse::IsSuccessful() const
 {
 	return !m_json.object().contains("errors");

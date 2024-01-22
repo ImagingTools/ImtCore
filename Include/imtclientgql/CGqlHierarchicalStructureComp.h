@@ -9,7 +9,6 @@
 
 // ImtCore includes
 #include <imtbase/IHierarchicalStructure.h>
-#include <imtclientgql/IGqlStructureResponse.h>
 #include <imtclientgql/IGqlHierarchicalStructureDelegate.h>
 #include <imtclientgql/IGqlClient.h>
 #include <imtclientgql/IGqlSubscriptionClient.h>
