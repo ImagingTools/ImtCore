@@ -6,6 +6,7 @@
 
 // Acf includes
 #include <iproc/TSyncProcessorCompBase.h>
+#include <icomp/TMakeComponentWrap.h>
 
 // imtsdl includes
 #include <imtsdl/ISdlProcessArgumentsParser.h>
@@ -17,15 +18,17 @@ namespace imtsdl
 
 
 class CGqlSchemaParserComp:
-			public iproc::CSyncProcessorCompBase,
-			public CGqlSchemaParser
+			public ilog::TLoggerCompWrap<icomp::TMakeComponentWrap<CGqlSchemaParser>>,
+			public iproc::TSyncProcessorWrap<iproc::IProcessor>
 {
 
 public:
-	typedef iproc::CSyncProcessorCompBase BaseClass;
-	typedef CGqlSchemaParser BaseClass2;
+//	typedef icomp::CComponentBase BaseClass;
+	typedef ilog::TLoggerCompWrap<icomp::TMakeComponentWrap<CGqlSchemaParser>> BaseClass;
+	typedef iproc::TSyncProcessorWrap<iproc::IProcessor> BaseClass2;
 
 	I_BEGIN_COMPONENT(CGqlSchemaParserComp)
+		I_REGISTER_INTERFACE(iproc::IProcessor)
 		I_REGISTER_INTERFACE(ISdlTypeListProvider)
 		I_ASSIGN(m_argumentParserCompPtr, "ArgumentParser", "Command line process argument parser", true, "ArgumentParser")
 	I_END_COMPONENT;

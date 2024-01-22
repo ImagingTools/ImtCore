@@ -8,12 +8,12 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="ApplicationInfo" X="575" Y="175" Note=""/>
-        <Element ComponentName="ConsoleApplication" X="575" Y="350" Note=""/>
+        <Element ComponentName="ApplicationInfo" X="200" Y="325" Note=""/>
+        <Element ComponentName="ConsoleApplication" X="575" Y="325" Note=""/>
         <Element ComponentName="ConsoleLog" X="875" Y="500" Note=""/>
         <Element ComponentName="SdlClassCodeGenerator" X="575" Y="650" Note=""/>
-        <Element ComponentName="SdlCoreFramework" X="567" Y="509" Note=""/>
-        <Element ComponentName="VersionInfo" X="575" Y="50" Note=""/>
+        <Element ComponentName="SdlCoreFramework" X="575" Y="500" Note=""/>
+        <Element ComponentName="VersionInfo" X="200" Y="175" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

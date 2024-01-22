@@ -31,9 +31,6 @@
         <Element Id="SdlCodeCreatorProcessorsController" PackageId="ImtSdlPck" ComponentId="SdlGeneralManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ArgumentsParser" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="SdlProcessArgumentsParser"/>
-                    </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -56,6 +53,9 @@
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">

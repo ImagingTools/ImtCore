@@ -33,7 +33,7 @@ int CGqlSchemaParserComp::DoProcessing(
 		return iproc::IProcessor::TS_INVALID;
 	}
 
-	BaseClass2::SetDevice(*m_currentInputFilePtr);
+	BaseClass::SetDevice(*m_currentInputFilePtr);
 
 	const bool isSchemaParsed = ParseGqlSchema();
 	retVal = isSchemaParsed ? iproc::IProcessor::TS_OK : iproc::IProcessor::TS_INVALID;

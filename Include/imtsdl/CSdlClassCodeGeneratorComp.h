@@ -46,6 +46,7 @@ private:
 	bool EndClassFiles();
 	void AbortCurrentProcessing();
 	QString GenerateAccessMethods(const CSdlField& sdlField, uint indents = 1, bool generateGetter = true, bool generateSetter = true);
+	QString GenerateAccessMethodsImpl(const QString className, const CSdlField& sdlField, uint indents = 0, bool generateGetter = true, bool generateSetter = true);
 
 	QString ConvertType(const CSdlField& sdlField, bool* isCustomPtr = nullptr) const;
 	QString ConvertType(const QString& sdlTypeName, bool* isCustomPtr = nullptr) const;

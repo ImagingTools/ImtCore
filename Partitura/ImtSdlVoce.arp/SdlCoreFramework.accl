@@ -8,9 +8,9 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="GqlSchemaParser" X="125" Y="375" Note=""/>
-        <Element ComponentName="SdlCodeCreatorProcessorsController" X="525" Y="225" Note=""/>
-        <Element ComponentName="SdlProcessArgumentsParser" X="900" Y="375" Note=""/>
+        <Element ComponentName="GqlSchemaParser" X="825" Y="400" Note=""/>
+        <Element ComponentName="SdlCodeCreatorProcessorsController" X="550" Y="325" Note=""/>
+        <Element ComponentName="SdlProcessArgumentsParser" X="825" Y="575" Note=""/>
     </PositionMap>
     <EmbeddedRegistries/>
 </Acf>

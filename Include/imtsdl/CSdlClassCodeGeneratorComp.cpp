@@ -109,7 +109,7 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType)
 	ifStream << QStringLiteral("#include <QtCore/QList>") << '\n';
 	FeedStream(ifStream, 2, false);
 
-	ifStream << QStringLiteral("class ") << sdlType.GetName() << '\n';
+	ifStream << QStringLiteral("class C") << sdlType.GetName() << '\n';
 	ifStream << QStringLiteral("{");
 	FeedStream(ifStream);
 
@@ -122,7 +122,7 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType)
 	ifStream << QStringLiteral("public:\n");
 
 	// default constructor for defining primitive types
-	ifStream << '\t' << sdlType.GetName() << QStringLiteral("();\n");
+	ifStream << QStringLiteral("\tC") << sdlType.GetName() << QStringLiteral("();\n");
 	FeedStream(ifStream);
 
 	// defining member's access methods
@@ -143,9 +143,16 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const CSdlType& sdlType)
 	QTextStream ifStream(m_sourceFilePtr.GetPtr());
 
 	// include section
-	ifStream << QStringLiteral("#include \"");
-	ifStream << sdlType.GetName() << ".h";
-	ifStream << '"' << "\n\n";
+	ifStream << QStringLiteral("#include \"C");
+	ifStream << sdlType.GetName() << QStringLiteral(".h\"");
+	FeedStream(ifStream, 3);
+
+	// default constructor implementation
+
+	// method implementation
+	for (const CSdlField& sdlField: sdlType.GetFields()){
+		ifStream << GenerateAccessMethodsImpl(sdlType.GetName(), sdlField);
+	}
 
 	return true;
 }
@@ -154,7 +161,7 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const CSdlType& sdlType)
 bool CSdlClassCodeGeneratorComp::EndClassFiles()
 {
 	QTextStream headerStream(m_headerFilePtr.GetPtr());
-	headerStream << QStringLiteral("};") << '\n';
+	headerStream << QStringLiteral("};\n");
 	headerStream.flush();
 
 	QTextStream sourceStream(m_sourceFilePtr.GetPtr());
@@ -218,6 +225,77 @@ QString CSdlClassCodeGeneratorComp::GenerateAccessMethods(const CSdlField& sdlFi
 		retVal += ' ';
 		retVal += GetDecapitalizedValue(sdlField.GetId());
 		retVal += QStringLiteral(");\n");
+	}
+
+	return retVal;
+}
+
+
+QString CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(const QString className, const CSdlField& sdlField, uint indents, bool generateGetter, bool generateSetter)
+{
+	QString retVal;
+
+	if (generateGetter){
+		FeedLineHorizontally(retVal, indents);
+
+		retVal += ConvertType(sdlField);
+		retVal += QStringLiteral(" C") + className + QStringLiteral("::");
+		retVal += QStringLiteral("Get") + GetCapitalizedValue(sdlField.GetId());
+		retVal += QStringLiteral("() const\n{\n");
+		FeedLineHorizontally(retVal, indents + 1);
+		retVal += QStringLiteral("return m_");
+		retVal += GetDecapitalizedValue(sdlField.GetId());
+		retVal += QStringLiteral(";\n}\n\n\n");
+	}
+
+	if (generateSetter){
+		FeedLineHorizontally(retVal, indents);
+
+		// name of method
+		retVal += QStringLiteral("void");
+		retVal += QStringLiteral(" C") + className + QStringLiteral("::");
+		retVal += QStringLiteral("Set") + GetCapitalizedValue(sdlField.GetId());
+		retVal += '(';
+
+		bool isCustom = false;
+		const QString convertedType = ConvertType(sdlField, &isCustom);
+
+		bool isComplex = sdlField.IsArray() ||
+					sdlField.GetType() == QStringLiteral("String") ||
+					sdlField.GetType() == QStringLiteral("ID") ||
+					isCustom;
+
+		if (isComplex){
+			retVal += QStringLiteral("const ");
+		}
+
+		retVal += convertedType;
+
+		if (isComplex){
+			retVal += '&';
+		}
+
+		retVal += ' ';
+		retVal += GetDecapitalizedValue(sdlField.GetId());
+		retVal += QStringLiteral(")\n{\n");
+
+		// impl of method
+		FeedLineHorizontally(retVal, indents + 1);
+		retVal += QStringLiteral("if (");
+		retVal += GetDecapitalizedValue(sdlField.GetId());
+		retVal += QStringLiteral(" != m_");
+		retVal += GetDecapitalizedValue(sdlField.GetId());
+		retVal += QStringLiteral(" ){\n");
+		FeedLineHorizontally(retVal, indents + 2);
+		retVal += QStringLiteral("m_");
+		retVal += GetDecapitalizedValue(sdlField.GetId());
+		retVal += QStringLiteral(" = ");
+		retVal += GetDecapitalizedValue(sdlField.GetId());
+		retVal += QStringLiteral(";\n");
+		FeedLineHorizontally(retVal, indents + 1);
+		retVal += QStringLiteral("}\n");
+
+		retVal += QStringLiteral("}\n\n\n");
 	}
 
 	return retVal;

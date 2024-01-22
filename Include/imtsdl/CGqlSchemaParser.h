@@ -2,7 +2,6 @@
 
 
 // Qt includes
-
 #include <QtCore/QTextStream>
 #include <QtCore/QIODevice>
 #include <QtCore/QMap>
