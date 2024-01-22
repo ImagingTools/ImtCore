@@ -160,10 +160,10 @@ Rectangle{
                         property string imageName: deleg.isOpen ? "Icons/Down" : "Icons/Right";
                         iconSource:  "../../../" + Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
 
-                        decorator: ButtonDecorator{
+                        decorator: Component { ButtonDecorator{
                             color: "transparent";
                             border.color: "transparent";
-                        }
+                        }}
 
                         onClicked: {
                             if(model.HasChildren__){

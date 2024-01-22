@@ -445,10 +445,10 @@ Item {
 
                     enabled: !datePicker.readOnly;
 
-                    decorator: ButtonDecorator {
+                    decorator: Component { ButtonDecorator {
                         color: yearUpButton.hovered ? Style.buttonHoverColor : "transparent";
                         border.width: 0;
-                    }
+                    }}
 
                     onClicked: {
                         if (!enabled){
@@ -475,10 +475,10 @@ Item {
 
                     enabled: !datePicker.readOnly;
 
-                    decorator: ButtonDecorator {
+                    decorator: Component { ButtonDecorator {
                         color: yearDownButton.hovered ? Style.buttonHoverColor : "transparent";
                         border.width: 0;
-                    }
+                    }}
 
                     onClicked: {
                         if (!enabled){
@@ -578,10 +578,10 @@ Item {
 
                     enabled: !datePicker.readOnly;
 
-                    decorator: ButtonDecorator {
+                    decorator: Component { ButtonDecorator {
                         color: monthUpButton.hovered ? Style.buttonHoverColor : "transparent";
                         border.width: 0;
-                    }
+                    }}
 
                     onClicked: {
                         if (!enabled){
@@ -611,10 +611,10 @@ Item {
 
                     enabled: !datePicker.readOnly;
 
-                    decorator: ButtonDecorator {
+                    decorator: Component { ButtonDecorator {
                         color: monthDownButton.hovered ? Style.buttonHoverColor : "transparent";
                         border.width: 0;
-                    }
+                    }}
 
                     onClicked: {
                         if (!enabled){
@@ -735,10 +735,10 @@ Item {
                     iconSource: datePicker.iconUpSource;
                     enabled: !datePicker.readOnly;
 
-                    decorator: ButtonDecorator {
+                    decorator: Component { ButtonDecorator {
                         color: dayUpButton.hovered ? Style.buttonHoverColor : "transparent";
                         border.width: 0;
-                    }
+                    }}
 
                     onClicked: {
                         if (!enabled){
@@ -766,10 +766,10 @@ Item {
 
                     enabled: !datePicker.readOnly;
 
-                    decorator: ButtonDecorator {
+                    decorator: Component { ButtonDecorator {
                         color: dayDownButton.hovered ? Style.buttonHoverColor : "transparent";
                         border.width: 0;
-                    }
+                    }}
 
                     onClicked: {
                         if (!enabled){

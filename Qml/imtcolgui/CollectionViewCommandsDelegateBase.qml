@@ -73,15 +73,16 @@ Item {
         }
     }
 
-    onTableDataChanged: {
-        if (containerBase.tableData){
-            if (containerBase.tableData.rightButtonMouseClicked){
-                containerBase.tableData.rightButtonMouseClicked.connect(openPopupMenu);
-            }
-
-            containerBase.tableData.selectionChanged.connect(containerBase.selectionChanged);
-        }
-    }
+    // Для чего это?
+//    onTableDataChanged: {
+//        if (containerBase.tableData){
+//            if (containerBase.tableData.rightButtonMouseClicked){
+//                containerBase.tableData.rightButtonMouseClicked.connect(openPopupMenu);
+//            }
+//            console.log('DEBUG::::onTableDataChanged', containerBase.tableData, containerBase.tableData.selectionChanged)
+//            containerBase.tableData.selectionChanged.connect(containerBase.selectionChanged);
+//        }
+//    }
 
     Component.onDestruction: {
         Events.unSubscribeEvent(containerBase.commandId + "CommandActivated", containerBase.commandHandle);

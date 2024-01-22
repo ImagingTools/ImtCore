@@ -7,6 +7,14 @@ import imtguivars 1.0
 ApplicationMain{
     id: window;
 
+    ModalDialogManager {
+        id: modalDialogManager;
+
+        z: 30;
+
+        anchors.fill: parent;
+    }
+
     Component {
         id: topPanelDecoratorCustom
         TopPanelDecoratorCustom {
@@ -22,9 +30,11 @@ ApplicationMain{
         id: decoratorsQt
     }
 
+
+
     Component.onCompleted: {
         console.log("MainOnCompleted", topPanelDecoratorCustom)
-        console.log("IconMode.selected", IconMode.selected)
+//        console.log("IconMode.selected", IconMode.selected)
     }
 
 

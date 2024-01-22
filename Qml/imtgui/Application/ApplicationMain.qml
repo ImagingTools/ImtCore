@@ -25,7 +25,7 @@ Item {
 
     property alias loadPageByClick: thumbnailDecorator.loadPageByClick;
     property alias canRecoveryPassword: thumbnailDecorator.canRecoveryPassword;
-    property alias modalDialogManager: modalDialogManager_;
+
 
     onWidthChanged: {
         Events.sendEvent("AppSizeChanged", {"Width": width, "Height": height})
@@ -192,13 +192,15 @@ Item {
         }
     }
 
-    ModalDialogManager {
-        id: modalDialogManager_;
+//    ModalDialogManager {
+//        id: modalDialogManager_;
 
-        z: 30;
+//        z: 30;
 
-        anchors.fill: parent;
-    }
+//        anchors.fill: parent;
+//    }
+
+
 
     ThumbnailDecorator {
         id: thumbnailDecorator;

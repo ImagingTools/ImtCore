@@ -122,10 +122,10 @@ TableViewItemDelegateBase {
                         connections.enabled = true;
                     }
 
-                    decorator: ButtonDecorator {
+                    decorator: Component { ButtonDecorator {
                         color: parent.hovered ? Style.buttonHoverColor : "transparent";
                         border.width: 0;
-                    }
+                    }}
                 }
             }
 
