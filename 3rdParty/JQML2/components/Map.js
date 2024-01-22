@@ -55,7 +55,7 @@ class Map extends Item {
         this.$initialized = true
 
         this.$map.on('moveend', (e)=>{
-            for(let child of this.$children){
+            for(let child of this.getProperty('children').get()){
                 if(child instanceof MapQuickItem && child.sourceItem){
                     let rect = child.sourceItem.getDom().getBoundingClientRect()
                     child.x = rect.x - this.x

@@ -10,18 +10,19 @@ class ListElement extends QtObject {
         if(this.$properties[name]){
             return this.$properties[name]
         } else {
-            this.$properties[name] = new QVar()
+            this.createProperty(name, QVar)
+            // this.$properties[name] = new QVar()
             return this.$properties[name]
         }
     }
 
-    createProperty(name, type, value){
-        if(name in this.$properties){
-            this.$properties[name].reset(value)
-        } else {
-            super.createProperty(name, type, value)
-        }
-    }
+    // createProperty(name, type, value){
+    //     if(name in this.$properties){
+    //         this.$properties[name].reset(value)
+    //     } else {
+    //         super.createProperty(name, type, value)
+    //     }
+    // }
     
 }
 
