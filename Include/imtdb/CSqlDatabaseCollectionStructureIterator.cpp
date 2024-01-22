@@ -11,8 +11,7 @@ namespace imtdb
 
 // public methods
 
-CSqlDatabaseCollectionStructureIterator::CSqlDatabaseCollectionStructureIterator(
-			QSqlQuery& sqlQuery)
+CSqlDatabaseCollectionStructureIterator::CSqlDatabaseCollectionStructureIterator(QSqlQuery& sqlQuery)
 	:m_currentIndex(-1)
 {
 	while(sqlQuery.next()){
