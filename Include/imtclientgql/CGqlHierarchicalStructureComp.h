@@ -3,15 +3,12 @@
 
 // ACF includes
 #include <icomp/CComponentBase.h>
-#include <idoc/CStandardDocumentMetaInfo.h>
 #include <ilog/TLoggerCompWrap.h>
-#include <iprm/COptionsManager.h>
 
 // ImtCore includes
 #include <imtbase/IHierarchicalStructure.h>
 #include <imtclientgql/IGqlHierarchicalStructureDelegate.h>
 #include <imtclientgql/IGqlClient.h>
-#include <imtclientgql/IGqlSubscriptionClient.h>
 
 
 namespace imtbase

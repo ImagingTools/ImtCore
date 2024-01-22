@@ -5,10 +5,7 @@
 #include <idoc/IDocumentMetaInfo.h>
 
 // ImtCore includes
-#include <imtbase/TIStructuredCollectionInfo.h>
-#include <imtbase/IObjectCollection.h>
 #include <imtbase/IOperationContext.h>
-#include <imtgql/IGqlRequest.h>
 #include <imtclientgql/IGqlResponseCreator.h>
 
 

@@ -16,32 +16,12 @@
 #include <imtbase/CTempDir.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtgql/IGqlResponse.h>
-#include <imtclientgql/IGqlStructureResponse.h>
 #include <imtbase/CFilterCollectionProxy.h>
 #include <imtbase/COperationContext.h>
 
 
 namespace imtclientgql
 {
-
-
-bool operator==(
-			const imtbase::IHierarchicalStructureInfo::ItemInfo& a,
-			const imtbase::IHierarchicalStructureInfo::ItemInfo& b)
-{
-	bool retVal =
-				a.itemId == b.itemId &&
-				a.name == b.name &&
-				a.itemType == b.itemType &&
-				a.metaInfo.isNull() == b.metaInfo.isNull() &&
-				a.parentId == b.parentId;
-
-	if (retVal && !a.metaInfo.isNull()){
-		retVal &= a.metaInfo->IsEqual(*b.metaInfo);
-	}
-
-	return retVal;
-}
 
 
 // public methods

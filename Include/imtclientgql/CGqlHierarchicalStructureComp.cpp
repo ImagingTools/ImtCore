@@ -1,19 +1,6 @@
 #include <imtclientgql/CGqlHierarchicalStructureComp.h>
 
 
-// Qt includes
-#include <QtNetwork/QNetworkReply>
-
-// ACF includes
-#include <idoc/CStandardDocumentMetaInfo.h>
-#include <imod/TModelWrap.h>
-
-// ImtCore includes
-#include <imtbase/CTempDir.h>
-#include <imtgql/CGqlRequest.h>
-#include <imtbase/CFilterCollectionProxy.h>
-
-
 namespace imtclientgql
 {
 
