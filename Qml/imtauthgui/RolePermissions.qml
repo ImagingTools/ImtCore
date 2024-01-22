@@ -121,7 +121,7 @@ Item {
 
             sourceComponent: Style.backGroundDecorator !==undefined ? Style.backGroundDecorator: emptyDecorator;
             onLoaded: {
-                if(backgroundDecoratorLoader.item){
+                if(backgroundDecoratorLoader.item && backgroundDecoratorLoader.item.rootItem ){
                     backgroundDecoratorLoader.item.rootItem = background;
                 }
             }
@@ -152,8 +152,6 @@ Item {
 
         anchors.right: permissionsTable.right;
         anchors.bottom: permissionsTable.bottom;
-
-        backgroundColor: Style.baseColor;
 
         secondSize: 10;
         targetItem: permissionsTable.tableListView;

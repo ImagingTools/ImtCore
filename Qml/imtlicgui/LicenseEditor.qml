@@ -10,15 +10,17 @@ import imtcontrols 1.0
 DocumentData {
     id: root;
 
-    property TreeItemModel allFeaturesModel: TreeItemModel {}
+    property TreeItemModel allFeaturesModel: CachedFeatureCollection.collectionModel
     property TreeItemModel featuresModel: TreeItemModel {}
     property TreeItemModel licensesModel: TreeItemModel {}
 
-    documentCompleted: productCollection.completed && licenseCollection.completed;
+    documentCompleted: productCollection.completed && licenseCollection.completed && CachedFeatureCollection.completed;
 
     Component.onCompleted: {
         productCollection.updateModel();
         licenseCollection.updateModel();
+
+        CachedFeatureCollection.updateModel();
     }
 
     function blockEditing(){
@@ -162,12 +164,20 @@ DocumentData {
             let features = productCollection.collectionModel.GetData("Features", productsCB.currentIndex);
             let featureIds = features.split(';');
 
-            for (let i = 0; i < FeaturesProvider.model.GetItemsCount(); i++){
-                let featureId = FeaturesProvider.model.GetData("Id", i)
+//            for (let i = 0; i < FeaturesProvider.model.GetItemsCount(); i++){
+//                let featureId = FeaturesProvider.model.GetData("Id", i)
+//                if (featureIds.includes(featureId)){
+//                    let index = root.featuresModel.InsertNewItem();
+
+//                    root.featuresModel.CopyItemDataFromModel(index, FeaturesProvider.model, i);
+//                }
+//            }
+            for (let i = 0; i < root.allFeaturesModel.GetItemsCount(); i++){
+                let featureId = root.allFeaturesModel.GetData("Id", i)
                 if (featureIds.includes(featureId)){
                     let index = root.featuresModel.InsertNewItem();
 
-                    root.featuresModel.CopyItemDataFromModel(index, FeaturesProvider.model, i);
+                    root.featuresModel.CopyItemDataFromModel(index, root.allFeaturesModel, i);
                 }
             }
         }

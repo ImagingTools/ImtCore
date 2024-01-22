@@ -107,6 +107,7 @@ Item {
     }
 
     function onTextFilterChanged(index, text){
+        ldng.start();
         console.log("onTextFilterChanged", text);
         modelFilterObj.SetData("TextFilter", text);
         gqlModels.updateModels();
@@ -274,6 +275,9 @@ Item {
             anchors.topMargin: tableInternal.headerElementHeight;
 
             visible: false;
+
+//            opacity: 0.5;
+            color: Style.baseColor;
         }
     }
 
@@ -302,15 +306,16 @@ Item {
         }
     }
 
-    Item {
+    Rectangle {
         id: paginationObj;
 
         anchors.bottom: parent.bottom;
-//        anchors.bottomMargin: 10;
         anchors.horizontalCenter: parent.horizontalCenter;
 
         width: parent.width;
-        height: 30;
+        height: collectionViewBaseContainer.hasPagination ? 30: 0;
+
+        color: Style.baseColor;
 
         Pagination {
             id: pagination_;

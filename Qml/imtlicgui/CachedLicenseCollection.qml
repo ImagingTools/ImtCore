@@ -7,10 +7,10 @@ import imtcolgui 1.0
 CollectionDataProvider {
     id: container;
 
-    fields: ["Id", "Name", "Description"];
-    commandId: "Accounts";
+    commandId: "Licenses";
 
-    sortByField: "Name";
+    fields: ["Id", "LicenseId", "LicenseName", "ProductId"]
+    sortByField: "LicenseName";
 }
 
 

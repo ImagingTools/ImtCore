@@ -100,9 +100,10 @@ StyleComponents {
     property string linkColor: "#0078D7";
     property string selectedColor: "#e3eefa";
 
-    property string color_scrollBackground: styleContainer.baseColor;
+//    property string color_scrollBackground: styleContainer.baseColor;
+    property string color_scrollBackground: Style.imagingToolsGradient0;
     property string color_scrollIndicator: Style.imagingToolsGradient3;
-    property string color_scrollHighlight: styleContainer.baseColor;
+    property string color_scrollHighlight: Style.imagingToolsGradient0;
 
     property string lightBlueColor: "#69b8e3";
 

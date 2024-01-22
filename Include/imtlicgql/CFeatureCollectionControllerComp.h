@@ -2,6 +2,7 @@
 
 
 // ImtCore includes
+#include <imtlic/CFeatureInfo.h>
 #include <imtgql/CObjectCollectionControllerCompBase.h>
 
 
@@ -25,6 +26,8 @@ protected:
 				int itemIndex,
 				const imtbase::IObjectCollectionIterator* objectCollectionIterator,
 				QString& errorMessage) const override;
+
+	virtual bool CreateChildModelRepresentation(const imtlic::CFeatureInfo& featureInfo, imtbase::CTreeItemModel& representationModel) const;
 };
 
 

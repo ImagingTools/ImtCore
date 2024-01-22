@@ -20,7 +20,6 @@ DocumentData {
         documentPtr: featureEditor;
 
         onCommandActivated: {
-            console.log("FeatureViewCommands onCommandActivated", commandId);
             let selectedIndex = null;
             if (tableView.tableSelection.items.length > 0){
                 selectedIndex = tableView.tableSelection.items[0];
@@ -42,6 +41,10 @@ DocumentData {
         }
     }
 
+    Component.onCompleted: {
+        CachedFeatureCollection.updateModel();
+    }
+
     function getAllParents(selectedIndex){
         let retVal = []
 
@@ -59,8 +62,6 @@ DocumentData {
     }
 
     function updateTreeViewGui(){
-        console.log("updateTreeViewGui");
-
         let selectedIndex = null;
         if (tableView.tableSelection.items.length > 0){
             selectedIndex = tableView.tableSelection.items[0];
@@ -101,8 +102,6 @@ DocumentData {
             tableView.findChildrenFeatureDependencies(parentId, childrenFeatureList);
         }
 
-        console.log("inactiveElements", inactiveElements);
-
         //Список основных зависящих фич для selectedId
         let dependenciesList = []
 
@@ -110,8 +109,6 @@ DocumentData {
         if (dependencies && dependencies !== ""){
             dependenciesList = dependencies.split(';');
         }
-
-        console.log("dependenciesList", dependenciesList);
 
         let itemsDataList = featureDependenciesView.getItemsDataAsList();
         for (let i = 0; i < itemsDataList.length; i++){
@@ -134,8 +131,6 @@ DocumentData {
                 delegateItem.checkState = Qt.Checked;
             }
         }
-
-        console.log("end updateTreeViewGui");
 
         featureDependenciesView.delegateUpdatingBlock = false;
     }
@@ -377,7 +372,6 @@ DocumentData {
                 featureDependenciesView.readOnly = !ok;
 
                 featureDependenciesView.addColumn({"Id": "FeatureName", "Name": "Dependencies"});
-                console.log("FeaturesProvider.model", FeaturesProvider.model);
 
                 featureEditor.dependenciewViewModel.Copy(FeaturesProvider.model);
                 featureDependenciesView.rowModel = featureEditor.dependenciewViewModel;
@@ -390,12 +384,7 @@ DocumentData {
             }
 
             function onFeaturesProviderModelChanged(){
-                console.log("onFeaturesProviderModelChanged", FeaturesProvider.model);
-                console.log("FeaturesProvider.model", FeaturesProvider.model.toJSON());
-
                 featureEditor.dependenciewViewModel.Copy(FeaturesProvider.model)
-
-                console.log("FeaturesProvider.model", featureEditor.dependenciewViewModel.toJSON());
 
                 featureEditor.dependenciewViewModel.Refresh();
 
@@ -408,8 +397,6 @@ DocumentData {
                     root: featureDependenciesView;
 
                     onCheckStateChanged: {
-                        console.log("onCheckStateChanged", delegate.checkState);
-
                         let selectedIndex =  null;
                         if (tableView.tableSelection.items.length > 0){
                             selectedIndex = tableView.tableSelection.items[0];
@@ -421,14 +408,8 @@ DocumentData {
                                     let featureId = delegate.itemData.FeatureId;
                                     let state = delegate.checkState;
 
-                                    console.log("onCheckStateChanged", featureId, state);
-
-
                                     let selectedId = selectedIndex.itemData.FeatureId;
                                     let dependencies = selectedIndex.itemData.Dependencies;
-
-                                    console.log("selectedId", selectedId);
-                                    console.log("dependencies1", dependencies);
 
                                     let dependencyList = []
                                     if (dependencies != ""){
@@ -454,8 +435,6 @@ DocumentData {
                                         selectedIndex.itemData.Dependencies = "";
                                     }
 
-                                    console.log("dependencies2", selectedIndex.itemData.Dependencies);
-
                                     featureEditor.updateTreeViewGui();
                                 }
                             }
@@ -465,16 +444,12 @@ DocumentData {
             }
 
             function findParentFeatureDependencies(featureId, retVal){
-                console.log("findParentFeatureDependencies", featureId, retVal);
 
                 let itemsDataList = featureDependenciesView.getItemsDataAsList();
                 for (let i = 0; i < itemsDataList.length; i++){
                     let delegateItem = itemsDataList[i]
                     let itemData = delegateItem.getItemData();
                     let id = itemData.FeatureId;
-                    console.log('DEBUG:::=================')
-                    console.log('DEBUG:::', itemData)
-                    console.log('DEBUG:::', Object.keys(itemData))
                     let dependencies = itemData.Dependencies;
 
                     let rootId = itemData.RootFeatureId;
@@ -482,10 +457,6 @@ DocumentData {
                     if (rootId === featureEditor.featureId){
                         continue;
                     }
-
-                    console.log("FeatureId",id);
-                    console.log("Dependencies", dependencies.split(';'));
-                    console.log();
 
                     if (dependencies && dependencies !== ""){
                         let dependencyList = dependencies.split(';');

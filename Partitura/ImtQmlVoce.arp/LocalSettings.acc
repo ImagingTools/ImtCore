@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5136" Description="ACF"/>
+            <Version Id="0" Number="5147" Description="ACF"/>
             <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -76,11 +76,11 @@
                     <AttributeInfo Id="DefaultServerPort" Type="Integer" ExportId="DefaultServerPort">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultWebSocketServerHost" Type="String" ExportId="DefaultWebSocketServerHost">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="DefaultWebSocketServerHost" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value=""/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultWebSocketServerPort" Type="Integer" ExportId="DefaultWebSocketServerPort">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="DefaultWebSocketServerPort" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="0"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>

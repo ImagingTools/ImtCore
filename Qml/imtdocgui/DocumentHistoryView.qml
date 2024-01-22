@@ -122,8 +122,6 @@ Rectangle {
         anchors.rightMargin: 5;
         anchors.bottom: flickable.bottom;
 
-        backgroundColor: "transparent";
-
         secondSize: 10;
         targetItem: flickable;
 

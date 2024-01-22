@@ -127,36 +127,6 @@ Rectangle {
                         bodyPanelRepeater.model = model.Parameters;
                     }
                 }
-
-//                delegate:
-//                    Button{
-
-//                    id: buttonContainer;
-
-//                    anchors.left: parent.left;
-//                    anchors.leftMargin: Style.size_mainMargin;
-//                    anchors.right: parent.right;
-//                    anchors.rightMargin: Style.size_mainMargin;
-
-//                    // decorator: Style.commonButtonDecorator !==undefined ? Style.commonButtonDecorator : defaultButtonDecorator;
-
-//                    // selected: mainPanel.selectedIndex === model.index;
-//                    focus: mainPanel.selectedIndex === model.index;
-//                    text: model.Name;
-
-//                    Component.onCompleted: {
-//                        if (model.index === 0){
-//                            clicked();
-//                        }
-//                    }
-
-//                    onClicked: {
-//                        if (mainPanel.selectedIndex !== model.index){
-//                            bodyPanelRepeater.model = model.Parameters;
-//                            mainPanel.selectedIndex = model.index;
-//                        }
-//                    }
-//                }//delegate
             }
 
             onSelectedIndexChanged: {}
@@ -171,8 +141,6 @@ Rectangle {
         anchors.right: parent.right;
         anchors.bottom: parent.bottom;
         anchors.top: parent.top;
-
-        backgroundColor: Style.baseColor;
 
         secondSize: 10;
         targetItem: flickable;

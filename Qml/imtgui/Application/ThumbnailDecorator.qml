@@ -29,6 +29,7 @@ Rectangle {
 
     property alias menuPanelRadius: menuPanel.radius;
     property alias loadPageByClick: pagesManager.loadByClick;
+    property alias canRecoveryPassword: authorizationPage.canRecoveryPassword;
 
     property var applicationMain: null;
 
@@ -36,8 +37,6 @@ Rectangle {
     property SettingsObserver settingsObserver: null;
 
     Component.onCompleted: {
-        console.log("Thumbnail onCompleted");
-
         Events.subscribeEvent("StartLoading", loading.start);
         Events.subscribeEvent("StopLoading", loading.stop);
 
@@ -62,7 +61,6 @@ Rectangle {
             }
             else{
                 if (error === ""){
-                    console.log("superuserPasswordPage.visible = true");
                     superuserPasswordPage.visible = true;
                 }
                 else{
@@ -72,10 +70,7 @@ Rectangle {
         }
 
         onModelStateChanged: {
-            console.log("Superuser onModelStateChanged", state);
-
             if (state === "Ready"){
-                console.log("SuperuserProvider Ready", state);
                 loading.stop();
             }
             else{
@@ -99,6 +94,7 @@ Rectangle {
     function onLogout(){
         clearModels();
         authorizationPage.logout();
+// soon...
 //        let exists = mainDocumentManager.dirtyDocumentsExists();
 //        if (exists){
 //            modalDialogManager.openDialog(saveDialog, {});
@@ -176,9 +172,7 @@ Rectangle {
         authorizationStatusProvider: authorizationPage;
 
         onModelStateChanged: {
-            console.log("PagesManager onModelStateChanged", pagesManager.modelState);
             if (pagesManager.modelState === "Ready"){
-                console.log("PagesManager Ready", pagesManager.modelState);
                 loading.stop();
             }
             else{
@@ -236,7 +230,7 @@ Rectangle {
         id: authorizationPage;
 
         anchors.fill: parent;
-        anchors.topMargin: 60;
+        anchors.topMargin: topPanel.height;
 
         visible: false;
 
@@ -267,8 +261,6 @@ Rectangle {
         }
 
         onPasswordSetted: {
-            console.log("onPasswordSetted Ready");
-
             loading.stop();
 
             superuserPasswordPage.visible = false;
@@ -276,7 +268,6 @@ Rectangle {
         }
 
         onFailed: {
-            console.log("onFailed Ready");
             loading.stop();
 
             thumbnailDecoratorContainer.closeAllPages();

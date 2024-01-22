@@ -29,7 +29,7 @@ Item {
         if (!y){
             y = 0
         }
-        modalDialogManager.closeDialog();
+//        modalDialogManager.closeDialog();
         contextMenuModel.clear();
 
         if (inputActions.canCut){

@@ -125,16 +125,6 @@ Item {
         id: background;
         anchors.fill: parent;
         color: Style.backgroundColor;
-        Loader{
-            id: backgroundDecoratorLoader;
-
-            sourceComponent: Style.backGroundDecorator !==undefined ? Style.backGroundDecorator: emptyDecorator;
-            onLoaded: {
-                if(backgroundDecoratorLoader.item){
-                    backgroundDecoratorLoader.item.rootItem = background;
-                }
-            }
-        }
     }
 
     function updateGui(){
@@ -208,11 +198,6 @@ Item {
         width: roleEditorContainer.panelWidth;
         height: bodyColumn.height + 2*bodyColumn.anchors.topMargin;
 
-        Loader{
-            id: mainPanelFrameLoader;
-            anchors.fill: parent;
-            sourceComponent: Style.frame !==undefined ? Style.frame: emptyDecorator;
-        }
         Column {
             id: bodyColumn;
 
@@ -241,17 +226,6 @@ Item {
                 font.pixelSize: Style.fontSize_common;
 
                 text: qsTr("Role Name");
-
-                Loader{
-                    id: titleDecoratorLoader1;
-
-                    sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
-                    onLoaded: {
-                        if(titleDecoratorLoader1.item){
-                            titleDecoratorLoader1.item.rootItem = titleRoleName;
-                        }
-                    }
-                }
             }
 
             CustomTextField {
@@ -273,17 +247,6 @@ Item {
                 }
 
                 KeyNavigation.tab: roleIdInput;
-
-                Loader{
-                    id: inputDecoratorLoader1;
-
-                    sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-                    onLoaded: {
-                        if(inputDecoratorLoader1.item && inputDecoratorLoader1.item.rootItem){
-                            inputDecoratorLoader1.item.rootItem = roleNameInput;
-                        }
-                    }
-                }
             }
 
             Text {
@@ -297,17 +260,6 @@ Item {
                 font.pixelSize: Style.fontSize_common;
 
                 text: qsTr("Role-ID");
-
-                Loader{
-                    id: titleDecoratorLoader2;
-
-                    sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
-                    onLoaded: {
-                        if(titleDecoratorLoader2.item){
-                            titleDecoratorLoader2.item.rootItem = titleRoleId;
-                        }
-                    }
-                }
             }
 
             CustomTextField {
@@ -318,17 +270,6 @@ Item {
                 readOnly: true;
 
                 KeyNavigation.tab: descriptionInput;
-
-                Loader{
-                    id: inputDecoratorLoader2;
-
-                    sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-                    onLoaded: {
-                        if(inputDecoratorLoader2.item){
-                            inputDecoratorLoader2.item.rootItem = roleIdInput;
-                        }
-                    }
-                }
             }
 
             Text {
@@ -343,16 +284,6 @@ Item {
 
                 text: qsTr("Description");
 
-                Loader{
-                    id: titleDecoratorLoader3;
-
-                    sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
-                    onLoaded: {
-                        if(titleDecoratorLoader3.item){
-                            titleDecoratorLoader3.item.rootItem = titleDescription;
-                        }
-                    }
-                }
             }
 
             CustomTextField {
@@ -364,11 +295,6 @@ Item {
                 placeHolderText: qsTr("Enter the description");
 
                 onEditingFinished: {
-//                    if (roleEditorContainer.documentPtr){
-//                        console.log("descriptionInput onEditingFinished");
-//                        roleEditorContainer.documentPtr.doUpdateModel();
-//                    }
-
                     if (roleEditorContainer.documentPtr){
                         let oldText = roleEditorContainer.documentModel.GetData("Description");
                         if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
@@ -378,17 +304,6 @@ Item {
                 }
 
                 KeyNavigation.tab: roleNameInput;
-
-                Loader{
-                    id: inputDecoratorLoader3;
-
-                    sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-                    onLoaded: {
-                        if(inputDecoratorLoader3.item){
-                            inputDecoratorLoader3.item.rootItem = descriptionInput;
-                        }
-                    }
-                }
             }
         }//Column bodyColumn
     }
@@ -419,17 +334,6 @@ Item {
         font.pixelSize: Style.fontSize_common;
 
         text: qsTr("Parent Roles");
-
-        Loader{
-            id: titleDecoratorLoader4;
-
-            sourceComponent: Style.inputTitleDecorator !==undefined ? Style.inputTitleDecorator: emptyDecorator;
-            onLoaded: {
-                if(titleDecoratorLoader4.item){
-                    titleDecoratorLoader4.item.rootItem = titleIncludes;
-                }
-            }
-        }
     }
 
     AuxTable {

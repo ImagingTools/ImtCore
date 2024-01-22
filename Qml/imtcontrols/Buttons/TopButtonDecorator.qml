@@ -7,8 +7,8 @@ import Qt5Compat.GraphicalEffects 6.0
 Item {
     id: topButtonDecorator;
 
-    width: isEmpty ? 20 : 60;
-    height: 28;
+    width: isEmpty ? 20 : 55;
+    height: 25;
 
     property var baseElement;
     property string textColor: Style.textColor;
@@ -69,7 +69,7 @@ Item {
 
             anchors.centerIn: parent;
 
-            height: parent.height - 8;
+            height: parent.height - 5;
             width: height;
 
             source: topButtonDecorator.baseElement.iconSource;
@@ -79,6 +79,78 @@ Item {
             sourceSize.height: height;
         }
     }
+
+//    Rectangle{
+//        id: button;
+
+////        anchors.top: topButtonDecorator.top;
+////        anchors.topMargin: 6;
+////        anchors.left: topButtonDecorator.left;
+//        anchors.horizontalCenter: topButtonDecorator.horizontalCenter;
+
+//        width: topButtonDecorator.width;
+//        height: topButtonDecorator.height;
+
+//        radius: topButtonDecorator.radius;
+
+//        color: Style.baseColor;
+
+//        gradient: topButtonDecorator.baseElement.checked || topButtonDecorator.baseElement.down ? pressedGradientButton : standardGradientButton;
+
+//        Gradient {
+//            id: standardGradientButton;
+
+//            GradientStop { position: 0.0; color: Style.imagingToolsGradient0; }
+//            GradientStop { position: 1.0; color: Style.imagingToolsGradient1; }
+//        }
+
+//        Gradient {
+//            id: pressedGradientButton;
+
+//            GradientStop { position: 0.0; color: Style.imagingToolsGradient1; }
+//            GradientStop { position: 1.0; color: Style.imagingToolsGradient1; }
+//        }
+
+//        Row {
+//            id: row;
+
+//            height: button.height;
+
+//            spacing: 8;
+
+//            Image {
+//                id: image;
+
+//                anchors.verticalCenter: parent.verticalCenter;
+
+//                height: parent.height - 8;
+//                width: height;
+
+//                source: topButtonDecorator.baseElement.iconSource;
+//                fillMode: Image.PreserveAspectFit;
+
+//                sourceSize.width: width;
+//                sourceSize.height: height;
+//            }
+
+//            Text {
+//                id: description;
+
+//                anchors.verticalCenter: parent.verticalCenter;
+
+//                anchors.top: selection.bottom;
+//                anchors.topMargin: 0;
+//                anchors.horizontalCenter: topButtonDecorator.horizontalCenter;
+
+//                color: topButtonDecorator.enabled ? topButtonDecorator.textColor : topButtonDecorator.textColorDisabled;
+
+//                font.pixelSize: Style.fontSize_small
+//                font.family: Style.fontFamily
+
+//                text: !topButtonDecorator.baseElement ? "" : topButtonDecorator.baseElement.text
+//            }
+//        }
+//    }
 
     DropShadow {
         id: innerShadow;

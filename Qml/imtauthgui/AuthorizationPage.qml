@@ -19,15 +19,14 @@ Rectangle {
 
     property alias modelState: userTokenProvider.modelState;
 
+    property bool canRecoveryPassword: true;
+
     signal loginSuccessful();
     signal loginFailed();
 
     Component.onCompleted: {
         decoratorPause.start();
         PermissionsController.authorizationPage = authPageContainer;
-    }
-
-    Component.onDestruction: {
     }
 
     onLoginSuccessful: {
@@ -191,7 +190,6 @@ Rectangle {
         Column {
             id: bodyColumn;
 
-            //anchors.top: headerRec.bottom;
             anchors.top: headerItem.bottom;
             anchors.horizontalCenter: parent.horizontalCenter;
 
@@ -327,6 +325,8 @@ Rectangle {
 
                 width: parent.width;
                 height: titlePasswordRecovery.height;
+
+                visible: authPageContainer.canRecoveryPassword;
 
                 Text {
                     id: titlePasswordRecovery;

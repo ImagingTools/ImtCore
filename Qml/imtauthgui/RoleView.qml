@@ -139,11 +139,11 @@ DocumentData {
 
         clip: true;
 
-        Button {
+        ToolButton {
             id: closeButton;
 
             anchors.verticalCenter: parent.verticalCenter;
-//            highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+
             width: 25;
             height: width;
 

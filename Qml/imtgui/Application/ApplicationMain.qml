@@ -24,6 +24,7 @@ Item {
     property bool useWebSocketSubscription: false;
 
     property alias loadPageByClick: thumbnailDecorator.loadPageByClick;
+    property alias canRecoveryPassword: thumbnailDecorator.canRecoveryPassword;
     property alias modalDialogManager: modalDialogManager_;
 
     onWidthChanged: {
@@ -159,12 +160,13 @@ Item {
                 console.log("onApplyUrlChanged");
                 let webSocketServerUrl = application.settingsProvider.getValue("WebSocketServerUrl");
                 console.log("webSocketServerUrl", webSocketServerUrl);
-                if (webSocketServerUrl && webSocketServerUrl !== ""){
-                    webSocketServerUrl =  webSocketServerUrl.replace("http", "ws")
-                    subscriptionManager.url = webSocketServerUrl;
 
-                    return;
-                }
+//                if (webSocketServerUrl && webSocketServerUrl !== ""){
+//                    webSocketServerUrl =  webSocketServerUrl.replace("http", "ws")
+//                    subscriptionManager.url = webSocketServerUrl;
+
+//                    return;
+//                }
 
                 let serverUrl = application.settingsProvider.getValue("ServerUrl");
 

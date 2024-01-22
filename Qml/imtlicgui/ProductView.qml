@@ -13,25 +13,21 @@ DocumentData {
         documentPtr: productViewContainer;
     }
 
-    property TreeItemModel allFeaturesModel: TreeItemModel {}
+    property TreeItemModel allFeaturesModel: CachedFeatureCollection.collectionModel;
     property TreeItemModel licensesModel: TreeItemModel {}
     property TreeItemModel productFeaturesViewModel: TreeItemModel {}
 
     Component.onCompleted: {
-        productViewContainer.allFeaturesModel = FeaturesProvider.model;
+        CachedFeatureCollection.updateModel();
 
-        FeaturesProvider.modelChanged.connect(productViewContainer.onFeaturesChanged);
+        CachedFeatureCollection.modelUpdated.connect(productViewContainer.onFeaturesChanged);
     }
 
     Component.onDestruction: {
-        FeaturesProvider.modelChanged.disconnect(productViewContainer.onFeaturesChanged);
+        CachedFeatureCollection.modelUpdated.disconnect(productViewContainer.onFeaturesChanged);
     }
 
     function onFeaturesChanged(){
-        productViewContainer.allFeaturesModel = FeaturesProvider.model;
-
-//        availableFeaturesTable.elements = productViewContainer.allFeaturesModel;
-
         productViewContainer.updateFeaturesGui();
     }
 
@@ -143,7 +139,6 @@ DocumentData {
     }
 
     function addFeature(featureId){
-
         console.log("addFeature", featureId);
         let features = productViewContainer.documentModel.GetData("Features")
 
@@ -317,9 +312,6 @@ DocumentData {
                         }
                     }
                 }
-
-
-
 
                 onCheckStateChanged: {
                     let featureId = model.FeatureId;

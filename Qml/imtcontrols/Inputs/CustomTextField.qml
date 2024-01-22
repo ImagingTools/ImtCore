@@ -37,6 +37,7 @@ FocusScope {
     property int margin: 5;
 
     property bool fontBold: false;
+    property bool hasActionMenu: true;
 
     property real placeHolderOpacity: 1;
 
@@ -109,9 +110,11 @@ FocusScope {
         acceptedButtons: Qt.RightButton;
 
         onClicked: {
-            let point = mapToItem(null, mouse.x, mouse.y);
+            if (containerTextField.hasActionMenu){
+                let point = mapToItem(null, mouse.x, mouse.y);
 
-            inputActions.open(point.x, point.y);
+                inputActions.open(point.x, point.y);
+            }
         }
     }
 

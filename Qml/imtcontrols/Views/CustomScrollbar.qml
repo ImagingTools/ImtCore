@@ -7,7 +7,8 @@ Rectangle{
     height: targetItem && vertical ? targetItem.height : !decorator_ ? secondSize : secondSizeDecorator;
     width: targetItem && !vertical ? targetItem.width : !decorator_ ? secondSize : secondSizeDecorator;
     color: backgroundColor;
-    radius: 4;
+//    radius: 4;
+    radius: 2;
 
     visible: vertical ? targetItem.contentHeight > scrollContainer.height : targetItem.contentWidth > scrollContainer.width;
 
@@ -17,7 +18,7 @@ Rectangle{
 
     property real minSize: 20;
     property real secondSize: 20;
-    property int indicatorRadius: 4;
+    property int indicatorRadius: 2;
     property string backgroundColor: decorator_ ? "transparent" : Style.color_scrollBackground !== undefined ? Style.color_scrollBackground  : "#efefef";
     property string indicatorColor: decorator_ ? "transparent" : Style.color_scrollIndicator !== undefined ? Style.color_scrollIndicator : "lightgray";
     property string highlightColor: decorator_ ? "transparent" : Style.color_scrollHighlight !== undefined ? Style.color_scrollHighlight : "lightgray";

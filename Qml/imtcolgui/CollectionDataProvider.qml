@@ -146,7 +146,7 @@ Item {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, container.itemsInfoModel);
+            console.log("State:", this.state, container.itemsInfoModel.toJSON());
             if (this.state === "Ready"){
                 var dataModelLocal;
                 if (container.itemsInfoModel.ContainsKey("errors")){

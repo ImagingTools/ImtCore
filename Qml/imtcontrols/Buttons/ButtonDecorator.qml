@@ -91,7 +91,7 @@ DecoratorBase {
         text: commonButtonDecorator.tooltipText;
         fitToTextWidth: false;
         componentMinHeight: 30;
-        timeout: 2000;
+//        timeout: 2000;
         fitToHCenter: true;
     }
 

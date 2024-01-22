@@ -60,7 +60,11 @@ Item {
 
     //forShortcutEnter
     Component.onCompleted: {
-        popupMenuContainer.forceActiveFocus();
+        if (forceFocus){
+//            popupMenuContainer.forceActiveFocus();
+        }
+
+        focus = true;
 
         Events.subscribeEvent("AppSizeChanged", onAppSizeChanged);
     }
@@ -145,26 +149,65 @@ Item {
             anchors.right: popupMenuListView.right;
             anchors.bottom: popupMenuListView.bottom;
 
-            backgroundColor: Style.baseColor;
-
             secondSize: !popupMenuContainer.visibleScrollBar ? 0 : Style.isMobile == undefined ? 10 : Style.isMobile ? 4 : 10;
             targetItem: popupMenuListView;
             canFade: Style.isMobile == undefined ? false : Style.isMobile;
         }
 
-        ListView {
+//        ListView {
+//            id: popupMenuListView;
+
+//            width: popupMenuContainer.width;
+//            height: Math.min(popupMenuContainer.shownItemsCount * popupMenuContainer.itemHeight, contentHeight);
+
+//            boundsBehavior: Flickable.StopAtBounds;
+//            clip: true;
+
+//            delegate: popupMenuContainer.delegate;
+
+//            cacheBuffer: count * popupMenuContainer.itemHeight;
+//        }//ListView
+
+        Flickable {
             id: popupMenuListView;
 
             width: popupMenuContainer.width;
-            height: Math.min(popupMenuContainer.shownItemsCount * popupMenuContainer.itemHeight, contentHeight);
+            height: Math.min(popupMenuContainer.shownItemsCount * popupMenuContainer.itemHeight, contentHeight)
+
+            contentWidth: width;
+            contentHeight: column.height;
 
             boundsBehavior: Flickable.StopAtBounds;
             clip: true;
 
-            delegate: popupMenuContainer.delegate;
+            property alias model: repeater.model;
+            property alias count: repeater.count;
 
-            cacheBuffer: count * popupMenuContainer.itemHeight;
-        }//ListView
+            function positionViewAtIndex(index, mode){
+                console.log("positionViewAtIndex", index, mode);
+                if (index >= 0 && index < repeater.count){
+                    let y = index * popupMenuContainer.itemHeight;
+
+                    console.log("y",y);
+                    popupMenuListView.contentY = y;
+                    console.log("popupMenuListView.contentY", popupMenuListView.contentY);
+                }
+            }
+
+            function positionViewAtEnd(){
+
+            }
+
+            Column {
+                id: column;
+                width: parent.width;
+                Repeater {
+                    id: repeater;
+
+                    delegate: popupMenuContainer.delegate;
+                }
+            }
+        }
 
         MouseArea{
             anchors.fill: parent;

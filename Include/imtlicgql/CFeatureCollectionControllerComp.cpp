@@ -18,7 +18,7 @@ bool CFeatureCollectionControllerComp::SetupGqlItem(
 			imtbase::CTreeItemModel& model,
 			int itemIndex,
 			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
-            QString& /*errorMessage*/) const
+			QString& /*errorMessage*/) const
 {
 	if (objectCollectionIterator == nullptr){
 		return false;
@@ -31,48 +31,105 @@ bool CFeatureCollectionControllerComp::SetupGqlItem(
 	QByteArray objectId = objectCollectionIterator->GetObjectId();
 
 	if (!informationIds.isEmpty() && m_objectCollectionCompPtr.IsValid()){
-		QByteArray json = objectCollectionIterator->GetElementInfo("Document").toByteArray();
-		QJsonDocument jsonDocument = QJsonDocument::fromJson(json);
+		const imtlic::CFeatureInfo* featureInfoPtr = nullptr;
 
-		for (QByteArray informationId : informationIds){
-			QVariant elementInformation;
-
-			if(informationId == "Id"){
-				elementInformation = objectId;
-			}
-			else if(informationId == "FeatureId"){
-				elementInformation = jsonDocument["FeatureId"].toString();
-			}
-			else if(informationId == "FeatureName"){
-				elementInformation = jsonDocument["FeatureName"].toString();
-			}
-			else if(informationId == "FeatureDescription"){
-				elementInformation = jsonDocument["FeatureDescription"].toString();
-			}
-			else if(informationId == "Added"){
-				QDateTime addedTime =  objectCollectionIterator->GetElementInfo("Added").toDateTime();
-				addedTime.setTimeSpec(Qt::UTC);
-
-				elementInformation = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-			}
-			else if(informationId == "LastModified"){
-				QDateTime lastTime =  objectCollectionIterator->GetElementInfo("LastModified").toDateTime();
-				lastTime.setTimeSpec(Qt::UTC);
-
-				elementInformation = lastTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
-			}
-
-			if (elementInformation.isNull()){
-				elementInformation = "";
-			}
-
-			retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
+		imtbase::IObjectCollection::DataPtr dataPtr;
+		if (objectCollectionIterator->GetObjectData(dataPtr)){
+			featureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(dataPtr.GetPtr());
 		}
 
-		return true;
+		if (featureInfoPtr != nullptr){
+			for (const QByteArray& informationId : informationIds){
+				QVariant elementInformation;
+
+				if(informationId == "Id"){
+					elementInformation = objectId;
+				}
+				else if(informationId == "FeatureId"){
+					elementInformation = featureInfoPtr->GetFeatureId();
+				}
+				else if(informationId == "FeatureName"){
+					elementInformation = featureInfoPtr->GetFeatureName();
+				}
+				else if(informationId == "FeatureDescription"){
+					elementInformation = featureInfoPtr->GetFeatureDescription();
+				}
+				else if(informationId == "Optional"){
+					elementInformation = featureInfoPtr->IsOptional();
+				}
+				else if(informationId == "Dependencies"){
+					elementInformation = featureInfoPtr->GetDependencies().join(';');
+				}
+				else if(informationId == "ChildModel"){
+					imtbase::CTreeItemModel* representationModelPtr = model.AddTreeModel("ChildModel", itemIndex);
+
+					CreateChildModelRepresentation(*featureInfoPtr, *representationModelPtr);
+
+					continue;
+				}
+				else if(informationId == "Added"){
+					QDateTime addedTime =  objectCollectionIterator->GetElementInfo("Added").toDateTime();
+					addedTime.setTimeSpec(Qt::UTC);
+
+					elementInformation = addedTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+				}
+				else if(informationId == "LastModified"){
+					QDateTime lastTime =  objectCollectionIterator->GetElementInfo("LastModified").toDateTime();
+					lastTime.setTimeSpec(Qt::UTC);
+
+					elementInformation = lastTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
+				}
+
+				if (elementInformation.isNull()){
+					elementInformation = "";
+				}
+
+				retVal = retVal && model.SetData(informationId, elementInformation, itemIndex);
+			}
+
+			return true;
+		}
 	}
 
 	return false;
+}
+
+
+bool CFeatureCollectionControllerComp::CreateChildModelRepresentation(
+			const imtlic::CFeatureInfo& featureInfo,
+			imtbase::CTreeItemModel& representationModel) const
+{
+	const imtlic::FeatureInfoList& subFeatures = featureInfo.GetSubFeatures();
+
+	for (int i = 0; i < subFeatures.GetCount(); i++){
+		const imtlic::IFeatureInfo* featureInfoPtr = subFeatures.GetAt(i);
+		if (featureInfoPtr == nullptr){
+			return false;
+		}
+
+		int index = representationModel.InsertNewItem();
+
+		representationModel.SetData("FeatureId", featureInfoPtr->GetFeatureId(), index);
+		representationModel.SetData("FeatureName", featureInfoPtr->GetFeatureName(), index);
+		representationModel.SetData("Optional", featureInfoPtr->IsOptional(), index);
+		representationModel.SetData("FeatureDescription", featureInfoPtr->GetFeatureDescription(), index);
+		representationModel.SetData("Dependencies", featureInfoPtr->GetDependencies().join(';'), index);
+		representationModel.SetData("ChildModel", 0, index);
+
+		const imtlic::FeatureInfoList& features = featureInfoPtr->GetSubFeatures();
+		if (!features.IsEmpty()){
+			const imtlic::CFeatureInfo* subFeatureInfoPtr = dynamic_cast<const imtlic::CFeatureInfo*>(featureInfoPtr);
+			Q_ASSERT(subFeatureInfoPtr != nullptr);
+
+			imtbase::CTreeItemModel* childModelPtr = representationModel.AddTreeModel("ChildModel", index);
+			bool ok = CreateChildModelRepresentation(*subFeatureInfoPtr, *childModelPtr);
+			if (!ok){
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 

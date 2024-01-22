@@ -292,8 +292,6 @@ Rectangle {
             anchors.right: parent.right;
             anchors.bottom: buttonsDialog.top;
 
-            backgroundColor: Style.baseColor;
-
             secondSize: 10;
             targetItem: flickable;
         }

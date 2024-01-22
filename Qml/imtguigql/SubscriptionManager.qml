@@ -44,13 +44,16 @@ WebSocket {
     }
 
     onTextMessageReceived:{
-        console.log("SubscriptionManager onTextMessageReceived", message)
         let ok = socketModel.CreateFromJson(message)
 
         if (socketModel.GetData("type") === "connection_ask"){
+            console.log("SubscriptionManager onTextMessageReceived", message)
+
             registerSubscriptionToServer()
         }
         else if (socketModel.GetData("type") === "start_ask"){
+            console.log("SubscriptionManager onTextMessageReceived", message)
+
             for (let index = 0; index < subscriptionModel.length; index++){
                 if (subscriptionModel[index]["subscriptionId"] === socketModel.GetData("id")){
                     let subscription = subscriptionModel[index]["subscription"]
@@ -60,6 +63,8 @@ WebSocket {
             }
         }
         else if (socketModel.GetData("type") === "data"){
+            console.log("SubscriptionManager onTextMessageReceived", message)
+
             for (let index = 0; index < subscriptionModel.length; index++){
                 if (subscriptionModel[index]["subscriptionId"] == socketModel.GetData("id")){
                     let subscription = subscriptionModel[index]["subscription"]
@@ -78,8 +83,6 @@ WebSocket {
     }
 
     function registerSubscriptionEvent(parameters){
-        console.log("registerSubscriptionEvent");
-
         let query = parameters["Query"];
         let client = parameters["Client"];
 
@@ -106,15 +109,12 @@ WebSocket {
                 let query = subscriptionModel[index]["query"]
                 payload["data"] = query.GetQuery()
                 request["payload"] = payload
-                console.log("registerSubscriptionToServer", JSON.stringify(request))
                 container.sendTextMessage(JSON.stringify(request))
             }
         }
     }
 
     function registerSubscription(query, subscriptionClient){
-        console.log("registerSubscription", query, subscriptionClient.subscriptionId);
-
         for (let index = 0; index < subscriptionModel.length; index++){
             if (subscriptionModel[index]["subscription"] === subscriptionClient){
                 return;

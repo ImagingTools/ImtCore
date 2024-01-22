@@ -177,8 +177,6 @@ Item {
                         dialogLoader.item.started();
                     }
 
-                    console.log("dialogLoader.item.parent", dialogLoader.item.parent);
-
                     if (dialogLoader.item.forceFocus === undefined || dialogLoader.item.forceFocus){
                         dialogLoader.item.forceActiveFocus();
                     }

@@ -211,16 +211,19 @@ Item {
         if (readOnly || internal.blockingUpdateModel){
             return;
         }
+        console.log("start doUpdateModel");
 
         internal.blockingUpdateGui = true;
 
         updateModel();
 
         internal.blockingUpdateGui = false;
+        console.log("end doUpdateModel");
     }
 
     function doUpdateGui()
     {
+        console.log("start doUpdateGui");
         if (readOnly){
             return;
         }
@@ -230,6 +233,8 @@ Item {
         updateGui();
 
         internal.blockingUpdateModel = false;
+
+        console.log("end doUpdateGui");
     }
 
     function updateCommands(){
@@ -283,10 +288,12 @@ Item {
 
     Shortcut {
         sequence: "Ctrl+S";
-
         enabled: documentData.visible;
-
         onActivated: {
+            if (!documentData.isDirty){
+                return
+            }
+
             if (documentData.commandsProvider.commandExists("Save")){
                 Events.sendEvent(documentData.uuid + "CommandActivated", "Save");
             }
@@ -295,24 +302,29 @@ Item {
 
     Shortcut {
         sequence: "Ctrl+Z";
-
         enabled: documentData.visible;
-
         onActivated: {
-            if (documentData.commandsProvider.commandExists("Undo")){
-                Events.sendEvent(documentData.uuid + "CommandActivated", "Undo");
+            console.log("Ctrl+Z")
+            let undoSteps = documentData.undoManagerPtr.getAvailableUndoSteps();
+
+            if (undoSteps > 0){
+                if (documentData.commandsProvider.commandExists("Undo")){
+                    Events.sendEvent(documentData.uuid + "CommandActivated", "Undo");
+                }
             }
         }
     }
 
     Shortcut {
         sequence: "Ctrl+Shift+Z";
-
         enabled: documentData.visible;
-
         onActivated: {
-            if (documentData.commandsProvider.commandExists("Redo")){
-                Events.sendEvent(documentData.uuid + "CommandActivated", "Redo");
+            console.log("Ctrl+Shift+Z")
+            let redoSteps = documentData.undoManagerPtr.getAvailableRedoSteps();
+            if (redoSteps > 0){
+                if (documentData.commandsProvider.commandExists("Redo")){
+                    Events.sendEvent(documentData.uuid + "CommandActivated", "Redo");
+                }
             }
         }
     }

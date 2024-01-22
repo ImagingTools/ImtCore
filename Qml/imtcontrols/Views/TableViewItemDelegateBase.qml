@@ -69,11 +69,23 @@ FocusScope {
     }
 
     Component.onCompleted: {
-        console.log("delegate onCompleted");
+        console.log("delegate onCompleted", delegate.itemData.FeatureId);
 
         if (delegate.root){
             delegate.root._addItem(delegate);
             delegate.root.tableSelection.selectionChanged.connect(delegate.selectionChanged);
+
+            internal.totalIndex = delegate.root.itemsList.indexOf(delegate);
+        }
+    }
+
+    QtObject {
+        id: internal;
+
+        property int totalIndex: delegate.root ? delegate.root.itemsList.indexOf(delegate): -1;
+
+        onTotalIndexChanged: {
+            console.log("onTotalIndexChanged", totalIndex, delegate.itemData.FeatureId);
         }
     }
 
@@ -127,6 +139,17 @@ FocusScope {
         anchors.top: headerDelegateLoader.bottom;
     }
 
+    Rectangle {
+        anchors.fill: delegate;
+
+//        visible: internal.totalIndex >= 0 ? internal.totalIndex % 2 == 0 : false;
+        visible: false;
+
+        color: Style.alternatingColor;
+
+        opacity: Style.alternatingOpacity;
+    }
+
     Loader {
         id: rowLoader;
 
@@ -145,8 +168,6 @@ FocusScope {
             onColumnModelChanged: {
                 repeater.model = row.columnModel;
             }
-
-//            layoutDirection: Qt.RightToLeft;
 
             Repeater {
                 id: repeater;

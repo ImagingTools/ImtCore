@@ -6,7 +6,7 @@ Item {
     id: settingsComboBoxContainer;
 
     width: 150;
-    height: 23;
+    height: Style.comboBoxHeight;
 
     property var modelData: model;
 

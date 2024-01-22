@@ -42,10 +42,6 @@ Item {
 
     function doUndo(steps)
     {
-        console.log("doUndo");
-
-        printInfo();
-
         internal.m_isBlocked = true;
 
         internal.m_redoStack.push(internal.m_observedModel.CopyMe());
@@ -62,18 +58,12 @@ Item {
         modelChanged();
 //        doListShift(steps, internal.m_undoStack, internal.m_redoStack);
 
-        printInfo();
-
         undo();
     }
 
 
     function doRedo(steps)
     {
-        console.log("doRedo");
-
-        printInfo();
-
         internal.m_isBlocked = true;
 
         internal.m_undoStack.push(internal.m_observedModel.CopyMe());
@@ -90,7 +80,6 @@ Item {
         modelChanged();
 //        doListShift(steps, internal.m_redoStack, internal.m_undoStack);
 
-        printInfo();
         redo();
     }
 
@@ -103,8 +92,6 @@ Item {
 
         if ((steps > 0) && (fromList.length >= steps)){
             internal.m_isBlocked = true;
-
-            printInfo();
 
             let stateModel = fromList[fromList.length - steps];
             if (internal.m_observedModel.Copy(stateModel)){
@@ -119,8 +106,6 @@ Item {
             }
 
             modelChanged();
-
-            printInfo();
 
             internal.m_isBlocked = false;
         }
@@ -212,8 +197,6 @@ Item {
 
             modelChanged();
         }
-
-        printInfo();
     }
 
 

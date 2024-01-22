@@ -49,7 +49,7 @@ Item {
         Timer {
             id: timer;
 
-            interval: 600;
+            interval: 300;
 
             onTriggered: {
                 filterPanelDecorator.rootLoader.textChanged(model.index, tfc.text);

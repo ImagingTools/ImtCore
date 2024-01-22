@@ -14,17 +14,25 @@ Item {
 
     signal userUpdated();
 
+    property var dialogManager: modalDialogManager;
+
     function logout(){
         Events.sendEvent("Logout");
     }
 
     function changePassword(){
-        modalDialogManager.openDialog(changePasswordComp, {});
+        userPanelDelegate.dialogManager.openDialog(changePasswordComp, {});
     }
 
     property QtObject cacheData : QtObject{
         property string login;
         property string password;
+    }
+
+    function onResult(id, name){
+        userPanelDelegate.dialogManager.openDialog(savingErrorDialog, {"message" : qsTr("Password changed successfully")});
+
+        userPanelDelegate.userUpdated();
     }
 
     Component {
@@ -41,15 +49,9 @@ Item {
                     userPanelDelegate.cacheData.password = this.password;
 
                     userPanelDelegate.userModel.SetData("Password", this.password)
-                    userPanelDelegate.userModel.SetData("Username", login)
+                    userPanelDelegate.userModel.SetData("Username", this.login)
 
-                    let onResult = function(id, name){
-                        modalDialogManager.openDialog(savingErrorDialog, {"message" : qsTr("Password changed successfully")});
-
-                        userPanelDelegate.userUpdated();
-                    }
-
-                    documentController.updateData("UserUpdate", userPanelDelegate.userId, userPanelDelegate.userModel, {}, onResult);
+                    documentController.updateData("UserUpdate", userPanelDelegate.userId, userPanelDelegate.userModel, {}, userPanelDelegate.onResult);
                 }
             }
         }
@@ -58,8 +60,8 @@ Item {
     GqlDocumentDataController{
         id: documentController;
 
-        onSetModelStateChanged: {
-            if (setModelState === "Loading"){
+        onUpdateModelStateChanged: {
+            if (updateModelState == "Loading"){
                 Events.sendEvent("StartLoading");
             }
             else{

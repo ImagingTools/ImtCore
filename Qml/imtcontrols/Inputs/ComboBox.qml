@@ -11,7 +11,7 @@ ControlBase {
 
     property color borderColor: comboBoxContainer.focus ? Style.iconColorOnSelected : Style.borderColor;
 
-    property color backgroundColor: Style.baseColor;
+    property color backgroundColor: Style.alternateBaseColor;
 
     property string currentText;
 
@@ -87,14 +87,12 @@ ControlBase {
             return;
         }
 
-//        comboBoxContainer.currentIndex = -1;
         if (comboBoxContainer.currentIndex > -1){
             comboBoxContainer.currentText = comboBoxContainer.model.GetData(comboBoxContainer.nameId, comboBoxContainer.currentIndex);
         }
     }
 
     onCurrentIndexChanged: {
-        console.log("ComboBox onCurrentIndexChanged", comboBoxContainer.currentIndex);
         if (!comboBoxContainer.model){
             return;
         }
@@ -110,7 +108,7 @@ ControlBase {
         }
     }
 
-    Component {
+    property Component popupMenuComp: Component {
         id: popupMenu;
         PopupMenuDialog {
             id: popup;
@@ -129,7 +127,7 @@ ControlBase {
             onFinished: {
                 console.log("MenuFinished")
 
-                popup.root.closeDialog();
+                comboBoxContainer.closePopupMenu();
             }
             Component.onCompleted: {
                 comboBoxContainer.finished.connect(popup.finished);
@@ -163,7 +161,7 @@ ControlBase {
         comboBoxContainer.dialogsCountPrev = modalDialogManager.count;
         //var point = comboBoxContainer.mapToItem(thumbnailDecoratorContainer, 0, comboBoxContainer.height);
         var point = comboBoxContainer.mapToItem(null, 0, comboBoxContainer.height);
-        modalDialogManager.openDialog(popupMenu, { "x":     point.x,
+        modalDialogManager.openDialog(popupMenuComp, { "x":     point.x,
                                           "y":     point.y,
                                           "model": comboBoxContainer.model,
                                           "width": comboBoxContainer.width,

@@ -26,7 +26,6 @@ FocusScope {
     property var rowModel: ListModel {};
 
     onRowModelChanged: {
-        //console.log("onRowModelChanged", rowModel.toJSON());
         tableViewRoot.itemsList = []
     }
 
@@ -69,7 +68,6 @@ FocusScope {
     }
 
     function checkItem(delegate){
-//        let delegate = tableViewRoot.getItemByIndex(modelIndex);
         if (delegate){
             if (delegate.checkState !== Qt.Checked){
                 delegate.checkState = Qt.Checked;
@@ -135,19 +133,6 @@ FocusScope {
         }
     }
 
-//    function __checkItems(delegates, state){
-//        for (let delegate of delegates){
-//            delegate.checkState = state;
-//            if (delegate.childrenDelegates.length > 0){
-//                tableViewRoot.__checkItems(delegate.childrenDelegates, state);
-//            }
-//        }
-//    }
-
-//    function __childrenChanged(state){
-
-//    }
-
     function _addItem(item){
         tableViewRoot.itemsList.push(item);
     }
@@ -162,19 +147,6 @@ FocusScope {
     function getItemsDataAsList(){
         return itemsList;
     }
-
-//    function getCheckedItems(){
-//        let result = []
-
-//        for (let i = 0; i < tableViewRoot.itemsList.length; i++){
-//            let itemData = tableViewRoot.itemsList[i];
-//            if (itemData.CheckState === Qt.Checked){
-//                result.push(itemData);
-//            }
-//        }
-
-//        return result;
-//    }
 
     function resetSelection(){
         tableViewRoot.tableSelection.resetSelection();

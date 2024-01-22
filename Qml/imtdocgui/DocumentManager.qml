@@ -443,11 +443,6 @@ Item {
                 ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Cancel"); Enabled: true}
             }
 
-            Component.onCompleted: {
-//                buttonsModel.append({"Id":"Cancel", "Name":qsTr("Cancel"), "Enabled": true});
-//                buttonsModel.append({Id: Enums.ButtonType.Cancel, Name:qsTr("Cancel"), Enabled: true});
-            }
-
             onFinished: {
                 if (buttonId === Enums.ButtonType.Yes){
                 }

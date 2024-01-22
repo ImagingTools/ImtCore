@@ -23,7 +23,6 @@ Item {
     }
 
     function setCommandsModel(parameters){
-        console.log("CommandsDecorator setCommandsModel", JSON.stringify(parameters));
         let model = parameters["Model"];
         let commId = parameters["CommandId"];
 
@@ -34,8 +33,6 @@ Item {
     }
 
     function clearModel(parameters){
-        console.log("CommandsDecorator clearModel", JSON.stringify(parameters));
-
         if (parameters){
             let commandId = parameters["CommandId"];
             if (commandId !== commandsDecoratorContainer.commandId){
@@ -79,10 +76,7 @@ Item {
 
                 property bool isHorizontal: model.IsHorizontal == undefined ? true : model.IsHorizontal;
                 Button {
-
                     id: topButtonDelegate;
-
-                    // decorator: Style.topButtonDecorator !==undefined ? Style.topButtonDecorator: defaultButtonDecorator;
 
                     decorator: Style.topButtonDecorator
 
@@ -95,17 +89,13 @@ Item {
 
                     text: model.Name;
 
-                    // isToggled: isToggleable ? model.IsToggled !== undefined ? model.IsToggled : false : false;
-                    // isToggleable: model.IsToggleable !== undefined ? model.IsToggleable : false
                     checked: checkable ? model.IsToggled !== undefined ? model.IsToggled : false : false;
                     checkable: model.IsToggleable !== undefined ? model.IsToggleable : false
 
-                    Component.onCompleted: {
-                        console.log("Command onCompleted", model.Id);
-                    }
+                    widthFromDecorator: true;
+                    heightFromDecorator: true;
 
                     onClicked: {
-                        console.log("onClicked");
                         Events.sendEvent(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);
                     }
 
@@ -140,7 +130,6 @@ Item {
                     }
                 }
             }
-
         }
 
         buttonDelegateVert: Component{
@@ -173,12 +162,10 @@ Item {
                     property string id: model.Id !== undefined ? model.Id : "";
 
                     onClicked: {
-                        console.log("onClicked", commandsDecoratorContainer.commandId + "CommandActivated " + model.Id)
                         Events.sendEvent(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);
                         buttonPanel.clicked(id);
                     }
                 }
-
 
                 Rectangle{
                     id: splitter;
@@ -190,11 +177,7 @@ Item {
                     color: Style.textColor;
                     visible: model.Name !== "" ? false : model.index == buttonPanel.horizCount ? false : model.index == (buttonPanel.buttonModel.GetItemsCount() - 1) ? false : true ;
                 }
-
-
             }
-
         }
     }
-
 }

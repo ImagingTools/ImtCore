@@ -9,19 +9,18 @@ Rectangle {
     property int indicatorSize: 50;
 
     function start(){
-        console.log("Loading start");
-
         root.visible = false;
         root.visible = true;
     }
 
     function stop(){
-        console.log("Loading stop");
         root.visible = false;
     }
 
     Item { // square
         id: square;
+
+        z: root.z + 1;
 
         anchors.centerIn: parent
         property double minimum: Math.min(root.width, root.height);

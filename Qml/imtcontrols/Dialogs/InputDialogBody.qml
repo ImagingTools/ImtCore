@@ -11,6 +11,10 @@ Item {
     property string inputValue: "";
     property Item rootItem: null;
 
+    Component.onCompleted: {
+        inputDialogBodyContainer.forceActiveFocus();
+    }
+
     onFocusChanged: {
         console.log("InputBody onFocusChanged", focus);
 

@@ -1,6 +1,6 @@
 import QtQuick 2.0
 import Acf 1.0
-//import QtQuick.Dialogs 1.3
+import QtQuick.Dialogs 1.3
 import imtcontrols 1.0
 import Qt.labs.platform 1.1
 
@@ -56,14 +56,14 @@ Item {
         }
     }
 
-//    FolderDialog {
-//        id: fileDialog;
+    FolderDialog {
+        id: fileDialog;
 
-//        onAccepted: {
-//            var pathDir = fileDialog.folder.toString();
-//            console.log("fileUrl", fileDialog.folder);
-//            pathDir = pathDir.replace('file:///', '')
-//            root.path = pathDir;
-//        }
-//    }
+        onAccepted: {
+            var pathDir = fileDialog.folder.toString();
+            console.log("fileUrl", fileDialog.folder);
+            pathDir = pathDir.replace('file:///', '')
+            root.path = pathDir;
+        }
+    }
 }

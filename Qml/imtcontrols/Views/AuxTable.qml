@@ -1031,6 +1031,8 @@ Rectangle {
 
         vertical: false;
         targetItem: elementsListObj;
+
+        visible: elementsListObj.width > 0;
     }
 
     ListView {
