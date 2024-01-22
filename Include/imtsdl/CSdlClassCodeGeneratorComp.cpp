@@ -1,6 +1,9 @@
 #include "CSdlClassCodeGeneratorComp.h"
 
 
+// C includes
+#include <iostream>
+
 // Qt includes
 #include <QtCore/QDir>
 
@@ -39,6 +42,16 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 		I_CRITICAL();
 
 		return iproc::IProcessor::TS_INVALID;
+	}
+
+	if (m_argumentParserCompPtr->IsDependenciesMode()){
+		SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes();
+		for (const CSdlType& sdlType: sdlTypeList){
+			std::cout << QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".h").toStdString();
+			std::cout << QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".cpp").toStdString();
+		}
+
+		return iproc::IProcessor::TS_OK;
 	}
 
 	SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes();

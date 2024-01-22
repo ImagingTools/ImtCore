@@ -12,6 +12,16 @@
 namespace imtsdl
 {
 
+
+// public methods
+
+CSdlProcessArgumentsParserComp::CSdlProcessArgumentsParserComp()
+:	m_isDependenciesMode(false),
+	m_isGenerateMode(true)
+{
+}
+
+
 bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 {
 	QStringList arguments;
@@ -22,6 +32,8 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	QCommandLineOption schemaFilePathOption({"S","schema-file",}, "SDL schema file path", "SchemaFilePath");
 	QCommandLineOption outputDirectoryPathOption({"O","output-directory",}, "Directory where created files will be created", "OutputDirectoryPath");
 	QCommandLineOption namespaceOption({"N","namespace",}, "Namespace, used in source and header files", "Namespace");
+	QCommandLineOption generateOption({"G","generate",}, "Generate code from SDL mode", "Generate");
+	QCommandLineOption dependenciesOption({"D","dependencies",}, "Generate a dependencies list to be generated. No code will be generated", "Dependencies");
 
 	QCommandLineParser commandLineParser;
 	bool isOptionsAdded = commandLineParser.addOptions({schemaFilePathOption, outputDirectoryPathOption, namespaceOption});
@@ -41,6 +53,11 @@ bool CSdlProcessArgumentsParserComp::SetArguments(int argc, char** argv)
 	if (commandLineParser.isSet(namespaceOption)){
 		m_namespace = commandLineParser.value(namespaceOption);
 	}
+
+	m_isGenerateMode = m_isGenerateMode || commandLineParser.isSet(generateOption);
+	m_isDependenciesMode = m_isDependenciesMode || commandLineParser.isSet(dependenciesOption);
+
+	Q_ASSERT(m_isGenerateMode ^ m_isDependenciesMode);
 
 	return true;
 }
@@ -67,6 +84,18 @@ QString CSdlProcessArgumentsParserComp::GetNamespace() const
 	Q_ASSERT(!m_namespace.isNull());
 
 	return m_namespace;
+}
+
+
+bool CSdlProcessArgumentsParserComp::IsGenerateMode() const
+{
+	return m_isGenerateMode;
+}
+
+
+bool CSdlProcessArgumentsParserComp::IsDependenciesMode() const
+{
+	return m_isDependenciesMode;
 }
 
 
