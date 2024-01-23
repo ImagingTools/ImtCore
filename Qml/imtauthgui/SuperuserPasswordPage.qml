@@ -172,11 +172,11 @@ Rectangle {
                     root.setSuperuserPassword(passwordTextInput.text);
                 }
 
-//                decorator: Component{ButtonDecorator{
-//                    width: 70;
-//                    height: 23;
-//                    radius: deviceEditorContainer.radius;
-//                }}
+                decorator: Component{ButtonDecorator{
+                    width: 70;
+                    height: 23;
+
+                }}
             }
         }
     }
