@@ -570,14 +570,6 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
                 stat.compute = true
                 stat.value.push(`inCtx.get('${tree[1]}')`)
                 currentObj.name = `inCtx.${tree[1]}`
-            } else if(tree[1] === 'Enums') {
-                if(SingletonList.indexOf(tree[1]) >= 0){
-                    stat.compute = true
-                    stat.value.push(`inCtx.get('${tree[1]}')`)
-                } else {
-                    stat.value.push(`inCtx.get('${tree[1]}')`)
-                }
-                
             } else {
                 if(stat.ignore.indexOf(tree[1]) >= 0 || stat.params.indexOf(tree[1]) >= 0 || tree[1] === 'true' || tree[1] === 'false' || tree[1] === 'this'){
                     stat.value.push(tree[1])
