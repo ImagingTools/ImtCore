@@ -19,6 +19,9 @@
 #include <imtbase/IObjectCollectionIterator.h>
 #include <imtrepo/CFileCollectionItem.h>
 
+// imtgqlrepo SDL includes
+#include <GeneratedFiles/imtgqlrepo/SDL/CFileMetaInfo.h>
+
 
 namespace imtgqlrepo
 {
@@ -434,6 +437,7 @@ bool CGqlFileRepositoryComp::SetupGqlItem(
 		return retVal;
 	}
 
+/// \todo remove it
 	for (const QByteArray& metaInfoId: metaInfoIdList){
 		QVariant elementInformation;
 
@@ -470,6 +474,23 @@ bool CGqlFileRepositoryComp::SetupGqlItem(
 			retVal = retVal && model.SetData(metaInfoId, elementInformation, itemIndex);
 		}
 	}
+
+	CFileMetaInfo fileMetaInfo;
+	fileMetaInfo.SetId(objectId);
+	fileMetaInfo.SetName(m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString());
+	fileMetaInfo.SetDescription(m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString());
+	QDateTime creationTime = elementMetaInfoPtr->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME).toDateTime().toUTC();
+	fileMetaInfo.SetAdded(creationTime.toString(Qt::ISODate));
+	QDateTime modificationTime = elementMetaInfoPtr->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME).toDateTime().toUTC();
+	fileMetaInfo.SetLastModified(modificationTime.toString(Qt::ISODate));
+	fileMetaInfo.SetChecksumAlgorithm(QStringLiteral("MD5"));
+	fileMetaInfo.SetChecksumValue(elementMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CONTENT_CHECKSUM).toString());
+	fileMetaInfo.SetVersion(elementMetaInfoPtr->GetMetaInfo(imtbase::IObjectCollection::MIT_REVISION).toString());
+
+#if SDL_TO_MODEL_ADD_IMPLEMEMNTED
+	fileMetaInfo.addToTreeModel(model, metaInfoIdList);
+#endif
+
 
 	return retVal;
 }
