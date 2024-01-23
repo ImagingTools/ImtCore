@@ -1,0 +1,10 @@
+type FileMetaInfo {
+    Id: ID!
+    Name: String!
+    Description: String
+    Added: String
+    LastModified: String
+    ChecksumAlgorithm: String
+    ChecksumValue: String
+    Version: String
+}
