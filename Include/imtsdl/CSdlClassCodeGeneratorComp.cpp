@@ -47,8 +47,8 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 	if (m_argumentParserCompPtr->IsDependenciesMode()){
 		SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes();
 		for (const CSdlType& sdlType: sdlTypeList){
-			std::cout << QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".h").toStdString();
-			std::cout << QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".cpp").toStdString();
+			std::cout << QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".h").toStdString() << std::endl;
+			std::cout << QString(outputDirectoryPath + "/C" + sdlType.GetName() + ".cpp").toStdString() << std::endl;
 		}
 
 		return iproc::IProcessor::TS_OK;
