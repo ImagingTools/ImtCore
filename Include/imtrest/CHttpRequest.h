@@ -76,6 +76,7 @@ private:
 	QUrl m_url;
 	RequestState m_state;
 	QByteArray m_body;
+	QByteArray m_data;
 
 	const IRequestServlet& m_requestHandler;
 	const IProtocolEngine& m_engine;

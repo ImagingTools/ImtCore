@@ -307,6 +307,7 @@ bool CHttpRequest::ResetData(CompatibilityMode /*mode*/)
 	m_headers.clear();
 	m_lastHeader.clear();
 	m_url.clear();
+	m_data.clear();
 
 	m_state = RS_NON_STARTED;
 
@@ -320,7 +321,8 @@ bool CHttpRequest::ParseDeviceData(QIODevice& device)
 {
 	QByteArray data = device.readAll();
 	if (!data.isEmpty()){
-		return ExecuteHttpParser(data, &device);
+		m_data += data;
+		return ExecuteHttpParser(m_data, &device);
 	}
 
 	return true;

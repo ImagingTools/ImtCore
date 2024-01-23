@@ -593,7 +593,7 @@ Rectangle {
             cacheBuffer: Math.max(contentWidth, tableContainer.width, 0);
             property bool compl: false;
 
-            property int currentIndex: 0;
+            currentIndex: 0;
 
             onCurrentIndexChanged: {
                 console.log("headersList onCurrentIndexChanged", headersList.currentIndex);
