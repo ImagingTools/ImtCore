@@ -8,7 +8,7 @@ find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core REQUIRED)
 target_link_libraries(${PROJECT_NAME} imtgql imtbase)
 
 ImtCoreGenerateSdl(
-	"${CMAKE_CURRENT_LIST_DIR}/../DDL/General.sdl.graphql"
+	"${CMAKE_CURRENT_LIST_DIR}/../SDL/General.sdl.graphql"
 	"${AUX_INCLUDE_DIR}/${PROJECT_NAME}/SDL"
 	"${PROJECT_NAME}"
 )
