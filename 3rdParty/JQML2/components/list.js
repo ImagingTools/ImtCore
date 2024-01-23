@@ -35,6 +35,7 @@ module.exports.listComponents = [
     'GridView',
     'FontLoader',
     'FileDialog',
+    'FolderDialog',
     'TextInput',
     'TextEdit',
     'Shortcut',

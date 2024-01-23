@@ -289,7 +289,7 @@ window.onload = ()=>{
                 return obj
             }
         })
-        if(obj.$id){
+        if(!(obj.$id in Singletons)){
             Object.defineProperty(Singletons, obj.$id, {
                 get(){
                     obj.$complete()
