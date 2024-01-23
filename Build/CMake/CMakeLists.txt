@@ -92,6 +92,7 @@ add_dependencies(imthttp imtcom)
 add_subdirectory("${INCLUDE_DIR}/imtauthgql/CMake" "${AUX_INCLUDE_DIR}/imtauthgql")
 add_subdirectory("${INCLUDE_DIR}/imtauthdb/CMake" "${AUX_INCLUDE_DIR}/imtauthdb")
 add_subdirectory("${INCLUDE_DIR}/imtgqlrepo/CMake" "${AUX_INCLUDE_DIR}/imtgqlrepo")
+add_dependencies(imtgqlrepo SdlCodeGenerator)
 
 
 #-------- Qml --------
