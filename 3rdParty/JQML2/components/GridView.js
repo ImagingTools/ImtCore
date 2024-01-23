@@ -116,8 +116,10 @@ class GridView extends Flickable {
                 // })
                 // obj.getStatement('index').reset(i)
                 // obj.getStatement('model').reset({index: i})
-                for(let update of updateList.splice(0, updateList.length)){
-                    update()
+                while(updateList.length){
+                    for(let update of updateList.splice(0, updateList.length)){
+                        update()
+                    }
                 }
                 obj.$complete()
                 this.$items.push(obj)
@@ -140,8 +142,10 @@ class GridView extends Flickable {
                 // obj.getStatement('index').setCompute(()=>{obj.getStatement('index').subscribe(model.getStatement('index')); return model.getStatement('index').get()})
                 // obj.getStatement('index').update()
                 // obj.getStatement('model').reset(model)
-                for(let update of updateList.splice(0, updateList.length)){
-                    update()
+                while(updateList.length){
+                    for(let update of updateList.splice(0, updateList.length)){
+                        update()
+                    }
                 }
                 obj.$complete()
                 this.$items.push(obj)

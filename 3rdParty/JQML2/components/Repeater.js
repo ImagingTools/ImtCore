@@ -109,8 +109,10 @@ class Repeater extends Item {
             // obj.getStatement('model').reset(model)
             this.$items[index] = obj   
         }
-        for(let update of updateList.splice(0, updateList.length)){
-            update()
+        while(updateList.length){
+            for(let update of updateList.splice(0, updateList.length)){
+                update()
+            }
         }
         
         this.$items[index].$complete()

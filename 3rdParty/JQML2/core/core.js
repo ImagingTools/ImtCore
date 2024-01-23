@@ -306,9 +306,13 @@ window.onload = ()=>{
         Singletons[name].$complete()
     }
     let root = new (Function('return '+document.body.dataset.qml.replace('.qml', ''))())(mainRoot)
-    for(let update of updateList.splice(0, updateList.length)){
-        update()
+
+    while(updateList.length){
+        for(let update of updateList.splice(0, updateList.length)){
+            update()
+        }
     }
+    
     mainRoot.$complete()
     console.timeEnd('build')
 }
