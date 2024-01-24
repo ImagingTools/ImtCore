@@ -11,5 +11,8 @@ ButtonDecorator{
     Component.onCompleted: {
         icon.width = width;
     }
+    onWidthChanged: {
+        icon.width = width;
+    }
 }
 
