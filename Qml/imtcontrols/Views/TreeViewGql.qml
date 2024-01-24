@@ -568,8 +568,8 @@ Rectangle{
         }
         let contentY__ = list.originY;
         for(let i = 0; i < index; i++){
-            let isOpen = treeViewGql.model.GetData("IsOpen__", i);
-            contentY__ += isOpen * treeViewGql.delegateHeight;
+            let isVisible = treeViewGql.model.GetData("Visible__", i);
+            contentY__ += isVisible * treeViewGql.delegateHeight;
         }
         list.contentY = Math.min(contentY__, maxContentY);
     }
