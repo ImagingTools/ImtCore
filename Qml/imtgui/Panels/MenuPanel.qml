@@ -28,7 +28,7 @@ Rectangle {
     property int spacing: 0;
 
     property int count: lvPages.count;
-    property int contentWidth: 0;
+    property int contentWidth: 80;
 
     signal activePageChanged;
 
@@ -142,7 +142,7 @@ Rectangle {
 
             menuPanelRef: menuPanel;
 
-            imageSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["Icon"], "On", "Selected"):
+            iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["Icon"], "On", "Selected"):
                                                      "../../../" + Style.getIconPath(model["Icon"], "On", "Normal");
 
             decoratorSource : Style.menuButtonDecoratorPath;

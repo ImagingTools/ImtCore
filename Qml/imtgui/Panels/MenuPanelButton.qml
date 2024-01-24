@@ -8,8 +8,10 @@ ControlBase {
     width: container.contentWidth;
     height: subPagesColumn.visible ? container.contentHeight + subPagesColumn.height : container.contentHeight;
 
+    decorator: Style.menuPanelButtonDecorator;
+
     property string text: "Test";
-    property string imageSource: "";
+    property string iconSource: !container.baseElement ? "" : container.baseElement.iconSource;
     property string textColor: "#335777";//"#191970"
     property string fontName: "";
 
@@ -21,8 +23,8 @@ ControlBase {
     property real imageSelectedCoeff: 0.73;
     property real fontSize: 11;
 
-    property int contentWidth: menuPanelButtonDecorator.width
-    property int contentHeight: menuPanelButtonDecorator.height
+    property int contentWidth: 80;
+    property int contentHeight: 80;
 
     property string decoratorSource;
 
@@ -46,13 +48,13 @@ ControlBase {
         }
     }
 
-    MenuPanelButtonDecorator {
-        id: menuPanelButtonDecorator
-        imageSource: container.imageSource
-        highlighted: container.highlighted
-        selected: container.selected
-        title: container.text
-    }
+    // MenuPanelButtonDecorator {
+    //     id: menuPanelButtonDecorator
+    //     imageSource: container.imageSource
+    //     highlighted: container.highlighted
+    //     selected: container.selected
+    //     title: container.text
+    // }
 
     Rectangle {
         id: mainRect;

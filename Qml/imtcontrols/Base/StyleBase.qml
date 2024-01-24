@@ -75,8 +75,8 @@ StyleComponents {
     property string color_text_titles: "#7700FF";
     property string color_text_notActive: "#C2CEDB";
 
-    property alias mainFontSource: mainFont.source;
-    property alias boldFontSource: boldFont.source;
+    property string mainFontSource: "../../../Fonts/Ubuntu-Light.ttf";
+    property string boldFontSource: "../../../Fonts/Ubuntu-Medium.ttf";
 
     property bool mobile;
     property real mainWidth;
@@ -443,11 +443,11 @@ StyleComponents {
 
     FontLoader{
         id: mainFont;
-        source: "../../../Fonts/Ubuntu-Light.ttf";
+        source: styleContainer.mainFontSource;
     }
 
     FontLoader{
         id: boldFont;
-        source: "../../../Fonts/Ubuntu-Medium.ttf";
+        source: styleContainer.boldFontSource;
     }
 }
