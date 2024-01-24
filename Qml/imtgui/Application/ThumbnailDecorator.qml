@@ -119,6 +119,16 @@ Rectangle {
         mainDocumentManager.clear();
     }
 
+    Loading {
+        id: loading;
+
+        z: 10000;
+
+        anchors.fill: parent;
+
+        visible: false;
+    }
+
     MenuPanel {
         id: menuPanel;
 
@@ -340,15 +350,7 @@ Rectangle {
         visible: false;
     }
 
-    Loading {
-        id: loading;
 
-        z: 10000;
-
-        anchors.fill: parent;
-
-        visible: false;
-    }
 
     // TODO
 //    function closeApp(){
