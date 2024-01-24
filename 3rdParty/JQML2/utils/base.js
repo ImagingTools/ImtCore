@@ -11,7 +11,11 @@ class ComplexObject {
     createProperty(name, type, value){
         if(name in this.$properties){
             console.log('Warning: redefine property', name)
-            this.$properties[name].reset(value)
+            if(this.$properties[name] instanceof type){
+                this.$properties[name].reset(value)
+            } else {
+                this.$properties[name] = new type(value)
+            }
             return
         }
         this.$properties[name] = new type(value)

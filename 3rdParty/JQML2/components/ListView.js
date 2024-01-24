@@ -362,11 +362,11 @@ class ListView extends Flickable {
             // obj.getStatement('model').reset(model)
             this.$items[index] = obj   
         }
-        while(updateList.length){
+        // while(updateList.length){
             for(let update of updateList.splice(0, updateList.length)){
                 update()
             }
-        }
+        // }
         this.$items[index].getProperty('width').getNotify().connect(()=>{
             if(this.getPropertyValue('orientation') === ListView.Horizontal){
                 if(this.$items[index+1]){

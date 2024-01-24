@@ -569,12 +569,12 @@ class QAnchors extends ComplexObject {
     }
 
     marginsChanged(){
-        if(this.completed) {
+        // if(this.completed) {
             this.getStatement('leftMargin').reset(this.getStatement('margins').get())
             this.getStatement('rightMargin').reset(this.getStatement('margins').get())
             this.getStatement('topMargin').reset(this.getStatement('margins').get())
             this.getStatement('bottomMargin').reset(this.getStatement('margins').get())
-        }
+        // }
     }
 
     getNotify(){

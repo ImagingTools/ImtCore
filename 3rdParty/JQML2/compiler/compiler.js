@@ -1361,7 +1361,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
     }
     
     if(innerComponent) {
-        // code.push(`if(forceUpdate)for(let update of updateList.splice(0, updateList.length)){update()}`)
+        code.push(`if(forceUpdate)for(let update of updateList.splice(0, updateList.length)){update()}`)
         code.push(`return el${currentInstructions.UID}`)
     }
 }

@@ -78,9 +78,11 @@ class Loader extends Item {
             }
             
 
-            for(let update of updateList.splice(0, updateList.length)){
-                update()
-            }
+            // while(updateList.length){
+                for(let update of updateList.splice(0, updateList.length)){
+                    update()
+                }
+            // }
 
             // if(!this.getProperty('x').auto) {
             //     item.getProperty('x').setCompute(()=>{
@@ -191,9 +193,11 @@ class Loader extends Item {
             this.getProperty('height').setAuto(item.getPropertyValue('height'))
             
 
-            for(let update of updateList.splice(0, updateList.length)){
-                update()
-            }
+            // while(updateList.length){
+                for(let update of updateList.splice(0, updateList.length)){
+                    update()
+                }
+            // }
 
             // if(!this.getProperty('x').auto) {
             //     item.getProperty('x').setCompute(()=>{

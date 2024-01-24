@@ -201,12 +201,19 @@ class MouseController {
 
         document.body.style.cursor = 'default'
 
-        for(let obj of this.oldList){
+        while(this.oldList.length){
+            let obj = this.oldList.shift()
             if(obj.$mousearea && obj.getPropertyValue('hoverEnabled')) {
                 obj.onMouseMove(x, y, false)
 
             }
         }
+        // for(let obj of this.oldList){
+        //     if(obj.$mousearea && obj.getPropertyValue('hoverEnabled')) {
+        //         obj.onMouseMove(x, y, false)
+
+        //     }
+        // }
 
         for(let obj of inner){
             if(obj.$textinput){
