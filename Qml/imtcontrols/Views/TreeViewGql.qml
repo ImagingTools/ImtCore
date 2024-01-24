@@ -558,6 +558,22 @@ Rectangle{
         treeViewGql.selectedIndex = index;
     }
 
+    function moveToElement(index){
+        if(index < 0 || index >= treeViewGql.model.GetItemsCount()){
+            return;
+        }
+        let maxContentY = list.contentHeight - list.height + list.originY;
+        if(maxContentY <= 0){
+            return;
+        }
+        let contentY__ = list.originY;
+        for(let i = 0; i < index; i++){
+            let isOpen = treeViewGql.model.GetData("IsOpen__", i);
+            contentY__ += isOpen * treeViewGql.delegateHeight;
+        }
+        list.contentY = Math.min(contentY__, maxContentY);
+    }
+
 
 }
 
