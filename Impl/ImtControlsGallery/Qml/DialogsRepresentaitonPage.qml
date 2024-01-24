@@ -143,7 +143,7 @@ Rectangle {
 
                 title: "Message";
 
-                contentComp: Item{
+                contentComp: Component{ Item{
                     width: 200;
                     height: messageText.height + 20;
 
@@ -158,7 +158,7 @@ Rectangle {
                         wrapMode: Text.WordWrap;
                     }
 
-                }
+                }}
 
                 backgroundColor: "white";
                 radius: 2;
@@ -173,7 +173,7 @@ Rectangle {
 
                 title: "Confirmation";
 
-                contentComp: Item{
+                contentComp: Component{ Item{
                     width: 300;
                     height: checkBox.y + checkBox.height + 20;
 
@@ -206,7 +206,7 @@ Rectangle {
 
                     }
 
-                }
+                }}
 
                 buttonsModel: ListModel{
                     ListElement{Id: Enums.ButtonType.Yes; Name:qsTr("Yes"); Enabled: true}
@@ -234,7 +234,7 @@ Rectangle {
             Dialog {
 
                 title: "Content";
-                contentComp: Rectangle{
+                contentComp: Component{ Rectangle{
                     width: 300;
                     height: contentText.height + 10;
 
@@ -258,7 +258,7 @@ Rectangle {
                         font.pixelSize: 18;
                         wrapMode: Text.WordWrap;
                     }
-                }
+                }}
 
                 buttonsModel: ListModel{
                     ListElement{Id: Enums.ButtonType.Close; Name:qsTr("Close"); Enabled: true}
@@ -278,7 +278,7 @@ Rectangle {
 
                 title: "Input";
 
-                contentComp: Item{
+                contentComp: Component{ Item{
                     width: 300;
                     height: column.height + 20;
 
@@ -333,7 +333,7 @@ Rectangle {
                         }
                     }
 
-                }
+                }}
 
 //                buttonsModel: ListModel{
 //                    ListElement{Id: Enums.ButtonType.Ok; Name:qsTr("Ok"); Enabled: true}
