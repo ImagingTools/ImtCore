@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5181" Description="ACF"/>
+            <Version Id="1" Number="2199" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="SdlClassCodeGenerator" X="425" Y="350" Note=""/>
+        <Element ComponentName="SdlClassTreeModelModificator" X="775" Y="200" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>

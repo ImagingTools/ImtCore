@@ -34,6 +34,11 @@ I_EXPORT_COMPONENT(
 		"The C++ class generator of SDL types",
 		"Schema Definition Language SDL Class Generator")
 
+I_EXPORT_COMPONENT(
+		SdlClassTreeModelModificator,
+		"The C++ class modificator, adds saving and loading generated SDL types to TreeItemModel",
+		"Schema Definition Language SDL Class Generator Tree Item Model")
+
 } // namespace ImtSdlPck
 
 

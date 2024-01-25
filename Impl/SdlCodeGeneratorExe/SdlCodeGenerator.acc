@@ -58,7 +58,7 @@
                 <AttributeInfoMap/>
             </Data>
         </Element>
-        <Element Id="SdlClassCodeGenerator" PackageId="ImtSdlPck" ComponentId="SdlClassCodeGenerator">
+        <Element Id="SdlClassCodeGenerator" PackageId="ImtSdlVoce" ComponentId="SdlClassCodeGeneratorFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="ArgumentParser" Type="Reference" ExportId="">
