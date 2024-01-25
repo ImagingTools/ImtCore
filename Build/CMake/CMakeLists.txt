@@ -190,8 +190,9 @@ if(NOT ANDROID)
 	add_dependencies(ImtFilePck imtfile)
 
 	add_subdirectory("${IMPL_DIR}/ImtGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtGqlPck")
-	add_subdirectory("${IMPL_DIR}/ImtGqlRepoPck/CMake" "${AUX_INCLUDE_DIR}/ImtGqlRepoPck")
 	add_dependencies(ImtGqlPck imtgql)
+
+	add_subdirectory("${IMPL_DIR}/ImtGqlRepoPck/CMake" "${AUX_INCLUDE_DIR}/ImtGqlRepoPck")
 
 	add_subdirectory("${IMPL_DIR}/ImtClientGqlPck/CMake" "${AUX_INCLUDE_DIR}/ImtClientGqlPck")
 	add_dependencies(ImtClientGqlPck ImtGqlPck imtclientgql)
