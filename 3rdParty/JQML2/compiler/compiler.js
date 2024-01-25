@@ -447,7 +447,7 @@ for(let fileName of fileList){
     if(meta[3]) qmlpragma(meta[3], instructions)
     qmlimport(meta[1], compiledFiles[fileName])
 
-    if(meta[2][0] === 'qmlelem'){
+    if(meta[2] && meta[2][0] === 'qmlelem'){
         preCompile(meta[2][1], meta[2][3], meta[2][2], instructions)
     }
 }
