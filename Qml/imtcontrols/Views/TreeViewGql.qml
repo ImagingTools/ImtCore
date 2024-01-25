@@ -10,7 +10,7 @@ Rectangle{
     color: "transparent";
     property TreeItemModel model: TreeItemModel{};
 
-    property int shift: 70;
+    property int shift: 35;
     property string nameId: "Name";
     property int delegateWidht: 200;
     property int delegateHeight: 40;
@@ -30,6 +30,9 @@ Rectangle{
     signal selectionChanged();
     signal openBranch(int index)
     signal closeBranch(int index)
+
+    signal forcedOpen(int index);
+    signal inserted(int index);
 
     onWidthChanged: {
         list.contentX = list.originX;
@@ -271,12 +274,6 @@ Rectangle{
     }//listContainer
 
 
-
-
-
-
-
-
     function insertTree(index, model_){
 
         if(!model_ || !model_.GetItemsCount()){
@@ -318,6 +315,8 @@ Rectangle{
             }
         }
         treeViewGql.setContentWidth();
+
+        treeViewGql.inserted(index);
     }
 
     function deleteBranch(index){
@@ -539,6 +538,7 @@ Rectangle{
         if(index < 0){
             return;
         }
+        let isForcedOpen = false;
         if(treeViewGql.model.GetData("HasChildren__", index)){
             if(!treeViewGql.model.GetData("IsOpen__", index)){
                 if(!treeViewGql.model.GetData("HasBranch__", index)){
@@ -547,6 +547,7 @@ Rectangle{
                 }
                 else {
                     treeViewGql.setVisibleElements(true, index)
+                    isForcedOpen = true;
                 }
                 treeViewGql.model.SetData("IsOpen__", true, index);
                 treeViewGql.model.SetData("OpenState__", 1, index);
@@ -554,6 +555,12 @@ Rectangle{
                 treeViewGql.openBranch(index);
             }
 
+        }
+        else {
+            isForcedOpen = true;
+        }
+        if(isForcedOpen){
+            treeViewGql.forcedOpen(index);
         }
         treeViewGql.selectedIndex = index;
     }

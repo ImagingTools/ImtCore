@@ -7,7 +7,7 @@ AuxTable{
 
     property TreeItemModel model: TreeItemModel{};
 
-    property int shift: 70;
+    property int shift: 35;
     property string nameId: "Name";
 
     property int delegateHeight: itemHeight;
