@@ -11,15 +11,19 @@
 // imtsdl includes
 #include <imtsdl/ISdlProcessArgumentsParser.h>
 #include <imtsdl/CGqlSchemaParser.h>
+#include <imtsdl/CSdlTools.h>
 
 
 namespace imtsdl
 {
 
-
+/**
+	A base C++ class generator of SDL types
+*/
 class CSdlClassCodeGeneratorComp:
 			public iproc::CSyncProcessorCompBase,
-			public CGqlSchemaParser
+			public CGqlSchemaParser,
+			private CSdlTools
 {
 
 public:
@@ -50,15 +54,6 @@ private:
 	void AbortCurrentProcessing();
 	QString GenerateAccessMethods(const CSdlField& sdlField, uint indents = 1, bool generateGetter = true, bool generateSetter = true);
 	QString GenerateAccessMethodsImpl(const QString className, const CSdlField& sdlField, uint indents = 0, bool generateGetter = true, bool generateSetter = true);
-
-	QString ConvertType(const CSdlField& sdlField, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr, bool* isArrayPtr = nullptr) const;
-	QString ConvertType(const QString& sdlTypeName, bool* isCustomPtr = nullptr, bool* isComplexPtr = nullptr) const;
-	void FeedStream(QTextStream& stream, uint lines = 1, bool flush = true) const;
-	void FeedLineHorizontally(QString& line, uint indents = 1, char indentDelimiter = '\t') const;
-	QString GetCapitalizedValue(const QString& inputValue) const;
-	QString GetDecapitalizedValue(const QString& inputValue) const;
-	bool IsTypeHasFundamentalTypes(const CSdlType& sdlType, QSet<QString>* foundTypesPtr =  nullptr) const;
-	bool IsTypeHasNonFundamentalTypes(const CSdlType& sdlType, QSet<QString>* foundTypesPtr =  nullptr) const;
 
 private:
 	I_REF(ISdlProcessArgumentsParser, m_argumentParserCompPtr);
