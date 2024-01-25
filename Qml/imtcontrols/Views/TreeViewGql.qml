@@ -20,7 +20,11 @@ Rectangle{
     property int scrollSize: 12;
 
     property string selectionColor: Style.selectedColor !== undefined ? Style.selectedColor : "lightsteelblue";
-    property real selectionOpacity: 0.5;
+    property string hoverColor: "lightsteelblue";
+    property real selectionOpacity: 1;
+    property real selectionRadius: 2;
+    property string selectedTextColor: Style.textColor;
+    property string textColor: Style.textColor;
 
     signal requestSignal(int index);
     signal rightButtonMouseClicked(int mX, int mY);
@@ -107,10 +111,9 @@ Rectangle{
 
                     anchors.fill: parent;
 
-                    radius: 2;
+                    radius: treeViewGql.selectionRadius;
                     opacity: treeViewGql.selectionOpacity;
-                    color: treeViewGql.selectionColor;
-                    visible: !treeViewGql.hasSelection ? false : model.index == treeViewGql.selectedIndex;
+                    color: !treeViewGql.hasSelection ? "transparent" : model.index == treeViewGql.selectedIndex ? treeViewGql.selectionColor: delegateMA.containsMouse ? treeViewGql.hoverColor : "transparent";
                 }
 
                 Rectangle{
@@ -534,13 +537,12 @@ Rectangle{
     }
 
     function openFunc(index){
-        treeViewGql.selectedIndex = index;
         if(index < 0){
             return;
         }
         let isForcedOpen = false;
         if(treeViewGql.model.GetData("HasChildren__", index)){
-            if(!treeViewGql.model.GetData("IsOpen__", index)){
+            if(treeViewGql.model.GetData("OpenState__", index) !== 1){
                 if(!treeViewGql.model.GetData("HasBranch__", index)){
                     treeViewGql.model.SetData("HasBranch__", true, index);
                     treeViewGql.requestSignal(index)
@@ -554,6 +556,9 @@ Rectangle{
 
                 treeViewGql.openBranch(index);
             }
+            else {
+                isForcedOpen = true;
+            }
 
         }
         else {
@@ -562,7 +567,6 @@ Rectangle{
         if(isForcedOpen){
             treeViewGql.forcedOpen(index);
         }
-        treeViewGql.selectedIndex = index;
     }
 
     function moveToElement(index){
