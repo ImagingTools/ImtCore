@@ -21,6 +21,8 @@ DecoratorBase {
     property alias topContentLoaderSourceComp: topContentLoader.sourceComponent;
     property alias bottomContentLoaderSourceComp: bottomContentLoader.sourceComponent;
 
+//    property alias bottomContentLoaderSourceComp: repeater;
+
     onModelChanged: {
         popupMenuListView.model = root.model;
 

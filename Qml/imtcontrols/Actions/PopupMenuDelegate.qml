@@ -2,132 +2,37 @@ import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
 
-Item {
+ItemDelegate {
     id: popupMenuDelegate;
 
-    property int textSize: Style.fontSize_common;
-    property string fontColor: Style.textColor;
-    property string mainColor: "transparent";
-    property string selectedColor: Style.selectedColor;
+    decorator: Style.popupItemDelegateDecorator;
 
-    property alias text: mainText.text;
-    property Item rootItem: null;
-    property Item menuItem: null;
-    property bool textCentered: false;
-
-    property bool selected: !rootItem ? false : rootItem.selectedIndex == model.index ;
+    property bool selected: false;
     property bool isSeparator: model.Id == "";
 
-    signal clicked(string commandId, int index);
+    // Reference to the control in which the delegate is declared
+    property Item containerItem: null;
+
+    onSelectedChanged: {
+        console.log("ItemDelegate onSelectedChanged", selected);
+    }
 
     onHeightChanged: {
-        console.log("onHeightChanged", model.Id, height)
-        if (isSeparator){
-            popupMenuDelegate.height = 5;
-        }
+        internal.checkSeparator();
     }
 
     onIsSeparatorChanged: {
-        console.log("onIsSeparatorChanged", isSeparator);
-        if (isSeparator){
-            mouseArea.visible = false;
-
-            popupMenuDelegate.height = 5;
-        }
+        internal.checkSeparator();
     }
 
-    Rectangle{
-        id: background;
+    QtObject {
+        id: internal;
 
-        anchors.fill: parent;
-        color: popupMenuDelegate.rootItem.currentIndex == model.index ? popupMenuDelegate.selectedColor : popupMenuDelegate.mainColor;
-    }
-
-    Rectangle {
-        id: separator;
-
-        anchors.left: parent.left;
-        anchors.leftMargin: 5;
-        anchors.right: parent.right;
-        anchors.rightMargin: 5;
-        anchors.verticalCenter: parent.verticalCenter;
-
-        height: 1;
-
-        color: popupMenuDelegate.fontColor;
-
-        visible: popupMenuDelegate.isSeparator;
-    }
-
-    Rectangle {
-        anchors.fill: parent;
-
-        color: popupMenuDelegate.selected ? popupMenuDelegate.selectedColor  : "transparent";
-        visible: true;
-        opacity: 0.5;
-    }
-
-    Item {
-        id: iconItem2;
-
-        anchors.left: parent.left;
-        anchors.leftMargin: 5;
-        anchors.verticalCenter: parent.verticalCenter;
-
-        visible: icon2.source != "";
-        width: icon2.source != "" ? 18 : 1;
-        height: width;
-
-        Image {
-            id: icon2;
-
-            anchors.fill: parent;
-
-            source: model.IconSource == undefined ? "" : model.IconSource;
-            sourceSize.width: width;
-            sourceSize.height: height;
-        }
-    }
-
-    Text {
-        id: mainText;
-
-        anchors.left: icon2.source != "" ? iconItem2.right : parent.left;
-        anchors.leftMargin: !popupMenuDelegate.textCentered ? 10 : (parent.width - width)/2;
-        anchors.right: parent.right;
-        anchors.rightMargin: 10;
-        anchors.verticalCenter: parent.verticalCenter;
-
-        color: popupMenuDelegate.fontColor;
-        font.pixelSize: popupMenuDelegate.textSize;
-        font.family: Style.fontFamily;
-
-//        text: model.Name;
-
-        text: model[popupMenuDelegate.rootItem.nameId];
-        elide: Text.ElideRight;
-    }
-
-    MouseArea {
-        id: mouseArea;
-
-        anchors.fill: parent;
-
-        hoverEnabled: true;
-        cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
-
-        visible: !popupMenuDelegate.rootItem ? true : !popupMenuDelegate.rootItem.hoverBlocked;
-        onEntered: {
-            if(popupMenuDelegate.rootItem && popupMenuDelegate.rootItem.selectedIndex !== undefined)
-            {
-                popupMenuDelegate.rootItem.selectedIndex = model.index;
+        function checkSeparator(){
+            if (popupMenuDelegate.isSeparator){
+                mouseArea.visible = false;
+                popupMenuDelegate.height = 5;
             }
-        }
-
-        onClicked: {
-            //console.log("DEBUG::2022-11-13")
-            popupMenuDelegate.clicked(model.Id, model.index);
-            popupMenuDelegate.rootItem.finished(model.Id, model.index)
         }
     }
 }

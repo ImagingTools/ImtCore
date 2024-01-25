@@ -69,7 +69,7 @@
       <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
        <widget class="QStackedWidget" name="StackedWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>3</number>
         </property>
         <widget class="QWidget" name="LoginPage">
          <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -584,10 +584,10 @@
          <widget class="QLabel" name="LoadingLabel">
           <property name="geometry">
            <rect>
-            <x>30</x>
-            <y>0</y>
-            <width>501</width>
-            <height>371</height>
+            <x>240</x>
+            <y>100</y>
+            <width>81</width>
+            <height>71</height>
            </rect>
           </property>
           <property name="text">

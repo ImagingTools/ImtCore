@@ -20,18 +20,17 @@ ControlBase {
     property bool isColor: false;
 
     property bool textCentered: false;
-    property bool menuVisible: false;
     property bool hiddenBackground: true;
     property bool openST: false;
-    property bool compTextCentered:  false;
+
     property bool visibleScrollBar: true;
     property string compMainColor: "transparent";
     property string compSelectedColor: Style.selectedColor;
     property bool moveToEnd: false;
     property int moveToIndex: currentIndex;
 
-    property int dialogsCountPrev: 1000;
-    property int dialogsCount: modalDialogManager.count;
+//    property int dialogsCountPrev: 1000;
+//    property int dialogsCount: modalDialogManager.count;
     property int shownItemsCount: 5;
 
     property int radius: 5;
@@ -44,18 +43,31 @@ ControlBase {
     // ID for display in combo box delegates
     property string nameId: "Name";
 
-    property int selectedIndex: -1;
+//    property int selectedIndex: -1;
     property bool hoverBlocked: true;
+
+    property var popup: null;
 
     property Component delegate: PopupMenuDelegate{
         width: comboBoxContainer.width;
         height: comboBoxContainer.itemHeight;
-        textSize: comboBoxContainer.textSize;
-        fontColor: comboBoxContainer.fontColor;
-        textCentered: comboBoxContainer.compTextCentered;
-        mainColor: comboBoxContainer.compMainColor;
-        selectedColor: comboBoxContainer.compSelectedColor;
-        rootItem: comboBoxContainer;
+
+        highlighted: comboBoxContainer.currentIndex == model.index
+        text: model[comboBoxContainer.nameId];
+
+        selected: comboBoxContainer.popup ? comboBoxContainer.popup.selectedIndex == model.index : false;
+
+        onClicked: {
+            if (comboBoxContainer.popup){
+                comboBoxContainer.popup.finished(model.Id, model.index)
+            }
+        }
+
+        onEntered: {
+            if (comboBoxContainer.popup){
+                comboBoxContainer.popup.selectedIndex = model.index;
+            }
+        }
     };
 
     property alias containsMouse: cbMouseArea.containsMouse;
@@ -69,17 +81,19 @@ ControlBase {
     property alias tooltipItem: tooltip;
     property bool isOpen: false;
 
+    signal accepted();
+    signal activated();
+    signal highlighted(int index);
+
     signal clicked();
     signal finished(string commandId, int index);
 
     onFinished: {
-        console.log("ComboFinished")
-        comboBoxContainer.currentIndex = index;
-        comboBoxContainer.isOpen = false;
-    }
+        if (index >= 0){
+            comboBoxContainer.currentIndex = index;
+        }
 
-    onOpenSTChanged: {
-        selectedIndex = -1;
+        comboBoxContainer.isOpen = false;
     }
 
     onModelChanged: {
@@ -93,6 +107,7 @@ ControlBase {
     }
 
     onCurrentIndexChanged: {
+        console.log("onCurrentIndexChanged", comboBoxContainer.currentIndex);
         if (!comboBoxContainer.model){
             return;
         }
@@ -110,6 +125,7 @@ ControlBase {
 
     property Component popupMenuComp: Component {
         id: popupMenu;
+
         PopupMenuDialog {
             id: popup;
 
@@ -122,32 +138,21 @@ ControlBase {
             shownItemsCount: comboBoxContainer.shownItemsCount;
             moveToEnd: comboBoxContainer.moveToEnd;
             moveToIndex: comboBoxContainer.moveToIndex;
-            rootItem: comboBoxContainer;
             visibleScrollBar: comboBoxContainer.visibleScrollBar;
-            onFinished: {
-                console.log("MenuFinished")
+            selectedIndex: comboBoxContainer.currentIndex;
 
-                comboBoxContainer.closePopupMenu();
+            onFinished: {
+                comboBoxContainer.finished(commandId, index)
             }
-            Component.onCompleted: {
-                comboBoxContainer.finished.connect(popup.finished);
+
+            onStarted: {
+                comboBoxContainer.popup = popup;
             }
         }
-    }
-
-    Component.onCompleted: {
-
     }
 
     onDecoratorChanged: {
         bindCurrentIndex.target = decorator_
-    }
-
-    onDialogsCountChanged: {
-        comboBoxContainer.openST = comboBoxContainer.dialogsCount > comboBoxContainer.dialogsCountPrev;
-        if(!comboBoxContainer.openST && comboBoxContainer.dialogsCountPrev < 1000){
-            comboBoxContainer.dialogsCountPrev = 1000;
-        }
     }
 
     Binding {
@@ -156,24 +161,24 @@ ControlBase {
         value: comboBoxContainer.currentIndex;
     }
 
-    function openPopupMenu(){
-        comboBoxContainer.isOpen = true;
-        comboBoxContainer.dialogsCountPrev = modalDialogManager.count;
-        //var point = comboBoxContainer.mapToItem(thumbnailDecoratorContainer, 0, comboBoxContainer.height);
-        var point = comboBoxContainer.mapToItem(null, 0, comboBoxContainer.height);
-        modalDialogManager.openDialog(popupMenuComp, { "x":     point.x,
-                                          "y":     point.y,
-                                          "model": comboBoxContainer.model,
-                                          "width": comboBoxContainer.width,
-                                          "countVisibleItem": 5 });
-
-    }
-
     function closePopupMenu(){
-        modalDialogManager.closeDialog();
+        if (comboBoxContainer.popup){
+            comboBoxContainer.popup.close();
+        }
+
         comboBoxContainer.isOpen = false;
     }
 
+    function openPopupMenu(){
+        var point = comboBoxContainer.mapToItem(null, 0, comboBoxContainer.height);
+        modalDialogManager.openDialog(popupMenuComp, {
+                                          "x":     point.x,
+                                          "y":     point.y,
+                                          "model": comboBoxContainer.model,
+                                          "width": comboBoxContainer.width});
+
+        comboBoxContainer.isOpen = true;
+    }
 
     MouseArea {
         id: cbMouseArea;
@@ -192,7 +197,6 @@ ControlBase {
             }
 
             comboBoxContainer.clicked();
-            console.log("comboBoxContainer.clicked()")
         }
 
         onPressed: {
@@ -220,34 +224,11 @@ ControlBase {
         fitToTextWidth: true;
     }
 
-
     Shortcut {
         sequence: "Space";
-        enabled: !comboBoxContainer.isOpen && comboBoxContainer.focus;
+        enabled: !comboBoxContainer.isOpen && comboBoxContainer.focus && comboBoxContainer.visible;
         onActivated: {
             comboBoxContainer.openPopupMenu();
         }
     }
-
-    Shortcut {
-        sequence: "Down";
-        enabled: !comboBoxContainer.isOpen && comboBoxContainer.focus;
-        onActivated: {
-            if(comboBoxContainer.currentIndex < comboBoxContainer.model.GetItemsCount() - 1){
-                comboBoxContainer.currentIndex++;
-            }
-
-        }
-    }
-
-    Shortcut {
-        sequence: "Up";
-        enabled: !comboBoxContainer.isOpen && comboBoxContainer.focus;
-        onActivated: {
-            if(comboBoxContainer.currentIndex > 0){
-                comboBoxContainer.currentIndex--;
-            }
-        }
-    }
-
 }
