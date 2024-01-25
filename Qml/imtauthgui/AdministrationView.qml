@@ -2,7 +2,8 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
-import Qt.labs.qmlmodels 1.1
+//import Qt.labs.qmlmodels 1.1
+// import QtQuick.Controls as QtControls
 
 Rectangle {
     id: container;
@@ -97,57 +98,6 @@ Rectangle {
         }
     }
 
-//    TableView {
-//      id: usersTable
-
-//      model: TableModel {
-//                   TableModelColumn { display: "id" }
-//                   TableModelColumn { display: "name" }
-
-//                   rows: [ { "id": "Harry", "name": "Harry" }, { "id": "Hedwig", "name": "Hedwig" } ]
-//               }
-
-//      anchors.top: header.bottom;
-//      anchors.left: parent.left;
-//      anchors.right: parent.right;
-//      anchors.bottom: parent.bottom;
-
-//      columnSpacing: 1
-//               rowSpacing: 1
-//               boundsBehavior: Flickable.StopAtBounds
-
-//      delegate: DelegateChooser
-//      {
-//        DelegateChoice
-//        {
-//          delegate: Rectangle {
-//            implicitWidth: 100
-//            implicitHeight: 50
-//            Text { text: display }
-
-//            MouseArea {
-//              anchors.fill: parent
-//              onClicked:
-//              {
-//                // print value from clicked cell
-//                var idx = usersTable.model.index(row,column)
-//                console.log("Clicked cell: ", usersTable.model.data(idx))
-
-//                // print values from all cells in a row
-//                console.log("Clicked row: ")
-//                for (var i = 0; i < usersTable.model.columnCount(); i++)
-//                {
-//                  var idx2 = usersTable.model.index(row,i)
-//                  var data = usersTable.model.data(idx2)
-//                  console.log(data)
-//                }
-//              } // onClicked
-//            } // MouseArea
-//          } // Rectangle
-//        }// DelegateChoice
-//      } // DelegateChooser
-//    } // TableView
-
     MultiPageView {
         id: multiPageView;
 
@@ -161,8 +111,6 @@ Rectangle {
         }
 
         onCurrentIndexChanged: {
-            console.log("onSelectedIndexChanged", currentIndex);
-
             if (currentIndex >= 0){
                 headerText.text = qsTr("Administration") + " / " + pagesModel.get(currentIndex).Name;
             }

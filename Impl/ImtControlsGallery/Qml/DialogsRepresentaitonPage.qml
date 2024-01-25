@@ -124,10 +124,10 @@ Rectangle {
 //            backgroundColor: "white";
 //            radius: 2;
 //            onFinished: {
-//                if(buttonId == Enums.ButtonType.Cancel || buttonId == Enums.ButtonType.No){
+//                if(buttonId == Enums.cancel || buttonId == Enums.no){
 //                    console.log("Cancel!!!");
 //                }
-//                else if(buttonId == Enums.ButtonType.Ok || buttonId == Enums.ButtonType.Yes){
+//                else if(buttonId == Enums.ok || buttonId == Enums.yes){
 //                    console.log("Ok!!!");
 //                }
 //            }
@@ -209,8 +209,8 @@ Rectangle {
                 }}
 
                 buttonsModel: ListModel{
-                    ListElement{Id: Enums.ButtonType.Yes; Name:qsTr("Yes"); Enabled: true}
-                    ListElement{Id: Enums.ButtonType.No; Name:qsTr("No"); Enabled: true}
+                    ListElement{Id: Enums.yes; Name:qsTr("Yes"); Enabled: true}
+                    ListElement{Id: Enums.no; Name:qsTr("No"); Enabled: true}
                 }
 
 
@@ -218,10 +218,10 @@ Rectangle {
                 radius: 2;
 
                 onFinished: {
-                    if(buttonId == Enums.ButtonType.Ok || buttonId == Enums.ButtonType.Yes){
+                    if(buttonId == Enums.ok || buttonId == Enums.yes){
                         console.log("Dialog Finished::Yes");
                     }
-                    else if(buttonId == Enums.ButtonType.Cancel || buttonId == Enums.ButtonType.No){
+                    else if(buttonId == Enums.cancel || buttonId == Enums.no){
                         console.log("Dialog Finished::No");
                     }
                 }
@@ -336,16 +336,16 @@ Rectangle {
                 }}
 
 //                buttonsModel: ListModel{
-//                    ListElement{Id: Enums.ButtonType.Ok; Name:qsTr("Ok"); Enabled: true}
-//                    ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Cancel"); Enabled: true}
+//                    ListElement{Id: Enums.ok; Name:qsTr("Ok"); Enabled: true}
+//                    ListElement{Id: Enums.cancel; Name:qsTr("Cancel"); Enabled: true}
 //                }
 
                 backgroundColor: "white";
                 radius: 2;
 
                 Component.onCompleted: {
-                    buttonsModel.append({Id: Enums.ButtonType.Ok, Name:qsTr("Ok"), Enabled: true})
-                    buttonsModel.append({Id: Enums.ButtonType.Cancel, Name:qsTr("Cancel"), Enabled: true})
+                    buttonsModel.append({Id: Enums.ok, Name:qsTr("Ok"), Enabled: true})
+                    buttonsModel.append({Id: Enums.cancel, Name:qsTr("Cancel"), Enabled: true})
                 }
             }
         }//inputDialogComp
@@ -364,10 +364,10 @@ Rectangle {
         radius: 2;
 
         onFinished: {
-            if(buttonId == Enums.ButtonType.Cancel || buttonId == Enums.ButtonType.No){
+            if(buttonId == Enums.cancel || buttonId == Enums.no){
                 console.log("Cancel!!!");
             }
-            else if(buttonId == Enums.ButtonType.Ok || buttonId == Enums.ButtonType.Yes){
+            else if(buttonId == Enums.ok || buttonId == Enums.yes){
                 console.log("Ok!!!");
             }
         }
@@ -409,12 +409,12 @@ Rectangle {
     ListModel{
         id: buttonsModelTest;
 
-        ListElement{Id: Enums.ButtonType.Yes; Name:qsTr("Yes"); Enabled: true}
-        ListElement{Id: Enums.ButtonType.No; Name:qsTr("No"); Enabled: true}
+        ListElement{Id: Enums.yes; Name:qsTr("Yes"); Enabled: true}
+        ListElement{Id: Enums.no; Name:qsTr("No"); Enabled: true}
         //                        ListElement{Id: Enums.ButtonType.Save; Name:qsTr("Save"); Enabled: true}
-        //                        ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Cancel"); Enabled: true}
+        //                        ListElement{Id: Enums.cancel; Name:qsTr("Cancel"); Enabled: true}
         //                        ListElement{Id: Enums.ButtonType.Close; Name:qsTr("Close"); Enabled: true}
-        //                        ListElement{Id: Enums.ButtonType.Apply; Name:qsTr("Apply"); Enabled: true}
+        //                        ListElement{Id: Enums.apply; Name:qsTr("Apply"); Enabled: true}
     }
 
 }

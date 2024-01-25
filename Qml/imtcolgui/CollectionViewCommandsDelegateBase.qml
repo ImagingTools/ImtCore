@@ -73,16 +73,15 @@ Item {
         }
     }
 
-    // Для чего это?
-//    onTableDataChanged: {
-//        if (containerBase.tableData){
-//            if (containerBase.tableData.rightButtonMouseClicked){
-//                containerBase.tableData.rightButtonMouseClicked.connect(openPopupMenu);
-//            }
-//            console.log('DEBUG::::onTableDataChanged', containerBase.tableData, containerBase.tableData.selectionChanged)
-//            containerBase.tableData.selectionChanged.connect(containerBase.selectionChanged);
-//        }
-//    }
+    onTableDataChanged: {
+        if (containerBase.tableData){
+            if (containerBase.tableData.rightButtonMouseClicked){
+                containerBase.tableData.rightButtonMouseClicked.connect(openPopupMenu);
+            }
+            console.log('DEBUG::::onTableDataChanged', containerBase.tableData, containerBase.tableData.selectionChanged)
+            containerBase.tableData.selectionChanged.connect(containerBase.selectionChanged);
+        }
+    }
 
     Component.onDestruction: {
         Events.unSubscribeEvent(containerBase.commandId + "CommandActivated", containerBase.commandHandle);
@@ -253,7 +252,7 @@ Item {
             message: containerBase.removeMessage;
             title: containerBase.removeDialogTitle;
             onFinished: {
-                if (buttonId == Enums.ButtonType.Yes){
+                if (buttonId == Enums.yes){
                     let indexes = containerBase.tableData.getSelectedIndexes();
                     if (indexes.length > 0){
                         let index = indexes[0];
@@ -273,7 +272,7 @@ Item {
         InputDialog {
             title: qsTr("Rename document");
             onFinished: {
-                if (buttonId == Enums.ButtonType.Ok){
+                if (buttonId == Enums.ok){
                     renameQuery.rename(inputValue);
                 }
 
@@ -293,7 +292,7 @@ Item {
                     elements.SetData(containerBase.descriptionFieldId, inputValue, indexes[0]);
                 }
 
-                if (buttonId == Enums.ButtonType.Ok){
+                if (buttonId == Enums.ok){
                     setDescriptionQuery.setDescription(inputValue);
                 }
 

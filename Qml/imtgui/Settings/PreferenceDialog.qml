@@ -10,17 +10,17 @@ Dialog {
 
     title: qsTr("Preferences");
 
-    notClosingButtons: Enums.ButtonType.Apply;
+    notClosingButtons: Enums.apply;
 
 //    topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
 
-    buttonsModel: ListModel{
-        ListElement{Id: Enums.ButtonType.Apply; Name:qsTr("Apply"); Enabled: false}
-        ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Close"); Enabled: true}
-    }
-
     property TreeItemModel settingsModel: TreeItemModel {};
     property SettingsProvider settingsProvider: null;
+
+    Component.onCompleted: {
+        buttonsModel.append({Id: Enums.apply, Name:qsTr("Apply"), Enabled: false})
+        buttonsModel.append({Id: Enums.cancel, Name:qsTr("Close"), Enabled: true})
+    }
 
     onSettingsProviderChanged: {
         if (messageDialog.settingsProvider != null){
@@ -53,13 +53,13 @@ Dialog {
             messageDialog.contentItem.settingsModel = representatioModel
         }
 
-        messageDialog.buttons.setButtonState(Enums.ButtonType.Apply, false);
+        messageDialog.buttons.setButtonState(Enums.apply, false);
         messageDialog.buttonsModel.setProperty(1, "Name", qsTr("Close"));
     }
 
     onFinished: {
-        if (buttonId == Enums.ButtonType.Apply){
-            messageDialog.buttons.setButtonState(Enums.ButtonType.Apply, false);
+        if (buttonId == Enums.apply){
+            messageDialog.buttons.setButtonState(Enums.apply, false);
             messageDialog.buttonsModel.setProperty(1, "Name", qsTr("Close"));
         }
     }
@@ -71,7 +71,7 @@ Dialog {
             onModelChanged: {
                 console.log("onModelChanged");
 
-                messageDialog.buttons.setButtonState(Enums.ButtonType.Apply, true);
+                messageDialog.buttons.setButtonState(Enums.apply, true);
 
                 messageDialog.buttonsModel.setProperty(1, "Name", qsTr("Cancel"));
             }

@@ -26,7 +26,6 @@ Item {
     property alias loadPageByClick: thumbnailDecorator.loadPageByClick;
     property alias canRecoveryPassword: thumbnailDecorator.canRecoveryPassword;
 
-
     onWidthChanged: {
         Events.sendEvent("AppSizeChanged", {"Width": width, "Height": height})
     }
@@ -187,7 +186,7 @@ Item {
         }
 
         onError: {
-            Events.sendEvent("SendWarningError", qsTr("There is no connection to the subscription server. Check the Web Server Socket Url in the settings or contact your system administrator."));
+//            Events.sendEvent("SendWarningError", qsTr("Web Socket Error"));
             Events.sendEvent("SendCriticalError");
         }
     }

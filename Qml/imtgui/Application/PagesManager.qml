@@ -80,7 +80,6 @@ Item {
             id: pagesDeleg;
 
             anchors.fill: container;
-//            anchors.margins: Style.size_mainMargin !== undefined ? Style.size_mainMargin : 0;
 
             visible: container.activePageIndex === model.index;
 

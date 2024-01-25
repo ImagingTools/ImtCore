@@ -5,11 +5,6 @@ import imtcontrols 1.0
 Dialog {
     id: messageDialog;
 
-    buttonsModel: ListModel{
-        ListElement{Id: Enums.ButtonType.Yes; Name:qsTr("Yes"); Enabled: true}
-        ListElement{Id: Enums.ButtonType.No; Name:qsTr("No"); Enabled: true}
-    }
-
     title: qsTr("Message");
 
     property string message;
@@ -17,11 +12,16 @@ Dialog {
 
     canMove: true;
 
+    Component.onCompleted: {
+        buttonsModel.append({Id: Enums.yes, Name:qsTr("Yes"), Enabled: true})
+        buttonsModel.append({Id: Enums.no, Name:qsTr("No"), Enabled: true})
+    }
+
     Keys.onPressed: {
         console.log("MessageDialog onPressed", event.key);
 
         if (event.key == Qt.Key_Return){
-            messageDialog.finished(Enums.ButtonType.Yes);
+            messageDialog.finished(Enums.yes);
         }
     }
 

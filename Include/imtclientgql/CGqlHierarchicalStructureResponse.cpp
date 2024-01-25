@@ -54,45 +54,48 @@ void CGqlHierarchicalStructureResponse::OnReply(const imtgql::IGqlRequest& reque
 
 	if (data.contains(m_commandId)){
 		data = data.value(m_commandId).toObject();
+	}
 
-		if (m_commandId == "InsertNewNode"){
-			ProcessInsertNewNodeReply();
-		}
-		else if (m_commandId == "SetNodeName"){
-			ProcessSetNodeNameReply();
-		}
-		else if (m_commandId == "SetNodeDescription"){
-			ProcessSetNodeDescriptionReply();
-		}
-		else if (m_commandId == "SetNodeMetaInfo"){
-			ProcessSetNodeMetaInfoReply();
-		}
-		else if (m_commandId == "MoveNode"){
-			ProcessMoveNodeReply();
-		}
-		else if (m_commandId == "RemoveNode"){
-			ProcessRemoveNodeReply();
-		}
-		else if (m_commandId == "InsertNewLeaf"){
-			ProcessInsertNewLeafReply();
-		}
-		else if (m_commandId == "MoveLeaf"){
-			ProcessMoveLeafReply();
-		}
-		else if (m_commandId == "RemoveLeaf"){
-			ProcessRemoveLeafReply();
-		}
-		else if (m_commandId == "GetItemCount"){
-			ProcessGetItemCountReply();
-		}
-		else if (m_commandId == "GetItemIds"){
-			ProcessGetItemIdsReply();
-		}
-		else if (m_commandId == "GetItemInfos"){
-			ProcessGetItemInfosReply();
-		}
-		else if (m_commandId == "GetItemPath"){
-			ProcessGetItemPathReply();
+	if (data.contains("itemsCount")){
+		m_variant = data.value("itemsCount").toVariant();
+	}
+
+	if (data.contains("itemIds")){
+		QStringList itemIdsData = data.value("itemIds").toString().split(";");
+//		ElementInfo itemInfo;
+
+//		for (QString id: itemIdsData){
+//			itemInfo.isNode = false;
+//			itemInfo.id = id.toLatin1();
+//			// m_elementList.push_back(itemInfo);
+//		}
+		// m_isElementListPresent = true;
+	}
+
+	if (data.contains("objectData")){
+		m_variant = data.value("objectData").toVariant();
+		qDebug() << m_variant;
+	}
+
+	if (data.contains("renameNotification") || data.contains("setDescriptionNotification")){
+		m_variant = true;
+	}
+
+	QByteArrayList keys;
+	keys << "info";
+	keys << "metaInfo";
+	keys << "dataMetaInfo";
+	keys << "addedNotification";
+	keys << "removedNotification";
+	keys << "updatedNotification";
+	keys << "updatedCollectionNotification";
+	keys << "items";
+
+	for (QByteArray key: keys){
+		if (data.contains(key)){
+			m_variant = data;
+
+			break;
 		}
 	}
 }

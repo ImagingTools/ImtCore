@@ -49,6 +49,23 @@ StyleComponents {
 
     itemDelegateDecorator: itemDelegateDecoratorComp;
 
+    popupDecorator: popupDecoratorComp;
+    popupItemDelegateDecorator: popupItemDelegateDecoratorComp;
+
+    Component {
+        id: popupItemDelegateDecoratorComp;
+
+        PopupItemDelegateDecorator {
+        }
+    }
+
+    Component {
+        id: popupDecoratorComp;
+
+        PopupDecorator {
+        }
+    }
+
     Component {
         id: itemDelegateDecoratorComp;
 
@@ -327,23 +344,14 @@ StyleComponents {
             property var model;
             property int currentIndex: -1;
 
+            property alias textVisible: cbTitleTxt.visible;
+            property alias iconVisible: cbArrowIcon.visible;
 
             border.color: !baseElement ? "transparent" : baseElement.borderColor;
             border.width: 1;
 
             radius: !baseElement ? 0 : baseElement.radius;
             color: !baseElement ? "transparent" : baseElement.backgroundColor;
-
-            gradient: Gradient {
-                id: grad;
-                property bool isColor: !cbMainRect.baseElement ? false : cbMainRect.baseElement.isColor;
-
-                GradientStop { position: 0.0; color: grad.isColor ? cbMainRect.color : Style.imagingToolsGradient1; }
-                GradientStop { position: 0.97; color: grad.isColor ? cbMainRect.color : Style.imagingToolsGradient2; }
-                GradientStop { position: 0.98; color: grad.isColor ? cbMainRect.color : Style.imagingToolsGradient3; }
-                GradientStop { position: 1.0; color: grad.isColor ? cbMainRect.color : Style.imagingToolsGradient4; }
-
-            }
 
             Text {
                 id: cbTitleTxt;
@@ -388,7 +396,7 @@ StyleComponents {
             id: checkBoxItem;
 
             width: checkBoxText.text == "" ? checkRect.width : checkRect.width + checkBoxText.width + checkBoxItem.mainMargin;
-            height: 15;
+            height: 17;
 
             property var baseElement: null;
 
@@ -1175,13 +1183,13 @@ StyleComponents {
                 baseElement.buttons = buttonsDialog;
             }
 
-//            onBodySourceChanged: {
-//                loaderBodyDialog.source = dialogContainer.bodySource;
-//            }
+            //            onBodySourceChanged: {
+            //                loaderBodyDialog.source = dialogContainer.bodySource;
+            //            }
 
-//            onTopPanelSourceChanged: {
-//                loaderTopPanel.source = dialogContainer.topPanelSource;
-//            }
+            //            onTopPanelSourceChanged: {
+            //                loaderTopPanel.source = dialogContainer.topPanelSource;
+            //            }
 
             onBaseElementFocusChanged: {
                 console.log("Dialog onFocusChanged", dialogContainer.baseElementFocus);
@@ -1312,8 +1320,8 @@ StyleComponents {
 
                     sourceComponent: dialogContainer.baseElement ? dialogContainer.baseElement.contentComp : undefined;
                     onLoaded: {
-                        loaderBodyDialog.width = loaderBodyDialog.item.width;
-                        loaderBodyDialog.height = loaderBodyDialog.item.height;
+                        //                        loaderBodyDialog.width = loaderBodyDialog.item.width;
+                        //                        loaderBodyDialog.height = loaderBodyDialog.item.height;
                         if(loaderBodyDialog.item.rootItem !== undefined){
                             loaderBodyDialog.item.rootItem = dialogContainer.baseElement;
                         }

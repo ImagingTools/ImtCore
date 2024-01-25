@@ -2,6 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 import imtdocgui 1.0
+import imtguigql 1.0
 import imtcontrols 1.0
 
 SingleDocumentWorkspaceView {
@@ -11,10 +12,16 @@ SingleDocumentWorkspaceView {
 
     property string commandId;
 
+    property Decorators decorators: decorators_
+    property alias modalDialogManager: modalDialogManager_
+
     signal commandsModelChanged(var commandsModel);
 
     Component.onCompleted: {
-        startPageObj = {"Id": "Administration",
+        Style.setDecorators(decorators)
+
+        startPageObj = {
+            "Id": "Administration",
             "Name": "Administration",
             "Source": "../imtauthgui/AdministrationView.qml",
             "CommandId": "Administration"};
@@ -35,26 +42,27 @@ SingleDocumentWorkspaceView {
         }
     }
 
+    Decorators {
+        id: decorators_
+    }
+
+    DecoratorsQt {
+        id: decoratorsQt;
+    }
+
     UserTokenProvider {
         id: userTokenProvider;
     }
 
     ModalDialogManager {
-        id: modalDialogManager;
-        z: 30;
+        id: modalDialogManager_;
+        z: 99;
         anchors.fill: parent;
     }
 
     SubscriptionManager {
         id: subscriptionManager;
     }
-
-    function login(login, password){
-        console.log("login", login, password);
-        userTokenProvider.authorization(login, password);
-    }
-
-    function logout(){}
 
     function onCommandsModelUpdated(parameters){
         console.log("onCommandsModelUpdated");

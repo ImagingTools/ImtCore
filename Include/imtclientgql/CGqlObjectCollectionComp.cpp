@@ -277,15 +277,15 @@ imtbase::IObjectCollection* CGqlObjectCollectionComp::CreateSubCollection(
 								DeSerializeObject(&operationContext, operationContextData);
 							}
 
-							subcollection->InsertNewObject(
-								typeId,
-								name,
-								description,
-								nullptr,
-								objectId,
-								dataMetainfoPtr.GetPtr(),
-								&metainfo,
-								&operationContext);
+							retVal->InsertNewObject(
+										typeId,
+										name,
+										description,
+										nullptr,
+										objectId,
+										dataMetainfoPtr.GetPtr(),
+										&metainfo,
+										&operationContext);
 
 							dataMetainfoPtr.SetPtr(nullptr);
 						}
@@ -296,7 +296,6 @@ imtbase::IObjectCollection* CGqlObjectCollectionComp::CreateSubCollection(
 				}
 			}
 		}
-
 
 		return nullptr;
 	}

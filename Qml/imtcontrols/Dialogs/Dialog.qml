@@ -82,11 +82,11 @@ ControlBase {
 
     onAccepted: {
         //console.log("Dialog::accepted()");
-        finished(Enums.ButtonType.Ok)
+        finished(Enums.ok)
     }
     onCanceled: {
         //console.log("Dialog::canceled()");
-        finished(Enums.ButtonType.Cancel)
+        finished(Enums.cancel)
     }
 
     onDecoratorVisibleChanged: {
@@ -142,7 +142,7 @@ ControlBase {
         enabled: true;
         onActivated: {
             //dialogContainer.finished("Cancel")
-            dialogContainer.finished(Enums.ButtonType.Cancel)
+            dialogContainer.finished(Enums.cancel)
         }
     }
 }

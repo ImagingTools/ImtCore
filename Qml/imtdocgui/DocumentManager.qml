@@ -334,14 +334,14 @@ Item {
 
         if (documentData.isDirty && !force){
             let callback = function(result){
-                if (result == Enums.ButtonType.Yes){
+                if (result == Enums.yes){
                     internal.m_closingDocuments.push(documentData.uuid);
-                    saveDocument(documentData.uuid);
+                    documentManager.saveDocument(documentData.uuid);
                 }
-                else if (result == Enums.ButtonType.No){
+                else if (result == Enums.no){
                     documentData.isDirty = false;
 
-                    closeDocumentByIndex(documentIndex);
+                    documentManager.closeDocumentByIndex(documentIndex);
                 }
 
                 modalDialogManager.finished.disconnect(callback);
@@ -437,14 +437,12 @@ Item {
 
             message: qsTr("Save all changes ?")
 
-            buttonsModel: ListModel{
-                ListElement{Id: Enums.ButtonType.Yes; Name:qsTr("Yes"); Enabled: true}
-                ListElement{Id: Enums.ButtonType.No; Name:qsTr("No"); Enabled: true}
-                ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Cancel"); Enabled: true}
+            Component.onCompleted: {
+                buttonsModel.append({Id: Enums.cancel, Name:qsTr("Cancel"), Enabled: true})
             }
 
             onFinished: {
-                if (buttonId === Enums.ButtonType.Yes){
+                if (buttonId === Enums.yes){
                 }
             }
         }

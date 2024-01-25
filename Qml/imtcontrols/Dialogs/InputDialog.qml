@@ -5,23 +5,23 @@ import imtcontrols 1.0
 Dialog {
     id: inputDialogContainer;
 
-    buttonsModel: ListModel{
-        ListElement{Id: Enums.ButtonType.Ok; Name:qsTr("OK"); Enabled: true}
-        ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Cancel"); Enabled: true}
-    }
-
     property string message;
     property string inputValue;
     property int contentWidth: 300;
 
+    Component.onCompleted: {
+        buttonsModel.append({Id: Enums.ok, Name:qsTr("OK"), Enabled: true})
+        buttonsModel.append({Id: Enums.cancel, Name:qsTr("Cancel"), Enabled: true})
+    }
+
     Keys.onPressed: {
         if (event.key == Qt.Key_Enter){
-            inputDialogContainer.finished(Enums.ButtonType.Ok);
+            inputDialogContainer.finished(Enums.ok);
         }
     }
 
     onFinished: {
-        if (buttonId == Enums.ButtonType.Ok){
+        if (buttonId == Enums.ok){
             inputDialogContainer.inputValue = inputDialogContainer.bodyItem.inputValue;
         }
     }

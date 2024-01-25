@@ -8,27 +8,21 @@ Dialog {
 
     width: 500;
 
-    buttonsModel: ListModel{
-//        Component.onCompleted: {
-//            append({Id: Enums.ok, Name:qsTr("Ok"), Enabled: true})
-//            append({Id: Enums.ok, Name:qsTr("Ok"), Enabled: true})
-//        }
-
-        ListElement{Id: Enums.ButtonType.Ok; Name:qsTr("OK"); Enabled: false}
-        ListElement{Id: Enums.ButtonType.Cancel; Name:qsTr("Cancel"); Enabled: true}
-    }
-
     property string password: contentItem.password;
 
     property string userPasswordHash;
     property string login;
 
+    Component.onCompleted: {
+        buttonsModel.append({Id: Enums.ok, Name:qsTr("OK"), Enabled: false})
+        buttonsModel.append({Id: Enums.cancel, Name:qsTr("Cancel"), Enabled: true})
+    }
 
     Keys.onPressed: {
         if (event.key === Qt.Key_Return){
-            let enabled = rootDialog.buttons.getButtonState(Enums.ButtonType.Ok);
+            let enabled = rootDialog.buttons.getButtonState(Enums.ok);
             if (enabled){
-                rootDialog.finished(Enums.ButtonType.Ok)
+                rootDialog.finished(Enums.ok)
             }
         }
     }

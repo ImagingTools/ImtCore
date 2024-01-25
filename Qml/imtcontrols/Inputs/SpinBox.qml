@@ -33,7 +33,6 @@ ControlBase{
         property: "value";
         value: spinBox.value;
     }
-
 }
 
 

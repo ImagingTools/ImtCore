@@ -44,7 +44,7 @@ Item {
             login: userPanelDelegate.login;
 
             onFinished: {
-                if (buttonId == Enums.ButtonType.Ok){
+                if (buttonId == Enums.ok){
                     userPanelDelegate.cacheData.login = this.login;
                     userPanelDelegate.cacheData.password = this.password;
 

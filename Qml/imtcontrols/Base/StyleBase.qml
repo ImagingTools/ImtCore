@@ -316,6 +316,14 @@ StyleComponents {
         if (sourceDecorators.toolButtonDecorator){
             styleContainer.toolButtonDecorator = sourceDecorators.toolButtonDecorator
         }
+
+        if (sourceDecorators.popupDecorator){
+            styleContainer.popupDecorator = sourceDecorators.popupDecorator
+        }
+
+        if (sourceDecorators.popupItemDelegateDecorator){
+            styleContainer.popupItemDelegateDecorator = sourceDecorators.popupItemDelegateDecorator
+        }
     }
 
     property string menuButtonDecoratorPath: "MenuPanelButtonDecorator.qml";

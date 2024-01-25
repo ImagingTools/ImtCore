@@ -407,7 +407,7 @@ Item {
                     backgroundColor: "transparent";
 
                     fontColorTitle: "transparent";
-                    compTextCentered: true;
+//                    compTextCentered: true;
                     shownItemsCount: datePicker.shownItemsCountCombo;
                     moveToIndex : datePicker.todayYear - datePicker.startYear - datePicker.shownItemsCountCombo +1;
                     visibleScrollBar: false;
@@ -543,7 +543,7 @@ Item {
                     backgroundColor: "transparent";
 
                     fontColorTitle: "transparent";
-                    compTextCentered: true;
+//                    compTextCentered: true;
                     shownItemsCount: 12;
 
                     visibleScrollBar: false;
@@ -695,7 +695,7 @@ Item {
                     backgroundColor: "transparent";
 
                     fontColorTitle: "transparent";
-                    compTextCentered: true;
+//                    compTextCentered: true;
                     shownItemsCount: datePicker.shownItemsCountCombo;
 
                     visibleScrollBar: false;

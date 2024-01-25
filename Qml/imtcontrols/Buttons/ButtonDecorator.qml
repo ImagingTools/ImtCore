@@ -15,11 +15,23 @@ DecoratorBase {
     property alias radius: background.radius
     property alias border: background.border
 
+    property bool contentCentered: true;
+
     property string tooltipText: baseElement ? baseElement.tooltipText : "";
 
     signal mouseEntered(real mouseX, real mouseY);
     signal mouseExited(real mouseX, real mouseY);
     signal mousePositionChanged(real mouseX, real mouseY);
+
+    onContentCenteredChanged: {
+        if (contentCentered){
+            content.anchors.horizontalCenter = commonButtonDecorator.horizontalCenter;
+        }
+        else{
+            content.anchors.left = commonButtonDecorator.left;
+            content.anchors.leftMargin = Style.size_mainMargin;
+        }
+    }
 
     onBaseElementChanged: {
         if(baseElement){
@@ -27,7 +39,6 @@ DecoratorBase {
             baseElement.entered.connect(commonButtonDecorator.mouseEntered);
             baseElement.positionChanged.connect(commonButtonDecorator.mousePositionChanged);
         }
-
     }
 
     onMousePositionChanged: {
@@ -55,34 +66,37 @@ DecoratorBase {
         border.color: !commonButtonDecorator.baseElement ? "transtarent" : commonButtonDecorator.baseElement.focus ? Style.borderFocusColor : Style.borderColor
     }
 
-    Image {
-        id: iconObj
+    Row {
+        id: content;
 
+        anchors.horizontalCenter: commonButtonDecorator.horizontalCenter;
         anchors.verticalCenter: commonButtonDecorator.verticalCenter
-        anchors.left: commonButtonDecorator.left
-        anchors.leftMargin: textObj.text == "" ? commonButtonDecorator.width/2 - width/2 : Style.paddingSmall
 
-        width: source === "" ? 0 : Style.iconSizeSmall
-        height: width
+        height: Math.max(iconObj.height, textObj.height)
 
-        sourceSize.width: width
-        sourceSize.height: height
-        source: !commonButtonDecorator.baseElement ? "" : commonButtonDecorator.baseElement.iconSource
-    }
+        spacing: Style.size_mainMargin;
 
-    Text {
-        id: textObj
+        Image {
+            id: iconObj
 
-        anchors.verticalCenter: commonButtonDecorator.verticalCenter
-        anchors.left: !commonButtonDecorator.baseElement ? commonButtonDecorator.left : commonButtonDecorator.baseElement.iconSource === "" ? commonButtonDecorator.left : iconObj.right
-        anchors.leftMargin: !commonButtonDecorator.baseElement ? 0 : commonButtonDecorator.baseElement.iconSource === "" ? commonButtonDecorator.width/2 - width/2 : Style.paddingSmall
+            width: source == "" ? 0 : Style.iconSizeSmall
+            height: width
 
-        color: !commonButtonDecorator.baseElement ? "transtarent" : commonButtonDecorator.baseElement.enabled ? Style.textColor : Style.inactive_textColor
+            sourceSize.width: width
+            sourceSize.height: height
+            source: !commonButtonDecorator.baseElement ? "" : commonButtonDecorator.baseElement.iconSource
+        }
 
-        font.pixelSize: Style.fontSize_common
-        font.family: Style.fontFamily
+        Text {
+            id: textObj
 
-        text: !commonButtonDecorator.baseElement ? "" : commonButtonDecorator.baseElement.text
+            color: !commonButtonDecorator.baseElement ? "transtarent" : commonButtonDecorator.baseElement.enabled ? Style.textColor : Style.inactive_textColor
+
+            font.pixelSize: Style.fontSize_common
+            font.family: Style.fontFamily
+
+            text: !commonButtonDecorator.baseElement ? "" : commonButtonDecorator.baseElement.text
+        }
     }
 
     CustomTooltip{
@@ -91,10 +105,9 @@ DecoratorBase {
         text: commonButtonDecorator.tooltipText;
         fitToTextWidth: false;
         componentMinHeight: 30;
-//        timeout: 2000;
+
         fitToHCenter: true;
     }
-
 }
 
 

@@ -51,8 +51,6 @@ void CSocket::Abort()
 void CSocket::TimeOut()
 {
 	if (m_socket != nullptr){
-		qDebug() << m_socket->socketDescriptor() << " Time out";
-
 		if (m_socket->isTransactionStarted()){
 			m_socket->commitTransaction();
 		}
@@ -118,8 +116,6 @@ void CSocket::HandleReadyRead()
 
 void CSocket::Disconnected()
 {
-	qDebug() << m_socket->socketDescriptor() << " Disconnected";
-
 	Q_EMIT m_rootSocket->SocketDisconnected(m_rootSocket->GetRequestId());
 }
 

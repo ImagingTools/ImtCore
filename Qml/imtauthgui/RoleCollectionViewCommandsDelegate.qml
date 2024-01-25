@@ -38,7 +38,7 @@ CollectionViewCommandsDelegateBase {
             message: container.removeMessage;
             title: container.removeDialogTitle;
             onFinished: {
-                if (buttonId == Enums.ButtonType.Yes){
+                if (buttonId == Enums.yes){
                     let itemIds = container.collectionViewBase.getSelectedIds();
                     let itemNames = container.collectionViewBase.getSelectedNames();
 

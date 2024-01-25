@@ -21,6 +21,8 @@ ControlBase {
     property int focusPolicy: Qt.WheelFocus;
     property int focusReason: -1;
 
+    property alias mouseArea: ma;
+
     signal clicked();
     signal doubleClicked();
     signal pressed();

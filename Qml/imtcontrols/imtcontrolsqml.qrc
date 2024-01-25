@@ -15,6 +15,7 @@
         <file alias="imtcontrols/Base/jsonpath.js">Base/jsonpath.js</file>
         <file alias="MainWindow.qml">Base/MainWindow.qml</file>
         <file alias="WrapItem.qml">Base/WrapItem.qml</file>
+
         <file alias="imtcontrols/Actions/Action.qml">Actions/Action.qml</file>
         <file alias="imtcontrols/Actions/PopupMenuDelegate.qml">Actions/PopupMenuDelegate.qml</file>
         <file alias="imtcontrols/Actions/ShortcutManager.qml">Actions/ShortcutManager.qml</file>
@@ -34,6 +35,7 @@
         <file alias="imtcontrols/Buttons/BaseButton.qml">Buttons/BaseButton.qml</file>
         <file alias="imtcontrols/Buttons/BaseButtonDecorator.qml">Buttons/BaseButtonDecorator.qml</file>
         <file alias="imtcontrols/Buttons/CommonButtonDecorator.qml">Buttons/CommonButtonDecorator.qml</file>
+
         <file alias="imtcontrols/Dialogs/DialogButtons.qml">Dialogs/DialogButtons.qml</file>
         <file alias="imtcontrols/Dialogs/Dialog.qml">Dialogs/Dialog.qml</file>
         <file alias="imtcontrols/Dialogs/TopPanelDialog.qml">Dialogs/TopPanelDialog.qml</file>
@@ -45,6 +47,9 @@
         <file alias="imtcontrols/Dialogs/MessageDialogBody.qml">Dialogs/MessageDialogBody.qml</file>
         <file alias="imtcontrols/Dialogs/ModalDialogManager.qml">Dialogs/ModalDialogManager.qml</file>
         <file alias="imtcontrols/Dialogs/PopupMenuDialog.qml">Dialogs/PopupMenuDialog.qml</file>
+	<file alias="imtcontrols/Dialogs/PopupDecorator.qml">Dialogs/PopupDecorator.qml</file>
+	<file alias="imtcontrols/Dialogs/PopupItemDelegateDecorator.qml">Dialogs/PopupItemDelegateDecorator.qml</file>
+
         <file alias="imtcontrols/Inputs/CustomTextField.qml">Inputs/CustomTextField.qml</file>
         <file alias="imtcontrols/Inputs/Calendar.qml">Inputs/Calendar.qml</file>
         <file alias="imtcontrols/Inputs/ComboBox.qml">Inputs/ComboBox.qml</file>
@@ -64,6 +69,7 @@
         <file alias="imtcontrols/Inputs/TextArea.qml">Inputs/TextArea.qml</file>
         <file alias="imtcontrols/Inputs/SpinBox.qml">Inputs/SpinBox.qml</file>
         <file alias="imtcontrols/Inputs/SpinBoxComp.qml">Inputs/SpinBoxComp.qml</file>
+
         <file alias="imtcontrols/Models/ModelIndex.qml">Models/ModelIndex.qml</file>
         <file alias="imtcontrols/Models/UuidGenerator.qml">Models/UuidGenerator.qml</file>
         <file alias="imtcontrols/Models/ModelIndex.qml">Models/ModelIndex.qml</file>
@@ -74,6 +80,7 @@
         <file alias="imtcontrols/Models/TreeItemModelConverter.qml">Models/TreeItemModelConverter.qml</file>
         <file alias="imtcontrols/Models/TreeItemModelObserver.qml">Models/TreeItemModelObserver.qml</file>
         <file alias="imtcontrols/Models/UuidGenerator.qml">Models/UuidGenerator.qml</file>
+
         <file alias="imtcontrols/Views/AuxTable.qml">Views/AuxTable.qml</file>
         <file alias="imtcontrols/Views/BarChart.qml">Views/BarChart.qml</file>
         <file alias="imtcontrols/Views/BasicTableView.qml">Views/BasicTableView.qml</file>

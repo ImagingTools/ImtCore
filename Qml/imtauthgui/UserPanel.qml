@@ -102,18 +102,12 @@ Item {
             id: popupMenuDialog;
 
             onFinished: {
-                this.root.closeDialog();
-
                 if (commandId == "Logout"){
                     panelDelegate.logout();
                 }
                 else if (commandId == "ChangePassword"){
                     panelDelegate.changePassword();
                 }
-            }
-
-            function onBackgroundClicked(){
-                popupMenuDialog.root.closeDialog();
             }
         }
     }

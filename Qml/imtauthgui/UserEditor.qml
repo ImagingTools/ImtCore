@@ -21,8 +21,6 @@ Item {
     }
 
     function updateGui(){
-        console.log("UserEditor updateGui", userEditorContainer.documentModel.toJSON());
-
         if (userEditorContainer.documentModel.ContainsKey("Username")){
             usernameInput.text = userEditorContainer.documentModel.GetData("Username");
         }
@@ -53,8 +51,6 @@ Item {
     }
 
     function updateModel(){
-        console.log("UserEditor updateModel");
-
         userEditorContainer.documentModel.SetData("Username", usernameInput.text);
         userEditorContainer.documentModel.SetData("Name", nameInput.text);
         userEditorContainer.documentModel.SetData("Email", mailInput.text);
@@ -75,7 +71,6 @@ Item {
 
         color: Style.backgroundColor;
 
-        //
         Item{
             id: columnContainer;
 
@@ -103,7 +98,6 @@ Item {
                     id: titleUsername;
 
                     anchors.left: parent.left;
-//                    anchors.leftMargin: 5;
 
                     color: Style.textColor;
                     font.family: Style.fontFamily;
@@ -126,8 +120,6 @@ Item {
                             if (oldText && oldText !== usernameInput.text || !oldText && usernameInput.text !== ""){
                                 userEditorContainer.documentPtr.doUpdateModel();
                             }
-
-//                            userEditorContainer.documentPtr.doUpdateModel();
                         }
                     }
 
@@ -159,10 +151,9 @@ Item {
                     onEditingFinished: {
                         if (userEditorContainer.documentPtr){
                             let oldText = userEditorContainer.documentModel.GetData("Password");
-                            if (oldText && oldText !== usernameInput.text || !oldText && usernameInput.text !== ""){
+                            if (oldText && oldText !== passwordInput.text || !oldText && passwordInput.text !== ""){
                                 userEditorContainer.documentPtr.doUpdateModel();
                             }
-//                            userEditorContainer.documentPtr.doUpdateModel();
                         }
                     }
 
@@ -173,7 +164,6 @@ Item {
                     id: titleName;
 
                     anchors.left: parent.left;
-//                    anchors.leftMargin: 5;
 
                     color: Style.textColor;
                     font.family: Style.fontFamily;
@@ -194,10 +184,9 @@ Item {
                     onEditingFinished: {
                         if (userEditorContainer.documentPtr){
                             let oldText = userEditorContainer.documentModel.GetData("Name");
-                            if (oldText && oldText !== usernameInput.text || !oldText && usernameInput.text !== ""){
+                            if (oldText && oldText !== nameInput.text || !oldText && nameInput.text !== ""){
                                 userEditorContainer.documentPtr.doUpdateModel();
                             }
-//                            userEditorContainer.documentPtr.doUpdateModel();
                         }
                     }
 
@@ -208,7 +197,6 @@ Item {
                     id: titleMail;
 
                     anchors.left: parent.left;
-//                    anchors.leftMargin: 5;
 
                     color: Style.textColor;
                     font.family: Style.fontFamily;
@@ -243,6 +231,5 @@ Item {
                 }
             }//Column bodyColumn
         }//columnContainer
-        //
     }
 }//Container

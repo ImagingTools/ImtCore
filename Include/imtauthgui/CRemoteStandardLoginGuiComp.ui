@@ -69,7 +69,7 @@
       <item alignment="Qt::AlignHCenter|Qt::AlignVCenter">
        <widget class="QStackedWidget" name="StackedWidget">
         <property name="currentIndex">
-         <number>2</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="LoginPage">
          <layout class="QVBoxLayout" name="verticalLayout_6">

@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5137" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394753" Description="Qt Framework"/>
+            <Version Id="0" Number="5181" Description="ACF"/>
+            <Version Id="1" Number="2199" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Remote object/document collection that can be accessed by GraphQL protocol</Description>
@@ -28,15 +28,15 @@
                     <AttributeInfo Id="MetaInfoCreator" Type="Reference" ExportId="MetaInfoCreator">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="ObjectTypeIds" Type="Id[]" ExportId="ObjectTypeIds">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
         <Element Id="GraphQLObjectCollectionBase" PackageId="ImtClientVoce" ComponentId="GraphQLObjectCollectionBase">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="ApiClient" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="GraphQlApiClient"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>

@@ -288,7 +288,7 @@ Rectangle {
         id: preferenceDialogComp;
         PreferenceDialog {
             onFinished: {
-                if (buttonId == Enums.ButtonType.Apply){
+                if (buttonId == Enums.apply){
                     if (thumbnailDecoratorContainer.settingsObserver != null){
                         thumbnailDecoratorContainer.settingsObserver.observedModelDataChanged();
                     }

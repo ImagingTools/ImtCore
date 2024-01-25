@@ -56,14 +56,14 @@ Item {
         }
     }
 
-    FolderDialog {
-        id: fileDialog;
+//    FolderDialog {
+//        id: fileDialog;
 
-        onAccepted: {
-            var pathDir = fileDialog.folder.toString();
-            console.log("fileUrl", fileDialog.folder);
-            pathDir = pathDir.replace('file:///', '')
-            root.path = pathDir;
-        }
-    }
+//        onAccepted: {
+//            var pathDir = fileDialog.folder.toString();
+//            console.log("fileUrl", fileDialog.folder);
+//            pathDir = pathDir.replace('file:///', '')
+//            root.path = pathDir;
+//        }
+//    }
 }

@@ -22,10 +22,11 @@ bool CGuiQuickWrapComp::IsGuiCreated() const
 
 bool CGuiQuickWrapComp::CreateGui(QWidget *parentPtr)
 {
-		
 	if (m_quickCompPtr.IsValid()){
 		imtqml::IQuickObject *quickObjectPtr = m_quickCompPtr.GetPtr();
 		if (m_quickWidget == nullptr){
+			QQuickWindow::setGraphicsApi(QSGRendererInterface::OpenGL);
+
 			m_quickWidget = new QQuickWidget(parentPtr);
 			m_quickWidget->setContentsMargins(0, 0, 0, 0);
 			m_quickWidget->setSource(QUrl("qrc:/qml/WrapItem.qml"));

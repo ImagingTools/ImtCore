@@ -5,10 +5,6 @@ import imtcontrols 1.0
 Dialog {
     id: documentHistoryDialog;
 
-    buttonsModel: ListModel{
-        ListElement{Id: Enums.ButtonType.Ok; Name:qsTr("OK"); Enabled: true}
-    }
-
 //    width: 500;
 
     property string documentTypeId: "";
@@ -16,6 +12,10 @@ Dialog {
 
     function updateModel(){
         documentHistoryDialog.bodyItem.updateModel(documentTypeId, documentId);
+    }
+
+    Component.onCompleted: {
+        buttonsModel.append({Id: Enums.ok, Name:qsTr("OK"), Enabled: true})
     }
 
     contentComp: Component {

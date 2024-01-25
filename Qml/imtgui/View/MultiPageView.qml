@@ -1,5 +1,4 @@
 import QtQuick 2.12
-//import QtQuick.Controls
 import Acf 1.0
 import imtcontrols 1.0
 

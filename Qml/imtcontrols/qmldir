@@ -12,8 +12,8 @@ Decorators 1.0 ./Base/Decorators.qml
 DecoratorsQt 1.0 ./Base/DecoratorsQt.qml
 StyleBase 1.0 ./Base/StyleBase.qml
 StyleComponents 1.0 ./Base/StyleComponents.qml
-MainWindow 1.0 MainWindow.qml
-WrapItem 1.0 WrapItem.qml
+MainWindow 1.0 ./Base/MainWindow.qml
+WrapItem 1.0 ./Base/WrapItem.qml
 
 Action 1.0 ./Actions/Action.qml
 PopupMenuDelegate 1.0 ./Actions/PopupMenuDelegate.qml
@@ -35,6 +35,7 @@ ToolButton 1.0 ./Buttons/ToolButton.qml
 ToolButtonDecorator 1.0 ./Buttons/ToolButtonDecorator.qml
 TopButtonDecorator 1.0 ./Buttons/TopButtonDecorator.qml
 TopButtonDecoratorNew 1.0 ./Buttons/TopButtonDecoratorNew.qml
+
 DialogButtons 1.0 ./Dialogs/DialogButtons.qml
 Dialog 1.0 ./Dialogs/Dialog.qml
 TopPanelDialog 1.0 ./Dialogs/TopPanelDialog.qml
@@ -46,6 +47,9 @@ MessageDialog 1.0 ./Dialogs/MessageDialog.qml
 MessageDialogBody 1.0 ./Dialogs/MessageDialogBody.qml
 ModalDialogManager 1.0 ./Dialogs/ModalDialogManager.qml
 PopupMenuDialog 1.0 ./Dialogs/PopupMenuDialog.qml
+PopupDecorator 1.0 ./Dialogs/PopupDecorator.qml
+PopupItemDelegateDecorator 1.0 ./Dialogs/PopupItemDelegateDecorator.qml
+
 Calendar 1.0 ./Inputs/Calendar.qml
 ComboBox 1.0 ./Inputs/ComboBox.qml
 FilterableComboBox 1.0 ./Inputs/FilterableComboBox.qml

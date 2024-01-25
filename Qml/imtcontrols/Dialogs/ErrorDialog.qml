@@ -7,19 +7,19 @@ Dialog {
 
     width: 400;
 
-    buttonsModel: ListModel{
-        ListElement{Id: Enums.ButtonType.Ok; Name:qsTr("OK"); Enabled: true}
-    }
-
     title: qsTr("Error");
 
     topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
 
     property string message;
 
+    Component.onCompleted: {
+        buttonsModel.append({Id: Enums.ok, Name:qsTr("OK"), Enabled: true})
+    }
+
     Keys.onPressed: {
         if (event.key == Qt.Key_Enter){
-            messageDialog.finished(Enums.ButtonType.Ok);
+            messageDialog.finished(Enums.ok);
         }
     }
 

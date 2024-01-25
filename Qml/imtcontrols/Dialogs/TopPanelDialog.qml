@@ -66,7 +66,7 @@ Rectangle {
 
         onClicked: {
             console.log("closeButtonClicked");
-            topPanelDialogContainer.closeButtonClicked(Enums.ButtonType.Cancel);
+            topPanelDialogContainer.closeButtonClicked(Enums.cancel);
         }
 
         decorator: Component {
