@@ -14,11 +14,16 @@ QtObject {
     property var additionInputParams: ({})
 
     signal commandModeChanged(string commandId, bool newMode);
+    signal commandsModelDataChanged(string commandId, bool newMode);
 
     Component.onDestruction: {
         if (commandsModel){
             commandsModel.Clear();
         }
+    }
+
+    onCommandModeChanged: {
+        Events.sendEvent("CommandsEnabledChanged", {"Model": commandsModel, "CommandId": uuid});
     }
 
     function updateModel(){

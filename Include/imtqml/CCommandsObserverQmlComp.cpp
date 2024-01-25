@@ -1,6 +1,10 @@
 #include <imtqml/CCommandsObserverQmlComp.h>
 
 
+
+#include <iqtgui/TMakeIconProviderCompWrap.h>
+
+
 namespace imtqml
 {
 
@@ -103,7 +107,7 @@ void CCommandsObserverQmlComp::OnCommandsModelChanged(QVariant value)
 		if (commandsModelPtr->ContainsKey("Icon", i)){
 			QByteArray iconPath = commandsModelPtr->GetData("Icon", i).toByteArray();
 
-			commandPtr->setIcon(QIcon(":/Icons/" + iconPath));
+			commandPtr->setIcon(QIcon(GetIconPath(":/" + iconPath)));
 		}
 
 		connect(commandPtr, SIGNAL(triggered()), SLOT(OnTriggered()), Qt::QueuedConnection);

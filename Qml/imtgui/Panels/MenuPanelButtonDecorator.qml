@@ -1,10 +1,11 @@
 import QtQuick 2.12
 import Acf 1.0
+import imtcontrols 1.0
 
-Item {
+DecoratorBase {
     id: leftPanelElement;
 
-    width: 90;
+    width: 100;
     height: 80;
 
     property string title: "";
@@ -15,60 +16,73 @@ Item {
     signal clicked();
 
     property bool highlighted;
-    property bool selected: false;
+    property bool selected: !leftPanelElement.baseElement ? false : leftPanelElement.baseElement.selected;
     property string text;
 
-    Image {
-        id: image;
+    onWidthChanged: {
+        if(leftPanelElement.baseElement){
+            leftPanelElement.baseElement.contentWidth = width;
+        }
+    }
 
-        anchors.horizontalCenter: parent.horizontalCenter;
-        anchors.top: parent.top;
-        anchors.topMargin: 5;
-
-        width: 60;
-        height: 45;
-
-        fillMode: Image.PreserveAspectFit;
-
-        source: parent.imageSource;
-        sourceSize.height: height;
-        sourceSize.width: width;
+    onHeightChanged: {
+        if(leftPanelElement.baseElement){
+            leftPanelElement.baseElement.contentHeight = height;
+        }
     }
 
     Rectangle {
-        anchors.top: parent.top;
-        anchors.bottom: parent.bottom;
-        anchors.left: parent.left;
+        anchors.top: leftPanelElement.top;
+        anchors.bottom: leftPanelElement.bottom;
+        anchors.left: leftPanelElement.left;
 
         width: 5;
 
         color: Style.iconColorOnSelected;
-        visible: parent.selected;
+        visible: leftPanelElement.selected;
     }
 
-    Item {
-        anchors.bottom: parent.bottom;
-        anchors.horizontalCenter: parent.horizontalCenter;
+    Item{
+        id: body;
 
-        width: parent.width - 12;
-        height: description.height;
+        height: image.height + description.height + description.anchors.topMargin;
+        anchors.verticalCenter: leftPanelElement.verticalCenter;
+        anchors.left: leftPanelElement.left;
+        anchors.right: leftPanelElement.right;
+
+        Image {
+            id: image;
+
+            anchors.horizontalCenter: body.horizontalCenter;
+            anchors.top: body.top;
+
+            width: 60;
+            height: 45;
+
+            fillMode: Image.PreserveAspectFit;
+
+            source: !leftPanelElement.baseElement ? "" : leftPanelElement.baseElement.iconSource;
+            sourceSize.height: height;
+            sourceSize.width: width;
+        }
 
         Text {
             id: description;
 
-            anchors.verticalCenter: parent.verticalCenter;
-            anchors.horizontalCenter: parent.horizontalCenter;
-            width: parent.width;
-            wrapMode: Text.WordWrap;
-            horizontalAlignment: Text.AlignHCenter;
+            anchors.top: image.bottom;
+            anchors.topMargin: 10;
+            anchors.horizontalCenter: body.horizontalCenter;
 
-            elide: Text.ElideRight;
+            width: body.width;
 
             color: leftPanelElement.selected ? Style.iconColorOnSelected: Style.textColor;
-            font.pixelSize: Style.fontSize_small;
-            font.family: Style.fontFamily;
 
-            text: leftPanelElement.title;
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_small;
+
+            text: !leftPanelElement.baseElement ? "" : leftPanelElement.baseElement.text;
+            wrapMode: Text.WordWrap;
+            horizontalAlignment: Text.AlignHCenter;
         }
     }
 }

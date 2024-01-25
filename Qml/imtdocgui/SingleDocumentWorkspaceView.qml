@@ -18,7 +18,6 @@ DocumentManager {
     }
 
     onStartPageObjChanged: {
-        console.log("onStartPageObjChanged", startPageObj["Source"]);
         documentLoader.source = startPageObj["Source"];
 
         if (!documentLoader.item){
@@ -49,7 +48,7 @@ DocumentManager {
     }
 
     function checkState(state){
-        if (state === "Loading"){
+        if (state == "Loading"){
             Events.sendEvent("StartLoading");
         }
         else{
@@ -70,8 +69,6 @@ DocumentManager {
     }
 
     function setAlertPanel(alertPanelComp){
-        console.log("DocumentManager setAlertPanel", alertPanelComp);
-
         alertPanel.sourceComponent = alertPanelComp;
     }
 
@@ -83,15 +80,12 @@ DocumentManager {
         visible: stackView.countPage == 0;
 
         onLoaded: {
-            console.log("Document onLoaded");
-
             if (item.documentManagerPtr !== undefined){
                 item.documentManagerPtr = documentManager;
             }
         }
 
         onStatusChanged: {
-            console.log("Document onStatusChanged", documentLoader.status);
             if (status === Loader.Error){
                 console.error("Document loading was failed", documentLoader.source);
             }
@@ -121,8 +115,6 @@ DocumentManager {
         anchors.right: parent.right;
 
         onItemAdded: {
-            console.log("Document onItemAdded", item);
-
             let documentObj = documentManager.documentsModel.get(index);
 
             if (item.uuid !== undefined){

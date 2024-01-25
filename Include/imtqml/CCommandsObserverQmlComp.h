@@ -4,9 +4,10 @@
 // ACF includes
 #include <ibase/ICommandsProvider.h>
 #include <ilog/TLoggerCompWrap.h>
-#include <iqtgui/CHierarchicalCommand.h>
 #include <imod/IModel.h>
 #include <imod/TSingleModelObserverBase.h>
+#include <iqtgui/TMakeIconProviderCompWrap.h>
+#include <iqtgui/CHierarchicalCommand.h>
 
 // ImtCore includes
 #include <imtbase/CTreeItemModel.h>
@@ -19,7 +20,7 @@ namespace imtqml
 
 class CCommandsObserverQmlComp:
 			public QObject,
-			public ilog::CLoggerComponentBase,
+			public iqtgui::TMakeIconProviderCompWrap<ilog::CLoggerComponentBase>,
 			public ibase::ICommandsProvider,
 			public iser::ISerializable,
 			protected imod::TSingleModelObserverBase<iprm::IEnableableParam>

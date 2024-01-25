@@ -145,7 +145,6 @@ Rectangle {
             iconSource: (highlighted || selected) ? "../../../" + Style.getIconPath(model["Icon"], "On", "Selected"):
                                                      "../../../" + Style.getIconPath(model["Icon"], "On", "Normal");
 
-            decoratorSource : Style.menuButtonDecoratorPath;
             selected: menuPanel.activePageIndex === model.index;
             property string pageId: model["Id"];
 

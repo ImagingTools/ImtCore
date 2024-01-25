@@ -36,7 +36,6 @@ SingleDocumentWorkspaceView {
     }
 
     onVisibleChanged: {
-        console.log("AdministrationUI onVisibleChanged", visible);
         if (visible){
             container.updateModels();
         }
@@ -64,8 +63,27 @@ SingleDocumentWorkspaceView {
         id: subscriptionManager;
     }
 
+    Loading {
+        id: loading;
+
+        z: 10000;
+
+        anchors.fill: parent;
+
+        visible: false;
+
+        Component.onCompleted: {
+            Events.subscribeEvent("StartLoading", loading.start);
+            Events.subscribeEvent("StopLoading", loading.stop);
+        }
+
+        Component.onDestruction: {
+            Events.unSubscribeEvent("StartLoading", loading.start);
+            Events.unSubscribeEvent("StopLoading", loading.stop);
+        }
+    }
+
     function onCommandsModelUpdated(parameters){
-        console.log("onCommandsModelUpdated");
         let model = parameters["Model"];
 
         let commandsId = parameters["CommandId"];
@@ -75,7 +93,6 @@ SingleDocumentWorkspaceView {
     }
 
     function onCommandsEnabledChanged(parameters){
-        console.log("onCommandsEnabledChanged");
         container.onCommandsModelUpdated(parameters);
     }
 
@@ -85,7 +102,6 @@ SingleDocumentWorkspaceView {
     }
 
     function updateModels(){
-        console.log("updateModels");
         Events.sendEvent(container.commandId + "_CommandUpdateModel");
     }
 

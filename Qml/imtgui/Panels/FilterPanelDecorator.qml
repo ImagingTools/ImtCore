@@ -52,7 +52,7 @@ Item {
             interval: 300;
 
             onTriggered: {
-                filterPanelDecorator.rootLoader.textChanged(model.index, tfc.text);
+                filterPanelDecorator.rootLoader.textChanged(-1, tfc.text);
             }
         }
 

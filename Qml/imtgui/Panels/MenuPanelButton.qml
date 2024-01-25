@@ -48,14 +48,6 @@ ControlBase {
         }
     }
 
-    // MenuPanelButtonDecorator {
-    //     id: menuPanelButtonDecorator
-    //     imageSource: container.imageSource
-    //     highlighted: container.highlighted
-    //     selected: container.selected
-    //     title: container.text
-    // }
-
     Rectangle {
         id: mainRect;
 
@@ -65,7 +57,6 @@ ControlBase {
         height: container.contentHeight;
 
         color: "transparent";
-
 
         MouseArea{
             id: ma;

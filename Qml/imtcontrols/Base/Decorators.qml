@@ -9,7 +9,7 @@ import imtgui 1.0
 
 StyleComponents {
     property string styleId: "StyleAcf"
-    // menuPanelButtonDecorator: menuPanelButtonDecoratorComp
+     menuPanelButtonDecorator: menuPanelButtonDecoratorComp
     subMenuPanelButtonDecorator: subMenuPanelButtonDecoratorComp
     filterPanelDecorator: filterPanelDecoratorComp
     // bottomPanelDecorator: bottomPanelDecoratorComp

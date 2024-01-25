@@ -8,61 +8,28 @@ ComboBox {
 
     property string filter;
 
-    delegate: Component{
-        Item {
-            width: comboBoxContainer.width;
-            height: acceptable ? comboBoxContainer.itemHeight : 0;
+    delegate: PopupMenuDelegate {
+        width: comboBoxContainer.width;
+        height: acceptable ? comboBoxContainer.itemHeight : 0;
 
-            property string displayText: model[comboBoxContainer.nameId];
-            property string filter: comboBoxContainer.filter;
+        visible: height > 0;
 
-            visible: height > 0;
+        text: displayText;
 
-            property bool acceptable: displayText.toLowerCase().indexOf(filter.toLowerCase()) >= 0;
+        highlighted: comboBoxContainer.currentIndex == model.index
 
-            Rectangle{
-                id: background;
-                anchors.fill: parent;
+        property string displayText: model[comboBoxContainer.nameId];
+        property string filter: comboBoxContainer.filter;
 
-                color: comboBoxContainer.currentIndex == model.index ? Style.selectedColor : "transparent";
-            }
+        property bool acceptable: displayText.toLowerCase().indexOf(filter.toLowerCase()) >= 0;
 
-            Text {
-                id: mainText;
+        onEntered: {
+//            comboBoxContainer.selectedIndex = model.index;
+        }
 
-                anchors.left: parent.left;
-                anchors.leftMargin: 10;
-                anchors.right: parent.right;
-                anchors.rightMargin: 10;
-                anchors.verticalCenter: parent.verticalCenter;
-
-                color: Style.textColor;
-                font.pixelSize: Style.fontSize_common;
-                font.family: Style.fontFamily;
-
-                text: parent.displayText;
-
-                elide: Text.ElideRight;
-            }
-
-            MouseArea {
-                id: mouseArea;
-
-                anchors.fill: parent;
-
-                hoverEnabled: true;
-                cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
-
-                visible: !comboBoxContainer ? true : !comboBoxContainer.hoverBlocked;
-                onEntered: {
-                    if(comboBoxContainer && comboBoxContainer.selectedIndex !== undefined){
-                        comboBoxContainer.selectedIndex = model.index;
-                    }
-                }
-
-                onClicked: {
-                    comboBoxContainer.finished(model.Id, model.index)
-                }
+        onClicked: {
+            if (comboBoxContainer.popup){
+                comboBoxContainer.popup.finished(model.Id, model.index)
             }
         }
     }
@@ -77,21 +44,12 @@ ComboBox {
             width: comboBoxContainer.width;
             itemHeight: comboBoxContainer.itemHeight;
             hiddenBackground: comboBoxContainer.hiddenBackground;
-            textSize: comboBoxContainer.textSize;
-            fontColor: comboBoxContainer.fontColor;
             shownItemsCount: comboBoxContainer.shownItemsCount;
             moveToEnd: comboBoxContainer.moveToEnd;
             moveToIndex: comboBoxContainer.moveToIndex;
-            rootItem: comboBoxContainer;
             visibleScrollBar: comboBoxContainer.visibleScrollBar;
-            onFinished: {
-                comboBoxContainer.currentIndex = index;
-                comboBoxContainer.isOpen = false;
-                popup.root.closeDialog();
-            }
-            Component.onCompleted: {
-                comboBoxContainer.finished.connect(popup.finished);
 
+            Component.onCompleted: {
                 if(comboBoxContainer.decorator_){
                     comboBoxContainer.decorator_.textVisible = false;
                 }
@@ -103,56 +61,68 @@ ComboBox {
                 }
             }
 
-            topContentLoaderSourceComp: Component {
-                Item {
-                    id: contentItem;
+            decorator: PopupDecorator {
+                topContentLoaderSourceComp: Component {
+                    Item {
+                        id: contentItem;
 
-                    width: popup.width;
-                    height: 25;
+                        width: popup.width;
+                        height: 25;
 
-                    property bool filterEnabled: false;
-
-                    Component.onCompleted: {
-                        popup.finished.connect(function(){ textField.text = "";});
-                    }
-
-                    CustomTextField {
-                        id: textField;
-
-                        anchors.centerIn: parent;
-
-                        width: parent.width - 10;
-                        height: parent.height;
-
-                        color: "transparent";
-                        borderWidth: 0;
-
-                        text: comboBoxContainer.currentText;
+                        property bool filterEnabled: false;
 
                         Component.onCompleted: {
-                            forceActiveFocus();
+                            popup.finished.connect(function(){ textField.text = "";});
                         }
 
-                        onTextChanged: {
-                            if (!contentItem.filterEnabled){
-                                contentItem.filterEnabled = true;
+                        CustomTextField {
+                            id: textField;
 
-                                return;
+                            anchors.centerIn: parent;
+
+                            width: parent.width - 10;
+                            height: parent.height;
+
+                            color: "transparent";
+                            borderWidth: 0;
+
+                            text: comboBoxContainer.currentText;
+
+                            Component.onCompleted: {
+                                forceActiveFocus();
+                                focus = true;
                             }
 
-                            comboBoxContainer.filter = text;
+                            onTextChanged: {
+                                if (!contentItem.filterEnabled){
+                                    contentItem.filterEnabled = true;
+
+                                    return;
+                                }
+
+                                comboBoxContainer.filter = text;
+                            }
                         }
                     }
                 }
+            }
+
+            onFinished: {
+                comboBoxContainer.finished(commandId, index)
+            }
+
+            onStarted: {
+                comboBoxContainer.popup = popup;
             }
         }
     }
 
     function openPopupMenu(){
         comboBoxContainer.isOpen = true;
-        comboBoxContainer.dialogsCountPrev = modalDialogManager.count;
+//        comboBoxContainer.dialogsCountPrev = modalDialogManager.count;
         var point = comboBoxContainer.mapToItem(null, 0, comboBoxContainer.height);
-        modalDialogManager.openDialog(popupMenuComp, { "x":     point.x,
+        modalDialogManager.openDialog(popupMenuComp, {
+                                          "x":     point.x,
                                           "y":     point.y - (comboBoxContainer.height - 2),
                                           "model": comboBoxContainer.model,
                                           "width": comboBoxContainer.width});
