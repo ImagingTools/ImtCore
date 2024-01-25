@@ -133,9 +133,7 @@ const { QtPositioning } = require('../utils/QtPositioning')
 global.QtPositioning = QtPositioning
 
 const listControllers = require('../utils/controllers')
-for(let prop in listControllers){
-    global[prop] = new listControllers[prop]()
-}
+
 
 const { listComponents } = require('../components/list')
 for(let componentName of listComponents){
@@ -174,6 +172,10 @@ global.updateList = []
 global.SingletonClass = {}
 
 window.onload = ()=>{
+    for(let prop in listControllers){
+        global[prop] = new listControllers[prop]()
+    }
+    
     global.rootPath = document.body.dataset.root
     document.head.insertAdjacentHTML("beforeend", `
     <style>

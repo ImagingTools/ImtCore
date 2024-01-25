@@ -16,21 +16,28 @@ class Column extends Item {
 
     updateGeometry(){
         if(this.preventAutoUpdateGeometry) return
-        this.setStyle({
-            width: '0px',
-            minWidth: '0px',
-            height: '0px',
-            minHeight: '0px',
-        })
-        this.getProperty('width').setAuto(this.getDom().scrollWidth)
-        this.getProperty('height').setAuto(this.getDom().scrollHeight)
 
-        this.setStyle({
-            width: `${this.getProperty('width').value}px`,
-            minWidth: `${this.getProperty('width').value}px`,
-            height: `${this.getProperty('height').value}px`,
-            minHeight: `${this.getProperty('height').value}px`,
-        })
+        let children = this.getProperty('children').get()
+        let w = 0
+        let h = 0
+        for(let i = 0; i < children.length; i++){
+            w = Math.max(w, children[i].getPropertyValue('width'))
+            h += children[i].getPropertyValue('height')
+            if(i < children.length - 1 && children[i].getPropertyValue('width') > 0 && children[i].getPropertyValue('height') > 0){
+                h += this.getPropertyValue('spacing')
+                children[i].setStyle({
+                    marginBottom: `${this.getPropertyValue('spacing')}px`
+                })
+            } else {
+                children[i].setStyle({
+                    marginBottom: `0`
+                })
+            }
+            
+        }
+
+        this.getProperty('width').setAuto(w)
+        this.getProperty('height').setAuto(h)
     }
 
     addChild(child){
@@ -49,9 +56,6 @@ class Column extends Item {
     }
 
     $spacingChanged(){
-        this.setStyle({
-            gap: `${this.getPropertyValue('spacing')}px`
-        })
         this.updateGeometry()
     }
 }
