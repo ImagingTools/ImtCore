@@ -12,6 +12,7 @@ ItemDelegate {
 
     // Reference to the control in which the delegate is declared
     property Item containerItem: null;
+    property Item rootItem: null;
 
     onSelectedChanged: {
         console.log("ItemDelegate onSelectedChanged", selected);
