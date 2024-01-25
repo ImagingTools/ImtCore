@@ -5,7 +5,6 @@ import imtguigql 1.0
 StyleComponents {
     id: styleContainer;
 
-
     property bool isQtStyle: false;  // deprecated
     property string styleId: "StyleAcf"
     property int fontSizeExtraLarge: 64
