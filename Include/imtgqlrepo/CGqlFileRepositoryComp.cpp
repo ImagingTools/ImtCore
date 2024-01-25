@@ -475,7 +475,7 @@ bool CGqlFileRepositoryComp::SetupGqlItem(
 		}
 	}
 
-	CFileMetaInfo fileMetaInfo;
+	sdl::CFileMetaInfo fileMetaInfo;
 	fileMetaInfo.SetId(objectId);
 	fileMetaInfo.SetName(m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString());
 	fileMetaInfo.SetDescription(m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION).toString());
@@ -487,8 +487,14 @@ bool CGqlFileRepositoryComp::SetupGqlItem(
 	fileMetaInfo.SetChecksumValue(elementMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CONTENT_CHECKSUM).toString());
 	fileMetaInfo.SetVersion(elementMetaInfoPtr->GetMetaInfo(imtbase::IObjectCollection::MIT_REVISION).toString());
 
+
+
+//	bool result = AddToMeTreeModel(&model, index)
+	model.SetData(QByteArrayLiteral("Id"), fileMetaInfo.GetId(), itemIndex);
+
+
 #if SDL_TO_MODEL_ADD_IMPLEMEMNTED
-	fileMetaInfo.addToTreeModel(model, metaInfoIdList);
+	fileMetaInfo.AddToMeTreeModel(model, metaInfoIdList);
 #endif
 
 

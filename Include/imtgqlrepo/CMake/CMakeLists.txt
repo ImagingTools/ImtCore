@@ -11,6 +11,6 @@ target_link_libraries(${PROJECT_NAME} imtgql imtbase)
 GenerateSdl(
 	"${CMAKE_CURRENT_LIST_DIR}/../SDL/General.sdl.graphql"
 	"${AUX_INCLUDE_DIR}/${PROJECT_NAME}/SDL"
-	"${PROJECT_NAME}"
+	"${PROJECT_NAME}::sdl"
 )
 
