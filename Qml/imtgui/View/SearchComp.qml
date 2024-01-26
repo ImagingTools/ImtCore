@@ -303,16 +303,16 @@ Rectangle{
                     searchTextField.currentText = searchTextField.currentText.slice(0, searchTextField.currentText.length - 1);
                 }
 
-//                var textArraySize = searchContainer.arraySize(searchTextField.currentText);
-//                var parentIdsArraySize = searchContainer.arraySize(searchContainer.parentIds);
-//                searchTextField.excludeFilterPart = searchContainer.removeLastElement(searchTextField.currentText);
-//                if(textArraySize == parentIdsArraySize){
-//                    searchContainer.parentIds = searchContainer.removeLastElement(searchContainer.parentIds);
-//                }
-//                setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
-
-                searchTextField.excludeFilterPart = searchTextField.currentText;
+                var textArraySize = searchContainer.arraySize(searchTextField.currentText);
+                var parentIdsArraySize = searchContainer.arraySize(searchContainer.parentIds);
+                searchTextField.excludeFilterPart = searchContainer.removeLastElement(searchTextField.currentText);
+                if(textArraySize == parentIdsArraySize){
+                    searchContainer.parentIds = searchContainer.removeLastElement(searchContainer.parentIds);
+                }
                 setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
+
+//                searchTextField.excludeFilterPart = searchTextField.currentText;
+//                setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
 
                 //console.log("secondSearch:: ", "parentIds:: " ,searchContainer.parentIds)
             }
