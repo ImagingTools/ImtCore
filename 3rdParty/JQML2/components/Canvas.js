@@ -7,6 +7,8 @@ class Canvas extends Item {
     static Cooperative = 2
     static Image = 0
 
+    $cache = {}
+
     static defaultProperties = {
         available: { type: QBool, value: true },
         canvasSize: { type: QBool, value: true },
@@ -53,19 +55,27 @@ class Canvas extends Item {
         ctx.roundedRect = (...args)=>{ctx.roundRect(...args)}
         let originDrawImage = ctx.drawImage
         ctx.drawImage = (...args)=>{
+            
             if(typeof args[0] === 'string'){
-                let img = new OriginImage();
                 let path = rootPath+'/'+args[0].replaceAll('../','')
-                img.onload = ()=>{
-                    args[0] = img
+                if(this.$cache[path]){
+                    args[0] = this.$cache[path]
                     originDrawImage.call(ctx, ...args)
-                    img.remove()
-                }
-                img.onerror = ()=>{
-                    img.remove()
-                }
+                } else {
+                    let img = new OriginImage();
+                    img.onload = ()=>{
+                        args[0] = img
+                        originDrawImage.call(ctx, ...args)
+                        this.$cache[path] = img
+                        // img.remove()
+                    }
+                    img.onerror = ()=>{
+                        img.remove()
+                    }
 
-                img.src = path.replaceAll('//','/')
+                    img.src = path.replaceAll('//','/')
+                }
+                
             } else {
                 originDrawImage.call(ctx, ...args)
             }
@@ -102,6 +112,13 @@ class Canvas extends Item {
     }
     unloadImage(image){
 
+    }
+
+    $destroy(){
+        for(let key in this.$cache){
+            this.$cache[key].remove()
+        }
+        super.$destroy()
     }
 }
 

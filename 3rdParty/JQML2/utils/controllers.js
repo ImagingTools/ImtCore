@@ -112,18 +112,25 @@ class MouseController {
     }
 
     onDoubleClick(x, y, button){
-        let res = this.get(x, y)
-        let inner = res[0]
-        let outer = res[1]
-        let pressedInner = res[2]
-        let pressedOuter = res[3]
+        let inner = this.get(x, y)
 
-        this.stopPropogation(null)
-        this.viewMode = false
-        for(let obj of inner){
-            if(!this.stopPropogate) {
-                obj.onDoubleClick(x, y, button)
-            }  
+        for(let i = 0; i < inner.length; i++){
+            if(inner[i].$textinput && inner[i].onDoubleClick(x, y, button)){
+                break
+            }
+
+            if(inner[i].$mousearea){
+                if(inner[i].onDoubleClick(x, y, button)){
+                    for(let j = i+1; j < inner.length; j++){
+                        if(!inner[j].onDoubleClick(x, y, button)){
+                            break
+                        }
+                    }
+                } else {
+                   break
+                }
+            }
+
         }
     }
 

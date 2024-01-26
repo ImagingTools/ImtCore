@@ -175,6 +175,23 @@ class TextEdit extends Item {
         }
     }
 
+    onDoubleClick(x, y, button){
+        if(this.getPropertyValue('enabled')) {
+            let btn = 0
+            switch(button){
+                case 0: btn = Qt.LeftButton; break;
+                case 1: btn = Qt.MiddleButton; break;
+                case 2: btn = Qt.RightButton; break;
+            }	
+            if(Qt.LeftButton & btn) {
+                this.getProperty('focus').reset(true)
+                this.$input.focus()
+                return true
+            }
+            return false
+        }
+    }
+
     
     onMouseDown(x, y, button){
         if(this.getPropertyValue('enabled')) {
