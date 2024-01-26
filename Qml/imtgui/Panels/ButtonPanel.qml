@@ -64,6 +64,8 @@ Rectangle {
     property bool compl: false;
     property bool ready: false;
 
+    property real horizontalWidth : horizontalListView.contentWidth;
+
     Component {
         id: defaultDelegate;
 

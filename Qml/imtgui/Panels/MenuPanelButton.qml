@@ -11,7 +11,7 @@ ControlBase {
     decorator: Style.menuPanelButtonDecorator;
 
     property string text: "Test";
-    property string iconSource: !container.baseElement ? "" : container.baseElement.iconSource;
+    property string iconSource: "";//!container.baseElement ? "" : container.baseElement.iconSource;
     property string textColor: "#335777";//"#191970"
     property string fontName: "";
 

@@ -572,7 +572,7 @@ Rectangle{
 
             width: searchTextField.width;
             height: visible ? searchTextField.itemHeight : 0;
-            textSize: searchTextField.textSize;
+            //textSize: searchTextField.textSize;
             text: "";
             clip: true;
             rootItem: searchTextField;
