@@ -35,7 +35,9 @@ Rectangle {
 
             if (splitterContainer.isPressed){
                 let newX = splitterContainer.x + mouseX;
-                if(newX > splitterContainer.leftLimit && newX < splitterContainer.rightLimit){
+                if((newX > splitterContainer.x && newX < splitterContainer.rightLimit)||
+                        (newX < splitterContainer.x && newX > splitterContainer.leftLimit)){
+
                     splitterContainer.x += mouseX;
                 }
             }
