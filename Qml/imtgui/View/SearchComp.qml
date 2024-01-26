@@ -212,7 +212,7 @@ Rectangle{
             if(searchTextField.openST){
                 var popup = modalDialogManager.topItem;
 
-                if(!searchContainer.isTextIncrease){
+                if(!searchContainer.isTextIncrease){//NOT isTextIncrease
                     var arrCount_prev = searchContainer.arraySize(searchContainer.selectedText);
                     var arrCount = searchContainer.newArrayCount(searchContainer.selectedText, filterText);
                     //console.log("arrCount::: prev , curr ", arrCount_prev, arrCount);
@@ -255,7 +255,8 @@ Rectangle{
                         if(filterText[filterText.length -1] == ","){
                             let str = filterText.slice(0,-1);
                             var strArrCount = searchContainer.arraySize(str);
-                            var newAddress = searchContainer.keepNElements(popup.model.GetData(searchContainer.valueName),strArrCount)//;
+                            //var newAddress = searchContainer.keepNElements(popup.model.GetData(searchContainer.valueName),strArrCount)//;
+                            var newAddress = popup.model.GetData(searchContainer.valueName);
                              str = str.replace(/ +/g, '');
                              newAddress = newAddress.replace(/ +/g, '');
                             //console.log("ЗАПЯТАЯ " , "str: ", str, "newAddress: ", newAddress);
