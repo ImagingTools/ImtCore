@@ -222,6 +222,9 @@ Rectangle{
                         if(comaDeleted){
                             keepCount--;
                         }
+                        if(keepCount < 0){
+                            keepCount = 0;
+                        }
 
                         searchContainer.selectedText = filterText;
 
@@ -239,8 +242,7 @@ Rectangle{
                         var str = filterText.replace(popup.excludeFilterPart, "");
                         popup.modelFilterAlias.SetData("TextFilter", str);
 
-                        updatePause.stop();
-                        updatePause.start();
+                        updatePause.restart();
 
                     }
 
@@ -257,9 +259,9 @@ Rectangle{
                              str = str.replace(/ +/g, '');
                              newAddress = newAddress.replace(/ +/g, '');
                             //console.log("ЗАПЯТАЯ " , "str: ", str, "newAddress: ", newAddress);
-                            //if(str !== newAddress){
+                            if(str.toLowerCase() == newAddress.toLowerCase()){
                                 searchContainer.setCurrentTextAddressFunc(popup.model,0, ",");
-                            //}
+                            }
 
                         }
                     }
@@ -421,7 +423,7 @@ Rectangle{
         if(N >= arr.lenght){
             return str;
         }
-        if(N === 0){
+        if(N <= 0){
             return "";
         }
         while(arr.length > N){
