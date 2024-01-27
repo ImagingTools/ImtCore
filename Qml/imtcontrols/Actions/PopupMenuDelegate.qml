@@ -8,7 +8,7 @@ ItemDelegate {
     decorator: Style.popupItemDelegateDecorator;
 
     property bool selected: false;
-    property bool isSeparator: model.Id == "";
+    property bool isSeparator: String(model.Id) === "";
 
     // Reference to the control in which the delegate is declared
     property Item containerItem: null;
