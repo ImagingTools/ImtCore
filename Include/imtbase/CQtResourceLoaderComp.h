@@ -4,9 +4,6 @@
 // ACF includes
 #include <icomp/CComponentBase.h>
 
-// ImtCore includes
-#include <imtbase/TAggergatedObjectCollectionWrap.h>
-
 
 namespace imtbase
 {
