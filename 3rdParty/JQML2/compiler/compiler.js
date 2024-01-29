@@ -1199,7 +1199,12 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
                 } else {
                     treeCompile(compiledFile, property.val)
                     // code.push(`${currentInstructions.name}.createVariantProperty('${property.name}',${property.type},${property.val.name})`)
-                    code.push(`${currentInstructions.name}.${property.name} = ${property.val.name}`)
+                    if(property.command === 'create'){
+                        code.push(`${currentInstructions.name}.createVariantProperty('${property.name}',${property.type},${property.val.name})`)
+                    } else {
+                        code.push(`${currentInstructions.name}.${property.name} = ${property.val.name}`)
+                    }
+                    
 
                 }
                 
