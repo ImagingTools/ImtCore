@@ -318,7 +318,7 @@ Rectangle{
             }
             counter++;
         }
-        if(treeViewGql.selectedIndex >=0){
+        if(treeViewGql.selectedIndex >=0 && treeViewGql.selectedIndex > index){
             treeViewGql.selectedIndex += counter;
         }
         treeViewGql.setContentWidth();
@@ -371,7 +371,7 @@ Rectangle{
             }
             counter++;
         }
-        if(treeViewGql.selectedIndex >=0){
+        if(treeViewGql.selectedIndex >=0 && treeViewGql.selectedIndex > index){
             treeViewGql.selectedIndex -= counter;
         }
 

@@ -400,7 +400,7 @@ AuxTable{
             counter++;
         }
 
-        if(tableTreeView.selectedIndex >=0){
+        if(tableTreeView.selectedIndex >=0 && tableTreeView.selectedIndex > index){
             tableTreeView.selectedIndex -= counter;
         }
 
@@ -453,7 +453,7 @@ AuxTable{
             }
             counter++;
         }
-        if(tableTreeView.selectedIndex >=0){
+        if(tableTreeView.selectedIndex >=0 && tableTreeView.selectedIndex > index){
             tableTreeView.selectedIndex += counter;
         }
         tableTreeView.setContentWidth();
