@@ -55,6 +55,8 @@ Item {
 
     property bool hasPagination: true;
 
+    property string backgroundColor: Style.baseColor;
+
     signal selectedItem(string id, string name);
     signal selectedIndexChangedSignal(int index);
     signal elementsChanged();
@@ -114,7 +116,7 @@ Item {
         //        width: gridInternal.minWidth * gridInternal.columnCount < parent.width ? gridInternal.minWidth * gridInternal.columnCount : parent.width;
         //        anchors.bottom: parent.bottom;
 
-        color: Style.baseColor;
+        color: collectionViewBaseContainer.backgroundColor;
 
         radius: 10;
 
@@ -407,7 +409,7 @@ Item {
 
         pagesSize: 1;
 
-        visible: collectionViewBaseContainer.hasPagination;
+        visible: collectionViewBaseContainer.hasPagination && pagesSize > 1;
 
         onCurrentValueChanged: {
             console.log("Pagination onCurrentValueChanged", paginationObj.currentValue);

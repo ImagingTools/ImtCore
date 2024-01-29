@@ -40,6 +40,9 @@ Rectangle{
     property TreeItemModel filterIdsModel: TreeItemModel{};
     property TreeItemModel propertiesModel: TreeItemModel{};
 
+    property TreeItemModel returnModel: TreeItemModel{};
+    property bool canReturnModel: false;
+
     property string parentIds: "";
     property string excludeFilterPart: "";
     property string selectedText: "";
@@ -61,6 +64,7 @@ Rectangle{
 
     signal accepted(string retVal);
     signal searchPartialAddress(string addressStr);
+    signal returnModelSignal();
 
     Component.onCompleted: {
     }
@@ -160,6 +164,13 @@ Rectangle{
                 retV = searchContainer.externalSearchParam;
             }
             //console.log("searchContainer.externalSearchParam", searchContainer.externalSearchParam)
+
+            if(searchContainer.canReturnModel){
+                searchContainer.returnModel.Clear();
+                searchContainer.returnModel.CopyItemDataFromModel(0, modelll, index_);
+                searchContainer.returnModelSignal();
+            }
+
             searchContainer.accepted(retV);
 
             if(searchTextField.openST){
