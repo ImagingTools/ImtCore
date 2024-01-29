@@ -53,6 +53,7 @@ private:
 	bool EndClassFiles(const CSdlType& sdlType);
 	bool CloseFiles();
 	void AbortCurrentProcessing();
+	/// \todo add error handling for it
 	void AddFieldWriteToModelCode(QTextStream& stream, const CSdlField& field);
 	void AddFieldReadFromModelCode(QTextStream& stream, const CSdlField& field);
 
