@@ -254,5 +254,17 @@ QString CSdlTools::GetFromVariantConversionString(const CSdlField& sdlField)
 	return "";
 }
 
+QString CSdlTools::FromVariantMapAccessString(const CSdlField& sdlField)
+{
+	QString retVal = s_variantMapClassMemberName;
+	retVal += '[' ;
+	retVal += '"';
+	retVal += sdlField.GetId();
+	retVal += '"';
+	retVal += ']';
+
+	return retVal;
+}
+
 
 } // namespace imtsdl

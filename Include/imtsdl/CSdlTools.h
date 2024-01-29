@@ -30,6 +30,7 @@ public:
 	static bool IsTypeHasFundamentalTypes(const CSdlType& sdlType, QSet<QString>* foundTypesPtr =  nullptr);
 	static bool IsTypeHasNonFundamentalTypes(const CSdlType& sdlType, QSet<QString>* foundTypesPtr =  nullptr);
 	static QString GetFromVariantConversionString(const CSdlField& sdlField);
+	static QString FromVariantMapAccessString(const CSdlField& sdlField);
 };
 
 
