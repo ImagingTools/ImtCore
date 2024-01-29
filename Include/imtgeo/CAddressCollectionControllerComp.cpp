@@ -215,6 +215,8 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
                         QList<QByteArray> parentsList = addressElementInfoPtr->GetParentIds();
                         QByteArray addressParentId = parentsList.isEmpty() ? QByteArray() : parentsList.last();
                         QString parentsStr = QString();
+                        double lat = addressElementInfoPtr->GetLatitude();
+                        double lon = addressElementInfoPtr->GetLongitude();
                         for(int i = 0; i < parentsList.count(); i++){
                             parentsStr.append(QString(parentsList.at(i)));
                             if(i < parentsList.count() -1){
@@ -230,6 +232,8 @@ imtbase::CTreeItemModel* CAddressCollectionControllerComp::ListObjects(const imt
                         itemsModel->SetData("TypeId", typeAddressId, itemIndex);
                         itemsModel->SetData("ParentId", addressParentId, itemIndex);
                         itemsModel->SetData("ParentIds", parentsStr, itemIndex);
+                        itemsModel->SetData("Latitude", lat, itemIndex);
+                        itemsModel->SetData("Longitude", lon, itemIndex);
 
                     }
 
