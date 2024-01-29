@@ -7,6 +7,7 @@
 
 // ImtCore includes
 #include <imtcom/CRequestSender.h>
+#include <imtgql/CGqlResponse.h>
 
 
 namespace imtclientgql
@@ -23,35 +24,39 @@ CApiClientComp::CApiClientComp()
 
 // reimplemented (IGqlClient)
 
-bool CApiClientComp::SendRequest(const imtgql::IGqlRequest& request, imtgql::IGqlResponseHandler& responseHandler) const
+IGqlClient::GqlResponsePtr CApiClientComp::SendRequest(GqlRequestPtr requestPtr) const
 {
-	bool retVal = false;
+	if (requestPtr.isNull()){
+		return IGqlClient::GqlResponsePtr(nullptr);
+	}
+
+	GqlResponsePtr retVal;
 
 	if (m_protocolEngineCompPtr.IsValid()){
-		imtgql::IGqlRequest::RequestType requestType = request.GetRequestType();
+		imtgql::IGqlRequest::RequestType requestType = requestPtr->GetRequestType();
 		if ((requestType == imtgql::IGqlRequest::RT_QUERY) || (requestType == imtgql::IGqlRequest::RT_MUTATION)){
-			QNetworkRequest* networkRequestPtr = m_protocolEngineCompPtr->CreateNetworkRequest(request);
+			QNetworkRequest* networkRequestPtr = m_protocolEngineCompPtr->CreateNetworkRequest(*requestPtr);
 			if (networkRequestPtr != nullptr){
 				QByteArray uuid = QUuid::createUuid().toByteArray();
 
 				istd::IInformationProvider::InformationCategory category = istd::IInformationProvider::IC_INFO;
-				QString message = "Send request with ID " + uuid + "\n" + request.GetQuery();
+				QString message = "Send request with ID " + uuid + "\n" + requestPtr->GetQuery();
 
 				SendVerboseMessage(message, "API client");
 
 				imtcom::CRequestSender requestSender;
-				QNetworkReply* replyPtr = requestSender.DoSyncPost(*networkRequestPtr, request.GetQuery(), m_timeout);
+				QNetworkReply* replyPtr = requestSender.DoSyncPost(*networkRequestPtr, requestPtr->GetQuery(), m_timeout);
 
 				if (replyPtr != nullptr){
 					QNetworkReply::NetworkError error = replyPtr->error();
 					if (error == QNetworkReply::NoError){
 						QByteArray payload = replyPtr->readAll();
 
-						responseHandler.OnReply(request, payload);
+						imtgql::CGqlResponse* responsePtr(new imtgql::CGqlResponse(requestPtr));
+						responsePtr->SetResponseData(payload);
+						retVal.reset(responsePtr);
 
 						category = istd::IInformationProvider::IC_INFO;
-
-						retVal = true;
 					}
 					else{
 						category = istd::IInformationProvider::IC_ERROR;

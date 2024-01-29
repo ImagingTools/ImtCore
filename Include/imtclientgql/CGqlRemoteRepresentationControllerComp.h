@@ -19,6 +19,7 @@ public:
 		I_ASSIGN(m_productIdAttrPtr, "ProductId", "Product ID", true, "");
 	I_END_COMPONENT;
 
+
 protected:
 	// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
 	virtual imtbase::CTreeItemModel* CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;

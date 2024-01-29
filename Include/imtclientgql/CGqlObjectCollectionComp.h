@@ -17,7 +17,6 @@
 #include <imtclientgql/IGqlObjectCollectionDelegate.h>
 #include <imtclientgql/IGqlClient.h>
 #include <imtclientgql/IGqlSubscriptionClient.h>
-#include <imtclientgql/IGqlObjectCollectionResponse.h>
 
 
 namespace imtbase
@@ -121,14 +120,8 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 private:
-	IObjectCollection::DataPtr GetObject(const QByteArray& objectId, const QByteArray& typeId) const;
-	// bool GetElementType(const QByteArray& elementId, ElementType& valueOut) const;
-	bool GetObjectInfo(const QByteArray& objectId, imtclientgql::IGqlObjectCollectionResponse::ObjectInfo& valueOut) const;
-	// bool GetObjectInfo(const QByteArray& objectId, imtclientgql::IGqlStructureResponse::ObjectInfo& valueOut) const;
+	bool GetObjectInfo(const QByteArray& objectId, imtclientgql::IGqlObjectCollectionDelegate::ObjectInfo& valueOut) const;
 	bool GetObjectMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const;
-	bool GetObjectDataMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& valueOut) const;
-	bool SerializeObject(const istd::IPolymorphic* object, QByteArray& objectData) const;
-	bool DeSerializeObject(istd::IPolymorphic* object, const QByteArray& objectData) const;
 
 protected:
 	I_REF(IGqlObjectCollectionDelegate, m_delegateCompPtr);

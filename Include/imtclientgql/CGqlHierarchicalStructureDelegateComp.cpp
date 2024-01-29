@@ -15,13 +15,9 @@
 #include <iser/CMemoryReadArchive.h>
 
 // ImtCore includes
-#include <imtbase/IObjectCollection.h>
 #include <imtbase/ICollectionFilter.h>
 #include <imtgql/CGqlRequest.h>
-#include <imtclientgql/CGqlObjectCollectionResponse.h>
-#include <imtbase/CFilterCollectionProxy.h>
 #include <imtbase/COperationContext.h>
-#include <imtclientgql/CGqlHierarchicalStructureResponse.h>
 
 
 namespace imtclientgql
@@ -345,38 +341,101 @@ imtbase::IHierarchicalStructureIterator* CGqlHierarchicalStructureDelegateComp::
 }
 
 
-// reimplemented (IGqlResponseCreator)
-
-imtgql::IGqlResponse* CGqlHierarchicalStructureDelegateComp::CreateResponse(const imtgql::IGqlRequest& request) const
+bool CGqlHierarchicalStructureDelegateComp::IsValid(imtgql::IGqlResponse& reqponse) const
 {
-	const imtgql::CGqlRequest* requestPtr = dynamic_cast<const imtgql::CGqlRequest*>(&request);
-	if (requestPtr != nullptr){
-		QByteArray commandId = request.GetCommandId();
-
-		if (commandId == "InsertNewNode" ||
-			commandId == "SetNodeName" ||
-			commandId == "SetNodeDescription" ||
-			commandId == "SetNodeMetaInfo" ||
-			commandId == "MoveNode" ||
-			commandId == "RemoveNode" ||
-			commandId == "InsertNewLeaf" ||
-			commandId == "MoveLeaf" ||
-			commandId == "RemoveLeaf" ||
-			commandId == "GetItemCount" ||
-			commandId == "GetItemIds" ||
-			commandId == "GetItemInfos" ||
-			commandId == "GetItemPath"){
-
-			CGqlHierarchicalStructureResponse* responsePtr = new CGqlHierarchicalStructureResponse();
-			responsePtr->SetRequest(*requestPtr);
-
-			return responsePtr;
-		}
-	}
-
-	return nullptr;
+	return false;
 }
 
+
+bool CGqlHierarchicalStructureDelegateComp::GetNodeId(imtgql::IGqlResponse& reqponse, Id& out) const
+{
+	return false;
+}
+
+
+bool CGqlHierarchicalStructureDelegateComp::GetOperationResult(imtgql::IGqlResponse& reqponse, bool& out) const
+{
+	return false;
+}
+
+
+bool CGqlHierarchicalStructureDelegateComp::GetItemCount(imtgql::IGqlResponse& reqponse, bool out) const
+{
+	return false;
+}
+
+
+bool CGqlHierarchicalStructureDelegateComp::GetItemIds(imtgql::IGqlResponse& reqponse, Ids& out) const
+{
+	return false;
+}
+
+
+bool CGqlHierarchicalStructureDelegateComp::GetItemPath(imtgql::IGqlResponse& reqponse, Ids& out) const
+{
+	return false;
+}
+
+
+bool CGqlHierarchicalStructureDelegateComp::GetItemInfos(imtgql::IGqlResponse& reqponse, imtbase::IHierarchicalStructureInfo::ItemInfoList& out) const
+{
+	return false;
+}
+
+
+//m_data = replyData;
+//m_commandId = request.GetCommandId();
+//
+//m_json = QJsonDocument::fromJson(replyData);
+//
+//QJsonObject data = m_json.object().value("data").toObject();
+//
+//if (data.contains(m_commandId)){
+//	data = data.value(m_commandId).toObject();
+//}
+//
+//if (data.contains("itemsCount")){
+//	m_variant = data.value("itemsCount").toVariant();
+//}
+//
+//if (data.contains("itemIds")){
+//	QStringList itemIdsData = data.value("itemIds").toString().split(";");
+//	//		ElementInfo itemInfo;
+//
+//	//		for (QString id: itemIdsData){
+//	//			itemInfo.isNode = false;
+//	//			itemInfo.id = id.toLatin1();
+//	//			// m_elementList.push_back(itemInfo);
+//	//		}
+//			// m_isElementListPresent = true;
+//}
+//
+//if (data.contains("objectData")){
+//	m_variant = data.value("objectData").toVariant();
+//	qDebug() << m_variant;
+//}
+//
+//if (data.contains("renameNotification") || data.contains("setDescriptionNotification")){
+//	m_variant = true;
+//}
+//
+//QByteArrayList keys;
+//keys << "info";
+//keys << "metaInfo";
+//keys << "dataMetaInfo";
+//keys << "addedNotification";
+//keys << "removedNotification";
+//keys << "updatedNotification";
+//keys << "updatedCollectionNotification";
+//keys << "items";
+//
+//for (QByteArray key : keys){
+//	if (data.contains(key)){
+//		m_variant = data;
+//
+//		break;
+//	}
+//}
 
 } // namespace imtclientgql
 

@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtgql/IGqlResponseHandler.h>
+#include <imtgql/IGqlResponse.h>
 
 
 namespace imtclientgql
@@ -15,10 +15,13 @@ namespace imtclientgql
 class IGqlClient: virtual public istd::IPolymorphic
 {
 public:
+	typedef QSharedPointer<imtgql::IGqlRequest> GqlRequestPtr;
+	typedef QSharedPointer<imtgql::IGqlResponse> GqlResponsePtr;
+
 	/**
 		Send a request to the server.
 	*/
-	virtual bool SendRequest(const imtgql::IGqlRequest& request, imtgql::IGqlResponseHandler& responseHandler) const = 0;
+	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr) const = 0;
 };
 
 

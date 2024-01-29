@@ -7,12 +7,11 @@
 #include <QtCore/QJsonArray>
 
 // ACF includes
-#include <icomp/CComponentBase.h>
+#include <ilog/TLoggerCompWrap.h>
 
 // ImtCore includes
 #include <imtclientgql/IGqlClient.h>
-#include <imtclientgql/CGqlObjectCollectionDelegateCompBase.h>
-#include <imtbase/IMetaInfoCreator.h>
+#include <imtclientgql/IGqlObjectCollectionDelegate.h>
 
 
 namespace imtclientgql
@@ -20,48 +19,17 @@ namespace imtclientgql
 
 
 class CGqlObjectCollectionDelegateComp:
-			public CGqlObjectCollectionDelegateCompBase
+			public ilog::CLoggerComponentBase,
+			virtual public IGqlObjectCollectionDelegate
 {
 public:
-	typedef CGqlObjectCollectionDelegateCompBase BaseClass;
+	typedef ilog::CLoggerComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CGqlObjectCollectionDelegateComp);
 		I_REGISTER_INTERFACE(IGqlObjectCollectionDelegate);
+		I_ASSIGN(m_clientCompPtr, "ApiClient", "GraphQL API client", true, "ApiClient");
 		I_ASSIGN(m_collectionIdAttrPtr, "Id", "Collection-ID", false, "");
-		I_ASSIGN(m_metaInfoCreatorCompPtr, "MetaInfoCreator", "Meta-info creator", false, "MetaInfoCreator");
 	I_END_COMPONENT;
-
-	// reimplemented (IGqlObjectCollectionDelegate)
-	// virtual bool GetObjectInfo(const QByteArray& objectId, imtgql::IGqlStructuredCollectionResponse::ObjectInfo& outInfo) const override;
-	// virtual bool GetObjectMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& outInfo) const override;
-	// virtual bool GetObjectDataMetaInfo(const QByteArray& objectId, idoc::MetaInfoPtr& outInfo) const override;
-	// virtual QByteArray GetObjectTypeId(const QByteArray& objectId) const override;
-	// virtual QByteArray InsertObject(
-	// 			const QByteArray& typeId,
-	// 			const QString& name,
-	// 			const QString& description,
-	// 			const istd::IChangeable& object,
-	// 			const QByteArray& proposedObjectId = QByteArray(),
-	// 			const QByteArray& nodeId = QByteArray(),
-	// 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
-	// 			const idoc::IDocumentMetaInfo* elementMetaInfoPtr = nullptr,
-	// 			const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
-	// virtual bool GetObjectData(
-	// 			const QByteArray& objectId,
-	// 			const QByteArray& typeId,
-	// 			imtbase::IObjectCollection::DataPtr objectPtr) const override;
-	// virtual bool SetObjectData(
-	// 			const QByteArray& objectId,
-	// 			const QByteArray& typeId,
-	// 			const istd::IChangeable& object,
-	// 			const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
-	// 			const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
-	// 			const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
-	// virtual bool GetSubCollection(
-	// 			imtbase::IObjectCollection* subcollection,
-	// 			int offset = 0,
-	// 			int count = -1,
-	// 			const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 
 	virtual imtgql::IGqlRequest* CreateGetObjectInfoRequest(const QByteArray& objectId) const override;
 	virtual imtgql::IGqlRequest* CreateGetObjectMetaInfoRequest(const QByteArray& objectId) const override;
@@ -76,6 +44,16 @@ public:
 				const QByteArray& nodeId = QByteArray(),
 				const idoc::IDocumentMetaInfo* dataMetaInfoPtr = nullptr,
 				const idoc::IDocumentMetaInfo* collectionItemMetaInfoPtr = nullptr,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
+	virtual imtgql::IGqlRequest* CreateSetObjectNameRequest(
+				const QByteArray& objectId,
+				const QString& name,
+				int clientVersion = -1,
+				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
+	virtual imtgql::IGqlRequest* CreateSetObjectDescriptionRequest(
+				const QByteArray& objectId,
+				const QString& description,
+				int clientVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 	virtual imtgql::IGqlRequest* CreateGetObjectRequest(const QByteArray& objectId) const override;
 	virtual imtgql::IGqlRequest* CreateSetObjectRequest(
@@ -99,26 +77,31 @@ public:
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
-	virtual imtgql::IGqlRequest* CreateSetObjectNameRequest(
-				const QByteArray& objectId,
-				const QString& name,
-				int clientVersion = -1,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
-	virtual imtgql::IGqlRequest* CreateSetObjectDescriptionRequest(
-				const QByteArray& objectId,
-				const QString& description,
-				int clientVersion = -1,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const override;
 
-	virtual imtgql::IGqlResponse* CreateResponse(const imtgql::IGqlRequest& request) const override;
+	virtual bool IsValid(const imtgql::IGqlResponse& reqponse) const override;
+	virtual bool GetOperationResult(const imtgql::IGqlResponse& response, bool& out) const override;
+	virtual bool GetObjectId(const imtgql::IGqlResponse& response, Id& out) const override;
+	virtual bool GetObjectInfo(const imtgql::IGqlResponse& response, ObjectInfo& out) const override;
+	virtual bool GetObjectData(const imtgql::IGqlResponse& response, istd::IChangeable& out) const override;
+	virtual bool GetMetaInfo(const imtgql::IGqlResponse& response, idoc::IDocumentMetaInfo& out) const override;
+	virtual bool GetItemCount(const imtgql::IGqlResponse& response, int& out) const override;
+	virtual bool GetItemIds(const imtgql::IGqlResponse& response, Ids& out) const override;
 
 private:
+	struct ResponseData
+	{
+		QJsonObject data;
+		QJsonObject errors;
+		QByteArray commandId;
+	};
+
+	ResponseData GetResponseData(const imtgql::IGqlResponse& response) const;
 	bool SerializeObject(const istd::IPolymorphic* object, QByteArray& objectData) const;
 	bool DeSerializeObject(istd::IPolymorphic* object, const QByteArray& objectData) const;
-	I_REF(imtbase::IMetaInfoCreator, m_metaInfoCreatorCompPtr);
 
 private:
 	I_ATTR(QByteArray, m_collectionIdAttrPtr);
+	I_REF(IGqlClient, m_clientCompPtr);
 };
 
 

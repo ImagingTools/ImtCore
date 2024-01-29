@@ -16,7 +16,6 @@
 #include <imtrest/IRequestManager.h>
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
-#include <imtgql/IGqlResponseHandler.h>
 #include <imtgql/CGqlRequest.h>
 #include <imtclientgql/IGqlClient.h>
 #include <imtclientgql/IGqlSubscriptionManager.h>
@@ -63,7 +62,7 @@ public:
 	virtual QByteArray GetSupportedCommandId() const override;
 
 	// reimplemented (IGqlClient)
-	virtual bool SendRequest(const imtgql::IGqlRequest& request, imtgql::IGqlResponseHandler& responseHandler) const override;
+	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr) const override;
 
 protected:
 	virtual void ServiceManagerRegister(const imtgql::CGqlRequest& subscriptionRequest, QByteArray subscriptionId) const;

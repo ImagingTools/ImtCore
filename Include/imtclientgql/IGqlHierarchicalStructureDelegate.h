@@ -6,14 +6,15 @@
 
 // ImtCore includes
 #include <imtbase/IOperationContext.h>
-#include <imtclientgql/IGqlResponseCreator.h>
+#include <imtgql/IGqlRequest.h>
+#include <imtgql/IGqlResponse.h>
 
 
 namespace imtclientgql
 {
 
 
-class IGqlHierarchicalStructureDelegate: virtual public IGqlResponseCreator
+class IGqlHierarchicalStructureDelegate: virtual public istd::IPolymorphic
 {
 public:
 	typedef QByteArray Id;
@@ -75,6 +76,14 @@ public:
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
+
+	virtual bool IsValid(imtgql::IGqlResponse& reqponse) const = 0;
+	virtual bool GetNodeId(imtgql::IGqlResponse& reqponse, Id& out) const = 0;
+	virtual bool GetOperationResult(imtgql::IGqlResponse& reqponse, bool& out) const = 0;
+	virtual bool GetItemCount(imtgql::IGqlResponse& reqponse, bool out) const = 0;
+	virtual bool GetItemIds(imtgql::IGqlResponse& reqponse, Ids& out) const = 0;
+	virtual bool GetItemPath(imtgql::IGqlResponse& reqponse, Ids& out) const = 0;
+	virtual bool GetItemInfos(imtgql::IGqlResponse& reqponse, imtbase::IHierarchicalStructureInfo::ItemInfoList& out) const = 0;
 };
 
 

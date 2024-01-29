@@ -18,7 +18,6 @@
 #include <imtrest/ISender.h>
 #include <imtrest/IRequestManager.h>
 #include <imtgql/IGqlRequest.h>
-#include <imtgql/IGqlResponseHandler.h>
 #include <imtclientgql/IGqlClient.h>
 
 
@@ -57,7 +56,7 @@ public:
 	CWebSocketClientComp();
 
 	// reimplemented (imtclientgql::IGqlClient)
-	virtual bool SendRequest(const imtgql::IGqlRequest& request, imtgql::IGqlResponseHandler& responseHandler) const override;
+	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr) const override;
 
 	// reimplemented (imtrest::ISender)
 	virtual bool SendResponse(imtrest::ConstResponsePtr& response) const override;

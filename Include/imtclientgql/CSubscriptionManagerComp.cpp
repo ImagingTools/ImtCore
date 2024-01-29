@@ -14,7 +14,7 @@
 
 // ImtCore includes
 #include <imtrest/CWebSocketRequest.h>
-
+#include <imtgql/CGqlResponse.h>
 
 namespace imtclientgql
 {
@@ -228,7 +228,7 @@ QByteArray CSubscriptionManagerComp::GetSupportedCommandId() const
 
 // reimplemented (IGqlClient)
 
-bool CSubscriptionManagerComp::SendRequest(const imtgql::IGqlRequest& request, imtgql::IGqlResponseHandler& responseHandler) const
+IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::GqlRequestPtr requestPtr) const
 {
 	QString key = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
@@ -236,29 +236,33 @@ bool CSubscriptionManagerComp::SendRequest(const imtgql::IGqlRequest& request, i
 	dataObject["type"] = "query";
 	dataObject["id"] = key;
 	QJsonObject payloadObject;
-	payloadObject["data"] = QString(request.GetQuery());
+	payloadObject["data"] = QString(requestPtr->GetQuery());
 	dataObject["payload"] = payloadObject;
 	QByteArray queryData = QJsonDocument(dataObject).toJson(QJsonDocument::Compact);
 
-	imtrest::ConstRequestPtr requestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, ""));
+	imtrest::ConstRequestPtr constRequestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, ""));
 
 	NetworkOperation networkOperation(10000, this);
 
-	if (!SendRequestInternal(request, requestPtr)){
-		SendErrorMessage(0, QString("Request could not be sent: '%1'").arg(QString(request.GetCommandId())));
+	GqlResponsePtr retVal;
 
-		return false;
+	if (!SendRequestInternal(*requestPtr, constRequestPtr)){
+		SendErrorMessage(0, QString("Request could not be sent: '%1'").arg(QString(requestPtr->GetCommandId())));
+
+		return retVal;
 	}
 
 	while(true){
 		int resultCode = networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
 		if(resultCode == 1){
 			if(m_queryDataMap.contains(key)){
-				responseHandler.OnReply(request, m_queryDataMap.value(key));
+				imtgql::CGqlResponse* responsePtr = new imtgql::CGqlResponse(requestPtr);
+				responsePtr->SetResponseData(m_queryDataMap.value(key));
+				retVal.reset(responsePtr);
 
 				m_queryDataMap.remove(key);
 
-				return true;
+				return retVal;
 			}
 			continue;
 		}
@@ -267,7 +271,7 @@ bool CSubscriptionManagerComp::SendRequest(const imtgql::IGqlRequest& request, i
 		}
 	}
 
-	return false;
+	return retVal;
 }
 
 

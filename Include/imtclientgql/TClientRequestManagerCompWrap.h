@@ -27,18 +27,7 @@ protected:
 	virtual bool SendModelRequest(const imtgql::IGqlRequest& request, imtbase::CTreeItemModel& responseModel) const;
 
 private:
-	class Response: virtual public imtgql::IGqlResponseHandler
-	{
-	public:
-		Response();
-		virtual imtbase::CTreeItemModel* GetResult();
-
-		// reimplemented (imtclientgql::IGqlClient::ResponseHandler)
-		virtual void OnReply(const imtgql::IGqlRequest& request, const QByteArray& replyData) override;
-
-	private:
-		imtbase::CTreeItemModel* m_replyResultPtr;
-	};
+	imtbase::CTreeItemModel* CreateTreeItemModel(const imtgql::IGqlRequest& request, const QByteArray& data) const;
 
 protected:
 	I_REF(imtclientgql::IGqlClient, m_apiClientCompPtr);
@@ -52,47 +41,30 @@ bool TClientRequestManagerCompWrap<Base>::SendModelRequest(const imtgql::IGqlReq
 		return false;
 	}
 
-	Response responseHandler;
-	bool retVal = m_apiClientCompPtr->SendRequest(request, responseHandler);
-	if (retVal){
-		imtbase::CTreeItemModel* resultModelPtr = responseHandler.GetResult();
-		if (resultModelPtr == nullptr){
+	IGqlClient::GqlResponsePtr responsePtr;// = m_apiClientCompPtr->SendRequest(request);
+	if (!responsePtr.isNull()){
+		istd::TDelPtr<imtbase::CTreeItemModel> resultModelPtr = CreateTreeItemModel(request, responsePtr->GetResponseData());
+		if (!resultModelPtr.IsValid()){
 			return false;
 		}
 
-		return responseModel.Copy(resultModelPtr);
+		return responseModel.Copy(resultModelPtr.GetPtr());
 	}
 
 	return false;
 }
 
 
-// public methods of the embedded class Response
+// private methods
 
-template <class Base>
-TClientRequestManagerCompWrap<Base>::Response::Response()
-	:m_replyResultPtr(nullptr)
+template<class Base>
+imtbase::CTreeItemModel* TClientRequestManagerCompWrap<Base>::CreateTreeItemModel(const imtgql::IGqlRequest& request, const QByteArray& data) const
 {
-}
+	qDebug() << "OnReply" << data;
 
+	imtbase::CTreeItemModel* replyResultPtr = nullptr;
 
-template <class Base>
-imtbase::CTreeItemModel* TClientRequestManagerCompWrap<Base>::Response::GetResult()
-{
-	qDebug() << "GetResult";
-
-	return m_replyResultPtr;
-}
-
-
-// reimplemented (imtclientgql::IGqlClient::ResponseHandler)
-
-template <class Base>
-void TClientRequestManagerCompWrap<Base>::Response::OnReply(const imtgql::IGqlRequest& request, const QByteArray& replyData)
-{
-	qDebug() << "OnReply" << replyData;
-
-	QJsonDocument document = QJsonDocument::fromJson(replyData);
+	QJsonDocument document = QJsonDocument::fromJson(data);
 	if (document.isObject()){
 		QJsonObject dataObject = document.object();
 
@@ -107,9 +79,9 @@ void TClientRequestManagerCompWrap<Base>::Response::OnReply(const imtgql::IGqlRe
 					document.setObject(dataObject);
 					QByteArray parserData = document.toJson(QJsonDocument::Compact);
 
-					m_replyResultPtr = new imtbase::CTreeItemModel();
+					replyResultPtr = new imtbase::CTreeItemModel();
 
-					bool ok = m_replyResultPtr->CreateFromJson(parserData);
+					bool ok = replyResultPtr->CreateFromJson(parserData);
 					if (!ok){
 						qDebug() << QString("Error when try create model from json: %1").arg(qPrintable(parserData));
 					}
@@ -125,13 +97,15 @@ void TClientRequestManagerCompWrap<Base>::Response::OnReply(const imtgql::IGqlRe
 				dataObject.insert("data", bodyValue);
 				document.setObject(dataObject);
 				QByteArray parserData = document.toJson(QJsonDocument::Compact);
-				
-				m_replyResultPtr = new imtbase::CTreeItemModel();
 
-				m_replyResultPtr->CreateFromJson(parserData);
+				replyResultPtr = new imtbase::CTreeItemModel();
+
+				replyResultPtr->CreateFromJson(parserData);
 			}
 		}
 	}
+
+	return replyResultPtr;
 }
 
 

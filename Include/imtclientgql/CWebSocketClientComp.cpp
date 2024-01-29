@@ -10,6 +10,7 @@
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
+#include <imtgql/CGqlResponse.h>
 #include <imtbase/CTreeItemModel.h>
 #include <imtrest/CWebSocketRequest.h>
 #include <imtrest/CWebSocketSender.h>
@@ -63,7 +64,7 @@ const imtrest::ISender* CWebSocketClientComp::GetSender(const QByteArray& /*requ
 }
 
 
-bool CWebSocketClientComp::SendRequest(const imtgql::IGqlRequest& request, imtgql::IGqlResponseHandler& responseHandler) const
+IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(IGqlClient::GqlRequestPtr requestPtr) const
 {
 	QString key = QUuid::createUuid().toString(QUuid::WithoutBraces);
 
@@ -71,21 +72,26 @@ bool CWebSocketClientComp::SendRequest(const imtgql::IGqlRequest& request, imtgq
 	dataObject["type"] = "query";
 	dataObject["id"] = key;
 	QJsonObject payloadObject;
-	payloadObject["data"] = QString(request.GetQuery());
+	payloadObject["data"] = QString(requestPtr->GetQuery());
 	dataObject["payload"] = payloadObject;
 	QByteArray data = QJsonDocument(dataObject).toJson(QJsonDocument::Compact);
 
 	m_webSocket.sendTextMessage(data);
 	NetworkOperation networkOperation(10000, this);
 
+	GqlResponsePtr retVal;
+
 	while(1){
 		int resultCode = networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
 		if(resultCode == 1){
 			if(m_queryDataMap.contains(key)){
-				responseHandler.OnReply(request, m_queryDataMap.value(key));
+				imtgql::CGqlResponse* responsePtr = new imtgql::CGqlResponse(requestPtr);
+				responsePtr->SetResponseData(m_queryDataMap.value(key));
+				retVal.reset(responsePtr);
+
 				m_queryDataMap.remove(key);
 
-				return true;
+				return retVal;
 			}
 			continue;
 		}
@@ -94,7 +100,7 @@ bool CWebSocketClientComp::SendRequest(const imtgql::IGqlRequest& request, imtgq
 		}
 	}
 
-	return false;
+	return retVal;
 }
 
 

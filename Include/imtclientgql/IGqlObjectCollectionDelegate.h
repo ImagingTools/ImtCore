@@ -8,69 +8,43 @@
 #include <imtbase/TIStructuredCollectionInfo.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IOperationContext.h>
-#include <imtclientgql/IGqlResponseCreator.h>
+#include <imtgql/IGqlResponse.h>
 
 
 namespace imtclientgql
 {
 
 
-// class IGqlObjectCollectionStructureDelegate: virtual public IGqlResponseCreator
-// {
-// 	// GQL context business logic of the structure management.
-// 	virtual imtgql::IGqlRequest* CreateGetNodeInfoRequest(const QByteArray& nodeId) const = 0;
-// 	/**
-// 		Structure manipulations
-// 	*/
-// 	virtual imtgql::IGqlRequest* CreateInsertNodeRequest(
-// 		const QString& name,
-// 		const QString& description,
-// 		const QByteArray& proposedNodeId = QByteArray(),
-// 		const QByteArray& parentNodeId = QByteArray(),
-// 		const idoc::IDocumentMetaInfo* metaInfoPtr = nullptr,
-// 		const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-// 	virtual imtgql::IGqlRequest* CreateSetNodeNameRequest(
-// 		const QByteArray& nodeId,
-// 		const QString& name,
-// 		const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-// 	virtual imtgql::IGqlRequest* CreateSetNodeDescriptionRequest(
-// 		const QByteArray& nodeId,
-// 		const QString& description,
-// 		const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-// 	virtual imtgql::IGqlRequest* CreateSetNodeMetaInfoRequest(
-// 		const QByteArray& nodeId,
-// 		const idoc::IDocumentMetaInfo& metaInfo,
-// 		const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-// 	virtual imtgql::IGqlRequest* CreateMoveNodeRequest(
-// 		const QByteArray& nodeId,
-// 		const QByteArray& parentNodeId,
-// 		const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-// 	virtual imtgql::IGqlRequest* CreateRemoveNodeRequest(
-// 		const QByteArray& nodeId,
-// 		const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-
-// 	virtual imtgql::IGqlRequest* CreateAddObjectToNodeRequest(
-// 		const QByteArray& objectId,
-// 		const QByteArray& nodeId,
-// 		int clientVersion = -1,
-// 		const imtbase::IOperationContext* operationContextPtr = nullptr) = 0;
-// 	virtual imtgql::IGqlRequest* CreateMoveObjectToNodeRequest(
-// 		const QByteArray& objectId,
-// 		const QByteArray& nodeId,
-// 		const QByteArray& newNodeId,
-// 		int clientVersion = -1,
-// 		const imtbase::IOperationContext* operationContextPtr = nullptr) = 0;
-// 	virtual imtgql::IGqlRequest* CreateRemoveObjectFromNodeRequest(
-// 		const QByteArray& objectId,
-// 		const QByteArray& nodeId,
-// 		int clientVersion = -1,
-// 		const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-// };
-
-
-class IGqlObjectCollectionDelegate: virtual public IGqlResponseCreator
+class IGqlObjectCollectionDelegate: virtual public istd::IPolymorphic
 {
 public:
+	typedef QByteArray Id;
+	typedef QByteArrayList Ids;
+
+	struct ObjectInfo
+	{
+		ObjectInfo()
+			:version(-1)
+		{
+		}
+
+		QByteArray id;
+		QString name;
+		QString description;
+		QByteArray typeId;
+
+		QSharedPointer<idoc::IDocumentMetaInfo> dataMetaInfoPtr;
+
+		/**
+			The server assigns the version to the document to be used when updating the data.
+			When we want to change a document or information about it on the server,
+			this version must be passed in the request. The version is used to synchronize
+			simultaneous access to a document by multiple clients.
+		*/
+			int version;
+	};
+	typedef QList<ObjectInfo> ObjectInfoList;
+
 	virtual imtgql::IGqlRequest* CreateGetObjectInfoRequest(const QByteArray& objectId) const = 0;
 	virtual imtgql::IGqlRequest* CreateGetObjectMetaInfoRequest(const QByteArray& objectId) const = 0;
 	virtual imtgql::IGqlRequest* CreateGetObjectDataMetaInfoRequest(const QByteArray& objectId) const = 0;
@@ -95,11 +69,11 @@ public:
 				const QString& description,
 				int clientVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-	virtual imtgql::IGqlRequest* CreateSetObjectMetaInfoRequest(
-				const QByteArray& objectId,
-				const idoc::IDocumentMetaInfo& metaInfo,
-				int clientVersion = -1,
-				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
+	//virtual imtgql::IGqlRequest* CreateSetObjectMetaInfoRequest(
+	//			const QByteArray& objectId,
+	//			const idoc::IDocumentMetaInfo& metaInfo,
+	//			int clientVersion = -1,
+	//			const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
 	virtual imtgql::IGqlRequest* CreateGetObjectRequest(const QByteArray& objectId) const = 0;
 	virtual imtgql::IGqlRequest* CreateSetObjectRequest(
 				const QByteArray& objectId,
@@ -123,6 +97,15 @@ public:
 				int offset = 0,
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const = 0;
+
+	virtual bool IsValid(const imtgql::IGqlResponse& reqponse) const = 0;
+	virtual bool GetOperationResult(const imtgql::IGqlResponse& reqponse, bool& out) const = 0;
+	virtual bool GetObjectId(const imtgql::IGqlResponse& reqponse, Id& out) const = 0;
+	virtual bool GetObjectInfo(const imtgql::IGqlResponse& reqponse, ObjectInfo& out) const = 0;
+	virtual bool GetObjectData(const imtgql::IGqlResponse& reqponse, istd::IChangeable& out) const = 0;
+	virtual bool GetMetaInfo(const imtgql::IGqlResponse& reqponse, idoc::IDocumentMetaInfo& out) const = 0;
+	virtual bool GetItemCount(const imtgql::IGqlResponse& reqponse, int& out) const = 0;
+	virtual bool GetItemIds(const imtgql::IGqlResponse& reqponse, Ids& out) const = 0;
 };
 
 

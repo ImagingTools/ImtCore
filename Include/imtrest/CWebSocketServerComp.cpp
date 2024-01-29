@@ -111,7 +111,12 @@ void CWebSocketServerComp::HandleNewConnections()
 		connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CWebSocketServerComp::OnWebSocketTextMessage);
 		connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CWebSocketServerComp::OnWebSocketBinaryMessage);
 		connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);
+
+#if (QT_VERSION >= 0x060500)
 		connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccurred), this, &CWebSocketServerComp::OnError);
+#else
+		connect(webSocketPtr, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &CWebSocketServerComp::OnError);
+#endif
 	}
 }
 

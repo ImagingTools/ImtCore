@@ -28,21 +28,8 @@ protected:
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
-protected:
-	class Response: public ilog::CMessageContainer, virtual public imtgql::IGqlResponseHandler
-	{
-	public:
-		Response();
-		virtual imtbase::CTreeItemModel* GetResult();
-
-		// reimplemented (imtclientgql::IGqlClient::ResponseHandler)
-		virtual void OnReply(const imtgql::IGqlRequest& request, const QByteArray& replyData) override;
-
-		// virtual bool IsSuccessful() const override { return false; }
-
-	private:
-		imtbase::CTreeItemModel* m_replyResultPtr;
-	};
+private:
+	imtbase::CTreeItemModel* CreateTreeItemModelFromResponse(const imtgql::IGqlResponse& response);
 
 protected:
 	I_REF(imtclientgql::IGqlClient, m_apiClientCompPtr);

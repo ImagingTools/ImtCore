@@ -52,11 +52,11 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 		gqlRequestPtr->AddParam(inputGqlObject);
 	}
 
-	Response responseHandler;
-	bool retVal = m_apiClientCompPtr->SendRequest(*gqlRequestPtr.GetPtr(), responseHandler);
-	if (retVal){
-		return responseHandler.GetResult();
-	}
+	//Response responseHandler;
+	//bool retVal = m_apiClientCompPtr->SendRequest(*gqlRequestPtr.GetPtr(), responseHandler);
+	//if (retVal){
+	//	return responseHandler.GetResult();
+	//}
 
 	SendErrorMessage(0, QString("Failed to create a network request to a remote server"), "CGqlRemoteRepresentationControllerComp");
 	errorMessage = QObject::tr("Failed to create a network request to a remote server").toUtf8();

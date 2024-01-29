@@ -2,23 +2,23 @@
 
 
 // ACF includes
-#include <ilog/IMessageContainer.h>
+#include <istd/IChangeable.h>
 
 // ImtCore includes
-#include <imtgql/IGqlResponseHandler.h>
+#include <imtgql/IGqlRequest.h>
 
 
 namespace imtgql
 {
 
 
-class IGqlResponse:
-			virtual public IGqlResponseHandler,
-			virtual public ilog::IMessageContainer
+class IGqlResponse : virtual public istd::IChangeable
 {
 public:
-	virtual bool IsSuccessful() const = 0;
-	virtual QVariant GetResult() const = 0;
+	typedef QSharedPointer<IGqlRequest> GqlRequestPtr;
+
+	virtual GqlRequestPtr GetOriginalRequest() const = 0;
+	virtual QByteArray GetResponseData() const = 0;
 };
 
 

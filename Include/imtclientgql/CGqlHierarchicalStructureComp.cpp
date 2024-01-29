@@ -17,34 +17,28 @@ imtbase::IHierarchicalStructureInfo::Id CGqlHierarchicalStructureComp::InsertNew
 			const idoc::IDocumentMetaInfo* metaInfoPtr,
 			const imtbase::IOperationContext* operationContextPtr)
 {
-	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()){
-		istd::TDelPtr<imtgql::IGqlRequest> requestPtr(m_delegateCompPtr->CreateInsertNewNodeRequest(
-					name,
-					description,
-					proposedNodeId,
-					parentNodeId,
-					metaInfoPtr,
-					operationContextPtr));
-		if (requestPtr.IsValid()){
-			istd::TDelPtr<imtgql::IGqlResponse> responsePtr(m_delegateCompPtr->CreateResponse(*requestPtr));
-			Q_ASSERT(responsePtr.IsValid());
-			if (responsePtr.IsValid()){
-				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-					if (responsePtr->IsSuccessful()){
-						QVariant result = responsePtr->GetResult();
-						Q_ASSERT(result.isValid());
-						if (result.isValid()){
-							if (result.canConvert(QMetaType::QByteArray)){
-								return result.toByteArray();
-							}
-						}
-					}
-				}
-			}
+	Id retVal;
+
+	if (!m_clientCompPtr.IsValid() || !m_delegateCompPtr.IsValid()){
+		return retVal;
+	}
+
+	IGqlClient::GqlRequestPtr requestPtr(m_delegateCompPtr->CreateInsertNewNodeRequest(
+				name,
+				description,
+				proposedNodeId,
+				parentNodeId,
+				metaInfoPtr,
+				operationContextPtr));
+
+	if (!requestPtr.isNull()){
+		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			m_delegateCompPtr->GetNodeId(*responsePtr, retVal);
 		}
 	}
 
-	return Id();
+	return retVal;
 }
 
 
@@ -53,26 +47,21 @@ bool CGqlHierarchicalStructureComp::SetNodeName(
 			const QString& name,
 			const imtbase::IOperationContext* operationContextPtr)
 {
-	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()){
-		istd::TDelPtr<imtgql::IGqlRequest> requestPtr(m_delegateCompPtr->CreateSetNodeNameRequest(
-					nodeId,
-					name,
-					operationContextPtr));
-		if (requestPtr.IsValid()){
-			istd::TDelPtr<imtgql::IGqlResponse> responsePtr(m_delegateCompPtr->CreateResponse(*requestPtr));
-			Q_ASSERT(responsePtr.IsValid());
-			if (responsePtr.IsValid()){
-				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-					if (responsePtr->IsSuccessful()){
-						QVariant result = responsePtr->GetResult();
-						Q_ASSERT(result.isValid());
-						if (result.isValid()){
-							if (result.canConvert(QMetaType::Bool)){
-								return result.toBool();
-							}
-						}
-					}
-				}
+	if (!m_clientCompPtr.IsValid() || !m_delegateCompPtr.IsValid()){
+		return false;
+	}
+
+	IGqlClient::GqlRequestPtr requestPtr(m_delegateCompPtr->CreateSetNodeNameRequest(
+				nodeId,
+				name,
+				operationContextPtr));
+
+	if (!requestPtr.isNull()){
+		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			bool retVal = false;
+			if (m_delegateCompPtr->GetOperationResult(*responsePtr, retVal)){
+				return retVal;
 			}
 		}
 	}
@@ -86,26 +75,21 @@ bool CGqlHierarchicalStructureComp::SetNodeDescription(
 			const QString& description,
 			const imtbase::IOperationContext* operationContextPtr)
 {
-	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()){
-		istd::TDelPtr<imtgql::IGqlRequest> requestPtr(m_delegateCompPtr->CreateSetNodeDescriptionRequest(
-					nodeId,
-					description,
-					operationContextPtr));
-		if (requestPtr.IsValid()){
-			istd::TDelPtr<imtgql::IGqlResponse> responsePtr(m_delegateCompPtr->CreateResponse(*requestPtr));
-			Q_ASSERT(responsePtr.IsValid());
-			if (responsePtr.IsValid()){
-				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-					if (responsePtr->IsSuccessful()){
-						QVariant result = responsePtr->GetResult();
-						Q_ASSERT(result.isValid());
-						if (result.isValid()){
-							if (result.canConvert(QMetaType::Bool)){
-								return result.toBool();
-							}
-						}
-					}
-				}
+	if (!m_clientCompPtr.IsValid() || !m_delegateCompPtr.IsValid()){
+		return false;
+	}
+
+	IGqlClient::GqlRequestPtr requestPtr(m_delegateCompPtr->CreateSetNodeDescriptionRequest(
+				nodeId,
+				description,
+				operationContextPtr));
+
+	if (!requestPtr.isNull()){
+		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			bool retVal = false;
+			if (m_delegateCompPtr->GetOperationResult(*responsePtr, retVal)){
+				return retVal;
 			}
 		}
 	}
@@ -119,26 +103,21 @@ bool CGqlHierarchicalStructureComp::SetNodeMetaInfo(
 			const idoc::IDocumentMetaInfo& metaInfo,
 			const imtbase::IOperationContext* operationContextPtr)
 {
-	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()){
-		istd::TDelPtr<imtgql::IGqlRequest> requestPtr(m_delegateCompPtr->CreateSetNodeMetaInfoRequest(
-					nodeId,
-					metaInfo,
-					operationContextPtr));
-		if (requestPtr.IsValid()){
-			istd::TDelPtr<imtgql::IGqlResponse> responsePtr(m_delegateCompPtr->CreateResponse(*requestPtr));
-			Q_ASSERT(responsePtr.IsValid());
-			if (responsePtr.IsValid()){
-				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-					if (responsePtr->IsSuccessful()){
-						QVariant result = responsePtr->GetResult();
-						Q_ASSERT(result.isValid());
-						if (result.isValid()){
-							if (result.canConvert(QMetaType::Bool)){
-								return result.toBool();
-							}
-						}
-					}
-				}
+	if (!m_clientCompPtr.IsValid() || !m_delegateCompPtr.IsValid()){
+		return false;
+	}
+
+	IGqlClient::GqlRequestPtr requestPtr(m_delegateCompPtr->CreateSetNodeMetaInfoRequest(
+				nodeId,
+				metaInfo,
+				operationContextPtr));
+
+	if (!requestPtr.isNull()){
+		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			bool retVal = false;
+			if (m_delegateCompPtr->GetOperationResult(*responsePtr, retVal)){
+				return retVal;
 			}
 		}
 	}
@@ -146,31 +125,27 @@ bool CGqlHierarchicalStructureComp::SetNodeMetaInfo(
 	return false;
 }
 
+
 bool CGqlHierarchicalStructureComp::MoveNode(
 			const Id& nodeId,
 			const Id& parentNodeId,
 			const imtbase::IOperationContext* operationContextPtr)
 {
-	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()){
-		istd::TDelPtr<imtgql::IGqlRequest> requestPtr(m_delegateCompPtr->CreateMoveNodeRequest(
-					nodeId,
-					parentNodeId,
-					operationContextPtr));
-		if (requestPtr.IsValid()){
-			istd::TDelPtr<imtgql::IGqlResponse> responsePtr(m_delegateCompPtr->CreateResponse(*requestPtr));
-			Q_ASSERT(responsePtr.IsValid());
-			if (responsePtr.IsValid()){
-				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-					if (responsePtr->IsSuccessful()){
-						QVariant result = responsePtr->GetResult();
-						Q_ASSERT(result.isValid());
-						if (result.isValid()){
-							if (result.canConvert(QMetaType::Bool)){
-								return result.toBool();
-							}
-						}
-					}
-				}
+	if (!m_clientCompPtr.IsValid() || !m_delegateCompPtr.IsValid()){
+		return false;
+	}
+
+	IGqlClient::GqlRequestPtr requestPtr(m_delegateCompPtr->CreateMoveNodeRequest(
+				nodeId,
+				parentNodeId,
+				operationContextPtr));
+
+	if (!requestPtr.isNull()){
+		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			bool retVal = false;
+			if (m_delegateCompPtr->GetOperationResult(*responsePtr, retVal)){
+				return retVal;
 			}
 		}
 	}
@@ -183,25 +158,20 @@ bool CGqlHierarchicalStructureComp::RemoveNode(
 			const Id& nodeId,
 			const imtbase::IOperationContext* operationContextPtr)
 {
-	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()){
-		istd::TDelPtr<imtgql::IGqlRequest> requestPtr(m_delegateCompPtr->CreateRemoveNodeRequest(
-					nodeId,
-					operationContextPtr));
-		if (requestPtr.IsValid()){
-			istd::TDelPtr<imtgql::IGqlResponse> responsePtr(m_delegateCompPtr->CreateResponse(*requestPtr));
-			Q_ASSERT(responsePtr.IsValid());
-			if (responsePtr.IsValid()){
-				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-					if (responsePtr->IsSuccessful()){
-						QVariant result = responsePtr->GetResult();
-						Q_ASSERT(result.isValid());
-						if (result.isValid()){
-							if (result.canConvert(QMetaType::Bool)){
-								return result.toBool();
-							}
-						}
-					}
-				}
+	if (!m_clientCompPtr.IsValid() || !m_delegateCompPtr.IsValid()){
+		return false;
+	}
+
+	IGqlClient::GqlRequestPtr requestPtr(m_delegateCompPtr->CreateRemoveNodeRequest(
+				nodeId,
+				operationContextPtr));
+
+	if (!requestPtr.isNull()){
+		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			bool retVal = false;
+			if (m_delegateCompPtr->GetOperationResult(*responsePtr, retVal)){
+				return retVal;
 			}
 		}
 	}
@@ -216,27 +186,22 @@ bool CGqlHierarchicalStructureComp::InsertLeaf(
 			const QString& leafName,
 			const imtbase::IOperationContext* operationContextPtr)
 {
-	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()){
-		istd::TDelPtr<imtgql::IGqlRequest> requestPtr(m_delegateCompPtr->CreateInsertLeafRequest(
-					leafId,
-					nodeId,
-					leafName,
-					operationContextPtr));
-		if (requestPtr.IsValid()){
-			istd::TDelPtr<imtgql::IGqlResponse> responsePtr(m_delegateCompPtr->CreateResponse(*requestPtr));
-			Q_ASSERT(responsePtr.IsValid());
-			if (responsePtr.IsValid()){
-				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-					if (responsePtr->IsSuccessful()){
-						QVariant result = responsePtr->GetResult();
-						Q_ASSERT(result.isValid());
-						if (result.isValid()){
-							if (result.canConvert(QMetaType::Bool)){
-								return result.toBool();
-							}
-						}
-					}
-				}
+	if (!m_clientCompPtr.IsValid() || !m_delegateCompPtr.IsValid()){
+		return false;
+	}
+
+	IGqlClient::GqlRequestPtr requestPtr(m_delegateCompPtr->CreateInsertLeafRequest(
+				leafId,
+				nodeId,
+				leafName,
+				operationContextPtr));
+
+	if (!requestPtr.isNull()){
+		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			bool retVal = false;
+			if (m_delegateCompPtr->GetOperationResult(*responsePtr, retVal)){
+				return retVal;
 			}
 		}
 	}
@@ -251,27 +216,22 @@ bool CGqlHierarchicalStructureComp::MoveLeaf(
 			const Id& targetNodeId,
 			const imtbase::IOperationContext* operationContextPtr)
 {
-	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()){
-		istd::TDelPtr<imtgql::IGqlRequest> requestPtr(m_delegateCompPtr->CreateMoveLeafRequest(
-					leafId,
-					sourceNodeId,
-					targetNodeId,
-					operationContextPtr));
-		if (requestPtr.IsValid()){
-			istd::TDelPtr<imtgql::IGqlResponse> responsePtr(m_delegateCompPtr->CreateResponse(*requestPtr));
-			Q_ASSERT(responsePtr.IsValid());
-			if (responsePtr.IsValid()){
-				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-					if (responsePtr->IsSuccessful()){
-						QVariant result = responsePtr->GetResult();
-						Q_ASSERT(result.isValid());
-						if (result.isValid()){
-							if (result.canConvert(QMetaType::Bool)){
-								return result.toBool();
-							}
-						}
-					}
-				}
+	if (!m_clientCompPtr.IsValid() || !m_delegateCompPtr.IsValid()){
+		return false;
+	}
+
+	IGqlClient::GqlRequestPtr requestPtr(m_delegateCompPtr->CreateMoveLeafRequest(
+				leafId,
+				sourceNodeId,
+				targetNodeId,
+				operationContextPtr));
+
+	if (!requestPtr.isNull()){
+		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			bool retVal = false;
+			if (m_delegateCompPtr->GetOperationResult(*responsePtr, retVal)){
+				return retVal;
 			}
 		}
 	}
@@ -285,26 +245,21 @@ bool CGqlHierarchicalStructureComp::RemoveLeaf(
 			const Id& nodeId,
 			const imtbase::IOperationContext* operationContextPtr)
 {
-	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()){
-		istd::TDelPtr<imtgql::IGqlRequest> requestPtr(m_delegateCompPtr->CreateRemoveLeafRequest(
+	if (!m_clientCompPtr.IsValid() || !m_delegateCompPtr.IsValid()){
+		return false;
+	}
+
+	IGqlClient::GqlRequestPtr requestPtr(m_delegateCompPtr->CreateRemoveLeafRequest(
 					leafId,
 					nodeId,
 					operationContextPtr));
-		if (requestPtr.IsValid()){
-			istd::TDelPtr<imtgql::IGqlResponse> responsePtr(m_delegateCompPtr->CreateResponse(*requestPtr));
-			Q_ASSERT(responsePtr.IsValid());
-			if (responsePtr.IsValid()){
-				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-					if (responsePtr->IsSuccessful()){
-						QVariant result = responsePtr->GetResult();
-						Q_ASSERT(result.isValid());
-						if (result.isValid()){
-							if (result.canConvert(QMetaType::Bool)){
-								return result.toBool();
-							}
-						}
-					}
-				}
+
+	if (!requestPtr.isNull()){
+		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			bool retVal = false;
+			if (m_delegateCompPtr->GetOperationResult(*responsePtr, retVal)){
+				return retVal;
 			}
 		}
 	}
@@ -317,29 +272,26 @@ bool CGqlHierarchicalStructureComp::RemoveLeaf(
 
 int CGqlHierarchicalStructureComp::GetItemCount(const iprm::IParamsSet* selectionParamsPtr) const
 {
-	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()){
-		istd::TDelPtr<imtgql::IGqlRequest> requestPtr(m_delegateCompPtr->CreateGetItemCountRequest(
+	int retVal = -1;
+
+	if (!m_clientCompPtr.IsValid() || !m_delegateCompPtr.IsValid()){
+		return -1;
+	}
+
+	IGqlClient::GqlRequestPtr requestPtr(m_delegateCompPtr->CreateGetItemCountRequest(
 					selectionParamsPtr));
-		if (requestPtr.IsValid()){
-			istd::TDelPtr<imtgql::IGqlResponse> responsePtr(m_delegateCompPtr->CreateResponse(*requestPtr));
-			Q_ASSERT(responsePtr.IsValid());
-			if (responsePtr.IsValid()){
-				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-					if (responsePtr->IsSuccessful()){
-						QVariant result = responsePtr->GetResult();
-						Q_ASSERT(result.isValid());
-						if (result.isValid()){
-							if (result.canConvert(QMetaType::Int)){
-								return result.toInt();
-							}
-						}
-					}
-				}
+
+	if (!requestPtr.isNull()){
+		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			int count = 0;
+			if (m_delegateCompPtr->GetItemCount(*responsePtr, count)){
+				retVal = count;
 			}
 		}
 	}
 
-	return -1;
+	return retVal;
 }
 
 
@@ -348,91 +300,66 @@ imtbase::IHierarchicalStructureInfo::Ids CGqlHierarchicalStructureComp::GetItemI
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
 {
-	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()){
-		istd::TDelPtr<imtgql::IGqlRequest> requestPtr(m_delegateCompPtr->CreateGetItemIdsRequest(
+	Ids retVal;
+
+	if (!m_clientCompPtr.IsValid() || !m_delegateCompPtr.IsValid()){
+		return Ids();
+	}
+
+	IGqlClient::GqlRequestPtr requestPtr(m_delegateCompPtr->CreateGetItemIdsRequest(
 					offset,
 					count,
 					selectionParamsPtr));
-		if (requestPtr.IsValid()){
-			istd::TDelPtr<imtgql::IGqlResponse> responsePtr(m_delegateCompPtr->CreateResponse(*requestPtr));
-			Q_ASSERT(responsePtr.IsValid());
-			if (responsePtr.IsValid()){
-				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-					if (responsePtr->IsSuccessful()){
-						QVariant result = responsePtr->GetResult();
-						Q_ASSERT(result.isValid());
-						if (result.isValid()){
-							if (result.canConvert(QMetaType::QByteArrayList)){
-								Ids retVal = result.value<QByteArrayList>();
 
-								return retVal;
-							}
-						}
-					}
-				}
-			}
+	if (!requestPtr.isNull()){
+		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			m_delegateCompPtr->GetItemIds(*responsePtr, retVal);
 		}
 	}
 
-	return Ids();
+	return retVal;
 }
 
 
 imtbase::IHierarchicalStructureInfo::ItemInfoList CGqlHierarchicalStructureComp::GetItemInfos(const Ids& itemIds)
 {
-	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()){
-		istd::TDelPtr<imtgql::IGqlRequest> requestPtr(m_delegateCompPtr->CreateGetItemInfosRequest(itemIds));
-		if (requestPtr.IsValid()){
-			istd::TDelPtr<imtgql::IGqlResponse> responsePtr(m_delegateCompPtr->CreateResponse(*requestPtr));
-			Q_ASSERT(responsePtr.IsValid());
-			if (responsePtr.IsValid()){
-				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-					if (responsePtr->IsSuccessful()){
-						QVariant result = responsePtr->GetResult();
-						Q_ASSERT(result.isValid());
-						if (result.isValid()){
-							if (result.canConvert<ItemInfoList>()){
-								ItemInfoList retVal = result.value<ItemInfoList>();
+	ItemInfoList retVal;
 
-								return retVal;
-							}
-						}
-					}
-				}
-			}
+	if (!m_clientCompPtr.IsValid() || !m_delegateCompPtr.IsValid()){
+		return ItemInfoList();
+	}
+
+	IGqlClient::GqlRequestPtr requestPtr(m_delegateCompPtr->CreateGetItemInfosRequest(itemIds));
+
+	if (!requestPtr.isNull()){
+		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			m_delegateCompPtr->GetItemInfos(*responsePtr, retVal);
 		}
 	}
 
-	return ItemInfoList();
+	return retVal;
 }
 
 
 imtbase::IHierarchicalStructureInfo::Ids CGqlHierarchicalStructureComp::GetItemPath(const Id& itemId) const
 {
-	if (m_clientCompPtr.IsValid() && m_delegateCompPtr.IsValid()){
-		istd::TDelPtr<imtgql::IGqlRequest> requestPtr(m_delegateCompPtr->CreateGetItemPathRequest(itemId));
-		if (requestPtr.IsValid()){
-			istd::TDelPtr<imtgql::IGqlResponse> responsePtr(m_delegateCompPtr->CreateResponse(*requestPtr));
-			Q_ASSERT(responsePtr.IsValid());
-			if (responsePtr.IsValid()){
-				if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-					if (responsePtr->IsSuccessful()){
-						QVariant result = responsePtr->GetResult();
-						Q_ASSERT(result.isValid());
-						if (result.isValid()){
-							if (result.canConvert(QMetaType::QByteArrayList)){
-								Ids retVal = result.value<QByteArrayList>();
+	Ids retVal;
 
-								return retVal;
-							}
-						}
-					}
-				}
-			}
+	if (!m_clientCompPtr.IsValid() || !m_delegateCompPtr.IsValid()){
+		return Ids();
+	}
+
+	IGqlClient::GqlRequestPtr requestPtr(m_delegateCompPtr->CreateGetItemPathRequest(itemId));
+	if (!requestPtr.isNull()){
+		IGqlClient::GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			m_delegateCompPtr->GetItemPath(*responsePtr, retVal);
 		}
 	}
 
-	return Ids();
+	return retVal;
 }
 
 

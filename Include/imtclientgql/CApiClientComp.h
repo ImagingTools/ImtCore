@@ -6,7 +6,6 @@
 
 // ImtCore includes
 #include <imtclientgql/IGqlClient.h>
-#include <imtgql/IGqlResponseHandler.h>
 #include <imtclientgql/IClientProtocolEngine.h>
 
 
@@ -30,7 +29,7 @@ public:
 	CApiClientComp();
 
 	// reimplemented (IGqlClient)
-	virtual bool SendRequest(const imtgql::IGqlRequest& request, imtgql::IGqlResponseHandler& responseHandler) const override;
+	virtual GqlResponsePtr SendRequest(GqlRequestPtr requestPtr) const override;
 
 protected:
 	// reimplemented (icomp::CComponentBase)

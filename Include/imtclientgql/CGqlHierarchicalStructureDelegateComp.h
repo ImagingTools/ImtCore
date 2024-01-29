@@ -87,8 +87,14 @@ public:
 				int count = -1,
 				const iprm::IParamsSet* selectionParamsPtr = nullptr) const override;
 
-	// reimplemented (IGqlResponseCreator)
-	virtual imtgql::IGqlResponse* CreateResponse(const imtgql::IGqlRequest& request) const override;
+	virtual bool IsValid(imtgql::IGqlResponse& reqponse) const override;
+	virtual bool GetNodeId(imtgql::IGqlResponse& reqponse, Id& out) const override;
+	virtual bool GetOperationResult(imtgql::IGqlResponse& reqponse, bool& out) const override;
+	virtual bool GetItemCount(imtgql::IGqlResponse& reqponse, bool out) const override;
+	virtual bool GetItemIds(imtgql::IGqlResponse& reqponse, Ids& out) const override;
+	virtual bool GetItemPath(imtgql::IGqlResponse& reqponse, Ids& out) const override;
+	virtual bool GetItemInfos(imtgql::IGqlResponse& reqponse, imtbase::IHierarchicalStructureInfo::ItemInfoList& out) const override;
+
 };
 
 
