@@ -248,6 +248,7 @@ void CWebSocketClientComp::Connect()
 	qDebug() << "CWebSocketClientComp::Connect";
 
 	QString host;
+	QString path;
 	int port = 0;
 
 	QString login = *m_serverLoginAttrPtr;
@@ -257,6 +258,7 @@ void CWebSocketClientComp::Connect()
 	if (m_webSocketServerAddressCompPtr.IsValid()){
 		host = m_webSocketServerAddressCompPtr->GetUrl().host();
 		port = m_webSocketServerAddressCompPtr->GetUrl().port();
+		path = m_webSocketServerAddressCompPtr->GetUrl().path();
 	}
 	if (m_webSocketServerLoginCompPtr.IsValid()){
 		login = m_webSocketServerLoginCompPtr->GetText();
@@ -272,7 +274,7 @@ void CWebSocketClientComp::Connect()
 
 	QUrl url;
 	url.setHost(host);
-	url.setPath("/realtime");
+	url.setPath(path);
 	url.setQuery("header=" + authHeader.toBase64() + "&payload=e30=");
 	url.setScheme("ws");
 	url.setPort(port);

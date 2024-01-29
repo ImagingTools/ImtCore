@@ -18,6 +18,7 @@ Item {
 
     property alias thumbDecMenuPanelRadius: thumbnailDecorator.menuPanelRadius;
 
+    property string applicationId;
     property var applicationInfo;
 
     property bool serverReady: false;
@@ -175,19 +176,19 @@ Item {
                     serverUrl += "/";
                 }
 
-                if (context.application){
-                    serverUrl += context.application + "/";
-                }
+                // if (context.application){
+                //     serverUrl += context.application + "/";
+                // }
 
-                serverUrl += "wssub";
+                serverUrl += application.applicationId + "/wssub";
 
                 subscriptionManager.url = serverUrl;
             }
         }
 
         onError: {
-//            Events.sendEvent("SendWarningError", qsTr("Web Socket Error"));
-            Events.sendEvent("SendCriticalError");
+           // Events.sendEvent("SendWarningError", qsTr("Web Socket Error"));
+            Events.sendEvent("SendCriticalError", qsTr("Web Socket Error: ") + errorString);
         }
     }
 

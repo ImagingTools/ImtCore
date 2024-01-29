@@ -209,8 +209,8 @@ Rectangle {
                 }}
 
                 buttonsModel: ListModel{
-                    ListElement{Id: Enums.yes; Name:qsTr("Yes"); Enabled: true}
-                    ListElement{Id: Enums.no; Name:qsTr("No"); Enabled: true}
+                    ListElement{Id: Enums.ButtonType.Yes; Name:qsTr("Yes"); Enabled: true}
+                    ListElement{Id: Enums.ButtonType.No; Name:qsTr("No"); Enabled: true}
                 }
 
 
@@ -409,8 +409,8 @@ Rectangle {
     ListModel{
         id: buttonsModelTest;
 
-        ListElement{Id: Enums.yes; Name:qsTr("Yes"); Enabled: true}
-        ListElement{Id: Enums.no; Name:qsTr("No"); Enabled: true}
+        ListElement{Id: Enums.ButtonType.Yes; Name:qsTr("Yes"); Enabled: true}
+        ListElement{Id: Enums.ButtonType.No; Name:qsTr("No"); Enabled: true}
         //                        ListElement{Id: Enums.ButtonType.Save; Name:qsTr("Save"); Enabled: true}
         //                        ListElement{Id: Enums.cancel; Name:qsTr("Cancel"); Enabled: true}
         //                        ListElement{Id: Enums.ButtonType.Close; Name:qsTr("Close"); Enabled: true}
