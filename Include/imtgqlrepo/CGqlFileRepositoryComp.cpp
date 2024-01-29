@@ -474,7 +474,8 @@ bool CGqlFileRepositoryComp::SetupGqlItem(
 			retVal = retVal && model.SetData(metaInfoId, elementInformation, itemIndex);
 		}
 	}
-
+	/// \todo restore it when SDL will be fixed
+/*
 	sdl::CFileMetaInfo fileMetaInfo;
 	fileMetaInfo.SetId(objectId);
 	fileMetaInfo.SetName(m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString());
@@ -489,9 +490,8 @@ bool CGqlFileRepositoryComp::SetupGqlItem(
 
 
 
-//	bool result = AddToMeTreeModel(&model, index)
-	model.SetData(QByteArrayLiteral("Id"), fileMetaInfo.GetId(), itemIndex);
-
+	bool result = fileMetaInfo.AddMeToModel(model, 0);
+*/
 
 #if SDL_TO_MODEL_ADD_IMPLEMEMNTED
 	fileMetaInfo.AddToMeTreeModel(model, metaInfoIdList);
