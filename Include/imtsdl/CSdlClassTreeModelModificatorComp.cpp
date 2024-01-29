@@ -132,7 +132,6 @@ bool CSdlClassTreeModelModificatorComp::BeginClassFiles(const CSdlType& sdlType)
 		return false;
 	}
 
-
 	bool retVal = true;
 	retVal = retVal && BeginHeaderClassFile(sdlType);
 	retVal = retVal && BeginSourceClassFile(sdlType);
@@ -162,9 +161,9 @@ bool CSdlClassTreeModelModificatorComp::BeginHeaderClassFile(const CSdlType& sdl
 	}
 
 	// add method definitions
-	ofStream << QStringLiteral("\tbool AddMeToModel(imtbase::CTreeItemModel& model, int modelIndex, const QList<QString>& requiredFields = QList<QString>()) const;");
+	ofStream << QStringLiteral("\t[[nodiscard]] bool AddMeToModel(imtbase::CTreeItemModel& model, int modelIndex, const QList<QString>& requiredFields = QList<QString>()) const;");
 	FeedStream(ofStream, 1, false);
-	ofStream << QStringLiteral("\tstatic bool ReadFromModel(C");
+	ofStream << QStringLiteral("\t[[nodiscard]] static bool ReadFromModel(C");
 	ofStream << sdlType.GetName();
 	ofStream << QStringLiteral("& object, const imtbase::CTreeItemModel& model, int modelIndex);");
 	FeedStream(ofStream, 2);
@@ -182,30 +181,65 @@ bool CSdlClassTreeModelModificatorComp::BeginSourceClassFile(const CSdlType& sdl
 		FeedStream(ofStream);
 	}
 
-
-	// add method implementations
+	// add method implementation
 	ofStream << QStringLiteral("bool C");
 	ofStream << sdlType.GetName();
-	ofStream << QStringLiteral("::AddMeToModel(imtbase::CTreeItemModel& model, int modelIndex, const QList<QString>& requiredFields) const\n{\n");
+	ofStream << QStringLiteral("::AddMeToModel(imtbase::CTreeItemModel& model, int modelIndex, const QList<QString>& requiredFields) const\n{");
 
+	// first add fields check
+	// a)add static variable with all suppotred fields
+	FeedStream(ofStream, 1, false);
+	FeedStreamHorizontally(ofStream);
+	ofStream << QStringLiteral("static QList<QString> supportedFieldNameList = {");
+	SdlFieldList fieldList = sdlType.GetFields();
+	const int fieldsCount = fieldList.count();
+	for (int fieldIndex = 0; fieldIndex < fieldsCount - 1; ++fieldIndex){
+		FeedStream(ofStream, 1, false);
+		FeedStreamHorizontally(ofStream, 4);
+		ofStream << '"' << fieldList[fieldIndex].GetId() << '"' << ',';
+	}
+	FeedStream(ofStream, 1, false);
+	FeedStreamHorizontally(ofStream, 4);
+	ofStream << '"' << fieldList[fieldsCount - 1].GetId() << '"' << "};";
+	FeedStream(ofStream, 1, false);
+
+	// b)ensure all requested fields is known
+	FeedStream(ofStream, 1, false);
+	FeedStreamHorizontally(ofStream);
+	ofStream << QStringLiteral("for (const QString& field: requiredFields){");
+	FeedStream(ofStream, 1, false);
+	FeedStreamHorizontally(ofStream, 2);
+	ofStream << QStringLiteral("if (!supportedFieldNameList.contains(field)){");
+	FeedStream(ofStream, 1, false);
+	FeedStreamHorizontally(ofStream, 3);
+	ofStream << QStringLiteral("return false;");
+	ofStream << QStringLiteral("\n\t\t}\n\t}");
+	FeedStream(ofStream, 1, false);
+
+	// them add write logic for each field
 	for (const CSdlField& field: sdlType.GetFields()){
 		AddFieldWriteToModelCode(ofStream, field);
+		FeedStream(ofStream, 1, false);
 	}
 	ofStream << QStringLiteral("\n\treturn true;\n}");
 
 	FeedStream(ofStream, 3, false);
 
+	// read method implementation
 	ofStream << QStringLiteral("bool C");
 	ofStream << sdlType.GetName();
 	ofStream << QStringLiteral("::ReadFromModel(C");
 	ofStream << sdlType.GetName();
-	ofStream << QStringLiteral("& object, const imtbase::CTreeItemModel& model, int modelIndex)\n{\n");
+	ofStream << QStringLiteral("& object, const imtbase::CTreeItemModel& model, int modelIndex)\n{");
+	FeedStream(ofStream, 1, false);
+
 	for (const CSdlField& field: sdlType.GetFields()){
 		AddFieldReadFromModelCode(ofStream, field);
+		FeedStream(ofStream, 1, false);
 	}
-	ofStream << QStringLiteral("\n\treturn true;\n}");
+	ofStream << QStringLiteral("\treturn true;\n}");
 
-	FeedStream(ofStream, 2);
+	FeedStream(ofStream, 3);
 
 	return true;
 }
@@ -261,7 +295,35 @@ void CSdlClassTreeModelModificatorComp::AbortCurrentProcessing()
 
 void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(QTextStream& stream, const CSdlField& field)
 {
-
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream);
+	if (field.IsRequired()){
+		stream << QStringLiteral("if (");
+		stream << FromVariantMapAccessString(field) << QStringLiteral(".isNull()){");
+		FeedStream(stream, 1, false);
+		FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("return false;\n\t}");
+		FeedStream(stream, 1, false);
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
+		stream << FromVariantMapAccessString(field) << QStringLiteral(", modelIndex);");
+	}
+	/*
+	if (!_m_fieldsMap["Name"].isNull() && (requiredFields.isEmpty() || requiredFields.contains("Name"))){
+		model.SetData("Name", _m_fieldsMap["Name"], modelIndex);
+	}
+	*/
+	else {
+		stream << QStringLiteral("if (!");
+		stream << FromVariantMapAccessString(field);
+		stream << QStringLiteral(".isNull() && (requiredFields.isEmpty() || requiredFields.contains(\"");
+		stream << field.GetId() << QStringLiteral("\"))){");
+		FeedStream(stream, 1, false);
+		FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("model.SetData(\"") << field.GetId() << QStringLiteral("\", ");
+		stream << FromVariantMapAccessString(field);
+		stream << QStringLiteral(", modelIndex);\n\t}");
+	}
 }
 
 
@@ -277,7 +339,6 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
 		FeedStream(stream, 1, false);
 
-		/// \todo add errorString here
 		FeedStreamHorizontally(stream, 2);
 		stream << QStringLiteral("return false;");
 		FeedStream(stream, 1, false);
@@ -306,8 +367,6 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 		stream << '}';
 		FeedStream(stream, 1, false);
 	}
-	FeedStream(stream);
-
 }
 
 
