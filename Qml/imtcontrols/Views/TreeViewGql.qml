@@ -297,7 +297,7 @@ Rectangle{
         let innerId_parent = treeViewGql.model.IsValidData("InnerId__", index) ? treeViewGql.model.GetData("InnerId__", index) : "";
         let branchIds = branchIds_parent !== "" ? branchIds_parent + "," + innerId_parent: innerId_parent;
 
-
+        let counter = 0;
         for(let i = 0; i < model_.GetItemsCount(); i++){
             let newIndex =  index + i + 1;
             treeViewGql.model.InsertNewItem(newIndex);
@@ -316,6 +316,10 @@ Rectangle{
             else {
                 listFrame.contentHeight += treeViewGql.delegateHeight;
             }
+            counter++;
+        }
+        if(treeViewGql.selectedIndex >=0){
+            treeViewGql.selectedIndex += counter;
         }
         treeViewGql.setContentWidth();
 
@@ -333,6 +337,7 @@ Rectangle{
         let innerId = treeViewGql.model.GetData("InnerId__", index);
         let found = false;
         let foundChangeCount = 0;
+        let counter = 0;
         for(let i = index + 1; i < treeViewGql.model.GetItemsCount(); i++){
             let branchIds = treeViewGql.model.IsValidData("BranchIds__", i) ? treeViewGql.model.GetData("BranchIds__", i) : "";
             //console.log("branchIds:: ", branchIds)
@@ -364,6 +369,10 @@ Rectangle{
                 listFrame.contentHeight -= treeViewGql.delegateHeight;
                 treeViewGql.deleteBranch(index);
             }
+            counter++;
+        }
+        if(treeViewGql.selectedIndex >=0){
+            treeViewGql.selectedIndex -= counter;
         }
 
         treeViewGql.model.SetData("IsOpen__", false, index);

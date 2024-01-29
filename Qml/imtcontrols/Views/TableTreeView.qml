@@ -361,6 +361,7 @@ AuxTable{
         let innerId = tableTreeView.model.GetData("InnerId__", index);
         let found = false;
         let foundChangeCount = 0;
+        let counter = 0;
         for(let i = index + 1; i < tableTreeView.model.GetItemsCount(); i++){
             let branchIds = tableTreeView.model.IsValidData("BranchIds__", i) ? tableTreeView.model.GetData("BranchIds__", i) : "";
             //console.log("branchIds:: ", branchIds)
@@ -395,6 +396,12 @@ AuxTable{
 
                 tableTreeView.deleteBranch(index);
             }
+
+            counter++;
+        }
+
+        if(tableTreeView.selectedIndex >=0){
+            tableTreeView.selectedIndex -= counter;
         }
 
         tableTreeView.model.SetData("IsOpen__", false, index);
@@ -423,7 +430,7 @@ AuxTable{
         let innerId_parent = tableTreeView.model.IsValidData("InnerId__", index) ? tableTreeView.model.GetData("InnerId__", index) : "";
         let branchIds = branchIds_parent !== "" ? branchIds_parent + "," + innerId_parent: innerId_parent;
 
-
+        let counter = 0;
         for(let i = 0; i < model_.GetItemsCount(); i++){
             let newIndex =  index + i + 1;
             tableTreeView.model.InsertNewItem(newIndex);
@@ -444,6 +451,10 @@ AuxTable{
                 content_height += tableTreeView.delegateHeight;
                 tableTreeView.setContentHeight(content_height);
             }
+            counter++;
+        }
+        if(tableTreeView.selectedIndex >=0){
+            tableTreeView.selectedIndex += counter;
         }
         tableTreeView.setContentWidth();
     }
