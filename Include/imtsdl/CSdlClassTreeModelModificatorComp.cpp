@@ -264,15 +264,17 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(QTextStream& st
 
 }
 
+
 void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& stream, const CSdlField& field)
 {
 	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("QVariant ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data = model.GetData(");
 	stream << '"' << field.GetId() << '"';
 	stream << QStringLiteral(", modelIndex);");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream);
 	if (field.IsRequired()){
-		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral(".isNull(){");
+		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
 		FeedStream(stream, 1, false);
 
 		/// \todo add errorString here
@@ -291,8 +293,7 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 		FeedStream(stream, 1, false);
 	}
 	else {
-		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("if (!") << GetDecapitalizedValue(field.GetId()) << QStringLiteral(".isNull(){");
+		stream << QStringLiteral("if (!") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, 2);
@@ -305,6 +306,7 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 		stream << '}';
 		FeedStream(stream, 1, false);
 	}
+	FeedStream(stream);
 
 }
 
