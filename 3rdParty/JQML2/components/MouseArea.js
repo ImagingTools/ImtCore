@@ -142,7 +142,7 @@ class MouseArea extends Item {
 
             if((pressed || this.getPropertyValue('hoverEnabled')) && this.$signals.positionChanged) this.$signals.positionChanged()
 
-            if(this.getPropertyValue('mouseX') >= 0 && this.getPropertyValue('mouseY') >= 0 && this.getPropertyValue('mouseX') <= this.getPropertyValue('width') && this.getPropertyValue('mouseY') <= this.getPropertyValue('height')){
+            if(this.getPropertyValue('mouseX') >= 0 && this.getPropertyValue('mouseY') >= 0 && this.getPropertyValue('mouseX') < this.getPropertyValue('width') && this.getPropertyValue('mouseY') < this.getPropertyValue('height')){
                 this.getPropertyValue('context').setStyle({
                     cursor: this.getPropertyValue('cursorShape')
                 })

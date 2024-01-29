@@ -59,7 +59,7 @@ class Image extends Item {
     }
 
     $sourceChanged(){
-        if(!this.source) {
+        if(!this.getPropertyValue('source')) {
             this.setStyle({
                 backgroundImage: 'none'
             })

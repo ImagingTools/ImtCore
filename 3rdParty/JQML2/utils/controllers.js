@@ -208,6 +208,7 @@ class MouseController {
 
         document.body.style.cursor = 'default'
 
+        // console.log('MouseController::: oldList =',this.oldList)
         while(this.oldList.length){
             let obj = this.oldList.shift()
             if(obj.$mousearea && obj.getPropertyValue('hoverEnabled')) {
