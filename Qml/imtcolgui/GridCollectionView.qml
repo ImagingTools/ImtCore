@@ -71,6 +71,9 @@ Item {
     property alias paginationPageSize: gridCollectionViewBase.paginationPageSize;
     property alias hasPagination: gridCollectionViewBase.hasPagination;
 
+    property string backgroundColor: Style.baseColor;
+
+
 //    Component.onCompleted: {
 //        itemId = documentsData.GetData("Id", model.index);
 //        itemName = documentsData.GetData("Title", model.index);
@@ -187,7 +190,7 @@ Item {
     Rectangle {
         anchors.fill: parent;
 
-        color: Style.baseColor;
+        color: gridCollectionViewContainer.backgroundColor;
     }
 
     GridCollectionViewBase {
@@ -198,6 +201,7 @@ Item {
         anchors.margins: parent.contentMargins;
 
         commandsId: parent.commandsId;
+        backgroundColor: gridCollectionViewContainer.backgroundColor;
 
         onSelectedIndexChangedSignal: {
             console.log("gridCollectionViewBase onSelectedIndexChanged");
