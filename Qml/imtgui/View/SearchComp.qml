@@ -576,6 +576,14 @@ Rectangle{
             text: "";
             clip: true;
             rootItem: searchTextField;
+            selected: searchTextField.selectedIndex == model.index;
+
+            onClicked: {
+                searchTextField.finished(model.Id, model.index)
+            }
+            onEntered: {
+                searchTextField.selectedIndex = model.index;
+            }
 
             Component.onCompleted:  {
             }
@@ -595,6 +603,7 @@ Rectangle{
                 color: searchContainer.fontColor;
                 font.pixelSize: searchContainer.textSize;
                 font.bold: false;
+                z:20;
 
                 text: model[searchContainer.valueName] !== undefined ?
                           model[searchContainer.valueName]: "нет данных";
@@ -603,8 +612,7 @@ Rectangle{
 
 
 
-            onClicked: {
-            }
+
 
         }}//delegate
 
