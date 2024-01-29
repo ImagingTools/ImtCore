@@ -53,6 +53,8 @@ private:
 	bool EndClassFiles(const CSdlType& sdlType);
 	bool CloseFiles();
 	void AbortCurrentProcessing();
+	void AddFieldWriteToModelCode(QTextStream& stream, const CSdlField& field);
+	void AddFieldReadFromModelCode(QTextStream& stream, const CSdlField& field);
 
 private:
 	I_ATTR(QString, m_processorModificatorName);

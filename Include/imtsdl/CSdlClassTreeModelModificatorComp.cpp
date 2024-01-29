@@ -3,6 +3,8 @@
 
 // Qt includes
 #include <QtCore/QDir>
+#include <QtCore/QRegularExpression>
+#include <QtCore/QRegularExpressionMatch>
 
 //Acf includes
 #include <istd/CSystem.h>
@@ -29,8 +31,14 @@ int CSdlClassTreeModelModificatorComp::DoProcessing(
 
 	int retVal = iproc::IProcessor::TS_OK;
 	if (!m_argumentParserCompPtr->IsModificatorEnabled(*m_processorModificatorName)){
-		// nothing todo if modificator is not exsits
+		// nothing todo if our modificator is not exsits
 		return retVal;
+	}
+
+	if (!m_argumentParserCompPtr->IsModificatorEnabled(*m_processorModificatorName)){
+		SendErrorMessage(1, QString("Variant map modificator is not enabled. Use -M%1 argument to enable it").arg(s_variantMapModificatorArgumentName));
+
+		return iproc::IProcessor::TS_INVALID;
 	}
 
 	const QString outputDirectoryPath = QDir::cleanPath(m_argumentParserCompPtr->GetOutputDirectoryPath());
@@ -138,11 +146,27 @@ bool CSdlClassTreeModelModificatorComp::BeginHeaderClassFile(const CSdlType& sdl
 	QTextStream ofStream(m_headerFilePtr.GetPtr());
 	QTextStream ifStream(m_originalHeaderFilePtr.GetPtr());
 	while (!ifStream.atEnd()){
-		ofStream << ifStream.readLine();
+		const QString readLine = ifStream.readLine();
+
+		// check if we reached end of include declaration (namespace begin)
+		static QRegularExpression namespaceRegExp(QStringLiteral("\\s*namespace"));
+		if (namespaceRegExp.match(readLine).hasMatch()){
+			ofStream.seek(ofStream.pos() - 1); // remove extra new line
+			ofStream << QStringLiteral("// imtbase includes");
+			FeedStream(ofStream, 1, false);
+			ofStream << QStringLiteral("#include <imtbase/CTreeItemModel.h>");
+			FeedStream(ofStream, 3, false);
+		}
+		ofStream << readLine;
 		FeedStream(ofStream);
 	}
 
-	ofStream << QStringLiteral("// Here should be a new code, allows to save and load this class to/from TreeModel. But it is not implemented yet))");
+	// add method definitions
+	ofStream << QStringLiteral("\tbool AddMeToModel(imtbase::CTreeItemModel& model, int modelIndex, const QList<QString>& requiredFields = QList<QString>()) const;");
+	FeedStream(ofStream, 1, false);
+	ofStream << QStringLiteral("\tstatic bool ReadFromModel(C");
+	ofStream << sdlType.GetName();
+	ofStream << QStringLiteral("& object, const imtbase::CTreeItemModel& model, int modelIndex);");
 	FeedStream(ofStream, 2);
 
 	return true;
@@ -157,6 +181,31 @@ bool CSdlClassTreeModelModificatorComp::BeginSourceClassFile(const CSdlType& sdl
 		ofStream << ifStream.readLine();
 		FeedStream(ofStream);
 	}
+
+
+	// add method implementations
+	ofStream << QStringLiteral("bool C");
+	ofStream << sdlType.GetName();
+	ofStream << QStringLiteral("::AddMeToModel(imtbase::CTreeItemModel& model, int modelIndex, const QList<QString>& requiredFields) const\n{\n");
+
+	for (const CSdlField& field: sdlType.GetFields()){
+		AddFieldWriteToModelCode(ofStream, field);
+	}
+	ofStream << QStringLiteral("\n\treturn true;\n}");
+
+	FeedStream(ofStream, 3, false);
+
+	ofStream << QStringLiteral("bool C");
+	ofStream << sdlType.GetName();
+	ofStream << QStringLiteral("::ReadFromModel(C");
+	ofStream << sdlType.GetName();
+	ofStream << QStringLiteral("& object, const imtbase::CTreeItemModel& model, int modelIndex)\n{\n");
+	for (const CSdlField& field: sdlType.GetFields()){
+		AddFieldReadFromModelCode(ofStream, field);
+	}
+	ofStream << QStringLiteral("\n\treturn true;\n}");
+
+	FeedStream(ofStream, 2);
 
 	return true;
 }
@@ -207,6 +256,56 @@ void CSdlClassTreeModelModificatorComp::AbortCurrentProcessing()
 
 	m_headerFilePtr->remove();
 	m_sourceFilePtr->remove();
+}
+
+
+void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(QTextStream& stream, const CSdlField& field)
+{
+
+}
+
+void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& stream, const CSdlField& field)
+{
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("QVariant ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data = model.GetData(");
+	stream << '"' << field.GetId() << '"';
+	stream << QStringLiteral(", modelIndex);");
+	if (field.IsRequired()){
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral(".isNull(){");
+		FeedStream(stream, 1, false);
+
+		/// \todo add errorString here
+		FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("return false;");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream);
+		stream << '}';
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
+		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.");
+		stream << GetFromVariantConversionString(field) << QStringLiteral(");");
+		FeedStream(stream, 1, false);
+	}
+	else {
+		FeedStreamHorizontally(stream);
+		stream << QStringLiteral("if (!") << GetDecapitalizedValue(field.GetId()) << QStringLiteral(".isNull(){");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
+		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.");
+		stream << GetFromVariantConversionString(field) << QStringLiteral(");");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream);
+		stream << '}';
+		FeedStream(stream, 1, false);
+	}
+
 }
 
 

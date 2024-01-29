@@ -3,7 +3,6 @@
 
 // Qt includes
 
-
 // imtsdl includes
 #include <imtsdl/CSdlField.h>
 #include <imtsdl/CSdlType.h>
@@ -11,6 +10,12 @@
 namespace imtsdl
 {
 
+// public static variables
+const QString CSdlTools::s_variantMapModificatorArgumentName = QStringLiteral("VMap");
+const QString CSdlTools::s_variantMapClassMemberName = QStringLiteral("_m_fieldsMap"); // add first underscore to avoid ambiguity
+
+
+// public static methods
 
 QString CSdlTools::ConvertType(const CSdlField& sdlField, bool* isCustomPtr, bool* isComplexPtr, bool* isArrayPtr)
 {
@@ -143,6 +148,14 @@ void CSdlTools::FeedLineHorizontally(QString& line, uint indents, char indentDel
 }
 
 
+void CSdlTools::FeedStreamHorizontally(QTextStream& stream, uint indents, char indentDelimiter)
+{
+	for (uint i = 0; i < indents; ++i){
+		stream << indentDelimiter;
+	}
+}
+
+
 QString CSdlTools::GetCapitalizedValue(const QString& inputValue)
 {
 	if (inputValue.isEmpty()){
@@ -214,19 +227,31 @@ bool CSdlTools::IsTypeHasNonFundamentalTypes(const CSdlType& sdlType, QSet<QStri
 	return true;
 }
 
-
-bool CSdlTools::MoveToEndOfIncludeDeclaration(QTextStream& stream)
+QString CSdlTools::GetFromVariantConversionString(const CSdlField& sdlField)
 {
-	qint64 savedPosition = stream.pos();
+	const QString sdlType = sdlField.GetType();
 
-	qint64 lastPosition = 0;
-	while(!stream.atEnd()){
-		const QString readLine = stream.readLine();
-		/// \todo finish it use regexp ^\s*(\#include)
+	if (sdlType == QStringLiteral("Int") || sdlType == QStringLiteral("Integer")){
+		return QStringLiteral("toInt()");
+	}
+	if (sdlType == QStringLiteral("Float")){
+		return QStringLiteral("toFloat()");
+	}
+	if (sdlType == QStringLiteral("Double")){
+		return QStringLiteral("toDouble()");
+	}
+	if (sdlType == QStringLiteral("String")){
+		return QStringLiteral("toString()");
+	}
+	if (sdlType == QStringLiteral("Boolean") || sdlType == QStringLiteral("Bool")){
+		return QStringLiteral("toBool()");
+	}
+	if (sdlType == QStringLiteral("ID")){
+		return QStringLiteral("toByteArray");
 	}
 
-	stream.seek(savedPosition);
-	return false;
+	/// \todo add convert type and add initialization of custom types
+	return "";
 }
 
 

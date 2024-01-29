@@ -180,10 +180,10 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType)
 	FeedStream(ifStream, 3, false);
 
 	QSet<QString> complexTypeList;
+	bool isQtCommentAdded = false;
 	if (IsTypeHasNonFundamentalTypes(sdlType, &complexTypeList)){
 
 		// Add Qt types
-		bool isQtCommentAdded = false;
 		if (complexTypeList.contains(QStringLiteral("QByteArray"))){
 			if (!isQtCommentAdded){
 				ifStream << QStringLiteral("// Qt includes\n");
@@ -226,8 +226,20 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType)
 			ifStream << QStringLiteral("#include \"") << complexTypeName << QStringLiteral(".h\"\n");
 		}
 	}
-	FeedStream(ifStream, 2, false);
 
+	// if variant map is enabled we need to add QVariant and QVariantMap
+	if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
+		if (!isQtCommentAdded){
+			ifStream << QStringLiteral("// Qt includes\n");
+			isQtCommentAdded = true;
+		}
+		ifStream << QStringLiteral("#include <QtCore/QVariant>\n");
+		ifStream << QStringLiteral("#include <QtCore/QVariantMap>\n");
+
+		FeedStream(ifStream, 1, false);
+	}
+
+	FeedStream(ifStream, 2, false);
 
 	// namespace begin
 	QString namespaceString;
@@ -275,9 +287,17 @@ bool CSdlClassCodeGeneratorComp::EndHeaderClassFile(const CSdlType& sdlType)
 	// defining class members
 	ifStream << QStringLiteral("private:\n");
 	for (const CSdlField& sdlField: sdlType.GetFields()){
-		ifStream << '\t' << ConvertType(sdlField) << " m_" << GetDecapitalizedValue(sdlField.GetId()) << ";\n";
+		ifStream << '\t' << ConvertType(sdlField) << " m_" << GetDecapitalizedValue(sdlField.GetId()) << ";";
+		FeedStream(ifStream, 1, false);
 	}
-	ifStream.flush();
+
+	if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
+		ifStream << QStringLiteral("\tQVariantMap ") << s_variantMapClassMemberName << ';';
+
+		FeedStream(ifStream, 1, false);
+	}
+
+	FeedStream(ifStream);
 
 	return true;
 }
@@ -453,6 +473,14 @@ QString CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(const QString clas
 {
 	QString retVal;
 
+	/*!
+		\todo add map variant usage
+
+		\code
+			if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
+				FeedStream(ifStream, 1, false);
+			}
+	*/
 	if (generateGetter){
 		FeedLineHorizontally(retVal, indents);
 
