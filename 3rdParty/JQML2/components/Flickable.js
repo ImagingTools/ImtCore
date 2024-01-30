@@ -64,14 +64,14 @@ class Flickable extends Item {
 
 
     $contentWidthChanged(){
-        this.getStatement('contentItem').get().getStatement('width').set(this.getStatement('contentWidth').get())
+        if(!isNaN(this.getStatement('contentWidth').get())) this.getStatement('contentItem').get().getStatement('width').set(this.getStatement('contentWidth').get())
         if(this.getPropertyValue('contentX') > this.getPropertyValue('contentWidth') - this.getPropertyValue('width')){
             this.getProperty('contentX').reset(this.getPropertyValue('contentWidth') - this.getPropertyValue('width'))
         }
     }
 
     $contentHeightChanged(){
-        this.getStatement('contentItem').get().getStatement('height').set(this.getStatement('contentHeight').get())
+        if(!isNaN(this.getStatement('contentHeight').get())) this.getStatement('contentItem').get().getStatement('height').set(this.getStatement('contentHeight').get())
         if(this.getPropertyValue('contentY') > this.getPropertyValue('contentHeight') - this.getPropertyValue('height')){
             this.getProperty('contentY').reset(this.getPropertyValue('contentHeight') - this.getPropertyValue('height'))
         }
