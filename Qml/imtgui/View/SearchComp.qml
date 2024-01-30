@@ -691,5 +691,15 @@ Rectangle{
 
     }
 
+    function setAddressFromOutside(address, parentIds){
+        searchContainer.parentIds = parentIds;
+        searchTextField.currentText = address
+        searchContainer.selectedText = searchTextField.currentText;
+        setPropertiesModel(searchContainer.propertyId, searchContainer.parentIds);
+        searchContainer.externalSearchParam = searchContainer.parentIds;
+        searchTextField.excludeFilterPart = searchContainer.removeLastElement(searchTextField.currentText);
+
+    }
+
 }
 

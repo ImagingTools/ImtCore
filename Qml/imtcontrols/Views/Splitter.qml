@@ -17,7 +17,8 @@ Rectangle {
 
         anchors.fill: parent;
 
-        hoverEnabled: true;
+        enabled: parent.enabled
+        hoverEnabled: enabled;
         acceptedButtons: Qt.LeftButton;
         cursorShape: Qt.SplitHCursor;
 
