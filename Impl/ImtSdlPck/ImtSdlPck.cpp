@@ -39,6 +39,11 @@ I_EXPORT_COMPONENT(
 		"The C++ class modificator, adds saving and loading generated SDL types to TreeItemModel",
 		"Schema Definition Language SDL Class Generator Tree Item Model")
 
+I_EXPORT_COMPONENT(
+		SdlClassGqlModificator,
+		"The C++ class modificator, adds loading generated SDL types from GraphQL request",
+		"Schema Definition Language SDL Class Generator GraphQL GQL")
+
 } // namespace ImtSdlPck
 
 

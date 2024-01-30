@@ -10,6 +10,7 @@
 #include <imtsdl/CGqlSchemaParserComp.h>
 #include <imtsdl/CSdlClassCodeGeneratorComp.h>
 #include <imtsdl/CSdlClassTreeModelModificatorComp.h>
+#include <imtsdl/CSdlClassGqlModificatorComp.h>
 
 
 /**
@@ -24,6 +25,7 @@ typedef imtsdl::CSdlProcessArgumentsParserComp SdlProcessArgumentsParser;
 typedef imtsdl::CGqlSchemaParserComp GqlSchemaParser;
 typedef imtsdl::CSdlClassCodeGeneratorComp SdlClassCodeGenerator;
 typedef imtsdl::CSdlClassTreeModelModificatorComp SdlClassTreeModelModificator;
+typedef imtsdl::CSdlClassGqlModificatorComp SdlClassGqlModificator;
 
 
 } // namespace ImtSdlPck

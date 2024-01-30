@@ -8,6 +8,7 @@
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
+        <Element ComponentName="CSdlClassGqlModificatorComp" X="775" Y="500" Note=""/>
         <Element ComponentName="SdlClassCodeGenerator" X="425" Y="350" Note=""/>
         <Element ComponentName="SdlClassTreeModelModificator" X="775" Y="200" Note=""/>
     </PositionMap>

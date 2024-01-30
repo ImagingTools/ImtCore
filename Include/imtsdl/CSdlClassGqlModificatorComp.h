@@ -13,13 +13,13 @@ namespace imtsdl
 	The C++ class modificator, adds saving and loading generated SDL types to TreeItemModel
 	Extends generated classes by add methods, allows to save and load it from/to \c imtbase::CTreeItemModel
  */
-class CSdlClassTreeModelModificatorComp: public CSdlClassModificatorBaseComp
+class CSdlClassGqlModificatorComp: public CSdlClassModificatorBaseComp
 {
 
 public:
 	typedef CSdlClassModificatorBaseComp BaseClass;
 
-	I_BEGIN_COMPONENT(CSdlClassTreeModelModificatorComp)
+	I_BEGIN_COMPONENT(CSdlClassGqlModificatorComp)
 	I_END_COMPONENT;
 
 protected:
@@ -29,8 +29,7 @@ protected:
 
 private:
 	/// \todo add error handling for it
-	void AddFieldWriteToModelCode(QTextStream& stream, const CSdlField& field);
-	void AddFieldReadFromModelCode(QTextStream& stream, const CSdlField& field);
+	void AddFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
 	/// \todo add complex and array values processing
 };
 
