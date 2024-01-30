@@ -74,7 +74,6 @@ class Image extends Item {
             this.getProperty('sourceSize').getProperty('height').setAuto(this.$img.naturalHeight)
 
             // this.dom.style.backgroundImage = `url("${this.$this.$img.src}")`
-            
             this.setStyle({
                 backgroundImage: `url("${path.replaceAll('//','/')}")`
             })

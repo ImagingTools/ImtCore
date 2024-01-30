@@ -1160,8 +1160,8 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             if(property.command === 'create' && property.val.className !== 'Component'){
                 if(property.type === 'Component'){  
                     code.push(`${currentInstructions.name}.$temp = new ${property.type}(${currentInstructions.name})`)
-                    code.push(`${currentInstructions.name}.$temp.createObject=function(currParent,exCtx=inCtx,exModel,forceUpdate=true){`)
-                    code.push(`let inCtx = new ContextController(exCtx)`)
+                    code.push(`${currentInstructions.name}.$temp.createObject=function(currParent,exCtx1=inCtx,exModel,forceUpdate=true,exCtx2=inCtx){`)
+                    code.push(`let inCtx = new ContextController(exCtx1,exCtx2)`)
                     treeCompile(compiledFile, property.val, [], [], 0, true)
                     code.push(`}`)
                     
@@ -1185,9 +1185,9 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
                     // TEMP !!!
                     if((property.name === 'delegate' && (currentInstructions.className === 'MapItemView'|| currentInstructions.className === 'ListView'|| currentInstructions.className === 'GridView' || currentInstructions.className === 'Repeater')) || (property.name === 'sourceComponent' && currentInstructions.className === 'Loader')){
                         code.push(`${currentInstructions.name}.getStatement('${property.name}').value = new Component(${currentInstructions.name}, inCtx)`)
-                        code.push(`${currentInstructions.name}.getStatement('${property.name}').value.createObject=function(currParent,exCtx=inCtx,exModel,forceUpdate=true){`)
+                        code.push(`${currentInstructions.name}.getStatement('${property.name}').value.createObject=function(currParent,exCtx1=inCtx,exModel,forceUpdate=true,exCtx2=inCtx){`)
                         
-                        code.push(`let inCtx = new ContextController(exCtx)`)
+                        code.push(`let inCtx = new ContextController(exCtx1,exCtx2)`)
                         treeCompile(compiledFile, property.val, [], [], 0, true)
                         code.push(`}`)
                         updateList.push(`${currentInstructions.name}.getStatement('${property.name}').getNotify()()`)
@@ -1338,8 +1338,8 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
     }
 
     if(currentInstructions.className === 'Component') {
-        code.push(`${currentInstructions.name}.createObject=function(currParent,exCtx=inCtx,exModel,forceUpdate=true){`)
-        code.push(`let inCtx = new ContextController(exCtx)`)
+        code.push(`${currentInstructions.name}.createObject=function(currParent,exCtx1=inCtx,exModel,forceUpdate=true,exCtx2=inCtx){`)
+        code.push(`let inCtx = new ContextController(exCtx1,exCtx2)`)
         for(let i = currentInstructions.children.length-1; i >= 0; i--){
             treeCompile(compiledFile, currentInstructions.children[i], [], [], 0, true)
         }

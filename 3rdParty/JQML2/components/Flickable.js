@@ -47,11 +47,19 @@ class Flickable extends Item {
     }
 
     $contentXChanged(){
-        this.getStatement('contentItem').get().getStatement('x').reset(-this.getStatement('contentX').get())
+        let x = this.getStatement('contentX').get()
+        if(x < 0) x = 0
+        if(x > this.getPropertyValue('contentWidth') - this.getPropertyValue('width')) x = this.getPropertyValue('contentWidth') - this.getPropertyValue('width')
+        this.getStatement('contentX').value = x
+        this.getStatement('contentItem').get().getStatement('x').reset(-x)
     }
 
     $contentYChanged(){
-        this.getStatement('contentItem').get().getStatement('y').reset(-this.getStatement('contentY').get())
+        let y = this.getStatement('contentY').get()
+        if(y < 0) y = 0
+        if(y > this.getPropertyValue('contentHeight') - this.getPropertyValue('height')) y = this.getPropertyValue('contentHeight') - this.getPropertyValue('height')
+        this.getStatement('contentY').value = y
+        this.getStatement('contentItem').get().getStatement('y').reset(-y)
     }
 
 

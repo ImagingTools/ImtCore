@@ -310,13 +310,23 @@ class ListView extends Flickable {
     }
 
     $contentXChanged(){
-        super.$contentXChanged()
+        this.getStatement('contentItem').get().getStatement('x').reset(-this.getStatement('contentX').get())
         this.updateView()
     }
+
     $contentYChanged(){
-        super.$contentYChanged()
-        this.updateView()     
+        this.getStatement('contentItem').get().getStatement('y').reset(-this.getStatement('contentY').get())
+        this.updateView()
     }
+
+    // $contentXChanged(){
+    //     super.$contentXChanged()
+    //     this.updateView()
+    // }
+    // $contentYChanged(){
+    //     super.$contentYChanged()
+    //     this.updateView()     
+    // }
     $contentWidthChanged(){
         this.getStatement('contentItem').get().getStatement('width').reset(this.getStatement('contentWidth').get())
         // if(this.getPropertyValue('contentX') > this.getPropertyValue('contentWidth') - this.getPropertyValue('width')){

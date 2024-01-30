@@ -83,14 +83,22 @@ class MouseArea extends Item {
             this.mouse.y = y - rect.y
             this.getStatement('mouseX').reset(x - rect.x)
             this.getStatement('mouseX').reset(y - rect.y)
-            this.mouse.accepted = true
+            this.mouse.accepted = false
             this.$entered = true
 
-            if(this.$signals && this.$signals.entered) this.$signals.entered()
+            if(this.$signals.clicked || this.$signals.doubleClicked) this.mouse.accepted = true
 
-            this.mouse.accepted = true
+            if(this.$signals && this.$signals.entered) {
+                this.mouse.accepted = true
+                this.$signals.entered()
+            }
+
+            
             this.getStatement('pressed').value = true
-            if(this.$properties && this.$properties.pressed && this.$properties.pressed.notify) this.$properties.pressed.notify()
+            if(this.$properties && this.$properties.pressed && this.$properties.pressed.notify) {
+                this.mouse.accepted = true
+                this.$properties.pressed.notify()
+            }
             
 
             // if(this.$signals && this.$signals.pressAndHold){
