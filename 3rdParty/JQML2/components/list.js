@@ -52,4 +52,6 @@ module.exports.listComponents = [
     'MapRectangle',
     'Connections',
     'Binding',
+    'WheelHandler',
+    'DragHandler',
 ]

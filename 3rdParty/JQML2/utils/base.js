@@ -12,7 +12,14 @@ class ComplexObject {
         if(name in this.$properties){
             console.log('Warning: redefine property', name)
             if(this.$properties[name] instanceof type){
-                this.$properties[name].reset(value)
+                if(typeof value === 'function'){
+                    this.$properties[name].setCompute(value)
+                    this.$properties[name].update()
+                    // updateList.push(()=>{this.$properties[name].update()})
+                } else {
+                    this.$properties[name].reset(value)
+                }
+                
             } else {
                 this.$properties[name] = new type(value)
             }

@@ -203,6 +203,16 @@ class MouseController {
             return false
         }
     }
+    normalizeXY(x, y, obj){
+        let target = obj
+        let rotation = 0
+        while(target && rotation === 0){
+            rotation = target.getPropertyValue('rotation')
+            target = target.getPropertyValue('parent')
+        }
+        let rad = rotation * Math.PI / 180
+        return {x: x*Math.cos(rad) + y*Math.sin(rad), y: x*Math.sin(rad) + y*Math.cos(rad)}
+    }
     onMouseMove(x, y){
         let inner = this.get(x, y)
 
@@ -212,7 +222,8 @@ class MouseController {
         while(this.oldList.length){
             let obj = this.oldList.shift()
             if(obj.$mousearea && obj.getPropertyValue('hoverEnabled')) {
-                obj.onMouseMove(x, y, false)
+                let normXY = this.normalizeXY(x, y, obj)
+                obj.onMouseMove(normXY.x, normXY.y, false)
 
             }
         }
@@ -246,7 +257,8 @@ class MouseController {
         }
 
         if(pressedMouseArea){
-            if(pressedMouseArea.onMouseMove(x, y, true)){
+            let normXY = this.normalizeXY(x, y, pressedMouseArea)
+            if(pressedMouseArea.onMouseMove(normXY.x, normXY.y, true)){
                 this.pressedMouseAreaInner = pressedMouseArea
                 this.pressedMouseAreaOuter = null
             } else {
@@ -264,8 +276,9 @@ class MouseController {
                 }
             } else {
                 for(let obj of inner){
+                    let normXY = this.normalizeXY(x, y, obj)
                     if(obj.$mousearea && obj.getPropertyValue('hoverEnabled')) {
-                        obj.onMouseMove(x, y, false)
+                        obj.onMouseMove(normXY.x, normXY.y, false)
         
                     }
                 }
