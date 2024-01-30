@@ -50,6 +50,9 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="ProcessModificatorName" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="TreeModelAccess"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="SdlTypeListProvider" Type="Reference" ExportId="SdlTypeListProvider">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
