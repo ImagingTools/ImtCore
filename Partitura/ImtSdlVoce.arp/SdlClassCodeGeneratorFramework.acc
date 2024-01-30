@@ -56,6 +56,9 @@
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="ShowComponentId">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
+                    <AttributeInfo Id="UseVariantMapModificator" Type="Boolean" ExportId="">
+                        <Data IsEnabled="true" Value="true"/>
+                    </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
