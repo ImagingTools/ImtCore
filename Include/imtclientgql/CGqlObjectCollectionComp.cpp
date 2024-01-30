@@ -205,91 +205,31 @@ imtbase::IObjectCollection* CGqlObjectCollectionComp::CreateSubCollection(
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr) const
 {
-	//if (m_delegateCompPtr.IsValid()){
-	//	imtbase::IObjectCollection* subcollection = const_cast<imtbase::IObjectCollection*>(dynamic_cast<const imtbase::IObjectCollection*>(this));
-	//	imtbase::CFilterCollectionProxy* retVal = new imtbase::CFilterCollectionProxy(*subcollection);
+	imtbase::IObjectCollection* retVal = nullptr;
 
-	//	if (!m_clientCompPtr.IsValid() || subcollection == nullptr){
-	//		return nullptr;
-	//	}
+	if (!m_clientCompPtr.IsValid() || !m_delegateCompPtr.IsValid()){
+		return retVal;
+	}
 
-	//	istd::TDelPtr<imtgql::IGqlRequest> requestPtr = m_delegateCompPtr->CreateGetSubCollectionRequest(offset, count, selectionParamsPtr);
-	//	istd::TDelPtr<imtgql::IGqlResponse> responsePtr;
-	//	responsePtr.SetCastedOrRemove(m_delegateCompPtr->CreateResponse(*requestPtr));
-	//	if (responsePtr.IsValid()){
-	//		if (m_clientCompPtr->SendRequest(*requestPtr, *responsePtr)){
-	//			if (responsePtr->IsSuccessful()){
-	//				QVariant variant = responsePtr->GetResult();
-	//				if (variant.canConvert<QJsonObject>()){
-	//					QJsonObject jsonObject = variant.value<QJsonObject>();
-	//					QJsonArray items = jsonObject.value("items").toArray();
-	//					for (int index = 0; index < items.count(); index++){
-	//						jsonObject = items.at(index).toObject();
-	//						QJsonObject info = jsonObject.value("info").toObject();
-	//						QByteArray objectId = info.value("id").toString().toUtf8();
-	//						QByteArray typeId = info.value("typeId").toString().toUtf8();
-	//						int version = info.value("version").toInt();
-	//						QString name = info.value("name").toString();
-	//						QString description = info.value("description").toString();
+	imtbase::IObjectCollection* collectionPtr = const_cast<imtbase::IObjectCollection*>(dynamic_cast<const imtbase::IObjectCollection*>(this));
+	Q_ASSERT(collectionPtr != nullptr);
 
-	//						idoc::MetaInfoPtr dataMetainfoPtr;
+	if (collectionPtr != nullptr){
+		QList<imtbase::IMetaInfoCreator*> metaInfoCreatorList;
+		if (m_metaInfoCreatorCompPtr.IsValid()){
+			metaInfoCreatorList.append(m_metaInfoCreatorCompPtr.GetPtr());
+		}
 
-	//						if (m_metaInfoCreatorCompPtr.IsValid()){
-	//							QByteArray typeId = GetObjectTypeId(objectId);
-	//							m_metaInfoCreatorCompPtr->CreateMetaInfo(nullptr, typeId, dataMetainfoPtr);
-	//						}
-	//						else{
-	//							dataMetainfoPtr.SetPtr(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
-	//						}
+		GqlRequestPtr requestPtr(m_delegateCompPtr->CreateGetSubCollectionRequest(offset, count, selectionParamsPtr));
+		if (!requestPtr.isNull()){
+			GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
+			if (!responsePtr.isNull()){
+				retVal = m_delegateCompPtr->GetSubCollection(*collectionPtr, *responsePtr, metaInfoCreatorList);
+			}
+		}
+	}
 
-	//						idoc::CStandardDocumentMetaInfo metainfo;
-	//						if (jsonObject.contains("metaInfo")){
-	//							QByteArray metaInfoData = QByteArray::fromBase64(jsonObject.value("metaInfo").toString().toUtf8());
-	//							bool retVal = DeSerializeObject(&metainfo, metaInfoData);
-	//							if (!retVal){
-	//								qDebug() << "Deserialization of the meta.information was failed!";
-	//							}
-	//						}
-
-	//						if (jsonObject.contains("dataMetaInfo")){
-	//							QByteArray dataMetaInfo = QByteArray::fromBase64(jsonObject.value("dataMetaInfo").toString().toUtf8());
-	//							bool retVal = DeSerializeObject(dataMetainfoPtr.GetPtr(), dataMetaInfo);
-	//							if (!retVal){
-	//								qDebug() << "Deserialization of the object was failed!";
-	//							}
-	//						}
-
-	//						imtbase::COperationContext operationContext;
-	//						if (jsonObject.contains("operationContext")){
-	//							QByteArray operationContextData = QByteArray::fromBase64(jsonObject.value("operationContext").toString().toUtf8());
-
-	//							DeSerializeObject(&operationContext, operationContextData);
-	//						}
-
-	//						retVal->InsertNewObject(
-	//									typeId,
-	//									name,
-	//									description,
-	//									nullptr,
-	//									objectId,
-	//									dataMetainfoPtr.GetPtr(),
-	//									&metainfo,
-	//									&operationContext);
-
-	//						dataMetainfoPtr.SetPtr(nullptr);
-	//					}
-
-	//					return retVal;
-	//				}
-
-	//			}
-	//		}
-	//	}
-
-	//	return nullptr;
-	//}
-
-	return nullptr;
+	return retVal;
 }
 
 

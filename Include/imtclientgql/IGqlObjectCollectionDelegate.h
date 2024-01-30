@@ -5,6 +5,7 @@
 #include <idoc/IDocumentMetaInfo.h>
 
 // ImtCore includes
+#include <imtbase/IMetaInfoCreator.h>
 #include <imtbase/TIStructuredCollectionInfo.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IOperationContext.h>
@@ -106,6 +107,10 @@ public:
 	virtual bool GetMetaInfo(const imtgql::IGqlResponse& reqponse, idoc::IDocumentMetaInfo& out) const = 0;
 	virtual bool GetItemCount(const imtgql::IGqlResponse& reqponse, int& out) const = 0;
 	virtual bool GetItemIds(const imtgql::IGqlResponse& reqponse, Ids& out) const = 0;
+	virtual imtbase::IObjectCollection* GetSubCollection(
+				imtbase::IObjectCollection& collection,
+				const imtgql::IGqlResponse& reqponse,
+				QList<imtbase::IMetaInfoCreator*> metaInfoCreatorList) const = 0;
 };
 
 

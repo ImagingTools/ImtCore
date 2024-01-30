@@ -435,6 +435,92 @@ bool CGqlObjectCollectionDelegateComp::GetItemIds(const imtgql::IGqlResponse& re
 }
 
 
+imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
+			imtbase::IObjectCollection& collection,
+			const imtgql::IGqlResponse& response,
+			QList<imtbase::IMetaInfoCreator*> metaInfoCreatorList) const
+{
+	istd::TDelPtr<imtbase::IObjectCollection> subCollectionPtr(new imtbase::CFilterCollectionProxy(collection));
+
+	ResponseData responseData = GetResponseData(response);
+	QJsonValue responseDataValue;
+	if (responseData.data.contains("itemIds")){
+		QJsonValue itemsValue = responseData.data.value("items");
+		if (!itemsValue.isArray()){
+			return nullptr;
+		}
+
+		QJsonArray items = itemsValue.toArray();
+		for (int index = 0; index < items.count(); index++){
+			QJsonObject jsonObject = items.at(index).toObject();
+			QJsonObject info = jsonObject.value("info").toObject();
+			QByteArray objectId = info.value("id").toString().toUtf8();
+			QByteArray typeId = info.value("typeId").toString().toUtf8();
+			int version = info.value("version").toInt();
+			QString name = info.value("name").toString();
+			QString description = info.value("description").toString();
+
+			idoc::MetaInfoPtr dataMetainfoPtr;
+			auto CreateMetaInfo = [](const QByteArray typeId,
+									 QList<imtbase::IMetaInfoCreator*> metaInfoCreatorList){
+				idoc::MetaInfoPtr metaInfoPtr;
+				for (int i = 0; i < metaInfoCreatorList.count(); i++){
+					if (metaInfoCreatorList[i] != nullptr && metaInfoCreatorList[i]->GetSupportedTypeIds().contains(typeId)){
+						metaInfoCreatorList[i]->CreateMetaInfo(nullptr, typeId, metaInfoPtr);
+					}
+				}
+
+				if (!metaInfoPtr.IsValid()){
+					metaInfoPtr.SetCastedOrRemove(new imod::TModelWrap<idoc::CStandardDocumentMetaInfo>());
+				}
+
+				Q_ASSERT(metaInfoPtr.IsValid());
+
+				return metaInfoPtr;
+			};
+
+			idoc::CStandardDocumentMetaInfo metainfo;
+			if (jsonObject.contains("metaInfo")){
+				QByteArray metaInfoData = QByteArray::fromBase64(jsonObject.value("metaInfo").toString().toUtf8());
+				bool retVal = DeSerializeObject(&metainfo, metaInfoData);
+				if (!retVal){
+					qDebug() << "Deserialization of the meta.information was failed!";
+				}
+			}
+
+			if (jsonObject.contains("dataMetaInfo")){
+				QByteArray dataMetaInfo = QByteArray::fromBase64(jsonObject.value("dataMetaInfo").toString().toUtf8());
+				bool retVal = DeSerializeObject(dataMetainfoPtr.GetPtr(), dataMetaInfo);
+				if (!retVal){
+					qDebug() << "Deserialization of the object was failed!";
+				}
+			}
+
+			imtbase::COperationContext operationContext;
+			if (jsonObject.contains("operationContext")){
+				QByteArray operationContextData = QByteArray::fromBase64(jsonObject.value("operationContext").toString().toUtf8());
+
+				DeSerializeObject(&operationContext, operationContextData);
+			}
+
+			subCollectionPtr->InsertNewObject(
+						typeId,
+						name,
+						description,
+						nullptr,
+						objectId,
+						dataMetainfoPtr.GetPtr(),
+						&metainfo,
+						&operationContext);
+
+			dataMetainfoPtr.SetPtr(nullptr);
+		}
+	}
+
+	return subCollectionPtr.PopPtr();
+}
+
+
 // private methods
 
 CGqlObjectCollectionDelegateComp::ResponseData CGqlObjectCollectionDelegateComp::GetResponseData(const imtgql::IGqlResponse& response) const

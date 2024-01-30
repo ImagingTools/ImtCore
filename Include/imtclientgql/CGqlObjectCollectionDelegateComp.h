@@ -86,6 +86,10 @@ public:
 	virtual bool GetMetaInfo(const imtgql::IGqlResponse& response, idoc::IDocumentMetaInfo& out) const override;
 	virtual bool GetItemCount(const imtgql::IGqlResponse& response, int& out) const override;
 	virtual bool GetItemIds(const imtgql::IGqlResponse& response, Ids& out) const override;
+	virtual imtbase::IObjectCollection* GetSubCollection(
+				imtbase::IObjectCollection& collection,
+				const imtgql::IGqlResponse& reqponse,
+				QList<imtbase::IMetaInfoCreator*> metaInfoCreatorList) const override;
 
 private:
 	struct ResponseData
