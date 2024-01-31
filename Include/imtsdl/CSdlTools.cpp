@@ -249,6 +249,9 @@ QString CSdlTools::GetFromVariantConversionString(const CSdlField& sdlField)
 	if (sdlType == QStringLiteral("ID")){
 		return QStringLiteral("toByteArray()");
 	}
+	else if (sdlField.IsArray()){
+		return QStringLiteral("toList()");
+	}
 
 	/// \todo add convert type and add initialization of custom types
 	return "";
