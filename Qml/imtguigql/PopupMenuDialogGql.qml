@@ -34,6 +34,7 @@ Item {
     property bool canClose: true;
     property bool canUpdateModel: true;
     property bool preventFirstLoading: false;
+    property bool doNotCorrectPosition : false;
 
     property alias modelFilterAlias: modelFilter;
 
@@ -45,7 +46,7 @@ Item {
         //console.log("__________ELEMENTS_COUNT____________",elementsCount);
     }
 
-    property bool ready: popupMenuContainer.root && rootItem && gettedParams && filterIdsModel && properties;
+    property bool ready: root && rootItem && gettedParams && filterIdsModel && properties;
 
     // ID for display in combo box delegates
     property string nameId: "Name";
@@ -68,6 +69,7 @@ Item {
         }
     }
 
+
     property TreeItemModel properties: TreeItemModel{};
     property TreeItemModel gettedParams: TreeItemModel{};
     property TreeItemModel filterIdsModel: TreeItemModel{};
@@ -85,6 +87,7 @@ Item {
     signal endList();
     signal textEdited();
     signal started();
+    signal clearSignal();
 
 
     function onBackgroundClicked(){
@@ -103,7 +106,7 @@ Item {
 
     Component.onCompleted: {
         //console.log("_____________POPUP_COMPL_____________", popupMenuContainer.preventFirstLoading);
-
+        popupMenuContainer.forceActiveFocus();
         modelFilter.AddTreeModel("FilterIds");
         modelFilter.SetData("FilterIds", popupMenuContainer.filterIdsModel)
         modelFilter.AddTreeModel("Sort");
@@ -126,7 +129,15 @@ Item {
             modelFilter.SetData(popupMenuContainer.properties.GetData("Id", item),  popupMenuContainer.properties.GetData("Value", item));
         }
         //itemsModel.updateModel(0);
+        //popupMenuContainer.rootItem.currentIndex = -1;
     }
+//    onGettedParamsChanged: {
+//        popupMenuContainer.rootItem.currentIndex = -1;
+//    }
+//    onFilterIdsModelChanged: {
+//        popupMenuContainer.rootItem.currentIndex = -1;
+
+//    }
 
 
 
@@ -227,7 +238,7 @@ Item {
 
             anchors.fill: parent;
 
-            source: "../../../../" + "Icons/" + Style.theme + "/" + "Close" + "_On_Normal.svg";
+            source: "../../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
             sourceSize.width: width;
             sourceSize.height: height;
@@ -246,6 +257,8 @@ Item {
             visible: parent.visible;
 
             onClicked: {
+                //console.log("clearMouseArea")
+                popupMenuContainer.clearSignal();
                 filterField.text = "";
             }
 
@@ -428,6 +441,9 @@ Item {
         sequence: "Up";
         enabled: true;
         onActivated: {
+            if(filterField.textInputFocus){
+                popupMenuContainer.setTextFocus(false)
+            }
             popupMenuContainer.hoverBlocked = true;
             if(popupMenuContainer.rootItem){
                 popupMenuContainer.rootItem.hoverBlocked = true;
@@ -443,6 +459,9 @@ Item {
         sequence: "Down";
         enabled: true;
         onActivated: {
+            if(filterField.textInputFocus){
+                popupMenuContainer.setTextFocus(false)
+            }
             popupMenuContainer.hoverBlocked = true;
             if(popupMenuContainer.rootItem){
                 popupMenuContainer.rootItem.hoverBlocked = true;
@@ -451,8 +470,10 @@ Item {
                     popupMenuContainer.contentYCorrection(true);
                 }
                 else if(popupMenuContainer.rootItem.selectedIndex == popupMenuContainer.model.GetItemsCount() - 1){
-                    popupMenuContainer.createAdditionalQuery();
-                    popupMenuListView.contentY += popupMenuContainer.itemHeight;
+                    if(popupMenuContainer.rootItem.selectedIndex >=0 && popupMenuContainer.elementsCount -1 > popupMenuContainer.rootItem.selectedIndex){
+                        popupMenuContainer.createAdditionalQuery();
+                    }
+                    //popupMenuListView.contentY += popupMenuContainer.itemHeight;
                 }
 
             }
@@ -514,7 +535,7 @@ Item {
 
                     if (dataModelLocal.ContainsKey(popupMenuContainer.commandId)){
                         dataModelLocal = dataModelLocal.GetData(popupMenuContainer.commandId);
-
+                        var isClosing = false;
                         if (dataModelLocal.ContainsKey("notification")){
                             var notifModel = dataModelLocal.GetData("notification");
                             if (notifModel.ContainsKey("ElementsCount")){
@@ -522,7 +543,8 @@ Item {
                             }
                             if(notifModel.ContainsKey("Close")){
                                 if(notifModel.GetData("Close")){
-                                    popupMenuContainer.rootItem.closeFunc();
+                                    isClosing = true;
+                                    //popupMenuContainer.rootItem.closeFunc();
                                 }
                             }
                         }
@@ -537,6 +559,10 @@ Item {
 
                             loadedRec.visible = false;
                             popupMenuContainer.endListStatus = false;
+                            popupMenuContainer.rootItem.selectedIndex = -1;
+                            if(isClosing){
+                                popupMenuContainer.rootItem.closeFunc();
+                            }
                         }
                         else{//OFSET !== 0
 
@@ -556,6 +582,11 @@ Item {
                                 popupMenuContainer.endListStatus = true;
                             }
                             loadedRec.visible = false;
+
+                            if(popupMenuContainer.rootItem.currentIndex >=0 && popupMenuContainer.elementsCount -1 > popupMenuContainer.rootItem.currentIndex){
+                                //popupMenuListView.contentY += popupMenuContainer.itemHeight;
+
+                            }
                         }
                     }
                     dataModelLocal.Refresh();
