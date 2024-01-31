@@ -55,10 +55,18 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 	}
 
 	SdlTypeList sdlTypeList = m_sdlTypeListCompPtr->GetSdlTypes();
+
+	// first create all files with basic mathods
 	for (const CSdlType& sdlType: sdlTypeList){
 		m_headerFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
 		m_sourceFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".cpp"));
-		BeginClassFiles(sdlType);
+
+		if (!BeginClassFiles(sdlType)){
+			SendErrorMessage(0, QString("Unable to begin files"));
+			I_CRITICAL();
+
+			return iproc::IProcessor::TS_INVALID;
+		}
 
 		// Close files so that extenders can make their own changes
 		if (!CloseFiles()){
@@ -67,21 +75,25 @@ int CSdlClassCodeGeneratorComp::DoProcessing(
 
 			return iproc::IProcessor::TS_INVALID;
 		}
+	}
 
-		// Then let extenders to make changes
-		const int extendersCount = m_codeGeneratorExtenderListCompPtr.GetCount();
-		for (int i = 0; i < extendersCount; ++i){
-			iproc::IProcessor* extenderPtr = m_codeGeneratorExtenderListCompPtr[i];
-			Q_ASSERT(extenderPtr != nullptr);
+	// Then let extenders to make changes
+	const int extendersCount = m_codeGeneratorExtenderListCompPtr.GetCount();
+	for (int i = 0; i < extendersCount; ++i){
+		iproc::IProcessor* extenderPtr = m_codeGeneratorExtenderListCompPtr[i];
+		Q_ASSERT(extenderPtr != nullptr);
 
-			const int extenderResult = extenderPtr->DoProcessing(paramsPtr, inputPtr, outputPtr, progressManagerPtr);
-			if (extenderResult != iproc::IProcessor::TS_OK){
-				return extenderResult;
-			}
-			retVal = qMax(retVal, extenderResult);
+		const int extenderResult = extenderPtr->DoProcessing(paramsPtr, inputPtr, outputPtr, progressManagerPtr);
+		if (extenderResult != iproc::IProcessor::TS_OK){
+			return extenderResult;
 		}
+		retVal = qMax(retVal, extenderResult);
+	}
 
-		// Reopen files to complete processing
+	// Reopen files to complete processing
+	for (const CSdlType& sdlType: sdlTypeList){
+		m_headerFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".h"));
+		m_sourceFilePtr.SetPtr(new QFile(outputDirectoryPath + "/C" + sdlType.GetName() + ".cpp"));
 		if (!ReOpenFiles()){
 			SendErrorMessage(0, QString("Unable to reopen files"));
 			I_CRITICAL();
