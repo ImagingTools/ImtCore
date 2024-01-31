@@ -193,8 +193,10 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType)
 
 	QSet<QString> complexTypeList;
 	bool isQtCommentAdded = false;
-	if (IsTypeHasNonFundamentalTypes(sdlType, &complexTypeList)){
+	bool hasComplexTypes = m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName);
+	hasComplexTypes = IsTypeHasNonFundamentalTypes(sdlType, &complexTypeList) || hasComplexTypes;
 
+	if (hasComplexTypes){
 		// Add Qt types
 		if (complexTypeList.contains(QStringLiteral("QByteArray"))){
 			if (!isQtCommentAdded){
@@ -223,13 +225,25 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType)
 			ifStream << QStringLiteral("#include <QtCore/QList>");
 			FeedStream(ifStream, 1, false);
 		}
+		// if variant map is enabled we need to add QVariant and QVariantMap
+		if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
+			if (!isQtCommentAdded){
+				ifStream << QStringLiteral("// Qt includes");
+				FeedStream(ifStream, 1, false);
+				isQtCommentAdded = true;
+			}
+			ifStream << QStringLiteral("#include <QtCore/QVariant>");
+			FeedStream(ifStream, 1, false);
+			ifStream << QStringLiteral("#include <QtCore/QVariantMap>");
+			FeedStream(ifStream, 1, false);
+		}
 
 		// remove qt types from list
 		complexTypeList.remove(QStringLiteral("QByteArray"));
 		complexTypeList.remove(QStringLiteral("QString"));
 		complexTypeList.remove(QStringLiteral("QList"));
 		if (!complexTypeList.isEmpty()){
-			FeedStream(ifStream, 2, false);
+			FeedStream(ifStream, 1, false);
 		}
 
 		// Add user custom types
@@ -245,19 +259,6 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType)
 			ifStream << QStringLiteral("#include \"") << complexTypeName << QStringLiteral(".h\"");
 			FeedStream(ifStream, 1, false);
 		}
-	}
-
-	// if variant map is enabled we need to add QVariant and QVariantMap
-	if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
-		if (!isQtCommentAdded){
-			ifStream << QStringLiteral("// Qt includes");
-			FeedStream(ifStream, 1, false);
-			isQtCommentAdded = true;
-		}
-		ifStream << QStringLiteral("#include <QtCore/QVariant>");
-		FeedStream(ifStream, 1, false);
-		ifStream << QStringLiteral("#include <QtCore/QVariantMap>");
-		FeedStream(ifStream, 2, false);
 	}
 
 	FeedStream(ifStream, 2, false);
@@ -304,6 +305,13 @@ bool CSdlClassCodeGeneratorComp::BeginHeaderClassFile(const CSdlType& sdlType)
 bool CSdlClassCodeGeneratorComp::EndHeaderClassFile(const CSdlType& sdlType)
 {
 	QTextStream ifStream(m_headerFilePtr.GetPtr());
+
+	// Add compare operator
+	FeedStreamHorizontally(ifStream);
+	ifStream << QStringLiteral("bool operator==(const ");
+	ifStream << 'C' << sdlType.GetName();
+	ifStream << QStringLiteral("& other) const;");
+	FeedStream(ifStream, 2, false);
 
 	// defining class members
 	ifStream << QStringLiteral("private:");
@@ -401,6 +409,45 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const CSdlType& sdlType)
 }
 
 
+bool CSdlClassCodeGeneratorComp::EndSourceClassFile(const CSdlType& sdlType)
+{
+	QTextStream ifStream(m_sourceFilePtr.GetPtr());
+
+	// Add compare operator
+	// a)declare
+	ifStream << QStringLiteral("bool ");
+	ifStream << 'C' << sdlType.GetName();
+	ifStream << QStringLiteral("::operator==(const ");
+	ifStream << 'C' << sdlType.GetName();
+	ifStream << QStringLiteral("& other) const\n{");
+	FeedStream(ifStream, 1, false);
+
+	// b)implement
+	FeedStreamHorizontally(ifStream);
+	ifStream << QStringLiteral("bool retVal = true;");
+	FeedStream(ifStream, 1, false);
+	for (const CSdlField& sdlField: sdlType.GetFields()){
+		FeedStreamHorizontally(ifStream);
+		ifStream << QStringLiteral("retVal = retVal && (m_");
+		ifStream << GetDecapitalizedValue(sdlField.GetId());
+		ifStream << QStringLiteral(" == other.m_");
+		ifStream << GetDecapitalizedValue(sdlField.GetId());
+		ifStream << QStringLiteral(");");
+		FeedStream(ifStream, 1, false);
+	}
+
+	// c)complete
+	FeedStream(ifStream, 1, false);
+	FeedStreamHorizontally(ifStream);
+	ifStream << QStringLiteral("return retVal;");
+	FeedStream(ifStream, 1, false);
+	ifStream << '}';
+	FeedStream(ifStream, 2);
+
+	return true;
+}
+
+
 bool CSdlClassCodeGeneratorComp::EndClassFiles(const CSdlType& sdlType)
 {
 	QString namespaceString;
@@ -436,6 +483,7 @@ bool CSdlClassCodeGeneratorComp::EndClassFiles(const CSdlType& sdlType)
 	FeedStream(headerStream, 3, true);
 
 	// finish source
+	EndSourceClassFile(sdlType);
 	QTextStream sourceStream(m_sourceFilePtr.GetPtr());
 	if (!namespaceString.isEmpty()){
 		sourceStream << namespaceString;

@@ -50,6 +50,7 @@ private:
 	bool BeginHeaderClassFile(const CSdlType& sdlType);
 	bool EndHeaderClassFile(const CSdlType& sdlType);
 	bool BeginSourceClassFile(const CSdlType& sdlType);
+	bool EndSourceClassFile(const CSdlType& sdlType);
 	bool EndClassFiles(const CSdlType& sdlType);
 	void AbortCurrentProcessing();
 	QString GenerateAccessMethods(const CSdlField& sdlField, uint indents = 1, bool generateGetter = true, bool generateSetter = true);
