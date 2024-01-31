@@ -51,6 +51,7 @@ Item {
         //diagram.setMaxValue();
     }
 
+
     function setMinValue(){
         if(!diagram.hasMinValue){
             diagram.minValue = 0;
@@ -234,7 +235,7 @@ Item {
             horizontalAlignment: Text.AlignLeft;
             verticalAlignment: Text.AlignVCenter;
             wrapMode: Text.NoWrap;
-            font.pixelSize: diagram.fontSize;
+            font.pixelSize: 10;
             font.bold: true;
             font.family: Style.fontFamily;
             color:  diagram.valueColor;
@@ -263,7 +264,7 @@ Item {
                     horizontalAlignment: Text.AlignHCenter;
                     verticalAlignment: Text.AlignTop;
                     wrapMode: Text.NoWrap;
-                    font.pixelSize: diagram.fontSize -2;
+                    font.pixelSize: 10;
                     font.bold: false;
                     font.family: Style.fontFamily;
                     color:  diagram.valueColor;
