@@ -125,7 +125,7 @@ eval("const { Item } = __webpack_require__(/*! ./Item */ \"./components/Item.js\
   \**********************************/
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-eval("const { Item } = __webpack_require__(/*! ./Item */ \"./components/Item.js\")\r\nconst { QReal, QBool, QString } = __webpack_require__(/*! ../utils/properties */ \"./utils/properties.js\")\r\n\r\nclass FocusScope extends Item {\r\n\r\n\r\n    $focusChanged(){\r\n\r\n    }\r\n \r\n}\r\n\r\nmodule.exports.FocusScope = FocusScope\n\n//# sourceURL=webpack://jqml2/./components/FocusScope.js?");
+eval("const { Item } = __webpack_require__(/*! ./Item */ \"./components/Item.js\")\r\nconst { QReal, QBool, QString } = __webpack_require__(/*! ../utils/properties */ \"./utils/properties.js\")\r\n\r\nclass FocusScope extends Item {\r\n\r\n\r\n    $focusChanged(){\r\n        if(this.getPropertyValue('focus')){\r\n            if(this.getPropertyValue('context').$focusedElement){\r\n                this.getPropertyValue('context').$focusedElement.getProperty('focus').reset(false)\r\n            }\r\n            this.getPropertyValue('context').$focusedElement = this\r\n        }\r\n        \r\n    }\r\n \r\n}\r\n\r\nmodule.exports.FocusScope = FocusScope\n\n//# sourceURL=webpack://jqml2/./components/FocusScope.js?");
 
 /***/ }),
 
