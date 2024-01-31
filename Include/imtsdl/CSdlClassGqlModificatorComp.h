@@ -28,17 +28,24 @@ protected:
 	virtual bool ProcessSourceClassFile(const CSdlType& sdlType) override;
 
 private:
-	/// \todo add error handling for it
 	void AddFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
 	void AddScalarFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
 	void AddScalarListFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
 	void AddCustomFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
 	void AddCustomListFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
 
-	// general help methods
+	// general help methods for scalar
 	void AddExtractValueFromRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
+
+	/// \todo add error handling for it. do not forget about arrays and arrays.isEmpty
 	void AddCheckRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
 	void AddSetValueToObjectCode(QTextStream& stream, const CSdlField& field);
+
+	// general help methods for custom
+	void AddExtractCustomValueFromRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
+	/// \todo add error handling for it. do not forget about arrays and arrays.isEmpty
+	void AddCheckCustomRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
+	void AddSetCustomValueToObjectCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
 };
 
 
