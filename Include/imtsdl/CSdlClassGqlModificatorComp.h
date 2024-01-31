@@ -30,7 +30,15 @@ protected:
 private:
 	/// \todo add error handling for it
 	void AddFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
-	/// \todo add complex and array values processing
+	void AddScalarFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
+	void AddScalarListFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
+	void AddCustomFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
+	void AddCustomListFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field);
+
+	// general help methods
+	void AddExtractValueFromRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
+	void AddCheckRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
+	void AddSetValueToObjectCode(QTextStream& stream, const CSdlField& field);
 };
 
 

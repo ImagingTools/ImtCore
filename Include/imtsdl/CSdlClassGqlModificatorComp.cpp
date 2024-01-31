@@ -79,28 +79,35 @@ bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const CSdlType& sdlType
 
 void CSdlClassGqlModificatorComp::AddFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field)
 {
+	bool isCustom = false;
+	bool isArray = false;
+	ConvertType(field, &isCustom, nullptr, &isArray);
+
+	if (isCustom && isArray){
+		AddCustomListFieldReadFromRequestCode(stream, field);
+	}
+	else if (isCustom && !isArray){
+		AddCustomFieldReadFromRequestCode(stream, field);
+	}
+	else if (!isCustom && isArray){
+		AddScalarListFieldReadFromRequestCode(stream, field);
+	}
+	else {
+		AddScalarFieldReadFromRequestCode(stream, field);
+	}
+}
+
+
+void CSdlClassGqlModificatorComp::AddScalarFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field)
+{
+	AddExtractValueFromRequestCode(stream, field);
 	FeedStreamHorizontally(stream);
-	stream << QStringLiteral("QVariant ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data = request.GetFieldArgumentValue(");
-	stream << '"' << field.GetId() << '"';
-	stream << QStringLiteral(");");
-	FeedStream(stream, 1, false);
-	FeedStreamHorizontally(stream);
+
 	if (field.IsRequired()){
-		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
-		FeedStream(stream, 1, false);
-
-		FeedStreamHorizontally(stream, 2);
-		stream << QStringLiteral("return false;");
-		FeedStream(stream, 1, false);
-
+		AddCheckRequiredValueCode(stream, field);
 		FeedStreamHorizontally(stream);
-		stream << '}';
-		FeedStream(stream, 1, false);
 
-		FeedStreamHorizontally(stream);
-		stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.");
-		stream << GetFromVariantConversionString(field) << QStringLiteral(");");
+		AddSetValueToObjectCode(stream, field);
 		FeedStream(stream, 1, false);
 	}
 	else {
@@ -108,9 +115,7 @@ void CSdlClassGqlModificatorComp::AddFieldReadFromRequestCode(QTextStream& strea
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream, 2);
-		stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
-		stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.");
-		stream << GetFromVariantConversionString(field) << QStringLiteral(");");
+		AddSetValueToObjectCode(stream, field);
 		FeedStream(stream, 1, false);
 
 		FeedStreamHorizontally(stream);
@@ -119,6 +124,61 @@ void CSdlClassGqlModificatorComp::AddFieldReadFromRequestCode(QTextStream& strea
 	}
 }
 
+
+void CSdlClassGqlModificatorComp::AddScalarListFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field)
+{
+	/// \todo implement it
+	qFatal("Not supported(");
+}
+
+
+void CSdlClassGqlModificatorComp::AddCustomFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field)
+{
+	/// \todo implement it
+	qFatal("Not supported(");
+}
+
+
+void CSdlClassGqlModificatorComp::AddCustomListFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field)
+{
+	/// \todo implement it
+	qFatal("Not supported(");
+}
+
+
+// general help methods
+
+void CSdlClassGqlModificatorComp::AddExtractValueFromRequestCode(QTextStream& stream, const CSdlField& field, quint32 hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("QVariant ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data = request.GetFieldArgumentValue(");
+	stream << '"' << field.GetId() << '"';
+	stream << QStringLiteral(");");
+	FeedStream(stream, 1, false);
+}
+
+
+void CSdlClassGqlModificatorComp::AddCheckRequiredValueCode(QTextStream& stream, const CSdlField& field, quint32 hIndents)
+{
+	stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 1, false);
+}
+
+
+void CSdlClassGqlModificatorComp::AddSetValueToObjectCode(QTextStream& stream, const CSdlField& field)
+{
+	stream << QStringLiteral("object.Set") << GetCapitalizedValue(field.GetId()) << '(';
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.");
+	stream << GetFromVariantConversionString(field) << QStringLiteral(");");
+}
 
 
 } // namespace imtsdl
