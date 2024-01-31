@@ -48,7 +48,7 @@ private:
 	I_REF(imtbase::IObjectCollection, m_userSettingsCollectionCompPtr);
 
 private:
-	mutable imtgql::CGqlRequest m_gqlRequest;
+	mutable imtgql::CGqlRequest m_lastRequest;
 };
 
 

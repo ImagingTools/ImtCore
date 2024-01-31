@@ -36,7 +36,6 @@ public:
 				int statusCode,
 				const QByteArray& data,
 				const QByteArray& dataTypeId) const override;
-
 	virtual IResponse* CreateResponse(
 				const IRequest& request,
 				int statusCode,

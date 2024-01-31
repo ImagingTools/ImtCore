@@ -1,7 +1,7 @@
 #pragma once
 
 
-// Acf includes
+// ACF includes
 #include <icomp/CComponentBase.h>
 #include <imod/TSingleModelObserverBase.h>
 
@@ -21,7 +21,7 @@ public:
 	typedef icomp::CComponentBase BaseClass;
 
 	I_BEGIN_COMPONENT(CSessionModelObserverComp);
-		I_ASSIGN(sessionChangeNotifierCompPtr, "SessionChangeNotifier", "Session change notifier", true, "SessionChangeNotifier");
+		I_ASSIGN(m_sessionChangeNotifierCompPtr, "SessionChangeNotifier", "Session change notifier", true, "SessionChangeNotifier");
 		I_ASSIGN(m_modelCompPtr, "Model", "Model", true, "Model");
 	I_END_COMPONENT;
 
@@ -34,7 +34,7 @@ protected:
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
 
 private:
-	I_REF(imtauth::ISessionChangeNotifier, sessionChangeNotifierCompPtr);
+	I_REF(imtauth::ISessionChangeNotifier, m_sessionChangeNotifierCompPtr);
 	I_REF(imod::IModel, m_modelCompPtr);
 };
 

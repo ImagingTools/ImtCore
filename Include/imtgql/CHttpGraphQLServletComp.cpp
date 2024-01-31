@@ -27,17 +27,17 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 			const HeadersMap& headers,
 			const imtrest::CHttpRequest& request) const
 {
-	m_gqlRequest.ResetData();
+	m_lastRequest.ResetData();
 
 	int errorPosition = -1;
 	QByteArray requestBody = request.GetBody();
-	if (!m_gqlRequest.ParseQuery(requestBody, errorPosition)){
+	if (!m_lastRequest.ParseQuery(requestBody, errorPosition)){
 		qCritical() << __FILE__ << __LINE__ << QString("Error when parsing request: %1; Error position: %2")
 						.arg(qPrintable(request.GetBody()))
 						.arg(errorPosition);
 	}
 
-	QByteArray gqlCommand = m_gqlRequest.GetCommandId();
+	QByteArray gqlCommand = m_lastRequest.GetCommandId();
 
 	QByteArray userId;
 
@@ -45,17 +45,17 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	QByteArray accessToken = headers.value("X-authentication-token");
 	if (!accessToken.isEmpty() && m_gqlContextControllerCompPtr.IsValid()){
 		QString errorMessage;
-		gqlContextPtr = m_gqlContextControllerCompPtr->GetRequestContext(m_gqlRequest, accessToken, errorMessage);
 
+		gqlContextPtr = m_gqlContextControllerCompPtr->GetRequestContext(m_lastRequest, accessToken, errorMessage);
 		if (gqlContextPtr != nullptr){
-			m_gqlRequest.SetGqlContext(gqlContextPtr);
+			m_lastRequest.SetGqlContext(gqlContextPtr);
 
 			if (gqlContextPtr->GetUserInfo() != nullptr){
 				userId = gqlContextPtr->GetUserInfo()->GetId();
 			}
 		}
 		else{
-			SendWarningMessage(0, QString("Invalid GQL-Context for token %1. Command: %2.").arg(qPrintable(accessToken)).arg(qPrintable(gqlCommand)), "GraphQL - servlet");
+			SendWarningMessage(0, QString("Invalid GraphQL-context for the access token %1. Command-ID: %2.").arg(qPrintable(accessToken)).arg(qPrintable(gqlCommand)), "GraphQL - servlet");
 
 			QByteArray responseData;
 
@@ -68,8 +68,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 			{
 				iser::CJsonMemWriteArchive archive(responseData);
-				if (!rootModel.Serialize(archive)){
-				}
+				rootModel.Serialize(archive);
 			}
 
 			if (!responseData.isEmpty()){
@@ -127,9 +126,9 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	for (int index = 0; index < dataControllersCount; index++){
 		const imtgql::IGqlRequestHandler* requestHandlerPtr = m_gqlRequestHandlerCompPtr[index];
 		if (requestHandlerPtr != nullptr){
-			if (requestHandlerPtr->IsRequestSupported(m_gqlRequest)){
+			if (requestHandlerPtr->IsRequestSupported(m_lastRequest)){
 				istd::TDelPtr<imtbase::CTreeItemModel> sourceItemModelPtr;
-				sourceItemModelPtr.SetPtr(requestHandlerPtr->CreateResponse(m_gqlRequest, errorMessage));
+				sourceItemModelPtr.SetPtr(requestHandlerPtr->CreateResponse(m_lastRequest, errorMessage));
 
 				if(sourceItemModelPtr.IsValid()){
 					imtbase::CTreeItemModel rootModel;
@@ -203,7 +202,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 const IGqlRequest* CHttpGraphQLServletComp::GetGqlRequest() const
 {
-	return &m_gqlRequest;
+	return &m_lastRequest;
 }
 
 

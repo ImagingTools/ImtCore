@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5087" Description="ACF"/>
-            <Version Id="1" Number="2190" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+            <Version Id="0" Number="5181" Description="ACF"/>
+            <Version Id="1" Number="2199" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Design schema for ImtCore</Description>
@@ -56,6 +56,9 @@
         <Element Id="ImtStyleDesignShema" PackageId="ImtStylePck" ComponentId="DesignManager">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultThemeIndex" Type="Integer" ExportId="DefaultThemeIndex">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="PaletteProvider" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="DesignTokenBasedResourceProvider"/>
                     </AttributeInfo>
