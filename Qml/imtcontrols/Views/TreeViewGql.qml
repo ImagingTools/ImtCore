@@ -38,6 +38,8 @@ Rectangle{
     signal forcedOpen(int index);
     signal inserted(int index);
 
+    signal openButtonClicked(int index);
+
     onWidthChanged: {
         list.contentX = list.originX;
     }
@@ -159,6 +161,7 @@ Rectangle{
                                     treeViewGql.model.SetData("OpenState__", 1, model.index);
 
                                     treeViewGql.openBranch(model.index)
+                                    treeViewGql.openButtonClicked(model.index);
                                 }
                                 else if(deleg.isOpen){
                                     treeViewGql.model.SetData("IsOpen__", false, model.index);
