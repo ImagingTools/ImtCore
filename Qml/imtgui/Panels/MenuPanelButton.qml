@@ -5,13 +5,10 @@ import imtcontrols 1.0
 ControlBase {
     id: container;
 
-    width: container.contentWidth;
-    height: subPagesColumn.visible ? container.contentHeight + subPagesColumn.height : container.contentHeight;
-
     decorator: Style.menuPanelButtonDecorator;
 
     property string text: "Test";
-    property string iconSource: "";//!container.baseElement ? "" : container.baseElement.iconSource;
+    property string iconSource: "";
     property string textColor: "#335777";//"#191970"
     property string fontName: "";
 
@@ -28,17 +25,19 @@ ControlBase {
 
     property string decoratorSource;
 
+    property alias subPagesCount: subPagesRepeater.count;
+
     property Item menuPanelRef: null;
 
     signal clicked;
 
-    onContentWidthChanged: {
+    onWidthChanged: {
         if (!menuPanelRef){
             return;
         }
 
-        if (menuPanelRef.contentWidth != container.contentWidth){
-            menuPanelRef.contentWidth = container.contentWidth;
+        if (menuPanelRef.contentWidth != container.width){
+            menuPanelRef.contentWidth = container.width;
         }
     }
 
@@ -53,8 +52,8 @@ ControlBase {
 
         anchors.top: container.top;
 
-        width: container.contentWidth;
-        height: container.contentHeight;
+        width: container.width;
+        height: container.height;
 
         color: "transparent";
 

@@ -12,12 +12,14 @@ DecoratorBase {
     property string imageSource: "";
     property bool visibleMarker: false;
 
-    signal accepted(string text);
-    signal clicked();
 
     property bool highlighted;
     property bool selected: !leftPanelElement.baseElement ? false : leftPanelElement.baseElement.selected;
     property string text;
+
+    signal accepted(string text);
+    signal clicked();
+
 
     onWidthChanged: {
         if(leftPanelElement.baseElement){
