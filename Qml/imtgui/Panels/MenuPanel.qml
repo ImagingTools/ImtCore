@@ -42,6 +42,10 @@ Rectangle {
         Events.unSubscribeEvent("UpdatePageVisualStatus", menuPanel.updateVisualStatus);
     }
 
+    onActivePageIdChanged: {
+        Events.sendEvent("ActivePageIdChanged", menuPanel.activePageId);
+    }
+
     function updateVisualStatus(data){
         if (!data){
             return;
