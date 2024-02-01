@@ -17,6 +17,7 @@ Rectangle {
     property alias loadingPage: loading;
 
     property int mainMargin: Style.mainWindowMargin !== undefined ? Style.mainWindowMargin : 0;
+    property int pageMargin: Style.pageMargin !== undefined ? Style.pageMargin : 0;
     property int mainRadius: 0;
 
     property alias authorizationPageAlias: authorizationPage;
@@ -174,6 +175,11 @@ Rectangle {
         anchors.right: thumbnailDecoratorContainer.right;
         anchors.top: topPanel.bottom;
         anchors.bottom: thumbnailDecoratorContainer.bottom;
+
+        anchors.topMargin: thumbnailDecoratorContainer.pageMargin;
+        anchors.bottomMargin: thumbnailDecoratorContainer.pageMargin;
+        anchors.leftMargin: thumbnailDecoratorContainer.pageMargin;
+        anchors.rightMargin: thumbnailDecoratorContainer.pageMargin;
 
         activePageIndex: menuPanel.activePageIndex;
 
