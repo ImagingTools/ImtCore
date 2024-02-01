@@ -281,8 +281,13 @@ JSONListModel {
     }
 
 
-    function InsertNewItem(){
-        this.append({});
+    function InsertNewItem(index){
+        if(index !== undefined && index !== null && typeof index === 'number'){
+            this.insert(index, {});
+        } else {
+            this.append({});
+        }
+
         return this.count - 1;
     }
 
