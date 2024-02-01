@@ -49,6 +49,7 @@ ModalDialogManager 1.0 ./Dialogs/ModalDialogManager.qml
 PopupMenuDialog 1.0 ./Dialogs/PopupMenuDialog.qml
 PopupDecorator 1.0 ./Dialogs/PopupDecorator.qml
 PopupItemDelegateDecorator 1.0 ./Dialogs/PopupItemDelegateDecorator.qml
+DialogDecorator 1.0 ./Dialogs/DialogDecorator.qml
 
 Calendar 1.0 ./Inputs/Calendar.qml
 ComboBox 1.0 ./Inputs/ComboBox.qml
