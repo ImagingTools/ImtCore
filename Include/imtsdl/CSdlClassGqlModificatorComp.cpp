@@ -125,10 +125,10 @@ void CSdlClassGqlModificatorComp::AddScalarFieldReadFromRequestCode(QTextStream&
 }
 
 
-void CSdlClassGqlModificatorComp::AddScalarListFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field)
+void CSdlClassGqlModificatorComp::AddScalarListFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field) throw()
 {
-	/// \todo implement it
-	qFatal("Not supported(");
+	/// \todo implement it when GQL will be able to store jscalar list
+	qFatal("GQL model does not support insert list of scalars(. Change schema or disable GQL modificator");
 }
 
 
@@ -161,8 +161,39 @@ void CSdlClassGqlModificatorComp::AddCustomFieldReadFromRequestCode(QTextStream&
 
 void CSdlClassGqlModificatorComp::AddCustomListFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field)
 {
-	/// \todo implement it
-	qFatal("Not supported(");
+
+/*!
+	/// \def
+
+	type ShareUserInfo {
+		Id: ID!
+		Type: Int
+	}
+
+	type ShareRequest {
+		ItemId: ID!
+		UserShareDataList: [ShareUserInfo!]!
+	}
+
+	/// \code
+	int userShareDataListCount = request.GetObjectsCount("UserShareDataList");
+	if (userShareDataListCount <= 0){
+		return false;
+	}
+	QList<CShareUserInfo> userShareDataList;
+	for (int userShareDataListIndex = 0; userShareDataListIndex < userShareDataListCount; ++userShareDataListIndex){
+		const imtgql::CGqlObject* userShareDataObjectPtr = request.GetFieldArgumentObjectPtr("UserShareDataList", userShareDataListIndex);
+		if (userShareDataObjectPtr == nullptr){
+			return false;
+		}
+		CShareUserInfo shareUserInfo;
+		if (!CShareUserInfo::ReadFromGraphQlRequest(shareUserInfo, *userShareDataObjectPtr)){
+			return false;
+		}
+		userShareDataList << shareUserInfo;
+	}
+	object.SetUserShareDataList(userShareDataList);
+*/
 }
 
 
@@ -255,6 +286,26 @@ void CSdlClassGqlModificatorComp::AddSetCustomValueToObjectCode(QTextStream& str
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
+
+}
+
+
+// general help methods for custom list
+
+void CSdlClassGqlModificatorComp::AddExtractCustomListValueFromRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents)
+{
+
+}
+
+
+void CSdlClassGqlModificatorComp::AddCheckCustomListRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents)
+{
+
+}
+
+
+void CSdlClassGqlModificatorComp::AddSetCustomListValueToObjectCode(QTextStream& stream, const CSdlField& field, uint hIndents)
+{
 
 }
 

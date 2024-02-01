@@ -438,6 +438,7 @@ bool CGqlFileRepositoryComp::SetupGqlItem(
 	}
 
 /// \todo remove it
+#if 0
 	for (const QByteArray& metaInfoId: metaInfoIdList){
 		QVariant elementInformation;
 
@@ -474,6 +475,7 @@ bool CGqlFileRepositoryComp::SetupGqlItem(
 			retVal = retVal && model.SetData(metaInfoId, elementInformation, itemIndex);
 		}
 	}
+#endif
 
 	sdl::CFileMetaInfo fileMetaInfo;
 	fileMetaInfo.SetId(objectId);
@@ -487,16 +489,11 @@ bool CGqlFileRepositoryComp::SetupGqlItem(
 	fileMetaInfo.SetChecksumValue(elementMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CONTENT_CHECKSUM).toString());
 	fileMetaInfo.SetVersion(elementMetaInfoPtr->GetMetaInfo(imtbase::IObjectCollection::MIT_REVISION).toString());
 
+	retVal = retVal && fileMetaInfo.AddMeToModel(model, 0);
 
-
-//	bool result = AddToMeTreeModel(&model, index)
-	model.SetData(QByteArrayLiteral("Id"), fileMetaInfo.GetId(), itemIndex);
-
-
-#if SDL_TO_MODEL_ADD_IMPLEMEMNTED
-	fileMetaInfo.AddToMeTreeModel(model, metaInfoIdList);
-#endif
-
+	if (!retVal){
+		/// \todo add error message
+	}
 
 	return retVal;
 }
