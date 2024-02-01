@@ -289,9 +289,14 @@ function qmlprop(meta, instructions){
                         isElement: true
                     })
                 } else {
+                    let command = ''
+                    if((name === 'latitude' || name === 'longitude') && !testProperty(name, instructions)){ // temp solution
+                        command = 'create'
+                    }
                     instructions.properties.push({
                         name: name,
-                        val: meta[2]
+                        val: meta[2],
+                        command: command
                     })
                 }
 

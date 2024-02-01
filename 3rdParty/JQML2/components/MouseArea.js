@@ -65,10 +65,11 @@ class MouseArea extends Item {
         if(this.getPropertyValue('enabled') && this.getPropertyValue('visible') && this.availableButton(button)) {
             this.mouse.accepted = true
             let rect = this.getDom().getBoundingClientRect()
-            this.mouse.x = x - rect.x
-            this.mouse.y = y - rect.y
-            this.getStatement('mouseX').reset(x - rect.x)
-            this.getStatement('mouseX').reset(y - rect.y)
+            let norm = this.normalizeXY(x - rect.x, y - rect.y)
+            this.mouse.x = norm.x
+            this.mouse.y = norm.y
+            this.getStatement('mouseX').reset(norm.x)
+            this.getStatement('mouseY').reset(norm.y)
 
             if(this.$signals && this.$signals.doubleClicked) this.$signals.doubleClicked()
 
@@ -79,10 +80,11 @@ class MouseArea extends Item {
         if(this.getPropertyValue('enabled') && this.getPropertyValue('visible') && this.availableButton(button)) {
             
             let rect = this.getDom().getBoundingClientRect()
-            this.mouse.x = x - rect.x
-            this.mouse.y = y - rect.y
-            this.getStatement('mouseX').reset(x - rect.x)
-            this.getStatement('mouseX').reset(y - rect.y)
+            let norm = this.normalizeXY(x - rect.x, y - rect.y)
+            this.mouse.x = norm.x
+            this.mouse.y = norm.y
+            this.getStatement('mouseX').reset(norm.x)
+            this.getStatement('mouseY').reset(norm.y)
             this.mouse.accepted = false
             this.$entered = true
 
@@ -117,10 +119,11 @@ class MouseArea extends Item {
         if(this.getPropertyValue('enabled') && this.getPropertyValue('visible') && this.availableButton(button)) {
             this.getStatement('pressed').value = false
             let rect = this.getDom().getBoundingClientRect()
-            this.mouse.x = x - rect.x
-            this.mouse.y = y - rect.y
-            this.getStatement('mouseX').reset(x - rect.x)
-            this.getStatement('mouseX').reset(y - rect.y)
+            let norm = this.normalizeXY(x - rect.x, y - rect.y)
+            this.mouse.x = norm.x
+            this.mouse.y = norm.y
+            this.getStatement('mouseX').reset(norm.x)
+            this.getStatement('mouseY').reset(norm.y)
             this.mouse.accepted = true
   
             if(this.$signals && this.$signals.released) this.$signals.released()
@@ -137,15 +140,26 @@ class MouseArea extends Item {
             return this.mouse ? !this.mouse.accepted : true
         }
     }
+    normalizeXY(x, y){
+        let target = this
+        let rotation = 0
+        while(target && rotation === 0){
+            rotation = target.getPropertyValue('rotation')
+            target = target.getPropertyValue('parent')
+        }
+        let rad = rotation * Math.PI / 180
+        return {x: x*Math.cos(rad) - y*Math.sin(rad), y: -x*Math.sin(rad) + y*Math.cos(rad)}
+    }
     onMouseMove(x, y, pressed){
         if(this.getPropertyValue('enabled') && this.getPropertyValue('visible')) {
             this.getStatement('pressed').value = pressed
             this.mouse.accepted = true
             let rect = this.getDom().getBoundingClientRect()
-            this.mouse.x = x - rect.x
-            this.mouse.y = y - rect.y
-            this.getStatement('mouseX').reset(x - rect.x)
-            this.getStatement('mouseY').reset(y - rect.y)
+            let norm = this.normalizeXY(x - rect.x, y - rect.y)
+            this.mouse.x = norm.x
+            this.mouse.y = norm.y
+            this.getStatement('mouseX').reset(norm.x)
+            this.getStatement('mouseY').reset(norm.y)
 
 
             if((pressed || this.getPropertyValue('hoverEnabled')) && this.$signals.positionChanged) this.$signals.positionChanged()

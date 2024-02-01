@@ -222,8 +222,8 @@ class MouseController {
         while(this.oldList.length){
             let obj = this.oldList.shift()
             if(obj.$mousearea && obj.getPropertyValue('hoverEnabled')) {
-                let normXY = this.normalizeXY(x, y, obj)
-                obj.onMouseMove(normXY.x, normXY.y, false)
+                // let normXY = this.normalizeXY(x, y, obj)
+                obj.onMouseMove(x, y, false)
 
             }
         }
@@ -257,8 +257,8 @@ class MouseController {
         }
 
         if(pressedMouseArea){
-            let normXY = this.normalizeXY(x, y, pressedMouseArea)
-            if(pressedMouseArea.onMouseMove(normXY.x, normXY.y, true)){
+            // let normXY = this.normalizeXY(x, y, pressedMouseArea)
+            if(pressedMouseArea.onMouseMove(x, y, true)){
                 this.pressedMouseAreaInner = pressedMouseArea
                 this.pressedMouseAreaOuter = null
             } else {
@@ -276,9 +276,9 @@ class MouseController {
                 }
             } else {
                 for(let obj of inner){
-                    let normXY = this.normalizeXY(x, y, obj)
+                    // let normXY = this.normalizeXY(x, y, obj)
                     if(obj.$mousearea && obj.getPropertyValue('hoverEnabled')) {
-                        obj.onMouseMove(normXY.x, normXY.y, false)
+                        obj.onMouseMove(x, y, false)
         
                     }
                 }

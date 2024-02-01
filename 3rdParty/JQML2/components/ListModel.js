@@ -79,11 +79,16 @@ class ListModel extends QtObject {
 
       
             for(let i = 0; i < dict.length; i++){
-                this.getStatement('data').get().splice(index, 0, new QModelData(dict[i], this.getStatement('data').get().length))
+                this.getStatement('data').get().splice(index, 0, new QModelData(dict[i], index+i))
             }
 		} else {
-            this.getStatement('data').get().splice(index, 0, new QModelData(dict, this.getStatement('data').get().length))
+            this.getStatement('data').get().splice(index, 0, new QModelData(dict, index))
 		}
+
+        let data = this.getStatement('data').get()
+        for(let i = 0; i < data.length; i++){
+            data[i].index = i
+        }
         
         this.getStatement('count').reset(this.getStatement('data').get().length)
         this.getStatement('data').getNotify()(index, index+1, 'insert')

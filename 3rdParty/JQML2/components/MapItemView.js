@@ -85,13 +85,13 @@ class MapItemView extends QtObject {
         let cls = this.getStatement('delegate').get().constructor
 
         if(typeof this.getPropertyValue('model') === 'number'){
-            let obj = createObject ? createObject(this.getStatement('contentItem').get(),ctx, {index: index}, false) : new cls(this.getStatement('contentItem').get(),ctx, {index: index})
+            let obj = createObject ? createObject(this.getStatement('parent').get(),ctx, {index: index}, false) : new cls(this.getStatement('parent').get(),ctx, {index: index})
             // obj.getStatement('index').reset(index)
             // obj.getStatement('model').reset({index: index})
             this.$items[index] = obj
         } else {
             let model = this.getPropertyValue('model').getPropertyValue('data')[index]
-            let obj = createObject ? createObject(this.getStatement('contentItem').get(),ctx, model, false) : new cls(this.getStatement('contentItem').get(),ctx, model)
+            let obj = createObject ? createObject(this.getStatement('parent').get(),ctx, model, false) : new cls(this.getStatement('parent').get(),ctx, model)
             // obj.getStatement('index').setCompute(()=>{return model.index})
             // obj.getStatement('index').update()
             // obj.getStatement('model').reset(model)
