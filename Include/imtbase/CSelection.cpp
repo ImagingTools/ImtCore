@@ -20,7 +20,7 @@ namespace imtbase
 // public methods
 
 CSelection::CSelection()
-	:CSelection(SelectionMode::SM_SINGLE)
+	:m_selectionMode(SelectionMode::SM_SINGLE)
 {
 }
 
@@ -35,6 +35,7 @@ void CSelection::SetSelectionConstraints(ICollectionInfo* selectionConstraintsPt
 {
 	istd::IChangeable::ChangeSet changeSet(CF_CONSTRAINTS_CHANGED);
 	changeSet.SetChangeInfo(ISelection::CN_CONSTRAINTS_CHANGED, QVariant());
+
 	istd::TDelPtr<istd::CChangeNotifier> notifierPtr;
 
 	if (GetModelPtr() == nullptr){
@@ -83,6 +84,8 @@ bool CSelection::Serialize(iser::IArchive& archive)
 {
 	bool retVal = true;
 
+	istd::CChangeNotifier changeNotifier(archive.IsStoring() ? nullptr : this);
+
 	SelectionMode selectionMode = m_selectionMode;
 	QByteArrayList selectedIds = m_selectedIds.values();
 
@@ -96,8 +99,6 @@ bool CSelection::Serialize(iser::IArchive& archive)
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeContainer(archive, selectedIds, "SelectedItems", "Item");
 
 	if (retVal && !archive.IsStoring()){
-		istd::CChangeGroup group(this);
-
 		ApplySelectionMode(selectionMode);
 
 #if QT_VERSION < 0x060000
@@ -174,11 +175,12 @@ bool CSelection::ResetData(CompatibilityMode /*mode*/)
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CSelection::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CSelection::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
-	istd::IChangeable::ChangeSet changeSet(CF_CONSTRAINTS_CHANGED);
-	changeSet.SetChangeInfo(ISelection::CN_CONSTRAINTS_CHANGED, QVariant());
-	istd::CChangeNotifier notifier(this, &changeSet);
+	//istd::IChangeable::ChangeSet changeSet(CF_CONSTRAINTS_CHANGED);
+	//changeSet.SetChangeInfo(ISelection::CN_CONSTRAINTS_CHANGED, QVariant());
+
+	//istd::CChangeNotifier notifier(this, &changeSet);
 }
 
 

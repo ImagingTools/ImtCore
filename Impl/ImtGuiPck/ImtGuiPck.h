@@ -43,6 +43,7 @@
 #include <imtgui/CGuiElementContainerComp.h>
 #include <imtgui/CMultiParamsSetGuiComp.h>
 #include <imtgui/CIconDataProviderComp.h>
+#include <imtgui/CMultiSelectionEditorComp.h>
 
 
 /**
@@ -89,6 +90,7 @@ typedef imtgui::CGuiElementModelComp GuiElementModel;
 typedef imtgui::CGuiElementContainerComp GuiElementContainer;
 typedef imtgui::CMultiParamsSetGuiComp MultiParamsSetGui;
 typedef imtgui::CIconDataProviderComp IconDataProvider;
+typedef imtgui::CMultiSelectionEditorComp MultiSelectionEditor;
 
 
 } // namespace ImtGuiPck

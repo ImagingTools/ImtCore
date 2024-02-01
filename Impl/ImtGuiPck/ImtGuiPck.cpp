@@ -197,6 +197,11 @@ I_EXPORT_COMPONENT(
 			"Component for providing icons",
 			"Icon Provider");
 
+I_EXPORT_COMPONENT(
+			MultiSelectionEditor,
+			"Editor for multi-selection",
+			"Selection Option View");
+
 
 } // namespace ImtGuiPck
 
