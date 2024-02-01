@@ -29,6 +29,10 @@ public:
 	I_BEGIN_COMPONENT(CDesignManagerComp);
 		I_REGISTER_INTERFACE(iprm::ISelectionParam);
 		I_REGISTER_INTERFACE(iser::ISerializable);
+		I_REGISTER_SUBELEMENT(DesignList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DesignList, iprm::IOptionsList, ExtractDesignList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DesignList, imod::IModel, ExtractDesignList);
+		I_REGISTER_SUBELEMENT_INTERFACE(DesignList, istd::IChangeable, ExtractDesignList);
 		I_ASSIGN(m_paletteProviderCompPtr, "PaletteProvider", "Palette provider", false, "PaletteProvider");
 		I_ASSIGN_TO(m_fontProviderCompPtr, m_paletteProviderCompPtr, false);
 		I_ASSIGN(m_defaultThemeIndexAttrPtr, "DefaultThemeIndex", "Index of the default theme", true, -1);
@@ -56,6 +60,13 @@ protected:
 
 private:
 	bool ApplyDesignScheme(const QByteArray& themeId);
+
+	// static template methods for subelement access
+	template <class InterfaceType>
+	static InterfaceType* ExtractDesignList(CDesignManagerComp& component)
+	{
+		return &component.m_designs;
+	}
 
 private:
 	class DesignList: virtual public iprm::IOptionsList

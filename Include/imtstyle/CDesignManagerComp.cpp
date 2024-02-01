@@ -63,6 +63,8 @@ bool CDesignManagerComp::Serialize(iser::IArchive& archive)
 
 // protected methods
 
+// reimplemented (ibase::TRuntimeStatusHanderCompWrap)
+
 void CDesignManagerComp::OnSystemStarting()
 {
 	m_designs.UpdateDesignList();
@@ -92,6 +94,11 @@ void CDesignManagerComp::OnSystemStarting()
 void CDesignManagerComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+
+	m_designs.UpdateDesignList();
+
+	SetSelectionConstraints(&m_designs);
+
 	BaseClass2::SetSelectedOptionIndex(*m_defaultThemeIndexAttrPtr);
 }
 
