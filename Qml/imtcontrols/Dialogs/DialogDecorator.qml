@@ -6,13 +6,13 @@ import Acf 1.0
 import imtcontrols 1.0
 
 
-Item {
+DecoratorBase {
     id: dialogContainer;
 
     width: dialogColumn ? dialogColumn.width : 0;
     height: dialogColumn ? dialogColumn.height : 0;
+    z:-1;
 
-    property var baseElement: null;
     property string title : baseElement ? baseElement.title : "";
     property string bodySource: baseElement ? baseElement.bodySource : "";
     property string topPanelSource: baseElement ? baseElement.topPanelSource : "";
@@ -21,6 +21,7 @@ Item {
     onBaseElementChanged: {
         baseElement.buttons = buttonsDialog;
     }
+
 
     //            onBodySourceChanged: {
     //                loaderBodyDialog.source = dialogContainer.bodySource;
@@ -68,6 +69,7 @@ Item {
         anchors.fill: parent;
 
         color: dialogContainer.baseElement.backgroundColor;
+        radius: 4;
     }
 
     DropShadow {
@@ -98,7 +100,9 @@ Item {
             dialogContainer.width = width
         }
         onHeightChanged: {
-            dialogContainer.height = height
+            if(dialogColumn.height > topPanelContainer.height){
+                dialogContainer.height = height
+            }
         }
 
         Item {
@@ -199,5 +203,7 @@ Item {
             }
         }
     }
+
+
 
 }//dialog
