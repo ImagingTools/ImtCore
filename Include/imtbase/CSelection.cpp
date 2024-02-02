@@ -199,12 +199,6 @@ bool CSelection::ApplySelectionMode(SelectionMode selectionMode)
 
 bool CSelection::ApplySelection(const Ids& selectionIds)
 {
-	for (const Id& id : selectionIds){
-		if (id.isEmpty()){
-			return false;
-		}
-	}
-
 	if (m_selectionMode == SM_SINGLE && selectionIds.count() > 1){
 		return false;
 	}
