@@ -268,14 +268,14 @@ FocusScope{
 
                     width: 28;
                     height: 28;
-                    radius: 5
+                    //radius: 5
                     mainMargin: 16;
                     borderColor:Style.color_gray;
-                    borderWidth: 2;
+                    //borderWidth: 2;
 
                     text: checkBoxMenu.hasSearch ? "" : "Все";
 
-                    imageSource: popupMenuContainer.rootItem && checkState == Qt.Checked ? popupMenuContainer.rootItem.checkImageSource: "";
+                    //imageSource: popupMenuContainer.rootItem && checkState == Qt.Checked ? popupMenuContainer.rootItem.checkImageSource: "";
 
                     onClicked: {
                         if(checkBoxAll.checkState == Qt.Unchecked){
@@ -358,11 +358,11 @@ FocusScope{
 
                             width: 28;
                             height: 28;
-                            radius: 5
+                            //radius: 5
                             mainMargin: 16;
                             borderColor:Style.color_gray;
 
-                            imageSource: popupMenuContainer.rootItem && checkState == Qt.Checked ? popupMenuContainer.rootItem.checkImageSource: "";
+                            //imageSource: popupMenuContainer.rootItem && checkState == Qt.Checked ? popupMenuContainer.rootItem.checkImageSource: "";
                             text: model[checkBoxMenu.nameId];
                             Component.onCompleted: {
                                 popupMenuContainer.setCheckedSignal.connect(checkBox.setCheckState);
