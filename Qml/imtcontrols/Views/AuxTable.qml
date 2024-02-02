@@ -55,7 +55,7 @@ Rectangle {
     property alias elementsCount: elementsListObj.count;
 
     property alias headerDelegate: headersList.delegate;
-    property real headerElementWidth: (headersList.width)/headersList.count;
+    property real headerElementWidth:  (headersList.width)/headersList.count;
     property alias headerElementHeight: headersList.height;
 
     property alias backgroundElementsColor: elementsBg.color;
@@ -590,7 +590,7 @@ Rectangle {
             contentX: tableContainer.elementsList.contentX;
             contentWidth: tableContainer.elementsList.contentWidth;
             interactive: false;
-            cacheBuffer: Math.max(contentWidth, tableContainer.width, 0);
+            cacheBuffer: Math.max(tableContainer.elementsList.contentWidth, tableContainer.width, 0);
             property bool compl: false;
 
             currentIndex: 0;
