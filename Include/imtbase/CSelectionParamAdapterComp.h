@@ -32,7 +32,7 @@ public:
 	I_REGISTER_SUBELEMENT_INTERFACE(Constraints, istd::IChangeable, ExtractConstraints);
 	I_REGISTER_INTERFACE(iprm::ISelectionParam);
 	I_REGISTER_INTERFACE(iser::ISerializable);
-	I_ASSIGN(m_selectionCompPtr, "Selection", "Source selection", false, "");
+	I_ASSIGN(m_selectionCompPtr, "Selection", "Source selection", true, "");
 	I_END_COMPONENT;
 
 	CSelectionParamAdapterComp();
