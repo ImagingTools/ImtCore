@@ -11,44 +11,48 @@ namespace imtbase
 
 void CSelectionComp::OnConstraintsUpdated(const istd::IChangeable::ChangeSet& changeset, const ICollectionInfo* modelPtr)
 {
-	Ids tempSelection;
-	Ids selection;
-	ICollectionInfo::Ids constraints = modelPtr->GetElementIds();
+	if (m_lastConstraints != modelPtr->GetElementIds()){
+		Ids tempSelection;
+		Ids selection;
+		ICollectionInfo::Ids constraints = modelPtr->GetElementIds();
 
-	switch (*m_autoSelectioModeAttrPtr){
-	case ASM_NO_ACTION:
-		selection = GetSelectedIds();
-		break;
+		switch (*m_autoSelectioModeAttrPtr){
+		case ASM_NO_ACTION:
+			selection = GetSelectedIds();
+			break;
 
-	case ASM_SELECT_ALL:
-		for (Id id : constraints){
-			selection += id;
-		}
-		break;
-
-	case ASM_DESELECT_ALL:
-		break;
-
-	case ASM_SET_PRESET:
-		for (int i = 0; i < m_autoSelectionIdsAttrPtr.GetCount(); i++){
-			selection += m_autoSelectionIdsAttrPtr[i];
-		}
-		break;
-
-	case ASM_UNSELECT_MISSING:
-		selection = GetSelectedIds();
-		for (Id id : selection){
-			if (constraints.contains(id)){
-				tempSelection += id;
+		case ASM_SELECT_ALL:
+			for (Id id : constraints){
+				selection += id;
 			}
+			break;
+
+		case ASM_DESELECT_ALL:
+			break;
+
+		case ASM_SET_PRESET:
+			for (int i = 0; i < m_autoSelectionIdsAttrPtr.GetCount(); i++){
+				selection += m_autoSelectionIdsAttrPtr[i];
+			}
+			break;
+
+		case ASM_UNSELECT_MISSING:
+			selection = GetSelectedIds();
+			for (Id id : selection){
+				if (constraints.contains(id)){
+					tempSelection += id;
+				}
+			}
+			selection = tempSelection;
+			break;
+		default:
+			Q_ASSERT(false);
 		}
-		selection = tempSelection;
-		break;
-	default:
-		Q_ASSERT(false);
+
+		SetSelectedIds(selection);
 	}
 
-	SetSelectedIds(selection);
+	m_lastConstraints = modelPtr->GetElementIds();
 }
 
 

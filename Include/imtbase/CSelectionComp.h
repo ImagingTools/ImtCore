@@ -52,6 +52,8 @@ private:
 	I_ATTR(int, m_autoSelectioModeAttrPtr);
 	I_MULTIATTR(QByteArray, m_initialSelectionIdsAttrPtr);
 	I_MULTIATTR(QByteArray, m_autoSelectionIdsAttrPtr);
+
+	ICollectionInfo::Ids m_lastConstraints;
 };
 
 
