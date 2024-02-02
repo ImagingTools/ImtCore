@@ -16,22 +16,26 @@ void CSelectionComp::OnConstraintsUpdated(const istd::IChangeable::ChangeSet& ch
 	ICollectionInfo::Ids constraints = modelPtr->GetElementIds();
 
 	switch (*m_autoSelectioModeAttrPtr){
-	case 0:
+	case ASM_NO_ACTION:
 		selection = GetSelectedIds();
 		break;
-	case 1:
+
+	case ASM_SELECT_ALL:
 		for (Id id : constraints){
 			selection += id;
 		}
 		break;
-	case 2:
+
+	case ASM_DESELECT_ALL:
 		break;
-	case 3:
+
+	case ASM_SET_PRESET:
 		for (int i = 0; i < m_autoSelectionIdsAttrPtr.GetCount(); i++){
 			selection += m_autoSelectionIdsAttrPtr[i];
 		}
 		break;
-	case 4:
+
+	case ASM_UNSELECT_MISSING:
 		selection = GetSelectedIds();
 		for (Id id : selection){
 			if (constraints.contains(id)){
@@ -52,6 +56,8 @@ void CSelectionComp::OnConstraintsUpdated(const istd::IChangeable::ChangeSet& ch
 
 void CSelectionComp::OnComponentCreated()
 {
+	BaseClass::OnComponentCreated();
+
 	switch (*m_initialSelectionModeAttrPtr){
 	case 0:
 		SetSelectionMode(SM_SINGLE);
@@ -71,11 +77,14 @@ void CSelectionComp::OnComponentCreated()
 			SetSelectedIds({ m_initialSelectionIdsAttrPtr[i] });
 		}
 		break;
+
 	case SM_MULTI:
 		for (int i = 0; i < m_initialSelectionIdsAttrPtr.GetCount(); i++){
 			selection += m_initialSelectionIdsAttrPtr[i];
 		}
+
 		SetSelectedIds(selection);
+
 		break;
 	}
 
@@ -88,6 +97,8 @@ void CSelectionComp::OnComponentCreated()
 void CSelectionComp::OnComponentDestroyed()
 {
 	SetSelectionConstraints(nullptr);
+
+	BaseClass::OnComponentDestroyed();
 }
 
 

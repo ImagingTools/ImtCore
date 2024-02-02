@@ -1,7 +1,7 @@
 #include <imtbase/CSelection.h>
 
 
-// Std includes
+// STL includes
 #include <algorithm>
 
 // ACF includes

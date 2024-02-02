@@ -20,8 +20,6 @@ namespace imtbase
 class CSelection: virtual public ISelection
 {
 public:
-	typedef imod::CSingleModelObserverBase BaseClass;
-
 	CSelection();
 	CSelection(SelectionMode selectionMode);
 
@@ -56,7 +54,7 @@ protected:
 private:
 	SelectionMode m_selectionMode;
 	Ids m_selectedIds;
-	TModelUpdateBinder<ICollectionInfo, CSelection> m_constraintsObserver;
+	imtbase::TModelUpdateBinder<ICollectionInfo, CSelection> m_constraintsObserver;
 };
 
 

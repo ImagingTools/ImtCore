@@ -128,40 +128,44 @@ void CMultiSelectionEditorComp::OnGuiRetranslate()
 
 void CMultiSelectionEditorComp::OnCheckBoxStateChanged(int checkState)
 {
-	QCheckBox* senderPtr = dynamic_cast<QCheckBox*>(sender());
-	Q_ASSERT(senderPtr != nullptr);
+	if (!IsUpdateBlocked()){
+		UpdateBlocker blockUpdate(this);
 
-	const imtbase::ICollectionInfo::Id checkBoxOptionId = m_checkBoxMap.key(senderPtr);
-	Q_ASSERT(checkBoxOptionId.isEmpty());
+		QCheckBox* senderPtr = dynamic_cast<QCheckBox*>(sender());
+		Q_ASSERT(senderPtr != nullptr);
 
-	imtbase::ISelection* objectPtr = GetObservedObject();
-	Q_ASSERT(objectPtr != nullptr);
+		const imtbase::ICollectionInfo::Id checkBoxOptionId = m_checkBoxMap.key(senderPtr);
+		Q_ASSERT(!checkBoxOptionId.isEmpty());
 
-	const imtbase::ICollectionInfo* collectionInfoPtr = objectPtr->GetSelectionConstraints();
-	if (collectionInfoPtr == nullptr) {
-		return;
-	}
+		imtbase::ISelection* objectPtr = GetObservedObject();
+		Q_ASSERT(objectPtr != nullptr);
 
-	imtbase::ISelection::Ids selectedOptions = objectPtr->GetSelectedIds();
-
-	switch (checkState) {
-	case Qt::Checked:
-		if (!selectedOptions.contains(checkBoxOptionId)){
-			selectedOptions << checkBoxOptionId;
+		const imtbase::ICollectionInfo* collectionInfoPtr = objectPtr->GetSelectionConstraints();
+		if (collectionInfoPtr == nullptr) {
+			return;
 		}
-		break;
 
-	case Qt::Unchecked:
-		if (selectedOptions.contains(checkBoxOptionId)){
-			selectedOptions.remove(checkBoxOptionId);
+		imtbase::ISelection::Ids selectedOptions = objectPtr->GetSelectedIds();
+
+		switch (checkState) {
+		case Qt::Checked:
+			if (!selectedOptions.contains(checkBoxOptionId)){
+				selectedOptions << checkBoxOptionId;
+			}
+			break;
+
+		case Qt::Unchecked:
+			if (selectedOptions.contains(checkBoxOptionId)){
+				selectedOptions.remove(checkBoxOptionId);
+			}
+			break;
+
+		default:
+			break;
 		}
-		break;
 
-	default:
-		break;
+		objectPtr->SetSelectedIds(selectedOptions);
 	}
-
-	objectPtr->SetSelectedIds(selectedOptions);
 }
 
 
