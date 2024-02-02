@@ -5,9 +5,11 @@ import imtcontrols 1.0
 DecoratorBase {
     id: commonButtonDecorator
 
-    width: iconObj.width + textObj.width + Style.paddingSmall * 3
+    width: Math.max(iconObj.width + textObj.width + Style.paddingSmall * 3, widthDefault)
     height: Style.buttonWidthMedium
+    clip: true;
 
+    property int widthDefault: 0;
     property alias icon: iconObj
     property alias font: textObj.font
     property alias textColor: textObj.color
