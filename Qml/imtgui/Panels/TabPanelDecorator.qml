@@ -2,13 +2,12 @@ import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
 
-Item {
+DecoratorBase {
     id: tabPanelDecorator;
 
     width: texttabDelegate.width + imagetabDelegate.width + 40;
     height: baseElement ? baseElement.height : 50
 
-    property Item baseElement: null;
 
     property string firstElementImageSource: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.firstElementImageSource : "";
     onFirstElementImageSourceChanged: {
