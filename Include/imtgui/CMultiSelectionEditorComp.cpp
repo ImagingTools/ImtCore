@@ -1,14 +1,8 @@
 #include <imtgui/CMultiSelectionEditorComp.h>
 
 
-// Qt includes
-#include <QtWidgets/QCheckBox>
-
 // ACF includes
 #include <iwidgets/iwidgets.h>
-
-// ImtCore includes
-#include <imtbase/ICollectionInfo.h>
 
 
 namespace imtgui
@@ -67,6 +61,13 @@ void CMultiSelectionEditorComp::OnGuiModelDetached()
 
 void CMultiSelectionEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
+	while (!m_checkBoxMap.isEmpty()){
+		QPointer<QCheckBox> optionCheckPtr = m_checkBoxMap.take(m_checkBoxMap.firstKey());
+		if (!optionCheckPtr.isNull()){
+			disconnect(optionCheckPtr, &QCheckBox::stateChanged, this, &CMultiSelectionEditorComp::OnCheckBoxStateChanged);
+		}
+	}
+	
 	QLayout* layoutPtr = SelectorFrame->layout();
 	iwidgets::ClearLayout(layoutPtr);
 
@@ -80,11 +81,16 @@ void CMultiSelectionEditorComp::UpdateGui(const istd::IChangeable::ChangeSet& /*
 		for (const imtbase::ICollectionInfo::Id& optionId : optionIds) {
 			QString optionName = collectionInfoPtr->GetElementInfo(optionId, imtbase::ICollectionInfo::EIT_NAME).toString();
 
-			QCheckBox* optionCheck= new QCheckBox(SelectorFrame);
-			optionCheck->setText(optionName);
-			optionCheck->setChecked(selectedOptions.contains(optionId));
+			QCheckBox* optionCheckPtr = new QCheckBox(SelectorFrame);
+			optionCheckPtr->setText(optionName);
+			optionCheckPtr->setChecked(selectedOptions.contains(optionId));
 
-			layoutPtr->addWidget(optionCheck);
+			Q_ASSERT(!m_checkBoxMap.contains(optionId));
+
+			m_checkBoxMap.insert(optionId, optionCheckPtr);
+			connect(optionCheckPtr, &QCheckBox::stateChanged, this, &CMultiSelectionEditorComp::OnCheckBoxStateChanged);
+
+			layoutPtr->addWidget(optionCheckPtr);
 		}
 	}
 }
@@ -119,6 +125,44 @@ void CMultiSelectionEditorComp::OnGuiRetranslate()
 
 
 // private slots
+
+void CMultiSelectionEditorComp::OnCheckBoxStateChanged(int checkState)
+{
+	QCheckBox* senderPtr = dynamic_cast<QCheckBox*>(sender());
+	Q_ASSERT(senderPtr != nullptr);
+
+	const imtbase::ICollectionInfo::Id checkBoxOptionId = m_checkBoxMap.key(senderPtr);
+	Q_ASSERT(checkBoxOptionId.isEmpty());
+
+	imtbase::ISelection* objectPtr = GetObservedObject();
+	Q_ASSERT(objectPtr != nullptr);
+
+	const imtbase::ICollectionInfo* collectionInfoPtr = objectPtr->GetSelectionConstraints();
+	if (collectionInfoPtr == nullptr) {
+		return;
+	}
+
+	imtbase::ISelection::Ids selectedOptions = objectPtr->GetSelectedIds();
+
+	switch (checkState) {
+	case Qt::Checked:
+		if (!selectedOptions.contains(checkBoxOptionId)){
+			selectedOptions << checkBoxOptionId;
+		}
+		break;
+
+	case Qt::Unchecked:
+		if (selectedOptions.contains(checkBoxOptionId)){
+			selectedOptions.remove(checkBoxOptionId);
+		}
+		break;
+
+	default:
+		break;
+	}
+
+	objectPtr->SetSelectedIds(selectedOptions);
+}
 
 
 } // namespace imtgui

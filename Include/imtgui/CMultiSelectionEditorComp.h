@@ -1,12 +1,17 @@
 #pragma once
 
 
+// Qt includes
+#include <QtCore/QPointer>
+#include <QtWidgets/QCheckBox>
+
 // ACF includes
 #include <iqtgui/TDesignerGuiObserverCompBase.h>
 #include <imod/CMultiModelDispatcherBase.h>
 
 // ImtCore includes
 #include <imtbase/ISelection.h>
+#include <imtbase/ICollectionInfo.h>
 #include <GeneratedFiles/imtgui/ui_CMultiSelectionEditorComp.h>
 
 
@@ -47,9 +52,12 @@ protected:
 	void OnGuiRetranslate() override;
 
 private Q_SLOTS:
+	void OnCheckBoxStateChanged(int checkState);
 
 private:
 	I_ATTR(bool, m_horizontalOrientationFlagAttrPtr);
+
+	QMap<imtbase::ICollectionInfo::Id, QPointer<QCheckBox>> m_checkBoxMap;
 };
 
 
