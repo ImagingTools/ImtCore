@@ -20,29 +20,26 @@ namespace imtbase
 // public methods
 
 CSelection::CSelection()
-	:m_selectionMode(SelectionMode::SM_SINGLE)
+	:m_selectionMode(SelectionMode::SM_SINGLE),
+	m_constraintsObserver(*this)
 {
 }
 
 
 CSelection::CSelection(SelectionMode selectionMode)
-	:m_selectionMode(selectionMode)
+	:m_selectionMode(selectionMode),
+	m_constraintsObserver(*this)
 {
 }
 
 
 void CSelection::SetSelectionConstraints(ICollectionInfo* selectionConstraintsPtr)
 {
-	istd::IChangeable::ChangeSet changeSet(CF_CONSTRAINTS_CHANGED);
-	changeSet.SetChangeInfo(ISelection::CN_CONSTRAINTS_CHANGED, QVariant());
+	m_constraintsObserver.UnregisterAllObjects();
 
-	istd::TDelPtr<istd::CChangeNotifier> notifierPtr;
-
-	if (GetModelPtr() == nullptr){
-		notifierPtr.SetPtr(new istd::CChangeNotifier(this, &changeSet));
+	if (selectionConstraintsPtr != nullptr){
+		m_constraintsObserver.RegisterObject(selectionConstraintsPtr, &CSelection::OnConstraintsUpdated);
 	}
-
-	AttachOrSetObject(selectionConstraintsPtr);
 }
 
 
@@ -50,7 +47,7 @@ void CSelection::SetSelectionConstraints(ICollectionInfo* selectionConstraintsPt
 
 const ICollectionInfo* CSelection::GetSelectionConstraints() const
 {
-	return GetObjectPtr();
+	return dynamic_cast<const ICollectionInfo*>(m_constraintsObserver.GetObjectAt(0));
 }
 
 
@@ -173,18 +170,12 @@ bool CSelection::ResetData(CompatibilityMode /*mode*/)
 }
 
 
-// reimplemented (imod::CSingleModelObserverBase)
+// private methods
 
-void CSelection::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
+void CSelection::OnConstraintsUpdated(const istd::IChangeable::ChangeSet& changeset, const ICollectionInfo* modelPtr)
 {
-	//istd::IChangeable::ChangeSet changeSet(CF_CONSTRAINTS_CHANGED);
-	//changeSet.SetChangeInfo(ISelection::CN_CONSTRAINTS_CHANGED, QVariant());
-
-	//istd::CChangeNotifier notifier(this, &changeSet);
 }
 
-
-// private methods
 
 bool CSelection::ApplySelectionMode(SelectionMode selectionMode)
 {

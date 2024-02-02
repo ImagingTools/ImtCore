@@ -5,6 +5,7 @@
 #include <imod/TSingleModelObserverBase.h>
 
 // ImtCore includes
+#include <imtbase/TModelUpdateBinder.h>
 #include <imtbase/ICollectionInfo.h>
 #include <imtbase/ISelection.h>
 
@@ -16,9 +17,7 @@ namespace imtbase
 /**
 	Implementation of the multiple selection.
 */
-class CSelection:
-			public imod::TSingleModelObserverBase<ICollectionInfo>,
-			virtual public ISelection
+class CSelection: virtual public ISelection
 {
 public:
 	typedef imod::CSingleModelObserverBase BaseClass;
@@ -45,20 +44,19 @@ public:
 	virtual IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
-protected:
-	// reimplemented (imod::CSingleModelObserverBase)
-	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet);
-
-private:
 	/**
 		If more than one ID is selected and SM_SINGLE is set, the selection will be reset
 	*/
 	bool ApplySelectionMode(SelectionMode selectionMode);
 	bool ApplySelection(const Ids& selectionIds);
 
+protected:
+	virtual void OnConstraintsUpdated(const istd::IChangeable::ChangeSet& changeset, const ICollectionInfo* modelPtr);
+
 private:
 	SelectionMode m_selectionMode;
 	Ids m_selectedIds;
+	TModelUpdateBinder<ICollectionInfo, CSelection> m_constraintsObserver;
 };
 
 
