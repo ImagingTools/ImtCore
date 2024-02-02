@@ -1,5 +1,8 @@
 #include <imtclientgql/CGqlRemoteRepresentationControllerComp.h>
 
+// ImtCore includes
+#include <imtclientgql/IGqlClient.h>
+
 
 namespace imtclientgql
 {
@@ -52,11 +55,13 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerComp::CreateInternalR
 		gqlRequestPtr->AddParam(inputGqlObject);
 	}
 
-	//Response responseHandler;
-	//bool retVal = m_apiClientCompPtr->SendRequest(*gqlRequestPtr.GetPtr(), responseHandler);
-	//if (retVal){
-	//	return responseHandler.GetResult();
-	//}
+	imtclientgql::IGqlClient::GqlRequestPtr requestPtr(dynamic_cast<imtgql::IGqlRequest*>(gqlRequestPtr->CloneMe()));
+	if (!requestPtr.isNull()){
+		imtclientgql::IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			return CreateTreeItemModelFromResponse(*responsePtr);
+		}
+	}
 
 	SendErrorMessage(0, QString("Failed to create a network request to a remote server"), "CGqlRemoteRepresentationControllerComp");
 	errorMessage = QObject::tr("Failed to create a network request to a remote server").toUtf8();

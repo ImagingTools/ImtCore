@@ -111,13 +111,7 @@ if(DEFINED WEB_COMPILE AND  WEB_COMPILE)
 endif()
 
 if(WIN32)
-	# list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtqml/Resources/qml")
-	# list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtqml/Qml")
-	# # list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtcontrols/Qml")
-	#        list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtstylecontrolsqml/Qml")
-	#	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Include/imtgui/Qml/imtgui")
 	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Qml")
-	list(APPEND listOptions "--qmldir=${IMTCOREDIR}/Qml/imtcontrols")
 	set(files  \"${AUX_INCLUDE_DIR}/../../../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME}/${PROJECT_NAME}.exe\")
 
 	windeploy(${PROJECT_NAME} "${listOptions}" "${files}")

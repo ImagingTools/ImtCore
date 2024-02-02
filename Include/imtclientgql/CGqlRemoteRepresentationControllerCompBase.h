@@ -28,8 +28,8 @@ protected:
 				const imtgql::CGqlRequest& gqlRequest,
 				QString& errorMessage) const override;
 
-private:
-	imtbase::CTreeItemModel* CreateTreeItemModelFromResponse(const imtgql::IGqlResponse& response);
+protected:
+	imtbase::CTreeItemModel* CreateTreeItemModelFromResponse(const imtgql::IGqlResponse& response) const;
 
 protected:
 	I_REF(imtclientgql::IGqlClient, m_apiClientCompPtr);

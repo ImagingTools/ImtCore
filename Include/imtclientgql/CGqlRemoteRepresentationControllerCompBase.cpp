@@ -15,15 +15,17 @@ namespace imtclientgql
 
 imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& /*errorMessage*/) const
 {
-	//if (!IsRequestSupported(gqlRequest)){
-	//	return nullptr;
-	//}
+	if (!IsRequestSupported(gqlRequest)){
+		return nullptr;
+	}
 
-	//Response responseHandler;
-	//bool retVal = m_apiClientCompPtr->SendRequest(gqlRequest, responseHandler);
-	//if (retVal){
-	//	return responseHandler.GetResult();
-	//}
+	imtclientgql::IGqlClient::GqlRequestPtr requestPtr(dynamic_cast<imtgql::IGqlRequest*>(gqlRequest.CloneMe()));
+	if (!requestPtr.isNull()){
+		imtclientgql::IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(requestPtr);
+		if (!responsePtr.isNull()){
+			return CreateTreeItemModelFromResponse(*responsePtr);
+		}
+	}
 
 	return nullptr;
 }
@@ -31,7 +33,7 @@ imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateInter
 
 // private methods
 
-imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateTreeItemModelFromResponse(const imtgql::IGqlResponse& response)
+imtbase::CTreeItemModel* CGqlRemoteRepresentationControllerCompBase::CreateTreeItemModelFromResponse(const imtgql::IGqlResponse& response) const
 {
 	istd::TDelPtr<imtbase::CTreeItemModel> retVal(new imtbase::CTreeItemModel());
 	QJsonDocument document = QJsonDocument::fromJson(response.GetResponseData());

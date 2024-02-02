@@ -22,6 +22,7 @@ Item {
 
     function showCriticalError(message){
         console.log("showCriticalError", message);
+        return
         if (root.errorPage != null){
 
             if (message){
