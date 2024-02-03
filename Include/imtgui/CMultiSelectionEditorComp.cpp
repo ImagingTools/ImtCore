@@ -169,6 +169,57 @@ void CMultiSelectionEditorComp::OnCheckBoxStateChanged(int checkState)
 }
 
 
+void CMultiSelectionEditorComp::on_SelectAllButton_clicked()
+{
+	imtbase::ISelection* objectPtr = GetObservedObject();
+	Q_ASSERT(objectPtr != nullptr);
+
+	const imtbase::ICollectionInfo* collectionInfoPtr = objectPtr->GetSelectionConstraints();
+	if (collectionInfoPtr != nullptr) {
+		imtbase::ICollectionInfo::Ids optionIds = collectionInfoPtr->GetElementIds();
+
+		objectPtr->SetSelectedIds(imtbase::ISelection::Ids(optionIds.begin(), optionIds.end()));
+	}
+}
+
+
+void CMultiSelectionEditorComp::on_DeselectAllButton_clicked()
+{
+	imtbase::ISelection* objectPtr = GetObservedObject();
+	Q_ASSERT(objectPtr != nullptr);
+
+	objectPtr->SetSelectedIds(imtbase::ISelection::Ids());
+}
+
+
+void CMultiSelectionEditorComp::on_InvertButton_clicked()
+{
+	imtbase::ISelection* objectPtr = GetObservedObject();
+	Q_ASSERT(objectPtr != nullptr);
+
+	imtbase::ISelection::Ids invertedIds;
+
+	imtbase::ISelection::Ids selectedIds = objectPtr->GetSelectedIds();
+
+	const imtbase::ICollectionInfo* collectionInfoPtr = objectPtr->GetSelectionConstraints();
+	if (collectionInfoPtr != nullptr) {
+		imtbase::ICollectionInfo::Ids optionIds = collectionInfoPtr->GetElementIds();
+		for (const imtbase::ICollectionInfo::Id& optionId : optionIds) {
+			if (!selectedIds.contains(optionId)){
+				invertedIds.insert(optionId);
+			}
+		}
+	}
+
+	objectPtr->SetSelectedIds(invertedIds);
+}
+
+
+void CMultiSelectionEditorComp::on_ExclusiveModeButton_toggled(bool toggled)
+{
+}
+
+
 } // namespace imtgui
 
 

@@ -50,9 +50,9 @@ void CSelectionComp::OnConstraintsUpdated(const istd::IChangeable::ChangeSet& ch
 		}
 
 		SetSelectedIds(selection);
-	}
 
-	m_lastConstraints = modelPtr->GetElementIds();
+		m_lastConstraints = modelPtr->GetElementIds();
+	}
 }
 
 

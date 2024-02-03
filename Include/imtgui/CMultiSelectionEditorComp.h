@@ -53,6 +53,10 @@ protected:
 
 private Q_SLOTS:
 	void OnCheckBoxStateChanged(int checkState);
+	void on_SelectAllButton_clicked();
+	void on_DeselectAllButton_clicked();
+	void on_InvertButton_clicked();
+	void on_ExclusiveModeButton_toggled(bool toggled);
 
 private:
 	I_ATTR(bool, m_horizontalOrientationFlagAttrPtr);
