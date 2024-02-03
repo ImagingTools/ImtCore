@@ -265,7 +265,15 @@ class Item extends QtObject {
     }
 
     $opacityChanged(){
-       
+        if(this.getPropertyValue('opacity') > 0){
+            this.setStyle({
+                opacity: 1
+            })
+        } else {
+            this.setStyle({
+                opacity: 0
+            })
+        }
     }
 
     $keyNavigationChanged(){
@@ -343,6 +351,7 @@ class Item extends QtObject {
                 this.getProperty('height').subscribePrimary(this.getProperty('anchors').getProperty('fill').get().getProperty('height'), this.getProperty('anchors').getProperty('topMargin'), this.getProperty('anchors').getProperty('bottomMargin')) 
                 return this.getProperty('anchors').getProperty('fill').get().getProperty('height').get() - this.getProperty('anchors').getProperty('topMargin').get() - this.getProperty('anchors').getProperty('bottomMargin').get()
             })
+            this.getProperty('anchors').getProperty('fill').get().getProperty('anchors').update()
             this.getProperty('x').update()
             this.getProperty('y').update()
             this.getProperty('width').update()

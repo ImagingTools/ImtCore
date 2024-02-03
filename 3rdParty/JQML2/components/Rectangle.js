@@ -60,7 +60,7 @@ class Rectangle extends Item {
     $opacityChanged(){
         let rgba = this.getProperty('color').toRGBA()
         this.setStyle({
-            opacity: 1,
+            opacity: this.getPropertyValue('opacity') > 0 ? 1 : 0,
             backgroundColor: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.getProperty('color').get() === 'transparent' ? 0 : rgba.a * this.getPropertyValue('opacity')})`
         })
     }
