@@ -409,11 +409,6 @@ class ListView extends Flickable {
             let obj = createObject ? createObject(this.getStatement('contentItem').get(),ctx, {index: index}, false) : new cls(this.getStatement('contentItem').get(),ctx, {index: index})
             // obj.getStatement('index').reset(index)
             // obj.getStatement('model').reset({index: index})
-            if(obj.getPropertyValue('width') === 0 || obj.getPropertyValue('height') === 0) {
-                obj.setStyle({
-                    visibility: 'hidden'
-                })
-            }
             this.$items[index] = obj
         } else {
             let model = this.getPropertyValue('model').getPropertyValue('data')[index]
@@ -421,11 +416,6 @@ class ListView extends Flickable {
             // obj.getStatement('index').setCompute(()=>{return model.index})
             // obj.getStatement('index').update()
             // obj.getStatement('model').reset(model)
-            if(obj.getPropertyValue('width') === 0 || obj.getPropertyValue('height') === 0) {
-                obj.setStyle({
-                    visibility: 'hidden'
-                })
-            }
             this.$items[index] = obj   
         }
         // while(updateList.length){
@@ -434,7 +424,19 @@ class ListView extends Flickable {
             }
         // }
 
+        
         let obj = this.$items[index]
+        if(obj.getPropertyValue('width') === 0 || obj.getPropertyValue('height') === 0) {
+            if(obj.getPropertyValue('width') === 0 || obj.getPropertyValue('height') === 0) {
+                obj.setStyle({
+                    visibility: 'hidden'
+                })
+            } else {
+                obj.setStyle({
+                    visibility: 'visible'
+                })
+            }
+        }
         obj.getProperty('width').getNotify().connect(()=>{
             if(obj.getPropertyValue('width') === 0 || obj.getPropertyValue('height') === 0) {
                 obj.setStyle({
