@@ -56,6 +56,25 @@ class Image extends Item {
             backgroundRepeat: "no-repeat",
             backgroundPosition: "center",
         })
+
+        this.$img = new OriginImage();
+
+        this.$img.onload = ()=>{
+            if(!this.UID) return
+            this.getProperty('sourceSize').getProperty('width').setAuto(this.$img.naturalWidth)
+            this.getProperty('sourceSize').getProperty('height').setAuto(this.$img.naturalHeight)
+
+            this.setStyle({
+                backgroundImage: `url("${this.$img.src}")`
+            })
+
+            this.getProperty('progress').reset(1)
+            this.getProperty('status').reset(Image.Ready)
+        }
+        this.$img.onerror = ()=>{
+            if(!this.UID) return
+            this.getProperty('status').reset(Image.Error)
+        }
     }
 
     $sourceChanged(){
@@ -66,28 +85,7 @@ class Image extends Item {
             return
         }
 
-        this.$img = new OriginImage();
         let path = rootPath+'/'+this.getProperty('source').get().replaceAll('../','')
-        this.$img.onload = ()=>{
-            if(!this.$img) return
-            this.getProperty('sourceSize').getProperty('width').setAuto(this.$img.naturalWidth)
-            this.getProperty('sourceSize').getProperty('height').setAuto(this.$img.naturalHeight)
-
-            // this.dom.style.backgroundImage = `url("${this.$this.$img.src}")`
-            this.setStyle({
-                backgroundImage: `url("${path.replaceAll('//','/')}")`
-            })
-
-            this.getProperty('progress').reset(1)
-            this.getProperty('status').reset(Image.Ready)
-            this.$img.remove()
-            delete this.$img
-        }
-        this.$img.onerror = ()=>{
-            this.getProperty('status').reset(Image.Error)
-            this.$img.remove()
-            delete this.$img
-        }
 
         this.getProperty('status').reset(Image.Loading)
         this.$img.src = path.replaceAll('//','/')
@@ -155,7 +153,7 @@ class Image extends Item {
     }
 
     destroy(){
-        if(this.$img) this.$img.remove()
+        this.$img.remove()
         super.destroy()
     }
 }
