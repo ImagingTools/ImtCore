@@ -220,27 +220,27 @@ Item {
             //            property real minWidth: 1000000;
         }
 
+    }
 
-        CustomScrollbar{
-            id: scrollBar;
+    CustomScrollbar{
+        id: scrollBar;
 
-            anchors.right: parent.right;
-            anchors.rightMargin: 10;
-            anchors.bottom: gridInternal.bottom;
+        anchors.right: parent.right;
+        anchors.rightMargin: 10;
+        anchors.bottom: backgroundTable.bottom;
 
-            targetItem: gridFrame;
+        targetItem: gridFrame;
 
-            secondSize: 8;
-            radius: secondSize;
-            indicatorRadius: secondSize;
-            indicatorMargin: 0;
+        secondSize: 8;
+        radius: secondSize;
+        indicatorRadius: secondSize;
+        indicatorMargin: 0;
 
-            z: 20;
-            onContentYSignal:{
-                gridInternal.contentY = contentY;
-            }
-
+        z: 20;
+        onContentYSignal:{
+            gridInternal.contentY = contentY;
         }
+
     }
 
     Item{
@@ -248,6 +248,7 @@ Item {
 
         width: parent.width;
         height: parent.height - collectionViewBaseContainer.gridBottomMargin;
+
         clip: true;
         Item{
             id: extendingInfoLoaderContainer;
