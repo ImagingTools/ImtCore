@@ -94,7 +94,6 @@ public:
 	virtual bool GetItemIds(imtgql::IGqlResponse& reqponse, Ids& out) const override;
 	virtual bool GetItemPath(imtgql::IGqlResponse& reqponse, Ids& out) const override;
 	virtual bool GetItemInfos(imtgql::IGqlResponse& reqponse, imtbase::IHierarchicalStructureInfo::ItemInfoList& out) const override;
-
 };
 
 
