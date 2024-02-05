@@ -666,7 +666,7 @@ Rectangle{
 
     }
 
-    AuxButton{
+    Button{
         id: clearButton;
 
         anchors.verticalCenter: parent.verticalCenter;
@@ -675,10 +675,7 @@ Rectangle{
 
         width: height;
         height: Math.max(parent.height/2, 16);
-        color: Style.backgroundColor;
-        hasIcon: true;
-
-        highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
+        decorator: Component{IconButtonDecorator{}}
 
         iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
