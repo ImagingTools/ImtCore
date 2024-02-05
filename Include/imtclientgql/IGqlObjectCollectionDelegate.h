@@ -6,7 +6,6 @@
 
 // ImtCore includes
 #include <imtbase/IMetaInfoCreator.h>
-#include <imtbase/TIStructuredCollectionInfo.h>
 #include <imtbase/IObjectCollection.h>
 #include <imtbase/IOperationContext.h>
 #include <imtgql/IGqlResponse.h>
@@ -70,11 +69,6 @@ public:
 				const QString& description,
 				int clientVersion = -1,
 				const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
-	//virtual imtgql::IGqlRequest* CreateSetObjectMetaInfoRequest(
-	//			const QByteArray& objectId,
-	//			const idoc::IDocumentMetaInfo& metaInfo,
-	//			int clientVersion = -1,
-	//			const imtbase::IOperationContext* operationContextPtr = nullptr) const = 0;
 	virtual imtgql::IGqlRequest* CreateGetObjectRequest(const QByteArray& objectId) const = 0;
 	virtual imtgql::IGqlRequest* CreateSetObjectRequest(
 				const QByteArray& objectId,

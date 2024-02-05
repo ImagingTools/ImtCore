@@ -40,27 +40,27 @@ int CObjectCollectionBasedPersistenceComp::LoadFromFile(
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
-	if (m_collectionCompPtr.IsValid()){
-		QUrl uri(filePath);
-		if (uri.scheme() == "collection"){
-			QString path = uri.path();
-			QStringList parts = path.split("/");
-			if (parts.count() == 2){
-				QByteArray nodeId = parts[0].toUtf8();
-				QByteArray objectId = parts[1].toUtf8();
+	//if (m_collectionCompPtr.IsValid()){
+	//	QUrl uri(filePath);
+	//	if (uri.scheme() == "collection"){
+	//		QString path = uri.path();
+	//		QStringList parts = path.split("/");
+	//		if (parts.count() == 2){
+	//			QByteArray nodeId = parts[0].toUtf8();
+	//			QByteArray objectId = parts[1].toUtf8();
 
-				Q_ASSERT(!objectId.isEmpty());
-				if (!objectId.isEmpty()){
-					imtbase::IObjectCollection::DataPtr dataPtr;
-					if (m_collectionCompPtr->GetObjectData(objectId, dataPtr)){
-						if (data.CopyFrom(*dataPtr)){
-							return OS_OK;
-						}
-					}
-				}
-			}
-		}
-	}
+	//			Q_ASSERT(!objectId.isEmpty());
+	//			if (!objectId.isEmpty()){
+	//				imtbase::IObjectCollection::DataPtr dataPtr;
+	//				if (m_collectionCompPtr->GetObjectData(objectId, dataPtr)){
+	//					if (data.CopyFrom(*dataPtr)){
+	//						return OS_OK;
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 
 	return OS_FAILED;
 }
@@ -71,108 +71,108 @@ int CObjectCollectionBasedPersistenceComp::SaveToFile(
 			const QString& filePath,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
-	if (m_collectionCompPtr.IsValid()){
-		QUrl uri(filePath);
-		if (uri.scheme() == "collection"){
-			QString path = uri.path();
-			QStringList parts = path.split("/");
-			if (parts.count() == 2){
-				QByteArray nodeId = parts[0].toUtf8();
-				QByteArray objectId = parts[1].toUtf8();
+	//if (m_collectionCompPtr.IsValid()){
+	//	QUrl uri(filePath);
+	//	if (uri.scheme() == "collection"){
+	//		QString path = uri.path();
+	//		QStringList parts = path.split("/");
+	//		if (parts.count() == 2){
+	//			QByteArray nodeId = parts[0].toUtf8();
+	//			QByteArray objectId = parts[1].toUtf8();
 
-				QString objectName;
-				if (uri.hasQuery()) {
-					QUrlQuery query(uri.query());
-					if (query.hasQueryItem("name")) {
-						objectName = query.queryItemValue("name");
-					}
-				}
+	//			QString objectName;
+	//			if (uri.hasQuery()) {
+	//				QUrlQuery query(uri.query());
+	//				if (query.hasQueryItem("name")) {
+	//					objectName = query.queryItemValue("name");
+	//				}
+	//			}
 
-				imtbase::ICollectionInfo::Ids ids;
+	//			imtbase::ICollectionInfo::Ids ids;
 
-				QSharedPointer<IStructuredObjectCollectionInfo> structuredObjectCollectionInfoPtr;
-				imtbase::ICollectionInfo* collectionInfoPtr = nullptr;
+	//			QSharedPointer<IStructuredObjectCollectionInfo> structuredObjectCollectionInfoPtr;
+	//			imtbase::ICollectionInfo* collectionInfoPtr = nullptr;
 
-				if (m_collectionStructureCompPtr.IsValid()){
-					structuredObjectCollectionInfoPtr = m_collectionStructureCompPtr->GetNodeContent(nodeId);
-					collectionInfoPtr = structuredObjectCollectionInfoPtr.data();
-				}
-				else{
-					collectionInfoPtr = m_collectionCompPtr.GetPtr();
-				}
+	//			if (m_collectionStructureCompPtr.IsValid()){
+	//				structuredObjectCollectionInfoPtr = m_collectionStructureCompPtr->GetNodeContent(nodeId);
+	//				collectionInfoPtr = structuredObjectCollectionInfoPtr.data();
+	//			}
+	//			else{
+	//				collectionInfoPtr = m_collectionCompPtr.GetPtr();
+	//			}
 
-				if (collectionInfoPtr != nullptr){
-					ids = collectionInfoPtr->GetElementIds();
+	//			if (collectionInfoPtr != nullptr){
+	//				ids = collectionInfoPtr->GetElementIds();
 
-					if (!objectId.isEmpty() && objectName.isEmpty()){
-						if (ids.contains(objectId)){
-							return m_collectionCompPtr->SetObjectData(objectId, data) ? OS_OK : OS_FAILED;
-						}
+	//				if (!objectId.isEmpty() && objectName.isEmpty()){
+	//					if (ids.contains(objectId)){
+	//						return m_collectionCompPtr->SetObjectData(objectId, data) ? OS_OK : OS_FAILED;
+	//					}
 
-						return OS_FAILED;
-					}
+	//					return OS_FAILED;
+	//				}
 
-					if (objectId.isEmpty() && !objectName.isEmpty()){
-						for (const QByteArray& id : ids){
-							QString collectionObjctName = collectionInfoPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
-							if (collectionObjctName == objectName){
-								return m_collectionCompPtr->SetObjectData(id, data) ? OS_OK : OS_FAILED;
-							}
-						}
+	//				if (objectId.isEmpty() && !objectName.isEmpty()){
+	//					for (const QByteArray& id : ids){
+	//						QString collectionObjctName = collectionInfoPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
+	//						if (collectionObjctName == objectName){
+	//							return m_collectionCompPtr->SetObjectData(id, data) ? OS_OK : OS_FAILED;
+	//						}
+	//					}
 
-						QByteArray insertedObjectId;
-						if (m_collectionInserterCompPtr.IsValid()){
-							insertedObjectId = m_collectionInserterCompPtr->InsertNewObjectIntoCollection(
-										m_collectionCompPtr.GetPtr(),
-										nodeId,
-										*m_objectTypeIdAttrPtr,
-										objectName,
-										"",
-										&data,
-										objectId);
-						}
-						else{
-							insertedObjectId = m_collectionCompPtr->InsertNewObject(*m_objectTypeIdAttrPtr, objectName, "", &data, objectId);
-						}
+	//					QByteArray insertedObjectId;
+	//					if (m_collectionInserterCompPtr.IsValid()){
+	//						insertedObjectId = m_collectionInserterCompPtr->InsertNewObjectIntoCollection(
+	//									m_collectionCompPtr.GetPtr(),
+	//									nodeId,
+	//									*m_objectTypeIdAttrPtr,
+	//									objectName,
+	//									"",
+	//									&data,
+	//									objectId);
+	//					}
+	//					else{
+	//						insertedObjectId = m_collectionCompPtr->InsertNewObject(*m_objectTypeIdAttrPtr, objectName, "", &data, objectId);
+	//					}
 
-						return !insertedObjectId.isEmpty() ? OS_OK : OS_FAILED;
-					}
+	//					return !insertedObjectId.isEmpty() ? OS_OK : OS_FAILED;
+	//				}
 
-					if (!objectId.isEmpty() && !objectName.isEmpty()){
-						// The collection contains element with id == objectId and name == objectName
-						if (ids.contains(objectId)){
-							QString collectionObjctName = collectionInfoPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
-							if (collectionObjctName == objectName){
-								return m_collectionCompPtr->SetObjectData(objectId, data) ? OS_OK : OS_FAILED;
-							}
+	//				if (!objectId.isEmpty() && !objectName.isEmpty()){
+	//					// The collection contains element with id == objectId and name == objectName
+	//					if (ids.contains(objectId)){
+	//						QString collectionObjctName = collectionInfoPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME).toString();
+	//						if (collectionObjctName == objectName){
+	//							return m_collectionCompPtr->SetObjectData(objectId, data) ? OS_OK : OS_FAILED;
+	//						}
 
-							return OS_FAILED;
-						}
+	//						return OS_FAILED;
+	//					}
 
-						// The collection contains no elements with either id == objectId or name == objectName
-						{
-							for (const QByteArray& id : ids){
-								QString collectionObjctName = m_collectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
-								if (collectionObjctName == objectName){
-									return OS_FAILED;
-								}
-							}
+	//					// The collection contains no elements with either id == objectId or name == objectName
+	//					{
+	//						for (const QByteArray& id : ids){
+	//							QString collectionObjctName = m_collectionCompPtr->GetElementInfo(id, imtbase::ICollectionInfo::EIT_NAME).toString();
+	//							if (collectionObjctName == objectName){
+	//								return OS_FAILED;
+	//							}
+	//						}
 
-							QByteArray insertedObjectId;
-							if (m_collectionInserterCompPtr.IsValid()){
-								insertedObjectId = m_collectionInserterCompPtr->InsertNewObjectIntoCollection(m_collectionCompPtr .GetPtr(), *m_objectTypeIdAttrPtr, nodeId, objectName, "", &data, objectId);
-							}
-							else{
-								insertedObjectId = m_collectionCompPtr->InsertNewObject(*m_objectTypeIdAttrPtr, objectName, "", &data, objectId);
-							}
+	//						QByteArray insertedObjectId;
+	//						if (m_collectionInserterCompPtr.IsValid()){
+	//							insertedObjectId = m_collectionInserterCompPtr->InsertNewObjectIntoCollection(m_collectionCompPtr .GetPtr(), *m_objectTypeIdAttrPtr, nodeId, objectName, "", &data, objectId);
+	//						}
+	//						else{
+	//							insertedObjectId = m_collectionCompPtr->InsertNewObject(*m_objectTypeIdAttrPtr, objectName, "", &data, objectId);
+	//						}
 
-							return !insertedObjectId.isEmpty() ? OS_OK : OS_FAILED;
-						}
-					}
-				}
-			}
-		}
-	}
+	//						return !insertedObjectId.isEmpty() ? OS_OK : OS_FAILED;
+	//					}
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
 
 	return OS_FAILED;
 }

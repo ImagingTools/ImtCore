@@ -5,6 +5,7 @@
 #include <idoc/IDocumentMetaInfo.h>
 
 // ImtCore includes
+#include <imtbase/IHierarchicalStructureInfo.h>
 #include <imtbase/IOperationContext.h>
 #include <imtgql/IGqlRequest.h>
 #include <imtgql/IGqlResponse.h>
