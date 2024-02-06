@@ -1,4 +1,4 @@
-TARGET = ImtGqlPck
+TARGET = ImtGqlDbPck
 
 include($(ACFCONFIGDIR)/QMake/ComponentConfig.pri)
 include($(ACFCONFIGDIR)/QMake/QtBaseConfig.pri)
@@ -6,7 +6,7 @@ include($$PWD/../../../Config/QMake/ImtCore.pri)
 
 CONFIG += network websockets sql
 
-LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtrest -limtgql -limtcom -limtrepo
+LIBS += -L../../../Lib/$$COMPILER_DIR -limtbase -limtrest -limtgql -limtgqldb -limtcom -limtrepo
 LIBS += -L$$(ACFSLNDIR)/Lib/$$COMPILER_DIR -liproc
 
 include($(ACFCONFIGDIR)/QMake/AcfQt.pri)
