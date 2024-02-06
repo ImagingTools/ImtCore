@@ -34,7 +34,7 @@ Rectangle {
 
     Column{
         anchors.centerIn: parent;
-        spacing: 100;
+        spacing: 150;
         Row{
             id: inputsRow;
 
@@ -123,7 +123,7 @@ Rectangle {
 
             anchors.horizontalCenter: parent.horizontalCenter;
             height: 40;
-            spacing: 50;
+            spacing: 70;
 
             Slider{
                 anchors.verticalCenter: parent.verticalCenter;
@@ -148,6 +148,32 @@ Rectangle {
                 from: 10;
                 to: 100;
                 valueSecond: 80;
+
+            }
+
+            BarControl {
+                id: barControlHoriz;
+
+                anchors.verticalCenter: parent.verticalCenter;
+
+                width: 200;
+                height: 60;
+                cornerColor: "white";
+
+                value: 0.5;
+            }
+
+            BarControl {
+                id: barControlVert;
+
+                anchors.verticalCenter: parent.verticalCenter;
+
+                width: 60;
+                height: 200;
+                orientation: Qt.Vertical;
+                cornerColor: "white";
+
+                value: 0.8;
 
             }
 
