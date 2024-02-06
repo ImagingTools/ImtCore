@@ -9,7 +9,7 @@ Item {
 
     property string backgroundColor: "lightgray";
     property string controlColor: "lightgreen";
-    property string cornerColor: !parent ? "transparent" : parent.color;
+    property string cornerColor: Style.backgroundColor;
 
     property real value: 0.0;
 
