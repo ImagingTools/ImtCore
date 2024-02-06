@@ -44,7 +44,7 @@ Rectangle {
             //                ctx.strokeStyle = canvas.strokeStyle;
             ctx.lineTo(0, canvas.height);
             ctx.lineTo(0, 0);
-            ctx.stroke();
+            //ctx.stroke();
             ctx.fill();
             ctx.closePath();
 
