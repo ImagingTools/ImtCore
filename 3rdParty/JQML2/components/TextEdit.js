@@ -27,6 +27,8 @@ class TextEdit extends Item {
         font: { type: QFont, changed: '$fontChanged' },
         contentHeight: { type: QReal, value: 0 },
         contentWidth: { type: QReal, value: 0 },
+        paintedHeight: { type: QReal, value: 0 },
+        paintedWidth: { type: QReal, value: 0 },
         cursorRectangle: { type: QVar, value: undefined },
     }
 
@@ -38,16 +40,34 @@ class TextEdit extends Item {
 
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
+
+        this.impl = document.createElement('span')
+        this.impl.style.position = 'absolute'
+        this.impl.style.left = '0'
+        this.impl.style.top = '0'
+        this.impl.style.right = '0'
+        this.impl.style.bottom = '0'
+        this.impl.style.opacity = '0'
+        this.getDom().appendChild(this.impl)
         
         this.$input = document.createElement('textarea')
         this.$input.style.outline = 'none'
         this.$input.style.border = 'none'
         this.$input.style.background = 'none'
         this.$input.style.width = '100%'
+        this.$input.style.maxHeight = '100%'
+        this.$input.style.height = '100%'
         this.$input.style.font = 'inherit'
         this.$input.style.resize = 'none'
         this.getDom().appendChild(this.$input)
         MouseController.add(this)
+
+        this.$input.oninput = (e)=>{
+            this.getProperty('text').reset(this.$input.value)
+        }
+
+        this.getProperty('width').setCompute(()=>{return this.getProperty('contentWidth').get()})
+        this.getProperty('height').setCompute(()=>{return Math.max(this.getProperty('contentHeight').get(), this.getProperty('font').getProperty('pixelSize').get())})
     }
 
     cut(){
@@ -139,15 +159,16 @@ class TextEdit extends Item {
         if(this.getPropertyValue('text')){
             this.setStyle({
                 fontWeight: this.getProperty('font').getPropertyValue('bold') ? 'bold' : 'normal',
-                fontSize: this.getProperty('font').getPropertyValue('pixelSize'),
+                fontSize: `${this.getProperty('font').getPropertyValue('pixelSize')}px`,
             })
-            this.applyMetrics()
+            
         } else {
             this.setStyle({
                 fontWeight: this.getProperty('font').getPropertyValue('bold') ? 'bold' : 'normal',
-                fontSize: this.getProperty('font').getPropertyValue('pixelSize'),
+                fontSize: `${this.getProperty('font').getPropertyValue('pixelSize')}px`,
             })
         }
+        this.applyMetrics()
     }
 
     $focusChanged(){
@@ -160,10 +181,59 @@ class TextEdit extends Item {
     }
 
     applyMetrics(){
-        let textMetrics = TextFontController.measureText(this.getPropertyValue('text'), this.getProperty('font').getPropertyValue('pixelSize'), this.getProperty('font').getPropertyValue('family'), this.getProperty('width').auto ? 0 : this.getProperty('width').get(), this.getPropertyValue('wrapMode'))
+        let isHTML = false
+        if(this.getPropertyValue('textFormat') === Text.AutoText){
+            let regexp = /<[^<>]+>/g
+            if(this.getPropertyValue('text') && (regexp.test(this.getPropertyValue('text')) || this.getPropertyValue('text').indexOf('\n') >= 0)){
+                isHTML = true
+            } else {
+                isHTML = false
+            }
+        } else if(this.getPropertyValue('textFormat') === Text.PlainText){
+            isHTML = false
+        } else {
+            isHTML = true
+        }
 
-        this.getProperty('contentWidth').reset(textMetrics.width)
-        this.getProperty('contentHeight').reset(textMetrics.height)
+        if(isHTML){
+            this.impl.innerHTML = this.getPropertyValue('text').replaceAll('\n', '<br>') + '.'
+            this.updateGeometry()
+
+        } else {
+            let textMetrics = TextFontController.measureText(this.getPropertyValue('text'), this.getProperty('font').getPropertyValue('pixelSize'), this.getProperty('font').getPropertyValue('family'), this.getProperty('width').auto ? 0 : this.getProperty('width').get(), this.getPropertyValue('wrapMode'))
+            
+            this.impl.innerHTML = this.getPropertyValue('text').replaceAll('\n', '<br>') + '.'
+            this.getProperty('width').setAuto(textMetrics.width)
+            this.getProperty('height').setAuto(textMetrics.height)
+
+            this.getProperty('contentWidth').reset(textMetrics.width)
+            this.getProperty('contentHeight').reset(textMetrics.height)
+            this.getProperty('paintedWidth').reset(textMetrics.width)
+            this.getProperty('paintedHeight').reset(textMetrics.height)
+            
+        }
+
+
+        
+    }
+
+    updateGeometry(){
+        this.setStyle({
+            minHeight: 0,
+            height: 0,
+        })
+        this.getProperty('width').setAuto(this.impl.scrollWidth)
+        this.getProperty('height').setAuto(Math.max(this.impl.scrollHeight, this.getProperty('font').getProperty('pixelSize').get()))
+        
+        this.getProperty('contentWidth').reset(this.impl.scrollWidth)
+        this.getProperty('contentHeight').reset(Math.max(this.impl.scrollHeight, this.getProperty('font').getProperty('pixelSize').get()))
+        this.getProperty('paintedWidth').reset(this.impl.scrollWidth)
+        this.getProperty('paintedHeight').reset(Math.max(this.impl.scrollHeight, this.getProperty('font').getProperty('pixelSize').get()))
+
+        this.setStyle({
+            minHeight: `${this.getPropertyValue('height')}px`,
+            height: `${this.getPropertyValue('height')}px`,
+        })
     }
 
     onKeyDown(key){
@@ -224,6 +294,7 @@ class TextEdit extends Item {
     }
 
     destroy(){
+        this.impl.remove()
         this.$input.remove()
         MouseController.remove(this)
         super.destroy()     

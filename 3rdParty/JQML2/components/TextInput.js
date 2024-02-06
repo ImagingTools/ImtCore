@@ -162,13 +162,13 @@ class TextInput extends Item {
         if(this.getPropertyValue('text')){
             this.setStyle({
                 fontWeight: this.getProperty('font').getPropertyValue('bold') ? 'bold' : 'normal',
-                fontSize: this.getProperty('font').getPropertyValue('pixelSize'),
+                fontSize: `${this.getProperty('font').getPropertyValue('pixelSize')}px`,
             })
             this.applyMetrics()
         } else {
             this.setStyle({
                 fontWeight: this.getProperty('font').getPropertyValue('bold') ? 'bold' : 'normal',
-                fontSize: this.getProperty('font').getPropertyValue('pixelSize'),
+                fontSize: `${this.getProperty('font').getPropertyValue('pixelSize')}px`,
             })
         }
     }
