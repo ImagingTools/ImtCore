@@ -177,9 +177,13 @@ void CSdlClassGqlModificatorComp::AddCustomListFieldReadFromRequestCode(QTextStr
 
 	/// \code
 	int userShareDataListCount = request.GetObjectsCount("UserShareDataList");
+
 	if (userShareDataListCount <= 0){
 		return false;
 	}
+
+
+//////////////////
 	QList<CShareUserInfo> userShareDataList;
 	for (int userShareDataListIndex = 0; userShareDataListIndex < userShareDataListCount; ++userShareDataListIndex){
 		const imtgql::CGqlObject* userShareDataObjectPtr = request.GetFieldArgumentObjectPtr("UserShareDataList", userShareDataListIndex);
@@ -194,6 +198,32 @@ void CSdlClassGqlModificatorComp::AddCustomListFieldReadFromRequestCode(QTextStr
 	}
 	object.SetUserShareDataList(userShareDataList);
 */
+
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("int ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Count = request.GetObjectsCount(");
+	stream << '"' << field.GetId() << '"';
+	stream << QStringLiteral(");");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream);
+
+	if (field.IsRequired()){
+		AddCheckCustomListRequiredValueCode(stream, field);
+
+		AddSetCustomListValueToObjectCode(stream, field);
+		FeedStream(stream, 1, false);
+	}
+	else {
+		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr != nullptr){");
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream, 1);
+		AddSetCustomListValueToObjectCode(stream, field, 2);
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream);
+		stream << '}';
+		FeedStream(stream, 1, false);
+	}
 }
 
 
@@ -292,13 +322,22 @@ void CSdlClassGqlModificatorComp::AddSetCustomValueToObjectCode(QTextStream& str
 
 // general help methods for custom list
 
-void CSdlClassGqlModificatorComp::AddExtractCustomListValueFromRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents)
-{
 
+void CSdlClassGqlModificatorComp::AddCheckCustomListRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Count <= 0){");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream);
+	stream << '}';
+	FeedStream(stream, 1, false);
 }
 
 
-void CSdlClassGqlModificatorComp::AddCheckCustomListRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents)
+void CSdlClassGqlModificatorComp::AddCheckCustomListEmptyValueCode(QTextStream& stream, const CSdlField& field, uint hIndents)
 {
 
 }
@@ -306,6 +345,45 @@ void CSdlClassGqlModificatorComp::AddCheckCustomListRequiredValueCode(QTextStrea
 
 void CSdlClassGqlModificatorComp::AddSetCustomListValueToObjectCode(QTextStream& stream, const CSdlField& field, uint hIndents)
 {
+	/*
+	QList<CShareUserInfo> userShareDataList;
+	for (int userShareDataListIndex = 0; userShareDataListIndex < userShareDataListCount; ++userShareDataListIndex){
+		const imtgql::CGqlObject* userShareDataObjectPtr = request.GetFieldArgumentObjectPtr("UserShareDataList", userShareDataListIndex);
+		if (userShareDataObjectPtr == nullptr){
+			return false;
+		}
+		CShareUserInfo shareUserInfo;
+		if (!CShareUserInfo::ReadFromGraphQlRequest(shareUserInfo, *userShareDataObjectPtr)){
+			return false;
+		}
+		userShareDataList << shareUserInfo;
+	}
+	object.SetUserShareDataList(userShareDataList);
+	*/
+
+	// declare list
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("QList<C") << field.GetType() << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List;");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents);
+
+	// declare 'for(;;)' loop
+	stream << QStringLiteral("for (int ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index = 0; ");
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index != ");
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Count ; ++");
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index){");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents + 1);
+
+	// declare iteration var
+	stream << QStringLiteral("const imtgql::CGqlObject* ");
+	stream <<GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr = request.GetFieldArgumentObjectPtr(");
+	stream << '"' << field.GetId() << '"' << ',' << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index);");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents + 1);
+	if (field.IsNonEmpty()){
+		AddCheckCustomListEmptyValueCode(stream, field, hIndents + 1);
+	}
 
 }
 

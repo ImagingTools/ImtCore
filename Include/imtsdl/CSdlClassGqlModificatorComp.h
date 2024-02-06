@@ -47,9 +47,9 @@ private:
 	void AddSetCustomValueToObjectCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
 
 	// general help methods for custom list
-	void AddExtractCustomListValueFromRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
 	/// \todo add error handling for it. do not forget about arrays and arrays.isEmpty
 	void AddCheckCustomListRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
+	void AddCheckCustomListEmptyValueCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
 	void AddSetCustomListValueToObjectCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
 
 
