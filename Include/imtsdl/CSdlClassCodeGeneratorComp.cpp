@@ -311,6 +311,13 @@ bool CSdlClassCodeGeneratorComp::EndHeaderClassFile(const CSdlType& sdlType)
 	ifStream << QStringLiteral("bool operator==(const ");
 	ifStream << 'C' << sdlType.GetName();
 	ifStream << QStringLiteral("& other) const;");
+	FeedStream(ifStream, 1, false);
+
+	// Add invrted compare operator
+	FeedStreamHorizontally(ifStream);
+	ifStream << QStringLiteral("bool operator!=(const ");
+	ifStream << 'C' << sdlType.GetName();
+	ifStream << QStringLiteral("& other) const { return !(operator==(other)); }");
 	FeedStream(ifStream, 2, false);
 
 	// defining class members
@@ -627,8 +634,37 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 
 		if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
 			FeedStreamHorizontally(stream, indents + 2);
-			stream << FromVariantMapAccessString(sdlField) << QStringLiteral(" = ");
-			stream << GetDecapitalizedValue(sdlField.GetId()) << ';';
+			if (isCustom && sdlField.IsArray()){
+				stream << QStringLiteral("QVariantList temp") << GetCapitalizedValue(sdlField.GetId()) << QStringLiteral("List;");
+
+				FeedStream(stream, 1, false);
+				FeedStreamHorizontally(stream, indents + 2);
+				stream << QStringLiteral("for (const auto& tempValue: std::as_const(");
+				stream << GetDecapitalizedValue(sdlField.GetId());
+				stream << QStringLiteral(")){");
+
+				FeedStream(stream, 1, false);
+				FeedStreamHorizontally(stream, indents + 3);
+				stream << QStringLiteral("temp") << GetCapitalizedValue(sdlField.GetId()) << QStringLiteral("List");
+				stream << QStringLiteral(" << QVariant::fromValue(tempValue);");
+
+				FeedStream(stream, 1, false);
+				FeedStreamHorizontally(stream, indents + 2);
+				stream << '}';
+
+				FeedStream(stream, 1, false);
+				FeedStreamHorizontally(stream, indents + 2);
+				stream << FromVariantMapAccessString(sdlField) << QStringLiteral(" = ");
+				stream << QStringLiteral("temp") << GetCapitalizedValue(sdlField.GetId()) << QStringLiteral("List;");
+			}
+			else if (isCustom){
+				stream << FromVariantMapAccessString(sdlField) << QStringLiteral(".setValue(");
+				stream << GetDecapitalizedValue(sdlField.GetId()) << ')' << ';';
+			}
+			else {
+				stream << FromVariantMapAccessString(sdlField) << QStringLiteral(" = ");
+				stream << GetDecapitalizedValue(sdlField.GetId()) << ';';
+			}
 			FeedStream(stream, 1, false);
 		}
 
