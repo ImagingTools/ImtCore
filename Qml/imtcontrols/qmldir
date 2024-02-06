@@ -71,6 +71,7 @@ TimePicker 1.0 ./Inputs/TimePicker.qml
 TextArea 1.0 ./Inputs/TextArea.qml
 SpinBox 1.0 ./Inputs/SpinBox.qml
 SpinBoxComp 1.0 ./Inputs/SpinBoxComp.qml
+BarControl 1.0 ./Inputs/BarControl.qml
 
 ModelIndex 1.0 Models/ModelIndex.qml
 SortController 1.0 Models/SortController.qml
