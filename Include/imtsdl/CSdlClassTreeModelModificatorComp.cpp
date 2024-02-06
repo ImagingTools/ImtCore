@@ -18,6 +18,17 @@ namespace imtsdl
 
 bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const CSdlType& sdlType)
 {
+	for (const CSdlField& field: sdlType.GetFields()){
+		bool isArray = false;
+		bool isCustom = false;
+		ConvertType(field, &isCustom, nullptr, &isArray);
+		if (isCustom || isArray){
+			SendErrorMessage(0, "SDL TreeItemModel does not supports arrays and custom values");
+
+			return false;
+		}
+	}
+
 	QTextStream ofStream(m_headerFilePtr.GetPtr());
 	QTextStream ifStream(m_originalHeaderFilePtr.GetPtr());
 	while (!ifStream.atEnd()){
