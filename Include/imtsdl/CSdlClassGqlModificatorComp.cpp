@@ -161,44 +161,6 @@ void CSdlClassGqlModificatorComp::AddCustomFieldReadFromRequestCode(QTextStream&
 
 void CSdlClassGqlModificatorComp::AddCustomListFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field)
 {
-
-/*!
-	/// \def
-
-	type ShareUserInfo {
-		Id: ID!
-		Type: Int
-	}
-
-	type ShareRequest {
-		ItemId: ID!
-		UserShareDataList: [ShareUserInfo!]!
-	}
-
-	/// \code
-	int userShareDataListCount = request.GetObjectsCount("UserShareDataList");
-
-	if (userShareDataListCount <= 0){
-		return false;
-	}
-
-
-//////////////////
-	QList<CShareUserInfo> userShareDataList;
-	for (int userShareDataListIndex = 0; userShareDataListIndex < userShareDataListCount; ++userShareDataListIndex){
-		const imtgql::CGqlObject* userShareDataObjectPtr = request.GetFieldArgumentObjectPtr("UserShareDataList", userShareDataListIndex);
-		if (userShareDataObjectPtr == nullptr){
-			return false;
-		}
-		CShareUserInfo shareUserInfo;
-		if (!CShareUserInfo::ReadFromGraphQlRequest(shareUserInfo, *userShareDataObjectPtr)){
-			return false;
-		}
-		userShareDataList << shareUserInfo;
-	}
-	object.SetUserShareDataList(userShareDataList);
-*/
-
 	FeedStreamHorizontally(stream, 1);
 	stream << QStringLiteral("int ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Count = request.GetObjectsCount(");
 	stream << '"' << field.GetId() << '"';
@@ -206,17 +168,16 @@ void CSdlClassGqlModificatorComp::AddCustomListFieldReadFromRequestCode(QTextStr
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream);
 
-	if (field.IsRequired()){
+	if (field.IsRequired() || field.IsNonEmpty()){
 		AddCheckCustomListRequiredValueCode(stream, field);
 
 		AddSetCustomListValueToObjectCode(stream, field);
 		FeedStream(stream, 1, false);
 	}
 	else {
-		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr != nullptr){");
+		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Count > 0){");
 		FeedStream(stream, 1, false);
 
-		FeedStreamHorizontally(stream, 1);
 		AddSetCustomListValueToObjectCode(stream, field, 2);
 		FeedStream(stream, 1, false);
 
@@ -316,12 +277,10 @@ void CSdlClassGqlModificatorComp::AddSetCustomValueToObjectCode(QTextStream& str
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
-
 }
 
 
 // general help methods for custom list
-
 
 void CSdlClassGqlModificatorComp::AddCheckCustomListRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents)
 {
@@ -337,33 +296,11 @@ void CSdlClassGqlModificatorComp::AddCheckCustomListRequiredValueCode(QTextStrea
 }
 
 
-void CSdlClassGqlModificatorComp::AddCheckCustomListEmptyValueCode(QTextStream& stream, const CSdlField& field, uint hIndents)
-{
-
-}
-
-
 void CSdlClassGqlModificatorComp::AddSetCustomListValueToObjectCode(QTextStream& stream, const CSdlField& field, uint hIndents)
 {
-	/*
-	QList<CShareUserInfo> userShareDataList;
-	for (int userShareDataListIndex = 0; userShareDataListIndex < userShareDataListCount; ++userShareDataListIndex){
-		const imtgql::CGqlObject* userShareDataObjectPtr = request.GetFieldArgumentObjectPtr("UserShareDataList", userShareDataListIndex);
-		if (userShareDataObjectPtr == nullptr){
-			return false;
-		}
-		CShareUserInfo shareUserInfo;
-		if (!CShareUserInfo::ReadFromGraphQlRequest(shareUserInfo, *userShareDataObjectPtr)){
-			return false;
-		}
-		userShareDataList << shareUserInfo;
-	}
-	object.SetUserShareDataList(userShareDataList);
-	*/
-
 	// declare list
 	FeedStreamHorizontally(stream, hIndents);
-	stream << QStringLiteral("QList<C") << field.GetType() << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List;");
+	stream << QStringLiteral("QList<C") << field.GetType() << '>' << ' ' << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List;");
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, hIndents);
 
@@ -381,10 +318,69 @@ void CSdlClassGqlModificatorComp::AddSetCustomListValueToObjectCode(QTextStream&
 	stream << '"' << field.GetId() << '"' << ',' << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Index);");
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, hIndents + 1);
-	if (field.IsNonEmpty()){
-		AddCheckCustomListEmptyValueCode(stream, field, hIndents + 1);
+
+	// checks for itaration var
+	stream << QStringLiteral("if (");
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr == nullptr){");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << '}';
+
+
+	/*
+		CShareUserInfo shareUserInfo;
+		if (!CShareUserInfo::ReadFromGraphQlRequest(shareUserInfo, *userShareDataObjectPtr)){
+			return false;
+		}
+
+		userShareDataList << shareUserInfo;
 	}
 
+	object.SetUserShareDataList(userShareDataList);
+	*/
+
+	// declare read variable
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << 'C' << GetCapitalizedValue(field.GetType());
+	stream << ' ' << GetDecapitalizedValue(field.GetId()) << ';';
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents + 1);
+
+	// read
+	stream << QStringLiteral("if (!");
+	stream << 'C' << GetCapitalizedValue(field.GetType());
+	stream << QStringLiteral("::ReadFromGraphQlRequest(");
+	stream << GetDecapitalizedValue(field.GetId());
+	stream << QStringLiteral(", *");
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr)){");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << '}';
+
+	// add to temp list
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List");
+	stream << QStringLiteral(" << ");
+	stream << GetDecapitalizedValue(field.GetId()) << ';';
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+
+	// set value
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("object.Set");
+	stream << GetCapitalizedValue(field.GetId()) << '(';
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List");
+	stream << ')' << ';';
 }
 
 
