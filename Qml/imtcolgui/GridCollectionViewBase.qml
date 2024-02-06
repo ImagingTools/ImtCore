@@ -2,6 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
+import imtcolgui 1.0
 
 Item {
     id: collectionViewBaseContainer;
@@ -33,7 +34,10 @@ Item {
     property int gridSelectedIndexInRow: gridSelectedRow < 0 ? 0 : gridInternal.selectedIndex - gridSelectedRow * gridCountInLine;
     property real gridAddHeight: 110*3;
     property int gridCellHeightMin: 110;
-    property int gridCellHeightMax: (gridCellHeightMin * gridRowCount + gridAddHeight) / gridRowCount + !isWeb * gridIsLastRow * gridAddHeight;
+
+    property int gridCellHeightMax: (gridCellHeightMin * gridRowCount + gridAddHeight) / gridRowCount
+                                    + !isWeb * (gridIsLastRow * gridAddHeight - gridAddHeight / gridRowCount + 1);
+
     property int gridDelegateMargin: 10;
 
     property alias gridIndicatorMainColor: gridIndicator.color;
@@ -73,6 +77,7 @@ Item {
 
         baseCommands.updateModels();
     }
+
 
     onGridSelectedRowChanged: {
         if(gridSelectedRow >=0){
@@ -176,7 +181,11 @@ Item {
             property real contentWidth: gridInternal.contentWidth;
             property real contentY: gridInternal.contentY;
             property real originY: 0;
-            property real contentHeight: collectionViewBaseContainer.openST ? collectionViewBaseContainer.gridRowCount * collectionViewBaseContainer.gridCellHeightMin + collectionViewBaseContainer.gridAddHeight + !collectionViewBaseContainer.isWeb /** collectionViewBaseContainer.gridIsLastRow*/ * collectionViewBaseContainer.gridAddHeight / collectionViewBaseContainer.gridRowCount : collectionViewBaseContainer.gridRowCount * collectionViewBaseContainer.gridCellHeightMin;
+            property real contentHeight: collectionViewBaseContainer.openST ? collectionViewBaseContainer.gridRowCount * collectionViewBaseContainer.gridCellHeightMin + collectionViewBaseContainer.gridAddHeight
+                                           //+ !collectionViewBaseContainer.isWeb  * (collectionViewBaseContainer.gridAddHeight / collectionViewBaseContainer.gridRowCount)
+                                            : collectionViewBaseContainer.gridRowCount * collectionViewBaseContainer.gridCellHeightMin;
+
+
         }
 
         GridView {
@@ -186,17 +195,25 @@ Item {
 
             boundsBehavior: Flickable.StopAtBounds;
             clip: true;
-
+            //cacheBuffer: collectionViewBaseContainer.gridRowCount * collectionViewBaseContainer.gridCellHeightMin + collectionViewBaseContainer.gridAddHeight;
+            cellWidth: collectionViewBaseContainer.gridCellHeightMin;
             cellHeight: !collectionViewBaseContainer.hasExtention ? collectionViewBaseContainer.gridCellHeightMin : !collectionViewBaseContainer.openST ? collectionViewBaseContainer.gridCellHeightMin : collectionViewBaseContainer.gridCellHeightMax;
 
             property int selectedIndex: -1;
             //            property alias elements: model;
             signal selectItem(string idSelected, string name);
 
+
             onContentYChanged: {
                 gridFrame.contentY = contentY;
             }
 
+            onContentHeightChanged: {
+                //console.log("GRID::CONTENT_Height:: ", contentHeight, ", must be:: " ,collectionViewBaseContainer.gridRowCount * collectionViewBaseContainer.gridCellHeightMin + collectionViewBaseContainer.gridAddHeight * collectionViewBaseContainer.openST, ", addHeight:: " , collectionViewBaseContainer.gridAddHeight)
+            }
+            onCellHeightChanged: {
+                //console.log("GRID::Cell_Height:: ", cellHeight, height)
+            }
 
             onSelectItem: {
                 console.log("MEGATEST1")
@@ -219,6 +236,12 @@ Item {
             //            anchors.margins: thumbnailDecoratorContainer.mainMargin;
             //            property real minWidth: 1000000;
         }
+
+//        Rectangle{//TEST!!!
+//            anchors.fill: gridInternal;
+//            color: "transparent"
+//            border.color: "red"
+//        }
 
     }
 
