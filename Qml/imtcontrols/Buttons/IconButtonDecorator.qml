@@ -12,8 +12,8 @@ DecoratorBase{
 
         anchors.centerIn:  parent;
 
-        width: dec.baseElement.width;
-        height: dec.baseElement.height;
+        width: dec.baseElement ? dec.baseElement.width : 0;
+        height: dec.baseElement ? dec.baseElement.height : 0;
 
         sourceSize.width: width;
         sourceSize.height: height;
