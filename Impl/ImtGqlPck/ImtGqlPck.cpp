@@ -95,11 +95,6 @@ I_EXPORT_COMPONENT(
 			"Model Subscriber Collection");
 
 I_EXPORT_COMPONENT(
-			StructureController,
-			"GraphQL-structure base controller",
-			"GQL GraphQL Structure Controller");
-
-I_EXPORT_COMPONENT(
 			StructureSubscriberController,
 			"Subscriprion controller for collection structure",
 			"Subscriprion Subscriber Collection ObjectCollection Subscriber");
