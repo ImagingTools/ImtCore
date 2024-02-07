@@ -9,7 +9,6 @@ Item {
 
     property string backgroundColor: "lightgray";
     property string controlColor: "lightgreen";
-    property string cornerColor: Style.backgroundColor;
 
     property alias radius: controlRec.radius;
 
