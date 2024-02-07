@@ -158,7 +158,6 @@ Rectangle {
 
                 width: 200;
                 height: 60;
-                cornerColor: "white";
 
                 value: 0.5;
             }
@@ -171,7 +170,6 @@ Rectangle {
                 width: 60;
                 height: 200;
                 orientation: Qt.Vertical;
-                cornerColor: "white";
 
                 value: 0.8;
 
