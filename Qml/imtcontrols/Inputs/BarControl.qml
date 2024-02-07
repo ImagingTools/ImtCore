@@ -60,6 +60,10 @@ Item {
 
         hoverEnabled: true;
         cursorShape: Qt.PointingHandCursor;
+        property var startPoint: Qt.point(0,0);
+        onPressed: {
+            ma.startPoint = Qt.point(mouse.x, mouse.y);
+        }
         onPositionChanged: {
             if(!pressed){
                 return;
@@ -67,12 +71,15 @@ Item {
             let val = -1;
             if(barControl.orientation == Qt.Horizontal){
                 if(mouse.x >= 0 && mouse.x <= barControl.width){
-                    val = mouse.x / barControl.width;
+                    //val = mouse.x / barControl.width;
+                    val = barControl.value - (ma.startPoint.x - mouse.x) / barControl.width;
+
                 }
             }
             else if(barControl.orientation == Qt.Vertical){
                 if(mouse.y >= 0 && mouse.y <= barControl.height){
-                    val = (barControl.height - mouse.y) / barControl.height;
+                    //val = (barControl.height - mouse.y) / barControl.height;
+                    val = barControl.value + (ma.startPoint.y - mouse.y) / barControl.height;
                 }
             }
 
@@ -87,6 +94,7 @@ Item {
                 barControl.value = val
                 //console.log(barControl.value)
             }
+            ma.startPoint = Qt.point(mouse.x, mouse.y);
         }
 
     }
