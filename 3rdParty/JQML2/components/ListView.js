@@ -63,8 +63,10 @@ class ListView extends Flickable {
         if(roles === 'remove'){
             for(let i = leftTop; i < bottomRight; i++){
                 if(this.$items[i]){
-                    this.$items[i].destroy()
+                    let obj = this.$items[i]
                     delete this.$items[i]
+                    obj.destroy()
+                    
                 }
             }
         }
@@ -73,7 +75,8 @@ class ListView extends Flickable {
                 if(this.$items[i]){
                     let length = this.$items.length.get()
                     for(let k = length; k > i; k--){
-                        this.$items[k] = this.$items[k-1]
+                        if(this.$items[k-1] && !this.$items[k-1].UID) delete this.$items[k-1]
+                        if(this.$items[k-1]) this.$items[k] = this.$items[k-1]
                           
                     }
                     this.$items[i] = null
@@ -82,7 +85,7 @@ class ListView extends Flickable {
                 // this.createElement(i) 
                 // this.updateGeometry()
                 if(this.getPropertyValue('orientation') === ListView.Horizontal){
-                    if(this.$items[i-1] && this.$items[i-1].getPropertyValue('x') + this.$items[i-1].getPropertyValue('width') + this.getPropertyValue('spacing') < this.getPropertyValue('width') + this.getPropertyValue('contentX') + this.getPropertyValue('cacheBuffer')){
+                    if(this.$items[i-1] && this.$items[i-1].UID && this.$items[i-1].getPropertyValue('x') + this.$items[i-1].getPropertyValue('width') + this.getPropertyValue('spacing') < this.getPropertyValue('width') + this.getPropertyValue('contentX') + this.getPropertyValue('cacheBuffer')){
                         let obj = this.createElement(i)
                         obj.getStatement('x').reset(this.$items[i-1].getPropertyValue('x') + this.$items[i-1].getPropertyValue('width') + this.getPropertyValue('spacing'))
                         
@@ -91,13 +94,13 @@ class ListView extends Flickable {
                         // }
 
                         this.updateGeometry()
-                    } else if(this.$items[i+1] && this.$items[i+1].getPropertyValue('x') - this.getPropertyValue('spacing') > this.getPropertyValue('contentX') - this.getPropertyValue('cacheBuffer')){
+                    } else if(this.$items[i+1] && this.$items[i+1].UID && this.$items[i+1].getPropertyValue('x') - this.getPropertyValue('spacing') > this.getPropertyValue('contentX') - this.getPropertyValue('cacheBuffer')){
                         let obj = this.createElement(i)
                         obj.getStatement('x').reset(this.$items[i+1].getPropertyValue('x') - obj.getPropertyValue('width') - this.getPropertyValue('spacing'))
                         this.updateGeometry()
                     } 
                 } else {
-                    if(this.$items[i-1] && this.$items[i-1].getPropertyValue('y') + this.$items[i-1].getPropertyValue('height') + this.getPropertyValue('spacing') < this.getPropertyValue('height') + this.getPropertyValue('contentY') + this.getPropertyValue('cacheBuffer')){
+                    if(this.$items[i-1] && this.$items[i-1].UID && this.$items[i-1].getPropertyValue('y') + this.$items[i-1].getPropertyValue('height') + this.getPropertyValue('spacing') < this.getPropertyValue('height') + this.getPropertyValue('contentY') + this.getPropertyValue('cacheBuffer')){
                         let obj = this.createElement(i)
                         obj.getStatement('y').reset(this.$items[i-1].getPropertyValue('y') + this.$items[i-1].getPropertyValue('height') + this.getPropertyValue('spacing'))
                         
@@ -106,7 +109,7 @@ class ListView extends Flickable {
                         // }
 
                         this.updateGeometry()
-                    } else if(this.$items[i+1] && this.$items[i+1].getPropertyValue('y') - this.getPropertyValue('spacing') > this.getPropertyValue('contentY') - this.getPropertyValue('cacheBuffer')){
+                    } else if(this.$items[i+1] && this.$items[i+1].UID && this.$items[i+1].getPropertyValue('y') - this.getPropertyValue('spacing') > this.getPropertyValue('contentY') - this.getPropertyValue('cacheBuffer')){
                         let obj = this.createElement(i)
                         obj.getStatement('y').reset(this.$items[i+1].getPropertyValue('y') - obj.getPropertyValue('height') - this.getPropertyValue('spacing'))
                         this.updateGeometry()
@@ -131,8 +134,10 @@ class ListView extends Flickable {
         this.$disconnectModel()
         for(let key in this.$items){
             if(key !== 'length') {
-                this.$items[key].destroy()
+                let obj = this.$items[key]
                 delete this.$items[key]
+                obj.destroy()
+                
             }
         }
         this.$items.length.reset(0)
@@ -149,8 +154,9 @@ class ListView extends Flickable {
     $delegateChanged(){
         for(let key in this.$items){
             if(key !== 'length') {
-                this.$items[key].destroy()
+                let obj = this.$items[key]
                 delete this.$items[key]
+                obj.destroy()
             }
         }
         this.updateView()
@@ -448,7 +454,7 @@ class ListView extends Flickable {
                 })
             }
             if(this.getPropertyValue('orientation') === ListView.Horizontal){
-                if(this.$items[obj.model.index+1]){
+                if(this.$items[obj.model.index+1] && this.$items[obj.model.index+1] !== obj){
                     this.$items[obj.model.index+1].getProperty('x').reset(obj.getPropertyValue('x')+obj.getPropertyValue('width')+this.getPropertyValue('spacing'))
                 }
                 this.updateGeometry()
@@ -466,7 +472,7 @@ class ListView extends Flickable {
             }
             
             if(this.getPropertyValue('orientation') === ListView.Vertical){
-                if(this.$items[obj.model.index+1]){
+                if(this.$items[obj.model.index+1] && this.$items[obj.model.index+1] !== obj){
                     this.$items[obj.model.index+1].getProperty('y').reset(obj.getPropertyValue('y')+obj.getPropertyValue('height')+this.getPropertyValue('spacing'))
                 }
                 this.updateGeometry()
@@ -474,7 +480,7 @@ class ListView extends Flickable {
         })
         obj.getProperty('x').getNotify().connect(()=>{
             if(this.getPropertyValue('orientation') === ListView.Horizontal){
-                if(this.$items[obj.model.index+1]){
+                if(this.$items[obj.model.index+1] && this.$items[obj.model.index+1] !== obj){
                     this.$items[obj.model.index+1].getProperty('x').reset(obj.getPropertyValue('x')+obj.getPropertyValue('width')+this.getPropertyValue('spacing'))
                     this.updateGeometry()
                 }
@@ -482,7 +488,7 @@ class ListView extends Flickable {
         })
         obj.getProperty('y').getNotify().connect(()=>{
             if(this.getPropertyValue('orientation') === ListView.Vertical){
-                if(this.$items[obj.model.index+1]){
+                if(this.$items[obj.model.index+1] && this.$items[obj.model.index+1] !== obj){
                     this.$items[obj.model.index+1].getProperty('y').reset(obj.getPropertyValue('y')+obj.getPropertyValue('height')+this.getPropertyValue('spacing'))
                     this.updateGeometry()
                 }
@@ -557,8 +563,10 @@ class ListView extends Flickable {
 
         for(let key in this.$items){
             if(key !== 'length') {
-                this.$items[key].destroy()
+                let obj = this.$items[key]
                 delete this.$items[key]
+                obj.destroy()
+                
             }
         }
         

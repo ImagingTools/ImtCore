@@ -873,7 +873,7 @@ class QVariant extends QVar {
 }
 
 class QModelData {
-    constructor(data, index){
+    constructor(model, data, index){
         this.index = new QInt(index)
 
         Object.assign(this, typeof data === 'object' ? data : {})
@@ -892,9 +892,15 @@ class QModelData {
             },
             set(target, name, value){
                 if(target[name] instanceof QProperty){
-                    target[name].reset(value)
+                    if(target[name].value !== value){
+                        target[name].reset(value)
+                        if(name !== 'index') model.getProperty('data').getNotify()()
+                    }
                 } else {
-                    target[name] = value
+                    if(target[name] !== value){
+                        target[name] = value
+                        if(name !== 'index') model.getProperty('data').getNotify()()
+                    } 
                 }
                 
                 return true

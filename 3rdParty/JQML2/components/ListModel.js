@@ -31,6 +31,10 @@ class ListModel extends QtObject {
     }
 
     $dataChanged(topLeft, bottomRight, roles){
+        let parent = this.getProperty('parent').get()
+        if(parent instanceof ListModel){
+            parent.getProperty('data').getNotify()()
+        }
         // if(this.parent && this.parent instanceof ListModel) this.parent.getProperty('data').getNotify()()
         // console.log('DEBUG:::dataChanged', topLeft, bottomRight, roles)
     }
@@ -51,10 +55,10 @@ class ListModel extends QtObject {
 
       
             for(let i = 0; i < dict.length; i++){
-                this.getStatement('data').get().push(new QModelData(dict[i], this.getStatement('data').get().length))
+                this.getStatement('data').get().push(new QModelData(this, dict[i], this.getStatement('data').get().length))
             }
 		} else {
-            this.getStatement('data').get().push(new QModelData(dict, this.getStatement('data').get().length))
+            this.getStatement('data').get().push(new QModelData(this, dict, this.getStatement('data').get().length))
 		}
         
         this.getStatement('count').reset(this.getStatement('data').get().length)
@@ -79,10 +83,10 @@ class ListModel extends QtObject {
 
       
             for(let i = 0; i < dict.length; i++){
-                this.getStatement('data').get().splice(index, 0, new QModelData(dict[i], index+i))
+                this.getStatement('data').get().splice(index, 0, new QModelData(this, dict[i], index+i))
             }
 		} else {
-            this.getStatement('data').get().splice(index, 0, new QModelData(dict, index))
+            this.getStatement('data').get().splice(index, 0, new QModelData(this, dict, index))
 		}
 
         let data = this.getStatement('data').get()

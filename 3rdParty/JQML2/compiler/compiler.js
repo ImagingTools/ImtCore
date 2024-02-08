@@ -515,6 +515,24 @@ function testProperty(name, currentInstructions){
     return false
 }
 
+function testSignal(name, currentInstructions){
+    let inExtends = false
+    if(currentInstructions.extends) inExtends = testSignal(name, currentInstructions.extends.instructions)
+    if(inExtends) return true
+    
+    let component = components[currentInstructions.getClassName()]
+    if(component)
+    while(component.defaultSignals){
+        if(name in component.defaultSignals){
+            return true
+        }
+        component = component.__proto__
+    }
+    if(name in currentInstructions.defineSignals) return true
+    
+    return false
+}
+
 function getSignalParams(name, currentInstructions){
     let component = components[currentInstructions.getClassName()]
     if(component)
@@ -1076,6 +1094,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
         
         let name = signal.name
         let linkedProperty = testProperty(name, currentInstructions)
+        if(testSignal(name, currentInstructions)) linkedProperty = false
         if(linkedProperty){
             name = name.replaceAll('Changed', '')
             if(currentInstructions.propertiesNames.indexOf(name) >= 0) continue
@@ -1283,6 +1302,8 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
     for(let signal of currentInstructions.connectionSignals){
         let name = signal.name
         let linkedProperty = testProperty(name, currentInstructions)
+        // if(currentInstructions.defineSignals[signal.name]) linkedProperty = false
+        if(testSignal(name, currentInstructions)) linkedProperty = false
         if(linkedProperty){
             name = name.replaceAll('Changed', '')
             if(currentInstructions.propertiesNames.indexOf(name) < 0) continue
