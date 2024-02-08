@@ -59,7 +59,9 @@ MouseArea{
 
     onDeltaSignal: {
         //console.log("Delta:: ", delta.x, delta.y);
-        movingFunction(delta);
+        if(movingItem){
+            movingFunction(delta);
+        }
     }
 
     onWheelDeltaSignal: {
