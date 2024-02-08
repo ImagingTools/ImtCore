@@ -25,11 +25,11 @@ Rectangle {
 
     onContentXChanged: {
         canvas.deltaX = contentX
-        canvas.requestPaint();
+        //canvas.requestPaint();
     }
     onContentYChanged: {
         canvas.deltaY = contentY
-        canvas.requestPaint();
+        //canvas.requestPaint();
     }
 
 
@@ -1031,6 +1031,9 @@ Rectangle {
             opacity = 1;
         }
         targetItem: parent;
+        onContentYSignal: {
+            canvas.requestPaint();
+        }
 
     }
 
@@ -1050,6 +1053,9 @@ Rectangle {
         }
         vertical: false;
         targetItem: parent;
+        onContentXSignal: {
+            canvas.requestPaint();
+        }
     }
 
 }
