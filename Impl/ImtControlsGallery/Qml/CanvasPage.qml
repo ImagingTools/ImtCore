@@ -9,6 +9,8 @@ Rectangle {
     anchors.fill: parent;
     clip: true;
 
+    color: "#ececec";
+
     property TreeItemModel objectModel: TreeItemModel{};
 
     //for scrollBars
@@ -33,6 +35,8 @@ Rectangle {
 
     Component.onCompleted: {
         //TEST
+        //        let page = new Shema.CPage()
+        //        console.log("Page", page.width, page.height)
         //links for test
         let index_link = linkModel.InsertNewItem();
         linkModel.SetData("ObjectId", "02", index_link);
@@ -56,40 +60,40 @@ Rectangle {
 
         let index = objectModel.InsertNewItem();
         objectModel.SetData("Id", "01", index);
-        objectModel.SetData("X", 0.3, index);
-        objectModel.SetData("Y", 0.3, index);
+        objectModel.SetData("X", 300, index);
+        objectModel.SetData("Y", 300, index);
         objectModel.SetData("MainText", "Main text Main text Main text", index);
         objectModel.SetData("SecondText", "Second text", index);
         objectModel.SetExternTreeModel("Links", linkModel, index);
 
         index = objectModel.InsertNewItem();
         objectModel.SetData("Id", "02", index);
-        objectModel.SetData("X", 0.6, index);
-        objectModel.SetData("Y", 0.6, index);
+        objectModel.SetData("X", 600, index);
+        objectModel.SetData("Y", 600, index);
         objectModel.SetData("MainText", "Main text 2", index);
         objectModel.SetData("SecondText", "Second text 2", index);
         objectModel.SetData("HasError", true, index);
 
         index = objectModel.InsertNewItem();
         objectModel.SetData("Id", "03", index);
-        objectModel.SetData("X", 0.1, index);
-        objectModel.SetData("Y", 0.1, index);
+        objectModel.SetData("X", 100, index);
+        objectModel.SetData("Y", 100, index);
         objectModel.SetData("MainText", "Main text 3", index);
         objectModel.SetData("SecondText", "Second text 3", index);
         objectModel.SetData("IsComposite", true, index);
 
         index = objectModel.InsertNewItem();
         objectModel.SetData("Id", "04", index);
-        objectModel.SetData("X", 0.6, index);
-        objectModel.SetData("Y", 0.1, index);
+        objectModel.SetData("X", 600, index);
+        objectModel.SetData("Y", 100, index);
         objectModel.SetData("MainText", "Main text 4", index);
         objectModel.SetData("SecondText", "Second text 4", index);
         objectModel.SetExternTreeModel("Links", linkModel3, index);
 
         index = objectModel.InsertNewItem();
         objectModel.SetData("Id", "05", index);
-        objectModel.SetData("X", 0.1, index);
-        objectModel.SetData("Y", 0.6, index);
+        objectModel.SetData("X", 100, index);
+        objectModel.SetData("Y", 600, index);
         objectModel.SetData("MainText", "Main text 5", index);
         objectModel.SetData("SecondText", "Second text 5", index);
         objectModel.SetExternTreeModel("Links", linkModel2, index);
@@ -124,6 +128,37 @@ Rectangle {
         }
     }
 
+    function correctPosition(addX, addY){
+        for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
+
+            let x_ = canvasPage.objectModel.GetData("X", i) ;
+            let y_ = canvasPage.objectModel.GetData("Y", i) ;
+            let newX = x_ + addX;
+            let newY = y_ + addY;
+            canvasPage.objectModel.SetData("X", newX, i);
+            canvasPage.objectModel.SetData("Y", newY, i);
+        }
+    }
+
+    function correctPositionScaled(addX, addY, scale_){
+        for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
+            //console.log("correctPositionScaled:: ", addX, addY, scale_)
+            let x_ = canvasPage.objectModel.GetData("X", i) ;
+            let y_ = canvasPage.objectModel.GetData("Y", i) ;
+            let width_ = canvasPage.objectModel.GetData("Width", i) ;
+            //            let newX = x_ + addX;
+            //            let newY = y_ + addY;
+            let newX =  x_; // + (width_ * scale_ - width_)/2;
+            let newY =  y_ ;
+            let newWidth = scale_ * width_;
+            canvasPage.objectModel.SetData("X", newX, i);
+            canvasPage.objectModel.SetData("Y", newY, i);
+            canvasPage.objectModel.SetData("Width", newWidth, i);
+        }
+    }
+
+
+
     TreeItemModel {id: linkModel;/*for test*/}
     TreeItemModel {id: linkModel2;/*for test*/}
     TreeItemModel {id: linkModel3;/*for test*/}
@@ -136,18 +171,10 @@ Rectangle {
         id: emptyModel;
     }
 
-    Rectangle{
+    Item{
         id: mainContainer;
 
-        x: parent.width/2 - width/2;
-        y: parent.height/2 - height/2;
-
-        width: parent.width * canvas.scaleCoeff;
-        height:  parent.height * canvas.scaleCoeff;
-        color: "transparent";
-        border.color: "lightgrey";
-        border.width: 2;
-        radius: 4;
+        anchors.fill: parent
 
         property real scaleCoeffContainer: canvas.scaleCoeff.toFixed(3);
         property real scaleCoeffContainerPrev: 1;
@@ -184,7 +211,7 @@ Rectangle {
             }
         }
 
-        ControlArea{
+        ControlArea {
             id: controlArea;
 
             anchors.fill: parent;
@@ -211,9 +238,16 @@ Rectangle {
                 for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
                     let x_  = canvasPage.objectModel.GetData("X", i)
                     let y_  = canvasPage.objectModel.GetData("Y", i)
-                    let width_ = canvasPage.objectModel.IsValidData("Width", i) ? canvasPage.objectModel.GetData("Width", i) * canvas.scaleCoeff : canvas.mainRec_width;
+                    let width_ = canvasPage.objectModel.IsValidData("Width", i) ? canvasPage.objectModel.GetData("Width", i)  : canvas.mainRec_width;
+                    let height_ = canvas.mainRec_height;
 
-                    let ok = checkInsideMovingItem(canvas.width * x_, canvas.height * y_, width_, canvas.mainRec_height);
+                    x_ = x_ * canvas.scaleCoeff + canvas.deltaX;
+                    y_ = y_ * canvas.scaleCoeff + canvas.deltaY;
+                    width_ = width_ * canvas.scaleCoeff;
+                    height_ = height_  * canvas.scaleCoeff;
+
+
+                    let ok = checkInsideMovingItem(x_, y_, width_, height_);
 
                     if(ok){
                         canvas.selectedIndex = i;
@@ -240,94 +274,103 @@ Rectangle {
                 }
             }
 
-            onWheelDeltaSignal: {
-                if(wheelDelta > 0){//up
-                    canvas.scaleCoeff += scaleStep;
+            //            onWheelDeltaSignal: {
+            //                if(wheelDelta > 0){//up
+            //                    if (canvas.scaleCoeff < 3){
+            //                        canvas.scaleCoeff += scaleStep;
+            //                    }
+            //                }
+            //                else{//down
+            //                    if(canvas.scaleCoeff > scaleStep * 2){
+            //                        canvas.scaleCoeff -= scaleStep;
+            //                    }
+            //                }
+            ////                canvas.markDirty()
+            ////                canvas.requestPaint();
+            //            }
+            onDeltaSignal: {
+                if(canvas.selectedIndex < 0){
+                    canvas.deltaX += delta.x
+                    canvas.deltaY += delta.y
+
+                    //canvasPage.correctPosition(delta.x, delta.y)
+
+                    canvas.requestPaint();
                 }
-                else{//down
-                    if(canvas.scaleCoeff > scaleStep){
-                        canvas.scaleCoeff -= scaleStep;
-                    }
+                else {
+                    movingFunction(delta);
                 }
             }
 
-            function movingFunction(delta){
+            onWheel: {
+                let scaleCoeffBack = canvas.scaleCoeff;
+                let deltaX = (wheel.x + canvas.deltaX) / canvas.scaleCoeff
+                let wheelDelta = wheel.angleDelta.y
+                let scaleCoeff_ = canvas.scaleCoeff;
+                if(wheelDelta > 0){//up
+                    if (canvas.scaleCoeff < 3){
+                        scaleCoeff_ += scaleStep;
+                    }
+                }
+                else{//down
+                    if(canvas.scaleCoeff > scaleStep * 2){
+                        scaleCoeff_ -= scaleStep;
+                    }
+                }
+                let newX = (wheel.x - canvas.deltaX) / scaleCoeffBack * scaleCoeff_ + canvas.deltaX
+                let newY = (wheel.y - canvas.deltaY) / scaleCoeffBack * scaleCoeff_ + canvas.deltaY
+                canvas.deltaX -= (newX - wheel.x)
+                canvas.deltaY -= (newY - wheel.y)
+
+                //canvasPage.correctPositionScaled(wheel.x - newX, wheel.y - newY, scaleCoeff_/ scaleCoeffBack)
+
+                canvas.scaleCoeff = scaleCoeff_
+                canvas.scaleCoeffPrev = scaleCoeff_;
+            }
+
+            function movingFunction(delta){//reimplemented
                 if(canvas.selectedIndex >= 0){
                     let x_  = canvasPage.objectModel.GetData("X", canvas.selectedIndex);
                     let y_  = canvasPage.objectModel.GetData("Y", canvas.selectedIndex);
-                    let width_ = canvasPage.objectModel.IsValidData("Width", canvas.selectedIndex) ? canvasPage.objectModel.GetData("Width", canvas.selectedIndex) * canvas.scaleCoeff : canvas.mainRec_width;
+                    let width_ = canvasPage.objectModel.IsValidData("Width", canvas.selectedIndex) ? canvasPage.objectModel.GetData("Width", canvas.selectedIndex)  : canvas.mainRec_width;
+                    let height_ = canvas.mainRec_height;
 
-                    let withinBorders_ = withinBorders(delta, canvas.width * x_, canvas.height * y_, width_, canvas.mainRec_height);
+                    x_ = x_ * canvas.scaleCoeff + canvas.deltaX;
+                    y_ = y_ * canvas.scaleCoeff + canvas.deltaY;
+                    width_ = width_ * canvas.scaleCoeff;
+                    height_ = height_  * canvas.scaleCoeff;
+
+                    let withinBorders_ = withinBorders(delta, x_,  y_, width_, height_);
 
                     if(withinBorders_){
-                        let newX = (canvas.width * canvasPage.objectModel.GetData("X", canvas.selectedIndex) + delta.x)/canvas.width;
-                        let newY = (canvas.height * canvasPage.objectModel.GetData("Y", canvas.selectedIndex) + delta.y)/canvas.height;
+                        let newX = (canvasPage.objectModel.GetData("X", canvas.selectedIndex) + delta.x);
+                        let newY = (canvasPage.objectModel.GetData("Y", canvas.selectedIndex) + delta.y);
 
-                        canvasPage.objectModel.SetData("X",newX, canvas.selectedIndex);
-                        canvasPage.objectModel.SetData("Y",newY, canvas.selectedIndex);
+                        //fit to borders
+                        let margin_ = 10;
+                        if(newX < margin_){
+                            newX = margin_;
+                        }
+                        if(newY < margin_){
+                            newY = margin_;
+                        }
+                        if(newX > (backgroundRec.width  - width_) / canvas.scaleCoeff - margin_){
+                            newX = (backgroundRec.width  - width_) / canvas.scaleCoeff - margin_
+                        }
+                        if(newY > (backgroundRec.height  - height_) / canvas.scaleCoeff - margin_){
+                            newY = (backgroundRec.height  - height_) / canvas.scaleCoeff - margin_
+                        }
+
+                        canvasPage.objectModel.SetData("Y", newY, canvas.selectedIndex);
+                        canvasPage.objectModel.SetData("X", newX, canvas.selectedIndex);
 
                         canvas.requestPaint();
+
                     }
                 }
 
-                //move Container
-                else if(canvas.scaleCoeff !== 1){
-                    let ok = false;
-
-                    let x_new = mainContainer.x + delta.x * moveContainerAnimX.coeff;
-                    let y_new = mainContainer.y + delta.y  * moveContainerAnimX.coeff;
-
-                    if(canvas.scaleCoeff < 1){
-                        ok = x_new > 0 && y_new > 0
-                                && x_new < canvasPage.width - mainContainer.width
-                                && y_new < canvasPage.height - mainContainer.height
-                    }
-
-                    else if(canvas.scaleCoeff > 1){
-                        ok = x_new > canvasPage.width - mainContainer.width
-                                && y_new > canvasPage.height - mainContainer.height
-                                && x_new < 0
-                                && y_new < 0
-                    }
-
-                    if(ok){
-                        //mainContainer.hasPositionShift = true;
-
-                        moveContainerAnimX.delta = delta;
-                        moveContainerAnimY.delta = delta;
-                        moveContainerAnimX.start();
-                        moveContainerAnimY.start();
-                    }
-                }
             }
 
-
-            NumberAnimation {
-                id: moveContainerAnimX;
-
-                duration: 15;
-                target: mainContainer;
-                property: "x";
-                from: mainContainer.x;
-                to: mainContainer.x + coeff * delta.x
-                property point delta;
-                property real coeff: 2.5;
-            }
-
-            NumberAnimation {
-                id: moveContainerAnimY;
-
-                duration: moveContainerAnimX.duration;
-                target: mainContainer;
-                property: "y";
-                from: mainContainer.y;
-                to: mainContainer.y + coeff * delta.y
-                property point delta;
-                property real coeff: moveContainerAnimX.coeff;
-
-            }
-
-            //hover reaction
             onPositionSignal: {
                 positionChangedPause.position = position;
                 positionChangedPause.restart();
@@ -338,35 +381,57 @@ Rectangle {
                 duration: 100;
                 property point position;
                 onFinished: {
-                    //console.log(position.x, position.y)
-                    canvas.hoverIndex = -1;
-                    for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
-                        let x_  = canvasPage.objectModel.GetData("X", i)
-                        let y_  = canvasPage.objectModel.GetData("Y", i)
-                        let width_ = canvasPage.objectModel.IsValidData("Width", i) ? canvasPage.objectModel.GetData("Width", i) * canvas.scaleCoeff : canvas.mainRec_width;
+                    controlArea.hoverReaction(position);
+                }
+            }
 
-                        let ok = controlArea.checkHoverItem(canvas.width * x_, canvas.height * y_, width_, canvas.mainRec_height, position);
-                        if(ok){
-                            canvas.hoverIndex = i;
-                            break;
-                        }
+            function hoverReaction(position){
+                //console.log(position.x, position.y)
+                canvas.hoverIndex = -1;
+                for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
+                    let x_  = canvasPage.objectModel.GetData("X", i) ;
+                    let y_  = canvasPage.objectModel.GetData("Y", i);
+                    let width_ = canvasPage.objectModel.IsValidData("Width", i) ? canvasPage.objectModel.GetData("Width", i)  : canvas.mainRec_width;
+                    let height_ = canvas.mainRec_height ;
+
+                    x_ = x_ * canvas.scaleCoeff + canvas.deltaX;
+                    y_ = y_ * canvas.scaleCoeff + canvas.deltaY;
+                    width_ = width_ * canvas.scaleCoeff;
+                    height_ = height_  * canvas.scaleCoeff;
+
+                    let ok = controlArea.checkHoverItem(x_, y_, width_, height_, position);
+
+                    if(ok){
+                        canvas.hoverIndex = i;
+                        break;
                     }
-                    if(canvas.hoverIndex >=0){
-                        controlArea.cursorShape = Qt.ArrowCursor;
-                        canvas.linkSelected = true;
+                }
+                if(canvas.hoverIndex >=0){
+                    controlArea.cursorShape = Qt.ArrowCursor;
+                    canvas.linkSelected = true;
+                    canvas.requestPaint();
+                }
+                else {
+                    controlArea.cursorShape = Qt.OpenHandCursor;
+                    if(canvas.linkSelected){
+                        canvas.linkSelected = false;
                         canvas.requestPaint();
-                    }
-                    else {
-                        controlArea.cursorShape = Qt.OpenHandCursor;
-                        if(canvas.linkSelected){
-                            canvas.linkSelected = false;
-                            canvas.requestPaint();
 
-                        }
                     }
                 }
             }
             //hover reaction
+
+        }
+
+        Rectangle{
+            id: backgroundRec;
+
+            x: canvas.deltaX;
+            y: canvas.deltaY;
+
+            width: canvas.backgroundWidth * canvas.scaleCoeff;
+            height: canvas.backgroundHeight * canvas.scaleCoeff;
 
         }
 
@@ -378,7 +443,10 @@ Rectangle {
 
             antialiasing: true;
 
-            property real scaleCoeff: 1.;
+            property real scaleCoeff: 1.0;
+            property real scaleCoeffPrev: 1.0;
+            property real deltaX: 0.0;
+            property real deltaY: 0.0;
 
             property int selectedIndex: -1;
             property int hoverIndex: -1;
@@ -386,21 +454,25 @@ Rectangle {
             property bool hasTailSelection: false;
 
             //sizes
-            property real mainRec_width: 250 * scaleCoeff;
-            property real mainRec_height: 60 * scaleCoeff;
+            property real mainRec_width: 250 //* scaleCoeff;
+            property real mainRec_height: 60 //* scaleCoeff;
 
-            property int fontSize: 20 * scaleCoeff;
-            property int fontSizeSmall: 14 * scaleCoeff;
-            property int radius_: 2 * scaleCoeff;
-            property int borderShift: 4 * scaleCoeff;
-            property int shadowSize: 6 * scaleCoeff;
-            property int backgroundStep: 30 * scaleCoeff;
-            property int intersectionSize: 16 * scaleCoeff;
-            property int arcRadius: 8 * scaleCoeff;
-            property int textMargin: 8 * canvas.scaleCoeff;
-            property int textVerticalOffset: 22 * canvas.scaleCoeff;
-            property real imageSize: 20 * scaleCoeff;
-            property real imageMargin: 4 * scaleCoeff;
+            property int fontSize: 20 //* scaleCoeff;
+            property int fontSizeSmall: 14 //* scaleCoeff;
+            property int radius_: 2 //* scaleCoeff;
+            property int borderShift: 4 //* scaleCoeff;
+            property int shadowSize: 6 //* scaleCoeff;
+
+            property int backgroundStep: 30 //* scaleCoeff;
+            property int backgroundWidth: 1024 //* scaleCoeff;
+            property int backgroundHeight: 768 //* scaleCoeff;
+
+            property int intersectionSize: 16 //* scaleCoeff;
+            property int arcRadius: 8 //* scaleCoeff;
+            property int textMargin: 8 //* canvas.scaleCoeff;
+            property int textVerticalOffset: 22 //* canvas.scaleCoeff;
+            property real imageSize: 20 //* scaleCoeff;
+            property real imageMargin: 4 //* scaleCoeff;
 
             //image urls
             property string imageUrl_1: "../../../" + Style.theme + "/Icons" + "/AppIcon.svg"
@@ -440,12 +512,19 @@ Rectangle {
             }
 
             onScaleCoeffChanged: {
+                //console.log("SCALE_COEFF:: ", scaleCoeff)
                 requestPaint()
             }
 
             onPaint: {
                 var ctx = canvas.getContext('2d');
+                ctx.reset()
                 ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+                let transtateX = canvas.deltaX
+                let transtateY = canvas.deltaY
+                ctx.translate(transtateX, transtateY)
+                ctx.scale(canvas.scaleCoeff, canvas.scaleCoeff)
 
                 drawBackground(ctx);
 
@@ -467,6 +546,8 @@ Rectangle {
                     }
                 }
 
+                //console.log("Count object", canvasPage.objectModel.GetItemsCount())
+
                 //drawObject
                 for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
                     if(i !== canvas.selectedIndex){
@@ -476,7 +557,6 @@ Rectangle {
                 if(canvas.selectedIndex >= 0){
                     drawObject(ctx, canvas.selectedIndex);
                 }
-
             }//onPaint
 
             onPainted: {
@@ -495,11 +575,11 @@ Rectangle {
                 ctx.strokeStyle = canvas.backgroundGridColor;
                 ctx.fillStyle = canvas.backgroundGridColor;
 
-                for(let i = 1; i * step < canvas.width; i++){//vertical lines
+                for(let i = 0; i * step < canvas.backgroundWidth; i++){//vertical lines
                     let x1 = i * step;
-                    let y1 = 0;
+                    let y1 =  0 ;
                     let x2 = i * step;
-                    let y2 = canvas.height;
+                    let y2 = canvas.backgroundHeight ;
 
                     ctx.beginPath()
                     ctx.moveTo(x1, y1);
@@ -507,11 +587,11 @@ Rectangle {
                     ctx.stroke();
                 }
 
-                for(let i = 1; i * step < canvas.height; i++){//horizontal lines
-                    let x1 = 0;
-                    let y1 = i * step;
-                    let x2 = canvas.width;
-                    let y2 = i * step;
+                for(let i = 0; i * step < canvas.backgroundHeight; i++){//horizontal lines
+                    let x1 = 0 ;
+                    let y1 =  i * step ;
+                    let x2 =  canvas.backgroundWidth ;
+                    let y2 =  i * step;
 
                     ctx.beginPath()
                     ctx.moveTo(x1, y1);
@@ -525,7 +605,7 @@ Rectangle {
                 //width calculation
                 let mainText  = canvasPage.objectModel.GetData("MainText", index)
                 let secondText  = canvasPage.objectModel.GetData("SecondText", index)
-                let width_ = canvasPage.objectModel.IsValidData("Width", index) ? canvasPage.objectModel.GetData("Width", index) * canvas.scaleCoeff : canvas.mainRec_width;
+                let width_ = canvasPage.objectModel.IsValidData("Width", index) ? canvasPage.objectModel.GetData("Width", index)  : canvas.mainRec_width;
 
                 ctx.lineWidth = 1;
                 let fontStr_main = String(canvas.fontSize) + "px sans-serif"
@@ -539,18 +619,18 @@ Rectangle {
                 let textStr_second = secondText;
                 let textWidth_second = ctx.measureText(secondText).width
 
-                let add = 2 * canvas.imageSize + 2 * canvas.imageMargin + 2 * canvas.borderShift + 30 * scaleCoeff;
+                let add = 2 * canvas.imageSize + 2 * canvas.imageMargin + 2 * canvas.borderShift + 30 /** scaleCoeff*/;
                 let mainRecWidth = Math.max(textWidth_main + add, textWidth_second + add, width_)
-                canvasPage.objectModel.SetData("Width", mainRecWidth / scaleCoeff, index);
+                canvasPage.objectModel.SetData("Width", mainRecWidth /*/ scaleCoeff*/, index);
 
                 return mainRecWidth;
             }
 
             function drawObject(ctx, index){
 
-                let x_  = canvas.width * canvasPage.objectModel.GetData("X", index)
-                let y_  = canvas.height * canvasPage.objectModel.GetData("Y", index)
-                let width_ = canvasPage.objectModel.IsValidData("Width", index) ? canvasPage.objectModel.GetData("Width", index) * canvas.scaleCoeff : canvas.mainRec_width;
+                let x_  = canvasPage.objectModel.GetData("X", index)
+                let y_  = canvasPage.objectModel.GetData("Y", index)
+                let width_ = canvasPage.objectModel.IsValidData("Width", index) ? canvasPage.objectModel.GetData("Width", index)  : canvas.mainRec_width;
                 let mainText  = canvasPage.objectModel.GetData("MainText", index)
                 let secondText  = canvasPage.objectModel.GetData("SecondText", index)
                 let selected = canvasPage.objectModel.IsValidData("Selected", index) ? canvasPage.objectModel.GetData("Selected", index) : false;
@@ -565,20 +645,20 @@ Rectangle {
 
                 //shadow rectangle
                 let shadowSize = canvas.shadowSize;
-                ctx.lineWidth = 2 * canvas.scaleCoeff;
+                ctx.lineWidth = 2 ;
                 ctx.fillStyle = selected ? Qt.rgba(0.2, 0.8, 0, 0.3) : Qt.rgba(0, 0, 0, 0.2);
                 ctx.beginPath()
-                ctx.roundedRect(x_ + shadowSize, y_ + shadowSize, mainRecWidth, canvas.mainRec_height, canvas.radius_, canvas.radius_);
+                ctx.roundedRect(x_ + shadowSize, y_ + shadowSize, mainRecWidth, canvas.mainRec_height , canvas.radius_, canvas.radius_);
                 ctx.fill();
 
                 //main rectangle
-                ctx.lineWidth = 2 * canvas.scaleCoeff;
+                ctx.lineWidth = 2 ;
                 ctx.strokeStyle = hasError ? canvas.errorColor : canvas.mainColor;
                 ctx.fillStyle = (!selected && !isComposite) ? canvas.backgroundColor :
                                                               (!selected && isComposite) ? canvas.compositeColor:
                                                                                            (selected && isComposite) ? canvas.compositeSelectedColor: (selected && !isComposite) ? canvas.selectedColor : canvas.backgroundColor;
                 ctx.beginPath()
-                ctx.roundedRect(x_, y_, mainRecWidth, canvas.mainRec_height, canvas.radius_, canvas.radius_);
+                ctx.roundedRect(x_, y_, mainRecWidth, canvas.mainRec_height , canvas.radius_, canvas.radius_);
                 ctx.fill();
                 ctx.stroke();
 
@@ -586,7 +666,7 @@ Rectangle {
                 ctx.strokeStyle = canvas.innerFrameColor;
 
                 ctx.beginPath()
-                ctx.roundedRect(x_ + canvas.borderShift, y_ + canvas.borderShift, mainRecWidth - 2 * canvas.borderShift, canvas.mainRec_height - 2 * canvas.borderShift, canvas.radius_, canvas.radius_);
+                ctx.roundedRect(x_ + canvas.borderShift, y_ + canvas.borderShift, mainRecWidth - 2 * canvas.borderShift, canvas.mainRec_height  - 2 * canvas.borderShift, canvas.radius_, canvas.radius_);
                 ctx.stroke();
 
                 //Main text
@@ -628,7 +708,7 @@ Rectangle {
                 let image2_y = text_y - canvas.imageSize + canvas.imageMargin;
                 ctx.beginPath()
                 ctx.drawImage(imageUrl_1, image1_x, image1_y, canvas.imageSize, canvas.imageSize);
-                ctx.drawImage(imageUrl_2, image2_x, image2_y, canvas.imageSize, canvas.imageSize);
+                // ctx.drawImage(imageUrl_2, image2_x, image2_y, canvas.imageSize, canvas.imageSize);
 
             }
 
@@ -638,17 +718,17 @@ Rectangle {
                 let y1 = canvasPage.objectModel.GetData("Y", fromIndex);
                 let x2 = canvasPage.objectModel.GetData("X", toIndex);
                 let y2 = canvasPage.objectModel.GetData("Y", toIndex);
-                let width1 = canvasPage.objectModel.IsValidData("Width", fromIndex) ? canvasPage.objectModel.GetData("Width", fromIndex) * canvas.scaleCoeff : canvas.mainRec_width;
-                let width2 = canvasPage.objectModel.IsValidData("Width", toIndex) ? canvasPage.objectModel.GetData("Width", toIndex) * canvas.scaleCoeff : canvas.mainRec_width;
+                let width1 = canvasPage.objectModel.IsValidData("Width", fromIndex) ? canvasPage.objectModel.GetData("Width", fromIndex) : canvas.mainRec_width;
+                let width2 = canvasPage.objectModel.IsValidData("Width", toIndex) ? canvasPage.objectModel.GetData("Width", toIndex) : canvas.mainRec_width;
 
-                let x1_link = canvas.width * x1 + width1/2;
-                let y1_link = canvas.height * y1 + canvas.mainRec_height/2;
-                let x2_link = canvas.width * x2 + width2/2;
-                let y2_link = canvas.height * y2 + canvas.mainRec_height/2;
+                let x1_link = x1 + width1/2;
+                let y1_link = y1 + canvas.mainRec_height/2;
+                let x2_link = x2 + width2/2;
+                let y2_link = y2 + canvas.mainRec_height/2;
 
                 ctx.lineCap = "round"
                 ctx.lineJoin = "round"
-                ctx.lineWidth = Math.max(canvas.scaleCoeff *1, 0.5);
+                ctx.lineWidth = 1;
 
                 let selected = canvas.linkSelected && canvas.hoverIndex == fromIndex;
                 ctx.strokeStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
@@ -669,65 +749,65 @@ Rectangle {
 
                 if(y1 > y2){
                     //bottom line
-                    x1_rec2 = canvas.width * x2;
-                    y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
-                    x2_rec2 = canvas.width * x2 + width2;
-                    y2_rec2 = canvas.height * y2 + canvas.mainRec_height;
+                    x1_rec2 = x2;
+                    y1_rec2 = y2 + canvas.mainRec_height;
+                    x2_rec2 = x2 + width2;
+                    y2_rec2 = y2 + canvas.mainRec_height;
 
                     intersection = findIntersection(x1_link, y1_link, x2_link, y2_link, x1_rec2, y1_rec2, x2_rec2, y2_rec2);
 
-                    if(intersection.x < canvas.width * x2 + width2 && intersection.x > canvas.width * x2){
+                    if(intersection.x < x2 + width2 && intersection.x > x2){
                         //bottom line
-                        x1_rec2 = canvas.width * x2;
-                        y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
-                        x2_rec2 = canvas.width * x2 + width2;
-                        y2_rec2 = canvas.height * y2 + canvas.mainRec_height;
+                        x1_rec2 = x2;
+                        y1_rec2 = y2 + canvas.mainRec_height;
+                        x2_rec2 = x2 + width2;
+                        y2_rec2 = y2 + canvas.mainRec_height;
                     }
-                    else if(intersection.x >= canvas.width * x2 + width2){
+                    else if(intersection.x >= x2 + width2){
                         //right line
-                        x1_rec2 = canvas.width * x2  + width2;
-                        y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
-                        x2_rec2 = canvas.width * x2 + width2;
-                        y2_rec2 = canvas.height * y2;
+                        x1_rec2 = x2  + width2;
+                        y1_rec2 = y2 + canvas.mainRec_height;
+                        x2_rec2 = x2 + width2;
+                        y2_rec2 = y2;
                     }
-                    else if(intersection.x <= canvas.width * x2){
+                    else if(intersection.x <= x2){
                         //left line
-                        x1_rec2 = canvas.width * x2;
-                        y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
-                        x2_rec2 = canvas.width * x2;
-                        y2_rec2 = canvas.height * y2;
+                        x1_rec2 = x2;
+                        y1_rec2 = y2 + canvas.mainRec_height;
+                        x2_rec2 = x2;
+                        y2_rec2 = y2;
                     }
                 }//y1 > y2
 
                 else if (y1 < y2){
                     //top line
-                    x1_rec2 = canvas.width * x2;
-                    y1_rec2 = canvas.height * y2;
-                    x2_rec2 = canvas.width * x2 + width2;
-                    y2_rec2 = canvas.height * y2;
+                    x1_rec2 = x2;
+                    y1_rec2 = y2;
+                    x2_rec2 = x2 + width2;
+                    y2_rec2 = y2;
 
                     intersection = findIntersection(x1_link, y1_link, x2_link, y2_link, x1_rec2, y1_rec2, x2_rec2, y2_rec2);
 
-                    if(intersection.x < canvas.width * x2 + width2 && intersection.x > canvas.width * x2){
+                    if(intersection.x < x2 + width2 && intersection.x > x2){
                         //top line
-                        x1_rec2 = canvas.width * x2;
-                        y1_rec2 = canvas.height * y2;
-                        x2_rec2 = canvas.width * x2 + width2;
-                        y2_rec2 = canvas.height * y2;
+                        x1_rec2 = x2;
+                        y1_rec2 = y2;
+                        x2_rec2 = x2 + width2;
+                        y2_rec2 = y2;
                     }
-                    else if(intersection.x >= canvas.width * x2 + width2){
+                    else if(intersection.x >= x2 + width2){
                         //right line
-                        x1_rec2 = canvas.width * x2  + width2;
-                        y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
-                        x2_rec2 = canvas.width * x2 + width2;
-                        y2_rec2 = canvas.height * y2;
+                        x1_rec2 = x2  + width2;
+                        y1_rec2 = y2 + canvas.mainRec_height;
+                        x2_rec2 = x2 + width2;
+                        y2_rec2 = y2;
                     }
-                    else if(intersection.x <= canvas.width * x2){
+                    else if(intersection.x <= x2){
                         //left line
-                        x1_rec2 = canvas.width * x2;
-                        y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
-                        x2_rec2 = canvas.width * x2;
-                        y2_rec2 = canvas.height * y2;
+                        x1_rec2 = x2;
+                        y1_rec2 = y2 + canvas.mainRec_height;
+                        x2_rec2 = x2;
+                        y2_rec2 = y2;
                     }
 
                 }//y1 < y2
@@ -735,19 +815,19 @@ Rectangle {
                 else if(y1 == y2){
                     if(x1 >= x2){
                         //right line
-                        x1_rec2 = canvas.width * x2  + width2;
-                        y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
-                        x2_rec2 = canvas.width * x2 + width2;
-                        y2_rec2 = canvas.height * y2;
+                        x1_rec2 = x2  + width2;
+                        y1_rec2 = y2 + canvas.mainRec_height;
+                        x2_rec2 = x2 + width2;
+                        y2_rec2 = y2;
 
 
                     }
                     else {
                         //left line
-                        x1_rec2 = canvas.width * x2;
-                        y1_rec2 = canvas.height * y2 + canvas.mainRec_height;
-                        x2_rec2 = canvas.width * x2;
-                        y2_rec2 = canvas.height * y2;
+                        x1_rec2 = x2;
+                        y1_rec2 = y2 + canvas.mainRec_height;
+                        x2_rec2 = x2;
+                        y2_rec2 = y2;
 
                     }
                 }//y1 == y2
@@ -782,7 +862,7 @@ Rectangle {
                     }
                     //offset length correction
 
-                    offset = 20 * canvas.scaleCoeff * (1 + add);
+                    offset = 20 * (1 + add);
 
                     let newX = intersection.x + offset * Math.cos(angle)
                     let newY = intersection.y + offset * Math.sin(angle)
@@ -806,7 +886,7 @@ Rectangle {
             function drawIntersection(ctx, intersection, selected){
                 let size = canvas.intersectionSize;
 
-                ctx.lineWidth = 0.5 * canvas.scaleCoeff;
+                ctx.lineWidth = 0.5;
                 ctx.strokeStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
                 ctx.fillStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
                 ctx.beginPath()
@@ -820,7 +900,7 @@ Rectangle {
                 let sizeSmall = size/2;
 
                 //draw white circle
-                ctx.lineWidth = 0.5 * canvas.scaleCoeff;
+                ctx.lineWidth = 0.5;
                 ctx.strokeStyle = canvas.backgroundColor;
                 ctx.fillStyle = canvas.backgroundColor;
                 ctx.beginPath()
@@ -840,7 +920,7 @@ Rectangle {
 
                 ctx.beginPath();
                 ctx.moveTo(intersection.x, intersection.y)
-                ctx.lineWidth = Math.max(canvas.scaleCoeff *1, 0.5);
+                ctx.lineWidth = 0.5;
                 let offset = size/2;
                 let newX = intersection.x + offset * Math.cos(angle)
                 let newY = intersection.y + offset * Math.sin(angle)
@@ -853,7 +933,7 @@ Rectangle {
             function drawIntersectionArc(ctx, point, angle, offset, selected){
                 let rad = canvas.arcRadius;
                 let endAngle = 0.6 * Math.PI;
-                ctx.lineWidth = 2 * canvas.scaleCoeff;
+                ctx.lineWidth = 2;
                 ctx.strokeStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
                 ctx.fillStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
                 ctx.beginPath()
@@ -867,7 +947,7 @@ Rectangle {
                 let startX = point.x + rad * Math.cos(angle);
                 let startY = point.y  + rad * Math.sin(angle);
                 ctx.moveTo(startX, startY);
-                ctx.lineWidth = Math.max(canvas.scaleCoeff * 1.2, 0.6);
+                ctx.lineWidth = 0.6;
                 let finishX = startX + offset * Math.cos(angle)
                 let finishY = startY + offset * Math.sin(angle)
                 ctx.lineTo(finishX, finishY);
@@ -926,6 +1006,8 @@ Rectangle {
                 return angle;
             }
 
+
+
         }//canvas
     }//mainContainer
 
@@ -955,8 +1037,8 @@ Rectangle {
                 bufferModel.SetExternTreeModel("Links", emptyModel, 0);
                 let mainText = bufferModel.GetData("MainText") + "_1";
                 let secondText = bufferModel.GetData("SecondText") + "_1";
-                let x_ = bufferModel.GetData("X") + 10/canvas.width;
-                let y_ = bufferModel.GetData("Y") + 10/canvas.height;
+                let x_ = bufferModel.GetData("X") + 10;
+                let y_ = bufferModel.GetData("Y") + 10;
 
                 //TO DO: unique Id
                 var date = new Date();
@@ -1038,35 +1120,36 @@ Rectangle {
 
     }
 
-    CustomScrollbar{
-        id: scrollVert;
 
-        anchors.right: parent.right;
-        anchors.rightMargin: 1;
-        anchors.bottom: parent.bottom;
+    //    CustomScrollbar{
+    //        id: scrollVert;
 
-        secondSize: 12;
-        backgroundColor: "transparent";
-        Component.onCompleted: {
-            opacity = 0.7;
-        }
-        targetItem: parent;
-    }
+    //        anchors.right: parent.right;
+    //        anchors.rightMargin: 1;
+    //        anchors.bottom: parent.bottom;
 
-    CustomScrollbar{
-        id: scrollHoriz;
+    //        secondSize: 12;
+    //        backgroundColor: "transparent";
+    //        Component.onCompleted: {
+    //            opacity = 0.7;
+    //        }
+    //        targetItem: parent;
+    //    }
 
-        anchors.right: parent.right;
-        anchors.bottom: parent.bottom;
-        anchors.bottomMargin: 1;
+    //    CustomScrollbar{
+    //        id: scrollHoriz;
 
-        secondSize: 12;
-        backgroundColor: "transparent";
-        Component.onCompleted: {
-            opacity = 0.7;
-        }
-        vertical: false;
-        targetItem: parent;
-    }
+    //        anchors.right: parent.right;
+    //        anchors.bottom: parent.bottom;
+    //        anchors.bottomMargin: 1;
+
+    //        secondSize: 12;
+    //        backgroundColor: "transparent";
+    //        Component.onCompleted: {
+    //            opacity = 0.7;
+    //        }
+    //        vertical: false;
+    //        targetItem: parent;
+    //    }
 
 }
