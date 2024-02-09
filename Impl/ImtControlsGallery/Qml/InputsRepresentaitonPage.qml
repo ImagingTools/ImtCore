@@ -156,8 +156,9 @@ Rectangle {
 
                 anchors.verticalCenter: parent.verticalCenter;
 
-                width: 200;
-                height: 60;
+                width: 180;
+                height: 45;
+                radius: 10;
 
                 value: 0.5;
             }
@@ -167,8 +168,10 @@ Rectangle {
 
                 anchors.verticalCenter: parent.verticalCenter;
 
-                width: 60;
-                height: 200;
+                width: 45;
+                height: 180;
+                radius: 10;
+
                 orientation: Qt.Vertical;
 
                 value: 0.8;
