@@ -30,10 +30,12 @@ Rectangle{
     property int _deleteCounter: 0;
 
     signal requestSignal(int index);
-    signal rightButtonMouseClicked(int mX, int mY);
 
     signal clicked(int index);
     signal doubleClicked(int index);
+    signal rightButtonMouseClicked(int mX, int mY);
+    signal openButtonClicked(int index);
+
     signal selectionChanged();
     signal openBranch(int index)
     signal closeBranch(int index)
@@ -41,7 +43,6 @@ Rectangle{
     signal forcedOpen(int index);
     signal inserted(int index);
 
-    signal openButtonClicked(int index);
 
     onWidthChanged: {
         list.contentX = list.originX;
@@ -497,75 +498,6 @@ Rectangle{
         }
     }
 
-    function getIcon(type, isOpen){
-        let source = "";
-        let imageName = "";
-        if(type == "Node"){
-            imageName = isOpen ? "Icons/FolderOpened" : "Icons/FolderClosed";
-        }
-        else if(type == "Doc"){
-            imageName = "Icons/New";
-        }
-        else {
-            imageName = "Icons/New";
-        }
-        source  =  "../../../" + Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
-        return source;
-    }
-
-
-
-    function checkIsOpen(index){
-        return model.GetData("IsOpen__", index);
-    }
-
-    function checkHasChildren(index){
-        return model.GetData("HasChildren__", index);
-    }
-
-    function getData(key,index){
-        return treeViewGql.model.GetData(key, index);
-    }
-
-    function getSelectedIndex(){
-        return selectedIndex;
-    }
-
-    function findParentIndex(index){
-        let foundIndex = -1;
-        let branchIds = treeViewGql.model.IsValidData("BranchIds__", index) ? treeViewGql.model.GetData("BranchIds__", index) : "";
-        if(branchIds == ""){
-            //console.log("FOUND_INDEX_ RETURN ", foundIndex);
-            return -1;
-        }
-        let arr = branchIds.split(",");
-        let parentId = arr[arr.length - 1];
-        for(let i = index - 1; i >=0; i--){
-            let innerId = treeViewGql.model.GetData("InnerId__", i);
-            if(innerId == parentId){
-                foundIndex =  i;
-                break;
-            }
-        }
-        //console.log("FOUND_INDEX ", foundIndex);
-        return foundIndex;
-    }
-
-    function findIndexById(id, nameId){
-        if(nameId == undefined){
-            nameId = "Id";
-        }
-        let foundIndex = -1;
-        for(let i = 0; i < treeViewGql.model.GetItemsCount(); i++){
-            let id_curr = treeViewGql.model.IsValidData(nameId, i) ? treeViewGql.model.GetData(nameId, i) : "";
-            if(id_curr == id){
-                foundIndex = i;
-                break;
-            }
-        }
-        return foundIndex;
-    }
-
     function openFunc(index){
         if(index < 0){
             return;
@@ -615,6 +547,76 @@ Rectangle{
         list.contentY = Math.min(contentY__, maxContentY);
     }
 
+    //
+
+    function getIcon(type, isOpen){
+        let source = "";
+        let imageName = "";
+        if(type == "Node"){
+            imageName = isOpen ? "Icons/FolderOpened" : "Icons/FolderClosed";
+        }
+        else if(type == "Doc"){
+            imageName = "Icons/New";
+        }
+        else {
+            imageName = "Icons/New";
+        }
+        source  =  "../../../" + Style.getIconPath(imageName, Icon.State.On, Icon.Mode.Normal);
+        return source;
+    }
+
+    function getData(key,index){
+        return treeViewGql.model.GetData(key, index);
+    }
+
+    function getSelectedIndex(){
+        return selectedIndex;
+    }
+
+
+    function checkIsOpen(index){
+        return model.GetData("IsOpen__", index);
+    }
+
+    function checkHasChildren(index){
+        return model.GetData("HasChildren__", index);
+    }
+
+
+    function findParentIndex(index){
+        let foundIndex = -1;
+        let branchIds = treeViewGql.model.IsValidData("BranchIds__", index) ? treeViewGql.model.GetData("BranchIds__", index) : "";
+        if(branchIds == ""){
+            //console.log("FOUND_INDEX_ RETURN ", foundIndex);
+            return -1;
+        }
+        let arr = branchIds.split(",");
+        let parentId = arr[arr.length - 1];
+        for(let i = index - 1; i >=0; i--){
+            let innerId = treeViewGql.model.GetData("InnerId__", i);
+            if(innerId == parentId){
+                foundIndex =  i;
+                break;
+            }
+        }
+        //console.log("FOUND_INDEX ", foundIndex);
+        return foundIndex;
+    }
+
+    function findIndexById(id, nameId){
+        if(nameId == undefined){
+            nameId = "Id";
+        }
+        let foundIndex = -1;
+        for(let i = 0; i < treeViewGql.model.GetItemsCount(); i++){
+            let id_curr = treeViewGql.model.IsValidData(nameId, i) ? treeViewGql.model.GetData(nameId, i) : "";
+            if(id_curr == id){
+                foundIndex = i;
+                break;
+            }
+        }
+        return foundIndex;
+    }
 
 }
 

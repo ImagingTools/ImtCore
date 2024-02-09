@@ -50,7 +50,9 @@ Rectangle {
     property alias contentHeight: elementsListObj.contentHeight;
     property alias contentWidth: elementsListObj.contentWidth;
     property alias originX: elementsListObj.originX;
+    property alias originY: elementsListObj.originY;
     property alias contentX: elementsListObj.contentX;
+    property alias contentY: elementsListObj.contentY;
     property alias elementsListWidth: elementsListObj.width;
     property alias elementsCount: elementsListObj.count;
 
