@@ -16,6 +16,8 @@ AuxTable{
     property int maxLevel: 1;
     property bool hasSelection: true;
 
+    property int _maxCountToClose: 10;
+    property int _deleteCounter: 0;
 
     signal requestSignal(int index);
     signal clicked(int index);
@@ -144,9 +146,14 @@ AuxTable{
 
                             }
                             else if(deleg.isOpen){
-                                tableTreeView.model.SetData("IsOpen__", false, model.index);
-                                tableTreeView.model.SetData("OpenState__", 0, model.index);
-                                tableTreeView.setVisibleElements(false, model.index)
+                                if(model.ChildrenCount__ <= tableTreeView._maxCountToClose){
+                                    tableTreeView.model.SetData("IsOpen__", false, model.index);
+                                    tableTreeView.model.SetData("OpenState__", 0, model.index);
+                                    tableTreeView.setVisibleElements(false, model.index)
+                                }
+                                else {
+                                    tableTreeView.deleteBranch(model.index);
+                                }
                             }
                         }
 
@@ -361,7 +368,7 @@ AuxTable{
         let innerId = tableTreeView.model.GetData("InnerId__", index);
         let found = false;
         let foundChangeCount = 0;
-        let counter = 0;
+
         for(let i = index + 1; i < tableTreeView.model.GetItemsCount(); i++){
             let branchIds = tableTreeView.model.IsValidData("BranchIds__", i) ? tableTreeView.model.GetData("BranchIds__", i) : "";
             //console.log("branchIds:: ", branchIds)
@@ -390,6 +397,7 @@ AuxTable{
             //
             if(ok){
                 tableTreeView.model.RemoveItem(i);
+                tableTreeView._deleteCounter++;
                 let content_height = tableTreeView.getContentHeight();
                 content_height -= tableTreeView.delegateHeight;
                 tableTreeView.setContentHeight(content_height);
@@ -397,14 +405,16 @@ AuxTable{
                 tableTreeView.deleteBranch(index);
             }
 
-            counter++;
         }
 
         if(tableTreeView.selectedIndex >=0 && tableTreeView.selectedIndex > index){
-            tableTreeView.selectedIndex -= counter;
+            tableTreeView.selectedIndex -= tableTreeView._deleteCounter;
         }
 
+        tableTreeView._deleteCounter = 0;
+
         tableTreeView.model.SetData("IsOpen__", false, index);
+        tableTreeView.model.SetData("OpenState__", -1, index);
         tableTreeView.model.SetData("HasBranch__", false, index);
 
         tableTreeView.setContentWidth();
@@ -442,6 +452,7 @@ AuxTable{
             tableTreeView.model.SetData("OpenState__", -1, newIndex);
             tableTreeView.model.SetData("HasBranch__", false, newIndex);
             tableTreeView.model.SetData("InnerId__", String(val + newIndex), newIndex);
+            tableTreeView.model.SetData("ChildrenCount__", -1, newIndex);
 
             if(i == 0 && level_ == -1){
                 tableTreeView.setContentHeight(tableTreeView.delegateHeight);
@@ -453,6 +464,11 @@ AuxTable{
             }
             counter++;
         }
+
+        if(index >= 0){
+            tableTreeView.model.SetData("ChildrenCount__", model_.GetItemsCount(), index);
+        }
+
         if(tableTreeView.selectedIndex >=0 && tableTreeView.selectedIndex > index){
             tableTreeView.selectedIndex += counter;
         }
