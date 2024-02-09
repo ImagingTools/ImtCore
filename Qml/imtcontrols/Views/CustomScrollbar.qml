@@ -7,7 +7,6 @@ Rectangle{
     height: targetItem && vertical ? targetItem.height : !decorator_ ? secondSize : secondSizeDecorator;
     width: targetItem && !vertical ? targetItem.width : !decorator_ ? secondSize : secondSizeDecorator;
     color: backgroundColor;
-//    radius: 4;
     radius: 2;
 
     visible: vertical ? targetItem.contentHeight > scrollContainer.height : targetItem.contentWidth > scrollContainer.width;
@@ -38,6 +37,8 @@ Rectangle{
 
     property bool visibleState: !canFade ? 1 : isMoving ? 1 : (scrollContainerMA.containsMouse || scrollMA.containsMouse) ? 1 : 0;
     property bool inSideTarget: false;
+    property bool alwaysVisible: false;
+    property bool canDragOutOfBounds: false;
 
     property int targetContentHeight: targetItem.contentHeight;
     property int targetContentWidth: targetItem.contentWidth;
@@ -54,6 +55,7 @@ Rectangle{
 
     signal contentXSignal(real contentX);
     signal contentYSignal(real contentY);
+    signal movingSignal();
 
     onDecoratorChanged: {
         if(decorator_){
@@ -134,6 +136,9 @@ Rectangle{
     }
 
     function setVisibleFunc(){
+        if(scrollContainer.alwaysVisible){
+            return;
+        }
         if(targetItem){
             if(vertical){
                 visible = targetItem.contentHeight > scrollContainer.height;
@@ -365,6 +370,7 @@ Rectangle{
                 fadePause.start();
 
             }
+            scrollContainer.movingSignal();
         }
 
         onYChanged:{
@@ -376,6 +382,7 @@ Rectangle{
                 fadePause.start();
 
             }
+            scrollContainer.movingSignal();
         }
 
 
@@ -394,6 +401,11 @@ Rectangle{
 
             onDragEnabledChanged: {
                 //console.log("onDragEnabledChanged", dragEnabled)
+            }
+            onVisibleChanged: {
+                if(!visible){
+                    dragEnabled = false;
+                }
             }
 
             property var coord: mapToItem(scrollContainer,0,0);
@@ -505,10 +517,21 @@ Rectangle{
                     if(scrollContainer.vertical){
                         var deltaY = newCoords.y - scrollMA.coord.y;
                         if(scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY + deltaY/scrollContainer.koeff <= 0){
-                            scrollContainer.targetItem.contentY = scrollContainer.targetItem.originY;
+                            if(!scrollContainer.canDragOutOfBounds){
+                                scrollContainer.targetItem.contentY = scrollContainer.targetItem.originY;
+                            }
+                            else {
+                                scrollContainer.targetItem.contentY += deltaY/scrollContainer.koeff;
+                            }
                         }
                         else if(scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY + deltaY/scrollContainer.koeff >= scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height){
-                            scrollContainer.targetItem.contentY  = scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height + scrollContainer.targetItem.originY;
+                            if(!scrollContainer.canDragOutOfBounds){
+                                scrollContainer.targetItem.contentY  = scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height + scrollContainer.targetItem.originY;
+                            }
+                            else {
+                                scrollContainer.targetItem.contentY += deltaY/scrollContainer.koeff;
+                            }
+
                         }
                         else {
                             scrollContainer.targetItem.contentY += deltaY/scrollContainer.koeff;
@@ -519,10 +542,20 @@ Rectangle{
                     else{//horiz
                         var deltaX = newCoords.x - scrollMA.coord.x;
                         if(scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX + deltaX/scrollContainer.koeff <= 0){
-                            scrollContainer.targetItem.contentX = scrollContainer.targetItem.originX;
+                            if(!scrollContainer.canDragOutOfBounds){
+                                scrollContainer.targetItem.contentX = scrollContainer.targetItem.originX;
+                            }
+                            else {
+                                scrollContainer.targetItem.contentX += deltaX/scrollContainer.koeff;
+                            }
                         }
                         else if(scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX + deltaX/scrollContainer.koeff >= scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width){
-                            scrollContainer.targetItem.contentX = scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width + scrollContainer.targetItem.originX;
+                            if(!scrollContainer.canDragOutOfBounds){
+                                scrollContainer.targetItem.contentX = scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width + scrollContainer.targetItem.originX;
+                            }
+                            else {
+                                scrollContainer.targetItem.contentX += deltaX/scrollContainer.koeff;
+                            }
                         }
                         else {
                             scrollContainer.targetItem.contentX += deltaX/scrollContainer.koeff;
