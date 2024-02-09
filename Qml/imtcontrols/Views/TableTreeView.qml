@@ -24,6 +24,7 @@ AuxTable{
     signal clicked(int index);
     signal doubleClicked(int index);
     signal rightButtonMouseClicked(int mX, int mY);
+
     signal openButtonClicked(int index);
 
     signal selectionChanged();
@@ -38,12 +39,6 @@ AuxTable{
             setContentWidth();
         }
         tableTreeView.contentX = tableTreeView.originX;
-    }
-
-
-
-    onClicked: {
-        selectedIndex = index;
     }
 
     itemHeight: 40;
@@ -90,7 +85,18 @@ AuxTable{
             tableItem: tableTreeView;
             selected: !tableTreeView.hasSelection ? false : tableTreeView.selectedIndex == model.index;
             onClicked: {
+                if (tableTreeView.selectedIndex !== model.index ){
+                    tableTreeView.selectedIndex = model.index;
+                    tableTreeView.selectionChanged();
+                }
                 tableTreeView.clicked(model.index);
+            }
+            onRightButtonMouseClicked: {
+                var point = mapToItem(null, mX, mY);
+                tableTreeView.rightButtonMouseClicked(point.x, point.y);
+            }
+            onDoubleClicked: {
+                tableTreeView.doubleClicked(model.index);
             }
 
         }
@@ -155,15 +161,19 @@ AuxTable{
                                 tableTreeView.model.SetData("IsOpen__", true, model.index);
                                 tableTreeView.model.SetData("OpenState__", 1, model.index);
 
+                                tableTreeView.openBranch(model.index)
+                                tableTreeView.openButtonClicked(model.index);
                             }
                             else if(deleg.isOpen){
                                 if(model.ChildrenCount__ <= tableTreeView._maxCountToClose){
                                     tableTreeView.model.SetData("IsOpen__", false, model.index);
                                     tableTreeView.model.SetData("OpenState__", 0, model.index);
                                     tableTreeView.setVisibleElements(false, model.index)
+                                    tableTreeView.closeBranch(model.index);
                                 }
                                 else {
                                     tableTreeView.deleteBranch(model.index);
+                                    tableTreeView.closeBranch(model.index);
                                 }
                             }
                         }

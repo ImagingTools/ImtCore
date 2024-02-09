@@ -34,6 +34,7 @@ Rectangle{
     signal clicked(int index);
     signal doubleClicked(int index);
     signal rightButtonMouseClicked(int mX, int mY);
+
     signal openButtonClicked(int index);
 
     signal selectionChanged();
@@ -47,18 +48,6 @@ Rectangle{
     onWidthChanged: {
         list.contentX = list.originX;
     }
-
-    // onClicked: {
-    //     if (selectedIndex != index ){
-    //         selectedIndex = index
-    //         treeViewGql.selectionChanged()
-    //     }
-
-    // }
-
-    onDoubleClicked: {
-    }
-
 
 
     Rectangle{
@@ -244,7 +233,7 @@ Rectangle{
                             }
                         }
                         onDoubleClicked: {
-                            treeViewGql.doubleClicked(model.index, model.Level__);
+                            treeViewGql.doubleClicked(model.index);
                         }
                     }
                 }
