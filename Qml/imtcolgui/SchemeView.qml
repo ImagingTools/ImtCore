@@ -411,6 +411,13 @@ Rectangle {
                 requestPaint()
             }
 
+            onDeltaXChanged: {
+                canvasPage.contentX = deltaX
+            }
+
+            onDeltaYChanged: {
+                canvasPage.contentY = deltaY
+            }
 
             onPaint: {
                 var ctx = canvas.getContext('2d');
@@ -1017,45 +1024,47 @@ Rectangle {
     }
 
 
-    CustomScrollbar{
-        id: scrollVert;
+//    CustomScrollbar{
+//        id: scrollVert;
 
-        anchors.right: parent.right;
-        anchors.rightMargin: 1;
-        anchors.bottom: parent.bottom;
+//        anchors.right: parent.right;
+//        anchors.rightMargin: 1;
+//        anchors.bottom: parent.bottom;
 
-        secondSize: 12;
-        backgroundColor: "gray";
-        indicatorColor: "lightgray"
-        Component.onCompleted: {
-            opacity = 1;
-        }
-        targetItem: parent;
-        onContentYSignal: {
-            canvas.requestPaint();
-        }
+//        secondSize: 12;
+//        backgroundColor: "gray";
+//        indicatorColor: "lightgray"
+//        Component.onCompleted: {
+//            opacity = 1;
+//        }
+//        visible: true;
+//        alwaysVisible: true;
+//        targetItem: parent;
+//        onContentYSignal: {
+//            canvas.requestPaint();
+//        }
 
-    }
+//    }
 
-    CustomScrollbar{
-        id: scrollHoriz;
+//    CustomScrollbar{
+//        id: scrollHoriz;
 
-        anchors.right: parent.right;
-        anchors.bottom: parent.bottom;
-        anchors.bottomMargin: 1;
+//        anchors.right: parent.right;
+//        anchors.bottom: parent.bottom;
+//        anchors.bottomMargin: 1;
 
-        secondSize: 12;
-        backgroundColor: "gray";
-        indicatorColor: "lightgray"
+//        secondSize: 12;
+//        backgroundColor: "gray";
+//        indicatorColor: "lightgray"
 
-        Component.onCompleted: {
-            opacity = 1;
-        }
-        vertical: false;
-        targetItem: parent;
-        onContentXSignal: {
-            canvas.requestPaint();
-        }
-    }
+//        Component.onCompleted: {
+//            opacity = 1;
+//        }
+//        vertical: false;
+//        targetItem: parent;
+//        onContentXSignal: {
+//            canvas.requestPaint();
+//        }
+//    }
 
 }
