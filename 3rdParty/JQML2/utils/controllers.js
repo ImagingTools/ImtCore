@@ -290,6 +290,8 @@ class MouseController {
     }
 }
 class KeyboardController {
+    shortcuts = []
+
     constructor(){
         window.onkeydown = (e)=>{
             if(!(mainRoot.$focusedElement instanceof TextInput) && !(mainRoot.$focusedElement instanceof TextEdit)){
@@ -303,74 +305,74 @@ class KeyboardController {
                 if(e.key === 'Return') key = 'Enter'
 
 
-                // let currentShortcuts = []
-                // for(let shortcut of this.shortcuts){
-                //     if(shortcut.enabled){
-                //         if(shortcut.sequence){
-                //             let stateKeys = {
-                //                 altKey: false,
-                //                 ctrlKey: false,
-                //                 shiftKey: false,
-                //                 key: ''
-                //             }
-                //             let skeys = shortcut.sequence.split('+')
-                //             for(let skey of skeys){
-                //                 if(skey === 'Shift') {
-                //                     stateKeys.shiftKey = true
-                //                 } else if(skey === 'Alt') {
-                //                     stateKeys.altKey = true
-                //                 } else if(skey === 'Ctrl') {
-                //                     stateKeys.ctrlKey = true
-                //                 } else {
-                //                     stateKeys.key = skey === 'Return' ? 'Enter' : skey
-                //                 }
-                //             }
-                //             if(stateKeys.key === key && stateKeys.shiftKey === e.shiftKey && stateKeys.ctrlKey === e.ctrlKey && stateKeys.altKey === e.altKey) {
-                //                 currentShortcuts.push(shortcut)
-                //             } 
-                //         } else if(shortcut.sequences.length) {
-                //             let i = 0
-                //             let find = false
-                //             while(i < shortcut.sequences.length && !find){
-                //                 let stateKeys = {
-                //                     altKey: false,
-                //                     ctrlKey: false,
-                //                     shiftKey: false,
-                //                     key: ''
-                //                 }
-                //                 let skeys = shortcut.sequences[i].split('+')
-                //                 for(let skey of skeys){
-                //                     if(skey === 'Shift') {
-                //                         stateKeys.shiftKey = true
-                //                     } else if(skey === 'Alt') {
-                //                         stateKeys.altKey = true
-                //                     } else if(skey === 'Ctrl') {
-                //                         stateKeys.ctrlKey = true
-                //                     } else {
-                //                         stateKeys.key = skey === 'Return' ? 'Enter' : skey
-                //                     }
-                //                 }
-                //                 if(stateKeys.key === key && stateKeys.shiftKey === e.shiftKey && stateKeys.ctrlKey === e.ctrlKey && stateKeys.altKey === e.altKey) {
-                //                     currentShortcuts.push(shortcut)
-                //                     find = true
-                //                 }
-                //                 i++
-                //             }
-                //         }
-                //     }
+                let currentShortcuts = []
+                for(let shortcut of this.shortcuts){
+                    if(shortcut.getPropertyValue('enabled')){
+                        if(shortcut.getPropertyValue('sequence')){
+                            let stateKeys = {
+                                altKey: false,
+                                ctrlKey: false,
+                                shiftKey: false,
+                                key: ''
+                            }
+                            let skeys = shortcut.getPropertyValue('sequence').split('+')
+                            for(let skey of skeys){
+                                if(skey === 'Shift') {
+                                    stateKeys.shiftKey = true
+                                } else if(skey === 'Alt') {
+                                    stateKeys.altKey = true
+                                } else if(skey === 'Ctrl') {
+                                    stateKeys.ctrlKey = true
+                                } else {
+                                    stateKeys.key = skey === 'Return' ? 'Enter' : skey
+                                }
+                            }
+                            if(stateKeys.key === (key.length === 1 ? key.toUpperCase() : key) && stateKeys.shiftKey === e.shiftKey && stateKeys.ctrlKey === e.ctrlKey && stateKeys.altKey === e.altKey) {
+                                currentShortcuts.push(shortcut)
+                            } 
+                        } else if(shortcut.getPropertyValue('sequences').length) {
+                            let i = 0
+                            let find = false
+                            while(i < shortcut.getPropertyValue('sequences').length && !find){
+                                let stateKeys = {
+                                    altKey: false,
+                                    ctrlKey: false,
+                                    shiftKey: false,
+                                    key: ''
+                                }
+                                let skeys = shortcut.getPropertyValue('sequences')[i].split('+')
+                                for(let skey of skeys){
+                                    if(skey === 'Shift') {
+                                        stateKeys.shiftKey = true
+                                    } else if(skey === 'Alt') {
+                                        stateKeys.altKey = true
+                                    } else if(skey === 'Ctrl') {
+                                        stateKeys.ctrlKey = true
+                                    } else {
+                                        stateKeys.key = skey === 'Return' ? 'Enter' : skey
+                                    }
+                                }
+                                if(stateKeys.key === (key.length === 1 ? key.toUpperCase() : key) && stateKeys.shiftKey === e.shiftKey && stateKeys.ctrlKey === e.ctrlKey && stateKeys.altKey === e.altKey) {
+                                    currentShortcuts.push(shortcut)
+                                    find = true
+                                }
+                                i++
+                            }
+                        }
+                    }
                     
-                // }
-                // if(currentShortcuts.length >= 1){
-                //     e.preventDefault()
-                //     if(currentShortcuts.length === 1){
-                //         currentShortcuts[0].activated()
-                //     } else {
-                //         currentShortcuts[currentShortcuts.length-1].activatedAmbiguously()
-                //         Core.shortcuts.splice(Core.shortcuts.indexOf(currentShortcuts[currentShortcuts.length-1]), 1)
-                //         Core.shortcuts.unshift(currentShortcuts[currentShortcuts.length-1])
-                //     }
-                //     return
-                // }
+                }
+                if(currentShortcuts.length >= 1){
+                    e.preventDefault()
+                    if(currentShortcuts.length === 1){
+                        if(currentShortcuts[0].$signals.activated) currentShortcuts[0].$signals.activated()
+                    } else {
+                        if(currentShortcuts[currentShortcuts.length-1].$signals.activatedAmbiguously) currentShortcuts[currentShortcuts.length-1].$signals.activatedAmbiguously()
+                        Core.shortcuts.splice(Core.shortcuts.indexOf(currentShortcuts[currentShortcuts.length-1]), 1)
+                        Core.shortcuts.unshift(currentShortcuts[currentShortcuts.length-1])
+                    }
+                    return
+                }
                 
             } else {
                 if(e.key === 'Enter' || e.key === 'Return'){
@@ -419,6 +421,15 @@ class KeyboardController {
                 }
             }
         }
+    }
+
+    add(obj){
+        if(this.shortcuts.indexOf(obj) < 0) this.shortcuts.push(obj)
+    }
+
+    remove(obj){
+        let index = this.shortcuts.indexOf(obj)
+        if(index >= 0) this.shortcuts.splice(index, 1)
     }
 }
 class TextFontController {

@@ -21,11 +21,12 @@ class Shortcut extends QtObject {
 
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
+        KeyboardController.add(this)
     }
 
 
     destroy(){
-
+        KeyboardController.remove(this)
         super.destroy()
     }
     
