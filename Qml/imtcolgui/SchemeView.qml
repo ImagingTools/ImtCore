@@ -13,22 +13,23 @@ Rectangle {
     color: "#ececec";
 
     property TreeItemModel objectModel: TreeItemModel{};
+    property alias selectedIndex: canvas.selectedIndex;
 
     //for scrollBars
     property real contentHeight: backgroundRec.height;
-    property real contentY: canvas.deltaY;
+    property real contentY: -canvas.deltaY;
     property real originY: 0;
 
     property real contentWidth: backgroundRec.width;
-    property real contentX: canvas.deltaX;
+    property real contentX: -canvas.deltaX;
     property real originX: 0;
 
     onContentXChanged: {
-        canvas.deltaX = contentX
+        canvas.deltaX = -contentX
         //canvas.requestPaint();
     }
     onContentYChanged: {
-        canvas.deltaY = contentY
+        canvas.deltaY = -contentY
         //canvas.requestPaint();
     }
 
@@ -327,7 +328,13 @@ Rectangle {
 
             width: canvas.backgroundWidth * canvas.scaleCoeff;
             height: canvas.backgroundHeight * canvas.scaleCoeff;
+            property real topY: y;
+            property real bottomY: y + height;
+            property real leftX: x;
+            property real rightX: x + width;
 
+            //border.color: "green";
+            //border.width: 3;
         }
 
         Canvas {
@@ -412,11 +419,11 @@ Rectangle {
             }
 
             onDeltaXChanged: {
-                canvasPage.contentX = deltaX
+                canvasPage.contentX = -deltaX
             }
 
             onDeltaYChanged: {
-                canvasPage.contentY = deltaY
+                canvasPage.contentY = -deltaY
             }
 
             onPaint: {
@@ -1024,47 +1031,64 @@ Rectangle {
     }
 
 
-//    CustomScrollbar{
-//        id: scrollVert;
+    CustomScrollbar{
+        id: scrollVert;
 
-//        anchors.right: parent.right;
-//        anchors.rightMargin: 1;
-//        anchors.bottom: parent.bottom;
+        anchors.right: parent.right;
+        anchors.rightMargin: 1;
+        anchors.bottom: parent.bottom;
 
-//        secondSize: 12;
-//        backgroundColor: "gray";
-//        indicatorColor: "lightgray"
-//        Component.onCompleted: {
-//            opacity = 1;
-//        }
-//        visible: true;
-//        alwaysVisible: true;
-//        targetItem: parent;
-//        onContentYSignal: {
-//            canvas.requestPaint();
-//        }
+        secondSize: 12;
+        backgroundColor: "gray";
+        indicatorColor: "lightgray";
+        Component.onCompleted: {
+            opacity = 1;
+        }
+        visible: (backgroundRec.topY >=0 && backgroundRec.bottomY <= canvasPage.height) ? false : true;
+        alwaysVisible: true;
+        canDragOutOfBounds: true;
+        targetItem: parent;
+        z: (scrollVert.isOnTop && scrollHoriz.isOnTop) ? 21 : (!scrollVert.isOnTop && !scrollHoriz.isOnTop) ? 21 : 20 + scrollVert.isOnTop;
+        property bool isOnTop: true;
+        onContentYSignal: {
+            canvas.requestPaint();
+        }
+        onMovingSignal: {
+            scrollVert.isOnTop = true;
+            scrollHoriz.isOnTop = false;
+        }
 
-//    }
+    }
 
-//    CustomScrollbar{
-//        id: scrollHoriz;
+    CustomScrollbar{
+        id: scrollHoriz;
 
-//        anchors.right: parent.right;
-//        anchors.bottom: parent.bottom;
-//        anchors.bottomMargin: 1;
+        anchors.right: parent.right;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 1;
 
-//        secondSize: 12;
-//        backgroundColor: "gray";
-//        indicatorColor: "lightgray"
+        secondSize: 12;
+        backgroundColor: "gray";
+        indicatorColor: "lightgray";
 
-//        Component.onCompleted: {
-//            opacity = 1;
-//        }
-//        vertical: false;
-//        targetItem: parent;
-//        onContentXSignal: {
-//            canvas.requestPaint();
-//        }
-//    }
+        Component.onCompleted: {
+            opacity = 1;
+        }
+        visible: (backgroundRec.leftX >=0 && backgroundRec.rightX <= canvasPage.width) ? false : true;
+        alwaysVisible: true;
+        canDragOutOfBounds: true;
+
+        vertical: false;
+        targetItem: parent;
+        z: (scrollHoriz.isOnTop && scrollVert.isOnTop) ? 20 : (!scrollHoriz.isOnTop && !scrollVert.isOnTop) ? 20 : 20 + scrollHoriz.isOnTop;
+        property bool isOnTop: false;
+        onContentXSignal: {
+            canvas.requestPaint();
+        }
+        onMovingSignal: {
+            scrollVert.isOnTop = false;
+            scrollHoriz.isOnTop = true;
+        }
+    }
 
 }
