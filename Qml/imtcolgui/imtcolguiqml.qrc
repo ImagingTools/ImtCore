@@ -18,7 +18,6 @@
 		<file alias="imtcolgui/GridExtendingBaseDelegate.qml">GridExtendingBaseDelegate.qml</file>
 		<file alias="imtcolgui/CollectionFilter.qml">CollectionFilter.qml</file>
 		<file alias="imtcolgui/CollectionCommandsController.qml">CollectionCommandsController.qml</file>
-		<file alias="imtcolgui/CollectionDocumentData.qml">CollectionDocumentData.qml</file>
 		<file alias="imtcolgui/CollectionViewDelegate.qml">CollectionViewDelegate.qml</file>
 		<file alias="imtcolgui/SchemeView.qml">SchemeView.qml</file>
         	<file alias="imtcolgui/MetaInfo.qml">MetaInfo.qml</file>
