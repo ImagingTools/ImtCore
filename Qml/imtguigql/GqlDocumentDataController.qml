@@ -61,9 +61,13 @@ DocumentDataController {
             inputParams.InsertField("Id", container.documentId);
             inputParams.InsertField ("Item", container.documentModel.toJSON());
 
-            let inputParamsObj = container.getAdditionalInputParams();
-            for (let key in inputParamsObj){
-                inputParams.InsertField(key, inputParamsObj[key]);
+            let additionInputParams = container.getAdditionalInputParams();
+            if (Object.keys(additionInputParams).length > 0){
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in additionInputParams){
+                    additionParams.InsertField(key, additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
             }
 
             query.AddParam(inputParams);
@@ -138,9 +142,13 @@ DocumentDataController {
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", container.documentId);
 
-            let inputParamsObj = container.getAdditionalInputParams();
-            for (let key in inputParamsObj){
-                inputParams.InsertField(key, inputParamsObj[key]);
+            let additionInputParams = container.getAdditionalInputParams();
+            if (Object.keys(additionInputParams).length > 0){
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in additionInputParams){
+                    additionParams.InsertField(key, additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
             }
 
             query.AddParam(inputParams);
@@ -201,9 +209,13 @@ DocumentDataController {
             inputParams.InsertField("Id", container.documentId);
             inputParams.InsertField ("Item", container.documentModel.toJSON());
 
-            let inputParamsObj = container.getAdditionalInputParams();
-            for (let key in inputParamsObj){
-                inputParams.InsertField(key, inputParamsObj[key]);
+            let additionInputParams = container.getAdditionalInputParams();
+            if (Object.keys(additionInputParams).length > 0){
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in additionInputParams){
+                    additionParams.InsertField(key, additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
             }
 
             query.AddParam(inputParams);

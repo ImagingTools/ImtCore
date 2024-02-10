@@ -130,6 +130,10 @@ Item {
         setDescriptionQuery.setDescription(elementId, description)
     }
 
+    function getAdditionalInputParams(){
+        return {};
+    }
+
     GqlModel {
         id: removeModel;
 
@@ -138,6 +142,16 @@ Item {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", id);
+
+            let additionInputParams = root.getAdditionalInputParams();
+            if (Object.keys(additionInputParams).length > 0){
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in additionInputParams){
+                    additionParams.InsertField(key, additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
+            }
+
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("removedNotification");
@@ -211,6 +225,15 @@ Item {
             inputParams.InsertField("Id", id);
             inputParams.InsertField("NewName", name);
 
+            let additionInputParams = root.getAdditionalInputParams();
+            if (Object.keys(additionInputParams).length > 0){
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in additionInputParams){
+                    additionParams.InsertField(key, additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
+            }
+
             query.AddParam(inputParams);
 
             queryFields = Gql.GqlObject("rename");
@@ -274,6 +297,16 @@ Item {
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", id);
             inputParams.InsertField("Description", description);
+
+            let additionInputParams = root.getAdditionalInputParams();
+            if (Object.keys(additionInputParams).length > 0){
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in additionInputParams){
+                    additionParams.InsertField(key, additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
+            }
+
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("setDescription");
@@ -334,6 +367,19 @@ Item {
 
         function getHeaders() {
             var query = Gql.GqlRequest("query", root.collectionId + "Info");
+
+            var inputParams = Gql.GqlObject("input");
+
+            let additionInputParams = root.getAdditionalInputParams();
+            if (Object.keys(additionInputParams).length > 0){
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in additionInputParams){
+                    additionParams.InsertField(key, additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
+            }
+
+            query.AddParam(inputParams);
 
             var queryHeaders = Gql.GqlObject("headers");
             queryHeaders.InsertField("Id");
@@ -408,6 +454,15 @@ Item {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertFieldObject(viewParams);
+
+            let additionInputParams = root.getAdditionalInputParams();
+            if (Object.keys(additionInputParams).length > 0){
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in additionInputParams){
+                    additionParams.InsertField(key, additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
+            }
 
             query.AddParam(inputParams);
 
