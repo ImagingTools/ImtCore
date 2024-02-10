@@ -1,3 +1,5 @@
+pragma Singleton
+
 import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
@@ -11,6 +13,7 @@ Item {
 
     Component.onCompleted: {
         Events.subscribeEvent("RegisterDocumentManager", registerDocumentManager);
+        Events.subscribeEvent("GetDocumentManager", registerDocumentManager);
         Events.subscribeEvent("OpenDocument", openDocument);
     }
 
@@ -23,28 +26,27 @@ Item {
         root.documentManagers = {};
     }
 
-    function registerDocumentManager(parameters){
-        console.log("registerDocumentManager");
+    function getDocumentManager(typeId){
+        return root.documentManagers[typeId];
+    }
 
-        let typeId = parameters["TypeId"];
-        let documentManager = parameters["DocumentManager"];
-
+    function registerDocumentManager(typeId, documentManager){
         root.documentManagers[typeId] = documentManager;
-
         return true;
     }
 
     function openDocument(parameters){
+        console.log("main openDocument", parameters);
+
         let typeId = parameters["TypeId"];
         let documentId = parameters["DocumentId"];
         let documentTypeId = parameters["DocumentTypeId"];
-
-        console.log('MainDocumentManager openDocument', typeId, documentId, documentTypeId)
+        let viewTypeId = parameters["ViewTypeId"];
 
         if (typeId in root.documentManagers){
             let documentManager = root.documentManagers[typeId];
             if (documentManager){
-                documentManager.openDocument(documentId, documentTypeId);
+                documentManager.openDocument(documentId, documentTypeId, viewTypeId);
             }
         }
 

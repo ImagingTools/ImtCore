@@ -4,11 +4,8 @@ import imtgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
 
-Item {
+ViewBase {
     id: roleEditorContainer;
-
-    property TreeItemModel documentModel: TreeItemModel {}
-    property Item documentPtr: null;
 
     property int mainMargin: 0;
     property int panelWidth: 400;
@@ -24,6 +21,10 @@ Item {
 
     Component.onCompleted: {
         rolesProvider.updateModel();
+    }
+
+    onModelChanged: {
+        console.log("RoleEditor onModelChanged", model.toJSON());
     }
 
     function getAllParentRoleIds(roleId, rolesModel, retVal){
@@ -56,13 +57,6 @@ Item {
         }
     }
 
-    function blockEditing(){
-        roleIdInput.readOnly = true;
-        roleNameInput.readOnly = true;
-        descriptionInput.readOnly = true;
-        parentRolesTable.readOnly = true;
-    }
-
     CollectionDataProvider {
         id: rolesProvider;
 
@@ -74,7 +68,7 @@ Item {
         onModelUpdated: {
             if (rolesProvider.collectionModel != null){
                 if (rolesProvider.collectionModel.ContainsKey("Roles")){
-                    let documentId = roleEditorContainer.documentModel.GetData("Id");
+                    let documentId = roleEditorContainer.model.GetData("Id");
                     let rolesModel = rolesProvider.collectionModel.GetData("Roles")
 
                     // Get all children ID-s
@@ -83,8 +77,8 @@ Item {
 
                     // Get all parent ID-s
                     let parentIds = []
-                    if (roleEditorContainer.documentModel.ContainsKey("ParentRoles")){
-                        let parentRoles = roleEditorContainer.documentModel.GetData("ParentRoles")
+                    if (roleEditorContainer.model.ContainsKey("ParentRoles")){
+                        let parentRoles = roleEditorContainer.model.GetData("ParentRoles")
                         let parentRolesIds = parentRoles.split(';')
                         for (let j = 0; j < parentRolesIds.length; j++){
                             roleEditorContainer.getAllParentRoleIds(parentRolesIds[j], rolesModel, parentIds);
@@ -109,6 +103,8 @@ Item {
                     parentRolesTable.elements = rolesModel;
 
                     rolesProvider.compl = true;
+
+                    roleEditorContainer.doUpdateGui();
                 }
             }
         }
@@ -128,32 +124,32 @@ Item {
     }
 
     function updateGui(){
-        console.log("RoleEditor start updateGui");
+        console.log("RoleEditor updateGui", model.toJSON());
 
-        if (roleEditorContainer.documentModel.ContainsKey("RoleId")){
-            roleIdInput.text = documentModel.GetData("RoleId");
+        if (roleEditorContainer.model.ContainsKey("RoleId")){
+            roleIdInput.text = model.GetData("RoleId");
         }
         else{
             roleIdInput.text = "";
         }
 
-        if (roleEditorContainer.documentModel.ContainsKey("Name")){
-            roleNameInput.text = documentModel.GetData("Name");
+        if (roleEditorContainer.model.ContainsKey("Name")){
+            roleNameInput.text = model.GetData("Name");
         }
         else{
             roleNameInput.text = "";
         }
 
-        if (roleEditorContainer.documentModel.ContainsKey("Description")){
-            descriptionInput.text = documentModel.GetData("Description");
+        if (roleEditorContainer.model.ContainsKey("Description")){
+            descriptionInput.text = model.GetData("Description");
         }
         else{
             descriptionInput.text = "";
         }
 
         let parentRolesIds = []
-        if (roleEditorContainer.documentModel.ContainsKey("ParentRoles")){
-            let parentGroups = roleEditorContainer.documentModel.GetData("ParentRoles");
+        if (roleEditorContainer.model.ContainsKey("ParentRoles")){
+            let parentGroups = roleEditorContainer.model.GetData("ParentRoles");
             if (parentGroups !== ""){
                 parentRolesIds = parentGroups.split(';')
             }
@@ -174,9 +170,11 @@ Item {
     }
 
     function updateModel(){
-        roleEditorContainer.documentModel.SetData("RoleId", roleIdInput.text);
-        roleEditorContainer.documentModel.SetData("Name", roleNameInput.text);
-        roleEditorContainer.documentModel.SetData("Description", descriptionInput.text);
+        console.log("RoleEditor updateModel", model.toJSON());
+
+        roleEditorContainer.model.SetData("RoleId", roleIdInput.text);
+        roleEditorContainer.model.SetData("Name", roleNameInput.text);
+        roleEditorContainer.model.SetData("Description", descriptionInput.text);
 
         let selectedRoleIds = []
         let indexes = parentRolesTable.getCheckedItems();
@@ -185,7 +183,7 @@ Item {
             selectedRoleIds.push(id);
         }
 
-        roleEditorContainer.documentModel.SetData("ParentRoles", selectedRoleIds.join(';'));
+        roleEditorContainer.model.SetData("ParentRoles", selectedRoleIds.join(';'));
     }
 
     Item{
@@ -237,12 +235,10 @@ Item {
                 placeHolderText: qsTr("Enter the role name");
 
                 onEditingFinished: {
-                    if (roleEditorContainer.documentPtr){
-                        let oldText = roleEditorContainer.documentModel.GetData("Name");
-                        if (oldText && oldText !== roleNameInput.text || !oldText && roleNameInput.text !== ""){
-                            roleIdInput.text = roleNameInput.text.replace(/\s+/g, '');
-                            roleEditorContainer.documentPtr.doUpdateModel();
-                        }
+                    let oldText = roleEditorContainer.model.GetData("Name");
+                    if (oldText && oldText !== roleNameInput.text || !oldText && roleNameInput.text !== ""){
+                        roleIdInput.text = roleNameInput.text.replace(/\s+/g, '');
+                        roleEditorContainer.doUpdateModel();
                     }
                 }
 
@@ -295,11 +291,9 @@ Item {
                 placeHolderText: qsTr("Enter the description");
 
                 onEditingFinished: {
-                    if (roleEditorContainer.documentPtr){
-                        let oldText = roleEditorContainer.documentModel.GetData("Description");
-                        if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
-                            roleEditorContainer.documentPtr.doUpdateModel();
-                        }
+                    let oldText = roleEditorContainer.model.GetData("Description");
+                    if (oldText && oldText !== descriptionInput.text || !oldText && descriptionInput.text !== ""){
+                        roleEditorContainer.doUpdateModel();
                     }
                 }
 
@@ -351,9 +345,7 @@ Item {
         radius: roleEditorContainer.radius;
 
         onCheckedItemsChanged: {
-            if (roleEditorContainer.documentPtr){
-                roleEditorContainer.documentPtr.doUpdateModel();
-            }
+            roleEditorContainer.doUpdateModel();
         }
     }
 }//Container

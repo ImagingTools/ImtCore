@@ -46,7 +46,7 @@ ControlBase {
         height: popupMenuContainer.itemHeight;
 
         text: model[popupMenuContainer.nameId];
-        iconSource: model.IconSource;
+        iconSource: model.Icon === "" ? "" : "../../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal);
 
         selected: popupMenuContainer.selectedIndex == model.index;
 

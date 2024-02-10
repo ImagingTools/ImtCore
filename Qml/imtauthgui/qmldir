@@ -13,5 +13,25 @@ UserTokenProvider 1.0 UserTokenProvider.qml
 
 singleton PermissionsController 1.0 PermissionsController.qml
 singleton CachedAccountCollection 1.0 CachedAccountCollection.qml
+singleton CachedRoleCollection 1.0 CachedRoleCollection.qml
+singleton CachedUserCollection 1.0 CachedUserCollection.qml
+singleton CachedGroupCollection 1.0 CachedGroupCollection.qml
+
+RoleView 1.0 RoleView.qml
+RoleEditor 1.0 RoleEditor.qml
+RolePermissions 1.0 RolePermissions.qml
+
+UserView 1.0 UserView.qml
+UserEditor 1.0 UserEditor.qml
+UserRoles 1.0 UserRoles.qml
+UserGroups 1.0 UserGroups.qml
+
+UserGroupView 1.0 UserGroupView.qml
+GroupEditor 1.0 GroupEditor.qml
+GroupRoles 1.0 GroupRoles.qml
+GroupUsers 1.0 GroupUsers.qml
+
+TableProductRolesDelegate 1.0 TableProductRolesDelegate.qml
+RoleCollectionViewCommandsDelegate 1.0 RoleCollectionViewCommandsDelegate.qml
 
 LoginButton 1.0 LoginButton.qml

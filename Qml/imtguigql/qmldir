@@ -9,3 +9,8 @@ RemoteFileController 1.0 RemoteFileController.qml
 SubscriptionClient 1.0 SubscriptionClient.qml
 SubscriptionManager 1.0 SubscriptionManager.qml
 Gql 1.0 GraphQLRequest.js
+ClientStyle 1.0 ClientStyle.qml
+CommandsRepresentationProvider 1.0 CommandsRepresentationProvider.qml
+CollectionRepresentation 1.0 CollectionRepresentation.qml
+RemoteCollectionView 1.0 RemoteCollectionView.qml
+MetaInfoProvider 1.0 MetaInfoProvider.qml

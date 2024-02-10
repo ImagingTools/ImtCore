@@ -5,7 +5,7 @@ import imtgui 1.0
 import imtdocgui 1.0
 import imtcolgui 1.0
 
-DocumentData {
+ViewBase {
     id: accountEditorContainer;
 
     anchors.fill: parent;
@@ -14,10 +14,8 @@ DocumentData {
 
     property int textInputHeight: 30;
 
-    documentCompleted: groupsProvider.completed;
-
     Component.onCompleted: {
-        groupsProvider.updateModel();
+        CachedGroupCollection.updateModel();
 
         Events.subscribeEvent("OnLocalizationChanged", accountEditorContainer.onLocalizationChanged);
     }
@@ -30,17 +28,17 @@ DocumentData {
         bodyColumn.updateHeaders();
     }
 
-    CollectionDataProvider {
-        id: groupsProvider;
+//    CollectionDataProvider {
+//        id: groupsProvider;
 
-        commandId: "Groups";
+//        commandId: "Groups";
 
-        fields: ["Id", "Name"];
+//        fields: ["Id", "Name"];
 
-        onModelUpdated: {
-            groupsTable.elements = groupsProvider.collectionModel;
-        }
-    }
+//        onModelUpdated: {
+//            groupsTable.elements = groupsProvider.collectionModel;
+//        }
+//    }
 
     function blockEditing(){
         accountNameInput.readOnly = true;
@@ -56,64 +54,66 @@ DocumentData {
     function updateGui(){
         console.log("AccountEditor updateGui");
 
-        if (accountEditorContainer.documentModel.ContainsKey("Name")){
-            accountNameInput.text = accountEditorContainer.documentModel.GetData("Name");
+        if (accountEditorContainer.model.ContainsKey("Name")){
+            accountNameInput.text = accountEditorContainer.model.GetData("Name");
         }
         else{
             accountNameInput.text = "";
         }
 
-        if (accountEditorContainer.documentModel.ContainsKey("Description")){
-            accountDescriptionInput.text = accountEditorContainer.documentModel.GetData("Description");
+        if (accountEditorContainer.model.ContainsKey("Description")){
+            accountDescriptionInput.text = accountEditorContainer.model.GetData("Description");
         }
         else{
             accountDescriptionInput.text = "";
         }
 
-        if (accountEditorContainer.documentModel.ContainsKey("Country")){
-            countryInput.text = accountEditorContainer.documentModel.GetData("Country");
+        if (accountEditorContainer.model.ContainsKey("Country")){
+            countryInput.text = accountEditorContainer.model.GetData("Country");
         }
         else{
             countryInput.text = "";
         }
 
-        if (accountEditorContainer.documentModel.ContainsKey("PostalCode")){
-            postalCodeInput.text = accountEditorContainer.documentModel.GetData("PostalCode");
+        if (accountEditorContainer.model.ContainsKey("PostalCode")){
+            postalCodeInput.text = accountEditorContainer.model.GetData("PostalCode");
         }
         else{
             postalCodeInput.text = "";
         }
 
-        if (accountEditorContainer.documentModel.ContainsKey("City")){
-            cityInput.text = accountEditorContainer.documentModel.GetData("City");
+        if (accountEditorContainer.model.ContainsKey("City")){
+            cityInput.text = accountEditorContainer.model.GetData("City");
         }
         else{
             cityInput.text = "";
         }
 
-        if (accountEditorContainer.documentModel.ContainsKey("Street")){
-            streetInput.text = accountEditorContainer.documentModel.GetData("Street");
+        if (accountEditorContainer.model.ContainsKey("Street")){
+            streetInput.text = accountEditorContainer.model.GetData("Street");
         }
         else{
             streetInput.text = "";
         }
 
-        if (accountEditorContainer.documentModel.ContainsKey("Email")){
-            emailInput.text = accountEditorContainer.documentModel.GetData("Email");
+        if (accountEditorContainer.model.ContainsKey("Email")){
+            emailInput.text = accountEditorContainer.model.GetData("Email");
         }
         else{
             emailInput.text = "";
         }
 
         let groupIds = [];
-        if (accountEditorContainer.documentModel.ContainsKey("Groups")){
-            let groups = accountEditorContainer.documentModel.GetData("Groups")
+        if (accountEditorContainer.model.ContainsKey("Groups")){
+            let groups = accountEditorContainer.model.GetData("Groups")
             if (groups !== ""){
                 groupIds = groups.split(';');
             }
         }
 
         groupsTable.uncheckAll();
+
+        console.log("groupsTable.elements", groupsTable.elements);
 
         if (groupsTable.elements){
             for (let i = 0; i < groupsTable.elements.GetItemsCount(); i++){
@@ -129,25 +129,25 @@ DocumentData {
         console.log("updateModel");
 
         let name = accountNameInput.text;
-        accountEditorContainer.documentModel.SetData("Name", name)
+        accountEditorContainer.model.SetData("Name", name)
 
         let description = accountDescriptionInput.text;
-        accountEditorContainer.documentModel.SetData("Description", description)
+        accountEditorContainer.model.SetData("Description", description)
 
         let country = countryInput.text;
-        accountEditorContainer.documentModel.SetData("Country", country)
+        accountEditorContainer.model.SetData("Country", country)
 
         let postalCode = postalCodeInput.text;
-        accountEditorContainer.documentModel.SetData("PostalCode", postalCode)
+        accountEditorContainer.model.SetData("PostalCode", postalCode)
 
         let city = cityInput.text;
-        accountEditorContainer.documentModel.SetData("City", city)
+        accountEditorContainer.model.SetData("City", city)
 
         let street = streetInput.text;
-        accountEditorContainer.documentModel.SetData("Street", street)
+        accountEditorContainer.model.SetData("Street", street)
 
         let email = emailInput.text;
-        accountEditorContainer.documentModel.SetData("Email", email);
+        accountEditorContainer.model.SetData("Email", email);
 
         let selectedGroupIds = []
         let indexes = groupsTable.getCheckedItems();
@@ -157,7 +157,7 @@ DocumentData {
         }
 
         let groups = selectedGroupIds.join(';');
-        accountEditorContainer.documentModel.SetData("Groups", groups)
+        accountEditorContainer.model.SetData("Groups", groups)
     }
 
     Rectangle {
@@ -440,6 +440,8 @@ DocumentData {
                     onCheckedItemsChanged: {
                         accountEditorContainer.doUpdateModel();
                     }
+
+                    elements: CachedGroupCollection.collectionModel;
 
                     Component.onCompleted: {
                         let ok = PermissionsController.checkPermission("ChangeAccount");

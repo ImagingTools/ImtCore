@@ -14,10 +14,6 @@ ItemDelegate {
     property Item containerItem: null;
     property Item rootItem: null;
 
-    onSelectedChanged: {
-        console.log("ItemDelegate onSelectedChanged", selected);
-    }
-
     onHeightChanged: {
         internal.checkSeparator();
     }

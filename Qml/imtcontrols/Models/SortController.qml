@@ -5,23 +5,27 @@ import imtcontrols 1.0
 Item {
     id: container;
 
-    property var commands;
-
     property TreeItemModel sortModel: TreeItemModel {}
-
-    property string currentHeaderId: "";
-    property string currentOrder: "ASC";
-
-    function headerClicked(headerId){
-        console.log("headerClicked", headerId, sortModel.toJSON());
-
-        container.setHeaderSort(currentHeaderId, currentOrder);
-        container.commands.updateItemsModel();
-    }
 
     function setHeaderSort(headerId, sortOrder){
         container.sortModel.SetData("HeaderId", headerId);
         container.sortModel.SetData("SortOrder", sortOrder);
+    }
+
+    function getCurrentSort(){
+        if (container.sortModel.ContainsKey("SortOrder")){
+            return container.sortModel.GetData("SortOrder")
+        }
+
+        return "";
+    }
+
+    function getCurrentHeaderId(){
+        if (container.sortModel.ContainsKey("HeaderId")){
+            return container.sortModel.GetData("HeaderId")
+        }
+
+        return "";
     }
 
     function isEmpty(){

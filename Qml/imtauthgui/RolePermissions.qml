@@ -4,23 +4,14 @@ import imtgui 1.0
 import imtlicgui 1.0
 import imtcontrols 1.0
 
-Item {
+ViewBase {
     id: rolePermissionsContainer;
 
-//    anchors.fill: parent;
-
-    property TreeItemModel documentModel: TreeItemModel {}
-    property Item documentPtr: null;
-
     property int mainMargin: 0;
-    property int panelWidth: 400;
 
-    property bool completed: permissionsProvider.compl;
-
-    property string productId: documentPtr ? documentPtr.productId : "";
+    property string productId: "";
 
     onProductIdChanged: {
-        console.log("onProductIdChanged", productId);
         if (productId !== ""){
             permissionsProvider.productId = productId;
 
@@ -38,6 +29,8 @@ Item {
                 permissionsTable.rowModel = permissionsProvider.dataModel;
 
                 compl = true;
+
+                rolePermissionsContainer.doUpdateGui();
             }
         }
 
@@ -58,8 +51,8 @@ Item {
         console.log("RolePermissions updateGui");
 
         let selectedPermissionsIds = [];
-        if (rolePermissionsContainer.documentModel.ContainsKey("Permissions")){
-            let selectedPermissions = rolePermissionsContainer.documentModel.GetData("Permissions");
+        if (rolePermissionsContainer.model.ContainsKey("Permissions")){
+            let selectedPermissions = rolePermissionsContainer.model.GetData("Permissions");
             if (selectedPermissions !== ""){
                 selectedPermissionsIds = selectedPermissions.split(';');
             }
@@ -96,11 +89,8 @@ Item {
             }
         }
 
-        console.log("selectedPermissionIds", selectedPermissionIds.join(';'));
-        let permissions = rolePermissionsContainer.documentModel.GetData("Permissions");
-        console.log("permissions", permissions);
-
-        rolePermissionsContainer.documentModel.SetData("Permissions", selectedPermissionIds.join(';'));
+        let permissions = rolePermissionsContainer.model.GetData("Permissions");
+        rolePermissionsContainer.model.SetData("Permissions", selectedPermissionIds.join(';'));
     }
 
     Component{
@@ -195,9 +185,7 @@ Item {
         }
 
         onCheckedItemsChanged: {
-            if (rolePermissionsContainer.documentPtr){
-                rolePermissionsContainer.documentPtr.doUpdateModel();
-            }
+            rolePermissionsContainer.doUpdateModel();
         }
     }//BasicTableView
 

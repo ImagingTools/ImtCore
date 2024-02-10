@@ -3,34 +3,30 @@ import Acf 1.0
 import imtgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
+import imtauthgui 1.0
 
-Item {
+ViewBase {
     id: userGroupsContainer;
-
-    property TreeItemModel documentModel: TreeItemModel {}
-    property Item documentPtr: null;
 
     property int radius: 3;
 
-    property bool completed: groupsProvider.completed;
-
     Component.onCompleted: {
-        groupsProvider.updateModel();
+        CachedGroupCollection.updateModel();
     }
 
-    CollectionDataProvider {
-        id: groupsProvider;
+//    CollectionDataProvider {
+//        id: groupsProvider;
 
-        commandId: "Groups";
+//        commandId: "Groups";
 
-        fields: ["Id", "Name", "Description", "Roles"];
+//        fields: ["Id", "Name", "Description", "Roles"];
 
-        onModelUpdated: {
-            if (groupsProvider.collectionModel != null){
-                groupsTable.elements = groupsProvider.collectionModel;
-            }
-        }
-    }
+//        onModelUpdated: {
+//            if (groupsProvider.collectionModel != null){
+//                groupsTable.elements = groupsProvider.collectionModel;
+//            }
+//        }
+//    }
 
     function blockEditing(){
         groupsTable.readOnly = true;
@@ -40,8 +36,8 @@ Item {
         console.log("UserGroups updateGui");
 
         let groupIds = []
-        if (userGroupsContainer.documentModel.ContainsKey("Groups")){
-            let parentGroups = userGroupsContainer.documentModel.GetData("Groups");
+        if (userGroupsContainer.model.ContainsKey("Groups")){
+            let parentGroups = userGroupsContainer.model.GetData("Groups");
             if (parentGroups !== ""){
                 groupIds = parentGroups.split(';')
             }
@@ -68,7 +64,7 @@ Item {
             selectedGroupIds.push(id);
         }
 
-        userGroupsContainer.documentModel.SetData("Groups", selectedGroupIds.join(';'));
+        userGroupsContainer.model.SetData("Groups", selectedGroupIds.join(';'));
     }
 
     Component{
@@ -137,10 +133,10 @@ Item {
         checkable: true;
         radius: userGroupsContainer.radius;
 
+        elements: CachedGroupCollection.collectionModel;
+
         onCheckedItemsChanged: {
-            if (userGroupsContainer.documentPtr){
-                userGroupsContainer.documentPtr.doUpdateModel();
-            }
+            userGroupsContainer.doUpdateModel();
         }
     }
 

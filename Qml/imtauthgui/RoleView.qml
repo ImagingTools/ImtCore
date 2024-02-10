@@ -2,102 +2,37 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
-import imtdocgui 1.0
 
-DocumentData {
+ViewBase {
     id: container;
 
     property string productId: "";
-    property string title;
-    property string roleName: qsTr("New Role");
-
-    property int mainMargin: 0;
-    property int panelWidth: 150;
-
-    documentCompleted: roleEditorCompleted && rolePermissionsCompleted;
-
-    onProductIdChanged: {
-        console.log("onProductIdChanged", container.productId);
-
-        container.title = container.productId + " / " + qsTr("Roles");
-    }
-
-    onSaved: {
-        updateRoleName();
-    }
-
-    function updateRoleName(){
-        if (container.documentModel.ContainsKey("Name")){
-            let roleName = container.documentModel.GetData("Name");
-
-            if (roleName != ""){
-                container.roleName = roleName;
-            }
-        }
-    }
-
-    function beginDocumentModelChanged(){
-        updateRoleName();
-
-        if (container.productId === "" && container.documentModel.ContainsKey("ProductId")){
-            container.productId = container.documentModel.GetData("ProductId")
-        }
-        else{
-            container.documentModel.SetData("ProductId", container.productId)
-        }
-
-        if (container.documentModel.ContainsKey("ProductId")){
-            container.productId = container.documentModel.GetData("ProductId")
-            console.log("productId", container.productId);
-        }
-
-        let generalPage = multiPageView.getPageById("General");
-        let permissionsPage = multiPageView.getPageById("Permissions");
-
-        if (generalPage){
-            generalPage.documentModel = container.documentModel;
-        }
-
-        if (permissionsPage){
-            permissionsPage.documentModel = container.documentModel;
-        }
-    }
-
-    function blockEditing(){
-        let generalPage = multiPageView.getPageById("General");
-        let permissionsPage = multiPageView.getPageById("Permissions");
-
-        if (generalPage){
-            generalPage.blockEditing();
-        }
-
-        if (permissionsPage){
-            permissionsPage.blockEditing();
-        }
-    }
 
     function updateGui(){
+        console.log("RoleView updateGui", model.toJSON());
         let generalPage = multiPageView.getPageById("General");
         let permissionsPage = multiPageView.getPageById("Permissions");
 
         if (generalPage){
-            generalPage.updateGui();
+            generalPage.doUpdateGui();
         }
         if (permissionsPage){
-            permissionsPage.updateGui();
+            permissionsPage.doUpdateGui();
         }
     }
 
     function updateModel(){
+        console.log("RoleView updateModel", model.toJSON());
+
         let generalPage = multiPageView.getPageById("General");
         let permissionsPage = multiPageView.getPageById("Permissions");
 
         if (generalPage){
-            generalPage.updateModel();
+            generalPage.doUpdateModel();
         }
 
         if (permissionsPage){
-            permissionsPage.updateModel();
+            permissionsPage.doUpdateModel();
         }
     }
 
@@ -124,93 +59,31 @@ DocumentData {
         }
     }
 
-    Row {
-        id: header;
-
-        z: 10;
-
-        anchors.top: parent.top;
-        anchors.left: parent.left;
-        anchors.leftMargin: 10;
-
-        height: 40;
-
-        spacing: 10;
-
-        clip: true;
-
-        ToolButton {
-            id: closeButton;
-
-            anchors.verticalCenter: parent.verticalCenter;
-
-            width: 25;
-            height: width;
-
-            iconSource: "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal);
-
-            onClicked: {
-                Events.sendEvent(container.uuid + "CommandActivated", "Close")
-            }
-        }
-
-        Text {
-            id: headerText;
-
-            anchors.verticalCenter: parent.verticalCenter;
-
-            font.pixelSize: Style.fontSize_title;
-            font.family: Style.fontFamily;
-
-            color: Style.titleColor;
-
-            text: container.title + " / " + container.roleName;
-
-            Loader{
-                id: titleDecoratorLoader;
-
-                sourceComponent: Style.titleDecorator !==undefined ? Style.titleDecorator: emptyDecorator;
-                onLoaded: {
-                    if(titleDecoratorLoader.item){
-                        titleDecoratorLoader.item.rootItem = headerText;
-                    }
-                }
-            }
-        }
-    }
-
-    property bool roleEditorCompleted: false;
     Component {
         id: roleEditorComp;
 
         RoleEditor {
-            documentPtr: container;
-            onCompletedChanged: {
-                if (completed){
-                    container.roleEditorCompleted = completed;
-                }
-            }
+            model: container.model;
+
+            readOnly: container.readOnly;
         }
     }
 
-    property bool rolePermissionsCompleted: false;
     Component {
         id: rolePermissionsComp;
 
         RolePermissions {
-            documentPtr: container;
-            onCompletedChanged: {
-                if (completed){
-                    container.rolePermissionsCompleted = completed;
-                }
-            }
+            model: container.model;
+            readOnly: container.readOnly;
+
+            productId: container.productId;
         }
     }
 
     MultiPageView {
         id: multiPageView;
 
-        anchors.top: header.bottom;
+        anchors.top: parent.top;
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.bottom: parent.bottom;

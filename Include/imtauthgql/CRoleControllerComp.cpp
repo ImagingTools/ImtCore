@@ -34,7 +34,7 @@ imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlReques
 
 	dataModelPtr->SetData("Id", "");
 	dataModelPtr->SetData("Name", "");
-	dataModelPtr->SetData("ProductId", productId);
+//	dataModelPtr->SetData("ProductId", productId);
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
@@ -88,7 +88,7 @@ imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlReques
 
 
 istd::IChangeable* CRoleControllerComp::CreateObject(
-			const QList<imtgql::CGqlObject>& inputParams,
+			const imtgql::CGqlRequest& gqlRequest,
 			QByteArray& objectId,
 			QString& name,
 			QString& description,
@@ -100,12 +100,24 @@ istd::IChangeable* CRoleControllerComp::CreateObject(
 		return nullptr;
 	}
 
-	objectId = GetObjectIdFromInputParams(inputParams);
+	QByteArray itemData;
+	QByteArray productId;
+	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
+	if (inputParamPtr != nullptr){
+		objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
+		productId = inputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
+		itemData = inputParamPtr->GetFieldArgumentValue("Item").toByteArray();
+	}
+
 	if (objectId.isEmpty()){
 		objectId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 	}
 
-	QByteArray itemData = inputParams.at(0).GetFieldArgumentValue("Item").toByteArray();
+	if (productId.isEmpty()){
+		errorMessage = QT_TR_NOOP("Product-ID can't be empty!");
+		return nullptr;
+	}
+
 	if (!itemData.isEmpty()){
 		imtauth::IRole* roleInstancePtr = m_roleFactCompPtr.CreateInstance();
 		if (roleInstancePtr == nullptr){
@@ -132,16 +144,7 @@ istd::IChangeable* CRoleControllerComp::CreateObject(
 			}
 		}
 
-		QByteArray productId;
-		if (itemModel.ContainsKey("ProductId")){
-			productId = itemModel.GetData("ProductId").toByteArray();
-			if (productId.isEmpty()){
-				errorMessage = QT_TR_NOOP("Product-ID can't be empty!");
-				return nullptr;
-			}
-
-			roleInfoPtr->SetProductId(productId);
-		}
+		roleInfoPtr->SetProductId(productId);
 
 		imtbase::ICollectionInfo::Ids collectionIds = m_objectCollectionCompPtr->GetElementIds();
 		for (imtbase::ICollectionInfo::Id collectionId : collectionIds){

@@ -5,18 +5,13 @@ import imtcolgui 1.0
 import imtlicgui 1.0
 import imtcontrols 1.0
 
-Item {
+ViewBase {
     id: userGroupEditorContainer;
-
-    property TreeItemModel documentModel: TreeItemModel {}
-    property Item documentPtr: null;
 
     property int mainMargin: 0;
     property int panelWidth: 400;
 
     property int radius: 3;
-
-    property bool completed: groupsProvider.compl;
 
     Component.onCompleted: {
         groupsProvider.updateModel();
@@ -63,16 +58,16 @@ Item {
 
         onModelUpdated: {
             if (groupsProvider.collectionModel != null){
-                let documentId = userGroupEditorContainer.documentModel.GetData("Id");
+                let objectId = userGroupEditorContainer.model.GetData("Id");
                 let removedIndexes = []
 
                 let childrenIds = []
-                userGroupEditorContainer.getAllChildrenGroups(documentId, childrenIds);
+                userGroupEditorContainer.getAllChildrenGroups(objectId, childrenIds);
 
                 // Get all parent ID-s
                 let parentIds = []
-                if (userGroupEditorContainer.documentModel.ContainsKey("ParentGroups")){
-                    let parentGroups = userGroupEditorContainer.documentModel.GetData("ParentGroups")
+                if (userGroupEditorContainer.model.ContainsKey("ParentGroups")){
+                    let parentGroups = userGroupEditorContainer.model.GetData("ParentGroups")
                     let parentGroupIds = parentGroups.split(';')
                     for (let j = 0; j < parentGroupIds.length; j++){
                         userGroupEditorContainer.getAllParentGroupIds(parentGroupIds[j], parentIds);
@@ -81,7 +76,7 @@ Item {
 
                 for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
                     let id = groupsProvider.collectionModel.GetData("Id", i);
-                    if (id === documentId || childrenIds.includes(id)){
+                    if (id === objectId || childrenIds.includes(id)){
                         removedIndexes.push(i);
                     }
                 }
@@ -95,6 +90,8 @@ Item {
                 parentGroupsTable.elements = groupsProvider.collectionModel;
 
                 compl = true;
+
+                userGroupEditorContainer.doUpdateGui();
             }
         }
     }
@@ -102,23 +99,23 @@ Item {
     function updateGui(){
         console.log("GroupEditor updateGui");
 
-        if (userGroupEditorContainer.documentModel.ContainsKey("Name")){
-            nameInput.text = userGroupEditorContainer.documentModel.GetData("Name");
+        if (userGroupEditorContainer.model.ContainsKey("Name")){
+            nameInput.text = userGroupEditorContainer.model.GetData("Name");
         }
         else{
             nameInput.text = "";
         }
 
-        if (userGroupEditorContainer.documentModel.ContainsKey("Description")){
-            descriptionInput.text = userGroupEditorContainer.documentModel.GetData("Description");
+        if (userGroupEditorContainer.model.ContainsKey("Description")){
+            descriptionInput.text = userGroupEditorContainer.model.GetData("Description");
         }
         else{
             descriptionInput.text = "";
         }
 
         let parentGroupIds = []
-        if (userGroupEditorContainer.documentModel.ContainsKey("ParentGroups")){
-            let parentGroups = userGroupEditorContainer.documentModel.GetData("ParentGroups");
+        if (userGroupEditorContainer.model.ContainsKey("ParentGroups")){
+            let parentGroups = userGroupEditorContainer.model.GetData("ParentGroups");
             if (parentGroups !== ""){
                 parentGroupIds = parentGroups.split(';')
             }
@@ -136,10 +133,8 @@ Item {
     }
 
     function updateModel(){
-        console.log("GroupEditor updateModel", userGroupEditorContainer.documentModel.toJSON());
-
-        userGroupEditorContainer.documentModel.SetData("Description", descriptionInput.text);
-        userGroupEditorContainer.documentModel.SetData("Name", nameInput.text);
+        userGroupEditorContainer.model.SetData("Description", descriptionInput.text);
+        userGroupEditorContainer.model.SetData("Name", nameInput.text);
 
         let selectedGroupIds = []
         let indexes = parentGroupsTable.getCheckedItems();
@@ -148,8 +143,7 @@ Item {
             selectedGroupIds.push(id);
         }
 
-        userGroupEditorContainer.documentModel.SetData("ParentGroups", selectedGroupIds.join(';'));
-        console.log("GroupEditor end updateModel", userGroupEditorContainer.documentModel.toJSON());
+        userGroupEditorContainer.model.SetData("ParentGroups", selectedGroupIds.join(';'));
     }
 
     Component{
@@ -230,9 +224,7 @@ Item {
                 placeHolderText: qsTr("Enter the name");
 
                 onEditingFinished: {
-                    if (userGroupEditorContainer.documentPtr){
-                        userGroupEditorContainer.documentPtr.doUpdateModel();
-                    }
+                    userGroupEditorContainer.doUpdateModel();
                 }
 
                 Loader{
@@ -270,9 +262,7 @@ Item {
                 placeHolderText: qsTr("Enter the description");
 
                 onEditingFinished: {
-                    if (userGroupEditorContainer.documentPtr){
-                        userGroupEditorContainer.documentPtr.doUpdateModel();
-                    }
+                    userGroupEditorContainer.doUpdateModel();
                 }
 
                 KeyNavigation.tab: nameInput;
@@ -332,9 +322,7 @@ Item {
         radius:userGroupEditorContainer.radius;
 
         onCheckedItemsChanged: {
-            if (userGroupEditorContainer.documentPtr){
-                userGroupEditorContainer.documentPtr.doUpdateModel();
-            }
+            userGroupEditorContainer.doUpdateModel();
         }
     }
 }//Container

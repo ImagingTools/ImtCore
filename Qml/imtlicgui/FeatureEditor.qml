@@ -5,6 +5,46 @@ import imtdocgui 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 
+//// SingleDocumentData.qml
+//QtObject {
+//    property string documentId;
+//    property string documentName;
+//    property string documentTypeId;
+//    property var view;
+//}
+
+
+//// ViewBase.qml
+//Item {
+//    property var commandsProvider: CommandsProvider {};
+//    property var commandsDelegate;
+//    property var dataController: DocumentDataController {};
+//    property var undoManager;
+//}
+
+//// FeatureEditor.qml
+//ViewBase {
+//    property var headerModel: {}
+//    property var elementsModel: {}
+
+//    Column {
+//        ListView {}
+//        TextEdit{}
+//    }
+//}
+
+//// FeatureEditorDocument.qml
+//SingleDocumentData {
+//    FeatureEditor {
+//        model: dataController.model;
+//        commandsProvider: GqlCommandsProvider {}
+//        dataController: GqlDocumentDataController {}
+//        undoManager: UndoManager{
+//            model: dataController.model;
+//        }
+//    }
+//}
+
 DocumentData {
     id: featureEditor;
 

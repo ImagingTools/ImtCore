@@ -4,7 +4,7 @@ import imtguigql 1.0
 import imtdocgui 1.0
 import imtcontrols 1.0
 
-
+// DocumentView
 Item {
     id: documentData;
 
@@ -12,15 +12,7 @@ Item {
     property string documentId;
     property string documentName;
     property string documentTypeId;
-
-//    // GraphQL command for creating a new document
-    property string gqlAddCommandId: documentTypeId + "Add";
-
-//    // GraphQL command for updating a document
-    property string gqlUpdateCommandId: documentTypeId + "Update";
-
-//    // GraphQL command for getting document data
-//    property string gqlGetCommandId: documentTypeId + "Item";
+    property var documentManagerPtr: null;
 
     property bool isDirty: false;
     property bool readOnly: false;
@@ -31,6 +23,10 @@ Item {
             documentData.onModelChanged();
         }
     };
+
+    property var commandsTemplate: [
+        {Id: "Close"}
+    ]
 
     property UndoRedoManager undoManagerPtr: UndoRedoManager {
         onModelChanged: {
@@ -58,10 +54,10 @@ Item {
         }
     }
 
-    property var documentManagerPtr: null;
+    property CommandsController commandsController: CommandsController {}
 
     property CommandsProvider commandsProvider: CommandsProvider {
-        commandId: documentData.documentTypeId;
+//        commandId: documentData.documentTypeId;
         uuid: documentData.uuid;
 
         property bool documentVisible: documentData.visible && uuid !== "";
@@ -211,19 +207,16 @@ Item {
         if (readOnly || internal.blockingUpdateModel){
             return;
         }
-        console.log("start doUpdateModel");
 
         internal.blockingUpdateGui = true;
 
         updateModel();
 
         internal.blockingUpdateGui = false;
-        console.log("end doUpdateModel");
     }
 
     function doUpdateGui()
     {
-        console.log("start doUpdateGui");
         if (readOnly){
             return;
         }
@@ -233,8 +226,6 @@ Item {
         updateGui();
 
         internal.blockingUpdateModel = false;
-
-        console.log("end doUpdateGui");
     }
 
     function updateCommands(){

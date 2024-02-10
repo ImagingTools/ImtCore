@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/qml">
         <file alias="imtdocgui/qmldir">qmldir</file>
-        <file alias="imtdocgui/CommandsProvider.qml">CommandsProvider.qml</file>
         <file alias="imtdocgui/DocumentWorkspaceCommandsDelegate.qml">DocumentWorkspaceCommandsDelegate.qml</file>
         <file alias="imtdocgui/DocumentWorkspaceCommandsDelegateBase.qml">DocumentWorkspaceCommandsDelegateBase.qml</file>
         <file alias="imtdocgui/MainDocumentManager.qml">MainDocumentManager.qml</file>
@@ -14,6 +13,9 @@
         <file alias="imtdocgui/DocumentHistoryDialog.qml">DocumentHistoryDialog.qml</file>
         <file alias="imtdocgui/DocumentHistoryProvider.qml">DocumentHistoryProvider.qml</file>
         <file alias="imtdocgui/DocumentHistoryView.qml">DocumentHistoryView.qml</file>
+        <file alias="imtdocgui/DocumentDataController.qml">DocumentDataController.qml</file>
+	<file alias="imtdocgui/DocumentCollectionViewDelegate.qml">DocumentCollectionViewDelegate.qml</file>
+	<file alias="imtdocgui/DocumentValidator.qml">DocumentValidator.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

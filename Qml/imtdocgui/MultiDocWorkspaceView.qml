@@ -9,11 +9,8 @@ DocumentManager {
 
     property alias alertPanelComp: alertPanel.sourceComponent;
 
-    Component.onCompleted: {
-        documentController.setModelStateChanged.connect(workspaceView.onSetModelStateChanged);
-        documentController.getModelStateChanged.connect(workspaceView.onGetModelStateChanged);
-        documentController.updateModelStateChanged.connect(workspaceView.onUpdateModelStateChanged);
-    }
+    property var fixedViews: [];
+    property var fixedViewNames: [];
 
     onDocumentClosed: {
         if (documentIndex <= tabPanel.selectedIndex && documentIndex > 0){
@@ -25,27 +22,20 @@ DocumentManager {
         tabPanel.selectedIndex = documentIndex;
     }
 
-    function checkState(state){
-        if (state === "Loading"){
-            Events.sendEvent("StartLoading");
-//            loading.start();
+    function addFixedView(viewComp, name){
+        let viewName = name;
+        if (!viewName || viewName == ""){
+            viewName = defaultDocumentName;
         }
-        else{
-            Events.sendEvent("StopLoading");
-//            loading.stop();
-        }
-    }
 
-    function onGetModelStateChanged(){
-        checkState(documentController.getModelState);
-    }
+        documentsModel.append({
+                                  "Uuid": UuidGenerator.generateUUID(),
+                                  "Title": viewName,
+                                  "DocumentViewComp": viewComp,
+                                  "Fixed": true
+                              });
 
-    function onSetModelStateChanged(){
-        checkState(documentController.setModelState);
-    }
-
-    function onUpdateModelStateChanged(){
-        checkState(documentController.updateModelState);
+        documentAdded(documentsModel.count - 1, "");
     }
 
     function setAlertPanel(alertPanelComp){
@@ -64,10 +54,6 @@ DocumentManager {
         height: visible ? 40: 0;
 
         visible: alertPanel.status == Loader.Ready;
-
-        onStatusChanged: {
-            console.log("alertPanel onStatusChanged", status);
-        }
     }
 
     TabPanel {
@@ -120,12 +106,19 @@ DocumentManager {
 
                 visible: tabPanel.selectedIndex === model.index;
 
-                sourceComponent: model.DocumentComp;
+                sourceComponent: model.DocumentViewComp;
 
                 clip: true;
 
                 onLoaded: {
-                    console.log("Document onLoaded");
+                    console.log("onLoaded", item);
+                    if (item.viewId !== undefined){
+                        item.viewId = model.Uuid;
+                    }
+
+                    if (model.Fixed !== undefined && model.Fixed){
+                        return;
+                    }
 
                     if (model.Properties){
                         for (let key in model.Properties){
@@ -135,28 +128,10 @@ DocumentManager {
                         }
                     }
 
-                    if (item.uuid !== undefined){
-                        item.uuid = model.Uuid;
-                    }
-
-                    if (item.documentManagerPtr !== undefined){
-                        item.documentManagerPtr = workspaceView;
-                    }
-
-                    if (item.documentTypeId !== undefined){
-                        item.documentTypeId = model.TypeId;
-                    }
-
-                    if (item.documentModel !== undefined){
-                        item.documentModel = model.Model;
-                    }
-
-                    if (documentLoader.item.isDirty !== undefined){
-                        documentLoader.item.onIsDirtyChanged.connect(documentLoader.onIsDirtyChanged);
-                    }
-
-                    if (workspaceView.documentsModel.count >= model.index){
-                        workspaceView.documentsModel.setProperty(model.index, "DocumentObj", item);
+                    let documentData = workspaceView.documentsModel.get(model.index).DocumentData;
+                    if (documentData){
+                        documentData.views.push(item);
+                        documentData.viewAdded(item);
                     }
 
                     workspaceView.updateDocumentTitle(model.index);
@@ -176,13 +151,5 @@ DocumentManager {
                 }
             }
         }
-    }
-
-    Loading {
-        id: loading;
-
-        anchors.fill: parent;
-
-        visible: false;
     }
 }

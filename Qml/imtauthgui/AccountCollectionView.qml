@@ -1,42 +1,63 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtauthgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
+import imtguigql 1.0
+import imtdocgui 1.0
 
 CollectionView {
     id: container;
 
-    filterMenuVisible: true;
+    dataController: CollectionRepresentation {
+        collectionId: "Accounts";
+    }
 
-    documentName: qsTr("Customers");
+    commandsController: CommandsRepresentationProvider {
+        commandId: "Accounts";
+        uuid: container.viewId;
+    }
+
+    commandsDelegate: DocumentCollectionViewDelegate {
+        collectionView: container;
+
+        documentTypeId: "Account";
+        viewTypeId: "AccountEditor";
+    }
 
     Component.onCompleted: {
-        container.commandsDelegatePath = "../imtauthgui/AccountCollectionViewCommandsDelegate.qml";
+        collectionFilter.setSortingOrder("DESC");
+        collectionFilter.setSortingInfoId("LastModified");
 
-        container.commandId = "Accounts";
-    }
+        let documentManager = MainDocumentManager.getDocumentManager("Accounts");
+        if (documentManager){
+            container.commandsDelegate.documentManager = documentManager;
 
-    onDocumentManagerPtrChanged: {
-        if (documentManagerPtr){
-//            documentManagerPtr.setDocumentTitle(0, title);
-            documentManagerPtr.registerDocument("Account", accountEditorComp);
+            documentManager.registerDocumentView("Account", "AccountEditor", accountEditorComp);
+            documentManager.registerDocumentDataController("Account", dataControllerComp);
         }
-    }
-
-    function fillContextMenuModel(){
-        contextMenuModel.clear();
-
-
-        contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../" + Style.getIconPath("Icons/Edit", Icon.State.On, Icon.Mode.Normal)});
-        contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../" + Style.getIconPath("Icons/Remove", Icon.State.On, Icon.Mode.Normal)});
-        contextMenuModel.append({"Id": "SetDescription", "Name": qsTr("Set Description"), "IconSource": ""});
     }
 
     Component {
         id: accountEditorComp;
 
         AccountEditor {
+            id: accountEditor;
+            commandsController: CommandsRepresentationProvider {
+                commandId: "Account";
+                uuid: accountEditor.viewId;
+            }
+        }
+    }
+
+    Component {
+        id: dataControllerComp;
+
+        GqlDocumentDataController {
+            gqlGetCommandId: "AccountItem";
+            gqlUpdateCommandId: "AccountUpdate";
+            gqlAddCommandId: "AccountAdd";
         }
     }
 }

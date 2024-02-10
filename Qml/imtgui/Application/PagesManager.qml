@@ -9,7 +9,6 @@ Item {
     property TreeItemModel pageModel: TreeItemModel {};
     property Item activeItem: null;
     property int activePageIndex: 0;
-    property var documentManager: null;
     property AuthorizationPage authorizationStatusProvider: null;
 
     /**

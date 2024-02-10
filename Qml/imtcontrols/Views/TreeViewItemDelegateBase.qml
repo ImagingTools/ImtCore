@@ -28,17 +28,12 @@ TableViewItemDelegateBase {
 
     property var childModel: model.ChildModel;
 
-    onChildModelChanged: {
-        console.log("Delegate onChildModelChanged", childModel);
-    }
-
     Connections {
         id: connections;
 
         target: treeDelegateBase;
 
         function onIsOpenedChanged(){
-            console.log("onIsOpenedChanged", treeDelegateBase.isOpened);
             if (treeDelegateBase.parentDelegate != null && treeDelegateBase.isOpened){
                 treeDelegateBase.parentDelegate.isOpened = true;
             }

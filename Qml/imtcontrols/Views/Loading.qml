@@ -9,7 +9,6 @@ Rectangle {
     property int indicatorSize: 50;
 
     function start(){
-        root.visible = false;
         root.visible = true;
     }
 

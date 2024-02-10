@@ -60,14 +60,14 @@ Item {
     GqlDocumentDataController{
         id: documentController;
 
-        onUpdateModelStateChanged: {
-            if (updateModelState == "Loading"){
-                Events.sendEvent("StartLoading");
-            }
-            else{
-                Events.sendEvent("StopLoading");
-            }
-        }
+//        onUpdateModelStateChanged: {
+//            if (updateModelState == "Loading"){
+//                Events.sendEvent("StartLoading");
+//            }
+//            else{
+//                Events.sendEvent("StopLoading");
+//            }
+//        }
     }
 
     Component {

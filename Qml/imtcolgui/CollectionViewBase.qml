@@ -3,54 +3,33 @@ import Acf 1.0
 import imtcontrols 1.0
 import imtgui 1.0
 
-Item {
+ViewBase {
     id: collectionViewBaseContainer;
 
-    property alias commands: gqlModels;
-
-    property string commandId;
-
-    property alias tableElementsDelegate: tableInternal.delegate;
-    property alias tableHeadersDelegate: tableInternal.headerDelegate;
-    property alias elementsList: tableInternal.elementsList;
-
-    property alias tableMinWidth: tableInternal.minWidth;
-    property alias tableHeaderHeight: tableInternal.headerHeight;
-    property alias tableItemHeight: tableInternal.itemHeight;
-    property alias tableDecoratorPath: loaderTableDecorator.source;
-    property alias tableDecoratorComp: loaderTableDecorator.sourceComponent;
-    property alias tableCellDecorator: tableInternal.cellDecorator;
-    property alias tableWidthDecorator: tableInternal.widthDecorator;
-    property alias tableWidth: tableInternal.width;
-    property alias tableHeaders: tableInternal.headers;
-
-    property var table: tableInternal;
+    property alias table: tableInternal;
     property bool hasPagination: true;
     property bool hasFilter: true;
 
     property bool hasSort: true;
     property alias isMultiCheckable: tableInternal.isMultiCheckable;
 
-    property alias filterMenu: filterMenuLocal.sourceComponent;
-    property alias filterMenuItem: filterMenuLocal.item;
-    property alias filterMenuVisible: filterMenuLocal.visible;
-    property alias modelFilter: modelFilterObj;
+    property alias filterMenu: filterMenu_;
+    property alias loading: loading_;
+    property alias filterMenuVisible: filterMenu_.visible;
     property alias pagination: pagination_;
 
-    // Sort by default this index
-    property int defaultSortHeaderIndex: 0;
+    property CollectionFilter collectionFilter: CollectionFilter {}
 
-    // only ASC or DESC
-    property alias defaultOrderType: sortCont.currentOrder;
-
-    signal selectedItem(string id, string name);
     signal selectedIndexChanged(int index);
 
     signal elementsChanged();
     signal headersChanged();
 
+    signal filterChanged();
+
     signal selectionChanged(var selection);
-    signal filterDecoratorLoaded();
+    signal rightButtonMouseClicked(int mouseX, int mouseY);
+    signal doubleClicked(string id, int index);
 
     Component.onCompleted: {
         tableInternal.focus = true;
@@ -62,66 +41,52 @@ Item {
         Events.unSubscribeEvent("OnLocalizationChanged", collectionViewBaseContainer.onLocalizationChanged);
     }
 
+    Connections {
+        target: collectionViewBaseContainer.collectionFilter;
 
-    onCommandIdChanged: {
-        gqlModels.commandId = commandId;
+        function onFilterChanged(){
+            console.log("onFilterChanged");
 
-        gqlModels.updateModels();
+            tableInternal.currentHeaderId = collectionViewBaseContainer.collectionFilter.getSortingInfoId();
+            tableInternal.currentSortOrder = collectionViewBaseContainer.collectionFilter.getSortingOrder();
+
+            if (tableInternal.headers.GetItemsCount() > 0){
+                collectionViewBaseContainer.doUpdateGui();
+            }
+        }
     }
 
-    Loader {
-        id: filterMenuLocal;
+    FilterMenu {
+        id: filterMenu_;
 
         anchors.top: collectionViewBaseContainer.top;
         anchors.topMargin: Style.margin;
+        anchors.left: parent.left;
+        anchors.leftMargin: Style.margin;
+        anchors.right: parent.right;
+        anchors.rightMargin: Style.margin;
 
-        width: parent.width;
-
-        visible: tableInternal ? false : false;//for web, do not remove!!!
-
-        onVisibleChanged: {
-            if (!filterMenuLocal.visible){
-                tableInternal.forceActiveFocus();
-            }
+        onClose: {
+            filterMenu_.visible = false;
         }
 
-        sourceComponent: Component {
-            FilterMenu {
-                decoratorSource: Style.filterPanelDecoratorPath;
-            }
-        }
-
-        onLoaded: {
-            filterMenuLocal.item.textFilterChanged.connect(collectionViewBaseContainer.onTextFilterChanged);
-            filterMenuLocal.item.closed.connect(collectionViewBaseContainer.onFilterClosed);
+        onFilterChanged: {
+            collectionViewBaseContainer.onFilterChanged(filterId, filterValue);
         }
     }
 
     function onLocalizationChanged(language){
-        console.log("CollectionViewBase onLocalizationChanged", commandId);
-        gqlModels.updateModels();
     }
 
-    function onFilterClosed(){
-        filterMenuLocal.visible = false;
-    }
-
-    function onTextFilterChanged(index, text){
-        ldng.start();
-        console.log("onTextFilterChanged", text);
-        modelFilterObj.SetData("TextFilter", text);
-        gqlModels.updateModels();
-    }
-
-    function updateModels(){
-        gqlModels.updateModels();
+    function onFilterChanged(filterId, filterValue){
+        collectionViewBaseContainer.collectionFilter.setTextFilter(filterValue);
     }
 
     Rectangle {
         id: backgroundTable;
 
-        anchors.top: filterMenuLocal.visible ? filterMenuLocal.bottom: parent.top;
-        anchors.topMargin: filterMenuLocal.visible ? Style.margin : 0;
+        anchors.top: filterMenu_.visible ? filterMenu_.bottom: parent.top;
+        anchors.topMargin: filterMenu_.visible ? Style.margin : 0;
         anchors.left: parent.left;
 
         width: tableInternal.minWidth * tableInternal.columnCount < parent.width ? tableInternal.minWidth * tableInternal.columnCount : parent.width;
@@ -202,18 +167,8 @@ Item {
 
             scrollbarRightMargin: -20;
 
-            sortController: sortCont;
-
-            onSelectItem: {
-                collectionViewBaseContainer.selectedItem(idSelected, name);
-            }
-
             onSelectionChanged: {
                 collectionViewBaseContainer.selectionChanged(selection);
-            }
-
-            onTextFilterChanged: {
-                modelFilterObj.SetData("TextFilter", text);
             }
 
             onElementsChanged: {
@@ -222,10 +177,39 @@ Item {
 
             onHeadersChanged: {
                 collectionViewBaseContainer.headersChanged();
+
+                let filteringInfoIds = []
+                for (let i = 0; i < tableInternal.headers.GetItemsCount(); i++){
+                    let headerId = tableInternal.headers.GetData("Id", i);
+
+                    filteringInfoIds.push(headerId);
+                }
+
+                collectionFilter.setFilteringInfoIds(filteringInfoIds);
             }
 
-            onFilterClicked: {
-                filterMenuLocal.visible = !filterMenuLocal.visible;
+            onRightButtonMouseClicked: {
+                collectionViewBaseContainer.rightButtonMouseClicked(mouseX, mouseY);
+            }
+
+            onDoubleClicked: {
+                collectionViewBaseContainer.doubleClicked(id, index);
+            }
+
+            onHeaderClicked: {
+                console.log("onHeaderClicked");
+                if (collectionViewBaseContainer.collectionFilter.getSortingInfoId() !== headerId){
+                    collectionViewBaseContainer.collectionFilter.setSortingInfoId(headerId);
+                    collectionViewBaseContainer.collectionFilter.setSortingOrder("ASC");
+                }
+                else{
+                    collectionViewBaseContainer.collectionFilter.setSortingInfoId(headerId);
+
+                    let currentSortingOrder = collectionViewBaseContainer.collectionFilter.getSortingOrder();
+                    collectionViewBaseContainer.collectionFilter.setSortingOrder(currentSortingOrder == "ASC" ? "DESC" : "ASC");
+                }
+
+                collectionViewBaseContainer.doUpdateGui();
             }
         }
 
@@ -262,49 +246,23 @@ Item {
                     iconSource: "../../../" + Style.getIconPath("Icons/Filter", Icon.State.On, Icon.Mode.Normal);
 
                     onClicked: {
-                        filterMenuLocal.visible = !filterMenuLocal.visible;
+                        filterMenu_.visible = !filterMenu_.visible;
                     }
                 }
             }
         }
-
-        Loading {
-            id: ldng;
-
-            anchors.fill: tableInternal;
-            anchors.topMargin: tableInternal.headerElementHeight;
-
-            visible: false;
-
-//            opacity: 0.5;
-            color: Style.baseColor;
-        }
     }
 
-    SortController {
-        id: sortCont;
+    Loading {
+        id: loading_;
 
-        commands: gqlModels;
+        anchors.fill: backgroundTable;
 
-        Component.onCompleted: {
-            tableInternal.headerClicked.connect(sortCont.headerClicked);
-        }
+        color: Style.baseColor;
 
-        Component.onDestruction: {
-            tableInternal.headerClicked.disconnect(sortCont.headerClicked);
-        }
+        visible: false;
     }
 
-    TreeItemModel {
-        id: modelFilterObj;
-
-        Component.onCompleted: {
-            modelFilterObj.SetUpdateEnabled(true)
-            modelFilterObj.AddTreeModel("FilterIds");
-            sortCont.sortModel = modelFilterObj.AddTreeModel("Sort");
-            console.log("modelFilterObj onCompleted", modelFilterObj.toJSON())
-        }
-    }
 
     Rectangle {
         id: paginationObj;
@@ -328,67 +286,19 @@ Item {
             visible: collectionViewBaseContainer.hasPagination /*&& pagesSize > 1*/;
 
             onCurrentIndexChanged: {
+                console.log("P onCurrentIndexChanged");
+
                 tableInternal.selectedIndex = -1;
-                gqlModels.updateModels();
+
+                collectionViewBaseContainer.doUpdateGui();
             }
 
             onCountElementsChanged: {
+                console.log("P onCountElementsChanged");
+
                 tableInternal.selectedIndex = -1;
-                gqlModels.updateModels();
-            }
-        }
-    }
 
-    CollectionViewBaseGqlModels {
-        id: gqlModels;
-
-        table: collectionViewBaseContainer.table;
-
-        commandId: collectionViewBaseContainer.commandId;
-        rootItem: collectionViewBaseContainer;
-
-        pagination: pagination_;
-
-        onHeadersChanged: {
-            let headersCount = gqlModels.headers.GetItemsCount();
-            if (headersCount > 0 && sortCont.isEmpty()){
-                if (collectionViewBaseContainer.defaultSortHeaderIndex < 0 || headersCount <= collectionViewBaseContainer.defaultSortHeaderIndex){
-                    collectionViewBaseContainer.defaultSortHeaderIndex = 0;
-                }
-
-                let headerId = gqlModels.headers.GetData("Id", collectionViewBaseContainer.defaultSortHeaderIndex);
-
-                sortCont.currentHeaderId = headerId;
-
-                sortCont.setHeaderSort(headerId, collectionViewBaseContainer.defaultOrderType);
-            }
-
-            tableInternal.headers = gqlModels.headers;
-            tableInternal.headersCompl = true;
-        }
-
-        onItemsChanged: {
-            tableInternal.elements = gqlModels.items;
-        }
-
-        onItemsInfoGqlStateChanged: {
-            if (state === "Loading"){
-                ldng.visible = true;
-            }
-            else{
-                ldng.visible = false;
-            }
-        }
-
-        onNotificationModelChanged: {
-            if (notificationModel != null){
-                if (notificationModel.ContainsKey("PagesCount")){
-                    pagination_.pagesSize = notificationModel.GetData("PagesCount");
-                }
-
-                if (notificationModel.ContainsKey("TotalCount")){
-                    pagination_.countAllElements = notificationModel.GetData("TotalCount");
-                }
+                collectionViewBaseContainer.doUpdateGui();
             }
         }
     }

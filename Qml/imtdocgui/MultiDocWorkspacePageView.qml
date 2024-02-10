@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
+import imtdocgui 1.0
 
 Rectangle {
     id: multiDocPageView;
@@ -9,20 +10,13 @@ Rectangle {
 
     property var startPageObj;
 
-    Component.onCompleted: {
-        console.log("multiDocPageView onCompleted");
-    }
-
     onStartPageObjChanged: {
-        console.log("multiDocPageView onStartPageObjChanged");
-
         let id = startPageObj["Id"];
+        let name = startPageObj["Name"];
         let source = startPageObj["Source"];
         let typeId = startPageObj["CommandId"];
 
-        Events.sendEvent("RegisterDocumentManager", {"TypeId" : id, "DocumentManager" : documentManager})
-
-        console.log("source", source);
+        MainDocumentManager.registerDocumentManager(typeId, documentManager);
 
         var startItemComp = Qt.createComponent(source);
         if (startItemComp.status !== Component.Ready) {
@@ -31,8 +25,7 @@ Rectangle {
             return;
         }
 
-        documentManager.registerDocument(typeId, startItemComp);
-        documentManager.insertNewDocument(typeId);
+        documentManager.addFixedView(startItemComp, name);
     }
 
     MultiDocWorkspaceView {

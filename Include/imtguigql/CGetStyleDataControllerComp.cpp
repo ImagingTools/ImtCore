@@ -1,11 +1,11 @@
 #include <imtguigql/CGetStyleDataControllerComp.h>
 
 
-// ACF includes
-#include <iprm/IOptionsList.h>
-
 // Qt includes
 #include <QtCore/QFile>
+
+// ACF includes
+#include <iprm/IOptionsList.h>
 
 
 namespace imtguigql
@@ -55,19 +55,7 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(con
 		imtbase::CTreeItemModel* sourceModelPtr = dataModelPtr->AddTreeModel("source");
 
 		QByteArray resources = resource.readAll();
-		bool ok = sourceModelPtr->CreateFromJson(resources);
-		if (!ok){
-		}
-	}
-
-	QFile decorators(":/Decorators/" + prefix + "decorators.theme");
-	if (decorators.open(QIODevice::ReadOnly)){
-		imtbase::CTreeItemModel* decoratorsModelPtr = dataModelPtr->AddTreeModel("decorators");
-
-		QByteArray decoratorsData = decorators.readAll();
-		bool ok = decoratorsModelPtr->CreateFromJson(decoratorsData);
-		if (!ok){
-		}
+		sourceModelPtr->CreateFromJson(resources);
 	}
 
 	return rootModelPtr.PopPtr();

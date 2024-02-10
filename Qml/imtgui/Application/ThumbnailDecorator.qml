@@ -25,7 +25,7 @@ Rectangle {
 
     property alias preferencePage: preferenceDialog;
     property alias userManagementProvider: userManagement;
-    property alias documentManager: mainDocumentManager;
+//    property alias documentManager: mainDocumentManager;
     property Item dialogManager: modalDialogManager;
 
     property alias menuPanelRadius: menuPanel.radius;
@@ -38,7 +38,7 @@ Rectangle {
     property SettingsObserver settingsObserver: null;
 
     Component.onCompleted: {
-        Events.subscribeEvent("StartLoading", loading.start);
+        Events.subscribeEvent("StartLoading", thumbnailDecoratorContainer.loadingPage.start);
         Events.subscribeEvent("StopLoading", loading.stop);
 
         Events.subscribeEvent("ShowPreferencePage", thumbnailDecoratorContainer.showPreferencePage);
@@ -46,8 +46,8 @@ Rectangle {
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("StartLoading", loading.start);
-        Events.unSubscribeEvent("StopLoading", loading.stop);
+        Events.unSubscribeEvent("StartLoading", thumbnailDecoratorContainer.loadingPage.start);
+        Events.unSubscribeEvent("StopLoading", thumbnailDecoratorContainer.loadingPage.stop);
 
         Events.unSubscribeEvent("ShowPreferencePage", thumbnailDecoratorContainer.showPreferencePage);
         Events.unSubscribeEvent("Logout", thumbnailDecoratorContainer.onLogout);
@@ -72,10 +72,10 @@ Rectangle {
 
         onModelStateChanged: {
             if (state === "Ready"){
-                loading.stop();
+                thumbnailDecoratorContainer.loadingPage.stop();
             }
             else{
-                 loading.start();
+                 thumbnailDecoratorContainer.loadingPage.start();
             }
         }
     }
@@ -87,7 +87,7 @@ Rectangle {
     function closeAllPages(){
         authorizationPage.visible = false;
         superuserPasswordPage.visible = false;
-        loading.visible = false;
+        thumbnailDecoratorContainer.loadingPage.visible = false;
         serverNoConnectionView.visible = false;
         preferenceDialog.visible = false;
     }
@@ -117,17 +117,7 @@ Rectangle {
             settingsProvider.serverModel = null;
         }
 
-        mainDocumentManager.clear();
-    }
-
-    Loading {
-        id: loading;
-
-        z: 10000;
-
-        anchors.fill: parent;
-
-        visible: false;
+        MainDocumentManager.clear();
     }
 
     MenuPanel {
@@ -143,6 +133,20 @@ Rectangle {
         model: pagesManager.pageModel;
 
         color: Style.color_menuPanel !==undefined ? Style.color_menuPanel : Style.imagingToolsGradient1;
+
+        Component.onCompleted: {
+            MainDocumentManager.documentOpened.connect(onDocumentOpened);
+        }
+
+        function onDocumentOpened(typeId, documentId, documentTypeId){
+            for (let i = 0; i < menuPanel.model.GetItemsCount(); i++){
+                let pageId = menuPanel.model.GetData("Id", i);
+                if (pageId === typeId){
+                    menuPanel.activePageIndex = i;
+                    break;
+                }
+            }
+        }
     }
 
     BottomPanel {
@@ -154,19 +158,19 @@ Rectangle {
         anchors.bottomMargin: thumbnailDecoratorContainer.mainMargin;
     }
 
-    MainDocumentManager {
-        id: mainDocumentManager;
+//    MainDocumentManager {
+//        id: mainDocumentManager;
 
-        onDocumentOpened: {
-            for (let i = 0; i < menuPanel.model.GetItemsCount(); i++){
-                let pageId = menuPanel.model.GetData("Id", i);
-                if (pageId === typeId){
-                    menuPanel.activePageIndex = i;
-                    break;
-                }
-            }
-        }
-    }
+//        onDocumentOpened: {
+//            for (let i = 0; i < menuPanel.model.GetItemsCount(); i++){
+//                let pageId = menuPanel.model.GetData("Id", i);
+//                if (pageId === typeId){
+//                    menuPanel.activePageIndex = i;
+//                    break;
+//                }
+//            }
+//        }
+//    }
 
     PagesManager {
         id: pagesManager;
@@ -183,16 +187,14 @@ Rectangle {
 
         activePageIndex: menuPanel.activePageIndex;
 
-        documentManager: mainDocumentManager;
-
         authorizationStatusProvider: authorizationPage;
 
         onModelStateChanged: {
             if (pagesManager.modelState === "Ready"){
-                loading.stop();
+                thumbnailDecoratorContainer.loadingPage.stop();
             }
             else{
-                 loading.start();
+//                 thumbnailDecoratorContainer.loadingPage.start();
             }
         }
     }
@@ -267,27 +269,37 @@ Rectangle {
         visible: false;
 
         onBeforeSetted: {
-             loading.start();
+             thumbnailDecoratorContainer.loadingPage.start();
         }
 
         onVisibleChanged: {
             if (visible){
-                loading.visible = false;
+                thumbnailDecoratorContainer.loadingPage.visible = false;
             }
         }
 
         onPasswordSetted: {
-            loading.stop();
+            thumbnailDecoratorContainer.loadingPage.stop();
 
             superuserPasswordPage.visible = false;
             authorizationPage.visible = true;
         }
 
         onFailed: {
-            loading.stop();
+            thumbnailDecoratorContainer.loadingPage.stop();
 
             thumbnailDecoratorContainer.closeAllPages();
         }
+    }
+
+    Loading {
+        id: loading;
+
+        z: 9999;
+
+        anchors.fill: parent;
+
+        visible: false;
     }
 
     Component {
@@ -355,8 +367,6 @@ Rectangle {
 
         visible: false;
     }
-
-
 
     // TODO
 //    function closeApp(){

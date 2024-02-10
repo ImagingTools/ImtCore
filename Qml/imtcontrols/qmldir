@@ -78,7 +78,9 @@ SortController 1.0 Models/SortController.qml
 StateMachine 1.0 Models/StateMachine.qml
 TreeItemModelConverter 1.0 ./Models/TreeItemModelConverter.qml
 TreeItemModelObserver 1.0 ./Models/TreeItemModelObserver.qml
-UuidGenerator 1.0 Models/UuidGenerator.qml
+singleton UuidGenerator 1.0 Models/UuidGenerator.qml
+CommandsController 1.0 Models/CommandsController.qml
+CommandsProvider 1.0 Models/CommandsProvider.qml
 
 AuxTable 1.0 ./Views/AuxTable.qml
 BarChart 1.0 ./Views/BarChart.qml

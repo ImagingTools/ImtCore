@@ -4,30 +4,21 @@ import imtgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
 
-Item {
+ViewBase {
     id: groupUsersContainer;
-
-    property TreeItemModel documentModel: TreeItemModel {}
-    property Item documentPtr: null;
 
     property int radius: 3;
 
-    property bool completed: usersProvider.completed;
-
     Component.onCompleted: {
         usersProvider.updateModel();
-    }
-
-    function blockEditing(){
-        usersTable.readOnly = true;
     }
 
     function updateGui(){
         console.log("GroupUsers updateGui");
 
         let userIds = [];
-        if (groupUsersContainer.documentModel.ContainsKey("Users")){
-            let roles = groupUsersContainer.documentModel.GetData("Users")
+        if (groupUsersContainer.model.ContainsKey("Users")){
+            let roles = groupUsersContainer.model.GetData("Users")
             if (roles !== ""){
                 userIds = roles.split(';');
             }
@@ -55,7 +46,7 @@ Item {
         }
 
         let result = selectedUserIds.join(';');
-        groupUsersContainer.documentModel.SetData("Users", result);
+        groupUsersContainer.model.SetData("Users", result);
     }
 
     Component{
@@ -75,6 +66,8 @@ Item {
         onModelUpdated: {
             if (usersProvider.collectionModel != null){
                 usersTable.elements = usersProvider.collectionModel;
+
+                groupUsersContainer.doUpdateGui();
             }
         }
     }
@@ -135,10 +128,10 @@ Item {
         checkable: true;
         radius: groupUsersContainer.radius;
 
+        readOnly: groupUsersContainer.readOnly;
+
         onCheckedItemsChanged: {
-            if (groupUsersContainer.documentPtr){
-                groupUsersContainer.documentPtr.doUpdateModel();
-            }
+            groupUsersContainer.doUpdateModel();
         }
     }
 }//Container

@@ -8,7 +8,6 @@ Item {
     signal undo();
     signal redo();
 
-
     function getCurrentStateModel()
     {
         if (internal.m_undoStack.length > 0){
@@ -200,6 +199,11 @@ Item {
     }
 
 
+    function setBlockingUpdateModel(blockingUpdateModel){
+        internal.m_isBlocked = blockingUpdateModel;
+    }
+
+
     function commandHandle(commandId)
     {
         if (commandId === "Undo"){
@@ -255,6 +259,31 @@ Item {
         undoRedoManager.makeChanges();
 
         internal.m_beginStateModel = internal.m_observedModel.CopyMe();
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Z";
+        enabled: true;
+        onActivated: {
+            console.log("Ctrl+Z")
+            let undoSteps = undoRedoManager.getAvailableUndoSteps();
+
+            if (undoSteps > 0){
+                undoRedoManager.commandHandle("Undo");
+            }
+        }
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Shift+Z";
+        enabled: true;
+        onActivated: {
+            console.log("Ctrl+Shift+Z")
+            let redoSteps = undoRedoManager.getAvailableRedoSteps();
+            if (redoSteps > 0){
+                undoRedoManager.commandHandle("Redo");
+            }
+        }
     }
 
 

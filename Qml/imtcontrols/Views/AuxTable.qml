@@ -40,7 +40,7 @@ Rectangle {
 
     property alias scrollbarItem: scrollbar;
 
-    property SortController sortController: null;
+//    property SortController sortController: null;
 
     property alias delegate: elementsListObj.delegate;
     property alias elements: elementsListObj.model;
@@ -90,6 +90,9 @@ Rectangle {
     property bool canMoveColumns : false;
     property bool isFrameScrolling : false;
     property int minCellWidth : 30;
+
+    property string currentHeaderId;
+    property string currentSortOrder: "ASC";
 
     property alias isMultiSelect: tableContainer.tableSelection.isMultiSelect;
 
@@ -142,9 +145,8 @@ Rectangle {
     signal checkedItemsChanged();
     signal selectionChanged(var selection);
 
-    signal selectItem(string idSelected, string name);
     signal rightButtonMouseClicked(int mouseX, int mouseY);
-    signal doubleClicked(int mouseX, int mouseY);
+    signal doubleClicked(string id, int index);
     signal setActiveFocusFromTable();
     signal headerClicked(string headerId);
     signal textFilterChanged(string id, int index, string text);
@@ -204,6 +206,8 @@ Rectangle {
         tableContainer.headerDecorator = tableContainer.tableDecorator.GetTreeItemModel("Headers");
         tableContainer.cellDecorator = tableContainer.tableDecorator.GetTreeItemModel("Cells");
         tableContainer.widthDecorator = tableContainer.tableDecorator.GetTreeItemModel("CellWidth");
+
+        console.log("tableContainer.widthDecorator", tableContainer.widthDecorator);
 
         tableContainer.emptyDecor = !tableContainer.tableDecorator.GetItemsCount();
 
@@ -877,9 +881,8 @@ Rectangle {
                     height: 10;
                     width: visible ? 10 : 0;
 
-                    visible: tableContainer.sortController && tableContainer.sortController.currentHeaderId === model.Id && tableContainer.hasSort;
-
-                    rotation:  tableContainer.sortController && tableContainer.sortController.currentOrder == "ASC" ? 180 : 0
+                    visible: tableContainer.currentHeaderId === model.Id && tableContainer.hasSort;
+                    rotation: tableContainer.currentSortOrder == "ASC" ? 180 : 0
 
                     sourceSize.width: width;
                     sourceSize.height: height;
@@ -904,19 +907,6 @@ Rectangle {
                     }
 
                     onClicked: {
-                        if (!tableContainer.sortController){
-                            return;
-                        }
-
-                        if (tableContainer.sortController.currentHeaderId !== model.Id){
-                            tableContainer.sortController.currentOrder = "ASC";
-
-                            tableContainer.sortController.currentHeaderId = model.Id;
-                        }
-                        else{
-                            tableContainer.sortController.currentOrder = tableContainer.sortController.currentOrder === "ASC" ? "DESC" : "ASC";
-                        }
-
                         tableContainer.headerClicked(model.Id);
                     }
                 }
@@ -1144,13 +1134,7 @@ Rectangle {
             }
 
             function selectionChanged(){
-                console.log("tableContainer selectionChanged")
-
                 tableDelegate.selected = tableContainer.tableSelection.selectedIndexes.includes(model.index);
-
-                if (tableDelegate.selected){
-                    //elementsListObj.positionViewAtIndex(model.index, ListView.Visible);
-                }
             }
 
             function checkedItemsChanged(){
@@ -1188,10 +1172,7 @@ Rectangle {
 
             onDoubleClicked: {
                 var point = mapToItem(null, mX, mY);
-                tableContainer.doubleClicked(point.x, point.y)
-
-                console.log("selectItem", model.Id, model.Name)
-                tableContainer.selectItem(model.Id, model.Name);
+                tableContainer.doubleClicked(model.Id, model.index)
             }
         }
     }//Elements ListView

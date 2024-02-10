@@ -18,6 +18,7 @@ Rectangle {
 
         Component.onCompleted: {
             var index = comboModel.InsertNewItem();
+
             comboModel.SetData("Id",index, index);
             comboModel.SetData("Name", "Name 1", index);
 
@@ -29,7 +30,6 @@ Rectangle {
             comboModel.SetData("Id",index, index);
             comboModel.SetData("Name", "Name 3", index);
         }
-
     }
 
     Column{
@@ -112,10 +112,7 @@ Rectangle {
 
                 KeyNavigation.right: textField;
                 KeyNavigation.tab: textField;
-
             }
-
-
         }//row - inputsRow
 
         Row{

@@ -3,38 +3,38 @@ import Acf 1.0
 import imtgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
+import imtguigql 1.0
+import imtdocgui 1.0
 
 CollectionView {
     id: userGroupCollectionViewContainer;
 
-    documentName: qsTr("Groups");
+    dataController: CollectionRepresentation {
+        collectionId: "Groups";
+    }
+
+    commandsController: CommandsRepresentationProvider {
+        commandId: "Groups";
+        uuid: userGroupCollectionViewContainer.viewId;
+    }
+
+    commandsDelegate: DocumentCollectionViewDelegate {
+        collectionView: userGroupCollectionViewContainer;
+
+        documentTypeId: "Group";
+        viewTypeId: "GroupEditor";
+    }
 
     Component.onCompleted: {
-        userGroupCollectionViewContainer.commandsDelegatePath = "../imtauthgui/UserGroupCollectionViewCommandsDelegate.qml";
+        collectionFilter.setSortingOrder("DESC");
+        collectionFilter.setSortingInfoId("LastModified");
 
-        userGroupCollectionViewContainer.commandId = "Groups";
-    }
+        let documentManager = MainDocumentManager.getDocumentManager("Administration");
+        if (documentManager){
+            userGroupCollectionViewContainer.commandsDelegate.documentManager = documentManager;
 
-    onDocumentManagerPtrChanged: {
-        if (documentManagerPtr){
-            documentManagerPtr.registerDocument("Group", userGroupDocumentComp);
-        }
-    }
-
-    function fillContextMenuModel(){
-        contextMenuModel.clear();
-
-        contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../../" + Style.getIconPath("Icons/Edit", Icon.State.On, Icon.Mode.Normal)});
-        contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../" + Style.getIconPath("Icons/Remove", Icon.State.On, Icon.Mode.Normal)});
-        contextMenuModel.append({"Id": "SetDescription", "Name": qsTr("Set Description"), "IconSource": ""});
-    }
-
-    function selectItem(id){
-        if (id === ""){
-            documentManagerPtr.insertNewDocument("Group");
-        }
-        else{
-            documentManagerPtr.openDocument(id, "Group");
+            documentManager.registerDocumentView("Group", "GroupEditor", userGroupDocumentComp);
+            documentManager.registerDocumentDataController("Group", dataControllerComp);
         }
     }
 
@@ -42,6 +42,32 @@ CollectionView {
         id: userGroupDocumentComp;
 
         UserGroupView {
+            id: groupEditor;
+            commandsController: CommandsRepresentationProvider {
+                commandId: "Group";
+                uuid: groupEditor.viewId;
+            }
+        }
+    }
+
+    Component {
+        id: dataControllerComp;
+
+        GqlDocumentDataController {
+            gqlGetCommandId: "GroupItem";
+            gqlUpdateCommandId: "GroupUpdate";
+            gqlAddCommandId: "GroupAdd";
+
+            function getDocumentName(){
+                let prefixName = qsTr("Groups");
+
+                if (documentModel.ContainsKey("Name")){
+                    return prefixName + " / " + documentModel.GetData("Name")
+                }
+
+                let newGroupName = qsTr("New Group");
+                return newGroupName;
+            }
         }
     }
 }

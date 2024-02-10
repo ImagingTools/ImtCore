@@ -1,9 +1,8 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtguigql 1.0
 import imtcontrols 1.0
-//import Qt.labs.qmlmodels 1.1
-// import QtQuick.Controls as QtControls
 
 Rectangle {
     id: container;
@@ -11,12 +10,6 @@ Rectangle {
     anchors.fill: parent;
 
     color: Style.backgroundColor;
-
-    property Item documentManagerPtr: null;
-
-    function addHeader(header){
-        headerText.text += "/ " + header;
-    }
 
     Component.onCompleted: {
         Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
@@ -45,40 +38,12 @@ Rectangle {
         if (groupsIndex >= 0){
             multiPageView.pagesModel.setProperty(groupsIndex, "Name", qsTr("Groups"))
         }
-
-        if (multiPageView.currentIndex >= 0){
-            headerText.text = qsTr("Administration") + " / " + multiPageView.pagesModel.get(multiPageView.currentIndex).Name;
-        }
-    }
-
-    Row {
-        id: header;
-
-        anchors.top: parent.top;
-        anchors.left: parent.left;
-        anchors.leftMargin: 10;
-
-        height: 40
-
-        spacing: 20;
-
-        Text {
-            id: headerText;
-
-            anchors.verticalCenter: parent.verticalCenter;
-
-            font.pixelSize: Style.fontSize_title;
-            font.family: Style.fontFamily;
-
-            color: Style.titleColor;
-        }
     }
 
     Component {
         id: roleCollectionComp;
 
         RoleCollectionView {
-            documentManagerPtr: container.documentManagerPtr;
         }
     }
 
@@ -86,7 +51,6 @@ Rectangle {
         id: userCollectionComp;
 
         UserCollectionView {
-            documentManagerPtr: container.documentManagerPtr;
         }
     }
 
@@ -94,26 +58,19 @@ Rectangle {
         id: userGroupCollectionComp;
 
         UserGroupCollectionView {
-            documentManagerPtr: container.documentManagerPtr;
         }
     }
 
     MultiPageView {
         id: multiPageView;
 
-        anchors.top: header.bottom;
+        anchors.top: parent.top;
         anchors.left: parent.left;
         anchors.right: parent.right;
         anchors.bottom: parent.bottom;
 
         Component.onCompleted: {
             updateModel();
-        }
-
-        onCurrentIndexChanged: {
-            if (currentIndex >= 0){
-                headerText.text = qsTr("Administration") + " / " + pagesModel.get(currentIndex).Name;
-            }
         }
 
         function updateModel(){

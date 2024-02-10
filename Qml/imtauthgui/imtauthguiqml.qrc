@@ -42,6 +42,9 @@
         <file alias="imtauthgui/ChangePasswordDialog.qml">ChangePasswordDialog.qml</file>
         <file alias="imtauthgui/PasswordInput.qml">PasswordInput.qml</file>
         <file alias="imtauthgui/CachedAccountCollection.qml">CachedAccountCollection.qml</file>
+	<file alias="imtauthgui/CachedRoleCollection.qml">CachedRoleCollection.qml</file>
+	<file alias="imtauthgui/CachedUserCollection.qml">CachedUserCollection.qml</file>
+	<file alias="imtauthgui/CachedGroupCollection.qml">CachedGroupCollection.qml</file>
         <file alias="imtauthgui/qmldir">qmldir</file>
     </qresource>
     <qresource prefix="/"/>

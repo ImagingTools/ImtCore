@@ -11,85 +11,47 @@ DocumentManager {
 
     property var startPageObj;
 
-    Component.onCompleted: {
-        documentController.setModelStateChanged.connect(documentManager.onSetModelStateChanged);
-        documentController.getModelStateChanged.connect(documentManager.onGetModelStateChanged);
-        documentController.updateModelStateChanged.connect(documentManager.onUpdateModelStateChanged);
-    }
-
     onStartPageObjChanged: {
-        documentLoader.source = startPageObj["Source"];
+        let id = startPageObj["Id"];
+        let name = startPageObj["Name"];
+        let source = startPageObj["Source"];
+        let typeId = startPageObj["CommandId"];
 
-        if (!documentLoader.item){
-            console.error("QML not loaded: ", documentLoader.source);
+        MainDocumentManager.registerDocumentManager(typeId, documentManager);
+
+        var startItemComp = Qt.createComponent(source);
+        if (startItemComp.status !== Component.Ready) {
+            console.log("Start component not ready!", startItemComp.errorString());
 
             return;
         }
 
-        if (documentLoader.item.commandId !== undefined){
-            documentLoader.item.commandId = startPageObj["CommandId"];
-        }
-
-        if(documentLoader.item.documentManagerPtr !== undefined){
-            documentLoader.item.documentManagerPtr = documentManager;
-        }
+        addInitialItem(startItemComp, name);
     }
 
     onDocumentAdded: {
-        let documentComp = documentManager.documentsModel.get(documentIndex).DocumentComp;
+        let documentComp = documentsModel.get(documentIndex).DocumentViewComp;
 
         stackView.push(documentComp);
     }
 
     onDocumentClosed: {
-        console.log("onDocumentClosed", documentIndex);
-
         stackView.pop();
     }
 
-    function checkState(state){
-        if (state == "Loading"){
-            Events.sendEvent("StartLoading");
-        }
-        else{
-            Events.sendEvent("StopLoading");
-        }
-    }
+    function addInitialItem(viewComp, name){
+        documentsModel.append({
+                                  "Uuid": UuidGenerator.generateUUID(),
+                                  "Title": name,
+                                  "DocumentViewComp": viewComp,
+                                  "Fixed": true
+                              });
 
-    function onGetModelStateChanged(){
-        checkState(documentController.getModelState);
-    }
-
-    function onSetModelStateChanged(){
-        checkState(documentController.setModelState);
-    }
-
-    function onUpdateModelStateChanged(){
-        checkState(documentController.updateModelState);
+        documentAdded(documentsModel.count - 1, "");
     }
 
     function setAlertPanel(alertPanelComp){
         alertPanel.sourceComponent = alertPanelComp;
-    }
-
-    Loader {
-        id: documentLoader;
-
-        anchors.fill: parent;
-
-        visible: stackView.countPage == 0;
-
-        onLoaded: {
-            if (item.documentManagerPtr !== undefined){
-                item.documentManagerPtr = documentManager;
-            }
-        }
-
-        onStatusChanged: {
-            if (status === Loader.Error){
-                console.error("Document loading was failed", documentLoader.source);
-            }
-        }
     }
 
     Loader {
@@ -104,44 +66,128 @@ DocumentManager {
         visible: alertPanel.status == Loader.Ready;
     }
 
+    Item {
+        id: buttonPanel;
+
+        anchors.top: alertPanel.bottom;
+        anchors.left: parent.left;
+        anchors.leftMargin: Style.size_mainMargin;
+
+        width: visible ? closeButton.width: 0;
+        height: headersListView.height;
+
+        visible: stackView.countPage > 1;
+
+        ToolButton {
+            id: closeButton;
+
+            anchors.centerIn: buttonPanel;
+
+            width: visible ? 25: 0;
+            height: width;
+
+            iconSource: "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal);
+
+            onClicked: {
+                let index = documentManager.documentsModel.count - 1 ;
+                if (index > 0){
+                    let documentId = documentManager.documentsModel.get(index).Uuid;
+
+                    Events.sendEvent(documentId + "CommandActivated", "Close")
+                }
+            }
+        }
+    }
+
+    ListView {
+        id: headersListView;
+
+        anchors.top: alertPanel.bottom;
+        anchors.left: buttonPanel.right;
+        anchors.leftMargin: Style.size_mainMargin;
+        anchors.right: parent.right;
+
+        height: 40;
+
+        orientation: ListView.Horizontal;
+        boundsBehavior: Flickable.StopAtBounds;
+
+        model: documentManager.documentsModel;
+
+        spacing: Style.size_mainMargin;
+
+        delegate: Item {
+            width: content.width;
+            height: headersListView.height;
+
+            Row {
+                id: content;
+
+                height: parent.height;
+
+                spacing: Style.size_mainMargin;
+
+                Text {
+                    id: separator;
+
+                    anchors.verticalCenter: content.verticalCenter;
+
+                    font.pixelSize: Style.fontSize_title;
+                    font.family: Style.fontFamily;
+
+                    color: Style.titleColor;
+
+                    text: "/"
+
+                    visible: model.index > 0;
+                }
+
+                Text {
+                    id: headerText;
+
+                    anchors.verticalCenter: content.verticalCenter;
+
+                    font.pixelSize: Style.fontSize_title;
+                    font.family: Style.fontFamily;
+
+                    color: Style.titleColor;
+
+                    text: model.Title;
+                }
+            }
+
+            MouseArea {
+                anchors.fill: parent;
+
+                onClicked: {
+                }
+            }
+        }
+    }
+
     StackView {
         id: stackView;
 
         z: 10;
 
-        anchors.top: alertPanel.bottom;
+        anchors.top: headersListView.bottom;
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
 
         onItemAdded: {
+            console.log("onItemAdded", index, item);
             let documentObj = documentManager.documentsModel.get(index);
 
-            if (item.uuid !== undefined){
-                item.uuid = documentObj.Uuid;
+            if (item.viewId !== undefined){
+                item.viewId = documentObj.Uuid;
             }
 
-            if (item.documentManagerPtr !== undefined){
-                item.documentManagerPtr = documentManager;
+            let documentData = documentObj.DocumentData;
+            if (documentData){
+                documentData.views.push(item);
+                documentData.viewAdded(item);
             }
-
-            if (item.documentTypeId !== undefined){
-                item.documentTypeId = documentObj.TypeId;
-            }
-
-            if (item.documentModel !== undefined){
-                item.documentModel = documentObj.Model;
-            }
-
-            documentManager.documentsModel.setProperty(index, "DocumentObj", item);
         }
-    }
-
-    Loading {
-        id: loading;
-
-        anchors.fill: parent;
-
-        visible: false;
     }
 }

@@ -1,231 +1,69 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtguigql 1.0
+import imtcontrols 1.0
+import imtdocgui 1.0
 
-QtObject {
+DocumentDataController {
     id: container;
 
-    property string getModelState: gqlGetModel.state;
-    property string setModelState: gqlSetModel.state;
-    property string updateModelState: gqlUpdateModel.state;
+    property string gqlGetCommandId;
+    property string gqlAddCommandId;
+    property string gqlUpdateCommandId;
 
+    signal saved(string id, string name);
     signal error(string message, string type);
 
-    function getData(documentTypeId, documentId, additionInputParams, callback){
-        if (documentTypeId === ""){
-            console.error("Get data object was failed! DocumentTypeId is invalid.");
-            return;
-        }
-
-        if (!additionInputParams){
-            additionInputParams = {}
-        }
-
-        container.gqlGetModel.getData(documentTypeId, documentId, additionInputParams, callback);
+    onError: {
+        Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
     }
 
-    function setData(addCommandId, documentId, documentData, additionInputParams, callback){
-        console.log("setData", addCommandId, documentId, documentData, callback);
-
-        if (addCommandId === ""){
-            console.error("Set data object was failed! addCommandId is invalid.");
-            return;
+    onDocumentModelChanged: {
+        if (documentModel.ContainsKey("Name")){
+            documentName = documentModel.GetData("Name");
         }
-
-        if (!additionInputParams){
-            additionInputParams = {}
-        }
-
-        container.gqlSetModel.setData(addCommandId, documentId, documentData, additionInputParams, callback);
     }
 
-    function updateData(documentTypeId, documentId, documentData, additionInputParams, callback){
-        if (documentTypeId === ""){
-            console.error("Update data object was failed! DocumentTypeId is invalid.");
-            return;
-        }
-
-        if (!additionInputParams){
-            additionInputParams = {}
-        }
-
-        container.gqlUpdateModel.setData(documentTypeId, documentId, documentData,additionInputParams, callback);
+    onSaved: {
+        documentName = name;
+        documentId = id;
     }
 
-    property GqlModel gqlGetModel: GqlModel {
-        function getData(documentTypeId, documentId, additionInputParams, callback){
-            var query = Gql.GqlRequest("query", documentTypeId + "Item");
+    function getDocumentName(){
+        return documentName;
+    }
 
-            var queryFields = Gql.GqlObject("item");
-            queryFields.InsertField("Id");
-            query.AddField(queryFields);
+    function updateDocumentModel(){
+        gqlGetModel.getData();
+    }
 
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", documentId);
+    function insertDocument(){
+        console.log("insertDocument", documentModel.toJSON());
+        gqlAddModel.save();
+    }
 
-            if (Object.keys(additionInputParams).length > 0){
-                let additionParams = Gql.GqlObject("addition");
-                for (let key in additionInputParams){
-                    additionParams.InsertField(key, additionInputParams[key]);
-                }
-                inputParams.InsertFieldObject(additionParams);
-            }
+    function saveDocument(){
+        console.log("saveDocument", documentModel.toJSON());
 
-            query.AddParam(inputParams);
+        gqlUpdateModel.save();
+    }
 
-            var gqlData = query.GetQuery();
-
-            this.SetGqlQuery(gqlData);
-
-            let onResult = function(){
-                let state = container.gqlGetModel.state;
-                console.log("onResult", state);
-
-                if (state === "Error"){
-                    container.gqlGetModel.onStateChanged.disconnect(onResult);
-
-                    container.error("Network error", "Critical");
-                }
-                else if (state === "Ready"){
-                    if (container.gqlGetModel.ContainsKey("errors")){
-                        let dataModelLocal = container.gqlGetModel.GetData("errors");
-
-                        if (dataModelLocal.ContainsKey(documentTypeId + "Item")){
-                            dataModelLocal = dataModelLocal.GetData(documentTypeId + "Item");
-                        }
-
-                        let message = ""
-                        if (dataModelLocal.ContainsKey("message")){
-                            message = dataModelLocal.GetData("message");
-                        }
-
-                        let type;
-                        if (dataModelLocal.ContainsKey("type")){
-                            type = dataModelLocal.GetData("type");
-                        }
-
-                        container.error(message, type);
-                    }
-
-                    else if (container.gqlGetModel.ContainsKey("data")){
-                        let dataModelLocal = container.gqlGetModel.GetData("data")
-
-                        if (dataModelLocal.ContainsKey(documentTypeId + "Item")){
-                            dataModelLocal = dataModelLocal.GetData(documentTypeId + "Item")
-
-                            if (callback){
-                                callback(dataModelLocal)
-                            }
-                        }
-                    }
-
-                    container.gqlGetModel.onStateChanged.disconnect(onResult);
-                }
-            }
-
-            this.onStateChanged.connect(onResult);
-        }
-    }//GqlModel itemModel
-
-    property GqlModel gqlSetModel: GqlModel {
-        function setData(addCommandId, documentId, documentData, additionInputParams, callback){
-
-            console.log("gqlSetModel additionInputParams", JSON.stringify(additionInputParams));
-            var query = Gql.GqlRequest("mutation", addCommandId);
-
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", documentId);
-            var jsonString = documentData.toJSON();
-            inputParams.InsertField ("Item", jsonString);
-
-            if (Object.keys(additionInputParams).length > 0){
-                let additionParams = Gql.GqlObject("addition");
-                for (let key in additionInputParams){
-                    additionParams.InsertField(key, additionInputParams[key]);
-                }
-                inputParams.InsertFieldObject(additionParams);
-            }
-
-            query.AddParam(inputParams);
-
-            var queryFields = Gql.GqlObject("addedNotification");
-            queryFields.InsertField("Id");
-            query.AddField(queryFields);
-
-            var gqlData = query.GetQuery();
-            this.SetGqlQuery(gqlData);
-
-            let onResult = function(){
-                let state = container.gqlSetModel.state;
-                console.log("onResult", state);
-
-                if (state === "Error"){
-                    container.gqlSetModel.onStateChanged.disconnect(onResult);
-
-                    container.error("Network error", "Critical");
-                }
-                if (state === "Ready"){
-                    var dataModelLocal;
-                    if (container.gqlSetModel.ContainsKey("errors")){
-                        dataModelLocal = container.gqlSetModel.GetData("errors");
-
-                        if (dataModelLocal.ContainsKey(addCommandId)){
-                            dataModelLocal = dataModelLocal.GetData(addCommandId);
-                        }
-
-                        let message = ""
-                        if (dataModelLocal.ContainsKey("message")){
-                            message = dataModelLocal.GetData("message");
-                        }
-
-                        let type;
-                        if (dataModelLocal.ContainsKey("type")){
-                            type = dataModelLocal.GetData("type");
-                        }
-
-                        container.error(message, type);
-                    }
-
-                    else if (container.gqlSetModel.ContainsKey("data")){
-                        dataModelLocal = container.gqlSetModel.GetData("data");
-
-                        if (dataModelLocal.ContainsKey(addCommandId)){
-                            dataModelLocal = dataModelLocal.GetData(addCommandId);
-                            dataModelLocal = dataModelLocal.GetData("addedNotification");
-
-                            let documentId = dataModelLocal.GetData("Id");
-                            let documentName = dataModelLocal.GetData("Name");
-
-                            if (callback){
-                                callback(documentId, documentName);
-                            }
-                        }
-                    }
-
-                    container.gqlSetModel.onStateChanged.disconnect(onResult);
-                }
-            }
-
-            this.onStateChanged.connect(onResult);
-        }
+    function getAdditionalInputParams(){
+        let obj = {}
+        return obj;
     }
 
     property GqlModel gqlUpdateModel: GqlModel {
-        function setData(updateCommandId, documentId, documentData, additionInputParams, callback){
-            var query = Gql.GqlRequest("mutation", updateCommandId);
+        function save(){
+            var query = Gql.GqlRequest("mutation", container.gqlUpdateCommandId);
 
             var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", documentId);
-            var jsonString = documentData.toJSON();
-            inputParams.InsertField ("Item", jsonString);
+            inputParams.InsertField("Id", container.documentId);
+            inputParams.InsertField ("Item", container.documentModel.toJSON());
 
-            if (Object.keys(additionInputParams).length > 0){
-                let additionParams = Gql.GqlObject("addition");
-                for (let key in additionInputParams){
-                    additionParams.InsertField(key, additionInputParams[key]);
-                }
-
-                inputParams.InsertFieldObject(additionParams);
+            let inputParamsObj = container.getAdditionalInputParams();
+            for (let key in inputParamsObj){
+                inputParams.InsertField(key, inputParamsObj[key]);
             }
 
             query.AddParam(inputParams);
@@ -238,9 +76,8 @@ QtObject {
             this.SetGqlQuery(gqlData);
 
             let onResult = function(){
+                console.log("onResult", container.gqlUpdateModel.state);
                 let state = container.gqlUpdateModel.state;
-                console.log("onResult", state);
-
                 if (state === "Error"){
                     container.gqlUpdateModel.onStateChanged.disconnect(onResult);
 
@@ -251,8 +88,8 @@ QtObject {
                     if (container.gqlUpdateModel.ContainsKey("errors")){
                         dataModelLocal = container.gqlUpdateModel.GetData("errors");
 
-                        if (dataModelLocal.ContainsKey(updateCommandId)){
-                            dataModelLocal = dataModelLocal.GetData(updateCommandId);
+                        if (dataModelLocal.ContainsKey(container.gqlUpdateCommandId)){
+                            dataModelLocal = dataModelLocal.GetData(container.gqlUpdateCommandId);
                         }
 
                         let message = ""
@@ -271,16 +108,14 @@ QtObject {
                     else if (container.gqlUpdateModel.ContainsKey("data")){
                         dataModelLocal = container.gqlUpdateModel.GetData("data");
 
-                        if (dataModelLocal.ContainsKey(updateCommandId)){
-                            dataModelLocal = dataModelLocal.GetData(updateCommandId);
+                        if (dataModelLocal.ContainsKey(container.gqlUpdateCommandId)){
+                            dataModelLocal = dataModelLocal.GetData(container.gqlUpdateCommandId);
                             dataModelLocal = dataModelLocal.GetData("updatedNotification");
 
                             let documentId = dataModelLocal.GetData("Id");
                             let documentName = dataModelLocal.GetData("Name");
 
-                            if (callback){
-                                callback(documentId, documentName);
-                            }
+                            container.saved(documentId, documentName);
                         }
                     }
 
@@ -288,7 +123,147 @@ QtObject {
                 }
             }
 
+            container.gqlUpdateModel.onStateChanged.connect(onResult);
+        }
+    }
+
+    property GqlModel gqlGetModel: GqlModel {
+        function getData(){
+            var query = Gql.GqlRequest("query", container.gqlGetCommandId);
+
+            var queryFields = Gql.GqlObject("item");
+            queryFields.InsertField("Id");
+            query.AddField(queryFields);
+
+            var inputParams = Gql.GqlObject("input");
+            inputParams.InsertField("Id", container.documentId);
+
+            let inputParamsObj = container.getAdditionalInputParams();
+            for (let key in inputParamsObj){
+                inputParams.InsertField(key, inputParamsObj[key]);
+            }
+
+            query.AddParam(inputParams);
+
+            var gqlData = query.GetQuery();
+
+            this.SetGqlQuery(gqlData);
+
+            let onResult = function(){
+                console.log("onResult",container.gqlGetModel.toJSON());
+                let state = container.gqlGetModel.state;
+                if (state === "Error"){
+                    container.gqlGetModel.onStateChanged.disconnect(onResult);
+
+                    container.error("Network error", "Critical");
+                }
+                else if (state === "Ready"){
+                    if (container.gqlGetModel.ContainsKey("errors")){
+                        let dataModelLocal = container.gqlGetModel.GetData("errors");
+
+                        if (dataModelLocal.ContainsKey(container.gqlGetCommandId)){
+                            dataModelLocal = dataModelLocal.GetData(container.gqlGetCommandId);
+                        }
+
+                        let message = ""
+                        if (dataModelLocal.ContainsKey("message")){
+                            message = dataModelLocal.GetData("message");
+                        }
+
+                        let type;
+                        if (dataModelLocal.ContainsKey("type")){
+                            type = dataModelLocal.GetData("type");
+                        }
+
+                        container.error(message, type);
+                    }
+
+                    else if (container.gqlGetModel.ContainsKey("data")){
+                        let dataModelLocal = container.gqlGetModel.GetData("data")
+                        if (dataModelLocal.ContainsKey(container.gqlGetCommandId)){
+                            container.documentModel = dataModelLocal.GetData(container.gqlGetCommandId)
+                        }
+                    }
+
+                    container.gqlGetModel.onStateChanged.disconnect(onResult);
+                }
+            }
+
             this.onStateChanged.connect(onResult);
+        }
+    }//GqlModel itemModel
+
+    property GqlModel gqlAddModel: GqlModel {
+        function save(){
+            var query = Gql.GqlRequest("mutation", container.gqlAddCommandId);
+
+            var inputParams = Gql.GqlObject("input");
+            inputParams.InsertField("Id", container.documentId);
+            inputParams.InsertField ("Item", container.documentModel.toJSON());
+
+            let inputParamsObj = container.getAdditionalInputParams();
+            for (let key in inputParamsObj){
+                inputParams.InsertField(key, inputParamsObj[key]);
+            }
+
+            query.AddParam(inputParams);
+
+            var queryFields = Gql.GqlObject("addedNotification");
+            queryFields.InsertField("Id");
+            query.AddField(queryFields);
+
+            var gqlData = query.GetQuery();
+            this.SetGqlQuery(gqlData);
+
+            let onResult = function(){
+                console.log("onResult", container.gqlAddModel.state);
+                let state = container.gqlAddModel.state;
+                if (state === "Error"){
+                    container.gqlAddModel.onStateChanged.disconnect(onResult);
+
+                    container.error("Network error", "Critical");
+                }
+                if (state === "Ready"){
+                    var dataModelLocal;
+                    if (container.gqlAddModel.ContainsKey("errors")){
+                        dataModelLocal = container.gqlAddModel.GetData("errors");
+
+                        if (dataModelLocal.ContainsKey(container.gqlAddCommandId)){
+                            dataModelLocal = dataModelLocal.GetData(container.gqlAddCommandId);
+                        }
+
+                        let message = ""
+                        if (dataModelLocal.ContainsKey("message")){
+                            message = dataModelLocal.GetData("message");
+                        }
+
+                        let type;
+                        if (dataModelLocal.ContainsKey("type")){
+                            type = dataModelLocal.GetData("type");
+                        }
+
+                        container.error(message, type);
+                    }
+
+                    else if (container.gqlAddModel.ContainsKey("data")){
+                        dataModelLocal = container.gqlAddModel.GetData("data");
+
+                        if (dataModelLocal.ContainsKey(container.gqlAddCommandId)){
+                            dataModelLocal = dataModelLocal.GetData(container.gqlAddCommandId);
+                            dataModelLocal = dataModelLocal.GetData("addedNotification");
+
+                            let documentId = dataModelLocal.GetData("Id");
+                            let documentName = dataModelLocal.GetData("Name");
+
+                            container.saved(documentId, documentName);
+                        }
+                    }
+
+                    container.gqlAddModel.onStateChanged.disconnect(onResult);
+                }
+            }
+
+            container.gqlAddModel.onStateChanged.connect(onResult);
         }
     }
 }

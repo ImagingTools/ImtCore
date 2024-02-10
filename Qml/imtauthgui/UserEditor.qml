@@ -3,47 +3,36 @@ import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
 
-Item {
+ViewBase {
     id: userEditorContainer;
-
-    property TreeItemModel documentModel: TreeItemModel {}
-    property Item documentPtr: null;
 
     property int mainMargin: 0;
     property int panelWidth: 400;
-    property int radius: 3;
-
-    function blockEditing(){
-        usernameInput.readOnly = true;
-        nameInput.readOnly = true;
-        mailInput.readOnly = true;
-        passwordInput.readOnly = true;
-    }
 
     function updateGui(){
-        if (userEditorContainer.documentModel.ContainsKey("Username")){
-            usernameInput.text = userEditorContainer.documentModel.GetData("Username");
+        if (userEditorContainer.model.ContainsKey("Username")){
+            usernameInput.text = userEditorContainer.model.GetData("Username");
         }
         else{
             usernameInput.text = "";
         }
 
-        if (userEditorContainer.documentModel.ContainsKey("Name")){
-            nameInput.text = userEditorContainer.documentModel.GetData("Name");
+        if (userEditorContainer.model.ContainsKey("Name")){
+            nameInput.text = userEditorContainer.model.GetData("Name");
         }
         else{
             nameInput.text = "";
         }
 
-        if (userEditorContainer.documentModel.ContainsKey("Email")){
-            mailInput.text = userEditorContainer.documentModel.GetData("Email");
+        if (userEditorContainer.model.ContainsKey("Email")){
+            mailInput.text = userEditorContainer.model.GetData("Email");
         }
         else{
             mailInput.text = "";
         }
 
-        if (userEditorContainer.documentModel.ContainsKey("Password")){
-            passwordInput.text = userEditorContainer.documentModel.GetData("Password");
+        if (userEditorContainer.model.ContainsKey("Password")){
+            passwordInput.text = userEditorContainer.model.GetData("Password");
         }
         else{
             passwordInput.text = "";
@@ -51,10 +40,10 @@ Item {
     }
 
     function updateModel(){
-        userEditorContainer.documentModel.SetData("Username", usernameInput.text);
-        userEditorContainer.documentModel.SetData("Name", nameInput.text);
-        userEditorContainer.documentModel.SetData("Email", mailInput.text);
-        userEditorContainer.documentModel.SetData("Password", passwordInput.text);
+        userEditorContainer.model.SetData("Username", usernameInput.text);
+        userEditorContainer.model.SetData("Name", nameInput.text);
+        userEditorContainer.model.SetData("Email", mailInput.text);
+        userEditorContainer.model.SetData("Password", passwordInput.text);
     }
 
     Component{
@@ -114,13 +103,13 @@ Item {
 
                     placeHolderText: qsTr("Enter the username");
 
+                    readOnly: userEditorContainer.readOnly;
+
                     onEditingFinished: {
-                        if (userEditorContainer.documentPtr){
-                            let oldText = userEditorContainer.documentModel.GetData("Username");
+                            let oldText = userEditorContainer.model.GetData("Username");
                             if (oldText && oldText !== usernameInput.text || !oldText && usernameInput.text !== ""){
-                                userEditorContainer.documentPtr.doUpdateModel();
+                                userEditorContainer.doUpdateModel();
                             }
-                        }
                     }
 
                     KeyNavigation.tab: passwordInput;
@@ -148,13 +137,13 @@ Item {
 
                     echoMode: TextInput.Password;
 
+                    readOnly: userEditorContainer.readOnly;
+
                     onEditingFinished: {
-                        if (userEditorContainer.documentPtr){
-                            let oldText = userEditorContainer.documentModel.GetData("Password");
+                            let oldText = userEditorContainer.model.GetData("Password");
                             if (oldText && oldText !== passwordInput.text || !oldText && passwordInput.text !== ""){
-                                userEditorContainer.documentPtr.doUpdateModel();
+                                userEditorContainer.doUpdateModel();
                             }
-                        }
                     }
 
                     KeyNavigation.tab: nameInput;
@@ -180,13 +169,12 @@ Item {
                     height: 30;
 
                     placeHolderText: qsTr("Enter the name");
+                    readOnly: userEditorContainer.readOnly;
 
                     onEditingFinished: {
-                        if (userEditorContainer.documentPtr){
-                            let oldText = userEditorContainer.documentModel.GetData("Name");
-                            if (oldText && oldText !== nameInput.text || !oldText && nameInput.text !== ""){
-                                userEditorContainer.documentPtr.doUpdateModel();
-                            }
+                        let oldText = userEditorContainer.model.GetData("Name");
+                        if (oldText && oldText !== nameInput.text || !oldText && nameInput.text !== ""){
+                            userEditorContainer.doUpdateModel();
                         }
                     }
 
@@ -220,11 +208,10 @@ Item {
                     textInputValidator: mailValid;
 
                     placeHolderText: qsTr("Enter the email");
+                    readOnly: userEditorContainer.readOnly;
 
                     onEditingFinished: {
-                        if (userEditorContainer.documentPtr){
-                            userEditorContainer.documentPtr.doUpdateModel();
-                        }
+                        userEditorContainer.doUpdateModel();
                     }
 
                     KeyNavigation.tab: usernameInput;

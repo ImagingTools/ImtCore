@@ -2,24 +2,15 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 import imtcontrols 1.0
-import imtguigql 1.0
 
 Rectangle {
     id: container;
 
     color: Style.backgroundColor;
 
-    property string getMetaInfoGqlCommand;
-
-    property var modelData;
-
+    property TreeItemModel metaInfoModel: TreeItemModel {}
     property int elementHeight: 20;
-
     property bool contentVisible: true;
-
-    function getMetaInfo(selectedId){
-        metaInfo.getMetaInfo(selectedId);
-    }
 
     Flickable {
         id: collectionMetaInfo;
@@ -39,12 +30,12 @@ Rectangle {
             anchors.rightMargin: 5;
             anchors.leftMargin: 5;
 
-            visible: container.contentVisible && !loading.visible;
+            visible: container.contentVisible;
 
             Repeater {
                 id: repeaterColumn;
 
-                model: container.modelData;
+                model: container.metaInfoModel;
 
                 delegate: Item {
                     id: repeaterTitle;
@@ -119,77 +110,5 @@ Rectangle {
             }
         }//Column main
     }
-
-    Loading {
-        id: loading;
-
-        anchors.top: parent.top;
-        anchors.horizontalCenter: parent.horizontalCenter;
-
-        width: parent.width;
-        height: 100;
-
-        indicatorSize: 20;
-
-        visible: metaInfo.state === "Loading";
-    }
-
-    GqlModel {
-        id: metaInfo;
-
-        function getMetaInfo(selectedId){
-            console.log( "CollectionView metaInfo getMetaInfo");
-            var query = Gql.GqlRequest("query", container.getMetaInfoGqlCommand);
-
-            var inputParams = Gql.GqlObject("input");
-            inputParams.InsertField("Id", selectedId);
-            //            inputParams.InsertField("ProductId", window.productId);
-            query.AddParam(inputParams);
-
-            var queryFields = Gql.GqlObject("metaInfo");
-            queryFields.InsertField("Id");
-            queryFields.InsertField("Successed");
-            query.AddField(queryFields);
-
-            var gqlData = query.GetQuery();
-            console.log("PackageCollectionView metaInfo query ", gqlData);
-            this.SetGqlQuery(gqlData);
-        }
-
-        onStateChanged: {
-            console.log("State:", this.state, metaInfo);
-            if (this.state === "Ready"){
-                var dataModelLocal;
-
-                if (metaInfo.ContainsKey("errors")){
-                    dataModelLocal = metaInfo.GetData("errors");
-                    let message = ""
-                    if (dataModelLocal.ContainsKey("message")){
-                        message = dataModelLocal.GetData("message");
-                    }
-
-                    let type;
-                    if (dataModelLocal.ContainsKey("type")){
-                        type = dataModelLocal.GetData("type");
-                    }
-
-                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
-
-                    return;
-                }
-
-                if (metaInfo.ContainsKey("data")){
-                    dataModelLocal = metaInfo.GetData("data");
-
-                    if (dataModelLocal.ContainsKey(container.getMetaInfoGqlCommand)){
-                        dataModelLocal = dataModelLocal.GetData(container.getMetaInfoGqlCommand);
-                        console.log( "dataModelLocal", dataModelLocal.toJSON());
-
-                        container.modelData = dataModelLocal;
-                    }
-                }
-            }
-        }
-    }//MetaInfo
 }
 

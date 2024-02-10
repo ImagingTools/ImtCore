@@ -3,16 +3,12 @@ import Acf 1.0
 import imtgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
+import imtauthgui 1.0
 
-Item {
+ViewBase {
     id: userRolesContainer;
 
-    property TreeItemModel documentModel: TreeItemModel {}
-    property Item documentPtr: null;
-
     property int radius: 3;
-
-    property bool completed: rolesProvider.completed;
 
     Component.onCompleted: {
         rolesProvider.updateModel();
@@ -30,20 +26,18 @@ Item {
                 if (rolesProvider.collectionModel.ContainsKey("Roles")){
                     let rolesModel = rolesProvider.collectionModel.GetData("Roles");
                     rolesTable.elements = rolesModel;
+
+                    userRolesContainer.doUpdateGui();
                 }
             }
         }
     }
 
-    function blockEditing(){
-        rolesTable.readOnly = true;
-    }
-
     function updateGui(){
         console.log("UserRoles updateGui");
         let roleIds = [];
-        if (userRolesContainer.documentModel.ContainsKey("Roles")){
-            let roles = userRolesContainer.documentModel.GetData("Roles")
+        if (userRolesContainer.model.ContainsKey("Roles")){
+            let roles = userRolesContainer.model.GetData("Roles")
             if (roles !== ""){
                 roleIds = roles.split(';');
             }
@@ -71,7 +65,7 @@ Item {
         }
 
         let result = selectedRoleIds.join(';');
-        userRolesContainer.documentModel.SetData("Roles", result);
+        userRolesContainer.model.SetData("Roles", result);
     }
 
     Component{
@@ -140,10 +134,10 @@ Item {
         checkable: true;
         radius: userRolesContainer.radius;
 
+        readOnly: userRolesContainer.readOnly;
+
         onCheckedItemsChanged: {
-            if (userRolesContainer.documentPtr){
-                userRolesContainer.documentPtr.doUpdateModel();
-            }
+            userRolesContainer.doUpdateModel();
         }
     }
 }//Container

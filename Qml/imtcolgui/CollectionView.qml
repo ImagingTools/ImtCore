@@ -4,445 +4,167 @@ import imtgui 1.0
 import imtdocgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
-import imtguigql 1.0
 
-Item {
-    id: collectionViewContainer;
+CollectionViewBase {
+    id: collectionView;
 
-    property string uuid;
-    property var documentManagerPtr: null;
-    property string documentName;
+    property bool visibleMetaInfo: false;
 
-    property int contentMargins: 0;
+    property var dataController: null;
 
-    property alias baseCollectionView: collectionViewBase;
+//    property var templateContextMenuModel: [
+//        {"Id": "Edit"},
+//        {"Id": ""},
+//        {"Id": "Rename"},
+//        {"Id": "SetDescription"}
+//    ]
 
-    property bool isUsedDocumentManager: true;
-    property bool visibleMetaInfo: true;
-    property bool hasFilter: true;
+    QtObject {
+        id: internal;
 
-    property string commandId;
-    property string documentTypeId;
+        property bool guiUpdateRequired: false
 
-    property string commandsDelegatePath: "CollectionViewCommandsDelegateBase.qml";
-    property alias commandsDelegate: commandsLoader.item;
-
-    property alias table: collectionViewBase.table;
-    property alias tableElementsDelegate: collectionViewBase.tableElementsDelegate;
-    property alias tableHeadersDelegate: collectionViewBase.tableHeadersDelegate;
-    property alias elementsList: collectionViewBase.elementsList;
-    property alias tableMinWidth: collectionViewBase.tableMinWidth;
-    property alias tableDecoratorPath: collectionViewBase.tableDecoratorPath;
-    property alias tableDecoratorComp: collectionViewBase.tableDecoratorComp;
-    property alias tableHeaderHeight: collectionViewBase.tableHeaderHeight;
-    property alias tableItemHeight: collectionViewBase.tableItemHeight;
-    property alias metaInfo: collectionMetaInfo;
-    property alias tableCellDecorator: collectionViewBase.tableCellDecorator;
-    property alias tableWidthDecorator: collectionViewBase.tableWidthDecorator;
-    property alias tableWidth: collectionViewBase.tableWidth;
-    property alias tableHeaders: collectionViewBase.tableHeaders;
-
-
-    property alias filterMenu: collectionViewBase.filterMenu;
-    property alias filterMenuVisible: collectionViewBase.filterMenuVisible;
-    property alias modelFilter: collectionViewBase.modelFilter;
-    property alias defaultSortHeaderIndex: collectionViewBase.defaultSortHeaderIndex;
-    property alias defaultOrderType: collectionViewBase.defaultOrderType;
-
-    property TreeItemModel notificationModel: collectionViewBase.commands.notificationModel;
-
-    property ListModel contextMenuModel: ListModel {}
-
-    property alias commandsProvider: commandsProviderLocal;
-
-    property bool hasRemoteChanges: false;
-    property bool localizationChanged: false;
-
-    signal elementsChanged();
-    signal headersChanged();
-
-    signal filterDecoratorLoaded();
+        function filterMenuActivate(){
+            if (collectionView.hasFilter){
+                collectionView.filterMenuVisible = !collectionView.filterMenuVisible;
+            }
+        }
+    }
 
     Component.onCompleted: {
-        Events.subscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
-        Events.subscribeEvent("OnLocalizationChanged", collectionViewContainer.onLocalizationChanged);
-        Events.subscribeEvent("UpdateAllModels", collectionViewContainer.receiveRemoteChanges);
+        Events.subscribeEvent("FilterActivated", internal.filterMenuActivate);
+        Events.subscribeEvent("OnLocalizationChanged", collectionView.onLocalizationChanged);
     }
 
     Component.onDestruction: {
-        console.log("CollectionView onDestruction", commandId)
-
-        Events.unSubscribeEvent("OnLocalizationChanged", collectionViewContainer.onLocalizationChanged);
-        Events.unSubscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
-        Events.unSubscribeEvent("UpdateAllModels", collectionViewContainer.receiveRemoteChanges);
+        Events.unSubscribeEvent("OnLocalizationChanged", collectionView.onLocalizationChanged);
+        Events.unSubscribeEvent("FilterActivated", internal.filterMenuActivate);
     }
 
-    onHasRemoteChangesChanged: {
-        console.log("onHasRemoteChangesChanged", hasRemoteChanges)
-
-        if (visible && hasRemoteChanges){
-            setAlertPanel(alertPanelComp)
-        }
-
-        if (hasRemoteChanges){
-            Events.sendEvent("HasRemoteChanges");
+    onDataControllerChanged: {
+        if (collectionView.dataController){
+            bindHeaders.target = collectionView.table;
+            bindElements.target = collectionView.table;
         }
     }
 
-    onNotificationModelChanged: {
-        if (documentManagerPtr){
-            let index = documentManagerPtr.getDocumentIndexByUuid(uuid);
-            if (index >= 0){
-                documentManagerPtr.updateDocumentTitle(index);
+    onRightButtonMouseClicked: {
+        openPopupMenu(mouseX, mouseY);
+    }
+
+    onDoubleClicked: {
+        if (collectionView.commandsDelegate){
+            collectionView.commandsDelegate.commandHandle("Edit");
+        }
+    }
+
+    Binding {
+        id: bindHeaders;
+        property: "headers";
+
+        value: collectionView.dataController.headersModel;
+    }
+
+    Binding {
+        id: bindElements;
+        property: "elements";
+        value: collectionView.dataController.elementsModel;
+    }
+
+    Connections {
+        target: collectionView.dataController;
+
+        function onBeginUpdate(){
+            collectionView.loading.start();
+        }
+
+        function onEndUpdate(){
+            collectionView.loading.stop();
+        }
+
+        function onHeadersModelChanged(){
+            collectionView.doUpdateGui();
+        }
+
+        function onNotificationModelChanged(){
+            let notificationModel = collectionView.dataController.notificationModel;
+            if (notificationModel.ContainsKey("TotalCount")){
+                let totalCount = notificationModel.GetData("TotalCount")
+
+                collectionView.pagination.countAllElements = totalCount;
             }
-        }
-    }
 
-    onDocumentManagerPtrChanged: {
-        if (commandsLoader.item){
-            if (commandsLoader.item.documentManagerPtr !== undefined){
-                commandsLoader.item.documentManagerPtr = collectionViewContainer.documentManagerPtr;
+            if (notificationModel.ContainsKey("PagesCount")){
+                let pagesCount = notificationModel.GetData("PagesCount")
+
+                collectionView.pagination.pagesSize = pagesCount;
             }
-        }
-    }
-
-    Keys.onPressed: {
-        if (event.key === Qt.Key_Delete){
-            commandsLoader.item.commandHandle("Remove");
         }
     }
 
     onVisibleChanged: {
-        console.log("CollectionView onVisibleChanged", visible);
-        if (collectionViewContainer.visible){
-
-            if (localizationChanged){
-                commandsProviderLocal.updateModel();
-
-                localizationChanged = false;
+        if (collectionView.visible){
+            if (internal.guiUpdateRequired){
+                internal.guiUpdateRequired = false;
+                collectionView.doUpdateGui();
             }
 
-            if (hasRemoteChanges){
-                setAlertPanel(alertPanelComp);
-            }
-
-            Events.subscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
+            Events.subscribeEvent("FilterActivated", collectionView.filterMenuActivate);
         }
         else{
-            if (hasRemoteChanges){
-                setAlertPanel(undefined);
-            }
-
-            Events.unSubscribeEvent("FilterActivated", collectionViewContainer.filterMenuActivate);
+            Events.unSubscribeEvent("FilterActivated", collectionView.filterMenuActivate);
         }
     }
 
-    onCommandIdChanged: {
-        console.log("CollectionView onCommandsIdChanged", collectionViewContainer.commandId);
-
-        commandsProviderLocal.additionInputParams = collectionViewContainer.getAdditionalInputParams();
-        commandsProviderLocal.commandId = collectionViewContainer.commandId;
-        commandsProviderLocal.uuid = collectionViewContainer.commandId;
-
-        collectionViewBase.commands.additionInputParams = getAdditionalInputParams()
-
-//        collectionViewBase.commandId = collectionViewContainer.commandId;
-
-        collectionMetaInfo.getMetaInfoGqlCommand = collectionViewContainer.commandId + "MetaInfo";
-
-        if (commandsLoader.item){
-            commandsLoader.item.commandId = collectionViewContainer.commandId;
-        }
-    }
-
-    function onLocalizationChanged(language){
-        console.log("CommandsDecorator onLocalizationChanged", commandId, visible);
-
-        if (visible){
-            commandsProviderLocal.updateModel();
-        }
-        else{
-            localizationChanged = true;
-        }
-
-        fillContextMenuModel();
-    }
-
-    function getDocumentName(){
-        let documentName = collectionViewContainer.documentName;
-
-        if (notificationModel != null){
-            if (notificationModel.ContainsKey("TotalCount")){
-                let totalCount = notificationModel.GetData("TotalCount");
-
-                documentName += " (" + totalCount + ")";
-            }
-        }
-
-        return documentName;
-    }
-
-    function receiveRemoteChanges(){
-        if (hasRemoteChanges){
-            updateGui();
-            hasRemoteChanges = false;
-
-            setAlertPanel(undefined);
-        }
-    }
-
-    function filterMenuActivate(){
-        if (collectionViewContainer.hasFilter){
-            collectionViewContainer.filterMenuVisible = !collectionViewContainer.filterMenuVisible;
-        }
-    }
-
-    function fillContextMenuModel(){
-        contextMenuModel.clear();
-
-        contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../../" + Style.getIconPath("Icons/Edit", "On", "Normal")});
-        contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../" + Style.getIconPath("Icons/Remove", "On", "Normal")});
-        contextMenuModel.append({"Id": "Rename", "Name": qsTr("Rename"), "IconSource": ""});
-        contextMenuModel.append({"Id": "SetDescription", "Name": qsTr("Set Description"), "IconSource": ""});
-    }
-
-    function getAdditionalInputParams(){
-        return {}
-    }
+    function fillContextMenuModel(){}
 
     function updateGui(){
-        collectionViewBase.updateModels();
-    }
+        console.log("CollectionView updateGui");
+        if (!collectionView.visible){
+            internal.guiUpdateRequired = true;
 
-    function updateModel(){
-
-    }
-
-
-    function selectItem(id, name){
-        console.log("CollectionView selectItem", id, name);
-
-        let editorPath = collectionViewContainer.getEditorPath();
-        let documentTypeId = collectionViewContainer.getEditorCommandId();
-
-        if (documentTypeId === ""){
-            console.error("Unable to select item documentTypeId is invalid");
             return;
         }
 
-        if (!name){
-            name = "";
+        let count = 0;
+        let offset = -1;
+
+        if (collectionView.hasPagination){
+            count = pagination.countElements;
+            offset = pagination.currentIndex * count;
         }
 
-        if (collectionViewContainer.isUsedDocumentManager){
-            if (id === ""){
-                documentManagerPtr.insertNewDocument(documentTypeId);
-            }
-            else{
-                documentManagerPtr.openDocument(id, documentTypeId);
-            }
-        }
-        else{
-            modalDialogManager.openDialog(contentDialog, {"contentId": id, "contentName": name, "contentCommandsId": documentTypeId,"contentSource": editorPath});
+        if (collectionView.dataController){
+            collectionView.dataController.updateElements(count, offset, collectionView.collectionFilter.filterModel);
         }
     }
 
-    function getEditorPath(){
-        return collectionViewBase.commands.objectViewEditorPath;
+    function openPopupMenu(x, y){
+        let offset = 26 * collectionView.commandsController.contextMenuCommandsModel.GetItemsCount();
+        modalDialogManager.openDialog(popupMenuDialog, {"x": x, "y": y - offset, "model": collectionView.commandsController.contextMenuCommandsModel});
     }
 
-    function getEditorCommandId(){
-        return collectionViewBase.commands.objectViewEditorCommandsId;
-    }
-
-    function getSelectedIds(){
-        return collectionViewBase.table.getSelectedIds();
-    }
-
-    function getSelectedIndexes(){
-        return collectionViewBase.table.getSelectedIndexes();
-    }
-
-    function getSelectedNames(){
-        return collectionViewBase.table.getSelectedNames();
-    }
-
-    Component {
-        id: contentDialog;
-        Item {
-            id: content;
-            property Item root: null;
-            property Item rootItem:collectionViewContainer;
-            property bool centered: true;
-            property string contentId;
-            property string contentName;
-            property string contentSource;
-            property string contentCommandsId;
-            width: contentLoader.width;
-            height: contentLoader.height;
-
-            onRootChanged: {
-                if(contentLoader.item){
-                    contentLoader.item.root = content.root;
-                }
-            }
-            onRootItemChanged: {
-                if(contentLoader.item){
-                    contentLoader.item.rootItem = content.rootItem;
-                }
-            }
-
-            Loader {
-                id: contentLoader;
-                anchors.centerIn: parent;
-                source: content.contentSource;
-                onLoaded: {
-                    console.log("contentLoader onLoaded");
-
-                    contentLoader.item.root = content.root;
-                    contentLoader.item.rootItem = content.rootItem;
-                    contentLoader.width = item.width;
-                    contentLoader.height = item.height;
-                    contentLoader.item.itemId = content.contentId;
-                    contentLoader.item.itemName = content.contentName;
-                    contentLoader.item.commandsId = content.contentCommandsId;
-                }
-            }
-        }
-
-    }
-
-    Loader {
-        id: commandsLoader;
-
-        Component.onCompleted: {
-            console.log("commandsLoader.source", parent.commandsDelegatePath);
-            commandsLoader.source = parent.commandsDelegatePath;
-        }
-
-        onLoaded: {
-            commandsLoader.item.commandId = collectionViewContainer.commandId;
-
-            commandsLoader.item.tableData = collectionViewBase.table;
-
-            commandsLoader.item.collectionViewBase = collectionViewContainer;
-            commandsLoader.item.commandsProvider = commandsProviderLocal;
-            commandsLoader.item.documentManagerPtr = collectionViewContainer.documentManagerPtr;
-
-            commandsLoader.item.contextMenuModel = collectionViewContainer.contextMenuModel;
-        }
-
-        onStatusChanged: {
-            if (status == Loader.Error){
-                console.error("Commands delegate is not loaded!");
-            }
+    function removeElement(elementIndex){
+        if (collectionView.dataController){
+            return collectionView.dataController.removeElement(elementIndex);
         }
     }
 
-    Rectangle {
-        anchors.fill: parent;
-
-        color: Style.baseColor;
-    }
-
-    CollectionViewBase {
-        id: collectionViewBase;
-
-        anchors.right: collectionMetaInfo.left;
-        anchors.left: parent.left;
-        anchors.top: parent.top;
-        anchors.bottom: parent.bottom;
-        anchors.margins: parent.contentMargins;
-
-        hasFilter: collectionViewContainer.hasFilter;
-
-        property bool ok: collectionViewContainer.visible && collectionViewContainer.commandId !== "";
-        onOkChanged: {
-            console.log("CollectionViewBase onOkChanged", ok);
-            if (ok){
-                collectionViewBase.commandId = collectionViewContainer.commandId;
-//                collectionViewContainer.updateGui();
-            }
-        }
-
-        onFilterDecoratorLoaded: {
-            collectionViewContainer.filterDecoratorLoaded();
-        }
-
-        onSelectionChanged: {
-            if (collectionMetaInfo.visible){
-                if (selection.length === 1){
-                    let itemIds = collectionViewContainer.getSelectedIds();
-                    let itemNames = collectionViewContainer.getSelectedNames();
-
-                    if (itemIds.length > 0){
-                        let itemId = itemIds[0];
-                        collectionMetaInfo.getMetaInfo(itemId);
-                    }
-
-                    collectionMetaInfo.contentVisible = true;
-                }
-                else{
-                    collectionMetaInfo.contentVisible = false
-                }
-            }
-        }
-
-        onSelectedItem: {
-            console.log("CollectionViewBase onItemSelected", commandsLoader, commandsLoader.item);
-
-            if (!commandsLoader.item){
-                return;
-            }
-
-            if (id == ""){
-                commandsLoader.item.commandHandle("New");
-            }
-            else{
-                commandsLoader.item.commandHandle("Edit");
-            }
-        }
-
-        onElementsChanged: {
-            collectionViewContainer.elementsChanged();
-        }
-
-        onHeadersChanged: {
-            collectionViewContainer.headersChanged();
+    function setElementName(elementIndex, name){
+        if (collectionView.dataController){
+            return collectionView.dataController.setElementName(elementIndex, name);
         }
     }
 
-    CommandsProvider {
-        id: commandsProviderLocal;
-
-        property bool ok: collectionViewContainer.visible && commandId !== "";
-        onOkChanged: {
-            if (commandsModel == null){
-                commandsProviderLocal.updateModel();
-
-                return;
-            }
-
-            if (ok){
-                commandsProviderLocal.updateGui()
-            }
-            else{
-                commandsProviderLocal.clearGui();
-            }
-        }
-
-        onCommandsModelChanged: {
-            if (ok){
-                commandsProviderLocal.updateGui()
-            }
-
-            collectionViewContainer.fillContextMenuModel();
-
-            collectionViewContainer.onCommandsModelChanged();
+    function setElementDescription(elementIndex, description){
+        if (collectionView.dataController){
+            return collectionView.dataController.setElementDescription(elementIndex, description);
         }
     }
 
-    function onCommandsModelChanged(){}
+    function setMetaInfoModel(metaInfoModel){
+        collectionMetaInfo.metaInfoModel = metaInfoModel;
+    }
 
     MetaInfo {
         id: collectionMetaInfo;
@@ -452,109 +174,16 @@ Item {
         width: visible ? 200 : 1;
         height: parent.height;
 
-        visible: collectionViewContainer.visibleMetaInfo;
-    }
-
-    SubscriptionClient {
-        id: subscriptionClient;
-
-        property bool ok: collectionViewContainer.commandId !== "" && subscriptionClient.subscriptionId !== "";
-        onOkChanged: {
-            if (ok){
-                let subscriptionRequestId = "On" + collectionViewContainer.commandId + "CollectionChanged"
-                var query = Gql.GqlRequest("subscription", subscriptionRequestId);
-                var queryFields = Gql.GqlObject("notification");
-                queryFields.InsertField("Id");
-                query.AddField(queryFields);
-
-                console.log("registerSubscription", subscriptionRequestId, subscriptionId)
-
-                Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient});
-            }
-        }
-
-        onStateChanged: {
-            console.log("SubscriptionClient onStateChanged", state);
-
-            if (state === "Ready"){
-                console.log("subscriptionClient Ready", subscriptionClient.commandId);
-
-                if (subscriptionClient.ContainsKey("data")){
-                    let dataModelLocal = subscriptionClient.GetData("data")
-                    if (dataModelLocal.ContainsKey("token")){
-                        let accessToken = dataModelLocal.GetData("token");
-                        Events.sendEvent("GetToken", function (token){
-                            console.log("local token", token);
-
-                            if (String(token) == String(accessToken)){
-                                collectionViewContainer.updateGui();
-                            }
-                            else{
-                                collectionViewContainer.hasRemoteChanges = true;
-                            }
-                        });
-                    }
-                }
-            }
-        }
-    }
-
-    function setAlertPanel(alertPanelComp){
-        if (collectionViewContainer.documentManagerPtr != null){
-            collectionViewContainer.documentManagerPtr.setAlertPanel(alertPanelComp);
-        }
+        visible: collectionView.visibleMetaInfo;
     }
 
     Component {
-        id: alertPanelComp;
+        id: popupMenuDialog;
 
-        Rectangle {
-            anchors.fill: parent;
-
-            color: Style.selectedColor;
-
-            Image {
-                id: icon;
-
-                anchors.verticalCenter: parent.verticalCenter;
-                anchors.left: parent.left;
-                anchors.leftMargin: 10;
-
-                width: 20;
-                height: 20;
-
-                sourceSize.height: height;
-                sourceSize.width: width;
-
-                source: "../../../" + Style.getIconPath("Icons/Lamp", Icon.State.On, Icon.Mode.Normal);
-            }
-
-            BaseText {
-                id: message;
-
-                anchors.verticalCenter: parent.verticalCenter;
-                anchors.left: icon.right;
-                anchors.leftMargin: 10;
-                anchors.right: updateButton.left;
-
-                text: qsTr("This table has been modified from another computer");
-            }
-
-            Button {
-                id: updateButton;
-
-                anchors.verticalCenter: parent.verticalCenter;
-                anchors.right: parent.right;
-                anchors.rightMargin: 10;
-
-                width: 70;
-                height: 30;
-
-                text: qsTr("Update");
-
-                onClicked: {
-                    Events.sendEvent("UpdateAllModels");
-                }
+        PopupMenuDialog {
+            onFinished: {
+                console.log("collectionView", collectionView);
+                collectionView.commandsDelegate.commandHandle(commandId);
             }
         }
     }

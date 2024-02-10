@@ -1,116 +1,141 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtauthgui 1.0
 import imtcolgui 1.0
+import imtcontrols 1.0
+import imtguigql 1.0
+import imtdocgui 1.0
 
 CollectionView {
     id: roleCollectionViewContainer;
-
-    contentMargins: 10;
 
     hasFilter: false;
 
     property bool newCommandIsEnabled: true;
 
-    documentName: qsTr("Roles");
+    table.showHeaders: false;
+    filterMenuVisible: false;
 
-    tableElementsDelegate: Component { TableProductRolesDelegate {
-        width: baseCollectionView.table.width;
+    table.delegate: Component {
+        TableProductRolesDelegate {
+            width: roleCollectionViewContainer.table.width;
 
-        selectedIndex: baseCollectionView.table.selectedIndex;
-        commandsId: roleCollectionViewContainer.commandId;
-        baseCollectionView: roleCollectionViewContainer.baseCollectionView;
-        newIsEnabled: roleCollectionViewContainer.newCommandIsEnabled;
+            newIsEnabled: roleCollectionViewContainer.newCommandIsEnabled;
 
-        onDoubleClicked: {
-            baseCollectionView.table.tableSelection.singleSelect(index);
+            Component.onCompleted: {
+                roleCollectionViewContainer.selectionChanged.connect(this.selectionChanged);
+            }
 
-            baseCollectionView.table.selectItem(id, name);
+            Component.onDestruction: {
+                roleCollectionViewContainer.selectionChanged.disconnect(this.selectionChanged);
+            }
+
+            onDoubleClicked: {
+                roleCollectionViewContainer.table.select(index);
+
+                roleCollectionViewContainer.doubleClicked(id, index)
+            }
+
+            onClicked: {
+                roleCollectionViewContainer.table.select(index)
+                roleCollectionViewContainer.table.elementsList.forceActiveFocus();
+            }
+
+            onNewClicked: {
+                if (roleCollectionViewContainer.commandsDelegate){
+                    roleCollectionViewContainer.commandsDelegate.commandHandle("New");
+                }
+            }
+
+            function selectionChanged(selection){
+                selectedIndex = selection[0];
+            }
         }
+    }
 
-        onClicked: {
-            baseCollectionView.table.tableSelection.singleSelect(index);
-            roleCollectionViewContainer.baseCollectionView.table.elementsList.forceActiveFocus();
-        }
-    } }
+    dataController: CollectionRepresentation {
+        collectionId: "Roles";
+    }
+
+    commandsController: CommandsRepresentationProvider {
+        commandId: "Roles";
+        uuid: roleCollectionViewContainer.viewId;
+    }
+
+    commandsDelegate: RoleCollectionViewCommandsDelegate {
+        collectionView: roleCollectionViewContainer;
+
+        documentTypeId: "Role";
+        viewTypeId: "RoleEditor";
+    }
 
     Component.onCompleted: {
-        roleCollectionViewContainer.commandsDelegatePath = "../imtauthgui/RoleCollectionViewCommandsDelegate.qml";
+        let documentManager = MainDocumentManager.getDocumentManager("Administration");
+        if (documentManager){
+            roleCollectionViewContainer.commandsDelegate.documentManager = documentManager;
 
-        elementsList.spacing = 10;
-        baseCollectionView.table.showHeaders = false;
-        baseCollectionView.hasPagination = false;
-
-        roleCollectionViewContainer.commandId = "Roles";
+            documentManager.registerDocumentView("Role", "RoleEditor", roleDocumentComp);
+            documentManager.registerDocumentDataController("Role", dataControllerComp);
+        }
     }
 
     onElementsChanged: {
-        if (elementsList.model.ContainsKey("Roles")){
-            let elementsModel = elementsList.model.GetData("Roles");
-            roleCollectionViewContainer.baseCollectionView.table.tableSelection.countElements = elementsModel.GetItemsCount();
-        }
-    }
-
-    onDocumentManagerPtrChanged: {
-        if (documentManagerPtr){
-            documentManagerPtr.registerDocument("Role", roleDocumentComp);
-        }
-    }
-
-    function getSelectedIds(){
-        let retVal = []
-
-        let elementsModel = roleCollectionViewContainer.baseCollectionView.table.elements;
-        let model = elementsModel.GetData("Roles");
-        let indexes = roleCollectionViewContainer.baseCollectionView.table.getSelectedIndexes();
-        for (let i = 0; i < indexes.length; i++){
-            if (model.ContainsKey("Id", indexes[i])){
-                let id = model.GetData("Id", indexes[i]);
-                retVal.push(id);
-            }
-        }
-
-        return retVal;
-    }
-
-    function getSelectedNames(){
-        let retVal = []
-
-        let elementsModel = roleCollectionViewContainer.baseCollectionView.table.elements;
-        let model = elementsModel.GetData("Roles");
-        let indexes = roleCollectionViewContainer.baseCollectionView.table.getSelectedIndexes();
-        for (let i = 0; i < indexes.length; i++){
-            if (model.ContainsKey("Name", indexes[i])){
-                let id = model.GetData("Name", indexes[i]);
-                retVal.push(id);
-            }
-        }
-
-        return retVal;
-    }
-
-    function selectItem(id){
-        console.log("CollectionView selectItem", id);
-
-        if (id === ""){
-            documentManagerPtr.insertNewDocument("Role");
-        }
-        else{
-            documentManagerPtr.openDocument(id, "Role");
+        if (table.elements.ContainsKey("Roles")){
+            let elementsModel = table.elements.GetData("Roles");
+            table.tableSelection.countElements = elementsModel.GetItemsCount();
         }
     }
 
     function onCommandsModelChanged(){
-        roleCollectionViewContainer.newCommandIsEnabled = commandsProvider.commandExists("New");
+        roleCollectionViewContainer.newCommandIsEnabled = commandsController.commandExists("New");
     }
 
     Component {
         id: roleDocumentComp;
 
         RoleView {
+            id: roleEditor;
+
+            commandsController: CommandsRepresentationProvider {
+                commandId: "Role";
+                uuid: roleEditor.viewId;
+            }
+
             Component.onCompleted: {
-                let elements = roleCollectionViewContainer.baseCollectionView.table.elements;
+                let elements = roleCollectionViewContainer.table.elements;
                 productId = elements.GetData("Id")
+            }
+        }
+    }
+
+    Component {
+        id: dataControllerComp;
+
+        GqlDocumentDataController {
+            gqlGetCommandId: "RoleItem";
+            gqlUpdateCommandId: "RoleUpdate";
+            gqlAddCommandId: "RoleAdd";
+
+            function getAdditionalInputParams(){
+                let elements = roleCollectionViewContainer.table.elements;
+                let productId = elements.GetData("Id")
+
+                let obj = {}
+                obj["ProductId"] = productId;
+
+                return obj;
+            }
+
+            function getDocumentName(){
+                let prefixName = qsTr("Roles");
+
+                if (documentModel.ContainsKey("Name")){
+                    return prefixName + " / " + documentModel.GetData("Name")
+                }
+
+                let newRoleName = qsTr("New Role");
+                return newRoleName;
             }
         }
     }

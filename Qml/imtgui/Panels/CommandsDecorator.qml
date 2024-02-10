@@ -13,18 +13,19 @@ Item {
     Component.onCompleted: {
         Events.subscribeEvent("Logout", commandsDecoratorContainer.clearModel);
         Events.subscribeEvent("SetCommandsVisible", commandsDecoratorContainer.setVisible);
-        Events.subscribeEvent("CommandsClearModel", commandsDecoratorContainer.clearModel);
+        Events.subscribeEvent("ClearCommandsGui", commandsDecoratorContainer.clearModel);
     }
 
     Component.onDestruction: {
         Events.unSubscribeEvent("Logout", commandsDecoratorContainer.clearModel);
         Events.unSubscribeEvent("SetCommandsVisible", commandsDecoratorContainer.setVisible);
-        Events.unSubscribeEvent("CommandsClearModel", commandsDecoratorContainer.clearModel);
+        Events.unSubscribeEvent("ClearCommandsGui", commandsDecoratorContainer.clearModel);
     }
 
     function setCommandsModel(parameters){
+        console.log("setCommandsModel", JSON.stringify(parameters));
         let model = parameters["Model"];
-        let commId = parameters["CommandId"];
+        let commId = parameters["ViewId"];
 
         commandsDecoratorContainer.commandId = commId;
         buttonPanel.buttonModel = model;
@@ -34,7 +35,7 @@ Item {
 
     function clearModel(parameters){
         if (parameters){
-            let commandId = parameters["CommandId"];
+            let commandId = parameters["ViewId"];
             if (commandId !== commandsDecoratorContainer.commandId){
                 return;
             }
@@ -96,6 +97,7 @@ Item {
                     heightFromDecorator: true;
 
                     onClicked: {
+                        console.log(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);
                         Events.sendEvent(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);
                     }
 

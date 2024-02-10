@@ -49,21 +49,16 @@ Item {
 
             sourceComponent: model.Component;
 
-            onLoaded: {
-                console.log("StackView onLoaded", item);
+            visible: model.index === container.pagesModel.count - 1;
 
+            onLoaded: {
                 container.itemAdded(container.pagesModel.count - 1, item);
             }
 
             onStatusChanged: {
-                console.log("StackView Loader onStatusChanged", status);
                 if (status === Loader.Error){
                     console.error("StackView item loading was failed!");
                 }
-            }
-
-            Component.onCompleted: {
-                console.log("StackView Loader onCompleted");
             }
         }
 

@@ -1,51 +1,51 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtauthgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
+import imtguigql 1.0
+import imtdocgui 1.0
+
 
 CollectionView {
     id: userCollectionViewContainer;
 
-    documentName: qsTr("Users");
+    dataController: CollectionRepresentation {
+        collectionId: "Users";
+    }
+
+    commandsController: CommandsRepresentationProvider {
+        commandId: "Users";
+        uuid: userCollectionViewContainer.viewId;
+    }
+
+    commandsDelegate: DocumentCollectionViewDelegate {
+        collectionView: userCollectionViewContainer;
+
+        documentTypeId: "User";
+        viewTypeId: "UserEditor";
+    }
 
     Component.onCompleted: {
-        userCollectionViewContainer.commandsDelegatePath = "../imtauthgui/UserCollectionViewCommandsDelegate.qml";
+        collectionFilter.setSortingOrder("DESC");
+        collectionFilter.setSortingInfoId("LastModified");
 
-        if (userCollectionViewContainer.baseCollectionView.table.headers){
-            userCollectionViewContainer.baseCollectionView.table.headersChanged.connect(userCollectionViewContainer.onHeadersChanged);
-        }
+        let documentManager = MainDocumentManager.getDocumentManager("Administration");
+        if (documentManager){
+            userCollectionViewContainer.commandsDelegate.documentManager = documentManager;
 
-        userCollectionViewContainer.commandId = "Users";
-    }
-
-    onDocumentManagerPtrChanged: {
-        if (documentManagerPtr){
-            documentManagerPtr.registerDocument("User", userDocumentComp);
+            documentManager.registerDocumentView("User", "UserEditor", userDocumentComp);
+            documentManager.registerDocumentDataController("User", dataControllerComp);
         }
     }
 
-    function fillContextMenuModel(){
-        contextMenuModel.clear();
-        contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../../" + Style.getIconPath("Icons/Edit", Icon.State.On, Icon.Mode.Normal)});
-        contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../" + Style.getIconPath("Icons/Remove", Icon.State.On, Icon.Mode.Normal)});
-    }
+    onHeadersChanged: {
+        let rolesIndex = table.getHeaderIndex("Roles");
+        let groupsIndex = table.getHeaderIndex("Groups");
 
-    function onHeadersChanged(){
-        let rolesIndex = userCollectionViewContainer.baseCollectionView.table.getHeaderIndex("Roles");
-        let groupsIndex = userCollectionViewContainer.baseCollectionView.table.getHeaderIndex("Groups");
-
-        userCollectionViewContainer.baseCollectionView.table.setColumnContentComponent(rolesIndex, dataComp);
-        userCollectionViewContainer.baseCollectionView.table.setColumnContentComponent(groupsIndex, groupsContentComp);
-    }
-
-    function selectItem(id){
-        if (id === ""){
-            documentManagerPtr.insertNewDocument("User");
-        }
-        else{
-            documentManagerPtr.openDocument(id, "User");
-        }
+        table.setColumnContentComponent(rolesIndex, dataComp);
+        table.setColumnContentComponent(groupsIndex, groupsContentComp);
     }
 
     Component {
@@ -132,8 +132,8 @@ CollectionView {
 
             onTableCellDelegateChanged: {
                 if (item2.tableCellDelegate != null){
-                    let username = userCollectionViewContainer.baseCollectionView.table.elements.GetData("Name", tableCellDelegate.rowIndex);
-                    let groups = userCollectionViewContainer.baseCollectionView.table.elements.GetData("Groups", tableCellDelegate.rowIndex);
+                    let username = userCollectionViewContainer.table.elements.GetData("Name", tableCellDelegate.rowIndex);
+                    let groups = userCollectionViewContainer.table.elements.GetData("Groups", tableCellDelegate.rowIndex);
                     arrowButton.visible = groups !== "";
                     if (groups !== ""){
                         let groupList = groups.split(';');
@@ -184,6 +184,36 @@ CollectionView {
         id: userDocumentComp;
 
         UserView {
+            id: userEditor;
+
+            commandsController: CommandsRepresentationProvider {
+                commandId: "User";
+                uuid: userEditor.viewId;
+            }
+        }
+    }
+
+    Component {
+        id: dataControllerComp;
+
+        GqlDocumentDataController {
+            gqlGetCommandId: "UserItem";
+            gqlUpdateCommandId: "UserUpdate";
+            gqlAddCommandId: "UserAdd";
+
+            function getDocumentName(){
+                let prefixName = qsTr("Users");
+
+//                if (documentModel.ContainsKey("Name")){
+//                    return prefixName + " / " + documentModel.GetData("Name")
+//                }
+
+                if (documentName !== ""){
+                    return prefixName + " / " + documentName;
+                }
+
+                return prefixName + " / " + qsTr("New User");
+            }
         }
     }
 }

@@ -186,10 +186,6 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap& /*infoMap*/)
 		EndChanges(changeSet);
 	}
 
-//	if (!m_isTransaction){
-//		emit dataChanged(QModelIndex(), QModelIndex(), QVector<int>());
-//	}
-
 	return true;
 }
 

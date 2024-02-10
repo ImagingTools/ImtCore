@@ -1,4 +1,4 @@
-import QtQuick 2.0
+import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
 
@@ -6,8 +6,6 @@ Item {
     id: productRolesDelegate;
 
     height: body.height + rolesColumn.height;
-
-    property string commandsId;
 
     property int index: model.index;
 
@@ -17,20 +15,13 @@ Item {
 
     property int radius: 3;
 
-    property Item baseCollectionView: null;
-
-    signal clicked(int index);
-    signal doubleClicked(string id, string name, int index);
+    signal clicked(string id, int index);
+    signal newClicked();
+    signal doubleClicked(string id, int index);
 
     Component.onCompleted: {
         if (model.Roles){
             rolesRepeater.model = model.Roles;
-        }
-    }
-
-    onSelectedIndexChanged: {
-        if (productRolesDelegate.selectedIndex != productRolesDelegate.index){
-            rolesRepeater.selectedIndex = -1;
         }
     }
 
@@ -96,7 +87,8 @@ Item {
             iconSource: "../../../../" + Style.getIconPath("Icons/Add", Icon.State.On, Icon.Mode.Normal);
 
             onClicked: {
-                Events.sendEvent(productRolesDelegate.commandsId + "CommandActivated", "New");
+//                Events.sendEvent(productRolesDelegate.commandsId + "CommandActivated", "New");
+                productRolesDelegate.newClicked();
             }
 
             decorator: Component {
@@ -134,42 +126,15 @@ Item {
             Repeater {
                 id: rolesRepeater;
 
-                property int selectedIndex: -1;
-
-                onSelectedIndexChanged: {
-                    if (productRolesDelegate.selectedIndex == productRolesDelegate.index){
-                        productRolesDelegate.baseCollectionView.selectedIndexChanged(rolesRepeater.selectedIndex);
-                    }
-                }
-
                 delegate: Rectangle {
                     width: rolesColumn.width;
                     height: body.height;
 
                     radius: productRolesDelegate.radius;
 
-                    property bool selected: false;
+                    property bool selected: productRolesDelegate.selectedIndex == model.index;
 
                     color: this.selected ? Style.selectedColor : "transparent";
-
-                    Component.onCompleted: {
-                        let table = productRolesDelegate.baseCollectionView.table;
-                        table.tableSelection.selectionChanged.connect(this.selectionChanged);
-                    }
-
-                    Component.onDestruction: {
-                        let table = productRolesDelegate.baseCollectionView.table;
-                        table.tableSelection.selectionChanged.disconnect(this.selectionChanged);
-                    }
-
-                    function selectionChanged(){
-                        console.log("selectionChanged");
-                        let table = productRolesDelegate.baseCollectionView.table;
-
-                        console.log("selectedIndexes", table.tableSelection.selectedIndexes);
-                        selected = table.tableSelection.selectedIndexes.includes(model.index);
-                        console.log("selected", selected);
-                    }
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter;
@@ -193,15 +158,15 @@ Item {
                         anchors.fill: parent;
 
                         onClicked: {
-                            rolesRepeater.selectedIndex = model.index;
+                            productRolesDelegate.selectedIndex = model.index;
 
-                            productRolesDelegate.clicked(rolesRepeater.selectedIndex);
+                            productRolesDelegate.clicked(model.Id, model.index);
                         }
 
                         onDoubleClicked: {
-                            rolesRepeater.selectedIndex = model.index;
+                            productRolesDelegate.selectedIndex = model.index;
 
-                            productRolesDelegate.doubleClicked(model.Id, model.Name, model.index);
+                            productRolesDelegate.doubleClicked(model.Id, model.index);
                         }
                     }
                 }

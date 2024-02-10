@@ -2,94 +2,77 @@ import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
 
-Item {
+DecoratorBase {
     id: filterPanelDecorator;
 
-    width: 325;
+    height: content.height;
 
-    property Item rootLoader: null;
+    Row {
+        id: content;
 
-    property alias textInputWidth: tfc.width;
+        anchors.right: filterPanelDecorator.right;
+        height: tfc.height;
+        spacing: Style.size_mainMargin;
 
-    function calcWidth(){
+        CustomTextField {
+            id: tfc;
 
-        if (filterPanelDecorator.rootLoader){
-            let width = filterPanelDecorator.rootLoader.parent.width - 30;
-            if (width <= tfc.width){
-                tfc.width = width;
+            anchors.verticalCenter: content.verticalCenter;
+
+            width: 270;
+            height: 30;
+
+            placeHolderText: qsTr("Enter some text to filter the item list");
+
+            onTextChanged: {
+                timer.restart();
             }
-            else{
-                tfc.width = 270;
+
+            Timer {
+                id: timer;
+
+                interval: 300;
+
+                onTriggered: {
+                    filterPanelDecorator.baseElement.filterChanged("TextFilter", tfc.text);
+                }
             }
-        }
-    }
 
-    onFocusChanged: {
-        if (filterPanelDecorator.focus){
-            tfc.forceActiveFocus();
-        }
-    }
+            ToolButton {
+                id: iconClear;
 
-    CustomTextField {
-        id: tfc;
+                anchors.right: tfc.right;
+                anchors.rightMargin: Style.margin;
+                anchors.verticalCenter: tfc.verticalCenter;
 
-        anchors.verticalCenter: parent.verticalCenter;
-        anchors.right: closeButton.left;
-        anchors.rightMargin: Style.margin;
+                width: Style.buttonWidthSmall;
+                height: width;
 
-        width: 270;
-        height: filterPanelDecorator.height;
+                visible: tfc.text != "";
 
-        placeHolderText: qsTr("Enter some text to filter the item list");
+                iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
-        onTextChanged: {
-            timer.restart();
-        }
-
-        Timer {
-            id: timer;
-
-            interval: 300;
-
-            onTriggered: {
-                filterPanelDecorator.rootLoader.textChanged(-1, tfc.text);
+                onClicked: {
+                    tfc.text = "";
+                }
             }
         }
 
         ToolButton {
-            id: iconClear;
+            id: closeButton;
 
-            anchors.right: parent.right;
-            anchors.rightMargin: Style.margin;
-            anchors.verticalCenter: parent.verticalCenter;
+            anchors.verticalCenter: content.verticalCenter;
 
-            width: Style.buttonWidthSmall;
+            width: Style.buttonWidthMedium;
             height: width;
-
-            visible: tfc.text != "";
 
             iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
             onClicked: {
                 tfc.text = "";
+                filterPanelDecorator.baseElement.close();
             }
         }
     }
-
-    ToolButton {
-        id: closeButton;
-
-        anchors.verticalCenter: parent.verticalCenter;
-        anchors.right: parent.right;
-
-        width: Style.buttonWidthMedium;
-        height: width;
-
-        iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
-
-        onClicked: {
-            tfc.text = "";
-            filterPanelDecorator.rootLoader.onClosed();
-        }
-    }
 }
+

@@ -4,30 +4,21 @@ import imtgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
 
-Item {
+ViewBase {
     id: groupRolesContainer;
-
-    property TreeItemModel documentModel: TreeItemModel {}
-    property Item documentPtr: null;
 
     property int radius: 3;
 
-    property bool completed: rolesProvider.compl;
-
     Component.onCompleted: {
         rolesProvider.updateModel();
-    }
-
-    function blockEditing(){
-        rolesTable.readOnly = true;
     }
 
     function updateGui(){
         console.log("UserRoles updateGui");
 
         let roleIds = [];
-        if (groupRolesContainer.documentModel.ContainsKey("Roles")){
-            let roles = groupRolesContainer.documentModel.GetData("Roles")
+        if (groupRolesContainer.model.ContainsKey("Roles")){
+            let roles = groupRolesContainer.model.GetData("Roles")
             if (roles !== ""){
                 roleIds = roles.split(';');
             }
@@ -53,7 +44,7 @@ Item {
         }
 
         let result = selectedRoleIds.join(';');
-        groupRolesContainer.documentModel.SetData("Roles", result);
+        groupRolesContainer.model.SetData("Roles", result);
     }
 
     Component{
@@ -78,6 +69,8 @@ Item {
                     rolesTable.elements = rolesModel;
 
                     compl = true;
+
+                    groupRolesContainer.doUpdateGui();
                 }
             }
         }
@@ -141,11 +134,10 @@ Item {
 
         checkable: true;
         radius: groupRolesContainer.radius;
+        readOnly: groupRolesContainer.readOnly;
 
         onCheckedItemsChanged: {
-            if (groupRolesContainer.documentPtr){
-                groupRolesContainer.documentPtr.doUpdateModel();
-            }
+            groupRolesContainer.doUpdateModel();
         }
     }
 }//Container

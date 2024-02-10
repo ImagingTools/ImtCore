@@ -8,7 +8,7 @@ DecoratorBase {
 
     Component.onDestruction: {
         console.log("topCenterPanelDecorator onDestruction");
-        Events.unSubscribeEvent("CommandsModelChanged", commandsDecorator.setCommandsModel);
+        Events.unSubscribeEvent("UpdateCommandsGui", commandsDecorator.setCommandsModel);
     }
 
     CommandsDecorator {
@@ -18,13 +18,13 @@ DecoratorBase {
 
         onVisibleChanged: {
             if (!commandsDecorator.visible){
-                Events.unSubscribeEvent("CommandsModelChanged", commandsDecorator.setCommandsModel);
+                Events.unSubscribeEvent("UpdateCommandsGui", commandsDecorator.setCommandsModel);
             }
         }
 
         Component.onCompleted: {
             console.log("topCenterPanelDecorator onCompleted");
-            Events.subscribeEvent("CommandsModelChanged", commandsDecorator.setCommandsModel);
+            Events.subscribeEvent("UpdateCommandsGui", commandsDecorator.setCommandsModel);
         }
     }
 }

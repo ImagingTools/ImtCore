@@ -3,7 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 import imtcolgui 1.0
 
- CollectionView {
+CollectionView {
      id: featureCollectionViewContainer;
 
      visibleMetaInfo: false;
@@ -11,6 +11,7 @@ import imtcolgui 1.0
      documentName: qsTr("Features");
      defaultSortHeaderIndex: 4;
      defaultOrderType: "DESC";
+
 
      Component.onCompleted: {
          console.log("featureCollection onCompleted");
