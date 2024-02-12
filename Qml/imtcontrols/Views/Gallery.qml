@@ -87,7 +87,7 @@ Rectangle {
 
         }
 
-        AuxButton{
+        Button{
             id: deleteButton;
 
             anchors.verticalCenter: parent.verticalCenter;
@@ -96,19 +96,12 @@ Rectangle {
 
             width: 20;
             height: width;
-            radius: width;
+
+            decorator: Component{IconButtonDecorator{}}
 
             enabled: visible;
 
-            color: "transparent";
-
-            border.color: "transparent";
-            border.width: 0;
-            hasIcon: true;
             iconSource:  "../../../" +Style.getIconPath("Icons/Clear", Icon.State.On, Icon.Mode.Normal);
-
-            iconWidth: width;
-            iconHeight: width;
 
             onClicked: {
                 let param = {"centered" : true};
@@ -117,7 +110,7 @@ Rectangle {
             }
         }
 
-        AuxButton{
+        Button{
             id: closeButton;
 
             anchors.verticalCenter: parent.verticalCenter;
@@ -126,19 +119,12 @@ Rectangle {
 
             width: 20;
             height: width;
-            radius: width;
+
+            decorator: Component{IconButtonDecorator{}}
 
             enabled: visible;
 
-            color: "transparent";
-
-            border.color: "transparent";
-            border.width: 0;
-            hasIcon: true;
             iconSource:  "../../../" +Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
-
-            iconWidth: width;
-            iconHeight: width;
 
             onClicked: {
                 gallery.close();
@@ -410,7 +396,7 @@ Rectangle {
 
             }
 
-            AuxButton {
+            Button {
                 id: okButton;
 
                 anchors.bottom: parent.bottom;
@@ -420,15 +406,8 @@ Rectangle {
 
                 width: (parent.width - 3 * Style.size_smallMargin)/2;
                 height: Style.size_ButtonHeight;
-                radius: Style.size_ButtonRadius;
-                color: "lightsteelblue";
-                fontPixelSize: Style.fontSize_common;
-                highlighted: false;
 
-                hasText: true;
-                hasIcon: false;
-
-                textButton: "Ок";
+                text: "Ок";
 
                 onClicked:{
                     confirmation.finished("Ok");
@@ -436,7 +415,7 @@ Rectangle {
 
             }
 
-            AuxButton {
+            Button {
                 id: cancelButton;
 
                 anchors.bottom: parent.bottom;
@@ -446,15 +425,8 @@ Rectangle {
 
                 width: (parent.width - 3 * Style.size_smallMargin)/2;
                 height: Style.size_ButtonHeight;
-                radius: Style.size_ButtonRadius;
-                color: "lightsteelblue";
-                fontPixelSize: Style.fontSize_common;
-                highlighted: false;
 
-                hasText: true;
-                hasIcon: false;
-
-                textButton: "Отмена";
+                text: "Отмена";
 
                 onClicked:{
                     confirmation.finished("Cancel");

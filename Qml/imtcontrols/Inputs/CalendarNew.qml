@@ -786,16 +786,19 @@ Rectangle {
 
             }
 
-            AuxButton {
+            Button {
                 id: leftButton;
 
                 anchors.verticalCenter: parent.verticalCenter;
                 anchors.left: parent.left;
                 anchors.leftMargin: 10;
 
-                highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
                 width: 25;
                 height: width;
+                decorator: Component{IconButtonDecorator{
+                    icon.width: !baseElement ? 0 : baseElement.width - 3;
+                    icon.height: !baseElement ? 0 : baseElement.height - 3;
+                    }}
 
                 iconSource: "../../../" + Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Active);
 
@@ -806,16 +809,20 @@ Rectangle {
                 }
             }
 
-            AuxButton {
+            Button {
                 id: rightButton;
 
                 anchors.verticalCenter: parent.verticalCenter;
                 anchors.right: parent.right;
                 anchors.rightMargin: 10;
 
-                highlighted: Style.highlightedButtons !==undefined ? Style.highlightedButtons : containsMouse;
                 width: 25;
                 height: width;
+
+                decorator: Component{IconButtonDecorator{
+                    icon.width: !baseElement ? 0 : baseElement.width - 3;
+                    icon.height: !baseElement ? 0 : baseElement.height - 3;
+                    }}
 
                 iconSource: "../../../" + Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Active);
 
