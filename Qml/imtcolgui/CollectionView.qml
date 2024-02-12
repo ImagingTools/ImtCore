@@ -53,6 +53,10 @@ CollectionViewBase {
     }
 
     onDoubleClicked: {
+        onEdit()
+    }
+
+    function onEdit() {
         if (collectionView.commandsDelegate){
             collectionView.commandsDelegate.commandHandle("Edit");
         }

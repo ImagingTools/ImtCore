@@ -70,6 +70,13 @@ Item {
 
     function registerDocumentDataController(documentTypeId, dataControllerComp){
         internal.m_registeredDataControllers[documentTypeId] = dataControllerComp;
+        console.log("registerDocumentDataController", documentTypeId, dataControllerComp)
+
+        return true;
+    }
+
+    function unRegisterDocumentDataController(documentTypeId){
+        delete internal.m_registeredDataControllers[documentTypeId]
 
         return true;
     }
@@ -97,6 +104,20 @@ Item {
         return true;
     }
 
+    function unRegisterDocumentView(documentTypeId, viewTypeId)
+    {
+        let registeredViewList = internal.m_registeredView[documentTypeId];
+        for (let i = 0; i < registeredViewList.length; i++){
+            let registeredViewObj = registeredViewList[i];
+            if (registeredViewObj["ViewTypeId"] == viewTypeId){
+                registeredViewList.splice(i,1)
+
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     function getDocumentView(documentTypeId, viewTypeId)
     {
@@ -264,7 +285,7 @@ Item {
             return false;
         }
 
-        Events.sendEvent("StartLoading");
+//        Events.sendEvent("StartLoading");
 
         documentData.documentIndex = documentsModel.count;
         documentsModel.append({
@@ -288,6 +309,7 @@ Item {
     */
     function saveDocument(documentId)
     {
+        console.log("DocumentManager saveDocument")
         Events.sendEvent("StartLoading");
 
         let index = getDocumentIndexByDocumentId(documentId);
@@ -311,6 +333,8 @@ Item {
                         return;
                     }
                 }
+
+                console.log("documentDataController", document.documentDataController)
 
                 if (document.documentDataController){
                     if (isNew){
@@ -672,7 +696,7 @@ Item {
             }
 
             function commandHandle(commandId){
-                console.log("commandHandle", documentId);
+                console.log("DicumentManager commandHandle, documentId", documentId);
 
                 if (commandId === "Close"){
                     documentManager.closeDocument(documentId);

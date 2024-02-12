@@ -509,7 +509,7 @@ Rectangle {
 
 
     function getSelectedId(){
-        console.log("getSelectedId");
+        console.log("getSelectedId", tableContainer.selectedIndex);
         if (tableContainer.selectedIndex > -1){
             let item = elementsListObj.itemAtIndex(tableContainer.selectedIndex);
             return item.getSelectedId();

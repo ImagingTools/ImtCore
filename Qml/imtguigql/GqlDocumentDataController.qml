@@ -133,6 +133,7 @@ DocumentDataController {
 
     property GqlModel gqlGetModel: GqlModel {
         function getData(){
+            console.log("getData", container.gqlGetCommandId)
             var query = Gql.GqlRequest("query", container.gqlGetCommandId);
 
             var queryFields = Gql.GqlObject("item");

@@ -33,6 +33,9 @@ CollectionViewCommandsDelegateBase {
         if (root.documentManager){
             root.documentManager.insertNewDocument(typeId, viewTypeId);
         }
+        else{
+            console.log("documentManager undefined!")
+        }
     }
 
     function openDocumentEditor(objectId, typeId, viewTypeId){
@@ -44,6 +47,7 @@ CollectionViewCommandsDelegateBase {
     }
 
     function onEdit(){
+        console.log("onEdit")
         let elementsModel = root.collectionView.table.elements;
         if (!elementsModel){
             return;
@@ -62,6 +66,7 @@ CollectionViewCommandsDelegateBase {
     }
 
     function onNew(){
+        console.log("onNew", documentTypeId, viewTypeId)
         root.createNewObject(documentTypeId, viewTypeId);
     }
 }

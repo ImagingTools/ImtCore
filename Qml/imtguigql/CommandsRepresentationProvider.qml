@@ -7,7 +7,7 @@ CommandsController {
     id: commandsProviderContainer;
 
     property string commandId;
-    property var additionInputParams: ({})
+//    property var additionInputParams: ({})
 
     onCommandIdChanged: {
         updateModel();
@@ -22,14 +22,19 @@ CommandsController {
         commandsProviderContainer.modelCommands.updateModel();
     }
 
+    function getAdditionalInputParams(){
+        return {};
+    }
+
     property GqlModel modelCommands: GqlModel {
         function updateModel() {
             var query = Gql.GqlRequest("query", commandsProviderContainer.commandId + "Commands");
-            if (Object.keys(commandsProviderContainer.additionInputParams).length > 0){
+            let additionInputParams = commandsProviderContainer.getAdditionalInputParams();
+            if (Object.keys(additionInputParams).length > 0){
                 let inputParams = Gql.GqlObject("input");
                 let additionParams = Gql.GqlObject("addition");
-                for (let key in commandsProviderContainer.additionInputParams){
-                    additionParams.InsertField(key, commandsProviderContainer.additionInputParams[key]);
+                for (let key in additionInputParams){
+                    additionParams.InsertField(key, additionInputParams[key]);
                 }
                 inputParams.InsertFieldObject(additionParams);
                 query.AddParam(inputParams);

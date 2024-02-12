@@ -15,7 +15,11 @@ QtObject {
 
     function updateDocumentModel(){}
 
-    function insertDocument(){}
+    function insertDocument(){
+        console.log("DocumentDataController insertDocument", documentModel.toJSON());
+    }
 
-    function saveDocument(){}
+    function saveDocument(){
+        console.log("DocumentDataController saveDocument", documentModel.toJSON());
+    }
 }

@@ -125,6 +125,7 @@ Rectangle {
     }
 
     function getSelectedId(){
+        console.log("Table delegate getSelectedId", model.Id)
         return model.Id;
     }
 
