@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtcontrols 1.0
 
 Rectangle {
     id: gallery;
@@ -388,7 +389,6 @@ Rectangle {
             height: 200;
             hasIcon: false;
             radius:8;
-            color: Style.backgroundColor;
 
             topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
             title: qsTr("Удалить фото");

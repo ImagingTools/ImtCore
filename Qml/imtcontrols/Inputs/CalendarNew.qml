@@ -1,9 +1,10 @@
 import QtQuick 2.12
 import QtGraphicalEffects 1.12
+import Qt5Compat.GraphicalEffects
 
 import Acf 1.0
 import imtgui 1.0
-import imtqml 1.0
+import imtcontrols 1.0
 
 
 Rectangle {
@@ -708,10 +709,10 @@ Rectangle {
                         visibleScrollBar: false;
                         isColor: true;
 
-                        titleTxtColor: "transparent";
-                        compTextCentered: true;
+                        //titleTxtColor: "transparent";
+                        //compTextCentered: true;
                         shownItemsCount: 12;
-                        imageVisible: false;
+                        //imageVisible: false;
 
                         onCurrentIndexChanged:{
                             if(monthComboObj.currentIndex >= 0){
@@ -765,10 +766,10 @@ Rectangle {
                         visibleScrollBar: false;
                         isColor:true
 
-                        titleTxtColor: "transparent";
-                        compTextCentered: true;
+                        //titleTxtColor: "transparent";
+                        //compTextCentered: true;
                         shownItemsCount: calendar.shownItemsCountCombo;
-                        imageVisible: false;
+                        //imageVisible: false;
 
                         moveToIndex : calendar.todayYear - calendar.startYear - calendar.shownItemsCountCombo +1;
 

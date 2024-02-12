@@ -52,6 +52,7 @@ PopupItemDelegateDecorator 1.0 ./Dialogs/PopupItemDelegateDecorator.qml
 DialogDecorator 1.0 ./Dialogs/DialogDecorator.qml
 
 Calendar 1.0 ./Inputs/Calendar.qml
+CalendarNew 1.0 ./Inputs/CalendarNew.qml
 ComboBox 1.0 ./Inputs/ComboBox.qml
 FilterableComboBox 1.0 ./Inputs/FilterableComboBox.qml
 CheckBox 1.0 ./Inputs/CheckBox.qml
@@ -98,6 +99,8 @@ Piechart 1.0 ./Views/Piechart.qml
 Spinner 1.0 ./Views/Spinner.qml
 Splitter 1.0 ./Views/Splitter.qml
 StackView 1.0 ./Views/StackView.qml
+Gallery 1.0 ./Views/Gallery.qml
+ExpandingContainer 1.0 ./Views/ExpandingContainer.qml
 
 SubMenuPanelButtonDecorator 1.0 ./Views/SubMenuPanelButtonDecorator.qml
 SwitchCustom 1.0 ./Views/SwitchCustom.qml

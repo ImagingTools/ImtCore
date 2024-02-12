@@ -53,6 +53,7 @@
 
         <file alias="imtcontrols/Inputs/CustomTextField.qml">Inputs/CustomTextField.qml</file>
         <file alias="imtcontrols/Inputs/Calendar.qml">Inputs/Calendar.qml</file>
+        <file alias="imtcontrols/Inputs/CalendarNew.qml">Inputs/CalendarNew.qml</file>
         <file alias="imtcontrols/Inputs/ComboBox.qml">Inputs/ComboBox.qml</file>
         <file alias="imtcontrols/Inputs/FilterableComboBox.qml">Inputs/FilterableComboBox.qml</file>
         <file alias="imtcontrols/Inputs/DatePicker.qml">Inputs/DatePicker.qml</file>
@@ -127,6 +128,8 @@
         <file alias="imtcontrols/Views/BaseText.qml">Views/BaseText.qml</file>
         <file alias="imtcontrols/Views/ItemDelegate.qml">Views/ItemDelegate.qml</file>
         <file alias="imtcontrols/Views/ItemDelegateDecorator.qml">Views/ItemDelegateDecorator.qml</file>
+        <file alias="imtcontrols/Views/Gallery.qml">Views/Gallery.qml</file>
+        <file alias="imtcontrols/Views/ExpandingContainer.qml">Views/ExpandingContainer.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>
