@@ -147,8 +147,18 @@ class MouseArea extends Item {
             rotation = target.getPropertyValue('rotation')
             target = target.getPropertyValue('parent')
         }
-        let rad = rotation * Math.PI / 180
-        return {x: x*Math.cos(rad) - y*Math.sin(rad), y: -x*Math.sin(rad) + y*Math.cos(rad)}
+        // let rad = rotation * Math.PI / 180
+        // let dx = Math.abs(rotation < 90) ? 1 : -1
+        // let dy = (rotation >= 0 && rotation < 180) ? -1 : 1
+        // return {x: Math.abs(x*Math.cos(rad)) + Math.abs(y*Math.sin(rad)), y: Math.abs(x*Math.sin(rad)) + Math.abs(y*Math.cos(rad))}
+
+        switch(rotation){
+            case 0: return {x: x, y: y}
+            case -90: return {x: this.getPropertyValue('width') - y, y: x}
+            case 90: return {x: y, y: this.getPropertyValue('height') - x}
+        }
+        return {x: x, y: y}
+
     }
     onMouseMove(x, y, pressed){
         if(this.getPropertyValue('enabled') && this.getPropertyValue('visible')) {
