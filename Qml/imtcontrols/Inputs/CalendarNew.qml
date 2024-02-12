@@ -1188,7 +1188,7 @@ Rectangle {
 
         }
 
-        BaseButton {
+        Button {
             id: okButton;
 
             anchors.right: parent.right;
@@ -1251,7 +1251,7 @@ Rectangle {
             }
         }
 
-        BaseButton {
+        Button {
             id: cancelButton;
 
             anchors.right: okButton.left;
@@ -1268,7 +1268,7 @@ Rectangle {
             }
         }
 
-        BaseButton {
+        Button {
             id: todayButton;
 
             anchors.left: parent.left;
@@ -1307,33 +1307,13 @@ Rectangle {
         Component{
             id: defaultButtonDecorator;
 
-            BaseButtonDecorator {
-                id: commonButtonDecorator;
-
+            ButtonDecorator{
                 width: calendar.buttonWidth;
                 height: calendar.buttonHeight;
-
-                Rectangle{
-                    id: mainRec;
-
-                    anchors.fill: parent;
-
-                    radius: calendar.buttonRadius;
-                    color: calendar.buttonColor;
-                    Text {
-                        id: mainText;
-
-                        anchors.centerIn: parent;
-
-                        font.family: Style.fontFamily;
-                        font.pixelSize: calendar.fontSize_button;
-                        font.bold: false;
-
-                        color: calendar.fontColor_button;
-
-                        text: commonButtonDecorator.text;
-                    }
-                }
+                radius: calendar.buttonRadius;
+                color: calendar.buttonColor;
+                font.pixelSize: calendar.fontSize_button;
+                textColor: calendar.fontColor_button;
             }
 
         }
