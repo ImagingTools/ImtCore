@@ -7,6 +7,18 @@ DecoratorBase{
     id: dec;
 
     property alias icon: image;
+    property alias color: background.color;
+    property alias border: background.border;
+
+    Rectangle{
+        id: background;
+
+        width: dec.baseElement ? dec.baseElement.width : 0;
+        height: dec.baseElement ? dec.baseElement.height : 0;
+        radius: dec.baseElement ? dec.baseElement.height : 0;
+
+        color: "transparent"
+    }
     Image{
         id: image;
 
