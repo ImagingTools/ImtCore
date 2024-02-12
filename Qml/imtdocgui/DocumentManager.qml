@@ -202,6 +202,8 @@ Item {
 
 
     function createTemplateDocument(documentId, documentTypeId, documentModel){
+        console.log("createTemplateDocument", documentId, documentTypeId, documentModel);
+
         let singleDocumentData = singleDocumentDataComp.createObject(documentManager);
         if (singleDocumentData){
             if (documentId === ""){
@@ -216,6 +218,9 @@ Item {
                 return false;
             }
 
+            documentDataController.documentId = singleDocumentData.documentId;
+
+            singleDocumentData.documentDataController = documentDataController;
             singleDocumentData.documentTypeId = documentTypeId;
 
             let documentValidator = getDocumentValidator(documentTypeId);
@@ -259,7 +264,7 @@ Item {
             return false;
         }
 
-//        Events.sendEvent("StartLoading");
+        Events.sendEvent("StartLoading");
 
         documentData.documentIndex = documentsModel.count;
         documentsModel.append({
@@ -550,6 +555,8 @@ Item {
                 }
 
                 function onDocumentModelChanged(){
+                    console.log("Connections onDocumentModelChanged", documentDataController);
+
                     let documentModel = singleDocumentData.documentDataController.documentModel;
 
                     if (documentModel.ContainsKey("Id")){
@@ -599,6 +606,7 @@ Item {
             property bool blockingUpdateModel: false;
 
             onDocumentDataControllerChanged: {
+                console.log("onDocumentDataControllerChanged", documentDataController);
                 if (documentDataController){
                     singleDocumentData.connections.target = documentDataController;
                 }
