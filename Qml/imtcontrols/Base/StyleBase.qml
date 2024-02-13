@@ -260,7 +260,7 @@ StyleComponents {
         if (sourceDecorators.tooltipDecorator){
             styleContainer.tooltipDecorator = sourceDecorators.tooltipDecorator
         }
-        if (1){
+        if (sourceDecorators.scrollBarDecorator !== undefined){
             styleContainer.scrollBarDecorator = sourceDecorators.scrollBarDecorator
         }
 
