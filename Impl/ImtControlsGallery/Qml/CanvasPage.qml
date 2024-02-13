@@ -78,6 +78,22 @@ SchemeView{
     TreeItemModel {id: linkModel;/*for test*/}
     TreeItemModel {id: linkModel2;/*for test*/}
     TreeItemModel {id: linkModel3;/*for test*/}
+
+    onCopySignal: {
+        if(scheme.selectedIndex >=0){
+            scheme.copyObjectFunc(scheme.selectedIndex);
+        }
+    }
+    onPasteSignal: {
+        if(scheme.selectedIndex >=0){
+            scheme.pasteObjectFunc();
+        }
+    }
+    onDeleteSignal: {
+        if(scheme.selectedIndex >=0){
+            scheme.deleteObjectFunc(scheme.selectedIndex);
+        }
+    }
 }
 
 
