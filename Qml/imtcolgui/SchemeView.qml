@@ -241,8 +241,8 @@ Rectangle {
                     width_ = width_ * canvas.scaleCoeff;
                     height_ = height_  * canvas.scaleCoeff;
 
-                    let withinBorders_ = withinBorders(delta, x_,  y_, width_, height_);
-
+                    //let withinBorders_ = withinBorders(delta, x_,  y_, width_, height_);
+                    let withinBorders_ = true;
                     if(withinBorders_){
                         let newX = (canvasPage.objectModel.GetData("X", canvas.selectedIndex) + delta.x / canvas.scaleCoeff);
                         let newY = (canvasPage.objectModel.GetData("Y", canvas.selectedIndex) + delta.y / canvas.scaleCoeff);
