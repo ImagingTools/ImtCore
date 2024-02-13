@@ -13,7 +13,7 @@ MouseArea{
     property var coordPressed: mapToItem(this,0,0);
 
     property bool hasWheelControl: true;
-    property real scaleStep: 0.22;
+    property real scaleStep: 0.1;
 
     property bool wasMoving: false;
     property bool isPressed: false;

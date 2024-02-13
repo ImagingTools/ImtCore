@@ -24,6 +24,12 @@ Rectangle {
     property real contentX: -canvas.deltaX;
     property real originX: 0;
 
+    signal copySignal(int index);
+    signal pasteSignal(int index);
+    signal deleteSignal(int index);
+    signal renameSignal(int index);
+    signal revertSignal();
+
     onContentXChanged: {
         canvas.deltaX = -contentX
         //canvas.requestPaint();
@@ -147,7 +153,6 @@ Rectangle {
 
                     if(ok){
                         canvas.selectedIndex = i;
-                        //break;
                     }
                 }
                 if(canvas.selectedIndex == -1){
@@ -239,8 +244,8 @@ Rectangle {
                     let withinBorders_ = withinBorders(delta, x_,  y_, width_, height_);
 
                     if(withinBorders_){
-                        let newX = (canvasPage.objectModel.GetData("X", canvas.selectedIndex) + delta.x);
-                        let newY = (canvasPage.objectModel.GetData("Y", canvas.selectedIndex) + delta.y);
+                        let newX = (canvasPage.objectModel.GetData("X", canvas.selectedIndex) + delta.x / canvas.scaleCoeff);
+                        let newY = (canvasPage.objectModel.GetData("Y", canvas.selectedIndex) + delta.y / canvas.scaleCoeff);
 
                         //fit to borders
                         let margin_ = 10;
@@ -299,7 +304,7 @@ Rectangle {
 
                     if(ok){
                         canvas.hoverIndex = i;
-                        break;
+
                     }
                 }
                 if(canvas.hoverIndex >=0){
@@ -469,12 +474,6 @@ Rectangle {
                 }
             }//onPaint
 
-            onPainted: {
-                if(pasteShortcut.prevSelectedIndex >= 0){
-                    canvas.selectedIndex = pasteShortcut.prevSelectedIndex;
-                    pasteShortcut.prevSelectedIndex = -1;
-                }
-            }
 
             function drawBackground(ctx){
                 let step = canvas.backgroundStep;
@@ -927,11 +926,7 @@ Rectangle {
         enabled: true;
         onActivated: {
             console.log("Ctrl+C");
-            if(canvas.selectedIndex >= 0){
-                bufferModel.Clear();
-                bufferModel.CopyItemDataFromModel(0, canvasPage.objectModel, canvas.selectedIndex);
-                //console.log("bufferModel:: ", bufferModel.toJSON());
-            }
+            canvasPage.copySignal(canvas.selectedIndex);
         }
     }
 
@@ -940,37 +935,19 @@ Rectangle {
 
         sequence: "Ctrl+V";
         enabled: true;
-        property int prevSelectedIndex: -1;
         onActivated: {
             console.log("Ctrl+V");
-            if(bufferModel.GetItemsCount()){
-                bufferModel.SetExternTreeModel("Links", emptyModel, 0);
-                let mainText = bufferModel.GetData("MainText") + "_1";
-                let secondText = bufferModel.GetData("SecondText") + "_1";
-                let x_ = bufferModel.GetData("X") + 10;
-                let y_ = bufferModel.GetData("Y") + 10;
+            canvasPage.pasteSignal(canvas.selectedIndex);
+        }
+    }
 
-                //TO DO: unique Id
-                var date = new Date();
-                let datString = String(date.valueOf());
-                bufferModel.SetData("Id", datString, 0);
 
-                bufferModel.SetData("MainText", mainText, 0);
-                bufferModel.SetData("SecondText", secondText, 0);
-                bufferModel.SetData("X", x_, 0);
-                bufferModel.SetData("Y", y_, 0);
-                bufferModel.SetData("Selected", false, 0);
-                let index = canvasPage.objectModel.InsertNewItem();
-                canvasPage.objectModel.CopyItemDataFromModel(index, bufferModel,0);
-
-                prevSelectedIndex = canvas.selectedIndex;
-
-                canvas.selectedIndex = index;
-
-                canvas.requestPaint();
-
-            }
-
+    Shortcut {
+        sequence: "Delete";
+        enabled: true;
+        onActivated: {
+            console.log("Delete");
+            canvasPage.deleteSignal(canvas.selectedIndex);
         }
     }
 
@@ -979,6 +956,7 @@ Rectangle {
         enabled: true;
         onActivated: {
             console.log("Ctrl+Z");
+            canvasPage.revertSignal();
         }
     }
 
@@ -987,19 +965,44 @@ Rectangle {
         enabled: true;
         onActivated: {
             console.log("F2");
-            if(canvas.selectedIndex >= 0){
-            }
+            canvasPage.renameSignal(canvas.selectedIndex);
         }
     }
 
-    Shortcut {
-        sequence: "Delete";
-        enabled: true;
-        onActivated: {
-            console.log("Delete");
-            if(canvas.selectedIndex >= 0){
-                canvasPage.deleteObjectFunc(canvas.selectedIndex);
-            }
+
+    function copyObjectFunc(index){
+        if(index >= 0){
+            bufferModel.Clear();
+            bufferModel.CopyItemDataFromModel(0, canvasPage.objectModel, index);
+            //console.log("bufferModel:: ", bufferModel.toJSON());
+        }
+    }
+
+    function pasteObjectFunc(){
+        if(bufferModel.GetItemsCount()){
+            bufferModel.SetExternTreeModel("Links", emptyModel, 0);
+            let mainText = bufferModel.GetData("MainText") + "_1";
+            let secondText = bufferModel.GetData("SecondText") + "_1";
+            let x_ = bufferModel.GetData("X") + 10;
+            let y_ = bufferModel.GetData("Y") + 10;
+
+            //TO DO: unique Id
+            var date = new Date();
+            let datString = String(date.valueOf());
+            bufferModel.SetData("Id", datString, 0);
+
+            bufferModel.SetData("MainText", mainText, 0);
+            bufferModel.SetData("SecondText", secondText, 0);
+            bufferModel.SetData("X", x_, 0);
+            bufferModel.SetData("Y", y_, 0);
+            bufferModel.SetData("Selected", false, 0);
+            let index = canvasPage.objectModel.InsertNewItem();
+            canvasPage.objectModel.CopyItemDataFromModel(index, bufferModel,0);
+
+            canvas.selectedIndex = 100//index;
+
+            canvas.requestPaint();
+
         }
     }
 
@@ -1039,11 +1042,8 @@ Rectangle {
         anchors.bottom: parent.bottom;
 
         secondSize: 12;
-        backgroundColor: "gray";
-        indicatorColor: "lightgray";
-        Component.onCompleted: {
-            opacity = 1;
-        }
+        //backgroundColor: "gray";
+        //indicatorColor: "lightgray";
         visible: (backgroundRec.topY >=0 && backgroundRec.bottomY <= canvasPage.height) ? false : true;
         alwaysVisible: true;
         canDragOutOfBounds: true;
@@ -1068,12 +1068,9 @@ Rectangle {
         anchors.bottomMargin: 1;
 
         secondSize: 12;
-        backgroundColor: "gray";
-        indicatorColor: "lightgray";
+        //backgroundColor: "gray";
+        //indicatorColor: "lightgray";
 
-        Component.onCompleted: {
-            opacity = 1;
-        }
         visible: (backgroundRec.leftX >=0 && backgroundRec.rightX <= canvasPage.width) ? false : true;
         alwaysVisible: true;
         canDragOutOfBounds: true;
