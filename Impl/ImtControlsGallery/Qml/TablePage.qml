@@ -93,9 +93,6 @@ Rectangle {
         canSetBorderParams: true;
         elements: tablePage.items;
 
-        onSelectItem: {
-        }
-
         onSelectedIndexChanged: {
         }
 
@@ -131,9 +128,6 @@ Rectangle {
         enableAlternating : false;
         canMoveColumns: true;
         elements: tablePage.items;
-
-        onSelectItem: {
-        }
 
         onSelectedIndexChanged: {
         }
