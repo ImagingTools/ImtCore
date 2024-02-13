@@ -508,24 +508,46 @@ class ListView extends Flickable {
 
     onMouseMove(x, y){
         if(this.getPropertyValue('enabled') && this.getPropertyValue('visible') && this.getPropertyValue('interactive')) {
-            if(this.getPropertyValue('contentHeight') <= this.getPropertyValue('height')){
-                this.getStatement('contentY').reset(0)
-                return true
-            }
-            if(this.getPropertyValue('contentY') + (y) > this.getPropertyValue('originY') && this.getPropertyValue('contentY') + (y) < this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height')){
-                this.getStatement('contentY').reset(this.getPropertyValue('contentY') + (y))
-                return false
+            if(this.getPropertyValue('orientation') === ListView.Vertical){
+                if(this.getPropertyValue('contentHeight') <= this.getPropertyValue('height')){
+                    this.getStatement('contentY').reset(0)
+                    return true
+                }
+                if(this.getPropertyValue('contentY') + (y) > this.getPropertyValue('originY') && this.getPropertyValue('contentY') + (y) < this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height')){
+                    this.getStatement('contentY').reset(this.getPropertyValue('contentY') + (y))
+                    return false
+                } else {
+                    if(this.getPropertyValue('contentY') + (y) <= this.getPropertyValue('originY')) {
+                        this.getStatement('contentY').reset(this.getPropertyValue('originY'))
+                        // MouseController.stopPropogation(null)
+                    }
+                    if(this.getPropertyValue('contentY') + (y) >= this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height')) {
+                        this.getStatement('contentY').reset(this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height'))
+                        // MouseController.stopPropogation(null)
+                    }
+                    return true
+                }
             } else {
-                if(this.getPropertyValue('contentY') + (y) <= this.getPropertyValue('originY')) {
-                    this.getStatement('contentY').reset(this.getPropertyValue('originY'))
-                    // MouseController.stopPropogation(null)
+                if(this.getPropertyValue('contentWidth') <= this.getPropertyValue('width')){
+                    this.getStatement('contentX').reset(0)
+                    return true
                 }
-                if(this.getPropertyValue('contentY') + (y) >= this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height')) {
-                    this.getStatement('contentY').reset(this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height'))
-                    // MouseController.stopPropogation(null)
+                if(this.getPropertyValue('contentX') + (x) > this.getPropertyValue('originX') && this.getPropertyValue('contentX') + (x) < this.getPropertyValue('contentWidth') + this.getPropertyValue('originX') - this.getPropertyValue('width')){
+                    this.getStatement('contentX').reset(this.getPropertyValue('contentX') + (x))
+                    return false
+                } else {
+                    if(this.getPropertyValue('contentX') + (x) <= this.getPropertyValue('originX')) {
+                        this.getStatement('contentX').reset(this.getPropertyValue('originX'))
+                        // MouseController.stopPropogation(null)
+                    }
+                    if(this.getPropertyValue('contentX') + (x) >= this.getPropertyValue('contentWidth') + this.getPropertyValue('originX') - this.getPropertyValue('width')) {
+                        this.getStatement('contentX').reset(this.getPropertyValue('contentWidth') + this.getPropertyValue('originX') - this.getPropertyValue('width'))
+                        // MouseController.stopPropogation(null)
+                    }
+                    return true
                 }
-                return true
             }
+            
         } else {
             return true
         }

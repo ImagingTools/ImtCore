@@ -72,6 +72,13 @@ class ComplexObject {
     }
 
     createSignal(name, ...args){
+        // if(name in this.$signals){
+        //     console.log('Warning: redefine property', name)
+        //     this.$signals[name].destroy()
+        //     this.$signals[name] = new QSignal(args)
+        //     return
+        // }
+
         this.$signals[name] = new QSignal(args)
         Object.defineProperty(this, name, {
             get: function(){
