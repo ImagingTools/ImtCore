@@ -343,10 +343,14 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelCode(QTextStr
 void CSdlClassTreeModelModificatorComp::AddCustomFieldReadToModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents)
 {
 	FeedStreamHorizontally(stream, hIndents);
+
+	// define readed container
 	stream << 'C' << GetCapitalizedValue(field.GetType());
 	stream << ' ' << GetDecapitalizedValue(field.GetId()) << ';';
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, hIndents);
+
+	// read from model
 	stream << QStringLiteral("const bool is");
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral("Readed = ");
@@ -356,6 +360,8 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadToModelImplCode(QTextS
 	stream << ',' << ' ' << QStringLiteral("*");
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral("DataModelPtr, modelIndex);");
+
+	// reading checks
 	stream << QStringLiteral("if (!is");
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral("Readed){");
@@ -367,6 +373,8 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadToModelImplCode(QTextS
 	stream << '}';
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, hIndents);
+
+	// setting a container value to object
 	stream << QStringLiteral("object.Set");
 	stream << GetCapitalizedValue(field.GetId());
 	stream << '(' << GetDecapitalizedValue(field.GetId()) << ')' << ';';
