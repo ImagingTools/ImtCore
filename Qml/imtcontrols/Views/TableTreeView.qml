@@ -22,12 +22,12 @@ AuxTable{
     signal requestSignal(int index);
 
     signal clicked(int index);
-    signal doubleClicked(int index);
-    signal rightButtonMouseClicked(int mX, int mY);
+//    signal doubleClicked(int index); // redefine!!!
+//    signal rightButtonMouseClicked(int mX, int mY); // redefine!!!
 
     signal openButtonClicked(int index);
 
-    signal selectionChanged();
+//    signal selectionChanged(); // redefine!!!
     signal openBranch(int index)
     signal closeBranch(int index)
 
@@ -61,7 +61,7 @@ AuxTable{
 
     }
 
-    delegate:Item{
+    delegate: Component{ Item{
         id: deleg;
 
         width: Math.max(tableTreeView.width, tableTreeView.contentWidth);
@@ -215,7 +215,7 @@ AuxTable{
             }
 
         }//topElement
-    }//delegate
+    }}//delegate
 
 
     Component{
