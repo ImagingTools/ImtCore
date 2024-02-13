@@ -132,7 +132,7 @@ Rectangle {
 
         model: pagesManager.pageModel;
 
-        color: Style.color_menuPanel !==undefined ? Style.color_menuPanel : Style.imagingToolsGradient1;
+        color: !pagesManager.pageModel.GetItemsCount() ? "transparent" : Style.color_menuPanel !==undefined ? Style.color_menuPanel : Style.imagingToolsGradient1;
 
         Component.onCompleted: {
             MainDocumentManager.documentOpened.connect(onDocumentOpened);
