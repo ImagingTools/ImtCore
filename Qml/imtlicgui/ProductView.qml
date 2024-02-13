@@ -7,11 +7,6 @@ import imtcontrols 1.0
 ViewBase {
     id: productViewContainer;
 
-//    commandsDelegate: ProductViewCommandsDelegate {
-//        tableData: tableView;
-//        documentPtr: productViewContainer;
-//    }
-
     property TreeItemModel allFeaturesModel: CachedFeatureCollection.collectionModel;
     property TreeItemModel licensesModel: TreeItemModel {}
     property TreeItemModel productFeaturesViewModel: TreeItemModel {}

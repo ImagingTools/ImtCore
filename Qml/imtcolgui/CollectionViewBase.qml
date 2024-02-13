@@ -41,12 +41,16 @@ ViewBase {
         Events.unSubscribeEvent("OnLocalizationChanged", collectionViewBaseContainer.onLocalizationChanged);
     }
 
-    Connections {
-        target: collectionViewBaseContainer.collectionFilter;
+    onCollectionFilterChanged: {
+        if (collectionFilter){
+            collectionFilter.filterChanged.connect(internal.onFilterChanged);
+        }
+    }
+
+    QtObject {
+        id: internal;
 
         function onFilterChanged(){
-            console.log("onFilterChanged");
-
             tableInternal.currentHeaderId = collectionViewBaseContainer.collectionFilter.getSortingInfoId();
             tableInternal.currentSortOrder = collectionViewBaseContainer.collectionFilter.getSortingOrder();
 

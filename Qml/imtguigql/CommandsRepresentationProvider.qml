@@ -7,7 +7,6 @@ CommandsController {
     id: commandsProviderContainer;
 
     property string commandId;
-//    property var additionInputParams: ({})
 
     onCommandIdChanged: {
         updateModel();

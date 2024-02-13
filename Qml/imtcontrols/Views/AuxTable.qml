@@ -40,8 +40,6 @@ Rectangle {
 
     property alias scrollbarItem: scrollbar;
 
-//    property SortController sortController: null;
-
     property alias delegate: elementsListObj.delegate;
     property alias elements: elementsListObj.model;
 

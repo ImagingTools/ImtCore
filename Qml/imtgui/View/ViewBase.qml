@@ -52,14 +52,9 @@ Item {
         doUpdateGui();
     }
 
-    Connections {
-        target: viewBase.commandsController;
-
-        function onCommandsModelChanged(){
-            console.log("onCommandsModelChanged");
-            if (viewBase.visible){
-                viewBase.updateCommandsGui();
-            }
+    onCommandsControllerChanged: {
+        if (commandsController){
+            commandsController.commandsModelChanged.connect(internal.onCommandsModelChanged);
         }
     }
 
@@ -130,6 +125,13 @@ Item {
             if (!blockingUpdateGui && countIncomingChanges > 0){
                 countIncomingChanges = 0;
                 viewBase.onModelChanged();
+            }
+        }
+
+        function onCommandsModelChanged(){
+            console.log("onCommandsModelChanged");
+            if (viewBase.visible){
+                viewBase.updateCommandsGui();
             }
         }
     }

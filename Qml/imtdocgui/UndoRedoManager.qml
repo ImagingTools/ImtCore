@@ -254,8 +254,6 @@ Item {
             return;
         }
 
-        console.error("Undo manager onDataChanged");
-
         undoRedoManager.makeChanges();
 
         internal.m_beginStateModel = internal.m_observedModel.CopyMe();
@@ -285,23 +283,6 @@ Item {
             }
         }
     }
-
-
-//    Connections {
-//        target: internal.m_observedModel;
-
-//        function onDataChanged(){
-//            if (internal.m_isBlocked){
-//                return;
-//            }
-
-//            console.error("Undo manager onDataChanged");
-
-//            undoRedoManager.makeChanges();
-
-//            internal.m_beginStateModel = internal.m_observedModel.CopyMe();
-//        }
-//    }
 
     function printInfo(){
         console.log("printInfo");

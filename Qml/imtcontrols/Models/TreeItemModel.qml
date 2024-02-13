@@ -218,6 +218,19 @@ JSONListModel {
         return true
     }
 
+    function CopyMe(){
+        let retModel = this.createComponent("imtqml/TreeItemModel.qml", null);
+        if (!retModel){
+            return null
+        }
+
+        if (!retModel.Copy(this)){
+            return null
+        }
+
+        return retModel;
+    }
+
     function GetKeys(index){
         if (index === undefined) index = 0
 

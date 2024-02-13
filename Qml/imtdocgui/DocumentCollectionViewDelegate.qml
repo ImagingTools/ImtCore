@@ -12,12 +12,12 @@ CollectionViewCommandsDelegateBase {
 
     onCollectionViewChanged: {
         if (collectionView && collectionView.dataController){
-            collectionViewConnections.target = collectionView.dataController;
+            collectionView.dataController.removed.connect(internal.onRemoved);
         }
     }
 
-    Connections {
-        id: collectionViewConnections;
+    QtObject {
+        id: internal;
 
         function onRemoved(objectId){
             if (root.documentManager){

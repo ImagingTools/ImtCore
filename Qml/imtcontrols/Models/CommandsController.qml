@@ -12,12 +12,8 @@ Item {
     signal commandModeChanged(string commandId, bool newMode);
 
     onCommandModeChanged: {
-        Events.sendEvent("CommandsEnabledChanged", {"Model": commandsModel, "CommandId": uuid});
+        Events.sendEvent("CommandsEnabledChanged", {"Model": root.commandsModel, "CommandId": uuid});
     }
-
-//    onCommandsModelChanged: {
-//        Events.sendEvent("CommandsModelChanged", {"Model": root.commandsModel, "CommandId": root.uuid});
-//    }
 
     function commandIsEnabled(commandId){
         if(!root.commandsModel){

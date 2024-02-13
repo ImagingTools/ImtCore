@@ -288,7 +288,7 @@ Item {
             return false;
         }
 
-//        Events.sendEvent("StartLoading");
+        Events.sendEvent("StartLoading");
 
         documentData.documentIndex = documentsModel.count;
         documentsModel.append({
@@ -564,7 +564,7 @@ Item {
             property var views: [];
             property bool isDirty: false;
 
-            property Connections connections: Connections {
+            property QtObject dataControllerConnections: QtObject {
                 function onSaved(documentId, documentName){
                     singleDocumentData.documentId = documentId;
                     singleDocumentData.documentName = documentName;
@@ -603,6 +603,8 @@ Item {
 
                     documentManager.updateDocumentTitle(singleDocumentData.documentIndex);
 
+                    documentModel.dataChanged.connect(singleDocumentData.modelConnections.onDataChanged);
+
                     singleDocumentData.undoManager.registerModel(documentModel);
                     singleDocumentData.documentValidator.documentModel = documentModel;
 
@@ -615,9 +617,7 @@ Item {
                 }
             }
 
-            property Connections modelConnections: Connections {
-                target: singleDocumentData.documentDataController.documentModel
-
+            property QtObject modelConnections: QtObject {
                 function onDataChanged(){
                     console.log("Connections onModelChanged", singleDocumentData.blockingUpdateModel);
                     if (singleDocumentData.blockingUpdateModel){
@@ -633,7 +633,9 @@ Item {
             onDocumentDataControllerChanged: {
                 console.log("onDocumentDataControllerChanged", documentDataController);
                 if (documentDataController){
-                    singleDocumentData.connections.target = documentDataController;
+                    documentDataController.saved.connect(dataControllerConnections.onSaved);
+                    documentDataController.documentModelChanged.connect(dataControllerConnections.onDocumentModelChanged);
+                    documentDataController.error.connect(dataControllerConnections.onError);
                 }
             }
 

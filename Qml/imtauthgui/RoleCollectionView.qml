@@ -17,42 +17,44 @@ CollectionView {
     table.showHeaders: false;
     filterMenuVisible: false;
 
-//    table.delegate: Component {
-//        TableProductRolesDelegate {
-//            width: roleCollectionViewContainer.table.width;
+    Component {
+        id: roleTableDelegateComp;
 
-//            newIsEnabled: roleCollectionViewContainer.newCommandIsEnabled;
+        TableProductRolesDelegate {
+            width: roleCollectionViewContainer.table.width;
 
-//            Component.onCompleted: {
-//                roleCollectionViewContainer.selectionChanged.connect(this.selectionChanged);
-//            }
+            newIsEnabled: roleCollectionViewContainer.newCommandIsEnabled;
 
-//            Component.onDestruction: {
-//                roleCollectionViewContainer.selectionChanged.disconnect(this.selectionChanged);
-//            }
+            Component.onCompleted: {
+                roleCollectionViewContainer.selectionChanged.connect(this.selectionChanged);
+            }
 
-//            onDoubleClicked: {
-//                roleCollectionViewContainer.table.select(index);
+            Component.onDestruction: {
+                roleCollectionViewContainer.selectionChanged.disconnect(this.selectionChanged);
+            }
 
-//                roleCollectionViewContainer.doubleClicked(id, index)
-//            }
+            onDoubleClicked: {
+                roleCollectionViewContainer.table.select(index);
 
-//            onClicked: {
-//                roleCollectionViewContainer.table.select(index)
-//                roleCollectionViewContainer.table.elementsList.forceActiveFocus();
-//            }
+                roleCollectionViewContainer.doubleClicked(id, index)
+            }
 
-//            onNewClicked: {
-//                if (roleCollectionViewContainer.commandsDelegate){
-//                    roleCollectionViewContainer.commandsDelegate.commandHandle("New");
-//                }
-//            }
+            onClicked: {
+                roleCollectionViewContainer.table.select(index)
+                roleCollectionViewContainer.table.elementsList.forceActiveFocus();
+            }
 
-//            function selectionChanged(selection){
-//                selectedIndex = selection[0];
-//            }
-//        }
-//    }
+            onNewClicked: {
+                if (roleCollectionViewContainer.commandsDelegate){
+                    roleCollectionViewContainer.commandsDelegate.commandHandle("New");
+                }
+            }
+
+            function selectionChanged(selection){
+                selectedIndex = selection[0];
+            }
+        }
+    }
 
     dataController: CollectionRepresentation {
         collectionId: "Roles";
@@ -78,6 +80,8 @@ CollectionView {
             documentManager.registerDocumentView("Role", "RoleEditor", roleDocumentComp);
             documentManager.registerDocumentDataController("Role", dataControllerComp);
         }
+
+        table.delegate = roleTableDelegateComp;
     }
 
     onElementsChanged: {

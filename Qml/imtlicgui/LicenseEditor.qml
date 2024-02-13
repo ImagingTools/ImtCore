@@ -205,8 +205,9 @@ ViewBase {
 
         onCollectionModelChanged: {
             if (productCollection.collectionModel){
-
                 productsCB.model = productCollection.collectionModel;
+
+                root.doUpdateGui();
             }
         }
     }
@@ -217,6 +218,10 @@ ViewBase {
         commandId: "Licenses";
 
         fields: ["Id", "ProductId", "LicenseId", "LicenseName", "ProductUuid", "ParentLicenses"];
+
+        onCollectionModelChanged: {
+            root.doUpdateGui();
+        }
     }
 
     Rectangle {

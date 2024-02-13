@@ -56,7 +56,6 @@ FocusScope {
     signal clicked();
 
     Component.onDestruction: {
-        console.log("delegate onDestruction");
         if (delegate.root){
             if (delegate.root.tableSelection.isSelected(delegate.modelIndex)){
                 delegate.root.tableSelection.resetSelection();
@@ -69,8 +68,6 @@ FocusScope {
     }
 
     Component.onCompleted: {
-        console.log("delegate onCompleted", delegate.itemData.FeatureId);
-
         if (delegate.root){
             delegate.root._addItem(delegate);
             delegate.root.tableSelection.selectionChanged.connect(delegate.selectionChanged);
@@ -83,10 +80,6 @@ FocusScope {
         id: internal;
 
         property int totalIndex: delegate.root ? delegate.root.itemsList.indexOf(delegate): -1;
-
-        onTotalIndexChanged: {
-            console.log("onTotalIndexChanged", totalIndex, delegate.itemData.FeatureId);
-        }
     }
 
     function selectionChanged(){

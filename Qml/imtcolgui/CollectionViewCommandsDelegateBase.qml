@@ -15,6 +15,15 @@ Item {
     property string removeDialogTitle: qsTr("Deleting a selected element");
     property string removeMessage: qsTr("Remove selected item from the collection ?");
 
+    property TreeItemModel contextMenuModel: TreeItemModel {}
+
+    property var templateContextMenuModel: [
+        {"Id": "Edit"},
+        {"Id": ""},
+        {"Id": "Rename"},
+        {"Id": "SetDescription"}
+    ]
+
     signal commandActivated(string commandId);
     signal renamed(string id, string newName);
     signal descriptionSetted(string id, string description);
@@ -26,25 +35,40 @@ Item {
         }
     }
 
-    Connections {
-        target: container.collectionView;
+    onCollectionViewChanged: {
+        if (collectionView){
+            collectionView.selectionChanged.connect(internal.onSelectionChanged);
+            collectionView.viewIdChanged.connect(internal.onViewIdChanged);
+
+            if (collectionView.commandsController){
+                collectionView.commandsController.commandsModelChanged.connect(internal.onCommandsModelChanged);
+            }
+        }
+    }
+
+    QtObject {
+        id: internal;
 
         function onSelectionChanged(selection){
-            console.log("CW selectionChanged", selection)
-
             container.updateItemSelection(selection);
         }
 
         function onViewIdChanged(){
-            console.log("Delegate onUuidChanged");
             let uuid = container.collectionView.viewId;
 
             Events.subscribeEvent(uuid + "CommandActivated", container.commandHandle)
         }
+
+        function onCommandsModelChanged(){
+            container.setupContextMenu();
+        }
+    }
+
+    function getContextMenuModel(){
+        return container.contextMenuModel;
     }
 
     function updateItemSelection(selectedItems){
-        console.log("updateItemSelection", selectedItems);
         if (container.collectionView && container.collectionView.commandsController){
             let isEnabled = selectedItems.length > 0;
             let commandsController = container.collectionView.commandsController;
@@ -55,11 +79,20 @@ Item {
         }
     }
 
-    function setupContextMenu(contextMenu){
-        if (contextMenu){
-            contextMenu.Clear();
+    function setupContextMenu(){
+        let commandsController = collectionView.commandsController;
+        if (commandsController){
+            container.contextMenuModel.Clear();
+            for (let i = 0; i < container.templateContextMenuModel.length; i++){
+                let commandObj = container.templateContextMenuModel[i];
 
-
+                let commandId = commandObj["Id"];
+                if (commandsController.commandExists(commandId)){
+                    let index = container.contextMenuModel.InsertNewItem();
+                    let commandIndex = commandsController.getCommandIndex(commandId);
+                    container.contextMenuModel.CopyItemDataFromModel(index, commandsController.commandsModel, commandIndex)
+                }
+            }
         }
     }
 
@@ -97,19 +130,13 @@ Item {
     }
 
     function commandHandle(commandId){
-        console.log("commandHandle", commandId);
-        console.log("container.collectionView", container.collectionView);
-
         if (!container.collectionView){
             return;
         }
 
         let commandsController = container.collectionView.commandsController;
-        console.log("commandsController", commandsController);
 
         let commandIsEnabled = commandsController.commandIsEnabled(commandId);
-        console.log("commandIsEnabled", commandIsEnabled);
-
         if (commandIsEnabled){
             if (commandId === "New"){
                 container.onNew();
@@ -118,8 +145,6 @@ Item {
                 container.onRemove();
             }
             else if (commandId === "Edit"){
-                console.log("=== Edit");
-
                 container.onEdit();
             }
         }

@@ -78,56 +78,50 @@ DocumentDataController {
 
             var gqlData = query.GetQuery();
             this.SetGqlQuery(gqlData);
+        }
 
-            let onResult = function(){
-                console.log("onResult", container.gqlUpdateModel.state);
-                let state = container.gqlUpdateModel.state;
-                if (state === "Error"){
-                    container.gqlUpdateModel.onStateChanged.disconnect(onResult);
+        onStateChanged: {
+            console.log("onResult", container.gqlUpdateModel.state);
+            let state = container.gqlUpdateModel.state;
+            if (state === "Error"){
+                container.error("Network error", "Critical");
+            }
+            if (state === "Ready"){
+                var dataModelLocal;
+                if (container.gqlUpdateModel.ContainsKey("errors")){
+                    dataModelLocal = container.gqlUpdateModel.GetData("errors");
 
-                    container.error("Network error", "Critical");
+                    if (dataModelLocal.ContainsKey(container.gqlUpdateCommandId)){
+                        dataModelLocal = dataModelLocal.GetData(container.gqlUpdateCommandId);
+                    }
+
+                    let message = ""
+                    if (dataModelLocal.ContainsKey("message")){
+                        message = dataModelLocal.GetData("message");
+                    }
+
+                    let type;
+                    if (dataModelLocal.ContainsKey("type")){
+                        type = dataModelLocal.GetData("type");
+                    }
+
+                    container.error(message, type);
                 }
-                if (state === "Ready"){
-                    var dataModelLocal;
-                    if (container.gqlUpdateModel.ContainsKey("errors")){
-                        dataModelLocal = container.gqlUpdateModel.GetData("errors");
 
-                        if (dataModelLocal.ContainsKey(container.gqlUpdateCommandId)){
-                            dataModelLocal = dataModelLocal.GetData(container.gqlUpdateCommandId);
-                        }
+                else if (container.gqlUpdateModel.ContainsKey("data")){
+                    dataModelLocal = container.gqlUpdateModel.GetData("data");
 
-                        let message = ""
-                        if (dataModelLocal.ContainsKey("message")){
-                            message = dataModelLocal.GetData("message");
-                        }
+                    if (dataModelLocal.ContainsKey(container.gqlUpdateCommandId)){
+                        dataModelLocal = dataModelLocal.GetData(container.gqlUpdateCommandId);
+                        dataModelLocal = dataModelLocal.GetData("updatedNotification");
 
-                        let type;
-                        if (dataModelLocal.ContainsKey("type")){
-                            type = dataModelLocal.GetData("type");
-                        }
+                        let documentId = dataModelLocal.GetData("Id");
+                        let documentName = dataModelLocal.GetData("Name");
 
-                        container.error(message, type);
+                        container.saved(documentId, documentName);
                     }
-
-                    else if (container.gqlUpdateModel.ContainsKey("data")){
-                        dataModelLocal = container.gqlUpdateModel.GetData("data");
-
-                        if (dataModelLocal.ContainsKey(container.gqlUpdateCommandId)){
-                            dataModelLocal = dataModelLocal.GetData(container.gqlUpdateCommandId);
-                            dataModelLocal = dataModelLocal.GetData("updatedNotification");
-
-                            let documentId = dataModelLocal.GetData("Id");
-                            let documentName = dataModelLocal.GetData("Name");
-
-                            container.saved(documentId, documentName);
-                        }
-                    }
-
-                    container.gqlUpdateModel.onStateChanged.disconnect(onResult);
                 }
             }
-
-            container.gqlUpdateModel.onStateChanged.connect(onResult);
         }
     }
 
@@ -157,52 +151,90 @@ DocumentDataController {
             var gqlData = query.GetQuery();
 
             this.SetGqlQuery(gqlData);
+        }
 
-            let onResult = function(){
-                console.log("onResult",container.gqlGetModel.toJSON());
-                let state = container.gqlGetModel.state;
-                if (state === "Error"){
-                    container.gqlGetModel.onStateChanged.disconnect(onResult);
+        onStateChanged: {
+            console.log("onResult",container.gqlGetModel.toJSON());
+            let state = container.gqlGetModel.state;
+            if (state === "Error"){
+                container.error("Network error", "Critical");
+            }
+            else if (state === "Ready"){
+                if (container.gqlGetModel.ContainsKey("errors")){
+                    let dataModelLocal = container.gqlGetModel.GetData("errors");
 
-                    container.error("Network error", "Critical");
+                    if (dataModelLocal.ContainsKey(container.gqlGetCommandId)){
+                        dataModelLocal = dataModelLocal.GetData(container.gqlGetCommandId);
+                    }
+
+                    let message = ""
+                    if (dataModelLocal.ContainsKey("message")){
+                        message = dataModelLocal.GetData("message");
+                    }
+
+                    let type;
+                    if (dataModelLocal.ContainsKey("type")){
+                        type = dataModelLocal.GetData("type");
+                    }
+
+                    container.error(message, type);
                 }
-                else if (state === "Ready"){
-                    if (container.gqlGetModel.ContainsKey("errors")){
-                        let dataModelLocal = container.gqlGetModel.GetData("errors");
 
-                        if (dataModelLocal.ContainsKey(container.gqlGetCommandId)){
-                            dataModelLocal = dataModelLocal.GetData(container.gqlGetCommandId);
-                        }
-
-                        let message = ""
-                        if (dataModelLocal.ContainsKey("message")){
-                            message = dataModelLocal.GetData("message");
-                        }
-
-                        let type;
-                        if (dataModelLocal.ContainsKey("type")){
-                            type = dataModelLocal.GetData("type");
-                        }
-
-                        container.error(message, type);
+                else if (container.gqlGetModel.ContainsKey("data")){
+                    let dataModelLocal = container.gqlGetModel.GetData("data")
+                    if (dataModelLocal.ContainsKey(container.gqlGetCommandId)){
+                        container.documentModel = dataModelLocal.GetData(container.gqlGetCommandId)
                     }
-
-                    else if (container.gqlGetModel.ContainsKey("data")){
-                        let dataModelLocal = container.gqlGetModel.GetData("data")
-                        if (dataModelLocal.ContainsKey(container.gqlGetCommandId)){
-                            container.documentModel = dataModelLocal.GetData(container.gqlGetCommandId)
-                        }
-                    }
-
-                    container.gqlGetModel.onStateChanged.disconnect(onResult);
                 }
             }
-
-            this.onStateChanged.connect(onResult);
         }
     }//GqlModel itemModel
 
     property GqlModel gqlAddModel: GqlModel {
+        onStateChanged: {
+            console.log("onResult", container.gqlAddModel.state);
+            let state = container.gqlAddModel.state;
+            if (state === "Error"){
+                container.error("Network error", "Critical");
+            }
+            if (state === "Ready"){
+                var dataModelLocal;
+                if (container.gqlAddModel.ContainsKey("errors")){
+                    dataModelLocal = container.gqlAddModel.GetData("errors");
+
+                    if (dataModelLocal.ContainsKey(container.gqlAddCommandId)){
+                        dataModelLocal = dataModelLocal.GetData(container.gqlAddCommandId);
+                    }
+
+                    let message = ""
+                    if (dataModelLocal.ContainsKey("message")){
+                        message = dataModelLocal.GetData("message");
+                    }
+
+                    let type;
+                    if (dataModelLocal.ContainsKey("type")){
+                        type = dataModelLocal.GetData("type");
+                    }
+
+                    container.error(message, type);
+                }
+
+                else if (container.gqlAddModel.ContainsKey("data")){
+                    dataModelLocal = container.gqlAddModel.GetData("data");
+
+                    if (dataModelLocal.ContainsKey(container.gqlAddCommandId)){
+                        dataModelLocal = dataModelLocal.GetData(container.gqlAddCommandId);
+                        dataModelLocal = dataModelLocal.GetData("addedNotification");
+
+                        let documentId = dataModelLocal.GetData("Id");
+                        let documentName = dataModelLocal.GetData("Name");
+
+                        container.saved(documentId, documentName);
+                    }
+                }
+            }
+        }
+
         function save(){
             var query = Gql.GqlRequest("mutation", container.gqlAddCommandId);
 
@@ -227,56 +259,6 @@ DocumentDataController {
 
             var gqlData = query.GetQuery();
             this.SetGqlQuery(gqlData);
-
-            let onResult = function(){
-                console.log("onResult", container.gqlAddModel.state);
-                let state = container.gqlAddModel.state;
-                if (state === "Error"){
-                    container.gqlAddModel.onStateChanged.disconnect(onResult);
-
-                    container.error("Network error", "Critical");
-                }
-                if (state === "Ready"){
-                    var dataModelLocal;
-                    if (container.gqlAddModel.ContainsKey("errors")){
-                        dataModelLocal = container.gqlAddModel.GetData("errors");
-
-                        if (dataModelLocal.ContainsKey(container.gqlAddCommandId)){
-                            dataModelLocal = dataModelLocal.GetData(container.gqlAddCommandId);
-                        }
-
-                        let message = ""
-                        if (dataModelLocal.ContainsKey("message")){
-                            message = dataModelLocal.GetData("message");
-                        }
-
-                        let type;
-                        if (dataModelLocal.ContainsKey("type")){
-                            type = dataModelLocal.GetData("type");
-                        }
-
-                        container.error(message, type);
-                    }
-
-                    else if (container.gqlAddModel.ContainsKey("data")){
-                        dataModelLocal = container.gqlAddModel.GetData("data");
-
-                        if (dataModelLocal.ContainsKey(container.gqlAddCommandId)){
-                            dataModelLocal = dataModelLocal.GetData(container.gqlAddCommandId);
-                            dataModelLocal = dataModelLocal.GetData("addedNotification");
-
-                            let documentId = dataModelLocal.GetData("Id");
-                            let documentName = dataModelLocal.GetData("Name");
-
-                            container.saved(documentId, documentName);
-                        }
-                    }
-
-                    container.gqlAddModel.onStateChanged.disconnect(onResult);
-                }
-            }
-
-            container.gqlAddModel.onStateChanged.connect(onResult);
         }
     }
 }

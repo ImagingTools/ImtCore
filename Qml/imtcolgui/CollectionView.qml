@@ -6,18 +6,15 @@ import imtcolgui 1.0
 import imtcontrols 1.0
 
 CollectionViewBase {
-    id: collectionView;
+    id: container;
 
     property bool visibleMetaInfo: false;
 
     property var dataController: null;
 
-//    property var templateContextMenuModel: [
-//        {"Id": "Edit"},
-//        {"Id": ""},
-//        {"Id": "Rename"},
-//        {"Id": "SetDescription"}
-//    ]
+    commandsDelegate: CollectionViewCommandsDelegateBase {
+        collectionView: container;
+    }
 
     QtObject {
         id: internal;
@@ -25,26 +22,58 @@ CollectionViewBase {
         property bool guiUpdateRequired: false
 
         function filterMenuActivate(){
-            if (collectionView.hasFilter){
-                collectionView.filterMenuVisible = !collectionView.filterMenuVisible;
+            if (container.hasFilter){
+                container.filterMenuVisible = !container.filterMenuVisible;
+            }
+        }
+
+        function onBeginUpdate(){
+            container.loading.start();
+        }
+
+        function onEndUpdate(){
+            container.loading.stop();
+        }
+
+        function onHeadersModelChanged(){
+            container.doUpdateGui();
+        }
+
+        function onNotificationModelChanged(){
+            let notificationModel = container.dataController.notificationModel;
+            if (notificationModel.ContainsKey("TotalCount")){
+                let totalCount = notificationModel.GetData("TotalCount")
+
+                container.pagination.countAllElements = totalCount;
+            }
+
+            if (notificationModel.ContainsKey("PagesCount")){
+                let pagesCount = notificationModel.GetData("PagesCount")
+
+                container.pagination.pagesSize = pagesCount;
             }
         }
     }
 
     Component.onCompleted: {
         Events.subscribeEvent("FilterActivated", internal.filterMenuActivate);
-        Events.subscribeEvent("OnLocalizationChanged", collectionView.onLocalizationChanged);
+        Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
     }
 
     Component.onDestruction: {
-        Events.unSubscribeEvent("OnLocalizationChanged", collectionView.onLocalizationChanged);
+        Events.unSubscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
         Events.unSubscribeEvent("FilterActivated", internal.filterMenuActivate);
     }
 
     onDataControllerChanged: {
-        if (collectionView.dataController){
-            bindHeaders.target = collectionView.table;
-            bindElements.target = collectionView.table;
+        if (container.dataController){
+            bindHeaders.target = container.table;
+            bindElements.target = container.table;
+
+            container.dataController.beginUpdate.connect(internal.onBeginUpdate);
+            container.dataController.endUpdate.connect(internal.onEndUpdate);
+            container.dataController.headersModelChanged.connect(internal.onHeadersModelChanged);
+            container.dataController.notificationModelChanged.connect(internal.onNotificationModelChanged);
         }
     }
 
@@ -57,8 +86,8 @@ CollectionViewBase {
     }
 
     function onEdit() {
-        if (collectionView.commandsDelegate){
-            collectionView.commandsDelegate.commandHandle("Edit");
+        if (container.commandsDelegate){
+            container.commandsDelegate.commandHandle("Edit");
         }
     }
 
@@ -66,65 +95,32 @@ CollectionViewBase {
         id: bindHeaders;
         property: "headers";
 
-        value: collectionView.dataController.headersModel;
+        value: container.dataController.headersModel;
     }
 
     Binding {
         id: bindElements;
         property: "elements";
-        value: collectionView.dataController.elementsModel;
-    }
-
-    Connections {
-        target: collectionView.dataController;
-
-        function onBeginUpdate(){
-            collectionView.loading.start();
-        }
-
-        function onEndUpdate(){
-            collectionView.loading.stop();
-        }
-
-        function onHeadersModelChanged(){
-            collectionView.doUpdateGui();
-        }
-
-        function onNotificationModelChanged(){
-            let notificationModel = collectionView.dataController.notificationModel;
-            if (notificationModel.ContainsKey("TotalCount")){
-                let totalCount = notificationModel.GetData("TotalCount")
-
-                collectionView.pagination.countAllElements = totalCount;
-            }
-
-            if (notificationModel.ContainsKey("PagesCount")){
-                let pagesCount = notificationModel.GetData("PagesCount")
-
-                collectionView.pagination.pagesSize = pagesCount;
-            }
-        }
+        value: container.dataController.elementsModel;
     }
 
     onVisibleChanged: {
-        if (collectionView.visible){
+        if (container.visible){
             if (internal.guiUpdateRequired){
                 internal.guiUpdateRequired = false;
-                collectionView.doUpdateGui();
+                container.doUpdateGui();
             }
 
-            Events.subscribeEvent("FilterActivated", collectionView.filterMenuActivate);
+            Events.subscribeEvent("FilterActivated", container.filterMenuActivate);
         }
         else{
-            Events.unSubscribeEvent("FilterActivated", collectionView.filterMenuActivate);
+            Events.unSubscribeEvent("FilterActivated", container.filterMenuActivate);
         }
     }
 
-    function fillContextMenuModel(){}
-
     function updateGui(){
         console.log("CollectionView updateGui");
-        if (!collectionView.visible){
+        if (!container.visible){
             internal.guiUpdateRequired = true;
 
             return;
@@ -133,36 +129,40 @@ CollectionViewBase {
         let count = 0;
         let offset = -1;
 
-        if (collectionView.hasPagination){
+        if (container.hasPagination){
             count = pagination.countElements;
             offset = pagination.currentIndex * count;
         }
 
-        if (collectionView.dataController){
-            collectionView.dataController.updateElements(count, offset, collectionView.collectionFilter.filterModel);
+        if (container.dataController){
+            container.dataController.updateElements(count, offset, container.collectionFilter.filterModel);
         }
     }
 
     function openPopupMenu(x, y){
-        let offset = 26 * collectionView.commandsController.contextMenuCommandsModel.GetItemsCount();
-        modalDialogManager.openDialog(popupMenuDialog, {"x": x, "y": y - offset, "model": collectionView.commandsController.contextMenuCommandsModel});
+        if (container.commandsDelegate){
+            let contextMenuModel = container.commandsDelegate.getContextMenuModel();
+
+            let offset = 26 * contextMenuModel.GetItemsCount();
+            modalDialogManager.openDialog(popupMenuDialog, {"x": x, "y": y - offset, "model": contextMenuModel});
+        }
     }
 
     function removeElement(elementIndex){
-        if (collectionView.dataController){
-            return collectionView.dataController.removeElement(elementIndex);
+        if (container.dataController){
+            return container.dataController.removeElement(elementIndex);
         }
     }
 
     function setElementName(elementIndex, name){
-        if (collectionView.dataController){
-            return collectionView.dataController.setElementName(elementIndex, name);
+        if (container.dataController){
+            return container.dataController.setElementName(elementIndex, name);
         }
     }
 
     function setElementDescription(elementIndex, description){
-        if (collectionView.dataController){
-            return collectionView.dataController.setElementDescription(elementIndex, description);
+        if (container.dataController){
+            return container.dataController.setElementDescription(elementIndex, description);
         }
     }
 
@@ -178,7 +178,7 @@ CollectionViewBase {
         width: visible ? 200 : 1;
         height: parent.height;
 
-        visible: collectionView.visibleMetaInfo;
+        visible: container.visibleMetaInfo;
     }
 
     Component {
@@ -186,8 +186,7 @@ CollectionViewBase {
 
         PopupMenuDialog {
             onFinished: {
-                console.log("collectionView", collectionView);
-                collectionView.commandsDelegate.commandHandle(commandId);
+                container.commandsDelegate.commandHandle(commandId);
             }
         }
     }
