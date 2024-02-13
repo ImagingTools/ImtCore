@@ -16,6 +16,7 @@
         <file alias="imtlicgui/LicenseEditor.qml">LicenseEditor.qml</file>
         <file alias="imtlicgui/LicenseCollectionView.qml">LicenseCollectionView.qml</file>
         <file alias="imtlicgui/LicensesProvider.qml">LicensesProvider.qml</file>
+	<file alias="imtlicgui/FeatureEditorCommandsDelegate.qml">FeatureEditorCommandsDelegate.qml</file>
 	<file alias="imtlicgui/CachedFeatureCollection.qml">CachedFeatureCollection.qml</file>
 	<file alias="imtlicgui/CachedProductCollection.qml">CachedProductCollection.qml</file>
 	<file alias="imtlicgui/CachedLicenseCollection.qml">CachedLicenseCollection.qml</file>

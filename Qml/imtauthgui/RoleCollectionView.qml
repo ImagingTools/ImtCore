@@ -17,42 +17,42 @@ CollectionView {
     table.showHeaders: false;
     filterMenuVisible: false;
 
-    table.delegate: Component {
-        TableProductRolesDelegate {
-            width: roleCollectionViewContainer.table.width;
+//    table.delegate: Component {
+//        TableProductRolesDelegate {
+//            width: roleCollectionViewContainer.table.width;
 
-            newIsEnabled: roleCollectionViewContainer.newCommandIsEnabled;
+//            newIsEnabled: roleCollectionViewContainer.newCommandIsEnabled;
 
-            Component.onCompleted: {
-                roleCollectionViewContainer.selectionChanged.connect(this.selectionChanged);
-            }
+//            Component.onCompleted: {
+//                roleCollectionViewContainer.selectionChanged.connect(this.selectionChanged);
+//            }
 
-            Component.onDestruction: {
-                roleCollectionViewContainer.selectionChanged.disconnect(this.selectionChanged);
-            }
+//            Component.onDestruction: {
+//                roleCollectionViewContainer.selectionChanged.disconnect(this.selectionChanged);
+//            }
 
-            onDoubleClicked: {
-                roleCollectionViewContainer.table.select(index);
+//            onDoubleClicked: {
+//                roleCollectionViewContainer.table.select(index);
 
-                roleCollectionViewContainer.doubleClicked(id, index)
-            }
+//                roleCollectionViewContainer.doubleClicked(id, index)
+//            }
 
-            onClicked: {
-                roleCollectionViewContainer.table.select(index)
-                roleCollectionViewContainer.table.elementsList.forceActiveFocus();
-            }
+//            onClicked: {
+//                roleCollectionViewContainer.table.select(index)
+//                roleCollectionViewContainer.table.elementsList.forceActiveFocus();
+//            }
 
-            onNewClicked: {
-                if (roleCollectionViewContainer.commandsDelegate){
-                    roleCollectionViewContainer.commandsDelegate.commandHandle("New");
-                }
-            }
+//            onNewClicked: {
+//                if (roleCollectionViewContainer.commandsDelegate){
+//                    roleCollectionViewContainer.commandsDelegate.commandHandle("New");
+//                }
+//            }
 
-            function selectionChanged(selection){
-                selectedIndex = selection[0];
-            }
-        }
-    }
+//            function selectionChanged(selection){
+//                selectedIndex = selection[0];
+//            }
+//        }
+//    }
 
     dataController: CollectionRepresentation {
         collectionId: "Roles";

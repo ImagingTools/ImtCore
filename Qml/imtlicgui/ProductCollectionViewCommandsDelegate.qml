@@ -3,8 +3,9 @@ import Acf 1.0
 import imtgui 1.0
 import Qt.labs.platform 1.1
 import imtcolgui 1.0
+import imtdocgui 1.0
 
-CollectionViewCommandsDelegateBase {
+DocumentCollectionViewDelegate {
     id: container;
 
     removeDialogTitle: qsTr("Deleting a product");
@@ -12,31 +13,31 @@ CollectionViewCommandsDelegateBase {
 
     descriptionFieldId: "ProductDescription";
 
-    onSelectionChanged: {
-        let indexes = container.tableData.getSelectedIndexes();
-        let isEnabled = indexes.length === 1;
-        if(container.commandsProvider){
-            commandsProvider.setCommandIsEnabled("Export", isEnabled);
+    function updateItemSelection(selectedItems){
+        if (container.collectionView && container.collectionView.commandsController){
+            let elementsModel = container.collectionView.table.elements;
+            if (!elementsModel){
+                return;
+            }
+
+            let isEnabled = selectedItems.length === 1;
+
+            let commandsController = container.collectionView.commandsController;
+            if(commandsController){
+                commandsController.setCommandIsEnabled("Remove", isEnabled);
+                commandsController.setCommandIsEnabled("Edit", isEnabled);
+                commandsController.setCommandIsEnabled("Export", isEnabled);
+            }
         }
     }
 
     onCommandActivated: {
-        if (commandId === "Duplicate"){
-            let itemId = container.tableData.getSelectedId();
-            let itemName = container.tableData.getSelectedName();
-
-            let copyStr = qsTr("Copy of ");
-            container.documentManager.addDocument({"Id":         itemId,
-                                      "Name":       copyStr + itemName,
-                                      "Source":     container.collectionViewBase.baseCollectionView.commands.objectViewEditorPath,
-                                      "CommandId": container.collectionViewBase.baseCollectionView.commands.objectViewEditorCommandsId});
-        }
-        else if (commandId === "Export"){
+        if (commandId === "Export"){
             console.log("Export");
-            let indexes = container.tableData.getSelectedIndexes();
+            let indexes = container.collectionView.table.getSelectedIndexes();
             if (indexes.length > 0){
                 let index = indexes[0];
-                let productId = container.tableData.elements.GetData("ProductId", index);
+                let productId = container.collectionView.table.elements.GetData("ProductId", index);
                 let fileName = productId + "Features"
 
                 fileDialogSave.currentFile = 'file:///' + fileName + ".xml";
@@ -46,9 +47,9 @@ CollectionViewCommandsDelegateBase {
     }
 
     function onRename(){
-        let indexes = tableData.getSelectedIndexes();
+        let indexes = container.collectionView.table.getSelectedIndexes();
         if (indexes.length > 0){
-            let selectedName = tableData.elements.GetData("ProductName", indexes[0]);
+            let selectedName = container.collectionView.table.elements.GetData("ProductName", indexes[0]);
             modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
         }
     }
@@ -72,10 +73,10 @@ CollectionViewCommandsDelegateBase {
             remoteFileController.downloadedFileLocation = pathDir.replace('file:///', '');
             var fileName = fileDialogSave.file.toString().replace(pathDir + "/", '');
 
-            let indexes = container.tableData.getSelectedIndexes();
+            let indexes = container.collectionView.table.getSelectedIndexes();
             if (indexes.length > 0){
                 let index = indexes[0];
-                let selectedProductId = container.tableData.elements.GetData("Id", index);
+                let selectedProductId = container.collectionView.table.elements.GetData("Id", index);
                 if (selectedProductId !== ""){
                     if (fileName == ""){
                         fileName = {};

@@ -27,7 +27,7 @@ ItemDelegate {
 
         function checkSeparator(){
             if (popupMenuDelegate.isSeparator){
-                mouseArea.visible = false;
+                popupMenuDelegate.mouseArea.visible = false;
                 popupMenuDelegate.height = 5;
             }
         }

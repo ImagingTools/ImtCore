@@ -2,16 +2,15 @@ import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
 import imtauthgui 1.0
-import imtdocgui 1.0
 import imtcontrols 1.0
 
-DocumentData {
+ViewBase {
     id: productViewContainer;
 
-    commandsDelegate: ProductViewCommandsDelegate {
-        tableData: tableView;
-        documentPtr: productViewContainer;
-    }
+//    commandsDelegate: ProductViewCommandsDelegate {
+//        tableData: tableView;
+//        documentPtr: productViewContainer;
+//    }
 
     property TreeItemModel allFeaturesModel: CachedFeatureCollection.collectionModel;
     property TreeItemModel licensesModel: TreeItemModel {}
@@ -49,41 +48,36 @@ DocumentData {
         }
     }
 
-    function blockEditing(){
-        tableView.readOnly = true;
-        categoryComboBox.changeable = false;
-    }
-
     function updateModel(){
-        productViewContainer.documentModel.SetData("ProductId", productNameInput.text);
-        productViewContainer.documentModel.SetData("ProductName", productNameInput.text);
+        productViewContainer.model.SetData("ProductId", productNameInput.text);
+        productViewContainer.model.SetData("ProductName", productNameInput.text);
 
         if (categoryComboBox.currentIndex == 0){
-            productViewContainer.documentModel.SetData("CategoryId", "Software");
+            productViewContainer.model.SetData("CategoryId", "Software");
         }
         else if (categoryComboBox.currentIndex == 1){
-            productViewContainer.documentModel.SetData("CategoryId", "Hardware");
+            productViewContainer.model.SetData("CategoryId", "Hardware");
         }
         else{
-            productViewContainer.documentModel.SetData("CategoryId", "");
+            productViewContainer.model.SetData("CategoryId", "");
         }
 
-        if (!productViewContainer.documentModel.ContainsKey("Features")){
-            productViewContainer.documentModel.SetData("Features", "");
+        if (!productViewContainer.model.ContainsKey("Features")){
+            productViewContainer.model.SetData("Features", "");
         }
     }
 
     function updateGui(){
-        if (productViewContainer.documentModel.ContainsKey("ProductName")){
-            productNameInput.text = productViewContainer.documentModel.GetData("ProductName")
+        if (productViewContainer.model.ContainsKey("ProductName")){
+            productNameInput.text = productViewContainer.model.GetData("ProductName")
         }
         else{
             productNameInput.text = "";
         }
 
         let categoryFound = false;
-        if (productViewContainer.documentModel.ContainsKey("CategoryId")){
-            let categoryId = productViewContainer.documentModel.GetData("CategoryId")
+        if (productViewContainer.model.ContainsKey("CategoryId")){
+            let categoryId = productViewContainer.model.GetData("CategoryId")
             if (categoryId === "Software"){
                 categoryComboBox.currentIndex = 0;
                 categoryFound = true;
@@ -106,7 +100,7 @@ DocumentData {
 
         productViewContainer.productFeaturesViewModel.Clear();
 
-        let features = productViewContainer.documentModel.GetData("Features")
+        let features = productViewContainer.model.GetData("Features")
         if (!features){
             return;
         }
@@ -140,7 +134,7 @@ DocumentData {
 
     function addFeature(featureId){
         console.log("addFeature", featureId);
-        let features = productViewContainer.documentModel.GetData("Features")
+        let features = productViewContainer.model.GetData("Features")
 
         let featureIds = []
         if (features !== ""){
@@ -151,13 +145,13 @@ DocumentData {
             featureIds.push(featureId)
         }
 
-        productViewContainer.documentModel.SetData("Features", featureIds.join(';'))
+        productViewContainer.model.SetData("Features", featureIds.join(';'))
 
-        console.log("productViewContainer.documentModel", productViewContainer.documentModel.toJSON());
+        console.log("productViewContainer.model", productViewContainer.model.toJSON());
     }
 
     function removeFeature(featureId){
-        let features = productViewContainer.documentModel.GetData("Features")
+        let features = productViewContainer.model.GetData("Features")
 
         let featureIds = []
 
@@ -170,7 +164,7 @@ DocumentData {
             featureIds.splice(i, 1);
         }
 
-        productViewContainer.documentModel.SetData("Features", featureIds.join(';'))
+        productViewContainer.model.SetData("Features", featureIds.join(';'))
     }
 
     TreeItemModel {
@@ -260,6 +254,8 @@ DocumentData {
             backgroundColor: Style.baseColor;
             currentIndex: 0;
 
+            changeable: !productViewContainer.readOnly;
+
             radius: 0;
 
             Component.onCompleted: {
@@ -281,7 +277,7 @@ DocumentData {
         anchors.left: parent.left;
         anchors.right: parent.right;
 
-        readOnly: false;
+        readOnly: productViewContainer.readOnly;
 
         tristate: true;
 
@@ -319,7 +315,7 @@ DocumentData {
 
                     let id = rootFeatureUuid + "/" + featureId;
 
-                    let features = productViewContainer.documentModel.GetData("Features");
+                    let features = productViewContainer.model.GetData("Features");
 
                     let featureIds = []
                     if (features !== ""){

@@ -185,7 +185,7 @@ ViewBase {
                     filteringInfoIds.push(headerId);
                 }
 
-                collectionFilter.setFilteringInfoIds(filteringInfoIds);
+                collectionViewBaseContainer.collectionFilter.setFilteringInfoIds(filteringInfoIds);
             }
 
             onRightButtonMouseClicked: {

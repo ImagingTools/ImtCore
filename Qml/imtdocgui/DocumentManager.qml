@@ -180,6 +180,7 @@ Item {
 
     function getDocumentDataController(documentTypeId)
     {
+        console.log("getDocumentDataController", documentTypeId);
         if (!dataControllerIsRegistered(documentTypeId)){
             console.error("Data controller for documents with type-ID: ", documentTypeId, " is unregistered!");
 
@@ -187,6 +188,8 @@ Item {
         }
 
         let dataControllerComp = internal.m_registeredDataControllers[documentTypeId];
+        console.log("dataControllerComp", dataControllerComp);
+        console.log("documentManager", documentManager);
 
         return dataControllerComp.createObject(documentManager);
     }
@@ -579,8 +582,6 @@ Item {
                 }
 
                 function onDocumentModelChanged(){
-                    console.log("Connections onDocumentModelChanged", documentDataController);
-
                     let documentModel = singleDocumentData.documentDataController.documentModel;
 
                     if (documentModel.ContainsKey("Id")){
@@ -615,7 +616,7 @@ Item {
             }
 
             property Connections modelConnections: Connections {
-                target: documentDataController.documentModel
+                target: singleDocumentData.documentDataController.documentModel
 
                 function onDataChanged(){
                     console.log("Connections onModelChanged", singleDocumentData.blockingUpdateModel);

@@ -1,53 +1,83 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtauthgui 1.0
 import imtcolgui 1.0
+import imtcontrols 1.0
+import imtguigql 1.0
+import imtdocgui 1.0
 
-CollectionView {
+RemoteCollectionView {
      id: featureCollectionViewContainer;
 
      visibleMetaInfo: false;
 
-     documentName: qsTr("Features");
-     defaultSortHeaderIndex: 4;
-     defaultOrderType: "DESC";
+     collectionId: "Features";
 
+     commandsDelegate: DocumentCollectionViewDelegate {
+         collectionView: featureCollectionViewContainer;
+
+         documentTypeId: "Feature";
+         viewTypeId: "FeatureEditor";
+     }
 
      Component.onCompleted: {
-         console.log("featureCollection onCompleted");
-         featureCollectionViewContainer.commandsDelegatePath = "../imtlicgui/PackageCollectionViewCommandsDelegate.qml";
+         collectionFilter.setSortingOrder("DESC");
+         collectionFilter.setSortingInfoId("LastModified");
 
-         featureCollectionViewContainer.commandId = "Features";
-     }
+         let documentManager = MainDocumentManager.getDocumentManager(featureCollectionViewContainer.collectionId);
+         if (documentManager){
+             featureCollectionViewContainer.commandsDelegate.documentManager = documentManager;
 
-     onDocumentManagerPtrChanged: {
-         if (documentManagerPtr){
-             documentManagerPtr.registerDocument("Feature", featureDocumentComp);
-         }
-     }
-
-     function fillContextMenuModel(){
-         contextMenuModel.clear();
-
-         contextMenuModel.append({"Id": "Edit", "Name": qsTr("Edit"), "IconSource": "../../../../" + Style.getIconPath("Icons/Edit", "On", "Normal")});
-         contextMenuModel.append({"Id": "Remove", "Name": qsTr("Remove"), "IconSource": "../../../../" + Style.getIconPath("Icons/Remove", "On", "Normal")});
-     }
-
-     function selectItem(id){
-         console.log("CollectionView selectItem", id);
-
-         if (id === ""){
-             documentManagerPtr.insertNewDocument("Feature");
-         }
-         else{
-             documentManagerPtr.openDocument(id, "Feature");
+             documentManager.registerDocumentView("Feature", "FeatureEditor", featureDocumentComp);
+             documentManager.registerDocumentDataController("Feature", dataControllerComp);
          }
      }
 
      Component {
          id: featureDocumentComp;
 
-         FeatureEditor {}
+         FeatureEditor {
+             id: featureEditor;
+
+             commandsController: CommandsRepresentationProvider {
+                 commandId: "Feature";
+                 uuid: featureEditor.viewId;
+             }
+
+             commandsDelegate: DocumentWorkspaceCommandsDelegateBase {
+                 onCommandActivated: {
+                     let selectedIndex = null;
+                     if (featureEditor.tableView.tableSelection.items.length > 0){
+                         selectedIndex = featureEditor.tableView.tableSelection.items[0];
+                     }
+
+                     if (commandId === "New"){
+                         if (selectedIndex != null){
+                             featureEditor.tableView.addChildItem(selectedIndex, {"FeatureId":"", "FeatureName":"Feature Name", "FeatureDescription":"", "Dependencies":"", "Optional":false, "ChildModel":0})
+
+                             featureEditor.model.dataChanged(null, null);
+                         }
+                     }
+                     else if (commandId === "Remove"){
+                         if (selectedIndex != null){
+                             featureEditor.tableView.removeChildItem(selectedIndex);
+                             featureEditor.model.dataChanged(null, null);
+                         }
+                     }
+                 }
+             }
+         }
+     }
+
+     Component {
+         id: dataControllerComp;
+
+         GqlDocumentDataController {
+             gqlGetCommandId: "FeatureItem";
+             gqlUpdateCommandId: "FeatureUpdate";
+             gqlAddCommandId: "FeatureAdd";
+         }
      }
  }
 

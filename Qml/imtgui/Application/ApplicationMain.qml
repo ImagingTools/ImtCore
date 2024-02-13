@@ -200,8 +200,6 @@ Item {
 //        anchors.fill: parent;
 //    }
 
-
-
     ThumbnailDecorator {
         id: thumbnailDecorator;
 

@@ -1,43 +1,55 @@
 import QtQuick 2.12
 import Acf 1.0
 import imtgui 1.0
+import imtauthgui 1.0
 import imtcolgui 1.0
+import imtcontrols 1.0
+import imtguigql 1.0
+import imtdocgui 1.0
 
-CollectionView {
+RemoteCollectionView {
     id: productCollectionViewContainer;
 
     visibleMetaInfo: false;
 
-    documentName: qsTr("Products");
-    defaultSortHeaderIndex: 4;
-    defaultOrderType: "DESC";
+    collectionId: "Products";
+
+    commandsDelegate: ProductCollectionViewCommandsDelegate {
+        collectionView: productCollectionViewContainer;
+
+        documentTypeId: "Product";
+        viewTypeId: "ProductEditor";
+    }
 
     Component.onCompleted: {
-        productCollectionViewContainer.commandsDelegatePath = "../imtlicgui/ProductCollectionViewCommandsDelegate.qml";
+        let documentManager = MainDocumentManager.getDocumentManager(productCollectionViewContainer.collectionId);
+        if (documentManager){
+            productCollectionViewContainer.commandsDelegate.documentManager = documentManager;
 
-        baseCollectionView.commands.fieldsData.push("ProductId");
-
-        productCollectionViewContainer.commandId = "Products";
-    }
-
-    onDocumentManagerPtrChanged: {
-        if (documentManagerPtr){
-            documentManagerPtr.registerDocument("Product", productDocumentComp);
-        }
-    }
-
-    function selectItem(id){
-        if (id === ""){
-            documentManagerPtr.insertNewDocument("Product");
-        }
-        else{
-            documentManagerPtr.openDocument(id, "Product");
+            documentManager.registerDocumentView("Product", "ProductEditor", productDocumentComp);
+            documentManager.registerDocumentDataController("Product", dataControllerComp);
         }
     }
 
     Component {
         id: productDocumentComp;
 
-        ProductView {}
+        ProductView {
+            id: productEditor;
+            commandsController: CommandsRepresentationProvider {
+                commandId: "Product";
+                uuid: productEditor.viewId;
+            }
+        }
+    }
+
+    Component {
+        id: dataControllerComp;
+
+        GqlDocumentDataController {
+            gqlGetCommandId: "ProductItem";
+            gqlUpdateCommandId: "ProductUpdate";
+            gqlAddCommandId: "ProductAdd";
+        }
     }
 }

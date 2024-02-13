@@ -2,19 +2,16 @@ import QtQuick 2.12
 import Acf 1.0
 import imtauthgui 1.0
 import imtlicgui 1.0
-import imtdocgui 1.0
 import imtgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
 
-DocumentData {
+ViewBase {
     id: root;
 
     property TreeItemModel allFeaturesModel: CachedFeatureCollection.collectionModel
     property TreeItemModel featuresModel: TreeItemModel {}
     property TreeItemModel licensesModel: TreeItemModel {}
-
-    documentCompleted: productCollection.completed && licenseCollection.completed && CachedFeatureCollection.completed;
 
     Component.onCompleted: {
         productCollection.updateModel();
@@ -23,21 +20,17 @@ DocumentData {
         CachedFeatureCollection.updateModel();
     }
 
-    function blockEditing(){
-    }
-
     function updateModel(){
-        console.log("updateModel");
-        root.documentModel.SetData("LicenseName", licenseNameInput.text);
-        root.documentModel.SetData("LicenseId", licenseIdInput.text);
-        root.documentModel.SetData("LicenseDescription", descriptionInput.text);
+        root.model.SetData("LicenseName", licenseNameInput.text);
+        root.model.SetData("LicenseId", licenseIdInput.text);
+        root.model.SetData("LicenseDescription", descriptionInput.text);
 
         if (productsCB.currentIndex >= 0 && productsCB.model){
             let productId = productsCB.model.GetData("Id", productsCB.currentIndex);
-            root.documentModel.SetData("ProductId", productId);
+            root.model.SetData("ProductId", productId);
         }
         else{
-            root.documentModel.SetData("ProductId", "")
+            root.model.SetData("ProductId", "")
         }
 
         let indexes = featuresTable.getCheckedItems();
@@ -48,10 +41,10 @@ DocumentData {
                 featuresIds.push(featureId);
             }
 
-            root.documentModel.SetData("Features", featuresIds.join(';'));
+            root.model.SetData("Features", featuresIds.join(';'));
         }
         else{
-            root.documentModel.SetData("Features", "");
+            root.model.SetData("Features", "");
         }
 
         let licensesIndexes = licensesTable.getCheckedItems();
@@ -62,32 +55,32 @@ DocumentData {
                 licenseIds.push(id);
             }
 
-            root.documentModel.SetData("ParentLicenses", licenseIds.join(';'));
+            root.model.SetData("ParentLicenses", licenseIds.join(';'));
         }
         else{
-            root.documentModel.SetData("ParentLicenses", "");
+            root.model.SetData("ParentLicenses", "");
         }
     }
 
     function updateGui(){
         console.log("updateGui");
 
-        if (root.documentModel.ContainsKey("LicenseId")){
-            licenseIdInput.text = root.documentModel.GetData("LicenseId")
+        if (root.model.ContainsKey("LicenseId")){
+            licenseIdInput.text = root.model.GetData("LicenseId")
         }
 
-        if (root.documentModel.ContainsKey("LicenseName")){
-            licenseNameInput.text = root.documentModel.GetData("LicenseName")
+        if (root.model.ContainsKey("LicenseName")){
+            licenseNameInput.text = root.model.GetData("LicenseName")
         }
 
-        if (root.documentModel.ContainsKey("LicenseDescription")){
-            descriptionInput.text = root.documentModel.GetData("LicenseDescription")
+        if (root.model.ContainsKey("LicenseDescription")){
+            descriptionInput.text = root.model.GetData("LicenseDescription")
         }
 
         let productFound = false;
 
-        if (root.documentModel.ContainsKey("ProductId")){
-            let productId = root.documentModel.GetData("ProductId");
+        if (root.model.ContainsKey("ProductId")){
+            let productId = root.model.GetData("ProductId");
             if (productsCB.model){
                 let productModel = productsCB.model;
                 for (let i = 0; i < productModel.GetItemsCount(); i++){
@@ -114,8 +107,8 @@ DocumentData {
     }
 
     function updateLicensesGui(){
-        if (root.documentModel.ContainsKey("ParentLicenses")){
-            let licenses = root.documentModel.GetData("ParentLicenses");
+        if (root.model.ContainsKey("ParentLicenses")){
+            let licenses = root.model.GetData("ParentLicenses");
             let licenseIds = licenses.split(';');
 
             licensesTable.uncheckAll();
@@ -186,8 +179,8 @@ DocumentData {
     }
 
     function updateFeaturesGui(){
-        if (root.documentModel.ContainsKey("Features")){
-            let licenseFeatures = root.documentModel.GetData("Features");
+        if (root.model.ContainsKey("Features")){
+            let licenseFeatures = root.model.GetData("Features");
             let licenseFeatureIds = licenseFeatures.split(';');
 
             featuresTable.uncheckAll();
