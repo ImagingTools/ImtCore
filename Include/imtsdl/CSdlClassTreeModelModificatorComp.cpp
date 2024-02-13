@@ -22,8 +22,8 @@ bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const CSdlType& s
 		bool isArray = false;
 		bool isCustom = false;
 		ConvertType(field, &isCustom, nullptr, &isArray);
-		if (isCustom || isArray){
-			SendErrorMessage(0, "SDL TreeItemModel does not supports arrays and custom values");
+		if (!isCustom && isArray){
+			SendErrorMessage(0, "SDL TreeItemModel does not supports arrays of scalar values. Use Array of custom values");
 
 			return false;
 		}
@@ -48,11 +48,11 @@ bool CSdlClassTreeModelModificatorComp::ProcessHeaderClassFile(const CSdlType& s
 	}
 
 	// add method definitions
-	ofStream << QStringLiteral("\t[[nodiscard]] bool AddMeToModel(imtbase::CTreeItemModel& model, int modelIndex, const QList<QString>& requiredFields = QList<QString>()) const;");
+	ofStream << QStringLiteral("\t[[nodiscard]] bool AddMeToModel(imtbase::CTreeItemModel& model, int modelIndex = 0, const QList<QString>& requiredFields = QList<QString>()) const;");
 	FeedStream(ofStream, 1, false);
 	ofStream << QStringLiteral("\t[[nodiscard]] static bool ReadFromModel(C");
 	ofStream << sdlType.GetName();
-	ofStream << QStringLiteral("& object, const imtbase::CTreeItemModel& model, int modelIndex);");
+	ofStream << QStringLiteral("& object, const imtbase::CTreeItemModel& model, int modelIndex = 0);");
 	FeedStream(ofStream, 2);
 
 	return true;
@@ -136,6 +136,22 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const CSdlType& s
 
 void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(QTextStream& stream, const CSdlField& field)
 {
+	bool isArray = false;
+	bool isCustom = false;
+	ConvertType(field, &isCustom, nullptr, &isArray);
+	if (isCustom && isArray){
+		AddCustomArrayFieldWriteToModelCode(stream, field);
+
+		return;
+	}
+
+	else if (isCustom){
+		AddCustomFieldWriteToModelCode(stream, field);
+
+		return;
+	}
+
+	// Process scalar value
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream);
 	if (field.IsRequired()){
@@ -165,6 +181,20 @@ void CSdlClassTreeModelModificatorComp::AddFieldWriteToModelCode(QTextStream& st
 
 void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& stream, const CSdlField& field)
 {
+	bool isArray = false;
+	bool isCustom = false;
+	ConvertType(field, &isCustom, nullptr, &isArray);
+	if (isCustom && isArray){
+		AddCustomArrayFieldReadFromModelCode(stream, field);
+		return;
+	}
+
+	else if (isCustom){
+		AddCustomFieldReadFromModelCode(stream, field);
+		return;
+	}
+
+	// Process scalar value
 	FeedStreamHorizontally(stream);
 	stream << QStringLiteral("QVariant ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data = model.GetData(");
 	stream << '"' << field.GetId() << '"';
@@ -203,6 +233,158 @@ void CSdlClassTreeModelModificatorComp::AddFieldReadFromModelCode(QTextStream& s
 		stream << '}';
 		FeedStream(stream, 1, false);
 	}
+}
+
+
+void CSdlClassTreeModelModificatorComp::AddCustomFieldWriteToModelCode(QTextStream& stream, const CSdlField& field)
+{
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream);
+	if (field.IsRequired()){
+		stream << QStringLiteral("if (");
+		stream << FromVariantMapAccessString(field) << QStringLiteral(".isNull()){");
+		FeedStream(stream, 1, false);
+		FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("return false;\n\t}");
+		FeedStream(stream, 1, false);
+		AddCustomFieldWriteToModelImplCode(stream, field);
+	}
+	else {
+		stream << QStringLiteral("if (!");
+		stream << FromVariantMapAccessString(field);
+		stream << QStringLiteral(".isNull() && (requiredFields.isEmpty() || requiredFields.contains(\"");
+		stream << field.GetId() << QStringLiteral("\"))){");
+		FeedStream(stream, 1, false);
+		AddCustomFieldWriteToModelImplCode(stream, field, 2);
+		stream << QStringLiteral("\n\t}");
+	}
+}
+
+
+void CSdlClassTreeModelModificatorComp::AddCustomFieldWriteToModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+
+	// Create a new model
+	stream << QStringLiteral("imtbase::CTreeItemModel* ");
+	stream << GetDecapitalizedValue(field.GetId());
+	stream << QStringLiteral("NewModelPtr = model.AddTreeModel(");
+	stream << '"' << GetDecapitalizedValue(field.GetId()) << '"';
+	stream << QStringLiteral(", modelIndex);");
+	FeedStream(stream, 1, false);
+
+	// Define check variable and add to model
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("const bool is");
+	stream << GetCapitalizedValue(field.GetId());
+	stream << QStringLiteral("Added = m_");
+	stream << GetDecapitalizedValue(field.GetId());
+	stream << QStringLiteral(".AddMeToModel(*");
+	stream << GetDecapitalizedValue(field.GetId());
+	stream << QStringLiteral("NewModelPtr, 0);");
+	FeedStream(stream, 1, false);
+
+	// add checks
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("if (!is");
+	stream << GetCapitalizedValue(field.GetId());
+	stream << QStringLiteral("Added){");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 1, false);
+}
+
+
+void CSdlClassTreeModelModificatorComp::AddCustomFieldReadFromModelCode(QTextStream& stream, const CSdlField& field)
+{
+	FeedStreamHorizontally(stream);
+
+	stream << QStringLiteral("imtbase::CTreeItemModel* ");
+	stream << GetDecapitalizedValue(field.GetId());
+	stream << QStringLiteral("DataModelPtr = model.GetTreeItemModel(");
+	stream << '"' << field.GetId() << '"';
+	stream << QStringLiteral(", modelIndex);");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream);
+
+	if (field.IsRequired()){
+		stream << QStringLiteral("if (");
+		stream << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("DataModelPtr == nullptr){");
+		FeedStream(stream, 1, false);
+		FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("return false;");
+		FeedStream(stream, 1, false);
+		FeedStreamHorizontally(stream);
+		stream << '}';
+		FeedStream(stream, 1, false);
+
+		AddCustomFieldReadToModelImplCode(stream, field);
+		FeedStream(stream, 1, false);
+	}
+	else {
+		stream << QStringLiteral("if (");
+		stream << GetDecapitalizedValue(field.GetId());
+		stream << QStringLiteral("DataModelPtr != nullptr){");
+		FeedStream(stream, 1, false);
+
+		AddCustomFieldReadToModelImplCode(stream, field, 2);
+		FeedStreamHorizontally(stream);
+		stream << '}';
+		FeedStream(stream, 1, false);
+	}
+}
+
+
+void CSdlClassTreeModelModificatorComp::AddCustomFieldReadToModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << 'C' << GetCapitalizedValue(field.GetType());
+	stream << ' ' << GetDecapitalizedValue(field.GetId()) << ';';
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("const bool is");
+	stream << GetDecapitalizedValue(field.GetId());
+	stream << QStringLiteral("Readed = ");
+	stream << 'C' << GetCapitalizedValue(field.GetType());
+	stream << QStringLiteral("::ReadFromModel(");
+	stream << GetDecapitalizedValue(field.GetId());
+	stream << ',' << ' ' << QStringLiteral("*");
+	stream << GetDecapitalizedValue(field.GetId());
+	stream << QStringLiteral("DataModelPtr, modelIndex);");
+	stream << QStringLiteral("if (!is");
+	stream << GetDecapitalizedValue(field.GetId());
+	stream << QStringLiteral("Readed){");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("object.Set");
+	stream << GetCapitalizedValue(field.GetId());
+	stream << '(' << GetDecapitalizedValue(field.GetId()) << ')' << ';';
+	FeedStream(stream, 1, false);
+}
+
+
+void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldWriteToModelCode(QTextStream& stream, const CSdlField& field)
+{
+	/// \todo implement it
+	I_CRITICAL();
+}
+
+
+void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldReadFromModelCode(QTextStream& stream, const CSdlField& field)
+{
+	/// \todo implement it
+	I_CRITICAL();
 }
 
 

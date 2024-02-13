@@ -31,7 +31,13 @@ private:
 	/// \todo add error handling for it
 	void AddFieldWriteToModelCode(QTextStream& stream, const CSdlField& field);
 	void AddFieldReadFromModelCode(QTextStream& stream, const CSdlField& field);
-	/// \todo add complex and array values processing
+	void AddCustomFieldWriteToModelCode(QTextStream& stream, const CSdlField& field);
+	void AddCustomFieldWriteToModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents = 1);
+	void AddCustomFieldReadFromModelCode(QTextStream& stream, const CSdlField& field);
+	void AddCustomFieldReadToModelImplCode(QTextStream& stream, const CSdlField& field, quint16 hIndents = 1);
+	void AddCustomArrayFieldWriteToModelCode(QTextStream& stream, const CSdlField& field);
+	void AddCustomArrayFieldReadFromModelCode(QTextStream& stream, const CSdlField& field);
+
 };
 
 
