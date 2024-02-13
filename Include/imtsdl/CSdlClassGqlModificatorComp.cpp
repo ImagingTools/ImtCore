@@ -329,19 +329,6 @@ void CSdlClassGqlModificatorComp::AddSetCustomListValueToObjectCode(QTextStream&
 	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << '}';
 
-
-	/*
-		CShareUserInfo shareUserInfo;
-		if (!CShareUserInfo::ReadFromGraphQlRequest(shareUserInfo, *userShareDataObjectPtr)){
-			return false;
-		}
-
-		userShareDataList << shareUserInfo;
-	}
-
-	object.SetUserShareDataList(userShareDataList);
-	*/
-
 	// declare read variable
 	FeedStream(stream, 1, false);
 	FeedStreamHorizontally(stream, hIndents + 1);
