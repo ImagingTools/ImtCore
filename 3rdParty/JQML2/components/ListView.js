@@ -512,15 +512,15 @@ class ListView extends Flickable {
                 this.getStatement('contentY').reset(0)
                 return true
             }
-            if(this.getPropertyValue('contentY') + (this.$mouseY - y) > this.getPropertyValue('originY') && this.getPropertyValue('contentY') + (this.$mouseY - y) < this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height')){
-                this.getStatement('contentY').reset(this.getPropertyValue('contentY') + (this.$mouseY - y))
+            if(this.getPropertyValue('contentY') + (y) > this.getPropertyValue('originY') && this.getPropertyValue('contentY') + (y) < this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height')){
+                this.getStatement('contentY').reset(this.getPropertyValue('contentY') + (y))
                 return false
             } else {
-                if(this.getPropertyValue('contentY') + (this.$mouseY - y) <= this.getPropertyValue('originY')) {
+                if(this.getPropertyValue('contentY') + (y) <= this.getPropertyValue('originY')) {
                     this.getStatement('contentY').reset(this.getPropertyValue('originY'))
                     // MouseController.stopPropogation(null)
                 }
-                if(this.getPropertyValue('contentY') + (this.$mouseY - y) >= this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height')) {
+                if(this.getPropertyValue('contentY') + (y) >= this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height')) {
                     this.getStatement('contentY').reset(this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height'))
                     // MouseController.stopPropogation(null)
                 }

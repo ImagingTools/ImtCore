@@ -139,6 +139,8 @@ class MouseController {
 
         this.originX = x
         this.originY = y
+        this.moveX = x
+        this.moveY = y
 
         this.pressedMouseAreaInner = null
         this.pressedMouseAreaOuter = null
@@ -214,6 +216,10 @@ class MouseController {
         return {x: x*Math.cos(rad) + y*Math.sin(rad), y: x*Math.sin(rad) + y*Math.cos(rad)}
     }
     onMouseMove(x, y){
+        let ax = this.moveX - x
+        let ay = this.moveY - y
+        this.moveX = x
+        this.moveY = y
         let inner = this.get(x, y)
 
         document.body.style.cursor = 'default'
@@ -249,7 +255,13 @@ class MouseController {
         // console.log(pressedMouseArea)
 
         if(pressedMouseArea && !pressedMouseArea.getPropertyValue('preventStealing') && this.flickList.length){
-            if(Math.abs(this.originX - x) >= 10 || Math.abs(this.originY - y) >= 10){
+            let mx = false
+            let my = false
+            for(let f of this.flickList){
+                if(f.getPropertyValue('width') < f.getPropertyValue('contentItem').getPropertyValue('width')) mx = true
+                if(f.getPropertyValue('height') < f.getPropertyValue('contentItem').getPropertyValue('height')) my = true
+            }
+            if((Math.abs(this.originX - x) >= 10 && mx) || (Math.abs(this.originY - y) >= 10 && my)){
                 pressedMouseArea = null
                 this.pressedMouseAreaInner = null
                 this.pressedMouseAreaOuter = null
@@ -268,7 +280,7 @@ class MouseController {
         } else {
             if(this.flickList.length){
                 while(this.flickList.length){
-                    if(this.flickList[0].onMouseMove(x, y)) {
+                    if(this.flickList[0].onMouseMove(ax, ay)) {
                         this.flickList.shift()
                     } else {
                         break

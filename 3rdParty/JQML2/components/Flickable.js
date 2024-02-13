@@ -103,18 +103,18 @@ class Flickable extends Item {
     }
     onMouseMove(x, y){
         if(this.getPropertyValue('enabled') && this.getPropertyValue('visible') && this.getPropertyValue('interactive')) {
-            if(this.getPropertyValue('contentX') + (this.$mouseX - x) > 0 && this.getPropertyValue('contentX') + (this.$mouseX - x) < this.getPropertyValue('contentItem').getPropertyValue('width') - this.getPropertyValue('width')){
-                this.getStatement('contentX').reset(this.getPropertyValue('contentX') + (this.$mouseX - x))
+            if(this.getPropertyValue('contentX') + (x) > 0 && this.getPropertyValue('contentX') + (x) < this.getPropertyValue('contentItem').getPropertyValue('width') - this.getPropertyValue('width')){
+                this.getStatement('contentX').reset(this.getPropertyValue('contentX') + (x))
             } else {
-                if(this.getPropertyValue('contentX') + (this.$mouseX - x) <= 0) this.getStatement('contentX').reset(0)
-                if(this.getPropertyValue('contentX') + (this.$mouseX - x) >= this.getPropertyValue('contentItem').getPropertyValue('width')) this.getStatement('contentX').reset(this.getPropertyValue('contentItem').getPropertyValue('width') - this.getPropertyValue('width'))
+                if(this.getPropertyValue('contentX') + (x) <= 0) this.getStatement('contentX').reset(0)
+                if(this.getPropertyValue('contentX') + (x) >= this.getPropertyValue('contentItem').getPropertyValue('width')) this.getStatement('contentX').reset(this.getPropertyValue('contentItem').getPropertyValue('width') - this.getPropertyValue('width'))
             }
 
-            if(this.getPropertyValue('contentY') + (this.$mouseY - y) > 0 && this.getPropertyValue('contentY') + (this.$mouseY - y) < this.getPropertyValue('contentItem').getPropertyValue('height') - this.getPropertyValue('height')){
-                this.getStatement('contentY').reset(this.getPropertyValue('contentY') + (this.$mouseY - y))
+            if(this.getPropertyValue('contentY') + (y) > 0 && this.getPropertyValue('contentY') + (y) < this.getPropertyValue('contentItem').getPropertyValue('height') - this.getPropertyValue('height')){
+                this.getStatement('contentY').reset(this.getPropertyValue('contentY') + (y))
             } else {
-                if(this.getPropertyValue('contentY') + (this.$mouseY - y) <= 0) this.getStatement('contentY').reset(0)
-                if(this.getPropertyValue('contentY') + (this.$mouseY - y) >= this.getPropertyValue('contentItem').getPropertyValue('height')) this.getStatement('contentY').reset(this.getPropertyValue('contentItem').getPropertyValue('height') - this.getPropertyValue('height'))
+                if(this.getPropertyValue('contentY') + (y) <= 0) this.getStatement('contentY').reset(0)
+                if(this.getPropertyValue('contentY') + (y) >= this.getPropertyValue('contentItem').getPropertyValue('height')) this.getStatement('contentY').reset(this.getPropertyValue('contentItem').getPropertyValue('height') - this.getPropertyValue('height'))
             }
             this.$mouseX = x
             this.$mouseY = y
