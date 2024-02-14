@@ -87,7 +87,11 @@ class Text extends Item {
         let isHTML = false
         if(this.getPropertyValue('textFormat') === Text.AutoText){
             let regexp = /<[^<>]+>/g
-            if(this.getPropertyValue('text') && (regexp.test(this.getPropertyValue('text')) || this.getPropertyValue('text').indexOf('\n') >= 0)){
+            if(this.getPropertyValue('text') && (this.getPropertyValue('text').indexOf('<a') >= 0 || this.getPropertyValue('text').indexOf('<div') >= 0 || 
+            this.getPropertyValue('text').indexOf('<span') >= 0 || this.getPropertyValue('text').indexOf('<h') >= 0 || 
+            this.getPropertyValue('text').indexOf('<p') >= 0 || this.getPropertyValue('text').indexOf('<b') >= 0 || 
+            this.getPropertyValue('text').indexOf('<img') >= 0 || this.getPropertyValue('text').indexOf('<br') >= 0 || 
+            this.getPropertyValue('text').indexOf('<hr') >= 0 || this.getPropertyValue('text').indexOf('\n') >= 0)){
                 isHTML = true
             } else {
                 isHTML = false
@@ -105,7 +109,7 @@ class Text extends Item {
         } else {
             let textMetrics = TextFontController.measureText(this.getPropertyValue('text'), this.getProperty('font').getPropertyValue('pixelSize'), this.getProperty('font').getPropertyValue('family'), this.getProperty('width').auto ? 0 : this.getProperty('width').get(), this.getPropertyValue('wrapMode'))
             
-            this.impl.innerHTML = this.getPropertyValue('text')
+            this.impl.innerText = this.getPropertyValue('text')
             this.getProperty('width').setAuto(textMetrics.width)
             this.getProperty('height').setAuto(textMetrics.height)
 
