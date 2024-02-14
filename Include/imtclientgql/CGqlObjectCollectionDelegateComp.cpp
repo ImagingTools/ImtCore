@@ -444,7 +444,7 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 
 	ResponseData responseData = GetResponseData(response);
 	QJsonValue responseDataValue;
-	if (responseData.data.contains("itemIds")){
+	if (responseData.data.contains("items")){
 		QJsonValue itemsValue = responseData.data.value("items");
 		if (!itemsValue.isArray()){
 			return nullptr;
@@ -478,6 +478,8 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 
 				return metaInfoPtr;
 			};
+
+			dataMetainfoPtr = CreateMetaInfo(typeId, metaInfoCreatorList);
 
 			idoc::CStandardDocumentMetaInfo metainfo;
 			if (jsonObject.contains("metaInfo")){
@@ -526,12 +528,23 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 CGqlObjectCollectionDelegateComp::ResponseData CGqlObjectCollectionDelegateComp::GetResponseData(const imtgql::IGqlResponse& response) const
 {
 	ResponseData data;
+	imtgql::IGqlResponse::GqlRequestPtr requestPtr = response.GetOriginalRequest();
+	if (!requestPtr.isNull()){
+		data.commandId = requestPtr->GetCommandId();
+
+		if (!data.data.contains(data.commandId)) {
+			SendErrorMessage(0, "GqlResponse data don't contains " + data.commandId);
+		}
+	}
 
 	QJsonDocument document = QJsonDocument::fromJson(response.GetResponseData());
 	if (document.isObject()){
 		QJsonObject rootObject = document.object();
 		if (rootObject.contains("data")){
-			data.data = rootObject.value("data").toObject();
+			QJsonObject dataObject = rootObject.value("data").toObject();
+			if (dataObject.contains(data.commandId)){
+				data.data = dataObject.value(data.commandId).toObject();
+			}
 		}
 
 		if (rootObject.contains("errors")){
@@ -539,15 +552,6 @@ CGqlObjectCollectionDelegateComp::ResponseData CGqlObjectCollectionDelegateComp:
 			QJsonDocument errorsDoc;
 			errorsDoc.setObject(data.errors);
 			SendErrorMessage(0, errorsDoc.toJson(QJsonDocument::Compact));
-		}
-	}
-
-	imtgql::IGqlResponse::GqlRequestPtr requestPtr = response.GetOriginalRequest();
-	if (!requestPtr.isNull()){
-		data.commandId = requestPtr->GetCommandId();
-
-		if (!data.data.contains(data.commandId)) {
-			SendErrorMessage(0, "GqlResponse data don't contains " + data.commandId);
 		}
 	}
 
