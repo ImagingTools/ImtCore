@@ -9,20 +9,34 @@ class DropShadow extends Item {
         radius: { type: QReal, value: 4, changed: '$updateShadow' },
         samples: { type: QReal, value: 9, changed: '$updateShadow' },
         spread: { type: QReal, value: 0, changed: '$updateShadow' },
-        source: { type: QVar, value: undefined, changed: '$updateShadow' },
+        source: { type: QVar, value: undefined, changed: '$sourceChanged' },
     }
 
     constructor(parent,exCtx,exModel) {
         super(parent,exCtx,exModel)
+
+        this.getProperty('visible').getNotify().connect(this, this.$updateShadow)
+    }
+
+    $sourceChanged(){
+        if(this.$source){
+            let index = this.$source.$shadows.indexOf(this)
+            if(index >= 0) this.$source.$shadows.splice(index, 1)
+            if(this.$source.$shadows.length === 0) delete this.$source.$shadows
+            this.$source.$updateShadow()
+        }
+
+        this.$source = this.getPropertyValue('source')
+        if(this.$source){
+            if(!this.$source.$shadows) this.$source.$shadows = []
+            this.$source.$shadows.push(this)
+            this.$source.$updateShadow()
+        }
+
     }
 
     $updateShadow(){
-        if(this.getPropertyValue('source')) {
-            let rgba = this.getProperty('color').toRGBA()
-            this.getPropertyValue('source').setStyle({
-                boxShadow: `${this.getPropertyValue('horizontalOffset')}px ${this.getPropertyValue('verticalOffset')}px ${this.getPropertyValue('radius')}px ${this.getPropertyValue('spread')}px rgba(${rgba.r},${rgba.g},${rgba.b},${this.getPropertyValue('color') === 'transparent' ? 0 : rgba.a * this.getPropertyValue('opacity')})`
-            })
-        }
+        if(this.$source) this.$source.$updateShadow()
     }
 }
 

@@ -113,6 +113,12 @@ class TextEdit extends Item {
         })
     }
 
+    forceActiveFocus(){
+        super.forceActiveFocus()
+        this.getProperty('activeFocus').reset(true)
+        this.$input.focus()
+    }
+
     $selectionColorChanged(){
 
     }
@@ -256,6 +262,7 @@ class TextEdit extends Item {
             }	
             if(Qt.LeftButton & btn) {
                 this.getProperty('focus').reset(true)
+                this.getProperty('activeFocus').reset(true)
                 this.$input.focus()
                 return true
             }
@@ -274,6 +281,7 @@ class TextEdit extends Item {
             }	
             if(Qt.LeftButton & btn) {
                 this.getProperty('focus').reset(true)
+                this.getProperty('activeFocus').reset(true)
                 this.$input.focus()
                 return true
             }

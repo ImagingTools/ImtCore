@@ -214,6 +214,19 @@ class Item extends QtObject {
         this.getProperty('focus').reset(true)
     }
 
+    $updateShadow(){
+        if(this.$shadows){
+            for(let shadow of this.$shadows){
+                if(shadow.getPropertyValue('visible')){
+                    let rgba = shadow.getProperty('color').toRGBA()
+                    this.setStyle({
+                        boxShadow: `${shadow.getPropertyValue('horizontalOffset')}px ${shadow.getPropertyValue('verticalOffset')}px ${shadow.getPropertyValue('radius')}px ${shadow.getPropertyValue('spread')}px rgba(${rgba.r},${rgba.g},${rgba.b},${shadow.getPropertyValue('color') === 'transparent' ? 0 : rgba.a * shadow.getPropertyValue('opacity')})`
+                    })
+                }
+            }
+        }
+    }
+
     $clipChanged(){
         this.setStyle({ overflow: this.getPropertyValue('clip') ? "hidden" : "unset" })
     }
@@ -238,7 +251,7 @@ class Item extends QtObject {
 
     $focusChanged(){
         if(this.getPropertyValue('focus')){
-            if(this.getPropertyValue('context').$focusedElement){
+            if(this.getPropertyValue('context').$focusedElement && this.getPropertyValue('context').$focusedElement.UID){
                 this.getPropertyValue('context').$focusedElement.getProperty('focus').reset(false)
             }
             this.getPropertyValue('context').$focusedElement = this
@@ -257,7 +270,13 @@ class Item extends QtObject {
     }
 
     $activeFocusChanged(){
-        
+        if(this.getPropertyValue('activeFocus')){
+            if(this.getPropertyValue('context').$activeFocusedElement && this.getPropertyValue('context').$activeFocusedElement.UID){
+                this.getPropertyValue('context').$activeFocusedElement.getProperty('focus').reset(false)
+                this.getPropertyValue('context').$activeFocusedElement.getProperty('activeFocus').reset(false)
+            }
+            this.getPropertyValue('context').$activeFocusedElement = this
+        }
     }
 
     $enabledChanged(){
@@ -712,7 +731,8 @@ class Item extends QtObject {
     }
 
     destroy(){
-        if(this.getPropertyValue('context').$focusedElement === this) this.getPropertyValue('context').$focusedElement = null
+        if(mainRoot.$focusedElement && mainRoot.$focusedElement === this) mainRoot.$focusedElement = null
+        if(mainRoot.$activeFocusedElement && mainRoot.$activeFocusedElement === this) mainRoot.$activeFocusedElement = null
         this.$dom.remove()
         super.destroy()
     }

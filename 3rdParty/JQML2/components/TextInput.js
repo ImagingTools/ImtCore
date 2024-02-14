@@ -71,6 +71,9 @@ class TextInput extends Item {
         this.$input.style.font = 'inherit'
         this.$input.style.color = 'inherit'
         this.$input.autocomplete = "new-password"
+        this.$input.onfocus = ()=>{
+            this.getProperty('activeFocus').reset(true)
+        }
         this.$form.appendChild(this.$input)
         MouseController.add(this)
 
@@ -97,6 +100,12 @@ class TextInput extends Item {
         this.setStyle({
             color: `rgba(${rgba.r},${rgba.g},${rgba.b},${this.getProperty('color').get() === 'transparent' ? 0 : rgba.a * this.getPropertyValue('opacity')})`
         })
+    }
+
+    forceActiveFocus(){
+        super.forceActiveFocus()
+        this.getProperty('activeFocus').reset(true)
+        this.$input.focus()
     }
 
     $selectionColorChanged(){
@@ -261,6 +270,7 @@ class TextInput extends Item {
             }	
             if(Qt.LeftButton & btn) {
                 this.getProperty('focus').reset(true)
+                this.getProperty('activeFocus').reset(true)
                 this.$input.focus()
                 return true
             }
@@ -278,6 +288,7 @@ class TextInput extends Item {
             }	
             if(Qt.LeftButton & btn) {
                 this.getProperty('focus').reset(true)
+                this.getProperty('activeFocus').reset(true)
                 this.$input.focus()
                 return true
             }

@@ -306,7 +306,8 @@ class KeyboardController {
 
     constructor(){
         window.onkeydown = (e)=>{
-            if(!(mainRoot.$focusedElement instanceof TextInput) && !(mainRoot.$focusedElement instanceof TextEdit)){
+            let target = mainRoot.$activeFocusedElement ? mainRoot.$activeFocusedElement : mainRoot.$focusedElement
+            if(!(target instanceof TextInput) && !(target instanceof TextEdit)){
                 
                 if(e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt') return
                 let key = e.key
@@ -389,46 +390,46 @@ class KeyboardController {
             } else {
                 if(e.key === 'Enter' || e.key === 'Return'){
                     e.preventDefault()
-                    mainRoot.$focusedElement.onKeyDown(e.key)
+                    target.onKeyDown(e.key)
                 }
             }
             
-            if(mainRoot.$focusedElement && mainRoot.$focusedElement.$properties.KeyNavigation){
+            if(target && target.$properties.KeyNavigation){
                 if(e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt') return
 
                 if(e.key === 'ArrowLeft') {
-                    if(mainRoot.$focusedElement.KeyNavigation.left){
+                    if(target.KeyNavigation.left){
                         e.preventDefault()
-                        mainRoot.$focusedElement.KeyNavigation.left.focus = true
+                        target.KeyNavigation.left.focus = true
                     }
                 }
                 if(e.key === 'ArrowRight') {
-                    if(mainRoot.$focusedElement.KeyNavigation.right){
+                    if(target.KeyNavigation.right){
                         e.preventDefault()
-                        mainRoot.$focusedElement.KeyNavigation.right.focus = true
+                        target.KeyNavigation.right.focus = true
                     }
                 }
                 if(e.key === 'ArrowUp') {
-                    if(mainRoot.$focusedElement.KeyNavigation.up){
+                    if(target.KeyNavigation.up){
                         e.preventDefault()
-                        mainRoot.$focusedElement.KeyNavigation.up.focus = true
+                        target.KeyNavigation.up.focus = true
                     }
                 }
                 if(e.key === 'ArrowDown') {
-                    if(mainRoot.$focusedElement.KeyNavigation.down){
+                    if(target.KeyNavigation.down){
                         e.preventDefault()
-                        mainRoot.$focusedElement.KeyNavigation.down.focus = true
+                        target.KeyNavigation.down.focus = true
                     }
                 }
                 if(e.key === 'Tab' && e.shiftKey) {
-                    if(mainRoot.$focusedElement.KeyNavigation.backtab){
+                    if(target.KeyNavigation.backtab){
                         e.preventDefault()
-                        mainRoot.$focusedElement.KeyNavigation.backtab.focus = true
+                        target.KeyNavigation.backtab.focus = true
                     }
                 } else if(e.key === 'Tab') {
-                    if(mainRoot.$focusedElement.KeyNavigation.tab){
+                    if(target.KeyNavigation.tab){
                         e.preventDefault()
-                        mainRoot.$focusedElement.KeyNavigation.tab.focus = true
+                        target.KeyNavigation.tab.focus = true
                     }
                 }
             }
