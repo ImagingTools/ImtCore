@@ -389,7 +389,7 @@ class KeyboardController {
                 
             } else {
                 if(e.key === 'Enter' || e.key === 'Return'){
-                    e.preventDefault()
+                    if(target instanceof TextInput) e.preventDefault()
                     target.onKeyDown(e.key)
                 }
             }
