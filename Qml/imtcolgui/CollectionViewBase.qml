@@ -156,8 +156,9 @@ ViewBase {
             anchors.right: tableRightPanel.left;
             anchors.top: parent.top;
 
-            anchors.bottom: paginationObj.visible ? paginationObj.top : parent.bottom;
-            anchors.margins: Style.size_mainMargin !== undefined ? Style.size_mainMargin : 0;
+            anchors.bottom: parent.bottom;
+            anchors.margins: Style.size_mainMargin !== undefined ? Style.size_mainMargin + paginationObj.visible * paginationObj.height : paginationObj.visible * paginationObj.height;
+
             hasFilter: collectionViewBaseContainer.hasFilter;
             hasSort: collectionViewBaseContainer.hasSort;
             scrollbarVisible: false;
