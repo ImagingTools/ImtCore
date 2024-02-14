@@ -514,6 +514,7 @@ bool CTreeItemModel::CreateFromJson(const QByteArray &jsonContent)
 	Clear();
 	QJsonParseError error;
 
+	qDebug() << "CreateFromJson" << jsonContent;
 	QJsonDocument document = QJsonDocument::fromJson(jsonContent, &error);
 	if (error.error != QJsonParseError::NoError){
 		qCritical()  << "Error during parsing JSON document:" << error.errorString() << "content:" << jsonContent;
@@ -806,7 +807,9 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	}
 
 	if (isMultiTag == false){
-		retVal = retVal && archive.BeginTag(objectTag);
+		if (!tagName.isEmpty()){
+			retVal = retVal && archive.BeginTag(objectTag);
+		}
 	}
 	else{
 		retVal = retVal && archive.BeginMultiTag(arrayTag, subArrayTag, countSize);
@@ -901,7 +904,9 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	}
 
 	if (isMultiTag == false){
-		retVal = retVal && archive.EndTag(objectTag);
+		if (!tagName.isEmpty()){
+			retVal = retVal && archive.EndTag(objectTag);
+		}
 	}
 	else{
 		retVal = retVal && archive.EndTag(arrayTag);
