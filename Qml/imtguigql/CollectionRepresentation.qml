@@ -10,8 +10,11 @@ Item {
 
     property TreeItemModel elementsModel: TreeItemModel {}
     property TreeItemModel headersModel: TreeItemModel {}
+    property TreeItemModel objectEditorInfoModel: TreeItemModel {}
 
     property TreeItemModel notificationModel: TreeItemModel {}
+
+    property TreeItemModel filterableHeadersModel: TreeItemModel {}
 
     property var additionalFieldIds: []
 
@@ -21,10 +24,6 @@ Item {
 
     signal beginUpdate();
     signal endUpdate();
-
-    onHeadersModelChanged: {
-        console.log("onHeadersModelChanged", headersModel.toJSON());
-    }
 
     onCollectionIdChanged: {
         updateModel();
@@ -50,6 +49,12 @@ Item {
 
     function updateModel(){
         updateHeaders();
+
+        updateObjectEditorInfo();
+    }
+
+    function updateObjectEditorInfo(){
+        objectViewGqlModel.getObjectView();
     }
 
     function updateHeaders(){
@@ -428,6 +433,8 @@ Item {
 
                         if (dataModelLocal.ContainsKey("FilterSearch")){
                             let filterSearchModel = dataModelLocal.GetData("FilterSearch")
+
+                            root.filterableHeadersModel = filterSearchModel;
                         }
 
                         if(dataModelLocal.ContainsKey("Headers")){
@@ -543,6 +550,81 @@ Item {
                 }
 
                 root.endUpdate();
+            }
+        }
+    }
+
+    GqlModel {
+        id: objectViewGqlModel;
+
+        function getObjectView(){
+            console.log( "CollectionView objectView");
+            var query = Gql.GqlRequest("query", root.collectionId + "ObjectView");
+
+            var inputParams = Gql.GqlObject("input");
+
+            let additionInputParams = root.getAdditionalInputParams();
+            if (Object.keys(additionInputParams).length > 0){
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in additionInputParams){
+                    additionParams.InsertField(key, additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
+            }
+
+            query.AddParam(inputParams);
+
+            var queryFields = Gql.GqlObject("objectView");
+            queryFields.InsertField("Id");
+            queryFields.InsertField("Name");
+            query.AddField(queryFields);
+
+            var gqlData = query.GetQuery();
+            console.log("CollectionView objectView query ", gqlData);
+            this.SetGqlQuery(gqlData);
+        }
+
+        onStateChanged: {
+            if (this.state === "Ready"){
+                var dataModelLocal;
+
+                if (this.ContainsKey("errors")){
+                    dataModelLocal = this.GetData("errors");
+
+                    if (dataModelLocal.ContainsKey(root.collectionId + "ObjectView")){
+                        dataModelLocal = dataModelLocal.GetData(root.collectionId + "ObjectView");
+                    }
+
+                    let message = ""
+                    if (dataModelLocal.ContainsKey("message")){
+                        message = dataModelLocal.GetData("message");
+                    }
+
+                    let type;
+                    if (dataModelLocal.ContainsKey("type")){
+                        type = dataModelLocal.GetData("type");
+                    }
+
+                    Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
+
+                    return;
+                }
+
+                dataModelLocal = this.GetData("data");
+                if(!dataModelLocal)
+                    return;
+
+                if (dataModelLocal.ContainsKey(root.collectionId + "ObjectView")){
+                    dataModelLocal = dataModelLocal.GetData(root.collectionId + "ObjectView");
+
+                    root.objectEditorInfoModel = dataModelLocal;
+
+//                    let objectView = dataModelLocal.GetData("Path");
+//                    let objectViewCommandsId = dataModelLocal.GetData("CommandId");
+
+//                    gqlModelBaseContainer.objectViewEditorPath = objectView;
+//                    gqlModelBaseContainer.objectViewEditorCommandsId = objectViewCommandsId;
+                }
             }
         }
     }

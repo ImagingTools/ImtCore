@@ -9,9 +9,11 @@ ViewBase {
 
     property int radius: 3;
 
-    Component.onCompleted: {
-        rolesProvider.updateModel();
-    }
+    property TreeItemModel rolesModel: TreeItemModel {}
+
+//    Component.onCompleted: {
+//        rolesProvider.updateModel();
+//    }
 
     function updateGui(){
         console.log("UserRoles updateGui");
@@ -54,27 +56,27 @@ ViewBase {
         }
     }
 
-    CollectionDataProvider {
-        id: rolesProvider;
+//    CollectionDataProvider {
+//        id: rolesProvider;
 
-        commandId: "Roles";
+//        commandId: "Roles";
 
-        fields: ["Id", "Name"];
-        property bool compl: false;
+//        fields: ["Id", "Name"];
+//        property bool compl: false;
 
-        onModelUpdated: {
-            if (rolesProvider.collectionModel != null){
-                if (rolesProvider.collectionModel.ContainsKey("Roles")){
-                    let rolesModel = rolesProvider.collectionModel.GetData("Roles");
-                    rolesTable.elements = rolesModel;
+//        onModelUpdated: {
+//            if (rolesProvider.collectionModel != null){
+//                if (rolesProvider.collectionModel.ContainsKey("Roles")){
+//                    let rolesModel = rolesProvider.collectionModel.GetData("Roles");
+//                    rolesTable.elements = rolesModel;
 
-                    compl = true;
+//                    compl = true;
 
-                    groupRolesContainer.doUpdateGui();
-                }
-            }
-        }
-    }
+//                    groupRolesContainer.doUpdateGui();
+//                }
+//            }
+//        }
+//    }
 
     Rectangle {
         id: background;
@@ -130,7 +132,7 @@ ViewBase {
 
         width: 400;
 
-        elements: TreeItemModel {}
+        elements: groupRolesContainer.rolesModel;
 
         checkable: true;
         radius: groupRolesContainer.radius;

@@ -56,12 +56,11 @@ CollectionViewCommandsDelegateBase {
         let indexes = root.collectionView.table.getSelectedIndexes();
         if (indexes.length > 0){
             let index = indexes[0];
-            let itemId = elementsModel.GetData("Id", index);
+            if (elementsModel.ContainsKey("Id", index)){
+                let itemId = elementsModel.GetData("Id", index);
 
-            console.log("elementsModel", elementsModel.toJSON());
-            console.log("itemId", itemId);
-            console.log("index", index);
-            root.openDocumentEditor(itemId, documentTypeId, viewTypeId);
+                root.openDocumentEditor(itemId, documentTypeId, viewTypeId);
+            }
         }
     }
 

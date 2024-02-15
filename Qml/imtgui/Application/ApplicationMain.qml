@@ -176,18 +176,18 @@ Item {
                     serverUrl += "/";
                 }
 
-                // if (context.application){
-                //     serverUrl += context.application + "/";
-                // }
+                 if (context.application){
+                     serverUrl += context.application + "/";
+                 }
 
-                serverUrl += application.applicationId + "/wssub";
+                serverUrl += "wssub";
+                console.log("WEB Socket serverUrl", serverUrl);
 
                 subscriptionManager.url = serverUrl;
             }
         }
 
         onError: {
-           // Events.sendEvent("SendWarningError", qsTr("Web Socket Error"));
             Events.sendEvent("SendCriticalError", qsTr("Web Socket Error: ") + errorString);
         }
     }

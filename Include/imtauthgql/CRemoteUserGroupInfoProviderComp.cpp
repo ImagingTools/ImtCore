@@ -43,6 +43,7 @@ const imtauth::IUserGroupInfo* CRemoteUserGroupInfoProviderComp::GetUserGroup(co
 	request.AddField(itemObject);
 
 	imtbase::CTreeItemModel responseModel;
+
 	bool retVal = SendModelRequest(request, responseModel);
 	if (retVal){
 		imtbase::CTreeItemModel* roleDataModelPtr = responseModel.GetTreeItemModel("data");

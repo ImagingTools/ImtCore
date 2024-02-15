@@ -129,6 +129,7 @@ DocumentManager {
                     }
 
                     let documentData = workspaceView.documentsModel.get(model.index).DocumentData;
+                    console.log("documentData", documentData);
                     if (documentData){
                         documentData.views.push(item);
                         documentData.viewAdded(item);

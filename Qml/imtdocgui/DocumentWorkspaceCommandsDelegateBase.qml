@@ -1,26 +1,14 @@
 import QtQuick 2.12
 import Acf 1.0
 
-QtObject {
+Item {
     id: container;
 
-    property DocumentManager documentManager: null;
-
-    property Component documentHistoryDialogComp: Component {
-        DocumentHistoryDialog {
-            title: qsTr("Document history");
-
-            onStarted: {
-                updateModel();
-            }
-        }
-    }
+    property Item view: null;
 
     signal commandActivated(string commandId);
 
     function commandHandle(commandId){
-        console.log("commandHandle", commandId, container);
-
         commandActivated(commandId);
     }
 }

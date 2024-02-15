@@ -28,6 +28,9 @@ CollectionView {
     }
 
     Component.onCompleted: {
+        CachedRoleCollection.updateModel();
+        CachedGroupCollection.updateModel();
+
         collectionFilter.setSortingOrder("DESC");
         collectionFilter.setSortingInfoId("LastModified");
 
@@ -180,11 +183,47 @@ CollectionView {
         }
     }
 
+    property TreeItemModel rolesModel: CachedRoleCollection.rolesModel;
+//    CollectionDataProvider {
+//        id: rolesProvider;
+
+//        commandId: "Roles";
+
+//        fields: ["Id", "Name"];
+
+//        onCollectionModelChanged: {
+//            if (rolesProvider.collectionModel != null){
+//                if (rolesProvider.collectionModel.ContainsKey("Roles")){
+//                    let rolesModel = rolesProvider.collectionModel.GetData("Roles");
+//                    userCollectionViewContainer.rolesModel = rolesModel;
+//                }
+//            }
+//        }
+//    }
+
+    property TreeItemModel groupsModel: CachedGroupCollection.collectionModel;
+//    CollectionDataProvider {
+//        id: groupsProvider;
+
+//        commandId: "Groups";
+
+//        fields: ["Id", "Name", "Description", "Roles"];
+
+//        onModelUpdated: {
+//            if (groupsProvider.collectionModel != null){
+//                userCollectionViewContainer.groupsModel = groupsProvider.collectionModel;
+//            }
+//        }
+//    }
+
     Component {
         id: userDocumentComp;
 
         UserView {
             id: userEditor;
+
+            rolesModel: userCollectionViewContainer.rolesModel;
+            groupsModel: userCollectionViewContainer.groupsModel;
 
             commandsController: CommandsRepresentationProvider {
                 commandId: "User";
@@ -203,10 +242,6 @@ CollectionView {
 
             function getDocumentName(){
                 let prefixName = qsTr("Users");
-
-//                if (documentModel.ContainsKey("Name")){
-//                    return prefixName + " / " + documentModel.GetData("Name")
-//                }
 
                 if (documentName !== ""){
                     return prefixName + " / " + documentName;

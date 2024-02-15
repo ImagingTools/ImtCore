@@ -9,9 +9,11 @@ ViewBase {
 
     property int radius: 3;
 
-    Component.onCompleted: {
-        usersProvider.updateModel();
-    }
+    property TreeItemModel usersModel: TreeItemModel {}
+
+//    Component.onCompleted: {
+//        usersProvider.updateModel();
+//    }
 
     function updateGui(){
         console.log("GroupUsers updateGui");
@@ -56,21 +58,21 @@ ViewBase {
         }
     }
 
-    CollectionDataProvider {
-        id: usersProvider;
+//    CollectionDataProvider {
+//        id: usersProvider;
 
-        commandId: "Users";
+//        commandId: "Users";
 
-        fields: ["Id", "Name"];
+//        fields: ["Id", "Name"];
 
-        onModelUpdated: {
-            if (usersProvider.collectionModel != null){
-                usersTable.elements = usersProvider.collectionModel;
+//        onModelUpdated: {
+//            if (usersProvider.collectionModel != null){
+//                usersTable.elements = usersProvider.collectionModel;
 
-                groupUsersContainer.doUpdateGui();
-            }
-        }
-    }
+//                groupUsersContainer.doUpdateGui();
+//            }
+//        }
+//    }
 
     Rectangle {
         id: background;
@@ -124,6 +126,8 @@ ViewBase {
         anchors.left: parent.left;
 
         width: 400;
+
+        elements: groupUsersContainer.usersModel;
 
         checkable: true;
         radius: groupUsersContainer.radius;

@@ -73,6 +73,9 @@ CollectionView {
     }
 
     Component.onCompleted: {
+        CachedRoleCollection.updateModel();
+
+
         let documentManager = MainDocumentManager.getDocumentManager("Administration");
         if (documentManager){
             roleCollectionViewContainer.commandsDelegate.documentManager = documentManager;
@@ -85,14 +88,33 @@ CollectionView {
     }
 
     onElementsChanged: {
+         permissionsProvider.productId = table.elements.GetData("Id");
+
         if (table.elements.ContainsKey("Roles")){
             let elementsModel = table.elements.GetData("Roles");
             table.tableSelection.countElements = elementsModel.GetItemsCount();
         }
+
+        permissionsProvider.updateModel();
     }
 
     function onCommandsModelChanged(){
         roleCollectionViewContainer.newCommandIsEnabled = commandsController.commandExists("New");
+    }
+
+    property TreeItemModel rolesModel: CachedRoleCollection.rolesModel;
+    property TreeItemModel permissionsModel: TreeItemModel {};
+
+    PermissionsProvider {
+        id: permissionsProvider;
+
+        property bool compl: false;
+
+        onDataModelChanged: {
+            if (permissionsProvider.dataModel != null){
+                roleCollectionViewContainer.permissionsModel = permissionsProvider.dataModel;
+            }
+        }
     }
 
     Component {
@@ -100,6 +122,9 @@ CollectionView {
 
         RoleView {
             id: roleEditor;
+
+            permissionsModel: roleCollectionViewContainer.permissionsModel;
+            rolesModel: roleCollectionViewContainer.rolesModel;
 
             commandsController: CommandsRepresentationProvider {
                 commandId: "Role";

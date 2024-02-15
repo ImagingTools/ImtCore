@@ -26,6 +26,10 @@ CollectionView {
     }
 
     Component.onCompleted: {
+        CachedUserCollection.updateModel();
+        CachedRoleCollection.updateModel();
+        CachedGroupCollection.updateModel();
+
         collectionFilter.setSortingOrder("DESC");
         collectionFilter.setSortingInfoId("LastModified");
 
@@ -38,11 +42,20 @@ CollectionView {
         }
     }
 
+    property TreeItemModel usersModel: CachedUserCollection.collectionModel;
+    property TreeItemModel rolesModel: CachedRoleCollection.rolesModel;
+    property TreeItemModel groupsModel: CachedGroupCollection.collectionModel;
+
     Component {
         id: userGroupDocumentComp;
 
         UserGroupView {
             id: groupEditor;
+
+            usersModel: userGroupCollectionViewContainer.usersModel;
+            rolesModel: userGroupCollectionViewContainer.rolesModel;
+            groupsModel: userGroupCollectionViewContainer.groupsModel;
+
             commandsController: CommandsRepresentationProvider {
                 commandId: "Group";
                 uuid: groupEditor.viewId;

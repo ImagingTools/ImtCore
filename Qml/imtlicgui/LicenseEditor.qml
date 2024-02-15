@@ -2,8 +2,8 @@ import QtQuick 2.12
 import Acf 1.0
 import imtauthgui 1.0
 import imtlicgui 1.0
-import imtgui 1.0
 import imtcolgui 1.0
+import imtgui 1.0
 import imtcontrols 1.0
 
 ViewBase {
@@ -14,10 +14,11 @@ ViewBase {
     property TreeItemModel licensesModel: TreeItemModel {}
 
     Component.onCompleted: {
-        productCollection.updateModel();
-        licenseCollection.updateModel();
-
         CachedFeatureCollection.updateModel();
+        CachedProductCollection.updateModel();
+        CachedLicenseCollection.updateModel();
+
+        CachedLicenseCollection.collectionModelChanged.connect(root.updateLicensesModel);
     }
 
     function updateModel(){
@@ -127,25 +128,33 @@ ViewBase {
     function updateLicensesModel(){
         root.licensesModel.Clear();
 
+        console.log("CachedLicenseCollection.collectionModel", CachedLicenseCollection.collectionModel.toJSON());
+
+
         if (productsCB.currentIndex >= 0 && productsCB.model){
             let productId = productsCB.model.GetData("Id", productsCB.currentIndex);
 
-            for (let i = 0; i < licenseCollection.collectionModel.GetItemsCount(); i++){
-                let id = licenseCollection.collectionModel.GetData("Id", i)
-                let licenses = licenseCollection.collectionModel.GetData("ParentLicenses", i)
+            for (let i = 0; i < CachedLicenseCollection.collectionModel.GetItemsCount(); i++){
+                let id = CachedLicenseCollection.collectionModel.GetData("Id", i)
+                let licenses = CachedLicenseCollection.collectionModel.GetData("ParentLicenses", i)
 
-                if (id === root.documentId || licenses.split(';').includes(root.documentId)){
-                    continue;
+                if (root.model.ContainsKey("Id")){
+                    let currentObjectId = root.model.GetData("Id")
+                    if (id === currentObjectId || licenses.split(';').includes(currentObjectId)){
+                        continue;
+                    }
                 }
 
-                let productUuid = licenseCollection.collectionModel.GetData("ProductUuid", i)
+                let productUuid = CachedLicenseCollection.collectionModel.GetData("ProductUuid", i)
                 if (productUuid === productId){
                     let index = root.licensesModel.InsertNewItem();
 
-                    root.licensesModel.CopyItemDataFromModel(index, licenseCollection.collectionModel, i);
+                    root.licensesModel.CopyItemDataFromModel(index, CachedLicenseCollection.collectionModel, i);
                 }
             }
         }
+
+        console.log("updateLicensesModel", root.licensesModel.toJSON());
 
         licensesTable.elements = root.licensesModel;
     }
@@ -154,17 +163,9 @@ ViewBase {
         root.featuresModel.Clear();
 
         if (productsCB.currentIndex >= 0){
-            let features = productCollection.collectionModel.GetData("Features", productsCB.currentIndex);
+            let features = productsCB.model.GetData("Features", productsCB.currentIndex);
             let featureIds = features.split(';');
 
-//            for (let i = 0; i < FeaturesProvider.model.GetItemsCount(); i++){
-//                let featureId = FeaturesProvider.model.GetData("Id", i)
-//                if (featureIds.includes(featureId)){
-//                    let index = root.featuresModel.InsertNewItem();
-
-//                    root.featuresModel.CopyItemDataFromModel(index, FeaturesProvider.model, i);
-//                }
-//            }
             for (let i = 0; i < root.allFeaturesModel.GetItemsCount(); i++){
                 let featureId = root.allFeaturesModel.GetData("Id", i)
                 if (featureIds.includes(featureId)){
@@ -193,34 +194,6 @@ ViewBase {
                     }
                 }
             }
-        }
-    }
-
-    CollectionDataProvider {
-        id: productCollection;
-
-        commandId: "Products";
-
-        fields: ["Id", "ProductId", "ProductName", "Features"];
-
-        onCollectionModelChanged: {
-            if (productCollection.collectionModel){
-                productsCB.model = productCollection.collectionModel;
-
-                root.doUpdateGui();
-            }
-        }
-    }
-
-    CollectionDataProvider {
-        id: licenseCollection;
-
-        commandId: "Licenses";
-
-        fields: ["Id", "ProductId", "LicenseId", "LicenseName", "ProductUuid", "ParentLicenses"];
-
-        onCollectionModelChanged: {
-            root.doUpdateGui();
         }
     }
 
@@ -339,21 +312,32 @@ ViewBase {
             id: productsCB;
 
             width: parent.width;
-            height: 23;
+            height: 30;
 
             radius: 3;
 
             nameId: "ProductName";
+
+            model: CachedProductCollection.collectionModel;
 
             Component.onCompleted: {
                 let ok = PermissionsController.checkPermission("ChangeLicenseDefinition");
                 productsCB.changeable = ok;
             }
 
+            onModelChanged: {
+                root.doUpdateGui();
+            }
+
             onCurrentIndexChanged: {
                 root.updateFeaturesModel()
                 root.updateLicensesModel()
+
+                featuresTable.uncheckAll();
+
                 root.doUpdateModel();
+
+                root.updateFeaturesGui();
             }
         }
 
@@ -394,11 +378,13 @@ ViewBase {
     Item {
         id: dependenciesBlock;
 
-        width: 300;
+//        width: 300;
 
         anchors.top: parent.top;
         anchors.left: column.right;
         anchors.leftMargin: 10;
+        anchors.right: parent.right;
+        anchors.rightMargin: 10;
         anchors.bottom: parent.bottom;
         anchors.bottomMargin: 10;
 

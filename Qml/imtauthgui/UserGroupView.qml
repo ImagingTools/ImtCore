@@ -6,6 +6,10 @@ import imtcontrols 1.0
 ViewBase {
     id: container;
 
+    property TreeItemModel groupsModel: TreeItemModel {}
+    property TreeItemModel rolesModel: TreeItemModel {}
+    property TreeItemModel usersModel: TreeItemModel {}
+
     function updateGui(){
         let generalPage = multiPageView.getPageById("General");
         let usersPage = multiPageView.getPageById("Users");
@@ -71,6 +75,8 @@ ViewBase {
         GroupEditor {
             model: container.model;
             readOnly: container.readOnly;
+
+            groupsModel: container.groupsModel;
         }
     }
 
@@ -80,6 +86,8 @@ ViewBase {
         GroupUsers {
             model: container.model;
             readOnly: container.readOnly;
+
+            usersModel: container.usersModel;
         }
     }
 
@@ -89,6 +97,8 @@ ViewBase {
         GroupRoles {
             model: container.model;
             readOnly: container.readOnly;
+
+            rolesModel: container.rolesModel;
         }
     }
 

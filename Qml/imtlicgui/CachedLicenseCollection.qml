@@ -9,7 +9,7 @@ CollectionDataProvider {
 
     commandId: "Licenses";
 
-    fields: ["Id", "LicenseId", "LicenseName", "ProductId"]
+    fields: ["Id", "LicenseId", "LicenseName", "ProductId", "ParentLicenses", "Features", "ProductUuid"]
     sortByField: "LicenseName";
 }
 

@@ -13,14 +13,60 @@ ViewBase {
 
     property int radius: 3;
 
-    Component.onCompleted: {
-        groupsProvider.updateModel();
+    property TreeItemModel groupsModel: TreeItemModel {}
+    property TreeItemModel copiedGroupsModel: TreeItemModel {}
+
+    onGroupsModelChanged: {
+        console.log("onGroupsModelChanged", groupsModel.toJSON());
+
+//        updateGroupsModel();
+    }
+
+//    Component.onCompleted: {
+//        groupsProvider.updateModel();
+//    }
+
+    function updateGroupsModel(){
+        copiedGroupsModel.Copy(groupsModel);
+
+        let objectId = userGroupEditorContainer.model.GetData("Id");
+        let removedIndexes = []
+
+        let childrenIds = []
+        userGroupEditorContainer.getAllChildrenGroups(objectId, childrenIds);
+
+        // Get all parent ID-s
+        let parentIds = []
+        if (userGroupEditorContainer.model.ContainsKey("ParentGroups")){
+            let parentGroups = userGroupEditorContainer.model.GetData("ParentGroups")
+            let parentGroupIds = parentGroups.split(';')
+            for (let j = 0; j < parentGroupIds.length; j++){
+                userGroupEditorContainer.getAllParentGroupIds(parentGroupIds[j], parentIds);
+            }
+        }
+
+        for (let i = 0; i < userGroupEditorContainer.copiedGroupsModel.GetItemsCount(); i++){
+            let id = userGroupEditorContainer.copiedGroupsModel.GetData("Id", i);
+            if (id === objectId || childrenIds.includes(id)){
+                removedIndexes.push(i);
+            }
+        }
+
+        let removedCount = 0
+        for (let i = 0; i < removedIndexes.length; i++){
+            userGroupEditorContainer.copiedGroupsModel.RemoveItem(removedIndexes[i] - removedCount);
+            removedCount++;
+        }
+
+        console.log("copiedGroupsModel", copiedGroupsModel.toJSON());
+
+        parentGroupsTable.elements = userGroupEditorContainer.copiedGroupsModel;
     }
 
     function getAllChildrenGroups(groupId, retVal){
-        for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
-            let id = groupsProvider.collectionModel.GetData("Id", i);
-            let parentGroups = groupsProvider.collectionModel.GetData("ParentGroups", i);
+        for (let i = 0; i < userGroupEditorContainer.copiedGroupsModel.GetItemsCount(); i++){
+            let id = userGroupEditorContainer.copiedGroupsModel.GetData("Id", i);
+            let parentGroups = userGroupEditorContainer.copiedGroupsModel.GetData("ParentGroups", i);
             if (parentGroups !== ""){
                 let parentGroupIds = parentGroups.split(';')
                 if (parentGroupIds.includes(groupId)){
@@ -33,10 +79,10 @@ ViewBase {
     }
 
     function getAllParentGroupIds(groupId, retVal){
-        for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
-            let id = groupsProvider.collectionModel.GetData("Id", i);
+        for (let i = 0; i < userGroupEditorContainer.copiedGroupsModel.GetItemsCount(); i++){
+            let id = userGroupEditorContainer.copiedGroupsModel.GetData("Id", i);
             if (id === groupId){
-                let parentGroups = groupsProvider.collectionModel.GetData("ParentGroups", i);
+                let parentGroups = userGroupEditorContainer.copiedGroupsModel.GetData("ParentGroups", i);
                 if (parentGroups !== ""){
                     let parentGroupsIds = parentGroups.split(';');
                     for (let j = 0; j < parentGroupsIds.length; j++){
@@ -48,53 +94,53 @@ ViewBase {
         }
     }
 
-    CollectionDataProvider {
-        id: groupsProvider;
+//    CollectionDataProvider {
+//        id: groupsProvider;
 
-        commandId: "Groups";
-        fields: ["Id", "Name", "Description", "ParentGroups", "Roles"];
+//        commandId: "Groups";
+//        fields: ["Id", "Name", "Description", "ParentGroups", "Roles"];
 
-        property bool compl: false;
+//        property bool compl: false;
 
-        onModelUpdated: {
-            if (groupsProvider.collectionModel != null){
-                let objectId = userGroupEditorContainer.model.GetData("Id");
-                let removedIndexes = []
+//        onModelUpdated: {
+//            if (userGroupEditorContainer.groupsModel != null){
+//                let objectId = userGroupEditorContainer.model.GetData("Id");
+//                let removedIndexes = []
 
-                let childrenIds = []
-                userGroupEditorContainer.getAllChildrenGroups(objectId, childrenIds);
+//                let childrenIds = []
+//                userGroupEditorContainer.getAllChildrenGroups(objectId, childrenIds);
 
-                // Get all parent ID-s
-                let parentIds = []
-                if (userGroupEditorContainer.model.ContainsKey("ParentGroups")){
-                    let parentGroups = userGroupEditorContainer.model.GetData("ParentGroups")
-                    let parentGroupIds = parentGroups.split(';')
-                    for (let j = 0; j < parentGroupIds.length; j++){
-                        userGroupEditorContainer.getAllParentGroupIds(parentGroupIds[j], parentIds);
-                    }
-                }
+//                // Get all parent ID-s
+//                let parentIds = []
+//                if (userGroupEditorContainer.model.ContainsKey("ParentGroups")){
+//                    let parentGroups = userGroupEditorContainer.model.GetData("ParentGroups")
+//                    let parentGroupIds = parentGroups.split(';')
+//                    for (let j = 0; j < parentGroupIds.length; j++){
+//                        userGroupEditorContainer.getAllParentGroupIds(parentGroupIds[j], parentIds);
+//                    }
+//                }
 
-                for (let i = 0; i < groupsProvider.collectionModel.GetItemsCount(); i++){
-                    let id = groupsProvider.collectionModel.GetData("Id", i);
-                    if (id === objectId || childrenIds.includes(id)){
-                        removedIndexes.push(i);
-                    }
-                }
+//                for (let i = 0; i < userGroupEditorContainer.groupsModel.GetItemsCount(); i++){
+//                    let id = userGroupEditorContainer.groupsModel.GetData("Id", i);
+//                    if (id === objectId || childrenIds.includes(id)){
+//                        removedIndexes.push(i);
+//                    }
+//                }
 
-                let removedCount = 0
-                for (let i = 0; i < removedIndexes.length; i++){
-                    groupsProvider.collectionModel.RemoveItem(removedIndexes[i] - removedCount);
-                    removedCount++;
-                }
+//                let removedCount = 0
+//                for (let i = 0; i < removedIndexes.length; i++){
+//                    userGroupEditorContainer.groupsModel.RemoveItem(removedIndexes[i] - removedCount);
+//                    removedCount++;
+//                }
 
-                parentGroupsTable.elements = groupsProvider.collectionModel;
+//                parentGroupsTable.elements = userGroupEditorContainer.groupsModel;
 
-                compl = true;
+//                compl = true;
 
-                userGroupEditorContainer.doUpdateGui();
-            }
-        }
-    }
+//                userGroupEditorContainer.doUpdateGui();
+//            }
+//        }
+//    }
 
     function updateGui(){
         console.log("GroupEditor updateGui");
@@ -273,7 +319,7 @@ ViewBase {
                     sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
                     onLoaded: {
                         if(inputDecoratorLoader4.item){
-                            inputDecoratorLoader4.item.rootItem = nameInput;
+//                            inputDecoratorLoader4.item.rootItem = nameInput;
                         }
                     }
                 }
@@ -316,10 +362,11 @@ ViewBase {
 
         width: 400;
 
-        elements: TreeItemModel {}
         checkable: true;
 
         radius:userGroupEditorContainer.radius;
+
+        elements: userGroupEditorContainer.groupsModel;
 
         onCheckedItemsChanged: {
             userGroupEditorContainer.doUpdateModel();

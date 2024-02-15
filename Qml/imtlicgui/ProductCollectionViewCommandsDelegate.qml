@@ -33,7 +33,6 @@ DocumentCollectionViewDelegate {
 
     onCommandActivated: {
         if (commandId === "Export"){
-            console.log("Export");
             let indexes = container.collectionView.table.getSelectedIndexes();
             if (indexes.length > 0){
                 let index = indexes[0];

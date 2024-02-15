@@ -11,6 +11,17 @@ CollectionDataProvider {
     commandId: "Roles";
 
     sortByField: "Name";
+
+    property TreeItemModel rolesModel: TreeItemModel {}
+
+    onCollectionModelChanged: {
+        if (container.collectionModel != null){
+            if (container.collectionModel.ContainsKey("Roles")){
+                let rolesModel = container.collectionModel.GetData("Roles");
+                container.rolesModel = rolesModel;
+            }
+        }
+    }
 }
 
 

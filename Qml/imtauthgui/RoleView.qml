@@ -6,6 +6,9 @@ import imtcontrols 1.0
 ViewBase {
     id: container;
 
+    property TreeItemModel permissionsModel: TreeItemModel {};
+    property TreeItemModel rolesModel: TreeItemModel {};
+
     property string productId: "";
 
     function updateGui(){
@@ -66,6 +69,7 @@ ViewBase {
             model: container.model;
 
             readOnly: container.readOnly;
+            rolesModel: container.rolesModel;
         }
     }
 
@@ -77,6 +81,8 @@ ViewBase {
             readOnly: container.readOnly;
 
             productId: container.productId;
+
+            permissionsModel: container.permissionsModel;
         }
     }
 

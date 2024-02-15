@@ -582,7 +582,12 @@ Item {
                 }
 
                 function onDocumentModelChanged(){
+                    if (!singleDocumentData.documentDataController || !singleDocumentData.documentDataController.documentModel){
+                        return;
+                    }
+
                     let documentModel = singleDocumentData.documentDataController.documentModel;
+                    console.log("onDocumentModelChanged", documentModel.toJSON());
 
                     if (documentModel.ContainsKey("Id")){
                         singleDocumentData.documentId = documentModel.GetData("Id");
@@ -623,6 +628,8 @@ Item {
                     if (singleDocumentData.blockingUpdateModel){
                         return;
                     }
+
+                    console.log("documentModel", singleDocumentData.documentDataController.documentModel.toJSON());
 
                     singleDocumentData.isDirty = true;
                 }
@@ -668,7 +675,6 @@ Item {
             }
 
             onViewAdded: {
-                console.log("onViewAdded", singleDocumentData.documentIndex);
                 if (singleDocumentData.documentDataController){
                     singleDocumentData.blockingUpdateModel = true;
                     view.model = singleDocumentData.documentDataController.documentModel;

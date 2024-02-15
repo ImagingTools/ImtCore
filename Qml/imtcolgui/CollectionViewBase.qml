@@ -41,14 +41,8 @@ ViewBase {
         Events.unSubscribeEvent("OnLocalizationChanged", collectionViewBaseContainer.onLocalizationChanged);
     }
 
-    onCollectionFilterChanged: {
-        if (collectionFilter){
-            collectionFilter.filterChanged.connect(internal.onFilterChanged);
-        }
-    }
-
-    QtObject {
-        id: internal;
+    Connections {
+        target: collectionViewBaseContainer.collectionFilter;
 
         function onFilterChanged(){
             tableInternal.currentHeaderId = collectionViewBaseContainer.collectionFilter.getSortingInfoId();
@@ -59,6 +53,7 @@ ViewBase {
             }
         }
     }
+
 
     FilterMenu {
         id: filterMenu_;
@@ -110,6 +105,7 @@ ViewBase {
             }
             onComplComplChanged: {
                 if(tableDecoratorModel.complCompl){
+
                     var tableDecorator = loaderTableDecorator.item;
                     var count = tableInternal.headers.GetItemsCount();
 
@@ -119,18 +115,7 @@ ViewBase {
                         var cells = tableDecoratorModel.AddTreeModel("Cells");
                         var cellWidth = tableDecoratorModel.AddTreeModel("CellWidth");
 
-                        var general;
-                        if(tableDecorator.IsValidData("General")){
-                            general = tableDecorator.GetTreeItemModel("General")
-                            let keys = general.GetKeys();
-                            for(let i = 0; i < keys.length; i++){
-                                if(tableInternal[keys[i]] !== undefined){
-                                    tableInternal[keys[i]] = general.GetData(keys[i]);
-                                }
-                            }
-                        }
-
-                        for(let i = 0; i < count; i++){
+                        for(var i = 0; i < count; i++){
                             headers.InsertNewItem();
                             cells.InsertNewItem();
                             cellWidth.InsertNewItem();
@@ -152,10 +137,8 @@ ViewBase {
             id: loaderTableDecorator;
 
             property bool compl: false;
-            sourceComponent: Style.collectionTableDecorator;
             onLoaded: {
                 if(loaderTableDecorator.item){
-                    //console.log("TABLE_DECORATOR::", item.toJSON())
                     loaderTableDecorator.compl = true;
                 }
             }
@@ -190,23 +173,6 @@ ViewBase {
 
             onElementsChanged: {
                 collectionViewBaseContainer.elementsChanged();
-            }
-
-            onHeadersChanged: {
-                collectionViewBaseContainer.headersChanged();
-
-                if(tableInternal.headers.GetItemsCount()){
-                    tableInternal.headersCompl = true;
-                }
-
-                let filteringInfoIds = []
-                for (let i = 0; i < tableInternal.headers.GetItemsCount(); i++){
-                    let headerId = tableInternal.headers.GetData("Id", i);
-
-                    filteringInfoIds.push(headerId);
-                }
-
-                collectionViewBaseContainer.collectionFilter.setFilteringInfoIds(filteringInfoIds);
             }
 
             onRightButtonMouseClicked: {

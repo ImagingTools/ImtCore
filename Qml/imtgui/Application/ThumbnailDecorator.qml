@@ -158,20 +158,6 @@ Rectangle {
         anchors.bottomMargin: thumbnailDecoratorContainer.mainMargin;
     }
 
-//    MainDocumentManager {
-//        id: mainDocumentManager;
-
-//        onDocumentOpened: {
-//            for (let i = 0; i < menuPanel.model.GetItemsCount(); i++){
-//                let pageId = menuPanel.model.GetData("Id", i);
-//                if (pageId === typeId){
-//                    menuPanel.activePageIndex = i;
-//                    break;
-//                }
-//            }
-//        }
-//    }
-
     PagesManager {
         id: pagesManager;
 

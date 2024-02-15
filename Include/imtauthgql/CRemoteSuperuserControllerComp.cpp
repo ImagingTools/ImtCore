@@ -33,6 +33,7 @@ bool CRemoteSuperuserControllerComp::SetSuperuserPassword(const QByteArray& pass
 	request.AddField(fieldObject);
 
 	imtbase::CTreeItemModel responseModel;
+
 	bool retVal = SendModelRequest(request, responseModel);
 	if (!retVal){
 	}

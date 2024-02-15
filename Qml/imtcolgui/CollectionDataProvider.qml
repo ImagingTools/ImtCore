@@ -77,7 +77,7 @@ Item {
 
     onHasRemoteChangesChanged: {
         if (hasRemoteChanges){
-            updateModel();
+//            updateModel();
         }
     }
 
@@ -189,13 +189,13 @@ Item {
         property bool ok: container.commandId !== "" && subscriptionClient.subscriptionId !== "";
         onOkChanged: {
             if (ok){
+                console.log("CollectionDataProvider SubscriptionClient", ok);
+
                 let subscriptionRequestId = "On" + container.commandId + "CollectionChanged"
                 var query = Gql.GqlRequest("subscription", subscriptionRequestId);
                 var queryFields = Gql.GqlObject("notification");
                 queryFields.InsertField("Id");
                 query.AddField(queryFields);
-
-                console.log("CollectionDataProvider subscriptionClient register", subscriptionRequestId, subscriptionClient.subscriptionId);
 
                 Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient});
             }

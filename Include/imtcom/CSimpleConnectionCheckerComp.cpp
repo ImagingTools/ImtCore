@@ -15,7 +15,7 @@ namespace imtcom
 
 IConnectionStatusProvider::ConnectionStatus CSimpleConnectionCheckerComp::GetConnectionStatus() const
 {
-	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, *m_commandIdAttrPtr);
+	imtgql::CGqlRequest request(imtgql::IGqlRequest::RT_QUERY, *m_commandIdAttrPtr);
 
 	imtbase::CTreeItemModel responseModel;
 	bool retVal = SendModelRequest(request, responseModel);

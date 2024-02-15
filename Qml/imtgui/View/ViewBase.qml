@@ -43,7 +43,6 @@ Item {
     }
 
     onModelChanged: {
-        console.log("ViewBase onModelChanged");
         if (internal.blockingUpdateGui || internal.blockingUpdateModel){
             internal.countIncomingChanges++;
             return;
@@ -66,6 +65,8 @@ Item {
 
     function doUpdateModel()
     {
+        console.log("View doUpdateModel");
+
         if (readOnly || internal.blockingUpdateModel || internal.blockingUpdateGui){
             return;
         }

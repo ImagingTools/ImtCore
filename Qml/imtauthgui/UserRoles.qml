@@ -10,31 +10,34 @@ ViewBase {
 
     property int radius: 3;
 
+    property TreeItemModel rolesModel: TreeItemModel {}
+
     Component.onCompleted: {
-        rolesProvider.updateModel();
+//        rolesProvider.updateModel();
     }
 
-    CollectionDataProvider {
-        id: rolesProvider;
+//    CollectionDataProvider {
+//        id: rolesProvider;
 
-        commandId: "Roles";
+//        commandId: "Roles";
 
-        fields: ["Id", "Name"];
+//        fields: ["Id", "Name"];
 
-        onModelUpdated: {
-            if (rolesProvider.collectionModel != null){
-                if (rolesProvider.collectionModel.ContainsKey("Roles")){
-                    let rolesModel = rolesProvider.collectionModel.GetData("Roles");
-                    rolesTable.elements = rolesModel;
+//        onModelUpdated: {
+//            if (rolesProvider.collectionModel != null){
+//                if (rolesProvider.collectionModel.ContainsKey("Roles")){
+//                    let rolesModel = rolesProvider.collectionModel.GetData("Roles");
+//                    rolesTable.elements = rolesModel;
 
-                    userRolesContainer.doUpdateGui();
-                }
-            }
-        }
-    }
+//                    userRolesContainer.doUpdateGui();
+//                }
+//            }
+//        }
+//    }
 
     function updateGui(){
-        console.log("UserRoles updateGui");
+        console.log("UserRoles updateGui", userRolesContainer.model.toJSON());
+        console.log("rolesTable.elements", rolesTable.elements);
         let roleIds = [];
         if (userRolesContainer.model.ContainsKey("Roles")){
             let roles = userRolesContainer.model.GetData("Roles")
@@ -56,7 +59,6 @@ ViewBase {
     }
 
     function updateModel(){
-        console.log("UserRoles updateModel");
         let selectedRoleIds = []
         let indexes = rolesTable.getCheckedItems();
         for (let index of indexes){
@@ -66,6 +68,8 @@ ViewBase {
 
         let result = selectedRoleIds.join(';');
         userRolesContainer.model.SetData("Roles", result);
+
+        console.log("UserRoles updateModel", userRolesContainer.model.toJSON());
     }
 
     Component{
@@ -129,7 +133,7 @@ ViewBase {
 
         width: 400;
 
-        elements: TreeItemModel {}
+        elements: userRolesContainer.rolesModel;
 
         checkable: true;
         radius: userRolesContainer.radius;

@@ -38,6 +38,8 @@ const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& obj
 		return nullptr;
 	}
 
+	imtclientgql::IGqlClient::GqlRequestPtr requestPtr(new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, "RoleItem"));
+
 	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, "RoleItem");
 	imtgql::CGqlObject inputObject("input");
 	inputObject.InsertField(QByteArray("Id"), QVariant(objectId));

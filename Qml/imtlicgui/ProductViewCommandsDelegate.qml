@@ -7,50 +7,56 @@ import imtcontrols 1.0
 DocumentWorkspaceCommandsDelegateBase {
     id: container;
 
-    property Item tableData: null;
-
-    property ModelIndex selectedIndex: container.tableData != null ? container.tableData.selectedIndex: null;
-
-    onSelectedIndexChanged: {
-        console.log("CollectionViewCommands onSelectedIndexChanged");
-        if (!documentPtr){
-            return;
+    onViewChanged: {
+        if (view){
+            tableConnections.target = view.tableView;
         }
+    }
 
-        let isEnabled = false;
-        if (container.selectedIndex != null){
-            let level = container.selectedIndex.depth;
-            if (level === 0){
-                isEnabled = true;
+    Connections {
+        id: tableConnections;
+
+        function onSelectedIndexChanged(){
+            let selectedIndex = container.view.tableView.selectedIndex;
+
+            let isEnabled = false;
+            if (selectedIndex != null){
+                let level = selectedIndex.depth;
+                if (level === 0){
+                    isEnabled = true;
+                }
             }
-        }
 
-        documentPtr.commandsProvider.setCommandIsEnabled("Remove", isEnabled);
+            container.view.commandsController.setCommandIsEnabled("Remove", isEnabled);
+        }
     }
 
     onCommandActivated: {
         console.log("ProductsCommands onCommandActivated", commandId);
+        if (!container.view){
+            return;
+        }
 
         if (commandId === "New"){
-            let features = documentPtr.documentModel.GetData("Features");
+            let features = container.view.model.GetData("Features");
 
             let featureIds = []
             if (features !== ""){
                 featureIds = features.split(';');
             }
 
-            modalDialogManager.openDialog(featuresDialogComp, {"featuresModel": documentPtr.allFeaturesModel, "excludeFeatureIds": featureIds});
+            modalDialogManager.openDialog(featuresDialogComp, {"featuresModel": container.view.allFeaturesModel, "excludeFeatureIds": featureIds});
         }
         else if (commandId === "Remove"){
-            let selectedIndex = tableData.selectedIndex;
+            let selectedIndex = container.view.tableView.selectedIndex;
             if (selectedIndex != null){
                 let index = selectedIndex.index;
 
-                let featureId = tableData.rowModel.GetData("Id", index);
+                let featureId = container.view.tableView.rowModel.GetData("Id", index);
 
-                documentPtr.removeFeature(featureId);
+                container.view.removeFeature(featureId);
 
-                documentPtr.updateFeaturesGui();
+                container.view.updateFeaturesGui();
             }
         }
     }
@@ -63,8 +69,8 @@ DocumentWorkspaceCommandsDelegateBase {
 
                     let featureId = tableModel.GetData("Id", index);
 
-                    container.documentPtr.addFeature(featureId);
-                    container.documentPtr.updateFeaturesGui();
+                    container.view.addFeature(featureId);
+                    container.view.updateFeaturesGui();
                 }
             }
         }

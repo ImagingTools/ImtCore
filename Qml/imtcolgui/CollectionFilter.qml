@@ -75,14 +75,7 @@ QtObject {
     }
 
     function setFilteringInfoIds(filteringInfoIds){
-        if (filteringInfoIds.length > 0){
-            let filteringInfoIdsStr = filteringInfoIds.join(';');
-
-            filterModel.SetData("FilterIds", filteringInfoIdsStr);
-        }
-        else{
-            filterModel.SetData("FilterIds", "");
-        }
+        filterModel.SetExternTreeModel("FilterIds", filteringInfoIds)
 
         root.filterChanged();
     }

@@ -8,7 +8,16 @@ ViewBase {
 
     anchors.fill: parent;
 
+    property TreeItemModel rolesModel: TreeItemModel {}
+    property TreeItemModel groupsModel: TreeItemModel {}
+
+    onModelChanged: {
+        console.log("UserView onModelChanged", model.toJSON());
+    }
+
     function updateGui(){
+        console.log("UserView updateGui")
+
         let generalPage = multiPageView.getPageById("General");
         let rolesPage = multiPageView.getPageById("Roles");
         let groupsPage = multiPageView.getPageById("Groups");
@@ -27,6 +36,8 @@ ViewBase {
     }
 
     function updateModel(){
+        console.log("UserView updateModel")
+
         let generalPage = multiPageView.getPageById("General");
         let rolesPage = multiPageView.getPageById("Roles");
         let groupsPage = multiPageView.getPageById("Groups");
@@ -82,6 +93,8 @@ ViewBase {
         UserRoles {
             model: container.model;
             readOnly: container.readOnly;
+
+            rolesModel: container.rolesModel;
         }
     }
 
@@ -91,6 +104,8 @@ ViewBase {
         UserGroups {
             model: container.model;
             readOnly: container.readOnly;
+
+            groupsModel: container.groupsModel;
         }
     }
 

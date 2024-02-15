@@ -189,6 +189,10 @@ Rectangle {
         setWidth();
     }
 
+    onElementsChanged: {
+        uncheckAll();
+    }
+
     onVisibleChanged: {
         if (visible){
             let indexes = tableContainer.tableSelection.selectedIndexes;

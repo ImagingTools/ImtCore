@@ -104,6 +104,14 @@ CollectionViewBase {
         value: container.dataController.elementsModel;
     }
 
+    Connections {
+        target: container.dataController;
+
+        function onFilterableHeadersModelChanged(){
+            container.collectionFilter.setFilteringInfoIds(container.dataController.filterableHeadersModel);
+        }
+    }
+
     onVisibleChanged: {
         if (container.visible){
             if (internal.guiUpdateRequired){
@@ -140,8 +148,10 @@ CollectionViewBase {
     }
 
     function openPopupMenu(x, y){
+        console.log("openPopupMenu", x, y);
         if (container.commandsDelegate){
             let contextMenuModel = container.commandsDelegate.getContextMenuModel();
+            console.log("contextMenuModel", contextMenuModel.toJSON());
 
             let offset = 26 * contextMenuModel.GetItemsCount();
             modalDialogManager.openDialog(popupMenuDialog, {"x": x, "y": y - offset, "model": contextMenuModel});

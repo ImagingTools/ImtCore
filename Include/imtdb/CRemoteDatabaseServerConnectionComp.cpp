@@ -15,8 +15,7 @@ bool CRemoteDatabaseServerConnectionComp::CheckDatabaseConnection(QString& error
 {
 	QByteArray commandID = m_commandIdAttrPtr.IsValid() ? *m_commandIdAttrPtr : QByteArrayLiteral("GetDatabaseStatus");
 
-	imtgql::CGqlRequest request(imtgql::CGqlRequest::RT_QUERY, commandID);
-
+	imtgql::CGqlRequest request(imtgql::IGqlRequest::RT_QUERY, *m_commandIdAttrPtr);
 	imtbase::CTreeItemModel responseModel;
 	bool retVal = SendModelRequest(request, responseModel);
 	if (retVal){

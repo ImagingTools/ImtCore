@@ -11,6 +11,8 @@ ViewBase {
     property TreeItemModel licensesModel: TreeItemModel {}
     property TreeItemModel productFeaturesViewModel: TreeItemModel {}
 
+    property alias tableView: tableView_;
+
     Component.onCompleted: {
         CachedFeatureCollection.updateModel();
 
@@ -39,7 +41,7 @@ ViewBase {
             productViewContainer.softwareHeadersModel.SetData("Id", "FeatureDescription", index);
             productViewContainer.softwareHeadersModel.SetData("Name", qsTr("Description"), index);
 
-            tableView.columnModel = productViewContainer.softwareHeadersModel;
+            tableView_.columnModel = productViewContainer.softwareHeadersModel;
         }
     }
 
@@ -103,11 +105,11 @@ ViewBase {
         let featureIds = features.split(';')
         console.log("featureIds", featureIds);
 
-        tableView.selectedOptionalFeatures = [];
+        tableView_.selectedOptionalFeatures = [];
 
         for (let featureId of featureIds){
             if (featureId.includes('/')){
-                tableView.selectedOptionalFeatures.push(featureId);
+                tableView_.selectedOptionalFeatures.push(featureId);
 
                 continue;
             }
@@ -123,8 +125,8 @@ ViewBase {
             }
         }
 
-        tableView.rowModel = 0;
-        tableView.rowModel = productViewContainer.productFeaturesViewModel;
+        tableView_.rowModel = 0;
+        tableView_.rowModel = productViewContainer.productFeaturesViewModel;
     }
 
     function addFeature(featureId){
@@ -265,7 +267,7 @@ ViewBase {
     }
 
     BasicTreeView {
-        id: tableView;
+        id: tableView_;
 
         anchors.top: headerPanel.bottom
         anchors.bottom: parent.bottom
@@ -280,14 +282,14 @@ ViewBase {
 
         Component.onCompleted: {
             let ok = PermissionsController.checkPermission("ChangeProduct");
-            tableView.readOnly = !ok;
+            tableView_.readOnly = !ok;
         }
 
         rowDelegate: Component {
             TreeViewItemDelegateBase {
                 id: delegate;
 
-                root: tableView;
+                root: tableView_;
 
                 isCheckable: model.Optional ? model.Optional : false;
 
@@ -298,7 +300,7 @@ ViewBase {
 
                         let id = rootFeatureUuid + "/" + featureId;
 
-                        if (tableView.selectedOptionalFeatures.includes(id)){
+                        if (tableView_.selectedOptionalFeatures.includes(id)){
                             delegate.checkState = Qt.Checked;
                         }
                     }

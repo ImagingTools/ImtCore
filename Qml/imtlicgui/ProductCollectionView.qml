@@ -14,6 +14,8 @@ RemoteCollectionView {
 
     collectionId: "Products";
 
+    additionalFieldIds: ["ProductId"]
+
     commandsDelegate: ProductCollectionViewCommandsDelegate {
         collectionView: productCollectionViewContainer;
 
@@ -36,9 +38,14 @@ RemoteCollectionView {
 
         ProductView {
             id: productEditor;
+
             commandsController: CommandsRepresentationProvider {
                 commandId: "Product";
                 uuid: productEditor.viewId;
+            }
+
+            commandsDelegate: ProductViewCommandsDelegate {
+                view: productEditor;
             }
         }
     }

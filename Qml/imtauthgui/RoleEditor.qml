@@ -12,20 +12,19 @@ ViewBase {
 
     property int radius: 3;
 
+    property TreeItemModel rolesModel: TreeItemModel {}
+    property TreeItemModel copiedRolesModel: TreeItemModel {}
+
     Rectangle{
         anchors.fill: parent;
         color: Style.backgroundColor;
     }
 
-    property bool completed: rolesProvider.compl;
+//    property bool completed: rolesProvider.compl;
 
-    Component.onCompleted: {
-        rolesProvider.updateModel();
-    }
-
-    onModelChanged: {
-        console.log("RoleEditor onModelChanged", model.toJSON());
-    }
+//    Component.onCompleted: {
+//        rolesProvider.updateModel();
+//    }
 
     function getAllParentRoleIds(roleId, rolesModel, retVal){
         for (let i = 0; i < rolesModel.GetItemsCount(); i++){
@@ -57,58 +56,58 @@ ViewBase {
         }
     }
 
-    CollectionDataProvider {
-        id: rolesProvider;
+//    CollectionDataProvider {
+//        id: rolesProvider;
 
-        commandId: "Roles";
-        fields: ["Id", "Name", "Description"];
+//        commandId: "Roles";
+//        fields: ["Id", "Name", "Description"];
 
-        property bool compl: false;
+//        property bool compl: false;
 
-        onModelUpdated: {
-            if (rolesProvider.collectionModel != null){
-                if (rolesProvider.collectionModel.ContainsKey("Roles")){
-                    let documentId = roleEditorContainer.model.GetData("Id");
-                    let rolesModel = rolesProvider.collectionModel.GetData("Roles")
+//        onModelUpdated: {
+//            if (rolesProvider.collectionModel != null){
+//                if (rolesProvider.collectionModel.ContainsKey("Roles")){
+//                    let documentId = roleEditorContainer.model.GetData("Id");
+//                    let rolesModel = rolesProvider.collectionModel.GetData("Roles")
 
-                    // Get all children ID-s
-                    let childrenIds = []
-                    roleEditorContainer.getAllChildrenRoleIds(documentId, rolesModel, childrenIds);
+//                    // Get all children ID-s
+//                    let childrenIds = []
+//                    roleEditorContainer.getAllChildrenRoleIds(documentId, rolesModel, childrenIds);
 
-                    // Get all parent ID-s
-                    let parentIds = []
-                    if (roleEditorContainer.model.ContainsKey("ParentRoles")){
-                        let parentRoles = roleEditorContainer.model.GetData("ParentRoles")
-                        let parentRolesIds = parentRoles.split(';')
-                        for (let j = 0; j < parentRolesIds.length; j++){
-                            roleEditorContainer.getAllParentRoleIds(parentRolesIds[j], rolesModel, parentIds);
-                        }
-                    }
+//                    // Get all parent ID-s
+//                    let parentIds = []
+//                    if (roleEditorContainer.model.ContainsKey("ParentRoles")){
+//                        let parentRoles = roleEditorContainer.model.GetData("ParentRoles")
+//                        let parentRolesIds = parentRoles.split(';')
+//                        for (let j = 0; j < parentRolesIds.length; j++){
+//                            roleEditorContainer.getAllParentRoleIds(parentRolesIds[j], rolesModel, parentIds);
+//                        }
+//                    }
 
-                    // Indexes for deleting
-                    let removedIndexes = []
-                    for (let i = 0; i < rolesModel.GetItemsCount(); i++){
-                        let id = rolesModel.GetData("Id", i);
-                        if (id === documentId || childrenIds.includes(id)){
-                            removedIndexes.push(i);
-                        }
-                    }
+//                    // Indexes for deleting
+//                    let removedIndexes = []
+//                    for (let i = 0; i < rolesModel.GetItemsCount(); i++){
+//                        let id = rolesModel.GetData("Id", i);
+//                        if (id === documentId || childrenIds.includes(id)){
+//                            removedIndexes.push(i);
+//                        }
+//                    }
 
-                    let removedCount = 0
-                    for (let i = 0; i < removedIndexes.length; i++){
-                        rolesModel.RemoveItem(removedIndexes[i] - removedCount);
-                        removedCount++;
-                    }
+//                    let removedCount = 0
+//                    for (let i = 0; i < removedIndexes.length; i++){
+//                        rolesModel.RemoveItem(removedIndexes[i] - removedCount);
+//                        removedCount++;
+//                    }
 
-                    parentRolesTable.elements = rolesModel;
+//                    parentRolesTable.elements = rolesModel;
 
-                    rolesProvider.compl = true;
+//                    rolesProvider.compl = true;
 
-                    roleEditorContainer.doUpdateGui();
-                }
-            }
-        }
-    }
+//                    roleEditorContainer.doUpdateGui();
+//                }
+//            }
+//        }
+//    }
 
     Component{
         id: emptyDecorator;
@@ -343,6 +342,8 @@ ViewBase {
         width: 400;
         checkable: true;
         radius: roleEditorContainer.radius;
+
+        elements: roleEditorContainer.rolesModel;
 
         onCheckedItemsChanged: {
             roleEditorContainer.doUpdateModel();

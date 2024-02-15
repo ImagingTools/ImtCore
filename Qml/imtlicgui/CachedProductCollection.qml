@@ -8,7 +8,7 @@ CollectionDataProvider {
     id: container;
 
     commandId: "Products";
-    fields: ["Id", "ProductName", "Description", "CategoryId", "Licenses"];
+    fields: ["Id", "ProductName", "Description", "CategoryId", "Licenses", "Features"];
     sortByField: "ProductName";
 
     property TreeItemModel hardwareProductsModel: TreeItemModel {};

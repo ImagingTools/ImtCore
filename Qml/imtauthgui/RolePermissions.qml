@@ -10,34 +10,35 @@ ViewBase {
     property int mainMargin: 0;
 
     property string productId: "";
+    property TreeItemModel permissionsModel: TreeItemModel {};
 
-    onProductIdChanged: {
-        if (productId !== ""){
-            permissionsProvider.productId = productId;
+//    onProductIdChanged: {
+//        if (productId !== ""){
+//            permissionsProvider.productId = productId;
 
-            permissionsProvider.updateModel();
-        }
-    }
+//            permissionsProvider.updateModel();
+//        }
+//    }
 
-    PermissionsProvider {
-        id: permissionsProvider;
+//    PermissionsProvider {
+//        id: permissionsProvider;
 
-        property bool compl: false;
+//        property bool compl: false;
 
-        onDataModelChanged: {
-            if (permissionsProvider.dataModel != null){
-                permissionsTable.rowModel = permissionsProvider.dataModel;
+//        onDataModelChanged: {
+//            if (permissionsProvider.dataModel != null){
+//                permissionsTable.rowModel = permissionsProvider.dataModel;
 
-                compl = true;
+//                compl = true;
 
-                rolePermissionsContainer.doUpdateGui();
-            }
-        }
+//                rolePermissionsContainer.doUpdateGui();
+//            }
+//        }
 
-        onDependenciesModelChanged: {
-            dependenciesProvider.model = dependenciesModel;
-        }
-    }
+//        onDependenciesModelChanged: {
+//            dependenciesProvider.model = dependenciesModel;
+//        }
+//    }
 
     FeaturesDependenciesProvider {
         id: dependenciesProvider;
@@ -157,6 +158,8 @@ ViewBase {
         anchors.bottomMargin: 10 + rolePermissionsContainer.mainMargin;
         anchors.leftMargin: rolePermissionsContainer.mainMargin;
         anchors.right: informationBlock.left;
+
+        rowModel: rolePermissionsContainer.permissionsModel;
 
         tristate: true;
 

@@ -99,6 +99,7 @@ WebSocket {
         if (container.status != WebSocket.Open){
             return;
         }
+        console.log("registerSubscriptionToServer");
 
         for (let index = 0; index < subscriptionModel.length; index++){
             if (subscriptionModel[index]["status"] === "unregistered"){
@@ -109,6 +110,9 @@ WebSocket {
                 let query = subscriptionModel[index]["query"]
                 payload["data"] = query.GetQuery()
                 request["payload"] = payload
+
+                console.log("Id", request["id"]);
+
                 container.sendTextMessage(JSON.stringify(request))
             }
         }

@@ -31,15 +31,13 @@ Item {
 
     Component.onDestruction: {
         if (container.collectionView){
-            Events.unSubscribeEvent(container.collectionView.uuid + "CommandActivated", container.commandHandle)
+            Events.unSubscribeAllFromSlot(container.commandHandle);
         }
     }
 
     onCollectionViewChanged: {
         if (collectionView){
             collectionView.selectionChanged.connect(internal.onSelectionChanged);
-            collectionView.viewIdChanged.connect(internal.onViewIdChanged);
-
             if (collectionView.commandsController){
                 collectionView.commandsController.commandsModelChanged.connect(internal.onCommandsModelChanged);
             }
@@ -51,12 +49,6 @@ Item {
 
         function onSelectionChanged(selection){
             container.updateItemSelection(selection);
-        }
-
-        function onViewIdChanged(){
-            let uuid = container.collectionView.viewId;
-
-            Events.subscribeEvent(uuid + "CommandActivated", container.commandHandle)
         }
 
         function onCommandsModelChanged(){
@@ -133,6 +125,10 @@ Item {
         if (!container.collectionView){
             return;
         }
+
+        console.log("commandHandle", commandId);
+
+        console.log("slots", Events.events[collectionView.viewId + "CommandActivated"]);
 
         let commandsController = container.collectionView.commandsController;
 

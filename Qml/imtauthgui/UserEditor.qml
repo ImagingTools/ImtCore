@@ -40,6 +40,7 @@ ViewBase {
     }
 
     function updateModel(){
+        console.log("UserEditor updateModel");
         userEditorContainer.model.SetData("Username", usernameInput.text);
         userEditorContainer.model.SetData("Name", nameInput.text);
         userEditorContainer.model.SetData("Email", mailInput.text);
@@ -106,10 +107,12 @@ ViewBase {
                     readOnly: userEditorContainer.readOnly;
 
                     onEditingFinished: {
-                            let oldText = userEditorContainer.model.GetData("Username");
-                            if (oldText && oldText !== usernameInput.text || !oldText && usernameInput.text !== ""){
-                                userEditorContainer.doUpdateModel();
-                            }
+                        let oldText = userEditorContainer.model.GetData("Username");
+                        if (oldText && oldText !== usernameInput.text || !oldText && usernameInput.text !== ""){
+                            console.log("usernameInput doUpdateModel")
+
+                            userEditorContainer.doUpdateModel();
+                        }
                     }
 
                     KeyNavigation.tab: passwordInput;
@@ -140,10 +143,11 @@ ViewBase {
                     readOnly: userEditorContainer.readOnly;
 
                     onEditingFinished: {
-                            let oldText = userEditorContainer.model.GetData("Password");
-                            if (oldText && oldText !== passwordInput.text || !oldText && passwordInput.text !== ""){
-                                userEditorContainer.doUpdateModel();
-                            }
+                        let oldText = userEditorContainer.model.GetData("Password");
+                        if (oldText && oldText !== passwordInput.text || !oldText && passwordInput.text !== ""){
+                            console.log("passwordInput doUpdateModel")
+                            userEditorContainer.doUpdateModel();
+                        }
                     }
 
                     KeyNavigation.tab: nameInput;
@@ -174,6 +178,8 @@ ViewBase {
                     onEditingFinished: {
                         let oldText = userEditorContainer.model.GetData("Name");
                         if (oldText && oldText !== nameInput.text || !oldText && nameInput.text !== ""){
+                            console.log("nameInput doUpdateModel")
+
                             userEditorContainer.doUpdateModel();
                         }
                     }
@@ -211,6 +217,8 @@ ViewBase {
                     readOnly: userEditorContainer.readOnly;
 
                     onEditingFinished: {
+                        console.log("mailInput doUpdateModel")
+
                         userEditorContainer.doUpdateModel();
                     }
 

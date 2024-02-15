@@ -45,6 +45,7 @@
 	<file alias="imtauthgui/CachedRoleCollection.qml">CachedRoleCollection.qml</file>
 	<file alias="imtauthgui/CachedUserCollection.qml">CachedUserCollection.qml</file>
 	<file alias="imtauthgui/CachedGroupCollection.qml">CachedGroupCollection.qml</file>
+	<file alias="imtauthgui/PermissionsProvider.qml">PermissionsProvider.qml</file>
         <file alias="imtauthgui/qmldir">qmldir</file>
     </qresource>
     <qresource prefix="/"/>

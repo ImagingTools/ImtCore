@@ -10,8 +10,10 @@ ViewBase {
 
     property int radius: 3;
 
+    property TreeItemModel groupsModel: TreeItemModel {}
+
     Component.onCompleted: {
-        CachedGroupCollection.updateModel();
+//        CachedGroupCollection.updateModel();
     }
 
 //    CollectionDataProvider {
@@ -27,10 +29,6 @@ ViewBase {
 //            }
 //        }
 //    }
-
-    function blockEditing(){
-        groupsTable.readOnly = true;
-    }
 
     function updateGui(){
         console.log("UserGroups updateGui");
@@ -133,7 +131,7 @@ ViewBase {
         checkable: true;
         radius: userGroupsContainer.radius;
 
-        elements: CachedGroupCollection.collectionModel;
+        elements: userGroupsContainer.groupsModel;
 
         onCheckedItemsChanged: {
             userGroupsContainer.doUpdateModel();

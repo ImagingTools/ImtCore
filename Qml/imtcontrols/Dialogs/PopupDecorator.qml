@@ -117,12 +117,12 @@ DecoratorBase {
         MouseArea{
             anchors.fill: parent;
             hoverEnabled: true;
-            visible: baseElement ? baseElement.hoverBlocked : true;
+            visible: root.baseElement ? root.baseElement.hoverBlocked : true;
 
             onPositionChanged: {
 //                popupMenuContainer.hoverBlocked = false;
-                if(baseElement){
-                    baseElement.hoverBlocked = false;
+                if(root.baseElement){
+                    root.baseElement.hoverBlocked = false;
                 }
             }
         }

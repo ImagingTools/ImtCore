@@ -86,6 +86,7 @@
         <file alias="imtcontrols/Models/UuidGenerator.qml">Models/UuidGenerator.qml</file>
 	<file alias="imtcontrols/Models/CommandsController.qml">Models/CommandsController.qml</file>
 	<file alias="imtcontrols/Models/CommandsProvider.qml">Models/CommandsProvider.qml</file>
+	<file alias="imtcontrols/Models/TransactionableTreeItemModel.qml">Models/TransactionableTreeItemModel.qml</file>
 
         <file alias="imtcontrols/Views/AuxTable.qml">Views/AuxTable.qml</file>
         <file alias="imtcontrols/Views/BarChart.qml">Views/BarChart.qml</file>

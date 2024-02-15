@@ -20,6 +20,7 @@ singleton CachedGroupCollection 1.0 CachedGroupCollection.qml
 RoleView 1.0 RoleView.qml
 RoleEditor 1.0 RoleEditor.qml
 RolePermissions 1.0 RolePermissions.qml
+PermissionsProvider 1.0 PermissionsProvider.qml
 
 UserView 1.0 UserView.qml
 UserEditor 1.0 UserEditor.qml
