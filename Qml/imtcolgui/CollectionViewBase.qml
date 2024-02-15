@@ -110,9 +110,8 @@ ViewBase {
             }
             onComplComplChanged: {
                 if(tableDecoratorModel.complCompl){
-
                     var tableDecorator = loaderTableDecorator.item;
-                    var count = tableInternal.columnCount;
+                    var count = tableInternal.headers.GetItemsCount();
 
                     if(tableDecorator.GetItemsCount()){
 
