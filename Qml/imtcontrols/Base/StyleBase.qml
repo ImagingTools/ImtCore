@@ -120,7 +120,7 @@ StyleComponents {
     property string borderFocusColor: "#1a76e7";   //b0b0b0
     property string borderColor2: "#a4a4a6";
 
-    property string dialogBackgroundColor: "#808080";
+    property string dialogBackgroundColor: "#f6f6f6";
 
     property string imagingToolsGradient0: "#f6f6f6";
     property string imagingToolsGradient1: "#e3e3e5";

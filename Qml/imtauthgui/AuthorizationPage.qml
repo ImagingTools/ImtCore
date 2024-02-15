@@ -90,7 +90,7 @@ Rectangle {
 
     Rectangle{
         anchors.fill: parent;
-        color: Style.dialogBackgroundColor;
+        color: "gray";
         opacity: 0.5;
     }
 

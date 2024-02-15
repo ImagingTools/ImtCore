@@ -29,7 +29,7 @@ ControlBase {
     property string notClosingButtons: "";
     property int buttonIds: 0;//81920;
 
-    property string backgroundColor: Style.backgroundColor;
+    property string backgroundColor: Style.dialogBackgroundColor;
     property int radius: 0;
 
     property bool canMove: false;
