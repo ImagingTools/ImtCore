@@ -142,8 +142,10 @@ ViewBase {
             id: loaderTableDecorator;
 
             property bool compl: false;
+            sourceComponent: Style.collectionTableDecorator;
             onLoaded: {
                 if(loaderTableDecorator.item){
+                    //console.log("TABLE_DECORATOR::", item.toJSON())
                     loaderTableDecorator.compl = true;
                 }
             }
@@ -182,6 +184,10 @@ ViewBase {
 
             onHeadersChanged: {
                 collectionViewBaseContainer.headersChanged();
+
+                if(tableInternal.headers.GetItemsCount()){
+                    tableInternal.headersCompl = true;
+                }
 
                 let filteringInfoIds = []
                 for (let i = 0; i < tableInternal.headers.GetItemsCount(); i++){

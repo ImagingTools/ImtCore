@@ -52,6 +52,9 @@ StyleComponents {
     popupDecorator: popupDecoratorComp;
     popupItemDelegateDecorator: popupItemDelegateDecoratorComp;
 
+    collectionTableDecorator: Component{TreeItemModel{}}
+
+
     Component {
         id: popupItemDelegateDecoratorComp;
 

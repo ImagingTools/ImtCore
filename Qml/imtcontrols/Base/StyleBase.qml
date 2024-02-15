@@ -307,6 +307,10 @@ StyleComponents {
         if (sourceDecorators.popupItemDelegateDecorator){
             styleContainer.popupItemDelegateDecorator = sourceDecorators.popupItemDelegateDecorator
         }
+        if (sourceDecorators.collectionTableDecorator){
+            styleContainer.collectionTableDecorator = sourceDecorators.collectionTableDecorator
+        }
+
     }
 
     function parseStyleTheme(themeType){
