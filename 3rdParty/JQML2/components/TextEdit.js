@@ -41,6 +41,11 @@ class TextEdit extends Item {
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
 
+        this.setStyle({
+            fontSize: '14px',
+            fontFamily: 'Segoe UI',
+        })
+
         this.impl = document.createElement('span')
         this.impl.style.position = 'absolute'
         this.impl.style.left = '0'

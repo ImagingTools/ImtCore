@@ -54,6 +54,7 @@ class Text extends Item {
             whiteSpace: 'pre',
             lineHeight: 'normal',
             fontSize: '14px',
+            fontFamily: 'Segoe UI',
         })
 
         this.impl = document.createElement('span')

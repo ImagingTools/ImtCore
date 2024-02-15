@@ -17,6 +17,11 @@ var Qt = {
     WheelFocus: 0x4,
     NoFocus: 0,
 
+    TopEdge: 0x00001,
+    LeftEdge: 0x00002,
+    RightEdge: 0x00004,
+    BottomEdge: 0x00008,
+
     Key_Escape: 0x01000000, 
     Key_Tab: 0x01000001, 
     Key_Backtab: 0x01000002, 

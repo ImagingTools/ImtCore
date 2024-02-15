@@ -49,6 +49,11 @@ class TextInput extends Item {
 
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
+
+        this.setStyle({
+            fontSize: '14px',
+            fontFamily: 'Segoe UI',
+        })
         
         this.$form = document.createElement('form')
         this.$form.style.outline = 'none'

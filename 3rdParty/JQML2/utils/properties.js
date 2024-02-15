@@ -66,7 +66,7 @@ class QProperty {
         } catch (error) {
             console.error(error)
         }
-        if(safeValue !== this.value){
+        if(safeValue !== this.value || this.alwaysNotify){
             this.value = safeValue
             if(this.notify) this.notify()
         }
@@ -624,7 +624,7 @@ class QAnchorLine {
 class QFont extends ComplexObject {
     static defaultProperties = {
         bold: { type: QBool, value: false, changed: 'mainChanged' },
-        family: { type: QString, value: '', changed: 'mainChanged' },
+        family: { type: QString, value: 'Segoe UI', changed: 'mainChanged' },
         italic: { type: QBool, value: false, changed: 'mainChanged' },
         underline: { type: QBool, value: false, changed: 'mainChanged' },
         pointSize: { type: QReal, value: 14/0.75, changed: 'mainChanged' },
@@ -656,7 +656,13 @@ class QFont extends ComplexObject {
 class QBorder extends ComplexObject {
     static defaultProperties = {
         color: { type: QColor, value: 'black', changed: 'mainChanged' },
-        width: { type: QReal, value: 0, changed: 'mainChanged' },
+        width: { type: QReal, value: 1, changed: 'mainChanged' },
+    }
+
+    constructor(){
+        super()
+        this.getProperty('color').alwaysNotify = true
+        this.getProperty('width').alwaysNotify = true
     }
 
     mainChanged(){
