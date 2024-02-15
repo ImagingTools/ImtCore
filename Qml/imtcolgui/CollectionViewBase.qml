@@ -120,7 +120,18 @@ ViewBase {
                         var cells = tableDecoratorModel.AddTreeModel("Cells");
                         var cellWidth = tableDecoratorModel.AddTreeModel("CellWidth");
 
-                        for(var i = 0; i < count; i++){
+                        var general;
+                        if(tableDecorator.IsValidData("General")){
+                            general = tableDecorator.GetTreeItemModel("General")
+                            let keys = general.GetKeys();
+                            for(let i = 0; i < keys.length; i++){
+                                if(tableInternal[keys[i]] !== undefined){
+                                    tableInternal[keys[i]] = general.GetData(keys[i]);
+                                }
+                            }
+                        }
+
+                        for(let i = 0; i < count; i++){
                             headers.InsertNewItem();
                             cells.InsertNewItem();
                             cellWidth.InsertNewItem();
