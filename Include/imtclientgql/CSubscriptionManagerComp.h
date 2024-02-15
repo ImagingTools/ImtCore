@@ -4,6 +4,7 @@
 // Qt includes
 #include <QtWebSockets/QWebSocket>
 #include <QtCore/QTimer>
+#include <QtCore/QMutex>
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
@@ -108,6 +109,9 @@ private:
 	mutable QMap <QByteArray, SubscriptionHelper> m_registeredClients;
 	mutable imtauth::ILoginStatusProvider::LoginStatusFlags m_loginStatus;
 	mutable QMap<QString, QByteArray> m_queryDataMap;
+	mutable QMutex m_registeredClientsMutex;
+//	QMutex m_loginStatusMutex;
+	mutable QMutex m_queryDataMapMutex;
 };
 
 

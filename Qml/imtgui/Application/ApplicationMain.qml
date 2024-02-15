@@ -161,12 +161,12 @@ Item {
                 let webSocketServerUrl = application.settingsProvider.getValue("WebSocketServerUrl");
                 console.log("webSocketServerUrl", webSocketServerUrl);
 
-//                if (webSocketServerUrl && webSocketServerUrl !== ""){
-//                    webSocketServerUrl =  webSocketServerUrl.replace("http", "ws")
-//                    subscriptionManager.url = webSocketServerUrl;
+                if (webSocketServerUrl && webSocketServerUrl !== ""){
+                    webSocketServerUrl =  webSocketServerUrl.replace("http", "ws")
+                    subscriptionManager.url = webSocketServerUrl;
 
-//                    return;
-//                }
+                    return;
+                }
 
                 let serverUrl = application.settingsProvider.getValue("ServerUrl");
 

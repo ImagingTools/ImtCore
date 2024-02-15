@@ -9,6 +9,7 @@ CommandsController {
     property string commandId;
 
     onCommandIdChanged: {
+        console.log("onCommandIdChanged", commandId, JSON.stringify(getAdditionalInputParams()), this)
         updateModel();
     }
 

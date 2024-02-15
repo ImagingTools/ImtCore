@@ -148,7 +148,7 @@ bool CGqlSubscriberControllerCompBase::SetSubscriptions()
 		"type": "data",
 		"id": "%1",
 		"payload": {
-			"data": "%2"
+			"data": %2
 		}
 	}
 		)"" ).arg(QString(id)).arg(QString(data)).toUtf8();
@@ -174,7 +174,7 @@ bool CGqlSubscriberControllerCompBase::SetSubscriptions()
 }
 
 
-bool CGqlSubscriberControllerCompBase::SetAllSubscriptions(const QByteArray& data)
+bool CGqlSubscriberControllerCompBase::SetAllSubscriptions(const QByteArray& subscriptionId, const QByteArray& data)
 {
 	if (!m_requestManagerCompPtr.IsValid()){
 		return false;
@@ -184,7 +184,7 @@ bool CGqlSubscriberControllerCompBase::SetAllSubscriptions(const QByteArray& dat
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequestPtr = requestNetworks.networkRequests[id];
 			if (networkRequestPtr != nullptr){
-				QByteArray body = QString(R"({"type": "data","id": "%1","payload": {"data": "%2"}})").arg(qPrintable(id)).arg(qPrintable(data)).toUtf8();
+				QByteArray body = QString(R"({"type": "data","id": "%1","payload": {"data": {"%2": %3}}})").arg(qPrintable(id)).arg(qPrintable(subscriptionId)).arg(qPrintable(data)).toUtf8();
 				QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
 				const imtrest::IProtocolEngine& engine = networkRequestPtr->GetProtocolEngine();
 

@@ -51,6 +51,8 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 		}
 	}
 
+	QMutexLocker locker(&m_registeredClientsMutex);
+
 	for (QByteArray subscriptionId : m_registeredClients.keys()){
 		if (m_registeredClients[subscriptionId].m_request.IsEqual(subscriptionRequest) && m_registeredClients[subscriptionId].m_clientId == clientId){
 			m_registeredClients[subscriptionId].m_clients.append(subscriptionClient);
@@ -68,6 +70,8 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 	subscriptionHelper.m_clients.append(subscriptionClient);
 	m_registeredClients.insert(subscriptionId.toLocal8Bit(), subscriptionHelper);
 
+	locker.unlock();
+
 	if (m_loginStatus == imtauth::ILoginStatusProvider::LSF_LOGGED_IN){
 		ServiceManagerRegister(*requestImplPtr, subscriptionId.toLocal8Bit());
 	}
@@ -78,6 +82,8 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 
 bool CSubscriptionManagerComp::UnregisterSubscription(const QByteArray& subscriptionId)
 {
+	QMutexLocker locker(&m_registeredClientsMutex);
+
 	if (m_registeredClients.contains(subscriptionId)){
 		m_registeredClients.remove(subscriptionId);
 
@@ -93,6 +99,8 @@ void CSubscriptionManagerComp::OnUpdate(const istd::IChangeable::ChangeSet& chan
 	if (!m_loginStatusCompPtr.IsValid()){
 		return;
 	}
+
+	QMutexLocker locker(&m_registeredClientsMutex);
 
 	m_loginStatus = (imtauth::ILoginStatusProvider::LoginStatusFlags)m_loginStatusCompPtr->GetLoginStatus();
 
@@ -117,6 +125,8 @@ void CSubscriptionManagerComp::OnUpdate(const istd::IChangeable::ChangeSet& chan
 
 imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest::IRequest& request) const
 {
+	QMutexLocker locker(&m_registeredClientsMutex);
+
 	QByteArray commandId = request.GetCommandId();
 
 	const imtrest::CWebSocketRequest* webSocketRequest = dynamic_cast<const imtrest::CWebSocketRequest*>(&request);
@@ -174,7 +184,7 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 							break;
 						}
 
-						QJsonObject payloadObject = rootObject.value("payload").toObject();
+						QJsonObject payloadObject = rootObject.value("payload").toObject().value("data").toObject();
 
 						QJsonDocument document;
 						document.setObject(payloadObject);
@@ -191,7 +201,11 @@ imtrest::ConstResponsePtr CSubscriptionManagerComp::ProcessRequest(const imtrest
 		break;
 
 		case imtrest::CWebSocketRequest::MT_QUERY_DATA:{
+			QMutexLocker queryLocker(&m_queryDataMapMutex);
+
 			m_queryDataMap.insert(webSocketRequest->GetSubscriptionId(), webSocketRequest->GetBody());
+
+			queryLocker.unlock();
 
 			Q_EMIT OnQueryDataReceived(1);
 		}
@@ -255,6 +269,8 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 	while(true){
 		int resultCode = networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
 		if(resultCode == 1){
+			QMutexLocker queryLocker(&m_queryDataMapMutex);
+
 			if(m_queryDataMap.contains(key)){
 				imtgql::CGqlResponse* responsePtr = new imtgql::CGqlResponse(requestPtr);
 				responsePtr->SetResponseData(m_queryDataMap.value(key));
@@ -264,6 +280,8 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 
 				return retVal;
 			}
+			queryLocker.unlock();
+
 			continue;
 		}
 		else{

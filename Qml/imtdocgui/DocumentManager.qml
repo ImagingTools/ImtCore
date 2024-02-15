@@ -288,7 +288,7 @@ Item {
             return false;
         }
 
-        Events.sendEvent("StartLoading");
+//        Events.sendEvent("StartLoading");
 
         documentData.documentIndex = documentsModel.count;
         documentsModel.append({
