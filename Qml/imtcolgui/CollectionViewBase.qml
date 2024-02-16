@@ -189,6 +189,7 @@ ViewBase {
             }
 
             onHeadersChanged: {
+                collectionViewBaseContainer.headersChanged();
                 if(tableInternal.headers.GetItemsCount()){
                     tableInternal.headersCompl = true;
                 }
