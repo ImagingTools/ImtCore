@@ -115,7 +115,18 @@ ViewBase {
                         var cells = tableDecoratorModel.AddTreeModel("Cells");
                         var cellWidth = tableDecoratorModel.AddTreeModel("CellWidth");
 
-                        for(var i = 0; i < count; i++){
+                        var general;
+                        if(tableDecorator.IsValidData("General")){
+                            general = tableDecorator.GetTreeItemModel("General")
+                            let keys = general.GetKeys();
+                            for(let i = 0; i < keys.length; i++){
+                                if(tableInternal[keys[i]] !== undefined){
+                                    tableInternal[keys[i]] = general.GetData(keys[i]);
+                                }
+                            }
+                        }
+
+                        for(let i = 0; i < count; i++){
                             headers.InsertNewItem();
                             cells.InsertNewItem();
                             cellWidth.InsertNewItem();
@@ -137,8 +148,10 @@ ViewBase {
             id: loaderTableDecorator;
 
             property bool compl: false;
+            sourceComponent: Style.collectionTableDecorator;
             onLoaded: {
                 if(loaderTableDecorator.item){
+                    //console.log("TABLE_DECORATOR::", item.toJSON())
                     loaderTableDecorator.compl = true;
                 }
             }
@@ -173,6 +186,12 @@ ViewBase {
 
             onElementsChanged: {
                 collectionViewBaseContainer.elementsChanged();
+            }
+
+            onHeadersChanged: {
+                if(tableInternal.headers.GetItemsCount()){
+                    tableInternal.headersCompl = true;
+                }
             }
 
             onRightButtonMouseClicked: {
