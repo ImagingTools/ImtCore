@@ -35,7 +35,7 @@ ControlBase {
     property bool canMove: false;
     property bool decoratorVisible: !decorator_ ? true: decorator_.visible;
 
-    property Component topPanelComp: Component{TopPanelDialog{}};
+    property Component topPanelComp: Style.topPanelDialogDecorator;//Component{TopPanelDialog{}};
     property Component topPanelDefault: Component{TopPanelDialog{}};
     property Component contentComp: null;
 
