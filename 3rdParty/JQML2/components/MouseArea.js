@@ -88,7 +88,7 @@ class MouseArea extends Item {
             this.mouse.accepted = false
             this.$entered = true
 
-            if(this.$signals.clicked || this.$signals.doubleClicked) this.mouse.accepted = true
+            if((this.$signals.clicked || this.$signals.doubleClicked) && !this.getPropertyValue('propagateComposedEvents')) this.mouse.accepted = true
 
             if(this.$signals && this.$signals.entered) {
                 this.mouse.accepted = true
