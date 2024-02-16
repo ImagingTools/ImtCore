@@ -165,7 +165,7 @@ ViewBase {
             anchors.top: parent.top;
 
             anchors.bottom: parent.bottom;
-            anchors.margins: Style.size_mainMargin !== undefined ? Style.size_mainMargin + paginationObj.visible * paginationObj.height : paginationObj.visible * paginationObj.height;
+            anchors.bottomMargin: Style.size_mainMargin !== undefined ? Style.size_mainMargin + paginationObj.visible * paginationObj.height : paginationObj.visible * paginationObj.height;
 
             hasFilter: collectionViewBaseContainer.hasFilter;
             hasSort: collectionViewBaseContainer.hasSort;
