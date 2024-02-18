@@ -386,15 +386,136 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadToModelImplCode(QTextS
 
 void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldWriteToModelCode(QTextStream& stream, const CSdlField& field)
 {
-	/// \todo implement it
-	I_CRITICAL();
+	/// \todo implement it!
+	Q_ASSERT(false);
+}
+
+
+void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldWriteToModelImplCode(
+			QTextStream& stream,
+			const CSdlField& field,
+			quint16 hIndents)
+{
 }
 
 
 void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldReadFromModelCode(QTextStream& stream, const CSdlField& field)
 {
-	/// \todo implement it
-	I_CRITICAL();
+	FeedStreamHorizontally(stream, 1);
+	stream << QStringLiteral("imtbase::CTreeItemModel* ") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model = model.GetTreeItemModel(");
+	stream << '"' << field.GetId() << '"';
+	stream << QStringLiteral(", modelIndex);");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream);
+
+	if (field.IsRequired() || field.IsNonEmpty()){
+
+		// value checks
+		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model == nullptr){");
+		FeedStream(stream, 1, false);
+		FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("return false;");
+		FeedStream(stream, 1, false);
+		FeedStreamHorizontally(stream);
+		stream << '}';
+		FeedStream(stream, 1, false);
+
+		AddCustomArrayFieldReadToModelImplCode(stream, field);
+		FeedStream(stream, 1, false);
+	}
+	else {
+		stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model != nullptr){");
+		FeedStream(stream, 1, false);
+
+		AddCustomArrayFieldReadToModelImplCode(stream, field, 2);
+		FeedStream(stream, 1, false);
+
+		FeedStreamHorizontally(stream);
+		stream << '}';
+		FeedStream(stream, 1, false);
+	}
+}
+
+void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldReadToModelImplCode(
+			QTextStream& stream,
+			const CSdlField& field,
+			quint16 hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+
+	const QString countVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Count");
+	// declare count value
+	stream << QStringLiteral("int ") << countVariableName << QStringLiteral(" = ");
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model->GetItemsCount();");
+	FeedStream(stream, 1, false);
+
+	// value checks
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("if (") << countVariableName << QStringLiteral(" <= 0){");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 1, false);
+
+	// declare temp list var
+	const QString listVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("List");
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("QList<C") << GetCapitalizedValue(field.GetType()) << '>';
+	stream << ' ' << listVariableName << ';';
+	FeedStream(stream, 1, false);
+
+	//declare for loop
+	const QString indexVariableName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Index");
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("for (int ") << indexVariableName << QStringLiteral(" = 0; ");
+	stream << indexVariableName << QStringLiteral(" < ") << countVariableName;
+	stream << QStringLiteral("; ++") << indexVariableName << QStringLiteral("){");
+	FeedStream(stream, 1, false);
+
+	// inLoop: declare temp var
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << 'C' << GetCapitalizedValue(field.GetType()) << ' ';
+	stream << GetDecapitalizedValue(field.GetId()) << ';';
+	FeedStream(stream, 1, false);
+
+	// inLoop: read and checks
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("if (!");
+	stream << 'C' << GetCapitalizedValue(field.GetType());
+	stream << QStringLiteral("::ReadFromModel(");
+	stream << GetDecapitalizedValue(field.GetId());
+	stream << QStringLiteral(", *");
+	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Model, ");
+	stream << indexVariableName << QStringLiteral(")){");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << '}';
+	FeedStream(stream, 1, false);
+
+	// inLoop: add variable to tempList
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << listVariableName;
+	stream << QStringLiteral(" << ");
+	stream << GetDecapitalizedValue(field.GetId()) << ';';
+	FeedStream(stream, 1, false);
+
+	// inLoop: end
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 1, false);
+
+	// set value list to object
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("object.Set");
+	stream << GetCapitalizedValue(field.GetId());
+	stream << '(' << listVariableName << ')' << ';';
+	FeedStream(stream, 1, false);
 }
 
 
