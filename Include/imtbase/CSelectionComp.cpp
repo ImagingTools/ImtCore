@@ -9,7 +9,7 @@ namespace imtbase
 
 // reimplemented (CSelection)
 
-void CSelectionComp::OnConstraintsUpdated(const istd::IChangeable::ChangeSet& changeset, const ICollectionInfo* modelPtr)
+void CSelectionComp::OnConstraintsUpdated(const istd::IChangeable::ChangeSet& /*changeset*/, const ICollectionInfo* modelPtr)
 {
 	if (m_lastConstraints != modelPtr->GetElementIds()){
 		Ids tempSelection;

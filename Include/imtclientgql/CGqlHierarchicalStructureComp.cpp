@@ -371,6 +371,8 @@ imtbase::IHierarchicalStructureIterator* CGqlHierarchicalStructureComp::CreateHi
 	if (m_delegateCompPtr.IsValid()){
 		return m_delegateCompPtr->CreateHierarchicalStructureIterator(offset, count, selectionParamsPtr);
 	}
+
+	return nullptr;
 }
 
 

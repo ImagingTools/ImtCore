@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="Capa_1"
+   enable-background="new 0 0 512 512"
+   height="512"
+   viewBox="0 0 512 512"
+   width="512"
+   version="1.1"
+   sodipodi:docname="ShowScrollbar.svg"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs3" />
+  <sodipodi:namedview
+     id="namedview3"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="2.2929688"
+     inkscape:cx="255.78194"
+     inkscape:cy="256"
+     inkscape:window-width="2560"
+     inkscape:window-height="1370"
+     inkscape:window-x="-6"
+     inkscape:window-y="-6"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Capa_1" />
+  <g
+     id="g3"
+     transform="matrix(0.78125,0,0,0.78125,55.999609,56)"
+     style="fill:#d9d9d9;fill-opacity:1">
+    <g
+       id="g2"
+       style="fill:#d9d9d9;fill-opacity:1">
+      <path
+         d="M 343.963,111.428 256,0 168.037,111.428 h 48.841 v 55.433 h 78.244 v -55.433 z"
+         id="path1"
+         style="fill:#d9d9d9;fill-opacity:1" />
+      <path
+         d="M 168.037,400.572 256,512 343.963,400.572 h -48.841 v -55.433 h -78.244 v 55.433 z"
+         id="path2"
+         style="fill:#d9d9d9;fill-opacity:1" />
+    </g>
+    <path
+       d="m 54.304,218.763 h 403.393 v 74.475 H 54.304 Z"
+       id="path3"
+       style="fill:#d9d9d9;fill-opacity:1" />
+  </g>
+</svg>

@@ -18,6 +18,7 @@ namespace imtgui
 
 /**
 	Component for switching between applications.
+	\ingroup ApplicationFramework
 */
 class CApplicationSwitchCommandComp:
 			public QObject,
