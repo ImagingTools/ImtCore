@@ -56,6 +56,9 @@ void CUrlParamComp::OnComponentCreated()
 
 	QString path = *m_defaultPathAttrPtr;
 	if (!path.isEmpty()){
+		if (path[0] != '/'){
+			path.prepend('/');
+		}
 		url.setPath(path);
 	}
 
