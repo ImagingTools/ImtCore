@@ -1,5 +1,21 @@
 import QtQuick 2.0
 
+
+/*!
+	\brief
+		The basic component for creating a style.
+		Inherit it to create your own style for the app.
+		To create your own style, you need to create your own module with Style.qml file.
+
+	\warning
+		The module must have a name 'Acf' and a version 1.0.
+
+	\example
+		\file qmldir
+			\code
+				module Acf
+				singleton Style 1.0 Style.qml
+*/
 StyleComponents {
     id: styleContainer;
 
