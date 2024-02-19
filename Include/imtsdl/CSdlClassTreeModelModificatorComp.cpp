@@ -109,7 +109,6 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const CSdlType& s
 		FeedStream(ofStream, 1, false);
 	}
 	ofStream << QStringLiteral("\n\treturn true;\n}");
-
 	FeedStream(ofStream, 3, false);
 
 	// read method implementation

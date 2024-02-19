@@ -449,7 +449,7 @@ bool CSdlClassCodeGeneratorComp::EndSourceClassFile(const CSdlType& sdlType)
 	ifStream << QStringLiteral("return retVal;");
 	FeedStream(ifStream, 1, false);
 	ifStream << '}';
-	FeedStream(ifStream, 2);
+	FeedStream(ifStream, 3);
 
 	return true;
 }
