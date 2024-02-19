@@ -3,6 +3,7 @@
 
 // Qt i ncludes
 #include <QtCore/QDataStream>
+#include <QtCore/QRegularExpression>
 
 // 3rdParty includes
 #include "zlib.h"
@@ -109,9 +110,8 @@ ConstResponsePtr CHttpRootServletComp::ProcessRequest(const IRequest& request) c
 		return responsePtr;
 	}
 	else{
-		QByteArray commandIdSafe = commandId.replace("<","<<");
-		commandIdSafe = commandId.replace(">",">>");
-		commandIdSafe = commandId.replace("/","//");
+		QString commandIdSafe = commandId;
+		commandIdSafe = commandIdSafe.replace(QRegularExpression("[<>\":;()= .]"),"_");
 		QByteArray body = QString("<html><head><title>Error</title></head><body><p>The requested command could not be executed. No servlet was found for the given command: '%1'</p></body></html>").arg(qPrintable(commandIdSafe)).toUtf8();
 		QByteArray reponseTypeId = QByteArray("text/html; charset=utf-8");
 
