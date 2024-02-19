@@ -267,7 +267,36 @@ void CSdlClassGqlModificatorComp::AddScalarListFieldWriteToRequestCode(QTextStre
 
 void CSdlClassGqlModificatorComp::AddCustomFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field)
 {
+	// declare temp GQL object
+	const QString dataObjectValueName = field.GetId() + QStringLiteral("DataObject");
+	stream << QStringLiteral("imtgql::CGqlObject ") << dataObjectValueName << ';';
+	FeedStream(stream, 1, false);
 
+	// add me to temt object and checks
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("if (!m_");
+	stream << GetDecapitalizedValue(field.GetId());
+	stream << QStringLiteral(".AddMeToGraphQlObject(");
+	stream << dataObjectValueName;
+	stream << QStringLiteral(")){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, 2);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream);
+	stream << '}';
+	FeedStream(stream, 1, false);
+
+	// insert temp GQL object
+	FeedStreamHorizontally(stream);
+	stream << QStringLiteral("request.InsertField(");
+	stream << '"' << field.GetId() << '"';
+	stream << ',' << ' ';
+	stream << dataObjectValueName;
+	stream << ')' << ';';
+	FeedStream(stream, 1, false);
 }
 
 
