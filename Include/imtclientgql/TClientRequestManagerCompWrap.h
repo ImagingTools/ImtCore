@@ -41,14 +41,21 @@ bool TClientRequestManagerCompWrap<Base>::SendModelRequest(const imtgql::IGqlReq
 		return false;
 	}
 
-	IGqlClient::GqlResponsePtr responsePtr;// = m_apiClientCompPtr->SendRequest(request);
+	imtclientgql::IGqlClient::GqlRequestPtr requestPtr(dynamic_cast<imtgql::IGqlRequest*>(request.CloneMe()));
+	if (requestPtr.isNull()){
+		return false;
+	}
+
+	IGqlClient::GqlRequestPtr gqlRequestPtr(requestPtr);
+
+	IGqlClient::GqlResponsePtr responsePtr = m_apiClientCompPtr->SendRequest(gqlRequestPtr);
 	if (!responsePtr.isNull()){
 		istd::TDelPtr<imtbase::CTreeItemModel> resultModelPtr = CreateTreeItemModel(request, responsePtr->GetResponseData());
 		if (!resultModelPtr.IsValid()){
 			return false;
 		}
 
-		return responseModel.Copy(resultModelPtr.GetPtr());
+		return responseModel.CopyFrom(*resultModelPtr);
 	}
 
 	return false;
@@ -104,6 +111,8 @@ imtbase::CTreeItemModel* TClientRequestManagerCompWrap<Base>::CreateTreeItemMode
 			}
 		}
 	}
+
+	qDebug() << "replyResultPtr" << replyResultPtr->toJSON();
 
 	return replyResultPtr;
 }

@@ -60,8 +60,6 @@ bool CGqlModel::SetGqlQuery(QString query)
 
 void CGqlModel::replyFinished()
 {
-	qDebug() << QString("replyFinished");
-
 	QNetworkReply* reply = dynamic_cast<QNetworkReply*>(sender());
 	if(reply){
 		QByteArray representationData = reply->readAll();
