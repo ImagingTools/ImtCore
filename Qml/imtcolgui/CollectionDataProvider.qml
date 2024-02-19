@@ -77,7 +77,7 @@ Item {
 
     onHasRemoteChangesChanged: {
         if (hasRemoteChanges){
-//            updateModel();
+            updateModel();
         }
     }
 

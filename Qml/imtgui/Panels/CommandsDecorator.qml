@@ -23,17 +23,19 @@ Item {
     }
 
     function setCommandsModel(parameters){
-        console.log("setCommandsModel", JSON.stringify(parameters));
+        console.log("setCommandsModel");
         let model = parameters["Model"];
         let commId = parameters["ViewId"];
 
         commandsDecoratorContainer.commandId = commId;
+
         buttonPanel.buttonModel = model;
 
         buttonPanel.updateModel();
     }
 
     function clearModel(parameters){
+        console.log("clearModel");
         if (parameters){
             let commandId = parameters["ViewId"];
             if (commandId !== commandsDecoratorContainer.commandId){

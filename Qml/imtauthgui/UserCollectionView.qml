@@ -8,8 +8,10 @@ import imtguigql 1.0
 import imtdocgui 1.0
 
 
-CollectionView {
+RemoteCollectionView {
     id: userCollectionViewContainer;
+
+    collectionId: "Users";
 
     dataController: CollectionRepresentation {
         collectionId: "Users";

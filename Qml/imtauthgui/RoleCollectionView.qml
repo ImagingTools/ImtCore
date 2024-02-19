@@ -7,10 +7,19 @@ import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
 
-CollectionView {
+RemoteCollectionView {
     id: roleCollectionViewContainer;
 
+    anchors.top: parent.top;
+    anchors.topMargin: Style.size_mainMargin;
+    anchors.horizontalCenter: parent.horizontalCenter;
+
+    width: parent.width - 2 * Style.size_mainMargin;
+
     hasFilter: false;
+    hasPagination: false;
+
+    collectionId: "Roles";
 
     property bool newCommandIsEnabled: true;
 
@@ -159,12 +168,11 @@ CollectionView {
             function getDocumentName(){
                 let prefixName = qsTr("Roles");
 
-                if (documentModel.ContainsKey("Name")){
-                    return prefixName + " / " + documentModel.GetData("Name")
+                if (documentName !== ""){
+                    return prefixName + " / " + documentName;
                 }
 
-                let newRoleName = qsTr("New Role");
-                return newRoleName;
+                return prefixName + " / " + qsTr("New Role");
             }
         }
     }

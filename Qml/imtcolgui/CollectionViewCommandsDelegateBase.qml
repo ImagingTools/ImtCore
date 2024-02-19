@@ -17,6 +17,10 @@ Item {
 
     property TreeItemModel contextMenuModel: TreeItemModel {}
 
+    property alias renameDialogComp: renameDialog;
+    property alias removeDialogComp: removeDialog;
+    property alias setDescriptionDialogComp: setDescriptionDialog;
+
     property var templateContextMenuModel: [
         {"Id": "Edit"},
         {"Id": ""},
@@ -126,11 +130,10 @@ Item {
             return;
         }
 
-        console.log("commandHandle", commandId);
-
-        console.log("slots", Events.events[collectionView.viewId + "CommandActivated"]);
-
         let commandsController = container.collectionView.commandsController;
+        if (!commandsController){
+            return;
+        }
 
         let commandIsEnabled = commandsController.commandIsEnabled(commandId);
         if (commandIsEnabled){

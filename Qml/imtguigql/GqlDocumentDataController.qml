@@ -11,9 +11,6 @@ DocumentDataController {
     property string gqlAddCommandId;
     property string gqlUpdateCommandId;
 
-    signal saved(string id, string name);
-    signal error(string message, string type);
-
     onError: {
         Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
     }

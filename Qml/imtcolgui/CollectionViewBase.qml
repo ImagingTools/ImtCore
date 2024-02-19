@@ -54,6 +54,13 @@ ViewBase {
         }
     }
 
+    function onModelChanged(){}
+
+    Rectangle{
+        anchors.fill: parent;
+
+        color: Style.backgroundColor;
+    }
 
     FilterMenu {
         id: filterMenu_;

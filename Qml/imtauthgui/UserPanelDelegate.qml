@@ -51,7 +51,9 @@ Item {
                     userPanelDelegate.userModel.SetData("Password", this.password)
                     userPanelDelegate.userModel.SetData("Username", this.login)
 
-                    documentController.updateData("UserUpdate", userPanelDelegate.userId, userPanelDelegate.userModel, {}, userPanelDelegate.onResult);
+                    documentController.documentId = userPanelDelegate.userId;
+                    documentController.documentModel = userPanelDelegate.userModel;
+                    documentController.saveDocument();
                 }
             }
         }
@@ -60,14 +62,9 @@ Item {
     GqlDocumentDataController{
         id: documentController;
 
-//        onUpdateModelStateChanged: {
-//            if (updateModelState == "Loading"){
-//                Events.sendEvent("StartLoading");
-//            }
-//            else{
-//                Events.sendEvent("StopLoading");
-//            }
-//        }
+        gqlGetCommandId: "UserItem";
+        gqlAddCommandId: "UserAdd";
+        gqlUpdateCommandId: "UserUpdate";
     }
 
     Component {

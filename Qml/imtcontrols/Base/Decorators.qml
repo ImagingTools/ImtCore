@@ -237,8 +237,6 @@ StyleComponents {
                 visible: !textFieldItem.baseElement ? false : textFieldItem.baseElement.text == "";
 
                 text: !textFieldItem.baseElement ? "" : textFieldItem.baseElement.placeHolderText;
-
-
             }
 
             MouseArea {
@@ -362,7 +360,7 @@ StyleComponents {
                 anchors.verticalCenter: cbMainRect.verticalCenter;
                 anchors.left: cbMainRect.left;
                 anchors.leftMargin: !cbMainRect.baseElement ? 0 : cbMainRect.baseElement.textCentered ? cbMainRect.width/2 - width/2 : 10;
-                anchors.right: cbMainRect.right;
+                anchors.right: cbArrowIcon.left;
                 anchors.rightMargin: 10;
 
                 color: !cbMainRect.baseElement ? "transparent" : cbMainRect.baseElement.fontColorTitle;

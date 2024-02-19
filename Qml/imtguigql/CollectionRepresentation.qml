@@ -37,6 +37,10 @@ Item {
         internal.elementsUpdatingBlock = false;
     }
 
+    onHeadersModelChanged: {
+        console.log("onHeadersModelChanged", headersModel.toJSON());
+    }
+
     QtObject {
         id: internal;
 
@@ -45,6 +49,7 @@ Item {
         property string setDescriptionGqlCommand: root.collectionId + "SetDescription";
 
         property bool elementsUpdatingBlock: false;
+        property bool headersUpdatingBlock: false;
     }
 
     function updateModel(){
@@ -58,6 +63,10 @@ Item {
     }
 
     function updateHeaders(){
+        if (internal.headersUpdatingBlock){
+            return;
+        }
+
         if (root.collectionId === ""){
             console.error("Unable to update headers 'collectionId' is empty!");
 
@@ -393,12 +402,16 @@ Item {
 
             var gqlData = query.GetQuery();
             console.log("headerInfoModel query ", gqlData);
+
+            internal.headersUpdatingBlock = true;
             this.SetGqlQuery(gqlData);
         }
 
         onStateChanged: {
             if (this.state === "Ready"){
                 var dataModelLocal;
+
+                console.log("Headers", this.toJSON());
 
                 if (this.ContainsKey("errors")){
                     dataModelLocal = this.GetData("errors");
@@ -441,6 +454,8 @@ Item {
                             dataModelLocal = dataModelLocal.GetData("Headers");
 
                             root.headersModel = dataModelLocal;
+
+                            internal.headersUpdatingBlock = false;
                         }
                     }
                 }
@@ -618,12 +633,6 @@ Item {
                     dataModelLocal = dataModelLocal.GetData(root.collectionId + "ObjectView");
 
                     root.objectEditorInfoModel = dataModelLocal;
-
-//                    let objectView = dataModelLocal.GetData("Path");
-//                    let objectViewCommandsId = dataModelLocal.GetData("CommandId");
-
-//                    gqlModelBaseContainer.objectViewEditorPath = objectView;
-//                    gqlModelBaseContainer.objectViewEditorCommandsId = objectViewCommandsId;
                 }
             }
         }

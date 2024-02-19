@@ -278,6 +278,8 @@ Item {
             return;
         }
 
+        Events.sendEvent("StartLoading");
+
         let documentData = createTemplateDocument(documentId, documentTypeId);
         if (!documentData){
             return false;
@@ -287,8 +289,6 @@ Item {
         if (!documentViewComp){
             return false;
         }
-
-//        Events.sendEvent("StartLoading");
 
         documentData.documentIndex = documentsModel.count;
         documentsModel.append({
@@ -391,6 +391,8 @@ Item {
 
 
     function generateDocumentTitle(documentIndex){
+        console.log("generateDocumentTitle", documentIndex);
+
         if (documentIndex < 0 || documentIndex >= documentsModel.count){
             return "";
         }
@@ -398,6 +400,8 @@ Item {
         let title = defaultDocumentName;
 
         let documentData = documentsModel.get(documentIndex).DocumentData;
+
+        console.log("documentData", documentData);
 
         let documentName = "";
 
@@ -587,7 +591,7 @@ Item {
                     }
 
                     let documentModel = singleDocumentData.documentDataController.documentModel;
-                    console.log("onDocumentModelChanged", documentModel.toJSON());
+                    console.log("singleDocumentData onDocumentModelChanged", documentModel.toJSON());
 
                     if (documentModel.ContainsKey("Id")){
                         singleDocumentData.documentId = documentModel.GetData("Id");
@@ -612,6 +616,8 @@ Item {
 
                     singleDocumentData.undoManager.registerModel(documentModel);
                     singleDocumentData.documentValidator.documentModel = documentModel;
+
+                    console.log("StopLoading");
 
                     Events.sendEvent("StopLoading");
                 }
@@ -675,6 +681,7 @@ Item {
             }
 
             onViewAdded: {
+                console.log("onViewAdded")
                 if (singleDocumentData.documentDataController){
                     singleDocumentData.blockingUpdateModel = true;
                     view.model = singleDocumentData.documentDataController.documentModel;
@@ -683,6 +690,8 @@ Item {
                         view.doUpdateModel();
                     }
                     singleDocumentData.blockingUpdateModel = false;
+
+                    documentManager.updateDocumentTitle(singleDocumentData.documentIndex);
                 }
             }
 

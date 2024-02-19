@@ -40,15 +40,15 @@ ViewBase {
 //        }
 //    }
 
-    function blockEditing(){
-        accountNameInput.readOnly = true;
-        accountDescriptionInput.readOnly = true;
-        countryInput.readOnly = true;
-        streetInput.readOnly = true;
-        postalCodeInput.readOnly = true;
-        cityInput.readOnly = true;
-        emailInput.readOnly = true;
-        groupsTable.readOnly = true;
+    function setReadOnly(readOnly){
+        accountNameInput.readOnly = readOnly;
+        accountDescriptionInput.readOnly = readOnly;
+        countryInput.readOnly = readOnly;
+        streetInput.readOnly = readOnly;
+        postalCodeInput.readOnly = readOnly;
+        cityInput.readOnly = readOnly;
+        emailInput.readOnly = readOnly;
+        groupsTable.readOnly = readOnly;
     }
 
     function updateGui(){

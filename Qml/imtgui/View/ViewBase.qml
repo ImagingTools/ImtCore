@@ -23,13 +23,25 @@ Item {
         }
     }
 
+    onReadOnlyChanged: {
+        setReadOnly(readOnly);
+    }
+
     onVisibleChanged: {
-        console.log("onVisibleChanged", visible);
+        console.log("onVisibleChanged", visible, model.toJSON());
         if (visible){
             viewBase.updateCommandsGui();
         }
         else{
             viewBase.clearCommandsGui();
+        }
+    }
+
+    Connections {
+        id: commandsConnections;
+
+        function onCommandsModelChanged(){
+            blockArea.visible = false;
         }
     }
 
@@ -42,17 +54,17 @@ Item {
         }
     }
 
-    onModelChanged: {
-        if (internal.blockingUpdateGui || internal.blockingUpdateModel){
-            internal.countIncomingChanges++;
-            return;
-        }
-
+    function onModelChanged(){
         doUpdateGui();
+    }
+
+    function setReadOnly(readOnly){
     }
 
     onCommandsControllerChanged: {
         if (commandsController){
+            commandsConnections.target = commandsController;
+
             commandsController.commandsModelChanged.connect(internal.onCommandsModelChanged);
         }
     }
@@ -80,7 +92,9 @@ Item {
 
     function doUpdateGui()
     {
-        if (readOnly || internal.blockingUpdateGui || internal.blockingUpdateModel){
+        console.log("View doUpdateGui");
+
+        if (internal.blockingUpdateGui || internal.blockingUpdateModel){
             return;
         }
 
@@ -105,7 +119,6 @@ Item {
 
     function updateCommandsGui(){
         if (commandsController && viewBase.viewId !== ""){
-            console.log("updateCommandsGui");
             Events.sendEvent("UpdateCommandsGui", {"Model": commandsController.commandsModel, "ViewId": viewBase.viewId});
         }
     }
@@ -135,6 +148,16 @@ Item {
                 viewBase.updateCommandsGui();
             }
         }
+    }
+
+    MouseArea {
+        id: blockArea;
+
+        z: parent.z + 1;
+
+        anchors.fill: parent;
+
+        visible: viewBase.commandsController != null;
     }
 }
 

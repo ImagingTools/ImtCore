@@ -6,8 +6,10 @@ import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
 
-CollectionView {
+RemoteCollectionView {
     id: userGroupCollectionViewContainer;
+
+    collectionId: "Groups";
 
     dataController: CollectionRepresentation {
         collectionId: "Groups";
@@ -74,12 +76,11 @@ CollectionView {
             function getDocumentName(){
                 let prefixName = qsTr("Groups");
 
-                if (documentModel.ContainsKey("Name")){
-                    return prefixName + " / " + documentModel.GetData("Name")
+                if (documentName !== ""){
+                    return prefixName + " / " + documentName;
                 }
 
-                let newGroupName = qsTr("New Group");
-                return newGroupName;
+                return prefixName + " / " + qsTr("New Group");
             }
         }
     }

@@ -61,6 +61,9 @@ CollectionView {
         }
     }
 
+    function setAlertPanel(alertPanel){
+    }
+
     MetaInfoProvider {
         id: metaInfoProvider;
 

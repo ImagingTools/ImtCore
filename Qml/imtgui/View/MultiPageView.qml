@@ -169,6 +169,8 @@ Item {
         Repeater {
             id: bodyRepeater;
 
+            anchors.fill: parent;
+
             model: root.pagesModel;
 
             delegate: Loader {

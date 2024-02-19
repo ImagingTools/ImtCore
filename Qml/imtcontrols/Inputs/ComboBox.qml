@@ -189,6 +189,10 @@ ControlBase {
         cursorShape: comboBoxContainer.changeable ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
         onClicked: {
+            if (!comboBoxContainer.model){
+                return;
+            }
+
             comboBoxContainer.focus = true;
             comboBoxContainer.forceActiveFocus();
 

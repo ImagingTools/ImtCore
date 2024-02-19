@@ -11,10 +11,6 @@ ViewBase {
     property TreeItemModel rolesModel: TreeItemModel {}
     property TreeItemModel groupsModel: TreeItemModel {}
 
-    onModelChanged: {
-        console.log("UserView onModelChanged", model.toJSON());
-    }
-
     function updateGui(){
         console.log("UserView updateGui")
 

@@ -49,7 +49,7 @@ DocumentCollectionViewDelegate {
         let indexes = container.collectionView.table.getSelectedIndexes();
         if (indexes.length > 0){
             let selectedName = container.collectionView.table.elements.GetData("ProductName", indexes[0]);
-            modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
+            modalDialogManager.openDialog(renameDialogComp, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
         }
     }
 

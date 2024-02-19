@@ -9,11 +9,16 @@ QtObject {
     property string documentId;
     property string documentName;
 
+    signal saved(string id, string name);
+    signal error(string message, string type);
+
     function getDocumentName(){
         return documentName;
     }
 
-    function updateDocumentModel(){}
+    function updateDocumentModel(){
+        documentModelChanged();
+    }
 
     function insertDocument(){
         console.log("DocumentDataController insertDocument", documentModel.toJSON());
