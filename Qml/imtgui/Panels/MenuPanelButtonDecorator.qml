@@ -34,6 +34,8 @@ DecoratorBase {
     }
 
     Rectangle {
+        id: indicator;
+
         anchors.top: leftPanelElement.top;
         anchors.bottom: leftPanelElement.bottom;
         anchors.left: leftPanelElement.left;
@@ -47,10 +49,11 @@ DecoratorBase {
     Item{
         id: body;
 
-        height: image.height + description.height + description.anchors.topMargin;
         anchors.verticalCenter: leftPanelElement.verticalCenter;
         anchors.left: leftPanelElement.left;
         anchors.right: leftPanelElement.right;
+
+        height: image.height + description.height + description.anchors.topMargin;
 
         Image {
             id: image;
@@ -72,10 +75,11 @@ DecoratorBase {
             id: description;
 
             anchors.top: image.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
             anchors.topMargin: 10;
-            anchors.horizontalCenter: body.horizontalCenter;
-
-            width: body.width;
+            anchors.leftMargin:  indicator.width;
+            anchors.rightMargin: indicator.width;
 
             color: leftPanelElement.selected ? Style.iconColorOnSelected: Style.textColor;
 
@@ -83,7 +87,8 @@ DecoratorBase {
             font.pixelSize: Style.fontSize_small;
 
             text: !leftPanelElement.baseElement ? "" : leftPanelElement.baseElement.text;
-            wrapMode: Text.WordWrap;
+            wrapMode: Text.NoWrap;
+            elide: Text.ElideRight;
             horizontalAlignment: Text.AlignHCenter;
         }
     }
