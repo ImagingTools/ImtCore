@@ -37,10 +37,10 @@ private:
 
 	// write methods
 	void AddFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field);
-	void AddScalarFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field);
-	void AddScalarListFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field) throw();
-	void AddCustomFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field);
-	void AddCustomListFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field);
+	void AddScalarFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
+	void AddScalarListFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1) throw();
+	void AddCustomFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
+	void AddCustomListFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents = 1);
 
 	// help methods
 	/// \todo move it to \c CSdlTools

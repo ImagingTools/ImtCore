@@ -225,19 +225,18 @@ void CSdlClassGqlModificatorComp::AddFieldWriteToRequestCode(QTextStream& stream
 	else {
 		AddBeginSelfCheckNonRequiredValueCode(stream, field);
 	}
-	FeedStreamHorizontally(stream, (isFieldRequired ? 1 : 2));
-
+	const int hIndents = (isFieldRequired ? 1 : 2);
 	if (isCustom && isArray){
-		AddCustomListFieldWriteToRequestCode(stream, field);
+		AddCustomListFieldWriteToRequestCode(stream, field, hIndents);
 	}
 	else if (isCustom && !isArray){
-		AddCustomFieldWriteToRequestCode(stream, field);
+		AddCustomFieldWriteToRequestCode(stream, field, hIndents);
 	}
 	else if (!isCustom && isArray){
-		AddScalarListFieldWriteToRequestCode(stream, field);
+		AddScalarListFieldWriteToRequestCode(stream, field, hIndents);
 	}
 	else {
-		AddScalarFieldWriteToRequestCode(stream, field);
+		AddScalarFieldWriteToRequestCode(stream, field, hIndents);
 	}
 
 	if (!isFieldRequired){
@@ -248,8 +247,9 @@ void CSdlClassGqlModificatorComp::AddFieldWriteToRequestCode(QTextStream& stream
 }
 
 
-void CSdlClassGqlModificatorComp::AddScalarFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field)
+void CSdlClassGqlModificatorComp::AddScalarFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents)
 {
+	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("request.InsertField(");
 	stream << '"' << field.GetId() << '"';
 	stream << ',' << ' ' << FromVariantMapAccessString(field);
@@ -258,22 +258,23 @@ void CSdlClassGqlModificatorComp::AddScalarFieldWriteToRequestCode(QTextStream& 
 }
 
 
-void CSdlClassGqlModificatorComp::AddScalarListFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field) throw()
+void CSdlClassGqlModificatorComp::AddScalarListFieldWriteToRequestCode(QTextStream& /*stream*/, const CSdlField& /*field*/, uint /*hIndents*/) throw()
 {
 	/// \todo implement it if GQL will be able to store scalar list
 	qFatal("GQL model does not support insert list of scalars(. Change schema or disable GQL modificator");
 }
 
 
-void CSdlClassGqlModificatorComp::AddCustomFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field)
+void CSdlClassGqlModificatorComp::AddCustomFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents)
 {
+	FeedStreamHorizontally(stream, hIndents);
 	// declare temp GQL object
 	const QString dataObjectValueName = field.GetId() + QStringLiteral("DataObject");
 	stream << QStringLiteral("imtgql::CGqlObject ") << dataObjectValueName << ';';
 	FeedStream(stream, 1, false);
 
 	// add me to temt object and checks
-	FeedStreamHorizontally(stream);
+	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("if (!m_");
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral(".AddMeToGraphQlObject(");
@@ -281,16 +282,16 @@ void CSdlClassGqlModificatorComp::AddCustomFieldWriteToRequestCode(QTextStream& 
 	stream << QStringLiteral(")){");
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream, 2);
+	FeedStreamHorizontally(stream, hIndents + 1);
 	stream << QStringLiteral("return false;");
 	FeedStream(stream, 1, false);
 
-	FeedStreamHorizontally(stream);
+	FeedStreamHorizontally(stream, hIndents);
 	stream << '}';
 	FeedStream(stream, 1, false);
 
 	// insert temp GQL object
-	FeedStreamHorizontally(stream);
+	FeedStreamHorizontally(stream, hIndents);
 	stream << QStringLiteral("request.InsertField(");
 	stream << '"' << field.GetId() << '"';
 	stream << ',' << ' ';
@@ -300,7 +301,7 @@ void CSdlClassGqlModificatorComp::AddCustomFieldWriteToRequestCode(QTextStream& 
 }
 
 
-void CSdlClassGqlModificatorComp::AddCustomListFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field)
+void CSdlClassGqlModificatorComp::AddCustomListFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents)
 {
 
 }
