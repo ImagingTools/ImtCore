@@ -103,7 +103,7 @@ bool CSdlClassTreeModelModificatorComp::ProcessSourceClassFile(const CSdlType& s
 	ofStream << QStringLiteral("\n\t\t}\n\t}");
 	FeedStream(ofStream, 1, false);
 
-	// them add write logic for each field
+	// then add write logic for each field
 	for (const CSdlField& field: sdlType.GetFields()){
 		AddFieldWriteToModelCode(ofStream, field);
 		FeedStream(ofStream, 1, false);
@@ -269,7 +269,7 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldWriteToModelImplCode(QText
 	stream << QStringLiteral("imtbase::CTreeItemModel* ");
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral("NewModelPtr = model.AddTreeModel(");
-	stream << '"' << GetDecapitalizedValue(field.GetId()) << '"';
+	stream << '"' << field.GetId() << '"';
 	stream << QStringLiteral(", modelIndex);");
 	FeedStream(stream, 1, false);
 
@@ -386,8 +386,25 @@ void CSdlClassTreeModelModificatorComp::AddCustomFieldReadToModelImplCode(QTextS
 
 void CSdlClassTreeModelModificatorComp::AddCustomArrayFieldWriteToModelCode(QTextStream& stream, const CSdlField& field)
 {
-	/// \todo implement it!
-	Q_ASSERT(false);
+	FeedStreamHorizontally(stream);
+	if (field.IsRequired()){
+		stream << QStringLiteral("if (");
+		stream << FromVariantMapAccessString(field) << QStringLiteral(".isNull()){");
+		FeedStream(stream, 1, false);
+		FeedStreamHorizontally(stream, 2);
+		stream << QStringLiteral("return false;\n\t}");
+		FeedStream(stream, 1, false);
+		AddCustomArrayFieldWriteToModelImplCode(stream, field);
+	}
+	else {
+		stream << QStringLiteral("if (!");
+		stream << FromVariantMapAccessString(field);
+		stream << QStringLiteral(".isNull() && (requiredFields.isEmpty() || requiredFields.contains(\"");
+		stream << field.GetId() << QStringLiteral("\"))){");
+		FeedStream(stream, 1, false);
+		AddCustomArrayFieldWriteToModelImplCode(stream, field, 2);
+		stream << QStringLiteral("\n\t}");
+	}
 }
 
 
@@ -396,6 +413,44 @@ void CSdlClassTreeModelModificatorComp:: AddCustomArrayFieldWriteToModelImplCode
 			const CSdlField& field,
 			quint16 hIndents)
 {
+	FeedStreamHorizontally(stream, hIndents);
+
+	// add a new model,to store list
+	const QString newTreeModelVarName = QStringLiteral("new") + GetCapitalizedValue(field.GetId()) + QStringLiteral("ModelPtr");
+	stream << QStringLiteral("imtbase::CTreeItemModel* ") << newTreeModelVarName;
+	stream << QStringLiteral(" = model.AddTreeModel(") << '"' << field.GetId() << '"' << QStringLiteral(");");
+	FeedStream(stream, 1, false);
+
+	// declare loop
+	FeedStreamHorizontally(stream, hIndents);
+	const QString treeModelIndexVarName = GetDecapitalizedValue(field.GetId()) + QStringLiteral("Index");
+	stream << QStringLiteral("for (qsizetype ") << treeModelIndexVarName;
+	stream << QStringLiteral(" = 0; ") << treeModelIndexVarName;
+	stream << QStringLiteral(" < m_") << GetDecapitalizedValue(field.GetId());
+	stream << QStringLiteral(".size(); ++") << treeModelIndexVarName;
+	stream << QStringLiteral("){");
+	FeedStream(stream, 1, false);
+
+	// inLoop: add item and check
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("if (!m_") << GetDecapitalizedValue(field.GetId());
+	stream << '[' << treeModelIndexVarName << ']';
+	stream << QStringLiteral(".AddMeToModel(*") << newTreeModelVarName;
+	stream << QStringLiteral(", ") << treeModelIndexVarName;
+	stream << QStringLiteral(")){");
+	FeedStream(stream, 1, false);
+
+	// inLoop: error report
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << '}';
+
+	// end of loop
+	FeedStream(stream, 1, false);
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
 }
 
 
