@@ -32,7 +32,7 @@ Dialog {
 
     contentComp: Component {
         MessageDialogBody {
-            width: contentWidth;
+            width: messageDialog.contentWidth;
             message: messageDialog.message;
         }
     }

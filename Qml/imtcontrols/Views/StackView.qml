@@ -21,8 +21,6 @@ Item {
     function pop(){
         let loader = repeaterView.itemAt(repeaterView.count - 1);
         pagesModel.remove(pagesModel.count - 1)
-
-        return loader.item;
     }
 
     function peek(){
