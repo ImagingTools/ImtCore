@@ -269,8 +269,8 @@ void CSdlClassGqlModificatorComp::AddCustomFieldWriteToRequestCode(QTextStream& 
 {
 	FeedStreamHorizontally(stream, hIndents);
 	// declare temp GQL object
-	const QString dataObjectValueName = field.GetId() + QStringLiteral("DataObject");
-	stream << QStringLiteral("imtgql::CGqlObject ") << dataObjectValueName << ';';
+	const QString dataObjectVariableName = field.GetId() + QStringLiteral("DataObject");
+	stream << QStringLiteral("imtgql::CGqlObject ") << dataObjectVariableName << ';';
 	FeedStream(stream, 1, false);
 
 	// add me to temt object and checks
@@ -278,7 +278,7 @@ void CSdlClassGqlModificatorComp::AddCustomFieldWriteToRequestCode(QTextStream& 
 	stream << QStringLiteral("if (!m_");
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral(".AddMeToGraphQlObject(");
-	stream << dataObjectValueName;
+	stream << dataObjectVariableName;
 	stream << QStringLiteral(")){");
 	FeedStream(stream, 1, false);
 
@@ -295,7 +295,7 @@ void CSdlClassGqlModificatorComp::AddCustomFieldWriteToRequestCode(QTextStream& 
 	stream << QStringLiteral("request.InsertField(");
 	stream << '"' << field.GetId() << '"';
 	stream << ',' << ' ';
-	stream << dataObjectValueName;
+	stream << dataObjectVariableName;
 	stream << ')' << ';';
 	FeedStream(stream, 1, false);
 }
@@ -303,7 +303,57 @@ void CSdlClassGqlModificatorComp::AddCustomFieldWriteToRequestCode(QTextStream& 
 
 void CSdlClassGqlModificatorComp::AddCustomListFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field, uint hIndents)
 {
+	FeedStreamHorizontally(stream, hIndents);
+	// declare temp GQL object list
+	const QString dataObjectVariableName = field.GetId() + QStringLiteral("DataObject");
+	const QString dataObjectListVariableName = dataObjectVariableName + QStringLiteral("List");
+	stream << QStringLiteral("QList<imtgql::CGqlObject> ") << dataObjectListVariableName << ';';
+	FeedStream(stream, 1, false);
 
+	// loop declaration
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("for (const auto& iterableValue : std::as_const(m_");
+	stream << GetDecapitalizedValue(field.GetId());
+	stream << QStringLiteral(")){");
+	FeedStream(stream, 1, false);
+
+	// inLoop: declare temp object (inserted to list)
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("imtgql::CGqlObject ") << dataObjectVariableName << ';';
+	FeedStream(stream, 1, false);
+
+	// inLoop: add me to temp object and checks
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("if (!iterableValue.AddMeToGraphQlObject(");
+	stream << dataObjectVariableName << QStringLiteral(")){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 2);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << '}';
+	FeedStream(stream, 1, false);
+
+	// inLoop: add temp object to list
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << dataObjectListVariableName;
+	stream << QStringLiteral(" << ");
+	stream << dataObjectVariableName << ';';
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 1, false);
+
+	// and finally add list to GQL
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("request.InsertField(");
+	stream << '"' << field.GetId() << '"';
+	stream << ',' << ' ' << dataObjectListVariableName;
+	stream << ')' << ';';
+	FeedStream(stream, 1, false);
 }
 
 
