@@ -35,6 +35,10 @@ class Repeater extends Item {
         })
     }
 
+    itemAt(index){
+        return index >= 0 && index < this.$items.length.get() ? this.$items[index] : undefined
+    }
+
     $modelDataChanged(leftTop, bottomRight, roles){
         if(roles === 'remove'){
             for(let i = leftTop; i < bottomRight; i++){

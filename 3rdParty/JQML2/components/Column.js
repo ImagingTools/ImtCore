@@ -22,18 +22,19 @@ class Column extends Item {
         let h = 0
         for(let i = 0; i < children.length; i++){
             w = Math.max(w, children[i].getPropertyValue('width'))
-            h += children[i].getPropertyValue('height')
-            if(i < children.length - 1 && children[i].getPropertyValue('width') > 0 && children[i].getPropertyValue('height') > 0 && children[i+1].getPropertyValue('width') > 0 && children[i+1].getPropertyValue('height') > 0){
-                h += this.getPropertyValue('spacing')
-                children[i].setStyle({
-                    marginBottom: `${this.getPropertyValue('spacing')}px`
-                })
-            } else {
-                children[i].setStyle({
-                    marginBottom: `0`
-                })
+            if(children[i].getPropertyValue('width') > 0 && children[i].getPropertyValue('height') > 0){
+                h += children[i].getPropertyValue('height')
+                if(i < children.length - 1 && children[i+1].getPropertyValue('width') > 0 && children[i+1].getPropertyValue('height') > 0){
+                    h += this.getPropertyValue('spacing')
+                    children[i].setStyle({
+                        marginBottom: `${this.getPropertyValue('spacing')}px`
+                    })
+                } else {
+                    children[i].setStyle({
+                        marginBottom: `0`
+                    })
+                }
             }
-            
         }
 
         this.getProperty('width').setAuto(w)
