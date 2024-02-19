@@ -164,6 +164,10 @@ void CWebSocketClientComp::OnWebSocketConnected()
 
 	if (m_clientIdCompPtr.IsValid()){
 		clientId = m_clientIdCompPtr->GetText();
+		if (clientId.isEmpty()){
+			clientId = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
+			m_clientIdCompPtr->SetText(clientId);
+		}
 	}
 
 	QString body = "{ \"type\": \"connection_init\" %1}";
@@ -200,6 +204,8 @@ void CWebSocketClientComp::OnWebSocketError(QAbstractSocket::SocketError /*error
 
 void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message)
 {
+	qDebug() << "OnWebSocketTextMessageReceived" << message;
+
 	QWebSocket* webSocketPtr = dynamic_cast<QWebSocket*>(sender());
 
 	if (webSocketPtr == nullptr){
@@ -236,7 +242,10 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 
 	if (responsePtr.IsValid()){
 		QByteArray data = responsePtr->GetData();
+		qDebug() << "Responce" << data;
+
 		webSocketPtr->sendTextMessage(data);
+
 		if (methodType == imtrest::CWebSocketRequest::MT_START){
 			m_startQueries.PushBack(webSocketRequest.PopPtr());
 		}
