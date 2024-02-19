@@ -108,14 +108,14 @@ DecoratorBase {
         Item {
             id: topPanelContainer;
 
-            width: loaderTopPanel.width;
-            height: loaderTopPanel.height;
+            width: loaderTopPanel.item ? loaderTopPanel.item.width : 0;
+            height: loaderTopPanel.item ? loaderTopPanel.item.height : 0;
 
             MovingItem {
-                visible: dialogContainer.baseElement.canMove;
+                visible: !dialogContainer.baseElement ? false : dialogContainer.baseElement.canMove;
                 containerItem: topPanelContainer;
-                globalParent: dialogContainer.baseElement.root;
-                movingItem: dialogContainer.baseElement;
+                globalParent: !dialogContainer.baseElement ? null : !dialogContainer.baseElement.root ? null : dialogContainer.baseElement.root;
+                movingItem: !dialogContainer.baseElement ? null : dialogContainer.baseElement;
             }
 
             Loader {
@@ -154,6 +154,7 @@ DecoratorBase {
                     }
                 }
             }
+
         }
 
         Loader {
