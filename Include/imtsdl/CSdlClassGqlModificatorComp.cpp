@@ -36,10 +36,15 @@ bool CSdlClassGqlModificatorComp::ProcessHeaderClassFile(const CSdlType& sdlType
 		FeedStream(ofStream);
 	}
 
-	// add method definition
-	ofStream << QStringLiteral("\t[[nodiscard]] static bool ReadFromGraphQlRequest(C");
+	// add read method definition
+	ofStream << QStringLiteral("\t[[nodiscard]] static bool ReadFromGraphQlObject(C");
 	ofStream << sdlType.GetName();
 	ofStream << QStringLiteral("& object, const imtgql::CGqlObject& request);");
+	FeedStream(ofStream, 1, false);
+
+	// add write method definition
+	ofStream << QStringLiteral("\t[[nodiscard]] bool AddMeToGraphQlObject(imtgql::CGqlObject& request) const;");
+
 	FeedStream(ofStream, 2);
 
 	return true;
@@ -58,13 +63,28 @@ bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const CSdlType& sdlType
 	// read method implementation
 	ofStream << QStringLiteral("bool C");
 	ofStream << sdlType.GetName();
-	ofStream << QStringLiteral("::ReadFromGraphQlRequest(C");
+	ofStream << QStringLiteral("::ReadFromGraphQlObject(C");
 	ofStream << sdlType.GetName();
 	ofStream << QStringLiteral("& object, const imtgql::CGqlObject& request)\n{");
 	FeedStream(ofStream, 1, false);
 
 	for (const CSdlField& field: sdlType.GetFields()){
 		AddFieldReadFromRequestCode(ofStream, field);
+		FeedStream(ofStream, 1, false);
+	}
+	ofStream << QStringLiteral("\treturn true;\n}");
+	FeedStream(ofStream, 3);
+
+	// write method implementation
+	ofStream << QStringLiteral("bool C");
+	ofStream << sdlType.GetName();
+	ofStream << QStringLiteral("::AddMeToGraphQlObject(imtgql::CGqlObject& request) const");
+	FeedStream(ofStream, 1, false);
+	ofStream << '{';
+	FeedStream(ofStream, 1, false);
+
+	for (const CSdlField& field: sdlType.GetFields()){
+		AddFieldWriteToRequestCode(ofStream, field);
 		FeedStream(ofStream, 1, false);
 	}
 	ofStream << QStringLiteral("\treturn true;\n}");
@@ -76,6 +96,8 @@ bool CSdlClassGqlModificatorComp::ProcessSourceClassFile(const CSdlType& sdlType
 
 
 // private methods
+
+// read methods
 
 void CSdlClassGqlModificatorComp::AddFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field)
 {
@@ -104,7 +126,7 @@ void CSdlClassGqlModificatorComp::AddScalarFieldReadFromRequestCode(QTextStream&
 	FeedStreamHorizontally(stream);
 
 	if (field.IsRequired()){
-		AddCheckRequiredValueCode(stream, field);
+		AddDataCheckRequiredValueCode(stream, field);
 		FeedStreamHorizontally(stream);
 
 		AddSetValueToObjectCode(stream, field);
@@ -127,7 +149,7 @@ void CSdlClassGqlModificatorComp::AddScalarFieldReadFromRequestCode(QTextStream&
 
 void CSdlClassGqlModificatorComp::AddScalarListFieldReadFromRequestCode(QTextStream& stream, const CSdlField& field) throw()
 {
-	/// \todo implement it when GQL will be able to store jscalar list
+	/// \todo implement it if GQL will be able to store scalar list
 	qFatal("GQL model does not support insert list of scalars(. Change schema or disable GQL modificator");
 }
 
@@ -188,6 +210,101 @@ void CSdlClassGqlModificatorComp::AddCustomListFieldReadFromRequestCode(QTextStr
 }
 
 
+// write methods
+
+void CSdlClassGqlModificatorComp::AddFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field)
+{
+	bool isCustom = false;
+	bool isArray = false;
+	ConvertType(field, &isCustom, nullptr, &isArray);
+
+	const bool isFieldRequired = field.IsRequired();
+	if (isFieldRequired){
+		AddSelfCheckRequiredValueCode(stream, field);
+	}
+	else {
+		AddBeginSelfCheckNonRequiredValueCode(stream, field);
+	}
+	FeedStreamHorizontally(stream, (isFieldRequired ? 1 : 2));
+
+	if (isCustom && isArray){
+		AddCustomListFieldWriteToRequestCode(stream, field);
+	}
+	else if (isCustom && !isArray){
+		AddCustomFieldWriteToRequestCode(stream, field);
+	}
+	else if (!isCustom && isArray){
+		AddScalarListFieldWriteToRequestCode(stream, field);
+	}
+	else {
+		AddScalarFieldWriteToRequestCode(stream, field);
+	}
+
+	if (!isFieldRequired){
+		FeedStreamHorizontally(stream);
+		stream << '}';
+		FeedStream(stream, 1, false);
+	}
+}
+
+
+void CSdlClassGqlModificatorComp::AddScalarFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field)
+{
+	stream << QStringLiteral("request.InsertField(");
+	stream << '"' << field.GetId() << '"';
+	stream << ',' << ' ' << FromVariantMapAccessString(field);
+	stream << QStringLiteral(");");
+	FeedStream(stream, 1, false);
+}
+
+
+void CSdlClassGqlModificatorComp::AddScalarListFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field) throw()
+{
+	/// \todo implement it if GQL will be able to store scalar list
+	qFatal("GQL model does not support insert list of scalars(. Change schema or disable GQL modificator");
+}
+
+
+void CSdlClassGqlModificatorComp::AddCustomFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field)
+{
+
+}
+
+
+void CSdlClassGqlModificatorComp::AddCustomListFieldWriteToRequestCode(QTextStream& stream, const CSdlField& field)
+{
+
+}
+
+
+// help methods
+
+void CSdlClassGqlModificatorComp::AddSelfCheckRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("if (!") << FromVariantMapAccessString(field);
+	stream << QStringLiteral(".isNull()){");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents + 1);
+	stream << QStringLiteral("return false;");
+	FeedStream(stream, 1, false);
+
+	FeedStreamHorizontally(stream, hIndents);
+	stream << '}';
+	FeedStream(stream, 1, false);
+}
+
+
+void CSdlClassGqlModificatorComp::AddBeginSelfCheckNonRequiredValueCode(QTextStream& stream, const CSdlField& field, uint hIndents)
+{
+	FeedStreamHorizontally(stream, hIndents);
+	stream << QStringLiteral("if (!") << FromVariantMapAccessString(field);
+	stream << QStringLiteral(".isNull()){");
+	FeedStream(stream, 1, false);
+}
+
+
 // general help methods for scalar
 
 void CSdlClassGqlModificatorComp::AddExtractValueFromRequestCode(QTextStream& stream, const CSdlField& field, quint32 hIndents)
@@ -200,7 +317,7 @@ void CSdlClassGqlModificatorComp::AddExtractValueFromRequestCode(QTextStream& st
 }
 
 
-void CSdlClassGqlModificatorComp::AddCheckRequiredValueCode(QTextStream& stream, const CSdlField& field, quint32 hIndents)
+void CSdlClassGqlModificatorComp::AddDataCheckRequiredValueCode(QTextStream& stream, const CSdlField& field, quint32 hIndents)
 {
 	stream << QStringLiteral("if (") << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data.isNull()){");
 	FeedStream(stream, 1, false);
@@ -260,7 +377,7 @@ void CSdlClassGqlModificatorComp::AddSetCustomValueToObjectCode(QTextStream& str
 
 	// declare bool variable and read data method
 	stream << QStringLiteral("const bool is") << GetCapitalizedValue(field.GetId()) << QStringLiteral("Read = ");
-	stream << 'C' << GetCapitalizedValue(field.GetType()) << QStringLiteral("::ReadFromGraphQlRequest(");
+	stream << 'C' << GetCapitalizedValue(field.GetType()) << QStringLiteral("::ReadFromGraphQlObject(");
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("Data, *");
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr);");
 	FeedStream(stream, 1, false);
@@ -340,7 +457,7 @@ void CSdlClassGqlModificatorComp::AddSetCustomListValueToObjectCode(QTextStream&
 	// read
 	stream << QStringLiteral("if (!");
 	stream << 'C' << GetCapitalizedValue(field.GetType());
-	stream << QStringLiteral("::ReadFromGraphQlRequest(");
+	stream << QStringLiteral("::ReadFromGraphQlObject(");
 	stream << GetDecapitalizedValue(field.GetId());
 	stream << QStringLiteral(", *");
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("DataObjectPtr)){");
@@ -369,7 +486,6 @@ void CSdlClassGqlModificatorComp::AddSetCustomListValueToObjectCode(QTextStream&
 	stream << GetDecapitalizedValue(field.GetId()) << QStringLiteral("List");
 	stream << ')' << ';';
 }
-
 
 } // namespace imtsdl
 
