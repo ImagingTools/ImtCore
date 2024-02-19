@@ -26,7 +26,7 @@ ControlBase {
 
     property ListModel buttonsModel: ListModel{};
     property int buttonsModelCount: buttonsModel.count;
-    property string notClosingButtons: "";
+    property int notClosingButtons;
     property int buttonIds: 0;//81920;
 
     property string backgroundColor: Style.dialogBackgroundColor;
@@ -74,7 +74,8 @@ ControlBase {
 
     onFinished: {
         if (dialogContainer.root){
-            if(dialogContainer.notClosingButtons.indexOf(buttonId) == -1){
+            //console.log("buttonID:::",dialogContainer.notClosingButtons, buttonId)
+            if(!(dialogContainer.notClosingButtons & buttonId)){
                 dialogContainer.root.closeDialog();
             }
         }
