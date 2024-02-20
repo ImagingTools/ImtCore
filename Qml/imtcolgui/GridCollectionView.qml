@@ -206,7 +206,7 @@ Item {
         onSelectedIndexChangedSignal: {
             console.log("gridCollectionViewBase onSelectedIndexChanged");
             if(gridCollectionViewContainer.hasMetaInfo){
-                collectionMetaInfo.getMetaInfo();
+                //collectionMetaInfo.getMetaInfo(); // в collectionMetaInfo нет getMetaInfo
             }
         }
 
