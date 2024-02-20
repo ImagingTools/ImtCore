@@ -408,7 +408,7 @@ class KeyboardController {
                 }
 
                 let obj = target
-                if(!target.$properties.KeyNavigation && parent.UID){
+                if(!target.$properties.KeyNavigation && parent && parent.UID){
                     obj = parent
                 }
 

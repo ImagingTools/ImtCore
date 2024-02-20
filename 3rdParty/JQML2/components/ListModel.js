@@ -108,6 +108,10 @@ class ListModel extends QtObject {
     }
     remove(index, count = 1){
         this.getStatement('data').get().splice(index, count)
+        let data = this.getStatement('data').get()
+        for(let i = index; i < data.length; i++){
+            data[i].index -= count
+        }
         this.getStatement('count').reset(this.getStatement('data').get().length)
         
         // for(let key in this.$deps){

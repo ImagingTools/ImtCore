@@ -65,10 +65,34 @@ class ListView extends Flickable {
                 if(this.$items[i]){
                     let obj = this.$items[i]
                     delete this.$items[i]
+                    for(let k = i + 1; k < this.$items.length.get(); k++){
+                        if(this.$items[k]){
+                            this.$items[k-1] = this.$items[k]
+                            delete this.$items[k]
+                        }
+                    }
                     obj.destroy()
                     
                 }
             }
+            if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                if(leftTop > 0){
+                    if(this.$items[leftTop] && this.$items[leftTop-1]){
+                        this.$items[leftTop].getStatement('x').reset(this.$items[leftTop-1].getStatement('x').get()+this.$items[leftTop-1].getStatement('width').get()+this.getStatement('spacing').get())
+                    }
+                } else if(leftTop === 0){
+                    this.$items[leftTop].getStatement('x').reset(0)
+                }
+            } else {
+                if(leftTop > 0){
+                    if(this.$items[leftTop] && this.$items[leftTop-1]){
+                        this.$items[leftTop].getStatement('y').reset(this.$items[leftTop-1].getStatement('y').get()+this.$items[leftTop-1].getStatement('height').get()+this.getStatement('spacing').get())
+                    }
+                } else if(leftTop === 0){
+                    this.$items[leftTop].getStatement('y').reset(0)
+                }
+            }
+            this.updateGeometry()
         }
         if(roles === 'insert'){
             for(let i = leftTop; i < bottomRight; i++){
@@ -80,7 +104,6 @@ class ListView extends Flickable {
                           
                     }
                     this.$items[i] = null
-                    
                 }
                 // this.createElement(i) 
                 // this.updateGeometry()
