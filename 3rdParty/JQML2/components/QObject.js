@@ -53,7 +53,7 @@ class QObject extends ComplexObject {
 
             if(!(this instanceof ListElement)) {
                 this.getStatement('index').setCompute(()=>{return this.parent.index})
-                this.getStatement('context').setCompute(()=>{return this.parent.context})
+                this.getStatement('context').reset(mainRoot)
             }
 
             if(exModel){
