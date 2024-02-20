@@ -81,7 +81,9 @@ class ListView extends Flickable {
                         this.$items[leftTop].getStatement('x').reset(this.$items[leftTop-1].getStatement('x').get()+this.$items[leftTop-1].getStatement('width').get()+this.getStatement('spacing').get())
                     }
                 } else if(leftTop === 0){
-                    this.$items[leftTop].getStatement('x').reset(0)
+                    if(this.$items[leftTop]){
+                        this.$items[leftTop].getStatement('x').reset(0)
+                    }
                 }
             } else {
                 if(leftTop > 0){
@@ -89,7 +91,10 @@ class ListView extends Flickable {
                         this.$items[leftTop].getStatement('y').reset(this.$items[leftTop-1].getStatement('y').get()+this.$items[leftTop-1].getStatement('height').get()+this.getStatement('spacing').get())
                     }
                 } else if(leftTop === 0){
-                    this.$items[leftTop].getStatement('y').reset(0)
+                    if(this.$items[leftTop]){
+                        this.$items[leftTop].getStatement('y').reset(0)
+                    }
+                    
                 }
             }
             this.updateGeometry()

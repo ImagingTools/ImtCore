@@ -75,6 +75,7 @@ class TextInput extends Item {
         this.$input.style.height = '1em'
         this.$input.style.font = 'inherit'
         this.$input.style.color = 'inherit'
+        this.$input.style.textAlign = 'inherit'
         this.$input.autocomplete = "new-password"
         this.$input.onfocus = ()=>{
             this.getProperty('activeFocus').reset(true)
@@ -127,10 +128,10 @@ class TextInput extends Item {
 
     $horizontalAlignmentChanged(){
         switch(this.getPropertyValue('horizontalAlignment')){
-            case Text.AlignLeft: this.setStyle({ justifyContent: 'flex-start' }); break;
-            case Text.AlignRight: this.setStyle({ justifyContent: 'flex-end' }); break;
-            case Text.AlignHCenter: this.setStyle({ justifyContent: 'center' }); break;
-            case Text.AlignJustify: this.setStyle({ justifyContent: 'normal' }); break;
+            case Text.AlignLeft: this.setStyle({ justifyContent: 'flex-start', textAlign: 'left' }); break;
+            case Text.AlignRight: this.setStyle({ justifyContent: 'flex-end', textAlign: 'right' }); break;
+            case Text.AlignHCenter: this.setStyle({ justifyContent: 'center', textAlign: 'center' }); break;
+            case Text.AlignJustify: this.setStyle({ justifyContent: 'normal', textAlign: 'justify' }); break;
         }
     }
 
