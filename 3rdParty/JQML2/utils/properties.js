@@ -900,12 +900,12 @@ class QModelData {
                 if(target[name] instanceof QProperty){
                     if(target[name].value !== value){
                         target[name].reset(value)
-                        if(name !== 'index') model.getProperty('data').getNotify()()
+                        if(name !== 'index' && model.isUpdateEnabled) model.getProperty('data').getNotify()()
                     }
                 } else {
                     if(target[name] !== value){
                         target[name] = value
-                        if(name !== 'index') model.getProperty('data').getNotify()()
+                        if(name !== 'index' && model.isUpdateEnabled) model.getProperty('data').getNotify()()
                     } 
                 }
                 

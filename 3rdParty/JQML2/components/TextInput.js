@@ -192,8 +192,19 @@ class TextInput extends Item {
             this.$input.focus()
         } else {
             this.$input.blur()
+            if(this.$signals.editingFinished) this.$signals.editingFinished()
         }
         super.$focusChanged()
+    }
+
+    $activeFocusChanged(){
+        if(this.getPropertyValue('activeFocus')){
+            this.$input.focus()
+        } else {
+            this.$input.blur()
+            if(this.$signals.editingFinished) this.$signals.editingFinished()
+        }
+        super.$activeFocusChanged()
     }
 
     applyMetrics(){

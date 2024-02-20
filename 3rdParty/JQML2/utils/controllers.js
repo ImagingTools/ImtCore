@@ -393,43 +393,63 @@ class KeyboardController {
                     target.onKeyDown(e.key)
                 }
             }
-            
-            if(target && target.$properties.KeyNavigation){
-                if(e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt') return
 
-                if(e.key === 'ArrowLeft') {
-                    if(target.KeyNavigation.left){
-                        e.preventDefault()
-                        target.KeyNavigation.left.focus = true
+            
+            
+            if(target){
+                let parent = target.parent
+                let find = false
+                while(parent && !find){
+                    if(parent instanceof FocusScope){
+                        find = true
+                    } else {
+                        parent = parent.parent
                     }
                 }
-                if(e.key === 'ArrowRight') {
-                    if(target.KeyNavigation.right){
-                        e.preventDefault()
-                        target.KeyNavigation.right.focus = true
-                    }
+
+                let obj = target
+                if(!target.$properties.KeyNavigation && parent.UID){
+                    obj = parent
                 }
-                if(e.key === 'ArrowUp') {
-                    if(target.KeyNavigation.up){
-                        e.preventDefault()
-                        target.KeyNavigation.up.focus = true
+
+                if(obj.$properties.KeyNavigation){
+                
+                    if(e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt') return
+
+                    if(e.key === 'ArrowLeft') {
+                        if(obj.KeyNavigation.left){
+                            e.preventDefault()
+                            obj.KeyNavigation.left.focus = true
+                        }
                     }
-                }
-                if(e.key === 'ArrowDown') {
-                    if(target.KeyNavigation.down){
-                        e.preventDefault()
-                        target.KeyNavigation.down.focus = true
+                    if(e.key === 'ArrowRight') {
+                        if(obj.KeyNavigation.right){
+                            e.preventDefault()
+                            obj.KeyNavigation.right.focus = true
+                        }
                     }
-                }
-                if(e.key === 'Tab' && e.shiftKey) {
-                    if(target.KeyNavigation.backtab){
-                        e.preventDefault()
-                        target.KeyNavigation.backtab.focus = true
+                    if(e.key === 'ArrowUp') {
+                        if(obj.KeyNavigation.up){
+                            e.preventDefault()
+                            obj.KeyNavigation.up.focus = true
+                        }
                     }
-                } else if(e.key === 'Tab') {
-                    if(target.KeyNavigation.tab){
-                        e.preventDefault()
-                        target.KeyNavigation.tab.focus = true
+                    if(e.key === 'ArrowDown') {
+                        if(obj.KeyNavigation.down){
+                            e.preventDefault()
+                            obj.KeyNavigation.down.focus = true
+                        }
+                    }
+                    if(e.key === 'Tab' && e.shiftKey) {
+                        if(obj.KeyNavigation.backtab){
+                            e.preventDefault()
+                            obj.KeyNavigation.backtab.focus = true
+                        }
+                    } else if(e.key === 'Tab') {
+                        if(obj.KeyNavigation.tab){
+                            e.preventDefault()
+                            obj.KeyNavigation.tab.focus = true
+                        }
                     }
                 }
             }

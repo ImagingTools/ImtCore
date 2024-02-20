@@ -14,7 +14,7 @@ class ListModel extends QtObject {
 
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
-        this.getProperty('data').reset([])
+        this.getProperty('data').value = []
     }
 
     $complete(){
