@@ -153,6 +153,8 @@ JSONListModel {
 
     }
 
+
+
     function IsEqualWithModel(externModel){
         if(!externModel) {
             return false
@@ -321,7 +323,9 @@ JSONListModel {
     function AddTreeModel(key, row){
         var retModel;
         retModel = this.createComponent("imtqml/TreeItemModel.qml", this);
+        this.SetUpdateEnabled(false)
         this.SetData(key, retModel, row);
+        this.SetUpdateEnabled(true)
         return retModel;
     }
 
