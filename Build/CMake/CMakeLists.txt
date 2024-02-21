@@ -92,6 +92,7 @@ add_dependencies(imthttp imtcom)
 add_subdirectory("${INCLUDE_DIR}/imtauthgql/CMake" "${AUX_INCLUDE_DIR}/imtauthgql")
 add_subdirectory("${INCLUDE_DIR}/imtauthdb/CMake" "${AUX_INCLUDE_DIR}/imtauthdb")
 add_subdirectory("${INCLUDE_DIR}/imtgqlrepo/CMake" "${AUX_INCLUDE_DIR}/imtgqlrepo")
+add_subdirectory("${INCLUDE_DIR}/imtservice/CMake" "${AUX_INCLUDE_DIR}/imtservice")
 
 #-------- Qml --------
 add_subdirectory("${QML_DIR}/imtdocgui/CMake" "${AUX_INCLUDE_DIR}/imtdocguiqml")
@@ -200,6 +201,9 @@ if(NOT ANDROID)
 
 	add_subdirectory("${IMPL_DIR}/ImtComPck/CMake" "${AUX_INCLUDE_DIR}/ImtComPck")
 	add_dependencies(ImtComPck imtcom)
+
+	add_subdirectory("${IMPL_DIR}/ImtServicePck/CMake" "${AUX_INCLUDE_DIR}/ImtServicePck")
+	add_dependencies(ImtServicePck imtservice)
 
 	add_subdirectory("${IMPL_DIR}/ImtHttpPck/CMake" "${AUX_INCLUDE_DIR}/ImtHttpPck")
 	add_dependencies(ImtHttpPck imthttp)
