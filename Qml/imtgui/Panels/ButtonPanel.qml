@@ -223,7 +223,8 @@ Rectangle {
     }
 
     function updateModel(){
-
+        buttonPanel.assignModel();
+        setModelPause.restart();
     }
 
     function clearModel(){
