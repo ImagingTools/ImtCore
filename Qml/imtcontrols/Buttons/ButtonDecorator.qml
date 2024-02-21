@@ -6,7 +6,7 @@ DecoratorBase {
     id: commonButtonDecorator
 
     width: Math.max(iconObj.width + textObj.width + Style.paddingSmall * 3, widthDefault)
-    height: Style.buttonWidthMedium
+    height: Style.buttonHeight;
     clip: true;
 
     property int widthDefault: 0;

@@ -14,6 +14,10 @@ Item {
 
     signal buttonClicked(string buttonId);
 
+    function clearButtons(){
+        buttonsRepeater.model = 0;
+    }
+
     function addButton(buttonObj){
         console.log("buttonsDialogContainer addButton");
         buttonsRepeater.model.append(buttonObj)

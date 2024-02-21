@@ -34,6 +34,7 @@ StyleComponents {
 	property int buttonWidthTiny: 8
     property int buttonRadius: 2
     property int buttonBorderWidth: 1
+    property int buttonHeight: 24
 	property int horizontalPageMargin: 24
 	property int iconSizeExtraSmall: 8
 	property int iconSizeSmall: 16
