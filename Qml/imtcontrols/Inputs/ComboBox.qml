@@ -125,9 +125,9 @@ ControlBase {
 
     onFocusChanged: {
         //console.log("FOCUS:: ", focus)
-        if(!focus && isOpen){
-            closePopupMenu();
-        }
+//        if(!focus && isOpen){
+//            closePopupMenu();
+//        }
     }
 
     property Component popupMenuComp: Component {
