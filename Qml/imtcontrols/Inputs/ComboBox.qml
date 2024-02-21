@@ -242,4 +242,26 @@ ControlBase {
             comboBoxContainer.openPopupMenu();
         }
     }
+
+    Shortcut {
+        sequence: "Ctrl+Up";
+        enabled: !comboBoxContainer.isOpen && comboBoxContainer.focus && comboBoxContainer.visible;
+        onActivated: {
+            if(comboBoxContainer.model !==undefined && comboBoxContainer.model.GetItemsCount() && comboBoxContainer.currentIndex > 0){
+                comboBoxContainer.currentIndex--;
+            }
+
+        }
+    }
+
+    Shortcut {
+        sequence: "Ctrl+Down";
+        enabled: !comboBoxContainer.isOpen && comboBoxContainer.focus && comboBoxContainer.visible;
+        onActivated: {
+            if(comboBoxContainer.model !==undefined && comboBoxContainer.model.GetItemsCount() && comboBoxContainer.currentIndex < (comboBoxContainer.model.GetItemsCount()-1)){
+                comboBoxContainer.currentIndex++;
+            }
+
+        }
+    }
 }
