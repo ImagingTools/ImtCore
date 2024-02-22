@@ -223,7 +223,7 @@ Item {
                 contentLoader.item.tableCellDelegate = delegateContainer;
             }
 
-            contentLoader.item.z = 100;
+            contentLoader.item.z = delegateContainer.mainMouseArea.z + 1;
         }
     }
 
@@ -237,6 +237,22 @@ Item {
         }
 
         return "";
+    }
+
+    function setValue(value){
+        console.log("setValue", value);
+        if (delegateContainer.complCompl){
+            if (delegateContainer.columnIndex >= 0){
+                if(delegateContainer.pTableDelegateContainer !== null && delegateContainer.pTableDelegateContainer.tableItem !==null){
+                    let tableItem = delegateContainer.pTableDelegateContainer.tableItem;
+                    let elements = tableItem.elements;
+                    let headerId = delegateContainer.pTableDelegateContainer.headers.GetData("Id", delegateContainer.columnIndex);
+
+                    elements.SetData(headerId, value, delegateContainer.rowIndex);
+//                    elements.Refresh();
+                }
+            }
+        }
     }
 
     property Component defaultContentComp: defaultContent;

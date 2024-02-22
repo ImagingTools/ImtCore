@@ -32,6 +32,22 @@ Item {
         }
     }
 
+    function setCommandIsEnabled(commandId, isEnabled){
+        if(!container.commandModel){
+            return;
+        }
+
+        for (let i = 0; i < container.commandModel.GetItemsCount(); i++){
+            let currentCommandId = container.commandModel.GetData("Id", i);
+            if (currentCommandId == commandId){
+                let currentIsEnabled = container.commandModel.GetData("IsEnabled", i);
+                if (currentIsEnabled !== isEnabled){
+                    container.commandModel.SetData("IsEnabled", isEnabled, i);
+                }
+            }
+        }
+    }
+
     Rectangle {
         id: commands;
 

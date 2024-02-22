@@ -185,6 +185,8 @@ Rectangle {
             return;
         }
 
+        console.log("ButtonPanel onButtonModelChanged", buttonPanel.buttonModel);
+
         if(buttonPanel.buttonModel.GetItemsCount()){
             for(let i = 0; i < buttonPanel.buttonModel.GetItemsCount(); i++){
                 buttonPanel.buttonModel.SetData("IsHorizontal", true, i);
@@ -197,6 +199,8 @@ Rectangle {
             buttonPanel.horizCount = 0;
             buttonSizeRep.model = buttonPanel.buttonModel;
             buttonSizeRepVert.model = buttonPanel.buttonModel;
+
+            setReady();
         }
     }
 
@@ -722,7 +726,9 @@ Rectangle {
 
             delegate: buttonPanel.buttonDelegate;
 
-
+            onModelChanged: {
+                console.log("horizontalListView onModelChanged", model);
+            }
         }//horizontalListView
 
 

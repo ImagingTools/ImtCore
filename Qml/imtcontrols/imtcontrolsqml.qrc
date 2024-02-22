@@ -131,6 +131,8 @@
         <file alias="imtcontrols/Views/ItemDelegateDecorator.qml">Views/ItemDelegateDecorator.qml</file>
         <file alias="imtcontrols/Views/Gallery.qml">Views/Gallery.qml</file>
         <file alias="imtcontrols/Views/ExpandingContainer.qml">Views/ExpandingContainer.qml</file>
+	<file alias="imtcontrols/Views/TextInputCellContentComp.qml">Views/TextInputCellContentComp.qml</file>
+	<file alias="imtcontrols/Views/ComboBoxCellContentComp.qml">Views/ComboBoxCellContentComp.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

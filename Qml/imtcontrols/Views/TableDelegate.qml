@@ -293,15 +293,11 @@ Rectangle {
     MouseArea {
         id: ma;
 
-        z: 1;
-
-		anchors.fill: parent;
+        anchors.fill: parent;
         hoverEnabled: true;
 
-        //visible: false;
-
-        //preventStealing: false;
-//        propagateComposedEvents: true;
+//        preventStealing: false;
+        propagateComposedEvents: true;
 
         acceptedButtons: Qt.LeftButton | Qt.RightButton;
 
@@ -316,9 +312,11 @@ Rectangle {
         property int clickCount: 0;
 
         onClicked: {
+            tableDelegateContainer.forceActiveFocus();
+
             clickCount++;
 
-            if ( ma.clickCount == 1){
+            if (ma.clickCount == 1){
                 console.log("onClicked", model["Id"])
                 if (mouse.button === Qt.RightButton) {
                     tableDelegateContainer.rightButtonMouseClicked(this.mouseX, this.mouseY);
@@ -328,7 +326,7 @@ Rectangle {
                 timer.start();
             }
 
-            if ( ma.clickCount == 2){
+            if (ma.clickCount == 2){
                 console.log("onDoubleClicked")
                 if (mouse.button === Qt.RightButton) {
                     return;
@@ -342,13 +340,6 @@ Rectangle {
 
             mouse.accepted = false;
         }
-//        onDoubleClicked: {
-//            console.log("onDoubleClicked")
-//            if (mouse.button === Qt.RightButton) {
-//                return;
-//            }
-
-//            tableDelegateContainer.doubleClicked(this.mouseX, this.mouseY);
-//        }
     }
+
 }

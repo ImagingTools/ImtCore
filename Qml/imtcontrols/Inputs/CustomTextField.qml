@@ -156,6 +156,8 @@ FocusScope {
     TextInput {
         id: textField;
 
+        z: parent.z + 1;
+
         anchors.fill: parent;
         anchors.leftMargin: containerTextField.margin;
         anchors.rightMargin: containerTextField.margin;

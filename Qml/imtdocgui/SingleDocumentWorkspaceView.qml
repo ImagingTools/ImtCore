@@ -54,6 +54,14 @@ DocumentManager {
         alertPanel.sourceComponent = alertPanelComp;
     }
 
+    Rectangle {
+        id: background;
+
+        anchors.fill: parent;
+
+        color: Style.backgroundColor;
+    }
+
     Loader {
         id: alertPanel;
 
@@ -174,6 +182,7 @@ DocumentManager {
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
+//        anchors.margins: Style.size_mainMargin;
 
         onItemAdded: {
             console.log("onItemAdded", index, item);

@@ -29,11 +29,13 @@ Item {
 
     onVisibleChanged: {
         console.log("onVisibleChanged", visible, model.toJSON());
-        if (visible){
-            viewBase.updateCommandsGui();
-        }
-        else{
-            viewBase.clearCommandsGui();
+        if (commandsController){
+            if (visible){
+                viewBase.updateCommandsGui();
+            }
+            else{
+                viewBase.clearCommandsGui();
+            }
         }
     }
 
@@ -124,7 +126,9 @@ Item {
     }
 
     function clearCommandsGui(){
-        Events.sendEvent("ClearCommandsGui", {"ViewId": viewBase.viewId});
+        if (commandsController){
+            Events.sendEvent("ClearCommandsGui", {"ViewId": viewBase.viewId});
+        }
     }
 
     QtObject {

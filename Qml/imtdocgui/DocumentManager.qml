@@ -106,6 +106,10 @@ Item {
 
     function unRegisterDocumentView(documentTypeId, viewTypeId)
     {
+        if (!documentIsRegistered(documentTypeId)){
+            return false;
+        }
+
         let registeredViewList = internal.m_registeredView[documentTypeId];
         for (let i = 0; i < registeredViewList.length; i++){
             let registeredViewObj = registeredViewList[i];
@@ -682,6 +686,10 @@ Item {
 
             onViewAdded: {
                 console.log("onViewAdded")
+                if (!view || !view.model){
+                    return;
+                }
+
                 if (singleDocumentData.documentDataController){
                     singleDocumentData.blockingUpdateModel = true;
                     view.model = singleDocumentData.documentDataController.documentModel;

@@ -23,7 +23,7 @@ Item {
     }
 
     function setCommandsModel(parameters){
-        console.log("setCommandsModel");
+        console.log("start setCommandsModel");
         let model = parameters["Model"];
         let commId = parameters["ViewId"];
 
@@ -32,10 +32,12 @@ Item {
         buttonPanel.buttonModel = model;
 
         buttonPanel.updateModel();
+
+        console.log("end setCommandsModel");
     }
 
     function clearModel(parameters){
-        console.log("clearModel");
+        console.log("start clearModel");
         if (parameters){
             let commandId = parameters["ViewId"];
             if (commandId !== commandsDecoratorContainer.commandId){
@@ -44,6 +46,7 @@ Item {
         }
 
         buttonPanel.clearModel();
+        console.log("end clearModel");
     }
 
     function setVisible(visible){
