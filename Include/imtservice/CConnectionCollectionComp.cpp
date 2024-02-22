@@ -77,6 +77,9 @@ QByteArray CConnectionCollectionComp::InsertNewConnection(
 
 void CConnectionCollectionComp::OnComponentCreated()
 {
+	typedef istd::TSingleFactory<istd::IChangeable, imtservice::CUrlConnectionParam> FactoryConnectionImpl;
+	m_collection.RegisterFactory<FactoryConnectionImpl>("ConnectionInfo");
+
 	if (
 		m_connectionIds.GetCount() == m_serviceNames.GetCount() &&
 		m_connectionIds.GetCount() == m_connectionDescriptions.GetCount() &&
@@ -92,7 +95,7 @@ void CConnectionCollectionComp::OnComponentCreated()
 			CUrlConnectionParam urlConnectionParam(serviceName, connectionType, url);
 			QByteArray connectionId = m_connectionIds[index];
 			QByteArray description = m_connectionDescriptions[index];
-			m_collection.InsertNewObject("Connections", connectionId, description, &urlConnectionParam, connectionId);
+			m_collection.InsertNewObject("ConnectionInfo", connectionId, description, &urlConnectionParam, connectionId);
 		}
 	}
 }

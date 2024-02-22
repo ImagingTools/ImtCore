@@ -134,6 +134,8 @@ bool CUrlConnectionParam::CopyFrom(const IChangeable& object, CompatibilityMode 
 	if (sourcePtr != nullptr){
 		istd::CChangeNotifier changeNotifier(this);
 
+		BaseClass::CopyFrom(object, mode);
+
 		m_serviceName = sourcePtr->m_serviceName;
 		m_connectionType = sourcePtr->m_connectionType;
 
