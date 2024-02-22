@@ -344,7 +344,9 @@ class QColor extends QProperty {
 }
 
 class QBool extends QProperty {
-    
+    getDefaultValue(){
+        return false
+    }
 }
 
 class QVisible extends QBool {
