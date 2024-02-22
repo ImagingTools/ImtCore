@@ -13,15 +13,11 @@
 namespace imtservice
 {
 
-// class CAddressCollection: public imtbase::TAggergatedObjectCollectionWrap<IAddressManager, CAddress>
-
 
 class CConnectionCollectionComp:
 			public ilog::CLoggerComponentBase,
 			virtual public IConnectionCollection
-			// public imtbase::TAggergatedObjectCollectionWrap<IConnectionCollection, CUrlConnectionParam>
 {
-	// Q_OBJECT
 public:
 	typedef ilog::CLoggerComponentBase BaseClass;
 
@@ -37,12 +33,12 @@ public:
 	// reimplemented (imtservice::IConnectionCollection)
 	virtual const imtbase::ICollectionInfo* GetUrlList() const override;
 	virtual const QUrl* GetUrl(const QByteArray& id) const override;
-	virtual const IConnectionMetaInfo* GetConnectionMetaInfo(const QByteArray& id) const override;
+	virtual const IServiceConnectionParam* GetConnectionMetaInfo(const QByteArray& id) const override;
 	virtual bool SetUrl(const QByteArray& id, const QUrl& url) const override;
 	virtual QByteArray InsertNewConnection(
 						const QByteArray& connectionId,
 						const QUrl& url,
-						imtservice::IConnectionMetaInfo::ConnectionType connectionType,
+						imtservice::IServiceConnectionParam::ConnectionType connectionType,
 						const QString& name = QString(),
 						const QString& description = QString() ) override;
 

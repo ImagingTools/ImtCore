@@ -8,6 +8,7 @@ namespace imtservice
 // public methods
 
 // reimplemented (imtservice::IConnectionCollection)
+
 const imtbase::ICollectionInfo* CConnectionCollectionComp::GetUrlList() const
 {
 	return &m_collection;
@@ -27,7 +28,7 @@ const QUrl* CConnectionCollectionComp::GetUrl(const QByteArray& id) const
 }
 
 
-const IConnectionMetaInfo* CConnectionCollectionComp::GetConnectionMetaInfo(const QByteArray& id) const
+const IServiceConnectionParam* CConnectionCollectionComp::GetConnectionMetaInfo(const QByteArray& id) const
 {
 	CUrlConnectionParam* urlConnectionParam =  dynamic_cast<CUrlConnectionParam*>(const_cast<istd::IChangeable*>(m_collection.GetObjectPtr(id)));
 	if (urlConnectionParam != nullptr){
@@ -64,7 +65,7 @@ bool CConnectionCollectionComp::SetUrl(const QByteArray& id, const QUrl& url) co
 QByteArray CConnectionCollectionComp::InsertNewConnection(
 			const QByteArray& /*connectionId*/,
 			const QUrl& /*url*/,
-			imtservice::IConnectionMetaInfo::ConnectionType /*connectionType*/,
+			imtservice::IServiceConnectionParam::ConnectionType /*connectionType*/,
 			const QString& /*name*/,
 			const QString& /*description*/)
 {
@@ -73,6 +74,7 @@ QByteArray CConnectionCollectionComp::InsertNewConnection(
 
 
 // reimplemented (icomp::CComponentBase)
+
 void CConnectionCollectionComp::OnComponentCreated()
 {
 	if (
@@ -81,9 +83,9 @@ void CConnectionCollectionComp::OnComponentCreated()
 		m_connectionIds.GetCount() == m_connectionTypes.GetCount() &&
 		m_connectionIds.GetCount() == m_connectionUrlListCompPtr.GetCount()){
 		for (int index = 0; index < m_connectionIds.GetCount(); index++){
-			IConnectionMetaInfo::ConnectionType connectionType = IConnectionMetaInfo::CT_INPUT;
+			IServiceConnectionParam::ConnectionType connectionType = IServiceConnectionParam::CT_INPUT;
 			if (m_connectionTypes[index] == 1){
-				connectionType = IConnectionMetaInfo::CT_OUTPUT;
+				connectionType = IServiceConnectionParam::CT_OUTPUT;
 			}
 			QByteArray serviceName = m_serviceNames[index];
 			QUrl url = m_connectionUrlListCompPtr[index]->GetUrl();
@@ -94,7 +96,6 @@ void CConnectionCollectionComp::OnComponentCreated()
 		}
 	}
 }
-
 
 
 } // namespace agentinodata
