@@ -41,8 +41,8 @@ public:
 	virtual bool GetStyleSheetColorPalette(const QByteArray& designSchemaId, QVariantMap& palette) const = 0;
 	virtual QByteArray GetRawColor(const QByteArray& styleName, QPalette::ColorGroup group, QPalette::ColorRole role) const = 0;
 
-	virtual QByteArray GetTemplateIconColor(const QByteArray& styleName) const = 0;
-	virtual QByteArray GetIconColor(const QByteArray& styleName, IconState iconState) const = 0;
+	virtual QByteArrayList GetTemplateIconColorList(const QByteArray& styleName) const = 0;
+	virtual QByteArray GetIconColor(const QByteArray& styleName, IconState iconState, const QByteArray& templateColor) const = 0;
 };
 
 

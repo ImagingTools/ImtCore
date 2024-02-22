@@ -57,16 +57,18 @@ int CDesignTokenIconProcessorComp::Exec()
 		}
 
 		for (const QByteArray& styleName : ::std::as_const(styles)){
-			m_templateIconColor = m_designTokenFileParserAttrPtr->GetTemplateIconColor(styleName);
-			m_normalColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_NORMAL);
-			m_offNormalColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_OFF_NORMAL);
-			m_offDisabledColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_OFF_DISABLED);
-			m_offActiveColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_OFF_ACTIVE);
-			m_offSelectedColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_OFF_SELECTED);
-			m_onNormalColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_ON_NORMAL);
-			m_onDisabledColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_ON_DISABLED);
-			m_onActiveColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_ON_ACTIVE);
-			m_onSelectedColor = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_ON_SELECTED);
+			m_templateIconColorList = m_designTokenFileParserAttrPtr->GetTemplateIconColorList(styleName);
+			for (const QByteArray& templateColor: m_templateIconColorList){
+				m_normalColor [templateColor] = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_NORMAL, templateColor);
+				m_offNormalColor[templateColor] = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_OFF_NORMAL, templateColor);
+				m_offDisabledColor[templateColor] = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_OFF_DISABLED, templateColor);
+				m_offActiveColor[templateColor] = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_OFF_ACTIVE, templateColor);
+				m_offSelectedColor[templateColor] = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_OFF_SELECTED, templateColor);
+				m_onNormalColor[templateColor] = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_ON_NORMAL, templateColor);
+				m_onDisabledColor[templateColor] = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_ON_DISABLED, templateColor);
+				m_onActiveColor[templateColor] = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_ON_ACTIVE, templateColor);
+				m_onSelectedColor[templateColor] = m_designTokenFileParserAttrPtr->GetIconColor(styleName, IDesignTokenFileParser::IS_ON_SELECTED, templateColor);
+			}
 
 			QByteArray outputDirName = m_outputDirName + QDir::separator().toLatin1() + QByteArray("Resources") + QDir::separator().toLatin1() + QByteArray("Icons") + QDir::separator().toLatin1() + styleName.constData();
 
@@ -138,6 +140,8 @@ QByteArray CDesignTokenIconProcessorComp::GetFileNameForState(const QByteArray& 
 		case IDesignTokenFileParser::IS_ON_SELECTED:
 			iconStateFileName = CDesignTokenStyleUtils::s_onSelectedColorParamName + QString(".") + fileInfo.suffix();
 			break;
+		default:
+			break;
 		}
 
 		if (!iconStateFileName.isEmpty()) {
@@ -152,14 +156,16 @@ QByteArray CDesignTokenIconProcessorComp::GetFileNameForState(const QByteArray& 
 }
 
 
-bool CDesignTokenIconProcessorComp::SetColor(const QByteArray& fileName, const QByteArray& outputFileName, const QByteArray& replacedColor, const QByteArray& reolacebleColor) const
+bool CDesignTokenIconProcessorComp::SetColor(const QByteArray& fileName, const QByteArray& outputFileName, const QByteArray& replacedColor, const QByteArray& reoplacebleColor) const
 {
 	QByteArray fileData;
 
-	QFile originalImageFile(fileName);
+	QString readFilePath = QFile::exists(outputFileName) ? outputFileName : fileName;
+
+	QFile originalImageFile(readFilePath);
 	bool openInputImageFile = originalImageFile.open(QFile::ReadOnly);
 	if (!openInputImageFile){
-		qCritical() << "Cannot open image file" << fileName;
+		qCritical() << "Cannot open image file" << readFilePath;
 
 		return false;
 	}
@@ -167,12 +173,12 @@ bool CDesignTokenIconProcessorComp::SetColor(const QByteArray& fileName, const Q
 	fileData = originalImageFile.readAll();
 	originalImageFile.close();
 	if (fileData.length() < 1){
-		qWarning() << "Skpiipng empty file" << fileName;
+		qWarning() << "Skpiipng empty file" << readFilePath;
 
 		return true;
 	}
 
-	QRegularExpression groupRegEx(QByteArray(reolacebleColor.length() ? reolacebleColor : m_templateIconColor), QRegularExpression::PatternOption::CaseInsensitiveOption);
+	QRegularExpression groupRegEx(reoplacebleColor, QRegularExpression::PatternOption::CaseInsensitiveOption);
 	QRegularExpressionMatchIterator globalMatch = groupRegEx.globalMatch(fileData);
 
 	while (globalMatch.hasNext()){
@@ -233,75 +239,77 @@ bool CDesignTokenIconProcessorComp::SetColorForAllModeState(const QByteArray& fi
 		inputFileSuffix.prepend('.');
 	}
 
-	if (m_normalColor.length()){
-		QByteArray stateFileName = GetFileNameForState(fileName, IDesignTokenFileParser::IS_NORMAL);
-		stateFileName = stateFileName.isEmpty() ? fileName : stateFileName;
-		if (!SetColor(stateFileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + inputFileSuffix), m_normalColor)){
-			return false;
+	for (const QByteArray& templateColor: std::as_const(m_templateIconColorList)){
+		if (!m_normalColor[templateColor].isEmpty()){
+			QByteArray stateFileName = GetFileNameForState(fileName, IDesignTokenFileParser::IS_NORMAL);
+			stateFileName = stateFileName.isEmpty() ? fileName : stateFileName;
+			if (!SetColor(stateFileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + inputFileSuffix), m_normalColor[templateColor], templateColor)){
+				return false;
+			}
 		}
-	}
 
-	if (m_offNormalColor.length()){
-		QByteArray stateFileName = GetFileNameForState(fileName, IDesignTokenFileParser::IS_OFF_NORMAL);
-		stateFileName = stateFileName.isEmpty() ? fileName : stateFileName;
-		if (!SetColor(stateFileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffNormal + inputFileSuffix), m_offNormalColor)){
-			return false;
+		if (!m_offNormalColor[templateColor].isEmpty()){
+			QByteArray stateFileName = GetFileNameForState(fileName, IDesignTokenFileParser::IS_OFF_NORMAL);
+			stateFileName = stateFileName.isEmpty() ? fileName : stateFileName;
+			if (!SetColor(stateFileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffNormal + inputFileSuffix), m_offNormalColor[templateColor], templateColor)){
+				return false;
+			}
 		}
-	}
 
-	if (m_offDisabledColor.length()){
-		QByteArray stateFileName = GetFileNameForState(fileName, IDesignTokenFileParser::IS_OFF_DISABLED);
-		stateFileName = stateFileName.isEmpty() ? fileName : stateFileName;
-		if (!SetColor(stateFileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffDisabled + inputFileSuffix), m_offDisabledColor)){
-			return false;
+		if (!m_offDisabledColor[templateColor].isEmpty()){
+			QByteArray stateFileName = GetFileNameForState(fileName, IDesignTokenFileParser::IS_OFF_DISABLED);
+			stateFileName = stateFileName.isEmpty() ? fileName : stateFileName;
+			if (!SetColor(stateFileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffDisabled + inputFileSuffix), m_offDisabledColor[templateColor], templateColor)){
+				return false;
+			}
 		}
-	}
 
-	if (m_offActiveColor.length()){
-		QByteArray stateFileName = GetFileNameForState(fileName, IDesignTokenFileParser::IS_OFF_ACTIVE);
-		stateFileName = stateFileName.isEmpty() ? fileName : stateFileName;
-		if (!SetColor(stateFileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffActive + inputFileSuffix), m_offActiveColor)){
-			return false;
+		if (!m_offActiveColor[templateColor].isEmpty()){
+			QByteArray stateFileName = GetFileNameForState(fileName, IDesignTokenFileParser::IS_OFF_ACTIVE);
+			stateFileName = stateFileName.isEmpty() ? fileName : stateFileName;
+			if (!SetColor(stateFileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffActive + inputFileSuffix), m_offActiveColor[templateColor], templateColor)){
+				return false;
+			}
 		}
-	}
 
-	if (m_offSelectedColor.length()){
-		QByteArray stateFileName = GetFileNameForState(fileName, IDesignTokenFileParser::IS_OFF_SELECTED);
-		stateFileName = stateFileName.isEmpty() ? fileName : stateFileName;
-		if (!SetColor(stateFileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffSelected + inputFileSuffix), m_offSelectedColor)){
-			return false;
+		if (!m_offSelectedColor[templateColor].isEmpty()){
+			QByteArray stateFileName = GetFileNameForState(fileName, IDesignTokenFileParser::IS_OFF_SELECTED);
+			stateFileName = stateFileName.isEmpty() ? fileName : stateFileName;
+			if (!SetColor(stateFileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOffSelected + inputFileSuffix), m_offSelectedColor[templateColor], templateColor)){
+				return false;
+			}
 		}
-	}
 
-	if (m_onNormalColor.length()){
-		QByteArray stateFileName = GetFileNameForState(fileName, IDesignTokenFileParser::IS_ON_NORMAL);
-		stateFileName = stateFileName.isEmpty() ? fileName : stateFileName;
-		if (!SetColor(stateFileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnNormal + inputFileSuffix), m_onNormalColor)){
-			return false;
+		if (!m_onNormalColor[templateColor].isEmpty()){
+			QByteArray stateFileName = GetFileNameForState(fileName, IDesignTokenFileParser::IS_ON_NORMAL);
+			stateFileName = stateFileName.isEmpty() ? fileName : stateFileName;
+			if (!SetColor(stateFileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnNormal + inputFileSuffix), m_onNormalColor[templateColor], templateColor)){
+				return false;
+			}
 		}
-	}
 
-	if (m_onDisabledColor.length()){
-		QByteArray stateFileName = GetFileNameForState(fileName, IDesignTokenFileParser::IS_ON_DISABLED);
-		stateFileName = stateFileName.isEmpty() ? fileName : stateFileName;
-		if (!SetColor(stateFileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnDisabled + inputFileSuffix), m_onDisabledColor)){
-			return false;
+		if (!m_onDisabledColor[templateColor].isEmpty()){
+			QByteArray stateFileName = GetFileNameForState(fileName, IDesignTokenFileParser::IS_ON_DISABLED);
+			stateFileName = stateFileName.isEmpty() ? fileName : stateFileName;
+			if (!SetColor(stateFileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnDisabled + inputFileSuffix), m_onDisabledColor[templateColor], templateColor)){
+				return false;
+			}
 		}
-	}
 
-	if (m_onActiveColor.length()){
-		QByteArray stateFileName = GetFileNameForState(fileName, IDesignTokenFileParser::IS_ON_ACTIVE);
-		stateFileName = stateFileName.isEmpty() ? fileName : stateFileName;
-		if (!SetColor(stateFileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnActive + inputFileSuffix), m_onActiveColor)){
-			return false;
+		if (!m_onActiveColor[templateColor].isEmpty()){
+			QByteArray stateFileName = GetFileNameForState(fileName, IDesignTokenFileParser::IS_ON_ACTIVE);
+			stateFileName = stateFileName.isEmpty() ? fileName : stateFileName;
+			if (!SetColor(stateFileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnActive + inputFileSuffix), m_onActiveColor[templateColor], templateColor)){
+				return false;
+			}
 		}
-	}
 
-	if (m_onSelectedColor.length()){
-		QByteArray stateFileName = GetFileNameForState(fileName, IDesignTokenFileParser::IS_ON_SELECTED);
-		stateFileName = stateFileName.isEmpty() ? fileName : stateFileName;
-		if (!SetColor(stateFileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnSelected + inputFileSuffix), m_onSelectedColor)){
-			return false;
+		if (!m_onSelectedColor[templateColor].isEmpty()){
+			QByteArray stateFileName = GetFileNameForState(fileName, IDesignTokenFileParser::IS_ON_SELECTED);
+			stateFileName = stateFileName.isEmpty() ? fileName : stateFileName;
+			if (!SetColor(stateFileName, QByteArray(outputDirName + dirSeparator + inputFileBaseName + s_suffixOnSelected + inputFileSuffix), m_onSelectedColor[templateColor], templateColor)){
+				return false;
+			}
 		}
 	}
 

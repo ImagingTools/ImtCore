@@ -8,3 +8,8 @@ type FileMetaInfo {
     ChecksumValue: String
     Version: String
 }
+
+type ShareRequest {
+	ItemId: ID!
+	FileMetaInfoList: [FileMetaInfo]!
+}

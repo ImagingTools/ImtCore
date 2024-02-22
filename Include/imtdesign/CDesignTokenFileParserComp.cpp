@@ -123,8 +123,6 @@ bool CDesignTokenFileParserComp::ParseFile()
 		return false;
 	}
 
-	m_templateIconColor = designTokenObject["TemplateIconColor"].toString().toUtf8();
-
 	QJsonObject singleStyle = designTokenObject["Style"].toObject();
 	QJsonArray designTokenStylesArray = designTokenObject["Styles"].toArray();
 	designTokenStylesArray << singleStyle;
@@ -162,18 +160,39 @@ bool CDesignTokenFileParserComp::ParseFile()
 			continue;
 		}
 
-		QJsonObject colorsObject = styleEntry["IconColor"].toObject();
-		if (colorsObject.isEmpty()){
-			SendInfoMessage (0,"Skipping empty IconColor object");
+
+		QJsonArray iconTemplateList = styleEntry["IconTemplateList"].toArray();
+		// make ref to simplify parsing process to support old versions
+		if (iconTemplateList.isEmpty()){
+			iconTemplateList << QJsonObject({
+						std::make_pair(QStringLiteral("IconColor"), styleEntry["IconColor"]),
+						std::make_pair(QStringLiteral("TemplateIconColor"), styleEntry["TemplateIconColor"])
+			});
 		}
 
-		if (!m_templateIconColor.length()){
-			m_templateIconColor = style["TemplateIconColor"].toString().toUtf8();
+		for (const QJsonValue& iconColorsEntry: std::as_const(iconTemplateList)){
+			if (iconColorsEntry["TemplateIconColor"].toString().isEmpty()){
+				Q_ASSERT_X(false, "Parse color entry", "Template color is not set");
+
+				continue;
+			}
+
+			const QByteArray templateIconColor = iconColorsEntry["TemplateIconColor"].toString().toUtf8();
+			m_templateIconColorList << templateIconColor;
+
+			QJsonObject colorsObject = iconColorsEntry["IconColor"].toObject();
+			if (colorsObject.isEmpty()){
+				SendWarningMessage (0,"Skipping empty IconColor object");
+				Q_ASSERT_X(false, "Parse color entry", "Icon color is not set");
+
+				continue;
+			}
+
+			QVariantMap colorsMap = colorsObject.toVariantMap();
+			m_iconColors << IconColor(templateIconColor, styleName.toUtf8(), colorsMap);
 		}
-		QVariantMap colorsMap = colorsObject.toVariantMap();
-		m_iconColors.insert(styleName, colorsMap);
+
 		m_designSchemaList.InsertItem(styleName.toUtf8(), styleName,"");
-
 		m_stylesPalettes.insert(styleName, styleEntry.toVariantMap());
 
 		ColorSchema schema;
@@ -317,33 +336,48 @@ bool CDesignTokenFileParserComp::GetColorPalette(const QByteArray& designSchemaI
 }
 
 
-QByteArray CDesignTokenFileParserComp::GetTemplateIconColor(const QByteArray&) const
+QByteArrayList CDesignTokenFileParserComp::GetTemplateIconColorList(const QByteArray&) const
 {
-	return m_templateIconColor;
+	return m_templateIconColorList;
 }
 
 
-QByteArray CDesignTokenFileParserComp::GetIconColor(const QByteArray& styleName, IconState iconState) const
+QByteArray CDesignTokenFileParserComp::GetIconColor(const QByteArray& styleName, IconState iconState, const QByteArray& templateColor) const
 {
+	QList<IconColor>::const_iterator coloramtsMap = m_iconColors.cend();
+	for (QList<IconColor>::const_iterator colorantListIterator = m_iconColors.cbegin(); colorantListIterator != m_iconColors.cend(); ++colorantListIterator){
+		if (colorantListIterator->style == styleName && colorantListIterator->color == templateColor){
+			coloramtsMap = colorantListIterator;
+
+			break;
+		}
+	}
+
+	if (coloramtsMap == m_iconColors.cend()){
+		Q_ASSERT_X(false, "GetIconColor", "Unexpected request");
+
+		return QByteArray();
+	}
+
 	switch (iconState){
 	case IS_NORMAL:
-		return m_iconColors[styleName].toMap()["Normal"].toByteArray();
+		return coloramtsMap->colorList["Normal"].toByteArray();
 	case IS_OFF_NORMAL:
-		return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_offNormalColorParamName].toByteArray();
+		return coloramtsMap->colorList[CDesignTokenStyleUtils::s_offNormalColorParamName].toByteArray();
 	case IS_OFF_DISABLED:
-		return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_offDisabledColorParamName].toByteArray();
+		return coloramtsMap->colorList[CDesignTokenStyleUtils::s_offDisabledColorParamName].toByteArray();
 	case IS_OFF_ACTIVE:
-		return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_offActiveColorParamName].toByteArray();
+		return coloramtsMap->colorList[CDesignTokenStyleUtils::s_offActiveColorParamName].toByteArray();
 	case IS_OFF_SELECTED:
-		return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_offSelectedColorParamName].toByteArray();
+		return coloramtsMap->colorList[CDesignTokenStyleUtils::s_offSelectedColorParamName].toByteArray();
 	case IS_ON_NORMAL:
-		return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_onNormalColorParamName].toByteArray();
+		return coloramtsMap->colorList[CDesignTokenStyleUtils::s_onNormalColorParamName].toByteArray();
 	case IS_ON_DISABLED:
-		return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_onDisabledColorParamName].toByteArray();
+		return coloramtsMap->colorList[CDesignTokenStyleUtils::s_onDisabledColorParamName].toByteArray();
 	case IS_ON_ACTIVE:
-		return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_onActiveColorParamName].toByteArray();
+		return coloramtsMap->colorList[CDesignTokenStyleUtils::s_onActiveColorParamName].toByteArray();
 	case IS_ON_SELECTED:
-		return m_iconColors[styleName].toMap()[CDesignTokenStyleUtils::s_onSelectedColorParamName].toByteArray();
+		return coloramtsMap->colorList[CDesignTokenStyleUtils::s_onSelectedColorParamName].toByteArray();
 	}
 
 	return QByteArray();
@@ -395,6 +429,18 @@ void CDesignTokenFileParserComp::ReplaceColorNamesRecursive(QJsonObject& json, c
 			QJsonObject jsonObject = jsonValue.toObject();
 			ReplaceColorNames(jsonObject, variableMaps);
 			json[key] = jsonObject;
+		}
+		else if (jsonValue.isArray()){
+			QJsonArray array = jsonValue.toArray();
+			for (int i = 0; i < array.count(); ++i){
+				QJsonValue entryValue = array[i];
+				if (entryValue.isObject()){
+					QJsonObject entryObject = entryValue.toObject();
+					ReplaceColorNamesRecursive(entryObject, variableMaps);
+					array[i] = entryObject;
+				}
+			}
+			json[key] = array;
 		}
 	}
 }

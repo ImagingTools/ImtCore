@@ -47,17 +47,17 @@ private:
 
 	I_REF(IDesignTokenArgumentsParser, m_argumentParserAttrPtr);
 	I_REF(IDesignTokenFileParser, m_designTokenFileParserAttrPtr);
-
-	QByteArray m_templateIconColor;
-	QByteArray m_normalColor;
-	QByteArray m_offNormalColor;
-	QByteArray m_offDisabledColor;
-	QByteArray m_offActiveColor;
-	QByteArray m_offSelectedColor;
-	QByteArray m_onNormalColor;
-	QByteArray m_onDisabledColor;
-	QByteArray m_onActiveColor;
-	QByteArray m_onSelectedColor;
+	
+	QByteArrayList m_templateIconColorList;
+	QMap<QByteArray/*template color*/,QByteArray> m_normalColor;
+	QMap<QByteArray/*template color*/,QByteArray> m_offNormalColor;
+	QMap<QByteArray/*template color*/,QByteArray> m_offDisabledColor;
+	QMap<QByteArray/*template color*/,QByteArray> m_offActiveColor;
+	QMap<QByteArray/*template color*/,QByteArray> m_offSelectedColor;
+	QMap<QByteArray/*template color*/,QByteArray> m_onNormalColor;
+	QMap<QByteArray/*template color*/,QByteArray> m_onDisabledColor;
+	QMap<QByteArray/*template color*/,QByteArray> m_onActiveColor;
+	QMap<QByteArray/*template color*/,QByteArray> m_onSelectedColor;
 
 	QByteArray m_inputDirName;
 	QByteArray m_inputFileName;
@@ -72,7 +72,7 @@ private:
 	/**
 		sets new color in single image
 	*/
-	bool SetColor(const QByteArray& fileName, const QByteArray& outputFileName, const QByteArray& replacedColor, const QByteArray& reolacebleColor = QByteArray()) const;
+	bool SetColor(const QByteArray& fileName, const QByteArray& outputFileName, const QByteArray& replacedColor, const QByteArray& reolacebleColor) const;
 
 	/**
 		sets all available colors for single images
