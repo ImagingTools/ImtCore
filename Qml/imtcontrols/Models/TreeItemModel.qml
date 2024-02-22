@@ -30,7 +30,8 @@ JSONListModel {
     }
 
     function GetTreeItemModel(key, row){
-        return GetData(key, row)
+        let model_ = GetData(key, row);
+        return model_ && typeof model_ === 'object' && model_.constructor.name.indexOf('TreeItemModel') >= 0 ? model_ : null;
     }
 
     function GetData(key, row){
