@@ -60,8 +60,9 @@ CommandsController {
 
                     if(dataModelLocal.ContainsKey(commandsProviderContainer.commandId + "Commands")){
                         dataModelLocal = dataModelLocal.GetData(commandsProviderContainer.commandId + "Commands");
-
-                        commandsProviderContainer.commandsModel = dataModelLocal;
+                        if (dataModelLocal != "null"){
+                            commandsProviderContainer.commandsModel = dataModelLocal;
+                        }
                     }
                 }
             }
