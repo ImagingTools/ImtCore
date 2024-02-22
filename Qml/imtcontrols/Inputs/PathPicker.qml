@@ -21,7 +21,7 @@ Item {
     }
 
     Component.onCompleted: {
-        fileDialog.currentFolder = model.Path;
+        // fileDialog.currentFolder = model.Path;
     }
 
     Item {
@@ -51,7 +51,7 @@ Item {
             text: "Browse...";
 
             onClicked: {
-                fileDialog.open();
+                // fileDialog.open();
             }
         }
     }
