@@ -24,6 +24,11 @@ I_EXPORT_COMPONENT(
 			"ConnectionCollection",
 			"Connection Collection");
 
+I_EXPORT_COMPONENT(
+			UrlConnectionParamInfo,
+			"Url connection param",
+			"Url Connection Param");
+
 
 } // namespace ImtServicePck
 

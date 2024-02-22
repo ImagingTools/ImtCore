@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5136" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5191" Description="ACF"/>
+            <Version Id="1" Number="2202" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Connection parameters for the server side</Description>
@@ -22,6 +22,21 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
+        <Element Id="PumaWebSocketUrlParam" PackageId="ImtCorePck" ComponentId="UrlParam">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DefaultHost" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="localhost"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultPort" Type="Integer" ExportId="">
+                        <Data IsEnabled="true" Value="8788"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultScheme" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="ws"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="ServerConnectionParams" PackageId="BasePck" ComponentId="ComposedParamsSet">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -31,6 +46,7 @@
                                 <Value>ServerPort</Value>
                                 <Value>WebSocketServerPort</Value>
                                 <Value>PumaUrl</Value>
+                                <Value>PumaWebSocketUrlParam</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -40,6 +56,7 @@
                                 <Value>ServerPort</Value>
                                 <Value>WebSocketServerPort</Value>
                                 <Value>PumaUrl</Value>
+                                <Value>PumaWebSocketPort</Value>
                             </Values>
                         </Data>
                     </AttributeInfo>
@@ -79,6 +96,7 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="PumaUrl" ComponentId="PumaUrl"/>
+        <Component ExportedId="PumaWebSocketUrlParam" ComponentId="PumaWebSocketUrlParam"/>
         <Component ExportedId="ServerPort" ComponentId="ServerPort"/>
         <Component ExportedId="WebSocketServerPort" ComponentId="WebSocketServerPort"/>
     </ExportedComponents>
