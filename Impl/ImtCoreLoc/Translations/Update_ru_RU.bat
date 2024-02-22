@@ -1,1 +1,1 @@
-%QTDIR%\bin\lupdate.exe ..\..\..\Include ..\..\..\AuxInclude -target-language ru_RU -ts ImtCore_ru_RU.ts -recursive -locations relative
+%QTDIR%\bin\lupdate.exe ..\..\..\Include ..\..\..\Qml ..\..\..\AuxInclude -target-language ru_RU -ts ImtCore_ru_RU.ts -recursive -locations relative
