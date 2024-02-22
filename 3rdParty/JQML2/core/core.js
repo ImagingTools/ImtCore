@@ -59,6 +59,7 @@ global.OriginImage = Image
 global.OriginWebSocket = WebSocket
 global.queueLink = []
 global.UIDList = {}
+global.RemoveList = []
 global.Singletons = {}
 global.classList = {}
 
@@ -170,6 +171,13 @@ for(let componentName of listComponents){
 
 global.updateList = []
 global.SingletonClass = {}
+
+function removeFunc(){
+    while(RemoveList.length){
+        RemoveList.shift().$free()
+    }
+    setTimeout(removeFunc, 5000)
+}
 
 window.onload = ()=>{
     for(let prop in listControllers){
@@ -316,5 +324,7 @@ window.onload = ()=>{
     }
     
     mainRoot.$complete()
+
+    removeFunc()
     console.timeEnd('build')
 }

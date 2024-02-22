@@ -175,11 +175,16 @@ class QObject extends ComplexObject {
             index = this.parent.getProperty('data').get().indexOf(this)
             if(index >= 0) this.parent.getProperty('data').get().splice(index, 1)
         }
+
         let data = this.getProperty('data').get()
         for(let i = data.length - 1; i >= 0; i--){
             if(data[i] instanceof QObject) data[i].destroy()
-        }
-        
+        } 
+
+        RemoveList.push(this)
+    }
+
+    $free(){
         for(let key in this){
             if(!(key in this.$properties) && !(key in this.$signals) && this[key] && this[key].clearDependsSignal){
                 this[key].clearDependsSignal()
@@ -193,16 +198,9 @@ class QObject extends ComplexObject {
             this.$signals[sigName].destroy()
         }
 
-        
-        // this.$dom.remove()
         for(let key in this){
-            // if(key === '$dom') this[key].remove()
-            // if(this[key].destroy) this[key].destroy()
-
             delete this[key]
         }
-        
-        
     }
 }
 

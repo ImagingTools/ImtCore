@@ -10,7 +10,7 @@ for(let componentName of listComponents){
 }
 const listProperties = require('../utils/properties')
 
-const source = process.argv[2] || 'C:\\projects\\ImagingTools\\ItDevelopment\\Chronos\\Bin\\web\\src'//'../test/qml'// 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src' // 
+const source = process.argv[2] || 'C:/projects/ImagingTools/ItDevelopment/ImtCore/3rdParty/JQML2/test/qml'//'C:\\projects\\ImagingTools\\ItDevelopment\\Chronos\\Bin\\web\\src'//'../test/qml'// 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src' // 
 if(!source) throw 'error: source not specified'
 
 function getFiles (dir, _files){
@@ -624,6 +624,7 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
                             stat.value.push(`inCtx.get('${tree[1]}')`)
                         } else {
                             if(tree[1] !== 'Gql' && tree[1] !== 'Icon' && tree[1] !== 'modalDialogManager') console.log(`Warning: name ${tree[1]} into ${compiledFile.fileName} not found`)
+                            if(assign && tree[1] !== 'Gql' && tree[1] !== 'Icon' && tree[1] !== 'modalDialogManager') console.log(`Error: there is no identifier before the ${tree[1]} into ${compiledFile.fileName}`)
                             stat.compute = true
                             stat.value.push(`inCtx.get('${tree[1]}')`)
                         }
