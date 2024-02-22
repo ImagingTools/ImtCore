@@ -40,7 +40,7 @@ TConnectionCollectionPluginComponentImpl<ComponentClass>::TConnectionCollectionP
 template <class ComponentClass>
 const imtservice::IConnectionCollectionPlugin::IConnectionCollectionFactory* TConnectionCollectionPluginComponentImpl<ComponentClass>::GetConnectionCollectionFactory() const
 {
-	return BaseClass::m_component.GetInterface<imtservice::IConnectionCollectionPlugin::IConnectionCollectionFactory>(QByteArray());
+	return BaseClass::m_component.template GetInterface<imtservice::IConnectionCollectionPlugin::IConnectionCollectionFactory>(QByteArray());
 }
 
 
