@@ -622,7 +622,7 @@ int CObjectCollectionBase::GetSupportedOperations() const
 }
 
 
-bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
+bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMode mode)
 {
 	const CObjectCollectionBase* sourcePtr = dynamic_cast<const CObjectCollectionBase*>(&object);
 	if (sourcePtr != nullptr){
@@ -650,7 +650,13 @@ bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMod
 			sourceLock.relock();
 
 			if (targetObjectInfoPtr == nullptr){
-				QByteArray newId = InsertNewObject(sourceObjectInfo.typeId, sourceObjectInfo.name, sourceObjectInfo.description, sourceObjectInfo.objectPtr.GetPtr());
+				QByteArray newId = InsertNewObject(
+							sourceObjectInfo.typeId,
+							sourceObjectInfo.name,
+							sourceObjectInfo.description,
+							sourceObjectInfo.objectPtr.GetPtr(),
+							sourceObjectInfo.id);
+
 				if (newId.isEmpty()){
 					return false;
 				}

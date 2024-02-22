@@ -139,6 +139,16 @@ bool CUrlConnectionParam::CopyFrom(const IChangeable& object, CompatibilityMode 
 		m_serviceName = sourcePtr->m_serviceName;
 		m_connectionType = sourcePtr->m_connectionType;
 
+		m_externConnectionList.clear();
+
+		for (const IncomingConnectionParam& connectionParam : sourcePtr->m_externConnectionList){
+			IncomingConnectionParam newParam;
+			newParam.description = connectionParam.description;
+			newParam.url = connectionParam.url;
+
+			m_externConnectionList << newParam;
+		}
+
 		return true;
 	}
 
