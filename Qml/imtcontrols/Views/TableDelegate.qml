@@ -265,6 +265,9 @@ Rectangle {
 
         clip: true;
         orientation: ListView.Horizontal;
+
+        boundsBehavior: Flickable.StopAtBounds;
+
         spacing: 0;
         property bool compl: false;
         Component.onCompleted: {
@@ -341,5 +344,4 @@ Rectangle {
             mouse.accepted = false;
         }
     }
-
 }

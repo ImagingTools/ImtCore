@@ -34,7 +34,7 @@ Item {
                 viewBase.updateCommandsGui();
             }
             else{
-                viewBase.clearCommandsGui();
+//                viewBase.clearCommandsGui();
             }
         }
     }

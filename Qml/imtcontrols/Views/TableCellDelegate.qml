@@ -208,6 +208,15 @@ Item {
         visible: delegateContainer.pTableDelegateContainer ? delegateContainer.pTableDelegateContainer.selected && mainRec.color != "transparent" : false;
     }
 
+//    MouseArea{
+//        anchors.fill: parent;
+
+//        hoverEnabled: true;
+
+////        preventStealing: false;
+//        propagateComposedEvents: true;
+//    }
+
     Loader {
         id: contentLoader;
 

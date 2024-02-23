@@ -17,6 +17,7 @@ namespace imtservice
 // public methods
 
 CUrlConnectionParam::CUrlConnectionParam()
+	:m_connectionType(CT_INPUT)
 {
 }
 
@@ -74,6 +75,8 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_serviceName);
 	retVal = retVal && archive.EndTag(serviceNameTag);
 
+	qDebug() << "m_serviceName" << m_serviceName;
+
 	iser::CArchiveTag connectionTypeTag("ConnectionType", "Connection Type", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(connectionTypeTag);
 	retVal = retVal && I_SERIALIZE_ENUM(ConnectionType, archive, m_connectionType);
@@ -101,6 +104,8 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 		iser::CArchiveTag urlTag("Url", "URL", iser::CArchiveTag::TT_LEAF, &objectTag);
 
 		QString urlStr = elementInfo.url.toString();
+
+		qDebug() << "urlStr" << urlStr;
 
 		bool retVal = archive.BeginTag(urlTag);
 		retVal = retVal && archive.Process(urlStr);
@@ -173,6 +178,7 @@ bool CUrlConnectionParam::ResetData(CompatibilityMode mode)
 
 	m_serviceName.clear();
 	m_externConnectionList.clear();
+	m_connectionType = CT_INPUT;
 
 	return true;
 }
