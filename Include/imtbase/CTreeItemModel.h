@@ -46,8 +46,6 @@ public:
 	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
 	virtual bool IsEqual(const IChangeable& object) const override;
 	virtual istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
-	virtual void OnEndChanges(const ChangeSet& changeSet) override;
-	virtual void OnBeginChanges() override;
 
 public Q_SLOTS:
 	void SetParent(QObject *parent);
@@ -145,7 +143,6 @@ protected:
 	virtual bool SerializeRecursive(iser::IArchive& archive, const QByteArray &tagName);
 	virtual int GetKeyRole(const QByteArray& key) const;
 	virtual bool ParseRecursive(const QJsonObject &jsonObject, int index = 0);
-	virtual void subModelChanged(const CTreeItemModel* model, istd::IChangeable::ChangeSet& changeSet);
 };
 
 

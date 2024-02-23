@@ -5,7 +5,6 @@
 #include <iser/IArchive.h>
 #include <iser/CArchiveTag.h>
 #include <iser/CJsonMemWriteArchive.h>
-#include <istd/CChangeNotifier.h>
 #include <istd/TDelPtr.h>
 
 
@@ -63,8 +62,14 @@ bool CTreeItemModel::Copy(CTreeItemModel* object)
 	if (object == nullptr){
 		return false;
 	}
-	
+
+	m_isTransaction = true;
+
 	bool result = CopyFrom(*object);
+
+	m_isTransaction = false;
+
+	emit dataChanged(QModelIndex(), QModelIndex());
 
 	return result;
 }
@@ -116,6 +121,8 @@ void CTreeItemModel::InsertNewItemWithParameters(int index, const QVariantMap &m
 	m_isTransaction = false;
 
 	endInsertRows();
+
+	emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
 }
 
 
@@ -131,6 +138,10 @@ int CTreeItemModel::InsertNewItem()
 
 	beginInsertRows(QModelIndex(), index, index);
 	endInsertRows();
+
+	if (!m_isTransaction){
+		emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
+	}
 
 	return index;
 }
@@ -152,6 +163,10 @@ int CTreeItemModel::InsertNewItem(int index)
 
 	endInsertRows();
 
+	if (!m_isTransaction){
+		emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
+	}
+
 	return index;
 }
 
@@ -160,14 +175,6 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap& /*infoMap*/)
 {
 	if (index < 0 || index > m_items.count() - 1){
 		return false;
-	}
-
-	IChangeable::ChangeSet changeSet = IChangeable::GetAnyChange();
-	if (m_isUpdateEnabled){
-		changeSet.SetChangeInfo("operation", "remove item");
-		changeSet.SetChangeInfo("index", index);
-
-		BeginChanges(changeSet);
 	}
 
 	beginRemoveRows(QModelIndex(), index, index);
@@ -182,8 +189,8 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap& /*infoMap*/)
 		m_isArray = false;
 	}
 
-	if (m_isUpdateEnabled){
-		EndChanges(changeSet);
+	if (!m_isTransaction){
+		emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
 	}
 
 	return true;
@@ -209,8 +216,6 @@ imtbase::CTreeItemModel* CTreeItemModel::AddTreeModel(const QByteArray &key, int
 		SetData(key, v, index);
 	}
 	else{
-		istd::CChangeNotifier changeNotifier(this);
-
 		retVal->Clear();
 	}
 
@@ -249,7 +254,10 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, CTreeItemModel *externTree
 
 bool CTreeItemModel::CopyItemDataFromModel(int index, const CTreeItemModel *externTreeModel, int externIndex)
 {
+	m_isTransaction = true;
+
 	RemoveItem(index);
+
 	InsertNewItem(index);
 
 	bool retVal = true;
@@ -275,6 +283,10 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, const CTreeItemModel *exte
 			break;
 		}
 	}
+
+	m_isTransaction = false;
+
+	emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
 
 	return retVal;
 }
@@ -320,24 +332,7 @@ bool CTreeItemModel::SetData(const QByteArray& key, const QVariant& value, int i
 		return true;
 	}
 
-	if (m_isUpdateEnabled){
-		IChangeable::ChangeSet changeSet = IChangeable::GetAnyChange();
-
-		changeSet.SetChangeInfo("operation", "set");
-		changeSet.SetChangeInfo("curVal", item->Value(key));
-		changeSet.SetChangeInfo("newVal", value);
-		changeSet.SetChangeInfo("key", key);
-		changeSet.SetChangeInfo("index", index);
-
-		BeginChanges(changeSet);
-
-		item->SetValue(key, value);
-
-		EndChanges(changeSet);
-	}
-	else{
-		item->SetValue(key, value);
-	}
+	item->SetValue(key, value);
 
 	int keyRole = GetKeyRole(key);
 	if (keyRole > -1){
@@ -345,7 +340,7 @@ bool CTreeItemModel::SetData(const QByteArray& key, const QVariant& value, int i
 		keyRoles.append(keyRole);
 
 		if (!m_isTransaction){
-			emit dataChanged(QAbstractListModel::index(index - 1), QAbstractListModel::index(index), keyRoles);
+			emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index), keyRoles);
 		}
 	}
 
@@ -361,29 +356,16 @@ bool CTreeItemModel::RemoveData(const QByteArray& key, int index, const ChangeIn
 
 	Item* item = m_items[index];
 
-	if (m_isUpdateEnabled){
-		IChangeable::ChangeSet changeSet = IChangeable::GetAnyChange();
-
-		changeSet.SetChangeInfo("operation", "remove");
-		changeSet.SetChangeInfo("curVal", item->Value(key));
-		changeSet.SetChangeInfo("key", key);
-		changeSet.SetChangeInfo("index", index);
-
-		BeginChanges(changeSet);
-
-		item->RemoveValue(key);
-
-		EndChanges(changeSet);
-	}
-	else{
-		item->RemoveValue(key);
-	}
+	item->RemoveValue(key);
 
 	int keyRole = GetKeyRole(key);
 	if (keyRole > -1){
 		QVector<int> roles;
 		roles.append(keyRole);
-		emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index), roles);
+
+		if (!m_isTransaction){
+			emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index), roles);
+		}
 	}
 
 	return true;
@@ -494,6 +476,10 @@ void CTreeItemModel::Clear()
 	qDeleteAll(m_items);
 	m_items.clear();
 	Refresh();
+
+	if (!m_isTransaction){
+		emit dataChanged(QModelIndex(), QModelIndex());
+	}
 }
 
 
@@ -509,12 +495,13 @@ void CTreeItemModel::SetIsArray(const bool &isArray)
 }
 
 
-bool CTreeItemModel::CreateFromJson(const QByteArray &jsonContent)
+bool CTreeItemModel::CreateFromJson(const QByteArray& jsonContent)
 {
+	m_isTransaction = true;
+
 	Clear();
 	QJsonParseError error;
 
-	qDebug() << "CreateFromJson" << jsonContent;
 	QJsonDocument document = QJsonDocument::fromJson(jsonContent, &error);
 	if (error.error != QJsonParseError::NoError){
 		qCritical()  << "Error during parsing JSON document:" << error.errorString() << "content:" << jsonContent;
@@ -532,9 +519,12 @@ bool CTreeItemModel::CreateFromJson(const QByteArray &jsonContent)
 		}
 	}
 	else{
-		InsertNewItem();
 		retVal = ParseRecursive(document.object(), 0);
 	}
+
+	m_isTransaction = false;
+
+	emit dataChanged(QModelIndex(), QModelIndex());
 
 	return retVal;
 }
@@ -656,8 +646,6 @@ bool CTreeItemModel::Serialize(iser::IArchive &archive)
 
 bool CTreeItemModel::JsonSerialize(iser::IArchive &archive)
 {
-	istd::CChangeNotifier changeNotifier(!archive.IsStoring() ? this : nullptr);
-
 	if (!archive.IsStoring()){
 		Clear();
 	}
@@ -678,8 +666,6 @@ bool CTreeItemModel::CopyFrom(const IChangeable& object, CompatibilityMode /*mod
 {
 	const imtbase::CTreeItemModel* sourcePtr = dynamic_cast<const imtbase::CTreeItemModel*>(&object);
 	if (sourcePtr != nullptr){
-		istd::CChangeNotifier changeNotifier(this);
-
 		Clear();
 
 		for (int i = 0; i < sourcePtr->m_items.count(); i++){
@@ -797,10 +783,6 @@ bool CTreeItemModel::SerializeRecursive(iser::IArchive &archive, const QByteArra
 	iser::CArchiveTag subArrayTag("Item", "array item", iser::CArchiveTag::TT_GROUP, &arrayTag);
 	iser::CArchiveTag objectTag(tagName, "key", iser::CArchiveTag::TT_GROUP);
 	bool isMultiTag = false;
-
-	if (countSize < 1 && m_isArray == false){
-		return false;
-	}
 
 	if (m_isArray || countSize > 1){
 		isMultiTag = true;
@@ -958,8 +940,13 @@ bool CTreeItemModel::ParseRecursive(const QJsonObject& jsonObject, int index)
 		}
 		else if(jsonValue.isObject()){
 			CTreeItemModel* treeItemModel = AddTreeModel(objectIterator.key().toUtf8(), index);
-			treeItemModel->InsertNewItem();
-			treeItemModel->ParseRecursive(jsonValue.toObject(), treeItemModel->m_items.count() - 1);
+
+			QJsonObject jsonObject = jsonValue.toObject();
+			if (!jsonObject.isEmpty()){
+//				treeItemModel->InsertNewItem();
+//				treeItemModel->ParseRecursive(jsonObject, treeItemModel->m_items.count() - 1);
+				treeItemModel->ParseRecursive(jsonObject, 0);
+			}
 		}
 		else{
 			SetData(objectIterator.key().toUtf8(),objectIterator.value().toVariant(), index);
@@ -968,46 +955,6 @@ bool CTreeItemModel::ParseRecursive(const QJsonObject& jsonObject, int index)
 	}
 
 	return retVal;
-}
-
-
-void CTreeItemModel::subModelChanged(const CTreeItemModel *model, ChangeSet &changeSet)
-{
-	for (int i = 0; i < m_items.count(); i++){
-		Item* item = m_items[i];
-		QList<QByteArray> keys;
-		item->GetKeys(keys);
-		for (int j = 0; j < keys.count(); j++){
-			if (item->Value(keys[j]).value<CTreeItemModel*>() == model){
-				int level = changeSet.GetChangeInfo("level").toInt();
-				level++;
-				changeSet.SetChangeInfo("level", level);
-				changeSet.SetChangeInfo("key" + QByteArray::number(level), keys[j]);
-				changeSet.SetChangeInfo("index" + QByteArray::number(level), i);
-			}
-		}
-	}
-	CTreeItemModel* parentModel = dynamic_cast<CTreeItemModel*>(parent());
-	if (parentModel != nullptr){
-		parentModel->subModelChanged(model, changeSet);
-	}
-	else{
-		istd::CChangeNotifier changeNotifier(this, &changeSet);
-	}
-}
-
-
-void CTreeItemModel::OnEndChanges(const ChangeSet& changeSet)
-{
-	emit dataChanged(QModelIndex(), QModelIndex(), QVector<int>());
-
-	BaseClass::OnEndChanges(changeSet);
-}
-
-
-void CTreeItemModel::OnBeginChanges()
-{
-	BaseClass::OnBeginChanges();
 }
 
 
