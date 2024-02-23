@@ -723,6 +723,9 @@ Item {
 
             function commandHandle(commandId){
                 console.log("DicumentManager commandHandle, documentId", documentId);
+                if (!documentManager){
+                    return;
+                }
 
                 if (commandId === "Close"){
                     documentManager.closeDocument(documentId);

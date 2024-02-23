@@ -223,8 +223,13 @@ DocumentDataController {
                         dataModelLocal = dataModelLocal.GetData(container.gqlAddCommandId);
                         dataModelLocal = dataModelLocal.GetData("addedNotification");
 
-                        let documentId = dataModelLocal.GetData("Id");
-                        let documentName = dataModelLocal.GetData("Name");
+                        let documentId = ""
+                        let documentName = ""
+
+                        if (dataModelLocal){
+                            documentId = dataModelLocal.GetData("Id");
+                            documentName = dataModelLocal.GetData("Name");
+                        }
 
                         container.saved(documentId, documentName);
                     }
