@@ -592,6 +592,10 @@ QString CTreeItemModel::toJSON()
 		Serialize(archive);
 	}
 
+	if (representationData.length() > 2 && representationData[1] == '['){
+		representationData = representationData.mid(1, representationData.length() - 2);
+	}
+
 	return QString(representationData);
 }
 

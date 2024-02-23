@@ -111,16 +111,17 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.Process(urlStr);
 		retVal = retVal && archive.EndTag(urlTag);
 
-		if (retVal && !archive.IsStoring()){
-			elementInfo.url = QUrl(urlStr);
-		}
-
 		iser::CArchiveTag descriptionTag("Description", "Connection description", iser::CArchiveTag::TT_LEAF, &objectTag);
 		retVal = retVal && archive.BeginTag(descriptionTag);
 		retVal = retVal && archive.Process(elementInfo.description);
 		retVal = retVal && archive.EndTag(descriptionTag);
 
 		retVal = retVal && archive.EndTag(objectTag);
+
+		if (retVal && !archive.IsStoring()){
+			elementInfo.url = QUrl(urlStr);
+			m_externConnectionList.append(elementInfo);
+		}
 	}
 
 	retVal = retVal && archive.EndTag(objectListTag);
