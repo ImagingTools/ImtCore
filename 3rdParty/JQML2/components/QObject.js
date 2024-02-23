@@ -7,6 +7,7 @@ var UID = 0
 class QObject extends ComplexObject {
     static defaultProperties = {
         model: { type: QVar, value: undefined, signalWithout: true },
+        model_: { type: QVar, value: undefined, signalWithout: true },
         index: { type: QReal, value: 0 },
         context: { type: QVar, value: undefined },
         parent: { type: QVar, value: undefined, changed: '$parentChanged' },
@@ -49,7 +50,9 @@ class QObject extends ComplexObject {
             } else if(parent.$repeater && !(this instanceof Component)){
                 parent = parent.parent
             }
-            if(!(this instanceof MapItemView) && !(this instanceof Repeater) && !(this instanceof ListView) && !(this instanceof GridView) && !(this instanceof ListElement)) this.getStatement('model').setCompute(()=>{return this.parent.model})
+
+            this.getStatement('model_').setCompute(()=>{return this.parent.model_})
+            if(!(this instanceof MapItemView) && !(this instanceof Repeater) && !(this instanceof ListView) && !(this instanceof GridView) && !(this instanceof ListElement)) this.getStatement('model').setCompute(()=>{return this.parent.model_})
 
             if(!(this instanceof ListElement)) {
                 this.getStatement('index').setCompute(()=>{return this.parent.index})
@@ -58,6 +61,7 @@ class QObject extends ComplexObject {
 
             if(exModel){
                 this.getStatement('model').reset(exModel)
+                this.getStatement('model_').reset(exModel)
                 this.getStatement('index').setCompute(()=>{return exModel.index})
                 this.getStatement('index').update()
             }

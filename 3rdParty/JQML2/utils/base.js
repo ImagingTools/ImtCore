@@ -50,6 +50,16 @@ class ComplexObject {
     }
 
     createVariantProperty(name, type, value){
+        if(name in this.$properties){
+            console.log('Warning: redefine property', name)
+            if(typeof value === 'function'){
+                this.$properties[name].setCompute(value)
+                this.$properties[name].update()
+            } else {
+                this.$properties[name].reset(value)
+            }
+            return
+        }
         this.$properties[name] = new QVariant(value, type)
         // updateList.push(this.$properties[name])
         Object.defineProperty(this, name, {

@@ -587,10 +587,10 @@ class ListView extends Flickable {
                 this.getStatement('contentY').reset(0)
                 return true
             }
-            if(this.getPropertyValue('contentWidth') <= this.getPropertyValue('width')){
-                this.getStatement('contentX').reset(0)
-                return true
-            }
+            // if(this.getPropertyValue('contentWidth') <= this.getPropertyValue('width')){
+            //     this.getStatement('contentX').reset(0)
+            //     return true
+            // }
             // this.getStatement('contentX').reset(this.getStatement('contentX').get()+deltaX)
             // this.getStatement('contentY').reset(this.getStatement('contentY').get()+deltaY)
             if(this.getPropertyValue('contentY') + deltaY > this.getPropertyValue('originY') && this.getPropertyValue('contentY') + deltaY < this.getPropertyValue('contentHeight') + this.getPropertyValue('originY') - this.getPropertyValue('height')){
