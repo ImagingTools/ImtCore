@@ -27,7 +27,7 @@ public:
 				imtservice::IServiceConnectionParam::ConnectionType connectionType,
 				const QString& name = QString(),
 				const QString& description = QString() ) = 0;
-	virtual QString GetServiceTypeName() const = 0;
+	// virtual QString GetServiceTypeName() const = 0;
 };
 
 // CUrlConnectionParam
