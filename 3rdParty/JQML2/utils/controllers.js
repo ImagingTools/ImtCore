@@ -154,8 +154,9 @@ class MouseController {
 
             if(inner[i].$mousearea && !this.pressedMouseAreaInner){
                 if(inner[i].onMouseDown(x, y, button)){
+                    this.pressedMouseAreaInner = inner[i]
                     for(let j = i+1; j < inner.length; j++){
-                        if(!inner[j].onMouseDown(x, y, button)){
+                        if(inner[j].$mousearea && !inner[j].onMouseDown(x, y, button)){
                             this.pressedMouseAreaInner = inner[j]
                             break
                         }
