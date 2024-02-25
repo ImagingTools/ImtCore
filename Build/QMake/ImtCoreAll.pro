@@ -158,6 +158,9 @@ imtimg.file = ../../Include/imtimg/QMake/imtimg.pro
 SUBDIRS += imtclientgql
 imtclientgql.file = ../../Include/imtclientgql/QMake/imtclientgql.pro
 
+SUBDIRS += imtservice
+imtservice.file = ../../Include/imtservice/QMake/imtservice.pro
+
 # QML modules
 SUBDIRS += imtguiqml
 imtguiqml.file = ../../Qml/imtgui/QMake/imtguiqml.pro
@@ -179,7 +182,6 @@ imtcontrolsqml.file = ../../Qml/imtcontrols/QMake/imtcontrolsqml.pro
 
 SUBDIRS += imtlicguiqml
 imtlicguiqml.file = ../../Qml/imtlicgui/QMake/imtlicguiqml.pro
-
 
 ######### Component packages
 SUBDIRS += ImtCorePck
@@ -314,6 +316,10 @@ ImtClientGqlPck.depends = imtclientgql
 SUBDIRS += ImtHttpPck
 ImtHttpPck.file = ../../Impl/ImtHttpPck/QMake/ImtHttpPck.pro
 ImtHttpPck.depends = imthttp
+
+SUBDIRS += ImtServicePck
+ImtServicePck.file = ../../Impl/ImtServicePck/QMake/ImtServicePck.pro
+ImtServicePck.depends = imtservice
 
 SUBDIRS += ImtControlsGallery
 ImtControlsGallery.file = ../../Impl/ImtControlsGallery/QMake/ImtControlsGallery.pro
