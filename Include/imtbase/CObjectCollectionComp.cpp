@@ -5,6 +5,28 @@ namespace imtbase
 {
 
 
+// reimplemented (IObjectCollection::IDataFactory)
+
+IObjectCollection::DataPtr CObjectCollectionComp::CreateInstance(const QByteArray& keyId) const
+{
+	return CreateObjectInstance(keyId);
+}
+
+
+// reimplemented (istd::IFactoryInfo)
+
+istd::IFactoryInfo::KeyList CObjectCollectionComp::GetFactoryKeys() const
+{
+	istd::IFactoryInfo::KeyList retVal;
+
+	for (int i = 0; i < m_typeIdsAttrPtr.GetCount(); ++i) {
+		retVal.insert(m_typeIdsAttrPtr[i]);
+	}
+
+	return retVal;
+}
+
+
 // reimplemented (IObjectCollectionInfo)
 
 const iprm::IOptionsList* CObjectCollectionComp::GetObjectTypesInfo() const

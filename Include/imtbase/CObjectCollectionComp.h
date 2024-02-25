@@ -21,7 +21,8 @@ namespace imtbase
 */
 class CObjectCollectionComp:
 			public icomp::CComponentBase,
-			public imtbase::TFilterableCollectionWrap<CObjectCollectionBase>
+			public imtbase::TFilterableCollectionWrap<CObjectCollectionBase>,
+			virtual public IObjectCollection::IDataFactory
 {
 public:
 	typedef icomp::CComponentBase BaseClass;
@@ -32,6 +33,7 @@ public:
 		I_REGISTER_INTERFACE(IObjectCollectionInfo);
 		I_REGISTER_INTERFACE(ICollectionInfo);
 		I_REGISTER_INTERFACE(iser::ISerializable);
+		I_REGISTER_INTERFACE(IObjectCollection::IDataFactory);
 		I_ASSIGN_MULTI_0(m_objectFactoriesCompPtr, "ObjectFactories", "List of factories used for object creation", false);
 		I_ASSIGN_MULTI_0(m_objectPersistenceListCompPtr, "ObjectPersistenceList", "List of persistence components used for object data persistence", false);
 		I_ASSIGN_MULTI_0(m_typeIdsAttrPtr, "TypeIds", "List of type-ID corresponding to the registered factories", false);
@@ -42,6 +44,10 @@ public:
 		I_ASSIGN_MULTI_0(m_fixedObjectNamesAttrPtr, "FixedObjectNames", "List of names for corresponding fixed object", false);
 		I_ASSIGN_MULTI_0(m_fixedObjectTypeNamesAttrPtr, "FixedObjectTypeNames", "List of names for corresponding fixed object type", false);
 	I_END_COMPONENT;
+
+	// reimplemented (IObjectCollection::IDataFactory)
+	virtual DataPtr CreateInstance(const QByteArray& keyId = "") const override;
+	virtual istd::IFactoryInfo::KeyList GetFactoryKeys() const override;
 
 	// reimplemented (IObjectCollectionInfo)
 	virtual const iprm::IOptionsList* GetObjectTypesInfo() const override;
