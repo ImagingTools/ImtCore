@@ -1,0 +1,1 @@
+%QTDIR%\bin\lupdate.exe ..\..\..\Include ..\..\..\Qml ..\..\..\AuxInclude -target-language ar_SA -ts ImtCore_ar_SA.ts -recursive -locations relative
