@@ -375,6 +375,7 @@ class Item extends QtObject {
             this.getProperty('y').update()
             this.getProperty('width').update()
             this.getProperty('height').update()
+            return
         } else if(this.getProperty('anchors').getPropertyValue('centerIn')){
             this.getProperty('x').freeze()
             this.getProperty('y').freeze()
@@ -399,6 +400,7 @@ class Item extends QtObject {
             
             this.getProperty('x').update()
             this.getProperty('y').update()
+            return
         } 
         if(this.getProperty('anchors').getPropertyValue('left') || this.getProperty('anchors').getPropertyValue('right')){
             if(this.getProperty('anchors').getPropertyValue('left') && this.getProperty('anchors').getPropertyValue('right')){

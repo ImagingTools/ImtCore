@@ -10,7 +10,7 @@ for(let componentName of listComponents){
 }
 const listProperties = require('../utils/properties')
 
-const source = process.argv[2] || 'C:/projects/ImagingTools/ItDevelopment/ImtCore/3rdParty/JQML2/test/qml'//'C:\\projects\\ImagingTools\\ItDevelopment\\Chronos\\Bin\\web\\src'//'../test/qml'// 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src' // 
+const source = process.argv[2] || 'C:\\projects\\ImagingTools\\ItDevelopment\\NeoPro\\Bin\\web\\src'//'../test/qml'// 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src' // 
 if(!source) throw 'error: source not specified'
 
 function getFiles (dir, _files){
@@ -487,7 +487,7 @@ function testName(name, currentInstructions){
     }
     
     for(let prop of currentInstructions.properties){
-        if(prop.name === name) return true
+        if(prop.name === name || prop.name === name.replaceAll('Changed', '')) return true
     }
     if(name in currentInstructions.defineSignals) return true
     if(name in currentInstructions.methods) return true
