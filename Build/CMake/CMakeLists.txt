@@ -19,7 +19,7 @@ set (IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
 set (QML_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Qml")
 set (TESTS_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Tests")
 set(AUX_INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../AuxInclude/${TARGETNAME}/GeneratedFiles")
-set(ENABLE_TESTS_IMTCORE True CACHE STRING "Enable tests (True or False), defaults to True")
+set(BUILD_TESTING OFF CACHE BOOL "Configures projects for testing")
 
 include_directories(${AUX_INCLUDE_DIR}/..)
 
@@ -283,7 +283,7 @@ endif()
 
 
 #-------- Tests --------
-if (${ENABLE_TESTS_IMTCORE})
+if (${BUILD_TESTING})
 	add_subdirectory("${INCLUDE_DIR}/imttest/CMake" "${AUX_INCLUDE_DIR}/imttest")
 
 	if(NOT DEFINED USE_QTDB OR USE_QTDB)
@@ -298,6 +298,5 @@ if (${ENABLE_TESTS_IMTCORE})
 	add_subdirectory("${TESTS_DIR}/RevisionControllerTest/CMake" "${AUX_INCLUDE_DIR}/RevisionControllerTest")
 	add_subdirectory("${TESTS_DIR}/StructureTest/CMake" "${AUX_INCLUDE_DIR}/StructureTest")
 	file(COPY ${TESTS_DIR}/Migrations DESTINATION ${TESTS_DIR}/../Bin/${CMAKE_BUILD_TYPE}_${TARGETNAME})
-
 endif()
 
