@@ -97,7 +97,8 @@ RemoteCollectionView {
     }
 
     onElementsChanged: {
-         permissionsProvider.productId = table.elements.GetData("Id");
+        if(!permissionsProvider) return
+        permissionsProvider.productId = table.elements.GetData("Id");
 
         if (table.elements.ContainsKey("Roles")){
             let elementsModel = table.elements.GetData("Roles");
