@@ -29,6 +29,7 @@ Rectangle {
     signal deleteSignal(int index);
     signal renameSignal(int index);
     signal revertSignal();
+    signal modelDataChanged();
 
     onContentXChanged: {
         canvas.deltaX = -contentX
@@ -42,6 +43,13 @@ Rectangle {
 
     onObjectModelChanged: {
         canvas.requestPaint();
+    }
+
+    Connections {
+        target: canvasPage.objectModel
+        onDataChanged: {
+            // canvasPage.modelDataChanged()
+        }
     }
 
     function requestPaint(){
@@ -266,6 +274,8 @@ Rectangle {
                         canvasPage.objectModel.SetData("X", newX, canvas.selectedIndex);
 
                         canvas.requestPaint();
+
+                        canvasPage.modelDataChanged()
 
                     }
                 }
