@@ -20,7 +20,6 @@ Component {
                 textInput.text = tableCellDelegate.getValue();
                 textLabel.text = tableCellDelegate.getValue();
 
-                tableCellDelegate.mainMouseArea.hoverEnabled = false;
             }
         }
 

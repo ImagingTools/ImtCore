@@ -497,7 +497,11 @@ Item {
                 internal.m_closingDocuments.splice(index, 1);
             }
 
+            console.log("documentData1", documentData);
+            console.log("documentData.destroy");
             documentData.destroy();
+            console.log("documentData2", documentData);
+
             documentsModel.remove(documentIndex);
 
             documentClosed(documentIndex, "");
@@ -666,6 +670,7 @@ Item {
             signal viewRemoved(var view);
 
             Component.onDestruction: {
+                console.log("singleDocumentData onDestruction");
                 Events.unSubscribeEvent(documentId + "CommandActivated", commandHandle);
                 if (singleDocumentData.undoManager){
                     Events.unSubscribeEvent(documentId + "CommandActivated", singleDocumentData.undoManager.commandHandle);

@@ -23,7 +23,7 @@ Item {
     }
 
     function setCommandsModel(parameters){
-        console.log("start setCommandsModel");
+        console.log("start setCommandsModel", JSON.stringify(parameters));
         let model = parameters["Model"];
         let commId = parameters["ViewId"];
 

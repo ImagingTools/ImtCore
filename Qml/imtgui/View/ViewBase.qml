@@ -18,6 +18,8 @@ Item {
     }
 
     Component.onDestruction: {
+        console.log("ViewBase onDestruction", viewBase);
+
         if (commandsDelegate){
             Events.unSubscribeEvent(viewId + "CommandActivated", commandsDelegate.commandHandle);
         }
@@ -28,13 +30,13 @@ Item {
     }
 
     onVisibleChanged: {
-        console.log("onVisibleChanged", visible, model.toJSON());
+        console.log("onVisibleChanged", viewBase, visible, model.toJSON());
         if (commandsController){
             if (visible){
                 viewBase.updateCommandsGui();
             }
             else{
-//                viewBase.clearCommandsGui();
+                viewBase.clearCommandsGui();
             }
         }
     }

@@ -41,7 +41,6 @@ QByteArray CSubscriptionManagerComp::RegisterSubscription(
 	QByteArray clientId;
 	const imtgql::CGqlRequest* requestImplPtr = dynamic_cast<const imtgql::CGqlRequest*>(&subscriptionRequest);
 	if (requestImplPtr != nullptr) {
-		requestImplPtr->GetParams();
 		const imtgql::CGqlObject* input = requestImplPtr->GetParam("input");
 		if (input != nullptr) {
 			const imtgql::CGqlObject* addition = input->GetFieldArgumentObjectPtr("addition");
