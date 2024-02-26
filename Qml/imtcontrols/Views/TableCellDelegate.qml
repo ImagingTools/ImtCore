@@ -56,6 +56,9 @@ Item {
         if(!delegateContainer.complCompl){
             return;
         }
+        if(!delegateContainer.pTableDelegateContainer){
+            return;
+        }
 
         var defaultWidth = delegateContainer.columnCount == 0 ? 0 : delegateContainer.pTableDelegateContainer.width/delegateContainer.columnCount;
         var widthFromModel = delegateContainer.pTableDelegateContainer.tableItem.widthDecoratorDynamic.IsValidData("Width", model.index) ?
