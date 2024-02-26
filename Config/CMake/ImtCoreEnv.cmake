@@ -73,7 +73,7 @@ if(NOT PYTHONEXE_RESULT_CODE EQUAL 0)
 	message(WARNING "${PYTHONEXE_RESULTS}")
 	message(WARNING "${PYTHONEXE_OUTPUT}")
 	message(WARNING "${PYTHONEXE_ERROR}")
-	message(FATAL_ERROR "Process (${PYTHONEXE} ${CMAKE_CURRENT_LIST_DIR}/../../../PartituraUpgrade.py) finished unexpacted! [${PYTHONEXE_RESULT_CODE}]")
+	message(WARNING "Process (${PYTHONEXE} ${CMAKE_CURRENT_LIST_DIR}/../../../PartituraUpgrade.py) finished unexpacted! [${PYTHONEXE_RESULT_CODE}]\nPlease ensure, the path to the svn programm exists and available(add to PATH system variable)")
 endif()
 
 if (CUSTOM_PYTHON)
