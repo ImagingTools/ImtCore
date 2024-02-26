@@ -235,7 +235,7 @@ ViewBase {
             anchors.rightMargin: 5;
             anchors.bottom: parent.bottom;
 
-            width: collectionViewBaseContainer.hasFilter ? 35 : 10;
+            width: collectionViewBaseContainer.hasFilter ? 35 : 0;
 
             visible: tableInternal.width > 0;
 
@@ -276,7 +276,6 @@ ViewBase {
 
         visible: false;
     }
-
 
     Rectangle {
         id: paginationObj;

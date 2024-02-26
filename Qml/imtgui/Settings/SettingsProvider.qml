@@ -13,12 +13,10 @@ QtObject {
     property var applicationInfoProvider;
 
     Component.onCompleted: {
-//        Events.subscribeEvent("OnLocalizationChanged", container.updateModel);
         Events.subscribeEvent("UpdateSettings", container.updateModel);
     }
 
     Component.onDestruction: {
-//        Events.unSubscribeEvent("OnLocalizationChanged", container.updateModel);
         Events.unSubscribeEvent("UpdateSettings", container.updateModel);
     }
 

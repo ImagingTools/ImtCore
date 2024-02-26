@@ -50,11 +50,6 @@ Item {
         application.updateAllModels();
     }
 
-//    onSystemStatusChanged: {
-//        let parameters = {"Status": application.systemStatus, "Message": application.message}
-//        Events.sendEvent("SystemStatusChanged", parameters)
-//    }
-
     Decorators {
         id: decorators_
     }
@@ -65,11 +60,11 @@ Item {
 
     function setDecorators(){
         Style.setDecorators(decorators)
-//        Style.setDecorators(decoratorsQt)
     }
 
     Component.onCompleted: {
         setDecorators()
+
         Events.subscribeEvent("UpdateModels", application.updateAllModels);
         Events.subscribeEvent("Logout", application.onLogout);
         Events.subscribeEvent("UpdateSystemStatus", application.updateSystemStatus);

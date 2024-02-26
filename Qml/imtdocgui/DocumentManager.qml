@@ -497,13 +497,13 @@ Item {
                 internal.m_closingDocuments.splice(index, 1);
             }
 
-            console.log("documentData1", documentData);
-            console.log("documentData.destroy");
+            console.log("destroy");
             documentData.destroy();
-            console.log("documentData2", documentData);
 
+            console.log("remove");
             documentsModel.remove(documentIndex);
 
+            console.log("documentClosed");
             documentClosed(documentIndex, "");
         }
     }
@@ -675,6 +675,10 @@ Item {
                 if (singleDocumentData.undoManager){
                     Events.unSubscribeEvent(documentId + "CommandActivated", singleDocumentData.undoManager.commandHandle);
                 }
+
+//                for (let i = 0; i < singleDocumentData.views.length; i++){
+//                    singleDocumentData.views[i].removed = true;
+//                }
             }
 
             onDocumentIdChanged: {

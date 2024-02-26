@@ -10,12 +10,6 @@ import imtdocgui 1.0
 RemoteCollectionView {
     id: roleCollectionViewContainer;
 
-    anchors.top: parent.top;
-    anchors.topMargin: Style.size_mainMargin;
-    anchors.horizontalCenter: parent.horizontalCenter;
-
-    width: parent.width - 2 * Style.size_mainMargin;
-
     hasFilter: false;
     hasPagination: false;
 
@@ -30,7 +24,7 @@ RemoteCollectionView {
         id: roleTableDelegateComp;
 
         TableProductRolesDelegate {
-            width: roleCollectionViewContainer.table.width;
+            width: roleCollectionViewContainer.width;
 
             newIsEnabled: roleCollectionViewContainer.newCommandIsEnabled;
 
@@ -83,7 +77,6 @@ RemoteCollectionView {
 
     Component.onCompleted: {
         CachedRoleCollection.updateModel();
-
 
         let documentManager = MainDocumentManager.getDocumentManager("Administration");
         if (documentManager){

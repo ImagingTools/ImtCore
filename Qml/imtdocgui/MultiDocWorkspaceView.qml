@@ -39,8 +39,6 @@ DocumentManager {
     }
 
     function setAlertPanel(alertPanelComp){
-        console.log("DocumentManager setAlertPanel", alertPanelComp);
-
         alertPanel.sourceComponent = alertPanelComp;
     }
 
@@ -99,6 +97,10 @@ DocumentManager {
         delegate: Item {
             anchors.fill: documentRepeater;
 
+            Component.onDestruction: {
+                console.log("Item onDestruction");
+            }
+
             Loader {
                 id: documentLoader;
 
@@ -144,12 +146,6 @@ DocumentManager {
                     if (status === Loader.Error){
                         console.error("Document loading was failed");
                     }
-                }
-
-                function onIsDirtyChanged(){
-                    console.log("DocumentManager onIsDirtyChanged");
-
-                    workspaceView.updateDocumentTitle(model.index);
                 }
             }
         }
