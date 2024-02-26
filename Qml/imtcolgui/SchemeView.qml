@@ -386,19 +386,19 @@ Rectangle {
             property string imageUrl_2: "../../../" + Style.theme + "/Icons" + "/Sickle.svg"
 
             //colors
-            property string selectedColor: "#00ff00"//"#90EE90";
+            property string selectedColor: "#98C9C2"; // "#00ff00"//"#90EE90";
             property string mainColor: "#335777";
             property string errorColor: "#ff0000";
             property string compositeColor: "#bcd2e8";
             property string compositeSelectedColor: "#1167b1";
-            property string selectedLinkColor: "#00ff00"//"#90EE90";
+            property string selectedLinkColor: "#98C9C2"; //"#00ff00"//"#90EE90";
             property string linkColor: "#335777";
             property string mainTextColor: "#000000";
             property string secondTextColor: "#808080";
-            property string backgroundGridColor: "#add8e6";
+            property string backgroundGridColor: "#d6d6d6"; // "#add8e6";
+            property string backgroundBorderColor: "#a0a0a0"; // "#add8e6";
             property string backgroundColor: "#ffffff";
-            property string innerFrameColor: "#808080";
-
+            property string innerFrameColor: "transparent"; // "#808080";
 
             Component.onCompleted: {
                 loadImage(imageUrl_1);
@@ -461,8 +461,6 @@ Rectangle {
                     }
                 }
 
-                //console.log("Count object", canvasPage.objectModel.GetItemsCount())
-
                 //drawObject
                 for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
                     if(i !== canvas.selectedIndex){
@@ -481,8 +479,10 @@ Rectangle {
                 ctx.lineCap = "round"
                 ctx.lineJoin = "round"
                 ctx.lineWidth = 1;
-                ctx.strokeStyle = canvas.backgroundGridColor;
+
                 ctx.fillStyle = canvas.backgroundGridColor;
+                ctx.strokeStyle = canvas.backgroundGridColor;
+
 
                 for(let i = 0; i * step < canvas.backgroundWidth; i++){//vertical lines
                     let x1 = i * step;
@@ -499,7 +499,7 @@ Rectangle {
                 for(let i = 0; i * step < canvas.backgroundHeight; i++){//horizontal lines
                     let x1 = 0 ;
                     let y1 =  i * step ;
-                    let x2 =  canvas.backgroundWidth ;
+                    let x2 =  canvas.backgroundWidth;
                     let y2 =  i * step;
 
                     ctx.beginPath()
@@ -508,6 +508,15 @@ Rectangle {
                     ctx.stroke();
                 }
 
+                ctx.strokeStyle = canvas.backgroundBorderColor;
+                ctx.lineWidth = 2;
+                ctx.beginPath()
+                ctx.moveTo(1, 1);
+                ctx.lineTo(canvas.backgroundWidth, 1);
+                ctx.lineTo(canvas.backgroundWidth, canvas.backgroundHeight - 1);
+                ctx.lineTo(1, canvas.backgroundHeight - 1);
+                ctx.lineTo(1, 1);
+                ctx.stroke();
             }
 
             function setObjectWidth(ctx, index){
@@ -545,6 +554,8 @@ Rectangle {
                 let selected = canvasPage.objectModel.IsValidData("Selected", index) ? canvasPage.objectModel.GetData("Selected", index) : false;
                 let hasError = canvasPage.objectModel.IsValidData("HasError", index) ? canvasPage.objectModel.GetData("HasError", index) : false;
                 let isComposite = canvasPage.objectModel.IsValidData("IsComposite", index) ? canvasPage.objectModel.GetData("IsComposite", index) : false;
+
+                isComposite = false
 
                 ctx.lineCap = "round"
                 ctx.lineJoin = "round"
@@ -616,7 +627,7 @@ Rectangle {
                 let image2_x = image1_x - canvas.imageSize - canvas.imageMargin;
                 let image2_y = text_y - canvas.imageSize + canvas.imageMargin;
                 ctx.beginPath()
-                ctx.drawImage(imageUrl_1, image1_x, image1_y, canvas.imageSize, canvas.imageSize);
+                // ctx.drawImage(imageUrl_1, image1_x, image1_y, canvas.imageSize, canvas.imageSize);
                 // ctx.drawImage(imageUrl_2, image2_x, image2_y, canvas.imageSize, canvas.imageSize);
 
             }
