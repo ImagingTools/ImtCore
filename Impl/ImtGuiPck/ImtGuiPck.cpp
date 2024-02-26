@@ -202,6 +202,11 @@ I_EXPORT_COMPONENT(
 			"Editor for multi-selection",
 			"Selection Option View");
 
+I_EXPORT_COMPONENT(
+			ButtonBasedSelectionGui,
+			"Button based selection gui",
+			"Selection Param Gui");
+
 
 } // namespace ImtGuiPck
 
