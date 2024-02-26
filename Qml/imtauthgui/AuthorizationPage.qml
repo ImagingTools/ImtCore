@@ -305,6 +305,7 @@ Rectangle {
 
                     height: Math.min(24, parent.height - 10);
                     width: height;
+                    z: 20
 
                     iconSource: passwordTextInput.echoMode == TextInput.Password ? "../../../" + Style.getIconPath("Icons/ShownPassword", Icon.State.On, Icon.Mode.Normal) :
                                                                                    "../../../" + Style.getIconPath("Icons/HiddenPassword", Icon.State.On, Icon.Mode.Normal) ;
