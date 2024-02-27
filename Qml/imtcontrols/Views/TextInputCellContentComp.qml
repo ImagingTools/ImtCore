@@ -51,6 +51,8 @@ Component {
             visible: false;
 
             onEditingFinished: {
+                console.log("onEditingFinished")
+
                 textInput.visible = false;
 
                 if (item.tableCellDelegate){
@@ -67,10 +69,8 @@ Component {
 
             anchors.fill: parent;
 
-            propagateComposedEvents: true;
-
             onClicked: {
-                mouse.accepted = false;
+                mouse.accepted = true;
             }
 
             onDoubleClicked: {

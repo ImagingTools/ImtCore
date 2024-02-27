@@ -255,58 +255,6 @@ Rectangle {
         }
     }
 
-    MouseArea {
-        id: ma;
-
-        anchors.fill: parent;
-        hoverEnabled: true;
-
-//        preventStealing: false;
-//        propagateComposedEvents: true;
-
-        acceptedButtons: Qt.LeftButton | Qt.RightButton;
-
-        Timer{
-            id:timer
-            interval: 300
-            onTriggered: {
-                ma.clickCount = 0;
-            }
-        }
-
-        property int clickCount: 0;
-
-        onClicked: {
-            tableDelegateContainer.forceActiveFocus();
-
-            clickCount++;
-
-            if (ma.clickCount == 1){
-                console.log("onClicked2", model["Id"])
-                if (mouse.button === Qt.RightButton) {
-                    tableDelegateContainer.rightButtonMouseClicked(this.mouseX, this.mouseY);
-                }
-                tableDelegateContainer.clicked();
-
-                timer.start();
-            }
-
-            if (ma.clickCount == 2){
-                console.log("onDoubleClicked2")
-                if (mouse.button === Qt.RightButton) {
-                    return;
-                }
-
-                tableDelegateContainer.doubleClicked(this.mouseX, this.mouseY);
-
-                ma.clickCount = 0;
-                timer.stop();
-            }
-
-            mouse.accepted = false;
-        }
-    }
-
     ListView {
         id: dataList;
 
@@ -342,6 +290,55 @@ Rectangle {
                 tableDelegateContainer.tableItem.hoverEnabled && ma.containsMouse ? tableDelegateContainer.hoverOpacity :
                 tableDelegateContainer.tableItem.enableAlternating && model.index % 2 === 0 ? tableDelegateContainer.tableItem.alternatingOpacity: 0;
 
-        visible: !tableDelegateContainer.selected;
+        visible: !tableDelegateContainer.selected && tableDelegateContainer.tableItem.selectable;
+    }
+
+    MouseArea {
+        id: ma;
+
+        anchors.fill: parent;
+        hoverEnabled: true;
+
+        propagateComposedEvents: true;
+
+        acceptedButtons: Qt.LeftButton | Qt.RightButton;
+
+        Timer{
+            id:timer
+            interval: 300
+            onTriggered: {
+                ma.clickCount = 0;
+            }
+        }
+
+        property int clickCount: 0;
+
+        onClicked: {
+            clickCount++;
+
+            if (ma.clickCount == 1){
+                console.log("onClicked2", model["Id"])
+                if (mouse.button === Qt.RightButton) {
+                    tableDelegateContainer.rightButtonMouseClicked(this.mouseX, this.mouseY);
+                }
+                tableDelegateContainer.clicked();
+
+                timer.start();
+            }
+
+            if (ma.clickCount == 2){
+                console.log("onDoubleClicked2")
+                if (mouse.button === Qt.RightButton) {
+                    return;
+                }
+
+                tableDelegateContainer.doubleClicked(this.mouseX, this.mouseY);
+
+                ma.clickCount = 0;
+                timer.stop();
+            }
+
+            mouse.accepted = false;
+        }
     }
 }
