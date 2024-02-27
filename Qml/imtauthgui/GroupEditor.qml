@@ -16,16 +16,6 @@ ViewBase {
     property TreeItemModel groupsModel: TreeItemModel {}
     property TreeItemModel copiedGroupsModel: TreeItemModel {}
 
-    onGroupsModelChanged: {
-        console.log("onGroupsModelChanged", groupsModel.toJSON());
-
-//        updateGroupsModel();
-    }
-
-//    Component.onCompleted: {
-//        groupsProvider.updateModel();
-//    }
-
     function updateGroupsModel(){
         copiedGroupsModel.Copy(groupsModel);
 
@@ -58,7 +48,6 @@ ViewBase {
             removedCount++;
         }
 
-        console.log("copiedGroupsModel", copiedGroupsModel.toJSON());
 
         parentGroupsTable.elements = userGroupEditorContainer.copiedGroupsModel;
     }
@@ -94,54 +83,6 @@ ViewBase {
         }
     }
 
-//    CollectionDataProvider {
-//        id: groupsProvider;
-
-//        commandId: "Groups";
-//        fields: ["Id", "Name", "Description", "ParentGroups", "Roles"];
-
-//        property bool compl: false;
-
-//        onModelUpdated: {
-//            if (userGroupEditorContainer.groupsModel != null){
-//                let objectId = userGroupEditorContainer.model.GetData("Id");
-//                let removedIndexes = []
-
-//                let childrenIds = []
-//                userGroupEditorContainer.getAllChildrenGroups(objectId, childrenIds);
-
-//                // Get all parent ID-s
-//                let parentIds = []
-//                if (userGroupEditorContainer.model.ContainsKey("ParentGroups")){
-//                    let parentGroups = userGroupEditorContainer.model.GetData("ParentGroups")
-//                    let parentGroupIds = parentGroups.split(';')
-//                    for (let j = 0; j < parentGroupIds.length; j++){
-//                        userGroupEditorContainer.getAllParentGroupIds(parentGroupIds[j], parentIds);
-//                    }
-//                }
-
-//                for (let i = 0; i < userGroupEditorContainer.groupsModel.GetItemsCount(); i++){
-//                    let id = userGroupEditorContainer.groupsModel.GetData("Id", i);
-//                    if (id === objectId || childrenIds.includes(id)){
-//                        removedIndexes.push(i);
-//                    }
-//                }
-
-//                let removedCount = 0
-//                for (let i = 0; i < removedIndexes.length; i++){
-//                    userGroupEditorContainer.groupsModel.RemoveItem(removedIndexes[i] - removedCount);
-//                    removedCount++;
-//                }
-
-//                parentGroupsTable.elements = userGroupEditorContainer.groupsModel;
-
-//                compl = true;
-
-//                userGroupEditorContainer.doUpdateGui();
-//            }
-//        }
-//    }
-
     function updateGui(){
         console.log("GroupEditor updateGui");
 
@@ -167,6 +108,10 @@ ViewBase {
             }
         }
 
+        if (!parentGroupsTable.elements){
+            updateGroupsModel();
+        }
+
         parentGroupsTable.uncheckAll();
         if (parentGroupsTable.elements){
             for (let i = 0; i < parentGroupsTable.elements.GetItemsCount(); i++){
@@ -190,6 +135,10 @@ ViewBase {
         }
 
         userGroupEditorContainer.model.SetData("ParentGroups", selectedGroupIds.join(';'));
+
+        if (!parentGroupsTable.elements){
+            updateGroupsModel();
+        }
     }
 
     Component{
@@ -273,17 +222,6 @@ ViewBase {
                     userGroupEditorContainer.doUpdateModel();
                 }
 
-                Loader{
-                    id: inputDecoratorLoader3;
-
-                    sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-                    onLoaded: {
-                        if(inputDecoratorLoader3.item){
-                            inputDecoratorLoader3.item.rootItem = nameInput;
-                        }
-                    }
-                }
-
                 KeyNavigation.tab: descriptionInput;
             }
 
@@ -312,17 +250,6 @@ ViewBase {
                 }
 
                 KeyNavigation.tab: nameInput;
-
-                Loader{
-                    id: inputDecoratorLoader4;
-
-                    sourceComponent: Style.textFieldDecorator !==undefined ? Style.textFieldDecorator: emptyDecorator;
-                    onLoaded: {
-                        if(inputDecoratorLoader4.item){
-//                            inputDecoratorLoader4.item.rootItem = nameInput;
-                        }
-                    }
-                }
             }
         }//Column bodyColumn
     }//columnContainer
@@ -364,9 +291,7 @@ ViewBase {
 
         checkable: true;
 
-        radius:userGroupEditorContainer.radius;
-
-        elements: userGroupEditorContainer.groupsModel;
+        radius: userGroupEditorContainer.radius;
 
         onCheckedItemsChanged: {
             userGroupEditorContainer.doUpdateModel();

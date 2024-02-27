@@ -111,7 +111,7 @@ WebSocket {
                 payload["data"] = query.GetQuery()
                 request["payload"] = payload
 
-                console.log("Id", request["id"]);
+                console.log("Id", JSON.stringify(request));
 
                 container.sendTextMessage(JSON.stringify(request))
             }

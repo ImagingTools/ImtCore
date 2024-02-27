@@ -190,8 +190,24 @@ StyleComponents {
     }
 
     function getThemeColor(colorType, colorKey, themeType){
-        var colorPalette = themeType.GetData("Style").GetData(colorType).GetData(colorKey);
-        return themeType.GetData("ColorPalette").GetData(colorPalette);
+        if (themeType.ContainsKey("Style")){
+            let styleModel = themeType.GetData("Style");
+            if (styleModel.ContainsKey(colorType)){
+                let typeModel = styleModel.GetData(colorType);
+                if (typeModel.ContainsKey(colorKey)){
+                    let colorPalette = typeModel.GetData(colorKey);
+
+                    if (themeType.ContainsKey("ColorPalette")){
+                        let themeModel = themeType.GetData("ColorPalette")
+                        if (themeModel.ContainsKey(colorPalette)){
+                            return themeModel.GetData(colorPalette)
+                        }
+                    }
+                }
+            }
+        }
+
+        return "";
     }
 
     function setDecorators(sourceDecorators){
@@ -372,6 +388,7 @@ StyleComponents {
             styleContainer.errorTextColor = styleContainer.getThemeColor("ActiveColors", "ErrorText", dataSource);
 
             styleContainer.shadowColor = styleContainer.getThemeColor("ActiveColors", "Shadow", dataSource);
+            console.log("shadowColor", styleContainer.shadowColor);
         }
     }
 

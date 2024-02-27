@@ -675,10 +675,6 @@ Item {
                 if (singleDocumentData.undoManager){
                     Events.unSubscribeEvent(documentId + "CommandActivated", singleDocumentData.undoManager.commandHandle);
                 }
-
-//                for (let i = 0; i < singleDocumentData.views.length; i++){
-//                    singleDocumentData.views[i].removed = true;
-//                }
             }
 
             onDocumentIdChanged: {

@@ -12,6 +12,10 @@ CollectionDataProvider {
     commandId: "Groups";
 
     sortByField: "Name";
+
+    onCollectionModelChanged: {
+        console.log("CachedGroupCollection onCollectionModelChanged", collectionModel.toJSON());
+    }
 }
 
 

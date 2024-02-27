@@ -41,13 +41,18 @@ DocumentCollectionViewDelegate {
             title: container.removeDialogTitle;
             onFinished: {
                 if (buttonId == Enums.yes){
-                    let itemIds = container.collectionViewBase.getSelectedIds();
-                    let itemNames = container.collectionViewBase.getSelectedNames();
+                    let elementsModel = container.collectionView.table.elements;
+                    if (!elementsModel){
+                        return;
+                    }
 
-                    for (let i = 0; i < itemIds.length; i++){
-                        let itemId = itemIds[i];
+                    let indexes = container.collectionView.table.getSelectedIndexes();
+                    if (indexes.length > 0){
+                        let index = indexes[0];
 
-                        container.removeGqlModel.updateModel(itemId);
+                        let itemId = elementsModel.GetData("Roles").GetData("Id", index);
+
+                        container.collectionView.removeElement(index)
                     }
                 }
 

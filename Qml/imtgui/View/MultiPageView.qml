@@ -164,6 +164,8 @@ Item {
         anchors.leftMargin: root.mainMargin;
         anchors.rightMargin: root.mainMargin;
 
+        color: Style.backgroundColor;
+
         z: 5;
 
         Repeater {

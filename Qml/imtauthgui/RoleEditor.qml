@@ -20,11 +20,44 @@ ViewBase {
         color: Style.backgroundColor;
     }
 
-//    property bool completed: rolesProvider.compl;
+    function updateRolesModel(){
+        copiedRolesModel.Copy(rolesModel);
 
-//    Component.onCompleted: {
-//        rolesProvider.updateModel();
-//    }
+        let documentId = roleEditorContainer.model.GetData("Id");
+
+        // Get all children ID-s
+        let childrenIds = []
+        roleEditorContainer.getAllChildrenRoleIds(documentId, copiedRolesModel, childrenIds);
+
+        // Get all parent ID-s
+        let parentIds = []
+        if (roleEditorContainer.model.ContainsKey("ParentRoles")){
+            let parentRoles = roleEditorContainer.model.GetData("ParentRoles")
+            let parentRolesIds = parentRoles.split(';')
+            for (let j = 0; j < parentRolesIds.length; j++){
+                roleEditorContainer.getAllParentRoleIds(parentRolesIds[j], copiedRolesModel, parentIds);
+            }
+        }
+
+        // Indexes for deleting
+        let removedIndexes = []
+        for (let i = 0; i < copiedRolesModel.GetItemsCount(); i++){
+            let id = copiedRolesModel.GetData("Id", i);
+            console.log("id", id);
+
+            if (id === documentId || childrenIds.includes(id)){
+                removedIndexes.push(i);
+            }
+        }
+
+        let removedCount = 0
+        for (let i = 0; i < removedIndexes.length; i++){
+            copiedRolesModel.RemoveItem(removedIndexes[i] - removedCount);
+            removedCount++;
+        }
+
+        parentRolesTable.elements = copiedRolesModel;
+    }
 
     function getAllParentRoleIds(roleId, rolesModel, retVal){
         for (let i = 0; i < rolesModel.GetItemsCount(); i++){
@@ -56,59 +89,6 @@ ViewBase {
         }
     }
 
-//    CollectionDataProvider {
-//        id: rolesProvider;
-
-//        commandId: "Roles";
-//        fields: ["Id", "Name", "Description"];
-
-//        property bool compl: false;
-
-//        onModelUpdated: {
-//            if (rolesProvider.collectionModel != null){
-//                if (rolesProvider.collectionModel.ContainsKey("Roles")){
-//                    let documentId = roleEditorContainer.model.GetData("Id");
-//                    let rolesModel = rolesProvider.collectionModel.GetData("Roles")
-
-//                    // Get all children ID-s
-//                    let childrenIds = []
-//                    roleEditorContainer.getAllChildrenRoleIds(documentId, rolesModel, childrenIds);
-
-//                    // Get all parent ID-s
-//                    let parentIds = []
-//                    if (roleEditorContainer.model.ContainsKey("ParentRoles")){
-//                        let parentRoles = roleEditorContainer.model.GetData("ParentRoles")
-//                        let parentRolesIds = parentRoles.split(';')
-//                        for (let j = 0; j < parentRolesIds.length; j++){
-//                            roleEditorContainer.getAllParentRoleIds(parentRolesIds[j], rolesModel, parentIds);
-//                        }
-//                    }
-
-//                    // Indexes for deleting
-//                    let removedIndexes = []
-//                    for (let i = 0; i < rolesModel.GetItemsCount(); i++){
-//                        let id = rolesModel.GetData("Id", i);
-//                        if (id === documentId || childrenIds.includes(id)){
-//                            removedIndexes.push(i);
-//                        }
-//                    }
-
-//                    let removedCount = 0
-//                    for (let i = 0; i < removedIndexes.length; i++){
-//                        rolesModel.RemoveItem(removedIndexes[i] - removedCount);
-//                        removedCount++;
-//                    }
-
-//                    parentRolesTable.elements = rolesModel;
-
-//                    rolesProvider.compl = true;
-
-//                    roleEditorContainer.doUpdateGui();
-//                }
-//            }
-//        }
-//    }
-
     Component{
         id: emptyDecorator;
         Item{
@@ -123,7 +103,7 @@ ViewBase {
     }
 
     function updateGui(){
-        console.log("RoleEditor updateGui", model.toJSON());
+        console.log("RoleEditor updateGui");
 
         if (roleEditorContainer.model.ContainsKey("RoleId")){
             roleIdInput.text = model.GetData("RoleId");
@@ -154,6 +134,10 @@ ViewBase {
             }
         }
 
+        if (!parentRolesTable.elements){
+            updateRolesModel();
+        }
+
         parentRolesTable.uncheckAll();
 
         if (parentRolesTable.elements){
@@ -164,13 +148,9 @@ ViewBase {
                 }
             }
         }
-
-        console.log("RoleEditor finish updateGui");
     }
 
     function updateModel(){
-        console.log("RoleEditor updateModel", model.toJSON());
-
         roleEditorContainer.model.SetData("RoleId", roleIdInput.text);
         roleEditorContainer.model.SetData("Name", roleNameInput.text);
         roleEditorContainer.model.SetData("Description", descriptionInput.text);
@@ -183,6 +163,10 @@ ViewBase {
         }
 
         roleEditorContainer.model.SetData("ParentRoles", selectedRoleIds.join(';'));
+
+        if (!parentRolesTable.elements){
+            updateRolesModel();
+        }
     }
 
     Item{
@@ -216,7 +200,6 @@ ViewBase {
                 id: titleRoleName;
 
                 anchors.left: parent.left;
-                //                anchors.leftMargin: 5;
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
@@ -271,7 +254,6 @@ ViewBase {
                 id: titleDescription;
 
                 anchors.left: parent.left;
-                //                anchors.leftMargin: 5;
 
                 color: Style.textColor;
                 font.family: Style.fontFamily;
@@ -342,8 +324,6 @@ ViewBase {
         width: 400;
         checkable: true;
         radius: roleEditorContainer.radius;
-
-        elements: roleEditorContainer.rolesModel;
 
         onCheckedItemsChanged: {
             roleEditorContainer.doUpdateModel();

@@ -31,7 +31,7 @@ DecoratorBase {
             Timer {
                 id: timer;
 
-                interval: 300;
+                interval: 200;
 
                 onTriggered: {
                     filterPanelDecorator.baseElement.filterChanged("TextFilter", tfc.text);
@@ -40,6 +40,8 @@ DecoratorBase {
 
             ToolButton {
                 id: iconClear;
+
+                z: tfc.z + 1;
 
                 anchors.right: tfc.right;
                 anchors.rightMargin: Style.margin;
@@ -53,6 +55,8 @@ DecoratorBase {
                 iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
                 onClicked: {
+                    console.log("iconClear onClicked");
+
                     tfc.text = "";
                 }
             }

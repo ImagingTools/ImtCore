@@ -8,7 +8,6 @@ ButtonDecorator{
     color: baseElement && baseElement.hovered  ? Style.buttonHoverColor : "transparent";
     border.width: 0;
 
-
     icon.width: width;
 }
 

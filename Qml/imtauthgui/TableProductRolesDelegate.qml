@@ -44,7 +44,7 @@ Item {
     Rectangle {
         id: body;
 
-        width: productRolesDelegate.width - 10;
+        width: productRolesDelegate.width;
         height: 30;
 
         color: Style.alternateBaseColor;
@@ -107,13 +107,15 @@ Item {
 
         anchors.top: body.bottom;
 
-        color: "transparent";
+        color: Style.baseColor;
 
         width: body.width;
         height: rolesColumn.height + 2;
 
         border.color: Style.imagingToolsGradient2;
         border.width: 1;
+
+        visible: rolesRepeater.count > 0;
 
         Column {
             id: rolesColumn;

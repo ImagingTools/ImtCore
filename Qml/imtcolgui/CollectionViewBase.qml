@@ -172,7 +172,8 @@ ViewBase {
             anchors.top: parent.top;
 
             anchors.bottom: parent.bottom;
-            anchors.bottomMargin: Style.size_mainMargin !== undefined ? Style.size_mainMargin + paginationObj.visible * paginationObj.height : paginationObj.visible * paginationObj.height;
+//            anchors.bottomMargin: Style.size_mainMargin !== undefined ? Style.size_mainMargin + paginationObj.visible * paginationObj.height : paginationObj.visible * paginationObj.height;
+//            anchors.bottomMargin: Style.size_mainMargin;
 
             hasFilter: collectionViewBaseContainer.hasFilter;
             hasSort: collectionViewBaseContainer.hasSort;
@@ -232,7 +233,7 @@ ViewBase {
 
             anchors.top: parent.top;
             anchors.right: parent.right;
-            anchors.rightMargin: 5;
+//            anchors.rightMargin: 5;
             anchors.bottom: parent.bottom;
 
             width: collectionViewBaseContainer.hasFilter ? 35 : 0;

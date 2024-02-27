@@ -10,6 +10,13 @@ import imtdocgui 1.0
 RemoteCollectionView {
     id: roleCollectionViewContainer;
 
+    anchors.left: parent.left;
+    anchors.leftMargin: Style.size_mainMargin;
+    anchors.right: parent.right;
+    anchors.rightMargin: Style.size_mainMargin;
+    anchors.top: parent.top;
+    anchors.topMargin: Style.size_mainMargin;
+
     hasFilter: false;
     hasPagination: false;
 
@@ -18,6 +25,8 @@ RemoteCollectionView {
     property bool newCommandIsEnabled: true;
 
     table.showHeaders: false;
+
+    table.backgroundElementsColor: Style.backgroundColor;
     filterMenuVisible: false;
 
     Component {

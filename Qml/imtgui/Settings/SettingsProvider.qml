@@ -371,6 +371,8 @@ QtObject {
                     if (dataModelLocal.ContainsKey("GetSettings")){
                         dataModelLocal = dataModelLocal.GetData("GetSettings");
 
+                        console.log("GetSettings", dataModelLocal.toJSON());
+
                         container.serverModel = dataModelLocal;
                     }
                 }
