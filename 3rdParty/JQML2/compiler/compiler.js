@@ -349,40 +349,57 @@ function preCompile(className, meta, on, instructions){
             instructions.className = pathName.join('_')
         } else {
             let find = false
-            for(let importObj of instructions.compiledFile.imports){
-                pathName = []
-                pathName.push(importObj.path)
-                let fileName = instructions.fileName.replaceAll('/','_').replaceAll('\\','_').split('_')
-                fileName.pop()
-                fileName = fileName.join('/')
-
-                let _pathName = path.relative(path.resolve(__dirname, source), path.resolve(fileName, pathName.join('/'))).replaceAll('/','_').replaceAll('\\','_')
-                if(classList.indexOf(_pathName + '_' + className) >= 0){
-                    instructions.className = _pathName + '_' + className
-                    find = true
-                    break
-                } else {
-                    // let test1 = path.resolve(__dirname, source)
-                    // let test2 = pathName.join('/')
-                    // let test3 = path.resolve(path.resolve(__dirname, source), pathName.join('/'))
-                    _pathName = path.relative(path.resolve(__dirname, source), path.resolve(path.resolve(__dirname, source), pathName.join('/'))).replaceAll('/','_').replaceAll('\\','_')
-                    if(classList.indexOf(_pathName + '_' + className) >= 0){
-                        instructions.className = _pathName + '_' + className
-                        find = true
-                        break
-                    }
+            let _classList = []
+            for(let _className of classList){
+                if(_className.split('_').pop() === className){
+                    _classList.push(_className)
                 }
             }
+
+            for(let importObj of instructions.compiledFile.imports){
+                for(_className of _classList)
+                if(_className.indexOf(importObj.path) >= 0){
+                    instructions.className = _className
+                    find = true
+                }
+            }
+            // for(let importObj of instructions.compiledFile.imports){
+            //     pathName = []
+            //     pathName.push(importObj.path)
+            //     let fileName = instructions.fileName.replaceAll('/','_').replaceAll('\\','_').split('_')
+            //     fileName.pop()
+            //     fileName = fileName.join('/')
+
+            //     let _pathName = path.relative(path.resolve(__dirname, source), path.resolve(fileName, pathName.join('/'))).replaceAll('/','_').replaceAll('\\','_')
+            //     if(classList.indexOf(_pathName + '_' + className) >= 0){
+            //         instructions.className = _pathName + '_' + className
+            //         find = true
+            //         break
+            //     } else {
+            //         // let test1 = path.resolve(__dirname, source)
+            //         // let test2 = pathName.join('/')
+            //         // let test3 = path.resolve(path.resolve(__dirname, source), pathName.join('/'))
+            //         _pathName = path.relative(path.resolve(__dirname, source), path.resolve(path.resolve(__dirname, source), pathName.join('/'))).replaceAll('/','_').replaceAll('\\','_')
+            //         if(classList.indexOf(_pathName + '_' + className) >= 0){
+            //             instructions.className = _pathName + '_' + className
+            //             find = true
+            //             break
+            //         }
+            //     }
+            // }
             if(!find){
-                // console.log(`Warning: class ${className} not found into file ${instructions.fileName}`)
-                for(let _className of classList){
-                    if(_className === className || _className.split('_').pop() === className){
+                console.log(`Warning: class ${className} not found into file ${instructions.fileName}`)
+                for(let _className of _classList){
+                    if(_className === className){
                         instructions.className = _className
                         find = true
                         break
                     }
                 }
-                if(!find) throw `Error: class ${className} not found into file ${instructions.fileName}`
+                if(!find){
+                    instructions.className = _classList[0]
+                    // throw `Error: class ${className} not found into file ${instructions.fileName}`
+                }
             } 
             // instructions.className = ''
         }
