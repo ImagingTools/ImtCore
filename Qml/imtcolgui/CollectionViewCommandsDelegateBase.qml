@@ -41,6 +41,8 @@ Item {
 
     onCollectionViewChanged: {
         if (collectionView){
+            elementsConnections.target = collectionView.table;
+
             collectionView.selectionChanged.connect(internal.onSelectionChanged);
             if (collectionView.commandsController){
                 collectionView.commandsController.commandsModelChanged.connect(internal.onCommandsModelChanged);
@@ -57,6 +59,15 @@ Item {
 
         function onCommandsModelChanged(){
             container.setupContextMenu();
+        }
+    }
+
+    Connections {
+        id: elementsConnections;
+
+        function onElementsChanged(){
+            let indexes = collectionView.table.getSelectedIndexes();
+            container.updateItemSelection(indexes);
         }
     }
 
@@ -93,7 +104,6 @@ Item {
     }
 
     function onEdit(){
-        console.log("onEdit");
     }
 
     function onRemove(){
@@ -170,7 +180,7 @@ Item {
     Component {
         id: setDescriptionDialog;
         InputDialog {
-            title: qsTr("Set description");
+            title: qsTr("Set Description");
             onFinished: {
                 if (buttonId == Enums.ok){
                     let indexes = container.collectionView.table.getSelectedIndexes();
@@ -186,7 +196,7 @@ Item {
     Component {
         id: renameDialog;
         InputDialog {
-            title: qsTr("Rename document");
+            title: qsTr("Rename Document");
             onFinished: {
                 if (buttonId == Enums.ok){
                     let indexes = container.collectionView.table.getSelectedIndexes();

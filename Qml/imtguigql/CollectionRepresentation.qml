@@ -22,6 +22,10 @@ Item {
     signal renamed(string objectId, string newName);
     signal descriptionSetted(string objectId, string description);
 
+    property alias removeGqlModel: removeModel;
+    property alias objectViewGqlModel: objectViewModel;
+    property alias headersGqlModel: headersModel;
+
     signal beginUpdate();
     signal endUpdate();
 
@@ -59,7 +63,7 @@ Item {
     }
 
     function updateObjectEditorInfo(){
-        objectViewGqlModel.getObjectView();
+        objectViewModel.getObjectView();
     }
 
     function updateHeaders(){
@@ -73,7 +77,7 @@ Item {
             return;
         }
 
-        headersGqlModel.getHeaders();
+        headersModel.getHeaders();
     }
 
     function updateElements(count, offset, filterModel){
@@ -377,7 +381,7 @@ Item {
     }
 
     GqlModel {
-        id: headersGqlModel;
+        id: headersModel;
 
         function getHeaders() {
             var query = Gql.GqlRequest("query", root.collectionId + "Info");
@@ -570,7 +574,7 @@ Item {
     }
 
     GqlModel {
-        id: objectViewGqlModel;
+        id: objectViewModel;
 
         function getObjectView(){
             console.log( "CollectionView objectView");

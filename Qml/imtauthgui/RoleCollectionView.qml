@@ -29,6 +29,24 @@ RemoteCollectionView {
     table.backgroundElementsColor: Style.backgroundColor;
     filterMenuVisible: false;
 
+
+    dataController: CollectionRepresentation {
+        collectionId: roleCollectionViewContainer.collectionId;
+
+        additionalFieldIds: roleCollectionViewContainer.additionalFieldIds;
+
+        function removeElement(elementIndex){
+            if (elementIndex < 0 || elementIndex >= roleCollectionViewContainer.table.elements.GetItemsCount()){
+                console.error();
+
+                return;
+            }
+
+            let itemId = elementsModel.GetData("Roles").GetData("Id", elementIndex);
+            removeGqlModel.remove(itemId);
+        }
+    }
+
     Component {
         id: roleTableDelegateComp;
 
@@ -66,10 +84,6 @@ RemoteCollectionView {
                 selectedIndex = selection[0];
             }
         }
-    }
-
-    dataController: CollectionRepresentation {
-        collectionId: "Roles";
     }
 
     commandsController: CommandsRepresentationProvider {

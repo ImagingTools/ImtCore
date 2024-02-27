@@ -49,9 +49,6 @@ DocumentCollectionViewDelegate {
                     let indexes = container.collectionView.table.getSelectedIndexes();
                     if (indexes.length > 0){
                         let index = indexes[0];
-
-                        let itemId = elementsModel.GetData("Roles").GetData("Id", index);
-
                         container.collectionView.removeElement(index)
                     }
                 }
