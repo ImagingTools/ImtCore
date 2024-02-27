@@ -63,12 +63,20 @@ Component {
         MouseArea {
             id: ma;
 
+            z: textInput.z + 1;
+
             anchors.fill: parent;
 
-            hoverEnabled: true;
+            propagateComposedEvents: true;
+
+            onClicked: {
+                mouse.accepted = false;
+            }
 
             onDoubleClicked: {
                 console.log("ma onDoubleClicked");
+                mouse.accepted = true;
+
                 textInput.visible = true;
 
                 textInput.forceActiveFocus();

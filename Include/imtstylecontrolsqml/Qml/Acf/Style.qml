@@ -7,7 +7,7 @@ import imtguigql 1.0
 ClientStyle {
     id: styleContainer;
 
-    size_mainMargin: 10;
+    size_mainMargin: 11;
 
     buttonWidthMedium: 20;
 

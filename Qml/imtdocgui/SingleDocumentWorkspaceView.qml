@@ -79,7 +79,7 @@ DocumentManager {
 
         anchors.top: alertPanel.bottom;
         anchors.left: parent.left;
-        anchors.leftMargin: Style.size_mainMargin;
+        anchors.leftMargin: visible ? Style.size_mainMargin : 0;
 
         width: visible ? closeButton.width: 0;
         height: headersListView.height;

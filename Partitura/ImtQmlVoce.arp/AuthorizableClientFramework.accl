@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5191" Description="ACF"/>
+            <Version Id="1" Number="2202" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="Application" X="575" Y="125" Note=""/>
+        <Element ComponentName="AuthorizableServerSystemStatusController" X="950" Y="625" Note="Checking the connection between the client's server and the authorization server.&#10;If there is no connection, a response will be sent to the client via the main server."/>
+        <Element ComponentName="LocalSettings" X="175" Y="425" Note=""/>
+        <Element ComponentName="SystemStatusController" X="1025" Y="425" Note="Checking the client's connection to the server and to the database"/>
+    </PositionMap>
+    <EmbeddedRegistries/>
+</Acf>
