@@ -29,7 +29,17 @@ RemoteCollectionView {
         viewTypeId: "UserEditor";
     }
 
+    function onLocalizationChanged(language){
+        userCollectionViewContainer.dataController.updateHeaders();
+    }
+
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", userCollectionViewContainer.onLocalizationChanged);
+    }
+
     Component.onCompleted: {
+        Events.subscribeEvent("OnLocalizationChanged", userCollectionViewContainer.onLocalizationChanged);
         CachedRoleCollection.updateModel();
         CachedGroupCollection.updateModel();
 
