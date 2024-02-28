@@ -32,5 +32,26 @@ Rectangle {
         id: documentManager;
 
         anchors.fill: parent;
+
+        Component.onDestruction: {
+            Events.unSubscribeEvent("MenuModelChanged", documentManager.onMenuModelChanged);
+        }
+
+        Component.onCompleted: {
+            Events.subscribeEvent("MenuModelChanged", documentManager.onMenuModelChanged);
+        }
+
+        function onMenuModelChanged(model){
+            let id = multiDocPageView.startPageObj["Id"];
+            for(let i = 0; i < model.GetItemsCount(); i++){
+                let curr_id = model.GetData("Id",i);
+                let curr_name = model.GetData("Name",i);
+                if(curr_id == id){
+                    documentManager.documentsModel.setProperty(0, "Title", curr_name);
+                    break;
+                }
+            }
+        }
+
     }
 }

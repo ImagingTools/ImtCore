@@ -46,6 +46,8 @@ Rectangle {
         Events.sendEvent("ActivePageIdChanged", menuPanel.activePageId);
     }
 
+
+
     function updateVisualStatus(data){
         if (!data){
             return;
@@ -104,6 +106,9 @@ Rectangle {
 
         lvPages.model = 0;
         lvPages.model = menuPanel.model;
+
+        Events.sendEvent("MenuModelChanged", menuPanel.model);
+
     }
 
     ListView {
