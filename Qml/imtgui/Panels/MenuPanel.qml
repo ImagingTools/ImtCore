@@ -33,11 +33,13 @@ Rectangle {
     signal activePageChanged;
 
     Component.onCompleted: {
+        Events.subscribeEvent("MenuModelRequest", menuPanel.onMenuModelRequest);
         Events.subscribeEvent("ChangePage", menuPanel.changePage);
         Events.subscribeEvent("UpdatePageVisualStatus", menuPanel.updateVisualStatus);
     }
 
     Component.onDestruction: {
+        Events.unSubscribeEvent("MenuModelRequest", menuPanel.onMenuModelRequest);
         Events.unSubscribeEvent("ChangePage", menuPanel.changePage);
         Events.unSubscribeEvent("UpdatePageVisualStatus", menuPanel.updateVisualStatus);
     }
@@ -47,6 +49,9 @@ Rectangle {
     }
 
 
+    function onMenuModelRequest(ok){
+        Events.sendEvent("MenuModelChanged", menuPanel.model);
+    }
 
     function updateVisualStatus(data){
         if (!data){

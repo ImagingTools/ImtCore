@@ -26,6 +26,7 @@ Rectangle {
         }
 
         documentManager.addFixedView(startItemComp, name);
+        Events.sendEvent("MenuModelRequest", true);
     }
 
     MultiDocWorkspaceView {
@@ -39,6 +40,7 @@ Rectangle {
 
         Component.onCompleted: {
             Events.subscribeEvent("MenuModelChanged", documentManager.onMenuModelChanged);
+
         }
 
         function onMenuModelChanged(model){

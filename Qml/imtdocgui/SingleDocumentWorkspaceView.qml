@@ -27,6 +27,7 @@ DocumentManager {
         }
 
         addInitialItem(startItemComp, name);
+        Events.sendEvent("MenuModelRequest", true);
     }
 
     onDocumentAdded: {
