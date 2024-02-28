@@ -98,7 +98,17 @@ RemoteCollectionView {
         viewTypeId: "RoleEditor";
     }
 
+    function onLocalizationChanged(language){
+        roleCollectionViewContainer.dataController.updateHeaders();
+    }
+
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", roleCollectionViewContainer.onLocalizationChanged);
+    }
+
     Component.onCompleted: {
+        Events.subscribeEvent("OnLocalizationChanged", roleCollectionViewContainer.onLocalizationChanged);
         CachedRoleCollection.updateModel();
 
         let documentManager = MainDocumentManager.getDocumentManager("Administration");
