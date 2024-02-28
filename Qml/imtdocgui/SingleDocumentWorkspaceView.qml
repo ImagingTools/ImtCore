@@ -39,6 +39,26 @@ DocumentManager {
         stackView.pop();
     }
 
+    Component.onDestruction: {
+        Events.unSubscribeEvent("MenuModelChanged", documentManager.onMenuModelChanged);
+    }
+
+    Component.onCompleted: {
+        Events.subscribeEvent("MenuModelChanged", documentManager.onMenuModelChanged);
+    }
+
+    function onMenuModelChanged(model){
+        let id = documentManager.startPageObj["Id"];
+        for(let i = 0; i < model.GetItemsCount(); i++){
+            let curr_id = model.GetData("Id",i);
+            let curr_name = model.GetData("Name",i);
+            if(curr_id == id){
+                documentManager.documentsModel.setProperty(0, "Title", curr_name);
+                break;
+            }
+        }
+    }
+
     function addInitialItem(viewComp, name){
         documentsModel.append({
                                   "Uuid": UuidGenerator.generateUUID(),
