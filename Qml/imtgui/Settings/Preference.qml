@@ -50,13 +50,13 @@ Rectangle {
 
     function clearModels(){
         root.settingsModel.Clear();
-        mainPanelRepeater.model = 0;
+        //mainPanelRepeater.model = 0;
         bodyPanelRepeater.model = 0;
     }
 
     function updateGui(){
         mainPanel.selectedIndex = 0;
-        mainPanelRepeater.model = root.settingsModel;
+        //mainPanelRepeater.model = root.settingsModel;
 
         let parametersModel = root.settingsModel.GetData("Parameters", 0)
         bodyPanelRepeater.model = parametersModel
@@ -116,6 +116,7 @@ Rectangle {
                 height: contentHeight;
 
                 spacing: Style.size_mainMargin;
+                model: root.settingsModel;
 
                 delegate: ItemDelegate {
                     text: model.Name;

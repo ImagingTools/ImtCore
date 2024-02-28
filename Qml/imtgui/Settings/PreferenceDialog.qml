@@ -34,10 +34,9 @@ Dialog {
     }
 
     onLocalizationChanged: {
-        messageDialog.buttonsModel.setProperty(0, "Name", qsTr("Apply"));
-
-        let name = messageDialog.buttonsModel.get(1).Name;
-        messageDialog.buttonsModel.setProperty(1, "Name", qsTr(name));
+        messageDialog.buttonsModel.clear();
+        messageDialog.buttonsModel.append({Id: Enums.apply, Name:qsTr("Apply"), Enabled: false})
+        messageDialog.buttonsModel.append({Id: Enums.cancel, Name:qsTr("Close"), Enabled: true})
     }
 
     function updateRepresentation(){
@@ -67,7 +66,6 @@ Dialog {
     contentComp: Component {
         Preference {
             width: messageDialog.width;
-
             onModelChanged: {
                 console.log("onModelChanged");
 

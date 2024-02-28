@@ -226,7 +226,7 @@ Rectangle {
                 thumbnailDecoratorContainer.settingsObserver.registerModel(representationModel);
             }
 
-            modalDialogManager.openDialog(preferenceDialogComp, {"settingsModel": representationModel, "settingsProvider": settingsProvider });
+            modalDialogManager.openDialog(preferenceDialogComp, {"settingsModel": representationModel, "settingsProvider": thumbnailDecoratorContainer.settingsProvider });
         }
     }
 
