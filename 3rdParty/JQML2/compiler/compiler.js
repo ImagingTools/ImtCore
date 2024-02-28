@@ -1174,11 +1174,19 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
 
 
 
+    let _properties = currentInstructions.properties.slice()
+    while(_properties.length){
+        let property = _properties.shift()
 
-    for(let property of currentInstructions.properties){
         let pathName = property.name.split('.')
 
         if(pathName[0] === 'anchors' || pathName[0] === 'font') continue
+
+        if((!property.command === 'create' || (property.val && property.val.className === 'Component')) && !property.ready){
+            property.ready = true
+            _properties.push(property)
+            continue
+        }
 
         for(let i = 0; i < pathName.length; i++){
             pathName[i] = `getStatement('${pathName[i]}')`
