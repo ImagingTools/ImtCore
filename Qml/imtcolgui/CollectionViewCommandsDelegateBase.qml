@@ -66,7 +66,7 @@ Item {
         id: elementsConnections;
 
         function onElementsChanged(){
-            let indexes = collectionView.table.getSelectedIndexes();
+            let indexes = container.collectionView.table.getSelectedIndexes();
             container.updateItemSelection(indexes);
         }
     }
