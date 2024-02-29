@@ -576,7 +576,8 @@ Rectangle {
                 //shadow rectangle
                 let shadowSize = canvas.shadowSize;
                 ctx.lineWidth = 2 ;
-                ctx.fillStyle = selected ? Qt.rgba(0.2, 0.8, 0, 0.3) : Qt.rgba(0, 0, 0, 0.2);
+                // ctx.fillStyle = selected ? Qt.rgba(0.2, 0.8, 0, 0.3) : Qt.rgba(0, 0, 0, 0.2);
+                ctx.fillStyle = Qt.rgba(0, 0, 0, 0.2);
                 ctx.beginPath()
                 ctx.roundedRect(x_ + shadowSize, y_ + shadowSize, mainRecWidth, canvas.mainRec_height , canvas.radius_, canvas.radius_);
                 ctx.fill();

@@ -7,16 +7,19 @@
 // ACF includes
 #include <istd/IChangeable.h>
 
+// ImtCore includes
+#include <imtservice/IServiceConnectionInfo.h>
+
 
 namespace imtservice
 {
 
 
 /**
-	Interface for describing an service connections info.
+	Interface for describing an service connection param.
 	\ingroup Service
 */
-class IServiceConnectionParam: virtual public istd::IChangeable
+class IServiceConnectionParam: virtual public IServiceConnectionInfo
 {
 public:
 	struct IncomingConnectionParam
@@ -35,16 +38,6 @@ public:
 		}
 	};
 
-	enum ConnectionType
-	{
-		CT_INPUT,
-		CT_OUTPUT
-	};
-
-	I_DECLARE_ENUM(ConnectionType, CT_INPUT, CT_OUTPUT);
-
-	virtual ConnectionType GetConnectionType() const = 0;
-	virtual QByteArray GetServiceName() const = 0;
 	virtual QList<IncomingConnectionParam> GetIncomingConnections() const = 0;
 };
 

@@ -17,16 +17,20 @@ namespace imtservice
 // public methods
 
 CUrlConnectionParam::CUrlConnectionParam()
-	:m_connectionType(CT_INPUT)
+	: m_connectionType(CT_INPUT),
+	m_connectionStatus(CS_OK)
 {
+
 }
 
 
-CUrlConnectionParam::CUrlConnectionParam(const QByteArray& serviceName, ConnectionType connectionType, QUrl url)
+CUrlConnectionParam::CUrlConnectionParam(const QByteArray& serviceTypeName, const QByteArray &usageId, ConnectionType connectionType, QUrl url)
+	: m_connectionType(connectionType),
+	m_serviceTypeName(serviceTypeName),
+	m_usageId(usageId),
+	m_connectionStatus(CS_OK)
 {
-	m_serviceName = serviceName;
-	m_connectionType = connectionType;
-	SetUrl(url);
+	BaseClass::SetUrl(url);
 }
 
 
@@ -48,15 +52,28 @@ imtservice::IServiceConnectionParam::ConnectionType CUrlConnectionParam::GetConn
 }
 
 
-QByteArray CUrlConnectionParam::GetServiceName() const
+QByteArray CUrlConnectionParam::GetServiceTypeName() const
 {
-	return m_serviceName;
+	return m_serviceTypeName;
+}
+
+
+QByteArray CUrlConnectionParam::GetUsageId() const
+{
+	return m_usageId;
 }
 
 
 QList<imtservice::IServiceConnectionParam::IncomingConnectionParam> CUrlConnectionParam::GetIncomingConnections() const
 {
 	return m_externConnectionList;
+}
+
+
+// reimplemented (imtservice::IConnectionStatus)
+imtservice::IConnectionStatus::ConnectionStatus CUrlConnectionParam::GetConnectionStatus() const
+{
+	return m_connectionStatus;
 }
 
 
@@ -70,17 +87,34 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 
 	retVal = retVal && BaseClass::Serialize(archive);
 
-	iser::CArchiveTag serviceNameTag("ServiceName", "Service Name", iser::CArchiveTag::TT_LEAF);
-	retVal = retVal && archive.BeginTag(serviceNameTag);
-	retVal = retVal && archive.Process(m_serviceName);
-	retVal = retVal && archive.EndTag(serviceNameTag);
+	iser::CArchiveTag serviceTypeNameTag("ServiceTypeName", "Service TypeName", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(serviceTypeNameTag);
+	retVal = retVal && archive.Process(m_serviceTypeName);
+	retVal = retVal && archive.EndTag(serviceTypeNameTag);
 
-	qDebug() << "m_serviceName" << m_serviceName;
+	iser::CArchiveTag serviceUsageIdTag("UsageId", "UsageId", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(serviceUsageIdTag);
+	retVal = retVal && archive.Process(m_usageId);
+	retVal = retVal && archive.EndTag(serviceUsageIdTag);
+
+	// qDebug() << "m_serviceName" << m_serviceName;
 
 	iser::CArchiveTag connectionTypeTag("ConnectionType", "Connection Type", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(connectionTypeTag);
-	retVal = retVal && I_SERIALIZE_ENUM(ConnectionType, archive, m_connectionType);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeEnum<
+				 IServiceConnectionInfo::ConnectionType,
+				 IServiceConnectionInfo::ToString,
+				 IServiceConnectionInfo::FromString>(archive, m_connectionType);
 	retVal = retVal && archive.EndTag(connectionTypeTag);
+
+	iser::CArchiveTag connectionStatusTag("ConnectionStatus", "Connection Status", iser::CArchiveTag::TT_LEAF);
+	retVal = retVal && archive.BeginTag(connectionStatusTag);
+	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeEnum<
+				 IConnectionStatus::ConnectionStatus,
+				 IConnectionStatus::ToString,
+				 IConnectionStatus::FromString>(archive, m_connectionStatus);
+
+	retVal = retVal && archive.EndTag(connectionStatusTag);
 
 	int objectCount = m_externConnectionList.count();
 	if (!archive.IsStoring()){
@@ -142,8 +176,10 @@ bool CUrlConnectionParam::CopyFrom(const IChangeable& object, CompatibilityMode 
 
 		BaseClass::CopyFrom(object, mode);
 
-		m_serviceName = sourcePtr->m_serviceName;
+		m_serviceTypeName = sourcePtr->m_serviceTypeName;
+		m_usageId = sourcePtr->m_usageId;
 		m_connectionType = sourcePtr->m_connectionType;
+		m_connectionStatus = sourcePtr->m_connectionStatus;
 
 		m_externConnectionList.clear();
 
@@ -177,9 +213,11 @@ bool CUrlConnectionParam::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
-	m_serviceName.clear();
+	m_serviceTypeName.clear();
+	m_usageId.clear();
 	m_externConnectionList.clear();
 	m_connectionType = CT_INPUT;
+	m_connectionStatus = CS_OK;
 
 	return true;
 }

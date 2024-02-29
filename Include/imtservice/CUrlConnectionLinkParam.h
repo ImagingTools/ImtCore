@@ -3,7 +3,7 @@
 
 // ImtCore includes
 #include <imtbase/CUrlParam.h>
-#include <imtservice/IServiceConnectionParam.h>
+#include <imtservice/IServiceConnectionLinkParam.h>
 #include <imtservice/IConnectionStatus.h>
 
 
@@ -11,26 +11,23 @@ namespace imtservice
 {
 
 
-class CUrlConnectionParam:
-			public imtbase::CUrlParam,
-			public imtservice::IServiceConnectionParam,
-			public imtservice::IConnectionStatus
+class CUrlConnectionLinkParam:
+			public virtual imtservice::IServiceConnectionLinkParam,
+			public virtual imtservice::IConnectionStatus
 {
 public:
 	typedef imtbase::CUrlParam BaseClass;
 
-	CUrlConnectionParam();
-	CUrlConnectionParam(const QByteArray& serviceTypeName, const QByteArray& usageId,ConnectionType connectionType, QUrl url);
-
-	void AddExternConnection(IncomingConnectionParam IncomingConnectionParam);
+	CUrlConnectionLinkParam();
+	CUrlConnectionLinkParam(const QByteArray& serviceTypeName, const QByteArray& usageId, const QByteArray& dependantServiceConnectionId);
 
 	// reimplemented (imtservice::IServiceInfo)
 	virtual ConnectionType GetConnectionType() const override;
 	virtual QByteArray GetServiceTypeName() const override;
 	virtual QByteArray GetUsageId() const override;
 
-	// reimplemented (imtservice::IServiceConnectionParam)
-	virtual QList<IncomingConnectionParam> GetIncomingConnections() const override;
+	// reimplemented (imtservice::IServiceConnectionLinkParam)
+	virtual QByteArray GetDependantServiceConnectionId() const override;
 
 	// reimplemented (imtservice::IConnectionStatus)
 	virtual ConnectionStatus GetConnectionStatus() const override;
@@ -44,10 +41,9 @@ public:
 	virtual bool ResetData(CompatibilityMode mode = CM_WITHOUT_REFS) override;
 
 protected:
-	ConnectionType m_connectionType;
 	QByteArray m_serviceTypeName;
 	QByteArray m_usageId;
-	QList<IncomingConnectionParam> m_externConnectionList;
+	QByteArray m_dependantServiceConnectionId;
 	ConnectionStatus m_connectionStatus;
 };
 
