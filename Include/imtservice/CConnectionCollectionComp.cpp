@@ -8,6 +8,22 @@ namespace imtservice
 // public methods
 
 // reimplemented (imtservice::IConnectionCollection)
+QString CConnectionCollectionComp::GetServiceTypeName() const
+{
+	QString retVal;
+	if (m_serviceTypeName.IsValid()){
+		retVal = m_serviceTypeName->GetValue();
+	}
+
+	return retVal;
+}
+
+
+bool CConnectionCollectionComp::SetServiceTypeName(const QString& serviceTypeName) const
+{
+	return false;
+}
+
 
 const imtbase::ICollectionInfo* CConnectionCollectionComp::GetUrlList() const
 {
@@ -44,8 +60,8 @@ bool CConnectionCollectionComp::SetUrl(const QByteArray& id, const QUrl& url) co
 {
 	CUrlConnectionParam* urlConnectionParam =  dynamic_cast<CUrlConnectionParam*>(const_cast<istd::IChangeable*>(m_collection.GetObjectPtr(id)));
 	if (urlConnectionParam != nullptr){
-		for (int index = 0; index < m_connectionIds.GetCount(); index++){
-			if (id == m_connectionIds[index]){
+		for (int index = 0; index < m_connectionUsageIds.GetCount(); index++){
+			if (id == m_connectionUsageIds[index]){
 				if (index < m_connectionUrlListCompPtr.GetCount()){
 					m_connectionUrlListCompPtr[index]->SetUrl(url);
 					urlConnectionParam->SetUrl(url);
@@ -81,21 +97,21 @@ void CConnectionCollectionComp::OnComponentCreated()
 	m_collection.RegisterFactory<FactoryConnectionImpl>("ConnectionInfo");
 
 	if (
-		m_connectionIds.GetCount() == m_serviceNames.GetCount() &&
-		m_connectionIds.GetCount() == m_connectionDescriptions.GetCount() &&
-		m_connectionIds.GetCount() == m_connectionTypes.GetCount() &&
-		m_connectionIds.GetCount() == m_connectionUrlListCompPtr.GetCount()){
-		for (int index = 0; index < m_connectionIds.GetCount(); index++){
+		m_connectionUsageIds.GetCount() == m_connectionServiceTypeNames.GetCount() &&
+		m_connectionUsageIds.GetCount() == m_connectionDescriptions.GetCount() &&
+		m_connectionUsageIds.GetCount() == m_connectionTypes.GetCount() &&
+		m_connectionUsageIds.GetCount() == m_connectionUrlListCompPtr.GetCount()){
+		for (int index = 0; index < m_connectionUsageIds.GetCount(); index++){
 			IServiceConnectionParam::ConnectionType connectionType = IServiceConnectionParam::CT_INPUT;
 			if (m_connectionTypes[index] == 1){
 				connectionType = IServiceConnectionParam::CT_OUTPUT;
 			}
-			QByteArray serviceName = m_serviceNames[index];
+			QByteArray serviceTypeName = m_connectionServiceTypeNames[index];
 			QUrl url = m_connectionUrlListCompPtr[index]->GetUrl();
-			CUrlConnectionParam urlConnectionParam(serviceName, connectionType, url);
-			QByteArray connectionId = m_connectionIds[index];
+			QByteArray connectionUsageId = m_connectionUsageIds[index];
+			CUrlConnectionParam urlConnectionParam(serviceTypeName, connectionUsageId, connectionType, url);
 			QByteArray description = m_connectionDescriptions[index];
-			m_collection.InsertNewObject("ConnectionInfo", connectionId, description, &urlConnectionParam, connectionId);
+			m_collection.InsertNewObject("ConnectionInfo", connectionUsageId, description, &urlConnectionParam, connectionUsageId);
 		}
 	}
 }

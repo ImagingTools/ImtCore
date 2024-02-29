@@ -23,14 +23,17 @@ public:
 
 	I_BEGIN_COMPONENT(CConnectionCollectionComp);
 		I_REGISTER_INTERFACE(imtservice::IConnectionCollection);
-		I_ASSIGN_MULTI_0(m_serviceNames, "ServiceNames", "Service names", true);
-		I_ASSIGN_MULTI_0(m_connectionIds, "ConnectionIds", "Service connection ids", true);
+		I_ASSIGN(m_serviceTypeName, "ServiceTypeName", "Service type name for service", true, "");
+		I_ASSIGN_MULTI_0(m_connectionServiceTypeNames, "ConnectionServiceTypeNames", "Service type name for connections", true);
+		I_ASSIGN_MULTI_0(m_connectionUsageIds, "ConnectionUsageIds", "Service connection usage ids", true);
 		I_ASSIGN_MULTI_0(m_connectionDescriptions, "ConnectionDescriptions", "Service connection descriptions", true);
 		I_ASSIGN_MULTI_0(m_connectionTypes, "ConnectionTypes", "Service connection types: 0 - input, 1 - output", true);
 		I_ASSIGN_MULTI_0(m_connectionUrlListCompPtr, "ConnectionUrlListCompPtr", "Parameter providing the server ports", true);
 	I_END_COMPONENT;
 
 	// reimplemented (imtservice::IConnectionCollection)
+	QString GetServiceTypeName() const override;
+	virtual bool SetServiceTypeName(const QString& serviceTypeName) const override;
 	virtual const imtbase::ICollectionInfo* GetUrlList() const override;
 	virtual const QUrl* GetUrl(const QByteArray& id) const override;
 	virtual const IServiceConnectionParam* GetConnectionMetaInfo(const QByteArray& id) const override;
@@ -47,8 +50,9 @@ protected:
 	virtual void OnComponentCreated() override;
 
 private:
-	I_MULTIATTR(QByteArray, m_serviceNames);
-	I_MULTIATTR(QByteArray, m_connectionIds);
+	I_ATTR(QByteArray, m_serviceTypeName);
+	I_MULTIATTR(QByteArray, m_connectionServiceTypeNames);
+	I_MULTIATTR(QByteArray, m_connectionUsageIds);
 	I_MULTIATTR(QByteArray, m_connectionDescriptions);
 	I_MULTIATTR(int, m_connectionTypes);
 	I_MULTIREF(imtbase::IUrlParam, m_connectionUrlListCompPtr);
