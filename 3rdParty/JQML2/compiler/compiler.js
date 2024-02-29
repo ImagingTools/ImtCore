@@ -10,7 +10,7 @@ for(let componentName of listComponents){
 }
 const listProperties = require('../utils/properties')
 
-const source = process.argv[2] || 'C:\\projects\\ImagingTools\\ItDevelopment\\NeoPro\\Bin\\web\\src'//'../test/qml'// 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src' // 
+const source = process.argv[2] || 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src'//'../test/qml'// 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src' // 
 if(!source) throw 'error: source not specified'
 
 function getFiles (dir, _files){
@@ -356,7 +356,9 @@ function preCompile(className, meta, on, instructions){
                 }
             }
 
-            for(let importObj of instructions.compiledFile.imports){
+            let _imports = instructions.compiledFile.imports.slice()
+            while(_imports.length){
+                let importObj = _imports.pop()
                 for(_className of _classList)
                 if(_className.indexOf(importObj.path) >= 0){
                     instructions.className = _className
@@ -721,7 +723,9 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
         case 'unary-prefix': {
             if(tree[1] === 'typeof'){
                 stat.value.push(`${tree[1]} `)
-            } else {
+            } else if(tree[1] === 'delete'){
+                stat.value.push(`${tree[1]} `)
+            } else{
                 stat.value.push(tree[1])
             }
             
