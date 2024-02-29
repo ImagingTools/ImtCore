@@ -49,6 +49,8 @@ DocumentManager {
     }
 
     function onMenuModelChanged(model){
+        if(!documentManager.startPageObj) return
+
         let id = documentManager.startPageObj["Id"];
         for(let i = 0; i < model.GetItemsCount(); i++){
             let curr_id = model.GetData("Id",i);
