@@ -2,7 +2,6 @@
 
 
 // ImtCore includes
-#include <imtbase/CUrlParam.h>
 #include <imtservice/IServiceConnectionLinkParam.h>
 #include <imtservice/IConnectionStatus.h>
 
@@ -16,8 +15,6 @@ class CUrlConnectionLinkParam:
 			public virtual imtservice::IConnectionStatus
 {
 public:
-	typedef imtbase::CUrlParam BaseClass;
-
 	CUrlConnectionLinkParam();
 	CUrlConnectionLinkParam(const QByteArray& serviceTypeName, const QByteArray& usageId, const QByteArray& dependantServiceConnectionId);
 

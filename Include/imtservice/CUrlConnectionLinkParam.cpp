@@ -50,6 +50,7 @@ QByteArray CUrlConnectionLinkParam::GetUsageId() const
 
 
 // reimplemented (imtservice::IServiceConnectionLinkParam)
+
 QByteArray CUrlConnectionLinkParam::GetDependantServiceConnectionId() const
 {
 	return m_dependantServiceConnectionId;
@@ -57,6 +58,7 @@ QByteArray CUrlConnectionLinkParam::GetDependantServiceConnectionId() const
 
 
 // reimplemented (imtservice::IConnectionStatus)
+
 imtservice::IConnectionStatus::ConnectionStatus CUrlConnectionLinkParam::GetConnectionStatus() const
 {
 	return m_connectionStatus;
@@ -64,6 +66,7 @@ imtservice::IConnectionStatus::ConnectionStatus CUrlConnectionLinkParam::GetConn
 
 
 // reimplemented (iser::ISerializable)
+
 bool CUrlConnectionLinkParam::Serialize(iser::IArchive& archive)
 {
 	istd::CChangeNotifier notifier(archive.IsStoring() ? nullptr : this);
