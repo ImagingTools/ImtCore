@@ -387,7 +387,10 @@ bool CSdlClassCodeGeneratorComp::BeginSourceClassFile(const CSdlType& sdlType)
 
 			ifStream << '\t' << "m_" << GetDecapitalizedValue(sdlField.GetId()) << '\(';
 
-			if (convertedType == QStringLiteral("int")){
+			if (convertedType == QStringLiteral("int") ||
+				convertedType == QStringLiteral("long") ||
+				convertedType == QStringLiteral("long long"))
+			{
 				ifStream << QStringLiteral("0");
 			}
 			else if (convertedType == QStringLiteral("float")){

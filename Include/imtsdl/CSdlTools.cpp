@@ -56,6 +56,28 @@ QString CSdlTools::ConvertType(const QString& sdlType, bool* isCustomPtr, bool* 
 		return QStringLiteral("int");
 	}
 
+	if (sdlType == QStringLiteral("Long")){
+		if (isCustomPtr != nullptr){
+			*isCustomPtr = false;
+		}
+		if (isComplexPtr != nullptr){
+			*isComplexPtr = false;
+		}
+
+		return QStringLiteral("long");
+	}
+
+	if (sdlType == QStringLiteral("LongLong")){
+		if (isCustomPtr != nullptr){
+			*isCustomPtr = false;
+		}
+		if (isComplexPtr != nullptr){
+			*isComplexPtr = false;
+		}
+
+		return QStringLiteral("qlonglong");
+	}
+
 	// A signed double-precision floating-point value
 	if (sdlType == QStringLiteral("Float")){
 		if (isCustomPtr != nullptr){
@@ -233,6 +255,12 @@ QString CSdlTools::GetFromVariantConversionString(const CSdlField& sdlField)
 
 	if (sdlType == QStringLiteral("Int") || sdlType == QStringLiteral("Integer")){
 		return QStringLiteral("toInt()");
+	}
+	if (sdlType == QStringLiteral("Long")){
+		return QStringLiteral("toLongLong()");
+	}
+	if (sdlType == QStringLiteral("LongLong")){
+		return QStringLiteral("toLongLong()");
 	}
 	if (sdlType == QStringLiteral("Float")){
 		return QStringLiteral("toFloat()");
