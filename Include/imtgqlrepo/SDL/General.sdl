@@ -1,15 +1,23 @@
 type FileMetaInfo {
-    Id: ID!
-    Name: String!
-    Description: String
-    Added: String
-    LastModified: String
-    ChecksumAlgorithm: String
-    ChecksumValue: String
-    Version: String
+	Id: ID!
+	Name: String!
+	Description: String!
+	Added: String!
+	LastModified: String!
+	ChecksumAlgorithm: String!
+	ChecksumValue: String!
+	Version: String!
 }
 
-type ShareRequest {
-	ItemId: ID!
-	FileMetaInfoList: [FileMetaInfo]!
+type InsertRequest {
+	FileId: ID
+	InsertionType: ID
+	FileData: ID
+	FileType: ID
+	TotalSize: LongLong!
+	FileName: String!
+	Description: String!
+	Version: String!
+	ChecksumAlgorithm: String!
+	ChecksumValue: String!
 }

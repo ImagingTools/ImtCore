@@ -15,8 +15,8 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools") IM_AUTHOR("Sergey Zastrovnyh"));
 
 I_EXPORT_COMPONENT(
-			GqlFileRepository,
-			"File-based GraphQL collection repository",
+			GqlFileRepositoryHandler,
+			"File-based GraphQL collection repository handler",
 			IM_AUTHOR("Sergey Zastrovnyh")"File Repository GQL GraphQL Collection Object Provider");
 
 

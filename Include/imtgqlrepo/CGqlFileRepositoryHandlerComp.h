@@ -19,14 +19,19 @@ namespace imtgqlrepo
 {
 
 
-class CGqlFileRepositoryComp:
+namespace sdl
+{
+	class CInsertRequest;
+}
+
+class CGqlFileRepositoryHandlerComp:
 			virtual public imtbase::IMetaInfoCreator,
 			public imtgql::CObjectCollectionControllerCompBase
 {
 public:
 	typedef imtgql::CObjectCollectionControllerCompBase BaseClass;
 
-	I_BEGIN_COMPONENT(CGqlFileRepositoryComp);
+	I_BEGIN_COMPONENT(CGqlFileRepositoryHandlerComp);
 		I_REGISTER_INTERFACE(imtbase::IMetaInfoCreator);
 		I_ASSIGN_MULTI_1(m_supportedTypeListAttrPtr, "SupportedTypeList", "The type list, supported by repository", true, "File");
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
@@ -34,6 +39,8 @@ public:
 		I_ASSIGN(m_hashGeneratorCompPtr, "HashGenerator", "The Generator, used to calc file's hash summ", false, "HashGenerator");
 		I_ASSIGN(m_tempFileManagerCompPtr, "TempFileManager", "Temporary file manager used to store uploading files", true, "TempFileManager");
 	I_END_COMPONENT;
+
+	bool CreateMetaInfoFromInsertRequest(const sdl::CInsertRequest& insertRequest, const QByteArray& typeId, idoc::MetaInfoPtr& metaInfoPtr) const;
 
 	// reimplemented(imtbase::IMetaInfoCreator)
 	virtual TypeIds GetSupportedTypeIds() const override;
@@ -64,6 +71,10 @@ protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
 	virtual void OnComponentDestroyed() override;
+
+private:
+	template<class T>
+	bool CheckAndCreateClassFromRequest(const imtgql::CGqlRequest& gqlRequest, T& object, QString& errorString) const;
 
 protected:
 	I_MULTIATTR(QByteArray, m_supportedTypeListAttrPtr);

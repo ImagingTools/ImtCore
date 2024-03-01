@@ -6,7 +6,7 @@
 #include <icomp/TMakeComponentWrap.h>
 
 // ImtCore includes
-#include <imtgqlrepo/CGqlFileRepositoryComp.h>
+#include <imtgqlrepo/CGqlFileRepositoryHandlerComp.h>
 
 
 /**
@@ -16,7 +16,7 @@ namespace ImtGqlRepoPck
 {
 
 
-typedef imtgqlrepo::CGqlFileRepositoryComp GqlFileRepository;
+typedef imtgqlrepo::CGqlFileRepositoryHandlerComp GqlFileRepositoryHandler;
 
 
 } // namespace ImtGqlRepoPck
