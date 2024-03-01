@@ -105,8 +105,13 @@ istd::IChangeable* CRoleControllerComp::CreateObject(
 	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");
 	if (inputParamPtr != nullptr){
 		objectId = inputParamPtr->GetFieldArgumentValue("Id").toByteArray();
-		productId = inputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
+//		productId = inputParamPtr->GetFieldArgumentValue("ProductId").toByteArray();
 		itemData = inputParamPtr->GetFieldArgumentValue("Item").toByteArray();
+
+		const imtgql::CGqlObject* additionalParamsPtr = inputParamPtr->GetFieldArgumentObjectPtr("addition");
+		if (additionalParamsPtr != nullptr) {
+			productId = additionalParamsPtr->GetFieldArgumentValue("ProductId").toByteArray();
+		}
 	}
 
 	if (objectId.isEmpty()){

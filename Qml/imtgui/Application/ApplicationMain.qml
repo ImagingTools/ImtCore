@@ -183,7 +183,8 @@ Item {
         }
 
         onError: {
-            Events.sendEvent("SendCriticalError", qsTr("Web Socket Error: ") + errorString);
+            Events.sendEvent("SendWarningError", qsTr("There is no connection to the subscription server. Check the Web Server Socket Url in the settings or contact your system administrator."));
+//            Events.sendEvent("SendCriticalError", qsTr("Web Socket Error: ") + errorString);
         }
     }
 
@@ -234,9 +235,6 @@ Item {
     }
 
     function setSystemStatus(status, message){
-        console.log("setSystemStatus", status, message);
-        console.log("current systemStatus", application.systemStatus);
-
         if (application.systemStatus !== status){
             application.message = message;
             application.systemStatus = status;
@@ -245,8 +243,6 @@ Item {
             Events.sendEvent("SystemStatusChanged", parameters)
 
             if (status === "NO_ERROR"){
-                thumbnailDecorator.errorPage.visible = false;
-
                 let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
                 if (loggedUserId === ""){
                     thumbnailDecorator.closeAllPages();

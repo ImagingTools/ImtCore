@@ -178,9 +178,14 @@ Rectangle {
             }
 
             onDoubleClicked: {
+                wasMoving = false;
+                isPressed = false;
+
                 if(canvas.selectedIndex >= 0){
                     canvasPage.goInside();
                 }
+
+//                canvas.selectedIndex = -1;
             }
 
             //            onWheelDeltaSignal: {

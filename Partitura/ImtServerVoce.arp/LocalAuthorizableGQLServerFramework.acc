@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5104" Description="ACF"/>
-            <Version Id="1" Number="2195" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5191" Description="ACF"/>
+            <Version Id="1" Number="2202" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -28,8 +28,14 @@
         <Element Id="GraphQlServerFramework" PackageId="ImtHttpServerVoce" ComponentId="GraphQlServerFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="FileAccessCommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Acula/files*"/>
+                    <AttributeInfo Id="BinaryDataControllers" Type="Reference[]" ExportId="BinaryDataControllers">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="BinaryDataProviders" Type="Reference[]" ExportId="BinaryDataProviders">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="FileAccessCommandId" Type="Id" ExportId="FileAccessCommandId">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="GqlContextController" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="GqlContextController"/>
@@ -37,8 +43,11 @@
                     <AttributeInfo Id="GqlRequestHandler" Type="Reference[]" ExportId="GqlRequestHandler">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="GraphQlCommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Acula/graphql"/>
+                    <AttributeInfo Id="GraphQlCommandId" Type="Id" ExportId="GraphQlCommandId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="HttpCommandIds" Type="Id[]" ExportId="HttpCommandIds">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -46,20 +55,24 @@
                     <AttributeInfo Id="LogPath" Type="Reference" ExportId="LogPath">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="RedirectToCommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Acula/Views/html/index.html?item=Pages/StartPage.qml"/>
+                    <AttributeInfo Id="RedirectToCommandId" Type="Id" ExportId="RedirectToCommandId">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UserSettingsCollection" Type="Reference" ExportId="UserSettingsCollection">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="WebCommandId" Type="Id" ExportId="">
-                        <Data IsEnabled="true" Value="Acula/files*"/>
+                    <AttributeInfo Id="WebCommandId" Type="Id" ExportId="WebCommandId">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
         </Element>
     </ElementsList>
     <EmbeddedRegistriesList/>
-    <ExportedInterfaces/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imtgql::IGqlRequestProvider" ComponentId="GraphQlServerFramework"/>
+        <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="GraphQlServerFramework"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="GraphQlServerFramework"/>
+    </ExportedInterfaces>
     <ExportedComponents/>
 </Acf>

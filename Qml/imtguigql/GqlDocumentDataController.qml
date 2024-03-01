@@ -11,6 +11,12 @@ DocumentDataController {
     property string gqlAddCommandId;
     property string gqlUpdateCommandId;
 
+    property string subscriptionCommandId;
+
+    Component.onDestruction: {
+        Events.sendEvent("UnRegisterSubscription", subscriptionClient);
+    }
+
     onError: {
         Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
     }
@@ -24,6 +30,14 @@ DocumentDataController {
     onSaved: {
         documentName = name;
         documentId = id;
+    }
+
+    onDocumentIdChanged: {
+        subscriptionClient.subscriptionId = documentId;
+    }
+
+    onHasRemoteChangesChanged: {
+        console.log("onHasRemoteChangesChanged", hasRemoteChanges);
     }
 
     function getDocumentName(){
@@ -48,6 +62,49 @@ DocumentDataController {
     function getAdditionalInputParams(){
         let obj = {}
         return obj;
+    }
+
+    property SubscriptionClient subscriptionClient: SubscriptionClient {
+        property bool ok: container.subscriptionCommandId !== "" && container.documentId !== "";
+        onOkChanged: {
+            if (ok){
+                console.log("Document RegisterSubscription", container.subscriptionCommandId, container.documentId);
+
+                let subscriptionRequestId = container.subscriptionCommandId;
+                var query = Gql.GqlRequest("subscription", subscriptionRequestId);
+                var queryFields = Gql.GqlObject("notification");
+                queryFields.InsertField("Id");
+                query.AddField(queryFields);
+
+                Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient});
+            }
+        }
+
+        onStateChanged: {
+            console.log("Document SubscriptionClient onStateChanged", state);
+
+            if (state === "Ready"){
+                console.log("subscriptionClient", subscriptionClient.toJSON());
+                console.log("container.documentId", container.documentId);
+
+                container.hasRemoteChanges = true;
+
+//                if (subscriptionClient.ContainsKey("data")){
+//                    let dataModelLocal = subscriptionClient.GetData("data")
+//                    if (dataModelLocal.ContainsKey("token")){
+//                        let accessToken = dataModelLocal.GetData("token");
+//                        Events.sendEvent("GetToken", function (token){
+//                            if (String(token) == String(accessToken)){
+//                                root.doUpdateGui();
+//                            }
+//                            else{
+//                                root.hasRemoteChanges = true;
+//                            }
+//                        });
+//                    }
+//                }
+            }
+        }
     }
 
     property GqlModel gqlUpdateModel: GqlModel {

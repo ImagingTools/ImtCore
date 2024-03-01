@@ -9,6 +9,8 @@ QtObject {
     property string documentId;
     property string documentName;
 
+    property bool hasRemoteChanges: false;
+
     signal saved(string id, string name);
     signal error(string message, string type);
 

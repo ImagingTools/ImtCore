@@ -36,7 +36,8 @@ RemoteCollectionView {
         additionalFieldIds: roleCollectionViewContainer.additionalFieldIds;
 
         function removeElement(elementIndex){
-            if (elementIndex < 0 || elementIndex >= roleCollectionViewContainer.table.elements.GetItemsCount()){
+            console.log("Roles removeElement", elementIndex);
+            if (elementIndex < 0){
                 console.error();
 
                 return;

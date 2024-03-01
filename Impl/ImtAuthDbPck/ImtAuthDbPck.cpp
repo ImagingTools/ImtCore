@@ -25,9 +25,19 @@ I_EXPORT_COMPONENT(
 			"SQL User Delegate");
 
 I_EXPORT_COMPONENT(
+			SqliteUserDatabaseDelegate,
+			"User object delegate for SQLite table",
+			"SQL SQLite User Delegate");
+
+I_EXPORT_COMPONENT(
 			UserGroupDatabaseDelegate,
 			"User group object delegate for SQL table",
 			"SQL User Group Delegate");
+
+I_EXPORT_COMPONENT(
+			SqliteUserGroupDatabaseDelegate,
+			"User group object delegate for SQLite table",
+			"SQL SQLite User Group Delegate");
 
 I_EXPORT_COMPONENT(
 			UsersSessionsDatabaseDelegate,
@@ -48,6 +58,16 @@ I_EXPORT_COMPONENT(
 			RemoteSuperuserProvider,
 			"Remote Superuser provider",
 			"Remote Puma SQL User su Superuser SuperUser admin");
+
+I_EXPORT_COMPONENT(
+			SqlJsonRoleDatabaseDelegate,
+			"Role object json delegate for SQL table",
+			"SQL JSON Role Delegate");
+
+I_EXPORT_COMPONENT(
+			SqliteJsonRoleDatabaseDelegate,
+			"Role object json delegate for SQLite table",
+			"SQL SQLite JSON Role Delegate");
 
 
 } // namespace ImtAuthDbPck

@@ -180,6 +180,8 @@ bool CGqlSubscriberControllerCompBase::SetAllSubscriptions(const QByteArray& sub
 		return false;
 	}
 
+	qDebug() << "SetAllSubscriptions" << subscriptionId << data;
+	qDebug() << "m_registeredSubscribers " << m_registeredSubscribers.count();
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequestPtr = requestNetworks.networkRequests[id];

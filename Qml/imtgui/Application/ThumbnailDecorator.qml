@@ -85,6 +85,7 @@ Rectangle {
     }
 
     function closeAllPages(){
+        serverNoConnectionView.visible = false;
         authorizationPage.visible = false;
         superuserPasswordPage.visible = false;
         thumbnailDecoratorContainer.loadingPage.visible = false;

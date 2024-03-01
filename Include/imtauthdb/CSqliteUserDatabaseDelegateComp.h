@@ -1,0 +1,50 @@
+#pragma once
+
+
+// ImtCore includes
+#include <imtdb/CSqliteJsonDatabaseDelegateComp.h>
+
+
+namespace imtauthdb
+{
+
+
+class CSqliteUserDatabaseDelegateComp: public imtdb::CSqliteJsonDatabaseDelegateComp
+{
+public:
+	typedef imtdb::CSqliteJsonDatabaseDelegateComp BaseClass;
+
+	I_BEGIN_COMPONENT(CSqliteUserDatabaseDelegateComp)
+		I_ASSIGN(m_userGroupDatabaseDelegateCompPtr, "UserGroupDatabaseSqlDelegate", "User group database sql delegate", true, "UserGroupDatabaseSqlDelegate");
+		I_ASSIGN(m_userGroupCollectionCompPtr, "UserGroupCollection", "User group collection", true, "UserGroupCollection");
+	I_END_COMPONENT
+
+	// reimplemented (imtdb::ISqlDatabaseObjectDelegate)
+	virtual NewObjectQuery CreateNewObjectQuery(
+				const QByteArray& typeId,
+				const QByteArray& proposedObjectId,
+				const QString& objectName,
+				const QString& objectDescription,
+				const istd::IChangeable* valuePtr,
+				const imtbase::IOperationContext* operationContextPtr) const override;
+	virtual QByteArray CreateUpdateObjectQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const istd::IChangeable& object,
+				const imtbase::IOperationContext* operationContextPtr,
+				bool useExternDelegate = true) const override;
+	virtual QByteArray CreateDeleteObjectQuery(
+				const imtbase::IObjectCollection& collection,
+				const QByteArray& objectId,
+				const imtbase::IOperationContext* operationContextPtr) const override;
+	virtual bool SetObjectMetaInfoFromRecord(const QSqlRecord& record, idoc::IDocumentMetaInfo& metaInfo) const override;
+
+private:
+	I_REF(imtdb::ISqlDatabaseObjectDelegate, m_userGroupDatabaseDelegateCompPtr);
+	I_REF(imtbase::IObjectCollection, m_userGroupCollectionCompPtr);
+};
+
+
+} // namespace imtauthdb
+
+

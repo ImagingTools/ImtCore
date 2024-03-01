@@ -52,8 +52,6 @@ DocumentCollectionViewDelegate {
                         container.collectionView.removeElement(index)
                     }
                 }
-
-                container.tableData.forceActiveFocus();
             }
         }
     }

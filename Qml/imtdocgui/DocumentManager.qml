@@ -577,6 +577,17 @@ Item {
             property bool isDirty: false;
 
             property QtObject dataControllerConnections: QtObject {
+                function onHasRemoteChangesChanged(){
+                    console.log("singleDocumentData onHasRemoteChangesChanged");
+                    if (singleDocumentData.documentDataController){
+                        let hasRemoteChanges = singleDocumentData.documentDataController.hasRemoteChanges;
+
+                        if (singleDocumentData.documentIndex >= 0){
+//                            documentManager.documentsModel.setProperty(singleDocumentData.documentIndex, "AlertVisible", hasRemoteChanges)
+                        }
+                    }
+                }
+
                 function onSaved(documentId, documentName){
                     singleDocumentData.documentId = documentId;
                     singleDocumentData.documentName = documentName;
@@ -657,6 +668,7 @@ Item {
                     documentDataController.saved.connect(dataControllerConnections.onSaved);
                     documentDataController.documentModelChanged.connect(dataControllerConnections.onDocumentModelChanged);
                     documentDataController.error.connect(dataControllerConnections.onError);
+                    documentDataController.hasRemoteChangesChanged.connect(dataControllerConnections.onHasRemoteChangesChanged);
                 }
             }
 

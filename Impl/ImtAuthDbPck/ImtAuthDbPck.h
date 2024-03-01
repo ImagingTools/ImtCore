@@ -9,6 +9,10 @@
 #include <imtauthdb/CUsersSettingsDatabaseDelegateComp.h>
 #include <imtauthdb/CSuperuserProviderComp.h>
 #include <imtauthdb/CRemoteSuperuserProviderComp.h>
+#include <imtauthdb/CSqliteUserGroupDatabaseDelegateComp.h>
+#include <imtauthdb/CSqliteUserDatabaseDelegateComp.h>
+#include <imtauthdb/TRoleDatabaseDelegateComp.h>
+#include <imtdb/CSqliteJsonDatabaseDelegateComp.h>
 
 
 /**
@@ -20,11 +24,15 @@ namespace ImtAuthDbPck
 
 typedef imtauthdb::CRoleDatabaseDelegateComp RoleDatabaseDelegate;
 typedef imtauthdb::CUserDatabaseDelegateComp UserDatabaseDelegate;
+typedef imtauthdb::CSqliteUserDatabaseDelegateComp SqliteUserDatabaseDelegate;
 typedef imtauthdb::CUserGroupDatabaseDelegateComp UserGroupDatabaseDelegate;
+typedef imtauthdb::CSqliteUserGroupDatabaseDelegateComp SqliteUserGroupDatabaseDelegate;
 typedef imtauthdb::CUsersSessionsDatabaseDelegateComp UsersSessionsDatabaseDelegate;
 typedef imtauthdb::CUsersSettingsDatabaseDelegateComp UsersSettingsDatabaseDelegate;
 typedef imtauthdb::CSuperuserProviderComp SuperuserProvider;
 typedef imtauthdb::CRemoteSuperuserProviderComp RemoteSuperuserProvider;
+typedef imtauthdb::TRoleDatabaseDelegateComp<imtdb::CSqlJsonDatabaseDelegateComp> SqlJsonRoleDatabaseDelegate;
+typedef imtauthdb::TRoleDatabaseDelegateComp<imtdb::CSqliteJsonDatabaseDelegateComp> SqliteJsonRoleDatabaseDelegate;
 
 
 } // namespace ImtAuthDbPck

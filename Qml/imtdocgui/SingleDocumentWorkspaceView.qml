@@ -7,8 +7,6 @@ import imtcontrols 1.0
 DocumentManager {
     id: documentManager;
 
-    property alias alertPanelComp: alertPanel.sourceComponent;
-
     property var startPageObj;
 
     onStartPageObjChanged: {
@@ -88,13 +86,11 @@ DocumentManager {
     Loader {
         id: alertPanel;
 
-        anchors.top: parent.top;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
+        anchors.fill: parent;
 
         height: visible ? 40: 0;
 
-        visible: alertPanel.status == Loader.Ready;
+        visible: status == Loader.Ready && model.AlertVisible;
     }
 
     Item {
@@ -205,7 +201,7 @@ DocumentManager {
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
-//        anchors.margins: Style.size_mainMargin;
+        //        anchors.margins: Style.size_mainMargin;
 
         onItemAdded: {
             console.log("onItemAdded", index, item);

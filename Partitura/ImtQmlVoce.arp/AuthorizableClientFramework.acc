@@ -124,11 +124,17 @@
                     <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/ApplicationInfo"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultServerHost" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="localhost"/>
+                    <AttributeInfo Id="DefaultServerHost" Type="String" ExportId="DefaultServerHost">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="DefaultServerPort" Type="Integer" ExportId="">
-                        <Data IsEnabled="true" Value="7778"/>
+                    <AttributeInfo Id="DefaultServerPort" Type="Integer" ExportId="DefaultServerPort">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultWebSocketServerHost" Type="String" ExportId="DefaultWebSocketServerHost">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DefaultWebSocketServerPort" Type="Integer" ExportId="DefaultWebSocketServerPort">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LanguageConstraints" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/ApplicationLocalization"/>
@@ -136,8 +142,8 @@
                     <AttributeInfo Id="Log" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="Application/TextFileLog"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="PreferenceDefaultPath" Type="String" ExportId="">
-                        <Data IsEnabled="true" Value="ProlifeClientPreferences.xml"/>
+                    <AttributeInfo Id="PreferenceDefaultPath" Type="String" ExportId="PreferenceDefaultPath">
+                        <Data IsEnabled="true" Value=""/>
                     </AttributeInfo>
                     <AttributeInfo Id="PreferenceLocationType" Type="Integer" ExportId="">
                         <Data IsEnabled="true" Value="9"/>
@@ -177,9 +183,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ServerPrefix" Type="Id" ExportId="ServerPrefix">
                         <Data IsEnabled="true" Value=""/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SlaveSystemStatus" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="AuthorizableServerSystemStatusController"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UrlParam" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="LocalSettings/ServerUrl"/>

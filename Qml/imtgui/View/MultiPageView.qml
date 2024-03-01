@@ -140,6 +140,8 @@ Item {
 
                 spacing: Style.size_mainMargin;
 
+                boundsBehavior: Flickable.StopAtBounds;
+
                 delegate: ItemDelegate {
                     text: model.Name;
 

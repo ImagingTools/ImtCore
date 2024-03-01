@@ -7,7 +7,7 @@ import imtcontrols 1.0
 DocumentManager {
     id: workspaceView;
 
-    property alias alertPanelComp: alertPanel.sourceComponent;
+//    property alias alertPanelComp: alertPanel.sourceComponent;
 
     property var fixedViews: [];
     property var fixedViewNames: [];
@@ -38,20 +38,14 @@ DocumentManager {
         documentAdded(documentsModel.count - 1, "");
     }
 
-    function setAlertPanel(alertPanelComp){
-        alertPanel.sourceComponent = alertPanelComp;
-    }
+//    function setAlertPanel(alertPanelComp){
+//        alertPanel.sourceComponent = alertPanelComp;
+//    }
 
-    Loader {
-        id: alertPanel;
+    Rectangle {
+        anchors.fill: parent;
 
-        anchors.top: parent.top;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
-
-        height: visible ? 40: 0;
-
-        visible: alertPanel.status == Loader.Ready;
+        color: Style.backgroundColor;
     }
 
     TabPanel {
@@ -82,6 +76,59 @@ DocumentManager {
         }
     }
 
+    Component {
+        id: alertPanelComp;
+
+        Rectangle {
+            anchors.fill: parent;
+
+            color: Style.selectedColor;
+
+            Image {
+                id: icon;
+
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: parent.left;
+                anchors.leftMargin: 10;
+
+                width: 20;
+                height: 20;
+
+                sourceSize.height: height;
+                sourceSize.width: width;
+
+                source: "../../../" + Style.getIconPath("Icons/Lamp", Icon.State.On, Icon.Mode.Normal);
+            }
+
+            BaseText {
+                id: message;
+
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.left: icon.right;
+                anchors.leftMargin: 10;
+                anchors.right: updateButton.left;
+
+                text: qsTr("This document has been modified");
+            }
+
+            Button {
+                id: updateButton;
+
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.right: parent.right;
+                anchors.rightMargin: 10;
+
+                width: 70;
+                height: 30;
+
+                text: qsTr("Update");
+
+                onClicked: {
+                }
+            }
+        }
+    }
+
     Repeater {
         id: documentRepeater;
 
@@ -97,14 +144,28 @@ DocumentManager {
         delegate: Item {
             anchors.fill: documentRepeater;
 
-            Component.onDestruction: {
-                console.log("Item onDestruction");
+            Loader {
+                id: alertPanel;
+
+                anchors.top: parent.top;
+                anchors.left: parent.left;
+                anchors.right: parent.right;
+
+                height: visible ? 40: 0;
+
+                sourceComponent: alertPanelComp;
+
+//                visible: alertPanel.status == Loader.Ready;
+                visible: false;
             }
 
             Loader {
                 id: documentLoader;
 
-                anchors.fill: parent;
+                anchors.top: alertPanel.bottom;
+                anchors.left: parent.left;
+                anchors.right: parent.right;
+                anchors.bottom: parent.bottom;
 
                 visible: tabPanel.selectedIndex === model.index;
 

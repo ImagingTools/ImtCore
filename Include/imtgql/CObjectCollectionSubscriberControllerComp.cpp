@@ -41,7 +41,7 @@ void CObjectCollectionSubscriberControllerComp::OnComponentDestroyed()
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CObjectCollectionSubscriberControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
+void CObjectCollectionSubscriberControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
 	SetSubscriptions();
 }
