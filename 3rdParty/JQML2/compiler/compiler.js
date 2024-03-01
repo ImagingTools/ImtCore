@@ -10,8 +10,17 @@ for(let componentName of listComponents){
 }
 const listProperties = require('../utils/properties')
 
-const source = process.argv[2] || 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src'//'../test/qml'// 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src' // 
-if(!source) throw 'error: source not specified'
+const args = {
+    source: 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src',
+    debug: 0
+}
+for(let _argv of process.argv.slice(2)){
+    let _args = _argv.split('=')
+    args[_args[0]] = _args[1]
+}
+if(!args.source) throw 'error: source not specified'
+
+const source = args.source
 
 function getFiles (dir, _files){
     _files = _files || []
@@ -390,7 +399,6 @@ function preCompile(className, meta, on, instructions){
             //     }
             // }
             if(!find){
-                console.log(`Warning: class ${className} not found into file ${instructions.fileName}`)
                 for(let _className of _classList){
                     if(_className === className){
                         instructions.className = _className
@@ -399,6 +407,7 @@ function preCompile(className, meta, on, instructions){
                     }
                 }
                 if(!find){
+                    console.log(`Warning: class ${className} not found into file ${instructions.fileName}`)
                     instructions.className = _classList[0]
                     // throw `Error: class ${className} not found into file ${instructions.fileName}`
                 }
@@ -642,8 +651,14 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
                             stat.compute = true
                             stat.value.push(`inCtx.get('${tree[1]}')`)
                         } else {
-                            if(tree[1] !== 'Gql' && tree[1] !== 'Icon' && tree[1] !== 'modalDialogManager') console.log(`Warning: name ${tree[1]} into ${compiledFile.fileName} not found`)
-                            if(assign && tree[1] !== 'Gql' && tree[1] !== 'Icon' && tree[1] !== 'modalDialogManager') console.log(`Error: there is no identifier before the ${tree[1]} into ${compiledFile.fileName}`)
+                            if(tree[1] !== 'Gql' && tree[1] !== 'Icon' && tree[1] !== 'modalDialogManager' && currentInstructions.fileName.indexOf('TreeItemModel.qml') < 0 && currentInstructions.fileName.indexOf('JSONListModel.qml') < 0) {
+                                console.log(`Warning: name ${tree[1]} into ${compiledFile.fileName} not found`)
+                                if(args.debug == 1) throw -1
+                            }
+                            if(assign && tree[1] !== 'Gql' && tree[1] !== 'Icon' && tree[1] !== 'modalDialogManager') {
+                                console.log(`Error: there is no identifier before the ${tree[1]} into ${compiledFile.fileName}`)
+                                if(args.debug == 1) throw -1
+                            }
                             stat.compute = true
                             stat.value.push(`inCtx.get('${tree[1]}')`)
                         }
@@ -1048,12 +1063,14 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             value: [],
             ignore: [],
             params: [],
+            type: property.type,
         }
         if(property.val) {
             try {
                 prepare(property.val, compiledFile, currentInstructions, stat, false, false, '', {})
             } catch (error) {
                 console.log('Error:', compiledFile.fileName, 'property', property.name)
+                if(args.debug == 1) throw -1
             }
             
         }
@@ -1146,6 +1163,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             prepare(signal.val, compiledFile, currentInstructions, stat, true, false, '', {})
         } catch (error) {
             console.log('Error:', compiledFile.fileName, 'signal', signal.name)
+            if(args.debug == 1) throw -1
         }
 
         for(let ignore of stat.ignore){
@@ -1273,6 +1291,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
                     prepare(property.val, compiledFile, currentInstructions, stat, false, false, '', {})
                 } catch (error) {
                     console.log('Error:', compiledFile.fileName, 'property', property.name)
+                    if(args.debug == 1) throw -1
                 }
                 
             }
@@ -1363,6 +1382,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             prepare(signal.val, compiledFile, currentInstructions, stat, true, false, '', {})
         } catch (error) {
             console.log('Error:', compiledFile.fileName, 'signal', signal.name)
+            if(args.debug == 1) throw -1
         }
 
         for(let ignore of stat.ignore){
@@ -1392,6 +1412,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             prepare(currentInstructions.methods[name].val, compiledFile, currentInstructions, stat, true, false, '', {})
         } catch (error) {
             console.log('Error:', compiledFile.fileName, 'method', name)
+            if(args.debug == 1) throw -1
         }
         
         code.push(`${currentInstructions.name}.${name}=${stat.value.join('')}`)
