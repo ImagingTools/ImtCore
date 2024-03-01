@@ -89,7 +89,7 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="VersionInfo" PackageId="ImtControlsGalleryVoce" ComponentId="VersionInfo">
+        <Element Id="VersionInfo" PackageId="ImtCoreVoce" ComponentId="VersionInfo">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap/>
             </Data>
