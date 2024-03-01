@@ -52,7 +52,7 @@ JSONListModel {
             retModel.isUpdateEnabled = this.isUpdateEnabled
             retModel.getProperty('isUpdateEnabled').setCompute(function(){return this.isUpdateEnabled}.bind(this))
             retModel.getProperty('isUpdateEnabled').update()
-            retModel.append(retVal);
+            if(Object.keys(retVal).length) retModel.append(retVal);
 
             return  retModel
         }
@@ -409,7 +409,7 @@ JSONListModel {
                     retModel.isUpdateEnabled = this.isUpdateEnabled
                     retModel.getProperty('isUpdateEnabled').setCompute(function(){return this.isUpdateEnabled}.bind(this))
                     retModel.getProperty('isUpdateEnabled').update()
-                    retModel.append(retVal);
+                    if(Object.keys(retVal).length) retModel.append(retVal);
                     retVal = retModel
                     retVal.updateTreeItemJSONModel()
                 }
