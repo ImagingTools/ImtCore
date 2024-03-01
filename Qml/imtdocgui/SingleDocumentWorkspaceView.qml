@@ -86,11 +86,11 @@ DocumentManager {
     Loader {
         id: alertPanel;
 
-        anchors.fill: parent;
+//        anchors.fill: parent;
 
         height: visible ? 40: 0;
 
-        visible: status == Loader.Ready && model.AlertVisible;
+        visible: false;
     }
 
     Item {

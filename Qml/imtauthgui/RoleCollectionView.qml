@@ -125,6 +125,16 @@ RemoteCollectionView {
 
     onElementsChanged: {
         if(!permissionsProvider) return
+
+        let productId = ""
+        if (table.elements.ContainsKey("Id")){
+            productId = table.elements.GetData("Id");
+        }
+
+        if (productId === ""){
+            return
+        }
+
         permissionsProvider.productId = table.elements.GetData("Id");
 
         if (table.elements.ContainsKey("Roles")){
