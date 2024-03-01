@@ -29,10 +29,13 @@ class QProperty {
         return value
     }
 
+    updateOnce(){
+        if(!this.completed) this.update()
+    }
+
     update(){
         if(this.debug) console.log('updating...', this.id)
-        
-        // if(this.updating) this.updateAfter = true
+
         if(this.updating || !this.compute) return
         
         this.updating = true
@@ -48,19 +51,6 @@ class QProperty {
         
         if(this.compute) this.set(value)
         
-        // if(this.updateAfter){
-        //     delete this.updateAfter
-        //     global.queueLink.push(this)
-        //     let value = this.value
-        //     try {
-        //         value = this.compute()
-        //     } catch (error) {
-                
-        //     } finally {
-        //         global.queueLink.pop()
-        //     }
-        //     if(this.compute) this.set(value)
-        // }
         this.updating = false
         this.completed = true
     }
@@ -601,7 +591,9 @@ class QAnchors extends ComplexObject {
         if(!this.notify) this.notify = new QSignal()
         return this.notify
     }
-
+    updateOnce(){
+        if(!this.completed) this.update()
+    }
     update(){
         this.completed = true
         
@@ -659,6 +651,10 @@ class QFont extends ComplexObject {
         return this.notify
     }
 
+    updateOnce(){
+        if(!this.completed) this.update()
+    }
+
     update(){
         this.completed = true
 
@@ -693,6 +689,10 @@ class QBorder extends ComplexObject {
         return this.notify
     }
 
+    updateOnce(){
+        if(!this.completed) this.update()
+    }
+
     update(){
         this.completed = true
 
@@ -714,6 +714,10 @@ class QLine extends ComplexObject {
     getNotify(){
         if(!this.notify) this.notify = new QSignal()
         return this.notify
+    }
+
+    updateOnce(){
+        if(!this.completed) this.update()
     }
 
     update(){
@@ -752,6 +756,10 @@ class QPoint extends ComplexObject {
         return this.notify
     }
 
+    updateOnce(){
+        if(!this.completed) this.update()
+    }
+
     update(){
         this.completed = true
 
@@ -778,6 +786,10 @@ class QKeyNavigation extends ComplexObject {
     getNotify(){
         if(!this.notify) this.notify = new QSignal()
         return this.notify
+    }
+
+    updateOnce(){
+        if(!this.completed) this.update()
     }
 
     update(){
@@ -834,6 +846,10 @@ class QSourceSize extends ComplexObject {
         return this.notify
     }
 
+    updateOnce(){
+        if(!this.completed) this.update()
+    }
+
     update(){
         this.completed = true
 
@@ -869,6 +885,10 @@ class MapGestureArea extends ComplexObject {
     getNotify(){
         if(!this.notify) this.notify = new QSignal()
         return this.notify
+    }
+
+    updateOnce(){
+        if(!this.completed) this.update()
     }
 
     update(){

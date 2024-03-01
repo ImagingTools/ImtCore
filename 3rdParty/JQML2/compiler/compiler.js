@@ -1108,11 +1108,11 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             }
             if(!updateAnchors && property.name.split('.')[0] === 'anchors'){
                 updateAnchors = true
-                updatePrimaryList.push(`${currentInstructions.name}.${pathName[0]}.update()`)
+                updatePrimaryList.push(`${currentInstructions.name}.${pathName[0]}.updateOnce()`)
             }
             if(!updateFont && property.name.split('.')[0] === 'font'){
                 updateFont = true
-                updatePrimaryList.push(`${currentInstructions.name}.${pathName[0]}.update()`)
+                updatePrimaryList.push(`${currentInstructions.name}.${pathName[0]}.updateOnce()`)
             }
             
         } else {
@@ -1327,7 +1327,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
                     }
                     
                 }
-                updateList.push(`${currentInstructions.name}.${pathName[0]}.update()`)
+                updateList.push(`${currentInstructions.name}.${pathName[0]}.updateOnce()`)
             } else {
                 if(property.command === 'create'){
                     if(listProperties[property.type]){
