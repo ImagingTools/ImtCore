@@ -1429,7 +1429,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
         // for(let i = currentInstructions.children.length-1; i >= 0; i--){
         //     treeCompile(compiledFile, currentInstructions.children[i], updatePrimaryList, updateList, step + 1, false)
         // }
-        for(let i = 0; i < currentInstructions.children.length; i++){
+        for(let i = currentInstructions.children.length-1; i >= 0; i--){
             treeCompile(compiledFile, currentInstructions.children[i], updatePrimaryList, updateList, step + 1, false)
         }
     }
