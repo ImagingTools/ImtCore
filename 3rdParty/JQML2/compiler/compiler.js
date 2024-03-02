@@ -11,7 +11,7 @@ for(let componentName of listComponents){
 const listProperties = require('../utils/properties')
 
 const args = {
-    source: 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src',
+    source: process.argv.length >= 3 ? process.argv[2] : 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src',
     debug: 0
 }
 for(let _argv of process.argv.slice(2)){
