@@ -1108,11 +1108,11 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
             }
             if(!updateAnchors && property.name.split('.')[0] === 'anchors'){
                 updateAnchors = true
-                updatePrimaryList.push(`${currentInstructions.name}.${pathName[0]}.updateOnce()`)
+                updatePrimaryList.push(`${currentInstructions.name}.${pathName[0]}.update()`)
             }
             if(!updateFont && property.name.split('.')[0] === 'font'){
                 updateFont = true
-                updatePrimaryList.push(`${currentInstructions.name}.${pathName[0]}.updateOnce()`)
+                updatePrimaryList.push(`${currentInstructions.name}.${pathName[0]}.update()`)
             }
             
         } else {
@@ -1327,7 +1327,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
                     }
                     
                 }
-                updateList.push(`${currentInstructions.name}.${pathName[0]}.updateOnce()`)
+                updateList.push(`${currentInstructions.name}.${pathName[0]}.update()`)
             } else {
                 if(property.command === 'create'){
                     if(listProperties[property.type]){
@@ -1429,7 +1429,8 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
         // for(let i = currentInstructions.children.length-1; i >= 0; i--){
         //     treeCompile(compiledFile, currentInstructions.children[i], updatePrimaryList, updateList, step + 1, false)
         // }
-        for(let i = currentInstructions.children.length-1; i >= 0; i--){
+        // for(let i = currentInstructions.children.length-1; i >= 0; i--){
+        for(let i = 0; i < currentInstructions.children.length; i++){
             treeCompile(compiledFile, currentInstructions.children[i], updatePrimaryList, updateList, step + 1, false)
         }
     }
