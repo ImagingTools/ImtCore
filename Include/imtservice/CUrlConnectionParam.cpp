@@ -152,6 +152,11 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 			elementInfo = m_externConnectionList[i];
 		}
 
+		iser::CArchiveTag idTag("Id", "Id", iser::CArchiveTag::TT_LEAF, &objectTag);
+		retVal = retVal && archive.BeginTag(idTag);
+		retVal = retVal && archive.Process(elementInfo.id);
+		retVal = retVal && archive.EndTag(idTag);
+
 		iser::CArchiveTag urlTag("Url", "URL", iser::CArchiveTag::TT_LEAF, &objectTag);
 
 		QString urlStr = elementInfo.url.toString();
@@ -205,6 +210,7 @@ bool CUrlConnectionParam::CopyFrom(const IChangeable& object, CompatibilityMode 
 			IncomingConnectionParam newParam;
 			newParam.description = connectionParam.description;
 			newParam.url = connectionParam.url;
+			newParam.id = connectionParam.id;
 
 			m_externConnectionList << newParam;
 		}

@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QUrl>
+#include <QtCore/QUuid>
 
 // ACF includes
 #include <istd/IChangeable.h>
@@ -26,6 +27,11 @@ public:
 	{
 		QUrl url;
 		QString description;
+		QByteArray id;
+
+		IncomingConnectionParam(){
+			id = QUuid::createUuid().toByteArray();
+		}
 
 		bool operator==(const IncomingConnectionParam& other) const
 		{
