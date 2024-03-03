@@ -3,11 +3,14 @@
 
 // Qt includes
 #include <QtGui/QOpenGLFunctions>
-#include <QtWidgets/QOpenGLWidget>
 #include <QtCore/QLine>
 #include <QtCore/QTimer>
 #include <QtCore/QVariantAnimation>
-
+#if QT_VERSION < 0x060000
+#include <QtWidgets/QOpenGLWidget>
+#else
+#include <QtOpenGLWidgets/QOpenGLWidget>
+#endif
 // ACF includes
 #include <istd/istd.h>
 
