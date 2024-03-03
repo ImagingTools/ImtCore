@@ -104,8 +104,6 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_usageId);
 	retVal = retVal && archive.EndTag(serviceUsageIdTag);
 
-	// qDebug() << "m_serviceName" << m_serviceName;
-
 	iser::CArchiveTag connectionTypeTag("ConnectionType", "Connection Type", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(connectionTypeTag);
 	retVal = retVal && iser::CPrimitiveTypesSerializer::SerializeEnum<
@@ -161,9 +159,7 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 
 		QString urlStr = elementInfo.url.toString();
 
-		qDebug() << "urlStr" << urlStr;
-
-		bool retVal = archive.BeginTag(urlTag);
+		retVal = retVal && archive.BeginTag(urlTag);
 		retVal = retVal && archive.Process(urlStr);
 		retVal = retVal && archive.EndTag(urlTag);
 
@@ -233,7 +229,7 @@ istd::IChangeable* CUrlConnectionParam::CloneMe(CompatibilityMode mode) const
 }
 
 
-bool CUrlConnectionParam::ResetData(CompatibilityMode mode)
+bool CUrlConnectionParam::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
@@ -248,6 +244,6 @@ bool CUrlConnectionParam::ResetData(CompatibilityMode mode)
 }
 
 
-} // namespace agentinodata
+} // namespace imtservice
 
 

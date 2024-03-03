@@ -121,7 +121,7 @@ bool CUrlConnectionLinkParam::Serialize(iser::IArchive& archive)
 
 // reimplemented (istd::IChangeable)
 
-bool CUrlConnectionLinkParam::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+bool CUrlConnectionLinkParam::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	istd::CChangeGroup changeGroup(this);
 
@@ -153,7 +153,7 @@ istd::IChangeable* CUrlConnectionLinkParam::CloneMe(CompatibilityMode mode) cons
 }
 
 
-bool CUrlConnectionLinkParam::ResetData(CompatibilityMode mode)
+bool CUrlConnectionLinkParam::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 

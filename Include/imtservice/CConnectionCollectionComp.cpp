@@ -19,7 +19,7 @@ QString CConnectionCollectionComp::GetServiceTypeName() const
 }
 
 
-bool CConnectionCollectionComp::SetServiceTypeName(const QString& serviceTypeName) const
+bool CConnectionCollectionComp::SetServiceTypeName(const QString& /*serviceTypeName*/) const
 {
 	return false;
 }

@@ -60,7 +60,7 @@ VALUES ('%1', '%2', '%3', '%4', '%5', '%6', '%1');)")
 QByteArray CSqlStructureDelegateComp::CreateSetNodeNameQuery(
 	const Id& nodeId,
 	const QString& name,
-	const imtbase::IOperationContext* operationContextPtr)
+	const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	QString query = QString("UPDATE  public.\"Nodes\" SET \"Name\" = '%1' WHERE \"NodeId\" = '%2';")
 		.arg(name).arg(qPrintable(nodeId));
@@ -72,7 +72,7 @@ QByteArray CSqlStructureDelegateComp::CreateSetNodeNameQuery(
 QByteArray CSqlStructureDelegateComp::CreateSetNodeDescriptionQuery(
 	const Id& nodeId,
 	const QString& description,
-	const imtbase::IOperationContext* operationContextPtr)
+	const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	QString query = QString("UPDATE  public.\"Nodes\" SET \"Description\" = '%1' WHERE \"NodeId\" = '%2';")
 						.arg(description).arg(qPrintable(nodeId));
@@ -84,7 +84,7 @@ QByteArray CSqlStructureDelegateComp::CreateSetNodeDescriptionQuery(
 QByteArray CSqlStructureDelegateComp::CreateSetNodeMetaInfoQuery(
 	const Id& nodeId,
 	const idoc::IDocumentMetaInfo* metaInfoPtr,
-	const imtbase::IOperationContext* operationContextPtr)
+	const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	QJsonArray metaInfos = CtreateJsonFromMetaInfo(metaInfoPtr);
 	QJsonDocument document;
@@ -100,7 +100,7 @@ QByteArray CSqlStructureDelegateComp::CreateSetNodeMetaInfoQuery(
 QByteArray CSqlStructureDelegateComp::CreateMoveNodeQuery(
 	const Id& nodeId,
 	const Id& parentNodeId,
-	const imtbase::IOperationContext* operationContextPtr)
+	const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	QString query = QString("UPDATE  public.\"Nodes\" SET \"ParentId\"='%1' WHERE \"NodeId\" = '%2';")
 						.arg(qPrintable(parentNodeId)).arg(qPrintable(nodeId));
@@ -111,7 +111,7 @@ QByteArray CSqlStructureDelegateComp::CreateMoveNodeQuery(
 
 QByteArray CSqlStructureDelegateComp::CreateRemoveNodeQuery(
 	const Id& nodeId,
-	const imtbase::IOperationContext* operationContextPtr)
+	const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	QString query = QString("DELETE FROM public.\"Nodes\" WHERE \"NodeId\" = '%1';")
 						.arg(qPrintable(nodeId));
@@ -168,7 +168,7 @@ QByteArray CSqlStructureDelegateComp::CreateMoveObjectQuery(
 	const Id& objectId,
 	const Id& sourceNodeId,
 	const Id& targetNodeId,
-	const imtbase::IOperationContext* operationContextPtr)
+	const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	QString query;
 
@@ -199,7 +199,7 @@ QByteArray CSqlStructureDelegateComp::CreateMoveObjectQuery(
 QByteArray CSqlStructureDelegateComp::CreateRemoveObjectQuery(
 	const Id& objectId,
 	const Id& nodeId,
-	const imtbase::IOperationContext* operationContextPtr)
+	const imtbase::IOperationContext* /*operationContextPtr*/)
 {
 	QString query = QString("DELETE FROM public.\"NodeDocuments\" WHERE \"DocumentId\"='%1' AND \"NodeId\" = '%2';")
 						.arg(qPrintable(objectId)).arg(qPrintable(nodeId));

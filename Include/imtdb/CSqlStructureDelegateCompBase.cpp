@@ -161,7 +161,7 @@ bool CSqlStructureDelegateCompBase::RemoveNode(const Id& nodeId, const imtbase::
 bool CSqlStructureDelegateCompBase::InsertLeaf(
 			const Id& leafId,
 			const Id& nodeId,
-			const QString& leafName,
+			const QString& /*leafName*/,
 			const imtbase::IOperationContext* operationContextPtr)
 {
 	QByteArray query = CreateInsertNewObjectQuery(
@@ -348,7 +348,7 @@ imtbase::IHierarchicalStructureIterator* CSqlStructureDelegateCompBase::CreateHi
 }
 
 
-imtbase::IHierarchicalStructureInfo::ItemInfoList CSqlStructureDelegateCompBase::GetItemInfos(const Ids& itemIds)
+imtbase::IHierarchicalStructureInfo::ItemInfoList CSqlStructureDelegateCompBase::GetItemInfos(const Ids& /*itemIds*/)
 {
 	// QByteArray query = CreateGetNodeInfoQuery(nodeId);
 	// if (query.isEmpty()){
@@ -374,7 +374,7 @@ imtbase::IHierarchicalStructureInfo::ItemInfoList CSqlStructureDelegateCompBase:
 }
 
 
-imtbase::IHierarchicalStructureInfo::Ids CSqlStructureDelegateCompBase::GetItemPath(const Id& itemId) const
+imtbase::IHierarchicalStructureInfo::Ids CSqlStructureDelegateCompBase::GetItemPath(const Id& /*itemId*/) const
 {
 	// NodePath retVal;
 	// QByteArray query = CreateGetNodePathQuery(nodeId);
