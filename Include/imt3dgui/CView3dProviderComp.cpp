@@ -1,6 +1,9 @@
 #include <imt3dgui/CView3dProviderComp.h>
 
 
+// Qt includes
+#include <QtGui/QGuiApplication>
+
 // ACF includes
 #include <istd/CChangeNotifier.h>
 
@@ -227,6 +230,9 @@ void CView3dProviderComp::OnGuiCreated()
 	imt3dgui::COpenGLWidget* widgetPtr = GetQtWidget();
 	Q_ASSERT(widgetPtr != nullptr);
 
+	QColor backgroundColor = QGuiApplication::palette().color(QPalette::Base);
+	widgetPtr->SetBackgroundColor(backgroundColor);
+
 	widgetPtr->SetCamera(m_cameraCompPtr.GetPtr());
 
 	static ChangeSet commandsChanged(ibase::ICommandsProvider::CF_COMMANDS);
@@ -399,6 +405,18 @@ void CView3dProviderComp::OnGuiRetranslate()
 	m_rotationAroundZCommand.SetVisuals(tr("Rotation around Z-Axis"), tr("Z-Rotation"), tr("Set Rotation around Z-Axis Mode"), QIcon(":/Icons/RotationAroundZ"));
 	m_viewModeCommand.SetVisuals(tr("View"), tr("View Mode"), tr("Set View Mode"), QIcon(":/Icons/View"));
 	m_selectionModeCommand.SetVisuals(tr("Selection"), tr("Selection Mode"), tr("Set Selection Mode"), QIcon(":/Icons/Selection"));
+}
+
+
+void CView3dProviderComp::OnGuiDesignChanged()
+{
+	BaseClass::OnGuiDesignChanged();
+
+	imt3dgui::COpenGLWidget* widgetPtr = GetQtWidget();
+	Q_ASSERT(widgetPtr != nullptr);
+
+	QColor backgroundColor = QGuiApplication::palette().color(QPalette::Base);
+	widgetPtr->SetBackgroundColor(backgroundColor);
 }
 
 

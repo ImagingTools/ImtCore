@@ -2,11 +2,20 @@
 
 
 // Qt includes
-#include <QtGui/QMouseEvent>
 #include <QtCore/QElapsedTimer>
+#include <QtGui/QMouseEvent>
 
 // ImtCore includes
 #include <imt3dgui/ISceneEventHandler.h>
+
+
+namespace
+{
+
+int default_timer_interval = 1000; // ms. Don't make this interval small, otherwise GPU will be overloaded with redrawing the scene
+
+
+}
 
 
 namespace imt3dgui
@@ -39,10 +48,10 @@ COpenGLWidget::COpenGLWidget(QWidget* parentPtr)
 	setCursor(Qt::OpenHandCursor);
 	setFocusPolicy(Qt::FocusPolicy::ClickFocus);
 
-	connect(&m_cameraRotationAnimation, SIGNAL(valueChanged(const QVariant&)), this, SLOT(OnCameraRotationAnimation(const QVariant&)));
-	connect(&m_cameraPositionAnimation, SIGNAL(valueChanged(const QVariant&)), this, SLOT(OnCameraPositionAnimation(const QVariant&)));
+	connect(&m_cameraRotationAnimation, &QVariantAnimation::valueChanged, this, &COpenGLWidget::OnCameraRotationAnimation);
+	connect(&m_cameraPositionAnimation, &QVariantAnimation::valueChanged, this, &COpenGLWidget::OnCameraPositionAnimation);
 
-	m_timer.setInterval(20);
+	m_timer.setInterval(default_timer_interval); // avoid frequent updates here - it will substantially slow down other GPU tasks
 	connect(&m_timer, SIGNAL(timeout()), this, SLOT(OnInternalTimer()));
 	m_timer.start();
 }
@@ -83,6 +92,7 @@ void COpenGLWidget::ZoomIn()
 {
 	if (m_cameraPtr && m_viewMode == ViewMode::VM_VIEW){
 		m_cameraPtr->ZoomIn();
+		update();
 	}
 }
 
@@ -91,6 +101,7 @@ void COpenGLWidget::ZoomOut()
 {
 	if (m_cameraPtr && m_viewMode == ViewMode::VM_VIEW){
 		m_cameraPtr->ZoomOut();
+		update();
 	}
 }
 
@@ -99,6 +110,7 @@ void COpenGLWidget::ShowGrid(bool show)
 {
 	if (m_eventHandlerPtr){
 		m_eventHandlerPtr->OnShowGrid(show);
+		update();
 	}
 }
 
@@ -107,6 +119,7 @@ void COpenGLWidget::ShowAxis(bool show)
 {
 	if (m_eventHandlerPtr){
 		m_eventHandlerPtr->OnShowAxis(show);
+		update();
 	}
 }
 
@@ -115,6 +128,7 @@ void COpenGLWidget::ShowRuler(bool show)
 {
 	if (m_eventHandlerPtr){
 		m_eventHandlerPtr->OnShowRuler(show);
+		update();
 	}
 }
 
@@ -196,6 +210,7 @@ void COpenGLWidget::SetCameraView(COpenGLWidget::ViewDirection viewDirection, bo
 	else{
 		m_cameraPtr->RotateTo(newRotation);
 		m_cameraPtr->MoveTo(QVector3D(0.0, 0.0, 5.0));
+		update();
 	}
 }
 
@@ -206,13 +221,13 @@ void COpenGLWidget::SetViewMode(ViewMode viewMode)
 	m_selectionRect.setRect(0.0, 0.0, 0.0, 0.0);
 
 	switch (viewMode){
-		case ViewMode::VM_VIEW:
-			setCursor(Qt::OpenHandCursor);
-			break;
+	case ViewMode::VM_VIEW:
+		setCursor(Qt::OpenHandCursor);
+		break;
 
-		case ViewMode::VM_SELECTION:
-			SetSelectionMode(SelectionMode::SM_POINT);
-			break;
+	case ViewMode::VM_SELECTION:
+		SetSelectionMode(SelectionMode::SM_POINT);
+		break;
 	}
 }
 
@@ -222,14 +237,14 @@ void COpenGLWidget::SetSelectionMode(SelectionMode selectionMode)
 	m_selectionMode = selectionMode;
 
 	switch (selectionMode){
-		case SelectionMode::SM_BOX:
-		case SelectionMode::SM_CIRCLE:
-			setCursor(Qt::CrossCursor);
-			break;
+	case SelectionMode::SM_BOX:
+	case SelectionMode::SM_CIRCLE:
+		setCursor(Qt::CrossCursor);
+		break;
 
-		case SelectionMode::SM_POINT:
-			setCursor(Qt::PointingHandCursor);
-			break;
+	case SelectionMode::SM_POINT:
+		setCursor(Qt::PointingHandCursor);
+		break;
 	}
 }
 
@@ -272,6 +287,16 @@ void COpenGLWidget::DeleteSelection()
 }
 
 
+void COpenGLWidget::SetBackgroundColor(const QColor& backgroundColor)
+{
+	m_backgroundColor = backgroundColor;
+
+	if (isValid()){
+		update();
+	}
+}
+
+
 // protected methods
 
 // reimplemented (QOpenGLWidget)
@@ -280,7 +305,7 @@ void COpenGLWidget::initializeGL()
 {
 	initializeOpenGLFunctions();
 
-	glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+	glClearColor(m_backgroundColor.redF(), m_backgroundColor.greenF(), m_backgroundColor.blueF(), 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_PROGRAM_POINT_SIZE);
 
@@ -309,7 +334,10 @@ void COpenGLWidget::initializeGL()
 void COpenGLWidget::resizeGL(int /*w*/, int /*h*/)
 {
 	m_scene.SetViewPort(rect());
+
 	m_scene.SetProjection(GetProjectionMatrix());
+
+	update();
 }
 
 
@@ -388,7 +416,7 @@ void COpenGLWidget::closeEvent(QCloseEvent* eventPtr)
 
 void COpenGLWidget::wheelEvent(QWheelEvent* eventPtr)
 {
-	if (eventPtr->pixelDelta().y() > 0 || eventPtr->angleDelta().y() > 0){
+	if (eventPtr->delta() > 0){
 		OnZoomIn();
 	}
 	else{
@@ -396,32 +424,37 @@ void COpenGLWidget::wheelEvent(QWheelEvent* eventPtr)
 	}
 }
 
-void COpenGLWidget::keyPressEvent(QKeyEvent * e)
+
+void COpenGLWidget::keyPressEvent(QKeyEvent* e)
 {
-	if (e->key() == Qt::Key::Key_PageUp) {
+	if (e->key() == Qt::Key::Key_PageUp){
 		ZoomIn();
 	}
-	else if (e->key() == Qt::Key::Key_PageDown) {
+	else if (e->key() == Qt::Key::Key_PageDown){
 		ZoomOut();
 	}
-	else if (e->key() == Qt::Key::Key_Right) {
-		if (m_cameraPtr != nullptr) {
-			m_cameraPtr->MoveTo(QPoint(width() / 2,height() / 2), QPoint(width() / 2 - 5, height() / 2));
+	else if (e->key() == Qt::Key::Key_Right){
+		if (m_cameraPtr != nullptr){
+			m_cameraPtr->MoveTo(QPoint(width() / 2, height() / 2), QPoint(width() / 2 - 5, height() / 2));
+			update();
 		}
 	}
-	else if (e->key() == Qt::Key::Key_Left) {
-		if (m_cameraPtr != nullptr) {
+	else if (e->key() == Qt::Key::Key_Left){
+		if (m_cameraPtr != nullptr){
 			m_cameraPtr->MoveTo(QPoint(width() / 2, height() / 2), QPoint(width() / 2 + 5, height() / 2));
+			update();
 		}
 	}
-	else if (e->key() == Qt::Key::Key_Up) {
-		if (m_cameraPtr != nullptr) {
+	else if (e->key() == Qt::Key::Key_Up){
+		if (m_cameraPtr != nullptr){
 			m_cameraPtr->MoveTo(QPoint(width() / 2, height() / 2), QPoint(width() / 2, height() / 2 + 5));
+			update();
 		}
 	}
-	else if (e->key() == Qt::Key::Key_Down) {
-		if (m_cameraPtr != nullptr) {
+	else if (e->key() == Qt::Key::Key_Down){
+		if (m_cameraPtr != nullptr){
 			m_cameraPtr->MoveTo(QPoint(width() / 2, height() / 2), QPoint(width() / 2, height() / 2 - 5));
+			update();
 		}
 	}
 }
@@ -443,9 +476,7 @@ void COpenGLWidget::OnZoomOut()
 
 void COpenGLWidget::OnInternalTimer()
 {
-	if (isVisible()){
-		update();
-	}
+	if (isVisible()) update();
 }
 
 
@@ -453,6 +484,7 @@ void COpenGLWidget::OnCameraRotationAnimation(const QVariant& value)
 {
 	if (m_cameraPtr){
 		m_cameraPtr->RotateTo(value.value<QQuaternion>());
+		update();
 	}
 }
 
@@ -461,6 +493,7 @@ void COpenGLWidget::OnCameraPositionAnimation(const QVariant& value)
 {
 	if (m_cameraPtr){
 		m_cameraPtr->MoveTo(value.value<QVector3D>());
+		update();
 	}
 }
 
@@ -473,6 +506,7 @@ void COpenGLWidget::PaintGl()
 
 	m_programPtr->bind();
 
+	glClearColor(m_backgroundColor.redF(), m_backgroundColor.greenF(), m_backgroundColor.blueF(), 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	SetGlFlags();
@@ -546,25 +580,27 @@ void COpenGLWidget::MouseMoveView(QMouseEvent& e)
 
 	if (e.buttons() == Qt::LeftButton){
 		switch (m_rotationMode){
-			case RotationMode::RTM_FREE:
-				m_cameraPtr->RotateTo(m_prevMousePosition, e.pos());
-				break;
+		case RotationMode::RTM_FREE:
+			m_cameraPtr->RotateTo(m_prevMousePosition, e.pos());
+			break;
 
-			case RotationMode::RTM_AROUND_X:
-				m_cameraPtr->RotateTo(m_prevMousePosition, e.pos(), QVector3D(1.0, 0.0, 0.0));
-				break;
+		case RotationMode::RTM_AROUND_X:
+			m_cameraPtr->RotateTo(m_prevMousePosition, e.pos(), QVector3D(1.0, 0.0, 0.0));
+			break;
 
-			case RotationMode::RTM_AROUND_Y:
-				m_cameraPtr->RotateTo(m_prevMousePosition, e.pos(), QVector3D(0.0, 1.0, 0.0));
-				break;
+		case RotationMode::RTM_AROUND_Y:
+			m_cameraPtr->RotateTo(m_prevMousePosition, e.pos(), QVector3D(0.0, 1.0, 0.0));
+			break;
 
-			case RotationMode::RTM_AROUND_Z:
-				m_cameraPtr->RotateTo(m_prevMousePosition, e.pos(), QVector3D(0.0, 0.0, 1.0));
-				break;
+		case RotationMode::RTM_AROUND_Z:
+			m_cameraPtr->RotateTo(m_prevMousePosition, e.pos(), QVector3D(0.0, 0.0, 1.0));
+			break;
 		}
+		update();
 	}
 	else if (e.buttons() == Qt::RightButton){
 		m_cameraPtr->MoveTo(m_prevMousePosition, e.pos());
+		update();
 	}
 }
 

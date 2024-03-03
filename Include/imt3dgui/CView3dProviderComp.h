@@ -200,6 +200,7 @@ protected:
 	// reimplemented (iqtgui::CGuiComponentBase)
 	void OnGuiCreated() override;
 	void OnGuiRetranslate() override;
+	void OnGuiDesignChanged() override;
 
 protected:
 	iqtgui::CHierarchicalCommand& GetShowGridCommand();
