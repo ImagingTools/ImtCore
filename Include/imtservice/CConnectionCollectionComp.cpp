@@ -97,6 +97,7 @@ void CConnectionCollectionComp::OnComponentCreated()
 	m_collection.RegisterFactory<FactoryConnectionImpl>("ConnectionInfo");
 
 	if (
+		m_connectionUsageIds.GetCount() == m_connectionNames.GetCount() &&
 		m_connectionUsageIds.GetCount() == m_connectionServiceTypeNames.GetCount() &&
 		m_connectionUsageIds.GetCount() == m_connectionDescriptions.GetCount() &&
 		m_connectionUsageIds.GetCount() == m_connectionTypes.GetCount() &&
@@ -106,12 +107,14 @@ void CConnectionCollectionComp::OnComponentCreated()
 			if (m_connectionTypes[index] == 1){
 				connectionType = IServiceConnectionParam::CT_OUTPUT;
 			}
+			QByteArray name = m_connectionNames[index];
 			QByteArray serviceTypeName = m_connectionServiceTypeNames[index];
 			QUrl url = m_connectionUrlListCompPtr[index]->GetUrl();
 			QByteArray connectionUsageId = m_connectionUsageIds[index];
-			CUrlConnectionParam urlConnectionParam(serviceTypeName, connectionUsageId, connectionType, url);
 			QByteArray description = m_connectionDescriptions[index];
-			m_collection.InsertNewObject("ConnectionInfo", connectionUsageId, description, &urlConnectionParam, connectionUsageId);
+
+			CUrlConnectionParam urlConnectionParam(serviceTypeName, connectionUsageId, connectionType, url);
+			m_collection.InsertNewObject("ConnectionInfo", name, description, &urlConnectionParam, connectionUsageId);
 		}
 	}
 }

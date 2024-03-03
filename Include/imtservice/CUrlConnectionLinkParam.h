@@ -22,6 +22,7 @@ public:
 	virtual ConnectionType GetConnectionType() const override;
 	virtual QByteArray GetServiceTypeName() const override;
 	virtual QByteArray GetUsageId() const override;
+	virtual QUrl GetDefaultUrl() const override;
 
 	// reimplemented (imtservice::IServiceConnectionLinkParam)
 	virtual QByteArray GetDependantServiceConnectionId() const override;
@@ -42,6 +43,7 @@ protected:
 	QByteArray m_usageId;
 	QByteArray m_dependantServiceConnectionId;
 	ConnectionStatus m_connectionStatus;
+	QUrl m_defaultUrl;
 };
 
 

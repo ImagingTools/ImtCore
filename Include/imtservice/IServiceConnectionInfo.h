@@ -4,6 +4,9 @@
 // ACF includes
 #include <iser/ISerializable.h>
 
+// Qt includes
+#include <QtCore/QUrl>
+
 
 namespace imtservice
 {
@@ -36,6 +39,10 @@ public:
 		Get connection usage id.
 	*/
 	virtual QByteArray GetUsageId() const = 0;
+	/**
+		Get default url params.
+	*/
+	virtual QUrl GetDefaultUrl() const = 0;
 };
 
 

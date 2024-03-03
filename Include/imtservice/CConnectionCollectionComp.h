@@ -24,6 +24,7 @@ public:
 	I_BEGIN_COMPONENT(CConnectionCollectionComp);
 		I_REGISTER_INTERFACE(imtservice::IConnectionCollection);
 		I_ASSIGN(m_serviceTypeName, "ServiceTypeName", "Service type name for service", true, "");
+		I_ASSIGN_MULTI_0(m_connectionNames, "ConnectionNames", "Connection names", true);
 		I_ASSIGN_MULTI_0(m_connectionServiceTypeNames, "ConnectionServiceTypeNames", "Service type name for connections", true);
 		I_ASSIGN_MULTI_0(m_connectionUsageIds, "ConnectionUsageIds", "Service connection usage ids", true);
 		I_ASSIGN_MULTI_0(m_connectionDescriptions, "ConnectionDescriptions", "Service connection descriptions", true);
@@ -51,6 +52,7 @@ protected:
 
 private:
 	I_ATTR(QByteArray, m_serviceTypeName);
+	I_MULTIATTR(QByteArray, m_connectionNames);
 	I_MULTIATTR(QByteArray, m_connectionServiceTypeNames);
 	I_MULTIATTR(QByteArray, m_connectionUsageIds);
 	I_MULTIATTR(QByteArray, m_connectionDescriptions);

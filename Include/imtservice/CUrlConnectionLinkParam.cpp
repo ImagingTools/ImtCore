@@ -17,15 +17,17 @@ namespace imtservice
 // public methods
 
 CUrlConnectionLinkParam::CUrlConnectionLinkParam()
+	:m_connectionStatus(CS_OK)
 {
 }
 
 
 CUrlConnectionLinkParam::CUrlConnectionLinkParam(const QByteArray& serviceTypeName, const QByteArray& usageId, const QByteArray& dependantServiceConnectionId)
+	:m_serviceTypeName(serviceTypeName),
+	m_usageId(usageId),
+	m_dependantServiceConnectionId(dependantServiceConnectionId),
+	m_connectionStatus(CS_OK)
 {
-	m_serviceTypeName = serviceTypeName;
-	m_usageId = usageId;
-	m_dependantServiceConnectionId = dependantServiceConnectionId;
 }
 
 
@@ -46,6 +48,12 @@ QByteArray CUrlConnectionLinkParam::GetServiceTypeName() const
 QByteArray CUrlConnectionLinkParam::GetUsageId() const
 {
 	return m_usageId;
+}
+
+
+QUrl CUrlConnectionLinkParam::GetDefaultUrl() const
+{
+	return m_defaultUrl;
 }
 
 
@@ -83,7 +91,16 @@ bool CUrlConnectionLinkParam::Serialize(iser::IArchive& archive)
 	retVal = retVal && archive.Process(m_usageId);
 	retVal = retVal && archive.EndTag(serviceUsageIdTag);
 
-	// qDebug() << "m_serviceName" << m_serviceName;
+	iser::CArchiveTag defaultUrlTag("DefaultUrl", "DefaultUrl", iser::CArchiveTag::TT_LEAF);
+	QString defaultUrlStr = m_defaultUrl.toString();
+
+	retVal = retVal && archive.BeginTag(defaultUrlTag);
+	retVal = retVal && archive.Process(defaultUrlStr);
+	retVal = retVal && archive.EndTag(defaultUrlTag);
+
+	if (retVal && !archive.IsStoring()){
+		m_defaultUrl = QUrl(defaultUrlStr);
+	}
 
 	iser::CArchiveTag connectionStatusTag("ConnectionStatus", "Connection Status", iser::CArchiveTag::TT_LEAF);
 	retVal = retVal && archive.BeginTag(connectionStatusTag);
@@ -116,6 +133,7 @@ bool CUrlConnectionLinkParam::CopyFrom(const IChangeable& object, CompatibilityM
 		m_usageId = sourcePtr->m_usageId;
 		m_dependantServiceConnectionId = sourcePtr->m_dependantServiceConnectionId;
 		m_connectionStatus = sourcePtr->m_connectionStatus;
+		m_defaultUrl = sourcePtr->m_defaultUrl;
 
 		return true;
 	}
@@ -143,6 +161,7 @@ bool CUrlConnectionLinkParam::ResetData(CompatibilityMode mode)
 	m_usageId.clear();
 	m_dependantServiceConnectionId.clear();
 	m_connectionStatus = CS_OK;
+	m_defaultUrl.clear();
 
 	return true;
 }

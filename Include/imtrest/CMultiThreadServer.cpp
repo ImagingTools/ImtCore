@@ -88,11 +88,11 @@ void CSocket::HandleReadyRead()
 	// Get state of request data:
 	if (!m_requestPtr->ParseDeviceData(*m_socket)){
 		qDebug() << "ParseDeviceData error";
-		m_startTimer.stop();
-		if (m_socket->isTransactionStarted()){
-			m_socket->commitTransaction();
-		}
-		m_socket->disconnect();
+		// m_startTimer.stop();
+		// if (m_socket->isTransactionStarted()){
+		// 	m_socket->commitTransaction();
+		// }
+		// m_socket->disconnect();
 
 		return;
 	}

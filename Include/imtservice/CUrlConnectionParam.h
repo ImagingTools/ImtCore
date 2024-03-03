@@ -28,6 +28,7 @@ public:
 	virtual ConnectionType GetConnectionType() const override;
 	virtual QByteArray GetServiceTypeName() const override;
 	virtual QByteArray GetUsageId() const override;
+	virtual QUrl GetDefaultUrl() const override;
 
 	// reimplemented (imtservice::IServiceConnectionParam)
 	virtual QList<IncomingConnectionParam> GetIncomingConnections() const override;
@@ -49,6 +50,7 @@ protected:
 	QByteArray m_usageId;
 	QList<IncomingConnectionParam> m_externConnectionList;
 	ConnectionStatus m_connectionStatus;
+	QUrl m_defaultUrl;
 };
 
 

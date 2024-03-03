@@ -9,6 +9,19 @@
 namespace imtgql
 {
 
+class IGqlQuery
+{
+public:
+	virtual void AddParam(const CGqlObject& param) = 0;
+	virtual void AddField(const CGqlObject& field) = 0;
+	virtual void AddSimpleField(const QByteArray& fieldId) = 0;
+	virtual void SetGqlContext(const imtgql::IGqlContext* gqlContext) = 0;
+	// virtual void SetRequestType(RequestType requestType) = 0;
+	virtual void SetCommandId(const QByteArray& commandId) = 0;
+};
+
+
+
 
 class CGqlRequest: virtual public IGqlRequest
 {
@@ -35,7 +48,7 @@ public:
 	// reimplemented (IGqlRequest)
 	virtual QByteArray GetCommandId() const override;
 	virtual RequestType GetRequestType() const override;
-	virtual QByteArray GetQuery() const override;
+	virtual QByteArray GetQuery() const override;  // GetRequestData
 	virtual imtgql::IGqlContext* GetRequestContext() const override;
 	virtual bool ParseQuery(const QByteArray& query, int &errorPosition);
 

@@ -28,9 +28,10 @@ CUrlConnectionParam::CUrlConnectionParam(const QByteArray& serviceTypeName, cons
 	: m_connectionType(connectionType),
 	m_serviceTypeName(serviceTypeName),
 	m_usageId(usageId),
-	m_connectionStatus(CS_OK)
+	m_connectionStatus(CS_OK),
+	m_defaultUrl(url)
 {
-	BaseClass::SetUrl(url);
+	m_url = url;
 }
 
 
@@ -61,6 +62,12 @@ QByteArray CUrlConnectionParam::GetServiceTypeName() const
 QByteArray CUrlConnectionParam::GetUsageId() const
 {
 	return m_usageId;
+}
+
+
+QUrl CUrlConnectionParam::GetDefaultUrl() const
+{
+	return m_defaultUrl;
 }
 
 
@@ -113,8 +120,18 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 				 IConnectionStatus::ConnectionStatus,
 				 IConnectionStatus::ToString,
 				 IConnectionStatus::FromString>(archive, m_connectionStatus);
-
 	retVal = retVal && archive.EndTag(connectionStatusTag);
+
+	iser::CArchiveTag defaultUrlTag("DefaultUrl", "DefaultUrl", iser::CArchiveTag::TT_LEAF);
+	QString defaultUrlStr = m_defaultUrl.toString();
+
+	retVal = retVal && archive.BeginTag(defaultUrlTag);
+	retVal = retVal && archive.Process(defaultUrlStr);
+	retVal = retVal && archive.EndTag(defaultUrlTag);
+
+	if (retVal && !archive.IsStoring()){
+		m_defaultUrl = QUrl(defaultUrlStr);
+	}
 
 	int objectCount = m_externConnectionList.count();
 	if (!archive.IsStoring()){
@@ -180,6 +197,7 @@ bool CUrlConnectionParam::CopyFrom(const IChangeable& object, CompatibilityMode 
 		m_usageId = sourcePtr->m_usageId;
 		m_connectionType = sourcePtr->m_connectionType;
 		m_connectionStatus = sourcePtr->m_connectionStatus;
+		m_defaultUrl = sourcePtr->m_defaultUrl;
 
 		m_externConnectionList.clear();
 
@@ -218,6 +236,7 @@ bool CUrlConnectionParam::ResetData(CompatibilityMode mode)
 	m_externConnectionList.clear();
 	m_connectionType = CT_INPUT;
 	m_connectionStatus = CS_OK;
+	m_defaultUrl.clear();
 
 	return true;
 }
