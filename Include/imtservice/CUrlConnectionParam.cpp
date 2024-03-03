@@ -155,6 +155,11 @@ bool CUrlConnectionParam::Serialize(iser::IArchive& archive)
 		retVal = retVal && archive.Process(elementInfo.id);
 		retVal = retVal && archive.EndTag(idTag);
 
+		iser::CArchiveTag nameTag("Name", "Name", iser::CArchiveTag::TT_LEAF, &objectTag);
+		retVal = retVal && archive.BeginTag(nameTag);
+		retVal = retVal && archive.Process(elementInfo.name);
+		retVal = retVal && archive.EndTag(nameTag);
+
 		iser::CArchiveTag urlTag("Url", "URL", iser::CArchiveTag::TT_LEAF, &objectTag);
 
 		QString urlStr = elementInfo.url.toString();
@@ -229,7 +234,7 @@ istd::IChangeable* CUrlConnectionParam::CloneMe(CompatibilityMode mode) const
 }
 
 
-bool CUrlConnectionParam::ResetData(CompatibilityMode /*mode*/)
+bool CUrlConnectionParam::ResetData(CompatibilityMode mode)
 {
 	istd::CChangeNotifier changeNotifier(this);
 
@@ -244,6 +249,6 @@ bool CUrlConnectionParam::ResetData(CompatibilityMode /*mode*/)
 }
 
 
-} // namespace imtservice
+} // namespace agentinodata
 
 

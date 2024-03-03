@@ -25,17 +25,21 @@ class IServiceConnectionParam: virtual public IServiceConnectionInfo
 public:
 	struct IncomingConnectionParam
 	{
-		QUrl url;
-		QString description;
 		QByteArray id;
+		QString name;
+		QString description;
+		QUrl url;
 
 		IncomingConnectionParam(){
-			id = QUuid::createUuid().toByteArray();
+			id = QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8();
 		}
 
 		bool operator==(const IncomingConnectionParam& other) const
 		{
-			return (url == other.url) && (description == other.description);
+			return	(url == other.url) &&
+					(description == other.description) &&
+					(name == other.name) &&
+					(id == other.id);
 		}
 
 		bool operator!=(const IncomingConnectionParam& other) const

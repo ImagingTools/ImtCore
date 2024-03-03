@@ -114,7 +114,7 @@ void CConnectionCollectionComp::OnComponentCreated()
 			QByteArray description = m_connectionDescriptions[index];
 
 			CUrlConnectionParam urlConnectionParam(serviceTypeName, connectionUsageId, connectionType, url);
-			m_collection.InsertNewObject("ConnectionInfo", name, description, &urlConnectionParam, connectionUsageId);
+			m_collection.InsertNewObject("ConnectionInfo", name, description, &urlConnectionParam, QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8());
 		}
 	}
 }
