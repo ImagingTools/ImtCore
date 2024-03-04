@@ -47,7 +47,7 @@ Rectangle {
 
     Connections {
         target: canvasPage.objectModel
-        onDataChanged: {
+        function onDataChanged(){
             // canvasPage.modelDataChanged()
         }
     }

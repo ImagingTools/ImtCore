@@ -8,6 +8,7 @@ namespace imtservice
 // public methods
 
 // reimplemented (imtservice::IConnectionCollection)
+
 QString CConnectionCollectionComp::GetServiceTypeName() const
 {
 	QString retVal;
@@ -58,7 +59,17 @@ const IServiceConnectionParam* CConnectionCollectionComp::GetConnectionMetaInfo(
 
 bool CConnectionCollectionComp::SetUrl(const QByteArray& id, const QUrl& url) const
 {
-	CUrlConnectionParam* urlConnectionParam =  dynamic_cast<CUrlConnectionParam*>(const_cast<istd::IChangeable*>(m_collection.GetObjectPtr(id)));
+	const istd::IChangeable* objectPtr = m_collection.GetObjectPtr(id);
+	if (objectPtr == nullptr){
+		return false;
+	}
+
+	istd::IChangeable* notConstObjectPtr = const_cast<istd::IChangeable*>(objectPtr);
+	if (notConstObjectPtr == nullptr){
+		return false;
+	}
+
+	CUrlConnectionParam* urlConnectionParam =  dynamic_cast<CUrlConnectionParam*>(notConstObjectPtr);
 	if (urlConnectionParam != nullptr){
 		for (int index = 0; index < m_connectionUsageIds.GetCount(); index++){
 			if (id == m_connectionUsageIds[index]){

@@ -576,7 +576,9 @@ Item {
             property var views: [];
             property bool isDirty: false;
 
-            property QtObject dataControllerConnections: QtObject {
+            property Connections dataControllerConnections: Connections {
+                target: singleDocumentData.documentDataController;
+
                 function onHasRemoteChangesChanged(){
                     console.log("singleDocumentData onHasRemoteChangesChanged");
                     if (singleDocumentData.documentDataController){
@@ -605,12 +607,13 @@ Item {
                 }
 
                 function onDocumentModelChanged(){
+
                     if (!singleDocumentData.documentDataController || !singleDocumentData.documentDataController.documentModel){
                         return;
                     }
 
                     let documentModel = singleDocumentData.documentDataController.documentModel;
-                    console.log("singleDocumentData onDocumentModelChanged", documentModel.toJSON());
+                    console.log("singleDocumentData onDocumentModelChanged", documentModel);
 
                     if (documentModel.ContainsKey("Id")){
                         singleDocumentData.documentId = documentModel.GetData("Id");
@@ -622,32 +625,39 @@ Item {
 
                     singleDocumentData.blockingUpdateModel = true;
                     for (let i = 0; i < singleDocumentData.views.length; i++){
+                        console.log("singleDocumentData.views[i].model", singleDocumentData.views[i].model);
+
                         singleDocumentData.views[i].model = documentModel;
                         if (documentManager.documentsModel.get(singleDocumentData.documentIndex).IsNew){
                             singleDocumentData.views[i].doUpdateModel();
                         }
+
+                        singleDocumentData.views[i].doUpdateGui();
                     }
                     singleDocumentData.blockingUpdateModel = false;
 
                     documentManager.updateDocumentTitle(singleDocumentData.documentIndex);
 
-                    documentModel.dataChanged.connect(singleDocumentData.modelConnections.onDataChanged);
+//                    documentModel.dataChanged.connect(singleDocumentData.modelConnections.onDataChanged);
+
+                    if (singleDocumentData.undoManager.modelIsRegistered()){
+                        singleDocumentData.undoManager.unregisterModel();
+                    }
 
                     singleDocumentData.undoManager.registerModel(documentModel);
                     singleDocumentData.documentValidator.documentModel = documentModel;
-
-                    console.log("StopLoading");
 
                     Events.sendEvent("StopLoading");
                 }
 
                 function onError(){
-                    console.log("OnError");
                     Events.sendEvent("StopLoading");
                 }
             }
 
-            property QtObject modelConnections: QtObject {
+            property Connections modelConnections: Connections {
+                target: singleDocumentData.documentDataController.documentModel;
+
                 function onDataChanged(){
                     console.log("Connections onModelChanged", singleDocumentData.blockingUpdateModel);
                     if (singleDocumentData.blockingUpdateModel){
@@ -662,15 +672,15 @@ Item {
 
             property bool blockingUpdateModel: false;
 
-            onDocumentDataControllerChanged: {
-                console.log("onDocumentDataControllerChanged", documentDataController);
-                if (documentDataController){
-                    documentDataController.saved.connect(dataControllerConnections.onSaved);
-                    documentDataController.documentModelChanged.connect(dataControllerConnections.onDocumentModelChanged);
-                    documentDataController.error.connect(dataControllerConnections.onError);
-                    documentDataController.hasRemoteChangesChanged.connect(dataControllerConnections.onHasRemoteChangesChanged);
-                }
-            }
+//            onDocumentDataControllerChanged: {
+//                console.log("onDocumentDataControllerChanged", documentDataController);
+//                if (documentDataController){
+//                    documentDataController.saved.connect(dataControllerConnections.onSaved);
+//                    documentDataController.documentModelChanged.connect(dataControllerConnections.onDocumentModelChanged);
+//                    documentDataController.error.connect(dataControllerConnections.onError);
+//                    documentDataController.hasRemoteChangesChanged.connect(dataControllerConnections.onHasRemoteChangesChanged);
+//                }
+//            }
 
             onBlockingUpdateModelChanged: {
                 if (undoManager){

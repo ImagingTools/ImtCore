@@ -25,6 +25,8 @@ DocumentDataController {
         if (documentModel.ContainsKey("Name")){
             documentName = documentModel.GetData("Name");
         }
+
+        hasRemoteChanges = false;
     }
 
     onSaved: {
@@ -33,7 +35,11 @@ DocumentDataController {
     }
 
     onDocumentIdChanged: {
-        subscriptionClient.subscriptionId = documentId;
+        if (documentId !== ""){
+            subscriptionClient.register();
+        }
+
+//        subscriptionClient.subscriptionId = documentId;
     }
 
     onHasRemoteChangesChanged: {
@@ -45,6 +51,7 @@ DocumentDataController {
     }
 
     function updateDocumentModel(){
+        console.log("updateDocumentModel");
         gqlGetModel.getData();
     }
 
@@ -65,19 +72,31 @@ DocumentDataController {
     }
 
     property SubscriptionClient subscriptionClient: SubscriptionClient {
-        property bool ok: container.subscriptionCommandId !== "" && container.documentId !== "";
-        onOkChanged: {
-            if (ok){
-                console.log("Document RegisterSubscription", container.subscriptionCommandId, container.documentId);
+//        property bool ok: container.subscriptionCommandId !== "" && container.documentId !== "";
+//        onOkChanged: {
+//            if (ok){
+//                console.log("Document RegisterSubscription", container.subscriptionCommandId, container.documentId);
 
-                let subscriptionRequestId = container.subscriptionCommandId;
-                var query = Gql.GqlRequest("subscription", subscriptionRequestId);
-                var queryFields = Gql.GqlObject("notification");
-                queryFields.InsertField("Id");
-                query.AddField(queryFields);
+//                let subscriptionRequestId = container.subscriptionCommandId;
+//                var query = Gql.GqlRequest("subscription", subscriptionRequestId);
+//                var queryFields = Gql.GqlObject("notification");
+//                queryFields.InsertField("Id");
+//                query.AddField(queryFields);
 
-                Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient});
-            }
+//                Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient});
+//            }
+//        }
+
+        function register(){
+            console.log("Document RegisterSubscription", container.subscriptionCommandId, container.documentId);
+
+            let subscriptionRequestId = container.subscriptionCommandId;
+            var query = Gql.GqlRequest("subscription", subscriptionRequestId);
+            var queryFields = Gql.GqlObject("notification");
+            queryFields.InsertField("Id");
+            query.AddField(queryFields);
+
+            Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient});
         }
 
         onStateChanged: {

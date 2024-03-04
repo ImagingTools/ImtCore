@@ -8,6 +8,12 @@ Item {
     signal undo();
     signal redo();
 
+    Component.onDestruction: {
+        if (modelIsRegistered()){
+            unregisterModel();
+        }
+    }
+
     function getCurrentStateModel()
     {
         if (internal.m_undoStack.length > 0){

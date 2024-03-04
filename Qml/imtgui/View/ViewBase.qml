@@ -59,6 +59,8 @@ Item {
     }
 
     function onModelChanged(){
+        console.log("ViewBase onModelChanged");
+
         doUpdateGui();
     }
 

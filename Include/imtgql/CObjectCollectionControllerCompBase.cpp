@@ -343,12 +343,12 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 		}
 
 		if (!m_objectCollectionCompPtr->SetObjectData(oldObjectId, *savedObject, istd::IChangeable::CM_WITHOUT_REFS, operationContextPtr.GetPtr())){
-			errorMessage = QObject::tr("Can not update object: %1").arg(qPrintable(oldObjectId));
+			errorMessage = QString("Can not update object: %1").arg(qPrintable(oldObjectId));
 		}
 	}
 	else{
 		if (errorMessage.isEmpty()){
-			errorMessage = QObject::tr("Can not create object for update: %1").arg(qPrintable(oldObjectId));
+			errorMessage = QString("Can not create object for update: %1").arg(qPrintable(oldObjectId));
 		}
 	}
 
@@ -404,7 +404,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateCollection(
 				if (!objectId.isEmpty()){
 					istd::IChangeable* savedObject = CreateObject(gqlRequest, objectId, name, description, errorMessage);
 					if (!m_objectCollectionCompPtr->SetObjectData(objectId, *savedObject)){
-						errorMessage += QObject::tr("Could not update object: %1; ").arg(qPrintable(objectId));
+						errorMessage += QString("Could not update object: %1; ").arg(qPrintable(objectId));
 						objectIdsModel.SetData("Failed", true, i);
 					}
 				}
@@ -714,7 +714,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 	if (objectId.isEmpty()){
-		errorMessage = QObject::tr("No object-ID could not be extracted from the request");
+		errorMessage = QString("No object-ID could not be extracted from the request");
 		SendErrorMessage(0, errorMessage, "CObjectCollectionControllerCompBase");
 
 		return nullptr;
@@ -738,7 +738,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::DeleteObject(
 		rootModelPtr->SetExternTreeModel("data", dataModel);
 	}
 	else{
-		errorMessage = QObject::tr("Can't remove object: %1").arg(QString(objectId));
+		errorMessage = QString("Can't remove object: %1").arg(QString(objectId));
 	}
 
 	if (!errorMessage.isEmpty()){

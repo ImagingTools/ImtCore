@@ -12,10 +12,6 @@ Window
     minimumWidth: 800;
 
     visible: true;
-
-    onActiveFocusItemChanged: {
-        console.log("current activeFocusItem", activeFocusItem)
-    }
 }
 
 
