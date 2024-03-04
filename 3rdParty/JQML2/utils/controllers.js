@@ -307,9 +307,88 @@ class KeyboardController {
 
     constructor(){
         window.onkeydown = (e)=>{
-            let target = mainRoot.$activeFocusedElement ? mainRoot.$activeFocusedElement : mainRoot.$focusedElement
-            if(!(target instanceof TextInput) && !(target instanceof TextEdit)){
-                
+
+            for(let target of mainRoot.$activeFocusedElements.length ? mainRoot.$activeFocusedElements : mainRoot.$focusedElements){
+                if(target){
+                    if(e.key === 'Enter' || e.key === 'Return'){
+                        if(target instanceof TextInput || target instanceof TextEdit) {
+                            if(target instanceof TextInput) e.preventDefault()
+                            target.onKeyDown(e.key)
+                            return
+                        }
+                        
+                    }
+                    let obj = target
+                    // let parent = target.parent
+                    // let find = false
+                    // while(parent && !find){
+                    //     if(parent instanceof FocusScope){
+                    //         find = true
+                    //     } else {
+                    //         parent = parent.parent
+                    //     }
+                    // }
+
+                    // let obj = target
+                    // if(!target.$properties.KeyNavigation && parent && parent.UID){
+                    //     obj = parent
+                    // }
+
+                    if(obj.$properties.KeyNavigation){
+                    
+                        if(e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt') return
+
+                        if(e.key === 'ArrowLeft') {
+                            if(obj.KeyNavigation.left){
+                                e.preventDefault()
+                                obj.KeyNavigation.left.focus = true
+                                return
+                            }
+                        }
+                        if(e.key === 'ArrowRight') {
+                            if(obj.KeyNavigation.right){
+                                e.preventDefault()
+                                obj.KeyNavigation.right.focus = true
+                                return
+                            }
+                        }
+                        if(e.key === 'ArrowUp') {
+                            if(obj.KeyNavigation.up){
+                                e.preventDefault()
+                                obj.KeyNavigation.up.focus = true
+                                return
+                            }
+                        }
+                        if(e.key === 'ArrowDown') {
+                            if(obj.KeyNavigation.down){
+                                e.preventDefault()
+                                obj.KeyNavigation.down.focus = true
+                                return
+                            }
+                        }
+                        if(e.key === 'Tab' && e.shiftKey) {
+                            if(obj.KeyNavigation.backtab){
+                                e.preventDefault()
+                                obj.KeyNavigation.backtab.focus = true
+                                return
+                            }
+                        } else if(e.key === 'Tab') {
+                            if(obj.KeyNavigation.tab){
+                                e.preventDefault()
+                                obj.KeyNavigation.tab.focus = true
+                                return
+                            }
+                        }
+                    }
+                    if(obj.$signals['Keys.pressed']){
+                        obj.$signals['Keys.pressed'](e)
+                        return
+                    }
+                }
+            }
+
+            // if(!(target instanceof TextInput) && !(target instanceof TextEdit)){
+                    
                 if(e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt') return
                 let key = e.key
                 if(e.key === 'ArrowLeft') key = 'Left'
@@ -388,72 +467,7 @@ class KeyboardController {
                     return
                 }
                 
-            } else {
-                if(e.key === 'Enter' || e.key === 'Return'){
-                    if(target instanceof TextInput) e.preventDefault()
-                    target.onKeyDown(e.key)
-                }
-            }
-
             
-            
-            if(target){
-                let parent = target.parent
-                let find = false
-                while(parent && !find){
-                    if(parent instanceof FocusScope){
-                        find = true
-                    } else {
-                        parent = parent.parent
-                    }
-                }
-
-                let obj = target
-                if(!target.$properties.KeyNavigation && parent && parent.UID){
-                    obj = parent
-                }
-
-                if(obj.$properties.KeyNavigation){
-                
-                    if(e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt') return
-
-                    if(e.key === 'ArrowLeft') {
-                        if(obj.KeyNavigation.left){
-                            e.preventDefault()
-                            obj.KeyNavigation.left.focus = true
-                        }
-                    }
-                    if(e.key === 'ArrowRight') {
-                        if(obj.KeyNavigation.right){
-                            e.preventDefault()
-                            obj.KeyNavigation.right.focus = true
-                        }
-                    }
-                    if(e.key === 'ArrowUp') {
-                        if(obj.KeyNavigation.up){
-                            e.preventDefault()
-                            obj.KeyNavigation.up.focus = true
-                        }
-                    }
-                    if(e.key === 'ArrowDown') {
-                        if(obj.KeyNavigation.down){
-                            e.preventDefault()
-                            obj.KeyNavigation.down.focus = true
-                        }
-                    }
-                    if(e.key === 'Tab' && e.shiftKey) {
-                        if(obj.KeyNavigation.backtab){
-                            e.preventDefault()
-                            obj.KeyNavigation.backtab.focus = true
-                        }
-                    } else if(e.key === 'Tab') {
-                        if(obj.KeyNavigation.tab){
-                            e.preventDefault()
-                            obj.KeyNavigation.tab.focus = true
-                        }
-                    }
-                }
-            }
         }
     }
 

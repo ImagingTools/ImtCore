@@ -250,16 +250,28 @@ class Item extends QtObject {
     }
 
     $focusChanged(){
+        let focusedElements = this.getPropertyValue('context').$focusedElements
         if(this.getPropertyValue('focus')){
-            if(this.getPropertyValue('context').$focusedElement && this.getPropertyValue('context').$focusedElement.UID){
-                this.getPropertyValue('context').$focusedElement.getProperty('focus').reset(false)
+            if(focusedElements.indexOf(this) < 0) {
+                for(let element of focusedElements){
+                    if(element.UID){
+                        element.getProperty('activeFocus').reset(false)
+                        element.getProperty('focus').reset(false)
+                    }
+                }
+                focusedElements.push(this)
             }
-            this.getPropertyValue('context').$focusedElement = this
+        } else {
+            let index = focusedElements.indexOf(this)
+            if(index >= 0) focusedElements.splice(index, 1)
         }
         
         let parent = this.parent
         while(parent){
             if(parent instanceof FocusScope){
+                if(focusedElements.indexOf(parent) < 0) {
+                    focusedElements.push(parent)
+                }
                 parent.getProperty('focus').reset(this.getPropertyValue('focus'))
                 break
             } else {
@@ -270,12 +282,32 @@ class Item extends QtObject {
     }
 
     $activeFocusChanged(){
+        let activeFocusedElements = this.getPropertyValue('context').$activeFocusedElements
         if(this.getPropertyValue('activeFocus')){
-            if(this.getPropertyValue('context').$activeFocusedElement && this.getPropertyValue('context').$activeFocusedElement.UID){
-                this.getPropertyValue('context').$activeFocusedElement.getProperty('focus').reset(false)
-                this.getPropertyValue('context').$activeFocusedElement.getProperty('activeFocus').reset(false)
+            if(activeFocusedElements.indexOf(this) < 0) {
+                for(let element of activeFocusedElements){
+                    if(element.UID){
+                        element.getProperty('activeFocus').reset(false)
+                    }
+                }
+                activeFocusedElements.push(this)
             }
-            this.getPropertyValue('context').$activeFocusedElement = this
+        } else {
+            let index = activeFocusedElements.indexOf(this)
+            if(index >= 0) activeFocusedElements.splice(index, 1)
+        }
+        
+        let parent = this.parent
+        while(parent){
+            if(parent instanceof FocusScope){
+                if(activeFocusedElements.indexOf(parent) < 0) {
+                    activeFocusedElements.push(parent)
+                }
+                parent.getProperty('activeFocus').reset(this.getPropertyValue('activeFocus'))
+                break
+            } else {
+                parent = parent.parent
+            }
         }
     }
 

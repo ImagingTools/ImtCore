@@ -280,6 +280,8 @@ window.onload = ()=>{
     mainRoot.createProperty('application',QVar,'')
     mainRoot.getProperty('language').getNotify().connect(mainRoot, mainRoot.updateLanguage)
     mainRoot.getProperty('application').getNotify().connect(mainRoot, mainRoot.updateLanguage)
+    mainRoot.$focusedElements = []
+    mainRoot.$activeFocusedElements = []
 
     mainRoot.createProperty('mapTools',QBool,false)
     mainRoot.getProperty('mapTools').getNotify().connect(mainRoot, ()=>{
