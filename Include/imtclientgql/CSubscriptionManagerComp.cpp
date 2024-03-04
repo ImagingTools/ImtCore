@@ -255,7 +255,7 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 
 	imtrest::ConstRequestPtr constRequestPtr(m_engineCompPtr->CreateRequestForSend(*this, 0, queryData, ""));
 
-	NetworkOperation networkOperation(10000, this);
+	NetworkOperation networkOperation(100, this);
 
 	GqlResponsePtr retVal;
 
@@ -265,27 +265,28 @@ IGqlClient::GqlResponsePtr CSubscriptionManagerComp::SendRequest(IGqlClient::Gql
 		return retVal;
 	}
 
-	while(true){
-		int resultCode = networkOperation.connectionLoop.exec(QEventLoop::ExcludeUserInputEvents);
-		if(resultCode == 1){
-			QMutexLocker queryLocker(&m_queryDataMapMutex);
-
-			if(m_queryDataMap.contains(key)){
-				imtgql::CGqlResponse* responsePtr = new imtgql::CGqlResponse(requestPtr);
-				responsePtr->SetResponseData(m_queryDataMap.value(key));
-				retVal.reset(responsePtr);
-
-				m_queryDataMap.remove(key);
-
-				return retVal;
-			}
-			queryLocker.unlock();
-
-			continue;
-		}
-		else{
+	int resultCode = 0;
+	for (int i = 0; i < 100; i++){
+		networkOperation.timer.start();
+		resultCode = networkOperation.connectionLoop.exec();
+		QCoreApplication::processEvents();
+		if (resultCode == 1){
 			break;
 		}
+	}
+	if(resultCode == 1){
+		QMutexLocker queryLocker(&m_queryDataMapMutex);
+
+		if(m_queryDataMap.contains(key)){
+			imtgql::CGqlResponse* responsePtr = new imtgql::CGqlResponse(requestPtr);
+			responsePtr->SetResponseData(m_queryDataMap.value(key));
+			retVal.reset(responsePtr);
+
+			m_queryDataMap.remove(key);
+
+			return retVal;
+		}
+		queryLocker.unlock();
 	}
 
 	return retVal;
@@ -428,8 +429,7 @@ CSubscriptionManagerComp::NetworkOperation::NetworkOperation(int timeout, const 
 
 		// If the timer is running out, the internal event loop will be finished:
 		QObject::connect(&timer, &QTimer::timeout, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);
-
-		timer.start(timeout);
+		timer.setInterval(timeout);
 	}
 }
 
