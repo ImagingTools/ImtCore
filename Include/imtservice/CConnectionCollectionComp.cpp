@@ -71,18 +71,20 @@ bool CConnectionCollectionComp::SetUrl(const QByteArray& id, const QUrl& url) co
 
 	CUrlConnectionParam* urlConnectionParam =  dynamic_cast<CUrlConnectionParam*>(notConstObjectPtr);
 	if (urlConnectionParam != nullptr){
+		bool retVal = true;
+
 		for (int index = 0; index < m_connectionUsageIds.GetCount(); index++){
 			if (id == m_connectionUsageIds[index]){
 				if (index < m_connectionUrlListCompPtr.GetCount()){
-					m_connectionUrlListCompPtr[index]->SetUrl(url);
-					urlConnectionParam->SetUrl(url);
+					retVal = retVal && m_connectionUrlListCompPtr[index]->SetUrl(url);
+					retVal = retVal && urlConnectionParam->SetUrl(url);
 
 					break;
 				}
 			}
 		}
 
-		return true;
+		return retVal;
 	}
 
 	return false;
@@ -125,7 +127,7 @@ void CConnectionCollectionComp::OnComponentCreated()
 			QByteArray description = m_connectionDescriptions[index];
 
 			CUrlConnectionParam urlConnectionParam(serviceTypeName, connectionUsageId, connectionType, url);
-			m_collection.InsertNewObject("ConnectionInfo", name, description, &urlConnectionParam, QUuid::createUuid().toString(QUuid::WithoutBraces).toUtf8());
+			m_collection.InsertNewObject("ConnectionInfo", name, description, &urlConnectionParam, connectionUsageId);
 		}
 	}
 }
