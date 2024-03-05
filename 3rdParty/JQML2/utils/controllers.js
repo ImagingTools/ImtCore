@@ -315,6 +315,8 @@ class KeyboardController {
                             if(target instanceof TextInput) e.preventDefault()
                             target.onKeyDown(e.key)
                             return
+                        } else {
+                            continue
                         }
                         
                     }
@@ -341,41 +343,41 @@ class KeyboardController {
                         if(e.key === 'ArrowLeft') {
                             if(obj.KeyNavigation.left){
                                 e.preventDefault()
-                                obj.KeyNavigation.left.focus = true
+                                obj.KeyNavigation.left.forceActiveFocus()
                                 return
                             }
                         }
                         if(e.key === 'ArrowRight') {
                             if(obj.KeyNavigation.right){
                                 e.preventDefault()
-                                obj.KeyNavigation.right.focus = true
+                                obj.KeyNavigation.right.forceActiveFocus()
                                 return
                             }
                         }
                         if(e.key === 'ArrowUp') {
                             if(obj.KeyNavigation.up){
                                 e.preventDefault()
-                                obj.KeyNavigation.up.focus = true
+                                obj.KeyNavigation.up.forceActiveFocus()
                                 return
                             }
                         }
                         if(e.key === 'ArrowDown') {
                             if(obj.KeyNavigation.down){
                                 e.preventDefault()
-                                obj.KeyNavigation.down.focus = true
+                                obj.KeyNavigation.down.forceActiveFocus()
                                 return
                             }
                         }
                         if(e.key === 'Tab' && e.shiftKey) {
                             if(obj.KeyNavigation.backtab){
                                 e.preventDefault()
-                                obj.KeyNavigation.backtab.focus = true
+                                obj.KeyNavigation.backtab.forceActiveFocus()
                                 return
                             }
                         } else if(e.key === 'Tab') {
                             if(obj.KeyNavigation.tab){
                                 e.preventDefault()
-                                obj.KeyNavigation.tab.focus = true
+                                obj.KeyNavigation.tab.forceActiveFocus()
                                 return
                             }
                         }
