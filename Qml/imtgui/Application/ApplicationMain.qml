@@ -159,25 +159,27 @@ Item {
                 if (webSocketServerUrl && webSocketServerUrl !== ""){
                     webSocketServerUrl =  webSocketServerUrl.replace("http", "ws")
                     subscriptionManager.url = webSocketServerUrl;
+                    console.log("WEB Socket serverUrl:", webSocketServerUrl);
 
                     return;
                 }
 
                 let serverUrl = application.settingsProvider.getValue("ServerUrl");
 
-                serverUrl = serverUrl.replace("http", "ws")
+                if (serverUrl !== ""){
+                    if (serverUrl[serverUrl.length - 1] !== '/'){
+                        serverUrl += "/";
+                    }
 
-                if (serverUrl[serverUrl.length - 1] !== '/'){
-                    serverUrl += "/";
+
+                    serverUrl += "wssub";
+
+                    console.log("WEB Socket serverUrl", serverUrl);
                 }
-
-                 if (context.application){
-                     serverUrl += context.application + "/";
-                 }
-
-                serverUrl += "wssub";
+                else{
+                    serverUrl = "ws://" + context.location.host + "/" + context.appName + "/wssub";
+                }
                 console.log("WEB Socket serverUrl", serverUrl);
-
                 subscriptionManager.url = serverUrl;
             }
         }
