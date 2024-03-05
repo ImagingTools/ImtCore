@@ -396,10 +396,6 @@ Rectangle {
             property real imageSize: 20 //* scaleCoeff;
             property real imageMargin: 4 //* scaleCoeff;
 
-            //image urls
-            property string imageUrl_1: "../../../" + Style.theme + "/Icons" + "/AppIcon.svg"
-            property string imageUrl_2: "../../../" + Style.theme + "/Icons" + "/Sickle.svg"
-
             //colors
             property string selectedColor: "#98C9C2"; // "#00ff00"//"#90EE90";
             property string mainColor: "#335777";
@@ -566,6 +562,10 @@ Rectangle {
                 let width_ = canvasPage.objectModel.IsValidData("Width", index) ? canvasPage.objectModel.GetData("Width", index)  : canvas.mainRec_width;
                 let mainText  = canvasPage.objectModel.GetData("MainText", index)
                 let secondText  = canvasPage.objectModel.GetData("SecondText", index)
+                let thirdText  = canvasPage.objectModel.GetData("ThirdText", index)
+                // Style.getIconPath("Icons/Running", Icon.State.On, Icon.Mode.Normal);
+                let iconUrl_1  = "../../../" + Style.getIconPath(canvasPage.objectModel.GetData("IconUrl_1", index), Icon.State.On, Icon.Mode.Normal)
+                // let iconUrl_1  = "../../../" + Style.theme + "/" + canvasPage.objectModel.GetData("IconUrl_1", index) + ".svg"
                 let selected = canvasPage.objectModel.IsValidData("Selected", index) ? canvasPage.objectModel.GetData("Selected", index) : false;
                 let hasError = canvasPage.objectModel.IsValidData("HasError", index) ? canvasPage.objectModel.GetData("HasError", index) : false;
                 let isComposite = canvasPage.objectModel.IsValidData("IsComposite", index) ? canvasPage.objectModel.GetData("IsComposite", index) : false;
@@ -637,13 +637,28 @@ Rectangle {
                 ctx.fillText(textStr2, text_x2, text_y2);
                 ctx.strokeText(textStr2, text_x2, text_y2);
 
+                //Third text
+                ctx.strokeStyle = canvas.secondTextColor;
+                ctx.fillStyle = canvas.secondTextColor;
+                ctx.lineWidth = 0.5;
+                ctx.font = fontStr2;
+                let textStr3 = thirdText;
+                let textWidth3 = ctx.measureText(thirdText).width
+
+                let text_x3 = x_ + mainRecWidth - textWidth3 - canvas.borderShift - canvas.textMargin ;
+                let text_y3 = y_ + canvas.mainRec_height - canvas.borderShift - canvas.textMargin;
+
+                ctx.beginPath()
+                ctx.fillText(textStr3, text_x3, text_y3);
+                ctx.strokeText(textStr3, text_x3, text_y3);
+
                 //images
                 let image1_x = x_ + mainRecWidth - canvas.borderShift - canvas.imageSize - canvas.imageMargin;
                 let image1_y = text_y - canvas.imageSize + canvas.imageMargin;
                 let image2_x = image1_x - canvas.imageSize - canvas.imageMargin;
                 let image2_y = text_y - canvas.imageSize + canvas.imageMargin;
                 ctx.beginPath()
-                // ctx.drawImage(imageUrl_1, image1_x, image1_y, canvas.imageSize, canvas.imageSize);
+                ctx.drawImage(iconUrl_1, image1_x, image1_y, canvas.imageSize, canvas.imageSize);
                 // ctx.drawImage(imageUrl_2, image2_x, image2_y, canvas.imageSize, canvas.imageSize);
 
             }
