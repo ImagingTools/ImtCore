@@ -11,21 +11,7 @@ namespace imtclientgql
 
 // protected methods
 
-void CSubscriberCompBase::OnComponentCreated()
-{
-	BaseClass::OnComponentCreated();
-
-	if (m_subscriptionManagerCompPtr.IsValid()){
-		imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, *m_commandAttrPtr);
-
-		imtgql::CGqlObject subscriptionField("data");
-		subscriptionField.InsertField("id");
-		gqlRequest.AddField(subscriptionField);
-
-		m_subscriptionId = m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, this);
-	}
-}
-
+// reimplemented (imtgql::IGqlSubscriptionClient)
 
 void CSubscriberCompBase::OnResponseReceived(
 			const QByteArray& /*subscriptionId*/,
@@ -39,6 +25,24 @@ void CSubscriberCompBase::OnSubscriptionStatusChanged(
 			const SubscriptionStatus& /*status*/,
 			const QString& /*message*/)
 {
+}
+
+
+// reimplemented (icomp::CComponentBase)
+
+void CSubscriberCompBase::OnComponentCreated()
+{
+	BaseClass::OnComponentCreated();
+
+	if (m_subscriptionManagerCompPtr.IsValid()){
+		imtgql::CGqlRequest gqlRequest(imtgql::IGqlRequest::RT_SUBSCRIPTION, *m_commandAttrPtr);
+
+		imtgql::CGqlObject subscriptionField("data");
+		subscriptionField.InsertField("id");
+		gqlRequest.AddField(subscriptionField);
+
+		m_subscriptionId = m_subscriptionManagerCompPtr->RegisterSubscription(gqlRequest, this);
+	}
 }
 
 

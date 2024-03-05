@@ -5,7 +5,6 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 
-
 // ImtCore includes
 #include <imtbase/ICollectionInfo.h>
 
@@ -18,9 +17,8 @@ namespace imtclientgql
 
 // reimplemented (imtgql::IGqlSubscriptionClient)
 
-void CModelSubscriberComp::OnResponseReceived(const QByteArray & subscriptionId, const QByteArray & subscriptionData)
+void CModelSubscriberComp::OnResponseReceived(const QByteArray& subscriptionId, const QByteArray& subscriptionData)
 {
-	qDebug() << "CModelSubscriberComp OnResponseReceived" << subscriptionId << subscriptionData;
 	istd::IChangeable::ChangeSet changeSet(istd::IChangeable::CF_ANY);
 	imtbase::ICollectionInfo::NotifierInfo notifierInfo;
 
@@ -44,14 +42,11 @@ void CModelSubscriberComp::OnResponseReceived(const QByteArray & subscriptionId,
 	}
 
 	if (m_changeableModelCompPtr.IsValid()){
-		qDebug() << "notifier";
-
 		istd::CChangeNotifier notifier(m_changeableModelCompPtr.GetPtr(), &changeSet);
 	}
 }
 
 
-
-} // namespace gmgaws
+} // namespace imtclientgql
 
 

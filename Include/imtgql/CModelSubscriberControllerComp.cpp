@@ -29,8 +29,6 @@ bool CModelSubscriberControllerComp::SetSubscriptions()
 			if (responsePtr.IsValid()){
 				const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest->GetRequestId());
 				if (sender != nullptr){
-					qDebug() << "SetSubscriptions";
-
 					sender->SendResponse(responsePtr);
 				}
 			}
@@ -66,10 +64,10 @@ void CModelSubscriberControllerComp::OnComponentDestroyed()
 
 void CModelSubscriberControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
-	qDebug() << "Model OnUpdate";
 	SetSubscriptions();
 }
 
 
 } // namespace imtgql
+
 

@@ -26,9 +26,6 @@ public:
 	I_END_COMPONENT;
 
 protected:
-	// reimplemented (icomp::CComponentBase)
-	virtual void OnComponentCreated() override;
-
 	// reimplemented (imtgql::IGqlSubscriptionClient)
 	virtual void OnResponseReceived(
 				const QByteArray& subscriptionId,
@@ -37,6 +34,9 @@ protected:
 				const QByteArray& subscriptionId,
 				const SubscriptionStatus& status,
 				const QString& message) override;
+
+	// reimplemented (icomp::CComponentBase)
+	virtual void OnComponentCreated() override;
 
 protected:
 	QByteArray m_subscriptionId;
