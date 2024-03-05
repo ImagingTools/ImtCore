@@ -43,10 +43,18 @@ Item {
         if (collectionView){
             elementsConnections.target = collectionView.table;
 
-            collectionView.selectionChanged.connect(internal.onSelectionChanged);
+//            collectionView.selectionChanged.connect(internal.onSelectionChanged);
             if (collectionView.commandsController){
                 collectionView.commandsController.commandsModelChanged.connect(internal.onCommandsModelChanged);
             }
+        }
+    }
+
+    Connections {
+        target: container.collectionView;
+
+        function onSelectionChanged(selection){
+            container.updateItemSelection(selection);
         }
     }
 

@@ -14,7 +14,7 @@ DocumentDataController {
     property string subscriptionCommandId;
 
     Component.onDestruction: {
-        Events.sendEvent("UnRegisterSubscription", subscriptionClient);
+        Events.sendEvent("UnRegisterSubscription", container.subscriptionClient);
     }
 
     onError: {
@@ -36,14 +36,8 @@ DocumentDataController {
 
     onDocumentIdChanged: {
         if (documentId !== ""){
-            subscriptionClient.register();
+            container.subscriptionClient.register();
         }
-
-//        subscriptionClient.subscriptionId = documentId;
-    }
-
-    onHasRemoteChangesChanged: {
-        console.log("onHasRemoteChangesChanged", hasRemoteChanges);
     }
 
     function getDocumentName(){
@@ -72,21 +66,6 @@ DocumentDataController {
     }
 
     property SubscriptionClient subscriptionClient: SubscriptionClient {
-//        property bool ok: container.subscriptionCommandId !== "" && container.documentId !== "";
-//        onOkChanged: {
-//            if (ok){
-//                console.log("Document RegisterSubscription", container.subscriptionCommandId, container.documentId);
-
-//                let subscriptionRequestId = container.subscriptionCommandId;
-//                var query = Gql.GqlRequest("subscription", subscriptionRequestId);
-//                var queryFields = Gql.GqlObject("notification");
-//                queryFields.InsertField("Id");
-//                query.AddField(queryFields);
-
-//                Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient});
-//            }
-//        }
-
         function register(){
             console.log("Document RegisterSubscription", container.subscriptionCommandId, container.documentId);
 
@@ -96,16 +75,13 @@ DocumentDataController {
             queryFields.InsertField("Id");
             query.AddField(queryFields);
 
-            Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient});
+            Events.sendEvent("RegisterSubscription", {"Query": query, "Client": container.subscriptionClient});
         }
 
         onStateChanged: {
             console.log("Document SubscriptionClient onStateChanged", state);
 
             if (state === "Ready"){
-                console.log("subscriptionClient", subscriptionClient.toJSON());
-                console.log("container.documentId", container.documentId);
-
                 container.hasRemoteChanges = true;
 
 //                if (subscriptionClient.ContainsKey("data")){
