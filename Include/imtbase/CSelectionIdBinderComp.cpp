@@ -114,7 +114,7 @@ CSelectionIdBinderComp::Observer::Observer(CSelectionIdBinderComp& parent)
 
 // reimplemented methods (imod::CMultiModelDispatcherBase)
 
-void CSelectionIdBinderComp::Observer::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+void CSelectionIdBinderComp::Observer::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	m_parent.UpdateIds();
 }

@@ -24,8 +24,8 @@ public:
 
 	I_BEGIN_COMPONENT(CSelectionIdBinderComp);
 		I_REGISTER_INTERFACE(ICollectionInfo);
-		I_ASSIGN_MULTI_0(m_selectionCompPtr, "Slave selection components", "Slave selection components", false, "");
-		I_ASSIGN_MULTI_0(m_selectionParamCompPtr, "Slave selection param components", "Slave selection param components", false, "");
+		I_ASSIGN_MULTI_0(m_selectionCompPtr, "Slave selection components", "Slave selection components", false);
+		I_ASSIGN_MULTI_0(m_selectionParamCompPtr, "Slave selection param components", "Slave selection param components", false);
 	I_END_COMPONENT;
 
 	CSelectionIdBinderComp();
