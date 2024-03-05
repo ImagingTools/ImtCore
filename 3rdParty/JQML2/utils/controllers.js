@@ -396,6 +396,7 @@ class KeyboardController {
                 if(e.key === 'ArrowUp') key = 'Up'
                 if(e.key === 'ArrowDown') key = 'Down'
                 if(e.key === 'Return') key = 'Enter'
+                if(e.code === 'Space') key = 'Space'
 
 
                 let currentShortcuts = []
