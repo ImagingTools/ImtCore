@@ -40,10 +40,10 @@ JSONListModel {
         if(row === null)
             row = 0
         var modelObject = this.get(row)
-        var retVal = modelObject ? modelObject[key] : null
+        var retVal = modelObject ? modelObject[key] : undefined
 
-        if (retVal === null)
-            return null
+        if (retVal === undefined)
+            return undefined
 
         if(typeof retVal === 'object' && !(retVal instanceof QtObject)){
             var retModel
