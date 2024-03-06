@@ -376,7 +376,7 @@ JSONListModel {
                         retVal += JSON.stringify(modelData)
                     }
                 } else if(typeof modelData === 'string'){
-                    retVal += "\"" + modelData + "\""
+                    retVal += "\"" + modelData.replaceAll('\u005C', '\u005C\u005C') + "\""
                 } else {
                     retVal += modelData
                 }
