@@ -4,7 +4,7 @@ import imtgui 1.0
 import imtcontrols 1.0
 import imtguigql 1.0
 
-Rectangle {
+Item {
     id: container;
 
     property string getMetaInfoGqlCommand;
@@ -13,6 +13,10 @@ Rectangle {
 
     function getMetaInfo(objectId){
         metaInfo.getMetaInfo(objectId);
+    }
+
+    function getAdditionalInputParams(){
+        return {};
     }
 
     GqlModel {
@@ -24,6 +28,16 @@ Rectangle {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", objectId);
+
+            let additionInputParams = container.getAdditionalInputParams();
+            if (Object.keys(additionInputParams).length > 0){
+                let additionParams = Gql.GqlObject("addition");
+                for (let key in additionInputParams){
+                    additionParams.InsertField(key, additionInputParams[key]);
+                }
+                inputParams.InsertFieldObject(additionParams);
+            }
+
             query.AddParam(inputParams);
 
             var queryFields = Gql.GqlObject("metaInfo");

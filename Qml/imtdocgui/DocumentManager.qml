@@ -672,16 +672,6 @@ Item {
 
             property bool blockingUpdateModel: false;
 
-//            onDocumentDataControllerChanged: {
-//                console.log("onDocumentDataControllerChanged", documentDataController);
-//                if (documentDataController){
-//                    documentDataController.saved.connect(dataControllerConnections.onSaved);
-//                    documentDataController.documentModelChanged.connect(dataControllerConnections.onDocumentModelChanged);
-//                    documentDataController.error.connect(dataControllerConnections.onError);
-//                    documentDataController.hasRemoteChangesChanged.connect(dataControllerConnections.onHasRemoteChangesChanged);
-//                }
-//            }
-
             onBlockingUpdateModelChanged: {
                 if (undoManager){
                     undoManager.setBlockingUpdateModel(blockingUpdateModel);

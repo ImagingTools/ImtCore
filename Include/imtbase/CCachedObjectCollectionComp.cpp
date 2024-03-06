@@ -409,7 +409,7 @@ CCachedObjectCollectionComp::FilteredCollection* CCachedObjectCollectionComp::Ch
 
 	IObjectCollection* subcollection = m_objectCollectionCompPtr->CreateSubCollection(offset, count, selectionParamsPtr);
 	if (subcollection == nullptr){
-		Q_ASSERT_X(false, __FILE__, "Sub-collection coult not be created");
+//		Q_ASSERT_X(false, __FILE__, "Sub-collection coult not be created");
 
 		return nullptr;
 	}

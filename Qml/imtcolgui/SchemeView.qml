@@ -7,7 +7,6 @@ import imtcontrols 1.0
 Rectangle {
     id: canvasPage;
 
-    anchors.fill: parent;
     clip: true;
 
     color: "#ececec";

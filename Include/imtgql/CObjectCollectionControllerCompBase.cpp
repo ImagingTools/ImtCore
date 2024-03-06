@@ -266,7 +266,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 		errorMessage = QT_TR_NOOP("Object with this ID already exists");
-		SendErrorMessage(0, QString("Object with ID: %1 already exists").arg(qPrintable(objectId)), "Object collection controller");
+		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return nullptr;
 	}
@@ -280,7 +280,7 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::InsertObject(
 	QByteArray newObjectId = m_objectCollectionCompPtr->InsertNewObject(typeId, name, description, newObjectPtr, objectId, nullptr, nullptr, operationContextPtr.GetPtr());
 	if (newObjectId.isEmpty()){
 		errorMessage = QT_TR_NOOP(QString("Can not insert object: %1").arg(qPrintable(objectId)));
-		SendErrorMessage(0, QString("Can not insert object: %1").arg(qPrintable(objectId)), "Object collection controller");
+		SendErrorMessage(0, errorMessage, "Object collection controller");
 
 		return nullptr;
 	}
@@ -315,8 +315,6 @@ imtbase::CTreeItemModel* CObjectCollectionControllerCompBase::UpdateObject(
 
 	imtbase::CTreeItemModel* dataModel = nullptr;
 	imtbase::CTreeItemModel* notificationModel = nullptr;
-
-	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
 
 	QByteArray oldObjectId;
 	const imtgql::CGqlObject* inputParamPtr = gqlRequest.GetParam("input");

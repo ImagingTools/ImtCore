@@ -149,18 +149,20 @@ CollectionView {
 
             if (state === "Ready"){
                 if (subscriptionClient.ContainsKey("data")){
-                    let dataModelLocal = subscriptionClient.GetData("data")
-                    if (dataModelLocal.ContainsKey("token")){
-                        let accessToken = dataModelLocal.GetData("token");
-                        Events.sendEvent("GetToken", function (token){
-                            if (String(token) == String(accessToken)){
-                                root.doUpdateGui();
-                            }
-                            else{
-                                root.hasRemoteChanges = true;
-                            }
-                        });
-                    }
+                    root.doUpdateGui();
+
+//                    let dataModelLocal = subscriptionClient.GetData("data")
+//                    if (dataModelLocal.ContainsKey("token")){
+//                        let accessToken = dataModelLocal.GetData("token");
+//                        Events.sendEvent("GetToken", function (token){
+//                            if (String(token) == String(accessToken)){
+//                                root.doUpdateGui();
+//                            }
+//                            else{
+//                                root.hasRemoteChanges = true;
+//                            }
+//                        });
+//                    }
                 }
             }
         }
