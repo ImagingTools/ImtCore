@@ -11,7 +11,7 @@ for(let componentName of listComponents){
 const listProperties = require('../utils/properties')
 
 const args = {
-    source: process.argv.length >= 3 ? process.argv[2] : 'C:\\projects\\ImagingTools\\ItDevelopment\\Lisa\\Bin\\web\\src',
+    source: process.argv.length >= 3 ? process.argv[2] : 'C:\\projects\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQML2\\test\\qml',
     debug: 0
 }
 for(let _argv of process.argv.slice(2)){
@@ -590,7 +590,7 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
             break
         }
         case 'string': {
-            stat.value.push(`\`${tree[1]}\``)
+            stat.value.push(`\`${tree[1].replaceAll('\u005C', '\u005C\u005C')}\``)
             break
         }
         case 'assign': {
@@ -696,11 +696,13 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
         }
         case 'conditional': {
             stat.compute = true
+            stat.value.push('(')
             prepare(tree[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
             stat.value.push(' ? ')
             prepare(tree[2], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
             stat.value.push(' : ')
             prepare(tree[3], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            stat.value.push(')')
             break
         }
         case 'binary': {
