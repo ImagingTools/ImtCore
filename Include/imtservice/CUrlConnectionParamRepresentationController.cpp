@@ -25,7 +25,7 @@ bool CUrlConnectionParamRepresentationController::IsModelSupported(const istd::I
 bool CUrlConnectionParamRepresentationController::GetRepresentationFromDataModel(
 			const istd::IChangeable& dataModel,
 			imtbase::CTreeItemModel& representation,
-			const iprm::IParamsSet* paramsPtr) const
+			const iprm::IParamsSet* /*paramsPtr*/) const
 {
 	if (!IsModelSupported(dataModel)){
 		return false;
@@ -67,8 +67,8 @@ bool CUrlConnectionParamRepresentationController::GetRepresentationFromDataModel
 
 
 bool CUrlConnectionParamRepresentationController::GetDataModelFromRepresentation(
-			const imtbase::CTreeItemModel& representation,
-			istd::IChangeable& dataModel) const
+			const imtbase::CTreeItemModel& /*representation*/,
+			istd::IChangeable& /*dataModel*/) const
 {
 	return false;
 }
