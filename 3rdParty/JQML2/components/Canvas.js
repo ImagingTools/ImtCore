@@ -36,26 +36,12 @@ class Canvas extends Item {
         }
     }
 
-    $widthChanged(){
-        super.$widthChanged()
-        this.getDom().setAttribute('width', this.getPropertyValue('width'))
-        if(this.$signals.paint) this.$signals.paint()
-    }
-    $heightChanged(){
-        super.$heightChanged()
-        this.getDom().setAttribute('height', this.getPropertyValue('height'))
-        if(this.$signals.paint) this.$signals.paint()
-    }
+    $initCtx(ctx){
+        if(this.$init) return
 
-    cancelRequestAnimationFrame(handle){
-
-    }
-    getContext(contextId, ...args){
-        let ctx = this.getDom().getContext(contextId)
         ctx.roundedRect = (...args)=>{ctx.roundRect(...args)}
         let originDrawImage = ctx.drawImage
         ctx.drawImage = (...args)=>{
-            
             if(typeof args[0] === 'string'){
                 let path = rootPath+'/'+args[0].replaceAll('../','')
                 if(this.$cache[path]){
@@ -81,6 +67,27 @@ class Canvas extends Item {
             }
             
         }
+
+        this.$init = true
+    }
+
+    $widthChanged(){
+        super.$widthChanged()
+        this.getDom().setAttribute('width', this.getPropertyValue('width'))
+        if(this.$signals.paint) this.$signals.paint()
+    }
+    $heightChanged(){
+        super.$heightChanged()
+        this.getDom().setAttribute('height', this.getPropertyValue('height'))
+        if(this.$signals.paint) this.$signals.paint()
+    }
+
+    cancelRequestAnimationFrame(handle){
+
+    }
+    getContext(contextId, ...args){
+        let ctx = this.getDom().getContext(contextId)
+        this.$initCtx(ctx)
         return ctx
     }
     isImageError(image){

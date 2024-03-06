@@ -535,7 +535,17 @@ var Qt = {
         }
     },
     rgba(r, g, b, a){
-        return `rgba(${Math.trunc(r*255)},${Math.trunc(g*255)},${Math.trunc(b*255)},${Math.trunc(a*255)})`
+        let _a = Math.trunc(a*255)
+        let _r = Math.trunc(r*255)
+        let _g = Math.trunc(g*255)
+        let _b = Math.trunc(b*255)
+
+        _a = (_a < 16 ? '0' : '') + _a.toString(16)
+        _r = (_r < 16 ? '0' : '') + _r.toString(16)
+        _g = (_g < 16 ? '0' : '') + _g.toString(16)
+        _b = (_b < 16 ? '0' : '') + _b.toString(16)
+
+        return `#${_r}${_g}${_b}${_a}`
     },
     openUrlExternally: function(url){
         return window.open(url, '_blank')
