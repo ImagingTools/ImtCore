@@ -187,20 +187,6 @@ Rectangle {
 //                canvas.selectedIndex = -1;
             }
 
-            //            onWheelDeltaSignal: {
-            //                if(wheelDelta > 0){//up
-            //                    if (canvas.scaleCoeff < 3){
-            //                        canvas.scaleCoeff += scaleStep;
-            //                    }
-            //                }
-            //                else{//down
-            //                    if(canvas.scaleCoeff > scaleStep * 2){
-            //                        canvas.scaleCoeff -= scaleStep;
-            //                    }
-            //                }
-            ////                canvas.markDirty()
-            ////                canvas.requestPaint();
-            //            }
             onDeltaSignal: {
                 if(canvas.selectedIndex < 0){
                     canvas.deltaX += delta.x
@@ -375,40 +361,40 @@ Rectangle {
             property bool hasTailSelection: false;
 
             //sizes
-            property real mainRec_width: 250 //* scaleCoeff;
-            property real mainRec_height: 60 //* scaleCoeff;
+            property real mainRec_width: 250
+            property real mainRec_height: 60
 
-            property int fontSize: 20 //* scaleCoeff;
-            property int fontSizeSmall: 14 //* scaleCoeff;
-            property int radius_: 2 //* scaleCoeff;
-            property int borderShift: 4 //* scaleCoeff;
-            property int shadowSize: 6 //* scaleCoeff;
+            property int fontSize: 20
+            property int fontSizeSmall: 14
+            property int radius_: 2
+            property int borderShift: 4
+            property int shadowSize: 6
 
-            property int backgroundStep: 30 //* scaleCoeff;
-            property int backgroundWidth: 1024 //* scaleCoeff;
-            property int backgroundHeight: 768 //* scaleCoeff;
+            property int backgroundStep: 30
+            property int backgroundWidth: 1024
+            property int backgroundHeight: 768
 
-            property int intersectionSize: 16 //* scaleCoeff;
-            property int arcRadius: 8 //* scaleCoeff;
-            property int textMargin: 8 //* canvas.scaleCoeff;
-            property int textVerticalOffset: 22 //* canvas.scaleCoeff;
-            property real imageSize: 20 //* scaleCoeff;
-            property real imageMargin: 4 //* scaleCoeff;
+            property int intersectionSize: 16
+            property int arcRadius: 8
+            property int textMargin: 8
+            property int textVerticalOffset: 22
+            property real imageSize: 20
+            property real imageMargin: 4
 
             //colors
-            property string selectedColor: "#98C9C2"; // "#00ff00"//"#90EE90";
-            property string mainColor: "#335777";
-            property string errorColor: "#ff0000";
+            property string selectedColor: Style.selectedColor
+            property string mainColor: Style.borderColor2
+            property string errorColor: Style.errorColor
             property string compositeColor: "#bcd2e8";
             property string compositeSelectedColor: "#1167b1";
-            property string selectedLinkColor: "#98C9C2"; //"#00ff00"//"#90EE90";
-            property string linkColor: "#335777";
-            property string mainTextColor: "#000000";
-            property string secondTextColor: "#808080";
-            property string backgroundGridColor: "#d6d6d6"; // "#add8e6";
-            property string backgroundBorderColor: "#a0a0a0"; // "#add8e6";
+            property string selectedLinkColor: Style.borderFocusColor
+            property string linkColor: Style.borderColor2
+            property string mainTextColor: Style.textColor
+            property string secondTextColor: Style.inactive_textColor
+            property string backgroundGridColor: "#d6d6d6";
+            property string backgroundBorderColor: "#a0a0a0";
             property string backgroundColor: "#ffffff";
-            property string innerFrameColor: "transparent"; // "#808080";
+            property string innerFrameColor: "transparent";
 
             Component.onCompleted: {
                 loadImage(imageUrl_1);
