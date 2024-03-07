@@ -9,7 +9,7 @@ Rectangle {
 
     clip: true;
 
-    color: "#ececec";
+    color: Style.backgroundColor;
 
     property TreeItemModel objectModel: TreeItemModel{};
     property alias selectedIndex: canvas.selectedIndex;
@@ -45,6 +45,7 @@ Rectangle {
     }
 
     function zoomIn(){
+        console.log("zoomIn");
         if (canvas.scaleCoeff < 3){
             let scaleCoeff_ = canvas.scaleCoeff;
             scaleCoeff_ += scaleStep;
@@ -348,6 +349,8 @@ Rectangle {
             property real bottomY: y + height;
             property real leftX: x;
             property real rightX: x + width;
+
+            color: Style.baseColor;
           }
 
         Canvas {
@@ -398,9 +401,9 @@ Rectangle {
             property string linkColor: Style.borderColor2
             property string mainTextColor: Style.textColor
             property string secondTextColor: Style.inactive_textColor
-            property string backgroundGridColor: "#d6d6d6";
+            property string gridColor: Style.inactive_textColor;
             property string backgroundBorderColor: "#a0a0a0";
-            property string backgroundColor: "#ffffff";
+            property string backgroundColor: Style.baseColor;
             property string innerFrameColor: "transparent";
 
             Component.onCompleted: {
@@ -495,8 +498,8 @@ Rectangle {
                 ctx.lineJoin = "round"
                 ctx.lineWidth = 1;
 
-                ctx.fillStyle = canvas.backgroundGridColor;
-                ctx.strokeStyle = canvas.backgroundGridColor;
+                ctx.fillStyle = canvas.gridColor;
+                ctx.strokeStyle = canvas.gridColor;
 
 
                 for(let i = 0; i * step < canvas.backgroundWidth; i++){//vertical lines

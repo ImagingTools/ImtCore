@@ -23,6 +23,7 @@ namespace imtservice
 class IServiceConnectionParam: virtual public IServiceConnectionInfo
 {
 public:
+
 	struct IncomingConnectionParam
 	{
 		QByteArray id;
@@ -47,6 +48,8 @@ public:
 			return !operator==(other);
 		}
 	};
+
+	typedef QList<IServiceConnectionParam::IncomingConnectionParam> IncomingConnectionList;
 
 	virtual QList<IncomingConnectionParam> GetIncomingConnections() const = 0;
 };
