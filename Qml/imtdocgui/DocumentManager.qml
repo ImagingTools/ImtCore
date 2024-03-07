@@ -184,7 +184,6 @@ Item {
 
     function getDocumentDataController(documentTypeId)
     {
-        console.log("getDocumentDataController", documentTypeId);
         if (!dataControllerIsRegistered(documentTypeId)){
             console.error("Data controller for documents with type-ID: ", documentTypeId, " is unregistered!");
 
@@ -192,9 +191,6 @@ Item {
         }
 
         let dataControllerComp = internal.m_registeredDataControllers[documentTypeId];
-        console.log("dataControllerComp", dataControllerComp);
-        console.log("documentManager", documentManager);
-
         return dataControllerComp.createObject(documentManager);
     }
 
@@ -213,9 +209,10 @@ Item {
         }
 
         documentData.documentIndex = documentsModel.count;
+        let uuid = UuidGenerator.generateUUID();
 
         documentsModel.append({
-                                  "Uuid": documentData.documentId,
+                                  "Uuid": documentData.uuid,
                                   "Title": defaultDocumentName,
                                   "TypeId": documentTypeId,
                                   "DocumentData": documentData,
@@ -240,6 +237,8 @@ Item {
             else{
                 singleDocumentData.documentId = documentId;
             }
+
+            singleDocumentData.uuid = UuidGenerator.generateUUID();
 
             let documentDataController = getDocumentDataController(documentTypeId);
             if (!documentDataController){
@@ -296,7 +295,7 @@ Item {
 
         documentData.documentIndex = documentsModel.count;
         documentsModel.append({
-                                  "Uuid": documentData.documentId,
+                                  "Uuid": documentData.uuid,
                                   "Title": defaultDocumentName,
                                   "TypeId": documentTypeId,
                                   "DocumentData": documentData,
@@ -461,7 +460,6 @@ Item {
     */
     function closeDocumentByIndex(documentIndex, force)
     {
-        console.log("closeDocumentByIndex", documentIndex);
         if (documentIndex < 0 || documentIndex >= documentsModel.count){
             console.error("Unable to close document with index: ", documentIndex);
 
@@ -542,6 +540,8 @@ Item {
         QtObject {
             id: singleDocumentData;
 
+            // UUID for unification
+            property string uuid: "";
             // index of the document in document manager
             property int documentIndex: -1;
             property string documentId;
@@ -683,19 +683,21 @@ Item {
 
             Component.onDestruction: {
                 console.log("singleDocumentData onDestruction");
-                Events.unSubscribeEvent(documentId + "CommandActivated", commandHandle);
+                Events.unSubscribeEvent(uuid + "CommandActivated", commandHandle);
                 if (singleDocumentData.undoManager){
-                    Events.unSubscribeEvent(documentId + "CommandActivated", singleDocumentData.undoManager.commandHandle);
+                    Events.unSubscribeEvent(uuid + "CommandActivated", singleDocumentData.undoManager.commandHandle);
+                }
+            }
+
+            onUuidChanged: {
+                Events.subscribeEvent(uuid + "CommandActivated", commandHandle);
+
+                if (singleDocumentData.undoManager){
+                    Events.subscribeEvent(uuid + "CommandActivated", singleDocumentData.undoManager.commandHandle);
                 }
             }
 
             onDocumentIdChanged: {
-                Events.subscribeEvent(documentId + "CommandActivated", commandHandle);
-
-                if (singleDocumentData.undoManager){
-                    Events.subscribeEvent(documentId + "CommandActivated", singleDocumentData.undoManager.commandHandle);
-                }
-
                 if (documentDataController){
                     documentDataController.documentId = documentId;
                 }

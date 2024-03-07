@@ -118,9 +118,9 @@ DocumentManager {
             onClicked: {
                 let index = documentManager.documentsModel.count - 1 ;
                 if (index > 0){
-                    let documentId = documentManager.documentsModel.get(index).Uuid;
+                    let uuid = documentManager.documentsModel.get(index).Uuid;
 
-                    Events.sendEvent(documentId + "CommandActivated", "Close")
+                    Events.sendEvent(uuid + "CommandActivated", "Close")
                 }
             }
         }

@@ -18,8 +18,6 @@ Item {
     }
 
     Component.onDestruction: {
-        console.log("ViewBase onDestruction", viewBase);
-
         if (commandsDelegate){
             Events.unSubscribeEvent(viewId + "CommandActivated", commandsDelegate.commandHandle);
         }
@@ -59,8 +57,6 @@ Item {
     }
 
     function onModelChanged(){
-        console.log("ViewBase onModelChanged");
-
         doUpdateGui();
     }
 

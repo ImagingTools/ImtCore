@@ -51,6 +51,22 @@ Rectangle {
         }
     }
 
+    function zoomIn(){
+
+    }
+
+    function zoomOut(){
+
+    }
+
+    function resetZoom(){
+
+    }
+
+    function zoomToFit(){
+
+    }
+
     function requestPaint(){
         canvas.requestPaint();
     }
@@ -343,7 +359,6 @@ Rectangle {
         }
 
         Canvas {
-
             id: canvas
 
             anchors.fill: parent;
@@ -936,14 +951,9 @@ Rectangle {
                     else if((y1 < y2) && (x1 > x2)){//top right
                         angle = angleBase + 2 * Math.PI;
                     }
-
                 }
-
                 return angle;
             }
-
-
-
         }//canvas
     }//mainContainer
 
@@ -1029,7 +1039,6 @@ Rectangle {
             canvas.selectedIndex = 100//index;
 
             canvas.requestPaint();
-
         }
     }
 
