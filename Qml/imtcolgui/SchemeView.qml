@@ -23,6 +23,8 @@ Rectangle {
     property real contentX: -canvas.deltaX;
     property real originX: 0;
 
+    property real scaleStep: 0.1;
+
     signal copySignal(int index);
     signal pasteSignal(int index);
     signal deleteSignal(int index);
@@ -32,11 +34,9 @@ Rectangle {
 
     onContentXChanged: {
         canvas.deltaX = -contentX
-        //canvas.requestPaint();
     }
     onContentYChanged: {
         canvas.deltaY = -contentY
-        //canvas.requestPaint();
     }
 
 
@@ -44,27 +44,35 @@ Rectangle {
         canvas.requestPaint();
     }
 
-    Connections {
-        target: canvasPage.objectModel
-        function onDataChanged(){
-            // canvasPage.modelDataChanged()
+    function zoomIn(){
+        if (canvas.scaleCoeff < 3){
+            let scaleCoeff_ = canvas.scaleCoeff;
+            scaleCoeff_ += scaleStep;
+            canvas.setScale(scaleCoeff_, canvas.width / 2, canvas.height / 2)
         }
     }
 
-    function zoomIn(){
-
-    }
-
     function zoomOut(){
-
+        if(canvas.scaleCoeff > scaleStep * 2){
+            let scaleCoeff_ = canvas.scaleCoeff;
+            scaleCoeff_ -= scaleStep;
+            canvas.setScale(scaleCoeff_, canvas.width / 2, canvas.height / 2)
+        }
     }
 
     function resetZoom(){
-
     }
 
     function zoomToFit(){
-
+        let scaleCoeff_ = canvas.width / canvas.backgroundWidth;
+        let scaleCoeff_h = canvas.height / canvas.backgroundHeight;
+        if (scaleCoeff_ > scaleCoeff_h){
+            scaleCoeff_ = scaleCoeff_h
+        }
+        canvas.setScale(scaleCoeff_, canvas.width / 2, canvas.height / 2)
+        canvas.deltaX = 0
+        canvas.deltaY = 0
+        requestPaint()
     }
 
     function requestPaint(){
@@ -200,17 +208,12 @@ Rectangle {
                 if(canvas.selectedIndex >= 0){
                     canvasPage.goInside();
                 }
-
-//                canvas.selectedIndex = -1;
             }
 
             onDeltaSignal: {
                 if(canvas.selectedIndex < 0){
                     canvas.deltaX += delta.x
                     canvas.deltaY += delta.y
-
-                    //canvasPage.correctPosition(delta.x, delta.y)
-
                     canvas.requestPaint();
                 }
                 else {
@@ -219,7 +222,6 @@ Rectangle {
             }
 
             onWheel: {
-                let scaleCoeffBack = canvas.scaleCoeff;
                 let deltaX = (wheel.x + canvas.deltaX) / canvas.scaleCoeff
                 let wheelDelta = wheel.angleDelta.y
                 let scaleCoeff_ = canvas.scaleCoeff;
@@ -233,16 +235,10 @@ Rectangle {
                         scaleCoeff_ -= scaleStep;
                     }
                 }
-                let newX = (wheel.x - canvas.deltaX) / scaleCoeffBack * scaleCoeff_ + canvas.deltaX
-                let newY = (wheel.y - canvas.deltaY) / scaleCoeffBack * scaleCoeff_ + canvas.deltaY
-                canvas.deltaX -= (newX - wheel.x)
-                canvas.deltaY -= (newY - wheel.y)
 
-                //canvasPage.correctPositionScaled(wheel.x - newX, wheel.y - newY, scaleCoeff_/ scaleCoeffBack)
-
-                canvas.scaleCoeff = scaleCoeff_
-                canvas.scaleCoeffPrev = scaleCoeff_;
+                canvas.setScale(scaleCoeff_, wheel.x, wheel.y)
             }
+
 
             function movingFunction(delta){//reimplemented
                 if(canvas.selectedIndex >= 0){
@@ -256,7 +252,6 @@ Rectangle {
                     width_ = width_ * canvas.scaleCoeff;
                     height_ = height_  * canvas.scaleCoeff;
 
-                    //let withinBorders_ = withinBorders(delta, x_,  y_, width_, height_);
                     let withinBorders_ = true;
                     if(withinBorders_){
                         let newX = (canvasPage.objectModel.GetData("X", canvas.selectedIndex) + delta.x / canvas.scaleCoeff);
@@ -304,7 +299,6 @@ Rectangle {
             }
 
             function hoverReaction(position){
-                //console.log(position.x, position.y)
                 canvas.hoverIndex = -1;
                 for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
                     let x_  = canvasPage.objectModel.GetData("X", i) ;
@@ -354,10 +348,7 @@ Rectangle {
             property real bottomY: y + height;
             property real leftX: x;
             property real rightX: x + width;
-
-            //border.color: "green";
-            //border.width: 3;
-        }
+          }
 
         Canvas {
             id: canvas
@@ -441,6 +432,17 @@ Rectangle {
 
             onDeltaYChanged: {
                 canvasPage.contentY = -deltaY
+            }
+
+            function setScale(newScale, scaleX, scaleY){
+                let scaleCoeffBack = canvas.scaleCoeff;
+                let newX = (scaleX - canvas.deltaX) / scaleCoeffBack * newScale + canvas.deltaX
+                let newY = (scaleY - canvas.deltaY) / scaleCoeffBack * newScale + canvas.deltaY
+                canvas.deltaX -= (newX - scaleX)
+                canvas.deltaY -= (newY - scaleY)
+
+                canvas.scaleCoeff = newScale
+                canvas.scaleCoeffPrev = newScale;
             }
 
             onPaint: {
@@ -565,9 +567,7 @@ Rectangle {
                 let mainText  = canvasPage.objectModel.GetData("MainText", index)
                 let secondText  = canvasPage.objectModel.GetData("SecondText", index)
                 let thirdText  = canvasPage.objectModel.GetData("ThirdText", index)
-                // Style.getIconPath("Icons/Running", Icon.State.On, Icon.Mode.Normal);
                 let iconUrl_1  = "../../../" + Style.getIconPath(canvasPage.objectModel.GetData("IconUrl_1", index), Icon.State.On, Icon.Mode.Normal)
-                // let iconUrl_1  = "../../../" + Style.theme + "/" + canvasPage.objectModel.GetData("IconUrl_1", index) + ".svg"
                 let selected = canvasPage.objectModel.IsValidData("Selected", index) ? canvasPage.objectModel.GetData("Selected", index) : false;
                 let hasError = canvasPage.objectModel.IsValidData("HasError", index) ? canvasPage.objectModel.GetData("HasError", index) : false;
                 let isComposite = canvasPage.objectModel.IsValidData("IsComposite", index) ? canvasPage.objectModel.GetData("IsComposite", index) : false;
@@ -1013,7 +1013,6 @@ Rectangle {
         if(index >= 0){
             bufferModel.Clear();
             bufferModel.CopyItemDataFromModel(0, canvasPage.objectModel, index);
-            //console.log("bufferModel:: ", bufferModel.toJSON());
         }
     }
 
@@ -1080,8 +1079,6 @@ Rectangle {
         anchors.bottom: parent.bottom;
 
         secondSize: 12;
-        //backgroundColor: "gray";
-        //indicatorColor: "lightgray";
         visible: (backgroundRec.topY >=0 && backgroundRec.bottomY <= canvasPage.height) ? false : true;
         alwaysVisible: true;
         canDragOutOfBounds: true;
@@ -1106,8 +1103,6 @@ Rectangle {
         anchors.bottomMargin: 1;
 
         secondSize: 12;
-        //backgroundColor: "gray";
-        //indicatorColor: "lightgray";
 
         visible: (backgroundRec.leftX >=0 && backgroundRec.rightX <= canvasPage.width) ? false : true;
         alwaysVisible: true;
