@@ -73,6 +73,7 @@ Rectangle {
 
     function findModelIndex(id){
         let ind = -1;
+        if(!id) return ind
         for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
             if(canvasPage.objectModel.GetData("Id", i) == id){
                 ind = i;
@@ -466,6 +467,7 @@ Rectangle {
                         for(let k = 0; k < links.GetItemsCount(); k++){
                             let objectId = links.GetData("ObjectId", k);
                             let ind = canvasPage.findModelIndex(objectId);
+                            if(ind === -1) continue
                             canvas.drawLink(ctx, ind, i);
                         }
 
