@@ -28,6 +28,7 @@ class CDesignTokenBasedResourceProviderComp:
 			virtual public IColorPaletteProvider,
 			virtual public IFontProvider
 {
+	Q_DECLARE_TR_FUNCTIONS(CDesignTokenBasedResourceProviderComp)
 public:
 	typedef ilog::TLoggerCompWrap<icomp::CComponentBase> BaseClass;
 
@@ -36,7 +37,8 @@ public:
 		I_REGISTER_INTERFACE(IColorPaletteProvider);
 		I_REGISTER_INTERFACE(IFontProvider);
 		I_ASSIGN_MULTI_0(m_resourceFileNameAttrPtr, "ResourceFileNames", "Path to the resource file containing the theme", true);
-		I_ASSIGN_MULTI_0(m_designShemaIdAttrPtr, "DesignSchemaIds", "Design schema ids", false);
+		I_ASSIGN_MULTI_0(m_designShemaIdAttrPtr, "DesignSchemaIds", "Design schema IDs", false);
+		I_ASSIGN_MULTI_0(m_designShemaNamesAttrPtr, "DesignSchemaNames", "Design schema names", false);
 		I_ASSIGN_MULTI_0(m_paletteModeAttrPtr, "PaletteModes", "Palette modes", false);
 		I_ASSIGN(m_designTokenFileParserCompPtr, "DesignTokenFileParser", "DesignToken File Parser", false, "DesignTokenFileParser");
 	I_END_COMPONENT;
@@ -63,10 +65,11 @@ private:
 private:
 	I_MULTIATTR(QByteArray, m_resourceFileNameAttrPtr);
 	I_MULTIATTR(QByteArray, m_designShemaIdAttrPtr);
+	I_MULTITEXTATTR(m_designShemaNamesAttrPtr);
 	I_MULTIATTR(QByteArray, m_paletteModeAttrPtr);
 	I_REF(imtdesign::IDesignTokenFileParser, m_designTokenFileParserCompPtr);
 
-	imtbase::CCollectionInfo m_designSchemaList;
+	mutable imtbase::CCollectionInfo m_designSchemaList;
 
 	imtbase::CCollectionInfo m_emptyCollectionInfo;
 

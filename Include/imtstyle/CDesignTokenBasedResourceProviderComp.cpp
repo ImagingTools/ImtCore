@@ -238,7 +238,7 @@ void CDesignTokenBasedResourceProviderComp::CreateDefaultPalettes()
 	light.stylePath = ":/Light/Styles/ImtColorStyle";
 
 	m_paletteMap["Light"] = light;
-	m_designSchemaList.InsertItem("Light", QObject::tr("Light"),"");
+	m_designSchemaList.InsertItem("Light", tr("Light"),"");
 
 	ColorSchema dark;
 	dark.id = "Dark";
@@ -258,7 +258,7 @@ void CDesignTokenBasedResourceProviderComp::CreateDefaultPalettes()
 	dark.stylePath = ":/Dark/Styles/ImtColorStyle";
 
 	m_paletteMap["Dark"] = dark;
-	m_designSchemaList.InsertItem("Dark", QObject::tr("Dark"), "");
+	m_designSchemaList.InsertItem("Dark", tr("Dark"), "");
 }
 
 
