@@ -1,12 +1,14 @@
 <RCC>
     <qresource prefix="/Translations">
-        <file alias="ImtCore_en_US">Translations/ImtCore_en_US.qm</file>
-        <file alias="ImtCore_de_DE">Translations/ImtCore_de_DE.qm</file>
-        <file alias="ImtCore_ru_RU">Translations/ImtCore_ru_RU.qm</file>
-        <file alias="ImtCore_pl_PL">Translations/ImtCore_pl_PL.qm</file>
-        <file alias="ProLife_fr_FR">Translations/ImtCore_fr_FR.qm</file>
-        <file alias="ProLife_it_IT">Translations/ImtCore_it_IT.qm</file>
-        <file alias="ProLife_pt_PT">Translations/ImtCore_pt_PT.qm</file>
-        <file alias="ImtCore_ar_SA">Translations/ImtCore_ar_SA.qm</file>
+      <file alias="ImtCore_ar_SA">Translations/ImtCore_ar_SA.qm</file>
+      <file alias="ImtCore_de_DE">Translations/ImtCore_de_DE.qm</file>
+      <file alias="ImtCore_en_US">Translations/ImtCore_en_US.qm</file>
+      <file alias="ImtCore_fr_FR">Translations/ImtCore_fr_FR.qm</file>
+      <file alias="ImtCore_it_IT">Translations/ImtCore_it_IT.qm</file>
+      <file alias="ImtCore_jp_JP">Translations/ImtCore_jp_JP.qm</file>
+      <file alias="ImtCore_pl_PL">Translations/ImtCore_pl_PL.qm</file>
+      <file alias="ImtCore_pt_PT">Translations/ImtCore_pt_PT.qm</file>
+      <file alias="ImtCore_ru_RU">Translations/ImtCore_ru_RU.qm</file>
+      <file alias="ImtCore_zh_ZH">Translations/ImtCore_zh_ZH.qm</file>
     </qresource>
 </RCC>
