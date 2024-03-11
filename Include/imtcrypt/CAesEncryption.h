@@ -18,14 +18,14 @@ public:
 	CAesEncryption();
 	~CAesEncryption();
 
-	bool Encrypt(const QByteArray& inputData, const CAesKey& key, QByteArray& outputData) const;
-	bool Decrypt(const QByteArray& inputData, const CAesKey& key, QByteArray& outputData) const;
+	virtual bool Encrypt(const QByteArray& inputData, const CAesKey& key, QByteArray& outputData) const;
+	virtual bool Decrypt(const QByteArray& inputData, const CAesKey& key, QByteArray& outputData) const;
 
 protected:
-	void InitContext() const;
-	void DestroyContext() const;
+	virtual void InitContext() const;
+	virtual void DestroyContext() const;
 
-private:
+protected:
 	mutable EVP_CIPHER_CTX* m_aesEncryptContext;
 	mutable EVP_CIPHER_CTX* m_aesDecryptContext;
 	CAesKey m_aesKey;
