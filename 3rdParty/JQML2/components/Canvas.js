@@ -53,6 +53,7 @@ class Canvas extends Item {
                         args[0] = img
                         originDrawImage.call(ctx, ...args)
                         this.$cache[path] = img
+                        this.requestPaint()
                         // img.remove()
                     }
                     img.onerror = ()=>{
