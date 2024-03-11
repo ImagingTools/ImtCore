@@ -2,50 +2,51 @@ const { Qt } = require('./Qt')
 
 class MouseController {
     list = []
-    flickList = []
-    oldList = []
     originX = 0
     originY = 0
-
-    pressedMouseAreaInner = null
-    pressedMouseAreaOuter = null
+    moveX = 0
+    moveY = 0
+    pressedMouseArea = []
+    pressed = []
+    oldList = []
+    timestamp = 0
 
     constructor(){
         window.onmousemove = (e)=>{
-            // e.preventDefault()
-            this.onMouseMove(e.pageX, e.pageY)
+            // e.stopPropagation()
+            this.onMouseMove(e.pageX, e.pageY, e)
         }
         window.ondblclick = (e)=>{
-            // e.preventDefault()
-            this.onDoubleClick(e.pageX, e.pageY, e.button)
+            // e.stopPropagation()
+            e.preventDefault()
         }
         window.onmousedown = (e)=>{
-            e.preventDefault()
-            this.onMouseDown(e.pageX, e.pageY, e.button)
+            // e.stopPropagation()
+            this.onMouseDown(e.pageX, e.pageY, e.button, e)
         }
         window.onmouseup = (e)=>{
-            e.preventDefault()
-            this.onMouseUp(e.pageX, e.pageY, e.button)
+            // e.stopPropagation()
+            this.onMouseUp(e.pageX, e.pageY, e.button, e)
         }
         window.oncontextmenu = (e)=>{
             e.preventDefault()
-            this.onMouseDown(e.pageX, e.pageY, e.button)
+            // e.stopPropagation()
+            this.onMouseDown(e.pageX, e.pageY, e.button, e)
         }
         window.ontouchstart = (e)=>{
-            e.preventDefault()
-            this.onMouseDown(e.changedTouches[0].pageX, e.changedTouches[0].pageY)
+            // e.stopPropagation()
+            this.onMouseDown(e.changedTouches[0].pageX, e.changedTouches[0].pageY, e)
         }
         window.ontouchend = (e)=>{
-            e.preventDefault()
-            this.onMouseUp(e.changedTouches[0].pageX, e.changedTouches[0].pageY)
+            // e.stopPropagation()
+            this.onMouseUp(e.changedTouches[0].pageX, e.changedTouches[0].pageY, e)
         }
         window.ontouchmove = (e)=>{
-            e.preventDefault()
-            this.onMouseMove(e.changedTouches[0].pageX, e.changedTouches[0].pageY)
+            // e.stopPropagation()
+            this.onMouseMove(e.changedTouches[0].pageX, e.changedTouches[0].pageY, e)
         }
-
         window.onwheel = (e)=>{
-            // e.preventDefault()
+            // e.stopPropagation()
             this.onWheel(e.pageX, e.pageY, e.deltaX, e.deltaY)
         }
     }
@@ -55,53 +56,37 @@ class MouseController {
     }
 
     remove(obj){
-        if(this.pressedMouseAreaInner === obj) this.pressedMouseAreaInner = null
-        if(this.pressedMouseAreaOuter === obj) this.pressedMouseAreaOuter = null
-
         let index = this.list.indexOf(obj)
         if(index >= 0) this.list.splice(index, 1)
-
-        index = this.oldList.indexOf(obj)
-        if(index >= 0) this.oldList.splice(index, 1)
-
-        index = this.flickList.indexOf(obj)
-        if(index >= 0) this.flickList.splice(index, 1)
     }
 
     get(x, y){
-        let elements = document.elementsFromPoint(x, y)
+        // let elements = document.elementsFromPoint(x, y)
         let inner = []
 
-        for(let element of elements){
-            if(element.id && UIDList[element.id] && (UIDList[element.id].$mousearea || UIDList[element.id].$flickable || UIDList[element.id].$textinput) && UIDList[element.id].getPropertyValue('enabled') && UIDList[element.id].getPropertyValue('visible')){
-                inner.push(UIDList[element.id])
+        // for(let element of elements){
+        //     if(element.id && UIDList[element.id] && (UIDList[element.id].$mousearea || UIDList[element.id].$flickable || UIDList[element.id].$textinput) && UIDList[element.id].getPropertyValue('enabled') && UIDList[element.id].getPropertyValue('visible')){
+        //         inner.push(UIDList[element.id])
+        //     }
+        // }
+
+        for(let i = this.list.length-1; i >= 0; i--){
+            if(this.list[i].getPropertyValue('enabled') && this.list[i].getPropertyValue('visible')){
+                let rect = this.list[i].getDom().getBoundingClientRect()
+                if(rect.left < x && rect.top < y && rect.right >= x && rect.bottom >= y) inner.push(this.list[i])
             }
         }
 
         return inner
-
-        // let inner = []
-        // let outer = []
-        // let pressedInner = []
-        // let pressedOuter = []
-        // for(let i = this.list.length - 1; i >= 0; i--){
-        //     if(this.list[i].getPropertyValue('enabled') && this.list[i].getPropertyValue('visible')){
-        //         let area = this.list[i].getDom().getBoundingClientRect()
-        //         if(x >= area.left && x <= area.right && y >= area.top && y <= area.bottom){
-        //             inner.push(this.list[i])
-        //             if(this.pressedList.indexOf(this.list[i]) >= 0) pressedInner.push(this.list[i])
-        //         } else {
-        //             outer.push(this.list[i])
-        //             if(this.pressedList.indexOf(this.list[i]) >= 0) pressedOuter.push(this.list[i])
-        //         }
-        //     }
-            
-        // }
-        // return [inner, outer, pressedInner, pressedOuter]
     }
 
-    stopPropogation(obj){
-        this.stopPropogate = obj
+    checkView(x, y, obj){
+        if(obj instanceof Flickable){
+            if(Math.abs(this.originX - x) >= 10 || Math.abs(this.originY - y) >= 10) this.viewMode = true
+            return true
+        } else {
+            return false
+        }
     }
 
     onWheel(x, y, deltaX, deltaY){
@@ -111,196 +96,459 @@ class MouseController {
         }
     }
 
-    onDoubleClick(x, y, button){
-        let inner = this.get(x, y)
-
-        for(let i = 0; i < inner.length; i++){
-            if(inner[i].$textinput && inner[i].onDoubleClick(x, y, button)){
-                break
-            }
-
-            if(inner[i].$mousearea){
-                if(inner[i].onDoubleClick(x, y, button)){
-                    for(let j = i+1; j < inner.length; j++){
-                        if(!inner[j].onDoubleClick(x, y, button)){
-                            break
-                        }
-                    }
-                } else {
-                   break
-                }
-            }
-
-        }
-    }
-
-    onMouseDown(x, y, button){
-        let inner = this.get(x, y)
-
+    onMouseDown(x, y, button, e){
+        this.target = null
+        this.dblClicked = false
+        let timestamp = (new Date()).getTime()
+        if(timestamp - this.timestamp < 300) this.dblClicked = true
+        this.timestamp = timestamp
         this.originX = x
         this.originY = y
         this.moveX = x
         this.moveY = y
+        this.pressedMouseArea = []
+        let inner = this.get(x, y)
+        this.pressed = inner
+        let view = null
 
-        this.pressedMouseAreaInner = null
-        this.pressedMouseAreaOuter = null
+        for(let i = 0; i < this.oldList.length; i++){
+            if(this.oldList[i] instanceof MouseArea){
+                this.pressed[i].getProperty('pressed').value = false
+            }
+        }
 
-        this.flickList = []
-
+        this.oldList = []
+        
+        if(inner[0] && inner[0] instanceof TextInput || inner[0] instanceof TextEdit){
+            if(inner[0].getPropertyValue('enabled') && inner[0].getPropertyValue('visible')) {
+                this.target = inner[0]
+                return
+            }
+        } 
         for(let i = 0; i < inner.length; i++){
-            if(inner[i].$textinput && inner[i].onMouseDown(x, y, button)){
+            if(!view && inner[i] instanceof Flickable && inner[i].getPropertyValue('enabled') && inner[i].getPropertyValue('visible') && inner[i].getPropertyValue('interactive')){
+                this.target = inner[i]
                 break
             }
-
-            if(inner[i].$mousearea && !this.pressedMouseAreaInner){
-                if(inner[i].onMouseDown(x, y, button)){
-                    this.pressedMouseAreaInner = inner[i]
-                    for(let j = i+1; j < inner.length; j++){
-                        if(inner[j].$mousearea){
-                            this.pressedMouseAreaInner = inner[j]
-                            if(!inner[j].onMouseDown(x, y, button)) break
-                        }
-                    }
-                } else {
-                    this.pressedMouseAreaInner = inner[i]
+            if(inner[i] instanceof TextInput || inner[i] instanceof TextEdit){
+                if(inner[i].getPropertyValue('enabled') && inner[i].getPropertyValue('visible') && inner[i].getPropertyValue('activeFocus')) {
+                    this.target = inner[i]
+                    break
                 }
             }
+            if(inner[i] instanceof MouseArea){
+                if(inner[i].getPropertyValue('enabled') && inner[i].getPropertyValue('visible') && inner[i].availableButton(button)){
+                    
+                    let rect = inner[i].getDom().getBoundingClientRect()
+                    let norm = inner[i].normalizeXY(x - rect.x, y - rect.y)
+                    inner[i].mouse.x = norm.x
+                    inner[i].mouse.y = norm.y
+                    
+                    inner[i].getStatement('mouseX').reset(norm.x)
+                    inner[i].getStatement('mouseY').reset(norm.y)
 
-            // if(inner[i].$textinput && !textinput){
-            //     textinput = inner[i]
-            // }
-
-            if(inner[i].$flickable){
-                inner[i].onMouseDown(x, y, button)
-                this.flickList.push(inner[i])
-            }
-
-            
-        }
-
-        // if(textinput){
-        //     textinput.onMouseDown(x, y, button)
-        // }
-        // console.log(this.pressedList)
-    }
-    onMouseUp(x, y, button){
-        let inner = this.get(x, y)
-
-        if(this.pressedMouseAreaInner){
-            this.pressedMouseAreaInner.onMouseUp(x, y, button)
-        }
-
-        for(let obj of this.flickList){
-            obj.onMouseUp(x, y, button)
-        }
-
-        this.pressedMouseAreaInner = null
-        this.pressedMouseAreaOuter = null
-        this.flickList = []
-    }
-    checkView(x, y, obj){
-        if(obj.$flickable){
-            if(Math.abs(this.originX - x) >= 10 || Math.abs(this.originY - y) >= 10) this.viewMode = true
-            return true
-        } else {
-            return false
-        }
-    }
-    normalizeXY(x, y, obj){
-        let target = obj
-        let rotation = 0
-        while(target && rotation === 0){
-            rotation = target.getPropertyValue('rotation')
-            target = target.getPropertyValue('parent')
-        }
-        let rad = rotation * Math.PI / 180
-        return {x: x*Math.cos(rad) + y*Math.sin(rad), y: x*Math.sin(rad) + y*Math.cos(rad)}
-    }
-    onMouseMove(x, y){
-        let ax = this.moveX - x
-        let ay = this.moveY - y
-        this.moveX = x
-        this.moveY = y
-        let inner = this.get(x, y)
-
-        document.body.style.cursor = 'default'
-
-        // console.log('MouseController::: oldList =',this.oldList)
-        while(this.oldList.length){
-            let obj = this.oldList.shift()
-            if(obj.$mousearea && obj.getPropertyValue('hoverEnabled')) {
-                // let normXY = this.normalizeXY(x, y, obj)
-                obj.onMouseMove(x, y, false)
-
-            }
-        }
-        // for(let obj of this.oldList){
-        //     if(obj.$mousearea && obj.getPropertyValue('hoverEnabled')) {
-        //         obj.onMouseMove(x, y, false)
-
-        //     }
-        // }
-
-        for(let obj of inner){
-            if(obj.$textinput){
-                obj.onMouseMove(x, y)
-                break
-            }
-        }
+                    if(inner[i].$signals.entered) {
+                        inner[i].$signals.entered()
+                    }
         
-        this.oldList = inner
-
-
-        let pressedMouseArea = this.pressedMouseAreaInner ? this.pressedMouseAreaInner : this.pressedMouseAreaOuter
-
-        // console.log(pressedMouseArea)
-
-        if(pressedMouseArea && !pressedMouseArea.getPropertyValue('preventStealing') && this.flickList.length){
-            let mx = false
-            let my = false
-            for(let f of this.flickList){
-                if(f.getPropertyValue('width') < f.getPropertyValue('contentItem').getPropertyValue('width')) mx = true
-                if(f.getPropertyValue('height') < f.getPropertyValue('contentItem').getPropertyValue('height')) my = true
-            }
-            if((Math.abs(this.originX - x) >= 10 && mx) || (Math.abs(this.originY - y) >= 10 && my)){
-                pressedMouseArea = null
-                this.pressedMouseAreaInner = null
-                this.pressedMouseAreaOuter = null
-            }
-        }
-
-        if(pressedMouseArea){
-            // let normXY = this.normalizeXY(x, y, pressedMouseArea)
-            if(pressedMouseArea.onMouseMove(x, y, true)){
-                this.pressedMouseAreaInner = pressedMouseArea
-                this.pressedMouseAreaOuter = null
-            } else {
-                this.pressedMouseAreaOuter = pressedMouseArea
-                this.pressedMouseAreaInner = null
-            }
-        } else {
-            if(this.flickList.length){
-                while(this.flickList.length){
-                    if(this.flickList[0].onMouseMove(ax, ay)) {
-                        this.flickList.shift()
+                    inner[i].mouse.accepted = false
+                    inner[i].getProperty('pressed').value = true
+                    if(inner[i].getProperty('pressed').notify) {
+                        // this.target = inner[i]
+                        inner[i].mouse.accepted = true
+                        inner[i].getProperty('pressed').notify()
                     } else {
+                        inner[i].mouse.accepted = true
+                    }
+
+                    
+
+                    if(inner[i].mouse.accepted) {
+                        this.target = inner[i]
+                        this.pressedMouseArea = [inner[i]]
+                        for(let k = i + 1; k < inner.length; k++){
+                            if(inner[k] instanceof TextInput || inner[k] instanceof TextEdit){
+                                if(inner[k].getPropertyValue('enabled') && inner[k].getPropertyValue('visible') && inner[k].getPropertyValue('activeFocus')) {
+                                    this.target = inner[k]
+                                    break
+                                }
+                            }
+                            if(inner[k] instanceof MouseArea && inner[k].getPropertyValue('enabled') && inner[k].getPropertyValue('visible') && inner[k].availableButton(button))
+                            this.pressedMouseArea.push(inner[k])
+                        }
                         break
                     }
+                    
                 }
-            } else {
-                for(let obj of inner){
-                    // let normXY = this.normalizeXY(x, y, obj)
-                    if(obj.$mousearea && obj.getPropertyValue('hoverEnabled')) {
-                        obj.onMouseMove(x, y, false)
+            }
+        }
+
+        // if(!this.target){
+        //     this.target = view
+        // }
+
+        if(!this.target || !(this.target instanceof TextInput || this.target instanceof TextInput)){
+            e.preventDefault()
+        }
+    }
+    onMouseUp(x, y, button, e){
+        for(let i = 0; i < this.pressed.length; i++){
+            if(this.pressed[i] instanceof MouseArea) this.pressed[i].getProperty('pressed').value = false
+        }
+        if(this.target){
+            if(this.target instanceof MouseArea){
+                e.preventDefault()
+                this.target.getProperty('pressed').value = false
+                let rect = this.target.getDom().getBoundingClientRect()
+                let norm = this.target.normalizeXY(x - rect.x, y - rect.y)
+                this.target.mouse.x = norm.x
+                this.target.mouse.y = norm.y
+                this.target.getStatement('mouseX').reset(norm.x)
+                this.target.getStatement('mouseY').reset(norm.y)
+                
         
+                if(this.target.$signals.released) {
+                    this.target.$signals.released()
+                }
+
+                let wasDblClicked = false
+
+                if(this.dblClicked){
+                    this.target.mouse.accepted = false
+                    if(this.target.$signals.doubleClicked) {
+                        this.target.$signals.doubleClicked()
+                        wasDblClicked = true
+                    }
+                    if(this.target.getPropertyValue('propagateComposedEvents') && !this.target.mouse.accepted)
+                    for(let i = 1; i < this.pressedMouseArea.length; i++){
+                        if(this.pressedMouseArea[i].$signals.doubleClicked){
+                            this.pressedMouseArea[i].mouse.accepted = false
+                            this.pressedMouseArea[i].$signals.doubleClicked()
+                            wasDblClicked = true
+                            if(!this.pressedMouseArea[i].getPropertyValue('propagateComposedEvents') || this.pressedMouseArea[i].mouse.accepted) break
+                        }
+                    }
+                }
+
+                if(!wasDblClicked){
+                    this.target.mouse.accepted = true
+                    if(this.target.$signals.clicked) {
+                        this.target.$signals.clicked()
+                        if(this.target.getPropertyValue('propagateComposedEvents') && !this.target.mouse.accepted)
+                        for(let i = 1; i < this.pressedMouseArea.length; i++){
+                            if(this.pressedMouseArea[i].$signals.clicked){
+                                this.pressedMouseArea[i].mouse.accepted = true
+                                this.pressedMouseArea[i].$signals.clicked()
+                                if(!this.pressedMouseArea[i].getPropertyValue('propagateComposedEvents') || this.pressedMouseArea[i].mouse.accepted) break
+                            }
+                        }
+                    }
+                }
+            
+                
+
+                if(this.target.$signals.exited) {
+                    this.target.$signals.exited()
+                }
+                
+                delete this.target.$entered
+            }
+        } else {
+            let wasDblClicked = false
+            if(this.dblClicked){
+                for(let i = 0; i < this.pressed.length; i++){
+                    if(this.pressed[i] instanceof TextInput || this.pressed[i] instanceof TextEdit){
+                        break
+                    } else if(this.pressed[i] instanceof MouseArea && this.pressed[i].availableButton(button)){
+                        if(this.pressed[i].$signals.doubleClicked){
+                            this.pressed[i].mouse.accepted = true
+                            this.pressed[i].$signals.doubleClicked()
+                            wasDblClicked = true
+                            if(!this.pressed[i].getPropertyValue('propagateComposedEvents') || this.pressed[i].mouse.accepted) break
+                        }
+                    }
+                }
+            }
+            if(!wasDblClicked){
+                for(let i = 0; i < this.pressed.length; i++){
+                    if(this.pressed[i] instanceof TextInput || this.pressed[i] instanceof TextEdit){
+                        break
+                    } else if(this.pressed[i] instanceof MouseArea && this.pressed[i].availableButton(button)){
+                        if(this.pressed[i].$signals.clicked){
+                            this.pressed[i].mouse.accepted = true
+                            this.pressed[i].$signals.clicked()
+                            if(!this.pressed[i].getPropertyValue('propagateComposedEvents') || this.pressed[i].mouse.accepted) break
+                        }
                     }
                 }
             }
             
         }
         
-        
+        this.pressed = []
+        this.pressedMouseArea = []
+        this.target = null
     }
+    onMouseMove(x, y, e){
+        let dx = this.moveX - x
+        let dy = this.moveY - y
+        this.moveX = x
+        this.moveY = y
+
+        if(this.target){
+            if(this.target instanceof MouseArea){
+                let rect = this.target.getDom().getBoundingClientRect()
+                let norm = this.target.normalizeXY(x - rect.x, y - rect.y)
+                this.target.mouse.x = norm.x
+                this.target.mouse.y = norm.y
+                this.target.getStatement('mouseX').reset(norm.x)
+                this.target.getStatement('mouseY').reset(norm.y)
+    
+                document.body.style.cursor = this.target.getPropertyValue('cursorShape')
+    
+                if((this.target.getPropertyValue('pressed') || this.target.getPropertyValue('hoverEnabled')) && this.target.$signals.positionChanged) this.target.$signals.positionChanged()
+    
+                this.target.getProperty('containsMouse').reset(true)
+                if(this.target.$signals && this.target.$signals.entered && !this.target.$entered) {
+                    this.target.$signals.entered()
+                }
+                this.target.$entered = true
+                
+                    
+                if(!this.target.getPropertyValue('preventStealing')){
+                    if(Math.abs(this.originX - x) >= 10 || Math.abs(this.originY - y) >= 10){
+                        for(let i = 0; i < this.pressed.length; i++){
+                            if(this.pressed[i] instanceof Flickable && this.pressed[i].getPropertyValue('enabled') && this.pressed[i].getPropertyValue('visible') && this.pressed[i].getPropertyValue('interactive')) {
+                                this.target.getProperty('pressed').value = false
+                                this.target = this.pressed[i]
+                                break
+                            }
+                        }
+                    } else {
+                        return
+                    }
+                } else {
+                    return
+                }
+            }
+        } else {
+            e.preventDefault()
+            document.body.style.cursor = 'default'
+            
+            let inner
+            if(this.pressed.length){
+                inner = this.pressed
+            } else {
+                inner = this.get(x, y)
+            }
+
+            for(let i = 0; i < inner.length; i++){
+                let index = this.oldList.indexOf(inner[i])
+                if(index >= 0) this.oldList.splice(index, 1)
+            }
+
+            for(let i = 0; i < this.oldList.length; i++){
+                if(this.oldList[i].UID && this.oldList[i] instanceof MouseArea && this.oldList[i].getPropertyValue('hoverEnabled')){
+                    let rect = this.oldList[i].getDom().getBoundingClientRect()
+                    let norm = this.oldList[i].normalizeXY(x - rect.x, y - rect.y)
+                    this.oldList[i].mouse.x = norm.x
+                    this.oldList[i].mouse.y = norm.y
+                    this.oldList[i].getStatement('mouseX').reset(norm.x)
+                    this.oldList[i].getStatement('mouseY').reset(norm.y)
+
+                    document.body.style.cursor = this.oldList[i].getPropertyValue('cursorShape')
+
+                    if((this.oldList[i].getPropertyValue('pressed') || this.oldList[i].getPropertyValue('hoverEnabled')) && this.oldList[i].$signals.positionChanged) this.oldList[i].$signals.positionChanged()
+
+                    this.oldList[i].getProperty('containsMouse').reset(false) 
+                    if(this.oldList[i].$signals && this.oldList[i].$signals.exited && this.oldList[i].$entered) {  
+                        this.oldList[i].$signals.exited()
+                    }
+                    delete this.oldList[i].$entered
+                }
+            }
+
+            if(this.pressed.length){
+                this.oldList = []
+            } else {
+                this.oldList = inner
+            }
+            
+
+            for(let i = 0; i < inner.length; i++){
+                if(inner[i] instanceof MouseArea && inner[i].getPropertyValue('hoverEnabled')){
+                    let rect = inner[i].getDom().getBoundingClientRect()
+                    let norm = inner[i].normalizeXY(x - rect.x, y - rect.y)
+                    inner[i].mouse.x = norm.x
+                    inner[i].mouse.y = norm.y
+                    inner[i].getStatement('mouseX').reset(norm.x)
+                    inner[i].getStatement('mouseY').reset(norm.y)
+
+                    document.body.style.cursor = inner[i].getPropertyValue('cursorShape')
+
+                    if((inner[i].getPropertyValue('pressed') || inner[i].getPropertyValue('hoverEnabled')) && inner[i].$signals.positionChanged) inner[i].$signals.positionChanged()
+
+                    inner[i].getProperty('containsMouse').reset(true)
+                    if(inner[i].$signals && inner[i].$signals.entered && !inner[i].$entered) {
+                        inner[i].$signals.entered()
+                    }
+                    inner[i].$entered = true
+                }
+                
+            }
+
+        }
+        
+
+        if(this.target && this.target instanceof Flickable){
+            if(this.target instanceof ListView){
+                if(this.target.getPropertyValue('enabled') && this.target.getPropertyValue('visible') && this.target.getPropertyValue('interactive')) {
+                    if(this.target.getPropertyValue('orientation') === ListView.Vertical){
+                        if(this.target.getPropertyValue('contentHeight') <= this.target.getPropertyValue('height')){
+                            this.target.getStatement('contentY').reset(0)
+            
+                        }
+                        if(this.target.getPropertyValue('contentY') + (dy) > this.target.getPropertyValue('originY') && this.target.getPropertyValue('contentY') + (dy) < this.target.getPropertyValue('contentHeight') + this.target.getPropertyValue('originY') - this.target.getPropertyValue('height')){
+                            this.target.getStatement('contentY').reset(this.target.getPropertyValue('contentY') + (dy))
+                            return
+                        } else {
+                            if(this.target.getPropertyValue('contentY') + (dy) <= this.target.getPropertyValue('originY')) {
+                                this.target.getStatement('contentY').reset(this.target.getPropertyValue('originY'))
+                                // MouseController.stopPropogation(null)
+                            }
+                            if(this.target.getPropertyValue('contentY') + (dy) >= this.target.getPropertyValue('contentHeight') + this.target.getPropertyValue('originY') - this.target.getPropertyValue('height')) {
+                                this.target.getStatement('contentY').reset(this.target.getPropertyValue('contentHeight') + this.target.getPropertyValue('originY') - this.target.getPropertyValue('height'))
+                                // MouseController.stopPropogation(null)
+                            }
+            
+                        }
+                    } else {
+                        if(this.target.getPropertyValue('contentWidth') <= this.target.getPropertyValue('width')){
+                            this.target.getStatement('contentX').reset(0)
+            
+                        }
+                        if(this.target.getPropertyValue('contentX') + (dx) > this.target.getPropertyValue('originX') && this.target.getPropertyValue('contentX') + (dx) < this.target.getPropertyValue('contentWidth') + this.target.getPropertyValue('originX') - this.target.getPropertyValue('width')){
+                            this.target.getStatement('contentX').reset(this.target.getPropertyValue('contentX') + (dx))
+                            return
+                        } else {
+                            if(this.target.getPropertyValue('contentX') + (dx) <= this.target.getPropertyValue('originX')) {
+                                this.target.getStatement('contentX').reset(this.target.getPropertyValue('originX'))
+                                // MouseController.stopPropogation(null)
+                            }
+                            if(this.target.getPropertyValue('contentX') + (dx) >= this.target.getPropertyValue('contentWidth') + this.target.getPropertyValue('originX') - this.target.getPropertyValue('width')) {
+                                this.target.getStatement('contentX').reset(this.target.getPropertyValue('contentWidth') + this.target.getPropertyValue('originX') - this.target.getPropertyValue('width'))
+                                // MouseController.stopPropogation(null)
+                            }
+            
+                        }
+                    }
+                    
+                }
+            } else if(this.target instanceof Flickable){
+                if(this.target.getPropertyValue('enabled') && this.target.getPropertyValue('visible') && this.target.getPropertyValue('interactive')) {
+                    if(this.target.getPropertyValue('contentX') + (dx) > 0 && this.target.getPropertyValue('contentX') + (dx) < this.target.getPropertyValue('contentItem').getPropertyValue('width') - this.target.getPropertyValue('width')){
+                        this.target.getStatement('contentX').reset(this.target.getPropertyValue('contentX') + (dx))
+                    } else {
+                        if(this.target.getPropertyValue('contentX') + (dx) <= 0) this.target.getStatement('contentX').reset(0)
+                        if(this.target.getPropertyValue('contentX') + (dx) >= this.target.getPropertyValue('contentItem').getPropertyValue('width')) this.target.getStatement('contentX').reset(this.target.getPropertyValue('contentItem').getPropertyValue('width') - this.target.getPropertyValue('width'))
+                    }
+        
+                    if(this.target.getPropertyValue('contentY') + (dy) > 0 && this.target.getPropertyValue('contentY') + (dy) < this.target.getPropertyValue('contentItem').getPropertyValue('height') - this.target.getPropertyValue('height')){
+                        this.target.getStatement('contentY').reset(this.target.getPropertyValue('contentY') + (dy))
+                    } else {
+                        if(this.target.getPropertyValue('contentY') + (dy) <= 0) this.target.getStatement('contentY').reset(0)
+                        if(this.target.getPropertyValue('contentY') + (dy) >= this.target.getPropertyValue('contentItem').getPropertyValue('height')) this.target.getStatement('contentY').reset(this.target.getPropertyValue('contentItem').getPropertyValue('height') - this.target.getPropertyValue('height'))
+                    }
+                }
+            }
+        }
+    }
+
+    // onMouseMove(x, y){
+    //     let ax = this.moveX - x
+    //     let ay = this.moveY - y
+    //     this.moveX = x
+    //     this.moveY = y
+    //     let inner = this.get(x, y)
+
+    //     document.body.style.cursor = 'default'
+
+    //     // console.log('MouseController::: oldList =',this.oldList)
+    //     while(this.oldList.length){
+    //         let obj = this.oldList.shift()
+    //         if(obj.$mousearea && obj.getPropertyValue('hoverEnabled')) {
+    //             // let normXY = this.normalizeXY(x, y, obj)
+    //             obj.onMouseMove(x, y, false)
+
+    //         }
+    //     }
+    //     // for(let obj of this.oldList){
+    //     //     if(obj.$mousearea && obj.getPropertyValue('hoverEnabled')) {
+    //     //         obj.onMouseMove(x, y, false)
+
+    //     //     }
+    //     // }
+
+    //     for(let obj of inner){
+    //         if(obj.$textinput){
+    //             obj.onMouseMove(x, y)
+    //             break
+    //         }
+    //     }
+        
+    //     this.oldList = inner
+
+
+    //     let pressedMouseArea = this.pressedMouseAreaInner ? this.pressedMouseAreaInner : this.pressedMouseAreaOuter
+
+    //     // console.log(pressedMouseArea)
+
+    //     if(pressedMouseArea && !pressedMouseArea.getPropertyValue('preventStealing') && this.flickList.length){
+    //         let mx = false
+    //         let my = false
+    //         for(let f of this.flickList){
+    //             if(f.getPropertyValue('width') < f.getPropertyValue('contentItem').getPropertyValue('width')) mx = true
+    //             if(f.getPropertyValue('height') < f.getPropertyValue('contentItem').getPropertyValue('height')) my = true
+    //         }
+    //         if((Math.abs(this.originX - x) >= 10 && mx) || (Math.abs(this.originY - y) >= 10 && my)){
+    //             pressedMouseArea = null
+    //             this.pressedMouseAreaInner = null
+    //             this.pressedMouseAreaOuter = null
+    //         }
+    //     }
+
+    //     if(pressedMouseArea){
+    //         // let normXY = this.normalizeXY(x, y, pressedMouseArea)
+    //         if(pressedMouseArea.onMouseMove(x, y, true)){
+    //             this.pressedMouseAreaInner = pressedMouseArea
+    //             this.pressedMouseAreaOuter = null
+    //         } else {
+    //             this.pressedMouseAreaOuter = pressedMouseArea
+    //             this.pressedMouseAreaInner = null
+    //         }
+    //     } else {
+    //         if(this.flickList.length){
+    //             while(this.flickList.length){
+    //                 if(this.flickList[0].onMouseMove(ax, ay)) {
+    //                     this.flickList.shift()
+    //                 } else {
+    //                     break
+    //                 }
+    //             }
+    //         } else {
+    //             for(let obj of inner){
+    //                 // let normXY = this.normalizeXY(x, y, obj)
+    //                 if(obj.$mousearea && obj.getPropertyValue('hoverEnabled')) {
+    //                     obj.onMouseMove(x, y, false)
+        
+    //                 }
+    //             }
+    //         }
+            
+    //     }
+        
+        
+    // }
 }
 class KeyboardController {
     shortcuts = []

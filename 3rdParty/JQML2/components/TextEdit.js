@@ -44,6 +44,8 @@ class TextEdit extends Item {
         this.setStyle({
             fontSize: '14px',
             fontFamily: 'Segoe UI',
+            pointerEvents: 'auto',
+            touchAction: 'auto',
         })
 
         this.impl = document.createElement('span')
@@ -63,6 +65,7 @@ class TextEdit extends Item {
         this.$input.style.maxHeight = '100%'
         this.$input.style.height = '100%'
         this.$input.style.font = 'inherit'
+        this.$input.style.zIndex = 'inherit'
         this.$input.style.resize = 'none'
         this.getDom().appendChild(this.$input)
         MouseController.add(this)

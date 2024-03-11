@@ -53,6 +53,8 @@ class TextInput extends Item {
         this.setStyle({
             fontSize: '14px',
             fontFamily: 'Segoe UI',
+            pointerEvents: 'auto',
+            touchAction: 'auto',
         })
         
         this.$form = document.createElement('form')
@@ -78,7 +80,8 @@ class TextInput extends Item {
         this.$input.style.textAlign = 'inherit'
         this.$input.autocomplete = "new-password"
         this.$input.onfocus = ()=>{
-            this.getProperty('activeFocus').reset(true)
+            this.forceActiveFocus()
+            // this.getProperty('activeFocus').reset(true)
         }
         this.$form.appendChild(this.$input)
         MouseController.add(this)

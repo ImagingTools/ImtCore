@@ -95,6 +95,8 @@ class Item extends QtObject {
             display: 'flex',
             overflow : 'unset',
             zIndex: 0,
+            pointerEvents: 'none',
+            touchAction: 'none',
         })
         
 
