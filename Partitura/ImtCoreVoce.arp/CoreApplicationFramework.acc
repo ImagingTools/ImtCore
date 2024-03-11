@@ -2,8 +2,8 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5181" Description="ACF"/>
-            <Version Id="1" Number="2199" Description="ACF-Solutions"/>
+            <Version Id="0" Number="5203" Description="ACF"/>
+            <Version Id="1" Number="2203" Description="ACF-Solutions"/>
             <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
@@ -197,7 +197,7 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DefaultPageIndex" Type="Integer" ExportId="DefaultPageIndex">
-                        <Data IsEnabled="false"/>
+                        <Data IsEnabled="true" Value="0"/>
                     </AttributeInfo>
                     <AttributeInfo Id="DisablePageListViewIndexes" Type="Integer[]" ExportId="DisablePageListViewIndexes">
                         <Data IsEnabled="false"/>

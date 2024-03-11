@@ -76,7 +76,7 @@ public:
 				const ifile::IFilePersistence* persistencePtr,
 				const DecoratorConfiguration& configuration);
 
-	virtual void UpdateSaveButtonsStatus();
+	virtual void UpdateButtonsStatus();
 	virtual void UpdateAppearance();
 
 	// reimplemeneted (IDocumentViewDecorator)
@@ -104,6 +104,9 @@ protected:
 	bool m_isInitialized;
 	QString m_documentName;
 	QString m_comment;
+
+	bool m_isUndoEnabled;
+	bool m_isRedoEnabled;
 
 	DecoratorConfiguration m_configuration;
 
@@ -188,10 +191,8 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 	m_commands.InsertChild(&m_saveAsCommand);
 	m_commands.InsertChild(&m_closeCommand);
 
-	UI::UndoButton->setEnabled(false);
-	UI::RedoButton->setEnabled(false);
-	m_undoCommand.setEnabled(false);
-	m_redoCommand.setEnabled(false);
+	m_isUndoEnabled = false;
+	m_isRedoEnabled = false;
 
 	idoc::IUndoManager* undoManagerPtr = m_parentPtr->GetUndoManagerForDocument(documentPtr);
 
@@ -230,6 +231,9 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 	UI::SaveButton->setToolButtonStyle(configuration.fileButtonsStyle);
 	connect(UI::SaveButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnSaveDocument);
 
+	UI::SaveAsButton->setToolButtonStyle(configuration.fileButtonsStyle);
+	connect(UI::SaveAsButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnSaveDocumentAs);
+
 	connect(&m_newCommand, &QAction::triggered, parentPtr, &WorkspaceImpl::OnNew);
 	connect(&m_openCommand, &QAction::triggered, parentPtr, &WorkspaceImpl::OnOpen);
 	connect(&m_undoCommand, &QAction::triggered, parentPtr, &WorkspaceImpl::OnUndo);
@@ -238,7 +242,7 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 	connect(&m_saveCommand, &QAction::triggered, parentPtr, &WorkspaceImpl::OnSaveDocument);
 	connect(&m_saveAsCommand, &QAction::triggered, parentPtr, &WorkspaceImpl::OnSaveDocumentAs);
 
-	UpdateSaveButtonsStatus();
+	UpdateButtonsStatus();
 
 	UpdateAppearance();
 
@@ -278,7 +282,7 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 
 
 template <class WorkspaceImpl, class UI>
-void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::UpdateSaveButtonsStatus()
+void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::UpdateButtonsStatus()
 {
 	bool isSaveActive = true;
 
@@ -299,13 +303,26 @@ void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::UpdateSaveButtonsStatus(
 	m_saveCommand.setEnabled(isSaveActive);
 	UI::SaveButton->setEnabled(isSaveActive);
 
+	m_saveAsCommand.setEnabled(m_filePersistencePtr != nullptr);
+	UI::SaveAsButton->setEnabled(m_filePersistencePtr != nullptr);
+
 	const imtgui::IDocumentViewConstraints* viewConstraintsPtr = CompCastPtr<imtgui::IDocumentViewConstraints>(m_viewObjectPtr);
 	if (viewConstraintsPtr != nullptr){
 		bool isSaveEnabled = viewConstraintsPtr->GetViewConstraints() & imtgui::IDocumentViewConstraints::CF_SAVE_DOCUMENT;
 
-		UI::SaveButton->setVisible(isSaveEnabled);
 		m_saveCommand.setVisible(isSaveEnabled);
+		UI::SaveButton->setVisible(isSaveEnabled);
+
+		m_saveAsCommand.setVisible(isSaveEnabled);
+		UI::SaveAsButton->setVisible(isSaveEnabled);
 	}
+
+	UI::UndoButton->setEnabled(m_isUndoEnabled);
+	UI::RedoButton->setEnabled(m_isRedoEnabled);
+	m_undoCommand.setEnabled(m_isUndoEnabled);
+	m_redoCommand.setEnabled(m_isRedoEnabled);
+
+	UI::CloseButton->setEnabled(true);
 }
 
 
@@ -335,12 +352,15 @@ void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::OnViewContraintsChanged(
 		}
 
 		UI::SaveButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_SAVE_DOCUMENT));
+		UI::SaveAsButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_SAVE_DOCUMENT));
 		UI::UndoButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_UNDO_SUPPORT));
 		UI::RedoButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_UNDO_SUPPORT));
+		UI::CloseButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_CLOSE_SUPPORT));
+		m_saveCommand.setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_SAVE_DOCUMENT));
+		m_saveAsCommand.setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_SAVE_DOCUMENT));
 		m_undoCommand.setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_UNDO_SUPPORT));
 		m_redoCommand.setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_UNDO_SUPPORT));
-
-		UI::CloseButton->setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_CLOSE_SUPPORT));
+		m_closeCommand.setVisible((viewFlags & imtgui::IDocumentViewConstraints::CF_CLOSE_SUPPORT));
 	}
 }
 
@@ -425,10 +445,8 @@ void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::OnModelChanged(int model
 				idoc::IUndoManager* undoManagerPtr = this->template GetObjectAt<idoc::IUndoManager>(MI_UNDO_MANAGER);
 				Q_ASSERT(undoManagerPtr != nullptr);
 
-				UI::UndoButton->setEnabled(undoManagerPtr->GetAvailableUndoSteps() > 0);
-				UI::RedoButton->setEnabled(undoManagerPtr->GetAvailableRedoSteps() > 0);
-				m_undoCommand.setEnabled(undoManagerPtr->GetAvailableUndoSteps() > 0);
-				m_redoCommand.setEnabled(undoManagerPtr->GetAvailableRedoSteps() > 0);
+				m_isUndoEnabled = undoManagerPtr->GetAvailableUndoSteps() > 0;
+				m_isRedoEnabled = undoManagerPtr->GetAvailableRedoSteps() > 0;
 			}
 			break;
 
@@ -468,7 +486,7 @@ void TStandardDocumentViewDecorator<WorkspaceImpl, UI>::OnModelChanged(int model
 			break;
 	}
 
-	UpdateSaveButtonsStatus();
+	UpdateButtonsStatus();
 }
 
 
