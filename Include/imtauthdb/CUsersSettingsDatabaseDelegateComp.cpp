@@ -7,16 +7,12 @@
 #include <iprm/CParamsSet.h>
 
 // ImtCore includes
-#include <imtlic/CFeatureInfo.h>
 #include <imtauth/CUserSettings.h>
-#include <imtauth/CUserInfo.h>
 
 
 namespace imtauthdb
 {
 
-
-//QMutex s_mutex;
 
 // public methods
 
@@ -28,9 +24,7 @@ istd::IChangeable* CUsersSettingsDatabaseDelegateComp::CreateObjectFromRecord(co
 		return nullptr;
 	}
 	
-//	s_mutex.lock();
 	istd::TDelPtr<imtauth::IUserSettings> userSettingsPtr = m_userSettingsInfoFactCompPtr.CreateInstance();
-//	s_mutex.unlock();
 
 	QByteArray userId;
 	if (record.contains("UserId")){
@@ -53,8 +47,6 @@ istd::IChangeable* CUsersSettingsDatabaseDelegateComp::CreateObjectFromRecord(co
 			if (!paramSetPtr->Serialize(archive)){
 				return nullptr;
 			}
-
-//			userSettingsPtr->SetSettings(paramSetPtr);
 		}
 	}
 
@@ -97,9 +89,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CUsersSettingsDatabaseDelegateCom
 
 	NewObjectQuery retVal;
 
-    retVal.query += QString("\nINSERT INTO \"UserSettings\" (\"UserId\", \"Settings\") VALUES ('%1', '%2');")
-			.arg(qPrintable(userId))
-			.arg(qPrintable(data)).toUtf8();
+	retVal.query += QString("\nINSERT INTO \"UserSettings\" (\"UserId\", \"Settings\") VALUES ('%1', '%2');")
+				.arg(qPrintable(userId))
+				.arg(qPrintable(data)).toUtf8();
 
 	return retVal;
 }
@@ -111,7 +103,7 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateDeleteObjectQuery(
 			const imtbase::IOperationContext* /*operationContextPtr*/) const
 {
 	return QString("\nDELETE FROM \"UserSettings\" WHERE \"UserId\" = '%1';")
-			.arg(qPrintable(objectId)).toUtf8();
+				.arg(qPrintable(objectId)).toUtf8();
 }
 
 
@@ -146,7 +138,7 @@ QByteArray CUsersSettingsDatabaseDelegateComp::CreateUpdateObjectQuery(
 		data = QByteArray((const char*) archive.GetBuffer(), archive.GetBufferSize()).toBase64();
 	}
 
-    QByteArray retVal = QString("UPDATE \"UserSettings\" SET \"UserId\" ='%1', \"Settings\" = '%2' WHERE \"UserId\" ='%3';")
+	QByteArray retVal = QString("UPDATE \"UserSettings\" SET \"UserId\" ='%1', \"Settings\" = '%2' WHERE \"UserId\" ='%3';")
 			.arg(qPrintable(userId))
 			.arg(qPrintable(data))
 			.arg(qPrintable(objectId))

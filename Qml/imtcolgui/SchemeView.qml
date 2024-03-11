@@ -25,6 +25,8 @@ Rectangle {
 
     property real scaleStep: 0.1;
 
+    property bool autoFit: true;
+
     signal copySignal(int index);
     signal pasteSignal(int index);
     signal deleteSignal(int index);
@@ -32,20 +34,51 @@ Rectangle {
     signal revertSignal();
     signal modelDataChanged();
 
+    Component.onCompleted: {
+        Events.subscribeEvent("DesignSchemeChanged", designSchemeChanged);
+        Events.subscribeEvent("AppSizeChanged", appSizeChanged)
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("DesignSchemeChanged", designSchemeChanged);
+        Events.unSubscribeEvent("AppSizeChanged", appSizeChanged)
+    }
+
     onContentXChanged: {
         canvas.deltaX = -contentX
     }
+
     onContentYChanged: {
         canvas.deltaY = -contentY
     }
-
 
     onObjectModelChanged: {
         canvas.requestPaint();
     }
 
+    onAutoFitChanged: {
+        if (autoFit){
+            appSizeChanged();
+        }
+    }
+
+    function designSchemeChanged(scheme){
+        canvas.requestPaint();
+    }
+
+    function appSizeChanged(params){
+        if (autoFit){
+            zoomToFit();
+
+            requestPaint()
+        }
+    }
+
+    function setAutoFit(autoFit){
+        canvasPage.autoFit = autoFit;
+    }
+
     function zoomIn(){
-        console.log("zoomIn");
         if (canvas.scaleCoeff < 3){
             let scaleCoeff_ = canvas.scaleCoeff;
             scaleCoeff_ += scaleStep;
@@ -62,6 +95,10 @@ Rectangle {
     }
 
     function resetZoom(){
+        canvas.scaleCoeff = 1.0;
+        canvas.scaleCoeffPrev = 1.0;
+
+        requestPaint()
     }
 
     function zoomToFit(){
@@ -71,9 +108,9 @@ Rectangle {
             scaleCoeff_ = scaleCoeff_h
         }
         canvas.setScale(scaleCoeff_, canvas.width / 2, canvas.height / 2)
-        canvas.deltaX = 0
-        canvas.deltaY = 0
-        requestPaint()
+
+        canvas.deltaX = canvasPage.width / 2 - backgroundRec.width / 2
+        canvas.deltaY = canvasPage.height / 2 - backgroundRec.height / 2
     }
 
     function requestPaint(){
@@ -351,7 +388,7 @@ Rectangle {
             property real rightX: x + width;
 
             color: Style.baseColor;
-          }
+        }
 
         Canvas {
             id: canvas
@@ -401,7 +438,7 @@ Rectangle {
             property string linkColor: Style.borderColor2
             property string mainTextColor: Style.textColor
             property string secondTextColor: Style.inactive_textColor
-            property string gridColor: Style.inactive_textColor;
+            property string gridColor: Style.imagingToolsGradient1;
             property string backgroundBorderColor: "#a0a0a0";
             property string backgroundColor: Style.baseColor;
             property string innerFrameColor: "transparent";
@@ -420,7 +457,7 @@ Rectangle {
             }
 
             onImageLoaded: {
-                //console.log("Image loaded")
+                console.log("Image loaded")
                 requestPaint()
             }
 
@@ -449,6 +486,10 @@ Rectangle {
             }
 
             onPaint: {
+                if (canvasPage.autoFit){
+                    canvasPage.zoomToFit();
+                }
+
                 var ctx = canvas.getContext('2d');
                 ctx.reset()
                 ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -684,7 +725,7 @@ Rectangle {
 
                 ctx.lineCap = "round"
                 ctx.lineJoin = "round"
-                ctx.lineWidth = 1;
+                ctx.lineWidth = 2;
 
                 let selected = canvas.linkSelected && canvas.hoverIndex == fromIndex;
                 ctx.strokeStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;

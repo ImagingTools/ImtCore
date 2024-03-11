@@ -134,7 +134,7 @@ void CWebSocketServerComp::OnSocketDisconnected()
 		if (socketObjectPtr == m_senders[key]->GetSocket()){
 			m_senders.remove(key);
 
-			int loginStatus = imtauth::ILoginStatusProvider::LSF_CACHED;
+			int loginStatus = 0;
 			istd::IChangeable::ChangeSet loginChangeSet(loginStatus, QObject::tr("Logout"));
 			loginChangeSet.SetChangeInfo("ClientId", key);
 			istd::CChangeNotifier notifier(this, &loginChangeSet);

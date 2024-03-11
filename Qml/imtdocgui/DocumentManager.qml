@@ -537,7 +537,7 @@ Item {
     Component {
         id: singleDocumentDataComp;
 
-        QtObject {
+        Item {
             id: singleDocumentData;
 
             // UUID for unification
@@ -770,10 +770,23 @@ Item {
                 }
             }
 
-            property Shortcut shortcut: Shortcut {
+            Shortcut {
                 sequence: "Ctrl+S";
-                enabled: true;
+
+                Component.onCompleted: {
+                    console.log("shortcut onCompleted", enabled);
+                }
+
+                Component.onDestruction: {
+                    console.log("shortcut onDestruction", enabled);
+                }
+
+                onEnabledChanged: {
+                    console.log("shortcut onEnabledChanged", enabled);
+                }
+
                 onActivated: {
+                    console.log("Ctrl+S onActivated");
                     if (!singleDocumentData.isDirty){
                         return
                     }

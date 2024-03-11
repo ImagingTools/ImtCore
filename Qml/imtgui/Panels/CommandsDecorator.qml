@@ -64,6 +64,7 @@ Item {
         anchors.verticalCenter: parent ? parent.verticalCenter : undefined;
         anchors.left: parent ? parent.left : undefined;
         anchors.leftMargin: 100;
+
         width:  parent.width - 2*anchors.leftMargin;
         height: parent.height
 

@@ -27,6 +27,12 @@ RemoteCollectionView {
         viewTypeId: "GroupEditor";
     }
 
+    onVisibleChanged: {
+        if (visible && table.elements.GetItemsCount() !== 0){
+            userGroupCollectionViewContainer.doUpdateGui();
+        }
+    }
+
     Component.onCompleted: {
         CachedUserCollection.updateModel();
         CachedRoleCollection.updateModel();

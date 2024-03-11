@@ -61,6 +61,7 @@ CommandsController {
                     if(dataModelLocal.ContainsKey(commandsProviderContainer.commandId + "Commands")){
                         dataModelLocal = dataModelLocal.GetData(commandsProviderContainer.commandId + "Commands");
                         if (dataModelLocal != "null"){
+                            commandsProviderContainer.setAdditionalProperties(dataModelLocal);
                             commandsProviderContainer.commandsModel = dataModelLocal;
                         }
                     }

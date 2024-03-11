@@ -37,17 +37,27 @@ Item {
     }
 
     function showWarningError(message){
+        console.log("showWarningError", message);
+
         modalDialogManager.openDialog(warningDialog, {"message": message});
     }
 
     function onError(parameters){
+        console.log("onError", JSON.stringify(parameters));
+
         let message = parameters["Message"];
         let errorType = parameters["ErrorType"];
         if (errorType === "Critical"){
             showCriticalError(message);
         }
         else if (errorType === "Warning"){
+            console.log("Warning");
+
             showWarningError(message);
+        }
+        else{
+            console.log("else");
+
         }
     }
 

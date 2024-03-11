@@ -347,6 +347,8 @@ StyleComponents {
     }
 
     function parseStyleTheme(themeType){
+        console.log("parseStyleTheme", themeType.toJSON());
+
         if (themeType.ContainsKey("source")){
             let dataSource = themeType.GetData("source");
             styleContainer.borderColor = styleContainer.getThemeColor("ActiveColors", "BorderColor", dataSource);
@@ -368,13 +370,8 @@ StyleComponents {
 
             styleContainer.disabledInActiveTextColor = styleContainer.getThemeColor("DisabledInActiveColors", "Text", dataSource);
 
-//            styleContainer.hover = styleContainer.getThemeColor("ActiveColors", "Hover", dataSource);
             styleContainer.buttonHoverColor = styleContainer.alternateBaseColor;
             styleContainer.buttonPressedColor = styleContainer.getThemeColor("ActiveColors", "BackgroundSelected", dataSource);
-
-            //        styleContainer.color_scrollBackground = styleContainer.getThemeColor("ActiveColors", "ScrollBackground", dataSource);
-            //        styleContainer.color_scrollIndicator = styleContainer.getThemeColor("ActiveColors", "ScrollIndicator", dataSource);
-            //        styleContainer.color_scrollHighlight = styleContainer.getThemeColor("ActiveColors", "ScrollHighlight", dataSource);
 
             styleContainer.imagingToolsGradient0 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient0");
             styleContainer.imagingToolsGradient1 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient1");
@@ -384,11 +381,11 @@ StyleComponents {
             styleContainer.greenColor = dataSource.GetData("ColorPalette").GetData("Green");
 
             styleContainer.iconColorOnSelected = styleContainer.getThemeColor("IconColor", "OnSelected", dataSource);
+
             styleContainer.tabSelectedColor = styleContainer.getThemeColor("ActiveColors", "TabSelected", dataSource);
             styleContainer.errorTextColor = styleContainer.getThemeColor("ActiveColors", "ErrorText", dataSource);
 
             styleContainer.shadowColor = styleContainer.getThemeColor("ActiveColors", "Shadow", dataSource);
-            console.log("shadowColor", styleContainer.shadowColor);
         }
     }
 

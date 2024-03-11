@@ -52,6 +52,8 @@ StyleBase {
                     if(dataModelLocal.ContainsKey("source")){
                         styleContainer.parseStyleTheme(dataModelLocal);
                     }
+
+                    Events.sendEvent("DesignSchemeChanged", styleContainer.theme);
                 }
             }
         }

@@ -72,15 +72,15 @@ QtObject {
         }
     }
 
-//    function setAdditionalProperties(model){
-//        if (!model){
-//            return;
-//        }
+    function setAdditionalProperties(model){
+        if (!model){
+            return;
+        }
 
-//        for (let i = 0; i < model.GetItemsCount(); i++){
-//            model.SetData("IsToggleable", false, i);
-//            model.SetData("IsToggled", false, i);
-//        }
-//    }
+        for (let i = 0; i < model.GetItemsCount(); i++){
+            model.SetData("IsToggleable", false, i);
+            model.SetData("IsToggled", false, i);
+        }
+    }
 }
 
