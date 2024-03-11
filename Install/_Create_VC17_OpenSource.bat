@@ -1,6 +1,5 @@
-set ACFDIR=w:\ImagingTools\ACF\Acf
-set IACFDIR=w:\ImagingTools\ACF\IAcf
-set ACFSLNDIR=w:\ImagingTools\ACF\AcfSln
+echo off
+
 set LICENSE_TYPE=OpenSource
 set LICENSE_DIR=Install/LGPL
 set LICENSE_INSTALL_PATH=../LGPL/License.txt
@@ -16,5 +15,3 @@ call %ACFDIR%\Install\InternalParts\CreateScripts.bat
 call %ACFDIR%\Install\InternalParts\Create_TechnicalDoc.bat
 
 call %ACFDIR%\Install\InternalParts\CopyTempFiles.bat
-
-pause
