@@ -40,18 +40,10 @@ ViewBase {
     }
 
     function updateModel(){
-        console.log("UserEditor updateModel");
         userEditorContainer.model.SetData("Username", usernameInput.text);
         userEditorContainer.model.SetData("Name", nameInput.text);
         userEditorContainer.model.SetData("Email", mailInput.text);
         userEditorContainer.model.SetData("Password", passwordInput.text);
-    }
-
-    Component{
-        id: emptyDecorator;
-        Item{
-            property Item rootItem: null;
-        }
     }
 
     Rectangle {
@@ -102,14 +94,13 @@ ViewBase {
                     width: parent.width;
                     height: 30;
 
-                    placeHolderText: qsTr("Enter the username");
+                    placeHolderText: qsTr("Enter the user name");
 
                     readOnly: userEditorContainer.readOnly;
 
                     onEditingFinished: {
                         let oldText = userEditorContainer.model.GetData("Username");
                         if (oldText && oldText !== usernameInput.text || !oldText && usernameInput.text !== ""){
-                            console.log("usernameInput doUpdateModel")
 
                             userEditorContainer.doUpdateModel();
                         }
@@ -145,7 +136,6 @@ ViewBase {
                     onEditingFinished: {
                         let oldText = userEditorContainer.model.GetData("Password");
                         if (oldText && oldText !== passwordInput.text || !oldText && passwordInput.text !== ""){
-                            console.log("passwordInput doUpdateModel")
                             userEditorContainer.doUpdateModel();
                         }
                     }
@@ -163,7 +153,6 @@ ViewBase {
                     font.pixelSize: Style.fontSize_common;
 
                     text: qsTr("Name");
-
                 }
 
                 CustomTextField {
@@ -178,8 +167,6 @@ ViewBase {
                     onEditingFinished: {
                         let oldText = userEditorContainer.model.GetData("Name");
                         if (oldText && oldText !== nameInput.text || !oldText && nameInput.text !== ""){
-                            console.log("nameInput doUpdateModel")
-
                             userEditorContainer.doUpdateModel();
                         }
                     }
@@ -217,8 +204,6 @@ ViewBase {
                     readOnly: userEditorContainer.readOnly;
 
                     onEditingFinished: {
-                        console.log("mailInput doUpdateModel")
-
                         userEditorContainer.doUpdateModel();
                     }
 
@@ -228,3 +213,5 @@ ViewBase {
         }//columnContainer
     }
 }//Container
+
+
