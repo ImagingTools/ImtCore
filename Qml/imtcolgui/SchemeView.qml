@@ -9,7 +9,7 @@ Rectangle {
 
     clip: true;
 
-    color: Style.backgroundColor;
+    color: Style.imagingToolsGradient0;
 
     property TreeItemModel objectModel: TreeItemModel{};
     property alias selectedIndex: canvas.selectedIndex;
