@@ -214,6 +214,7 @@ class Item extends QtObject {
 
     forceActiveFocus(){
         this.getProperty('focus').reset(true)
+        this.getProperty('activeFocus').reset(true)
     }
 
     $updateShadow(){
@@ -269,6 +270,7 @@ class Item extends QtObject {
         }
         
         let parent = this.parent
+        // if(!(parent instanceof FocusScope))
         while(parent){
             if(parent instanceof FocusScope){
                 if(focusedElements.indexOf(parent) < 0) {
@@ -300,6 +302,7 @@ class Item extends QtObject {
         }
         
         let parent = this.parent
+        // if(!(parent instanceof FocusScope))
         while(parent){
             if(parent instanceof FocusScope){
                 if(activeFocusedElements.indexOf(parent) < 0) {
