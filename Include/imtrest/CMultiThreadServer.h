@@ -76,6 +76,8 @@ public:
 	virtual bool SendResponse(ConstResponsePtr& response) const override;
 	virtual bool SendRequest(ConstRequestPtr& reguest) const override;
 
+	virtual IRequest* CreateRequest();
+
 Q_SIGNALS:
 	void Error(QTcpSocket::SocketError socketerror);
 	void SocketDisconnected(QByteArray requestId);

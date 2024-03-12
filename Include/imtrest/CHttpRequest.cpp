@@ -321,8 +321,7 @@ bool CHttpRequest::ParseDeviceData(QIODevice& device)
 {
 	QByteArray data = device.readAll();
 	if (!data.isEmpty()){
-		m_data += data;
-		return ExecuteHttpParser(m_data, &device);
+		return ExecuteHttpParser(data, &device);
 	}
 
 	return true;

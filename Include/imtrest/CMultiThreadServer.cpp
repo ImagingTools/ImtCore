@@ -54,11 +54,8 @@ void CSocket::Abort()
 void CSocket::TimeOut()
 {
 	if (m_socket != nullptr){
-		if (m_socket->isTransactionStarted()){
-			m_socket->commitTransaction();
-		}
-
-		m_socket->disconnect();
+		qDebug() << m_socket->socketDescriptor() << " Time out";
+		m_socket->abort();
 	}
 }
 
@@ -68,8 +65,12 @@ void CSocket::HandleReadyRead()
 	imtrest::IRequestServlet* requestHandlerPtr = m_rootSocket->GetRequestServlet();
 	Q_ASSERT(requestHandlerPtr != nullptr);
 
-	if (!m_requestPtr.IsValid() || requestHandlerPtr == nullptr){
+	if (requestHandlerPtr == nullptr){
 		return;
+	}
+
+	if (!m_requestPtr.IsValid()){
+		m_requestPtr.SetPtr(m_rootSocket->CreateRequest());
 	}
 
 	if (!m_socket->isOpen()){
@@ -91,11 +92,7 @@ void CSocket::HandleReadyRead()
 	// Get state of request data:
 	if (!m_requestPtr->ParseDeviceData(*m_socket)){
 		qDebug() << "ParseDeviceData error";
-		m_startTimer.stop();
-		if (m_socket->isTransactionStarted()){
-			m_socket->commitTransaction();
-		}
-		m_socket->disconnect();
+		m_socket->rollbackTransaction();
 
 		return;
 	}
@@ -241,6 +238,20 @@ bool CSocketThread::SendResponse(ConstResponsePtr& response) const
 bool CSocketThread::SendRequest(ConstRequestPtr& reguest) const
 {
 	return false;
+}
+
+
+IRequest* CSocketThread::CreateRequest()
+{
+	if (m_enginePtr == nullptr){
+		return nullptr;
+	}
+	imtrest::IRequest* newRequestPtr = m_enginePtr->CreateRequest(*this);
+	if (newRequestPtr != nullptr){
+		m_requestId = newRequestPtr->GetRequestId();
+	}
+
+	return newRequestPtr;
 }
 
 
