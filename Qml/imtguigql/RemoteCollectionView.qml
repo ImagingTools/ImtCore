@@ -139,6 +139,7 @@ CollectionView {
                 var queryFields = Gql.GqlObject("notification");
                 queryFields.InsertField("Id");
                 query.AddField(queryFields);
+                console.log("RegisterSubscription", subscriptionRequestId);
 
                 Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient});
             }

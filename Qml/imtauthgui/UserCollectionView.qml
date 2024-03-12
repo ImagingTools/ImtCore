@@ -29,16 +29,9 @@ RemoteCollectionView {
         viewTypeId: "UserEditor";
     }
 
-    onVisibleChanged: {
-        if (visible && table.elements.GetItemsCount() !== 0){
-            userCollectionViewContainer.doUpdateGui();
-        }
-    }
-
     function onLocalizationChanged(language){
         userCollectionViewContainer.dataController.updateHeaders();
     }
-
 
     Component.onDestruction: {
         Events.unSubscribeEvent("OnLocalizationChanged", userCollectionViewContainer.onLocalizationChanged);

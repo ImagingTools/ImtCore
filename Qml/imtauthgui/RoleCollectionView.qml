@@ -103,12 +103,6 @@ RemoteCollectionView {
         roleCollectionViewContainer.dataController.updateHeaders();
     }
 
-    onVisibleChanged: {
-        if (visible && table.elements.GetItemsCount() !== 0){
-            roleCollectionViewContainer.doUpdateGui();
-        }
-    }
-
     Component.onDestruction: {
         Events.unSubscribeEvent("OnLocalizationChanged", roleCollectionViewContainer.onLocalizationChanged);
     }

@@ -96,11 +96,16 @@ Item {
 
                     text: model.Name;
 
-                    checked: checkable ? model.IsToggled !== undefined ? model.IsToggled : false : false;
                     checkable: model.IsToggleable !== undefined ? model.IsToggleable : false
 
                     widthFromDecorator: true;
                     heightFromDecorator: true;
+
+                    property bool isToggled: model.IsToggled !== undefined ? model.IsToggled : false;
+
+                    onIsToggledChanged: {
+                        checked = checkable ? model.IsToggled !== undefined ? model.IsToggled : false : false;
+                    }
 
                     onClicked: {
                         console.log(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);

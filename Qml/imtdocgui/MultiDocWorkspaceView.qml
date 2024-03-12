@@ -7,8 +7,6 @@ import imtcontrols 1.0
 DocumentManager {
     id: workspaceView;
 
-//    property alias alertPanelComp: alertPanel.sourceComponent;
-
     property var fixedViews: [];
     property var fixedViewNames: [];
 
@@ -192,8 +190,6 @@ DocumentManager {
                     }
 
                     let documentData = workspaceView.documentsModel.get(model.index).DocumentData;
-                    console.log("documentData", documentData);
-
                     if (documentData){
                         documentData.views.push(item);
                         documentData.viewAdded(item);

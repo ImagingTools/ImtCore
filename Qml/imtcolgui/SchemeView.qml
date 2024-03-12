@@ -250,6 +250,8 @@ Rectangle {
 
             onDeltaSignal: {
                 if(canvas.selectedIndex < 0){
+                    canvasPage.autoFit = false;
+
                     canvas.deltaX += delta.x
                     canvas.deltaY += delta.y
                     canvas.requestPaint();
@@ -260,6 +262,8 @@ Rectangle {
             }
 
             onWheel: {
+                canvasPage.autoFit = false;
+
                 let deltaX = (wheel.x + canvas.deltaX) / canvas.scaleCoeff
                 let wheelDelta = wheel.angleDelta.y
                 let scaleCoeff_ = canvas.scaleCoeff;
@@ -1111,7 +1115,6 @@ Rectangle {
         canvas.selectedIndex = -1;
 
         canvas.requestPaint();
-
     }
 
 
