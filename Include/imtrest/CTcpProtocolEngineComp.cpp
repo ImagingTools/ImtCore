@@ -16,7 +16,7 @@ namespace imtrest
 
 QByteArray CTcpProtocolEngineComp::GetProtocolTypeId() const
 {
-    return "tcp";
+	return "tcp";
 }
 
 
@@ -152,7 +152,7 @@ bool CTcpProtocolEngineComp::GetProtocolStatusCode(int statusCode, int& protocol
 
 IRequest* CTcpProtocolEngineComp::CreateRequest(const IRequestServlet& requestHandler) const
 {
-    return new CTcpRequest(requestHandler, *this);
+	return new CTcpRequest(requestHandler, *this);
 }
 
 
@@ -162,7 +162,7 @@ IRequest* CTcpProtocolEngineComp::CreateRequestForSend(
 			const QByteArray& /*data*/,
 			const QByteArray& /*dataTypeId*/) const
 {
-    return new CTcpRequest(requestHandler, *this);
+	return new CTcpRequest(requestHandler, *this);
 }
 
 
@@ -172,7 +172,7 @@ IResponse* CTcpProtocolEngineComp::CreateResponse(
 			const QByteArray& data,
 			const QByteArray& dataTypeId) const
 {
-    return new CTcpResponse(statusCode, data, dataTypeId, *this);
+	return new CTcpResponse(statusCode, data, dataTypeId, *this);
 }
 
 
