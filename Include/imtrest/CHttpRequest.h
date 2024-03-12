@@ -36,8 +36,8 @@ public:
 	QByteArrayList GetHeaders() const;
 	QByteArray GetHeaderValue(const QByteArray& headerType) const;
 	QUrl GetUrl() const;
-	MethodType GetMethodType() const;
-	QByteArray GetBody() const;
+    virtual MethodType GetMethodType() const;
+    virtual QByteArray GetBody() const override;
 	QHostAddress GetRemoteAddress() const;
 
 	static int OnStartMessage(http_parser* httpParser);
@@ -70,7 +70,7 @@ public:
 private:
 	static bool ParseUrl(const char *at, size_t length, bool connect, QUrl& url);
 
-private:
+protected:
 	http_parser m_httpParser;
 	QHostAddress m_remoteAddress;
 	QUrl m_url;

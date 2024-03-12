@@ -8,7 +8,10 @@
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/ISender.h>
 #include <imtrest/CHttpRequest.h>
+#include <imtrest/CHttpResponse.h>
 #include <imtrest/CHttpSender.h>
+#include <imtrest/CTcpResponse.h>
+#include <imtrest/CTcpSender.h>
 
 
 namespace imtrest
@@ -122,9 +125,19 @@ void CSocket::Disconnected()
 
 void CSocket::OnSendResponse(ConstResponsePtr response)
 {
-	CHttpSender sender(m_socket.GetPtr());
+    CHttpResponse* httpResponsePtr = const_cast<CHttpResponse*>(dynamic_cast<const CHttpResponse*>(response.GetPtr()));
+    CTcpResponse* tcpResponsePtr = const_cast<CTcpResponse*>(dynamic_cast<const CTcpResponse*>(response.GetPtr()));
 
-	sender.SendResponse(response);
+    if(httpResponsePtr != nullptr){
+        CHttpSender sender(m_socket.GetPtr());
+
+        sender.SendResponse(response);
+    }
+    else if(tcpResponsePtr != nullptr){
+        CTcpSender sender(m_socket.GetPtr());
+
+        sender.SendResponse(response);
+    }
 }
 
 
@@ -274,6 +287,8 @@ const ISender* CMultiThreadServer::GetSender(const QByteArray& requestId) const
 
 void CMultiThreadServer::Disconnected(QByteArray requestId)
 {
+    qDebug() << "OnSocketDisconnected  " + requestId;
+
 	for (CSocketThread* socket : m_threadSocketList){
 		if (socket->GetRequestId() == requestId){
 			if (m_threadSocketList.removeOne(socket)){

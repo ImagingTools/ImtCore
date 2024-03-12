@@ -357,8 +357,9 @@ bool CHttpRequest::ExecuteHttpParser(const QByteArray& data, const QObject* sock
 		&s_httpParserSettings,
 		data.constData(),
 		size_t(data.size()));
+
 	if (parsedCount < data.size()){
-		qDebug() << "parsedCount < data.size" << parsedCount << data.size();
+        qDebug() << "parsedCount < data.size" << parsedCount << data.size() << "\t\t" << data.toHex(' ');
 		return false;
 	}
 

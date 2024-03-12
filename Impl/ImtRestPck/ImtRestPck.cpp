@@ -84,6 +84,11 @@ I_EXPORT_COMPONENT(
 		"Component for providing the server log",
 		"Server Log Provider");
 
+I_EXPORT_COMPONENT(
+    TcpProtocolEngine,
+    "General TCP protocol engine",
+    "Tcp Connection Server");
+
 
 } // namespace ImtRestPck
 
