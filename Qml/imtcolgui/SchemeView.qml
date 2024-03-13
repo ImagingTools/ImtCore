@@ -616,7 +616,10 @@ Rectangle {
                 let secondText  = canvasPage.objectModel.GetData("SecondText", index)
                 let thirdText  = canvasPage.objectModel.GetData("ThirdText", index)
                 let iconUrl_1  = "../../../" + Style.getIconPath(canvasPage.objectModel.GetData("IconUrl_1", index), Icon.State.On, Icon.Mode.Normal)
-                let selected = canvasPage.objectModel.IsValidData("Selected", index) ? canvasPage.objectModel.GetData("Selected", index) : false;
+                // for future multiselect
+                // let selected = canvasPage.objectModel.IsValidData("Selected", index) ? canvasPage.objectModel.GetData("Selected", index) : false;
+                let selected = index === canvasPage.selectedIndex
+
                 let hasError = canvasPage.objectModel.IsValidData("HasError", index) ? canvasPage.objectModel.GetData("HasError", index) : false;
                 let isComposite = canvasPage.objectModel.IsValidData("IsComposite", index) ? canvasPage.objectModel.GetData("IsComposite", index) : false;
 
