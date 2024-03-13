@@ -79,7 +79,15 @@ class QProperty {
         }
     }
 
+    subscribersReset(){
+        if(this.subscribers)
+        for(let subscriber of this.subscribers){
+            subscriber.updating = false
+        }
+    }
+
     reset(newValue){
+        this.subscribersReset()
         this.unsubscribe()
         this.set(newValue)
     }
@@ -402,6 +410,7 @@ class QVisible extends QBool {
     }
 
     reset(newValue){
+        this.subscribersReset()
         try {
             let safeValue = this.typeCasting(newValue)
             this.originValue = safeValue
@@ -488,6 +497,7 @@ class QAlias extends QProperty {
     }
 
     reset(newValue){
+        this.subscribersReset()
         this.unsubscribe()
         let targetProperty = this.getTargetProperty()
         let safeValue = targetProperty instanceof QProperty ? this.getTargetProperty().typeCasting.call(this, newValue) : newValue
@@ -807,6 +817,7 @@ class QKeyNavigation extends ComplexObject {
 
 class QGeometry extends QReal {
     reset(newValue){
+        this.subscribersReset()
         if(this.frozen) return
         super.reset(newValue)
     }

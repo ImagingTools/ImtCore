@@ -460,19 +460,19 @@ class ListView extends Flickable {
 
         
         let obj = this.$items[index]
-        if(obj.getPropertyValue('width') === 0 || obj.getPropertyValue('height') === 0) {
-            if(obj.getPropertyValue('width') === 0 || obj.getPropertyValue('height') === 0) {
-                obj.setStyle({
-                    visibility: 'hidden'
-                })
-            } else {
-                obj.setStyle({
-                    visibility: 'visible'
-                })
-            }
+        
+        if(obj.getPropertyValue('width') <= 0 || obj.getPropertyValue('height') <= 0) {
+            obj.setStyle({
+                visibility: 'hidden'
+            })
+        } else {
+            obj.setStyle({
+                visibility: 'visible'
+            })
         }
+        
         obj.getProperty('width').getNotify().connect(()=>{
-            if(obj.getPropertyValue('width') === 0 || obj.getPropertyValue('height') === 0) {
+            if(obj.getPropertyValue('width') <= 0 || obj.getPropertyValue('height') <= 0) {
                 obj.setStyle({
                     visibility: 'hidden'
                 })
@@ -489,7 +489,7 @@ class ListView extends Flickable {
             }
         })
         obj.getProperty('height').getNotify().connect(()=>{
-            if(obj.getPropertyValue('width') === 0 || obj.getPropertyValue('height') === 0) {
+            if(obj.getPropertyValue('width') <= 0 || obj.getPropertyValue('height') <= 0) {
                 obj.setStyle({
                     visibility: 'hidden'
                 })
