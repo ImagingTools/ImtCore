@@ -17,7 +17,7 @@ TreeViewItemDelegateBase {
             Item {
                 id: nameItem;
 
-                width: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.width / packageTreeItemDelegate.root.columnCount - 20 * packageTreeItemDelegate.level : 0;
+                width: packageTreeItemDelegate.root && packageTreeItemDelegate.root.columnCount !== 0 ? packageTreeItemDelegate.root.width / packageTreeItemDelegate.root.columnCount - 20 * packageTreeItemDelegate.level : 0;
                 height: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.rowItemHeight : 0;
 
                 Text {
@@ -89,7 +89,7 @@ TreeViewItemDelegateBase {
             Item {
                 id: idItem;
 
-                width: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.width / packageTreeItemDelegate.root.columnCount : 0;
+                width: packageTreeItemDelegate.root && packageTreeItemDelegate.root.columnCount !== 0 ? packageTreeItemDelegate.root.width / packageTreeItemDelegate.root.columnCount : 0;
                 height: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.rowItemHeight : 0;
 
                 Text {
@@ -170,7 +170,7 @@ TreeViewItemDelegateBase {
             Item {
                 id: descriptionItem;
 
-                width: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.width / packageTreeItemDelegate.root.columnCount : 0;
+                width: packageTreeItemDelegate.root && packageTreeItemDelegate.root.columnCount !== 0 ? packageTreeItemDelegate.root.width / packageTreeItemDelegate.root.columnCount : 0;
                 height: packageTreeItemDelegate.root ? packageTreeItemDelegate.root.rowItemHeight : 0;
 
                 Text {

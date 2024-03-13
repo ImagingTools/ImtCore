@@ -102,6 +102,10 @@ Rectangle {
     }
 
     function zoomToFit(){
+        if (canvas.backgroundWidth == 0 | canvas.backgroundHeight == 0){
+            return
+        }
+
         let scaleCoeff_ = canvas.width / canvas.backgroundWidth;
         let scaleCoeff_h = canvas.height / canvas.backgroundHeight;
         if (scaleCoeff_ > scaleCoeff_h){
@@ -262,6 +266,10 @@ Rectangle {
             }
 
             onWheel: {
+                if (canvas.scaleCoeff == 0){
+                    return
+                }
+
                 canvasPage.autoFit = false;
 
                 let deltaX = (wheel.x + canvas.deltaX) / canvas.scaleCoeff
@@ -283,7 +291,7 @@ Rectangle {
 
 
             function movingFunction(delta){//reimplemented
-                if(canvas.selectedIndex >= 0){
+                if(canvas.selectedIndex >= 0 && canvas.scaleCoeff != 0){
                     let x_  = canvasPage.objectModel.GetData("X", canvas.selectedIndex);
                     let y_  = canvasPage.objectModel.GetData("Y", canvas.selectedIndex);
                     let width_ = canvasPage.objectModel.IsValidData("Width", canvas.selectedIndex) ? canvasPage.objectModel.GetData("Width", canvas.selectedIndex)  : canvas.mainRec_width;
@@ -954,6 +962,9 @@ Rectangle {
             }
 
             function findAngle(x1, y1, x2, y2){
+                if (x2 - x1 == 0){
+                    return 0
+                }
 
                 let angle;
                 angle = Math.atan((y2 - y1) / (x2 - x1))

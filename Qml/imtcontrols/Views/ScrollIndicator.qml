@@ -113,19 +113,19 @@ Rectangle{
     Rectangle{
         id: scrollIndicator;
 
-        x: scrollContainer.vertical ? (parent.width - width)/2 :
+        x: scrollContainer.vertical || scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width == 0 ? (parent.width - width)/2 :
                                       (scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX)*(scrollContainer.targetItem.width - scrollIndicator.width)/(scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width)
 
-        y: !scrollContainer.vertical ? (parent.height - height)/2:
+        y: !scrollContainer.vertical || scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height == 0 ? (parent.height - height)/2:
                                        (scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY)*(scrollContainer.targetItem.height - scrollIndicator.height)/(scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height)
 
-        width: scrollContainer.vertical ? (parent.width - 2*scrollContainer.indicatorMargin) :
+        width: scrollContainer.vertical || scrollContainer.targetItem.contentWidth === 0 || scrollContainer.targetItem.width === 0 ? (parent.width - 2*scrollContainer.indicatorMargin) :
                                           (scrollContainer.targetItem.contentWidth <= scrollContainer.targetItem.width ? scrollContainer.targetItem.width :
                                                                                                                          (scrollContainer.targetItem.width / scrollContainer.targetItem.contentWidth * scrollContainer.targetItem.width)) < scrollContainer.minSize ?
                                               scrollContainer.minSize :
                                               (scrollContainer.targetItem.width / scrollContainer.targetItem.contentWidth * scrollContainer.targetItem.width);
 
-        height: !scrollContainer.vertical ? (parent.height - 2*scrollContainer.indicatorMargin) :
+        height: !scrollContainer.vertical || scrollContainer.targetItem.contentHeight == 0 || scrollContainer.targetItem.height == 0 ? (parent.height - 2*scrollContainer.indicatorMargin) :
                                             (scrollContainer.targetItem.contentHeight <= scrollContainer.targetItem.height ? scrollContainer.targetItem.height :
                                                                                                                              (scrollContainer.targetItem.height / scrollContainer.targetItem.contentHeight * scrollContainer.targetItem.height)) < scrollContainer.minSize ?
                                                 scrollContainer.minSize :

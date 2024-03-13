@@ -35,7 +35,7 @@ Item {
     property real gridAddHeight: 110*3;
     property int gridCellHeightMin: 110;
 
-    property int gridCellHeightMax: (gridCellHeightMin * gridRowCount + gridAddHeight) / gridRowCount
+    property int gridCellHeightMax: gridRowCount == 0 ? gridCellHeightMin : (gridCellHeightMin * gridRowCount + gridAddHeight) / gridRowCount
                                     + !isWeb * (gridIsLastRow * gridAddHeight - gridAddHeight / gridRowCount + 1);
 
     property int gridDelegateMargin: 10;

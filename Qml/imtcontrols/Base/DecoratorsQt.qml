@@ -641,7 +641,7 @@ Item {
 
             active: false;
             orientation: !baseElement ? Qt.Vertical : baseElement.vertical ? Qt.Vertical : Qt.Horizontal;
-            size: !targetItem ? 0 : orientation == Qt.Vertical ? targetItem.height / targetItem.contentHeight : targetItem.width / targetItem.contentWidth;
+            size: !targetItem || targetItem.contentHeight === 0 || targetItem.contentWidth === 0 ? 0 : orientation == Qt.Vertical ? targetItem.height / targetItem.contentHeight : targetItem.width / targetItem.contentWidth;
             policy: ScrollBar.AlwaysOn;
 
 

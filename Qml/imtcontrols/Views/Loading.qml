@@ -37,7 +37,8 @@ Rectangle {
                 property double b: 0.1;
                 property double a: 0.25;
 
-                width: ((b - a) / repeater.count * index + a) * square.height;  height: width;
+                width: repeater.count == 0 ? square.height : ((b - a) / repeater.count * index + a) * square.height;
+                height: width;
                 radius: 0.5 * height;
 
                 x: 0.5 * square.width  + 0.5 * (square.width  - width )  * Math.cos(2 * Math.PI / repeater.count * model.index) - 0.5 * width;

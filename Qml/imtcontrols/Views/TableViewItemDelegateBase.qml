@@ -171,7 +171,7 @@ FocusScope {
                     width: calcWidth;
                     height: delegate.root ? delegate.root.rowItemHeight :0;
 
-                    property int calcWidth: delegate.root ? delegate.root.width / delegate.root.columnCount  : 0;
+                    property int calcWidth: delegate.root && delegate.root.columnCount !== 0 ? delegate.root.width / delegate.root.columnCount  : 0;
 
                     Text {
                         id: text_;

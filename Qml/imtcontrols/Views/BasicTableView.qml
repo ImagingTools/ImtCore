@@ -326,7 +326,7 @@ FocusScope {
                 delegate: Item {
                     id: repeaterItem;
 
-                    width: tableViewRoot.width / tableViewRoot.columnCount;
+                    width: tableViewRoot.columnCount == 0 ? tableViewRoot.width : tableViewRoot.width / tableViewRoot.columnCount;
                     height: tableViewRoot.headerHeight;
 
                     Text {
