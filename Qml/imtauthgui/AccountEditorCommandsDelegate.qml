@@ -3,9 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 import imtdocgui 1.0
 
-DocumentWorkspaceCommandsDelegateBase {
+ViewCommandsDelegateBase {
     id: container;
-
-    showInputIdDialog: false;
 }
 

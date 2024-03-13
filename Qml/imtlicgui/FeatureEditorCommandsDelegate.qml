@@ -6,7 +6,7 @@ import imtcontrols 1.0
 import imtdocgui 1.0
 
 
-DocumentWorkspaceCommandsDelegateBase {
+ViewCommandsDelegateBase {
     id: root;
 
     onCommandActivated: {

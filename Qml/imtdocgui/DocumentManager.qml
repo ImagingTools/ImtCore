@@ -7,6 +7,7 @@ Item {
     id: documentManager;
 
     property string defaultDocumentName: qsTr("<no name>");
+//    property int activeDocumentIndex: -1;
 
     property ListModel documentsModel: ListModel {
         dynamicRoles: true;
@@ -316,13 +317,14 @@ Item {
     function saveDocument(documentId)
     {
         console.log("DocumentManager saveDocument")
-        Events.sendEvent("StartLoading");
 
         let index = getDocumentIndexByDocumentId(documentId);
         if (index >= 0){
             let isNew = documentsModel.get(index).IsNew;
             let document = documentsModel.get(index).DocumentData;
             if (document.isDirty){
+                Events.sendEvent("StartLoading");
+
                 for (let i = 0; i < document.views.length; i++){
                     if (!document.views[i].readOnly){
                         document.views[i].doUpdateModel();
@@ -533,11 +535,10 @@ Item {
         return treeItemModelComp.createObject(parent);
     }
 
-
     Component {
         id: singleDocumentDataComp;
 
-        Item {
+        QtObject {
             id: singleDocumentData;
 
             // UUID for unification
@@ -585,7 +586,7 @@ Item {
                         let hasRemoteChanges = singleDocumentData.documentDataController.hasRemoteChanges;
 
                         if (singleDocumentData.documentIndex >= 0){
-//                            documentManager.documentsModel.setProperty(singleDocumentData.documentIndex, "AlertVisible", hasRemoteChanges)
+                            //                            documentManager.documentsModel.setProperty(singleDocumentData.documentIndex, "AlertVisible", hasRemoteChanges)
                         }
                     }
                 }
@@ -638,7 +639,7 @@ Item {
 
                     documentManager.updateDocumentTitle(singleDocumentData.documentIndex);
 
-//                    documentModel.dataChanged.connect(singleDocumentData.modelConnections.onDataChanged);
+                    //                    documentModel.dataChanged.connect(singleDocumentData.modelConnections.onDataChanged);
 
                     if (singleDocumentData.undoManager.modelIsRegistered()){
                         singleDocumentData.undoManager.unregisterModel();
@@ -682,7 +683,6 @@ Item {
             signal viewRemoved(var view);
 
             Component.onDestruction: {
-                console.log("singleDocumentData onDestruction");
                 Events.unSubscribeEvent(uuid + "CommandActivated", commandHandle);
                 if (singleDocumentData.undoManager){
                     Events.unSubscribeEvent(uuid + "CommandActivated", singleDocumentData.undoManager.commandHandle);
@@ -709,6 +709,10 @@ Item {
                     return;
                 }
 
+                if (view.commandsDelegate){
+                    view.commandsDelegate.commandActivated.connect(singleDocumentData.commandHandle);
+                }
+
                 if (singleDocumentData.documentDataController){
                     singleDocumentData.blockingUpdateModel = true;
                     view.model = singleDocumentData.documentDataController.documentModel;
@@ -721,8 +725,6 @@ Item {
                     documentManager.updateDocumentTitle(singleDocumentData.documentIndex);
                 }
             }
-
-            onViewRemoved: {}
 
             onIsDirtyChanged: {
                 for (let i = 0; i < singleDocumentData.views.length; i++){
@@ -739,6 +741,13 @@ Item {
                     return singleDocumentData.documentDataController.getDocumentName();
                 }
             }
+
+            // Processing commands that came from the view
+//            function viewCommandHandle(commandId){
+//                if (commandId === "Save"){
+//                    commandHandle("Save");
+//                }
+//            }
 
             function commandHandle(commandId){
                 console.log("DicumentManager commandHandle, documentId", documentId);
@@ -770,31 +779,6 @@ Item {
                 }
             }
 
-            Shortcut {
-                sequence: "Ctrl+S";
-
-                Component.onCompleted: {
-                    console.log("shortcut onCompleted", enabled);
-                }
-
-                Component.onDestruction: {
-                    console.log("shortcut onDestruction", enabled);
-                }
-
-                onEnabledChanged: {
-                    console.log("shortcut onEnabledChanged", enabled);
-                }
-
-                onActivated: {
-                    console.log("Ctrl+S onActivated");
-                    if (!singleDocumentData.isDirty){
-                        return
-                    }
-
-                    singleDocumentData.commandHandle("Save");
-                }
-            }
-
             property Component documentHistoryDialogComp: Component {
                 DocumentHistoryDialog {
                     title: qsTr("Document history");
@@ -804,6 +788,21 @@ Item {
                     }
                 }
             }
+
+            //            property Shortcut shortcut:  Shortcut {
+            //                sequence: "Ctrl+S";
+
+            //                enabled: singleDocumentData.documentIndex == documentManager.activeDocumentIndex;
+
+            //                onEnabledChanged: {
+            //                    console.log("Document onEnabledChanged", enabled, model.index);
+            //                }
+
+            //                onActivated: {
+            //                    console.log("Document Ctrl+S onActivated");
+            //                    singleDocumentData.commandHandle("Save");
+            //                }
+            //            }
         }
     }
 

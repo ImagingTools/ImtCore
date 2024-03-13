@@ -5,7 +5,7 @@ import imtdocgui 1.0
 import imtcolgui 1.0
 import imtcontrols 1.0
 
-Item {
+ViewCommandsDelegateBase {
     id: container;
 
     property Item collectionView: null;
@@ -28,7 +28,6 @@ Item {
         {"Id": "SetDescription"}
     ]
 
-    signal commandActivated(string commandId);
     signal renamed(string id, string newName);
     signal descriptionSetted(string id, string description);
     signal removed(string id);

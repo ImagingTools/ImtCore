@@ -2,7 +2,6 @@
     <qresource prefix="/qml">
         <file alias="imtdocgui/qmldir">qmldir</file>
         <file alias="imtdocgui/DocumentWorkspaceCommandsDelegate.qml">DocumentWorkspaceCommandsDelegate.qml</file>
-        <file alias="imtdocgui/DocumentWorkspaceCommandsDelegateBase.qml">DocumentWorkspaceCommandsDelegateBase.qml</file>
         <file alias="imtdocgui/MainDocumentManager.qml">MainDocumentManager.qml</file>
         <file alias="imtdocgui/MultiDocWorkspacePageView.qml">MultiDocWorkspacePageView.qml</file>
         <file alias="imtdocgui/MultiDocWorkspaceView.qml">MultiDocWorkspaceView.qml</file>

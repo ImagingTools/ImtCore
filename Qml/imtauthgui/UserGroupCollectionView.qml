@@ -58,6 +58,10 @@ RemoteCollectionView {
             rolesModel: userGroupCollectionViewContainer.rolesModel;
             groupsModel: userGroupCollectionViewContainer.groupsModel;
 
+            commandsDelegate: ViewCommandsDelegateBase {
+                view: groupEditor;
+            }
+
             commandsController: CommandsRepresentationProvider {
                 commandId: "Group";
                 uuid: groupEditor.viewId;

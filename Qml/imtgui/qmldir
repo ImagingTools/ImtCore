@@ -59,4 +59,5 @@ ServerNoConnectionView 1.0 View/ServerNoConnectionView.qml
 SimpleCommandsDecorator 1.0 View/SimpleCommandsDecorator.qml
 SearchComp 1.0 View/SearchComp.qml
 ViewBase 1.0 View/ViewBase.qml
+ViewCommandsDelegateBase 1.0 View/ViewCommandsDelegateBase.qml
 

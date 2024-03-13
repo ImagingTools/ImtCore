@@ -45,7 +45,7 @@ RemoteCollectionView {
                  uuid: featureEditor.viewId;
              }
 
-             commandsDelegate: DocumentWorkspaceCommandsDelegateBase {
+             commandsDelegate: ViewCommandsDelegateBase {
                  onCommandActivated: {
                      let selectedIndex = null;
                      if (featureEditor.tableView.tableSelection.items.length > 0){

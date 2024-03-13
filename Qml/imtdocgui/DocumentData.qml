@@ -80,7 +80,7 @@ Item {
         }
     }
 
-    property DocumentWorkspaceCommandsDelegateBase commandsDelegate: DocumentWorkspaceCommandsDelegateBase {
+    property ViewCommandsDelegateBase commandsDelegate: ViewCommandsDelegateBase {
         documentPtr: documentData;
     }
 
