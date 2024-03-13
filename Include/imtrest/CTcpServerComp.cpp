@@ -71,7 +71,7 @@ void CTcpServerComp::OnComponentCreated()
 		if (m_serverPortCompPtr.IsValid()){
 			int port = m_serverPortCompPtr->GetUrl().port();
 
-			StartListening(QHostAddress::LocalHost, port);
+			StartListening(QHostAddress::Any, port);
 		}
 		else{
 			StartListening();

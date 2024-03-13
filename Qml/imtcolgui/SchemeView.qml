@@ -438,7 +438,8 @@ Rectangle {
             property string errorColor: Style.errorColor
             property string compositeColor: "#bcd2e8";
             property string compositeSelectedColor: "#1167b1";
-            property string selectedLinkColor: Style.borderFocusColor
+            property string selectedLinkFromColor: Style.selectedLinkFromColor
+            property string selectedLinkToColor: Style.selectedLinkToColor
             property string linkColor: Style.borderColor2
             property string mainTextColor: Style.textColor
             property string secondTextColor: Style.inactive_textColor
@@ -734,9 +735,8 @@ Rectangle {
                 ctx.lineJoin = "round"
                 ctx.lineWidth = 2;
 
-                let selected = canvas.linkSelected && canvas.hoverIndex == fromIndex;
-                ctx.strokeStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
-                ctx.fillStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
+                ctx.strokeStyle = canvas.hoverIndex === fromIndex ? canvas.selectedLinkFromColor : canvas.hoverIndex === toIndex ? canvas.selectedLinkToColor : canvas.linkColor;
+                ctx.fillStyle = ctx.strokeStyle
 
                 ctx.beginPath()
                 ctx.moveTo(x1_link, y1_link);
@@ -876,14 +876,12 @@ Rectangle {
                 }//for intersection margin
 
                 if(complexIntersection && hasMargin){
-                    drawIntersectionExt(ctx, intersection,angle, selected);
-                    let selectedArcIndex = canvas.hasTailSelection ? toIndex : fromIndex;
-                    let selectedArc = canvas.linkSelected && canvas.hoverIndex == selectedArcIndex;
-                    drawIntersectionArc(ctx, intersection, angle + Math.PI, offset, selectedArc)
+                    drawIntersectionExt(ctx, intersection,angle, false);
+                    drawIntersectionArc(ctx, intersection, angle + Math.PI, offset, false)
 
                 }
                 else {//simple
-                    drawIntersection(ctx, intersection, selected);
+                    drawIntersection(ctx, intersection, false);
                 }
             }
 
@@ -891,8 +889,6 @@ Rectangle {
                 let size = canvas.intersectionSize;
 
                 ctx.lineWidth = 0.5;
-                ctx.strokeStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
-                ctx.fillStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
                 ctx.beginPath()
                 ctx.roundedRect(intersection.x - size/2, intersection.y  - size/2, size, size, size, size);
                 ctx.fill();
@@ -903,18 +899,6 @@ Rectangle {
                 let size = canvas.intersectionSize;
                 let sizeSmall = size/2;
 
-                //draw white circle
-                ctx.lineWidth = 0.5;
-                ctx.strokeStyle = canvas.backgroundColor;
-                ctx.fillStyle = canvas.backgroundColor;
-                ctx.beginPath()
-                ctx.roundedRect(intersection.x - size/2, intersection.y  - size/2, size, size, size, size);
-                ctx.fill();
-                ctx.stroke();
-
-                //draw colored circle
-                ctx.strokeStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
-                ctx.fillStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
                 ctx.beginPath()
                 ctx.roundedRect(intersection.x - sizeSmall/2, intersection.y  - sizeSmall/2, sizeSmall, sizeSmall, sizeSmall, sizeSmall);
                 ctx.fill();
@@ -938,8 +922,6 @@ Rectangle {
                 let rad = canvas.arcRadius;
                 let endAngle = 0.6 * Math.PI;
                 ctx.lineWidth = 2;
-                ctx.strokeStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
-                ctx.fillStyle = selected ? canvas.selectedLinkColor : canvas.linkColor;
                 ctx.beginPath()
                 ctx.arc(point.x, point.y, rad, angle , angle - endAngle, true);
                 ctx.stroke();

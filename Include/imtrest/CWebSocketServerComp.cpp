@@ -46,7 +46,7 @@ void CWebSocketServerComp::OnComponentCreated()
 			if (m_webSocketServerPortCompPtr.IsValid()){
 				int port = m_webSocketServerPortCompPtr->GetUrl().port();
 
-				StartListening(QHostAddress::LocalHost, port);
+				StartListening(QHostAddress::Any, port);
 			}
 			else{
 				StartListening();
@@ -187,7 +187,6 @@ void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 			QObject::connect(webSocketPtr, &QWebSocket::disconnected, this, &CWebSocketServerComp::OnSocketDisconnected);
 		}
 
-//		imtrest::ConstResponsePtr responsePtr = m_requestServerHandlerCompPtr->ProcessRequest(*webSocketRequest);
 		imtrest::ConstResponsePtr responsePtr;
 
 		if (

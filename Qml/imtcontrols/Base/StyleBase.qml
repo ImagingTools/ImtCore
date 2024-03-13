@@ -137,6 +137,9 @@ StyleComponents {
     property string borderFocusColor: "#1a76e7";   //b0b0b0
     property string borderColor2: "#a4a4a6";
 
+    property string selectedLinkFromColor: "#1974d2";
+    property string selectedLinkToColor: "#51AC2A";
+
     property string dialogBackgroundColor: "#f6f6f6";
 
     property string imagingToolsGradient0: "#f6f6f6";
