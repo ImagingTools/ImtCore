@@ -75,12 +75,12 @@ class Canvas extends Item {
     $widthChanged(){
         super.$widthChanged()
         this.getDom().setAttribute('width', this.getPropertyValue('width'))
-        if(this.$signals.paint) this.$signals.paint()
+        if(this.getPropertyValue('width') > 0 && this.getPropertyValue('height') > 0 && this.$signals.paint) this.$signals.paint()
     }
     $heightChanged(){
         super.$heightChanged()
         this.getDom().setAttribute('height', this.getPropertyValue('height'))
-        if(this.$signals.paint) this.$signals.paint()
+        if(this.getPropertyValue('width') > 0 && this.getPropertyValue('height') > 0 && this.$signals.paint) this.$signals.paint()
     }
 
     cancelRequestAnimationFrame(handle){
@@ -110,7 +110,7 @@ class Canvas extends Item {
 
     }
     requestPaint(){
-        if(this.$signals.paint) this.$signals.paint()
+        if(this.getPropertyValue('width') > 0 && this.getPropertyValue('height') > 0 && this.$signals.paint) this.$signals.paint()
     }
     save(filename, imageSize){
 

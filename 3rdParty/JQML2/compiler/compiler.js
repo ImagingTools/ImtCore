@@ -1439,10 +1439,10 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
 
     if(step === 0){
         code.push('updateList.push(()=>{')
-        for(let i = updatePrimaryList.length-1; i >= 0; i--){
+        for(let i = 0; i < updatePrimaryList.length; i++){
             code.push(updatePrimaryList[i])
         }
-    
+        if(updatePrimaryList.length) code.push('for(let update of updateList.splice(0, updateList.length)){update()}')
         for(let upd of updateList){
             code.push(upd)
         }

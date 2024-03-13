@@ -381,17 +381,20 @@ class Item extends QtObject {
             this.getProperty('height').freeze()
 
             if(this.parent === this.getProperty('anchors').getProperty('fill').get()){
-                this.getProperty('x').setCompute(()=>{
-                    this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('leftMargin'))
+                this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('leftMargin'))
+
+                this.getProperty('x').setCompute(()=>{ 
                     return this.getProperty('anchors').getProperty('leftMargin').get()
                 })
+                this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('topMargin'))
+
                 this.getProperty('y').setCompute(()=>{
-                    this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('topMargin'))
                     return this.getProperty('anchors').getProperty('topMargin').get()
                 })
             } else {
+                this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('fill').get().getProperty('x'), this.getProperty('anchors').getProperty('leftMargin'))
+                    
                 this.getProperty('x').setCompute(()=>{
-                    this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('fill').get().getProperty('x'), this.getProperty('anchors').getProperty('leftMargin'))
                     return this.getProperty('anchors').getProperty('fill').get().getProperty('x').get() + this.getProperty('anchors').getProperty('leftMargin').get()
                 })
                 this.getProperty('y').setCompute(()=>{
@@ -399,44 +402,69 @@ class Item extends QtObject {
                     return this.getProperty('anchors').getProperty('fill').get().getProperty('y').get() + this.getProperty('anchors').getProperty('topMargin').get()
                 })
             }
+            this.getProperty('width').subscribePrimary(this.getProperty('anchors').getProperty('fill').get().getProperty('width'), this.getProperty('anchors').getProperty('leftMargin'), this.getProperty('anchors').getProperty('rightMargin'))
+                
             this.getProperty('width').setCompute(()=>{
-                this.getProperty('width').subscribePrimary(this.getProperty('anchors').getProperty('fill').get().getProperty('width'), this.getProperty('anchors').getProperty('leftMargin'), this.getProperty('anchors').getProperty('rightMargin'))
                 return this.getProperty('anchors').getProperty('fill').get().getProperty('width').get() - this.getProperty('anchors').getProperty('leftMargin').get() - this.getProperty('anchors').getProperty('rightMargin').get()
             })
+            this.getProperty('height').subscribePrimary(this.getProperty('anchors').getProperty('fill').get().getProperty('height'), this.getProperty('anchors').getProperty('topMargin'), this.getProperty('anchors').getProperty('bottomMargin')) 
+                
             this.getProperty('height').setCompute(()=>{
-                this.getProperty('height').subscribePrimary(this.getProperty('anchors').getProperty('fill').get().getProperty('height'), this.getProperty('anchors').getProperty('topMargin'), this.getProperty('anchors').getProperty('bottomMargin')) 
                 return this.getProperty('anchors').getProperty('fill').get().getProperty('height').get() - this.getProperty('anchors').getProperty('topMargin').get() - this.getProperty('anchors').getProperty('bottomMargin').get()
             })
-            this.getProperty('anchors').getProperty('fill').get().getProperty('anchors').update()
-            this.getProperty('x').update()
-            this.getProperty('y').update()
-            this.getProperty('width').update()
-            this.getProperty('height').update()
+            let update = ()=>{
+                this.getProperty('anchors').getProperty('fill').get().getProperty('anchors').update()
+                this.getProperty('x').update()
+                this.getProperty('y').update()
+                this.getProperty('width').update()
+                this.getProperty('height').update()
+            }
+            if(this.$completed){
+                update()
+            } else {
+                updateList.push(update)
+            }
+            
             return
         } else if(this.getProperty('anchors').getPropertyValue('centerIn')){
             this.getProperty('x').freeze()
             this.getProperty('y').freeze()
 
             if(this.parent === this.getProperty('anchors').getProperty('centerIn').get()){
+                this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('centerIn').get().getProperty('width'), this.getProperty('width'), this.getProperty('anchors').getProperty('leftMargin'), this.getProperty('anchors').getProperty('rightMargin'))
+                    
                 this.getProperty('x').setCompute(()=>{
-                    this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('centerIn').get().getProperty('width'), this.getProperty('width'), this.getProperty('anchors').getProperty('leftMargin'), this.getProperty('anchors').getProperty('rightMargin'))
                     return this.getProperty('anchors').getProperty('centerIn').get().getProperty('width').get() / 2 - this.getProperty('width').get() / 2
                 })
-                this.getProperty('y').setCompute(()=>{this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('centerIn').get().getProperty('height'), this.getProperty('height'), this.getProperty('anchors').getProperty('topMargin'), this.getProperty('anchors').getProperty('bottomMargin'))
+                this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('centerIn').get().getProperty('height'), this.getProperty('height'), this.getProperty('anchors').getProperty('topMargin'), this.getProperty('anchors').getProperty('bottomMargin'))
+                    
+                this.getProperty('y').setCompute(()=>{
                     return this.getProperty('anchors').getProperty('centerIn').get().getProperty('height').get() / 2 - this.getProperty('height').get() / 2
                 })
             } else {
+                this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('centerIn').get().getProperty('width'), this.getProperty('anchors').getProperty('centerIn').get().getProperty('x'), this.getProperty('width'))
+                    
                 this.getProperty('x').setCompute(()=>{
-                    this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('centerIn').get().getProperty('width'), this.getProperty('anchors').getProperty('centerIn').get().getProperty('x'), this.getProperty('width'))
                     return this.getProperty('anchors').getProperty('centerIn').get().getProperty('x').get() + this.getProperty('anchors').getProperty('centerIn').get().getProperty('width').get() / 2 - this.getProperty('width').get() / 2
                 })
-                this.getProperty('y').setCompute(()=>{this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('centerIn').get().getProperty('height'), this.getProperty('anchors').getProperty('centerIn').get().getProperty('y'), this.getProperty('height'))
+                this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('centerIn').get().getProperty('height'), this.getProperty('anchors').getProperty('centerIn').get().getProperty('y'), this.getProperty('height'))
+                    
+                this.getProperty('y').setCompute(()=>{
                     return this.getProperty('anchors').getProperty('centerIn').get().getProperty('y').get() + this.getProperty('anchors').getProperty('centerIn').get().getProperty('height').get() / 2 - this.getProperty('height').get() / 2
                 })
             }
+
+            let update = ()=>{
+                this.getProperty('x').update()
+                this.getProperty('y').update()
+            }
+            if(this.$completed){
+                update()
+            } else {
+                updateList.push(update)
+            }
             
-            this.getProperty('x').update()
-            this.getProperty('y').update()
+            
             return
         } 
         if(this.getProperty('anchors').getPropertyValue('left') || this.getProperty('anchors').getPropertyValue('right')){
@@ -446,119 +474,158 @@ class Item extends QtObject {
 
                 if(this.parent === this.getProperty('anchors').getProperty('left').get().target){
                     if(this.getProperty('anchors').getProperty('left').get().float === QAnchorLine.Left){
+                        this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('leftMargin'))
+                            
                         this.getProperty('x').setCompute(()=>{
-                            this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('leftMargin'))
                             return this.getProperty('anchors').getProperty('leftMargin').get()
                         })
                     } else if(this.getProperty('anchors').getProperty('left').get().float === QAnchorLine.Right){
+                        this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('left').get().target.getProperty('width'), this.getProperty('anchors').getProperty('leftMargin'))
+                            
                         this.getProperty('x').setCompute(()=>{
-                            this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('left').get().target.getProperty('width'), this.getProperty('anchors').getProperty('leftMargin'))
                             return this.getProperty('anchors').getProperty('left').get().target.getProperty('width').get() + this.getProperty('anchors').getProperty('leftMargin').get()
                         })
                     }
                     
                 } else {
                     if(this.getProperty('anchors').getProperty('left').get().float === QAnchorLine.Left){
+                        this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('left').get().target.getProperty('x'), this.getProperty('anchors').getProperty('leftMargin'))
+                            
                         this.getProperty('x').setCompute(()=>{
-                            this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('left').get().target.getProperty('x'), this.getProperty('anchors').getProperty('leftMargin'))
                             return this.getProperty('anchors').getProperty('left').get().target.getProperty('x').get() + this.getProperty('anchors').getProperty('leftMargin').get()
                         })
                     } else if(this.getProperty('anchors').getProperty('left').get().float === QAnchorLine.Right){
+                        this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('left').get().target.getProperty('x'), this.getProperty('anchors').getProperty('left').get().target.getProperty('width'), this.getProperty('anchors').getProperty('leftMargin'))
+                            
                         this.getProperty('x').setCompute(()=>{
-                            this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('left').get().target.getProperty('x'), this.getProperty('anchors').getProperty('left').get().target.getProperty('width'), this.getProperty('anchors').getProperty('leftMargin'))
                             return this.getProperty('anchors').getProperty('left').get().target.getProperty('x').get() + this.getProperty('anchors').getProperty('left').get().target.getProperty('width').get() + this.getProperty('anchors').getProperty('leftMargin').get()
                         })
                     }
                 }
                 if(this.parent === this.getProperty('anchors').getProperty('right').get().target){
                     if(this.getProperty('anchors').getProperty('right').get().float === QAnchorLine.Left){
+                        this.getProperty('width').subscribePrimary(this.getProperty('x'), this.getProperty('anchors').getProperty('rightMargin'))
+                            
                         this.getProperty('width').setCompute(()=>{
-                            this.getProperty('width').subscribePrimary(this.getProperty('x'), this.getProperty('anchors').getProperty('rightMargin'))
                             return -this.getProperty('x').get() - this.getProperty('anchors').getProperty('rightMargin').get()
                         })
                     } else if(this.getProperty('anchors').getProperty('right').get().float === QAnchorLine.Right){
+                        this.getProperty('width').subscribePrimary(this.getProperty('x'), this.getProperty('anchors').getProperty('right').get().target.getProperty('width'), this.getProperty('anchors').getProperty('rightMargin'))
+                            
                         this.getProperty('width').setCompute(()=>{
-                            this.getProperty('width').subscribePrimary(this.getProperty('x'), this.getProperty('anchors').getProperty('right').get().target.getProperty('width'), this.getProperty('anchors').getProperty('rightMargin'))
                             return this.getProperty('anchors').getProperty('right').get().target.getProperty('width').get() - this.getProperty('x').get() - this.getProperty('anchors').getProperty('rightMargin').get()
                         })
                     }
                     
                 } else {
                     if(this.getProperty('anchors').getProperty('right').get().float === QAnchorLine.Left){
+                        this.getProperty('width').subscribePrimary(this.getProperty('x'), this.getProperty('anchors').getProperty('right').get().target.getProperty('x'), this.getProperty('anchors').getProperty('rightMargin'))
+                            
                         this.getProperty('width').setCompute(()=>{
-                            this.getProperty('width').subscribePrimary(this.getProperty('x'), this.getProperty('anchors').getProperty('right').get().target.getProperty('x'), this.getProperty('anchors').getProperty('rightMargin'))
                             return this.getProperty('anchors').getProperty('right').get().target.getProperty('x').get() - this.getProperty('x').get() - this.getProperty('anchors').getProperty('rightMargin').get()
                         })
                     } else if(this.getProperty('anchors').getProperty('right').get().float === QAnchorLine.Right){
+                        this.getProperty('width').subscribePrimary(this.getProperty('x'), this.getProperty('anchors').getProperty('right').get().target.getProperty('x'), this.getProperty('anchors').getProperty('right').get().target.getProperty('width'), this.getProperty('anchors').getProperty('rightMargin'))
+                            
                         this.getProperty('width').setCompute(()=>{
-                            this.getProperty('width').subscribePrimary(this.getProperty('x'), this.getProperty('anchors').getProperty('right').get().target.getProperty('x'), this.getProperty('anchors').getProperty('right').get().target.getProperty('width'), this.getProperty('anchors').getProperty('rightMargin'))
                             return this.getProperty('anchors').getProperty('right').get().target.getProperty('x').get() + this.getProperty('anchors').getProperty('right').get().target.getProperty('width').get() - this.getProperty('x').get() - this.getProperty('anchors').getProperty('rightMargin').get()
                         })
                     }
                 }
-                this.getProperty('x').update()
-                this.getProperty('width').update()
+                
+                let update = ()=>{
+                    this.getProperty('x').update()
+                    this.getProperty('width').update()
+                }
+                if(this.$completed){
+                    update()
+                } else {
+                    updateList.push(update)
+                }
         
             } else if(this.getProperty('anchors').getPropertyValue('left')){
                 this.getProperty('x').freeze()
 
                 if(this.parent === this.getProperty('anchors').getProperty('left').get().target){
                     if(this.getProperty('anchors').getProperty('left').get().float === QAnchorLine.Left){
+                        this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('leftMargin'))
+                            
                         this.getProperty('x').setCompute(()=>{
-                            this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('leftMargin'))
                             return this.getProperty('anchors').getProperty('leftMargin').get()
                         })
                     } else if(this.getProperty('anchors').getProperty('left').get().float === QAnchorLine.Right){
+                        this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('left').get().target.getProperty('width'), this.getProperty('anchors').getProperty('leftMargin'))
+                            
                         this.getProperty('x').setCompute(()=>{
-                            this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('left').get().target.getProperty('width'), this.getProperty('anchors').getProperty('leftMargin'))
                             return this.getProperty('anchors').getProperty('left').get().target.getProperty('width').get() + this.getProperty('anchors').getProperty('leftMargin').get()
                         })
                     }
                     
                 } else {
                     if(this.getProperty('anchors').getProperty('left').get().float === QAnchorLine.Left){
+                        this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('left').get().target.getProperty('x'), this.getProperty('anchors').getProperty('leftMargin'))
+                            
                         this.getProperty('x').setCompute(()=>{
-                            this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('left').get().target.getProperty('x'), this.getProperty('anchors').getProperty('leftMargin'))
                             return this.getProperty('anchors').getProperty('left').get().target.getProperty('x').get() + this.getProperty('anchors').getProperty('leftMargin').get()
                         })
                     } else if(this.getProperty('anchors').getProperty('left').get().float === QAnchorLine.Right){
+                        this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('left').get().target.getProperty('x'), this.getProperty('anchors').getProperty('left').get().target.getProperty('width'), this.getProperty('anchors').getProperty('leftMargin'))
+                            
                         this.getProperty('x').setCompute(()=>{
-                            this.getProperty('x').subscribePrimary(this.getProperty('anchors').getProperty('left').get().target.getProperty('x'), this.getProperty('anchors').getProperty('left').get().target.getProperty('width'), this.getProperty('anchors').getProperty('leftMargin'))
                             return this.getProperty('anchors').getProperty('left').get().target.getProperty('x').get() + this.getProperty('anchors').getProperty('left').get().target.getProperty('width').get() + this.getProperty('anchors').getProperty('leftMargin').get()
                         })
                     }
                 }
-                this.getProperty('x').update()
+                let update = ()=>{
+                    this.getProperty('x').update()
+                }
+                if(this.$completed){
+                    update()
+                } else {
+                    updateList.push(update)
+                }
             } else if(this.getProperty('anchors').getPropertyValue('right')){
                 this.getProperty('x').freeze()
 
                 if(this.parent === this.getProperty('anchors').getProperty('right').get().target){
                     if(this.getProperty('anchors').getProperty('right').get().float === QAnchorLine.Left){
+                        this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('rightMargin'))
+                            
                         this.getProperty('x').setCompute(()=>{
-                            this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('rightMargin'))
                             return -this.getProperty('width').get() - this.getProperty('anchors').getProperty('rightMargin').get()
                         })
                     } else if(this.getProperty('anchors').getProperty('right').get().float === QAnchorLine.Right){
+                        this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('right').get().target.getProperty('width'), this.getProperty('anchors').getProperty('rightMargin'))
+                            
                         this.getProperty('x').setCompute(()=>{
-                            this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('right').get().target.getProperty('width'), this.getProperty('anchors').getProperty('rightMargin'))
                             return this.getProperty('anchors').getProperty('right').get().target.getProperty('width').get() - this.getProperty('width').get() - this.getProperty('anchors').getProperty('rightMargin').get()
                         })
                     }
                     
                 } else {
                     if(this.getProperty('anchors').getProperty('right').get().float === QAnchorLine.Left){
+                        this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('right').get().target.getProperty('x'), this.getProperty('anchors').getProperty('rightMargin'))
+                            
                         this.getProperty('x').setCompute(()=>{
-                            this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('right').get().target.getProperty('x'), this.getProperty('anchors').getProperty('rightMargin'))
                             return this.getProperty('anchors').getProperty('right').get().target.getProperty('x').get() - this.getProperty('width').get() - this.getProperty('anchors').getProperty('rightMargin').get()
                         })
                     } else if(this.getProperty('anchors').getProperty('right').get().float === QAnchorLine.Right){
+                        this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('right').get().target.getProperty('x'), this.getProperty('anchors').getProperty('right').get().target.getProperty('width'), this.getProperty('anchors').getProperty('rightMargin'))
+                            
                         this.getProperty('x').setCompute(()=>{
-                            this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('right').get().target.getProperty('x'), this.getProperty('anchors').getProperty('right').get().target.getProperty('width'), this.getProperty('anchors').getProperty('rightMargin'))
                             return this.getProperty('anchors').getProperty('right').get().target.getProperty('x').get() + this.getProperty('anchors').getProperty('right').get().target.getProperty('width').get() - this.getProperty('width').get() - this.getProperty('anchors').getProperty('rightMargin').get()
                         })
                     }
                 }
-                this.getProperty('x').update()
+
+                let update = ()=>{
+                    this.getProperty('x').update()
+                }
+                if(this.$completed){
+                    update()
+                } else {
+                    updateList.push(update)
+                }
             }
         } 
         if(this.getProperty('anchors').getPropertyValue('top') || this.getProperty('anchors').getPropertyValue('bottom')){
@@ -568,119 +635,157 @@ class Item extends QtObject {
 
                 if(this.parent === this.getProperty('anchors').getProperty('top').get().target){
                     if(this.getProperty('anchors').getProperty('top').get().float === QAnchorLine.Top){
+                        this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('topMargin'))
+                            
                         this.getProperty('y').setCompute(()=>{
-                            this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('topMargin'))
                             return this.getProperty('anchors').getProperty('topMargin').get()
                         })
                     } else if(this.getProperty('anchors').getProperty('top').get().float === QAnchorLine.Bottom){
+                        this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('top').get().target.getProperty('height'), this.getProperty('anchors').getProperty('topMargin'))
+                            
                         this.getProperty('y').setCompute(()=>{
-                            this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('top').get().target.getProperty('height'), this.getProperty('anchors').getProperty('topMargin'))
                             return this.getProperty('anchors').getProperty('top').get().target.getProperty('height').get() + this.getProperty('anchors').getProperty('topMargin').get()
                         })
                     }
                     
                 } else {
                     if(this.getProperty('anchors').getProperty('top').get().float === QAnchorLine.Top){
+                        this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('top').get().target.getProperty('y'), this.getProperty('anchors').getProperty('topMargin'))
+                            
                         this.getProperty('y').setCompute(()=>{
-                            this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('top').get().target.getProperty('y'), this.getProperty('anchors').getProperty('topMargin'))
                             return this.getProperty('anchors').getProperty('top').get().target.getProperty('y').get() + this.getProperty('anchors').getProperty('topMargin').get()
                         })
                     } else if(this.getProperty('anchors').getProperty('top').get().float === QAnchorLine.Bottom){
+                        this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('top').get().target.getProperty('y'), this.getProperty('anchors').getProperty('top').get().target.getProperty('height'), this.getProperty('anchors').getProperty('topMargin'))
+                            
                         this.getProperty('y').setCompute(()=>{
-                            this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('top').get().target.getProperty('y'), this.getProperty('anchors').getProperty('top').get().target.getProperty('height'), this.getProperty('anchors').getProperty('topMargin'))
                             return this.getProperty('anchors').getProperty('top').get().target.getProperty('y').get() + this.getProperty('anchors').getProperty('top').get().target.getProperty('height').get() + this.getProperty('anchors').getProperty('topMargin').get()
                         })
                     }
                 }
                 if(this.parent === this.getProperty('anchors').getProperty('bottom').get().target){
                     if(this.getProperty('anchors').getProperty('bottom').get().float === QAnchorLine.Top){
+                        this.getProperty('height').subscribePrimary(this.getProperty('y'), this.getProperty('anchors').getProperty('bottomMargin'))
+                            
                         this.getProperty('height').setCompute(()=>{
-                            this.getProperty('height').subscribePrimary(this.getProperty('y'), this.getProperty('anchors').getProperty('bottomMargin'))
                             return -this.getProperty('y').get() - this.getProperty('anchors').getProperty('bottomMargin').get()
                         })
                     } else if(this.getProperty('anchors').getProperty('bottom').get().float === QAnchorLine.Bottom){
+                        this.getProperty('height').subscribePrimary(this.getProperty('y'), this.getProperty('anchors').getProperty('bottom').get().target.getProperty('height'), this.getProperty('anchors').getProperty('bottomMargin'))
+                            
                         this.getProperty('height').setCompute(()=>{
-                            this.getProperty('height').subscribePrimary(this.getProperty('y'), this.getProperty('anchors').getProperty('bottom').get().target.getProperty('height'), this.getProperty('anchors').getProperty('bottomMargin'))
                             return this.getProperty('anchors').getProperty('bottom').get().target.getProperty('height').get() - this.getProperty('y').get() - this.getProperty('anchors').getProperty('bottomMargin').get()
                         })
                     }
                     
                 } else {
                     if(this.getProperty('anchors').getProperty('bottom').get().float === QAnchorLine.Top){
+                        this.getProperty('height').subscribePrimary(this.getProperty('y'), this.getProperty('anchors').getProperty('bottom').get().target.getProperty('y'), this.getProperty('anchors').getProperty('bottomMargin'))
+                            
                         this.getProperty('height').setCompute(()=>{
-                            this.getProperty('height').subscribePrimary(this.getProperty('y'), this.getProperty('anchors').getProperty('bottom').get().target.getProperty('y'), this.getProperty('anchors').getProperty('bottomMargin'))
                             return this.getProperty('anchors').getProperty('bottom').get().target.getProperty('y').get() - this.getProperty('y').get() - this.getProperty('anchors').getProperty('bottomMargin').get()
                         })
                     } else if(this.getProperty('anchors').getProperty('bottom').get().float === QAnchorLine.Bottom){
+                        this.getProperty('height').subscribePrimary(this.getProperty('y'), this.getProperty('anchors').getProperty('bottom').get().target.getProperty('y'), this.getProperty('anchors').getProperty('bottom').get().target.getProperty('height'), this.getProperty('anchors').getProperty('bottomMargin'))
+                            
                         this.getProperty('height').setCompute(()=>{
-                            this.getProperty('height').subscribePrimary(this.getProperty('y'), this.getProperty('anchors').getProperty('bottom').get().target.getProperty('y'), this.getProperty('anchors').getProperty('bottom').get().target.getProperty('height'), this.getProperty('anchors').getProperty('bottomMargin'))
                             return this.getProperty('anchors').getProperty('bottom').get().target.getProperty('y').get() + this.getProperty('anchors').getProperty('bottom').get().target.getProperty('height').get() - this.getProperty('y').get() - this.getProperty('anchors').getProperty('bottomMargin').get()
                         })
                     }
                 }
-                this.getProperty('y').update()
-                this.getProperty('height').update()
+                
+                let update = ()=>{
+                    this.getProperty('y').update()
+                    this.getProperty('height').update()
+                }
+                if(this.$completed){
+                    update()
+                } else {
+                    updateList.push(update)
+                }
         
             } else if(this.getProperty('anchors').getPropertyValue('top')){
                 this.getProperty('y').freeze()
 
                 if(this.parent === this.getProperty('anchors').getProperty('top').get().target){
                     if(this.getProperty('anchors').getProperty('top').get().float === QAnchorLine.Top){
+                        this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('topMargin'))
+                            
                         this.getProperty('y').setCompute(()=>{
-                            this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('topMargin'))
                             return this.getProperty('anchors').getProperty('topMargin').get()
                         })
                     } else if(this.getProperty('anchors').getProperty('top').get().float === QAnchorLine.Bottom){
+                        this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('top').get().target.getProperty('height'), this.getProperty('anchors').getProperty('topMargin'))
+                            
                         this.getProperty('y').setCompute(()=>{
-                            this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('top').get().target.getProperty('height'), this.getProperty('anchors').getProperty('topMargin'))
                             return this.getProperty('anchors').getProperty('top').get().target.getProperty('height').get() + this.getProperty('anchors').getProperty('topMargin').get()
                         })
                     }
                     
                 } else {
                     if(this.getProperty('anchors').getProperty('top').get().float === QAnchorLine.Top){
+                        this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('top').get().target.getProperty('y'), this.getProperty('anchors').getProperty('topMargin'))
+                            
                         this.getProperty('y').setCompute(()=>{
-                            this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('top').get().target.getProperty('y'), this.getProperty('anchors').getProperty('topMargin'))
                             return this.getProperty('anchors').getProperty('top').get().target.getProperty('y').get() + this.getProperty('anchors').getProperty('topMargin').get()
                         })
                     } else if(this.getProperty('anchors').getProperty('top').get().float === QAnchorLine.Bottom){
+                        this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('top').get().target.getProperty('y'), this.getProperty('anchors').getProperty('top').get().target.getProperty('height'), this.getProperty('anchors').getProperty('topMargin'))
+                            
                         this.getProperty('y').setCompute(()=>{
-                            this.getProperty('y').subscribePrimary(this.getProperty('anchors').getProperty('top').get().target.getProperty('y'), this.getProperty('anchors').getProperty('top').get().target.getProperty('height'), this.getProperty('anchors').getProperty('topMargin'))
                             return this.getProperty('anchors').getProperty('top').get().target.getProperty('y').get() + this.getProperty('anchors').getProperty('top').get().target.getProperty('height').get() + this.getProperty('anchors').getProperty('topMargin').get()
                         })
                     }
                 }
-                this.getProperty('y').update()
+                let update = ()=>{
+                    this.getProperty('y').update()
+                }
+                if(this.$completed){
+                    update()
+                } else {
+                    updateList.push(update)
+                }
             } else if(this.getProperty('anchors').getPropertyValue('bottom')){
                 this.getProperty('y').freeze()
 
                 if(this.parent === this.getProperty('anchors').getProperty('bottom').get().target){
                     if(this.getProperty('anchors').getProperty('bottom').get().float === QAnchorLine.Top){
+                        this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('bottomMargin'))
+                            
                         this.getProperty('y').setCompute(()=>{
-                            this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('bottomMargin'))
                             return -this.getProperty('height').get() - this.getProperty('anchors').getProperty('bottomMargin').get()
                         })
                     } else if(this.getProperty('anchors').getProperty('bottom').get().float === QAnchorLine.Bottom){
+                        this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('bottom').get().target.getProperty('height'), this.getProperty('anchors').getProperty('bottomMargin'))
+                            
                         this.getProperty('y').setCompute(()=>{
-                            this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('bottom').get().target.getProperty('height'), this.getProperty('anchors').getProperty('bottomMargin'))
                             return this.getProperty('anchors').getProperty('bottom').get().target.getProperty('height').get() - this.getProperty('height').get() - this.getProperty('anchors').getProperty('bottomMargin').get()
                         })
                     }
                     
                 } else {
                     if(this.getProperty('anchors').getProperty('bottom').get().float === QAnchorLine.Top){
+                        this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('bottom').get().target.getProperty('y'), this.getProperty('anchors').getProperty('bottomMargin'))
+                            
                         this.getProperty('y').setCompute(()=>{
-                            this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('bottom').get().target.getProperty('y'), this.getProperty('anchors').getProperty('bottomMargin'))
                             return this.getProperty('anchors').getProperty('bottom').get().target.getProperty('y').get() - this.getProperty('height').get() - this.getProperty('anchors').getProperty('bottomMargin').get()
                         })
                     } else if(this.getProperty('anchors').getProperty('bottom').get().float === QAnchorLine.Bottom){
+                        this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('bottom').get().target.getProperty('y'), this.getProperty('anchors').getProperty('bottom').get().target.getProperty('height'), this.getProperty('anchors').getProperty('bottomMargin'))
+                            
                         this.getProperty('y').setCompute(()=>{
-                            this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('bottom').get().target.getProperty('y'), this.getProperty('anchors').getProperty('bottom').get().target.getProperty('height'), this.getProperty('anchors').getProperty('bottomMargin'))
                             return this.getProperty('anchors').getProperty('bottom').get().target.getProperty('y').get() + this.getProperty('anchors').getProperty('bottom').get().target.getProperty('height').get() - this.getProperty('height').get() - this.getProperty('anchors').getProperty('bottomMargin').get()
                         })
                     }
                 }
-                this.getProperty('y').update()
+                let update = ()=>{
+                    this.getProperty('y').update()
+                }
+                if(this.$completed){
+                    update()
+                } else {
+                    updateList.push(update)
+                }
             }
         }
 
@@ -689,41 +794,54 @@ class Item extends QtObject {
 
             if(this.parent === this.getProperty('anchors').getProperty('verticalCenter').get().target){
                 if(this.getProperty('anchors').getProperty('verticalCenter').get().float === QAnchorLine.Top){
+                    this.getProperty('y').subscribePrimary(this.getProperty('height'))
+                        
                     this.getProperty('y').setCompute(()=>{
-                        this.getProperty('y').subscribePrimary(this.getProperty('height'))
                         return -this.getProperty('height').get() / 2
                     })
                 } else if(this.getProperty('anchors').getProperty('verticalCenter').get().float === QAnchorLine.Bottom){
+                    this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height'))
+                        
                     this.getProperty('y').setCompute(()=>{
-                        this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height'))
                         return this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height').get() - this.getProperty('height').get() / 2
                     })
                 } else if(this.getProperty('anchors').getProperty('verticalCenter').get().float === QAnchorLine.VerticalCenter){
+                    this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height'))
+                        
                     this.getProperty('y').setCompute(()=>{
-                        this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height'))
                         return this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height').get() / 2 - this.getProperty('height').get() / 2
                     })
                 }
             } else {
                 //
                 if(this.getProperty('anchors').getProperty('verticalCenter').get().float === QAnchorLine.Top){
+                    this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y'))
+                        
                     this.getProperty('y').setCompute(()=>{
-                        this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y'))
                         return this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y').get()-this.getProperty('height').get() / 2
                     })
                 } else if(this.getProperty('anchors').getProperty('verticalCenter').get().float === QAnchorLine.Bottom){
+                    this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y'))
+                        
                     this.getProperty('y').setCompute(()=>{
-                        this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y'))
                         return this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y').get()+this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height').get() - this.getProperty('height').get() / 2
                     })
                 } else if(this.getProperty('anchors').getProperty('verticalCenter').get().float === QAnchorLine.VerticalCenter){
+                    this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y'))
+                        
                     this.getProperty('y').setCompute(()=>{
-                        this.getProperty('y').subscribePrimary(this.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height'), this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y'))
                         return this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('y').get()+this.getProperty('anchors').getProperty('verticalCenter').get().target.getProperty('height').get() / 2 - this.getProperty('height').get() / 2
                     })
                 }
             }
-            this.getProperty('y').update()
+            let update = ()=>{
+                this.getProperty('y').update()
+            }
+            if(this.$completed){
+                update()
+            } else {
+                updateList.push(update)
+            }
         }
 
         if(this.getProperty('anchors').getPropertyValue('horizontalCenter')){
@@ -731,41 +849,54 @@ class Item extends QtObject {
 
             if(this.parent === this.getProperty('anchors').getProperty('horizontalCenter').get().target){
                 if(this.getProperty('anchors').getProperty('horizontalCenter').get().float === QAnchorLine.Left){
+                    this.getProperty('x').subscribePrimary(this.getProperty('width'))
+                        
                     this.getProperty('x').setCompute(()=>{
-                        this.getProperty('x').subscribePrimary(this.getProperty('width'))
                         return -this.getProperty('width').get() / 2
                     })
                 } else if(this.getProperty('anchors').getProperty('horizontalCenter').get().float === QAnchorLine.Right){
+                    this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width'))
+                        
                     this.getProperty('x').setCompute(()=>{
-                        this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width'))
                         return this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width').get() - this.getProperty('width').get() / 2
                     })
                 } else if(this.getProperty('anchors').getProperty('horizontalCenter').get().float === QAnchorLine.HorizontalCenter){
+                    this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width'))
+                        
                     this.getProperty('x').setCompute(()=>{
-                        this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width'))
                         return this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width').get() / 2 - this.getProperty('width').get() / 2
                     })
                 }
             } else {
                 //
                 if(this.getProperty('anchors').getProperty('horizontalCenter').get().float === QAnchorLine.Left){
+                    this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x'))
+                        
                     this.getProperty('x').setCompute(()=>{
-                        this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x'))
                         return this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x').get()-this.getProperty('width').get() / 2
                     })
                 } else if(this.getProperty('anchors').getProperty('horizontalCenter').get().float === QAnchorLine.Right){
+                    this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x'))
+                        
                     this.getProperty('x').setCompute(()=>{
-                        this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x'))
                         return this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x').get()+this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width').get() - this.getProperty('width').get() / 2
                     })
                 } else if(this.getProperty('anchors').getProperty('horizontalCenter').get().float === QAnchorLine.HorizontalCenter){
+                    this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x'))
+                        
                     this.getProperty('x').setCompute(()=>{
-                        this.getProperty('x').subscribePrimary(this.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width'), this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x'))
                         return this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('x').get()+this.getProperty('anchors').getProperty('horizontalCenter').get().target.getProperty('width').get() / 2 - this.getProperty('width').get() / 2
                     })
                 }
             }
-            this.getProperty('x').update()
+            let update = ()=>{
+                this.getProperty('x').update()
+            }
+            if(this.$completed){
+                update()
+            } else {
+                updateList.push(update)
+            }
         }
     }
 
