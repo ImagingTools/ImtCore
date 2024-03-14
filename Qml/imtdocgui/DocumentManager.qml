@@ -745,7 +745,7 @@ Item {
             // Processing commands that came from the view
             function viewCommandHandle(commandId){
                 if (commandId === "Save"){
-//                    commandHandle("Save");
+                    commandHandle("Save");
                 }
             }
 

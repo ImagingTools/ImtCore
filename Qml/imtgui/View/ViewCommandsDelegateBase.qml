@@ -9,7 +9,13 @@ Item {
     signal commandActivated(string commandId);
 
     function commandHandle(commandId){
-        commandActivated(commandId);
+        if (commandId === "Save"){
+        }
+        else if (commandId === "Close"){
+        }
+        else{
+            commandActivated(commandId);
+        }
     }
 
     Shortcut {
@@ -17,7 +23,8 @@ Item {
 
         enabled: container.view ? container.view.visible : false;
         onActivated: {
-            container.commandHandle("Save");
+            console.log("Ctrl+S onActivated");
+            container.commandActivated("Save");
         }
     }
 }
