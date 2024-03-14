@@ -159,7 +159,6 @@ Item {
                 if (webSocketServerUrl && webSocketServerUrl !== ""){
                     webSocketServerUrl =  webSocketServerUrl.replace("http", "ws")
                     subscriptionManager.url = webSocketServerUrl;
-                    console.log("WEB Socket serverUrl:", webSocketServerUrl);
 
                     return;
                 }
@@ -171,8 +170,8 @@ Item {
                         serverUrl += "/";
                     }
 
-
-                    serverUrl += "wssub";
+                    serverUrl += context.appName + "/wssub";
+                    serverUrl = serverUrl.replace("http", "ws")
 
                     console.log("WEB Socket serverUrl", serverUrl);
                 }
