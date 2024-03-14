@@ -15,6 +15,7 @@ class ListModel extends QtObject {
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
         this.getProperty('data').value = []
+        // if(this.constructor.name.indexOf('TreeItemModel') >= 0) this.m_isTransaction = true
     }
 
     $complete(){
@@ -62,7 +63,12 @@ class ListModel extends QtObject {
 		}
         
         this.getStatement('count').reset(this.getStatement('data').get().length)
-        this.getStatement('data').getNotify()(this.getStatement('data').get().length-1, this.getStatement('data').get().length, 'append')
+        if(!this.m_isTransaction) {
+            this.getStatement('data').getNotify()(this.getStatement('data').get().length-1, this.getStatement('data').get().length, 'append')
+        } else {
+            TransactionController.begin()
+            TransactionController.add(()=>{this.getStatement('data').getNotify()(this.getStatement('data').get().length-1, this.getStatement('data').get().length, 'append')})
+        }
 
     }
     clear(){
@@ -95,7 +101,12 @@ class ListModel extends QtObject {
         }
         
         this.getStatement('count').reset(this.getStatement('data').get().length)
-        this.getStatement('data').getNotify()(index, index+1, 'insert')
+        if(!this.m_isTransaction) {
+            this.getStatement('data').getNotify()(index, index+1, 'insert')
+        } else {
+            TransactionController.begin()
+            TransactionController.add(()=>{this.getStatement('data').getNotify()(index, index+1, 'insert')})
+        }
     }
     set(index, dict){
         this.getStatement('data').get()[index] = dict

@@ -407,8 +407,7 @@ class MouseController {
                         if(this.target.getPropertyValue('contentHeight') <= this.target.getPropertyValue('height')){
                             this.target.getStatement('contentY').reset(0)
             
-                        }
-                        if(this.target.getPropertyValue('contentY') + (dy) > this.target.getPropertyValue('originY') && this.target.getPropertyValue('contentY') + (dy) < this.target.getPropertyValue('contentHeight') + this.target.getPropertyValue('originY') - this.target.getPropertyValue('height')){
+                        } else if(this.target.getPropertyValue('contentY') + (dy) > this.target.getPropertyValue('originY') && this.target.getPropertyValue('contentY') + (dy) < this.target.getPropertyValue('contentHeight') + this.target.getPropertyValue('originY') - this.target.getPropertyValue('height')){
                             this.target.getStatement('contentY').reset(this.target.getPropertyValue('contentY') + (dy))
                             return
                         } else {
@@ -426,8 +425,7 @@ class MouseController {
                         if(this.target.getPropertyValue('contentWidth') <= this.target.getPropertyValue('width')){
                             this.target.getStatement('contentX').reset(0)
             
-                        }
-                        if(this.target.getPropertyValue('contentX') + (dx) > this.target.getPropertyValue('originX') && this.target.getPropertyValue('contentX') + (dx) < this.target.getPropertyValue('contentWidth') + this.target.getPropertyValue('originX') - this.target.getPropertyValue('width')){
+                        } else if(this.target.getPropertyValue('contentX') + (dx) > this.target.getPropertyValue('originX') && this.target.getPropertyValue('contentX') + (dx) < this.target.getPropertyValue('contentWidth') + this.target.getPropertyValue('originX') - this.target.getPropertyValue('width')){
                             this.target.getStatement('contentX').reset(this.target.getPropertyValue('contentX') + (dx))
                             return
                         } else {
@@ -814,8 +812,30 @@ class AnimationController {
     }
 }
 
+class TransactionController {
+    transactions = []
+
+    begin(){
+        this.transactions.push([])
+    }
+
+    add(func){
+        if(this.transactions.length) this.transactions[this.transactions.length-1].push(func)
+    }
+
+    end(){
+        let transaction = this.transactions.pop()
+        if(transaction){
+            while(transaction.legnth){
+                transaction.shift()()
+            }
+        }
+    }
+}
+
 
 module.exports.MouseController = MouseController
 module.exports.KeyboardController = KeyboardController
 module.exports.TextFontController = TextFontController
 module.exports.AnimationController = AnimationController
+module.exports.TransactionController = TransactionController

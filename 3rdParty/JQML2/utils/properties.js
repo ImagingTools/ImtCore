@@ -424,7 +424,12 @@ class QVisible extends QBool {
 }
 
 class QVar extends QProperty {
-    
+    get(){
+        if(this.value && this.value instanceof ComplexObject && !this.value.$properties){
+            this.value = null
+        }   
+        return super.get()
+    }
 }
 
 class QData extends QProperty {
