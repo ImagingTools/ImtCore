@@ -31,6 +31,36 @@ CUrlConnectionLinkParam::CUrlConnectionLinkParam(const QByteArray& serviceTypeNa
 }
 
 
+void CUrlConnectionLinkParam::SetServiceTypeName(const QByteArray& serviceTypeName)
+{
+	if (m_serviceTypeName != serviceTypeName){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_serviceTypeName = serviceTypeName;
+	}
+}
+
+
+void CUrlConnectionLinkParam::SetDependantServiceConnectionId(const QByteArray& dependantId)
+{
+	if (m_dependantServiceConnectionId != dependantId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_dependantServiceConnectionId = dependantId;
+	}
+}
+
+
+void CUrlConnectionLinkParam::SetUsageId(const QByteArray& usageId)
+{
+	if (m_usageId != usageId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_usageId = usageId;
+	}
+}
+
+
 // reimplemented (imtservice::IServiceConnectionInfo)
 
 imtservice::IServiceConnectionInfo::ConnectionType CUrlConnectionLinkParam::GetConnectionType() const

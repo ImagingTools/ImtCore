@@ -45,6 +45,36 @@ void CUrlConnectionParam::AddExternConnection(imtservice::IServiceConnectionPara
 }
 
 
+void CUrlConnectionParam::SetConnectionType(imtservice::IServiceConnectionParam::ConnectionType connectionType)
+{
+	if (m_connectionType != connectionType){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_connectionType = connectionType;
+	}
+}
+
+
+void CUrlConnectionParam::SetServiceTypeName(const QByteArray& serviceTypeName)
+{
+	if (m_serviceTypeName != serviceTypeName){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_serviceTypeName = serviceTypeName;
+	}
+}
+
+
+void CUrlConnectionParam::SetUsageId(const QByteArray& usageId)
+{
+	if (m_usageId != usageId){
+		istd::CChangeNotifier changeNotifier(this);
+
+		m_usageId = usageId;
+	}
+}
+
+
 // reimplemented (imtservice::IServiceConnectionParam)
 
 imtservice::IServiceConnectionParam::ConnectionType CUrlConnectionParam::GetConnectionType() const

@@ -10,7 +10,7 @@ Item {
 
     property CommandsController commandsController: null;
     property TreeItemModel model: TreeItemModel {}
-    property var commandsDelegate: null;
+    property var commandsDelegate: ViewCommandsDelegateBase {};
     property bool readOnly: false;
 
     Component.onCompleted: {

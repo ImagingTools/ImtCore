@@ -20,9 +20,12 @@ public:
 	typedef imtbase::CUrlParam BaseClass;
 
 	CUrlConnectionParam();
-	CUrlConnectionParam(const QByteArray& serviceTypeName, const QByteArray& usageId,ConnectionType connectionType, QUrl url);
+	CUrlConnectionParam(const QByteArray& serviceTypeName, const QByteArray& usageId, ConnectionType connectionType, QUrl url);
 
 	void AddExternConnection(IncomingConnectionParam IncomingConnectionParam);
+	void SetConnectionType(ConnectionType connectionType);
+	void SetServiceTypeName(const QByteArray& serviceTypeName);
+	void SetUsageId(const QByteArray& usageId);
 
 	// reimplemented (imtservice::IServiceInfo)
 	virtual ConnectionType GetConnectionType() const override;

@@ -710,7 +710,7 @@ Item {
                 }
 
                 if (view.commandsDelegate){
-                    view.commandsDelegate.commandActivated.connect(singleDocumentData.commandHandle);
+                    view.commandsDelegate.commandActivated.connect(singleDocumentData.viewCommandHandle);
                 }
 
                 if (singleDocumentData.documentDataController){
@@ -743,14 +743,14 @@ Item {
             }
 
             // Processing commands that came from the view
-//            function viewCommandHandle(commandId){
-//                if (commandId === "Save"){
+            function viewCommandHandle(commandId){
+                if (commandId === "Save"){
 //                    commandHandle("Save");
-//                }
-//            }
+                }
+            }
 
             function commandHandle(commandId){
-                console.log("DicumentManager commandHandle, documentId", documentId);
+                console.log("DocumentManager commandHandle, documentId", documentId);
                 if (!documentManager){
                     return;
                 }

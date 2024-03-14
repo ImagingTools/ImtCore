@@ -18,6 +18,10 @@ public:
 	CUrlConnectionLinkParam();
 	CUrlConnectionLinkParam(const QByteArray& serviceTypeName, const QByteArray& usageId, const QByteArray& dependantServiceConnectionId);
 
+	void SetServiceTypeName(const QByteArray& serviceTypeName);
+	void SetDependantServiceConnectionId(const QByteArray& dependantId);
+	void SetUsageId(const QByteArray& usageId);
+
 	// reimplemented (imtservice::IServiceInfo)
 	virtual ConnectionType GetConnectionType() const override;
 	virtual QByteArray GetServiceTypeName() const override;

@@ -16,13 +16,7 @@ Item {
         sequence: "Ctrl+S";
 
         enabled: container.view ? container.view.visible : false;
-
-        onEnabledChanged: {
-            console.log("View Ctrl+S onEnabledChanged", enabled);
-        }
-
         onActivated: {
-            console.log("View Ctrl+S onActivated");
             container.commandHandle("Save");
         }
     }

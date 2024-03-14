@@ -353,7 +353,6 @@ Rectangle {
     }
 
     function setCellHeight(){
-
         var maxVal = 0;
         for(var i = 0; i < heightModel.count; i++){
             var currVal = heightModel.get(i).cellHeight;
