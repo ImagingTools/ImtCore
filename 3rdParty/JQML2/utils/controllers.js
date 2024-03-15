@@ -12,43 +12,47 @@ class MouseController {
     timestamp = 0
 
     constructor(){
-        window.onmousemove = (e)=>{
+        window.addEventListener('mousemove', (e)=>{
             // e.stopPropagation()
             this.onMouseMove(e.pageX, e.pageY, e)
-        }
-        window.ondblclick = (e)=>{
+        })
+        
+        window.addEventListener('dblclick', (e)=>{
             // e.stopPropagation()
             e.preventDefault()
-        }
-        window.onmousedown = (e)=>{
+        })
+        window.addEventListener('mousedown', (e)=>{
             // e.stopPropagation()
             this.onMouseDown(e.pageX, e.pageY, e.button, e)
-        }
-        window.onmouseup = (e)=>{
+        })
+        window.addEventListener('mouseup', (e)=>{
             // e.stopPropagation()
             this.onMouseUp(e.pageX, e.pageY, e.button, e)
-        }
-        window.oncontextmenu = (e)=>{
+        })
+        window.addEventListener('contextmenu', (e)=>{
             e.preventDefault()
             // e.stopPropagation()
             this.onMouseDown(e.pageX, e.pageY, e.button, e)
-        }
-        window.ontouchstart = (e)=>{
+        })
+        window.addEventListener('touchstart', (e)=>{
+            // e.preventDefault()
             // e.stopPropagation()
-            this.onMouseDown(e.changedTouches[0].pageX, e.changedTouches[0].pageY, e)
-        }
-        window.ontouchend = (e)=>{
+            this.onMouseDown(e.changedTouches[0].pageX, e.changedTouches[0].pageY, 0, e)
+        })
+        window.addEventListener('touchend', (e)=>{
+            // e.preventDefault()
             // e.stopPropagation()
-            this.onMouseUp(e.changedTouches[0].pageX, e.changedTouches[0].pageY, e)
-        }
-        window.ontouchmove = (e)=>{
+            this.onMouseUp(e.changedTouches[0].pageX, e.changedTouches[0].pageY, 0, e)
+        })
+        window.addEventListener('touchmove', (e)=>{
+            // e.preventDefault()
             // e.stopPropagation()
             this.onMouseMove(e.changedTouches[0].pageX, e.changedTouches[0].pageY, e)
-        }
-        window.onwheel = (e)=>{
+        })
+        window.addEventListener('wheel', (e)=>{
             // e.stopPropagation()
             this.onWheel(e.pageX, e.pageY, e.deltaX, e.deltaY)
-        }
+        })
     }
 
     add(obj){
@@ -129,6 +133,7 @@ class MouseController {
         this.pressed = inner
         let view = null
 
+
         for(let i = 0; i < this.oldList.length; i++){
             if(this.oldList[i] instanceof MouseArea){
                 this.pressed[i].getProperty('pressed').value = false
@@ -143,15 +148,22 @@ class MouseController {
                 return
             }
         } 
-        for(let i = 1; i < inner.length; i++){
+        // for(let i = 1; i < inner.length; i++){
+        //     if(inner[i] instanceof TextInput || inner[i] instanceof TextEdit){
+        //         if(inner[i].getPropertyValue('enabled') && inner[i].getPropertyValue('visible') && inner[i].getPropertyValue('activeFocus')) {
+        //             this.target = inner[i]
+        //             return
+        //         }
+        //     }
+        // }
+        for(let i = 0; i < inner.length; i++){
             if(inner[i] instanceof TextInput || inner[i] instanceof TextEdit){
                 if(inner[i].getPropertyValue('enabled') && inner[i].getPropertyValue('visible') && inner[i].getPropertyValue('activeFocus')) {
                     this.target = inner[i]
                     return
                 }
             }
-        }
-        for(let i = 0; i < inner.length; i++){
+            
             if(!view && inner[i] instanceof Flickable && inner[i].getPropertyValue('enabled') && inner[i].getPropertyValue('visible') && inner[i].getPropertyValue('interactive')){
                 this.target = inner[i]
                 break
@@ -216,6 +228,7 @@ class MouseController {
         for(let i = 0; i < this.pressed.length; i++){
             if(this.pressed[i] instanceof MouseArea) this.pressed[i].getProperty('pressed').value = false
         }
+
         if(this.target){
             if(this.target instanceof MouseArea){
                 e.preventDefault()
