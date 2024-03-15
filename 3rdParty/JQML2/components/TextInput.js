@@ -62,7 +62,7 @@ class TextInput extends Item {
         this.$form.style.border = 'none'
         this.$form.style.background = 'none'
         this.$form.style.width = '100%'
-        this.$form.style.height = '1em'
+        // this.$form.style.height = '1em'
         this.$form.style.font = 'inherit'
         this.$form.style.color = 'inherit'
         this.$form.autocomplete = "new-password"
@@ -74,10 +74,11 @@ class TextInput extends Item {
         this.$input.style.border = 'none'
         this.$input.style.background = 'none'
         this.$input.style.width = '100%'
-        this.$input.style.height = '1em'
+        // this.$input.style.height = '1em'
         this.$input.style.font = 'inherit'
         this.$input.style.color = 'inherit'
         this.$input.style.textAlign = 'inherit'
+        this.$input.style.cursor = 'defult'
         this.$input.autocomplete = "new-password"
         this.$input.onfocus = ()=>{
             this.forceActiveFocus()
@@ -334,6 +335,7 @@ class TextInput extends Item {
         MouseController.remove(this)
         super.destroy()     
     }
+
 }
 
 module.exports.TextInput = TextInput

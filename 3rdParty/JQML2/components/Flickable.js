@@ -43,10 +43,10 @@ class Flickable extends Item {
         contentItem.getProperty('height').setCompute(()=>{return this.height})
         contentItem.getProperty('width').update()
         contentItem.getProperty('height').update()
-        // this.setStyle({
-        //     pointerEvents: 'auto',
-        //     touchAction: 'auto',
-        // })
+        this.setStyle({
+            pointerEvents: 'auto',
+            touchAction: 'auto',
+        })
         MouseController.add(this)
     }
 
@@ -153,6 +153,7 @@ class Flickable extends Item {
         MouseController.remove(this)
         super.destroy()
     }
+
 }
 
 module.exports.Flickable = Flickable

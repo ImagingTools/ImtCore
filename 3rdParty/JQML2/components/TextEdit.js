@@ -67,6 +67,7 @@ class TextEdit extends Item {
         this.$input.style.font = 'inherit'
         this.$input.style.zIndex = 'inherit'
         this.$input.style.resize = 'none'
+        this.$input.style.cursor = 'defult'
         this.getDom().appendChild(this.$input)
         MouseController.add(this)
 
@@ -315,6 +316,7 @@ class TextEdit extends Item {
         MouseController.remove(this)
         super.destroy()     
     }
+
 }
 
 module.exports.TextEdit = TextEdit

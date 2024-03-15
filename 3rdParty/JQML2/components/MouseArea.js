@@ -47,10 +47,10 @@ class MouseArea extends Item {
 
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
-        // this.setStyle({
-        //     pointerEvents: 'auto',
-        //     touchAction: 'auto',
-        // })
+        this.setStyle({
+            pointerEvents: 'auto',
+            touchAction: 'auto',
+        })
         MouseController.add(this)
     }
 
@@ -225,6 +225,7 @@ class MouseArea extends Item {
         MouseController.remove(this)
         super.destroy()
     }
+
 }
 
 module.exports.MouseArea = MouseArea

@@ -61,21 +61,38 @@ class MouseController {
     }
 
     get(x, y){
-        // let elements = document.elementsFromPoint(x, y)
-        let inner = []
-
-        // for(let element of elements){
-        //     if(element.id && UIDList[element.id] && (UIDList[element.id].$mousearea || UIDList[element.id].$flickable || UIDList[element.id].$textinput) && UIDList[element.id].getPropertyValue('enabled') && UIDList[element.id].getPropertyValue('visible')){
-        //         inner.push(UIDList[element.id])
-        //     }
-        // }
-
-        for(let i = this.list.length-1; i >= 0; i--){
-            if(this.list[i].getPropertyValue('enabled') && this.list[i].getPropertyValue('visible')){
-                let rect = this.list[i].getDom().getBoundingClientRect()
-                if(rect.left < x && rect.top < y && rect.right >= x && rect.bottom >= y) inner.push(this.list[i])
+        for(let obj of this.list){
+            if(obj instanceof MouseArea || obj instanceof Flickable){
+                obj.setStyle({
+                    pointerEvents: 'auto',
+                    touchAction: 'auto',
+                })
             }
         }
+        let elements = document.elementsFromPoint(x, y)
+        let inner = []
+
+        for(let element of elements){
+            if(element.id && UIDList[element.id] && (UIDList[element.id].$mousearea || (UIDList[element.id].$flickable && UIDList[element.id].getPropertyValue('interactive')) || UIDList[element.id].$textinput) && UIDList[element.id].getPropertyValue('enabled') && UIDList[element.id].getPropertyValue('visible')){
+                inner.push(UIDList[element.id])
+            }
+        }
+
+        for(let obj of this.list){
+            if(obj instanceof MouseArea || obj instanceof Flickable){
+                obj.setStyle({
+                    pointerEvents: 'none',
+                    touchAction: 'none',
+                })
+            }
+        }
+
+        // for(let i = this.list.length-1; i >= 0; i--){
+        //     if(this.list[i].getPropertyValue('enabled') && this.list[i].getPropertyValue('visible')){
+        //         let rect = this.list[i].getDom().getBoundingClientRect()
+        //         if(rect.left < x && rect.top < y && rect.right >= x && rect.bottom >= y) inner.push(this.list[i])
+        //     }
+        // }
 
         return inner
     }
@@ -108,6 +125,7 @@ class MouseController {
         this.moveY = y
         this.pressedMouseArea = []
         let inner = this.get(x, y)
+        // let testInner = mainRoot.$getForMouseEvent(x, y)
         this.pressed = inner
         let view = null
 
@@ -125,17 +143,20 @@ class MouseController {
                 return
             }
         } 
+        for(let i = 1; i < inner.length; i++){
+            if(inner[i] instanceof TextInput || inner[i] instanceof TextEdit){
+                if(inner[i].getPropertyValue('enabled') && inner[i].getPropertyValue('visible') && inner[i].getPropertyValue('activeFocus')) {
+                    this.target = inner[i]
+                    return
+                }
+            }
+        }
         for(let i = 0; i < inner.length; i++){
             if(!view && inner[i] instanceof Flickable && inner[i].getPropertyValue('enabled') && inner[i].getPropertyValue('visible') && inner[i].getPropertyValue('interactive')){
                 this.target = inner[i]
                 break
             }
-            if(inner[i] instanceof TextInput || inner[i] instanceof TextEdit){
-                if(inner[i].getPropertyValue('enabled') && inner[i].getPropertyValue('visible') && inner[i].getPropertyValue('activeFocus')) {
-                    this.target = inner[i]
-                    break
-                }
-            }
+            
             if(inner[i] instanceof MouseArea){
                 if(inner[i].getPropertyValue('enabled') && inner[i].getPropertyValue('visible') && inner[i].availableButton(button)){
                     
@@ -343,6 +364,16 @@ class MouseController {
             }
 
             for(let i = 0; i < inner.length; i++){
+                if(inner[i] instanceof TextInput || inner[i] instanceof TextEdit){
+                    document.body.style.cursor = 'text'
+                    break
+                } else if(inner[i] instanceof MouseArea && inner[i].getPropertyValue('hoverEnabled')){
+                    document.body.style.cursor = inner[i].getPropertyValue('cursorShape')
+                    break
+                }
+            }
+
+            for(let i = 0; i < inner.length; i++){
                 let index = this.oldList.indexOf(inner[i])
                 if(index >= 0) this.oldList.splice(index, 1)
             }
@@ -356,7 +387,7 @@ class MouseController {
                     this.oldList[i].getStatement('mouseX').reset(norm.x)
                     this.oldList[i].getStatement('mouseY').reset(norm.y)
 
-                    document.body.style.cursor = this.oldList[i].getPropertyValue('cursorShape')
+                    // document.body.style.cursor = this.oldList[i].getPropertyValue('cursorShape')
 
                     if((this.oldList[i].getPropertyValue('pressed') || this.oldList[i].getPropertyValue('hoverEnabled')) && this.oldList[i].$signals.positionChanged) this.oldList[i].$signals.positionChanged()
 
@@ -384,7 +415,7 @@ class MouseController {
                     inner[i].getStatement('mouseX').reset(norm.x)
                     inner[i].getStatement('mouseY').reset(norm.y)
 
-                    document.body.style.cursor = inner[i].getPropertyValue('cursorShape')
+                    // if(document.body.style.cursor === 'default') document.body.style.cursor = inner[i].getPropertyValue('cursorShape')
 
                     if((inner[i].getPropertyValue('pressed') || inner[i].getPropertyValue('hoverEnabled')) && inner[i].$signals.positionChanged) inner[i].$signals.positionChanged()
 

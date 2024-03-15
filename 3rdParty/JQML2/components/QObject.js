@@ -206,6 +206,7 @@ class QObject extends ComplexObject {
             delete this[key]
         }
     }
+
 }
 
 module.exports.QObject = QObject
