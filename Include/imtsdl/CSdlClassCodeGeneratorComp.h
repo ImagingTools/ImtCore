@@ -53,14 +53,20 @@ private:
 	bool EndSourceClassFile(const CSdlType& sdlType);
 	bool EndClassFiles(const CSdlType& sdlType);
 	void AbortCurrentProcessing();
-	QString GenerateAccessMethods(const CSdlField& sdlField, uint indents = 1, bool generateGetter = true, bool generateSetter = true);
+	QString GenerateAccessMethods(
+				const CSdlField& sdlField,
+				uint indents = 1,
+				bool generateGetter = true,
+				bool generateSetter = true,
+				bool generateExistenceChecks = true);
 	void GenerateAccessMethodsImpl(
 				QTextStream& stream,
 				const QString className,
 				const CSdlField& sdlField,
 				uint indents = 0,
 				bool generateGetter = true,
-				bool generateSetter = true);
+				bool generateSetter = true,
+				bool generateExistenceChecks = true);
 
 private:
 	I_REF(ISdlProcessArgumentsParser, m_argumentParserCompPtr);

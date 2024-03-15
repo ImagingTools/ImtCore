@@ -519,13 +519,19 @@ void CSdlClassCodeGeneratorComp::AbortCurrentProcessing()
 }
 
 
-QString CSdlClassCodeGeneratorComp::GenerateAccessMethods(const CSdlField& sdlField, uint indents, bool generateGetter, bool generateSetter)
+QString CSdlClassCodeGeneratorComp::GenerateAccessMethods(
+			const CSdlField& sdlField,
+			uint indents,
+			bool generateGetter,
+			bool generateSetter,
+			bool generateExistenceChecks)
 {
 	QString retVal;
 
 	if (generateGetter){
 		FeedLineHorizontally(retVal, indents);
 
+		retVal += QStringLiteral("[[nodiscard]] ");
 		retVal += ConvertType(sdlField);
 		retVal += QStringLiteral(" Get") + GetCapitalizedValue(sdlField.GetId());
 		retVal += QStringLiteral("() const;\n");
@@ -560,6 +566,16 @@ QString CSdlClassCodeGeneratorComp::GenerateAccessMethods(const CSdlField& sdlFi
 		retVal += QStringLiteral(");\n");
 	}
 
+	if (generateExistenceChecks){
+		if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
+			FeedLineHorizontally(retVal, indents);
+
+			retVal += QStringLiteral("[[nodiscard]] bool Has");
+			retVal += GetCapitalizedValue(sdlField.GetId());
+			retVal += QStringLiteral("() const;\n");
+		}
+	}
+
 	return retVal;
 }
 
@@ -570,7 +586,8 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 			const CSdlField& sdlField,
 			uint indents,
 			bool generateGetter,
-			bool generateSetter)
+			bool generateSetter,
+			bool generateExistenceChecks)
 {
 	if (generateGetter){
 		FeedStreamHorizontally(stream, indents);
@@ -677,6 +694,33 @@ void CSdlClassCodeGeneratorComp::GenerateAccessMethodsImpl(
 
 		stream << '}';
 		FeedStream(stream, 3);
+	}
+
+	if (generateExistenceChecks){
+		if (m_argumentParserCompPtr->IsModificatorEnabled(s_variantMapModificatorArgumentName)){
+			FeedStreamHorizontally(stream, indents);
+
+			stream << QStringLiteral("bool");
+			stream << QStringLiteral(" C") + className + QStringLiteral("::");
+			stream << QStringLiteral("Has");
+			stream << GetCapitalizedValue(sdlField.GetId());
+			stream << QStringLiteral("() const");
+			FeedStream(stream, 1, false);
+			FeedStreamHorizontally(stream, indents);
+			stream << '{';
+
+			FeedStream(stream, 1, false);
+			FeedStreamHorizontally(stream, indents + 1);
+			stream << QStringLiteral("return bool(!");
+			stream << FromVariantMapAccessString(sdlField);
+			stream << QStringLiteral(".isNull());");
+
+			FeedStream(stream, 1, false);
+			FeedStreamHorizontally(stream, indents);
+			stream << '}';
+
+			FeedStream(stream, 3, false);
+		}
 	}
 }
 
