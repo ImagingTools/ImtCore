@@ -12,9 +12,8 @@ win32*{
 
 
 mac*{
-    INCLUDEPATH += /usr/local/opt/openssl/include/
-
-    LIBS += -L/usr/local/opt/openssl/lib/ -lssl -lcrypto
+	INCLUDEPATH += $$PWD/../../3rdParty/openssl/1.1
+	LIBS += -L$$PWD/../../3rdParty/openssl/1.1/lib/$$COMPILER_CODE -lcrypto -lssl
 }
 
 

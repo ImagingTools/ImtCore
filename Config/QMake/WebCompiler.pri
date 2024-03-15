@@ -2,6 +2,7 @@
 defineTest(copyToWebDir) {
     files = $$1
     dir = $$2
+
     # replace slashes in destination path for Windows
     win32:dir ~= s,/,\\,g
 
@@ -36,6 +37,7 @@ defineTest(copyFile) {
 	    WEB_COMMAND += &&
 	}
 	WEB_COMMAND += $$QMAKE_COPY_FILE $$shell_quote($$file) $$shell_quote($$fileNew)
+
 	export(WEB_COMMAND)
 }
 
@@ -43,7 +45,7 @@ defineTest(compyleWeb) {
     buildwebdir = $$1
 	resname = $$2
 	dir = $$1/src
-	jqmldir = $(IMTCOREDIR)/3rdParty/JQML
+	jqmldir = $(IMTCOREDIR)/3rdParty/JQML2
 	npmexe = npm
 
     win32{
@@ -58,7 +60,6 @@ defineTest(compyleWeb) {
     WEB_COMMAND += && cd $$shell_quote($$jqmldir) && $$npmexe run compile  $$shell_quote($$dir)
 
     copyFile($$buildwebdir/src/jqml.full.js, $$buildwebdir/Resources/jqml.$${resname}.js)
-	copyToWebDir($$buildwebdir/src/imtqml/GraphQLRequest.js, $$buildwebdir/Resources)
 
     QRC_WEB_FILE = $${buildwebdir}/Resources/$${TARGET}JsWeb.qrc
 	QRC_CPP_WEB_FILE = $${buildwebdir}/Resources/qrc_$${TARGET}Web.cpp
@@ -72,7 +73,7 @@ defineTest(compyleWeb) {
 	    QMAKE_RCC = rcc
 	}
 	WEB_COMMAND += && $$[QT_INSTALL_BINS]/$$QMAKE_RCC -name $${TARGET}Web $${QRC_WEB_FILE} -o $${QRC_CPP_WEB_FILE}
-	export(WEB_COMMAND)
 
+	export(WEB_COMMAND)
 }
 
