@@ -30,12 +30,13 @@ class ListView extends Flickable {
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
         this.$exCtx = exCtx
+        this.$queueData = []
         this.$items = {
             length: new QInt(0)
         }
-        this.$items.length.getNotify().connect(()=>{
-            this.updateView()
-        })
+        // this.$items.length.getNotify().connect(()=>{
+        //     this.updateView()
+        // })
     }
 
     itemAtIndex(index){
@@ -60,93 +61,110 @@ class ListView extends Flickable {
     }
 
     $modelDataChanged(leftTop, bottomRight, roles){
-        if(roles === 'remove'){
-            for(let i = leftTop; i < bottomRight; i++){
-                if(this.$items[i]){
-                    let obj = this.$items[i]
-                    delete this.$items[i]
-                    for(let k = i + 1; k < this.$items.length.get(); k++){
-                        if(this.$items[k]){
-                            this.$items[k-1] = this.$items[k]
-                            delete this.$items[k]
-                        }
-                    }
-                    obj.destroy()
-                    
-                }
-            }
-            if(this.getPropertyValue('orientation') === ListView.Horizontal){
-                if(leftTop > 0){
-                    if(this.$items[leftTop] && this.$items[leftTop-1]){
-                        this.$items[leftTop].getStatement('x').reset(this.$items[leftTop-1].getStatement('x').get()+this.$items[leftTop-1].getStatement('width').get()+this.getStatement('spacing').get())
-                    }
-                } else if(leftTop === 0){
-                    if(this.$items[leftTop]){
-                        this.$items[leftTop].getStatement('x').reset(0)
-                    }
-                }
-            } else {
-                if(leftTop > 0){
-                    if(this.$items[leftTop] && this.$items[leftTop-1]){
-                        this.$items[leftTop].getStatement('y').reset(this.$items[leftTop-1].getStatement('y').get()+this.$items[leftTop-1].getStatement('height').get()+this.getStatement('spacing').get())
-                    }
-                } else if(leftTop === 0){
-                    if(this.$items[leftTop]){
-                        this.$items[leftTop].getStatement('y').reset(0)
-                    }
-                    
-                }
-            }
-            this.updateGeometry()
-        }
-        if(roles === 'insert'){
-            for(let i = leftTop; i < bottomRight; i++){
-                if(this.$items[i]){
-                    let length = this.$items.length.get()
-                    for(let k = length; k > i; k--){
-                        if(this.$items[k-1] && !this.$items[k-1].UID) delete this.$items[k-1]
-                        if(this.$items[k-1]) this.$items[k] = this.$items[k-1]
-                          
-                    }
-                    this.$items[i] = null
-                }
-                // this.createElement(i) 
-                // this.updateGeometry()
-                if(this.getPropertyValue('orientation') === ListView.Horizontal){
-                    if(this.$items[i-1] && this.$items[i-1].UID && this.$items[i-1].getPropertyValue('x') + this.$items[i-1].getPropertyValue('width') + this.getPropertyValue('spacing') < this.getPropertyValue('width') + this.getPropertyValue('contentX') + this.getPropertyValue('cacheBuffer')){
-                        let obj = this.createElement(i)
-                        obj.getStatement('x').reset(this.$items[i-1].getPropertyValue('x') + this.$items[i-1].getPropertyValue('width') + this.getPropertyValue('spacing'))
-                        
-                        // if(this.$items[i+1]){
-                        //     this.$items[i+1].getStatement('x').reset(this.$items[i].getPropertyValue('x') + this.$items[i].getPropertyValue('width') + this.getPropertyValue('spacing'))
-                        // }
-
-                        this.updateGeometry()
-                    } else if(this.$items[i+1] && this.$items[i+1].UID && this.$items[i+1].getPropertyValue('x') - this.getPropertyValue('spacing') > this.getPropertyValue('contentX') - this.getPropertyValue('cacheBuffer')){
-                        let obj = this.createElement(i)
-                        obj.getStatement('x').reset(this.$items[i+1].getPropertyValue('x') - obj.getPropertyValue('width') - this.getPropertyValue('spacing'))
-                        this.updateGeometry()
-                    } 
-                } else {
-                    if(this.$items[i-1] && this.$items[i-1].UID && this.$items[i-1].getPropertyValue('y') + this.$items[i-1].getPropertyValue('height') + this.getPropertyValue('spacing') < this.getPropertyValue('height') + this.getPropertyValue('contentY') + this.getPropertyValue('cacheBuffer')){
-                        let obj = this.createElement(i)
-                        obj.getStatement('y').reset(this.$items[i-1].getPropertyValue('y') + this.$items[i-1].getPropertyValue('height') + this.getPropertyValue('spacing'))
-                        
-                        // if(this.$items[i+1]){
-                        //     this.$items[i+1].getStatement('y').reset(this.$items[i].getPropertyValue('y') + this.$items[i].getPropertyValue('height') + this.getPropertyValue('spacing'))
-                        // }
-
-                        this.updateGeometry()
-                    } else if(this.$items[i+1] && this.$items[i+1].UID && this.$items[i+1].getPropertyValue('y') - this.getPropertyValue('spacing') > this.getPropertyValue('contentY') - this.getPropertyValue('cacheBuffer')){
-                        let obj = this.createElement(i)
-                        obj.getStatement('y').reset(this.$items[i+1].getPropertyValue('y') - obj.getPropertyValue('height') - this.getPropertyValue('spacing'))
-                        this.updateGeometry()
-                    }
-                }
-            }
-        }
+        if(roles) this.$queueData.push([leftTop, bottomRight, roles])
+        if(this.$timer) clearTimeout(this.$timer)
+        this.$timer = setTimeout(()=>{
+            this.$modelDataUpdate()
+        }, 10)
         // console.log('DEBUG:::', leftTop, bottomRight, roles)
     }
+    
+    $modelDataUpdate(){
+        while(this.$queueData.length){
+            let params = this.$queueData.shift()
+            let leftTop = params[0]
+            let bottomRight = params[1]
+            let roles = params[2]
+            if(roles === 'append'){
+                this.updateView()
+            } else if(roles === 'remove'){
+                for(let i = leftTop; i < bottomRight; i++){
+                    if(this.$items[i]){
+                        let obj = this.$items[i]
+                        delete this.$items[i]
+                        for(let k = i + 1; k < this.$items.length.get(); k++){
+                            if(this.$items[k]){
+                                this.$items[k-1] = this.$items[k]
+                                delete this.$items[k]
+                            }
+                        }
+                        obj.destroy()
+                        
+                    }
+                }
+                if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                    if(leftTop > 0){
+                        if(this.$items[leftTop] && this.$items[leftTop-1]){
+                            this.$items[leftTop].getStatement('x').reset(this.$items[leftTop-1].getStatement('x').get()+this.$items[leftTop-1].getStatement('width').get()+this.getStatement('spacing').get())
+                        }
+                    } else if(leftTop === 0){
+                        if(this.$items[leftTop]){
+                            this.$items[leftTop].getStatement('x').reset(0)
+                        }
+                    }
+                } else {
+                    if(leftTop > 0){
+                        if(this.$items[leftTop] && this.$items[leftTop-1]){
+                            this.$items[leftTop].getStatement('y').reset(this.$items[leftTop-1].getStatement('y').get()+this.$items[leftTop-1].getStatement('height').get()+this.getStatement('spacing').get())
+                        }
+                    } else if(leftTop === 0){
+                        if(this.$items[leftTop]){
+                            this.$items[leftTop].getStatement('y').reset(0)
+                        }
+                        
+                    }
+                }
+                this.updateGeometry()
+            } else if(roles === 'insert'){
+                for(let i = leftTop; i < bottomRight; i++){
+                    if(this.$items[i]){
+                        let length = this.$items.length.get()
+                        for(let k = length; k > i; k--){
+                            if(this.$items[k-1] && !this.$items[k-1].UID) delete this.$items[k-1]
+                            if(this.$items[k-1]) this.$items[k] = this.$items[k-1]
+                            
+                        }
+                        this.$items[i] = null
+                    }
+                    // this.createElement(i) 
+                    // this.updateGeometry()
+                    if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                        if(this.$items[i-1] && this.$items[i-1].UID && this.$items[i-1].getPropertyValue('x') + this.$items[i-1].getPropertyValue('width') + this.getPropertyValue('spacing') < this.getPropertyValue('width') + this.getPropertyValue('contentX') + this.getPropertyValue('cacheBuffer')){
+                            let obj = this.createElement(i)
+                            obj.getStatement('x').reset(this.$items[i-1].getPropertyValue('x') + this.$items[i-1].getPropertyValue('width') + this.getPropertyValue('spacing'))
+                            
+                            // if(this.$items[i+1]){
+                            //     this.$items[i+1].getStatement('x').reset(this.$items[i].getPropertyValue('x') + this.$items[i].getPropertyValue('width') + this.getPropertyValue('spacing'))
+                            // }
+
+                            this.updateGeometry()
+                        } else if(this.$items[i+1] && this.$items[i+1].UID && this.$items[i+1].getPropertyValue('x') - this.getPropertyValue('spacing') > this.getPropertyValue('contentX') - this.getPropertyValue('cacheBuffer')){
+                            let obj = this.createElement(i)
+                            obj.getStatement('x').reset(this.$items[i+1].getPropertyValue('x') - obj.getPropertyValue('width') - this.getPropertyValue('spacing'))
+                            this.updateGeometry()
+                        } 
+                    } else {
+                        if(this.$items[i-1] && this.$items[i-1].UID && this.$items[i-1].getPropertyValue('y') + this.$items[i-1].getPropertyValue('height') + this.getPropertyValue('spacing') < this.getPropertyValue('height') + this.getPropertyValue('contentY') + this.getPropertyValue('cacheBuffer')){
+                            let obj = this.createElement(i)
+                            obj.getStatement('y').reset(this.$items[i-1].getPropertyValue('y') + this.$items[i-1].getPropertyValue('height') + this.getPropertyValue('spacing'))
+                            
+                            // if(this.$items[i+1]){
+                            //     this.$items[i+1].getStatement('y').reset(this.$items[i].getPropertyValue('y') + this.$items[i].getPropertyValue('height') + this.getPropertyValue('spacing'))
+                            // }
+
+                            this.updateGeometry()
+                        } else if(this.$items[i+1] && this.$items[i+1].UID && this.$items[i+1].getPropertyValue('y') - this.getPropertyValue('spacing') > this.getPropertyValue('contentY') - this.getPropertyValue('cacheBuffer')){
+                            let obj = this.createElement(i)
+                            obj.getStatement('y').reset(this.$items[i+1].getPropertyValue('y') - obj.getPropertyValue('height') - this.getPropertyValue('spacing'))
+                            this.updateGeometry()
+                        }
+                    }
+                }
+            }
+        }
+
+    }
+
     $disconnectModel(){
         if(this.$model && this.$model instanceof ListModel && this.$model.UID){
             this.$model.getProperty('data').getNotify().disconnect(this, this.$modelDataChanged)
@@ -177,6 +195,7 @@ class ListView extends Flickable {
             
         }
         this.$items.length.update()
+        this.updateView()
     }
 
     $delegateChanged(){
