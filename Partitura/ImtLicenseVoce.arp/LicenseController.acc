@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5010" Description="ACF"/>
-            <Version Id="1" Number="2177" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="330758" Description="Qt Framework"/>
+            <Version Id="0" Number="5208" Description="ACF"/>
+            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Client-side license controller for an installation instance of a software product</Description>
@@ -76,28 +76,6 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="FingerprintCachePersistence" PackageId="QFilePck" ComponentId="SecureFileSerializer">
-            <Data IsEnabled="true" Flags="0">
-                <AttributeInfoMap>
-                    <AttributeInfo Id="AutoCreatePath" Type="Boolean" ExportId="">
-                        <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="FileExtensions" Type="String[]" ExportId="">
-                        <Data IsEnabled="true">
-                            <Values>
-                                <Value>xli</Value>
-                            </Values>
-                        </Data>
-                    </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                </AttributeInfoMap>
-            </Data>
-        </Element>
         <Element Id="LicenseBasedRights" PackageId="ImtLicensePck" ComponentId="LicenseBasedRightsProvider">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -116,8 +94,8 @@
                     <AttributeInfo Id="FingerprintExpiration" Type="Integer" ExportId="FingerprintExpiration">
                         <Data IsEnabled="true" Value="10"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="FingerprintInstancePersistence" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="FingerprintCachePersistence"/>
+                    <AttributeInfo Id="FingerprintInstancePersistence" Type="Reference" ExportId="FingerprintInstancePersistence">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="LicenseFilePath" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="LicenseFile"/>
@@ -169,6 +147,12 @@
                                 <Value>xml</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
