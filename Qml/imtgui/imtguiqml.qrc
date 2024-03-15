@@ -60,6 +60,7 @@
 		<file alias="imtgui/View/SearchComp.qml">View/SearchComp.qml</file>
 		<file alias="imtgui/View/ViewBase.qml">View/ViewBase.qml</file>
 		<file alias="imtgui/View/ViewCommandsDelegateBase.qml">View/ViewCommandsDelegateBase.qml</file>
+		<file alias="imtgui/View/LogView.qml">View/LogView.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

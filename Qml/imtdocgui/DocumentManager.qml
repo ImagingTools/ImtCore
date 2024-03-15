@@ -7,7 +7,6 @@ Item {
     id: documentManager;
 
     property string defaultDocumentName: qsTr("<no name>");
-//    property int activeDocumentIndex: -1;
 
     property ListModel documentsModel: ListModel {
         dynamicRoles: true;
@@ -788,21 +787,6 @@ Item {
                     }
                 }
             }
-
-            //            property Shortcut shortcut:  Shortcut {
-            //                sequence: "Ctrl+S";
-
-            //                enabled: singleDocumentData.documentIndex == documentManager.activeDocumentIndex;
-
-            //                onEnabledChanged: {
-            //                    console.log("Document onEnabledChanged", enabled, model.index);
-            //                }
-
-            //                onActivated: {
-            //                    console.log("Document Ctrl+S onActivated");
-            //                    singleDocumentData.commandHandle("Save");
-            //                }
-            //            }
         }
     }
 

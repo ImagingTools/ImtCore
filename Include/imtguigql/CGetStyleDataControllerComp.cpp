@@ -56,6 +56,8 @@ imtbase::CTreeItemModel* CGetStyleDataControllerComp::CreateInternalResponse(con
 
 		QByteArray resources = resource.readAll();
 		sourceModelPtr->CreateFromJson(resources);
+
+		resource.close();
 	}
 
 	return rootModelPtr.PopPtr();

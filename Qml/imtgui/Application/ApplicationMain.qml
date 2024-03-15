@@ -152,9 +152,7 @@ Item {
         property bool applyUrl: application.serverReady && application.settingsProvider.serverModel != null;
         onApplyUrlChanged: {
             if (applyUrl){
-                console.log("onApplyUrlChanged");
                 let webSocketServerUrl = application.settingsProvider.getValue("WebSocketServerUrl");
-                console.log("webSocketServerUrl", webSocketServerUrl);
 
                 if (webSocketServerUrl && webSocketServerUrl !== ""){
                     webSocketServerUrl =  webSocketServerUrl.replace("http", "ws")
@@ -173,7 +171,6 @@ Item {
                     serverUrl += context.appName + "/wssub";
                     serverUrl = serverUrl.replace("http", "ws")
 
-                    console.log("WEB Socket serverUrl", serverUrl);
                 }
                 else{
                     serverUrl = "ws://" + context.location.host + "/" + context.appName + "/wssub";

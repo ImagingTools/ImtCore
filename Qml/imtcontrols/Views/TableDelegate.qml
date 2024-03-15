@@ -178,6 +178,8 @@ Rectangle {
     }
 
     function setHeightModelElememt(index_,height_){
+        console.log("setHeightModelElememt", index_,height_);
+
         if(!tableDelegateContainer.tableItem || !tableDelegateContainer.tableItem.canFitHeight ){
             return;
         }

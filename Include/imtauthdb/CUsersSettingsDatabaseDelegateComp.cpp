@@ -18,6 +18,29 @@ namespace imtauthdb
 
 // reimplemented (imtdb::ISqlDatabaseObjectDelegate)
 
+QByteArray CUsersSettingsDatabaseDelegateComp::GetSelectionQuery(
+			const QByteArray& objectId,
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*paramsPtr*/) const
+{
+	if (!objectId.isEmpty()){
+		return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
+					.arg(qPrintable(*m_tableNameAttrPtr))
+					.arg(qPrintable(*m_objectIdColumnAttrPtr))
+					.arg(qPrintable(objectId))
+					.toUtf8();
+	}
+	else{
+		QString retVal = GetBaseSelectionQuery();
+
+		return retVal.toUtf8();
+	}
+
+	return QByteArray();
+}
+
+
 istd::IChangeable* CUsersSettingsDatabaseDelegateComp::CreateObjectFromRecord(const QSqlRecord& record) const
 {
 	if (!m_databaseEngineCompPtr.IsValid() || !m_userSettingsInfoFactCompPtr.IsValid()){
