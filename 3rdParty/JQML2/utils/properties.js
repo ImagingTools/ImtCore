@@ -423,6 +423,10 @@ class QVisible extends QBool {
     }
 }
 
+class QVisibleNot extends QVisible {
+    originValue = false
+}
+
 class QVar extends QProperty {
     get(){
         if(this.value && this.value instanceof ComplexObject && !this.value.$properties){
@@ -987,6 +991,7 @@ module.exports.QVar = QVar
 module.exports.QData = QData
 module.exports.QBool = QBool
 module.exports.QVisible = QVisible
+module.exports.QVisibleNot = QVisibleNot
 module.exports.QFont = QFont
 module.exports.QBorder = QBorder
 module.exports.QLine = QLine
