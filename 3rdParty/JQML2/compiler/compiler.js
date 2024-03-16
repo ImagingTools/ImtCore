@@ -1482,7 +1482,12 @@ while(queueFiles.length){
     if(compiledFile.instructions.Singleton) code.push(`if(Singletons['${SingletonName}']) return Singletons['${SingletonName}']`)
     code.push(`let inCtx = new ContextController(exCtx)`)
     code.push(`super(parent, inCtx, exModel)`)
-    if(compiledFile.instructions.Singleton) code.push(`Singletons['${SingletonName}'] = this`)
+    if(compiledFile.instructions.Singleton) {
+        code.push(`Singletons['${SingletonName}'] = this`)
+        if(SingletonName === 'Enums') {
+            code.push(`for(let key in Enums){this[key]=Enums[key]}`)
+        }
+    }
     // if(compiledFile.instructions.Singleton) code.push(`Singletons['${SingletonName}'] = this`)
     
 
