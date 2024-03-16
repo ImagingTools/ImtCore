@@ -17,7 +17,7 @@ QtObject {
     signal fileUploadFailed();
 
 
-    function sendFile(fileUrl){
+    function SendFile(fileUrl){
         this.state = "Loading"
         var xhr = new XMLHttpRequest;        
 
@@ -55,7 +55,7 @@ QtObject {
 
     }
 
-    function getFile(fileHash, fileName) {
+    function GetFile(fileHash, fileName) {
         if (this.prefix == ""){
             this.prefix = "files"
         }
@@ -64,7 +64,7 @@ QtObject {
         Qt.openUrlExternally(pathIn)
     }
 
-    function deleteFile(fileHash, fileUrl){
+    function DeleteFile(fileHash, fileUrl){
         if (this.prefix == ""){
             this.prefix = "files"
         }

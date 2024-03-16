@@ -49,10 +49,7 @@ Item {
             var fileName = fileDialogSave.file.toString().replace(pathDir + "/", '');
             var id = "GetServerLog";
 
-            if (fileName == ""){
-                fileName = {};
-                fileName["name"] = "ServerLog.txt";
-            }
+            if (fileName == "") fileName = "ServerLog.txt";
 
             remoteFileController.GetFile(id, fileName);
         }
