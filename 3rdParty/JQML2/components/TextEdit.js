@@ -195,6 +195,12 @@ class TextEdit extends Item {
         super.$focusChanged()
     }
 
+    $visibleChanged(){
+        if(this.getPropertyValue('visible') && this.getPropertyValue('activeFocus')){
+            this.$input.focus()
+        }
+    }
+
     applyMetrics(){
         let isHTML = false
         if(this.getPropertyValue('textFormat') === Text.AutoText){

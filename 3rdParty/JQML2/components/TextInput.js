@@ -193,9 +193,9 @@ class TextInput extends Item {
     }
 
     $focusChanged(){
-        if(this.getPropertyValue('focus')){
+        if(this.getPropertyValue('focus')){    
             this.$input.focus()
-        } else {
+        } else {  
             this.$input.blur()
         }
         super.$focusChanged()
@@ -209,6 +209,12 @@ class TextInput extends Item {
             if(this.$signals.editingFinished) this.$signals.editingFinished()
         }
         super.$activeFocusChanged()
+    }
+
+    $visibleChanged(){
+        if(this.getPropertyValue('visible') && this.getPropertyValue('activeFocus')){
+            this.$input.focus()
+        }
     }
 
     applyMetrics(){
