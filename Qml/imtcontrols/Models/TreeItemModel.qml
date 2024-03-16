@@ -76,11 +76,6 @@ JSONListModel {
             console.log("modelObject is null")
 
         modelObject[key] = value
-
-        if (isUpdateEnabled){
-            this.modelChanged()
-            this.dataChanged(row, row+1)
-        }
     }
 
     function RemoveData(key, row){
