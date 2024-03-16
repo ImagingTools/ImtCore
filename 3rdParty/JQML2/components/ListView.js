@@ -82,7 +82,7 @@ class ListView extends Flickable {
                     if(this.$items[i]){
                         let obj = this.$items[i]
                         delete this.$items[i]
-                        for(let k = i + 1; k < this.$items.length.get(); k++){
+                        for(let k = i + 1; k < this.$items.length.get() + (bottomRight - leftTop); k++){
                             if(this.$items[k]){
                                 this.$items[k-1] = this.$items[k]
                                 delete this.$items[k]

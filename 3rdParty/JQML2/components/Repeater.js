@@ -43,8 +43,16 @@ class Repeater extends Item {
         if(roles === 'remove'){
             for(let i = leftTop; i < bottomRight; i++){
                 if(this.$items[i]){
-                    this.$items[i].destroy()
+                    let obj = this.$items[i]
                     delete this.$items[i]
+                    for(let k = i + 1; k < this.$items.length.get() + (bottomRight - leftTop); k++){
+                        if(this.$items[k]){
+                            this.$items[k-1] = this.$items[k]
+                            delete this.$items[k]
+                        }
+                    }
+                    obj.destroy()
+                    
                 }
             }
         }
