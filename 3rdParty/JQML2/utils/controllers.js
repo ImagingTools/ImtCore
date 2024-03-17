@@ -689,6 +689,34 @@ class KeyboardController {
                         obj.$signals['Keys.pressed'](e)
                         return
                     }
+                    if(e.key === 'ArrowLeft' && obj.$signals['Keys.leftPressed']){
+                        obj.$signals['Keys.leftPressed'](e)
+                        return
+                    }
+                    if(e.key === 'ArrowRight' && obj.$signals['Keys.rightPressed']){
+                        obj.$signals['Keys.rightPressed'](e)
+                        return
+                    }
+                    if(e.key === 'ArrowUp' && obj.$signals['Keys.upPressed']){
+                        obj.$signals['Keys.upPressed'](e)
+                        return
+                    }
+                    if(e.key === 'ArrowDown' && obj.$signals['Keys.downPressed']){
+                        obj.$signals['Keys.downPressed'](e)
+                        return
+                    }
+                    if(e.key === 'Return' && obj.$signals['Keys.returnPressed']){
+                        obj.$signals['Keys.returnPressed'](e)
+                        return
+                    }
+                    if(e.key === 'Enter' && obj.$signals['Keys.enterPressed']){
+                        obj.$signals['Keys.enterPressed'](e)
+                        return
+                    }
+                    if(e.key === 'Space' && obj.$signals['Keys.spacePressed']){
+                        obj.$signals['Keys.spacePressed'](e)
+                        return
+                    }
                 }
             }
 
