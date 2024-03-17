@@ -282,11 +282,11 @@ Item {
                                                                                            delegateContainer.pTableDelegateContainer.cellDecorator.GetData("FontSize", delegateContainer.columnIndex) :
                                                                                            Style.fontSize_common : Style.fontSize_common;
             font.family: Style.fontFamily;
-            font.bold: delegateContainer.pTableDelegateContainer ?
-                           delegateContainer.pTableDelegateContainer.emptyDecorCell ? true :
-                                                                                  delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("FontBold", delegateContainer.columnIndex) ?
-                                                                                      delegateContainer.pTableDelegateContainer.cellDecorator.GetData("FontBold", delegateContainer.columnIndex) :
-                                                                                      true: false;
+//            font.bold: delegateContainer.pTableDelegateContainer ?
+//                           delegateContainer.pTableDelegateContainer.emptyDecorCell ? true :
+//                                                                                  delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("FontBold", delegateContainer.columnIndex) ?
+//                                                                                      delegateContainer.pTableDelegateContainer.cellDecorator.GetData("FontBold", delegateContainer.columnIndex) :
+//                                                                                      true: false;
             color: delegateContainer.pTableDelegateContainer && delegateContainer.pTableDelegateContainer.enabled ?
                        (delegateContainer.pTableDelegateContainer.emptyDecorCell ? Style.textColor :
                                                                               delegateContainer.pTableDelegateContainer.cellDecorator.IsValidData("FontColor", delegateContainer.columnIndex) ?
