@@ -12,7 +12,7 @@
 
 // ImtCore includes
 #include <imtbase/IUrlParam.h>
-#include <imtauth/ILoginStatusProvider.h>
+#include <imtauth/ILogin.h>
 #include <imtrest/IRequestServlet.h>
 #include <imtrest/IProtocolEngine.h>
 #include <imtrest/ISender.h>
@@ -29,7 +29,7 @@ class CWebSocketClientComp:
 			public QObject,
 			public ilog::CLoggerComponentBase,
 			virtual public imtrest::ISender,
-			virtual public imtauth::ILoginStatusProvider,
+			virtual public imtauth::ILogin,
 			virtual public imtrest::IRequestManager,
 			virtual public imtclientgql::IGqlClient
 {
@@ -41,6 +41,7 @@ public:
 		I_REGISTER_INTERFACE(ISender)
 		I_REGISTER_INTERFACE(IRequestManager)
 		I_REGISTER_INTERFACE(imtauth::ILoginStatusProvider)
+		I_REGISTER_INTERFACE(imtauth::ILogin)
 		I_REGISTER_INTERFACE(imtclientgql::IGqlClient)
 		I_ASSIGN(m_serverRequestHandlerCompPtr, "ServerRequestHandler", "Request handler registered for the server", false, "ServerRequestHandler");
 		I_ASSIGN(m_clientRequestHandlerCompPtr, "ClientRequestHandler", "Request handler registered for the client", false, "ClientRequestHandler");
@@ -69,6 +70,11 @@ public:
 	virtual const imtrest::IRequest* GetRequest(const QByteArray& requestId) const override;
 	virtual const imtrest::ISender* GetSender(const QByteArray& requestId) const override;
 
+	// reimplemented (imtauth::ILogin)
+	virtual QByteArray GetLoggedUserId() const override;
+	virtual bool Login(const QByteArray& userId, const QString& password) override;
+	virtual bool Logout() override;
+
 protected:
 	QByteArray Sign(const QByteArray& message, const QByteArray& key = "") const;
 
@@ -77,12 +83,16 @@ protected:
 	virtual void OnComponentDestroyed() override;
 
 Q_SIGNALS:
-	void OnQueryDataReceived(int resultCode = 1);
+	void EmitQueryDataReceived(int resultCode = 1);
+	void EmitAgentinoDisconnect(QWebSocketProtocol::CloseCode closeCode = QWebSocketProtocol::CloseCodeNormal,
+							const QString &reason = QString());
+	void EmitStopTimer();
+	void EmitStartTimer();
 
 private Q_SLOTS:
 	void OnConnectedTimer();
 	void OnWebSocketConnected();
-	void OnWebSocketDisConnected();
+	void OnWebSocketDisconnected();
 	void OnWebSocketError(QAbstractSocket::SocketError error);
 	void OnWebSocketTextMessageReceived(const QString& message);
 	void OnWebSocketBinaryMessageReceived(const QByteArray& message);

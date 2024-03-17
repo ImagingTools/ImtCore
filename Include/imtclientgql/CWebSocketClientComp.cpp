@@ -64,6 +64,32 @@ const imtrest::ISender* CWebSocketClientComp::GetSender(const QByteArray& /*requ
 }
 
 
+// reimplemented (imtauth::ILogin)
+QByteArray CWebSocketClientComp::GetLoggedUserId() const
+{
+	return QByteArray();
+}
+
+
+bool CWebSocketClientComp::Login(const QByteArray& /*userId*/, const QString& /*password*/)
+{
+//	m_refreshTimer.start();
+	EmitStartTimer();
+
+	return true;
+}
+
+
+bool CWebSocketClientComp::Logout()
+{
+//	m_refreshTimer.stop();
+	EmitStopTimer();
+	EmitAgentinoDisconnect();
+
+	return true;
+}
+
+
 IGqlClient::GqlResponsePtr CWebSocketClientComp::SendRequest(IGqlClient::GqlRequestPtr requestPtr) const
 {
 	QString key = QUuid::createUuid().toString(QUuid::WithoutBraces);
@@ -121,16 +147,19 @@ void CWebSocketClientComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
 
-	connect(&m_webSocket, &QWebSocket::connected, this, &CWebSocketClientComp::OnWebSocketConnected);
-	connect(&m_webSocket, &QWebSocket::disconnected, this, &CWebSocketClientComp::OnWebSocketDisConnected);
+	connect(&m_webSocket, &QWebSocket::connected, this, &CWebSocketClientComp::OnWebSocketConnected, Qt::QueuedConnection);
+	connect(&m_webSocket, &QWebSocket::disconnected, this, &CWebSocketClientComp::OnWebSocketDisconnected, Qt::QueuedConnection);
 	connect(&m_webSocket, &QWebSocket::textMessageReceived, this, &CWebSocketClientComp::OnWebSocketTextMessageReceived);
 	connect(&m_webSocket, &QWebSocket::binaryMessageReceived, this, &CWebSocketClientComp::OnWebSocketBinaryMessageReceived);
+	connect(this, &CWebSocketClientComp::EmitAgentinoDisconnect, &m_webSocket, &QWebSocket::close);
+	connect(this, SIGNAL(EmitStartTimer()), &m_refreshTimer, SLOT(start()), Qt::QueuedConnection);
+	connect(this, SIGNAL(EmitStopTimer()), &m_refreshTimer, SLOT(stop()), Qt::QueuedConnection);
 	connect(&m_webSocket, SIGNAL(error(QAbstractSocket::SocketError)), this, SLOT(OnWebSocketError(QAbstractSocket::SocketError)));
 
 	connect(&m_refreshTimer, &QTimer::timeout, this, &CWebSocketClientComp::OnConnectedTimer);
 
 	m_refreshTimer.setSingleShot(true);
-	m_refreshTimer.setInterval(5000);
+	m_refreshTimer.setInterval(4000);
 
 	Connect();
 }
@@ -182,7 +211,7 @@ void CWebSocketClientComp::OnWebSocketConnected()
 }
 
 
-void CWebSocketClientComp::OnWebSocketDisConnected()
+void CWebSocketClientComp::OnWebSocketDisconnected()
 {
 	m_loginStatus = imtauth::ILoginStatusProvider::LSF_CACHED;
 	istd::IChangeable::ChangeSet loginChangeSet(m_loginStatus, QObject::tr("Logout"));
@@ -229,7 +258,7 @@ void CWebSocketClientComp::OnWebSocketTextMessageReceived(const QString& message
 	else if (methodType == imtrest::CWebSocketRequest::MT_QUERY_DATA){
 		m_queryDataMap.insert(webSocketRequest->GetRequestId(), webSocketRequest->GetBody());
 
-		emit OnQueryDataReceived(1);
+		emit EmitQueryDataReceived(1);
 	}
 	else if (methodType == imtrest::CWebSocketRequest::MT_ERROR
 			 || methodType == imtrest::CWebSocketRequest::MT_START_ASK
@@ -308,7 +337,7 @@ CWebSocketClientComp::NetworkOperation::NetworkOperation(int timeout, const CWeb
 	timerFlag = false;
 
 	// If the network reply is finished, the internal event loop will be finished:
-	QObject::connect(parent, &CWebSocketClientComp::OnQueryDataReceived, &connectionLoop, &QEventLoop::exit, Qt::DirectConnection);
+	QObject::connect(parent, &CWebSocketClientComp::EmitQueryDataReceived, &connectionLoop, &QEventLoop::exit, Qt::DirectConnection);
 
 	// If the application will be finished, the internal event loop will be also finished:
 	QObject::connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &connectionLoop, &QEventLoop::quit, Qt::DirectConnection);

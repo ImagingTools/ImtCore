@@ -2,7 +2,7 @@
 
 
 // ImtCore includes
-#include <imtauth/ILoginStatusProvider>
+#include <imtauth/ILoginStatusProvider.h>
 
 
 namespace imtauth

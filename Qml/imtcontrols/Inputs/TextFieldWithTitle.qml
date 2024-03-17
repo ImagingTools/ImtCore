@@ -23,7 +23,7 @@ Item {
 
     property alias spacing: contentColumn.spacing;
 
-    property int radius: 3;
+    property int radius: Style.textFieldRadius;
 
     property alias readOnly: input.readOnly;
 
@@ -40,7 +40,7 @@ Item {
 
         width: parent.width;
 
-        spacing: 5;
+        spacing: Style.size_smallMargin;
 
         Text {
             id: title;
@@ -53,11 +53,11 @@ Item {
             font.pixelSize: Style.fontSize_common;
         }
 
-        CustomTextField {
+        TextField {
             id: input;
 
             width: parent.width;
-            height: 30;
+            height: Style.itemSizeMedium;
 
             radius: root.radius;
 

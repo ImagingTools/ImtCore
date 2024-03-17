@@ -82,6 +82,8 @@ StyleComponents {
 	property real alternatingOpacity: 0.05
 	property bool enableHoverEffect: true
 
+    property int textFieldRadius: 3;
+
     property int size_smallMargin: 6;
     property int size_mainMargin: 11;
     property int size_indicatorHeight: 50;
