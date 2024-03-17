@@ -610,6 +610,14 @@ class KeyboardController {
                         }
                         
                     }
+                    if(e.key === 'Tab'){
+                        e.preventDefault()
+                        if(target instanceof TextEdit) {
+                            target.onKeyDown(e.key)
+                            return
+                        }
+                    }
+                    
                     let obj = target
                     // let parent = target.parent
                     // let find = false
@@ -672,6 +680,7 @@ class KeyboardController {
                             }
                         }
                     }
+
                     if(obj.$signals['Keys.pressed']){
                         obj.$signals['Keys.pressed'](e)
                         return

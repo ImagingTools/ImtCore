@@ -273,7 +273,7 @@ class Item extends QtObject {
         // if(!(parent instanceof FocusScope))
         while(parent){
             if(parent instanceof FocusScope){
-                if(focusedElements.indexOf(parent) < 0) {
+                if(this.getPropertyValue('focus') && focusedElements.indexOf(parent) < 0) {
                     focusedElements.push(parent)
                 }
                 parent.getProperty('focus').reset(this.getPropertyValue('focus'))
@@ -305,7 +305,7 @@ class Item extends QtObject {
         // if(!(parent instanceof FocusScope))
         while(parent){
             if(parent instanceof FocusScope){
-                if(activeFocusedElements.indexOf(parent) < 0) {
+                if(this.getPropertyValue('activeFocus') && activeFocusedElements.indexOf(parent) < 0) {
                     activeFocusedElements.push(parent)
                 }
                 parent.getProperty('activeFocus').reset(this.getPropertyValue('activeFocus'))
