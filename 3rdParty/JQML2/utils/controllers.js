@@ -353,9 +353,13 @@ class MouseController {
                     if(Math.abs(this.originX - x) >= 10 || Math.abs(this.originY - y) >= 10){
                         for(let i = 0; i < this.pressed.length; i++){
                             if(this.pressed[i] instanceof Flickable && this.pressed[i].getPropertyValue('enabled') && this.pressed[i].getPropertyValue('visible') && this.pressed[i].getPropertyValue('interactive')) {
-                                this.target.getProperty('pressed').value = false
-                                this.target = this.pressed[i]
-                                break
+                                if((Math.abs(this.originX - x) >= 10 && this.pressed[i].getPropertyValue('width') < this.pressed[i].getPropertyValue('contentItem').getPropertyValue('width')) || 
+                                (Math.abs(this.originY - y) >= 10 && this.pressed[i].getPropertyValue('height') < this.pressed[i].getPropertyValue('contentItem').getPropertyValue('height'))){
+                                    this.target.getProperty('pressed').value = false
+                                    this.target = this.pressed[i]
+                                    break
+                                }
+                                
                             }
                         }
                     } else {
