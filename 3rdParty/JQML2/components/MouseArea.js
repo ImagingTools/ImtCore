@@ -207,7 +207,7 @@ class MouseArea extends Item {
                 this.$signals.wheel.y = y - rect.y
                 this.$signals.wheel.angleDelta = {
                     x: deltaX / 8,
-                    y: deltaY / 8
+                    y: -deltaY / 8
                 }
                 this.$signals.wheel()
 
