@@ -8,7 +8,7 @@ Dialog {
 
     width: 500;
 
-    property string password: contentItem.password;
+    property string password;
 
     property string userPasswordHash;
     property string login;
@@ -37,6 +37,10 @@ Dialog {
         height: columnBodyMain.height + 30;
 
         property alias password: columnBody.password;
+
+        onPasswordChanged: {
+            rootDialog.password = password
+        }
 
         onFocusChanged: {
             console.log("InputBody onFocusChanged", focus);
