@@ -836,7 +836,7 @@ class TextFontController {
                 let word = words[i]
                 let width = this.ctx.measureText(currentLine + " " + word).width
                 if (width < maxWidth) {
-                    currentLine += " " + word
+                    currentLine += wordWrap && wordWrap === 1 ? " " + word : word
                 } else {
                     lines.push(currentLine)
                     let metrics = this.ctx.measureText(currentLine)

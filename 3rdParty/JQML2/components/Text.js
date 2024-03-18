@@ -68,7 +68,9 @@ class Text extends Item {
 
 
     updateGeometry(){
+        let tempDisplay = this.getDom().style.display
         this.setStyle({
+            display: 'flex',
             minHeight: 0,
             height: 0,
         })
@@ -79,6 +81,7 @@ class Text extends Item {
         this.getProperty('contentHeight').reset(this.impl.scrollHeight)
 
         this.setStyle({
+            display: this.getPropertyValue('visible') ? tempDisplay : 'none',
             minHeight: `${this.getPropertyValue('height')}px`,
             height: `${this.getPropertyValue('height')}px`,
         })
@@ -159,7 +162,7 @@ class Text extends Item {
             case Text.WordWrap: this.setStyle({ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }); break;
             case Text.WrapAnywhere: this.setStyle({ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }); break;
             case Text.Wrap: this.setStyle({ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }); break;
-            case Text.WrapAtWordBoundaryOrAnywhere: this.setStyle({ whiteSpace: 'pre-wrap', wordBreak: 'break-all' }); break;
+            case Text.WrapAtWordBoundaryOrAnywhere: this.setStyle({ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }); break;
         }
         this.applyMetrics()
     }
