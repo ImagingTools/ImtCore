@@ -84,6 +84,7 @@ Item {
 
     function registerDocumentView(documentTypeId, viewTypeId, viewComp)
     {
+        console.log("registerDocumentView", documentTypeId, viewTypeId, viewComp);
         if (documentTypeId === "" || viewTypeId === "" || !viewComp){
             return false;
         }
@@ -292,6 +293,8 @@ Item {
         if (!documentViewComp){
             return false;
         }
+
+        console.log("documentViewComp", documentViewComp);
 
         documentData.documentIndex = documentsModel.count;
         documentsModel.append({
@@ -626,6 +629,7 @@ Item {
                     singleDocumentData.blockingUpdateModel = true;
                     for (let i = 0; i < singleDocumentData.views.length; i++){
                         console.log("singleDocumentData.views[i].model", singleDocumentData.views[i].model);
+                        console.log("singleDocumentData.views[i]", singleDocumentData.views[i]);
 
                         singleDocumentData.views[i].model = documentModel;
                         if (documentManager.documentsModel.get(singleDocumentData.documentIndex).IsNew){
