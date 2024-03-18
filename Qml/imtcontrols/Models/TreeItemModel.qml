@@ -69,14 +69,21 @@ JSONListModel {
         if(this.count === 0 && row === 0){
             this.append({})
         }
-//        console.log("setData",key,value,row)
+
         var modelObject = this.get(row)
 
         if (modelObject === null)
             console.log("modelObject is null")
 
         modelObject[key] = value
+
+        if (isUpdateEnabled){
+            this.dataChanged(row, row+1)
+        }
+
+        return true
     }
+
 
     function RemoveData(key, row){
         if(row === undefined)
@@ -115,16 +122,67 @@ JSONListModel {
         this.SetData(key, value, row)
     }
 
-    function CopyItemDataFromModel(index, model, externIndex){
-        if(externIndex === undefined){
-            externIndex = 0;
-        }
-        var keys = model.GetKeys(externIndex);
+    function CopyItemDataFromModel(index, externTreeModel, externIndex){
+        RemoveItem(index)
+        InsertNewItem(index)
 
-        for(var key in keys){
-            let value = model.GetData(keys[key], externIndex);
-            this.SetData(keys[key], value, index);
+        let retVal = true
+        let keys = externTreeModel.GetKeys(externIndex)
+
+        for(let key of keys){
+            let value = externTreeModel.GetData(key, externIndex)
+
+            if (typeof value === 'object' && value.constructor.name.indexOf('TreeItemModel') >= 0){
+                let childModel = AddTreeModel(key, index)
+
+                retVal = retVal && childModel.CopyFrom(value)
+            } else {
+                retVal = retVal && SetData(key, value, index)
+            }
+
+            if (!retVal){
+                break
+            }
         }
+
+        this.dataChanged()
+
+        return retVal
+    }
+
+    function CopyFrom(externTreeModel){
+        if(externTreeModel){
+            Clear()
+
+            let retVal = true
+
+            for(let index = 0; index < externTreeModel.GetItemsCount(); index++){
+                InsertNewItem(index)
+
+                let keys = externTreeModel.GetKeys(externIndex)
+
+                for(let key of keys){
+                    let value = externTreeModel.GetData(key, index)
+
+                    if (typeof value === 'object' && value.constructor.name.indexOf('TreeItemModel') >= 0){
+                        let childModel = AddTreeModel(key, index)
+
+                        retVal = retVal && childModel.CopyFrom(value)
+                    } else {
+                        retVal = retVal && SetData(key, value, index)
+                    }
+
+                    if (!retVal){
+                        break
+                    }
+                }
+
+            }
+
+            return retVal
+        }
+
+        return false
     }
 
     function CopyItemDataToModel(index, model, externIndex){
