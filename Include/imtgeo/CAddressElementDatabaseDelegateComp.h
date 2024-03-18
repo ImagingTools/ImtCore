@@ -3,8 +3,6 @@
 
 // ImtCore includes
 #include <imtdb/CSqlDatabaseObjectDelegateCompBase.h>
-
-// NeoPro includes
 #include <imtgeo/CAddressElementInfo.h>
 
 
