@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5204" Description="ACF"/>
+            <Version Id="1" Number="2203" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394754" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <PositionMap>
+        <Element ComponentName="RoleRepository" X="900" Y="200" Note=""/>
+        <Element ComponentName="UserGroupRepository" X="575" Y="325" Note=""/>
+        <Element ComponentName="UserRepository" X="575" Y="175" Note=""/>
+    </PositionMap>
+    <EmbeddedRegistries>
+        <EmbededRegistry Id="UserRepository">
+            <PositionMap>
+                <Element ComponentName="JsonSerializer" X="175" Y="350" Note=""/>
+                <Element ComponentName="Repository" X="550" Y="550" Note=""/>
+                <Element ComponentName="Types" X="550" Y="125" Note=""/>
+                <Element ComponentName="UserCollectionAdapter" X="200" Y="550" Note=""/>
+                <Element ComponentName="UserDatabaseDelegate" X="550" Y="350" Note=""/>
+                <Element ComponentName="UserInfo" X="875" Y="350" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="RoleRepository">
+            <PositionMap>
+                <Element ComponentName="JsonSerializer" X="325" Y="75" Note=""/>
+                <Element ComponentName="Repository" X="575" Y="475" Note=""/>
+                <Element ComponentName="Role" X="900" Y="300" Note=""/>
+                <Element ComponentName="RoleCollectionAdapter" X="950" Y="475" Note=""/>
+                <Element ComponentName="RoleDatabaseDelegate" X="575" Y="275" Note=""/>
+                <Element ComponentName="RoleMetaInfoCreator" X="550" Y="700" Note=""/>
+                <Element ComponentName="Types" X="825" Y="75" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+        <EmbededRegistry Id="UserGroupRepository">
+            <PositionMap>
+                <Element ComponentName="CompactXmlFileSerializer" X="200" Y="325" Note=""/>
+                <Element ComponentName="Repository" X="575" Y="550" Note=""/>
+                <Element ComponentName="Types" X="575" Y="125" Note=""/>
+                <Element ComponentName="UserGroupDatabaseDelegate" X="575" Y="325" Note=""/>
+                <Element ComponentName="UserGroupInfo" X="950" Y="325" Note=""/>
+                <Element ComponentName="UserGroupInfoProvider" X="925" Y="550" Note=""/>
+            </PositionMap>
+            <EmbeddedRegistries/>
+        </EmbededRegistry>
+    </EmbeddedRegistries>
+</Acf>
