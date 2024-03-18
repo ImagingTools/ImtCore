@@ -293,29 +293,23 @@ window.onload = ()=>{
 
     console.time('build')
     for(let name in SingletonClass){
-        let obj = new SingletonClass[name]()
-
         Object.defineProperty(Singletons, name, {
             get(){
-                obj.$complete()
-                return obj
+                // obj.$complete()
+                if(!Singletons[`$${name}`]) {
+                    Singletons[`$${name}`] = new SingletonClass[name]()
+                    if(!(Singletons[`$${name}`].$id in Singletons)){
+                        Object.defineProperty(Singletons, Singletons[`$${name}`].$id, {
+                            get(){
+                                return Singletons[`$${name}`]
+                            }
+                        })
+                    }
+                    Singletons[`$${name}`].$complete()
+                }
+                return Singletons[`$${name}`]
             }
         })
-        if(!(obj.$id in Singletons)){
-            Object.defineProperty(Singletons, obj.$id, {
-                get(){
-                    obj.$complete()
-                    return obj
-                }
-            })
-        }
-        
-        // Singletons[name] = obj
-        // if(obj.$id) Singletons[obj.$id] = obj
-        // obj.$complete()
-    }
-    for(let name in Singletons){
-        Singletons[name].$complete()
     }
     let root = new (Function('return '+document.body.dataset.qml.replace('.qml', ''))())(mainRoot)
 
