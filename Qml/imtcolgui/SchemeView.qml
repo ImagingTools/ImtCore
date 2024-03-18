@@ -671,7 +671,7 @@ Rectangle {
                 ctx.strokeStyle = canvas.mainTextColor;
                 ctx.fillStyle = canvas.mainTextColor;
                 ctx.lineWidth = 1;
-                let fontStr = String(canvas.fontSize) + "px sans-serif"
+                let fontStr = "bold " + String(canvas.fontSize) + "px sans-serif"
                 ctx.font = fontStr; //"20px sans-serif";
                 let textStr = mainText
                 let textWidth = ctx.measureText(mainText).width
@@ -681,7 +681,7 @@ Rectangle {
 
                 ctx.beginPath()
                 ctx.fillText(textStr, text_x, text_y);
-                ctx.strokeText(textStr, text_x, text_y);
+//                ctx.strokeText(textStr, text_x, text_y);
 
                 //Second text
                 ctx.strokeStyle = canvas.secondTextColor;

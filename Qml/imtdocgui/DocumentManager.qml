@@ -610,13 +610,11 @@ Item {
                 }
 
                 function onDocumentModelChanged(){
-
                     if (!singleDocumentData.documentDataController || !singleDocumentData.documentDataController.documentModel){
                         return;
                     }
 
                     let documentModel = singleDocumentData.documentDataController.documentModel;
-                    console.log("singleDocumentData onDocumentModelChanged", documentModel);
 
                     if (documentModel.ContainsKey("Id")){
                         singleDocumentData.documentId = documentModel.GetData("Id");
@@ -628,9 +626,6 @@ Item {
 
                     singleDocumentData.blockingUpdateModel = true;
                     for (let i = 0; i < singleDocumentData.views.length; i++){
-                        console.log("singleDocumentData.views[i].model", singleDocumentData.views[i].model);
-                        console.log("singleDocumentData.views[i]", singleDocumentData.views[i]);
-
                         singleDocumentData.views[i].model = documentModel;
                         if (documentManager.documentsModel.get(singleDocumentData.documentIndex).IsNew){
                             singleDocumentData.views[i].doUpdateModel();

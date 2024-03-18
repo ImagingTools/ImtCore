@@ -98,10 +98,10 @@ WebSocket {
     }
 
     function registerSubscriptionToServer(){
+        console.log("registerSubscriptionToServer",container.status);
         if (container.status != WebSocket.Open){
             return;
         }
-        console.log("registerSubscriptionToServer");
 
         for (let index = 0; index < subscriptionModel.length; index++){
             if (subscriptionModel[index]["status"] === "unregistered"){
@@ -121,6 +121,8 @@ WebSocket {
     }
 
     function registerSubscription(query, subscriptionClient){
+        console.log("registerSubscription", query, subscriptionClient);
+
         for (let index = 0; index < subscriptionModel.length; index++){
             if (subscriptionModel[index]["subscription"] === subscriptionClient){
                 return;

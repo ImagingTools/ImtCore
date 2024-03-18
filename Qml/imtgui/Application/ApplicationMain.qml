@@ -98,6 +98,7 @@ Item {
         applicationInfoProvider: application.applicationInfoProvider;
 
         onServerModelChanged: {
+            console.log("onServerModelChanged", serverModel);
             let design = application.designProvider.getDesignSchema();
 
             console.log("design", design);
@@ -147,12 +148,15 @@ Item {
     SubscriptionManager {
         id: subscriptionManager;
 
-        active: application.useWebSocketSubscription;
+//        active: application.useWebSocketSubscription;
 
         property bool applyUrl: application.serverReady && application.settingsProvider.serverModel != null;
         onApplyUrlChanged: {
+            console.log("onApplyUrlChanged", applyUrl);
+
             if (applyUrl){
                 let webSocketServerUrl = application.settingsProvider.getValue("WebSocketServerUrl");
+                console.log("webSocketServerUrl", webSocketServerUrl);
 
                 if (webSocketServerUrl && webSocketServerUrl !== ""){
                     webSocketServerUrl =  webSocketServerUrl.replace("http", "ws")

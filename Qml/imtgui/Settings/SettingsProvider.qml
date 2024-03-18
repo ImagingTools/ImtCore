@@ -248,14 +248,16 @@ QtObject {
                             let parameterId = String(parametersModel.GetData("Id", j));
                             if (parameterId == String("Language")){
                                 let languageParametersModel = parametersModel.GetData("Parameters", j);
-                                for (let k = 0; k < languageParametersModel.GetItemsCount(); k++){
-                                    let langId = languageParametersModel.GetData("Id", k);
-                                    if (String(langId) == String(language)){
-                                        parametersModel.SetData("Value", k, j);
-                                        break;
+                                if (languageParametersModel){
+                                    for (let k = 0; k < languageParametersModel.GetItemsCount(); k++){
+                                        let langId = languageParametersModel.GetData("Id", k);
+                                        if (String(langId) == String(language)){
+                                            parametersModel.SetData("Value", k, j);
+                                            break;
+                                        }
                                     }
+                                    break;
                                 }
-                                break;
                             }
                         }
                     }
