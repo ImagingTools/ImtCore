@@ -45,14 +45,13 @@ class Repeater extends Item {
                 if(this.$items[i]){
                     let obj = this.$items[i]
                     delete this.$items[i]
-                    for(let k = i + 1; k < this.$items.length.get() + (bottomRight - leftTop); k++){
-                        if(this.$items[k]){
-                            this.$items[k-1] = this.$items[k]
-                            delete this.$items[k]
-                        }
-                    }
                     obj.destroy()
-                    
+                }
+            }
+            for(let k = bottomRight; k < this.$items.length.get() + (bottomRight - leftTop); k++){
+                if(this.$items[k]){
+                    this.$items[k-(bottomRight - leftTop)] = this.$items[k]
+                    delete this.$items[k]
                 }
             }
         }
