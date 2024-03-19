@@ -59,6 +59,7 @@ class Text extends Item {
 
         this.impl = document.createElement('span')
         this.impl.style.textAlign = 'inherit'
+        this.impl.style.textOverflow = 'inherit'
         this.getDom().appendChild(this.impl)
 
         this.getProperty('visible').getNotify().connect(()=>{
