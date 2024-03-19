@@ -15,7 +15,9 @@ Item {
     property alias textInputValidator: input.textInputValidator;
     property alias echoMode: input.echoMode;
 
+    property alias font: title.font.family;
     property alias titleFontFamily: title.font.family;
+    property alias titleFontPixelSize: title.font.pixelSize;
 
     property string placeHolderText;
 

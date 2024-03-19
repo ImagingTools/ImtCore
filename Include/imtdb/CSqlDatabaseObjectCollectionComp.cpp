@@ -158,6 +158,12 @@ bool CSqlDatabaseObjectCollectionComp::GetObjectData(const QByteArray& objectId,
 		return false;
 	}
 
+	if (!m_dbEngineCompPtr.IsValid()){
+		SendCriticalMessage(0, "Invalid component configuration: Database engine missing", "Database collection");
+
+		return 0;
+	}
+
 	if (objectId.isEmpty()){
 		return false;
 	}
@@ -228,6 +234,12 @@ imtbase::IObjectCollection* CSqlDatabaseObjectCollectionComp::CreateSubCollectio
 {
 	if (!m_objectCollectionFactoryCompPtr.IsValid()){
 		return nullptr;
+	}
+
+	if (!m_dbEngineCompPtr.IsValid()){
+		SendCriticalMessage(0, "Invalid component configuration: Database engine missing", "Database collection");
+
+		return 0;
 	}
 
 	imtbase::IObjectCollection* collectionPtr = m_objectCollectionFactoryCompPtr.CreateInstance();

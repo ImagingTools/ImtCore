@@ -174,14 +174,38 @@ bool CGqlSubscriberControllerCompBase::SetSubscriptions()
 }
 
 
+bool CGqlSubscriberControllerCompBase::SetData(
+			const QByteArray& id,
+			const QByteArray& subscriptionId,
+			const QByteArray& data,
+			const imtrest::IRequest& networkRequest)
+{
+	QByteArray body = QString(R"({"type": "data","id": "%1","payload": {"data": {"%2": %3}}})")
+				.arg(qPrintable(id))
+				.arg(qPrintable(subscriptionId))
+				.arg(qPrintable(data)).toUtf8();
+
+	QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
+	const imtrest::IProtocolEngine& engine = networkRequest.GetProtocolEngine();
+
+	imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(networkRequest, imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
+	if (responsePtr.IsValid()){
+		const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest.GetRequestId());
+		if (sender != nullptr){
+			sender->SendResponse(responsePtr);
+		}
+	}
+
+	return true;
+}
+
+
 bool CGqlSubscriberControllerCompBase::SetAllSubscriptions(const QByteArray& subscriptionId, const QByteArray& data)
 {
 	if (!m_requestManagerCompPtr.IsValid()){
 		return false;
 	}
 
-	qDebug() << "SetAllSubscriptions" << subscriptionId << data;
-	qDebug() << "m_registeredSubscribers " << m_registeredSubscribers.count();
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequestPtr = requestNetworks.networkRequests[id];

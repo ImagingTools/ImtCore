@@ -51,6 +51,7 @@ public:
 
 protected:
 	virtual bool SetSubscriptions();
+	virtual bool SetData(const QByteArray& id, const QByteArray& subscriptionId, const QByteArray& data, const imtrest::IRequest& networkRequest);
 	virtual bool SetAllSubscriptions(const QByteArray& subscriptionId, const QByteArray& data);
 	virtual bool StartInternalSubscriber(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage);
 

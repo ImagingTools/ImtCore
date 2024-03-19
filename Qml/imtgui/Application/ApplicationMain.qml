@@ -148,7 +148,7 @@ Item {
     SubscriptionManager {
         id: subscriptionManager;
 
-//        active: application.useWebSocketSubscription;
+        active: application.useWebSocketSubscription;
 
         property bool applyUrl: application.serverReady && application.settingsProvider.serverModel != null;
         onApplyUrlChanged: {
@@ -166,7 +166,6 @@ Item {
                 }
 
                 let serverUrl = application.settingsProvider.getValue("ServerUrl");
-
                 if (serverUrl !== ""){
                     if (serverUrl[serverUrl.length - 1] !== '/'){
                         serverUrl += "/";
@@ -174,7 +173,6 @@ Item {
 
                     serverUrl += context.appName + "/wssub";
                     serverUrl = serverUrl.replace("http", "ws")
-
                 }
                 else{
                     serverUrl = "ws://" + context.location.host + "/" + context.appName + "/wssub";
@@ -185,7 +183,7 @@ Item {
         }
 
         onError: {
-            Events.sendEvent("SendWarningError", qsTr("There is no connection to the subscription server. Check the Web Server Socket Url in the settings or contact your system administrator."));
+//            Events.sendEvent("SendWarningError", qsTr("There is no connection to the subscription server. Check the Web Server Socket Url in the settings or contact your system administrator."));
 //            Events.sendEvent("SendCriticalError", qsTr("Web Socket Error: ") + errorString);
         }
     }
