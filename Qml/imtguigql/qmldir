@@ -14,3 +14,4 @@ CommandsRepresentationProvider 1.0 CommandsRepresentationProvider.qml
 CollectionRepresentation 1.0 CollectionRepresentation.qml
 RemoteCollectionView 1.0 RemoteCollectionView.qml
 MetaInfoProvider 1.0 MetaInfoProvider.qml
+WebSocketPortProvider 1.0 WebSocketPortProvider.qml

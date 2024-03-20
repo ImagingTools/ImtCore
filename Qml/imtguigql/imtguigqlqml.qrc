@@ -15,5 +15,6 @@
 	<file alias="imtguigql/CollectionRepresentation.qml">CollectionRepresentation.qml</file>
 	<file alias="imtguigql/RemoteCollectionView.qml">RemoteCollectionView.qml</file>
 	<file alias="imtguigql/MetaInfoProvider.qml">MetaInfoProvider.qml</file>
+	<file alias="imtguigql/WebSocketPortProvider.qml">WebSocketPortProvider.qml</file>
     </qresource>
 </RCC>

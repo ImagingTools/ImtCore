@@ -72,6 +72,8 @@ Item {
         thumbnailDecorator.userManagementProvider.updated.connect(application.onUserModeChanged);
 
         thumbnailDecorator.loadingPage.start();
+
+        webSocketPortProvider.updateModel();
     }
 
     Component.onDestruction: {
@@ -175,26 +177,35 @@ Item {
                     serverUrl = serverUrl.replace("http", "ws")
                 }
                 else{
-                    serverUrl = "ws://" + context.location.host + "/" + context.appName + "/wssub";
+                    let address = context.location.host;
+                    let data = address.split(':')
+                    if (data.length === 2){
+                        let host = data[0];
+                        let port = webSocketPortProvider.port;
+                        if (port !== -1){
+                            serverUrl = "ws://" + host + ":" + port + "/" + context.appName + "/wssub";
+                        }
+                        else{
+                            serverUrl = "ws://" + address + "/" + context.appName + "/wssub";
+                        }
+                    }
                 }
+
                 console.log("WEB Socket serverUrl", serverUrl);
                 subscriptionManager.url = serverUrl;
             }
         }
 
         onError: {
-//            Events.sendEvent("SendWarningError", qsTr("There is no connection to the subscription server. Check the Web Server Socket Url in the settings or contact your system administrator."));
-//            Events.sendEvent("SendCriticalError", qsTr("Web Socket Error: ") + errorString);
+            //            Events.sendEvent("SendWarningError", qsTr("There is no connection to the subscription server. Check the Web Server Socket Url in the settings or contact your system administrator."));
+            //            Events.sendEvent("SendCriticalError", qsTr("Web Socket Error: ") + errorString);
         }
     }
 
-//    ModalDialogManager {
-//        id: modalDialogManager_;
+    WebSocketPortProvider {
+        id: webSocketPortProvider;
 
-//        z: 30;
-
-//        anchors.fill: parent;
-//    }
+    }
 
     ThumbnailDecorator {
         id: thumbnailDecorator;
@@ -275,15 +286,15 @@ Item {
             application.onStrongUserManagement();
         }
     }
-//    Connections {
-//        target: Qt.application;
+    //    Connections {
+    //        target: Qt.application;
 
-//        onAboutToQuit: {
-//            console.log("onAboutToQuit");
+    //        onAboutToQuit: {
+    //            console.log("onAboutToQuit");
 
-//            let dirtyDocumentsExists = thumbnailDecorator.documentManager.dirtyDocumentsExists();
+    //            let dirtyDocumentsExists = thumbnailDecorator.documentManager.dirtyDocumentsExists();
 
-//            console.log("dirtyDocumentsExists", dirtyDocumentsExists);
-//        }
-//    }
+    //            console.log("dirtyDocumentsExists", dirtyDocumentsExists);
+    //        }
+    //    }
 }
