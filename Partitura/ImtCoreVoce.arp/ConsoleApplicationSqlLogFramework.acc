@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5200" Description="ACF"/>
+            <Version Id="1" Number="2203" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394753" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description>Base framework for a console application</Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="CollectionBasedMessageConsumer" PackageId="ImtLogPck" ComponentId="CollectionBasedMessageConsumer">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="MessageCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="LogSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConsoleApplicationFramework/RuntimeStatus"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="ConsoleApplicationFramework" PackageId="ImtCoreVoce" ComponentId="ConsoleApplicationFramework">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AppendToExisting" Type="Boolean" ExportId="AppendToExisting">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationName" Type="Text" ExportId="ApplicationName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationSubname" Type="Text" ExportId="ApplicationSubname">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ApplicationType" Type="Text" ExportId="ApplicationType">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="CompanyName" Type="Text" ExportId="CompanyName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ComponentsToInitialize" Type="Reference[]" ExportId="ComponentsToInitialize">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LogLocationType" Type="Integer" ExportId="LogLocationType">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="LogPath" Type="String" ExportId="LogPath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MainVersionId" Type="Integer" ExportId="MainVersionId">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductEdition" Type="Text" ExportId="ProductEdition">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ProductName" Type="Text" ExportId="ProductName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SlaveMessageConsumer" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CollectionBasedMessageConsumer"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="LogSqlRepository" PackageId="ImtDatabaseVoce" ComponentId="LogSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SqLiteDatabaseEngine"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SqLiteDatabaseEngine" PackageId="ImtCoreVoce" ComponentId="SqLiteDatabaseEngine">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="ConsoleApplicationFramework/ApplicationInfo"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="DatabaseSqlFilePath" Type="String" ExportId="SqlLogFilePath">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="MigrationPath" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="LogMigrations"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="ibase::IApplication" ComponentId="ConsoleApplicationFramework"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="ApplicationInfo" ComponentId="ConsoleApplicationFramework/ApplicationInfo"/>
+        <Component ExportedId="DatabaseFilePath" ComponentId="SqLiteDatabaseEngine/DatabaseFilePath"/>
+        <Component ExportedId="Log" ComponentId="ConsoleApplicationFramework/Log"/>
+        <Component ExportedId="LogFilePath" ComponentId="ConsoleApplicationFramework/LogFilePath"/>
+        <Component ExportedId="RuntimeStatus" ComponentId="ConsoleApplicationFramework/RuntimeStatus"/>
+    </ExportedComponents>
+</Acf>
