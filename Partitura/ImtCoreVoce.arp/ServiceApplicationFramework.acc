@@ -2,15 +2,15 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5203" Description="ACF"/>
+            <Version Id="0" Number="5200" Description="ACF"/>
             <Version Id="1" Number="2203" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394754" Description="Qt Framework"/>
+            <Version Id="1023" Number="394753" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Base framework for service/damon-based applications</Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="ConsoleApplicationFramework" PackageId="ImtCoreVoce" ComponentId="ConsoleApplicationFramework">
+        <Element Id="ConsoleApplicationFramework" PackageId="ImtCoreVoce" ComponentId="ConsoleApplicationSqlLogFramework">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
                     <AttributeInfo Id="AppendToExisting" Type="Boolean" ExportId="AppendToExisting">
@@ -44,6 +44,9 @@
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="ProductName" Type="Text" ExportId="ProductName">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SqlLogFilePath" Type="String" ExportId="SqlLogFilePath">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
@@ -84,6 +87,7 @@
     </ExportedInterfaces>
     <ExportedComponents>
         <Component ExportedId="ApplicationInfo" ComponentId="ConsoleApplicationFramework/ApplicationInfo"/>
+        <Component ExportedId="DatabaseFilePath" ComponentId="ConsoleApplicationFramework/DatabaseFilePath"/>
         <Component ExportedId="Log" ComponentId="ConsoleApplicationFramework/Log"/>
         <Component ExportedId="LogFilePath" ComponentId="ConsoleApplicationFramework/LogFilePath"/>
         <Component ExportedId="RuntimeStatus" ComponentId="ConsoleApplicationFramework/RuntimeStatus"/>

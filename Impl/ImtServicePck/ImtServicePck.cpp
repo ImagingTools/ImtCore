@@ -15,6 +15,11 @@ I_EXPORT_PACKAGE(
 			IM_PROJECT("\"ImagingTools Core Framework\"") IM_COMPANY("ImagingTools"));
 
 I_EXPORT_COMPONENT(
+			ObjectCollectionFactory,
+			"ObjectCollection factory",
+			"Processing ObjectCollection Factory");
+
+I_EXPORT_COMPONENT(
 			ConnectionCollectionFactory,
 			"ConnectionCollection factory",
 			"Processing Connection Collection Factory");

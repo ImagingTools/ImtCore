@@ -39,7 +39,15 @@ I_EXPORT_COMPONENT(
 			"Event filter",
 			"Event Filter");
 
+I_EXPORT_COMPONENT(
+			CollectionBasedMessageConsumer,
+			"Collection based message consumer",
+			"Collection Message Consumer");
 
+I_EXPORT_COMPONENT(
+			MessageComp,
+			"Message component",
+			"Message");
 
 } // namespace ImtLogPck
 

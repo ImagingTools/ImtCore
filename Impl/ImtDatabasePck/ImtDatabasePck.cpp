@@ -75,6 +75,11 @@ I_EXPORT_COMPONENT(
 			"Delegate for SQLite json-oriented hierarchical structure tables",
 			"Database Delegate Structure Json SQLite SQL");
 
+I_EXPORT_COMPONENT(
+			SqliteJsonMessageDatabaseDelegate,
+			"Message object json delegate for SQL table",
+			"SQL JSON Message Delegate");
+
 
 } // namespace ImtDatabasePck
 

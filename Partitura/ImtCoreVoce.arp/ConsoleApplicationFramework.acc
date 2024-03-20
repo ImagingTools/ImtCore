@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5203" Description="ACF"/>
+            <Version Id="0" Number="5200" Description="ACF"/>
             <Version Id="1" Number="2203" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394754" Description="Qt Framework"/>
+            <Version Id="1023" Number="394753" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>Base framework for a console application</Description>
@@ -108,6 +108,9 @@
                     </AttributeInfo>
                     <AttributeInfo Id="LogFile" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="LogFilePath"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SlaveMessageConsumer" Type="Reference" ExportId="SlaveMessageConsumer">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="UseCategory" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="false"/>

@@ -8,6 +8,7 @@
 
 // ImtCore includes
 #include <imtbase/TComponentFactoryComp.h>
+#include <imtbase/IObjectCollection.h>
 #include <imtservice/CConnectionCollectionComp.h>
 #include <imtservice/CUrlConnectionParamComp.h>
 
@@ -19,6 +20,7 @@ namespace ImtServicePck
 {
 
 
+typedef imtbase::TComponentFactoryComp<imtbase::IObjectCollection> ObjectCollectionFactory;
 typedef imtbase::TComponentFactoryComp<imtservice::IConnectionCollection> ConnectionCollectionFactory;
 typedef imod::TModelWrap<imtservice::CConnectionCollectionComp> ConnectionCollection;
 typedef imtservice::CUrlConnectionParamComp UrlConnectionParamInfo;

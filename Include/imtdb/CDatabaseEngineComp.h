@@ -45,8 +45,8 @@ public:
 		I_REGISTER_SUBELEMENT_INTERFACE(DatabaseAccessSettings, imod::IModel, ExtractDatabaseAccessSettings);
 		I_ASSIGN(m_databaseAccessSettingsCompPtr, "DatabaseAccessSettings", "Settings for database access", false, "DatabaseAccessSettings");
 		I_ASSIGN(m_dbTypeAttrPtr, "DbType", "The property holds database connections using the driver", true, "QPSQL");
-		I_ASSIGN(m_dbNameAttrPtr, "DbName", "The property holds connection's database name", true, "postgres");
-		I_ASSIGN(m_dbPathAttrPtr, "DbPath", "The property holds connection's database path", true, "");
+		I_ASSIGN(m_dbNameAttrPtr, "DbName", "The property holds connection's database name", true, "");
+		I_ASSIGN(m_dbFilePathCompPtr, "DbPath", "Database path for a file-based database", false, "");
 		I_ASSIGN(m_userNameAttrPtr, "UserName", "The property holds connection's user name", true, "postgres");
 		I_ASSIGN(m_paswordAttrPtr, "Pasword", "The property holds connection's password.", true, "12345");
 		I_ASSIGN(m_hostNameAttrPtr, "HostName", "The property holds connection's host name.", true, "localhost");
@@ -90,6 +90,7 @@ protected:
 	virtual bool ExecuteDatabasePatches() const;
 	virtual bool ExecuteTransaction(const QByteArray& sqlQuery) const;
 	void OnDatabaseAccessChanged(const istd::IChangeable::ChangeSet& changeSet, const imtdb::IDatabaseLoginSettings* databaseAccessSettingsPtr);
+	QSqlDatabase InitDatabase(QByteArray databaseDriverTypeId) const;
 
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -145,7 +146,7 @@ private:
 	I_REF(imtdb::IDatabaseLoginSettings, m_databaseAccessSettingsCompPtr);
 	I_ATTR(QByteArray, m_dbTypeAttrPtr);
 	I_ATTR(QByteArray, m_dbNameAttrPtr);
-	I_ATTR(QByteArray, m_dbPathAttrPtr);
+	I_REF(ifile::IFileNameParam, m_dbFilePathCompPtr);
 	I_ATTR(QByteArray, m_userNameAttrPtr);
 	I_ATTR(QByteArray, m_paswordAttrPtr);
 	I_ATTR(QByteArray, m_hostNameAttrPtr);

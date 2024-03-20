@@ -222,24 +222,7 @@ bool CDatabaseEngineComp::OpenDatabase() const
 
 	QByteArray databaseDriverTypeId = *m_dbTypeAttrPtr;
 
-	databaseConnection = QSqlDatabase::addDatabase(databaseDriverTypeId, GetConnectionName());
-
-	databaseConnection.setConnectOptions(GetConnectionOptionsString(databaseDriverTypeId));
-
-	QString databaseName = GetDatabaseName();
-	if (databaseDriverTypeId.compare(QByteArray("QODBC"), Qt::CaseInsensitive) == 0){
-	}
-	else if (databaseDriverTypeId.compare(QByteArray("QSQLITE"), Qt::CaseInsensitive) == 0){
-		 databaseName = GetDatabasePath();
-	}
-	else{
-		databaseConnection.setHostName(GetHostName());
-		databaseConnection.setUserName(GetUserName());
-		databaseConnection.setPassword(GetPassword());
-		databaseConnection.setPort(GetPort());
-	}
-
-	databaseConnection.setDatabaseName(databaseName);
+	databaseConnection = InitDatabase(databaseDriverTypeId);
 
 	retVal = databaseConnection.open();
 
@@ -278,16 +261,8 @@ bool CDatabaseEngineComp::CreateDatabase(int flags) const
 	}
 
 	if (retVal){
-		// Initialize a new connection to the "real" database:
-		QSqlDatabase databaseConnection = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, GetConnectionName());
-
-		databaseConnection.setConnectOptions(GetConnectionOptionsString(*m_dbTypeAttrPtr));
-
-		databaseConnection.setHostName(GetHostName());
-		databaseConnection.setUserName(GetUserName());
-		databaseConnection.setPassword(GetPassword());
-		databaseConnection.setDatabaseName(GetDatabaseName());
-		databaseConnection.setPort(GetPort());
+		QByteArray databaseDriverTypeId = *m_dbTypeAttrPtr;
+		QSqlDatabase databaseConnection = InitDatabase(databaseDriverTypeId);
 
 		// Open the database
 		retVal = databaseConnection.open();
@@ -391,6 +366,31 @@ void CDatabaseEngineComp::OnDatabaseAccessChanged(
 	if (databaseAccessSettingsPtr != nullptr){
 		m_workingAccessSettings.CopyFrom(*databaseAccessSettingsPtr);
 	}
+}
+
+
+QSqlDatabase CDatabaseEngineComp::InitDatabase(QByteArray databaseDriverTypeId) const
+{
+	QSqlDatabase databaseConnection = QSqlDatabase::addDatabase(databaseDriverTypeId, GetConnectionName());
+
+	databaseConnection.setConnectOptions(GetConnectionOptionsString(databaseDriverTypeId));
+
+	QString databaseName = GetDatabaseName();
+	if (databaseDriverTypeId.compare(QByteArray("QODBC"), Qt::CaseInsensitive) == 0){
+	}
+	else if (databaseDriverTypeId.compare(QByteArray("QSQLITE"), Qt::CaseInsensitive) == 0){
+		databaseName = GetDatabasePath();
+	}
+	else{
+		databaseConnection.setHostName(GetHostName());
+		databaseConnection.setUserName(GetUserName());
+		databaseConnection.setPassword(GetPassword());
+		databaseConnection.setPort(GetPort());
+	}
+
+	databaseConnection.setDatabaseName(databaseName);
+
+	return databaseConnection;
 }
 
 
@@ -615,7 +615,14 @@ QString CDatabaseEngineComp::GetDatabaseName() const
 		return m_databaseAccessSettingsCompPtr->GetDatabaseName();
 	}
 
-	return *m_dbNameAttrPtr;
+	QString databaseName = *m_dbNameAttrPtr;
+
+	if (databaseName.isEmpty()){
+		QFileInfo fileInfo(GetDatabasePath());
+		databaseName = fileInfo.fileName();
+	}
+
+	return databaseName;
 }
 
 
@@ -625,7 +632,13 @@ QString CDatabaseEngineComp::GetDatabasePath() const
 		return m_databaseAccessSettingsCompPtr->GetDatabasePath();
 	}
 
-	return *m_dbPathAttrPtr;
+	if (!m_dbFilePathCompPtr.IsValid()){
+		SendErrorMessage(0, QString("Database file path incorrected"));
+
+		return QString();
+	}
+
+	return m_dbFilePathCompPtr->GetPath();
 }
 
 
