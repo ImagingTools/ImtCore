@@ -4,14 +4,15 @@
 namespace imtlog
 {
 
-CCollectionBasedMessageConsumerComp::CCollectionBasedMessageConsumerComp()
-	: m_isSystemStarted(false)
-{
 
+CCollectionBasedMessageConsumerComp::CCollectionBasedMessageConsumerComp()
+	:m_isSystemStarted(false)
+{
 }
 
 
 // reimplemented (ilog::IMessageConsumer)
+
 void CCollectionBasedMessageConsumerComp::OnSystemStarted()
 {
 	BaseClass::OnSystemStarted();
@@ -19,21 +20,23 @@ void CCollectionBasedMessageConsumerComp::OnSystemStarted()
 	m_isSystemStarted = true;
 }
 
+
 // reimplemented (ilog::IMessageConsumer)
+
 void CCollectionBasedMessageConsumerComp::WriteMessageToLog(const MessagePtr& messagePtr)
 {
 	if (m_isSystemStarted){
-		if (!m_messageCollection.IsValid()){
+		if (!m_messageCollectionCompPtr.IsValid()){
 			Q_ASSERT(false);
 
 			return;
 		}
 		while (!m_startMessages.isEmpty()){
 		const MessagePtr startMessage = m_startMessages.takeFirst();
-			m_messageCollection->InsertNewObject("Message", "", "", startMessage.GetPtr());
+			m_messageCollectionCompPtr->InsertNewObject("Message", "", "", startMessage.GetPtr());
 		}
 
-		m_messageCollection->InsertNewObject("Message", "", "", messagePtr.GetPtr());
+		m_messageCollectionCompPtr->InsertNewObject("Message", "", "", messagePtr.GetPtr());
 	}
 	else {
 		m_startMessages.append(messagePtr);

@@ -21,7 +21,7 @@ public:
 	typedef ibase::TRuntimeStatusHanderCompWrap<ilog::CLogCompBase> BaseClass;
 
 	I_BEGIN_COMPONENT(CCollectionBasedMessageConsumerComp);
-		I_ASSIGN(m_messageCollection, "MessageCollection", "Message collection", true, "MessageCollection");
+		I_ASSIGN(m_messageCollectionCompPtr, "MessageCollection", "Message collection", true, "MessageCollection");
 	I_END_COMPONENT;
 
 	CCollectionBasedMessageConsumerComp();
@@ -34,13 +34,11 @@ protected:
 	virtual void WriteMessageToLog(const MessagePtr& messagePtr) override;
 
 private:
-	I_REF(imtbase::IObjectCollection, m_messageCollection);
+	I_REF(imtbase::IObjectCollection, m_messageCollectionCompPtr);
 
 	bool m_isSystemStarted;
 	QList<MessagePtr> m_startMessages;
 };
-
-// Q_DECLARE_METATYPE(ilog::IMessageConsumer::MessagePtr);
 
 
 } // namespace imtlog
