@@ -248,6 +248,7 @@ class MouseController {
                 let wasDblClicked = false
 
                 if(this.dblClicked){
+                    this.timestamp = 0
                     this.target.mouse.accepted = false
                     if(this.target.$signals.doubleClicked) {
                         this.target.$signals.doubleClicked()
@@ -290,6 +291,7 @@ class MouseController {
         } else {
             let wasDblClicked = false
             if(this.dblClicked){
+                this.timestamp = 0
                 for(let i = 0; i < this.pressed.length; i++){
                     if(this.pressed[i] instanceof TextInput || this.pressed[i] instanceof TextEdit){
                         break
