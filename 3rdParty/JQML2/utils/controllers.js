@@ -77,7 +77,7 @@ class MouseController {
         let inner = []
 
         for(let element of elements){
-            if(element.id && UIDList[element.id] && (UIDList[element.id].$mousearea || (UIDList[element.id].$flickable && UIDList[element.id].getPropertyValue('interactive')) || UIDList[element.id].$textinput) && UIDList[element.id].getPropertyValue('enabled') && UIDList[element.id].getPropertyValue('visible')){
+            if(element.id && UIDList[element.id] && (UIDList[element.id] instanceof MouseArea || UIDList[element.id] instanceof TextEdit || UIDList[element.id] instanceof TextInput || UIDList[element.id] instanceof Map || (UIDList[element.id] instanceof Flickable && UIDList[element.id].getPropertyValue('interactive'))) && UIDList[element.id].getPropertyValue('enabled') && UIDList[element.id].getPropertyValue('visible')){
                 inner.push(UIDList[element.id])
             }
         }
@@ -142,7 +142,7 @@ class MouseController {
 
         this.oldList = []
         
-        if(inner[0] && inner[0] instanceof TextInput || inner[0] instanceof TextEdit){
+        if(inner[0] && inner[0] instanceof TextInput || inner[0] instanceof TextEdit || inner[0] instanceof Map){
             if(inner[0].getPropertyValue('enabled') && inner[0].getPropertyValue('visible')) {
                 this.target = inner[0]
                 return
@@ -220,7 +220,7 @@ class MouseController {
         //     this.target = view
         // }
 
-        if(!this.target || !(this.target instanceof TextInput || this.target instanceof TextInput)){
+        if(!this.target || !(this.target instanceof TextInput || this.target instanceof TextInput || this.target instanceof Map)){
             e.preventDefault()
         }
     }
@@ -331,7 +331,14 @@ class MouseController {
         this.moveX = x
         this.moveY = y
 
+        let inner = this.get(x, y)
+
+        
+
         if(this.target){
+            if(this.target instanceof Map){
+                return
+            }
             if(this.target instanceof MouseArea){
                 let rect = this.target.getDom().getBoundingClientRect()
                 let norm = this.target.normalizeXY(x - rect.x, y - rect.y)
@@ -344,7 +351,12 @@ class MouseController {
     
                 if((this.target.getPropertyValue('pressed') || this.target.getPropertyValue('hoverEnabled')) && this.target.$signals.positionChanged) this.target.$signals.positionChanged()
     
-                this.target.getProperty('containsMouse').reset(true)
+                if(inner.indexOf(this.target) >= 0){
+                    this.target.getProperty('containsMouse').reset(true)
+                } else {
+                    this.target.getProperty('containsMouse').reset(false)
+                }
+                
                 if(this.target.$signals && this.target.$signals.entered && !this.target.$entered) {
                     this.target.$signals.entered()
                 }
@@ -373,80 +385,48 @@ class MouseController {
             }
         } else {
             e.preventDefault()
+
             document.body.style.cursor = 'default'
+            let contains = false
             
-            let inner
-            if(this.pressed.length){
-                inner = this.pressed
-            } else {
-                inner = this.get(x, y)
+            for(let i = this.list.length-1; i >= 0; i--){
+                if(this.list[i].UID && this.list[i] instanceof MouseArea && this.list[i].getPropertyValue('hoverEnabled')){
+                    let rect = this.list[i].getDom().getBoundingClientRect()
+                    let norm = this.list[i].normalizeXY(x - rect.x, y - rect.y)
+                    this.list[i].mouse.x = norm.x
+                    this.list[i].mouse.y = norm.y
+                    this.list[i].getStatement('mouseX').reset(norm.x)
+                    this.list[i].getStatement('mouseY').reset(norm.y)
+    
+                    if(!contains && inner.indexOf(this.list[i]) >= 0){
+                        contains = true
+                        if((this.list[i].getPropertyValue('pressed') || this.list[i].getPropertyValue('hoverEnabled')) && this.list[i].$signals.positionChanged) this.list[i].$signals.positionChanged()
+                        
+                        this.list[i].getProperty('containsMouse').reset(true)
+                        if(this.list[i].$signals && this.list[i].$signals.entered && !this.list[i].$entered) {
+                            this.list[i].$signals.entered()
+                        }
+                        this.list[i].$entered = true
+                    } else {
+                        this.list[i].getProperty('containsMouse').reset(false) 
+                        if(this.list[i].$signals && this.list[i].$signals.exited && this.list[i].$entered) {  
+                            this.list[i].$signals.exited()
+                        }
+                        delete this.list[i].$entered
+                    }
+                    
+                }
             }
 
             for(let i = 0; i < inner.length; i++){
                 if(inner[i] instanceof TextInput || inner[i] instanceof TextEdit){
                     document.body.style.cursor = 'text'
                     break
-                } else if(inner[i] instanceof MouseArea && inner[i].getPropertyValue('hoverEnabled')){
+                } else if(inner[i] instanceof MouseArea && inner[i].$properties.cursorShape && inner[i].getPropertyValue('hoverEnabled')){
                     document.body.style.cursor = inner[i].getPropertyValue('cursorShape')
                     break
                 }
             }
-
-            for(let i = 0; i < inner.length; i++){
-                let index = this.oldList.indexOf(inner[i])
-                if(index >= 0) this.oldList.splice(index, 1)
-            }
-
-            for(let i = 0; i < this.oldList.length; i++){
-                if(this.oldList[i].UID && this.oldList[i] instanceof MouseArea && this.oldList[i].getPropertyValue('hoverEnabled')){
-                    let rect = this.oldList[i].getDom().getBoundingClientRect()
-                    let norm = this.oldList[i].normalizeXY(x - rect.x, y - rect.y)
-                    this.oldList[i].mouse.x = norm.x
-                    this.oldList[i].mouse.y = norm.y
-                    this.oldList[i].getStatement('mouseX').reset(norm.x)
-                    this.oldList[i].getStatement('mouseY').reset(norm.y)
-
-                    // document.body.style.cursor = this.oldList[i].getPropertyValue('cursorShape')
-
-                    if((this.oldList[i].getPropertyValue('pressed') || this.oldList[i].getPropertyValue('hoverEnabled')) && this.oldList[i].$signals.positionChanged) this.oldList[i].$signals.positionChanged()
-
-                    this.oldList[i].getProperty('containsMouse').reset(false) 
-                    if(this.oldList[i].$signals && this.oldList[i].$signals.exited && this.oldList[i].$entered) {  
-                        this.oldList[i].$signals.exited()
-                    }
-                    delete this.oldList[i].$entered
-                }
-            }
-
-            if(this.pressed.length){
-                this.oldList = []
-            } else {
-                this.oldList = inner
-            }
-            
-
-            for(let i = 0; i < inner.length; i++){
-                if(inner[i] instanceof MouseArea && inner[i].getPropertyValue('hoverEnabled')){
-                    let rect = inner[i].getDom().getBoundingClientRect()
-                    let norm = inner[i].normalizeXY(x - rect.x, y - rect.y)
-                    inner[i].mouse.x = norm.x
-                    inner[i].mouse.y = norm.y
-                    inner[i].getStatement('mouseX').reset(norm.x)
-                    inner[i].getStatement('mouseY').reset(norm.y)
-
-                    // if(document.body.style.cursor === 'default') document.body.style.cursor = inner[i].getPropertyValue('cursorShape')
-
-                    if((inner[i].getPropertyValue('pressed') || inner[i].getPropertyValue('hoverEnabled')) && inner[i].$signals.positionChanged) inner[i].$signals.positionChanged()
-
-                    inner[i].getProperty('containsMouse').reset(true)
-                    if(inner[i].$signals && inner[i].$signals.entered && !inner[i].$entered) {
-                        inner[i].$signals.entered()
-                    }
-                    inner[i].$entered = true
-                }
-                
-            }
-
         }
         
 

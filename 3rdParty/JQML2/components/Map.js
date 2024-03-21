@@ -22,6 +22,12 @@ class Map extends Item {
         this.$queue = new Set()
         this.$initialized = false
         this.getSignal('Component.completed').connect(this, this.$init)
+        MouseController.add(this)
+
+        this.setStyle({
+            pointerEvents: 'auto',
+            touchAction: 'auto',
+        })
     }
 
     $init(){
@@ -149,6 +155,7 @@ class Map extends Item {
         }
     }
     destroy(){
+        MouseController.remove(this)
         this.$queue.clear()
         super.destroy()
     }
