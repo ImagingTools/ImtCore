@@ -387,7 +387,7 @@ class MouseController {
             e.preventDefault()
 
             document.body.style.cursor = 'default'
-            let contains = false
+            let accepted = false
             
             for(let i = this.list.length-1; i >= 0; i--){
                 if(this.list[i].UID && this.list[i] instanceof MouseArea && this.list[i].getPropertyValue('hoverEnabled')){
@@ -398,10 +398,13 @@ class MouseController {
                     this.list[i].getStatement('mouseX').reset(norm.x)
                     this.list[i].getStatement('mouseY').reset(norm.y)
     
-                    if(!contains && inner.indexOf(this.list[i]) >= 0){
-                        contains = true
-                        if((this.list[i].getPropertyValue('pressed') || this.list[i].getPropertyValue('hoverEnabled')) && this.list[i].$signals.positionChanged) this.list[i].$signals.positionChanged()
-                        
+                    if(inner.indexOf(this.list[i]) >= 0){
+                        this.list[i].mouse.accepted = false
+                        if(!accepted && (this.list[i].getPropertyValue('pressed') || this.list[i].getPropertyValue('hoverEnabled')) && this.list[i].$signals.positionChanged) {
+                            this.list[i].$signals.positionChanged()
+                            this.accepted = this.list[i].mouse.accepted
+                        }
+
                         this.list[i].getProperty('containsMouse').reset(true)
                         if(this.list[i].$signals && this.list[i].$signals.entered && !this.list[i].$entered) {
                             this.list[i].$signals.entered()
