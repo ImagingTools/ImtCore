@@ -936,6 +936,26 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
             stat.value.push(`)`)
             break
         }
+        case 'try': {
+            stat.value.push(`try{`)
+            prepare(tree[1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            if(tree[2][0]){
+                stat.ignore.push(tree[2][0])
+                stat.value.push(`}catch(${tree[2][0]}){`)
+                prepare(tree[2][1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            } else {
+                stat.value.push(`}catch{`)
+                prepare(tree[2][1], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            }
+            stat.value.push(`}`)
+            if(tree[3] && tree[3].length){
+                stat.value.push(`finally{`)
+                prepare(tree[3], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+                stat.value.push(`}`)
+            }
+
+            break
+        }
         case 'break': {
             stat.value.push(`break;`)
             break
