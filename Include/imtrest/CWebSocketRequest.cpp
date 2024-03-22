@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QUrlQuery>
+#include <QtCore/QUuid>
 #if QT_CONFIG(ssl)
 #include <QtNetwork/QSslSocket>
 #endif
