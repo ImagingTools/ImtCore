@@ -15,6 +15,7 @@ namespace imtddl
 
 
 // reimplemented (CConstVarCreatorProcessorCompBase)
+
 bool CConstVarQrcCreatorProcessorComp::OpenFiles(const iprm::IParamsSet* paramsPtr)
 {
 	QString filePath = GetQmlDirPath(paramsPtr);
@@ -28,10 +29,10 @@ bool CConstVarQrcCreatorProcessorComp::OpenFiles(const iprm::IParamsSet* paramsP
 		m_outputFile.resize(0);
 		QTextStream textStream(&m_outputFile);
 
-		textStream << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << Qt::endl;
-		textStream << "<RCC>" << Qt::endl;
-		textStream << "	<qresource prefix=\"/qml\">" << Qt::endl;
-		textStream << QString("		<file alias=\"%1/qmldir\">%1/qmldir</file>").arg(moduleName) << Qt::endl;
+		textStream << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" << "\n";
+		textStream << "<RCC>" << "\n";
+		textStream << "	<qresource prefix=\"/qml\">" << "\n";
+		textStream << QString("		<file alias=\"%1/qmldir\">%1/qmldir</file>").arg(moduleName) << "\n";
 
 
 		return true;
@@ -41,13 +42,13 @@ bool CConstVarQrcCreatorProcessorComp::OpenFiles(const iprm::IParamsSet* paramsP
 }
 
 
-bool CConstVarQrcCreatorProcessorComp::CloseFiles(const iprm::IParamsSet *paramsPtr)
+bool CConstVarQrcCreatorProcessorComp::CloseFiles(const iprm::IParamsSet* /*paramsPtr*/)
 {
 	QTextStream textStream(&m_outputFile);
 	textStream.device()->seek(m_outputFile.size());
 
-	textStream << "	</qresource>" << Qt::endl;
-	textStream << "</RCC>" << Qt::endl;
+	textStream << "	</qresource>" << "\n";
+	textStream << "</RCC>" << "\n";
 
 	m_outputFile.close();
 
@@ -107,7 +108,7 @@ bool CConstVarQrcCreatorProcessorComp::CreateBody(const QString moduleName, cons
 	}
 
 	if (!isFind){
-		textStream << newLineData << Qt::endl;
+		textStream << newLineData << "\n";
 	}
 
 	return true;

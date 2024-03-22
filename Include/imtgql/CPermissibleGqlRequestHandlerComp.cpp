@@ -64,7 +64,9 @@ bool CPermissibleGqlRequestHandlerComp::CheckPermissions(const imtgql::CGqlReque
 
 // reimplemented (imtgql::CGqlRequestHandlerCompBase)
 
-imtbase::CTreeItemModel* CPermissibleGqlRequestHandlerComp::CreateInternalResponse(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+imtbase::CTreeItemModel* CPermissibleGqlRequestHandlerComp::CreateInternalResponse(
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			QString& /*errorMessage*/) const
 {
 	return nullptr;
 }

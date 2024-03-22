@@ -41,7 +41,7 @@ bool CGqlSubscriberDemultiplexerComp::RegisterSubscription(
 }
 
 
-bool CGqlSubscriberDemultiplexerComp::UnRegisterSubscription(const QByteArray& subscriptionId)
+bool CGqlSubscriberDemultiplexerComp::UnRegisterSubscription(const QByteArray& /*subscriptionId*/)
 {
 	return false;
 }

@@ -20,7 +20,7 @@ CMultiSelectionEditorComp::CMultiSelectionEditorComp()
 
 // reimplemented (imod::CMultiModelDispatcherBase)
 
-void CMultiSelectionEditorComp::OnModelChanged(int modelId, const istd::IChangeable::ChangeSet& changeSet)
+void CMultiSelectionEditorComp::OnModelChanged(int /*modelId*/, const istd::IChangeable::ChangeSet& /*changeSet*/)
 {
 	Q_ASSERT(IsGuiCreated());
 
@@ -175,10 +175,15 @@ void CMultiSelectionEditorComp::on_SelectAllButton_clicked()
 	Q_ASSERT(objectPtr != nullptr);
 
 	const imtbase::ICollectionInfo* collectionInfoPtr = objectPtr->GetSelectionConstraints();
-	if (collectionInfoPtr != nullptr) {
+	if (collectionInfoPtr != nullptr){
 		imtbase::ICollectionInfo::Ids optionIds = collectionInfoPtr->GetElementIds();
 
-		objectPtr->SetSelectedIds(imtbase::ISelection::Ids(optionIds.begin(), optionIds.end()));
+		imtbase::ISelection::Ids selectedIds;
+		for (const imtbase::ICollectionInfo::Id& selectionId : optionIds){
+			selectedIds.insert(selectionId);
+		}
+
+		objectPtr->SetSelectedIds(selectedIds);
 	}
 }
 
@@ -215,7 +220,7 @@ void CMultiSelectionEditorComp::on_InvertButton_clicked()
 }
 
 
-void CMultiSelectionEditorComp::on_ExclusiveModeButton_toggled(bool toggled)
+void CMultiSelectionEditorComp::on_ExclusiveModeButton_toggled(bool /*toggled*/)
 {
 }
 

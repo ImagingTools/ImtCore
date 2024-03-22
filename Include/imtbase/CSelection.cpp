@@ -172,7 +172,7 @@ bool CSelection::ResetData(CompatibilityMode /*mode*/)
 
 // private methods
 
-void CSelection::OnConstraintsUpdated(const istd::IChangeable::ChangeSet& changeset, const ICollectionInfo* modelPtr)
+void CSelection::OnConstraintsUpdated(const istd::IChangeable::ChangeSet& /*changeset*/, const ICollectionInfo* /*modelPtr*/)
 {
 }
 

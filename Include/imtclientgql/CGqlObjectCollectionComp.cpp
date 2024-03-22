@@ -250,7 +250,7 @@ const iprm::IOptionsList* CGqlObjectCollectionComp::GetObjectTypesInfo() const
 }
 
 
-QByteArray CGqlObjectCollectionComp::GetObjectTypeId(const Id& objectId) const
+QByteArray CGqlObjectCollectionComp::GetObjectTypeId(const Id& /*objectId*/) const
 {
 	QByteArrayList ids;
 	if (m_typeIdsAttrPtr.IsValid()) {
@@ -306,7 +306,7 @@ idoc::MetaInfoPtr CGqlObjectCollectionComp::GetDataMetaInfo(const Id& objectId) 
 
 // reimplemented (ICollectionInfo)
 
-int CGqlObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* selectionParamsPtr, ilog::IMessageConsumer* logPtr) const
+int CGqlObjectCollectionComp::GetElementsCount(const iprm::IParamsSet* selectionParamsPtr, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	int retVal = -1;
 
@@ -333,7 +333,7 @@ imtbase::ICollectionInfo::Ids CGqlObjectCollectionComp::GetElementIds(
 			int offset,
 			int count,
 			const iprm::IParamsSet* selectionParamsPtr,
-			ilog::IMessageConsumer* logPtr) const
+			ilog::IMessageConsumer* /*logPtr*/) const
 {
 	if (!m_clientCompPtr.IsValid() || !m_delegateCompPtr.IsValid()){
 		return Ids();
@@ -345,9 +345,9 @@ imtbase::ICollectionInfo::Ids CGqlObjectCollectionComp::GetElementIds(
 	if (!requestPtr.isNull()){
 		GqlResponsePtr responsePtr = m_clientCompPtr->SendRequest(requestPtr);
 		if (!responsePtr.isNull()){
-			Ids ids;
+			IGqlObjectCollectionDelegate::Ids ids;
 			if (m_delegateCompPtr->GetItemIds(*responsePtr, ids)){
-				retVal = ids;
+				std::copy(ids.begin(), ids.end(), std::back_inserter(retVal));
 			}
 		}
 	}
@@ -367,7 +367,7 @@ bool CGqlObjectCollectionComp::GetSubsetInfo(
 }
 
 
-QVariant CGqlObjectCollectionComp::GetElementInfo(const Id& elementId, int infoType, ilog::IMessageConsumer* logPtr) const
+QVariant CGqlObjectCollectionComp::GetElementInfo(const Id& elementId, int infoType, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	imtclientgql::IGqlObjectCollectionDelegate::ObjectInfo info;
 
@@ -389,7 +389,7 @@ QVariant CGqlObjectCollectionComp::GetElementInfo(const Id& elementId, int infoT
 }
 
 
-idoc::MetaInfoPtr CGqlObjectCollectionComp::GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* logPtr) const
+idoc::MetaInfoPtr CGqlObjectCollectionComp::GetElementMetaInfo(const Id& elementId, ilog::IMessageConsumer* /*logPtr*/) const
 {
 	idoc::MetaInfoPtr metaInfoPtr;
 
@@ -410,7 +410,7 @@ idoc::MetaInfoPtr CGqlObjectCollectionComp::GetElementMetaInfo(const Id& element
 }
 
 
-bool CGqlObjectCollectionComp::SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* logPtr)
+bool CGqlObjectCollectionComp::SetElementName(const Id& elementId, const QString& name, ilog::IMessageConsumer* /*logPtr*/)
 {
 	bool retVal = false;
 
@@ -431,7 +431,7 @@ bool CGqlObjectCollectionComp::SetElementName(const Id& elementId, const QString
 }
 
 
-bool CGqlObjectCollectionComp::SetElementDescription(const Id& elementId, const QString& description, ilog::IMessageConsumer* logPtr)
+bool CGqlObjectCollectionComp::SetElementDescription(const Id& elementId, const QString& description, ilog::IMessageConsumer* /*logPtr*/)
 {
 	bool retVal = false;
 

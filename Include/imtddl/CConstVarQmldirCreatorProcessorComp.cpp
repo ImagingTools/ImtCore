@@ -28,7 +28,7 @@ bool CConstVarQmldirCreatorProcessorComp::OpenFiles(const iprm::IParamsSet* para
 		QTextStream textStream(&m_outputFile);
 		QString moduleName = GetModuleName(paramsPtr);
 		if (m_outputFile.size() == 0){
-			textStream << "module " << moduleName << Qt::endl << Qt::endl;
+			textStream << "module " << moduleName << "\n\n";
 		}
 
 		return true;
@@ -87,7 +87,7 @@ bool CConstVarQmldirCreatorProcessorComp::CreateBody(const QString moduleName, c
 	}
 
 	if (!isFind){
-		textStream << "singleton " << name << " 1.0 " << name << ".qml" << Qt::endl;
+		textStream << "singleton " << name << " 1.0 " << name << ".qml" << "\n";
 	}
 
 	return true;

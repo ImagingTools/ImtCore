@@ -132,21 +132,20 @@ bool CUrlConnectionParamRepresentationController::GetDataModelFromRepresentation
 					incomingConnection.description = description;
 				}
 
-				QUrl url;
-
+				QUrl externalUrl;
 				if (externPortsModelPtr->ContainsKey("Host", i)){
 					QString host = externPortsModelPtr->GetData("Host", i).toString();
 
-					url.setHost(host);
+					externalUrl.setHost(host);
 				}
 
 				if (externPortsModelPtr->ContainsKey("Port", i)){
 					int port = externPortsModelPtr->GetData("Port", i).toInt();
 
-					url.setPort(port);
+					externalUrl.setPort(port);
 				}
 
-				incomingConnection.url = url;
+				incomingConnection.url = externalUrl;
 
 				urlConnectionParamPtr->AddExternConnection(incomingConnection);
 			}

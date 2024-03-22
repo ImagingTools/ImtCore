@@ -945,11 +945,9 @@ bool CTreeItemModel::ParseRecursive(const QJsonObject& jsonObject, int index)
 		else if(jsonValue.isObject()){
 			CTreeItemModel* treeItemModel = AddTreeModel(objectIterator.key().toUtf8(), index);
 
-			QJsonObject jsonObject = jsonValue.toObject();
-			if (!jsonObject.isEmpty()){
-//				treeItemModel->InsertNewItem();
-//				treeItemModel->ParseRecursive(jsonObject, treeItemModel->m_items.count() - 1);
-				treeItemModel->ParseRecursive(jsonObject, 0);
+			QJsonObject valueObject = jsonValue.toObject();
+			if (!valueObject.isEmpty()){
+				treeItemModel->ParseRecursive(valueObject, 0);
 			}
 		}
 		else{

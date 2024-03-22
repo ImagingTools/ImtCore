@@ -109,7 +109,7 @@ void CStructureControllerCompBase::OnComponentCreated()
 
 bool CStructureControllerCompBase::GetOperationFromRequest(
 	const imtgql::CGqlRequest& gqlRequest,
-	imtgql::CGqlObject& gqlObject,
+	imtgql::CGqlObject& /*gqlObject*/,
 	QString& errorMessage,
 	int& operationType) const
 {
@@ -515,30 +515,30 @@ imtbase::CTreeItemModel* CStructureControllerCompBase::GetNodes(
 
 
 imtbase::CTreeItemModel* CStructureControllerCompBase::GetElements(
-	const imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+	const imtgql::CGqlRequest& /*gqlRequest*/,
+	QString& /*errorMessage*/) const
 {
 	return nullptr;
 }
 
 
 bool CStructureControllerCompBase::SetupNodeItem(
-			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
-			const imtbase::IHierarchicalStructureIterator* collectionStructureIterator,
-			QString& errorMessage) const
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			imtbase::CTreeItemModel& /*model*/,
+			int /*itemIndex*/,
+			const imtbase::IHierarchicalStructureIterator* /*collectionStructureIterator*/,
+			QString& /*errorMessage*/) const
 {
 	return false;
 }
 
 
 bool CStructureControllerCompBase::SetupObjectItem(
-			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
-			const imtbase::IObjectCollectionIterator* objectCollectionIterator,
-			QString& errorMessage) const
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			imtbase::CTreeItemModel& /*model*/,
+			int /*itemIndex*/,
+			const imtbase::IObjectCollectionIterator* /*objectCollectionIterator*/,
+			QString& /*errorMessage*/) const
 {
 	return false;
 }

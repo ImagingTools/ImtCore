@@ -1,5 +1,9 @@
 #include <imtddl/CConstVarQmlCreatorProcessorComp.h>
 
+
+// STL includes
+#include <iostream>
+
 // Qt includes
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
@@ -15,6 +19,7 @@ namespace imtddl
 
 
 // reimplemented (CConstVarCreatorProcessorCompBase)
+
 QString CConstVarQmlCreatorProcessorComp::GetModuleName(const iprm::IParamsSet* paramsPtr)
 {
 	if (paramsPtr == nullptr){
@@ -33,7 +38,10 @@ QString CConstVarQmlCreatorProcessorComp::GetModuleName(const iprm::IParamsSet* 
 }
 
 
-bool CConstVarQmlCreatorProcessorComp::CreateBody(const QString moduleName, const QJsonDocument& templateDocument, const iprm::IParamsSet* paramsPtr)
+bool CConstVarQmlCreatorProcessorComp::CreateBody(
+			const QString moduleName,
+			const QJsonDocument& templateDocument,
+			const iprm::IParamsSet* paramsPtr)
 {
 	QJsonObject rootObject = templateDocument.object();
 
@@ -54,9 +62,9 @@ bool CConstVarQmlCreatorProcessorComp::CreateBody(const QString moduleName, cons
 	outputFile.resize(0);
 	QTextStream textStream(&outputFile);
 
-	textStream << "pragma Singleton" << Qt::endl;
-	textStream << "import QtQuick 2.12" << Qt::endl << Qt::endl;
-	textStream << "QtObject {" << Qt::endl;
+	textStream << "pragma Singleton" << "\n";
+	textStream << "import QtQuick 2.12" << "\n\n";
+	textStream << "QtObject {" << "\n";
 
 	for (QString key: propertyKeys){
 		QJsonObject property = properties.value(key).toObject();
@@ -67,15 +75,15 @@ bool CConstVarQmlCreatorProcessorComp::CreateBody(const QString moduleName, cons
 
 		if (property.value("type") == "int"){
 			textStream << "    readonly property int " + normalKey + ": " + QString::number(property.value("value").toInt());
-			textStream << Qt::endl;
+			textStream << "\n";
 		}
 		else{
 			textStream << "readonly property string " + normalKey + ": \"" + property.value("value").toString() + "\"";
-			textStream << Qt::endl;
+			textStream << "\n";
 		}
 	}
 
-	textStream << "}" << Qt::endl << Qt::endl;
+	textStream << "}" << "\n\n";
 
 
 	return true;

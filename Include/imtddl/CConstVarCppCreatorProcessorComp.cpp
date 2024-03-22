@@ -1,6 +1,9 @@
 #include <imtddl/CConstVarCppCreatorProcessorComp.h>
 
 
+// STL includes
+#include <iostream>
+
 // ACF includes
 #include <iprm/ITextParam.h>
 #include <iprm/TParamsPtr.h>
@@ -32,9 +35,9 @@ bool CConstVarCppCreatorProcessorComp::OpenFiles(const iprm::IParamsSet* paramsP
 	}
 	m_outputFile.resize(0);
 	QTextStream cppStream(&m_outputFile);
-	cppStream << "#include \"Globals.h\"" << Qt::endl << Qt::endl;
-	cppStream << "namespace " + moduleName << Qt::endl;
-	cppStream << "{" << Qt::endl << Qt::endl << Qt::endl;
+	cppStream << "#include \"Globals.h\"" << "\n\n";
+	cppStream << "namespace " + moduleName << "\n";
+	cppStream << "{" << "\n\n\n";
 
 	return true;
 }
@@ -44,8 +47,8 @@ bool CConstVarCppCreatorProcessorComp::CloseFiles(const iprm::IParamsSet* params
 {
 	QString moduleName = GetModuleName(paramsPtr);
 	QTextStream cppStream(&m_outputFile);
-	cppStream << Qt::endl << Qt::endl;
-	cppStream << "} // namespace " + moduleName << Qt::endl << Qt::endl;
+	cppStream << "\n\n";
+	cppStream << "} // namespace " + moduleName << "\n\n";
 
 	return true;
 }
@@ -73,7 +76,7 @@ QString CConstVarCppCreatorProcessorComp::GetModuleName(const iprm::IParamsSet* 
 bool CConstVarCppCreatorProcessorComp::CreateBody(
 			const QString moduleName,
 			const QJsonDocument& templateDocument,
-			const iprm::IParamsSet* paramsPtr)
+			const iprm::IParamsSet* /*paramsPtr*/)
 {
 
 	QJsonObject rootObject = templateDocument.object();
@@ -84,19 +87,19 @@ bool CConstVarCppCreatorProcessorComp::CreateBody(
 
 	QTextStream stream(&m_outputFile);
 
-	stream << Qt::endl;
+	stream << "\n";
 
 	for (QString key: propertyKeys){
 		QJsonObject property = properties.value(key).toObject();
 		if (property.value("type") == "int"){
-			stream << "const QString " << name << "::s_" << key << " = " << QString::number(property.value("value").toInt()) << ";" << Qt::endl;
+			stream << "const QString " << name << "::s_" << key << " = " << QString::number(property.value("value").toInt()) << ";" << "\n";
 		}
 		else{
-			stream << "const QString " << name << "::s_" << key << " = \"" << property.value("value").toString() << "\";" << Qt::endl;
+			stream << "const QString " << name << "::s_" << key << " = \"" << property.value("value").toString() << "\";" << "\n";
 		}
 	}
 
-	stream << Qt::endl;
+	stream << "\n";
 
 	return true;
 }

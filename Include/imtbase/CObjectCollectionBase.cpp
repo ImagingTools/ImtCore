@@ -622,7 +622,7 @@ int CObjectCollectionBase::GetSupportedOperations() const
 }
 
 
-bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMode mode)
+bool CObjectCollectionBase::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
 {
 	const CObjectCollectionBase* sourcePtr = dynamic_cast<const CObjectCollectionBase*>(&object);
 	if (sourcePtr != nullptr){

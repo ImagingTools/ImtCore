@@ -77,7 +77,7 @@ imtbase::ISelection::Ids CObjectCollectionViewComp::GetSelectedIds() const
 {
 	QModelIndexList selectedIndexes = ItemList->selectionModel()->selectedRows();
 
-	imtbase::ICollectionInfo::Ids itemIds;
+	imtbase::ISelection::Ids selectedIds;
 
 	QSet<QByteArray> selectedTypes;
 
@@ -88,13 +88,12 @@ imtbase::ISelection::Ids CObjectCollectionViewComp::GetSelectedIds() const
 			QModelIndex mappedIndex = selectedIndexes[i];
 			QByteArray itemId = m_tableModel.data(mappedIndex, DR_OBJECT_ID).toByteArray();
 			if (!itemId.isEmpty()){
-				itemIds.push_back(itemId);
+				selectedIds.insert(itemId);
 			}
 		}
 	}
-	ISelection::Ids ids(itemIds.cbegin(), itemIds.cend());
 
-	return ids;
+	return selectedIds;
 }
 
 

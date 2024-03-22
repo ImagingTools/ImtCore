@@ -1,6 +1,9 @@
 #include <imtddl/CConstVarHCreatorProcessorComp.h>
 
 
+// STL includes
+#include <iostream>
+
 // ACF includes
 #include <iprm/ITextParam.h>
 #include <iprm/TParamsPtr.h>
@@ -32,11 +35,11 @@ bool CConstVarHCreatorProcessorComp::OpenFiles(const iprm::IParamsSet* paramsPtr
 	m_outputFile.resize(0);
 
 	QTextStream hStream(&m_outputFile);
-	hStream << "#pragma once" << Qt::endl << Qt::endl;
-	hStream << "// Qt includes" << Qt::endl;
-	hStream << "#include <QtCore/QString>" << Qt::endl << Qt::endl << Qt::endl;
-	hStream << "namespace " + moduleName << Qt::endl;
-	hStream << "{" << Qt::endl << Qt::endl << Qt::endl;
+	hStream << "#pragma once" << "\n\n";
+	hStream << "// Qt includes" << "\n";
+	hStream << "#include <QtCore/QString>" << "\n\n\n";
+	hStream << "namespace " + moduleName << "\n";
+	hStream << "{" << "\n\n\n";
 
 	return true;
 }
@@ -46,7 +49,7 @@ bool CConstVarHCreatorProcessorComp::CloseFiles(const iprm::IParamsSet* paramsPt
 {
 	QString moduleName = GetModuleName(paramsPtr);
 	QTextStream hStream(&m_outputFile);
-	hStream << "} // namespace " + moduleName << Qt::endl << Qt::endl << Qt::endl;
+	hStream << "} // namespace " + moduleName << "\n\n\n";
 
 	return true;
 }
@@ -73,7 +76,7 @@ QString CConstVarHCreatorProcessorComp::GetModuleName(const iprm::IParamsSet* pa
 bool CConstVarHCreatorProcessorComp::CreateBody(
 			const QString moduleName,
 			const QJsonDocument& templateDocument,
-			const iprm::IParamsSet* paramsPtr)
+			const iprm::IParamsSet* /*paramsPtr*/)
 {
 
 	QJsonObject rootObject = templateDocument.object();
@@ -84,22 +87,22 @@ bool CConstVarHCreatorProcessorComp::CreateBody(
 
 	QTextStream hStream(&m_outputFile);
 
-	hStream << "struct " << name << Qt::endl;
-	hStream << "{" << Qt::endl;
+	hStream << "struct " << name << "\n";
+	hStream << "{" << "\n";
 
 	for (QString key: propertyKeys){
 		QJsonObject property = properties.value(key).toObject();
 		if (property.value("type") == "int"){
 			hStream << "static const int s_" << key << ";";
-			hStream << Qt::endl;
+			hStream << "\n";
 		}
 		else{
 			hStream << "static const QString s_" << key << ";";
-			hStream << Qt::endl;
+			hStream << "\n";
 		}
 	}
 
-	hStream << "};" << Qt::endl << Qt::endl << Qt::endl;
+	hStream << "};" << "\n\n\n";
 
 	return true;
 }

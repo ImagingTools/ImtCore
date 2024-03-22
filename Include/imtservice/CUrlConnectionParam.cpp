@@ -264,7 +264,7 @@ istd::IChangeable* CUrlConnectionParam::CloneMe(CompatibilityMode mode) const
 }
 
 
-bool CUrlConnectionParam::ResetData(CompatibilityMode mode)
+bool CUrlConnectionParam::ResetData(CompatibilityMode /*mode*/)
 {
 	istd::CChangeNotifier changeNotifier(this);
 

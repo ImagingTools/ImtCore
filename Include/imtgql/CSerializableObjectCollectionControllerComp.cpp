@@ -230,8 +230,8 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::GetObject(
 istd::IChangeable* CSerializableObjectCollectionControllerComp::CreateObject(
 			const QList<imtgql::CGqlObject>& inputParams,
 			QByteArray& objectId,
-			QString& name,
-			QString& description,
+			QString& /*name*/,
+			QString& /*description*/,
 			QString& errorMessage) const
 {
 	if (!m_objectFactCompPtr.IsValid()){

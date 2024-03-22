@@ -36,8 +36,8 @@ bool CObjectCollectionBasedPersistenceComp::IsOperationSupported(
 
 
 int CObjectCollectionBasedPersistenceComp::LoadFromFile(
-			istd::IChangeable& data,
-			const QString& filePath,
+			istd::IChangeable& /*data*/,
+			const QString& /*filePath*/,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
 	//if (m_collectionCompPtr.IsValid()){
@@ -67,8 +67,8 @@ int CObjectCollectionBasedPersistenceComp::LoadFromFile(
 
 
 int CObjectCollectionBasedPersistenceComp::SaveToFile(
-			const istd::IChangeable& data,
-			const QString& filePath,
+			const istd::IChangeable& /*data*/,
+			const QString& /*filePath*/,
 			ibase::IProgressManager* /*progressManagerPtr*/) const
 {
 	//if (m_collectionCompPtr.IsValid()){

@@ -9,7 +9,7 @@
 
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-#define QT_ENDL Qt::endl
+#define QT_ENDL std::endl
 #else
 #define QT_ENDL endl
 #endif

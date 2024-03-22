@@ -5,6 +5,7 @@
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonArray>
+#include <QtCore/QDebug>
 
 // ACF includes
 #include <idoc/CStandardDocumentMetaInfo.h>
@@ -302,7 +303,7 @@ imtgql::IGqlRequest* CGqlObjectCollectionDelegateComp::CreateSetObjectDescriptio
 }
 
 
-bool CGqlObjectCollectionDelegateComp::IsValid(const imtgql::IGqlResponse& reqponse) const
+bool CGqlObjectCollectionDelegateComp::IsValid(const imtgql::IGqlResponse& /*response*/) const
 {
 	return false;
 }
@@ -457,6 +458,8 @@ imtbase::IObjectCollection* CGqlObjectCollectionDelegateComp::GetSubCollection(
 			QByteArray objectId = info.value("id").toString().toUtf8();
 			QByteArray typeId = info.value("typeId").toString().toUtf8();
 			int version = info.value("version").toInt();
+			Q_UNUSED(version);
+
 			QString name = info.value("name").toString();
 			QString description = info.value("description").toString();
 

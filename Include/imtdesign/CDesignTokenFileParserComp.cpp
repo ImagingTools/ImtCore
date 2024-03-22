@@ -164,10 +164,9 @@ bool CDesignTokenFileParserComp::ParseFile()
 		QJsonArray iconTemplateList = styleEntry["IconTemplateList"].toArray();
 		// make ref to simplify parsing process to support old versions
 		if (iconTemplateList.isEmpty()){
-			iconTemplateList << QJsonObject({
-						std::make_pair(QStringLiteral("IconColor"), styleEntry["IconColor"]),
-						std::make_pair(QStringLiteral("TemplateIconColor"), styleEntry["TemplateIconColor"])
-			});
+			QJsonObject object;
+			object.insert(QStringLiteral("IconColor"), styleEntry["IconColor"]);
+			object.insert(QStringLiteral("TemplateIconColor"), styleEntry["TemplateIconColor"]);
 		}
 
 		for (const QJsonValue& iconColorsEntry: std::as_const(iconTemplateList)){
