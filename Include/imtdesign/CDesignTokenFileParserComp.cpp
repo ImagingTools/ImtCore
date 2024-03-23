@@ -167,6 +167,7 @@ bool CDesignTokenFileParserComp::ParseFile()
 			QJsonObject object;
 			object.insert(QStringLiteral("IconColor"), styleEntry["IconColor"]);
 			object.insert(QStringLiteral("TemplateIconColor"), styleEntry["TemplateIconColor"]);
+			iconTemplateList << object;
 		}
 
 		for (const QJsonValue& iconColorsEntry: std::as_const(iconTemplateList)){
