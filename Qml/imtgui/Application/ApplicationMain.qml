@@ -220,10 +220,10 @@ Item {
                     wsUrl = application.getWebSocketUrl(serverUrl);
                 }
                 else{
-                    wsUrl = application.getWebSocketUrl(context.location.host);
+                    wsUrl = application.getWebSocketUrl(context.location);
                 }
 
-                console.log("WEB Socket serverUrl", serverUrl);
+                console.log("WEB Socket serverUrl", wsUrl);
                 subscriptionManager.url = wsUrl;
             }
         }
