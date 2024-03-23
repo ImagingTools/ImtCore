@@ -7,12 +7,13 @@ Item {
     id: viewBase;
 
     property string viewId;
-
-    property CommandsController commandsController: null;
     property TreeItemModel model: TreeItemModel {}
-    property var commandsDelegate: ViewCommandsDelegateBase {
-//        view: viewBase
-    };
+
+    property alias commandsControllerComp: commandsControllerLoader.sourceComponent;
+    property alias commandsController: commandsControllerLoader.item;
+
+    property alias commandsDelegateComp: commandsDelegateLoader.sourceComponent;
+    property alias commandsDelegate: commandsDelegateLoader.item;
 
     property bool readOnly: false;
 
@@ -38,6 +39,25 @@ Item {
             }
             else{
                 viewBase.clearCommandsGui();
+            }
+        }
+    }
+
+    Loader {
+        id: commandsControllerLoader;
+    }
+
+    Loader {
+        id: commandsDelegateLoader;
+
+        sourceComponent: Component {
+            ViewCommandsDelegateBase {}
+        }
+
+        onLoaded: {
+            if (viewBase.viewId !== ""){
+                Events.unSubscribeAllFromSlot(item.commandHandle);
+                Events.subscribeEvent(viewBase.viewId + "CommandActivated", item.commandHandle);
             }
         }
     }

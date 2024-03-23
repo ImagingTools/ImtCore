@@ -14,15 +14,19 @@ CollectionView {
     // Invisible fields that will be requested for collection
     property var additionalFieldIds: ["Id", "Name"]
 
-    dataController: CollectionRepresentation {
-        collectionId: root.collectionId;
+    dataControllerComp: Component {
+        CollectionRepresentation {
+            collectionId: root.collectionId;
 
-        additionalFieldIds: root.additionalFieldIds;
+            additionalFieldIds: root.additionalFieldIds;
+        }
     }
 
-    commandsController: CommandsRepresentationProvider {
-        commandId: root.collectionId;
-        uuid: root.viewId;
+    commandsControllerComp: Component {
+        CommandsRepresentationProvider {
+            commandId: root.collectionId;
+            uuid: root.viewId;
+        }
     }
 
     Component.onCompleted: {
@@ -53,6 +57,8 @@ CollectionView {
     }
 
     function receiveRemoteChanges(){
+        console.log("receiveRemoteChanges");
+
         if (hasRemoteChanges){
             hasRemoteChanges = false;
 
@@ -62,6 +68,7 @@ CollectionView {
     }
 
     function setAlertPanel(alertPanel){
+        Events.sendEvent("SetAlertPanel", alertPanel)
     }
 
     MetaInfoProvider {
@@ -122,9 +129,29 @@ CollectionView {
                 text: qsTr("Update");
 
                 onClicked: {
-                    Events.sendEvent("UpdateAllModels");
+//                    Events.sendEvent("UpdateAllModels");
+
+                    root.receiveRemoteChanges()
                 }
             }
+        }
+    }
+
+    function handleSubscription(dataModel){
+        if (!dataModel){
+            return;
+        }
+
+        if (dataModel.ContainsKey("token")){
+            let accessToken = dataModel.GetData("token");
+            Events.sendEvent("GetToken", function (token){
+                if (String(token) == String(accessToken)){
+                    root.doUpdateGui();
+                }
+                else{
+                    root.hasRemoteChanges = true;
+                }
+            });
         }
     }
 
@@ -150,20 +177,8 @@ CollectionView {
 
             if (state === "Ready"){
                 if (subscriptionClient.ContainsKey("data")){
-                    root.doUpdateGui();
-
-//                    let dataModelLocal = subscriptionClient.GetData("data")
-//                    if (dataModelLocal.ContainsKey("token")){
-//                        let accessToken = dataModelLocal.GetData("token");
-//                        Events.sendEvent("GetToken", function (token){
-//                            if (String(token) == String(accessToken)){
-//                                root.doUpdateGui();
-//                            }
-//                            else{
-//                                root.hasRemoteChanges = true;
-//                            }
-//                        });
-//                    }
+                    let dataModelLocal = subscriptionClient.GetData("data")
+                    root.handleSubscription(dataModelLocal);
                 }
             }
         }

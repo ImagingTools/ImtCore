@@ -41,6 +41,21 @@ WebSocket {
         }
     }
 
+//    Timer {
+//        id: timer;
+
+//        interval: 5000;
+
+//        repeat: true;
+//        running: true;
+
+//        onTriggered: {
+//            let url = container.url;
+//            container.url = ""
+//            container.url = url;
+//        }
+//    }
+
     onUrlChanged: {
         console.log("SubscriptionManager onUrlChanged", url)
     }
@@ -66,7 +81,7 @@ WebSocket {
         }
         else if (socketModel.GetData("type") === "data"){
             console.log("SubscriptionManager onTextMessageReceived", message)
-
+            console.log("subscriptionModel", subscriptionModel)
             for (let index = 0; index < subscriptionModel.length; index++){
                 if (subscriptionModel[index]["subscriptionId"] == socketModel.GetData("id")){
                     let subscription = subscriptionModel[index]["subscription"]

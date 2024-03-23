@@ -7,8 +7,18 @@ import imtcontrols 1.0
 DocumentManager {
     id: workspaceView;
 
-    property var fixedViews: [];
-    property var fixedViewNames: [];
+    Component.onDestruction: {
+        Events.unSubscribeEvent("SetAlertPanel", setAlertPanel)
+    }
+
+    onVisibleChanged: {
+        if (visible){
+            Events.subscribeEvent("SetAlertPanel", setAlertPanel)
+        }
+        else{
+            Events.unSubscribeEvent("SetAlertPanel", setAlertPanel)
+        }
+    }
 
     onDocumentClosed: {
         if (documentIndex <= tabPanel.selectedIndex && documentIndex > 0){
@@ -36,9 +46,11 @@ DocumentManager {
         documentAdded(documentsModel.count - 1, "");
     }
 
-//    function setAlertPanel(alertPanelComp){
-//        alertPanel.sourceComponent = alertPanelComp;
-//    }
+    function setAlertPanel(alertPanelComp){
+        console.log("MD setAlertPanel", alertPanelComp);
+
+        alertPanel.sourceComponent = alertPanelComp;
+    }
 
     Rectangle {
         anchors.fill: parent;
@@ -74,63 +86,22 @@ DocumentManager {
         }
     }
 
-    Component {
-        id: alertPanelComp;
+    Loader {
+        id: alertPanel;
 
-        Rectangle {
-            anchors.fill: parent;
+        anchors.top: tabPanel.bottom;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
 
-            color: Style.selectedColor;
+        height: visible ? 40: 0;
 
-            Image {
-                id: icon;
-
-                anchors.verticalCenter: parent.verticalCenter;
-                anchors.left: parent.left;
-                anchors.leftMargin: 10;
-
-                width: 20;
-                height: 20;
-
-                sourceSize.height: height;
-                sourceSize.width: width;
-
-                source: "../../../" + Style.getIconPath("Icons/Lamp", Icon.State.On, Icon.Mode.Normal);
-            }
-
-            BaseText {
-                id: message;
-
-                anchors.verticalCenter: parent.verticalCenter;
-                anchors.left: icon.right;
-                anchors.leftMargin: 10;
-                anchors.right: updateButton.left;
-
-                text: qsTr("This document has been modified");
-            }
-
-            Button {
-                id: updateButton;
-
-                anchors.verticalCenter: parent.verticalCenter;
-                anchors.right: parent.right;
-                anchors.rightMargin: 10;
-
-                width: 70;
-                height: 30;
-
-                text: qsTr("Update");
-
-                onClicked: {
-                }
-            }
-        }
+        visible: alertPanel.item;
     }
 
     Repeater {
         id: documentRepeater;
 
-        anchors.top: tabPanel.bottom;
+        anchors.top: alertPanel.bottom;
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
@@ -143,24 +114,9 @@ DocumentManager {
             anchors.fill: documentRepeater;
 
             Loader {
-                id: alertPanel;
-
-                anchors.top: parent.top;
-                anchors.left: parent.left;
-                anchors.right: parent.right;
-
-                height: visible ? 40: 0;
-
-                sourceComponent: alertPanelComp;
-
-//                visible: alertPanel.status == Loader.Ready;
-                visible: false;
-            }
-
-            Loader {
                 id: documentLoader;
 
-                anchors.top: alertPanel.bottom;
+                anchors.top: parent.top;
                 anchors.left: parent.left;
                 anchors.right: parent.right;
                 anchors.bottom: parent.bottom;

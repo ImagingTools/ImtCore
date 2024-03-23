@@ -8,35 +8,10 @@ Rectangle {
 
     color: Style.backgroundColor;
 
-    property string text: qsTr("There is no connection to the server. Please check server url.");
+    property alias text: textNoConnection.text;
+    property alias loadingVisible: loading.visible;
 
     signal refresh();
-
-    Component.onCompleted: {
-        Events.subscribeEvent("SystemStatusChanged", container.onSystemStatusChanged)
-    }
-
-    Component.onDestruction: {
-        Events.unSubscribeEvent("SystemStatusChanged", container.onSystemStatusChanged)
-    }
-
-    function onSystemStatusChanged(parameters){
-        console.log("onSystemStatusChanged");
-
-        let status = parameters["Status"];
-        let message = parameters["Message"];
-
-        console.log("status", status);
-        console.log("message", message);
-
-        loading.visible = false;
-
-        if (status === "TRY_CONNECTING"){
-            loading.visible = true;
-        }
-
-        textNoConnection.text = message;
-    }
 
     Column {
         id: content;

@@ -11,12 +11,12 @@ QtObject {
     onSettingsProviderChanged: {
         console.log("DesignProvider onSettingsProviderChanged", settingsProvider);
         if (container.settingsProvider != null){
-            container.settingsProvider.localModelChanged.connect(container.onLocalModelChanged);
+            container.settingsProvider.localModelChanged.connect(container.modelUpdated);
+            container.settingsProvider.serverModelChanged.connect(container.modelUpdated);
         }
     }
 
-    function onLocalModelChanged(){
-
+    function modelUpdated(){
         if (settingsProvider == null){
             return;
         }
@@ -30,8 +30,6 @@ QtObject {
         if (localModel == null){
             return;
         }
-
-        console.log("localModel", localModel.toJSON());
 
         for (let i = 0; i < localModel.GetItemsCount(); i++){
             let pageModel = localModel.GetModelFromItem(i);
@@ -65,10 +63,7 @@ QtObject {
     }
 
     function applyCachedDesignSchema(){
-        console.log("applyCachedDesignSchema");
         let design = container.getDesignSchema();
-        console.log("design", design);
-
         if (design != null){
             Style.getDesignScheme(design);
         }

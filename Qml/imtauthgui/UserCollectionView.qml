@@ -13,20 +13,23 @@ RemoteCollectionView {
 
     collectionId: "Users";
 
-    dataController: CollectionRepresentation {
+    dataControllerComp: Component {CollectionRepresentation {
         collectionId: "Users";
     }
+    }
 
-    commandsController: CommandsRepresentationProvider {
+    commandsControllerComp: Component {CommandsRepresentationProvider {
         commandId: "Users";
         uuid: userCollectionViewContainer.viewId;
     }
+    }
 
-    commandsDelegate: DocumentCollectionViewDelegate {
+    commandsDelegateComp: Component {DocumentCollectionViewDelegate {
         collectionView: userCollectionViewContainer;
 
         documentTypeId: "User";
         viewTypeId: "UserEditor";
+    }
     }
 
     function onLocalizationChanged(language){
@@ -195,38 +198,8 @@ RemoteCollectionView {
     }
 
     property TreeItemModel rolesModel: CachedRoleCollection.rolesModel;
-//    CollectionDataProvider {
-//        id: rolesProvider;
-
-//        commandId: "Roles";
-
-//        fields: ["Id", "Name"];
-
-//        onCollectionModelChanged: {
-//            if (rolesProvider.collectionModel != null){
-//                if (rolesProvider.collectionModel.ContainsKey("Roles")){
-//                    let rolesModel = rolesProvider.collectionModel.GetData("Roles");
-//                    userCollectionViewContainer.rolesModel = rolesModel;
-//                }
-//            }
-//        }
-//    }
 
     property TreeItemModel groupsModel: CachedGroupCollection.collectionModel;
-//    CollectionDataProvider {
-//        id: groupsProvider;
-
-//        commandId: "Groups";
-
-//        fields: ["Id", "Name", "Description", "Roles"];
-
-//        onModelUpdated: {
-//            if (groupsProvider.collectionModel != null){
-//                userCollectionViewContainer.groupsModel = groupsProvider.collectionModel;
-//            }
-//        }
-//    }
-
     Component {
         id: userDocumentComp;
 
@@ -236,13 +209,15 @@ RemoteCollectionView {
             rolesModel: userCollectionViewContainer.rolesModel;
             groupsModel: userCollectionViewContainer.groupsModel;
 
-            commandsDelegate: ViewCommandsDelegateBase {
+            commandsDelegateComp: Component {ViewCommandsDelegateBase {
                 view: userEditor;
             }
+            }
 
-            commandsController: CommandsRepresentationProvider {
+            commandsControllerComp: Component {CommandsRepresentationProvider {
                 commandId: "User";
                 uuid: userEditor.viewId;
+            }
             }
         }
     }

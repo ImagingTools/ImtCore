@@ -13,7 +13,7 @@ Item {
     property Decorators decorators: decorators_
 
     property string message;
-    property string systemStatus: "NO_ERROR";
+//    property string systemStatus: "NO_ERROR";
     property alias localSettings: application.settingsProvider.localModel;
 
     property alias thumbDecMenuPanelRadius: thumbnailDecorator.menuPanelRadius;
@@ -42,12 +42,29 @@ Item {
         }
     }
 
+    onServerReadyChanged: {
+        if (serverReady){
+            webSocketPortProvider.updateModel();
+            startSystemStatusChecking();
+        }
+    }
+
     signal updateSystemStatus();
     signal settingsUpdate();
     signal localSettingsUpdated();
 
     onLocalSettingsUpdated: {
         application.updateAllModels();
+    }
+
+    Connections {
+        target: application.settingsProvider;
+
+        function onLocalModelChanged(){
+            let serverUrl = application.settingsProvider.getValue("ServerUrl");
+
+            application.systemStatusController.serverUrl = serverUrl;
+        }
     }
 
     Decorators {
@@ -72,8 +89,6 @@ Item {
         thumbnailDecorator.userManagementProvider.updated.connect(application.onUserModeChanged);
 
         thumbnailDecorator.loadingPage.start();
-
-        webSocketPortProvider.updateModel();
     }
 
     Component.onDestruction: {
@@ -111,9 +126,9 @@ Item {
             }
         }
 
-        onLocalModelChanged: {
-            application.designProvider.applyCachedDesignSchema();
-        }
+//        onLocalModelChanged: {
+//            application.designProvider.applyCachedDesignSchema();
+//        }
 
         onLocalSettingsSaved: {
             application.settingsUpdate();
@@ -147,6 +162,40 @@ Item {
         settingsProvider: application.settingsProvider;
     }
 
+    property SystemStatusController systemStatusController : SystemStatusController{
+        onSystemStatusChanged: {
+            console.log("AppMain onSystemStatusChanged", systemStatus);
+
+            let message = this.getLastMessage();
+
+            thumbnailDecorator.closeAllPages();
+            thumbnailDecorator.messagePage.loadingVisible = false;
+
+            if (systemStatus === 1){
+                thumbnailDecorator.messagePage.loadingVisible = true;
+            }
+
+            if (systemStatus === 0 ||
+                systemStatus === 1 ||
+                systemStatus === 2 ||
+                systemStatus === 3){
+                thumbnailDecorator.messagePage.visible = true;
+                thumbnailDecorator.messagePage.text = message
+            }
+            else if (systemStatus === 4){
+                thumbnailDecorator.messagePage.visible = false;
+
+                // No error
+                let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
+                if (loggedUserId === ""){
+                    thumbnailDecorator.closeAllPages();
+
+                    application.firstModelsInit();
+                }
+            }
+        }
+    }
+
     SubscriptionManager {
         id: subscriptionManager;
 
@@ -158,8 +207,6 @@ Item {
 
             if (applyUrl){
                 let webSocketServerUrl = application.settingsProvider.getValue("WebSocketServerUrl");
-                console.log("webSocketServerUrl", webSocketServerUrl);
-
                 if (webSocketServerUrl && webSocketServerUrl !== ""){
                     webSocketServerUrl =  webSocketServerUrl.replace("http", "ws")
                     subscriptionManager.url = webSocketServerUrl;
@@ -167,44 +214,66 @@ Item {
                     return;
                 }
 
+                let wsUrl = "";
                 let serverUrl = application.settingsProvider.getValue("ServerUrl");
                 if (serverUrl !== ""){
-                    if (serverUrl[serverUrl.length - 1] !== '/'){
-                        serverUrl += "/";
-                    }
-
-                    serverUrl += context.appName + "/wssub";
-                    serverUrl = serverUrl.replace("http", "ws")
+                    wsUrl = application.getWebSocketUrl(serverUrl);
                 }
                 else{
-                    let address = context.location.host;
-                    let data = address.split(':')
-                    if (data.length === 2){
-                        let host = data[0];
-                        let port = webSocketPortProvider.port;
-                        if (port !== -1){
-                            serverUrl = "ws://" + host + ":" + port + "/" + context.appName + "/wssub";
-                        }
-                        else{
-                            serverUrl = "ws://" + address + "/" + context.appName + "/wssub";
-                        }
-                    }
+                    wsUrl = application.getWebSocketUrl(context.location.host);
                 }
 
                 console.log("WEB Socket serverUrl", serverUrl);
-                subscriptionManager.url = serverUrl;
+                subscriptionManager.url = wsUrl;
             }
         }
 
         onError: {
-            //            Events.sendEvent("SendWarningError", qsTr("There is no connection to the subscription server. Check the Web Server Socket Url in the settings or contact your system administrator."));
-            //            Events.sendEvent("SendCriticalError", qsTr("Web Socket Error: ") + errorString);
+            Events.sendEvent("SendWarningError", qsTr("There is no connection to the subscription server. Check the Web Server Socket Url in the settings or contact your system administrator."));
+
+            application.systemStatusController.updateSystemStatus();
         }
     }
 
     WebSocketPortProvider {
         id: webSocketPortProvider;
+    }
 
+    function startSystemStatusChecking(){
+        systemStatusController.updateSystemStatus();
+    }
+
+    function getWebSocketUrl(serverUrl){
+        console.log("getWebSocketUrl", serverUrl);
+
+        try {
+            let url = new URL(serverUrl);
+
+            url.protocol = "ws";
+
+            console.log("context.appName", context.appName);
+
+
+            if (context.appName && context.appName !== ""){
+                console.log("===");
+
+                url.pathname = "/" + context.appName + "/wssub";
+            }
+
+            if (webSocketPortProvider.port >= 0){
+                url.port = webSocketPortProvider.port;
+            }
+            else{
+                console.error("WebSocket port provider has invalid port!");
+            }
+
+            console.log("url.pathname", url.pathname);
+
+            return String(url)
+        }
+        catch(error){
+            return "";
+        }
     }
 
     ThumbnailDecorator {
@@ -245,34 +314,9 @@ Item {
         }
     }
 
-    function setSystemStatus(status, message){
-        if (application.systemStatus !== status){
-            application.message = message;
-            application.systemStatus = status;
-
-            let parameters = {"Status": application.systemStatus, "Message": application.message}
-            Events.sendEvent("SystemStatusChanged", parameters)
-
-            if (status === "NO_ERROR"){
-                let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
-                if (loggedUserId === ""){
-                    thumbnailDecorator.closeAllPages();
-
-                    firstModelsInit();
-                }
-            }
-            else{
-                thumbnailDecorator.closeAllPages();
-                thumbnailDecorator.errorPage.visible = true;
-            }
-        }
-    }
-
     function firstModelsInit(){
         console.log("firstModelsInit");
-        if (application.systemStatus == "NO_ERROR"){
-            thumbnailDecorator.userManagementProvider.updateModel();
-        }
+        thumbnailDecorator.userManagementProvider.updateModel();
     }
 
     function onUserModeChanged(){
@@ -286,15 +330,4 @@ Item {
             application.onStrongUserManagement();
         }
     }
-    //    Connections {
-    //        target: Qt.application;
-
-    //        onAboutToQuit: {
-    //            console.log("onAboutToQuit");
-
-    //            let dirtyDocumentsExists = thumbnailDecorator.documentManager.dirtyDocumentsExists();
-
-    //            console.log("dirtyDocumentsExists", dirtyDocumentsExists);
-    //        }
-    //    }
 }

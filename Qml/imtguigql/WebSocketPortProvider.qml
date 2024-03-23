@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Acf 1.0
 import imtcontrols 1.0
-
+import imtguigql 1.0
 
 GqlModel {
     id: webSocketUrlGqlModel;
@@ -27,9 +27,12 @@ GqlModel {
                     if (dataModelLocal.ContainsKey("Value")){
                         let value = dataModelLocal.GetData("Value")
 
-                        let data = value.split(":")
-                        if (data.length === 3){
-                            webSocketUrlGqlModel.port = data[2];
+                        try {
+                            let url = new URL(value);
+                            webSocketUrlGqlModel.port = url.port;
+                        }
+                        catch(error){
+                            console.error("Web socket URL is invalid: ", value);
                         }
                     }
                 }

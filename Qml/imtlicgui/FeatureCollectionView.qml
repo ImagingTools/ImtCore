@@ -14,11 +14,12 @@ RemoteCollectionView {
 
      collectionId: "Features";
 
-     commandsDelegate: DocumentCollectionViewDelegate {
+     commandsDelegateComp: Component {DocumentCollectionViewDelegate {
          collectionView: featureCollectionViewContainer;
 
          documentTypeId: "Feature";
          viewTypeId: "FeatureEditor";
+     }
      }
 
      Component.onCompleted: {
@@ -40,12 +41,13 @@ RemoteCollectionView {
          FeatureEditor {
              id: featureEditor;
 
-             commandsController: CommandsRepresentationProvider {
+             commandsControllerComp: Component {CommandsRepresentationProvider {
                  commandId: "Feature";
                  uuid: featureEditor.viewId;
              }
+             }
 
-             commandsDelegate: ViewCommandsDelegateBase {
+             commandsDelegateComp: Component {ViewCommandsDelegateBase {
                  onCommandActivated: {
                      let selectedIndex = null;
                      if (featureEditor.tableView.tableSelection.items.length > 0){
@@ -66,6 +68,7 @@ RemoteCollectionView {
                          }
                      }
                  }
+             }
              }
          }
      }

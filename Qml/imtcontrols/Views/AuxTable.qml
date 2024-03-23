@@ -364,6 +364,10 @@ Rectangle {
     }
 
     function setWidth(){
+        if (!tableContainer.widthDecorator || !tableContainer.headers || !tableContainer.widthDecoratorDynamic){
+            return;
+        }
+
         var headersCount = tableContainer.headers.GetItemsCount();
         var tableWidth_ = Math.max(tableContainer.width, tableContainer.contentWidth);
 

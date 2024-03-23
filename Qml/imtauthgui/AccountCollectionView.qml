@@ -10,20 +10,23 @@ import imtdocgui 1.0
 CollectionView {
     id: container;
 
-    dataController: CollectionRepresentation {
-        collectionId: "Accounts";
+    dataControllerComp: Component {CollectionRepresentation {
+            collectionId: "Accounts";
+        }
     }
 
-    commandsController: CommandsRepresentationProvider {
-        commandId: "Accounts";
-        uuid: container.viewId;
+    commandsControllerComp: Component {CommandsRepresentationProvider {
+            commandId: "Accounts";
+            uuid: container.viewId;
+        }
     }
 
-    commandsDelegate: DocumentCollectionViewDelegate {
-        collectionView: container;
+    commandsDelegateComp: Component {DocumentCollectionViewDelegate {
+            collectionView: container;
 
-        documentTypeId: "Account";
-        viewTypeId: "AccountEditor";
+            documentTypeId: "Account";
+            viewTypeId: "AccountEditor";
+        }
     }
 
     Component.onCompleted: {
@@ -44,9 +47,16 @@ CollectionView {
 
         AccountEditor {
             id: accountEditor;
-            commandsController: CommandsRepresentationProvider {
-                commandId: "Account";
-                uuid: accountEditor.viewId;
+
+            commandsDelegateComp: Component {ViewCommandsDelegateBase {
+                view: accountEditor;
+            }
+            }
+
+            commandsControllerComp: Component {CommandsRepresentationProvider {
+                    commandId: "Account";
+                    uuid: accountEditor.viewId;
+                }
             }
         }
     }

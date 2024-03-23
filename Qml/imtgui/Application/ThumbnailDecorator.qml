@@ -13,7 +13,7 @@ Rectangle {
 
     color: Style.backgroundColor;
 
-    property alias errorPage: serverNoConnectionView;
+    property alias messagePage: serverNoConnectionView;
     property alias loadingPage: loading;
 
     property int mainMargin: Style.mainWindowMargin !== undefined ? Style.mainWindowMargin : 0;
@@ -23,7 +23,6 @@ Rectangle {
     property alias authorizationPageAlias: authorizationPage;
     property alias superuserPasswordPageAlias: superuserPasswordPage;
 
-    property alias preferencePage: preferenceDialog;
     property alias userManagementProvider: userManagement;
 //    property alias documentManager: mainDocumentManager;
     property Item dialogManager: modalDialogManager;
@@ -90,7 +89,6 @@ Rectangle {
         superuserPasswordPage.visible = false;
         thumbnailDecoratorContainer.loadingPage.visible = false;
         serverNoConnectionView.visible = false;
-        preferenceDialog.visible = false;
     }
 
     function onLogout(){
@@ -110,8 +108,6 @@ Rectangle {
     function clearModels(){
         menuPanel.clearModels();
         pagesManager.clearModels();
-
-        preferenceDialog.clearModels();
 
         if (settingsProvider){
             settingsProvider.clearModel();
@@ -181,7 +177,7 @@ Rectangle {
                 thumbnailDecoratorContainer.loadingPage.stop();
             }
             else{
-//                 thumbnailDecoratorContainer.loadingPage.start();
+//                thumbnailDecoratorContainer.loadingPage.start();
             }
         }
     }
@@ -300,35 +296,6 @@ Rectangle {
                 }
             }
         }
-    }
-
-    Preference {
-        id: preferenceDialog;
-
-        z: 20;
-
-        anchors.fill: parent;
-
-        visible: false;
-
-        onVisibleChanged: {
-            if (visible){
-                if (thumbnailDecoratorContainer.settingsProvider != null){
-                    let representationModel = thumbnailDecoratorContainer.settingsProvider.getRepresentationModel();
-
-                    preferenceDialog.settingsModel = representationModel;
-                }
-            }
-            else{
-                preferenceDialog.clearModels();
-            }
-        }
-    }
-
-    GqlModelObserver {
-        observedModel: userManagement.userModeGqlModel;
-
-        noConnectionView: serverNoConnectionView;
     }
 
     UserManagementProvider {

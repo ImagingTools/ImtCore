@@ -10,10 +10,60 @@ CollectionViewBase {
 
     property bool visibleMetaInfo: false;
 
-    property var dataController: null;
+    property alias dataControllerComp: dataControllerLoader.sourceComponent;
+    property alias dataController: dataControllerLoader.item;
 
-    commandsDelegate: CollectionViewCommandsDelegateBase {
-        collectionView: container;
+    commandsDelegateComp: Component {
+        CollectionViewCommandsDelegateBase {
+            collectionView: container;
+        }
+    }
+
+    Loader {
+        id: dataControllerLoader;
+    }
+
+    Connections {
+        target: dataControllerLoader.item;
+
+        function onBeginUpdate(){
+            container.loading.start();
+        }
+
+        function onEndUpdate(){
+            container.loading.stop();
+        }
+
+        function onHeadersModelChanged(){
+            container.doUpdateGui();
+        }
+
+        function onNotificationModelChanged(){
+            if (!dataControllerLoader.item){
+                return;
+            }
+
+            let notificationModel = dataControllerLoader.item.notificationModel;
+            if (notificationModel.ContainsKey("TotalCount")){
+                let totalCount = notificationModel.GetData("TotalCount")
+
+                container.pagination.countAllElements = totalCount;
+            }
+
+            if (notificationModel.ContainsKey("PagesCount")){
+                let pagesCount = notificationModel.GetData("PagesCount")
+
+                container.pagination.pagesSize = pagesCount;
+            }
+        }
+
+        function onFilterableHeadersModelChanged(){
+            if (!dataControllerLoader.item){
+                return;
+            }
+
+            container.collectionFilter.setFilteringInfoIds(dataControllerLoader.item.filterableHeadersModel);
+        }
     }
 
     QtObject {
@@ -70,10 +120,10 @@ CollectionViewBase {
             bindHeaders.target = container.table;
             bindElements.target = container.table;
 
-            container.dataController.beginUpdate.connect(internal.onBeginUpdate);
-            container.dataController.endUpdate.connect(internal.onEndUpdate);
-            container.dataController.headersModelChanged.connect(internal.onHeadersModelChanged);
-            container.dataController.notificationModelChanged.connect(internal.onNotificationModelChanged);
+            //            container.dataController.beginUpdate.connect(internal.onBeginUpdate);
+            //            container.dataController.endUpdate.connect(internal.onEndUpdate);
+            //            container.dataController.headersModelChanged.connect(internal.onHeadersModelChanged);
+            //            container.dataController.notificationModelChanged.connect(internal.onNotificationModelChanged);
         }
     }
 
@@ -95,22 +145,22 @@ CollectionViewBase {
         id: bindHeaders;
         property: "headers";
 
-        value: container.dataController.headersModel;
+        value: dataControllerLoader.item.headersModel;
     }
 
     Binding {
         id: bindElements;
         property: "elements";
-        value: container.dataController.elementsModel;
+        value: dataControllerLoader.item.elementsModel;
     }
 
-    Connections {
-        target: container.dataController;
+    //    Connections {
+    //        target: container.dataController;
 
-        function onFilterableHeadersModelChanged(){
-            container.collectionFilter.setFilteringInfoIds(container.dataController.filterableHeadersModel);
-        }
-    }
+    //        function onFilterableHeadersModelChanged(){
+    //            container.collectionFilter.setFilteringInfoIds(container.dataController.filterableHeadersModel);
+    //        }
+    //    }
 
     onVisibleChanged: {
         if (container.visible){

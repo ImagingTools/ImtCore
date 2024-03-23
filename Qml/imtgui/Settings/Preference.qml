@@ -38,10 +38,7 @@ Rectangle {
     }
 
     onSettingsModelChanged: {
-        console.log("onSettingsModelChanged", settingsModel);
-
         if (root.settingsModel != null){
-            console.log("connect");
             root.settingsModel.dataChanged.connect(root.modelChanged);
 
             root.updateGui();
@@ -50,13 +47,11 @@ Rectangle {
 
     function clearModels(){
         root.settingsModel.Clear();
-        //mainPanelRepeater.model = 0;
         bodyPanelRepeater.model = 0;
     }
 
     function updateGui(){
         mainPanel.selectedIndex = 0;
-        //mainPanelRepeater.model = root.settingsModel;
 
         let parametersModel = root.settingsModel.GetData("Parameters", 0)
         bodyPanelRepeater.model = parametersModel
@@ -117,6 +112,8 @@ Rectangle {
 
                 spacing: Style.size_mainMargin;
                 model: root.settingsModel;
+
+                boundsBehavior: Flickable.StopAtBounds;
 
                 delegate: ItemDelegate {
                     text: model.Name;

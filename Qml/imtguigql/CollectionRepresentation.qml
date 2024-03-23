@@ -30,6 +30,8 @@ Item {
     signal endUpdate();
 
     onCollectionIdChanged: {
+        console.log("onCollectionIdChanged", collectionId);
+
         updateModel();
     }
 
@@ -57,16 +59,22 @@ Item {
     }
 
     function updateModel(){
+        console.log("Collection representation updateModel");
+
         updateHeaders();
 
         updateObjectEditorInfo();
     }
 
     function updateObjectEditorInfo(){
+        console.log("Collection representation updateObjectEditorInfo");
+
         objectViewModel.getObjectView();
     }
 
     function updateHeaders(){
+        console.log("Collection representation updateHeaders");
+
         if (internal.headersUpdatingBlock){
             return;
         }

@@ -16,11 +16,12 @@ RemoteCollectionView {
 
     additionalFieldIds: ["ProductId"]
 
-    commandsDelegate: ProductCollectionViewCommandsDelegate {
+    commandsDelegateComp: Component {ProductCollectionViewCommandsDelegate {
         collectionView: productCollectionViewContainer;
 
         documentTypeId: "Product";
         viewTypeId: "ProductEditor";
+    }
     }
 
     Component.onCompleted: {
@@ -39,13 +40,15 @@ RemoteCollectionView {
         ProductView {
             id: productEditor;
 
-            commandsController: CommandsRepresentationProvider {
+            commandsControllerComp: Component {CommandsRepresentationProvider {
                 commandId: "Product";
                 uuid: productEditor.viewId;
             }
+            }
 
-            commandsDelegate: ProductViewCommandsDelegate {
+            commandsDelegateComp: Component {ProductViewCommandsDelegate {
                 view: productEditor;
+            }
             }
         }
     }

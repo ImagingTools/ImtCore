@@ -32,15 +32,20 @@ Item {
     signal failed();
 
     function updateModel(inputParams){
+        if (!inputParams){
+            inputParams = {}
+        }
+
+        if (collectionModel && collectionModel.GetItemsCount() == 0){
+            container.itemsInfoModel.updateModel(inputParams, container.fields);
+            return;
+        }
+
         if (!completed || hasRemoteChanges){
             if (container.commandId == ""){
                 console.log( "ERROR: CollectionDataProvider commandId is empty!");
 
                 return;
-            }
-
-            if (!inputParams){
-                inputParams = {}
             }
 
             container.itemsInfoModel.updateModel(inputParams, container.fields);

@@ -11,20 +11,23 @@ RemoteCollectionView {
 
     collectionId: "Groups";
 
-    dataController: CollectionRepresentation {
+    dataControllerComp: Component {CollectionRepresentation {
         collectionId: "Groups";
     }
+    }
 
-    commandsController: CommandsRepresentationProvider {
+    commandsControllerComp: Component {CommandsRepresentationProvider {
         commandId: "Groups";
         uuid: userGroupCollectionViewContainer.viewId;
     }
+    }
 
-    commandsDelegate: DocumentCollectionViewDelegate {
+    commandsDelegateComp: Component {DocumentCollectionViewDelegate {
         collectionView: userGroupCollectionViewContainer;
 
         documentTypeId: "Group";
         viewTypeId: "GroupEditor";
+    }
     }
 
     Component.onCompleted: {
@@ -58,13 +61,14 @@ RemoteCollectionView {
             rolesModel: userGroupCollectionViewContainer.rolesModel;
             groupsModel: userGroupCollectionViewContainer.groupsModel;
 
-            commandsDelegate: ViewCommandsDelegateBase {
+            commandsDelegateComp: Component {ViewCommandsDelegateBase {
                 view: groupEditor;
-            }
+            }}
 
-            commandsController: CommandsRepresentationProvider {
+            commandsControllerComp: Component {CommandsRepresentationProvider {
                 commandId: "Group";
                 uuid: groupEditor.viewId;
+            }
             }
         }
     }

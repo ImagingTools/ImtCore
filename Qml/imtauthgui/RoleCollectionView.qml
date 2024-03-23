@@ -29,22 +29,22 @@ RemoteCollectionView {
     table.backgroundElementsColor: Style.backgroundColor;
     filterMenuVisible: false;
 
+    dataControllerComp: Component {CollectionRepresentation {
+            collectionId: roleCollectionViewContainer.collectionId;
 
-    dataController: CollectionRepresentation {
-        collectionId: roleCollectionViewContainer.collectionId;
+            additionalFieldIds: roleCollectionViewContainer.additionalFieldIds;
 
-        additionalFieldIds: roleCollectionViewContainer.additionalFieldIds;
+            function removeElement(elementIndex){
+                console.log("Roles removeElement", elementIndex);
+                if (elementIndex < 0){
+                    console.error();
 
-        function removeElement(elementIndex){
-            console.log("Roles removeElement", elementIndex);
-            if (elementIndex < 0){
-                console.error();
+                    return;
+                }
 
-                return;
+                let itemId = elementsModel.GetData("Roles").GetData("Id", elementIndex);
+                removeGqlModel.remove(itemId);
             }
-
-            let itemId = elementsModel.GetData("Roles").GetData("Id", elementIndex);
-            removeGqlModel.remove(itemId);
         }
     }
 
@@ -87,16 +87,18 @@ RemoteCollectionView {
         }
     }
 
-    commandsController: CommandsRepresentationProvider {
-        commandId: "Roles";
-        uuid: roleCollectionViewContainer.viewId;
+    commandsControllerComp: Component {CommandsRepresentationProvider {
+            commandId: "Roles";
+            uuid: roleCollectionViewContainer.viewId;
+        }
     }
 
-    commandsDelegate: RoleCollectionViewCommandsDelegate {
-        collectionView: roleCollectionViewContainer;
+    commandsDelegateComp: Component {RoleCollectionViewCommandsDelegate {
+            collectionView: roleCollectionViewContainer;
 
-        documentTypeId: "Role";
-        viewTypeId: "RoleEditor";
+            documentTypeId: "Role";
+            viewTypeId: "RoleEditor";
+        }
     }
 
     function onLocalizationChanged(language){
@@ -172,13 +174,15 @@ RemoteCollectionView {
             permissionsModel: roleCollectionViewContainer.permissionsModel;
             rolesModel: roleCollectionViewContainer.rolesModel;
 
-            commandsDelegate: ViewCommandsDelegateBase {
-                view: roleEditor;
+            commandsDelegateComp: Component {ViewCommandsDelegateBase {
+                    view: roleEditor;
+                }
             }
 
-            commandsController: CommandsRepresentationProvider {
-                commandId: "Role";
-                uuid: roleEditor.viewId;
+            commandsControllerComp: Component {CommandsRepresentationProvider {
+                    commandId: "Role";
+                    uuid: roleEditor.viewId;
+                }
             }
 
             Component.onCompleted: {

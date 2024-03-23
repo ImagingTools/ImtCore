@@ -14,11 +14,12 @@ RemoteCollectionView {
 
      collectionId: "Licenses";
 
-     commandsDelegate: DocumentCollectionViewDelegate {
+     commandsDelegateComp: Component {DocumentCollectionViewDelegate {
          collectionView: root;
 
          documentTypeId: "License";
          viewTypeId: "LicenseEditor";
+     }
      }
 
      Component.onCompleted: {
@@ -40,9 +41,10 @@ RemoteCollectionView {
          LicenseEditor {
              id: licenceEditor;
 
-             commandsController: CommandsRepresentationProvider {
+             commandsControllerComp: Component {CommandsRepresentationProvider {
                  commandId: "License";
                  uuid: licenceEditor.viewId;
+             }
              }
          }
      }
