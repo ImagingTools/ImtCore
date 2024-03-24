@@ -9,11 +9,11 @@ Item {
     property string viewId;
     property TreeItemModel model: TreeItemModel {}
 
-    property alias commandsControllerComp: commandsControllerLoader.sourceComponent;
-    property alias commandsController: commandsControllerLoader.item;
+    property Component commandsControllerComp: null;
+    property CommandsController commandsController: null;
 
-    property alias commandsDelegateComp: commandsDelegateLoader.sourceComponent;
-    property alias commandsDelegate: commandsDelegateLoader.item;
+    property Component commandsDelegateComp: null;
+    property ViewCommandsDelegateBase commandsDelegate: null;
 
     property bool readOnly: false;
 
@@ -24,6 +24,33 @@ Item {
     Component.onDestruction: {
         if (commandsDelegate){
             Events.unSubscribeEvent(viewId + "CommandActivated", commandsDelegate.commandHandle);
+        }
+    }
+
+    onCommandsControllerCompChanged: {
+        if (commandsControllerComp){
+            if (commandsController){
+                commandsController.destroy();
+            }
+
+            commandsController = commandsControllerComp.createObject(viewBase);
+        }
+    }
+
+    onCommandsDelegateCompChanged: {
+        if (commandsDelegateComp){
+            if (commandsDelegate){
+                commandsDelegate.destroy();
+            }
+
+            commandsDelegate = commandsDelegateComp.createObject(viewBase);
+        }
+    }
+
+    onCommandsDelegateChanged: {
+        if (viewBase.viewId !== ""){
+            Events.unSubscribeAllFromSlot(item.commandHandle);
+            Events.subscribeEvent(viewBase.viewId + "CommandActivated", item.commandHandle);
         }
     }
 
@@ -39,25 +66,6 @@ Item {
             }
             else{
                 viewBase.clearCommandsGui();
-            }
-        }
-    }
-
-    Loader {
-        id: commandsControllerLoader;
-    }
-
-    Loader {
-        id: commandsDelegateLoader;
-
-        sourceComponent: Component {
-            ViewCommandsDelegateBase {}
-        }
-
-        onLoaded: {
-            if (viewBase.viewId !== ""){
-                Events.unSubscribeAllFromSlot(item.commandHandle);
-                Events.subscribeEvent(viewBase.viewId + "CommandActivated", item.commandHandle);
             }
         }
     }

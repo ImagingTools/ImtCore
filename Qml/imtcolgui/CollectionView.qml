@@ -10,8 +10,18 @@ CollectionViewBase {
 
     property bool visibleMetaInfo: false;
 
-    property alias dataControllerComp: dataControllerLoader.sourceComponent;
-    property alias dataController: dataControllerLoader.item;
+    property Component dataControllerComp;
+    property var dataController: null;
+
+    onDataControllerCompChanged: {
+        if (dataControllerComp){
+            if (dataController){
+                dataController.destroy();
+            }
+
+            dataController = dataControllerComp.createObject(container);
+        }
+    }
 
     commandsDelegateComp: Component {
         CollectionViewCommandsDelegateBase {
@@ -19,12 +29,8 @@ CollectionViewBase {
         }
     }
 
-    Loader {
-        id: dataControllerLoader;
-    }
-
     Connections {
-        target: dataControllerLoader.item;
+        target: container.dataController;
 
         function onBeginUpdate(){
             container.loading.start();
@@ -39,11 +45,11 @@ CollectionViewBase {
         }
 
         function onNotificationModelChanged(){
-            if (!dataControllerLoader.item){
+            if (!dataController){
                 return;
             }
 
-            let notificationModel = dataControllerLoader.item.notificationModel;
+            let notificationModel = dataController.notificationModel;
             if (notificationModel.ContainsKey("TotalCount")){
                 let totalCount = notificationModel.GetData("TotalCount")
 
@@ -58,11 +64,11 @@ CollectionViewBase {
         }
 
         function onFilterableHeadersModelChanged(){
-            if (!dataControllerLoader.item){
+            if (!dataController){
                 return;
             }
 
-            container.collectionFilter.setFilteringInfoIds(dataControllerLoader.item.filterableHeadersModel);
+            container.collectionFilter.setFilteringInfoIds(dataController.filterableHeadersModel);
         }
     }
 
@@ -145,13 +151,13 @@ CollectionViewBase {
         id: bindHeaders;
         property: "headers";
 
-        value: dataControllerLoader.item.headersModel;
+        value: dataController.headersModel;
     }
 
     Binding {
         id: bindElements;
         property: "elements";
-        value: dataControllerLoader.item.elementsModel;
+        value: dataController.elementsModel;
     }
 
     //    Connections {
