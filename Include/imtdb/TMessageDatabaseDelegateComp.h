@@ -6,9 +6,6 @@
 #include <istd/TOptDelPtr.h>
 #include <ilog/CMessage.h>
 
-// ImtCore includes
-#include <imtdb/CSqlJsonDatabaseDelegateComp.h>
-
 
 namespace imtdb
 {
@@ -18,7 +15,7 @@ template <class BaseDelegate>
 class TMessageDatabaseDelegateComp: public BaseDelegate
 {
 public:
-	typedef imtdb::CSqlJsonDatabaseDelegateComp BaseClass;
+	typedef BaseDelegate BaseClass;
 
 	I_BEGIN_COMPONENT(TMessageDatabaseDelegateComp)
 	I_END_COMPONENT
@@ -118,9 +115,9 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery TMessageDatabaseDelegateComp<Base
 template <class BaseDelegate>
 QByteArray TMessageDatabaseDelegateComp<BaseDelegate>::CreateUpdateObjectQuery(
 			const imtbase::IObjectCollection& /*collection*/,
-			const QByteArray& objectId,
-			const istd::IChangeable& object,
-			const imtbase::IOperationContext* operationContextPtr,
+			const QByteArray& /*objectId*/,
+			const istd::IChangeable& /*object*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/,
 			bool /*useExternDelegate*/) const
 {
 	return QByteArray();
