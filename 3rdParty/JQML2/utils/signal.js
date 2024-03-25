@@ -67,15 +67,15 @@ class QSignal {
         if(!this.connections) return
 
         for(let connection of this.connections){
-            // try {
+            try {
                 if(connection.target){
                     connection.slot.call(connection.target, ...args)  
                 } else {
                     connection.slot(...args)
                 }
-            // } catch (error) {
-                
-            // }
+            } catch (error) {
+                console.error(error)
+            }
             
         }
     }
