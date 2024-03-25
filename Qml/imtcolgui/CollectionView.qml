@@ -151,13 +151,13 @@ CollectionViewBase {
         id: bindHeaders;
         property: "headers";
 
-        value: dataController.headersModel;
+        value: container.dataController.headersModel;
     }
 
     Binding {
         id: bindElements;
         property: "elements";
-        value: dataController.elementsModel;
+        value: container.dataController.elementsModel;
     }
 
     //    Connections {
