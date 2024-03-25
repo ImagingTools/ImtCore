@@ -7,6 +7,8 @@
 #include <QtCore/QThread>
 #include <QtCore/QMutex>
 #include <QtCore/QTimer>
+#include <QtCore/QPointer>
+#include <QtCore/QReadWriteLock>
 
 // ImtCore  includes
 #include <imtrest/CTcpServerComp.h>
@@ -125,10 +127,11 @@ protected:
 	void incomingConnection(qintptr socketDescriptor) override;
 
 protected:
-	QList<CSocketThread*> m_threadSocketList;
+	QList<QPointer<CSocketThread>> m_threadSocketList;
 	CTcpServerComp& m_rootServer;
 	mutable QList<qintptr> m_descriptorList;
 	mutable QMutex m_descriptorListMutex;
+	mutable QReadWriteLock m_threadSocketListGuard;
 	bool m_isActive;
 };
 

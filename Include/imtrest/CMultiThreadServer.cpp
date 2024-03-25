@@ -3,6 +3,7 @@
 
 // Qt includes
 #include <QtCore/QCoreApplication>
+#include <QtCore/QMutableListIterator>
 
 // ImtCore includes
 #include <imtrest/IProtocolEngine.h>
@@ -258,6 +259,7 @@ IRequest* CSocketThread::CreateRequest()
 CMultiThreadServer::CMultiThreadServer(CTcpServerComp* rootServer)
 	:QTcpServer((QObject*)rootServer),
 	m_rootServer(*rootServer),
+	m_threadSocketListGuard(QReadWriteLock::Recursive),
 	m_isActive(true)
 {
 	connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit, this, &CMultiThreadServer::AboutToQuit, Qt::DirectConnection);
@@ -286,6 +288,8 @@ const IRequest* CMultiThreadServer::GetRequest(const QByteArray& requestId) cons
 
 const ISender* CMultiThreadServer::GetSender(const QByteArray& requestId) const
 {
+	QReadLocker threadListLock(&m_threadSocketListGuard);
+
 	for (CSocketThread* socket : m_threadSocketList){
 		if (socket->GetRequestId() == requestId){
 			return socket;
@@ -298,15 +302,22 @@ const ISender* CMultiThreadServer::GetSender(const QByteArray& requestId) const
 
 void CMultiThreadServer::Disconnected(QByteArray requestId)
 {
-    qDebug() << "OnSocketDisconnected  " + requestId;
+	QWriteLocker threadListLock(&m_threadSocketListGuard);
 
-	for (CSocketThread* socket : m_threadSocketList){
-		if (socket->GetRequestId() == requestId){
-			if (m_threadSocketList.removeOne(socket)){
-				socket->quit();
-				socket->wait(1000);
-				socket->deleteLater();
-			}
+	QMutableListIterator threadSocketIterator(m_threadSocketList);
+	while(threadSocketIterator.hasNext()){
+		QPointer<CSocketThread>& socketPtr = threadSocketIterator.next();
+		if(socketPtr.isNull()){
+			// socket is already removed. Stop tracking and go to next
+			threadSocketIterator.remove();
+
+			continue;
+		}
+		if (socketPtr->GetRequestId() == requestId){
+			socketPtr->quit();
+			socketPtr->wait(1000);
+			socketPtr->deleteLater();
+			threadSocketIterator.remove();
 		}
 	}
 
@@ -328,14 +339,18 @@ void CMultiThreadServer::AboutToQuit()
 {
 	m_isActive = false;
 
-	for (CSocketThread* socket : m_threadSocketList){
-		Q_EMIT socket->Abort();
+	QWriteLocker threadListLock(&m_threadSocketListGuard);
 
-		socket->wait(1000);
-		socket->quit();
+	QMutableListIterator threadSocketIterator(m_threadSocketList);
+	while(threadSocketIterator.hasNext()){
+		QPointer<CSocketThread>& socketPtr = threadSocketIterator.next();
+		if(!socketPtr.isNull()){
+			socketPtr->quit();
+			socketPtr->wait(1000);
+			socketPtr->deleteLater();
+		}
 
-		socket->wait(1000);
-		socket->deleteLater();
+		threadSocketIterator.remove();
 	}
 }
 
@@ -367,6 +382,7 @@ void CMultiThreadServer::incomingConnection(qintptr socketDescriptor)
 
 	qDebug() << socketDescriptor << " Connecting..." << m_rootServer.GetThreadsLimit();
 
+	QWriteLocker threadListLock(&m_threadSocketListGuard);
 	AddSocketDescriptor(socketDescriptor);
 
 	CSocketThread* threadSocket = nullptr;
