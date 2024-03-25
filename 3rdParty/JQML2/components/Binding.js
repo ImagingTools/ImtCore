@@ -36,6 +36,7 @@ class Binding extends QtObject {
             this.$prop = prop
             prop.subscribe(this.getProperty('value'))
             prop.setCompute(()=>{return this.getPropertyValue('value')})
+            this.getProperty('value').update()
             prop.update()
         }
     }
