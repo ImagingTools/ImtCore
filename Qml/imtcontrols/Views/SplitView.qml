@@ -3,7 +3,7 @@ import Acf 1.0;
 import imtcontrols 1.0
 
 
-Row{
+Item{
     id: splitView;
 
     property int orientation: Qt.Horizontal;
@@ -12,74 +12,159 @@ Row{
     property int _splitterCount: !_childrenCount  ? 0 : _childrenCount -1;
 
     property bool compl: false;
-    property bool hasAnim: false;
-    property int animDuration: 70;
+    property bool hasParent: false;
+    property bool ready: compl && hasParent;
+
+    property bool hasAnimation: false;
+    property int animationDuration: 70;
+
+    property real parentWidth: parent ? parent.width : 0;
+    property real parentHeight: parent ? parent.height : 0;
+
+    property real prevWidth: 0;
+    property real prevHeight: 0;
 
     property TreeItemModel sizeModel: TreeItemModel{};
 
     clip: true;
 
     Component.onCompleted: {
-        console.log("children.length:: ", children.length)
-        let count = children.length;
-        splitView._childrenCount = count;
+        compl = true;
+    }
+    onParentChanged: {
+        if(parent){
+            hasParent = true;
+        }
+    }
 
-        if(splitView.orientation == Qt.Horizontal){
-            for(let i = 0; i < count ; i++){
-                splitView.children[i].height = splitView.height;
-            }
+    onReadyChanged: {
+        if(ready){
+            console.log("children.length:: ", children.length)
+            let count = children.length;
+            splitView._childrenCount = count;
 
-            for(let i = 0; i < count -1; i++){
-                splitterComp.createObject(splitView)
-            }
-
-            let newCount = children.length;
-            let list = []
-
-            for(let i = 0; i < count; i++){
-                let obj_ = children[i];
-                list.push(obj_)
-                if(i < count - 1){
-                    let splitObj =  children[newCount - 1 - i];
-                    splitObj.rowIndex = 2 * i + 1;
-                    list.push(splitObj)
+            if(splitView.orientation == Qt.Horizontal){
+                for(let i = 0; i < count ; i++){
+                    splitView.children[i].height = splitView.height;
                 }
 
-            }
-            children = list;
-        }//horizontal
+                for(let i = 0; i < count -1; i++){
+                    splitterComp.createObject(splitView)
+                }
 
-        else if(splitView.orientation == Qt.Vertical){
+                let newCount = children.length;
+                let list = []
+
+                for(let i = 0; i < count; i++){
+                    let obj_ = children[i];
+                    list.push(obj_)
+                    if(i < count - 1){
+                        let splitObj =  children[newCount - 1 - i];
+                        splitObj.rowIndex = 2 * i + 1;
+                        list.push(splitObj)
+                    }
+
+                }
+                children = [];
+                row.createObject(splitView);
+                children[0].children = list;
+            }//horizontal
+
+            else if(splitView.orientation == Qt.Vertical){
+                for(let i = 0; i < count ; i++){
+                    splitView.children[i].width = splitView.width;
+                }
+                for(let i = 0; i < count -1; i++){
+                    splitterCompForVert.createObject(splitView);
+                }
+
+                let newCount = children.length;
+                let list = []
+
+                for(let i = 0; i < count; i++){
+                    let obj_ = children[i];
+                    list.push(obj_)
+                    if(i < count - 1){
+                        let splitObj =  children[newCount - 1 - i];
+                        splitObj.rowIndex = 2 * i + 1;
+                        list.push(splitObj)
+                    }
+                }
+
+                children = [];
+                column.createObject(splitView);
+                children[0].children = list;
+            }
+
+            fillSizeModelDefault(count);
+            correctSize();
+            sizeModel.dataChanged.connect(onModelDataChanged)
+
+            prevWidth = width;
+            prevHeight = height;
+
+        }//if(ready)
+
+    }
+
+    onWidthChanged: {
+        if(!ready){
+            return;
+        }
+        if(splitView.orientation == Qt.Vertical){
+            splitView.children[0].width = splitView.width;
+            let count = splitView.children[0].children.length;
             for(let i = 0; i < count ; i++){
-                splitView.children[i].width = splitView.width;
+                splitView.children[0].children[i].width = splitView.width;
             }
-            for(let i = 0; i < count -1; i++){
-                splitterCompForVert.createObject(splitView);
-            }
-
-            let newCount = children.length;
-            let list = []
-
-            for(let i = 0; i < count; i++){
-                let obj_ = children[i];
-                list.push(obj_)
-                if(i < count - 1){
-                    let splitObj =  children[newCount - 1 - i];
-                    splitObj.rowIndex = 2 * i + 1;
-                    list.push(splitObj)
+        }
+        else if(splitView.orientation == Qt.Horizontal){
+            //correct splitter position
+            if(prevWidth){
+                let coeff = width / prevWidth;
+                let count = splitView.children[0].children.length;
+                for(let i = 0; i < count ; i++){
+                    if(!(i % 2)){
+                        splitView.children[0].children[i].width = coeff * splitView.children[0].children[i].width;
+                    }
                 }
             }
-
-            children = [];
-            column.createObject(splitView);
-            children[0].children = list;
         }
 
-        fillSizeModelDefault(count);
-        correctSize();
-        splitView.compl = true;
-        sizeModel.dataChanged.connect(onModelDataChanged)
+        splitView.prevWidth = width;
     }
+
+    onHeightChanged: {
+        if(!ready){
+            return;
+        }
+        if(splitView.orientation == Qt.Horizontal ){
+            splitView.children[0].height = splitView.height
+            let count = splitView.children[0].children.length;
+            for(let i = 0; i < count ; i++){
+                splitView.children[0].children[i].height = splitView.height;
+            }
+        }
+        else if(splitView.orientation == Qt.Vertical){
+            //correct splitter position
+            if(prevHeight){
+
+                let coeff = height / prevHeight;
+                let count = splitView.children[0].children.length;
+
+                for(let i = 0; i < count ; i++){
+                    if(!(i % 2)){
+                        splitView.children[0].children[i].height =
+                                coeff * splitView.children[0].children[i].height;
+                    }
+                }
+            }
+
+        }
+
+        splitView.prevHeight = height;
+    }
+
 
     function fillSizeModelDefault(count_){
         for(let i = 0; i < count_; i++){
@@ -89,9 +174,9 @@ Row{
             sizeModel.SetData("MaximumWidth", 1000000, index);
             sizeModel.SetData("MaximumHeight", 1000000, index);
 
-            let width_ = splitView.orientation == Qt.Horizontal ? splitView.children[2*i].width:
+            let width_ = splitView.orientation == Qt.Horizontal ? splitView.children[0].children[2*i].width:
                                                                   splitView.children[0].children[2*i].width;
-            let height_ = splitView.orientation == Qt.Horizontal ? splitView.children[2*i].height :
+            let height_ = splitView.orientation == Qt.Horizontal ? splitView.children[0].children[2*i].height :
                                                                    splitView.children[0].children[2*i].height;
 
             sizeModel.SetData("PreferredWidth", width_, index);
@@ -136,7 +221,7 @@ Row{
 
             for(let i = 0; i < (splitView._childrenCount + splitView._splitterCount); i++){
                 if(i % 2){
-                    widthRest += splitView.children[i].width;
+                    widthRest += splitView.children[0].children[i].width;
                 }
             }
 
@@ -147,10 +232,10 @@ Row{
                 }
                 else {
                     widthRest += sizeModel.GetData("PreferredWidth",i);
-                    }
+                }
             }
             if(indexFillWidth >=0){
-                splitView.children[indexFillWidth].width = splitView.width - widthRest;
+                splitView.children[0].children[indexFillWidth].width = splitView.width - widthRest;
             }
         }
 
@@ -186,7 +271,7 @@ Row{
             let width_ = sizeModel.GetData("PreferredWidth", i);
             let height_ = sizeModel.GetData("PreferredHeight", i);
             if(splitView.orientation == Qt.Horizontal){
-                splitView.children[2*i].width = width_;
+                splitView.children[0].children[2*i].width = width_;
             }
             else if(splitView.orientation == Qt.Vertical){
                 splitView.children[0].children[2*i].height = height_;
@@ -209,6 +294,14 @@ Row{
         }
     }
 
+    Component{
+        id: row;
+        Row{
+            height:  splitView.width;
+            clip: true;
+        }
+    }
+
 
     Component{
         id: splitterComp;
@@ -226,23 +319,23 @@ Row{
                 let prevModelIndex = (rowIndex - 1)/2;
                 let nextModelIndex = prevModelIndex + 1;
 
-                if(splitView.children[rowIndex - 1].width + delta_ > splitView.sizeModel.GetData("MinimumWidth", prevModelIndex) &&
-                    splitView.children[rowIndex - 1].width + delta_ <  splitView.sizeModel.GetData("MaximumWidth", prevModelIndex) &&
-                        splitView.children[rowIndex + 1].width - delta_ > splitView.sizeModel.GetData("MinimumWidth", nextModelIndex) &&
-                        splitView.children[rowIndex + 1].width - delta_ <  splitView.sizeModel.GetData("MaximumWidth", nextModelIndex))
+                if(splitView.children[0].children[rowIndex - 1].width + delta_ > splitView.sizeModel.GetData("MinimumWidth", prevModelIndex) &&
+                        splitView.children[0].children[rowIndex - 1].width + delta_ <  splitView.sizeModel.GetData("MaximumWidth", prevModelIndex) &&
+                        splitView.children[0].children[rowIndex + 1].width - delta_ > splitView.sizeModel.GetData("MinimumWidth", nextModelIndex) &&
+                        splitView.children[0].children[rowIndex + 1].width - delta_ <  splitView.sizeModel.GetData("MaximumWidth", nextModelIndex))
                 {
-                    if(splitView.hasAnim){
-                        let width1 = splitView.children[rowIndex - 1].width;
-                        let width2 = splitView.children[rowIndex + 1].width;
+                    if(splitView.hasAnimation){
+                        let width1 = splitView.children[0].children[rowIndex - 1].width;
+                        let width2 = splitView.children[0].children[rowIndex + 1].width;
                         anim1.from = width1; anim1.to = width1 + delta_;
                         anim2.from = width2; anim2.to = width2 - delta_;
-                        anim1.target = splitView.children[rowIndex - 1];
-                        anim2.target = splitView.children[rowIndex + 1];
+                        anim1.target = splitView.children[0].children[rowIndex - 1];
+                        anim2.target = splitView.children[0].children[rowIndex + 1];
                         anim1.start(); anim2.start();
                     }
                     else {
-                        splitView.children[rowIndex - 1].width += delta_;
-                        splitView.children[rowIndex + 1].width -= delta_;
+                        splitView.children[0].children[rowIndex - 1].width += delta_;
+                        splitView.children[0].children[rowIndex + 1].width -= delta_;
                     }
                 }
             }
@@ -305,12 +398,12 @@ Row{
                 let nextModelIndex = prevModelIndex + 1;
 
                 if(splitView.children[0].children[rowIndex - 1].height + delta_ > splitView.sizeModel.GetData("MinimumHeight", prevModelIndex) &&
-                    splitView.children[0].children[rowIndex - 1].height + delta_ <  splitView.sizeModel.GetData("MaximumHeight", prevModelIndex) &&
+                        splitView.children[0].children[rowIndex - 1].height + delta_ <  splitView.sizeModel.GetData("MaximumHeight", prevModelIndex) &&
                         splitView.children[0].children[rowIndex + 1].height - delta_ > splitView.sizeModel.GetData("MinimumHeight", nextModelIndex) &&
                         splitView.children[0].children[rowIndex + 1].height - delta_ <  splitView.sizeModel.GetData("MaximumHeight", nextModelIndex))
                 {
 
-                    if(splitView.hasAnim){
+                    if(splitView.hasAnimation){
                         let height1 = splitView.children[0].children[rowIndex - 1].height;
                         let height2 = splitView.children[0].children[rowIndex + 1].height;
                         anim1.from = height1; anim1.to = height1 + delta_;
@@ -319,7 +412,7 @@ Row{
                         anim2.target = splitView.children[0].children[rowIndex + 1];
                         anim1.start(); anim2.start();
 
-                                      }
+                    }
                     else {
                         splitView.children[0].children[rowIndex - 1].height += delta_;
                         splitView.children[0].children[rowIndex + 1].height -= delta_;
@@ -374,14 +467,14 @@ Row{
         id: anim1;
 
         property: splitView.orientation == Qt.Horizontal ? "width" : "height";
-        duration: splitView.animDuration;
+        duration: splitView.animationDuration;
     }
 
     NumberAnimation {
         id: anim2
 
         property: splitView.orientation == Qt.Horizontal ? "width" : "height";
-        duration: splitView.animDuration;
+        duration: splitView.animationDuration;
     }
 
 }
