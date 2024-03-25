@@ -23,9 +23,10 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter;
 
             width: splitView.orientation == Qt.Horizontal ? 800 : 200;
-            height: splitView.orientation == Qt.Horizontal ? 200 : 800;
+            height: splitView.orientation == Qt.Horizontal ? 200 : 500;
             color: "transparent";
             border.color: "lightgreen";
+
 
             SplitView{
                 id: splitView;
@@ -46,9 +47,10 @@ Rectangle {
                     id: red;
 
                     width: splitView.orientation == Qt.Horizontal ? 100 : 0;
-                    height: splitView.orientation == Qt.Vertical ? 100 : 0;
+                    height: splitView.orientation == Qt.Vertical ? 70 : 0;
 
                     color: "red";
+                    clip: true;
                     Text {
                         anchors.centerIn: parent;
                         font.pixelSize: 14;
@@ -60,8 +62,9 @@ Rectangle {
                     id: green;
 
                     width: splitView.orientation == Qt.Horizontal ? 200 : 0;
-                    height: splitView.orientation == Qt.Vertical ? 200 : 0;
+                    height: splitView.orientation == Qt.Vertical ? 100 : 0;
                     color: "green";
+                    clip: true;
                     Text {
                         anchors.centerIn: parent;
                         font.pixelSize: 14;
@@ -73,8 +76,9 @@ Rectangle {
                     id: yellow;
 
                     width: splitView.orientation == Qt.Horizontal ? 400 : 0;
-                    height: splitView.orientation == Qt.Vertical ? 400 : 0;
+                    height: splitView.orientation == Qt.Vertical ? 200 : 0;
                     color: "yellow";
+                    clip: true;
                     Text {
                         anchors.centerIn: parent;
                         font.pixelSize: 14;
