@@ -335,4 +335,62 @@ Rectangle {
 //        }
 //    }
 
+    SplitView{
+        id: splitView;
+
+        anchors.fill: parent;
+
+        orientation: Qt.Vertical;//!!!
+
+//        Component.onCompleted: {
+//            //sizeModel.SetData("MinimumWidth", 50, 0);
+//            sizeModel.SetData("FillWidth", true, 0);
+//        }
+
+        Rectangle{
+            id: red;
+
+            width: splitView.orientation == Qt.Horizontal ? 400 : 0;
+            height: splitView.orientation == Qt.Vertical ? 400 : 0;
+
+            color: "red";
+            clip: true;
+            Text {
+                anchors.centerIn: parent;
+                font.pixelSize: 14;
+                text: "SplitView red";
+            }
+        }
+
+        Rectangle{
+            id: green;
+
+            width: splitView.orientation == Qt.Horizontal ? 500 : 0;
+            height: splitView.orientation == Qt.Vertical ? 500 : 0;
+            color: "green";
+            clip: true;
+            Text {
+                anchors.centerIn: parent;
+                font.pixelSize: 14;
+                text: "SplitView green";
+            }
+        }
+
+//        Rectangle{
+//            id: yellow;
+
+//            width: splitView.orientation == Qt.Horizontal ? 400 : 0;
+//            height: splitView.orientation == Qt.Vertical ? 200 : 0;
+//            color: "yellow";
+//            clip: true;
+//            Text {
+//                anchors.centerIn: parent;
+//                font.pixelSize: 14;
+//                text: "SplitView yellow";
+//            }
+//        }
+
+
+    }//SplitView
+
 }
