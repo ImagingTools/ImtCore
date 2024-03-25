@@ -7,9 +7,11 @@
 // ImtCore includes
 #include <imtbase/ICollectionInfo.h>
 
+#include <QtCore/QString>
+
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-#define QT_ENDL std::endl
+#define QT_ENDL Qt::endl
 #else
 #define QT_ENDL endl
 #endif

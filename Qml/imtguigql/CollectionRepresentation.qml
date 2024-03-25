@@ -36,7 +36,7 @@ Item {
     }
 
     onBeginUpdate: {
-        internal.elementsUpdatingBlock = true;
+        // internal.elementsUpdatingBlock = true;
     }
 
     onEndUpdate: {
@@ -553,7 +553,7 @@ Item {
 
                     Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
 
-                    root.endUpdate();
+                    // root.endUpdate();
 
                     return;
                 }
@@ -576,6 +576,9 @@ Item {
                     }
                 }
 
+                // root.endUpdate();
+            }
+            if (this.state !== "Loading"){
                 root.endUpdate();
             }
         }

@@ -199,6 +199,7 @@ CollectionViewBase {
         }
 
         if (container.dataController){
+            console.log("CollectionView updateElements");
             container.dataController.updateElements(count, offset, container.collectionFilter.filterModel);
         }
     }
