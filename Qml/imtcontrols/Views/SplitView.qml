@@ -12,7 +12,7 @@ Row{
     property int _splitterCount: !_childrenCount  ? 0 : _childrenCount -1;
 
     property bool compl: false;
-    property bool hasAnim: true;
+    property bool hasAnim: false;
     property int animDuration: 70;
 
     property TreeItemModel sizeModel: TreeItemModel{};
@@ -217,7 +217,7 @@ Row{
             id: splitter;
 
             width: 6;
-            height: parent.height;
+            height: parent ? parent.height : 0;
             color: "#ffffff";
             property int rowIndex: -1;
             function correctSizes(delta_){
@@ -294,7 +294,7 @@ Row{
         Rectangle{
             id: splitterForVert;
 
-            width: parent.width;
+            width: parent ? parent.width : 0;
             height: 6;
             color: "#ffffff";
             property int rowIndex: -1;
@@ -311,14 +311,15 @@ Row{
                 {
 
                     if(splitView.hasAnim){
-                        let height1 = splitView.children[rowIndex - 1].height;
-                        let height2 = splitView.children[rowIndex + 1].height;
+                        let height1 = splitView.children[0].children[rowIndex - 1].height;
+                        let height2 = splitView.children[0].children[rowIndex + 1].height;
                         anim1.from = height1; anim1.to = height1 + delta_;
                         anim2.from = height2; anim2.to = height2 - delta_;
-                        anim1.target = splitView.children[rowIndex - 1];
-                        anim2.target = splitView.children[rowIndex + 1];
+                        anim1.target = splitView.children[0].children[rowIndex - 1];
+                        anim2.target = splitView.children[0].children[rowIndex + 1];
                         anim1.start(); anim2.start();
-                    }
+
+                                      }
                     else {
                         splitView.children[0].children[rowIndex - 1].height += delta_;
                         splitView.children[0].children[rowIndex + 1].height -= delta_;
@@ -372,14 +373,14 @@ Row{
     NumberAnimation {
         id: anim1;
 
-        property: splitView.orientation == Qt.Horizontal ? "width" : "height;"
+        property: splitView.orientation == Qt.Horizontal ? "width" : "height";
         duration: splitView.animDuration;
     }
 
     NumberAnimation {
         id: anim2
 
-        property: splitView.orientation == Qt.Horizontal ? "width" : "height;"
+        property: splitView.orientation == Qt.Horizontal ? "width" : "height";
         duration: splitView.animDuration;
     }
 
