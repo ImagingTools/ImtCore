@@ -338,7 +338,9 @@ Rectangle {
     SplitView{
         id: splitView;
 
-        anchors.fill: parent;
+        //anchors.fill: parent;
+        width: parent.width
+        height: parent.height/2
 
         orientation: Qt.Vertical;//!!!
 
@@ -354,11 +356,20 @@ Rectangle {
             height: splitView.orientation == Qt.Vertical ? 400 : 0;
 
             color: "red";
+            border.color: "violet"
+            border.width: 3
             clip: true;
             Text {
                 anchors.centerIn: parent;
                 font.pixelSize: 14;
                 text: "SplitView red";
+            }
+
+            MouseArea{
+                anchors.fill: parent;
+                onClicked: {
+                    console.log("TEST_CLICKED")
+                }
             }
         }
 
@@ -368,6 +379,8 @@ Rectangle {
             width: splitView.orientation == Qt.Horizontal ? 500 : 0;
             height: splitView.orientation == Qt.Vertical ? 500 : 0;
             color: "green";
+            border.color: "orange"
+            border.width: 3
             clip: true;
             Text {
                 anchors.centerIn: parent;
