@@ -32,6 +32,7 @@ GqlModel {
                             webSocketUrlGqlModel.port = url.port;
                         }
                         catch(error){
+                            webSocketUrlGqlModel.port = -1;
                             console.error("Web socket URL is invalid: ", value);
                         }
                     }
@@ -39,6 +40,7 @@ GqlModel {
             }
         }
         else if (this.state === "Error"){
+            webSocketUrlGqlModel.port = -1;
             console.error("Web socket URL provider ERROR");
         }
     }

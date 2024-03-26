@@ -385,7 +385,7 @@ StyleComponents {
             styleContainer.imagingToolsGradient4 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient4");
             styleContainer.greenColor = dataSource.GetData("ColorPalette").GetData("Green");
 
-            styleContainer.iconColorOnSelected = styleContainer.getThemeColor("IconColor", "OnSelected", dataSource);
+            styleContainer.iconColorOnSelected = styleContainer.getThemeColor("ActiveColors", "Highlight", dataSource);
 
             styleContainer.tabSelectedColor = styleContainer.getThemeColor("ActiveColors", "TabSelected", dataSource);
             styleContainer.errorTextColor = styleContainer.getThemeColor("ActiveColors", "ErrorText", dataSource);

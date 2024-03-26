@@ -99,11 +99,16 @@ Item {
         return "";
     }
 
+    function reconnect(){
+        webSocketPortProvider.port = -1;
+    }
+
     Component.onCompleted: {
         setDecorators()
 
         Events.subscribeEvent("UpdateModels", application.updateAllModels);
         Events.subscribeEvent("Logout", application.onLogout);
+        Events.subscribeEvent("Reconnect", application.reconnect);
 
         thumbnailDecorator.userManagementProvider.updated.connect(application.onUserModeChanged);
 
@@ -113,6 +118,7 @@ Item {
     Component.onDestruction: {
         Events.unSubscribeEvent("UpdateModels", application.updateAllModels);
         Events.unSubscribeEvent("Logout", application.onLogout);
+        Events.unSubscribeEvent("Reconnect", application.reconnect);
     }
 
     property alias thumbnailDecoratorGui: thumbnailDecorator;

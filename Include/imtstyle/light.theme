@@ -29,7 +29,22 @@
 	},
 	"Style": {
 		"Name": "Light",
-		"TemplateIconColor": "#D9D9D9",
+		"IconTemplateList": [
+		    {
+			    "TemplateIconColor": "#D9D9D9",
+				"IconColor": {
+				    "Normal": "ImagingTools Blue",
+					"OffActive": "ImagingTools Blue",
+					"OffDisabled": "LightGray 2",
+					"OffNormal": "ImagingTools Blue",
+					"OffSelected": "ImaginTools Accent",
+					"OnActive": "ImagingTools Blue",
+					"OnDisabled": "LightGray 2",
+					"OnNormal": "ImagingTools Blue",
+					"OnSelected": "ImaginTools Accent"
+				}
+			}
+		],
 		"ToolButtonGradient": {
 			"Start": "#F8F8FB",
 			"End": "#EEEEEE"
@@ -39,17 +54,6 @@
 			"End": "#F5F5F5"
 		},
 		"ToolButtonBorderColor": "#FFFFFF",
-		"IconColor": {
-			"Normal": "ImagingTools Blue",
-			"OffActive": "ImagingTools Blue",
-			"OffDisabled": "LightGray 2",
-			"OffNormal": "ImagingTools Blue",
-			"OffSelected": "ImaginTools Accent",
-			"OnActive": "ImagingTools Blue",
-			"OnDisabled": "LightGray 2",
-			"OnNormal": "ImagingTools Blue",
-			"OnSelected": "ImaginTools Accent"
-		},
 		"ActiveColors": {
 			"Background": "GrayBlue",
 			"Foreground": "White",

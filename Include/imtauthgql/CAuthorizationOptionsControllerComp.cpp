@@ -35,25 +35,6 @@ imtbase::CTreeItemModel* CAuthorizationOptionsControllerComp::CreateRepresentati
 		if (value < 0){
 			return nullptr;
 		}
-
-		QByteArray userModeId = parametersModelPtr->GetData("Id", value).toByteArray();
-		if (userModeId == "STRONG_USER_MANAGEMENT"){
-			if (m_superuserProviderCompPtr.IsValid()){
-				QString message;
-				bool superuserExists = m_superuserProviderCompPtr->SuperuserExists(message);
-				dataModelPtr->SetData("SuperUserExists", superuserExists);
-
-				if (!errorMessage.isEmpty()){
-					dataModelPtr->SetData("ErrorMessage", message);
-				}
-			}
-		}
-
-		if (m_databaseServerConnectionChekerCompPtr.IsValid()){
-			bool isConnected = m_databaseServerConnectionChekerCompPtr->CheckDatabaseConnection(errorMessage);
-
-			dataModelPtr->SetData("DatabaseConnectionState", isConnected);
-		}
 	}
 
 	return rootModelPtr.PopPtr();

@@ -45,6 +45,8 @@ WebSocket {
     }
 
     function reconnect(){
+        console.log("reconnect to", url)
+
         active = false;
         active = true;
     }

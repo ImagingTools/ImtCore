@@ -62,7 +62,7 @@ TreeItemModelObserver {
         if (container.settingsProvider != null){
             container.settingsProvider.setServerUrl(newVal);
             Events.sendEvent("Logout");
-            Events.sendEvent("UpdateSystemStatus");
+            Events.sendEvent("Reconnect");
         }
     }
 

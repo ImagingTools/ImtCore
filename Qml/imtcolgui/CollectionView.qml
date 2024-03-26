@@ -63,6 +63,12 @@ Item {
         collectionMetaInfo.metaInfoModel = metaInfoModel;
     }
 
+    function onEdit() {
+        if (container.commandsDelegate){
+            container.commandsDelegate.commandHandle("Edit");
+        }
+    }
+
     Connections {
         target: container;
 
@@ -201,13 +207,7 @@ Item {
         }
 
         onDoubleClicked: {
-            onEdit()
-        }
-
-        function onEdit() {
-            if (container.commandsDelegate){
-                container.commandsDelegate.commandHandle("Edit");
-            }
+            root.onEdit()
         }
 
         Binding {

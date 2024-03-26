@@ -148,7 +148,7 @@ bool CDatabaseEngineComp::CheckDatabaseConnection(QString& errorMessage) const
 {
 	QSqlDatabase::removeDatabase(*m_maintenanceDatabaseNameAttrPtr);
 
-	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, GetConnectionName());
+	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, *m_maintenanceDatabaseNameAttrPtr);
 
 	maintainanceDb.setConnectOptions(GetConnectionOptionsString(*m_dbTypeAttrPtr));
 
