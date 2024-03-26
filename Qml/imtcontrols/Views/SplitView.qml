@@ -12,8 +12,7 @@ Item{
     property int _splitterCount: !_childrenCount  ? 0 : _childrenCount -1;
 
     property bool compl: false;
-    property bool hasParent: false;
-    property bool ready: compl && hasParent;
+    property bool ready: compl && height > 0 && width > 0;
 
     property bool hasAnimation: false;
     property int animationDuration: 70;
@@ -30,11 +29,6 @@ Item{
 
     Component.onCompleted: {
         compl = true;
-    }
-    onParentChanged: {
-        if(parent){
-            hasParent = true;
-        }
     }
 
     onReadyChanged: {
@@ -112,10 +106,12 @@ Item{
             return;
         }
         if(splitView.orientation == Qt.Vertical){
-            splitView.children[0].width = splitView.width;
-            let count = splitView.children[0].children.length;
-            for(let i = 0; i < count ; i++){
-                splitView.children[0].children[i].width = splitView.width;
+            if ( splitView.children[0]){
+                splitView.children[0].width = splitView.width;
+                let count = splitView.children[0].children.length;
+                for(let i = 0; i < count ; i++){
+                    splitView.children[0].children[i].width = splitView.width;
+                }
             }
         }
         else if(splitView.orientation == Qt.Horizontal){
@@ -147,15 +143,17 @@ Item{
         }
         else if(splitView.orientation == Qt.Vertical){
             //correct splitter position
-            if(prevHeight){
+            if(prevHeight > 0){
 
                 let coeff = height / prevHeight;
                 let count = splitView.children[0].children.length;
+                console.log("count", count)
 
                 for(let i = 0; i < count ; i++){
                     if(!(i % 2)){
                         splitView.children[0].children[i].height =
                                 coeff * splitView.children[0].children[i].height;
+                        console.log(splitView.children[0].children[i].height, i, coeff)
                     }
                 }
             }
@@ -234,7 +232,7 @@ Item{
                     widthRest += sizeModel.GetData("PreferredWidth",i);
                 }
             }
-            if(indexFillWidth >=0){
+            if(indexFillWidth >=0 && splitView.width - widthRest > 0){
                 splitView.children[0].children[indexFillWidth].width = splitView.width - widthRest;
             }
         }
@@ -258,7 +256,7 @@ Item{
                     heightRest += sizeModel.GetData("PreferredHeight",i);
                 }
             }
-            if(indexFillHeight >=0){
+            if(indexFillHeight >=0 && splitView.height - heightRest > 0){
                 splitView.children[0].children[indexFillHeight].height = splitView.height - heightRest;
             }
 
@@ -312,30 +310,36 @@ Item{
             width: 6;
             height: parent ? parent.height : 0;
             color: "#ffffff";
+            z: 100
             property int rowIndex: -1;
             function correctSizes(delta_){
                 //console.log("delta_ :: ", delta_, rowIndex)
+                if (!splitView.children[0]){
+                    return
+                }
 
                 let prevModelIndex = (rowIndex - 1)/2;
                 let nextModelIndex = prevModelIndex + 1;
+                let childrenPrev = splitView.children[0].children[splitter.rowIndex - 1]
+                let childrenNext = splitView.children[0].children[splitter.rowIndex + 1]
 
-                if(splitView.children[0].children[rowIndex - 1].width + delta_ > splitView.sizeModel.GetData("MinimumWidth", prevModelIndex) &&
-                        splitView.children[0].children[rowIndex - 1].width + delta_ <  splitView.sizeModel.GetData("MaximumWidth", prevModelIndex) &&
-                        splitView.children[0].children[rowIndex + 1].width - delta_ > splitView.sizeModel.GetData("MinimumWidth", nextModelIndex) &&
-                        splitView.children[0].children[rowIndex + 1].width - delta_ <  splitView.sizeModel.GetData("MaximumWidth", nextModelIndex))
+                if(childrenPrev.width + delta_ > splitView.sizeModel.GetData("MinimumWidth", prevModelIndex) &&
+                        childrenPrev.width + delta_ <  splitView.sizeModel.GetData("MaximumWidth", prevModelIndex) &&
+                        childrenNext.width - delta_ > splitView.sizeModel.GetData("MinimumWidth", nextModelIndex) &&
+                        childrenNext.width - delta_ <  splitView.sizeModel.GetData("MaximumWidth", nextModelIndex))
                 {
                     if(splitView.hasAnimation){
-                        let width1 = splitView.children[0].children[rowIndex - 1].width;
-                        let width2 = splitView.children[0].children[rowIndex + 1].width;
+                        let width1 = childrenPrev.width;
+                        let width2 = childrenNext.width;
                         anim1.from = width1; anim1.to = width1 + delta_;
                         anim2.from = width2; anim2.to = width2 - delta_;
-                        anim1.target = splitView.children[0].children[rowIndex - 1];
-                        anim2.target = splitView.children[0].children[rowIndex + 1];
+                        anim1.target = childrenPrev;
+                        anim2.target = childrenNext;
                         anim1.start(); anim2.start();
                     }
                     else {
-                        splitView.children[0].children[rowIndex - 1].width += delta_;
-                        splitView.children[0].children[rowIndex + 1].width -= delta_;
+                        childrenPrev.width += delta_;
+                        childrenNext.width -= delta_;
                     }
                 }
             }
@@ -390,32 +394,39 @@ Item{
             width: parent ? parent.width : 0;
             height: 6;
             color: "#ffffff";
+            z: 100
             property int rowIndex: -1;
             function correctSizes(delta_){
                 //console.log("delta_ :: ", delta_, rowIndex)
+                if (!splitView.children[0]){
+                    return
+                }
 
                 let prevModelIndex = (rowIndex - 1)/2;
                 let nextModelIndex = prevModelIndex + 1;
+                let childrenPrev = splitView.children[0].children[splitterForVert.rowIndex - 1]
+                let childrenNext = splitView.children[0].children[splitterForVert.rowIndex + 1]
 
-                if(splitView.children[0].children[rowIndex - 1].height + delta_ > splitView.sizeModel.GetData("MinimumHeight", prevModelIndex) &&
-                        splitView.children[0].children[rowIndex - 1].height + delta_ <  splitView.sizeModel.GetData("MaximumHeight", prevModelIndex) &&
-                        splitView.children[0].children[rowIndex + 1].height - delta_ > splitView.sizeModel.GetData("MinimumHeight", nextModelIndex) &&
-                        splitView.children[0].children[rowIndex + 1].height - delta_ <  splitView.sizeModel.GetData("MaximumHeight", nextModelIndex))
+
+                if(childrenPrev.height + delta_ > splitView.sizeModel.GetData("MinimumHeight", prevModelIndex) &&
+                        childrenPrev.height + delta_ <  splitView.sizeModel.GetData("MaximumHeight", prevModelIndex) &&
+                        childrenNext.height - delta_ > splitView.sizeModel.GetData("MinimumHeight", nextModelIndex) &&
+                        childrenNext.height - delta_ <  splitView.sizeModel.GetData("MaximumHeight", nextModelIndex))
                 {
 
                     if(splitView.hasAnimation){
-                        let height1 = splitView.children[0].children[rowIndex - 1].height;
-                        let height2 = splitView.children[0].children[rowIndex + 1].height;
+                        let height1 = childrenPrev.height;
+                        let height2 = childrenNext.height;
                         anim1.from = height1; anim1.to = height1 + delta_;
                         anim2.from = height2; anim2.to = height2 - delta_;
-                        anim1.target = splitView.children[0].children[rowIndex - 1];
-                        anim2.target = splitView.children[0].children[rowIndex + 1];
+                        anim1.target = childrenPrev;
+                        anim2.target = childrenNext;
                         anim1.start(); anim2.start();
 
                     }
                     else {
-                        splitView.children[0].children[rowIndex - 1].height += delta_;
-                        splitView.children[0].children[rowIndex + 1].height -= delta_;
+                        childrenPrev.height += delta_;
+                        childrenNext.height -= delta_;
                     }
 
                 }

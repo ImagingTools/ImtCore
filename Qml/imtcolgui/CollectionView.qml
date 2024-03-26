@@ -190,8 +190,8 @@ CollectionViewBase {
             return;
         }
 
-        let count = 0;
-        let offset = -1;
+        let count = -1;
+        let offset = 0;
 
         if (container.hasPagination){
             count = pagination.countElements;

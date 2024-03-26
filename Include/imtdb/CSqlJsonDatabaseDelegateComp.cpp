@@ -146,7 +146,6 @@ imtdb::IDatabaseObjectDelegate::NewObjectQuery CSqlJsonDatabaseDelegateComp::Cre
 					.arg(checksum).toUtf8();
 
 			retVal.query += CreateOperationDescriptionQuery(objectId, operationContextPtr);
-
 			retVal.objectName = objectName;
 		}
 	}

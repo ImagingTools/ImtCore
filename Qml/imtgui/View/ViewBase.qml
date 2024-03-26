@@ -28,11 +28,12 @@ Item {
     }
 
     onCommandsControllerCompChanged: {
-        if (commandsControllerComp){
-            if (commandsController){
-                commandsController.destroy();
-            }
+        if (commandsController){
+            commandsController.destroy();
+            commandsController = null
+        }
 
+        if (commandsControllerComp){
             commandsController = commandsControllerComp.createObject(viewBase);
         }
     }
