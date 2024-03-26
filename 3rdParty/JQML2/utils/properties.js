@@ -514,6 +514,8 @@ class QAlias extends QProperty {
             this.value = safeValue
             if(targetProperty instanceof QProperty) targetProperty.reset(safeValue)
             if(this.notify) this.notify()
+        } else {
+            if(targetProperty instanceof QProperty) targetProperty.reset(safeValue)
         }
     }
 
