@@ -219,49 +219,86 @@ Item{
 
         if(splitView.orientation == Qt.Horizontal){
             let widthRest = 0;
+            let widthSplitters = 0;
             let indexFillWidth = - 1;
+            let totalValue = 0;
 
             for(let i = 0; i < (splitView._childrenCount + splitView._splitterCount); i++){
+                totalValue += splitView.children[0].children[i].width;
                 if(i % 2){
-                    widthRest += splitView.children[0].children[i].width;
+                    widthSplitters += splitView.children[0].children[i].width;
                 }
             }
 
-            for(let i = 0; i < sizeModel.GetItemsCount(); i++){
-                let ok = sizeModel.GetData("FillWidth", i) && indexFillWidth < 0;
-                if(ok){
-                    indexFillWidth = 2*i;
+            if(totalValue <= splitView.width){
+                widthRest = widthSplitters;
+                for(let i = 0; i < sizeModel.GetItemsCount(); i++){
+                    let ok = sizeModel.GetData("FillWidth", i) && indexFillWidth < 0;
+                    if(ok){
+                        indexFillWidth = 2*i;
+                    }
+                    else {
+                        widthRest += sizeModel.GetData("PreferredWidth",i);
+                    }
                 }
-                else {
-                    widthRest += sizeModel.GetData("PreferredWidth",i);
+                if(indexFillWidth >=0 && splitView.width - widthRest > 0){
+                    splitView.children[0].children[indexFillWidth].width = splitView.width - widthRest;
+                }
+
+            }//totalValue <= splitView.width
+            else {//totalValue > splitView.width
+                let coeff = totalValue / splitView.width;
+
+                let correction = Math.ceil((widthSplitters - widthSplitters / coeff) / splitView._childrenCount)
+                for(let i = 0; i < (splitView._childrenCount + splitView._splitterCount); i++){
+                    if(!(i % 2)){
+                        splitView.children[0].children[i].width =
+                                splitView.children[0].children[i].width / coeff - correction;
+                    }
                 }
             }
-            if(indexFillWidth >=0 && splitView.width - widthRest > 0){
-                splitView.children[0].children[indexFillWidth].width = splitView.width - widthRest;
-            }
-        }
+
+        }//Horizontal
 
         else if(splitView.orientation == Qt.Vertical){
             let heightRest = 0;
+            let heightSplitters = 0;
             let indexFillHeight = - 1;
+            let totalValue = 0;
 
             for(let i = 0; i < (splitView._childrenCount + splitView._splitterCount); i++){
+                totalValue += splitView.children[0].children[i].height;
                 if(i % 2){
-                    heightRest += splitView.children[0].children[i].height;
+                    heightSplitters += splitView.children[0].children[i].height;
                 }
             }
 
-            for(let i = 0; i < sizeModel.GetItemsCount(); i++){
-                let ok =  sizeModel.GetData("FillHeight", i) && indexFillHeight < 0;
-                if(ok){
-                    indexFillHeight = 2*i;
+            if(totalValue <= splitView.height){
+                heightRest = heightSplitters;
+                for(let i = 0; i < sizeModel.GetItemsCount(); i++){
+                    let ok =  sizeModel.GetData("FillHeight", i) && indexFillHeight < 0;
+                    if(ok){
+                        indexFillHeight = 2*i;
+                    }
+                    else {
+                        heightRest += sizeModel.GetData("PreferredHeight",i);
+                    }
                 }
-                else {
-                    heightRest += sizeModel.GetData("PreferredHeight",i);
+                if(indexFillHeight >=0 && splitView.height - heightRest > 0){
+                    splitView.children[0].children[indexFillHeight].height = splitView.height - heightRest;
                 }
-            }
-            if(indexFillHeight >=0 && splitView.height - heightRest > 0){
-                splitView.children[0].children[indexFillHeight].height = splitView.height - heightRest;
+            }//totalValue <= splitView.height
+
+            else {//totalValue >splitView.height
+                let coeff = totalValue / splitView.height;
+
+                let correction = Math.ceil((heightSplitters - heightSplitters / coeff) / splitView._childrenCount)
+                for(let i = 0; i < (splitView._childrenCount + splitView._splitterCount); i++){
+                    if(!(i % 2)){
+                        splitView.children[0].children[i].height =
+                                splitView.children[0].children[i].height / coeff - correction;
+                    }
+                }
             }
 
         }
@@ -283,7 +320,7 @@ Item{
     }
 
     function onModelDataChanged(topLeft, bottomRight, keyRoles){
-        if(compl){
+        if(ready){
             correctSize();
         }
     }
