@@ -105,6 +105,8 @@ class CMultiThreadServer : public QTcpServer, virtual public IRequestManager
 	Q_OBJECT
 public:
 	explicit CMultiThreadServer(CTcpServerComp* rootServer);
+	virtual ~CMultiThreadServer();
+
 	imtrest::IRequestServlet* GetRequestServlet();
 	imtrest::IProtocolEngine* GetProtocolEngine();
 
@@ -117,7 +119,9 @@ Q_SIGNALS:
 
 public Q_SLOTS:
 	void Disconnected(QByteArray requestId);
-	void AboutToQuit();
+
+protected Q_SLOTS:
+	void ShutdownServer();
 
 protected:
 	void AddSocketDescriptor(qintptr socketDescriptor);
