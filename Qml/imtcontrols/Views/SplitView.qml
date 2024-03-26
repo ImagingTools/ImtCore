@@ -105,13 +105,14 @@ Item{
         if(!ready){
             return;
         }
+        if(!splitView.children[0]){
+            return;
+        }
         if(splitView.orientation == Qt.Vertical){
-            if ( splitView.children[0]){
-                splitView.children[0].width = splitView.width;
-                let count = splitView.children[0].children.length;
-                for(let i = 0; i < count ; i++){
-                    splitView.children[0].children[i].width = splitView.width;
-                }
+            splitView.children[0].width = splitView.width;
+            let count = splitView.children[0].children.length;
+            for(let i = 0; i < count ; i++){
+                splitView.children[0].children[i].width = splitView.width;
             }
         }
         else if(splitView.orientation == Qt.Horizontal){
@@ -132,6 +133,9 @@ Item{
 
     onHeightChanged: {
         if(!ready){
+            return;
+        }
+        if(!splitView.children[0]){
             return;
         }
         if(splitView.orientation == Qt.Horizontal ){
