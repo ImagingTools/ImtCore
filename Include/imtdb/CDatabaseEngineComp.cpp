@@ -147,7 +147,8 @@ QSqlQuery CDatabaseEngineComp::ExecSqlQueryFromFile(const QString& filePath, con
 bool CDatabaseEngineComp::CheckDatabaseConnection(QString& errorMessage) const
 {
 	QSqlDatabase::removeDatabase(*m_maintenanceDatabaseNameAttrPtr);
-	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, *m_maintenanceDatabaseNameAttrPtr);
+
+	QSqlDatabase maintainanceDb = QSqlDatabase::addDatabase(*m_dbTypeAttrPtr, GetConnectionName());
 
 	maintainanceDb.setConnectOptions(GetConnectionOptionsString(*m_dbTypeAttrPtr));
 
