@@ -350,8 +350,7 @@ Item{
 
             width: 6;
             height: parent.height;
-            color: "#ffffff";
-            z: 100
+            color: Style.color_scrollBackground;
             property int rowIndex: -1;
             function correctSizes(delta_){
                 //console.log("delta_ :: ", delta_, rowIndex)
@@ -441,8 +440,7 @@ Item{
 
             width: parent.width ;
             height: 6;
-            color: "#ffffff";
-            z: 100
+            color: Style.color_scrollBackground;
             property int rowIndex: -1;
             function correctSizes(delta_){
                 //console.log("delta_ :: ", delta_, rowIndex)
