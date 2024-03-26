@@ -27,7 +27,7 @@ class WebSocket extends QtObject {
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
 
-        this.reconnect = false
+        this.$reconnect = false
     }
 
     $statusChanged() {
@@ -36,7 +36,7 @@ class WebSocket extends QtObject {
         }
     }
     connectSocket() {
-        this.reconnect = false
+        this.$reconnect = false
 
         if (!this.getPropertyValue('url') || !this.getPropertyValue('active')) {
             return
@@ -49,7 +49,7 @@ class WebSocket extends QtObject {
         }
         this.$socket.onclose = () => {
             this.getProperty('status').reset(WebSocket.Closed)
-            if (this.reconnect) {
+            if (this.$reconnect) {
                 this.connectSocket()
             }
         }
@@ -62,7 +62,7 @@ class WebSocket extends QtObject {
         }
     }
     $reconnectSocket() {
-        this.reconnect = true
+        this.$reconnect = true
         if (this.getPropertyValue('status') === WebSocket.Open) {
             this.getProperty('status').reset(WebSocket.Closing)
             this.$socket.close()

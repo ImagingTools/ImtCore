@@ -63,7 +63,7 @@ class Text extends Item {
         this.getDom().appendChild(this.impl)
 
         this.getProperty('visible').getNotify().connect(()=>{
-            this.updateGeometry()
+            this.applyMetrics()
         })
     }
 

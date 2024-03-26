@@ -176,6 +176,7 @@ class ListView extends Flickable {
         }
     }
     $modelChanged(){
+        this.$queueData = []
         this.$disconnectModel()
         for(let key in this.$items){
             if(key !== 'length') {
@@ -198,6 +199,7 @@ class ListView extends Flickable {
     }
 
     $delegateChanged(){
+        this.$queueData = []
         for(let key in this.$items){
             if(key !== 'length') {
                 let obj = this.$items[key]
@@ -546,10 +548,8 @@ class ListView extends Flickable {
 
     updateView(){
         if(!this.getPropertyValue('delegate') || this.getPropertyValue('model') === undefined || this.getPropertyValue('model') === null) return
-
-        this.prepare()
-
-        
+        this.$queueData = []
+        this.prepare() 
     }
 
     onMouseMove(x, y){
