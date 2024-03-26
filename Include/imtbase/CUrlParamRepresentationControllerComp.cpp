@@ -22,7 +22,19 @@ bool CUrlParamRepresentationControllerComp::GetRepresentationFromValue(
 	const imtbase::IUrlParam* urlParamPtr = dynamic_cast<const imtbase::IUrlParam*>(&dataModel);
 	Q_ASSERT(urlParamPtr != nullptr);
 
-	const QUrl url = urlParamPtr->GetUrl();
+	QUrl url = urlParamPtr->GetUrl();
+
+	if (url.host().isEmpty()){
+		url.setHost("localhost");
+	}
+
+	if (url.scheme().isEmpty()){
+		url.setScheme("http");
+	}
+
+	if (url.port() == -1){
+		url.setPort(80);
+	}
 
 	representation.SetData("Value", url.toString());
 

@@ -13,8 +13,6 @@ Item {
 
     property Decorators decorators: decorators_
 
-    property string message;
-    //    property string systemStatus: "NO_ERROR";
     property alias localSettings: application.settingsProvider.localModel;
 
     property alias thumbDecMenuPanelRadius: thumbnailDecorator.menuPanelRadius;
@@ -201,7 +199,7 @@ Item {
         }
         else if (status === WebSocket.Error || status === WebSocket.Closed){
             thumbnailDecorator.messagePage.visible = true;
-            thumbnailDecorator.messagePage.text = qsTr("Connection error")
+            thumbnailDecorator.messagePage.text = qsTr("Server connection error")
         }
         else if (status === WebSocket.Open){
             // No error
@@ -262,17 +260,6 @@ Item {
 
         applicationMain: application;
     }
-
-//    Component {
-//        id: errorDialog;
-
-//        ErrorDialog {
-//            title: qsTr("Warning Message");
-//            message: qsTr("Authorization server connection error");
-
-//            onFinished: {}
-//        }
-//    }
 
     function onLogout(){
         settingsProvider.serverModel = null;

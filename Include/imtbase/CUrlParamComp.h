@@ -30,7 +30,7 @@ public:
 		I_ASSIGN(m_defaultSchemeAttrPtr, "DefaultScheme", "Default scheme", true, "http");
 		I_ASSIGN(m_defaultUsernameAttrPtr, "DefaultUsername", "Default user name", true, "");
 		I_ASSIGN(m_defaultPasswordAttrPtr, "DefaultPassword", "Default password", true, "");
-		I_ASSIGN(m_defaultHostAttrPtr, "DefaultHost", "Default host", true, "");
+		I_ASSIGN(m_defaultHostAttrPtr, "DefaultHost", "Default host", true, "localhost");
 		I_ASSIGN(m_defaultPortAttrPtr, "DefaultPort", "Default port", true, 80);
 		I_ASSIGN(m_defaultPathAttrPtr, "DefaultPath", "Default path", true, "");
 		I_ASSIGN(m_defaultQueryAttrPtr, "DefaultQuery", "Default query", true, "");

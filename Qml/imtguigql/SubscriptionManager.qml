@@ -44,6 +44,11 @@ WebSocket {
         }
     }
 
+    function reconnect(){
+        active = false;
+        active = true;
+    }
+
     property Timer timer: Timer{
         id: timer;
 
@@ -58,11 +63,6 @@ WebSocket {
                 container.reconnect()
             }
         }
-    }
-
-    function reconnect(){
-        active = false;
-        active = true;
     }
 
     onUrlChanged: {
