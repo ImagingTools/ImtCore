@@ -99,29 +99,13 @@ class Item extends QtObject {
             touchAction: 'none',
         })
         
-
         if(parent){
-            // if(parent.$loader){
-            //     this.getProperty('width').setCompute(()=>{
-            //         this.getProperty('width').subscribe(parent.getProperty('width'))
-            //         return parent.getProperty('width').get()
-            //     })
-            //     this.getProperty('height').setCompute(()=>{
-            //         this.getProperty('height').subscribe(parent.getProperty('height'))
-            //         return parent.getProperty('height').get()
-            //     })
-            //     this.getProperty('width').update()
-            //     this.getProperty('height').update()
-            // }
-
-            this.getProperty('visible').setOriginCompute(()=>{this.getProperty('visible').subscribe(parent.getProperty('visible')); return parent.getProperty('visible').get()})
+            this.getProperty('visible').setOriginCompute(()=>{this.getProperty('visible').subscribe(this.getProperty('parent').get().getProperty('visible')); return this.getProperty('parent').get().getProperty('visible').get()})
             this.getProperty('visible').update()
 
             this.getProperty('activeFocus').setCompute(()=>{this.getProperty('activeFocus').subscribe(this.getProperty('focus'));return this.getProperty('focus').get()})
             this.getProperty('activeFocus').update()
         }
-
-        // this.getDom().onblur = (event) => {this.getProperty('focus').reset(false)}
     }
     
     createDom(tag = 'div', style){
@@ -152,12 +136,14 @@ class Item extends QtObject {
     $childrenChanged(topLeft, bottomRight, roles){
         if(roles === 'append'){
             for(let index = topLeft; index < bottomRight; index++){
-                if(this.getProperty('children').get().length > 1 && index > 0){
-                    this.$dom.insertBefore(this.getProperty('children').get()[index].$dom, this.getProperty('children').get()[index-1].$dom.nextSibling)
-                } else {
-                    this.$dom.insertBefore(this.getProperty('children').get()[index].$dom, null)
-                    // this.$dom.appendChild(this.getProperty('children').get()[index].$dom)
-                }
+                if(this.getProperty('children').get()[index].$dom){
+                    if(this.getProperty('children').get().length > 1 && index > 0){
+                        this.$dom.insertBefore(this.getProperty('children').get()[index].$dom, this.getProperty('children').get()[index-1].$dom.nextSibling)
+                    } else {
+                        this.$dom.insertBefore(this.getProperty('children').get()[index].$dom, null)
+                        // this.$dom.appendChild(this.getProperty('children').get()[index].$dom)
+                    }
+                }                
             }
         }  
         super.$childrenChanged(topLeft, bottomRight, roles)

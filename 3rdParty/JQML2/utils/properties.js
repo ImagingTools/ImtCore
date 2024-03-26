@@ -547,7 +547,7 @@ class QList extends QProperty {
     typeCasting(value){
         let push = value.push
         value.push = (...args)=>{
-            push.value.call(args)
+            push.call(value, ...args)
             if(this.notify) this.notify(value.length-1, value.length, 'append')
         }
         return value
