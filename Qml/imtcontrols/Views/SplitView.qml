@@ -369,11 +369,18 @@ Item{
 
                 hoverEnabled: true;
                 acceptedButtons: Qt.LeftButton;
-                cursorShape: splitView.orientation == Qt.Horizontal ? Qt.SplitHCursor : Qt.SplitVCursor;
+                propagateComposedEvents: true;
+                //cursorShape: splitView.orientation == Qt.Horizontal ? Qt.SplitHCursor : Qt.SplitVCursor;
+                cursorShape: pressed && containsMouse ? Qt.SplitHCursor : !pressed && withinParent ? Qt.SplitHCursor : Qt.ArrowCursor;
+                property bool withinParent:  mouseX > (width - parent.width)/2 && mouseX <  (width + parent.width)/2;
                 property int startX;
 
                 onPressed: {
                     startX = mouse.x;
+                }
+
+                onClicked: {
+                    mouse.accepted = false;
                 }
 
                 onPositionChanged:  {
@@ -458,11 +465,18 @@ Item{
 
                 hoverEnabled: true;
                 acceptedButtons: Qt.LeftButton;
-                cursorShape: splitView.orientation == Qt.Horizontal ? Qt.SplitHCursor : Qt.SplitVCursor;
+                propagateComposedEvents: true;
+                //cursorShape: splitView.orientation == Qt.Horizontal ? Qt.SplitHCursor : Qt.SplitVCursor;
+                cursorShape: pressed && containsMouse ? Qt.SplitVCursor : !pressed && withinParent ? Qt.SplitVCursor : Qt.ArrowCursor;
+                property bool withinParent:  mouseY > (height - parent.height)/2 && mouseY <  (height + parent.height)/2;
                 property int startY;
 
                 onPressed: {
                     startY = mouse.y;
+                }
+
+                onClicked: {
+                    mouse.accepted = false;
                 }
 
                 onPositionChanged:  {
