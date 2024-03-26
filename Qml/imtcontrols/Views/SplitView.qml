@@ -25,7 +25,7 @@ Item{
 
     property TreeItemModel sizeModel: TreeItemModel{};
 
-    clip: true;
+    //clip: true;
 
     Component.onCompleted: {
         compl = true;
@@ -43,7 +43,8 @@ Item{
                 }
 
                 for(let i = 0; i < count -1; i++){
-                    splitterComp.createObject(splitView)
+                  let obj =  splitterComp.createObject(splitView)
+                  obj.height = splitView.height;
                 }
 
                 let newCount = children.length;
@@ -69,7 +70,8 @@ Item{
                     splitView.children[i].width = splitView.width;
                 }
                 for(let i = 0; i < count -1; i++){
-                    splitterCompForVert.createObject(splitView);
+                   let obj = splitterCompForVert.createObject(splitView);
+                   obj.width = splitView.width;
                 }
 
                 let newCount = children.length;
@@ -176,10 +178,8 @@ Item{
             sizeModel.SetData("MaximumWidth", 1000000, index);
             sizeModel.SetData("MaximumHeight", 1000000, index);
 
-            let width_ = splitView.orientation == Qt.Horizontal ? splitView.children[0].children[2*i].width:
-                                                                  splitView.children[0].children[2*i].width;
-            let height_ = splitView.orientation == Qt.Horizontal ? splitView.children[0].children[2*i].height :
-                                                                   splitView.children[0].children[2*i].height;
+            let width_ = splitView.children[0].children[2*i].width;
+            let height_ = splitView.children[0].children[2*i].height;
 
             sizeModel.SetData("PreferredWidth", width_, index);
             sizeModel.SetData("PreferredHeight", height_, index);
@@ -312,7 +312,7 @@ Item{
             id: splitter;
 
             width: 6;
-            height: parent ? parent.height : 0;
+            height: parent.height;
             color: "#ffffff";
             z: 100
             property int rowIndex: -1;
@@ -395,7 +395,7 @@ Item{
         Rectangle{
             id: splitterForVert;
 
-            width: parent ? parent.width : 0;
+            width: parent.width ;
             height: 6;
             color: "#ffffff";
             z: 100
