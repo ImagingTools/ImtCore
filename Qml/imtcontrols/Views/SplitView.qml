@@ -25,7 +25,7 @@ Item{
 
     property TreeItemModel sizeModel: TreeItemModel{};
 
-    //clip: true;
+    clip: true;
 
     Component.onCompleted: {
         compl = true;
