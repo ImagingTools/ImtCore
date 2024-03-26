@@ -3,6 +3,7 @@ import Acf 1.0
 import imtgui 1.0
 import imtguigql 1.0
 import imtcontrols 1.0
+import QtWebSockets 1.2
 
 
 Item {
@@ -13,7 +14,7 @@ Item {
     property Decorators decorators: decorators_
 
     property string message;
-//    property string systemStatus: "NO_ERROR";
+    //    property string systemStatus: "NO_ERROR";
     property alias localSettings: application.settingsProvider.localModel;
 
     property alias thumbDecMenuPanelRadius: thumbnailDecorator.menuPanelRadius;
@@ -22,10 +23,32 @@ Item {
     property var applicationInfo;
 
     property bool serverReady: false;
+    property bool authorizationServerConnected: false;
     property bool useWebSocketSubscription: false;
+
+    property alias subscriptionManager: subscriptionManager_;
 
     property alias loadPageByClick: thumbnailDecorator.loadPageByClick;
     property alias canRecoveryPassword: thumbnailDecorator.canRecoveryPassword;
+
+    property bool start: serverReady && application.settingsProvider.localModel != null && webSocketPortProvider.port != -1;
+    onStartChanged: {
+        if (start){
+            connectToWebSocketServer();
+        }
+    }
+
+    onAuthorizationServerConnectedChanged: {
+        console.log("onAuthorizationServerConnectedChanged", authorizationServerConnected);
+        if (authorizationServerConnected){
+            let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
+            if (loggedUserId === ""){
+                thumbnailDecorator.closeAllPages();
+
+                application.firstModelsInit();
+            }
+        }
+    }
 
     onWidthChanged: {
         Events.sendEvent("AppSizeChanged", {"Width": width, "Height": height})
@@ -45,7 +68,6 @@ Item {
     onServerReadyChanged: {
         if (serverReady){
             webSocketPortProvider.updateModel();
-            startSystemStatusChecking();
         }
     }
 
@@ -55,16 +77,6 @@ Item {
 
     onLocalSettingsUpdated: {
         application.updateAllModels();
-    }
-
-    Connections {
-        target: application.settingsProvider;
-
-        function onLocalModelChanged(){
-            let serverUrl = application.settingsProvider.getValue("ServerUrl");
-
-            application.systemStatusController.serverUrl = serverUrl;
-        }
     }
 
     Decorators {
@@ -79,12 +91,21 @@ Item {
         Style.setDecorators(decorators)
     }
 
+    function getServerUrl(){
+        if (application.settingsProvider){
+            let serverUrl = application.settingsProvider.getValue("ServerUrl");
+
+            return serverUrl;
+        }
+
+        return "";
+    }
+
     Component.onCompleted: {
         setDecorators()
 
         Events.subscribeEvent("UpdateModels", application.updateAllModels);
         Events.subscribeEvent("Logout", application.onLogout);
-        Events.subscribeEvent("UpdateSystemStatus", application.updateSystemStatus);
 
         thumbnailDecorator.userManagementProvider.updated.connect(application.onUserModeChanged);
 
@@ -94,7 +115,6 @@ Item {
     Component.onDestruction: {
         Events.unSubscribeEvent("UpdateModels", application.updateAllModels);
         Events.unSubscribeEvent("Logout", application.onLogout);
-        Events.unSubscribeEvent("UpdateSystemStatus", application.updateSystemStatus);
     }
 
     property alias thumbnailDecoratorGui: thumbnailDecorator;
@@ -125,10 +145,6 @@ Item {
                 application.settingsObserver.onDesignSchemaChanged(index);
             }
         }
-
-//        onLocalModelChanged: {
-//            application.designProvider.applyCachedDesignSchema();
-//        }
 
         onLocalSettingsSaved: {
             application.settingsUpdate();
@@ -162,85 +178,52 @@ Item {
         settingsProvider: application.settingsProvider;
     }
 
-    property SystemStatusController systemStatusController : SystemStatusController{
-        onSystemStatusChanged: {
-            console.log("AppMain onSystemStatusChanged", systemStatus);
-
-            let message = this.getLastMessage();
-
-            thumbnailDecorator.closeAllPages();
-            thumbnailDecorator.messagePage.loadingVisible = false;
-
-            if (systemStatus === 1){
-                thumbnailDecorator.messagePage.loadingVisible = true;
-            }
-
-            if (systemStatus === 0 ||
-                systemStatus === 1 ||
-                systemStatus === 2 ||
-                systemStatus === 3){
-                thumbnailDecorator.messagePage.visible = true;
-                thumbnailDecorator.messagePage.text = message
-            }
-            else if (systemStatus === 4){
-                thumbnailDecorator.messagePage.visible = false;
-
-                // No error
-                let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
-                if (loggedUserId === ""){
-                    thumbnailDecorator.closeAllPages();
-
-                    application.firstModelsInit();
-                }
-            }
-        }
-    }
-
     SubscriptionManager {
-        id: subscriptionManager;
+        id: subscriptionManager_;
 
         active: application.useWebSocketSubscription;
 
-        property bool applyUrl: application.serverReady && application.settingsProvider.serverModel != null;
-        onApplyUrlChanged: {
-            console.log("onApplyUrlChanged", applyUrl);
+        onStatusChanged: {
+            application.checkStatus(status)
+        }
+    }
 
-            if (applyUrl){
-                let webSocketServerUrl = application.settingsProvider.getValue("WebSocketServerUrl");
-                if (webSocketServerUrl && webSocketServerUrl !== ""){
-                    webSocketServerUrl =  webSocketServerUrl.replace("http", "ws")
-                    subscriptionManager.url = webSocketServerUrl;
+    function checkStatus(status){
+        thumbnailDecorator.closeAllPages();
+        thumbnailDecorator.messagePage.loadingVisible = false;
 
-                    return;
-                }
+        if (status === WebSocket.Connecting){
+            thumbnailDecorator.messagePage.visible = true;
+            thumbnailDecorator.messagePage.loadingVisible = true;
 
-                let wsUrl = "";
-                let serverUrl = application.settingsProvider.getValue("ServerUrl");
-                if (serverUrl !== ""){
-                    wsUrl = application.getWebSocketUrl(serverUrl);
-                }
-                else{
-                    wsUrl = application.getWebSocketUrl(context.location);
-                }
+            let serverUrl = application.getServerUrl();
+            thumbnailDecorator.messagePage.text = qsTr("Try connecting to ") + serverUrl + " ...";
+        }
+        else if (status === WebSocket.Error || status === WebSocket.Closed){
+            thumbnailDecorator.messagePage.visible = true;
+            thumbnailDecorator.messagePage.text = qsTr("Connection error")
+        }
+        else if (status === WebSocket.Open){
+            // No error
+            let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
+            if (loggedUserId === ""){
+                thumbnailDecorator.closeAllPages();
 
-                console.log("WEB Socket serverUrl", wsUrl);
-                subscriptionManager.url = wsUrl;
+                application.firstModelsInit();
             }
         }
-
-        onError: {
-            Events.sendEvent("SendWarningError", qsTr("There is no connection to the subscription server. Check the Web Server Socket Url in the settings or contact your system administrator."));
-
-            application.systemStatusController.updateSystemStatus();
+        else if (status === 5){
+            thumbnailDecorator.messagePage.visible = true;
+            thumbnailDecorator.messagePage.text = qsTr("Authorization server connection error")
         }
     }
 
     WebSocketPortProvider {
         id: webSocketPortProvider;
-    }
 
-    function startSystemStatusChecking(){
-        systemStatusController.updateSystemStatus();
+        onPortChanged: {
+            application.connectToWebSocketServer();
+        }
     }
 
     function getWebSocketUrl(serverUrl){
@@ -251,12 +234,7 @@ Item {
 
             url.protocol = "ws";
 
-            console.log("context.appName", context.appName);
-
-
             if (context.appName && context.appName !== ""){
-                console.log("===");
-
                 url.pathname = "/" + context.appName + "/wssub";
             }
 
@@ -266,8 +244,6 @@ Item {
             else{
                 console.error("WebSocket port provider has invalid port!");
             }
-
-            console.log("url.pathname", url.pathname);
 
             return String(url)
         }
@@ -287,10 +263,21 @@ Item {
         applicationMain: application;
     }
 
+//    Component {
+//        id: errorDialog;
+
+//        ErrorDialog {
+//            title: qsTr("Warning Message");
+//            message: qsTr("Authorization server connection error");
+
+//            onFinished: {}
+//        }
+//    }
+
     function onLogout(){
         settingsProvider.serverModel = null;
 
-        subscriptionManager.clear();
+        subscriptionManager_.clear();
     }
 
     function updateAllModels(){
@@ -310,6 +297,11 @@ Item {
     function onStrongUserManagement(){
         let loggedUserId = thumbnailDecorator.authorizationPageAlias.getLoggedUserId();
         if (loggedUserId === ""){
+            if (!authorizationServerConnected){
+                checkStatus(5);
+                return;
+            }
+
             thumbnailDecorator.superuserProvider.superuserExists();
         }
     }
@@ -330,4 +322,33 @@ Item {
             application.onStrongUserManagement();
         }
     }
+
+    function connectToWebSocketServer(){
+        subscriptionManager_.active = false;
+        let serverUrl = getServerUrl();
+        let webSocketServerUrl = getWebSocketUrl(serverUrl);
+        subscriptionManager_.url = webSocketServerUrl;
+        subscriptionManager_.active = true;
+    }
+
+    property Timer timer: Timer{
+        id: timer;
+
+        interval: 3000;
+
+        repeat: true;
+        running: true;
+
+        onTriggered: {
+            if (webSocketPortProvider.port == -1){
+                application.checkStatus(WebSocket.Error)
+
+                if (application.serverReady){
+                    webSocketPortProvider.updateModel();
+                }
+            }
+        }
+    }
 }
+
+

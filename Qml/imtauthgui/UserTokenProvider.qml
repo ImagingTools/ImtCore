@@ -53,11 +53,7 @@ QtObject {
         onStateChanged: {
             console.log("User Token State:", this.state, container.authorizationGqlModel.toJSON());
 
-            if (this.state === "NetworkError"){
-                let message = qsTr("There was a problem when trying to access the server. Check your network connection or contact your system administrator.");
-                Events.sendEvent("SendError", {"Message": message, "ErrorType": "Warning"})
-            }
-            else if (this.state === "Ready"){
+            if (this.state === "Ready"){
                 var dataModelLocal;
 
                 if (container.authorizationGqlModel.ContainsKey("errors")){

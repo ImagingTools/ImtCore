@@ -104,6 +104,11 @@ I_EXPORT_COMPONENT(
 			"Session subscriber controller",
 			"Session Subscriber Subscription Controller");
 
+I_EXPORT_COMPONENT(
+			LoginStatusSubscriberController,
+			"Login status subscriber controller",
+			"Login Status Subscriber Controller");
+
 
 } // namespace ImtAuthGqlPck
 

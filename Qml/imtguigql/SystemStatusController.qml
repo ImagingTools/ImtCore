@@ -140,6 +140,8 @@ QtObject {
             return;
         }
 
+        systemStatus = -1;
+
         if (slaveSystemStatusController != null){
             slaveSystemStatusController.updateSystemStatus();
         }

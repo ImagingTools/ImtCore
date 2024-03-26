@@ -43,6 +43,8 @@ QtObject {
         onStateChanged: {
             console.log("State:", this.state);
             if (this.state === "Ready"){
+                console.log("superuserExists", this.toJSON());
+
                 var dataModelLocal;
 
                 if (root.gqlGetModel.ContainsKey("errors")){

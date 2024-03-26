@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5137" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="394753" Description="Qt Framework"/>
+            <Version Id="0" Number="5211" Description="ACF"/>
+            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -93,5 +93,7 @@
         <Interface InterfaceId="imtrest::IRequestServlet" ComponentId="SubscriptionManager"/>
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="SubscriptionManager"/>
     </ExportedInterfaces>
-    <ExportedComponents/>
+    <ExportedComponents>
+        <Component ExportedId="WebSocketClient" ComponentId="WebSocketClient"/>
+    </ExportedComponents>
 </Acf>

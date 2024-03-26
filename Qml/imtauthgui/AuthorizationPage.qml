@@ -87,7 +87,6 @@ Rectangle {
         }
     }
 
-
     Rectangle{
         anchors.fill: parent;
         color: "gray";
@@ -159,7 +158,6 @@ Rectangle {
                     text: qsTr("Welcome");
                 }
             }
-
         }
 
         Item{
@@ -171,7 +169,6 @@ Rectangle {
             Loader{
                 id: headerLoader;
 
-
                 anchors.horizontalCenter: parent.horizontalCenter;
 
                 sourceComponent: Style.authorizationHeaderDecorator !== undefined ? Style.authorizationHeaderDecorator: headerDefaultComp;
@@ -180,9 +177,7 @@ Rectangle {
                     headerItem.height = headerLoader.item.height;
                     headerLoader.width = headerLoader.item.width;
                     headerLoader.height = headerLoader.item.height;
-
                 }
-
             }
         }
 
@@ -348,7 +343,6 @@ Rectangle {
                         onLoaded: {
                         }
                     }
-
                 }
 
                 MouseArea{
@@ -361,10 +355,8 @@ Rectangle {
                     onClicked: {
                         authPageContainer.passwordRecovery();
                     }
-
                 }
             }
-
 
             Item{
                 id: errorMessageItem;
@@ -384,7 +376,6 @@ Rectangle {
 
                     visible:  errorMessage.text != "";
                 }
-
             }
 
             Item {
@@ -412,8 +403,6 @@ Rectangle {
                     text: qsTr("Login");
 
                     onClicked: {
-//                        let passwordHash = Qt.md5(loginTextInput.text + passwordTextInput.text);
-//                        userTokenProvider.authorization(loginTextInput.text, passwordHash);
                         userTokenProvider.authorization(loginTextInput.text, passwordTextInput.text);
                     }
                 }

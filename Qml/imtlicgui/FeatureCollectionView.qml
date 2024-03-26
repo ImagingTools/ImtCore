@@ -8,80 +8,81 @@ import imtguigql 1.0
 import imtdocgui 1.0
 
 RemoteCollectionView {
-     id: featureCollectionViewContainer;
+    id: featureCollectionViewContainer;
 
-     visibleMetaInfo: false;
+    visibleMetaInfo: false;
 
-     collectionId: "Features";
+    collectionId: "Features";
 
-     commandsDelegateComp: Component {DocumentCollectionViewDelegate {
-         collectionView: featureCollectionViewContainer;
+    commandsDelegateComp: Component {DocumentCollectionViewDelegate {
+            collectionView: featureCollectionViewContainer;
 
-         documentTypeId: "Feature";
-         viewTypeId: "FeatureEditor";
-     }
-     }
+            documentTypeId: "Feature";
+            viewTypeId: "FeatureEditor";
+        }
+    }
 
-     Component.onCompleted: {
-         collectionFilter.setSortingOrder("DESC");
-         collectionFilter.setSortingInfoId("LastModified");
+    Component.onCompleted: {
+        collectionFilter.setSortingOrder("DESC");
+        collectionFilter.setSortingInfoId("LastModified");
 
-         let documentManager = MainDocumentManager.getDocumentManager(featureCollectionViewContainer.collectionId);
-         if (documentManager){
-             featureCollectionViewContainer.commandsDelegate.documentManager = documentManager;
+        let documentManager = MainDocumentManager.getDocumentManager(featureCollectionViewContainer.collectionId);
+        if (documentManager){
+            featureCollectionViewContainer.commandsDelegate.documentManager = documentManager;
 
-             documentManager.registerDocumentView("Feature", "FeatureEditor", featureDocumentComp);
-             documentManager.registerDocumentDataController("Feature", dataControllerComp);
-         }
-     }
+            documentManager.registerDocumentView("Feature", "FeatureEditor", featureDocumentComp);
+            documentManager.registerDocumentDataController("Feature", dataControllerComp);
+        }
+    }
 
-     Component {
-         id: featureDocumentComp;
+    Component {
+        id: featureDocumentComp;
 
-         FeatureEditor {
-             id: featureEditor;
+        FeatureEditor {
+            id: featureEditor;
 
-             commandsControllerComp: Component {CommandsRepresentationProvider {
-                 commandId: "Feature";
-                 uuid: featureEditor.viewId;
-             }
-             }
+            commandsControllerComp: Component {CommandsRepresentationProvider {
+                    commandId: "Feature";
+                    uuid: featureEditor.viewId;
+                }
+            }
 
-             commandsDelegateComp: Component {ViewCommandsDelegateBase {
-                 onCommandActivated: {
-                     let selectedIndex = null;
-                     if (featureEditor.tableView.tableSelection.items.length > 0){
-                         selectedIndex = featureEditor.tableView.tableSelection.items[0];
-                     }
+            commandsDelegateComp: Component {ViewCommandsDelegateBase {
+                    view: featureEditor;
+                    onCommandActivated: {
+                        let selectedIndex = null;
+                        if (featureEditor.tableView.tableSelection.items.length > 0){
+                            selectedIndex = featureEditor.tableView.tableSelection.items[0];
+                        }
 
-                     if (commandId === "New"){
-                         if (selectedIndex != null){
-                             featureEditor.tableView.addChildItem(selectedIndex, {"FeatureId":"", "FeatureName":"Feature Name", "FeatureDescription":"", "Dependencies":"", "Optional":false, "ChildModel":0})
+                        if (commandId === "New"){
+                            if (selectedIndex != null){
+                                featureEditor.tableView.addChildItem(selectedIndex, {"FeatureId":"", "FeatureName":"Feature Name", "FeatureDescription":"", "Dependencies":"", "Optional":false, "ChildModel":0})
 
-                             featureEditor.model.dataChanged(null, null);
-                         }
-                     }
-                     else if (commandId === "Remove"){
-                         if (selectedIndex != null){
-                             featureEditor.tableView.removeChildItem(selectedIndex);
-                             featureEditor.model.dataChanged(null, null);
-                         }
-                     }
-                 }
-             }
-             }
-         }
-     }
+                                featureEditor.model.dataChanged(null, null);
+                            }
+                        }
+                        else if (commandId === "Remove"){
+                            if (selectedIndex != null){
+                                featureEditor.tableView.removeChildItem(selectedIndex);
+                                featureEditor.model.dataChanged(null, null);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-     Component {
-         id: dataControllerComp;
+    Component {
+        id: dataControllerComp;
 
-         GqlDocumentDataController {
-             gqlGetCommandId: "FeatureItem";
-             gqlUpdateCommandId: "FeatureUpdate";
-             gqlAddCommandId: "FeatureAdd";
-         }
-     }
- }
+        GqlDocumentDataController {
+            gqlGetCommandId: "FeatureItem";
+            gqlUpdateCommandId: "FeatureUpdate";
+            gqlAddCommandId: "FeatureAdd";
+        }
+    }
+}
 
 

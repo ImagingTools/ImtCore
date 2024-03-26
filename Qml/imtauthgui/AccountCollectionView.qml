@@ -7,8 +7,11 @@ import imtcontrols 1.0
 import imtguigql 1.0
 import imtdocgui 1.0
 
-CollectionView {
+RemoteCollectionView {
     id: container;
+
+    visibleMetaInfo: true;
+    collectionId: "Accounts";
 
     dataControllerComp: Component {CollectionRepresentation {
             collectionId: "Accounts";

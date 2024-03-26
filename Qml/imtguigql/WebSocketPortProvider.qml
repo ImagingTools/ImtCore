@@ -38,5 +38,8 @@ GqlModel {
                 }
             }
         }
+        else if (this.state === "Error"){
+            console.error("Web socket URL provider ERROR");
+        }
     }
 }

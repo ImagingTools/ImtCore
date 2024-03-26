@@ -26,8 +26,7 @@ public:
 	virtual bool CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const override;
 	virtual bool CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const override;
 	virtual bool CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const override;
-	virtual bool CreatePaginationQuery(int offset, int count, QByteArray& paginationQuery) const;
-	virtual QString GetBaseSelectionQuery() const override;
+	virtual bool CreatePaginationQuery(int offset, int count, QByteArray& paginationQuery) const override;
 };
 
 

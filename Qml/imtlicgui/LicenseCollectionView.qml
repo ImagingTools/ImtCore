@@ -8,54 +8,59 @@ import imtguigql 1.0
 import imtdocgui 1.0
 
 RemoteCollectionView {
-     id: root;
+    id: root;
 
-     visibleMetaInfo: false;
+    visibleMetaInfo: false;
 
-     collectionId: "Licenses";
+    collectionId: "Licenses";
 
-     commandsDelegateComp: Component {DocumentCollectionViewDelegate {
-         collectionView: root;
+    commandsDelegateComp: Component {DocumentCollectionViewDelegate {
+            collectionView: root;
 
-         documentTypeId: "License";
-         viewTypeId: "LicenseEditor";
-     }
-     }
+            documentTypeId: "License";
+            viewTypeId: "LicenseEditor";
+        }
+    }
 
-     Component.onCompleted: {
-         collectionFilter.setSortingOrder("DESC");
-         collectionFilter.setSortingInfoId("LastModified");
+    Component.onCompleted: {
+        collectionFilter.setSortingOrder("DESC");
+        collectionFilter.setSortingInfoId("LastModified");
 
-         let documentManager = MainDocumentManager.getDocumentManager(root.collectionId);
-         if (documentManager){
-             root.commandsDelegate.documentManager = documentManager;
+        let documentManager = MainDocumentManager.getDocumentManager(root.collectionId);
+        if (documentManager){
+            root.commandsDelegate.documentManager = documentManager;
 
-             documentManager.registerDocumentView("License", "LicenseEditor", featureDocumentComp);
-             documentManager.registerDocumentDataController("License", dataControllerComp);
-         }
-     }
+            documentManager.registerDocumentView("License", "LicenseEditor", featureDocumentComp);
+            documentManager.registerDocumentDataController("License", dataControllerComp);
+        }
+    }
 
-     Component {
-         id: featureDocumentComp;
+    Component {
+        id: featureDocumentComp;
 
-         LicenseEditor {
-             id: licenceEditor;
+        LicenseEditor {
+            id: licenceEditor;
 
-             commandsControllerComp: Component {CommandsRepresentationProvider {
-                 commandId: "License";
-                 uuid: licenceEditor.viewId;
-             }
-             }
-         }
-     }
+            commandsDelegateComp: Component {ViewCommandsDelegateBase {
+                    view: licenceEditor;
+                }
+            }
 
-     Component {
-         id: dataControllerComp;
+            commandsControllerComp: Component {CommandsRepresentationProvider {
+                    commandId: "License";
+                    uuid: licenceEditor.viewId;
+                }
+            }
+        }
+    }
 
-         GqlDocumentDataController {
-             gqlGetCommandId: "LicenseItem";
-             gqlUpdateCommandId: "LicenseUpdate";
-             gqlAddCommandId: "LicenseAdd";
-         }
-     }
- }
+    Component {
+        id: dataControllerComp;
+
+        GqlDocumentDataController {
+            gqlGetCommandId: "LicenseItem";
+            gqlUpdateCommandId: "LicenseUpdate";
+            gqlAddCommandId: "LicenseAdd";
+        }
+    }
+}

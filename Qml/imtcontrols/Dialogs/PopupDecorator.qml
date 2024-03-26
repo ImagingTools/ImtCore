@@ -106,10 +106,18 @@ DecoratorBase {
             Column {
                 id: column;
                 width: parent.width;
+
                 Repeater {
                     id: repeater;
 
                     delegate: root.delegate;
+
+                    onItemAdded: {
+                        console.log("repeater onItemAdded", item);
+                        console.log("item.height", item.height);
+                        console.log("repeater count", repeater.count);
+                        console.log("column", repeater.height);
+                    }
                 }
             }
         }

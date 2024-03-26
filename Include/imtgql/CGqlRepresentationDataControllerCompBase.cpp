@@ -50,7 +50,7 @@ imtbase::CTreeItemModel* CGqlRepresentationControllerCompBase::CreateInternalRes
 		}
 	}
 
-	Q_ASSERT(false);
+//	Q_ASSERT(false);
 
 	return nullptr;
 }

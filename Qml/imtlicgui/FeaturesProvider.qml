@@ -9,11 +9,6 @@ QtObject {
     id: provider;
 
     property TreeItemModel model: TreeItemModel {}
-    onModelChanged: {
-        if (model){
-            Events.sendEvent("FeaturesUpdated");
-        }
-    }
 
     function updateModel(){
         provider.featuresModel.updateModel();

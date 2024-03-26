@@ -12,8 +12,6 @@ WebSocket {
 
     property var subscriptionModel: []
 
-    signal error(string message);
-
     Component.onCompleted: {
         Events.subscribeEvent("RegisterSubscription", container.registerSubscriptionEvent);
         Events.subscribeEvent("UnRegisterSubscription", container.unRegisterSubscription);
@@ -24,15 +22,20 @@ WebSocket {
         Events.unSubscribeEvent("UnRegisterSubscription", container.unRegisterSubscription);
     }
 
+    onActiveChanged: {
+        console.log("SubscriptionManager onActiveChanged", active)
+    }
+
     onStatusChanged: {
         console.log("SubscriptionManager onStatusChanged", status)
 
         if (status == WebSocket.Error){
             console.error("SubscriptionManager ERROR", errorString)
-            error(errorString);
         }
         else if (status == WebSocket.Open){
             sendTextMessage("{ \"type\": \"connection_init\" }")
+
+            registerSubscriptionToServer();
         }
         else if (status == WebSocket.Closed){
             for (let index = 0; index < subscriptionModel.length; index++){
@@ -41,20 +44,26 @@ WebSocket {
         }
     }
 
-//    Timer {
-//        id: timer;
+    property Timer timer: Timer{
+        id: timer;
 
-//        interval: 5000;
+        interval: 4000;
 
-//        repeat: true;
-//        running: true;
+        repeat: true;
+        running: true;
 
-//        onTriggered: {
-//            let url = container.url;
-//            container.url = ""
-//            container.url = url;
-//        }
-//    }
+        onTriggered: {
+            if (container.status == WebSocket.Closed ||
+                container.status == WebSocket.Error){
+                container.reconnect()
+            }
+        }
+    }
+
+    function reconnect(){
+        active = false;
+        active = true;
+    }
 
     onUrlChanged: {
         console.log("SubscriptionManager onUrlChanged", url)

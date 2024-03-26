@@ -10,6 +10,10 @@ CollectionDataProvider {
     commandId: "Features";
     fields: ["Id", "FeatureId", "FeatureName", "FeatureDescription", "Optional", "ChildModel"];
     sortByField: "FeatureName";
+
+    onModelUpdated: {
+        FeaturesProvider.updateModel();
+    }
 }
 
 

@@ -10,6 +10,7 @@ RemoteCollectionView {
     id: userGroupCollectionViewContainer;
 
     collectionId: "Groups";
+    visibleMetaInfo: true;
 
     dataControllerComp: Component {CollectionRepresentation {
         collectionId: "Groups";

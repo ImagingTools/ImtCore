@@ -21,12 +21,12 @@ ViewCommandsDelegateBase {
     property alias removeDialogComp: removeDialog;
     property alias setDescriptionDialogComp: setDescriptionDialog;
 
-    property var templateContextMenuModel: [
-        {"Id": "Edit"},
-        {"Id": ""},
-        {"Id": "Rename"},
-        {"Id": "SetDescription"}
-    ]
+    //    property var templateContextMenuModel: [
+    //        {"Id": "Edit"},
+    //        {"Id": ""},
+    //        {"Id": "Rename"},
+    //        {"Id": "SetDescription"}
+    //    ]
 
     signal renamed(string id, string newName);
     signal descriptionSetted(string id, string description);
@@ -42,7 +42,7 @@ ViewCommandsDelegateBase {
         if (collectionView){
             elementsConnections.target = collectionView.table;
 
-//            collectionView.selectionChanged.connect(internal.onSelectionChanged);
+            //            collectionView.selectionChanged.connect(internal.onSelectionChanged);
             if (collectionView.commandsController){
                 collectionView.commandsController.commandsModelChanged.connect(internal.onCommandsModelChanged);
             }
@@ -97,16 +97,50 @@ ViewCommandsDelegateBase {
         let commandsController = collectionView.commandsController;
         if (commandsController){
             container.contextMenuModel.Clear();
-            for (let i = 0; i < container.templateContextMenuModel.length; i++){
-                let commandObj = container.templateContextMenuModel[i];
 
-                let commandId = commandObj["Id"];
-                if (commandsController.commandExists(commandId)){
-                    let index = container.contextMenuModel.InsertNewItem();
-                    let commandIndex = commandsController.getCommandIndex(commandId);
-                    container.contextMenuModel.CopyItemDataFromModel(index, commandsController.commandsModel, commandIndex)
-                }
+            let canEdit = commandsController.commandExists("Edit");
+            let canRemove = commandsController.commandExists("Remove");
+
+            if (canEdit){
+                let index = container.contextMenuModel.InsertNewItem();
+
+                container.contextMenuModel.SetData("Id", "Edit", index);
+                container.contextMenuModel.SetData("Name", qsTr("Edit"), index);
+                container.contextMenuModel.SetData("Icon", "Icons/Edit", index);
             }
+
+            if (canRemove){
+                let index = container.contextMenuModel.InsertNewItem();
+
+                container.contextMenuModel.SetData("Id", "Remove", index);
+                container.contextMenuModel.SetData("Name", qsTr("Remove"), index);
+                container.contextMenuModel.SetData("Icon", "Icons/Delete", index);
+            }
+
+            if (canEdit){
+                let index = container.contextMenuModel.InsertNewItem();
+
+                container.contextMenuModel.SetData("Id", "Rename", index);
+                container.contextMenuModel.SetData("Name", qsTr("Rename"), index);
+                container.contextMenuModel.SetData("Icon", "", index);
+
+                index = container.contextMenuModel.InsertNewItem();
+
+                container.contextMenuModel.SetData("Id", "SetDescription", index);
+                container.contextMenuModel.SetData("Name", qsTr("Set Description"), index);
+                container.contextMenuModel.SetData("Icon", "", index);
+            }
+
+            //            for (let i = 0; i < container.templateContextMenuModel.length; i++){
+            //                let commandObj = container.templateContextMenuModel[i];
+
+            //                let commandId = commandObj["Id"];
+            //                if (commandsController.commandExists(commandId)){
+            //                    let index = container.contextMenuModel.InsertNewItem();
+            //                    let commandIndex = commandsController.getCommandIndex(commandId);
+            //                    container.contextMenuModel.CopyItemDataFromModel(index, commandsController.commandsModel, commandIndex)
+            //                }
+            //            }
         }
     }
 
