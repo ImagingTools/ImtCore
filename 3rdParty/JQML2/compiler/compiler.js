@@ -11,7 +11,7 @@ for(let componentName of listComponents){
 const listProperties = require('../utils/properties')
 
 const args = {
-    source: process.argv.length >= 3 ? process.argv[2] : 'C:\\projects\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQML2\\test\\qml',
+    source: process.argv.length >= 3 ? process.argv[2] : 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ProLife\\Bin\\web\\src',
     debug: 0
 }
 for(let _argv of process.argv.slice(2)){
@@ -1050,7 +1050,27 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
     // let updateList = []
     // let updatePrimaryList = []
 
+    let AF = false
+    let AC = false
+    let AL = false
+    let AR = false
+    let AT = false
+    let AB = false
+    let AH = false
+    let AV = false
+
     for(let property of currentInstructions.properties){
+        switch(property.name){
+            case 'anchors.fill': AF = true; break;
+            case 'anchors.centerIn': AC = true; break;
+            case 'anchors.left': AL = true; break;
+            case 'anchors.top': AT = true; break;
+            case 'anchors.right': AR = true; break;
+            case 'anchors.bottom': AB = true; break;
+            case 'anchors.horizontalCenter': AH = true; break;
+            case 'anchors.verticalCenter': AV = true; break;
+        }
+
         let pathName = property.name.split('.')
         if(pathName[0] !== 'anchors' && pathName[0] !== 'font') continue
 
@@ -1221,6 +1241,35 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
     let _properties = currentInstructions.properties.slice()
     while(_properties.length){
         let property = _properties.shift()
+
+        if(AF){
+            if(property.name === 'x') continue
+            if(property.name === 'y') continue
+            if(property.name === 'width') continue
+            if(property.name === 'height') continue
+        }
+        if(AC){
+            if(property.name === 'x') continue
+            if(property.name === 'y') continue
+        }
+        if(AL || AR){
+            if(property.name === 'x') continue
+            if(AL && AR){
+                if(property.name === 'width') continue
+            }
+        }
+        if(AT || AB){
+            if(property.name === 'y') continue
+            if(AT && AB){
+                if(property.name === 'height') continue
+            }
+        }
+        if(AH){
+            if(property.name === 'x') continue
+        }
+        if(AV){
+            if(property.name === 'y') continue
+        }
 
         let pathName = property.name.split('.')
 
