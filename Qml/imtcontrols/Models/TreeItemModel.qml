@@ -353,11 +353,11 @@ JSONListModel {
     function InsertNewItem(index){
         if(index !== undefined && index !== null && typeof index === 'number'){
             this.insert(index, {});
+            return index;
         } else {
             this.append({});
+            return this.count - 1;
         }
-
-        return this.count - 1;
     }
 
     function InsertNewItemWithParameters(index, parameters){
