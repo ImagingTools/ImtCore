@@ -55,13 +55,13 @@ class MouseArea extends Item {
     }
 
     availableButton(button){
-		let btn = 0
+		this.mouse.button = 0
 		switch(button){
-			case 0: btn = Qt.LeftButton; break;
-			case 1: btn = Qt.MiddleButton; break;
-			case 2: btn = Qt.RightButton; break;
+			case 0: this.mouse.button = Qt.LeftButton; break;
+			case 1: this.mouse.button = Qt.MiddleButton; break;
+			case 2: this.mouse.button = Qt.RightButton; break;
 		}	
-		if(this.getPropertyValue('acceptedButtons') & btn) return true
+		if(this.getPropertyValue('acceptedButtons') & this.mouse.button) return true
 		return false
 	}
 

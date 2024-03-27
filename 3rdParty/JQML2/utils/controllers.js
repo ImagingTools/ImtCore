@@ -27,12 +27,12 @@ class MouseController {
         })
         window.addEventListener('mouseup', (e)=>{
             // e.stopPropagation()
-            this.onMouseUp(e.pageX, e.pageY, e.button, e)
+            if(e.button !== 2) this.onMouseUp(e.pageX, e.pageY, e.button, e)
         })
         window.addEventListener('contextmenu', (e)=>{
             e.preventDefault()
             // e.stopPropagation()
-            this.onMouseDown(e.pageX, e.pageY, e.button, e)
+            this.onMouseUp(e.pageX, e.pageY, e.button, e)
         })
         window.addEventListener('touchstart', (e)=>{
             // e.preventDefault()
@@ -142,7 +142,7 @@ class MouseController {
 
         this.oldList = []
         
-        if(inner[0] && inner[0] instanceof TextInput || inner[0] instanceof TextEdit || inner[0] instanceof Map){
+        if(button === 0 && inner[0] && (inner[0] instanceof TextInput || inner[0] instanceof TextEdit || inner[0] instanceof Map)){
             if(inner[0].getPropertyValue('enabled') && inner[0].getPropertyValue('visible')) {
                 this.target = inner[0]
                 return
@@ -157,7 +157,7 @@ class MouseController {
         //     }
         // }
         for(let i = 0; i < inner.length; i++){
-            if(inner[i] instanceof TextInput || inner[i] instanceof TextEdit){
+            if(button === 0 && (inner[i] instanceof TextInput || inner[i] instanceof TextEdit)){
                 if(inner[i].getPropertyValue('enabled') && inner[i].getPropertyValue('visible') && inner[i].getPropertyValue('activeFocus')) {
                     this.target = inner[i]
                     return
@@ -200,7 +200,7 @@ class MouseController {
                         this.target = inner[i]
                         this.pressedMouseArea = [inner[i]]
                         for(let k = i + 1; k < inner.length; k++){
-                            if(inner[k] instanceof TextInput || inner[k] instanceof TextEdit){
+                            if(button === 0 && (inner[k] instanceof TextInput || inner[k] instanceof TextEdit)){
                                 if(inner[k].getPropertyValue('enabled') && inner[k].getPropertyValue('visible') && inner[k].getPropertyValue('activeFocus')) {
                                     this.target = inner[k]
                                     break
@@ -293,7 +293,7 @@ class MouseController {
             if(this.dblClicked){
                 this.timestamp = 0
                 for(let i = 0; i < this.pressed.length; i++){
-                    if(this.pressed[i] instanceof TextInput || this.pressed[i] instanceof TextEdit){
+                    if(button === 0 && (this.pressed[i] instanceof TextInput || this.pressed[i] instanceof TextEdit)){
                         break
                     } else if(this.pressed[i] instanceof MouseArea && this.pressed[i].availableButton(button)){
                         if(this.pressed[i].$signals.doubleClicked){
@@ -307,7 +307,7 @@ class MouseController {
             }
             if(!wasDblClicked){
                 for(let i = 0; i < this.pressed.length; i++){
-                    if(this.pressed[i] instanceof TextInput || this.pressed[i] instanceof TextEdit){
+                    if(button === 0 && (this.pressed[i] instanceof TextInput || this.pressed[i] instanceof TextEdit)){
                         break
                     } else if(this.pressed[i] instanceof MouseArea && this.pressed[i].availableButton(button)){
                         if(this.pressed[i].$signals.clicked){
