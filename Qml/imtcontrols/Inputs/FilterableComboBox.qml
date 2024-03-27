@@ -58,7 +58,7 @@ ComboBox {
                 }
             }
 
-            decorator: PopupDecorator {
+            decorator: Component {PopupDecorator {
                 topContentLoaderSourceComp: Component {
                     Item {
                         id: contentItem;
@@ -102,6 +102,7 @@ ComboBox {
                         }
                     }
                 }
+            }
             }
 
             onFinished: {
