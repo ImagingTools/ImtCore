@@ -70,12 +70,20 @@ Dialog {
         property alias tableView: tableTreeView;
 
         property TreeItemModel headersModel: TreeItemModel {
-            Component.onCompleted: {
+            function updateHeaders(){
+                dialogBody.headersModel.Clear();
+
                 let index = dialogBody.headersModel.InsertNewItem();
                 dialogBody.headersModel.SetData("Id", "FeatureName", index);
-                dialogBody.headersModel.SetData("Name", "Feature Name", index);
+                dialogBody.headersModel.SetData("Name", qsTr("Feature Name"), index);
+
+                dialogBody.headersModel.Refresh();
 
                 tableTreeView.headers = dialogBody.headersModel;
+            }
+
+            Component.onCompleted: {
+                updateHeaders();
             }
         }
 

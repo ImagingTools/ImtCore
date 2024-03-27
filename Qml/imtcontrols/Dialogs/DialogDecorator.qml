@@ -18,18 +18,24 @@ DecoratorBase {
     property string topPanelSource: baseElement ? baseElement.topPanelSource : "";
     property bool baseElementFocus: baseElement ? baseElement.focus : false;
     property Component topPanelComp : !baseElement ? undefined : baseElement.topPanelComp;
+
+    Component.onCompleted: {
+        Events.subscribeEvent("OnLocalizationChanged", dialogContainer.onLocalizationChanged);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", dialogContainer.onLocalizationChanged);
+    }
+
+    function onLocalizationChanged(language){
+        if(loaderTopPanel.item){
+            loaderTopPanel.item.title = dialogContainer.title;
+        }
+    }
+
     onBaseElementChanged: {
         baseElement.buttons = buttonsDialog;
     }
-
-
-    //            onBodySourceChanged: {
-    //                loaderBodyDialog.source = dialogContainer.bodySource;
-    //            }
-
-    //            onTopPanelSourceChanged: {
-    //                loaderTopPanel.source = dialogContainer.topPanelSource;
-    //            }
 
     onBaseElementFocusChanged: {
         console.log("Dialog onFocusChanged", dialogContainer.baseElementFocus);
@@ -56,7 +62,6 @@ DecoratorBase {
             loaderTopPanel.item.title = dialogContainer.title;
         }
     }
-
 
     MouseArea {
         anchors.fill: parent;

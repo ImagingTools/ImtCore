@@ -12,33 +12,17 @@ ViewBase {
     property string productId: "";
     property TreeItemModel permissionsModel: TreeItemModel {};
 
-//    onProductIdChanged: {
-//        if (productId !== ""){
-//            permissionsProvider.productId = productId;
+    Component.onCompleted: {
+        Events.subscribeEvent("OnLocalizationChanged", rolePermissionsContainer.onLocalizationChanged);
+    }
 
-//            permissionsProvider.updateModel();
-//        }
-//    }
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", rolePermissionsContainer.onLocalizationChanged);
+    }
 
-//    PermissionsProvider {
-//        id: permissionsProvider;
-
-//        property bool compl: false;
-
-//        onDataModelChanged: {
-//            if (permissionsProvider.dataModel != null){
-//                permissionsTable.rowModel = permissionsProvider.dataModel;
-
-//                compl = true;
-
-//                rolePermissionsContainer.doUpdateGui();
-//            }
-//        }
-
-//        onDependenciesModelChanged: {
-//            dependenciesProvider.model = dependenciesModel;
-//        }
-//    }
+    function onLocalizationChanged(language){
+        permissionHeaders.updateHeaders();
+    }
 
     FeaturesDependenciesProvider {
         id: dependenciesProvider;
@@ -164,7 +148,23 @@ ViewBase {
         tristate: true;
 
         Component.onCompleted: {
-            permissionsTable.addColumn({"Id": "FeatureName", "Name": "Permission"});
+            permissionHeaders.updateHeaders();
+        }
+
+        TreeItemModel {
+            id: permissionHeaders;
+
+            function updateHeaders(){
+                permissionHeaders.Clear();
+
+                let index = permissionHeaders.InsertNewItem();
+                permissionHeaders.SetData("Id", "FeatureName", index)
+                permissionHeaders.SetData("Name", qsTr("Permission"), index)
+
+                permissionHeaders.Refresh();
+
+                permissionsTable.columnModel = permissionHeaders;
+            }
         }
 
         onSelectedIndexChanged: {

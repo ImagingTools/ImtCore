@@ -11,6 +11,31 @@ ViewBase {
     property TreeItemModel rolesModel: TreeItemModel {}
     property TreeItemModel groupsModel: TreeItemModel {}
 
+    Component.onCompleted: {
+        Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
+    }
+
+    function onLocalizationChanged(language){
+        let index1 = multiPageView.getIndexById("General");
+        if (index1 >= 0){
+            multiPageView.pagesModel.setProperty(index1, "Name", qsTr("General"))
+        }
+
+        let index2 = multiPageView.getIndexById("Roles");
+        if (index2 >= 0){
+            multiPageView.pagesModel.setProperty(index2, "Name", qsTr("Roles"))
+        }
+
+        let index3 = multiPageView.getIndexById("Groups");
+        if (index3 >= 0){
+            multiPageView.pagesModel.setProperty(index3, "Name", qsTr("Groups"))
+        }
+    }
+
     function updateGui(){
         console.log("UserView updateGui")
 
@@ -114,9 +139,9 @@ ViewBase {
         anchors.bottom: parent.bottom;
 
         Component.onCompleted: {
-            multiPageView.addPage("General", "General", userEditorComp);
-            multiPageView.addPage("Roles", "Roles", userRolesComp);
-            multiPageView.addPage("Groups", "Groups", userGroupsComp);
+            multiPageView.addPage("General", qsTr("General"), userEditorComp);
+            multiPageView.addPage("Roles", qsTr("Roles"), userRolesComp);
+            multiPageView.addPage("Groups", qsTr("Groups"), userGroupsComp);
 
             multiPageView.currentIndex = 0;
         }

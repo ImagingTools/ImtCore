@@ -19,6 +19,16 @@ ViewBase {
         CachedLicenseCollection.updateModel();
 
         CachedLicenseCollection.collectionModelChanged.connect(root.updateLicensesModel);
+        Events.subscribeEvent("OnLocalizationChanged", onLocalizationChanged)
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", onLocalizationChanged)
+    }
+
+    function onLocalizationChanged(language){
+        updateLicensesHeaders();
+        updateHeaders();
     }
 
     function updateModel(){
@@ -378,8 +388,6 @@ ViewBase {
     Item {
         id: dependenciesBlock;
 
-//        width: 300;
-
         anchors.top: parent.top;
         anchors.left: column.right;
         anchors.leftMargin: 10;
@@ -451,6 +459,8 @@ ViewBase {
         licensesHeaders.SetData("Id", "LicenseId", index);
         licensesHeaders.SetData("Name", qsTr("License-ID"), index);
 
+        licensesHeaders.Refresh();
+
         licensesTable.headers = licensesHeaders;
     }
 
@@ -461,6 +471,8 @@ ViewBase {
 
         featuresHeaders.SetData("Id", "FeatureName", index);
         featuresHeaders.SetData("Name", qsTr("Feature Name"), index);
+
+        featuresHeaders.Refresh();
 
         featuresTable.headers = featuresHeaders;
     }

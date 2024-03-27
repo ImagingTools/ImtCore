@@ -32,11 +32,14 @@ Item {
     signal failed();
 
     function updateModel(inputParams){
+        console.log("CollectionDataProvider updateModel");
         if (!inputParams){
             inputParams = {}
         }
 
-        if (collectionModel && collectionModel.GetItemsCount() == 0){
+        console.log("GetItemsCount", collectionModel.GetItemsCount());
+
+        if (collectionModel && collectionModel.GetItemsCount() === 0){
             container.itemsInfoModel.updateModel(inputParams, container.fields);
             return;
         }

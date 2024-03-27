@@ -72,6 +72,10 @@ ControlBase {
         root.backgroundItem.opacity = 0.4;
     }
 
+    onTitleChanged: {
+        console.log("Dialog onTitleChanged", title);
+    }
+
     onFinished: {
         if (dialogContainer.root){
             //console.log("buttonID:::",dialogContainer.notClosingButtons, buttonId)

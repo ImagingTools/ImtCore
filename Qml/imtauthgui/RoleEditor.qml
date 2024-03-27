@@ -15,6 +15,18 @@ ViewBase {
     property TreeItemModel rolesModel: TreeItemModel {}
     property TreeItemModel copiedRolesModel: TreeItemModel {}
 
+    Component.onCompleted: {
+        Events.subscribeEvent("OnLocalizationChanged", roleEditorContainer.onLocalizationChanged);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", roleEditorContainer.onLocalizationChanged);
+    }
+
+    function onLocalizationChanged(language){
+        rolesHeadersModel.updateHeaders();
+    }
+
     Rectangle{
         anchors.fill: parent;
         color: Style.backgroundColor;
@@ -286,13 +298,21 @@ ViewBase {
     TreeItemModel {
         id: rolesHeadersModel;
 
-        Component.onCompleted: {
+        function updateHeaders(){
+            rolesHeadersModel.Clear();
+
             let index = rolesHeadersModel.InsertNewItem();
 
             rolesHeadersModel.SetData("Id", "Name");
-            rolesHeadersModel.SetData("Name", "Role Name");
+            rolesHeadersModel.SetData("Name", qsTr("Role Name"));
+
+            rolesHeadersModel.Refresh();
 
             parentRolesTable.headers = rolesHeadersModel;
+        }
+
+        Component.onCompleted: {
+            updateHeaders();
         }
     }
 

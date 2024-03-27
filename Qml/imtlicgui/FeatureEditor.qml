@@ -19,6 +19,17 @@ ViewBase {
 
     Component.onCompleted: {
         CachedFeatureCollection.updateModel();
+
+        Events.subscribeEvent("OnLocalizationChanged", onLocalizationChanged)
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", onLocalizationChanged)
+    }
+
+    function onLocalizationChanged(language){
+        featureEditor.updateHeaders();
+        dependenciesHeadersModel.updateHeaders();
     }
 
     function getAllParents(selectedIndex){
@@ -349,7 +360,7 @@ ViewBase {
                 let ok = PermissionsController.checkPermission("ChangeFeature");
                 featureDependenciesView.readOnly = !ok;
 
-                featureDependenciesView.addColumn({"Id": "FeatureName", "Name": "Dependencies"});
+                dependenciesHeadersModel.updateHeaders();
 
                 featureEditor.dependenciewViewModel.Copy(FeaturesProvider.model);
                 featureDependenciesView.rowModel = featureEditor.dependenciewViewModel;
@@ -359,6 +370,22 @@ ViewBase {
 
             Component.onDestruction: {
                 FeaturesProvider.modelChanged.disconnect(featureDependenciesView.onFeaturesProviderModelChanged);
+            }
+
+            TreeItemModel {
+                id: dependenciesHeadersModel;
+
+                function updateHeaders(){
+                    dependenciesHeadersModel.Clear();
+
+                    let index = dependenciesHeadersModel.InsertNewItem();
+                    dependenciesHeadersModel.SetData("Id", "FeatureName", index)
+                    dependenciesHeadersModel.SetData("Name", qsTr("Dependencies"), index)
+
+                    dependenciesHeadersModel.Refresh();
+
+                    featureDependenciesView.columnModel = dependenciesHeadersModel;
+                }
             }
 
             function onFeaturesProviderModelChanged(){
@@ -482,27 +509,35 @@ ViewBase {
         }
     }
 
+    function updateHeaders(){
+        headersModel.Clear();
+
+        let index = headersModel.InsertNewItem();
+        headersModel.SetData("Id", "FeatureName", index);
+        headersModel.SetData("Name", qsTr("Feature Name"), index);
+
+        index = headersModel.InsertNewItem();
+        headersModel.SetData("Id", "FeatureId", index);
+        headersModel.SetData("Name", qsTr("Feature-ID"), index);
+
+        index = headersModel.InsertNewItem();
+        headersModel.SetData("Id", "FeatureDescription", index);
+        headersModel.SetData("Name", qsTr("Feature Description"), index);
+
+        index = headersModel.InsertNewItem();
+        headersModel.SetData("Id", "Optional", index);
+        headersModel.SetData("Name", qsTr("Optional"), index);
+
+        headersModel.Refresh();
+
+        tableView_.columnModel = headersModel;
+    }
+
     TreeItemModel {
         id: headersModel;
 
         Component.onCompleted: {
-            let index = headersModel.InsertNewItem();
-            headersModel.SetData("Id", "FeatureName", index);
-            headersModel.SetData("Name", qsTr("Feature Name"), index);
-
-            index = headersModel.InsertNewItem();
-            headersModel.SetData("Id", "FeatureId", index);
-            headersModel.SetData("Name", qsTr("Feature-ID"), index);
-
-            index = headersModel.InsertNewItem();
-            headersModel.SetData("Id", "FeatureDescription", index);
-            headersModel.SetData("Name", qsTr("Feature Description"), index);
-
-            index = headersModel.InsertNewItem();
-            headersModel.SetData("Id", "Optional", index);
-            headersModel.SetData("Name", qsTr("Optional"), index);
-
-            tableView_.columnModel = headersModel;
+            featureEditor.updateHeaders();
         }
     }
 }

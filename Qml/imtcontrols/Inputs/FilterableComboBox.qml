@@ -23,10 +23,6 @@ ComboBox {
 
         property bool acceptable: displayText.toLowerCase().indexOf(filter.toLowerCase()) >= 0;
 
-        onEntered: {
-//            comboBoxContainer.selectedIndex = model.index;
-        }
-
         onClicked: {
             if (comboBoxContainer.popup){
                 comboBoxContainer.popup.finished(model.Id, model.index)
@@ -119,7 +115,6 @@ ComboBox {
 
     function openPopupMenu(){
         comboBoxContainer.isOpen = true;
-//        comboBoxContainer.dialogsCountPrev = modalDialogManager.count;
         var point = comboBoxContainer.mapToItem(null, 0, comboBoxContainer.height);
         modalDialogManager.openDialog(popupMenuComp, {
                                           "x":     point.x,

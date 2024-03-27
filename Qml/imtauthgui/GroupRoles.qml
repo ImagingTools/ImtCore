@@ -11,9 +11,17 @@ ViewBase {
 
     property TreeItemModel rolesModel: TreeItemModel {}
 
-//    Component.onCompleted: {
-//        rolesProvider.updateModel();
-//    }
+    Component.onCompleted: {
+        Events.subscribeEvent("OnLocalizationChanged", groupRolesContainer.onLocalizationChanged);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", groupRolesContainer.onLocalizationChanged);
+    }
+
+    function onLocalizationChanged(language){
+        headersModel.updateHeaders();
+    }
 
     function updateGui(){
         console.log("UserRoles updateGui");
@@ -111,13 +119,21 @@ ViewBase {
     TreeItemModel {
         id: headersModel;
 
-        Component.onCompleted: {
+        function updateHeaders(){
+            headersModel.Clear();
+
             headersModel.InsertNewItem();
 
             headersModel.SetData("Id", "Name");
-            headersModel.SetData("Name", "Role Name");
+            headersModel.SetData("Name", qsTr("Role Name"));
+
+            headersModel.Refresh();
 
             rolesTable.headers = headersModel;
+        }
+
+        Component.onCompleted: {
+            updateHeaders();
         }
     }
 

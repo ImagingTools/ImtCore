@@ -11,6 +11,26 @@ ViewBase {
 
     property string productId: "";
 
+    Component.onCompleted: {
+        Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
+    }
+
+    function onLocalizationChanged(language){
+        let generalIndex = multiPageView.getIndexById("General");
+        if (generalIndex >= 0){
+            multiPageView.pagesModel.setProperty(generalIndex, "Name", qsTr("General"))
+        }
+
+        let permissionsIndex = multiPageView.getIndexById("Permissions");
+        if (permissionsIndex >= 0){
+            multiPageView.pagesModel.setProperty(permissionsIndex, "Name", qsTr("Permissions"))
+        }
+    }
+
     function updateGui(){
         console.log("RoleView updateGui", model.toJSON());
         let generalPage = multiPageView.getPageById("General");
@@ -95,8 +115,13 @@ ViewBase {
         anchors.bottom: parent.bottom;
 
         Component.onCompleted: {
-            multiPageView.addPage("General", "General", roleEditorComp);
-            multiPageView.addPage("Permissions", "Permissions", rolePermissionsComp);
+            updateModel();
+        }
+
+        function updateModel(){
+            multiPageView.clear();
+            multiPageView.addPage("General", qsTr("General"), roleEditorComp);
+            multiPageView.addPage("Permissions", qsTr("Permissions"), rolePermissionsComp);
 
             multiPageView.currentIndex = 0;
         }

@@ -183,6 +183,8 @@ FocusScope {
             if(containerTextField.text !== text){// for web TEMP!!!
                 containerTextField.text = text
             }
+
+            editingFinishedTimer.restart();
         }
 
         onTextEdited: {
@@ -219,6 +221,15 @@ FocusScope {
             visible: textField.text === "";
 
             text: containerTextField.placeHolderText;
+        }
+    }
+
+    Timer {
+        id: editingFinishedTimer;
+        interval: 500;
+
+        onTriggered: {
+            containerTextField.editingFinished();
         }
     }
 }

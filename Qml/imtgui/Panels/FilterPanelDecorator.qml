@@ -7,6 +7,24 @@ DecoratorBase {
 
     height: content.height;
 
+    Component.onCompleted: {
+        Events.subscribeEvent("OnLocalizationChanged", onLocalizationChanged)
+
+        updateText();
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", onLocalizationChanged)
+    }
+
+    function onLocalizationChanged(language){
+        updateText();
+    }
+
+    function updateText(){
+        tfc.placeHolderText = qsTr("Enter some text to filter the item list");
+    }
+
     Row {
         id: content;
 
@@ -21,8 +39,6 @@ DecoratorBase {
 
             width: 270;
             height: 30;
-
-            placeHolderText: qsTr("Enter some text to filter the item list");
 
             onTextChanged: {
                 timer.restart();
@@ -55,8 +71,6 @@ DecoratorBase {
                 iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
                 onClicked: {
-                    console.log("iconClear onClicked");
-
                     tfc.text = "";
                 }
             }

@@ -25,7 +25,7 @@ ViewBase {
     signal elementsChanged();
     signal headersChanged();
 
-    signal filterChanged();
+    signal filterChanged(string filterId, string filterValue);
 
     signal selectionChanged(var selection);
     signal rightButtonMouseClicked(int mouseX, int mouseY);
@@ -33,18 +33,14 @@ ViewBase {
 
     Component.onCompleted: {
         tableInternal.focus = true;
-
-        Events.subscribeEvent("OnLocalizationChanged", collectionViewBaseContainer.onLocalizationChanged);
-    }
-
-    Component.onDestruction: {
-        Events.unSubscribeEvent("OnLocalizationChanged", collectionViewBaseContainer.onLocalizationChanged);
     }
 
     Connections {
         target: collectionViewBaseContainer.collectionFilter;
 
         function onFilterChanged(){
+            console.log("CollView onFilterChanged");
+
             tableInternal.currentHeaderId = collectionViewBaseContainer.collectionFilter.getSortingInfoId();
             tableInternal.currentSortOrder = collectionViewBaseContainer.collectionFilter.getSortingOrder();
 
@@ -77,15 +73,8 @@ ViewBase {
         }
 
         onFilterChanged: {
-            collectionViewBaseContainer.onFilterChanged(filterId, filterValue);
+            collectionViewBaseContainer.filterChanged(filterId, filterValue);
         }
-    }
-
-    function onLocalizationChanged(language){
-    }
-
-    function onFilterChanged(filterId, filterValue){
-        collectionViewBaseContainer.collectionFilter.setTextFilter(filterValue);
     }
 
     Rectangle {

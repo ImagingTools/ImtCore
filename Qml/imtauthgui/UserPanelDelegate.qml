@@ -65,6 +65,10 @@ Item {
         gqlGetCommandId: "UserItem";
         gqlAddCommandId: "UserAdd";
         gqlUpdateCommandId: "UserUpdate";
+
+        onSaved: {
+            userPanelDelegate.onResult(id, name);
+        }
     }
 
     Component {

@@ -96,11 +96,13 @@ WebSocket {
             for (let index = 0; index < subscriptionModel.length; index++){
                 if (subscriptionModel[index]["subscriptionId"] == socketModel.GetData("id")){
                     let subscription = subscriptionModel[index]["subscription"]
+                    if (!subscription){
+                        continue;
+                    }
+
                     console.log("subscription", subscription);
                     subscription.state = "Processing"
                     let dataModelLocal = socketModel.GetData("payload");
-                    console.log("dataModelLocal", dataModelLocal.toJSON());
-                    // dataModelLocal = dataModelLocal.GetData("data");
                     subscription.Copy(dataModelLocal)
                     subscription.state = "Ready"
 

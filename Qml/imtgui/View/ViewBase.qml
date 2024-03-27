@@ -19,12 +19,15 @@ Item {
 
     Component.onCompleted: {
         viewId = UuidGenerator.generateUUID();
+        Events.subscribeEvent("OnLocalizationChanged", internal.onLocalizationChanged)
     }
 
     Component.onDestruction: {
         if (commandsDelegate){
             Events.unSubscribeEvent(viewId + "CommandActivated", commandsDelegate.commandHandle);
         }
+
+        Events.unSubscribeEvent("OnLocalizationChanged", internal.onLocalizationChanged)
     }
 
     onCommandsControllerCompChanged: {
@@ -64,6 +67,10 @@ Item {
         if (commandsController){
             if (visible){
                 viewBase.updateCommandsGui();
+
+//                if (internal.localizationChanged){
+//                    internal.onLocalizationChanged();
+//                }
             }
             else{
                 viewBase.clearCommandsGui();
@@ -75,6 +82,15 @@ Item {
         id: commandsConnections;
 
         function onCommandsModelChanged(){
+            if (viewBase.commandsController){
+                for (let i = 0; i < internal.cachedCommandsModel.GetItemsCount(); i++){
+                    let id = internal.cachedCommandsModel.GetData("Id", i);
+                    let isEnabled = internal.cachedCommandsModel.GetData("IsEnabled", i);
+
+                    viewBase.commandsController.setCommandIsEnabled(id, isEnabled);
+                }
+            }
+
             blockArea.visible = false;
         }
     }
@@ -166,10 +182,16 @@ Item {
     QtObject {
         id: internal;
 
+        property bool localizationChanged: false;
+        property TreeItemModel cachedCommandsModel: TreeItemModel {};
         property bool blockingUpdateGui: false;
         property bool blockingUpdateModel: false;
 
         property int countIncomingChanges: 0;
+
+        Component.onDestruction: {
+            console.log("internal onDestruction");
+        }
 
         onBlockingUpdateGuiChanged: {
             if (!blockingUpdateGui && countIncomingChanges > 0){
@@ -183,6 +205,24 @@ Item {
             if (viewBase.visible){
                 viewBase.updateCommandsGui();
             }
+        }
+
+        function onLocalizationChanged(language){
+            console.log("onLocalizationChanged Events.events", Events.events["OnLocalizationChanged"]);
+
+            console.log("ViewBase onLocalizationChanged", language);
+//            if (!viewBase.visible){
+//                localizationChanged = true;
+//                return;
+//            }
+
+            if (viewBase.commandsController){
+                internal.cachedCommandsModel.Clear();
+                internal.cachedCommandsModel.Copy(viewBase.commandsController.commandsModel);
+                viewBase.commandsController.updateModel();
+            }
+
+            localizationChanged = false
         }
     }
 

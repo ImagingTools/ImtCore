@@ -17,31 +17,45 @@ ViewBase {
         CachedFeatureCollection.updateModel();
 
         CachedFeatureCollection.modelUpdated.connect(productViewContainer.onFeaturesChanged);
+        Events.subscribeEvent("OnLocalizationChanged", onLocalizationChanged)
     }
 
     Component.onDestruction: {
         CachedFeatureCollection.modelUpdated.disconnect(productViewContainer.onFeaturesChanged);
+        Events.unSubscribeEvent("OnLocalizationChanged", onLocalizationChanged)
+    }
+
+    function onLocalizationChanged(language){
+        updateHeaders();
     }
 
     function onFeaturesChanged(){
         productViewContainer.updateFeaturesGui();
     }
 
+    function updateHeaders(){
+        productViewContainer.softwareHeadersModel.Clear();
+
+        let index = productViewContainer.softwareHeadersModel.InsertNewItem();
+        productViewContainer.softwareHeadersModel.SetData("Id", "FeatureName", index);
+        productViewContainer.softwareHeadersModel.SetData("Name", qsTr("Feature Name"), index);
+
+        index = productViewContainer.softwareHeadersModel.InsertNewItem();
+        productViewContainer.softwareHeadersModel.SetData("Id", "FeatureId", index);
+        productViewContainer.softwareHeadersModel.SetData("Name", qsTr("Feature-ID"), index);
+
+        index = productViewContainer.softwareHeadersModel.InsertNewItem();
+        productViewContainer.softwareHeadersModel.SetData("Id", "FeatureDescription", index);
+        productViewContainer.softwareHeadersModel.SetData("Name", qsTr("Description"), index);
+
+        productViewContainer.softwareHeadersModel.Refresh();
+
+        tableView_.columnModel = productViewContainer.softwareHeadersModel;
+    }
+
     property TreeItemModel softwareHeadersModel: TreeItemModel {
         Component.onCompleted: {
-            let index = productViewContainer.softwareHeadersModel.InsertNewItem();
-            productViewContainer.softwareHeadersModel.SetData("Id", "FeatureName", index);
-            productViewContainer.softwareHeadersModel.SetData("Name", qsTr("Feature Name"), index);
-
-            index = productViewContainer.softwareHeadersModel.InsertNewItem();
-            productViewContainer.softwareHeadersModel.SetData("Id", "FeatureId", index);
-            productViewContainer.softwareHeadersModel.SetData("Name", qsTr("Feature-ID"), index);
-
-            index = productViewContainer.softwareHeadersModel.InsertNewItem();
-            productViewContainer.softwareHeadersModel.SetData("Id", "FeatureDescription", index);
-            productViewContainer.softwareHeadersModel.SetData("Name", qsTr("Description"), index);
-
-            tableView_.columnModel = productViewContainer.softwareHeadersModel;
+            productViewContainer.updateHeaders();
         }
     }
 

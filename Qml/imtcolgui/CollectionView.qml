@@ -34,12 +34,29 @@ Item {
     signal selectedIndexChanged(int index);
     signal elementsChanged();
     signal headersChanged();
-    signal filterChanged();
     signal selectionChanged(var selection);
     signal rightButtonMouseClicked(int mouseX, int mouseY);
-    signal doubleClicked(string id, int index);
+
+    Component.onCompleted: {
+        Events.subscribeEvent("OnLocalizationChanged", onLocalizationChanged)
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", onLocalizationChanged)
+    }
+
+    function onLocalizationChanged(language){
+        if (root.dataController){
+            root.dataController.updateModel();
+        }
+    }
+
+    function doubleClicked(id, index){
+        container.doubleClicked(id, index)
+    }
 
     function doUpdateGui(){
+        console.log("CollectionView doUpdateGui");
         container.doUpdateGui();
     }
 
@@ -69,6 +86,10 @@ Item {
         }
     }
 
+    function onFilterChanged(filterId, filterValue){
+        container.collectionFilter.setTextFilter(filterValue);
+    }
+
     Connections {
         target: container;
 
@@ -96,10 +117,6 @@ Item {
 
         function onRightButtonMouseClicked(mouseX, mouseY){
             root.rightButtonMouseClicked(mouseX, mouseY)
-        }
-
-        function onDoubleClicked(id,index){
-            root.doubleClicked(id,index)
         }
     }
 
@@ -208,6 +225,10 @@ Item {
 
         onDoubleClicked: {
             root.onEdit()
+        }
+
+        onFilterChanged: {
+            root.onFilterChanged(filterId, filterValue);
         }
 
         Binding {

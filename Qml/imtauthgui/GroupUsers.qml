@@ -11,9 +11,17 @@ ViewBase {
 
     property TreeItemModel usersModel: TreeItemModel {}
 
-//    Component.onCompleted: {
-//        usersProvider.updateModel();
-//    }
+    Component.onCompleted: {
+        Events.subscribeEvent("OnLocalizationChanged", groupUsersContainer.onLocalizationChanged);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", groupUsersContainer.onLocalizationChanged);
+    }
+
+    function onLocalizationChanged(language){
+        headersModel.updateHeaders();
+    }
 
     function updateGui(){
         console.log("GroupUsers updateGui");
@@ -106,13 +114,21 @@ ViewBase {
     TreeItemModel {
         id: headersModel;
 
-        Component.onCompleted: {
+        function updateHeaders(){
+            headersModel.Clear();
+
             headersModel.InsertNewItem();
 
             headersModel.SetData("Id", "Name");
-            headersModel.SetData("Name", "User Name");
+            headersModel.SetData("Name", qsTr("User Name"));
+
+            headersModel.Refresh();
 
             usersTable.headers = headersModel;
+        }
+
+        Component.onCompleted: {
+            updateHeaders();
         }
     }
 

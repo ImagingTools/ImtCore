@@ -79,25 +79,8 @@ DocumentDataController {
         }
 
         onStateChanged: {
-            console.log("Document SubscriptionClient onStateChanged", state);
-
             if (state === "Ready"){
                 container.hasRemoteChanges = true;
-
-//                if (subscriptionClient.ContainsKey("data")){
-//                    let dataModelLocal = subscriptionClient.GetData("data")
-//                    if (dataModelLocal.ContainsKey("token")){
-//                        let accessToken = dataModelLocal.GetData("token");
-//                        Events.sendEvent("GetToken", function (token){
-//                            if (String(token) == String(accessToken)){
-//                                root.doUpdateGui();
-//                            }
-//                            else{
-//                                root.hasRemoteChanges = true;
-//                            }
-//                        });
-//                    }
-//                }
             }
         }
     }

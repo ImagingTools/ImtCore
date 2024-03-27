@@ -8,11 +8,7 @@ Dialog {
 
     width: 500;
 
-    title: qsTr("Preferences");
-
     notClosingButtons: Enums.apply;
-
-//    topPanelComp: Style.topPanelDialogDecorator !==undefined ? Style.topPanelDialogDecorator: topPanelDefault;
 
     property TreeItemModel settingsModel: TreeItemModel {};
     property SettingsProvider settingsProvider: null;
@@ -20,6 +16,8 @@ Dialog {
     Component.onCompleted: {
         buttonsModel.append({Id: Enums.apply, Name:qsTr("Apply"), Enabled: false})
         buttonsModel.append({Id: Enums.cancel, Name:qsTr("Close"), Enabled: true})
+
+        updateText();
     }
 
     onSettingsProviderChanged: {
@@ -34,9 +32,17 @@ Dialog {
     }
 
     onLocalizationChanged: {
+        updateText();
+
         messageDialog.buttonsModel.clear();
         messageDialog.buttonsModel.append({Id: Enums.apply, Name:qsTr("Apply"), Enabled: false})
         messageDialog.buttonsModel.append({Id: Enums.cancel, Name:qsTr("Close"), Enabled: true})
+
+        messageDialog.updateRepresentation();
+    }
+
+    function updateText(){
+        messageDialog.title = qsTr("Preferences");
     }
 
     function updateRepresentation(){

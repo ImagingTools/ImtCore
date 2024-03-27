@@ -10,6 +10,31 @@ ViewBase {
     property TreeItemModel rolesModel: TreeItemModel {}
     property TreeItemModel usersModel: TreeItemModel {}
 
+    Component.onCompleted: {
+        Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
+    }
+
+    function onLocalizationChanged(language){
+        let index1 = multiPageView.getIndexById("General");
+        if (index1 >= 0){
+            multiPageView.pagesModel.setProperty(index1, "Name", qsTr("General"))
+        }
+
+        let index2 = multiPageView.getIndexById("Roles");
+        if (index2 >= 0){
+            multiPageView.pagesModel.setProperty(index2, "Name", qsTr("Roles"))
+        }
+
+        let index3 = multiPageView.getIndexById("Users");
+        if (index3 >= 0){
+            multiPageView.pagesModel.setProperty(index3, "Name", qsTr("Users"))
+        }
+    }
+
     function updateGui(){
         let generalPage = multiPageView.getPageById("General");
         let usersPage = multiPageView.getPageById("Users");
@@ -111,9 +136,9 @@ ViewBase {
         anchors.bottom: parent.bottom;
 
         Component.onCompleted: {
-            multiPageView.addPage("General", "General", groupEditorComp);
-            multiPageView.addPage("Users", "Users", groupUsersComp);
-            multiPageView.addPage("Roles", "Roles", groupRolesComp);
+            multiPageView.addPage("General", qsTr("General"), groupEditorComp);
+            multiPageView.addPage("Users", qsTr("Users"), groupUsersComp);
+            multiPageView.addPage("Roles", qsTr("Roles"), groupRolesComp);
 
             multiPageView.currentIndex = 0;
         }

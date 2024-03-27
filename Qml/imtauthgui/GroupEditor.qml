@@ -16,6 +16,18 @@ ViewBase {
     property TreeItemModel groupsModel: TreeItemModel {}
     property TreeItemModel copiedGroupsModel: TreeItemModel {}
 
+    Component.onCompleted: {
+        Events.subscribeEvent("OnLocalizationChanged", userGroupEditorContainer.onLocalizationChanged);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", userGroupEditorContainer.onLocalizationChanged);
+    }
+
+    function onLocalizationChanged(language){
+        groupsHeadersModel.updateHeaders();
+    }
+
     function updateGroupsModel(){
         copiedGroupsModel.Copy(groupsModel);
 
@@ -269,13 +281,21 @@ ViewBase {
     TreeItemModel {
         id: groupsHeadersModel;
 
-        Component.onCompleted: {
+        function updateHeaders(){
+            groupsHeadersModel.Clear();
+
             let index = groupsHeadersModel.InsertNewItem();
 
             groupsHeadersModel.SetData("Id", "Name");
-            groupsHeadersModel.SetData("Name", "Group Name");
+            groupsHeadersModel.SetData("Name", qsTr("Group Name"));
+
+            groupsHeadersModel.Refresh();
 
             parentGroupsTable.headers = groupsHeadersModel;
+        }
+
+        Component.onCompleted: {
+            updateHeaders();
         }
     }
 

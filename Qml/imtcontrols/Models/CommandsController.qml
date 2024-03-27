@@ -32,6 +32,8 @@ Item {
         return false;
     }
 
+    function updateModel(){}
+
     function setCommandIsEnabled(commandId, isEnabled){
         if(!root.commandsModel){
             return;

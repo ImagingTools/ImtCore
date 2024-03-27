@@ -13,22 +13,16 @@ ViewBase {
     property TreeItemModel groupsModel: TreeItemModel {}
 
     Component.onCompleted: {
-//        CachedGroupCollection.updateModel();
+        Events.subscribeEvent("OnLocalizationChanged", userGroupsContainer.onLocalizationChanged);
     }
 
-//    CollectionDataProvider {
-//        id: groupsProvider;
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", userGroupsContainer.onLocalizationChanged);
+    }
 
-//        commandId: "Groups";
-
-//        fields: ["Id", "Name", "Description", "Roles"];
-
-//        onModelUpdated: {
-//            if (groupsProvider.collectionModel != null){
-//                groupsTable.elements = groupsProvider.collectionModel;
-//            }
-//        }
-//    }
+    function onLocalizationChanged(language){
+        groupsHeadersModel.updateHeaders();
+    }
 
     function updateGui(){
         console.log("UserGroups updateGui");
@@ -104,17 +98,25 @@ ViewBase {
     TreeItemModel {
         id: groupsHeadersModel;
 
-        Component.onCompleted: {
+        function updateHeaders(){
+            groupsHeadersModel.Clear();
+
             let index = groupsHeadersModel.InsertNewItem();
             groupsHeadersModel.SetData("Id", "Name", index);
-            groupsHeadersModel.SetData("Name", "Group Name", index);
+            groupsHeadersModel.SetData("Name", qsTr("Group Name"), index);
 
             index = groupsHeadersModel.InsertNewItem();
 
             groupsHeadersModel.SetData("Id", "Description", index);
-            groupsHeadersModel.SetData("Name", "Description", index);
+            groupsHeadersModel.SetData("Name", qsTr("Description"), index);
+
+            groupsHeadersModel.Refresh();
 
             groupsTable.headers = groupsHeadersModel;
+        }
+
+        Component.onCompleted: {
+            updateHeaders();
         }
     }
 

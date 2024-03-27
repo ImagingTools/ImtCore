@@ -13,31 +13,18 @@ ViewBase {
     property TreeItemModel rolesModel: TreeItemModel {}
 
     Component.onCompleted: {
-//        rolesProvider.updateModel();
+        Events.subscribeEvent("OnLocalizationChanged", userRolesContainer.onLocalizationChanged);
     }
 
-//    CollectionDataProvider {
-//        id: rolesProvider;
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", userRolesContainer.onLocalizationChanged);
+    }
 
-//        commandId: "Roles";
-
-//        fields: ["Id", "Name"];
-
-//        onModelUpdated: {
-//            if (rolesProvider.collectionModel != null){
-//                if (rolesProvider.collectionModel.ContainsKey("Roles")){
-//                    let rolesModel = rolesProvider.collectionModel.GetData("Roles");
-//                    rolesTable.elements = rolesModel;
-
-//                    userRolesContainer.doUpdateGui();
-//                }
-//            }
-//        }
-//    }
+    function onLocalizationChanged(language){
+        headersModel.updateHeaders();
+    }
 
     function updateGui(){
-        console.log("UserRoles updateGui", userRolesContainer.model.toJSON());
-        console.log("rolesTable.elements", rolesTable.elements);
         let roleIds = [];
         if (userRolesContainer.model.ContainsKey("Roles")){
             let roles = userRolesContainer.model.GetData("Roles")
@@ -68,8 +55,6 @@ ViewBase {
 
         let result = selectedRoleIds.join(';');
         userRolesContainer.model.SetData("Roles", result);
-
-        console.log("UserRoles updateModel", userRolesContainer.model.toJSON());
     }
 
     Component{
@@ -101,7 +86,6 @@ ViewBase {
 
         anchors.top: parent.top;
         anchors.left: parent.left;
-//        anchors.leftMargin: 10;
 
         text: qsTr("Roles");
         color: Style.textColor;
@@ -112,13 +96,21 @@ ViewBase {
     TreeItemModel {
         id: headersModel;
 
-        Component.onCompleted: {
+        function updateHeaders(){
+            headersModel.Clear();
+
             headersModel.InsertNewItem();
 
             headersModel.SetData("Id", "Name");
-            headersModel.SetData("Name", "Role Name");
+            headersModel.SetData("Name", qsTr("Role Name"));
+
+            headersModel.Refresh();
 
             rolesTable.headers = headersModel;
+        }
+
+        Component.onCompleted: {
+            updateHeaders();
         }
     }
 
