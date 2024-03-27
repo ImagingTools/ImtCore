@@ -204,6 +204,13 @@ Rectangle {
 
     function setDecorators(){
         console.log("onTableDecoratorChanged");
+        if (!tableContainer.tableDecorator){
+            return;
+        }
+
+        if (!tableContainer.headers){
+            return;
+        }
 
         tableContainer.headerDecorator = tableContainer.tableDecorator.GetTreeItemModel("Headers");
         tableContainer.cellDecorator = tableContainer.tableDecorator.GetTreeItemModel("Cells");
@@ -229,8 +236,6 @@ Rectangle {
             pauseHeight.stop();
             pauseHeight.start();
         }
-
-
     }
 
     function getSelectedIndexes(){

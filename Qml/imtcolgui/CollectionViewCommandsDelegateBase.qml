@@ -41,11 +41,22 @@ ViewCommandsDelegateBase {
     onCollectionViewChanged: {
         if (collectionView){
             elementsConnections.target = collectionView.table;
+            commandsControllerConn.target = collectionView.commandsController
 
             //            collectionView.selectionChanged.connect(internal.onSelectionChanged);
             if (collectionView.commandsController){
-                collectionView.commandsController.commandsModelChanged.connect(internal.onCommandsModelChanged);
+//                collectionView.commandsController.commandsModelChanged.connect(internal.onCommandsModelChanged);
+
+//                container.setupContextMenu();
             }
+        }
+    }
+
+    Connections {
+        id: commandsControllerConn;
+
+        function onCommandsModelChanged(){
+            container.setupContextMenu();
         }
     }
 
@@ -94,6 +105,7 @@ ViewCommandsDelegateBase {
     }
 
     function setupContextMenu(){
+        console.log("setupContextMenu", collectionView);
         let commandsController = collectionView.commandsController;
         if (commandsController){
             container.contextMenuModel.Clear();
@@ -131,16 +143,7 @@ ViewCommandsDelegateBase {
                 container.contextMenuModel.SetData("Icon", "", index);
             }
 
-            //            for (let i = 0; i < container.templateContextMenuModel.length; i++){
-            //                let commandObj = container.templateContextMenuModel[i];
-
-            //                let commandId = commandObj["Id"];
-            //                if (commandsController.commandExists(commandId)){
-            //                    let index = container.contextMenuModel.InsertNewItem();
-            //                    let commandIndex = commandsController.getCommandIndex(commandId);
-            //                    container.contextMenuModel.CopyItemDataFromModel(index, commandsController.commandsModel, commandIndex)
-            //                }
-            //            }
+            container.contextMenuModel.Refresh();
         }
     }
 

@@ -69,6 +69,8 @@ ControlBase {
     }
 
     Component.onDestruction: {
+        console.log("Popup onDestruction");
+
         Events.unSubscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
         Events.unSubscribeEvent("AppSizeChanged", onAppSizeChanged);
     }
@@ -77,8 +79,18 @@ ControlBase {
         close();
     }
 
-    onSelectedIndexChanged: {
-        console.log("Popup onSelectedIndexChanged", selectedIndex);
+    onStarted: {
+        timer.start();
+    }
+
+    Timer {
+        id: timer;
+
+        interval: 100;
+
+        onTriggered: {
+            Events.subscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
+        }
     }
 
     onRootChanged: {
@@ -88,18 +100,16 @@ ControlBase {
         if(popupMenuContainer.hiddenBackground){
             popupMenuContainer.root.backgroundItem.opacity = 0;
         }
-
-        /**
-            Close the dialog by clicking on the background
-        */
-        Events.subscribeEvent("DialogBackgroundClicked", popupMenuContainer.onBackgroundClicked)
     }
 
     function onAppSizeChanged(parameters){
+        console.log("Popup onAppSizeChanged");
         onBackgroundClicked();
     }
 
     function onBackgroundClicked(){
+        console.log("Popup onBackgroundClicked");
+
         popupMenuContainer.finished('', -1);
     }
 

@@ -45,7 +45,7 @@ ViewBase {
             tableInternal.currentSortOrder = collectionViewBaseContainer.collectionFilter.getSortingOrder();
 
             if (tableInternal.headers.GetItemsCount() > 0){
-                collectionViewBaseContainer.doUpdateGui();
+//                collectionViewBaseContainer.doUpdateGui();
             }
         }
     }

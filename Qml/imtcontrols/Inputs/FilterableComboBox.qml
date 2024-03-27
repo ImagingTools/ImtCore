@@ -8,7 +8,7 @@ ComboBox {
 
     property string filter;
 
-    delegate: PopupMenuDelegate {
+    delegate: Component {PopupMenuDelegate {
         width: comboBoxContainer.width;
         height: acceptable ? comboBoxContainer.itemHeight : 0;
 
@@ -28,6 +28,7 @@ ComboBox {
                 comboBoxContainer.popup.finished(model.Id, model.index)
             }
         }
+    }
     }
 
     popupMenuComp: Component {

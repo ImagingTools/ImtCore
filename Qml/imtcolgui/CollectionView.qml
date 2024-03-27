@@ -106,10 +106,6 @@ Item {
             root.headersChanged();
         }
 
-        function onFilterChanged(){
-            root.filterChanged();
-        }
-
         function onSelectionChanged(selection){
             console.log("CV onSelectionChanged", selection);
             root.selectionChanged(selection);
@@ -313,9 +309,6 @@ Item {
             id: popupMenuDialog;
 
             PopupMenuDialog {
-                itemWidth: 250;
-                itemHeight: 30;
-
                 onFinished: {
                     container.commandsDelegate.commandHandle(commandId);
                 }

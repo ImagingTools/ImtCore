@@ -48,7 +48,7 @@ ControlBase {
 
     property var popup: null;
 
-    property Component delegate: PopupMenuDelegate{
+    property Component delegate: Component {PopupMenuDelegate{
         width: comboBoxContainer.width;
         height: comboBoxContainer.itemHeight;
 
@@ -68,7 +68,8 @@ ControlBase {
                 comboBoxContainer.popup.selectedIndex = model.index;
             }
         }
-    };
+    }
+    }
 
     property alias containsMouse: cbMouseArea.containsMouse;
 

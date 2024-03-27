@@ -12,6 +12,10 @@ Item {
     property TreeItemModel metaInfoModel: TreeItemModel {}
 
     function getMetaInfo(objectId){
+        if (getMetaInfoGqlCommand == ""){
+            return;
+        }
+
         metaInfo.getMetaInfo(objectId);
     }
 
