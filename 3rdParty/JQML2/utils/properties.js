@@ -596,7 +596,7 @@ class QAnchors extends ComplexObject {
     }
 
     mainChanged(){
-        if(this.completed) this.getNotify()()
+        this.getNotify()()
     }
 
     marginsChanged(){
