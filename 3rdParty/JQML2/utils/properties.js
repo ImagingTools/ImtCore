@@ -193,7 +193,7 @@ class QString extends QProperty {
 
     typeCasting(value){
         if(value === undefined) throw 'Cannot assign [undefined] to QString'
-        if(typeof value === 'string' && value.indexOf('undefined') >= 0) throw 'Cannot assign [undefined] to QString'
+        // if(typeof value === 'string' && value.indexOf('undefined') >= 0) throw 'Cannot assign [undefined] to QString'
         if(typeof value === 'object') throw 'Cannot assign QJSValue to QString'
         if(typeof value === 'number') {
             if(isNaN(value)) return 'nan'
