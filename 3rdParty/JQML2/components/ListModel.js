@@ -68,7 +68,7 @@ class ListModel extends QtObject {
     clear(){
         let leftTop = 0
         let rightBottom = this.getStatement('data').get().length
-        this.getStatement('data').reset([])
+        this.getStatement('data').value = []
 
         this.getStatement('count').reset(0)
         this.getStatement('data').getNotify()(leftTop, rightBottom, 'remove')
