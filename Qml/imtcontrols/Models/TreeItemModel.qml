@@ -406,8 +406,6 @@ JSONListModel {
             if (this.isArray || this.count > 1)
                 retVal += "{"
 
-
-
             let recurciveJSON = function(modelData){
                 if (modelData === null) {
                     retVal += "null"
@@ -439,9 +437,8 @@ JSONListModel {
 
             if (this.isArray || this.count > 1)
                 retVal += "}"
-
-
         }
+
         if (this.isArray || this.count > 1)
             retVal += "]"
         else

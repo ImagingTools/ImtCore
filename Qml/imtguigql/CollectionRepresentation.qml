@@ -33,16 +33,8 @@ Item {
         updateModel();
     }
 
-    onBeginUpdate: {
-        // internal.elementsUpdatingBlock = true;
-    }
-
     onEndUpdate: {
         internal.elementsUpdatingBlock = false;
-    }
-
-    onHeadersModelChanged: {
-        console.log("onHeadersModelChanged", headersModel.toJSON());
     }
 
     QtObject {
@@ -550,8 +542,6 @@ Item {
                     }
 
                     Events.sendEvent("SendError", {"Message": message, "ErrorType": type})
-
-                    // root.endUpdate();
 
                     return;
                 }

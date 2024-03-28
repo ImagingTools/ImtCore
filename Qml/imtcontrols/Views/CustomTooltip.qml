@@ -29,9 +29,9 @@ ControlBase {
     property int horizontalAlignment: Text.AlignHCenter;
 
     property int radius: 4;
-    property string color: "#ffffff";
+    property string color: Style.baseColor;
     property int borderWidth: 1;
-    property string borderColor: "lightgray";
+    property string borderColor: Style.borderColor;
 
     property bool openST: false;
     property int waitingDuration: delay;

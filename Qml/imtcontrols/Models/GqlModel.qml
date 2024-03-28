@@ -16,7 +16,6 @@ TreeItemModel {
         xhr.send(gqlData);
 
         xhr.onreadystatechange = function(){
-//        xhr.onreadystatechange = function() {
             if (xhr.readyState === XMLHttpRequest.DONE){
                 this.json = xhr.responseText;
                 this.state = "Processing"
