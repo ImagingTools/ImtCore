@@ -882,24 +882,67 @@ class AnimationController {
     }
 }
 
-class TransactionController {
-    transactions = []
+class ImageController {
+    cache = {}
 
-    begin(){
-        this.transactions.push([])
-    }
-
-    add(func){
-        if(this.transactions.length) this.transactions[this.transactions.length-1].push(func)
-    }
-
-    end(){
-        let transaction = this.transactions.pop()
-        if(transaction){
-            while(transaction.legnth){
-                transaction.shift()()
+    load(url, onLoaded, onError) {
+        let item = this.cache[url]
+        if(!item) {
+            item = {
+                data: '',
+                width: 0,
+                height: 0,
+                status: 0,
+                onLoaded: new QSignal('img'),
+                onError: new QSignal(),
             }
+            this.cache[url] = item
         }
+        
+        if(item.status === 2) {
+            if(onLoaded) onLoaded(item)
+            return
+        } else if(item.status === 1) {
+            if(onLoaded) item.onLoaded.connect(onLoaded)
+            if(onError) item.onError.connect(onError)
+            return
+        } else if(item.status === -1){
+            if(onError) onError()
+            return
+        } else {
+            if(onLoaded) item.onLoaded.connect(onLoaded)
+            if(onError) item.onError.connect(onError)
+            
+            item.status = 1
+            let xhr = new XMLHttpRequest()
+            xhr.onload = ()=>{
+                if(xhr.status === 200){
+                    let reader = new FileReader()
+                    reader.onloadend = ()=>{
+                        let img = new OriginImage()
+                        img.onload = ()=>{
+                            item.data = reader.result,
+                            item.width = img.naturalWidth,
+                            item.height = img.naturalHeight,
+                            img.remove()
+
+                            item.status = 2
+                            item.onLoaded(item)
+                        }
+                        img.src = reader.result
+                    }
+                    reader.readAsDataURL(xhr.response)
+                } else {
+                    item.status = -1
+                    item.onError()
+                }
+                
+            }
+            xhr.open('GET', url)
+            xhr.responseType = 'blob'
+            xhr.send()
+        }
+
     }
 }
 
@@ -908,4 +951,4 @@ module.exports.MouseController = MouseController
 module.exports.KeyboardController = KeyboardController
 module.exports.TextFontController = TextFontController
 module.exports.AnimationController = AnimationController
-module.exports.TransactionController = TransactionController
+module.exports.ImageController = ImageController

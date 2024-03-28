@@ -24,31 +24,6 @@ class Image extends Item {
         status: { type: QReal, value: Image.Null },
     }
 
-    /*
-    this.$cP('progress', 0, this.$progressChanged)
-        this.$img = new window.Image();
-        this.$imgLoad = function(){
-            if(this.$sizeWidthAuto){
-                this.sourceSize.width = this.$img.naturalWidth
-                this.$sizeWidthAuto = true
-            }
-            if(this.$sizeHeightAuto){
-                this.sourceSize.height = this.$img.naturalHeight
-                this.$sizeHeightAuto = true
-            }
-
-            this.dom.style.backgroundImage = `url("${this.$img.src}")`
-
-            this.progress = 1;
-            this.status = Image.Ready;
-        }.bind(this)
-        this.$imgError = function(){
-            this.status = Image.Error;
-        }.bind(this)
-        this.$img.addEventListener("load", this.$imgLoad);
-        this.$img.addEventListener("error", this.$imgError);
-    */
-
     constructor(parent,exCtx,exModel){
         super(parent,exCtx,exModel)
         
@@ -56,25 +31,6 @@ class Image extends Item {
             backgroundRepeat: "no-repeat",
             backgroundPosition: "center",
         })
-
-        this.$img = new OriginImage();
-
-        this.$img.onload = ()=>{
-            if(!this.UID) return
-            this.getProperty('sourceSize').getProperty('width').setAuto(this.$img.naturalWidth)
-            this.getProperty('sourceSize').getProperty('height').setAuto(this.$img.naturalHeight)
-
-            this.setStyle({
-                backgroundImage: `url("${this.$img.src}")`
-            })
-
-            this.getProperty('progress').reset(1)
-            this.getProperty('status').reset(Image.Ready)
-        }
-        this.$img.onerror = ()=>{
-            if(!this.UID) return
-            this.getProperty('status').reset(Image.Error)
-        }
     }
 
     $sourceChanged(){
@@ -85,10 +41,27 @@ class Image extends Item {
             return
         }
 
-        let path = rootPath+'/'+this.getProperty('source').get().replaceAll('../','')
+        let url = (rootPath+'/'+this.getProperty('source').get().replaceAll('../','')).replaceAll('qrc:','').replaceAll('//','/')
+        this.$url = url
 
         this.getProperty('status').reset(Image.Loading)
-        this.$img.src = path.replaceAll('qrc:','').replaceAll('//','/')
+
+        ImageController.load(url, (img)=>{
+            if(!this.UID || this.$url !== url) return
+            this.getProperty('sourceSize').getProperty('width').setAuto(img.width)
+            this.getProperty('sourceSize').getProperty('height').setAuto(img.height)
+
+            this.setStyle({
+                backgroundImage: `url("${img.data}")`
+            })
+
+            this.getProperty('progress').reset(1)
+            this.getProperty('status').reset(Image.Ready)
+        },()=>{
+            if(!this.UID) return
+            this.getProperty('status').reset(Image.Error)
+        })
+        
     }
 
     updateImage(){
@@ -150,11 +123,6 @@ class Image extends Item {
 
     $sourceSizeChanged(){
         this.updateImage()
-    }
-
-    destroy(){
-        this.$img.remove()
-        super.destroy()
     }
 }
 

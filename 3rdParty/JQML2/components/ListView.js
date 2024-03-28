@@ -113,6 +113,7 @@ class ListView extends Flickable {
                         
                     }
                 }
+                this.getProperty('count').reset(this.$items.length.get())
                 this.updateGeometry()
             } else if(roles === 'insert'){
                 for(let i = leftTop; i < bottomRight; i++){
@@ -159,6 +160,7 @@ class ListView extends Flickable {
                         }
                     }
                 }
+                this.getProperty('count').reset(this.$items.length.get())
             }
         }
 
