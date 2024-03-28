@@ -88,7 +88,7 @@ class Image extends Item {
         let path = rootPath+'/'+this.getProperty('source').get().replaceAll('../','')
 
         this.getProperty('status').reset(Image.Loading)
-        this.$img.src = path.replaceAll('//','/')
+        this.$img.src = path.replaceAll('qrc:','').replaceAll('//','/')
     }
 
     updateImage(){
