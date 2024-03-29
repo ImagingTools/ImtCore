@@ -22,6 +22,21 @@ Item {
         Events.unSubscribeEvent("ClearCommandsGui", commandsDecoratorContainer.clearModel);
     }
 
+    property int loadImages: 0
+    property TreeItemModel buttonModel;
+
+    onLoadImagesChanged: {
+        if (loadImages == 0){
+            buttonPanel.buttonModel = buttonModel;
+
+            buttonPanel.updateModel();
+        }
+    }
+
+    function counterImage(){
+        loadImages--
+    }
+
     function setCommandsModel(parameters){
         console.log("start setCommandsModel", JSON.stringify(parameters));
         let model = parameters["Model"];
@@ -29,9 +44,28 @@ Item {
 
         commandsDecoratorContainer.commandId = commId;
 
-        buttonPanel.buttonModel = model;
+        console.log("*Debug* setCommandsModel:", model)
 
-        buttonPanel.updateModel();
+        if (Qt.platform.os === "web"){
+            buttonModel = model;
+            for (let index = 0; index < model.GetItemsCount(); index++){
+                let modelIcon = model.GetData("Icon",index)
+                let isEnabled = model.GetData("IsEnabled",index)
+                let path = modelIcon === "" ? "" : isEnabled ? Style.getIconPath(modelIcon, Icon.State.On, Icon.Mode.Normal) :
+                                                               Style.getIconPath(modelIcon, Icon.State.Off, Icon.Mode.Disabled)
+                if (path !== ""){
+                    path = "/" + context.appName + "/Views/" + path
+                    console.log("*Debug* path:", path)
+                    loadImages++;
+
+                    ImageController.load(path, counterImage, counterImage);
+                }
+            }
+        }
+        else{
+            buttonPanel.buttonModel = model;
+            buttonPanel.updateModel();
+        }
     }
 
     function clearModel(parameters){
