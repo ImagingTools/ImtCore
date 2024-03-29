@@ -8,7 +8,7 @@ Item {
 
     property TreeItemModel pageModel: TreeItemModel {};
     property Item activeItem: null;
-    property int activePageIndex: 0;
+    property int activePageIndex: -1;
     property AuthorizationPage authorizationStatusProvider: null;
 
     /**
@@ -22,6 +22,10 @@ Item {
 
     Component.onDestruction: {
         Events.unSubscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
+    }
+
+    onActivePageIndexChanged: {
+        console.log("pagesProvider onActivePageIndexChanged", activePageIndex);
     }
 
     function updateModel(){
@@ -50,7 +54,8 @@ Item {
         id: pagesProvider;
 
         onPagesModelChanged: {
-            console.log("pagesProvider onPagesModelChanged", pagesProvider.pagesModel.toJSON());
+            container.pageModel = pagesProvider.pagesModel;
+
             let updateRepeaterModel = true;
 
             if (pagesData.model){
@@ -63,8 +68,6 @@ Item {
             if (updateRepeaterModel){
                 pagesData.model = pagesProvider.pagesModel;
             }
-
-            container.pageModel = pagesProvider.pagesModel;
         }
     }
 
@@ -82,19 +85,43 @@ Item {
 
             visible: container.activePageIndex === model.index;
 
+            property bool isLoaded: false;
+
             onVisibleChanged: {
-                if(pagesDeleg.visible && container.loadByClick){
+                if (visible){
+                    load();
+                }
+            }
+
+            function load(){
+                if (isLoaded){
+                    return;
+                }
+
+                if(pagesDeleg.visible){
                     if (!pagesLoader.item){
                         pagesLoader.source = model.Source;
                     }
 
-                    container.activeItem = pagesLoader.item;
+                    if (pagesLoader.item){
+                        Events.sendEvent("StartLoading")
+
+                        if (pagesLoader.item.loadStartItem !== undefined){
+                            pagesLoader.item.loadStartItem();
+                        }
+
+                        pagesDeleg.isLoaded = true;
+
+                        Events.sendEvent("StopLoading")
+                    }
                 }
             }
 
             Component.onCompleted: {
-                if (!container.loadByClick){
+                if (!container.loadByClick || container.activePageIndex === model.index){
                     pagesLoader.source = model.Source;
+
+                    load();
                 }
             }
 
@@ -104,16 +131,14 @@ Item {
 
                 visible: parent.visible;
 
-                onItemChanged: {
-                    if (pagesLoader.item){
-                        pagesLoader.item.startPageObj =
-                        {
-                            "Id": model.Id,
-                            "Name": model.Name,
-                            "Source": model.StartItem,
-                            "CommandId": model.Id
-                        };
-                    }
+                onLoaded: {
+                    pagesLoader.item.startPageObj =
+                            {
+                        "Id": model.Id,
+                        "Name": model.Name,
+                        "Source": model.StartItem,
+                        "CommandId": model.Id
+                    };
                 }
 
                 onStatusChanged: {

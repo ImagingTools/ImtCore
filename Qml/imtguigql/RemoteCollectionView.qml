@@ -14,18 +14,34 @@ CollectionView {
     // Invisible fields that will be requested for collection
     property var additionalFieldIds: ["Id", "Name"]
 
-    dataControllerComp: Component {
-        CollectionRepresentation {
-            collectionId: root.collectionId;
-
-            additionalFieldIds: root.additionalFieldIds;
-        }
-    }
-
     commandsControllerComp: Component {
         CommandsRepresentationProvider {
             commandId: root.collectionId;
             uuid: root.viewId;
+        }
+    }
+
+    dataControllerComp: Component {
+        CollectionRepresentation {
+            property bool isReady: false;
+
+            Component.onCompleted: {
+                Events.subscribeEvent("CommandsGuiReady", commandsIsReady);
+            }
+
+            Component.onDestruction: {
+                Events.unSubscribeEvent("CommandsGuiReady", commandsIsReady);
+            }
+
+            function commandsIsReady(){
+                isReady = true;
+
+                Events.unSubscribeEvent("CommandsGuiReady", commandsIsReady);
+            }
+
+            collectionId: isReady ? root.collectionId : "";
+
+            additionalFieldIds: root.additionalFieldIds;
         }
     }
 

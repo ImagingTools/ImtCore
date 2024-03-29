@@ -10,14 +10,14 @@ Item {
 
     property alias viewId: container.viewId;
 
+    property alias commandsControllerComp: container.commandsControllerComp;
+    property alias commandsController: container.commandsController;
+
     property alias dataControllerComp: container.dataControllerComp;
     property alias dataController: container.dataController;
 
     property alias commandsDelegateComp: container.commandsDelegateComp;
     property alias commandsDelegate: container.commandsDelegate;
-
-    property alias commandsControllerComp: container.commandsControllerComp;
-    property alias commandsController: container.commandsController;
 
     property alias collectionFilter: container.collectionFilter;
     property alias table: container.table;
@@ -28,6 +28,7 @@ Item {
     property alias hasFilter: container.hasFilter;
     property alias hasSort: container.hasSort;
     property alias hasPagination: container.hasPagination;
+    property alias elementsCount: container.elementsCount;
 
     property bool visibleMetaInfo: false;
 
@@ -255,7 +256,12 @@ Item {
         }
 
         function updateGui(){
-            console.log("CollectionView updateGui");
+            console.log("CollectionView updateGui", container.visible);
+
+            if (container.dataController){
+                console.log("ID", container.dataController.collectionId);
+            }
+
             if (!container.visible){
                 internal.guiUpdateRequired = true;
 

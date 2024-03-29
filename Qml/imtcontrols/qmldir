@@ -109,6 +109,7 @@ SwitchCustom 1.0 ./Views/SwitchCustom.qml
 TableCellDelegate 1.0 ./Views/TableCellDelegate.qml
 TableCellDelegateSimple 1.0 ./Views/TableCellDelegateSimple.qml
 TableDelegate 1.0 ./Views/TableDelegate.qml
+SimpleTableDelegate 1.0 ./Views/SimpleTableDelegate.qml
 TableProperties 1.0 ./Views/TableProperties.qml
 TableSelection 1.0 ./Views/TableSelection.qml
 TableTreeItemDelegate 1.0 ./Views/TableTreeItemDelegate.qml

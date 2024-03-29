@@ -30,7 +30,9 @@ Item {
             buttonPanel.buttonModel = buttonModel;
 
             buttonPanel.updateModel();
-        }
+
+            Events.sendEvent("CommandsGuiReady");
+         }
     }
 
     function counterImage(){
@@ -65,6 +67,8 @@ Item {
         else{
             buttonPanel.buttonModel = model;
             buttonPanel.updateModel();
+
+            Events.sendEvent("CommandsGuiReady");
         }
     }
 

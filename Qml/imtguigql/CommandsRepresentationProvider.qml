@@ -14,6 +14,8 @@ CommandsController {
     }
 
     function updateModel(){
+        console.log("Commands updateModel", commandId);
+
         if (commandId === ""){
             console.error("Unable to update commands model. Command-ID is empty.");
             return;
@@ -63,6 +65,8 @@ CommandsController {
                         if (dataModelLocal != "null"){
                             commandsProviderContainer.setAdditionalProperties(dataModelLocal);
                             commandsProviderContainer.commandsModel = dataModelLocal;
+
+                            commandsProviderContainer.isReady = true;
                         }
                     }
                 }

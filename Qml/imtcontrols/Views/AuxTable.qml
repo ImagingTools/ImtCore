@@ -1079,6 +1079,10 @@ Rectangle {
             }
         }
 
+        onCountChanged: {
+            console.log("onCountChanged");
+        }
+
         delegate:
             TableDelegate {
 

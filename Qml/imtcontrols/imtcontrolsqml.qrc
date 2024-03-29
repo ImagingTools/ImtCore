@@ -109,6 +109,7 @@
         <file alias="imtcontrols/Views/TableCellDelegate.qml">Views/TableCellDelegate.qml</file>
         <file alias="imtcontrols/Views/TableCellDelegateSimple.qml">Views/TableCellDelegateSimple.qml</file>
         <file alias="imtcontrols/Views/TableDelegate.qml">Views/TableDelegate.qml</file>
+	<file alias="imtcontrols/Views/SimpleTableDelegate.qml">Views/SimpleTableDelegate.qml</file>
         <file alias="imtcontrols/Views/TableProperties.qml">Views/TableProperties.qml</file>
         <file alias="imtcontrols/Views/TableSelection.qml">Views/TableSelection.qml</file>
         <file alias="imtcontrols/Views/TreeItemDelegate.qml">Views/TreeItemDelegate.qml</file>

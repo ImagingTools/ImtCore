@@ -11,6 +11,8 @@ Item {
 
     signal commandModeChanged(string commandId, bool newMode);
 
+    property bool isReady: false;
+
     onCommandModeChanged: {
         Events.sendEvent("CommandsEnabledChanged", {"Model": root.commandsModel, "CommandId": uuid});
     }

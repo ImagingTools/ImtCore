@@ -9,23 +9,12 @@ DocumentManager {
 
     property var startPageObj;
 
+    property bool startItemIsLoaded: false;
+
     onStartPageObjChanged: {
-        let id = startPageObj["Id"];
-        let name = startPageObj["Name"];
-        let source = startPageObj["Source"];
         let typeId = startPageObj["CommandId"];
 
         MainDocumentManager.registerDocumentManager(typeId, documentManager);
-
-        var startItemComp = Qt.createComponent(source);
-        if (startItemComp.status !== Component.Ready) {
-            console.log("Start component not ready!", startItemComp.errorString());
-
-            return;
-        }
-
-        addInitialItem(startItemComp, name);
-        Events.sendEvent("MenuModelRequest", true);
     }
 
     onDocumentAdded: {
@@ -44,6 +33,25 @@ DocumentManager {
 
     Component.onCompleted: {
         Events.subscribeEvent("MenuModelChanged", documentManager.onMenuModelChanged);
+    }
+
+    function loadStartItem(){
+        if (startItemIsLoaded){
+            return;
+        }
+
+        let name = startPageObj["Name"];
+        let source = startPageObj["Source"];
+
+        var startItemComp = Qt.createComponent(source);
+        if (startItemComp.status !== Component.Ready) {
+            console.log("Start component not ready!", startItemComp.errorString());
+
+            return;
+        }
+
+        addInitialItem(startItemComp, name);
+//        Events.sendEvent("MenuModelRequest", true);
     }
 
     function onMenuModelChanged(model){

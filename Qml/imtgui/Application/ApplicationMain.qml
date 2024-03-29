@@ -36,6 +36,14 @@ Item {
         }
     }
 
+    property bool updatingModel: serverReady && application.settingsProvider.serverModel != null;
+
+    onUpdatingModelChanged: {
+        if (updatingModel){
+            Events.sendEvent("UpdateModels");
+        }
+    }
+
     onAuthorizationServerConnectedChanged: {
         console.log("onAuthorizationServerConnectedChanged", authorizationServerConnected);
         if (authorizationServerConnected){
@@ -140,9 +148,11 @@ Item {
 
         onServerModelChanged: {
             console.log("onServerModelChanged", serverModel);
-            let design = application.designProvider.getDesignSchema();
+//            if (serverModel == null){
+//                Events.sendEvent("UpdateModels");
+//            }
 
-            console.log("design", design);
+            let design = application.designProvider.getDesignSchema();
 
             let index = application.designProvider.getDesignSchemaIndex(design);
             if (index >= 0){
@@ -317,6 +327,10 @@ Item {
     }
 
     function connectToWebSocketServer(){
+        if (!application.useWebSocketSubscription){
+            return;
+        }
+
         subscriptionManager_.active = false;
         let serverUrl = getServerUrl();
         let webSocketServerUrl = getWebSocketUrl(serverUrl);
@@ -333,6 +347,10 @@ Item {
         running: true;
 
         onTriggered: {
+            if (!application.useWebSocketSubscription){
+                return;
+            }
+
             if (webSocketPortProvider.port == -1){
                 application.checkStatus(WebSocket.Error)
 

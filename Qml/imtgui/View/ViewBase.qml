@@ -42,19 +42,21 @@ Item {
     }
 
     onCommandsDelegateCompChanged: {
-        if (commandsDelegateComp){
-            if (commandsDelegate){
-                commandsDelegate.destroy();
-            }
+        if (commandsDelegate){
+            commandsDelegate.destroy();
 
+            commandsDelegate = null;
+        }
+
+        if (commandsDelegateComp){
             commandsDelegate = commandsDelegateComp.createObject(viewBase);
         }
     }
 
     onCommandsDelegateChanged: {
         if (viewBase.viewId !== ""){
-            Events.unSubscribeAllFromSlot(item.commandHandle);
-            Events.subscribeEvent(viewBase.viewId + "CommandActivated", item.commandHandle);
+            Events.unSubscribeAllFromSlot(commandsDelegate.commandHandle);
+            Events.subscribeEvent(viewBase.viewId + "CommandActivated", commandsDelegate.commandHandle);
         }
     }
 
@@ -63,14 +65,13 @@ Item {
     }
 
     onVisibleChanged: {
-        console.log("onVisibleChanged", viewBase, visible, model.toJSON());
         if (commandsController){
             if (visible){
-                viewBase.updateCommandsGui();
+                if (internal.localizationChanged){
+                    internal.updateCommandsAtferLocalizationChanged();
+                }
 
-//                if (internal.localizationChanged){
-//                    internal.onLocalizationChanged();
-//                }
+                viewBase.updateCommandsGui();
             }
             else{
                 viewBase.clearCommandsGui();
@@ -156,6 +157,11 @@ Item {
     }
 
     function updateCommands(){
+        if (!commandsController){
+            console.error("Unable to update commands for view 'commandsController' is invalid")
+            return;
+        }
+
         commandsController.updateModel();
     }
 
@@ -211,18 +217,22 @@ Item {
             console.log("onLocalizationChanged Events.events", Events.events["OnLocalizationChanged"]);
 
             console.log("ViewBase onLocalizationChanged", language);
-//            if (!viewBase.visible){
-//                localizationChanged = true;
-//                return;
-//            }
+            if (!viewBase.visible){
+                localizationChanged = true;
+                return;
+            }
 
+            updateCommandsAtferLocalizationChanged();
+
+            localizationChanged = false
+        }
+
+        function updateCommandsAtferLocalizationChanged(){
             if (viewBase.commandsController){
                 internal.cachedCommandsModel.Clear();
                 internal.cachedCommandsModel.Copy(viewBase.commandsController.commandsModel);
                 viewBase.commandsController.updateModel();
             }
-
-            localizationChanged = false
         }
     }
 

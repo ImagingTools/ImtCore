@@ -10,13 +10,22 @@ Rectangle {
 
     property var startPageObj;
 
+    property bool startItemIsLoaded: false;
+
     onStartPageObjChanged: {
-        let id = startPageObj["Id"];
-        let name = startPageObj["Name"];
-        let source = startPageObj["Source"];
         let typeId = startPageObj["CommandId"];
 
         MainDocumentManager.registerDocumentManager(typeId, documentManager);
+    }
+
+    function loadStartItem(){
+        if (startItemIsLoaded){
+            return;
+        }
+
+        let id = startPageObj["Id"];
+        let name = startPageObj["Name"];
+        let source = startPageObj["Source"];
 
         var startItemComp = Qt.createComponent(source);
         if (startItemComp.status !== Component.Ready) {
@@ -26,7 +35,10 @@ Rectangle {
         }
 
         documentManager.addFixedView(startItemComp, name);
-        Events.sendEvent("MenuModelRequest", true);
+
+        startItemIsLoaded = true;
+
+//        Events.sendEvent("MenuModelRequest", true);
     }
 
     MultiDocWorkspaceView {
@@ -34,13 +46,12 @@ Rectangle {
 
         anchors.fill: parent;
 
-        Component.onDestruction: {
-            Events.unSubscribeEvent("MenuModelChanged", documentManager.onMenuModelChanged);
-        }
-
         Component.onCompleted: {
             Events.subscribeEvent("MenuModelChanged", documentManager.onMenuModelChanged);
+        }
 
+        Component.onDestruction: {
+            Events.unSubscribeEvent("MenuModelChanged", documentManager.onMenuModelChanged);
         }
 
         function onMenuModelChanged(model){
@@ -54,6 +65,5 @@ Rectangle {
                 }
             }
         }
-
     }
 }

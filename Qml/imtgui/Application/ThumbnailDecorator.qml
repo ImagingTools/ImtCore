@@ -135,6 +135,10 @@ Rectangle {
             MainDocumentManager.documentOpened.connect(onDocumentOpened);
         }
 
+        Component.onDestruction: {
+            MainDocumentManager.documentOpened.disconnect(onDocumentOpened);
+        }
+
         function onDocumentOpened(typeId, documentId, documentTypeId){
             for (let i = 0; i < menuPanel.model.GetItemsCount(); i++){
                 let pageId = menuPanel.model.GetData("Id", i);
@@ -240,7 +244,7 @@ Rectangle {
             authorizationPage.state = "authorized";
 
             Events.sendEvent("UpdateSettings");
-            Events.sendEvent("UpdateModels");
+//            Events.sendEvent("UpdateModels");
         }
     }
 

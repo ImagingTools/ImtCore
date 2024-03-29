@@ -17,6 +17,7 @@ ViewBase {
     property alias loading: loading_;
     property alias filterMenuVisible: filterMenu_.visible;
     property alias pagination: pagination_;
+    property alias elementsCount: tableInternal.elementsCount;
 
     property CollectionFilter collectionFilter: CollectionFilter {}
 
@@ -45,7 +46,7 @@ ViewBase {
             tableInternal.currentSortOrder = collectionViewBaseContainer.collectionFilter.getSortingOrder();
 
             if (tableInternal.headers.GetItemsCount() > 0){
-//                collectionViewBaseContainer.doUpdateGui();
+                collectionViewBaseContainer.doUpdateGui();
             }
         }
     }
@@ -215,6 +216,49 @@ ViewBase {
 
                 collectionViewBaseContainer.doUpdateGui();
             }
+
+//            delegate: Component {Item {
+//                    id: rowDelegate;
+
+//                width: tableInternal.width;
+//                height: tableInternal.itemHeight;
+
+//                property int rowIndex: model.index;
+
+//                ListView {
+//                    width: parent.width;
+//                    height: parent.height;
+
+//                    clip: true;
+//                    orientation: ListView.Horizontal;
+
+//                    model: tableInternal.columnCount;
+
+//                    boundsBehavior: Flickable.StopAtBounds;
+
+//                    delegate: Component {
+//                        Item {
+//                            width: tableInternal.width / tableInternal.columnCount;
+//                            height: parent.height;
+
+//                            Text {
+//                                id: contentText;
+
+//                                width: parent.width;
+//                            }
+
+//                            Component.onCompleted: {
+//                                let headerId = tableInternal.headers.GetData("Id", model.index);
+
+//                                let text = tableInternal.elements.GetData(headerId,rowDelegate.rowIndex);
+
+//                                contentText.text = text;
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//            }
         }
 
         Item {

@@ -30,13 +30,14 @@ ApplicationMain{
         id: decoratorsQt
     }
 
-
-
     Component.onCompleted: {
         console.log("MainOnCompleted", topPanelDecoratorCustom)
 //        console.log("IconMode.selected", IconMode.selected)
     }
 
+    onServerReadyChanged: {
+        firstModelsInit();
+    }
 
     function updateAllModels(){
         console.log("settingsProviderLocal.updateModel", Style.textColor);
@@ -58,8 +59,6 @@ ApplicationMain{
             Style.setDecorators(decorators)
         }
     }
-
 }
-
 
 

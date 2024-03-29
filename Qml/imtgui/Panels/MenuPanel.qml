@@ -165,11 +165,11 @@ Rectangle {
             onClicked: {
                 //                lvPages.currentIndex = model.index;
                 console.log("MenuPanel onClicked", model.index);
-                menuPanel.activePageIndex = model.index;
                 menuPanel.activePageName = model["Name"];
                 menuPanel.activeIcon = model["Icon"];
                 menuPanel.activePageId = model["Id"];
 
+                menuPanel.activePageIndex = model.index;
                 lvPages.forceActiveFocus();
             }
         }
