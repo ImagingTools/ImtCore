@@ -78,7 +78,7 @@ QToolButton#windowTitle
 	border: 1px solid  ${Active.Button}; 
 }
 
-QToolButton#PageIconToolButton 
+QToolButton#PageIconToolButton
 {
 	background-color: transparent;
 	border: 0px solid transparent;
@@ -103,18 +103,18 @@ QTableView[ImtMenu=true]
 
 QAbstractItemView::item::selected
 {
-	color: ${Active.Text}; 
-	background-color: ${Active.ItemSelected}; 
+	color: ${Active.Text};
+	background-color: ${Active.ItemSelected};
 }
 
 QAbstractItemView::branch::selected
 {
-	background: ${Active.ItemSelected}; 
+	background: ${Active.ItemSelected};
 }
 
 QComboBox::item:selected 
 {
- 	color: ${Active.BackgroundSelected}; 
+ 	color: ${Active.BackgroundSelected};
 }
 
 QHeaderView::section

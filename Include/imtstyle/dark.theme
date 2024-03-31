@@ -60,7 +60,7 @@
 			"Button": "DeepGray",
 			"ErrorText": "Red",
 			"ButtonBorder": "LightGray2",
-			"HeaderBorder": "DeepGray2",
+			"HeaderBorder": "DeepGray",
 			"HeaderSection": "DeepGray",
 			"ButtonText": "LightGray",
 			"BrightText": "White",
