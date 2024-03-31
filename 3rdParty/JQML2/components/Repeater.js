@@ -133,18 +133,6 @@ class Repeater extends Item {
     updateView(){
         if(!this.getPropertyValue('delegate') || this.getPropertyValue('model') === undefined || this.getPropertyValue('model') === null) return
         
-        // for(let key in this.$items){
-        //     if(key !== 'length') {
-        //         if(this.$signals.itemRemoved) this.$signals.itemRemoved(key, this.$items[key])
-        //         this.$items[key].destroy()
-        //         delete this.$items[key]
-        //     }
-        // }
-        if(this.$id === 'childModelRepeater'){
-            console.log('DEBUG:::this.$items.length =', this.$items.length.get())
-            console.log('DEBUG:::this.model.UID =', this.getProperty('model').get().UID)
-        }
-        
         this.parent.preventAutoUpdateGeometry = true
         for(let i = 0; i < this.$items.length.get(); i++){
             this.createElement(i)
@@ -158,17 +146,17 @@ class Repeater extends Item {
 
     destroy(){
         this.$disconnectModel()
-        this.$items.length.unsubscribe()
+        this.$items.length.destroy()
+        delete this.$items.length
 
         for(let key in this.$items){
-            if(key !== 'length') {
-                if(this.$items[key].UID){
-                    if(this.$signals.itemRemoved) this.$signals.itemRemoved(key, this.$items[key])
-                    this.$items[key].destroy()
-                }
-                
-                delete this.$items[key]
+            if(this.$items[key].UID){
+                if(this.$signals.itemRemoved) this.$signals.itemRemoved(key, this.$items[key])
+                this.$items[key].destroy()
             }
+            
+            delete this.$items[key]
+            
         }
         
         super.destroy()

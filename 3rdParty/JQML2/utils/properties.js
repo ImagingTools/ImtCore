@@ -183,6 +183,10 @@ class QProperty {
 
     destroy(){
         this.unsubscribe()
+        if(this.notify) this.notify.destroy()
+        for(let key in this){
+            delete this[key]
+        }
     }
 }
 
@@ -650,6 +654,11 @@ class QAnchorLine {
 
     get(){
         return this
+    }
+
+    destroy(){
+        delete this.target
+        delete this.float
     }
 }
 

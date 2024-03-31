@@ -48,7 +48,7 @@ class QObject extends ComplexObject {
                     parent = parent.getStatement('contentItem').get()
                 }
             } else if(parent.$repeater && !(this instanceof Component)){
-                parent = parent.parent
+                parent = parent.getProperty('parent').get()
             }
 
             this.getStatement('model_').setCompute(()=>{return this.parent.model_})
@@ -189,14 +189,8 @@ class QObject extends ComplexObject {
     }
 
     $free(){
-        for(let key in this){
-            if(!(key in this.$properties) && !(key in this.$signals) && this[key] && this[key].clearDependsSignal){
-                this[key].clearDependsSignal()
-            }
-        }
         for(let propName in this.$properties){
-            if(this.$properties[propName].unsubscribe) this.$properties[propName].unsubscribe()
-            if(this.$properties[propName].notify) this.$properties[propName].notify.destroy()
+            this.$properties[propName].destroy()
         }
         for(let sigName in this.$signals){
             this.$signals[sigName].destroy()

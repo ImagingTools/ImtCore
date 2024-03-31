@@ -186,6 +186,19 @@ class ComplexObject {
             current = current.__proto__
         }
     }
+
+    destroy(){
+        for(let propName in this.$properties){
+            this.$properties[propName].destroy()
+        }
+        for(let sigName in this.$signals){
+            this.$signals[sigName].destroy()
+        }
+
+        for(let key in this){
+            delete this[key]
+        }
+    }
 }
 
 module.exports.ComplexObject = ComplexObject

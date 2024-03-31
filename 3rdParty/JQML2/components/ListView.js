@@ -628,16 +628,13 @@ class ListView extends Flickable {
 
     destroy(){
         this.$disconnectModel()
-
-        this.$items.length.unsubscribe()
+        this.$items.length.destroy()
+        delete this.$items.length
 
         for(let key in this.$items){
-            if(key !== 'length') {
-                let obj = this.$items[key]
-                delete this.$items[key]
-                obj.destroy()
-                
-            }
+            let obj = this.$items[key]
+            delete this.$items[key]
+            obj.destroy()
         }
         
         super.destroy()
