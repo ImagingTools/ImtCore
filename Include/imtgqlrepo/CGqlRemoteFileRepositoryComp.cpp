@@ -1,22 +1,16 @@
 #include <imtgqlrepo/CGqlRemoteFileRepositoryComp.h>
 
 
-// STL includes
-#include <cmath>
-
 // Qt includes
-#include <QtCore/QFile>
-#include <QtCore/QDir>
-#include <QtCore/QStandardPaths>
 
 // Acf includes
-#include <iprm/TParamsPtr.h>
-#include <iprm/IIdParam.h>
-#include <ifile/CFileNameParam.h>
+#include <ilog/CMessage.h>
+#include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
-#include <imtbase/IObjectCollectionIterator.h>
-#include <imtrepo/CFileCollectionItem.h>
+#include <imtgql/CGqlRequest.h>
+
+#include <GeneratedFiles/imtgqlrepo/DDL/Cpp/Globals.h>
 
 
 namespace imtgqlrepo
@@ -25,407 +19,273 @@ namespace imtgqlrepo
 
 // public methods
 
-// reimplemented(imtbase::IMetaInfoCreator)
+// reimplemented (imtbase::ICollectionInfo)
 
-CGqlRemoteFileRepositoryComp::TypeIds CGqlRemoteFileRepositoryComp::GetSupportedTypeIds() const
+int CGqlRemoteFileRepositoryComp::GetElementsCount(
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* logPtr) const
 {
-	TypeIds supportedValues;
-	const int typesCount = m_supportedTypeListAttrPtr.GetCount();
-	for (int typeIndex = 0; typeIndex < typesCount; ++typeIndex){
-		supportedValues << m_supportedTypeListAttrPtr[typeIndex];
-	}
-	return supportedValues;
+	FileMetaInfoList metaInfoList = ApiGetListOfObjects(logPtr);
+
+	return metaInfoList.count();
 }
 
 
-bool CGqlRemoteFileRepositoryComp::CreateMetaInfo(const istd::IChangeable* dataPtr, const QByteArray& typeId, idoc::MetaInfoPtr& metaInfoPtr) const
+CGqlRemoteFileRepositoryComp::Ids CGqlRemoteFileRepositoryComp::GetElementIds(
+			int /*offset*/,
+			int /*count*/,
+			const iprm::IParamsSet* /*selectionParamsPtr*/,
+			ilog::IMessageConsumer* logPtr) const
 {
-	if (!GetSupportedTypeIds().contains(typeId)){
-		SendErrorMessage(0, QString("Unsupported file type id: '%1'").arg(QString(typeId)), "CreateMetaInfo", __LINE__);
+	CGqlRemoteFileRepositoryComp::Ids retVal;
+	const FileMetaInfoList metaInfoList = ApiGetListOfObjects(logPtr);
 
-		I_CRITICAL();
-		return false;
+	for (const sdl::CFileMetaInfo& metaInfo: metaInfoList){
+		retVal << metaInfo.GetId();
 	}
 
-	const imtgql::CGqlObject* dataParams = dynamic_cast<const imtgql::CGqlObject*>(dataPtr);
-	if (dataParams == nullptr){
-		SendErrorMessage(0, "Unable to find data object");
+	return retVal;
+}
 
-		I_CRITICAL();
-		return false;
+
+QVariant CGqlRemoteFileRepositoryComp::GetElementInfo(
+			const Id& elementId,
+			int infoType,
+			ilog::IMessageConsumer* logPtr) const
+{
+
+	/// \todo use \c GetFileInfo instead
+	sdl::CFileMetaInfo fileMetaInfo = GetMetaInfoById(elementId, logPtr);
+
+	switch (infoType){
+	case EIT_DESCRIPTION:
+		return fileMetaInfo.GetDescription();
+
+	case EIT_NAME:
+		return fileMetaInfo.GetName();
+
+	case EIT_ENABLED:
+		return true;
 	}
 
-	metaInfoPtr.SetPtr(new idoc::CStandardDocumentMetaInfo);
+	return QVariant();
+}
 
-	QDateTime creationTime = QDateTime::currentDateTimeUtc();
-	metaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, creationTime);
-	metaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, creationTime);
 
-	const QString tempFilePath = GetFilePathFromRequestQueue((*dataParams)["Id"].toByteArray());
-	if (m_hashGeneratorCompPtr.IsValid()){
-		QFile tempFile(tempFilePath);
-		if (tempFile.open(QIODevice::ReadOnly)){
-			const QByteArray fileData = tempFile.readAll();
-			const QByteArray checksumm = m_hashGeneratorCompPtr->GenerateHash(fileData);
-			metaInfoPtr->SetMetaInfo(idoc::IDocumentMetaInfo::MIT_CONTENT_CHECKSUM, checksumm);
-		}
-	}
-	metaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_REVISION, (*dataParams)["Revision"].toLongLong());
+idoc::MetaInfoPtr CGqlRemoteFileRepositoryComp::GetElementMetaInfo(
+			const Id& elementId,
+			ilog::IMessageConsumer* logPtr) const
+{
+	/// \todo use \c GetFileInfo instead
+	sdl::CFileMetaInfo fileMetaInfo = GetMetaInfoById(elementId, logPtr);
 
-	return true;
+	idoc::MetaInfoPtr metaInfoPtr(new idoc::CStandardDocumentMetaInfo);
+	metaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, fileMetaInfo.GetLastModified());
+	metaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME, fileMetaInfo.GetAdded());
+	metaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_REVISION, fileMetaInfo.GetVersion());
+
+	return metaInfoPtr;
+}
+
+
+bool CGqlRemoteFileRepositoryComp::SetElementName(
+			const Id& /*elementId*/,
+			const QString& /*name*/,
+			ilog::IMessageConsumer* /*logPtr*/)
+{
+	return false;
+}
+
+
+bool CGqlRemoteFileRepositoryComp::SetElementDescription(
+			const Id& /*elementId*/,
+			const QString& /*description*/,
+			ilog::IMessageConsumer* /*logPtr*/)
+{
+	return false;
+}
+
+
+bool CGqlRemoteFileRepositoryComp::SetElementEnabled(
+			const Id& /*elementId*/,
+			bool /*isEnabled*/,
+			ilog::IMessageConsumer* /*logPtr*/)
+{
+	return false;
+}
+
+
+// reimplemented (imtbase::IObjectCollectionInfo)
+
+idoc::MetaInfoPtr CGqlRemoteFileRepositoryComp::GetDataMetaInfo(const Id& objectId) const
+{
+	/// \todo use \c GetFileInfo instead
+	sdl::CFileMetaInfo fileMetaInfo = GetMetaInfoById(objectId);
+
+	idoc::MetaInfoPtr metaInfoPtr(new idoc::CStandardDocumentMetaInfo);
+	metaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME, fileMetaInfo.GetLastModified());
+	metaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME, fileMetaInfo.GetAdded());
+	metaInfoPtr->SetMetaInfo(imtbase::IObjectCollection::MIT_REVISION, fileMetaInfo.GetVersion());
+
+	return metaInfoPtr;
+}
+
+
+// reimplemented (imtrepo::IFileCollectionInfo)
+
+
+bool CGqlRemoteFileRepositoryComp::GetFileInfo(
+			const QByteArray& /*objectId*/,
+			imtrepo::IFileCollectionItem& /*collectionItem*/) const
+{
+	/// \todo implement it
+	I_CRITICAL();
+
+	return false;
+}
+
+
+CGqlRemoteFileRepositoryComp::FileCollectionLayout CGqlRemoteFileRepositoryComp::GetCollectionFileLayout() const
+{
+	return FCL_FOLDER;
+}
+
+
+QString CGqlRemoteFileRepositoryComp::GetCollectionRootFolder() const
+{
+	return QString();
+}
+
+
+// reimplemented (imtbase::IObjectCollection)
+
+int CGqlRemoteFileRepositoryComp::GetOperationFlags(const Id& /*elementId*/) const
+{
+	return OF_SUPPORT_INSERT | OF_SUPPORT_DELETE | OF_SUPPORT_USING;
+}
+
+
+CGqlRemoteFileRepositoryComp::Id CGqlRemoteFileRepositoryComp::InsertNewObject(
+			const QByteArray& /*typeId*/,
+			const QString& /*name*/,
+			const QString& /*description*/,
+			DataPtr /*defaultValuePtr*/,
+			const Id& /*proposedElementId*/,
+			const idoc::IDocumentMetaInfo* /*dataMetaInfoPtr*/,
+			const idoc::IDocumentMetaInfo* /*elementMetaInfoPtr*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/)
+{
+	return Id();
+}
+
+
+bool CGqlRemoteFileRepositoryComp::RemoveElement(
+			const Id& /*elementId*/,
+			const imtbase::IOperationContext* /*operationContextPtr*/)
+{
+	/// \todo implement it
+	I_CRITICAL();
+
+	return false;
+}
+
+
+// reimplemented (imtrepo::IFileObjectCollection)
+
+QString CGqlRemoteFileRepositoryComp::GetFile(
+			const QByteArray& /*objectId*/,
+			const QString& /*targetFilePath*/) const
+{
+	/// \todo implement it
+	I_CRITICAL();
+
+	return QString();
+}
+
+
+QByteArray CGqlRemoteFileRepositoryComp::InsertFile(
+			const QString& /*filePath*/,
+			const QByteArray& /*objectTypeId*/,
+			const QString& /*objectName*/,
+			const QString& /*objectDescription*/,
+			const QByteArray& /*proposedObjectId*/,
+			const idoc::IDocumentMetaInfo* /*dataMetaInfoPtr*/,
+			const idoc::IDocumentMetaInfo* /*collectionItemMetaInfoPtr*/)
+{
+	/// \todo implement it
+	I_CRITICAL();
+
+	return QByteArray();
+}
+
+
+bool CGqlRemoteFileRepositoryComp::UpdateFile(
+			const QString& /*filePath*/,
+			const QByteArray& /*objectId*/)
+{
+	/// \todo implement it
+	I_CRITICAL();
+
+	return false;
 }
 
 
 // protected methods
 
-void CGqlRemoteFileRepositoryComp::SetErrorToModel(
-	imtbase::CTreeItemModel& rootModel,
-	imtbase::CTreeItemModel& dataModel,
-	imtbase::CTreeItemModel& itemsModel,
-	imtbase::CTreeItemModel& notificationModel,
-	const QString& errorMessage)
+bool CGqlRemoteFileRepositoryComp::SendInfoMessage(
+	const QString& message,
+	const QString& messageSource,
+	ilog::IMessageConsumer* slaveLogPtr) const
 {
-	imtbase::CTreeItemModel* errorsItemModel = rootModel.AddTreeModel("errors");
-	errorsItemModel->SetData("message", errorMessage);
+	bool retVal = SendLogMessage(istd::IInformationProvider::IC_INFO, 0, message, messageSource);
+	if (slaveLogPtr != nullptr){
+		auto messagePtr = istd::TSmartPtr<const istd::IInformationProvider>(new ilog::CMessage(istd::IInformationProvider::IC_INFO, 0, message, messageSource));
+		slaveLogPtr->AddMessage(messagePtr);
+	}
 
-	dataModel.SetExternTreeModel("items", &itemsModel);
-	dataModel.SetExternTreeModel("notification", &notificationModel);
-
-	rootModel.SetExternTreeModel("data", &dataModel);
+	return retVal;
 }
 
 
-
-QString CGqlRemoteFileRepositoryComp::GetFilePathFromRequestQueue(const QByteArray& queueRequestId) const
+bool CGqlRemoteFileRepositoryComp::SendWarningMessage(
+	const QString& message,
+	const QString& messageSource,
+	ilog::IMessageConsumer* slaveLogPtr) const
 {
-	QString filePath;
-	if (!m_requestCollectionCompPtr.IsValid()){
-		SendCriticalMessage(0, "Request collection is invalid");
-		I_CRITICAL();
-
-		return filePath;
+	bool retVal = SendLogMessage(istd::IInformationProvider::IC_WARNING, 0, message, messageSource);
+	if (slaveLogPtr != nullptr){
+		auto messagePtr = istd::TSmartPtr<const istd::IInformationProvider>(new ilog::CMessage(istd::IInformationProvider::IC_WARNING, 0, message, messageSource));
+		slaveLogPtr->AddMessage(messagePtr);
 	}
 
-	const istd::IChangeable* objectPtr = m_requestCollectionCompPtr->GetObjectPtr(queueRequestId);
-	if (objectPtr == nullptr){
-		SendCriticalMessage(0, QString("Unable to find request with ID: '%1'").arg(QString(queueRequestId)));
-		I_CRITICAL();
-
-		return filePath;
-	}
-
-	const iprm::IParamsSet* paramsSetPtr = dynamic_cast<const iprm::IParamsSet*>(objectPtr);
-	if (paramsSetPtr == nullptr){
-		SendCriticalMessage(0, QString("Model has unsupported modelType"));
-		I_CRITICAL();
-
-		return filePath;
-	}
-
-	iprm::TParamsPtr<ifile::IFileNameParam> fileNameParamPtr(paramsSetPtr, "FilePath");
-	if (fileNameParamPtr.IsValid()){
-		filePath = fileNameParamPtr->GetPath();
-	}
-
-	return filePath;
+	return retVal;
 }
 
 
-// reimplemented (imtgql::CGqlRepresentationDataControllerComp)
-
-imtbase::CTreeItemModel* CGqlRemoteFileRepositoryComp::InsertObject(
-	const imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
+bool CGqlRemoteFileRepositoryComp::SendErrorMessage(
+	const QString& message,
+	const QString& messageSource,
+	ilog::IMessageConsumer* slaveLogPtr) const
 {
-	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
-	const imtgql::CGqlObject* dataParams = nullptr;
-	for(const imtgql::CGqlObject& gqlObject: inputParams){
-		dataParams = gqlObject.GetFieldArgumentObjectPtr("Data");
-		if (dataParams != nullptr){
-			break;
-		}
+	bool retVal = SendLogMessage(istd::IInformationProvider::IC_ERROR, 0, message, messageSource);
+	if (slaveLogPtr != nullptr){
+		auto messagePtr = istd::TSmartPtr<const istd::IInformationProvider>(new ilog::CMessage(istd::IInformationProvider::IC_ERROR, 0, message, messageSource));
+		slaveLogPtr->AddMessage(messagePtr);
 	}
 
-	idoc::MetaInfoPtr metaInfoPtr;
-	if (!CreateMetaInfo(dataParams, QByteArray(), metaInfoPtr)){
-		errorMessage = QT_TR_NOOP("Unable to create MetaInfo");
-		SendErrorMessage(0, "Unable to create MetaInfo");
-
-		I_CRITICAL();
-		return nullptr;
-	}
-	if (dataParams == nullptr){
-		errorMessage = QT_TR_NOOP("Unable to create MetaInfo");
-		SendErrorMessage(0, "Unable to create MetaInfo");
-
-		I_CRITICAL();
-		return nullptr;
-	}
-
-	const QByteArray typeId = (*dataParams)["Type"].toByteArray();
-	const QString name = (*dataParams)["Name"].toByteArray();
-	const QString description = (*dataParams)["Description"].toByteArray();
-
-	const QString tempFilePath = GetFilePathFromRequestQueue((*dataParams)["Id"].toByteArray());;
-	const QByteArray createdFileId = m_fileObjectCollectionCompPtr->InsertFile(
-		tempFilePath,
-		typeId,
-		name,
-		description,
-		QByteArray(),
-		metaInfoPtr.GetPtr());
-
-	if(createdFileId.isEmpty()){
-		errorMessage = QT_TR_NOOP("Unable to import file");
-		SendErrorMessage(0, "Unable to import file");
-
-		I_CRITICAL();
-		return nullptr;
-	}
-
-	imtbase::CTreeItemModel* rootModelPtr = new imtbase::CTreeItemModel;
-	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel;
-	imtbase::CTreeItemModel* itemsModel = new imtbase::CTreeItemModel;
-	itemsModel->SetData("Id", createdFileId);
-	dataModel->SetExternTreeModel("items", itemsModel);
-	rootModelPtr->SetExternTreeModel("data", dataModel);
-
-	return rootModelPtr;
+	return retVal;
 }
 
 
-
-imtbase::CTreeItemModel* CGqlRemoteFileRepositoryComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
+bool CGqlRemoteFileRepositoryComp::SendCriticalMessage(
+	const QString& message,
+	const QString& messageSource,
+	ilog::IMessageConsumer* slaveLogPtr) const
 {
-	if (!m_fileObjectCollectionCompPtr.IsValid()){
-		errorMessage = QString("500: File collection is not set");
-		SendErrorMessage(500, errorMessage, "CGqlRemoteFileRepositoryComp::GetObject");
-
-		return nullptr;
-	}
-
-	QByteArray fileId = GetObjectIdFromInputParams(gqlRequest.GetParams());
-
-	imtrepo::CFileCollectionItem fileInfo;
-	if (m_fileObjectCollectionCompPtr->GetFileInfo(fileId, fileInfo)){
-
-		QString fileDirectoryPath = QStandardPaths::writableLocation(QStandardPaths::TempLocation) + "HttpFileBuffer";
-		if (m_tempDirectoryPathCompPtr.IsValid()){
-			fileDirectoryPath = m_tempDirectoryPathCompPtr->GetPath();
-		}
-		QString tempFilePath = (QDir::cleanPath(fileDirectoryPath + "/" + QUuid::createUuid().toString(QUuid::Id128)));
-		tempFilePath = m_fileObjectCollectionCompPtr->GetFile(fileId, tempFilePath);
-		if (tempFilePath.isEmpty()){
-			errorMessage = QString("500: Unable to prepare file");
-			SendErrorMessage(500, errorMessage, "CGqlRemoteFileRepositoryComp::GetObject");
-
-			return nullptr;
-		}
-
-		istd::TDelPtr<iprm::CParamsSet> paramsSetPtr = new iprm::CParamsSet;
-		ifile::CFileNameParam* fileNameParamPtr = new ifile::CFileNameParam;
-		fileNameParamPtr->SetPath(tempFilePath);
-		paramsSetPtr->SetEditableParameter("FilePath", fileNameParamPtr, true);
-		imtbase::CObjectCollectionBase::DataPtr valuePtr(paramsSetPtr.GetPtr());
-		const QByteArray createdFileId = m_requestCollectionCompPtr->InsertNewObject(
-			"File",
-			fileInfo.GetName(),
-			QString(),
-			valuePtr
-			);
-
-		istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-		imtbase::CTreeItemModel* dataModelPtr = rootModelPtr->AddTreeModel("data");
-		dataModelPtr->SetData("Id", QString(createdFileId));
-
-		return rootModelPtr.PopPtr();
-	}
-
-	errorMessage = QT_TR_NOOP(QString("400: Unable to get an account with ID: '%1'.").arg(qPrintable(fileId)));
-	SendErrorMessage(400, errorMessage, "CGqlRemoteFileRepositoryComp::GetObject");
-
-	return nullptr;
-}
-
-
-imtbase::CTreeItemModel* CGqlRemoteFileRepositoryComp::ListObjects(
-	const imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
-{
-	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QString("Unable to get list objects. Internal error.");
-		SendErrorMessage(0, errorMessage, "CGqlRemoteFileRepositoryComp");
-
-		return nullptr;
-	}
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-	imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel;
-	imtbase::CTreeItemModel* itemsModel = new imtbase::CTreeItemModel;
-	imtbase::CTreeItemModel* notificationModel = new imtbase::CTreeItemModel;
-
-	if (!errorMessage.isEmpty()){
-		SetErrorToModel(*rootModelPtr, *dataModel, *itemsModel, *notificationModel, errorMessage);
-		return rootModelPtr.PopPtr();
-	}
-
-	const imtgql::CGqlObject* viewParamsGql = nullptr;
-	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
-	if (inputParams.size() > 0){
-		viewParamsGql = inputParams.at(0).GetFieldArgumentObjectPtr("viewParams");
-	}
-
-	iprm::CParamsSet filterParams;
-
-	int offset = 0;
-	int count = -1;
-
-	if (viewParamsGql != nullptr){
-		offset = viewParamsGql->GetFieldArgumentValue("Offset").toInt();
-		count = viewParamsGql->GetFieldArgumentValue("Count").toInt();
-		PrepareFilters(gqlRequest, *viewParamsGql, filterParams);
-	}
-
-	int elementsCount = m_objectCollectionCompPtr->GetElementsCount(&filterParams);
-	int pagesCount = std::ceil(elementsCount / (double)count);
-	if (pagesCount <= 0){
-		pagesCount = 1;
-	}
-
-	notificationModel->SetData("PagesCount", pagesCount);
-	notificationModel->SetData("TotalCount", elementsCount);
-
-	imtbase::IObjectCollection::Ids elementIds = m_objectCollectionCompPtr->GetElementIds(offset, count, &filterParams);
-	for (const imtbase::IObjectCollection::Id& elementId: qAsConst(elementIds)){
-
-		int itemIndex = itemsModel->InsertNewItem();
-		if (itemIndex >= 0){
-			if (!SetupGqlItem(gqlRequest, *itemsModel, itemIndex, elementId, errorMessage)){
-				SetErrorToModel(*rootModelPtr, *dataModel, *itemsModel, *notificationModel, errorMessage);
-
-				return rootModelPtr.PopPtr();
-			}
-		}
-		else{
-			errorMessage = QString("Unable to insert new item to model.");
-			SetErrorToModel(*rootModelPtr, *dataModel, *itemsModel, *notificationModel, errorMessage);
-
-			return rootModelPtr.PopPtr();
-		}
-	}
-
-	itemsModel->SetIsArray(true);
-	dataModel->SetExternTreeModel("items", itemsModel);
-	dataModel->SetExternTreeModel("notification", notificationModel);
-	rootModelPtr->SetExternTreeModel("data", dataModel);
-
-	return rootModelPtr.PopPtr();
-}
-
-
-imtbase::CTreeItemModel* CGqlRemoteFileRepositoryComp::DeleteObject(
-	const imtgql::CGqlRequest& gqlRequest,
-	QString& errorMessage) const
-{
-	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = "No collection component was set";
-		SendErrorMessage(0, errorMessage, "CGqlRemoteFileRepositoryComp");
-
-		return nullptr;
-	}
-
-	const QList<imtgql::CGqlObject> inputParams = gqlRequest.GetParams();
-
-	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
-	if (objectId.isEmpty()){
-		errorMessage = QObject::tr("No object-ID could not be extracted from the request");
-		SendErrorMessage(0, errorMessage, "CGqlRemoteFileRepositoryComp");
-
-		return nullptr;
-	}
-
-	istd::TDelPtr<imtbase::CTreeItemModel> rootModelPtr(new imtbase::CTreeItemModel());
-
-	imtbase::IOperationContext* operationContextPtr = nullptr;
-
-	if (m_operationContextControllerCompPtr.IsValid()){
-		operationContextPtr = m_operationContextControllerCompPtr->CreateOperationContext(imtbase::IDocumentChangeGenerator::OT_REMOVE, gqlRequest);
-	}
-
-	if (m_objectCollectionCompPtr->RemoveElement(objectId, operationContextPtr)){
-		imtbase::CTreeItemModel* dataModel = new imtbase::CTreeItemModel();
-		imtbase::CTreeItemModel* notificationModel = new imtbase::CTreeItemModel();
-
-		notificationModel->SetData("Id", objectId);
-		dataModel->SetExternTreeModel("removedNotification", notificationModel);
-
-		rootModelPtr->SetExternTreeModel("data", dataModel);
-	}
-	else{
-		errorMessage = QObject::tr("Can't remove object: %1").arg(QString(objectId));
-	}
-
-	if (!errorMessage.isEmpty()){
-		imtbase::CTreeItemModel* errorsModel = rootModelPtr->AddTreeModel("errors");
-		errorsModel->SetData("message", errorMessage);
-	}
-
-	return rootModelPtr.PopPtr();
-}
-
-
-bool CGqlRemoteFileRepositoryComp::SetupGqlItem(
-			const imtgql::CGqlRequest& gqlRequest,
-			imtbase::CTreeItemModel& model,
-			int itemIndex,
-			const QByteArray& objectId,
-			QString& errorMessage) const
-{
-	bool retVal = false;
-
-	const QByteArrayList metaInfoIdList = GetInformationIds(gqlRequest, "items");
-	idoc::MetaInfoPtr elementMetaInfoPtr = m_objectCollectionCompPtr->GetDataMetaInfo(objectId);
-	if (!elementMetaInfoPtr.IsValid()){
-		errorMessage.append("\nUnable to get file metainfo");
-
-		SendErrorMessage(0, QString("Unable to get metainfo from file: '%1'").arg(QString(objectId)), "SetupGqlItem", __LINE__);
-		return retVal;
-	}
-
-	for (const QByteArray& metaInfoId: metaInfoIdList){
-		QVariant elementInformation;
-
-		if (metaInfoId == QByteArrayLiteral("Id")){
-			elementInformation = objectId;
-		}
-		else if (metaInfoId == QByteArrayLiteral("Name")){
-			m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_NAME);
-		}
-		else if (metaInfoId == QByteArrayLiteral("Description")){
-			m_objectCollectionCompPtr->GetElementInfo(objectId, imtbase::ICollectionInfo::EIT_DESCRIPTION);
-		}
-		else if (metaInfoId == QByteArrayLiteral("Added")){
-			QDateTime creationTime = elementMetaInfoPtr->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME).toDateTime().toUTC();
-			elementInformation = creationTime.toString(Qt::ISODate);
-		}
-		else if (metaInfoId == QByteArrayLiteral("LastModified")){
-			QDateTime modificationTime = elementMetaInfoPtr->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME).toDateTime().toUTC();
-			elementInformation = modificationTime.toString(Qt::ISODate);
-		}
-		else if (metaInfoId == QByteArrayLiteral("ChecksumAlgorithm")){
-			elementInformation = QByteArrayLiteral("MD5");
-		}
-		else if (metaInfoId == QByteArrayLiteral("ChecksumValue")){
-			elementInformation = elementMetaInfoPtr->GetMetaInfo(idoc::IDocumentMetaInfo::MIT_CONTENT_CHECKSUM);
-		}
-		else if (metaInfoId == QByteArrayLiteral("Version")){
-			elementInformation = elementMetaInfoPtr->GetMetaInfo(imtbase::IObjectCollection::MIT_REVISION);
-		}
-		else {
-			elementInformation = GetObjectInformation(metaInfoId, objectId);
-		}
-		if (!elementInformation.isNull()){
-			retVal = retVal && model.SetData(metaInfoId, elementInformation, itemIndex);
-		}
+	bool retVal = SendLogMessage(istd::IInformationProvider::IC_CRITICAL, 0, message, messageSource);
+	if (slaveLogPtr != nullptr){
+		auto messagePtr = istd::TSmartPtr<const istd::IInformationProvider>(new ilog::CMessage(istd::IInformationProvider::IC_CRITICAL, 0, message, messageSource));
+		slaveLogPtr->AddMessage(messagePtr);
 	}
 
 	return retVal;
@@ -437,16 +297,88 @@ bool CGqlRemoteFileRepositoryComp::SetupGqlItem(
 void CGqlRemoteFileRepositoryComp::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
+}
 
-	if (!m_fileObjectCollectionCompPtr.IsValid()){
-		SendCriticalMessage(0, "Invalid file object collection component");
-		I_CRITICAL();
+
+// private methods
+
+imtclientgql::IGqlClient::GqlRequestPtr CGqlRemoteFileRepositoryComp::CreateApiRequest(
+		const QString& requestName,
+		ilog::IMessageConsumer* slaveLogPtr	) const
+{
+	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, requestName.toUtf8());
+	imtgql::CGqlObject requestIdField(requestName.toUtf8());
+	requestPtr->AddField(requestIdField);
+
+	return imtclientgql::IGqlClient::GqlRequestPtr(requestPtr);
+}
+
+
+CGqlRemoteFileRepositoryComp::FileMetaInfoList CGqlRemoteFileRepositoryComp::ApiGetListOfObjects(ilog::IMessageConsumer* slaveLogPtr) const
+{
+	const QString logTag = QStringLiteral("ApiGetListOfObjects");
+
+	FileMetaInfoList retVal;
+
+	imtclientgql::IGqlClient::GqlRequestPtr requestPtr = CreateApiRequest(RequestTypeId::s_GetObjects, slaveLogPtr);
+	if (requestPtr.isNull()){
+		SendErrorMessage("Unable to create request", logTag, slaveLogPtr);
+
+		return retVal;
 	}
 
-	if (!m_requestCollectionCompPtr.IsValid()){
-		SendCriticalMessage(0, "Invalid request collection component");
-		I_CRITICAL();
+	imtclientgql::IGqlClient::GqlResponsePtr responcePtr = m_graphQlApiClientCompPtr->SendRequest(requestPtr);
+	if (responcePtr.isNull()){
+		SendErrorMessage("Unable to exec request", logTag, slaveLogPtr);
+
+		return retVal;
 	}
+
+	const QByteArray responceData = responcePtr->GetData();
+	imtbase::CTreeItemModel treeModel;
+	const bool isCreated = treeModel.CreateFromJson(responceData);
+	if (!isCreated){
+		SendErrorMessage("Unable to create model from data", logTag, slaveLogPtr);
+		Q_ASSERT_X(false, "CreateApiRequest", "Unable to create model from data");
+
+		return retVal;
+	}
+
+	for (int i = 0; i < treeModel.GetItemsCount(); ++i){
+		sdl::CFileMetaInfo metaInfo;
+		const bool isReaded = sdl::CFileMetaInfo::ReadFromModel(metaInfo, treeModel);
+		if (isReaded){
+			retVal << metaInfo;
+		}
+		else {
+			SendErrorMessage("Unable to read from model data", logTag, slaveLogPtr);
+			Q_ASSERT_X(false, "CreateApiRequest", "Unable to read from model data");
+
+			retVal.clear();
+
+			break;
+		}
+	}
+
+	return retVal;
+}
+
+
+sdl::CFileMetaInfo CGqlRemoteFileRepositoryComp::GetMetaInfoById(
+			const Id& elementId,
+			ilog::IMessageConsumer* slaveLogPtr) const
+{
+	const FileMetaInfoList fileMetaInfoList = ApiGetListOfObjects(slaveLogPtr);
+
+	for (const sdl::CFileMetaInfo& fileMetaInfo: fileMetaInfoList){
+		if (fileMetaInfo.GetId() == elementId){
+			return fileMetaInfo;
+		}
+	}
+
+	SendErrorMessage(QString("Unable to find element by ID '%1'").arg(elementId), "GetMetaInfoById", slaveLogPtr);
+
+	return sdl::CFileMetaInfo();
 }
 
 
