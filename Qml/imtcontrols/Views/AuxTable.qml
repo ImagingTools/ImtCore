@@ -630,6 +630,9 @@ Rectangle {
                 Component.onCompleted: {
                     deleg.compl = true;
                 }
+                Component.onDestruction: {
+                    if(deleg.complCompl) tableContainer.widthRecalc.disconnect(deleg.setCellWidth);
+                }
                 onComplComplChanged: {
                     if(deleg.complCompl){
                         tableContainer.widthRecalc.connect(deleg.setCellWidth);
@@ -856,6 +859,10 @@ Rectangle {
                     }
 
                     text: model.Name;
+
+                    Component.onDestruction: {
+                        tableContainer.heightRecalc.disconnect(name.sendHeightData);
+                    }
 
                     Component.onCompleted: {
                         tableContainer.heightRecalc.connect(name.sendHeightData);

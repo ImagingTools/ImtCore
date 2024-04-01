@@ -38,6 +38,10 @@ Item {
         delegateContainer.compl = true;
     }
 
+    Component.onDestruction: {
+        if(delegateContainer.complCompl) pTableDelegateContainer.tableItem.widthRecalc.disconnect(delegateContainer.setCellWidth)
+    }
+
     onComplComplChanged: {
         if(delegateContainer.complCompl){
             delegateContainer.contentComp = delegateContainer.pTableDelegateContainer.tableItem.columnContentComps[model.index] !== null ?
