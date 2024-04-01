@@ -1,0 +1,9 @@
+{
+	"name": "RequestTypeId",
+	"properties": {
+		"GetObjects": {
+			"type": "string",
+			"value": "ObjectList"
+		}
+	}
+}
