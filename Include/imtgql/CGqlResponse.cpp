@@ -7,13 +7,13 @@ namespace imtgql
 
 // public methods
 
-CGqlResponse::CGqlResponse(GqlRequestPtr originalRequestPtr)
+CGqlResponseBase::CGqlResponseBase(GqlRequestPtr originalRequestPtr)
 	:m_originalRequestPtr(originalRequestPtr)
 {
 }
 
 
-void CGqlResponse::SetResponseData(const QByteArray& data)
+void CGqlResponseBase::SetResponseData(const QByteArray& data)
 {
 	m_responseData = data;
 }
@@ -21,13 +21,13 @@ void CGqlResponse::SetResponseData(const QByteArray& data)
 
 // reimplemented (IGqlResponse)
 
-IGqlResponse::GqlRequestPtr CGqlResponse::GetOriginalRequest() const
+IGqlResponse::GqlRequestPtr CGqlResponseBase::GetOriginalRequest() const
 {
 	return m_originalRequestPtr;
 }
 
 
-QByteArray CGqlResponse::GetResponseData() const
+QByteArray CGqlResponseBase::GetResponseData() const
 {
 	return m_responseData;
 }

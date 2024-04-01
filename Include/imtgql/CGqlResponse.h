@@ -3,16 +3,17 @@
 
 // ImtCore includes
 #include <imtgql/IGqlResponse.h>
+#include <imtgql/TGraphQlJsonSerializerWrap.h>
 
 
 namespace imtgql
 {
 
 
-class CGqlResponse : virtual public IGqlResponse
+class CGqlResponseBase : virtual public IGqlResponse
 {
 public:
-	explicit CGqlResponse(GqlRequestPtr originalRequestPtr);
+	explicit CGqlResponseBase(GqlRequestPtr originalRequestPtr);
 
 	void SetResponseData(const QByteArray& data);
 
@@ -24,6 +25,9 @@ protected:
 	GqlRequestPtr m_originalRequestPtr;
 	QByteArray m_responseData;
 };
+
+
+typedef TGraphQlJsonSerializerWrap<CGqlResponseBase> CGqlResponse;
 
 
 } // namespace imtgql
