@@ -121,15 +121,6 @@ Item {
 
             spacing: Style.size_mainMargin;
 
-            Component{
-                id: defaultButtonDecorator;
-
-                CommonButtonDecorator{
-                    height: 35;
-                    color: Style.alternateBaseColor;
-                }
-            }
-
             ListView {
                 id: mainPanelRepeater;
 
