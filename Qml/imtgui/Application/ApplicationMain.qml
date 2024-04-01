@@ -148,10 +148,6 @@ Item {
 
         onServerModelChanged: {
             console.log("onServerModelChanged", serverModel);
-//            if (serverModel == null){
-//                Events.sendEvent("UpdateModels");
-//            }
-
             let design = application.designProvider.getDesignSchema();
 
             let index = application.designProvider.getDesignSchemaIndex(design);

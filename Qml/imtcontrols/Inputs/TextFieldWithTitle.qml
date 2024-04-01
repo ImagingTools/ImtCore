@@ -55,7 +55,7 @@ Item {
             font.pixelSize: Style.fontSize_common;
         }
 
-        TextField {
+        CustomTextField {
             id: input;
 
             width: parent.width;
@@ -64,8 +64,6 @@ Item {
             radius: root.radius;
 
             placeHolderText: root.placeHolderText
-
-            borderColor: Style.iconColorOnSelected;
 
             onEditingFinished: {
                 root.editingFinished();

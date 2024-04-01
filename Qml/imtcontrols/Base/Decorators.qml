@@ -214,7 +214,10 @@ StyleComponents {
 
                 radius: !textFieldItem.baseElement ? 0 : textFieldItem.baseElement.radius;
 
-                border.color: !textFieldItem.baseElement ? "transparent" : textFieldItem.baseElement.borderColorConst !== "" ? textFieldItem.baseElement.borderColorConst: textFieldItem.baseElement.activeFocus ? textFieldItem.baseElement.borderColor : Style.hover;
+                border.color: !textFieldItem.baseElement ?
+                                  "transparent" : textFieldItem.baseElement.borderColorConst !== "" ?
+                                      textFieldItem.baseElement.borderColorConst: textFieldItem.baseElement.activeFocus ?
+                                          textFieldItem.baseElement.borderColor : Style.hover;
 
                 border.width: 1;
             }

@@ -7,10 +7,9 @@ QtObject {
     id: container;
 
     property SettingsProvider settingsProvider: null;
-
     property TreeItemModel languagesModel: TreeItemModel {}
-
     property string currentLanguage: context.language;
+    property bool localizationChanged: false;
 
     Component.onDestruction: {
         if (container.settingsProvider != null){
@@ -25,10 +24,6 @@ QtObject {
             container.settingsProvider.serverModelChanged.connect(container.updateLanguageModel);
             container.settingsProvider.serverSettingsSaved.connect(container.onServerSettingsSaved);
         }
-    }
-
-    function onServerSettingsSaved(){
-        Events.sendEvent("OnLocalizationChanged", container.currentLanguage);
     }
 
     function updateLanguageModel(){
@@ -136,7 +131,21 @@ QtObject {
                 container.settingsProvider.setLanguage(langId);
             }
 
-//            Events.sendEvent("OnLocalizationChanged", langId);
+            if (!settingsProvider.serverModel){
+                Events.sendEvent("OnLocalizationChanged", langId);
+            }
+
+            localizationChanged = true;
+        }
+    }
+
+    function onServerSettingsSaved(){
+        if (localizationChanged){
+            Events.sendEvent("OnLocalizationChanged", container.currentLanguage);
+
+            localizationChanged = false;
         }
     }
 }
+
+

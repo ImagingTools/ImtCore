@@ -35,13 +35,11 @@ TopRightPanel 1.0 Panels/TopRightPanel.qml
 TopRightPanelDecorator 1.0 Panels/TopRightPanelDecorator.qml
 
 DatabaseInput 1.0 Settings/DatabaseInput.qml
-LocalSettingsModelObserver 1.0 Settings/LocalSettingsModelObserver.qml
 PageAboutProvider 1.0 Settings/PageAboutProvider.qml
 Preference 1.0 Settings/Preference.qml
 PreferenceDialog 1.0 Settings/PreferenceDialog.qml
 PreferenceButton 1.0 Settings/PreferenceButton.qml
 ServerLogProvider 1.0 Settings/ServerLogProvider.qml
-ServerSettingsModelObserver 1.0 Settings/ServerSettingsModelObserver.qml
 SettingsComboBox 1.0 Settings/SettingsComboBox.qml
 SettingsIntegerInput 1.0 Settings/SettingsIntegerInput.qml
 SettingsObserver 1.0 Settings/SettingsObserver.qml
