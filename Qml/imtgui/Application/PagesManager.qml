@@ -132,8 +132,7 @@ Item {
                 visible: parent.visible;
 
                 onLoaded: {
-                    pagesLoader.item.startPageObj =
-                            {
+                    pagesLoader.item.startPageObj = {
                         "Id": model.Id,
                         "Name": model.Name,
                         "Source": model.StartItem,

@@ -18,8 +18,6 @@ Item {
         height: root.height;
 
         text: qsTr("Download");
-//        borderColor: (button.highlighted || button.focus) ? Style.iconColorOnSelected : Style.buttonColor;
-//        backgroundColor: Style.imagingToolsGradient2;
 
         onClicked: {
             fileDialogSave.open();

@@ -38,6 +38,10 @@ Item {
 
     property bool updatingModel: serverReady && application.settingsProvider.serverModel != null;
 
+    signal updateSystemStatus();
+    signal settingsUpdate();
+    signal localSettingsUpdated();
+
     onUpdatingModelChanged: {
         if (updatingModel){
             Events.sendEvent("UpdateModels");
@@ -76,10 +80,6 @@ Item {
             webSocketPortProvider.updateModel();
         }
     }
-
-    signal updateSystemStatus();
-    signal settingsUpdate();
-    signal localSettingsUpdated();
 
     onLocalSettingsUpdated: {
         application.updateAllModels();

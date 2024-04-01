@@ -11,11 +11,12 @@ Rectangle {
     property var startPageObj;
 
     property bool startItemIsLoaded: false;
+    property alias documentManager: documentManager_;
 
     onStartPageObjChanged: {
         let typeId = startPageObj["CommandId"];
 
-        MainDocumentManager.registerDocumentManager(typeId, documentManager);
+        MainDocumentManager.registerDocumentManager(typeId, documentManager_);
     }
 
     function loadStartItem(){
@@ -34,24 +35,22 @@ Rectangle {
             return;
         }
 
-        documentManager.addFixedView(startItemComp, name);
+        documentManager_.addFixedView(startItemComp, name, 0);
 
         startItemIsLoaded = true;
-
-//        Events.sendEvent("MenuModelRequest", true);
     }
 
     MultiDocWorkspaceView {
-        id: documentManager;
+        id: documentManager_;
 
         anchors.fill: parent;
 
         Component.onCompleted: {
-            Events.subscribeEvent("MenuModelChanged", documentManager.onMenuModelChanged);
+            Events.subscribeEvent("MenuModelChanged", documentManager_.onMenuModelChanged);
         }
 
         Component.onDestruction: {
-            Events.unSubscribeEvent("MenuModelChanged", documentManager.onMenuModelChanged);
+            Events.unSubscribeEvent("MenuModelChanged", documentManager_.onMenuModelChanged);
         }
 
         function onMenuModelChanged(model){
@@ -60,7 +59,7 @@ Rectangle {
                 let curr_id = model.GetData("Id",i);
                 let curr_name = model.GetData("Name",i);
                 if(curr_id == id){
-                    documentManager.documentsModel.setProperty(0, "Title", curr_name);
+                    documentManager_.documentsModel.setProperty(0, "Title", curr_name);
                     break;
                 }
             }

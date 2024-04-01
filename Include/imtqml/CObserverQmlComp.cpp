@@ -182,8 +182,6 @@ void CObserverQmlComp::OnComponentCreated()
 
 			bool isConnected = connect(quickItem, SIGNAL(settingsUpdate()), this, SLOT(OnGuiChanged()));
 			Q_ASSERT(isConnected);
-
-//			QMetaObject::invokeMethod(quickItem, "firstModelsInit");
 		}
 	}
 }

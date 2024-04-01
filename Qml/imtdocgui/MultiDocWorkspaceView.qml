@@ -30,20 +30,24 @@ DocumentManager {
         tabPanel.selectedIndex = documentIndex;
     }
 
-    function addFixedView(viewComp, name){
+    function addFixedView(viewComp, name, index){
         let viewName = name;
         if (!viewName || viewName == ""){
             viewName = defaultDocumentName;
         }
 
-        documentsModel.append({
+        if (!index){
+            index = documentsModel.count;
+        }
+
+        documentsModel.insert(index, {
                                   "Uuid": UuidGenerator.generateUUID(),
                                   "Title": viewName,
                                   "DocumentViewComp": viewComp,
                                   "Fixed": true
-                              });
+                              })
 
-        documentAdded(documentsModel.count - 1, "");
+        documentAdded(index, "");
     }
 
     function setAlertPanel(alertPanelComp){
