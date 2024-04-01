@@ -81,15 +81,6 @@ Rectangle {
 
         color: Style.baseColor;
 
-        Component{
-            id: defaultButtonDecorator;
-
-            CommonButtonDecorator{
-                width: mainPanelRepeater.width;
-                height: 35;
-            }
-        }
-
         Column {
             id: mainPanel;
 

@@ -24,12 +24,8 @@ ControlArea 1.0 ./Actions/ControlArea.qml
 AuxButton 1.0 ./Buttons/AuxButton.qml
 Button 1.0 ./Buttons/Button.qml
 TextButton 1.0 ./Buttons/TextButton.qml
-BaseButton 1.0 ./Buttons/BaseButton.qml
-BaseButtonDecorator 1.0 ./Buttons/BaseButtonDecorator.qml
-CommonButtonDecorator 1.0 ./Buttons/CommonButtonDecorator.qml
 ButtonDecorator 1.0 ./Buttons/ButtonDecorator.qml
 RadioButton 1.0 ./Buttons/RadioButton.qml
-IconButtonDecorator 1.0 ./Buttons/IconButtonDecorator.qml
 TextButtonDecorator 1.0 ./Buttons/TextButtonDecorator.qml
 ToolButton 1.0 ./Buttons/ToolButton.qml
 ToolButtonDecorator 1.0 ./Buttons/ToolButtonDecorator.qml

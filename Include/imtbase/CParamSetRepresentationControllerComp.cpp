@@ -58,7 +58,11 @@ bool CParamSetRepresentationControllerComp::GetRepresentationFromValue(const ist
 	Q_ASSERT(parametersRepresentationPtr != nullptr);
 
 	iprm::IParamsSet::Ids parameterIds = paramsSetPtr->GetParamIds();
-	for (const QByteArray& paramId : parameterIds){
+
+	QByteArrayList ids = parameterIds.values();
+	std::sort(ids.begin(), ids.end());
+
+	for (const QByteArray& paramId : ids){
 		if (!paramId.contains('/')){
 			if (!isAdmin){
 				bool result = CheckPermissions(userPermissions, paramId);

@@ -70,6 +70,9 @@ TreeItemModelObserver {
         console.log("onLanguageChanged", newVal);
         if (container.languageProvider != null){
             let lang = container.languageProvider.getLanguageIdByIndex(newVal);
+
+            console.log("lang", lang);
+
             container.languageProvider.setLanguage(lang);
         }
     }

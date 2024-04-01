@@ -24,7 +24,6 @@ SubMenuPanelButtonDecorator 1.0 Panels/SubMenuPanelButtonDecorator.qml
 TabDelegate 1.0 Panels/TabDelegate.qml
 TabPanel 1.0 Panels/TabPanel.qml
 TabPanelDecorator 1.0 Panels/TabPanelDecorator.qml
-TopButtonDecorator_ 1.0 Panels/TopButtonDecorator.qml
 TopCenterPanel 1.0 Panels/TopCenterPanel.qml
 TopCenterPanelDecorator 1.0 Panels/TopCenterPanelDecorator.qml
 TopLeftPanel 1.0 Panels/TopLeftPanel.qml
@@ -41,7 +40,6 @@ PageAboutProvider 1.0 Settings/PageAboutProvider.qml
 Preference 1.0 Settings/Preference.qml
 PreferenceDialog 1.0 Settings/PreferenceDialog.qml
 PreferenceButton 1.0 Settings/PreferenceButton.qml
-PreferencePage 1.0 Settings/PreferencePage.qml
 ServerLogProvider 1.0 Settings/ServerLogProvider.qml
 ServerSettingsModelObserver 1.0 Settings/ServerSettingsModelObserver.qml
 SettingsComboBox 1.0 Settings/SettingsComboBox.qml

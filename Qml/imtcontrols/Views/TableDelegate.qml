@@ -70,8 +70,8 @@ Rectangle {
 
     property string selectedColor: Style.selectedColor;
 
-    property  Component cellDelegate: tableItem ? tableItem.cellDelegate : cellDelegateDefault;
-    property  Component cellDelegateDefault: TableCellDelegate {};
+    property  Component cellDelegate: tableItem ? tableItem.cellDelegate : null//: cellDelegateDefault;
+//    property  Component cellDelegateDefault: TableCellDelegate {};
 
     signal clicked();
     signal rightButtonMouseClicked(int mX, int mY);

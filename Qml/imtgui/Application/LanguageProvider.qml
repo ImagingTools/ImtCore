@@ -12,9 +12,17 @@ QtObject {
 
     property string currentLanguage: context.language;
 
+    Component.onDestruction: {
+        if (container.settingsProvider != null){
+            container.settingsProvider.localModelChanged.disconnect(container.updateLanguageModel);
+            container.settingsProvider.serverModelChanged.disconnect(container.updateLanguageModel);
+        }
+    }
+
     onSettingsProviderChanged: {
         if (container.settingsProvider != null){
-            container.settingsProvider.localModelChanged.connect(container.onLocalModelChanged);
+            container.settingsProvider.localModelChanged.connect(container.updateLanguageModel);
+            container.settingsProvider.serverModelChanged.connect(container.updateLanguageModel);
             container.settingsProvider.serverSettingsSaved.connect(container.onServerSettingsSaved);
         }
     }
@@ -23,7 +31,7 @@ QtObject {
         Events.sendEvent("OnLocalizationChanged", container.currentLanguage);
     }
 
-    function onLocalModelChanged(){
+    function updateLanguageModel(){
         if (settingsProvider == null){
             return;
         }
@@ -42,13 +50,16 @@ QtObject {
             let pageModel = localModel.GetModelFromItem(i);
             if (pageModel){
                 let pageId = pageModel.GetData("Id");
-                if (pageId == "General"){
+                if (String(pageId) == String("General")){
                     let elements = pageModel.GetData("Parameters");
 
                     for (let j = 0; j < elements.GetItemsCount(); j++){
                         let elementId = elements.GetData("Id", j);
-                        if (elementId == "Language"){
+                        if (String(elementId) == String("Language")){
+                            languagesModel.Clear();
                             languagesModel.Copy(elements.GetData("Parameters", j))
+                            languagesModel.Refresh();
+
                             break;
                         }
                     }

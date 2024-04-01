@@ -431,7 +431,7 @@ Rectangle {
             }
 
             else if(width_ >= 0  && widthPercent_ >= 0){
-                tableContainer.widthDecoratorDynamic.SetData("Width", width_,i);
+                tableConainer.widthDecoratorDynamic.SetData("Width", width_,i);
             }
 
         }

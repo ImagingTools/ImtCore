@@ -25,7 +25,6 @@
 		<file alias="imtgui/Panels/TabDelegate.qml">Panels/TabDelegate.qml</file>
 		<file alias="imtgui/Panels/TabPanel.qml">Panels/TabPanel.qml</file>
 		<file alias="imtgui/Panels/TabPanelDecorator.qml">Panels/TabPanelDecorator.qml</file>
-		<file alias="imtgui/Panels/TopButtonDecorator.qml">Panels/TopButtonDecorator.qml</file>
 		<file alias="imtgui/Panels/TopCenterPanel.qml">Panels/TopCenterPanel.qml</file>
 		<file alias="imtgui/Panels/TopCenterPanelDecorator.qml">Panels/TopCenterPanelDecorator.qml</file>
 		<file alias="imtgui/Panels/TopLeftPanel.qml">Panels/TopLeftPanel.qml</file>
@@ -41,7 +40,6 @@
 		<file alias="imtgui/Settings/Preference.qml">Settings/Preference.qml</file>
 		<file alias="imtgui/Settings/PreferenceButton.qml">Settings/PreferenceButton.qml</file>
 		<file alias="imtgui/Settings/PreferenceDialog.qml">Settings/PreferenceDialog.qml</file>
-		<file alias="imtgui/Settings/PreferencePage.qml">Settings/PreferencePage.qml</file>
 		<file alias="imtgui/Settings/ServerLogProvider.qml">Settings/ServerLogProvider.qml</file>
 		<file alias="imtgui/Settings/ServerSettingsModelObserver.qml">Settings/ServerSettingsModelObserver.qml</file>
 		<file alias="imtgui/Settings/SettingsComboBox.qml">Settings/SettingsComboBox.qml</file>
