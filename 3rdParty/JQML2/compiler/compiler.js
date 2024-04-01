@@ -409,7 +409,10 @@ function preCompile(className, meta, on, instructions){
                 if(!find){
                     console.log(`Warning: class ${className} not found into file ${instructions.fileName}`)
                     instructions.className = _classList[0]
-                    // throw `Error: class ${className} not found into file ${instructions.fileName}`
+                    if(!instructions.className) {
+                        console.log(`Error: class ${className} not found into file ${instructions.fileName}`)
+                        throw -1
+                    }
                 }
             } 
             // instructions.className = ''
