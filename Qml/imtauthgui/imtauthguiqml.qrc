@@ -36,15 +36,14 @@
         <file alias="imtauthgui/GroupUsers.qml">GroupUsers.qml</file>
         <file alias="imtauthgui/PermissionsProvider.qml">PermissionsProvider.qml</file>
         <file alias="imtauthgui/PermissionsController.qml">PermissionsController.qml</file>
-        <file alias="imtauthgui/LoginButton.qml">LoginButton.qml</file>
         <file alias="imtauthgui/SuperuserPasswordPage.qml">SuperuserPasswordPage.qml</file>
         <file alias="imtauthgui/SuperuserProvider.qml">SuperuserProvider.qml</file>
         <file alias="imtauthgui/ChangePasswordDialog.qml">ChangePasswordDialog.qml</file>
         <file alias="imtauthgui/PasswordInput.qml">PasswordInput.qml</file>
         <file alias="imtauthgui/CachedAccountCollection.qml">CachedAccountCollection.qml</file>
-	<file alias="imtauthgui/CachedRoleCollection.qml">CachedRoleCollection.qml</file>
-	<file alias="imtauthgui/CachedUserCollection.qml">CachedUserCollection.qml</file>
-	<file alias="imtauthgui/CachedGroupCollection.qml">CachedGroupCollection.qml</file>
+        <file alias="imtauthgui/CachedRoleCollection.qml">CachedRoleCollection.qml</file>
+        <file alias="imtauthgui/CachedUserCollection.qml">CachedUserCollection.qml</file>
+        <file alias="imtauthgui/CachedGroupCollection.qml">CachedGroupCollection.qml</file>
         <file alias="imtauthgui/qmldir">qmldir</file>
     </qresource>
     <qresource prefix="/"/>

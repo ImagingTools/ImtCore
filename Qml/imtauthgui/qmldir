@@ -34,5 +34,3 @@ GroupUsers 1.0 GroupUsers.qml
 
 TableProductRolesDelegate 1.0 TableProductRolesDelegate.qml
 RoleCollectionViewCommandsDelegate 1.0 RoleCollectionViewCommandsDelegate.qml
-
-LoginButton 1.0 LoginButton.qml

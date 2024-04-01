@@ -28,18 +28,6 @@ ViewBase {
         bodyColumn.updateHeaders();
     }
 
-//    CollectionDataProvider {
-//        id: groupsProvider;
-
-//        commandId: "Groups";
-
-//        fields: ["Id", "Name"];
-
-//        onModelUpdated: {
-//            groupsTable.elements = groupsProvider.collectionModel;
-//        }
-//    }
-
     function setReadOnly(readOnly){
         accountNameInput.readOnly = readOnly;
         accountDescriptionInput.readOnly = readOnly;
@@ -155,6 +143,8 @@ ViewBase {
             let id = groupsTable.elements.GetData("Id", index);
             selectedGroupIds.push(id)
         }
+
+        selectedGroupIds.sort()
 
         let groups = selectedGroupIds.join(';');
         accountEditorContainer.model.SetData("Groups", groups)
@@ -438,6 +428,7 @@ ViewBase {
                     radius: accountEditorContainer.radius;
 
                     onCheckedItemsChanged: {
+                        console.log("onCheckedItemsChanged");
                         accountEditorContainer.doUpdateModel();
                     }
 
