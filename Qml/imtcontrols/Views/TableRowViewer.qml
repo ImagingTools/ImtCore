@@ -26,19 +26,24 @@ Row {
                 cell.compl = true;
             }
 
+            Component.onDestruction: {
+                console.log("*Debug* cell onDestruction")
+                dataList.rowDelegate.table.widthRecalc.disconnect(cell.setCellWidth)
+            }
+
             onComplComplChanged: {
                 if(cell.complCompl){
                     loader.sourceComponent = dataList.rowDelegate.table.columnContentComps[model.index] !== null ?
                                 dataList.rowDelegate.table.columnContentComps[model.index] : dataList.rowDelegate.table.cellDelegate;
 
-                    table.widthRecalc.connect(cell.setCellWidth)
+                    dataList.rowDelegate.table.widthRecalc.connect(cell.setCellWidth)
                     cell.setCellWidth();
                 }
             }
 
             function setCellWidth(){
 
-                if(!cell.complCompl){
+                if(!dataList.rowDelegate || !dataList.rowDelegate.table){
                     return;
                 }
 

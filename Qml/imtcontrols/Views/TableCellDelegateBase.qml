@@ -20,7 +20,9 @@ Item {
     property int rowIndex: rowDelegate ? rowDelegate.rowIndex : -1;
 
     Component.onDestruction: {
-        delegateContainer.rowDelegate.table.widthRecalc.disconnect(delegateContainer.setCellWidth)
+        if (rowDelegate && rowDelegate.table){
+            rowDelegate.table.widthRecalc.disconnect(delegateContainer.setCellWidth)
+        }
     }
 
 

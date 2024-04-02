@@ -15,12 +15,16 @@ Item{
     Component.onCompleted: {
         headerDelegate.compl = true;
     }
+
+    Component.onDestruction: {
+        headerDelegate.table.widthRecalc.disconnect(headerDelegate.setCellWidth);
+    }
+
     onComplComplChanged: {
         if(headerDelegate.complCompl){
             headerDelegate.table.widthRecalc.connect(headerDelegate.setCellWidth);
             headerDelegate.setCellWidth();
         }
-
     }
 
     function setCellWidth(){
