@@ -1334,13 +1334,16 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
                 if(property.val.className !== 'Component'){  
                     // TEMP !!!
                     if((property.name === 'delegate' && (currentInstructions.className === 'MapItemView'|| currentInstructions.className === 'ListView'|| currentInstructions.className === 'GridView' || currentInstructions.className === 'Repeater')) || (property.name === 'sourceComponent' && currentInstructions.className === 'Loader')){
-                        code.push(`${currentInstructions.name}.getStatement('${property.name}').value = new Component(${currentInstructions.name}, inCtx)`)
-                        code.push(`${currentInstructions.name}.getStatement('${property.name}').value.createObject=function(currParent,exCtx1=inCtx,exModel,forceUpdate=true,exCtx2=inCtx){`)
+                        code.push(`${currentInstructions.name}.$temp = new Component(${currentInstructions.name}, inCtx)`)
+
+                        code.push(`${currentInstructions.name}.$temp.createObject=function(currParent,exCtx1=inCtx,exModel,forceUpdate=true,exCtx2=inCtx){`)
                         
                         code.push(`let inCtx = new ContextController(exCtx1,exCtx2)`)
                         treeCompile(compiledFile, property.val, [], [], 0, true)
                         code.push(`}`)
-                        updateList.push(`${currentInstructions.name}.getStatement('${property.name}').getNotify()()`)
+                        code.push(`${currentInstructions.name}.${property.name} = ${currentInstructions.name}.$temp`)
+                        code.push(`delete ${currentInstructions.name}.$temp`)
+                        // updateList.push(`${currentInstructions.name}.getStatement('${property.name}').update()`)
                     } else {
                         treeCompile(compiledFile, property.val)
                         code.push(`${currentInstructions.name}.${property.name} = ${property.val.name}`)
