@@ -704,7 +704,7 @@ Item {
                     visibleScrollBar: false;
                     isColor: true;
                     changeable: !datePicker.readOnly;
-                    z: dayComboObj.readOnly ? 1 : 0;
+                    z: dayField.readOnly ? 1 : 0;
 
                     onCurrentIndexChanged:{
                         if(dayComboObj.currentIndex >=0){
