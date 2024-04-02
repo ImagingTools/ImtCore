@@ -7,12 +7,36 @@
             <Version Id="1023" Number="395008" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
-    <Description>Base framework for service/damon-based applications</Description>
+    <Description>Base framework for a console application</Description>
     <Keywords></Keywords>
     <ElementsList>
-        <Element Id="QuickApplicationSqlLogFramework" PackageId="ImtCoreVoce" ComponentId="QuickApplicationSqlLogFramework">
+        <Element Id="CollectionBasedMessageConsumer" PackageId="ImtLogPck" ComponentId="CollectionBasedMessageConsumer">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
+                    <AttributeInfo Id="MessageCollection" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="LogSqlRepository"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RuntimeStatus" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="QuickApplicationFramework/RuntimeStatus"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="LogSqlRepository" PackageId="ImtDatabaseVoce" ComponentId="LogSqlRepository">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="DatabaseEngine" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="SqLiteDatabaseEngine"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="QuickApplicationFramework" PackageId="ImtCoreVoce" ComponentId="QuickApplicationFramework">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="AppendToExisting" Type="Boolean" ExportId="AppendToExisting">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
                     <AttributeInfo Id="ApplicationName" Type="Text" ExportId="ApplicationName">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
@@ -43,8 +67,8 @@
                     <AttributeInfo Id="ProductName" Type="Text" ExportId="ProductName">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="SqlLogFilePath" Type="String" ExportId="SqlLogFilePath">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="SlaveMessageConsumer" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="CollectionBasedMessageConsumer"/>
                     </AttributeInfo>
                     <AttributeInfo Id="VersionInfo" Type="Reference" ExportId="VersionInfo">
                         <Data IsEnabled="false"/>
@@ -52,26 +76,17 @@
                 </AttributeInfoMap>
             </Data>
         </Element>
-        <Element Id="ServiceApplication" PackageId="QtExPck" ComponentId="ServiceApplication">
+        <Element Id="SqLiteDatabaseEngine" PackageId="ImtCoreVoce" ComponentId="SqLiteDatabaseEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
-                    <AttributeInfo Id="ApplicationInstance" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="QuickApplicationSqlLogFramework"/>
+                    <AttributeInfo Id="ApplicationInfo" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="QuickApplicationFramework/ApplicationInfo"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="EnableVerbose" Type="Boolean" ExportId="EnableVerbose">
+                    <AttributeInfo Id="DatabaseSqlFilePath" Type="String" ExportId="SqlLogFilePath">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="Log" Type="Reference" ExportId="">
-                        <Data IsEnabled="true" Value="QuickApplicationSqlLogFramework/Log"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ManualStartup" Type="Boolean" ExportId="ManualStartup">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="SeriviceDescription" Type="Text" ExportId="SeriviceDescription">
-                        <Data IsEnabled="false"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="ServiceName" Type="String" ExportId="ServiceName">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="MigrationPath" Type="String" ExportId="">
+                        <Data IsEnabled="true" Value="LogMigrations"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -79,12 +94,13 @@
     </ElementsList>
     <EmbeddedRegistriesList/>
     <ExportedInterfaces>
-        <Interface InterfaceId="ibase::IApplication" ComponentId="ServiceApplication"/>
+        <Interface InterfaceId="ibase::IApplication" ComponentId="QuickApplicationFramework"/>
     </ExportedInterfaces>
     <ExportedComponents>
-        <Component ExportedId="ApplicationInfo" ComponentId="QuickApplicationSqlLogFramework/ApplicationInfo"/>
-        <Component ExportedId="Log" ComponentId="QuickApplicationSqlLogFramework/Log"/>
-        <Component ExportedId="LogFilePath" ComponentId="QuickApplicationSqlLogFramework/LogFilePath"/>
-        <Component ExportedId="RuntimeStatus" ComponentId="QuickApplicationSqlLogFramework/RuntimeStatus"/>
+        <Component ExportedId="ApplicationInfo" ComponentId="QuickApplicationFramework/ApplicationInfo"/>
+        <Component ExportedId="DatabaseFilePath" ComponentId="SqLiteDatabaseEngine/DatabaseFilePath"/>
+        <Component ExportedId="Log" ComponentId="QuickApplicationFramework/Log"/>
+        <Component ExportedId="LogFilePath" ComponentId="QuickApplicationFramework/LogFilePath"/>
+        <Component ExportedId="RuntimeStatus" ComponentId="QuickApplicationFramework/RuntimeStatus"/>
     </ExportedComponents>
 </Acf>
