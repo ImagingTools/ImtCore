@@ -624,354 +624,354 @@ Rectangle {
                 headersList.compl = true;
             }
 
-            delegate: Item{
-                id: deleg;
-
-                height: headersList.height;
-
-                property bool compl: false;
-                property bool complCompl: deleg.compl && headersList.compl;
-
-                Component.onCompleted: {
-                    deleg.compl = true;
-                }
-                onComplComplChanged: {
-                    if(deleg.complCompl){
-                        tableContainer.widthRecalc.connect(deleg.setCellWidth);
-                        deleg.setCellWidth();
-                    }
-
-                }
-
-                function setCellWidth(){
-
-                    if(!deleg || !deleg.complCompl || !headersList){
-                        return;
-                    }
-
-                    var defaultWidth = (headersList.width)/headersList.count;
-                    var widthFromModel = tableContainer.widthDecoratorDynamic.IsValidData("Width", model.index) ? tableContainer.widthDecoratorDynamic.GetData("Width", model.index) : -1;
-
-                    if(!tableContainer.widthDecoratorDynamic.GetItemsCount()){
-                        width = defaultWidth;
-                    }
-                    else if(widthFromModel >= 0){
-                        width = widthFromModel;
-                    }
-                    else{
-                        width = defaultWidth;
-                    }
-
-                }
-
-                //borders
-
-                Rectangle{
-                    id: topBorder;
-                    anchors.top: parent.top;
-                    anchors.left: parent.left;
-                    anchors.right: parent.right;
-                    height: tableContainer.visibleTopBorderFirst  ? tableContainer.horizontalBorderSize : 0;
-                    color: tableContainer.borderColorHorizontal;
-                }
-
-                Rectangle{
-                    id: bottomBorder;
-                    anchors.bottom: parent.bottom;
-                    anchors.left: parent.left;
-                    anchors.right: parent.right;
-                    height: tableContainer.visibleBottomBorderLast ? tableContainer.horizontalBorderSize : 0;
-                    color:  tableContainer.borderColorHorizontal;
-                }
-
-                Rectangle{
-                    id: leftBorder;
-                    anchors.left: parent.left;
-                    anchors.top: parent.top;
-                    anchors.bottom: parent.bottom;
-                    width: tableContainer.isRightBorder ? tableContainer.verticalBorderSize * tableContainer.visibleLeftBorderFirst * (model.index == 0)
-                                                        : tableContainer.visibleLeftBorderFirst ? tableContainer.verticalBorderSize : model.index > 0 ? tableContainer.verticalBorderSize : 0;
-                    color:  tableContainer.borderColorVertical;
-                }
-
-                Rectangle{
-                    id: rightBorder;
-                    anchors.right: parent.right;
-                    anchors.top: parent.top;
-                    anchors.bottom: parent.bottom;
-                    width: !tableContainer.isRightBorder ?
-                               tableContainer.verticalBorderSize * tableContainer.visibleRightBorderLast  * (model.index == (headersList.count -1)) * (headersList.count > 0) :
-                               tableContainer.visibleRightBorderLast ? tableContainer.verticalBorderSize  :
-                                                                       tableContainer.verticalBorderSize * (model.index < (headersList.count -1));
-
-                    color: tableContainer.borderColorVertical;
-                }
-
-
-                //borders
-
-                Rectangle{
-                    id: mainRec;
-                    anchors.top: topBorder.bottom;
-                    anchors.left: leftBorder.right;
-                    anchors.right: rightBorder.left;
-                    anchors.bottom: bottomBorder.top;
-                    color: tableContainer.emptyDecorHeader ? "transparent" :
-                                                             tableContainer.headerDecorator.IsValidData("Color", model.index) ?
-                                                                 tableContainer.headerDecorator.GetData("Color", model.index) :
-                                                                 "transparent";
-
-                    opacity:  tableContainer.emptyDecorHeader ? 1 :
-                                                                tableContainer.headerDecorator.IsValidData("Opacity", model.index) ?
-                                                                    tableContainer.headerDecorator.GetData("Opacity", model.index) :
-                                                                    1;
-
-                    radius: tableContainer.emptyDecorHeader ? 0 :
-                                                              tableContainer.headerDecorator.IsValidData("CellRadius", model.index) ?
-                                                                  tableContainer.headerDecorator.GetData("CellRadius", model.index) :0;
-
-
-
-
-                    //cornerPatches
-                    Rectangle{
-                        id: leftTopCornerPatch;
-                        anchors.left: parent.left;
-                        anchors.top: parent.top;
-                        width: parent.width/2;
-                        height: parent.height/2;
-                        color: parent.color;
-                        visible: tableContainer.emptyDecorHeader ? true :
-                                                                   tableContainer.headerDecorator.IsValidData("LeftTopRound", model.index) ?
-                                                                       !tableContainer.headerDecorator.GetData("LeftTopRound", model.index) :true;
-                    }
-
-                    Rectangle{
-                        id: rightTopCornerPatch;
-                        anchors.right: parent.right;
-                        anchors.top: parent.top;
-                        width: parent.width/2;
-                        height: parent.height/2;
-                        color: parent.color;
-                        visible: tableContainer.emptyDecorHeader ? true :
-                                                                   tableContainer.headerDecorator.IsValidData("RightTopRound", model.index) ?
-                                                                       !tableContainer.headerDecorator.GetData("RightTopRound", model.index) :true;
+            // delegate: Item{
+            //     id: deleg;
+
+            //     height: headersList.height;
+
+            //     property bool compl: false;
+            //     property bool complCompl: deleg.compl && headersList.compl;
+
+            //     Component.onCompleted: {
+            //         deleg.compl = true;
+            //     }
+            //     onComplComplChanged: {
+            //         if(deleg.complCompl){
+            //             tableContainer.widthRecalc.connect(deleg.setCellWidth);
+            //             deleg.setCellWidth();
+            //         }
+
+            //     }
+
+            //     function setCellWidth(){
+
+            //         if(!deleg || !deleg.complCompl || !headersList){
+            //             return;
+            //         }
+
+            //         var defaultWidth = (headersList.width)/headersList.count;
+            //         var widthFromModel = tableContainer.widthDecoratorDynamic.IsValidData("Width", model.index) ? tableContainer.widthDecoratorDynamic.GetData("Width", model.index) : -1;
+
+            //         if(!tableContainer.widthDecoratorDynamic.GetItemsCount()){
+            //             width = defaultWidth;
+            //         }
+            //         else if(widthFromModel >= 0){
+            //             width = widthFromModel;
+            //         }
+            //         else{
+            //             width = defaultWidth;
+            //         }
+
+            //     }
+
+            //     //borders
+
+            //     Rectangle{
+            //         id: topBorder;
+            //         anchors.top: parent.top;
+            //         anchors.left: parent.left;
+            //         anchors.right: parent.right;
+            //         height: tableContainer.visibleTopBorderFirst  ? tableContainer.horizontalBorderSize : 0;
+            //         color: tableContainer.borderColorHorizontal;
+            //     }
+
+            //     Rectangle{
+            //         id: bottomBorder;
+            //         anchors.bottom: parent.bottom;
+            //         anchors.left: parent.left;
+            //         anchors.right: parent.right;
+            //         height: tableContainer.visibleBottomBorderLast ? tableContainer.horizontalBorderSize : 0;
+            //         color:  tableContainer.borderColorHorizontal;
+            //     }
+
+            //     Rectangle{
+            //         id: leftBorder;
+            //         anchors.left: parent.left;
+            //         anchors.top: parent.top;
+            //         anchors.bottom: parent.bottom;
+            //         width: tableContainer.isRightBorder ? tableContainer.verticalBorderSize * tableContainer.visibleLeftBorderFirst * (model.index == 0)
+            //                                             : tableContainer.visibleLeftBorderFirst ? tableContainer.verticalBorderSize : model.index > 0 ? tableContainer.verticalBorderSize : 0;
+            //         color:  tableContainer.borderColorVertical;
+            //     }
+
+            //     Rectangle{
+            //         id: rightBorder;
+            //         anchors.right: parent.right;
+            //         anchors.top: parent.top;
+            //         anchors.bottom: parent.bottom;
+            //         width: !tableContainer.isRightBorder ?
+            //                    tableContainer.verticalBorderSize * tableContainer.visibleRightBorderLast  * (model.index == (headersList.count -1)) * (headersList.count > 0) :
+            //                    tableContainer.visibleRightBorderLast ? tableContainer.verticalBorderSize  :
+            //                                                            tableContainer.verticalBorderSize * (model.index < (headersList.count -1));
+
+            //         color: tableContainer.borderColorVertical;
+            //     }
+
+
+            //     //borders
+
+            //     Rectangle{
+            //         id: mainRec;
+            //         anchors.top: topBorder.bottom;
+            //         anchors.left: leftBorder.right;
+            //         anchors.right: rightBorder.left;
+            //         anchors.bottom: bottomBorder.top;
+            //         color: tableContainer.emptyDecorHeader ? "transparent" :
+            //                                                  tableContainer.headerDecorator.IsValidData("Color", model.index) ?
+            //                                                      tableContainer.headerDecorator.GetData("Color", model.index) :
+            //                                                      "transparent";
+
+            //         opacity:  tableContainer.emptyDecorHeader ? 1 :
+            //                                                     tableContainer.headerDecorator.IsValidData("Opacity", model.index) ?
+            //                                                         tableContainer.headerDecorator.GetData("Opacity", model.index) :
+            //                                                         1;
+
+            //         radius: tableContainer.emptyDecorHeader ? 0 :
+            //                                                   tableContainer.headerDecorator.IsValidData("CellRadius", model.index) ?
+            //                                                       tableContainer.headerDecorator.GetData("CellRadius", model.index) :0;
+
+
+
+
+            //         //cornerPatches
+            //         Rectangle{
+            //             id: leftTopCornerPatch;
+            //             anchors.left: parent.left;
+            //             anchors.top: parent.top;
+            //             width: parent.width/2;
+            //             height: parent.height/2;
+            //             color: parent.color;
+            //             visible: tableContainer.emptyDecorHeader ? true :
+            //                                                        tableContainer.headerDecorator.IsValidData("LeftTopRound", model.index) ?
+            //                                                            !tableContainer.headerDecorator.GetData("LeftTopRound", model.index) :true;
+            //         }
+
+            //         Rectangle{
+            //             id: rightTopCornerPatch;
+            //             anchors.right: parent.right;
+            //             anchors.top: parent.top;
+            //             width: parent.width/2;
+            //             height: parent.height/2;
+            //             color: parent.color;
+            //             visible: tableContainer.emptyDecorHeader ? true :
+            //                                                        tableContainer.headerDecorator.IsValidData("RightTopRound", model.index) ?
+            //                                                            !tableContainer.headerDecorator.GetData("RightTopRound", model.index) :true;
 
-
-                    }
-
-                    Rectangle{
-                        id: leftBottomCornerPatch;
-                        anchors.left: parent.left;
-                        anchors.bottom: parent.bottom;
-                        width: parent.width/2;
-                        height: parent.height/2;
-                        color: parent.color;
-                        visible: tableContainer.emptyDecorHeader ? true :
-                                                                   tableContainer.headerDecorator.IsValidData("LeftBottomRound", model.index) ?
-                                                                       !tableContainer.headerDecorator.GetData("LeftBottomRound", model.index) :true;
-                    }
+
+            //         }
+
+            //         Rectangle{
+            //             id: leftBottomCornerPatch;
+            //             anchors.left: parent.left;
+            //             anchors.bottom: parent.bottom;
+            //             width: parent.width/2;
+            //             height: parent.height/2;
+            //             color: parent.color;
+            //             visible: tableContainer.emptyDecorHeader ? true :
+            //                                                        tableContainer.headerDecorator.IsValidData("LeftBottomRound", model.index) ?
+            //                                                            !tableContainer.headerDecorator.GetData("LeftBottomRound", model.index) :true;
+            //         }
 
-                    Rectangle{
-                        id: rightBottomCornerPatch;
-                        anchors.right:  parent.right;
-                        anchors.bottom: parent.bottom;
-                        width: parent.width/2;
-                        height: parent.height/2;
-                        color: parent.color;
-                        visible: tableContainer.emptyDecorHeader ? true :
-                                                                   tableContainer.headerDecorator.IsValidData("RightBottomRound", model.index) ?
-                                                                       !tableContainer.headerDecorator.GetData("RightBottomRound", model.index) :true;
-                    }
-                    //cornerPatches
+            //         Rectangle{
+            //             id: rightBottomCornerPatch;
+            //             anchors.right:  parent.right;
+            //             anchors.bottom: parent.bottom;
+            //             width: parent.width/2;
+            //             height: parent.height/2;
+            //             color: parent.color;
+            //             visible: tableContainer.emptyDecorHeader ? true :
+            //                                                        tableContainer.headerDecorator.IsValidData("RightBottomRound", model.index) ?
+            //                                                            !tableContainer.headerDecorator.GetData("RightBottomRound", model.index) :true;
+            //         }
+            //         //cornerPatches
 
 
 
-                }//mainRec
+            //     }//mainRec
 
-                CheckBox {
-                    id: checkBox;
+            //     CheckBox {
+            //         id: checkBox;
 
-                    z: 1000;
+            //         z: 1000;
 
-                    anchors.verticalCenter: mainRec.verticalCenter;
-                    anchors.left: mainRec.left;
-                    anchors.leftMargin: 8;
+            //         anchors.verticalCenter: mainRec.verticalCenter;
+            //         anchors.left: mainRec.left;
+            //         anchors.leftMargin: 8;
 
-                    checkState: tableContainer.isAllItemChecked ? Qt.Checked : Qt.Unchecked;
+            //         checkState: tableContainer.isAllItemChecked ? Qt.Checked : Qt.Unchecked;
 
-                    visible: tableContainer.checkable && model.index === 0 && elementsListObj.count > 0 && tableContainer.canSelectAll;
+            //         visible: tableContainer.checkable && model.index === 0 && elementsListObj.count > 0 && tableContainer.canSelectAll;
 
-                    isActive: !tableContainer.readOnly;
+            //         isActive: !tableContainer.readOnly;
 
-                    onClicked: {
-                        if (tableContainer.readOnly){
-                            return;
-                        }
+            //         onClicked: {
+            //             if (tableContainer.readOnly){
+            //                 return;
+            //             }
 
-                        if (checkBox.checkState === Qt.Checked){
-                            tableContainer.uncheckAll();
-                        }
-                        else{
-                            tableContainer.checkAll();
-                        }
-                    }
-                }
+            //             if (checkBox.checkState === Qt.Checked){
+            //                 tableContainer.uncheckAll();
+            //             }
+            //             else{
+            //                 tableContainer.checkAll();
+            //             }
+            //         }
+            //     }
 
-                Text {
-                    id: name;
+            //     Text {
+            //         id: name;
 
-                    anchors.verticalCenter: mainRec.verticalCenter;
-                    anchors.left: checkBox.visible ? checkBox.right : mainRec.left;
-                    anchors.right: iconSort.visible ? iconSort.left : mainRec.right;
-                    anchors.leftMargin: tableContainer.textMarginHor;
-                    anchors.rightMargin: iconSort.visible ? 0 : tableContainer.textMarginHor;
+            //         anchors.verticalCenter: mainRec.verticalCenter;
+            //         anchors.left: checkBox.visible ? checkBox.right : mainRec.left;
+            //         anchors.right: iconSort.visible ? iconSort.left : mainRec.right;
+            //         anchors.leftMargin: tableContainer.textMarginHor;
+            //         anchors.rightMargin: iconSort.visible ? 0 : tableContainer.textMarginHor;
 
-                    verticalAlignment: Text.AlignVCenter;
-                    horizontalAlignment: tableContainer.emptyDecorHeader ? Text.AlignLeft :
-                                                                           tableContainer.headerDecorator.IsValidData("TextPosition", model.index) ?
-                                                                               tableContainer.headerDecorator.GetData("TextPosition", model.index) :
-                                                                               Text.AlignLeft;
+            //         verticalAlignment: Text.AlignVCenter;
+            //         horizontalAlignment: tableContainer.emptyDecorHeader ? Text.AlignLeft :
+            //                                                                tableContainer.headerDecorator.IsValidData("TextPosition", model.index) ?
+            //                                                                    tableContainer.headerDecorator.GetData("TextPosition", model.index) :
+            //                                                                    Text.AlignLeft;
 
 
-                    font.pixelSize: tableContainer.emptyDecorHeader ? Style.fontSize_common * deleg.scale :
-                                                                      tableContainer.headerDecorator.IsValidData("FontSize", model.index) ?
-                                                                          tableContainer.headerDecorator.GetData("FontSize", model.index) :
-                                                                          Style.fontSize_common * deleg.scale;
+            //         font.pixelSize: tableContainer.emptyDecorHeader ? Style.fontSize_common * deleg.scale :
+            //                                                           tableContainer.headerDecorator.IsValidData("FontSize", model.index) ?
+            //                                                               tableContainer.headerDecorator.GetData("FontSize", model.index) :
+            //                                                               Style.fontSize_common * deleg.scale;
 
 
-                    font.family: Style.fontFamilyBold;
+            //         font.family: Style.fontFamilyBold;
 
-                    font.bold: tableContainer.emptyDecorHeader ? true :
-                                                                 tableContainer.headerDecorator.IsValidData("FontBold", model.index) ?
-                                                                     tableContainer.headerDecorator.GetData("FontBold", model.index) :
-                                                                     true;
+            //         font.bold: tableContainer.emptyDecorHeader ? true :
+            //                                                      tableContainer.headerDecorator.IsValidData("FontBold", model.index) ?
+            //                                                          tableContainer.headerDecorator.GetData("FontBold", model.index) :
+            //                                                          true;
 
 
-                    color: tableContainer.emptyDecorHeader ? Style.textColor :
-                                                             tableContainer.headerDecorator.IsValidData("FontColor", model.index) ?
-                                                                 tableContainer.headerDecorator.GetData("FontColor", model.index) :
-                                                                 Style.textColor;
-                    elide: tableContainer.elideMode;
+            //         color: tableContainer.emptyDecorHeader ? Style.textColor :
+            //                                                  tableContainer.headerDecorator.IsValidData("FontColor", model.index) ?
+            //                                                      tableContainer.headerDecorator.GetData("FontColor", model.index) :
+            //                                                      Style.textColor;
+            //         elide: tableContainer.elideMode;
 
-                    wrapMode: tableContainer.wrapMode;
+            //         wrapMode: tableContainer.wrapMode;
 
-                    onLinkActivated: {
-                        Qt.openUrlExternally(link)
-                    }
+            //         onLinkActivated: {
+            //             Qt.openUrlExternally(link)
+            //         }
 
-                    text: model.Name;
+            //         text: model.Name;
 
-                    Component.onCompleted: {
-                        tableContainer.heightRecalc.connect(name.sendHeightData);
-                    }
+            //         Component.onCompleted: {
+            //             tableContainer.heightRecalc.connect(name.sendHeightData);
+            //         }
 
-                    onHeightChanged: {
-                        name.sendHeightData();
-                    }
+            //         onHeightChanged: {
+            //             name.sendHeightData();
+            //         }
 
-                    function sendHeightData(){
-                        if(tableContainer.wrapMode !== Text.NoWrap){
-                            if(model.index < heightModel.count){
-                                var height_ = name.height +
-                                        2*tableContainer.textMarginVer +
-                                        topBorder.height + bottomBorder.height;
+            //         function sendHeightData(){
+            //             if(tableContainer.wrapMode !== Text.NoWrap){
+            //                 if(model.index < heightModel.count){
+            //                     var height_ = name.height +
+            //                             2*tableContainer.textMarginVer +
+            //                             topBorder.height + bottomBorder.height;
 
-                                heightModel.setProperty(model.index, "cellHeight", height_);
+            //                     heightModel.setProperty(model.index, "cellHeight", height_);
 
-                            }
-                        }
-                    }
+            //                 }
+            //             }
+            //         }
 
-                }
+            //     }
 
-                Image {
-                    id: iconSort;
+            //     Image {
+            //         id: iconSort;
 
-                    anchors.verticalCenter: mainRec.verticalCenter;
-                    anchors.right: mainRec.right;
+            //         anchors.verticalCenter: mainRec.verticalCenter;
+            //         anchors.right: mainRec.right;
 
-                    anchors.rightMargin: 5;
+            //         anchors.rightMargin: 5;
 
-                    height: 10;
-                    width: visible ? 10 : 0;
+            //         height: 10;
+            //         width: visible ? 10 : 0;
 
-                    visible: tableContainer.currentHeaderId === model.Id && tableContainer.hasSort;
-                    rotation: tableContainer.currentSortOrder == "ASC" ? 180 : 0
+            //         visible: tableContainer.currentHeaderId === model.Id && tableContainer.hasSort;
+            //         rotation: tableContainer.currentSortOrder == "ASC" ? 180 : 0
 
-                    sourceSize.width: width;
-                    sourceSize.height: height;
+            //         sourceSize.width: width;
+            //         sourceSize.height: height;
 
-                    source: tableContainer.sortIndicatorIcon
-                }
+            //         source: tableContainer.sortIndicatorIcon
+            //     }
 
-                ////
-                MouseArea {
-                    id: headerMa;
+            //     ////
+            //     MouseArea {
+            //         id: headerMa;
 
-                    anchors.fill: parent;
+            //         anchors.fill: parent;
 
-                    visible: tableContainer.hasSort;
+            //         visible: tableContainer.hasSort;
 
-                    onReleased: {
-                        deleg.scale = 1;
-                    }
+            //         onReleased: {
+            //             deleg.scale = 1;
+            //         }
 
-                    onPressed: {
-                        deleg.scale = 0.985;
-                    }
+            //         onPressed: {
+            //             deleg.scale = 0.985;
+            //         }
 
-                    onClicked: {
-                        tableContainer.headerClicked(model.Id);
-                    }
-                }
+            //         onClicked: {
+            //             tableContainer.headerClicked(model.Id);
+            //         }
+            //     }
 
-                MouseArea{
-                    id: moving;
+            //     MouseArea{
+            //         id: moving;
 
-                    anchors.right:  parent.right;
-                    anchors.rightMargin: -width/2;
+            //         anchors.right:  parent.right;
+            //         anchors.rightMargin: -width/2;
 
-                    height: parent.height;
-                    width: 30;
+            //         height: parent.height;
+            //         width: 30;
 
-                    visible: tableContainer.canMoveColumns && model.index < headersList.count -1;
-                    enabled: visible;
+            //         visible: tableContainer.canMoveColumns && model.index < headersList.count -1;
+            //         enabled: visible;
 
-                    hoverEnabled: true;
-                    cursorShape: Qt.SplitHCursor;//containsMouse ? Qt.SplitHCursor : containsPress ? Qt.PointingHandCursor : Qt.ArrowCursor;
-                    //                    cursorShape: containsMouse ? Qt.SplitHCursor : Qt.ArrowCursor;
-                    property var coord: mapToItem(moving,0,0);
-                    onPressed: {
-                        moving.coord = mapToItem(moving,mouse.x,mouse.y)
-                    }
-                    onPositionChanged: {
-                        if(pressed){
-                            var newCoords = mapToItem(moving,mouse.x,mouse.y);
-                            var deltaX = Math.trunc(newCoords.x - moving.coord.x);
-                            var width_ = tableContainer.widthDecoratorDynamic.GetData("Width", model.index);
-                            var width_next = tableContainer.widthDecoratorDynamic.GetData("Width", model.index+1);
-                            var width_min = tableContainer.widthDecoratorDynamic.IsValidData("MinWidth", model.index) ? tableContainer.widthDecoratorDynamic.GetData("MinWidth", model.index) : tableContainer.minCellWidth;
-                            var width_next_min = tableContainer.widthDecoratorDynamic.IsValidData("MinWidth", model.index+1) ? tableContainer.widthDecoratorDynamic.GetData("MinWidth", model.index+1) : tableContainer.minCellWidth;
+            //         hoverEnabled: true;
+            //         cursorShape: Qt.SplitHCursor;//containsMouse ? Qt.SplitHCursor : containsPress ? Qt.PointingHandCursor : Qt.ArrowCursor;
+            //         //                    cursorShape: containsMouse ? Qt.SplitHCursor : Qt.ArrowCursor;
+            //         property var coord: mapToItem(moving,0,0);
+            //         onPressed: {
+            //             moving.coord = mapToItem(moving,mouse.x,mouse.y)
+            //         }
+            //         onPositionChanged: {
+            //             if(pressed){
+            //                 var newCoords = mapToItem(moving,mouse.x,mouse.y);
+            //                 var deltaX = Math.trunc(newCoords.x - moving.coord.x);
+            //                 var width_ = tableContainer.widthDecoratorDynamic.GetData("Width", model.index);
+            //                 var width_next = tableContainer.widthDecoratorDynamic.GetData("Width", model.index+1);
+            //                 var width_min = tableContainer.widthDecoratorDynamic.IsValidData("MinWidth", model.index) ? tableContainer.widthDecoratorDynamic.GetData("MinWidth", model.index) : tableContainer.minCellWidth;
+            //                 var width_next_min = tableContainer.widthDecoratorDynamic.IsValidData("MinWidth", model.index+1) ? tableContainer.widthDecoratorDynamic.GetData("MinWidth", model.index+1) : tableContainer.minCellWidth;
 
 
-                            width_ += deltaX;
-                            width_next -= deltaX
-                            if(width_ > width_min && width_next > width_next_min){
-                                tableContainer.widthDecorator.SetData("Width", width_, model.index);
-                                tableContainer.widthDecorator.SetData("Width", width_next, model.index+1);
+            //                 width_ += deltaX;
+            //                 width_next -= deltaX
+            //                 if(width_ > width_min && width_next > width_next_min){
+            //                     tableContainer.widthDecorator.SetData("Width", width_, model.index);
+            //                     tableContainer.widthDecorator.SetData("Width", width_next, model.index+1);
 
-                                tableContainer.setWidth();
-                            }
-                        }
+            //                     tableContainer.setWidth();
+            //                 }
+            //             }
 
-                    }
-                    onReleased: {
-                        tableContainer.saveWidth();
-                    }
-                }
+            //         }
+            //         onReleased: {
+            //             tableContainer.saveWidth();
+            //         }
+            //     }
 
-            }//delegate
+            // }//delegate
 
         }//Headers ListView
 

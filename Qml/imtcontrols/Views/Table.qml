@@ -14,4 +14,11 @@ TableBase {
     cellDelegate: Component {
         TableCellDelegateSimple {}
     }
+
+    headerDelegate: Component {
+        TableHeaderDelegate {
+            height: tableContainer.headerHeight
+            table: tableContainer
+        }
+    }
 }
