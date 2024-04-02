@@ -4,10 +4,14 @@ import imtcontrols 1.0
 
 TableBase {
     id: tableContainer;
-    rowDelegate: TableRowDelegate {
-        table: tableContainer
-        width: tableContainer.width
-        minHeight: tableContainer.itemHeight
+    rowDelegate: Component {
+            TableRowDelegate {
+            table: tableContainer
+            width: tableContainer.width
+            minHeight: tableContainer.itemHeight
+        }
     }
-    cellDelegate: TableCellDelegateSimple {}
+    cellDelegate: Component {
+        TableCellDelegateSimple {}
+    }
 }

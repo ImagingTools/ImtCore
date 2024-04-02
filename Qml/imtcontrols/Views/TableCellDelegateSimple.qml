@@ -14,7 +14,7 @@ TableCellDelegateBase {
 
         // text: delegateContainer.columnIndex + " " + delegateContainer.rowIndex //getValue()
         rowDelegate:  delegateContainer.rowDelegate
-        text: getValue()
+        text: delegateContainer.getValue()
     }
 }
 
