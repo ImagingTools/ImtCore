@@ -362,6 +362,9 @@ class ListView extends Flickable {
         let middleWidth = 0
         let middleHeight = 0
 
+        let countChanged = this.getPropertyValue('count') !== this.$items.length.get() ? true : false
+        this.getProperty('count').value = this.$items.length.get()
+
         while(children.length){
             let child = children.pop()
 
@@ -504,7 +507,11 @@ class ListView extends Flickable {
             }
         }
 
-        this.getProperty('count').reset(this.$items.length.get())
+        this.getProperty('count').value = this.$items.length.get()
+
+        if(countChanged){
+            if(this.getProperty('count').notify) this.getProperty('count').notify()
+        }
     }
 
     $contentXChanged(){
