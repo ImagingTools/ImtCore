@@ -4,10 +4,9 @@ import imtcontrols 1.0
 
 Row {
     id: dataList;
-
-    property alias model: repeater.model
     property TableRowDelegateBase rowDelegate: null;
     property bool compl: false;
+    property alias model: repeater.model
 
     Repeater {
         id: repeater
@@ -18,10 +17,8 @@ Row {
 
         delegate: Item {
             id: cell
-
             property bool compl: false;
             property bool complCompl: dataList.compl && dataList.rowDelegate.table.columnCount;
-
             width: 20
             height: dataList.rowDelegate ? dataList.rowDelegate.height : 0;
 
@@ -34,12 +31,13 @@ Row {
                     loader.sourceComponent = dataList.rowDelegate.table.columnContentComps[model.index] !== null ?
                                 dataList.rowDelegate.table.columnContentComps[model.index] : dataList.rowDelegate.table.cellDelegate;
 
-                    dataList.rowDelegate.table.widthRecalc.connect(cell.setCellWidth)
+                    table.widthRecalc.connect(cell.setCellWidth)
                     cell.setCellWidth();
                 }
             }
 
             function setCellWidth(){
+
                 if(!cell.complCompl){
                     return;
                 }

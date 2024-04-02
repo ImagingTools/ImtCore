@@ -182,9 +182,6 @@ Rectangle {
 
                 headers.SetData("LeftTopRound",true,0)
                 headers.SetData("RightTopRound",true,tableHeaderModel.GetItemsCount()-1)
-
-                // tableDecor.tableDecorator = decorModel;
-
             }
         }
     }

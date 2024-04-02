@@ -11,13 +11,17 @@ Item {
     height: rowDelegate ? rowDelegate.height : 0;
     width: rowDelegate ? rowDelegate.width/rowDelegate.columnCount : 0;
 
-    property int columnCount: rowDelegate && rowDelegate.tableItem ? rowDelegate.tableItem.columnCount : 0;
+    property int columnCount: rowDelegate && rowDelegate.table ? rowDelegate.table.columnCount : 0;
 
     property real textLeftIndent: 0
     property real textRightIndent: 0
 
     property int columnIndex: -1
     property int rowIndex: rowDelegate ? rowDelegate.rowIndex : -1;
+
+    Component.onDestruction: {
+        delegateContainer.rowDelegate.table.widthRecalc.disconnect(delegateContainer.setCellWidth)
+    }
 
 
     onRowDelegateChanged: {
@@ -67,6 +71,8 @@ Item {
         // if (rightBottomCornerPatchVisible){
         //     rightBottomCornerPatch.createObject(mainRec)
         // }
+
+        delegateContainer.rowDelegate.table.widthRecalc.connect(delegateContainer.setCellWidth)
     }
 
 
@@ -225,6 +231,26 @@ Item {
 
             return "";
         }
+
+    function setCellWidth(){
+        if(!delegateContainer.rowDelegate){
+            return;
+        }
+
+        var defaultWidth = delegateContainer.columnCount == 0 ? 0 : delegateContainer.rowDelegate.width/delegateContainer.columnCount;
+        var widthFromModel = delegateContainer.rowDelegate.table.widthDecoratorDynamic.IsValidData("Width", delegateContainer.columnIndex) ?
+                    delegateContainer.rowDelegate.table.widthDecoratorDynamic.GetData("Width", delegateContainer.columnIndex) : -1;
+
+        if(!delegateContainer.rowDelegate.table.widthDecoratorDynamic.GetItemsCount()){
+            delegateContainer.width = defaultWidth;
+        }
+        else if(widthFromModel >= 0){
+            delegateContainer.width = widthFromModel;
+        }
+        else{
+            delegateContainer.width = defaultWidth;
+        }
+    }
 
 
 }//delegate

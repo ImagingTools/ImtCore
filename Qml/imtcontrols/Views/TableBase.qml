@@ -35,7 +35,7 @@ Rectangle {
 
     property TreeItemModel headerDecorator
     property TreeItemModel cellDecorator
-    property TreeItemModel widthDecorator
+    property TreeItemModel widthDecorator: TreeItemModel{}
     property TreeItemModel widthDecoratorDynamic: TreeItemModel{}
 
     property alias scrollbarItem: scrollbar;
@@ -644,13 +644,13 @@ Rectangle {
                 }
 
                 function setCellWidth(){
+
                     if(!deleg || !deleg.complCompl || !headersList){
                         return;
                     }
 
                     var defaultWidth = (headersList.width)/headersList.count;
                     var widthFromModel = tableContainer.widthDecoratorDynamic.IsValidData("Width", model.index) ? tableContainer.widthDecoratorDynamic.GetData("Width", model.index) : -1;
-
 
                     if(!tableContainer.widthDecoratorDynamic.GetItemsCount()){
                         width = defaultWidth;
