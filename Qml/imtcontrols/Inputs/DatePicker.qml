@@ -56,6 +56,7 @@ Item {
     property bool openST: monthComboObj.openST || yearComboObj.openST || dayComboObj.openST;
     property bool endComboOnCurrentMonth: false;
     property bool readOnly: false;
+    property bool textInputBan: false;
 
     //icons
     property int iconWidth: 12;
@@ -377,7 +378,6 @@ Item {
                 borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
                 margin: datePicker.textFieldMargin;
 
-
                 leftPadding: horizontalAlignment == TextInput.AlignLeft ? 4 : 0;
                 horizontalAlignment: datePicker.horizontalAlignment;
 
@@ -391,7 +391,7 @@ Item {
                     yearDownButton.clicked();
                 }
 
-                readOnly: datePicker.readOnly;
+                readOnly: datePicker.readOnly || datePicker.textInputBan;
 
                 ComboBox {
                     id: yearComboObj;
@@ -407,13 +407,15 @@ Item {
                     backgroundColor: "transparent";
 
                     fontColorTitle: "transparent";
-//                    compTextCentered: true;
+                    textCentered: true;
                     shownItemsCount: datePicker.shownItemsCountCombo;
                     moveToIndex : datePicker.todayYear - datePicker.startYear - datePicker.shownItemsCountCombo +1;
                     visibleScrollBar: false;
                     isColor: true;
+                    openST: true;
 
                     changeable: !datePicker.readOnly;
+                    z: yearField.readOnly ? 1 : 0;
 
                     onCurrentIndexChanged:{
                         if(yearComboObj.currentIndex >=0){
@@ -514,7 +516,7 @@ Item {
                 borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
                 margin: datePicker.textFieldMargin;
 
-                readOnly: datePicker.readOnly;
+                readOnly: datePicker.readOnly || datePicker.textInputBan;
 
                 leftPadding: horizontalAlignment == TextInput.AlignLeft ? 4 : 0;
                 horizontalAlignment: datePicker.horizontalAlignment;
@@ -543,13 +545,14 @@ Item {
                     backgroundColor: "transparent";
 
                     fontColorTitle: "transparent";
-//                    compTextCentered: true;
+                    textCentered: true;
                     shownItemsCount: 12;
 
                     visibleScrollBar: false;
                     isColor: true;
 
                     changeable: !datePicker.readOnly;
+                    z: monthField.readOnly ? 1 : 0;
 
                     onCurrentIndexChanged:{
                         if(monthComboObj.currentIndex >= 0){
@@ -658,7 +661,7 @@ Item {
                 borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
                 margin: datePicker.textFieldMargin;
 
-                readOnly: datePicker.readOnly;
+                readOnly: datePicker.readOnly || datePicker.textInputBan;
 
                 leftPadding: horizontalAlignment == TextInput.AlignLeft ? 4 : 0;
                 horizontalAlignment: datePicker.horizontalAlignment;
@@ -695,12 +698,13 @@ Item {
                     backgroundColor: "transparent";
 
                     fontColorTitle: "transparent";
-//                    compTextCentered: true;
+                    textCentered: true;
                     shownItemsCount: datePicker.shownItemsCountCombo;
 
                     visibleScrollBar: false;
                     isColor: true;
                     changeable: !datePicker.readOnly;
+                    z: dayComboObj.readOnly ? 1 : 0;
 
                     onCurrentIndexChanged:{
                         if(dayComboObj.currentIndex >=0){
