@@ -146,6 +146,8 @@ ViewBase {
             selectedGroupIds.push(id);
         }
 
+        selectedGroupIds.sort();
+
         userGroupEditorContainer.model.SetData("ParentGroups", selectedGroupIds.join(';'));
 
         if (!parentGroupsTable.elements){

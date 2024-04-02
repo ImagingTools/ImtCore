@@ -27,6 +27,15 @@ Rectangle {
     Component.onCompleted: {
         decoratorPause.start();
         PermissionsController.authorizationPage = authPageContainer;
+        Events.subscribeEvent("OnLocalizationChanged", authPageContainer.onLocalizationChanged);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("OnLocalizationChanged", authPageContainer.onLocalizationChanged);
+    }
+
+    function onLocalizationChanged(language){
+        titleLogin.text = qsTr("Login")
     }
 
     onLoginSuccessful: {

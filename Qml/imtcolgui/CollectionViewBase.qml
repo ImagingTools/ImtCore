@@ -148,13 +148,12 @@ ViewBase {
             sourceComponent: Style.collectionTableDecorator;
             onLoaded: {
                 if(loaderTableDecorator.item){
-                    //console.log("TABLE_DECORATOR::", item.toJSON())
                     loaderTableDecorator.compl = true;
                 }
             }
         }
 
-        AuxTable {
+       AuxTable {
             id: tableInternal;
 
             anchors.left: parent.left;
@@ -162,8 +161,6 @@ ViewBase {
             anchors.top: parent.top;
 
             anchors.bottom: parent.bottom;
-//            anchors.bottomMargin: Style.size_mainMargin !== undefined ? Style.size_mainMargin + paginationObj.visible * paginationObj.height : paginationObj.visible * paginationObj.height;
-//            anchors.bottomMargin: Style.size_mainMargin;
 
             hasFilter: collectionViewBaseContainer.hasFilter;
             hasSort: collectionViewBaseContainer.hasSort;
@@ -202,7 +199,6 @@ ViewBase {
             }
 
             onHeaderClicked: {
-                console.log("onHeaderClicked");
                 if (collectionViewBaseContainer.collectionFilter.getSortingInfoId() !== headerId){
                     collectionViewBaseContainer.collectionFilter.setSortingInfoId(headerId);
                     collectionViewBaseContainer.collectionFilter.setSortingOrder("ASC");
@@ -216,49 +212,6 @@ ViewBase {
 
                 collectionViewBaseContainer.doUpdateGui();
             }
-
-//            delegate: Component {Item {
-//                    id: rowDelegate;
-
-//                width: tableInternal.width;
-//                height: tableInternal.itemHeight;
-
-//                property int rowIndex: model.index;
-
-//                ListView {
-//                    width: parent.width;
-//                    height: parent.height;
-
-//                    clip: true;
-//                    orientation: ListView.Horizontal;
-
-//                    model: tableInternal.columnCount;
-
-//                    boundsBehavior: Flickable.StopAtBounds;
-
-//                    delegate: Component {
-//                        Item {
-//                            width: tableInternal.width / tableInternal.columnCount;
-//                            height: parent.height;
-
-//                            Text {
-//                                id: contentText;
-
-//                                width: parent.width;
-//                            }
-
-//                            Component.onCompleted: {
-//                                let headerId = tableInternal.headers.GetData("Id", model.index);
-
-//                                let text = tableInternal.elements.GetData(headerId,rowDelegate.rowIndex);
-
-//                                contentText.text = text;
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            }
         }
 
         Item {
@@ -266,7 +219,6 @@ ViewBase {
 
             anchors.top: parent.top;
             anchors.right: parent.right;
-//            anchors.rightMargin: 5;
             anchors.bottom: parent.bottom;
 
             width: collectionViewBaseContainer.hasFilter ? 35 : 0;
@@ -333,7 +285,6 @@ ViewBase {
             visible: collectionViewBaseContainer.hasPagination /*&& pagesSize > 1*/;
 
             onCurrentIndexChanged: {
-                console.log("P onCurrentIndexChanged");
 
                 tableInternal.selectedIndex = -1;
 
@@ -341,8 +292,6 @@ ViewBase {
             }
 
             onCountElementsChanged: {
-                console.log("P onCountElementsChanged");
-
                 tableInternal.selectedIndex = -1;
 
                 collectionViewBaseContainer.doUpdateGui();

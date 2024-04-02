@@ -7,7 +7,6 @@ import imtcontrols 1.0
 QtObject {
     id: root;
 
-    property TreeItemModel pageModel: TreeItemModel {};
     property ApplicationInfoProvider applicationInfoProvider: null;
 
     property TreeItemModel representationModel: TreeItemModel {};
@@ -62,9 +61,5 @@ QtObject {
         root.representationModel.Refresh();
 
         return root.representationModel;
-    }
-
-    function getRepresentation(){
-        return pageModel;
     }
 }

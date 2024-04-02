@@ -53,6 +53,8 @@ ViewBase {
             selectedRoleIds.push(id);
         }
 
+        selectedRoleIds.sort();
+
         let result = selectedRoleIds.join(';');
         userRolesContainer.model.SetData("Roles", result);
     }

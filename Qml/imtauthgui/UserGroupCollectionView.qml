@@ -36,8 +36,8 @@ RemoteCollectionView {
         CachedRoleCollection.updateModel();
         CachedGroupCollection.updateModel();
 
-        collectionFilter.setSortingOrder("DESC");
-        collectionFilter.setSortingInfoId("LastModified");
+        collectionFilter.setSortingOrder("ASC");
+        collectionFilter.setSortingInfoId("Name");
 
         let documentManager = MainDocumentManager.getDocumentManager("Administration");
         if (documentManager){

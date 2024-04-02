@@ -36,6 +36,8 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlReq
 			QString mail = companyInfoPtr->GetEmail();
 			QByteArrayList groups = companyInfoPtr->GetGroups();
 
+			std::sort(groups.begin(), groups.end());
+
 			const imtauth::IAddressProvider* addressProviderPtr = companyInfoPtr->GetAddresses();
 			if (addressProviderPtr != nullptr){
 				imtbase::ICollectionInfo::Ids addressesIds = addressProviderPtr->GetAddressList().GetElementIds();

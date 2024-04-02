@@ -56,6 +56,8 @@ ViewBase {
             selectedGroupIds.push(id);
         }
 
+        selectedGroupIds.sort();
+
         userGroupsContainer.model.SetData("Groups", selectedGroupIds.join(';'));
     }
 

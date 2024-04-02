@@ -34,7 +34,6 @@ imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlReques
 
 	dataModelPtr->SetData("Id", "");
 	dataModelPtr->SetData("Name", "");
-//	dataModelPtr->SetData("ProductId", productId);
 
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
@@ -73,9 +72,15 @@ imtbase::CTreeItemModel* CRoleControllerComp::GetObject(const imtgql::CGqlReques
 			dataModelPtr->SetData("Description", roleDescription);
 
 			QByteArrayList parentsRolesIds = roleInfoPtr->GetIncludedRoles();
+
+			std::sort(parentsRolesIds.begin(), parentsRolesIds.end());
+
 			dataModelPtr->SetData("ParentRoles", parentsRolesIds.join(';'));
 
 			imtauth::IRole::FeatureIds permissions = roleInfoPtr->GetLocalPermissions();
+
+			std::sort(permissions.begin(), permissions.end());
+
 			dataModelPtr->SetData("Permissions", permissions.join(';'));
 		}
 	}

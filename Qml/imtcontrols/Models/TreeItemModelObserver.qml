@@ -17,14 +17,19 @@ QtObject {
         console.log("PreferenceObserver registerModel", model);
 
         container.observedModel = model;
-        container.private_.beginModel.Copy(container.observedModel);
+
+        container.private_.beginModel = model.CopyMe();
+//        container.private_.beginModel.Copy(container.observedModel);
     }
 
     function observedModelDataChanged(){
         console.log("observedModelDataChanged");
         let changeList = compare(container.private_.beginModel, container.observedModel);
         container.modelChanged(changeList);
-        container.private_.beginModel.Copy(container.observedModel);
+
+        container.private_.beginModel = container.observedModel.CopyMe();
+
+//        container.private_.beginModel.Copy(container.observedModel);
     }
 
     function compare(model1, model2){
@@ -56,6 +61,11 @@ QtObject {
                     else{
                         let value1 = String(model1.GetData(key, i));
                         let value2 = String(model2.GetData(key, i));
+
+                        console.log("value1", value1)
+                        console.log("value2", value2)
+
+                        console.log("value1 !== value2", value1 !== value2)
 
                         if (value1 !== value2){
                             console.log("value1 != value2")

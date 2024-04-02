@@ -166,6 +166,8 @@ Item {
             if (applyCachedLanguage){
                 let lang = application.languageProvider.getLanguage();
                 application.languageProvider.setLanguage(lang);
+
+                application.settingsUpdate();
             }
         }
 

@@ -43,14 +43,14 @@ Item {
         let documentTypeId = parameters["DocumentTypeId"];
         let viewTypeId = parameters["ViewTypeId"];
 
+        documentOpened(typeId, documentId ,documentTypeId);
+
         if (typeId in root.documentManagers){
             let documentManager = root.documentManagers[typeId];
             if (documentManager){
                 documentManager.openDocument(documentId, documentTypeId, viewTypeId);
             }
         }
-
-        documentOpened(typeId, documentId ,documentTypeId);
     }
 
     function saveDirtyDocuments(){

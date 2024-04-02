@@ -146,6 +146,8 @@ ViewBase {
             }
         }
 
+        parentRolesIds.sort();
+
         if (!parentRolesTable.elements){
             updateRolesModel();
         }
@@ -173,6 +175,8 @@ ViewBase {
             let id = parentRolesTable.elements.GetData("Id", index);
             selectedRoleIds.push(id);
         }
+
+        selectedRoleIds.sort();
 
         roleEditorContainer.model.SetData("ParentRoles", selectedRoleIds.join(';'));
 

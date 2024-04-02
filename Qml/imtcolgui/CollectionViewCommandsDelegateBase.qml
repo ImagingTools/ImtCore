@@ -6,7 +6,7 @@ import imtcolgui 1.0
 import imtcontrols 1.0
 
 ViewCommandsDelegateBase {
-    id: container;
+    id: collectionViewCommandsDelegate;
 
     property Item collectionView: null;
 
@@ -33,21 +33,21 @@ ViewCommandsDelegateBase {
     signal removed(string id);
 
     Component.onDestruction: {
-        if (container.collectionView){
-            Events.unSubscribeAllFromSlot(container.commandHandle);
+        if (collectionViewCommandsDelegate.collectionView){
+            Events.unSubscribeAllFromSlot(collectionViewCommandsDelegate.commandHandle);
         }
     }
 
     onCollectionViewChanged: {
         if (collectionView){
+            collectionConnections.target = collectionView;
             elementsConnections.target = collectionView.table;
             commandsControllerConn.target = collectionView.commandsController
 
-            //            collectionView.selectionChanged.connect(internal.onSelectionChanged);
             if (collectionView.commandsController){
 //                collectionView.commandsController.commandsModelChanged.connect(internal.onCommandsModelChanged);
 
-//                container.setupContextMenu();
+//                collectionViewCommandsDelegate.setupContextMenu();
             }
         }
     }
@@ -56,15 +56,15 @@ ViewCommandsDelegateBase {
         id: commandsControllerConn;
 
         function onCommandsModelChanged(){
-            container.setupContextMenu();
+            collectionViewCommandsDelegate.setupContextMenu();
         }
     }
 
     Connections {
-        target: container.collectionView;
+        id: collectionConnections;
 
         function onSelectionChanged(selection){
-            container.updateItemSelection(selection);
+            collectionViewCommandsDelegate.updateItemSelection(selection);
         }
     }
 
@@ -72,11 +72,11 @@ ViewCommandsDelegateBase {
         id: internal;
 
         function onSelectionChanged(selection){
-            container.updateItemSelection(selection);
+            collectionViewCommandsDelegate.updateItemSelection(selection);
         }
 
         function onCommandsModelChanged(){
-            container.setupContextMenu();
+            collectionViewCommandsDelegate.setupContextMenu();
         }
     }
 
@@ -84,19 +84,19 @@ ViewCommandsDelegateBase {
         id: elementsConnections;
 
         function onElementsChanged(){
-            let indexes = container.collectionView.table.getSelectedIndexes();
-            container.updateItemSelection(indexes);
+            let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
+            collectionViewCommandsDelegate.updateItemSelection(indexes);
         }
     }
 
     function getContextMenuModel(){
-        return container.contextMenuModel;
+        return collectionViewCommandsDelegate.contextMenuModel;
     }
 
     function updateItemSelection(selectedItems){
-        if (container.collectionView && container.collectionView.commandsController){
+        if (collectionViewCommandsDelegate.collectionView && collectionViewCommandsDelegate.collectionView.commandsController){
             let isEnabled = selectedItems.length > 0;
-            let commandsController = container.collectionView.commandsController;
+            let commandsController = collectionViewCommandsDelegate.collectionView.commandsController;
             if(commandsController){
                 commandsController.setCommandIsEnabled("Remove", isEnabled);
                 commandsController.setCommandIsEnabled("Edit", isEnabled);
@@ -108,42 +108,42 @@ ViewCommandsDelegateBase {
         console.log("setupContextMenu", collectionView);
         let commandsController = collectionView.commandsController;
         if (commandsController){
-            container.contextMenuModel.Clear();
+            collectionViewCommandsDelegate.contextMenuModel.Clear();
 
             let canEdit = commandsController.commandExists("Edit");
             let canRemove = commandsController.commandExists("Remove");
 
             if (canEdit){
-                let index = container.contextMenuModel.InsertNewItem();
+                let index = collectionViewCommandsDelegate.contextMenuModel.InsertNewItem();
 
-                container.contextMenuModel.SetData("Id", "Edit", index);
-                container.contextMenuModel.SetData("Name", qsTr("Edit"), index);
-                container.contextMenuModel.SetData("Icon", "Icons/Edit", index);
+                collectionViewCommandsDelegate.contextMenuModel.SetData("Id", "Edit", index);
+                collectionViewCommandsDelegate.contextMenuModel.SetData("Name", qsTr("Edit"), index);
+                collectionViewCommandsDelegate.contextMenuModel.SetData("Icon", "Icons/Edit", index);
             }
 
             if (canRemove){
-                let index = container.contextMenuModel.InsertNewItem();
+                let index = collectionViewCommandsDelegate.contextMenuModel.InsertNewItem();
 
-                container.contextMenuModel.SetData("Id", "Remove", index);
-                container.contextMenuModel.SetData("Name", qsTr("Remove"), index);
-                container.contextMenuModel.SetData("Icon", "Icons/Delete", index);
+                collectionViewCommandsDelegate.contextMenuModel.SetData("Id", "Remove", index);
+                collectionViewCommandsDelegate.contextMenuModel.SetData("Name", qsTr("Remove"), index);
+                collectionViewCommandsDelegate.contextMenuModel.SetData("Icon", "Icons/Delete", index);
             }
 
             if (canEdit){
-                let index = container.contextMenuModel.InsertNewItem();
+                let index = collectionViewCommandsDelegate.contextMenuModel.InsertNewItem();
 
-                container.contextMenuModel.SetData("Id", "Rename", index);
-                container.contextMenuModel.SetData("Name", qsTr("Rename"), index);
-                container.contextMenuModel.SetData("Icon", "", index);
+                collectionViewCommandsDelegate.contextMenuModel.SetData("Id", "Rename", index);
+                collectionViewCommandsDelegate.contextMenuModel.SetData("Name", qsTr("Rename"), index);
+                collectionViewCommandsDelegate.contextMenuModel.SetData("Icon", "", index);
 
-                index = container.contextMenuModel.InsertNewItem();
+                index = collectionViewCommandsDelegate.contextMenuModel.InsertNewItem();
 
-                container.contextMenuModel.SetData("Id", "SetDescription", index);
-                container.contextMenuModel.SetData("Name", qsTr("Set Description"), index);
-                container.contextMenuModel.SetData("Icon", "", index);
+                collectionViewCommandsDelegate.contextMenuModel.SetData("Id", "SetDescription", index);
+                collectionViewCommandsDelegate.contextMenuModel.SetData("Name", qsTr("Set Description"), index);
+                collectionViewCommandsDelegate.contextMenuModel.SetData("Icon", "", index);
             }
 
-            container.contextMenuModel.Refresh();
+            collectionViewCommandsDelegate.contextMenuModel.Refresh();
         }
     }
 
@@ -157,22 +157,22 @@ ViewCommandsDelegateBase {
     function onNew(){}
 
     function onRename(){
-        let indexes = container.collectionView.table.getSelectedIndexes();
+        let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
         if (indexes.length > 0){
-            let selectedName = container.collectionView.table.elements.GetData("Name", indexes[0]);
+            let selectedName = collectionViewCommandsDelegate.collectionView.table.elements.GetData("Name", indexes[0]);
             modalDialogManager.openDialog(renameDialog, {"message": qsTr("Please enter the name of the document:"), "inputValue": selectedName});
         }
     }
 
     function onSetDescription(){
-        let elements = container.collectionView.table.elements;
+        let elements = collectionViewCommandsDelegate.collectionView.table.elements;
 
-        let indexes = container.collectionView.table.getSelectedIndexes();
+        let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
         if (indexes.length > 0){
             let selectedDescription = "";
 
-            if (elements.ContainsKey(container.descriptionFieldId, indexes[0])){
-                selectedDescription = elements.GetData(container.descriptionFieldId, indexes[0]);
+            if (elements.ContainsKey(collectionViewCommandsDelegate.descriptionFieldId, indexes[0])){
+                selectedDescription = elements.GetData(collectionViewCommandsDelegate.descriptionFieldId, indexes[0]);
             }
 
             modalDialogManager.openDialog(setDescriptionDialog, {"message": qsTr("Please enter the description of the document:"), "inputValue": selectedDescription});
@@ -180,11 +180,11 @@ ViewCommandsDelegateBase {
     }
 
     function commandHandle(commandId){
-        if (!container.collectionView){
+        if (!collectionViewCommandsDelegate.collectionView){
             return;
         }
 
-        let commandsController = container.collectionView.commandsController;
+        let commandsController = collectionViewCommandsDelegate.collectionView.commandsController;
         if (!commandsController){
             return;
         }
@@ -192,27 +192,27 @@ ViewCommandsDelegateBase {
         let commandIsEnabled = commandsController.commandIsEnabled(commandId);
         if (commandIsEnabled){
             if (commandId === "New"){
-                container.onNew();
+                collectionViewCommandsDelegate.onNew();
             }
             else if (commandId === "Remove"){
-                container.onRemove();
+                collectionViewCommandsDelegate.onRemove();
             }
             else if (commandId === "Edit"){
-                container.onEdit();
+                collectionViewCommandsDelegate.onEdit();
             }
         }
 
         let editIsEnabled = commandsController.commandIsEnabled("Edit");
         if (editIsEnabled){
             if (commandId === "Rename"){
-                container.onRename();
+                collectionViewCommandsDelegate.onRename();
             }
             else if (commandId === "SetDescription"){
-                container.onSetDescription();
+                collectionViewCommandsDelegate.onSetDescription();
             }
         }
 
-        container.commandActivated(commandId);
+        collectionViewCommandsDelegate.commandActivated(commandId);
     }
 
     Component {
@@ -227,10 +227,10 @@ ViewCommandsDelegateBase {
             title: qsTr("Set Description");
             onFinished: {
                 if (buttonId == Enums.ok){
-                    let indexes = container.collectionView.table.getSelectedIndexes();
+                    let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
                     if (indexes.length >= 0){
                         let index = indexes[0];
-                        container.collectionView.setElementDescription(index, inputValue)
+                        collectionViewCommandsDelegate.collectionView.setElementDescription(index, inputValue)
                     }
                 }
             }
@@ -243,10 +243,10 @@ ViewCommandsDelegateBase {
             title: qsTr("Rename Document");
             onFinished: {
                 if (buttonId == Enums.ok){
-                    let indexes = container.collectionView.table.getSelectedIndexes();
+                    let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
                     if (indexes.length >= 0){
                         let index = indexes[0];
-                        container.collectionView.setElementName(index, inputValue)
+                        collectionViewCommandsDelegate.collectionView.setElementName(index, inputValue)
                     }
                 }
             }
@@ -261,10 +261,10 @@ ViewCommandsDelegateBase {
             onFinished: {
                 console.log("removeDialog onFinished", buttonId);
                 if (buttonId == Enums.yes){
-                    let indexes = container.collectionView.table.getSelectedIndexes();
+                    let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
                     if (indexes.length >= 0){
                         let index = indexes[0];
-                        container.collectionView.removeElement(index)
+                        collectionViewCommandsDelegate.collectionView.removeElement(index)
                     }
                 }
             }

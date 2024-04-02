@@ -4,31 +4,24 @@ import imtcontrols 1.0
 
 Row {
     id: dataList;
+
     property alias model: repeater.model
     property TableRowDelegateBase rowDelegate: null;
     property bool compl: false;
 
     Repeater {
         id: repeater
-        // orientation: ListView.Horizontal;
-
-        // boundsBehavior: Flickable.StopAtBounds;
-
-        // property TableBase table: null;
-
-
-
 
         Component.onCompleted: {
             dataList.compl = true;
         }
 
-        //    delegate: table.columnContentComps[model.index];
-
         delegate: Item {
             id: cell
+
             property bool compl: false;
             property bool complCompl: dataList.compl && dataList.rowDelegate.table.columnCount;
+
             width: 20
             height: dataList.rowDelegate ? dataList.rowDelegate.height : 0;
 
@@ -41,13 +34,12 @@ Row {
                     loader.sourceComponent = dataList.rowDelegate.table.columnContentComps[model.index] !== null ?
                                 dataList.rowDelegate.table.columnContentComps[model.index] : dataList.rowDelegate.table.cellDelegate;
 
-                    table.widthRecalc.connect(cell.setCellWidth)
+                    dataList.rowDelegate.table.widthRecalc.connect(cell.setCellWidth)
                     cell.setCellWidth();
                 }
             }
 
             function setCellWidth(){
-
                 if(!cell.complCompl){
                     return;
                 }
@@ -78,25 +70,6 @@ Row {
                 }
             }
         }
-
-        //    delegate: Component {
-        //        Item {
-        //            width: rowDelegate.table.width / rowDelegate.table.columnCount;
-        //            height: parent.height;
-
-        //            Text {
-        //                id: contentText;
-
-        //                width: parent.width;
-        //            }
-
-        //            Component.onCompleted: {
-        //                let headerId = rowDelegate.table.headers.GetData("Id", model.index);
-        //                let text = rowDelegate.table.elements.GetData(headerId, rowDelegate.rowIndex);
-        //                contentText.text = text;
-        //            }
-        //        }
-        //    }
     }
 }
 

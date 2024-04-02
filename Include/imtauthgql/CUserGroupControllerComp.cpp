@@ -63,12 +63,18 @@ imtbase::CTreeItemModel* CUserGroupControllerComp::GetObject(const imtgql::CGqlR
 				dataModel->SetData("Description", description);
 
 				imtauth::IUserGroupInfo::UserIds userGroupIds = userGroupInfoPtr->GetUsers();
+				std::sort(userGroupIds.begin(), userGroupIds.end());
+
 				dataModel->SetData("Users", userGroupIds.join(';'));
 
 				imtauth::IUserGroupInfo::RoleIds roleIds = userGroupInfoPtr->GetRoles(productId);
+				std::sort(roleIds.begin(), roleIds.end());
+
 				dataModel->SetData("Roles", roleIds.join(';'));
 
 				imtauth::IUserGroupInfo::GroupIds groupIds = userGroupInfoPtr->GetParentGroups();
+				std::sort(groupIds.begin(), groupIds.end());
+
 				dataModel->SetData("ParentGroups", groupIds.join(';'));
 			}
 		}

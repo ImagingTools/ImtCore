@@ -29,7 +29,7 @@
         <file alias="imtcontrols/Buttons/ToolButtonDecorator.qml">Buttons/ToolButtonDecorator.qml</file>
         <file alias="imtcontrols/Buttons/TopButtonDecorator.qml">Buttons/TopButtonDecorator.qml</file>
         <file alias="imtcontrols/Buttons/TopButtonDecoratorNew.qml">Buttons/TopButtonDecoratorNew.qml</file>
-	<file alias="imtcontrols/Buttons/IconButtonDecorator.qml">Buttons/IconButtonDecorator.qml</file>
+        <file alias="imtcontrols/Buttons/IconButtonDecorator.qml">Buttons/IconButtonDecorator.qml</file>
         <file alias="imtcontrols/Dialogs/DialogButtons.qml">Dialogs/DialogButtons.qml</file>
         <file alias="imtcontrols/Dialogs/Dialog.qml">Dialogs/Dialog.qml</file>
         <file alias="imtcontrols/Dialogs/TopPanelDialog.qml">Dialogs/TopPanelDialog.qml</file>
@@ -78,7 +78,6 @@
         <file alias="imtcontrols/Models/UuidGenerator.qml">Models/UuidGenerator.qml</file>
         <file alias="imtcontrols/Models/CommandsController.qml">Models/CommandsController.qml</file>
         <file alias="imtcontrols/Models/CommandsProvider.qml">Models/CommandsProvider.qml</file>
-        <file alias="imtcontrols/Models/TransactionableTreeItemModel.qml">Models/TransactionableTreeItemModel.qml</file>
         <file alias="imtcontrols/Views/TableRowViewer.qml">Views/TableRowViewer.qml</file>
         <file alias="imtcontrols/Views/TableRowDelegateBase.qml">Views/TableRowDelegateBase.qml</file>
         <file alias="imtcontrols/Views/SimpleTableDelegate.qml">Views/SimpleTableDelegate.qml</file>

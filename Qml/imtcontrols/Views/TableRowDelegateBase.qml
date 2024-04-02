@@ -93,6 +93,21 @@ Rectangle {
         }
     }
 
+    onDoubleClicked: {
+        if (table){
+            table.doubleClicked(model.Id, model.index)
+        }
+    }
+
+    onRightButtonMouseClicked: {
+        console.log("onRightButtonMouseClicked")
+        var point = mapToItem(null, mX, mY);
+
+        if (table){
+            table.rightButtonMouseClicked(point.x, point.y);
+        }
+    }
+
     // onHeadersChanged: {
     //     tableDelegateContainer.columnCount = tableDelegateContainer.headers.GetItemsCount();
     //     setCellHeightModelDefault();
@@ -110,7 +125,6 @@ Rectangle {
                 pauseHeight.start();
             }
         }
-
     }
 
     onColumnCountChanged: {
@@ -232,9 +246,6 @@ Rectangle {
         id: heightModel;
     }
 
-
-
-
     Rectangle{
         id: alternatingRect;
 
@@ -300,8 +311,9 @@ Rectangle {
     }
 
     Component{
+        id: checkBox;
+
         CheckBox {
-            id: checkBox;
 
             z: 1000;
 

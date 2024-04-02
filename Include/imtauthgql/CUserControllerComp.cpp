@@ -91,19 +91,24 @@ imtbase::CTreeItemModel* CUserControllerComp::GetObject(
 				QString name = userInfoPtr->GetName();
 				QByteArray passwordHash = userInfoPtr->GetPasswordHash();
 				QString mail = userInfoPtr->GetMail();
-				QByteArray roles = userInfoPtr->GetRoles(productId).join(';');
-				QByteArray groups = userInfoPtr->GetGroups().join(';');
+
+				QByteArrayList roleList = userInfoPtr->GetRoles(productId);
+				std::sort(roleList.begin(), roleList.end());
+
+				QByteArrayList groupList = userInfoPtr->GetGroups();
+				std::sort(groupList.begin(), groupList.end());
 
 				dataModel->SetData("Id", objectUuid);
 				dataModel->SetData("Username", username);
 				dataModel->SetData("Name", name);
 				dataModel->SetData("Password", passwordHash);
 				dataModel->SetData("Email", mail);
-				dataModel->SetData("Groups", groups);
-				dataModel->SetData("Roles", roles);
+				dataModel->SetData("Groups", groupList.join(';'));
+				dataModel->SetData("Roles", roleList.join(';'));
 
 				if (allFields.contains("Permissions")){
 					QByteArray permissions = userInfoPtr->GetPermissions(productId).join(';');
+					std::sort(permissions.begin(), permissions.end());
 					dataModel->SetData("Permissions", permissions);
 				}
 			}

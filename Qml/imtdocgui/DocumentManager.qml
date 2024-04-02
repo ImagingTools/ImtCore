@@ -552,7 +552,23 @@ Item {
             property string documentTypeId;
             property DocumentDataController documentDataController: DocumentDataController {};
             property DocumentValidator documentValidator: DocumentValidator {};
+
+            property TreeItemModelObserver treeItemModelObserver: TreeItemModelObserver {
+                onModelChanged: {
+                    let wasChanges = changeList.length > 0;
+
+                    singleDocumentData.isDirty = wasChanges;
+
+                    if (wasChanges){
+                        singleDocumentData.undoManager.onDataChanged();
+                    }
+
+                    console.log("Document model changed: ", JSON.stringify(changeList));
+                }
+            }
             property UndoRedoManager undoManager: UndoRedoManager {
+                autoTracking: false;
+
                 onUndo: {
                     singleDocumentData.checkDocumentModel();
                 }
@@ -616,6 +632,8 @@ Item {
 
                     let documentModel = singleDocumentData.documentDataController.documentModel;
 
+                    singleDocumentData.treeItemModelObserver.registerModel(documentModel);
+
                     if (documentModel.ContainsKey("Id")){
                         singleDocumentData.documentId = documentModel.GetData("Id");
                     }
@@ -636,8 +654,6 @@ Item {
                     singleDocumentData.blockingUpdateModel = false;
 
                     documentManager.updateDocumentTitle(singleDocumentData.documentIndex);
-
-                    //                    documentModel.dataChanged.connect(singleDocumentData.modelConnections.onDataChanged);
 
                     if (singleDocumentData.undoManager.modelIsRegistered()){
                         singleDocumentData.undoManager.unregisterModel();
@@ -663,9 +679,9 @@ Item {
                         return;
                     }
 
-                    console.log("documentModel", singleDocumentData.documentDataController.documentModel.toJSON());
+                    singleDocumentData.treeItemModelObserver.observedModelDataChanged();
 
-                    singleDocumentData.isDirty = true;
+//                    singleDocumentData.isDirty = true;
                 }
             }
 

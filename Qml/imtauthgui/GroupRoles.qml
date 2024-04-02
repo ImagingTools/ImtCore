@@ -53,6 +53,8 @@ ViewBase {
             selectedRoleIds.push(id);
         }
 
+        selectedRoleIds.sort();
+
         let result = selectedRoleIds.join(';');
         groupRolesContainer.model.SetData("Roles", result);
     }
@@ -63,28 +65,6 @@ ViewBase {
             property Item rootItem: null;
         }
     }
-
-//    CollectionDataProvider {
-//        id: rolesProvider;
-
-//        commandId: "Roles";
-
-//        fields: ["Id", "Name"];
-//        property bool compl: false;
-
-//        onModelUpdated: {
-//            if (rolesProvider.collectionModel != null){
-//                if (rolesProvider.collectionModel.ContainsKey("Roles")){
-//                    let rolesModel = rolesProvider.collectionModel.GetData("Roles");
-//                    rolesTable.elements = rolesModel;
-
-//                    compl = true;
-
-//                    groupRolesContainer.doUpdateGui();
-//                }
-//            }
-//        }
-//    }
 
     Rectangle {
         id: background;

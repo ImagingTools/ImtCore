@@ -16,7 +16,7 @@ void CClientUserContextComp::SetLanguage(QString translation)
 {
 	if (m_translationManagerCompPtr.IsValid()){
 		if (!translation.isEmpty()){
-			int languageIndex = languageIndex = iprm::FindOptionIndexById(translation.toUtf8(), m_translationManagerCompPtr->GetLanguagesInfo());
+			int languageIndex = iprm::FindOptionIndexById(translation.toUtf8(), m_translationManagerCompPtr->GetLanguagesInfo());
 			if (languageIndex >= 0){
 				m_translationManagerCompPtr->SwitchLanguage(languageIndex);
 

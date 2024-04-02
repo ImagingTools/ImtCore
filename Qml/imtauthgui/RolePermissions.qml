@@ -43,6 +43,8 @@ ViewBase {
             }
         }
 
+        selectedPermissionsIds.sort();
+
         permissionsTable.uncheckAll();
 
         let itemsList = permissionsTable.getItemsDataAsList();
@@ -73,6 +75,8 @@ ViewBase {
                 selectedPermissionIds.push(id)
             }
         }
+
+        selectedPermissionIds.sort();
 
         let permissions = rolePermissionsContainer.model.GetData("Permissions");
         rolePermissionsContainer.model.SetData("Permissions", selectedPermissionIds.join(';'));

@@ -4,6 +4,8 @@ import Acf 1.0;
 Item {
     id: undoRedoManager;
 
+    property bool autoTracking: true; // automatic tracking of model changes
+
     signal modelChanged();
     signal undo();
     signal redo();
@@ -61,7 +63,6 @@ Item {
         internal.m_isBlocked = false;
 
         modelChanged();
-//        doListShift(steps, internal.m_undoStack, internal.m_redoStack);
 
         undo();
     }
@@ -83,7 +84,6 @@ Item {
         internal.m_isBlocked = false;
 
         modelChanged();
-//        doListShift(steps, internal.m_redoStack, internal.m_undoStack);
 
         redo();
     }
@@ -131,7 +131,9 @@ Item {
 
         internal.m_observedModel = model;
 
-        internal.m_observedModel.dataChanged.connect(onDataChanged);
+        if (autoTracking){
+            internal.m_observedModel.dataChanged.connect(onDataChanged);
+        }
 
         setStandardModel(model);
     }
@@ -139,7 +141,9 @@ Item {
 
     function unregisterModel()
     {
-        internal.m_observedModel.dataChanged.disconnect(onDataChanged);
+        if (autoTracking){
+            internal.m_observedModel.dataChanged.disconnect(onDataChanged);
+        }
 
         internal.m_observedModel = null;
         resetUndo();

@@ -417,7 +417,7 @@ ViewBase {
                     hoverEnabled: true;
                 }
 
-                AuxTable {
+                Table {
                     id: groupsTable;
 
                     width: parent.width;

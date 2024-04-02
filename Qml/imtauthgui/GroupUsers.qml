@@ -55,6 +55,8 @@ ViewBase {
             selectedUserIds.push(id);
         }
 
+        selectedUserIds.sort()
+
         let result = selectedUserIds.join(';');
         groupUsersContainer.model.SetData("Users", result);
     }
