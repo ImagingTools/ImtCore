@@ -75,11 +75,14 @@ JSONListModel {
         if (modelObject === null)
             console.log("modelObject is null")
 
-        modelObject[key] = value
+        if(modelObject[key] !== value){
+            modelObject[key] = value
 
-        if (isUpdateEnabled){
-            this.dataChanged(row, row+1)
+            if (isUpdateEnabled){
+                this.dataChanged(row, row+1)
+            }
         }
+
 
         return true
     }
@@ -159,7 +162,7 @@ JSONListModel {
             for(let index = 0; index < externTreeModel.GetItemsCount(); index++){
                 InsertNewItem(index)
 
-                let keys = externTreeModel.GetKeys(externIndex)
+                let keys = externTreeModel.GetKeys(index)
 
                 for(let key of keys){
                     let value = externTreeModel.GetData(key, index)
