@@ -166,6 +166,7 @@ class QObject extends ComplexObject {
 
     destroy(){
         delete UIDList[this.UID]
+        delete this.UID
 
         if(this.$signals['Component.destruction']) this.$signals['Component.destruction']()
 

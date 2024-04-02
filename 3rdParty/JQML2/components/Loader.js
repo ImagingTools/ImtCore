@@ -118,6 +118,10 @@ class Loader extends Item {
             }
 
             item.$complete()
+            if(!this.UID){
+                item.destroy()
+                return
+            }
             this.getStatement('item').reset(item)
 
             if(this.getPropertyValue('item')){
@@ -234,6 +238,10 @@ class Loader extends Item {
             }
 
             item.$complete()
+            if(!this.UID){
+                item.destroy()
+                return
+            }
             this.getStatement('item').reset(item)
 
             if(this.getPropertyValue('item')){
@@ -247,6 +255,12 @@ class Loader extends Item {
             this.getStatement('item').reset(undefined)  
             this.getStatement('status').reset(Loader.Null)
         }
+    }
+
+    destroy(){
+        if(this.getPropertyValue('item')) this.getPropertyValue('item').destroy()
+
+        super.destroy()
     }
 }
 
