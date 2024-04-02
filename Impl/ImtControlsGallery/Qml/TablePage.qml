@@ -28,7 +28,7 @@ Rectangle {
             }
 
             tableDataModel.compl = true;
-            tablePage.items = tableDataModel;
+            // tablePage.items = tableDataModel;
         }
 
     }
@@ -69,13 +69,15 @@ Rectangle {
             tableHeaderModel.compl = true;
             table.headers = tableHeaderModel;
             tableDecor.headers = tableHeaderModel;
+            tableDecor.tableDecorator = decorModel;
+            tablePage.items = tableDataModel;
         }
 
     }
 
 
 
-    AuxTable{
+    Table{
         id: table;
 
         anchors.top: parent.top;
@@ -84,7 +86,7 @@ Rectangle {
         anchors.leftMargin: Style.size_mainMargin;
         anchors.right: parent.right;
         anchors.rightMargin: Style.size_mainMargin;
-        height: 400;
+        height: 300;
         itemHeight: 50;
         headerHeight: 50;
         visibleLeftBorderFirst: false;
@@ -107,7 +109,7 @@ Rectangle {
 
     }
 
-    AuxTable{
+    Table{
         id: tableDecor;
 
         anchors.top: table.bottom;
@@ -128,6 +130,10 @@ Rectangle {
         enableAlternating : false;
         canMoveColumns: true;
         elements: tablePage.items;
+
+        // delegate: TableRowDelegateBase{
+
+        // }
 
         onSelectedIndexChanged: {
         }
@@ -177,7 +183,7 @@ Rectangle {
                 headers.SetData("LeftTopRound",true,0)
                 headers.SetData("RightTopRound",true,tableHeaderModel.GetItemsCount()-1)
 
-                tableDecor.tableDecorator = decorModel;
+                // tableDecor.tableDecorator = decorModel;
 
             }
         }

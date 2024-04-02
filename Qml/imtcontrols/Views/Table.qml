@@ -1,0 +1,13 @@
+import QtQuick 2.12
+import Acf 1.0
+import imtcontrols 1.0
+
+TableBase {
+    id: tableContainer;
+    rowDelegate: TableRowDelegate {
+        table: tableContainer
+        width: tableContainer.width
+        minHeight: tableContainer.itemHeight
+    }
+    cellDelegate: TableCellDelegateSimple {}
+}

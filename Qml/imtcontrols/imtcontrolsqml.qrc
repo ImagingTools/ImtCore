@@ -20,7 +20,6 @@
         <file alias="imtcontrols/Actions/ShortcutManager.qml">Actions/ShortcutManager.qml</file>
         <file alias="imtcontrols/Actions/MovingItem.qml">Actions/MovingItem.qml</file>
         <file alias="imtcontrols/Actions/ControlArea.qml">Actions/ControlArea.qml</file>
-        <file alias="imtcontrols/Buttons/AuxButton.qml">Buttons/AuxButton.qml</file>
         <file alias="imtcontrols/Buttons/Button.qml">Buttons/Button.qml</file>
         <file alias="imtcontrols/Buttons/TextButton.qml">Buttons/TextButton.qml</file>
         <file alias="imtcontrols/Buttons/ButtonDecorator.qml">Buttons/ButtonDecorator.qml</file>
@@ -80,7 +79,23 @@
         <file alias="imtcontrols/Models/CommandsController.qml">Models/CommandsController.qml</file>
         <file alias="imtcontrols/Models/CommandsProvider.qml">Models/CommandsProvider.qml</file>
         <file alias="imtcontrols/Models/TransactionableTreeItemModel.qml">Models/TransactionableTreeItemModel.qml</file>
+        <file alias="imtcontrols/Views/TableRowViewer.qml">Views/TableRowViewer.qml</file>
+        <file alias="imtcontrols/Views/TableRowDelegateBase.qml">Views/TableRowDelegateBase.qml</file>
+        <file alias="imtcontrols/Views/TableCheckedRowDelegate.qml">Views/TableCheckedRowDelegate.qml</file>
+        <file alias="imtcontrols/Views/SimpleTableDelegate.qml">Views/SimpleTableDelegate.qml</file>
+        <file alias="imtcontrols/Views/Table.qml">Views/Table.qml</file>
+        <file alias="imtcontrols/Views/TableBase.qml">Views/TableBase.qml</file>
         <file alias="imtcontrols/Views/AuxTable.qml">Views/AuxTable.qml</file>
+        <file alias="imtcontrols/Views/TableCellDelegate.qml">Views/TableCellDelegate.qml</file>
+		<file alias="imtcontrols/Views/TableCellDelegateBase.qml">Views/TableCellDelegateBase.qml</file>
+		<file alias="imtcontrols/Views/TableCellDelegateSimple.qml">Views/TableCellDelegateSimple.qml</file>
+		<file alias="imtcontrols/Views/TableCellText.qml">Views/TableCellText.qml</file>
+		<file alias="imtcontrols/Views/TableDelegate.qml">Views/TableDelegate.qml</file>
+        <file alias="imtcontrols/Views/TableRowDelegate.qml">Views/TableRowDelegate.qml</file>
+        <file alias="imtcontrols/Views/TableCheckedRowDelegate.qml">Views/TableCheckedRowDelegate.qml</file>
+        <file alias="imtcontrols/Views/TableProperties.qml">Views/TableProperties.qml</file>
+        <file alias="imtcontrols/Views/TableSelection.qml">Views/TableSelection.qml</file>
+
         <file alias="imtcontrols/Views/BarChart.qml">Views/BarChart.qml</file>
         <file alias="imtcontrols/Views/BasicTableView.qml">Views/BasicTableView.qml</file>
         <file alias="imtcontrols/Views/BasicTreeView.qml">Views/BasicTreeView.qml</file>
@@ -98,12 +113,6 @@
         <file alias="imtcontrols/Views/StackView.qml">Views/StackView.qml</file>
         <file alias="imtcontrols/Views/SubMenuPanelButtonDecorator.qml">Views/SubMenuPanelButtonDecorator.qml</file>
         <file alias="imtcontrols/Views/SwitchCustom.qml">Views/SwitchCustom.qml</file>
-        <file alias="imtcontrols/Views/TableCellDelegate.qml">Views/TableCellDelegate.qml</file>
-        <file alias="imtcontrols/Views/TableCellDelegateSimple.qml">Views/TableCellDelegateSimple.qml</file>
-        <file alias="imtcontrols/Views/TableDelegate.qml">Views/TableDelegate.qml</file>
-        <file alias="imtcontrols/Views/SimpleTableDelegate.qml">Views/SimpleTableDelegate.qml</file>
-        <file alias="imtcontrols/Views/TableProperties.qml">Views/TableProperties.qml</file>
-        <file alias="imtcontrols/Views/TableSelection.qml">Views/TableSelection.qml</file>
         <file alias="imtcontrols/Views/TreeItemDelegate.qml">Views/TreeItemDelegate.qml</file>
         <file alias="imtcontrols/Views/TreeViewGql.qml">Views/TreeViewGql.qml</file>
         <file alias="imtcontrols/Views/TreeViewModelAdapter.qml">Views/TreeViewModelAdapter.qml</file>
