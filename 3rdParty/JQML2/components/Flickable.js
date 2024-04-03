@@ -68,14 +68,14 @@ class Flickable extends Item {
 
 
     $contentWidthChanged(){
-        if(!isNaN(this.getStatement('contentWidth').get())) this.getStatement('contentItem').get().getStatement('width').set(this.getStatement('contentWidth').get())
+        this.getStatement('contentItem').get().getStatement('width').reset(this.getStatement('contentWidth').get())
         if(this.getPropertyValue('contentX') > this.getPropertyValue('contentWidth') - this.getPropertyValue('width')){
             this.getProperty('contentX').reset(this.getPropertyValue('contentWidth') - this.getPropertyValue('width'))
         }
     }
 
     $contentHeightChanged(){
-        if(!isNaN(this.getStatement('contentHeight').get())) this.getStatement('contentItem').get().getStatement('height').set(this.getStatement('contentHeight').get())
+        this.getStatement('contentItem').get().getStatement('height').reset(this.getStatement('contentHeight').get())
         if(this.getPropertyValue('contentY') > this.getPropertyValue('contentHeight') - this.getPropertyValue('height')){
             this.getProperty('contentY').reset(this.getPropertyValue('contentHeight') - this.getPropertyValue('height'))
         }
@@ -111,14 +111,14 @@ class Flickable extends Item {
                 this.getStatement('contentX').reset(this.getPropertyValue('contentX') + (x))
             } else {
                 if(this.getPropertyValue('contentX') + (x) <= 0) this.getStatement('contentX').reset(0)
-                if(this.getPropertyValue('contentX') + (x) >= this.getPropertyValue('contentItem').getPropertyValue('width')) this.getStatement('contentX').reset(this.getPropertyValue('contentItem').getPropertyValue('width') - this.getPropertyValue('width'))
+                if(this.getPropertyValue('contentX') + (x) >= this.getPropertyValue('contentItem').getPropertyValue('width') - this.getPropertyValue('width')) this.getStatement('contentX').reset(this.getPropertyValue('contentItem').getPropertyValue('width') - this.getPropertyValue('width'))
             }
 
             if(this.getPropertyValue('contentY') + (y) > 0 && this.getPropertyValue('contentY') + (y) < this.getPropertyValue('contentItem').getPropertyValue('height') - this.getPropertyValue('height')){
                 this.getStatement('contentY').reset(this.getPropertyValue('contentY') + (y))
             } else {
                 if(this.getPropertyValue('contentY') + (y) <= 0) this.getStatement('contentY').reset(0)
-                if(this.getPropertyValue('contentY') + (y) >= this.getPropertyValue('contentItem').getPropertyValue('height')) this.getStatement('contentY').reset(this.getPropertyValue('contentItem').getPropertyValue('height') - this.getPropertyValue('height'))
+                if(this.getPropertyValue('contentY') + (y) >= this.getPropertyValue('contentItem').getPropertyValue('height') - this.getPropertyValue('height')) this.getStatement('contentY').reset(this.getPropertyValue('contentItem').getPropertyValue('height') - this.getPropertyValue('height'))
             }
             this.$mouseX = x
             this.$mouseY = y
@@ -133,7 +133,7 @@ class Flickable extends Item {
                 this.getStatement('contentX').reset(this.getPropertyValue('contentX') + (deltaX))
             } else {
                 if(this.getPropertyValue('contentX') + (deltaX) <= 0) this.getStatement('contentX').reset(0)
-                if(this.getPropertyValue('contentX') + (deltaX) >= this.getPropertyValue('contentItem').getPropertyValue('width')) this.getStatement('contentX').reset(this.getPropertyValue('contentItem').getPropertyValue('width') - this.getPropertyValue('width'))
+                if(this.getPropertyValue('contentX') + (deltaX) >= this.getPropertyValue('contentItem').getPropertyValue('width') - this.getPropertyValue('width')) this.getStatement('contentX').reset(this.getPropertyValue('contentItem').getPropertyValue('width') - this.getPropertyValue('width'))
             }
 
             if(this.getPropertyValue('contentY') + (deltaY) > 0 && this.getPropertyValue('contentY') + (deltaY) < this.getPropertyValue('contentItem').getPropertyValue('height') - this.getPropertyValue('height')){
@@ -141,7 +141,7 @@ class Flickable extends Item {
                 return false
             } else {
                 if(this.getPropertyValue('contentY') + (deltaY) <= 0) this.getStatement('contentY').reset(0)
-                if(this.getPropertyValue('contentY') + (deltaY) >= this.getPropertyValue('contentItem').getPropertyValue('height')) this.getStatement('contentY').reset(this.getPropertyValue('contentItem').getPropertyValue('height') - this.getPropertyValue('height'))
+                if(this.getPropertyValue('contentY') + (deltaY) >= this.getPropertyValue('contentItem').getPropertyValue('height') - this.getPropertyValue('height')) this.getStatement('contentY').reset(this.getPropertyValue('contentItem').getPropertyValue('height') - this.getPropertyValue('height'))
                 return true
             }
         } else {

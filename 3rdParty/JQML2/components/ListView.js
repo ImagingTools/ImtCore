@@ -526,12 +526,12 @@ class ListView extends Flickable {
 
     $contentXChanged(){
         this.getStatement('contentItem').get().getStatement('x').reset(-this.getStatement('contentX').get())
-        this.updateView()
+        this.$modelDataUpdate()
     }
 
     $contentYChanged(){
         this.getStatement('contentItem').get().getStatement('y').reset(-this.getStatement('contentY').get())
-        this.updateView()
+        this.$modelDataUpdate()
     }
 
     // $contentXChanged(){
@@ -558,15 +558,15 @@ class ListView extends Flickable {
     $widthChanged(){
         super.$widthChanged()
         if(this.getPropertyValue('orientation') === ListView.Vertical) this.getProperty('contentWidth').reset(this.getPropertyValue('width'))
-        this.updateView()
+        this.$modelDataUpdate()
     }
     $heightChanged(){
         super.$heightChanged()
         if(this.getPropertyValue('orientation') === ListView.Horizontal) this.getProperty('contentHeight').reset(this.getPropertyValue('height'))
-        this.updateView()
+        this.$modelDataUpdate()
     }
     $cacheBufferChanged(){
-        this.updateView()
+        this.$modelDataUpdate()
     }
     createElement(index){
         if(this.$items[index]) return this.$items[index]
