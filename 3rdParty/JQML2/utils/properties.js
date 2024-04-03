@@ -953,12 +953,17 @@ class QModelData {
         this.index = new QInt(index)
 
         Object.assign(this, typeof data === 'object' ? data : {})
+        let lock = false
 
         return new Proxy(this, {
             has(target, name){
                 return true
             },
             get(target, name){
+                if(name === '$lock'){
+                    return lock
+                }
+
                 let caller = global.queueLink[global.queueLink.length-1]
                 if(caller) {
                     if(!(target[name] instanceof QProperty)) target[name] = new QVar(target[name])
@@ -967,15 +972,20 @@ class QModelData {
                 return target[name] instanceof QProperty ? target[name].get() : target[name]
             },
             set(target, name, value){
+                if(name === '$lock'){
+                    lock = value
+                    return true
+                }
+
                 if(target[name] instanceof QProperty){
                     if(target[name].value !== value){
                         target[name].reset(value)
-                        if(name !== 'index' && model.isUpdateEnabled) model.getProperty('data').getNotify()()
+                        if(name !== 'index' && model.isUpdateEnabled && !lock) model.getProperty('data').getNotify()()
                     }
                 } else {
                     if(target[name] !== value){
                         target[name] = value
-                        if(name !== 'index' && model.isUpdateEnabled) model.getProperty('data').getNotify()()
+                        if(name !== 'index' && model.isUpdateEnabled && !lock) model.getProperty('data').getNotify()()
                     } 
                 }
                 
