@@ -27,9 +27,11 @@ DecoratorBase {
 
     onContentCenteredChanged: {
         if (contentCentered){
+            content.anchors.left = undefined;
             content.anchors.horizontalCenter = commonButtonDecorator.horizontalCenter;
         }
         else{
+            content.anchors.horizontalCenter = undefined;
             content.anchors.left = commonButtonDecorator.left;
             content.anchors.leftMargin = Style.size_mainMargin;
         }
