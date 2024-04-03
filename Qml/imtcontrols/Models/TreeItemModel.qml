@@ -48,7 +48,13 @@ JSONListModel {
         if(typeof retVal === 'object' && !(retVal instanceof QtObject)){
             var retModel
             retModel = this.createComponent("imtqml/TreeItemModel.qml", this);
-            modelObject[key] = retModel
+            if(typeof modelObject === 'object' && modelObject.constructor.name === 'QModelData'){
+                modelObject.$lock = true
+                modelObject[key] = retModel
+                modelObject.$lock = false
+            } else {
+                modelObject[key] = retModel
+            }
             retModel.isUpdateEnabled = this.isUpdateEnabled
             retModel.getProperty('isUpdateEnabled').setCompute(function(){return this.isUpdateEnabled}.bind(this))
             retModel.getProperty('isUpdateEnabled').update()
@@ -76,7 +82,13 @@ JSONListModel {
             console.log("modelObject is null")
 
         if(modelObject[key] !== value){
-            modelObject[key] = value
+            if(typeof modelObject === 'object' && modelObject.constructor.name === 'QModelData'){
+                modelObject.$lock = true
+                modelObject[key] = value
+                modelObject.$lock = false
+            } else {
+                modelObject[key] = value
+            }
 
             if (isUpdateEnabled){
                 this.dataChanged(row, row+1)
@@ -458,7 +470,13 @@ JSONListModel {
                 var retVal = modelObject[keys[index]]
                 if(retVal !== null && typeof retVal === 'object' && !(retVal instanceof QtObject)){
                     var retModel = this.createComponent("imtqml/TreeItemModel.qml", this);
-                    modelObject[keys[index]] = retModel
+                    if(typeof modelObject === 'object' && modelObject.constructor.name === 'QModelData'){
+                        modelObject.$lock = true
+                        modelObject[keys[index]] = retModel
+                        modelObject.$lock = false
+                    } else {
+                        modelObject[keys[index]] = retModel
+                    }
                     retModel.isUpdateEnabled = this.isUpdateEnabled
                     retModel.getProperty('isUpdateEnabled').setCompute(function(){return this.isUpdateEnabled}.bind(this))
                     retModel.getProperty('isUpdateEnabled').update()
