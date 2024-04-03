@@ -65,6 +65,7 @@ class TextEdit extends Item {
         this.$input.style.maxHeight = '100%'
         this.$input.style.height = '100%'
         this.$input.style.font = 'inherit'
+        this.$input.style.color = 'inherit'
         this.$input.style.zIndex = 'inherit'
         this.$input.style.resize = 'none'
         this.$input.style.cursor = 'defult'
@@ -171,18 +172,12 @@ class TextEdit extends Item {
     }
 
     $fontChanged(){
-        if(this.getPropertyValue('text')){
-            this.setStyle({
-                fontWeight: this.getProperty('font').getPropertyValue('bold') ? 'bold' : 'normal',
-                fontSize: `${this.getProperty('font').getPropertyValue('pixelSize')}px`,
-            })
-            
-        } else {
-            this.setStyle({
-                fontWeight: this.getProperty('font').getPropertyValue('bold') ? 'bold' : 'normal',
-                fontSize: `${this.getProperty('font').getPropertyValue('pixelSize')}px`,
-            })
-        }
+        this.setStyle({
+            fontWeight: this.getProperty('font').getPropertyValue('bold') ? 'bold' : 'normal',
+            fontSize: `${this.getProperty('font').getPropertyValue('pixelSize')}px`,
+            fontFamily: `${this.getProperty('font').getPropertyValue('family')}`,
+        })
+        
         this.applyMetrics()
     }
 

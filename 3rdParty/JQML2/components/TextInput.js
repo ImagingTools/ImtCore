@@ -178,18 +178,12 @@ class TextInput extends Item {
     }
 
     $fontChanged(){
-        if(this.getPropertyValue('text')){
-            this.setStyle({
-                fontWeight: this.getProperty('font').getPropertyValue('bold') ? 'bold' : 'normal',
-                fontSize: `${this.getProperty('font').getPropertyValue('pixelSize')}px`,
-            })
-            this.applyMetrics()
-        } else {
-            this.setStyle({
-                fontWeight: this.getProperty('font').getPropertyValue('bold') ? 'bold' : 'normal',
-                fontSize: `${this.getProperty('font').getPropertyValue('pixelSize')}px`,
-            })
-        }
+        this.setStyle({
+            fontWeight: this.getProperty('font').getPropertyValue('bold') ? 'bold' : 'normal',
+            fontSize: `${this.getProperty('font').getPropertyValue('pixelSize')}px`,
+            fontFamily: `${this.getProperty('font').getPropertyValue('family')}`,
+        })
+        if(this.getPropertyValue('text'))this.applyMetrics()
     }
 
     $focusChanged(){
