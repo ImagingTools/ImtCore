@@ -299,8 +299,9 @@ Item{
         enabled: visible;
 
         hoverEnabled: true;
-        cursorShape: Qt.SplitHCursor;//containsMouse ? Qt.SplitHCursor : containsPress ? Qt.PointingHandCursor : Qt.ArrowCursor;
-        //                    cursorShape: containsMouse ? Qt.SplitHCursor : Qt.ArrowCursor;
+        cursorShape: pressed ?  Qt.SplitHCursor : isSplitCursor ? Qt.SplitHCursor : Qt.ArrowCursor;
+        property bool isSplitCursor: mouseX >= width/2 - splitterWidth/2 && mouseX <= width/2 + splitterWidth/2;
+        property int splitterWidth: 6;
         property var coord: mapToItem(moving,0,0);
         onPressed: {
             moving.coord = mapToItem(moving,mouse.x,mouse.y)
