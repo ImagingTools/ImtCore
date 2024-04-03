@@ -225,8 +225,8 @@ Item {
     }
 
     function getValue(){
-            if (delegateContainer.columnIndex >= 0){
-                if(delegateContainer.rowDelegate !== null && delegateContainer.rowDelegate.table !==null){
+            if (delegateContainer && delegateContainer.columnIndex >= 0){
+                if(delegateContainer.rowDelegate !== null && delegateContainer.rowDelegate.table !==null && delegateContainer.rowDelegate.dataModel != null){
                     return delegateContainer.rowDelegate.dataModel[delegateContainer.rowDelegate.table.headers.GetData("Id", delegateContainer.columnIndex)];
                 }
             }
@@ -235,7 +235,7 @@ Item {
         }
 
     function setCellWidth(){
-        if(!delegateContainer.rowDelegate){
+        if(!delegateContainer || !delegateContainer.rowDelegate){
             return;
         }
 

@@ -153,7 +153,7 @@ ViewBase {
             }
         }
 
-       AuxTable {
+       Table {
             id: tableInternal;
 
             anchors.left: parent.left;

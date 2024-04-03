@@ -4,6 +4,7 @@ import imtcontrols 1.0
 
 TableBase {
     id: tableContainer;
+
     rowDelegate: Component {
             TableRowDelegate {
             table: tableContainer

@@ -27,7 +27,7 @@ Row {
             }
 
             Component.onDestruction: {
-                console.log("*Debug* cell onDestruction")
+                // console.log("*Debug* cell onDestruction")
                 dataList.rowDelegate.table.widthRecalc.disconnect(cell.setCellWidth)
             }
 
@@ -67,8 +67,8 @@ Row {
                 anchors.fill: parent
                 onItemChanged: {
                     if (item){
-                        item.rowDelegate = dataList.rowDelegate
                         item.columnIndex = model.index
+                        item.rowDelegate = dataList.rowDelegate
                     }
                 }
             }

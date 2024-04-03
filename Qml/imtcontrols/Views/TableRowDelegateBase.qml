@@ -21,17 +21,10 @@ Rectangle {
 
     property TableBase table: null;
 
-    // property var bodyArray:  [];
-
     property var dataModel: model;
 
     property int rowIndex: model.index;
 
-    // property TreeItemModel headers: TreeItemModel{};
-
-    // property TreeItemModel cellDecorator : TreeItemModel{};
-    // property TreeItemModel widthDecorator : TreeItemModel{};
-    // property TreeItemModel widthDecoratorDynamic : TreeItemModel{};
     property TreeItemModel cellDecorator : table.cellDecorator
 
     property alias mouseArea: ma;
@@ -85,12 +78,34 @@ Rectangle {
         tableDelegateContainer.compl = true;
     }
 
+    Component.onDestruction: {
+        if (table){
+            table.tableSelection.selectionChanged.disconnect(tableDelegateContainer.selectionChanged);
+            table.checkedItemsChanged.disconnect(tableDelegateContainer.checkedItemsChanged);
+
+            table.properties.visibleItemsChanged.disconnect(tableDelegateContainer.visibleItemsChanged);
+            table.properties.stateItemsChanged.disconnect(tableDelegateContainer.enabledItemsChanged);
+        }
+    }
+
 
     onCellDecoratorChanged: {
         if (tableDelegateContainer.table.cellDecorator){
-            // tableDelegateContainer.emptyDecorCell = !tableDelegateContainer.table.cellDecorator.GetItemsCount();
             tableDelegateContainer.setBorderParams();
         }
+    }
+
+    onClicked: {
+        console.log("tableRow onClicked")
+
+        if (!table.selectable){
+            return;
+        }
+
+        table.tableSelection.singleSelect(model.index);
+
+        console.log("table.tableSelection", table.tableSelection.selectedIndexes)
+        table.forceActiveFocus();
     }
 
     onDoubleClicked: {
@@ -108,13 +123,17 @@ Rectangle {
         }
     }
 
-    // onHeadersChanged: {
-    //     tableDelegateContainer.columnCount = tableDelegateContainer.headers.GetItemsCount();
-    //     setCellHeightModelDefault();
-    // }
     onTableChanged: {
-        if (tableDelegateContainer.table && tableDelegateContainer.table.checkable){
-            checkBox.createObject(tableDelegateContainer)
+        if (table){
+            table.tableSelection.selectionChanged.connect(tableDelegateContainer.selectionChanged);
+            table.checkedItemsChanged.connect(tableDelegateContainer.checkedItemsChanged);
+
+            table.properties.visibleItemsChanged.connect(tableDelegateContainer.visibleItemsChanged);
+            table.properties.stateItemsChanged.connect(tableDelegateContainer.enabledItemsChanged);
+            ma.visible = table.hoverEnabled
+            if (table.checkable){
+                checkBox.createObject(tableDelegateContainer)
+            }
         }
     }
 
@@ -151,13 +170,6 @@ Rectangle {
     }
 
     function setBorderParams(){
-        // if(tableDelegateContainer.emptyDecorCell){
-        //     return;
-        // }
-        // if(!tableDelegateContainer.canSetBorderParams){
-        //     return;
-        // }
-
         if(tableDelegateContainer.table.cellDecorator.IsValidData("BorderColorHorizontal")){
             tableDelegateContainer.borderColorHorizontal = tableDelegateContainer.table.cellDecorator.GetData("BorderColorHorizontal");
         }
@@ -232,6 +244,24 @@ Rectangle {
         tableDelegateContainer.height = Math.max(maxVal, tableDelegateContainer.minHeight);
     }
 
+
+    function selectionChanged(){
+        selected = table.tableSelection.selectedIndexes.includes(model.index);
+    }
+
+    function checkedItemsChanged(){
+        checkedState = table.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
+    }
+
+    function visibleItemsChanged(){
+        visible = table.properties.itemIsVisible(model.index);
+    }
+
+    function enabledItemsChanged(){
+        enabled = table.properties.itemIsEnabled(model.index);
+
+        readOnly = !enabled;
+    }
 
 
     PauseAnimation {

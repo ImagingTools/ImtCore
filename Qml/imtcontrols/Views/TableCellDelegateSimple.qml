@@ -7,12 +7,11 @@ TableCellDelegateBase {
 
     TableCellText {
         anchors.left: parent.left;
-        anchors.leftMargin:  rowDelegate.textLeftMargin  // .textLeftIndent;
+        anchors.leftMargin:  delegateContainer.rowDelegate ? delegateContainer.rowDelegate.textLeftMargin : 0
         anchors.right: parent.right;
-        anchors.rightMargin: rowDelegate.textRightMargin;
+        anchors.rightMargin: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.textRightMargin : 0
         anchors.verticalCenter: parent.verticalCenter
 
-        // text: delegateContainer.columnIndex + " " + delegateContainer.rowIndex //getValue()
         rowDelegate:  delegateContainer.rowDelegate
         text: delegateContainer.getValue()
     }

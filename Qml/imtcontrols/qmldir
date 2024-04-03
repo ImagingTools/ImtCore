@@ -85,6 +85,7 @@ AuxTable 1.0 ./Views/AuxTable.qml
 Table 1.0 ./Views/Table.qml
 TableBase 1.0 ./Views/TableBase.qml
 TableCellDelegate 1.0 ./Views/TableCellDelegate.qml
+TableCellDelegateBase 1.0 ./Views/TableCellDelegateBase.qml
 TableCellDelegateSimple 1.0 ./Views/TableCellDelegateSimple.qml
 TableDelegate 1.0 ./Views/TableDelegate.qml
 TableRowDelegateBase 1.0 ./Views/TableRowDelegateBase.qml

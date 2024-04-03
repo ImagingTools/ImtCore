@@ -6,7 +6,7 @@ TableRowDelegateBase {
     id: tableDelegateContainer;
 
     onColumnCountChanged: {
-        console.log("*Debug* columnCount", tableDelegateContainer.columnCount)
+        // console.log("*Debug* columnCount", tableDelegateContainer.columnCount)
     }
 
     TableRowViewer {
