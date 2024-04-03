@@ -259,7 +259,9 @@ class ListView extends Flickable {
                 this.getProperty('count').reset(this.$items.length.get())
             }
         }
-
+        this.updateView()
+        this.getProperty('count').reset(this.$items.length.get())
+        this.updateGeometry()
     }
 
     $disconnectModel(){
