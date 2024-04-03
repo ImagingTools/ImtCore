@@ -1404,7 +1404,7 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
                     }
                     
                 }
-                updateList.push(`${currentInstructions.name}.${pathName[0]}.update()`)
+                updateList.push(`${currentInstructions.name}.${pathName.join('.')}.update()`)
             } else {
                 if(property.command === 'create'){
                     if(listProperties[property.type]){

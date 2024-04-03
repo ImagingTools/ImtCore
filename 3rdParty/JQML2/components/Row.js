@@ -11,7 +11,7 @@ class Row extends Item {
     }
 
     updateGeometry(){
-        if(this.preventAutoUpdateGeometry) return
+        if(this.preventAutoUpdateGeometry || !this.getPropertyValue('visible')) return
 
         let children = this.getProperty('children').get()
         let w = 0
