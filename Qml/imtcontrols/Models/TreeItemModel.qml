@@ -112,7 +112,7 @@ JSONListModel {
             console.log("modelObject is null")
 
         if(key in modelObject){
-            if(modelObject[key].unsubscribe) modelObject[key].unsubscribe()
+            if(modelObject[key] && modelObject[key].unsubscribe) modelObject[key].unsubscribe()
             delete modelObject[key]
         }
 
