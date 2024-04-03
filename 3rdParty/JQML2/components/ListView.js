@@ -284,6 +284,14 @@ class ListView extends Flickable {
                 
             }
         }
+
+        this.getProperty('contentX').value = 0
+        this.getProperty('contentY').value = 0
+        this.getProperty('originX').value = 0
+        this.getProperty('originY').value = 0
+        this.getStatement('contentItem').get().getStatement('x').reset(-this.getStatement('contentX').get())
+        this.getStatement('contentItem').get().getStatement('y').reset(-this.getStatement('contentY').get())
+
         this.$items.length.reset(0)
         if(typeof this.getPropertyValue('model') === 'number'){     
             this.$items.length.setCompute(()=>{this.$items.length.subscribe(this.getProperty('model')); return this.getPropertyValue('model')})
