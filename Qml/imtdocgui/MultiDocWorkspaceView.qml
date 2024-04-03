@@ -60,6 +60,7 @@ DocumentManager {
         anchors.fill: parent;
 
         color: Style.backgroundColor;
+//        color: Style.alternateBaseColor;
     }
 
     TabPanel {
@@ -109,6 +110,7 @@ DocumentManager {
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
+        anchors.margins: Style.size_mainMargin;
 
         model: workspaceView.documentsModel;
 

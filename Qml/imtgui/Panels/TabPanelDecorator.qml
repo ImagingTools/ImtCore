@@ -8,16 +8,12 @@ DecoratorBase {
     width: texttabDelegate.width + imagetabDelegate.width + 40;
     height: baseElement ? baseElement.height : 50
 
-
     property string firstElementImageSource: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.firstElementImageSource : "";
+
     onFirstElementImageSourceChanged: {
         if (tabPanelDecorator.firstElementImageSource !== ""){
             firsElementImage.source = "../../../" + Style.getIconPath(tabPanelDecorator.firstElementImageSource, Icon.State.On, Icon.Mode.Normal);
         }
-    }
-
-    onWidthChanged: {
-        console.log("tabPanelDecorator onWidthChanged", width);
     }
 
     Rectangle {
@@ -25,7 +21,23 @@ DecoratorBase {
         color: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected ? Style.baseColor: "transparent": "transparent";
     }
 
-    Rectangle{
+    Rectangle {
+        anchors.right: tabPanelDecorator.right;
+        anchors.verticalCenter: tabPanelDecorator.verticalCenter;
+
+        width: 1;
+        height: tabPanelDecorator.height / 2;
+
+        visible: tabPanelDecorator.baseElement
+                 ? tabPanelDecorator.baseElement.index < tabPanelDecorator.baseElement.listView.count - 1 &&
+                   !tabPanelDecorator.baseElement.selected &&
+                   (tabPanelDecorator.baseElement.index + 1) !== tabPanelDecorator.baseElement.selectedIndex
+                 : false;
+
+        color: Style.borderColor2;
+    }
+
+    Rectangle {
         id: selection;
 
         anchors.bottom: tabPanelDecorator.bottom;
@@ -109,7 +121,7 @@ DecoratorBase {
             source: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
         }
 
-        MouseArea{
+        MouseArea {
             id: closeMA;
 
             anchors.fill: closeButton;
@@ -124,4 +136,5 @@ DecoratorBase {
         }
     }
 }
+
 

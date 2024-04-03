@@ -9,6 +9,7 @@ QtObject {
 
     property QtObject private_: QtObject{
             property TreeItemModel beginModel: TreeItemModel {}; // Model before changes
+            property bool block: false;
     }
 
     signal modelChanged(var changeList);
@@ -19,17 +20,25 @@ QtObject {
         container.observedModel = model;
 
         container.private_.beginModel = model.CopyMe();
-//        container.private_.beginModel.Copy(container.observedModel);
     }
 
     function observedModelDataChanged(){
-        console.log("observedModelDataChanged");
+//        console.log("observedModelDataChanged");
+//        console.log("container.private_.beginModel", container.private_.beginModel.toJSON());
+//        console.log("container.observedModel", container.observedModel.toJSON());
+
+        if (container.private_.block){
+            return;
+        }
+
+        container.private_.block = true;
+
         let changeList = compare(container.private_.beginModel, container.observedModel);
         container.modelChanged(changeList);
 
         container.private_.beginModel = container.observedModel.CopyMe();
 
-//        container.private_.beginModel.Copy(container.observedModel);
+        container.private_.block = false;
     }
 
     function compare(model1, model2){
@@ -40,6 +49,24 @@ QtObject {
 
     function compareRecursive(model1, model2, changeList, parentKey){
         if (!model1 || !model2){
+            return;
+        }
+
+        let countItems1 = model1.GetItemsCount();
+        let countItems2 = model2.GetItemsCount();
+
+        if (countItems1 !== countItems2){
+            let changeObj = {}
+
+            changeObj["operation"] = "";
+            changeObj["key"] = "";
+            changeObj["curVal"] = "";
+            changeObj["newVal"] = "";
+            changeObj["index"] = -1;
+            changeObj["id"] = "";
+
+            changeList.push(changeObj)
+
             return;
         }
 
@@ -62,13 +89,13 @@ QtObject {
                         let value1 = String(model1.GetData(key, i));
                         let value2 = String(model2.GetData(key, i));
 
-                        console.log("value1", value1)
-                        console.log("value2", value2)
+//                        console.log("value1", value1)
+//                        console.log("value2", value2)
 
-                        console.log("value1 !== value2", value1 !== value2)
+//                        console.log("value1 !== value2", value1 !== value2)
 
                         if (value1 !== value2){
-                            console.log("value1 != value2")
+//                            console.log("value1 != value2")
 
                             let changeObj = {}
 

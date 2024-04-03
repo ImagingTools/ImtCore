@@ -69,34 +69,34 @@ RemoteCollectionView {
     Component {
         id: dataComp;
 
-        Item {
-            id: item;
+        TableCellDelegateBase {
+            id: cellDelegate
 
             height: 20;
 
             clip: true;
 
-            property Item tableCellDelegate: null;
+            onRowIndexChanged: {
+                if (!rowDelegate){
+                    return
+                }
 
-            onTableCellDelegateChanged: {
-                if (item.tableCellDelegate != null){
-                    let username = userCollectionViewContainer.table.elements.GetData("Name", tableCellDelegate.rowIndex);
-                    let roles = userCollectionViewContainer.table.elements.GetData("Roles", tableCellDelegate.rowIndex);
-                    arrowButton.visible = roles !== "";
-                    if (roles !== ""){
-                        let roleList = roles.split(';');
-                        name.text = qsTr("View roles") + "(" + roleList.length +  ")";
+                let username = userCollectionViewContainer.table.elements.GetData("Name", rowIndex);
+                let roles = userCollectionViewContainer.table.elements.GetData("Roles", rowIndex);
+                arrowButton.visible = roles !== "";
+                if (roles !== ""){
+                    let roleList = roles.split(';');
+                    name.text = qsTr("View roles") + "(" + roleList.length +  ")";
 
-                        let result = "<b><u>" + username + "</u></b> " + qsTr("has been assigned") + " <b>" + roleList.length + "</b> " + qsTr("roles:");
-                        for (let i = 0; i < roleList.length; i++){
-                            result += "<p>" + roleList[i] + "</p>";
-                        }
-
-                        arrowButton.tooltipText = result;
+                    let result = "<b><u>" + username + "</u></b> " + qsTr("has been assigned") + " <b>" + roleList.length + "</b> " + qsTr("roles:");
+                    for (let i = 0; i < roleList.length; i++){
+                        result += "<p>" + roleList[i] + "</p>";
                     }
-                    else{
-                        name.text = qsTr("No roles");
-                    }
+
+                    arrowButton.tooltipText = result;
+                }
+                else{
+                    name.text = qsTr("No roles");
                 }
             }
 
@@ -123,10 +123,6 @@ RemoteCollectionView {
                 height: width;
 
                 iconSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
-
-                onClicked: {
-                    console.log("Roles Button onClicked");
-                }
             }
         }
     }
@@ -134,40 +130,42 @@ RemoteCollectionView {
     Component {
         id: groupsContentComp;
 
-        Item {
-            id: item2;
+        TableCellDelegateBase {
+            id: cellDelegate
 
             property Item tableCellDelegate: null;
 
-            Component.onCompleted: {
-                let loader = parent;
-                let tableCellDelegate = loader.parent;
+            onRowIndexChanged: {
+                if (!rowDelegate){
+                    return
+                }
 
-                if (tableCellDelegate.mainMouseArea){
-                    tableCellDelegate.mainMouseArea.hoverEnabled = false;
+                let username = userCollectionViewContainer.table.elements.GetData("Name", rowIndex);
+                let groups = userCollectionViewContainer.table.elements.GetData("Groups", rowIndex);
+                arrowButton.visible = groups !== "";
+                if (groups !== ""){
+                    let groupList = groups.split(';');
+                    name2.text =  qsTr("View groups") + "(" + groupList.length +  ")";
+
+                    let result = "<b><u>" + username + "</u></b> " + qsTr("is included into") + " <b>" + groupList.length + "</b> " + qsTr("groups") + ":";
+                    for (let i = 0; i < groupList.length; i++){
+                        result += "<p>" + groupList[i] + "</p>";
+                    }
+                    arrowButton.tooltipText = result;
+                }
+                else{
+                    name2.text = qsTr("No groups");
                 }
             }
 
-            onTableCellDelegateChanged: {
-                if (item2.tableCellDelegate != null){
-                    let username = userCollectionViewContainer.table.elements.GetData("Name", tableCellDelegate.rowIndex);
-                    let groups = userCollectionViewContainer.table.elements.GetData("Groups", tableCellDelegate.rowIndex);
-                    arrowButton.visible = groups !== "";
-                    if (groups !== ""){
-                        let groupList = groups.split(';');
-                        name2.text =  qsTr("View groups") + "(" + groupList.length +  ")";
+//            Component.onCompleted: {
+//                let loader = parent;
+//                let tableCellDelegate = loader.parent;
 
-                        let result = "<b><u>" + username + "</u></b> " + qsTr("is included into") + " <b>" + groupList.length + "</b> " + qsTr("groups") + ":";
-                        for (let i = 0; i < groupList.length; i++){
-                            result += "<p>" + groupList[i] + "</p>";
-                        }
-                        arrowButton.tooltipText = result;
-                    }
-                    else{
-                        name2.text = qsTr("No groups");
-                    }
-                }
-            }
+//                if (tableCellDelegate.mainMouseArea){
+//                    tableCellDelegate.mainMouseArea.hoverEnabled = false;
+//                }
+//            }
 
             Text {
                 id: name2;

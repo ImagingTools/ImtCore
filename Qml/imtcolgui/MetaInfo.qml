@@ -7,6 +7,7 @@ Rectangle {
     id: container;
 
     color: Style.backgroundColor;
+//    color: Style.alternateBaseColor;
 
     property TreeItemModel metaInfoModel: TreeItemModel {}
     property int elementHeight: 20;

@@ -21,13 +21,6 @@ ViewCommandsDelegateBase {
     property alias removeDialogComp: removeDialog;
     property alias setDescriptionDialogComp: setDescriptionDialog;
 
-    //    property var templateContextMenuModel: [
-    //        {"Id": "Edit"},
-    //        {"Id": ""},
-    //        {"Id": "Rename"},
-    //        {"Id": "SetDescription"}
-    //    ]
-
     signal renamed(string id, string newName);
     signal descriptionSetted(string id, string description);
     signal removed(string id);
@@ -43,12 +36,6 @@ ViewCommandsDelegateBase {
             collectionConnections.target = collectionView;
             elementsConnections.target = collectionView.table;
             commandsControllerConn.target = collectionView.commandsController
-
-            if (collectionView.commandsController){
-//                collectionView.commandsController.commandsModelChanged.connect(internal.onCommandsModelChanged);
-
-//                collectionViewCommandsDelegate.setupContextMenu();
-            }
         }
     }
 

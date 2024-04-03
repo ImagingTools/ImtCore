@@ -9,7 +9,8 @@ Rectangle {
     height: 40;
     width: 1000;
 
-    color: Style.backgroundColor;
+//    color: Style.backgroundColor;
+    color: Style.imagingToolsGradient2;
 
     property int selectedIndex: 0;
     property int count: 0;
@@ -27,7 +28,7 @@ Rectangle {
         list.positionViewAtIndex(index, ListView.Contain);
     }
 
-    ListView{
+    ListView {
         id: list;
 
         width: externButtons.visible ? parent.width - externButtons.width :  parent.width;
@@ -44,11 +45,13 @@ Rectangle {
             height: list.height;
 
             selected: model.index === tabPanelContainer.selectedIndex;
+            selectedIndex: tabPanelContainer.selectedIndex;
             firstElement: model.index === 0;
             lastElement: model.index === list.count - 1;
             firstElementImageSource: tabPanelContainer.firstElementImageSource;
             text: model.Title ? model.Title : "";
             isCloseEnable: tabPanelContainer.isCloseEnable;
+            listView: list;
 
             onClicked: {
                 tabPanelContainer.selectedIndex = model.index;
@@ -101,14 +104,7 @@ Rectangle {
             width: externButtons.width / 2;
             height: externButtons.height;
 
-//            hasIcon: true;
-//            hasText: false;
-
-//            iconHeight: 10;
-//            iconWidth: 10;
-
             iconSource: "../../../" +  Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal);
-//            borderColor: Style.buttonColor;
 
             onClicked: {
                 tabPanelContainer.leftClicked();
@@ -124,12 +120,7 @@ Rectangle {
             width: externButtons.width / 2;
             height: externButtons.height;
 
-//            hasIcon: true;
-//            hasText: false;
-//            iconHeight: 10;
-//            iconWidth: 10;
             iconSource: "../../../" +  Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal);
-//            borderColor: Style.buttonColor;
 
             onClicked: {
                 tabPanelContainer.rightClicked();

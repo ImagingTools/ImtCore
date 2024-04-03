@@ -2,7 +2,7 @@ import QtQuick 2.12
 import Acf 1.0
 import imtcontrols 1.0
 
-Item {
+TableRowDelegateBase {
     id: productRolesDelegate;
 
     height: body.height + rolesColumn.height;
@@ -15,14 +15,17 @@ Item {
 
     property int radius: 3;
 
-    signal clicked(string id, int index);
+    signal roleClicked(string id, int index);
     signal newClicked();
-    signal doubleClicked(string id, int index);
+    signal roleDoubleClicked(string id, int index);
 
     Component.onCompleted: {
+        console.log("Roles delegate onCompleted", model.Roles);
         if (model.Roles){
             rolesRepeater.model = model.Roles;
         }
+
+        mouseArea.enabled = false;
     }
 
     function getSelectedId(){
@@ -87,7 +90,6 @@ Item {
             iconSource: "../../../../" + Style.getIconPath("Icons/Add", Icon.State.On, Icon.Mode.Normal);
 
             onClicked: {
-//                Events.sendEvent(productRolesDelegate.commandsId + "CommandActivated", "New");
                 productRolesDelegate.newClicked();
             }
 
@@ -134,9 +136,7 @@ Item {
 
                     radius: productRolesDelegate.radius;
 
-                    property bool selected: productRolesDelegate.selectedIndex == model.index;
-
-                    color: this.selected ? Style.selectedColor : "transparent";
+                    color: productRolesDelegate.selectedIndex === model.index ? Style.selectedColor : "transparent";
 
                     Text {
                         anchors.verticalCenter: parent.verticalCenter;
@@ -160,15 +160,19 @@ Item {
                         anchors.fill: parent;
 
                         onClicked: {
+                            console.log("Roles MouseArea onClicked", model.index);
+
                             productRolesDelegate.selectedIndex = model.index;
 
-                            productRolesDelegate.clicked(model.Id, model.index);
+                            productRolesDelegate.roleClicked(model.Id, model.index);
                         }
 
                         onDoubleClicked: {
+                            console.log("RolesMouseArea onDoubleClicked");
+
                             productRolesDelegate.selectedIndex = model.index;
 
-                            productRolesDelegate.doubleClicked(model.Id, model.index);
+                            productRolesDelegate.roleDoubleClicked(model.Id, model.index);
                         }
                     }
                 }

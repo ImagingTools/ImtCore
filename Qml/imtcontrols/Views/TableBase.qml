@@ -218,9 +218,9 @@ Rectangle {
         tableContainer.cellDecorator = tableContainer.tableDecorator.GetTreeItemModel("Cells");
         tableContainer.widthDecorator = tableContainer.tableDecorator.GetTreeItemModel("CellWidth");
 
-        tableContainer.emptyDecorCell = !tableContainer.cellDecorator.GetItemsCount()
-
-        console.log("tableContainer.widthDecorator", tableContainer.widthDecorator);
+        if (tableContainer.cellDecorator){
+            tableContainer.emptyDecorCell = !tableContainer.cellDecorator.GetItemsCount()
+        }
 
         tableContainer.emptyDecor = !tableContainer.tableDecorator.GetItemsCount();
 

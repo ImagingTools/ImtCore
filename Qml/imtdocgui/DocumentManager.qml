@@ -557,7 +557,9 @@ Item {
                 onModelChanged: {
                     let wasChanges = changeList.length > 0;
 
-                    singleDocumentData.isDirty = wasChanges;
+                    if (!singleDocumentData.isDirty){
+                        singleDocumentData.isDirty = wasChanges;
+                    }
 
                     if (wasChanges){
                         singleDocumentData.undoManager.onDataChanged();
@@ -598,17 +600,6 @@ Item {
             property Connections dataControllerConnections: Connections {
                 target: singleDocumentData.documentDataController;
 
-                function onHasRemoteChangesChanged(){
-                    console.log("singleDocumentData onHasRemoteChangesChanged");
-                    if (singleDocumentData.documentDataController){
-                        let hasRemoteChanges = singleDocumentData.documentDataController.hasRemoteChanges;
-
-                        if (singleDocumentData.documentIndex >= 0){
-                            //                            documentManager.documentsModel.setProperty(singleDocumentData.documentIndex, "AlertVisible", hasRemoteChanges)
-                        }
-                    }
-                }
-
                 function onSaved(documentId, documentName){
                     singleDocumentData.documentId = documentId;
                     singleDocumentData.documentName = documentName;
@@ -643,13 +634,15 @@ Item {
                     }
 
                     singleDocumentData.blockingUpdateModel = true;
+
                     for (let i = 0; i < singleDocumentData.views.length; i++){
                         singleDocumentData.views[i].model = documentModel;
+
                         if (documentManager.documentsModel.get(singleDocumentData.documentIndex).IsNew){
                             singleDocumentData.views[i].doUpdateModel();
                         }
 
-                        singleDocumentData.views[i].doUpdateGui();
+//                        singleDocumentData.views[i].doUpdateGui();
                     }
                     singleDocumentData.blockingUpdateModel = false;
 

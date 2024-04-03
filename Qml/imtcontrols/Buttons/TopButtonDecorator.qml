@@ -8,7 +8,7 @@ Item {
     id: topButtonDecorator;
 
     width: isEmpty ? 20 : 55;
-    height: 25;
+    height: button.height + description.height;
 
     property var baseElement;
     property string textColor: Style.textColor;
@@ -42,7 +42,7 @@ Item {
         anchors.horizontalCenter: topButtonDecorator.horizontalCenter;
 
         width: topButtonDecorator.width;
-        height: topButtonDecorator.height;
+        height: 25;
 
         radius: topButtonDecorator.radius;
 

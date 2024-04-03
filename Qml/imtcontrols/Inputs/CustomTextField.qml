@@ -231,7 +231,7 @@ FocusScope {
         interval: 500;
 
         onTriggered: {
-            containerTextField.editingFinished();
+//            containerTextField.editingFinished();
         }
     }
 }

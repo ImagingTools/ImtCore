@@ -40,13 +40,10 @@ Item {
     }
 
     function setCommandsModel(parameters){
-        console.log("start setCommandsModel", JSON.stringify(parameters));
         let model = parameters["Model"];
         let commId = parameters["ViewId"];
 
         commandsDecoratorContainer.commandId = commId;
-
-        console.log("*Debug* setCommandsModel:", model)
 
         if (Qt.platform.os === "web"){
             buttonModel = model;
@@ -57,7 +54,6 @@ Item {
                                                                Style.getIconPath(modelIcon, Icon.State.Off, Icon.Mode.Disabled)
                 if (path !== ""){
                     path = "/" + context.appName + "/Views/" + path
-                    console.log("*Debug* path:", path)
                     loadImages++;
 
                     ImageController.load(path, counterImage, counterImage);
@@ -73,7 +69,6 @@ Item {
     }
 
     function clearModel(parameters){
-        console.log("start clearModel");
         if (parameters){
             let commandId = parameters["ViewId"];
             if (commandId !== commandsDecoratorContainer.commandId){
@@ -82,7 +77,6 @@ Item {
         }
 
         buttonPanel.clearModel();
-        console.log("end clearModel");
     }
 
     function setVisible(visible){
@@ -144,7 +138,6 @@ Item {
                     }
 
                     onClicked: {
-                        console.log(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);
                         Events.sendEvent(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);
                     }
 

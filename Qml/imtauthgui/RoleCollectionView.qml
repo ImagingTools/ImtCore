@@ -31,11 +31,9 @@ RemoteCollectionView {
 
     dataControllerComp: Component {CollectionRepresentation {
             collectionId: roleCollectionViewContainer.collectionId;
-
             additionalFieldIds: roleCollectionViewContainer.additionalFieldIds;
 
             function removeElement(elementIndex){
-                console.log("Roles removeElement", elementIndex);
                 if (elementIndex < 0){
                     console.error();
 
@@ -52,6 +50,7 @@ RemoteCollectionView {
         id: roleTableDelegateComp;
 
         TableProductRolesDelegate {
+            table: roleCollectionViewContainer.table;
             width: roleCollectionViewContainer.table.width;
 
             newIsEnabled: roleCollectionViewContainer.newCommandIsEnabled;
@@ -64,13 +63,16 @@ RemoteCollectionView {
                 roleCollectionViewContainer.selectionChanged.disconnect(this.selectionChanged);
             }
 
-            onDoubleClicked: {
+            onRoleDoubleClicked: {
+                console.log("onRoleDoubleClicked", index);
+
                 roleCollectionViewContainer.table.select(index);
 
                 roleCollectionViewContainer.doubleClicked(id, index)
             }
 
-            onClicked: {
+            onRoleClicked: {
+                console.log("onRoleClicked", index);
                 roleCollectionViewContainer.table.select(index)
                 roleCollectionViewContainer.table.elementsList.forceActiveFocus();
             }
@@ -82,7 +84,11 @@ RemoteCollectionView {
             }
 
             function selectionChanged(selection){
-                selectedIndex = selection[0];
+                let selectedIndexes = roleCollectionViewContainer.table.tableSelection.selectedIndexes;
+                console.log("RoleCollection selectionChanged", selection);
+                if (selectedIndexes.length > 0){
+//                    selectedIndex = selectedIndexes[0];
+                }
             }
         }
     }
@@ -121,7 +127,7 @@ RemoteCollectionView {
             documentManager.registerDocumentDataController("Role", dataControllerComp);
         }
 
-        table.delegate = roleTableDelegateComp;
+        table.rowDelegate = roleTableDelegateComp;
     }
 
     onElementsChanged: {

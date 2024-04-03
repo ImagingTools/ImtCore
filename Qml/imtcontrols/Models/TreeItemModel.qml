@@ -81,6 +81,12 @@ JSONListModel {
         if (modelObject === null)
             console.log("modelObject is null")
 
+        if (modelObject[key] === undefined && value === ""){
+            modelObject[key] = value
+
+            return true
+        }
+
         if(modelObject[key] !== value){
             if(typeof modelObject === 'object' && modelObject.constructor.name === 'QModelData'){
                 modelObject.$lock = true
@@ -94,7 +100,6 @@ JSONListModel {
                 this.dataChanged(row, row+1)
             }
         }
-
 
         return true
     }

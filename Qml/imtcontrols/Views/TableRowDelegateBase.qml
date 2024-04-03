@@ -98,6 +98,12 @@ Rectangle {
     onClicked: {
         console.log("tableRow onClicked")
 
+        if (!table){
+            console.error("table is invalid")
+
+            return;
+        }
+
         if (!table.selectable){
             return;
         }

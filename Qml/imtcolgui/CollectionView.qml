@@ -117,6 +117,14 @@ Item {
         }
     }
 
+    function setTableElements(){
+        if (!container.dataController){
+            return;
+        }
+
+        container.table.elements = container.dataController.elementsModel;
+    }
+
     CollectionViewBase {
         id: container;
 
@@ -158,6 +166,10 @@ Item {
             function onHeadersModelChanged(){
                 container.doUpdateGui();
             }
+
+//            function onElementModelChanged(){
+//                root.setTableElements();
+//            }
 
             function onNotificationModelChanged(){
                 if (!container.dataController){

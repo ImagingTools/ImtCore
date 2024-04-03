@@ -393,10 +393,10 @@ StyleComponents {
 
     }
 
-    Component{
+    Component {
         id: checkBoxDecoratorComp;
 
-        Item{
+        Item {
             id: checkBoxItem;
 
             width: checkBoxText.text == "" ? checkRect.width : checkRect.width + checkBoxText.width + checkBoxItem.mainMargin;
@@ -420,7 +420,7 @@ StyleComponents {
                 width: height;
                 height: checkBoxItem.height;
 
-                color: "transparent";
+                color: Style.baseColor;
 
                 border.width: 1;
                 border.color: !checkBoxItem.baseElement ? "transparent" : checkBoxItem.borderColor !=="" ? checkBoxItem.borderColor  : checkBoxItem.baseElement.isActive ? Style.borderColor : Style.disabledInActiveTextColor;
@@ -454,8 +454,6 @@ StyleComponents {
 
                 visible: !checkBoxItem.baseElement ? false : checkBoxItem.baseElement.checkState == Qt.PartiallyChecked;
             }
-
-
 
             Text {
                 id: checkBoxText;

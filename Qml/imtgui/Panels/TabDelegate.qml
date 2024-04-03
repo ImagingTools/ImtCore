@@ -13,6 +13,10 @@ ControlBase {
 
     property string text;
     property string firstElementImageSource:  "../../../" + "Icons/" + Style.theme + "/" + "Workflow" + "_On_Normal.svg";
+    property int index: model.index;
+    property int selectedIndex: -1;
+
+    property ListView listView: null;
 
     decorator: Style.tabPanelDecorator
 
@@ -21,14 +25,15 @@ ControlBase {
     signal clicked;
     signal closeSignal;
 
-    MouseArea{
+    MouseArea {
         id: ma;
 
         anchors.fill: tabDelegate;
 
         onClicked: {
-            console.log("tabDelegate clicked ");
             tabDelegate.clicked();
         }
     }
 }
+
+

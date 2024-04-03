@@ -114,8 +114,6 @@ ViewBase {
     }
 
     function updateModel(){
-        console.log("updateModel");
-
         let name = accountNameInput.text;
         accountEditorContainer.model.SetData("Name", name)
 

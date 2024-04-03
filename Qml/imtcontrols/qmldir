@@ -90,7 +90,6 @@ TableCellDelegateSimple 1.0 ./Views/TableCellDelegateSimple.qml
 TableDelegate 1.0 ./Views/TableDelegate.qml
 TableRowDelegateBase 1.0 ./Views/TableRowDelegateBase.qml
 TableRowDelegate 1.0 ./Views/TableRowDelegate.qml
-TableCheckedRowDelegate 1.0 ./Views/TableCheckedRowDelegate.qml
 SimpleTableDelegate 1.0 ./Views/SimpleTableDelegate.qml
 
 TableTreeView 1.0 ./Views/TableTreeView.qml

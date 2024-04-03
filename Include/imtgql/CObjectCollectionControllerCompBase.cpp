@@ -1084,9 +1084,9 @@ istd::IChangeable* CObjectCollectionControllerCompBase::CreateObject(
 
 
 void CObjectCollectionControllerCompBase::PrepareFilters(
-		const imtgql::CGqlRequest& gqlRequest,
-		const imtgql::CGqlObject& viewParamsGql,
-		iprm::CParamsSet& filterParams) const
+			const imtgql::CGqlRequest& gqlRequest,
+			const imtgql::CGqlObject& viewParamsGql,
+			iprm::CParamsSet& filterParams) const
 {
 	istd::TDelPtr<imtbase::CCollectionFilter> collectionFilterPtr;
 	collectionFilterPtr.SetPtr(new imtbase::CCollectionFilter);
@@ -1150,9 +1150,9 @@ void CObjectCollectionControllerCompBase::SetAdditionalFilters(const imtgql::CGq
 
 
 void CObjectCollectionControllerCompBase::SetObjectFilter(
-		const imtgql::CGqlRequest& /*gqlRequest*/,
-		const imtbase::CTreeItemModel& objectFilterModel,
-		iprm::CParamsSet& filterParams) const
+			const imtgql::CGqlRequest& /*gqlRequest*/,
+			const imtbase::CTreeItemModel& objectFilterModel,
+			iprm::CParamsSet& filterParams) const
 {
 	QByteArray key;
 	if (objectFilterModel.ContainsKey("Key")){

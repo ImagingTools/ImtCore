@@ -8,6 +8,8 @@ Rectangle {
 
     anchors.fill: parent;
 
+    color: Style.baseColor;
+
     property var startPageObj;
 
     property bool startItemIsLoaded: false;
