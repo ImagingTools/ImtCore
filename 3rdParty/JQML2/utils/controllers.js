@@ -240,47 +240,46 @@ class MouseController {
                 this.target.getStatement('mouseX').reset(norm.x)
                 this.target.getStatement('mouseY').reset(norm.y)
                 
-        
                 if(this.target.$signals.released) {
                     this.target.$signals.released()
                 }
 
-                let wasDblClicked = false
+                if(x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom){
+                    let wasDblClicked = false
 
-                if(this.dblClicked){
-                    this.timestamp = 0
-                    this.target.mouse.accepted = false
-                    if(this.target.$signals.doubleClicked) {
-                        this.target.$signals.doubleClicked()
-                        wasDblClicked = true
-                    }
-                    if(this.target.getPropertyValue('propagateComposedEvents') && !this.target.mouse.accepted)
-                    for(let i = 1; i < this.pressedMouseArea.length; i++){
-                        if(this.pressedMouseArea[i].$signals.doubleClicked){
-                            this.pressedMouseArea[i].mouse.accepted = false
-                            this.pressedMouseArea[i].$signals.doubleClicked()
+                    if(this.dblClicked){
+                        this.timestamp = 0
+                        this.target.mouse.accepted = false
+                        if(this.target.$signals.doubleClicked) {
+                            this.target.$signals.doubleClicked()
                             wasDblClicked = true
-                            if(!this.pressedMouseArea[i].getPropertyValue('propagateComposedEvents') || this.pressedMouseArea[i].mouse.accepted) break
                         }
-                    }
-                }
-
-                if(!wasDblClicked){
-                    this.target.mouse.accepted = true
-                    if(this.target.$signals.clicked) {
-                        this.target.$signals.clicked()
                         if(this.target.getPropertyValue('propagateComposedEvents') && !this.target.mouse.accepted)
                         for(let i = 1; i < this.pressedMouseArea.length; i++){
-                            if(this.pressedMouseArea[i].$signals.clicked){
-                                this.pressedMouseArea[i].mouse.accepted = true
-                                this.pressedMouseArea[i].$signals.clicked()
+                            if(this.pressedMouseArea[i].$signals.doubleClicked){
+                                this.pressedMouseArea[i].mouse.accepted = false
+                                this.pressedMouseArea[i].$signals.doubleClicked()
+                                wasDblClicked = true
                                 if(!this.pressedMouseArea[i].getPropertyValue('propagateComposedEvents') || this.pressedMouseArea[i].mouse.accepted) break
                             }
                         }
                     }
+
+                    if(!wasDblClicked){
+                        this.target.mouse.accepted = true
+                        if(this.target.$signals.clicked) {
+                            this.target.$signals.clicked()
+                            if(this.target.getPropertyValue('propagateComposedEvents') && !this.target.mouse.accepted)
+                            for(let i = 1; i < this.pressedMouseArea.length; i++){
+                                if(this.pressedMouseArea[i].$signals.clicked){
+                                    this.pressedMouseArea[i].mouse.accepted = true
+                                    this.pressedMouseArea[i].$signals.clicked()
+                                    if(!this.pressedMouseArea[i].getPropertyValue('propagateComposedEvents') || this.pressedMouseArea[i].mouse.accepted) break
+                                }
+                            }
+                        }
+                    }
                 }
-            
-                
 
                 if(this.target.$signals.exited) {
                     this.target.$signals.exited()
