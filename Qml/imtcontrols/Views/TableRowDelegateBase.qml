@@ -123,6 +123,10 @@ Rectangle {
         }
     }
 
+    onCheckedStateChanged: {
+        tableDelegateContainer.table.isAllItemChecked = tableDelegateContainer.table.isAllChecked();
+    }
+
     onTableChanged: {
         if (table){
             table.tableSelection.selectionChanged.connect(tableDelegateContainer.selectionChanged);
@@ -367,6 +371,7 @@ Rectangle {
                 else{
                     tableDelegateContainer.table.checkItem(tableDelegateContainer.rowIndex);
                 }
+
             }
         }
     }

@@ -47,7 +47,7 @@ DecoratorBase {
             Timer {
                 id: timer;
 
-                interval: 200;
+                interval: 1000;
 
                 onTriggered: {
                     filterPanelDecorator.baseElement.filterChanged("TextFilter", tfc.text);
