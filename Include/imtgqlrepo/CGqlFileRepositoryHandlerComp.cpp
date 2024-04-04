@@ -178,7 +178,7 @@ imtbase::CTreeItemModel* CGqlFileRepositoryHandlerComp::InsertObject(
 		return nullptr;
 	}
 
-	QByteArray newFileId = QUuid::createUuid().toString(QUuid::Id128).toLatin1();
+	QByteArray newFileId = QUuid::createUuid().toString(QUuid::WithoutBraces).toLatin1();
 	const QByteArray typeId = !insertRequest.GetFileType().isEmpty() ? insertRequest.GetFileType() : m_supportedTypeListAttrPtr[0];
 	const QString name = insertRequest.GetFileName();
 	const QString description = insertRequest.GetDescription();

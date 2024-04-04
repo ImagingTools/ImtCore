@@ -2,15 +2,26 @@
 
 
 // Qt includes
+#include <QtCore/QDir>
+#include <QtCore/QUuid>
 
 // Acf includes
+#include <istd/CSystem.h>
 #include <ilog/CMessage.h>
 #include <idoc/CStandardDocumentMetaInfo.h>
 
 // ImtCore includes
 #include <imtgql/CGqlRequest.h>
 
+// imtgqlrepo DDL includes
 #include <GeneratedFiles/imtgqlrepo/DDL/Cpp/Globals.h>
+
+// imtgqlrepo SDL includes
+#include <GeneratedFiles/imtgqlrepo/SDL/CInsertRequest.h>
+#include <GeneratedFiles/imtgqlrepo/SDL/CRemoveFileRequest.h>
+#include <GeneratedFiles/imtgqlrepo/SDL/CFileDataRequest.h>
+#include <GeneratedFiles/imtgqlrepo/SDL/CFileDataReply.h>
+#include <GeneratedFiles/imtgqlrepo/SDL/CInsertFileResponse.h>
 
 
 namespace imtgqlrepo
@@ -138,9 +149,6 @@ bool CGqlRemoteFileRepositoryComp::GetFileInfo(
 			const QByteArray& /*objectId*/,
 			imtrepo::IFileCollectionItem& /*collectionItem*/) const
 {
-	/// \todo implement it
-	I_CRITICAL();
-
 	return false;
 }
 
@@ -161,7 +169,7 @@ QString CGqlRemoteFileRepositoryComp::GetCollectionRootFolder() const
 
 int CGqlRemoteFileRepositoryComp::GetOperationFlags(const Id& /*elementId*/) const
 {
-	return OF_SUPPORT_INSERT | OF_SUPPORT_DELETE | OF_SUPPORT_USING;
+	return OF_SUPPORT_INSERT | OF_SUPPORT_DELETE;
 }
 
 
@@ -180,42 +188,225 @@ CGqlRemoteFileRepositoryComp::Id CGqlRemoteFileRepositoryComp::InsertNewObject(
 
 
 bool CGqlRemoteFileRepositoryComp::RemoveElement(
-			const Id& /*elementId*/,
+			const Id& elementId,
 			const imtbase::IOperationContext* /*operationContextPtr*/)
 {
-	/// \todo implement it
-	I_CRITICAL();
+	const char* const logTag = "RemoveElement";
+	if (!m_graphQlApiClientCompPtr.IsValid()){
+		SendCriticalMessage("Unable to create request. API client is invalid", logTag);
+		Q_ASSERT_X(false, logTag, "Unable to create request. API client is invalid");
 
-	return false;
+		return false;
+	}
+
+	sdl::CRemoveFileRequest removeRequest;
+	removeRequest.SetId(elementId);
+
+	imtgql::CGqlObject removeRequestParam;
+	const bool isAdded = removeRequest.AddMeToGraphQlObject(removeRequestParam);
+	if (!isAdded){
+		SendCriticalMessage("Unable to add request to ghaphQL request", "RemoveElement");
+		Q_ASSERT_X(false, "RemoveElement", "Unable to add request to ghaphQL request");
+
+		return false;
+	}
+
+	imtclientgql::IGqlClient::GqlRequestPtr requestPtr = CreateApiRequest(imtgql::IGqlRequest::RT_MUTATION, RequestTypeId::s_RemoveObject, {removeRequestParam});
+
+	imtclientgql::IGqlClient::GqlResponsePtr responcePtr = m_graphQlApiClientCompPtr->SendRequest(requestPtr);
+	if (responcePtr.isNull()){
+		SendErrorMessage("Unable to exec request", logTag);
+
+		return false;
+	}
+
+	if (!CheckResponceOnErrors(*responcePtr)){
+		SendErrorMessage("Unable to remove file", logTag);
+
+		return false;
+	}
+
+
+	return true;
 }
 
 
 // reimplemented (imtrepo::IFileObjectCollection)
 
 QString CGqlRemoteFileRepositoryComp::GetFile(
-			const QByteArray& /*objectId*/,
-			const QString& /*targetFilePath*/) const
+			const QByteArray& objectId,
+			const QString& targetFilePath) const
 {
-	/// \todo implement it
-	I_CRITICAL();
+	const char* const logTag = "GetFile";
 
-	return QString();
+	sdl::CFileDataRequest fileDataRequest;
+	fileDataRequest.SetId(objectId);
+
+	imtgql::CGqlObject fileDataRequestParam;
+	const bool isAdded = fileDataRequest.AddMeToGraphQlObject(fileDataRequestParam);
+	if (!isAdded){
+		SendCriticalMessage("Unable to add request to ghaphQL request", logTag);
+		Q_ASSERT_X(false, logTag, "Unable to add request to ghaphQL request");
+
+		return QString();
+	}
+
+	imtclientgql::IGqlClient::GqlRequestPtr requestPtr = CreateApiRequest(imtgql::IGqlRequest::RT_MUTATION, RequestTypeId::s_RemoveObject, {fileDataRequestParam});
+
+	imtclientgql::IGqlClient::GqlResponsePtr responcePtr = m_graphQlApiClientCompPtr->SendRequest(requestPtr);
+	if (responcePtr.isNull()){
+		SendErrorMessage("Unable to exec request", logTag);
+
+		return QString();
+	}
+
+	if (!CheckResponceOnErrors(*responcePtr)){
+		SendErrorMessage("Unable to get file", logTag);
+
+		return QString();
+	}
+
+	const QByteArray responceData = responcePtr->GetData();
+	imtbase::CTreeItemModel treeModel;
+	const bool isCreated = treeModel.CreateFromJson(responceData);
+	if (!isCreated){
+		SendErrorMessage("Unable to create model from data", logTag);
+
+		return QString();
+	}
+
+	if (treeModel.GetItemsCount() != 1){
+		SendErrorMessage("Invalid data received", logTag);
+
+		return QString();
+	}
+
+	sdl::CFileDataReply fileDataReply;
+	bool isFileDataReaded = sdl::CFileDataReply::ReadFromModel(fileDataReply, treeModel);
+	if (!isFileDataReaded){
+		SendErrorMessage("Unable to read reply data", logTag);
+
+		return QString();
+	}
+
+	QString storedFilePath = targetFilePath;
+	if (storedFilePath.isEmpty()){
+		static QString tempPath = QDir::tempPath() + QStringLiteral("/ImtCore/GqlRemoteFileRepository/");
+		storedFilePath = tempPath + QUuid::createUuid().toString(QUuid::WithoutBraces);
+		if (!istd::CSystem::EnsurePathExists(tempPath)){
+			SendCriticalMessage("Unable to create temp directory", logTag);
+
+			return QString();
+		}
+	}
+
+	QFile targetFile(storedFilePath);
+	if (!targetFile.open(QIODevice::WriteOnly)){
+		QString errorString = QString ("Unable to create temp directory '%1'").arg(storedFilePath);
+		SendCriticalMessage(errorString, logTag);
+		Q_ASSERT_X(false, logTag, errorString.toLocal8Bit());
+
+		return QString();
+	}
+
+	const QByteArray encodedFileData = fileDataReply.GetData();
+
+	const QByteArray::FromBase64Result decodeResult = QByteArray::fromBase64Encoding(encodedFileData);
+	if (decodeResult.decodingStatus != QByteArray::Base64DecodingStatus::Ok){
+		QString errorMessage = QString("Decoding error '%1'").arg(QString::number(int(decodeResult.decodingStatus)));
+		targetFile.close();
+		SendErrorMessage(errorMessage, logTag);
+		I_CRITICAL();
+
+		return nullptr;
+	}
+
+	targetFile.write(decodeResult.decoded);
+	targetFile.close();
+
+	return storedFilePath;
 }
 
 
 QByteArray CGqlRemoteFileRepositoryComp::InsertFile(
-			const QString& /*filePath*/,
-			const QByteArray& /*objectTypeId*/,
-			const QString& /*objectName*/,
-			const QString& /*objectDescription*/,
-			const QByteArray& /*proposedObjectId*/,
+			const QString& filePath,
+			const QByteArray& objectTypeId,
+			const QString& objectName,
+			const QString& objectDescription,
+			const QByteArray& proposedObjectId,
 			const idoc::IDocumentMetaInfo* /*dataMetaInfoPtr*/,
 			const idoc::IDocumentMetaInfo* /*collectionItemMetaInfoPtr*/)
 {
-	/// \todo implement it
-	I_CRITICAL();
+	const char* const logTag = "InsertFile";
+	sdl::CInsertRequest insertRequest;
+	insertRequest.SetFileType(objectTypeId);
+	insertRequest.SetFileName(objectName);
+	insertRequest.SetDescription(objectDescription);
+	insertRequest.SetFileId(proposedObjectId);
+	insertRequest.SetChecksumAlgorithm("MD5");
+	insertRequest.SetChecksumValue(QString());
+	insertRequest.SetVersion("1.0");
 
-	return QByteArray();
+	QFile fileToInsert(filePath);
+	if (!fileToInsert.open(QIODevice::ReadOnly)){
+		SendCriticalMessage(QString("Unable to open file '%1'").arg(filePath), logTag);
+		I_CRITICAL();
+
+		return QByteArray();
+	}
+	QByteArray fileData = fileToInsert.readAll();
+	fileData = fileData.toBase64();
+
+	insertRequest.SetFileData(fileData);
+	insertRequest.SetTotalSize(fileData.length());
+
+	imtgql::CGqlObject insertRequestParam;
+	const bool isAdded = insertRequest.AddMeToGraphQlObject(insertRequestParam);
+	if (!isAdded){
+		SendCriticalMessage("Unable to add request to ghaphQL request", logTag);
+		Q_ASSERT_X(false, logTag, "Unable to add request to ghaphQL request");
+
+		return QByteArray();
+	}
+
+	imtclientgql::IGqlClient::GqlRequestPtr requestPtr = CreateApiRequest(imtgql::IGqlRequest::RT_MUTATION, RequestTypeId::s_InsertObject, {insertRequestParam});
+	imtclientgql::IGqlClient::GqlResponsePtr responcePtr = m_graphQlApiClientCompPtr->SendRequest(requestPtr);
+	if (responcePtr.isNull()){
+		SendErrorMessage("Unable to exec request", logTag);
+
+		return QByteArray();
+	}
+
+	if (!CheckResponceOnErrors(*responcePtr)){
+		SendErrorMessage("Unable to get file", logTag);
+
+		return QByteArray();
+	}
+
+	const QByteArray responceData = responcePtr->GetData();
+	imtbase::CTreeItemModel treeModel;
+	const bool isCreated = treeModel.CreateFromJson(responceData);
+	if (!isCreated){
+		SendErrorMessage("Unable to create model from data", logTag);
+
+		return QByteArray();
+	}
+
+	if (treeModel.GetItemsCount() != 1){
+		SendErrorMessage("Invalid data received", logTag);
+
+		return QByteArray();
+	}
+
+	sdl::CInsertFileResponse fileInsertRsponse;
+	bool isFileDataReaded = sdl::CInsertFileResponse::ReadFromModel(fileInsertRsponse, treeModel);
+	if (!isFileDataReaded){
+		SendErrorMessage("Unable to read reply data", logTag);
+
+		return QByteArray();
+	}
+
+	return fileInsertRsponse.GetId();
 }
 
 
@@ -223,9 +414,6 @@ bool CGqlRemoteFileRepositoryComp::UpdateFile(
 			const QString& /*filePath*/,
 			const QByteArray& /*objectId*/)
 {
-	/// \todo implement it
-	I_CRITICAL();
-
 	return false;
 }
 
@@ -302,13 +490,35 @@ void CGqlRemoteFileRepositoryComp::OnComponentCreated()
 
 // private methods
 
-imtclientgql::IGqlClient::GqlRequestPtr CGqlRemoteFileRepositoryComp::CreateApiRequest(
-		const QString& requestName,
-		ilog::IMessageConsumer* slaveLogPtr	) const
+bool CGqlRemoteFileRepositoryComp::CheckResponceOnErrors(const imtgql::IGqlResponse& response, ilog::IMessageConsumer* slaveLogPtr) const
 {
-	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(imtgql::IGqlRequest::RT_QUERY, requestName.toUtf8());
+	const QStringList errorMessageList = response.GetErrorMessageList();
+	if (errorMessageList.isEmpty()){
+		return true;
+	}
+
+	SendErrorMessage("Errors occured during the request exec:", "CheckResponceOnErrors");
+	for (const QString& errorMessage: errorMessageList){
+		SendErrorMessage(QString("\t- %1").arg(errorMessage), "CheckResponceOnErrors");
+	}
+
+	return false;
+}
+
+
+imtclientgql::IGqlClient::GqlRequestPtr CGqlRemoteFileRepositoryComp::CreateApiRequest(
+		imtgql::IGqlRequest::RequestType requestType,
+		const QString& requestName,
+		const QList<imtgql::CGqlObject> paramList,
+		ilog::IMessageConsumer* slaveLogPtr) const
+{
+	imtgql::CGqlRequest* requestPtr = new imtgql::CGqlRequest(requestType, requestName.toUtf8());
 	imtgql::CGqlObject requestIdField(requestName.toUtf8());
 	requestPtr->AddField(requestIdField);
+
+	for (const imtgql::CGqlObject& field: paramList){
+		requestPtr->AddParam(field);
+	}
 
 	return imtclientgql::IGqlClient::GqlRequestPtr(requestPtr);
 }
@@ -317,10 +527,16 @@ imtclientgql::IGqlClient::GqlRequestPtr CGqlRemoteFileRepositoryComp::CreateApiR
 CGqlRemoteFileRepositoryComp::FileMetaInfoList CGqlRemoteFileRepositoryComp::ApiGetListOfObjects(ilog::IMessageConsumer* slaveLogPtr) const
 {
 	const QString logTag = QStringLiteral("ApiGetListOfObjects");
+	if (!m_graphQlApiClientCompPtr.IsValid()){
+		SendErrorMessage("Unable to create request. API client is invalid", logTag, slaveLogPtr);
+		Q_ASSERT_X(false, "CreateApiRequest", "Unable to create request. API client is invalid");
+
+		return FileMetaInfoList();
+	}
 
 	FileMetaInfoList retVal;
 
-	imtclientgql::IGqlClient::GqlRequestPtr requestPtr = CreateApiRequest(RequestTypeId::s_GetObjects, slaveLogPtr);
+	imtclientgql::IGqlClient::GqlRequestPtr requestPtr = CreateApiRequest(imtgql::IGqlRequest::RT_QUERY, RequestTypeId::s_GetObjects, {}, slaveLogPtr);
 	if (requestPtr.isNull()){
 		SendErrorMessage("Unable to create request", logTag, slaveLogPtr);
 

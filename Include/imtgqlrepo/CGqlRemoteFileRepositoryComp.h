@@ -13,7 +13,6 @@
 
 // imtgqlrepo SDL includes
 #include <GeneratedFiles/imtgqlrepo/SDL/CFileMetaInfo.h>
-#include <GeneratedFiles/imtgqlrepo/SDL/CInsertRequest.h>
 
 // win-API bug
 #undef GetObject
@@ -27,7 +26,6 @@ namespace imtgqlrepo
 	Gql Remote File Repository Comp
  */
 class CGqlRemoteFileRepositoryComp:
-			virtual public imtrepo::IFileObjectCollection,
 			public imtrepo:: CFileRepositoryComp
 {
 public:
@@ -88,12 +86,23 @@ protected:
 	virtual void OnComponentCreated() override;
 
 private:
+	/**
+		Checks if the response has errors.
+		\return True - if response has NOT errors i.e. \c imtgql::IGqlResponse::GetErrorMessageList() is EMPTY
+		\return False - if responce HAS at least one error
+	 */
+	bool CheckResponceOnErrors(
+			const imtgql::IGqlResponse& response,
+			ilog::IMessageConsumer* slaveLogPtr = nullptr) const;
+
 	sdl::CFileMetaInfo GetMetaInfoById(
 			const Id& elementId,
 			ilog::IMessageConsumer* slaveLogPtr = nullptr) const;
 
 	imtclientgql::IGqlClient::GqlRequestPtr CreateApiRequest(
+			imtgql::IGqlRequest::RequestType requestType,
 			const QString& requestName,
+			const QList<imtgql::CGqlObject> paramList,
 			ilog::IMessageConsumer* slaveLogPtr = nullptr) const;
 
 	FileMetaInfoList ApiGetListOfObjects(ilog::IMessageConsumer* slaveLogPtr = nullptr) const;

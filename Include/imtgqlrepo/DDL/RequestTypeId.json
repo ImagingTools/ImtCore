@@ -4,6 +4,14 @@
 		"GetObjects": {
 			"type": "string",
 			"value": "ObjectList"
+		},
+		"RemoveObject": {
+			"type": "string",
+			"value:": "RemoveObject"
+		},
+		"InsertObject": {
+			"type": "string",
+			"value:": "InsertObject"
 		}
 	}
 }

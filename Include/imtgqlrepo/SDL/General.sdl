@@ -2,6 +2,7 @@ type FileMetaInfo {
 	Id: ID!
 	Name: String!
 	Description: String!
+	FileType: ID!
 	Added: String!
 	LastModified: String!
 	ChecksumAlgorithm: String!
@@ -9,15 +10,37 @@ type FileMetaInfo {
 	Version: String!
 }
 
+type RemoveFileRequest {
+	Id: ID!
+}
+
+type FileDataRequest {
+	Id: ID!
+	Offset: LongLong
+	Length: LongLong
+	Encoding: ID
+}
+
+type FileDataReply {
+	MetaInfo: FileMetaInfo!
+	DataInfo: FileDataRequest!
+	Size: LongLong!
+	Data: ID!
+}
+
 type InsertRequest {
 	FileId: ID
-	InsertionType: ID
-	FileData: ID
-	FileType: ID
+	InsertionType: ID!
+	FileData: ID!
+	FileType: ID!
 	TotalSize: LongLong!
 	FileName: String!
 	Description: String!
 	Version: String!
 	ChecksumAlgorithm: String!
 	ChecksumValue: String!
+}
+
+type InsertFileResponse {
+	Id: ID!
 }
