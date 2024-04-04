@@ -31,7 +31,7 @@ class TextInput extends Item {
         echoMode: { type: QReal, value: TextInput.Normal, changed: '$echoModeChanged' },
         readOnly: { type: QBool, value: false, changed: '$readOnlyChanged' },
         acceptableInput: { type: QBool, value: true },
-        validator: { type: QVar, value: undefined },
+        validator: { type: QVar, value: undefined, changed: '$validatorChanged' },
         font: { type: QFont, changed: '$fontChanged' },
         contentHeight: { type: QReal, value: 0 },
         contentWidth: { type: QReal, value: 0 },
@@ -89,17 +89,17 @@ class TextInput extends Item {
 
         this.$input.oninput = (e)=>{
             if(this.getPropertyValue('validator')){
-                if(this.getPropertyValue('validator').validate(this.$input.value)){
+                if(this.getPropertyValue('validator').hasPartialMatch(this.$input.value)){
                     this.getProperty('text').reset(this.$input.value)
-                    this.getProperty('acceptableInput') .reset(true)
+                    // this.getProperty('acceptableInput').reset(true)
                     if(this.$signals.textEdited) this.$signals.textEdited()
                 } else {
                     this.$input.value = this.getPropertyValue('text')
-                    this.getProperty('acceptableInput') .reset(false)
+                    // this.getProperty('acceptableInput').reset(false)
                 }
             } else {
                 this.getProperty('text').reset(this.$input.value)
-                this.getProperty('acceptableInput') .reset(true)
+                this.getProperty('acceptableInput').reset(true)
                 if(this.$signals.textEdited) this.$signals.textEdited()
             }
         }
@@ -172,8 +172,21 @@ class TextInput extends Item {
         }
     }
 
+    $validatorChanged(){
+        if(this.getPropertyValue('validator')){
+            if(this.getPropertyValue('validator').validate(this.getPropertyValue('text'))){
+                this.getProperty('acceptableInput').reset(true)
+            } else {
+                this.getProperty('acceptableInput').reset(false)
+            }
+        } else {
+            this.getProperty('acceptableInput').reset(true)
+        }
+    }
+
     $textChanged(){
         this.$input.value = this.getPropertyValue('text')
+        this.$validatorChanged()
         this.applyMetrics()
     }
 
