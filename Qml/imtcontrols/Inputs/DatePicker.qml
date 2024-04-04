@@ -364,42 +364,57 @@ Item {
             height: parent.height;
             spacing: datePicker.mainMargin;
 
-            CustomTextField {
-                id: yearField;
+            Item{
+                id: yearItem;
 
                 anchors.verticalCenter: parent.verticalCenter;
 
                 height: datePicker.textFieldHeight;
                 width: datePicker.textFieldWidthYear;
-                radius: datePicker.textFieldRadius;
-                textSize: datePicker.textSize;
-                fontColor: datePicker.fontColor;
-                color: datePicker.textFieldColor;
-                borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
-                margin: datePicker.textFieldMargin;
 
-                leftPadding: horizontalAlignment == TextInput.AlignLeft ? 4 : 0;
-                horizontalAlignment: datePicker.horizontalAlignment;
+                CustomTextField {
+                    id: yearField;
 
-                textInputValidator: yearValid;
+                    anchors.verticalCenter: parent.verticalCenter;
 
-                Keys.onUpPressed: {
-                    yearUpButton.clicked();
+                    width: parent.width;
+                    height: parent.height;
+                    visible: !yearCombo.openST;
+
+                    radius: datePicker.textFieldRadius;
+                    textSize: datePicker.textSize;
+                    fontColor: datePicker.fontColor;
+                    color: datePicker.textFieldColor;
+                    borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
+                    margin: datePicker.textFieldMargin;
+
+                    leftPadding: horizontalAlignment == TextInput.AlignLeft ? 4 : 0;
+                    horizontalAlignment: datePicker.horizontalAlignment;
+
+                    textInputValidator: yearValid;
+
+                    Keys.onUpPressed: {
+                        yearUpButton.clicked();
+                    }
+
+                    Keys.onDownPressed: {
+                        yearDownButton.clicked();
+                    }
+
+                    readOnly: true//datePicker.readOnly || datePicker.textInputBan;
+
+
                 }
 
-                Keys.onDownPressed: {
-                    yearDownButton.clicked();
-                }
-
-                readOnly: datePicker.readOnly || datePicker.textInputBan;
 
                 ComboBox {
                     id: yearComboObj;
 
+                    anchors.fill: parent;
+
                     visible: datePicker.hasYearCombo;
                     enabled: visible;
                     model: yearTreeModel;
-                    anchors.fill: parent;
 
                     textSize: datePicker.textSize;
                     fontColor: yearField.fontColor;
@@ -412,10 +427,9 @@ Item {
                     moveToIndex : datePicker.todayYear - datePicker.startYear - datePicker.shownItemsCountCombo +1;
                     visibleScrollBar: false;
                     isColor: true;
-                    openST: true;
 
                     changeable: !datePicker.readOnly;
-                    z: yearField.readOnly ? 1 : 0;
+                    //z: yearField.readOnly ? 1 : 0;
 
                     onCurrentIndexChanged:{
                         if(yearComboObj.currentIndex >=0){
@@ -432,8 +446,10 @@ Item {
                         }
 
                     }
-                }//yearComboObj
-            }
+                }////yearComboObj
+
+            }//yearItem
+
 
             Column {
                 anchors.verticalCenter: parent.verticalCenter;
@@ -502,42 +518,55 @@ Item {
                 }
             }
 
-            CustomTextField {
-                id: monthField;
-
+            Item{
+                id: monthItem;
                 anchors.verticalCenter: parent.verticalCenter;
 
                 height: datePicker.textFieldHeight;
                 width: datePicker.textFieldWidthMonth;
-                radius: datePicker.textFieldRadius;
-                textSize: datePicker.textSize;
-                fontColor: datePicker.fontColor;
-                color: datePicker.textFieldColor;
-                borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
-                margin: datePicker.textFieldMargin;
 
-                readOnly: datePicker.readOnly || datePicker.textInputBan;
+                CustomTextField {
+                    id: monthField;
 
-                leftPadding: horizontalAlignment == TextInput.AlignLeft ? 4 : 0;
-                horizontalAlignment: datePicker.horizontalAlignment;
+                    anchors.verticalCenter: parent.verticalCenter;
 
-                text: datePicker.monthNames[datePicker.selectedIndexMonth];
+                    height: parent.height;
+                    width: parent.width;
+                    visible: !monthComboObj.openST;
 
-                Keys.onUpPressed: {
-                    monthUpButton.clicked();
-                }
+                    radius: datePicker.textFieldRadius;
+                    textSize: datePicker.textSize;
+                    fontColor: datePicker.fontColor;
+                    color: datePicker.textFieldColor;
+                    borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
+                    margin: datePicker.textFieldMargin;
 
-                Keys.onDownPressed: {
-                    monthDownButton.clicked();
+                    readOnly: true//datePicker.readOnly || datePicker.textInputBan;
+
+                    leftPadding: horizontalAlignment == TextInput.AlignLeft ? 4 : 0;
+                    horizontalAlignment: datePicker.horizontalAlignment;
+
+                    text: datePicker.monthNames[datePicker.selectedIndexMonth];
+
+                    Keys.onUpPressed: {
+                        monthUpButton.clicked();
+                    }
+
+                    Keys.onDownPressed: {
+                        monthDownButton.clicked();
+                    }
+
+
                 }
 
                 ComboBox {
                     id: monthComboObj;
 
+                    anchors.fill: parent;
+
                     visible: datePicker.hasMonthCombo;
                     enabled: visible;
                     model: monthTreeModel;
-                    anchors.fill: parent;
 
                     textSize: datePicker.textSize;//Style.fontSize_common;
                     fontColor: monthField.fontColor;
@@ -552,7 +581,7 @@ Item {
                     isColor: true;
 
                     changeable: !datePicker.readOnly;
-                    z: monthField.readOnly ? 1 : 0;
+                    //z: monthField.readOnly ? 1 : 0;
 
                     onCurrentIndexChanged:{
                         if(monthComboObj.currentIndex >= 0){
@@ -567,7 +596,9 @@ Item {
                         }
                     }
                 }//monthComboObj
-            }
+
+            }//monthItem
+
 
             Column {
                 anchors.verticalCenter: parent.verticalCenter;
@@ -645,8 +676,8 @@ Item {
                 regularExpression: /\b([1-9]|[12][0-9]|3[01])\b/;
             }
 
-            CustomTextField {
-                id: dayField;
+            Item {
+                id: dayItem;
 
                 anchors.verticalCenter: parent.verticalCenter;
 
@@ -654,43 +685,58 @@ Item {
 
                 height: datePicker.textFieldHeight;
                 width: datePicker.textFieldWidthDay;
-                radius: datePicker.textFieldRadius;
-                textSize: datePicker.textSize;
-                fontColor: datePicker.fontColor;
-                color: datePicker.textFieldColor;
-                borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
-                margin: datePicker.textFieldMargin;
 
-                readOnly: datePicker.readOnly || datePicker.textInputBan;
+                CustomTextField {
+                    id: dayField;
 
-                leftPadding: horizontalAlignment == TextInput.AlignLeft ? 4 : 0;
-                horizontalAlignment: datePicker.horizontalAlignment;
+                    anchors.verticalCenter: parent.verticalCenter;
 
-                textInputValidator: dayValid;
+                    visible: datePicker.hasDay && !dayComboObj.openST;
 
-                Keys.onUpPressed: {
-                    if (readOnly){
-                        return;
+                    height: parent.width;
+                    width: parent.height;
+
+                    radius: datePicker.textFieldRadius;
+                    textSize: datePicker.textSize;
+                    fontColor: datePicker.fontColor;
+                    color: datePicker.textFieldColor;
+                    borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
+                    margin: datePicker.textFieldMargin;
+
+                    readOnly: true;//datePicker.readOnly || datePicker.textInputBan;
+
+                    leftPadding: horizontalAlignment == TextInput.AlignLeft ? 4 : 0;
+                    horizontalAlignment: datePicker.horizontalAlignment;
+
+                    textInputValidator: dayValid;
+
+                    Keys.onUpPressed: {
+                        if (readOnly){
+                            return;
+                        }
+
+                        dayUpButton.clicked();
                     }
 
-                    dayUpButton.clicked();
-                }
-
-                Keys.onDownPressed: {
-                    if (readOnly){
-                        return;
+                    Keys.onDownPressed: {
+                        if (readOnly){
+                            return;
+                        }
+                        dayDownButton.clicked();
                     }
-                    dayDownButton.clicked();
+
+
                 }
 
                 ComboBox {
                     id: dayComboObj;
 
+                    anchors.fill: parent;
+
                     visible: datePicker.hasDayCombo;
                     enabled: visible;
 
                     model: dayTreeModel;
-                    anchors.fill: parent;
 
                     textSize: datePicker.textSize;
                     fontColor: dayField.fontColor;
@@ -704,7 +750,7 @@ Item {
                     visibleScrollBar: false;
                     isColor: true;
                     changeable: !datePicker.readOnly;
-                    z: dayField.readOnly ? 1 : 0;
+                    //z: dayField.readOnly ? 1 : 0;
 
                     onCurrentIndexChanged:{
                         if(dayComboObj.currentIndex >=0){
@@ -722,7 +768,10 @@ Item {
 
                     }
                 }//dayComboObj
-            }
+
+
+            }//dayItem
+
 
             Column {
                 id: dayButtons;
