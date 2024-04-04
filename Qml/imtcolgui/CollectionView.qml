@@ -29,6 +29,7 @@ Item {
     property alias hasSort: container.hasSort;
     property alias hasPagination: container.hasPagination;
     property alias elementsCount: container.elementsCount;
+    property alias pagination: container.pagination;
 
     property bool visibleMetaInfo: false;
 
@@ -81,7 +82,7 @@ Item {
         collectionMetaInfo.metaInfoModel = metaInfoModel;
     }
 
-    function onEdit() {
+    function onEdit(id, index) {
         if (container.commandsDelegate){
             container.commandsDelegate.commandHandle("Edit");
         }
@@ -233,7 +234,7 @@ Item {
         }
 
         onDoubleClicked: {
-            root.onEdit()
+            root.onEdit(id, index)
         }
 
         onFilterChanged: {
