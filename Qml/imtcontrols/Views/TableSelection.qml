@@ -7,19 +7,19 @@ QtObject {
 
     property var selectedIndexes: []
 
-    property ListView table: null;
+    property ListView tableItem: null;
     signal selectionChanged();
 
     property bool isMultiSelect: true;
 
-    property int countElements: root.table ? root.table.count : -1;
+    property int countElements: root.tableItem ? root.tableItem.count : -1;
 
     Component.onDestruction: {
         root.unsubscribeEvents();
     }
 
-    onTableChanged: {
-        if (root.table != null){
+    onTableItemChanged: {
+        if (root.tableItem != null){
             root.subscribeEvents();
         }
     }

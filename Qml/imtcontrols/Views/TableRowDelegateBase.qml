@@ -8,24 +8,26 @@ Rectangle {
     width: 1000;
     height: visible ? minHeight : 0;
     property real minHeight: 40;
+    property real contentHeight: height;
 
     color: tableDelegateContainer.selected ? Style.selectedColor : "transparent";
+    //color:  "transparent";
 
     visible: true
 
     property int textTopMargin: 8;
-    property int columnCount: table ? table.columnCount : 0;
+    property int columnCount: tableItem ? tableItem.columnCount : 0;
 
     property bool selected: false;
     property int checkedState: Qt.Unchecked;
 
-    property TableBase table: null;
+    property TableBase tableItem: null;
 
     property var dataModel: model;
 
     property int rowIndex: model.index;
 
-    property TreeItemModel cellDecorator : table.cellDecorator
+    property TreeItemModel cellDecorator : tableItem.cellDecorator
 
     property alias mouseArea: ma;
 
@@ -33,8 +35,8 @@ Rectangle {
 
     property bool enabled: true;
 
-    property real selectedOpacity: ((Style.selectedOpacity !== undefined && Style.selectedOpacity !== undefined) ?  Style.selectedOpacity :  0.5);
-    property real hoverOpacity:((Style.hoverOpacity !== undefined && Style.hoverOpacity !== undefined) ?  Style.hoverOpacity :  selectedOpacity/2);
+    property real selectedOpacity: ((Style.selectedOpacity !== undefined && Style.selectedOpacity !== null) ?  Style.selectedOpacity :  0.5);
+    property real hoverOpacity:((Style.hoverOpacity !== undefined && Style.hoverOpacity !== null) ?  Style.hoverOpacity :  selectedOpacity/2);
 
     //
     property string borderColorHorizontal: "transparent";
@@ -64,7 +66,7 @@ Rectangle {
 
     property string selectedColor: Style.selectedColor;
 
-    property  Component cellDelegate: table ? table.cellDelegate : cellDelegateDefault;
+    property  Component cellDelegate: tableItem ? tableItem.cellDelegate : cellDelegateDefault;
     property  Component cellDelegateDefault: TableCellDelegate {};
 
     signal clicked();
@@ -79,66 +81,44 @@ Rectangle {
     }
 
     Component.onDestruction: {
-        if (table){
-//            table.tableSelection.selectionChanged.disconnect(tableDelegateContainer.selectionChanged);
-            table.checkedItemsChanged.disconnect(tableDelegateContainer.checkedItemsChanged);
+        if (tableItem){
+            //tableItem.tableSelection.selectionChanged.disconnect(tableDelegateContainer.selectionChanged);
+            tableItem.checkedItemsChanged.disconnect(tableDelegateContainer.checkedItemsChanged);
 
-            table.properties.visibleItemsChanged.disconnect(tableDelegateContainer.visibleItemsChanged);
-            table.properties.stateItemsChanged.disconnect(tableDelegateContainer.enabledItemsChanged);
+            tableItem.properties.visibleItemsChanged.disconnect(tableDelegateContainer.visibleItemsChanged);
+            tableItem.properties.stateItemsChanged.disconnect(tableDelegateContainer.enabledItemsChanged);
         }
     }
 
 
     onCellDecoratorChanged: {
-        if (tableDelegateContainer.table.cellDecorator){
+        if (tableDelegateContainer.tableItem.cellDecorator){
             tableDelegateContainer.setBorderParams();
-        }
-    }
-
-    Connections {
-        id: tableConnections;
-
-        function onSelectionChanged(selection){
-            if (!tableDelegateContainer.table){
-                return;
-            }
-
-            tableDelegateContainer.selected = selection.includes(tableDelegateContainer.rowIndex);
-        }
-
-        function onElementsChanged(){
-            if (!tableDelegateContainer.table){
-                return;
-            }
-
-            let selection = tableDelegateContainer.table.tableSelection.selectedIndexes;
-
-            tableDelegateContainer.selected = selection.includes(tableDelegateContainer.rowIndex);
         }
     }
 
     onClicked: {
         console.log("tableRow onClicked")
 
-        if (!table){
-            console.error("table is invalid")
+        if (!tableItem){
+            console.error("tableItem is invalid")
 
             return;
         }
 
-        if (!table.selectable){
+        if (!tableItem.selectable){
             return;
         }
 
-        table.tableSelection.singleSelect(model.index);
+        tableItem.tableSelection.singleSelect(model.index);
 
-        console.log("table.tableSelection", table.tableSelection.selectedIndexes)
-        table.forceActiveFocus();
+        console.log("tableItem.tableSelection", tableItem.tableSelection.selectedIndexes)
+        tableItem.forceActiveFocus();
     }
 
     onDoubleClicked: {
-        if (table){
-            table.doubleClicked(model.Id, model.index)
+        if (tableItem){
+            tableItem.doubleClicked(model.Id, model.index)
         }
     }
 
@@ -146,27 +126,24 @@ Rectangle {
         console.log("onRightButtonMouseClicked")
         var point = mapToItem(null, mX, mY);
 
-        if (table){
-            table.rightButtonMouseClicked(point.x, point.y);
+        if (tableItem){
+            tableItem.rightButtonMouseClicked(point.x, point.y);
         }
     }
 
     onCheckedStateChanged: {
-        tableDelegateContainer.table.isAllItemChecked = tableDelegateContainer.table.isAllChecked();
+        tableDelegateContainer.tableItem.isAllItemChecked = tableDelegateContainer.tableItem.isAllChecked();
     }
 
-    onTableChanged: {
-        if (table){
+    onTableItemChanged: {
+        if (tableItem){
+            //tableItem.tableSelection.selectionChanged.connect(tableDelegateContainer.selectionChanged);
+            tableItem.checkedItemsChanged.connect(tableDelegateContainer.checkedItemsChanged);
 
-            tableConnections.target = table;
-
-//            table.tableSelection.selectionChanged.connect(tableDelegateContainer.selectionChanged);
-            table.checkedItemsChanged.connect(tableDelegateContainer.checkedItemsChanged);
-
-            table.properties.visibleItemsChanged.connect(tableDelegateContainer.visibleItemsChanged);
-            table.properties.stateItemsChanged.connect(tableDelegateContainer.enabledItemsChanged);
-            ma.visible = table.hoverEnabled
-            if (table.checkable){
+            tableItem.properties.visibleItemsChanged.connect(tableDelegateContainer.visibleItemsChanged);
+            tableItem.properties.stateItemsChanged.connect(tableDelegateContainer.enabledItemsChanged);
+            ma.visible = tableItem.hoverEnabled
+            if (tableItem.checkable){
                 checkBox.createObject(tableDelegateContainer)
             }
         }
@@ -205,38 +182,38 @@ Rectangle {
     }
 
     function setBorderParams(){
-        if(tableDelegateContainer.table.cellDecorator.IsValidData("BorderColorHorizontal")){
-            tableDelegateContainer.borderColorHorizontal = tableDelegateContainer.table.cellDecorator.GetData("BorderColorHorizontal");
+        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("BorderColorHorizontal")){
+            tableDelegateContainer.borderColorHorizontal = tableDelegateContainer.tableItem.cellDecorator.GetData("BorderColorHorizontal");
         }
-        if(tableDelegateContainer.table.cellDecorator.IsValidData("BorderColorVertical")){
-            tableDelegateContainer.borderColorVertical = tableDelegateContainer.table.cellDecorator.GetData("BorderColorVertical");
+        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("BorderColorVertical")){
+            tableDelegateContainer.borderColorVertical = tableDelegateContainer.tableItem.cellDecorator.GetData("BorderColorVertical");
         }
-        if(tableDelegateContainer.table.cellDecorator.IsValidData("HorizontalBorderSize")){
-            tableDelegateContainer.horizontalBorderSize = tableDelegateContainer.table.cellDecorator.GetData("HorizontalBorderSize");
+        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("HorizontalBorderSize")){
+            tableDelegateContainer.horizontalBorderSize = tableDelegateContainer.tableItem.cellDecorator.GetData("HorizontalBorderSize");
         }
-        if(tableDelegateContainer.table.cellDecorator.IsValidData("VerticalBorderSize")){
-            tableDelegateContainer.verticalBorderSize = tableDelegateContainer.table.cellDecorator.GetData("VerticalBorderSize");
+        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("VerticalBorderSize")){
+            tableDelegateContainer.verticalBorderSize = tableDelegateContainer.tableItem.cellDecorator.GetData("VerticalBorderSize");
         }
-        if(tableDelegateContainer.table.cellDecorator.IsValidData("VisibleLeftBorderFirst")){
-            tableDelegateContainer.visibleLeftBorderFirst = tableDelegateContainer.table.cellDecorator.GetData("VisibleLeftBorderFirst");
+        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("VisibleLeftBorderFirst")){
+            tableDelegateContainer.visibleLeftBorderFirst = tableDelegateContainer.tableItem.cellDecorator.GetData("VisibleLeftBorderFirst");
         }
-        if(tableDelegateContainer.table.cellDecorator.IsValidData("VisibleRightBorderLast")){
-            tableDelegateContainer.visibleRightBorderLast = tableDelegateContainer.table.cellDecorator.GetData("VisibleRightBorderLast");
+        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("VisibleRightBorderLast")){
+            tableDelegateContainer.visibleRightBorderLast = tableDelegateContainer.tableItem.cellDecorator.GetData("VisibleRightBorderLast");
         }
-        if(tableDelegateContainer.table.cellDecorator.IsValidData("VisibleTopBorderFirst")){
-            tableDelegateContainer.visibleTopBorderFirst = tableDelegateContainer.table.cellDecorator.GetData("VisibleTopBorderFirst");
+        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("VisibleTopBorderFirst")){
+            tableDelegateContainer.visibleTopBorderFirst = tableDelegateContainer.tableItem.cellDecorator.GetData("VisibleTopBorderFirst");
         }
-        if(tableDelegateContainer.table.cellDecorator.IsValidData("VisibleBottomBorderLast")){
-            tableDelegateContainer.visibleBottomBorderLast = tableDelegateContainer.table.cellDecorator.GetData("VisibleBottomBorderLast");
+        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("VisibleBottomBorderLast")){
+            tableDelegateContainer.visibleBottomBorderLast = tableDelegateContainer.tableItem.cellDecorator.GetData("VisibleBottomBorderLast");
         }
-        if(tableDelegateContainer.table.cellDecorator.IsValidData("WrapMode")){
-            tableDelegateContainer.wrapMode = tableDelegateContainer.table.cellDecorator.GetData("WrapMode");
+        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("WrapMode")){
+            tableDelegateContainer.wrapMode = tableDelegateContainer.tableItem.cellDecorator.GetData("WrapMode");
         }
-        if(tableDelegateContainer.table.cellDecorator.IsValidData("IsRightBorder")){
-            tableDelegateContainer.isRightBorder = tableDelegateContainer.table.cellDecorator.GetData("IsRightBorder");
+        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("IsRightBorder")){
+            tableDelegateContainer.isRightBorder = tableDelegateContainer.tableItem.cellDecorator.GetData("IsRightBorder");
         }
-        if(tableDelegateContainer.table.cellDecorator.IsValidData("ElideMode")){
-            tableDelegateContainer.elideMode = tableDelegateContainer.table.cellDecorator.GetData("ElideMode");
+        if(tableDelegateContainer.tableItem.cellDecorator.IsValidData("ElideMode")){
+            tableDelegateContainer.elideMode = tableDelegateContainer.tableItem.cellDecorator.GetData("ElideMode");
         }
 
     }
@@ -244,7 +221,7 @@ Rectangle {
     function setHeightModelElememt(index_,height_){
         console.log("setHeightModelElememt", index_,height_);
 
-        if(!tableDelegateContainer.table || !tableDelegateContainer.table.canFitHeight ){
+        if(!tableDelegateContainer.tableItem || !tableDelegateContainer.tableItem.canFitHeight ){
             return;
         }
         if(index_ < heightModel.count){
@@ -253,7 +230,7 @@ Rectangle {
     }
 
     function setCellHeightModelDefault(){
-        if(!tableDelegateContainer.table || !tableDelegateContainer.table.canFitHeight ){
+        if(!tableDelegateContainer.tableItem || !tableDelegateContainer.tableItem.canFitHeight ){
             return;
         }
         for(var i = 0; i < tableDelegateContainer.columnCount; i++){
@@ -262,7 +239,7 @@ Rectangle {
     }
 
     function setCellHeight(){
-        if(!tableDelegateContainer.table || !tableDelegateContainer.table.canFitHeight ){
+        if(!tableDelegateContainer.tableItem || !tableDelegateContainer.tableItem.canFitHeight ){
             return;
         }
         if(tableDelegateContainer.wrapMode == Text.NoWrap){
@@ -281,19 +258,19 @@ Rectangle {
 
 
     function selectionChanged(){
-        selected = table.tableSelection.selectedIndexes.includes(model.index);
+        selected = tableItem.tableSelection.selectedIndexes.includes(model.index);
     }
 
     function checkedItemsChanged(){
-        checkedState = table.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
+        checkedState = tableItem.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
     }
 
     function visibleItemsChanged(){
-        visible = table.properties.itemIsVisible(model.index);
+        visible = tableItem.properties.itemIsVisible(model.index);
     }
 
     function enabledItemsChanged(){
-        enabled = table.properties.itemIsEnabled(model.index);
+        enabled = tableItem.properties.itemIsEnabled(model.index);
 
         readOnly = !enabled;
     }
@@ -316,14 +293,14 @@ Rectangle {
 
         anchors.fill: parent;
 
-        color: tableDelegateContainer.table.hoverEnabled && ma.containsMouse ? Style.selectedColor :
-            tableDelegateContainer.table.enableAlternating ? tableDelegateContainer.table.alternatingColor : 'transparent';
+        color: tableDelegateContainer.tableItem.hoverEnabled && ma.containsMouse ? Style.selectedColor :
+            tableDelegateContainer.tableItem.enableAlternating ? tableDelegateContainer.tableItem.alternatingColor : 'transparent';
 
         opacity: tableDelegateContainer.selected ? tableDelegateContainer.selectedOpacity :
-                tableDelegateContainer.table.hoverEnabled && ma.containsMouse ? tableDelegateContainer.hoverOpacity :
-                tableDelegateContainer.table.enableAlternating && model.index % 2 === 0 ? tableDelegateContainer.table.alternatingOpacity: 0;
+                tableDelegateContainer.tableItem.hoverEnabled && ma.containsMouse ? tableDelegateContainer.hoverOpacity :
+                tableDelegateContainer.tableItem.enableAlternating && model.index % 2 === 0 ? tableDelegateContainer.tableItem.alternatingOpacity: 0;
 
-        visible: !tableDelegateContainer.selected && tableDelegateContainer.table.selectable;
+        visible: !tableDelegateContainer.selected && tableDelegateContainer.tableItem.selectable;
     }
 
     MouseArea {
@@ -388,7 +365,7 @@ Rectangle {
 
             checkState: tableDelegateContainer.checkedState;
 
-            visible: tableDelegateContainer.table ? tableDelegateContainer.table.checkable : false;
+            visible: tableDelegateContainer.tableItem ? tableDelegateContainer.tableItem.checkable : false;
             isActive: !tableDelegateContainer.readOnly;
 
             onClicked: {
@@ -396,11 +373,11 @@ Rectangle {
                     return;
                 }
 
-                if (tableDelegateContainer.table.itemIsChecked(tableDelegateContainer.rowIndex)){
-                    tableDelegateContainer.table.uncheckItem(tableDelegateContainer.rowIndex);
+                if (tableDelegateContainer.tableItem.itemIsChecked(tableDelegateContainer.rowIndex)){
+                    tableDelegateContainer.tableItem.uncheckItem(tableDelegateContainer.rowIndex);
                 }
                 else{
-                    tableDelegateContainer.table.checkItem(tableDelegateContainer.rowIndex);
+                    tableDelegateContainer.tableItem.checkItem(tableDelegateContainer.rowIndex);
                 }
 
             }

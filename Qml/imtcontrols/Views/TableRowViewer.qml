@@ -8,6 +8,7 @@ Row {
     property bool compl: false;
     property alias model: repeater.model
 
+
     Repeater {
         id: repeater
 
@@ -18,9 +19,9 @@ Row {
         delegate: Item {
             id: cell
             property bool compl: false;
-            property bool complCompl: dataList.compl && dataList.rowDelegate.table.columnCount;
+            property bool complCompl: dataList.compl && dataList.rowDelegate.tableItem.columnCount;
             width: 20
-            height: dataList.rowDelegate ? dataList.rowDelegate.height : 0;
+            height: dataList.height;
 
             Component.onCompleted: {
                 cell.compl = true;
@@ -28,30 +29,30 @@ Row {
 
             Component.onDestruction: {
                 // console.log("*Debug* cell onDestruction")
-                dataList.rowDelegate.table.widthRecalc.disconnect(cell.setCellWidth)
+                dataList.rowDelegate.tableItem.widthRecalc.disconnect(cell.setCellWidth)
             }
 
             onComplComplChanged: {
                 if(cell.complCompl){
-                    loader.sourceComponent = dataList.rowDelegate.table.columnContentComps[model.index] !== null ?
-                                dataList.rowDelegate.table.columnContentComps[model.index] : dataList.rowDelegate.table.cellDelegate;
+                    loader.sourceComponent = dataList.rowDelegate.tableItem.columnContentComps[model.index] !== null ?
+                                dataList.rowDelegate.tableItem.columnContentComps[model.index] : dataList.rowDelegate.tableItem.cellDelegate;
 
-                    dataList.rowDelegate.table.widthRecalc.connect(cell.setCellWidth)
+                    dataList.rowDelegate.tableItem.widthRecalc.connect(cell.setCellWidth)
                     cell.setCellWidth();
                 }
             }
 
             function setCellWidth(){
 
-                if(!dataList.rowDelegate || !dataList.rowDelegate.table){
+                if(!dataList.rowDelegate || !dataList.rowDelegate.tableItem){
                     return;
                 }
 
-                var defaultWidth = dataList.rowDelegate.table.columnCount == 0 ? 0 : dataList.rowDelegate.table.width/dataList.rowDelegate.table.columnCount;
-                var widthFromModel = dataList.rowDelegate.table.widthDecoratorDynamic.IsValidData("Width", model.index) ?
-                            dataList.rowDelegate.table.widthDecoratorDynamic.GetData("Width", model.index) : -1;
+                var defaultWidth = dataList.rowDelegate.tableItem.columnCount == 0 ? 0 : dataList.rowDelegate.tableItem.width/dataList.rowDelegate.tableItem.columnCount;
+                var widthFromModel = dataList.rowDelegate.tableItem.widthDecoratorDynamic.IsValidData("Width", model.index) ?
+                            dataList.rowDelegate.tableItem.widthDecoratorDynamic.GetData("Width", model.index) : -1;
 
-                if(!dataList.rowDelegate.table.widthDecoratorDynamic.GetItemsCount()){
+                if(!dataList.rowDelegate.tableItem.widthDecoratorDynamic.GetItemsCount()){
                     cell.width = defaultWidth;
                 }
                 else if(widthFromModel >= 0){

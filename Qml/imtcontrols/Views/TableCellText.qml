@@ -14,26 +14,26 @@ Text {
 
     verticalAlignment: Text.AlignVCenter;
     horizontalAlignment: rowDelegate ?
-                             rowDelegate.table.emptyDecorCell ? Text.AlignLeft :
-                                                    rowDelegate.table.cellDecorator.IsValidData("TextPosition", delegateContainer.columnIndex) ?
-                                                        rowDelegate.table.cellDecorator.GetData("TextPosition", delegateContainer.columnIndex) :
+                             rowDelegate.tableItem.emptyDecorCell ? Text.AlignLeft :
+                                                    rowDelegate.tableItem.cellDecorator.IsValidData("TextPosition", delegateContainer.columnIndex) ?
+                                                        rowDelegate.tableItem.cellDecorator.GetData("TextPosition", delegateContainer.columnIndex) :
                                                         Text.AlignLeft: Text.AlignLeft;
 
 
-    font.pixelSize: rowDelegate ? rowDelegate.table.emptyDecorCell ? Style.fontSize_common:
-                                                   rowDelegate.table.cellDecorator.IsValidData("FontSize", delegateContainer.columnIndex) ?
-                                                       rowDelegate.table.cellDecorator.GetData("FontSize", delegateContainer.columnIndex) :
+    font.pixelSize: rowDelegate ? rowDelegate.tableItem.emptyDecorCell ? Style.fontSize_common:
+                                                   rowDelegate.tableItem.cellDecorator.IsValidData("FontSize", delegateContainer.columnIndex) ?
+                                                       rowDelegate.tableItem.cellDecorator.GetData("FontSize", delegateContainer.columnIndex) :
                                                        Style.fontSize_common : Style.fontSize_common;
     font.family: Style.fontFamily;
     font.bold: rowDelegate ?
-                   rowDelegate.table.emptyDecorCell ? true :
-                                                  rowDelegate.table.cellDecorator.IsValidData("FontBold", delegateContainer.columnIndex) ?
-                                                      rowDelegate.table.cellDecorator.GetData("FontBold", delegateContainer.columnIndex) :
+                   rowDelegate.tableItem.emptyDecorCell ? true :
+                                                  rowDelegate.tableItem.cellDecorator.IsValidData("FontBold", delegateContainer.columnIndex) ?
+                                                      rowDelegate.tableItem.cellDecorator.GetData("FontBold", delegateContainer.columnIndex) :
                                                       true: false;
     color: rowDelegate && rowDelegate.enabled ?
-               (rowDelegate.table.emptyDecorCell ? Style.textColor :
-                                                  rowDelegate.table.cellDecorator.IsValidData("FontColor", delegateContainer.columnIndex) ?
-                                                      rowDelegate.table.cellDecorator.GetData("FontColor", delegateContainer.columnIndex) :
+               (rowDelegate.tableItem.emptyDecorCell ? Style.textColor :
+                                                  rowDelegate.tableItem.cellDecorator.IsValidData("FontColor", delegateContainer.columnIndex) ?
+                                                      rowDelegate.tableItem.cellDecorator.GetData("FontColor", delegateContainer.columnIndex) :
                                                       Style.textColor) : Style.inactive_textColor;
 
     elide: rowDelegate ? rowDelegate.elideMode : Text.ElideLeft;
@@ -53,7 +53,7 @@ Text {
         }
     }
     onHeightChanged: {
-        if(!rowDelegate || !rowDelegate.table || !rowDelegate.table.canFitHeight ){
+        if(!rowDelegate || !rowDelegate.tableItem || !rowDelegate.tableItem.canFitHeight ){
             return;
         }
         if(wrapMode !== Text.NoWrap && rowDelegate){

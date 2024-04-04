@@ -91,6 +91,7 @@ TableDelegate 1.0 ./Views/TableDelegate.qml
 TableRowDelegateBase 1.0 ./Views/TableRowDelegateBase.qml
 TableRowDelegate 1.0 ./Views/TableRowDelegate.qml
 SimpleTableDelegate 1.0 ./Views/SimpleTableDelegate.qml
+TableRowViewer 1.0 ./Views/TableRowViewer.qml
 
 TableTreeView 1.0 ./Views/TableTreeView.qml
 TableDecorator 1.0 ./Views/TableDecorator.qml

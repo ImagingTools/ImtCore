@@ -160,7 +160,7 @@ Rectangle {
         tableContainer.headerMinHeight = tableContainer.headerHeight;
         tableContainer.setWidth();
 
-        tableContainer.tableSelection.table = elementsListObj;
+        tableContainer.tableSelection.tableItem = elementsListObj;
         tableContainer.compl = true;
     }
 

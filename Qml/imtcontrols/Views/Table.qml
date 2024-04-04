@@ -7,7 +7,7 @@ TableBase {
 
     rowDelegate: Component {
         TableRowDelegate {
-            table: tableContainer
+            tableItem: tableContainer
             width: tableContainer.width
             minHeight: tableContainer.itemHeight
         }
@@ -20,7 +20,7 @@ TableBase {
     headerDelegate: Component {
         TableHeaderDelegate {
             height: tableContainer.headerHeight
-            table: tableContainer
+            tableItem: tableContainer
         }
     }
 }
