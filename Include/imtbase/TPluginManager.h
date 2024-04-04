@@ -98,7 +98,7 @@ bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::LoadPlugi
 			ilog::CLoggerBase::SendInfoMessage(0, QString("Load: '%1'").arg(pluginPath.canonicalFilePath()));
 
 			QString pluginName;
-			QByteArray pluginTypeId;
+			QByteArray instanceTypeId;
 			istd::IInformationProvider::InformationCategory category;
 			QString statusMessage;
 
@@ -109,9 +109,9 @@ bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::LoadPlugi
 					istd::TDelPtr<PluginInterface> pluginInstancePtr = createPluginFunc();
 					if (pluginInstancePtr.IsValid()){
 						pluginName = pluginInstancePtr->GetPluginName();
-						pluginTypeId = pluginInstancePtr->GetPluginTypeId();
+						instanceTypeId = pluginInstancePtr->GetPluginTypeId();
 
-						if (pluginInstancePtr->GetPluginTypeId() == pluginTypeId){
+						if (instanceTypeId == pluginTypeId){
 							PluginInfo pluginInfo;
 							pluginInfo.pluginPath = pluginPath.canonicalFilePath();
 							pluginInfo.pluginPtr = pluginInstancePtr.PopPtr();
