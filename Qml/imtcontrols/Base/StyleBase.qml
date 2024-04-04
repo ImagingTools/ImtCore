@@ -115,6 +115,7 @@ StyleComponents {
     property string backgroundColor: "#e6e6e8";
     property string linkColor: "#0078D7";
     property string selectedColor: "#e3eefa";
+    property string tabPanelBackgroundColor: imagingToolsGradient2;
 
     property string color_scrollBackground: styleContainer.imagingToolsGradient0;
     property string color_scrollIndicator: styleContainer.imagingToolsGradient3;

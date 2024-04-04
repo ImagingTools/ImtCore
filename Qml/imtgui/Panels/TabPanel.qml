@@ -10,7 +10,7 @@ Rectangle {
     width: 1000;
 
 //    color: Style.backgroundColor;
-    color: Style.imagingToolsGradient2;
+    color: Style.tabPanelBackgroundColor;
 
     property int selectedIndex: 0;
     property int count: 0;

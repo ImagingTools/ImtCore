@@ -110,7 +110,7 @@ DocumentManager {
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
-        anchors.margins: Style.size_mainMargin;
+        anchors.margins: 0;//Style.size_mainMargin;
 
         model: workspaceView.documentsModel;
 
