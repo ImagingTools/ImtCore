@@ -6,12 +6,13 @@ TableBase {
     id: tableContainer;
 
     rowDelegate: Component {
-            TableRowDelegate {
+        TableRowDelegate {
             table: tableContainer
             width: tableContainer.width
             minHeight: tableContainer.itemHeight
         }
     }
+
     cellDelegate: Component {
         TableCellDelegateSimple {}
     }
@@ -23,3 +24,4 @@ TableBase {
         }
     }
 }
+

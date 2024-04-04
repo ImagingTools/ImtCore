@@ -21,6 +21,9 @@ CollectionView {
         }
     }
 
+    function getAdditionalInputParams(){
+    }
+
     dataControllerComp: Component {
         CollectionRepresentation {
             property bool isReady: false;
@@ -179,6 +182,18 @@ CollectionView {
             if (ok){
                 let subscriptionRequestId = "On" + root.collectionId + "CollectionChanged"
                 var query = Gql.GqlRequest("subscription", subscriptionRequestId);
+                var inputParams = Gql.GqlObject("input");
+
+                let additionInputParams = root.getAdditionalInputParams();
+                if (Object.keys(additionInputParams).length > 0){
+                    let additionParams = Gql.GqlObject("addition");
+                    for (let key in additionInputParams){
+                        additionParams.InsertField(key, additionInputParams[key]);
+                    }
+                    inputParams.InsertFieldObject(additionParams);
+                }
+
+                query.AddParam(inputParams);
                 var queryFields = Gql.GqlObject("notification");
                 queryFields.InsertField("Id");
                 query.AddField(queryFields);

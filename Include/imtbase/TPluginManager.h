@@ -103,7 +103,7 @@ bool TPluginManager<PluginInterface, CreateFunction, DestroyFunction>::LoadPlugi
 			QString statusMessage;
 
 			QLibrary library(pluginPath.canonicalFilePath());
-			if (library.load()){
+			if (library.load() == true){
 				CreateFunction createPluginFunc = (CreateFunction)library.resolve(m_createMethodName);
 				if (createPluginFunc != NULL){
 					istd::TDelPtr<PluginInterface> pluginInstancePtr = createPluginFunc();

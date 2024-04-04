@@ -16,7 +16,7 @@ Rectangle {
         id: tableDataModel;
         property bool compl: false;
         Component.onCompleted: {
-            for(let i = 0; i < 20; i++){
+            for(let i = 0; i < 200; i++){
                 let index = tableDataModel.InsertNewItem();
                 tableDataModel.SetData("Account", 10000 + index, index);
                 tableDataModel.SetData("FullName", "Иванов Иван Иванович", index);
@@ -86,7 +86,7 @@ Rectangle {
         anchors.leftMargin: Style.size_mainMargin;
         anchors.right: parent.right;
         anchors.rightMargin: Style.size_mainMargin;
-        height: 300;
+        height: 700;
         itemHeight: 50;
         headerHeight: 50;
         visibleLeftBorderFirst: false;
@@ -109,7 +109,7 @@ Rectangle {
 
     }
 
-    Table{
+    AuxTable{
         id: tableDecor;
 
         anchors.top: table.bottom;
