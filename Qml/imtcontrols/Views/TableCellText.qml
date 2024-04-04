@@ -15,25 +15,25 @@ Text {
     verticalAlignment: Text.AlignVCenter;
     horizontalAlignment: rowDelegate ?
                              rowDelegate.tableItem.emptyDecorCell ? Text.AlignLeft :
-                                                    rowDelegate.tableItem.cellDecorator.IsValidData("TextPosition", delegateContainer.columnIndex) ?
-                                                        rowDelegate.tableItem.cellDecorator.GetData("TextPosition", delegateContainer.columnIndex) :
+                                                    rowDelegate.tableItem.cellDecorator.IsValidData("TextPosition", rowDelegate.columnIndex) ?
+                                                        rowDelegate.tableItem.cellDecorator.GetData("TextPosition", rowDelegate.columnIndex) :
                                                         Text.AlignLeft: Text.AlignLeft;
 
 
     font.pixelSize: rowDelegate ? rowDelegate.tableItem.emptyDecorCell ? Style.fontSize_common:
-                                                   rowDelegate.tableItem.cellDecorator.IsValidData("FontSize", delegateContainer.columnIndex) ?
-                                                       rowDelegate.tableItem.cellDecorator.GetData("FontSize", delegateContainer.columnIndex) :
+                                                   rowDelegate.tableItem.cellDecorator.IsValidData("FontSize", rowDelegate.columnIndex) ?
+                                                       rowDelegate.tableItem.cellDecorator.GetData("FontSize", rowDelegate.columnIndex) :
                                                        Style.fontSize_common : Style.fontSize_common;
     font.family: Style.fontFamily;
     font.bold: rowDelegate ?
                    rowDelegate.tableItem.emptyDecorCell ? true :
-                                                  rowDelegate.tableItem.cellDecorator.IsValidData("FontBold", delegateContainer.columnIndex) ?
-                                                      rowDelegate.tableItem.cellDecorator.GetData("FontBold", delegateContainer.columnIndex) :
+                                                  rowDelegate.tableItem.cellDecorator.IsValidData("FontBold", rowDelegate.columnIndex) ?
+                                                      rowDelegate.tableItem.cellDecorator.GetData("FontBold", rowDelegate.columnIndex) :
                                                       true: false;
     color: rowDelegate && rowDelegate.enabled ?
                (rowDelegate.tableItem.emptyDecorCell ? Style.textColor :
-                                                  rowDelegate.tableItem.cellDecorator.IsValidData("FontColor", delegateContainer.columnIndex) ?
-                                                      rowDelegate.tableItem.cellDecorator.GetData("FontColor", delegateContainer.columnIndex) :
+                                                  rowDelegate.tableItem.cellDecorator.IsValidData("FontColor", rowDelegate.columnIndex) ?
+                                                      rowDelegate.tableItem.cellDecorator.GetData("FontColor", rowDelegate.columnIndex) :
                                                       Style.textColor) : Style.inactive_textColor;
 
     elide: rowDelegate ? rowDelegate.elideMode : Text.ElideLeft;
@@ -42,7 +42,7 @@ Text {
         Qt.openUrlExternally(link);
     }
 
-    // text: delegateContainer.getValue();
+    // text: rowDelegate.getValue();
     onTextChanged: {
         // Multiline fit in one line
         if(wrapMode == Text.NoWrap){
@@ -60,7 +60,7 @@ Text {
             var height_ = name.height +
                     2*rowDelegate.textMarginVer;
 
-            rowDelegate.setHeightModelElememt(delegateContainer.columnIndex, height_);
+            rowDelegate.setHeightModelElememt(rowDelegate.columnIndex, height_);
 
         }
     }
