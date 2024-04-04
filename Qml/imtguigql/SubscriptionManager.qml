@@ -22,10 +22,6 @@ WebSocket {
         Events.unSubscribeEvent("UnRegisterSubscription", container.unRegisterSubscription);
     }
 
-    onActiveChanged: {
-        console.log("SubscriptionManager onActiveChanged", active)
-    }
-
     onStatusChanged: {
         console.log("SubscriptionManager onStatusChanged", status)
 
@@ -45,8 +41,6 @@ WebSocket {
     }
 
     function reconnect(){
-        console.log("reconnect to", url)
-
         active = false;
         active = true;
     }

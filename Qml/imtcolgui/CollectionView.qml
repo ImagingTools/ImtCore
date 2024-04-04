@@ -109,21 +109,12 @@ Item {
         }
 
         function onSelectionChanged(selection){
-            console.log("CV onSelectionChanged", selection);
             root.selectionChanged(selection);
         }
 
         function onRightButtonMouseClicked(mouseX, mouseY){
             root.rightButtonMouseClicked(mouseX, mouseY)
         }
-    }
-
-    function setTableElements(){
-        if (!container.dataController){
-            return;
-        }
-
-        container.table.elements = container.dataController.elementsModel;
     }
 
     CollectionViewBase {
@@ -167,10 +158,6 @@ Item {
             function onHeadersModelChanged(){
                 container.doUpdateGui();
             }
-
-//            function onElementModelChanged(){
-//                root.setTableElements();
-//            }
 
             function onNotificationModelChanged(){
                 if (!container.dataController){

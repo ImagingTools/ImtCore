@@ -33,8 +33,8 @@ RemoteCollectionView {
     }
 
     Component.onCompleted: {
-        collectionFilter.setSortingOrder("DESC");
-        collectionFilter.setSortingInfoId("LastModified");
+        collectionFilter.setSortingOrder("ASC");
+        collectionFilter.setSortingInfoId("Name");
 
         let documentManager = MainDocumentManager.getDocumentManager("Accounts");
         if (documentManager){

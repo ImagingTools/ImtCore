@@ -89,14 +89,7 @@ QtObject {
                         let value1 = String(model1.GetData(key, i));
                         let value2 = String(model2.GetData(key, i));
 
-//                        console.log("value1", value1)
-//                        console.log("value2", value2)
-
-//                        console.log("value1 !== value2", value1 !== value2)
-
                         if (value1 !== value2){
-//                            console.log("value1 != value2")
-
                             let changeObj = {}
 
                             changeObj["operation"] = "change";

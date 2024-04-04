@@ -98,6 +98,7 @@ Rectangle {
 
     property TableSelection tableSelection: TableSelection {
         onSelectionChanged: {
+            console.log("TableSelection onSelectionChanged", tableContainer.tableSelection.selectedIndexes);
             tableContainer.selectionChanged(tableContainer.tableSelection.selectedIndexes);
         }
     }
@@ -195,12 +196,11 @@ Rectangle {
         uncheckAll();
     }
 
-    onVisibleChanged: {
-        if (visible){
-            let indexes = tableContainer.tableSelection.selectedIndexes;
-            if (indexes.length > 0){
-                elementsListObj.positionViewAtIndex(indexes[0], ListView.Beginning)
-            }
+    onSelectionChanged: {
+        if (selection.length > 0){
+            let maxIndex = selection.sort()[selection.length - 1]
+
+            elementsListObj.positionViewAtIndex(maxIndex, ListView.Contain)
         }
     }
 
@@ -704,7 +704,8 @@ Rectangle {
 
         boundsBehavior: Flickable.StopAtBounds;
 
-        cacheBuffer: count * tableContainer.itemHeight;
+//        cacheBuffer: count * tableContainer.itemHeight;
+        cacheBuffer: tableContainer.height + 5 * tableContainer.itemHeight;
 
         clip: true;
 
@@ -720,25 +721,21 @@ Rectangle {
             tableContainer.tableSelection.down();
         }
 
-        onActiveFocusChanged: {
-            if (elementsListObj.activeFocus){
-                tableContainer.tableSelection.subscribeEvents();
-            }
-            else{
-                tableContainer.tableSelection.unsubscribeEvents();
-            }
-        }
+//        onActiveFocusChanged: {
+//            if (elementsListObj.activeFocus){
+//                tableContainer.tableSelection.subscribeEvents();
+//            }
+//            else{
+//                tableContainer.tableSelection.unsubscribeEvents();
+//            }
+//        }
 
         onContentYChanged: {
             if(tableContainer.isFrameScrolling){
                 elementsBg.contentY = elementsListObj.contentY;
             }
         }
-
-        onCountChanged: {
-            console.log("onCountChanged");
-        }
-
     }//Elements ListView
-
 }
+
+

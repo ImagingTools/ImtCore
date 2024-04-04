@@ -33,8 +33,8 @@ Rectangle {
 
     property bool enabled: true;
 
-    property real selectedOpacity: ((Style.selectedOpacity !== undefined && Style.selectedOpacity !== null) ?  Style.selectedOpacity :  0.5);
-    property real hoverOpacity:((Style.hoverOpacity !== undefined && Style.hoverOpacity !== null) ?  Style.hoverOpacity :  selectedOpacity/2);
+    property real selectedOpacity: ((Style.selectedOpacity !== undefined && Style.selectedOpacity !== undefined) ?  Style.selectedOpacity :  0.5);
+    property real hoverOpacity:((Style.hoverOpacity !== undefined && Style.hoverOpacity !== undefined) ?  Style.hoverOpacity :  selectedOpacity/2);
 
     //
     property string borderColorHorizontal: "transparent";
@@ -80,7 +80,7 @@ Rectangle {
 
     Component.onDestruction: {
         if (table){
-            table.tableSelection.selectionChanged.disconnect(tableDelegateContainer.selectionChanged);
+//            table.tableSelection.selectionChanged.disconnect(tableDelegateContainer.selectionChanged);
             table.checkedItemsChanged.disconnect(tableDelegateContainer.checkedItemsChanged);
 
             table.properties.visibleItemsChanged.disconnect(tableDelegateContainer.visibleItemsChanged);
@@ -92,6 +92,28 @@ Rectangle {
     onCellDecoratorChanged: {
         if (tableDelegateContainer.table.cellDecorator){
             tableDelegateContainer.setBorderParams();
+        }
+    }
+
+    Connections {
+        id: tableConnections;
+
+        function onSelectionChanged(selection){
+            if (!tableDelegateContainer.table){
+                return;
+            }
+
+            tableDelegateContainer.selected = selection.includes(tableDelegateContainer.rowIndex);
+        }
+
+        function onElementsChanged(){
+            if (!tableDelegateContainer.table){
+                return;
+            }
+
+            let selection = tableDelegateContainer.table.tableSelection.selectedIndexes;
+
+            tableDelegateContainer.selected = selection.includes(tableDelegateContainer.rowIndex);
         }
     }
 
@@ -135,7 +157,10 @@ Rectangle {
 
     onTableChanged: {
         if (table){
-            table.tableSelection.selectionChanged.connect(tableDelegateContainer.selectionChanged);
+
+            tableConnections.target = table;
+
+//            table.tableSelection.selectionChanged.connect(tableDelegateContainer.selectionChanged);
             table.checkedItemsChanged.connect(tableDelegateContainer.checkedItemsChanged);
 
             table.properties.visibleItemsChanged.connect(tableDelegateContainer.visibleItemsChanged);

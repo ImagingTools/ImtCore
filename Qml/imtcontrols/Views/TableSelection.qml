@@ -31,15 +31,15 @@ QtObject {
     function subscribeEvents(){
         console.log("TableSelection subscribeEvents");
 
-        Events.subscribeEvent("SelectAll", root.selectAll);
-        Events.subscribeEvent("ShiftUp", root.shiftUp);
-        Events.subscribeEvent("ShiftDown", root.shiftDown);
+//        Events.subscribeEvent("SelectAll", root.selectAll);
+//        Events.subscribeEvent("ShiftUp", root.shiftUp);
+//        Events.subscribeEvent("ShiftDown", root.shiftDown);
     }
 
     function unsubscribeEvents(){
-        Events.unSubscribeEvent("SelectAll", root.selectAll);
-        Events.unSubscribeEvent("ShiftUp", root.shiftUp);
-        Events.unSubscribeEvent("ShiftDown", root.shiftDown);
+//        Events.unSubscribeEvent("SelectAll", root.selectAll);
+//        Events.unSubscribeEvent("ShiftUp", root.shiftUp);
+//        Events.unSubscribeEvent("ShiftDown", root.shiftDown);
     }
 
     function resetSelection(){

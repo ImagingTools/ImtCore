@@ -7,7 +7,7 @@ TableRowDelegateBase {
 
     TableRowViewer {
         anchors.fill: parent
-        anchors.leftMargin: tableDelegateContainer.table && tableDelegateContainer.table.checkable ? 2* Style.size_mainMargin : 0;
+        anchors.leftMargin: tableDelegateContainer.table && tableDelegateContainer.table.checkable ? 3* Style.size_mainMargin : 0;
 
         rowDelegate: tableDelegateContainer
         model: tableDelegateContainer.columnCount;
