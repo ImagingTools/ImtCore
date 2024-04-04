@@ -283,33 +283,34 @@ Item{
 
         onClicked: {
             headerDelegate.tableItem.headerClicked(model.Id);
+            //console.log("HEADER CLICKED")
         }
     }
 
     MouseArea{
-        id: moving;
+        id: movingRight;
 
         anchors.right:  parent.right;
-        anchors.rightMargin: -width/2;
 
         height: parent.height;
-        width: 30;
+        width: 15;
 
         visible: headerDelegate.tableItem.canMoveColumns && headerDelegate.columnIndex < headerDelegate.columnCount -1;
         enabled: visible;
 
         hoverEnabled: true;
-        cursorShape: pressed ?  Qt.SplitHCursor : isSplitCursor ? Qt.SplitHCursor : Qt.ArrowCursor;
-        property bool isSplitCursor: mouseX >= width/2 - splitterWidth/2 && mouseX <= width/2 + splitterWidth/2;
+        cursorShape: pressed ?  Qt.SplitHCursor : isWithinBorder ? Qt.SplitHCursor : Qt.ArrowCursor;
+        property bool isWithinBorder: mouseX >= width - splitterWidth //&& mouseX <= width/2 + splitterWidth/2;
         property int splitterWidth: 6;
-        property var coord: mapToItem(moving,0,0);
+        property var coord: mapToItem(movingRight,0,0);
+        property bool  blocked: false;
         onPressed: {
-            moving.coord = mapToItem(moving,mouse.x,mouse.y)
+            movingRight.coord = mapToItem(movingRight,mouse.x,mouse.y)
         }
         onPositionChanged: {
             if(pressed){
-                var newCoords = mapToItem(moving,mouse.x,mouse.y);
-                var deltaX = Math.trunc(newCoords.x - moving.coord.x);
+                var newCoords = mapToItem(movingRight,mouse.x,mouse.y);
+                var deltaX = Math.trunc(newCoords.x - movingRight.coord.x);
                 var width_ = headerDelegate.tableItem.widthDecoratorDynamic.GetData("Width", headerDelegate.columnIndex);
                 var width_next = headerDelegate.tableItem.widthDecoratorDynamic.GetData("Width", headerDelegate.columnIndex+1);
                 var width_min = headerDelegate.tableItem.widthDecoratorDynamic.IsValidData("MinWidth", headerDelegate.columnIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.GetData("MinWidth", headerDelegate.columnIndex) : headerDelegate.tableItem.minCellWidth;
@@ -326,11 +327,101 @@ Item{
                 }
             }
 
+            blocked = true;
+            blockmovingRightPause.restart();
         }
         onReleased: {
             headerDelegate.tableItem.saveWidth();
         }
+        onClicked: {
+            if(blocked){
+                mouse.accepted = true;
+            }
+            else {
+                mouse.accepted = false;
+            }
+        }
+
     }
+
+
+    PauseAnimation {
+        id: blockmovingRightPause;
+
+        duration: 200
+        onFinished: {
+            movingRight.blocked = false;
+        }
+    }
+
+    MouseArea{
+        id: movingLeft;
+
+        anchors.left:  parent.left;
+
+        height: parent.height;
+        width: 15;
+
+        visible: headerDelegate.tableItem.canMoveColumns && headerDelegate.columnIndex > 0;
+        enabled: visible;
+
+        hoverEnabled: true;
+        cursorShape: pressed ?  Qt.SplitHCursor : isWithinBorder ? Qt.SplitHCursor : Qt.ArrowCursor;
+        property bool isWithinBorder:  mouseX <= splitterWidth;
+        property int splitterWidth: 6;
+        property var coord: mapToItem(movingLeft,0,0);
+        property bool  blocked: false;
+        onPressed: {
+            movingLeft.coord = mapToItem(movingLeft,mouse.x,mouse.y)
+        }
+        onPositionChanged: {
+            if(pressed){
+                var newCoords = mapToItem(movingLeft,mouse.x,mouse.y);
+                var deltaX = Math.trunc(newCoords.x - movingLeft.coord.x);
+                var width_ = headerDelegate.tableItem.widthDecoratorDynamic.GetData("Width", headerDelegate.columnIndex);
+                var width_prev = headerDelegate.tableItem.widthDecoratorDynamic.GetData("Width", headerDelegate.columnIndex-1);
+                var width_min = headerDelegate.tableItem.widthDecoratorDynamic.IsValidData("MinWidth", headerDelegate.columnIndex) ? headerDelegate.tableItem.widthDecoratorDynamic.GetData("MinWidth", headerDelegate.columnIndex) : headerDelegate.tableItem.minCellWidth;
+                var width_prev_min = headerDelegate.tableItem.widthDecoratorDynamic.IsValidData("MinWidth", headerDelegate.columnIndex-1) ? headerDelegate.tableItem.widthDecoratorDynamic.GetData("MinWidth", headerDelegate.columnIndex-1) : headerDelegate.tableItem.minCellWidth;
+
+
+                width_ -= deltaX;
+                width_prev += deltaX
+                if(width_ > width_min && width_prev > width_prev_min){
+                    headerDelegate.tableItem.widthDecorator.SetData("Width", width_, headerDelegate.columnIndex);
+                    headerDelegate.tableItem.widthDecorator.SetData("Width", width_prev, headerDelegate.columnIndex-1);
+
+                    headerDelegate.tableItem.setWidth();
+                }
+            }
+
+            blocked = true;
+            blockmovingLeftPause.restart();
+        }
+        onReleased: {
+            headerDelegate.tableItem.saveWidth();
+        }
+        onClicked: {
+            if(blocked){
+                mouse.accepted = true;
+            }
+            else {
+                mouse.accepted = false;
+            }
+        }
+
+    }
+
+
+    PauseAnimation {
+        id: blockmovingLeftPause;
+
+        duration: 200
+        onFinished: {
+            movingLeft.blocked = false;
+        }
+    }
+
+
 
 }//delegate
 

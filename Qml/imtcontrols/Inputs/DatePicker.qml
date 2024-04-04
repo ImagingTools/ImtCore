@@ -45,9 +45,9 @@ Item {
     property bool startWithFirstDay: false;
     property bool hasDay: true;
 
-    property bool hasDayCombo: false;
-    property bool hasMonthCombo: false;
-    property bool hasYearCombo: false;
+    property bool hasDayCombo: true;
+    property bool hasMonthCombo: true;
+    property bool hasYearCombo: true;
     property int shownItemsCountCombo: 12;
     property alias monthCombo: monthComboObj;
     property alias yearCombo: yearComboObj;
