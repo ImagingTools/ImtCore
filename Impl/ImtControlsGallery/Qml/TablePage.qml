@@ -86,7 +86,7 @@ Rectangle {
         anchors.leftMargin: Style.size_mainMargin;
         anchors.right: parent.right;
         anchors.rightMargin: Style.size_mainMargin;
-        height: 700;
+        height: 500;
         itemHeight: 50;
         headerHeight: 50;
         visibleLeftBorderFirst: false;
@@ -109,7 +109,7 @@ Rectangle {
 
     }
 
-    AuxTable{
+    Table{
         id: tableDecor;
 
         anchors.top: table.bottom;
