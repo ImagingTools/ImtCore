@@ -2,7 +2,7 @@ import QtQuick 2.12
 import Acf 1.0;
 import imtcontrols 1.0
 
-AuxTable{
+Table{
     id: tableTreeView;
 
     property TreeItemModel model: TreeItemModel{};
@@ -21,7 +21,6 @@ AuxTable{
 
     signal requestSignal(int index);
 
-    signal clicked(int index);
 //    signal doubleClicked(int index); // redefine!!!
 //    signal rightButtonMouseClicked(int mX, int mY); // redefine!!!
 
@@ -61,44 +60,59 @@ AuxTable{
 
     }
 
-    delegate: Component{ Item{
+    rowDelegate: Component{
+        TableRowDelegateBase{
         id: deleg;
 
         width: Math.max(tableTreeView.width, tableTreeView.contentWidth);
 
         height: model.Visible__ ? tableTreeView.delegateHeight : 0;
         opacity: model.Visible__;
+        contentHeight: tableTreeView.itemHeight;
         clip: true;
+        tableItem: tableTreeView;
         property bool isOpen: model.IsOpen__ == undefined ? false : model.IsOpen__;
 
+        onClicked: {
+            if (tableTreeView.selectedIndex !== model.index ){
+                tableTreeView.selectedIndex = model.index;
+                tableTreeView.selectionChanged();
+            }
+            tableTreeView.clicked(model.index);
+        }
+        onRightButtonMouseClicked: {
+            var point = mapToItem(null, mX, mY);
+            tableTreeView.rightButtonMouseClicked(point.x, point.y);
+        }
+        onDoubleClicked: {
+            tableTreeView.doubleClicked(model.index);
+        }
 
-        TableDelegate {
-            id: tableRow;
 
-            minHeight: tableTreeView.itemHeight;
+//        TableDelegate {
+//            id: tableRow;
+
+//            minHeight: tableTreeView.itemHeight;
+//            width: parent.width;
+//            headers: tableTreeView.headers;
+//            //!!!
+//            cellDecorator: tableTreeView.cellDecorator;
+//            widthDecorator: tableTreeView.widthDecorator;
+//            canSetBorderParams: true;
+//            tableItem: tableTreeView;
+//            selected: !tableTreeView.hasSelection ? false : tableTreeView.selectedIndex == model.index;
+
+
+//        }
+        TableRowViewer {
+            id: tableRowViewer;
+
             width: parent.width;
-            headers: tableTreeView.headers;
-            //!!!
-            cellDecorator: tableTreeView.cellDecorator;
-            widthDecorator: tableTreeView.widthDecorator;
-            canSetBorderParams: true;
-            tableItem: tableTreeView;
-            selected: !tableTreeView.hasSelection ? false : tableTreeView.selectedIndex == model.index;
-            onClicked: {
-                if (tableTreeView.selectedIndex !== model.index ){
-                    tableTreeView.selectedIndex = model.index;
-                    tableTreeView.selectionChanged();
-                }
-                tableTreeView.clicked(model.index);
-            }
-            onRightButtonMouseClicked: {
-                var point = mapToItem(null, mX, mY);
-                tableTreeView.rightButtonMouseClicked(point.x, point.y);
-            }
-            onDoubleClicked: {
-                tableTreeView.doubleClicked(model.index);
-            }
+            height: tableTreeView.itemHeight;
+            z: 10;
 
+            rowDelegate: deleg
+            model: deleg.columnCount;
         }
 
         Rectangle{
@@ -221,9 +235,8 @@ AuxTable{
     Component{
         id: nameComp;
 
-        Item{
+        TableCellDelegateBase{
             height: tableTreeView.itemHeight;
-            property Item tableCellDelegate: null;
 
         }
     }
