@@ -14,7 +14,7 @@ TableBase {
     }
 
     cellDelegate: Component {
-        TableCellDelegateSimple {}
+        TableCellTextDelegate {}
     }
 
     headerDelegate: Component {

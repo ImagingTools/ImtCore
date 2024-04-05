@@ -86,7 +86,8 @@ Table 1.0 ./Views/Table.qml
 TableBase 1.0 ./Views/TableBase.qml
 TableCellDelegate 1.0 ./Views/TableCellDelegate.qml
 TableCellDelegateBase 1.0 ./Views/TableCellDelegateBase.qml
-TableCellDelegateSimple 1.0 ./Views/TableCellDelegateSimple.qml
+TableCellTextDelegate 1.0 ./Views/TableCellTextDelegate.qml
+TableCellIconTextDelegate 1.0 ./Views/TableCellIconTextDelegate.qml
 TableDelegate 1.0 ./Views/TableDelegate.qml
 TableRowDelegateBase 1.0 ./Views/TableRowDelegateBase.qml
 TableRowDelegate 1.0 ./Views/TableRowDelegate.qml
