@@ -208,6 +208,13 @@ Rectangle {
 
                 text: "text";
 
+                backgroundColor: "green"
+                controlColor: "red"
+                backgroundColorChecked: "yellow"
+                controlColorChecked: "violet"
+                height: 40;
+                backgroundWidth: 80;
+
             }
 
             RadioButton{
