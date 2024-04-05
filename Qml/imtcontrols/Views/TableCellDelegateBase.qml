@@ -191,7 +191,8 @@ Item {
     function getValue(){
             if (delegateContainer && delegateContainer.columnIndex >= 0){
                 if(delegateContainer.rowDelegate !== null && delegateContainer.rowDelegate.tableItem !==null && delegateContainer.rowDelegate.dataModel != null){
-                    return delegateContainer.rowDelegate.dataModel[delegateContainer.rowDelegate.tableItem.headers.GetData("Id", delegateContainer.columnIndex)];
+                    let val = delegateContainer.rowDelegate.dataModel[delegateContainer.rowDelegate.tableItem.headers.GetData("Id", delegateContainer.columnIndex)];
+                    return val !== undefined ? val : "";
                 }
             }
 
