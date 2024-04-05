@@ -11,7 +11,6 @@ Rectangle {
     property real contentHeight: height;
 
     color: tableDelegateContainer.selected ? Style.selectedColor : "transparent";
-    //color:  "transparent";
 
     visible: true
 
@@ -104,6 +103,8 @@ Rectangle {
 
             return;
         }
+
+        tableItem.clicked();
 
         if (!tableItem.selectable){
             return;

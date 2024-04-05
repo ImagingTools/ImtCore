@@ -146,6 +146,7 @@ Rectangle {
     signal checkedItemsChanged();
     signal selectionChanged(var selection);
 
+    signal clicked();
     signal rightButtonMouseClicked(int mouseX, int mouseY);
     signal doubleClicked(string id, int index);
     signal setActiveFocusFromTable();

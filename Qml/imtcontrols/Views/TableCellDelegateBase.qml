@@ -82,6 +82,9 @@ Item {
         id: mainRec;
 
         anchors.fill: parent;
+//        anchors.centerIn: parent;
+//        width: parent.width - 10;
+//        height: parent.height - 10;
 
         color: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.tableItem.emptyDecorCell ? "transparent" :
                                                                           delegateContainer.rowDelegate.tableItem.cellDecorator.IsValidData("Color", delegateContainer.columnIndex) ?
