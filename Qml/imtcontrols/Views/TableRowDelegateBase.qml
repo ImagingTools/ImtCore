@@ -82,7 +82,6 @@ Rectangle {
 
     Component.onDestruction: {
         if (tableItem){
-            //tableItem.tableSelection.selectionChanged.disconnect(tableDelegateContainer.selectionChanged);
             tableItem.checkedItemsChanged.disconnect(tableDelegateContainer.checkedItemsChanged);
 
             tableItem.properties.visibleItemsChanged.disconnect(tableDelegateContainer.visibleItemsChanged);
@@ -137,7 +136,7 @@ Rectangle {
 
     onTableItemChanged: {
         if (tableItem){
-            //tableItem.tableSelection.selectionChanged.connect(tableDelegateContainer.selectionChanged);
+            tableConnections.target = tableItem;
             tableItem.checkedItemsChanged.connect(tableDelegateContainer.checkedItemsChanged);
 
             tableItem.properties.visibleItemsChanged.connect(tableDelegateContainer.visibleItemsChanged);
@@ -167,6 +166,29 @@ Rectangle {
             }
         }
     }
+
+    Connections {
+        id: tableConnections;
+
+        function onSelectionChanged(selection){
+            if (!tableDelegateContainer.tableItem){
+                return;
+            }
+
+            tableDelegateContainer.selected = selection.includes(tableDelegateContainer.rowIndex);
+        }
+
+        function onElementsChanged(){
+            if (!tableDelegateContainer.tableItem){
+                return;
+            }
+
+            let selection = tableDelegateContainer.tableItem.tableSelection.selectedIndexes;
+
+            tableDelegateContainer.selected = selection.includes(tableDelegateContainer.rowIndex);
+        }
+    }
+
 
     function getItemData(){
         return model;
