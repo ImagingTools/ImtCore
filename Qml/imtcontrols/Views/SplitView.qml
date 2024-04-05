@@ -400,7 +400,7 @@ Item{
 
                 anchors.centerIn: parent;
 
-                width: parent.width * 10;
+                width: parent.width * (1 + isPressed * 9);
                 height: parent.height;
 
                 hoverEnabled: true;
@@ -410,14 +410,19 @@ Item{
                 cursorShape: pressed && containsMouse ? Qt.SplitHCursor : !pressed && withinParent ? Qt.SplitHCursor : Qt.ArrowCursor;
                 property bool withinParent:  mouseX > (width - parent.width)/2 && mouseX <  (width + parent.width)/2;
                 property int startX;
+                property bool isPressed;
 
                 onPressed: {
                     startX = mouse.x;
+                    isPressed = true;
                 }
 
+
                 onClicked: {
-                    mouse.accepted = false;
+                    mouse.accepted = true;
+                    isPressed = false;
                 }
+
 
                 onPositionChanged:  {
 
@@ -425,6 +430,19 @@ Item{
                         let x_ = mouse.x;
                         let delta = x_ - startX;
                         splitter.correctSizes(delta);
+
+                        movingPause.restart();
+                    }
+                }
+
+                Rectangle{anchors.fill: parent; color: "yellow"; opacity: 0.3}
+
+
+                PauseAnimation {
+                    id: movingPause
+                    duration: 2000;
+                    onFinished: {
+                        splitterMA.isPressed = false;
                     }
                 }
             }
