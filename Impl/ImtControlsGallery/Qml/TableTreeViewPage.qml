@@ -164,8 +164,8 @@ Rectangle {
             tableHeaderModel.SetData("Name", qsTr("Size"), index);
 
 
-            tableHeaderModel.compl = true;
             tableTreeView.headers = tableHeaderModel;
+            tableHeaderModel.compl = true;
         }
 
     }

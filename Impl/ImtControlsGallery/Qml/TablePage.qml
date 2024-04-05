@@ -66,9 +66,9 @@ Rectangle {
             tableHeaderModel.SetData("Id", "Gauges", index);
             tableHeaderModel.SetData("Name", qsTr("Счетчики"), index);
 
-            tableHeaderModel.compl = true;
             table.headers = tableHeaderModel;
             tableDecor.headers = tableHeaderModel;
+            tableHeaderModel.compl = true;
             tableDecor.tableDecorator = decorModel;
             tablePage.items = tableDataModel;
         }
