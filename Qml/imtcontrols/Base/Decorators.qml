@@ -493,7 +493,7 @@ StyleComponents {
             property int fontPixelSize: !baseElement ? 10 : baseElement.fontPixelSize == undefined ? 10 : baseElement.fontPixelSize;
             property bool fontBold: !baseElement ? false : baseElement.fontBold == undefined ? false : baseElement.fontBold;
 
-            property real backgroundWidth: 40;
+            property real backgroundWidth: !baseElement ? 0 : baseElement.backgroundWidth;
 
             Rectangle{
                 id: backgroundRec;
@@ -503,7 +503,7 @@ StyleComponents {
 
                 width: switchItem.backgroundWidth;
                 height: !switchItem.baseElement ? 0 : switchItem.baseElement.backgroundHeight;
-                color: !switchItem.baseElement ? "transparent" : switchItem.checked ? switchItem.baseElement.backgroundColor_checked :
+                color: !switchItem.baseElement ? "transparent" : switchItem.checked ? switchItem.baseElement.backgroundColorChecked :
                                                                                       switchItem.baseElement.backgroundColor;
                 radius: height;
 
@@ -520,7 +520,7 @@ StyleComponents {
                 width: switchItem.height;
                 height: width;
                 radius: width;
-                color: !switchItem.baseElement ? "transparent" : switchItem.checked ? switchItem.baseElement.controlColor_checked :
+                color: !switchItem.baseElement ? "transparent" : switchItem.checked ? switchItem.baseElement.controlColorChecked :
                                                                                       switchItem.baseElement.controlColor;
             }
 

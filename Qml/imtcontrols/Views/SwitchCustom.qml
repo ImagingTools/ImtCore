@@ -9,12 +9,12 @@ ControlBase {
 
     property string text: "";
 
-    property int backgroundWidth: decorator_ ? decorator_.backgroundWidth : 0;
+    property int backgroundWidth: 40;//decorator_ ? decorator_.backgroundWidth : 0;
     property int backgroundHeight: 14;
     property string backgroundColor: "#E1E1E1";
     property string controlColor: "#C4C4C4";
-    property string backgroundColor_checked: "#ffc0cb";
-    property string controlColor_checked: "#F7B6AE";
+    property string backgroundColorChecked: "#ffc0cb";
+    property string controlColorChecked: "#F7B6AE";
 
     property real backgroundOpacity: 1.;
 
