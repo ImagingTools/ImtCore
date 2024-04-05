@@ -435,7 +435,6 @@ Item{
                     }
                 }
 
-                Rectangle{anchors.fill: parent; color: "yellow"; opacity: 0.3}
 
 
                 PauseAnimation {
