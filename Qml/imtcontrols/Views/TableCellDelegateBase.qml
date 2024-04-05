@@ -78,45 +78,6 @@ Item {
     }
 
 
-    Rectangle{
-        id: mainRec;
-
-        anchors.fill: parent;
-//        anchors.centerIn: parent;
-//        width: parent.width - 10;
-//        height: parent.height - 10;
-
-        color: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.tableItem.emptyDecorCell ? "transparent" :
-                                                                          delegateContainer.rowDelegate.tableItem.cellDecorator.IsValidData("Color", delegateContainer.columnIndex) ?
-                                                                              delegateContainer.rowDelegate.tableItem.cellDecorator.GetData("Color", delegateContainer.columnIndex) :
-                                                                              "transparent" : "transparent"
-
-        opacity: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.tableItem.emptyDecorCell ? 1 :
-                                                                            delegateContainer.rowDelegate.tableItem.cellDecorator.IsValidData("Opacity", delegateContainer.columnIndex) ?
-                                                                                delegateContainer.rowDelegate.tableItem.cellDecorator.GetData("Opacity", delegateContainer.columnIndex) :
-                                                                                1 : 0;
-
-        radius: delegateContainer.rowDelegate ?  delegateContainer.rowDelegate.tableItem.emptyDecorCell ? 0 :
-                                                                           delegateContainer.rowDelegate.tableItem.cellDecorator.IsValidData("CellRadius", delegateContainer.columnIndex) ?
-                                                                               delegateContainer.rowDelegate.tableItem.cellDecorator.GetData("CellRadius", delegateContainer.columnIndex) :0 : 0;
-
-    }//mainRec
-
-    Rectangle {
-        id: selectionRec;
-
-        anchors.left: parent.left;
-        anchors.right: parent.right;
-        anchors.top: parent.top;
-        anchors.bottom: parent.bottom;
-
-        color: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.selectedColor : "transparent";
-        opacity: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.selectedOpacity : 0;
-
-        radius: mainRec.radius;
-        visible: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.selected && mainRec.color != "transparent" : false;
-    }
-
     Component{
         id: topBorder;
         Rectangle{
