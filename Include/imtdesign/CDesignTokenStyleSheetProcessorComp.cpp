@@ -146,6 +146,25 @@ bool CDesignTokenStyleSheetProcessorComp::ProcesCssFile(const QByteArray& fileNa
 
 	CDesignTokenStyleUtils::SetVariables(fileData, '$', '{', '}', QVariantMap({ std::make_pair("Scheme", m_currentTheme) }));
 
+	// ensure, all variables is setted if no error ignoring
+	if (!m_argumentParserAttrPtr->IsErrorsIgnoreRequested()){
+		bool hasUnsettedValues = false;
+		static QRegularExpression veriableRegEx(R"(\$\{.{0,}\})");
+		QRegularExpressionMatchIterator variableGlobalMatch = veriableRegEx.globalMatch(fileData);
+		while (variableGlobalMatch.hasNext()) {
+			QRegularExpressionMatch variableMatch = variableGlobalMatch.next();
+			SendErrorMessage(0,
+							 QString("The unsettled variable remains at: '%1' value : '%2'")
+								 .arg(QString::number(variableMatch.capturedStart()), variableMatch.captured()));
+
+			hasUnsettedValues = true;
+		}
+		if (hasUnsettedValues){
+			return false;
+		}
+	}
+
+
 	QFile outputImageFile(outputFileName);
 	bool openOutputFile = outputImageFile.open(QFile::WriteOnly);
 	if(!openOutputFile){
