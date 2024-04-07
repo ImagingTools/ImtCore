@@ -122,7 +122,7 @@ ViewBase {
         }
     }
 
-    AuxTable {
+    Table {
         id: groupsTable;
 
         anchors.top: titleRoles.bottom;

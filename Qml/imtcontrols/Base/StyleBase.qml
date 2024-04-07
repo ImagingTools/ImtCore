@@ -32,7 +32,7 @@ StyleComponents {
 	property int buttonWidthMedium: 24
 	property int buttonWidthSmall: 16
 	property int buttonWidthTiny: 8
-    property int buttonRadius: 2
+    property int buttonRadius: 3
     property int buttonBorderWidth: 1
     property int buttonHeight: 24
 	property int horizontalPageMargin: 24
@@ -83,9 +83,11 @@ StyleComponents {
 	property bool enableHoverEffect: true
 
     property int textFieldRadius: 3;
+    property int comboBoxRadius: 3;
 
     property int size_smallMargin: 6;
     property int size_mainMargin: 11;
+    property int size_largeMargin: 23;
     property int size_indicatorHeight: 50;
     property int size_leftPanelWidth: 250;
     property string color_text_titles: "#7700FF";
@@ -113,9 +115,10 @@ StyleComponents {
     property string baseColor: "white";
     property string alternateBaseColor: "#f5f5f5";
     property string backgroundColor: "#e6e6e8";
+    property string backgroundColor2: "#e6e6e8";
     property string linkColor: "#0078D7";
     property string selectedColor: "#e3eefa";
-    property string tabPanelBackgroundColor: imagingToolsGradient2;
+    property string tabPanelBackgroundColor: backgroundColor;
 
     property string color_scrollBackground: styleContainer.imagingToolsGradient0;
     property string color_scrollIndicator: styleContainer.imagingToolsGradient3;
@@ -126,7 +129,7 @@ StyleComponents {
     property string tabSelectedColor: "#FF4500";
 
     property string errorTextColor: "#FF4500";
-    property string shadowColor: "#aaaaaa";
+    property string shadowColor: "#ececec";
 
     property string buttonColor: "#dedede";
     property string buttonBorderColor: "#b0b0b0";
@@ -361,6 +364,7 @@ StyleComponents {
             styleContainer.baseColor = styleContainer.getThemeColor("ActiveColors", "Base", dataSource);
             styleContainer.alternateBaseColor = styleContainer.getThemeColor("ActiveColors", "AlternateBase", dataSource);
             styleContainer.backgroundColor = styleContainer.getThemeColor("ActiveColors", "Background", dataSource);
+            styleContainer.backgroundColor2 = styleContainer.getThemeColor("ActiveColors", "Background2", dataSource);
 
             styleContainer.textColor = styleContainer.getThemeColor("ActiveColors", "Text", dataSource);
             styleContainer.textSelected = styleContainer.getThemeColor("ActiveColors", "TextSelectedBackground", dataSource);

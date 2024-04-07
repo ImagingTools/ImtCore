@@ -29,11 +29,9 @@ ControlBase {
     property bool moveToEnd: false;
     property int moveToIndex: currentIndex;
 
-//    property int dialogsCountPrev: 1000;
-//    property int dialogsCount: modalDialogManager.count;
     property int shownItemsCount: 5;
 
-    property int radius: 5;
+    property int radius: Style.comboBoxRadius;
     property int currentIndex: -1;
 
     property string placeHolderText: "";

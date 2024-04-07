@@ -96,8 +96,6 @@ Rectangle {
     }
 
     onClicked: {
-        console.log("tableRow onClicked")
-
         if (!tableItem){
             console.error("tableItem is invalid")
 

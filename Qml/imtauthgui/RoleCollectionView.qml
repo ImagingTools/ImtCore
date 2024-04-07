@@ -50,7 +50,7 @@ RemoteCollectionView {
         id: roleTableDelegateComp;
 
         TableProductRolesDelegate {
-            table: roleCollectionViewContainer.table;
+            tableItem: roleCollectionViewContainer.table;
             width: roleCollectionViewContainer.table.width;
 
             newIsEnabled: roleCollectionViewContainer.newCommandIsEnabled;

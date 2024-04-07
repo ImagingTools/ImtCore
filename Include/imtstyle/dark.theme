@@ -51,8 +51,9 @@
 		],
 		"ActiveColors": {
 			"Background": "DeepGray",
+			"Background2": "DarkGray",
 			"Foreground": "White",
-			"Base": "DarkGray",
+			"Base": "DarkGray 3",
 			"AlternateBase": "DeepGray",
 			"ToolTipBase": "LightGray",
 			"ToolTipText": "LightGray",

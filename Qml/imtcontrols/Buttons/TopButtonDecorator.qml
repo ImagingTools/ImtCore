@@ -7,13 +7,13 @@ import Qt5Compat.GraphicalEffects 6.0
 Item {
     id: topButtonDecorator;
 
-    width: isEmpty ? 20 : 55;
+    width: isEmpty ? 20 : description.width > button.width ? description.width: button.width;
     height: button.height + description.height;
 
     property var baseElement;
     property string textColor: Style.textColor;
-    property string textColorDisabled: "gray";
-    property int radius: 4;
+    property string textColorDisabled: Style.inactive_textColor;
+    property int radius: Style.buttonRadius;
     property bool isEmpty: baseElement.text === "";
 
     visible: !isEmpty;
@@ -26,22 +26,21 @@ Item {
        verticalOffset: 1;
        horizontalOffset: 1;
 
-       radius: 2;
+       radius: topButtonDecorator.radius;
        color: Style.shadowColor;
        source: button;
 
        visible: !(topButtonDecorator.baseElement.checked || topButtonDecorator.baseElement.down)
     }
 
-    Rectangle{
+    Rectangle {
         id: button;
 
-        anchors.top: topButtonDecorator.top;
-        anchors.topMargin: 6;
-        anchors.left: topButtonDecorator.left;
         anchors.horizontalCenter: topButtonDecorator.horizontalCenter;
+        anchors.top: topButtonDecorator.top;
+        anchors.topMargin: Style.size_smallMargin;
 
-        width: topButtonDecorator.width;
+        width: 55;
         height: 25;
 
         radius: topButtonDecorator.radius;
@@ -88,31 +87,19 @@ Item {
         verticalOffset: -1;
         horizontalOffset: -1;
 
-        radius: 2;
+        radius: topButtonDecorator.radius;
         color: Style.shadowColor;
         source: button;
 
         visible: topButtonDecorator.baseElement.checked || topButtonDecorator.baseElement.down
     }
 
-    Rectangle{
-        id: selection;
-
-        anchors.top: button.bottom;
-        anchors.horizontalCenter: topButtonDecorator.horizontalCenter;
-
-        height: 4;
-        width: button.width/1.8;
-        color: Style.greenColor;
-        visible: false;
-    }
-
     Text {
         id: description;
 
-        anchors.top: selection.bottom;
-        anchors.topMargin: 0;
         anchors.horizontalCenter: topButtonDecorator.horizontalCenter;
+        anchors.top: button.bottom;
+        anchors.topMargin: Style.size_smallMargin;
 
         color: topButtonDecorator.enabled ? topButtonDecorator.textColor : topButtonDecorator.textColorDisabled;
 
@@ -122,4 +109,5 @@ Item {
         text: !topButtonDecorator.baseElement ? "" : topButtonDecorator.baseElement.text
     }
 }
+
 

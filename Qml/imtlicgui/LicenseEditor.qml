@@ -360,7 +360,7 @@ ViewBase {
         }
     }
 
-    AuxTable {
+    Table {
         id: featuresTable;
 
         anchors.top: column.bottom;
@@ -406,7 +406,7 @@ ViewBase {
             text: qsTr("Dependencies");
         }
 
-        AuxTable {
+        Table {
             id: licensesTable;
 
             anchors.top: dependenciesTitle.bottom;

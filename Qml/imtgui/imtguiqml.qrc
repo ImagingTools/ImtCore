@@ -55,6 +55,10 @@
         <file alias="imtgui/View/ViewBase.qml">View/ViewBase.qml</file>
         <file alias="imtgui/View/ViewCommandsDelegateBase.qml">View/ViewCommandsDelegateBase.qml</file>
         <file alias="imtgui/View/LogView.qml">View/LogView.qml</file>
+	<file alias="imtgui/View/TextInputElementView.qml">View/TextInputElementView.qml</file>
+	<file alias="imtgui/View/ElementView.qml">View/ElementView.qml</file>
+	<file alias="imtgui/View/ComboBoxElementView.qml">View/ComboBoxElementView.qml</file>
+	<file alias="imtgui/View/GroupElementView.qml">View/GroupElementView.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

@@ -98,7 +98,7 @@ Dialog {
 
             width: featuresDialog.width;
 
-            AuxTable {
+            Table {
                 id: tableTreeView;
 
                 width: parent.width;

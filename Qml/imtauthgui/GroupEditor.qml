@@ -301,7 +301,7 @@ ViewBase {
         }
     }
 
-    AuxTable {
+    Table {
         id: parentGroupsTable;
 
         anchors.top: title.bottom;

@@ -134,7 +134,7 @@ ViewBase {
         }
     }
 
-    AuxTable {
+    Table {
         id: usersTable;
 
         anchors.top: titleRoles.bottom;

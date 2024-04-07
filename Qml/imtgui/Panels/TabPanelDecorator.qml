@@ -18,7 +18,7 @@ DecoratorBase {
 
     Rectangle {
         anchors.fill: tabPanelDecorator;
-        color: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected ? Style.baseColor: "transparent": "transparent";
+        color: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected ? Style.alternateBaseColor: "transparent": "transparent";
     }
 
     Rectangle {

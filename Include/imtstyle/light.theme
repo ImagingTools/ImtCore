@@ -25,7 +25,8 @@
 		"ImagingToolsGradient3": "#bebec0",
 		"ImagingToolsGradient4": "#b4b4b6",
 		"Red": "#FF4500",
-		"Green": "#00FF00"
+		"Green": "#00FF00",
+		"EarthbornBugle": "#F7F7F7"
 	},
 	"Style": {
 		"Name": "Light",
@@ -56,6 +57,7 @@
 		"ToolButtonBorderColor": "#FFFFFF",
 		"ActiveColors": {
 			"Background": "GrayBlue",
+			"Background2": "EarthbornBugle",
 			"Foreground": "White",
 			"Base": "White",
 			"AlternateBase": "VeryLightGray",

@@ -335,7 +335,7 @@ ViewBase {
         text: qsTr("Parent Roles");
     }
 
-    AuxTable {
+    Table {
         id: parentRolesTable;
 
         anchors.top: titleIncludes.bottom;
