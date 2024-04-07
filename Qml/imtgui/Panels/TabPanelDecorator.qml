@@ -89,7 +89,8 @@ DecoratorBase {
             anchors.centerIn: texttabDelegate;
 
             color: Style.textColor;
-            font.family: Style.fontFamily;
+            font.family: tabPanelDecorator.baseElement.index === 0 ? Style.fontFamilyBold : Style.fontFamily;
+            font.bold: tabPanelDecorator.baseElement.index === 0;
             font.pixelSize: Style.fontSize_common;
             text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
         }

@@ -22,6 +22,7 @@ CollectionView {
     }
 
     function getAdditionalInputParams(){
+        return {};
     }
 
     dataControllerComp: Component {
@@ -179,6 +180,8 @@ CollectionView {
 
         property bool ok: root.collectionId !== "" && subscriptionClient.subscriptionId !== "";
         onOkChanged: {
+            console.log("onOkChanged", ok, root.collectionId );
+
             if (ok){
                 let subscriptionRequestId = "On" + root.collectionId + "CollectionChanged"
                 var query = Gql.GqlRequest("subscription", subscriptionRequestId);

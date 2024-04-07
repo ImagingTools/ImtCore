@@ -102,7 +102,7 @@ Rectangle {
             return;
         }
 
-        tableItem.clicked();
+        tableItem.clicked(rowIndex);
 
         if (!tableItem.selectable){
             return;

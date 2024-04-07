@@ -15,9 +15,8 @@ namespace imtbase
 CTreeItemModel::CTreeItemModel(QObject *parent)
 	:QAbstractListModel(parent),
 	  m_isArray(false),
-	  m_isUpdateEnabled(false)
+	  m_isUpdateEnabled(true)
 {
-	m_isTransaction = false;
 	imtbase::CTreeItemModel* parentModel = dynamic_cast<imtbase::CTreeItemModel*>(parent);
 	if (parentModel != nullptr){
 		SetSlavePtr(parentModel);
@@ -63,13 +62,11 @@ bool CTreeItemModel::Copy(CTreeItemModel* object)
 		return false;
 	}
 
-	m_isTransaction = true;
-
 	bool result = CopyFrom(*object);
 
-	m_isTransaction = false;
-
-	emit dataChanged(QModelIndex(), QModelIndex());
+	if (m_isUpdateEnabled){
+		emit dataChanged(QModelIndex(), QModelIndex());
+	}
 
 	return result;
 }
@@ -103,8 +100,6 @@ void CTreeItemModel::InsertNewItemWithParameters(int index, const QVariantMap &m
 
 	m_items.insert(index, new Item());
 
-	m_isTransaction = true;
-
 	for(auto value = map.cbegin(); value != map.cend(); ++ value){
 		CTreeItemModel* treeItemModelPtr = nullptr;
 		if ((*value).isValid()){
@@ -118,11 +113,11 @@ void CTreeItemModel::InsertNewItemWithParameters(int index, const QVariantMap &m
 		SetData(value.key().toUtf8(), *value, index);
 	}
 
-	m_isTransaction = false;
-
 	endInsertRows();
 
-	emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
+	if (m_isUpdateEnabled){
+		emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
+	}
 }
 
 
@@ -139,7 +134,7 @@ int CTreeItemModel::InsertNewItem()
 	beginInsertRows(QModelIndex(), index, index);
 	endInsertRows();
 
-	if (!m_isTransaction){
+	if (m_isUpdateEnabled){
 		emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
 	}
 
@@ -163,7 +158,7 @@ int CTreeItemModel::InsertNewItem(int index)
 
 	endInsertRows();
 
-	if (!m_isTransaction){
+	if (m_isUpdateEnabled){
 		emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
 	}
 
@@ -189,7 +184,7 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap& /*infoMap*/)
 		m_isArray = false;
 	}
 
-	if (!m_isTransaction){
+	if (m_isUpdateEnabled){
 		emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
 	}
 
@@ -254,8 +249,6 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, CTreeItemModel *externTree
 
 bool CTreeItemModel::CopyItemDataFromModel(int index, const CTreeItemModel *externTreeModel, int externIndex)
 {
-	m_isTransaction = true;
-
 	RemoveItem(index);
 
 	InsertNewItem(index);
@@ -284,9 +277,9 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, const CTreeItemModel *exte
 		}
 	}
 
-	m_isTransaction = false;
-
-	emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
+	if (m_isUpdateEnabled){
+		emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
+	}
 
 	return retVal;
 }
@@ -339,7 +332,7 @@ bool CTreeItemModel::SetData(const QByteArray& key, const QVariant& value, int i
 		QVector<int> keyRoles;
 		keyRoles.append(keyRole);
 
-		if (!m_isTransaction){
+		if (m_isUpdateEnabled){
 			emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index), keyRoles);
 		}
 	}
@@ -363,7 +356,7 @@ bool CTreeItemModel::RemoveData(const QByteArray& key, int index, const ChangeIn
 		QVector<int> roles;
 		roles.append(keyRole);
 
-		if (!m_isTransaction){
+		if (m_isUpdateEnabled){
 			emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index), roles);
 		}
 	}
@@ -477,7 +470,7 @@ void CTreeItemModel::Clear()
 	m_items.clear();
 	Refresh();
 
-	if (!m_isTransaction){
+	if (m_isUpdateEnabled){
 		emit dataChanged(QModelIndex(), QModelIndex());
 	}
 }
@@ -497,8 +490,6 @@ void CTreeItemModel::SetIsArray(const bool &isArray)
 
 bool CTreeItemModel::CreateFromJson(const QByteArray& jsonContent)
 {
-	m_isTransaction = true;
-
 	Clear();
 	QJsonParseError error;
 
@@ -522,9 +513,9 @@ bool CTreeItemModel::CreateFromJson(const QByteArray& jsonContent)
 		retVal = ParseRecursive(document.object(), 0);
 	}
 
-	m_isTransaction = false;
-
-	emit dataChanged(QModelIndex(), QModelIndex());
+	if (m_isUpdateEnabled){
+		emit dataChanged(QModelIndex(), QModelIndex());
+	}
 
 	return retVal;
 }
@@ -570,7 +561,9 @@ void CTreeItemModel::OnDataChanged(const QModelIndex &topLeft, const QModelIndex
 {
 	CTreeItemModel* parentModelPtr = GetParent();
 	if (parentModelPtr != nullptr){
-		emit parentModelPtr->dataChanged(topLeft, bottomRight, roles);
+		if (parentModelPtr->m_isUpdateEnabled){
+			emit parentModelPtr->dataChanged(topLeft, bottomRight, roles);
+		}
 	}
 }
 

@@ -30,8 +30,8 @@ Rectangle {
     property alias bottomComp: bottomLoader.sourceComponent;
     property alias bottomItem: bottomLoader.item;
 
-    property int topBorderWidth: 1;
-    property int leftBorderWidth: 1;
+    property bool topRoundedCorners: true;
+    property bool bottomRoundedCorners: true;
 
     onFocusChanged: {
         if (focus && controlItem){
@@ -39,39 +39,66 @@ Rectangle {
         }
     }
 
-//    Rectangle {
-//        id: topBorderRect;
+    Rectangle {
+        id: topRect;
+        anchors.top: parent.top;
 
-//        anchors.top: parent.top;
+        width: parent.width;
+        height: rootElement.radius;
 
-//        width: parent.width;
-////        height: Style.size_largeMargin;
-//        height: rootElement.topBorderWidth;
+        visible: !rootElement.topRoundedCorners;
 
-//        radius: rootElement.radius;
+        border.width: rootElement.border.width;
+        border.color: rootElement.border.color;
 
-//        color: Style.borderColor;
+        color: rootElement.color;
+    }
 
-////        border.width: rootElement.topBorderWidth;
-////        border.color: Style.borderColor;
-//    }
+    Rectangle {
+        anchors.left: parent.left;
+        anchors.leftMargin: rootElement.border.width;
 
-//    Rectangle {
-//        id: leftBorderRect;
+        anchors.right: parent.right;
+        anchors.rightMargin: rootElement.border.width;
 
-//        anchors.left: parent.left;
+        anchors.top: topRect.bottom;
+        anchors.topMargin: -height;
 
-////        width: Style.size_largeMargin
-//        width: rootElement.leftBorderWidth
-//        height: parent.height;
+        height: rootElement.border.width;
 
-//        radius: rootElement.radius;
+        color: rootElement.color;
+    }
 
-//        color: Style.borderColor;
+    Rectangle {
+        id: bottomRect;
 
-////        border.width: rootElement.leftBorderWidth;
-////        border.color: Style.borderColor;
-//    }
+        anchors.bottom: parent.bottom;
+
+        width: parent.width;
+        height: rootElement.radius;
+
+        visible: !rootElement.bottomRoundedCorners;
+
+        border.width: rootElement.border.width;
+        border.color: rootElement.border.color;
+
+        color: rootElement.color;
+    }
+
+    Rectangle {
+        anchors.left: parent.left;
+        anchors.leftMargin: rootElement.border.width;
+
+        anchors.right: parent.right;
+        anchors.rightMargin: rootElement.border.width;
+
+        anchors.top: bottomRect.top;
+//        anchors.topMargin: -height;
+
+        height: rootElement.border.width;
+
+        color: rootElement.color;
+    }
 
     Column {
         id: content;

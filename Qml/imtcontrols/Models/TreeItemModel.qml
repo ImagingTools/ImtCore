@@ -165,7 +165,9 @@ JSONListModel {
             }
         }
 
-        this.dataChanged()
+        if (isUpdateEnabled){
+            this.dataChanged()
+        }
 
         return retVal
     }
