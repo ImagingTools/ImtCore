@@ -18,7 +18,6 @@ namespace imtwidgets
 
 CMenuPanelDelegate::CMenuPanelDelegate(QTreeView* menuPanelPtr)
 	:QStyledItemDelegate(menuPanelPtr),
-	m_fontMetrics(QFontMetrics(QFont())),
 	m_indent(0),
 	m_height(0),
 	m_iconSizeRatio(1),
@@ -38,11 +37,11 @@ int CMenuPanelDelegate::GetMinimumWidth()
 }
 
 
-
-void CMenuPanelDelegate::SetFontMetrics(const QFontMetrics& fontMetrics)
+void CMenuPanelDelegate::SetFont(const QFont& font)
 {
-	m_fontMetrics = fontMetrics;
+	m_font = font;
 }
+
 
 void CMenuPanelDelegate::SetIndent(int indent)
 {
@@ -151,8 +150,10 @@ QSize CMenuPanelDelegate::sizeHint(const QStyleOptionViewItem& /*option*/, const
 
 	QString text = index.data(Qt::DisplayRole).toString();
 
+	QFontMetrics fm(m_font);
+
 	int width = m_leftPadding + offset + m_height + m_iconToTextPadding;
-	width += m_fontMetrics.boundingRect(text).width() + m_rightPadding;
+	width += fm.boundingRect(text).width() + m_rightPadding;
 
 	size.setWidth(width);
 

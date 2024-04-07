@@ -1,10 +1,9 @@
 #include <imtwidgets/CMenuPanel.h>
-#include <math.h>
-#include <QDebug>
 
 
 // Qt includes
 #include <QtCore/QEvent>
+#include <QtCore/QtMath>
 #include <QtCore/QStack>
 #include <QtCore/QModelIndex>
 #include <QtGui/QStandardItem>
@@ -36,7 +35,10 @@ CMenuPanel::CMenuPanel(QWidget* parent)
 	m_leftFramePtr(parent),
 	m_parentWidgetPtr(nullptr),
 	m_delegatePtr(nullptr),
-	m_shadowPtr(nullptr)
+	m_shadowPtr(nullptr),
+	m_cachedItemHeight(0),
+	m_cachedIconSizeRatio(0),
+	m_cachedFontSizeRatio(0)
 {
 	setupUi(this);
 
@@ -443,7 +445,9 @@ void CMenuPanel::SetItemHeight(int height)
 	if (m_delegatePtr != nullptr){
 		m_delegatePtr->SetItemHeight(height);
 	}
+
 	UpdateFontSize();
+
 	AfterSizesChanged();
 }
 
@@ -469,8 +473,10 @@ void CMenuPanel::SetIconSizeHoverRatio(double ratio)
 
 void CMenuPanel::SetFontSizeRatio(double ratio)
 {
-	m_cachedFontSizeRatio = ratio;	
+	m_cachedFontSizeRatio = ratio;
+
 	UpdateFontSize();
+
 	AfterSizesChanged();
 }
 
@@ -593,11 +599,14 @@ void CMenuPanel::CollapsePanelImmideatly()
 void CMenuPanel::UpdateFontSize()
 {
 	QFont font = PageTree->font();
-	font.setPixelSize(m_cachedItemHeight * m_cachedIconSizeRatio * m_cachedFontSizeRatio);
+	int fontSize = qCeil(m_cachedItemHeight* m_cachedIconSizeRatio* m_cachedFontSizeRatio);
+
+	font.setPixelSize(fontSize);
 	PageTree->setFont(font);
 	BottomPageTree->setFont(font);
+
 	if (m_delegatePtr != nullptr){
-		m_delegatePtr->SetFontMetrics(PageTree->fontMetrics());
+		m_delegatePtr->SetFont(font);
 	}
 }
 
@@ -605,7 +614,6 @@ void CMenuPanel::UpdateFontSize()
 void CMenuPanel::SetDelegate(IMenuPanelDelegate* menuPanelDelegate)
 {
 	m_delegatePtr = menuPanelDelegate;
-	m_delegatePtr->SetFontMetrics(PageTree->fontMetrics());
 	PageTree->setItemDelegate(m_delegatePtr);
 	BottomPageTree->setItemDelegate(m_delegatePtr);
 	m_animationIndent.setTargetObject(m_delegatePtr);

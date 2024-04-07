@@ -4,6 +4,7 @@
 // ImtCore includes
 #include <imtwidgets/IMenuPanelDelegate.h>
 
+
 namespace imtwidgets
 {
 
@@ -16,7 +17,7 @@ public:
 	// reimplemented (IMenuPanelDelegate)
 	int GetMinimumWidth() override;
 
-	void SetFontMetrics(const QFontMetrics& fontMetrics) override;
+	void SetFont(const QFont& font) override;
 
 	void SetIndent(int indent) override;
 	void SetItemHeight(int height) override;
@@ -47,7 +48,7 @@ protected:
 	int m_rightPadding;
 	int m_iconToTextPadding;
 
-	QFontMetrics m_fontMetrics;
+	QFont m_font;
 };
 
 

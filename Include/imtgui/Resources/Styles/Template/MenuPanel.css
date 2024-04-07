@@ -8,11 +8,6 @@ QWidget#BottomPageTree
 	background-color: ${Active.Background};
 }
 
-QTreeView
-{
-	font-size: 10px;
-}
-
 QTreeView#PageTree::item::hover
 {
 	background-color: ${Active.Hover};

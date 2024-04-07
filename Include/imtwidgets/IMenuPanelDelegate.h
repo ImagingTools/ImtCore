@@ -17,7 +17,7 @@ class IMenuPanelDelegate: virtual public QStyledItemDelegate
 public:	
 	virtual int GetMinimumWidth() = 0;
 
-	virtual void SetFontMetrics(const QFontMetrics& fontMetrics) = 0;
+	virtual void SetFont(const QFont& font) = 0;
 
 	virtual void SetIndent(int indent) = 0;
 	virtual void SetItemHeight(int height) = 0;
