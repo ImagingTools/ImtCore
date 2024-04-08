@@ -1,28 +1,26 @@
 QWidget {
-	font: 12px "Open Sans";
+	font-family: "Verdana";
+	font-size: 10pt;
 }
 
-QWidget#ResultFrame
-{
+QWidget#ResultFrame {
 	font-size: 24px;
 }
 
 QLabel#PageLabel {
-	font-size: 14pt;
+	font-size: 12pt;
 	font-weight: bold;
 }
 
-QWidget#LoadWorkflowButton
-{
+QWidget#LoadWorkflowButton {
 	text-align: left;
 }
 
 QLabel[Header=true] {
-	font-size: 14pt;
+	font-size: 12pt;
 }
 
-QLineEdit, QPlainTextEdit
-{
+QLineEdit, QPlainTextEdit {
 	height: 1.3em;
 }
 
