@@ -24,7 +24,6 @@ QLabel[Header=true] {
 QLineEdit, QPlainTextEdit
 {
 	height: 1.3em;
-	font-size: 13pt;
 }
 
 QToolButton#windowTitle
