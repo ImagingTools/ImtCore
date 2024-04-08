@@ -12,9 +12,6 @@ CollectionFilter {
         }
         objectFilter.SetData(messageKey, status);
 
-        // objectFilter.SetData("Key", messageKey);
-        // objectFilter.SetData("Value", status);
-
         filterChanged();
     }
 
