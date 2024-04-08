@@ -429,7 +429,7 @@ JSONListModel {
                 retVal += "{"
 
             let recurciveJSON = function(modelData){
-                if (modelData === null) {
+                if (modelData === null || modelData === undefined) {
                     retVal += "null"
                 } else if(typeof modelData === 'object'){
                     if(modelData instanceof QModelData){
