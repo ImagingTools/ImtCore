@@ -215,24 +215,24 @@ TStandardDocumentViewDecorator<WorkspaceImpl, UI>::TStandardDocumentViewDecorato
 	}
 
 	UI::NewButton->setToolButtonStyle(configuration.fileButtonsStyle);
-	connect(UI::NewButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnNew);
+	UI::NewButton->setDefaultAction(&m_newCommand);
 
 	UI::OpenButton->setToolButtonStyle(configuration.fileButtonsStyle);
-	connect(UI::OpenButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnOpen);
+	UI::OpenButton->setDefaultAction(&m_openCommand);
 
 	UI::UndoButton->setToolButtonStyle(configuration.undoButtonsStyle);
-	connect(UI::UndoButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnUndo);
+	UI::UndoButton->setDefaultAction(&m_undoCommand);
 
 	UI::RedoButton->setToolButtonStyle(configuration.undoButtonsStyle);
-	connect(UI::RedoButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnRedo);
+	UI::RedoButton->setDefaultAction(&m_redoCommand);
 
-	connect(UI::CloseButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnCloseDocument);
+	UI::CloseButton->setDefaultAction(&m_closeCommand);
 
 	UI::SaveButton->setToolButtonStyle(configuration.fileButtonsStyle);
-	connect(UI::SaveButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnSaveDocument);
+	UI::SaveButton->setDefaultAction(&m_saveCommand);
 
 	UI::SaveAsButton->setToolButtonStyle(configuration.fileButtonsStyle);
-	connect(UI::SaveAsButton, &QToolButton::clicked, parentPtr, &WorkspaceImpl::OnSaveDocumentAs);
+	UI::SaveAsButton->setDefaultAction(&m_saveAsCommand);
 
 	connect(&m_newCommand, &QAction::triggered, parentPtr, &WorkspaceImpl::OnNew);
 	connect(&m_openCommand, &QAction::triggered, parentPtr, &WorkspaceImpl::OnOpen);
