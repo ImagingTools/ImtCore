@@ -22,5 +22,9 @@ CollectionCommandsController 1.0 CollectionCommandsController.qml
 CollectionDocumentData 1.0 CollectionDocumentData.qml
 CollectionViewDelegate 1.0 CollectionViewDelegate.qml
 
+MessageCollectionFilterDecorator 1.0 MessageCollectionFilterDecorator.qml
+MessageCollectionFilter 1.0 MessageCollectionFilter.qml
+MessageFilterItem 1.0 MessageFilterItem.qml
+
 SchemeView 1.0 SchemeView.qml
 MetaInfo 1.0 MetaInfo.qml

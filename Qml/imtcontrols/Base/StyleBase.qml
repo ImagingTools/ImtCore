@@ -32,9 +32,9 @@ StyleComponents {
 	property int buttonWidthMedium: 24
 	property int buttonWidthSmall: 16
 	property int buttonWidthTiny: 8
-    property int buttonRadius: 3
+    property int buttonRadius: 4
     property int buttonBorderWidth: 1
-    property int buttonHeight: 24
+    property int buttonHeight: 30
 	property int horizontalPageMargin: 24
 	property int iconSizeExtraSmall: 8
 	property int iconSizeSmall: 16
@@ -71,6 +71,7 @@ StyleComponents {
 	property color primaryColor: mainColor
 	property color secondaryColor: secondColor
 	property color secondaryHighlightColor: linkColor
+    property color imaginToolsAccent: "#2a82da"
 
 	//------------------------------------------for basic components
 
@@ -135,6 +136,7 @@ StyleComponents {
     property string buttonBorderColor: "#b0b0b0";
     property string buttonHoverColor: "#d2d2d2";
     property string buttonPressedColor: "#c6c6c6";
+    property string buttonBorderFocusColor: borderColor;
     property color inactive_buttonColor: "#C0C0C0";
     property color buttonText: "#335777";
     property color inactive_buttonText: "#335777";
@@ -256,6 +258,15 @@ StyleComponents {
         }
         if (sourceDecorators.buttonDecorator){
             styleContainer.buttonDecorator = sourceDecorators.buttonDecorator
+        }
+        if (sourceDecorators.firstSegmentDecorator){
+            styleContainer.firstSegmentDecorator = sourceDecorators.firstSegmentDecorator
+        }
+        if (sourceDecorators.middleSegmentDecorator){
+            styleContainer.middleSegmentDecorator = sourceDecorators.middleSegmentDecorator
+        }
+        if (sourceDecorators.lastSegmentDecorator){
+            styleContainer.lastSegmentDecorator = sourceDecorators.lastSegmentDecorator
         }
         if (sourceDecorators.roundButtonDecorator){
             styleContainer.roundButtonDecorator = sourceDecorators.roundButtonDecorator
@@ -389,6 +400,7 @@ StyleComponents {
             styleContainer.imagingToolsGradient3 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient3");
             styleContainer.imagingToolsGradient4 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient4");
             styleContainer.greenColor = dataSource.GetData("ColorPalette").GetData("Green");
+            styleContainer.imaginToolsAccent = dataSource.GetData("ColorPalette").GetData("ImaginTools Accent");
 
             styleContainer.iconColorOnSelected = styleContainer.getThemeColor("ActiveColors", "Highlight", dataSource);
 

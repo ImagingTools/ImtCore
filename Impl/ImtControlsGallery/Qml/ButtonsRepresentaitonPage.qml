@@ -33,7 +33,6 @@ Rectangle {
 
             text: "Text button";
             tooltipText: "Hellow!!!";
-            //tooltipText: "ffff fffff  ffff    fffffff ffff jkljlkjklj ljlkj klkjkljk jkljlk ljj jkljlk jkljklj jklj kljkljkl jklljklj kljklj kljklj jlkjklj !!!";
             onClicked: {
                 pauseMessage.show("Text button clicked!")
             }
@@ -101,6 +100,57 @@ Rectangle {
                     else {
                         pauseMessage.show("toggled off!")
                     }
+                }
+            }
+        }
+
+        SegmentedButton {
+
+            height: Style.buttonHeight
+            isExclusive: true
+
+            Button{
+                anchors.verticalCenter:  parent.verticalCenter;
+
+                KeyNavigation.right: roundButton
+                KeyNavigation.tab: roundButton
+
+                iconSource: "../../../../" + Style.getIconPath("Icons/Info", Icon.State.On, Icon.Mode.Normal);
+
+                text: "Info";
+                tooltipText: "Info!!!";
+                onClicked: {
+                    pauseMessage.show("Info button clicked!")
+                }
+            }
+
+            Button{
+                anchors.verticalCenter:  parent.verticalCenter;
+
+                KeyNavigation.right: roundButton
+                KeyNavigation.tab: roundButton
+
+                iconSource: "../../../../" + Style.getIconPath("Icons/Warning", Icon.State.On, Icon.Mode.Normal);
+
+                text: "Warning";
+                tooltipText: "Warning!!!";
+                onClicked: {
+                    pauseMessage.show("Warning button clicked!")
+                }
+            }
+
+            Button{
+                anchors.verticalCenter:  parent.verticalCenter;
+
+                KeyNavigation.right: roundButton
+                KeyNavigation.tab: roundButton
+
+                iconSource: "../../../../" + Style.getIconPath("Icons/Error", Icon.State.On, Icon.Mode.Normal);
+
+                text: "Error";
+                tooltipText: "Error!!!";
+                onClicked: {
+                    pauseMessage.show("Error button clicked!")
                 }
             }
         }

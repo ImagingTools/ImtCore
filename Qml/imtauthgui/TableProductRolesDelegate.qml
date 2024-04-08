@@ -13,7 +13,7 @@ TableRowDelegateBase {
 
     property bool newIsEnabled: true;
 
-    property int radius: 3;
+    radius: 3;
 
     signal roleClicked(string id, int index);
     signal newClicked();

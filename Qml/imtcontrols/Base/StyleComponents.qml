@@ -13,6 +13,9 @@ Item {
     property Component topRightPanelDecorator
     property Component tabPanelDecorator
     property Component buttonDecorator
+    property Component firstSegmentDecorator
+    property Component middleSegmentDecorator
+    property Component lastSegmentDecorator
     property Component toolButtonDecorator
     property Component roundButtonDecorator
     property Component textFieldDecorator

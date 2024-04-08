@@ -25,6 +25,7 @@ AuxButton 1.0 ./Buttons/AuxButton.qml
 Button 1.0 ./Buttons/Button.qml
 TextButton 1.0 ./Buttons/TextButton.qml
 ButtonDecorator 1.0 ./Buttons/ButtonDecorator.qml
+ExternalSegmentDecorator 1.0 ./Buttons/ExternalSegmentDecorator.qml
 RadioButton 1.0 ./Buttons/RadioButton.qml
 TextButtonDecorator 1.0 ./Buttons/TextButtonDecorator.qml
 ToolButton 1.0 ./Buttons/ToolButton.qml
@@ -32,6 +33,7 @@ ToolButtonDecorator 1.0 ./Buttons/ToolButtonDecorator.qml
 TopButtonDecorator 1.0 ./Buttons/TopButtonDecorator.qml
 TopButtonDecoratorNew 1.0 ./Buttons/TopButtonDecoratorNew.qml
 IconButtonDecorator 1.0 ./Buttons/IconButtonDecorator.qml
+SegmentedButton 1.0 ./Buttons/SegmentedButton.qml
 
 DialogButtons 1.0 ./Dialogs/DialogButtons.qml
 Dialog 1.0 ./Dialogs/Dialog.qml

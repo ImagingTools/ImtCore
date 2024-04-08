@@ -452,7 +452,7 @@ Rectangle {
             property string mainTextColor: Style.textColor
             property string secondTextColor: Style.inactive_textColor
             property string gridColor: Style.imagingToolsGradient1;
-            property string backgroundBorderColor: "#a0a0a0";
+            property string backgroundBorderColor: Style.alternateBaseColor;
             property string backgroundColor: Style.baseColor;
             property string innerFrameColor: "transparent";
 

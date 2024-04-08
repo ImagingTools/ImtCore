@@ -5,7 +5,7 @@ import imtcontrols 1.0
 DecoratorBase {
     id: commonButtonDecorator
 
-    width: Math.max(iconObj.width + textObj.width + Style.paddingSmall * 3, widthDefault)
+    width: Math.max(iconObj.width + textObj.width + Style.paddingMedium * 3, widthDefault)
     height: Style.buttonHeight;
     clip: true;
 
@@ -16,6 +16,8 @@ DecoratorBase {
     property alias color: background.color
     property alias radius: background.radius
     property alias border: background.border
+
+    property alias backgroundItem: background
 
     property bool contentCentered: true;
 
@@ -64,10 +66,12 @@ DecoratorBase {
         radius: Style.buttonRadius
         color: !commonButtonDecorator.baseElement ? "transtarent" :
                                                     commonButtonDecorator.baseElement.down || commonButtonDecorator.baseElement.checked ?
-                                                        Style.buttonPressedColor : commonButtonDecorator.baseElement.hovered ?
-                                                            Style.buttonHoverColor : Style.buttonColor
+                                                    Style.buttonPressedColor : commonButtonDecorator.baseElement.hovered ?
+                                                    Style.buttonHoverColor : Style.buttonColor
         border.width: Style.buttonBorderWidth
-        border.color: !commonButtonDecorator.baseElement ? "transtarent" : commonButtonDecorator.baseElement.focus ? Style.borderFocusColor : Style.borderColor
+        border.color: !commonButtonDecorator.baseElement ? "transtarent" :
+                                                    commonButtonDecorator.baseElement.focus ? Style.buttonBorderFocusColor :
+                                                    Style.borderColor
     }
 
     Row {

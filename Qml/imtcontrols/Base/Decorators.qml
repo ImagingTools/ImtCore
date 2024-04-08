@@ -22,6 +22,10 @@ StyleComponents {
     tabPanelDecorator: tabPanelDecoratorComp
 
     buttonDecorator: buttonDecoratorComp
+    firstSegmentDecorator: firstSegmentDecoratorComp
+    middleSegmentDecorator: middleSegmentDecoratorComp
+    lastSegmentDecorator: lastSegmentDecoratorComp
+
     toolButtonDecorator: toolButtonDecoratorComp;
 
     roundButtonDecorator: roundButtonDecoratorComp
@@ -167,9 +171,27 @@ StyleComponents {
         id: buttonDecoratorComp;
 
         ButtonDecorator{
-            width: 160;
-            height: 30;
-            radius: 4;
+        }
+    }
+
+    Component{
+        id: firstSegmentDecoratorComp
+        ExternalSegmentDecorator{
+        }
+    }
+
+    Component{
+        id: middleSegmentDecoratorComp
+        ButtonDecorator{
+            radius: 0;
+        }
+    }
+
+    Component{
+        id: lastSegmentDecoratorComp
+
+        ExternalSegmentDecorator{
+            isLast: true
         }
     }
 
