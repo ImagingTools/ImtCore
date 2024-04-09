@@ -204,20 +204,21 @@ void CPopupController::AddMessage(const MessagePtr& messagePtr)
 
 void CPopupController::OnAddMessage(const QByteArray& id, const MessagePtr& messagePtr)
 {
+	int timeout = m_timeout;
+
 	QString source = messagePtr->GetInformationSource();
 	if (m_exclusiveMessageSources.contains(source)){
-		PopupItem* itemPtr = GetPopupItem(source);
-		if (itemPtr != nullptr){
-			IPopupWidget* widgetPtr = dynamic_cast<IPopupWidget*>(itemPtr->widgetPtr);
-			Q_ASSERT(widgetPtr != nullptr);
-
-			widgetPtr->SetContent(messagePtr);
-
-			return;
+		PopupItem* itemPtr = nullptr;
+		while ((itemPtr = GetPopupItem(source)) != nullptr){
+			ClosePopup(itemPtr->id);
 		}
+
+		timeout = 0;
 	}
 
-	CreatePopupItem(id, messagePtr, m_timeout, true, nullptr);
+	if (!messagePtr->GetInformationDescription().isEmpty()){
+		CreatePopupItem(id, messagePtr, timeout, true, nullptr);
+	}
 }
 
 
