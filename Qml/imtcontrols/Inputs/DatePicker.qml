@@ -693,8 +693,8 @@ Item {
 
                     visible: datePicker.hasDay && !dayComboObj.openST;
 
-                    height: parent.width;
-                    width: parent.height;
+                    width: parent.width;
+                    height: parent.height;
 
                     radius: datePicker.textFieldRadius;
                     textSize: datePicker.textSize;
