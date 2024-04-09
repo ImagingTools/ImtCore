@@ -24,6 +24,7 @@ public:
 		I_ASSIGN(m_popupAnchorAttrPtr, "PopupAnchorCorner", "0 - TopLeft\n1 - TopRight\n2 - BottomLeft\n3 - BottomRight", true, 3);
 		I_ASSIGN(m_popupSpacingAttrPtr, "PopupSpacing", "Spacing between adjacent popups", true, 5);
 		I_ASSIGN(m_popupDefaultTimeoutAttrPtr, "PopupDefaultTimeout", "Timeout value in msecs before the popup closes, a zero or negative value requires user action to close", true, 3000);
+		I_ASSIGN_MULTI_0(m_exclusiveMessageSourcesAttrPtr, "ExclusiveMessageSources", "Sources of exclusive messages", false);
 	I_END_COMPONENT;
 
 	// pseudo-reimplemented (iqtgui::CGuiComponentBase)
@@ -48,6 +49,7 @@ private:
 	I_ATTR(int, m_popupAnchorAttrPtr);
 	I_ATTR(int, m_popupSpacingAttrPtr);
 	I_ATTR(int, m_popupDefaultTimeoutAttrPtr);
+	I_MULTIATTR(QString, m_exclusiveMessageSourcesAttrPtr);
 
 	CPopupController m_controller;
 };
@@ -98,6 +100,16 @@ void TPopupControllerCompWrap<GuiObject>::OnComponentCreated()
 	m_controller.SetSpacing(*m_popupSpacingAttrPtr);
 	m_controller.SetDefaultTimeOut(*m_popupDefaultTimeoutAttrPtr);
 	m_controller.SetPopupWidgetFactory(m_popupWidgetFactoryCompPtr.GetPtr());
+
+	QStringList sources;
+	for (int i = 0; i < m_exclusiveMessageSourcesAttrPtr.GetCount(); i++){
+		QString source = m_exclusiveMessageSourcesAttrPtr[i];
+		if (!source.isEmpty() && !sources.contains(source)){
+			sources.append(source);
+		}
+	}
+	m_controller.SetExclusiveMessageSources(sources);
+
 	for (int i = 0; i < m_popupEventHandlerCompPtr.GetCount(); i++){
 		if (m_popupEventHandlerCompPtr[i] != nullptr){
 			m_controller.RegisterEventHandler(m_popupEventHandlerCompPtr[i]);

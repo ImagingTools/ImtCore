@@ -44,6 +44,7 @@ public:
 	void SetSpacing(double spacing);
 	void SetDefaultTimeOut(int msec);
 	void SetPopupWidgetFactory(IPopupWidgetFactory* factoryPtr);
+	void SetExclusiveMessageSources(const QStringList& exclusiveMessageSources);
 
 	void SetEnabled(bool enable);
 
@@ -102,6 +103,9 @@ private:
 	int GetVisibleItemIndex(const QObject* memberPtr);
 	int GetInvisibleItemIndex(const QByteArray& id);
 
+	PopupItem* GetPopupItem(const QByteArray& popupId);
+	PopupItem* GetPopupItem(const QString& source);
+
 	void ValidateVisibleItems();
 	void ArrangeVisibleItems();
 	void ShowItems();
@@ -154,6 +158,8 @@ private:
 
 	QList<IPopupEventHandler*> m_eventHandlers;
 	QMutex m_eventHandlersMutex;
+
+	QStringList m_exclusiveMessageSources;
 
 	QList<PopupItemPtr> m_items;
 	QList<PopupItemPtr> m_visibleItems;

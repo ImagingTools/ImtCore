@@ -113,6 +113,12 @@ void CPopupController::SetPopupWidgetFactory(IPopupWidgetFactory* factoryPtr)
 }
 
 
+void CPopupController::SetExclusiveMessageSources(const QStringList& exclusiveMessageSources)
+{
+	m_exclusiveMessageSources = exclusiveMessageSources;
+}
+
+
 void CPopupController::SetEnabled(bool /*enable*/)
 {
 }
@@ -198,6 +204,19 @@ void CPopupController::AddMessage(const MessagePtr& messagePtr)
 
 void CPopupController::OnAddMessage(const QByteArray& id, const MessagePtr& messagePtr)
 {
+	QString source = messagePtr->GetInformationSource();
+	if (m_exclusiveMessageSources.contains(source)){
+		PopupItem* itemPtr = GetPopupItem(source);
+		if (itemPtr != nullptr){
+			IPopupWidget* widgetPtr = dynamic_cast<IPopupWidget*>(itemPtr->widgetPtr);
+			Q_ASSERT(widgetPtr != nullptr);
+
+			widgetPtr->SetContent(messagePtr);
+
+			return;
+		}
+	}
+
 	CreatePopupItem(id, messagePtr, m_timeout, true, nullptr);
 }
 
@@ -406,6 +425,56 @@ int CPopupController::GetVisibleItemIndex(const QObject* memberPtr)
 	}
 
 	return -1;
+}
+
+
+CPopupController::PopupItem* CPopupController::GetPopupItem(const QByteArray& popupId)
+{
+	for (int i = 0; i < m_items.count(); i++){
+		PopupItem* itemPtr = m_items[i].GetPtr();
+
+		if (itemPtr->id == popupId){
+			return itemPtr;
+		}
+	}
+
+	for (int i = 0; i < m_visibleItems.count(); i++){
+		PopupItem* itemPtr = m_visibleItems[i].GetPtr();
+
+		if (itemPtr->id == popupId){
+			return itemPtr;
+		}
+	}
+
+	return nullptr;
+}
+
+
+CPopupController::PopupItem* CPopupController::GetPopupItem(const QString& source)
+{
+	for (int i = 0; i < m_items.count(); i++){
+		PopupItem* itemPtr = m_items[i].GetPtr();
+
+		IPopupWidget* widgetPtr = dynamic_cast<IPopupWidget*>(itemPtr->widgetPtr);
+		Q_ASSERT(widgetPtr != nullptr);
+
+		if (widgetPtr->GetMessagePtr()->GetInformationSource() == source){
+			return itemPtr;
+		}
+	}
+
+	for (int i = 0; i < m_visibleItems.count(); i++){
+		PopupItem* itemPtr = m_visibleItems[i].GetPtr();
+
+		IPopupWidget* widgetPtr = dynamic_cast<IPopupWidget*>(itemPtr->widgetPtr);
+		Q_ASSERT(widgetPtr != nullptr);
+
+		if (widgetPtr->GetMessagePtr()->GetInformationSource() == source){
+			return itemPtr;
+		}
+	}
+
+	return nullptr;
 }
 
 
