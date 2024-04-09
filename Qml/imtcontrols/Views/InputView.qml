@@ -12,7 +12,7 @@ Item{
     property bool fitToWidth: false;
 
     onModelChanged: {
-        console.log("INPUT_MODEL:: ", model.toJSON())
+        //console.log("INPUT_MODEL:: ", model.toJSON())
     }
 
     ListView{
@@ -29,7 +29,6 @@ Item{
             id: loader;
 
             source: model.Source;
-            //sourceComponent: model.index % 2 ? green : orange;
             onLoaded: {
                 if(inputView.fitToWidth){
                     item.width = inputView.width;
@@ -41,15 +40,21 @@ Item{
                 let keys = [];
                 keys = inputView.model.GetKeys(model.index);
                 for(let i = 0; i < keys.length; i++){
-                    if(item[keys[i]] !== undefined){
-                        item[keys[i]] = inputView.model.GetData(keys[i], model.index);
+                    //console.log("KEY::", keys[i], item[keys[i]])
+                    if(item[keys[i]] !==undefined){
+                        if(inputView.model.IsTreeModel(keys[i], model.index)){
+                            console.log("IS_MODEL:: ", keys[i])
+                            item[keys[i]] = inputView.model.GetTreeItemModel(keys[i], model.index);
+                        }
+                        else {
+                            item[keys[i]] = inputView.model.GetData(keys[i], model.index);
+                        }
                     }
                 }
 
             }
         }
     }//list
-
 
 }
 

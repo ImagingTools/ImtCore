@@ -7,7 +7,7 @@ ControlBase {
 
     decorator: Style.comboBoxDecorator
 
-    property var model;
+    property var model:0;
 
     property color borderColor: comboBoxContainer.focus ? Style.iconColorOnSelected : Style.borderColor;
 
