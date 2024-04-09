@@ -59,6 +59,11 @@
 	<file alias="imtgui/View/ElementView.qml">View/ElementView.qml</file>
 	<file alias="imtgui/View/ComboBoxElementView.qml">View/ComboBoxElementView.qml</file>
 	<file alias="imtgui/View/GroupElementView.qml">View/GroupElementView.qml</file>
+	<file alias="imtgui/View/GroupHeaderView.qml">View/GroupHeaderView.qml</file>
+	<file alias="imtgui/View/ClearableComboBoxElementView.qml">View/ClearableComboBoxElementView.qml</file>
+	<file alias="imtgui/View/FilterableComboBoxElementView.qml">View/FilterableComboBoxElementView.qml</file>
+	<file alias="imtgui/View/TableElementView.qml">View/TableElementView.qml</file>
+	<file alias="imtgui/View/TreeViewElementView.qml">View/TreeViewElementView.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

@@ -24,6 +24,19 @@ ViewBase {
         Events.unSubscribeEvent("OnLocalizationChanged", accountEditorContainer.onLocalizationChanged);
     }
 
+    onWidthChanged: {
+        checkWidth();
+    }
+
+    function checkWidth(){
+        if (width < bodyColumn.width + scrollbar.width + 50){
+            bodyColumn.width = width - 50;
+        }
+        else{
+            bodyColumn.width = 700;
+        }
+    }
+
     function onLocalizationChanged(language){
         bodyColumn.updateHeaders();
     }
@@ -36,7 +49,7 @@ ViewBase {
         postalCodeInput.readOnly = readOnly;
         cityInput.readOnly = readOnly;
         emailInput.readOnly = readOnly;
-        groupsTable.readOnly = readOnly;
+        groupsElement.table.readOnly = readOnly;
     }
 
     function updateGui(){
@@ -99,15 +112,15 @@ ViewBase {
             }
         }
 
-        groupsTable.uncheckAll();
+        groupsElement.table.uncheckAll();
 
-        console.log("groupsTable.elements", groupsTable.elements);
+        console.log("groupsElement.table.elements", groupsElement.table.elements);
 
-        if (groupsTable.elements){
-            for (let i = 0; i < groupsTable.elements.GetItemsCount(); i++){
-                let id = groupsTable.elements.GetData("Id", i);
+        if (groupsElement.table.elements){
+            for (let i = 0; i < groupsElement.table.elements.GetItemsCount(); i++){
+                let id = groupsElement.table.elements.GetData("Id", i);
                 if (groupIds.includes(id)){
-                    groupsTable.checkItem(i);
+                    groupsElement.table.checkItem(i);
                 }
             }
         }
@@ -136,9 +149,9 @@ ViewBase {
         accountEditorContainer.model.SetData("Email", email);
 
         let selectedGroupIds = []
-        let indexes = groupsTable.getCheckedItems();
+        let indexes = groupsElement.table.getCheckedItems();
         for (let index of indexes){
-            let id = groupsTable.elements.GetData("Id", index);
+            let id = groupsElement.table.elements.GetData("Id", index);
             selectedGroupIds.push(id)
         }
 
@@ -148,19 +161,12 @@ ViewBase {
         accountEditorContainer.model.SetData("Groups", groups)
     }
 
-    Rectangle {
-        anchors.fill: parent;
-
-        color: Style.backgroundColor;
-    }
-
     CustomScrollbar {
         id: scrollbar;
 
-        anchors.left: flickable.right;
-        anchors.leftMargin: 5;
-        anchors.top: parent.top;
-        anchors.bottom: parent.bottom;
+        anchors.right: parent.right;
+        anchors.top: flickable.top;
+        anchors.bottom: flickable.bottom;
 
         secondSize: 10;
         targetItem: flickable;
@@ -170,212 +176,203 @@ ViewBase {
 
     Flickable {
         id: flickable;
-        anchors.top: parent.top;
-        anchors.bottom: parent.bottom;
-        anchors.left: parent.left;
-        anchors.leftMargin: 20;
 
-        width: 450;
+        anchors.top: parent.top;
+        anchors.topMargin: Style.size_largeMargin;
+
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: Style.size_largeMargin;
+
+        anchors.left: parent.left;
+        anchors.leftMargin: Style.size_largeMargin;
+
+        anchors.right: scrollbar.left;
+        anchors.rightMargin: Style.size_largeMargin;
+
         contentWidth: bodyColumn.width;
-        contentHeight: bodyColumn.height;
+        contentHeight: bodyColumn.height + 2 * Style.size_largeMargin;
 
         boundsBehavior: Flickable.StopAtBounds;
-        interactive: !mouseArea.containsMouse;
 
         Column {
             id: bodyColumn;
 
-            width: flickable.width;
+            width: 700;
 
-            spacing: 15;
+            spacing: Style.size_largeMargin;
 
-            TextFieldWithTitle {
-                id: accountNameInput;
+            Component.onCompleted: {
+                accountEditorContainer.checkWidth();
+            }
+
+            GroupHeaderView {
+                width: parent.width;
+
+                title: qsTr("Account Information");
+                groupView: accountInformationGroup;
+            }
+
+            GroupElementView {
+                id: accountInformationGroup;
 
                 width: parent.width;
 
-                title: qsTr("Account name");
-                placeHolderText: qsTr("Enter the account name");
+                TextInputElementView {
+                    id: accountNameInput;
 
-                onEditingFinished: {
-                    accountEditorContainer.doUpdateModel();
+                    name: qsTr("Account Name");
+                    placeHolderText: qsTr("Enter the account name");
+
+                    onEditingFinished: {
+                        accountEditorContainer.doUpdateModel();
+                    }
+
+                    KeyNavigation.tab: accountDescriptionInput;
+
+                    Component.onCompleted: {
+                        let ok = PermissionsController.checkPermission("ChangeAccount");
+
+                        accountNameInput.readOnly = !ok;
+                    }
                 }
 
-                KeyNavigation.tab: accountDescriptionInput;
+                TextInputElementView {
+                    id: accountDescriptionInput;
 
-                Component.onCompleted: {
-                    let ok = PermissionsController.checkPermission("ChangeAccount");
+                    name: qsTr("Account Description");
+                    placeHolderText: qsTr("Enter the account description");
 
-                    accountNameInput.readOnly = !ok;
+                    onEditingFinished: {
+                        accountEditorContainer.doUpdateModel();
+                    }
+
+                    KeyNavigation.tab: emailInput;
+
+                    Component.onCompleted: {
+                        let ok = PermissionsController.checkPermission("ChangeAccount");
+
+                        accountDescriptionInput.readOnly = !ok;
+                    }
+                }
+
+                TextInputElementView {
+                    id: emailInput;
+
+                    width: parent.width;
+
+                    name: qsTr("Email");
+                    placeHolderText: qsTr("Enter the email");
+
+                    textInputValidator: mailValid;
+
+                    onEditingFinished: {
+                        accountEditorContainer.doUpdateModel();
+                    }
+
+                    KeyNavigation.tab: countryInput;
+
+                    Component.onCompleted: {
+                        let ok = PermissionsController.checkPermission("ChangeAccount");
+
+                        emailInput.readOnly = !ok;
+                    }
+                }
+
+                RegularExpressionValidator {
+                    id: mailValid;
+
+                    regularExpression: /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
                 }
             }
 
-            TextFieldWithTitle {
-                id: accountDescriptionInput;
+            GroupHeaderView {
+                width: parent.width;
+
+                title: qsTr("Company Address");
+                groupView: companyAddressGroup;
+            }
+
+            GroupElementView {
+                id: companyAddressGroup;
 
                 width: parent.width;
 
-                title: qsTr("Account description");
-                placeHolderText: qsTr("Enter the account description");
+                TextInputElementView {
+                    id: countryInput;
 
-                onEditingFinished: {
-                    accountEditorContainer.doUpdateModel();
-                }
+                    name: qsTr("Country");
+                    placeHolderText: qsTr("Enter the country");
 
-                KeyNavigation.tab: emailInput;
-
-                Component.onCompleted: {
-                    let ok = PermissionsController.checkPermission("ChangeAccount");
-
-                    accountDescriptionInput.readOnly = !ok;
-                }
-            }
-
-            TextFieldWithTitle {
-                id: emailInput;
-
-                width: parent.width;
-
-                title: qsTr("Email");
-                placeHolderText: qsTr("Enter the email");
-
-                textInputValidator: mailValid;
-
-                onEditingFinished: {
-                    accountEditorContainer.doUpdateModel();
-                }
-
-                KeyNavigation.tab: countryInput;
-
-                Component.onCompleted: {
-                    let ok = PermissionsController.checkPermission("ChangeAccount");
-
-                    emailInput.readOnly = !ok;
-                }
-            }
-
-            RegularExpressionValidator {
-                id: mailValid;
-
-                regularExpression: /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-            }
-
-            Text {
-                color: Style.textColor;
-                font.family: Style.fontFamilyBold;
-                font.pixelSize: Style.fontSize_common;
-
-                text: qsTr("Company address");
-            }
-
-            Rectangle {
-                id: companyAddressBlockBorders;
-
-                width: parent.width;
-                height: companyAddressBlock.height + 25;
-
-                color: "transparent";
-
-                border.width: 1;
-                border.color: Style.borderColor;
-
-                radius: accountEditorContainer.radius;
-
-                Column {
-                    id: companyAddressBlock;
-
-                    anchors.horizontalCenter: companyAddressBlockBorders.horizontalCenter;
-                    anchors.verticalCenter: companyAddressBlockBorders.verticalCenter;
-
-                    width: parent.width - 20;
-
-                    spacing: 15;
-
-                    TextFieldWithTitle {
-                        id: countryInput;
-
-                        width: parent.width;
-
-                        title: qsTr("Country");
-                        placeHolderText: qsTr("Enter the country");
-
-                        onEditingFinished: {
-                            accountEditorContainer.doUpdateModel();
-                        }
-
-                        KeyNavigation.tab: cityInput;
-
-                        Component.onCompleted: {
-                            let ok = PermissionsController.checkPermission("ChangeAccount");
-
-                            countryInput.readOnly = !ok;
-                        }
+                    onEditingFinished: {
+                        accountEditorContainer.doUpdateModel();
                     }
 
-                    TextFieldWithTitle {
-                        id: cityInput;
+                    KeyNavigation.tab: cityInput;
 
-                        width: parent.width;
+                    Component.onCompleted: {
+                        let ok = PermissionsController.checkPermission("ChangeAccount");
 
-                        title: qsTr("City");
-                        placeHolderText: qsTr("Enter the city");
+                        countryInput.readOnly = !ok;
+                    }
+                }
 
-                        onEditingFinished: {
-                            accountEditorContainer.doUpdateModel();
-                        }
+                TextInputElementView {
+                    id: cityInput;
 
-                        KeyNavigation.tab: postalCodeInput;
+                    name: qsTr("City");
+                    placeHolderText: qsTr("Enter the city");
 
-                        Component.onCompleted: {
-                            let ok = PermissionsController.checkPermission("ChangeAccount");
-
-                            cityInput.readOnly = !ok;
-                        }
+                    onEditingFinished: {
+                        accountEditorContainer.doUpdateModel();
                     }
 
-                    TextFieldWithTitle {
-                        id: postalCodeInput;
+                    KeyNavigation.tab: postalCodeInput;
 
-                        width: parent.width;
+                    Component.onCompleted: {
+                        let ok = PermissionsController.checkPermission("ChangeAccount");
 
-                        title: qsTr("Postal Code");
-                        placeHolderText: qsTr("Enter the postal code");
+                        cityInput.readOnly = !ok;
+                    }
+                }
 
-                        onEditingFinished: {
-                            accountEditorContainer.doUpdateModel();
-                        }
+                TextInputElementView {
+                    id: postalCodeInput;
 
-                        KeyNavigation.tab: streetInput;
+                    name: qsTr("Postal Code");
+                    placeHolderText: qsTr("Enter the postal code");
 
-                        Component.onCompleted: {
-                            let ok = PermissionsController.checkPermission("ChangeAccount");
-
-                            postalCodeInput.readOnly = !ok;
-                        }
+                    onEditingFinished: {
+                        accountEditorContainer.doUpdateModel();
                     }
 
-                    TextFieldWithTitle {
-                        id: streetInput;
+                    KeyNavigation.tab: streetInput;
 
-                        width: parent.width;
+                    Component.onCompleted: {
+                        let ok = PermissionsController.checkPermission("ChangeAccount");
 
-                        title: qsTr("Street");
-                        placeHolderText: qsTr("Enter the street");
-
-                        onEditingFinished: {
-                            accountEditorContainer.doUpdateModel();
-                        }
-
-                        KeyNavigation.tab: accountNameInput;
-
-                        Component.onCompleted: {
-                            let ok = PermissionsController.checkPermission("ChangeAccount");
-
-                            streetInput.readOnly = !ok;
-                        }
+                        postalCodeInput.readOnly = !ok;
                     }
-                }// Company address block
-            }//Company address block borders
+                }
+
+                TextInputElementView {
+                    id: streetInput;
+
+                    name: qsTr("Street");
+                    placeHolderText: qsTr("Enter the street");
+
+                    onEditingFinished: {
+                        accountEditorContainer.doUpdateModel();
+                    }
+
+                    KeyNavigation.tab: accountNameInput;
+
+                    Component.onCompleted: {
+                        let ok = PermissionsController.checkPermission("ChangeAccount");
+
+                        streetInput.readOnly = !ok;
+                    }
+                }
+            }
 
             TreeItemModel {
                 id: headersModel;
@@ -393,53 +390,50 @@ ViewBase {
                 headersModel.SetData("Id", "Name");
                 headersModel.SetData("Name", qsTr("Group Name"));
 
-                groupsTable.headers = headersModel;
+                groupsElement.table.headers = headersModel;
             }
 
             Text {
+                id: titleText;
+
                 color: Style.textColor;
                 font.family: Style.fontFamilyBold;
-                font.pixelSize: Style.fontSize_common;
+                font.pixelSize: Style.fontSize_title;
 
-                text: qsTr("Groups");
+                text: qsTr("Group Information");
             }
 
-            Item {
+            TableElementView {
+                id: groupsElement;
+
                 width: parent.width;
-                height: groupsTable.height;
 
-                MouseArea {
-                    id: mouseArea;
+                name: qsTr("Groups");
 
-                    anchors.fill: groupsTable;
-                    hoverEnabled: true;
+                Component.onCompleted: {
+                    let ok = PermissionsController.checkPermission("ChangeAccount");
+
+                    groupsElement.table.readOnly = !ok;
+                    groupsElement.table.checkable = true;
+                    groupsElement.table.elements = CachedGroupCollection.collectionModel;
                 }
 
-                Table {
-                    id: groupsTable;
-
-                    width: parent.width;
-                    height: 250;
-
-                    checkable: true;
-
-                    radius: accountEditorContainer.radius;
-
-                    onCheckedItemsChanged: {
-                        console.log("onCheckedItemsChanged");
-                        accountEditorContainer.doUpdateModel();
+                onTableChanged: {
+                    if (groupsElement.table){
+                        tableConn.target = groupsElement.table;
                     }
+                }
 
-                    elements: CachedGroupCollection.collectionModel;
+                Connections {
+                    id: tableConn;
 
-                    Component.onCompleted: {
-                        let ok = PermissionsController.checkPermission("ChangeAccount");
+                    function onCheckedItemsChanged(){
+                        console.log("Connections checkedItemsChanged");
 
-                        groupsTable.readOnly = !ok;
+                        accountEditorContainer.doUpdateModel();
                     }
                 }
             }
         }//Body column
-
     }//Flickable
 }// Account Editor container

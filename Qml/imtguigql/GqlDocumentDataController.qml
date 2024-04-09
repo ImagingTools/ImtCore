@@ -186,7 +186,6 @@ DocumentDataController {
         }
 
         onStateChanged: {
-            console.log("onResult",container.gqlGetModel.toJSON());
             let state = container.gqlGetModel.state;
             if (state === "Error"){
                 container.error("Network error", "Critical");

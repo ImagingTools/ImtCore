@@ -17,7 +17,9 @@ Item{
     }
 
     Component.onDestruction: {
-        headerDelegate.tableItem.widthRecalc.disconnect(headerDelegate.setCellWidth);
+        if (headerDelegate.tableItem){
+            headerDelegate.tableItem.widthRecalc.disconnect(headerDelegate.setCellWidth);
+        }
     }
 
     onComplComplChanged: {
@@ -182,7 +184,7 @@ Item{
 
         checkState: headerDelegate.tableItem.isAllItemChecked ? Qt.Checked : Qt.Unchecked;
 
-        visible: headerDelegate.tableItem.checkable && headerDelegate.columnIndex === 0 && elementsListObj.count > 0 && headerDelegate.tableItem.canSelectAll;
+        visible: headerDelegate.tableItem.checkable && headerDelegate.columnIndex === 0 && headerDelegate.tableItem.elementsList.count > 0 && headerDelegate.tableItem.canSelectAll;
 
         isActive: !headerDelegate.tableItem.readOnly;
 

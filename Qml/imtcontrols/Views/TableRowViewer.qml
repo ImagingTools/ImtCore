@@ -4,10 +4,10 @@ import imtcontrols 1.0
 
 Row {
     id: dataList;
+
     property TableRowDelegateBase rowDelegate: null;
     property bool compl: false;
     property alias model: repeater.model
-
 
     Repeater {
         id: repeater
@@ -29,7 +29,9 @@ Row {
 
             Component.onDestruction: {
                 // console.log("*Debug* cell onDestruction")
-                dataList.rowDelegate.tableItem.widthRecalc.disconnect(cell.setCellWidth)
+                if (dataList.rowDelegate && dataList.rowDelegate.tableItem){
+                    dataList.rowDelegate.tableItem.widthRecalc.disconnect(cell.setCellWidth)
+                }
             }
 
             onComplComplChanged: {

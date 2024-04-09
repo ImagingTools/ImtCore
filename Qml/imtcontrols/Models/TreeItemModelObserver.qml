@@ -27,9 +27,9 @@ QtObject {
 //        console.log("container.private_.beginModel", container.private_.beginModel.toJSON());
 //        console.log("container.observedModel", container.observedModel.toJSON());
 
-        if (container.private_.block){
-            return;
-        }
+//        if (container.private_.block){
+//            return;
+//        }
 
         container.private_.block = true;
 

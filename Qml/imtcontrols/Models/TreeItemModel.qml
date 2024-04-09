@@ -9,18 +9,6 @@ JSONListModel {
     property bool isArray: false;
     property bool isUpdateEnabled: true;
 
-
-    signal modelChanged();
-//    signal dataChanged();
-
-//    onModelChanged: {
-//        console.log("TreeItemModel onModelChanged");
-//    }
-
-//    onDataChanged: {
-//        console.log("TreeItemModel onDataChanged");
-//    }
-
     function SetUpdateEnabled(flag){
         isUpdateEnabled = flag
     }
@@ -391,7 +379,7 @@ JSONListModel {
         this.remove(index)
 
         if (isUpdateEnabled){
-            this.modelChanged()
+            this.dataChanged()
         }
     }
 

@@ -47,10 +47,13 @@ Rectangle {
             if (i == 0){
                 children[i].anchors.top = container.top;
                 children[i].radius = container.radius;
+            }
+
+            if (i == 0 && children.length > 1){
                 children[i].bottomRoundedCorners = false;
             }
 
-            if (i == children.length - 1){
+            if (i != 0 && i == children.length - 1){
                 children[i].radius = container.radius;
                 children[i].topRoundedCorners = false;
             }

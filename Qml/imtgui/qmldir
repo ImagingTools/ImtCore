@@ -61,3 +61,8 @@ TextInputElementView 1.0 View/TextInputElementView.qml
 ElementView 1.0 View/ElementView.qml
 ComboBoxElementView 1.0 View/ComboBoxElementView.qml
 GroupElementView 1.0 View/GroupElementView.qml
+GroupHeaderView 1.0 View/GroupHeaderView.qml
+ClearableComboBoxElementView 1.0 View/ClearableComboBoxElementView.qml
+FilterableComboBoxElementView 1.0 View/FilterableComboBoxElementView.qml
+TableElementView 1.0 View/TableElementView.qml
+TreeViewElementView 1.0 View/TreeViewElementView.qml

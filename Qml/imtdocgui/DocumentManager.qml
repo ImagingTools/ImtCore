@@ -499,13 +499,10 @@ Item {
                 internal.m_closingDocuments.splice(index, 1);
             }
 
-            console.log("destroy");
             documentData.destroy();
 
-            console.log("remove");
             documentsModel.remove(documentIndex);
 
-            console.log("documentClosed");
             documentClosed(documentIndex, "");
         }
     }
@@ -621,6 +618,8 @@ Item {
                         return;
                     }
 
+                    console.log("onDocumentModelChanged", singleDocumentData.documentDataController.documentModel.toJSON());
+
                     let documentModel = singleDocumentData.documentDataController.documentModel;
 
                     singleDocumentData.treeItemModelObserver.registerModel(documentModel);
@@ -641,8 +640,6 @@ Item {
                         if (documentManager.documentsModel.get(singleDocumentData.documentIndex).IsNew){
                             singleDocumentData.views[i].doUpdateModel();
                         }
-
-//                        singleDocumentData.views[i].doUpdateGui();
                     }
                     singleDocumentData.blockingUpdateModel = false;
 
@@ -720,17 +717,17 @@ Item {
                     view.commandsDelegate.commandActivated.connect(singleDocumentData.viewCommandHandle);
                 }
 
-                if (singleDocumentData.documentDataController){
-                    singleDocumentData.blockingUpdateModel = true;
-                    view.model = singleDocumentData.documentDataController.documentModel;
+//                if (singleDocumentData.documentDataController){
+//                    singleDocumentData.blockingUpdateModel = true;
+//                    view.model = singleDocumentData.documentDataController.documentModel;
 
-                    if (documentManager.documentsModel.get(singleDocumentData.documentIndex).IsNew){
-                        view.doUpdateModel();
-                    }
-                    singleDocumentData.blockingUpdateModel = false;
+//                    if (documentManager.documentsModel.get(singleDocumentData.documentIndex).IsNew){
+//                        view.doUpdateModel();
+//                    }
+//                    singleDocumentData.blockingUpdateModel = false;
 
-                    documentManager.updateDocumentTitle(singleDocumentData.documentIndex);
-                }
+//                    documentManager.updateDocumentTitle(singleDocumentData.documentIndex);
+//                }
             }
 
             onIsDirtyChanged: {

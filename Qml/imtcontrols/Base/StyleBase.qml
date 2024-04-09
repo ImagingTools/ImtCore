@@ -380,6 +380,7 @@ StyleComponents {
             styleContainer.textColor = styleContainer.getThemeColor("ActiveColors", "Text", dataSource);
             styleContainer.textSelected = styleContainer.getThemeColor("ActiveColors", "TextSelectedBackground", dataSource);
             styleContainer.inactive_textColor = styleContainer.getThemeColor("InactiveColors", "Text", dataSource);
+            styleContainer.shadowColor = styleContainer.getThemeColor("ActiveColors", "Shadow", dataSource);
 
             styleContainer.selectedColor = styleContainer.getThemeColor("ActiveColors", "ItemSelected", dataSource);
 
@@ -400,14 +401,13 @@ StyleComponents {
             styleContainer.imagingToolsGradient3 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient3");
             styleContainer.imagingToolsGradient4 = dataSource.GetData("ColorPalette").GetData("ImagingToolsGradient4");
             styleContainer.greenColor = dataSource.GetData("ColorPalette").GetData("Green");
-            styleContainer.imaginToolsAccent = dataSource.GetData("ColorPalette").GetData("ImaginTools Accent");
 
             styleContainer.iconColorOnSelected = styleContainer.getThemeColor("ActiveColors", "Highlight", dataSource);
 
             styleContainer.tabSelectedColor = styleContainer.getThemeColor("ActiveColors", "TabSelected", dataSource);
             styleContainer.errorTextColor = styleContainer.getThemeColor("ActiveColors", "ErrorText", dataSource);
 
-            styleContainer.shadowColor = styleContainer.getThemeColor("ActiveColors", "Shadow", dataSource);
+            styleContainer.imaginToolsAccent = dataSource.GetData("ColorPalette").GetData("ImaginTools Accent");
         }
     }
 

@@ -4,9 +4,9 @@ import imtgui 1.0
 import imtcontrols 1.0
 
 ElementView {
-    id: root;
+    id: comboBoxElementView;
 
-    property TreeItemModel model: null;
+    property var model: null;
     property bool changeable: true;
     property int shownItemsCount: 5;
     property int currentIndex: -1;
@@ -14,37 +14,72 @@ ElementView {
     // ID for display in combo box delegates
     property string nameId: "Name";
 
+    QtObject {
+        id: internal;
+
+        property ComboBox cbRef: null;
+    }
+
     onModelChanged: {
-        if (controlItem && model){
-            controlItem.model = model;
+        if (internal.cbRef && model){
+            internal.cbRef.model = model;
         }
     }
 
     onControlItemChanged: {
-        if (controlItem && model){
-            controlItem.model = model;
+        if (internal.cbRef && model){
+            internal.cbRef.model = model;
         }
     }
 
     onCurrentIndexChanged: {
-        if (controlItem){
-            controlItem.currentIndex = currentIndex;
+        if (internal.cbRef){
+            internal.cbRef.currentIndex = currentIndex;
         }
     }
 
-    controlComp: Component {
+    function setupComboBox(cbRef){
+        if (!cbRef){
+            return;
+        }
+
+        cbRef.changeable = comboBoxElementView.changeable;
+        cbRef.nameId = comboBoxElementView.nameId;
+        cbRef.model = comboBoxElementView.model;
+        cbRef.currentIndex = comboBoxElementView.currentIndex;
+
+        internal.cbRef = cbRef;
+
+        cbConn.target = cbRef;
+    }
+
+    Connections {
+        id: cbConn;
+
+        function onCurrentIndexChanged(){
+            if (!internal.cbRef){
+                return;
+            }
+
+            if (comboBoxElementView.currentIndex != internal.cbRef.currentIndex){
+                comboBoxElementView.currentIndex = internal.cbRef.currentIndex;
+            }
+        }
+    }
+
+    controlComp: cbComp;
+
+    Component {
+        id: cbComp;
+
         ComboBox {
+            id: cb;
+
             width: 300;
             height: 30;
 
-            changeable: root.changeable;
-            nameId: root.nameId;
-            currentIndex: root.currentIndex;
-
-            onCurrentIndexChanged: {
-                if (root.currentIndex != currentIndex){
-                    root.currentIndex = currentIndex;
-                }
+            Component.onCompleted: {
+                comboBoxElementView.setupComboBox(cb);
             }
         }
     }

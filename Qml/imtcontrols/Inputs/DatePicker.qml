@@ -402,10 +402,7 @@ Item {
                     }
 
                     readOnly: true//datePicker.readOnly || datePicker.textInputBan;
-
-
                 }
-
 
                 ComboBox {
                     id: yearComboObj;

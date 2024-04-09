@@ -84,7 +84,6 @@ Rectangle {
     Flickable {
         id: flickable;
 
-//        anchors.fill: parent;
         anchors.top: parent.top;
         anchors.bottom: parent.bottom;
 
@@ -101,9 +100,9 @@ Rectangle {
             id: column;
 
             anchors.left: parent.left;
+            anchors.leftMargin: Style.size_mainMargin;
             anchors.right: parent.right;
-            anchors.rightMargin: 5;
-            anchors.leftMargin: 5;
+            anchors.rightMargin: Style.size_mainMargin;
 
             spacing: 2 * Style.size_mainMargin;
 
@@ -141,7 +140,7 @@ Rectangle {
 
         text: qsTr("There is no history for this document");
 
-        visible: repeaterColumn.count == 0;
+        visible: repeaterColumn.count === 0;
     }
 
     Loading {

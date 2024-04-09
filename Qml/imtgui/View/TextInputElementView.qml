@@ -11,8 +11,11 @@ ElementView {
     property var textInputMask;
     property var textInputValidator;
     property bool readOnly: false;
+    property bool acceptableInput: true;
     property int maximumLength: -1;
     property string placeHolderText;
+    property string borderColor;
+    property int echoMode: TextInput.Normal;
 
     signal accepted();
     signal cancelled();
@@ -37,7 +40,29 @@ ElementView {
         }
     }
 
-    controlComp: Component {
+    onEchoModeChanged: {
+        if (controlItem && echoMode){
+            controlItem.echoMode = echoMode;
+        }
+    }
+
+    onBorderColorChanged: {
+        if (controlItem){
+            controlItem.borderColor = borderColor;
+        }
+    }
+
+    onControlItemChanged: {
+        if (controlItem && textInputValidator){
+            controlItem.textInputValidator = textInputValidator;
+            controlItem.maximumLength = maximumLength;
+        }
+    }
+
+    controlComp: textInputComp;
+
+    Component {
+        id: textInputComp;
         CustomTextField {
             width: 300;
             height: 30;
@@ -45,9 +70,9 @@ ElementView {
             text: root.text;
 
             textInputFocus: root.textInputFocus;
-//            textInputMask: root.textInputMask
             readOnly: root.readOnly
             placeHolderText: root.placeHolderText;
+            echoMode: root.echoMode;
 
             onAccepted: {
                 root.accepted();
@@ -69,6 +94,10 @@ ElementView {
                 if(root.text !== text){
                     root.text = text
                 }
+            }
+
+            onAcceptableInputChanged: {
+                root.acceptableInput = acceptableInput;
             }
         }
     }

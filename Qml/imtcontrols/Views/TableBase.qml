@@ -69,7 +69,8 @@ Rectangle {
 
     //
     property string borderColorHorizontal: "transparent";
-    property string borderColorVertical: "transparent";
+//    property string borderColorVertical: "transparent";
+    property string borderColorVertical: "black";
     property int horizontalBorderSize: 0;
     property int verticalBorderSize: 0;
 
@@ -586,7 +587,6 @@ Rectangle {
 
         anchors.left: parent.left;
         anchors.right: parent.right;
-        // anchors.rightMargin: 5;
         anchors.top: parent.top;
 
         height: visible ? tableContainer.headerHeight: 0;
@@ -594,8 +594,6 @@ Rectangle {
         visible: headersList.count > 0 && tableContainer.showHeaders;
 
         color: Style.baseColor;
-
-        //radius: tableContainer.radius;
 
         clip: true;
 
@@ -616,10 +614,6 @@ Rectangle {
             property bool compl: false;
 
             currentIndex: 0;
-
-            onCurrentIndexChanged: {
-                console.log("headersList onCurrentIndexChanged", headersList.currentIndex);
-            }
 
             Component.onCompleted: {
                 headersList.compl = true;
@@ -690,8 +684,6 @@ Rectangle {
 
         vertical: false;
         targetItem: elementsListObj;
-
-        visible: elementsListObj.width > 0;
     }
 
     ListView {
@@ -701,11 +693,10 @@ Rectangle {
         anchors.right: headersPanel.right;
         anchors.top: headersPanel.bottom;
         anchors.bottom: parent.bottom;
-        anchors.bottomMargin: scrollHoriz.secondSize + scrollHoriz.anchors.topMargin;
+        anchors.bottomMargin: scrollHoriz.visible ? scrollHoriz.secondSize + scrollHoriz.anchors.topMargin : 0;
 
         boundsBehavior: Flickable.StopAtBounds;
 
-//        cacheBuffer: count * tableContainer.itemHeight;
         cacheBuffer: tableContainer.height + 5 * tableContainer.itemHeight;
 
         clip: true;

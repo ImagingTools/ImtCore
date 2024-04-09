@@ -10,137 +10,436 @@ ViewBase {
     property TreeItemModel rolesModel: TreeItemModel {}
     property TreeItemModel usersModel: TreeItemModel {}
 
-    Component.onCompleted: {
-        Events.subscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
-    }
-
-    Component.onDestruction: {
-        Events.unSubscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
-    }
-
-    function onLocalizationChanged(language){
-        let index1 = multiPageView.getIndexById("General");
-        if (index1 >= 0){
-            multiPageView.pagesModel.setProperty(index1, "Name", qsTr("General"))
-        }
-
-        let index2 = multiPageView.getIndexById("Roles");
-        if (index2 >= 0){
-            multiPageView.pagesModel.setProperty(index2, "Name", qsTr("Roles"))
-        }
-
-        let index3 = multiPageView.getIndexById("Users");
-        if (index3 >= 0){
-            multiPageView.pagesModel.setProperty(index3, "Name", qsTr("Users"))
-        }
-    }
+    property TreeItemModel copiedGroupsModel: TreeItemModel {}
 
     function updateGui(){
-        let generalPage = multiPageView.getPageById("General");
-        let usersPage = multiPageView.getPageById("Users");
-        let groupsPage = multiPageView.getPageById("Roles");
-
-        if (generalPage){
-            generalPage.doUpdateGui();
-        }
-
-        if (usersPage){
-            usersPage.doUpdateGui();
-        }
-
-        if (groupsPage){
-            groupsPage.doUpdateGui();
-        }
+        generalGroup.updateGui();
+        usersGroup.updateGui();
+        rolesGroup.updateGui();
     }
 
     function updateModel(){
-        let generalPage = multiPageView.getPageById("General");
-        let usersPage = multiPageView.getPageById("Users");
-        let groupsPage = multiPageView.getPageById("Roles");
-
-        if (generalPage){
-            generalPage.doUpdateModel();
-        }
-
-        if (usersPage){
-            usersPage.doUpdateModel();
-        }
-
-        if (groupsPage){
-            groupsPage.doUpdateModel();
-        }
+        generalGroup.updateModel();
+        usersGroup.updateModel();
+        rolesGroup.updateModel();
     }
 
-    Component{
-        id: emptyDecorator;
-        Item{
-            property Item rootItem: null;
-        }
+    CustomScrollbar {
+        id: scrollbar;
+
+        anchors.right: parent.right;
+        anchors.top: flickable.top;
+        anchors.bottom: flickable.bottom;
+
+        secondSize: 10;
+        targetItem: flickable;
     }
 
-    Rectangle {
-        id: background;
-        anchors.fill: parent;
-        color: Style.backgroundColor;
-        Loader{
-            id: backgroundDecoratorLoader;
+    Flickable {
+        id: flickable;
 
-            sourceComponent: Style.backGroundDecorator !==undefined ? Style.backGroundDecorator: emptyDecorator;
-            onLoaded: {
-                if(backgroundDecoratorLoader.item){
-                    backgroundDecoratorLoader.item.rootItem = background;
+        anchors.top: parent.top;
+        anchors.topMargin: Style.size_largeMargin;
+
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: Style.size_largeMargin;
+
+        anchors.left: parent.left;
+        anchors.leftMargin: Style.size_largeMargin;
+
+        anchors.right: scrollbar.left;
+        anchors.rightMargin: Style.size_largeMargin;
+
+        contentWidth: bodyColumn.width;
+        contentHeight: bodyColumn.height + 2 * Style.size_largeMargin;
+
+        boundsBehavior: Flickable.StopAtBounds;
+
+        clip: true;
+
+        Column {
+            id: bodyColumn;
+
+            width: 700;
+
+            spacing: Style.size_largeMargin;
+
+            GroupHeaderView {
+                width: parent.width;
+
+                title: qsTr("General");
+                groupView: generalGroup;
+            }
+
+            GroupElementView {
+                id: generalGroup;
+
+                width: parent.width;
+
+                TextInputElementView {
+                    id: nameInput;
+
+                    name: qsTr("Group Name");
+                    placeHolderText: qsTr("Enter the name");
+
+                    onEditingFinished: {
+                        container.doUpdateModel();
+                    }
+
+                    KeyNavigation.tab: descriptionInput;
+                }
+
+                TextInputElementView {
+                    id: descriptionInput;
+
+                    name: qsTr("Description");
+                    placeHolderText: qsTr("Enter the description");
+
+                    onEditingFinished: {
+                        container.doUpdateModel();
+                    }
+
+                    KeyNavigation.tab: nameInput;
+                }
+
+                TableElementView {
+                    id: parentGroupsTable;
+
+                    name: qsTr("Parent Groups");
+
+                    Connections {
+                        target: parentGroupsTable.table;
+
+                        function onCheckedItemsChanged(){
+                            container.doUpdateModel();
+                        }
+                    }
+
+                    TreeItemModel {
+                        id: groupsHeadersModel;
+
+                        function updateHeaders(){
+                            groupsHeadersModel.Clear();
+
+                            let index = groupsHeadersModel.InsertNewItem();
+
+                            groupsHeadersModel.SetData("Id", "Name");
+                            groupsHeadersModel.SetData("Name", qsTr("Group Name"));
+
+                            groupsHeadersModel.Refresh();
+
+                            parentGroupsTable.table.checkable = true;
+                            parentGroupsTable.table.headers = groupsHeadersModel;
+                        }
+
+                        Component.onCompleted: {
+                            updateHeaders();
+                        }
+                    }
+                }
+
+                function updateGroupsModel(){
+                    container.copiedGroupsModel.Copy(container.groupsModel);
+
+                    let objectId = container.model.GetData("Id");
+                    let removedIndexes = []
+
+                    let childrenIds = []
+                    getAllChildrenGroups(objectId, childrenIds);
+
+                    // Get all parent ID-s
+                    let parentIds = []
+                    if (container.model.ContainsKey("ParentGroups")){
+                        let parentGroups = container.model.GetData("ParentGroups")
+                        let parentGroupIds = parentGroups.split(';')
+                        for (let j = 0; j < parentGroupIds.length; j++){
+                            getAllParentGroupIds(parentGroupIds[j], parentIds);
+                        }
+                    }
+
+                    for (let i = 0; i < container.copiedGroupsModel.GetItemsCount(); i++){
+                        let id = container.copiedGroupsModel.GetData("Id", i);
+                        if (id === objectId || childrenIds.includes(id)){
+                            removedIndexes.push(i);
+                        }
+                    }
+
+                    let removedCount = 0
+                    for (let i = 0; i < removedIndexes.length; i++){
+                        container.copiedGroupsModel.RemoveItem(removedIndexes[i] - removedCount);
+                        removedCount++;
+                    }
+
+                    parentGroupsTable.table.checkable = true;
+                    parentGroupsTable.table.elements = container.copiedGroupsModel;
+                }
+
+                function getAllChildrenGroups(groupId, retVal){
+                    for (let i = 0; i < container.copiedGroupsModel.GetItemsCount(); i++){
+                        let id = container.copiedGroupsModel.GetData("Id", i);
+                        let parentGroups = container.copiedGroupsModel.GetData("ParentGroups", i);
+                        if (parentGroups !== ""){
+                            let parentGroupIds = parentGroups.split(';')
+                            if (parentGroupIds.includes(groupId)){
+                                retVal.push(id);
+
+                                getAllChildrenGroups(id, retVal);
+                            }
+                        }
+                    }
+                }
+
+                function getAllParentGroupIds(groupId, retVal){
+                    for (let i = 0; i < container.copiedGroupsModel.GetItemsCount(); i++){
+                        let id = container.copiedGroupsModel.GetData("Id", i);
+                        if (id === groupId){
+                            let parentGroups = container.copiedGroupsModel.GetData("ParentGroups", i);
+                            if (parentGroups !== ""){
+                                let parentGroupsIds = parentGroups.split(';');
+                                for (let j = 0; j < parentGroupsIds.length; j++){
+                                    retVal.push(parentGroupsIds[j])
+                                    getAllParentGroupIds(parentGroupsIds[j], retVal);
+                                }
+                            }
+                        }
+                    }
+                }
+
+                function updateGui(){
+                    console.log("GroupEditor updateGui");
+
+                    if (container.model.ContainsKey("Name")){
+                        nameInput.text = container.model.GetData("Name");
+                    }
+                    else{
+                        nameInput.text = "";
+                    }
+
+                    if (container.model.ContainsKey("Description")){
+                        descriptionInput.text = container.model.GetData("Description");
+                    }
+                    else{
+                        descriptionInput.text = "";
+                    }
+
+                    let parentGroupIds = []
+                    if (container.model.ContainsKey("ParentGroups")){
+                        let parentGroups = container.model.GetData("ParentGroups");
+                        if (parentGroups !== ""){
+                            parentGroupIds = parentGroups.split(';')
+                        }
+                    }
+
+                    if (!parentGroupsTable.table.elements){
+                        updateGroupsModel();
+                    }
+
+                    parentGroupsTable.table.uncheckAll();
+                    if (parentGroupsTable.table.elements){
+                        for (let i = 0; i < parentGroupsTable.table.elements.GetItemsCount(); i++){
+                            let id = parentGroupsTable.table.elements.GetData("Id", i);
+                            if (parentGroupIds.includes(id)){
+                                parentGroupsTable.table.checkItem(i);
+                            }
+                        }
+                    }
+                }
+
+                function updateModel(){
+                    container.model.SetData("Description", descriptionInput.text);
+                    container.model.SetData("Name", nameInput.text);
+
+                    let selectedGroupIds = []
+                    let indexes = parentGroupsTable.table.getCheckedItems();
+                    for (let index of indexes){
+                        let id = parentGroupsTable.table.elements.GetData("Id", index);
+                        selectedGroupIds.push(id);
+                    }
+
+                    selectedGroupIds.sort();
+
+                    container.model.SetData("ParentGroups", selectedGroupIds.join(';'));
+
+                    if (!parentGroupsTable.table.elements){
+                        updateGroupsModel();
+                    }
+                }
+            }
+
+            GroupHeaderView {
+                width: parent.width;
+
+                title: qsTr("Users");
+                groupView: usersGroup;
+            }
+
+            GroupElementView {
+                id: usersGroup;
+
+                width: parent.width;
+
+                TableElementView {
+                    id: usersTable;
+
+                    Component.onCompleted: {
+                        usersTable.table.readOnly = container.readOnly;
+                    }
+
+                    Connections {
+                        target: usersTable.table;
+
+                        function onCheckedItemsChanged(){
+                            container.doUpdateModel();
+                        }
+                    }
+                }
+
+                TreeItemModel {
+                    id: headersModel;
+
+                    function updateHeaders(){
+                        headersModel.Clear();
+
+                        headersModel.InsertNewItem();
+
+                        headersModel.SetData("Id", "Name");
+                        headersModel.SetData("Name", qsTr("User Name"));
+
+                        headersModel.Refresh();
+
+                        usersTable.table.checkable = true;
+                        usersTable.table.headers = headersModel;
+                        usersTable.table.elements = container.usersModel;
+                    }
+
+                    Component.onCompleted: {
+                        updateHeaders();
+                    }
+                }
+
+                function updateGui(){
+                    let userIds = [];
+                    if (container.model.ContainsKey("Users")){
+                        let roles = container.model.GetData("Users")
+                        if (roles !== ""){
+                            userIds = roles.split(';');
+                        }
+                    }
+
+                    usersTable.table.uncheckAll();
+                    if (usersTable.table.elements){
+                        for (let i = 0; i < usersTable.table.elements.GetItemsCount(); i++){
+                            let id = usersTable.table.elements.GetData("Id", i);
+                            if (userIds.includes(id)){
+                                usersTable.table.checkItem(i);
+                            }
+                        }
+                    }
+                }
+
+                function updateModel(){
+                    let selectedUserIds = []
+
+                    let indexes = usersTable.table.getCheckedItems();
+                    for (let index of indexes){
+                        let id = usersTable.table.elements.GetData("Id", index);
+                        selectedUserIds.push(id);
+                    }
+
+                    selectedUserIds.sort()
+
+                    let result = selectedUserIds.join(';');
+                    container.model.SetData("Users", result);
+                }
+            }
+
+            GroupHeaderView {
+                width: parent.width;
+
+                title: qsTr("Roles");
+                groupView: rolesGroup;
+            }
+
+            GroupElementView {
+                id: rolesGroup;
+
+                width: parent.width;
+
+                TableElementView {
+                    id: rolesTable;
+
+                    Component.onCompleted: {
+                        rolesTable.table.readOnly = container.readOnly;
+                    }
+
+                    Connections {
+                        target: rolesTable.table;
+
+                        function onCheckedItemsChanged(){
+                            container.doUpdateModel();
+                        }
+                    }
+                }
+
+                TreeItemModel {
+                    id: rolesHeadersModel;
+
+                    function updateHeaders(){
+                        rolesHeadersModel.Clear();
+
+                        rolesHeadersModel.InsertNewItem();
+
+                        rolesHeadersModel.SetData("Id", "Name");
+                        rolesHeadersModel.SetData("Name", qsTr("Role Name"));
+
+                        rolesHeadersModel.Refresh();
+
+                        rolesTable.table.checkable = true;;
+                        rolesTable.table.elements = container.rolesModel;
+                        rolesTable.table.headers = rolesHeadersModel;
+                    }
+
+                    Component.onCompleted: {
+                        updateHeaders();
+                    }
+                }
+
+                function updateGui(){
+                    let roleIds = [];
+                    if (container.model.ContainsKey("Roles")){
+                        let roles = container.model.GetData("Roles")
+                        if (roles !== ""){
+                            roleIds = roles.split(';');
+                        }
+                    }
+
+                    rolesTable.table.uncheckAll();
+                    if (rolesTable.table.elements){
+                        for (let i = 0; i < rolesTable.table.elements.GetItemsCount(); i++){
+                            let id = rolesTable.table.elements.GetData("Id", i);
+                            if (roleIds.includes(id)){
+                                rolesTable.table.checkItem(i);
+                            }
+                        }
+                    }
+                }
+
+                function updateModel(){
+                    let selectedRoleIds = []
+                    let indexes = rolesTable.table.getCheckedItems();
+                    for (let index of indexes){
+                        let id = rolesTable.table.elements.GetData("Id", index);
+                        selectedRoleIds.push(id);
+                    }
+
+                    selectedRoleIds.sort();
+
+                    let result = selectedRoleIds.join(';');
+                    container.model.SetData("Roles", result);
                 }
             }
         }
     }
-
-    Component {
-        id: groupEditorComp;
-
-        GroupEditor {
-            model: container.model;
-            readOnly: container.readOnly;
-
-            groupsModel: container.groupsModel;
-        }
-    }
-
-    Component {
-        id: groupUsersComp;
-
-        GroupUsers {
-            model: container.model;
-            readOnly: container.readOnly;
-
-            usersModel: container.usersModel;
-        }
-    }
-
-    Component {
-        id: groupRolesComp;
-
-        GroupRoles {
-            model: container.model;
-            readOnly: container.readOnly;
-
-            rolesModel: container.rolesModel;
-        }
-    }
-
-    MultiPageView {
-        id: multiPageView;
-
-        anchors.top: parent.top;
-        anchors.left: parent.left;
-        anchors.right: parent.right;
-        anchors.bottom: parent.bottom;
-
-        Component.onCompleted: {
-            multiPageView.addPage("General", qsTr("General"), groupEditorComp);
-            multiPageView.addPage("Users", qsTr("Users"), groupUsersComp);
-            multiPageView.addPage("Roles", qsTr("Roles"), groupRolesComp);
-
-            multiPageView.currentIndex = 0;
-        }
-    }
 }
+
+

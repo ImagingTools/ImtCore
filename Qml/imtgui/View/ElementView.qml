@@ -33,6 +33,8 @@ Rectangle {
     property bool topRoundedCorners: true;
     property bool bottomRoundedCorners: true;
 
+    property alias contentWidth: content.width
+
     onFocusChanged: {
         if (focus && controlItem){
             controlItem.forceActiveFocus();
@@ -41,6 +43,7 @@ Rectangle {
 
     Rectangle {
         id: topRect;
+
         anchors.top: parent.top;
 
         width: parent.width;
@@ -57,10 +60,8 @@ Rectangle {
     Rectangle {
         anchors.left: parent.left;
         anchors.leftMargin: rootElement.border.width;
-
         anchors.right: parent.right;
         anchors.rightMargin: rootElement.border.width;
-
         anchors.top: topRect.bottom;
         anchors.topMargin: -height;
 
@@ -88,12 +89,9 @@ Rectangle {
     Rectangle {
         anchors.left: parent.left;
         anchors.leftMargin: rootElement.border.width;
-
         anchors.right: parent.right;
         anchors.rightMargin: rootElement.border.width;
-
         anchors.top: bottomRect.top;
-//        anchors.topMargin: -height;
 
         height: rootElement.border.width;
 
@@ -113,14 +111,14 @@ Rectangle {
 
         clip: true;
 
+        spacing: Style.size_mainMargin;
+
         Loader {
             id: topLoader;
 
             width: parent.width;
 
-            onLoaded: {
-                item.radius = rootElement.radius;
-            }
+            visible: item;
         }
 
         Item {
@@ -128,6 +126,8 @@ Rectangle {
 
             width: parent.width;
             height: Math.max(textName.height, controlLoader.height)
+
+            visible: textName.text !== "" || controlLoader.item;
 
             Text {
                 id: textName;
@@ -158,6 +158,8 @@ Rectangle {
             width: parent.width;
             height: textDescription.text !== "" ? textDescription.height: 0;
 
+            visible: height > 0;
+
             Text {
                 id: textDescription;
 
@@ -179,9 +181,7 @@ Rectangle {
 
             width: parent.width;
 
-            onLoaded: {
-                item.radius = rootElement.radius;
-            }
+            visible: item;
         }
     }
 }

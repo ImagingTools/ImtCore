@@ -23,6 +23,8 @@ FocusScope {
     property int rowItemHeight: 30;
     property int headerHeight: 35;
 
+    property alias contentHeight: bodyColumn.height;
+
     property var rowModel: ListModel {};
 
     onRowModelChanged: {
@@ -212,27 +214,6 @@ FocusScope {
         return false;
     }
 
-//    function addChildItem(parentIndex, rowObj){
-//        let count = tableViewRoot.rowModel.GetItemsCount();
-//        if (parentIndex !== null){
-//            let parentModel = parentIndex.getParentModel();
-//            let childModel = parentIndex.getData("ChildModel");
-//            if (!childModel){
-//                if (parentModel){
-//                    childModel = parentModel.AddTreeModel("ChildModel", parentIndex.getIndex());
-//                }
-//                else{
-//                    parentModel = tableViewRoot.rowModel;
-//                    childModel = tableViewRoot.rowModel.AddTreeModel("ChildModel", parentIndex.getIndex());
-//                }
-//            }
-//            childModel.InsertNewItemWithParameters(count, rowObj)
-//        }
-//        else{
-//            tableViewRoot.rowModel.InsertNewItemWithParameters(count, rowObj)
-//        }
-//    }
-
     function removeByIndex(modelIndex){
         for (let i = 0; i < tableViewRoot.itemsList.length; i++){
             let delegateItem = tableViewRoot.itemsList[i];
@@ -366,6 +347,7 @@ FocusScope {
 
         anchors.top: headerItem.bottom;
         anchors.bottom: parent.bottom;
+
         width: parent.width;
 
         contentWidth: bodyColumn.width;
@@ -380,10 +362,10 @@ FocusScope {
 
             width: parent.width;
 
-            Repeater{
+            Repeater {
                 id: listView;
 
-                anchors.fill: parent;
+//                anchors.fill: parent;
 
                 model: tableViewRoot.rowModel;
 

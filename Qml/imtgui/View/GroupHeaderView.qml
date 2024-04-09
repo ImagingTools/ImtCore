@@ -1,0 +1,80 @@
+import QtQuick 2.12
+import Acf 1.0
+import imtgui 1.0
+import imtcontrols 1.0
+
+Rectangle {
+    id: root;
+
+    height: titleText.height;
+
+    color: "transparent";
+
+    property bool opened: true;
+
+    property GroupElementView groupView: null;
+    property alias title: titleText.text;
+
+    onOpenedChanged: {
+        if (!groupView){
+            console.error("property 'groupView' is invalid");
+            return;
+        }
+
+        if (opened){
+            animation.from = 0;
+            animation.to = groupView.contentHeight;
+        }
+        else{
+            animation.from = groupView.contentHeight;
+            animation.to = 0;
+        }
+
+        animation.start();
+    }
+
+    onGroupViewChanged: {
+        if (groupView){
+            animation.target = groupView;
+        }
+    }
+
+    NumberAnimation {
+        id: animation;
+
+        property: "height";
+        duration: 200;
+    }
+
+    ToolButton {
+        id: openButton;
+
+        anchors.verticalCenter: parent.verticalCenter;
+        anchors.right: parent.right;
+        anchors.rightMargin: 10;
+
+        height: 22;
+        width: height;
+
+        iconSource: root.opened
+                    ? "../../../" + Style.getIconPath("Icons/Up", Icon.State.On, Icon.Mode.Normal)
+                    : "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
+
+        onClicked: {
+            root.opened = !root.opened;
+        }
+    }
+
+    Text {
+        id: titleText;
+
+        anchors.left: parent.left;
+        anchors.verticalCenter: parent.verticalCenter;
+
+        color: Style.textColor;
+        font.family: Style.fontFamilyBold;
+        font.pixelSize: Style.fontSize_title;
+    }
+}
+
+
