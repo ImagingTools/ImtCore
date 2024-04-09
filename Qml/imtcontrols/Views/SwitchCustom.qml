@@ -62,8 +62,13 @@ ControlBase {
         onReleased: {
             ma.canDrag = false;
             if(ma.canClick){
-                switchCustom.checked = !switchCustom.checked;
-                switchCustom.controlRecX = switchCustom.checked * (switchCustom.backgroundWidth - switchCustom.controlWidth);
+                //switchCustom.checked = !switchCustom.checked;
+                //switchCustom.controlRecX = switchCustom.checked * (switchCustom.backgroundWidth - switchCustom.controlWidth);
+
+                xAnim.from = switchCustom.controlRecX;
+                xAnim.to = !switchCustom.checked * (switchCustom.backgroundWidth - switchCustom.controlWidth);
+                xAnim.start();
+
             }
             ma.canClick = true;
 
@@ -113,6 +118,18 @@ ControlBase {
         id: tooltip;
 
         fitToTextWidth: true;
+    }
+
+
+    NumberAnimation {
+        id: xAnim;
+
+        target: switchCustom;
+        property: "controlRecX";
+        duration: 100;
+        onFinished: {
+            switchCustom.checked = !switchCustom.checked;
+        }
     }
 
 }
