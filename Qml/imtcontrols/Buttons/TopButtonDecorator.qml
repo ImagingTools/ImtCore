@@ -99,7 +99,7 @@ Item {
 
         anchors.horizontalCenter: topButtonDecorator.horizontalCenter;
         anchors.top: button.bottom;
-        anchors.topMargin: Style.size_smallMargin;
+        anchors.topMargin: 3;
 
         color: topButtonDecorator.enabled ? topButtonDecorator.textColor : topButtonDecorator.textColorDisabled;
 

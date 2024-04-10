@@ -16,7 +16,7 @@ imtbase::CTreeItemModel* CCollectionUserInfoProviderComp::CreateInternalResponse
 			QString& errorMessage) const
 {
 	if (!m_userCollectionCompPtr.IsValid()){
-		errorMessage = QObject::tr("m_userCollectionCompPtr invalid").toUtf8();
+		errorMessage = QString("m_userCollectionCompPtr invalid").toUtf8();
 		SendErrorMessage(0, errorMessage, "CCollectionUserInfoProviderComp");
 
 		return nullptr;
@@ -38,32 +38,30 @@ imtbase::CTreeItemModel* CCollectionUserInfoProviderComp::CreateInternalResponse
 	if (m_userCollectionCompPtr->GetObjectData(objectId, dataPtr)){
 		imtauth::IUserInfo* objectInfoPtr = dynamic_cast<imtauth::IUserInfo*>(dataPtr.GetPtr());
 		if (objectInfoPtr == nullptr){
-			errorMessage = QObject::tr("Object conversing error").toUtf8();
+			errorMessage = QString("Object conversing error").toUtf8();
 			SendErrorMessage(0, errorMessage, "CCollectionUserInfoProviderComp");
 
 			return nullptr;
 		}
 
 		if (!objectInfoPtr->IsAdmin()){
+			QByteArrayList productPermissions = objectInfoPtr->GetPermissions(productId);
+
 			QByteArrayList products = objectInfoPtr->GetProducts();
-			if (products.contains(productId)){
-				QByteArrayList productPermissions = objectInfoPtr->GetPermissions(productId);
-
-				for (const QByteArray& currentProduct : products){
-					if (currentProduct != productId){
-						objectInfoPtr->RemoveProduct(currentProduct);
-					}
+			for (const QByteArray& currentProduct : products){
+				if (currentProduct != productId){
+					objectInfoPtr->RemoveProduct(currentProduct);
 				}
-
-				objectInfoPtr->SetLocalPermissions(productId, productPermissions);
 			}
+
+			objectInfoPtr->SetLocalPermissions(productId, productPermissions);
 		}
 
 		QByteArray json;
 		{
 			iser::CJsonMemWriteArchive archive(json, m_versionInfoCompPtr.GetPtr());
 			if (!objectInfoPtr->Serialize(archive)){
-				errorMessage = QObject::tr("Error when serializing an object").toUtf8();
+				errorMessage = QString("Error when serializing an object").toUtf8();
 				SendErrorMessage(0, errorMessage, "CCollectionUserInfoProviderComp");
 
 				return nullptr;
@@ -71,14 +69,14 @@ imtbase::CTreeItemModel* CCollectionUserInfoProviderComp::CreateInternalResponse
 		}
 
 		if (!dataModelPtr->CreateFromJson(json)){
-			errorMessage = QObject::tr("Error when creating a tree model from json").toUtf8();
+			errorMessage = QString("Error when creating a tree model from json").toUtf8();
 			SendErrorMessage(0, errorMessage);
 
 			return nullptr;
 		}
 	}
 	else{
-		errorMessage = QObject::tr("Object with ID %1 not exists").arg(qPrintable(objectId)).toUtf8();
+		errorMessage = QString("Object with ID %1 not exists").arg(qPrintable(objectId)).toUtf8();
 		SendErrorMessage(0, errorMessage);
 
 		return nullptr;

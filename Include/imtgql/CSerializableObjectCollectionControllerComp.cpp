@@ -331,10 +331,6 @@ imtbase::CTreeItemModel* CSerializableObjectCollectionControllerComp::ListObject
 			data.clear();
 			idoc::MetaInfoPtr dataMetaInfo = m_objectCollectionCompPtr->GetDataMetaInfo(id);
 
-			QString r1 = dataMetaInfo->GetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_ID).toString();
-			QString r2 = dataMetaInfo->GetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_NAME).toString();
-			QString r3 = dataMetaInfo->GetMetaInfo(imtlic::ILicenseDefinition::MIT_LICENSE_DESCRIPTION).toString();
-
 			SerializeObject(dataMetaInfo.GetPtr(), data);
 
 			itemsModel->SetData("dataMetaInfo", data.toBase64(), itemIndex);

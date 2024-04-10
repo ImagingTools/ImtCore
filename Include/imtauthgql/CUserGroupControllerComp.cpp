@@ -16,7 +16,7 @@ namespace imtauthgql
 imtbase::CTreeItemModel* CUserGroupControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
+		errorMessage = QString("Internal error").toUtf8();
 
 		return nullptr;
 	}
@@ -171,17 +171,17 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 
 		if (itemModel.ContainsKey("Users")){
 			QByteArray users = itemModel.GetData("Users").toByteArray();
-			if (!users.isEmpty()){
-				QByteArrayList userIds = users.split(';');
+			QByteArrayList userIds = users.split(';');
+			userIds.removeAll("");
 
-				userGroupInfoPtr->SetUsers(userIds);
-			}
+			userGroupInfoPtr->SetUsers(userIds);
 		}
 
 		if (itemModel.ContainsKey("Roles")){
 			QByteArray roles = itemModel.GetData("Roles").toByteArray();
 			if (!roles.isEmpty()){
 				QByteArrayList roleIds = roles.split(';');
+				roleIds.removeAll("");
 
 				userGroupInfoPtr->SetRoles(productId, roleIds);
 			}
@@ -192,9 +192,9 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 
 		if (itemModel.ContainsKey("ParentGroups")){
 			QByteArray groups = itemModel.GetData("ParentGroups").toByteArray();
-			if (!groups.isEmpty()){
-				QByteArrayList groupIds = groups.split(';');
-				for (const QByteArray& parentGroupId : groupIds){
+			QByteArrayList groupIds = groups.split(';');
+			for (const QByteArray& parentGroupId : groupIds){
+				if (!parentGroupId.isEmpty()){
 					userGroupInfoPtr->AddParentGroup(parentGroupId);
 				}
 			}
@@ -203,9 +203,77 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 		return userGroupInfoPtr.PopPtr();
 	}
 
-	errorMessage = QObject::tr("Can not create group: %1").arg(QString(objectId));
+	errorMessage = QString("Can not create group: %1").arg(QString(objectId));
 
 	return nullptr;
+}
+
+
+imtbase::CTreeItemModel* CUserGroupControllerComp::DeleteObject(
+			const imtgql::CGqlRequest& gqlRequest,
+			QString& errorMessage) const
+{
+	const imtgql::CGqlObject* gqlObjectPtr = gqlRequest.GetParam("input");
+	if (gqlObjectPtr == nullptr){
+		SendErrorMessage(0, QString("Input params from GraphQL request is invalid"));
+
+		return nullptr;
+	}
+
+	QByteArray userGroupId = gqlObjectPtr->GetFieldArgumentValue("Id").toByteArray();
+
+	const imtauth::IUserGroupInfo* userGroupInfoPtr = nullptr;
+
+	imtbase::IObjectCollection::DataPtr dataPtr;
+	if (m_objectCollectionCompPtr->GetObjectData(userGroupId, dataPtr)){
+		userGroupInfoPtr = dynamic_cast<const imtauth::IUserGroupInfo*>(dataPtr.GetPtr());
+	}
+
+	if (userGroupInfoPtr == nullptr){
+		SendErrorMessage(0, QString("Unable to get group with ID: '%1'").arg(userGroupId));
+
+		return nullptr;
+	}
+
+	imtbase::CTreeItemModel* resultModelPtr = BaseClass::DeleteObject(gqlRequest, errorMessage);
+	if (errorMessage.isEmpty()){
+		if (m_userCollectionCompPtr.IsValid()){
+			QByteArrayList userIds = userGroupInfoPtr->GetUsers();
+			for (const QByteArray& userId : userIds){
+				imtbase::IObjectCollection::DataPtr userDataPtr;
+				if (m_userCollectionCompPtr->GetObjectData(userId, userDataPtr)){
+					imtauth::IUserInfo* userInfoPtr = dynamic_cast<imtauth::IUserInfo*>(userDataPtr.GetPtr());
+					if (userInfoPtr != nullptr){
+						userInfoPtr->RemoveFromGroup(userGroupId);
+
+						if (!m_userCollectionCompPtr->SetObjectData(userId, *userInfoPtr)){
+							SendWarningMessage(0, QString("Unable to update an user"));
+						}
+					}
+				}
+			}
+		}
+
+		imtbase::ICollectionInfo::Ids elementIds = m_objectCollectionCompPtr->GetElementIds();
+		for (const imtbase::ICollectionInfo::Id& elementId: elementIds){
+			imtbase::IObjectCollection::DataPtr groupDataPtr;
+			if (m_objectCollectionCompPtr->GetObjectData(elementId, groupDataPtr)){
+				imtauth::IUserGroupInfo* userGroupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(groupDataPtr.GetPtr());
+				if (userGroupInfoPtr != nullptr){
+					QByteArrayList parentGroupIds = userGroupInfoPtr->GetParentGroups();
+					if (parentGroupIds.contains(userGroupId)){
+						userGroupInfoPtr->RemoveParentGroup(userGroupId);
+
+						if (!m_objectCollectionCompPtr->SetObjectData(elementId, *userGroupInfoPtr)){
+							SendWarningMessage(0, QString("Unable to update a group"));
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return resultModelPtr;
 }
 
 

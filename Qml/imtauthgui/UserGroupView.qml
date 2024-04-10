@@ -142,6 +142,10 @@ ViewBase {
                     container.copiedGroupsModel.Copy(container.groupsModel);
 
                     let objectId = container.model.GetData("Id");
+                    if (!objectId){
+                        return;
+                    }
+
                     let removedIndexes = []
 
                     let childrenIds = []
@@ -159,6 +163,8 @@ ViewBase {
 
                     for (let i = 0; i < container.copiedGroupsModel.GetItemsCount(); i++){
                         let id = container.copiedGroupsModel.GetData("Id", i);
+                        console.log("id", id);
+
                         if (id === objectId || childrenIds.includes(id)){
                             removedIndexes.push(i);
                         }

@@ -246,11 +246,11 @@ imtbase::CTreeItemModel* CUserControllerComp::UpdateObject(
 		}
 
 		QByteArray groups = representationModel.GetData("Groups").toByteArray();
-		if (!groups.isEmpty()){
-			QByteArrayList groupIds = groups.split(';');
-			for (const QByteArray& groupId : groupIds){
-				userInfoPtr->AddToGroup(groupId);
-			}
+		QByteArrayList groupIds = groups.split(';');
+		groupIds.removeAll("");
+
+		for (const QByteArray& groupId : groupIds){
+			userInfoPtr->AddToGroup(groupId);
 		}
 	}
 
@@ -398,6 +398,8 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 					}
 				}
 
+				permissions.removeAll("");
+
 				userInfoPtr->SetLocalPermissions(productId, permissions);
 			}
 		}
@@ -406,6 +408,8 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 			QByteArray roles = itemModel.GetData("Roles").toByteArray();
 			if (!roles.isEmpty()){
 				QByteArrayList roleIds = roles.split(';');
+				roleIds.removeAll("");
+
 				userInfoPtr->SetRoles(productId, roleIds);
 			}
 			else{
@@ -415,9 +419,9 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 
 		if (itemModel.ContainsKey("Groups")){
 			QByteArray groups = itemModel.GetData("Groups").toByteArray();
-			if (!groups.isEmpty()){
-				QByteArrayList groupIds = groups.split(';');
-				for (const QByteArray& groupId : groupIds){
+			QByteArrayList groupIds = groups.split(';');
+			for (const QByteArray& groupId : groupIds){
+				if (!groupId.isEmpty()){
 					userInfoPtr->AddToGroup(groupId);
 				}
 			}
@@ -426,8 +430,8 @@ istd::IChangeable* CUserControllerComp::CreateObject(
 		return userInfoPtr;
 	}
 
-	SendErrorMessage(0, QString("Can not create user: %1").arg(QString(objectId)), "imtauthgql::CUserControllerComp");
-	errorMessage = QObject::tr("Can not create user: %1").arg(QString(objectId));
+	errorMessage = QString("Can not create user: %1").arg(QString(objectId));
+	SendErrorMessage(0, errorMessage, "imtauthgql::CUserControllerComp");
 
 	return nullptr;
 }
@@ -447,19 +451,23 @@ imtbase::CTreeItemModel* CUserControllerComp::DeleteObject(
 
 	QByteArray objectId = GetObjectIdFromInputParams(inputParams);
 	if (objectId.isEmpty()){
-		errorMessage = QObject::tr("No object-ID could not be extracted from the request");
+		errorMessage = QString("No object-ID could not be extracted from the request");
 
 		return nullptr;
 	}
 
+	const imtauth::IUserInfo* userInfoPtr = nullptr;
 	QByteArray removedUserId;
 	imtbase::IObjectCollection::DataPtr dataPtr;
 	if (m_objectCollectionCompPtr->GetObjectData(objectId, dataPtr)){
-		const imtauth::IUserInfo* userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
-		if (userInfoPtr != nullptr){
-			removedUserId = userInfoPtr->GetId();
-		}
+		userInfoPtr = dynamic_cast<const imtauth::IUserInfo*>(dataPtr.GetPtr());
 	}
+
+	if (userInfoPtr == nullptr){
+		return nullptr;
+	}
+
+	removedUserId = userInfoPtr->GetId();
 
 	if (!removedUserId.isEmpty()){
 		imtgql::IGqlContext* contextPtr = gqlRequest.GetRequestContext();
@@ -468,7 +476,7 @@ imtbase::CTreeItemModel* CUserControllerComp::DeleteObject(
 			if (userInfoPtr != nullptr){
 				QByteArray userId = userInfoPtr->GetId();
 				if (removedUserId == userId){
-					errorMessage = QObject::tr("It is not possible to delete a user");
+					errorMessage = QString("It is not possible to delete a user");
 
 					return nullptr;
 				}
@@ -486,9 +494,27 @@ imtbase::CTreeItemModel* CUserControllerComp::DeleteObject(
 		dataModel->SetExternTreeModel("removedNotification", notificationModel);
 
 		rootModelPtr->SetExternTreeModel("data", dataModel);
+
+		if (m_groupCollectionCompPtr.IsValid()){
+			QByteArrayList groupIds = userInfoPtr->GetGroups();
+
+			for (const QByteArray& groupId : groupIds){
+				imtbase::IObjectCollection::DataPtr groupDataPtr;
+				if (m_groupCollectionCompPtr->GetObjectData(groupId, groupDataPtr)){
+					imtauth::IUserGroupInfo* groupInfoPtr = dynamic_cast<imtauth::IUserGroupInfo*>(groupDataPtr.GetPtr());
+					if (groupInfoPtr != nullptr){
+						groupInfoPtr->RemoveUser(objectId);
+
+						if (!m_groupCollectionCompPtr->SetObjectData(groupId, *groupInfoPtr)){
+							SendWarningMessage(0, QString("Unable to update a group"));
+						}
+					}
+				}
+			}
+		}
 	}
 	else{
-		errorMessage = QObject::tr("Can't remove object: %1").arg(QString(objectId));
+		errorMessage = QString("Can't remove user: %1").arg(QString(objectId));
 	}
 
 	if (!errorMessage.isEmpty()){

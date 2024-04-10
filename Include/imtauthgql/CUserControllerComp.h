@@ -19,6 +19,7 @@ public:
 	I_BEGIN_COMPONENT(CUserControllerComp);
 		I_ASSIGN(m_userInfoFactCompPtr, "UserFactory", "Factory used for creation of the new user", true, "UserFactory");
 		I_ASSIGN(m_hashCalculatorCompPtr, "HashCalculator", "Hash calculator", true, "HashCalculator");
+		I_ASSIGN(m_groupCollectionCompPtr, "GroupCollection", "Group collection", true, "GroupCollection");
 	I_END_COMPONENT;
 
 protected:
@@ -30,6 +31,7 @@ protected:
 private:
 	I_FACT(imtauth::IUserInfo, m_userInfoFactCompPtr);
 	I_REF(imtcrypt::IHashGenerator, m_hashCalculatorCompPtr);
+	I_REF(imtbase::IObjectCollection, m_groupCollectionCompPtr);
 };
 
 

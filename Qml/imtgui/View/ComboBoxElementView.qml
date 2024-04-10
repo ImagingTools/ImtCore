@@ -38,6 +38,12 @@ ElementView {
         }
     }
 
+    onChangeableChanged: {
+        if (internal.cbRef){
+            internal.cbRef.changeable = changeable;
+        }
+    }
+
     function setupComboBox(cbRef){
         if (!cbRef){
             return;

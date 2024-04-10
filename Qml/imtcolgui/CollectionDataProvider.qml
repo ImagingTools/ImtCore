@@ -46,13 +46,19 @@ Item {
 
         if (!completed || hasRemoteChanges){
             if (container.commandId == ""){
-                console.log( "ERROR: CollectionDataProvider commandId is empty!");
+                console.log( "ERROR: Collection data provider Command-ID is empty!");
 
                 return;
             }
 
             container.itemsInfoModel.updateModel(inputParams, container.fields);
         }
+
+        container.updateSubscription();
+    }
+
+    function clearModel(){
+        collectionModel.Clear();
     }
 
     Component.onCompleted: {
@@ -191,6 +197,21 @@ Item {
         }
     }
 
+    function updateSubscription(){
+        if (container.commandId === ""){
+            console.error("Unable to update subscription, command-ID is empty!");
+            return;
+        }
+
+        let subscriptionRequestId = "On" + container.commandId + "CollectionChanged"
+        var query = Gql.GqlRequest("subscription", subscriptionRequestId);
+        var queryFields = Gql.GqlObject("notification");
+        queryFields.InsertField("Id");
+        query.AddField(queryFields);
+
+        Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient});
+    }
+
     SubscriptionClient {
         id: subscriptionClient;
 
@@ -199,13 +220,7 @@ Item {
             if (ok){
                 console.log("CollectionDataProvider SubscriptionClient", ok);
 
-                let subscriptionRequestId = "On" + container.commandId + "CollectionChanged"
-                var query = Gql.GqlRequest("subscription", subscriptionRequestId);
-                var queryFields = Gql.GqlObject("notification");
-                queryFields.InsertField("Id");
-                query.AddField(queryFields);
-
-                Events.sendEvent("RegisterSubscription", {"Query": query, "Client": subscriptionClient});
+                container.updateSubscription();
             }
         }
 

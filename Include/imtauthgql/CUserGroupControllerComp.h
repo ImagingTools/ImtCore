@@ -17,12 +17,13 @@ public:
 
 	I_BEGIN_COMPONENT(CUserGroupControllerComp);
 		I_ASSIGN(m_userGroupInfoFactCompPtr, "UserGroupFactory", "Factory used for creation of the new group", true, "UserGroupFactory");
-		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Users collection", true, "UserCollection");
+		I_ASSIGN(m_userCollectionCompPtr, "UserCollection", "Users collection", false, "UserCollection");
 	I_END_COMPONENT;
 
 protected:
 	virtual imtbase::CTreeItemModel* GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 	virtual istd::IChangeable* CreateObject(const QList<imtgql::CGqlObject>& inputParams, QByteArray &objectId, QString &name, QString &description, QString& errorMessage) const override;
+	virtual imtbase::CTreeItemModel* DeleteObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const override;
 
 private:
 	I_FACT(imtauth::IUserGroupInfo, m_userGroupInfoFactCompPtr);

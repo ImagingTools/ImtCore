@@ -191,6 +191,8 @@ istd::IChangeable* CRoleControllerComp::CreateObject(
 			QByteArray parentRoles = itemModel.GetData("ParentRoles").toByteArray();
 			if (!parentRoles.isEmpty()){
 				QByteArrayList parentRoleIds = parentRoles.split(';');
+				parentRoleIds.removeAll("");
+
 				for (const QByteArray& parentRoleId : parentRoleIds){
 					if (parentRoleId == objectId || !roleInfoPtr->IncludeRole(parentRoleId)){
 						errorMessage = QT_TR_NOOP(QString("Unable include role %1 to the role %2. Check the dependencies between them.")
@@ -205,11 +207,10 @@ istd::IChangeable* CRoleControllerComp::CreateObject(
 
 		if (itemModel.ContainsKey("Permissions")){
 			QByteArray permissions = itemModel.GetData("Permissions").toByteArray();
-			if (!permissions.isEmpty()){
-				QByteArrayList permissionIds = permissions.split(';');
+			QByteArrayList permissionIds = permissions.split(';');
+			permissionIds.removeAll("");
 
-				roleInfoPtr->SetLocalPermissions(permissionIds);
-			}
+			roleInfoPtr->SetLocalPermissions(permissionIds);
 		}
 
 		return roleInfoPtr;

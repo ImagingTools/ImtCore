@@ -59,6 +59,12 @@ ElementView {
         }
     }
 
+    onReadOnlyChanged: {
+        if (controlItem){
+            controlItem.readOnly = readOnly;
+        }
+    }
+
     controlComp: textInputComp;
 
     Component {

@@ -634,6 +634,8 @@ Item {
 
                     singleDocumentData.blockingUpdateModel = true;
 
+                    console.log("onDocumentModelChanged", singleDocumentData.documentDataController.documentModel.toJSON());
+
                     for (let i = 0; i < singleDocumentData.views.length; i++){
                         singleDocumentData.views[i].model = documentModel;
 
@@ -717,17 +719,17 @@ Item {
                     view.commandsDelegate.commandActivated.connect(singleDocumentData.viewCommandHandle);
                 }
 
-//                if (singleDocumentData.documentDataController){
-//                    singleDocumentData.blockingUpdateModel = true;
-//                    view.model = singleDocumentData.documentDataController.documentModel;
+                if (singleDocumentData.documentDataController){
+                    singleDocumentData.blockingUpdateModel = true;
+                    if (documentManager.documentsModel.get(singleDocumentData.documentIndex).IsNew){
+                        view.model = singleDocumentData.documentDataController.documentModel;
 
-//                    if (documentManager.documentsModel.get(singleDocumentData.documentIndex).IsNew){
-//                        view.doUpdateModel();
-//                    }
-//                    singleDocumentData.blockingUpdateModel = false;
+                        view.doUpdateModel();
+                    }
+                    singleDocumentData.blockingUpdateModel = false;
 
-//                    documentManager.updateDocumentTitle(singleDocumentData.documentIndex);
-//                }
+                    documentManager.updateDocumentTitle(singleDocumentData.documentIndex);
+                }
             }
 
             onIsDirtyChanged: {

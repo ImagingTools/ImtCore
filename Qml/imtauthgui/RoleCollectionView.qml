@@ -55,14 +55,6 @@ RemoteCollectionView {
 
             newIsEnabled: roleCollectionViewContainer.newCommandIsEnabled;
 
-            Component.onCompleted: {
-                roleCollectionViewContainer.selectionChanged.connect(this.selectionChanged);
-            }
-
-            Component.onDestruction: {
-                roleCollectionViewContainer.selectionChanged.disconnect(this.selectionChanged);
-            }
-
             onRoleDoubleClicked: {
                 console.log("onRoleDoubleClicked", index);
 
@@ -78,16 +70,10 @@ RemoteCollectionView {
             }
 
             onNewClicked: {
-                if (roleCollectionViewContainer.commandsDelegate){
-                    roleCollectionViewContainer.commandsDelegate.commandHandle("New");
-                }
-            }
+                console.log("onNewClicked");
 
-            function selectionChanged(selection){
-                let selectedIndexes = roleCollectionViewContainer.table.tableSelection.selectedIndexes;
-                console.log("RoleCollection selectionChanged", selection);
-                if (selectedIndexes.length > 0){
-//                    selectedIndex = selectedIndexes[0];
+                if (roleCollectionViewContainer.commandsDelegate){
+                    roleCollectionViewContainer.commandsDelegate.onNew();
                 }
             }
         }

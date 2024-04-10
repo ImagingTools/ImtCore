@@ -2,9 +2,9 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5147" Description="ACF"/>
-            <Version Id="1" Number="2198" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="331522" Description="Qt Framework"/>
+            <Version Id="0" Number="5211" Description="ACF"/>
+            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="393732" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description></Description>
@@ -55,9 +55,6 @@
                     </AttributeInfo>
                     <AttributeInfo Id="ShowComponentId" Type="Boolean" ExportId="">
                         <Data IsEnabled="true" Value="true"/>
-                    </AttributeInfo>
-                    <AttributeInfo Id="TranslationManager" Type="Reference" ExportId="TranslationManager">
-                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
             </Data>
@@ -143,8 +140,12 @@
                                 <Value>UserAdd</Value>
                                 <Value>UserUpdate</Value>
                                 <Value>UserItem</Value>
+                                <Value>UsersRemove</Value>
                             </Values>
                         </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="GroupCollection" Type="Reference" ExportId="GroupCollection">
+                        <Data IsEnabled="false"/>
                     </AttributeInfo>
                     <AttributeInfo Id="HashCalculator" Type="Reference" ExportId="">
                         <Data IsEnabled="true" Value="HashCalculator"/>
@@ -190,7 +191,6 @@
                             <Values>
                                 <Value>UsersInfo</Value>
                                 <Value>UsersList</Value>
-                                <Value>UsersRemove</Value>
                                 <Value>UsersMetaInfo</Value>
                                 <Value>UsersRename</Value>
                                 <Value>UsersSetDescription</Value>
