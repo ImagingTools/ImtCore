@@ -37,6 +37,7 @@ Item {
     signal elementsChanged();
     signal headersChanged();
     signal selectionChanged(var selection);
+    signal checkedItemsChanged();
     signal rightButtonMouseClicked(int mouseX, int mouseY);
 
     Component.onCompleted: {
@@ -142,6 +143,10 @@ Item {
             CollectionViewCommandsDelegateBase {
                 collectionView: container;
             }
+        }
+
+        onCheckedItemsChanged: {
+            root.checkedItemsChanged();
         }
 
         Connections {
@@ -327,7 +332,7 @@ Item {
 
         anchors.right: parent.right;
 
-        width: visible ? 200 : 1;
+        width: visible ? 200 : 0;
         height: parent.height;
 
         visible: root.visibleMetaInfo;

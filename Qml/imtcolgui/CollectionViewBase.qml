@@ -29,6 +29,7 @@ ViewBase {
     signal filterChanged(string filterId, string filterValue);
 
     signal selectionChanged(var selection);
+    signal checkedItemsChanged();
     signal rightButtonMouseClicked(int mouseX, int mouseY);
     signal doubleClicked(string id, int index);
 
@@ -40,13 +41,11 @@ ViewBase {
         target: collectionViewBaseContainer.collectionFilter;
 
         function onFilterChanged(){
-            console.log("CollView onFilterChanged");
-
             tableInternal.currentHeaderId = collectionViewBaseContainer.collectionFilter.getSortingInfoId();
             tableInternal.currentSortOrder = collectionViewBaseContainer.collectionFilter.getSortingOrder();
 
             if (tableInternal.headers.GetItemsCount() > 0){
-                collectionViewBaseContainer.doUpdateGui();
+//                collectionViewBaseContainer.doUpdateGui();
             }
         }
     }
@@ -81,13 +80,12 @@ ViewBase {
     Rectangle {
         id: backgroundTable;
 
+        anchors.bottom: paginationObj.top;
         anchors.top: filterMenu_.visible ? filterMenu_.bottom: parent.top;
         anchors.topMargin: filterMenu_.visible ? Style.margin : 0;
         anchors.left: parent.left;
 
         width: tableInternal.minWidth * tableInternal.columnCount < parent.width ? tableInternal.minWidth * tableInternal.columnCount : parent.width;
-
-        anchors.bottom: paginationObj.top;
 
         color: Style.baseColor;
 
@@ -159,7 +157,6 @@ ViewBase {
             anchors.left: parent.left;
             anchors.right: tableRightPanel.left;
             anchors.top: parent.top;
-
             anchors.bottom: parent.bottom;
 
             hasFilter: collectionViewBaseContainer.hasFilter;
@@ -177,6 +174,10 @@ ViewBase {
 
             onSelectionChanged: {
                 collectionViewBaseContainer.selectionChanged(selection);
+            }
+
+            onCheckedItemsChanged: {
+                collectionViewBaseContainer.checkedItemsChanged();
             }
 
             onElementsChanged: {
@@ -285,8 +286,7 @@ ViewBase {
             visible: collectionViewBaseContainer.hasPagination /*&& pagesSize > 1*/;
 
             onCurrentIndexChanged: {
-
-                tableInternal.selectedIndex = -1;
+                tableInternal.resetSelection();
 
                 collectionViewBaseContainer.doUpdateGui();
             }

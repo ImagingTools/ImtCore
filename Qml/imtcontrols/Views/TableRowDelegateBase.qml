@@ -314,14 +314,16 @@ Rectangle {
 
         anchors.fill: parent;
 
-        color: tableDelegateContainer.tableItem.hoverEnabled && ma.containsMouse ? Style.selectedColor :
+        property bool containsMouse: tableDelegateContainer.tableItem.hoverEnabled && ma.containsMouse;
+
+        color: containsMouse ? Style.selectedColor :
             tableDelegateContainer.tableItem.enableAlternating ? tableDelegateContainer.tableItem.alternatingColor : 'transparent';
 
         opacity: tableDelegateContainer.selected ? tableDelegateContainer.selectedOpacity :
-                tableDelegateContainer.tableItem.hoverEnabled && ma.containsMouse ? tableDelegateContainer.hoverOpacity :
+                containsMouse ? tableDelegateContainer.hoverOpacity :
                 tableDelegateContainer.tableItem.enableAlternating && model.index % 2 === 0 ? tableDelegateContainer.tableItem.alternatingOpacity: 0;
 
-        visible: !tableDelegateContainer.selected && tableDelegateContainer.tableItem.selectable;
+        visible: !tableDelegateContainer.selected && (tableDelegateContainer.tableItem.enableAlternating || tableDelegateContainer.tableItem.selectable);
     }
 
     MouseArea {

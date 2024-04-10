@@ -29,6 +29,7 @@ DecoratorBase {
         id: content;
 
         anchors.right: filterPanelDecorator.right;
+
         height: tfc.height;
         spacing: Style.size_mainMargin;
 
@@ -47,7 +48,7 @@ DecoratorBase {
             Timer {
                 id: timer;
 
-                interval: 1000;
+                interval: 500;
 
                 onTriggered: {
                     filterPanelDecorator.baseElement.filterChanged("TextFilter", tfc.text);
@@ -59,9 +60,9 @@ DecoratorBase {
 
                 z: tfc.z + 1;
 
+                anchors.verticalCenter: tfc.verticalCenter;
                 anchors.right: tfc.right;
                 anchors.rightMargin: Style.margin;
-                anchors.verticalCenter: tfc.verticalCenter;
 
                 width: Style.buttonWidthSmall;
                 height: width;
