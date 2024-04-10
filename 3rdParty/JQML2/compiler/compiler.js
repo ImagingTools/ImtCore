@@ -1225,21 +1225,24 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
         
     }
 
-    // if(currentInstructions.className === 'Component') {
-    //     code.push(`${currentInstructions.name}.createObject=(currParent)=>{`)
-    //     for(let i = currentInstructions.children.length-1; i >= 0; i--){      
-    //         // preTreeCompile(compiledFile, currentInstructions.children[i], true)
-    //         treeCompile(compiledFile, currentInstructions.children[i], true)
-    //     }
-    //     code.push(`}`)
-    // } else {
-    //     for(let i = currentInstructions.children.length-1; i >= 0; i--){      
-    //         preTreeCompile(compiledFile, currentInstructions.children[i], false)
-    //     }
-    // }
-
-
-
+    for(let name in currentInstructions.methods){
+        let stat = {
+            return: false,
+            compute: false,
+            subscribe: [],
+            value: [],
+            ignore: [],
+            params: [],
+        }
+        try {
+            prepare(currentInstructions.methods[name].val, compiledFile, currentInstructions, stat, true, false, '', {})
+        } catch (error) {
+            console.log('Error:', compiledFile.fileName, 'method', name)
+            if(args.debug == 1) throw -1
+        }
+        
+        code.push(`${currentInstructions.name}.${name}=${stat.value.join('')}`)
+    }
 
     let _properties = currentInstructions.properties.slice()
     while(_properties.length){
@@ -1474,25 +1477,6 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
         }
         
         
-    }
-
-    for(let name in currentInstructions.methods){
-        let stat = {
-            return: false,
-            compute: false,
-            subscribe: [],
-            value: [],
-            ignore: [],
-            params: [],
-        }
-        try {
-            prepare(currentInstructions.methods[name].val, compiledFile, currentInstructions, stat, true, false, '', {})
-        } catch (error) {
-            console.log('Error:', compiledFile.fileName, 'method', name)
-            if(args.debug == 1) throw -1
-        }
-        
-        code.push(`${currentInstructions.name}.${name}=${stat.value.join('')}`)
     }
 
     if(currentInstructions.className === 'Component') {

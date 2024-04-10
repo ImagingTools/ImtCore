@@ -113,7 +113,45 @@ class MouseController {
     onWheel(x, y, deltaX, deltaY){
         let inner = this.get(x, y)
         for(let obj of inner){
-            if(!obj.onWheel(x, y, deltaX, deltaY)) break
+            if(obj instanceof MouseArea){
+                if(obj.$signals.wheel){
+                    obj.$signals.wheel.accepted = true
+                    obj.$signals.wheel()
+                    if(obj.$signals.wheel.accepted) return
+                }
+            }if(obj instanceof ListView){
+                if(obj.getPropertyValue('enabled') && obj.getPropertyValue('visible') && obj.getPropertyValue('interactive')) {
+                    if(obj.getPropertyValue('orientation') === ListView.Vertical){
+                        if(obj.getPropertyValue('contentHeight') <= obj.getPropertyValue('height')){
+                            obj.getStatement('contentY').reset(0)
+                        } else if(obj.getPropertyValue('contentY') + (deltaY) > obj.getPropertyValue('originY') && obj.getPropertyValue('contentY') + (deltaY) < obj.getPropertyValue('contentHeight') + obj.getPropertyValue('originY') - obj.getPropertyValue('height')){
+                            obj.getStatement('contentY').reset(obj.getPropertyValue('contentY') + (deltaY))
+                            return
+                        } else {
+                            if(obj.getPropertyValue('contentY') + (deltaY) <= obj.getPropertyValue('originY')) {
+                                obj.getStatement('contentY').reset(obj.getPropertyValue('originY'))
+                            }
+                            if(obj.getPropertyValue('contentY') + (deltaY) >= obj.getPropertyValue('contentHeight') + obj.getPropertyValue('originY') - obj.getPropertyValue('height')) {
+                                obj.getStatement('contentY').reset(obj.getPropertyValue('contentHeight') + obj.getPropertyValue('originY') - obj.getPropertyValue('height'))
+                            }
+            
+                        }
+                    }
+                    
+                }
+            } else if(obj instanceof Flickable){
+                if(obj.getPropertyValue('enabled') && obj.getPropertyValue('visible') && obj.getPropertyValue('interactive')) {
+                    if(obj.getPropertyValue('contentY') + (deltaY) > 0 && obj.getPropertyValue('contentY') + (deltaY) < obj.getPropertyValue('contentItem').getPropertyValue('height') - obj.getPropertyValue('height')){
+                        obj.getStatement('contentY').reset(obj.getPropertyValue('contentY') + (deltaY))
+                        return
+                    } else {
+                        if(obj.getPropertyValue('contentY') + (deltaY) <= 0) obj.getStatement('contentY').reset(0)
+                        if(obj.getPropertyValue('contentY') + (deltaY) >= obj.getPropertyValue('contentItem').getPropertyValue('height')) obj.getStatement('contentY').reset(obj.getPropertyValue('contentItem').getPropertyValue('height') - obj.getPropertyValue('height'))
+                    }
+                }
+            } else if(obj instanceof Map){
+                return
+            }
         }
     }
 
