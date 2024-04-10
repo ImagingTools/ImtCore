@@ -18,6 +18,10 @@ Item {
     property var helpers_: []
 
     property bool ready: container.compl  && firstSegmentDecorator && middleSegmentDecorator && lastSegmentdecorator
+    property bool isSet: false;
+    property int spacing: 0;
+    property int selectedIndex: -1;
+
 
     onReadyChanged: {
         console.log("SegmentedButton children.length:: ", children.length)
@@ -35,6 +39,16 @@ Item {
         compl = true
     }
 
+    function setChecked(itemIndex){
+        for (let index = 0; index < row.children.length; index++){
+            if (index != itemIndex){
+                row.children[index].checked = false
+            }
+        }
+        row.children[itemIndex].checked = true
+        container.selectedIndex = itemIndex
+    }
+
     Component {
         id: objectHelper
         QtObject {
@@ -42,12 +56,7 @@ Item {
 
             function onClicked(){
                 console.log("sender", itemIndex, row.children[itemIndex])
-                for (let index = 0; index < row.children.length; index++){
-                    if (index != itemIndex){
-                        row.children[index].checked = false
-                    }
-                }
-                row.children[itemIndex].checked = true
+                container.setChecked(itemIndex)
             }
         }
     }
@@ -63,6 +72,7 @@ Item {
         id: row
 
         height: container.height
+        spacing: container.spacing
 
         function setup() {
             console.log("SegmentedButton row children.length:: ", children.length)
@@ -84,6 +94,8 @@ Item {
                     children[index].clicked.connect(helper.onClicked)
                 }
             }
+
+            container.isSet = true;
         }
     }
 }
