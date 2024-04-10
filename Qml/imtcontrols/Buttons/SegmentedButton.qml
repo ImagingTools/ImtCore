@@ -21,7 +21,7 @@ Item {
     property bool isSet: false;
     property int spacing: 0;
     property int selectedIndex: -1;
-
+    property alias rowAlias: row;
 
     onReadyChanged: {
         console.log("SegmentedButton children.length:: ", children.length)
@@ -68,6 +68,19 @@ Item {
         return helper
     }
 
+    function setDecorator(index){
+        if (index == 0){
+            row.children[index].decorator = container.firstSegmentDecorator
+        }
+        else if (index == row.children.length - 1){
+            row.children[index].decorator = container.lastSegmentdecorator
+        }
+        else{
+            row.children[index].decorator = container.middleSegmentDecorator
+        }
+
+    }
+
     Row {
         id: row
 
@@ -77,15 +90,9 @@ Item {
         function setup() {
             console.log("SegmentedButton row children.length:: ", children.length)
             for (let index = 0; index < children.length; index++){
-                if (index == 0){
-                    children[index].decorator = container.firstSegmentDecorator
-                }
-                else if (index == children.length - 1){
-                    children[index].decorator = container.lastSegmentdecorator
-                }
-                else{
-                    children[index].decorator = container.middleSegmentDecorator
-                }
+
+                container.setDecorator(index)
+
                 if (checkable){
                     children[index].checkable = true
                 }

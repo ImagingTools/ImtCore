@@ -9,7 +9,9 @@ Item{
     property TreeItemModel dataModel: TreeItemModel{};
     property int spacing: 20;
     property alias contentHeight: list.contentHeight;
+    property alias contentWidth: list.contentWidth;
     property bool fitToWidth: false;
+    property int orientation: Qt.Vertical;
 
     onModelChanged: {
         //console.log("INPUT_MODEL:: ", model.toJSON())
@@ -23,6 +25,7 @@ Item{
         clip: true;
         spacing: inputView.spacing;
         boundsBehavior: Flickable.StopAtBounds;
+        orientation: inputView.orientation == Qt.Vertical ? ListView.Vertical : ListView.Horizontal
         model: inputView.model;
         delegate:
             Loader{
