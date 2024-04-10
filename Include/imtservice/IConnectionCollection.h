@@ -17,6 +17,7 @@ namespace imtservice
 class IConnectionCollection: virtual public istd::IChangeable
 {
 public:
+	virtual QString GetServiceVersion() const = 0;
 	virtual QString GetServiceTypeName() const = 0;
 	virtual bool SetServiceTypeName(const QString& serviceTypeName) const = 0;
 	virtual const imtbase::ICollectionInfo* GetUrlList() const = 0;

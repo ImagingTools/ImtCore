@@ -29,6 +29,7 @@ public:
 	I_BEGIN_COMPONENT(CObjectCollectionSubscriberControllerComp);
 		I_ASSIGN(m_objectCollectionCompPtr, "ObjectCollection", "Object collection", true, "ObjectCollection");
 		I_ASSIGN_TO(m_objectCollectionModelCompPtr, m_objectCollectionCompPtr, true);
+		I_ASSIGN(m_isSendItemSource, "IsSendItemSource", "Object collection", false, false);
 	I_END_COMPONENT;
 
 protected:
@@ -38,18 +39,12 @@ protected:
 
 	// reimplemented (imod::CSingleModelObserverBase)
 	virtual void OnUpdate(const istd::IChangeable::ChangeSet& changeSet) override;
-
 	virtual bool SetSubscriptions() override;
-
-private Q_SLOTS:
-	void OnTimeout();
 
 protected:
 	I_REF(imtbase::IObjectCollection, m_objectCollectionCompPtr);
 	I_REF(imod::IModel, m_objectCollectionModelCompPtr);
-
-protected:
-	QTimer m_timer;
+	I_ATTR(bool, m_isSendItemSource);
 };
 
 

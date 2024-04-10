@@ -1,6 +1,9 @@
 #include <imtgql/CObjectCollectionSubscriberControllerComp.h>
 
 
+// ACF includes
+#include <iser/CJsonMemWriteArchive.h>
+
 // ImtCore includes
 #include<imtrest/IProtocolEngine.h>
 
@@ -23,12 +26,6 @@ void CObjectCollectionSubscriberControllerComp::OnComponentCreated()
 }
 
 
-void CObjectCollectionSubscriberControllerComp::OnTimeout()
-{
-	SetSubscriptions();
-}
-
-
 void CObjectCollectionSubscriberControllerComp::OnComponentDestroyed()
 {
 	if (m_objectCollectionModelCompPtr.IsValid()){
@@ -41,45 +38,58 @@ void CObjectCollectionSubscriberControllerComp::OnComponentDestroyed()
 
 // reimplemented (imod::CSingleModelObserverBase)
 
-void CObjectCollectionSubscriberControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& /*changeSet*/)
-{
-	SetSubscriptions();
-}
-
-
-bool CObjectCollectionSubscriberControllerComp::SetSubscriptions()
+void CObjectCollectionSubscriberControllerComp::OnUpdate(const istd::IChangeable::ChangeSet& changeSet)
 {
 	if (!m_requestManagerCompPtr.IsValid()){
-		return false;
+		return;
 	}
 
 	for (RequestNetworks& requestNetworks: m_registeredSubscribers){
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequest = requestNetworks.networkRequests[id];
-			QByteArray body = QString(R"(
-{
-"type": "data",
-"id": %1,
-"payload": {
-	"data": %2
-}
-})")
-								.arg(QString(id))
-								.arg(QString("Test")).toUtf8();
-			QByteArray reponseTypeId = QByteArray("application/json; charset=utf-8");
-			const imtrest::IProtocolEngine& engine = networkRequest->GetProtocolEngine();
+			QByteArray data;
+			QByteArray itemId;
+			QJsonObject dataObject;
 
-			imtrest::ConstResponsePtr responsePtr(engine.CreateResponse(*networkRequest, imtrest::IProtocolEngine::SC_OPERATION_NOT_AVAILABLE, body, reponseTypeId));
-			if (responsePtr.IsValid()){
-				const imtrest::ISender* sender = m_requestManagerCompPtr->GetSender(networkRequest->GetRequestId());
-				if (sender != nullptr){
-					sender->SendResponse(responsePtr);
-				}
+			if (changeSet.Contains(imtbase::ICollectionInfo::CF_ADDED)){
+				itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_INSERTED).toByteArray();
+				dataObject.insert("typeOperation", "inserted");
 			}
+			else if (changeSet.Contains(imtbase::ICollectionInfo::CF_REMOVED)){
+				itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_REMOVED).toByteArray();
+				dataObject.insert("typeOperation", "removed");
+			}
+			else if (changeSet.Contains(imtbase::ICollectionInfo::CF_UPDATED)){
+				itemId = changeSet.GetChangeInfo(imtbase::ICollectionInfo::CN_ELEMENT_UPDATED).toByteArray();
+				dataObject.insert("typeOperation", "updated");
+			}
+			dataObject.insert("itemId", QString(itemId));
+
+			if (itemId.isEmpty() && m_isSendItemSource.IsValid() && m_objectCollectionCompPtr.IsValid() && *m_isSendItemSource == true){
+				imtbase::IObjectCollection::DataPtr dataPtr;
+				m_objectCollectionCompPtr->GetObjectData(itemId, dataPtr);
+				QByteArray representationData;
+				iser::ISerializable* objectPtr = dynamic_cast<iser::ISerializable*>(dataPtr.GetPtr());
+				if (objectPtr != nullptr){
+					iser::CJsonMemWriteArchive archive(representationData);
+					objectPtr->Serialize(archive);
+				}
+				dataObject.insert("item", QString(representationData));
+			}
+
+			QJsonDocument jsonDocument;
+			jsonDocument.setObject(dataObject);
+			data = jsonDocument.toJson(QJsonDocument::Compact);
+
+			SetData(id, networkRequest->GetRequestId(), data, *networkRequest);
 		}
 	}
+}
 
-	return true;
+
+bool CObjectCollectionSubscriberControllerComp::SetSubscriptions()
+{
+	return false;
 }
 
 

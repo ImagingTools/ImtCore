@@ -9,6 +9,17 @@ namespace imtservice
 
 // reimplemented (imtservice::IConnectionCollection)
 
+QString CConnectionCollectionComp::GetServiceVersion() const
+{
+	if (!m_applicationInfoCompPtr.IsValid()){
+		return QString();
+	}
+
+	QString version = m_applicationInfoCompPtr->GetApplicationAttribute(ibase::IApplicationInfo::AA_MAIN_VERSION);
+
+	return version;
+}
+
 QString CConnectionCollectionComp::GetServiceTypeName() const
 {
 	QString retVal;

@@ -3,6 +3,7 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
+#include <ibase/IApplicationInfo.h>
 
 // ImtCore includes
 #include <imtbase/TAggergatedObjectCollectionWrap.h>
@@ -23,6 +24,7 @@ public:
 
 	I_BEGIN_COMPONENT(CConnectionCollectionComp);
 		I_REGISTER_INTERFACE(imtservice::IConnectionCollection);
+		I_ASSIGN(m_applicationInfoCompPtr, "ApplicationInfo", "Application info of the service", true, "ApplicationInfo");
 		I_ASSIGN(m_serviceTypeName, "ServiceTypeName", "Service type name for service", true, "");
 		I_ASSIGN_MULTI_0(m_connectionNames, "ConnectionNames", "Connection names", true);
 		I_ASSIGN_MULTI_0(m_connectionServiceTypeNames, "ConnectionServiceTypeNames", "Service type name for connections", true);
@@ -33,6 +35,7 @@ public:
 	I_END_COMPONENT;
 
 	// reimplemented (imtservice::IConnectionCollection)
+	QString GetServiceVersion() const override;
 	QString GetServiceTypeName() const override;
 	virtual bool SetServiceTypeName(const QString& serviceTypeName) const override;
 	virtual const imtbase::ICollectionInfo* GetUrlList() const override;
@@ -51,6 +54,7 @@ protected:
 	virtual void OnComponentCreated() override;
 
 private:
+	I_REF(ibase::IApplicationInfo, m_applicationInfoCompPtr);
 	I_ATTR(QByteArray, m_serviceTypeName);
 	I_MULTIATTR(QByteArray, m_connectionNames);
 	I_MULTIATTR(QByteArray, m_connectionServiceTypeNames);
