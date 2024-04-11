@@ -26,14 +26,17 @@ Rectangle{
     property bool isMoving: false;
     property int pauseDuration: 300;
     property int indicatorMargin: 0;
+    property real minimum: 0.0000000001;
 
     property bool notUsed: !targetItem ? true : vertical ? targetItem.contentHeight <= targetItem.height:
                                                            targetItem.contentWidth <= targetItem.width;
     property bool hideNotUsed: true;
 
-    property real koeff: !targetItem ? 1 : vertical ? (targetItem.height - scrollIndicator.height)/(targetItem.contentHeight - targetItem.height):
-                                    (targetItem.width - scrollIndicator.width)/(targetItem.contentWidth - targetItem.width);
 
+    property real koeff: vertical ? koeffVert : koeffHoriz;
+
+    property real koeffVert: !targetItem ? 1 : !vertical ? 1 : Math.abs((targetItem.contentHeight - targetItem.height)) > minimum ? (targetItem.height - scrollIndicator.height)/(targetItem.contentHeight - targetItem.height): 1;
+    property real koeffHoriz: !targetItem ? 1 : vertical ? 1 : Math.abs((targetItem.contentWidth - targetItem.width)) > minimum ? (targetItem.width - scrollIndicator.width)/(targetItem.contentWidth - targetItem.width): 1;
 
     property bool visibleState: !canFade ? 1 : isMoving ? 1 : (scrollContainerMA.containsMouse || scrollMA.containsMouse) ? 1 : 0;
     property bool inSideTarget: false;
@@ -346,19 +349,23 @@ Rectangle{
     Rectangle{
         id:scrollIndicator;
 
-        x: scrollContainer.vertical || scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width == 0 ? (parent.width - width)/2 :
-           (scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX)*(scrollContainer.targetItem.width - scrollIndicator.width)/(scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width)
+        x: scrollContainer.vertical ? (parent.width - width)/2 :
+           scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width == 0 ? (scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX):
+                                                                                               (scrollContainer.targetItem.contentX - scrollContainer.targetItem.originX)*(scrollContainer.targetItem.width - scrollIndicator.width)/(scrollContainer.targetItem.contentWidth - scrollContainer.targetItem.width)
 
-        y: !scrollContainer.vertical || scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height == 0? (parent.height - height)/2:
-           (scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY)*(scrollContainer.targetItem.height - scrollIndicator.height)/(scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height)
+        y: !scrollContainer.vertical  ? (parent.height - height)/2:
+            scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height == 0 ? (scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY) :
+                                                                                                (scrollContainer.targetItem.contentY - scrollContainer.targetItem.originY)*(scrollContainer.targetItem.height - scrollIndicator.height)/(scrollContainer.targetItem.contentHeight - scrollContainer.targetItem.height)
 
-        width: scrollContainer.vertical || scrollContainer.targetItem.contentWidth === 0 ? (parent.width - 2*scrollContainer.indicatorMargin) :
+        width: scrollContainer.vertical  ? (parent.width - 2*scrollContainer.indicatorMargin) :
+                                           scrollContainer.targetItem.contentWidth === 0 ? scrollContainer.minimum:
                                           (scrollContainer.targetItem.contentWidth <= scrollContainer.targetItem.width ? scrollContainer.targetItem.width :
                                                                                                                            (scrollContainer.targetItem.width / scrollContainer.targetItem.contentWidth * scrollContainer.targetItem.width)) < scrollContainer.minSize ?
                                                                                                                                scrollContainer.minSize :
                                                                                                                                (scrollContainer.targetItem.width / scrollContainer.targetItem.contentWidth * scrollContainer.targetItem.width);
 
-        height: !scrollContainer.vertical || scrollContainer.targetItem.contentHeight === 0 ? (parent.height - 2*scrollContainer.indicatorMargin) :
+        height: !scrollContainer.vertical  ? (parent.height - 2*scrollContainer.indicatorMargin) :
+                                             scrollContainer.targetItem.contentHeight === 0 ? scrollContainer.minimum:
                                             (scrollContainer.targetItem.contentHeight <= scrollContainer.targetItem.height ? scrollContainer.targetItem.height :
                                                                                                                              (scrollContainer.targetItem.height / scrollContainer.targetItem.contentHeight * scrollContainer.targetItem.height)) < scrollContainer.minSize ?
                                                                                                                                  scrollContainer.minSize :
