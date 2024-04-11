@@ -49,7 +49,7 @@ Rectangle {
     }
 
     onContentYChanged: {
-        canvas.deltaY = -contentY
+        canvas.deltaY = -canvasPage.contentY
     }
 
     onObjectModelChanged: {
@@ -304,6 +304,10 @@ Rectangle {
 
                     let withinBorders_ = true;
                     if(withinBorders_){
+                        if (canvas.scaleCoeff < 0.0000001){
+                            return;
+                        }
+
                         let newX = (canvasPage.objectModel.GetData("X", canvas.selectedIndex) + delta.x / canvas.scaleCoeff);
                         let newY = (canvasPage.objectModel.GetData("Y", canvas.selectedIndex) + delta.y / canvas.scaleCoeff);
 
@@ -315,6 +319,11 @@ Rectangle {
                         if(newY < margin_){
                             newY = margin_;
                         }
+
+                        if (canvas.scaleCoeff - margin_ === 0){
+                            return;
+                        }
+
                         if(newX > (backgroundRec.width  - width_) / canvas.scaleCoeff - margin_){
                             newX = (backgroundRec.width  - width_) / canvas.scaleCoeff - margin_
                         }
@@ -456,11 +465,6 @@ Rectangle {
             property string backgroundColor: Style.baseColor;
             property string innerFrameColor: "transparent";
 
-            Component.onCompleted: {
-                loadImage(imageUrl_1);
-                loadImage(imageUrl_2);
-            }
-
             onWidthChanged: {
                 requestPaint()
             }
@@ -484,11 +488,21 @@ Rectangle {
             }
 
             onDeltaYChanged: {
-                canvasPage.contentY = -deltaY
+                canvasPage.contentY = -canvas.deltaY
             }
 
             function setScale(newScale, scaleX, scaleY){
+                if (newScale < 0.0000001){
+                    return;
+                }
+
                 let scaleCoeffBack = canvas.scaleCoeff;
+                if (scaleCoeffBack * newScale + canvas.deltaX === 0 ||
+                    scaleCoeffBack * newScale + canvas.deltaY === 0){
+
+                    return;
+                }
+
                 let newX = (scaleX - canvas.deltaX) / scaleCoeffBack * newScale + canvas.deltaX
                 let newY = (scaleY - canvas.deltaY) / scaleCoeffBack * newScale + canvas.deltaY
                 canvas.deltaX -= (newX - scaleX)
