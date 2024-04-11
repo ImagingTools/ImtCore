@@ -176,6 +176,9 @@ StyleComponents {
     property string menuPanelBackgroundColor: "#e2e2e8";
 
     function getIconPath(iconName, state, mode){
+        if(iconName == undefined){
+            return;
+        }
         if (iconName.length > 0){
             if (iconName.charAt(0) !== '/'){
                 iconName = '/' + iconName;
