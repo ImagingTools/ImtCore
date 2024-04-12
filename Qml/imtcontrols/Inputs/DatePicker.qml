@@ -379,7 +379,7 @@ Item {
 
                     width: parent.width;
                     height: parent.height;
-                    visible: !yearCombo.openST;
+                    visible: !yearComboObj.openST;
 
                     radius: datePicker.textFieldRadius;
                     textSize: datePicker.textSize;
