@@ -1,141 +1,128 @@
-import QtQuick 2.12
+import QtQuick 2.15
 import Acf 1.0
 import imtcontrols 1.0
 
-Item {
-    id: root;
+Rectangle {
+    id: timeInput;
 
-    height: 100;
-    width: row.width;
+    width: minutesInput.width + minutesInput.x + mainMargin;
+    height: 40;
 
-    property int hours: 0;
-    property int minutes: 0;
+    border.color: "lightgray";
+    color: "transparent";
 
-    property bool allCompleted: hoursModel.completed && minuitesModel.completed;
+    property int mainMargin: 4;
+    property int fontSize: 18;
+    property int inputWidth: 36;
 
-    signal timeChanged();
+    property var hoursRegExp: /^([01]?\d)|(2[0-3]?)$/
+    property var minutesRegExp: /^[0-5]?[0-9]$/
+    property var timeRegExp: /^[01]\d|2[0-3]:[0-5]\d$/
 
-    onHoursChanged: {
-        root.timeChanged();
-    }
+    property string time: (hoursInput.text + ":" + minutesInput.text).match(timeInput.timeRegExp) !== null ?
+                               (hoursInput.text + ":" + minutesInput.text) : "";
 
-    onMinutesChanged: {
-        root.timeChanged();
-    }
+    signal accepted(string value);
 
-    function getInSeconds(){
-        let result = 0;
 
-        if (root.hours > 0){
-            result += 3600 * root.hours;
+    function setTime(str){
+        if(str.match(timeInput.timeRegExp) === null){
+            console.log("Wrong time format!")
+            return;
+        }
+        let arr = str.split(":");
+        if(arr.length < 2){
+            return;
         }
 
-        if (root.minutes > 0){
-            result += 60 * root.minutes;
-        }
-
-        return result;
+        hoursInput.text = arr[0];
+        minutesInput.text = arr[1];
     }
 
-    function setHours(hour){
-        hours.setValue(hour);
-    }
+    TextField{
+        id: hoursInput
 
-    function setMinutes(minute){
-        minutes.setValue(minute);
-    }
+        anchors.left: parent.left;
+        anchors.leftMargin:  parent.mainMargin;
+        anchors.verticalCenter: parent.verticalCenter;
 
-    ListModel {
-        id: hoursModel;
-         property bool completed: false;
-        Component.onCompleted: {
-            hoursModel.append({ value: -1, text: " " })
-            for(var i = 0; i <= 23; i++){
-                var norm = i.toString();
-                if( i < 10 ) norm = "0" + i
-                hoursModel.append({ value: i, text: norm })
+        width: parent.inputWidth;
+        height: 40 - 2 * parent.mainMargin;
+
+        textSize: parent.fontSize;
+
+        KeyNavigation.right: minutesInput;
+        KeyNavigation.tab: minutesInput;
+
+        textInputValidator : RegularExpressionValidator { regularExpression: timeInput.hoursRegExp }
+
+        onFocusChanged: {
+            if(!focus && text.length == 1){
+                text = "0" + text;
             }
-            hoursModel.append({ value: -1, text: " " })
-
-            hours.model = hoursModel;
-
-            hoursModel.completed = true;
         }
-    }
-
-    ListModel {
-        id: minuitesModel;
-        property bool completed: false;
-        Component.onCompleted: {
-            minuitesModel.append({ value: -1, text: " " })
-            for(var i = 0; i <= 59; i++){
-                var norm = i.toString();
-                if( i < 10 ) norm = "0" + i
-                minuitesModel.append({ value: i, text: norm })
-            }
-            minuitesModel.append({ value: -1, text: " " })
-
-            minutes.model = minuitesModel;
-
-            minuitesModel.completed = true;
-        }
-    }
-
-    Row {
-        id: row;
-
-        height: root.height;
-
-        Item {
-            width: hours.width;
-            height: parent.height;
-
-            Text {
-                id: hoursTitle;
-
-                text: qsTr("Hours");
-
-                color: Style.textColor;
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
-            }
-
-            Spinner {
-                id: hours;
-
-                anchors.top: hoursTitle.bottom;
-                anchors.topMargin: 5;
-
-                onCurrentValueChanged: {
-                    root.hours = hours.currentValue;
-                }
+        onAccepted: {
+            if(text.length == 1){
+                text = "0" + text;
             }
         }
 
-        Item {
-            width: minutes.width;
-            height: parent.height;
+        onTextChanged: {
 
-            Text {
-                id: minutesTitle;
 
-                text: qsTr("Minutes");
+        }
+    }
 
-                color: Style.textColor;
-                font.family: Style.fontFamily;
-                font.pixelSize: Style.fontSize_common;
+    Text{
+        id: colon;
+
+        anchors.left: hoursInput.right;
+        anchors.leftMargin: 4;
+        anchors.verticalCenter: parent.verticalCenter;
+
+        font.family: Style.fontFamily;
+        font.pixelSize:  parent.fontSize;
+        color: Style.textColor;
+
+        text: ":"
+
+    }
+
+    TextField{
+        id: minutesInput
+
+        anchors.left: colon.right;
+        anchors.leftMargin: 4;
+        anchors.verticalCenter: parent.verticalCenter;
+
+        width: parent.inputWidth;
+        height: 40 - 2 * parent.mainMargin;
+
+        textSize: parent.fontSize;
+
+        KeyNavigation.left: hoursInput;
+        KeyNavigation.tab: hoursInput;
+
+        textInputValidator : RegularExpressionValidator { regularExpression: timeInput.minutesRegExp }
+
+        onFocusChanged: {
+            if(!focus && text.length == 1){
+                text = "0" + text;
+            }
+        }
+        onAccepted: {
+            if(text.length == 1){
+                text = "0" + text;
+            }
+            let str = hoursInput.text + ":" + minutesInput.text;
+            if(str.match(timeInput.timeRegExp) !== null){
+                timeInput.accepted(str);
             }
 
-            Spinner {
-                id: minutes;
+        }
 
-                anchors.top: minutesTitle.bottom;
-                anchors.topMargin: 5;
+        onTextChanged: {
 
-                onCurrentValueChanged: {
-                    root.minutes = minutes.currentValue;
-                }
-            }
         }
     }
 }
