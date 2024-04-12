@@ -26,6 +26,7 @@ Item{
         spacing: inputView.spacing;
         boundsBehavior: Flickable.StopAtBounds;
         orientation: inputView.orientation == Qt.Vertical ? ListView.Vertical : ListView.Horizontal
+        cacheBuffer: 5000;
         model: inputView.model;
         delegate:
             Loader{
