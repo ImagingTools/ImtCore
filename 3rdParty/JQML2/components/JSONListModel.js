@@ -17,6 +17,7 @@ class JSONListModel extends ListModel {
 
     $complete(){
         this.updateJSONModel()
+        super.$complete()
     }
 
     $sourceChanged(){
