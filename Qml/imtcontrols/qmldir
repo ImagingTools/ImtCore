@@ -67,6 +67,7 @@ TextFieldWithTitle 1.0 ./Inputs/TextFieldWithTitle.qml
 TextInputWithLabel 1.0 ./Inputs/TextInputWithLabel.qml
 TimeIntervalPicker 1.0 ./Inputs/TimeIntervalPicker.qml
 TimePicker 1.0 ./Inputs/TimePicker.qml
+TimeInput 1.0 ./Inputs/TimeInput.qml
 TextArea 1.0 ./Inputs/TextArea.qml
 SpinBox 1.0 ./Inputs/SpinBox.qml
 SpinBoxComp 1.0 ./Inputs/SpinBoxComp.qml
