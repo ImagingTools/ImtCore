@@ -21,7 +21,6 @@ ShortcutManager 1.0 ./Actions/ShortcutManager.qml
 MovingItem 1.0 ./Actions/MovingItem.qml
 ControlArea 1.0 ./Actions/ControlArea.qml
 
-AuxButton 1.0 ./Buttons/AuxButton.qml
 Button 1.0 ./Buttons/Button.qml
 TextButton 1.0 ./Buttons/TextButton.qml
 ButtonDecorator 1.0 ./Buttons/ButtonDecorator.qml
