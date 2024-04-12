@@ -6,14 +6,16 @@ Rectangle {
     id: timeInput;
 
     width: minutesInput.width + minutesInput.x + mainMargin;
-    height: 40;
+    height: 36;
 
     border.color: "lightgray";
     color: "transparent";
 
     property int mainMargin: 4;
-    property int fontSize: 18;
     property int inputWidth: 36;
+    property int fontSize: 18;
+
+    property string fontColor: Style.textColor;
 
     property var hoursRegExp: /^([01]?\d)|(2[0-3]?)$/
     property var minutesRegExp: /^[0-5]?[0-9]$/
@@ -47,9 +49,10 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter;
 
         width: parent.inputWidth;
-        height: 40 - 2 * parent.mainMargin;
+        height: parent.height - 2 * parent.mainMargin;
 
         textSize: parent.fontSize;
+        fontColor: timeInput.fontColor;
 
         KeyNavigation.right: minutesInput;
         KeyNavigation.tab: minutesInput;
@@ -82,7 +85,7 @@ Rectangle {
 
         font.family: Style.fontFamily;
         font.pixelSize:  parent.fontSize;
-        color: Style.textColor;
+        color: timeInput.fontColor;
 
         text: ":"
 
@@ -96,9 +99,10 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter;
 
         width: parent.inputWidth;
-        height: 40 - 2 * parent.mainMargin;
+        height: parent.height - 2 * parent.mainMargin;
 
         textSize: parent.fontSize;
+        fontColor: timeInput.fontColor;
 
         KeyNavigation.left: hoursInput;
         KeyNavigation.tab: hoursInput;
