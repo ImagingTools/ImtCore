@@ -211,6 +211,7 @@ import View from 'ol/View.js'
 import SourceVector from 'ol/source/Vector'
 import LayerVector from 'ol/layer/Vector'
 import { transform } from 'ol/proj'
+import { defaults, MouseWheelZoom } from 'ol/interaction'
 
 import Feature from 'ol/Feature.js'
 import Circle from 'ol/geom/Circle.js'
@@ -234,7 +235,10 @@ global.OpenLayers = {
     Stroke: Stroke,
     LineString: LineString,
     Overlay: Overlay,
+    MouseWheelZoom: MouseWheelZoom,
     transform: transform,
+    defaults: defaults,
+
 }
 
 global.Enums = {}

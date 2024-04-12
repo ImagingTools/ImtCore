@@ -157,6 +157,12 @@ class MouseController {
                     }
                 }
             } else if(obj instanceof Map){
+                let currentZoomLevel = obj.getPropertyValue('zoomLevel')
+                if(deltaY > 0){
+                    obj.getProperty('zoomLevel').reset(currentZoomLevel-0.1)
+                } else if(deltaY < 0){
+                    obj.getProperty('zoomLevel').reset(currentZoomLevel+0.1)
+                }
                 return
             }
         }

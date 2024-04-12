@@ -42,6 +42,7 @@ class Map extends Item {
 		})
 		this.$map = new OpenLayers.Map({
 			target: this.getDom(),
+            interactions: OpenLayers.defaults({mouseWheelZoom:false}),
 			layers: [
 				new OpenLayers.TileLayer({
 					source: new OpenLayers.OSM({
@@ -61,19 +62,21 @@ class Map extends Item {
         this.$initialized = true
 
         this.$map.on('moveend', (e)=>{
-            for(let child of this.getProperty('children').get()){
-                if(child instanceof MapQuickItem && child.sourceItem){
-                    let rect = child.sourceItem.getDom().getBoundingClientRect()
-                    child.x = rect.x - this.x
-                    child.y = rect.y - this.y
+            if(this.$timer) clearTimeout(this.$timer)
+            this.$timer = setTimeout(()=>{
+                for(let child of this.getProperty('children').get()){
+                    if(child instanceof MapQuickItem && child.sourceItem){
+                        let rect = child.sourceItem.getDom().getBoundingClientRect()
+                        child.x = rect.x - this.x
+                        child.y = rect.y - this.y
+                    }
                 }
-            }
-
-            this.getProperty('center').preventDefault = false
-
-            this.zoomLevel = this.$map.getView().getZoom()
-
-            this.bearing = -this.$map.getView().getRotation()*180/Math.PI
+    
+                this.getProperty('center').preventDefault = false
+                this.zoomLevel = this.$map.getView().getZoom()
+    
+                // this.bearing = -this.$map.getView().getRotation()*180/Math.PI
+            }, 100)
         })
         this.$map.on('movestart', (e)=>{
             this.getProperty('center').preventDefault = true
@@ -156,6 +159,7 @@ class Map extends Item {
     }
     destroy(){
         MouseController.remove(this)
+        if(this.$timer) clearTimeout(this.$timer)
         this.$queue.clear()
         super.destroy()
     }

@@ -81,8 +81,7 @@ class TextInput extends Item {
         this.$input.style.cursor = 'defult'
         this.$input.autocomplete = "new-password"
         this.$input.onfocus = ()=>{
-            this.forceActiveFocus()
-            // this.getProperty('activeFocus').reset(true)
+            if(!this.getPropertyValue('activeFocus')) this.forceActiveFocus()
         }
         this.$form.appendChild(this.$input)
         MouseController.add(this)
