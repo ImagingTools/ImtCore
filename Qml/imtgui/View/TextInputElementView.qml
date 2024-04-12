@@ -29,6 +29,8 @@ ElementView {
     }
 
     onMaximumLengthChanged: {
+        console.log("onMaximumLengthChanged", controlItem);
+
         if (controlItem){
             controlItem.maximumLength = maximumLength;
         }
@@ -53,9 +55,14 @@ ElementView {
     }
 
     onControlItemChanged: {
-        if (controlItem && textInputValidator){
-            controlItem.textInputValidator = textInputValidator;
-            controlItem.maximumLength = maximumLength;
+        if (controlItem){
+            if (textInputValidator){
+                controlItem.textInputValidator = textInputValidator;
+            }
+
+            if (maximumLength >= 0){
+                controlItem.maximumLength = maximumLength;
+            }
         }
     }
 

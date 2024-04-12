@@ -32,7 +32,6 @@ public:
 
 private:
 	imod::TModelWrap<CAddressCollection> m_addresses;
-
 	imod::CModelUpdateBridge m_modelUpdateBridge;
 };
 
@@ -41,3 +40,5 @@ typedef imtbase::TIdentifiableWrap<CCompanyInfo> CIdentifiableCompanyInfo;
 
 
 }
+
+

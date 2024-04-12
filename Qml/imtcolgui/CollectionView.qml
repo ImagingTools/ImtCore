@@ -91,6 +91,8 @@ Item {
 
     function onFilterChanged(filterId, filterValue){
         container.collectionFilter.setTextFilter(filterValue);
+
+        container.doUpdateGui();
     }
 
     Connections {

@@ -166,17 +166,6 @@ bool CAccountCollectionControllerComp::SetupGqlItem(
 
 					elementInformation = lastTime.toLocalTime().toString("dd.MM.yyyy hh:mm:ss");
 				}
-//				else{
-//					if (elementMetaInfo.IsValid()){
-//						if (informationId == QByteArray("Added")){
-//							elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_INSERTION_TIME)
-//									.toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-//						}
-//						else if (informationId == QByteArray("LastModified")){
-//							elementInformation = elementMetaInfo->GetMetaInfo(imtbase::IObjectCollection::MIT_LAST_OPERATION_TIME).toDateTime().toString("dd.MM.yyyy hh:mm:ss");
-//						}
-//					}
-//				}
 
 				if(elementInformation.isNull()){
 					elementInformation = GetObjectInformation(informationId, collectionId);

@@ -104,6 +104,13 @@ ViewBase {
             emailInput.text = "";
         }
 
+        if (accountEditorContainer.model.ContainsKey("CustomerId")){
+            customerIdInput.text = accountEditorContainer.model.GetData("CustomerId");
+        }
+        else{
+            customerIdInput.text = "";
+        }
+
         let groupIds = [];
         if (accountEditorContainer.model.ContainsKey("Groups")){
             let groups = accountEditorContainer.model.GetData("Groups")
@@ -147,6 +154,9 @@ ViewBase {
 
         let email = emailInput.text;
         accountEditorContainer.model.SetData("Email", email);
+
+        let customerId = customerIdInput.text;
+        accountEditorContainer.model.SetData("CustomerId", customerId);
 
         let selectedGroupIds = []
         let indexes = groupsElement.table.getCheckedItems();
@@ -201,8 +211,36 @@ ViewBase {
 
             spacing: Style.size_largeMargin;
 
-            Component.onCompleted: {
-                accountEditorContainer.checkWidth();
+            GroupHeaderView {
+                width: parent.width;
+
+                title: qsTr("Customer Information");
+                groupView: customerInformationGroup;
+            }
+
+            GroupElementView {
+                id: customerInformationGroup;
+
+                width: parent.width;
+
+                TextInputElementView {
+                    id: customerIdInput;
+
+                    name: qsTr("Customer-ID");
+                    placeHolderText: qsTr("Enter the customer-ID");
+
+                    onEditingFinished: {
+                        accountEditorContainer.doUpdateModel();
+                    }
+
+                    KeyNavigation.tab: accountNameInput;
+
+                    Component.onCompleted: {
+                        let ok = PermissionsController.checkPermission("ChangeAccount");
+
+                        customerIdInput.readOnly = !ok;
+                    }
+                }
             }
 
             GroupHeaderView {
@@ -364,7 +402,7 @@ ViewBase {
                         accountEditorContainer.doUpdateModel();
                     }
 
-                    KeyNavigation.tab: accountNameInput;
+                    KeyNavigation.tab: customerIdInput;
 
                     Component.onCompleted: {
                         let ok = PermissionsController.checkPermission("ChangeAccount");
