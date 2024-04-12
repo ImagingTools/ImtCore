@@ -21,11 +21,18 @@ Rectangle {
     property var minutesRegExp: /^[0-5]?[0-9]$/
     property var timeRegExp: /^[01]\d|2[0-3]:[0-5]\d$/
 
+    property bool canShowCurrentTime: false;
+
     property string time: (hoursInput.text + ":" + minutesInput.text).match(timeInput.timeRegExp) !== null ?
                                (hoursInput.text + ":" + minutesInput.text) : "";
 
     signal accepted(string value);
 
+    Component.onCompleted:{
+        if(canShowCurrentTime){
+            showCurrentTime();
+        }
+    }
 
     function setTime(str){
         if(str.match(timeInput.timeRegExp) === null){
@@ -39,6 +46,22 @@ Rectangle {
 
         hoursInput.text = arr[0];
         minutesInput.text = arr[1];
+    }
+
+    function showCurrentTime(){
+        let date = new Date();
+
+        let hours = date.getHours();
+        let minutes = date.getMinutes();
+        if(hours.length == 1){
+            hours = "0" + hours;
+        }
+        if(minutes.length == 1){
+            minutes = "0" + minutes;
+        }
+
+        let time  = hours + ":" + minutes;
+        setTime(time);
     }
 
     TextField{
