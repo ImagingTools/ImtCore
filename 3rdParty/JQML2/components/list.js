@@ -54,4 +54,6 @@ module.exports.listComponents = [
     'Binding',
     'WheelHandler',
     'DragHandler',
+    'JSONListModel',
+    'TreeItemModel',
 ]

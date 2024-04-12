@@ -116,6 +116,13 @@ class MouseController {
             if(obj instanceof MouseArea){
                 if(obj.$signals.wheel){
                     obj.$signals.wheel.accepted = true
+                    let rect = obj.getDom().getBoundingClientRect()
+                    obj.$signals.wheel.x = x - rect.x
+                    obj.$signals.wheel.y = y - rect.y
+                    obj.$signals.wheel.angleDelta = {
+                        x: deltaX / 8,
+                        y: -deltaY / 8
+                    }
                     obj.$signals.wheel()
                     if(obj.$signals.wheel.accepted) return
                 }
