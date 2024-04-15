@@ -35,6 +35,7 @@ Rectangle {
     }
 
     function setTime(str){
+        console.log("Set time")
         if(str.match(timeInput.timeRegExp) === null){
             console.log("Wrong time format!")
             return;
@@ -49,18 +50,20 @@ Rectangle {
     }
 
     function showCurrentTime(){
+        console.log("showCurrentTime")
         let date = new Date();
 
         let hours = date.getHours();
         let minutes = date.getMinutes();
-        if(hours.length == 1){
+        if(String(hours).length == 1){
             hours = "0" + hours;
         }
-        if(minutes.length == 1){
+        if(String(minutes).length == 1){
             minutes = "0" + minutes;
         }
 
         let time  = hours + ":" + minutes;
+        //console.log("showCurrentTime:: ", time)
         setTime(time);
     }
 
