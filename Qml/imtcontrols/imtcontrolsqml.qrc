@@ -25,6 +25,7 @@
         <file alias="imtcontrols/Buttons/ButtonDecorator.qml">Buttons/ButtonDecorator.qml</file>
         <file alias="imtcontrols/Buttons/ExternalSegmentDecorator.qml">Buttons/ExternalSegmentDecorator.qml</file>
         <file alias="imtcontrols/Buttons/ButtonDecorator.qml">Buttons/ButtonDecorator.qml</file>
+        <file alias="imtcontrols/Buttons/RadioButtonDecorator.qml">Buttons/RadioButtonDecorator.qml</file>
         <file alias="imtcontrols/Buttons/RadioButton.qml">Buttons/RadioButton.qml</file>
         <file alias="imtcontrols/Buttons/TextButtonDecorator.qml">Buttons/TextButtonDecorator.qml</file>
         <file alias="imtcontrols/Buttons/ToolButton.qml">Buttons/ToolButton.qml</file>
