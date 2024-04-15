@@ -6,7 +6,7 @@ DecoratorBase{
     id: decorator;
 
     width: buttonText.width + buttonText.x;
-    height: 10;
+    height: 20;
 
     opacity: !baseElement ? 0.4 : baseElement.checked ? 1 : 0.25
 
@@ -19,7 +19,7 @@ DecoratorBase{
 
         anchors.verticalCenter: parent.verticalCenter;
 
-        width: segmentedButton.height;
+        width: decorator.height;
         height: width ;
         radius: width;
         color: "transparent";
