@@ -87,7 +87,7 @@ class TreeItemModel extends JSONListModel {
             }
 
             if (this.isUpdateEnabled){
-                let signal = this.getSignal('dataChanged')
+                let signal = this.getProperty('data').getNotify()
                 if(signal) signal(row, row+1)
             }
         }
@@ -150,7 +150,7 @@ class TreeItemModel extends JSONListModel {
         }
 
         if (this.isUpdateEnabled){
-            let signal = this.getSignal('dataChanged')
+            let signal = this.getProperty('data').getNotify()
             if(signal) signal()
         }
 
