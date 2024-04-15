@@ -59,7 +59,6 @@ class JSONListModel extends ListModel {
 
         this.append(objectArray)
 		let d2 = new Date()
-		console.log(d2.getMilliseconds() - d1.getMilliseconds())
     }
 
     parseJSONString(jsonString, jsonPathQuery){

@@ -30,6 +30,7 @@ class TextInput extends Item {
         wrapMode: { type: QReal, value: TextInput.NoWrap, changed: '$wrapModeChanged' },
         echoMode: { type: QReal, value: TextInput.Normal, changed: '$echoModeChanged' },
         readOnly: { type: QBool, value: false, changed: '$readOnlyChanged' },
+        activeFocusOnPress: { type: QBool, value: true },
         acceptableInput: { type: QBool, value: true },
         validator: { type: QVar, value: undefined, changed: '$validatorChanged' },
         font: { type: QFont, changed: '$fontChanged' },
