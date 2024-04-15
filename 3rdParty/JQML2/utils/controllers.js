@@ -153,7 +153,7 @@ class MouseController {
                         return
                     } else {
                         if(obj.getPropertyValue('contentY') + (deltaY) <= 0) obj.getStatement('contentY').reset(0)
-                        if(obj.getPropertyValue('contentY') + (deltaY) >= obj.getPropertyValue('contentItem').getPropertyValue('height')) obj.getStatement('contentY').reset(obj.getPropertyValue('contentItem').getPropertyValue('height') - obj.getPropertyValue('height'))
+                        if(obj.getPropertyValue('contentY') + (deltaY) >= obj.getPropertyValue('contentItem').getPropertyValue('height') - obj.getPropertyValue('height')) obj.getStatement('contentY').reset(obj.getPropertyValue('contentItem').getPropertyValue('height') - obj.getPropertyValue('height'))
                     }
                 }
             } else if(obj instanceof Map){
