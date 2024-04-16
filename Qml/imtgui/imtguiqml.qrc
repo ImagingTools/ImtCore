@@ -64,6 +64,8 @@
 	<file alias="imtgui/View/FilterableComboBoxElementView.qml">View/FilterableComboBoxElementView.qml</file>
 	<file alias="imtgui/View/TableElementView.qml">View/TableElementView.qml</file>
 	<file alias="imtgui/View/TreeViewElementView.qml">View/TreeViewElementView.qml</file>
+	<file alias="imtgui/View/SwitchElementView.qml">View/SwitchElementView.qml</file>
+	<file alias="imtgui/View/TextElementView.qml">View/TextElementView.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

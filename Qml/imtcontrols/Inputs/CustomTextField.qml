@@ -28,6 +28,9 @@ FocusScope {
 
     property color borderColor: containerTextField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
 
+//     property color borderColor: containerTextField.borderColorConst !== "" ? containerTextField.borderColorConst : textField.activeFocus ?
+//                                  containerTextField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor : Style.borderColor;
+
     property string borderColorConst: "";
 
     property int radius: Style.textFieldRadius;
@@ -94,6 +97,7 @@ FocusScope {
 
         radius: containerTextField.radius;
 
+//        border.color: containerTextField.borderColor ;
         border.color: containerTextField.borderColorConst !== "" ?
                           containerTextField.borderColorConst: textField.activeFocus ?
                               containerTextField.borderColor : Style.borderColor;
@@ -175,6 +179,8 @@ FocusScope {
         selectionColor: Style.textSelected;
         selectByMouse: true;
         clip: true;
+
+        activeFocusOnPress: !containerTextField.readOnly;
         //text: containerTextField.text // for web TEMP!!!
 
         onAccepted: {

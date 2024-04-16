@@ -13,3 +13,4 @@ ControlBase {
     signal close();
     signal clear();
 }
+

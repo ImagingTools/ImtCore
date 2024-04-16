@@ -39,6 +39,8 @@ ElementView {
     }
 
     onChangeableChanged: {
+        console.log("comboBoxElementView onChangeableChanged", internal.cbRef);
+
         if (internal.cbRef){
             internal.cbRef.changeable = changeable;
         }

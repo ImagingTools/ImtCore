@@ -61,8 +61,10 @@ Item {
     //icons
     property int iconWidth: 12;
     property int iconHeight: 10;
-    property string iconUpSource: "../../../" + Style.getIconPath("Icons/Up", Icon.State.On, Icon.Mode.Normal);
-    property string iconDownSource: "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
+    property string iconUpSource: readOnly ? "../../../" + Style.getIconPath("Icons/Up", Icon.State.Off, Icon.Mode.Disabled)
+                                           : "../../../" + Style.getIconPath("Icons/Up", Icon.State.On, Icon.Mode.Normal);
+    property string iconDownSource: readOnly ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.Off, Icon.Mode.Disabled)
+                                             : "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal);
     //margins
     property int mainMargin: 0;
     //CustomTextField

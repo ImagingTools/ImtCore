@@ -126,6 +126,7 @@ Item {
     // for override
     function updateModel(){}
 
+    // Update representation model from GUI
     function doUpdateModel()
     {
         console.log("View doUpdateModel");
@@ -141,6 +142,7 @@ Item {
         internal.blockingUpdateGui = false;
     }
 
+    // Update GUI from representation model
     function doUpdateGui()
     {
         console.log("View doUpdateGui");

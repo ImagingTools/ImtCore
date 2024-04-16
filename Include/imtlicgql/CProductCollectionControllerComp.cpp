@@ -132,7 +132,7 @@ bool CProductCollectionControllerComp::SetupGqlItem(
 imtbase::CTreeItemModel* CProductCollectionControllerComp::GetMetaInfo(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
+		errorMessage = QString("Internal error").toUtf8();
 
 		return nullptr;
 	}
@@ -198,7 +198,7 @@ void CProductCollectionControllerComp::SetObjectFilter(
 imtbase::CTreeItemModel* CProductCollectionControllerComp::RenameObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
+		errorMessage = QString("Internal error").toUtf8();
 		SendErrorMessage(0, errorMessage, "Product controller");
 
 		return nullptr;
@@ -256,7 +256,7 @@ imtbase::CTreeItemModel* CProductCollectionControllerComp::RenameObject(const im
 imtbase::CTreeItemModel* CProductCollectionControllerComp::SetObjectDescription(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error").toUtf8();
+		errorMessage = QString("Internal error").toUtf8();
 		SendErrorMessage(0, errorMessage, "Product controller");
 
 		return nullptr;

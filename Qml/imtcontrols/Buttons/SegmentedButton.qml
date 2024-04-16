@@ -40,6 +40,10 @@ Item {
     }
 
     function setChecked(itemIndex){
+        if (!checkable){
+            return;
+        }
+
         for (let index = 0; index < row.children.length; index++){
             if (index != itemIndex){
                 row.children[index].checked = false

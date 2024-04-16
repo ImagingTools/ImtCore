@@ -29,8 +29,6 @@ ElementView {
     }
 
     onMaximumLengthChanged: {
-        console.log("onMaximumLengthChanged", controlItem);
-
         if (controlItem){
             controlItem.maximumLength = maximumLength;
         }

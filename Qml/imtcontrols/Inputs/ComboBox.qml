@@ -9,9 +9,9 @@ ControlBase {
 
     property var model:0;
 
-    property color borderColor: comboBoxContainer.focus ? Style.iconColorOnSelected : Style.borderColor;
+    property color borderColor: comboBoxContainer.activeFocus ? Style.iconColorOnSelected : Style.borderColor;
 
-    property color backgroundColor: Style.alternateBaseColor;
+    property color backgroundColor: changeable ? Style.baseColor : Style.alternateBaseColor;
 
     property string currentText;
 
@@ -45,6 +45,10 @@ ControlBase {
     property bool hoverBlocked: true;
 
     property var popup: null;
+
+    onChangeableChanged: {
+        console.log("onChangeableChanged", changeable);
+    }
 
     property Component delegate: Component {PopupMenuDelegate{
         width: comboBoxContainer.width;
@@ -122,13 +126,6 @@ ControlBase {
         }
     }
 
-    onFocusChanged: {
-        //console.log("FOCUS:: ", focus)
-//        if(!focus && isOpen){
-//            closePopupMenu();
-//        }
-    }
-
     property Component popupMenuComp: Component {
         id: popupMenu;
 
@@ -195,14 +192,14 @@ ControlBase {
         cursorShape: comboBoxContainer.changeable ? Qt.PointingHandCursor : Qt.ArrowCursor;
 
         onClicked: {
-            if (!comboBoxContainer.model){
+            if (!comboBoxContainer.model || !comboBoxContainer.changeable){
                 return;
             }
 
             comboBoxContainer.focus = true;
             comboBoxContainer.forceActiveFocus();
 
-            if (comboBoxContainer.changeable && comboBoxContainer.model !==undefined && comboBoxContainer.model.GetItemsCount() > 0){
+            if (comboBoxContainer.model !==undefined && comboBoxContainer.model.GetItemsCount() > 0){
                 comboBoxContainer.openPopupMenu();
             }
 

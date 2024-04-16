@@ -66,3 +66,5 @@ ClearableComboBoxElementView 1.0 View/ClearableComboBoxElementView.qml
 FilterableComboBoxElementView 1.0 View/FilterableComboBoxElementView.qml
 TableElementView 1.0 View/TableElementView.qml
 TreeViewElementView 1.0 View/TreeViewElementView.qml
+SwitchElementView 1.0 View/SwitchElementView.qml
+TextElementView 1.0 View/TextElementView.qml

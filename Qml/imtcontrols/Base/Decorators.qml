@@ -406,7 +406,8 @@ StyleComponents {
                 width: 12;
                 height: 10;
                 rotation: !cbMainRect.baseElement ? 0 : cbMainRect.baseElement.isOpen ? 180 : 0
-                source: "../../../" + Style.theme + "/Icons/" + "/" + "Down" + "_On_Normal.svg";
+                source: cbMainRect.baseElement.changeable ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal)
+                                                        : "../../../" + Style.getIconPath("Icons/Down", Icon.State.Off, Icon.Mode.Disabled);
 
                 sourceSize.width: width;
                 sourceSize.height: height;
