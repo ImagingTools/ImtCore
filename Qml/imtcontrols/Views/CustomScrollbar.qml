@@ -43,9 +43,8 @@ Rectangle{
     property bool alwaysVisible: false;
     property bool canDragOutOfBounds: false;
 
-    property int targetContentHeight: targetItem.contentHeight;
-    property int targetContentWidth: targetItem.contentWidth;
-
+    property int targetContentHeight: !targetItem ? 0 : targetItem.contentHeight == undefined ? 0 : targetItem.contentHeight;
+    property int targetContentWidth: !targetItem ? 0 : targetItem.contentWidth == undefined ? 0 : targetItem.contentWidth;
 
     /*for Qt Style decoration*/
     property Component decorator : Style.scrollBarDecorator ? Style.scrollBarDecorator : null
