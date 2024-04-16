@@ -37,7 +37,7 @@ Text {
                                                       Style.textColor) : Style.inactive_textColor;
 
     elide: rowDelegate ? rowDelegate.elideMode : Text.ElideLeft;
-    wrapMode: rowDelegate ? rowDelegate.wrapMode : Text.NoWrap;
+    wrapMode: (!rowDelegate || !rowDelegate.tableItem) ? Text.NoWrap : rowDelegate.tableItem.wrapMode_deleg;
     onLinkActivated: {
         Qt.openUrlExternally(link);
     }
