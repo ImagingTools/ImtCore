@@ -96,8 +96,23 @@ I_EXPORT_COMPONENT(
 
 I_EXPORT_COMPONENT(
 			StructureSubscriberController,
-			"Subscriprion controller for collection structure",
-			"Subscriprion Subscriber Collection ObjectCollection Subscriber");
+			"Subscription controller for collection structure",
+			"Subscription Subscriber Collection ObjectCollection Subscriber");
+
+I_EXPORT_COMPONENT(
+			BroadcastMessageConsumerController,
+			"Gql controller for broadcast message",
+			"GraphQl Controller Broadcast Message Consumer");
+
+I_EXPORT_COMPONENT(
+			BroadcastMessageConsumerSubscriber,
+			"Subscriber controller for broadcast message",
+			"GraphQl Subscriber Broadcast Message Consumer");
+
+I_EXPORT_COMPONENT(
+			SlaveSubscriberController,
+			"Slave subscriber controller",
+			"GraphQl Subscriber Controller");
 
 
 } // namespace ImtGqlPck

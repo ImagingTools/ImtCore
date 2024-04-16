@@ -2,14 +2,30 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5191" Description="ACF"/>
-            <Version Id="1" Number="2202" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5210" Description="ACF"/>
+            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394754" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <Description>HTTP server framework</Description>
     <Keywords>HTTP Server Company='ImagingTools' Project='&quot;Core Framework&quot;'</Keywords>
     <ElementsList>
+        <Element Id="BroadcastMessageConsumerSubscriber" PackageId="ImtGqlPck" ComponentId="BroadcastMessageConsumerSubscriber">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="CommandIds" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>OnBroadCastMessage</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="RequestManager" Type="Reference" ExportId="">
+                        <Data IsEnabled="true" Value="WebSocketServer"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
         <Element Id="HttpProtocolEngine" PackageId="ImtRestPck" ComponentId="HttpProtocolEngine">
             <Data IsEnabled="true" Flags="0">
                 <AttributeInfoMap>
@@ -17,6 +33,18 @@
                         <Data IsEnabled="true" Value="true"/>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="SlaveSubscriberController" PackageId="ImtGqlPck" ComponentId="SlaveSubscriberController">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
+                        <Data IsEnabled="false"/>
+                    </AttributeInfo>
+                    <AttributeInfo Id="SubscriberController" Type="Reference[]" ExportId="GqlSubscriberControllers">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
                 </AttributeInfoMap>
@@ -124,8 +152,13 @@
                     <AttributeInfo Id="GqlRequestHandler" Type="Reference" ExportId="GqlRequestHandler">
                         <Data IsEnabled="false"/>
                     </AttributeInfo>
-                    <AttributeInfo Id="GqlSubscriberControllers" Type="Reference[]" ExportId="GqlSubscriberControllers">
-                        <Data IsEnabled="false"/>
+                    <AttributeInfo Id="GqlSubscriberControllers" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>SlaveSubscriberController</Value>
+                                <Value>BroadcastMessageConsumerSubscriber</Value>
+                            </Values>
+                        </Data>
                     </AttributeInfo>
                     <AttributeInfo Id="Log" Type="Reference" ExportId="Log">
                         <Data IsEnabled="false"/>
@@ -162,6 +195,7 @@
         <Interface InterfaceId="istd::IPolymorphic" ComponentId="TcpServer"/>
     </ExportedInterfaces>
     <ExportedComponents>
+        <Component ExportedId="BroadcastMessageConsumerSubscriber" ComponentId="BroadcastMessageConsumerSubscriber"/>
         <Component ExportedId="SubscriptionManager" ComponentId="SubscriptionManager"/>
         <Component ExportedId="WebSocketProtocolEngine" ComponentId="WebSocketProtocolEngine"/>
         <Component ExportedId="WebSocketServer" ComponentId="WebSocketServer"/>

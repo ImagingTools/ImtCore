@@ -11,7 +11,9 @@ CCollectionBasedMessageConsumerComp::CCollectionBasedMessageConsumerComp()
 }
 
 
-// reimplemented (ilog::IMessageConsumer)
+// protected methods
+
+// reimplemented (ibase::TRuntimeStatusHanderCompWrap)
 
 void CCollectionBasedMessageConsumerComp::OnSystemStarted()
 {
@@ -21,7 +23,7 @@ void CCollectionBasedMessageConsumerComp::OnSystemStarted()
 }
 
 
-// reimplemented (ilog::IMessageConsumer)
+// reimplemented (ilog::CLogCompBase)
 
 void CCollectionBasedMessageConsumerComp::WriteMessageToLog(const MessagePtr& messagePtr)
 {

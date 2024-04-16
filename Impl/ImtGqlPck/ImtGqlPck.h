@@ -23,6 +23,9 @@
 #include <imtgql/CObjectCollectionSubscriberControllerComp.h>
 #include <imtgql/CModelSubscriberControllerComp.h>
 #include <imtgql/CStructureSubscriberControllerComp.h>
+#include <imtgql/CBroadcastMessageConsumerControllerComp.h>
+#include <imtgql/CBroadcastMessageConsumerSubscriberComp.h>
+#include <imtgql/CSlaveSubscriberControllerComp.h>
 
 
 /**
@@ -49,6 +52,9 @@ typedef imtgql::COperationContextControllerComp OperationContextController;
 typedef imtgql::CObjectCollectionSubscriberControllerComp ObjectCollectionSubscriberController;
 typedef imtgql::CModelSubscriberControllerComp ModelSubscriberController;
 typedef imtgql::CStructureSubscriberControllerComp StructureSubscriberController;
+typedef imtgql::CBroadcastMessageConsumerControllerComp BroadcastMessageConsumerController;
+typedef imtgql::CBroadcastMessageConsumerSubscriberComp BroadcastMessageConsumerSubscriber;
+typedef imtgql::CSlaveSubscriberControllerComp SlaveSubscriberController;
 
 
 } // namespace ImtGqlPck

@@ -30,7 +30,7 @@ protected:
 	// reimplemented (ibase::TRuntimeStatusHanderCompWrap)
 	virtual void OnSystemStarted() override;
 
-	// reimplemented (ilog::IMessageConsumer)
+	// reimplemented (ilog::CLogCompBase)
 	virtual void WriteMessageToLog(const MessagePtr& messagePtr) override;
 
 private:

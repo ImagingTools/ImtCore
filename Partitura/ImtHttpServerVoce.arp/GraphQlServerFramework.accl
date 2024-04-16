@@ -2,13 +2,14 @@
 <Acf>
     <AcfHeader>
         <VersionInfos>
-            <Version Id="0" Number="5191" Description="ACF"/>
-            <Version Id="1" Number="2202" Description="ACF-Solutions"/>
-            <Version Id="1023" Number="393732" Description="Qt Framework"/>
+            <Version Id="0" Number="5210" Description="ACF"/>
+            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394754" Description="Qt Framework"/>
         </VersionInfos>
     </AcfHeader>
     <PositionMap>
-        <Element ComponentName="DelegatedBinaryDataProviders" X="650" Y="550" Note=""/>
+        <Element ComponentName="BroadcastMessageConsumerController" X="475" Y="600" Note=""/>
+        <Element ComponentName="DelegatedBinaryDataProviders" X="800" Y="475" Note=""/>
         <Element ComponentName="GraphQlRoot" X="150" Y="525" Note="Handler/Servlet for all GraphQL requests"/>
         <Element ComponentName="HttpRedirect" X="150" Y="75" Note="HTTP redirect component used for web applications"/>
         <Element ComponentName="HttpRootHandler" X="600" Y="375" Note=""/>
@@ -18,6 +19,7 @@
         <Element ComponentName="RessourcesProvider" X="800" Y="200" Note=""/>
         <Element ComponentName="ServerLogDataProvider" X="1050" Y="675" Note=""/>
         <Element ComponentName="ServerLogFileAccess" X="1050" Y="550" Note=""/>
+        <Element ComponentName="SlaveGraphQLDemultiplexer" X="150" Y="700" Note=""/>
         <Element ComponentName="WebResourcesServlet" X="1075" Y="125" Note="Handler for all compiled resources of the application. Primary used in the web application"/>
     </PositionMap>
     <EmbeddedRegistries/>

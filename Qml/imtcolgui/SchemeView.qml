@@ -106,8 +106,8 @@ Rectangle {
             return
         }
 
-        let scaleCoeff_ = canvas.width / canvas.backgroundWidth;
-        let scaleCoeff_h = canvas.height / canvas.backgroundHeight;
+        let scaleCoeff_ = (canvas.width - Style.size_mainMargin * 2) / canvas.backgroundWidth;
+        let scaleCoeff_h = (canvas.height - Style.size_mainMargin * 2) / canvas.backgroundHeight;
         if (scaleCoeff_ > scaleCoeff_h){
             scaleCoeff_ = scaleCoeff_h
         }
@@ -461,7 +461,7 @@ Rectangle {
             property string mainTextColor: Style.textColor
             property string secondTextColor: Style.inactive_textColor
             property string gridColor: Style.imagingToolsGradient1;
-            property string backgroundBorderColor: Style.alternateBaseColor;
+            property string backgroundBorderColor: Style.borderColor; // Style.alternateBaseColor;
             property string backgroundColor: Style.baseColor;
             property string innerFrameColor: "transparent";
 
@@ -638,7 +638,9 @@ Rectangle {
                 let mainText  = canvasPage.objectModel.GetData("MainText", index)
                 let secondText  = canvasPage.objectModel.GetData("SecondText", index)
                 let thirdText  = canvasPage.objectModel.GetData("ThirdText", index)
+                let backgroundColor = canvasPage.objectModel.IsValidData("BackgroundColor", index) ? canvasPage.objectModel.GetData("BackgroundColor", index) : canvas.backgroundColor;
                 let iconUrl_1  = "../../../" + Style.getIconPath(canvasPage.objectModel.GetData("IconUrl_1", index), Icon.State.On, Icon.Mode.Normal)
+                let iconUrl_2  = "../../../" + Style.getIconPath(canvasPage.objectModel.GetData("IconUrl_2", index), Icon.State.On, Icon.Mode.Normal)
                 // for future multiselect
                 // let selected = canvasPage.objectModel.IsValidData("Selected", index) ? canvasPage.objectModel.GetData("Selected", index) : false;
                 let selected = index === canvasPage.selectedIndex
@@ -666,9 +668,9 @@ Rectangle {
                 //main rectangle
                 ctx.lineWidth = 2 ;
                 ctx.strokeStyle = hasError ? canvas.errorColor : canvas.mainColor;
-                ctx.fillStyle = (!selected && !isComposite) ? canvas.backgroundColor :
+                ctx.fillStyle = (!selected && !isComposite) ? backgroundColor :
                                                               (!selected && isComposite) ? canvas.compositeColor:
-                                                                                           (selected && isComposite) ? canvas.compositeSelectedColor: (selected && !isComposite) ? canvas.selectedColor : canvas.backgroundColor;
+                                                                                           (selected && isComposite) ? canvas.compositeSelectedColor: (selected && !isComposite) ? canvas.selectedColor : backgroundColor;
                 ctx.beginPath()
                 ctx.roundedRect(x_, y_, mainRecWidth, canvas.mainRec_height , canvas.radius_, canvas.radius_);
                 ctx.fill();
@@ -735,7 +737,7 @@ Rectangle {
                 let image2_y = text_y - canvas.imageSize + canvas.imageMargin;
                 ctx.beginPath()
                 ctx.drawImage(iconUrl_1, image1_x, image1_y, canvas.imageSize, canvas.imageSize);
-                // ctx.drawImage(imageUrl_2, image2_x, image2_y, canvas.imageSize, canvas.imageSize);
+                ctx.drawImage(iconUrl_2, image2_x, image2_y, canvas.imageSize, canvas.imageSize);
 
             }
 
