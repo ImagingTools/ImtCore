@@ -697,7 +697,7 @@ Rectangle {
 
         boundsBehavior: Flickable.StopAtBounds;
 
-        cacheBuffer: tableContainer.height + 5 * tableContainer.itemHeight;
+        cacheBuffer: Math.max(0, tableContainer.height + 5 * tableContainer.itemHeight);
 
         clip: true;
 
