@@ -13,44 +13,32 @@ class MouseController {
 
     constructor(){
         window.addEventListener('mousemove', (e)=>{
-            // e.stopPropagation()
             this.onMouseMove(e.pageX, e.pageY, e)
         })
         
         window.addEventListener('dblclick', (e)=>{
-            // e.stopPropagation()
             e.preventDefault()
         })
         window.addEventListener('mousedown', (e)=>{
-            // e.stopPropagation()
             this.onMouseDown(e.pageX, e.pageY, e.button, e)
         })
         window.addEventListener('mouseup', (e)=>{
-            // e.stopPropagation()
             if(e.button !== 2) this.onMouseUp(e.pageX, e.pageY, e.button, e)
         })
         window.addEventListener('contextmenu', (e)=>{
             e.preventDefault()
-            // e.stopPropagation()
             this.onMouseUp(e.pageX, e.pageY, e.button, e)
         })
         window.addEventListener('touchstart', (e)=>{
-            // e.preventDefault()
-            // e.stopPropagation()
             this.onMouseDown(e.changedTouches[0].pageX, e.changedTouches[0].pageY, 0, e)
         })
         window.addEventListener('touchend', (e)=>{
-            // e.preventDefault()
-            // e.stopPropagation()
             this.onMouseUp(e.changedTouches[0].pageX, e.changedTouches[0].pageY, 0, e)
         })
         window.addEventListener('touchmove', (e)=>{
-            // e.preventDefault()
-            // e.stopPropagation()
             this.onMouseMove(e.changedTouches[0].pageX, e.changedTouches[0].pageY, e)
         })
         window.addEventListener('wheel', (e)=>{
-            // e.stopPropagation()
             this.onWheel(e.pageX, e.pageY, e.deltaX, e.deltaY)
         })
     }
@@ -90,13 +78,6 @@ class MouseController {
                 })
             }
         }
-
-        // for(let i = this.list.length-1; i >= 0; i--){
-        //     if(this.list[i].getPropertyValue('enabled') && this.list[i].getPropertyValue('visible')){
-        //         let rect = this.list[i].getDom().getBoundingClientRect()
-        //         if(rect.left < x && rect.top < y && rect.right >= x && rect.bottom >= y) inner.push(this.list[i])
-        //     }
-        // }
 
         return inner
     }
@@ -180,7 +161,6 @@ class MouseController {
         this.moveY = y
         this.pressedMouseArea = []
         let inner = this.get(x, y)
-        // let testInner = mainRoot.$getForMouseEvent(x, y)
         this.pressed = inner
         let view = null
 
@@ -199,14 +179,7 @@ class MouseController {
                 return
             }
         } 
-        // for(let i = 1; i < inner.length; i++){
-        //     if(inner[i] instanceof TextInput || inner[i] instanceof TextEdit){
-        //         if(inner[i].getPropertyValue('enabled') && inner[i].getPropertyValue('visible') && inner[i].getPropertyValue('activeFocus')) {
-        //             this.target = inner[i]
-        //             return
-        //         }
-        //     }
-        // }
+
         for(let i = 0; i < inner.length; i++){
             if(button === 0 && (inner[i] instanceof TextInput || inner[i] instanceof TextEdit)){
                 if(inner[i].getPropertyValue('enabled') && inner[i].getPropertyValue('visible') && inner[i].getPropertyValue('activeFocus')) {
@@ -238,7 +211,6 @@ class MouseController {
                     inner[i].mouse.accepted = false
                     inner[i].getProperty('pressed').value = true
                     if(inner[i].getProperty('pressed').notify) {
-                        // this.target = inner[i]
                         inner[i].mouse.accepted = true
                         inner[i].getProperty('pressed').notify()
                     } else {
@@ -266,10 +238,6 @@ class MouseController {
                 }
             }
         }
-
-        // if(!this.target){
-        //     this.target = view
-        // }
 
         if(!this.target || !(this.target instanceof TextInput || this.target instanceof TextInput || this.target instanceof Map)){
             e.preventDefault()
@@ -438,8 +406,17 @@ class MouseController {
 
             document.body.style.cursor = 'default'
             let accepted = false
+            let wasInner = false
+            let wasCursor = false
             
             for(let i = this.list.length-1; i >= 0; i--){
+                if(!wasCursor && this.list[i].UID && (this.list[i] instanceof TextInput || this.list[i] instanceof TextEdit)){
+                    if(inner.indexOf(this.list[i]) >= 0){
+                        document.body.style.cursor = 'text'
+                        wasCursor = true
+                    }
+                    
+                }
                 if(this.list[i].UID && this.list[i] instanceof MouseArea && this.list[i].getPropertyValue('hoverEnabled')){
                     let rect = this.list[i].getDom().getBoundingClientRect()
                     let norm = this.list[i].normalizeXY(x - rect.x, y - rect.y)
@@ -449,17 +426,25 @@ class MouseController {
                     this.list[i].getStatement('mouseY').reset(norm.y)
     
                     if(inner.indexOf(this.list[i]) >= 0){
-                        this.list[i].mouse.accepted = false
-                        if(!accepted && (this.list[i].getPropertyValue('pressed') || this.list[i].getPropertyValue('hoverEnabled')) && this.list[i].$signals.positionChanged) {
-                            this.list[i].$signals.positionChanged()
-                            this.accepted = this.list[i].mouse.accepted
-                        }
+                        if(!wasInner){
+                            this.list[i].mouse.accepted = false
+                            if(!accepted && (this.list[i].getPropertyValue('pressed') || this.list[i].getPropertyValue('hoverEnabled')) && this.list[i].$signals.positionChanged) {
+                                this.list[i].$signals.positionChanged()
+                                accepted = this.list[i].mouse.accepted
+                            }
 
-                        this.list[i].getProperty('containsMouse').reset(true)
-                        if(this.list[i].$signals && this.list[i].$signals.entered && !this.list[i].$entered) {
-                            this.list[i].$signals.entered()
+                            this.list[i].getProperty('containsMouse').reset(true)
+                            if(this.list[i].$signals && this.list[i].$signals.entered && !this.list[i].$entered) {
+                                this.list[i].$signals.entered()
+                            }
+                            this.list[i].$entered = true
+                            if(!wasCursor){
+                                document.body.style.cursor = this.list[i].getPropertyValue('cursorShape')
+                                wasCursor = true
+                            }
+                            
+                            wasInner = true
                         }
-                        this.list[i].$entered = true
                     } else {
                         this.list[i].getProperty('containsMouse').reset(false) 
                         if(this.list[i].$signals && this.list[i].$signals.exited && this.list[i].$entered) {  
@@ -471,15 +456,6 @@ class MouseController {
                 }
             }
 
-            for(let i = 0; i < inner.length; i++){
-                if(inner[i] instanceof TextInput || inner[i] instanceof TextEdit){
-                    document.body.style.cursor = 'text'
-                    break
-                } else if(inner[i] instanceof MouseArea && inner[i].$properties.cursorShape && inner[i].getPropertyValue('hoverEnabled')){
-                    document.body.style.cursor = inner[i].getPropertyValue('cursorShape')
-                    break
-                }
-            }
         }
         
 
@@ -545,99 +521,14 @@ class MouseController {
         }
     }
 
-    // onMouseMove(x, y){
-    //     let ax = this.moveX - x
-    //     let ay = this.moveY - y
-    //     this.moveX = x
-    //     this.moveY = y
-    //     let inner = this.get(x, y)
-
-    //     document.body.style.cursor = 'default'
-
-    //     // console.log('MouseController::: oldList =',this.oldList)
-    //     while(this.oldList.length){
-    //         let obj = this.oldList.shift()
-    //         if(obj.$mousearea && obj.getPropertyValue('hoverEnabled')) {
-    //             // let normXY = this.normalizeXY(x, y, obj)
-    //             obj.onMouseMove(x, y, false)
-
-    //         }
-    //     }
-    //     // for(let obj of this.oldList){
-    //     //     if(obj.$mousearea && obj.getPropertyValue('hoverEnabled')) {
-    //     //         obj.onMouseMove(x, y, false)
-
-    //     //     }
-    //     // }
-
-    //     for(let obj of inner){
-    //         if(obj.$textinput){
-    //             obj.onMouseMove(x, y)
-    //             break
-    //         }
-    //     }
-        
-    //     this.oldList = inner
-
-
-    //     let pressedMouseArea = this.pressedMouseAreaInner ? this.pressedMouseAreaInner : this.pressedMouseAreaOuter
-
-    //     // console.log(pressedMouseArea)
-
-    //     if(pressedMouseArea && !pressedMouseArea.getPropertyValue('preventStealing') && this.flickList.length){
-    //         let mx = false
-    //         let my = false
-    //         for(let f of this.flickList){
-    //             if(f.getPropertyValue('width') < f.getPropertyValue('contentItem').getPropertyValue('width')) mx = true
-    //             if(f.getPropertyValue('height') < f.getPropertyValue('contentItem').getPropertyValue('height')) my = true
-    //         }
-    //         if((Math.abs(this.originX - x) >= 10 && mx) || (Math.abs(this.originY - y) >= 10 && my)){
-    //             pressedMouseArea = null
-    //             this.pressedMouseAreaInner = null
-    //             this.pressedMouseAreaOuter = null
-    //         }
-    //     }
-
-    //     if(pressedMouseArea){
-    //         // let normXY = this.normalizeXY(x, y, pressedMouseArea)
-    //         if(pressedMouseArea.onMouseMove(x, y, true)){
-    //             this.pressedMouseAreaInner = pressedMouseArea
-    //             this.pressedMouseAreaOuter = null
-    //         } else {
-    //             this.pressedMouseAreaOuter = pressedMouseArea
-    //             this.pressedMouseAreaInner = null
-    //         }
-    //     } else {
-    //         if(this.flickList.length){
-    //             while(this.flickList.length){
-    //                 if(this.flickList[0].onMouseMove(ax, ay)) {
-    //                     this.flickList.shift()
-    //                 } else {
-    //                     break
-    //                 }
-    //             }
-    //         } else {
-    //             for(let obj of inner){
-    //                 // let normXY = this.normalizeXY(x, y, obj)
-    //                 if(obj.$mousearea && obj.getPropertyValue('hoverEnabled')) {
-    //                     obj.onMouseMove(x, y, false)
-        
-    //                 }
-    //             }
-    //         }
-            
-    //     }
-        
-        
-    // }
 }
 class KeyboardController {
     shortcuts = []
 
     constructor(){
         window.onkeydown = (e)=>{
-
-            for(let target of mainRoot.$activeFocusedElements.length ? mainRoot.$activeFocusedElements : mainRoot.$focusedElements){
+            let elements = mainRoot.$activeFocusedElements.concat(mainRoot.$focusedElements)
+            for(let target of elements){
                 if(target){
                     if(e.key === 'Enter' || e.key === 'Return'){
                         if(target instanceof TextInput || target instanceof TextEdit) {
@@ -658,20 +549,6 @@ class KeyboardController {
                     }
                     
                     let obj = target
-                    // let parent = target.parent
-                    // let find = false
-                    // while(parent && !find){
-                    //     if(parent instanceof FocusScope){
-                    //         find = true
-                    //     } else {
-                    //         parent = parent.parent
-                    //     }
-                    // }
-
-                    // let obj = target
-                    // if(!target.$properties.KeyNavigation && parent && parent.UID){
-                    //     obj = parent
-                    // }
 
                     if(obj.$properties.KeyNavigation){
                     
@@ -755,29 +632,52 @@ class KeyboardController {
                 }
             }
 
-            // if(!(target instanceof TextInput) && !(target instanceof TextEdit)){
-                    
-                if(e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt') return
-                let key = e.key
-                if(e.key === 'ArrowLeft') key = 'Left'
-                if(e.key === 'ArrowRight') key = 'Right'
-                if(e.key === 'ArrowUp') key = 'Up'
-                if(e.key === 'ArrowDown') key = 'Down'
-                if(e.key === 'Return') key = 'Enter'
-                if(e.code === 'Space') key = 'Space'
+            if(e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt') return
+            let key = e.key
+            if(e.key === 'ArrowLeft') key = 'Left'
+            if(e.key === 'ArrowRight') key = 'Right'
+            if(e.key === 'ArrowUp') key = 'Up'
+            if(e.key === 'ArrowDown') key = 'Down'
+            if(e.key === 'Return') key = 'Enter'
+            if(e.code === 'Space') key = 'Space'
 
 
-                let currentShortcuts = []
-                for(let shortcut of this.shortcuts){
-                    if(shortcut.getPropertyValue('enabled')){
-                        if(shortcut.getPropertyValue('sequence')){
+            let currentShortcuts = []
+            for(let shortcut of this.shortcuts){
+                if(shortcut.getPropertyValue('enabled')){
+                    if(shortcut.getPropertyValue('sequence')){
+                        let stateKeys = {
+                            altKey: false,
+                            ctrlKey: false,
+                            shiftKey: false,
+                            key: ''
+                        }
+                        let skeys = shortcut.getPropertyValue('sequence').split('+')
+                        for(let skey of skeys){
+                            if(skey === 'Shift') {
+                                stateKeys.shiftKey = true
+                            } else if(skey === 'Alt') {
+                                stateKeys.altKey = true
+                            } else if(skey === 'Ctrl') {
+                                stateKeys.ctrlKey = true
+                            } else {
+                                stateKeys.key = skey === 'Return' ? 'Enter' : skey
+                            }
+                        }
+                        if(stateKeys.key === (key.length === 1 ? key.toUpperCase() : key) && stateKeys.shiftKey === e.shiftKey && stateKeys.ctrlKey === e.ctrlKey && stateKeys.altKey === e.altKey) {
+                            currentShortcuts.push(shortcut)
+                        } 
+                    } else if(shortcut.getPropertyValue('sequences').length) {
+                        let i = 0
+                        let find = false
+                        while(i < shortcut.getPropertyValue('sequences').length && !find){
                             let stateKeys = {
                                 altKey: false,
                                 ctrlKey: false,
                                 shiftKey: false,
                                 key: ''
                             }
-                            let skeys = shortcut.getPropertyValue('sequence').split('+')
+                            let skeys = shortcut.getPropertyValue('sequences')[i].split('+')
                             for(let skey of skeys){
                                 if(skey === 'Shift') {
                                     stateKeys.shiftKey = true
@@ -791,50 +691,25 @@ class KeyboardController {
                             }
                             if(stateKeys.key === (key.length === 1 ? key.toUpperCase() : key) && stateKeys.shiftKey === e.shiftKey && stateKeys.ctrlKey === e.ctrlKey && stateKeys.altKey === e.altKey) {
                                 currentShortcuts.push(shortcut)
-                            } 
-                        } else if(shortcut.getPropertyValue('sequences').length) {
-                            let i = 0
-                            let find = false
-                            while(i < shortcut.getPropertyValue('sequences').length && !find){
-                                let stateKeys = {
-                                    altKey: false,
-                                    ctrlKey: false,
-                                    shiftKey: false,
-                                    key: ''
-                                }
-                                let skeys = shortcut.getPropertyValue('sequences')[i].split('+')
-                                for(let skey of skeys){
-                                    if(skey === 'Shift') {
-                                        stateKeys.shiftKey = true
-                                    } else if(skey === 'Alt') {
-                                        stateKeys.altKey = true
-                                    } else if(skey === 'Ctrl') {
-                                        stateKeys.ctrlKey = true
-                                    } else {
-                                        stateKeys.key = skey === 'Return' ? 'Enter' : skey
-                                    }
-                                }
-                                if(stateKeys.key === (key.length === 1 ? key.toUpperCase() : key) && stateKeys.shiftKey === e.shiftKey && stateKeys.ctrlKey === e.ctrlKey && stateKeys.altKey === e.altKey) {
-                                    currentShortcuts.push(shortcut)
-                                    find = true
-                                }
-                                i++
+                                find = true
                             }
+                            i++
                         }
                     }
-                    
                 }
-                if(currentShortcuts.length >= 1){
-                    e.preventDefault()
-                    if(currentShortcuts.length === 1){
-                        if(currentShortcuts[0].$signals.activated) currentShortcuts[0].$signals.activated()
-                    } else {
-                        if(currentShortcuts[currentShortcuts.length-1].$signals.activatedAmbiguously) currentShortcuts[currentShortcuts.length-1].$signals.activatedAmbiguously()
-                        Core.shortcuts.splice(Core.shortcuts.indexOf(currentShortcuts[currentShortcuts.length-1]), 1)
-                        Core.shortcuts.unshift(currentShortcuts[currentShortcuts.length-1])
-                    }
-                    return
+                
+            }
+            if(currentShortcuts.length >= 1){
+                e.preventDefault()
+                if(currentShortcuts.length === 1){
+                    if(currentShortcuts[0].$signals.activated) currentShortcuts[0].$signals.activated()
+                } else {
+                    if(currentShortcuts[currentShortcuts.length-1].$signals.activatedAmbiguously) currentShortcuts[currentShortcuts.length-1].$signals.activatedAmbiguously()
+                    Core.shortcuts.splice(Core.shortcuts.indexOf(currentShortcuts[currentShortcuts.length-1]), 1)
+                    Core.shortcuts.unshift(currentShortcuts[currentShortcuts.length-1])
                 }
+                return
+            }
                 
             
         }
@@ -851,53 +726,38 @@ class KeyboardController {
 }
 class TextFontController {
     constructor(){
-        let canvas = document.createElement('canvas')
-        this.ctx = canvas.getContext('2d')
-        // this.parser = new DOMParser()
+        this.container = document.createElement('div')
+        this.container.style.maxWidth = 0
+        this.container.style.maxHeight = 0
+        this.container.style.opacity = 0
+        this.container.style.lineHeight = 'normal'
+        document.body.appendChild(this.container)
     }
 
-    measureText(text, pixelSize, fontFamily, maxWidth, wordWrap){
-        this.ctx.font = `${pixelSize}px ${fontFamily ? fontFamily : 'auto'}`
-        
-        if(wordWrap && maxWidth){
-            let resWidth = 0
-            let resHeight = 0
-            // let nodes = this.parser.parseFromString(text, 'text/html').body.childNodes
-            let words = wordWrap && wordWrap === 1 ? text.split(" ") : text
-            let lines = []
-            let currentLine = words[0]
-        
-            for (let i = 1; i < words.length; i++) {
-                let word = words[i]
-                let width = this.ctx.measureText(currentLine + " " + word).width
-                if (width < maxWidth) {
-                    currentLine += wordWrap && wordWrap === 1 ? " " + word : word
-                } else {
-                    lines.push(currentLine)
-                    let metrics = this.ctx.measureText(currentLine)
-                    resWidth = Math.max(resWidth, metrics.width)
-                    resHeight += metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
-                    currentLine = word
-                }
-            }
-            let metrics = this.ctx.measureText(currentLine)
-            resWidth = Math.max(resWidth, metrics.width)
-            resHeight += metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
-            lines.push(currentLine)
-            return {
-                text: lines.join('\n'),
-                width: resWidth,
-                height: resHeight
+    measureText(text, pixelSize, fontFamily, maxWidth, wrapMode){
+        this.container.style.fontFamily = fontFamily
+        this.container.style.fontSize = pixelSize+'px'
+        this.container.style.maxWidth = maxWidth ? maxWidth+'px' : 0
+        if(maxWidth){
+            switch(wrapMode){
+                case Text.NoWrap: this.container.style.whiteSpace = 'pre'; this.container.style.wordBreak = 'unset'; break;
+                case Text.WordWrap: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-word'; break;
+                case Text.WrapAnywhere: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-all'; break;
+                case Text.Wrap: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-word'; break;
+                case Text.WrapAtWordBoundaryOrAnywhere: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-word'; break;
             }
         } else {
-            let metrics = this.ctx.measureText(text)
-            return {
-                text: text,
-                width: metrics.width,
-                height: metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent
-            }
+            this.container.style.whiteSpace = 'pre'; 
+            this.container.style.wordBreak = 'unset';
         }
         
+
+        this.container.innerHTML = text
+
+        return {
+            width: this.container.scrollWidth,
+            height: this.container.scrollHeight,
+        }
     }
 }
 class AnimationController {

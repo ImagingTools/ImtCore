@@ -89,41 +89,14 @@ class Text extends Item {
     }
 
     applyMetrics(){
-        let isHTML = false
-        if(this.getPropertyValue('textFormat') === Text.AutoText){
-            let regexp = /<[^<>]+>/g
-            if(this.getPropertyValue('text') && (this.getPropertyValue('text').indexOf('<a') >= 0 || this.getPropertyValue('text').indexOf('<div') >= 0 || 
-            this.getPropertyValue('text').indexOf('<span') >= 0 || this.getPropertyValue('text').indexOf('<h') >= 0 || 
-            this.getPropertyValue('text').indexOf('<p') >= 0 || this.getPropertyValue('text').indexOf('<b') >= 0 || 
-            this.getPropertyValue('text').indexOf('<img') >= 0 || this.getPropertyValue('text').indexOf('<br') >= 0 || 
-            this.getPropertyValue('text').indexOf('<hr') >= 0 || this.getPropertyValue('text').indexOf('\n') >= 0)){
-                isHTML = true
-            } else {
-                isHTML = false
-            }
-        } else if(this.getPropertyValue('textFormat') === Text.PlainText){
-            isHTML = false
-        } else {
-            isHTML = true
-        }
-
-        if(isHTML){
-            this.impl.innerHTML = this.getPropertyValue('text').replaceAll('<br>', '\r')
-            this.updateGeometry()
-
-        } else {
-            let textMetrics = TextFontController.measureText(this.getPropertyValue('text'), this.getProperty('font').getPropertyValue('pixelSize'), this.getProperty('font').getPropertyValue('family'), this.getProperty('width').auto ? 0 : this.getProperty('width').get(), this.getPropertyValue('wrapMode'))
-            
-            this.impl.innerText = this.getPropertyValue('text')
-            this.getProperty('width').setAuto(textMetrics.width)
-            this.getProperty('height').setAuto(textMetrics.height)
-
-            this.getProperty('contentWidth').reset(textMetrics.width)
-            this.getProperty('contentHeight').reset(textMetrics.height)
-        }
+        let textMetrics = TextFontController.measureText(this.getPropertyValue('text'), this.getProperty('font').getPropertyValue('pixelSize'), this.getProperty('font').getPropertyValue('family'), this.getProperty('width').auto ? 0 : this.getPropertyValue('width'), this.getPropertyValue('wrapMode'))
         
+        this.impl.innerHTML = this.getPropertyValue('text').replaceAll('<br>', '\r')
 
-        
+        this.getProperty('width').setAuto(textMetrics.width)
+        this.getProperty('height').setAuto(textMetrics.height)
+        this.getProperty('contentWidth').reset(textMetrics.width)
+        this.getProperty('contentHeight').reset(textMetrics.height)
     }
 
     $lineHeightChanged(){
@@ -209,7 +182,7 @@ class Text extends Item {
         })
         // for Mozilla Firefox
         // this.impl.style.borderBottom = this.getProperty('font').getPropertyValue('underline') ? `1px solid ${this.getPropertyValue('color')}` : 'unset'
-        if(this.getPropertyValue('text')) this.applyMetrics()
+        this.applyMetrics()
     }
 
     $opacityChanged(){

@@ -52,16 +52,20 @@ class Flickable extends Item {
 
     $contentXChanged(){
         let x = this.getStatement('contentX').get()
-        if(x < 0) x = 0
+
         if(x > this.getPropertyValue('contentWidth') - this.getPropertyValue('width')) x = this.getPropertyValue('contentWidth') - this.getPropertyValue('width')
+        if(x < 0) x = 0
+        
         this.getStatement('contentX').value = x
         this.getStatement('contentItem').get().getStatement('x').reset(-x)
     }
 
     $contentYChanged(){
         let y = this.getStatement('contentY').get()
-        if(y < 0) y = 0
+
         if(y > this.getPropertyValue('contentHeight') - this.getPropertyValue('height')) y = this.getPropertyValue('contentHeight') - this.getPropertyValue('height')
+        if(y < 0) y = 0
+        
         this.getStatement('contentY').value = y
         this.getStatement('contentItem').get().getStatement('y').reset(-y)
     }
@@ -69,14 +73,19 @@ class Flickable extends Item {
 
     $contentWidthChanged(){
         this.getStatement('contentItem').get().getStatement('width').reset(this.getStatement('contentWidth').get())
-        if(this.getPropertyValue('contentX') > this.getPropertyValue('contentWidth') - this.getPropertyValue('width') && this.getPropertyValue('contentWidth') - this.getPropertyValue('width') >= 0){
+
+        if(this.getPropertyValue('contentWidth') - this.getPropertyValue('width') <= 0){
+            this.getProperty('contentX').reset(0)
+        } else if(this.getPropertyValue('contentX') > this.getPropertyValue('contentWidth') - this.getPropertyValue('width')){
             this.getProperty('contentX').reset(this.getPropertyValue('contentWidth') - this.getPropertyValue('width'))
         }
     }
 
     $contentHeightChanged(){
         this.getStatement('contentItem').get().getStatement('height').reset(this.getStatement('contentHeight').get())
-        if(this.getPropertyValue('contentY') > this.getPropertyValue('contentHeight') - this.getPropertyValue('height') && this.getPropertyValue('contentHeight') - this.getPropertyValue('height') >= 0){
+        if(this.getPropertyValue('contentHeight') - this.getPropertyValue('height') <= 0){
+            this.getProperty('contentY').reset(0)
+        } else if(this.getPropertyValue('contentY') > this.getPropertyValue('contentHeight') - this.getPropertyValue('height')){
             this.getProperty('contentY').reset(this.getPropertyValue('contentHeight') - this.getPropertyValue('height'))
         }
     }

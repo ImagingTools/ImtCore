@@ -8,6 +8,10 @@ class ListView extends Flickable {
     static Beginning = 0
     static Center = 1
     static End = 2
+    static Visible = 3
+    static Contain = 4
+    static SnapPosition = 5
+
 
     static NoSnap = 0
     static SnapToItem = 1
@@ -56,6 +60,25 @@ class ListView extends Flickable {
             case ListView.Beginning: pos = 'start'; break;
             case ListView.Center: pos = 'center'; break;
             case ListView.End: pos = 'end'; break;
+            case ListView.Visible: break;
+            case ListView.Contain: {
+                if(this.$items[index]){
+                    if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                        if(this.$items[index].getPropertyValue('x') <= this.getPropertyValue('contentX')){
+                            this.getProperty('contentX').reset(this.$items[index].getPropertyValue('x'))
+                        } else if(this.$items[index].getPropertyValue('x') + this.$items[index].getPropertyValue('width') >= this.getPropertyValue('contentX') - this.getPropertyValue('width')){
+                            this.getProperty('contentX').reset(this.$items[index].getPropertyValue('x') + this.$items[index].getPropertyValue('width') - this.getPropertyValue('width'))
+                        }
+                    } else {
+                        if(this.$items[index].getPropertyValue('y') <= this.getPropertyValue('contentY')){
+                            this.getProperty('contentY').reset(this.$items[index].getPropertyValue('y'))
+                        } else if(this.$items[index].getPropertyValue('y') + this.$items[index].getPropertyValue('height') >= this.getPropertyValue('contentY') + this.getPropertyValue('height')){
+                            this.getProperty('contentY').reset(this.$items[index].getPropertyValue('y') + this.$items[index].getPropertyValue('height') - this.getPropertyValue('height'))
+                        }
+                    }
+                }
+                break;
+            }
         }
 
     }
