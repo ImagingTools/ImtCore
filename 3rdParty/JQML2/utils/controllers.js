@@ -426,25 +426,40 @@ class MouseController {
                     this.list[i].getStatement('mouseY').reset(norm.y)
     
                     if(inner.indexOf(this.list[i]) >= 0){
-                        if(!wasInner){
+                        
                             this.list[i].mouse.accepted = false
                             if(!accepted && (this.list[i].getPropertyValue('pressed') || this.list[i].getPropertyValue('hoverEnabled')) && this.list[i].$signals.positionChanged) {
                                 this.list[i].$signals.positionChanged()
                                 accepted = this.list[i].mouse.accepted
+
+                                this.list[i].getProperty('containsMouse').reset(true)
+                                if(this.list[i].$signals && this.list[i].$signals.entered && !this.list[i].$entered) {
+                                    this.list[i].$signals.entered()
+                                }
+                                this.list[i].$entered = true
+                                if(!wasCursor){
+                                    document.body.style.cursor = this.list[i].getPropertyValue('cursorShape')
+                                    wasCursor = true
+                                }
+                                
+                                wasInner = true
+                            } else {
+                                if(!wasInner){
+                                    this.list[i].getProperty('containsMouse').reset(true)
+                                    if(this.list[i].$signals && this.list[i].$signals.entered && !this.list[i].$entered) {
+                                        this.list[i].$signals.entered()
+                                    }
+                                    this.list[i].$entered = true
+                                    if(!wasCursor){
+                                        document.body.style.cursor = this.list[i].getPropertyValue('cursorShape')
+                                        wasCursor = true
+                                    }
+                                    
+                                    wasInner = true
+                                }
                             }
 
-                            this.list[i].getProperty('containsMouse').reset(true)
-                            if(this.list[i].$signals && this.list[i].$signals.entered && !this.list[i].$entered) {
-                                this.list[i].$signals.entered()
-                            }
-                            this.list[i].$entered = true
-                            if(!wasCursor){
-                                document.body.style.cursor = this.list[i].getPropertyValue('cursorShape')
-                                wasCursor = true
-                            }
                             
-                            wasInner = true
-                        }
                     } else {
                         this.list[i].getProperty('containsMouse').reset(false) 
                         if(this.list[i].$signals && this.list[i].$signals.exited && this.list[i].$entered) {  
@@ -527,7 +542,11 @@ class KeyboardController {
 
     constructor(){
         window.onkeydown = (e)=>{
-            let elements = mainRoot.$activeFocusedElements.concat(mainRoot.$focusedElements)
+            let elements = mainRoot.$activeFocusedElements.slice()
+            for(let el of mainRoot.$focusedElements){
+                if(elements.indexOf(el) < 0) elements.push(el)
+            }
+        
             for(let target of elements){
                 if(target){
                     if(e.key === 'Enter' || e.key === 'Return'){
@@ -598,36 +617,44 @@ class KeyboardController {
                     }
 
                     if(obj.$signals['Keys.pressed']){
+                        e.accepted = false
                         obj.$signals['Keys.pressed'](e)
-                        return
+                        if(e.accepted) return
                     }
                     if(e.key === 'ArrowLeft' && obj.$signals['Keys.leftPressed']){
+                        e.accepted = false
                         obj.$signals['Keys.leftPressed'](e)
-                        return
+                        if(e.accepted) return
                     }
                     if(e.key === 'ArrowRight' && obj.$signals['Keys.rightPressed']){
+                        e.accepted = false
                         obj.$signals['Keys.rightPressed'](e)
-                        return
+                        if(e.accepted) return
                     }
                     if(e.key === 'ArrowUp' && obj.$signals['Keys.upPressed']){
+                        e.accepted = false
                         obj.$signals['Keys.upPressed'](e)
-                        return
+                        if(e.accepted) return
                     }
                     if(e.key === 'ArrowDown' && obj.$signals['Keys.downPressed']){
+                        e.accepted = false
                         obj.$signals['Keys.downPressed'](e)
-                        return
+                        if(e.accepted) return
                     }
                     if(e.key === 'Return' && obj.$signals['Keys.returnPressed']){
+                        e.accepted = false
                         obj.$signals['Keys.returnPressed'](e)
-                        return
+                        if(e.accepted) return
                     }
                     if(e.key === 'Enter' && obj.$signals['Keys.enterPressed']){
+                        e.accepted = false
                         obj.$signals['Keys.enterPressed'](e)
-                        return
+                        if(e.accepted) return
                     }
                     if(e.key === 'Space' && obj.$signals['Keys.spacePressed']){
+                        e.accepted = false
                         obj.$signals['Keys.spacePressed'](e)
-                        return
+                        if(e.accepted) return
                     }
                 }
             }
@@ -705,8 +732,8 @@ class KeyboardController {
                     if(currentShortcuts[0].$signals.activated) currentShortcuts[0].$signals.activated()
                 } else {
                     if(currentShortcuts[currentShortcuts.length-1].$signals.activatedAmbiguously) currentShortcuts[currentShortcuts.length-1].$signals.activatedAmbiguously()
-                    Core.shortcuts.splice(Core.shortcuts.indexOf(currentShortcuts[currentShortcuts.length-1]), 1)
-                    Core.shortcuts.unshift(currentShortcuts[currentShortcuts.length-1])
+                    currentShortcuts.splice(currentShortcuts.indexOf(currentShortcuts[currentShortcuts.length-1]), 1)
+                    currentShortcuts.unshift(currentShortcuts[currentShortcuts.length-1])
                 }
                 return
             }
