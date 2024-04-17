@@ -36,6 +36,10 @@ ControlBase {
         setChecked(switchCustom.checked)
     }
 
+    onCheckedChanged: {
+        setChecked(checked);
+    }
+
     function setChecked(checkedVal){
         switchCustom.checked = checkedVal;
         switchCustom.controlRecX = switchCustom.checked * (switchCustom.backgroundWidth - switchCustom.controlWidth);

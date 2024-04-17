@@ -233,7 +233,7 @@ ControlBase {
 
     Shortcut {
         sequence: "Space";
-        enabled: !comboBoxContainer.isOpen && comboBoxContainer.focus && comboBoxContainer.visible;
+        enabled: !comboBoxContainer.isOpen && (comboBoxContainer.activeFocus) && comboBoxContainer.visible;
         onActivated: {
             comboBoxContainer.openPopupMenu();
         }
@@ -241,7 +241,7 @@ ControlBase {
 
     Shortcut {
         sequence: "Ctrl+Up";
-        enabled: !comboBoxContainer.isOpen && comboBoxContainer.focus && comboBoxContainer.visible;
+        enabled: !comboBoxContainer.isOpen && comboBoxContainer.activeFocus && comboBoxContainer.visible;
         onActivated: {
             if(comboBoxContainer.model !==undefined && comboBoxContainer.model.GetItemsCount() && comboBoxContainer.currentIndex > 0){
                 comboBoxContainer.currentIndex--;
@@ -252,7 +252,7 @@ ControlBase {
 
     Shortcut {
         sequence: "Ctrl+Down";
-        enabled: !comboBoxContainer.isOpen && comboBoxContainer.focus && comboBoxContainer.visible;
+        enabled: !comboBoxContainer.isOpen && comboBoxContainer.activeFocus && comboBoxContainer.visible;
         onActivated: {
             if(comboBoxContainer.model !==undefined && comboBoxContainer.model.GetItemsCount() && comboBoxContainer.currentIndex < (comboBoxContainer.model.GetItemsCount()-1)){
                 comboBoxContainer.currentIndex++;

@@ -31,6 +31,8 @@ ComboBox {
     }
     }
 
+    property CustomTextField textInput;
+
     popupMenuComp: Component {
         id: popupMenu;
 
@@ -85,11 +87,6 @@ ComboBox {
 
                             text: comboBoxContainer.currentText;
 
-                            Component.onCompleted: {
-                                forceActiveFocus();
-                                focus = true;
-                            }
-
                             onTextChanged: {
                                 if (!contentItem.filterEnabled){
                                     contentItem.filterEnabled = true;
@@ -98,6 +95,10 @@ ComboBox {
                                 }
 
                                 comboBoxContainer.filter = text;
+                            }
+
+                            Component.onCompleted: {
+                                comboBoxContainer.textInput = textField;
                             }
                         }
                     }
@@ -123,5 +124,10 @@ ComboBox {
                                           "y":     point.y - (comboBoxContainer.height - 2),
                                           "model": comboBoxContainer.model,
                                           "width": comboBoxContainer.width});
+
+        if (textInput){
+            textInput.focus = true;
+            textInput.forceActiveFocus();
+        }
     }
 }

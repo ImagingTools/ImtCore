@@ -28,9 +28,6 @@ FocusScope {
 
     property color borderColor: containerTextField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
 
-//     property color borderColor: containerTextField.borderColorConst !== "" ? containerTextField.borderColorConst : textField.activeFocus ?
-//                                  containerTextField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor : Style.borderColor;
-
     property string borderColorConst: "";
 
     property int radius: Style.textFieldRadius;
@@ -210,6 +207,10 @@ FocusScope {
 
         onEditingFinished: {
             containerTextField.editingFinished();
+        }
+
+        onActiveFocusChanged: {
+            console.log("TextInput onActiveFocusChanged", activeFocus);
         }
 
         Text {
