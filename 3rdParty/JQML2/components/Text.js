@@ -89,7 +89,7 @@ class Text extends Item {
     }
 
     applyMetrics(){
-        let textMetrics = TextFontController.measureText(this.getPropertyValue('text'), this.getProperty('font').getPropertyValue('pixelSize'), this.getProperty('font').getPropertyValue('family'), this.getProperty('width').auto ? 0 : this.getPropertyValue('width'), this.getPropertyValue('wrapMode'))
+        let textMetrics = TextFontController.measureText(this.getPropertyValue('text'), this.getProperty('font'), this.getProperty('width').auto ? 0 : this.getPropertyValue('width'), this.getPropertyValue('wrapMode'))
         
         this.impl.innerHTML = this.getPropertyValue('text').replaceAll('<br>', '\r')
 

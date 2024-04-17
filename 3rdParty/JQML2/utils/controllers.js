@@ -761,10 +761,13 @@ class TextFontController {
         document.body.appendChild(this.container)
     }
 
-    measureText(text, pixelSize, fontFamily, maxWidth, wrapMode){
-        this.container.style.fontFamily = fontFamily
-        this.container.style.fontSize = pixelSize+'px'
+    measureText(text, font, maxWidth, wrapMode){
+        this.container.style.fontFamily = font.getPropertyValue('family')
+        this.container.style.fontSize = font.getPropertyValue('pixelSize')+'px'
         this.container.style.maxWidth = maxWidth ? maxWidth+'px' : 0
+        this.container.style.fontWeight = font.getPropertyValue('bold') ? 'bold' : 'normal'
+        this.container.style.fontStyle = font.getPropertyValue('italic') ? 'italic' : 'normal'
+        this.container.style.textDecoration = font.getPropertyValue('underline') ? 'underline' : 'unset'
         if(maxWidth){
             switch(wrapMode){
                 case Text.NoWrap: this.container.style.whiteSpace = 'pre'; this.container.style.wordBreak = 'unset'; break;

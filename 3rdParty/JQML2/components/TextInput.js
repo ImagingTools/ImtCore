@@ -225,7 +225,7 @@ class TextInput extends Item {
     }
 
     applyMetrics(){
-        let textMetrics = TextFontController.measureText(this.getPropertyValue('text'), this.getProperty('font').getPropertyValue('pixelSize'), this.getProperty('font').getPropertyValue('family'), this.getProperty('width').auto ? 0 : this.getProperty('width').get(), this.getPropertyValue('wrapMode'))
+        let textMetrics = TextFontController.measureText(this.getPropertyValue('text'), this.getProperty('font'), this.getProperty('width').auto ? 0 : this.getProperty('width').get(), this.getPropertyValue('wrapMode'))
 
         this.getProperty('contentWidth').reset(textMetrics.width)
         // this.getProperty('contentHeight').reset(textMetrics.height)
