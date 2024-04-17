@@ -92,10 +92,10 @@ bool CConstVarCppCreatorProcessorComp::CreateBody(
 	for (QString key: propertyKeys){
 		QJsonObject property = properties.value(key).toObject();
 		if (property.value("type") == "int"){
-			stream << "const QString " << name << "::s_" << key << " = " << QString::number(property.value("value").toInt()) << ";" << "\n";
+			stream << "const QByteArray " << name << "::s_" << key << " = " << QString::number(property.value("value").toInt()) << ";" << "\n";
 		}
 		else{
-			stream << "const QString " << name << "::s_" << key << " = \"" << property.value("value").toString() << "\";" << "\n";
+			stream << "const QByteArray " << name << "::s_" << key << " = \"" << property.value("value").toString() << "\";" << "\n";
 		}
 	}
 

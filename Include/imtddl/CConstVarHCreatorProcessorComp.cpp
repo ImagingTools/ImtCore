@@ -37,7 +37,7 @@ bool CConstVarHCreatorProcessorComp::OpenFiles(const iprm::IParamsSet* paramsPtr
 	QTextStream hStream(&m_outputFile);
 	hStream << "#pragma once" << "\n\n";
 	hStream << "// Qt includes" << "\n";
-	hStream << "#include <QtCore/QString>" << "\n\n\n";
+	hStream << "#include <QtCore/QByteArray>" << "\n\n\n";
 	hStream << "namespace " + moduleName << "\n";
 	hStream << "{" << "\n\n\n";
 
@@ -97,7 +97,7 @@ bool CConstVarHCreatorProcessorComp::CreateBody(
 			hStream << "\n";
 		}
 		else{
-			hStream << "static const QString s_" << key << ";";
+			hStream << "static const QByteArray s_" << key << ";";
 			hStream << "\n";
 		}
 	}

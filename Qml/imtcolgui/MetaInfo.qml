@@ -7,7 +7,6 @@ Rectangle {
     id: container;
 
     color: Style.backgroundColor;
-//    color: Style.alternateBaseColor;
 
     property TreeItemModel metaInfoModel: TreeItemModel {}
     property int elementHeight: 20;
@@ -72,7 +71,7 @@ Rectangle {
                         id: childColumn;
 
                         anchors.top: nameTitle.bottom;
-                        anchors.topMargin: 5;
+                        anchors.topMargin: Style.size_smallMargin;
 
                         width: collectionMetaInfo.width;
 
@@ -82,25 +81,39 @@ Rectangle {
                             width: collectionMetaInfo.width;
 
                             delegate: Rectangle {
-
-                                height: container.elementHeight;
+                                height: container.elementHeight > valueText.contentHeight ? container.elementHeight : valueText.contentHeight;
                                 width: collectionMetaInfo.width;
 
                                 color: "transparent";
 
+                                Image {
+                                    id: icon
+                                    anchors.left: parent.left;
+                                    anchors.leftMargin: Style.size_mainMargin;
+                                    anchors.verticalCenter: parent.verticalCenter
+
+                                    width: model.Icon === undefined ? 0 : Style.iconSizeSmall
+                                    height: width
+                                    sourceSize.width: width
+                                    sourceSize.height: height
+                                    source: model.Icon === undefined ? "" : "../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal)
+                                }
+
                                 Text {
                                     id: valueText;
 
-                                    anchors.left: parent.left;
-                                    anchors.leftMargin: 10;
+                                    anchors.left: icon.right;
+                                    anchors.leftMargin: icon.width == 0 ? 0 : Style.size_mainMargin;
                                     anchors.right: parent.right;
-                                    anchors.rightMargin: 10;
+                                    anchors.rightMargin: Style.size_mainMargin;
+                                    anchors.verticalCenter: parent.verticalCenter
 
                                     font.family: Style.fontFamily;
                                     font.pixelSize: Style.fontSize_small;
+                                    wrapMode: Text.WordWrap
 
                                     color: Style.textColor;
-                                    elide: Text.ElideRight;
+                                    // elide: Text.ElideRight;
 
                                     text: model.Value;
                                 }
