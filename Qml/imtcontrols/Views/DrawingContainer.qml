@@ -25,12 +25,30 @@ Item{
     property string controlColor: "#ffe4c4";
 
     Component.onCompleted: {
+        Events.subscribeEvent("DrawerSetVisible", setVisible);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("DrawerSetVisible");
     }
 
     onStepsLengthChanged: {
         if(steps.length){
             mainStep = steps[steps.length - 1];
         }
+    }
+
+    function setVisible(visible){
+        if(!visible){
+            animMargin.from = hiddenItem.addToMargin;
+            animMargin.to = 0;
+        }
+        else{
+            animMargin.from = 0;
+            animMargin.to = hiddenItem.addToMargin;
+        }
+
+        animMargin.start();
     }
 
     function addStep(step){
@@ -57,6 +75,7 @@ Item{
         property point startPointConst;
         property int lastDeltaX: 0;
         property int lastDeltaY: 0;
+
         onPressed: {
             startPoint = mapToItem(drawer.parent, mouse.x, mouse.y);
             startPointConst = mapToItem(drawer.parent, mouse.x, mouse.y);
