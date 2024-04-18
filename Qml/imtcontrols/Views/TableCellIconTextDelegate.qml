@@ -23,7 +23,7 @@ TableCellDelegateBase {
 
     TableCellText {
         anchors.left: image_.right;
-        anchors.leftMargin:  delegateContainer.rowDelegate ? delegateContainer.rowDelegate.textLeftMargin : 0
+        anchors.leftMargin:  delegateContainer.rowDelegate && image_.visible ? delegateContainer.rowDelegate.textLeftMargin : 0
         anchors.right: parent.right;
         anchors.rightMargin: delegateContainer.rowDelegate ? delegateContainer.rowDelegate.textRightMargin : 0
         anchors.verticalCenter: parent.verticalCenter
