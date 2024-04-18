@@ -384,14 +384,14 @@ StyleComponents {
 
                 anchors.verticalCenter: cbMainRect.verticalCenter;
                 anchors.left: cbMainRect.left;
-                anchors.leftMargin: !cbMainRect.baseElement ? 0 : cbMainRect.baseElement.textCentered ? cbMainRect.width/2 - width/2 : 10;
+                anchors.leftMargin: !cbMainRect.baseElement ? 0 : cbMainRect.baseElement.textCentered ? cbMainRect.width/2 - width/2 : Style.size_mainMargin;
                 anchors.right: cbArrowIcon.left;
-                anchors.rightMargin: 10;
+                anchors.rightMargin: Style.size_mainMargin;
 
                 color: !cbMainRect.baseElement ? "transparent" : cbMainRect.baseElement.fontColorTitle;
                 text: !cbMainRect.baseElement ? "" : cbMainRect.baseElement.currentText !== "" ? cbMainRect.baseElement.currentText : cbMainRect.baseElement.placeHolderText;
                 font.family: Style.fontFamily;
-                font.pixelSize: !cbMainRect.baseElement ? 10 : cbMainRect.baseElement.textSize;
+                font.pixelSize: !cbMainRect.baseElement ? Style.fontSize_common : cbMainRect.baseElement.textSize;
 
                 elide: Text.ElideRight;
             }
@@ -401,10 +401,11 @@ StyleComponents {
 
                 anchors.right: cbMainRect.right;
                 anchors.verticalCenter: cbMainRect.verticalCenter;
-                anchors.rightMargin: 5;
+                anchors.rightMargin: Style.size_smallMargin;
 
                 width: 12;
                 height: 10;
+
                 rotation: !cbMainRect.baseElement ? 0 : cbMainRect.baseElement.isOpen ? 180 : 0
                 source: cbMainRect.baseElement.changeable ? "../../../" + Style.getIconPath("Icons/Down", Icon.State.On, Icon.Mode.Normal)
                                                         : "../../../" + Style.getIconPath("Icons/Down", Icon.State.Off, Icon.Mode.Disabled);

@@ -10,14 +10,40 @@ ComboBoxElementView {
 
     Component {
         id: cbComp;
-        FilterableComboBox {
-            id: cb;
 
+        Item {
             width: 300;
             height: 30;
 
-            Component.onCompleted: {
-                root.setupComboBox(cb);
+            FilterableComboBox {
+                id: cb;
+
+                anchors.left: parent.left;
+
+                width: 230;
+                height: 30;
+
+                Component.onCompleted: {
+                    root.setupComboBox(cb);
+                }
+            }
+
+            Button {
+                id: clearButton;
+
+                anchors.left: cb.right;
+                anchors.leftMargin: Style.size_mainMargin;
+                anchors.right: parent.right;
+
+                height: 30;
+
+                text: qsTr("Clear");
+
+                enabled: root.changeable && root.currentIndex >= 0;
+
+                onClicked: {
+                    root.currentIndex = -1;
+                }
             }
         }
     }

@@ -35,6 +35,8 @@ Rectangle {
 
     property alias contentWidth: content.width
 
+    property alias nameWidth: textName.width;
+
     onFocusChanged: {
         if (focus && controlItem){
             controlItem.forceActiveFocus();
@@ -132,9 +134,9 @@ Rectangle {
             Text {
                 id: textName;
 
+                anchors.verticalCenter: parent.verticalCenter;
                 anchors.left: parent.left;
                 anchors.right: controlLoader.left;
-                anchors.verticalCenter: parent.verticalCenter;
 
                 color: Style.textColor;
                 font.family: Style.fontFamilyBold;

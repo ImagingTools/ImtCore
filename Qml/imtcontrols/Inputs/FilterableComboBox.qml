@@ -39,9 +39,10 @@ ComboBox {
         PopupMenuDialog {
             id: popup;
 
-            delegate: comboBoxContainer.delegate;
             width: comboBoxContainer.width;
             itemHeight: comboBoxContainer.itemHeight;
+
+            delegate: comboBoxContainer.delegate;
             hiddenBackground: comboBoxContainer.hiddenBackground;
             shownItemsCount: comboBoxContainer.shownItemsCount;
             moveToEnd: comboBoxContainer.moveToEnd;

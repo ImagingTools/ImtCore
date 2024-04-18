@@ -41,14 +41,9 @@ ControlBase {
     // ID for display in combo box delegates
     property string nameId: "Name";
 
-//    property int selectedIndex: -1;
     property bool hoverBlocked: true;
 
     property var popup: null;
-
-    onChangeableChanged: {
-        console.log("onChangeableChanged", changeable);
-    }
 
     property Component delegate: Component {PopupMenuDelegate{
         width: comboBoxContainer.width;

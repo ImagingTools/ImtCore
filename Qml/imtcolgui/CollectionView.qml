@@ -30,6 +30,7 @@ Item {
     property alias hasPagination: container.hasPagination;
     property alias elementsCount: container.elementsCount;
     property alias pagination: container.pagination;
+    property alias metaInfoView: collectionMetaInfo;
 
     property bool visibleMetaInfo: false;
 

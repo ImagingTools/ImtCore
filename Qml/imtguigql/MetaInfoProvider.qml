@@ -11,6 +11,8 @@ Item {
 
     property TreeItemModel metaInfoModel: TreeItemModel {}
 
+    property alias state: metaInfo.state;
+
     function getMetaInfo(objectId){
         if (getMetaInfoGqlCommand == ""){
             return;

@@ -38,6 +38,8 @@ DecoratorBase {
 
             anchors.verticalCenter: content.verticalCenter;
 
+            textFieldRightMargin: iconClear.width + 2 * margin;
+
             width: 270;
             height: 30;
 

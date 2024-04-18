@@ -88,7 +88,9 @@ CollectionView {
     }
 
     function setAlertPanel(alertPanel){
-        Events.sendEvent("SetAlertPanel", alertPanel)
+        let parameters = {"Id": collectionId, "AlertPanelComp": alertPanel};
+
+        Events.sendEvent("SetAlertPanel", parameters)
     }
 
     MetaInfoProvider {
@@ -97,7 +99,16 @@ CollectionView {
         getMetaInfoGqlCommand: root.collectionId + "MetaInfo";
 
         onMetaInfoModelChanged: {
-            root.setMetaInfoModel(metaInfoProvider.metaInfoModel);
+            root.metaInfoView.metaInfoModel = metaInfoProvider.metaInfoModel
+        }
+
+        onStateChanged: {
+            if (state === "Loading"){
+                root.metaInfoView.startLoading();
+            }
+            else{
+                root.metaInfoView.stopLoading();
+            }
         }
     }
 

@@ -12,6 +12,14 @@ Rectangle {
     property int elementHeight: 20;
     property bool contentVisible: true;
 
+    function startLoading(){
+        loading.start();
+    }
+
+    function stopLoading(){
+        loading.stop();
+    }
+
     Flickable {
         id: collectionMetaInfo;
 
@@ -26,9 +34,9 @@ Rectangle {
             id: column;
 
             anchors.left: parent.left;
+            anchors.leftMargin: Style.size_mainMargin;
             anchors.right: parent.right;
-            anchors.rightMargin: 5;
-            anchors.leftMargin: 5;
+            anchors.rightMargin: Style.size_mainMargin;
 
             visible: container.contentVisible;
 
@@ -52,9 +60,9 @@ Rectangle {
 
                         width: column.width;
 
-                        anchors.left: parent.left;
-                        anchors.leftMargin: 10;
                         anchors.horizontalCenter: parent.horizontalCenter;
+                        anchors.left: parent.left;
+                        anchors.leftMargin: Style.size_mainMargin;
 
                         font.pixelSize: Style.fontSize_common;
                         font.family: Style.fontFamilyBold;
@@ -88,12 +96,14 @@ Rectangle {
 
                                 Image {
                                     id: icon
+
+                                    anchors.verticalCenter: parent.verticalCenter
                                     anchors.left: parent.left;
                                     anchors.leftMargin: Style.size_mainMargin;
-                                    anchors.verticalCenter: parent.verticalCenter
 
                                     width: model.Icon === undefined ? 0 : Style.iconSizeSmall
                                     height: width
+
                                     sourceSize.width: width
                                     sourceSize.height: height
                                     source: model.Icon === undefined ? "" : "../../../" + Style.getIconPath(model.Icon, Icon.State.On, Icon.Mode.Normal)
@@ -102,18 +112,17 @@ Rectangle {
                                 Text {
                                     id: valueText;
 
+                                    anchors.verticalCenter: parent.verticalCenter
                                     anchors.left: icon.right;
                                     anchors.leftMargin: icon.width == 0 ? 0 : Style.size_mainMargin;
                                     anchors.right: parent.right;
                                     anchors.rightMargin: Style.size_mainMargin;
-                                    anchors.verticalCenter: parent.verticalCenter
 
                                     font.family: Style.fontFamily;
                                     font.pixelSize: Style.fontSize_small;
                                     wrapMode: Text.WordWrap
 
                                     color: Style.textColor;
-                                    // elide: Text.ElideRight;
 
                                     text: model.Value;
                                 }
@@ -123,6 +132,21 @@ Rectangle {
                 }
             }
         }//Column main
+    }
+
+    Loading {
+        id: loading;
+
+        anchors.top: parent.top;
+
+        width: parent.width;
+        height: 200;
+
+        indicatorSize: 20;
+
+        color: container.color;
+
+        visible: false;
     }
 }
 
