@@ -143,6 +143,7 @@ void CButtonBasedSelectionGuiComp::OnOptionListUpdate(
 		for (int i = 0; i < count; i++) {
 			QToolButton* buttonPtr = new QToolButton(Frame);
 			buttonPtr->setText(objectPtr->GetOptionName(i));
+			buttonPtr->setEnabled(objectPtr->IsOptionEnabled(i));
 			buttonPtr->setIconSize(
 				*m_iconSizeAttrPtr > 0 ? QSize(*m_iconSizeAttrPtr, *m_iconSizeAttrPtr) : QSize(16, 16));
 			buttonPtr->setCheckable(true);
