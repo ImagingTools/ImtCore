@@ -57,7 +57,7 @@ StyleComponents {
     popupItemDelegateDecorator: popupItemDelegateDecoratorComp;
 
     collectionTableDecorator: Component{TreeItemModel{}}
-
+    drawingContainerDecorator: null;
 
     Component {
         id: popupItemDelegateDecoratorComp;

@@ -94,6 +94,7 @@ Rectangle {
     function onLogout(){
         clearModels();
         authorizationPage.logout();
+        drawingContainer.content = null;
 // soon...
 //        let exists = mainDocumentManager.dirtyDocumentsExists();
 //        if (exists){
@@ -186,6 +187,14 @@ Rectangle {
         }
     }
 
+    DrawingContainer{
+        id: drawingContainer;
+        anchors.bottom: parent.bottom;
+        anchors.bottomMargin: 50;
+        edge: Qt.RightEdge;
+        z: topPanel.z + 1;
+    }
+
     TopPanel {
         id: topPanel;
 
@@ -243,6 +252,7 @@ Rectangle {
             authorizationPage.visible = false;
             authorizationPage.state = "authorized";
 
+            drawingContainer.content = Style.drawingContainerDecorator;
             Events.sendEvent("UpdateSettings");
 //            Events.sendEvent("UpdateModels");
         }

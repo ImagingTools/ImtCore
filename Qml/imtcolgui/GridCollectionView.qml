@@ -39,6 +39,7 @@ Item {
     property alias hasExtention: gridCollectionViewBase.hasExtention;
     property alias openST: gridCollectionViewBase.openST;
 
+    property alias grid: gridCollectionViewBase.grid;
     property alias gridCount: gridCollectionViewBase.gridCount;
     property alias gridCountInLine: gridCollectionViewBase.gridCountInLine;
     property alias gridRowCount : gridCollectionViewBase.gridRowCount;
@@ -128,6 +129,20 @@ Item {
         }
     }
 
+    function findIndexById(id, nameId){
+        if(nameId == undefined){
+            nameId = "Id";
+        }
+        let foundIndex = -1;
+        for(let i = 0; i < gridCollectionViewContainer.gridElementsModel.GetItemsCount(); i++){
+            let id_curr = gridCollectionViewContainer.gridElementsModel.IsValidData(nameId, i) ? gridCollectionViewContainer.gridElementsModel.GetData(nameId, i) : "";
+            if(id_curr == id){
+                foundIndex = i;
+                break;
+            }
+        }
+        return foundIndex;
+    }
 
     Component {
         id: contentDialog;
