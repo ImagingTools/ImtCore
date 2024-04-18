@@ -639,8 +639,10 @@ Rectangle {
                 let secondText  = canvasPage.objectModel.GetData("SecondText", index)
                 let thirdText  = canvasPage.objectModel.GetData("ThirdText", index)
                 let backgroundColor = canvasPage.objectModel.IsValidData("BackgroundColor", index) ? canvasPage.objectModel.GetData("BackgroundColor", index) : canvas.backgroundColor;
-                let iconUrl_1  = "../../../" + Style.getIconPath(canvasPage.objectModel.GetData("IconUrl_1", index), Icon.State.On, Icon.Mode.Normal)
-                let iconUrl_2  = "../../../" + Style.getIconPath(canvasPage.objectModel.GetData("IconUrl_2", index), Icon.State.On, Icon.Mode.Normal)
+                let icon = canvasPage.objectModel.GetData("IconUrl_1", index)
+                let iconUrl_1  = icon === "" ? "" : "../../../" + Style.getIconPath(icon, Icon.State.On, Icon.Mode.Normal)
+                icon = canvasPage.objectModel.GetData("IconUrl_2", index)
+                let iconUrl_2  = icon === "" ? "" : "../../../" + Style.getIconPath(icon, Icon.State.On, Icon.Mode.Normal)
                 // for future multiselect
                 // let selected = canvasPage.objectModel.IsValidData("Selected", index) ? canvasPage.objectModel.GetData("Selected", index) : false;
                 let selected = index === canvasPage.selectedIndex
@@ -736,8 +738,12 @@ Rectangle {
                 let image2_x = image1_x - canvas.imageSize - canvas.imageMargin;
                 let image2_y = text_y - canvas.imageSize + canvas.imageMargin;
                 ctx.beginPath()
-                ctx.drawImage(iconUrl_1, image1_x, image1_y, canvas.imageSize, canvas.imageSize);
-                ctx.drawImage(iconUrl_2, image2_x, image2_y, canvas.imageSize, canvas.imageSize);
+                if (iconUrl_1 !== ""){
+                    ctx.drawImage(iconUrl_1, image1_x, image1_y, canvas.imageSize, canvas.imageSize);
+                }
+                if (iconUrl_2 !== ""){
+                    ctx.drawImage(iconUrl_2, image2_x, image2_y, canvas.imageSize, canvas.imageSize);
+                }
 
             }
 

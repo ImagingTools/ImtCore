@@ -70,15 +70,15 @@ bool CConstVarQmlCreatorProcessorComp::CreateBody(
 		QJsonObject property = properties.value(key).toObject();
 		QString normalKey = key;
 		if (normalKey.size() > 0){
-			normalKey[0] = normalKey[0].toLower();
+			normalKey[0] = normalKey[0].toUpper();
 		}
 
 		if (property.value("type") == "int"){
-			textStream << "    readonly property int " + normalKey + ": " + QString::number(property.value("value").toInt());
+			textStream << "    readonly property int i_" + normalKey + ": " + QString::number(property.value("value").toInt());
 			textStream << "\n";
 		}
 		else{
-			textStream << "readonly property string " + normalKey + ": \"" + property.value("value").toString() + "\"";
+			textStream << "readonly property string s_" + normalKey + ": \"" + property.value("value").toString() + "\"";
 			textStream << "\n";
 		}
 	}
