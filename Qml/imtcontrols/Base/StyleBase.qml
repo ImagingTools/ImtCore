@@ -24,7 +24,8 @@ StyleComponents {
     property int fontSizeExtraLarge: 64
 	property int fontSizeHuge: 32
 	property int fontSizeLarge: 24
-	property int fontSizeMedium: 12
+    property int fontSizeNormal: 18
+    property int fontSizeMedium: 12
 	property int fontSizeSmall: 8
 	property int fontSizeTiny: 4
 	property int buttonWidthExtraSmall: 4
