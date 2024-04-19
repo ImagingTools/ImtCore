@@ -38,14 +38,14 @@ Item{
         }
     }
 
-    function setVisible(visible){
-        if(!visible){
-            animMargin.from = hiddenItem.addToMargin;
+    function setVisible(visible_){
+        if(!visible_){
+            animMargin.from = drawer.mainStep;
             animMargin.to = 0;
         }
         else{
             animMargin.from = 0;
-            animMargin.to = hiddenItem.addToMargin;
+            animMargin.to = drawer.mainStep;
         }
 
         animMargin.start();
@@ -452,6 +452,7 @@ Item{
         target: hiddenItem;
         property: "addToMargin";
         duration: 200;
+
     }
 
     
