@@ -386,7 +386,7 @@ class TreeItemModel extends JSONListModel {
         this.updateTreeItemJSONModel()
     }
 
-    toJSON(){
+    ToJson(){
         let retVal = ""
         if (this.isArray || this.count > 1)
             retVal += "["
@@ -414,7 +414,7 @@ class TreeItemModel extends JSONListModel {
                             recurciveJSON(modelData[property])
                         }
                     } else if(modelData instanceof TreeItemModel){
-                        retVal += modelData.toJSON()
+                        retVal += modelData.ToJson()
                     } else if(modelData instanceof QtObject){
                         retVal += "null"
                     } else {
