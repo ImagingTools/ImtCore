@@ -368,7 +368,7 @@ class QBool extends QProperty {
     }
 }
 
-class QVisible extends QBool {
+class QLinkedBool extends QBool {
     originValue = true
 
     update(){
@@ -425,6 +425,10 @@ class QVisible extends QBool {
         this.unsubscribe()
         this.update()
     }
+}
+
+class QVisible extends QLinkedBool {
+
 }
 
 class QVisibleNot extends QVisible {
@@ -980,12 +984,12 @@ class QModelData {
                 if(target[name] instanceof QProperty){
                     if(target[name].value !== value){
                         target[name].reset(value)
-                        if(name !== 'index' && model.isUpdateEnabled && !lock) model.getProperty('data').getNotify()()
+                        if(name !== 'index' && !lock) model.$emitDataChanged()
                     }
                 } else {
                     if(target[name] !== value){
                         target[name] = value
-                        if(name !== 'index' && model.isUpdateEnabled && !lock) model.getProperty('data').getNotify()()
+                        if(name !== 'index' && !lock) model.$emitDataChanged()
                     } 
                 }
                 
@@ -1011,6 +1015,7 @@ module.exports.QString = QString
 module.exports.QVar = QVar
 module.exports.QData = QData
 module.exports.QBool = QBool
+module.exports.QLinkedBool = QLinkedBool
 module.exports.QVisible = QVisible
 module.exports.QVisibleNot = QVisibleNot
 module.exports.QFont = QFont

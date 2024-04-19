@@ -39,6 +39,10 @@ class ListModel extends QtObject {
         // console.log('DEBUG:::dataChanged', topLeft, bottomRight, roles)
     }
 
+    $emitDataChanged(topLeft, bottomRight, roles){
+        this.getStatement('data').getNotify()(topLeft, bottomRight, roles)
+    }
+
     addResource(resource){
         super.addResource(resource)
         resource.getStatement('index').reset(this.getStatement('data').get().length)
@@ -62,8 +66,7 @@ class ListModel extends QtObject {
 		}
         
         this.getStatement('count').reset(this.getStatement('data').get().length)
-        this.getStatement('data').getNotify()(this.getStatement('data').get().length-1, this.getStatement('data').get().length, 'append')
-
+        this.$emitDataChanged(this.getStatement('data').get().length-1, this.getStatement('data').get().length, 'append')
     }
     clear(){
         let leftTop = 0
@@ -95,7 +98,7 @@ class ListModel extends QtObject {
         }
         
         this.getStatement('count').reset(this.getStatement('data').get().length)
-        this.getStatement('data').getNotify()(index, index+1, 'insert')
+        this.$emitDataChanged(index, index+1, 'insert')
     }
     set(index, dict){
         this.getStatement('data').get()[index] = dict
@@ -118,7 +121,7 @@ class ListModel extends QtObject {
         //     this.$deps[key].$remove(index, count)
         // }
         // this.dataChanged(index, index+count)
-        this.getStatement('data').getNotify()(index, index+count, 'remove')
+        this.$emitDataChanged(index, index+count, 'remove')
     }
     setProperty(index, property, value){
         this.getStatement('data').get()[index][property] = value

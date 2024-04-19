@@ -1,5 +1,5 @@
 const { JSONListModel } = require('./JSONListModel')
-const { QString, QBool, QVar, QModelData, QProperty } = require('../utils/properties')
+const { QString, QBool, QVar, QModelData, QProperty, QLinkedBool } = require('../utils/properties')
 
 class TreeItemModel extends JSONListModel {
     static defaultProperties = {
@@ -7,7 +7,7 @@ class TreeItemModel extends JSONListModel {
         queryParams: { type: QVar, value: undefined },
         baseUrl: { type: QString, value: '' },
         isArray: { type: QBool, value: false },
-        isUpdateEnabled: { type: QBool, value: true },
+        isUpdateEnabled: { type: QLinkedBool, value: true },
     }
 
     static defaultSignals = {
@@ -18,8 +18,12 @@ class TreeItemModel extends JSONListModel {
         super(parent,exCtx,exModel)
     }
 
+    $emitDataChanged(topLeft, bottomRight, roles){
+        if(this.getPropertyValue('isUpdateEnabled')) super.$emitDataChanged(topLeft, bottomRight, roles)
+    }
+
     SetUpdateEnabled(flag){
-        this.isUpdateEnabled = flag
+        this.getProperty('isUpdateEnabled').reset(flag)
     }
 
     GetItemsCount(){
@@ -50,8 +54,8 @@ class TreeItemModel extends JSONListModel {
                 modelObject[key] = retModel
             }
 
-            retModel.isUpdateEnabled = this.isUpdateEnabled
-            retModel.getProperty('isUpdateEnabled').subscribe(this.getProperty('isUpdateEnabled'))
+            retModel.getProperty('isUpdateEnabled').setOriginCompute(()=>{retModel.getProperty('isUpdateEnabled').subscribe(this.getProperty('isUpdateEnabled')); return this.getProperty('isUpdateEnabled').get()})
+            retModel.getProperty('isUpdateEnabled').update()
 
             if(Object.keys(retVal).length) retModel.append(retVal)
 
@@ -86,7 +90,7 @@ class TreeItemModel extends JSONListModel {
                 modelObject[key] = value
             }
 
-            if (this.isUpdateEnabled){
+            if (this.getPropertyValue('isUpdateEnabled')){
                 let signal = this.getProperty('data').getNotify()
                 if(signal) signal(row, row+1)
             }
@@ -106,7 +110,7 @@ class TreeItemModel extends JSONListModel {
             delete modelObject[key]
         }
 
-        if (this.isUpdateEnabled){
+        if (this.getPropertyValue('isUpdateEnabled')){
             let signal = this.getSignal('modelChanged')
             if(signal) signal()
         }
@@ -149,7 +153,7 @@ class TreeItemModel extends JSONListModel {
             }
         }
 
-        if (this.isUpdateEnabled){
+        if (this.getPropertyValue('isUpdateEnabled')){
             let signal = this.getProperty('data').getNotify()
             if(signal) signal()
         }
@@ -360,7 +364,7 @@ class TreeItemModel extends JSONListModel {
     RemoveItem(index){
         this.remove(index)
 
-        if (this.isUpdateEnabled){
+        if (this.getPropertyValue('isUpdateEnabled')){
             this.modelChanged()
         }
     }
@@ -452,8 +456,8 @@ class TreeItemModel extends JSONListModel {
                         modelObject[keys[index]] = retModel
                     }
 
-                    retModel.isUpdateEnabled = this.isUpdateEnabled
-                    retModel.getProperty('isUpdateEnabled').subscribe(this.getProperty('isUpdateEnabled'))
+                    retModel.getProperty('isUpdateEnabled').setOriginCompute(()=>{retModel.getProperty('isUpdateEnabled').subscribe(this.getProperty('isUpdateEnabled')); return this.getProperty('isUpdateEnabled').get()})
+                    retModel.getProperty('isUpdateEnabled').update()
 
                     if(Object.keys(retVal).length) retModel.append(retVal)
                     retVal = retModel
