@@ -60,5 +60,16 @@ Item{
         }
     }//list
 
+    CustomScrollbar{
+        id: scroll;
+
+        anchors.right: list.right;
+        anchors.bottom: list.bottom;
+
+        targetItem: list;
+        secondSize: 16;
+        //indicatorColor: Style.color_gray;
+        z: 20;
+    }
 }
 

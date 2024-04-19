@@ -22,10 +22,12 @@ Item {
     property int spacing: 0;
     property int selectedIndex: -1;
     property alias rowAlias: row;
+    property int rowCount: 0;
 
     onReadyChanged: {
         console.log("SegmentedButton children.length:: ", children.length)
         let count  = children.length
+        rowCount = count
         let list = []
         for (let index = 1; index < count; index++){
             list.push(children[index])
