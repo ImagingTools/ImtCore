@@ -212,7 +212,7 @@ void CTreeItemModel::InsertNewItemWithParameters(int index, const QVariantMap &m
 
 int CTreeItemModel::InsertNewItem()
 {
-	int index = m_items.count() - 1;
+	int index = m_items.count();
 
 	beginInsertRows(QModelIndex(), index, index);
 
