@@ -28,12 +28,15 @@ FocusScope {
     }
 
     function decoratorChangedFuncBase(){
+        if(decorator_){
+            decorator_.destroy();
+            decorator_ = null;
+        }
+
         if(decorator == null || decorator == undefined){
             return;
         }
-        if(decorator_){
-            decorator_.destroy();
-        }
+
         decorator_ = decorator.createObject(controlBase);
         decorator_.baseElement = controlBase;
     }
