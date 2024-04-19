@@ -97,10 +97,10 @@ Item {
 
                 container.setDecorator(index)
 
-                if (checkable){
+                if (container.checkable){
                     children[index].checkable = true
                 }
-                if (isExclusive){
+                if (container.isExclusive){
                     var helper = container.createObjectHelper(index)
                     children[index].clicked.connect(helper.onClicked)
                 }
