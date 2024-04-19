@@ -1248,35 +1248,6 @@ function treeCompile(compiledFile, currentInstructions, updatePrimaryList = [], 
     while(_properties.length){
         let property = _properties.shift()
 
-        if(AF){
-            if(property.name === 'x') continue
-            if(property.name === 'y') continue
-            if(property.name === 'width') continue
-            if(property.name === 'height') continue
-        }
-        if(AC){
-            if(property.name === 'x') continue
-            if(property.name === 'y') continue
-        }
-        if(AL || AR){
-            if(property.name === 'x') continue
-            if(AL && AR){
-                if(property.name === 'width') continue
-            }
-        }
-        if(AT || AB){
-            if(property.name === 'y') continue
-            if(AT && AB){
-                if(property.name === 'height') continue
-            }
-        }
-        if(AH){
-            if(property.name === 'x') continue
-        }
-        if(AV){
-            if(property.name === 'y') continue
-        }
-
         let pathName = property.name.split('.')
 
         if(pathName[0] === 'anchors' || pathName[0] === 'font') continue
