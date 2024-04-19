@@ -220,7 +220,7 @@ Item {
             Component.onCompleted: {
                 modelFilterObj.SetUpdateEnabled(true)
                 modelFilterObj.AddTreeModel("FilterIds");
-                console.log("modelFilterObj onCompleted", modelFilterObj.toJSON())
+                console.log("modelFilterObj onCompleted", modelFilterObj.ToJson())
             }
         }
 

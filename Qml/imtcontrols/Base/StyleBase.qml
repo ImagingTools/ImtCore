@@ -376,7 +376,7 @@ StyleComponents {
     }
 
     function parseStyleTheme(themeType){
-        console.log("parseStyleTheme", themeType.toJSON());
+        console.log("parseStyleTheme", themeType.ToJson());
 
         if (themeType.ContainsKey("source")){
             let dataSource = themeType.GetData("source");

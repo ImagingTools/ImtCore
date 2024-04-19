@@ -133,7 +133,7 @@ Item {
             viewParams.InsertField("Offset", container.offset);
             viewParams.InsertField("Count", container.count);
 
-            var jsonString = container.filterModel.toJSON();
+            var jsonString = container.filterModel.ToJson();
             viewParams.InsertField("FilterModel", jsonString);
             console.log( "gqlModelBaseContainer filterModel", jsonString);
 
@@ -160,7 +160,7 @@ Item {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, container.itemsInfoModel.toJSON());
+            console.log("State:", this.state, container.itemsInfoModel.ToJson());
             if (this.state === "Ready"){
                 var dataModelLocal;
                 if (container.itemsInfoModel.ContainsKey("errors")){

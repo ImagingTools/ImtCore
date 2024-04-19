@@ -43,7 +43,7 @@ QtObject {
         onStateChanged: {
             console.log("State:", this.state);
             if (this.state === "Ready"){
-                console.log("superuserExists", this.toJSON());
+                console.log("superuserExists", this.ToJson());
 
                 var dataModelLocal;
 

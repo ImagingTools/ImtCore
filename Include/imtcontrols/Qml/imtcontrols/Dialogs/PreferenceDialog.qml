@@ -66,7 +66,7 @@ Rectangle {
     }
 
     onLocalSettingsChanged: {
-        console.log("PreferenceDialog onLocalSettingsChanged", preferenceContainer.localSettings.toJSON());
+        console.log("PreferenceDialog onLocalSettingsChanged", preferenceContainer.localSettings.ToJson());
         if (preferenceContainer.localSettings){
             for (var i = 0; i < preferenceContainer.localSettings.GetItemsCount(); i++){
                 var index = globalSettings.InsertNewItem();
@@ -509,7 +509,7 @@ Rectangle {
                    Style.changeSchemeDesign(preferenceContainer.currentModeId);
                }
 
-               console.log("preferenceContainer.serverSettings", preferenceContainer.serverSettings.toJSON());
+               console.log("preferenceContainer.serverSettings", preferenceContainer.serverSettings.ToJson());
 
                preferenceSaveQuery.save();
            }
@@ -630,10 +630,10 @@ Rectangle {
                return;
            }
            var query = Gql.GqlRequest("mutation", "SaveSettings");
-//           console.log("preferenceContainer.serverSettings", preferenceContainer.serverSettings.toJSON())
+//           console.log("preferenceContainer.serverSettings", preferenceContainer.serverSettings.ToJson())
 
            var inputParams = Gql.GqlObject("input");
-           var jsonString = preferenceContainer.serverSettings.toJSON();
+           var jsonString = preferenceContainer.serverSettings.ToJson();
            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
 
            inputParams.InsertField ("Item", jsonString);

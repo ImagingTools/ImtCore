@@ -14,7 +14,7 @@ CollectionDataProvider {
     sortByField: "Name";
 
     onCollectionModelChanged: {
-        console.log("CachedGroupCollection onCollectionModelChanged", collectionModel.toJSON());
+        console.log("CachedGroupCollection onCollectionModelChanged", collectionModel.ToJson());
     }
 }
 

@@ -123,7 +123,7 @@ imtrest::ConstResponsePtr CWebSocketServletComp::ProcessGqlRequest(const imtrest
 			return imtrest::ConstResponsePtr();
 		}
 
-		QString responseData = responseDataModel->toJSON();
+		QString responseData = responseDataModel->ToJson();
 //		responseData.replace('\\', "\\\\");
 //		responseData.replace('\"', "\\\"");
 //		responseData.replace('\n', "\\n");

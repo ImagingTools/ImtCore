@@ -12,13 +12,13 @@ QtObject {
     signal updated();
 
     onClientApplicationInfoChanged: {
-        console.log("onClientApplicationInfoChanged", clientApplicationInfo.toJSON());
+        console.log("onClientApplicationInfoChanged", clientApplicationInfo.ToJson());
 
         root.updated();
     }
 
     onServerApplicationInfoChanged: {
-        console.log("onServerApplicationInfoChanged", serverApplicationInfo.toJSON());
+        console.log("onServerApplicationInfoChanged", serverApplicationInfo.ToJson());
 
         root.updated();
     }

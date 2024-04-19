@@ -49,9 +49,9 @@ int CDesignTokenIconQmlGeneratorComp::Exec()
 	out.setCodec("UTF-8");
 #endif
 
-	out << "pragma Singleton" << QT_ENDL;
-	out << "import QtQuick 2.0" << QT_ENDL;
-	out << "Item {" << QT_ENDL;
+	out << "pragma Singleton" << "\n";
+	out << "import QtQuick 2.0" << "\n";
+	out << "Item {" << "\n";
 
 
 	for (const QByteArray& dir: ::std::as_const(argumentsDirs)){
@@ -62,7 +62,7 @@ int CDesignTokenIconQmlGeneratorComp::Exec()
 				for (const QString& typesActive: ::std::as_const(typesOfActive)){
 					for (const QString& typesState: ::std::as_const(typesOfState)){
 						QString propertyName = "icon_" + fileInfo.baseName() + '_' + typesActive + '_' + typesState;
-						out << "property string " + propertyName + ";" << QT_ENDL;
+						out << "property string " + propertyName + ";" << "\n";
 					}
 				}
 				properties.append(fileInfo.baseName());
@@ -77,8 +77,8 @@ int CDesignTokenIconQmlGeneratorComp::Exec()
 		}
 		out << "\""  << properties[i] << "\"";
 	}
-	out << "];" << QT_ENDL;
-	out << "}" << QT_ENDL;
+	out << "];" << "\n";
+	out << "}" << "\n";
 	outputFile.close();
 	return 0;
 }

@@ -13,7 +13,7 @@ Item {
     property string currentOrder: "ASC";
 
     function headerClicked(headerId){
-        console.log("headerClicked", headerId, sortModel.toJSON());
+        console.log("headerClicked", headerId, sortModel.ToJson());
 
         container.setHeaderSort(currentHeaderId, currentOrder);
         container.commands.updateItemsModel();

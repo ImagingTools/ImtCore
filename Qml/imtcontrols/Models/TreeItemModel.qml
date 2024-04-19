@@ -402,7 +402,7 @@ JSONListModel {
         this.updateTreeItemJSONModel()
     }
 
-    function toJSON(){
+    function ToJson(){
         var retVal = ""
         if (this.isArray || this.count > 1)
             retVal += "["
@@ -430,7 +430,7 @@ JSONListModel {
                             recurciveJSON(modelData[property])
                         }
                     } else if(modelData.constructor.name.indexOf('TreeItemModel') >= 0){
-                        retVal += modelData.toJSON()
+                        retVal += modelData.ToJson()
                     } else if(modelData instanceof QtObject){
                         retVal += "null"
                     } else {

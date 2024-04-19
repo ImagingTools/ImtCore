@@ -42,7 +42,7 @@ Item {
         id: pagesProvider;
 
         onPagesModelChanged: {
-            console.log("pagesProvider onPagesModelChanged", pagesProvider.pagesModel.toJSON());
+            console.log("pagesProvider onPagesModelChanged", pagesProvider.pagesModel.ToJson());
             let updateRepeaterModel = true;
 
             if (pagesData.model){

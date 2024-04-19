@@ -294,7 +294,7 @@ Item {
             console.log("openPopupMenu", x, y);
             if (container.commandsDelegate){
                 let contextMenuModel = container.commandsDelegate.getContextMenuModel();
-                console.log("contextMenuModel", contextMenuModel.toJSON());
+                console.log("contextMenuModel", contextMenuModel.ToJson());
 
                 let offset = 26 * contextMenuModel.GetItemsCount();
                 modalDialogManager.openDialog(popupMenuDialog, {"x": x, "y": y - offset, "model": contextMenuModel});

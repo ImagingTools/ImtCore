@@ -19,7 +19,7 @@ bool CRemoteDatabaseServerConnectionComp::CheckDatabaseConnection(QString& error
 	imtbase::CTreeItemModel responseModel;
 	bool retVal = SendModelRequest(request, responseModel);
 	if (retVal){
-		QString json = responseModel.toJSON();
+		QString json = responseModel.ToJson();
 		if (responseModel.ContainsKey("errors")){
 			imtbase::CTreeItemModel* errorsModelPtr = responseModel.GetTreeItemModel("errors");
 			if (errorsModelPtr != nullptr){

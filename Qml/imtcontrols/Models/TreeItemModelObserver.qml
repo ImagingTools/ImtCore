@@ -24,8 +24,8 @@ QtObject {
 
     function observedModelDataChanged(){
 //        console.log("observedModelDataChanged");
-//        console.log("container.private_.beginModel", container.private_.beginModel.toJSON());
-//        console.log("container.observedModel", container.observedModel.toJSON());
+//        console.log("container.private_.beginModel", container.private_.beginModel.ToJson());
+//        console.log("container.observedModel", container.observedModel.ToJson());
 
 //        if (container.private_.block){
 //            return;

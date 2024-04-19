@@ -139,7 +139,7 @@ QtObject {
     }
 
     onLocalModelChanged: {
-        console.log("SettingsProvider onLocalModelChanged", container.localModel.toJSON());
+        console.log("SettingsProvider onLocalModelChanged", container.localModel.ToJson());
 
         if (container.localModel){
             container.localModel.dataChanged.connect(container.onLocalModelDataChanged);
@@ -147,7 +147,7 @@ QtObject {
     }
 
     function onLocalModelDataChanged(){
-        console.log("onLocalModelDataChanged", container.localModel.toJSON());
+        console.log("onLocalModelDataChanged", container.localModel.ToJson());
     }
 
     function clearModel(){
@@ -319,7 +319,7 @@ QtObject {
     function getValue(parameterId){
         console.log("getValue", parameterId);
         let settingsModel = getRepresentationModel();
-        console.log("settingsModel", settingsModel.toJSON());
+        console.log("settingsModel", settingsModel.ToJson());
 
         return findValue(settingsModel, parameterId);
     }
@@ -373,7 +373,7 @@ QtObject {
                     if (dataModelLocal.ContainsKey("GetSettings")){
                         dataModelLocal = dataModelLocal.GetData("GetSettings");
 
-                        console.log("GetSettings", dataModelLocal.toJSON());
+                        console.log("GetSettings", dataModelLocal.ToJson());
 
                         container.serverModel = dataModelLocal;
                     }
@@ -389,7 +389,7 @@ QtObject {
             var query = Gql.GqlRequest("mutation", "SetSettings");
 
             var inputParams = Gql.GqlObject("input");
-            var jsonString = container.serverModel.toJSON();
+            var jsonString = container.serverModel.ToJson();
 
             inputParams.InsertField("Item", jsonString);
             query.AddParam(inputParams);

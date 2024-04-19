@@ -138,7 +138,7 @@ bool CGqlSubscriberControllerCompBase::SetSubscriptions()
 			return false;
 		}
 
-		QByteArray data =  dataModelPtr->toJSON().toUtf8();
+		QByteArray data =  dataModelPtr->ToJson().toUtf8();
 
 		for (const QByteArray& id: requestNetworks.networkRequests.keys()){
 			const imtrest::IRequest* networkRequestPtr = requestNetworks.networkRequests[id];

@@ -47,7 +47,7 @@ QtObject {
                         dataModelLocal = dataModelLocal.GetData("PagesData");
 
                         console.log("dataModelLocal1", dataModelLocal)
-                        console.log("dataModelLocal2", dataModelLocal.toJSON())
+                        console.log("dataModelLocal2", dataModelLocal.ToJson())
 
                         pagesProvider.pagesModel = dataModelLocal;
                     }

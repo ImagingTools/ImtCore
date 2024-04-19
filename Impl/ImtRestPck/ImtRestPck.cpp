@@ -65,11 +65,6 @@ I_EXPORT_COMPONENT(
 		"FileProvider - based HTTP servlet");
 
 I_EXPORT_COMPONENT(
-		JsonModelBasedServlet,
-		"Generates Json model for QML??",
-		"JSON Model");
-
-I_EXPORT_COMPONENT(
 		HttpClientRequestFactory,
 		"The factory for creting http client requests for 'HttpClientRequestManager'",
 		"REST HTTP Client Request Factory");
@@ -85,9 +80,9 @@ I_EXPORT_COMPONENT(
 		"Server Log Provider");
 
 I_EXPORT_COMPONENT(
-    TcpProtocolEngine,
-    "General TCP protocol engine",
-    "Tcp Connection Server");
+			TcpProtocolEngine,
+			"General TCP protocol engine",
+			"Tcp Connection Server");
 
 
 } // namespace ImtRestPck

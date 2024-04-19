@@ -14,7 +14,7 @@ Item{
     property int orientation: Qt.Vertical;
 
     onModelChanged: {
-        //console.log("INPUT_MODEL:: ", model.toJSON())
+        //console.log("INPUT_MODEL:: ", model.ToJson())
     }
 
     ListView{

@@ -152,7 +152,7 @@ QtObject {
             viewParams.InsertField("FilterModel");
 
             let filterModel = gqlModelBaseContainer.rootItem.modelFilter;
-            var jsonString = filterModel.toJSON();
+            var jsonString = filterModel.ToJson();
             viewParams.InsertField("FilterModel", jsonString);
 
             var inputParams = Gql.GqlObject("input");

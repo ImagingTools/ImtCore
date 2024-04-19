@@ -170,7 +170,7 @@ bool CSimpleLoginWrapComp::RetrieveUserInfo(const QByteArray& userObjectId)
 			return false;
 		}
 
-		QByteArray userJson = userDataModelPtr->toJSON().toUtf8();
+		QByteArray userJson = userDataModelPtr->ToJson().toUtf8();
 		iser::CJsonMemReadArchive archive(userJson);
 		if (!m_userInfoPtr->Serialize(archive)){
 			return false;

@@ -11,7 +11,6 @@
 
 // ACF includes
 #include <iser/ISerializable.h>
-#include <istd/TChangeDelegator.h>
 #include <istd/TSmartPtr.h>
 
 
@@ -20,15 +19,14 @@ namespace imtbase
 
 
 /**
-	Universal data controller for UI representations
+	Hierarchical representation of the data model.
 */
-class CTreeItemModel: public QAbstractListModel, public istd::CChangeDelegator, public iser::ISerializable
+class CTreeItemModel: public QAbstractListModel
 {
 	Q_OBJECT
 	Q_PROPERTY(QString state READ State WRITE SetState NOTIFY stateChanged)
 
 public:
-	typedef istd::CChangeDelegator BaseClass;
 	typedef QAbstractListModel BaseClass2;
 
 	explicit CTreeItemModel(QObject* parent = nullptr);
@@ -37,32 +35,24 @@ public:
 	const QString &State() const;
 	void SetState(const QString &newState);
 
-	// reimplemented (iser::ISerializable)
-	virtual bool Serialize(iser::IArchive &archive) override;
-	virtual bool JsonSerialize(iser::IArchive &archive);
-
-	// reimplemented (istd::IChangeable)
-	virtual int GetSupportedOperations() const override;
-	virtual bool CopyFrom(const IChangeable& object, CompatibilityMode mode = CM_WITHOUT_REFS) override;
-	virtual bool IsEqual(const IChangeable& object) const override;
-	virtual istd::IChangeable* CloneMe(CompatibilityMode mode = CM_WITHOUT_REFS) const override;
+	virtual bool SerializeModel(iser::IArchive& archive);
 
 public Q_SLOTS:
 	void SetParent(QObject *parent);
-	bool Copy(CTreeItemModel* object);
+	bool Copy(const CTreeItemModel* object);
 	imtbase::CTreeItemModel* CopyMe() const;
 	bool IsEqualWithModel(CTreeItemModel* modelPtr) const;
 	void InsertNewItemWithParameters(int index, const QVariantMap& map);
 	int InsertNewItem();
 	int InsertNewItem(int index);
-	int RemoveItem(int index, const ChangeInfoMap& infoMap = ChangeInfoMap());
+	int RemoveItem(int index);
 	imtbase::CTreeItemModel* AddTreeModel(const QByteArray &key, int index = 0);
 	bool SetExternTreeModel(const QByteArray &key, CTreeItemModel *externTreeModel, int index = 0);
 	bool CopyItemDataFromModel(int index, const CTreeItemModel *externTreeModel, int externIndex = 0);
 	bool CopyItemDataFromModel(int index, CTreeItemModel *externTreeModel, int externIndex = 0);
 	bool CopyItemDataToModel(int index, CTreeItemModel *externTreeModel, int externIndex = 0) const;
-	bool SetData(const QByteArray &key, const QVariant &value, int index = 0, const ChangeInfoMap& infoMap = ChangeInfoMap());
-	bool RemoveData(const QByteArray &key, int index = 0, const ChangeInfoMap& infoMap = ChangeInfoMap());
+	bool SetData(const QByteArray &key, const QVariant &value, int index = 0);
+	bool RemoveData(const QByteArray &key, int index = 0);
 	QVariant GetData(const QByteArray &key, int index = 0) const;
 	imtbase::CTreeItemModel* GetParent() const;
 	bool IsTreeModel(const QByteArray &key, int index = 0) const;
@@ -88,7 +78,7 @@ public Q_SLOTS:
 
 	void Refresh();
 
-	QString toJSON();
+	QString ToJson();
 
 	// reimplemented (QAbstractListModel)
 	virtual int rowCount(const QModelIndex & parent = QModelIndex()) const override;
@@ -99,6 +89,9 @@ public Q_SLOTS:
 Q_SIGNALS:
 	void stateChanged(const QString& state);
 	void needsReload();
+	
+protected:
+	bool SerializeRecursive(iser::IArchive& archive, const QByteArray& tagName);
 
 private:
 	class Item
@@ -140,7 +133,6 @@ private:
 	bool m_isTransaction;
 
 protected:
-	virtual bool SerializeRecursive(iser::IArchive& archive, const QByteArray &tagName);
 	virtual int GetKeyRole(const QByteArray& key) const;
 	virtual bool ParseRecursive(const QJsonObject &jsonObject, int index = 0);
 };

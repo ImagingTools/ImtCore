@@ -58,7 +58,7 @@ const imtauth::IRole* CRemoteRoleInfoProviderComp::GetRole(const QByteArray& obj
 			return nullptr;
 		}
 
-		QByteArray roleJson = roleDataModelPtr->toJSON().toUtf8();
+		QByteArray roleJson = roleDataModelPtr->ToJson().toUtf8();
 
 		istd::TDelPtr<imtauth::IRole> roleInfoPtr;
 		roleInfoPtr.SetPtr(m_roleInfoFactCompPtr.CreateInstance());

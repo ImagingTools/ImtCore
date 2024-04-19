@@ -65,7 +65,7 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 	if (userSessionModelPtr->ContainsKey("data")){
 		imtbase::CTreeItemModel* dataModelPtr = userSessionModelPtr->GetTreeItemModel("data");
 		if (dataModelPtr != nullptr){
-			QByteArray sessionJson = dataModelPtr->toJSON().toUtf8();
+			QByteArray sessionJson = dataModelPtr->ToJson().toUtf8();
 
 			istd::TDelPtr<imtauth::ISession> sessionInstancePtr = m_sessionInfoFactCompPtr.CreateInstance();
 			if (!sessionInstancePtr.IsValid()){
@@ -106,7 +106,7 @@ imtgql::IGqlContext* CRemoteGqlContextControllerComp::GetRequestContext(
 			return nullptr;
 		}
 
-		QByteArray userJson = dataModelPtr->toJSON().toUtf8();
+		QByteArray userJson = dataModelPtr->ToJson().toUtf8();
 
 		istd::TDelPtr<imtauth::IUserInfo> userInstancePtr = m_userInfoFactCompPtr.CreateInstance();
 		if (!userInstancePtr.IsValid()){

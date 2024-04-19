@@ -64,7 +64,7 @@ Rectangle {
         if (visible){
             //console.log("settingsProvider.localModel", settingsProvider.localModel);
             if (container.settingsProvider && container.settingsProvider.localModel){
-                let localModelJson = container.settingsProvider.localModel.toJSON();
+                let localModelJson = container.settingsProvider.localModel.ToJson();
 
                 console.log("localModelJson", localModelJson);
                 container.localModel.CreateFromJson(localModelJson);
@@ -76,7 +76,7 @@ Rectangle {
 
            // console.log("settingsProvider.serverModel", container.settingsProvider.serverModel);
             if (container.settingsProvider && container.settingsProvider.serverModel){
-                let serverModelJson = container.settingsProvider.serverModel.toJSON();
+                let serverModelJson = container.settingsProvider.serverModel.ToJson();
                 container.serverModel.CreateFromJson(serverModelJson);
 
 //                updateCommonModel(serverModel);

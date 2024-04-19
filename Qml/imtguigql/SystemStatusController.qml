@@ -182,7 +182,7 @@ QtObject {
 
         onStateChanged: {
             if (this.state === "Ready") {
-                console.log("serverStatusGqlModel Ready", this.toJSON());
+                console.log("serverStatusGqlModel Ready", this.ToJson());
 
                 var dataModelLocal;
 
@@ -214,7 +214,7 @@ QtObject {
 
         onStateChanged: {
             if (this.state === "Ready") {
-                console.log("databaseStatusGqlModel Ready", this.toJSON());
+                console.log("databaseStatusGqlModel Ready", this.ToJson());
 
                 var dataModelLocal;
 

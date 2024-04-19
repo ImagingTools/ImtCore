@@ -14,15 +14,10 @@ namespace imtbase
 
 CTreeItemModel::CTreeItemModel(QObject *parent)
 	:QAbstractListModel(parent),
-	  m_isArray(false),
-	  m_isUpdateEnabled(true)
+	m_isArray(false),
+	m_isUpdateEnabled(true)
 {
-	imtbase::CTreeItemModel* parentModel = dynamic_cast<imtbase::CTreeItemModel*>(parent);
-	if (parentModel != nullptr){
-		SetSlavePtr(parentModel);
-	}
-
-	connect(this, SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)), this, SLOT(OnDataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)));
+	connect(this, &QAbstractListModel::dataChanged, this, &CTreeItemModel::OnDataChanged);
 }
 
 
@@ -56,27 +51,77 @@ void CTreeItemModel::SetParent(QObject* parent)
 }
 
 
-bool CTreeItemModel::Copy(CTreeItemModel* object)
+bool CTreeItemModel::Copy(const CTreeItemModel* object)
 {
 	if (object == nullptr){
 		return false;
 	}
 
-	bool result = CopyFrom(*object);
+	beginResetModel();
 
-	if (m_isUpdateEnabled){
-		emit dataChanged(QModelIndex(), QModelIndex());
+	qDeleteAll(m_items);
+
+	m_items.clear();
+
+	for (int i = 0; i < object->m_items.count(); i++) {
+		Item* item = new Item();
+		Item* sourceItem = object->m_items[i];
+
+		QList<QByteArray> keys;
+		sourceItem->GetKeys(keys);
+
+		for (const QByteArray& key : keys) {
+			QVariant value = sourceItem->Value(key);
+
+			CTreeItemModel* treeItemModelPtr = nullptr;
+			if (value.isValid()) {
+				treeItemModelPtr = value.value<CTreeItemModel*>();
+			}
+
+			if (treeItemModelPtr != nullptr) {
+				CTreeItemModel* subModelPtr = new CTreeItemModel();
+				
+				if (!subModelPtr->Copy(treeItemModelPtr)){
+					endResetModel();
+
+					return false;
+				}
+
+				subModelPtr->setParent(this);
+
+				item->SetValue(key, QVariant::fromValue(subModelPtr));
+			}
+			else {
+				item->SetValue(key, value);
+			}
+		}
+
+		m_items.append(item);
 	}
 
-	return result;
+	m_roleNames = object->m_roleNames;
+	m_queryParams = object->m_queryParams;
+	m_isArray = object->m_isArray;
+	m_state = object->m_state;
+
+	endResetModel();
+
+	if (m_isUpdateEnabled){
+		Q_EMIT dataChanged(QModelIndex(), QModelIndex());
+	}
+
+	return true;
 }
 
 
 imtbase::CTreeItemModel* CTreeItemModel::CopyMe() const
 {
 	istd::TDelPtr<CTreeItemModel> resultModelPtr = new CTreeItemModel();
-	resultModelPtr->CopyFrom(*this);
-	return resultModelPtr.PopPtr();
+	if (resultModelPtr->Copy(this)){
+		return resultModelPtr.PopPtr();
+	}
+
+	return nullptr;
 }
 
 
@@ -86,7 +131,51 @@ bool CTreeItemModel::IsEqualWithModel(CTreeItemModel* modelPtr) const
 		return false;
 	}
 
-	return IsEqual(*modelPtr);
+	if (m_items.size() != modelPtr->m_items.size()) {
+		return false;
+	}
+
+	for (int i = 0; i < modelPtr->m_items.count(); i++) {
+		Item* item = m_items[i];
+		Item* sourceItem = modelPtr->m_items[i];
+
+		QList<QByteArray> itemKeys;
+		item->GetKeys(itemKeys);
+
+		QList<QByteArray> keys;
+		sourceItem->GetKeys(keys);
+
+		if (itemKeys.size() != keys.size()) {
+			return false;
+		}
+
+		for (const QByteArray& key : keys) {
+			if (!itemKeys.contains(key)) {
+				return false;
+			}
+
+			QVariant sourceValue = sourceItem->Value(key);
+			QVariant itemValue = item->Value(key);
+
+			CTreeItemModel* sourceTreeItemModelPtr = sourceValue.value<CTreeItemModel*>();
+			if (sourceTreeItemModelPtr != nullptr) {
+				CTreeItemModel* treeItemModelPtr = itemValue.value<CTreeItemModel*>();
+				if (treeItemModelPtr == nullptr) {
+					return false;
+				}
+
+				bool result = sourceTreeItemModelPtr->IsEqualWithModel(treeItemModelPtr);
+				if (!result) {
+					return false;
+				}
+			}
+			else if (sourceValue != itemValue) {
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
 
 
@@ -116,26 +205,27 @@ void CTreeItemModel::InsertNewItemWithParameters(int index, const QVariantMap &m
 	endInsertRows();
 
 	if (m_isUpdateEnabled){
-		emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
+		Q_EMIT dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
 	}
 }
 
 
 int CTreeItemModel::InsertNewItem()
 {
+	int index = m_items.count() - 1;
+
+	beginInsertRows(QModelIndex(), index, index);
+
 	m_items.append(new Item());
 
 	if(m_items.count() > 1){
 		m_isArray = true;
 	}
 
-	int index = m_items.count() - 1;
-
-	beginInsertRows(QModelIndex(), index, index);
 	endInsertRows();
 
 	if (m_isUpdateEnabled){
-		emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
+		Q_EMIT dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
 	}
 
 	return index;
@@ -159,14 +249,14 @@ int CTreeItemModel::InsertNewItem(int index)
 	endInsertRows();
 
 	if (m_isUpdateEnabled){
-		emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
+		Q_EMIT dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
 	}
 
 	return index;
 }
 
 
-int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap& /*infoMap*/)
+int CTreeItemModel::RemoveItem(int index)
 {
 	if (index < 0 || index > m_items.count() - 1){
 		return false;
@@ -185,7 +275,7 @@ int CTreeItemModel::RemoveItem(int index, const ChangeInfoMap& /*infoMap*/)
 	}
 
 	if (m_isUpdateEnabled){
-		emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
+		Q_EMIT dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
 	}
 
 	return true;
@@ -230,7 +320,6 @@ bool CTreeItemModel::SetExternTreeModel(const QByteArray &key, CTreeItemModel *e
 
 	if (externTreeModel != nullptr){
 		externTreeModel->setParent(this);
-		externTreeModel->SetSlavePtr(this);
 	}
 
 	QVariant v = QVariant::fromValue(externTreeModel);
@@ -243,6 +332,7 @@ bool CTreeItemModel::SetExternTreeModel(const QByteArray &key, CTreeItemModel *e
 bool CTreeItemModel::CopyItemDataFromModel(int index, CTreeItemModel *externTreeModel, int externIndex)
 {
 	const CTreeItemModel* constExternTreeModel = externTreeModel;
+
 	return CopyItemDataFromModel(index, constExternTreeModel, externIndex);
 }
 
@@ -266,7 +356,7 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, const CTreeItemModel *exte
 		if (treeItemModelPtr != nullptr){
 			CTreeItemModel* childModelPtr = AddTreeModel(key, index);
 
-			retVal = retVal && childModelPtr->CopyFrom(*treeItemModelPtr);
+			retVal = retVal && childModelPtr->Copy(treeItemModelPtr);
 		}
 		else{
 			retVal = retVal && SetData(key, value, index);
@@ -278,7 +368,7 @@ bool CTreeItemModel::CopyItemDataFromModel(int index, const CTreeItemModel *exte
 	}
 
 	if (m_isUpdateEnabled){
-		emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
+		Q_EMIT dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index));
 	}
 
 	return retVal;
@@ -304,7 +394,10 @@ bool CTreeItemModel::CopyItemDataToModel(int index, CTreeItemModel *externTreeMo
 }
 
 
-bool CTreeItemModel::SetData(const QByteArray& key, const QVariant& value, int index, const istd::IChangeable::ChangeInfoMap& /*infoMap*/)
+bool CTreeItemModel::SetData(
+			const QByteArray& key,
+			const QVariant& value,
+			int index)
 {
 	if (m_items.isEmpty() && index == 0){
 		InsertNewItem();
@@ -333,7 +426,7 @@ bool CTreeItemModel::SetData(const QByteArray& key, const QVariant& value, int i
 		keyRoles.append(keyRole);
 
 		if (m_isUpdateEnabled){
-			emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index), keyRoles);
+			Q_EMIT dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index), keyRoles);
 		}
 	}
 
@@ -341,7 +434,7 @@ bool CTreeItemModel::SetData(const QByteArray& key, const QVariant& value, int i
 }
 
 
-bool CTreeItemModel::RemoveData(const QByteArray& key, int index, const ChangeInfoMap& /*infoMap*/)
+bool CTreeItemModel::RemoveData(const QByteArray& key, int index)
 {
 	if (index < 0 || index > m_items.count() - 1){
 		return false;
@@ -357,10 +450,10 @@ bool CTreeItemModel::RemoveData(const QByteArray& key, int index, const ChangeIn
 		roles.append(keyRole);
 
 		if (m_isUpdateEnabled){
-			emit dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index), roles);
+			Q_EMIT dataChanged(QAbstractListModel::index(index), QAbstractListModel::index(index), roles);
 		}
 	}
-
+	
 	return true;
 }
 
@@ -466,12 +559,15 @@ QList<QString> CTreeItemModel::GetKeys(int index) const
 
 void CTreeItemModel::Clear()
 {
+	beginResetModel();
+
 	qDeleteAll(m_items);
 	m_items.clear();
-	Refresh();
+
+	endResetModel();
 
 	if (m_isUpdateEnabled){
-		emit dataChanged(QModelIndex(), QModelIndex());
+		Q_EMIT dataChanged(QModelIndex(), QModelIndex());
 	}
 }
 
@@ -514,7 +610,7 @@ bool CTreeItemModel::CreateFromJson(const QByteArray& jsonContent)
 	}
 
 	if (m_isUpdateEnabled){
-		emit dataChanged(QModelIndex(), QModelIndex());
+		Q_EMIT dataChanged(QModelIndex(), QModelIndex());
 	}
 
 	return retVal;
@@ -557,7 +653,10 @@ void CTreeItemModel::SetUpdateEnabled(bool updateEnabled)
 }
 
 
-void CTreeItemModel::OnDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+void CTreeItemModel::OnDataChanged(
+			const QModelIndex& topLeft,
+			const QModelIndex& bottomRight,
+			const QVector<int>& roles)
 {
 	CTreeItemModel* parentModelPtr = GetParent();
 	if (parentModelPtr != nullptr){
@@ -575,14 +674,14 @@ void CTreeItemModel::Refresh()
 }
 
 
-QString CTreeItemModel::toJSON()
+QString CTreeItemModel::ToJson()
 {
 	QByteArray representationData;
 
 	{
 		iser::CJsonMemWriteArchive archive(representationData);
 
-		Serialize(archive);
+		SerializeModel(archive);
 	}
 
 	if (representationData.length() > 2 && representationData[1] == '['){
@@ -620,9 +719,12 @@ bool CTreeItemModel::setData(const QModelIndex &index, const QVariant &value, in
 	if (!m_roleNames.contains(role)){
 		return false;
 	}
+
 	QByteArray key = m_roleNames.value(role);
 	int row = index.row();
+
 	SetData(key, value, row);
+
 	return true;
 }
 
@@ -633,141 +735,15 @@ QHash<int, QByteArray> CTreeItemModel::roleNames() const
 }
 
 
-bool CTreeItemModel::Serialize(iser::IArchive &archive)
+bool CTreeItemModel::SerializeModel(iser::IArchive& archive)
 {
-	return JsonSerialize(archive);
-}
-
-
-// reimplemented (iser::ISerializable)
-
-bool CTreeItemModel::JsonSerialize(iser::IArchive &archive)
-{
-	if (!archive.IsStoring()){
+	if (!archive.IsStoring()) {
 		Clear();
 	}
 
-	return SerializeRecursive(archive,"");
+	return SerializeRecursive(archive, "");
 }
 
-
-// reimplemented (istd::IChangeable)
-
-int CTreeItemModel::GetSupportedOperations() const
-{
-	return SO_COPY;
-}
-
-
-bool CTreeItemModel::CopyFrom(const IChangeable& object, CompatibilityMode /*mode*/)
-{
-	const imtbase::CTreeItemModel* sourcePtr = dynamic_cast<const imtbase::CTreeItemModel*>(&object);
-	if (sourcePtr != nullptr){
-		Clear();
-
-		for (int i = 0; i < sourcePtr->m_items.count(); i++){
-			Item* item = new Item();
-			Item* sourceItem = sourcePtr->m_items[i];
-
-			QList<QByteArray> keys;
-			sourceItem->GetKeys(keys);
-
-			for (const QByteArray& key : keys){
-				QVariant value = sourceItem->Value(key);
-
-				CTreeItemModel* treeItemModelPtr = nullptr;
-				if (value.isValid()){
-					treeItemModelPtr = value.value<CTreeItemModel*>();
-				}
-
-				if (treeItemModelPtr != nullptr){
-					CTreeItemModel* subModelPtr = new CTreeItemModel();
-					subModelPtr->CopyFrom(*treeItemModelPtr);
-
-					subModelPtr->setParent(this);
-					subModelPtr->SetSlavePtr(this);
-
-					item->SetValue(key, QVariant::fromValue(subModelPtr));
-				}
-				else{
-					item->SetValue(key, value);
-				}
-			}
-
-			m_items.append(item);
-		}
-
-		m_roleNames = sourcePtr->m_roleNames;
-		m_queryParams = sourcePtr->m_queryParams;
-		m_isArray = sourcePtr->m_isArray;
-		m_state = sourcePtr->m_state;
-
-		return true;
-	}
-
-	return false;
-}
-
-
-bool CTreeItemModel::IsEqual(const IChangeable& object) const
-{
-	const CTreeItemModel* sourcePtr = dynamic_cast<const CTreeItemModel*>(&object);
-	if (sourcePtr != nullptr){
-		if (m_items.size() != sourcePtr->m_items.size()){
-			return false;
-		}
-
-		for (int i = 0; i < sourcePtr->m_items.count(); i++){
-			Item* item = m_items[i];
-			Item* sourceItem = sourcePtr->m_items[i];
-
-			QList<QByteArray> itemKeys;
-			item->GetKeys(itemKeys);
-
-			QList<QByteArray> keys;
-			sourceItem->GetKeys(keys);
-
-			if (itemKeys.size() != keys.size()){
-				return false;
-			}
-
-			for (const QByteArray& key : keys){
-				if (!itemKeys.contains(key)){
-					return false;
-				}
-
-				QVariant sourceValue = sourceItem->Value(key);
-				QVariant itemValue = item->Value(key);
-
-				CTreeItemModel* sourceTreeItemModelPtr = sourceValue.value<CTreeItemModel*>();
-				if (sourceTreeItemModelPtr != nullptr){
-					CTreeItemModel* treeItemModelPtr = itemValue.value<CTreeItemModel*>();
-					if (treeItemModelPtr == nullptr){
-						return false;
-					}
-
-					bool result = sourceTreeItemModelPtr->IsEqual(*treeItemModelPtr);
-					if (!result){
-						return false;
-					}
-				}
-				else if (sourceValue != itemValue){
-					return false;
-				}
-			}
-		}
-
-		return true;
-	}
-
-	return false;
-}
-
-
-istd::IChangeable* CTreeItemModel::CloneMe(CompatibilityMode /*mode*/) const
-{
-	return NULL;
-}
 
 
 // protected methods

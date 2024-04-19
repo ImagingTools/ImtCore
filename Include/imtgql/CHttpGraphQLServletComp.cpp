@@ -68,7 +68,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 			{
 				iser::CJsonMemWriteArchive archive(responseData);
-				rootModel.Serialize(archive);
+				rootModel.SerializeModel(archive);
 			}
 
 			if (!responseData.isEmpty()){
@@ -152,7 +152,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 					isSuccessful = true;
 
 					iser::CJsonMemWriteArchive archive(responseData);
-					if (!rootModel.Serialize(archive)){
+					if (!rootModel.SerializeModel(archive)){
 						isSuccessful = false;
 					}
 				}
@@ -166,7 +166,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 						errorItemModelPtr->SetData("type", "Warning");
 
 						iser::CJsonMemWriteArchive archive(responseData);
-						if (!rootModel.Serialize(archive)){
+						if (!rootModel.SerializeModel(archive)){
 						}
 					}
 

@@ -14,14 +14,14 @@ ViewBase {
     property string productId: "";
 
     function updateGui(){
-        console.log("RoleView updateGui", model.toJSON());
+        console.log("RoleView updateGui", model.ToJson());
 
         generalGroup.updateGui();
         permissionsGroup.updateGui()
     }
 
     function updateModel(){
-        console.log("RoleView updateModel", model.toJSON());
+        console.log("RoleView updateModel", model.ToJson());
 
         generalGroup.updateModel();
         permissionsGroup.updateModel()

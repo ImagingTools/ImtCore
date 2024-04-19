@@ -123,7 +123,7 @@ ViewBase {
     }
 
     function updateGui(){
-        console.log("updateGui", model.toJSON());
+        console.log("updateGui", model.ToJson());
 
 //        if (tableView.rowModel){
 //            tableView.rowModel = model;

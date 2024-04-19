@@ -413,7 +413,7 @@ Item {
             if (this.state === "Ready"){
                 var dataModelLocal;
 
-                console.log("Headers", this.toJSON());
+                console.log("Headers", this.ToJson());
 
                 if (this.ContainsKey("errors")){
                     dataModelLocal = this.GetData("errors");
@@ -474,7 +474,7 @@ Item {
             var viewParams = Gql.GqlObject("viewParams");
             viewParams.InsertField("Count", count);
             viewParams.InsertField("Offset", offset);
-            viewParams.InsertField("FilterModel", filterModel.toJSON());
+            viewParams.InsertField("FilterModel", filterModel.ToJson());
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertFieldObject(viewParams);
@@ -521,7 +521,7 @@ Item {
 
             if (this.state === "Ready"){
 
-                console.log("List", this.toJSON());
+                console.log("List", this.ToJson());
 
                 var dataModelLocal;
                 if (this.ContainsKey("errors")){

@@ -91,7 +91,7 @@ Item {
     }
 
     onDocumentModelChanged: {
-        console.log("onDocumentModelChanged", documentModel.toJSON());
+        console.log("onDocumentModelChanged", documentModel.ToJson());
 
         if (documentModel.ContainsKey("Id")){
             documentId = documentModel.GetData("Id")
@@ -132,7 +132,7 @@ Item {
         target: documentModel;
 
         function onDataChanged(){
-            console.log("documentModel onDataChanged", documentModel.toJSON());
+            console.log("documentModel onDataChanged", documentModel.ToJson());
             documentData.onModelChanged();
         }
     }

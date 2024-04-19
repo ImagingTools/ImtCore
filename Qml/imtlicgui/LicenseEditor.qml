@@ -138,7 +138,7 @@ ViewBase {
     function updateLicensesModel(){
         root.licensesModel.Clear();
 
-        console.log("CachedLicenseCollection.collectionModel", CachedLicenseCollection.collectionModel.toJSON());
+        console.log("CachedLicenseCollection.collectionModel", CachedLicenseCollection.collectionModel.ToJson());
 
 
         if (productsCB.currentIndex >= 0 && productsCB.model){
@@ -164,7 +164,7 @@ ViewBase {
             }
         }
 
-        console.log("updateLicensesModel", root.licensesModel.toJSON());
+        console.log("updateLicensesModel", root.licensesModel.ToJson());
 
         licensesTable.elements = root.licensesModel;
     }

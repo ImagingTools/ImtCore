@@ -499,7 +499,7 @@ Item {
             viewParams.InsertField("Offset", offsetVar);
             viewParams.InsertField("Count", popupMenuContainer.count);
             viewParams.InsertField("FilterModel");
-            var jsonString = modelFilter.toJSON();
+            var jsonString = modelFilter.ToJson();
             //            jsonString = jsonString.replace(/\"/g,"\\\\\\\"")
             viewParams.InsertField("FilterModel", jsonString);
             inputParams.InsertFieldObject(viewParams);
@@ -552,7 +552,7 @@ Item {
                         dataModelLocal = dataModelLocal.GetData("items");
 
                         //console.log(popupMenuContainer.commandId, " = ", dataModelLocal);
-                        //console.log("comboModel:::", dataModelLocal.toJSON());
+                        //console.log("comboModel:::", dataModelLocal.ToJson());
                         if (popupMenuContainer.offset == 0){
                             popupMenuContainer.model = dataModelLocal;
                             //popupMenuListView.model = popupMenuContainer.model;
@@ -566,7 +566,7 @@ Item {
                         }
                         else{//OFSET !== 0
 
-                            //console.log("count items = ", dataModelLocal.GetItemsCount(), dataModelLocal.toJSON())
+                            //console.log("count items = ", dataModelLocal.GetItemsCount(), dataModelLocal.ToJson())
 
                             if(dataModelLocal.GetItemsCount() > 0){
                                 for (var i = 0; i < dataModelLocal.GetItemsCount(); i++){

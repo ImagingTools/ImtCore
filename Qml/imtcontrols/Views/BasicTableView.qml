@@ -186,13 +186,13 @@ FocusScope {
             return false;
         }
 
-        console.log("childModel1", childModel.toJSON());
+        console.log("childModel1", childModel.ToJson());
 
 //        childModel.SetUpdateEnabled(true);
         childModel.InsertNewItemWithParameters(0, rowObj)
 //        childModel.SetUpdateEnabled(false);
 
-        console.log("childModel2", childModel.toJSON());
+        console.log("childModel2", childModel.ToJson());
 
         return false;
     }

@@ -80,7 +80,7 @@ Item {
 
                     if (dataModelLocal.ContainsKey(container.getMetaInfoGqlCommand)){
                         dataModelLocal = dataModelLocal.GetData(container.getMetaInfoGqlCommand);
-                        console.log( "dataModelLocal", dataModelLocal.toJSON());
+                        console.log( "dataModelLocal", dataModelLocal.ToJson());
 
                         container.metaInfoModel = dataModelLocal;
                     }

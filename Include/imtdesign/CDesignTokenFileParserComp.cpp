@@ -271,7 +271,7 @@ bool CDesignTokenFileParserComp::SplitFile(const QString& outputDirPath, const Q
 
 	QJsonArray designTokenStylesArray = designTokenObject["Styles"].toArray();
 	if(designTokenStylesArray.isEmpty()){
-		SendErrorMessage(__LINE__, "Cannot parse Styles");
+		SendErrorMessage(__LINE__, "Cannot parse <Styles> variable in the theme file");
 
 		return false;
 	}

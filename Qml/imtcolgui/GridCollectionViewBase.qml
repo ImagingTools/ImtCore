@@ -467,7 +467,7 @@ Item {
 
         onItemsChanged: {
             console.log("baseCommands.items - ", baseCommands.items);
-            console.log("baseCommands.items.toJSON - ", baseCommands.items.toJSON());
+            console.log("baseCommands.items.ToJson - ", baseCommands.items.ToJson());
             gridInternal.model = baseCommands.items;
         }
     }

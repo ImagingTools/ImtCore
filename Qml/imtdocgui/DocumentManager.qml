@@ -618,7 +618,7 @@ Item {
                         return;
                     }
 
-                    console.log("onDocumentModelChanged", singleDocumentData.documentDataController.documentModel.toJSON());
+                    console.log("onDocumentModelChanged", singleDocumentData.documentDataController.documentModel.ToJson());
 
                     let documentModel = singleDocumentData.documentDataController.documentModel;
 
@@ -634,7 +634,7 @@ Item {
 
                     singleDocumentData.blockingUpdateModel = true;
 
-                    console.log("onDocumentModelChanged", singleDocumentData.documentDataController.documentModel.toJSON());
+                    console.log("onDocumentModelChanged", singleDocumentData.documentDataController.documentModel.ToJson());
 
                     for (let i = 0; i < singleDocumentData.views.length; i++){
                         singleDocumentData.views[i].model = documentModel;

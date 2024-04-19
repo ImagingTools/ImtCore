@@ -51,7 +51,7 @@ const imtauth::IUserGroupInfo* CRemoteUserGroupInfoProviderComp::GetUserGroup(co
 			return nullptr;
 		}
 
-		QByteArray json = roleDataModelPtr->toJSON().toUtf8();
+		QByteArray json = roleDataModelPtr->ToJson().toUtf8();
 
 		istd::TDelPtr<imtauth::IUserGroupInfo> groupInfoPtr;
 		groupInfoPtr.SetPtr(m_userGroupInfoFactCompPtr.CreateInstance());

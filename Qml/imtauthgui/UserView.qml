@@ -270,7 +270,7 @@ ViewBase {
                 }
 
                 function updateModel(){
-                    console.log("Roles updateModel", container.model.toJSON());
+                    console.log("Roles updateModel", container.model.ToJson());
                     let selectedRoleIds = []
                     let indexes = rolesTable.table.getCheckedItems();
                     for (let index of indexes){

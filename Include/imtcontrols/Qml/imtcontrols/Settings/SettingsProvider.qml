@@ -47,14 +47,14 @@ QtObject {
     }
 
     function saveLocalModel(){
-        console.log("SettingsProvider saveLocalModel", container.localModel.toJSON());
+        console.log("SettingsProvider saveLocalModel", container.localModel.ToJson());
         container.rewriteModel(container.serverModel, container.localModel);
 
         container.localSettingsSaved();
     }
 
     function saveServerModel(){
-        console.log("SettingsProvider saveServerModel", container.serverModel.toJSON());
+        console.log("SettingsProvider saveServerModel", container.serverModel.ToJson());
 
         preferenceSaveQuery.save();
 
@@ -124,7 +124,7 @@ QtObject {
             var query = Gql.GqlRequest("mutation", "SetSettings");
 
             var inputParams = Gql.GqlObject("input");
-            var jsonString = container.serverModel.toJSON();
+            var jsonString = container.serverModel.ToJson();
 
             inputParams.InsertField("Item", jsonString);
             query.AddParam(inputParams);

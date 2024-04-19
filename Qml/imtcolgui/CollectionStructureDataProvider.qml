@@ -82,7 +82,7 @@ Item {
             viewParams.InsertField("Offset", container.offset);
             viewParams.InsertField("Count", container.count);
 
-            var jsonString = container.filterModel.toJSON();
+            var jsonString = container.filterModel.ToJson();
             viewParams.InsertField("FilterModel", jsonString);
             console.log( "gqlModelBaseContainer filterModel", jsonString);
 

@@ -158,7 +158,7 @@ ViewBase {
 
         productViewContainer.model.SetData("Features", featureIds.join(';'))
 
-        console.log("productViewContainer.model", productViewContainer.model.toJSON());
+        console.log("productViewContainer.model", productViewContainer.model.ToJson());
     }
 
     function removeFeature(featureId){

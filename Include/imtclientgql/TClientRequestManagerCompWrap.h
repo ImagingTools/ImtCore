@@ -55,7 +55,7 @@ bool TClientRequestManagerCompWrap<Base>::SendModelRequest(const imtgql::IGqlReq
 			return false;
 		}
 
-		return responseModel.CopyFrom(*resultModelPtr);
+		return responseModel.Copy(resultModelPtr.GetPtr());
 	}
 
 	return false;
@@ -112,7 +112,7 @@ imtbase::CTreeItemModel* TClientRequestManagerCompWrap<Base>::CreateTreeItemMode
 		}
 	}
 
-	qDebug() << "replyResultPtr" << replyResultPtr->toJSON();
+	qDebug() << "replyResultPtr" << replyResultPtr->ToJson();
 
 	return replyResultPtr;
 }

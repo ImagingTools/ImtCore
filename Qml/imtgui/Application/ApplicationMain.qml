@@ -69,7 +69,7 @@ Item {
     }
 
     onApplicationInfoChanged: {
-        console.log("onApplicationInfoChanged", application.applicationInfo.toJSON());
+        console.log("onApplicationInfoChanged", application.applicationInfo.ToJson());
         if (application.applicationInfo){
             applicationInfoProvider.clientApplicationInfo = application.applicationInfo;
         }

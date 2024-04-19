@@ -13,7 +13,6 @@
 #include <imtrest/CHttpRootServletComp.h>
 #include <imtrest/CHttpFileBasedServletComp.h>
 #include <imtrest/CHttpHtmlFolderBasedServletComp.h>
-#include <imtrest/CJsonModelBasedServletComp.h>
 #include <imtrest/CHttpRedirectComp.h>
 #include <imtrest/CHttpFileProviderBasedServletComp.h>
 #include <imtrest/CHttpFileControllerServletComp.h>
@@ -38,7 +37,6 @@ typedef imtrest::CHttpProtocolEngineComp HttpProtocolEngine;
 typedef imtrest::CHttpRootServletComp HttpRootServlet;
 typedef imtrest::CHttpFileBasedServletComp HttpFileBasedServlet;
 typedef imtrest::CHttpHtmlFolderBasedServletComp HttpHtmlFolderBasedServlet;
-typedef imtrest::CJsonModelBasedServletComp JsonModelBasedServlet;
 typedef imtrest::CHttpRedirectComp HttpRedirectServlet;
 typedef imtrest::CHttpFileProviderBasedServletComp HttpFileProviderBasedServlet;
 typedef imtrest::CHttpFileControllerServletComp HttpFileControllerServlet;

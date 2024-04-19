@@ -26,7 +26,7 @@ FocusScope {
     property var rowModel: ListModel {};
 
     onRowModelChanged: {
-        //console.log("onRowModelChanged", rowModel.toJSON());
+        //console.log("onRowModelChanged", rowModel.ToJson());
         tableViewRoot.itemsList = []
     }
 
@@ -219,11 +219,11 @@ FocusScope {
             return false;
         }
 
-        console.log("childModel1", childModel.toJSON());
+        console.log("childModel1", childModel.ToJson());
 
         childModel.InsertNewItemWithParameters(0, rowObj)
 
-        console.log("childModel2", childModel.toJSON());
+        console.log("childModel2", childModel.ToJson());
 
         return false;
     }

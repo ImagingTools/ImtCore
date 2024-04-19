@@ -50,12 +50,12 @@ DocumentDataController {
     }
 
     function insertDocument(){
-        console.log("insertDocument", documentModel.toJSON());
+        console.log("insertDocument", documentModel.ToJson());
         gqlAddModel.save();
     }
 
     function saveDocument(){
-        console.log("saveDocument", documentModel.toJSON());
+        console.log("saveDocument", documentModel.ToJson());
 
         gqlUpdateModel.save();
     }
@@ -91,7 +91,7 @@ DocumentDataController {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", container.documentId);
-            inputParams.InsertField ("Item", container.documentModel.toJSON());
+            inputParams.InsertField ("Item", container.documentModel.ToJson());
 
             let additionInputParams = container.getAdditionalInputParams();
             if (Object.keys(additionInputParams).length > 0){
@@ -276,7 +276,7 @@ DocumentDataController {
 
             var inputParams = Gql.GqlObject("input");
             inputParams.InsertField("Id", container.documentId);
-            inputParams.InsertField ("Item", container.documentModel.toJSON());
+            inputParams.InsertField ("Item", container.documentModel.ToJson());
 
             let additionInputParams = container.getAdditionalInputParams();
             if (Object.keys(additionInputParams).length > 0){

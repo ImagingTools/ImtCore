@@ -16,7 +16,7 @@ GqlModel {
 
     onStateChanged: {
         if (this.state === "Ready") {
-            console.log("GetWebSocketUrl", webSocketUrlGqlModel.toJSON());
+            console.log("GetWebSocketUrl", webSocketUrlGqlModel.ToJson());
             var dataModelLocal;
 
             if (webSocketUrlGqlModel.ContainsKey("data")){
