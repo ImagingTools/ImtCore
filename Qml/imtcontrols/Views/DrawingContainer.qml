@@ -24,6 +24,10 @@ Item{
     property int edgeSize: 12;
     property string controlColor: "#ffe4c4";
 
+    property int itemWidth: !loader.item ? 0 : loader.item.width;
+    property int itemHeight: !loader.item ? 0 : loader.item.height;
+    property bool loaded: false;
+
     Component.onCompleted: {
         Events.subscribeEvent("DrawerSetVisible", setVisible);
     }
@@ -35,6 +39,17 @@ Item{
     onStepsLengthChanged: {
         if(steps.length){
             mainStep = steps[steps.length - 1];
+        }
+    }
+
+    onItemWidthChanged: {
+        if(loaded){
+            setSizes();
+        }
+    }
+    onItemHeightChanged: {
+        if(loaded){
+            setSizes();
         }
     }
 
@@ -53,6 +68,34 @@ Item{
 
     function addStep(step){
         steps.push(step);
+    }
+
+    function setSizes(){
+        let width_ = loader.item.width;
+        let height_ = loader.item.height;
+
+        hiddenItem.width = width_;
+        hiddenItem.height = height_;
+
+        if(drawer.edge == Qt.LeftEdge || drawer.edge == Qt.RightEdge){
+            drawer.width = width_ + drawer.edgeSize;
+            drawer.height = height_;
+            if(!drawer.steps.length){
+                drawer.mainStep = width_;
+            }
+        }
+        else if(drawer.edge == Qt.TopEdge || drawer.edge == Qt.BottomEdge){
+            drawer.width = width_;
+            drawer.height = height_ + drawer.edgeSize;
+            if(!drawer.steps.length){
+                drawer.mainStep = height_;
+            }
+        }
+
+        if(isOpen && !drawer.steps.length){
+            hiddenItem.addToMargin = drawer.mainStep;
+        }
+
     }
 
     Component{
@@ -363,27 +406,8 @@ Item{
 
             sourceComponent: drawer.content;
             onLoaded: {
-                let width_ = loader.item.width;
-                let height_ = loader.item.height;
-
-                hiddenItem.width = width_;
-                hiddenItem.height = height_;
-
-                if(drawer.edge == Qt.LeftEdge || drawer.edge == Qt.RightEdge){
-                    drawer.width = width_ + drawer.edgeSize;
-                    drawer.height = height_;
-                    if(!drawer.steps.length){
-                        drawer.mainStep = width_;
-                    }
-                }
-                else if(drawer.edge == Qt.TopEdge || drawer.edge == Qt.BottomEdge){
-                    drawer.width = width_;
-                    drawer.height = height_ + drawer.edgeSize;
-                    if(!drawer.steps.length){
-                        drawer.mainStep = height_;
-                    }
-                }
-
+                setSizes();
+                drawer.loaded = true;
             }
         }
 
