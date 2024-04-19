@@ -8,7 +8,7 @@ Rectangle {
     width: minutesInput.width + minutesInput.x + mainMargin;
     height: 36;
 
-    border.color: "lightgray";
+    border.color: hoursInput.isEmpty || minutesInput.isEmpty ? "red" : "lightgray";
     color: "transparent";
 
     property int mainMargin: 4;
@@ -85,6 +85,14 @@ Rectangle {
 
         textInputValidator : RegularExpressionValidator { regularExpression: timeInput.hoursRegExp }
 
+        property bool isEmpty: false;
+
+        onVisibleChanged: {
+            if(text == ""){
+                isEmpty = true;
+            }
+        }
+
         onFocusChanged: {
             if(!focus && text.length == 1){
                 text = "0" + text;
@@ -97,7 +105,9 @@ Rectangle {
         }
 
         onTextChanged: {
-
+            if(text !== ""){
+                isEmpty = false;
+            }
 
         }
     }
@@ -135,6 +145,14 @@ Rectangle {
 
         textInputValidator : RegularExpressionValidator { regularExpression: timeInput.minutesRegExp }
 
+        property bool isEmpty: false;
+
+        onVisibleChanged: {
+            if(text == ""){
+                isEmpty = true;
+            }
+        }
+
         onFocusChanged: {
             if(!focus && text.length == 1){
                 text = "0" + text;
@@ -152,7 +170,9 @@ Rectangle {
         }
 
         onTextChanged: {
-
+            if(text !== ""){
+                isEmpty = false;
+            }
         }
     }
 }
