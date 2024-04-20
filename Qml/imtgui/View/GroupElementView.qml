@@ -24,7 +24,7 @@ Rectangle {
         let h = 0;
 
         for (let i = 0; i < children.length; i++){
-            if (children[i].height >= 0){
+            if (children[i].visible && children[i].height >= 0){
                 h += children[i].height;
 
                 if (i > 0){
@@ -37,34 +37,76 @@ Rectangle {
         container.height = container.contentHeight;
     }
 
+    QtObject {
+        id: internal;
+
+        property bool block: false;
+
+        function onVisibleChanged(){
+            if (!block){
+                container.update();
+            }
+        }
+    }
+
     Component.onCompleted: {
         for (let i = 0; i < children.length; i++){
-            children[i].radius = 0;
+            children[i].visibleChanged.connect(internal.onVisibleChanged);
+            children[i].heightChanged.connect(calcHeight);
+        }
 
-            children[i].anchors.left = container.left;
-            children[i].anchors.right = container.right;
+        update();
+    }
+
+    Component.onDestruction:  {
+        for (let i = 0; i < children.length; i++){
+            children[i].visibleChanged.disconnect(internal.onVisibleChanged);
+            children[i].heightChanged.disconnect(calcHeight);
+        }
+    }
+
+    function update(){
+        internal.block = true;
+
+        let visibleItems = []
+        for (let i = 0; i < children.length; i++){
+            if (children[i].visible){
+                visibleItems.push(children[i])
+            }
+        }
+
+        for (let i = 0; i < visibleItems.length; i++){
+            visibleItems[i].anchors.top = undefined;
+            visibleItems[i].anchors.topMargin = 0;
+            visibleItems[i].bottomRoundedCorners = true;
+            visibleItems[i].topRoundedCorners = true;
+
+            visibleItems[i].radius = 0;
+
+            visibleItems[i].anchors.left = container.left;
+            visibleItems[i].anchors.right = container.right;
 
             if (i == 0){
-                children[i].anchors.top = container.top;
-                children[i].radius = container.radius;
+                visibleItems[i].anchors.top = container.top;
+                visibleItems[i].radius = container.radius;
             }
 
-            if (i == 0 && children.length > 1){
-                children[i].bottomRoundedCorners = false;
+            if (i == 0 && visibleItems.length > 1){
+                visibleItems[i].bottomRoundedCorners = false;
             }
 
-            if (i != 0 && i == children.length - 1){
-                children[i].radius = container.radius;
-                children[i].topRoundedCorners = false;
+            if (i != 0 && i == visibleItems.length - 1){
+                visibleItems[i].radius = container.radius;
+                visibleItems[i].topRoundedCorners = false;
             }
 
             if (i > 0){
-                children[i].anchors.top = children[i - 1].bottom;
-                children[i].anchors.topMargin = -children[i].border.width;
+                visibleItems[i].anchors.top = visibleItems[i - 1].bottom;
+                visibleItems[i].anchors.topMargin = -visibleItems[i].border.width;
             }
-
-            children[i].heightChanged.connect(container.calcHeight);
         }
+
+        internal.block = false;
 
         calcHeight();
     }

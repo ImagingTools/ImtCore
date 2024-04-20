@@ -210,8 +210,10 @@ ViewCommandsDelegateBase {
 
     Component {
         id: setDescriptionDialog;
+
         InputDialog {
-            title: qsTr("Set Description");
+            width: 300;
+            title: qsTr("Set description");
             onFinished: {
                 if (buttonId == Enums.ok){
                     let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
@@ -227,7 +229,8 @@ ViewCommandsDelegateBase {
     Component {
         id: renameDialog;
         InputDialog {
-            title: qsTr("Rename Document");
+            width: 300;
+            title: qsTr("Rename document");
             onFinished: {
                 if (buttonId == Enums.ok){
                     let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
@@ -243,10 +246,10 @@ ViewCommandsDelegateBase {
     Component {
         id: removeDialog;
         MessageDialog {
-            message: qsTr("Deleting a selected element");
-            title: qsTr("Remove selected item from the collection ?");
+            width: 300;
+            title: collectionViewCommandsDelegate.removeDialogTitle;
+            message: collectionViewCommandsDelegate.removeMessage;
             onFinished: {
-                console.log("removeDialog onFinished", buttonId);
                 if (buttonId == Enums.yes){
                     let indexes = collectionViewCommandsDelegate.collectionView.table.getSelectedIndexes();
                     if (indexes.length >= 0){

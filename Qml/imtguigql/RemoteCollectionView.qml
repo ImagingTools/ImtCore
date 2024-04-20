@@ -76,6 +76,15 @@ CollectionView {
         }
     }
 
+    onVisibleChanged: {
+        if (hasRemoteChanges && visible){
+            root.setAlertPanel(alertPanelComp)
+        }
+        else{
+            root.setAlertPanel(undefined)
+        }
+    }
+
     function receiveRemoteChanges(){
         console.log("receiveRemoteChanges");
 
@@ -160,8 +169,6 @@ CollectionView {
                 text: qsTr("Update");
 
                 onClicked: {
-//                    Events.sendEvent("UpdateAllModels");
-
                     root.receiveRemoteChanges()
                 }
             }

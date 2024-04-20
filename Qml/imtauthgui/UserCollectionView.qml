@@ -158,15 +158,6 @@ RemoteCollectionView {
                 }
             }
 
-//            Component.onCompleted: {
-//                let loader = parent;
-//                let tableCellDelegate = loader.parent;
-
-//                if (tableCellDelegate.mainMouseArea){
-//                    tableCellDelegate.mainMouseArea.hoverEnabled = false;
-//                }
-//            }
-
             Text {
                 id: name2;
 

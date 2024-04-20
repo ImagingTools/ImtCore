@@ -12,9 +12,17 @@ ElementView {
 
     property SwitchCustom switchRef;
 
+    property bool readOnly: false;
+
     onCheckedChanged: {
         if (switchRef){
             switchRef.checked = checked;
+        }
+    }
+
+    onReadOnlyChanged: {
+        if (switchRef){
+            switchRef.readOnly = readOnly;
         }
     }
 
@@ -32,6 +40,7 @@ ElementView {
 
             Component.onCompleted: {
                 switchElementView.switchRef = cb;
+                cb.readOnly = switchElementView.readOnly;
             }
         }
     }

@@ -25,11 +25,7 @@ Text {
                                                        rowDelegate.tableItem.cellDecorator.GetData("FontSize", rowDelegate.columnIndex) :
                                                        Style.fontSize_common : Style.fontSize_common;
     font.family: Style.fontFamily;
-    font.bold: rowDelegate ?
-                   rowDelegate.tableItem.emptyDecorCell ? true :
-                                                  rowDelegate.tableItem.cellDecorator.IsValidData("FontBold", rowDelegate.columnIndex) ?
-                                                      rowDelegate.tableItem.cellDecorator.GetData("FontBold", rowDelegate.columnIndex) :
-                                                      true: false;
+
     color: rowDelegate && rowDelegate.enabled ?
                (rowDelegate.tableItem.emptyDecorCell ? Style.textColor :
                                                   rowDelegate.tableItem.cellDecorator.IsValidData("FontColor", rowDelegate.columnIndex) ?

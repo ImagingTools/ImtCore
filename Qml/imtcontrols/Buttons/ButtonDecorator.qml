@@ -5,7 +5,7 @@ import imtcontrols 1.0
 DecoratorBase {
     id: commonButtonDecorator
 
-    width: Math.max(iconObj.width + textObj.width + Style.paddingMedium * 3, widthDefault)
+    width: Math.max(Style.iconSizeSmall + textObj.width + Style.paddingMedium * 3, widthDefault)
     height: Style.buttonHeight;
     clip: true;
 

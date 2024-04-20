@@ -28,6 +28,7 @@ ControlBase {
     property bool fontBold: false;
 
     property int mainMargin: 8;
+    property bool readOnly: false;
 
     property alias tooltipText: tooltip.text;
     property alias tooltipItem: tooltip;
@@ -55,6 +56,8 @@ ControlBase {
         property int mouseX_prev: 0;
         property bool canDrag: false;
         property bool canClick: true;
+
+        visible: !switchCustom.readOnly;
 
         onPressed: {
             ma.canDrag = true;

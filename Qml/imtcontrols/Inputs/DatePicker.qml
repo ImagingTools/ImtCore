@@ -58,6 +58,8 @@ Item {
     property bool readOnly: false;
     property bool textInputBan: false;
 
+    property alias contentWidth: content.width;
+
     //icons
     property int iconWidth: 12;
     property int iconHeight: 10;
@@ -350,6 +352,7 @@ Item {
     }
 
     Row {
+        id: content;
 
         height: datePicker.height;
 

@@ -31,10 +31,13 @@ FocusScope {
     property string borderColorConst: "";
 
     property int radius: Style.textFieldRadius;
-    property int textSize: 15;
+    property int textSize: Style.fontSize_common;
     property int placeHolderTextSize: textSize;
     property int echoMode: TextInput.Normal;
-    property int margin: 5;
+    property int margin: Style.size_mainMargin;
+
+    property int textFieldLeftMargin: margin;
+    property int textFieldRightMargin: margin;
 
     property bool fontBold: false;
     property bool hasActionMenu: true;
@@ -48,10 +51,8 @@ FocusScope {
 
     Keys.onPressed: {
         if (containerTextField.activeFocus){
-            console.log("CustomTextField onPressed");
 
             if (event.key == Qt.Key_Escape) {
-                console.log("Key_Escape");
                 containerTextField.cancelled();
             }
         }
@@ -94,7 +95,6 @@ FocusScope {
 
         radius: containerTextField.radius;
 
-//        border.color: containerTextField.borderColor ;
         border.color: containerTextField.borderColorConst !== "" ?
                           containerTextField.borderColorConst: textField.activeFocus ?
                               containerTextField.borderColor : Style.borderColor;
@@ -162,8 +162,8 @@ FocusScope {
         z: parent.z + 1;
 
         anchors.fill: parent;
-        anchors.leftMargin: containerTextField.margin;
-        anchors.rightMargin: containerTextField.margin;
+        anchors.leftMargin: containerTextField.textFieldLeftMargin;
+        anchors.rightMargin: containerTextField.textFieldRightMargin;
 
         color: containerTextField.fontColor;
         font.pixelSize: containerTextField.textSize;
@@ -216,8 +216,8 @@ FocusScope {
         Text {
             id: placeHolder;
 
-            anchors.left: textField.left;
             anchors.verticalCenter: textField.verticalCenter;
+            anchors.left: textField.left;
 
             font.pixelSize: containerTextField.placeHolderTextSize;
             font.bold: containerTextField.fontBold;
