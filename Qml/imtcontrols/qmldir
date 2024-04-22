@@ -82,7 +82,7 @@ TreeItemModelObserver 1.0 ./Models/TreeItemModelObserver.qml
 singleton UuidGenerator 1.0 Models/UuidGenerator.qml
 CommandsController 1.0 Models/CommandsController.qml
 CommandsProvider 1.0 Models/CommandsProvider.qml
-TransactionableTreeItemModel 1.0 Models/TransactionableTreeItemModel.qml
+MacAddressValidator 1.0 Models/MacAddressValidator.qml
 
 AuxTable 1.0 ./Views/AuxTable.qml
 Table 1.0 ./Views/Table.qml

@@ -7,7 +7,6 @@
         <file alias="imtlicgui/FeatureCollectionView.qml">FeatureCollectionView.qml</file>
         <file alias="imtlicgui/FeaturesDependenciesProvider.qml">FeaturesDependenciesProvider.qml</file>
         <file alias="imtlicgui/PackageCollectionViewCommandsDelegate.qml">PackageCollectionViewCommandsDelegate.qml</file>
-        <file alias="imtlicgui/PackageViewCommandsDelegate.qml">PackageViewCommandsDelegate.qml</file>
         <file alias="imtlicgui/PackageViewItemDelegate.qml">PackageViewItemDelegate.qml</file>
         <file alias="imtlicgui/ProductViewCommandsDelegate.qml">ProductViewCommandsDelegate.qml</file>
         <file alias="imtlicgui/ProductView.qml">ProductView.qml</file>

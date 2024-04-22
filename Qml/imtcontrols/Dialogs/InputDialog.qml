@@ -5,9 +5,13 @@ import imtcontrols 1.0
 Dialog {
     id: inputDialogContainer;
 
+    width: 300;
+
     property string message;
     property string inputValue;
     property int contentWidth: 300;
+
+    property string placeHolderText;
 
     Component.onCompleted: {
         buttonsModel.append({Id: Enums.ok, Name:qsTr("OK"), Enabled: true})
@@ -35,6 +39,7 @@ Dialog {
             width: inputDialogContainer.width;
             message: inputDialogContainer.message;
             inputValue: inputDialogContainer.inputValue;
+            placeHolderText: inputDialogContainer.placeHolderText;
         } }
 }
 

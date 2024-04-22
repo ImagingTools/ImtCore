@@ -1,7 +1,6 @@
 module imtdocgui
 
 singleton MainDocumentManager 1.0 MainDocumentManager.qml
-DocumentData 1.0 DocumentData.qml
 DocumentWorkspaceCommandsDelegate 1.0 DocumentWorkspaceCommandsDelegate.qml
 MultiDocWorkspacePageView 1.0 MultiDocWorkspacePageView.qml
 MultiDocWorkspaceView 1.0 MultiDocWorkspaceView.qml

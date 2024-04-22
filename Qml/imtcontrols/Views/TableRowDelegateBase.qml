@@ -130,7 +130,9 @@ Rectangle {
     }
 
     onCheckedStateChanged: {
-        tableDelegateContainer.tableItem.isAllItemChecked = tableDelegateContainer.tableItem.isAllChecked();
+        if (tableDelegateContainer.tableItem){
+            tableDelegateContainer.tableItem.isAllItemChecked = tableDelegateContainer.tableItem.isAllChecked();
+        }
     }
 
     onTableItemChanged: {
@@ -279,21 +281,29 @@ Rectangle {
 
 
     function selectionChanged(){
-        selected = tableItem.tableSelection.selectedIndexes.includes(model.index);
+        if (tableItem){
+            selected = tableItem.tableSelection.selectedIndexes.includes(model.index);
+        }
     }
 
     function checkedItemsChanged(){
-        checkedState = tableItem.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
+        if (tableItem){
+            checkedState = tableItem.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
+        }
     }
 
     function visibleItemsChanged(){
-        visible = tableItem.properties.itemIsVisible(model.index);
+        if (tableItem){
+            visible = tableItem.properties.itemIsVisible(model.index);
+        }
     }
 
     function enabledItemsChanged(){
-        enabled = tableItem.properties.itemIsEnabled(model.index);
+        if (tableItem){
+            enabled = tableItem.properties.itemIsEnabled(model.index);
 
-        readOnly = !enabled;
+            readOnly = !enabled;
+        }
     }
 
 
@@ -393,6 +403,10 @@ Rectangle {
 
             onClicked: {
                 if (tableDelegateContainer.readOnly){
+                    return;
+                }
+
+                if (!tableDelegateContainer.tableItem){
                     return;
                 }
 

@@ -60,7 +60,7 @@ DecoratorBase {
             ToolButton {
                 id: iconClear;
 
-                z: tfc.z + 1;
+                z: 999;
 
                 anchors.verticalCenter: tfc.verticalCenter;
                 anchors.right: tfc.right;

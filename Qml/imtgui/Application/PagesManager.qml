@@ -24,22 +24,16 @@ Item {
         Events.unSubscribeEvent("OnLocalizationChanged", container.onLocalizationChanged);
     }
 
-    onActivePageIndexChanged: {
-        console.log("pagesProvider onActivePageIndexChanged", activePageIndex);
-    }
-
     function updateModel(){
         pagesProvider.updateModel();
     }
 
     function clearModels(){
-        console.log("clearModels");
         pagesData.model = 0;
         pageModel.Clear();
     }
 
     function onLocalizationChanged(language){
-        console.log("pagesProvider onLocalizationChanged", language);
         if (container.authorizationStatusProvider != null){
             let loggedUserId = container.authorizationStatusProvider.getLoggedUserId();
             if (loggedUserId !== ""){
@@ -141,8 +135,6 @@ Item {
                 }
 
                 onStatusChanged: {
-                    console.log("pagesLoader onStatusChanged", pagesLoader.source);
-
                     if (status == Loader.Error){
                         console.error("Loading page with source", pagesLoader.source, "was failed!");
                     }

@@ -23,7 +23,6 @@
         <file alias="imtauthgui/UserPanelDelegate.qml">UserPanelDelegate.qml</file>
         <file alias="imtauthgui/UserTokenProvider.qml">UserTokenProvider.qml</file>
         <file alias="imtauthgui/TableProductRolesDelegate.qml">TableProductRolesDelegate.qml</file>
-        <file alias="imtauthgui/RolesProvider.qml">RolesProvider.qml</file>
         <file alias="imtauthgui/RolePermissions.qml">RolePermissions.qml</file>
         <file alias="imtauthgui/RoleViewCommandsDelegate.qml">RoleViewCommandsDelegate.qml</file>
         <file alias="imtauthgui/RoleCollectionViewCommandsDelegate.qml">RoleCollectionViewCommandsDelegate.qml</file>

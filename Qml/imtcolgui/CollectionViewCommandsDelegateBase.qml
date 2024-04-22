@@ -246,7 +246,7 @@ ViewCommandsDelegateBase {
     Component {
         id: removeDialog;
         MessageDialog {
-            width: 300;
+            width: 400;
             title: collectionViewCommandsDelegate.removeDialogTitle;
             message: collectionViewCommandsDelegate.removeMessage;
             onFinished: {

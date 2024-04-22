@@ -32,12 +32,9 @@ Item {
     signal failed();
 
     function updateModel(inputParams){
-        console.log("CollectionDataProvider updateModel");
         if (!inputParams){
             inputParams = {}
         }
-
-        console.log("GetItemsCount", collectionModel.GetItemsCount());
 
         if (collectionModel && collectionModel.GetItemsCount() === 0){
             container.itemsInfoModel.updateModel(inputParams, container.fields);
@@ -126,7 +123,6 @@ Item {
 
     property GqlModel itemsInfoModel: GqlModel {
         function updateModel(externInputParams, fields) {
-            console.log( "gqlModelBaseContainer updateModel", container.commandId + "List");
             var query = Gql.GqlRequest("query", container.commandId + "List");
 
             var viewParams = Gql.GqlObject("viewParams");
@@ -135,7 +131,6 @@ Item {
 
             var jsonString = container.filterModel.ToJson();
             viewParams.InsertField("FilterModel", jsonString);
-            console.log( "gqlModelBaseContainer filterModel", jsonString);
 
             var inputParams = Gql.GqlObject("input");
             let keys = Object.keys(externInputParams)
@@ -155,12 +150,10 @@ Item {
             var gqlData = query.GetQuery();
 
             container.completed = false;
-            console.log("gqlModelBaseContainer query ", gqlData);
             this.SetGqlQuery(gqlData);
         }
 
         onStateChanged: {
-            console.log("State:", this.state, container.itemsInfoModel.ToJson());
             if (this.state === "Ready"){
                 var dataModelLocal;
                 if (container.itemsInfoModel.ContainsKey("errors")){
@@ -218,16 +211,12 @@ Item {
         property bool ok: container.commandId !== "" && subscriptionClient.subscriptionId !== "";
         onOkChanged: {
             if (ok){
-                console.log("CollectionDataProvider SubscriptionClient", ok);
-
                 container.updateSubscription();
             }
         }
 
         onStateChanged: {
             if (state === "Ready"){
-                console.log("CollectionDataProvider subscriptionClient Ready", subscriptionClient.subscriptionId);
-
                 container.hasRemoteChanges = true;
             }
         }

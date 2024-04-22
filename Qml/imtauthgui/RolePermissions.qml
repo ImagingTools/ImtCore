@@ -31,8 +31,6 @@ ViewBase {
     }
 
     function updateGui(){
-        console.log("RolePermissions updateGui");
-
         let selectedPermissionsIds = [];
         if (rolePermissionsContainer.model.ContainsKey("Permissions")){
             let selectedPermissions = rolePermissionsContainer.model.GetData("Permissions");
@@ -80,16 +78,6 @@ ViewBase {
         rolePermissionsContainer.model.SetData("Permissions", selectedPermissionIds.join(';'));
     }
 
-//    CustomScrollbar {
-//        id: scrollbar;
-
-//        anchors.right: permissionsTable.right;
-//        anchors.bottom: permissionsTable.bottom;
-
-//        secondSize: 10;
-//        targetItem: permissionsTable.tableListView;
-//    }
-
     TreeViewElementView {
         id: permissionsGroup;
 
@@ -119,8 +107,6 @@ ViewBase {
                     if (featureDependencies.length === 0){
                         featureDependencies.push(qsTr("No dependencies"))
                     }
-
-//                    repeater.model = featureDependencies;
                 }
             }
 
@@ -146,132 +132,8 @@ ViewBase {
         }
     }
 
-//    BasicTreeView {
-//        id: permissionsTable;
-
-//        anchors.left: parent.left;
-//        anchors.top: parent.top;
-//        anchors.bottom: parent.bottom;
-//        anchors.topMargin: Math.max(10,rolePermissionsContainer.mainMargin);
-//        anchors.bottomMargin: 10 + rolePermissionsContainer.mainMargin;
-//        anchors.leftMargin: rolePermissionsContainer.mainMargin;
-//        anchors.right: informationBlock.left;
-
-//        rowModel: rolePermissionsContainer.permissionsModel;
-
-//        tristate: true;
-
-//        Component.onCompleted: {
-//            permissionHeaders.updateHeaders();
-//        }
-
-//        TreeItemModel {
-//            id: permissionHeaders;
-
-//            function updateHeaders(){
-//                permissionHeaders.Clear();
-
-//                let index = permissionHeaders.InsertNewItem();
-//                permissionHeaders.SetData("Id", "FeatureName", index)
-//                permissionHeaders.SetData("Name", qsTr("Permission"), index)
-
-//                permissionHeaders.Refresh();
-
-//                permissionsTable.columnModel = permissionHeaders;
-//            }
-//        }
-
-//        onSelectedIndexChanged: {
-//            if (selectedIndex != null && selectedIndex.itemData){
-//                let selectedFeatureId = selectedIndex.itemData.FeatureId;
-
-//                let dependencies = selectedIndex.itemData.Dependencies;
-
-//                let featureDependencies = []
-
-//                if (dependencies !== ""){
-//                    featureDependencies = dependencies.split(';');
-//                }
-
-//                if (featureDependencies.length === 0){
-//                    featureDependencies.push(qsTr("No dependencies"))
-//                }
-
-//                repeater.model = featureDependencies;
-//            }
-//        }
-
-//        onCheckedItemsChanged: {
-//            rolePermissionsContainer.doUpdateModel();
-//        }
-//    }//BasicTableView
-
-//    Item {
-//        id: informationBlock;
-
-//        anchors.right: parent.right;
-//        anchors.rightMargin: 10;
-//        anchors.top: parent.top;
-//        anchors.topMargin: Math.max(10, rolePermissionsContainer.mainMargin);
-//        anchors.bottom: parent.bottom;
-
-//        width: 200;
-
-//        visible: permissionsTable.selectedIndex != null;
-
-//        Item {
-//            anchors.fill: parent;
-
-//            anchors.rightMargin: 10;
-//            anchors.leftMargin: 10;
-//            anchors.bottomMargin: 10;
-
-//            Text {
-//                id: title;
-
-//                text: qsTr("Dependencies");
-
-//                font.pixelSize: Style.fontSize_common;
-//                font.family: Style.fontFamilyBold;
-//                font.bold: true;
-
-//                color: Style.lightBlueColor;
-//                elide: Text.ElideRight;
-//                wrapMode: Text.WrapAnywhere ;
-//            }
-
-//            Column {
-//                id: childColumn;
-
-//                anchors.top: title.bottom;
-//                anchors.topMargin: 5;
-
-//                width: parent.width;
-
-//                Repeater {
-//                    id: repeater;
-
-//                    visible: false;
-
-//                    delegate: Text {
-//                        width: 200;
-//                        height: 20;
-
-//                        text: modelData;
-
-//                        font.family: Style.fontFamily;
-//                        font.pixelSize: Style.fontSize_small;
-
-//                        color: Style.textColor;
-//                        elide: Text.ElideRight;
-//                    }
-//                }
-//            }
-//        }
-//    }
-
     function findChildrenFeatureDependencies(featureId, retVal){
-        let itemsDataList = permissionsTable.getItemsDataAsList();
+        let itemsDataList = permissionsGroup.treeView.getItemsDataAsList();
         for (let i = 0; i < itemsDataList.length; i++){
             let delegateItem = itemsDataList[i]
             let itemData = delegateItem.getItemData();

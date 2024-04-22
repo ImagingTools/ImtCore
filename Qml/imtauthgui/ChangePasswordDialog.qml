@@ -43,15 +43,9 @@ Dialog {
         }
 
         onFocusChanged: {
-            console.log("InputBody onFocusChanged", focus);
-
             if (contentItem.focus){
                 oldPassword.focus = contentItem.focus;
             }
-        }
-
-        onWidthChanged: {
-            console.log("onWidthChanged", width);
         }
 
         Column {
@@ -101,7 +95,6 @@ Dialog {
                 }
 
                 onTextChanged: {
-                    console.log("onTextChanged", oldPassword.text);
                     columnBodyMain.checkPassword();
                 }
 

@@ -32,22 +32,16 @@ QtObject {
 
             var gqlData = query.GetQuery();
 
-            console.log("gqlData", gqlData);
-
             this.SetGqlQuery(gqlData)
         }
 
         onStateChanged: {
-            console.log("Pages Provider State:",this.state, pagesProvider.pagesGqlModel)
             if (this.state === "Ready"){
                 if (this.ContainsKey("data")){
                     var dataModelLocal = this.GetData("data");
 
                     if(dataModelLocal.ContainsKey("PagesData")){
                         dataModelLocal = dataModelLocal.GetData("PagesData");
-
-                        console.log("dataModelLocal1", dataModelLocal)
-                        console.log("dataModelLocal2", dataModelLocal.ToJson())
 
                         pagesProvider.pagesModel = dataModelLocal;
                     }

@@ -24,12 +24,9 @@ Item {
             text: model.Value;
 
             onTextChanged: {
-                console.log("onTextChanged", hostInput.text);
                 if (model.Value !== hostInput.text){
                     model.Value = hostInput.text;
                 }
-
-                console.log("model.Host", model.Value);
             }
         }
     }

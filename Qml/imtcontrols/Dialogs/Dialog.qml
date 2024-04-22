@@ -35,7 +35,7 @@ ControlBase {
     property bool canMove: false;
     property bool decoratorVisible: !decorator_ ? true: decorator_.visible;
 
-    property Component topPanelComp: Style.topPanelDialogDecorator;//Component{TopPanelDialog{}};
+    property Component topPanelComp: Style.topPanelDialogDecorator;
     property Component topPanelDefault: Component{TopPanelDialog{}};
     property Component contentComp: null;
 
@@ -64,21 +64,12 @@ ControlBase {
         dialogContainer.localizationChanged(language);
     }
 
-    Keys.onPressed: {
-        console.log("Dialog onPressed", event.key);
-    }
-
     onRootChanged: {
         root.backgroundItem.opacity = 0.4;
     }
 
-    onTitleChanged: {
-        console.log("Dialog onTitleChanged", title);
-    }
-
     onFinished: {
         if (dialogContainer.root){
-            //console.log("buttonID:::",dialogContainer.notClosingButtons, buttonId)
             if(!(dialogContainer.notClosingButtons & buttonId)){
                 dialogContainer.root.closeDialog();
             }
@@ -86,11 +77,9 @@ ControlBase {
     }
 
     onAccepted: {
-        //console.log("Dialog::accepted()");
         finished(Enums.ok)
     }
     onCanceled: {
-        //console.log("Dialog::canceled()");
         finished(Enums.cancel)
     }
 
@@ -137,7 +126,6 @@ ControlBase {
                 buttonIds = buttonIds | id;
             }
         }
-        console.log("buttonIds", buttonIds);
 
         dialogContainer.buttonIds = buttonIds;
     }
@@ -146,7 +134,6 @@ ControlBase {
         sequence: "Escape";
         enabled: true;
         onActivated: {
-            //dialogContainer.finished("Cancel")
             dialogContainer.finished(Enums.cancel)
         }
     }

@@ -83,6 +83,7 @@
         <file alias="imtcontrols/Models/UuidGenerator.qml">Models/UuidGenerator.qml</file>
         <file alias="imtcontrols/Models/CommandsController.qml">Models/CommandsController.qml</file>
         <file alias="imtcontrols/Models/CommandsProvider.qml">Models/CommandsProvider.qml</file>
+	<file alias="imtcontrols/Models/MacAddressValidator.qml">Models/MacAddressValidator.qml</file>
         <file alias="imtcontrols/Views/TableRowViewer.qml">Views/TableRowViewer.qml</file>
         <file alias="imtcontrols/Views/TableRowDelegateBase.qml">Views/TableRowDelegateBase.qml</file>
         <file alias="imtcontrols/Views/TableHeaderDelegate.qml">Views/TableHeaderDelegate.qml</file>
@@ -99,7 +100,6 @@
         <file alias="imtcontrols/Views/TableRowDelegate.qml">Views/TableRowDelegate.qml</file>
         <file alias="imtcontrols/Views/TableProperties.qml">Views/TableProperties.qml</file>
         <file alias="imtcontrols/Views/TableSelection.qml">Views/TableSelection.qml</file>
-
         <file alias="imtcontrols/Views/BarChart.qml">Views/BarChart.qml</file>
         <file alias="imtcontrols/Views/BasicTableView.qml">Views/BasicTableView.qml</file>
         <file alias="imtcontrols/Views/BasicTreeView.qml">Views/BasicTreeView.qml</file>

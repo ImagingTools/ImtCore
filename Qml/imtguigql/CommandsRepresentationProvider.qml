@@ -9,13 +9,10 @@ CommandsController {
     property string commandId;
 
     onCommandIdChanged: {
-        console.log("onCommandIdChanged", commandId, JSON.stringify(getAdditionalInputParams()), this)
         updateModel();
     }
 
     function updateModel(){
-        console.log("Commands updateModel", commandId);
-
         if (commandId === ""){
             console.error("Unable to update commands model. Command-ID is empty.");
             return;
@@ -47,7 +44,6 @@ CommandsController {
 
         onStateChanged: {
             if (this.state === "Ready"){
-                console.log("Commands", this.ToJson());
                 var dataModelLocal;
 
                 if (this.ContainsKey("errors")){

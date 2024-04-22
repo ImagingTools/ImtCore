@@ -5,10 +5,11 @@ import imtcontrols 1.0
 Dialog {
     id: messageDialog;
 
+    width: 500;
+
     title: qsTr("Message");
 
     property string message;
-    property int contentWidth: 300;
 
     canMove: true;
 
@@ -18,9 +19,7 @@ Dialog {
     }
 
     Keys.onPressed: {
-        console.log("MessageDialog onPressed", event.key);
-
-        if (event.key == Qt.Key_Return){
+        if (event.key === Qt.Key_Return){
             messageDialog.finished(Enums.yes);
         }
     }
@@ -32,7 +31,7 @@ Dialog {
 
     contentComp: Component {
         MessageDialogBody {
-            width: messageDialog.contentWidth;
+            width: messageDialog.width;
             message: messageDialog.message;
         }
     }

@@ -10,8 +10,6 @@ QtObject {
     signal modelStateChanged(string state);
 
     function superuserExists(){
-        console.log("superuserExists");
-
         root.gqlGetModel.getModelData("su", {});
     }
 
@@ -35,16 +33,12 @@ QtObject {
 
             var gqlData = query.GetQuery();
 
-            console.log("UserItem query", gqlData);
-
             this.SetGqlQuery(gqlData);
         }
 
         onStateChanged: {
             console.log("State:", this.state);
             if (this.state === "Ready"){
-                console.log("superuserExists", this.ToJson());
-
                 var dataModelLocal;
 
                 if (root.gqlGetModel.ContainsKey("errors")){

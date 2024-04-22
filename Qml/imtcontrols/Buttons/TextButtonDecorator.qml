@@ -34,7 +34,7 @@ Item {
             id: textObj;
 
             anchors.verticalCenter: parent.verticalCenter;
-            anchors.left: commonButtonDecorator.baseButton.imageSource ? iconObj.right : parent.left;
+            anchors.left: parent.left;
             anchors.leftMargin: commonButtonDecorator.baseButton.imageSource ? Style.paddingSmall : commonButtonDecorator.baseButton.width/2 - width/2;
 
             color: commonButtonDecorator.baseButton.enabled ? Style.textColor : Style.inactive_textColor;

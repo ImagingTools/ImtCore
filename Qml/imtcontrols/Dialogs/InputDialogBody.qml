@@ -10,14 +10,13 @@ Item {
     property string message;
     property string inputValue: "";
     property Item rootItem: null;
+    property alias placeHolderText: inputField.placeHolderText;
 
     Component.onCompleted: {
         inputDialogBodyContainer.forceActiveFocus();
     }
 
     onFocusChanged: {
-        console.log("InputBody onFocusChanged", focus);
-
         if (inputDialogBodyContainer.focus){
             inputField.focus = inputDialogBodyContainer.focus;
         }

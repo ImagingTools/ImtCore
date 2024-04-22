@@ -8,95 +8,79 @@ ComboBox {
 
     property string filter;
 
-    property TreeItemModel proxyModel: TreeItemModel {}
+//    property TreeItemModel proxyModel: TreeItemModel {}
 
-    onModelChanged: {
-        if (model){
-            proxyModel.Copy(model);
-        }
-    }
+//    onModelChanged: {
+//        if (model){
+//            proxyModel.Copy(model);
+//        }
+//    }
 
-    //    onFilterChanged: {
-    //        proxyModel.Clear();
+//    Repeater {
+//        id: helperRepeater;
 
-    //        for (let i = 0; i < model.GetItemsCount(); i++){
-    //            if (model.ContainsKey(comboBoxContainer.nameId, i)){
-    //                let data = model.GetData(comboBoxContainer.nameId, i);
-    //                if (data.toLowerCase().indexOf(filter.toLowerCase()) >= 0){
-    //                    let index = proxyModel.InsertNewItem();
+//        model: comboBoxContainer.model;
 
-    //                    proxyModel.SetData("Id", model.GetData("Id", i), index);
-    //                    proxyModel.SetData(comboBoxContainer.nameId, model.GetData(comboBoxContainer.nameId, i), index);
-    //                }
-    //            }
-    //        }
-    //    }
+//        visible: false;
 
-    Repeater {
-        id: helperRepeater;
+//        delegate: Component {
+//            Item {
+//                property string displayText: model[comboBoxContainer.nameId];
+//                property bool acceptable: displayText.toLowerCase().indexOf(comboBoxContainer.filter.toLowerCase()) >= 0;
 
-        model: comboBoxContainer.model;
+//                onAcceptableChanged: {
+//                    if (!acceptable){
+//                        comboBoxContainer.proxyModel.RemoveItem(model.index);
+////                        for (let i = 0; i < comboBoxContainer.proxyModel.GetItemsCount(); i++){
+////                            if (comboBoxContainer.proxyModel.GetData("Id", i) === model.Id){
+////                                comboBoxContainer.proxyModel.RemoveItem(i)
 
-        visible: false;
-
-        delegate: Component {
-            Item {
-                property string displayText: model[comboBoxContainer.nameId];
-                property bool acceptable: displayText.toLowerCase().indexOf(comboBoxContainer.filter.toLowerCase()) >= 0;
-
-                onAcceptableChanged: {
-                    console.log("onAcceptableChanged", acceptable, model.index);
-                    if (!acceptable){
-                        for (let i = 0; i < comboBoxContainer.proxyModel.GetItemsCount(); i++){
-                            if (comboBoxContainer.proxyModel.GetData("Id", i) == model.Id){
-                                comboBoxContainer.proxyModel.RemoveItem(i)
-
-                                break;
-                            }
-                        }
-                    }
-                    else{
-                        let index = comboBoxContainer.proxyModel.InsertNewItem();
-                        comboBoxContainer.proxyModel.CopyItemDataFromModel(index, comboBoxContainer.model, model.index)
-                    }
-                }
-            }
-        }
-    }
-
-//    delegate: Component {PopupMenuDelegate {
-//            width: comboBoxContainer.width;
-//            height: acceptable ? comboBoxContainer.itemHeight : 0;
-
-//            visible: height > 0;
-
-//            text: displayText;
-
-//            highlighted: comboBoxContainer.currentIndex === model.index
-//            selected: comboBoxContainer.popup ? comboBoxContainer.popup.selectedIndex === model.index : false;
-
-//            property string displayText: model[comboBoxContainer.nameId];
-//            property string filter: comboBoxContainer.filter;
-
-//            property bool acceptable: displayText.toLowerCase().indexOf(filter.toLowerCase()) >= 0;
-
-//            onClicked: {
-//                if (comboBoxContainer.popup){
-//                    comboBoxContainer.popup.finished(model.Id, model.index)
+////                                break;
+////                            }
+////                        }
+//                    }
+//                    else{
+//                        let index = comboBoxContainer.proxyModel.InsertNewItem();
+//                        comboBoxContainer.proxyModel.CopyItemDataFromModel(index, comboBoxContainer.model, model.index)
+//                    }
 //                }
-//            }
-
-//            onEntered: {
-//                if (comboBoxContainer.popup){
-//                    comboBoxContainer.popup.selectedIndex = model.index;
-//                }
-//            }
-
-//            Component.onCompleted: {
-//                console.log("PopupMenuDelegate onCompleted");
 //            }
 //        }
 //    }
+
+    delegate: Component {PopupMenuDelegate {
+            width: comboBoxContainer.width;
+            height: acceptable ? comboBoxContainer.itemHeight : 0;
+
+            visible: height > 0;
+
+            text: displayText;
+
+            highlighted: comboBoxContainer.currentIndex === model.index
+            selected: comboBoxContainer.popup ? comboBoxContainer.popup.selectedIndex === model.index : false;
+
+            property string displayText: model[comboBoxContainer.nameId];
+            property string filter: comboBoxContainer.filter;
+
+            property bool acceptable: displayText.toLowerCase().indexOf(filter.toLowerCase()) >= 0;
+
+            onClicked: {
+                if (comboBoxContainer.popup){
+                    comboBoxContainer.popup.finished(model.Id, model.index)
+                }
+            }
+
+            onEntered: {
+                if (comboBoxContainer.popup){
+                    comboBoxContainer.popup.selectedIndex = model.index;
+                }
+            }
+
+            Component.onCompleted: {
+                console.log("PopupMenuDelegate onCompleted");
+            }
+        }
+    }
 
     property CustomTextField textInput;
 
@@ -193,7 +177,7 @@ ComboBox {
         modalDialogManager.openDialog(popupMenuComp, {
                                           "x":     point.x,
                                           "y":     point.y - (comboBoxContainer.height - 2),
-                                          "model": comboBoxContainer.proxyModel,
+                                          "model": comboBoxContainer.model,
                                           "width": comboBoxContainer.width});
 
         if (textInput){

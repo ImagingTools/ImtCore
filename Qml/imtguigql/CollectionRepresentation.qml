@@ -49,22 +49,16 @@ Item {
     }
 
     function updateModel(){
-        console.log("Collection representation updateModel");
-
         updateHeaders();
 
         updateObjectEditorInfo();
     }
 
     function updateObjectEditorInfo(){
-        console.log("Collection representation updateObjectEditorInfo");
-
         objectViewModel.getObjectView();
     }
 
     function updateHeaders(){
-        console.log("Collection representation updateHeaders");
-
         if (internal.headersUpdatingBlock){
             return;
         }
@@ -83,7 +77,6 @@ Item {
             return;
         }
 
-        console.log("updateElements", count, offset);
         if (root.collectionId === ""){
             console.error();
 
@@ -179,9 +172,7 @@ Item {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, removeModel);
             if (this.state === "Ready"){
-
                 var dataModelLocal;
                 if (removeModel.ContainsKey("errors")){
                     dataModelLocal = removeModel.GetData("errors");
@@ -230,8 +221,6 @@ Item {
         id: renameQuery;
 
         function rename(id, name) {
-            console.log( "CollectionView renameQuery rename");
-
             var query;
             var queryFields;
             var inputParams = Gql.GqlObject("input");
@@ -335,7 +324,6 @@ Item {
         }
 
         onStateChanged: {
-            console.log("State:", this.state, setDescriptionQuery);
             if (this.state === "Ready"){
                 var dataModelLocal;
 
@@ -403,7 +391,6 @@ Item {
             query.AddField(queryHeaders);
 
             var gqlData = query.GetQuery();
-            console.log("headerInfoModel query ", gqlData);
 
             internal.headersUpdatingBlock = true;
             this.SetGqlQuery(gqlData);
@@ -412,8 +399,6 @@ Item {
         onStateChanged: {
             if (this.state === "Ready"){
                 var dataModelLocal;
-
-                console.log("Headers", this.ToJson());
 
                 if (this.ContainsKey("errors")){
                     dataModelLocal = this.GetData("errors");
@@ -516,13 +501,7 @@ Item {
         }
 
         onStateChanged: {
-
-            console.log("List onStateChanged", this.state);
-
             if (this.state === "Ready"){
-
-                console.log("List", this.ToJson());
-
                 var dataModelLocal;
                 if (this.ContainsKey("errors")){
                     dataModelLocal = this.GetData("errors");
@@ -563,8 +542,6 @@ Item {
                         }
                     }
                 }
-
-                // root.endUpdate();
             }
             if (this.state !== "Loading"){
                 root.endUpdate();
@@ -576,7 +553,6 @@ Item {
         id: objectViewModel;
 
         function getObjectView(){
-            console.log( "CollectionView objectView");
             var query = Gql.GqlRequest("query", root.collectionId + "ObjectView");
 
             var inputParams = Gql.GqlObject("input");
@@ -598,7 +574,6 @@ Item {
             query.AddField(queryFields);
 
             var gqlData = query.GetQuery();
-            console.log("CollectionView objectView query ", gqlData);
             this.SetGqlQuery(gqlData);
         }
 

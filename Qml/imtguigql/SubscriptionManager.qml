@@ -69,13 +69,9 @@ WebSocket {
         let ok = socketModel.CreateFromJson(message)
 
         if (socketModel.GetData("type") === "connection_ask"){
-            console.log("SubscriptionManager onTextMessageReceived", message)
-
             registerSubscriptionToServer()
         }
         else if (socketModel.GetData("type") === "start_ask"){
-            console.log("SubscriptionManager onTextMessageReceived", message)
-
             for (let index = 0; index < subscriptionModel.length; index++){
                 if (subscriptionModel[index]["subscriptionId"] === socketModel.GetData("id")){
                     let subscription = subscriptionModel[index]["subscription"]
@@ -85,8 +81,6 @@ WebSocket {
             }
         }
         else if (socketModel.GetData("type") === "data"){
-            console.log("SubscriptionManager onTextMessageReceived", message)
-            console.log("subscriptionModel", subscriptionModel)
             for (let index = 0; index < subscriptionModel.length; index++){
                 if (subscriptionModel[index]["subscriptionId"] == socketModel.GetData("id")){
                     let subscription = subscriptionModel[index]["subscription"]
@@ -94,7 +88,6 @@ WebSocket {
                         continue;
                     }
 
-                    console.log("subscription", subscription);
                     subscription.state = "Processing"
                     let dataModelLocal = socketModel.GetData("payload");
                     subscription.Copy(dataModelLocal)
@@ -109,8 +102,6 @@ WebSocket {
     function registerSubscriptionEvent(parameters){
         let query = parameters["Query"];
         let client = parameters["Client"];
-
-        console.log("client", client.subscriptionId);
 
         registerSubscription(query, client);
     }
