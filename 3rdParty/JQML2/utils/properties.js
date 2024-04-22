@@ -594,13 +594,18 @@ class QAnchors extends ComplexObject {
         bottom: { type: QVar, value: undefined, changed: 'mainChanged' },
         horizontalCenter: { type: QVar, value: undefined, changed: 'mainChanged' },
         verticalCenter: { type: QVar, value: undefined, changed: 'mainChanged' },
-        leftMargin: { type: QReal, value: 0, changed: 'mainChanged' },
-        topMargin: { type: QReal, value: 0, changed: 'mainChanged' },
-        rightMargin: { type: QReal, value: 0, changed: 'mainChanged' },
-        bottomMargin: { type: QReal, value: 0, changed: 'mainChanged' },
+
+        leftMargin: { type: QReal, value: 0, changed: 'numberChanged' },
+        topMargin: { type: QReal, value: 0, changed: 'numberChanged' },
+        rightMargin: { type: QReal, value: 0, changed: 'numberChanged' },
+        bottomMargin: { type: QReal, value: 0, changed: 'numberChanged' },
         margins: { type: QReal, value: 0, changed: 'marginsChanged' },
-        horizontalCenterOffset: { type: QReal, value: 0, changed: 'mainChanged' },
-        verticalCenterOffset: { type: QReal, value: 0, changed: 'mainChanged' },
+        horizontalCenterOffset: { type: QReal, value: 0, changed: 'numberChanged' },
+        verticalCenterOffset: { type: QReal, value: 0, changed: 'numberChanged' },
+    }
+
+    numberChanged(){
+        if(this.completed) this.mainChanged()
     }
 
     mainChanged(){
