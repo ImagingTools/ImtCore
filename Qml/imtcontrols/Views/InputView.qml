@@ -13,6 +13,12 @@ Item{
     property bool fitToWidth: false;
     property int orientation: Qt.Vertical;
 
+    signal modelDataChanged(string role, int index);
+
+    onModelDataChanged: {
+        //console.log("Role:: ", role, "Index:: ", index);
+    }
+
     onModelChanged: {
         //console.log("INPUT_MODEL:: ", model.ToJson())
     }
@@ -39,6 +45,9 @@ Item{
                 }
                 if(item.dataModel !==undefined){
                     item.dataModel = inputView.dataModel;
+                }
+                if(item.modelDataChanged !==undefined){
+                    item.modelDataChanged.connect(inputView.modelDataChanged)
                 }
 
                 let keys = [];
