@@ -15,6 +15,7 @@ ViewBase {
 
     property alias filterMenu: filterMenu_;
     property alias loading: loading_;
+    property alias error: error_;
     property alias filterMenuVisible: filterMenu_.visible;
     property alias pagination: pagination_;
     property alias elementsCount: tableInternal.elementsCount;
@@ -252,6 +253,23 @@ ViewBase {
                 }
             }
         }
+    }
+
+    Rectangle {
+        id: error_;
+
+        anchors.fill: backgroundTable;
+
+        color: Style.baseColor;
+
+        Text {
+            anchors.centerIn: parent
+            text: "Error"
+            color: Style.textColor
+            font.pixelSize: Style.fontSizeLarge
+        }
+
+        visible: false;
     }
 
     Loading {

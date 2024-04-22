@@ -384,15 +384,12 @@ Item{
                 }
             }
 
-            Rectangle{
+            Text {
                 anchors.centerIn: parent;
-
-                width: 2;
-                height: 10;//20;
-                radius: width;
-
-                color: "gray";
-                opacity: 0.5;
+                color: Style.textColor
+                font.pixelSize: Style.fontSizeSmall
+                font.family: Style.fontFamily
+                text: "..."
             }
 
             MouseArea {
