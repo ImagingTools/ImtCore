@@ -459,7 +459,7 @@ class QData extends QProperty {
 // }
 
 class QAlias extends QProperty {
-    once = true
+    // once = true
     constructor(getTargetProperty){
         super()
         this.getTargetProperty = getTargetProperty   

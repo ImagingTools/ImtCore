@@ -127,7 +127,7 @@ class TextInput extends Item {
     }
 
     $maximumLengthChanged(){
-        this.$input.maxlength = this.getPropertyValue('maximumLength')
+        this.$input.setAttribute('maxLength', this.getPropertyValue('maximumLength'))
     }
 
     $horizontalAlignmentChanged(){
