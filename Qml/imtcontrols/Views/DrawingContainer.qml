@@ -406,7 +406,7 @@ Item{
 
             sourceComponent: drawer.content;
             onLoaded: {
-                setSizes();
+                drawer.setSizes();
                 drawer.loaded = true;
             }
         }
