@@ -23,17 +23,6 @@ Item {
     function showCriticalError(message){
         console.log("showCriticalError", message);
         return
-        if (root.errorPage != null){
-
-            if (message){
-                root.errorPage.text = message;
-            }
-
-            root.errorPage.visible = true;
-
-//            Events.sendEvent("Logout");
-            Events.sendEvent("UpdateSystemStatus");
-        }
     }
 
     function showWarningError(message){

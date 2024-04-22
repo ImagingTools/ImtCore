@@ -16,6 +16,9 @@ ControlBase {
     property int index: model.index;
     property int selectedIndex: -1;
 
+    property int maxWidth: 250;
+    property int minWidth: 100;
+
     property ListView listView: null;
 
     decorator: Style.tabPanelDecorator

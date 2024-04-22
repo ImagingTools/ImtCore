@@ -5,7 +5,7 @@ import imtcontrols 1.0
 DecoratorBase {
     id: leftPanelElement;
 
-    width: 100;
+    width: 90;
     height: 80;
 
     property string title: "";
@@ -75,10 +75,10 @@ DecoratorBase {
             id: description;
 
             anchors.top: image.bottom;
+            anchors.topMargin: Style.size_mainMargin;
             anchors.left: parent.left;
-            anchors.right: parent.right;
-            anchors.topMargin: 10;
             anchors.leftMargin:  indicator.width;
+            anchors.right: parent.right;
             anchors.rightMargin: indicator.width;
 
             color: leftPanelElement.selected ? Style.iconColorOnSelected: Style.textColor;

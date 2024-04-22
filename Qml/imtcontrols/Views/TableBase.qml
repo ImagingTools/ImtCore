@@ -697,7 +697,7 @@ Rectangle {
 
         boundsBehavior: Flickable.StopAtBounds;
 
-        cacheBuffer: Math.max(0, tableContainer.height + 20 * tableContainer.itemHeight);
+        cacheBuffer: elementsListObj.count * tableContainer.itemHeight;
 
         clip: true;
 
@@ -712,15 +712,6 @@ Rectangle {
         Keys.onDownPressed: {
             tableContainer.tableSelection.down();
         }
-
-//        onActiveFocusChanged: {
-//            if (elementsListObj.activeFocus){
-//                tableContainer.tableSelection.subscribeEvents();
-//            }
-//            else{
-//                tableContainer.tableSelection.unsubscribeEvents();
-//            }
-//        }
 
         onContentYChanged: {
             if(tableContainer.isFrameScrolling){

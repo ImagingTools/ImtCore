@@ -46,7 +46,15 @@ imtbase::CTreeItemModel* CAccountControllerComp::GetObject(const imtgql::CGqlReq
 					if (addressPtr != nullptr){
 						dataModelPtr->SetData("Country", addressPtr->GetCountry());
 						dataModelPtr->SetData("City", addressPtr->GetCity());
-						dataModelPtr->SetData("PostalCode", addressPtr->GetPostalCode());
+
+						QString postalCodeStr;
+
+						int postalCode = addressPtr->GetPostalCode();
+						if (postalCode > 0){
+							postalCodeStr = QString::number(postalCode);
+						}
+
+						dataModelPtr->SetData("PostalCode", postalCodeStr);
 						dataModelPtr->SetData("Street", addressPtr->GetStreet());
 
 						break;

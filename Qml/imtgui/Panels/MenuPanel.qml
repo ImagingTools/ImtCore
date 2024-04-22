@@ -11,7 +11,7 @@ Rectangle {
 
     clip: true;
 
-    width: visible ? contentWidth : 1;
+    width: visible ? contentWidth : 0;
 
     property string textColor: Style.textColor;
     property string fontName: "Helvetica";

@@ -5,7 +5,7 @@ import imtcontrols 1.0
 DecoratorBase {
     id: tabPanelDecorator;
 
-    width: texttabDelegate.width + imagetabDelegate.width + 40;
+    width: content.width + 2 * Style.size_mainMargin;
     height: baseElement ? baseElement.height : 50
 
     property string firstElementImageSource: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.firstElementImageSource : "";
@@ -50,86 +50,81 @@ DecoratorBase {
         visible: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.selected: false;
     }
 
-    Item {
-        id: imagetabDelegate;
+    Row {
+        id: content;
+
+        anchors.centerIn: tabPanelDecorator;
 
         height: tabPanelDecorator.height;
-        width: visible ? height : 1;
 
-        visible: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.firstElement: false;
+        spacing: Style.size_mainMargin;
 
-        Image {
-            id: firsElementImage;
+        Item {
+            id: imagetabDelegate;
 
-            anchors.centerIn: imagetabDelegate;
+            anchors.verticalCenter: parent.verticalCenter;
 
-            width: imagetabDelegate.width * 0.6;
-            height: imagetabDelegate.height * 0.6;
+            width: visible ? height : 0;
+            height: tabPanelDecorator.height;
 
-            sourceSize.width: width;
-            sourceSize.height: height;
+            visible: false;
 
-            fillMode: Image.PreserveAspectFit;
+            Image {
+                id: firsElementImage;
+
+                anchors.centerIn: imagetabDelegate;
+
+                width: imagetabDelegate.width * 0.6;
+                height: imagetabDelegate.height * 0.6;
+
+                sourceSize.width: width;
+                sourceSize.height: height;
+
+                fillMode: Image.PreserveAspectFit;
+            }
         }
-    }
 
-    Item {
-        id: texttabDelegate;
+        Item {
+            id: texttabDelegate;
 
-        anchors.top: tabPanelDecorator.top;
-        anchors.bottom: tabPanelDecorator.bottom;
-        anchors.left: imagetabDelegate.right;
-        anchors.leftMargin: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.firstElement ? 0 :10 : 0;
+            anchors.verticalCenter: parent.verticalCenter;
 
-        width: text.width;
+            width: tabPanelDecorator.baseElement && text.width < tabPanelDecorator.baseElement.minWidth ? tabPanelDecorator.baseElement.minWidth :
+                   tabPanelDecorator.baseElement && text.width > tabPanelDecorator.baseElement.maxWidth ? tabPanelDecorator.baseElement.maxWidth : text.width;
 
-        Text {
-            id: text;
+            height: tabPanelDecorator.height;
 
-            anchors.centerIn: texttabDelegate;
+            clip: true;
 
-            color: Style.textColor;
-            font.family: tabPanelDecorator.baseElement.index === 0 ? Style.fontFamilyBold : Style.fontFamily;
-            font.bold: tabPanelDecorator.baseElement.index === 0;
-            font.pixelSize: Style.fontSize_common;
-            text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
+            Text {
+                id: text;
+
+                anchors.verticalCenter: parent.verticalCenter;
+                anchors.horizontalCenter: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.index === 0 ||
+                                          text.width < tabPanelDecorator.baseElement.minWidth
+                                          ? parent.horizontalCenter : undefined;
+
+                color: Style.textColor;
+                font.family: tabPanelDecorator.baseElement.index === 0 ? Style.fontFamilyBold : Style.fontFamily;
+                font.bold: tabPanelDecorator.baseElement.index === 0;
+                font.pixelSize: Style.fontSize_common;
+                text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
+
+                elide: Text.ElideRight;
+            }
         }
-    }
 
-    Item {
-        id: closeButton;
-        anchors.right: tabPanelDecorator.right;
-        anchors.rightMargin: 8;
-        anchors.verticalCenter: tabPanelDecorator.verticalCenter;
+        ToolButton {
+            id: closeButton;
 
-        height: tabPanelDecorator.height;
-        width: closeImage.width;
+            anchors.verticalCenter: parent.verticalCenter;
 
-        visible: !tabPanelDecorator.baseElement.firstElement && tabPanelDecorator.baseElement.isCloseEnable;
-
-        Image {
-            id: closeImage;
-
-            anchors.centerIn: closeButton;
-
-            width: 13;
+            width: Style.iconSizeSmall;
             height: width;
 
-            sourceSize.width: width;
-            sourceSize.height: height;
+            visible: !tabPanelDecorator.baseElement.firstElement && tabPanelDecorator.baseElement.isCloseEnable;
 
-            fillMode: Image.PreserveAspectFit;
-            source: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
-        }
-
-        MouseArea {
-            id: closeMA;
-
-            anchors.fill: closeButton;
-
-            enabled: closeButton.visible;
-            hoverEnabled: enabled;
-            cursorShape: containsMouse ? Qt.PointingHandCursor : Qt.ArrowCursor;
+            iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
             onClicked: {
                 tabPanelDecorator.baseElement.closeSignal();
