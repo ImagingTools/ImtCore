@@ -28,7 +28,6 @@ Item {
 
     signal beginUpdate();
     signal endUpdate();
-    signal error();
 
     onCollectionIdChanged: {
         updateModel();
@@ -564,11 +563,9 @@ Item {
                         }
                     }
                 }
-            }
-            else if (this.state === "Error"){
-                // root.error()
-            }
 
+                // root.endUpdate();
+            }
             if (this.state !== "Loading"){
                 root.endUpdate();
             }

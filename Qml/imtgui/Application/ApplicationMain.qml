@@ -358,50 +358,6 @@ Item {
             }
         }
     }
-
-    SubscriptionClient {
-        id: broadcastMessageSub;
-
-        Component.onCompleted: {
-            let subscriptionRequestId = "OnBroadCastMessage"
-            var query = Gql.GqlRequest("subscription", subscriptionRequestId);
-            var queryFields = Gql.GqlObject("message");
-
-            window.subscriptionManager.registerSubscription(query, broadcastMessageSub)
-        }
-
-        onStateChanged: {
-            console.log("LisaWsConnection onStateChanged", state);
-
-            if (state === "Ready"){
-                console.log("data", broadcastMessageSub.toJSON());
-
-                if (broadcastMessageSub.ContainsKey("data")){
-                    let localModel = broadcastMessageSub.GetData("data")
-
-                    if (localModel.ContainsKey("OnBroadCastMessage")){
-                        localModel = localModel.GetData("OnBroadCastMessage")
-
-                        if (localModel.ContainsKey("message")){
-                            let serverMessage = localModel.GetData("message")
-                            modalDialogManager.openDialog(broadcastMessageDialog, { "message": serverMessage });
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    Component {
-        id: broadcastMessageDialog;
-
-        ErrorDialog {
-            title: qsTr("Warning Message");
-            message: qsTr("Broadcast message");
-
-            onFinished: {}
-        }
-    }
 }
 
 

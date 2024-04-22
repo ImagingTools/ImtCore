@@ -139,7 +139,6 @@ Item {
                 }
 
                 dataController = dataControllerComp.createObject(container);
-                console.log("*DEBUG* dataController.additionalFieldIds", dataController.additionalFieldIds)
             }
         }
 
@@ -157,7 +156,6 @@ Item {
             target: container.dataController;
 
             function onBeginUpdate(){
-                container.error.visible = false;
                 container.loading.start();
             }
 
@@ -169,9 +167,6 @@ Item {
                 container.doUpdateGui();
             }
 
-            function onError(){
-                container.error.visible = true;
-            }
             function onNotificationModelChanged(){
                 if (!container.dataController){
                     return;

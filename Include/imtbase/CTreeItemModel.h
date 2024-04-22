@@ -12,7 +12,6 @@
 // ACF includes
 #include <iser/ISerializable.h>
 #include <istd/TSmartPtr.h>
-#include <istd/IChangeable.h>
 
 
 namespace imtbase
@@ -22,7 +21,7 @@ namespace imtbase
 /**
 	Hierarchical representation of the data model.
 */
-class CTreeItemModel: public QAbstractListModel, virtual public istd::IChangeable
+class CTreeItemModel: public QAbstractListModel
 {
 	Q_OBJECT
 	Q_PROPERTY(QString state READ State WRITE SetState NOTIFY stateChanged)
@@ -37,8 +36,6 @@ public:
 	void SetState(const QString &newState);
 
 	virtual bool SerializeModel(iser::IArchive& archive);
-
-	// reimplemented (istd::IChangeable)
 
 public Q_SLOTS:
 	void SetParent(QObject *parent);
