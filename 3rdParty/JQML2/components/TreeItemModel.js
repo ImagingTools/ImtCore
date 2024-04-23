@@ -22,6 +22,15 @@ class TreeItemModel extends JSONListModel {
         if(this.getPropertyValue('isUpdateEnabled')) super.$emitDataChanged(topLeft, bottomRight, roles)
     }
 
+    addResource(resource){
+        super.addResource(resource)
+
+        if(resource instanceof TreeItemModel){
+            resource.getProperty('isUpdateEnabled').setOriginCompute(()=>{resource.getProperty('isUpdateEnabled').subscribe(this.getProperty('isUpdateEnabled')); return this.getProperty('isUpdateEnabled').get()})
+            resource.getProperty('isUpdateEnabled').update()
+        }
+    }
+
     SetUpdateEnabled(flag){
         this.getProperty('isUpdateEnabled').reset(flag)
     }
@@ -53,9 +62,6 @@ class TreeItemModel extends JSONListModel {
             } else {
                 modelObject[key] = retModel
             }
-
-            retModel.getProperty('isUpdateEnabled').setOriginCompute(()=>{retModel.getProperty('isUpdateEnabled').subscribe(this.getProperty('isUpdateEnabled')); return this.getProperty('isUpdateEnabled').get()})
-            retModel.getProperty('isUpdateEnabled').update()
 
             if(Object.keys(retVal).length) retModel.append(retVal)
 
@@ -455,9 +461,6 @@ class TreeItemModel extends JSONListModel {
                     } else {
                         modelObject[keys[index]] = retModel
                     }
-
-                    retModel.getProperty('isUpdateEnabled').setOriginCompute(()=>{retModel.getProperty('isUpdateEnabled').subscribe(this.getProperty('isUpdateEnabled')); return this.getProperty('isUpdateEnabled').get()})
-                    retModel.getProperty('isUpdateEnabled').update()
 
                     if(Object.keys(retVal).length) retModel.append(retVal)
                     retVal = retModel

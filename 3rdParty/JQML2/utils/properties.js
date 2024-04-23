@@ -377,7 +377,19 @@ class QLinkedBool extends QBool {
         global.queueLink.push(this)
         let value = this.value
         try {
-            value = this.compute ? this.originCompute() && this.compute() : this.originCompute() && this.originValue
+            if(this.compute){
+                if(this.originCompute){
+                    value = this.originCompute() && this.compute()
+                } else {
+                    value = this.originValue && this.compute()
+                }
+            } else {
+                if(this.originCompute){
+                    value = this.originCompute() && this.originValue
+                } else {
+                    value = this.originValue
+                }
+            }
         } catch (error) {
             
         } finally {
