@@ -239,7 +239,7 @@ class MouseController {
             }
         }
 
-        if(!this.target || !(this.target instanceof TextInput || this.target instanceof TextInput || this.target instanceof Map)){
+        if(!this.target || !(this.target instanceof TextInput || this.target instanceof TextEdit || this.target instanceof Map)){
             e.preventDefault()
         }
     }
@@ -790,15 +790,15 @@ class TextFontController {
 
         this.container.innerHTML = text
 
-        if(accuracy){
+        // if(accuracy){
             let rect = this.container.getBoundingClientRect()
             return rect
-        } else {
-            return {
-                width: this.container.clientWidth,
-                height: this.container.clientHeight,
-            }
-        }
+        // } else {
+        //     return {
+        //         width: this.container.clientWidth,
+        //         height: this.container.clientHeight,
+        //     }
+        // }
         
     }
 }
