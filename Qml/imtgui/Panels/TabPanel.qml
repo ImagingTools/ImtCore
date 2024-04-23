@@ -29,7 +29,7 @@ Rectangle {
     }
 
     onSelectedIndexChanged: {
-        viewTabInListView(selectedIndex);
+//        viewTabInListView(selectedIndex);
     }
 
     ListView {
@@ -68,22 +68,6 @@ Rectangle {
     }
 
     Rectangle {
-        anchors.right: externButtons.left;
-
-        height: parent.height;
-        width: parent.height;
-
-        visible: externButtons.visible;
-        rotation: -90;
-
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: "#00ffffff"; }
-            GradientStop { position: 0.5; color: "#00ffffff"; }
-            GradientStop { position: 1.0; color: Style.imagingToolsGradient2; }
-        }
-    }
-
-    Rectangle {
         id: externButtons;
 
         anchors.right: parent.right;
@@ -108,7 +92,10 @@ Rectangle {
             width: externButtons.width / 2;
             height: externButtons.height;
 
-            iconSource: "../../../" +  Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal);
+            enabled: tabPanelContainer.selectedIndex > 0;
+
+            iconSource: enabled ? "../../../" +  Style.getIconPath("Icons/Left", Icon.State.On, Icon.Mode.Normal)
+                                : "../../../" +  Style.getIconPath("Icons/Left", Icon.State.Off, Icon.Mode.Disabled);
 
             onClicked: {
                 tabPanelContainer.leftClicked();
@@ -124,7 +111,10 @@ Rectangle {
             width: externButtons.width / 2;
             height: externButtons.height;
 
-            iconSource: "../../../" +  Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal);
+            enabled: tabPanelContainer.selectedIndex < list.count - 1;
+
+            iconSource: enabled ? "../../../" +  Style.getIconPath("Icons/Right", Icon.State.On, Icon.Mode.Normal)
+                                : "../../../" +  Style.getIconPath("Icons/Right", Icon.State.Off, Icon.Mode.Disabled);
 
             onClicked: {
                 tabPanelContainer.rightClicked();

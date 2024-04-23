@@ -14,15 +14,11 @@ ViewBase {
     property string productId: "";
 
     function updateGui(){
-        console.log("RoleView updateGui", model.ToJson());
-
         generalGroup.updateGui();
         permissionsGroup.updateGui()
     }
 
     function updateModel(){
-        console.log("RoleView updateModel", model.ToJson());
-
         generalGroup.updateModel();
         permissionsGroup.updateModel()
     }
@@ -96,6 +92,7 @@ ViewBase {
                     }
 
                     KeyNavigation.tab: roleIdInput;
+                    KeyNavigation.backtab: permissionsGroup;
                 }
 
                 TextInputElementView {
@@ -106,6 +103,7 @@ ViewBase {
                     name: qsTr("Role-ID");
 
                     KeyNavigation.tab: descriptionInput;
+                    KeyNavigation.backtab: roleNameInput;
                 }
 
                 TextInputElementView {
@@ -121,13 +119,17 @@ ViewBase {
                         }
                     }
 
-                    KeyNavigation.tab: roleNameInput;
+                    KeyNavigation.tab: parentRolesTable;
+                    KeyNavigation.backtab: roleIdInput;
                 }
 
                 TableElementView {
                     id: parentRolesTable;
 
                     name: qsTr("Parent Roles");
+
+                    KeyNavigation.tab: permissionsGroup;
+                    KeyNavigation.backtab: descriptionInput;
 
                     Component.onCompleted: {
                         parentRolesTable.table.checkable = true;
@@ -318,6 +320,9 @@ ViewBase {
 
                 TreeViewElementView {
                     id: permissionsGroup;
+
+                    KeyNavigation.tab: roleNameInput;
+                    KeyNavigation.backtab: parentRolesTable;
 
                     Component.onCompleted: {
                         permissionsGroup.treeView.tristate = true;

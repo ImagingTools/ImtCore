@@ -38,7 +38,7 @@ DecoratorBase {
 
             anchors.verticalCenter: content.verticalCenter;
 
-            //textFieldRightMargin: iconClear.width + 2 * margin;
+            textFieldRightMargin: iconClear.width + 2 * margin;
 
             width: 270;
             height: 30;
@@ -74,6 +74,7 @@ DecoratorBase {
                 iconSource: "../../../" + Style.getIconPath("Icons/Close", Icon.State.On, Icon.Mode.Normal);
 
                 onClicked: {
+                    console.log("iconClear onClicked")
                     tfc.text = "";
                 }
             }

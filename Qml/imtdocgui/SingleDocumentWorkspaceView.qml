@@ -209,10 +209,8 @@ DocumentManager {
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
-        //        anchors.margins: Style.size_mainMargin;
 
         onItemAdded: {
-            console.log("onItemAdded", index, item);
             let documentObj = documentManager.documentsModel.get(index);
 
             if (item.viewId !== undefined){

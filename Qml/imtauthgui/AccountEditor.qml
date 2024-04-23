@@ -53,8 +53,6 @@ ViewBase {
     }
 
     function updateGui(){
-        console.log("AccountEditor updateGui");
-
         if (accountEditorContainer.model.ContainsKey("Name")){
             accountNameInput.text = accountEditorContainer.model.GetData("Name");
         }
@@ -120,8 +118,6 @@ ViewBase {
         }
 
         groupsElement.table.uncheckAll();
-
-        console.log("groupsElement.table.elements", groupsElement.table.elements);
 
         if (groupsElement.table.elements){
             for (let i = 0; i < groupsElement.table.elements.GetItemsCount(); i++){
@@ -234,9 +230,10 @@ ViewBase {
                     }
 
                     KeyNavigation.tab: accountNameInput;
+                    KeyNavigation.backtab: groupsElement;
 
                     Component.onCompleted: {
-                        let ok = PermissionsController.checkPermission("ChangeAccount");
+                        let ok = PermissionsController.checkPermission("ChangeCustomerId");
 
                         customerIdInput.readOnly = !ok;
                     }
@@ -266,9 +263,10 @@ ViewBase {
                     }
 
                     KeyNavigation.tab: accountDescriptionInput;
+                    KeyNavigation.backtab: customerIdInput;
 
                     Component.onCompleted: {
-                        let ok = PermissionsController.checkPermission("ChangeAccount");
+                        let ok = PermissionsController.checkPermission("ChangeAccountName");
 
                         accountNameInput.readOnly = !ok;
                     }
@@ -285,9 +283,10 @@ ViewBase {
                     }
 
                     KeyNavigation.tab: emailInput;
+                    KeyNavigation.backtab: accountNameInput;
 
                     Component.onCompleted: {
-                        let ok = PermissionsController.checkPermission("ChangeAccount");
+                        let ok = PermissionsController.checkPermission("ChangeAccountDescription");
 
                         accountDescriptionInput.readOnly = !ok;
                     }
@@ -308,9 +307,10 @@ ViewBase {
                     }
 
                     KeyNavigation.tab: countryInput;
+                    KeyNavigation.backtab: accountDescriptionInput;
 
                     Component.onCompleted: {
-                        let ok = PermissionsController.checkPermission("ChangeAccount");
+                        let ok = PermissionsController.checkPermission("ChangeAccountEmail");
 
                         emailInput.readOnly = !ok;
                     }
@@ -346,9 +346,10 @@ ViewBase {
                     }
 
                     KeyNavigation.tab: cityInput;
+                    KeyNavigation.backtab: emailInput;
 
                     Component.onCompleted: {
-                        let ok = PermissionsController.checkPermission("ChangeAccount");
+                        let ok = PermissionsController.checkPermission("ChangeCompanyAddress");
 
                         countryInput.readOnly = !ok;
                     }
@@ -365,9 +366,10 @@ ViewBase {
                     }
 
                     KeyNavigation.tab: postalCodeInput;
+                    KeyNavigation.backtab: countryInput;
 
                     Component.onCompleted: {
-                        let ok = PermissionsController.checkPermission("ChangeAccount");
+                        let ok = PermissionsController.checkPermission("ChangeCompanyAddress");
 
                         cityInput.readOnly = !ok;
                     }
@@ -384,9 +386,10 @@ ViewBase {
                     }
 
                     KeyNavigation.tab: streetInput;
+                    KeyNavigation.backtab: cityInput;
 
                     Component.onCompleted: {
-                        let ok = PermissionsController.checkPermission("ChangeAccount");
+                        let ok = PermissionsController.checkPermission("ChangeCompanyAddress");
 
                         postalCodeInput.readOnly = !ok;
                     }
@@ -402,10 +405,11 @@ ViewBase {
                         accountEditorContainer.doUpdateModel();
                     }
 
-                    KeyNavigation.tab: customerIdInput;
+                    KeyNavigation.tab: groupsElement;
+                    KeyNavigation.backtab: postalCodeInput;
 
                     Component.onCompleted: {
-                        let ok = PermissionsController.checkPermission("ChangeAccount");
+                        let ok = PermissionsController.checkPermission("ChangeCompanyAddress");
 
                         streetInput.readOnly = !ok;
                     }
@@ -448,16 +452,17 @@ ViewBase {
 
                 name: qsTr("Groups");
 
-                Component.onCompleted: {
-                    let ok = PermissionsController.checkPermission("ChangeAccount");
-
-                    groupsElement.table.readOnly = !ok;
-                    groupsElement.table.checkable = true;
-                    groupsElement.table.elements = CachedGroupCollection.collectionModel;
-                }
+                KeyNavigation.tab: customerIdInput;
+                KeyNavigation.backtab: streetInput;
 
                 onTableChanged: {
                     if (groupsElement.table){
+                        groupsElement.table.checkable = true;
+                        groupsElement.table.elements = CachedGroupCollection.collectionModel;
+
+                        let ok = PermissionsController.checkPermission("ChangeAccountGroups");
+                        groupsElement.table.readOnly = !ok;
+
                         tableConn.target = groupsElement.table;
                     }
                 }
@@ -466,8 +471,6 @@ ViewBase {
                     id: tableConn;
 
                     function onCheckedItemsChanged(){
-                        console.log("Connections checkedItemsChanged");
-
                         accountEditorContainer.doUpdateModel();
                     }
                 }

@@ -36,6 +36,12 @@ RemoteCollectionView {
     }
 
     Component {
+        id: treeItemModelComp;
+
+        TreeItemModel {}
+    }
+
+    Component {
         id: featureDocumentComp;
 
         FeatureEditor {
@@ -50,22 +56,25 @@ RemoteCollectionView {
             commandsDelegateComp: Component {ViewCommandsDelegateBase {
                     view: featureEditor;
                     onCommandActivated: {
+                        console.log("onCommandActivated", commandId);
                         let selectedIndex = null;
                         if (featureEditor.tableView.tableSelection.items.length > 0){
                             selectedIndex = featureEditor.tableView.tableSelection.items[0];
                         }
 
-                        if (commandId === "New"){
+                        if (commandId === "InsertFeature"){
                             if (selectedIndex != null){
-                                featureEditor.tableView.addChildItem(selectedIndex, {"FeatureId":"", "FeatureName":"Feature Name", "FeatureDescription":"", "Dependencies":"", "Optional":false, "ChildModel":0})
+                                let childModel = selectedIndex.getData("ChildModel");
 
-                                featureEditor.model.dataChanged(null, null);
+                                let emptyModel = treeItemModelComp.createObject(childModel)
+                                childModel.InsertNewItemWithParameters(0, {"FeatureId":"", "FeatureName":"Feature Name", "FeatureDescription":"", "Dependencies":"", "Optional":false, "ChildModel": emptyModel});
                             }
                         }
-                        else if (commandId === "Remove"){
+                        else if (commandId === "RemoveFeature"){
                             if (selectedIndex != null){
-                                featureEditor.tableView.removeChildItem(selectedIndex);
-                                featureEditor.model.dataChanged(null, null);
+                                let parentModel = selectedIndex.getParentModel();
+
+                                parentModel.RemoveItem(selectedIndex.index);
                             }
                         }
                     }

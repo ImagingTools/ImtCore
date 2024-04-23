@@ -225,6 +225,7 @@ Rectangle {
 
                 placeHolderText: qsTr("Enter the login");
                 KeyNavigation.tab: passwordTextInput;
+                KeyNavigation.backtab: passwordTextInput;
 
                 onTextChanged: {
                     if (errorMessage.text != ""){
@@ -278,6 +279,7 @@ Rectangle {
                 echoMode: TextInput.Password;
 
                 KeyNavigation.tab: loginTextInput;
+                KeyNavigation.backtab: loginTextInput;
 
                 onTextChanged: {
                     if (errorMessage.text != ""){

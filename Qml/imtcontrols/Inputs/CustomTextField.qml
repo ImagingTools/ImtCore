@@ -41,6 +41,7 @@ FocusScope {
 
     property bool fontBold: false;
     property bool hasActionMenu: true;
+    property bool autoEditingFinished: true;
 
     property real placeHolderOpacity: 1;
 
@@ -52,7 +53,7 @@ FocusScope {
     Keys.onPressed: {
         if (containerTextField.activeFocus){
 
-            if (event.key == Qt.Key_Escape) {
+            if (event.key === Qt.Key_Escape) {
                 containerTextField.cancelled();
             }
         }
@@ -208,10 +209,6 @@ FocusScope {
             containerTextField.editingFinished();
         }
 
-        onActiveFocusChanged: {
-            console.log("TextInput onActiveFocusChanged", activeFocus);
-        }
-
         Text {
             id: placeHolder;
 
@@ -237,7 +234,9 @@ FocusScope {
         interval: 500;
 
         onTriggered: {
-            containerTextField.editingFinished();
+            if (containerTextField.autoEditingFinished){
+                containerTextField.editingFinished();
+            }
         }
     }
 }

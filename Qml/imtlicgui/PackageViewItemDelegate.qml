@@ -61,6 +61,7 @@ TreeViewItemDelegateBase {
                     text: model.FeatureName ? model.FeatureName : "";
 
                     visible: false;
+                    autoEditingFinished: false;
 
                     onCancelled: {
                         inputName.visible = false;
@@ -132,6 +133,7 @@ TreeViewItemDelegateBase {
                     text: model.FeatureId ? model.FeatureId : "";
 
                     visible: false;
+                    autoEditingFinished: false;
 
                     onCancelled: {
                         inputId.visible = false;
@@ -213,6 +215,7 @@ TreeViewItemDelegateBase {
                     text: model.FeatureDescription ? model.FeatureDescription : "";
 
                     visible: false;
+                    autoEditingFinished: false;
 
                     onCancelled: {
                         inputDescription.visible = false;

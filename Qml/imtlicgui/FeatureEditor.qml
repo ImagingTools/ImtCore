@@ -125,12 +125,6 @@ ViewBase {
     function updateGui(){
         console.log("updateGui", model.ToJson());
 
-//        if (tableView.rowModel){
-//            tableView.rowModel = model;
-
-//            tableView.rowModel.Refresh();
-//        }
-
         featureEditor.updateTreeViewGui();
     }
 
@@ -249,8 +243,8 @@ ViewBase {
                 }
 
                 if (featureEditor.commandsController){
-                    featureEditor.commandsController.setCommandIsEnabled("New", newIsEnabled)
-                    featureEditor.commandsController.setCommandIsEnabled("Remove", removeIsEnabled)
+                    featureEditor.commandsController.setCommandIsEnabled("InsertFeature", newIsEnabled)
+                    featureEditor.commandsController.setCommandIsEnabled("RemoveFeature", removeIsEnabled)
                 }
             }
 

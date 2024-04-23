@@ -96,6 +96,7 @@ ViewBase {
                     }
 
                     KeyNavigation.tab: passwordInput;
+                    KeyNavigation.backtab: groupsTable;
                 }
 
                 TextInputElementView {
@@ -116,6 +117,7 @@ ViewBase {
                     }
 
                     KeyNavigation.tab: nameInput;
+                    KeyNavigation.backtab: usernameInput;
                 }
 
                 TextInputElementView {
@@ -133,6 +135,7 @@ ViewBase {
                     }
 
                     KeyNavigation.tab: mailInput;
+                    KeyNavigation.backtab: passwordInput;
                 }
 
                 RegularExpressionValidator {
@@ -155,6 +158,7 @@ ViewBase {
                     }
 
                     KeyNavigation.tab: usernameInput;
+                    KeyNavigation.backtab: nameInput;
                 }
 
                 function updateGui(){
@@ -209,6 +213,9 @@ ViewBase {
 
                 TableElementView {
                     id: rolesTable;
+
+                    KeyNavigation.tab: groupsTable;
+                    KeyNavigation.backtab: mailInput;
 
                     Component.onCompleted: {
                         rolesTable.table.readOnly = container.readOnly;
@@ -300,6 +307,9 @@ ViewBase {
 
                 TableElementView {
                     id: groupsTable;
+
+                    KeyNavigation.tab: usernameInput;
+                    KeyNavigation.backtab: rolesTable;
 
                     Component.onCompleted: {
                         groupsTable.table.readOnly = container.readOnly;

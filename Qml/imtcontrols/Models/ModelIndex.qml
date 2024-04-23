@@ -58,15 +58,7 @@ QtObject {
     }
 
     function equalByArrayIndexes(indexes){
-        console.log("equalByArrayIndexes");
-
         let selfIndexes = root.getIndexes();
-
-        console.log("selfIndexes", selfIndexes.toString());
-        console.log("otherIndexes", indexes.toString());
-
-        console.log("result", selfIndexes.toString() === indexes.toString());
-
         return selfIndexes.toString() === indexes.toString();
     }
 

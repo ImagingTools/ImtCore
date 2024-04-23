@@ -87,7 +87,7 @@ istd::IChangeable* CFeatureControllerComp::CreateObject(
 imtbase::CTreeItemModel* CFeatureControllerComp::GetObject(const imtgql::CGqlRequest& gqlRequest, QString& errorMessage) const
 {
 	if (!m_objectCollectionCompPtr.IsValid()){
-		errorMessage = QObject::tr("Internal error.").toUtf8();
+		errorMessage = QString("Internal error.").toUtf8();
 		SendErrorMessage(0, errorMessage, "Feature controller");
 
 		return nullptr;
@@ -241,7 +241,7 @@ bool CFeatureControllerComp::CreateFeatureFromRepresentationModel(
 	if (!collectionIds.isEmpty()){
 		QByteArray id = collectionIds[0];
 		if (objectId != id){
-			errorMessage = QT_TR_NOOP(QString("Feature-ID: %1 already exists. Please rename.")).arg(qPrintable(featureId));
+			errorMessage = QT_TR_NOOP(QString("Feature-ID: '%1' already exists. Please rename.")).arg(qPrintable(featureId));
 			return false;
 		}
 	}
@@ -255,24 +255,6 @@ bool CFeatureControllerComp::CreateFeatureFromRepresentationModel(
 		errorMessage = QT_TR_NOOP(QString("Unable to create feature with an empty Name."));
 
 		return false;
-	}
-
-	iprm::CIdParam nameParam;
-	nameParam.SetId(featureName.toUtf8());
-
-	iprm::CParamsSet paramsSet2;
-	paramsSet2.SetEditableParameter("FeatureName", &nameParam);
-
-	iprm::CParamsSet filterParam2;
-	filterParam2.SetEditableParameter("ObjectFilter", &paramsSet2);
-
-	imtbase::ICollectionInfo::Ids collectionIds2 = m_objectCollectionCompPtr->GetElementIds(0, -1, &filterParam2);
-	if (!collectionIds2.isEmpty()){
-		QByteArray id = collectionIds2[0];
-		if (objectId != id){
-			errorMessage = QT_TR_NOOP(QString("Feature Name: %1 already exists. Please rename.").arg(featureName));
-			return false;
-		}
 	}
 
 	bool isOptional = false;
@@ -338,7 +320,7 @@ bool CFeatureControllerComp::CreateRepresentationModelFromFeatureInfo(
 	representationModel.SetData("Optional", featureInfo.IsOptional());
 	representationModel.SetData("FeatureDescription", featureInfo.GetFeatureDescription());
 	representationModel.SetData("Dependencies", featureInfo.GetDependencies().join(';'));
-	representationModel.SetData("ChildModel", 0);
+	representationModel.AddTreeModel("ChildModel");
 
 	if (parentModelPtr != nullptr){
 		if (parentModelPtr->ContainsKey("FeatureId")){

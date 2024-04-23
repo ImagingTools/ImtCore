@@ -179,7 +179,7 @@ bool CTreeItemModel::IsEqualWithModel(CTreeItemModel* modelPtr) const
 }
 
 
-void CTreeItemModel::InsertNewItemWithParameters(int index, const QVariantMap &map)
+void CTreeItemModel::InsertNewItemWithParameters(int index, const QVariantMap& map)
 {
 	if (index < 0 || index > m_items.count()){
 		return;
@@ -199,7 +199,17 @@ void CTreeItemModel::InsertNewItemWithParameters(int index, const QVariantMap &m
 			treeItemModelPtr->SetParent(this);
 		}
 
-		SetData(value.key().toUtf8(), *value, index);
+		QByteArray key = value.key().toUtf8();
+
+		QList<QByteArray> roles = m_roleNames.values();
+		if (!roles.contains(key)){
+			m_roleNames.insert(Qt::UserRole + 1 + m_roleNames.count(), key);
+		}
+
+		Item* itemPtr = m_items[index];
+		if (itemPtr != nullptr){
+			itemPtr->SetValue(key, *value);
+		}
 	}
 
 	endInsertRows();

@@ -12,8 +12,7 @@ DecoratorBase {
     property string imageSource: "";
     property bool visibleMarker: false;
 
-
-    property bool highlighted;
+    property bool highlighted: !leftPanelElement.baseElement ? false : leftPanelElement.baseElement.highlighted;
     property bool selected: !leftPanelElement.baseElement ? false : leftPanelElement.baseElement.selected;
     property string text;
 
@@ -81,7 +80,7 @@ DecoratorBase {
             anchors.right: parent.right;
             anchors.rightMargin: indicator.width;
 
-            color: leftPanelElement.selected ? Style.iconColorOnSelected: Style.textColor;
+            color: (leftPanelElement.selected || leftPanelElement.highlighted) ? Style.iconColorOnSelected: Style.textColor;
 
             font.family: Style.fontFamily;
             font.pixelSize: Style.fontSize_small;

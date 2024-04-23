@@ -101,7 +101,7 @@ Item {
         anchors.top: button.bottom;
         anchors.topMargin: 3;
 
-        color: topButtonDecorator.enabled ? topButtonDecorator.textColor : topButtonDecorator.textColorDisabled;
+        color: topButtonDecorator.baseElement && topButtonDecorator.baseElement.enabled ? topButtonDecorator.textColor : topButtonDecorator.textColorDisabled;
 
         font.pixelSize: Style.fontSize_small
         font.family: Style.fontFamily

@@ -110,7 +110,6 @@ Rectangle {
 
         tableItem.tableSelection.singleSelect(model.index);
 
-        console.log("tableItem.tableSelection", tableItem.tableSelection.selectedIndexes)
         tableItem.forceActiveFocus();
     }
 
@@ -121,7 +120,6 @@ Rectangle {
     }
 
     onRightButtonMouseClicked: {
-        console.log("onRightButtonMouseClicked")
         var point = mapToItem(null, mX, mY);
 
         if (tableItem){
@@ -196,7 +194,6 @@ Rectangle {
     }
 
     function getSelectedId(){
-        console.log("Table delegate getSelectedId", model.Id)
         return model.Id;
     }
 
@@ -242,8 +239,6 @@ Rectangle {
     }
 
     function setHeightModelElememt(index_,height_){
-        console.log("setHeightModelElememt", index_,height_);
-
         if(!tableDelegateContainer.tableItem || !tableDelegateContainer.tableItem.canFitHeight ){
             return;
         }
@@ -360,7 +355,6 @@ Rectangle {
             clickCount++;
 
             if (ma.clickCount == 1){
-                console.log("onClicked2", model["Id"])
                 if (mouse.button === Qt.RightButton) {
                     tableDelegateContainer.rightButtonMouseClicked(this.mouseX, this.mouseY);
                 }
@@ -370,7 +364,6 @@ Rectangle {
             }
 
             if (ma.clickCount == 2){
-                console.log("onDoubleClicked2")
                 if (mouse.button === Qt.RightButton) {
                     return;
                 }

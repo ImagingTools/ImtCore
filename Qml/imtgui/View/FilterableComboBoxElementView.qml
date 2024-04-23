@@ -15,6 +15,12 @@ ComboBoxElementView {
             width: 300;
             height: 30;
 
+            onFocusChanged: {
+                if (focus){
+                    cb.forceActiveFocus();
+                }
+            }
+
             FilterableComboBox {
                 id: cb;
 

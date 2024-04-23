@@ -94,6 +94,8 @@ Rectangle {
 
                                 color: "transparent";
 
+                                clip: true;
+
                                 Image {
                                     id: icon
 
@@ -123,6 +125,8 @@ Rectangle {
                                     wrapMode: Text.WordWrap
 
                                     color: Style.textColor;
+
+                                    elide: Text.ElideRight;
 
                                     text: model.Value;
                                 }

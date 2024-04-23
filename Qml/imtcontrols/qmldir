@@ -107,7 +107,6 @@ TreeViewItemDelegateBase 1.0 ./Views/TreeViewItemDelegateBase.qml
 TableTreeItemDelegate 1.0 ./Views/TableTreeItemDelegate.qml
 TreeItemDelegate 1.0 ./Views/TreeItemDelegate.qml
 TreeViewGql 1.0 ./Views/TreeViewGql.qml
-TreeViewModelAdapter 1.0 ./Views/TreeViewModelAdapter.qml
 TreeViewSelection 1.0 ./Views/TreeViewSelection.qml
 
 BarChart 1.0 ./Views/BarChart.qml

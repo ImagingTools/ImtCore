@@ -119,7 +119,6 @@
         <file alias="imtcontrols/Views/SwitchCustom.qml">Views/SwitchCustom.qml</file>
         <file alias="imtcontrols/Views/TreeItemDelegate.qml">Views/TreeItemDelegate.qml</file>
         <file alias="imtcontrols/Views/TreeViewGql.qml">Views/TreeViewGql.qml</file>
-        <file alias="imtcontrols/Views/TreeViewModelAdapter.qml">Views/TreeViewModelAdapter.qml</file>
         <file alias="imtcontrols/Views/TreeViewSelection.qml">Views/TreeViewSelection.qml</file>
         <file alias="imtcontrols/Views/ProgressBar.qml">Views/ProgressBar.qml</file>
         <file alias="imtcontrols/Views/ProgressRoundIndicator.qml">Views/ProgressRoundIndicator.qml</file>

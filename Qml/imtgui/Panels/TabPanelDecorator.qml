@@ -89,20 +89,32 @@ DecoratorBase {
 
             anchors.verticalCenter: parent.verticalCenter;
 
-            width: tabPanelDecorator.baseElement && text.width < tabPanelDecorator.baseElement.minWidth ? tabPanelDecorator.baseElement.minWidth :
-                   tabPanelDecorator.baseElement && text.width > tabPanelDecorator.baseElement.maxWidth ? tabPanelDecorator.baseElement.maxWidth : text.width;
+            width: tabPanelDecorator.baseElement && textHelper.width < tabPanelDecorator.baseElement.minWidth ? tabPanelDecorator.baseElement.minWidth :
+                   tabPanelDecorator.baseElement && textHelper.width > tabPanelDecorator.baseElement.maxWidth ? tabPanelDecorator.baseElement.maxWidth : textHelper.width + 10;
 
             height: tabPanelDecorator.height;
 
             clip: true;
 
             Text {
+                id: textHelper;
+
+                visible: false;
+
+                text: tabPanelDecorator.baseElement ? tabPanelDecorator.baseElement.text : "";
+                font.family: tabPanelDecorator.baseElement.index === 0 ? Style.fontFamilyBold : Style.fontFamily;
+                font.bold: tabPanelDecorator.baseElement.index === 0;
+                font.pixelSize: Style.fontSize_common;
+            }
+
+            Text {
                 id: text;
 
                 anchors.verticalCenter: parent.verticalCenter;
                 anchors.horizontalCenter: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.index === 0 ||
-                                          text.width < tabPanelDecorator.baseElement.minWidth
-                                          ? parent.horizontalCenter : undefined;
+                                          tabPanelDecorator.baseElement && textHelper.width < tabPanelDecorator.baseElement.minWidth ? parent.horizontalCenter : undefined;
+
+                width: tabPanelDecorator.baseElement && tabPanelDecorator.baseElement.index === 0 ? textHelper.width : parent.width;
 
                 color: Style.textColor;
                 font.family: tabPanelDecorator.baseElement.index === 0 ? Style.fontFamilyBold : Style.fontFamily;
@@ -112,6 +124,7 @@ DecoratorBase {
 
                 elide: Text.ElideRight;
             }
+
         }
 
         ToolButton {

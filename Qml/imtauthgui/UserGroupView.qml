@@ -87,6 +87,7 @@ ViewBase {
                     }
 
                     KeyNavigation.tab: descriptionInput;
+                    KeyNavigation.backtab: rolesTable;
                 }
 
                 TextInputElementView {
@@ -99,13 +100,17 @@ ViewBase {
                         container.doUpdateModel();
                     }
 
-                    KeyNavigation.tab: nameInput;
+                    KeyNavigation.tab: parentGroupsTable;
+                    KeyNavigation.backtab: nameInput;
                 }
 
                 TableElementView {
                     id: parentGroupsTable;
 
                     name: qsTr("Parent Groups");
+
+                    KeyNavigation.tab: usersTable;
+                    KeyNavigation.backtab: descriptionInput;
 
                     Connections {
                         target: parentGroupsTable.table;
@@ -287,6 +292,9 @@ ViewBase {
                 TableElementView {
                     id: usersTable;
 
+                    KeyNavigation.tab: rolesTable;
+                    KeyNavigation.backtab: parentGroupsTable;
+
                     Component.onCompleted: {
                         usersTable.table.readOnly = container.readOnly;
                     }
@@ -373,6 +381,9 @@ ViewBase {
 
                 TableElementView {
                     id: rolesTable;
+
+                    KeyNavigation.tab: nameInput;
+                    KeyNavigation.backtab: usersTable;
 
                     Component.onCompleted: {
                         rolesTable.table.readOnly = container.readOnly;
