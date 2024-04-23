@@ -50,7 +50,7 @@ class Loader extends Item {
 
         this.getStatement('status').reset(Loader.Loading)
 
-        if(this.getPropertyValue('item')) this.getPropertyValue('item').destroy()
+        if(this.getPropertyValue('item') && this.getPropertyValue('item') !== this) this.getPropertyValue('item').destroy()
         
         if(this.getPropertyValue('sourceComponent')){
             let ctx = new ContextController(this.getStatement('sourceComponent').get().$exCtx, this.$exCtx)

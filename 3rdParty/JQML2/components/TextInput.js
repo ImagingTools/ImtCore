@@ -81,6 +81,7 @@ class TextInput extends Item {
         this.$input.style.textAlign = 'inherit'
         this.$input.style.cursor = 'unset'
         this.$input.autocomplete = "new-password"
+        this.$input.spellcheck = "false"
         this.$input.onfocus = ()=>{
             if(!this.getPropertyValue('activeFocus')) this.forceActiveFocus()
         }

@@ -69,6 +69,7 @@ class TextEdit extends Item {
         this.$input.style.zIndex = 'inherit'
         this.$input.style.resize = 'none'
         this.$input.style.cursor = 'unset'
+        this.$input.spellcheck = "false"
         this.getDom().appendChild(this.$input)
         MouseController.add(this)
 
