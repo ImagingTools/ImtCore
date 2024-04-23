@@ -556,8 +556,6 @@ class KeyboardController {
                             if(target instanceof TextInput) e.preventDefault()
                             target.onKeyDown(e.key)
                             return
-                        } else {
-                            continue
                         }
                         
                     }
