@@ -11,7 +11,7 @@ for(let componentName of listComponents){
 const listProperties = require('../utils/properties')
 
 const args = {
-    source: process.argv.length >= 3 ? process.argv[2] : 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ProLife\\Bin\\web\\src',
+    source: process.argv.length >= 3 ? process.argv[2] : 'C:\\Users\\Artur\\Documents\\ImagingTools\\ItDevelopment\\ImtCore\\3rdParty\\JQML2\\test\\qml',
     debug: 0
 }
 for(let _argv of process.argv.slice(2)){
@@ -794,6 +794,7 @@ function prepare(tree, compiledFile, currentInstructions, stat = null, propValue
             prepare(tree[2], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
             stat.value.push(`;`)
             prepare(tree[3], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
+            if(stat.value[stat.value.length-1] === ';') stat.value.pop()
             stat.value.push(`){`)
             prepare(tree[4], compiledFile, currentInstructions, stat, propValue, assign, prevCommand, currentObj)
             stat.value.push(`};`)
