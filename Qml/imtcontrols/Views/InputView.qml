@@ -38,7 +38,7 @@ Item{
             Loader{
             id: loader;
 
-            source: model.Source;
+            source: model.Source !==undefined ? model.Source : "";
             function setValue(value_){
                 item.value = value_
             }
@@ -48,6 +48,9 @@ Item{
                 }
                 if(item.dataModel !==undefined){
                     item.dataModel = inputView.dataModel;
+                }
+                if(item.index !==undefined){
+                    item.index = model.index;
                 }
                 if(item.modelDataChanged !==undefined){
                     item.modelDataChanged.connect(inputView.modelDataChanged)
