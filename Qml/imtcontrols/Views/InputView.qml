@@ -39,6 +39,9 @@ Item{
             id: loader;
 
             source: model.Source;
+            function setValue(value_){
+                item.value = value_
+            }
             onLoaded: {
                 if(inputView.fitToWidth){
                     item.width = inputView.width;
@@ -54,13 +57,18 @@ Item{
                 keys = inputView.model.GetKeys(model.index);
                 for(let i = 0; i < keys.length; i++){
                     //console.log("KEY::", keys[i], item[keys[i]])
-                    if(item[keys[i]] !==undefined){
-                        if(inputView.model.IsTreeModel(keys[i], model.index)){
-                            console.log("IS_MODEL:: ", keys[i])
-                            item[keys[i]] = inputView.model.GetTreeItemModel(keys[i], model.index);
-                        }
-                        else {
-                            item[keys[i]] = inputView.model.GetData(keys[i], model.index);
+                    if(keys[i] == "value"){
+                        loader.setValue(inputView.model.GetData(keys[i], model.index));
+                    }
+                    else {
+                        if(item[keys[i]] !==undefined){
+                            if(inputView.model.IsTreeModel(keys[i], model.index)){
+                                console.log("IS_MODEL:: ", keys[i])
+                                item[keys[i]] = inputView.model.GetTreeItemModel(keys[i], model.index);
+                            }
+                            else {
+                                item[keys[i]] = inputView.model.GetData(keys[i], model.index);
+                            }
                         }
                     }
                 }
