@@ -38,9 +38,6 @@ class ListView extends Flickable {
         this.$items = {
             length: new QInt(0)
         }
-        // this.$items.length.getNotify().connect(()=>{
-        //     this.updateView()
-        // })
     }
 
     itemAtIndex(index){
@@ -64,12 +61,16 @@ class ListView extends Flickable {
             case ListView.Contain: {
                 if(this.$items[index]){
                     if(this.getPropertyValue('orientation') === ListView.Horizontal){
+                        if(this.getPropertyValue('contentWidth') <= this.getPropertyValue('width')) return
+
                         if(this.$items[index].getPropertyValue('x') <= this.getPropertyValue('contentX')){
                             this.getProperty('contentX').reset(this.$items[index].getPropertyValue('x'))
-                        } else if(this.$items[index].getPropertyValue('x') + this.$items[index].getPropertyValue('width') >= this.getPropertyValue('contentX') - this.getPropertyValue('width')){
+                        } else if(this.$items[index].getPropertyValue('x') + this.$items[index].getPropertyValue('width') >= this.getPropertyValue('contentX') + this.getPropertyValue('width')){
                             this.getProperty('contentX').reset(this.$items[index].getPropertyValue('x') + this.$items[index].getPropertyValue('width') - this.getPropertyValue('width'))
                         }
                     } else {
+                        if(this.getPropertyValue('contentHeight') <= this.getPropertyValue('height')) return
+
                         if(this.$items[index].getPropertyValue('y') <= this.getPropertyValue('contentY')){
                             this.getProperty('contentY').reset(this.$items[index].getPropertyValue('y'))
                         } else if(this.$items[index].getPropertyValue('y') + this.$items[index].getPropertyValue('height') >= this.getPropertyValue('contentY') + this.getPropertyValue('height')){
@@ -398,6 +399,18 @@ class ListView extends Flickable {
         let middleWidth = 0
         let middleHeight = 0
 
+        
+        let countChanged = this.getPropertyValue('count') !== this.$items.length.get()
+        this.getProperty('count').value = this.$items.length.get()
+        
+        if(countChanged && this.$items.length.get() === 0) {
+            for(let child of children){
+                child.destroy()
+            }
+            this.getProperty('count').getNotify()()
+            return
+        }
+
         while(children.length){
             let child = children.pop()
 
@@ -540,7 +553,8 @@ class ListView extends Flickable {
             }
         }
 
-        this.getProperty('count').reset(this.$items.length.get())
+        this.getProperty('count').value = this.$items.length.get()
+        if(countChanged) this.getProperty('count').getNotify()()
     }
 
     $contentXChanged(){
@@ -563,6 +577,12 @@ class ListView extends Flickable {
     // }
     $contentWidthChanged(){
         this.getStatement('contentItem').get().getStatement('width').reset(this.getStatement('contentWidth').get())
+        if(this.getPropertyValue('contentWidth') < this.getPropertyValue('width')){
+            this.getProperty('contentX').reset(0)
+        }
+        // if(this.getPropertyValue('contentX') > this.getPropertyValue('contentWidth') - this.getPropertyValue('width')){
+        //     this.getProperty('contentX').reset(this.getPropertyValue('contentWidth') - this.getPropertyValue('width'))
+        // }
         // if(this.getPropertyValue('contentX') > this.getPropertyValue('contentWidth') - this.getPropertyValue('width')){
         //     this.getProperty('contentX').reset(this.getPropertyValue('contentWidth') - this.getPropertyValue('width'))
         // }
@@ -570,6 +590,12 @@ class ListView extends Flickable {
 
     $contentHeightChanged(){
         this.getStatement('contentItem').get().getStatement('height').reset(this.getStatement('contentHeight').get())
+        if(this.getPropertyValue('contentWidth') < this.getPropertyValue('width')){
+            this.getProperty('contentY').reset(0)
+        }
+        // if(this.getPropertyValue('contentY') > this.getPropertyValue('contentHeight') - this.getPropertyValue('height')){
+        //     this.getProperty('contentY').reset(this.getPropertyValue('contentHeight') - this.getPropertyValue('height'))
+        // }
         // if(this.getPropertyValue('contentY') > this.getPropertyValue('contentHeight') - this.getPropertyValue('height')){
         //     this.getProperty('contentY').reset(this.getPropertyValue('contentHeight') - this.getPropertyValue('height'))
         // }
