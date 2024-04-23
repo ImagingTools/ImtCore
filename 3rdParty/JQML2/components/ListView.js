@@ -153,9 +153,9 @@ class ListView extends Flickable {
             let bottomRight = params[1]
             let roles = params[2]
             if(this.getPropertyValue('count') === 0) {
-                this.updateView()
+                break
             } else if(roles === 'append'){
-                this.updateView()
+                break
             } else if(roles === 'remove'){
                 for(let i = leftTop; i < bottomRight; i++){
                     if(this.$items[i]){
@@ -192,7 +192,7 @@ class ListView extends Flickable {
                         
                     }
                 }
-                this.updateView()
+
                 this.getProperty('count').reset(this.$items.length.get())
                 this.updateGeometry()
             } else if(roles === 'insert'){
@@ -269,6 +269,8 @@ class ListView extends Flickable {
                             }
                         }
                     }
+                    this.getProperty('count').reset(this.$items.length.get())
+                    this.updateGeometry()
                 }
                 if(needClear){
                     let length = this.$items.length.get()
@@ -394,9 +396,6 @@ class ListView extends Flickable {
         let minY = 0
         let middleWidth = 0
         let middleHeight = 0
-
-        let countChanged = this.getPropertyValue('count') !== this.$items.length.get() ? true : false
-        this.getProperty('count').value = this.$items.length.get()
 
         while(children.length){
             let child = children.pop()
@@ -540,21 +539,17 @@ class ListView extends Flickable {
             }
         }
 
-        this.getProperty('count').value = this.$items.length.get()
-
-        if(countChanged){
-            if(this.getProperty('count').notify) this.getProperty('count').notify()
-        }
+        this.getProperty('count').reset(this.$items.length.get())
     }
 
     $contentXChanged(){
         this.getStatement('contentItem').get().getStatement('x').reset(-this.getStatement('contentX').get())
-        this.$modelDataUpdate()
+        this.updateView()
     }
 
     $contentYChanged(){
         this.getStatement('contentItem').get().getStatement('y').reset(-this.getStatement('contentY').get())
-        this.$modelDataUpdate()
+        this.updateView()
     }
 
     // $contentXChanged(){
@@ -581,17 +576,17 @@ class ListView extends Flickable {
     $widthChanged(){
         super.$widthChanged()
         if(this.getPropertyValue('orientation') === ListView.Vertical) this.getProperty('contentWidth').reset(this.getPropertyValue('width'))
-        this.$modelDataUpdate()
+        this.updateView()
     }
     $heightChanged(){
         super.$heightChanged()
         if(this.getPropertyValue('orientation') === ListView.Horizontal) this.getProperty('contentHeight').reset(this.getPropertyValue('height'))
-        this.$modelDataUpdate()
+        this.updateView()
     }
     $cacheBufferChanged(){
-        this.$modelDataUpdate()
+        this.updateView()
     }
-    createElement(index){
+    createElement(index){ 
         if(this.$items[index]) return this.$items[index]
         let ctx = new ContextController(this.delegate.get().$exCtx, this.$exCtx)
         let createObject = this.getStatement('delegate').get().createObject

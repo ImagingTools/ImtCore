@@ -223,12 +223,12 @@ class MouseController {
                         this.target = inner[i]
                         this.pressedMouseArea = [inner[i]]
                         for(let k = i + 1; k < inner.length; k++){
-                            if(button === 0 && (inner[k] instanceof TextInput || inner[k] instanceof TextEdit)){
-                                if(inner[k].getPropertyValue('enabled') && inner[k].getPropertyValue('visible') && inner[k].getPropertyValue('activeFocus')) {
-                                    this.target = inner[k]
-                                    break
-                                }
-                            }
+                            // if(button === 0 && (inner[k] instanceof TextInput || inner[k] instanceof TextEdit)){
+                            //     if(inner[k].getPropertyValue('enabled') && inner[k].getPropertyValue('visible') && inner[k].getPropertyValue('activeFocus')) {
+                            //         this.target = inner[k]
+                            //         break
+                            //     }
+                            // }
                             if(inner[k] instanceof MouseArea && inner[k].getPropertyValue('enabled') && inner[k].getPropertyValue('visible') && inner[k].availableButton(button))
                             this.pressedMouseArea.push(inner[k])
                         }
@@ -383,16 +383,18 @@ class MouseController {
                     
                 if(!this.target.getPropertyValue('preventStealing')){
                     if(Math.abs(this.originX - x) >= 10 || Math.abs(this.originY - y) >= 10){
-                        for(let i = 0; i < this.pressed.length; i++){
-                            if(this.pressed[i] instanceof Flickable && this.pressed[i].getPropertyValue('enabled') && this.pressed[i].getPropertyValue('visible') && this.pressed[i].getPropertyValue('interactive')) {
-                                if((Math.abs(this.originX - x) >= 10 && this.pressed[i].getPropertyValue('width') < this.pressed[i].getPropertyValue('contentItem').getPropertyValue('width')) || 
-                                (Math.abs(this.originY - y) >= 10 && this.pressed[i].getPropertyValue('height') < this.pressed[i].getPropertyValue('contentItem').getPropertyValue('height'))){
+                        let parent = this.target.getPropertyValue('parent')
+                        while(parent){
+                            if(this.pressed.indexOf(parent) && parent instanceof Flickable && parent.getPropertyValue('enabled') && parent.getPropertyValue('visible') && parent.getPropertyValue('interactive')) {
+                                if((Math.abs(this.originX - x) >= 10 && parent.getPropertyValue('width') < parent.getPropertyValue('contentItem').getPropertyValue('width')) || 
+                                (Math.abs(this.originY - y) >= 10 && parent.getPropertyValue('height') < parent.getPropertyValue('contentItem').getPropertyValue('height'))){
                                     this.target.getProperty('pressed').value = false
-                                    this.target = this.pressed[i]
+                                    this.target = parent
                                     break
                                 }
                                 
                             }
+                            parent = parent.getPropertyValue('parent')
                         }
                     } else {
                         return
@@ -759,21 +761,21 @@ class KeyboardController {
 class TextFontController {
     constructor(){
         this.container = document.createElement('div')
-        this.container.style.maxWidth = 0
-        this.container.style.maxHeight = 0
+        this.container.style.position = 'absolute'
+        this.container.style.display = 'inline'
         this.container.style.opacity = 0
         this.container.style.lineHeight = 'normal'
         document.body.appendChild(this.container)
     }
 
-    measureText(text, font, maxWidth, wrapMode){
+    measureText(text, font, maxWidth, wrapMode, accuracy = false){
         this.container.style.fontFamily = font.getPropertyValue('family')
         this.container.style.fontSize = font.getPropertyValue('pixelSize')+'px'
-        this.container.style.maxWidth = maxWidth ? maxWidth+'px' : 0
         this.container.style.fontWeight = font.getPropertyValue('bold') ? 'bold' : 'normal'
         this.container.style.fontStyle = font.getPropertyValue('italic') ? 'italic' : 'normal'
         this.container.style.textDecoration = font.getPropertyValue('underline') ? 'underline' : 'unset'
         if(maxWidth){
+            this.container.style.maxWidth = maxWidth+'px'
             switch(wrapMode){
                 case Text.NoWrap: this.container.style.whiteSpace = 'pre'; this.container.style.wordBreak = 'unset'; break;
                 case Text.WordWrap: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-word'; break;
@@ -782,6 +784,7 @@ class TextFontController {
                 case Text.WrapAtWordBoundaryOrAnywhere: this.container.style.whiteSpace ='pre-wrap'; this.container.style.wordBreak = 'break-word'; break;
             }
         } else {
+            this.container.style.maxWidth = 'unset'
             this.container.style.whiteSpace = 'pre'; 
             this.container.style.wordBreak = 'unset';
         }
@@ -789,10 +792,16 @@ class TextFontController {
 
         this.container.innerHTML = text
 
-        return {
-            width: this.container.scrollWidth,
-            height: this.container.scrollHeight,
+        if(accuracy){
+            let rect = this.container.getBoundingClientRect()
+            return rect
+        } else {
+            return {
+                width: this.container.clientWidth,
+                height: this.container.clientHeight,
+            }
         }
+        
     }
 }
 class AnimationController {

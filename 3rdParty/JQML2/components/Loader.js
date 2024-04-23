@@ -256,12 +256,6 @@ class Loader extends Item {
             this.getStatement('status').reset(Loader.Null)
         }
     }
-
-    destroy(){
-        if(this.getPropertyValue('item')) this.getPropertyValue('item').destroy()
-
-        super.destroy()
-    }
 }
 
 module.exports.Loader = Loader
