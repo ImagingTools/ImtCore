@@ -55,9 +55,9 @@ endif()
 
 execute_process(
 	COMMAND
-		${PYTHONEXE} ${CMAKE_CURRENT_LIST_DIR}/../../../PartituraUpgrade.py
+		${PYTHONEXE} ${CMAKE_CURRENT_LIST_DIR}/../../PartituraUpgrade.py
 	WORKING_DIRECTORY
-		${CMAKE_CURRENT_LIST_DIR}/../../..
+		${CMAKE_CURRENT_LIST_DIR}/../..
 	RESULT_VARIABLE
 		PYTHONEXE_RESULT_CODE
 	RESULTS_VARIABLE
@@ -73,7 +73,7 @@ if(NOT PYTHONEXE_RESULT_CODE EQUAL 0)
 	message(WARNING "${PYTHONEXE_RESULTS}")
 	message(WARNING "${PYTHONEXE_OUTPUT}")
 	message(WARNING "${PYTHONEXE_ERROR}")
-	message(WARNING "Process (${PYTHONEXE} ${CMAKE_CURRENT_LIST_DIR}/../../../PartituraUpgrade.py) finished unexpacted! [${PYTHONEXE_RESULT_CODE}]\nPlease ensure, the path to the svn programm exists and available(add to PATH system variable)")
+	message(WARNING "Process (${PYTHONEXE} ${CMAKE_CURRENT_LIST_DIR}/../../PartituraUpgrade.py) finished unexpacted! [${PYTHONEXE_RESULT_CODE}]\nPlease ensure, the path to the svn programm exists and available(add to PATH system variable)")
 endif()
 
 if (CUSTOM_PYTHON)
