@@ -766,7 +766,7 @@ class TextFontController {
         document.body.appendChild(this.container)
     }
 
-    measureText(text, font, maxWidth, wrapMode, accuracy = false){
+    measureText(text, font, maxWidth, wrapMode, textFormat){
         this.container.style.fontFamily = font.getPropertyValue('family')
         this.container.style.fontSize = font.getPropertyValue('pixelSize')+'px'
         this.container.style.fontWeight = font.getPropertyValue('bold') ? 'bold' : 'normal'
@@ -787,8 +787,12 @@ class TextFontController {
             this.container.style.wordBreak = 'unset';
         }
         
-
-        this.container.innerHTML = text
+        if(textFormat === undefined || textFormat === Text.PlainText || textFormat === Text.AutoText){
+            this.container.innerText = text
+        } else {
+            this.container.innerHTML = text
+        }
+        
 
         // if(accuracy){
             let rect = this.container.getBoundingClientRect()
