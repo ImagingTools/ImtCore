@@ -344,6 +344,7 @@ class ListView extends Flickable {
     }
 
     updateGeometry(){
+        if(!this.$items.length) return 
         let visibleContentWidth = 0
         let visibleContentHeight = 0
         let lastIndex = 0
