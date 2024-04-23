@@ -75,7 +75,7 @@ Item {
     property int textFieldWidthMonth: 85;
     property int textFieldWidthDay: 25;
     property int textFieldRadius:0;
-    property int textSize: 15;
+    property int textSize: Style.fontSize_common;
     property string textFieldColor: Style.baseColor;
     property string fontColor: Style.textColor;
     property string textFieldBorderColor: "";//textField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
@@ -374,16 +374,16 @@ Item {
 
                 anchors.verticalCenter: parent.verticalCenter;
 
+                width: yearField.width + yearButtons.width;
                 height: datePicker.textFieldHeight;
-                width: datePicker.textFieldWidthYear;
 
                 CustomTextField {
                     id: yearField;
 
                     anchors.verticalCenter: parent.verticalCenter;
 
-                    width: parent.width;
-                    height: parent.height;
+                    width: datePicker.textFieldWidthYear;
+                    height: datePicker.textFieldHeight;
                     visible: !yearComboObj.openST;
 
                     radius: datePicker.textFieldRadius;
@@ -407,6 +407,78 @@ Item {
                     }
 
                     readOnly: true//datePicker.readOnly || datePicker.textInputBan;
+                }
+
+                Column {
+                    id: yearButtons;
+
+                    anchors.left: yearField.right;
+
+                    width: datePicker.buttonWidth;
+
+                    Button {
+                        id: yearUpButton;
+
+                        width: datePicker.buttonWidth;
+                        height: datePicker.buttonHeight;
+
+                        iconSource: datePicker.iconUpSource;
+
+                        enabled: !datePicker.readOnly;
+
+                        decorator: Component { ButtonDecorator {
+                            color: yearUpButton.hovered ? Style.buttonHoverColor : "transparent";
+                            border.width: 0;
+                        }}
+
+                        onClicked: {
+                            if (!enabled){
+                                return;
+                            }
+
+                            let selectedYear = Number(yearField.text);
+
+                            let newYear = String(selectedYear + 1);
+
+                            if (datePicker.checkDate(newYear, datePicker.selectedIndexMonth, Number(dayField.text))){
+                                yearField.text = newYear;
+                            }
+                        }
+                    }
+
+                    Button {
+                        id: yearDownButton;
+
+                        width: datePicker.buttonWidth;
+                        height: datePicker.buttonHeight;
+
+                        iconSource: datePicker.iconDownSource;
+
+                        enabled: !datePicker.readOnly;
+
+                        decorator: Component { ButtonDecorator {
+                            color: yearDownButton.hovered ? Style.buttonHoverColor : "transparent";
+                            border.width: 0;
+                        }}
+
+                        onClicked: {
+                            if (!enabled){
+                                return;
+                            }
+
+                            if (yearField.text == ""){
+                                return;
+                            }
+
+                            let selectedYear = Number(yearField.text);
+
+                            let newYear = String(selectedYear - 1);
+
+                            if (datePicker.checkDate(newYear, datePicker.selectedIndexMonth, Number(dayField.text))){
+                                yearField.text = newYear;
+                            }
+                        }
+                    }
                 }
 
                 ComboBox {
@@ -452,88 +524,21 @@ Item {
 
             }//yearItem
 
-
-            Column {
-                anchors.verticalCenter: parent.verticalCenter;
-                Button {
-                    id: yearUpButton;
-
-                    width: datePicker.buttonWidth;
-                    height: datePicker.buttonHeight;
-
-                    iconSource: datePicker.iconUpSource;
-
-                    enabled: !datePicker.readOnly;
-
-                    decorator: Component { ButtonDecorator {
-                        color: yearUpButton.hovered ? Style.buttonHoverColor : "transparent";
-                        border.width: 0;
-                    }}
-
-                    onClicked: {
-                        if (!enabled){
-                            return;
-                        }
-
-                        let selectedYear = Number(yearField.text);
-
-                        let newYear = String(selectedYear + 1);
-
-                        if (datePicker.checkDate(newYear, datePicker.selectedIndexMonth, Number(dayField.text))){
-                            yearField.text = newYear;
-                        }
-                    }
-                }
-
-                Button {
-                    id: yearDownButton;
-
-                    width: datePicker.buttonWidth;
-                    height: datePicker.buttonHeight;
-
-                    iconSource: datePicker.iconDownSource;
-
-                    enabled: !datePicker.readOnly;
-
-                    decorator: Component { ButtonDecorator {
-                        color: yearDownButton.hovered ? Style.buttonHoverColor : "transparent";
-                        border.width: 0;
-                    }}
-
-                    onClicked: {
-                        if (!enabled){
-                            return;
-                        }
-
-                        if (yearField.text == ""){
-                            return;
-                        }
-
-                        let selectedYear = Number(yearField.text);
-
-                        let newYear = String(selectedYear - 1);
-
-                        if (datePicker.checkDate(newYear, datePicker.selectedIndexMonth, Number(dayField.text))){
-                            yearField.text = newYear;
-                        }
-                    }
-                }
-            }
-
             Item{
                 id: monthItem;
                 anchors.verticalCenter: parent.verticalCenter;
 
+                width: monthField.width + monthButtons.width;
                 height: datePicker.textFieldHeight;
-                width: datePicker.textFieldWidthMonth;
 
                 CustomTextField {
                     id: monthField;
 
                     anchors.verticalCenter: parent.verticalCenter;
 
+                    width: datePicker.textFieldWidthMonth;
                     height: parent.height;
-                    width: parent.width;
+
                     visible: !monthComboObj.openST;
 
                     radius: datePicker.textFieldRadius;
@@ -557,8 +562,82 @@ Item {
                     Keys.onDownPressed: {
                         monthDownButton.clicked();
                     }
+                }
 
+                Column {
+                    id: monthButtons;
 
+                    anchors.verticalCenter: parent.verticalCenter;
+                    anchors.left: monthField.right;
+
+                    width: datePicker.buttonWidth;
+
+                    Button {
+                        id: monthUpButton;
+
+                        width: datePicker.buttonWidth;
+                        height: datePicker.buttonHeight;
+
+                        iconSource: datePicker.iconUpSource;
+
+                        enabled: !datePicker.readOnly;
+
+                        decorator: Component { ButtonDecorator {
+                            color: monthUpButton.hovered ? Style.buttonHoverColor : "transparent";
+                            border.width: 0;
+                        }}
+
+                        onClicked: {
+                            if (!enabled){
+                                return;
+                            }
+                            let index;
+                            if (datePicker.selectedIndexMonth < 11){
+                                index = datePicker.selectedIndexMonth + 1;
+                            }
+                            else{
+                                index = 0;
+                            }
+
+                            if (datePicker.checkDate(Number(yearField.text), index, Number(dayField.text))){
+                                datePicker.selectedIndexMonth = index;
+                            }
+                        }
+                    }
+
+                    Button {
+                        id: monthDownButton;
+
+                        width: datePicker.buttonWidth;
+                        height: datePicker.buttonHeight;
+
+                        iconSource: datePicker.iconDownSource;
+
+                        enabled: !datePicker.readOnly;
+
+                        decorator: Component { ButtonDecorator {
+                            color: monthDownButton.hovered ? Style.buttonHoverColor : "transparent";
+                            border.width: 0;
+                        }}
+
+                        onClicked: {
+                            if (!enabled){
+                                return;
+                            }
+
+                            let index;
+                            if (datePicker.selectedIndexMonth > 0){
+                                index = datePicker.selectedIndexMonth - 1;
+                            }
+                            else{
+                                index = 11;
+                            }
+
+                            if (datePicker.checkDate(Number(yearField.text), index, Number(dayField.text))){
+                                datePicker.selectedIndexMonth = index;
+                            }
+                        }
+                    }
                 }
 
                 ComboBox {
@@ -601,77 +680,6 @@ Item {
 
             }//monthItem
 
-
-            Column {
-                anchors.verticalCenter: parent.verticalCenter;
-                Button {
-                    id: monthUpButton;
-
-                    width: datePicker.buttonWidth;
-                    height: datePicker.buttonHeight;
-
-                    iconSource: datePicker.iconUpSource;
-
-                    enabled: !datePicker.readOnly;
-
-                    decorator: Component { ButtonDecorator {
-                        color: monthUpButton.hovered ? Style.buttonHoverColor : "transparent";
-                        border.width: 0;
-                    }}
-
-                    onClicked: {
-                        if (!enabled){
-                            return;
-                        }
-                        let index;
-                        if (datePicker.selectedIndexMonth < 11){
-                            index = datePicker.selectedIndexMonth + 1;
-                        }
-                        else{
-                            index = 0;
-                        }
-
-                        if (datePicker.checkDate(Number(yearField.text), index, Number(dayField.text))){
-                            datePicker.selectedIndexMonth = index;
-                        }
-                    }
-                }
-
-                Button {
-                    id: monthDownButton;
-
-                    width: datePicker.buttonWidth;
-                    height: datePicker.buttonHeight;
-
-                    iconSource: datePicker.iconDownSource;
-
-                    enabled: !datePicker.readOnly;
-
-                    decorator: Component { ButtonDecorator {
-                        color: monthDownButton.hovered ? Style.buttonHoverColor : "transparent";
-                        border.width: 0;
-                    }}
-
-                    onClicked: {
-                        if (!enabled){
-                            return;
-                        }
-
-                        let index;
-                        if (datePicker.selectedIndexMonth > 0){
-                            index = datePicker.selectedIndexMonth - 1;
-                        }
-                        else{
-                            index = 11;
-                        }
-
-                        if (datePicker.checkDate(Number(yearField.text), index, Number(dayField.text))){
-                            datePicker.selectedIndexMonth = index;
-                        }
-                    }
-                }
-            }
-
             RegularExpressionValidator {
                 id: dayValid;
 
@@ -685,8 +693,8 @@ Item {
 
                 visible: datePicker.hasDay;
 
+                width: dayField.width + dayButtons.width;
                 height: datePicker.textFieldHeight;
-                width: datePicker.textFieldWidthDay;
 
                 CustomTextField {
                     id: dayField;
@@ -695,7 +703,7 @@ Item {
 
                     visible: datePicker.hasDay && !dayComboObj.openST;
 
-                    width: parent.width;
+                    width: datePicker.textFieldWidthDay;
                     height: parent.height;
 
                     radius: datePicker.textFieldRadius;
@@ -726,8 +734,78 @@ Item {
                         }
                         dayDownButton.clicked();
                     }
+                }
 
+                Column {
+                    id: dayButtons;
 
+                    anchors.verticalCenter: parent.verticalCenter;
+                    anchors.left: dayField.right;
+
+                    width: datePicker.buttonWidth;
+
+                    visible: datePicker.hasDay;
+
+                    Button {
+                        id: dayUpButton;
+
+                        width: datePicker.buttonWidth;
+                        height: datePicker.buttonHeight;
+
+                        iconSource: datePicker.iconUpSource;
+                        enabled: !datePicker.readOnly;
+
+                        decorator: Component { ButtonDecorator {
+                            color: dayUpButton.hovered ? Style.buttonHoverColor : "transparent";
+                            border.width: 0;
+                        }}
+
+                        onClicked: {
+                            if (!enabled){
+                                return;
+                            }
+
+                            let selectedDay = Number(dayField.text);
+                            if (selectedDay < 31){
+                                let newDay = String(selectedDay + 1)
+
+                                if (datePicker.checkDate(Number(yearField.text), datePicker.selectedIndexMonth, Number(newDay))){
+                                    dayField.text = newDay;
+                                }
+                            }
+                        }
+                    }
+
+                    Button {
+                        id: dayDownButton;
+
+                        width: datePicker.buttonWidth;
+                        height: datePicker.buttonHeight;
+
+                        iconSource: datePicker.iconDownSource;
+
+                        enabled: !datePicker.readOnly;
+
+                        decorator: Component { ButtonDecorator {
+                            color: dayDownButton.hovered ? Style.buttonHoverColor : "transparent";
+                            border.width: 0;
+                        }}
+
+                        onClicked: {
+                            if (!enabled){
+                                return;
+                            }
+
+                            let selectedDay = Number(dayField.text);
+                            if (selectedDay > 1){
+                                let newDay = String(selectedDay - 1);
+
+                                if (datePicker.checkDate(Number(yearField.text), datePicker.selectedIndexMonth, Number(newDay))){
+                                    dayField.text = newDay;
+                                }
+                            }
+                        }
+                    }
                 }
 
                 ComboBox {
@@ -767,81 +845,9 @@ Item {
                                 dayComboObj.currentIndex = -1;
                             }
                         }
-
                     }
                 }//dayComboObj
-
-
             }//dayItem
-
-
-            Column {
-                id: dayButtons;
-
-                anchors.verticalCenter: parent.verticalCenter;
-                visible: datePicker.hasDay;
-
-                Button {
-                    id: dayUpButton;
-
-                    width: datePicker.buttonWidth;
-                    height: datePicker.buttonHeight;
-
-                    iconSource: datePicker.iconUpSource;
-                    enabled: !datePicker.readOnly;
-
-                    decorator: Component { ButtonDecorator {
-                        color: dayUpButton.hovered ? Style.buttonHoverColor : "transparent";
-                        border.width: 0;
-                    }}
-
-                    onClicked: {
-                        if (!enabled){
-                            return;
-                        }
-
-                        let selectedDay = Number(dayField.text);
-                        if (selectedDay < 31){
-                            let newDay = String(selectedDay + 1)
-
-                            if (datePicker.checkDate(Number(yearField.text), datePicker.selectedIndexMonth, Number(newDay))){
-                                dayField.text = newDay;
-                            }
-                        }
-                    }
-                }
-
-                Button {
-                    id: dayDownButton;
-
-                    width: datePicker.buttonWidth;
-                    height: datePicker.buttonHeight;
-
-                    iconSource: datePicker.iconDownSource;
-
-                    enabled: !datePicker.readOnly;
-
-                    decorator: Component { ButtonDecorator {
-                        color: dayDownButton.hovered ? Style.buttonHoverColor : "transparent";
-                        border.width: 0;
-                    }}
-
-                    onClicked: {
-                        if (!enabled){
-                            return;
-                        }
-
-                        let selectedDay = Number(dayField.text);
-                        if (selectedDay > 1){
-                            let newDay = String(selectedDay - 1);
-
-                            if (datePicker.checkDate(Number(yearField.text), datePicker.selectedIndexMonth, Number(newDay))){
-                                dayField.text = newDay;
-                            }
-                        }
-                    }
-                }
-            }
         }
 
         Rectangle {

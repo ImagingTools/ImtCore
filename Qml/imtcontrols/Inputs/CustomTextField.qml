@@ -24,7 +24,7 @@ FocusScope {
     property string focusColor: Style.textSelected;
 
     property string fontColor: Style.textColor;
-    property string placeHolderFontColor: "gray";
+    property string placeHolderFontColor: "#808094";
 
     property color borderColor: containerTextField.acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
 
@@ -178,7 +178,6 @@ FocusScope {
         clip: true;
 
         activeFocusOnPress: !containerTextField.readOnly;
-        //text: containerTextField.text // for web TEMP!!!
 
         onAccepted: {
             containerTextField.accepted();

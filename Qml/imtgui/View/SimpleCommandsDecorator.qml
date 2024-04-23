@@ -6,12 +6,9 @@ import imtcontrols 1.0
 Item {
     id: container;
 
-    width: commands.width;
+    width: row.width;
 
     property TreeItemModel commandModel: null;
-
-    property alias radius: commands.radius;
-    property alias color: commands.color;
 
     signal commandActivated(string commandId);
     signal commandAdded(int index, string commandId);
@@ -48,47 +45,37 @@ Item {
         }
     }
 
-    Rectangle {
-        id: commands;
+    Row {
+        id: row;
 
-        width: row.width;
+        anchors.horizontalCenter: parent.horizontalCenter;
+        anchors.verticalCenter: parent.verticalCenter;
 
-        height: container.height;
+        spacing: Style.size_mainMargin;
 
-        color: "transparent";
+        Repeater {
+            id: repeater;
 
-        Row {
-            id: row;
+            delegate: ToolButton {
+                width: 18;
+                height: width;
 
-            anchors.horizontalCenter: parent.horizontalCenter;
-            anchors.verticalCenter: parent.verticalCenter;
+                iconSource: enabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Normal) :
+                                              "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled);
 
-            spacing: 10;
+                enabled: model.IsEnabled;
 
-            Repeater {
-                id: repeater;
+                visible: model.Visible;
 
-                delegate: ToolButton {
-                    width: 18;
-                    height: width;
+                property string commandId: model.Id;
 
-                    iconSource: enabled ? "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Normal) :
-                                                  "../../../../" + Style.getIconPath(model.Icon, Icon.State.Off, Icon.Mode.Disabled);
-
-                    enabled: model.IsEnabled;
-
-                    visible: model.Visible;
-
-                    property string commandId: model.Id;
-
-                    onClicked: {
-                        container.commandActivated(model.Id);
-                    }
+                onClicked: {
+                    container.commandActivated(model.Id);
                 }
+            }
 
-                onItemAdded: {
-                    container.commandAdded(index, item.commandId)
-                }
+            onItemAdded: {
+                container.commandAdded(index, item.commandId)
             }
         }
     }

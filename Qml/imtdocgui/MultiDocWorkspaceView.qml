@@ -7,19 +7,6 @@ import imtcontrols 1.0
 DocumentManager {
     id: workspaceView;
 
-    Component.onDestruction: {
-        Events.unSubscribeEvent("SetAlertPanel", setAlertPanel)
-    }
-
-    onVisibleChanged: {
-        if (visible){
-            Events.subscribeEvent("SetAlertPanel", setAlertPanel)
-        }
-        else{
-            Events.unSubscribeEvent("SetAlertPanel", setAlertPanel)
-        }
-    }
-
     onDocumentClosed: {
         if (documentIndex <= tabPanel.selectedIndex && documentIndex > 0){
             tabPanel.selectedIndex--;
@@ -51,15 +38,13 @@ DocumentManager {
     }
 
     function setAlertPanel(alertPanelComp){
-        console.log("MD setAlertPanel", alertPanelComp);
-
         alertPanel.sourceComponent = alertPanelComp;
     }
 
     Rectangle {
         anchors.fill: parent;
 
-        color: Style.backgroundColor;
+        color: Style.backgroundColor2;
 //        color: Style.alternateBaseColor;
     }
 
@@ -110,7 +95,6 @@ DocumentManager {
         anchors.bottom: parent.bottom;
         anchors.left: parent.left;
         anchors.right: parent.right;
-        anchors.margins: 0;//Style.size_mainMargin;
 
         model: workspaceView.documentsModel;
 
@@ -134,7 +118,6 @@ DocumentManager {
                 clip: true;
 
                 onLoaded: {
-                    console.log("onLoaded", item);
                     if (item.viewId !== undefined){
                         item.viewId = model.Uuid;
                     }

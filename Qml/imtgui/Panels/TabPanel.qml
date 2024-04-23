@@ -28,6 +28,10 @@ Rectangle {
         list.positionViewAtIndex(index, ListView.Contain);
     }
 
+    onSelectedIndexChanged: {
+        viewTabInListView(selectedIndex);
+    }
+
     ListView {
         id: list;
 

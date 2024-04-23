@@ -8,7 +8,7 @@ Rectangle {
 
     anchors.fill: parent;
 
-    color: Style.baseColor;
+    color: Style.backgroundColor2;
 
     property var startPageObj;
 
@@ -49,10 +49,12 @@ Rectangle {
 
         Component.onCompleted: {
             Events.subscribeEvent("MenuModelChanged", documentManager_.onMenuModelChanged);
+            Events.subscribeEvent("SetAlertPanel", setAlert);
         }
 
         Component.onDestruction: {
             Events.unSubscribeEvent("MenuModelChanged", documentManager_.onMenuModelChanged);
+            Events.unSubscribeEvent("SetAlertPanel", setAlert);
         }
 
         function onMenuModelChanged(model){
@@ -64,6 +66,20 @@ Rectangle {
                     documentManager_.documentsModel.setProperty(0, "Title", curr_name);
                     break;
                 }
+            }
+        }
+
+        function setAlert(parameters){
+            if (!parameters){
+                console.error("Unable to set alert panel, 'parameters' is invalid");
+                return;
+            }
+
+            let id = parameters["Id"];
+            let alertPanelComp = parameters["AlertPanelComp"];
+
+            if (id === multiDocPageView.startPageObj["Id"]){
+                setAlertPanel(alertPanelComp);
             }
         }
     }
