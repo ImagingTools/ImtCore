@@ -146,9 +146,10 @@ ViewBase {
                 function updateGroupsModel(){
                     container.copiedGroupsModel.Copy(container.groupsModel);
 
-                    let objectId = container.model.GetData("Id");
-                    if (!objectId){
-                        return;
+                    let objectId = "";
+
+                    if (container.model.ContainsKey("Id")){
+                        objectId = container.model.GetData("Id");
                     }
 
                     let removedIndexes = []
@@ -168,8 +169,6 @@ ViewBase {
 
                     for (let i = 0; i < container.copiedGroupsModel.GetItemsCount(); i++){
                         let id = container.copiedGroupsModel.GetData("Id", i);
-                        console.log("id", id);
-
                         if (id === objectId || childrenIds.includes(id)){
                             removedIndexes.push(i);
                         }
@@ -217,8 +216,6 @@ ViewBase {
                 }
 
                 function updateGui(){
-                    console.log("GroupEditor updateGui");
-
                     if (container.model.ContainsKey("Name")){
                         nameInput.text = container.model.GetData("Name");
                     }

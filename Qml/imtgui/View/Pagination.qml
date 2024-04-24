@@ -187,7 +187,7 @@ Row {
 
             anchors.verticalCenter: parent.verticalCenter;
 
-            width: 20;
+            width: 25;
             height: 20;
 
             decorator: buttonDecorator;
@@ -206,7 +206,7 @@ Row {
 
             anchors.verticalCenter: parent.verticalCenter;
 
-            width: 20;
+            width: 25;
             height: 20;
 
             decorator: buttonDecorator;
@@ -225,7 +225,7 @@ Row {
 
             anchors.verticalCenter: parent.verticalCenter;
 
-            width: 20;
+            width: 25;
             height: 20;
 
             decorator: buttonDecorator;

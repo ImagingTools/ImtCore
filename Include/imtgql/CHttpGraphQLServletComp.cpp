@@ -119,7 +119,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 	}
 
 	QByteArray responseData;
-	bool isSuccessful = false;
+	bool isSuccessful = true;
 	QString errorMessage;
 
 	int dataControllersCount = m_gqlRequestHandlerCompPtr.GetCount();
@@ -149,8 +149,6 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 						errorsItemModel->SetExternTreeModel(gqlCommand, errorsSourceItemModel);
 					}
 
-					isSuccessful = true;
-
 					iser::CJsonMemWriteArchive archive(responseData);
 					if (!rootModel.SerializeModel(archive)){
 						isSuccessful = false;
@@ -167,6 +165,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 
 						iser::CJsonMemWriteArchive archive(responseData);
 						if (!rootModel.SerializeModel(archive)){
+							isSuccessful = false;
 						}
 					}
 

@@ -127,7 +127,7 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 		}
 
 		if (name.isEmpty()){
-			errorMessage = QT_TR_NOOP("Group Name cannot be empty");
+			errorMessage = QT_TR_NOOP("Group name cannot be empty");
 
 			return nullptr;
 		}
@@ -151,7 +151,7 @@ istd::IChangeable* CUserGroupControllerComp::CreateObject(
 					if (collectionId != objectId){
 						QString currentUserGroupName = currentUserGroupInfoPtr->GetName();
 						if (currentUserGroupName == name){
-							errorMessage = QT_TR_NOOP("Group name already exists");
+							errorMessage = QT_TR_NOOP(QString("Group name '%1' already exists").arg(currentUserGroupName));
 							return nullptr;
 						}
 					}

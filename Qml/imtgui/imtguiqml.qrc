@@ -66,6 +66,7 @@
 	<file alias="imtgui/View/TreeViewElementView.qml">View/TreeViewElementView.qml</file>
 	<file alias="imtgui/View/SwitchElementView.qml">View/SwitchElementView.qml</file>
 	<file alias="imtgui/View/TextElementView.qml">View/TextElementView.qml</file>
+	<file alias="imtgui/View/MacAddressElementView.qml">View/MacAddressElementView.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>
