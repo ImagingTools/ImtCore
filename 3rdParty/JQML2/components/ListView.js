@@ -141,6 +141,7 @@ class ListView extends Flickable {
         }
 
         if(this.$timer) clearTimeout(this.$timer)
+        if(this.getPropertyValue('model').getPropertyValue('data').length !== this.getPropertyValue('contentItem').getPropertyValue('children').length)
         this.$timer = setTimeout(()=>{
             this.$modelDataUpdate()
         }, 10)
