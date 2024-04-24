@@ -5,9 +5,13 @@ import imtcontrols 1.0
 DecoratorBase {
     id: commonButtonDecorator
 
-    width: Math.max(Style.iconSizeSmall + textObj.width + Style.paddingMedium * 3, widthDefault)
+    width: Math.max(Style.iconSizeSmall + textItem.width + Style.size_mainMargin * 2, widthDefault)
     height: Style.buttonHeight;
+
     clip: true;
+
+    property int maxTextWidth: 80;
+    property int minTextWidth: 40;
 
     property int widthDefault: 0;
     property alias icon: iconObj
@@ -64,12 +68,12 @@ DecoratorBase {
 
         anchors.fill: parent
         radius: Style.buttonRadius
-        color: !commonButtonDecorator.baseElement ? "transtarent" :
+        color: !commonButtonDecorator.baseElement ? "transparent" :
                                                     commonButtonDecorator.baseElement.down || commonButtonDecorator.baseElement.checked ?
                                                     Style.buttonPressedColor : commonButtonDecorator.baseElement.hovered ?
                                                     Style.buttonHoverColor : Style.buttonColor
         border.width: Style.buttonBorderWidth
-        border.color: !commonButtonDecorator.baseElement ? "transtarent" :
+        border.color: !commonButtonDecorator.baseElement ? "transparent" :
                                                     commonButtonDecorator.baseElement.focus ? Style.buttonBorderFocusColor :
                                                     Style.borderColor
     }
@@ -80,7 +84,7 @@ DecoratorBase {
         anchors.horizontalCenter: commonButtonDecorator.horizontalCenter;
         anchors.verticalCenter: commonButtonDecorator.verticalCenter
 
-        height: Math.max(iconObj.height, textObj.height)
+        height: Math.max(iconObj.height, textItem.height)
 
         spacing: Style.size_mainMargin;
 
@@ -95,15 +99,40 @@ DecoratorBase {
             source: !commonButtonDecorator.baseElement ? "" : commonButtonDecorator.baseElement.iconSource
         }
 
-        Text {
-            id: textObj
+        Item {
+            id: textItem;
 
-            color: !commonButtonDecorator.baseElement ? "transtarent" : commonButtonDecorator.baseElement.enabled ? Style.textColor : Style.inactive_textColor
+            width: helperText.width > commonButtonDecorator.maxTextWidth ? commonButtonDecorator.maxTextWidth :
+//                   helperText.width < commonButtonDecorator.minTextWidth ? commonButtonDecorator.minTextWidth :
+                   helperText.width;
+            height: textObj.height;
 
-            font.pixelSize: Style.fontSize_common
-            font.family: Style.fontFamily
+            visible: textObj.text !== "";
 
-            text: !commonButtonDecorator.baseElement ? "" : commonButtonDecorator.baseElement.text
+            Text {
+                id: textObj
+
+                width: parent.width;
+
+                color: !commonButtonDecorator.baseElement ? "transparent" : commonButtonDecorator.baseElement.enabled ? Style.textColor : Style.inactive_textColor
+
+                font.pixelSize: Style.fontSize_common
+                font.family: Style.fontFamily
+
+                text: !commonButtonDecorator.baseElement ? "" : commonButtonDecorator.baseElement.text
+                elide: Text.ElideRight;
+            }
+
+            Text {
+                id: helperText;
+
+                font.pixelSize: Style.fontSize_common
+                font.family: Style.fontFamily
+
+                text: textObj.text;
+
+                visible: false;
+            }
         }
     }
 

@@ -38,8 +38,6 @@ DecoratorBase {
     }
 
     onBaseElementFocusChanged: {
-        console.log("Dialog onFocusChanged", dialogContainer.baseElementFocus);
-
         if (dialogContainer.focus && loaderBodyDialog.item){
             loaderBodyDialog.item.focus = true;
         }
@@ -52,13 +50,11 @@ DecoratorBase {
         }
 
         if (loaderBodyDialog && loaderBodyDialog.item){
-            //loaderBodyDialog.item.width = dialogContainer.width;
         }
     }
 
     onTitleChanged: {
         if(loaderTopPanel.item){
-            console.log("Dialog onTitleChanged", dialogContainer.title);
             loaderTopPanel.item.title = dialogContainer.title;
         }
     }
@@ -96,7 +92,7 @@ DecoratorBase {
 
         width: Math.max(buttonsWidth, bodyWidth);
 
-        spacing: 10;
+        spacing: Style.size_mainMargin;
 
         property real bodyWidth: !loaderBodyDialog.item ? 1 : loaderBodyDialog.item.width;
         property real buttonsWidth: buttonsContainer.width + 2 * buttonsContainer.anchors.rightMargin;
@@ -129,15 +125,11 @@ DecoratorBase {
                 sourceComponent: dialogContainer.topPanelComp;
 
                 onLoaded:  {
-                    console.log("loaderTopPanel onLoaded");
-
                     loaderTopPanel.item.width = dialogContainer.width;
 
                     if(loaderTopPanel.item.title !== undefined){
                         loaderTopPanel.item.title = dialogContainer.baseElement.title;
                     }
-
-                    console.log("loaderTopPanel.item.height", loaderTopPanel.item.height);
 
                     loaderTopPanel.width = loaderTopPanel.item.width;
                     loaderTopPanel.height = loaderTopPanel.item.height;
@@ -148,9 +140,6 @@ DecoratorBase {
                     dialogContainer.baseElement.topPanel = loaderTopPanel.item;
                 }
                 onItemChanged: {
-                    console.log("loaderTopPanel onItemChanged");
-
-                    //loaderTopPanel.item.closeButtonClicked.connect(dialogContainer.finished);
                     if(loaderTopPanel.item){
                         loaderTopPanel.item.width = dialogContainer.width;
                         if(loaderTopPanel.item.title !== undefined){
@@ -169,8 +158,6 @@ DecoratorBase {
 
             sourceComponent: dialogContainer.baseElement ? dialogContainer.baseElement.contentComp : undefined;
             onLoaded: {
-                //                        loaderBodyDialog.width = loaderBodyDialog.item.width;
-                //                        loaderBodyDialog.height = loaderBodyDialog.item.height;
                 if(loaderBodyDialog.item.rootItem !== undefined){
                     loaderBodyDialog.item.rootItem = dialogContainer.baseElement;
                 }
@@ -188,7 +175,7 @@ DecoratorBase {
             id: buttonsContainer;
 
             anchors.right: !parent ? undefined : parent.right;
-            anchors.rightMargin: 10;
+            anchors.rightMargin: Style.size_mainMargin;
 
             width: buttonsDialog.width;
             height: buttonsDialog.height + 2* buttonsDialog.anchors.bottomMargin;
@@ -198,18 +185,14 @@ DecoratorBase {
 
                 anchors.right: !parent ? undefined : parent.right;
                 anchors.bottom: !parent ? undefined : parent.bottom;
-                anchors.bottomMargin: 10;
+                anchors.bottomMargin: Style.size_mainMargin;
 
                 buttons: !dialogContainer.baseElement ? 0 : dialogContainer.baseElement.buttonsModel;
 
                 onButtonClicked: {
-                    console.log("DialogButtons onButtonClicked", buttonId);
                     dialogContainer.baseElement.finished(buttonId);
                 }
             }
         }
     }
-
-
-
 }//dialog

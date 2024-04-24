@@ -5,11 +5,13 @@ import imtcontrols 1.0
 ButtonDecorator {
     id: root;
 
-    color: !root.baseElement ? "transtarent" :
+    color: !root.baseElement ? "transparent" :
                                root.baseElement.highlighted ? Style.highlightColor :
                                root.baseElement.down || root.baseElement.checked ?
                                    Style.buttonPressedColor : root.baseElement.hovered ?
                                        Style.buttonHoverColor : Style.buttonColor
+
+    maxTextWidth: 1000;
 }
 
 

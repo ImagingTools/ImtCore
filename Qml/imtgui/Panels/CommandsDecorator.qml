@@ -196,7 +196,7 @@ Item {
 
                     decorator: Component {
                         ButtonDecorator {
-                            color: !baseElement ? "transtarent" : baseElement.down || baseElement.checked ? Style.buttonPressedColor : baseElement.hovered ?  Style.buttonHoverColor : "transparent"
+                            color: !baseElement ? "transparent" : baseElement.down || baseElement.checked ? Style.buttonPressedColor : baseElement.hovered ?  Style.buttonHoverColor : "transparent"
                             border.color: "transparent"
                         }
                     }

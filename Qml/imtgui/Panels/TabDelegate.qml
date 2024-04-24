@@ -20,6 +20,7 @@ ControlBase {
     property int minWidth: 100;
 
     property ListView listView: null;
+    property alias mouseArea: ma;
 
     decorator: Style.tabPanelDecorator
 

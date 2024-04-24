@@ -9,7 +9,7 @@ ItemDelegateDecorator {
 
     contentCentered: false;
 
-    color: !baseElement ? "transtarent" :
+    color: !baseElement ? "transparent" :
                               baseElement.highlighted ? Style.selectedColor :
                               baseElement.down || baseElement.checked ?
                                    Style.buttonPressedColor : root.selected ?
