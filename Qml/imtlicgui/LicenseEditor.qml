@@ -17,8 +17,6 @@ ViewBase {
         CachedFeatureCollection.updateModel();
         CachedProductCollection.updateModel();
         CachedLicenseCollection.updateModel();
-
-        CachedLicenseCollection.collectionModelChanged.connect(root.updateLicensesModel);
         Events.subscribeEvent("OnLocalizationChanged", onLocalizationChanged)
     }
 
@@ -32,6 +30,7 @@ ViewBase {
     }
 
     function updateModel(){
+        console.log("updateModel1", root.model.ToJson());
         root.model.SetData("LicenseName", licenseNameInput.text);
         root.model.SetData("LicenseId", licenseIdInput.text);
         root.model.SetData("LicenseDescription", descriptionInput.text);
@@ -71,10 +70,15 @@ ViewBase {
         else{
             root.model.SetData("ParentLicenses", "");
         }
+
+//        root.updateFeaturesModel()
+//        root.updateLicensesModel()
+
+        console.log("updateModel2", root.model.ToJson());
     }
 
     function updateGui(){
-        console.log("updateGui");
+        console.log("updateGui1", root.model.ToJson());
 
         if (root.model.ContainsKey("LicenseId")){
             licenseIdInput.text = root.model.GetData("LicenseId")
@@ -105,6 +109,8 @@ ViewBase {
             }
         }
 
+        console.log("productFound", productFound);
+
         if (!productFound){
             productsCB.currentIndex = -1;
         }
@@ -113,8 +119,43 @@ ViewBase {
             updateLicensesModel();
         }
 
-        updateFeaturesGui();
-        updateLicensesGui();
+        if (root.model.ContainsKey("Features")){
+            let licenseFeatures = root.model.GetData("Features");
+            let licenseFeatureIds = licenseFeatures.split(';');
+
+            featuresTable.uncheckAll();
+
+            if (featuresTable.elements){
+                for (let i = 0; i < featuresTable.elements.GetItemsCount(); i++){
+                    let id = featuresTable.elements.GetData("Id", i);
+                    console.log("id", id);
+
+                    if (licenseFeatureIds.includes(id)){
+                        console.log("ok", id);
+
+                        featuresTable.checkItem(i);
+                    }
+                }
+            }
+        }
+
+        if (root.model.ContainsKey("ParentLicenses")){
+            let licenses = root.model.GetData("ParentLicenses");
+            let licenseIds = licenses.split(';');
+
+            licensesTable.uncheckAll();
+
+            if (licensesTable.elements){
+                for (let i = 0; i < licensesTable.elements.GetItemsCount(); i++){
+                    let id = licensesTable.elements.GetData("Id", i);
+                    if (licenseIds.includes(id)){
+                        licensesTable.checkItem(i);
+                    }
+                }
+            }
+        }
+
+        console.log("updateGui2", root.model.ToJson());
     }
 
     function updateLicensesGui(){
@@ -136,10 +177,9 @@ ViewBase {
     }
 
     function updateLicensesModel(){
+        licensesTable.elements = 0;
+
         root.licensesModel.Clear();
-
-        console.log("CachedLicenseCollection.collectionModel", CachedLicenseCollection.collectionModel.ToJson());
-
 
         if (productsCB.currentIndex >= 0 && productsCB.model){
             let productId = productsCB.model.GetData("Id", productsCB.currentIndex);
@@ -164,12 +204,13 @@ ViewBase {
             }
         }
 
-        console.log("updateLicensesModel", root.licensesModel.ToJson());
-
         licensesTable.elements = root.licensesModel;
     }
 
     function updateFeaturesModel(){
+        console.log("updateFeaturesModel");
+
+        featuresTable.elements = 0;
         root.featuresModel.Clear();
 
         if (productsCB.currentIndex >= 0){
@@ -190,16 +231,22 @@ ViewBase {
     }
 
     function updateFeaturesGui(){
+        console.log("updateFeaturesGui");
         if (root.model.ContainsKey("Features")){
             let licenseFeatures = root.model.GetData("Features");
             let licenseFeatureIds = licenseFeatures.split(';');
+            console.log("licenseFeatureIds", licenseFeatureIds);
+            console.log("featuresTable.elements", featuresTable.elements);
 
             featuresTable.uncheckAll();
 
             if (featuresTable.elements){
                 for (let i = 0; i < featuresTable.elements.GetItemsCount(); i++){
                     let id = featuresTable.elements.GetData("Id", i);
+                    console.log("id", id);
+
                     if (licenseFeatureIds.includes(id)){
+                        console.log("ok", id);
                         featuresTable.checkItem(i);
                     }
                 }
@@ -218,7 +265,7 @@ ViewBase {
 
         width: 500;
 
-        spacing: 7;
+        spacing: Style.size_mainMargin;
 
         Text {
             id: titleLicense;
@@ -233,8 +280,8 @@ ViewBase {
         CustomTextField {
             id: licenseNameInput;
 
-            height: 30;
             width: parent.width;
+            height: 30;
 
             placeHolderText: qsTr("Enter the license name");
 
@@ -263,8 +310,8 @@ ViewBase {
         CustomTextField {
             id: licenseIdInput;
 
-            height: 30;
             width: parent.width;
+            height: 30;
 
             placeHolderText: qsTr("Enter the license ID");
 
@@ -293,8 +340,8 @@ ViewBase {
         CustomTextField {
             id: descriptionInput;
 
-            height: 30;
             width: parent.width;
+            height: 30;
 
             placeHolderText: qsTr("Enter the license description");
 
@@ -340,14 +387,14 @@ ViewBase {
             }
 
             onCurrentIndexChanged: {
+                if (root.guiIsBlocked()){
+                    return;
+                }
+
                 root.updateFeaturesModel()
                 root.updateLicensesModel()
 
-                featuresTable.uncheckAll();
-
                 root.doUpdateModel();
-
-                root.updateFeaturesGui();
             }
         }
 
@@ -381,6 +428,8 @@ ViewBase {
         }
 
         onCheckedItemsChanged: {
+            console.log("Table onCheckedItemsChanged", getCheckedItems());
+
             root.doUpdateModel();
         }
     }

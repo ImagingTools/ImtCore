@@ -60,8 +60,10 @@ ViewBase {
     }
 
     function updateModel(){
-        productViewContainer.model.SetData("ProductId", productNameInput.text);
         productViewContainer.model.SetData("ProductName", productNameInput.text);
+
+        let productId = productNameInput.text.replace(/\s+/g, '');
+        productViewContainer.model.SetData("ProductId", productId);
 
         if (categoryComboBox.currentIndex == 0){
             productViewContainer.model.SetData("CategoryId", "Software");
@@ -107,8 +109,6 @@ ViewBase {
     }
 
     function updateFeaturesGui(){
-        console.log("updateFeaturesGui");
-
         productViewContainer.productFeaturesViewModel.Clear();
 
         let features = productViewContainer.model.GetData("Features")
@@ -117,7 +117,6 @@ ViewBase {
         }
 
         let featureIds = features.split(';')
-        console.log("featureIds", featureIds);
 
         tableView_.selectedOptionalFeatures = [];
 
@@ -144,7 +143,6 @@ ViewBase {
     }
 
     function addFeature(featureId){
-        console.log("addFeature", featureId);
         let features = productViewContainer.model.GetData("Features")
 
         let featureIds = []
@@ -157,8 +155,6 @@ ViewBase {
         }
 
         productViewContainer.model.SetData("Features", featureIds.join(';'))
-
-        console.log("productViewContainer.model", productViewContainer.model.ToJson());
     }
 
     function removeFeature(featureId){

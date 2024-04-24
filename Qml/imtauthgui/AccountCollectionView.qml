@@ -29,6 +29,42 @@ RemoteCollectionView {
 
             documentTypeId: "Account";
             viewTypeId: "AccountEditor";
+
+            function setupContextMenu(){
+                let commandsController = collectionView.commandsController;
+                if (commandsController){
+                    contextMenuModel.Clear();
+
+                    let canEdit = commandsController.commandExists("Edit");
+                    let canRemove = commandsController.commandExists("Remove");
+
+                    if (canEdit){
+                        let index = contextMenuModel.InsertNewItem();
+
+                        contextMenuModel.SetData("Id", "Edit", index);
+                        contextMenuModel.SetData("Name", qsTr("Edit"), index);
+                        contextMenuModel.SetData("Icon", "Icons/Edit", index);
+                    }
+
+                    if (canRemove){
+                        let index = contextMenuModel.InsertNewItem();
+
+                        contextMenuModel.SetData("Id", "Remove", index);
+                        contextMenuModel.SetData("Name", qsTr("Remove"), index);
+                        contextMenuModel.SetData("Icon", "Icons/Delete", index);
+                    }
+
+                    if (canEdit){
+                        let index = contextMenuModel.InsertNewItem();
+
+                        contextMenuModel.SetData("Id", "SetDescription", index);
+                        contextMenuModel.SetData("Name", qsTr("Set Description"), index);
+                        contextMenuModel.SetData("Icon", "", index);
+                    }
+
+                    contextMenuModel.Refresh();
+                }
+            }
         }
     }
 

@@ -67,7 +67,7 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 	}
 
 	if (productId.isEmpty()){
-		errorMessage = QT_TR_NOOP("Unable to create product with an empty product-ID.");
+		errorMessage = QT_TR_NOOP("Product name cannot be empty");
 		SendErrorMessage(0, errorMessage, "Product controller");
 
 		return nullptr;
@@ -86,7 +86,7 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 	if (!collectionIds.isEmpty()){
 		QByteArray id = collectionIds[0];
 		if (objectId != id){
-			errorMessage = QT_TR_NOOP(QString("Product-ID: %1 already exists.")).arg(qPrintable(productId));
+			errorMessage = QT_TR_NOOP(QString("Product '%1' already exists")).arg(qPrintable(productId));
 
 			return nullptr;
 		}
@@ -118,7 +118,7 @@ istd::IChangeable* CProductControllerComp::CreateObject(
 	if (!collectionIds2.isEmpty()){
 		QByteArray id = collectionIds2[0];
 		if (objectId != id){
-			errorMessage = QT_TR_NOOP(QString("Product Name: %1 already exists. Please rename.")).arg(qPrintable(name));
+			errorMessage = QT_TR_NOOP(QString("Product name '%1' already exists. Please rename.")).arg(qPrintable(name));
 
 			return nullptr;
 		}

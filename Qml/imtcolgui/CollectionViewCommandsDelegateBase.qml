@@ -92,7 +92,6 @@ ViewCommandsDelegateBase {
     }
 
     function setupContextMenu(){
-        console.log("setupContextMenu", collectionView);
         let commandsController = collectionView.commandsController;
         if (commandsController){
             collectionViewCommandsDelegate.contextMenuModel.Clear();

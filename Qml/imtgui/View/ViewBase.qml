@@ -187,6 +187,10 @@ Item {
         }
     }
 
+    function guiIsBlocked(){
+        return internal.blockingUpdateGui;
+    }
+
     QtObject {
         id: internal;
 

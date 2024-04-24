@@ -77,17 +77,21 @@ Rectangle {
 
     Component.onCompleted: {
         tableDelegateContainer.compl = true;
+
+        console.log("TableRowDelegateBase onCompleted", tableItem)
+
+        if (tableItem){
+            tableConnections.target = tableItem;
+        }
     }
 
     Component.onDestruction: {
         if (tableItem){
             tableItem.checkedItemsChanged.disconnect(tableDelegateContainer.checkedItemsChanged);
-
             tableItem.properties.visibleItemsChanged.disconnect(tableDelegateContainer.visibleItemsChanged);
             tableItem.properties.stateItemsChanged.disconnect(tableDelegateContainer.enabledItemsChanged);
         }
     }
-
 
     onCellDecoratorChanged: {
         if (tableDelegateContainer.tableItem.cellDecorator){
@@ -136,6 +140,7 @@ Rectangle {
     onTableItemChanged: {
         if (tableItem){
             tableConnections.target = tableItem;
+
             tableItem.checkedItemsChanged.connect(tableDelegateContainer.checkedItemsChanged);
 
             tableItem.properties.visibleItemsChanged.connect(tableDelegateContainer.visibleItemsChanged);
@@ -168,6 +173,10 @@ Rectangle {
 
     Connections {
         id: tableConnections;
+
+//        function onCheckedItemsChanged(selection){
+//            checkedState = tableItem.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
+//        }
 
         function onSelectionChanged(selection){
             if (!tableDelegateContainer.tableItem){
@@ -282,6 +291,9 @@ Rectangle {
     }
 
     function checkedItemsChanged(){
+        console.log("checkedItemsChanged");
+        console.log("tableItem", tableItem);
+        console.log("model.index", model.index);
         if (tableItem){
             checkedState = tableItem.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
         }

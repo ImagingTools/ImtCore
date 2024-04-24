@@ -398,8 +398,6 @@ Item {
 
 
     function generateDocumentTitle(documentIndex){
-        console.log("generateDocumentTitle", documentIndex);
-
         if (documentIndex < 0 || documentIndex >= documentsModel.count){
             return "";
         }
@@ -408,12 +406,9 @@ Item {
 
         let documentData = documentsModel.get(documentIndex).DocumentData;
 
-        console.log("documentData", documentData);
-
         let documentName = "";
 
         if (documentData){
-            console.log("getDocumentName", documentData.getDocumentName());
             documentName = documentData.getDocumentName();
         }
 
@@ -422,7 +417,7 @@ Item {
         }
 
         if (documentData && documentData.isDirty){
-            title += " *";
+            title = "* " + title;
         }
 
         return title;
@@ -430,7 +425,6 @@ Item {
 
 
     function updateDocumentTitle(documentIndex){
-        console.log("updateDocumentTitle", documentIndex);
         if (documentIndex < 0 || documentIndex >= documentsModel.count){
             return;
         }

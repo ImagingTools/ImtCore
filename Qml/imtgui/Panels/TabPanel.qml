@@ -29,7 +29,7 @@ Rectangle {
     }
 
     onSelectedIndexChanged: {
-//        viewTabInListView(selectedIndex);
+        viewTabInListView(selectedIndex);
     }
 
     ListView {
