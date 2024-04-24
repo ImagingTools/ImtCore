@@ -14,6 +14,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QTextStream>
 #include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 
 
 namespace imtddl
@@ -82,20 +83,48 @@ bool CConstVarCppCreatorProcessorComp::CreateBody(
 	QJsonObject rootObject = templateDocument.object();
 
 	QString name = rootObject.value("name").toString();
-	QJsonObject properties = rootObject.value("properties").toObject();
-	QStringList propertyKeys = properties.keys();
 
 	QTextStream stream(&m_outputFile);
 
 	stream << "\n";
 
-	for (QString key: propertyKeys){
-		QJsonObject property = properties.value(key).toObject();
-		if (property.value("type") == "int"){
-			stream << "const QByteArray " << name << "::s_" << key << " = " << QString::number(property.value("value").toInt()) << ";" << "\n";
+	if (rootObject.contains("key")){
+		stream << "const QByteArray " << name << "::s_Key = \"" << rootObject.value("key").toString() << "\";" << "\n";
+	}
+
+	if (rootObject.value("type") == "object"){
+		QJsonObject properties = rootObject.value("properties").toObject();
+		QStringList propertyKeys = properties.keys();
+
+		for (QString key: propertyKeys){
+			if (key.isEmpty()){
+				Q_ASSERT(0);
+
+				break;
+			}
+			QJsonObject property = properties.value(key).toObject();
+			key[0] = key[0].toUpper();
+			if (property.value("type") == "int"){
+				stream << "const QByteArray " << name << "::s_" << key << " = " << QString::number(property.value("value").toInt()) << ";" << "\n";
+			}
+			else{
+				stream << "const QByteArray " << name << "::s_" << key << " = \"" << property.value("value").toString() << "\";" << "\n";
+			}
 		}
-		else{
-			stream << "const QByteArray " << name << "::s_" << key << " = \"" << property.value("value").toString() << "\";" << "\n";
+	}
+	else if (rootObject.value("type") == "enum"){
+		QJsonArray enumArray = rootObject.value("enum").toArray();
+		for (int index = 0; index < enumArray.count(); index++){
+			QString key = enumArray[index].toString();
+			if (key.isEmpty()){
+				Q_ASSERT(0);
+
+				break;
+			}
+			key[0] = key[0].toUpper();
+			QString value = key;
+			value[0] = value[0].toLower();
+			stream << "const QByteArray " << name << "::s_" << key << " = \"" << value << "\";" << "\n";
 		}
 	}
 

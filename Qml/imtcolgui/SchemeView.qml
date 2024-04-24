@@ -125,7 +125,7 @@ Rectangle {
         let ind = -1;
         if(!id) return ind
         for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
-            if(canvasPage.objectModel.GetData("Id", i) == id){
+            if(canvasPage.objectModel.GetData("id", i) == id){
                 ind = i;
                 break;
             }
@@ -135,11 +135,11 @@ Rectangle {
 
     function goInside(){
         if(objectModel.GetItemsCount() > canvas.selectedIndex && canvas.selectedIndex >= 0){
-            let isComposite = objectModel.IsValidData("IsComposite", canvas.selectedIndex) ? objectModel.GetData("IsComposite", canvas.selectedIndex) : false;
+            let isComposite = objectModel.IsValidData("isComposite", canvas.selectedIndex) ? objectModel.GetData("isComposite", canvas.selectedIndex) : false;
             if(!isComposite){
                 return;
             }
-            let id = objectModel.GetData("Id", canvas.selectedIndex);
+            let id = objectModel.GetData("id", canvas.selectedIndex);
             console.log("Go inside");
         }
     }
@@ -147,29 +147,29 @@ Rectangle {
     function correctPosition(addX, addY){
         for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
 
-            let x_ = canvasPage.objectModel.GetData("X", i) ;
-            let y_ = canvasPage.objectModel.GetData("Y", i) ;
+            let x_ = canvasPage.objectModel.GetData("x", i) ;
+            let y_ = canvasPage.objectModel.GetData("y", i) ;
             let newX = x_ + addX;
             let newY = y_ + addY;
-            canvasPage.objectModel.SetData("X", newX, i);
-            canvasPage.objectModel.SetData("Y", newY, i);
+            canvasPage.objectModel.SetData("x", newX, i);
+            canvasPage.objectModel.SetData("y", newY, i);
         }
     }
 
     function correctPositionScaled(addX, addY, scale_){
         for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
             //console.log("correctPositionScaled:: ", addX, addY, scale_)
-            let x_ = canvasPage.objectModel.GetData("X", i) ;
-            let y_ = canvasPage.objectModel.GetData("Y", i) ;
-            let width_ = canvasPage.objectModel.GetData("Width", i) ;
+            let x_ = canvasPage.objectModel.GetData("x", i) ;
+            let y_ = canvasPage.objectModel.GetData("y", i) ;
+            let width_ = canvasPage.objectModel.GetData("width", i) ;
             //            let newX = x_ + addX;
             //            let newY = y_ + addY;
             let newX =  x_; // + (width_ * scale_ - width_)/2;
             let newY =  y_ ;
             let newWidth = scale_ * width_;
-            canvasPage.objectModel.SetData("X", newX, i);
-            canvasPage.objectModel.SetData("Y", newY, i);
-            canvasPage.objectModel.SetData("Width", newWidth, i);
+            canvasPage.objectModel.SetData("x", newX, i);
+            canvasPage.objectModel.SetData("y", newY, i);
+            canvasPage.objectModel.SetData("width", newWidth, i);
         }
     }
 
@@ -212,9 +212,9 @@ Rectangle {
             onPressed: {
                 canvas.selectedIndex = -1;
                 for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
-                    let x_  = canvasPage.objectModel.GetData("X", i)
-                    let y_  = canvasPage.objectModel.GetData("Y", i)
-                    let width_ = canvasPage.objectModel.IsValidData("Width", i) ? canvasPage.objectModel.GetData("Width", i)  : canvas.mainRec_width;
+                    let x_  = canvasPage.objectModel.GetData("x", i)
+                    let y_  = canvasPage.objectModel.GetData("y", i)
+                    let width_ = canvasPage.objectModel.IsValidData("width", i) ? canvasPage.objectModel.GetData("width", i)  : canvas.mainRec_width;
                     let height_ = canvas.mainRec_height;
 
                     x_ = x_ * canvas.scaleCoeff + canvas.deltaX;
@@ -292,9 +292,9 @@ Rectangle {
 
             function movingFunction(delta){//reimplemented
                 if(canvas.selectedIndex >= 0 && canvas.scaleCoeff != 0){
-                    let x_  = canvasPage.objectModel.GetData("X", canvas.selectedIndex);
-                    let y_  = canvasPage.objectModel.GetData("Y", canvas.selectedIndex);
-                    let width_ = canvasPage.objectModel.IsValidData("Width", canvas.selectedIndex) ? canvasPage.objectModel.GetData("Width", canvas.selectedIndex)  : canvas.mainRec_width;
+                    let x_  = canvasPage.objectModel.GetData("x", canvas.selectedIndex);
+                    let y_  = canvasPage.objectModel.GetData("y", canvas.selectedIndex);
+                    let width_ = canvasPage.objectModel.IsValidData("width", canvas.selectedIndex) ? canvasPage.objectModel.GetData("width", canvas.selectedIndex)  : canvas.mainRec_width;
                     let height_ = canvas.mainRec_height;
 
                     x_ = x_ * canvas.scaleCoeff + canvas.deltaX;
@@ -308,8 +308,8 @@ Rectangle {
                             return;
                         }
 
-                        let newX = (canvasPage.objectModel.GetData("X", canvas.selectedIndex) + delta.x / canvas.scaleCoeff);
-                        let newY = (canvasPage.objectModel.GetData("Y", canvas.selectedIndex) + delta.y / canvas.scaleCoeff);
+                        let newX = (canvasPage.objectModel.GetData("x", canvas.selectedIndex) + delta.x / canvas.scaleCoeff);
+                        let newY = (canvasPage.objectModel.GetData("y", canvas.selectedIndex) + delta.y / canvas.scaleCoeff);
 
                         //fit to borders
                         let margin_ = 10;
@@ -331,8 +331,8 @@ Rectangle {
                             newY = (backgroundRec.height  - height_) / canvas.scaleCoeff - margin_
                         }
 
-                        canvasPage.objectModel.SetData("Y", newY, canvas.selectedIndex);
-                        canvasPage.objectModel.SetData("X", newX, canvas.selectedIndex);
+                        canvasPage.objectModel.SetData("y", newY, canvas.selectedIndex);
+                        canvasPage.objectModel.SetData("x", newX, canvas.selectedIndex);
 
                         canvas.requestPaint();
 
@@ -360,9 +360,9 @@ Rectangle {
             function hoverReaction(position){
                 canvas.hoverIndex = -1;
                 for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
-                    let x_  = canvasPage.objectModel.GetData("X", i) ;
-                    let y_  = canvasPage.objectModel.GetData("Y", i);
-                    let width_ = canvasPage.objectModel.IsValidData("Width", i) ? canvasPage.objectModel.GetData("Width", i)  : canvas.mainRec_width;
+                    let x_  = canvasPage.objectModel.GetData("x", i) ;
+                    let y_  = canvasPage.objectModel.GetData("y", i);
+                    let width_ = canvasPage.objectModel.IsValidData("width", i) ? canvasPage.objectModel.GetData("width", i)  : canvas.mainRec_width;
                     let height_ = canvas.mainRec_height ;
 
                     x_ = x_ * canvas.scaleCoeff + canvas.deltaX;
@@ -535,10 +535,10 @@ Rectangle {
 
                 //drawLink
                 for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
-                    if(canvasPage.objectModel.GetData("Links", i) !==undefined){
-                        let links = canvasPage.objectModel.GetData("Links",i);
+                    if(canvasPage.objectModel.GetData("links", i) !==undefined){
+                        let links = canvasPage.objectModel.GetData("links",i);
                         for(let k = 0; k < links.GetItemsCount(); k++){
-                            let objectId = links.GetData("ObjectId", k);
+                            let objectId = links.GetData("objectId", k);
                             let ind = canvasPage.findModelIndex(objectId);
                             if(ind === -1) continue
                             canvas.drawLink(ctx, ind, i);
@@ -607,9 +607,9 @@ Rectangle {
 
             function setObjectWidth(ctx, index){
                 //width calculation
-                let mainText  = canvasPage.objectModel.GetData("MainText", index)
-                let secondText  = canvasPage.objectModel.GetData("SecondText", index)
-                let width_ = canvasPage.objectModel.IsValidData("Width", index) ? canvasPage.objectModel.GetData("Width", index)  : canvas.mainRec_width;
+                let mainText  = canvasPage.objectModel.GetData("mainText", index)
+                let secondText  = canvasPage.objectModel.GetData("secondText", index)
+                let width_ = canvasPage.objectModel.IsValidData("width", index) ? canvasPage.objectModel.GetData("width", index)  : canvas.mainRec_width;
 
                 ctx.lineWidth = 1;
                 let fontStr_main = String(canvas.fontSize) + "px sans-serif"
@@ -625,30 +625,30 @@ Rectangle {
 
                 let add = 2 * canvas.imageSize + 2 * canvas.imageMargin + 2 * canvas.borderShift + 30 /** scaleCoeff*/;
                 let mainRecWidth = Math.max(textWidth_main + add, textWidth_second + add, width_)
-                canvasPage.objectModel.SetData("Width", mainRecWidth /*/ scaleCoeff*/, index);
+                canvasPage.objectModel.SetData("width", mainRecWidth /*/ scaleCoeff*/, index);
 
                 return mainRecWidth;
             }
 
             function drawObject(ctx, index){
 
-                let x_  = canvasPage.objectModel.GetData("X", index)
-                let y_  = canvasPage.objectModel.GetData("Y", index)
-                let width_ = canvasPage.objectModel.IsValidData("Width", index) ? canvasPage.objectModel.GetData("Width", index)  : canvas.mainRec_width;
-                let mainText  = canvasPage.objectModel.GetData("MainText", index)
-                let secondText  = canvasPage.objectModel.GetData("SecondText", index)
-                let thirdText  = canvasPage.objectModel.GetData("ThirdText", index)
-                let backgroundColor = canvasPage.objectModel.IsValidData("BackgroundColor", index) ? canvasPage.objectModel.GetData("BackgroundColor", index) : canvas.backgroundColor;
-                let icon = canvasPage.objectModel.GetData("IconUrl_1", index)
+                let x_  = canvasPage.objectModel.GetData("x", index)
+                let y_  = canvasPage.objectModel.GetData("y", index)
+                let width_ = canvasPage.objectModel.IsValidData("width", index) ? canvasPage.objectModel.GetData("width", index)  : canvas.mainRec_width;
+                let mainText  = canvasPage.objectModel.GetData("mainText", index)
+                let secondText  = canvasPage.objectModel.GetData("secondText", index)
+                let thirdText  = canvasPage.objectModel.GetData("thirdText", index)
+                let backgroundColor = canvasPage.objectModel.IsValidData("backgroundColor", index) ? canvasPage.objectModel.GetData("backgroundColor", index) : canvas.backgroundColor;
+                let icon = canvasPage.objectModel.GetData("iconUrl_1", index)
                 let iconUrl_1  = icon === "" ? "" : "../../../" + Style.getIconPath(icon, Icon.State.On, Icon.Mode.Normal)
-                icon = canvasPage.objectModel.GetData("IconUrl_2", index)
+                icon = canvasPage.objectModel.GetData("iconUrl_2", index)
                 let iconUrl_2  = icon === "" ? "" : "../../../" + Style.getIconPath(icon, Icon.State.On, Icon.Mode.Normal)
                 // for future multiselect
                 // let selected = canvasPage.objectModel.IsValidData("Selected", index) ? canvasPage.objectModel.GetData("Selected", index) : false;
                 let selected = index === canvasPage.selectedIndex
 
-                let hasError = canvasPage.objectModel.IsValidData("HasError", index) ? canvasPage.objectModel.GetData("HasError", index) : false;
-                let isComposite = canvasPage.objectModel.IsValidData("IsComposite", index) ? canvasPage.objectModel.GetData("IsComposite", index) : false;
+                let hasError = canvasPage.objectModel.IsValidData("hasError", index) ? canvasPage.objectModel.GetData("hasError", index) : false;
+                let isComposite = canvasPage.objectModel.IsValidData("isComposite", index) ? canvasPage.objectModel.GetData("isComposite", index) : false;
 
                 isComposite = false
 
@@ -749,12 +749,12 @@ Rectangle {
 
             function drawLink(ctx, fromIndex, toIndex){
 
-                let x1 = canvasPage.objectModel.GetData("X", fromIndex);
-                let y1 = canvasPage.objectModel.GetData("Y", fromIndex);
-                let x2 = canvasPage.objectModel.GetData("X", toIndex);
-                let y2 = canvasPage.objectModel.GetData("Y", toIndex);
-                let width1 = canvasPage.objectModel.IsValidData("Width", fromIndex) ? canvasPage.objectModel.GetData("Width", fromIndex) : canvas.mainRec_width;
-                let width2 = canvasPage.objectModel.IsValidData("Width", toIndex) ? canvasPage.objectModel.GetData("Width", toIndex) : canvas.mainRec_width;
+                let x1 = canvasPage.objectModel.GetData("x", fromIndex);
+                let y1 = canvasPage.objectModel.GetData("y", fromIndex);
+                let x2 = canvasPage.objectModel.GetData("x", toIndex);
+                let y2 = canvasPage.objectModel.GetData("y", toIndex);
+                let width1 = canvasPage.objectModel.IsValidData("width", fromIndex) ? canvasPage.objectModel.GetData("width", fromIndex) : canvas.mainRec_width;
+                let width2 = canvasPage.objectModel.IsValidData("width", toIndex) ? canvasPage.objectModel.GetData("width", toIndex) : canvas.mainRec_width;
 
                 let x1_link = x1 + width1/2;
                 let y1_link = y1 + canvas.mainRec_height/2;
@@ -1084,21 +1084,21 @@ Rectangle {
 
     function pasteObjectFunc(){
         if(bufferModel.GetItemsCount()){
-            bufferModel.SetExternTreeModel("Links", emptyModel, 0);
-            let mainText = bufferModel.GetData("MainText") + "_1";
-            let secondText = bufferModel.GetData("SecondText") + "_1";
-            let x_ = bufferModel.GetData("X") + 10;
-            let y_ = bufferModel.GetData("Y") + 10;
+            bufferModel.SetExternTreeModel("links", emptyModel, 0);
+            let mainText = bufferModel.GetData("mainText") + "_1";
+            let secondText = bufferModel.GetData("secondText") + "_1";
+            let x_ = bufferModel.GetData("x") + 10;
+            let y_ = bufferModel.GetData("y") + 10;
 
             //TO DO: unique Id
             var date = new Date();
             let datString = String(date.valueOf());
-            bufferModel.SetData("Id", datString, 0);
+            bufferModel.SetData("id", datString, 0);
 
-            bufferModel.SetData("MainText", mainText, 0);
-            bufferModel.SetData("SecondText", secondText, 0);
-            bufferModel.SetData("X", x_, 0);
-            bufferModel.SetData("Y", y_, 0);
+            bufferModel.SetData("mainText", mainText, 0);
+            bufferModel.SetData("secondText", secondText, 0);
+            bufferModel.SetData("x", x_, 0);
+            bufferModel.SetData("y", y_, 0);
             bufferModel.SetData("Selected", false, 0);
             let index = canvasPage.objectModel.InsertNewItem();
             canvasPage.objectModel.CopyItemDataFromModel(index, bufferModel,0);
@@ -1111,14 +1111,14 @@ Rectangle {
 
     function deleteObjectFunc(index){
         console.log("DELETE OBJECT: ", index);
-        let id = canvasPage.objectModel.GetData("Id", index);
+        let id = canvasPage.objectModel.GetData("id", index);
 
         //remove links
         for(let i = 0; i < canvasPage.objectModel.GetItemsCount(); i++){
-            let links = canvasPage.objectModel.GetData("Links", i);
+            let links = canvasPage.objectModel.GetData("links", i);
             if(links !== undefined){
                 for(let k = 0; k < links.GetItemsCount(); k++){
-                    let objectId = links.GetData("ObjectId", k);
+                    let objectId = links.GetData("objectId", k);
                     if(objectId == id){
                         links.RemoveItem(k);
                         break;

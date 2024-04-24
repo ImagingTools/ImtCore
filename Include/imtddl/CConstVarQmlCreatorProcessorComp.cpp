@@ -8,6 +8,7 @@
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>
 #include <QtCore/QJsonObject>
+#include <QtCore/QJsonArray>
 
 // ACF includes
 #include <iprm/ITextParam.h>
@@ -66,25 +67,49 @@ bool CConstVarQmlCreatorProcessorComp::CreateBody(
 	textStream << "import QtQuick 2.12" << "\n\n";
 	textStream << "QtObject {" << "\n";
 
-	for (QString key: propertyKeys){
-		QJsonObject property = properties.value(key).toObject();
-		QString normalKey = key;
-		if (normalKey.size() > 0){
-			normalKey[0] = normalKey[0].toUpper();
-		}
+	if (rootObject.contains("key")){
+		textStream << "readonly property string s_Key: \"" + rootObject.value("key").toString() + "\"\n";
+	}
 
-		if (property.value("type") == "int"){
-			textStream << "    readonly property int i_" + normalKey + ": " + QString::number(property.value("value").toInt());
-			textStream << "\n";
+	if (rootObject.value("type") == "object"){
+		QJsonObject properties = rootObject.value("properties").toObject();
+		QStringList propertyKeys = properties.keys();
+
+		for (QString key: propertyKeys){
+			QJsonObject property = properties.value(key).toObject();
+			QString normalKey = key;
+			if (normalKey.size() > 0){
+				normalKey[0] = normalKey[0].toUpper();
+			}
+
+			if (property.value("type") == "int"){
+				textStream << "readonly property int i_" + normalKey + ": " + QString::number(property.value("value").toInt());
+				textStream << "\n";
+			}
+			else{
+				textStream << "readonly property string s_" + normalKey + ": \"" + property.value("value").toString() + "\"";
+				textStream << "\n";
+			}
 		}
-		else{
-			textStream << "readonly property string s_" + normalKey + ": \"" + property.value("value").toString() + "\"";
+	}
+	else if (rootObject.value("type") == "enum"){
+		QJsonArray enumArray = rootObject.value("enum").toArray();
+		for (int index = 0; index < enumArray.count(); index++){
+			QString key = enumArray[index].toString();
+			if (key.isEmpty()){
+				Q_ASSERT(0);
+
+				break;
+			}
+			key[0] = key[0].toUpper();
+			QString value = key;
+			value[0] = value[0].toLower();
+			textStream << "readonly property string s_" + key + ": \"" + value + "\"";
 			textStream << "\n";
 		}
 	}
 
 	textStream << "}" << "\n\n";
-
 
 	return true;
 }
