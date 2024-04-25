@@ -414,7 +414,7 @@ class MouseController {
             for(let i = this.list.length-1; i >= 0; i--){
                 if(!wasCursor && this.list[i].UID && (this.list[i] instanceof TextInput || this.list[i] instanceof TextEdit)){
                     if(inner.indexOf(this.list[i]) >= 0){
-                        document.body.style.cursor = 'text'
+                        if(!this.list[i].getPropertyValue('readOnly')) document.body.style.cursor = 'text'
                         wasCursor = true
                     }
                     

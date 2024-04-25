@@ -73,6 +73,10 @@ class TextEdit extends Item {
         this.getDom().appendChild(this.$input)
         MouseController.add(this)
 
+        this.$input.onfocus = ()=>{
+            if(!this.getPropertyValue('activeFocus') && !this.getPropertyValue('readOnly')) this.forceActiveFocus()
+        }
+
         this.$input.oninput = (e)=>{
             this.getProperty('text').reset(this.$input.value)
         }
@@ -125,8 +129,8 @@ class TextEdit extends Item {
     }
 
     forceActiveFocus(){
-        super.forceActiveFocus()
-        this.getProperty('activeFocus').reset(true)
+        this.getProperty('focus').reset(true)
+        if(!this.getPropertyValue('readOnly')) this.getProperty('activeFocus').reset(true)
         this.$input.focus()
     }
 

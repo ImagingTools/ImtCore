@@ -83,7 +83,7 @@ class TextInput extends Item {
         this.$input.setAttribute('autocomplete', "new-password")
         this.$input.setAttribute('spellcheck', "false")
         this.$input.onfocus = ()=>{
-            if(!this.getPropertyValue('activeFocus')) this.forceActiveFocus()
+            if(!this.getPropertyValue('activeFocus') && !this.getPropertyValue('readOnly')) this.forceActiveFocus()
         }
         this.$form.appendChild(this.$input)
         MouseController.add(this)
@@ -114,8 +114,8 @@ class TextInput extends Item {
     }
 
     forceActiveFocus(){
-        super.forceActiveFocus()
-        this.getProperty('activeFocus').reset(true)
+        this.getProperty('focus').reset(true)
+        if(!this.getPropertyValue('readOnly')) this.getProperty('activeFocus').reset(true)
         this.$input.focus()
     }
 
