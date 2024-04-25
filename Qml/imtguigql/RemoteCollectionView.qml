@@ -74,6 +74,23 @@ CollectionView {
             let elementId = elementsModel.GetData("Id", index);
             metaInfoProvider.getMetaInfo(elementId);
         }
+
+        if (selection.length !== 0){
+            if (root.metaInfoView.width !== 200){
+                animation.from = 0;
+                animation.to = 200;
+
+                animation.start();
+            }
+        }
+        else{
+            if (root.metaInfoView.width !== 0){
+                animation.from = 200;
+                animation.to = 0;
+
+                animation.start();
+            }
+        }
     }
 
     onVisibleChanged: {
@@ -100,6 +117,14 @@ CollectionView {
         let parameters = {"Id": collectionId, "AlertPanelComp": alertPanel};
 
         Events.sendEvent("SetAlertPanel", parameters)
+    }
+
+    NumberAnimation {
+        id: animation;
+
+        target: root.metaInfoView;
+        property: "width";
+        duration: 100;
     }
 
     MetaInfoProvider {

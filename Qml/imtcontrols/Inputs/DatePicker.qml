@@ -377,6 +377,29 @@ Item {
                 width: yearField.width + yearButtons.width;
                 height: datePicker.textFieldHeight;
 
+                MouseArea {
+                    id: yearMouseArea;
+
+                    anchors.fill: yearField;
+
+                    enabled: !datePicker.readOnly;
+
+                    propagateComposedEvents: true;
+
+                    onWheel: {
+                        if (datePicker.readOnly){
+                            return;
+                        }
+
+                        if(wheel.angleDelta.y > 0){
+                            yearUpButton.clicked();
+                        }
+                        else {
+                            yearDownButton.clicked();
+                        }
+                    }
+                }
+
                 CustomTextField {
                     id: yearField;
 
@@ -390,7 +413,7 @@ Item {
                     textSize: datePicker.textSize;
                     fontColor: datePicker.fontColor;
                     color: datePicker.textFieldColor;
-                    borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
+//                    borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
                     margin: datePicker.textFieldMargin;
 
                     leftPadding: horizontalAlignment == TextInput.AlignLeft ? 4 : 0;
@@ -412,6 +435,7 @@ Item {
                 Column {
                     id: yearButtons;
 
+                    anchors.verticalCenter: parent.verticalCenter;
                     anchors.left: yearField.right;
 
                     width: datePicker.buttonWidth;
@@ -531,6 +555,29 @@ Item {
                 width: monthField.width + monthButtons.width;
                 height: datePicker.textFieldHeight;
 
+                MouseArea {
+                    id: monthMouseArea;
+
+                    anchors.fill: monthField;
+
+                    enabled: !datePicker.readOnly;
+
+                    propagateComposedEvents: true;
+
+                    onWheel: {
+                        if (datePicker.readOnly){
+                            return;
+                        }
+
+                        if(wheel.angleDelta.y > 0){
+                            monthUpButton.clicked();
+                        }
+                        else {
+                            monthDownButton.clicked();
+                        }
+                    }
+                }
+
                 CustomTextField {
                     id: monthField;
 
@@ -545,7 +592,6 @@ Item {
                     textSize: datePicker.textSize;
                     fontColor: datePicker.fontColor;
                     color: datePicker.textFieldColor;
-                    borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
                     margin: datePicker.textFieldMargin;
 
                     readOnly: true//datePicker.readOnly || datePicker.textInputBan;
@@ -696,6 +742,25 @@ Item {
                 width: dayField.width + dayButtons.width;
                 height: datePicker.textFieldHeight;
 
+                MouseArea {
+                    id: daysMouseArea;
+
+                    anchors.fill: dayField;
+
+                    enabled: !datePicker.readOnly;
+
+                    propagateComposedEvents: true;
+
+                    onWheel: {
+                        if(wheel.angleDelta.y > 0){
+                            dayUpButton.clicked();
+                        }
+                        else {
+                            dayDownButton.clicked();
+                        }
+                    }
+                }
+
                 CustomTextField {
                     id: dayField;
 
@@ -710,7 +775,6 @@ Item {
                     textSize: datePicker.textSize;
                     fontColor: datePicker.fontColor;
                     color: datePicker.textFieldColor;
-                    borderColorConst: datePicker.textFieldBorderColor !== "" ? datePicker.textFieldBorderColor : acceptableInput ? Style.iconColorOnSelected : Style.errorTextColor;
                     margin: datePicker.textFieldMargin;
 
                     readOnly: true;//datePicker.readOnly || datePicker.textInputBan;
@@ -721,7 +785,7 @@ Item {
                     textInputValidator: dayValid;
 
                     Keys.onUpPressed: {
-                        if (readOnly){
+                        if (datePicker.readOnly){
                             return;
                         }
 
@@ -729,9 +793,10 @@ Item {
                     }
 
                     Keys.onDownPressed: {
-                        if (readOnly){
+                        if (datePicker.readOnly){
                             return;
                         }
+
                         dayDownButton.clicked();
                     }
                 }
@@ -830,7 +895,6 @@ Item {
                     visibleScrollBar: false;
                     isColor: true;
                     changeable: !datePicker.readOnly;
-                    //z: dayField.readOnly ? 1 : 0;
 
                     onCurrentIndexChanged:{
                         if(dayComboObj.currentIndex >=0){

@@ -55,7 +55,7 @@ ViewBase {
     Rectangle{
         anchors.fill: parent;
 
-        color: Style.backgroundColor;
+        color: Style.backgroundColor2;
     }
 
     FilterMenu {

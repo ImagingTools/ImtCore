@@ -6,7 +6,9 @@ import imtcontrols 1.0
 Rectangle {
     id: container;
 
-    color: Style.backgroundColor;
+    color: Style.backgroundColor2;
+
+    clip: true;
 
     property TreeItemModel metaInfoModel: TreeItemModel {}
     property int elementHeight: 20;
@@ -33,6 +35,8 @@ Rectangle {
         Column {
             id: column;
 
+            anchors.top: parent.top;
+            anchors.topMargin: Style.size_mainMargin;
             anchors.left: parent.left;
             anchors.leftMargin: Style.size_mainMargin;
             anchors.right: parent.right;
@@ -136,6 +140,12 @@ Rectangle {
                 }
             }
         }//Column main
+    }
+
+    Rectangle {
+        anchors.fill: parent;
+        color: parent.color;
+        visible: loading.visible;
     }
 
     Loading {

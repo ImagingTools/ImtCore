@@ -164,7 +164,7 @@ Rectangle {
                     font.family: Style.fontFamily;
                     font.pixelSize: Style.fontSize_title;
 
-                    text: qsTr("Welcome");
+                    text: context.appName && context.appName !== "" ? qsTr("Welcome to ") + context.appName : qsTr("Welcome");
                 }
             }
         }
@@ -197,7 +197,7 @@ Rectangle {
             anchors.top: headerItem.bottom;
             anchors.horizontalCenter: parent.horizontalCenter;
 
-            spacing: 10;
+            spacing: Style.size_mainMargin;
 
             Text {
                 id: titleLogin;

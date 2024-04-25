@@ -8,11 +8,13 @@ ComboBoxElementView {
 
     controlComp: cbComp;
 
+    property var filteringFields: [nameId];
+
     Component {
         id: cbComp;
 
         Item {
-            width: 300;
+            width: 350;
             height: 30;
 
             onFocusChanged: {
@@ -30,6 +32,8 @@ ComboBoxElementView {
 
                 width: 230;
                 height: 30;
+
+                filteringFields: root.filteringFields;
 
                 Component.onCompleted: {
                     root.setupComboBox(cb);

@@ -333,9 +333,10 @@ Item {
     MetaInfo {
         id: collectionMetaInfo;
 
+        anchors.top: parent.top;
         anchors.right: parent.right;
 
-        width: visible ? 200 : 0;
+        width: 0;
         height: parent.height;
 
         visible: root.visibleMetaInfo;

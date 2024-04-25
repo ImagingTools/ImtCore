@@ -78,8 +78,6 @@ Rectangle {
     Component.onCompleted: {
         tableDelegateContainer.compl = true;
 
-        console.log("TableRowDelegateBase onCompleted", tableItem)
-
         if (tableItem){
             tableConnections.target = tableItem;
         }

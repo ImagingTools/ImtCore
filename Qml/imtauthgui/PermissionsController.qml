@@ -25,8 +25,6 @@ Item {
         property var permissions: []
 
         function setPermissions(permissions){
-            console.log("setPermissions", permissions);
-
             private_.permissions = permissions;
         }
 

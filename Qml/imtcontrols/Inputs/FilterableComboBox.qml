@@ -7,6 +7,7 @@ ComboBox {
     id: comboBoxContainer;
 
     property string filter;
+    property var filteringFields: [comboBoxContainer.nameId];
 
 //    property TreeItemModel proxyModel: TreeItemModel {}
 
@@ -62,7 +63,23 @@ ComboBox {
             property string displayText: model[comboBoxContainer.nameId];
             property string filter: comboBoxContainer.filter;
 
-            property bool acceptable: displayText.toLowerCase().indexOf(filter.toLowerCase()) >= 0;
+            onFilterChanged: {
+                acceptable = false;
+
+                let keys = comboBoxContainer.model.GetKeys(model.index);
+                for (let i = 0; i < comboBoxContainer.filteringFields.length; i++){
+                    let id = comboBoxContainer.filteringFields[i];
+                    if (keys.includes(id)){
+                        let value = model[id];
+                        if (value.toLowerCase().indexOf(filter.toLowerCase()) >= 0){
+                            acceptable = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            property bool acceptable: true;
 
             onClicked: {
                 if (comboBoxContainer.popup){
@@ -74,10 +91,6 @@ ComboBox {
                 if (comboBoxContainer.popup){
                     comboBoxContainer.popup.selectedIndex = model.index;
                 }
-            }
-
-            Component.onCompleted: {
-                console.log("PopupMenuDelegate onCompleted");
             }
         }
     }
