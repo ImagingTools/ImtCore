@@ -331,7 +331,7 @@ window.onload = ()=>{
     global.rootPath = document.body.dataset.root
     document.head.insertAdjacentHTML("beforeend", `
     <style>
-        *{padding:0;margin:0;border:0;overflow:hidden;-ms-overflow-style:none;scrollbar-width:none;user-select:none;}
+        *{padding:0;margin:0;border:0;overflow:hidden;-ms-overflow-style:none;scrollbar-width:none;user-select:none;-webkit-user-select: none;}
         *::-webkit-scrollbar{width:0;height:0;}
         *,*:before,*:after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box;}
         :focus,:active{outline:none;}

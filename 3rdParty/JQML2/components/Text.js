@@ -26,6 +26,10 @@ class Text extends Item {
     static ElideLeft = 1
     static ElideMiddle = 2
     static ElideRight = 3
+
+    static html = []
+
+    
     
     static defaultProperties = {
         text: { type: QString, value: '', changed: '$textChanged' },
@@ -91,10 +95,10 @@ class Text extends Item {
     applyMetrics(){
         let textMetrics = TextFontController.measureText(this.getPropertyValue('text'), this.getProperty('font'), this.getProperty('width').auto ? 0 : this.getPropertyValue('width'), this.getPropertyValue('wrapMode'), this.getPropertyValue('textFormat'))
         
-        if(this.getPropertyValue('textFormat') === Text.PlainText || this.getPropertyValue('textFormat') === Text.AutoText){
-            this.impl.innerText = this.getPropertyValue('text').replaceAll('<br>', '\r')
-        } else {
+        if(textMetrics.isHTML){
             this.impl.innerHTML = this.getPropertyValue('text').replaceAll('<br>', '\r')
+        } else {
+            this.impl.innerText = this.getPropertyValue('text').replaceAll('<br>', '\r')
         }
         
 

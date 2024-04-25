@@ -761,6 +761,9 @@ class KeyboardController {
     }
 }
 class TextFontController {
+    static tags = ['<a>','<abbr>','<address>','<area>','<article>','<aside>','<audio>','<b>','<base>','<bdi>','<bdo>','<blockquote>','<body>','<br>','<button>','<canvas>','<caption>','<cite>','<code>','<col>','<colgroup>','<data>','<datalist>','<dd>','<del>','<details>','<dfn>','<dialog>','<div>','<dl>','<dt>','<em>','<embed>','<fieldset>','<figcaption>','<figure>','<footer>','<form>','<h1>','<h2>','<h3>','<h4>','<h5>','<h6>','<head>','<header>','<hr>','<html>','<i>','<iframe>','<img>','<input>','<ins>','<kbd>','<label>','<legend>','<li>','<link>','<main>','<map>','<mark>','<meta>','<meter>','<nav>','<noscript>','<object>','<ol>','<optgroup>','<option>','<output>','<p>','<param>','<picture>','<pre>','<progress>','<q>','<ruby>','<rb>','<rt>','<rtc>','<rp>','<s>','<samp>','<script>','<section>','<select>','<small>','<source>','<span>','<strong>','<style>','<sub>','<summary>','<sup>','<table>','<tbody>','<td>','<template>','<textarea>','<tfoot>','<th>','<thead>','<time>','<title>','<tr>','<track>','<u>','<ul>','<var>','<video>','<wbr>']
+    static regexp = /<[^<>]+>/g
+
     constructor(){
         this.container = document.createElement('div')
         this.container.style.position = 'absolute'
@@ -791,23 +794,36 @@ class TextFontController {
             this.container.style.wordBreak = 'unset';
         }
         
-        if(textFormat === undefined || textFormat === Text.PlainText || textFormat === Text.AutoText){
-            this.container.innerText = text
+        let isHTML = false
+        if(textFormat === undefined || textFormat === Text.PlainText){
+            isHTML = false
+        } else if(textFormat === Text.AutoText){
+            isHTML = false
+            let result = text.match(TextFontController.regexp)
+            if(result){
+                for(let res of result){
+                    if(TextFontController.tags.indexOf(res) >= 0){
+                        isHTML = true
+                        break
+                    }
+                }
+                
+            } else {
+                isHTML = false
+            }
         } else {
+            isHTML = true
+        }
+
+        if(isHTML){
             this.container.innerHTML = text
+        } else {
+            this.container.innerText = text
         }
         
-
-        // if(accuracy){
-            let rect = this.container.getBoundingClientRect()
-            return rect
-        // } else {
-        //     return {
-        //         width: this.container.clientWidth,
-        //         height: this.container.clientHeight,
-        //     }
-        // }
-        
+        let rect = this.container.getBoundingClientRect()
+        rect.isHTML = isHTML
+        return rect
     }
 }
 class AnimationController {
