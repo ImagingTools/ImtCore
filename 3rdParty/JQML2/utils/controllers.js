@@ -566,6 +566,10 @@ class KeyboardController {
                             return
                         }
                     }
+
+                    if((target instanceof TextInput || target instanceof TextEdit) && e.ctrlKey && (e.code === 'KeyC' || e.code === 'KeyV' || e.code === 'KeyZ' || e.code === 'KeyA')) {
+                        return
+                    }
                     
                     let obj = target
 
