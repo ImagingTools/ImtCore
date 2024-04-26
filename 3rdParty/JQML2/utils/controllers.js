@@ -288,13 +288,13 @@ class MouseController {
                         this.target.mouse.accepted = true
                         if(this.target.$signals.clicked) {
                             this.target.$signals.clicked()
-                            if(this.target.getPropertyValue('propagateComposedEvents') && !this.target.mouse.accepted)
-                            for(let i = 1; i < this.pressedMouseArea.length; i++){
-                                if(this.pressedMouseArea[i].$signals.clicked){
-                                    this.pressedMouseArea[i].mouse.accepted = true
-                                    this.pressedMouseArea[i].$signals.clicked()
-                                    if(!this.pressedMouseArea[i].getPropertyValue('propagateComposedEvents') || this.pressedMouseArea[i].mouse.accepted) break
-                                }
+                        }
+                        if(this.target.getPropertyValue('propagateComposedEvents') && !this.target.mouse.accepted)
+                        for(let i = 1; i < this.pressedMouseArea.length; i++){
+                            if(this.pressedMouseArea[i].$signals.clicked){
+                                this.pressedMouseArea[i].mouse.accepted = true
+                                this.pressedMouseArea[i].$signals.clicked()
+                                if(!this.pressedMouseArea[i].getPropertyValue('propagateComposedEvents') || this.pressedMouseArea[i].mouse.accepted) break
                             }
                         }
                     }
