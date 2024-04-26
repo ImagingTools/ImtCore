@@ -88,7 +88,7 @@ Item {
     property string buttonColor:"";
     property int buttonHighlighted: -1;
 
-    property int spixBoxSpacing: 0;
+    property int spinBoxSpacing: 0;
     //
 
     signal dateChanged();
@@ -374,7 +374,7 @@ Item {
 
                 anchors.verticalCenter: parent.verticalCenter;
 
-                width: yearField.width + yearButtons.width + datePicker.spixBoxSpacing;
+                width: yearField.width + yearButtons.width + datePicker.spinBoxSpacing;
                 height: datePicker.textFieldHeight;
 
                 MouseArea {
@@ -437,7 +437,7 @@ Item {
 
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.left: yearField.right;
-                    anchors.leftMargin: datePicker.spixBoxSpacing;
+                    anchors.leftMargin: datePicker.spinBoxSpacing;
 
                     width: datePicker.buttonWidth;
 
@@ -553,7 +553,7 @@ Item {
                 id: monthItem;
                 anchors.verticalCenter: parent.verticalCenter;
 
-                width: monthField.width + monthButtons.width + datePicker.spixBoxSpacing;
+                width: monthField.width + monthButtons.width + datePicker.spinBoxSpacing;
                 height: datePicker.textFieldHeight;
 
                 MouseArea {
@@ -616,7 +616,7 @@ Item {
 
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.left: monthField.right;
-                    anchors.leftMargin: datePicker.spixBoxSpacing;
+                    anchors.leftMargin: datePicker.spinBoxSpacing;
 
                     width: datePicker.buttonWidth;
 
@@ -740,7 +740,7 @@ Item {
 
                 visible: datePicker.hasDay;
 
-                width: dayField.width + dayButtons.width + datePicker.spixBoxSpacing;
+                width: dayField.width + dayButtons.width + datePicker.spinBoxSpacing;
                 height: datePicker.textFieldHeight;
 
                 MouseArea {
@@ -807,7 +807,7 @@ Item {
 
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.left: dayField.right;
-                    anchors.leftMargin: datePicker.spixBoxSpacing;
+                    anchors.leftMargin: datePicker.spinBoxSpacing;
 
                     width: datePicker.buttonWidth;
 
