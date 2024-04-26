@@ -12,13 +12,9 @@ Item {
     property Item rootItem: null;
     property alias placeHolderText: inputField.placeHolderText;
 
-    Component.onCompleted: {
-        inputDialogBodyContainer.forceActiveFocus();
-    }
-
     onFocusChanged: {
-        if (inputDialogBodyContainer.focus){
-            inputField.focus = inputDialogBodyContainer.focus;
+        if (focus){
+            inputField.forceActiveFocus();
         }
     }
 
@@ -27,9 +23,9 @@ Item {
 
         anchors.verticalCenter: parent.verticalCenter;
         anchors.right: parent.right;
+        anchors.rightMargin: Style.size_mainMargin;
         anchors.left: parent.left;
-        anchors.rightMargin: 10;
-        anchors.leftMargin: 10;
+        anchors.leftMargin: Style.size_mainMargin;
 
         spacing: 5;
 
@@ -62,7 +58,7 @@ Item {
             }
 
             onAccepted: {
-                inputDialogBodyContainer.rootItem.buttons.buttonClicked("Ok");
+                inputDialogBodyContainer.rootItem.buttons.buttonClicked(Enums.ok);
             }
         }
     }

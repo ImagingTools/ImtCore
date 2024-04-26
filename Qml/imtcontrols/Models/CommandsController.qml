@@ -94,6 +94,20 @@ Item {
         }
     }
 
+    function setCommandVisible(commandId, isVisible){
+        if(!root.commandsModel){
+            return;
+        }
+
+        for (let i = 0; i < root.commandsModel.GetItemsCount(); i++){
+            let currentCommandId = root.commandsModel.GetData("Id", i);
+            if (currentCommandId === commandId){
+                root.commandsModel.SetData("Visible", isVisible, i);
+                break;
+            }
+        }
+    }
+
     function getCommandIndex(commandId){
         if(!root.commandsModel){
             return -1;

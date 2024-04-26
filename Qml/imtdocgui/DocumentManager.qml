@@ -70,7 +70,6 @@ Item {
 
     function registerDocumentDataController(documentTypeId, dataControllerComp){
         internal.m_registeredDataControllers[documentTypeId] = dataControllerComp;
-        console.log("registerDocumentDataController", documentTypeId, dataControllerComp)
 
         return true;
     }
@@ -84,7 +83,6 @@ Item {
 
     function registerDocumentView(documentTypeId, viewTypeId, viewComp)
     {
-        console.log("registerDocumentView", documentTypeId, viewTypeId, viewComp);
         if (documentTypeId === "" || viewTypeId === "" || !viewComp){
             return false;
         }
@@ -198,7 +196,6 @@ Item {
 
     function insertNewDocument(documentTypeId, viewTypeId)
     {
-        console.log("insertNewDocument", documentTypeId, viewTypeId);
         let documentData = createTemplateDocument("", documentTypeId, createDocumentModel(null));
         if (!documentData){
             return false;
@@ -228,8 +225,6 @@ Item {
 
 
     function createTemplateDocument(documentId, documentTypeId, documentModel){
-        console.log("createTemplateDocument", documentId, documentTypeId, documentModel);
-
         let singleDocumentData = singleDocumentDataComp.createObject(documentManager);
         if (singleDocumentData){
             if (documentId === ""){
@@ -272,8 +267,6 @@ Item {
 
     function openDocument(documentId, documentTypeId, viewTypeId)
     {
-        console.log("openDocument", documentId, documentTypeId, viewTypeId);
-
         let index = getDocumentIndexByDocumentId(documentId);
         if (index >= 0){
             // already opened
@@ -293,8 +286,6 @@ Item {
         if (!documentViewComp){
             return false;
         }
-
-        console.log("documentViewComp", documentViewComp);
 
         documentData.documentIndex = documentsModel.count;
         documentsModel.append({
@@ -318,8 +309,6 @@ Item {
     */
     function saveDocument(documentId)
     {
-        console.log("DocumentManager saveDocument")
-
         let index = getDocumentIndexByDocumentId(documentId);
         if (index >= 0){
             let isNew = documentsModel.get(index).IsNew;
@@ -343,8 +332,6 @@ Item {
                         return;
                     }
                 }
-
-                console.log("documentDataController", document.documentDataController)
 
                 if (document.documentDataController){
                     if (isNew){
@@ -612,8 +599,6 @@ Item {
                         return;
                     }
 
-                    console.log("onDocumentModelChanged", singleDocumentData.documentDataController.documentModel.ToJson());
-
                     let documentModel = singleDocumentData.documentDataController.documentModel;
 
                     singleDocumentData.treeItemModelObserver.registerModel(documentModel);
@@ -627,8 +612,6 @@ Item {
                     }
 
                     singleDocumentData.blockingUpdateModel = true;
-
-                    console.log("onDocumentModelChanged", singleDocumentData.documentDataController.documentModel.ToJson());
 
                     for (let i = 0; i < singleDocumentData.views.length; i++){
                         singleDocumentData.views[i].model = documentModel;
@@ -660,7 +643,6 @@ Item {
                 target: singleDocumentData.documentDataController.documentModel;
 
                 function onDataChanged(){
-                    console.log("Connections onModelChanged", singleDocumentData.blockingUpdateModel);
                     if (singleDocumentData.blockingUpdateModel){
                         return;
                     }
@@ -704,7 +686,6 @@ Item {
             }
 
             onViewAdded: {
-                console.log("onViewAdded")
                 if (!view || !view.model){
                     return;
                 }

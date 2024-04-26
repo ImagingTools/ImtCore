@@ -22,6 +22,11 @@ DetailedPopupMenuDelegate {
             return;
         }
 
+        if (filter === ""){
+            acceptable = true;
+            return;
+        }
+
         acceptable = false;
 
         let keys = comboBoxRef.model.GetKeys(model.index);

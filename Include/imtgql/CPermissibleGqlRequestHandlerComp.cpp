@@ -22,7 +22,7 @@ imtbase::CTreeItemModel* CPermissibleGqlRequestHandlerComp::CreateResponse(const
 		}
 	}
 
-	errorMessage = QString("Unable to create response for command %1 because invalid permissions for %1").arg(qPrintable(gqlRequest.GetCommandId())).arg(userName);
+	errorMessage = QString("Invalid permissions for the user '%1'").arg(userName);
 	SendErrorMessage(0, errorMessage);
 
 	return nullptr;

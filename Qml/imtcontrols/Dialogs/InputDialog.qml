@@ -19,7 +19,7 @@ Dialog {
     }
 
     Keys.onPressed: {
-        if (event.key == Qt.Key_Enter){
+        if (event.key === Qt.Key_Return){
             inputDialogContainer.finished(Enums.ok);
         }
     }

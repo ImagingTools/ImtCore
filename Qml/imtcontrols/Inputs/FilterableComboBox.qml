@@ -48,6 +48,8 @@ ComboBox {
                 if(comboBoxContainer.decorator_){
                     comboBoxContainer.decorator_.textVisible = true;
                 }
+
+                comboBoxContainer.filter = "";
             }
 
             function onKeyboardUp(){
@@ -63,8 +65,6 @@ ComboBox {
 
                             width: popup.width;
                             height: 25;
-
-                            property bool filterEnabled: false;
 
                             Component.onCompleted: {
                                 popup.finished.connect(function(){ textField.text = "";});
@@ -86,13 +86,9 @@ ComboBox {
                                 text: comboBoxContainer.currentText;
 
                                 onTextChanged: {
-                                    if (!contentItem.filterEnabled){
-                                        contentItem.filterEnabled = true;
-
-                                        return;
+                                    if (text != comboBoxContainer.currentText){
+                                        comboBoxContainer.filter = text;
                                     }
-
-                                    comboBoxContainer.filter = text;
                                 }
 
                                 Component.onCompleted: {

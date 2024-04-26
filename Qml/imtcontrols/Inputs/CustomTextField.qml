@@ -223,7 +223,7 @@ FocusScope {
             color: containerTextField.placeHolderFontColor;
             opacity: containerTextField.placeHolderOpacity;
 
-            visible: textField.text === "";
+            visible: textField.text === "" && !containerTextField.readOnly;
 
             text: containerTextField.placeHolderText;
         }
