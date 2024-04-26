@@ -87,13 +87,13 @@ Item {
 
     property string buttonColor:"";
     property int buttonHighlighted: -1;
+
+    property int spixBoxSpacing: 0;
     //
 
     signal dateChanged();
 
     Component.onCompleted: {
-        console.log("DatePicker onCompleted");
-
         var date_ = new Date();
 
         datePicker.selectedIndexMonth = date_.getMonth();
@@ -356,7 +356,7 @@ Item {
 
         height: datePicker.height;
 
-        spacing: 10;
+        spacing: Style.size_mainMargin;
 
         RegularExpressionValidator {
             id: yearValid;
@@ -374,7 +374,7 @@ Item {
 
                 anchors.verticalCenter: parent.verticalCenter;
 
-                width: yearField.width + yearButtons.width;
+                width: yearField.width + yearButtons.width + datePicker.spixBoxSpacing;
                 height: datePicker.textFieldHeight;
 
                 MouseArea {
@@ -437,6 +437,7 @@ Item {
 
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.left: yearField.right;
+                    anchors.leftMargin: datePicker.spixBoxSpacing;
 
                     width: datePicker.buttonWidth;
 
@@ -508,7 +509,7 @@ Item {
                 ComboBox {
                     id: yearComboObj;
 
-                    anchors.fill: parent;
+                    anchors.fill: yearField;
 
                     visible: datePicker.hasYearCombo;
                     enabled: visible;
@@ -552,7 +553,7 @@ Item {
                 id: monthItem;
                 anchors.verticalCenter: parent.verticalCenter;
 
-                width: monthField.width + monthButtons.width;
+                width: monthField.width + monthButtons.width + datePicker.spixBoxSpacing;
                 height: datePicker.textFieldHeight;
 
                 MouseArea {
@@ -615,6 +616,7 @@ Item {
 
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.left: monthField.right;
+                    anchors.leftMargin: datePicker.spixBoxSpacing;
 
                     width: datePicker.buttonWidth;
 
@@ -689,7 +691,7 @@ Item {
                 ComboBox {
                     id: monthComboObj;
 
-                    anchors.fill: parent;
+                    anchors.fill: monthField;
 
                     visible: datePicker.hasMonthCombo;
                     enabled: visible;
@@ -708,7 +710,6 @@ Item {
                     isColor: true;
 
                     changeable: !datePicker.readOnly;
-                    //z: monthField.readOnly ? 1 : 0;
 
                     onCurrentIndexChanged:{
                         if(monthComboObj.currentIndex >= 0){
@@ -739,7 +740,7 @@ Item {
 
                 visible: datePicker.hasDay;
 
-                width: dayField.width + dayButtons.width;
+                width: dayField.width + dayButtons.width + datePicker.spixBoxSpacing;
                 height: datePicker.textFieldHeight;
 
                 MouseArea {
@@ -777,7 +778,7 @@ Item {
                     color: datePicker.textFieldColor;
                     margin: datePicker.textFieldMargin;
 
-                    readOnly: true;//datePicker.readOnly || datePicker.textInputBan;
+                    readOnly: true;
 
                     leftPadding: horizontalAlignment == TextInput.AlignLeft ? 4 : 0;
                     horizontalAlignment: datePicker.horizontalAlignment;
@@ -806,6 +807,7 @@ Item {
 
                     anchors.verticalCenter: parent.verticalCenter;
                     anchors.left: dayField.right;
+                    anchors.leftMargin: datePicker.spixBoxSpacing;
 
                     width: datePicker.buttonWidth;
 
@@ -876,7 +878,7 @@ Item {
                 ComboBox {
                     id: dayComboObj;
 
-                    anchors.fill: parent;
+                    anchors.fill: dayField;
 
                     visible: datePicker.hasDayCombo;
                     enabled: visible;
