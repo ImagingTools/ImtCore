@@ -9,6 +9,7 @@ ComboBoxElementView {
     controlComp: cbComp;
 
     property var filteringFields: [nameId];
+    property string descriptionFieldId;
 
     Component {
         id: cbComp;
@@ -34,8 +35,13 @@ ComboBoxElementView {
                 height: 30;
 
                 filteringFields: root.filteringFields;
+                descriptionFieldId: root.descriptionFieldId;
 
                 Component.onCompleted: {
+                    if (root.delegate){
+                        cb.delegate = root.delegate;
+                    }
+
                     root.setupComboBox(cb);
                 }
             }

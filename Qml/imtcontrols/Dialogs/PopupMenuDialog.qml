@@ -119,11 +119,38 @@ ControlBase {
         }
     }
 
+    function onEscape(){
+        popupMenuContainer.finished('', -1);
+    }
+
+    function onReturn(){
+        if(popupMenuContainer.selectedIndex >= 0){
+            var id = popupMenuContainer.model.GetData("Id", popupMenuContainer.selectedIndex);
+            popupMenuContainer.finished(id, popupMenuContainer.selectedIndex);
+        }
+    }
+
+    function onKeyboardUp(){
+        if(popupMenuContainer.selectedIndex > 0){
+            popupMenuContainer.selectedIndex--;
+
+            popupMenuContainer.decorator_.contentYCorrection(false);
+        }
+    }
+
+    function onKeyboardDown(){
+        if(popupMenuContainer.selectedIndex < popupMenuContainer.model.GetItemsCount() - 1){
+            popupMenuContainer.selectedIndex++;
+
+            popupMenuContainer.decorator_.contentYCorrection(true);
+        }
+    }
+
     Shortcut {
         sequence: "Escape";
         enabled: popupMenuContainer.visible;
         onActivated: {
-            popupMenuContainer.finished('', -1);
+           popupMenuContainer.onEscape();
         }
     }
 
@@ -131,10 +158,7 @@ ControlBase {
         sequence: "Return";
         enabled: popupMenuContainer.visible;
         onActivated: {
-            if(popupMenuContainer.selectedIndex >= 0){
-                var id = popupMenuContainer.model.GetData("Id", popupMenuContainer.selectedIndex);
-                popupMenuContainer.finished(id, popupMenuContainer.selectedIndex);
-            }
+            popupMenuContainer.onReturn();
         }
     }
 
@@ -142,11 +166,7 @@ ControlBase {
         sequence: "Up";
         enabled: popupMenuContainer.visible;
         onActivated: {
-            if(popupMenuContainer.selectedIndex > 0){
-                popupMenuContainer.selectedIndex--;
-
-                popupMenuContainer.decorator_.contentYCorrection(false);
-            }
+            popupMenuContainer.onKeyboardUp();
         }
     }
 
@@ -154,11 +174,7 @@ ControlBase {
         sequence: "Down";
         enabled: popupMenuContainer.visible;
         onActivated: {
-            if(popupMenuContainer.selectedIndex < popupMenuContainer.model.GetItemsCount() - 1){
-                popupMenuContainer.selectedIndex++;
-
-                popupMenuContainer.decorator_.contentYCorrection(true);
-            }
+            popupMenuContainer.onKeyboardDown();
         }
     }
 }

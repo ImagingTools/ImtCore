@@ -60,7 +60,6 @@ Item {
     }
 
     function doUpdateGui(){
-        console.log("CollectionView doUpdateGui");
         container.doUpdateGui();
     }
 
@@ -264,12 +263,6 @@ Item {
         }
 
         function updateGui(){
-            console.log("CollectionView updateGui", container.visible);
-
-            if (container.dataController){
-                console.log("ID", container.dataController.collectionId);
-            }
-
             if (!container.visible){
                 internal.guiUpdateRequired = true;
 
@@ -285,16 +278,13 @@ Item {
             }
 
             if (container.dataController){
-                console.log("CollectionView updateElements");
                 container.dataController.updateElements(count, offset, container.collectionFilter.filterModel);
             }
         }
 
         function openPopupMenu(x, y){
-            console.log("openPopupMenu", x, y);
             if (container.commandsDelegate){
                 let contextMenuModel = container.commandsDelegate.getContextMenuModel();
-                console.log("contextMenuModel", contextMenuModel.ToJson());
 
                 let offset = 26 * contextMenuModel.GetItemsCount();
                 modalDialogManager.openDialog(popupMenuDialog, {"x": x, "y": y - offset, "model": contextMenuModel});

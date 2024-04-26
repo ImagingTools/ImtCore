@@ -10,39 +10,36 @@ ElementView {
     property bool changeable: true;
     property int shownItemsCount: 5;
     property int currentIndex: -1;
+    property var delegate;
 
     // ID for display in combo box delegates
     property string nameId: "Name";
 
-    QtObject {
-        id: internal;
-
-        property ComboBox cbRef: null;
-    }
+    property ComboBox cbRef: null;
 
     onModelChanged: {
-        if (internal.cbRef && model){
-            internal.cbRef.model = model;
+        if (cbRef && model){
+            cbRef.model = model;
         }
     }
 
     onControlItemChanged: {
-        if (internal.cbRef && model){
-            internal.cbRef.model = model;
+        if (cbRef && model){
+            cbRef.model = model;
         }
     }
 
     onCurrentIndexChanged: {
-        if (internal.cbRef){
-            internal.cbRef.currentIndex = currentIndex;
+        if (cbRef){
+            cbRef.currentIndex = currentIndex;
         }
     }
 
     onChangeableChanged: {
-        console.log("comboBoxElementView onChangeableChanged", internal.cbRef);
+        console.log("comboBoxElementView onChangeableChanged", cbRef);
 
-        if (internal.cbRef){
-            internal.cbRef.changeable = changeable;
+        if (cbRef){
+            cbRef.changeable = changeable;
         }
     }
 
@@ -56,7 +53,7 @@ ElementView {
         cbRef.model = comboBoxElementView.model;
         cbRef.currentIndex = comboBoxElementView.currentIndex;
 
-        internal.cbRef = cbRef;
+        comboBoxElementView.cbRef = cbRef;
 
         cbConn.target = cbRef;
     }
@@ -65,12 +62,12 @@ ElementView {
         id: cbConn;
 
         function onCurrentIndexChanged(){
-            if (!internal.cbRef){
+            if (!comboBoxElementView.cbRef){
                 return;
             }
 
-            if (comboBoxElementView.currentIndex != internal.cbRef.currentIndex){
-                comboBoxElementView.currentIndex = internal.cbRef.currentIndex;
+            if (comboBoxElementView.currentIndex != comboBoxElementView.cbRef.currentIndex){
+                comboBoxElementView.currentIndex = comboBoxElementView.cbRef.currentIndex;
             }
         }
     }
@@ -87,6 +84,10 @@ ElementView {
             height: 30;
 
             Component.onCompleted: {
+                if (comboBoxElementView.delegate){
+                    cb.delegate = comboBoxElementView.delegate;
+                }
+
                 comboBoxElementView.setupComboBox(cb);
             }
         }

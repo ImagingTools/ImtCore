@@ -105,8 +105,8 @@ StyleComponents {
 
     property string theme: "Light";
 
-    property string fontFamily: mainFont.name;
-    property string fontFamilyBold: boldFont.name;
+    property string fontFamily: "Verdana";
+    property string fontFamilyBold: "Verdana";
 
     property string mainColor: "#e6e6e8";
 
@@ -363,6 +363,10 @@ StyleComponents {
 
         if (sourceDecorators.popupItemDelegateDecorator){
             styleContainer.popupItemDelegateDecorator = sourceDecorators.popupItemDelegateDecorator
+        }
+
+        if (sourceDecorators.detailedPopupItemDelegateDecorator){
+            styleContainer.detailedPopupItemDelegateDecorator = sourceDecorators.detailedPopupItemDelegateDecorator
         }
 
         if (sourceDecorators.collectionTableDecorator){

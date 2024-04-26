@@ -20,7 +20,7 @@ DecoratorBase {
 
     property alias topContentLoaderSourceComp: topContentLoader.sourceComponent;
     property alias bottomContentLoaderSourceComp: bottomContentLoader.sourceComponent;
-//    property alias repeater: repeater_;
+    property alias repeater: repeater_;
 
     onModelChanged: {
         popupMenuListView.model = root.model;
@@ -71,66 +71,48 @@ DecoratorBase {
             canFade: Style.isMobile == undefined ? false : Style.isMobile;
         }
 
-        ListView {
+        Flickable {
             id: popupMenuListView;
 
             width: root.width;
             height: Math.min(root.shownItemsCount * root.itemHeight, contentHeight)
 
+            contentWidth: width;
+            contentHeight: column.height;
+
             boundsBehavior: Flickable.StopAtBounds;
             clip: true;
 
-            delegate: root.delegate;
+            property alias model: repeater_.model;
+            property alias count: repeater_.count;
 
-            cacheBuffer: 300;
+            function positionViewAtIndex(index, mode){
+                if (index >= 0 && index < repeater_.count){
+                    let y = index * root.itemHeight;
 
-            onModelChanged: {
-                console.log("popupMenuListView onModelChanged");
+                    popupMenuListView.contentY = y;
+                }
+            }
+
+            function positionViewAtEnd(){
+                if (repeater_.count > 0){
+                    let lastIndex = repeater_.count - 1;
+
+                    positionViewAtIndex(lastIndex, ListView.Beginning);
+                }
+            }
+
+            Column {
+                id: column;
+                width: parent.width;
+
+                Repeater {
+                    id: repeater_;
+
+                    delegate: root.delegate;
+                }
             }
         }
-
-//        Flickable {
-//            id: popupMenuListView;
-
-//            width: root.width;
-//            height: Math.min(root.shownItemsCount * root.itemHeight, contentHeight)
-
-//            contentWidth: width;
-//            contentHeight: column.height;
-
-//            boundsBehavior: Flickable.StopAtBounds;
-//            clip: true;
-
-//            property alias model: repeater_.model;
-//            property alias count: repeater_.count;
-
-//            function positionViewAtIndex(index, mode){
-//                if (index >= 0 && index < repeater_.count){
-//                    let y = index * root.itemHeight;
-
-//                    popupMenuListView.contentY = y;
-//                }
-//            }
-
-//            function positionViewAtEnd(){
-//                if (repeater_.count > 0){
-//                    let lastIndex = repeater_.count - 1;
-
-//                    positionViewAtIndex(lastIndex, ListView.Beginning);
-//                }
-//            }
-
-//            Column {
-//                id: column;
-//                width: parent.width;
-
-//                Repeater {
-//                    id: repeater_;
-
-//                    delegate: root.delegate;
-//                }
-//            }
-//        }
 
         MouseArea{
             anchors.fill: parent;

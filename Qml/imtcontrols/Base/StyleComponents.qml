@@ -44,6 +44,7 @@ Item {
     property Component itemDelegateDecorator
     property Component popupDecorator
     property Component popupItemDelegateDecorator
+    property Component detailedPopupItemDelegateDecorator
     property Component collectionTableDecorator
     property Component drawingContainerDecorator
 }

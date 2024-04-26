@@ -8,90 +8,14 @@ ComboBox {
 
     property string filter;
     property var filteringFields: [comboBoxContainer.nameId];
+    property string descriptionFieldId;
 
-//    property TreeItemModel proxyModel: TreeItemModel {}
+    itemHeight: 35;
 
-//    onModelChanged: {
-//        if (model){
-//            proxyModel.Copy(model);
-//        }
-//    }
-
-//    Repeater {
-//        id: helperRepeater;
-
-//        model: comboBoxContainer.model;
-
-//        visible: false;
-
-//        delegate: Component {
-//            Item {
-//                property string displayText: model[comboBoxContainer.nameId];
-//                property bool acceptable: displayText.toLowerCase().indexOf(comboBoxContainer.filter.toLowerCase()) >= 0;
-
-//                onAcceptableChanged: {
-//                    if (!acceptable){
-//                        comboBoxContainer.proxyModel.RemoveItem(model.index);
-////                        for (let i = 0; i < comboBoxContainer.proxyModel.GetItemsCount(); i++){
-////                            if (comboBoxContainer.proxyModel.GetData("Id", i) === model.Id){
-////                                comboBoxContainer.proxyModel.RemoveItem(i)
-
-////                                break;
-////                            }
-////                        }
-//                    }
-//                    else{
-//                        let index = comboBoxContainer.proxyModel.InsertNewItem();
-//                        comboBoxContainer.proxyModel.CopyItemDataFromModel(index, comboBoxContainer.model, model.index)
-//                    }
-//                }
-//            }
-//        }
-//    }
-
-    delegate: Component {PopupMenuDelegate {
+    delegate: Component {
+        FilterableComboBoxDelegate {
             width: comboBoxContainer.width;
-            height: acceptable ? comboBoxContainer.itemHeight : 0;
-
-            visible: height > 0;
-
-            text: displayText;
-
-            highlighted: comboBoxContainer.currentIndex === model.index
-            selected: comboBoxContainer.popup ? comboBoxContainer.popup.selectedIndex === model.index : false;
-
-            property string displayText: model[comboBoxContainer.nameId];
-            property string filter: comboBoxContainer.filter;
-
-            onFilterChanged: {
-                acceptable = false;
-
-                let keys = comboBoxContainer.model.GetKeys(model.index);
-                for (let i = 0; i < comboBoxContainer.filteringFields.length; i++){
-                    let id = comboBoxContainer.filteringFields[i];
-                    if (keys.includes(id)){
-                        let value = model[id];
-                        if (value.toLowerCase().indexOf(filter.toLowerCase()) >= 0){
-                            acceptable = true;
-                            break;
-                        }
-                    }
-                }
-            }
-
-            property bool acceptable: true;
-
-            onClicked: {
-                if (comboBoxContainer.popup){
-                    comboBoxContainer.popup.finished(model.Id, model.index)
-                }
-            }
-
-            onEntered: {
-                if (comboBoxContainer.popup){
-                    comboBoxContainer.popup.selectedIndex = model.index;
-                }
-            }
+            comboBoxRef: comboBoxContainer;
         }
     }
 
@@ -124,6 +48,12 @@ ComboBox {
                 if(comboBoxContainer.decorator_){
                     comboBoxContainer.decorator_.textVisible = true;
                 }
+            }
+
+            function onKeyboardUp(){
+            }
+
+            function onKeyboardDown(){
             }
 
             decorator: Component {PopupDecorator {

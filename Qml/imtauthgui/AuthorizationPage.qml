@@ -164,7 +164,7 @@ Rectangle {
                     font.family: Style.fontFamily;
                     font.pixelSize: Style.fontSize_title;
 
-                    text: context.appName && context.appName !== "" ? qsTr("Welcome to ") + context.appName : qsTr("Welcome");
+                    text: context.appName && context.appName !== "" ? qsTr("Welcome to") + " " + context.appName : qsTr("Welcome");
                 }
             }
         }

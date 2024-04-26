@@ -17,6 +17,8 @@
         <file alias="WrapItem.qml">Base/WrapItem.qml</file>
         <file alias="imtcontrols/Actions/Action.qml">Actions/Action.qml</file>
         <file alias="imtcontrols/Actions/PopupMenuDelegate.qml">Actions/PopupMenuDelegate.qml</file>
+	<file alias="imtcontrols/Actions/DetailedPopupMenuDelegate.qml">Actions/DetailedPopupMenuDelegate.qml</file>
+	<file alias="imtcontrols/Actions/FilterableComboBoxDelegate.qml">Actions/FilterableComboBoxDelegate.qml</file>
         <file alias="imtcontrols/Actions/ShortcutManager.qml">Actions/ShortcutManager.qml</file>
         <file alias="imtcontrols/Actions/MovingItem.qml">Actions/MovingItem.qml</file>
         <file alias="imtcontrols/Actions/ControlArea.qml">Actions/ControlArea.qml</file>
@@ -139,6 +141,7 @@
         <file alias="imtcontrols/Views/TextInputCellContentComp.qml">Views/TextInputCellContentComp.qml</file>
         <file alias="imtcontrols/Views/ComboBoxCellContentComp.qml">Views/ComboBoxCellContentComp.qml</file>
         <file alias="imtcontrols/Views/InputView.qml">Views/InputView.qml</file>
+	<file alias="imtcontrols/Views/PopupDetailedDelegateDecorator.qml">Views/PopupDetailedDelegateDecorator.qml</file>
     </qresource>
     <qresource prefix="/"/>
 </RCC>

@@ -105,7 +105,6 @@ ControlBase {
     }
 
     onCurrentIndexChanged: {
-        console.log("onCurrentIndexChanged", comboBoxContainer.currentIndex);
         if (!comboBoxContainer.model){
             return;
         }

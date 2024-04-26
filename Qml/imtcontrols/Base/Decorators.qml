@@ -55,6 +55,7 @@ StyleComponents {
 
     popupDecorator: popupDecoratorComp;
     popupItemDelegateDecorator: popupItemDelegateDecoratorComp;
+    detailedPopupItemDelegateDecorator: detailedPopupItemDelegateDecoratorComp;
 
     collectionTableDecorator: Component{TreeItemModel{}}
     drawingContainerDecorator: null;
@@ -63,6 +64,13 @@ StyleComponents {
         id: popupItemDelegateDecoratorComp;
 
         PopupItemDelegateDecorator {
+        }
+    }
+
+    Component {
+        id: detailedPopupItemDelegateDecoratorComp;
+
+        PopupDetailedDelegateDecorator {
         }
     }
 
