@@ -30,6 +30,7 @@ ControlBase {
     signal exited(real mouseX, real mouseY);
     signal positionChanged(real mouseX, real mouseY);
     signal toggled();
+    signal closeTooltip();
 
     QtObject {
         id: _private
@@ -40,6 +41,7 @@ ControlBase {
                 baseButton.checked = !baseButton.checked
                 baseButton.toggled()
             }
+            baseButton.closeTooltip();
             baseButton.clicked();
         }
     }

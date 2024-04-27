@@ -48,14 +48,17 @@ DecoratorBase {
             baseElement.exited.connect(commonButtonDecorator.mouseExited);
             baseElement.entered.connect(commonButtonDecorator.mouseEntered);
             baseElement.positionChanged.connect(commonButtonDecorator.mousePositionChanged);
+            baseElement.closeTooltip.connect(commonButtonDecorator.closeTooltip);
         }
     }
 
     onMousePositionChanged: {
         if(tooltip.text !== ""){
+            if(mouseX >= 0 && mouseX <= baseElement.width && mouseY >= 0 && mouseY <= baseElement.height)
             tooltip.show(mouseX, mouseY);
         }
     }
+
 
     onMouseExited: {
         if(tooltip.text !== ""){
@@ -133,6 +136,12 @@ DecoratorBase {
 
                 visible: false;
             }
+        }
+    }
+
+    function closeTooltip(){
+        if(tooltip.openST){
+            tooltip.closeTooltip();
         }
     }
 
