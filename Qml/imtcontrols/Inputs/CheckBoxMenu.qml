@@ -52,13 +52,14 @@ FocusScope{
     property var menuItem : null;
     property bool canOpenMenu : true;
     property bool hasSearch : true;
+    property bool hasAllSelection : true;
 
     property int menuHeight: 400;
     property int delegateHeight: 60;
 
     signal finished();
     signal menuCreated();
-    signal changedSignal()
+    signal changedSignal();
 
     Component.onCompleted: {
 
@@ -272,12 +273,17 @@ FocusScope{
                     mainMargin: 16;
                     borderColor:Style.color_gray;
                     //borderWidth: 2;
+                    visible: checkBoxMenu.hasAllSelection;
+                    enabled: visible;
 
                     text: checkBoxMenu.hasSearch ? "" : "Все";
 
                     //imageSource: popupMenuContainer.rootItem && checkState == Qt.Checked ? popupMenuContainer.rootItem.checkImageSource: "";
 
                     onClicked: {
+                        if(!enabled){
+                            return;
+                        }
                         if(checkBoxAll.checkState == Qt.Unchecked){
                             checkBoxAll.checkState = Qt.Checked;
                             popupMenuContainer.setAllCheckedInModel(Qt.Checked)
@@ -332,7 +338,7 @@ FocusScope{
                 ListView{
                     id: listView;
 
-                    anchors.top: searchBlock.bottom;
+                    anchors.top: checkBoxMenu.hasAllSelection ? searchBlock.bottom : parent.top;
                     anchors.bottom: parent.bottom;
                     anchors.left: parent.left;
                     anchors.right: parent.right;
