@@ -217,7 +217,8 @@ class MouseController {
                         inner[i].mouse.accepted = true
                     }
 
-                    
+                    // if(inner[i].$signals.positionChanged) inner[i].$signals.positionChanged()
+
 
                     if(inner[i].mouse.accepted) {
                         this.target = inner[i]
@@ -273,7 +274,7 @@ class MouseController {
                             this.target.$signals.doubleClicked()
                             wasDblClicked = true
                         }
-                        if(this.target.getPropertyValue('propagateComposedEvents') && !this.target.mouse.accepted)
+                        if((this.target.getPropertyValue('propagateComposedEvents') && !this.target.mouse.accepted) || !this.target.$signals.doubleClicked)
                         for(let i = 1; i < this.pressedMouseArea.length; i++){
                             if(this.pressedMouseArea[i].$signals.doubleClicked){
                                 this.pressedMouseArea[i].mouse.accepted = false
@@ -289,7 +290,7 @@ class MouseController {
                         if(this.target.$signals.clicked) {
                             this.target.$signals.clicked()
                         }
-                        if(this.target.getPropertyValue('propagateComposedEvents') && !this.target.mouse.accepted)
+                        if((this.target.getPropertyValue('propagateComposedEvents') && !this.target.mouse.accepted) || !this.target.$signals.clicked)
                         for(let i = 1; i < this.pressedMouseArea.length; i++){
                             if(this.pressedMouseArea[i].$signals.clicked){
                                 this.pressedMouseArea[i].mouse.accepted = true
@@ -410,6 +411,7 @@ class MouseController {
             let accepted = false
             let wasInner = false
             let wasCursor = false
+
             
             for(let i = this.list.length-1; i >= 0; i--){
                 if(!wasCursor && this.list[i].UID && (this.list[i] instanceof TextInput || this.list[i] instanceof TextEdit)){
@@ -429,39 +431,27 @@ class MouseController {
     
                     if(inner.indexOf(this.list[i]) >= 0){
                         
-                            this.list[i].mouse.accepted = false
-                            if(!accepted && (this.list[i].getPropertyValue('pressed') || this.list[i].getPropertyValue('hoverEnabled')) && this.list[i].$signals.positionChanged) {
+                        // this.list[i].mouse.accepted = false
+                        if(this.list[i].getPropertyValue('pressed') || this.list[i].getPropertyValue('hoverEnabled')) {
+                            if(!accepted && this.list[i].$signals.positionChanged) {
                                 this.list[i].$signals.positionChanged()
-                                accepted = this.list[i].mouse.accepted
-
-                                this.list[i].getProperty('containsMouse').reset(true)
-                                if(this.list[i].$signals && this.list[i].$signals.entered && !this.list[i].$entered) {
-                                    this.list[i].$signals.entered()
-                                }
-                                this.list[i].$entered = true
-                                if(!wasCursor){
-                                    document.body.style.cursor = this.list[i].getPropertyValue('cursorShape')
-                                    wasCursor = true
-                                }
+                                accepted = true
                                 
-                                wasInner = true
-                            } else {
-                                if(!wasInner){
-                                    this.list[i].getProperty('containsMouse').reset(true)
-                                    if(this.list[i].$signals && this.list[i].$signals.entered && !this.list[i].$entered) {
-                                        this.list[i].$signals.entered()
-                                    }
-                                    this.list[i].$entered = true
-                                    if(!wasCursor){
-                                        document.body.style.cursor = this.list[i].getPropertyValue('cursorShape')
-                                        wasCursor = true
-                                    }
-                                    
-                                    wasInner = true
-                                }
+                            }
+                        }
+
+                        if(!wasInner){
+                            this.list[i].getProperty('containsMouse').reset(true)
+                            if(this.list[i].$signals && this.list[i].$signals.entered && !this.list[i].$entered) {
+                                this.list[i].$signals.entered()
+                                this.list[i].$entered = true
                             }
 
-                            
+                            document.body.style.cursor = this.list[i].getPropertyValue('cursorShape')
+                            wasCursor = true
+                            wasInner = true
+                        }
+
                     } else {
                         this.list[i].getProperty('containsMouse').reset(false) 
                         if(this.list[i].$signals && this.list[i].$signals.exited && this.list[i].$entered) {  
