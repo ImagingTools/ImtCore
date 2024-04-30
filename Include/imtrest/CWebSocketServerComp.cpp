@@ -76,8 +76,8 @@ bool CWebSocketServerComp::StartListening(const QHostAddress &address, quint16 p
 
 	istd::TDelPtr<QWebSocketServer> webSocketServerPtr(new QWebSocketServer("",QWebSocketServer::NonSecureMode,this));
 	if (webSocketServerPtr->listen(address, port)){
-		SendInfoMessage(0, QString("Web server successfully started on %1:%2").arg(address.toString()).arg(port));
-		qDebug() << QString("Web server successfully started on %1:%2").arg(address.toString()).arg(port);
+		SendInfoMessage(0, QString("Web socket server successfully started on port %1").arg(port));
+		qDebug() << QString("Web server successfully started on port %1").arg(port);
 
 		connect(webSocketServerPtr.GetPtr(), &QWebSocketServer::newConnection, this, &CWebSocketServerComp::HandleNewConnections, Qt::UniqueConnection);
 
@@ -86,7 +86,7 @@ bool CWebSocketServerComp::StartListening(const QHostAddress &address, quint16 p
 		return true;
 	}
 	else{
-		SendErrorMessage(0, QString("Server could not be started on %1:%2").arg(address.toString()).arg(port));
+		SendErrorMessage(0, QString("Server could not be started on port %1").arg(port));
 	}
 
 	return false;
@@ -106,7 +106,7 @@ void CWebSocketServerComp::HandleNewConnections()
 		}
 
 		QString message = QString("Handle new web socket connection");
-		SendInfoMessage(0, message, "CWebSocketServerComp");
+		SendVerboseMessage(message, "CWebSocketServerComp");
 
 		connect(webSocketPtr, &QWebSocket::textMessageReceived, this, &CWebSocketServerComp::OnWebSocketTextMessage);
 		connect(webSocketPtr, &QWebSocket::binaryMessageReceived, this, &CWebSocketServerComp::OnWebSocketBinaryMessage);
@@ -167,7 +167,7 @@ void CWebSocketServerComp::OnWebSocketTextMessage(const QString& textMessage)
 	}
 
 	QString message = QString("Web socket text message received: %1").arg(textMessage);
-	SendInfoMessage(0, message, "CWebSocketServerComp");
+	SendVerboseMessage(message, "CWebSocketServerComp");
 
 	qDebug() << message;
 

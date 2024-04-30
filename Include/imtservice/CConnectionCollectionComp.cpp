@@ -113,6 +113,28 @@ QByteArray CConnectionCollectionComp::InsertNewConnection(
 }
 
 
+int CConnectionCollectionComp::GetTracingLevel() const
+{
+	if (!m_tracingConfigurationCompPtr.IsValid())
+	{
+		return -1;
+	}
+
+	return m_tracingConfigurationCompPtr->GetTracingLevel();
+}
+
+
+void CConnectionCollectionComp::SetTracingLevel(int tracingLevel)
+{
+	if (!m_tracingConfigurationCompPtr.IsValid())
+	{
+		return;
+	}
+
+	m_tracingConfigurationCompPtr->SetTracingLevel(tracingLevel);
+}
+
+
 // reimplemented (icomp::CComponentBase)
 
 void CConnectionCollectionComp::OnComponentCreated()

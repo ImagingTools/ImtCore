@@ -370,8 +370,6 @@ inline void TDeviceControllerCompWrap<Base>::OnComponentCreated()
 
 	if (InitializeDeviceManager()){
 		UpdateDevices();
-
-		SetTracingEnabled(IsVerboseEnabled());
 	}
 }
 

@@ -98,7 +98,13 @@ bool TMessageDatabaseDelegateComp<BaseDelegate>::CreateObjectFilterQuery(const i
 			}
 
 			QString value = textParamPtr->GetText();
-			if (key == "InfoFilter" && value == "false"){
+			if (key == "VerboseFilter" && value == "false"){
+				if (!filterQuery.isEmpty()){
+					filterQuery += " AND ";
+				}
+				filterQuery += QString("json_extract(\"Document\",'$.Category') != 0");
+			}
+			else if (key == "InfoFilter" && value == "false"){
 				if (!filterQuery.isEmpty()){
 					filterQuery += " AND ";
 				}

@@ -39,6 +39,7 @@ DecoratorBase {
         warningFilter.text = qsTr("Warning");
         errorFilter.text = qsTr("Error");
         criticalFilter.text = qsTr("Critical");
+        verboseFilter.text = qsTr("Verbose");
     }
 
     Rectangle{
@@ -71,12 +72,10 @@ DecoratorBase {
         // spacing: Style.size_mainMargin;
         height: parent.height
 
-
         Button {
             id: infoFilter;
 
             anchors.verticalCenter: parent.verticalCenter;
-            // height: Style.itemSizeMedium
             checkable: true
             checked: true
             iconSource: "../../../../" + Style.getIconPath("Icons/Info", Icon.State.On, Icon.Mode.Normal);
@@ -89,7 +88,6 @@ DecoratorBase {
             id: warningFilter;
 
             anchors.verticalCenter: parent.verticalCenter;
-            // height: Style.itemSizeMedium
             checkable: true
             checked: true
             iconSource: "../../../../" + Style.getIconPath("Icons/Warning", Icon.State.On, Icon.Mode.Normal);
@@ -102,7 +100,6 @@ DecoratorBase {
             id: errorFilter;
 
             anchors.verticalCenter: parent.verticalCenter;
-            // height: Style.itemSizeMedium
             checkable: true
             checked: true
 
@@ -116,13 +113,29 @@ DecoratorBase {
             id: criticalFilter;
 
             anchors.verticalCenter: parent.verticalCenter;
-            // height: Style.itemSizeMedium
             checkable: true
             checked: true
 
             iconSource: "../../../../" + Style.getIconPath("Icons/Critical", Icon.State.On, Icon.Mode.Normal);
             onCheckedChanged: {
                 mainItem.baseElement.filterChanged("CriticalFilter", checked);
+            }
+        }
+
+        Button {
+            id: verboseFilter;
+
+            anchors.verticalCenter: parent.verticalCenter;
+            checkable: true
+            checked: false
+            iconSource: "../../../../" + Style.getIconPath("Icons/Diagnostics", Icon.State.On, Icon.Mode.Normal);
+
+            Component.onCompleted: {
+                 mainItem.baseElement.filterChanged("VerboseFilter", false);
+            }
+
+            onCheckedChanged: {
+                mainItem.baseElement.filterChanged("VerboseFilter", checked);
             }
         }
 

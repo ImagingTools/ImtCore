@@ -101,7 +101,7 @@ const ISender* CTcpServerComp::GetSender(const QByteArray& requestId) const
 bool CTcpServerComp::StartListening(const QHostAddress &address, quint16 port)
 {
 	if (m_server->listen(address, port)){
-		QString message = QString("Server successfully started on %1:%2").arg(address.toString()).arg(port);
+		QString message = QString("Server successfully started on port %1").arg(port);
 
 		qDebug() << message;
 		SendInfoMessage(0, message);
@@ -111,7 +111,7 @@ bool CTcpServerComp::StartListening(const QHostAddress &address, quint16 port)
 		return true;
 	}
 	else{
-		QString errorMessage = QString("Server could not be started on %1:%2. Error: %3").arg(address.toString()).arg(port).arg(m_server->errorString());
+		QString errorMessage = QString("Server could not be started on port %1. Error: %2").arg(port).arg(m_server->errorString());
 		qDebug() << errorMessage;
 
 		SendErrorMessage(0, errorMessage);

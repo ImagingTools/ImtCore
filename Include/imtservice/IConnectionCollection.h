@@ -1,5 +1,9 @@
 #pragma once
 
+
+// ACF includes
+#include <ilog/ITracingConfiguration.h>
+
 // ImtCore includes
 #include <imtservice/IServiceConnectionParam.h>
 #include <imtbase/ICollectionInfo.h>
@@ -14,7 +18,8 @@ namespace imtservice
 	Interface for describing an service connections collection.
 	\ingroup Service
 */
-class IConnectionCollection: virtual public istd::IChangeable
+class IConnectionCollection:
+			virtual public ilog::ITracingConfiguration
 {
 public:
 	virtual QString GetServiceVersion() const = 0;

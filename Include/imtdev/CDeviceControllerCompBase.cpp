@@ -82,8 +82,6 @@ void CDeviceControllerCompBase::UpdateDeviceList(EnumeratedDeviceList& enumerate
 void CDeviceControllerCompBase::OnComponentCreated()
 {
 	BaseClass::OnComponentCreated();
-
-	SetTracingEnabled(IsVerboseEnabled());
 }
 
 

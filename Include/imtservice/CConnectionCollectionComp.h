@@ -3,7 +3,9 @@
 
 // ACF includes
 #include <ilog/TLoggerCompWrap.h>
+#include <ilog/ITracingConfiguration.h>
 #include <ibase/IApplicationInfo.h>
+#include <iprm/IEnableableParam.h>
 
 // ImtCore includes
 #include <imtbase/TAggergatedObjectCollectionWrap.h>
@@ -32,6 +34,7 @@ public:
 		I_ASSIGN_MULTI_0(m_connectionDescriptions, "ConnectionDescriptions", "Service connection descriptions", true);
 		I_ASSIGN_MULTI_0(m_connectionTypes, "ConnectionTypes", "Service connection types: 0 - input, 1 - output", true);
 		I_ASSIGN_MULTI_0(m_connectionUrlListCompPtr, "ConnectionUrlListCompPtr", "Parameter providing the server ports", true);
+		I_ASSIGN(m_tracingConfigurationCompPtr, "TracingConfiguration", "Tracing configuration of verbose messages", true, "TracingConfiguration");
 	I_END_COMPONENT;
 
 	// reimplemented (imtservice::IConnectionCollection)
@@ -49,6 +52,10 @@ public:
 						const QString& name = QString(),
 						const QString& description = QString() ) override;
 
+	// reimplemented (ilog::ITracingConfiguration)
+	virtual int GetTracingLevel() const override;
+	virtual void SetTracingLevel(int tracingLevel) override;
+
 protected:
 	// reimplemented (icomp::CComponentBase)
 	virtual void OnComponentCreated() override;
@@ -62,6 +69,7 @@ private:
 	I_MULTIATTR(QByteArray, m_connectionDescriptions);
 	I_MULTIATTR(int, m_connectionTypes);
 	I_MULTIREF(imtbase::IUrlParam, m_connectionUrlListCompPtr);
+	I_REF(ilog::ITracingConfiguration, m_tracingConfigurationCompPtr);
 
 	imtbase::CObjectCollection m_collection;
 };
