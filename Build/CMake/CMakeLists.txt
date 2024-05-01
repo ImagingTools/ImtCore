@@ -2,8 +2,10 @@ cmake_minimum_required(VERSION 3.1.0)
 
 project(ImtCore)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core)
-find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core Widgets Core Gui Xml Network Svg Concurrent REQUIRED)
+if(NOT DEFINED QT_VERSION_MAJOR)
+	find_package(QT NAMES Qt6 Qt5 COMPONENTS Core)
+	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Core Widgets Core Gui Xml Network Svg Concurrent REQUIRED)
+endif()
 
 if(UNIX AND NOT APPLE)
 	if (NOT CMAKE_SHARED_LINKER_FLAGS)
