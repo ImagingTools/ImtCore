@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Acf>
+    <AcfHeader>
+        <VersionInfos>
+            <Version Id="0" Number="5221" Description="ACF"/>
+            <Version Id="1" Number="2205" Description="ACF-Solutions"/>
+            <Version Id="1023" Number="394754" Description="Qt Framework"/>
+        </VersionInfos>
+    </AcfHeader>
+    <Description></Description>
+    <Keywords></Keywords>
+    <ElementsList>
+        <Element Id="LoggingParams" PackageId="BasePck" ComponentId="ComposedParamsSet">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap>
+                    <AttributeInfo Id="Parameters" Type="Reference[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TracingConfiguration</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="ParametersId" Type="Id[]" ExportId="">
+                        <Data IsEnabled="true">
+                            <Values>
+                                <Value>TracingLevel</Value>
+                            </Values>
+                        </Data>
+                    </AttributeInfo>
+                    <AttributeInfo Id="TypeId" Type="Id" ExportId="">
+                        <Data IsEnabled="true" Value="Default"/>
+                    </AttributeInfo>
+                </AttributeInfoMap>
+            </Data>
+        </Element>
+        <Element Id="TracingConfiguration" PackageId="BasePck" ComponentId="TracingConfiguration">
+            <Data IsEnabled="true" Flags="0">
+                <AttributeInfoMap/>
+            </Data>
+        </Element>
+    </ElementsList>
+    <EmbeddedRegistriesList/>
+    <ExportedInterfaces>
+        <Interface InterfaceId="imod::IModel" ComponentId="LoggingParams"/>
+        <Interface InterfaceId="iprm::IParamsSet" ComponentId="LoggingParams"/>
+        <Interface InterfaceId="iser::ISerializable" ComponentId="LoggingParams"/>
+        <Interface InterfaceId="istd::IChangeable" ComponentId="LoggingParams"/>
+        <Interface InterfaceId="istd::IPolymorphic" ComponentId="LoggingParams"/>
+        <Interface InterfaceId="istd::TIHierarchical&lt;istd::IPolymorphic&gt;" ComponentId="LoggingParams"/>
+    </ExportedInterfaces>
+    <ExportedComponents>
+        <Component ExportedId="TracingConfiguration" ComponentId="TracingConfiguration"/>
+    </ExportedComponents>
+</Acf>
