@@ -66,7 +66,7 @@ Item{
                     else {
                         if(item[keys[i]] !==undefined){
                             if(inputView.model.IsTreeModel(keys[i], model.index)){
-                                console.log("IS_MODEL:: ", keys[i])
+                                //console.log("IS_MODEL:: ", keys[i])
                                 item[keys[i]] = inputView.model.GetTreeItemModel(keys[i], model.index);
                             }
                             else {
