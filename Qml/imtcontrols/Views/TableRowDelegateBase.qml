@@ -289,9 +289,6 @@ Rectangle {
     }
 
     function checkedItemsChanged(){
-        console.log("checkedItemsChanged");
-        console.log("tableItem", tableItem);
-        console.log("model.index", model.index);
         if (tableItem){
             checkedState = tableItem.getCheckedItems().includes(model.index) ? Qt.Checked : Qt.Unchecked;
         }

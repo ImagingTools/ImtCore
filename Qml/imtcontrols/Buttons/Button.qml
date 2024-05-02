@@ -46,13 +46,11 @@ ControlBase {
         }
     }
 
-
     onDecoratorChanged: {
         if(focus){
             forceActiveFocus()
         }
     }
-
 
     Keys.onPressed: {
         if (event.key === Qt.Key_Return || event.key === Qt.Key_Space){
@@ -77,28 +75,32 @@ ControlBase {
                 _private.onClicked()
             }
         }
+
         onDoubleClicked: {
             baseButton.doubleClicked();
         }
+
         onPressed: {
             baseButton.down = true
             baseButton.pressed();
 
         }
+
         onReleased: {
             baseButton.down = false
             baseButton.released();
         }
+
         onEntered: {
             baseButton.entered(mouseX, mouseY);
         }
+
         onExited: {
             baseButton.exited(mouseX, mouseY);
         }
+
         onPositionChanged: {
             baseButton.positionChanged(mouse.x, mouse.y);
         }
-
     }
-
 }

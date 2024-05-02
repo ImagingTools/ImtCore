@@ -157,7 +157,7 @@ void CLicenseManagerViewDelegateComp::SetupSummaryInformation()
 	m_summaryInformationTypes.InsertItem("Name", tr("License Name"), "");
 	m_summaryInformationHeaders["Name"] = HeaderInfo(true, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
-	m_summaryInformationTypes.InsertItem("Id", tr("License-ID"), "");//Изменил LicenseId на Id
+	m_summaryInformationTypes.InsertItem("Id", tr("License-ID"), "");
 	m_summaryInformationHeaders["Id"] = HeaderInfo(true, HeaderInfo::IF_FILTERABLE | HeaderInfo::IF_SORTABLE);
 
 	m_summaryInformationTypes.InsertItem("Description", tr("Description"), "");

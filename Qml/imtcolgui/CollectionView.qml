@@ -113,6 +113,8 @@ Item {
 
         function onSelectionChanged(selection){
             root.selectionChanged(selection);
+
+            additionalInformation.visible = root.visibleMetaInfo && root.table.tableSelection.selectedIndexes.length == 0;
         }
 
         function onRightButtonMouseClicked(mouseX, mouseY){
@@ -326,10 +328,35 @@ Item {
         anchors.top: parent.top;
         anchors.right: parent.right;
 
-        width: 0;
+        width: visible ? 200 : 0;
         height: parent.height;
 
         visible: root.visibleMetaInfo;
+    }
+
+    Rectangle {
+        id: additionalInformation;
+
+        anchors.fill: collectionMetaInfo;
+        anchors.margins: Style.size_mainMargin;
+
+        color: collectionMetaInfo.color;
+
+        visible: root.visibleMetaInfo;
+
+        Text {
+            id: valueText;
+
+            anchors.fill: parent;
+
+            font.family: Style.fontFamily;
+            font.pixelSize: Style.fontSize_common;
+
+            wrapMode: Text.WordWrap;
+            color: Style.textColor;
+
+            text: qsTr("Please select an item for showing additional informations");
+        }
     }
 }
 

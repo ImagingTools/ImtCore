@@ -74,23 +74,6 @@ CollectionView {
             let elementId = elementsModel.GetData("Id", index);
             metaInfoProvider.getMetaInfo(elementId);
         }
-
-        if (selection.length !== 0){
-            if (root.metaInfoView.width !== 200){
-                animation.from = 0;
-                animation.to = 200;
-
-                animation.start();
-            }
-        }
-        else{
-            if (root.metaInfoView.width !== 0){
-                animation.from = 200;
-                animation.to = 0;
-
-                animation.start();
-            }
-        }
     }
 
     onVisibleChanged: {
@@ -103,8 +86,6 @@ CollectionView {
     }
 
     function receiveRemoteChanges(){
-        console.log("receiveRemoteChanges");
-
         if (hasRemoteChanges){
             hasRemoteChanges = false;
 
@@ -119,13 +100,6 @@ CollectionView {
         Events.sendEvent("SetAlertPanel", parameters)
     }
 
-    NumberAnimation {
-        id: animation;
-
-        target: root.metaInfoView;
-        property: "width";
-        duration: 100;
-    }
 
     MetaInfoProvider {
         id: metaInfoProvider;
@@ -221,10 +195,12 @@ CollectionView {
     SubscriptionClient {
         id: subscriptionClient;
 
+        Component.onDestruction: {
+            Events.sendEvent("UnRegisterSubscription", subscriptionClient);
+        }
+
         property bool ok: root.collectionId !== "" && subscriptionClient.subscriptionId !== "";
         onOkChanged: {
-            console.log("onOkChanged", ok, root.collectionId );
-
             if (ok){
                 let subscriptionRequestId = "On" + root.collectionId + "CollectionChanged"
                 var query = Gql.GqlRequest("subscription", subscriptionRequestId);

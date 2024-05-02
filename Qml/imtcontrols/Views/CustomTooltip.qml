@@ -219,6 +219,7 @@ ControlBase {
         property real x: 0;
         property real y: 0;
         onFinished: {
+            console.log("pauseOpenTooltip onFinished");
             if(customTooltip.decorator_ && customTooltip.decorator_.show !== undefined){
                 customTooltip.decorator_.show(customTooltip.text, customTooltip.timeout);
             }

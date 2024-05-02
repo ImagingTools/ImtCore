@@ -27,12 +27,29 @@ DocumentManager {
         stackView.pop();
     }
 
-    Component.onDestruction: {
-        Events.unSubscribeEvent("MenuModelChanged", documentManager.onMenuModelChanged);
-    }
-
     Component.onCompleted: {
         Events.subscribeEvent("MenuModelChanged", documentManager.onMenuModelChanged);
+        Events.subscribeEvent("SetAlertPanel", setAlert);
+    }
+
+    Component.onDestruction: {
+        Events.unSubscribeEvent("MenuModelChanged", documentManager.onMenuModelChanged);
+        Events.unSubscribeEvent("SetAlertPanel", setAlert);
+    }
+
+
+    function setAlert(parameters){
+        if (!parameters){
+            console.error("Unable to set alert panel, 'parameters' is invalid");
+            return;
+        }
+
+        let id = parameters["Id"];
+        let alertPanelComp = parameters["AlertPanelComp"];
+
+        if (id === documentManager.startPageObj["Id"]){
+            setAlertPanel(alertPanelComp);
+        }
     }
 
     function loadStartItem(){
@@ -51,7 +68,6 @@ DocumentManager {
         }
 
         addInitialItem(startItemComp, name);
-//        Events.sendEvent("MenuModelRequest", true);
     }
 
     function onMenuModelChanged(model){
@@ -93,8 +109,6 @@ DocumentManager {
 
     Loader {
         id: alertPanel;
-
-//        anchors.fill: parent;
 
         height: visible ? 40: 0;
 

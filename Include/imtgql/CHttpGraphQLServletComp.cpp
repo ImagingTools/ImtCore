@@ -191,7 +191,7 @@ imtrest::ConstResponsePtr CHttpGraphQLServletComp::OnPost(
 		}
 	}
 
-	SendErrorMessage(0, QString("Internal server error for command %1").arg(qPrintable(gqlCommand)), "GraphQL - servlet");
+	SendErrorMessage(0, QString("Internal server error for command '%1'").arg(qPrintable(gqlCommand)), "GraphQL - servlet");
 
 	return GenerateError(imtrest::IProtocolEngine::StatusCode::SC_INTERNAL_SERVER_ERROR,"Request incorrected",request);
 }

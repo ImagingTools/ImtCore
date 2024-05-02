@@ -15,10 +15,10 @@ DecoratorBase {
         id: background
 
         anchors.fill: parent
-        color: !baseElement ? "transparent" :
-                              baseElement.highlighted ? Style.selectedColor :
-                              baseElement.down || baseElement.checked ?
-                                   Style.buttonPressedColor : baseElement.selected ?
+        color: !commonButtonDecorator.baseElement ? "transparent" :
+                              commonButtonDecorator.baseElement.highlighted ? Style.selectedColor :
+                              commonButtonDecorator.baseElement.down || commonButtonDecorator.baseElement.checked ?
+                                   Style.buttonPressedColor : commonButtonDecorator.baseElement.selected ?
                                        Style.buttonHoverColor : "transparent";
     }
 

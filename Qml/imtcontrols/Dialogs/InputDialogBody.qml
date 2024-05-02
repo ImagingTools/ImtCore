@@ -12,10 +12,8 @@ Item {
     property Item rootItem: null;
     property alias placeHolderText: inputField.placeHolderText;
 
-    onFocusChanged: {
-        if (focus){
-            inputField.forceActiveFocus();
-        }
+    Component.onCompleted: {
+        inputField.forceActiveFocus();
     }
 
     Column {

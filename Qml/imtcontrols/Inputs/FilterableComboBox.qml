@@ -86,7 +86,7 @@ ComboBox {
                                 text: comboBoxContainer.currentText;
 
                                 onTextChanged: {
-                                    if (text != comboBoxContainer.currentText){
+                                    if (text === "" || text != comboBoxContainer.currentText){
                                         comboBoxContainer.filter = text;
                                     }
                                 }

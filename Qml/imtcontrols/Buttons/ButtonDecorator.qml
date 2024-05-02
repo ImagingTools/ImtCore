@@ -26,6 +26,7 @@ DecoratorBase {
     property bool contentCentered: true;
 
     property string tooltipText: baseElement ? baseElement.tooltipText : "";
+    property bool enabled: baseElement ? baseElement.enabled : false;
 
     signal mouseEntered(real mouseX, real mouseY);
     signal mouseExited(real mouseX, real mouseY);
@@ -53,16 +54,23 @@ DecoratorBase {
     }
 
     onMousePositionChanged: {
-        if(tooltip.text !== ""){
-            if(mouseX >= 0 && mouseX <= baseElement.width && mouseY >= 0 && mouseY <= baseElement.height)
-            tooltip.show(mouseX, mouseY);
+        if(tooltip.text !== "" && enabled){
+            if(mouseX >= 0 && mouseX <= baseElement.width && mouseY >= 0 && mouseY <= baseElement.height){
+                tooltip.show(mouseX, mouseY);
+            }
+            else{
+                closeTooltip();
+            }
         }
     }
 
-
     onMouseExited: {
-        if(tooltip.text !== ""){
-            tooltip.hide();
+        closeTooltip();
+    }
+
+    onEnabledChanged: {
+        if (!enabled){
+            closeTooltip()
         }
     }
 
@@ -105,9 +113,7 @@ DecoratorBase {
         Item {
             id: textItem;
 
-            width: helperText.width > commonButtonDecorator.maxTextWidth ? commonButtonDecorator.maxTextWidth :
-//                   helperText.width < commonButtonDecorator.minTextWidth ? commonButtonDecorator.minTextWidth :
-                   helperText.width;
+            width: helperText.width > commonButtonDecorator.maxTextWidth ? commonButtonDecorator.maxTextWidth : helperText.width;
             height: textObj.height;
 
             visible: textObj.text !== "";
@@ -140,7 +146,7 @@ DecoratorBase {
     }
 
     function closeTooltip(){
-        if(tooltip.openST){
+        if(tooltip && tooltip.openST){
             tooltip.closeTooltip();
         }
     }
@@ -153,6 +159,10 @@ DecoratorBase {
         componentMinHeight: 30;
 
         fitToHCenter: true;
+
+        function hide(){
+            closeTooltip();
+        }
     }
 }
 
