@@ -14,7 +14,7 @@ function (imt_core_upgrade_partitura A_WORKING_DIRECTORY)
 
 	execute_process(
 		COMMAND
-			${PYTHONEXE} ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../../PartituraUpgrade.py -D${A_WORKING_DIRECTORY}
+			${PYTHONEXE} ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../PartituraUpgrade.py -D${A_WORKING_DIRECTORY}
 		RESULT_VARIABLE
 			PYTHONEXE_RESULT_CODE
 		RESULTS_VARIABLE
@@ -30,7 +30,7 @@ function (imt_core_upgrade_partitura A_WORKING_DIRECTORY)
 		message(WARNING "${PYTHONEXE_RESULTS}")
 		message(WARNING "${PYTHONEXE_OUTPUT}")
 		message(WARNING "${PYTHONEXE_ERROR}")
-		message(FATAL_ERROR "Process (${PYTHONEXE} ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../../PartituraUpgrade.py) finished unexpacted! [${PYTHONEXE_RESULT_CODE}]\nPlease ensure, the path to the svn programm exists and available(add to PATH system variable)")
+		message(FATAL_ERROR "Process (${PYTHONEXE} ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../PartituraUpgrade.py) finished unexpacted! [${PYTHONEXE_RESULT_CODE}]\nPlease ensure, the path to the svn programm exists and available(add to PATH system variable)")
 	endif()
 
 	if (CUSTOM_PYTHON)
