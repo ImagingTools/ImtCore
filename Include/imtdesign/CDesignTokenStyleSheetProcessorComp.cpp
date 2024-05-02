@@ -146,8 +146,7 @@ bool CDesignTokenStyleSheetProcessorComp::ProcesCssFile(const QByteArray& fileNa
 
 	CDesignTokenStyleUtils::SetVariables(fileData, '$', '{', '}', QVariantMap({ std::make_pair("Scheme", m_currentTheme) }));
 
-	// ensure, all variables is setted if no error ignoring
-
+	// ensure, all variables is setted
 	bool hasUnsettedValues = false;
 	static QRegularExpression veriableRegEx(R"(\$\{.{0,}\})");
 	QRegularExpressionMatchIterator variableGlobalMatch = veriableRegEx.globalMatch(fileData);
@@ -162,8 +161,6 @@ bool CDesignTokenStyleSheetProcessorComp::ProcesCssFile(const QByteArray& fileNa
 	if (hasUnsettedValues){
 		return false;
 	}
-
-
 
 	QFile outputImageFile(outputFileName);
 	bool openOutputFile = outputImageFile.open(QFile::WriteOnly);
