@@ -6,7 +6,6 @@ include(${ACFDIR}/Config/CMake/AcfQt.cmake)
 include(${ACFDIR}/Config/CMake/AcfStdGui.cmake)
 
 if(QT_VERSION_MAJOR EQUAL 6)
-	find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS OpenGLWidgets REQUIRED)
 	target_link_libraries(${PROJECT_NAME}  Qt${QT_VERSION_MAJOR}::OpenGLWidgets)
 endif()
 

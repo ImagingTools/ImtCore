@@ -2,8 +2,6 @@ project(ImtRestPck LANGUAGES CXX)
 
 message("QT_VERSION_MAJOR " ${QT_VERSION_MAJOR})
 
-find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS WebSockets REQUIRED)
-
 include(${ACFDIR}/Config/CMake/ComponentConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
 include(${ACFDIR}/Config/CMake/AcfQt.cmake)

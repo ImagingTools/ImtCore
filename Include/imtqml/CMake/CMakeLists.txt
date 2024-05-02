@@ -1,8 +1,4 @@
 project(imtqml LANGUAGES CXX)
-# set (CMAKE_CXX_STANDARD 11)
-
-find_package("Qt${QT_VERSION_MAJOR}" COMPONENTS Quick Qml QuickWidgets REQUIRED)
-
 
 include(${ACFDIR}/Config/CMake/StaticConfig.cmake)
 include(${IMTCOREDIR}/Config/CMake/ImtCore.cmake)
