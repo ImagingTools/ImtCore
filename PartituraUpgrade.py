@@ -1,6 +1,18 @@
 import pathlib, os, subprocess, re, argparse
 
 
+def GetSvnVersion(dirPath):
+	svnProcess = subprocess.Popen(
+				['svn', 'info', '--show-item', 'last-changed-revision', dirPath], 
+				stdin=subprocess.PIPE,
+				stdout=subprocess.PIPE)
+	svnProcessOutput = svnProcess.communicate()
+	svnRevision = svnProcessOutput[0].decode()
+	svnRevision = svnRevision.replace('\n', '')
+	print(f'Version: {svnRevision} of {dirPath}')
+
+	return svnRevision;
+
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Helper script to upgrade partitura")
 	parser.add_argument('-D', '--working-directory', required=False, help='The directory in which you want to find version template files')
@@ -12,19 +24,11 @@ if __name__ == "__main__":
 		workingDirectory = os.path.dirname(os.path.realpath(__file__))
 
 	print (f'Lookup starts at: {workingDirectory}')
-
-	svnProcess = subprocess.Popen(
-				['svn', 'info', '--show-item', 'revision', workingDirectory], 
-				stdin=subprocess.PIPE,
-				stdout=subprocess.PIPE)
-	svnProcessOutput = svnProcess.communicate()
-	svnRevision = svnProcessOutput[0].decode()
-	svnRevision = svnRevision.replace('\n', '')
-	print (f'SVN revision: {svnRevision}')
-
 	xtrAttrFileList = pathlib.Path(workingDirectory).rglob('*.acc.xtrsvn')
 	for xtrAttrFilePath in xtrAttrFileList:
 		print(f'processing: {xtrAttrFilePath}')
+		#cdUp X2 ->.arp ->Partitura ->dest
+		svnRevision = GetSvnVersion(xtrAttrFilePath.parents[2])
 		with open(xtrAttrFilePath, 'r') as xtrAttrFile:
 			xtrAttrFileData = xtrAttrFile.read()
 			outputFilePath = re.sub(r'.xtrsvn$', r'', str(xtrAttrFilePath))
