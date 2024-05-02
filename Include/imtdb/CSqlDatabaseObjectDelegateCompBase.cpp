@@ -73,7 +73,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetCountQuery(const iprm::IParams
 		}
 	}
 
-	return QString("SELECT COUNT(*) FROM \"%1\" %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(filterQuery).toUtf8();
+    return QString("SELECT COUNT(*) FROM %0.\"%1\" %2").arg(qPrintable(*m_tableSchemaAttrPtr), qPrintable(*m_tableNameAttrPtr)).arg(filterQuery).toUtf8();
 }
 
 
@@ -84,7 +84,8 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 			const iprm::IParamsSet* paramsPtr) const
 {
 	if (!objectId.isEmpty()){
-		return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
+        return QString("SELECT * FROM %0.\"%1\" WHERE \"%2\" = '%3'")
+                    .arg(qPrintable(*m_tableSchemaAttrPtr))
 					.arg(qPrintable(*m_tableNameAttrPtr))
 					.arg(qPrintable(*m_objectIdColumnAttrPtr))
 					.arg(qPrintable(objectId))
@@ -181,7 +182,7 @@ QVariant CSqlDatabaseObjectDelegateCompBase::GetElementInfoFromRecord(const QSql
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::CreateResetQuery(const imtbase::IObjectCollection& /*collection*/) const
 {
-	QByteArray retVal = QString("DELETE FROM \"%1\";").arg(qPrintable(*m_tableNameAttrPtr)).toUtf8();
+    QByteArray retVal = QString("DELETE FROM %0.\"%1\";").arg(qPrintable(*m_tableSchemaAttrPtr), qPrintable(*m_tableNameAttrPtr)).toUtf8();
 
 	return retVal;
 }
@@ -213,7 +214,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::CreateCollectionItemMetaInfoQuery
 
 QString CSqlDatabaseObjectDelegateCompBase::GetBaseSelectionQuery() const
 {
-	return QString("SELECT * FROM \"%1\"").arg(qPrintable(*m_tableNameAttrPtr));
+    return QString("SELECT * FROM %0.\"%1\"").arg(qPrintable(*m_tableSchemaAttrPtr), qPrintable(*m_tableNameAttrPtr));
 }
 
 
@@ -300,7 +301,9 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateFilterQuery(const iprm::IParamsSe
 		}
 	}
 
-	if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty()){
+    QString additionalFilters = CreateAdditionalFiltersQuery(filterParams);
+
+    if (!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty() || !additionalFilters.isEmpty()){
 		filterQuery = " WHERE ";
 	}
 
@@ -312,6 +315,14 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateFilterQuery(const iprm::IParamsSe
 	if (!textFilterQuery.isEmpty()){
 		filterQuery += "(" + textFilterQuery + ")";
 	}
+
+    if ((!objectFilterQuery.isEmpty() || !textFilterQuery.isEmpty()) && !additionalFilters.isEmpty()){
+        filterQuery += " AND ";
+    }
+
+    if(!additionalFilters.isEmpty()){
+        filterQuery += "(" + additionalFilters + ")";
+    }
 
 	return true;
 }
@@ -340,7 +351,7 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateObjectFilterQuery(
 
 			QString value = textParamPtr->GetText();
 
-			filterQuery = QString("%1 = '%2'").arg(qPrintable(key)).arg(value);
+            filterQuery = QString("\"%1\" = '%2'").arg(qPrintable(key)).arg(value);
 		}
 	}
 
@@ -390,6 +401,8 @@ bool CSqlDatabaseObjectDelegateCompBase::CreateSortQuery(
 	case imtbase::ICollectionFilter::SO_DESC:
 		sortOrder = "DESC";
 		break;
+    default:
+        break;
 	}
 
 	if (!columnId.isEmpty() && !sortOrder.isEmpty()){
@@ -408,6 +421,12 @@ QString CSqlDatabaseObjectDelegateCompBase::EncodeTextArgument(const QString& ar
 
 	return retVal;
 }
+
+QString CSqlDatabaseObjectDelegateCompBase::CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const
+{
+    return QString();
+}
+
 
 } // namespace imtdb
 
