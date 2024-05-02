@@ -418,6 +418,7 @@ window.onload = ()=>{
         
     }
 
+    mainRoot.createProperty('appName',QString,'')
     mainRoot.createProperty('location',QVar,location)
     mainRoot.createProperty('history',QVar,history)
     mainRoot.createProperty('language',QString,'')
