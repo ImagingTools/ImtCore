@@ -21,6 +21,8 @@ if (NOT DEFINED IMTCOREDIR)
 endif ()
 
 include(${IMTCOREDIR}/Config/CMake/ImtCoreEnv.cmake)
+include(${IMTCOREDIR}/Config/CMake/PartituraUpgrade.cmake)
+imt_core_upgrade_partitura("${CMAKE_CURRENT_LIST_DIR}/../..")
 
 set (INCLUDE_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Include")
 set (IMPL_DIR "${CMAKE_CURRENT_LIST_DIR}/../../Impl")
@@ -101,6 +103,7 @@ add_subdirectory("${INCLUDE_DIR}/imtauthgql/CMake" "${AUX_INCLUDE_DIR}/imtauthgq
 add_subdirectory("${INCLUDE_DIR}/imtauthdb/CMake" "${AUX_INCLUDE_DIR}/imtauthdb")
 add_subdirectory("${INCLUDE_DIR}/imtgqlrepo/CMake" "${AUX_INCLUDE_DIR}/imtgqlrepo")
 add_subdirectory("${INCLUDE_DIR}/imtservice/CMake" "${AUX_INCLUDE_DIR}/imtservice")
+
 
 #-------- Qml --------
 add_subdirectory("${QML_DIR}/imtdocgui/CMake" "${AUX_INCLUDE_DIR}/imtdocguiqml")
