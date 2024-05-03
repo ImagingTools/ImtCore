@@ -93,21 +93,24 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 			const iprm::IParamsSet* paramsPtr) const
 {
 	if (!objectId.isEmpty()){
-		QByteArray tableSchema = *m_tableSchemaAttrPtr;
-		if (tableSchema.isEmpty()){
+		QByteArray tableSchema;
+		if (m_tableSchemaAttrPtr.IsValid()){
+			tableSchema = *m_tableSchemaAttrPtr;
+
+			return QString("SELECT * FROM %0.\"%1\" WHERE \"%2\" = '%3'")
+				.arg(qPrintable(*m_tableSchemaAttrPtr))
+				.arg(qPrintable(*m_tableNameAttrPtr))
+				.arg(qPrintable(*m_objectIdColumnAttrPtr))
+				.arg(qPrintable(objectId))
+				.toUtf8();
+		}
+		else{
 			return QString("SELECT * FROM \"%1\" WHERE \"%2\" = '%3'")
 					.arg(qPrintable(*m_tableNameAttrPtr))
 					.arg(qPrintable(*m_objectIdColumnAttrPtr))
 					.arg(qPrintable(objectId))
 					.toUtf8();
 		}
-
-		return QString("SELECT * FROM %0.\"%1\" WHERE \"%2\" = '%3'")
-				.arg(qPrintable(*m_tableSchemaAttrPtr))
-				.arg(qPrintable(*m_tableNameAttrPtr))
-				.arg(qPrintable(*m_objectIdColumnAttrPtr))
-				.arg(qPrintable(objectId))
-				.toUtf8();
 	}
 	else{
 		QString sortQuery;
