@@ -73,13 +73,18 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetCountQuery(const iprm::IParams
 		}
 	}
 
-	QByteArray tableSchema = *m_tableSchemaAttrPtr;
+	QByteArray tableSchema;
+
+	if (m_tableSchemaAttrPtr.IsValid()){
+		tableSchema = *m_tableSchemaAttrPtr;
+	}
+
 	if (tableSchema.isEmpty()){
 		return QString("SELECT COUNT(*) FROM \"%1\" %2").arg(qPrintable(*m_tableNameAttrPtr)).arg(filterQuery).toUtf8();
 	}
 
 	return QString("SELECT COUNT(*) FROM %0.\"%1\" %2")
-			.arg(qPrintable(*m_tableSchemaAttrPtr))
+			.arg(qPrintable(tableSchema))
 			.arg(qPrintable(*m_tableNameAttrPtr))
 			.arg(filterQuery)
 			.toUtf8();
@@ -98,7 +103,7 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::GetSelectionQuery(
 			tableSchema = *m_tableSchemaAttrPtr;
 
 			return QString("SELECT * FROM %0.\"%1\" WHERE \"%2\" = '%3'")
-				.arg(qPrintable(*m_tableSchemaAttrPtr))
+				.arg(qPrintable(tableSchema))
 				.arg(qPrintable(*m_tableNameAttrPtr))
 				.arg(qPrintable(*m_objectIdColumnAttrPtr))
 				.arg(qPrintable(objectId))
@@ -203,13 +208,17 @@ QVariant CSqlDatabaseObjectDelegateCompBase::GetElementInfoFromRecord(const QSql
 
 QByteArray CSqlDatabaseObjectDelegateCompBase::CreateResetQuery(const imtbase::IObjectCollection& /*collection*/) const
 {
-	QByteArray tableSchema = *m_tableSchemaAttrPtr;
+	QByteArray tableSchema;
+	if (m_tableSchemaAttrPtr.IsValid()){
+		tableSchema = *m_tableSchemaAttrPtr;
+	}
+
 	if (tableSchema.isEmpty()){
 		return QString("DELETE FROM \"%1\";").arg(qPrintable(*m_tableNameAttrPtr)).toUtf8();
 	}
 
 	return QString("DELETE FROM %0.\"%1\";")
-			.arg(qPrintable(*m_tableSchemaAttrPtr))
+			.arg(qPrintable(tableSchema))
 			.arg(qPrintable(*m_tableNameAttrPtr))
 			.toUtf8();
 }
@@ -241,13 +250,17 @@ QByteArray CSqlDatabaseObjectDelegateCompBase::CreateCollectionItemMetaInfoQuery
 
 QString CSqlDatabaseObjectDelegateCompBase::GetBaseSelectionQuery() const
 {
-	QByteArray tableSchema = *m_tableSchemaAttrPtr;
+	QByteArray tableSchema ;
+	if (m_tableSchemaAttrPtr.IsValid()){
+		tableSchema = *m_tableSchemaAttrPtr;
+	}
+
 	if (tableSchema.isEmpty()){
 		return QString("SELECT * FROM \"%1\"").arg(qPrintable(*m_tableNameAttrPtr));
 	}
 
 	return QString("SELECT * FROM %0.\"%1\"")
-			.arg(qPrintable(*m_tableSchemaAttrPtr))
+			.arg(qPrintable(tableSchema))
 			.arg(qPrintable(*m_tableNameAttrPtr));
 }
 
