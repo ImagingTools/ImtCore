@@ -20,10 +20,6 @@ ItemDelegateDecorator {
     property bool isSeparator: !root.baseElement ? false : root.baseElement.isSeparator;
     property bool selected: !root.baseElement ? false : root.baseElement.selected;
 
-    onSelectedChanged: {
-        console.log("Decorator onSelectedChanged", selected);
-    }
-
     Rectangle {
         id: separator;
 

@@ -205,7 +205,9 @@ Item {
 
                     onClicked: {
                         Events.sendEvent(commandsDecoratorContainer.commandId + "CommandActivated", model.Id);
-                        buttonPanel.clicked(id);
+                        if (buttonPanel){
+                            buttonPanel.clicked(id);
+                        }
                     }
                 }
 

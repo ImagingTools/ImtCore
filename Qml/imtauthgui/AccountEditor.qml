@@ -24,19 +24,6 @@ ViewBase {
         Events.unSubscribeEvent("OnLocalizationChanged", accountEditorContainer.onLocalizationChanged);
     }
 
-    onWidthChanged: {
-        checkWidth();
-    }
-
-    function checkWidth(){
-        if (width < bodyColumn.width + scrollbar.width + 50){
-            bodyColumn.width = width - 50;
-        }
-        else{
-            bodyColumn.width = 700;
-        }
-    }
-
     function onLocalizationChanged(language){
         bodyColumn.updateHeaders();
     }
@@ -169,6 +156,7 @@ ViewBase {
 
     CustomScrollbar {
         id: scrollbar;
+        z: parent.z + 1;
 
         anchors.right: parent.right;
         anchors.top: flickable.top;
@@ -178,6 +166,21 @@ ViewBase {
         targetItem: flickable;
 
         visible: accountEditorContainer.visible;
+    }
+
+    CustomScrollbar{
+        id: scrollHoriz;
+
+        z: parent.z + 1;
+
+        anchors.left: flickable.left;
+        anchors.right: flickable.right;
+        anchors.bottom: flickable.bottom;
+
+        secondSize: 10;
+
+        vertical: false;
+        targetItem: flickable;
     }
 
     Flickable {
@@ -199,6 +202,7 @@ ViewBase {
         contentHeight: bodyColumn.height + 2 * Style.size_largeMargin;
 
         boundsBehavior: Flickable.StopAtBounds;
+        clip: true;
 
         Column {
             id: bodyColumn;

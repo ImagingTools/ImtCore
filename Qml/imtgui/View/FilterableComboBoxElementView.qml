@@ -31,7 +31,6 @@ ComboBoxElementView {
                 anchors.right: clearButton.left;
                 anchors.rightMargin: Style.size_mainMargin
 
-                width: 230;
                 height: 30;
 
                 filteringFields: root.filteringFields;

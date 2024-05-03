@@ -221,6 +221,10 @@ ViewCommandsDelegateBase {
                         collectionViewCommandsDelegate.collectionView.setElementDescription(index, inputValue)
                     }
                 }
+
+                if (collectionViewCommandsDelegate.collectionView){
+                    collectionViewCommandsDelegate.collectionView.table.forceActiveFocus();
+                }
             }
         }
     }
@@ -237,6 +241,10 @@ ViewCommandsDelegateBase {
                         let index = indexes[0];
                         collectionViewCommandsDelegate.collectionView.setElementName(index, inputValue)
                     }
+                }
+
+                if (collectionViewCommandsDelegate.collectionView){
+                    collectionViewCommandsDelegate.collectionView.table.forceActiveFocus();
                 }
             }
         }
@@ -255,6 +263,10 @@ ViewCommandsDelegateBase {
                         let index = indexes[0];
                         collectionViewCommandsDelegate.collectionView.removeElement(index)
                     }
+                }
+
+                if (collectionViewCommandsDelegate.collectionView){
+                    collectionViewCommandsDelegate.collectionView.table.forceActiveFocus();
                 }
             }
         }

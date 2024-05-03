@@ -49,6 +49,12 @@ Item {
         Events.unSubscribeEvent("OnLocalizationChanged", onLocalizationChanged)
     }
 
+    Keys.onPressed: {
+        if (event.key === Qt.Key_Delete){
+            container.commandsDelegate.commandHandle("Remove");
+        }
+    }
+
     function onLocalizationChanged(language){
         if (root.dataController){
             root.dataController.updateModel();

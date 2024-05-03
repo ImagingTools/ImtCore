@@ -69,7 +69,6 @@ Rectangle {
 
     //
     property string borderColorHorizontal: "transparent";
-//    property string borderColorVertical: "transparent";
     property string borderColorVertical: "black";
     property int horizontalBorderSize: 0;
     property int verticalBorderSize: 0;
@@ -99,7 +98,6 @@ Rectangle {
 
     property TableSelection tableSelection: TableSelection {
         onSelectionChanged: {
-            console.log("TableSelection onSelectionChanged", tableContainer.tableSelection.selectedIndexes);
             tableContainer.selectionChanged(tableContainer.tableSelection.selectedIndexes);
         }
     }
@@ -207,7 +205,6 @@ Rectangle {
     }
 
     function setDecorators(){
-        console.log("onTableDecoratorChanged", tableContainer.tableDecorator, tableContainer.headers);
         if (!tableContainer.tableDecorator){
             return;
         }
@@ -450,8 +447,6 @@ Rectangle {
     }
 
     function setBorderParams(){
-
-        console.log("setBorderParams", tableContainer.emptyDecorHeader, tableContainer.canSetBorderParams)
         if(tableContainer.emptyDecorHeader){
             return;
         }
@@ -526,7 +521,6 @@ Rectangle {
 
 
     function getSelectedId(){
-        console.log("getSelectedId", tableContainer.selectedIndex);
         if (tableContainer.selectedIndex > -1){
             let item = elementsListObj.itemAtIndex(tableContainer.selectedIndex);
             return item.getSelectedId();
@@ -678,7 +672,7 @@ Rectangle {
 
         anchors.right: elementsListObj.right;
         anchors.top: elementsListObj.bottom;
-        anchors.topMargin: 1 ;
+        anchors.topMargin: 1;
 
         secondSize: 10;
 

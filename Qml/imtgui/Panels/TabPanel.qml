@@ -35,15 +35,21 @@ Rectangle {
     ListView {
         id: list;
 
-        width: externButtons.visible ? parent.width - externButtons.width :  parent.width;
+        anchors.left: parent.left;
+        anchors.right: externButtons.left;
+
         height: parent.height;
 
         clip: true;
-        orientation: ListView.Horizontal;
 
+        orientation: ListView.Horizontal;
         boundsBehavior: Flickable.StopAtBounds;
 
         spacing: 0;
+
+        onContentWidthChanged: {
+            tabPanelContainer.viewTabInListView(tabPanelContainer.selectedIndex);
+        }
 
         delegate: TabDelegate {
             height: list.height;
@@ -72,16 +78,12 @@ Rectangle {
 
         anchors.right: parent.right;
 
+        width: visible ? height : 0;
         height: parent.height;
-        width: height;
 
         color: Style.backgroundColor;
 
         visible: list.contentWidth > tabPanelContainer.width;
-
-        MouseArea {
-            anchors.fill: parent;
-        }
 
         Button {
             id: leftButton;

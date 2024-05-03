@@ -28,11 +28,28 @@ ViewBase {
     CustomScrollbar {
         id: scrollbar;
 
+        z: parent.z + 1;
+
         anchors.right: parent.right;
         anchors.top: flickable.top;
         anchors.bottom: flickable.bottom;
 
         secondSize: 10;
+        targetItem: flickable;
+    }
+
+    CustomScrollbar{
+        id: scrollHoriz;
+
+        z: parent.z + 1;
+
+        anchors.left: flickable.left;
+        anchors.right: flickable.right;
+        anchors.bottom: flickable.bottom;
+
+        secondSize: 10;
+
+        vertical: false;
         targetItem: flickable;
     }
 

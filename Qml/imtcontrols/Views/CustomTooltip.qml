@@ -64,8 +64,6 @@ ControlBase {
 
     function openTooltip(xX, yY){
         if(!customTooltip.openST){
-            console.log("openTooltip", xX, yY);
-
             var point = mapToItem(null, xX, yY);
             var centeredAdd = customTooltip.fitToTextWidth ? customTooltip.fitToHCenter * (forWidthText.width/2 + customTooltip.textMargin + customTooltip.componentMargin) :
                                                              customTooltip.fitToHCenter * (customTooltip.tooltipWidth/2 + customTooltip.componentMargin);
@@ -98,8 +96,6 @@ ControlBase {
 
     function closeTooltip(){
         if(customTooltip.openST){
-            console.log("closeTooltip");
-
             modalDialogManager.closeDialog();
 
             customTooltip.openST = false;
@@ -219,7 +215,6 @@ ControlBase {
         property real x: 0;
         property real y: 0;
         onFinished: {
-            console.log("pauseOpenTooltip onFinished");
             if(customTooltip.decorator_ && customTooltip.decorator_.show !== undefined){
                 customTooltip.decorator_.show(customTooltip.text, customTooltip.timeout);
             }

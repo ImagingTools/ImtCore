@@ -24,8 +24,9 @@ DecoratorBase {
     property alias backgroundItem: background
 
     property bool contentCentered: true;
+    property bool textIsCropped: helperText.width > textObj.width;
 
-    property string tooltipText: baseElement ? baseElement.tooltipText : "";
+    property string tooltipText: baseElement && baseElement.tooltipText !== "" ? baseElement.tooltipText : (textIsCropped ? textObj.text : "");
     property bool enabled: baseElement ? baseElement.enabled : false;
 
     signal mouseEntered(real mouseX, real mouseY);
@@ -151,7 +152,7 @@ DecoratorBase {
         }
     }
 
-    CustomTooltip{
+    CustomTooltip {
         id: tooltip;
 
         text: commonButtonDecorator.tooltipText;
@@ -162,6 +163,10 @@ DecoratorBase {
 
         function hide(){
             closeTooltip();
+        }
+
+        function show(xX, yY){
+            openTooltip(xX, yY);
         }
     }
 }

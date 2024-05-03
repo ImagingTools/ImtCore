@@ -52,7 +52,7 @@ Rectangle {
                 delegate: Item {
                     id: repeaterTitle;
 
-                    width: collectionMetaInfo.width;
+                    width: column.width;
                     height: childColumn.height + nameTitle.height + container.elementHeight;
 
                     Component.onCompleted: {
@@ -64,9 +64,9 @@ Rectangle {
 
                         width: column.width;
 
-                        anchors.horizontalCenter: parent.horizontalCenter;
-                        anchors.left: parent.left;
-                        anchors.leftMargin: Style.size_mainMargin;
+//                        anchors.horizontalCenter: parent.horizontalCenter;
+//                        anchors.left: parent.left;
+//                        anchors.leftMargin: Style.size_mainMargin;
 
                         font.pixelSize: Style.fontSize_common;
                         font.family: Style.fontFamilyBold;
@@ -85,16 +85,16 @@ Rectangle {
                         anchors.top: nameTitle.bottom;
                         anchors.topMargin: Style.size_smallMargin;
 
-                        width: collectionMetaInfo.width;
+                        width: column.width;
 
                         Repeater {
                             id: repeaterChilds;
 
-                            width: collectionMetaInfo.width;
+                            width: column.width;
 
                             delegate: Rectangle {
                                 height: container.elementHeight > valueText.contentHeight ? container.elementHeight : valueText.contentHeight;
-                                width: collectionMetaInfo.width;
+                                width: column.width;
 
                                 color: "transparent";
 
@@ -105,7 +105,7 @@ Rectangle {
 
                                     anchors.verticalCenter: parent.verticalCenter
                                     anchors.left: parent.left;
-                                    anchors.leftMargin: Style.size_mainMargin;
+                                    anchors.leftMargin: width > 0 ? Style.size_mainMargin : 0;
 
                                     width: model.Icon === undefined ? 0 : Style.iconSizeSmall
                                     height: width
@@ -122,7 +122,7 @@ Rectangle {
                                     anchors.left: icon.right;
                                     anchors.leftMargin: icon.width == 0 ? 0 : Style.size_mainMargin;
                                     anchors.right: parent.right;
-                                    anchors.rightMargin: Style.size_mainMargin;
+//                                    anchors.rightMargin: Style.size_mainMargin;
 
                                     font.family: Style.fontFamily;
                                     font.pixelSize: Style.fontSize_small;

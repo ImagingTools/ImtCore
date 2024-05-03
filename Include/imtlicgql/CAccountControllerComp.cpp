@@ -161,8 +161,6 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 			companyInfoPtr->SetEmail(email);
 		}
 
-//		imtauth::CAddress address;
-
 		if (itemModel.ContainsKey("CompanyName")){
 			QString companyName = itemModel.GetData("CompanyName").toString();
 		}
@@ -203,7 +201,7 @@ istd::IChangeable* CAccountControllerComp::CreateObject(
 		return companyInfoPtr;
 	}
 
-	errorMessage = QObject::tr("Can not create account: %1").arg(QString(objectId));
+	errorMessage = QString("Can not create account: %1").arg(QString(objectId));
 	SendErrorMessage(0, errorMessage, "CAccountControllerComp");
 
 	return nullptr;

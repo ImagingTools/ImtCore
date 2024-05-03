@@ -12,16 +12,12 @@ ViewBase {
     property TreeItemModel groupsModel: TreeItemModel {}
 
     function updateGui(){
-        console.log("UserView updateGui")
-
         generalGroup.updateGui();
         rolesGroup.updateGui();
         groupsBlock.updateGui();
     }
 
     function updateModel(){
-        console.log("UserView updateModel")
-
         generalGroup.updateModel();
         rolesGroup.updateModel();
         groupsBlock.updateModel();
@@ -30,11 +26,28 @@ ViewBase {
     CustomScrollbar {
         id: scrollbar;
 
+        z: parent.z + 1;
+
         anchors.right: parent.right;
         anchors.top: flickable.top;
         anchors.bottom: flickable.bottom;
 
         secondSize: 10;
+        targetItem: flickable;
+    }
+
+    CustomScrollbar{
+        id: scrollHoriz;
+
+        z: parent.z + 1;
+
+        anchors.left: flickable.left;
+        anchors.right: flickable.right;
+        anchors.bottom: flickable.bottom;
+
+        secondSize: 10;
+
+        vertical: false;
         targetItem: flickable;
     }
 
