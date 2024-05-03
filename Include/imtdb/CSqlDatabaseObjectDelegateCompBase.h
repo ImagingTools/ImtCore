@@ -26,7 +26,7 @@ public:
 		I_REGISTER_INTERFACE(imtdb::ISqlDatabaseObjectDelegate);
 		I_ASSIGN(m_typesCompPtr, "ObjectTypes", "List of object types supported by the related database collection", false, "ObjectTypes");
 		I_ASSIGN(m_databaseEngineCompPtr, "DatabaseEngine", "Database engine for SQL queries", true, "DatabaseEngine");
-        I_ASSIGN(m_tableSchemaAttrPtr, "TableSchema", "Name of the schema containing the object table", true, "public");
+		I_ASSIGN(m_tableSchemaAttrPtr, "TableSchema", "Name of the schema containing the object table", false, "");
 		I_ASSIGN(m_tableNameAttrPtr, "TableName", "Name of the object table", true, "");
 		I_ASSIGN(m_objectIdColumnAttrPtr, "ObjectIdColumn", "Name of the column containing ID of the object", true, "Id");
 		I_ASSIGN(m_objectTypeIdColumnAttrPtr, "ObjectTypeIdColumn", "Name of the column containing type-ID of the object", true, "TypeId");
@@ -70,7 +70,7 @@ protected:
 	virtual bool CreateFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const;
 	virtual bool CreateObjectFilterQuery(const iprm::IParamsSet& filterParams, QString& filterQuery) const;
 	virtual bool CreateTextFilterQuery(const imtbase::ICollectionFilter& collectionFilter, QString& textFilterQuery) const;
-    virtual QString CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const;
+	virtual QString CreateAdditionalFiltersQuery(const iprm::IParamsSet& filterParams) const;
 	virtual bool CreateSortQuery(const imtbase::ICollectionFilter& collectionFilter, QString& sortQuery) const;
 	virtual QString EncodeTextArgument(const QString& argument) const;
 
@@ -78,7 +78,7 @@ protected:
 	I_REF(imtdb::IDatabaseEngine, m_databaseEngineCompPtr);
 	I_REF(iprm::IOptionsList, m_typesCompPtr);
 	I_REF(iser::IVersionInfo, m_versionInfoCompPtr);
-    I_ATTR(QByteArray, m_tableSchemaAttrPtr);
+	I_ATTR(QByteArray, m_tableSchemaAttrPtr);
 	I_ATTR(QByteArray, m_tableNameAttrPtr);
 	I_ATTR(QByteArray, m_separatorObjectIdAttrPtr);
 	I_ATTR(QByteArray, m_objectIdColumnAttrPtr);
