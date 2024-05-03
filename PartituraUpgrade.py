@@ -9,9 +9,12 @@ def GetSvnVersion(dirPath):
 	svnProcessOutput = svnProcess.communicate()
 	svnRevision = svnProcessOutput[0].decode()
 	svnRevision = svnRevision.replace('\n', '')
+	svnRevision = svnRevision.replace('\t', '')
+	svnRevision = svnRevision.replace('\r', '')
 	print(f'Version: {svnRevision} of {dirPath}')
 
 	return svnRevision;
+
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Helper script to upgrade partitura")
